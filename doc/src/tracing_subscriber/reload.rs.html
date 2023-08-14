@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/nix/store/jnqxxv1xi811ni996b002f4jnyz38xck-vendor-cargo-deps/c19b7c6f923b580ac259164a89f2577984ad5ab09ee9d583b888f934adbbe8d0/tracing-subscriber-0.3.11/src/reload.rs`."><title>reload.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-f3501f0f5ae15dfb.css" id="mainThemeStyle"><div id="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="tracing_subscriber" data-themes="" data-resource-suffix="" data-rustdoc-version="1.71.0 (8ede3aae2 2023-07-12)" data-search-js="search-4926e5fc22a5646a.js" data-settings-js="settings-de11bff964e9d4e5.js" data-settings-css="settings-8c76f75bfb6bd192.css" data-theme-light-css="light-0f8c037637f9eb3e.css" data-theme-dark-css="dark-1097f8e92a01e3cf.css" data-theme-ayu-css="ayu-614652228113ac93.css" ></div><script src="../../static.files/storage-62ce34ea385b278a.js"></script><script defer src="../../static.files/source-script-11255107d0a65077.js"></script><script defer src="../../source-files.js"></script><script defer src="../../static.files/main-f0540c1d82cde29b.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../../static.files/light-0f8c037637f9eb3e.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../../static.files/dark-1097f8e92a01e3cf.css"><link rel="stylesheet" href="../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../tracing_subscriber/index.html"><img src="https://raw.githubusercontent.com/tokio-rs/tracing/master/assets/logo-type.png" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/nix/store/yf45a1rayffhnidhgyjynpyhr9lqkd09-vendor-cargo-deps/c19b7c6f923b580ac259164a89f2577984ad5ab09ee9d583b888f934adbbe8d0/tracing-subscriber-0.3.17/src/reload.rs`."><title>reload.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-f3501f0f5ae15dfb.css" id="mainThemeStyle"><div id="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="tracing_subscriber" data-themes="" data-resource-suffix="" data-rustdoc-version="1.71.0 (8ede3aae2 2023-07-12)" data-search-js="search-4926e5fc22a5646a.js" data-settings-js="settings-de11bff964e9d4e5.js" data-settings-css="settings-8c76f75bfb6bd192.css" data-theme-light-css="light-0f8c037637f9eb3e.css" data-theme-dark-css="dark-1097f8e92a01e3cf.css" data-theme-ayu-css="ayu-614652228113ac93.css" ></div><script src="../../static.files/storage-62ce34ea385b278a.js"></script><script defer src="../../static.files/source-script-11255107d0a65077.js"></script><script defer src="../../source-files.js"></script><script defer src="../../static.files/main-f0540c1d82cde29b.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../../static.files/light-0f8c037637f9eb3e.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../../static.files/dark-1097f8e92a01e3cf.css"><link rel="stylesheet" href="../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../tracing_subscriber/index.html"><img src="https://raw.githubusercontent.com/tokio-rs/tracing/master/assets/logo-type.png" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -283,13 +283,113 @@
 <a href="#283" id="283">283</a>
 <a href="#284" id="284">284</a>
 <a href="#285" id="285">285</a>
+<a href="#286" id="286">286</a>
+<a href="#287" id="287">287</a>
+<a href="#288" id="288">288</a>
+<a href="#289" id="289">289</a>
+<a href="#290" id="290">290</a>
+<a href="#291" id="291">291</a>
+<a href="#292" id="292">292</a>
+<a href="#293" id="293">293</a>
+<a href="#294" id="294">294</a>
+<a href="#295" id="295">295</a>
+<a href="#296" id="296">296</a>
+<a href="#297" id="297">297</a>
+<a href="#298" id="298">298</a>
+<a href="#299" id="299">299</a>
+<a href="#300" id="300">300</a>
+<a href="#301" id="301">301</a>
+<a href="#302" id="302">302</a>
+<a href="#303" id="303">303</a>
+<a href="#304" id="304">304</a>
+<a href="#305" id="305">305</a>
+<a href="#306" id="306">306</a>
+<a href="#307" id="307">307</a>
+<a href="#308" id="308">308</a>
+<a href="#309" id="309">309</a>
+<a href="#310" id="310">310</a>
+<a href="#311" id="311">311</a>
+<a href="#312" id="312">312</a>
+<a href="#313" id="313">313</a>
+<a href="#314" id="314">314</a>
+<a href="#315" id="315">315</a>
+<a href="#316" id="316">316</a>
+<a href="#317" id="317">317</a>
+<a href="#318" id="318">318</a>
+<a href="#319" id="319">319</a>
+<a href="#320" id="320">320</a>
+<a href="#321" id="321">321</a>
+<a href="#322" id="322">322</a>
+<a href="#323" id="323">323</a>
+<a href="#324" id="324">324</a>
+<a href="#325" id="325">325</a>
+<a href="#326" id="326">326</a>
+<a href="#327" id="327">327</a>
+<a href="#328" id="328">328</a>
+<a href="#329" id="329">329</a>
+<a href="#330" id="330">330</a>
+<a href="#331" id="331">331</a>
+<a href="#332" id="332">332</a>
+<a href="#333" id="333">333</a>
+<a href="#334" id="334">334</a>
+<a href="#335" id="335">335</a>
+<a href="#336" id="336">336</a>
+<a href="#337" id="337">337</a>
+<a href="#338" id="338">338</a>
+<a href="#339" id="339">339</a>
+<a href="#340" id="340">340</a>
+<a href="#341" id="341">341</a>
+<a href="#342" id="342">342</a>
+<a href="#343" id="343">343</a>
+<a href="#344" id="344">344</a>
+<a href="#345" id="345">345</a>
+<a href="#346" id="346">346</a>
+<a href="#347" id="347">347</a>
+<a href="#348" id="348">348</a>
+<a href="#349" id="349">349</a>
+<a href="#350" id="350">350</a>
+<a href="#351" id="351">351</a>
+<a href="#352" id="352">352</a>
+<a href="#353" id="353">353</a>
+<a href="#354" id="354">354</a>
+<a href="#355" id="355">355</a>
+<a href="#356" id="356">356</a>
+<a href="#357" id="357">357</a>
+<a href="#358" id="358">358</a>
+<a href="#359" id="359">359</a>
+<a href="#360" id="360">360</a>
+<a href="#361" id="361">361</a>
+<a href="#362" id="362">362</a>
+<a href="#363" id="363">363</a>
+<a href="#364" id="364">364</a>
+<a href="#365" id="365">365</a>
+<a href="#366" id="366">366</a>
+<a href="#367" id="367">367</a>
+<a href="#368" id="368">368</a>
+<a href="#369" id="369">369</a>
+<a href="#370" id="370">370</a>
+<a href="#371" id="371">371</a>
+<a href="#372" id="372">372</a>
+<a href="#373" id="373">373</a>
+<a href="#374" id="374">374</a>
+<a href="#375" id="375">375</a>
+<a href="#376" id="376">376</a>
+<a href="#377" id="377">377</a>
+<a href="#378" id="378">378</a>
+<a href="#379" id="379">379</a>
+<a href="#380" id="380">380</a>
+<a href="#381" id="381">381</a>
+<a href="#382" id="382">382</a>
+<a href="#383" id="383">383</a>
+<a href="#384" id="384">384</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Wrapper for a `Layer` to allow it to be dynamically reloaded.
 //!
-//! This module provides a [`Layer` type] which wraps another type implementing
-//! the [`Layer` trait], allowing the wrapped type to be replaced with another
+//! This module provides a [`Layer` type] implementing the [`Layer` trait] or [`Filter` trait]
+//! which wraps another type implementing the corresponding trait. This
+//! allows the wrapped type to be replaced with another
 //! instance of that type at runtime.
 //!
-//! This can be used in cases where a subset of `Subscriber` functionality
+//! This can be used in cases where a subset of `Layer` or `Filter` functionality
 //! should be dynamically reconfigured, such as when filtering directives may
 //! change at runtime. Note that this layer introduces a (relatively small)
 //! amount of overhead, and should thus only be used as needed.
@@ -337,11 +437,21 @@
 //! info!(&quot;This will be logged&quot;);
 //! ```
 //!
-//! [`Layer` type]: struct.Layer.html
-//! [`Layer` trait]: ../layer/trait.Layer.html
+//! ## Note
+//!
+//! The [`Layer`] implementation is unable to implement downcasting functionality,
+//! so certain [`Layer`] will fail to downcast if wrapped in a `reload::Layer`.
+//!
+//! If you only want to be able to dynamically change the
+//! `Filter` on a layer, prefer wrapping that `Filter` in the `reload::Layer`.
+//!
+//! [`Filter` trait]: crate::layer::Filter
+//! [`Layer` type]: Layer
+//! [`Layer` trait]: super::layer::Layer
 </span><span class="kw">use </span><span class="kw">crate</span>::layer;
 <span class="kw">use </span><span class="kw">crate</span>::sync::RwLock;
 
+<span class="kw">use </span>core::any::TypeId;
 <span class="kw">use </span>std::{
     error, fmt,
     marker::PhantomData,
@@ -350,10 +460,10 @@
 <span class="kw">use </span>tracing_core::{
     callsite, span,
     subscriber::{Interest, Subscriber},
-    Event, Metadata,
+    Dispatch, Event, LevelFilter, Metadata,
 };
 
-<span class="doccomment">/// Wraps a `Layer`, allowing it to be reloaded dynamically at runtime.
+<span class="doccomment">/// Wraps a `Layer` or `Filter`, allowing it to be reloaded dynamically at runtime.
 </span><span class="attr">#[derive(Debug)]
 </span><span class="kw">pub struct </span>Layer&lt;L, S&gt; {
     <span class="comment">// TODO(eliza): this once used a `crossbeam_util::ShardedRwLock`. We may
@@ -390,6 +500,10 @@
     </span>L: <span class="kw">crate</span>::Layer&lt;S&gt; + <span class="lifetime">&#39;static</span>,
     S: Subscriber,
 {
+    <span class="kw">fn </span>on_register_dispatch(<span class="kw-2">&amp;</span><span class="self">self</span>, subscriber: <span class="kw-2">&amp;</span>Dispatch) {
+        <span class="macro">try_lock!</span>(<span class="self">self</span>.inner.read()).on_register_dispatch(subscriber);
+    }
+
     <span class="kw">fn </span>on_layer(<span class="kw-2">&amp;mut </span><span class="self">self</span>, subscriber: <span class="kw-2">&amp;mut </span>S) {
         <span class="macro">try_lock!</span>(<span class="self">self</span>.inner.write(), <span class="kw">else return</span>).on_layer(subscriber);
     }
@@ -420,6 +534,11 @@
     }
 
     <span class="attr">#[inline]
+    </span><span class="kw">fn </span>event_enabled(<span class="kw-2">&amp;</span><span class="self">self</span>, event: <span class="kw-2">&amp;</span>Event&lt;<span class="lifetime">&#39;_</span>&gt;, ctx: layer::Context&lt;<span class="lifetime">&#39;_</span>, S&gt;) -&gt; bool {
+        <span class="macro">try_lock!</span>(<span class="self">self</span>.inner.read(), <span class="kw">else return </span><span class="bool-val">false</span>).event_enabled(event, ctx)
+    }
+
+    <span class="attr">#[inline]
     </span><span class="kw">fn </span>on_event(<span class="kw-2">&amp;</span><span class="self">self</span>, event: <span class="kw-2">&amp;</span>Event&lt;<span class="lifetime">&#39;_</span>&gt;, ctx: layer::Context&lt;<span class="lifetime">&#39;_</span>, S&gt;) {
         <span class="macro">try_lock!</span>(<span class="self">self</span>.inner.read()).on_event(event, ctx)
     }
@@ -443,15 +562,88 @@
     </span><span class="kw">fn </span>on_id_change(<span class="kw-2">&amp;</span><span class="self">self</span>, old: <span class="kw-2">&amp;</span>span::Id, new: <span class="kw-2">&amp;</span>span::Id, ctx: layer::Context&lt;<span class="lifetime">&#39;_</span>, S&gt;) {
         <span class="macro">try_lock!</span>(<span class="self">self</span>.inner.read()).on_id_change(old, new, ctx)
     }
+
+    <span class="attr">#[inline]
+    </span><span class="kw">fn </span>max_level_hint(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;LevelFilter&gt; {
+        <span class="macro">try_lock!</span>(<span class="self">self</span>.inner.read(), <span class="kw">else return </span><span class="prelude-val">None</span>).max_level_hint()
+    }
+
+    <span class="attr">#[doc(hidden)]
+    </span><span class="kw">unsafe fn </span>downcast_raw(<span class="kw-2">&amp;</span><span class="self">self</span>, id: TypeId) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">*const </span>()&gt; {
+        <span class="comment">// Safety: it is generally unsafe to downcast through a reload, because
+        // the pointer can be invalidated after the lock is dropped.
+        // `NoneLayerMarker` is a special case because it
+        // is never dereferenced.
+        //
+        // Additionally, even if the marker type *is* dereferenced (which it
+        // never will be), the pointer should be valid even if the subscriber
+        // is reloaded, because all `NoneLayerMarker` pointers that we return
+        // actually point to the global static singleton `NoneLayerMarker`,
+        // rather than to a field inside the lock.
+        </span><span class="kw">if </span>id == TypeId::of::&lt;layer::NoneLayerMarker&gt;() {
+            <span class="kw">return </span><span class="macro">try_lock!</span>(<span class="self">self</span>.inner.read(), <span class="kw">else return </span><span class="prelude-val">None</span>).downcast_raw(id);
+        }
+
+        <span class="prelude-val">None
+    </span>}
 }
 
-<span class="kw">impl</span>&lt;L, S&gt; Layer&lt;L, S&gt;
+<span class="comment">// ===== impl Filter =====
+
+</span><span class="attr">#[cfg(all(feature = <span class="string">&quot;registry&quot;</span>, feature = <span class="string">&quot;std&quot;</span>))]
+#[cfg_attr(docsrs, doc(cfg(all(feature = <span class="string">&quot;registry&quot;</span>, feature = <span class="string">&quot;std&quot;</span>))))]
+</span><span class="kw">impl</span>&lt;S, L&gt; <span class="kw">crate</span>::layer::Filter&lt;S&gt; <span class="kw">for </span>Layer&lt;L, S&gt;
 <span class="kw">where
-    </span>L: <span class="kw">crate</span>::Layer&lt;S&gt; + <span class="lifetime">&#39;static</span>,
+    </span>L: <span class="kw">crate</span>::layer::Filter&lt;S&gt; + <span class="lifetime">&#39;static</span>,
     S: Subscriber,
 {
-    <span class="doccomment">/// Wraps the given `Layer`, returning a `Layer` and a `Handle` that allows
-    /// the inner type to be modified at runtime.
+    <span class="attr">#[inline]
+    </span><span class="kw">fn </span>callsite_enabled(<span class="kw-2">&amp;</span><span class="self">self</span>, metadata: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>Metadata&lt;<span class="lifetime">&#39;static</span>&gt;) -&gt; Interest {
+        <span class="macro">try_lock!</span>(<span class="self">self</span>.inner.read(), <span class="kw">else return </span>Interest::sometimes()).callsite_enabled(metadata)
+    }
+
+    <span class="attr">#[inline]
+    </span><span class="kw">fn </span>enabled(<span class="kw-2">&amp;</span><span class="self">self</span>, metadata: <span class="kw-2">&amp;</span>Metadata&lt;<span class="lifetime">&#39;_</span>&gt;, ctx: <span class="kw-2">&amp;</span>layer::Context&lt;<span class="lifetime">&#39;_</span>, S&gt;) -&gt; bool {
+        <span class="macro">try_lock!</span>(<span class="self">self</span>.inner.read(), <span class="kw">else return </span><span class="bool-val">false</span>).enabled(metadata, ctx)
+    }
+
+    <span class="attr">#[inline]
+    </span><span class="kw">fn </span>on_new_span(<span class="kw-2">&amp;</span><span class="self">self</span>, attrs: <span class="kw-2">&amp;</span>span::Attributes&lt;<span class="lifetime">&#39;_</span>&gt;, id: <span class="kw-2">&amp;</span>span::Id, ctx: layer::Context&lt;<span class="lifetime">&#39;_</span>, S&gt;) {
+        <span class="macro">try_lock!</span>(<span class="self">self</span>.inner.read()).on_new_span(attrs, id, ctx)
+    }
+
+    <span class="attr">#[inline]
+    </span><span class="kw">fn </span>on_record(<span class="kw-2">&amp;</span><span class="self">self</span>, span: <span class="kw-2">&amp;</span>span::Id, values: <span class="kw-2">&amp;</span>span::Record&lt;<span class="lifetime">&#39;_</span>&gt;, ctx: layer::Context&lt;<span class="lifetime">&#39;_</span>, S&gt;) {
+        <span class="macro">try_lock!</span>(<span class="self">self</span>.inner.read()).on_record(span, values, ctx)
+    }
+
+    <span class="attr">#[inline]
+    </span><span class="kw">fn </span>on_enter(<span class="kw-2">&amp;</span><span class="self">self</span>, id: <span class="kw-2">&amp;</span>span::Id, ctx: layer::Context&lt;<span class="lifetime">&#39;_</span>, S&gt;) {
+        <span class="macro">try_lock!</span>(<span class="self">self</span>.inner.read()).on_enter(id, ctx)
+    }
+
+    <span class="attr">#[inline]
+    </span><span class="kw">fn </span>on_exit(<span class="kw-2">&amp;</span><span class="self">self</span>, id: <span class="kw-2">&amp;</span>span::Id, ctx: layer::Context&lt;<span class="lifetime">&#39;_</span>, S&gt;) {
+        <span class="macro">try_lock!</span>(<span class="self">self</span>.inner.read()).on_exit(id, ctx)
+    }
+
+    <span class="attr">#[inline]
+    </span><span class="kw">fn </span>on_close(<span class="kw-2">&amp;</span><span class="self">self</span>, id: span::Id, ctx: layer::Context&lt;<span class="lifetime">&#39;_</span>, S&gt;) {
+        <span class="macro">try_lock!</span>(<span class="self">self</span>.inner.read()).on_close(id, ctx)
+    }
+
+    <span class="attr">#[inline]
+    </span><span class="kw">fn </span>max_level_hint(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;LevelFilter&gt; {
+        <span class="macro">try_lock!</span>(<span class="self">self</span>.inner.read(), <span class="kw">else return </span><span class="prelude-val">None</span>).max_level_hint()
+    }
+}
+
+<span class="kw">impl</span>&lt;L, S&gt; Layer&lt;L, S&gt; {
+    <span class="doccomment">/// Wraps the given [`Layer`] or [`Filter`], returning a `reload::Layer`
+    /// and a `Handle` that allows the inner value to be modified at runtime.
+    ///
+    /// [`Layer`]: crate::layer::Layer
+    /// [`Filter`]: crate::layer::Filter
     </span><span class="kw">pub fn </span>new(inner: L) -&gt; (<span class="self">Self</span>, Handle&lt;L, S&gt;) {
         <span class="kw">let </span>this = <span class="self">Self </span>{
             inner: Arc::new(RwLock::new(inner)),
@@ -461,7 +653,10 @@
         (this, handle)
     }
 
-    <span class="doccomment">/// Returns a `Handle` that can be used to reload the wrapped `Layer`.
+    <span class="doccomment">/// Returns a `Handle` that can be used to reload the wrapped [`Layer`] or [`Filter`].
+    ///
+    /// [`Layer`]: crate::layer::Layer
+    /// [`Filter`]: crate::filter::Filter
     </span><span class="kw">pub fn </span>handle(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Handle&lt;L, S&gt; {
         Handle {
             inner: Arc::downgrade(<span class="kw-2">&amp;</span><span class="self">self</span>.inner),
@@ -472,24 +667,27 @@
 
 <span class="comment">// ===== impl Handle =====
 
-</span><span class="kw">impl</span>&lt;L, S&gt; Handle&lt;L, S&gt;
-<span class="kw">where
-    </span>L: <span class="kw">crate</span>::Layer&lt;S&gt; + <span class="lifetime">&#39;static</span>,
-    S: Subscriber,
-{
-    <span class="doccomment">/// Replace the current layer with the provided `new_layer`.
+</span><span class="kw">impl</span>&lt;L, S&gt; Handle&lt;L, S&gt; {
+    <span class="doccomment">/// Replace the current [`Layer`] or [`Filter`] with the provided `new_value`.
     ///
-    /// **Warning:** The [`Filtered`](crate::filter::Filtered) type currently can&#39;t be changed
-    /// at runtime via the [`Handle::reload`] method.
-    /// Use the [`Handle::modify`] method to change the filter instead.
-    /// (see &lt;https://github.com/tokio-rs/tracing/issues/1629&gt;)
-    </span><span class="kw">pub fn </span>reload(<span class="kw-2">&amp;</span><span class="self">self</span>, new_layer: <span class="kw">impl </span>Into&lt;L&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;(), Error&gt; {
+    /// [`Handle::reload`] cannot be used with the [`Filtered`] layer; use
+    /// [`Handle::modify`] instead (see [this issue] for additional details).
+    ///
+    /// However, if the _only_ the [`Filter`]  needs to be modified, use
+    /// `reload::Layer` to wrap the `Filter` directly.
+    ///
+    /// [`Layer`]: crate::layer::Layer
+    /// [`Filter`]: crate::layer::Filter
+    /// [`Filtered`]: crate::filter::Filtered
+    ///
+    /// [this issue]: https://github.com/tokio-rs/tracing/issues/1629
+    </span><span class="kw">pub fn </span>reload(<span class="kw-2">&amp;</span><span class="self">self</span>, new_value: <span class="kw">impl </span>Into&lt;L&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;(), Error&gt; {
         <span class="self">self</span>.modify(|layer| {
-            <span class="kw-2">*</span>layer = new_layer.into();
+            <span class="kw-2">*</span>layer = new_value.into();
         })
     }
 
-    <span class="doccomment">/// Invokes a closure with a mutable reference to the current layer,
+    <span class="doccomment">/// Invokes a closure with a mutable reference to the current layer or filter,
     /// allowing it to be modified in place.
     </span><span class="kw">pub fn </span>modify(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw">impl </span>FnOnce(<span class="kw-2">&amp;mut </span>L)) -&gt; <span class="prelude-ty">Result</span>&lt;(), Error&gt; {
         <span class="kw">let </span>inner = <span class="self">self</span>.inner.upgrade().ok_or(Error {
@@ -506,7 +704,7 @@
         <span class="prelude-val">Ok</span>(())
     }
 
-    <span class="doccomment">/// Returns a clone of the layer&#39;s current value if it still exists.
+    <span class="doccomment">/// Returns a clone of the layer or filter&#39;s current value if it still exists.
     /// Otherwise, if the subscriber has been dropped, returns `None`.
     </span><span class="kw">pub fn </span>clone_current(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;L&gt;
     <span class="kw">where
@@ -515,7 +713,7 @@
         <span class="self">self</span>.with_current(L::clone).ok()
     }
 
-    <span class="doccomment">/// Invokes a closure with a borrowed reference to the current layer,
+    <span class="doccomment">/// Invokes a closure with a borrowed reference to the current layer or filter,
     /// returning the result (or an error if the subscriber no longer exists).
     </span><span class="kw">pub fn </span>with_current&lt;T&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw">impl </span>FnOnce(<span class="kw-2">&amp;</span>L) -&gt; T) -&gt; <span class="prelude-ty">Result</span>&lt;T, Error&gt; {
         <span class="kw">let </span>inner = <span class="self">self</span>.inner.upgrade().ok_or(Error {

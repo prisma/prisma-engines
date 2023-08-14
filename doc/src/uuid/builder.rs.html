@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/nix/store/jnqxxv1xi811ni996b002f4jnyz38xck-vendor-cargo-deps/c19b7c6f923b580ac259164a89f2577984ad5ab09ee9d583b888f934adbbe8d0/uuid-1.1.2/src/builder.rs`."><title>builder.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-f3501f0f5ae15dfb.css" id="mainThemeStyle"><div id="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="uuid" data-themes="" data-resource-suffix="" data-rustdoc-version="1.71.0 (8ede3aae2 2023-07-12)" data-search-js="search-4926e5fc22a5646a.js" data-settings-js="settings-de11bff964e9d4e5.js" data-settings-css="settings-8c76f75bfb6bd192.css" data-theme-light-css="light-0f8c037637f9eb3e.css" data-theme-dark-css="dark-1097f8e92a01e3cf.css" data-theme-ayu-css="ayu-614652228113ac93.css" ></div><script src="../../static.files/storage-62ce34ea385b278a.js"></script><script defer src="../../static.files/source-script-11255107d0a65077.js"></script><script defer src="../../source-files.js"></script><script defer src="../../static.files/main-f0540c1d82cde29b.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../../static.files/light-0f8c037637f9eb3e.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../../static.files/dark-1097f8e92a01e3cf.css"><link rel="stylesheet" href="../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="icon" href="https://www.rust-lang.org/favicon.ico"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../uuid/index.html"><img src="https://www.rust-lang.org/logos/rust-logo-128x128-blk-v2.png" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/nix/store/yf45a1rayffhnidhgyjynpyhr9lqkd09-vendor-cargo-deps/c19b7c6f923b580ac259164a89f2577984ad5ab09ee9d583b888f934adbbe8d0/uuid-1.4.1/src/builder.rs`."><title>builder.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-f3501f0f5ae15dfb.css" id="mainThemeStyle"><div id="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="uuid" data-themes="" data-resource-suffix="" data-rustdoc-version="1.71.0 (8ede3aae2 2023-07-12)" data-search-js="search-4926e5fc22a5646a.js" data-settings-js="settings-de11bff964e9d4e5.js" data-settings-css="settings-8c76f75bfb6bd192.css" data-theme-light-css="light-0f8c037637f9eb3e.css" data-theme-dark-css="dark-1097f8e92a01e3cf.css" data-theme-ayu-css="ayu-614652228113ac93.css" ></div><script src="../../static.files/storage-62ce34ea385b278a.js"></script><script defer src="../../static.files/source-script-11255107d0a65077.js"></script><script defer src="../../source-files.js"></script><script defer src="../../static.files/main-f0540c1d82cde29b.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../../static.files/light-0f8c037637f9eb3e.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../../static.files/dark-1097f8e92a01e3cf.css"><link rel="stylesheet" href="../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="icon" href="https://www.rust-lang.org/favicon.ico"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../uuid/index.html"><img src="https://www.rust-lang.org/logos/rust-logo-128x128-blk-v2.png" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -811,6 +811,100 @@
 <a href="#811" id="811">811</a>
 <a href="#812" id="812">812</a>
 <a href="#813" id="813">813</a>
+<a href="#814" id="814">814</a>
+<a href="#815" id="815">815</a>
+<a href="#816" id="816">816</a>
+<a href="#817" id="817">817</a>
+<a href="#818" id="818">818</a>
+<a href="#819" id="819">819</a>
+<a href="#820" id="820">820</a>
+<a href="#821" id="821">821</a>
+<a href="#822" id="822">822</a>
+<a href="#823" id="823">823</a>
+<a href="#824" id="824">824</a>
+<a href="#825" id="825">825</a>
+<a href="#826" id="826">826</a>
+<a href="#827" id="827">827</a>
+<a href="#828" id="828">828</a>
+<a href="#829" id="829">829</a>
+<a href="#830" id="830">830</a>
+<a href="#831" id="831">831</a>
+<a href="#832" id="832">832</a>
+<a href="#833" id="833">833</a>
+<a href="#834" id="834">834</a>
+<a href="#835" id="835">835</a>
+<a href="#836" id="836">836</a>
+<a href="#837" id="837">837</a>
+<a href="#838" id="838">838</a>
+<a href="#839" id="839">839</a>
+<a href="#840" id="840">840</a>
+<a href="#841" id="841">841</a>
+<a href="#842" id="842">842</a>
+<a href="#843" id="843">843</a>
+<a href="#844" id="844">844</a>
+<a href="#845" id="845">845</a>
+<a href="#846" id="846">846</a>
+<a href="#847" id="847">847</a>
+<a href="#848" id="848">848</a>
+<a href="#849" id="849">849</a>
+<a href="#850" id="850">850</a>
+<a href="#851" id="851">851</a>
+<a href="#852" id="852">852</a>
+<a href="#853" id="853">853</a>
+<a href="#854" id="854">854</a>
+<a href="#855" id="855">855</a>
+<a href="#856" id="856">856</a>
+<a href="#857" id="857">857</a>
+<a href="#858" id="858">858</a>
+<a href="#859" id="859">859</a>
+<a href="#860" id="860">860</a>
+<a href="#861" id="861">861</a>
+<a href="#862" id="862">862</a>
+<a href="#863" id="863">863</a>
+<a href="#864" id="864">864</a>
+<a href="#865" id="865">865</a>
+<a href="#866" id="866">866</a>
+<a href="#867" id="867">867</a>
+<a href="#868" id="868">868</a>
+<a href="#869" id="869">869</a>
+<a href="#870" id="870">870</a>
+<a href="#871" id="871">871</a>
+<a href="#872" id="872">872</a>
+<a href="#873" id="873">873</a>
+<a href="#874" id="874">874</a>
+<a href="#875" id="875">875</a>
+<a href="#876" id="876">876</a>
+<a href="#877" id="877">877</a>
+<a href="#878" id="878">878</a>
+<a href="#879" id="879">879</a>
+<a href="#880" id="880">880</a>
+<a href="#881" id="881">881</a>
+<a href="#882" id="882">882</a>
+<a href="#883" id="883">883</a>
+<a href="#884" id="884">884</a>
+<a href="#885" id="885">885</a>
+<a href="#886" id="886">886</a>
+<a href="#887" id="887">887</a>
+<a href="#888" id="888">888</a>
+<a href="#889" id="889">889</a>
+<a href="#890" id="890">890</a>
+<a href="#891" id="891">891</a>
+<a href="#892" id="892">892</a>
+<a href="#893" id="893">893</a>
+<a href="#894" id="894">894</a>
+<a href="#895" id="895">895</a>
+<a href="#896" id="896">896</a>
+<a href="#897" id="897">897</a>
+<a href="#898" id="898">898</a>
+<a href="#899" id="899">899</a>
+<a href="#900" id="900">900</a>
+<a href="#901" id="901">901</a>
+<a href="#902" id="902">902</a>
+<a href="#903" id="903">903</a>
+<a href="#904" id="904">904</a>
+<a href="#905" id="905">905</a>
+<a href="#906" id="906">906</a>
+<a href="#907" id="907">907</a>
 </pre></div><pre class="rust"><code><span class="comment">// Copyright 2013-2014 The Rust Project Developers.
 // Copyright 2018 The Uuid Project Developers.
 //
@@ -826,17 +920,21 @@
 //!
 //! [`Uuid`]: ../struct.Uuid.html
 
-</span><span class="kw">use crate</span>::{error::<span class="kw-2">*</span>, Bytes, Uuid, Variant, Version};
+</span><span class="kw">use crate</span>::{error::<span class="kw-2">*</span>, timestamp, Bytes, Uuid, Variant, Version};
 
-<span class="doccomment">/// A builder struct for creating a UUID.
+<span class="doccomment">/// A builder for creating a UUID.
 ///
 /// This type is useful if you need to mutate individual fields of a [`Uuid`]
 /// while constructing it. Since the [`Uuid`] type is `Copy`, it doesn&#39;t offer
 /// any methods to mutate in place. They live on the `Builder` instead.
 ///
+/// The `Builder` type also always exposes APIs to construct [`Uuid`]s for any
+/// version without needing crate features or additional dependencies. It&#39;s a
+/// lower-level API than the methods on [`Uuid`].
+///
 /// # Examples
 ///
-/// Creating a v4 UUID from externally generated bytes:
+/// Creating a version 4 UUID from externally generated random bytes:
 ///
 /// ```
 /// # use uuid::{Builder, Version, Variant};
@@ -856,12 +954,14 @@
 </span><span class="kw">pub struct </span>Builder(Uuid);
 
 <span class="kw">impl </span>Uuid {
-    <span class="doccomment">/// The &#39;nil UUID&#39;.
+    <span class="doccomment">/// The &#39;nil UUID&#39; (all zeros).
     ///
     /// The nil UUID is a special form of UUID that is specified to have all
-    /// 128 bits set to zero, as defined in [IETF RFC 4122 Section 4.1.7][RFC].
+    /// 128 bits set to zero.
     ///
-    /// [RFC]: https://tools.ietf.org/html/rfc4122.html#section-4.1.7
+    /// # References
+    ///
+    /// * [Nil UUID in RFC4122](https://tools.ietf.org/html/rfc4122.html#section-4.1.7)
     ///
     /// # Examples
     ///
@@ -878,6 +978,33 @@
     /// ```
     </span><span class="kw">pub const fn </span>nil() -&gt; <span class="self">Self </span>{
         Uuid::from_bytes([<span class="number">0</span>; <span class="number">16</span>])
+    }
+
+    <span class="doccomment">/// The &#39;max UUID&#39; (all ones).
+    ///
+    /// The max UUID is a special form of UUID that is specified to have all
+    /// 128 bits set to one.
+    ///
+    /// # References
+    ///
+    /// * [Max UUID in Draft RFC: New UUID Formats, Version 4](https://datatracker.ietf.org/doc/html/draft-peabody-dispatch-new-uuid-format-04#section-5.4)
+    ///
+    /// # Examples
+    ///
+    /// Basic usage:
+    ///
+    /// ```
+    /// # use uuid::Uuid;
+    /// let uuid = Uuid::max();
+    ///
+    /// assert_eq!(
+    ///     &quot;ffffffff-ffff-ffff-ffff-ffffffffffff&quot;,
+    ///     uuid.hyphenated().to_string(),
+    /// );
+    /// ```
+    </span><span class="attr">#[cfg(uuid_unstable)]
+    </span><span class="kw">pub const fn </span>max() -&gt; <span class="self">Self </span>{
+        Uuid::from_bytes([<span class="number">0xFF</span>; <span class="number">16</span>])
     }
 
     <span class="doccomment">/// Creates a UUID from four field values.
@@ -930,6 +1057,8 @@
     ///
     /// # Examples
     ///
+    /// Basic usage:
+    ///
     /// ```
     /// # use uuid::Uuid;
     /// let d1 = 0xa1a2a3a4;
@@ -944,12 +1073,7 @@
     ///     uuid.hyphenated().to_string(),
     /// );
     /// ```
-    </span><span class="kw">pub const fn </span>from_fields_le(
-        d1: u32,
-        d2: u16,
-        d3: u16,
-        d4: <span class="kw-2">&amp;</span>[u8; <span class="number">8</span>],
-    ) -&gt; Uuid {
+    </span><span class="kw">pub const fn </span>from_fields_le(d1: u32, d2: u16, d3: u16, d4: <span class="kw-2">&amp;</span>[u8; <span class="number">8</span>]) -&gt; Uuid {
         Uuid::from_bytes([
             d1 <span class="kw">as </span>u8,
             (d1 &gt;&gt; <span class="number">8</span>) <span class="kw">as </span>u8,
@@ -1101,7 +1225,7 @@
     /// Basic usage:
     ///
     /// ```
-    /// # fn main() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {
+    /// # fn main() -&gt; Result&lt;(), uuid::Error&gt; {
     /// # use uuid::Uuid;
     /// let bytes = [
     ///     0xa1, 0xa2, 0xa3, 0xa4,
@@ -1142,7 +1266,7 @@
     /// Basic usage:
     ///
     /// ```
-    /// # fn main() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {
+    /// # fn main() -&gt; Result&lt;(), uuid::Error&gt; {
     /// # use uuid::Uuid;
     /// let bytes = [
     ///     0xa1, 0xa2, 0xa3, 0xa4,
@@ -1177,7 +1301,7 @@
     /// Basic usage:
     ///
     /// ```
-    /// # fn main() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {
+    /// # fn main() -&gt; Result&lt;(), uuid::Error&gt; {
     /// # use uuid::Uuid;
     /// let bytes = [
     ///     0xa1, 0xa2, 0xa3, 0xa4,
@@ -1195,6 +1319,7 @@
     /// # Ok(())
     /// # }
     /// ```
+    </span><span class="attr">#[inline]
     </span><span class="kw">pub const fn </span>from_bytes(bytes: Bytes) -&gt; Uuid {
         Uuid(bytes)
     }
@@ -1208,7 +1333,7 @@
     /// Basic usage:
     ///
     /// ```
-    /// # fn main() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {
+    /// # fn main() -&gt; Result&lt;(), uuid::Error&gt; {
     /// # use uuid::Uuid;
     /// let bytes = [
     ///     0xa1, 0xa2, 0xa3, 0xa4,
@@ -1228,8 +1353,8 @@
     /// ```
     </span><span class="kw">pub const fn </span>from_bytes_le(b: Bytes) -&gt; Uuid {
         Uuid([
-            b[<span class="number">3</span>], b[<span class="number">2</span>], b[<span class="number">1</span>], b[<span class="number">0</span>], b[<span class="number">5</span>], b[<span class="number">4</span>], b[<span class="number">7</span>], b[<span class="number">6</span>], b[<span class="number">8</span>], b[<span class="number">9</span>], b[<span class="number">10</span>],
-            b[<span class="number">11</span>], b[<span class="number">12</span>], b[<span class="number">13</span>], b[<span class="number">14</span>], b[<span class="number">15</span>],
+            b[<span class="number">3</span>], b[<span class="number">2</span>], b[<span class="number">1</span>], b[<span class="number">0</span>], b[<span class="number">5</span>], b[<span class="number">4</span>], b[<span class="number">7</span>], b[<span class="number">6</span>], b[<span class="number">8</span>], b[<span class="number">9</span>], b[<span class="number">10</span>], b[<span class="number">11</span>], b[<span class="number">12</span>], b[<span class="number">13</span>],
+            b[<span class="number">14</span>], b[<span class="number">15</span>],
         ])
     }
 
@@ -1240,7 +1365,7 @@
     /// Basic usage:
     ///
     /// ```
-    /// # fn main() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {
+    /// # fn main() -&gt; Result&lt;(), uuid::Error&gt; {
     /// # use uuid::Uuid;
     /// let bytes = [
     ///     0xa1, 0xa2, 0xa3, 0xa4,
@@ -1263,6 +1388,7 @@
     /// # Ok(())
     /// # }
     /// ```
+    </span><span class="attr">#[inline]
     </span><span class="kw">pub fn </span>from_bytes_ref(bytes: <span class="kw-2">&amp;</span>Bytes) -&gt; <span class="kw-2">&amp;</span>Uuid {
         <span class="comment">// SAFETY: `Bytes` and `Uuid` have the same ABI
         </span><span class="kw">unsafe </span>{ <span class="kw-2">&amp;*</span>(bytes <span class="kw">as </span><span class="kw-2">*const </span>Bytes <span class="kw">as </span><span class="kw-2">*const </span>Uuid) }
@@ -1309,7 +1435,7 @@
     /// Basic usage:
     ///
     /// ```
-    /// # fn main() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {
+    /// # fn main() -&gt; Result&lt;(), uuid::Error&gt; {
     /// # use uuid::{Builder, Uuid};
     /// let bytes = [
     ///     0xa1, 0xa2, 0xa3, 0xa4,
@@ -1331,11 +1457,22 @@
         Builder(Uuid::from_bytes_le(b))
     }
 
-    <span class="doccomment">/// Creates a `Builder` using the supplied random bytes.
+    <span class="doccomment">/// Creates a `Builder` for a version 1 UUID using the supplied timestamp and node ID.
+    </span><span class="kw">pub const fn </span>from_rfc4122_timestamp(ticks: u64, counter: u16, node_id: <span class="kw-2">&amp;</span>[u8; <span class="number">6</span>]) -&gt; <span class="self">Self </span>{
+        Builder(timestamp::encode_rfc4122_timestamp(ticks, counter, node_id))
+    }
+
+    <span class="doccomment">/// Creates a `Builder` for a version 3 UUID using the supplied MD5 hashed bytes.
+    </span><span class="kw">pub const fn </span>from_md5_bytes(md5_bytes: Bytes) -&gt; <span class="self">Self </span>{
+        Builder(Uuid::from_bytes(md5_bytes))
+            .with_variant(Variant::RFC4122)
+            .with_version(Version::Md5)
+    }
+
+    <span class="doccomment">/// Creates a `Builder` for a version 4 UUID using the supplied random bytes.
     ///
-    /// This method can be useful in environments where the `v4` feature isn&#39;t
-    /// available. This method will take care of setting the appropriate
-    /// version and variant fields.
+    /// This method assumes the bytes are already sufficiently random, it will only
+    /// set the appropriate bits for the UUID version and variant.
     ///
     /// # Examples
     ///
@@ -1351,24 +1488,80 @@
     /// assert_eq!(Some(Version::Random), uuid.get_version());
     /// assert_eq!(Variant::RFC4122, uuid.get_variant());
     /// ```
-    </span><span class="kw">pub const fn </span>from_random_bytes(b: Bytes) -&gt; <span class="self">Self </span>{
-        Builder(Uuid::from_bytes(b))
+    </span><span class="kw">pub const fn </span>from_random_bytes(random_bytes: Bytes) -&gt; <span class="self">Self </span>{
+        Builder(Uuid::from_bytes(random_bytes))
             .with_variant(Variant::RFC4122)
             .with_version(Version::Random)
     }
 
-    <span class="doccomment">/// Creates a `Builder` using the supplied MD5 hashed bytes.
-    </span><span class="kw">pub const fn </span>from_md5_bytes(b: Bytes) -&gt; <span class="self">Self </span>{
-        Builder(Uuid::from_bytes(b))
-            .with_variant(Variant::RFC4122)
-            .with_version(Version::Md5)
-    }
-
-    <span class="doccomment">/// Creates a `Builder` using the supplied SHA1 hashed bytes.
-    </span><span class="kw">pub const fn </span>from_sha1_bytes(b: Bytes) -&gt; <span class="self">Self </span>{
-        Builder(Uuid::from_bytes(b))
+    <span class="doccomment">/// Creates a `Builder` for a version 5 UUID using the supplied SHA-1 hashed bytes.
+    ///
+    /// This method assumes the bytes are already a SHA-1 hash, it will only set the appropriate
+    /// bits for the UUID version and variant.
+    </span><span class="kw">pub const fn </span>from_sha1_bytes(sha1_bytes: Bytes) -&gt; <span class="self">Self </span>{
+        Builder(Uuid::from_bytes(sha1_bytes))
             .with_variant(Variant::RFC4122)
             .with_version(Version::Sha1)
+    }
+
+    <span class="doccomment">/// Creates a `Builder` for a version 6 UUID using the supplied timestamp and node ID.
+    ///
+    /// This method will encode the ticks, counter, and node ID in a sortable UUID.
+    </span><span class="attr">#[cfg(uuid_unstable)]
+    </span><span class="kw">pub const fn </span>from_sorted_rfc4122_timestamp(
+        ticks: u64,
+        counter: u16,
+        node_id: <span class="kw-2">&amp;</span>[u8; <span class="number">6</span>],
+    ) -&gt; <span class="self">Self </span>{
+        Builder(timestamp::encode_sorted_rfc4122_timestamp(
+            ticks, counter, node_id,
+        ))
+    }
+
+    <span class="doccomment">/// Creates a `Builder` for a version 7 UUID using the supplied Unix timestamp and random bytes.
+    ///
+    /// This method assumes the bytes are already sufficiently random.
+    ///
+    /// # Examples
+    ///
+    /// Creating a UUID using the current system timestamp:
+    ///
+    /// ```
+    /// # use std::convert::TryInto;
+    /// use std::time::{Duration, SystemTime};
+    /// # fn main() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {
+    /// # use uuid::{Builder, Uuid, Variant, Version, Timestamp, NoContext};
+    /// # let rng = || [
+    /// #     70, 235, 208, 238, 14, 109, 67, 201, 185, 13
+    /// # ];
+    /// let ts = SystemTime::now().duration_since(SystemTime::UNIX_EPOCH)?;
+    ///
+    /// let random_bytes = rng();
+    ///
+    /// let uuid = Builder::from_unix_timestamp_millis(ts.as_millis().try_into()?, &amp;random_bytes).into_uuid();
+    ///
+    /// assert_eq!(Some(Version::SortRand), uuid.get_version());
+    /// assert_eq!(Variant::RFC4122, uuid.get_variant());
+    /// # Ok(())
+    /// # }
+    /// ```
+    </span><span class="attr">#[cfg(uuid_unstable)]
+    </span><span class="kw">pub const fn </span>from_unix_timestamp_millis(millis: u64, random_bytes: <span class="kw-2">&amp;</span>[u8; <span class="number">10</span>]) -&gt; <span class="self">Self </span>{
+        Builder(timestamp::encode_unix_timestamp_millis(
+            millis,
+            random_bytes,
+        ))
+    }
+
+    <span class="doccomment">/// Creates a `Builder` for a version 8 UUID using the supplied user-defined bytes.
+    ///
+    /// This method won&#39;t interpret the given bytes in any way, except to set the appropriate
+    /// bits for the UUID version and variant.
+    </span><span class="attr">#[cfg(uuid_unstable)]
+    </span><span class="kw">pub const fn </span>from_custom_bytes(custom_bytes: Bytes) -&gt; <span class="self">Self </span>{
+        Builder::from_bytes(custom_bytes)
+            .with_variant(Variant::RFC4122)
+            .with_version(Version::Custom)
     }
 
     <span class="doccomment">/// Creates a `Builder` using the supplied bytes.
@@ -1383,7 +1576,7 @@
     ///
     /// ```
     /// # use uuid::Builder;
-    /// # fn main() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {
+    /// # fn main() -&gt; Result&lt;(), uuid::Error&gt; {
     /// let bytes = [
     ///     0xa1, 0xa2, 0xa3, 0xa4,
     ///     0xb1, 0xb2,
@@ -1418,7 +1611,7 @@
     ///
     /// ```
     /// # use uuid::Builder;
-    /// # fn main() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {
+    /// # fn main() -&gt; Result&lt;(), uuid::Error&gt; {
     /// let bytes = [
     ///     0xa1, 0xa2, 0xa3, 0xa4,
     ///     0xb1, 0xb2,
@@ -1483,12 +1676,7 @@
     ///     &quot;a4a3a2a1-b2b1-c2c1-d1d2-d3d4d5d6d7d8&quot;
     /// );
     /// ```
-    </span><span class="kw">pub const fn </span>from_fields_le(
-        d1: u32,
-        d2: u16,
-        d3: u16,
-        d4: <span class="kw-2">&amp;</span>[u8; <span class="number">8</span>],
-    ) -&gt; <span class="self">Self </span>{
+    </span><span class="kw">pub const fn </span>from_fields_le(d1: u32, d2: u16, d3: u16, d4: <span class="kw-2">&amp;</span>[u8; <span class="number">8</span>]) -&gt; <span class="self">Self </span>{
         Builder(Uuid::from_fields_le(d1, d2, d3, d4))
     }
 

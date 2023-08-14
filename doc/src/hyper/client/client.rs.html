@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/nix/store/jnqxxv1xi811ni996b002f4jnyz38xck-vendor-cargo-deps/c19b7c6f923b580ac259164a89f2577984ad5ab09ee9d583b888f934adbbe8d0/hyper-0.14.23/src/client/client.rs`."><title>client.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-f3501f0f5ae15dfb.css" id="mainThemeStyle"><div id="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="hyper" data-themes="" data-resource-suffix="" data-rustdoc-version="1.71.0 (8ede3aae2 2023-07-12)" data-search-js="search-4926e5fc22a5646a.js" data-settings-js="settings-de11bff964e9d4e5.js" data-settings-css="settings-8c76f75bfb6bd192.css" data-theme-light-css="light-0f8c037637f9eb3e.css" data-theme-dark-css="dark-1097f8e92a01e3cf.css" data-theme-ayu-css="ayu-614652228113ac93.css" ></div><script src="../../../static.files/storage-62ce34ea385b278a.js"></script><script defer src="../../../static.files/source-script-11255107d0a65077.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../static.files/main-f0540c1d82cde29b.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../../../static.files/light-0f8c037637f9eb3e.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../../../static.files/dark-1097f8e92a01e3cf.css"><link rel="stylesheet" href="../../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../../hyper/index.html"><img class="rust-logo" src="../../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/nix/store/yf45a1rayffhnidhgyjynpyhr9lqkd09-vendor-cargo-deps/c19b7c6f923b580ac259164a89f2577984ad5ab09ee9d583b888f934adbbe8d0/hyper-0.14.27/src/client/client.rs`."><title>client.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-f3501f0f5ae15dfb.css" id="mainThemeStyle"><div id="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="hyper" data-themes="" data-resource-suffix="" data-rustdoc-version="1.71.0 (8ede3aae2 2023-07-12)" data-search-js="search-4926e5fc22a5646a.js" data-settings-js="settings-de11bff964e9d4e5.js" data-settings-css="settings-8c76f75bfb6bd192.css" data-theme-light-css="light-0f8c037637f9eb3e.css" data-theme-dark-css="dark-1097f8e92a01e3cf.css" data-theme-ayu-css="ayu-614652228113ac93.css" ></div><script src="../../../static.files/storage-62ce34ea385b278a.js"></script><script defer src="../../../static.files/source-script-11255107d0a65077.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../static.files/main-f0540c1d82cde29b.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../../../static.files/light-0f8c037637f9eb3e.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../../../static.files/dark-1097f8e92a01e3cf.css"><link rel="stylesheet" href="../../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../../hyper/index.html"><img class="rust-logo" src="../../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -1493,6 +1493,26 @@
 <a href="#1493" id="1493">1493</a>
 <a href="#1494" id="1494">1494</a>
 <a href="#1495" id="1495">1495</a>
+<a href="#1496" id="1496">1496</a>
+<a href="#1497" id="1497">1497</a>
+<a href="#1498" id="1498">1498</a>
+<a href="#1499" id="1499">1499</a>
+<a href="#1500" id="1500">1500</a>
+<a href="#1501" id="1501">1501</a>
+<a href="#1502" id="1502">1502</a>
+<a href="#1503" id="1503">1503</a>
+<a href="#1504" id="1504">1504</a>
+<a href="#1505" id="1505">1505</a>
+<a href="#1506" id="1506">1506</a>
+<a href="#1507" id="1507">1507</a>
+<a href="#1508" id="1508">1508</a>
+<a href="#1509" id="1509">1509</a>
+<a href="#1510" id="1510">1510</a>
+<a href="#1511" id="1511">1511</a>
+<a href="#1512" id="1512">1512</a>
+<a href="#1513" id="1513">1513</a>
+<a href="#1514" id="1514">1514</a>
+<a href="#1515" id="1515">1515</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::error::Error <span class="kw">as </span>StdError;
 <span class="kw">use </span>std::fmt;
 <span class="kw">use </span>std::mem;
@@ -1505,6 +1525,14 @@
 <span class="kw">use </span>http::{Method, Request, Response, Uri, Version};
 <span class="kw">use </span>tracing::{debug, trace, warn};
 
+<span class="kw">use </span><span class="kw">crate</span>::body::{Body, HttpBody};
+<span class="kw">use </span><span class="kw">crate</span>::client::connect::CaptureConnectionExtension;
+<span class="kw">use </span><span class="kw">crate</span>::common::{
+    exec::BoxSendFuture, lazy <span class="kw">as </span>hyper_lazy, sync_wrapper::SyncWrapper, task, Future, Lazy, Pin,
+    Poll,
+};
+<span class="kw">use </span><span class="kw">crate</span>::rt::Executor;
+
 <span class="kw">use </span><span class="kw">super</span>::conn;
 <span class="kw">use </span><span class="kw">super</span>::connect::{<span class="self">self</span>, sealed::Connect, Alpn, Connected, Connection};
 <span class="kw">use </span><span class="kw">super</span>::pool::{
@@ -1512,9 +1540,6 @@
 };
 <span class="attr">#[cfg(feature = <span class="string">&quot;tcp&quot;</span>)]
 </span><span class="kw">use </span><span class="kw">super</span>::HttpConnector;
-<span class="kw">use </span><span class="kw">crate</span>::body::{Body, HttpBody};
-<span class="kw">use </span><span class="kw">crate</span>::common::{exec::BoxSendFuture, sync_wrapper::SyncWrapper, lazy <span class="kw">as </span>hyper_lazy, task, Future, Lazy, Pin, Poll};
-<span class="kw">use </span><span class="kw">crate</span>::rt::Executor;
 
 <span class="doccomment">/// A Client to make outgoing HTTP requests.
 ///
@@ -1523,7 +1548,8 @@
 </span><span class="attr">#[cfg_attr(docsrs, doc(cfg(any(feature = <span class="string">&quot;http1&quot;</span>, feature = <span class="string">&quot;http2&quot;</span>))))]
 </span><span class="kw">pub struct </span>Client&lt;C, B = Body&gt; {
     config: Config,
-    conn_builder: conn::Builder,
+    <span class="attr">#[cfg_attr(feature = <span class="string">&quot;deprecated&quot;</span>, allow(deprecated))]
+    </span>conn_builder: conn::Builder,
     connector: C,
     pool: Pool&lt;PoolClient&lt;B&gt;&gt;,
 }
@@ -1733,12 +1759,14 @@
                 })
             }
         };
-
+        req.extensions_mut()
+            .get_mut::&lt;CaptureConnectionExtension&gt;()
+            .map(|conn| conn.set(<span class="kw-2">&amp;</span>pooled.conn_info));
         <span class="kw">if </span>pooled.is_http1() {
             <span class="kw">if </span>req.version() == Version::HTTP_2 {
                 <span class="macro">warn!</span>(<span class="string">&quot;Connection is HTTP/1, but request requires HTTP/2&quot;</span>);
                 <span class="kw">return </span><span class="prelude-val">Err</span>(ClientError::Normal(
-                    <span class="kw">crate</span>::Error::new_user_unsupported_version(),
+                    <span class="kw">crate</span>::Error::new_user_unsupported_version().with_client_connect_info(pooled.conn_info.clone()),
                 ));
             }
 
@@ -1768,18 +1796,20 @@
             authority_form(req.uri_mut());
         }
 
-        <span class="kw">let </span>fut = pooled
-            .send_request_retryable(req)
-            .map_err(ClientError::map_with_reused(pooled.is_reused()));
+        <span class="kw">let </span><span class="kw-2">mut </span>res = <span class="kw">match </span>pooled.send_request_retryable(req).<span class="kw">await </span>{
+            <span class="prelude-val">Err</span>((err, orig_req)) =&gt; {
+                <span class="kw">return </span><span class="prelude-val">Err</span>(ClientError::map_with_reused(pooled.is_reused())((
+                    err.with_client_connect_info(pooled.conn_info.clone()),
+                    orig_req,
+                )));
+            }
+            <span class="prelude-val">Ok</span>(res) =&gt; res,
+        };
 
         <span class="comment">// If the Connector included &#39;extra&#39; info, add to Response...
-        </span><span class="kw">let </span>extra_info = pooled.conn_info.extra.clone();
-        <span class="kw">let </span>fut = fut.map_ok(<span class="kw">move </span>|<span class="kw-2">mut </span>res| {
-            <span class="kw">if let </span><span class="prelude-val">Some</span>(extra) = extra_info {
-                extra.set(res.extensions_mut());
-            }
-            res
-        });
+        </span><span class="kw">if let </span><span class="prelude-val">Some</span>(extra) = <span class="kw-2">&amp;</span>pooled.conn_info.extra {
+            extra.set(res.extensions_mut());
+        }
 
         <span class="comment">// As of futures@0.1.21, there is a race condition in the mpsc
         // channel, such that sending when the receiver is closing can
@@ -1789,10 +1819,8 @@
         // To counteract this, we must check if our senders &#39;want&#39; channel
         // has been closed after having tried to send. If so, error out...
         </span><span class="kw">if </span>pooled.is_closed() {
-            <span class="kw">return </span>fut.<span class="kw">await</span>;
+            <span class="kw">return </span><span class="prelude-val">Ok</span>(res);
         }
-
-        <span class="kw">let </span><span class="kw-2">mut </span>res = fut.<span class="kw">await</span><span class="question-mark">?</span>;
 
         <span class="comment">// If pooled is HTTP/2, we can toss this reference immediately.
         //
@@ -1815,13 +1843,15 @@
                 </span>drop(delayed_tx);
             });
 
-            <span class="self">self</span>.conn_builder.exec.execute(on_idle);
+            <span class="attr">#[cfg_attr(feature = <span class="string">&quot;deprecated&quot;</span>, allow(deprecated))]
+            </span><span class="self">self</span>.conn_builder.exec.execute(on_idle);
         } <span class="kw">else </span>{
             <span class="comment">// There&#39;s no body to delay, but the connection isn&#39;t
             // ready yet. Only re-insert when it&#39;s ready
             </span><span class="kw">let </span>on_idle = future::poll_fn(<span class="kw">move </span>|cx| pooled.poll_ready(cx)).map(|<span class="kw">_</span>| ());
 
-            <span class="self">self</span>.conn_builder.exec.execute(on_idle);
+            <span class="attr">#[cfg_attr(feature = <span class="string">&quot;deprecated&quot;</span>, allow(deprecated))]
+            </span><span class="self">self</span>.conn_builder.exec.execute(on_idle);
         }
 
         <span class="prelude-val">Ok</span>(res)
@@ -1874,6 +1904,7 @@
                         </span>});
                     <span class="comment">// An execute error here isn&#39;t important, we&#39;re just trying
                     // to prevent a waste of a socket...
+                    </span><span class="attr">#[cfg_attr(feature = <span class="string">&quot;deprecated&quot;</span>, allow(deprecated))]
                     </span><span class="self">self</span>.conn_builder.exec.execute(bg);
                 }
                 <span class="prelude-val">Ok</span>(checked_out)
@@ -1918,7 +1949,8 @@
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         pool_key: PoolKey,
     ) -&gt; <span class="kw">impl </span>Lazy&lt;Output = <span class="kw">crate</span>::Result&lt;Pooled&lt;PoolClient&lt;B&gt;&gt;&gt;&gt; + Unpin {
-        <span class="kw">let </span>executor = <span class="self">self</span>.conn_builder.exec.clone();
+        <span class="attr">#[cfg_attr(feature = <span class="string">&quot;deprecated&quot;</span>, allow(deprecated))]
+        </span><span class="kw">let </span>executor = <span class="self">self</span>.conn_builder.exec.clone();
         <span class="kw">let </span>pool = <span class="self">self</span>.pool.clone();
         <span class="attr">#[cfg(not(feature = <span class="string">&quot;http2&quot;</span>))]
         </span><span class="kw">let </span>conn_builder = <span class="self">self</span>.conn_builder.clone();
@@ -2117,7 +2149,8 @@
 }
 
 <span class="kw">enum </span>PoolTx&lt;B&gt; {
-    Http1(conn::SendRequest&lt;B&gt;),
+    <span class="attr">#[cfg_attr(feature = <span class="string">&quot;deprecated&quot;</span>, allow(deprecated))]
+    </span>Http1(conn::SendRequest&lt;B&gt;),
     <span class="attr">#[cfg(feature = <span class="string">&quot;http2&quot;</span>)]
     </span>Http2(conn::Http2SendRequest&lt;B&gt;),
 }
@@ -2184,6 +2217,10 @@
     </span>B: Send + <span class="lifetime">&#39;static</span>,
 {
     <span class="kw">fn </span>is_open(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="kw">if </span><span class="self">self</span>.conn_info.poisoned.poisoned() {
+            <span class="macro">trace!</span>(<span class="string">&quot;marking {:?} as closed because it was poisoned&quot;</span>, <span class="self">self</span>.conn_info);
+            <span class="kw">return </span><span class="bool-val">false</span>;
+        }
         <span class="kw">match </span><span class="self">self</span>.tx {
             PoolTx::Http1(<span class="kw-2">ref </span>tx) =&gt; tx.is_ready(),
             <span class="attr">#[cfg(feature = <span class="string">&quot;http2&quot;</span>)]
@@ -2389,7 +2426,8 @@
 #[derive(Clone)]
 </span><span class="kw">pub struct </span>Builder {
     client_config: Config,
-    conn_builder: conn::Builder,
+    <span class="attr">#[cfg_attr(feature = <span class="string">&quot;deprecated&quot;</span>, allow(deprecated))]
+    </span>conn_builder: conn::Builder,
     pool_config: pool::Config,
 }
 
@@ -2401,7 +2439,8 @@
                 set_host: <span class="bool-val">true</span>,
                 ver: Ver::Auto,
             },
-            conn_builder: conn::Builder::new(),
+            <span class="attr">#[cfg_attr(feature = <span class="string">&quot;deprecated&quot;</span>, allow(deprecated))]
+            </span>conn_builder: conn::Builder::new(),
             pool_config: pool::Config {
                 idle_timeout: <span class="prelude-val">Some</span>(Duration::from_secs(<span class="number">90</span>)),
                 max_idle_per_host: std::usize::MAX,
@@ -2865,7 +2904,8 @@
         B: HttpBody + Send,
         B::Data: Send,
     {
-        Client {
+        <span class="attr">#[cfg_attr(feature = <span class="string">&quot;deprecated&quot;</span>, allow(deprecated))]
+        </span>Client {
             config: <span class="self">self</span>.client_config,
             conn_builder: <span class="self">self</span>.conn_builder.clone(),
             connector,

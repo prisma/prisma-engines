@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/nix/store/jnqxxv1xi811ni996b002f4jnyz38xck-vendor-cargo-deps/c19b7c6f923b580ac259164a89f2577984ad5ab09ee9d583b888f934adbbe8d0/pest_generator-2.3.0/src/lib.rs`."><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-f3501f0f5ae15dfb.css" id="mainThemeStyle"><div id="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="pest_generator" data-themes="" data-resource-suffix="" data-rustdoc-version="1.71.0 (8ede3aae2 2023-07-12)" data-search-js="search-4926e5fc22a5646a.js" data-settings-js="settings-de11bff964e9d4e5.js" data-settings-css="settings-8c76f75bfb6bd192.css" data-theme-light-css="light-0f8c037637f9eb3e.css" data-theme-dark-css="dark-1097f8e92a01e3cf.css" data-theme-ayu-css="ayu-614652228113ac93.css" ></div><script src="../../static.files/storage-62ce34ea385b278a.js"></script><script defer src="../../static.files/source-script-11255107d0a65077.js"></script><script defer src="../../source-files.js"></script><script defer src="../../static.files/main-f0540c1d82cde29b.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../../static.files/light-0f8c037637f9eb3e.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../../static.files/dark-1097f8e92a01e3cf.css"><link rel="stylesheet" href="../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../pest_generator/index.html"><img class="rust-logo" src="../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/nix/store/yf45a1rayffhnidhgyjynpyhr9lqkd09-vendor-cargo-deps/c19b7c6f923b580ac259164a89f2577984ad5ab09ee9d583b888f934adbbe8d0/pest_generator-2.7.2/src/lib.rs`."><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-f3501f0f5ae15dfb.css" id="mainThemeStyle"><div id="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="pest_generator" data-themes="" data-resource-suffix="" data-rustdoc-version="1.71.0 (8ede3aae2 2023-07-12)" data-search-js="search-4926e5fc22a5646a.js" data-settings-js="settings-de11bff964e9d4e5.js" data-settings-css="settings-8c76f75bfb6bd192.css" data-theme-light-css="light-0f8c037637f9eb3e.css" data-theme-dark-css="dark-1097f8e92a01e3cf.css" data-theme-ayu-css="ayu-614652228113ac93.css" ></div><script src="../../static.files/storage-62ce34ea385b278a.js"></script><script defer src="../../static.files/source-script-11255107d0a65077.js"></script><script defer src="../../source-files.js"></script><script defer src="../../static.files/main-f0540c1d82cde29b.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../../static.files/light-0f8c037637f9eb3e.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../../static.files/dark-1097f8e92a01e3cf.css"><link rel="stylesheet" href="../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="icon" href="https://raw.githubusercontent.com/pest-parser/pest/master/pest-logo.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../pest_generator/index.html"><img src="https://raw.githubusercontent.com/pest-parser/pest/master/pest-logo.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -206,6 +206,104 @@
 <a href="#206" id="206">206</a>
 <a href="#207" id="207">207</a>
 <a href="#208" id="208">208</a>
+<a href="#209" id="209">209</a>
+<a href="#210" id="210">210</a>
+<a href="#211" id="211">211</a>
+<a href="#212" id="212">212</a>
+<a href="#213" id="213">213</a>
+<a href="#214" id="214">214</a>
+<a href="#215" id="215">215</a>
+<a href="#216" id="216">216</a>
+<a href="#217" id="217">217</a>
+<a href="#218" id="218">218</a>
+<a href="#219" id="219">219</a>
+<a href="#220" id="220">220</a>
+<a href="#221" id="221">221</a>
+<a href="#222" id="222">222</a>
+<a href="#223" id="223">223</a>
+<a href="#224" id="224">224</a>
+<a href="#225" id="225">225</a>
+<a href="#226" id="226">226</a>
+<a href="#227" id="227">227</a>
+<a href="#228" id="228">228</a>
+<a href="#229" id="229">229</a>
+<a href="#230" id="230">230</a>
+<a href="#231" id="231">231</a>
+<a href="#232" id="232">232</a>
+<a href="#233" id="233">233</a>
+<a href="#234" id="234">234</a>
+<a href="#235" id="235">235</a>
+<a href="#236" id="236">236</a>
+<a href="#237" id="237">237</a>
+<a href="#238" id="238">238</a>
+<a href="#239" id="239">239</a>
+<a href="#240" id="240">240</a>
+<a href="#241" id="241">241</a>
+<a href="#242" id="242">242</a>
+<a href="#243" id="243">243</a>
+<a href="#244" id="244">244</a>
+<a href="#245" id="245">245</a>
+<a href="#246" id="246">246</a>
+<a href="#247" id="247">247</a>
+<a href="#248" id="248">248</a>
+<a href="#249" id="249">249</a>
+<a href="#250" id="250">250</a>
+<a href="#251" id="251">251</a>
+<a href="#252" id="252">252</a>
+<a href="#253" id="253">253</a>
+<a href="#254" id="254">254</a>
+<a href="#255" id="255">255</a>
+<a href="#256" id="256">256</a>
+<a href="#257" id="257">257</a>
+<a href="#258" id="258">258</a>
+<a href="#259" id="259">259</a>
+<a href="#260" id="260">260</a>
+<a href="#261" id="261">261</a>
+<a href="#262" id="262">262</a>
+<a href="#263" id="263">263</a>
+<a href="#264" id="264">264</a>
+<a href="#265" id="265">265</a>
+<a href="#266" id="266">266</a>
+<a href="#267" id="267">267</a>
+<a href="#268" id="268">268</a>
+<a href="#269" id="269">269</a>
+<a href="#270" id="270">270</a>
+<a href="#271" id="271">271</a>
+<a href="#272" id="272">272</a>
+<a href="#273" id="273">273</a>
+<a href="#274" id="274">274</a>
+<a href="#275" id="275">275</a>
+<a href="#276" id="276">276</a>
+<a href="#277" id="277">277</a>
+<a href="#278" id="278">278</a>
+<a href="#279" id="279">279</a>
+<a href="#280" id="280">280</a>
+<a href="#281" id="281">281</a>
+<a href="#282" id="282">282</a>
+<a href="#283" id="283">283</a>
+<a href="#284" id="284">284</a>
+<a href="#285" id="285">285</a>
+<a href="#286" id="286">286</a>
+<a href="#287" id="287">287</a>
+<a href="#288" id="288">288</a>
+<a href="#289" id="289">289</a>
+<a href="#290" id="290">290</a>
+<a href="#291" id="291">291</a>
+<a href="#292" id="292">292</a>
+<a href="#293" id="293">293</a>
+<a href="#294" id="294">294</a>
+<a href="#295" id="295">295</a>
+<a href="#296" id="296">296</a>
+<a href="#297" id="297">297</a>
+<a href="#298" id="298">298</a>
+<a href="#299" id="299">299</a>
+<a href="#300" id="300">300</a>
+<a href="#301" id="301">301</a>
+<a href="#302" id="302">302</a>
+<a href="#303" id="303">303</a>
+<a href="#304" id="304">304</a>
+<a href="#305" id="305">305</a>
+<a href="#306" id="306">306</a>
 </pre></div><pre class="rust"><code><span class="comment">// pest. The Elegant Parser
 // Copyright (c) 2018 Dragoș Tiselice
 //
@@ -215,17 +313,19 @@
 // option. All files in the project carrying such notice may not be copied,
 // modified, or distributed except according to those terms.
 
-</span><span class="attr">#![doc(html_root_url = <span class="string">&quot;https://docs.rs/pest_derive&quot;</span>)]
+</span><span class="attr">#![doc(
+    html_root_url = <span class="string">&quot;https://docs.rs/pest_derive&quot;</span>,
+    html_logo_url = <span class="string">&quot;https://raw.githubusercontent.com/pest-parser/pest/master/pest-logo.svg&quot;</span>,
+    html_favicon_url = <span class="string">&quot;https://raw.githubusercontent.com/pest-parser/pest/master/pest-logo.svg&quot;
+</span>)]
+#![warn(missing_docs, rust_2018_idioms, unused_qualifications)]
 #![recursion_limit = <span class="string">&quot;256&quot;</span>]
+</span><span class="doccomment">//! # pest generator
+//!
+//! This crate generates code from ASTs (which is used in the `pest_derive` crate).
 
-</span><span class="kw">extern crate </span>pest;
-<span class="kw">extern crate </span>pest_meta;
-
-<span class="kw">extern crate </span>proc_macro;
-<span class="kw">extern crate </span>proc_macro2;
-<span class="attr">#[macro_use]
+</span><span class="attr">#[macro_use]
 </span><span class="kw">extern crate </span>quote;
-<span class="kw">extern crate </span>syn;
 
 <span class="kw">use </span>std::env;
 <span class="kw">use </span>std::fs::File;
@@ -233,77 +333,83 @@
 <span class="kw">use </span>std::path::Path;
 
 <span class="kw">use </span>proc_macro2::TokenStream;
-<span class="kw">use </span>syn::{Attribute, DeriveInput, Generics, Ident, Lit, Meta};
+<span class="kw">use </span>syn::{Attribute, DeriveInput, Expr, ExprLit, Generics, Ident, Lit, Meta};
 
 <span class="attr">#[macro_use]
 </span><span class="kw">mod </span>macros;
+<span class="kw">mod </span>docs;
 <span class="kw">mod </span>generator;
 
-<span class="kw">use </span>pest_meta::parser::{<span class="self">self</span>, Rule};
+<span class="kw">use </span>pest_meta::parser::{<span class="self">self</span>, rename_meta_rule, Rule};
 <span class="kw">use </span>pest_meta::{optimizer, unwrap_or_report, validator};
 
-<span class="kw">pub fn </span>derive_parser(input: TokenStream, include_grammar: bool) -&gt; TokenStream {
+<span class="doccomment">/// Processes the derive/proc macro input and generates the corresponding parser based
+/// on the parsed grammar. If `include_grammar` is set to true, it&#39;ll generate an explicit
+/// &quot;include_str&quot; statement (done in pest_derive, but turned off in the local bootstrap).
+</span><span class="kw">pub fn </span>derive_parser(input: TokenStream, include_grammar: bool) -&gt; TokenStream {
     <span class="kw">let </span>ast: DeriveInput = syn::parse2(input).unwrap();
-    <span class="kw">let </span>(name, generics, content) = parse_derive(ast);
+    <span class="kw">let </span>(parsed_derive, contents) = parse_derive(ast);
 
-    <span class="kw">let </span>(data, path) = <span class="kw">match </span>content {
-        GrammarSource::File(<span class="kw-2">ref </span>path) =&gt; {
-            <span class="kw">let </span>root = env::var(<span class="string">&quot;CARGO_MANIFEST_DIR&quot;</span>).unwrap_or_else(|<span class="kw">_</span>| <span class="string">&quot;.&quot;</span>.into());
-            <span class="kw">let </span>path = Path::new(<span class="kw-2">&amp;</span>root).join(<span class="string">&quot;src/&quot;</span>).join(<span class="kw-2">&amp;</span>path);
-            <span class="kw">let </span>file_name = <span class="kw">match </span>path.file_name() {
-                <span class="prelude-val">Some</span>(file_name) =&gt; file_name,
-                <span class="prelude-val">None </span>=&gt; <span class="macro">panic!</span>(<span class="string">&quot;grammar attribute should point to a file&quot;</span>),
-            };
+    <span class="kw">let </span><span class="kw-2">mut </span>data = String::new();
+    <span class="kw">let </span><span class="kw-2">mut </span>paths = <span class="macro">vec!</span>[];
 
-            <span class="kw">let </span>data = <span class="kw">match </span>read_file(<span class="kw-2">&amp;</span>path) {
-                <span class="prelude-val">Ok</span>(data) =&gt; data,
-                <span class="prelude-val">Err</span>(error) =&gt; <span class="macro">panic!</span>(<span class="string">&quot;error opening {:?}: {}&quot;</span>, file_name, error),
-            };
-            (data, <span class="prelude-val">Some</span>(path.clone()))
+    <span class="kw">for </span>content <span class="kw">in </span>contents {
+        <span class="kw">let </span>(_data, _path) = <span class="kw">match </span>content {
+            GrammarSource::File(<span class="kw-2">ref </span>path) =&gt; {
+                <span class="kw">let </span>root = env::var(<span class="string">&quot;CARGO_MANIFEST_DIR&quot;</span>).unwrap_or_else(|<span class="kw">_</span>| <span class="string">&quot;.&quot;</span>.into());
+
+                <span class="comment">// Check whether we can find a file at the path relative to the CARGO_MANIFEST_DIR
+                // first.
+                //
+                // If we cannot find the expected file over there, fallback to the
+                // `CARGO_MANIFEST_DIR/src`, which is the old default and kept for convenience
+                // reasons.
+                // TODO: This could be refactored once `std::path::absolute()` get&#39;s stabilized.
+                // https://doc.rust-lang.org/std/path/fn.absolute.html
+                </span><span class="kw">let </span>path = <span class="kw">if </span>Path::new(<span class="kw-2">&amp;</span>root).join(path).exists() {
+                    Path::new(<span class="kw-2">&amp;</span>root).join(path)
+                } <span class="kw">else </span>{
+                    Path::new(<span class="kw-2">&amp;</span>root).join(<span class="string">&quot;src/&quot;</span>).join(path)
+                };
+
+                <span class="kw">let </span>file_name = <span class="kw">match </span>path.file_name() {
+                    <span class="prelude-val">Some</span>(file_name) =&gt; file_name,
+                    <span class="prelude-val">None </span>=&gt; <span class="macro">panic!</span>(<span class="string">&quot;grammar attribute should point to a file&quot;</span>),
+                };
+
+                <span class="kw">let </span>data = <span class="kw">match </span>read_file(<span class="kw-2">&amp;</span>path) {
+                    <span class="prelude-val">Ok</span>(data) =&gt; data,
+                    <span class="prelude-val">Err</span>(error) =&gt; <span class="macro">panic!</span>(<span class="string">&quot;error opening {:?}: {}&quot;</span>, file_name, error),
+                };
+                (data, <span class="prelude-val">Some</span>(path.clone()))
+            }
+            GrammarSource::Inline(content) =&gt; (content, <span class="prelude-val">None</span>),
+        };
+
+        data.push_str(<span class="kw-2">&amp;</span>_data);
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(path) = _path {
+            paths.push(path);
         }
-        GrammarSource::Inline(content) =&gt; (content, <span class="prelude-val">None</span>),
-    };
+    }
 
     <span class="kw">let </span>pairs = <span class="kw">match </span>parser::parse(Rule::grammar_rules, <span class="kw-2">&amp;</span>data) {
         <span class="prelude-val">Ok</span>(pairs) =&gt; pairs,
-        <span class="prelude-val">Err</span>(error) =&gt; <span class="macro">panic!</span>(
-            <span class="string">&quot;error parsing \n{}&quot;</span>,
-            error.renamed_rules(|rule| <span class="kw">match </span><span class="kw-2">*</span>rule {
-                Rule::grammar_rule =&gt; <span class="string">&quot;rule&quot;</span>.to_owned(),
-                Rule::_push =&gt; <span class="string">&quot;PUSH&quot;</span>.to_owned(),
-                Rule::assignment_operator =&gt; <span class="string">&quot;`=`&quot;</span>.to_owned(),
-                Rule::silent_modifier =&gt; <span class="string">&quot;`_`&quot;</span>.to_owned(),
-                Rule::atomic_modifier =&gt; <span class="string">&quot;`@`&quot;</span>.to_owned(),
-                Rule::compound_atomic_modifier =&gt; <span class="string">&quot;`$`&quot;</span>.to_owned(),
-                Rule::non_atomic_modifier =&gt; <span class="string">&quot;`!`&quot;</span>.to_owned(),
-                Rule::opening_brace =&gt; <span class="string">&quot;`{`&quot;</span>.to_owned(),
-                Rule::closing_brace =&gt; <span class="string">&quot;`}`&quot;</span>.to_owned(),
-                Rule::opening_brack =&gt; <span class="string">&quot;`[`&quot;</span>.to_owned(),
-                Rule::closing_brack =&gt; <span class="string">&quot;`]`&quot;</span>.to_owned(),
-                Rule::opening_paren =&gt; <span class="string">&quot;`(`&quot;</span>.to_owned(),
-                Rule::positive_predicate_operator =&gt; <span class="string">&quot;`&amp;`&quot;</span>.to_owned(),
-                Rule::negative_predicate_operator =&gt; <span class="string">&quot;`!`&quot;</span>.to_owned(),
-                Rule::sequence_operator =&gt; <span class="string">&quot;`&amp;`&quot;</span>.to_owned(),
-                Rule::choice_operator =&gt; <span class="string">&quot;`|`&quot;</span>.to_owned(),
-                Rule::optional_operator =&gt; <span class="string">&quot;`?`&quot;</span>.to_owned(),
-                Rule::repeat_operator =&gt; <span class="string">&quot;`*`&quot;</span>.to_owned(),
-                Rule::repeat_once_operator =&gt; <span class="string">&quot;`+`&quot;</span>.to_owned(),
-                Rule::comma =&gt; <span class="string">&quot;`,`&quot;</span>.to_owned(),
-                Rule::closing_paren =&gt; <span class="string">&quot;`)`&quot;</span>.to_owned(),
-                Rule::quote =&gt; <span class="string">&quot;`\&quot;`&quot;</span>.to_owned(),
-                Rule::insensitive_string =&gt; <span class="string">&quot;`^`&quot;</span>.to_owned(),
-                Rule::range_operator =&gt; <span class="string">&quot;`..`&quot;</span>.to_owned(),
-                Rule::single_quote =&gt; <span class="string">&quot;`&#39;`&quot;</span>.to_owned(),
-                other_rule =&gt; <span class="macro">format!</span>(<span class="string">&quot;{:?}&quot;</span>, other_rule),
-            })
-        ),
+        <span class="prelude-val">Err</span>(error) =&gt; <span class="macro">panic!</span>(<span class="string">&quot;error parsing \n{}&quot;</span>, error.renamed_rules(rename_meta_rule)),
     };
 
     <span class="kw">let </span>defaults = unwrap_or_report(validator::validate_pairs(pairs.clone()));
+    <span class="kw">let </span>doc_comment = docs::consume(pairs.clone());
     <span class="kw">let </span>ast = unwrap_or_report(parser::consume_rules(pairs));
     <span class="kw">let </span>optimized = optimizer::optimize(ast);
 
-    generator::generate(name, <span class="kw-2">&amp;</span>generics, path, optimized, defaults, include_grammar)
+    generator::generate(
+        parsed_derive,
+        paths,
+        optimized,
+        defaults,
+        <span class="kw-2">&amp;</span>doc_comment,
+        include_grammar,
+    )
 }
 
 <span class="kw">fn </span>read_file&lt;P: AsRef&lt;Path&gt;&gt;(path: P) -&gt; io::Result&lt;String&gt; {
@@ -319,34 +425,56 @@
     Inline(String),
 }
 
-<span class="kw">fn </span>parse_derive(ast: DeriveInput) -&gt; (Ident, Generics, GrammarSource) {
+<span class="kw">struct </span>ParsedDerive {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) name: Ident,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) generics: Generics,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) non_exhaustive: bool,
+}
+
+<span class="kw">fn </span>parse_derive(ast: DeriveInput) -&gt; (ParsedDerive, Vec&lt;GrammarSource&gt;) {
     <span class="kw">let </span>name = ast.ident;
     <span class="kw">let </span>generics = ast.generics;
 
     <span class="kw">let </span>grammar: Vec&lt;<span class="kw-2">&amp;</span>Attribute&gt; = ast
         .attrs
         .iter()
-        .filter(|attr| <span class="kw">match </span>attr.parse_meta() {
-            <span class="prelude-val">Ok</span>(Meta::NameValue(name_value)) =&gt; {
-                name_value.path.is_ident(<span class="string">&quot;grammar&quot;</span>) || name_value.path.is_ident(<span class="string">&quot;grammar_inline&quot;</span>)
-            }
-            <span class="kw">_ </span>=&gt; <span class="bool-val">false</span>,
+        .filter(|attr| {
+            <span class="kw">let </span>path = attr.meta.path();
+            path.is_ident(<span class="string">&quot;grammar&quot;</span>) || path.is_ident(<span class="string">&quot;grammar_inline&quot;</span>)
         })
         .collect();
 
-    <span class="kw">let </span>argument = <span class="kw">match </span>grammar.len() {
-        <span class="number">0 </span>=&gt; <span class="macro">panic!</span>(<span class="string">&quot;a grammar file needs to be provided with the #[grammar = \&quot;PATH\&quot;] or #[grammar_inline = \&quot;GRAMMAR CONTENTS\&quot;] attribute&quot;</span>),
-        <span class="number">1 </span>=&gt; get_attribute(grammar[<span class="number">0</span>]),
-        <span class="kw">_ </span>=&gt; <span class="macro">panic!</span>(<span class="string">&quot;only 1 grammar file can be provided&quot;</span>),
-    };
+    <span class="kw">if </span>grammar.is_empty() {
+        <span class="macro">panic!</span>(<span class="string">&quot;a grammar file needs to be provided with the #[grammar = \&quot;PATH\&quot;] or #[grammar_inline = \&quot;GRAMMAR CONTENTS\&quot;] attribute&quot;</span>);
+    }
 
-    (name, generics, argument)
+    <span class="kw">let </span><span class="kw-2">mut </span>grammar_sources = Vec::with_capacity(grammar.len());
+    <span class="kw">for </span>attr <span class="kw">in </span>grammar {
+        grammar_sources.push(get_attribute(attr))
+    }
+
+    <span class="kw">let </span>non_exhaustive = ast
+        .attrs
+        .iter()
+        .any(|attr| attr.meta.path().is_ident(<span class="string">&quot;non_exhaustive&quot;</span>));
+
+    (
+        ParsedDerive {
+            name,
+            generics,
+            non_exhaustive,
+        },
+        grammar_sources,
+    )
 }
 
 <span class="kw">fn </span>get_attribute(attr: <span class="kw-2">&amp;</span>Attribute) -&gt; GrammarSource {
-    <span class="kw">match </span>attr.parse_meta() {
-        <span class="prelude-val">Ok</span>(Meta::NameValue(name_value)) =&gt; <span class="kw">match </span>name_value.lit {
-            Lit::Str(string) =&gt; {
+    <span class="kw">match </span><span class="kw-2">&amp;</span>attr.meta {
+        Meta::NameValue(name_value) =&gt; <span class="kw">match </span><span class="kw-2">&amp;</span>name_value.value {
+            Expr::Lit(ExprLit {
+                lit: Lit::Str(string),
+                ..
+            }) =&gt; {
                 <span class="kw">if </span>name_value.path.is_ident(<span class="string">&quot;grammar&quot;</span>) {
                     GrammarSource::File(string.value())
                 } <span class="kw">else </span>{
@@ -363,7 +491,6 @@
 </span><span class="kw">mod </span>tests {
     <span class="kw">use </span><span class="kw">super</span>::parse_derive;
     <span class="kw">use </span><span class="kw">super</span>::GrammarSource;
-    <span class="kw">use </span>syn;
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>derive_inline_file() {
@@ -373,8 +500,8 @@
             pub struct MyParser&lt;&#39;a, T&gt;;
         &quot;</span>;
         <span class="kw">let </span>ast = syn::parse_str(definition).unwrap();
-        <span class="kw">let </span>(<span class="kw">_</span>, <span class="kw">_</span>, filename) = parse_derive(ast);
-        <span class="macro">assert_eq!</span>(filename, GrammarSource::Inline(<span class="string">&quot;GRAMMAR&quot;</span>.to_string()));
+        <span class="kw">let </span>(<span class="kw">_</span>, filenames) = parse_derive(ast);
+        <span class="macro">assert_eq!</span>(filenames, [GrammarSource::Inline(<span class="string">&quot;GRAMMAR&quot;</span>.to_string())]);
     }
 
     <span class="attr">#[test]
@@ -385,12 +512,12 @@
             pub struct MyParser&lt;&#39;a, T&gt;;
         &quot;</span>;
         <span class="kw">let </span>ast = syn::parse_str(definition).unwrap();
-        <span class="kw">let </span>(<span class="kw">_</span>, <span class="kw">_</span>, filename) = parse_derive(ast);
-        <span class="macro">assert_eq!</span>(filename, GrammarSource::File(<span class="string">&quot;myfile.pest&quot;</span>.to_string()));
+        <span class="kw">let </span>(parsed_derive, filenames) = parse_derive(ast);
+        <span class="macro">assert_eq!</span>(filenames, [GrammarSource::File(<span class="string">&quot;myfile.pest&quot;</span>.to_string())]);
+        <span class="macro">assert!</span>(!parsed_derive.non_exhaustive);
     }
 
     <span class="attr">#[test]
-    #[should_panic(expected = <span class="string">&quot;only 1 grammar file can be provided&quot;</span>)]
     </span><span class="kw">fn </span>derive_multiple_grammars() {
         <span class="kw">let </span>definition = <span class="string">&quot;
             #[other_attr]
@@ -399,7 +526,27 @@
             pub struct MyParser&lt;&#39;a, T&gt;;
         &quot;</span>;
         <span class="kw">let </span>ast = syn::parse_str(definition).unwrap();
-        parse_derive(ast);
+        <span class="kw">let </span>(<span class="kw">_</span>, filenames) = parse_derive(ast);
+        <span class="macro">assert_eq!</span>(
+            filenames,
+            [
+                GrammarSource::File(<span class="string">&quot;myfile1.pest&quot;</span>.to_string()),
+                GrammarSource::File(<span class="string">&quot;myfile2.pest&quot;</span>.to_string())
+            ]
+        );
+    }
+
+    <span class="attr">#[test]
+    </span><span class="kw">fn </span>derive_nonexhaustive() {
+        <span class="kw">let </span>definition = <span class="string">&quot;
+            #[non_exhaustive]
+            #[grammar = \&quot;myfile.pest\&quot;]
+            pub struct MyParser&lt;&#39;a, T&gt;;
+        &quot;</span>;
+        <span class="kw">let </span>ast = syn::parse_str(definition).unwrap();
+        <span class="kw">let </span>(parsed_derive, filenames) = parse_derive(ast);
+        <span class="macro">assert_eq!</span>(filenames, [GrammarSource::File(<span class="string">&quot;myfile.pest&quot;</span>.to_string())]);
+        <span class="macro">assert!</span>(parsed_derive.non_exhaustive);
     }
 
     <span class="attr">#[test]
@@ -412,6 +559,55 @@
         &quot;</span>;
         <span class="kw">let </span>ast = syn::parse_str(definition).unwrap();
         parse_derive(ast);
+    }
+
+    <span class="attr">#[test]
+    #[should_panic(
+        expected = <span class="string">&quot;a grammar file needs to be provided with the #[grammar = \&quot;PATH\&quot;] or #[grammar_inline = \&quot;GRAMMAR CONTENTS\&quot;] attribute&quot;
+    </span>)]
+    </span><span class="kw">fn </span>derive_no_grammar() {
+        <span class="kw">let </span>definition = <span class="string">&quot;
+            #[other_attr]
+            pub struct MyParser&lt;&#39;a, T&gt;;
+        &quot;</span>;
+        <span class="kw">let </span>ast = syn::parse_str(definition).unwrap();
+        parse_derive(ast);
+    }
+
+    <span class="attr">#[doc = <span class="string">&quot;Matches dar\n\nMatch dar description\n&quot;</span>]
+    #[test]
+    </span><span class="kw">fn </span>test_generate_doc() {
+        <span class="kw">let </span>input = <span class="macro">quote! </span>{
+            <span class="attr">#[derive(Parser)]
+            #[non_exhaustive]
+            #[grammar = <span class="string">&quot;../tests/test.pest&quot;</span>]
+            </span><span class="kw">pub struct </span>TestParser;
+        };
+
+        <span class="kw">let </span>token = <span class="kw">super</span>::derive_parser(input, <span class="bool-val">true</span>);
+
+        <span class="kw">let </span>expected = <span class="macro">quote! </span>{
+            <span class="attr">#[doc = <span class="string">&quot;A parser for JSON file.\nAnd this is a example for JSON parser.\n\n    indent-4-space\n&quot;</span>]
+            #[allow(dead_code, non_camel_case_types, clippy::upper_case_acronyms)]
+            #[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
+            #[non_exhaustive]
+            </span><span class="kw">pub enum </span>Rule {
+                <span class="attr">#[doc = <span class="string">&quot;Matches foo str, e.g.: `foo`&quot;</span>]
+                </span>r#foo,
+                <span class="attr">#[doc = <span class="string">&quot;Matches bar str\n\n  Indent 2, e.g: `bar` or `foobar`&quot;</span>]
+                </span>r#bar,
+                r#bar1,
+                <span class="attr">#[doc = <span class="string">&quot;Matches dar\n\nMatch dar description\n&quot;</span>]
+                </span>r#dar
+            }
+        };
+
+        <span class="macro">assert!</span>(
+            token.to_string().contains(expected.to_string().as_str()),
+            <span class="string">&quot;{}\n\nExpected to contains:\n{}&quot;</span>,
+            token,
+            expected
+        );
     }
 }
 </code></pre></div></section></main></body></html>

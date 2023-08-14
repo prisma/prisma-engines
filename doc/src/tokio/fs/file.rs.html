@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/nix/store/jnqxxv1xi811ni996b002f4jnyz38xck-vendor-cargo-deps/c19b7c6f923b580ac259164a89f2577984ad5ab09ee9d583b888f934adbbe8d0/tokio-1.25.0/src/fs/file.rs`."><title>file.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-f3501f0f5ae15dfb.css" id="mainThemeStyle"><div id="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="tokio" data-themes="" data-resource-suffix="" data-rustdoc-version="1.71.0 (8ede3aae2 2023-07-12)" data-search-js="search-4926e5fc22a5646a.js" data-settings-js="settings-de11bff964e9d4e5.js" data-settings-css="settings-8c76f75bfb6bd192.css" data-theme-light-css="light-0f8c037637f9eb3e.css" data-theme-dark-css="dark-1097f8e92a01e3cf.css" data-theme-ayu-css="ayu-614652228113ac93.css" ></div><script src="../../../static.files/storage-62ce34ea385b278a.js"></script><script defer src="../../../static.files/source-script-11255107d0a65077.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../static.files/main-f0540c1d82cde29b.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../../../static.files/light-0f8c037637f9eb3e.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../../../static.files/dark-1097f8e92a01e3cf.css"><link rel="stylesheet" href="../../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../../tokio/index.html"><img class="rust-logo" src="../../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/nix/store/yf45a1rayffhnidhgyjynpyhr9lqkd09-vendor-cargo-deps/c19b7c6f923b580ac259164a89f2577984ad5ab09ee9d583b888f934adbbe8d0/tokio-1.30.0/src/fs/file.rs`."><title>file.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-f3501f0f5ae15dfb.css" id="mainThemeStyle"><div id="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="tokio" data-themes="" data-resource-suffix="" data-rustdoc-version="1.71.0 (8ede3aae2 2023-07-12)" data-search-js="search-4926e5fc22a5646a.js" data-settings-js="settings-de11bff964e9d4e5.js" data-settings-css="settings-8c76f75bfb6bd192.css" data-theme-light-css="light-0f8c037637f9eb3e.css" data-theme-dark-css="dark-1097f8e92a01e3cf.css" data-theme-ayu-css="ayu-614652228113ac93.css" ></div><script src="../../../static.files/storage-62ce34ea385b278a.js"></script><script defer src="../../../static.files/source-script-11255107d0a65077.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../static.files/main-f0540c1d82cde29b.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../../../static.files/light-0f8c037637f9eb3e.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../../../static.files/dark-1097f8e92a01e3cf.css"><link rel="stylesheet" href="../../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../../tokio/index.html"><img class="rust-logo" src="../../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -778,12 +778,76 @@
 <a href="#778" id="778">778</a>
 <a href="#779" id="779">779</a>
 <a href="#780" id="780">780</a>
+<a href="#781" id="781">781</a>
+<a href="#782" id="782">782</a>
+<a href="#783" id="783">783</a>
+<a href="#784" id="784">784</a>
+<a href="#785" id="785">785</a>
+<a href="#786" id="786">786</a>
+<a href="#787" id="787">787</a>
+<a href="#788" id="788">788</a>
+<a href="#789" id="789">789</a>
+<a href="#790" id="790">790</a>
+<a href="#791" id="791">791</a>
+<a href="#792" id="792">792</a>
+<a href="#793" id="793">793</a>
+<a href="#794" id="794">794</a>
+<a href="#795" id="795">795</a>
+<a href="#796" id="796">796</a>
+<a href="#797" id="797">797</a>
+<a href="#798" id="798">798</a>
+<a href="#799" id="799">799</a>
+<a href="#800" id="800">800</a>
+<a href="#801" id="801">801</a>
+<a href="#802" id="802">802</a>
+<a href="#803" id="803">803</a>
+<a href="#804" id="804">804</a>
+<a href="#805" id="805">805</a>
+<a href="#806" id="806">806</a>
+<a href="#807" id="807">807</a>
+<a href="#808" id="808">808</a>
+<a href="#809" id="809">809</a>
+<a href="#810" id="810">810</a>
+<a href="#811" id="811">811</a>
+<a href="#812" id="812">812</a>
+<a href="#813" id="813">813</a>
+<a href="#814" id="814">814</a>
+<a href="#815" id="815">815</a>
+<a href="#816" id="816">816</a>
+<a href="#817" id="817">817</a>
+<a href="#818" id="818">818</a>
+<a href="#819" id="819">819</a>
+<a href="#820" id="820">820</a>
+<a href="#821" id="821">821</a>
+<a href="#822" id="822">822</a>
+<a href="#823" id="823">823</a>
+<a href="#824" id="824">824</a>
+<a href="#825" id="825">825</a>
+<a href="#826" id="826">826</a>
+<a href="#827" id="827">827</a>
+<a href="#828" id="828">828</a>
+<a href="#829" id="829">829</a>
+<a href="#830" id="830">830</a>
+<a href="#831" id="831">831</a>
+<a href="#832" id="832">832</a>
+<a href="#833" id="833">833</a>
+<a href="#834" id="834">834</a>
+<a href="#835" id="835">835</a>
+<a href="#836" id="836">836</a>
+<a href="#837" id="837">837</a>
+<a href="#838" id="838">838</a>
+<a href="#839" id="839">839</a>
+<a href="#840" id="840">840</a>
+<a href="#841" id="841">841</a>
+<a href="#842" id="842">842</a>
+<a href="#843" id="843">843</a>
+<a href="#844" id="844">844</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Types for working with [`File`].
 //!
 //! [`File`]: File
 
 </span><span class="kw">use </span><span class="self">self</span>::State::<span class="kw-2">*</span>;
-<span class="kw">use </span><span class="kw">crate</span>::fs::asyncify;
+<span class="kw">use </span><span class="kw">crate</span>::fs::{asyncify, OpenOptions};
 <span class="kw">use </span><span class="kw">crate</span>::io::blocking::Buf;
 <span class="kw">use </span><span class="kw">crate</span>::io::{AsyncRead, AsyncSeek, AsyncWrite, ReadBuf};
 <span class="kw">use </span><span class="kw">crate</span>::sync::Mutex;
@@ -904,8 +968,6 @@
     ///
     /// See [`OpenOptions`] for more details.
     ///
-    /// [`OpenOptions`]: super::OpenOptions
-    ///
     /// # Errors
     ///
     /// This function will return an error if called from outside of the Tokio
@@ -947,8 +1009,6 @@
     ///
     /// See [`OpenOptions`] for more details.
     ///
-    /// [`OpenOptions`]: super::OpenOptions
-    ///
     /// # Errors
     ///
     /// Results in an error if called from outside of the Tokio runtime or if
@@ -977,6 +1037,37 @@
         <span class="kw">let </span>path = path.as_ref().to_owned();
         <span class="kw">let </span>std_file = asyncify(<span class="kw">move </span>|| StdFile::create(path)).<span class="kw">await</span><span class="question-mark">?</span>;
         <span class="prelude-val">Ok</span>(File::from_std(std_file))
+    }
+
+    <span class="doccomment">/// Returns a new [`OpenOptions`] object.
+    ///
+    /// This function returns a new `OpenOptions` object that you can use to
+    /// open or create a file with specific options if `open()` or `create()`
+    /// are not appropriate.
+    ///
+    /// It is equivalent to `OpenOptions::new()`, but allows you to write more
+    /// readable code. Instead of
+    /// `OpenOptions::new().append(true).open(&quot;example.log&quot;)`,
+    /// you can write `File::options().append(true).open(&quot;example.log&quot;)`. This
+    /// also avoids the need to import `OpenOptions`.
+    ///
+    /// See the [`OpenOptions::new`] function for more details.
+    ///
+    /// # Examples
+    ///
+    /// ```no_run
+    /// use tokio::fs::File;
+    /// use tokio::io::AsyncWriteExt;
+    ///
+    /// # async fn dox() -&gt; std::io::Result&lt;()&gt; {
+    /// let mut f = File::options().append(true).open(&quot;example.log&quot;).await?;
+    /// f.write_all(b&quot;new line\n&quot;).await?;
+    /// # Ok(())
+    /// # }
+    /// ```
+    </span><span class="attr">#[must_use]
+    </span><span class="kw">pub fn </span>options() -&gt; OpenOptions {
+        OpenOptions::new()
     }
 
     <span class="doccomment">/// Converts a [`std::fs::File`][std] to a [`tokio::fs::File`][file].
@@ -1179,6 +1270,7 @@
     /// # }
     /// ```
     </span><span class="kw">pub async fn </span>try_clone(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; io::Result&lt;File&gt; {
+        <span class="self">self</span>.inner.lock().<span class="kw">await</span>.complete_inflight().<span class="kw">await</span>;
         <span class="kw">let </span>std = <span class="self">self</span>.std.clone();
         <span class="kw">let </span>std_file = asyncify(<span class="kw">move </span>|| std.try_clone()).<span class="kw">await</span><span class="question-mark">?</span>;
         <span class="prelude-val">Ok</span>(File::from_std(std_file))
@@ -1278,6 +1370,7 @@
         cx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;,
         dst: <span class="kw-2">&amp;mut </span>ReadBuf&lt;<span class="lifetime">&#39;_</span>&gt;,
     ) -&gt; Poll&lt;io::Result&lt;()&gt;&gt; {
+        <span class="macro">ready!</span>(<span class="kw">crate</span>::trace::trace_leaf(cx));
         <span class="kw">let </span>me = <span class="self">self</span>.get_mut();
         <span class="kw">let </span>inner = me.inner.get_mut();
 
@@ -1374,6 +1467,7 @@
     }
 
     <span class="kw">fn </span>poll_complete(<span class="kw-2">mut </span><span class="self">self</span>: Pin&lt;<span class="kw-2">&amp;mut </span><span class="self">Self</span>&gt;, cx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; Poll&lt;io::Result&lt;u64&gt;&gt; {
+        <span class="macro">ready!</span>(<span class="kw">crate</span>::trace::trace_leaf(cx));
         <span class="kw">let </span>inner = <span class="self">self</span>.inner.get_mut();
 
         <span class="kw">loop </span>{
@@ -1409,6 +1503,7 @@
         cx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;,
         src: <span class="kw-2">&amp;</span>[u8],
     ) -&gt; Poll&lt;io::Result&lt;usize&gt;&gt; {
+        <span class="macro">ready!</span>(<span class="kw">crate</span>::trace::trace_leaf(cx));
         <span class="kw">let </span>me = <span class="self">self</span>.get_mut();
         <span class="kw">let </span>inner = me.inner.get_mut();
 
@@ -1475,11 +1570,13 @@
     }
 
     <span class="kw">fn </span>poll_flush(<span class="kw-2">mut </span><span class="self">self</span>: Pin&lt;<span class="kw-2">&amp;mut </span><span class="self">Self</span>&gt;, cx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; Poll&lt;<span class="prelude-ty">Result</span>&lt;(), io::Error&gt;&gt; {
+        <span class="macro">ready!</span>(<span class="kw">crate</span>::trace::trace_leaf(cx));
         <span class="kw">let </span>inner = <span class="self">self</span>.inner.get_mut();
         inner.poll_flush(cx)
     }
 
     <span class="kw">fn </span>poll_shutdown(<span class="self">self</span>: Pin&lt;<span class="kw-2">&amp;mut </span><span class="self">Self</span>&gt;, cx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; Poll&lt;<span class="prelude-ty">Result</span>&lt;(), io::Error&gt;&gt; {
+        <span class="macro">ready!</span>(<span class="kw">crate</span>::trace::trace_leaf(cx));
         <span class="self">self</span>.poll_flush(cx)
     }
 }
@@ -1506,23 +1603,44 @@
 }
 
 <span class="attr">#[cfg(unix)]
+</span><span class="kw">impl </span>std::os::unix::io::AsFd <span class="kw">for </span>File {
+    <span class="kw">fn </span>as_fd(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; std::os::unix::io::BorrowedFd&lt;<span class="lifetime">&#39;_</span>&gt; {
+        <span class="kw">unsafe </span>{
+            std::os::unix::io::BorrowedFd::borrow_raw(std::os::unix::io::AsRawFd::as_raw_fd(<span class="self">self</span>))
+        }
+    }
+}
+
+<span class="attr">#[cfg(unix)]
 </span><span class="kw">impl </span>std::os::unix::io::FromRawFd <span class="kw">for </span>File {
     <span class="kw">unsafe fn </span>from_raw_fd(fd: std::os::unix::io::RawFd) -&gt; <span class="self">Self </span>{
         StdFile::from_raw_fd(fd).into()
     }
 }
 
-<span class="attr">#[cfg(windows)]
-</span><span class="kw">impl </span>std::os::windows::io::AsRawHandle <span class="kw">for </span>File {
-    <span class="kw">fn </span>as_raw_handle(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; std::os::windows::io::RawHandle {
-        <span class="self">self</span>.std.as_raw_handle()
-    }
-}
+<span class="macro">cfg_windows! </span>{
+    <span class="kw">use </span><span class="kw">crate</span>::os::windows::io::{AsRawHandle, FromRawHandle, RawHandle, AsHandle, BorrowedHandle};
 
-<span class="attr">#[cfg(windows)]
-</span><span class="kw">impl </span>std::os::windows::io::FromRawHandle <span class="kw">for </span>File {
-    <span class="kw">unsafe fn </span>from_raw_handle(handle: std::os::windows::io::RawHandle) -&gt; <span class="self">Self </span>{
-        StdFile::from_raw_handle(handle).into()
+    <span class="kw">impl </span>AsRawHandle <span class="kw">for </span>File {
+        <span class="kw">fn </span>as_raw_handle(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; RawHandle {
+            <span class="self">self</span>.std.as_raw_handle()
+        }
+    }
+
+    <span class="kw">impl </span>AsHandle <span class="kw">for </span>File {
+        <span class="kw">fn </span>as_handle(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; BorrowedHandle&lt;<span class="lifetime">&#39;_</span>&gt; {
+            <span class="kw">unsafe </span>{
+                BorrowedHandle::borrow_raw(
+                    AsRawHandle::as_raw_handle(<span class="self">self</span>),
+                )
+            }
+        }
+    }
+
+    <span class="kw">impl </span>FromRawHandle <span class="kw">for </span>File {
+        <span class="kw">unsafe fn </span>from_raw_handle(handle: RawHandle) -&gt; <span class="self">Self </span>{
+            StdFile::from_raw_handle(handle).into()
+        }
     }
 }
 
@@ -1530,8 +1648,18 @@
     <span class="kw">async fn </span>complete_inflight(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
         <span class="kw">use </span><span class="kw">crate</span>::future::poll_fn;
 
-        <span class="kw">if let </span><span class="prelude-val">Err</span>(e) = poll_fn(|cx| Pin::new(<span class="kw-2">&amp;mut *</span><span class="self">self</span>).poll_flush(cx)).<span class="kw">await </span>{
-            <span class="self">self</span>.last_write_err = <span class="prelude-val">Some</span>(e.kind());
+        poll_fn(|cx| <span class="self">self</span>.poll_complete_inflight(cx)).<span class="kw">await
+    </span>}
+
+    <span class="kw">fn </span>poll_complete_inflight(<span class="kw-2">&amp;mut </span><span class="self">self</span>, cx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; Poll&lt;()&gt; {
+        <span class="macro">ready!</span>(<span class="kw">crate</span>::trace::trace_leaf(cx));
+        <span class="kw">match </span><span class="self">self</span>.poll_flush(cx) {
+            Poll::Ready(<span class="prelude-val">Err</span>(e)) =&gt; {
+                <span class="self">self</span>.last_write_err = <span class="prelude-val">Some</span>(e.kind());
+                Poll::Ready(())
+            }
+            Poll::Ready(<span class="prelude-val">Ok</span>(())) =&gt; Poll::Ready(()),
+            Poll::Pending =&gt; Poll::Pending,
         }
     }
 

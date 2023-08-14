@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/nix/store/jnqxxv1xi811ni996b002f4jnyz38xck-vendor-cargo-deps/c19b7c6f923b580ac259164a89f2577984ad5ab09ee9d583b888f934adbbe8d0/tracing-attributes-0.1.22/src/attr.rs`."><title>attr.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-f3501f0f5ae15dfb.css" id="mainThemeStyle"><div id="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="tracing_attributes" data-themes="" data-resource-suffix="" data-rustdoc-version="1.71.0 (8ede3aae2 2023-07-12)" data-search-js="search-4926e5fc22a5646a.js" data-settings-js="settings-de11bff964e9d4e5.js" data-settings-css="settings-8c76f75bfb6bd192.css" data-theme-light-css="light-0f8c037637f9eb3e.css" data-theme-dark-css="dark-1097f8e92a01e3cf.css" data-theme-ayu-css="ayu-614652228113ac93.css" ></div><script src="../../static.files/storage-62ce34ea385b278a.js"></script><script defer src="../../static.files/source-script-11255107d0a65077.js"></script><script defer src="../../source-files.js"></script><script defer src="../../static.files/main-f0540c1d82cde29b.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../../static.files/light-0f8c037637f9eb3e.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../../static.files/dark-1097f8e92a01e3cf.css"><link rel="stylesheet" href="../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../tracing_attributes/index.html"><img src="https://raw.githubusercontent.com/tokio-rs/tracing/master/assets/logo-type.png" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/nix/store/yf45a1rayffhnidhgyjynpyhr9lqkd09-vendor-cargo-deps/c19b7c6f923b580ac259164a89f2577984ad5ab09ee9d583b888f934adbbe8d0/tracing-attributes-0.1.26/src/attr.rs`."><title>attr.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-f3501f0f5ae15dfb.css" id="mainThemeStyle"><div id="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="tracing_attributes" data-themes="" data-resource-suffix="" data-rustdoc-version="1.71.0 (8ede3aae2 2023-07-12)" data-search-js="search-4926e5fc22a5646a.js" data-settings-js="settings-de11bff964e9d4e5.js" data-settings-css="settings-8c76f75bfb6bd192.css" data-theme-light-css="light-0f8c037637f9eb3e.css" data-theme-dark-css="dark-1097f8e92a01e3cf.css" data-theme-ayu-css="ayu-614652228113ac93.css" ></div><script src="../../static.files/storage-62ce34ea385b278a.js"></script><script defer src="../../static.files/source-script-11255107d0a65077.js"></script><script defer src="../../source-files.js"></script><script defer src="../../static.files/main-f0540c1d82cde29b.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../../static.files/light-0f8c037637f9eb3e.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../../static.files/dark-1097f8e92a01e3cf.css"><link rel="stylesheet" href="../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../tracing_attributes/index.html"><img src="https://raw.githubusercontent.com/tokio-rs/tracing/master/assets/logo-type.png" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -411,6 +411,50 @@
 <a href="#411" id="411">411</a>
 <a href="#412" id="412">412</a>
 <a href="#413" id="413">413</a>
+<a href="#414" id="414">414</a>
+<a href="#415" id="415">415</a>
+<a href="#416" id="416">416</a>
+<a href="#417" id="417">417</a>
+<a href="#418" id="418">418</a>
+<a href="#419" id="419">419</a>
+<a href="#420" id="420">420</a>
+<a href="#421" id="421">421</a>
+<a href="#422" id="422">422</a>
+<a href="#423" id="423">423</a>
+<a href="#424" id="424">424</a>
+<a href="#425" id="425">425</a>
+<a href="#426" id="426">426</a>
+<a href="#427" id="427">427</a>
+<a href="#428" id="428">428</a>
+<a href="#429" id="429">429</a>
+<a href="#430" id="430">430</a>
+<a href="#431" id="431">431</a>
+<a href="#432" id="432">432</a>
+<a href="#433" id="433">433</a>
+<a href="#434" id="434">434</a>
+<a href="#435" id="435">435</a>
+<a href="#436" id="436">436</a>
+<a href="#437" id="437">437</a>
+<a href="#438" id="438">438</a>
+<a href="#439" id="439">439</a>
+<a href="#440" id="440">440</a>
+<a href="#441" id="441">441</a>
+<a href="#442" id="442">442</a>
+<a href="#443" id="443">443</a>
+<a href="#444" id="444">444</a>
+<a href="#445" id="445">445</a>
+<a href="#446" id="446">446</a>
+<a href="#447" id="447">447</a>
+<a href="#448" id="448">448</a>
+<a href="#449" id="449">449</a>
+<a href="#450" id="450">450</a>
+<a href="#451" id="451">451</a>
+<a href="#452" id="452">452</a>
+<a href="#453" id="453">453</a>
+<a href="#454" id="454">454</a>
+<a href="#455" id="455">455</a>
+<a href="#456" id="456">456</a>
+<a href="#457" id="457">457</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::collections::HashSet;
 <span class="kw">use </span>syn::{punctuated::Punctuated, Expr, Ident, LitInt, LitStr, Path, Token};
 
@@ -418,6 +462,14 @@
 <span class="kw">use </span>quote::{quote, quote_spanned, ToTokens};
 <span class="kw">use </span>syn::ext::IdentExt <span class="kw">as _</span>;
 <span class="kw">use </span>syn::parse::{Parse, ParseStream};
+
+<span class="doccomment">/// Arguments to `#[instrument(err(...))]` and `#[instrument(ret(...))]` which describe how the
+/// return value event should be emitted.
+</span><span class="attr">#[derive(Clone, Default, Debug)]
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>EventArgs {
+    level: <span class="prelude-ty">Option</span>&lt;Level&gt;,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) mode: FormatMode,
+}
 
 <span class="attr">#[derive(Clone, Default, Debug)]
 </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>InstrumentArgs {
@@ -429,51 +481,15 @@
     <span class="kw">pub</span>(<span class="kw">crate</span>) skips: HashSet&lt;Ident&gt;,
     <span class="kw">pub</span>(<span class="kw">crate</span>) skip_all: bool,
     <span class="kw">pub</span>(<span class="kw">crate</span>) fields: <span class="prelude-ty">Option</span>&lt;Fields&gt;,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) err_mode: <span class="prelude-ty">Option</span>&lt;FormatMode&gt;,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) ret_mode: <span class="prelude-ty">Option</span>&lt;FormatMode&gt;,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) err_args: <span class="prelude-ty">Option</span>&lt;EventArgs&gt;,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) ret_args: <span class="prelude-ty">Option</span>&lt;EventArgs&gt;,
     <span class="doccomment">/// Errors describing any unrecognized parse inputs that we skipped.
     </span>parse_warnings: Vec&lt;syn::Error&gt;,
 }
 
 <span class="kw">impl </span>InstrumentArgs {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>level(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw">impl </span>ToTokens {
-        <span class="kw">fn </span>is_level(lit: <span class="kw-2">&amp;</span>LitInt, expected: u64) -&gt; bool {
-            <span class="kw">match </span>lit.base10_parse::&lt;u64&gt;() {
-                <span class="prelude-val">Ok</span>(value) =&gt; value == expected,
-                <span class="prelude-val">Err</span>(<span class="kw">_</span>) =&gt; <span class="bool-val">false</span>,
-            }
-        }
-
-        <span class="kw">match </span><span class="kw-2">&amp;</span><span class="self">self</span>.level {
-            <span class="prelude-val">Some</span>(Level::Str(<span class="kw-2">ref </span>lit)) <span class="kw">if </span>lit.value().eq_ignore_ascii_case(<span class="string">&quot;trace&quot;</span>) =&gt; {
-                <span class="macro">quote!</span>(tracing::Level::TRACE)
-            }
-            <span class="prelude-val">Some</span>(Level::Str(<span class="kw-2">ref </span>lit)) <span class="kw">if </span>lit.value().eq_ignore_ascii_case(<span class="string">&quot;debug&quot;</span>) =&gt; {
-                <span class="macro">quote!</span>(tracing::Level::DEBUG)
-            }
-            <span class="prelude-val">Some</span>(Level::Str(<span class="kw-2">ref </span>lit)) <span class="kw">if </span>lit.value().eq_ignore_ascii_case(<span class="string">&quot;info&quot;</span>) =&gt; {
-                <span class="macro">quote!</span>(tracing::Level::INFO)
-            }
-            <span class="prelude-val">Some</span>(Level::Str(<span class="kw-2">ref </span>lit)) <span class="kw">if </span>lit.value().eq_ignore_ascii_case(<span class="string">&quot;warn&quot;</span>) =&gt; {
-                <span class="macro">quote!</span>(tracing::Level::WARN)
-            }
-            <span class="prelude-val">Some</span>(Level::Str(<span class="kw-2">ref </span>lit)) <span class="kw">if </span>lit.value().eq_ignore_ascii_case(<span class="string">&quot;error&quot;</span>) =&gt; {
-                <span class="macro">quote!</span>(tracing::Level::ERROR)
-            }
-            <span class="prelude-val">Some</span>(Level::Int(<span class="kw-2">ref </span>lit)) <span class="kw">if </span>is_level(lit, <span class="number">1</span>) =&gt; <span class="macro">quote!</span>(tracing::Level::TRACE),
-            <span class="prelude-val">Some</span>(Level::Int(<span class="kw-2">ref </span>lit)) <span class="kw">if </span>is_level(lit, <span class="number">2</span>) =&gt; <span class="macro">quote!</span>(tracing::Level::DEBUG),
-            <span class="prelude-val">Some</span>(Level::Int(<span class="kw-2">ref </span>lit)) <span class="kw">if </span>is_level(lit, <span class="number">3</span>) =&gt; <span class="macro">quote!</span>(tracing::Level::INFO),
-            <span class="prelude-val">Some</span>(Level::Int(<span class="kw-2">ref </span>lit)) <span class="kw">if </span>is_level(lit, <span class="number">4</span>) =&gt; <span class="macro">quote!</span>(tracing::Level::WARN),
-            <span class="prelude-val">Some</span>(Level::Int(<span class="kw-2">ref </span>lit)) <span class="kw">if </span>is_level(lit, <span class="number">5</span>) =&gt; <span class="macro">quote!</span>(tracing::Level::ERROR),
-            <span class="prelude-val">Some</span>(Level::Path(<span class="kw-2">ref </span>pat)) =&gt; <span class="macro">quote!</span>(#pat),
-            <span class="prelude-val">Some</span>(<span class="kw">_</span>) =&gt; <span class="macro">quote! </span>{
-                <span class="macro">compile_error!</span>(
-                    <span class="string">&quot;unknown verbosity level, expected one of \&quot;trace\&quot;, \
-                     \&quot;debug\&quot;, \&quot;info\&quot;, \&quot;warn\&quot;, or \&quot;error\&quot;, or a number 1-5&quot;
-                </span>)
-            },
-            <span class="prelude-val">None </span>=&gt; <span class="macro">quote!</span>(tracing::Level::INFO),
-        }
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>level(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Level {
+        <span class="self">self</span>.level.clone().unwrap_or(Level::Info)
     }
 
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>target(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw">impl </span>ToTokens {
@@ -580,12 +596,12 @@
                 args.fields = <span class="prelude-val">Some</span>(input.parse()<span class="question-mark">?</span>);
             } <span class="kw">else if </span>lookahead.peek(kw::err) {
                 <span class="kw">let _ </span>= input.parse::&lt;kw::err&gt;();
-                <span class="kw">let </span>mode = FormatMode::parse(input)<span class="question-mark">?</span>;
-                args.err_mode = <span class="prelude-val">Some</span>(mode);
+                <span class="kw">let </span>err_args = EventArgs::parse(input)<span class="question-mark">?</span>;
+                args.err_args = <span class="prelude-val">Some</span>(err_args);
             } <span class="kw">else if </span>lookahead.peek(kw::ret) {
                 <span class="kw">let _ </span>= input.parse::&lt;kw::ret&gt;()<span class="question-mark">?</span>;
-                <span class="kw">let </span>mode = FormatMode::parse(input)<span class="question-mark">?</span>;
-                args.ret_mode = <span class="prelude-val">Some</span>(mode);
+                <span class="kw">let </span>ret_args = EventArgs::parse(input)<span class="question-mark">?</span>;
+                args.ret_args = <span class="prelude-val">Some</span>(ret_args);
             } <span class="kw">else if </span>lookahead.peek(<span class="macro">Token!</span>[,]) {
                 <span class="kw">let _ </span>= input.parse::&lt;<span class="macro">Token!</span>[,]&gt;()<span class="question-mark">?</span>;
             } <span class="kw">else </span>{
@@ -600,6 +616,55 @@
             }
         }
         <span class="prelude-val">Ok</span>(args)
+    }
+}
+
+<span class="kw">impl </span>EventArgs {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>level(<span class="kw-2">&amp;</span><span class="self">self</span>, default: Level) -&gt; Level {
+        <span class="self">self</span>.level.clone().unwrap_or(default)
+    }
+}
+
+<span class="kw">impl </span>Parse <span class="kw">for </span>EventArgs {
+    <span class="kw">fn </span>parse(input: ParseStream&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; syn::Result&lt;<span class="self">Self</span>&gt; {
+        <span class="kw">if </span>!input.peek(syn::token::Paren) {
+            <span class="kw">return </span><span class="prelude-val">Ok</span>(<span class="self">Self</span>::default());
+        }
+        <span class="kw">let </span>content;
+        <span class="kw">let _ </span>= <span class="macro">syn::parenthesized!</span>(content <span class="kw">in </span>input);
+        <span class="kw">let </span><span class="kw-2">mut </span>result = <span class="self">Self</span>::default();
+        <span class="kw">let </span><span class="kw-2">mut </span>parse_one_arg =
+            || {
+                <span class="kw">let </span>lookahead = content.lookahead1();
+                <span class="kw">if </span>lookahead.peek(kw::level) {
+                    <span class="kw">if </span>result.level.is_some() {
+                        <span class="kw">return </span><span class="prelude-val">Err</span>(content.error(<span class="string">&quot;expected only a single `level` argument&quot;</span>));
+                    }
+                    result.level = <span class="prelude-val">Some</span>(content.parse()<span class="question-mark">?</span>);
+                } <span class="kw">else if </span>result.mode != FormatMode::default() {
+                    <span class="kw">return </span><span class="prelude-val">Err</span>(content.error(<span class="string">&quot;expected only a single format argument&quot;</span>));
+                } <span class="kw">else if let </span><span class="prelude-val">Some</span>(ident) = content.parse::&lt;<span class="prelude-ty">Option</span>&lt;Ident&gt;&gt;()<span class="question-mark">? </span>{
+                    <span class="kw">match </span>ident.to_string().as_str() {
+                        <span class="string">&quot;Debug&quot; </span>=&gt; result.mode = FormatMode::Debug,
+                        <span class="string">&quot;Display&quot; </span>=&gt; result.mode = FormatMode::Display,
+                        <span class="kw">_ </span>=&gt; <span class="kw">return </span><span class="prelude-val">Err</span>(syn::Error::new(
+                            ident.span(),
+                            <span class="string">&quot;unknown event formatting mode, expected either `Debug` or `Display`&quot;</span>,
+                        )),
+                    }
+                }
+                <span class="prelude-val">Ok</span>(())
+            };
+        parse_one_arg()<span class="question-mark">?</span>;
+        <span class="kw">if </span>!content.is_empty() {
+            <span class="kw">if </span>content.lookahead1().peek(<span class="macro">Token!</span>[,]) {
+                <span class="kw">let _ </span>= content.parse::&lt;<span class="macro">Token!</span>[,]&gt;()<span class="question-mark">?</span>;
+                parse_one_arg()<span class="question-mark">?</span>;
+            } <span class="kw">else </span>{
+                <span class="kw">return </span><span class="prelude-val">Err</span>(content.error(<span class="string">&quot;expected `,` or `)`&quot;</span>));
+            }
+        }
+        <span class="prelude-val">Ok</span>(result)
     }
 }
 
@@ -644,7 +709,7 @@
         <span class="kw">let _ </span>= input.parse::&lt;kw::skip&gt;();
         <span class="kw">let </span>content;
         <span class="kw">let _ </span>= <span class="macro">syn::parenthesized!</span>(content <span class="kw">in </span>input);
-        <span class="kw">let </span>names: Punctuated&lt;Ident, <span class="macro">Token!</span>[,]&gt; = content.parse_terminated(Ident::parse_any)<span class="question-mark">?</span>;
+        <span class="kw">let </span>names = content.parse_terminated(Ident::parse_any, <span class="macro">Token!</span>[,])<span class="question-mark">?</span>;
         <span class="kw">let </span><span class="kw-2">mut </span>skips = HashSet::new();
         <span class="kw">for </span>name <span class="kw">in </span>names {
             <span class="kw">if </span>skips.contains(<span class="kw-2">&amp;</span>name) {
@@ -673,27 +738,6 @@
     }
 }
 
-<span class="kw">impl </span>Parse <span class="kw">for </span>FormatMode {
-    <span class="kw">fn </span>parse(input: ParseStream&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; syn::Result&lt;<span class="self">Self</span>&gt; {
-        <span class="kw">if </span>!input.peek(syn::token::Paren) {
-            <span class="kw">return </span><span class="prelude-val">Ok</span>(FormatMode::default());
-        }
-        <span class="kw">let </span>content;
-        <span class="kw">let _ </span>= <span class="macro">syn::parenthesized!</span>(content <span class="kw">in </span>input);
-        <span class="kw">let </span>maybe_mode: <span class="prelude-ty">Option</span>&lt;Ident&gt; = content.parse()<span class="question-mark">?</span>;
-        maybe_mode.map_or(<span class="prelude-val">Ok</span>(FormatMode::default()), |ident| {
-            <span class="kw">match </span>ident.to_string().as_str() {
-                <span class="string">&quot;Debug&quot; </span>=&gt; <span class="prelude-val">Ok</span>(FormatMode::Debug),
-                <span class="string">&quot;Display&quot; </span>=&gt; <span class="prelude-val">Ok</span>(FormatMode::Display),
-                <span class="kw">_ </span>=&gt; <span class="prelude-val">Err</span>(syn::Error::new(
-                    ident.span(),
-                    <span class="string">&quot;unknown error mode, must be Debug or Display&quot;</span>,
-                )),
-            }
-        })
-    }
-}
-
 <span class="attr">#[derive(Clone, Debug)]
 </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>Fields(<span class="kw">pub</span>(<span class="kw">crate</span>) Punctuated&lt;Field, <span class="macro">Token!</span>[,]&gt;);
 
@@ -716,7 +760,7 @@
         <span class="kw">let _ </span>= input.parse::&lt;kw::fields&gt;();
         <span class="kw">let </span>content;
         <span class="kw">let _ </span>= <span class="macro">syn::parenthesized!</span>(content <span class="kw">in </span>input);
-        <span class="kw">let </span>fields: Punctuated&lt;<span class="kw">_</span>, <span class="macro">Token!</span>[,]&gt; = content.parse_terminated(Field::parse)<span class="question-mark">?</span>;
+        <span class="kw">let </span>fields = content.parse_terminated(Field::parse, <span class="macro">Token!</span>[,])<span class="question-mark">?</span>;
         <span class="prelude-val">Ok</span>(<span class="self">Self</span>(fields))
     }
 }
@@ -761,7 +805,7 @@
             <span class="kw">let </span>name = <span class="kw-2">&amp;</span><span class="self">self</span>.name;
             <span class="kw">let </span>kind = <span class="kw-2">&amp;</span><span class="self">self</span>.kind;
             tokens.extend(<span class="macro">quote! </span>{
-                #name = #kind#value
+                #name = #kind #value
             })
         } <span class="kw">else if </span><span class="self">self</span>.kind == FieldKind::Value {
             <span class="comment">// XXX(eliza): I don&#39;t like that fields without values produce
@@ -789,9 +833,12 @@
 }
 
 <span class="attr">#[derive(Clone, Debug)]
-</span><span class="kw">enum </span>Level {
-    Str(LitStr),
-    Int(LitInt),
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">enum </span>Level {
+    Trace,
+    Debug,
+    Info,
+    Warn,
+    Error,
     Path(Path),
 }
 
@@ -801,13 +848,54 @@
         <span class="kw">let _ </span>= input.parse::&lt;<span class="macro">Token!</span>[=]&gt;()<span class="question-mark">?</span>;
         <span class="kw">let </span>lookahead = input.lookahead1();
         <span class="kw">if </span>lookahead.peek(LitStr) {
-            <span class="prelude-val">Ok</span>(<span class="self">Self</span>::Str(input.parse()<span class="question-mark">?</span>))
+            <span class="kw">let </span>str: LitStr = input.parse()<span class="question-mark">?</span>;
+            <span class="kw">match </span>str.value() {
+                s <span class="kw">if </span>s.eq_ignore_ascii_case(<span class="string">&quot;trace&quot;</span>) =&gt; <span class="prelude-val">Ok</span>(Level::Trace),
+                s <span class="kw">if </span>s.eq_ignore_ascii_case(<span class="string">&quot;debug&quot;</span>) =&gt; <span class="prelude-val">Ok</span>(Level::Debug),
+                s <span class="kw">if </span>s.eq_ignore_ascii_case(<span class="string">&quot;info&quot;</span>) =&gt; <span class="prelude-val">Ok</span>(Level::Info),
+                s <span class="kw">if </span>s.eq_ignore_ascii_case(<span class="string">&quot;warn&quot;</span>) =&gt; <span class="prelude-val">Ok</span>(Level::Warn),
+                s <span class="kw">if </span>s.eq_ignore_ascii_case(<span class="string">&quot;error&quot;</span>) =&gt; <span class="prelude-val">Ok</span>(Level::Error),
+                <span class="kw">_ </span>=&gt; <span class="prelude-val">Err</span>(input.error(
+                    <span class="string">&quot;unknown verbosity level, expected one of \&quot;trace\&quot;, \
+                     \&quot;debug\&quot;, \&quot;info\&quot;, \&quot;warn\&quot;, or \&quot;error\&quot;, or a number 1-5&quot;</span>,
+                )),
+            }
         } <span class="kw">else if </span>lookahead.peek(LitInt) {
-            <span class="prelude-val">Ok</span>(<span class="self">Self</span>::Int(input.parse()<span class="question-mark">?</span>))
+            <span class="kw">fn </span>is_level(lit: <span class="kw-2">&amp;</span>LitInt, expected: u64) -&gt; bool {
+                <span class="kw">match </span>lit.base10_parse::&lt;u64&gt;() {
+                    <span class="prelude-val">Ok</span>(value) =&gt; value == expected,
+                    <span class="prelude-val">Err</span>(<span class="kw">_</span>) =&gt; <span class="bool-val">false</span>,
+                }
+            }
+            <span class="kw">let </span>int: LitInt = input.parse()<span class="question-mark">?</span>;
+            <span class="kw">match </span><span class="kw-2">&amp;</span>int {
+                i <span class="kw">if </span>is_level(i, <span class="number">1</span>) =&gt; <span class="prelude-val">Ok</span>(Level::Trace),
+                i <span class="kw">if </span>is_level(i, <span class="number">2</span>) =&gt; <span class="prelude-val">Ok</span>(Level::Debug),
+                i <span class="kw">if </span>is_level(i, <span class="number">3</span>) =&gt; <span class="prelude-val">Ok</span>(Level::Info),
+                i <span class="kw">if </span>is_level(i, <span class="number">4</span>) =&gt; <span class="prelude-val">Ok</span>(Level::Warn),
+                i <span class="kw">if </span>is_level(i, <span class="number">5</span>) =&gt; <span class="prelude-val">Ok</span>(Level::Error),
+                <span class="kw">_ </span>=&gt; <span class="prelude-val">Err</span>(input.error(
+                    <span class="string">&quot;unknown verbosity level, expected one of \&quot;trace\&quot;, \
+                     \&quot;debug\&quot;, \&quot;info\&quot;, \&quot;warn\&quot;, or \&quot;error\&quot;, or a number 1-5&quot;</span>,
+                )),
+            }
         } <span class="kw">else if </span>lookahead.peek(Ident) {
             <span class="prelude-val">Ok</span>(<span class="self">Self</span>::Path(input.parse()<span class="question-mark">?</span>))
         } <span class="kw">else </span>{
             <span class="prelude-val">Err</span>(lookahead.error())
+        }
+    }
+}
+
+<span class="kw">impl </span>ToTokens <span class="kw">for </span>Level {
+    <span class="kw">fn </span>to_tokens(<span class="kw-2">&amp;</span><span class="self">self</span>, tokens: <span class="kw-2">&amp;mut </span>TokenStream) {
+        <span class="kw">match </span><span class="self">self </span>{
+            Level::Trace =&gt; tokens.extend(<span class="macro">quote!</span>(tracing::Level::TRACE)),
+            Level::Debug =&gt; tokens.extend(<span class="macro">quote!</span>(tracing::Level::DEBUG)),
+            Level::Info =&gt; tokens.extend(<span class="macro">quote!</span>(tracing::Level::INFO)),
+            Level::Warn =&gt; tokens.extend(<span class="macro">quote!</span>(tracing::Level::WARN)),
+            Level::Error =&gt; tokens.extend(<span class="macro">quote!</span>(tracing::Level::ERROR)),
+            Level::Path(<span class="kw-2">ref </span>pat) =&gt; tokens.extend(<span class="macro">quote!</span>(#pat)),
         }
     }
 }

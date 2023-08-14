@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/nix/store/jnqxxv1xi811ni996b002f4jnyz38xck-vendor-cargo-deps/c19b7c6f923b580ac259164a89f2577984ad5ab09ee9d583b888f934adbbe8d0/tracing-subscriber-0.3.11/src/filter/layer_filters/mod.rs`."><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../../static.files/rustdoc-f3501f0f5ae15dfb.css" id="mainThemeStyle"><div id="rustdoc-vars" data-root-path="../../../../" data-static-root-path="../../../../static.files/" data-current-crate="tracing_subscriber" data-themes="" data-resource-suffix="" data-rustdoc-version="1.71.0 (8ede3aae2 2023-07-12)" data-search-js="search-4926e5fc22a5646a.js" data-settings-js="settings-de11bff964e9d4e5.js" data-settings-css="settings-8c76f75bfb6bd192.css" data-theme-light-css="light-0f8c037637f9eb3e.css" data-theme-dark-css="dark-1097f8e92a01e3cf.css" data-theme-ayu-css="ayu-614652228113ac93.css" ></div><script src="../../../../static.files/storage-62ce34ea385b278a.js"></script><script defer src="../../../../static.files/source-script-11255107d0a65077.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../static.files/main-f0540c1d82cde29b.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../../../../static.files/light-0f8c037637f9eb3e.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../../../../static.files/dark-1097f8e92a01e3cf.css"><link rel="stylesheet" href="../../../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../../../tracing_subscriber/index.html"><img src="https://raw.githubusercontent.com/tokio-rs/tracing/master/assets/logo-type.png" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/nix/store/yf45a1rayffhnidhgyjynpyhr9lqkd09-vendor-cargo-deps/c19b7c6f923b580ac259164a89f2577984ad5ab09ee9d583b888f934adbbe8d0/tracing-subscriber-0.3.17/src/filter/layer_filters/mod.rs`."><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../../static.files/rustdoc-f3501f0f5ae15dfb.css" id="mainThemeStyle"><div id="rustdoc-vars" data-root-path="../../../../" data-static-root-path="../../../../static.files/" data-current-crate="tracing_subscriber" data-themes="" data-resource-suffix="" data-rustdoc-version="1.71.0 (8ede3aae2 2023-07-12)" data-search-js="search-4926e5fc22a5646a.js" data-settings-js="settings-de11bff964e9d4e5.js" data-settings-css="settings-8c76f75bfb6bd192.css" data-theme-light-css="light-0f8c037637f9eb3e.css" data-theme-dark-css="dark-1097f8e92a01e3cf.css" data-theme-ayu-css="ayu-614652228113ac93.css" ></div><script src="../../../../static.files/storage-62ce34ea385b278a.js"></script><script defer src="../../../../static.files/source-script-11255107d0a65077.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../static.files/main-f0540c1d82cde29b.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../../../../static.files/light-0f8c037637f9eb3e.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../../../../static.files/dark-1097f8e92a01e3cf.css"><link rel="stylesheet" href="../../../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../../../tracing_subscriber/index.html"><img src="https://raw.githubusercontent.com/tokio-rs/tracing/master/assets/logo-type.png" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -1133,6 +1133,91 @@
 <a href="#1133" id="1133">1133</a>
 <a href="#1134" id="1134">1134</a>
 <a href="#1135" id="1135">1135</a>
+<a href="#1136" id="1136">1136</a>
+<a href="#1137" id="1137">1137</a>
+<a href="#1138" id="1138">1138</a>
+<a href="#1139" id="1139">1139</a>
+<a href="#1140" id="1140">1140</a>
+<a href="#1141" id="1141">1141</a>
+<a href="#1142" id="1142">1142</a>
+<a href="#1143" id="1143">1143</a>
+<a href="#1144" id="1144">1144</a>
+<a href="#1145" id="1145">1145</a>
+<a href="#1146" id="1146">1146</a>
+<a href="#1147" id="1147">1147</a>
+<a href="#1148" id="1148">1148</a>
+<a href="#1149" id="1149">1149</a>
+<a href="#1150" id="1150">1150</a>
+<a href="#1151" id="1151">1151</a>
+<a href="#1152" id="1152">1152</a>
+<a href="#1153" id="1153">1153</a>
+<a href="#1154" id="1154">1154</a>
+<a href="#1155" id="1155">1155</a>
+<a href="#1156" id="1156">1156</a>
+<a href="#1157" id="1157">1157</a>
+<a href="#1158" id="1158">1158</a>
+<a href="#1159" id="1159">1159</a>
+<a href="#1160" id="1160">1160</a>
+<a href="#1161" id="1161">1161</a>
+<a href="#1162" id="1162">1162</a>
+<a href="#1163" id="1163">1163</a>
+<a href="#1164" id="1164">1164</a>
+<a href="#1165" id="1165">1165</a>
+<a href="#1166" id="1166">1166</a>
+<a href="#1167" id="1167">1167</a>
+<a href="#1168" id="1168">1168</a>
+<a href="#1169" id="1169">1169</a>
+<a href="#1170" id="1170">1170</a>
+<a href="#1171" id="1171">1171</a>
+<a href="#1172" id="1172">1172</a>
+<a href="#1173" id="1173">1173</a>
+<a href="#1174" id="1174">1174</a>
+<a href="#1175" id="1175">1175</a>
+<a href="#1176" id="1176">1176</a>
+<a href="#1177" id="1177">1177</a>
+<a href="#1178" id="1178">1178</a>
+<a href="#1179" id="1179">1179</a>
+<a href="#1180" id="1180">1180</a>
+<a href="#1181" id="1181">1181</a>
+<a href="#1182" id="1182">1182</a>
+<a href="#1183" id="1183">1183</a>
+<a href="#1184" id="1184">1184</a>
+<a href="#1185" id="1185">1185</a>
+<a href="#1186" id="1186">1186</a>
+<a href="#1187" id="1187">1187</a>
+<a href="#1188" id="1188">1188</a>
+<a href="#1189" id="1189">1189</a>
+<a href="#1190" id="1190">1190</a>
+<a href="#1191" id="1191">1191</a>
+<a href="#1192" id="1192">1192</a>
+<a href="#1193" id="1193">1193</a>
+<a href="#1194" id="1194">1194</a>
+<a href="#1195" id="1195">1195</a>
+<a href="#1196" id="1196">1196</a>
+<a href="#1197" id="1197">1197</a>
+<a href="#1198" id="1198">1198</a>
+<a href="#1199" id="1199">1199</a>
+<a href="#1200" id="1200">1200</a>
+<a href="#1201" id="1201">1201</a>
+<a href="#1202" id="1202">1202</a>
+<a href="#1203" id="1203">1203</a>
+<a href="#1204" id="1204">1204</a>
+<a href="#1205" id="1205">1205</a>
+<a href="#1206" id="1206">1206</a>
+<a href="#1207" id="1207">1207</a>
+<a href="#1208" id="1208">1208</a>
+<a href="#1209" id="1209">1209</a>
+<a href="#1210" id="1210">1210</a>
+<a href="#1211" id="1211">1211</a>
+<a href="#1212" id="1212">1212</a>
+<a href="#1213" id="1213">1213</a>
+<a href="#1214" id="1214">1214</a>
+<a href="#1215" id="1215">1215</a>
+<a href="#1216" id="1216">1216</a>
+<a href="#1217" id="1217">1217</a>
+<a href="#1218" id="1218">1218</a>
+<a href="#1219" id="1219">1219</a>
+<a href="#1220" id="1220">1220</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! ## Per-Layer Filtering
 //!
 //! Per-layer filters permit individual `Layer`s to have their own filter
@@ -1179,7 +1264,7 @@
 <span class="kw">use </span>tracing_core::{
     span,
     subscriber::{Interest, Subscriber},
-    Event, Metadata,
+    Dispatch, Event, Metadata,
 };
 <span class="kw">pub mod </span>combinator;
 
@@ -1433,6 +1518,63 @@
 
     <span class="doccomment">/// Inverts `self`, returning a filter that enables spans and events only if
     /// `self` would *not* enable them.
+    ///
+    /// This inverts the values returned by the [`enabled`] and [`callsite_enabled`]
+    /// methods on the wrapped filter; it does *not* invert [`event_enabled`], as
+    /// filters which do not implement filtering on event field values will return
+    /// the default `true` even for events that their [`enabled`] method disables.
+    ///
+    /// Consider a normal filter defined as:
+    ///
+    /// ```ignore (pseudo-code)
+    /// // for spans
+    /// match callsite_enabled() {
+    ///     ALWAYS =&gt; on_span(),
+    ///     SOMETIMES =&gt; if enabled() { on_span() },
+    ///     NEVER =&gt; (),
+    /// }
+    /// // for events
+    /// match callsite_enabled() {
+    ///    ALWAYS =&gt; on_event(),
+    ///    SOMETIMES =&gt; if enabled() &amp;&amp; event_enabled() { on_event() },
+    ///    NEVER =&gt; (),
+    /// }
+    /// ```
+    ///
+    /// and an inverted filter defined as:
+    ///
+    /// ```ignore (pseudo-code)
+    /// // for spans
+    /// match callsite_enabled() {
+    ///     ALWAYS =&gt; (),
+    ///     SOMETIMES =&gt; if !enabled() { on_span() },
+    ///     NEVER =&gt; on_span(),
+    /// }
+    /// // for events
+    /// match callsite_enabled() {
+    ///     ALWAYS =&gt; (),
+    ///     SOMETIMES =&gt; if !enabled() { on_event() },
+    ///     NEVER =&gt; on_event(),
+    /// }
+    /// ```
+    ///
+    /// A proper inversion would do `!(enabled() &amp;&amp; event_enabled())` (or
+    /// `!enabled() || !event_enabled()`), but because of the implicit `&amp;&amp;`
+    /// relation between `enabled` and `event_enabled`, it is difficult to
+    /// short circuit and not call the wrapped `event_enabled`.
+    ///
+    /// A combinator which remembers the result of `enabled` in order to call
+    /// `event_enabled` only when `enabled() == true` is possible, but requires
+    /// additional thread-local mutable state to support a very niche use case.
+    </span><span class="comment">//
+    //  Also, it&#39;d mean the wrapped layer&#39;s `enabled()` always gets called and
+    //  globally applied to events where it doesn&#39;t today, since we can&#39;t know
+    //  what `event_enabled` will say until we have the event to call it with.
+    </span><span class="doccomment">///
+    /// [`Filter`]: crate::subscribe::Filter
+    /// [`enabled`]: crate::subscribe::Filter::enabled
+    /// [`event_enabled`]: crate::subscribe::Filter::event_enabled
+    /// [`callsite_enabled`]: crate::subscribe::Filter::callsite_enabled
     </span><span class="kw">fn </span>not(<span class="self">self</span>) -&gt; combinator::Not&lt;<span class="self">Self</span>, S&gt;
     <span class="kw">where
         </span><span class="self">Self</span>: Sized,
@@ -1664,7 +1806,7 @@
     /// #
     /// # // specifying the Registry type is required
     /// # let _: &amp;reload::Handle&lt;filter::Filtered&lt;fmt::Layer&lt;Registry, _, _, fn() -&gt; std::io::Stdout&gt;,
-    /// # filter::LevelFilter, Registry&gt;, _&gt;
+    /// # filter::LevelFilter, Registry&gt;, Registry&gt;
     /// # = &amp;reload_handle;
     /// #
     /// info!(&quot;This will be logged to stderr&quot;);
@@ -1685,6 +1827,10 @@
     F: layer::Filter&lt;S&gt; + <span class="lifetime">&#39;static</span>,
     L: Layer&lt;S&gt;,
 {
+    <span class="kw">fn </span>on_register_dispatch(<span class="kw-2">&amp;</span><span class="self">self</span>, collector: <span class="kw-2">&amp;</span>Dispatch) {
+        <span class="self">self</span>.layer.on_register_dispatch(collector);
+    }
+
     <span class="kw">fn </span>on_layer(<span class="kw-2">&amp;mut </span><span class="self">self</span>, subscriber: <span class="kw-2">&amp;mut </span>S) {
         <span class="self">self</span>.id = MagicPlfDowncastMarker(subscriber.register_filter());
         <span class="self">self</span>.layer.on_layer(subscriber);
@@ -1776,6 +1922,22 @@
             <span class="self">self</span>.layer
                 .on_follows_from(span, follows, cx.with_filter(<span class="self">self</span>.id()))
         }
+    }
+
+    <span class="kw">fn </span>event_enabled(<span class="kw-2">&amp;</span><span class="self">self</span>, event: <span class="kw-2">&amp;</span>Event&lt;<span class="lifetime">&#39;_</span>&gt;, cx: Context&lt;<span class="lifetime">&#39;_</span>, S&gt;) -&gt; bool {
+        <span class="kw">let </span>cx = cx.with_filter(<span class="self">self</span>.id());
+        <span class="kw">let </span>enabled = FILTERING
+            .with(|filtering| filtering.and(<span class="self">self</span>.id(), || <span class="self">self</span>.filter.event_enabled(event, <span class="kw-2">&amp;</span>cx)));
+
+        <span class="kw">if </span>enabled {
+            <span class="comment">// If the filter enabled this event, ask the wrapped subscriber if
+            // _it_ wants it --- it might have a global filter.
+            </span><span class="self">self</span>.layer.event_enabled(event, cx)
+        } <span class="kw">else </span>{
+            <span class="comment">// Otherwise, return `true`. See the comment in `enabled` for why this
+            // is necessary.
+            </span><span class="bool-val">true
+        </span>}
     }
 
     <span class="kw">fn </span>on_event(<span class="kw-2">&amp;</span><span class="self">self</span>, event: <span class="kw-2">&amp;</span>Event&lt;<span class="lifetime">&#39;_</span>&gt;, cx: Context&lt;<span class="lifetime">&#39;_</span>, S&gt;) {
@@ -2147,6 +2309,14 @@
                 <span class="string">&quot;if we are in a filter pass, we must not be in an interest pass.&quot;
             </span>)
         }
+    }
+
+    <span class="doccomment">/// Run a second filtering pass, e.g. for Subscribe::event_enabled.
+    </span><span class="kw">fn </span>and(<span class="kw-2">&amp;</span><span class="self">self</span>, filter: FilterId, f: <span class="kw">impl </span>FnOnce() -&gt; bool) -&gt; bool {
+        <span class="kw">let </span>map = <span class="self">self</span>.enabled.get();
+        <span class="kw">let </span>enabled = map.is_enabled(filter) &amp;&amp; f();
+        <span class="self">self</span>.enabled.set(map.set(filter, enabled));
+        enabled
     }
 
     <span class="doccomment">/// Clears the current in-progress filter state.

@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"struct":["CipherCtx","CipherCtxRef"]};
+window.SIDEBAR_ITEMS = {"struct":["CipherCtx","CipherCtxFlags","CipherCtxRef"]};

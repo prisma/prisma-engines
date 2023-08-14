@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/nix/store/jnqxxv1xi811ni996b002f4jnyz38xck-vendor-cargo-deps/c19b7c6f923b580ac259164a89f2577984ad5ab09ee9d583b888f934adbbe8d0/mongodb-2.3.0/src/cmap/worker.rs`."><title>worker.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-f3501f0f5ae15dfb.css" id="mainThemeStyle"><div id="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="mongodb" data-themes="" data-resource-suffix="" data-rustdoc-version="1.71.0 (8ede3aae2 2023-07-12)" data-search-js="search-4926e5fc22a5646a.js" data-settings-js="settings-de11bff964e9d4e5.js" data-settings-css="settings-8c76f75bfb6bd192.css" data-theme-light-css="light-0f8c037637f9eb3e.css" data-theme-dark-css="dark-1097f8e92a01e3cf.css" data-theme-ayu-css="ayu-614652228113ac93.css" ></div><script src="../../../static.files/storage-62ce34ea385b278a.js"></script><script defer src="../../../static.files/source-script-11255107d0a65077.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../static.files/main-f0540c1d82cde29b.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../../../static.files/light-0f8c037637f9eb3e.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../../../static.files/dark-1097f8e92a01e3cf.css"><link rel="stylesheet" href="../../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../../mongodb/index.html"><img class="rust-logo" src="../../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/nix/store/yf45a1rayffhnidhgyjynpyhr9lqkd09-vendor-cargo-deps/c19b7c6f923b580ac259164a89f2577984ad5ab09ee9d583b888f934adbbe8d0/mongodb-2.6.0/src/cmap/worker.rs`."><title>worker.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-f3501f0f5ae15dfb.css" id="mainThemeStyle"><div id="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="mongodb" data-themes="" data-resource-suffix="" data-rustdoc-version="1.71.0 (8ede3aae2 2023-07-12)" data-search-js="search-4926e5fc22a5646a.js" data-settings-js="settings-de11bff964e9d4e5.js" data-settings-css="settings-8c76f75bfb6bd192.css" data-theme-light-css="light-0f8c037637f9eb3e.css" data-theme-dark-css="dark-1097f8e92a01e3cf.css" data-theme-ayu-css="ayu-614652228113ac93.css" ></div><script src="../../../static.files/storage-62ce34ea385b278a.js"></script><script defer src="../../../static.files/source-script-11255107d0a65077.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../static.files/main-f0540c1d82cde29b.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../../../static.files/light-0f8c037637f9eb3e.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../../../static.files/dark-1097f8e92a01e3cf.css"><link rel="stylesheet" href="../../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../../mongodb/index.html"><img class="rust-logo" src="../../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -714,19 +714,7 @@
 <a href="#714" id="714">714</a>
 <a href="#715" id="715">715</a>
 <a href="#716" id="716">716</a>
-<a href="#717" id="717">717</a>
-<a href="#718" id="718">718</a>
-<a href="#719" id="719">719</a>
-<a href="#720" id="720">720</a>
-<a href="#721" id="721">721</a>
-<a href="#722" id="722">722</a>
-<a href="#723" id="723">723</a>
-<a href="#724" id="724">724</a>
-<a href="#725" id="725">725</a>
-<a href="#726" id="726">726</a>
-</pre></div><pre class="rust"><code><span class="kw">use </span>derivative::Derivative;
-
-<span class="attr">#[cfg(test)]
+</pre></div><pre class="rust"><code><span class="attr">#[cfg(test)]
 </span><span class="kw">use </span><span class="kw">super</span>::options::BackgroundThreadInterval;
 <span class="kw">use super</span>::{
     conn::PendingConnection,
@@ -740,7 +728,7 @@
     establish::ConnectionEstablisher,
     manager,
     manager::{ConnectionSucceeded, ManagementRequestReceiver, PoolManagementRequest, PoolManager},
-    options::{ConnectionOptions, ConnectionPoolOptions},
+    options::ConnectionPoolOptions,
     status,
     status::{PoolGenerationPublisher, PoolGenerationSubscriber},
     Connection,
@@ -748,9 +736,10 @@
 };
 <span class="kw">use crate</span>::{
     bson::oid::ObjectId,
+    client::auth::Credential,
     error::{load_balanced_mode_mismatch, Error, ErrorKind, <span class="prelude-ty">Result</span>},
     event::cmap::{
-        CmapEventHandler,
+        CmapEventEmitter,
         ConnectionClosedEvent,
         ConnectionClosedReason,
         PoolClearedEvent,
@@ -764,7 +753,6 @@
 
 <span class="kw">use </span>std::{
     collections::{HashMap, VecDeque},
-    sync::Arc,
     time::Duration,
 };
 
@@ -772,8 +760,6 @@
 <span class="kw">const </span>MAINTENACE_FREQUENCY: Duration = Duration::from_millis(<span class="number">500</span>);
 
 <span class="doccomment">/// A worker task that manages the shared state of the pool.
-</span><span class="attr">#[derive(Derivative)]
-#[derivative(Debug)]
 </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>ConnectionPoolWorker {
     <span class="doccomment">/// The address the pool&#39;s connections will connect to.
     </span>address: ServerAddress,
@@ -808,12 +794,12 @@
     /// authenticating a connection when it&#39;s first created.
     </span>establisher: ConnectionEstablisher,
 
-    <span class="doccomment">/// The options used to create new connections.
-    </span>connection_options: <span class="prelude-ty">Option</span>&lt;ConnectionOptions&gt;,
+    <span class="doccomment">/// The credential used to authenticate connections, if any.
+    </span>credential: <span class="prelude-ty">Option</span>&lt;Credential&gt;,
 
-    <span class="doccomment">/// The event handler specified by the user to process CMAP events.
-    </span><span class="attr">#[derivative(Debug = <span class="string">&quot;ignore&quot;</span>)]
-    </span>event_handler: <span class="prelude-ty">Option</span>&lt;Arc&lt;<span class="kw">dyn </span>CmapEventHandler&gt;&gt;,
+    <span class="doccomment">/// The type responsible for emitting CMAP events both to an optional user-specified handler
+    /// and as tracing events.
+    </span>event_emitter: CmapEventEmitter,
 
     <span class="doccomment">/// The time between maintenance tasks.
     </span>maintenance_frequency: Duration,
@@ -867,15 +853,11 @@
     /// and close the pool.
     </span><span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>start(
         address: ServerAddress,
-        http_client: runtime::HttpClient,
+        establisher: ConnectionEstablisher,
         server_updater: TopologyUpdater,
+        event_emitter: CmapEventEmitter,
         options: <span class="prelude-ty">Option</span>&lt;ConnectionPoolOptions&gt;,
     ) -&gt; (PoolManager, ConnectionRequester, PoolGenerationSubscriber) {
-        <span class="kw">let </span>establisher = ConnectionEstablisher::new(http_client, options.as_ref());
-        <span class="kw">let </span>event_handler = options
-            .as_ref()
-            .and_then(|opts| opts.cmap_event_handler.clone());
-
         <span class="comment">// The CMAP spec indicates that a max idle time of zero means that connections should not be
         // closed due to idleness.
         </span><span class="kw">let </span><span class="kw-2">mut </span>max_idle_time = options.as_ref().and_then(|opts| opts.max_idle_time);
@@ -889,10 +871,6 @@
             .unwrap_or(DEFAULT_MAX_POOL_SIZE);
 
         <span class="kw">let </span>min_pool_size = options.as_ref().and_then(|opts| opts.min_pool_size);
-
-        <span class="kw">let </span>connection_options: <span class="prelude-ty">Option</span>&lt;ConnectionOptions&gt; = options
-            .as_ref()
-            .map(|pool_options| ConnectionOptions::from(pool_options.clone()));
 
         <span class="kw">let </span>(handle, handle_listener) = WorkerHandleListener::channel();
         <span class="kw">let </span>(connection_requester, request_receiver) = connection_requester::channel(handle);
@@ -940,18 +918,20 @@
             </span>state = PoolState::Ready;
         }
 
+        <span class="kw">let </span>credential = options.and_then(|o| o.credential);
+
         <span class="kw">let </span>worker = ConnectionPoolWorker {
             address,
-            event_handler: event_handler.clone(),
+            event_emitter,
             max_idle_time,
             min_pool_size,
+            credential,
             establisher,
             next_connection_id: <span class="number">1</span>,
             total_connection_count: <span class="number">0</span>,
             pending_connection_count: <span class="number">0</span>,
             generation,
             service_connection_count: HashMap::new(),
-            connection_options,
             available_connections: VecDeque::new(),
             max_pool_size,
             request_receiver,
@@ -980,15 +960,21 @@
 
         <span class="kw">loop </span>{
             <span class="kw">let </span>task = <span class="macro">tokio::select! </span>{
-                <span class="prelude-val">Some</span>(request) = <span class="self">self</span>.request_receiver.recv() =&gt; {
-                    PoolTask::CheckOut(request)
-                },
+                <span class="comment">// This marker indicates that the futures will be polled in order from top to
+                // bottom in this select! macro. We use this to ensure checkIn, clear,
+                // and ready always have priority over checkout requests. The pool
+                // exiting also has priority.
+                </span>biased;
+
                 <span class="prelude-val">Some</span>(request) = <span class="self">self</span>.management_receiver.recv() =&gt; request.into(),
                 <span class="kw">_ </span>= <span class="self">self</span>.handle_listener.wait_for_all_handle_drops() =&gt; {
                     <span class="comment">// all worker handles have been dropped meaning this
                     // pool has no more references and can be dropped itself.
                     </span><span class="kw">break
                 </span>},
+                <span class="prelude-val">Some</span>(request) = <span class="self">self</span>.request_receiver.recv() =&gt; {
+                    PoolTask::CheckOut(request)
+                },
                 <span class="kw">_ </span>= maintenance_interval.tick() =&gt; {
                     PoolTask::Maintenance
                 },
@@ -1024,11 +1010,9 @@
                     } =&gt; {
                         <span class="self">self</span>.clear(cause, service_id);
                     }
-                    PoolManagementRequest::MarkAsReady {
-                        _completion_handler,
-                    } =&gt; {
+                    PoolManagementRequest::MarkAsReady { completion_handler } =&gt; {
                         <span class="self">self</span>.mark_as_ready();
-                        _completion_handler.acknowledge(());
+                        completion_handler.acknowledge(());
                     }
                     PoolManagementRequest::HandleConnectionSucceeded(conn) =&gt; {
                         <span class="self">self</span>.handle_connection_succeeded(conn);
@@ -1048,7 +1032,7 @@
 
             <span class="kw">if </span><span class="self">self</span>.can_service_connection_request() {
                 <span class="kw">if let </span><span class="prelude-val">Some</span>(request) = <span class="self">self</span>.wait_queue.pop_front() {
-                    <span class="self">self</span>.check_out(request).<span class="kw">await</span>;
+                    <span class="self">self</span>.check_out(request);
                 }
             }
         }
@@ -1057,10 +1041,11 @@
             connection.close_and_drop(ConnectionClosedReason::PoolClosed);
         }
 
-        <span class="self">self</span>.emit_event(|handler| {
-            handler.handle_pool_closed_event(PoolClosedEvent {
+        <span class="self">self</span>.event_emitter.emit_event(|| {
+            PoolClosedEvent {
                 address: <span class="self">self</span>.address.clone(),
-            });
+            }
+            .into()
         });
     }
 
@@ -1080,7 +1065,7 @@
         <span class="self">self</span>.below_max_connections() &amp;&amp; <span class="self">self</span>.pending_connection_count &lt; MAX_CONNECTING
     }
 
-    <span class="kw">async fn </span>check_out(<span class="kw-2">&amp;mut </span><span class="self">self</span>, request: ConnectionRequest) {
+    <span class="kw">fn </span>check_out(<span class="kw-2">&amp;mut </span><span class="self">self</span>, request: ConnectionRequest) {
         <span class="comment">// first attempt to check out an available connection
         </span><span class="kw">while let </span><span class="prelude-val">Some</span>(<span class="kw-2">mut </span>conn) = <span class="self">self</span>.available_connections.pop_back() {
             <span class="comment">// Close the connection if it&#39;s stale.
@@ -1109,19 +1094,21 @@
 
         <span class="comment">// otherwise, attempt to create a connection.
         </span><span class="kw">if </span><span class="self">self</span>.below_max_connections() {
-            <span class="kw">let </span>event_handler = <span class="self">self</span>.event_handler.clone();
+            <span class="kw">let </span>event_emitter = <span class="self">self</span>.event_emitter.clone();
             <span class="kw">let </span>establisher = <span class="self">self</span>.establisher.clone();
             <span class="kw">let </span>pending_connection = <span class="self">self</span>.create_pending_connection();
             <span class="kw">let </span>manager = <span class="self">self</span>.manager.clone();
-            <span class="kw">let </span><span class="kw-2">mut </span>server_updater = <span class="self">self</span>.server_updater.clone();
+            <span class="kw">let </span>server_updater = <span class="self">self</span>.server_updater.clone();
+            <span class="kw">let </span>credential = <span class="self">self</span>.credential.clone();
 
             <span class="kw">let </span>handle = runtime::spawn(<span class="kw">async move </span>{
                 <span class="kw">let </span><span class="kw-2">mut </span>establish_result = establish_connection(
-                    <span class="kw-2">&amp;</span>establisher,
+                    establisher,
                     pending_connection,
-                    <span class="kw-2">&amp;mut </span>server_updater,
+                    server_updater,
                     <span class="kw-2">&amp;</span>manager,
-                    event_handler.as_ref(),
+                    credential,
+                    event_emitter,
                 )
                 .<span class="kw">await</span>;
 
@@ -1154,12 +1141,11 @@
             id: <span class="self">self</span>.next_connection_id,
             address: <span class="self">self</span>.address.clone(),
             generation: <span class="self">self</span>.generation.clone(),
-            options: <span class="self">self</span>.connection_options.clone(),
+            event_emitter: <span class="self">self</span>.event_emitter.clone(),
         };
         <span class="self">self</span>.next_connection_id += <span class="number">1</span>;
-        <span class="self">self</span>.emit_event(|handler| {
-            handler.handle_connection_created_event(pending_connection.created_event())
-        });
+        <span class="self">self</span>.event_emitter
+            .emit_event(|| pending_connection.created_event().into());
 
         pending_connection
     }
@@ -1188,9 +1174,8 @@
     }
 
     <span class="kw">fn </span>check_in(<span class="kw-2">&amp;mut </span><span class="self">self</span>, <span class="kw-2">mut </span>conn: Connection) {
-        <span class="self">self</span>.emit_event(|handler| {
-            handler.handle_connection_checked_in_event(conn.checked_in_event());
-        });
+        <span class="self">self</span>.event_emitter
+            .emit_event(|| conn.checked_in_event().into());
 
         conn.mark_as_available();
 
@@ -1222,13 +1207,12 @@
         <span class="self">self</span>.generation_publisher.publish(<span class="self">self</span>.generation.clone());
 
         <span class="kw">if </span>was_ready {
-            <span class="self">self</span>.emit_event(|handler| {
-                <span class="kw">let </span>event = PoolClearedEvent {
+            <span class="self">self</span>.event_emitter.emit_event(|| {
+                PoolClearedEvent {
                     address: <span class="self">self</span>.address.clone(),
                     service_id,
-                };
-
-                handler.handle_pool_cleared_event(event);
+                }
+                .into()
             });
 
             <span class="kw">if </span>!<span class="macro">matches!</span>(<span class="self">self</span>.generation, PoolGeneration::LoadBalanced(<span class="kw">_</span>)) {
@@ -1248,22 +1232,12 @@
         }
 
         <span class="self">self</span>.state = PoolState::Ready;
-        <span class="self">self</span>.emit_event(|handler| {
-            <span class="kw">let </span>event = PoolReadyEvent {
+        <span class="self">self</span>.event_emitter.emit_event(|| {
+            PoolReadyEvent {
                 address: <span class="self">self</span>.address.clone(),
-            };
-
-            handler.handle_pool_ready_event(event);
+            }
+            .into()
         });
-    }
-
-    <span class="kw">fn </span>emit_event&lt;F&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, emit: F)
-    <span class="kw">where
-        </span>F: FnOnce(<span class="kw-2">&amp;</span>Arc&lt;<span class="kw">dyn </span>CmapEventHandler&gt;),
-    {
-        <span class="kw">if let </span><span class="prelude-val">Some</span>(<span class="kw-2">ref </span>handler) = <span class="self">self</span>.event_handler {
-            emit(handler);
-        }
     }
 
     <span class="doccomment">/// Close a connection, emit the event for it being closed, and decrement the
@@ -1323,17 +1297,20 @@
                 &amp;&amp; <span class="self">self</span>.pending_connection_count &lt; MAX_CONNECTING
             {
                 <span class="kw">let </span>pending_connection = <span class="self">self</span>.create_pending_connection();
-                <span class="kw">let </span>event_handler = <span class="self">self</span>.event_handler.clone();
+                <span class="kw">let </span>event_handler = <span class="self">self</span>.event_emitter.clone();
                 <span class="kw">let </span>manager = <span class="self">self</span>.manager.clone();
                 <span class="kw">let </span>establisher = <span class="self">self</span>.establisher.clone();
-                <span class="kw">let </span><span class="kw-2">mut </span>updater = <span class="self">self</span>.server_updater.clone();
+                <span class="kw">let </span>updater = <span class="self">self</span>.server_updater.clone();
+                <span class="kw">let </span>credential = <span class="self">self</span>.credential.clone();
+
                 runtime::execute(<span class="kw">async move </span>{
                     <span class="kw">let </span>connection = establish_connection(
-                        <span class="kw-2">&amp;</span>establisher,
+                        establisher,
                         pending_connection,
-                        <span class="kw-2">&amp;mut </span>updater,
+                        updater,
                         <span class="kw-2">&amp;</span>manager,
-                        event_handler.as_ref(),
+                        credential,
+                        event_handler,
                     )
                     .<span class="kw">await</span>;
 
@@ -1352,16 +1329,19 @@
 /// connections established in check_out and those established as part of
 /// satisfying min_pool_size.
 </span><span class="kw">async fn </span>establish_connection(
-    establisher: <span class="kw-2">&amp;</span>ConnectionEstablisher,
+    establisher: ConnectionEstablisher,
     pending_connection: PendingConnection,
-    server_updater: <span class="kw-2">&amp;mut </span>TopologyUpdater,
+    server_updater: TopologyUpdater,
     manager: <span class="kw-2">&amp;</span>PoolManager,
-    event_handler: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>Arc&lt;<span class="kw">dyn </span>CmapEventHandler&gt;&gt;,
+    credential: <span class="prelude-ty">Option</span>&lt;Credential&gt;,
+    event_emitter: CmapEventEmitter,
 ) -&gt; <span class="prelude-ty">Result</span>&lt;Connection&gt; {
     <span class="kw">let </span>connection_id = pending_connection.id;
     <span class="kw">let </span>address = pending_connection.address.clone();
 
-    <span class="kw">let </span><span class="kw-2">mut </span>establish_result = establisher.establish_connection(pending_connection).<span class="kw">await</span>;
+    <span class="kw">let </span><span class="kw-2">mut </span>establish_result = establisher
+        .establish_connection(pending_connection, credential.as_ref())
+        .<span class="kw">await</span>;
 
     <span class="kw">match </span>establish_result {
         <span class="prelude-val">Err</span>(<span class="kw-2">ref </span>e) =&gt; {
@@ -1372,20 +1352,20 @@
                     e.handshake_phase.clone(),
                 )
                 .<span class="kw">await</span>;
-            <span class="kw">if let </span><span class="prelude-val">Some</span>(handler) = event_handler {
-                <span class="kw">let </span>event = ConnectionClosedEvent {
+            event_emitter.emit_event(|| {
+                ConnectionClosedEvent {
                     address,
                     reason: ConnectionClosedReason::Error,
                     connection_id,
-                };
-                handler.handle_connection_closed_event(event);
-            }
+                    <span class="attr">#[cfg(feature = <span class="string">&quot;tracing-unstable&quot;</span>)]
+                    </span>error: <span class="prelude-val">Some</span>(e.cause.clone()),
+                }
+                .into()
+            });
             manager.handle_connection_failed();
         }
         <span class="prelude-val">Ok</span>(<span class="kw-2">ref mut </span>connection) =&gt; {
-            <span class="kw">if let </span><span class="prelude-val">Some</span>(handler) = event_handler {
-                handler.handle_connection_ready_event(connection.ready_event())
-            };
+            event_emitter.emit_event(|| connection.ready_event().into());
         }
     }
 

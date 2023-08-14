@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/nix/store/jnqxxv1xi811ni996b002f4jnyz38xck-vendor-cargo-deps/c19b7c6f923b580ac259164a89f2577984ad5ab09ee9d583b888f934adbbe8d0/time-0.3.14/src/date.rs`."><title>date.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-f3501f0f5ae15dfb.css" id="mainThemeStyle"><div id="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="time" data-themes="" data-resource-suffix="" data-rustdoc-version="1.71.0 (8ede3aae2 2023-07-12)" data-search-js="search-4926e5fc22a5646a.js" data-settings-js="settings-de11bff964e9d4e5.js" data-settings-css="settings-8c76f75bfb6bd192.css" data-theme-light-css="light-0f8c037637f9eb3e.css" data-theme-dark-css="dark-1097f8e92a01e3cf.css" data-theme-ayu-css="ayu-614652228113ac93.css" ></div><script src="../../static.files/storage-62ce34ea385b278a.js"></script><script defer src="../../static.files/source-script-11255107d0a65077.js"></script><script defer src="../../source-files.js"></script><script defer src="../../static.files/main-f0540c1d82cde29b.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../../static.files/light-0f8c037637f9eb3e.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../../static.files/dark-1097f8e92a01e3cf.css"><link rel="stylesheet" href="../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="icon" href="https://avatars0.githubusercontent.com/u/55999857"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../time/index.html"><img src="https://avatars0.githubusercontent.com/u/55999857" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/nix/store/yf45a1rayffhnidhgyjynpyhr9lqkd09-vendor-cargo-deps/c19b7c6f923b580ac259164a89f2577984ad5ab09ee9d583b888f934adbbe8d0/time-0.3.25/src/date.rs`."><title>date.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-f3501f0f5ae15dfb.css" id="mainThemeStyle"><div id="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="time" data-themes="" data-resource-suffix="" data-rustdoc-version="1.71.0 (8ede3aae2 2023-07-12)" data-search-js="search-4926e5fc22a5646a.js" data-settings-js="settings-de11bff964e9d4e5.js" data-settings-css="settings-8c76f75bfb6bd192.css" data-theme-light-css="light-0f8c037637f9eb3e.css" data-theme-dark-css="dark-1097f8e92a01e3cf.css" data-theme-ayu-css="ayu-614652228113ac93.css" ></div><script src="../../static.files/storage-62ce34ea385b278a.js"></script><script defer src="../../static.files/source-script-11255107d0a65077.js"></script><script defer src="../../source-files.js"></script><script defer src="../../static.files/main-f0540c1d82cde29b.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../../static.files/light-0f8c037637f9eb3e.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../../static.files/dark-1097f8e92a01e3cf.css"><link rel="stylesheet" href="../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="icon" href="https://avatars0.githubusercontent.com/u/55999857"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../time/index.html"><img src="https://avatars0.githubusercontent.com/u/55999857" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -1034,6 +1034,185 @@
 <a href="#1034" id="1034">1034</a>
 <a href="#1035" id="1035">1035</a>
 <a href="#1036" id="1036">1036</a>
+<a href="#1037" id="1037">1037</a>
+<a href="#1038" id="1038">1038</a>
+<a href="#1039" id="1039">1039</a>
+<a href="#1040" id="1040">1040</a>
+<a href="#1041" id="1041">1041</a>
+<a href="#1042" id="1042">1042</a>
+<a href="#1043" id="1043">1043</a>
+<a href="#1044" id="1044">1044</a>
+<a href="#1045" id="1045">1045</a>
+<a href="#1046" id="1046">1046</a>
+<a href="#1047" id="1047">1047</a>
+<a href="#1048" id="1048">1048</a>
+<a href="#1049" id="1049">1049</a>
+<a href="#1050" id="1050">1050</a>
+<a href="#1051" id="1051">1051</a>
+<a href="#1052" id="1052">1052</a>
+<a href="#1053" id="1053">1053</a>
+<a href="#1054" id="1054">1054</a>
+<a href="#1055" id="1055">1055</a>
+<a href="#1056" id="1056">1056</a>
+<a href="#1057" id="1057">1057</a>
+<a href="#1058" id="1058">1058</a>
+<a href="#1059" id="1059">1059</a>
+<a href="#1060" id="1060">1060</a>
+<a href="#1061" id="1061">1061</a>
+<a href="#1062" id="1062">1062</a>
+<a href="#1063" id="1063">1063</a>
+<a href="#1064" id="1064">1064</a>
+<a href="#1065" id="1065">1065</a>
+<a href="#1066" id="1066">1066</a>
+<a href="#1067" id="1067">1067</a>
+<a href="#1068" id="1068">1068</a>
+<a href="#1069" id="1069">1069</a>
+<a href="#1070" id="1070">1070</a>
+<a href="#1071" id="1071">1071</a>
+<a href="#1072" id="1072">1072</a>
+<a href="#1073" id="1073">1073</a>
+<a href="#1074" id="1074">1074</a>
+<a href="#1075" id="1075">1075</a>
+<a href="#1076" id="1076">1076</a>
+<a href="#1077" id="1077">1077</a>
+<a href="#1078" id="1078">1078</a>
+<a href="#1079" id="1079">1079</a>
+<a href="#1080" id="1080">1080</a>
+<a href="#1081" id="1081">1081</a>
+<a href="#1082" id="1082">1082</a>
+<a href="#1083" id="1083">1083</a>
+<a href="#1084" id="1084">1084</a>
+<a href="#1085" id="1085">1085</a>
+<a href="#1086" id="1086">1086</a>
+<a href="#1087" id="1087">1087</a>
+<a href="#1088" id="1088">1088</a>
+<a href="#1089" id="1089">1089</a>
+<a href="#1090" id="1090">1090</a>
+<a href="#1091" id="1091">1091</a>
+<a href="#1092" id="1092">1092</a>
+<a href="#1093" id="1093">1093</a>
+<a href="#1094" id="1094">1094</a>
+<a href="#1095" id="1095">1095</a>
+<a href="#1096" id="1096">1096</a>
+<a href="#1097" id="1097">1097</a>
+<a href="#1098" id="1098">1098</a>
+<a href="#1099" id="1099">1099</a>
+<a href="#1100" id="1100">1100</a>
+<a href="#1101" id="1101">1101</a>
+<a href="#1102" id="1102">1102</a>
+<a href="#1103" id="1103">1103</a>
+<a href="#1104" id="1104">1104</a>
+<a href="#1105" id="1105">1105</a>
+<a href="#1106" id="1106">1106</a>
+<a href="#1107" id="1107">1107</a>
+<a href="#1108" id="1108">1108</a>
+<a href="#1109" id="1109">1109</a>
+<a href="#1110" id="1110">1110</a>
+<a href="#1111" id="1111">1111</a>
+<a href="#1112" id="1112">1112</a>
+<a href="#1113" id="1113">1113</a>
+<a href="#1114" id="1114">1114</a>
+<a href="#1115" id="1115">1115</a>
+<a href="#1116" id="1116">1116</a>
+<a href="#1117" id="1117">1117</a>
+<a href="#1118" id="1118">1118</a>
+<a href="#1119" id="1119">1119</a>
+<a href="#1120" id="1120">1120</a>
+<a href="#1121" id="1121">1121</a>
+<a href="#1122" id="1122">1122</a>
+<a href="#1123" id="1123">1123</a>
+<a href="#1124" id="1124">1124</a>
+<a href="#1125" id="1125">1125</a>
+<a href="#1126" id="1126">1126</a>
+<a href="#1127" id="1127">1127</a>
+<a href="#1128" id="1128">1128</a>
+<a href="#1129" id="1129">1129</a>
+<a href="#1130" id="1130">1130</a>
+<a href="#1131" id="1131">1131</a>
+<a href="#1132" id="1132">1132</a>
+<a href="#1133" id="1133">1133</a>
+<a href="#1134" id="1134">1134</a>
+<a href="#1135" id="1135">1135</a>
+<a href="#1136" id="1136">1136</a>
+<a href="#1137" id="1137">1137</a>
+<a href="#1138" id="1138">1138</a>
+<a href="#1139" id="1139">1139</a>
+<a href="#1140" id="1140">1140</a>
+<a href="#1141" id="1141">1141</a>
+<a href="#1142" id="1142">1142</a>
+<a href="#1143" id="1143">1143</a>
+<a href="#1144" id="1144">1144</a>
+<a href="#1145" id="1145">1145</a>
+<a href="#1146" id="1146">1146</a>
+<a href="#1147" id="1147">1147</a>
+<a href="#1148" id="1148">1148</a>
+<a href="#1149" id="1149">1149</a>
+<a href="#1150" id="1150">1150</a>
+<a href="#1151" id="1151">1151</a>
+<a href="#1152" id="1152">1152</a>
+<a href="#1153" id="1153">1153</a>
+<a href="#1154" id="1154">1154</a>
+<a href="#1155" id="1155">1155</a>
+<a href="#1156" id="1156">1156</a>
+<a href="#1157" id="1157">1157</a>
+<a href="#1158" id="1158">1158</a>
+<a href="#1159" id="1159">1159</a>
+<a href="#1160" id="1160">1160</a>
+<a href="#1161" id="1161">1161</a>
+<a href="#1162" id="1162">1162</a>
+<a href="#1163" id="1163">1163</a>
+<a href="#1164" id="1164">1164</a>
+<a href="#1165" id="1165">1165</a>
+<a href="#1166" id="1166">1166</a>
+<a href="#1167" id="1167">1167</a>
+<a href="#1168" id="1168">1168</a>
+<a href="#1169" id="1169">1169</a>
+<a href="#1170" id="1170">1170</a>
+<a href="#1171" id="1171">1171</a>
+<a href="#1172" id="1172">1172</a>
+<a href="#1173" id="1173">1173</a>
+<a href="#1174" id="1174">1174</a>
+<a href="#1175" id="1175">1175</a>
+<a href="#1176" id="1176">1176</a>
+<a href="#1177" id="1177">1177</a>
+<a href="#1178" id="1178">1178</a>
+<a href="#1179" id="1179">1179</a>
+<a href="#1180" id="1180">1180</a>
+<a href="#1181" id="1181">1181</a>
+<a href="#1182" id="1182">1182</a>
+<a href="#1183" id="1183">1183</a>
+<a href="#1184" id="1184">1184</a>
+<a href="#1185" id="1185">1185</a>
+<a href="#1186" id="1186">1186</a>
+<a href="#1187" id="1187">1187</a>
+<a href="#1188" id="1188">1188</a>
+<a href="#1189" id="1189">1189</a>
+<a href="#1190" id="1190">1190</a>
+<a href="#1191" id="1191">1191</a>
+<a href="#1192" id="1192">1192</a>
+<a href="#1193" id="1193">1193</a>
+<a href="#1194" id="1194">1194</a>
+<a href="#1195" id="1195">1195</a>
+<a href="#1196" id="1196">1196</a>
+<a href="#1197" id="1197">1197</a>
+<a href="#1198" id="1198">1198</a>
+<a href="#1199" id="1199">1199</a>
+<a href="#1200" id="1200">1200</a>
+<a href="#1201" id="1201">1201</a>
+<a href="#1202" id="1202">1202</a>
+<a href="#1203" id="1203">1203</a>
+<a href="#1204" id="1204">1204</a>
+<a href="#1205" id="1205">1205</a>
+<a href="#1206" id="1206">1206</a>
+<a href="#1207" id="1207">1207</a>
+<a href="#1208" id="1208">1208</a>
+<a href="#1209" id="1209">1209</a>
+<a href="#1210" id="1210">1210</a>
+<a href="#1211" id="1211">1211</a>
+<a href="#1212" id="1212">1212</a>
+<a href="#1213" id="1213">1213</a>
+<a href="#1214" id="1214">1214</a>
+<a href="#1215" id="1215">1215</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! The [`Date`] struct and its associated `impl`s.
 
 </span><span class="kw">use </span>core::fmt;
@@ -1042,6 +1221,7 @@
 <span class="attr">#[cfg(feature = <span class="string">&quot;formatting&quot;</span>)]
 </span><span class="kw">use </span>std::io;
 
+<span class="kw">use </span><span class="kw">crate</span>::convert::<span class="kw-2">*</span>;
 <span class="attr">#[cfg(feature = <span class="string">&quot;formatting&quot;</span>)]
 </span><span class="kw">use </span><span class="kw">crate</span>::formatting::Formattable;
 <span class="attr">#[cfg(feature = <span class="string">&quot;parsing&quot;</span>)]
@@ -1075,15 +1255,6 @@
     // | unassigned |         year          |  ordinal  |
     // The year is 15 bits when `large-dates` is not enabled.
     </span>value: i32,
-}
-
-<span class="kw">impl </span>fmt::Debug <span class="kw">for </span>Date {
-    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;(), fmt::Error&gt; {
-        f.debug_struct(<span class="string">&quot;Date&quot;</span>)
-            .field(<span class="string">&quot;year&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.year())
-            .field(<span class="string">&quot;ordinal&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.ordinal())
-            .finish()
-    }
 }
 
 <span class="kw">impl </span>Date {
@@ -1216,7 +1387,8 @@
     /// freely available [here](https://www.researchgate.net/publication/316558298_Date_Algorithms).
     ///
     /// ```rust
-    /// # use time::{Date, macros::date};
+    /// # use time::Date;
+    /// # use time_macros::date;
     /// assert_eq!(Date::from_julian_day(0), Ok(date!(-4713 - 11 - 24)));
     /// assert_eq!(Date::from_julian_day(2_451_545), Ok(date!(2000 - 01 - 01)));
     /// assert_eq!(Date::from_julian_day(2_458_485), Ok(date!(2019 - 01 - 01)));
@@ -1274,7 +1446,7 @@
     </span><span class="doccomment">/// Get the year of the date.
     ///
     /// ```rust
-    /// # use time::macros::date;
+    /// # use time_macros::date;
     /// assert_eq!(date!(2019 - 01 - 01).year(), 2019);
     /// assert_eq!(date!(2019 - 12 - 31).year(), 2019);
     /// assert_eq!(date!(2020 - 01 - 01).year(), 2020);
@@ -1286,7 +1458,8 @@
     <span class="doccomment">/// Get the month.
     ///
     /// ```rust
-    /// # use time::{macros::date, Month};
+    /// # use time::Month;
+    /// # use time_macros::date;
     /// assert_eq!(date!(2019 - 01 - 01).month(), Month::January);
     /// assert_eq!(date!(2019 - 12 - 31).month(), Month::December);
     /// ```
@@ -1299,7 +1472,7 @@
     /// The returned value will always be in the range `1..=31`.
     ///
     /// ```rust
-    /// # use time::macros::date;
+    /// # use time_macros::date;
     /// assert_eq!(date!(2019 - 01 - 01).day(), 1);
     /// assert_eq!(date!(2019 - 12 - 31).day(), 31);
     /// ```
@@ -1353,7 +1526,7 @@
     /// The returned value will always be in the range `1..=366` (`1..=365` for common years).
     ///
     /// ```rust
-    /// # use time::macros::date;
+    /// # use time_macros::date;
     /// assert_eq!(date!(2019 - 01 - 01).ordinal(), 1);
     /// assert_eq!(date!(2019 - 12 - 31).ordinal(), 365);
     /// ```
@@ -1377,7 +1550,7 @@
     /// The returned value will always be in the range `1..=53`.
     ///
     /// ```rust
-    /// # use time::macros::date;
+    /// # use time_macros::date;
     /// assert_eq!(date!(2019 - 01 - 01).iso_week(), 1);
     /// assert_eq!(date!(2019 - 10 - 04).iso_week(), 40);
     /// assert_eq!(date!(2020 - 01 - 01).iso_week(), 1);
@@ -1393,7 +1566,7 @@
     /// The returned value will always be in the range `0..=53`.
     ///
     /// ```rust
-    /// # use time::macros::date;
+    /// # use time_macros::date;
     /// assert_eq!(date!(2019 - 01 - 01).sunday_based_week(), 0);
     /// assert_eq!(date!(2020 - 01 - 01).sunday_based_week(), 0);
     /// assert_eq!(date!(2020 - 12 - 31).sunday_based_week(), 52);
@@ -1408,7 +1581,7 @@
     /// The returned value will always be in the range `0..=53`.
     ///
     /// ```rust
-    /// # use time::macros::date;
+    /// # use time_macros::date;
     /// assert_eq!(date!(2019 - 01 - 01).monday_based_week(), 0);
     /// assert_eq!(date!(2020 - 01 - 01).monday_based_week(), 0);
     /// assert_eq!(date!(2020 - 12 - 31).monday_based_week(), 52);
@@ -1421,7 +1594,8 @@
     <span class="doccomment">/// Get the year, month, and day.
     ///
     /// ```rust
-    /// # use time::{macros::date, Month};
+    /// # use time::Month;
+    /// # use time_macros::date;
     /// assert_eq!(
     ///     date!(2019 - 01 - 01).to_calendar_date(),
     ///     (2019, Month::January, 1)
@@ -1435,7 +1609,7 @@
     <span class="doccomment">/// Get the year and ordinal day number.
     ///
     /// ```rust
-    /// # use time::macros::date;
+    /// # use time_macros::date;
     /// assert_eq!(date!(2019 - 01 - 01).to_ordinal_date(), (2019, 1));
     /// ```
     </span><span class="kw">pub const fn </span>to_ordinal_date(<span class="self">self</span>) -&gt; (i32, u16) {
@@ -1445,7 +1619,8 @@
     <span class="doccomment">/// Get the ISO 8601 year, week number, and weekday.
     ///
     /// ```rust
-    /// # use time::{Weekday::*, macros::date};
+    /// # use time::Weekday::*;
+    /// # use time_macros::date;
     /// assert_eq!(date!(2019 - 01 - 01).to_iso_week_date(), (2019, 1, Tuesday));
     /// assert_eq!(date!(2019 - 10 - 04).to_iso_week_date(), (2019, 40, Friday));
     /// assert_eq!(
@@ -1472,7 +1647,8 @@
     <span class="doccomment">/// Get the weekday.
     ///
     /// ```rust
-    /// # use time::{Weekday::*, macros::date};
+    /// # use time::Weekday::*;
+    /// # use time_macros::date;
     /// assert_eq!(date!(2019 - 01 - 01).weekday(), Tuesday);
     /// assert_eq!(date!(2019 - 02 - 01).weekday(), Friday);
     /// assert_eq!(date!(2019 - 03 - 01).weekday(), Friday);
@@ -1504,7 +1680,8 @@
     <span class="doccomment">/// Get the next calendar date.
     ///
     /// ```rust
-    /// # use time::{Date, macros::date};
+    /// # use time::Date;
+    /// # use time_macros::date;
     /// assert_eq!(
     ///     date!(2019 - 01 - 01).next_day(),
     ///     Some(date!(2019 - 01 - 02))
@@ -1536,7 +1713,8 @@
     <span class="doccomment">/// Get the previous calendar date.
     ///
     /// ```rust
-    /// # use time::{Date, macros::date};
+    /// # use time::Date;
+    /// # use time_macros::date;
     /// assert_eq!(
     ///     date!(2019 - 01 - 02).previous_day(),
     ///     Some(date!(2019 - 01 - 01))
@@ -1566,13 +1744,113 @@
         }
     }
 
+    <span class="doccomment">/// Calculates the first occurrence of a weekday that is strictly later than a given `Date`.
+    ///
+    /// # Panics
+    /// Panics if an overflow occurred.
+    ///
+    /// # Examples
+    /// ```
+    /// # use time::Weekday;
+    /// # use time_macros::date;
+    /// assert_eq!(
+    ///     date!(2023 - 06 - 28).next_occurrence(Weekday::Monday),
+    ///     date!(2023 - 07 - 03)
+    /// );
+    /// assert_eq!(
+    ///     date!(2023 - 06 - 19).next_occurrence(Weekday::Monday),
+    ///     date!(2023 - 06 - 26)
+    /// );
+    /// ```
+    </span><span class="kw">pub const fn </span>next_occurrence(<span class="self">self</span>, weekday: Weekday) -&gt; <span class="self">Self </span>{
+        <span class="macro">expect_opt!</span>(
+            <span class="self">self</span>.checked_next_occurrence(weekday),
+            <span class="string">&quot;overflow calculating the next occurrence of a weekday&quot;
+        </span>)
+    }
+
+    <span class="doccomment">/// Calculates the first occurrence of a weekday that is strictly earlier than a given `Date`.
+    ///
+    /// # Panics
+    /// Panics if an overflow occurred.
+    ///
+    /// # Examples
+    /// ```
+    /// # use time::Weekday;
+    /// # use time_macros::date;
+    /// assert_eq!(
+    ///     date!(2023 - 06 - 28).prev_occurrence(Weekday::Monday),
+    ///     date!(2023 - 06 - 26)
+    /// );
+    /// assert_eq!(
+    ///     date!(2023 - 06 - 19).prev_occurrence(Weekday::Monday),
+    ///     date!(2023 - 06 - 12)
+    /// );
+    /// ```
+    </span><span class="kw">pub const fn </span>prev_occurrence(<span class="self">self</span>, weekday: Weekday) -&gt; <span class="self">Self </span>{
+        <span class="macro">expect_opt!</span>(
+            <span class="self">self</span>.checked_prev_occurrence(weekday),
+            <span class="string">&quot;overflow calculating the previous occurrence of a weekday&quot;
+        </span>)
+    }
+
+    <span class="doccomment">/// Calculates the `n`th occurrence of a weekday that is strictly later than a given `Date`.
+    ///
+    /// # Panics
+    /// Panics if an overflow occurred or if `n == 0`.
+    ///
+    /// # Examples
+    /// ```
+    /// # use time::Weekday;
+    /// # use time_macros::date;
+    /// assert_eq!(
+    ///     date!(2023 - 06 - 25).nth_next_occurrence(Weekday::Monday, 5),
+    ///     date!(2023 - 07 - 24)
+    /// );
+    /// assert_eq!(
+    ///     date!(2023 - 06 - 26).nth_next_occurrence(Weekday::Monday, 5),
+    ///     date!(2023 - 07 - 31)
+    /// );
+    /// ```
+    </span><span class="kw">pub const fn </span>nth_next_occurrence(<span class="self">self</span>, weekday: Weekday, n: u8) -&gt; <span class="self">Self </span>{
+        <span class="macro">expect_opt!</span>(
+            <span class="self">self</span>.checked_nth_next_occurrence(weekday, n),
+            <span class="string">&quot;overflow calculating the next occurrence of a weekday&quot;
+        </span>)
+    }
+
+    <span class="doccomment">/// Calculates the `n`th occurrence of a weekday that is strictly earlier than a given `Date`.
+    ///
+    /// # Panics
+    /// Panics if an overflow occurred or if `n == 0`.
+    ///
+    /// # Examples
+    /// ```
+    /// # use time::Weekday;
+    /// # use time_macros::date;
+    /// assert_eq!(
+    ///     date!(2023 - 06 - 27).nth_prev_occurrence(Weekday::Monday, 3),
+    ///     date!(2023 - 06 - 12)
+    /// );
+    /// assert_eq!(
+    ///     date!(2023 - 06 - 26).nth_prev_occurrence(Weekday::Monday, 3),
+    ///     date!(2023 - 06 - 05)
+    /// );
+    /// ```
+    </span><span class="kw">pub const fn </span>nth_prev_occurrence(<span class="self">self</span>, weekday: Weekday, n: u8) -&gt; <span class="self">Self </span>{
+        <span class="macro">expect_opt!</span>(
+            <span class="self">self</span>.checked_nth_prev_occurrence(weekday, n),
+            <span class="string">&quot;overflow calculating the previous occurrence of a weekday&quot;
+        </span>)
+    }
+
     <span class="doccomment">/// Get the Julian day for the date.
     ///
     /// The algorithm to perform this conversion is derived from one provided by Peter Baum; it is
     /// freely available [here](https://www.researchgate.net/publication/316558298_Date_Algorithms).
     ///
     /// ```rust
-    /// # use time::macros::date;
+    /// # use time_macros::date;
     /// assert_eq!(date!(-4713 - 11 - 24).to_julian_day(), 0);
     /// assert_eq!(date!(2000 - 01 - 01).to_julian_day(), 2_451_545);
     /// assert_eq!(date!(2019 - 01 - 01).to_julian_day(), 2_458_485);
@@ -1592,7 +1870,8 @@
     </span><span class="doccomment">/// Computes `self + duration`, returning `None` if an overflow occurred.
     ///
     /// ```rust
-    /// # use time::{Date, ext::NumericalDuration, macros::date};
+    /// # use time::{Date, ext::NumericalDuration};
+    /// # use time_macros::date;
     /// assert_eq!(Date::MAX.checked_add(1.days()), None);
     /// assert_eq!(Date::MIN.checked_add((-2).days()), None);
     /// assert_eq!(
@@ -1606,7 +1885,8 @@
     /// This function only takes whole days into account.
     ///
     /// ```rust
-    /// # use time::{Date, ext::NumericalDuration, macros::date};
+    /// # use time::{Date, ext::NumericalDuration};
+    /// # use time_macros::date;
     /// assert_eq!(Date::MAX.checked_add(23.hours()), Some(Date::MAX));
     /// assert_eq!(Date::MIN.checked_add((-23).hours()), Some(Date::MIN));
     /// assert_eq!(
@@ -1635,7 +1915,8 @@
     <span class="doccomment">/// Computes `self - duration`, returning `None` if an overflow occurred.
     ///
     /// ```
-    /// # use time::{Date, ext::NumericalDuration, macros::date};
+    /// # use time::{Date, ext::NumericalDuration};
+    /// # use time_macros::date;
     /// assert_eq!(Date::MAX.checked_sub((-2).days()), None);
     /// assert_eq!(Date::MIN.checked_sub(1.days()), None);
     /// assert_eq!(
@@ -1649,7 +1930,8 @@
     /// This function only takes whole days into account.
     ///
     /// ```
-    /// # use time::{Date, ext::NumericalDuration, macros::date};
+    /// # use time::{Date, ext::NumericalDuration};
+    /// # use time_macros::date;
     /// assert_eq!(Date::MAX.checked_sub((-23).hours()), Some(Date::MAX));
     /// assert_eq!(Date::MIN.checked_sub(23.hours()), Some(Date::MIN));
     /// assert_eq!(
@@ -1674,13 +1956,74 @@
             <span class="prelude-val">None
         </span>}
     }
+
+    <span class="doccomment">/// Calculates the first occurrence of a weekday that is strictly later than a given `Date`.
+    /// Returns `None` if an overflow occurred.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">const fn </span>checked_next_occurrence(<span class="self">self</span>, weekday: Weekday) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>&gt; {
+        <span class="kw">let </span>day_diff = <span class="kw">match </span>weekday <span class="kw">as </span>i8 - <span class="self">self</span>.weekday() <span class="kw">as </span>i8 {
+            <span class="number">1 </span>| -<span class="number">6 </span>=&gt; <span class="number">1</span>,
+            <span class="number">2 </span>| -<span class="number">5 </span>=&gt; <span class="number">2</span>,
+            <span class="number">3 </span>| -<span class="number">4 </span>=&gt; <span class="number">3</span>,
+            <span class="number">4 </span>| -<span class="number">3 </span>=&gt; <span class="number">4</span>,
+            <span class="number">5 </span>| -<span class="number">2 </span>=&gt; <span class="number">5</span>,
+            <span class="number">6 </span>| -<span class="number">1 </span>=&gt; <span class="number">6</span>,
+            val =&gt; {
+                <span class="macro">debug_assert!</span>(val == <span class="number">0</span>);
+                <span class="number">7
+            </span>}
+        };
+
+        <span class="self">self</span>.checked_add(Duration::days(day_diff))
+    }
+
+    <span class="doccomment">/// Calculates the first occurrence of a weekday that is strictly earlier than a given `Date`.
+    /// Returns `None` if an overflow occurred.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">const fn </span>checked_prev_occurrence(<span class="self">self</span>, weekday: Weekday) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>&gt; {
+        <span class="kw">let </span>day_diff = <span class="kw">match </span>weekday <span class="kw">as </span>i8 - <span class="self">self</span>.weekday() <span class="kw">as </span>i8 {
+            <span class="number">1 </span>| -<span class="number">6 </span>=&gt; <span class="number">6</span>,
+            <span class="number">2 </span>| -<span class="number">5 </span>=&gt; <span class="number">5</span>,
+            <span class="number">3 </span>| -<span class="number">4 </span>=&gt; <span class="number">4</span>,
+            <span class="number">4 </span>| -<span class="number">3 </span>=&gt; <span class="number">3</span>,
+            <span class="number">5 </span>| -<span class="number">2 </span>=&gt; <span class="number">2</span>,
+            <span class="number">6 </span>| -<span class="number">1 </span>=&gt; <span class="number">1</span>,
+            val =&gt; {
+                <span class="macro">debug_assert!</span>(val == <span class="number">0</span>);
+                <span class="number">7
+            </span>}
+        };
+
+        <span class="self">self</span>.checked_sub(Duration::days(day_diff))
+    }
+
+    <span class="doccomment">/// Calculates the `n`th occurrence of a weekday that is strictly later than a given `Date`.
+    /// Returns `None` if an overflow occurred or if `n == 0`.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">const fn </span>checked_nth_next_occurrence(<span class="self">self</span>, weekday: Weekday, n: u8) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>&gt; {
+        <span class="kw">if </span>n == <span class="number">0 </span>{
+            <span class="kw">return </span><span class="prelude-val">None</span>;
+        }
+
+        <span class="macro">const_try_opt!</span>(<span class="self">self</span>.checked_next_occurrence(weekday))
+            .checked_add(Duration::weeks(n <span class="kw">as </span>i64 - <span class="number">1</span>))
+    }
+
+    <span class="doccomment">/// Calculates the `n`th occurrence of a weekday that is strictly earlier than a given `Date`.
+    /// Returns `None` if an overflow occurred or if `n == 0`.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">const fn </span>checked_nth_prev_occurrence(<span class="self">self</span>, weekday: Weekday, n: u8) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>&gt; {
+        <span class="kw">if </span>n == <span class="number">0 </span>{
+            <span class="kw">return </span><span class="prelude-val">None</span>;
+        }
+
+        <span class="macro">const_try_opt!</span>(<span class="self">self</span>.checked_prev_occurrence(weekday))
+            .checked_sub(Duration::weeks(n <span class="kw">as </span>i64 - <span class="number">1</span>))
+    }
     <span class="comment">// endregion: checked arithmetic
 
     // region: saturating arithmetic
     </span><span class="doccomment">/// Computes `self + duration`, saturating value on overflow.
     ///
     /// ```rust
-    /// # use time::{Date, ext::NumericalDuration, macros::date};
+    /// # use time::{Date, ext::NumericalDuration};
+    /// # use time_macros::date;
     /// assert_eq!(Date::MAX.saturating_add(1.days()), Date::MAX);
     /// assert_eq!(Date::MIN.saturating_add((-2).days()), Date::MIN);
     /// assert_eq!(
@@ -1694,7 +2037,8 @@
     /// This function only takes whole days into account.
     ///
     /// ```rust
-    /// # use time::{ext::NumericalDuration, macros::date};
+    /// # use time::ext::NumericalDuration;
+    /// # use time_macros::date;
     /// assert_eq!(
     ///     date!(2020 - 12 - 31).saturating_add(23.hours()),
     ///     date!(2020 - 12 - 31)
@@ -1718,7 +2062,8 @@
     <span class="doccomment">/// Computes `self - duration`, saturating value on overflow.
     ///
     /// ```
-    /// # use time::{Date, ext::NumericalDuration, macros::date};
+    /// # use time::{Date, ext::NumericalDuration};
+    /// # use time_macros::date;
     /// assert_eq!(Date::MAX.saturating_sub((-2).days()), Date::MAX);
     /// assert_eq!(Date::MIN.saturating_sub(1.days()), Date::MIN);
     /// assert_eq!(
@@ -1732,7 +2077,8 @@
     /// This function only takes whole days into account.
     ///
     /// ```
-    /// # use time::{ext::NumericalDuration, macros::date};
+    /// # use time::ext::NumericalDuration;
+    /// # use time_macros::date;
     /// assert_eq!(
     ///     date!(2020 - 12 - 31).saturating_sub(23.hours()),
     ///     date!(2020 - 12 - 31)
@@ -1758,7 +2104,7 @@
     </span><span class="doccomment">/// Replace the year. The month and day will be unchanged.
     ///
     /// ```rust
-    /// # use time::macros::date;
+    /// # use time_macros::date;
     /// assert_eq!(
     ///     date!(2022 - 02 - 18).replace_year(2019),
     ///     Ok(date!(2019 - 02 - 18))
@@ -1799,7 +2145,7 @@
     <span class="doccomment">/// Replace the month of the year.
     ///
     /// ```rust
-    /// # use time::macros::date;
+    /// # use time_macros::date;
     /// # use time::Month;
     /// assert_eq!(
     ///     date!(2022 - 02 - 18).replace_month(Month::January),
@@ -1820,7 +2166,7 @@
     <span class="doccomment">/// Replace the day of the month.
     ///
     /// ```rust
-    /// # use time::macros::date;
+    /// # use time_macros::date;
     /// assert_eq!(
     ///     date!(2022 - 02 - 18).replace_day(1),
     ///     Ok(date!(2022 - 02 - 01))
@@ -1852,7 +2198,7 @@
     /// to midnight.
     ///
     /// ```rust
-    /// # use time::macros::{date, datetime};
+    /// # use time_macros::{date, datetime};
     /// assert_eq!(date!(1970-01-01).midnight(), datetime!(1970-01-01 0:00));
     /// ```
     </span><span class="kw">pub const fn </span>midnight(<span class="self">self</span>) -&gt; PrimitiveDateTime {
@@ -1862,7 +2208,7 @@
     <span class="doccomment">/// Create a [`PrimitiveDateTime`] using the existing date and the provided [`Time`].
     ///
     /// ```rust
-    /// # use time::macros::{date, datetime, time};
+    /// # use time_macros::{date, datetime, time};
     /// assert_eq!(
     ///     date!(1970-01-01).with_time(time!(0:00)),
     ///     datetime!(1970-01-01 0:00),
@@ -1875,7 +2221,7 @@
     <span class="doccomment">/// Attempt to create a [`PrimitiveDateTime`] using the existing date and the provided time.
     ///
     /// ```rust
-    /// # use time::macros::date;
+    /// # use time_macros::date;
     /// assert!(date!(1970 - 01 - 01).with_hms(0, 0, 0).is_ok());
     /// assert!(date!(1970 - 01 - 01).with_hms(24, 0, 0).is_err());
     /// ```
@@ -1894,7 +2240,7 @@
     <span class="doccomment">/// Attempt to create a [`PrimitiveDateTime`] using the existing date and the provided time.
     ///
     /// ```rust
-    /// # use time::macros::date;
+    /// # use time_macros::date;
     /// assert!(date!(1970 - 01 - 01).with_hms_milli(0, 0, 0, 0).is_ok());
     /// assert!(date!(1970 - 01 - 01).with_hms_milli(24, 0, 0, 0).is_err());
     /// ```
@@ -1914,7 +2260,7 @@
     <span class="doccomment">/// Attempt to create a [`PrimitiveDateTime`] using the existing date and the provided time.
     ///
     /// ```rust
-    /// # use time::macros::date;
+    /// # use time_macros::date;
     /// assert!(date!(1970 - 01 - 01).with_hms_micro(0, 0, 0, 0).is_ok());
     /// assert!(date!(1970 - 01 - 01).with_hms_micro(24, 0, 0, 0).is_err());
     /// ```
@@ -1934,7 +2280,7 @@
     <span class="doccomment">/// Attempt to create a [`PrimitiveDateTime`] using the existing date and the provided time.
     ///
     /// ```rust
-    /// # use time::macros::date;
+    /// # use time_macros::date;
     /// assert!(date!(1970 - 01 - 01).with_hms_nano(0, 0, 0, 0).is_ok());
     /// assert!(date!(1970 - 01 - 01).with_hms_nano(24, 0, 0, 0).is_err());
     /// ```
@@ -1968,7 +2314,8 @@
     <span class="doccomment">/// Format the `Date` using the provided [format description](crate::format_description).
     ///
     /// ```rust
-    /// # use time::{format_description, macros::date};
+    /// # use time::{format_description};
+    /// # use time_macros::date;
     /// let format = format_description::parse(&quot;[year]-[month]-[day]&quot;)?;
     /// assert_eq!(date!(2020 - 01 - 02).format(&amp;format)?, &quot;2020-01-02&quot;);
     /// # Ok::&lt;_, time::Error&gt;(())
@@ -1984,8 +2331,9 @@
     /// description](crate::format_description).
     ///
     /// ```rust
-    /// # use time::{format_description, macros::date, Date};
-    /// let format = format_description::parse(&quot;[year]-[month]-[day]&quot;)?;
+    /// # use time::Date;
+    /// # use time_macros::{date, format_description};
+    /// let format = format_description!(&quot;[year]-[month]-[day]&quot;);
     /// assert_eq!(Date::parse(&quot;2020-01-02&quot;, &amp;format)?, date!(2020 - 01 - 02));
     /// # Ok::&lt;_, time::Error&gt;(())
     /// ```
@@ -2019,6 +2367,12 @@
         }
     }
 }
+
+<span class="kw">impl </span>fmt::Debug <span class="kw">for </span>Date {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;(), fmt::Error&gt; {
+        fmt::Display::fmt(<span class="self">self</span>, f)
+    }
+}
 <span class="comment">// endregion formatting &amp; parsing
 
 // region: trait impls
@@ -2035,8 +2389,10 @@
     <span class="kw">type </span>Output = <span class="self">Self</span>;
 
     <span class="kw">fn </span>add(<span class="self">self</span>, duration: StdDuration) -&gt; <span class="self">Self</span>::Output {
-        <span class="self">Self</span>::from_julian_day(<span class="self">self</span>.to_julian_day() + (duration.as_secs() / <span class="number">86_400</span>) <span class="kw">as </span>i32)
-            .expect(<span class="string">&quot;overflow adding duration to date&quot;</span>)
+        <span class="self">Self</span>::from_julian_day(
+            <span class="self">self</span>.to_julian_day() + (duration.as_secs() / Second.per(Day) <span class="kw">as </span>u64) <span class="kw">as </span>i32,
+        )
+        .expect(<span class="string">&quot;overflow adding duration to date&quot;</span>)
     }
 }
 
@@ -2055,8 +2411,10 @@
     <span class="kw">type </span>Output = <span class="self">Self</span>;
 
     <span class="kw">fn </span>sub(<span class="self">self</span>, duration: StdDuration) -&gt; <span class="self">Self</span>::Output {
-        <span class="self">Self</span>::from_julian_day(<span class="self">self</span>.to_julian_day() - (duration.as_secs() / <span class="number">86_400</span>) <span class="kw">as </span>i32)
-            .expect(<span class="string">&quot;overflow subtracting duration from date&quot;</span>)
+        <span class="self">Self</span>::from_julian_day(
+            <span class="self">self</span>.to_julian_day() - (duration.as_secs() / Second.per(Day) <span class="kw">as </span>u64) <span class="kw">as </span>i32,
+        )
+        .expect(<span class="string">&quot;overflow subtracting duration from date&quot;</span>)
     }
 }
 

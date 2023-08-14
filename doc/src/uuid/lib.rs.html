@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/nix/store/jnqxxv1xi811ni996b002f4jnyz38xck-vendor-cargo-deps/c19b7c6f923b580ac259164a89f2577984ad5ab09ee9d583b888f934adbbe8d0/uuid-1.1.2/src/lib.rs`."><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-f3501f0f5ae15dfb.css" id="mainThemeStyle"><div id="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="uuid" data-themes="" data-resource-suffix="" data-rustdoc-version="1.71.0 (8ede3aae2 2023-07-12)" data-search-js="search-4926e5fc22a5646a.js" data-settings-js="settings-de11bff964e9d4e5.js" data-settings-css="settings-8c76f75bfb6bd192.css" data-theme-light-css="light-0f8c037637f9eb3e.css" data-theme-dark-css="dark-1097f8e92a01e3cf.css" data-theme-ayu-css="ayu-614652228113ac93.css" ></div><script src="../../static.files/storage-62ce34ea385b278a.js"></script><script defer src="../../static.files/source-script-11255107d0a65077.js"></script><script defer src="../../source-files.js"></script><script defer src="../../static.files/main-f0540c1d82cde29b.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../../static.files/light-0f8c037637f9eb3e.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../../static.files/dark-1097f8e92a01e3cf.css"><link rel="stylesheet" href="../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="icon" href="https://www.rust-lang.org/favicon.ico"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../uuid/index.html"><img src="https://www.rust-lang.org/logos/rust-logo-128x128-blk-v2.png" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/nix/store/yf45a1rayffhnidhgyjynpyhr9lqkd09-vendor-cargo-deps/c19b7c6f923b580ac259164a89f2577984ad5ab09ee9d583b888f934adbbe8d0/uuid-1.4.1/src/lib.rs`."><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-f3501f0f5ae15dfb.css" id="mainThemeStyle"><div id="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="uuid" data-themes="" data-resource-suffix="" data-rustdoc-version="1.71.0 (8ede3aae2 2023-07-12)" data-search-js="search-4926e5fc22a5646a.js" data-settings-js="settings-de11bff964e9d4e5.js" data-settings-css="settings-8c76f75bfb6bd192.css" data-theme-light-css="light-0f8c037637f9eb3e.css" data-theme-dark-css="dark-1097f8e92a01e3cf.css" data-theme-ayu-css="ayu-614652228113ac93.css" ></div><script src="../../static.files/storage-62ce34ea385b278a.js"></script><script defer src="../../static.files/source-script-11255107d0a65077.js"></script><script defer src="../../source-files.js"></script><script defer src="../../static.files/main-f0540c1d82cde29b.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../../static.files/light-0f8c037637f9eb3e.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../../static.files/dark-1097f8e92a01e3cf.css"><link rel="stylesheet" href="../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="icon" href="https://www.rust-lang.org/favicon.ico"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../uuid/index.html"><img src="https://www.rust-lang.org/logos/rust-logo-128x128-blk-v2.png" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -1431,6 +1431,384 @@
 <a href="#1431" id="1431">1431</a>
 <a href="#1432" id="1432">1432</a>
 <a href="#1433" id="1433">1433</a>
+<a href="#1434" id="1434">1434</a>
+<a href="#1435" id="1435">1435</a>
+<a href="#1436" id="1436">1436</a>
+<a href="#1437" id="1437">1437</a>
+<a href="#1438" id="1438">1438</a>
+<a href="#1439" id="1439">1439</a>
+<a href="#1440" id="1440">1440</a>
+<a href="#1441" id="1441">1441</a>
+<a href="#1442" id="1442">1442</a>
+<a href="#1443" id="1443">1443</a>
+<a href="#1444" id="1444">1444</a>
+<a href="#1445" id="1445">1445</a>
+<a href="#1446" id="1446">1446</a>
+<a href="#1447" id="1447">1447</a>
+<a href="#1448" id="1448">1448</a>
+<a href="#1449" id="1449">1449</a>
+<a href="#1450" id="1450">1450</a>
+<a href="#1451" id="1451">1451</a>
+<a href="#1452" id="1452">1452</a>
+<a href="#1453" id="1453">1453</a>
+<a href="#1454" id="1454">1454</a>
+<a href="#1455" id="1455">1455</a>
+<a href="#1456" id="1456">1456</a>
+<a href="#1457" id="1457">1457</a>
+<a href="#1458" id="1458">1458</a>
+<a href="#1459" id="1459">1459</a>
+<a href="#1460" id="1460">1460</a>
+<a href="#1461" id="1461">1461</a>
+<a href="#1462" id="1462">1462</a>
+<a href="#1463" id="1463">1463</a>
+<a href="#1464" id="1464">1464</a>
+<a href="#1465" id="1465">1465</a>
+<a href="#1466" id="1466">1466</a>
+<a href="#1467" id="1467">1467</a>
+<a href="#1468" id="1468">1468</a>
+<a href="#1469" id="1469">1469</a>
+<a href="#1470" id="1470">1470</a>
+<a href="#1471" id="1471">1471</a>
+<a href="#1472" id="1472">1472</a>
+<a href="#1473" id="1473">1473</a>
+<a href="#1474" id="1474">1474</a>
+<a href="#1475" id="1475">1475</a>
+<a href="#1476" id="1476">1476</a>
+<a href="#1477" id="1477">1477</a>
+<a href="#1478" id="1478">1478</a>
+<a href="#1479" id="1479">1479</a>
+<a href="#1480" id="1480">1480</a>
+<a href="#1481" id="1481">1481</a>
+<a href="#1482" id="1482">1482</a>
+<a href="#1483" id="1483">1483</a>
+<a href="#1484" id="1484">1484</a>
+<a href="#1485" id="1485">1485</a>
+<a href="#1486" id="1486">1486</a>
+<a href="#1487" id="1487">1487</a>
+<a href="#1488" id="1488">1488</a>
+<a href="#1489" id="1489">1489</a>
+<a href="#1490" id="1490">1490</a>
+<a href="#1491" id="1491">1491</a>
+<a href="#1492" id="1492">1492</a>
+<a href="#1493" id="1493">1493</a>
+<a href="#1494" id="1494">1494</a>
+<a href="#1495" id="1495">1495</a>
+<a href="#1496" id="1496">1496</a>
+<a href="#1497" id="1497">1497</a>
+<a href="#1498" id="1498">1498</a>
+<a href="#1499" id="1499">1499</a>
+<a href="#1500" id="1500">1500</a>
+<a href="#1501" id="1501">1501</a>
+<a href="#1502" id="1502">1502</a>
+<a href="#1503" id="1503">1503</a>
+<a href="#1504" id="1504">1504</a>
+<a href="#1505" id="1505">1505</a>
+<a href="#1506" id="1506">1506</a>
+<a href="#1507" id="1507">1507</a>
+<a href="#1508" id="1508">1508</a>
+<a href="#1509" id="1509">1509</a>
+<a href="#1510" id="1510">1510</a>
+<a href="#1511" id="1511">1511</a>
+<a href="#1512" id="1512">1512</a>
+<a href="#1513" id="1513">1513</a>
+<a href="#1514" id="1514">1514</a>
+<a href="#1515" id="1515">1515</a>
+<a href="#1516" id="1516">1516</a>
+<a href="#1517" id="1517">1517</a>
+<a href="#1518" id="1518">1518</a>
+<a href="#1519" id="1519">1519</a>
+<a href="#1520" id="1520">1520</a>
+<a href="#1521" id="1521">1521</a>
+<a href="#1522" id="1522">1522</a>
+<a href="#1523" id="1523">1523</a>
+<a href="#1524" id="1524">1524</a>
+<a href="#1525" id="1525">1525</a>
+<a href="#1526" id="1526">1526</a>
+<a href="#1527" id="1527">1527</a>
+<a href="#1528" id="1528">1528</a>
+<a href="#1529" id="1529">1529</a>
+<a href="#1530" id="1530">1530</a>
+<a href="#1531" id="1531">1531</a>
+<a href="#1532" id="1532">1532</a>
+<a href="#1533" id="1533">1533</a>
+<a href="#1534" id="1534">1534</a>
+<a href="#1535" id="1535">1535</a>
+<a href="#1536" id="1536">1536</a>
+<a href="#1537" id="1537">1537</a>
+<a href="#1538" id="1538">1538</a>
+<a href="#1539" id="1539">1539</a>
+<a href="#1540" id="1540">1540</a>
+<a href="#1541" id="1541">1541</a>
+<a href="#1542" id="1542">1542</a>
+<a href="#1543" id="1543">1543</a>
+<a href="#1544" id="1544">1544</a>
+<a href="#1545" id="1545">1545</a>
+<a href="#1546" id="1546">1546</a>
+<a href="#1547" id="1547">1547</a>
+<a href="#1548" id="1548">1548</a>
+<a href="#1549" id="1549">1549</a>
+<a href="#1550" id="1550">1550</a>
+<a href="#1551" id="1551">1551</a>
+<a href="#1552" id="1552">1552</a>
+<a href="#1553" id="1553">1553</a>
+<a href="#1554" id="1554">1554</a>
+<a href="#1555" id="1555">1555</a>
+<a href="#1556" id="1556">1556</a>
+<a href="#1557" id="1557">1557</a>
+<a href="#1558" id="1558">1558</a>
+<a href="#1559" id="1559">1559</a>
+<a href="#1560" id="1560">1560</a>
+<a href="#1561" id="1561">1561</a>
+<a href="#1562" id="1562">1562</a>
+<a href="#1563" id="1563">1563</a>
+<a href="#1564" id="1564">1564</a>
+<a href="#1565" id="1565">1565</a>
+<a href="#1566" id="1566">1566</a>
+<a href="#1567" id="1567">1567</a>
+<a href="#1568" id="1568">1568</a>
+<a href="#1569" id="1569">1569</a>
+<a href="#1570" id="1570">1570</a>
+<a href="#1571" id="1571">1571</a>
+<a href="#1572" id="1572">1572</a>
+<a href="#1573" id="1573">1573</a>
+<a href="#1574" id="1574">1574</a>
+<a href="#1575" id="1575">1575</a>
+<a href="#1576" id="1576">1576</a>
+<a href="#1577" id="1577">1577</a>
+<a href="#1578" id="1578">1578</a>
+<a href="#1579" id="1579">1579</a>
+<a href="#1580" id="1580">1580</a>
+<a href="#1581" id="1581">1581</a>
+<a href="#1582" id="1582">1582</a>
+<a href="#1583" id="1583">1583</a>
+<a href="#1584" id="1584">1584</a>
+<a href="#1585" id="1585">1585</a>
+<a href="#1586" id="1586">1586</a>
+<a href="#1587" id="1587">1587</a>
+<a href="#1588" id="1588">1588</a>
+<a href="#1589" id="1589">1589</a>
+<a href="#1590" id="1590">1590</a>
+<a href="#1591" id="1591">1591</a>
+<a href="#1592" id="1592">1592</a>
+<a href="#1593" id="1593">1593</a>
+<a href="#1594" id="1594">1594</a>
+<a href="#1595" id="1595">1595</a>
+<a href="#1596" id="1596">1596</a>
+<a href="#1597" id="1597">1597</a>
+<a href="#1598" id="1598">1598</a>
+<a href="#1599" id="1599">1599</a>
+<a href="#1600" id="1600">1600</a>
+<a href="#1601" id="1601">1601</a>
+<a href="#1602" id="1602">1602</a>
+<a href="#1603" id="1603">1603</a>
+<a href="#1604" id="1604">1604</a>
+<a href="#1605" id="1605">1605</a>
+<a href="#1606" id="1606">1606</a>
+<a href="#1607" id="1607">1607</a>
+<a href="#1608" id="1608">1608</a>
+<a href="#1609" id="1609">1609</a>
+<a href="#1610" id="1610">1610</a>
+<a href="#1611" id="1611">1611</a>
+<a href="#1612" id="1612">1612</a>
+<a href="#1613" id="1613">1613</a>
+<a href="#1614" id="1614">1614</a>
+<a href="#1615" id="1615">1615</a>
+<a href="#1616" id="1616">1616</a>
+<a href="#1617" id="1617">1617</a>
+<a href="#1618" id="1618">1618</a>
+<a href="#1619" id="1619">1619</a>
+<a href="#1620" id="1620">1620</a>
+<a href="#1621" id="1621">1621</a>
+<a href="#1622" id="1622">1622</a>
+<a href="#1623" id="1623">1623</a>
+<a href="#1624" id="1624">1624</a>
+<a href="#1625" id="1625">1625</a>
+<a href="#1626" id="1626">1626</a>
+<a href="#1627" id="1627">1627</a>
+<a href="#1628" id="1628">1628</a>
+<a href="#1629" id="1629">1629</a>
+<a href="#1630" id="1630">1630</a>
+<a href="#1631" id="1631">1631</a>
+<a href="#1632" id="1632">1632</a>
+<a href="#1633" id="1633">1633</a>
+<a href="#1634" id="1634">1634</a>
+<a href="#1635" id="1635">1635</a>
+<a href="#1636" id="1636">1636</a>
+<a href="#1637" id="1637">1637</a>
+<a href="#1638" id="1638">1638</a>
+<a href="#1639" id="1639">1639</a>
+<a href="#1640" id="1640">1640</a>
+<a href="#1641" id="1641">1641</a>
+<a href="#1642" id="1642">1642</a>
+<a href="#1643" id="1643">1643</a>
+<a href="#1644" id="1644">1644</a>
+<a href="#1645" id="1645">1645</a>
+<a href="#1646" id="1646">1646</a>
+<a href="#1647" id="1647">1647</a>
+<a href="#1648" id="1648">1648</a>
+<a href="#1649" id="1649">1649</a>
+<a href="#1650" id="1650">1650</a>
+<a href="#1651" id="1651">1651</a>
+<a href="#1652" id="1652">1652</a>
+<a href="#1653" id="1653">1653</a>
+<a href="#1654" id="1654">1654</a>
+<a href="#1655" id="1655">1655</a>
+<a href="#1656" id="1656">1656</a>
+<a href="#1657" id="1657">1657</a>
+<a href="#1658" id="1658">1658</a>
+<a href="#1659" id="1659">1659</a>
+<a href="#1660" id="1660">1660</a>
+<a href="#1661" id="1661">1661</a>
+<a href="#1662" id="1662">1662</a>
+<a href="#1663" id="1663">1663</a>
+<a href="#1664" id="1664">1664</a>
+<a href="#1665" id="1665">1665</a>
+<a href="#1666" id="1666">1666</a>
+<a href="#1667" id="1667">1667</a>
+<a href="#1668" id="1668">1668</a>
+<a href="#1669" id="1669">1669</a>
+<a href="#1670" id="1670">1670</a>
+<a href="#1671" id="1671">1671</a>
+<a href="#1672" id="1672">1672</a>
+<a href="#1673" id="1673">1673</a>
+<a href="#1674" id="1674">1674</a>
+<a href="#1675" id="1675">1675</a>
+<a href="#1676" id="1676">1676</a>
+<a href="#1677" id="1677">1677</a>
+<a href="#1678" id="1678">1678</a>
+<a href="#1679" id="1679">1679</a>
+<a href="#1680" id="1680">1680</a>
+<a href="#1681" id="1681">1681</a>
+<a href="#1682" id="1682">1682</a>
+<a href="#1683" id="1683">1683</a>
+<a href="#1684" id="1684">1684</a>
+<a href="#1685" id="1685">1685</a>
+<a href="#1686" id="1686">1686</a>
+<a href="#1687" id="1687">1687</a>
+<a href="#1688" id="1688">1688</a>
+<a href="#1689" id="1689">1689</a>
+<a href="#1690" id="1690">1690</a>
+<a href="#1691" id="1691">1691</a>
+<a href="#1692" id="1692">1692</a>
+<a href="#1693" id="1693">1693</a>
+<a href="#1694" id="1694">1694</a>
+<a href="#1695" id="1695">1695</a>
+<a href="#1696" id="1696">1696</a>
+<a href="#1697" id="1697">1697</a>
+<a href="#1698" id="1698">1698</a>
+<a href="#1699" id="1699">1699</a>
+<a href="#1700" id="1700">1700</a>
+<a href="#1701" id="1701">1701</a>
+<a href="#1702" id="1702">1702</a>
+<a href="#1703" id="1703">1703</a>
+<a href="#1704" id="1704">1704</a>
+<a href="#1705" id="1705">1705</a>
+<a href="#1706" id="1706">1706</a>
+<a href="#1707" id="1707">1707</a>
+<a href="#1708" id="1708">1708</a>
+<a href="#1709" id="1709">1709</a>
+<a href="#1710" id="1710">1710</a>
+<a href="#1711" id="1711">1711</a>
+<a href="#1712" id="1712">1712</a>
+<a href="#1713" id="1713">1713</a>
+<a href="#1714" id="1714">1714</a>
+<a href="#1715" id="1715">1715</a>
+<a href="#1716" id="1716">1716</a>
+<a href="#1717" id="1717">1717</a>
+<a href="#1718" id="1718">1718</a>
+<a href="#1719" id="1719">1719</a>
+<a href="#1720" id="1720">1720</a>
+<a href="#1721" id="1721">1721</a>
+<a href="#1722" id="1722">1722</a>
+<a href="#1723" id="1723">1723</a>
+<a href="#1724" id="1724">1724</a>
+<a href="#1725" id="1725">1725</a>
+<a href="#1726" id="1726">1726</a>
+<a href="#1727" id="1727">1727</a>
+<a href="#1728" id="1728">1728</a>
+<a href="#1729" id="1729">1729</a>
+<a href="#1730" id="1730">1730</a>
+<a href="#1731" id="1731">1731</a>
+<a href="#1732" id="1732">1732</a>
+<a href="#1733" id="1733">1733</a>
+<a href="#1734" id="1734">1734</a>
+<a href="#1735" id="1735">1735</a>
+<a href="#1736" id="1736">1736</a>
+<a href="#1737" id="1737">1737</a>
+<a href="#1738" id="1738">1738</a>
+<a href="#1739" id="1739">1739</a>
+<a href="#1740" id="1740">1740</a>
+<a href="#1741" id="1741">1741</a>
+<a href="#1742" id="1742">1742</a>
+<a href="#1743" id="1743">1743</a>
+<a href="#1744" id="1744">1744</a>
+<a href="#1745" id="1745">1745</a>
+<a href="#1746" id="1746">1746</a>
+<a href="#1747" id="1747">1747</a>
+<a href="#1748" id="1748">1748</a>
+<a href="#1749" id="1749">1749</a>
+<a href="#1750" id="1750">1750</a>
+<a href="#1751" id="1751">1751</a>
+<a href="#1752" id="1752">1752</a>
+<a href="#1753" id="1753">1753</a>
+<a href="#1754" id="1754">1754</a>
+<a href="#1755" id="1755">1755</a>
+<a href="#1756" id="1756">1756</a>
+<a href="#1757" id="1757">1757</a>
+<a href="#1758" id="1758">1758</a>
+<a href="#1759" id="1759">1759</a>
+<a href="#1760" id="1760">1760</a>
+<a href="#1761" id="1761">1761</a>
+<a href="#1762" id="1762">1762</a>
+<a href="#1763" id="1763">1763</a>
+<a href="#1764" id="1764">1764</a>
+<a href="#1765" id="1765">1765</a>
+<a href="#1766" id="1766">1766</a>
+<a href="#1767" id="1767">1767</a>
+<a href="#1768" id="1768">1768</a>
+<a href="#1769" id="1769">1769</a>
+<a href="#1770" id="1770">1770</a>
+<a href="#1771" id="1771">1771</a>
+<a href="#1772" id="1772">1772</a>
+<a href="#1773" id="1773">1773</a>
+<a href="#1774" id="1774">1774</a>
+<a href="#1775" id="1775">1775</a>
+<a href="#1776" id="1776">1776</a>
+<a href="#1777" id="1777">1777</a>
+<a href="#1778" id="1778">1778</a>
+<a href="#1779" id="1779">1779</a>
+<a href="#1780" id="1780">1780</a>
+<a href="#1781" id="1781">1781</a>
+<a href="#1782" id="1782">1782</a>
+<a href="#1783" id="1783">1783</a>
+<a href="#1784" id="1784">1784</a>
+<a href="#1785" id="1785">1785</a>
+<a href="#1786" id="1786">1786</a>
+<a href="#1787" id="1787">1787</a>
+<a href="#1788" id="1788">1788</a>
+<a href="#1789" id="1789">1789</a>
+<a href="#1790" id="1790">1790</a>
+<a href="#1791" id="1791">1791</a>
+<a href="#1792" id="1792">1792</a>
+<a href="#1793" id="1793">1793</a>
+<a href="#1794" id="1794">1794</a>
+<a href="#1795" id="1795">1795</a>
+<a href="#1796" id="1796">1796</a>
+<a href="#1797" id="1797">1797</a>
+<a href="#1798" id="1798">1798</a>
+<a href="#1799" id="1799">1799</a>
+<a href="#1800" id="1800">1800</a>
+<a href="#1801" id="1801">1801</a>
+<a href="#1802" id="1802">1802</a>
+<a href="#1803" id="1803">1803</a>
+<a href="#1804" id="1804">1804</a>
+<a href="#1805" id="1805">1805</a>
+<a href="#1806" id="1806">1806</a>
+<a href="#1807" id="1807">1807</a>
+<a href="#1808" id="1808">1808</a>
+<a href="#1809" id="1809">1809</a>
+<a href="#1810" id="1810">1810</a>
+<a href="#1811" id="1811">1811</a>
 </pre></div><pre class="rust"><code><span class="comment">// Copyright 2013-2014 The Rust Project Developers.
 // Copyright 2018 The Uuid Project Developers.
 //
@@ -1463,13 +1841,16 @@
 //! practical purposes, it can be assumed that an unintentional collision would
 //! be extremely unlikely.
 //!
+//! UUIDs have a number of standardized encodings that are specified in [RFC4122](http://tools.ietf.org/html/rfc4122),
+//! with recent additions [in draft](https://datatracker.ietf.org/doc/html/draft-peabody-dispatch-new-uuid-format-04).
+//!
 //! # Getting started
 //!
 //! Add the following to your `Cargo.toml`:
 //!
 //! ```toml
 //! [dependencies.uuid]
-//! version = &quot;1.1.2&quot;
+//! version = &quot;1.4.1&quot;
 //! features = [
 //!     &quot;v4&quot;,                # Lets you generate random UUIDs
 //!     &quot;fast-rng&quot;,          # Use a faster (but still sufficiently random) RNG
@@ -1498,21 +1879,35 @@
 //! const ID: Uuid = uuid!(&quot;67e55044-10b1-426f-9247-bb680e5fe0c8&quot;);
 //! ```
 //!
-//! # Dependencies
+//! # Working with different UUID versions
 //!
-//! By default, this crate depends on nothing but `std` and can parse and format
-//! UUIDs, but cannot generate them. You need to enable the following Cargo
-//! features to enable various pieces of functionality:
+//! This library supports all standardized methods for generating UUIDs through individual Cargo features.
 //!
-//! * `v1` - adds the [`Uuid::new_v1`] function and the ability to create a V1
-//!   UUID using an implementation of [`v1::ClockSequence`] (usually
-//! [`v1::Context`]) and a UNIX timestamp.
-//! * `v3` - adds the [`Uuid::new_v3`] function and the ability to create a V3
-//!   UUID based on the MD5 hash of some data.
-//! * `v4` - adds the [`Uuid::new_v4`] function and the ability to randomly
-//!   generate a UUID.
-//! * `v5` - adds the [`Uuid::new_v5`] function and the ability to create a V5
-//!   UUID based on the SHA1 hash of some data.
+//! By default, this crate depends on nothing but the Rust standard library and can parse and format
+//! UUIDs, but cannot generate them. Depending on the kind of UUID you&#39;d like to work with, there
+//! are Cargo features that enable generating them:
+//!
+//! * `v1` - Version 1 UUIDs using a timestamp and monotonic counter.
+//! * `v3` - Version 3 UUIDs based on the MD5 hash of some data.
+//! * `v4` - Version 4 UUIDs with random data.
+//! * `v5` - Version 5 UUIDs based on the SHA1 hash of some data.
+//!
+//! Versions that are in draft are also supported. See the _unstable features_ section for details.
+//!
+//! This library also includes a [`Builder`] type that can be used to help construct UUIDs of any
+//! version without any additional dependencies or features. It&#39;s a lower-level API than [`Uuid`]
+//! that can be used when you need control over implicit requirements on things like a source
+//! of randomness.
+//!
+//! ## Which UUID version should I use?
+//!
+//! If you just want to generate unique identifiers then consider version 4 (`v4`) UUIDs. If you want
+//! to use UUIDs as database keys or need to sort them then consider version 7 (`v7`) UUIDs.
+//! Other versions should generally be avoided unless there&#39;s an existing need for them.
+//!
+//! Some UUID versions supersede others. Prefer version 6 over version 1 and version 5 over version 3.
+//!
+//! # Other features
 //!
 //! Other crate features can also be useful beyond the version support:
 //!
@@ -1521,17 +1916,22 @@
 //!   `serde`.
 //! * `arbitrary` - adds an `Arbitrary` trait implementation to `Uuid` for
 //!   fuzzing.
-//! * `fast-rng` - when combined with `v4` uses a faster algorithm for
-//!   generating random UUIDs. This feature requires more dependencies to
-//!   compile, but is just as suitable for UUIDs as the default algorithm.
+//! * `fast-rng` - uses a faster algorithm for generating random UUIDs.
+//!   This feature requires more dependencies to compile, but is just as suitable for
+//!   UUIDs as the default algorithm.
 //!
-//! ## Unstable features
+//! # Unstable features
 //!
 //! Some features are unstable. They may be incomplete or depend on other
 //! unstable libraries. These include:
 //!
+//! * `v6` - Version 6 UUIDs using a timestamp and monotonic counter.
+//! * `v7` - Version 7 UUIDs using a Unix timestamp.
+//! * `v8` - Version 8 UUIDs using user-defined data.
 //! * `zerocopy` - adds support for zero-copy deserialization using the
 //!   `zerocopy` library.
+//! * `borsh` - adds the ability to serialize and deserialize a UUID using
+//!   `borsh`.
 //!
 //! Unstable features may break between minor releases.
 //!
@@ -1547,20 +1947,17 @@
 //!
 //! ## WebAssembly
 //!
-//! For WebAssembly, enable the `js` feature along with `v4` for a
-//! source of randomness:
+//! For WebAssembly, enable the `js` feature:
 //!
 //! ```toml
 //! [dependencies.uuid]
-//! version = &quot;1&quot;
+//! version = &quot;1.4.1&quot;
 //! features = [
 //!     &quot;v4&quot;,
+//!     &quot;v7&quot;,
 //!     &quot;js&quot;,
 //! ]
 //! ```
-//!
-//! You don&#39;t need the `js` feature to use `uuid` in WebAssembly if you&#39;re
-//! not also enabling `v4`.
 //!
 //! ## Embedded
 //!
@@ -1569,16 +1966,16 @@
 //!
 //! ```toml
 //! [dependencies.uuid]
-//! version = &quot;1&quot;
+//! version = &quot;1.4.1&quot;
 //! default-features = false
 //! ```
 //!
 //! Some additional features are supported in no-std environments:
 //!
-//! * `v1`, `v3`, and `v5`
-//! * `serde`
+//! * `v1`, `v3`, `v5`, `v6`, and `v8`.
+//! * `serde`.
 //!
-//! If you need to use `v4` in a no-std environment, you&#39;ll need to
+//! If you need to use `v4` or `v7` in a no-std environment, you&#39;ll need to
 //! follow [`getrandom`&#39;s docs] on configuring a source of randomness
 //! on currently unsupported targets. Alternatively, you can produce
 //! random bytes yourself and then pass them to [`Builder::from_random_bytes`]
@@ -1586,11 +1983,11 @@
 //!
 //! # Examples
 //!
-//! To parse a UUID given in the simple format and print it as a urn:
+//! Parse a UUID given in the simple format and print it as a URN:
 //!
 //! ```
 //! # use uuid::Uuid;
-//! # fn main() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {
+//! # fn main() -&gt; Result&lt;(), uuid::Error&gt; {
 //! let my_uuid = Uuid::parse_str(&quot;a1a2a3a4b1b2c1c2d1d2d3d4d5d6d7d8&quot;)?;
 //!
 //! println!(&quot;{}&quot;, my_uuid.urn());
@@ -1598,7 +1995,7 @@
 //! # }
 //! ```
 //!
-//! To create a new random (V4) UUID and print it out in hexadecimal form:
+//! Generate a random UUID and print it out in hexadecimal form:
 //!
 //! ```
 //! // Note that this requires the `v4` feature to be enabled.
@@ -1615,17 +2012,11 @@
 //! # References
 //!
 //! * [Wikipedia: Universally Unique Identifier](http://en.wikipedia.org/wiki/Universally_unique_identifier)
-//! * [RFC4122: A Universally Unique IDentifier (UUID) URN Namespace](http://tools.ietf.org/html/rfc4122)
+//! * [RFC4122: A Universally Unique Identifier (UUID) URN Namespace](http://tools.ietf.org/html/rfc4122)
+//! * [Draft RFC: New UUID Formats, Version 4](https://datatracker.ietf.org/doc/html/draft-peabody-dispatch-new-uuid-format-04)
 //!
 //! [`wasm-bindgen`]: https://crates.io/crates/wasm-bindgen
 //! [`cargo-web`]: https://crates.io/crates/cargo-web
-//! [`Uuid`]: struct.Uuid.html
-//! [`Uuid::new_v1`]: struct.Uuid.html#method.new_v1
-//! [`Uuid::new_v3`]: struct.Uuid.html#method.new_v3
-//! [`Uuid::new_v4`]: struct.Uuid.html#method.new_v4
-//! [`Uuid::new_v5`]: struct.Uuid.html#method.new_v5
-//! [`v1::ClockSequence`]: v1/trait.ClockSequence.html
-//! [`v1::Context`]: v1/struct.Context.html
 //! [`getrandom`&#39;s docs]: https://docs.rs/getrandom
 
 </span><span class="attr">#![no_std]
@@ -1633,7 +2024,7 @@
 #![doc(
     html_logo_url = <span class="string">&quot;https://www.rust-lang.org/logos/rust-logo-128x128-blk-v2.png&quot;</span>,
     html_favicon_url = <span class="string">&quot;https://www.rust-lang.org/favicon.ico&quot;</span>,
-    html_root_url = <span class="string">&quot;https://docs.rs/uuid/1.1.2&quot;
+    html_root_url = <span class="string">&quot;https://docs.rs/uuid/1.4.1&quot;
 </span>)]
 
 #[cfg(any(feature = <span class="string">&quot;std&quot;</span>, test))]
@@ -1644,11 +2035,7 @@
 #[macro_use]
 </span><span class="kw">extern crate </span>core <span class="kw">as </span>std;
 
-<span class="comment">// Check that unstable features are accompanied by a the `uuid_unstable` cfg
-</span><span class="attr">#[cfg(all(not(uuid_unstable), feature = <span class="string">&quot;zerocopy&quot;</span>))]
-</span><span class="macro">compile_error!</span>(<span class="string">&quot;The `zerocopy` feature is unstable and may break between releases. Please also pass `RUSTFLAGS=\&quot;--cfg uuid_unstable\&quot;` to allow it.&quot;</span>);
-
-<span class="attr">#[cfg(feature = <span class="string">&quot;zerocopy&quot;</span>)]
+<span class="attr">#[cfg(all(uuid_unstable, feature = <span class="string">&quot;zerocopy&quot;</span>))]
 </span><span class="kw">use </span>zerocopy::{AsBytes, FromBytes, Unaligned};
 
 <span class="kw">mod </span>builder;
@@ -1656,8 +2043,17 @@
 <span class="kw">mod </span>parser;
 
 <span class="kw">pub mod </span>fmt;
+<span class="kw">pub mod </span>timestamp;
+
+<span class="kw">pub use </span>timestamp::{context::NoContext, ClockSequence, Timestamp};
+
+<span class="attr">#[cfg(any(feature = <span class="string">&quot;v1&quot;</span>, feature = <span class="string">&quot;v6&quot;</span>))]
+</span><span class="kw">pub use </span>timestamp::context::Context;
 
 <span class="attr">#[cfg(feature = <span class="string">&quot;v1&quot;</span>)]
+#[doc(hidden)]
+</span><span class="comment">// Soft-deprecated (Rust doesn&#39;t support deprecating re-exports)
+// Use `Context` from the crate root instead
 </span><span class="kw">pub mod </span>v1;
 <span class="attr">#[cfg(feature = <span class="string">&quot;v3&quot;</span>)]
 </span><span class="kw">mod </span>v3;
@@ -1665,6 +2061,12 @@
 </span><span class="kw">mod </span>v4;
 <span class="attr">#[cfg(feature = <span class="string">&quot;v5&quot;</span>)]
 </span><span class="kw">mod </span>v5;
+<span class="attr">#[cfg(all(uuid_unstable, feature = <span class="string">&quot;v6&quot;</span>))]
+</span><span class="kw">mod </span>v6;
+<span class="attr">#[cfg(all(uuid_unstable, feature = <span class="string">&quot;v7&quot;</span>))]
+</span><span class="kw">mod </span>v7;
+<span class="attr">#[cfg(all(uuid_unstable, feature = <span class="string">&quot;v8&quot;</span>))]
+</span><span class="kw">mod </span>v8;
 
 <span class="attr">#[cfg(feature = <span class="string">&quot;md5&quot;</span>)]
 </span><span class="kw">mod </span>md5;
@@ -1680,7 +2082,12 @@
 
 <span class="attr">#[doc(hidden)]
 #[cfg(feature = <span class="string">&quot;macro-diagnostics&quot;</span>)]
-</span><span class="kw">pub extern crate </span>private_uuid_macro_internal;
+</span><span class="kw">pub extern crate </span>uuid_macro_internal;
+
+<span class="attr">#[doc(hidden)]
+</span><span class="kw">pub mod </span>__macro_support {
+    <span class="kw">pub use </span><span class="kw">crate</span>::std::result::Result::{<span class="prelude-val">Err</span>, <span class="prelude-val">Ok</span>};
+}
 
 <span class="kw">use </span><span class="kw">crate</span>::std::convert;
 
@@ -1700,19 +2107,32 @@
 /// * [Version in RFC4122](https://datatracker.ietf.org/doc/html/rfc4122#section-4.1.3)
 </span><span class="attr">#[derive(Clone, Copy, Debug, PartialEq)]
 #[non_exhaustive]
+#[repr(u8)]
 </span><span class="kw">pub enum </span>Version {
-    <span class="doccomment">/// Special case for `nil` UUID.
-    </span>Nil = <span class="number">0</span>,
-    <span class="doccomment">/// Version 1: MAC address.
-    </span>Mac,
+    <span class="doccomment">/// The &quot;nil&quot; (all zeros) UUID.
+    </span>Nil = <span class="number">0u8</span>,
+    <span class="doccomment">/// Version 1: Timestamp and node ID.
+    </span>Mac = <span class="number">1</span>,
     <span class="doccomment">/// Version 2: DCE Security.
-    </span>Dce,
+    </span>Dce = <span class="number">2</span>,
     <span class="doccomment">/// Version 3: MD5 hash.
-    </span>Md5,
+    </span>Md5 = <span class="number">3</span>,
     <span class="doccomment">/// Version 4: Random.
-    </span>Random,
+    </span>Random = <span class="number">4</span>,
     <span class="doccomment">/// Version 5: SHA-1 hash.
-    </span>Sha1,
+    </span>Sha1 = <span class="number">5</span>,
+    <span class="doccomment">/// Version 6: Sortable Timestamp and node ID.
+    </span><span class="attr">#[cfg(uuid_unstable)]
+    </span>SortMac = <span class="number">6</span>,
+    <span class="doccomment">/// Version 7: Timestamp and random.
+    </span><span class="attr">#[cfg(uuid_unstable)]
+    </span>SortRand = <span class="number">7</span>,
+    <span class="doccomment">/// Version 8: Custom.
+    </span><span class="attr">#[cfg(uuid_unstable)]
+    </span>Custom = <span class="number">8</span>,
+    <span class="doccomment">/// The &quot;max&quot; (all ones) UUID.
+    </span><span class="attr">#[cfg(uuid_unstable)]
+    </span>Max = <span class="number">0xff</span>,
 }
 
 <span class="doccomment">/// The reserved variants of UUIDs.
@@ -1722,9 +2142,10 @@
 /// * [Variant in RFC4122](http://tools.ietf.org/html/rfc4122#section-4.1.1)
 </span><span class="attr">#[derive(Clone, Copy, Debug, PartialEq)]
 #[non_exhaustive]
+#[repr(u8)]
 </span><span class="kw">pub enum </span>Variant {
     <span class="doccomment">/// Reserved by the NCS for backward compatibility.
-    </span>NCS = <span class="number">0</span>,
+    </span>NCS = <span class="number">0u8</span>,
     <span class="doccomment">/// As described in the RFC4122 Specification (default).
     </span>RFC4122,
     <span class="doccomment">/// Reserved by Microsoft for backward compatibility.
@@ -1741,7 +2162,7 @@
 ///
 /// ```
 /// # use uuid::Uuid;
-/// # fn main() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {
+/// # fn main() -&gt; Result&lt;(), uuid::Error&gt; {
 /// let my_uuid = Uuid::parse_str(&quot;a1a2a3a4b1b2c1c2d1d2d3d4d5d6d7d8&quot;)?;
 ///
 /// println!(&quot;{}&quot;, my_uuid.urn());
@@ -1778,7 +2199,7 @@
 ///
 /// ```
 /// # use uuid::Uuid;
-/// # fn main() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {
+/// # fn main() -&gt; Result&lt;(), uuid::Error&gt; {
 /// let my_uuid = Uuid::parse_str(&quot;a1a2a3a4b1b2c1c2d1d2d3d4d5d6d7d8&quot;)?;
 ///
 /// assert_eq!(
@@ -1793,7 +2214,7 @@
 ///
 /// ```
 /// # use uuid::Uuid;
-/// # fn main() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {
+/// # fn main() -&gt; Result&lt;(), uuid::Error&gt; {
 /// let my_uuid = Uuid::parse_str(&quot;a1a2a3a4b1b2c1c2d1d2d3d4d5d6d7d8&quot;)?;
 ///
 /// assert_eq!(
@@ -1828,33 +2249,40 @@
 ///
 /// The `Uuid` type is always guaranteed to be have the same ABI as [`Bytes`].
 </span><span class="attr">#[derive(Clone, Copy, Eq, Hash, Ord, PartialEq, PartialOrd)]
-#[cfg_attr(feature = <span class="string">&quot;zerocopy&quot;</span>, derive(AsBytes, FromBytes, Unaligned))]
+#[cfg_attr(
+    all(uuid_unstable, feature = <span class="string">&quot;zerocopy&quot;</span>),
+    derive(AsBytes, FromBytes, Unaligned)
+)]
+#[cfg_attr(
+    all(uuid_unstable, feature = <span class="string">&quot;borsh&quot;</span>),
+    derive(borsh::BorshDeserialize, borsh::BorshSerialize)
+)]
 #[repr(transparent)]
 </span><span class="kw">pub struct </span>Uuid(Bytes);
 
 <span class="kw">impl </span>Uuid {
     <span class="doccomment">/// UUID namespace for Domain Name System (DNS).
     </span><span class="kw">pub const </span>NAMESPACE_DNS: <span class="self">Self </span>= Uuid([
-        <span class="number">0x6b</span>, <span class="number">0xa7</span>, <span class="number">0xb8</span>, <span class="number">0x10</span>, <span class="number">0x9d</span>, <span class="number">0xad</span>, <span class="number">0x11</span>, <span class="number">0xd1</span>, <span class="number">0x80</span>, <span class="number">0xb4</span>, <span class="number">0x00</span>, <span class="number">0xc0</span>,
-        <span class="number">0x4f</span>, <span class="number">0xd4</span>, <span class="number">0x30</span>, <span class="number">0xc8</span>,
+        <span class="number">0x6b</span>, <span class="number">0xa7</span>, <span class="number">0xb8</span>, <span class="number">0x10</span>, <span class="number">0x9d</span>, <span class="number">0xad</span>, <span class="number">0x11</span>, <span class="number">0xd1</span>, <span class="number">0x80</span>, <span class="number">0xb4</span>, <span class="number">0x00</span>, <span class="number">0xc0</span>, <span class="number">0x4f</span>, <span class="number">0xd4</span>, <span class="number">0x30</span>,
+        <span class="number">0xc8</span>,
     ]);
 
     <span class="doccomment">/// UUID namespace for ISO Object Identifiers (OIDs).
     </span><span class="kw">pub const </span>NAMESPACE_OID: <span class="self">Self </span>= Uuid([
-        <span class="number">0x6b</span>, <span class="number">0xa7</span>, <span class="number">0xb8</span>, <span class="number">0x12</span>, <span class="number">0x9d</span>, <span class="number">0xad</span>, <span class="number">0x11</span>, <span class="number">0xd1</span>, <span class="number">0x80</span>, <span class="number">0xb4</span>, <span class="number">0x00</span>, <span class="number">0xc0</span>,
-        <span class="number">0x4f</span>, <span class="number">0xd4</span>, <span class="number">0x30</span>, <span class="number">0xc8</span>,
+        <span class="number">0x6b</span>, <span class="number">0xa7</span>, <span class="number">0xb8</span>, <span class="number">0x12</span>, <span class="number">0x9d</span>, <span class="number">0xad</span>, <span class="number">0x11</span>, <span class="number">0xd1</span>, <span class="number">0x80</span>, <span class="number">0xb4</span>, <span class="number">0x00</span>, <span class="number">0xc0</span>, <span class="number">0x4f</span>, <span class="number">0xd4</span>, <span class="number">0x30</span>,
+        <span class="number">0xc8</span>,
     ]);
 
     <span class="doccomment">/// UUID namespace for Uniform Resource Locators (URLs).
     </span><span class="kw">pub const </span>NAMESPACE_URL: <span class="self">Self </span>= Uuid([
-        <span class="number">0x6b</span>, <span class="number">0xa7</span>, <span class="number">0xb8</span>, <span class="number">0x11</span>, <span class="number">0x9d</span>, <span class="number">0xad</span>, <span class="number">0x11</span>, <span class="number">0xd1</span>, <span class="number">0x80</span>, <span class="number">0xb4</span>, <span class="number">0x00</span>, <span class="number">0xc0</span>,
-        <span class="number">0x4f</span>, <span class="number">0xd4</span>, <span class="number">0x30</span>, <span class="number">0xc8</span>,
+        <span class="number">0x6b</span>, <span class="number">0xa7</span>, <span class="number">0xb8</span>, <span class="number">0x11</span>, <span class="number">0x9d</span>, <span class="number">0xad</span>, <span class="number">0x11</span>, <span class="number">0xd1</span>, <span class="number">0x80</span>, <span class="number">0xb4</span>, <span class="number">0x00</span>, <span class="number">0xc0</span>, <span class="number">0x4f</span>, <span class="number">0xd4</span>, <span class="number">0x30</span>,
+        <span class="number">0xc8</span>,
     ]);
 
     <span class="doccomment">/// UUID namespace for X.500 Distinguished Names (DNs).
     </span><span class="kw">pub const </span>NAMESPACE_X500: <span class="self">Self </span>= Uuid([
-        <span class="number">0x6b</span>, <span class="number">0xa7</span>, <span class="number">0xb8</span>, <span class="number">0x14</span>, <span class="number">0x9d</span>, <span class="number">0xad</span>, <span class="number">0x11</span>, <span class="number">0xd1</span>, <span class="number">0x80</span>, <span class="number">0xb4</span>, <span class="number">0x00</span>, <span class="number">0xc0</span>,
-        <span class="number">0x4f</span>, <span class="number">0xd4</span>, <span class="number">0x30</span>, <span class="number">0xc8</span>,
+        <span class="number">0x6b</span>, <span class="number">0xa7</span>, <span class="number">0xb8</span>, <span class="number">0x14</span>, <span class="number">0x9d</span>, <span class="number">0xad</span>, <span class="number">0x11</span>, <span class="number">0xd1</span>, <span class="number">0x80</span>, <span class="number">0xb4</span>, <span class="number">0x00</span>, <span class="number">0xc0</span>, <span class="number">0x4f</span>, <span class="number">0xd4</span>, <span class="number">0x30</span>,
+        <span class="number">0xc8</span>,
     ]);
 
     <span class="doccomment">/// Returns the variant of the UUID structure.
@@ -1869,7 +2297,7 @@
     ///
     /// ```
     /// # use uuid::{Uuid, Variant};
-    /// # fn main() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {
+    /// # fn main() -&gt; Result&lt;(), uuid::Error&gt; {
     /// let my_uuid = Uuid::parse_str(&quot;02f09a3f-1624-3b1d-8409-44eff7708208&quot;)?;
     ///
     /// assert_eq!(Variant::RFC4122, my_uuid.get_variant());
@@ -1904,7 +2332,7 @@
     ///
     /// ```
     /// # use uuid::Uuid;
-    /// # fn main() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {
+    /// # fn main() -&gt; Result&lt;(), uuid::Error&gt; {
     /// let my_uuid = Uuid::parse_str(&quot;02f09a3f-1624-3b1d-8409-44eff7708208&quot;)?;
     ///
     /// assert_eq!(3, my_uuid.get_version_num());
@@ -1934,7 +2362,7 @@
     ///
     /// ```
     /// # use uuid::{Uuid, Version};
-    /// # fn main() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {
+    /// # fn main() -&gt; Result&lt;(), uuid::Error&gt; {
     /// let my_uuid = Uuid::parse_str(&quot;02f09a3f-1624-3b1d-8409-44eff7708208&quot;)?;
     ///
     /// assert_eq!(Some(Version::Md5), my_uuid.get_version());
@@ -1953,6 +2381,14 @@
             <span class="number">3 </span>=&gt; <span class="prelude-val">Some</span>(Version::Md5),
             <span class="number">4 </span>=&gt; <span class="prelude-val">Some</span>(Version::Random),
             <span class="number">5 </span>=&gt; <span class="prelude-val">Some</span>(Version::Sha1),
+            <span class="attr">#[cfg(uuid_unstable)]
+            </span><span class="number">6 </span>=&gt; <span class="prelude-val">Some</span>(Version::SortMac),
+            <span class="attr">#[cfg(uuid_unstable)]
+            </span><span class="number">7 </span>=&gt; <span class="prelude-val">Some</span>(Version::SortRand),
+            <span class="attr">#[cfg(uuid_unstable)]
+            </span><span class="number">8 </span>=&gt; <span class="prelude-val">Some</span>(Version::Custom),
+            <span class="attr">#[cfg(uuid_unstable)]
+            </span><span class="number">0xf </span>=&gt; <span class="prelude-val">Some</span>(Version::Max),
             <span class="kw">_ </span>=&gt; <span class="prelude-val">None</span>,
         }
     }
@@ -1981,7 +2417,7 @@
     ///
     /// ```
     /// # use uuid::Uuid;
-    /// # fn main() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {
+    /// # fn main() -&gt; Result&lt;(), uuid::Error&gt; {
     /// let uuid = Uuid::nil();
     ///
     /// assert_eq!(uuid.as_fields(), (0, 0, 0, &amp;[0u8; 8]));
@@ -2028,7 +2464,7 @@
     /// ```
     /// use uuid::Uuid;
     ///
-    /// # fn main() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {
+    /// # fn main() -&gt; Result&lt;(), uuid::Error&gt; {
     /// let uuid = Uuid::parse_str(&quot;a1a2a3a4-b1b2-c1c2-d1d2-d3d4d5d6d7d8&quot;)?;
     ///
     /// assert_eq!(
@@ -2053,8 +2489,7 @@
 
         <span class="kw">let </span>d3 = (<span class="self">self</span>.as_bytes()[<span class="number">6</span>] <span class="kw">as </span>u16) | (<span class="self">self</span>.as_bytes()[<span class="number">7</span>] <span class="kw">as </span>u16) &lt;&lt; <span class="number">8</span>;
 
-        <span class="kw">let </span>d4: <span class="kw-2">&amp;</span>[u8; <span class="number">8</span>] =
-            convert::TryInto::try_into(<span class="kw-2">&amp;</span><span class="self">self</span>.as_bytes()[<span class="number">8</span>..<span class="number">16</span>]).unwrap();
+        <span class="kw">let </span>d4: <span class="kw-2">&amp;</span>[u8; <span class="number">8</span>] = convert::TryInto::try_into(<span class="kw-2">&amp;</span><span class="self">self</span>.as_bytes()[<span class="number">8</span>..<span class="number">16</span>]).unwrap();
         (d1, d2, d3, d4)
     }
 
@@ -2066,7 +2501,7 @@
     ///
     /// ```
     /// # use uuid::Uuid;
-    /// # fn main() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {
+    /// # fn main() -&gt; Result&lt;(), uuid::Error&gt; {
     /// let uuid = Uuid::parse_str(&quot;a1a2a3a4-b1b2-c1c2-d1d2-d3d4d5d6d7d8&quot;)?;
     ///
     /// assert_eq!(
@@ -2077,22 +2512,7 @@
     /// # }
     /// ```
     </span><span class="kw">pub const fn </span>as_u128(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; u128 {
-        (<span class="self">self</span>.as_bytes()[<span class="number">0</span>] <span class="kw">as </span>u128) &lt;&lt; <span class="number">120
-            </span>| (<span class="self">self</span>.as_bytes()[<span class="number">1</span>] <span class="kw">as </span>u128) &lt;&lt; <span class="number">112
-            </span>| (<span class="self">self</span>.as_bytes()[<span class="number">2</span>] <span class="kw">as </span>u128) &lt;&lt; <span class="number">104
-            </span>| (<span class="self">self</span>.as_bytes()[<span class="number">3</span>] <span class="kw">as </span>u128) &lt;&lt; <span class="number">96
-            </span>| (<span class="self">self</span>.as_bytes()[<span class="number">4</span>] <span class="kw">as </span>u128) &lt;&lt; <span class="number">88
-            </span>| (<span class="self">self</span>.as_bytes()[<span class="number">5</span>] <span class="kw">as </span>u128) &lt;&lt; <span class="number">80
-            </span>| (<span class="self">self</span>.as_bytes()[<span class="number">6</span>] <span class="kw">as </span>u128) &lt;&lt; <span class="number">72
-            </span>| (<span class="self">self</span>.as_bytes()[<span class="number">7</span>] <span class="kw">as </span>u128) &lt;&lt; <span class="number">64
-            </span>| (<span class="self">self</span>.as_bytes()[<span class="number">8</span>] <span class="kw">as </span>u128) &lt;&lt; <span class="number">56
-            </span>| (<span class="self">self</span>.as_bytes()[<span class="number">9</span>] <span class="kw">as </span>u128) &lt;&lt; <span class="number">48
-            </span>| (<span class="self">self</span>.as_bytes()[<span class="number">10</span>] <span class="kw">as </span>u128) &lt;&lt; <span class="number">40
-            </span>| (<span class="self">self</span>.as_bytes()[<span class="number">11</span>] <span class="kw">as </span>u128) &lt;&lt; <span class="number">32
-            </span>| (<span class="self">self</span>.as_bytes()[<span class="number">12</span>] <span class="kw">as </span>u128) &lt;&lt; <span class="number">24
-            </span>| (<span class="self">self</span>.as_bytes()[<span class="number">13</span>] <span class="kw">as </span>u128) &lt;&lt; <span class="number">16
-            </span>| (<span class="self">self</span>.as_bytes()[<span class="number">14</span>] <span class="kw">as </span>u128) &lt;&lt; <span class="number">8
-            </span>| (<span class="self">self</span>.as_bytes()[<span class="number">15</span>] <span class="kw">as </span>u128)
+        u128::from_be_bytes(<span class="kw-2">*</span><span class="self">self</span>.as_bytes())
     }
 
     <span class="doccomment">/// Returns a 128bit little-endian value containing the value.
@@ -2110,7 +2530,7 @@
     ///
     /// ```
     /// # use uuid::Uuid;
-    /// # fn main() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {
+    /// # fn main() -&gt; Result&lt;(), uuid::Error&gt; {
     /// let uuid = Uuid::parse_str(&quot;a1a2a3a4-b1b2-c1c2-d1d2-d3d4d5d6d7d8&quot;)?;
     ///
     /// assert_eq!(
@@ -2121,23 +2541,8 @@
     /// # }
     /// ```
     </span><span class="kw">pub const fn </span>to_u128_le(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; u128 {
-        (<span class="self">self</span>.as_bytes()[<span class="number">0</span>] <span class="kw">as </span>u128)
-            | (<span class="self">self</span>.as_bytes()[<span class="number">1</span>] <span class="kw">as </span>u128) &lt;&lt; <span class="number">8
-            </span>| (<span class="self">self</span>.as_bytes()[<span class="number">2</span>] <span class="kw">as </span>u128) &lt;&lt; <span class="number">16
-            </span>| (<span class="self">self</span>.as_bytes()[<span class="number">3</span>] <span class="kw">as </span>u128) &lt;&lt; <span class="number">24
-            </span>| (<span class="self">self</span>.as_bytes()[<span class="number">4</span>] <span class="kw">as </span>u128) &lt;&lt; <span class="number">32
-            </span>| (<span class="self">self</span>.as_bytes()[<span class="number">5</span>] <span class="kw">as </span>u128) &lt;&lt; <span class="number">40
-            </span>| (<span class="self">self</span>.as_bytes()[<span class="number">6</span>] <span class="kw">as </span>u128) &lt;&lt; <span class="number">48
-            </span>| (<span class="self">self</span>.as_bytes()[<span class="number">7</span>] <span class="kw">as </span>u128) &lt;&lt; <span class="number">56
-            </span>| (<span class="self">self</span>.as_bytes()[<span class="number">8</span>] <span class="kw">as </span>u128) &lt;&lt; <span class="number">64
-            </span>| (<span class="self">self</span>.as_bytes()[<span class="number">9</span>] <span class="kw">as </span>u128) &lt;&lt; <span class="number">72
-            </span>| (<span class="self">self</span>.as_bytes()[<span class="number">10</span>] <span class="kw">as </span>u128) &lt;&lt; <span class="number">80
-            </span>| (<span class="self">self</span>.as_bytes()[<span class="number">11</span>] <span class="kw">as </span>u128) &lt;&lt; <span class="number">88
-            </span>| (<span class="self">self</span>.as_bytes()[<span class="number">12</span>] <span class="kw">as </span>u128) &lt;&lt; <span class="number">96
-            </span>| (<span class="self">self</span>.as_bytes()[<span class="number">13</span>] <span class="kw">as </span>u128) &lt;&lt; <span class="number">104
-            </span>| (<span class="self">self</span>.as_bytes()[<span class="number">14</span>] <span class="kw">as </span>u128) &lt;&lt; <span class="number">112
-            </span>| (<span class="self">self</span>.as_bytes()[<span class="number">15</span>] <span class="kw">as </span>u128) &lt;&lt; <span class="number">120
-    </span>}
+        u128::from_le_bytes(<span class="kw-2">*</span><span class="self">self</span>.as_bytes())
+    }
 
     <span class="doccomment">/// Returns two 64bit values containing the value.
     ///
@@ -2149,7 +2554,7 @@
     ///
     /// ```
     /// # use uuid::Uuid;
-    /// # fn main() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {
+    /// # fn main() -&gt; Result&lt;(), uuid::Error&gt; {
     /// let uuid = Uuid::parse_str(&quot;a1a2a3a4-b1b2-c1c2-d1d2-d3d4d5d6d7d8&quot;)?;
     /// assert_eq!(
     ///     uuid.as_u64_pair(),
@@ -2189,6 +2594,7 @@
     ///     &amp;bytes1 as *const [u8; 16] as *const u8,
     /// ));
     /// ```
+    </span><span class="attr">#[inline]
     </span><span class="kw">pub const fn </span>as_bytes(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>Bytes {
         <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0
     </span>}
@@ -2208,6 +2614,7 @@
     /// let uuid = Uuid::from_bytes(bytes);
     /// assert_eq!(bytes, uuid.into_bytes());
     /// ```
+    </span><span class="attr">#[inline]
     </span><span class="kw">pub const fn </span>into_bytes(<span class="self">self</span>) -&gt; Bytes {
         <span class="self">self</span>.<span class="number">0
     </span>}
@@ -2223,7 +2630,7 @@
     /// ```
     /// use uuid::Uuid;
     ///
-    /// # fn main() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {
+    /// # fn main() -&gt; Result&lt;(), uuid::Error&gt; {
     /// let uuid = Uuid::parse_str(&quot;a1a2a3a4-b1b2-c1c2-d1d2-d3d4d5d6d7d8&quot;)?;
     ///
     /// assert_eq!(
@@ -2238,16 +2645,22 @@
     /// ```
     </span><span class="kw">pub const fn </span>to_bytes_le(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Bytes {
         [
-            <span class="self">self</span>.<span class="number">0</span>[<span class="number">3</span>], <span class="self">self</span>.<span class="number">0</span>[<span class="number">2</span>], <span class="self">self</span>.<span class="number">0</span>[<span class="number">1</span>], <span class="self">self</span>.<span class="number">0</span>[<span class="number">0</span>], <span class="self">self</span>.<span class="number">0</span>[<span class="number">5</span>], <span class="self">self</span>.<span class="number">0</span>[<span class="number">4</span>],
-            <span class="self">self</span>.<span class="number">0</span>[<span class="number">7</span>], <span class="self">self</span>.<span class="number">0</span>[<span class="number">6</span>], <span class="self">self</span>.<span class="number">0</span>[<span class="number">8</span>], <span class="self">self</span>.<span class="number">0</span>[<span class="number">9</span>], <span class="self">self</span>.<span class="number">0</span>[<span class="number">10</span>], <span class="self">self</span>.<span class="number">0</span>[<span class="number">11</span>],
-            <span class="self">self</span>.<span class="number">0</span>[<span class="number">12</span>], <span class="self">self</span>.<span class="number">0</span>[<span class="number">13</span>], <span class="self">self</span>.<span class="number">0</span>[<span class="number">14</span>], <span class="self">self</span>.<span class="number">0</span>[<span class="number">15</span>],
+            <span class="self">self</span>.<span class="number">0</span>[<span class="number">3</span>], <span class="self">self</span>.<span class="number">0</span>[<span class="number">2</span>], <span class="self">self</span>.<span class="number">0</span>[<span class="number">1</span>], <span class="self">self</span>.<span class="number">0</span>[<span class="number">0</span>], <span class="self">self</span>.<span class="number">0</span>[<span class="number">5</span>], <span class="self">self</span>.<span class="number">0</span>[<span class="number">4</span>], <span class="self">self</span>.<span class="number">0</span>[<span class="number">7</span>], <span class="self">self</span>.<span class="number">0</span>[<span class="number">6</span>],
+            <span class="self">self</span>.<span class="number">0</span>[<span class="number">8</span>], <span class="self">self</span>.<span class="number">0</span>[<span class="number">9</span>], <span class="self">self</span>.<span class="number">0</span>[<span class="number">10</span>], <span class="self">self</span>.<span class="number">0</span>[<span class="number">11</span>], <span class="self">self</span>.<span class="number">0</span>[<span class="number">12</span>], <span class="self">self</span>.<span class="number">0</span>[<span class="number">13</span>], <span class="self">self</span>.<span class="number">0</span>[<span class="number">14</span>],
+            <span class="self">self</span>.<span class="number">0</span>[<span class="number">15</span>],
         ]
     }
 
-    <span class="doccomment">/// Tests if the UUID is nil.
+    <span class="doccomment">/// Tests if the UUID is nil (all zeros).
     </span><span class="kw">pub const fn </span>is_nil(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
-        <span class="self">self</span>.as_u128() == <span class="number">0
-    </span>}
+        <span class="self">self</span>.as_u128() == u128::MIN
+    }
+
+    <span class="doccomment">/// Tests if the UUID is max (all ones).
+    </span><span class="attr">#[cfg(uuid_unstable)]
+    </span><span class="kw">pub const fn </span>is_max(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.as_u128() == u128::MAX
+    }
 
     <span class="doccomment">/// A buffer that can be used for `encode_...` calls, that is
     /// guaranteed to be long enough for any of the format adapters.
@@ -2276,6 +2689,56 @@
     /// ```
     </span><span class="kw">pub const fn </span>encode_buffer() -&gt; [u8; fmt::Urn::LENGTH] {
         [<span class="number">0</span>; fmt::Urn::LENGTH]
+    }
+
+    <span class="doccomment">/// If the UUID is the correct version (v1, v6, or v7) this will return
+    /// the timestamp and counter portion parsed from a V1 UUID.
+    ///
+    /// Returns `None` if the supplied UUID is not V1.
+    ///
+    /// The V1 timestamp format defined in RFC4122 specifies a 60-bit
+    /// integer representing the number of 100-nanosecond intervals
+    /// since 00:00:00.00, 15 Oct 1582.
+    ///
+    /// [`Timestamp`] offers several options for converting the raw RFC4122
+    /// value into more commonly-used formats, such as a unix timestamp.
+    ///
+    /// # Roundtripping
+    ///
+    /// This method is unlikely to roundtrip a timestamp in a UUID due to the way
+    /// UUIDs encode timestamps. The timestamp returned from this method will be truncated to
+    /// 100ns precision for version 1 and 6 UUIDs, and to millisecond precision for version 7 UUIDs.
+    ///
+    /// [`Timestamp`]: v1/struct.Timestamp.html
+    </span><span class="kw">pub const fn </span>get_timestamp(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;Timestamp&gt; {
+        <span class="kw">match </span><span class="self">self</span>.get_version() {
+            <span class="prelude-val">Some</span>(Version::Mac) =&gt; {
+                <span class="kw">let </span>(ticks, counter) = timestamp::decode_rfc4122_timestamp(<span class="self">self</span>);
+
+                <span class="prelude-val">Some</span>(Timestamp::from_rfc4122(ticks, counter))
+            }
+            <span class="attr">#[cfg(uuid_unstable)]
+            </span><span class="prelude-val">Some</span>(Version::SortMac) =&gt; {
+                <span class="kw">let </span>(ticks, counter) = timestamp::decode_sorted_rfc4122_timestamp(<span class="self">self</span>);
+
+                <span class="prelude-val">Some</span>(Timestamp::from_rfc4122(ticks, counter))
+            }
+            <span class="attr">#[cfg(uuid_unstable)]
+            </span><span class="prelude-val">Some</span>(Version::SortRand) =&gt; {
+                <span class="kw">let </span>millis = timestamp::decode_unix_timestamp_millis(<span class="self">self</span>);
+
+                <span class="kw">let </span>seconds = millis / <span class="number">1000</span>;
+                <span class="kw">let </span>nanos = ((millis % <span class="number">1000</span>) * <span class="number">1_000_000</span>) <span class="kw">as </span>u32;
+
+                <span class="prelude-val">Some</span>(Timestamp {
+                    seconds,
+                    nanos,
+                    <span class="attr">#[cfg(any(feature = <span class="string">&quot;v1&quot;</span>, feature = <span class="string">&quot;v6&quot;</span>))]
+                    </span>counter: <span class="number">0</span>,
+                })
+            }
+            <span class="kw">_ </span>=&gt; <span class="prelude-val">None</span>,
+        }
     }
 }
 
@@ -2310,7 +2773,11 @@
 
     <span class="kw">use </span><span class="kw">crate</span>::std::string::{String, ToString};
 
-    <span class="attr">#[cfg(target_arch = <span class="string">&quot;wasm32&quot;</span>)]
+    <span class="attr">#[cfg(all(
+        target_arch = <span class="string">&quot;wasm32&quot;</span>,
+        target_vendor = <span class="string">&quot;unknown&quot;</span>,
+        target_os = <span class="string">&quot;unknown&quot;
+    </span>))]
     </span><span class="kw">use </span>wasm_bindgen_test::<span class="kw-2">*</span>;
 
     <span class="macro">macro_rules! </span>check {
@@ -2324,20 +2791,27 @@
 
     <span class="kw">pub const fn </span>new() -&gt; Uuid {
         Uuid::from_bytes([
-            <span class="number">0xF9</span>, <span class="number">0x16</span>, <span class="number">0x8C</span>, <span class="number">0x5E</span>, <span class="number">0xCE</span>, <span class="number">0xB2</span>, <span class="number">0x4F</span>, <span class="number">0xAA</span>, <span class="number">0xB6</span>, <span class="number">0xBF</span>, <span class="number">0x32</span>,
-            <span class="number">0x9B</span>, <span class="number">0xF3</span>, <span class="number">0x9F</span>, <span class="number">0xA1</span>, <span class="number">0xE4</span>,
+            <span class="number">0xF9</span>, <span class="number">0x16</span>, <span class="number">0x8C</span>, <span class="number">0x5E</span>, <span class="number">0xCE</span>, <span class="number">0xB2</span>, <span class="number">0x4F</span>, <span class="number">0xAA</span>, <span class="number">0xB6</span>, <span class="number">0xBF</span>, <span class="number">0x32</span>, <span class="number">0x9B</span>, <span class="number">0xF3</span>, <span class="number">0x9F</span>,
+            <span class="number">0xA1</span>, <span class="number">0xE4</span>,
         ])
     }
 
     <span class="kw">pub const fn </span>new2() -&gt; Uuid {
         Uuid::from_bytes([
-            <span class="number">0xF9</span>, <span class="number">0x16</span>, <span class="number">0x8C</span>, <span class="number">0x5E</span>, <span class="number">0xCE</span>, <span class="number">0xB2</span>, <span class="number">0x4F</span>, <span class="number">0xAB</span>, <span class="number">0xB6</span>, <span class="number">0xBF</span>, <span class="number">0x32</span>,
-            <span class="number">0x9B</span>, <span class="number">0xF3</span>, <span class="number">0x9F</span>, <span class="number">0xA1</span>, <span class="number">0xE4</span>,
+            <span class="number">0xF9</span>, <span class="number">0x16</span>, <span class="number">0x8C</span>, <span class="number">0x5E</span>, <span class="number">0xCE</span>, <span class="number">0xB2</span>, <span class="number">0x4F</span>, <span class="number">0xAB</span>, <span class="number">0xB6</span>, <span class="number">0xBF</span>, <span class="number">0x32</span>, <span class="number">0x9B</span>, <span class="number">0xF3</span>, <span class="number">0x9F</span>,
+            <span class="number">0xA1</span>, <span class="number">0xE4</span>,
         ])
     }
 
     <span class="attr">#[test]
-    #[cfg_attr(target_arch = <span class="string">&quot;wasm32&quot;</span>, wasm_bindgen_test)]
+    #[cfg_attr(
+        all(
+            target_arch = <span class="string">&quot;wasm32&quot;</span>,
+            target_vendor = <span class="string">&quot;unknown&quot;</span>,
+            target_os = <span class="string">&quot;unknown&quot;
+        </span>),
+        wasm_bindgen_test
+    )]
     </span><span class="kw">fn </span>test_uuid_compare() {
         <span class="kw">let </span>uuid1 = new();
         <span class="kw">let </span>uuid2 = new2();
@@ -2350,7 +2824,14 @@
     }
 
     <span class="attr">#[test]
-    #[cfg_attr(target_arch = <span class="string">&quot;wasm32&quot;</span>, wasm_bindgen_test)]
+    #[cfg_attr(
+        all(
+            target_arch = <span class="string">&quot;wasm32&quot;</span>,
+            target_vendor = <span class="string">&quot;unknown&quot;</span>,
+            target_os = <span class="string">&quot;unknown&quot;
+        </span>),
+        wasm_bindgen_test
+    )]
     </span><span class="kw">fn </span>test_uuid_default() {
         <span class="kw">let </span>default_uuid = Uuid::default();
         <span class="kw">let </span>nil_uuid = Uuid::nil();
@@ -2359,7 +2840,14 @@
     }
 
     <span class="attr">#[test]
-    #[cfg_attr(target_arch = <span class="string">&quot;wasm32&quot;</span>, wasm_bindgen_test)]
+    #[cfg_attr(
+        all(
+            target_arch = <span class="string">&quot;wasm32&quot;</span>,
+            target_vendor = <span class="string">&quot;unknown&quot;</span>,
+            target_os = <span class="string">&quot;unknown&quot;
+        </span>),
+        wasm_bindgen_test
+    )]
     </span><span class="kw">fn </span>test_uuid_display() {
         <span class="kw">use </span><span class="kw">crate</span>::std::fmt::Write;
 
@@ -2375,7 +2863,14 @@
     }
 
     <span class="attr">#[test]
-    #[cfg_attr(target_arch = <span class="string">&quot;wasm32&quot;</span>, wasm_bindgen_test)]
+    #[cfg_attr(
+        all(
+            target_arch = <span class="string">&quot;wasm32&quot;</span>,
+            target_vendor = <span class="string">&quot;unknown&quot;</span>,
+            target_os = <span class="string">&quot;unknown&quot;
+        </span>),
+        wasm_bindgen_test
+    )]
     </span><span class="kw">fn </span>test_uuid_lowerhex() {
         <span class="kw">use </span><span class="kw">crate</span>::std::fmt::Write;
 
@@ -2389,7 +2884,14 @@
 
     <span class="comment">// noinspection RsAssertEqual
     </span><span class="attr">#[test]
-    #[cfg_attr(target_arch = <span class="string">&quot;wasm32&quot;</span>, wasm_bindgen_test)]
+    #[cfg_attr(
+        all(
+            target_arch = <span class="string">&quot;wasm32&quot;</span>,
+            target_vendor = <span class="string">&quot;unknown&quot;</span>,
+            target_os = <span class="string">&quot;unknown&quot;
+        </span>),
+        wasm_bindgen_test
+    )]
     </span><span class="kw">fn </span>test_uuid_operator_eq() {
         <span class="kw">let </span>uuid1 = new();
         <span class="kw">let </span>uuid1_dup = uuid1.clone();
@@ -2406,7 +2908,14 @@
     }
 
     <span class="attr">#[test]
-    #[cfg_attr(target_arch = <span class="string">&quot;wasm32&quot;</span>, wasm_bindgen_test)]
+    #[cfg_attr(
+        all(
+            target_arch = <span class="string">&quot;wasm32&quot;</span>,
+            target_vendor = <span class="string">&quot;unknown&quot;</span>,
+            target_os = <span class="string">&quot;unknown&quot;
+        </span>),
+        wasm_bindgen_test
+    )]
     </span><span class="kw">fn </span>test_uuid_to_string() {
         <span class="kw">use </span><span class="kw">crate</span>::std::fmt::Write;
 
@@ -2422,25 +2931,85 @@
     }
 
     <span class="attr">#[test]
-    #[cfg_attr(target_arch = <span class="string">&quot;wasm32&quot;</span>, wasm_bindgen_test)]
+    #[cfg_attr(
+        all(
+            target_arch = <span class="string">&quot;wasm32&quot;</span>,
+            target_vendor = <span class="string">&quot;unknown&quot;</span>,
+            target_os = <span class="string">&quot;unknown&quot;
+        </span>),
+        wasm_bindgen_test
+    )]
+    </span><span class="kw">fn </span>test_non_conforming() {
+        <span class="kw">let </span>from_bytes =
+            Uuid::from_bytes([<span class="number">4</span>, <span class="number">54</span>, <span class="number">67</span>, <span class="number">12</span>, <span class="number">43</span>, <span class="number">2</span>, <span class="number">2</span>, <span class="number">76</span>, <span class="number">32</span>, <span class="number">50</span>, <span class="number">87</span>, <span class="number">5</span>, <span class="number">1</span>, <span class="number">33</span>, <span class="number">43</span>, <span class="number">87</span>]);
+
+        <span class="macro">assert_eq!</span>(from_bytes.get_version(), <span class="prelude-val">None</span>);
+    }
+
+    <span class="attr">#[test]
+    #[cfg_attr(
+        all(
+            target_arch = <span class="string">&quot;wasm32&quot;</span>,
+            target_vendor = <span class="string">&quot;unknown&quot;</span>,
+            target_os = <span class="string">&quot;unknown&quot;
+        </span>),
+        wasm_bindgen_test
+    )]
     </span><span class="kw">fn </span>test_nil() {
         <span class="kw">let </span>nil = Uuid::nil();
         <span class="kw">let </span>not_nil = new();
-        <span class="kw">let </span>from_bytes = Uuid::from_bytes([
-            <span class="number">4</span>, <span class="number">54</span>, <span class="number">67</span>, <span class="number">12</span>, <span class="number">43</span>, <span class="number">2</span>, <span class="number">2</span>, <span class="number">76</span>, <span class="number">32</span>, <span class="number">50</span>, <span class="number">87</span>, <span class="number">5</span>, <span class="number">1</span>, <span class="number">33</span>, <span class="number">43</span>, <span class="number">87</span>,
-        ]);
-
-        <span class="macro">assert_eq!</span>(from_bytes.get_version(), <span class="prelude-val">None</span>);
 
         <span class="macro">assert!</span>(nil.is_nil());
         <span class="macro">assert!</span>(!not_nil.is_nil());
 
         <span class="macro">assert_eq!</span>(nil.get_version(), <span class="prelude-val">Some</span>(Version::Nil));
-        <span class="macro">assert_eq!</span>(not_nil.get_version(), <span class="prelude-val">Some</span>(Version::Random))
+        <span class="macro">assert_eq!</span>(not_nil.get_version(), <span class="prelude-val">Some</span>(Version::Random));
+
+        <span class="macro">assert_eq!</span>(
+            nil,
+            Builder::from_bytes([<span class="number">0</span>; <span class="number">16</span>])
+                .with_version(Version::Nil)
+                .into_uuid()
+        );
     }
 
     <span class="attr">#[test]
-    #[cfg_attr(target_arch = <span class="string">&quot;wasm32&quot;</span>, wasm_bindgen_test)]
+    #[cfg(uuid_unstable)]
+    #[cfg_attr(
+        all(
+            target_arch = <span class="string">&quot;wasm32&quot;</span>,
+            target_vendor = <span class="string">&quot;unknown&quot;</span>,
+            target_os = <span class="string">&quot;unknown&quot;
+        </span>),
+        wasm_bindgen_test
+    )]
+    </span><span class="kw">fn </span>test_max() {
+        <span class="kw">let </span>max = Uuid::max();
+        <span class="kw">let </span>not_max = new();
+
+        <span class="macro">assert!</span>(max.is_max());
+        <span class="macro">assert!</span>(!not_max.is_max());
+
+        <span class="macro">assert_eq!</span>(max.get_version(), <span class="prelude-val">Some</span>(Version::Max));
+        <span class="macro">assert_eq!</span>(not_max.get_version(), <span class="prelude-val">Some</span>(Version::Random));
+
+        <span class="macro">assert_eq!</span>(
+            max,
+            Builder::from_bytes([<span class="number">0xff</span>; <span class="number">16</span>])
+                .with_version(Version::Max)
+                .into_uuid()
+        );
+    }
+
+    <span class="attr">#[test]
+    #[cfg_attr(
+        all(
+            target_arch = <span class="string">&quot;wasm32&quot;</span>,
+            target_vendor = <span class="string">&quot;unknown&quot;</span>,
+            target_os = <span class="string">&quot;unknown&quot;
+        </span>),
+        wasm_bindgen_test
+    )]
     </span><span class="kw">fn </span>test_predefined_namespaces() {
         <span class="macro">assert_eq!</span>(
             Uuid::NAMESPACE_DNS.hyphenated().to_string(),
@@ -2462,29 +3031,37 @@
 
     <span class="attr">#[cfg(feature = <span class="string">&quot;v3&quot;</span>)]
     #[test]
-    #[cfg_attr(target_arch = <span class="string">&quot;wasm32&quot;</span>, wasm_bindgen_test)]
+    #[cfg_attr(
+        all(
+            target_arch = <span class="string">&quot;wasm32&quot;</span>,
+            target_vendor = <span class="string">&quot;unknown&quot;</span>,
+            target_os = <span class="string">&quot;unknown&quot;
+        </span>),
+        wasm_bindgen_test
+    )]
     </span><span class="kw">fn </span>test_get_version_v3() {
-        <span class="kw">let </span>uuid =
-            Uuid::new_v3(<span class="kw-2">&amp;</span>Uuid::NAMESPACE_DNS, <span class="string">&quot;rust-lang.org&quot;</span>.as_bytes());
+        <span class="kw">let </span>uuid = Uuid::new_v3(<span class="kw-2">&amp;</span>Uuid::NAMESPACE_DNS, <span class="string">&quot;rust-lang.org&quot;</span>.as_bytes());
 
         <span class="macro">assert_eq!</span>(uuid.get_version().unwrap(), Version::Md5);
         <span class="macro">assert_eq!</span>(uuid.get_version_num(), <span class="number">3</span>);
     }
 
     <span class="attr">#[test]
-    #[cfg_attr(target_arch = <span class="string">&quot;wasm32&quot;</span>, wasm_bindgen_test)]
+    #[cfg_attr(
+        all(
+            target_arch = <span class="string">&quot;wasm32&quot;</span>,
+            target_vendor = <span class="string">&quot;unknown&quot;</span>,
+            target_os = <span class="string">&quot;unknown&quot;
+        </span>),
+        wasm_bindgen_test
+    )]
     </span><span class="kw">fn </span>test_get_variant() {
         <span class="kw">let </span>uuid1 = new();
-        <span class="kw">let </span>uuid2 =
-            Uuid::parse_str(<span class="string">&quot;550e8400-e29b-41d4-a716-446655440000&quot;</span>).unwrap();
-        <span class="kw">let </span>uuid3 =
-            Uuid::parse_str(<span class="string">&quot;67e55044-10b1-426f-9247-bb680e5fe0c8&quot;</span>).unwrap();
-        <span class="kw">let </span>uuid4 =
-            Uuid::parse_str(<span class="string">&quot;936DA01F9ABD4d9dC0C702AF85C822A8&quot;</span>).unwrap();
-        <span class="kw">let </span>uuid5 =
-            Uuid::parse_str(<span class="string">&quot;F9168C5E-CEB2-4faa-D6BF-329BF39FA1E4&quot;</span>).unwrap();
-        <span class="kw">let </span>uuid6 =
-            Uuid::parse_str(<span class="string">&quot;f81d4fae-7dec-11d0-7765-00a0c91e6bf6&quot;</span>).unwrap();
+        <span class="kw">let </span>uuid2 = Uuid::parse_str(<span class="string">&quot;550e8400-e29b-41d4-a716-446655440000&quot;</span>).unwrap();
+        <span class="kw">let </span>uuid3 = Uuid::parse_str(<span class="string">&quot;67e55044-10b1-426f-9247-bb680e5fe0c8&quot;</span>).unwrap();
+        <span class="kw">let </span>uuid4 = Uuid::parse_str(<span class="string">&quot;936DA01F9ABD4d9dC0C702AF85C822A8&quot;</span>).unwrap();
+        <span class="kw">let </span>uuid5 = Uuid::parse_str(<span class="string">&quot;F9168C5E-CEB2-4faa-D6BF-329BF39FA1E4&quot;</span>).unwrap();
+        <span class="kw">let </span>uuid6 = Uuid::parse_str(<span class="string">&quot;f81d4fae-7dec-11d0-7765-00a0c91e6bf6&quot;</span>).unwrap();
 
         <span class="macro">assert_eq!</span>(uuid1.get_variant(), Variant::RFC4122);
         <span class="macro">assert_eq!</span>(uuid2.get_variant(), Variant::RFC4122);
@@ -2495,7 +3072,14 @@
     }
 
     <span class="attr">#[test]
-    #[cfg_attr(target_arch = <span class="string">&quot;wasm32&quot;</span>, wasm_bindgen_test)]
+    #[cfg_attr(
+        all(
+            target_arch = <span class="string">&quot;wasm32&quot;</span>,
+            target_vendor = <span class="string">&quot;unknown&quot;</span>,
+            target_os = <span class="string">&quot;unknown&quot;
+        </span>),
+        wasm_bindgen_test
+    )]
     </span><span class="kw">fn </span>test_to_simple_string() {
         <span class="kw">let </span>uuid1 = new();
         <span class="kw">let </span>s = uuid1.simple().to_string();
@@ -2505,17 +3089,31 @@
     }
 
     <span class="attr">#[test]
-    #[cfg_attr(target_arch = <span class="string">&quot;wasm32&quot;</span>, wasm_bindgen_test)]
+    #[cfg_attr(
+        all(
+            target_arch = <span class="string">&quot;wasm32&quot;</span>,
+            target_vendor = <span class="string">&quot;unknown&quot;</span>,
+            target_os = <span class="string">&quot;unknown&quot;
+        </span>),
+        wasm_bindgen_test
+    )]
     </span><span class="kw">fn </span>test_hyphenated_string() {
         <span class="kw">let </span>uuid1 = new();
         <span class="kw">let </span>s = uuid1.hyphenated().to_string();
 
-        <span class="macro">assert!</span>(s.len() == <span class="number">36</span>);
+        <span class="macro">assert_eq!</span>(<span class="number">36</span>, s.len());
         <span class="macro">assert!</span>(s.chars().all(|c| c.is_digit(<span class="number">16</span>) || c == <span class="string">&#39;-&#39;</span>));
     }
 
     <span class="attr">#[test]
-    #[cfg_attr(target_arch = <span class="string">&quot;wasm32&quot;</span>, wasm_bindgen_test)]
+    #[cfg_attr(
+        all(
+            target_arch = <span class="string">&quot;wasm32&quot;</span>,
+            target_vendor = <span class="string">&quot;unknown&quot;</span>,
+            target_os = <span class="string">&quot;unknown&quot;
+        </span>),
+        wasm_bindgen_test
+    )]
     </span><span class="kw">fn </span>test_upper_lower_hex() {
         <span class="kw">use </span>std::fmt::Write;
 
@@ -2537,8 +3135,12 @@
         <span class="macro">check!</span>(buf, <span class="string">&quot;{:X}&quot;</span>, u, <span class="number">36</span>, |c| c.is_uppercase()
             || c.is_digit(<span class="number">10</span>)
             || c == <span class="string">&#39;-&#39;</span>);
-        <span class="macro">check!</span>(buf, <span class="string">&quot;{:#x}&quot;</span>, u, <span class="number">32</span>, |c| c.is_lowercase() || c.is_digit(<span class="number">10</span>));
-        <span class="macro">check!</span>(buf, <span class="string">&quot;{:#X}&quot;</span>, u, <span class="number">32</span>, |c| c.is_uppercase() || c.is_digit(<span class="number">10</span>));
+        <span class="macro">check!</span>(buf, <span class="string">&quot;{:#x}&quot;</span>, u, <span class="number">36</span>, |c| c.is_lowercase()
+            || c.is_digit(<span class="number">10</span>)
+            || c == <span class="string">&#39;-&#39;</span>);
+        <span class="macro">check!</span>(buf, <span class="string">&quot;{:#X}&quot;</span>, u, <span class="number">36</span>, |c| c.is_uppercase()
+            || c.is_digit(<span class="number">10</span>)
+            || c == <span class="string">&#39;-&#39;</span>);
 
         <span class="macro">check!</span>(buf, <span class="string">&quot;{:X}&quot;</span>, u.hyphenated(), <span class="number">36</span>, |c| c.is_uppercase()
             || c.is_digit(<span class="number">10</span>)
@@ -2564,7 +3166,14 @@
     }
 
     <span class="attr">#[test]
-    #[cfg_attr(target_arch = <span class="string">&quot;wasm32&quot;</span>, wasm_bindgen_test)]
+    #[cfg_attr(
+        all(
+            target_arch = <span class="string">&quot;wasm32&quot;</span>,
+            target_vendor = <span class="string">&quot;unknown&quot;</span>,
+            target_os = <span class="string">&quot;unknown&quot;
+        </span>),
+        wasm_bindgen_test
+    )]
     </span><span class="kw">fn </span>test_to_urn_string() {
         <span class="kw">let </span>uuid1 = new();
         <span class="kw">let </span>ss = uuid1.urn().to_string();
@@ -2576,7 +3185,14 @@
     }
 
     <span class="attr">#[test]
-    #[cfg_attr(target_arch = <span class="string">&quot;wasm32&quot;</span>, wasm_bindgen_test)]
+    #[cfg_attr(
+        all(
+            target_arch = <span class="string">&quot;wasm32&quot;</span>,
+            target_vendor = <span class="string">&quot;unknown&quot;</span>,
+            target_os = <span class="string">&quot;unknown&quot;
+        </span>),
+        wasm_bindgen_test
+    )]
     </span><span class="kw">fn </span>test_to_simple_string_matching() {
         <span class="kw">let </span>uuid1 = new();
 
@@ -2589,7 +3205,14 @@
     }
 
     <span class="attr">#[test]
-    #[cfg_attr(target_arch = <span class="string">&quot;wasm32&quot;</span>, wasm_bindgen_test)]
+    #[cfg_attr(
+        all(
+            target_arch = <span class="string">&quot;wasm32&quot;</span>,
+            target_vendor = <span class="string">&quot;unknown&quot;</span>,
+            target_os = <span class="string">&quot;unknown&quot;
+        </span>),
+        wasm_bindgen_test
+    )]
     </span><span class="kw">fn </span>test_string_roundtrip() {
         <span class="kw">let </span>uuid = new();
 
@@ -2603,7 +3226,14 @@
     }
 
     <span class="attr">#[test]
-    #[cfg_attr(target_arch = <span class="string">&quot;wasm32&quot;</span>, wasm_bindgen_test)]
+    #[cfg_attr(
+        all(
+            target_arch = <span class="string">&quot;wasm32&quot;</span>,
+            target_vendor = <span class="string">&quot;unknown&quot;</span>,
+            target_os = <span class="string">&quot;unknown&quot;
+        </span>),
+        wasm_bindgen_test
+    )]
     </span><span class="kw">fn </span>test_from_fields() {
         <span class="kw">let </span>d1: u32 = <span class="number">0xa1a2a3a4</span>;
         <span class="kw">let </span>d2: u16 = <span class="number">0xb1b2</span>;
@@ -2618,7 +3248,14 @@
     }
 
     <span class="attr">#[test]
-    #[cfg_attr(target_arch = <span class="string">&quot;wasm32&quot;</span>, wasm_bindgen_test)]
+    #[cfg_attr(
+        all(
+            target_arch = <span class="string">&quot;wasm32&quot;</span>,
+            target_vendor = <span class="string">&quot;unknown&quot;</span>,
+            target_os = <span class="string">&quot;unknown&quot;
+        </span>),
+        wasm_bindgen_test
+    )]
     </span><span class="kw">fn </span>test_from_fields_le() {
         <span class="kw">let </span>d1: u32 = <span class="number">0xa4a3a2a1</span>;
         <span class="kw">let </span>d2: u16 = <span class="number">0xb2b1</span>;
@@ -2633,7 +3270,14 @@
     }
 
     <span class="attr">#[test]
-    #[cfg_attr(target_arch = <span class="string">&quot;wasm32&quot;</span>, wasm_bindgen_test)]
+    #[cfg_attr(
+        all(
+            target_arch = <span class="string">&quot;wasm32&quot;</span>,
+            target_vendor = <span class="string">&quot;unknown&quot;</span>,
+            target_os = <span class="string">&quot;unknown&quot;
+        </span>),
+        wasm_bindgen_test
+    )]
     </span><span class="kw">fn </span>test_as_fields() {
         <span class="kw">let </span>u = new();
         <span class="kw">let </span>(d1, d2, d3, d4) = u.as_fields();
@@ -2646,7 +3290,14 @@
     }
 
     <span class="attr">#[test]
-    #[cfg_attr(target_arch = <span class="string">&quot;wasm32&quot;</span>, wasm_bindgen_test)]
+    #[cfg_attr(
+        all(
+            target_arch = <span class="string">&quot;wasm32&quot;</span>,
+            target_vendor = <span class="string">&quot;unknown&quot;</span>,
+            target_os = <span class="string">&quot;unknown&quot;
+        </span>),
+        wasm_bindgen_test
+    )]
     </span><span class="kw">fn </span>test_fields_roundtrip() {
         <span class="kw">let </span>d1_in: u32 = <span class="number">0xa1a2a3a4</span>;
         <span class="kw">let </span>d2_in: u16 = <span class="number">0xb1b2</span>;
@@ -2663,7 +3314,14 @@
     }
 
     <span class="attr">#[test]
-    #[cfg_attr(target_arch = <span class="string">&quot;wasm32&quot;</span>, wasm_bindgen_test)]
+    #[cfg_attr(
+        all(
+            target_arch = <span class="string">&quot;wasm32&quot;</span>,
+            target_vendor = <span class="string">&quot;unknown&quot;</span>,
+            target_os = <span class="string">&quot;unknown&quot;
+        </span>),
+        wasm_bindgen_test
+    )]
     </span><span class="kw">fn </span>test_fields_le_roundtrip() {
         <span class="kw">let </span>d1_in: u32 = <span class="number">0xa4a3a2a1</span>;
         <span class="kw">let </span>d2_in: u16 = <span class="number">0xb2b1</span>;
@@ -2680,7 +3338,14 @@
     }
 
     <span class="attr">#[test]
-    #[cfg_attr(target_arch = <span class="string">&quot;wasm32&quot;</span>, wasm_bindgen_test)]
+    #[cfg_attr(
+        all(
+            target_arch = <span class="string">&quot;wasm32&quot;</span>,
+            target_vendor = <span class="string">&quot;unknown&quot;</span>,
+            target_os = <span class="string">&quot;unknown&quot;
+        </span>),
+        wasm_bindgen_test
+    )]
     </span><span class="kw">fn </span>test_fields_le_are_actually_le() {
         <span class="kw">let </span>d1_in: u32 = <span class="number">0xa1a2a3a4</span>;
         <span class="kw">let </span>d2_in: u16 = <span class="number">0xb1b2</span>;
@@ -2697,7 +3362,14 @@
     }
 
     <span class="attr">#[test]
-    #[cfg_attr(target_arch = <span class="string">&quot;wasm32&quot;</span>, wasm_bindgen_test)]
+    #[cfg_attr(
+        all(
+            target_arch = <span class="string">&quot;wasm32&quot;</span>,
+            target_vendor = <span class="string">&quot;unknown&quot;</span>,
+            target_os = <span class="string">&quot;unknown&quot;
+        </span>),
+        wasm_bindgen_test
+    )]
     </span><span class="kw">fn </span>test_from_u128() {
         <span class="kw">let </span>v_in: u128 = <span class="number">0xa1a2a3a4b1b2c1c2d1d2d3d4d5d6d7d8</span>;
 
@@ -2709,7 +3381,14 @@
     }
 
     <span class="attr">#[test]
-    #[cfg_attr(target_arch = <span class="string">&quot;wasm32&quot;</span>, wasm_bindgen_test)]
+    #[cfg_attr(
+        all(
+            target_arch = <span class="string">&quot;wasm32&quot;</span>,
+            target_vendor = <span class="string">&quot;unknown&quot;</span>,
+            target_os = <span class="string">&quot;unknown&quot;
+        </span>),
+        wasm_bindgen_test
+    )]
     </span><span class="kw">fn </span>test_from_u128_le() {
         <span class="kw">let </span>v_in: u128 = <span class="number">0xd8d7d6d5d4d3d2d1c2c1b2b1a4a3a2a1</span>;
 
@@ -2721,7 +3400,14 @@
     }
 
     <span class="attr">#[test]
-    #[cfg_attr(target_arch = <span class="string">&quot;wasm32&quot;</span>, wasm_bindgen_test)]
+    #[cfg_attr(
+        all(
+            target_arch = <span class="string">&quot;wasm32&quot;</span>,
+            target_vendor = <span class="string">&quot;unknown&quot;</span>,
+            target_os = <span class="string">&quot;unknown&quot;
+        </span>),
+        wasm_bindgen_test
+    )]
     </span><span class="kw">fn </span>test_from_u64_pair() {
         <span class="kw">let </span>high_in: u64 = <span class="number">0xa1a2a3a4b1b2c1c2</span>;
         <span class="kw">let </span>low_in: u64 = <span class="number">0xd1d2d3d4d5d6d7d8</span>;
@@ -2734,7 +3420,14 @@
     }
 
     <span class="attr">#[test]
-    #[cfg_attr(target_arch = <span class="string">&quot;wasm32&quot;</span>, wasm_bindgen_test)]
+    #[cfg_attr(
+        all(
+            target_arch = <span class="string">&quot;wasm32&quot;</span>,
+            target_vendor = <span class="string">&quot;unknown&quot;</span>,
+            target_os = <span class="string">&quot;unknown&quot;
+        </span>),
+        wasm_bindgen_test
+    )]
     </span><span class="kw">fn </span>test_u128_roundtrip() {
         <span class="kw">let </span>v_in: u128 = <span class="number">0xa1a2a3a4b1b2c1c2d1d2d3d4d5d6d7d8</span>;
 
@@ -2745,7 +3438,14 @@
     }
 
     <span class="attr">#[test]
-    #[cfg_attr(target_arch = <span class="string">&quot;wasm32&quot;</span>, wasm_bindgen_test)]
+    #[cfg_attr(
+        all(
+            target_arch = <span class="string">&quot;wasm32&quot;</span>,
+            target_vendor = <span class="string">&quot;unknown&quot;</span>,
+            target_os = <span class="string">&quot;unknown&quot;
+        </span>),
+        wasm_bindgen_test
+    )]
     </span><span class="kw">fn </span>test_u128_le_roundtrip() {
         <span class="kw">let </span>v_in: u128 = <span class="number">0xd8d7d6d5d4d3d2d1c2c1b2b1a4a3a2a1</span>;
 
@@ -2756,7 +3456,14 @@
     }
 
     <span class="attr">#[test]
-    #[cfg_attr(target_arch = <span class="string">&quot;wasm32&quot;</span>, wasm_bindgen_test)]
+    #[cfg_attr(
+        all(
+            target_arch = <span class="string">&quot;wasm32&quot;</span>,
+            target_vendor = <span class="string">&quot;unknown&quot;</span>,
+            target_os = <span class="string">&quot;unknown&quot;
+        </span>),
+        wasm_bindgen_test
+    )]
     </span><span class="kw">fn </span>test_u64_pair_roundtrip() {
         <span class="kw">let </span>high_in: u64 = <span class="number">0xa1a2a3a4b1b2c1c2</span>;
         <span class="kw">let </span>low_in: u64 = <span class="number">0xd1d2d3d4d5d6d7d8</span>;
@@ -2769,7 +3476,14 @@
     }
 
     <span class="attr">#[test]
-    #[cfg_attr(target_arch = <span class="string">&quot;wasm32&quot;</span>, wasm_bindgen_test)]
+    #[cfg_attr(
+        all(
+            target_arch = <span class="string">&quot;wasm32&quot;</span>,
+            target_vendor = <span class="string">&quot;unknown&quot;</span>,
+            target_os = <span class="string">&quot;unknown&quot;
+        </span>),
+        wasm_bindgen_test
+    )]
     </span><span class="kw">fn </span>test_u128_le_is_actually_le() {
         <span class="kw">let </span>v_in: u128 = <span class="number">0xa1a2a3a4b1b2c1c2d1d2d3d4d5d6d7d8</span>;
 
@@ -2780,11 +3494,18 @@
     }
 
     <span class="attr">#[test]
-    #[cfg_attr(target_arch = <span class="string">&quot;wasm32&quot;</span>, wasm_bindgen_test)]
+    #[cfg_attr(
+        all(
+            target_arch = <span class="string">&quot;wasm32&quot;</span>,
+            target_vendor = <span class="string">&quot;unknown&quot;</span>,
+            target_os = <span class="string">&quot;unknown&quot;
+        </span>),
+        wasm_bindgen_test
+    )]
     </span><span class="kw">fn </span>test_from_slice() {
         <span class="kw">let </span>b = [
-            <span class="number">0xa1</span>, <span class="number">0xa2</span>, <span class="number">0xa3</span>, <span class="number">0xa4</span>, <span class="number">0xb1</span>, <span class="number">0xb2</span>, <span class="number">0xc1</span>, <span class="number">0xc2</span>, <span class="number">0xd1</span>, <span class="number">0xd2</span>, <span class="number">0xd3</span>,
-            <span class="number">0xd4</span>, <span class="number">0xd5</span>, <span class="number">0xd6</span>, <span class="number">0xd7</span>, <span class="number">0xd8</span>,
+            <span class="number">0xa1</span>, <span class="number">0xa2</span>, <span class="number">0xa3</span>, <span class="number">0xa4</span>, <span class="number">0xb1</span>, <span class="number">0xb2</span>, <span class="number">0xc1</span>, <span class="number">0xc2</span>, <span class="number">0xd1</span>, <span class="number">0xd2</span>, <span class="number">0xd3</span>, <span class="number">0xd4</span>, <span class="number">0xd5</span>, <span class="number">0xd6</span>,
+            <span class="number">0xd7</span>, <span class="number">0xd8</span>,
         ];
 
         <span class="kw">let </span>u = Uuid::from_slice(<span class="kw-2">&amp;</span>b).unwrap();
@@ -2794,11 +3515,18 @@
     }
 
     <span class="attr">#[test]
-    #[cfg_attr(target_arch = <span class="string">&quot;wasm32&quot;</span>, wasm_bindgen_test)]
+    #[cfg_attr(
+        all(
+            target_arch = <span class="string">&quot;wasm32&quot;</span>,
+            target_vendor = <span class="string">&quot;unknown&quot;</span>,
+            target_os = <span class="string">&quot;unknown&quot;
+        </span>),
+        wasm_bindgen_test
+    )]
     </span><span class="kw">fn </span>test_from_bytes() {
         <span class="kw">let </span>b = [
-            <span class="number">0xa1</span>, <span class="number">0xa2</span>, <span class="number">0xa3</span>, <span class="number">0xa4</span>, <span class="number">0xb1</span>, <span class="number">0xb2</span>, <span class="number">0xc1</span>, <span class="number">0xc2</span>, <span class="number">0xd1</span>, <span class="number">0xd2</span>, <span class="number">0xd3</span>,
-            <span class="number">0xd4</span>, <span class="number">0xd5</span>, <span class="number">0xd6</span>, <span class="number">0xd7</span>, <span class="number">0xd8</span>,
+            <span class="number">0xa1</span>, <span class="number">0xa2</span>, <span class="number">0xa3</span>, <span class="number">0xa4</span>, <span class="number">0xb1</span>, <span class="number">0xb2</span>, <span class="number">0xc1</span>, <span class="number">0xc2</span>, <span class="number">0xd1</span>, <span class="number">0xd2</span>, <span class="number">0xd3</span>, <span class="number">0xd4</span>, <span class="number">0xd5</span>, <span class="number">0xd6</span>,
+            <span class="number">0xd7</span>, <span class="number">0xd8</span>,
         ];
 
         <span class="kw">let </span>u = Uuid::from_bytes(b);
@@ -2808,7 +3536,14 @@
     }
 
     <span class="attr">#[test]
-    #[cfg_attr(target_arch = <span class="string">&quot;wasm32&quot;</span>, wasm_bindgen_test)]
+    #[cfg_attr(
+        all(
+            target_arch = <span class="string">&quot;wasm32&quot;</span>,
+            target_vendor = <span class="string">&quot;unknown&quot;</span>,
+            target_os = <span class="string">&quot;unknown&quot;
+        </span>),
+        wasm_bindgen_test
+    )]
     </span><span class="kw">fn </span>test_as_bytes() {
         <span class="kw">let </span>u = new();
         <span class="kw">let </span>ub = u.as_bytes();
@@ -2821,11 +3556,18 @@
     }
 
     <span class="attr">#[test]
-    #[cfg_attr(target_arch = <span class="string">&quot;wasm32&quot;</span>, wasm_bindgen_test)]
+    #[cfg_attr(
+        all(
+            target_arch = <span class="string">&quot;wasm32&quot;</span>,
+            target_vendor = <span class="string">&quot;unknown&quot;</span>,
+            target_os = <span class="string">&quot;unknown&quot;
+        </span>),
+        wasm_bindgen_test
+    )]
     </span><span class="kw">fn </span>test_bytes_roundtrip() {
         <span class="kw">let </span>b_in: <span class="kw">crate</span>::Bytes = [
-            <span class="number">0xa1</span>, <span class="number">0xa2</span>, <span class="number">0xa3</span>, <span class="number">0xa4</span>, <span class="number">0xb1</span>, <span class="number">0xb2</span>, <span class="number">0xc1</span>, <span class="number">0xc2</span>, <span class="number">0xd1</span>, <span class="number">0xd2</span>, <span class="number">0xd3</span>,
-            <span class="number">0xd4</span>, <span class="number">0xd5</span>, <span class="number">0xd6</span>, <span class="number">0xd7</span>, <span class="number">0xd8</span>,
+            <span class="number">0xa1</span>, <span class="number">0xa2</span>, <span class="number">0xa3</span>, <span class="number">0xa4</span>, <span class="number">0xb1</span>, <span class="number">0xb2</span>, <span class="number">0xc1</span>, <span class="number">0xc2</span>, <span class="number">0xd1</span>, <span class="number">0xd2</span>, <span class="number">0xd3</span>, <span class="number">0xd4</span>, <span class="number">0xd5</span>, <span class="number">0xd6</span>,
+            <span class="number">0xd7</span>, <span class="number">0xd8</span>,
         ];
 
         <span class="kw">let </span>u = Uuid::from_slice(<span class="kw-2">&amp;</span>b_in).unwrap();
@@ -2836,11 +3578,18 @@
     }
 
     <span class="attr">#[test]
-    #[cfg_attr(target_arch = <span class="string">&quot;wasm32&quot;</span>, wasm_bindgen_test)]
+    #[cfg_attr(
+        all(
+            target_arch = <span class="string">&quot;wasm32&quot;</span>,
+            target_vendor = <span class="string">&quot;unknown&quot;</span>,
+            target_os = <span class="string">&quot;unknown&quot;
+        </span>),
+        wasm_bindgen_test
+    )]
     </span><span class="kw">fn </span>test_bytes_le_roundtrip() {
         <span class="kw">let </span>b = [
-            <span class="number">0xa1</span>, <span class="number">0xa2</span>, <span class="number">0xa3</span>, <span class="number">0xa4</span>, <span class="number">0xb1</span>, <span class="number">0xb2</span>, <span class="number">0xc1</span>, <span class="number">0xc2</span>, <span class="number">0xd1</span>, <span class="number">0xd2</span>, <span class="number">0xd3</span>,
-            <span class="number">0xd4</span>, <span class="number">0xd5</span>, <span class="number">0xd6</span>, <span class="number">0xd7</span>, <span class="number">0xd8</span>,
+            <span class="number">0xa1</span>, <span class="number">0xa2</span>, <span class="number">0xa3</span>, <span class="number">0xa4</span>, <span class="number">0xb1</span>, <span class="number">0xb2</span>, <span class="number">0xc1</span>, <span class="number">0xc2</span>, <span class="number">0xd1</span>, <span class="number">0xd2</span>, <span class="number">0xd3</span>, <span class="number">0xd4</span>, <span class="number">0xd5</span>, <span class="number">0xd6</span>,
+            <span class="number">0xd7</span>, <span class="number">0xd8</span>,
         ];
 
         <span class="kw">let </span>u1 = Uuid::from_bytes(b);
@@ -2853,7 +3602,14 @@
     }
 
     <span class="attr">#[test]
-    #[cfg_attr(target_arch = <span class="string">&quot;wasm32&quot;</span>, wasm_bindgen_test)]
+    #[cfg_attr(
+        all(
+            target_arch = <span class="string">&quot;wasm32&quot;</span>,
+            target_vendor = <span class="string">&quot;unknown&quot;</span>,
+            target_os = <span class="string">&quot;unknown&quot;
+        </span>),
+        wasm_bindgen_test
+    )]
     </span><span class="kw">fn </span>test_iterbytes_impl_for_uuid() {
         <span class="kw">let </span><span class="kw-2">mut </span>set = std::collections::HashSet::new();
         <span class="kw">let </span>id1 = new();

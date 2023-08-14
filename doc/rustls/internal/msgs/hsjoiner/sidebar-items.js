@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"struct":["HandshakeJoiner"]};
+window.SIDEBAR_ITEMS = {"enum":["JoinerError"],"struct":["HandshakeJoiner"]};

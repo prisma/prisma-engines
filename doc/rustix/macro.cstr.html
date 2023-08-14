@@ -7,7 +7,7 @@ strings, and passing strings to rustix as <code>CStr</code>s means that rustix d
 need to copy them into a separate buffer to NUL-terminate them.</p>
 <h2 id="examples"><a href="#examples">Examples</a></h2>
 <div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use </span>rustix::cstr;
-<span class="kw">use </span>rustix::fs::{cwd, statat, AtFlags};
+<span class="kw">use </span>rustix::fs::{statat, AtFlags, CWD};
 
-<span class="kw">let </span>metadata = statat(cwd(), <span class="macro">cstr!</span>(<span class="string">&quot;test.txt&quot;</span>), AtFlags::empty())<span class="question-mark">?</span>;</code></pre></div>
+<span class="kw">let </span>metadata = statat(CWD, <span class="macro">cstr!</span>(<span class="string">&quot;Cargo.toml&quot;</span>), AtFlags::empty())<span class="question-mark">?</span>;</code></pre></div>
 </div></details></section></div></main></body></html>

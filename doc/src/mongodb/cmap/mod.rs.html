@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/nix/store/jnqxxv1xi811ni996b002f4jnyz38xck-vendor-cargo-deps/c19b7c6f923b580ac259164a89f2577984ad5ab09ee9d583b888f934adbbe8d0/mongodb-2.3.0/src/cmap/mod.rs`."><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-f3501f0f5ae15dfb.css" id="mainThemeStyle"><div id="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="mongodb" data-themes="" data-resource-suffix="" data-rustdoc-version="1.71.0 (8ede3aae2 2023-07-12)" data-search-js="search-4926e5fc22a5646a.js" data-settings-js="settings-de11bff964e9d4e5.js" data-settings-css="settings-8c76f75bfb6bd192.css" data-theme-light-css="light-0f8c037637f9eb3e.css" data-theme-dark-css="dark-1097f8e92a01e3cf.css" data-theme-ayu-css="ayu-614652228113ac93.css" ></div><script src="../../../static.files/storage-62ce34ea385b278a.js"></script><script defer src="../../../static.files/source-script-11255107d0a65077.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../static.files/main-f0540c1d82cde29b.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../../../static.files/light-0f8c037637f9eb3e.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../../../static.files/dark-1097f8e92a01e3cf.css"><link rel="stylesheet" href="../../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../../mongodb/index.html"><img class="rust-logo" src="../../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/nix/store/yf45a1rayffhnidhgyjynpyhr9lqkd09-vendor-cargo-deps/c19b7c6f923b580ac259164a89f2577984ad5ab09ee9d583b888f934adbbe8d0/mongodb-2.6.0/src/cmap/mod.rs`."><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-f3501f0f5ae15dfb.css" id="mainThemeStyle"><div id="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="mongodb" data-themes="" data-resource-suffix="" data-rustdoc-version="1.71.0 (8ede3aae2 2023-07-12)" data-search-js="search-4926e5fc22a5646a.js" data-settings-js="settings-de11bff964e9d4e5.js" data-settings-css="settings-8c76f75bfb6bd192.css" data-theme-light-css="light-0f8c037637f9eb3e.css" data-theme-dark-css="dark-1097f8e92a01e3cf.css" data-theme-ayu-css="ayu-614652228113ac93.css" ></div><script src="../../../static.files/storage-62ce34ea385b278a.js"></script><script defer src="../../../static.files/source-script-11255107d0a65077.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../static.files/main-f0540c1d82cde29b.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../../../static.files/light-0f8c037637f9eb3e.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../../../static.files/dark-1097f8e92a01e3cf.css"><link rel="stylesheet" href="../../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../../mongodb/index.html"><img class="rust-logo" src="../../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -180,18 +180,24 @@
 <a href="#180" id="180">180</a>
 <a href="#181" id="181">181</a>
 <a href="#182" id="182">182</a>
+<a href="#183" id="183">183</a>
+<a href="#184" id="184">184</a>
+<a href="#185" id="185">185</a>
+<a href="#186" id="186">186</a>
+<a href="#187" id="187">187</a>
+<a href="#188" id="188">188</a>
+<a href="#189" id="189">189</a>
+<a href="#190" id="190">190</a>
 </pre></div><pre class="rust"><code><span class="attr">#[cfg(test)]
 </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">mod </span>test;
 
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">mod </span>conn;
 <span class="kw">mod </span>connection_requester;
-<span class="kw">mod </span>establish;
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">mod </span>establish;
 <span class="kw">mod </span>manager;
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">mod </span>options;
 <span class="kw">mod </span>status;
 <span class="kw">mod </span>worker;
-
-<span class="kw">use </span>std::sync::Arc;
 
 <span class="kw">use </span>derivative::Derivative;
 <span class="attr">#[cfg(test)]
@@ -200,23 +206,26 @@
 <span class="kw">pub use </span><span class="self">self</span>::conn::ConnectionInfo;
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use </span><span class="self">self</span>::{
     conn::{Command, Connection, RawCommand, RawCommandResponse, StreamDescription},
-    establish::handshake::Handshaker,
     status::PoolGenerationSubscriber,
     worker::PoolGeneration,
 };
-<span class="kw">use </span><span class="self">self</span>::{connection_requester::ConnectionRequestResult, options::ConnectionPoolOptions};
+<span class="kw">use </span><span class="self">self</span>::{
+    connection_requester::ConnectionRequestResult,
+    establish::ConnectionEstablisher,
+    options::ConnectionPoolOptions,
+};
 <span class="kw">use crate</span>::{
     bson::oid::ObjectId,
     error::{Error, <span class="prelude-ty">Result</span>},
     event::cmap::{
-        CmapEventHandler,
+        CmapEvent,
+        CmapEventEmitter,
         ConnectionCheckoutFailedEvent,
         ConnectionCheckoutFailedReason,
         ConnectionCheckoutStartedEvent,
         PoolCreatedEvent,
     },
     options::ServerAddress,
-    runtime::HttpClient,
     sdam::TopologyUpdater,
 };
 <span class="kw">use </span>connection_requester::ConnectionRequester;
@@ -228,8 +237,9 @@
 
 <span class="kw">const </span>DEFAULT_MAX_POOL_SIZE: u32 = <span class="number">10</span>;
 
-<span class="doccomment">/// A pool of connections implementing the CMAP spec. All state is kept internally in an `Arc`, and
-/// internal state that is mutable is additionally wrapped by a lock.
+<span class="doccomment">/// A pool of connections implementing the CMAP spec.
+/// This type is actually a handle to task that manages the connections and is cheap to clone and
+/// pass around.
 </span><span class="attr">#[derive(Clone, Derivative)]
 #[derivative(Debug)]
 </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>ConnectionPool {
@@ -239,40 +249,44 @@
     generation_subscriber: PoolGenerationSubscriber,
 
     <span class="attr">#[derivative(Debug = <span class="string">&quot;ignore&quot;</span>)]
-    </span>event_handler: <span class="prelude-ty">Option</span>&lt;Arc&lt;<span class="kw">dyn </span>CmapEventHandler&gt;&gt;,
+    </span>event_emitter: CmapEventEmitter,
 }
 
 <span class="kw">impl </span>ConnectionPool {
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>new(
         address: ServerAddress,
-        http_client: HttpClient,
+        connection_establisher: ConnectionEstablisher,
         server_updater: TopologyUpdater,
+        topology_id: ObjectId,
         options: <span class="prelude-ty">Option</span>&lt;ConnectionPoolOptions&gt;,
     ) -&gt; <span class="self">Self </span>{
-        <span class="kw">let </span>(manager, connection_requester, generation_subscriber) = ConnectionPoolWorker::start(
-            address.clone(),
-            http_client,
-            server_updater,
-            options.clone(),
-        );
-
         <span class="kw">let </span>event_handler = options
             .as_ref()
             .and_then(|opts| opts.cmap_event_handler.clone());
 
-        <span class="kw">if let </span><span class="prelude-val">Some</span>(<span class="kw-2">ref </span>handler) = event_handler {
-            handler.handle_pool_created_event(PoolCreatedEvent {
+        <span class="kw">let </span>event_emitter = CmapEventEmitter::new(event_handler, topology_id);
+
+        <span class="kw">let </span>(manager, connection_requester, generation_subscriber) = ConnectionPoolWorker::start(
+            address.clone(),
+            connection_establisher,
+            server_updater,
+            event_emitter.clone(),
+            options.clone(),
+        );
+
+        event_emitter.emit_event(|| {
+            CmapEvent::PoolCreated(PoolCreatedEvent {
                 address: address.clone(),
                 options: options.map(|o| o.to_event_options()),
-            });
-        };
+            })
+        });
 
         <span class="self">Self </span>{
             address,
             manager,
             connection_requester,
             generation_subscriber,
-            event_handler,
+            event_emitter,
         }
     }
 
@@ -288,16 +302,7 @@
             manager,
             connection_requester,
             generation_subscriber,
-            event_handler: <span class="prelude-val">None</span>,
-        }
-    }
-
-    <span class="kw">fn </span>emit_event&lt;F&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, emit: F)
-    <span class="kw">where
-        </span>F: FnOnce(<span class="kw-2">&amp;</span>Arc&lt;<span class="kw">dyn </span>CmapEventHandler&gt;),
-    {
-        <span class="kw">if let </span><span class="prelude-val">Some</span>(<span class="kw-2">ref </span>handler) = <span class="self">self</span>.event_handler {
-            emit(handler);
+            event_emitter: CmapEventEmitter::new(<span class="prelude-val">None</span>, ObjectId::new()),
         }
     }
 
@@ -305,12 +310,11 @@
     /// front of the wait queue, and then will block again if no available connections are in the
     /// pool and the total number of connections is not less than the max pool size.
     </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async fn </span>check_out(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;Connection&gt; {
-        <span class="self">self</span>.emit_event(|handler| {
-            <span class="kw">let </span>event = ConnectionCheckoutStartedEvent {
+        <span class="self">self</span>.event_emitter.emit_event(|| {
+            ConnectionCheckoutStartedEvent {
                 address: <span class="self">self</span>.address.clone(),
-            };
-
-            handler.handle_connection_checkout_started_event(event);
+            }
+            .into()
         });
 
         <span class="kw">let </span>response = <span class="self">self</span>.connection_requester.request().<span class="kw">await</span>;
@@ -325,16 +329,28 @@
 
         <span class="kw">match </span>conn {
             <span class="prelude-val">Ok</span>(<span class="kw-2">ref </span>conn) =&gt; {
-                <span class="self">self</span>.emit_event(|handler| {
-                    handler.handle_connection_checked_out_event(conn.checked_out_event());
-                });
+                <span class="self">self</span>.event_emitter
+                    .emit_event(|| conn.checked_out_event().into());
             }
-            <span class="prelude-val">Err</span>(<span class="kw">_</span>) =&gt; {
-                <span class="self">self</span>.emit_event(|handler| {
-                    handler.handle_connection_checkout_failed_event(ConnectionCheckoutFailedEvent {
+            <span class="attr">#[cfg(feature = <span class="string">&quot;tracing-unstable&quot;</span>)]
+            </span><span class="prelude-val">Err</span>(<span class="kw-2">ref </span>err) =&gt; {
+                <span class="self">self</span>.event_emitter.emit_event(|| {
+                    ConnectionCheckoutFailedEvent {
                         address: <span class="self">self</span>.address.clone(),
                         reason: ConnectionCheckoutFailedReason::ConnectionError,
-                    })
+                        error: <span class="prelude-val">Some</span>(err.clone()),
+                    }
+                    .into()
+                });
+            }
+            <span class="attr">#[cfg(not(feature = <span class="string">&quot;tracing-unstable&quot;</span>))]
+            </span><span class="prelude-val">Err</span>(<span class="kw">_</span>) =&gt; {
+                <span class="self">self</span>.event_emitter.emit_event(|| {
+                    ConnectionCheckoutFailedEvent {
+                        address: <span class="self">self</span>.address.clone(),
+                        reason: ConnectionCheckoutFailedReason::ConnectionError,
+                    }
+                    .into()
                 });
             }
         }
@@ -348,10 +364,10 @@
         <span class="self">self</span>.manager.clear(cause, service_id).<span class="kw">await
     </span>}
 
-    <span class="doccomment">/// Mark the pool as &quot;ready&quot;, allowing connections to be created and checked out.
+    <span class="doccomment">/// Mark the pool as &quot;ready&quot; as per the CMAP specification.
     </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async fn </span>mark_as_ready(<span class="kw-2">&amp;</span><span class="self">self</span>) {
-        <span class="self">self</span>.manager.mark_as_ready().<span class="kw">await</span>;
-    }
+        <span class="self">self</span>.manager.mark_as_ready().<span class="kw">await
+    </span>}
 
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>generation(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; PoolGeneration {
         <span class="self">self</span>.generation_subscriber.generation()

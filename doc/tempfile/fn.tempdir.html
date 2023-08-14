@@ -13,14 +13,14 @@ destructor is run.</p>
 <span class="kw">use </span>std::io::{<span class="self">self</span>, Write};
 
 <span class="comment">// Create a directory inside of `std::env::temp_dir()`
-</span><span class="kw">let </span>dir = tempdir()<span class="question-mark">?</span>;
+</span><span class="kw">let </span>tmp_dir = tempdir()<span class="question-mark">?</span>;
 
-<span class="kw">let </span>file_path = dir.path().join(<span class="string">&quot;my-temporary-note.txt&quot;</span>);
-<span class="kw">let </span><span class="kw-2">mut </span>file = File::create(file_path)<span class="question-mark">?</span>;
-<span class="macro">writeln!</span>(file, <span class="string">&quot;Brian was here. Briefly.&quot;</span>)<span class="question-mark">?</span>;
+<span class="kw">let </span>file_path = tmp_dir.path().join(<span class="string">&quot;my-temporary-note.txt&quot;</span>);
+<span class="kw">let </span><span class="kw-2">mut </span>tmp_file = File::create(file_path)<span class="question-mark">?</span>;
+<span class="macro">writeln!</span>(tmp_file, <span class="string">&quot;Brian was here. Briefly.&quot;</span>)<span class="question-mark">?</span>;
 
 <span class="comment">// `tmp_dir` goes out of scope, the directory as well as
 // `tmp_file` will be deleted here.
-</span>drop(file);
-dir.close()<span class="question-mark">?</span>;</code></pre></div>
+</span>drop(tmp_file);
+tmp_dir.close()<span class="question-mark">?</span>;</code></pre></div>
 </div></details></section></div></main></body></html>

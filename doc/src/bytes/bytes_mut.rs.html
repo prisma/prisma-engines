@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/nix/store/jnqxxv1xi811ni996b002f4jnyz38xck-vendor-cargo-deps/c19b7c6f923b580ac259164a89f2577984ad5ab09ee9d583b888f934adbbe8d0/bytes-1.2.1/src/bytes_mut.rs`."><title>bytes_mut.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-f3501f0f5ae15dfb.css" id="mainThemeStyle"><div id="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="bytes" data-themes="" data-resource-suffix="" data-rustdoc-version="1.71.0 (8ede3aae2 2023-07-12)" data-search-js="search-4926e5fc22a5646a.js" data-settings-js="settings-de11bff964e9d4e5.js" data-settings-css="settings-8c76f75bfb6bd192.css" data-theme-light-css="light-0f8c037637f9eb3e.css" data-theme-dark-css="dark-1097f8e92a01e3cf.css" data-theme-ayu-css="ayu-614652228113ac93.css" ></div><script src="../../static.files/storage-62ce34ea385b278a.js"></script><script defer src="../../static.files/source-script-11255107d0a65077.js"></script><script defer src="../../source-files.js"></script><script defer src="../../static.files/main-f0540c1d82cde29b.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../../static.files/light-0f8c037637f9eb3e.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../../static.files/dark-1097f8e92a01e3cf.css"><link rel="stylesheet" href="../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../bytes/index.html"><img class="rust-logo" src="../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/nix/store/yf45a1rayffhnidhgyjynpyhr9lqkd09-vendor-cargo-deps/c19b7c6f923b580ac259164a89f2577984ad5ab09ee9d583b888f934adbbe8d0/bytes-1.4.0/src/bytes_mut.rs`."><title>bytes_mut.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-f3501f0f5ae15dfb.css" id="mainThemeStyle"><div id="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="bytes" data-themes="" data-resource-suffix="" data-rustdoc-version="1.71.0 (8ede3aae2 2023-07-12)" data-search-js="search-4926e5fc22a5646a.js" data-settings-js="settings-de11bff964e9d4e5.js" data-settings-css="settings-8c76f75bfb6bd192.css" data-theme-light-css="light-0f8c037637f9eb3e.css" data-theme-dark-css="dark-1097f8e92a01e3cf.css" data-theme-ayu-css="ayu-614652228113ac93.css" ></div><script src="../../static.files/storage-62ce34ea385b278a.js"></script><script defer src="../../static.files/source-script-11255107d0a65077.js"></script><script defer src="../../source-files.js"></script><script defer src="../../static.files/main-f0540c1d82cde29b.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../../static.files/light-0f8c037637f9eb3e.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../../static.files/dark-1097f8e92a01e3cf.css"><link rel="stylesheet" href="../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../bytes/index.html"><img class="rust-logo" src="../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -1772,8 +1772,46 @@
 <a href="#1772" id="1772">1772</a>
 <a href="#1773" id="1773">1773</a>
 <a href="#1774" id="1774">1774</a>
+<a href="#1775" id="1775">1775</a>
+<a href="#1776" id="1776">1776</a>
+<a href="#1777" id="1777">1777</a>
+<a href="#1778" id="1778">1778</a>
+<a href="#1779" id="1779">1779</a>
+<a href="#1780" id="1780">1780</a>
+<a href="#1781" id="1781">1781</a>
+<a href="#1782" id="1782">1782</a>
+<a href="#1783" id="1783">1783</a>
+<a href="#1784" id="1784">1784</a>
+<a href="#1785" id="1785">1785</a>
+<a href="#1786" id="1786">1786</a>
+<a href="#1787" id="1787">1787</a>
+<a href="#1788" id="1788">1788</a>
+<a href="#1789" id="1789">1789</a>
+<a href="#1790" id="1790">1790</a>
+<a href="#1791" id="1791">1791</a>
+<a href="#1792" id="1792">1792</a>
+<a href="#1793" id="1793">1793</a>
+<a href="#1794" id="1794">1794</a>
+<a href="#1795" id="1795">1795</a>
+<a href="#1796" id="1796">1796</a>
+<a href="#1797" id="1797">1797</a>
+<a href="#1798" id="1798">1798</a>
+<a href="#1799" id="1799">1799</a>
+<a href="#1800" id="1800">1800</a>
+<a href="#1801" id="1801">1801</a>
+<a href="#1802" id="1802">1802</a>
+<a href="#1803" id="1803">1803</a>
+<a href="#1804" id="1804">1804</a>
+<a href="#1805" id="1805">1805</a>
+<a href="#1806" id="1806">1806</a>
+<a href="#1807" id="1807">1807</a>
+<a href="#1808" id="1808">1808</a>
+<a href="#1809" id="1809">1809</a>
+<a href="#1810" id="1810">1810</a>
+<a href="#1811" id="1811">1811</a>
+<a href="#1812" id="1812">1812</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>core::iter::{FromIterator, Iterator};
-<span class="kw">use </span>core::mem::{<span class="self">self</span>, ManuallyDrop};
+<span class="kw">use </span>core::mem::{<span class="self">self</span>, ManuallyDrop, MaybeUninit};
 <span class="kw">use </span>core::ops::{Deref, DerefMut};
 <span class="kw">use </span>core::ptr::{<span class="self">self</span>, NonNull};
 <span class="kw">use </span>core::{cmp, fmt, hash, isize, slice, usize};
@@ -2479,7 +2517,16 @@
                     new_cap = cmp::max(double, new_cap);
 
                     <span class="comment">// No space - allocate more
-                    </span>v.reserve(new_cap - v.len());
+                    //
+                    // The length field of `Shared::vec` is not used by the `BytesMut`;
+                    // instead we use the `len` field in the `BytesMut` itself. However,
+                    // when calling `reserve`, it doesn&#39;t guarantee that data stored in
+                    // the unused capacity of the vector is copied over to the new
+                    // allocation, so we need to ensure that we don&#39;t have any data we
+                    // care about in the unused capacity before calling `reserve`.
+                    </span><span class="macro">debug_assert!</span>(off + len &lt;= v.capacity());
+                    v.set_len(off + len);
+                    v.reserve(new_cap - v.len());
 
                     <span class="comment">// Update the info
                     </span><span class="self">self</span>.ptr = vptr(v.as_mut_ptr().add(off));
@@ -2531,11 +2578,11 @@
         <span class="self">self</span>.reserve(cnt);
 
         <span class="kw">unsafe </span>{
-            <span class="kw">let </span>dst = <span class="self">self</span>.uninit_slice();
+            <span class="kw">let </span>dst = <span class="self">self</span>.spare_capacity_mut();
             <span class="comment">// Reserved above
             </span><span class="macro">debug_assert!</span>(dst.len() &gt;= cnt);
 
-            ptr::copy_nonoverlapping(extend.as_ptr(), dst.as_mut_ptr(), cnt);
+            ptr::copy_nonoverlapping(extend.as_ptr(), dst.as_mut_ptr().cast(), cnt);
         }
 
         <span class="kw">unsafe </span>{
@@ -2757,13 +2804,42 @@
         <span class="self">self</span>.data = invalid_ptr((pos &lt;&lt; VEC_POS_OFFSET) | (prev &amp; NOT_VEC_POS_MASK));
     }
 
-    <span class="attr">#[inline]
-    </span><span class="kw">fn </span>uninit_slice(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;mut </span>UninitSlice {
+    <span class="doccomment">/// Returns the remaining spare capacity of the buffer as a slice of `MaybeUninit&lt;u8&gt;`.
+    ///
+    /// The returned slice can be used to fill the buffer with data (e.g. by
+    /// reading from a file) before marking the data as initialized using the
+    /// [`set_len`] method.
+    ///
+    /// [`set_len`]: BytesMut::set_len
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use bytes::BytesMut;
+    ///
+    /// // Allocate buffer big enough for 10 bytes.
+    /// let mut buf = BytesMut::with_capacity(10);
+    ///
+    /// // Fill in the first 3 elements.
+    /// let uninit = buf.spare_capacity_mut();
+    /// uninit[0].write(0);
+    /// uninit[1].write(1);
+    /// uninit[2].write(2);
+    ///
+    /// // Mark the first 3 bytes of the buffer as being initialized.
+    /// unsafe {
+    ///     buf.set_len(3);
+    /// }
+    ///
+    /// assert_eq!(&amp;buf[..], &amp;[0, 1, 2]);
+    /// ```
+    </span><span class="attr">#[inline]
+    </span><span class="kw">pub fn </span>spare_capacity_mut(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;mut </span>[MaybeUninit&lt;u8&gt;] {
         <span class="kw">unsafe </span>{
             <span class="kw">let </span>ptr = <span class="self">self</span>.ptr.as_ptr().add(<span class="self">self</span>.len);
             <span class="kw">let </span>len = <span class="self">self</span>.cap - <span class="self">self</span>.len;
 
-            UninitSlice::from_raw_parts_mut(ptr, len)
+            slice::from_raw_parts_mut(ptr.cast(), len)
         }
     }
 }
@@ -2837,7 +2913,7 @@
         <span class="kw">if </span><span class="self">self</span>.capacity() == <span class="self">self</span>.len() {
             <span class="self">self</span>.reserve(<span class="number">64</span>);
         }
-        <span class="self">self</span>.uninit_slice()
+        UninitSlice::from_slice(<span class="self">self</span>.spare_capacity_mut())
     }
 
     <span class="comment">// Specialize these methods so they can skip checking `remaining_mut`
@@ -2862,7 +2938,7 @@
     <span class="kw">fn </span>put_bytes(<span class="kw-2">&amp;mut </span><span class="self">self</span>, val: u8, cnt: usize) {
         <span class="self">self</span>.reserve(cnt);
         <span class="kw">unsafe </span>{
-            <span class="kw">let </span>dst = <span class="self">self</span>.uninit_slice();
+            <span class="kw">let </span>dst = <span class="self">self</span>.spare_capacity_mut();
             <span class="comment">// Reserved above
             </span><span class="macro">debug_assert!</span>(dst.len() &gt;= cnt);
 

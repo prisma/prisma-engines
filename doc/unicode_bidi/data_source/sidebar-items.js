@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"trait":["BidiDataSource"]};
+window.SIDEBAR_ITEMS = {"struct":["BidiMatchedOpeningBracket"],"trait":["BidiDataSource"]};

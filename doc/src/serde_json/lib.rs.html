@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/nix/store/jnqxxv1xi811ni996b002f4jnyz38xck-vendor-cargo-deps/c19b7c6f923b580ac259164a89f2577984ad5ab09ee9d583b888f934adbbe8d0/serde_json-1.0.85/src/lib.rs`."><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-f3501f0f5ae15dfb.css" id="mainThemeStyle"><div id="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="serde_json" data-themes="" data-resource-suffix="" data-rustdoc-version="1.71.0 (8ede3aae2 2023-07-12)" data-search-js="search-4926e5fc22a5646a.js" data-settings-js="settings-de11bff964e9d4e5.js" data-settings-css="settings-8c76f75bfb6bd192.css" data-theme-light-css="light-0f8c037637f9eb3e.css" data-theme-dark-css="dark-1097f8e92a01e3cf.css" data-theme-ayu-css="ayu-614652228113ac93.css" ></div><script src="../../static.files/storage-62ce34ea385b278a.js"></script><script defer src="../../static.files/source-script-11255107d0a65077.js"></script><script defer src="../../source-files.js"></script><script defer src="../../static.files/main-f0540c1d82cde29b.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../../static.files/light-0f8c037637f9eb3e.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../../static.files/dark-1097f8e92a01e3cf.css"><link rel="stylesheet" href="../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../serde_json/index.html"><img class="rust-logo" src="../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/nix/store/yf45a1rayffhnidhgyjynpyhr9lqkd09-vendor-cargo-deps/c19b7c6f923b580ac259164a89f2577984ad5ab09ee9d583b888f934adbbe8d0/serde_json-1.0.104/src/lib.rs`."><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-f3501f0f5ae15dfb.css" id="mainThemeStyle"><div id="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="serde_json" data-themes="" data-resource-suffix="" data-rustdoc-version="1.71.0 (8ede3aae2 2023-07-12)" data-search-js="search-4926e5fc22a5646a.js" data-settings-js="settings-de11bff964e9d4e5.js" data-settings-css="settings-8c76f75bfb6bd192.css" data-theme-light-css="light-0f8c037637f9eb3e.css" data-theme-dark-css="dark-1097f8e92a01e3cf.css" data-theme-ayu-css="ayu-614652228113ac93.css" ></div><script src="../../static.files/storage-62ce34ea385b278a.js"></script><script defer src="../../static.files/source-script-11255107d0a65077.js"></script><script defer src="../../source-files.js"></script><script defer src="../../static.files/main-f0540c1d82cde29b.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../../static.files/light-0f8c037637f9eb3e.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../../static.files/dark-1097f8e92a01e3cf.css"><link rel="stylesheet" href="../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../serde_json/index.html"><img class="rust-logo" src="../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -416,9 +416,6 @@
 <a href="#416" id="416">416</a>
 <a href="#417" id="417">417</a>
 <a href="#418" id="418">418</a>
-<a href="#419" id="419">419</a>
-<a href="#420" id="420">420</a>
-<a href="#421" id="421">421</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! # Serde JSON
 //!
 //! JSON is a ubiquitous open-standard format that uses human-readable text to
@@ -525,7 +522,7 @@
 //! a JSON string to a Rust string with [`as_str()`] or avoiding the use of
 //! `Value` as described in the following section.
 //!
-//! [`as_str()`]: https://docs.serde.rs/serde_json/enum.Value.html#method.as_str
+//! [`as_str()`]: crate::Value::as_str
 //!
 //! The `Value` representation is sufficient for very basic tasks but can be
 //! tedious to work with for anything more significant. Error handling is
@@ -700,8 +697,8 @@
 //! # No-std support
 //!
 //! As long as there is a memory allocator, it is possible to use serde_json
-//! without the rest of the Rust standard library. This is supported on Rust
-//! 1.36+. Disable the default &quot;std&quot; feature and enable the &quot;alloc&quot; feature:
+//! without the rest of the Rust standard library. Disable the default &quot;std&quot;
+//! feature and enable the &quot;alloc&quot; feature:
 //!
 //! ```toml
 //! [dependencies]
@@ -711,17 +708,17 @@
 //! For JSON support in Serde without a memory allocator, please see the
 //! [`serde-json-core`] crate.
 //!
-//! [value]: https://docs.serde.rs/serde_json/value/enum.Value.html
-//! [from_str]: https://docs.serde.rs/serde_json/de/fn.from_str.html
-//! [from_slice]: https://docs.serde.rs/serde_json/de/fn.from_slice.html
-//! [from_reader]: https://docs.serde.rs/serde_json/de/fn.from_reader.html
-//! [to_string]: https://docs.serde.rs/serde_json/ser/fn.to_string.html
-//! [to_vec]: https://docs.serde.rs/serde_json/ser/fn.to_vec.html
-//! [to_writer]: https://docs.serde.rs/serde_json/ser/fn.to_writer.html
-//! [macro]: https://docs.serde.rs/serde_json/macro.json.html
+//! [value]: crate::value::Value
+//! [from_str]: crate::de::from_str
+//! [from_slice]: crate::de::from_slice
+//! [from_reader]: crate::de::from_reader
+//! [to_string]: crate::ser::to_string
+//! [to_vec]: crate::ser::to_vec
+//! [to_writer]: crate::ser::to_writer
+//! [macro]: crate::json
 //! [`serde-json-core`]: https://github.com/rust-embedded-community/serde-json-core
 
-</span><span class="attr">#![doc(html_root_url = <span class="string">&quot;https://docs.rs/serde_json/1.0.85&quot;</span>)]
+</span><span class="attr">#![doc(html_root_url = <span class="string">&quot;https://docs.rs/serde_json/1.0.104&quot;</span>)]
 </span><span class="comment">// Ignored clippy lints
 </span><span class="attr">#![allow(
     clippy::collapsible_else_if,
@@ -736,19 +733,13 @@
     clippy::match_single_binding,
     clippy::needless_doctest_main,
     clippy::needless_late_init,
-    <span class="comment">// clippy bug: https://github.com/rust-lang/rust-clippy/issues/8366
-    </span>clippy::ptr_arg,
     clippy::return_self_not_must_use,
     clippy::transmute_ptr_to_ptr,
-    clippy::unnecessary_wraps,
-    <span class="comment">// clippy bug: https://github.com/rust-lang/rust-clippy/issues/5704
-    </span>clippy::unnested_or_patterns,
+    clippy::unnecessary_wraps
 )]
 </span><span class="comment">// Ignored clippy_pedantic lints
 </span><span class="attr">#![allow(
-    <span class="comment">// buggy
-    </span>clippy::iter_not_returning_iterator, <span class="comment">// https://github.com/rust-lang/rust-clippy/issues/8285
-    // Deserializer::from_str, into_iter
+    <span class="comment">// Deserializer::from_str, into_iter
     </span>clippy::should_implement_trait,
     <span class="comment">// integer and float ser/de requires these sorts of casts
     </span>clippy::cast_possible_truncation,
@@ -759,6 +750,7 @@
     </span>clippy::enum_glob_use,
     clippy::if_not_else,
     clippy::integer_division,
+    clippy::let_underscore_untyped,
     clippy::map_err_ignore,
     clippy::match_same_arms,
     clippy::similar_names,
@@ -782,6 +774,8 @@
     </span>clippy::missing_errors_doc,
     clippy::must_use_candidate,
 )]
+</span><span class="comment">// Restrictions
+</span><span class="attr">#![deny(clippy::question_mark_used)]
 #![allow(non_upper_case_globals)]
 #![deny(missing_docs)]
 #![cfg_attr(not(feature = <span class="string">&quot;std&quot;</span>), no_std)]

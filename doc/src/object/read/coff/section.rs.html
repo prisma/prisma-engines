@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/nix/store/jnqxxv1xi811ni996b002f4jnyz38xck-vendor-cargo-deps/c19b7c6f923b580ac259164a89f2577984ad5ab09ee9d583b888f934adbbe8d0/object-0.29.0/src/read/coff/section.rs`."><title>section.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../../static.files/rustdoc-f3501f0f5ae15dfb.css" id="mainThemeStyle"><div id="rustdoc-vars" data-root-path="../../../../" data-static-root-path="../../../../static.files/" data-current-crate="object" data-themes="" data-resource-suffix="" data-rustdoc-version="1.71.0 (8ede3aae2 2023-07-12)" data-search-js="search-4926e5fc22a5646a.js" data-settings-js="settings-de11bff964e9d4e5.js" data-settings-css="settings-8c76f75bfb6bd192.css" data-theme-light-css="light-0f8c037637f9eb3e.css" data-theme-dark-css="dark-1097f8e92a01e3cf.css" data-theme-ayu-css="ayu-614652228113ac93.css" ></div><script src="../../../../static.files/storage-62ce34ea385b278a.js"></script><script defer src="../../../../static.files/source-script-11255107d0a65077.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../static.files/main-f0540c1d82cde29b.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../../../../static.files/light-0f8c037637f9eb3e.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../../../../static.files/dark-1097f8e92a01e3cf.css"><link rel="stylesheet" href="../../../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../../../object/index.html"><img class="rust-logo" src="../../../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/nix/store/yf45a1rayffhnidhgyjynpyhr9lqkd09-vendor-cargo-deps/c19b7c6f923b580ac259164a89f2577984ad5ab09ee9d583b888f934adbbe8d0/object-0.31.1/src/read/coff/section.rs`."><title>section.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../../static.files/rustdoc-f3501f0f5ae15dfb.css" id="mainThemeStyle"><div id="rustdoc-vars" data-root-path="../../../../" data-static-root-path="../../../../static.files/" data-current-crate="object" data-themes="" data-resource-suffix="" data-rustdoc-version="1.71.0 (8ede3aae2 2023-07-12)" data-search-js="search-4926e5fc22a5646a.js" data-settings-js="settings-de11bff964e9d4e5.js" data-settings-css="settings-8c76f75bfb6bd192.css" data-theme-light-css="light-0f8c037637f9eb3e.css" data-theme-dark-css="dark-1097f8e92a01e3cf.css" data-theme-ayu-css="ayu-614652228113ac93.css" ></div><script src="../../../../static.files/storage-62ce34ea385b278a.js"></script><script defer src="../../../../static.files/source-script-11255107d0a65077.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../static.files/main-f0540c1d82cde29b.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../../../../static.files/light-0f8c037637f9eb3e.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../../../../static.files/dark-1097f8e92a01e3cf.css"><link rel="stylesheet" href="../../../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../../../object/index.html"><img class="rust-logo" src="../../../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -522,6 +522,56 @@
 <a href="#522" id="522">522</a>
 <a href="#523" id="523">523</a>
 <a href="#524" id="524">524</a>
+<a href="#525" id="525">525</a>
+<a href="#526" id="526">526</a>
+<a href="#527" id="527">527</a>
+<a href="#528" id="528">528</a>
+<a href="#529" id="529">529</a>
+<a href="#530" id="530">530</a>
+<a href="#531" id="531">531</a>
+<a href="#532" id="532">532</a>
+<a href="#533" id="533">533</a>
+<a href="#534" id="534">534</a>
+<a href="#535" id="535">535</a>
+<a href="#536" id="536">536</a>
+<a href="#537" id="537">537</a>
+<a href="#538" id="538">538</a>
+<a href="#539" id="539">539</a>
+<a href="#540" id="540">540</a>
+<a href="#541" id="541">541</a>
+<a href="#542" id="542">542</a>
+<a href="#543" id="543">543</a>
+<a href="#544" id="544">544</a>
+<a href="#545" id="545">545</a>
+<a href="#546" id="546">546</a>
+<a href="#547" id="547">547</a>
+<a href="#548" id="548">548</a>
+<a href="#549" id="549">549</a>
+<a href="#550" id="550">550</a>
+<a href="#551" id="551">551</a>
+<a href="#552" id="552">552</a>
+<a href="#553" id="553">553</a>
+<a href="#554" id="554">554</a>
+<a href="#555" id="555">555</a>
+<a href="#556" id="556">556</a>
+<a href="#557" id="557">557</a>
+<a href="#558" id="558">558</a>
+<a href="#559" id="559">559</a>
+<a href="#560" id="560">560</a>
+<a href="#561" id="561">561</a>
+<a href="#562" id="562">562</a>
+<a href="#563" id="563">563</a>
+<a href="#564" id="564">564</a>
+<a href="#565" id="565">565</a>
+<a href="#566" id="566">566</a>
+<a href="#567" id="567">567</a>
+<a href="#568" id="568">568</a>
+<a href="#569" id="569">569</a>
+<a href="#570" id="570">570</a>
+<a href="#571" id="571">571</a>
+<a href="#572" id="572">572</a>
+<a href="#573" id="573">573</a>
+<a href="#574" id="574">574</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>core::convert::TryFrom;
 <span class="kw">use </span>core::{iter, result, slice, str};
 
@@ -533,7 +583,7 @@
     ReadRef, <span class="prelude-ty">Result</span>, SectionFlags, SectionIndex, SectionKind, SegmentFlags,
 };
 
-<span class="kw">use super</span>::{CoffFile, CoffRelocationIterator};
+<span class="kw">use super</span>::{CoffFile, CoffHeader, CoffRelocationIterator};
 
 <span class="doccomment">/// The table of section headers in a COFF or PE file.
 </span><span class="attr">#[derive(Debug, Default, Clone, Copy)]
@@ -546,13 +596,13 @@
     ///
     /// `data` must be the entire file data.
     /// `offset` must be after the optional file header.
-    </span><span class="kw">pub fn </span>parse&lt;R: ReadRef&lt;<span class="lifetime">&#39;data</span>&gt;&gt;(
-        header: <span class="kw-2">&amp;</span>pe::ImageFileHeader,
+    </span><span class="kw">pub fn </span>parse&lt;Coff: CoffHeader, R: ReadRef&lt;<span class="lifetime">&#39;data</span>&gt;&gt;(
+        header: <span class="kw-2">&amp;</span>Coff,
         data: R,
         offset: u64,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>&gt; {
         <span class="kw">let </span>sections = data
-            .read_slice_at(offset, header.number_of_sections.get(LE).into())
+            .read_slice_at(offset, header.number_of_sections() <span class="kw">as </span>usize)
             .read_error(<span class="string">&quot;Invalid COFF/PE section headers&quot;</span>)<span class="question-mark">?</span>;
         <span class="prelude-val">Ok</span>(SectionTable { sections })
     }
@@ -628,15 +678,26 @@
     }
 }
 
+<span class="doccomment">/// An iterator over the loadable sections of a `CoffBigFile`.
+</span><span class="kw">pub type </span>CoffBigSegmentIterator&lt;<span class="lifetime">&#39;data</span>, <span class="lifetime">&#39;file</span>, R = <span class="kw-2">&amp;</span><span class="lifetime">&#39;data </span>[u8]&gt; =
+    CoffSegmentIterator&lt;<span class="lifetime">&#39;data</span>, <span class="lifetime">&#39;file</span>, R, pe::AnonObjectHeaderBigobj&gt;;
+
 <span class="doccomment">/// An iterator over the loadable sections of a `CoffFile`.
 </span><span class="attr">#[derive(Debug)]
-</span><span class="kw">pub struct </span>CoffSegmentIterator&lt;<span class="lifetime">&#39;data</span>, <span class="lifetime">&#39;file</span>, R: ReadRef&lt;<span class="lifetime">&#39;data</span>&gt; = <span class="kw-2">&amp;</span><span class="lifetime">&#39;data </span>[u8]&gt; {
-    <span class="kw">pub</span>(<span class="kw">super</span>) file: <span class="kw-2">&amp;</span><span class="lifetime">&#39;file </span>CoffFile&lt;<span class="lifetime">&#39;data</span>, R&gt;,
+</span><span class="kw">pub struct </span>CoffSegmentIterator&lt;
+    <span class="lifetime">&#39;data</span>,
+    <span class="lifetime">&#39;file</span>,
+    R: ReadRef&lt;<span class="lifetime">&#39;data</span>&gt; = <span class="kw-2">&amp;</span><span class="lifetime">&#39;data </span>[u8],
+    Coff: CoffHeader = pe::ImageFileHeader,
+&gt; {
+    <span class="kw">pub</span>(<span class="kw">super</span>) file: <span class="kw-2">&amp;</span><span class="lifetime">&#39;file </span>CoffFile&lt;<span class="lifetime">&#39;data</span>, R, Coff&gt;,
     <span class="kw">pub</span>(<span class="kw">super</span>) iter: slice::Iter&lt;<span class="lifetime">&#39;data</span>, pe::ImageSectionHeader&gt;,
 }
 
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;data</span>, <span class="lifetime">&#39;file</span>, R: ReadRef&lt;<span class="lifetime">&#39;data</span>&gt;&gt; Iterator <span class="kw">for </span>CoffSegmentIterator&lt;<span class="lifetime">&#39;data</span>, <span class="lifetime">&#39;file</span>, R&gt; {
-    <span class="kw">type </span>Item = CoffSegment&lt;<span class="lifetime">&#39;data</span>, <span class="lifetime">&#39;file</span>, R&gt;;
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;data</span>, <span class="lifetime">&#39;file</span>, R: ReadRef&lt;<span class="lifetime">&#39;data</span>&gt;, Coff: CoffHeader&gt; Iterator
+    <span class="kw">for </span>CoffSegmentIterator&lt;<span class="lifetime">&#39;data</span>, <span class="lifetime">&#39;file</span>, R, Coff&gt;
+{
+    <span class="kw">type </span>Item = CoffSegment&lt;<span class="lifetime">&#39;data</span>, <span class="lifetime">&#39;file</span>, R, Coff&gt;;
 
     <span class="kw">fn </span>next(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>::Item&gt; {
         <span class="self">self</span>.iter.next().map(|section| CoffSegment {
@@ -646,14 +707,23 @@
     }
 }
 
+<span class="doccomment">/// A loadable section of a `CoffBigFile`.
+</span><span class="kw">pub type </span>CoffBigSegment&lt;<span class="lifetime">&#39;data</span>, <span class="lifetime">&#39;file</span>, R = <span class="kw-2">&amp;</span><span class="lifetime">&#39;data </span>[u8]&gt; =
+    CoffSegment&lt;<span class="lifetime">&#39;data</span>, <span class="lifetime">&#39;file</span>, R, pe::AnonObjectHeaderBigobj&gt;;
+
 <span class="doccomment">/// A loadable section of a `CoffFile`.
 </span><span class="attr">#[derive(Debug)]
-</span><span class="kw">pub struct </span>CoffSegment&lt;<span class="lifetime">&#39;data</span>, <span class="lifetime">&#39;file</span>, R: ReadRef&lt;<span class="lifetime">&#39;data</span>&gt; = <span class="kw-2">&amp;</span><span class="lifetime">&#39;data </span>[u8]&gt; {
-    <span class="kw">pub</span>(<span class="kw">super</span>) file: <span class="kw-2">&amp;</span><span class="lifetime">&#39;file </span>CoffFile&lt;<span class="lifetime">&#39;data</span>, R&gt;,
+</span><span class="kw">pub struct </span>CoffSegment&lt;
+    <span class="lifetime">&#39;data</span>,
+    <span class="lifetime">&#39;file</span>,
+    R: ReadRef&lt;<span class="lifetime">&#39;data</span>&gt; = <span class="kw-2">&amp;</span><span class="lifetime">&#39;data </span>[u8],
+    Coff: CoffHeader = pe::ImageFileHeader,
+&gt; {
+    <span class="kw">pub</span>(<span class="kw">super</span>) file: <span class="kw-2">&amp;</span><span class="lifetime">&#39;file </span>CoffFile&lt;<span class="lifetime">&#39;data</span>, R, Coff&gt;,
     <span class="kw">pub</span>(<span class="kw">super</span>) section: <span class="kw-2">&amp;</span><span class="lifetime">&#39;data </span>pe::ImageSectionHeader,
 }
 
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;data</span>, <span class="lifetime">&#39;file</span>, R: ReadRef&lt;<span class="lifetime">&#39;data</span>&gt;&gt; CoffSegment&lt;<span class="lifetime">&#39;data</span>, <span class="lifetime">&#39;file</span>, R&gt; {
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;data</span>, <span class="lifetime">&#39;file</span>, R: ReadRef&lt;<span class="lifetime">&#39;data</span>&gt;, Coff: CoffHeader&gt; CoffSegment&lt;<span class="lifetime">&#39;data</span>, <span class="lifetime">&#39;file</span>, R, Coff&gt; {
     <span class="kw">fn </span>bytes(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;data </span>[u8]&gt; {
         <span class="self">self</span>.section
             .coff_data(<span class="self">self</span>.file.data)
@@ -661,9 +731,14 @@
     }
 }
 
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;data</span>, <span class="lifetime">&#39;file</span>, R: ReadRef&lt;<span class="lifetime">&#39;data</span>&gt;&gt; read::private::Sealed <span class="kw">for </span>CoffSegment&lt;<span class="lifetime">&#39;data</span>, <span class="lifetime">&#39;file</span>, R&gt; {}
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;data</span>, <span class="lifetime">&#39;file</span>, R: ReadRef&lt;<span class="lifetime">&#39;data</span>&gt;, Coff: CoffHeader&gt; read::private::Sealed
+    <span class="kw">for </span>CoffSegment&lt;<span class="lifetime">&#39;data</span>, <span class="lifetime">&#39;file</span>, R, Coff&gt;
+{
+}
 
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;data</span>, <span class="lifetime">&#39;file</span>, R: ReadRef&lt;<span class="lifetime">&#39;data</span>&gt;&gt; ObjectSegment&lt;<span class="lifetime">&#39;data</span>&gt; <span class="kw">for </span>CoffSegment&lt;<span class="lifetime">&#39;data</span>, <span class="lifetime">&#39;file</span>, R&gt; {
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;data</span>, <span class="lifetime">&#39;file</span>, R: ReadRef&lt;<span class="lifetime">&#39;data</span>&gt;, Coff: CoffHeader&gt; ObjectSegment&lt;<span class="lifetime">&#39;data</span>&gt;
+    <span class="kw">for </span>CoffSegment&lt;<span class="lifetime">&#39;data</span>, <span class="lifetime">&#39;file</span>, R, Coff&gt;
+{
     <span class="attr">#[inline]
     </span><span class="kw">fn </span>address(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; u64 {
         u64::from(<span class="self">self</span>.section.virtual_address.get(LE))
@@ -721,15 +796,26 @@
     }
 }
 
+<span class="doccomment">/// An iterator over the sections of a `CoffBigFile`.
+</span><span class="kw">pub type </span>CoffBigSectionIterator&lt;<span class="lifetime">&#39;data</span>, <span class="lifetime">&#39;file</span>, R = <span class="kw-2">&amp;</span><span class="lifetime">&#39;data </span>[u8]&gt; =
+    CoffSectionIterator&lt;<span class="lifetime">&#39;data</span>, <span class="lifetime">&#39;file</span>, R, pe::AnonObjectHeaderBigobj&gt;;
+
 <span class="doccomment">/// An iterator over the sections of a `CoffFile`.
 </span><span class="attr">#[derive(Debug)]
-</span><span class="kw">pub struct </span>CoffSectionIterator&lt;<span class="lifetime">&#39;data</span>, <span class="lifetime">&#39;file</span>, R: ReadRef&lt;<span class="lifetime">&#39;data</span>&gt; = <span class="kw-2">&amp;</span><span class="lifetime">&#39;data </span>[u8]&gt; {
-    <span class="kw">pub</span>(<span class="kw">super</span>) file: <span class="kw-2">&amp;</span><span class="lifetime">&#39;file </span>CoffFile&lt;<span class="lifetime">&#39;data</span>, R&gt;,
+</span><span class="kw">pub struct </span>CoffSectionIterator&lt;
+    <span class="lifetime">&#39;data</span>,
+    <span class="lifetime">&#39;file</span>,
+    R: ReadRef&lt;<span class="lifetime">&#39;data</span>&gt; = <span class="kw-2">&amp;</span><span class="lifetime">&#39;data </span>[u8],
+    Coff: CoffHeader = pe::ImageFileHeader,
+&gt; {
+    <span class="kw">pub</span>(<span class="kw">super</span>) file: <span class="kw-2">&amp;</span><span class="lifetime">&#39;file </span>CoffFile&lt;<span class="lifetime">&#39;data</span>, R, Coff&gt;,
     <span class="kw">pub</span>(<span class="kw">super</span>) iter: iter::Enumerate&lt;slice::Iter&lt;<span class="lifetime">&#39;data</span>, pe::ImageSectionHeader&gt;&gt;,
 }
 
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;data</span>, <span class="lifetime">&#39;file</span>, R: ReadRef&lt;<span class="lifetime">&#39;data</span>&gt;&gt; Iterator <span class="kw">for </span>CoffSectionIterator&lt;<span class="lifetime">&#39;data</span>, <span class="lifetime">&#39;file</span>, R&gt; {
-    <span class="kw">type </span>Item = CoffSection&lt;<span class="lifetime">&#39;data</span>, <span class="lifetime">&#39;file</span>, R&gt;;
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;data</span>, <span class="lifetime">&#39;file</span>, R: ReadRef&lt;<span class="lifetime">&#39;data</span>&gt;, Coff: CoffHeader&gt; Iterator
+    <span class="kw">for </span>CoffSectionIterator&lt;<span class="lifetime">&#39;data</span>, <span class="lifetime">&#39;file</span>, R, Coff&gt;
+{
+    <span class="kw">type </span>Item = CoffSection&lt;<span class="lifetime">&#39;data</span>, <span class="lifetime">&#39;file</span>, R, Coff&gt;;
 
     <span class="kw">fn </span>next(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>::Item&gt; {
         <span class="self">self</span>.iter.next().map(|(index, section)| CoffSection {
@@ -740,15 +826,24 @@
     }
 }
 
+<span class="doccomment">/// A section of a `CoffBigFile`.
+</span><span class="kw">pub type </span>CoffBigSection&lt;<span class="lifetime">&#39;data</span>, <span class="lifetime">&#39;file</span>, R = <span class="kw-2">&amp;</span><span class="lifetime">&#39;data </span>[u8]&gt; =
+    CoffSection&lt;<span class="lifetime">&#39;data</span>, <span class="lifetime">&#39;file</span>, R, pe::AnonObjectHeaderBigobj&gt;;
+
 <span class="doccomment">/// A section of a `CoffFile`.
 </span><span class="attr">#[derive(Debug)]
-</span><span class="kw">pub struct </span>CoffSection&lt;<span class="lifetime">&#39;data</span>, <span class="lifetime">&#39;file</span>, R: ReadRef&lt;<span class="lifetime">&#39;data</span>&gt; = <span class="kw-2">&amp;</span><span class="lifetime">&#39;data </span>[u8]&gt; {
-    <span class="kw">pub</span>(<span class="kw">super</span>) file: <span class="kw-2">&amp;</span><span class="lifetime">&#39;file </span>CoffFile&lt;<span class="lifetime">&#39;data</span>, R&gt;,
+</span><span class="kw">pub struct </span>CoffSection&lt;
+    <span class="lifetime">&#39;data</span>,
+    <span class="lifetime">&#39;file</span>,
+    R: ReadRef&lt;<span class="lifetime">&#39;data</span>&gt; = <span class="kw-2">&amp;</span><span class="lifetime">&#39;data </span>[u8],
+    Coff: CoffHeader = pe::ImageFileHeader,
+&gt; {
+    <span class="kw">pub</span>(<span class="kw">super</span>) file: <span class="kw-2">&amp;</span><span class="lifetime">&#39;file </span>CoffFile&lt;<span class="lifetime">&#39;data</span>, R, Coff&gt;,
     <span class="kw">pub</span>(<span class="kw">super</span>) index: SectionIndex,
     <span class="kw">pub</span>(<span class="kw">super</span>) section: <span class="kw-2">&amp;</span><span class="lifetime">&#39;data </span>pe::ImageSectionHeader,
 }
 
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;data</span>, <span class="lifetime">&#39;file</span>, R: ReadRef&lt;<span class="lifetime">&#39;data</span>&gt;&gt; CoffSection&lt;<span class="lifetime">&#39;data</span>, <span class="lifetime">&#39;file</span>, R&gt; {
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;data</span>, <span class="lifetime">&#39;file</span>, R: ReadRef&lt;<span class="lifetime">&#39;data</span>&gt;, Coff: CoffHeader&gt; CoffSection&lt;<span class="lifetime">&#39;data</span>, <span class="lifetime">&#39;file</span>, R, Coff&gt; {
     <span class="kw">fn </span>bytes(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;data </span>[u8]&gt; {
         <span class="self">self</span>.section
             .coff_data(<span class="self">self</span>.file.data)
@@ -756,10 +851,15 @@
     }
 }
 
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;data</span>, <span class="lifetime">&#39;file</span>, R: ReadRef&lt;<span class="lifetime">&#39;data</span>&gt;&gt; read::private::Sealed <span class="kw">for </span>CoffSection&lt;<span class="lifetime">&#39;data</span>, <span class="lifetime">&#39;file</span>, R&gt; {}
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;data</span>, <span class="lifetime">&#39;file</span>, R: ReadRef&lt;<span class="lifetime">&#39;data</span>&gt;, Coff: CoffHeader&gt; read::private::Sealed
+    <span class="kw">for </span>CoffSection&lt;<span class="lifetime">&#39;data</span>, <span class="lifetime">&#39;file</span>, R, Coff&gt;
+{
+}
 
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;data</span>, <span class="lifetime">&#39;file</span>, R: ReadRef&lt;<span class="lifetime">&#39;data</span>&gt;&gt; ObjectSection&lt;<span class="lifetime">&#39;data</span>&gt; <span class="kw">for </span>CoffSection&lt;<span class="lifetime">&#39;data</span>, <span class="lifetime">&#39;file</span>, R&gt; {
-    <span class="kw">type </span>RelocationIterator = CoffRelocationIterator&lt;<span class="lifetime">&#39;data</span>, <span class="lifetime">&#39;file</span>, R&gt;;
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;data</span>, <span class="lifetime">&#39;file</span>, R: ReadRef&lt;<span class="lifetime">&#39;data</span>&gt;, Coff: CoffHeader&gt; ObjectSection&lt;<span class="lifetime">&#39;data</span>&gt;
+    <span class="kw">for </span>CoffSection&lt;<span class="lifetime">&#39;data</span>, <span class="lifetime">&#39;file</span>, R, Coff&gt;
+{
+    <span class="kw">type </span>RelocationIterator = CoffRelocationIterator&lt;<span class="lifetime">&#39;data</span>, <span class="lifetime">&#39;file</span>, R, Coff&gt;;
 
     <span class="attr">#[inline]
     </span><span class="kw">fn </span>index(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; SectionIndex {
@@ -839,7 +939,7 @@
         <span class="self">self</span>.section.kind()
     }
 
-    <span class="kw">fn </span>relocations(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; CoffRelocationIterator&lt;<span class="lifetime">&#39;data</span>, <span class="lifetime">&#39;file</span>, R&gt; {
+    <span class="kw">fn </span>relocations(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; CoffRelocationIterator&lt;<span class="lifetime">&#39;data</span>, <span class="lifetime">&#39;file</span>, R, Coff&gt; {
         <span class="kw">let </span>relocations = <span class="self">self</span>.section.coff_relocations(<span class="self">self</span>.file.data).unwrap_or(<span class="kw-2">&amp;</span>[]);
         CoffRelocationIterator {
             file: <span class="self">self</span>.file,

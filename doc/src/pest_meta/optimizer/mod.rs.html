@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/nix/store/jnqxxv1xi811ni996b002f4jnyz38xck-vendor-cargo-deps/c19b7c6f923b580ac259164a89f2577984ad5ab09ee9d583b888f934adbbe8d0/pest_meta-2.3.0/src/optimizer/mod.rs`."><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-f3501f0f5ae15dfb.css" id="mainThemeStyle"><div id="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="pest_meta" data-themes="" data-resource-suffix="" data-rustdoc-version="1.71.0 (8ede3aae2 2023-07-12)" data-search-js="search-4926e5fc22a5646a.js" data-settings-js="settings-de11bff964e9d4e5.js" data-settings-css="settings-8c76f75bfb6bd192.css" data-theme-light-css="light-0f8c037637f9eb3e.css" data-theme-dark-css="dark-1097f8e92a01e3cf.css" data-theme-ayu-css="ayu-614652228113ac93.css" ></div><script src="../../../static.files/storage-62ce34ea385b278a.js"></script><script defer src="../../../static.files/source-script-11255107d0a65077.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../static.files/main-f0540c1d82cde29b.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../../../static.files/light-0f8c037637f9eb3e.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../../../static.files/dark-1097f8e92a01e3cf.css"><link rel="stylesheet" href="../../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../../pest_meta/index.html"><img class="rust-logo" src="../../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/nix/store/yf45a1rayffhnidhgyjynpyhr9lqkd09-vendor-cargo-deps/c19b7c6f923b580ac259164a89f2577984ad5ab09ee9d583b888f934adbbe8d0/pest_meta-2.7.2/src/optimizer/mod.rs`."><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-f3501f0f5ae15dfb.css" id="mainThemeStyle"><div id="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="pest_meta" data-themes="" data-resource-suffix="" data-rustdoc-version="1.71.0 (8ede3aae2 2023-07-12)" data-search-js="search-4926e5fc22a5646a.js" data-settings-js="settings-de11bff964e9d4e5.js" data-settings-css="settings-8c76f75bfb6bd192.css" data-theme-light-css="light-0f8c037637f9eb3e.css" data-theme-dark-css="dark-1097f8e92a01e3cf.css" data-theme-ayu-css="ayu-614652228113ac93.css" ></div><script src="../../../static.files/storage-62ce34ea385b278a.js"></script><script defer src="../../../static.files/source-script-11255107d0a65077.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../static.files/main-f0540c1d82cde29b.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../../../static.files/light-0f8c037637f9eb3e.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../../../static.files/dark-1097f8e92a01e3cf.css"><link rel="stylesheet" href="../../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="icon" href="https://raw.githubusercontent.com/pest-parser/pest/master/pest-logo.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../../pest_meta/index.html"><img src="https://raw.githubusercontent.com/pest-parser/pest/master/pest-logo.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -588,6 +588,508 @@
 <a href="#588" id="588">588</a>
 <a href="#589" id="589">589</a>
 <a href="#590" id="590">590</a>
+<a href="#591" id="591">591</a>
+<a href="#592" id="592">592</a>
+<a href="#593" id="593">593</a>
+<a href="#594" id="594">594</a>
+<a href="#595" id="595">595</a>
+<a href="#596" id="596">596</a>
+<a href="#597" id="597">597</a>
+<a href="#598" id="598">598</a>
+<a href="#599" id="599">599</a>
+<a href="#600" id="600">600</a>
+<a href="#601" id="601">601</a>
+<a href="#602" id="602">602</a>
+<a href="#603" id="603">603</a>
+<a href="#604" id="604">604</a>
+<a href="#605" id="605">605</a>
+<a href="#606" id="606">606</a>
+<a href="#607" id="607">607</a>
+<a href="#608" id="608">608</a>
+<a href="#609" id="609">609</a>
+<a href="#610" id="610">610</a>
+<a href="#611" id="611">611</a>
+<a href="#612" id="612">612</a>
+<a href="#613" id="613">613</a>
+<a href="#614" id="614">614</a>
+<a href="#615" id="615">615</a>
+<a href="#616" id="616">616</a>
+<a href="#617" id="617">617</a>
+<a href="#618" id="618">618</a>
+<a href="#619" id="619">619</a>
+<a href="#620" id="620">620</a>
+<a href="#621" id="621">621</a>
+<a href="#622" id="622">622</a>
+<a href="#623" id="623">623</a>
+<a href="#624" id="624">624</a>
+<a href="#625" id="625">625</a>
+<a href="#626" id="626">626</a>
+<a href="#627" id="627">627</a>
+<a href="#628" id="628">628</a>
+<a href="#629" id="629">629</a>
+<a href="#630" id="630">630</a>
+<a href="#631" id="631">631</a>
+<a href="#632" id="632">632</a>
+<a href="#633" id="633">633</a>
+<a href="#634" id="634">634</a>
+<a href="#635" id="635">635</a>
+<a href="#636" id="636">636</a>
+<a href="#637" id="637">637</a>
+<a href="#638" id="638">638</a>
+<a href="#639" id="639">639</a>
+<a href="#640" id="640">640</a>
+<a href="#641" id="641">641</a>
+<a href="#642" id="642">642</a>
+<a href="#643" id="643">643</a>
+<a href="#644" id="644">644</a>
+<a href="#645" id="645">645</a>
+<a href="#646" id="646">646</a>
+<a href="#647" id="647">647</a>
+<a href="#648" id="648">648</a>
+<a href="#649" id="649">649</a>
+<a href="#650" id="650">650</a>
+<a href="#651" id="651">651</a>
+<a href="#652" id="652">652</a>
+<a href="#653" id="653">653</a>
+<a href="#654" id="654">654</a>
+<a href="#655" id="655">655</a>
+<a href="#656" id="656">656</a>
+<a href="#657" id="657">657</a>
+<a href="#658" id="658">658</a>
+<a href="#659" id="659">659</a>
+<a href="#660" id="660">660</a>
+<a href="#661" id="661">661</a>
+<a href="#662" id="662">662</a>
+<a href="#663" id="663">663</a>
+<a href="#664" id="664">664</a>
+<a href="#665" id="665">665</a>
+<a href="#666" id="666">666</a>
+<a href="#667" id="667">667</a>
+<a href="#668" id="668">668</a>
+<a href="#669" id="669">669</a>
+<a href="#670" id="670">670</a>
+<a href="#671" id="671">671</a>
+<a href="#672" id="672">672</a>
+<a href="#673" id="673">673</a>
+<a href="#674" id="674">674</a>
+<a href="#675" id="675">675</a>
+<a href="#676" id="676">676</a>
+<a href="#677" id="677">677</a>
+<a href="#678" id="678">678</a>
+<a href="#679" id="679">679</a>
+<a href="#680" id="680">680</a>
+<a href="#681" id="681">681</a>
+<a href="#682" id="682">682</a>
+<a href="#683" id="683">683</a>
+<a href="#684" id="684">684</a>
+<a href="#685" id="685">685</a>
+<a href="#686" id="686">686</a>
+<a href="#687" id="687">687</a>
+<a href="#688" id="688">688</a>
+<a href="#689" id="689">689</a>
+<a href="#690" id="690">690</a>
+<a href="#691" id="691">691</a>
+<a href="#692" id="692">692</a>
+<a href="#693" id="693">693</a>
+<a href="#694" id="694">694</a>
+<a href="#695" id="695">695</a>
+<a href="#696" id="696">696</a>
+<a href="#697" id="697">697</a>
+<a href="#698" id="698">698</a>
+<a href="#699" id="699">699</a>
+<a href="#700" id="700">700</a>
+<a href="#701" id="701">701</a>
+<a href="#702" id="702">702</a>
+<a href="#703" id="703">703</a>
+<a href="#704" id="704">704</a>
+<a href="#705" id="705">705</a>
+<a href="#706" id="706">706</a>
+<a href="#707" id="707">707</a>
+<a href="#708" id="708">708</a>
+<a href="#709" id="709">709</a>
+<a href="#710" id="710">710</a>
+<a href="#711" id="711">711</a>
+<a href="#712" id="712">712</a>
+<a href="#713" id="713">713</a>
+<a href="#714" id="714">714</a>
+<a href="#715" id="715">715</a>
+<a href="#716" id="716">716</a>
+<a href="#717" id="717">717</a>
+<a href="#718" id="718">718</a>
+<a href="#719" id="719">719</a>
+<a href="#720" id="720">720</a>
+<a href="#721" id="721">721</a>
+<a href="#722" id="722">722</a>
+<a href="#723" id="723">723</a>
+<a href="#724" id="724">724</a>
+<a href="#725" id="725">725</a>
+<a href="#726" id="726">726</a>
+<a href="#727" id="727">727</a>
+<a href="#728" id="728">728</a>
+<a href="#729" id="729">729</a>
+<a href="#730" id="730">730</a>
+<a href="#731" id="731">731</a>
+<a href="#732" id="732">732</a>
+<a href="#733" id="733">733</a>
+<a href="#734" id="734">734</a>
+<a href="#735" id="735">735</a>
+<a href="#736" id="736">736</a>
+<a href="#737" id="737">737</a>
+<a href="#738" id="738">738</a>
+<a href="#739" id="739">739</a>
+<a href="#740" id="740">740</a>
+<a href="#741" id="741">741</a>
+<a href="#742" id="742">742</a>
+<a href="#743" id="743">743</a>
+<a href="#744" id="744">744</a>
+<a href="#745" id="745">745</a>
+<a href="#746" id="746">746</a>
+<a href="#747" id="747">747</a>
+<a href="#748" id="748">748</a>
+<a href="#749" id="749">749</a>
+<a href="#750" id="750">750</a>
+<a href="#751" id="751">751</a>
+<a href="#752" id="752">752</a>
+<a href="#753" id="753">753</a>
+<a href="#754" id="754">754</a>
+<a href="#755" id="755">755</a>
+<a href="#756" id="756">756</a>
+<a href="#757" id="757">757</a>
+<a href="#758" id="758">758</a>
+<a href="#759" id="759">759</a>
+<a href="#760" id="760">760</a>
+<a href="#761" id="761">761</a>
+<a href="#762" id="762">762</a>
+<a href="#763" id="763">763</a>
+<a href="#764" id="764">764</a>
+<a href="#765" id="765">765</a>
+<a href="#766" id="766">766</a>
+<a href="#767" id="767">767</a>
+<a href="#768" id="768">768</a>
+<a href="#769" id="769">769</a>
+<a href="#770" id="770">770</a>
+<a href="#771" id="771">771</a>
+<a href="#772" id="772">772</a>
+<a href="#773" id="773">773</a>
+<a href="#774" id="774">774</a>
+<a href="#775" id="775">775</a>
+<a href="#776" id="776">776</a>
+<a href="#777" id="777">777</a>
+<a href="#778" id="778">778</a>
+<a href="#779" id="779">779</a>
+<a href="#780" id="780">780</a>
+<a href="#781" id="781">781</a>
+<a href="#782" id="782">782</a>
+<a href="#783" id="783">783</a>
+<a href="#784" id="784">784</a>
+<a href="#785" id="785">785</a>
+<a href="#786" id="786">786</a>
+<a href="#787" id="787">787</a>
+<a href="#788" id="788">788</a>
+<a href="#789" id="789">789</a>
+<a href="#790" id="790">790</a>
+<a href="#791" id="791">791</a>
+<a href="#792" id="792">792</a>
+<a href="#793" id="793">793</a>
+<a href="#794" id="794">794</a>
+<a href="#795" id="795">795</a>
+<a href="#796" id="796">796</a>
+<a href="#797" id="797">797</a>
+<a href="#798" id="798">798</a>
+<a href="#799" id="799">799</a>
+<a href="#800" id="800">800</a>
+<a href="#801" id="801">801</a>
+<a href="#802" id="802">802</a>
+<a href="#803" id="803">803</a>
+<a href="#804" id="804">804</a>
+<a href="#805" id="805">805</a>
+<a href="#806" id="806">806</a>
+<a href="#807" id="807">807</a>
+<a href="#808" id="808">808</a>
+<a href="#809" id="809">809</a>
+<a href="#810" id="810">810</a>
+<a href="#811" id="811">811</a>
+<a href="#812" id="812">812</a>
+<a href="#813" id="813">813</a>
+<a href="#814" id="814">814</a>
+<a href="#815" id="815">815</a>
+<a href="#816" id="816">816</a>
+<a href="#817" id="817">817</a>
+<a href="#818" id="818">818</a>
+<a href="#819" id="819">819</a>
+<a href="#820" id="820">820</a>
+<a href="#821" id="821">821</a>
+<a href="#822" id="822">822</a>
+<a href="#823" id="823">823</a>
+<a href="#824" id="824">824</a>
+<a href="#825" id="825">825</a>
+<a href="#826" id="826">826</a>
+<a href="#827" id="827">827</a>
+<a href="#828" id="828">828</a>
+<a href="#829" id="829">829</a>
+<a href="#830" id="830">830</a>
+<a href="#831" id="831">831</a>
+<a href="#832" id="832">832</a>
+<a href="#833" id="833">833</a>
+<a href="#834" id="834">834</a>
+<a href="#835" id="835">835</a>
+<a href="#836" id="836">836</a>
+<a href="#837" id="837">837</a>
+<a href="#838" id="838">838</a>
+<a href="#839" id="839">839</a>
+<a href="#840" id="840">840</a>
+<a href="#841" id="841">841</a>
+<a href="#842" id="842">842</a>
+<a href="#843" id="843">843</a>
+<a href="#844" id="844">844</a>
+<a href="#845" id="845">845</a>
+<a href="#846" id="846">846</a>
+<a href="#847" id="847">847</a>
+<a href="#848" id="848">848</a>
+<a href="#849" id="849">849</a>
+<a href="#850" id="850">850</a>
+<a href="#851" id="851">851</a>
+<a href="#852" id="852">852</a>
+<a href="#853" id="853">853</a>
+<a href="#854" id="854">854</a>
+<a href="#855" id="855">855</a>
+<a href="#856" id="856">856</a>
+<a href="#857" id="857">857</a>
+<a href="#858" id="858">858</a>
+<a href="#859" id="859">859</a>
+<a href="#860" id="860">860</a>
+<a href="#861" id="861">861</a>
+<a href="#862" id="862">862</a>
+<a href="#863" id="863">863</a>
+<a href="#864" id="864">864</a>
+<a href="#865" id="865">865</a>
+<a href="#866" id="866">866</a>
+<a href="#867" id="867">867</a>
+<a href="#868" id="868">868</a>
+<a href="#869" id="869">869</a>
+<a href="#870" id="870">870</a>
+<a href="#871" id="871">871</a>
+<a href="#872" id="872">872</a>
+<a href="#873" id="873">873</a>
+<a href="#874" id="874">874</a>
+<a href="#875" id="875">875</a>
+<a href="#876" id="876">876</a>
+<a href="#877" id="877">877</a>
+<a href="#878" id="878">878</a>
+<a href="#879" id="879">879</a>
+<a href="#880" id="880">880</a>
+<a href="#881" id="881">881</a>
+<a href="#882" id="882">882</a>
+<a href="#883" id="883">883</a>
+<a href="#884" id="884">884</a>
+<a href="#885" id="885">885</a>
+<a href="#886" id="886">886</a>
+<a href="#887" id="887">887</a>
+<a href="#888" id="888">888</a>
+<a href="#889" id="889">889</a>
+<a href="#890" id="890">890</a>
+<a href="#891" id="891">891</a>
+<a href="#892" id="892">892</a>
+<a href="#893" id="893">893</a>
+<a href="#894" id="894">894</a>
+<a href="#895" id="895">895</a>
+<a href="#896" id="896">896</a>
+<a href="#897" id="897">897</a>
+<a href="#898" id="898">898</a>
+<a href="#899" id="899">899</a>
+<a href="#900" id="900">900</a>
+<a href="#901" id="901">901</a>
+<a href="#902" id="902">902</a>
+<a href="#903" id="903">903</a>
+<a href="#904" id="904">904</a>
+<a href="#905" id="905">905</a>
+<a href="#906" id="906">906</a>
+<a href="#907" id="907">907</a>
+<a href="#908" id="908">908</a>
+<a href="#909" id="909">909</a>
+<a href="#910" id="910">910</a>
+<a href="#911" id="911">911</a>
+<a href="#912" id="912">912</a>
+<a href="#913" id="913">913</a>
+<a href="#914" id="914">914</a>
+<a href="#915" id="915">915</a>
+<a href="#916" id="916">916</a>
+<a href="#917" id="917">917</a>
+<a href="#918" id="918">918</a>
+<a href="#919" id="919">919</a>
+<a href="#920" id="920">920</a>
+<a href="#921" id="921">921</a>
+<a href="#922" id="922">922</a>
+<a href="#923" id="923">923</a>
+<a href="#924" id="924">924</a>
+<a href="#925" id="925">925</a>
+<a href="#926" id="926">926</a>
+<a href="#927" id="927">927</a>
+<a href="#928" id="928">928</a>
+<a href="#929" id="929">929</a>
+<a href="#930" id="930">930</a>
+<a href="#931" id="931">931</a>
+<a href="#932" id="932">932</a>
+<a href="#933" id="933">933</a>
+<a href="#934" id="934">934</a>
+<a href="#935" id="935">935</a>
+<a href="#936" id="936">936</a>
+<a href="#937" id="937">937</a>
+<a href="#938" id="938">938</a>
+<a href="#939" id="939">939</a>
+<a href="#940" id="940">940</a>
+<a href="#941" id="941">941</a>
+<a href="#942" id="942">942</a>
+<a href="#943" id="943">943</a>
+<a href="#944" id="944">944</a>
+<a href="#945" id="945">945</a>
+<a href="#946" id="946">946</a>
+<a href="#947" id="947">947</a>
+<a href="#948" id="948">948</a>
+<a href="#949" id="949">949</a>
+<a href="#950" id="950">950</a>
+<a href="#951" id="951">951</a>
+<a href="#952" id="952">952</a>
+<a href="#953" id="953">953</a>
+<a href="#954" id="954">954</a>
+<a href="#955" id="955">955</a>
+<a href="#956" id="956">956</a>
+<a href="#957" id="957">957</a>
+<a href="#958" id="958">958</a>
+<a href="#959" id="959">959</a>
+<a href="#960" id="960">960</a>
+<a href="#961" id="961">961</a>
+<a href="#962" id="962">962</a>
+<a href="#963" id="963">963</a>
+<a href="#964" id="964">964</a>
+<a href="#965" id="965">965</a>
+<a href="#966" id="966">966</a>
+<a href="#967" id="967">967</a>
+<a href="#968" id="968">968</a>
+<a href="#969" id="969">969</a>
+<a href="#970" id="970">970</a>
+<a href="#971" id="971">971</a>
+<a href="#972" id="972">972</a>
+<a href="#973" id="973">973</a>
+<a href="#974" id="974">974</a>
+<a href="#975" id="975">975</a>
+<a href="#976" id="976">976</a>
+<a href="#977" id="977">977</a>
+<a href="#978" id="978">978</a>
+<a href="#979" id="979">979</a>
+<a href="#980" id="980">980</a>
+<a href="#981" id="981">981</a>
+<a href="#982" id="982">982</a>
+<a href="#983" id="983">983</a>
+<a href="#984" id="984">984</a>
+<a href="#985" id="985">985</a>
+<a href="#986" id="986">986</a>
+<a href="#987" id="987">987</a>
+<a href="#988" id="988">988</a>
+<a href="#989" id="989">989</a>
+<a href="#990" id="990">990</a>
+<a href="#991" id="991">991</a>
+<a href="#992" id="992">992</a>
+<a href="#993" id="993">993</a>
+<a href="#994" id="994">994</a>
+<a href="#995" id="995">995</a>
+<a href="#996" id="996">996</a>
+<a href="#997" id="997">997</a>
+<a href="#998" id="998">998</a>
+<a href="#999" id="999">999</a>
+<a href="#1000" id="1000">1000</a>
+<a href="#1001" id="1001">1001</a>
+<a href="#1002" id="1002">1002</a>
+<a href="#1003" id="1003">1003</a>
+<a href="#1004" id="1004">1004</a>
+<a href="#1005" id="1005">1005</a>
+<a href="#1006" id="1006">1006</a>
+<a href="#1007" id="1007">1007</a>
+<a href="#1008" id="1008">1008</a>
+<a href="#1009" id="1009">1009</a>
+<a href="#1010" id="1010">1010</a>
+<a href="#1011" id="1011">1011</a>
+<a href="#1012" id="1012">1012</a>
+<a href="#1013" id="1013">1013</a>
+<a href="#1014" id="1014">1014</a>
+<a href="#1015" id="1015">1015</a>
+<a href="#1016" id="1016">1016</a>
+<a href="#1017" id="1017">1017</a>
+<a href="#1018" id="1018">1018</a>
+<a href="#1019" id="1019">1019</a>
+<a href="#1020" id="1020">1020</a>
+<a href="#1021" id="1021">1021</a>
+<a href="#1022" id="1022">1022</a>
+<a href="#1023" id="1023">1023</a>
+<a href="#1024" id="1024">1024</a>
+<a href="#1025" id="1025">1025</a>
+<a href="#1026" id="1026">1026</a>
+<a href="#1027" id="1027">1027</a>
+<a href="#1028" id="1028">1028</a>
+<a href="#1029" id="1029">1029</a>
+<a href="#1030" id="1030">1030</a>
+<a href="#1031" id="1031">1031</a>
+<a href="#1032" id="1032">1032</a>
+<a href="#1033" id="1033">1033</a>
+<a href="#1034" id="1034">1034</a>
+<a href="#1035" id="1035">1035</a>
+<a href="#1036" id="1036">1036</a>
+<a href="#1037" id="1037">1037</a>
+<a href="#1038" id="1038">1038</a>
+<a href="#1039" id="1039">1039</a>
+<a href="#1040" id="1040">1040</a>
+<a href="#1041" id="1041">1041</a>
+<a href="#1042" id="1042">1042</a>
+<a href="#1043" id="1043">1043</a>
+<a href="#1044" id="1044">1044</a>
+<a href="#1045" id="1045">1045</a>
+<a href="#1046" id="1046">1046</a>
+<a href="#1047" id="1047">1047</a>
+<a href="#1048" id="1048">1048</a>
+<a href="#1049" id="1049">1049</a>
+<a href="#1050" id="1050">1050</a>
+<a href="#1051" id="1051">1051</a>
+<a href="#1052" id="1052">1052</a>
+<a href="#1053" id="1053">1053</a>
+<a href="#1054" id="1054">1054</a>
+<a href="#1055" id="1055">1055</a>
+<a href="#1056" id="1056">1056</a>
+<a href="#1057" id="1057">1057</a>
+<a href="#1058" id="1058">1058</a>
+<a href="#1059" id="1059">1059</a>
+<a href="#1060" id="1060">1060</a>
+<a href="#1061" id="1061">1061</a>
+<a href="#1062" id="1062">1062</a>
+<a href="#1063" id="1063">1063</a>
+<a href="#1064" id="1064">1064</a>
+<a href="#1065" id="1065">1065</a>
+<a href="#1066" id="1066">1066</a>
+<a href="#1067" id="1067">1067</a>
+<a href="#1068" id="1068">1068</a>
+<a href="#1069" id="1069">1069</a>
+<a href="#1070" id="1070">1070</a>
+<a href="#1071" id="1071">1071</a>
+<a href="#1072" id="1072">1072</a>
+<a href="#1073" id="1073">1073</a>
+<a href="#1074" id="1074">1074</a>
+<a href="#1075" id="1075">1075</a>
+<a href="#1076" id="1076">1076</a>
+<a href="#1077" id="1077">1077</a>
+<a href="#1078" id="1078">1078</a>
+<a href="#1079" id="1079">1079</a>
+<a href="#1080" id="1080">1080</a>
+<a href="#1081" id="1081">1081</a>
+<a href="#1082" id="1082">1082</a>
+<a href="#1083" id="1083">1083</a>
+<a href="#1084" id="1084">1084</a>
+<a href="#1085" id="1085">1085</a>
+<a href="#1086" id="1086">1086</a>
+<a href="#1087" id="1087">1087</a>
+<a href="#1088" id="1088">1088</a>
+<a href="#1089" id="1089">1089</a>
+<a href="#1090" id="1090">1090</a>
+<a href="#1091" id="1091">1091</a>
+<a href="#1092" id="1092">1092</a>
 </pre></div><pre class="rust"><code><span class="comment">// pest. The Elegant Parser
 // Copyright (c) 2018 Dragoș Tiselice
 //
@@ -596,6 +1098,8 @@
 // license &lt;LICENSE-MIT or http://opensource.org/licenses/MIT&gt;, at your
 // option. All files in the project carrying such notice may not be copied,
 // modified, or distributed except according to those terms.
+
+</span><span class="doccomment">//! Different optimizations for pest&#39;s ASTs.
 
 </span><span class="kw">use </span><span class="kw">crate</span>::ast::<span class="kw-2">*</span>;
 <span class="kw">use </span>std::collections::HashMap;
@@ -616,7 +1120,8 @@
 <span class="kw">mod </span>skipper;
 <span class="kw">mod </span>unroller;
 
-<span class="kw">pub fn </span>optimize(rules: Vec&lt;Rule&gt;) -&gt; Vec&lt;OptimizedRule&gt; {
+<span class="doccomment">/// Takes pest&#39;s ASTs and optimizes them
+</span><span class="kw">pub fn </span>optimize(rules: Vec&lt;Rule&gt;) -&gt; Vec&lt;OptimizedRule&gt; {
     <span class="kw">let </span>optimized: Vec&lt;OptimizedRule&gt; = rules
         .into_iter()
         .map(rotater::rotate)
@@ -655,11 +1160,15 @@
             Expr::Rep(expr) =&gt; OptimizedExpr::Rep(Box::new(to_optimized(<span class="kw-2">*</span>expr))),
             Expr::Skip(strings) =&gt; OptimizedExpr::Skip(strings),
             Expr::Push(expr) =&gt; OptimizedExpr::Push(Box::new(to_optimized(<span class="kw-2">*</span>expr))),
-            Expr::RepOnce(<span class="kw">_</span>)
-            | Expr::RepExact(..)
-            | Expr::RepMin(..)
-            | Expr::RepMax(..)
-            | Expr::RepMinMax(..) =&gt; <span class="macro">unreachable!</span>(<span class="string">&quot;No valid transformation to OptimizedRule&quot;</span>),
+            <span class="attr">#[cfg(feature = <span class="string">&quot;grammar-extras&quot;</span>)]
+            </span>Expr::NodeTag(expr, tag) =&gt; OptimizedExpr::NodeTag(Box::new(to_optimized(<span class="kw-2">*</span>expr)), tag),
+            <span class="attr">#[cfg(feature = <span class="string">&quot;grammar-extras&quot;</span>)]
+            </span>Expr::RepOnce(expr) =&gt; OptimizedExpr::RepOnce(Box::new(to_optimized(<span class="kw-2">*</span>expr))),
+            <span class="attr">#[cfg(not(feature = <span class="string">&quot;grammar-extras&quot;</span>))]
+            </span>Expr::RepOnce(<span class="kw">_</span>) =&gt; <span class="macro">unreachable!</span>(<span class="string">&quot;No valid transformation to OptimizedRule&quot;</span>),
+            Expr::RepExact(..) | Expr::RepMin(..) | Expr::RepMax(..) | Expr::RepMinMax(..) =&gt; {
+                <span class="macro">unreachable!</span>(<span class="string">&quot;No valid transformation to OptimizedRule&quot;</span>)
+            }
         }
     }
 
@@ -677,37 +1186,71 @@
         .collect()
 }
 
-<span class="attr">#[derive(Clone, Debug, Eq, PartialEq)]
+<span class="doccomment">/// The optimized version of the pest AST&#39;s `Rule`.
+</span><span class="attr">#[derive(Clone, Debug, Eq, PartialEq)]
 </span><span class="kw">pub struct </span>OptimizedRule {
-    <span class="kw">pub </span>name: String,
-    <span class="kw">pub </span>ty: RuleType,
-    <span class="kw">pub </span>expr: OptimizedExpr,
+    <span class="doccomment">/// The name of the rule.
+    </span><span class="kw">pub </span>name: String,
+    <span class="doccomment">/// The type of the rule.
+    </span><span class="kw">pub </span>ty: RuleType,
+    <span class="doccomment">/// The optimized expression of the rule.
+    </span><span class="kw">pub </span>expr: OptimizedExpr,
 }
 
-<span class="attr">#[derive(Clone, Debug, Eq, PartialEq)]
+<span class="doccomment">/// The optimized version of the pest AST&#39;s `Expr`.
+///
+/// # Warning: Semantic Versioning
+/// There may be non-breaking changes to the meta-grammar
+/// between minor versions. Those non-breaking changes, however,
+/// may translate into semver-breaking changes due to the additional variants
+/// propaged from the `Rule` enum. This is a known issue and will be fixed in the
+/// future (e.g. by increasing MSRV and non_exhaustive annotations).
+</span><span class="attr">#[derive(Clone, Debug, Eq, PartialEq)]
 </span><span class="kw">pub enum </span>OptimizedExpr {
-    Str(String),
-    Insens(String),
-    Range(String, String),
-    Ident(String),
-    PeekSlice(i32, <span class="prelude-ty">Option</span>&lt;i32&gt;),
-    PosPred(Box&lt;OptimizedExpr&gt;),
-    NegPred(Box&lt;OptimizedExpr&gt;),
-    Seq(Box&lt;OptimizedExpr&gt;, Box&lt;OptimizedExpr&gt;),
-    Choice(Box&lt;OptimizedExpr&gt;, Box&lt;OptimizedExpr&gt;),
-    Opt(Box&lt;OptimizedExpr&gt;),
-    Rep(Box&lt;OptimizedExpr&gt;),
-    Skip(Vec&lt;String&gt;),
-    Push(Box&lt;OptimizedExpr&gt;),
-    RestoreOnErr(Box&lt;OptimizedExpr&gt;),
+    <span class="doccomment">/// Matches an exact string, e.g. `&quot;a&quot;`
+    </span>Str(String),
+    <span class="doccomment">/// Matches an exact string, case insensitively (ASCII only), e.g. `^&quot;a&quot;`
+    </span>Insens(String),
+    <span class="doccomment">/// Matches one character in the range, e.g. `&#39;a&#39;..&#39;z&#39;`
+    </span>Range(String, String),
+    <span class="doccomment">/// Matches the rule with the given name, e.g. `a`
+    </span>Ident(String),
+    <span class="doccomment">/// Matches a custom part of the stack, e.g. `PEEK[..]`
+    </span>PeekSlice(i32, <span class="prelude-ty">Option</span>&lt;i32&gt;),
+    <span class="doccomment">/// Positive lookahead; matches expression without making progress, e.g. `&amp;e`
+    </span>PosPred(Box&lt;OptimizedExpr&gt;),
+    <span class="doccomment">/// Negative lookahead; matches if expression doesn&#39;t match, without making progress, e.g. `!e`
+    </span>NegPred(Box&lt;OptimizedExpr&gt;),
+    <span class="doccomment">/// Matches a sequence of two expressions, e.g. `e1 ~ e2`
+    </span>Seq(Box&lt;OptimizedExpr&gt;, Box&lt;OptimizedExpr&gt;),
+    <span class="doccomment">/// Matches either of two expressions, e.g. `e1 | e2`
+    </span>Choice(Box&lt;OptimizedExpr&gt;, Box&lt;OptimizedExpr&gt;),
+    <span class="doccomment">/// Optionally matches an expression, e.g. `e?`
+    </span>Opt(Box&lt;OptimizedExpr&gt;),
+    <span class="doccomment">/// Matches an expression zero or more times, e.g. `e*`
+    </span>Rep(Box&lt;OptimizedExpr&gt;),
+    <span class="doccomment">/// Matches an expression one or more times, e.g. `e+`
+    </span><span class="attr">#[cfg(feature = <span class="string">&quot;grammar-extras&quot;</span>)]
+    </span>RepOnce(Box&lt;OptimizedExpr&gt;),
+    <span class="doccomment">/// Continues to match expressions until one of the strings in the `Vec` is found
+    </span>Skip(Vec&lt;String&gt;),
+    <span class="doccomment">/// Matches an expression and pushes it to the stack, e.g. `push(e)`
+    </span>Push(Box&lt;OptimizedExpr&gt;),
+    <span class="doccomment">/// Matches an expression and assigns a label to it, e.g. #label = exp
+    </span><span class="attr">#[cfg(feature = <span class="string">&quot;grammar-extras&quot;</span>)]
+    </span>NodeTag(Box&lt;OptimizedExpr&gt;, String),
+    <span class="doccomment">/// Restores an expression&#39;s checkpoint
+    </span>RestoreOnErr(Box&lt;OptimizedExpr&gt;),
 }
 
 <span class="kw">impl </span>OptimizedExpr {
-    <span class="kw">pub fn </span>iter_top_down(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; OptimizedExprTopDownIterator {
+    <span class="doccomment">/// Returns a top-down iterator over the `OptimizedExpr`.
+    </span><span class="kw">pub fn </span>iter_top_down(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; OptimizedExprTopDownIterator {
         OptimizedExprTopDownIterator::new(<span class="self">self</span>)
     }
 
-    <span class="kw">pub fn </span>map_top_down&lt;F&gt;(<span class="self">self</span>, <span class="kw-2">mut </span>f: F) -&gt; OptimizedExpr
+    <span class="doccomment">/// Applies `f` to the `OptimizedExpr` top-down.
+    </span><span class="kw">pub fn </span>map_top_down&lt;F&gt;(<span class="self">self</span>, <span class="kw-2">mut </span>f: F) -&gt; OptimizedExpr
     <span class="kw">where
         </span>F: FnMut(OptimizedExpr) -&gt; OptimizedExpr,
     {
@@ -718,8 +1261,7 @@
             <span class="kw">let </span>expr = f(expr);
 
             <span class="kw">match </span>expr {
-                <span class="comment">// TODO: Use box syntax when it gets stabilized.
-                </span>OptimizedExpr::PosPred(expr) =&gt; {
+                OptimizedExpr::PosPred(expr) =&gt; {
                     <span class="kw">let </span>mapped = Box::new(map_internal(<span class="kw-2">*</span>expr, f));
                     OptimizedExpr::PosPred(mapped)
                 }
@@ -756,7 +1298,8 @@
         map_internal(<span class="self">self</span>, <span class="kw-2">&amp;mut </span>f)
     }
 
-    <span class="kw">pub fn </span>map_bottom_up&lt;F&gt;(<span class="self">self</span>, <span class="kw-2">mut </span>f: F) -&gt; OptimizedExpr
+    <span class="doccomment">/// Applies `f` to the `OptimizedExpr` bottom-up.
+    </span><span class="kw">pub fn </span>map_bottom_up&lt;F&gt;(<span class="self">self</span>, <span class="kw-2">mut </span>f: F) -&gt; OptimizedExpr
     <span class="kw">where
         </span>F: FnMut(OptimizedExpr) -&gt; OptimizedExpr,
     {
@@ -766,8 +1309,7 @@
         {
             <span class="kw">let </span>mapped = <span class="kw">match </span>expr {
                 OptimizedExpr::PosPred(expr) =&gt; {
-                    <span class="comment">// TODO: Use box syntax when it gets stabilized.
-                    </span><span class="kw">let </span>mapped = Box::new(map_internal(<span class="kw-2">*</span>expr, f));
+                    <span class="kw">let </span>mapped = Box::new(map_internal(<span class="kw-2">*</span>expr, f));
                     OptimizedExpr::PosPred(mapped)
                 }
                 OptimizedExpr::NegPred(expr) =&gt; {
@@ -806,14 +1348,87 @@
     }
 }
 
-<span class="kw">pub struct </span>OptimizedExprTopDownIterator {
+<span class="kw">impl </span>core::fmt::Display <span class="kw">for </span>OptimizedExpr {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>core::fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; core::fmt::Result {
+        <span class="kw">match </span><span class="self">self </span>{
+            OptimizedExpr::Str(s) =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;{:?}&quot;</span>, s),
+            OptimizedExpr::Insens(s) =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;^{:?}&quot;</span>, s),
+            OptimizedExpr::Range(start, end) =&gt; {
+                <span class="kw">let </span>start = start.chars().next().expect(<span class="string">&quot;Empty range start.&quot;</span>);
+                <span class="kw">let </span>end = end.chars().next().expect(<span class="string">&quot;Empty range end.&quot;</span>);
+                <span class="macro">write!</span>(f, <span class="string">&quot;({:?}..{:?})&quot;</span>, start, end)
+            }
+            OptimizedExpr::Ident(id) =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;{}&quot;</span>, id),
+            OptimizedExpr::PeekSlice(start, end) =&gt; <span class="kw">match </span>end {
+                <span class="prelude-val">Some</span>(end) =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;PEEK[{}..{}]&quot;</span>, start, end),
+                <span class="prelude-val">None </span>=&gt; <span class="macro">write!</span>(f, <span class="string">&quot;PEEK[{}..]&quot;</span>, start),
+            },
+            OptimizedExpr::PosPred(expr) =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;&amp;{}&quot;</span>, expr.as_ref()),
+            OptimizedExpr::NegPred(expr) =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;!{}&quot;</span>, expr.as_ref()),
+            OptimizedExpr::Seq(lhs, rhs) =&gt; {
+                <span class="kw">let </span><span class="kw-2">mut </span>nodes = Vec::new();
+                nodes.push(lhs);
+                <span class="kw">let </span><span class="kw-2">mut </span>current = rhs;
+                <span class="kw">while let </span>OptimizedExpr::Seq(lhs, rhs) = current.as_ref() {
+                    nodes.push(lhs);
+                    current = rhs;
+                }
+                nodes.push(current);
+                <span class="kw">let </span>sequence = nodes
+                    .iter()
+                    .map(|node| <span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, node))
+                    .collect::&lt;Vec&lt;<span class="kw">_</span>&gt;&gt;()
+                    .join(<span class="string">&quot; ~ &quot;</span>);
+                <span class="macro">write!</span>(f, <span class="string">&quot;({})&quot;</span>, sequence)
+            }
+            OptimizedExpr::Choice(lhs, rhs) =&gt; {
+                <span class="kw">let </span><span class="kw-2">mut </span>nodes = Vec::new();
+                nodes.push(lhs);
+                <span class="kw">let </span><span class="kw-2">mut </span>current = rhs;
+                <span class="kw">while let </span>OptimizedExpr::Choice(lhs, rhs) = current.as_ref() {
+                    nodes.push(lhs);
+                    current = rhs;
+                }
+                nodes.push(current);
+                <span class="kw">let </span>sequence = nodes
+                    .iter()
+                    .map(|node| <span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, node))
+                    .collect::&lt;Vec&lt;<span class="kw">_</span>&gt;&gt;()
+                    .join(<span class="string">&quot; | &quot;</span>);
+                <span class="macro">write!</span>(f, <span class="string">&quot;({})&quot;</span>, sequence)
+            }
+            OptimizedExpr::Opt(expr) =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;{}?&quot;</span>, expr),
+            OptimizedExpr::Rep(expr) =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;{}*&quot;</span>, expr),
+            <span class="attr">#[cfg(feature = <span class="string">&quot;grammar-extras&quot;</span>)]
+            </span>OptimizedExpr::RepOnce(expr) =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;{}+&quot;</span>, expr),
+            OptimizedExpr::Skip(strings) =&gt; {
+                <span class="kw">let </span>strings = strings
+                    .iter()
+                    .map(|s| <span class="macro">format!</span>(<span class="string">&quot;{:?}&quot;</span>, s))
+                    .collect::&lt;Vec&lt;<span class="kw">_</span>&gt;&gt;()
+                    .join(<span class="string">&quot; | &quot;</span>);
+                <span class="macro">write!</span>(f, <span class="string">&quot;(!({}) ~ ANY)*&quot;</span>, strings)
+            }
+            OptimizedExpr::Push(expr) =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;PUSH({})&quot;</span>, expr),
+            <span class="attr">#[cfg(feature = <span class="string">&quot;grammar-extras&quot;</span>)]
+            </span>OptimizedExpr::NodeTag(expr, tag) =&gt; {
+                <span class="macro">write!</span>(f, <span class="string">&quot;(#{} = {})&quot;</span>, tag, expr)
+            }
+            OptimizedExpr::RestoreOnErr(expr) =&gt; core::fmt::Display::fmt(expr.as_ref(), f),
+        }
+    }
+}
+
+<span class="doccomment">/// A top-down iterator over an `OptimizedExpr`.
+</span><span class="kw">pub struct </span>OptimizedExprTopDownIterator {
     current: <span class="prelude-ty">Option</span>&lt;OptimizedExpr&gt;,
     next: <span class="prelude-ty">Option</span>&lt;OptimizedExpr&gt;,
     right_branches: Vec&lt;OptimizedExpr&gt;,
 }
 
 <span class="kw">impl </span>OptimizedExprTopDownIterator {
-    <span class="kw">pub fn </span>new(expr: <span class="kw-2">&amp;</span>OptimizedExpr) -&gt; <span class="self">Self </span>{
+    <span class="doccomment">/// Creates a new top down iterator from an `OptimizedExpr`.
+    </span><span class="kw">pub fn </span>new(expr: <span class="kw-2">&amp;</span>OptimizedExpr) -&gt; <span class="self">Self </span>{
         <span class="kw">let </span><span class="kw-2">mut </span>iter = OptimizedExprTopDownIterator {
             current: <span class="prelude-val">None</span>,
             next: <span class="prelude-val">None</span>,
@@ -1106,7 +1721,7 @@
             <span class="kw">use </span><span class="kw">crate</span>::ast::Expr::<span class="kw-2">*</span>;
             <span class="macro">vec!</span>[Rule {
                 name: <span class="string">&quot;rule&quot;</span>.to_owned(),
-                ty: RuleType::Silent,
+                ty: RuleType::Atomic,
                 expr: <span class="macro">box_tree!</span>(Choice(
                     Seq(Ident(String::from(<span class="string">&quot;a&quot;</span>)), Ident(String::from(<span class="string">&quot;b&quot;</span>))),
                     Ident(String::from(<span class="string">&quot;a&quot;</span>))
@@ -1117,7 +1732,7 @@
             <span class="kw">use </span><span class="kw">crate</span>::optimizer::OptimizedExpr::<span class="kw-2">*</span>;
             <span class="macro">vec!</span>[OptimizedRule {
                 name: <span class="string">&quot;rule&quot;</span>.to_owned(),
-                ty: RuleType::Silent,
+                ty: RuleType::Atomic,
                 expr: <span class="macro">box_tree!</span>(Seq(Ident(String::from(<span class="string">&quot;a&quot;</span>)), Opt(Ident(String::from(<span class="string">&quot;b&quot;</span>))))),
             }]
         };
@@ -1176,6 +1791,395 @@
         };
 
         <span class="macro">assert_eq!</span>(optimize(rules), optimized);
+    }
+
+    <span class="kw">mod </span>display {
+        <span class="kw">use </span><span class="kw">super</span>::<span class="kw">super</span>::<span class="kw-2">*</span>;
+        <span class="doccomment">/// In previous implementation of Display for OptimizedExpr
+        /// in commit 48e0a8bd3d43a17c1c78f099610b745d18ec0c5f (actually committed by me),
+        /// Str(&quot;\n&quot;) will be displayed as
+        /// &quot;
+        /// &quot;
+        ///
+        /// It will not break the compilation in normal use.
+        ///
+        /// But when I use it in automatically generating documents,
+        /// it will quite confusing and we&#39;ll be unable to distinguish \n and \r.
+        ///
+        /// And `cargo expand` will emit codes that can&#39;t be compiled,
+        /// for it expand `#[doc(&quot;...&quot;)]` to `/// ...`,
+        /// and when the document comment breaks the line,
+        /// it will be expanded into wrong codes.
+        </span><span class="attr">#[test]
+        </span><span class="kw">fn </span>control_character() {
+            <span class="macro">assert_eq!</span>(OptimizedExpr::Str(<span class="string">&quot;\n&quot;</span>.to_owned()).to_string(), <span class="string">&quot;\&quot;\\n\&quot;&quot;</span>);
+            <span class="macro">assert_eq!</span>(
+                OptimizedExpr::Insens(<span class="string">&quot;\n&quot;</span>.to_owned()).to_string(),
+                <span class="string">&quot;^\&quot;\\n\&quot;&quot;</span>,
+            );
+            <span class="macro">assert_eq!</span>(
+                OptimizedExpr::Range(<span class="string">&quot;\n&quot;</span>.to_owned(), <span class="string">&quot;\r&quot;</span>.to_owned()).to_string(),
+                <span class="string">&quot;(&#39;\\n&#39;..&#39;\\r&#39;)&quot;</span>,
+            );
+            <span class="macro">assert_eq!</span>(
+                OptimizedExpr::Skip(<span class="macro">vec!</span>[
+                    <span class="string">&quot;\n&quot;</span>.to_owned(),
+                    <span class="string">&quot;\r&quot;</span>.to_owned(),
+                    <span class="string">&quot;\n\r&quot;</span>.to_owned(),
+                    <span class="string">&quot;\0&quot;</span>.to_owned(),
+                ])
+                .to_string(),
+                <span class="string">r#&quot;(!(&quot;\n&quot; | &quot;\r&quot; | &quot;\n\r&quot; | &quot;\0&quot;) ~ ANY)*&quot;#</span>,
+            );
+
+            <span class="macro">assert_ne!</span>(OptimizedExpr::Str(<span class="string">&quot;\n&quot;</span>.to_owned()).to_string(), <span class="string">&quot;\&quot;\n\&quot;&quot;</span>);
+        }
+
+        <span class="attr">#[test]
+        </span><span class="kw">fn </span>str() {
+            <span class="macro">assert_eq!</span>(OptimizedExpr::Str(<span class="string">&quot;a&quot;</span>.to_owned()).to_string(), <span class="string">r#&quot;&quot;a&quot;&quot;#</span>);
+        }
+
+        <span class="attr">#[test]
+        </span><span class="kw">fn </span>insens() {
+            <span class="macro">assert_eq!</span>(OptimizedExpr::Insens(<span class="string">&quot;a&quot;</span>.to_owned()).to_string(), <span class="string">r#&quot;^&quot;a&quot;&quot;#</span>);
+        }
+
+        <span class="attr">#[test]
+        </span><span class="kw">fn </span>range() {
+            <span class="macro">assert_eq!</span>(
+                OptimizedExpr::Range(<span class="string">&quot;a&quot;</span>.to_owned(), <span class="string">&quot;z&quot;</span>.to_owned()).to_string(),
+                <span class="string">r#&quot;(&#39;a&#39;..&#39;z&#39;)&quot;#</span>,
+            );
+        }
+
+        <span class="attr">#[test]
+        </span><span class="kw">fn </span>ident() {
+            <span class="macro">assert_eq!</span>(OptimizedExpr::Ident(<span class="string">&quot;a&quot;</span>.to_owned()).to_string(), <span class="string">r#&quot;a&quot;#</span>);
+        }
+
+        <span class="attr">#[test]
+        </span><span class="kw">fn </span>peek_slice() {
+            <span class="macro">assert_eq!</span>(OptimizedExpr::PeekSlice(<span class="number">0</span>, <span class="prelude-val">None</span>).to_string(), <span class="string">&quot;PEEK[0..]&quot;</span>);
+            <span class="macro">assert_eq!</span>(
+                OptimizedExpr::PeekSlice(<span class="number">0</span>, <span class="prelude-val">Some</span>(-<span class="number">1</span>)).to_string(),
+                <span class="string">&quot;PEEK[0..-1]&quot;</span>,
+            );
+            <span class="macro">assert_eq!</span>(
+                OptimizedExpr::PeekSlice(<span class="number">2</span>, <span class="prelude-val">Some</span>(<span class="number">3</span>)).to_string(),
+                <span class="string">&quot;PEEK[2..3]&quot;</span>,
+            );
+            <span class="macro">assert_eq!</span>(
+                OptimizedExpr::PeekSlice(<span class="number">2</span>, <span class="prelude-val">Some</span>(-<span class="number">1</span>)).to_string(),
+                <span class="string">&quot;PEEK[2..-1]&quot;</span>,
+            );
+            <span class="macro">assert_eq!</span>(OptimizedExpr::PeekSlice(<span class="number">0</span>, <span class="prelude-val">None</span>).to_string(), <span class="string">&quot;PEEK[0..]&quot;</span>);
+        }
+
+        <span class="attr">#[test]
+        </span><span class="kw">fn </span>pos_pred() {
+            <span class="macro">assert_eq!</span>(
+                OptimizedExpr::PosPred(Box::new(OptimizedExpr::NegPred(Box::new(
+                    OptimizedExpr::Ident(<span class="string">&quot;a&quot;</span>.to_owned()),
+                ))))
+                .to_string(),
+                <span class="string">&quot;&amp;!a&quot;</span>,
+            );
+            <span class="macro">assert_eq!</span>(
+                OptimizedExpr::PosPred(Box::new(OptimizedExpr::Choice(
+                    Box::new(OptimizedExpr::Rep(Box::new(OptimizedExpr::Ident(
+                        <span class="string">&quot;a&quot;</span>.to_owned(),
+                    )))),
+                    Box::new(OptimizedExpr::Str(<span class="string">&quot;a&quot;</span>.to_owned())),
+                )))
+                .to_string(),
+                <span class="string">r#&quot;&amp;(a* | &quot;a&quot;)&quot;#</span>,
+            );
+            <span class="macro">assert_eq!</span>(
+                OptimizedExpr::PosPred(Box::new(OptimizedExpr::RestoreOnErr(Box::new(
+                    OptimizedExpr::NegPred(Box::new(OptimizedExpr::Ident(<span class="string">&quot;a&quot;</span>.to_owned()))),
+                ))))
+                .to_string(),
+                <span class="string">&quot;&amp;!a&quot;</span>,
+            );
+        }
+
+        <span class="attr">#[test]
+        </span><span class="kw">fn </span>neg_pred() {
+            <span class="macro">assert_eq!</span>(
+                OptimizedExpr::NegPred(Box::new(OptimizedExpr::Ident(<span class="string">&quot;e&quot;</span>.to_owned()))).to_string(),
+                <span class="string">r#&quot;!e&quot;#</span>,
+            );
+            <span class="macro">assert_eq!</span>(
+                OptimizedExpr::NegPred(Box::new(OptimizedExpr::Choice(
+                    Box::new(OptimizedExpr::Push(Box::new(OptimizedExpr::Ident(
+                        <span class="string">&quot;a&quot;</span>.to_owned(),
+                    )))),
+                    Box::new(OptimizedExpr::Str(<span class="string">&quot;a&quot;</span>.to_owned())),
+                )))
+                .to_string(),
+                <span class="string">r#&quot;!(PUSH(a) | &quot;a&quot;)&quot;#</span>,
+            );
+        }
+
+        <span class="attr">#[test]
+        </span><span class="kw">fn </span>seq() {
+            <span class="macro">assert_eq!</span>(
+                OptimizedExpr::Seq(
+                    Box::new(OptimizedExpr::Ident(<span class="string">&quot;e1&quot;</span>.to_owned())),
+                    Box::new(OptimizedExpr::Ident(<span class="string">&quot;e2&quot;</span>.to_owned())),
+                )
+                .to_string(),
+                <span class="string">r#&quot;(e1 ~ e2)&quot;#</span>,
+            );
+            <span class="macro">assert_eq!</span>(
+                Expr::Seq(
+                    Box::new(Expr::Ident(<span class="string">&quot;e1&quot;</span>.to_owned())),
+                    Box::new(Expr::Seq(
+                        Box::new(Expr::Ident(<span class="string">&quot;e2&quot;</span>.to_owned())),
+                        Box::new(Expr::Ident(<span class="string">&quot;e3&quot;</span>.to_owned())),
+                    )),
+                )
+                .to_string(),
+                <span class="string">&quot;(e1 ~ e2 ~ e3)&quot;</span>,
+            );
+            <span class="macro">assert_eq!</span>(
+                Expr::Seq(
+                    Box::new(Expr::Ident(<span class="string">&quot;e1&quot;</span>.to_owned())),
+                    Box::new(Expr::Seq(
+                        Box::new(Expr::Ident(<span class="string">&quot;e2&quot;</span>.to_owned())),
+                        Box::new(Expr::Seq(
+                            Box::new(Expr::Ident(<span class="string">&quot;e3&quot;</span>.to_owned())),
+                            Box::new(Expr::Ident(<span class="string">&quot;e4&quot;</span>.to_owned())),
+                        )),
+                    )),
+                )
+                .to_string(),
+                <span class="string">&quot;(e1 ~ e2 ~ e3 ~ e4)&quot;</span>,
+            );
+            <span class="macro">assert_eq!</span>(
+                Expr::Seq(
+                    Box::new(Expr::Ident(<span class="string">&quot;e1&quot;</span>.to_owned())),
+                    Box::new(Expr::Choice(
+                        Box::new(Expr::Ident(<span class="string">&quot;e2&quot;</span>.to_owned())),
+                        Box::new(Expr::Seq(
+                            Box::new(Expr::Ident(<span class="string">&quot;e3&quot;</span>.to_owned())),
+                            Box::new(Expr::Ident(<span class="string">&quot;e4&quot;</span>.to_owned())),
+                        )),
+                    )),
+                )
+                .to_string(),
+                <span class="string">&quot;(e1 ~ (e2 | (e3 ~ e4)))&quot;</span>,
+            );
+            <span class="macro">assert_eq!</span>(
+                Expr::Seq(
+                    Box::new(Expr::Ident(<span class="string">&quot;e1&quot;</span>.to_owned())),
+                    Box::new(Expr::Seq(
+                        Box::new(Expr::Ident(<span class="string">&quot;e2&quot;</span>.to_owned())),
+                        Box::new(Expr::Choice(
+                            Box::new(Expr::Ident(<span class="string">&quot;e3&quot;</span>.to_owned())),
+                            Box::new(Expr::Ident(<span class="string">&quot;e4&quot;</span>.to_owned())),
+                        )),
+                    )),
+                )
+                .to_string(),
+                <span class="string">&quot;(e1 ~ e2 ~ (e3 | e4))&quot;</span>,
+            );
+            <span class="macro">assert_eq!</span>(
+                OptimizedExpr::Seq(
+                    Box::new(OptimizedExpr::Rep(Box::new(OptimizedExpr::Str(
+                        <span class="string">&quot;a&quot;</span>.to_owned(),
+                    )))),
+                    Box::new(OptimizedExpr::Seq(
+                        Box::new(OptimizedExpr::Ident(<span class="string">&quot;b&quot;</span>.to_owned())),
+                        Box::new(OptimizedExpr::Insens(<span class="string">&quot;c&quot;</span>.to_owned())),
+                    )),
+                )
+                .to_string(),
+                <span class="string">r#&quot;(&quot;a&quot;* ~ b ~ ^&quot;c&quot;)&quot;#</span>,
+            );
+            <span class="macro">assert_eq!</span>(
+                OptimizedExpr::Seq(
+                    Box::new(OptimizedExpr::PosPred(Box::new(OptimizedExpr::Range(
+                        <span class="string">&quot;a&quot;</span>.to_owned(),
+                        <span class="string">&quot;z&quot;</span>.to_owned(),
+                    )))),
+                    Box::new(OptimizedExpr::NegPred(Box::new(OptimizedExpr::Opt(
+                        Box::new(OptimizedExpr::Range(<span class="string">&quot;A&quot;</span>.to_owned(), <span class="string">&quot;Z&quot;</span>.to_owned())),
+                    )))),
+                )
+                .to_string(),
+                <span class="string">&quot;(&amp;(&#39;a&#39;..&#39;z&#39;) ~ !(&#39;A&#39;..&#39;Z&#39;)?)&quot;</span>,
+            );
+        }
+
+        <span class="attr">#[test]
+        </span><span class="kw">fn </span>choice() {
+            <span class="macro">assert_eq!</span>(
+                OptimizedExpr::Choice(
+                    Box::new(OptimizedExpr::Ident(<span class="string">&quot;e1&quot;</span>.to_owned())),
+                    Box::new(OptimizedExpr::Ident(<span class="string">&quot;e2&quot;</span>.to_owned())),
+                )
+                .to_string(),
+                <span class="string">r#&quot;(e1 | e2)&quot;#</span>,
+            );
+            <span class="macro">assert_eq!</span>(
+                Expr::Choice(
+                    Box::new(Expr::Ident(<span class="string">&quot;e1&quot;</span>.to_owned())),
+                    Box::new(Expr::Choice(
+                        Box::new(Expr::Ident(<span class="string">&quot;e2&quot;</span>.to_owned())),
+                        Box::new(Expr::Ident(<span class="string">&quot;e3&quot;</span>.to_owned())),
+                    )),
+                )
+                .to_string(),
+                <span class="string">&quot;(e1 | e2 | e3)&quot;</span>,
+            );
+            <span class="macro">assert_eq!</span>(
+                Expr::Choice(
+                    Box::new(Expr::Ident(<span class="string">&quot;e1&quot;</span>.to_owned())),
+                    Box::new(Expr::Choice(
+                        Box::new(Expr::Ident(<span class="string">&quot;e2&quot;</span>.to_owned())),
+                        Box::new(Expr::Choice(
+                            Box::new(Expr::Ident(<span class="string">&quot;e3&quot;</span>.to_owned())),
+                            Box::new(Expr::Ident(<span class="string">&quot;e4&quot;</span>.to_owned())),
+                        )),
+                    )),
+                )
+                .to_string(),
+                <span class="string">&quot;(e1 | e2 | e3 | e4)&quot;</span>,
+            );
+            <span class="macro">assert_eq!</span>(
+                Expr::Choice(
+                    Box::new(Expr::Ident(<span class="string">&quot;e1&quot;</span>.to_owned())),
+                    Box::new(Expr::Seq(
+                        Box::new(Expr::Ident(<span class="string">&quot;e2&quot;</span>.to_owned())),
+                        Box::new(Expr::Choice(
+                            Box::new(Expr::Ident(<span class="string">&quot;e3&quot;</span>.to_owned())),
+                            Box::new(Expr::Ident(<span class="string">&quot;e4&quot;</span>.to_owned())),
+                        )),
+                    )),
+                )
+                .to_string(),
+                <span class="string">&quot;(e1 | (e2 ~ (e3 | e4)))&quot;</span>,
+            );
+            <span class="macro">assert_eq!</span>(
+                OptimizedExpr::Choice(
+                    Box::new(OptimizedExpr::Str(<span class="string">&quot;a&quot;</span>.to_owned())),
+                    Box::new(OptimizedExpr::Choice(
+                        Box::new(OptimizedExpr::Push(Box::new(OptimizedExpr::Ident(
+                            <span class="string">&quot;b&quot;</span>.to_owned(),
+                        )))),
+                        Box::new(OptimizedExpr::Insens(<span class="string">&quot;c&quot;</span>.to_owned())),
+                    )),
+                )
+                .to_string(),
+                <span class="string">r#&quot;(&quot;a&quot; | PUSH(b) | ^&quot;c&quot;)&quot;#</span>,
+            );
+        }
+
+        <span class="attr">#[test]
+        </span><span class="kw">fn </span>opt() {
+            <span class="macro">assert_eq!</span>(
+                OptimizedExpr::Opt(Box::new(OptimizedExpr::Ident(<span class="string">&quot;e&quot;</span>.to_owned()))).to_string(),
+                <span class="string">&quot;e?&quot;</span>,
+            );
+        }
+
+        <span class="attr">#[test]
+        </span><span class="kw">fn </span>rep() {
+            <span class="macro">assert_eq!</span>(
+                OptimizedExpr::Rep(Box::new(OptimizedExpr::Ident(<span class="string">&quot;x&quot;</span>.to_owned()))).to_string(),
+                <span class="string">&quot;x*&quot;</span>,
+            );
+            <span class="macro">assert_eq!</span>(
+                OptimizedExpr::Rep(Box::new(OptimizedExpr::Range(
+                    <span class="string">&quot;0&quot;</span>.to_owned(),
+                    <span class="string">&quot;9&quot;</span>.to_owned(),
+                )))
+                .to_string(),
+                <span class="string">&quot;(&#39;0&#39;..&#39;9&#39;)*&quot;</span>,
+            );
+        }
+
+        <span class="attr">#[test]
+        #[cfg(feature = <span class="string">&quot;grammar-extras&quot;</span>)]
+        </span><span class="kw">fn </span>rep_once() {
+            <span class="macro">assert_eq!</span>(
+                OptimizedExpr::RepOnce(Box::new(OptimizedExpr::Ident(<span class="string">&quot;e&quot;</span>.to_owned()))).to_string(),
+                <span class="string">&quot;e+&quot;</span>,
+            );
+            <span class="macro">assert_eq!</span>(
+                OptimizedExpr::RepOnce(Box::new(OptimizedExpr::Range(
+                    <span class="string">&quot;0&quot;</span>.to_owned(),
+                    <span class="string">&quot;9&quot;</span>.to_owned(),
+                )))
+                .to_string(),
+                <span class="string">&quot;(&#39;0&#39;..&#39;9&#39;)+&quot;</span>,
+            );
+        }
+
+        <span class="attr">#[test]
+        </span><span class="kw">fn </span>skip() {
+            <span class="macro">assert_eq!</span>(
+                OptimizedExpr::Skip(
+                    [<span class="string">&quot;a&quot;</span>, <span class="string">&quot;bc&quot;</span>]
+                        .into_iter()
+                        .map(|s| s.to_owned())
+                        .collect::&lt;Vec&lt;<span class="kw">_</span>&gt;&gt;(),
+                )
+                .to_string(),
+                <span class="string">r#&quot;(!(&quot;a&quot; | &quot;bc&quot;) ~ ANY)*&quot;#</span>,
+            );
+        }
+
+        <span class="attr">#[test]
+        </span><span class="kw">fn </span>push() {
+            <span class="macro">assert_eq!</span>(
+                OptimizedExpr::Push(Box::new(OptimizedExpr::Ident(<span class="string">&quot;e&quot;</span>.to_owned()))).to_string(),
+                <span class="string">&quot;PUSH(e)&quot;</span>,
+            );
+        }
+
+        <span class="attr">#[test]
+        #[cfg(feature = <span class="string">&quot;grammar-extras&quot;</span>)]
+        </span><span class="kw">fn </span>node_tag() {
+            <span class="macro">assert_eq!</span>(
+                OptimizedExpr::NodeTag(
+                    Box::new(OptimizedExpr::Ident(<span class="string">&quot;expr&quot;</span>.to_owned())),
+                    <span class="string">&quot;label&quot;</span>.to_owned(),
+                )
+                .to_string(),
+                <span class="string">r#&quot;(#label = expr)&quot;#</span>,
+            );
+            <span class="macro">assert_eq!</span>(
+                OptimizedExpr::NodeTag(
+                    Box::new(OptimizedExpr::Ident(<span class="string">&quot;x&quot;</span>.to_owned())),
+                    <span class="string">&quot;X&quot;</span>.to_owned(),
+                )
+                .to_string(),
+                <span class="string">r#&quot;(#X = x)&quot;#</span>,
+            );
+            <span class="macro">assert_eq!</span>(
+                OptimizedExpr::NodeTag(
+                    Box::new(OptimizedExpr::Seq(
+                        Box::new(OptimizedExpr::Ident(<span class="string">&quot;x&quot;</span>.to_owned())),
+                        Box::new(OptimizedExpr::Str(<span class="string">&quot;y&quot;</span>.to_owned())),
+                    )),
+                    <span class="string">&quot;X&quot;</span>.to_owned(),
+                )
+                .to_string(),
+                <span class="string">r#&quot;(#X = (x ~ &quot;y&quot;))&quot;#</span>,
+            );
+        }
+
+        <span class="attr">#[test]
+        </span><span class="kw">fn </span>restore_on_err() {
+            <span class="macro">assert_eq!</span>(
+                OptimizedExpr::RestoreOnErr(Box::new(OptimizedExpr::Ident(<span class="string">&quot;e&quot;</span>.to_owned())))
+                    .to_string(),
+                <span class="string">&quot;e&quot;</span>,
+            );
+        }
     }
 }
 </code></pre></div></section></main></body></html>

@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/nix/store/jnqxxv1xi811ni996b002f4jnyz38xck-vendor-cargo-deps/c19b7c6f923b580ac259164a89f2577984ad5ab09ee9d583b888f934adbbe8d0/rustls-0.20.6/src/server/server_conn.rs`."><title>server_conn.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-f3501f0f5ae15dfb.css" id="mainThemeStyle"><div id="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="rustls" data-themes="" data-resource-suffix="" data-rustdoc-version="1.71.0 (8ede3aae2 2023-07-12)" data-search-js="search-4926e5fc22a5646a.js" data-settings-js="settings-de11bff964e9d4e5.js" data-settings-css="settings-8c76f75bfb6bd192.css" data-theme-light-css="light-0f8c037637f9eb3e.css" data-theme-dark-css="dark-1097f8e92a01e3cf.css" data-theme-ayu-css="ayu-614652228113ac93.css" ></div><script src="../../../static.files/storage-62ce34ea385b278a.js"></script><script defer src="../../../static.files/source-script-11255107d0a65077.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../static.files/main-f0540c1d82cde29b.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../../../static.files/light-0f8c037637f9eb3e.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../../../static.files/dark-1097f8e92a01e3cf.css"><link rel="stylesheet" href="../../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../../rustls/index.html"><img class="rust-logo" src="../../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/nix/store/yf45a1rayffhnidhgyjynpyhr9lqkd09-vendor-cargo-deps/c19b7c6f923b580ac259164a89f2577984ad5ab09ee9d583b888f934adbbe8d0/rustls-0.20.8/src/server/server_conn.rs`."><title>server_conn.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-f3501f0f5ae15dfb.css" id="mainThemeStyle"><div id="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="rustls" data-themes="" data-resource-suffix="" data-rustdoc-version="1.71.0 (8ede3aae2 2023-07-12)" data-search-js="search-4926e5fc22a5646a.js" data-settings-js="settings-de11bff964e9d4e5.js" data-settings-css="settings-8c76f75bfb6bd192.css" data-theme-light-css="light-0f8c037637f9eb3e.css" data-theme-dark-css="dark-1097f8e92a01e3cf.css" data-theme-ayu-css="ayu-614652228113ac93.css" ></div><script src="../../../static.files/storage-62ce34ea385b278a.js"></script><script defer src="../../../static.files/source-script-11255107d0a65077.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../static.files/main-f0540c1d82cde29b.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../../../static.files/light-0f8c037637f9eb3e.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../../../static.files/dark-1097f8e92a01e3cf.css"><link rel="stylesheet" href="../../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../../rustls/index.html"><img class="rust-logo" src="../../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -788,8 +788,68 @@
 <a href="#788" id="788">788</a>
 <a href="#789" id="789">789</a>
 <a href="#790" id="790">790</a>
+<a href="#791" id="791">791</a>
+<a href="#792" id="792">792</a>
+<a href="#793" id="793">793</a>
+<a href="#794" id="794">794</a>
+<a href="#795" id="795">795</a>
+<a href="#796" id="796">796</a>
+<a href="#797" id="797">797</a>
+<a href="#798" id="798">798</a>
+<a href="#799" id="799">799</a>
+<a href="#800" id="800">800</a>
+<a href="#801" id="801">801</a>
+<a href="#802" id="802">802</a>
+<a href="#803" id="803">803</a>
+<a href="#804" id="804">804</a>
+<a href="#805" id="805">805</a>
+<a href="#806" id="806">806</a>
+<a href="#807" id="807">807</a>
+<a href="#808" id="808">808</a>
+<a href="#809" id="809">809</a>
+<a href="#810" id="810">810</a>
+<a href="#811" id="811">811</a>
+<a href="#812" id="812">812</a>
+<a href="#813" id="813">813</a>
+<a href="#814" id="814">814</a>
+<a href="#815" id="815">815</a>
+<a href="#816" id="816">816</a>
+<a href="#817" id="817">817</a>
+<a href="#818" id="818">818</a>
+<a href="#819" id="819">819</a>
+<a href="#820" id="820">820</a>
+<a href="#821" id="821">821</a>
+<a href="#822" id="822">822</a>
+<a href="#823" id="823">823</a>
+<a href="#824" id="824">824</a>
+<a href="#825" id="825">825</a>
+<a href="#826" id="826">826</a>
+<a href="#827" id="827">827</a>
+<a href="#828" id="828">828</a>
+<a href="#829" id="829">829</a>
+<a href="#830" id="830">830</a>
+<a href="#831" id="831">831</a>
+<a href="#832" id="832">832</a>
+<a href="#833" id="833">833</a>
+<a href="#834" id="834">834</a>
+<a href="#835" id="835">835</a>
+<a href="#836" id="836">836</a>
+<a href="#837" id="837">837</a>
+<a href="#838" id="838">838</a>
+<a href="#839" id="839">839</a>
+<a href="#840" id="840">840</a>
+<a href="#841" id="841">841</a>
+<a href="#842" id="842">842</a>
+<a href="#843" id="843">843</a>
+<a href="#844" id="844">844</a>
+<a href="#845" id="845">845</a>
+<a href="#846" id="846">846</a>
+<a href="#847" id="847">847</a>
+<a href="#848" id="848">848</a>
+<a href="#849" id="849">849</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::builder::{ConfigBuilder, WantsCipherSuites};
 <span class="kw">use </span><span class="kw">crate</span>::conn::{CommonState, ConnectionCommon, Side, State};
+<span class="kw">use </span><span class="kw">crate</span>::enums::{CipherSuite, ProtocolVersion, SignatureScheme};
 <span class="kw">use </span><span class="kw">crate</span>::error::Error;
 <span class="kw">use </span><span class="kw">crate</span>::kx::SupportedKxGroup;
 <span class="attr">#[cfg(feature = <span class="string">&quot;logging&quot;</span>)]
@@ -797,17 +857,17 @@
 <span class="kw">use </span><span class="kw">crate</span>::msgs::base::{Payload, PayloadU8};
 <span class="attr">#[cfg(feature = <span class="string">&quot;quic&quot;</span>)]
 </span><span class="kw">use </span><span class="kw">crate</span>::msgs::enums::AlertDescription;
-<span class="kw">use </span><span class="kw">crate</span>::msgs::enums::ProtocolVersion;
-<span class="kw">use </span><span class="kw">crate</span>::msgs::enums::SignatureScheme;
 <span class="kw">use </span><span class="kw">crate</span>::msgs::handshake::{ClientHelloPayload, ServerExtension};
 <span class="kw">use </span><span class="kw">crate</span>::msgs::message::Message;
+<span class="kw">use </span><span class="kw">crate</span>::sign;
 <span class="kw">use </span><span class="kw">crate</span>::suites::SupportedCipherSuite;
 <span class="kw">use </span><span class="kw">crate</span>::vecbuf::ChunkVecBuffer;
 <span class="kw">use </span><span class="kw">crate</span>::verify;
+<span class="attr">#[cfg(feature = <span class="string">&quot;secret_extraction&quot;</span>)]
+</span><span class="kw">use </span><span class="kw">crate</span>::ExtractedSecrets;
 <span class="kw">use </span><span class="kw">crate</span>::KeyLog;
 <span class="attr">#[cfg(feature = <span class="string">&quot;quic&quot;</span>)]
 </span><span class="kw">use crate</span>::{conn::Protocol, quic};
-<span class="kw">use crate</span>::{sign, CipherSuite};
 
 <span class="kw">use </span><span class="kw">super</span>::hs;
 
@@ -942,9 +1002,23 @@
         <span class="self">self</span>.signature_schemes
     }
 
-    <span class="doccomment">/// Get the alpn.
+    <span class="doccomment">/// Get the ALPN protocol identifiers submitted by the client.
     ///
-    /// Returns `None` if the client did not include an ALPN extension
+    /// Returns `None` if the client did not include an ALPN extension.
+    ///
+    /// Application Layer Protocol Negotiation (ALPN) is a TLS extension that lets a client
+    /// submit a set of identifiers that each a represent an application-layer protocol.
+    /// The server will then pick its preferred protocol from the set submitted by the client.
+    /// Each identifier is represented as a byte array, although common values are often ASCII-encoded.
+    /// See the official RFC-7301 specifications at &lt;https://datatracker.ietf.org/doc/html/rfc7301&gt;
+    /// for more information on ALPN.
+    ///
+    /// For example, a HTTP client might specify &quot;http/1.1&quot; and/or &quot;h2&quot;. Other well-known values
+    /// are listed in the at IANA registry at
+    /// &lt;https://www.iana.org/assignments/tls-extensiontype-values/tls-extensiontype-values.xhtml#alpn-protocol-ids&gt;.
+    ///
+    /// The server can specify supported ALPN protocols by setting [`ServerConfig::alpn_protocols`].
+    /// During the handshake, the server will select the first protocol configured that the client supports.
     </span><span class="kw">pub fn </span>alpn(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw">impl </span>Iterator&lt;Item = <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>[u8]&gt;&gt; {
         <span class="self">self</span>.alpn.map(|protocols| {
             protocols
@@ -1021,6 +1095,11 @@
     /// does nothing.
     </span><span class="kw">pub </span>key_log: Arc&lt;<span class="kw">dyn </span>KeyLog&gt;,
 
+    <span class="doccomment">/// Allows traffic secrets to be extracted after the handshake,
+    /// e.g. for kTLS setup.
+    </span><span class="attr">#[cfg(feature = <span class="string">&quot;secret_extraction&quot;</span>)]
+    </span><span class="kw">pub </span>enable_secret_extraction: bool,
+
     <span class="doccomment">/// Amount of early data to accept for sessions created by
     /// this config.  Specify 0 to disable early data.  The
     /// default is 0.
@@ -1054,6 +1133,18 @@
     /// sent by the server comes after receiving and validating the client&#39;s
     /// handshake up to the `Finished` message.  This is the safest option.
     </span><span class="kw">pub </span>send_half_rtt_data: bool,
+}
+
+<span class="kw">impl </span>fmt::Debug <span class="kw">for </span>ServerConfig {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
+        f.debug_struct(<span class="string">&quot;ServerConfig&quot;</span>)
+            .field(<span class="string">&quot;ignore_client_order&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.ignore_client_order)
+            .field(<span class="string">&quot;max_fragment_size&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.max_fragment_size)
+            .field(<span class="string">&quot;alpn_protocols&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.alpn_protocols)
+            .field(<span class="string">&quot;max_early_data_size&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.max_early_data_size)
+            .field(<span class="string">&quot;send_half_rtt_data&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.send_half_rtt_data)
+            .finish_non_exhaustive()
+    }
 }
 
 <span class="kw">impl </span>ServerConfig {
@@ -1101,8 +1192,8 @@
     }
 
     <span class="attr">#[cfg(read_buf)]
-    </span><span class="kw">fn </span>read_buf(<span class="kw-2">&amp;mut </span><span class="self">self</span>, buf: <span class="kw-2">&amp;mut </span>io::ReadBuf&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; io::Result&lt;()&gt; {
-        <span class="self">self</span>.early_data.read_buf(buf)
+    </span><span class="kw">fn </span>read_buf(<span class="kw-2">&amp;mut </span><span class="self">self</span>, cursor: io::BorrowedCursor&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; io::Result&lt;()&gt; {
+        <span class="self">self</span>.early_data.read_buf(cursor)
     }
 }
 
@@ -1125,7 +1216,12 @@
         config: Arc&lt;ServerConfig&gt;,
         extra_exts: Vec&lt;ServerExtension&gt;,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, Error&gt; {
-        <span class="kw">let </span>common = CommonState::new(config.max_fragment_size, Side::Server)<span class="question-mark">?</span>;
+        <span class="kw">let </span><span class="kw-2">mut </span>common = CommonState::new(Side::Server);
+        common.set_max_fragment_size(config.max_fragment_size)<span class="question-mark">?</span>;
+        <span class="attr">#[cfg(feature = <span class="string">&quot;secret_extraction&quot;</span>)]
+        </span>{
+            common.enable_secret_extraction = config.enable_secret_extraction;
+        }
         <span class="prelude-val">Ok</span>(<span class="self">Self </span>{
             inner: ConnectionCommon::new(
                 Box::new(hs::ExpectClientHello::new(config, extra_exts)),
@@ -1216,6 +1312,12 @@
             <span class="prelude-val">None
         </span>}
     }
+
+    <span class="doccomment">/// Extract secrets, so they can be used when configuring kTLS, for example.
+    </span><span class="attr">#[cfg(feature = <span class="string">&quot;secret_extraction&quot;</span>)]
+    </span><span class="kw">pub fn </span>extract_secrets(<span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;ExtractedSecrets, Error&gt; {
+        <span class="self">self</span>.inner.extract_secrets()
+    }
 }
 
 <span class="kw">impl </span>fmt::Debug <span class="kw">for </span>ServerConnection {
@@ -1253,21 +1355,34 @@
     inner: <span class="prelude-ty">Option</span>&lt;ConnectionCommon&lt;ServerConnectionData&gt;&gt;,
 }
 
+<span class="kw">impl </span>Default <span class="kw">for </span>Acceptor {
+    <span class="kw">fn </span>default() -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{
+            inner: <span class="prelude-val">Some</span>(ConnectionCommon::new(
+                Box::new(Accepting),
+                ServerConnectionData::default(),
+                CommonState::new(Side::Server),
+            )),
+        }
+    }
+}
+
 <span class="kw">impl </span>Acceptor {
     <span class="doccomment">/// Create a new `Acceptor`.
+    </span><span class="attr">#[deprecated(
+        since = <span class="string">&quot;0.20.7&quot;</span>,
+        note = <span class="string">&quot;Use Acceptor::default instead for an infallible constructor&quot;
+    </span>)]
     </span><span class="kw">pub fn </span>new() -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, Error&gt; {
-        <span class="kw">let </span>common = CommonState::new(<span class="prelude-val">None</span>, Side::Server)<span class="question-mark">?</span>;
-        <span class="kw">let </span>state = Box::new(Accepting);
-        <span class="prelude-val">Ok</span>(<span class="self">Self </span>{
-            inner: <span class="prelude-val">Some</span>(ConnectionCommon::new(state, Default::default(), common)),
-        })
+        <span class="prelude-val">Ok</span>(<span class="self">Self</span>::default())
     }
 
     <span class="doccomment">/// Returns true if the caller should call [`Connection::read_tls()`] as soon as possible.
     ///
-    /// For more details, refer to [`CommonState::wants_read()`].
+    /// Since the purpose of an Acceptor is to read and then parse TLS bytes, this always returns true.
     ///
     /// [`Connection::read_tls()`]: crate::Connection::read_tls
+    </span><span class="attr">#[deprecated(since = <span class="string">&quot;0.20.7&quot;</span>, note = <span class="string">&quot;Always returns true&quot;</span>)]
     </span><span class="kw">pub fn </span>wants_read(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
         <span class="self">self</span>.inner
             .as_ref()
@@ -1293,39 +1408,32 @@
 
     <span class="doccomment">/// Check if a `ClientHello` message has been received.
     ///
-    /// Returns an error if the `ClientHello` message is invalid or if the acceptor has already
-    /// yielded an [`Accepted`]. Returns `Ok(None)` if no complete `ClientHello` has been received
-    /// yet.
+    /// Returns `Ok(None)` if the complete `ClientHello` has not yet been received.
+    /// Do more I/O and then call this function again.
+    ///
+    /// Returns `Ok(Some(accepted))` if the connection has been accepted. Call
+    /// `accepted.into_connection()` to continue. Do not call this function again.
+    ///
+    /// Returns `Err(err)` if an error occurred. Do not call this function again.
     </span><span class="kw">pub fn </span>accept(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="prelude-ty">Option</span>&lt;Accepted&gt;, Error&gt; {
         <span class="kw">let </span><span class="kw-2">mut </span>connection = <span class="kw">match </span><span class="self">self</span>.inner.take() {
             <span class="prelude-val">Some</span>(conn) =&gt; conn,
             <span class="prelude-val">None </span>=&gt; {
-                <span class="kw">return </span><span class="prelude-val">Err</span>(Error::General(
-                    <span class="string">&quot;cannot accept after successful acceptance&quot;</span>.into(),
-                ));
+                <span class="kw">return </span><span class="prelude-val">Err</span>(Error::General(<span class="string">&quot;Acceptor polled after completion&quot;</span>.into()));
             }
         };
 
-        <span class="kw">let </span>message = <span class="kw">match </span>connection.first_handshake_message() {
-            <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(msg)) =&gt; msg,
-            <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>) =&gt; {
+        <span class="kw">let </span>message = <span class="kw">match </span>connection.first_handshake_message()<span class="question-mark">? </span>{
+            <span class="prelude-val">Some</span>(msg) =&gt; msg,
+            <span class="prelude-val">None </span>=&gt; {
                 <span class="self">self</span>.inner = <span class="prelude-val">Some</span>(connection);
                 <span class="kw">return </span><span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>);
             }
-            <span class="prelude-val">Err</span>(e) =&gt; {
-                <span class="self">self</span>.inner = <span class="prelude-val">Some</span>(connection);
-                <span class="kw">return </span><span class="prelude-val">Err</span>(e);
-            }
         };
-
-        <span class="comment">// XXX(https://github.com/rustls/rustls/issues/973): We shouldn&#39;t be using
-        // `ALL_CIPHER_SUITES` here.
-        </span><span class="kw">let </span>supported_cipher_suites = <span class="kw-2">&amp;</span><span class="kw">crate</span>::ALL_CIPHER_SUITES;
 
         <span class="kw">let </span>(<span class="kw">_</span>, sig_schemes) = hs::process_client_hello(
             <span class="kw-2">&amp;</span>message,
             <span class="bool-val">false</span>,
-            supported_cipher_suites,
             <span class="kw-2">&amp;mut </span>connection.common_state,
             <span class="kw-2">&amp;mut </span>connection.data,
         )<span class="question-mark">?</span>;
@@ -1368,6 +1476,14 @@
         <span class="self">self</span>.connection
             .common_state
             .set_max_fragment_size(config.max_fragment_size)<span class="question-mark">?</span>;
+
+        <span class="attr">#[cfg(feature = <span class="string">&quot;secret_extraction&quot;</span>)]
+        </span>{
+            <span class="self">self</span>.connection
+                .common_state
+                .enable_secret_extraction = config.enable_secret_extraction;
+        }
+
         <span class="kw">let </span>state = hs::ExpectClientHello::new(config, Vec::new());
         <span class="kw">let </span><span class="kw-2">mut </span>cx = hs::ServerContext {
             common: <span class="kw-2">&amp;mut </span><span class="self">self</span>.connection.common_state,
@@ -1448,9 +1564,9 @@
     }
 
     <span class="attr">#[cfg(read_buf)]
-    </span><span class="kw">fn </span>read_buf(<span class="kw-2">&amp;mut </span><span class="self">self</span>, buf: <span class="kw-2">&amp;mut </span>io::ReadBuf&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; io::Result&lt;()&gt; {
+    </span><span class="kw">fn </span>read_buf(<span class="kw-2">&amp;mut </span><span class="self">self</span>, cursor: io::BorrowedCursor&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; io::Result&lt;()&gt; {
         <span class="kw">match </span><span class="self">self </span>{
-            <span class="self">Self</span>::Accepted(<span class="kw-2">ref mut </span>received) =&gt; received.read_buf(buf),
+            <span class="self">Self</span>::Accepted(<span class="kw-2">ref mut </span>received) =&gt; received.read_buf(cursor),
             <span class="kw">_ </span>=&gt; <span class="prelude-val">Err</span>(io::Error::from(io::ErrorKind::BrokenPipe)),
         }
     }
@@ -1479,11 +1595,12 @@
 <span class="attr">#[cfg(read_buf)]
 #[test]
 </span><span class="kw">fn </span>test_read_buf_in_new_state() {
+    <span class="kw">use </span>std::io::BorrowedBuf;
+
+    <span class="kw">let </span><span class="kw-2">mut </span>buf = [<span class="number">0u8</span>; <span class="number">5</span>];
+    <span class="kw">let </span><span class="kw-2">mut </span>buf: BorrowedBuf&lt;<span class="lifetime">&#39;_</span>&gt; = buf.as_mut_slice().into();
     <span class="macro">assert_eq!</span>(
-        <span class="macro">format!</span>(
-            <span class="string">&quot;{:?}&quot;</span>,
-            EarlyDataState::default().read_buf(<span class="kw-2">&amp;mut </span>io::ReadBuf::new(<span class="kw-2">&amp;mut </span>[<span class="number">0u8</span>; <span class="number">5</span>]))
-        ),
+        <span class="macro">format!</span>(<span class="string">&quot;{:?}&quot;</span>, EarlyDataState::default().read_buf(buf.unfilled())),
         <span class="string">&quot;Err(Kind(BrokenPipe))&quot;
     </span>);
 }
@@ -1545,6 +1662,7 @@
 
 <span class="doccomment">/// Methods specific to QUIC server sessions
 </span><span class="attr">#[cfg(feature = <span class="string">&quot;quic&quot;</span>)]
+#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;quic&quot;</span>)))]
 </span><span class="kw">pub trait </span>ServerQuicExt {
     <span class="doccomment">/// Make a new QUIC ServerConnection. This differs from `ServerConnection::new()`
     /// in that it takes an extra argument, `params`, which contains the

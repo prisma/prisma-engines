@@ -31,7 +31,7 @@ the need to maintain a <code>MutexGuard</code> object alive, for example when
 dealing with FFI.</p>
 <h5 id="safety"><a href="#safety">Safety</a></h5>
 <p>This method must only be called if the current thread logically owns a
-<code>MutexGuard</code> but that guard has be discarded using <code>mem::forget</code>.
+<code>MutexGuard</code> but that guard has been discarded using <code>mem::forget</code>.
 Behavior is undefined if a mutex is unlocked when not locked.</p>
 </div></details><details class="toggle method-toggle" open><summary><section id="method.raw" class="method"><a class="srclink rightside" href="../src/lock_api/mutex.rs.html#277-279">source</a><h4 class="code-header">pub unsafe fn <a href="#method.raw" class="fn">raw</a>(&amp;self) -&gt; <a class="primitive" href="https://doc.rust-lang.org/1.71.0/core/primitive.reference.html">&amp;R</a></h4></section></summary><div class="docblock"><p>Returns the underlying raw mutex object.</p>
 <p>Note that you will most likely need to import the <code>RawMutex</code> trait from
@@ -53,7 +53,7 @@ the need to maintain a <code>MutexGuard</code> object alive, for example when
 dealing with FFI.</p>
 <h5 id="safety-3"><a href="#safety-3">Safety</a></h5>
 <p>This method must only be called if the current thread logically owns a
-<code>MutexGuard</code> but that guard has be discarded using <code>mem::forget</code>.
+<code>MutexGuard</code> but that guard has been discarded using <code>mem::forget</code>.
 Behavior is undefined if a mutex is unlocked when not locked.</p>
 </div></details></div></details><details class="toggle implementors-toggle" open><summary><section id="impl-Mutex%3CR,+T%3E-4" class="impl"><a class="srclink rightside" href="../src/lock_api/mutex.rs.html#355-418">source</a><a href="#impl-Mutex%3CR,+T%3E-4" class="anchor">§</a><h3 class="code-header">impl&lt;R: <a class="trait" href="trait.RawMutexTimed.html" title="trait lock_api::RawMutexTimed">RawMutexTimed</a>, T: ?<a class="trait" href="https://doc.rust-lang.org/1.71.0/core/marker/trait.Sized.html" title="trait core::marker::Sized">Sized</a>&gt; <a class="struct" href="struct.Mutex.html" title="struct lock_api::Mutex">Mutex</a>&lt;R, T&gt;</h3></section></summary><div class="impl-items"><details class="toggle method-toggle" open><summary><section id="method.try_lock_for" class="method"><a class="srclink rightside" href="../src/lock_api/mutex.rs.html#362-369">source</a><h4 class="code-header">pub fn <a href="#method.try_lock_for" class="fn">try_lock_for</a>(&amp;self, timeout: R::<a class="associatedtype" href="trait.RawMutexTimed.html#associatedtype.Duration" title="type lock_api::RawMutexTimed::Duration">Duration</a>) -&gt; <a class="enum" href="https://doc.rust-lang.org/1.71.0/core/option/enum.Option.html" title="enum core::option::Option">Option</a>&lt;<a class="struct" href="struct.MutexGuard.html" title="struct lock_api::MutexGuard">MutexGuard</a>&lt;'_, R, T&gt;&gt;</h4></section></summary><div class="docblock"><p>Attempts to acquire this lock until a timeout is reached.</p>
 <p>If the lock could not be acquired before the timeout expired, then

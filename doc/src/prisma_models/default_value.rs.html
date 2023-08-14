@@ -366,6 +366,7 @@
 <a href="#366" id="366">366</a>
 <a href="#367" id="367">367</a>
 <a href="#368" id="368">368</a>
+<a href="#369" id="369">369</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>prisma_value::PrismaValue;
 <span class="kw">use </span>std::fmt;
 
@@ -643,7 +644,8 @@
 
     <span class="attr">#[cfg(feature = <span class="string">&quot;default_generators&quot;</span>)]
     </span><span class="kw">fn </span>generate_cuid() -&gt; PrismaValue {
-        PrismaValue::String(cuid::cuid().unwrap())
+        <span class="attr">#[allow(deprecated)]
+        </span>PrismaValue::String(cuid::cuid().unwrap())
     }
 
     <span class="attr">#[cfg(feature = <span class="string">&quot;default_generators&quot;</span>)]

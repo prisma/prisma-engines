@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"enum":["Bitness","Type","Version"],"fn":["get"],"struct":["Info"]};

@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/nix/store/jnqxxv1xi811ni996b002f4jnyz38xck-vendor-cargo-deps/c19b7c6f923b580ac259164a89f2577984ad5ab09ee9d583b888f934adbbe8d0/subtle-2.4.1/src/lib.rs`."><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-f3501f0f5ae15dfb.css" id="mainThemeStyle"><div id="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="subtle" data-themes="" data-resource-suffix="" data-rustdoc-version="1.71.0 (8ede3aae2 2023-07-12)" data-search-js="search-4926e5fc22a5646a.js" data-settings-js="settings-de11bff964e9d4e5.js" data-settings-css="settings-8c76f75bfb6bd192.css" data-theme-light-css="light-0f8c037637f9eb3e.css" data-theme-dark-css="dark-1097f8e92a01e3cf.css" data-theme-ayu-css="ayu-614652228113ac93.css" ></div><script src="../../static.files/storage-62ce34ea385b278a.js"></script><script defer src="../../static.files/source-script-11255107d0a65077.js"></script><script defer src="../../source-files.js"></script><script defer src="../../static.files/main-f0540c1d82cde29b.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../../static.files/light-0f8c037637f9eb3e.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../../static.files/dark-1097f8e92a01e3cf.css"><link rel="stylesheet" href="../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../subtle/index.html"><img src="https://doc.dalek.rs/assets/dalek-logo-clear.png" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/nix/store/yf45a1rayffhnidhgyjynpyhr9lqkd09-vendor-cargo-deps/c19b7c6f923b580ac259164a89f2577984ad5ab09ee9d583b888f934adbbe8d0/subtle-2.5.0/src/lib.rs`."><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-f3501f0f5ae15dfb.css" id="mainThemeStyle"><div id="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="subtle" data-themes="" data-resource-suffix="" data-rustdoc-version="1.71.0 (8ede3aae2 2023-07-12)" data-search-js="search-4926e5fc22a5646a.js" data-settings-js="settings-de11bff964e9d4e5.js" data-settings-css="settings-8c76f75bfb6bd192.css" data-theme-light-css="light-0f8c037637f9eb3e.css" data-theme-dark-css="dark-1097f8e92a01e3cf.css" data-theme-ayu-css="ayu-614652228113ac93.css" ></div><script src="../../static.files/storage-62ce34ea385b278a.js"></script><script defer src="../../static.files/source-script-11255107d0a65077.js"></script><script defer src="../../source-files.js"></script><script defer src="../../static.files/main-f0540c1d82cde29b.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../../static.files/light-0f8c037637f9eb3e.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../../static.files/dark-1097f8e92a01e3cf.css"><link rel="stylesheet" href="../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../subtle/index.html"><img src="https://doc.dalek.rs/assets/dalek-logo-clear.png" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -862,6 +862,118 @@
 <a href="#862" id="862">862</a>
 <a href="#863" id="863">863</a>
 <a href="#864" id="864">864</a>
+<a href="#865" id="865">865</a>
+<a href="#866" id="866">866</a>
+<a href="#867" id="867">867</a>
+<a href="#868" id="868">868</a>
+<a href="#869" id="869">869</a>
+<a href="#870" id="870">870</a>
+<a href="#871" id="871">871</a>
+<a href="#872" id="872">872</a>
+<a href="#873" id="873">873</a>
+<a href="#874" id="874">874</a>
+<a href="#875" id="875">875</a>
+<a href="#876" id="876">876</a>
+<a href="#877" id="877">877</a>
+<a href="#878" id="878">878</a>
+<a href="#879" id="879">879</a>
+<a href="#880" id="880">880</a>
+<a href="#881" id="881">881</a>
+<a href="#882" id="882">882</a>
+<a href="#883" id="883">883</a>
+<a href="#884" id="884">884</a>
+<a href="#885" id="885">885</a>
+<a href="#886" id="886">886</a>
+<a href="#887" id="887">887</a>
+<a href="#888" id="888">888</a>
+<a href="#889" id="889">889</a>
+<a href="#890" id="890">890</a>
+<a href="#891" id="891">891</a>
+<a href="#892" id="892">892</a>
+<a href="#893" id="893">893</a>
+<a href="#894" id="894">894</a>
+<a href="#895" id="895">895</a>
+<a href="#896" id="896">896</a>
+<a href="#897" id="897">897</a>
+<a href="#898" id="898">898</a>
+<a href="#899" id="899">899</a>
+<a href="#900" id="900">900</a>
+<a href="#901" id="901">901</a>
+<a href="#902" id="902">902</a>
+<a href="#903" id="903">903</a>
+<a href="#904" id="904">904</a>
+<a href="#905" id="905">905</a>
+<a href="#906" id="906">906</a>
+<a href="#907" id="907">907</a>
+<a href="#908" id="908">908</a>
+<a href="#909" id="909">909</a>
+<a href="#910" id="910">910</a>
+<a href="#911" id="911">911</a>
+<a href="#912" id="912">912</a>
+<a href="#913" id="913">913</a>
+<a href="#914" id="914">914</a>
+<a href="#915" id="915">915</a>
+<a href="#916" id="916">916</a>
+<a href="#917" id="917">917</a>
+<a href="#918" id="918">918</a>
+<a href="#919" id="919">919</a>
+<a href="#920" id="920">920</a>
+<a href="#921" id="921">921</a>
+<a href="#922" id="922">922</a>
+<a href="#923" id="923">923</a>
+<a href="#924" id="924">924</a>
+<a href="#925" id="925">925</a>
+<a href="#926" id="926">926</a>
+<a href="#927" id="927">927</a>
+<a href="#928" id="928">928</a>
+<a href="#929" id="929">929</a>
+<a href="#930" id="930">930</a>
+<a href="#931" id="931">931</a>
+<a href="#932" id="932">932</a>
+<a href="#933" id="933">933</a>
+<a href="#934" id="934">934</a>
+<a href="#935" id="935">935</a>
+<a href="#936" id="936">936</a>
+<a href="#937" id="937">937</a>
+<a href="#938" id="938">938</a>
+<a href="#939" id="939">939</a>
+<a href="#940" id="940">940</a>
+<a href="#941" id="941">941</a>
+<a href="#942" id="942">942</a>
+<a href="#943" id="943">943</a>
+<a href="#944" id="944">944</a>
+<a href="#945" id="945">945</a>
+<a href="#946" id="946">946</a>
+<a href="#947" id="947">947</a>
+<a href="#948" id="948">948</a>
+<a href="#949" id="949">949</a>
+<a href="#950" id="950">950</a>
+<a href="#951" id="951">951</a>
+<a href="#952" id="952">952</a>
+<a href="#953" id="953">953</a>
+<a href="#954" id="954">954</a>
+<a href="#955" id="955">955</a>
+<a href="#956" id="956">956</a>
+<a href="#957" id="957">957</a>
+<a href="#958" id="958">958</a>
+<a href="#959" id="959">959</a>
+<a href="#960" id="960">960</a>
+<a href="#961" id="961">961</a>
+<a href="#962" id="962">962</a>
+<a href="#963" id="963">963</a>
+<a href="#964" id="964">964</a>
+<a href="#965" id="965">965</a>
+<a href="#966" id="966">966</a>
+<a href="#967" id="967">967</a>
+<a href="#968" id="968">968</a>
+<a href="#969" id="969">969</a>
+<a href="#970" id="970">970</a>
+<a href="#971" id="971">971</a>
+<a href="#972" id="972">972</a>
+<a href="#973" id="973">973</a>
+<a href="#974" id="974">974</a>
+<a href="#975" id="975">975</a>
+<a href="#976" id="976">976</a>
 </pre></div><pre class="rust"><code><span class="comment">// -*- mode: rust; -*-
 //
 // This file is part of subtle, part of the dalek cryptography project.
@@ -875,7 +987,7 @@
 </span><span class="attr">#![no_std]
 #![deny(missing_docs)]
 #![doc(html_logo_url = <span class="string">&quot;https://doc.dalek.rs/assets/dalek-logo-clear.png&quot;</span>)]
-#![doc(html_root_url = <span class="string">&quot;https://docs.rs/subtle/2.4.1&quot;</span>)]
+#![doc(html_root_url = <span class="string">&quot;https://docs.rs/subtle/2.5.0&quot;</span>)]
 
 </span><span class="doccomment">//! # subtle [![](https://img.shields.io/crates/v/subtle.svg)](https://crates.io/crates/subtle) [![](https://img.shields.io/badge/dynamic/json.svg?label=docs&amp;uri=https%3A%2F%2Fcrates.io%2Fapi%2Fv1%2Fcrates%2Fsubtle%2Fversions&amp;query=%24.versions%5B0%5D.num&amp;colorB=4F74A6)](https://doc.dalek.rs/subtle) [![](https://travis-ci.org/dalek-cryptography/subtle.svg?branch=master)](https://travis-ci.org/dalek-cryptography/subtle)
 //!
@@ -886,7 +998,7 @@
 //! type is a wrapper around a `u8` that holds a `0` or `1`.
 //!
 //! ```toml
-//! subtle = &quot;2.4&quot;
+//! subtle = &quot;2.5&quot;
 //! ```
 //!
 //! This crate represents a “best-effort” attempt, since side-channels
@@ -904,6 +1016,13 @@
 //! prevent this refinement, the crate tries to hide the value of a `Choice`&#39;s
 //! inner `u8` by passing it through a volatile read. For more information, see
 //! the _About_ section below.
+//!
+//! Rust versions from 1.66 or higher support a new best-effort optimization
+//! barrier ([`core::hint::black_box`]).  To use the new optimization barrier,
+//! enable the `core_hint_black_box` feature.
+//!
+//! Rust versions from 1.51 or higher have const generics support. You may enable
+//! `const-generics` feautre to have `subtle` traits implemented for arrays `[T; N]`.
 //!
 //! Versions prior to `2.2` recommended use of the `nightly` feature to enable an
 //! optimization barrier; this is not required in versions `2.2` and above.
@@ -927,10 +1046,15 @@
 //!
 //! This library aims to be the Rust equivalent of Go’s `crypto/subtle` module.
 //!
-//! The optimization barrier in `impl From&lt;u8&gt; for Choice` was based on Tim
-//! Maclean&#39;s [work on `rust-timing-shield`][rust-timing-shield], which attempts to
-//! provide a more comprehensive approach for preventing software side-channels in
-//! Rust code.
+//! Old versions of the optimization barrier in `impl From&lt;u8&gt; for Choice` were
+//! based on Tim Maclean&#39;s [work on `rust-timing-shield`][rust-timing-shield],
+//! which attempts to provide a more comprehensive approach for preventing
+//! software side-channels in Rust code.
+//!
+//! From version `2.2`, it was based on Diane Hosfelt and Amber Sprenkels&#39; work on
+//! &quot;Secret Types in Rust&quot;. Version `2.5` adds the `core_hint_black_box` feature,
+//! which uses the original method through the [`core::hint::black_box`] function
+//! from the Rust standard library.
 //!
 //! `subtle` is authored by isis agora lovecruft and Henry de Valence.
 //!
@@ -945,12 +1069,14 @@
 //! **USE AT YOUR OWN RISK**
 //!
 //! [docs]: https://docs.rs/subtle
+//! [`core::hint::black_box`]: https://doc.rust-lang.org/core/hint/fn.black_box.html
 //! [rust-timing-shield]: https://www.chosenplaintext.ca/open-source/rust-timing-shield/security
 
 </span><span class="attr">#[cfg(feature = <span class="string">&quot;std&quot;</span>)]
 #[macro_use]
 </span><span class="kw">extern crate </span>std;
 
+<span class="kw">use </span>core::cmp;
 <span class="kw">use </span>core::ops::{BitAnd, BitAndAssign, BitOr, BitOrAssign, BitXor, BitXorAssign, Neg, Not};
 <span class="kw">use </span>core::option::Option;
 
@@ -1074,7 +1200,8 @@
 /// Note: Rust&#39;s notion of &quot;volatile&quot; is subject to change over time. While this
 /// code may break in a non-destructive way in the future, “constant-time” code
 /// is a continually moving target, and this is better than doing nothing.
-</span><span class="attr">#[inline(never)]
+</span><span class="attr">#[cfg(not(feature = <span class="string">&quot;core_hint_black_box&quot;</span>))]
+#[inline(never)]
 </span><span class="kw">fn </span>black_box(input: u8) -&gt; u8 {
     <span class="macro">debug_assert!</span>((input == <span class="number">0u8</span>) | (input == <span class="number">1u8</span>));
 
@@ -1089,6 +1216,13 @@
         //   - u8 type is always properly aligned.
         </span>core::ptr::read_volatile(<span class="kw-2">&amp;</span>input <span class="kw">as </span><span class="kw-2">*const </span>u8)
     }
+}
+
+<span class="attr">#[cfg(feature = <span class="string">&quot;core_hint_black_box&quot;</span>)]
+#[inline(never)]
+</span><span class="kw">fn </span>black_box(input: u8) -&gt; u8 {
+    <span class="macro">debug_assert!</span>((input == <span class="number">0u8</span>) | (input == <span class="number">1u8</span>));
+    core::hint::black_box(input)
 }
 
 <span class="kw">impl </span>From&lt;u8&gt; <span class="kw">for </span>Choice {
@@ -1123,6 +1257,19 @@
     /// * `Choice(0u8)` if `self != other`.
     </span><span class="attr">#[inline]
     </span><span class="kw">fn </span>ct_eq(<span class="kw-2">&amp;</span><span class="self">self</span>, other: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; Choice;
+
+    <span class="doccomment">/// Determine if two items are NOT equal.
+    ///
+    /// The `ct_ne` function should execute in constant time.
+    ///
+    /// # Returns
+    ///
+    /// * `Choice(0u8)` if `self == other`;
+    /// * `Choice(1u8)` if `self != other`.
+    </span><span class="attr">#[inline]
+    </span><span class="kw">fn </span>ct_ne(<span class="kw-2">&amp;</span><span class="self">self</span>, other: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; Choice {
+        !<span class="self">self</span>.ct_eq(other)
+    }
 }
 
 <span class="kw">impl</span>&lt;T: ConstantTimeEq&gt; ConstantTimeEq <span class="kw">for </span>[T] {
@@ -1214,6 +1361,14 @@
 </span><span class="macro">generate_integer_equal!</span>(u128, i128, <span class="number">128</span>);
 <span class="macro">generate_integer_equal!</span>(usize, isize, ::core::mem::size_of::&lt;usize&gt;() * <span class="number">8</span>);
 
+<span class="doccomment">/// `Ordering` is `#[repr(i8)]` making it possible to leverage `i8::ct_eq`.
+</span><span class="kw">impl </span>ConstantTimeEq <span class="kw">for </span>cmp::Ordering {
+    <span class="attr">#[inline]
+    </span><span class="kw">fn </span>ct_eq(<span class="kw-2">&amp;</span><span class="self">self</span>, other: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; Choice {
+        (<span class="kw-2">*</span><span class="self">self </span><span class="kw">as </span>i8).ct_eq(<span class="kw-2">&amp;</span>(<span class="kw-2">*</span>other <span class="kw">as </span>i8))
+    }
+}
+
 <span class="doccomment">/// A type which can be conditionally selected in constant time.
 ///
 /// This trait also provides generic implementations of conditional
@@ -1231,7 +1386,6 @@
     /// # Example
     ///
     /// ```
-    /// # extern crate subtle;
     /// use subtle::ConditionallySelectable;
     /// #
     /// # fn main() {
@@ -1254,7 +1408,6 @@
     /// # Example
     ///
     /// ```
-    /// # extern crate subtle;
     /// use subtle::ConditionallySelectable;
     /// #
     /// # fn main() {
@@ -1280,7 +1433,6 @@
     /// # Example
     ///
     /// ```
-    /// # extern crate subtle;
     /// use subtle::ConditionallySelectable;
     /// #
     /// # fn main() {
@@ -1375,10 +1527,49 @@
 <span class="attr">#[cfg(feature = <span class="string">&quot;i128&quot;</span>)]
 </span><span class="macro">generate_integer_conditional_select!</span>(u128 i128);
 
+<span class="doccomment">/// `Ordering` is `#[repr(i8)]` where:
+///
+/// - `Less` =&gt; -1
+/// - `Equal` =&gt; 0
+/// - `Greater` =&gt; 1
+///
+/// Given this, it&#39;s possible to operate on orderings as if they&#39;re integers,
+/// which allows leveraging conditional masking for predication.
+</span><span class="kw">impl </span>ConditionallySelectable <span class="kw">for </span>cmp::Ordering {
+    <span class="kw">fn </span>conditional_select(a: <span class="kw-2">&amp;</span><span class="self">Self</span>, b: <span class="kw-2">&amp;</span><span class="self">Self</span>, choice: Choice) -&gt; <span class="self">Self </span>{
+        <span class="kw">let </span>a = <span class="kw-2">*</span>a <span class="kw">as </span>i8;
+        <span class="kw">let </span>b = <span class="kw-2">*</span>b <span class="kw">as </span>i8;
+        <span class="kw">let </span>ret = i8::conditional_select(<span class="kw-2">&amp;</span>a, <span class="kw-2">&amp;</span>b, choice);
+
+        <span class="comment">// SAFETY: `Ordering` is `#[repr(i8)]` and `ret` has been assigned to
+        // a value which was originally a valid `Ordering` then cast to `i8`
+        </span><span class="kw">unsafe </span>{ <span class="kw-2">*</span>((<span class="kw-2">&amp;</span>ret <span class="kw">as </span><span class="kw-2">*const </span><span class="kw">_</span>) <span class="kw">as </span><span class="kw-2">*const </span>cmp::Ordering) }
+    }
+}
+
 <span class="kw">impl </span>ConditionallySelectable <span class="kw">for </span>Choice {
     <span class="attr">#[inline]
     </span><span class="kw">fn </span>conditional_select(a: <span class="kw-2">&amp;</span><span class="self">Self</span>, b: <span class="kw-2">&amp;</span><span class="self">Self</span>, choice: Choice) -&gt; <span class="self">Self </span>{
         Choice(u8::conditional_select(<span class="kw-2">&amp;</span>a.<span class="number">0</span>, <span class="kw-2">&amp;</span>b.<span class="number">0</span>, choice))
+    }
+}
+
+<span class="attr">#[cfg(feature = <span class="string">&quot;const-generics&quot;</span>)]
+</span><span class="kw">impl</span>&lt;T, <span class="kw">const </span>N: usize&gt; ConditionallySelectable <span class="kw">for </span>[T; N]
+<span class="kw">where
+    </span>T: ConditionallySelectable,
+{
+    <span class="attr">#[inline]
+    </span><span class="kw">fn </span>conditional_select(a: <span class="kw-2">&amp;</span><span class="self">Self</span>, b: <span class="kw-2">&amp;</span><span class="self">Self</span>, choice: Choice) -&gt; <span class="self">Self </span>{
+        <span class="kw">let </span><span class="kw-2">mut </span>output = <span class="kw-2">*</span>a;
+        output.conditional_assign(b, choice);
+        output
+    }
+
+    <span class="kw">fn </span>conditional_assign(<span class="kw-2">&amp;mut </span><span class="self">self</span>, other: <span class="kw-2">&amp;</span><span class="self">Self</span>, choice: Choice) {
+        <span class="kw">for </span>(a_i, b_i) <span class="kw">in </span><span class="self">self</span>.iter_mut().zip(other) {
+            a_i.conditional_assign(b_i, choice)
+        }
     }
 }
 
@@ -1469,6 +1660,18 @@
         }
     }
 
+    <span class="doccomment">/// Returns the contained value, consuming the `self` value.
+    ///
+    /// # Panics
+    ///
+    /// Panics if the value is none with a custom panic message provided by
+    /// `msg`.
+    </span><span class="kw">pub fn </span>expect(<span class="self">self</span>, msg: <span class="kw-2">&amp;</span>str) -&gt; T {
+        <span class="macro">assert_eq!</span>(<span class="self">self</span>.is_some.unwrap_u8(), <span class="number">1</span>, <span class="string">&quot;{}&quot;</span>, msg);
+
+        <span class="self">self</span>.value
+    }
+
     <span class="doccomment">/// This returns the underlying value but panics if it
     /// is not `Some`.
     </span><span class="attr">#[inline]
@@ -1490,6 +1693,9 @@
 
     <span class="doccomment">/// This returns the underlying value if it is `Some`
     /// or the value produced by the provided closure otherwise.
+    ///
+    /// This operates in constant time, because the provided closure
+    /// is always called.
     </span><span class="attr">#[inline]
     </span><span class="kw">pub fn </span>unwrap_or_else&lt;F&gt;(<span class="self">self</span>, f: F) -&gt; T
     <span class="kw">where
@@ -1612,7 +1818,6 @@
     /// # Example
     ///
     /// ```
-    /// # extern crate subtle;
     /// use subtle::ConstantTimeGreater;
     ///
     /// let x: u8 = 13;
@@ -1665,7 +1870,7 @@
                 </span>Choice::from((bit &amp; <span class="number">1</span>) <span class="kw">as </span>u8)
             }
         }
-    }
+    };
 }
 
 <span class="macro">generate_unsigned_integer_greater!</span>(u8, <span class="number">8</span>);
@@ -1674,6 +1879,16 @@
 <span class="macro">generate_unsigned_integer_greater!</span>(u64, <span class="number">64</span>);
 <span class="attr">#[cfg(feature = <span class="string">&quot;i128&quot;</span>)]
 </span><span class="macro">generate_unsigned_integer_greater!</span>(u128, <span class="number">128</span>);
+
+<span class="kw">impl </span>ConstantTimeGreater <span class="kw">for </span>cmp::Ordering {
+    <span class="attr">#[inline]
+    </span><span class="kw">fn </span>ct_gt(<span class="kw-2">&amp;</span><span class="self">self</span>, other: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; Choice {
+        <span class="comment">// No impl of `ConstantTimeGreater` for `i8`, so use `u8`
+        </span><span class="kw">let </span>a = (<span class="kw-2">*</span><span class="self">self </span><span class="kw">as </span>i8) + <span class="number">1</span>;
+        <span class="kw">let </span>b = (<span class="kw-2">*</span>other <span class="kw">as </span>i8) + <span class="number">1</span>;
+        (a <span class="kw">as </span>u8).ct_gt(<span class="kw-2">&amp;</span>(b <span class="kw">as </span>u8))
+    }
+}
 
 <span class="doccomment">/// A type which can be compared in some manner and be determined to be less
 /// than another of the same type.
@@ -1696,7 +1911,6 @@
     /// # Example
     ///
     /// ```
-    /// # extern crate subtle;
     /// use subtle::ConstantTimeLess;
     ///
     /// let x: u8 = 13;
@@ -1726,4 +1940,14 @@
 <span class="kw">impl </span>ConstantTimeLess <span class="kw">for </span>u64 {}
 <span class="attr">#[cfg(feature = <span class="string">&quot;i128&quot;</span>)]
 </span><span class="kw">impl </span>ConstantTimeLess <span class="kw">for </span>u128 {}
+
+<span class="kw">impl </span>ConstantTimeLess <span class="kw">for </span>cmp::Ordering {
+    <span class="attr">#[inline]
+    </span><span class="kw">fn </span>ct_lt(<span class="kw-2">&amp;</span><span class="self">self</span>, other: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; Choice {
+        <span class="comment">// No impl of `ConstantTimeLess` for `i8`, so use `u8`
+        </span><span class="kw">let </span>a = (<span class="kw-2">*</span><span class="self">self </span><span class="kw">as </span>i8) + <span class="number">1</span>;
+        <span class="kw">let </span>b = (<span class="kw-2">*</span>other <span class="kw">as </span>i8) + <span class="number">1</span>;
+        (a <span class="kw">as </span>u8).ct_lt(<span class="kw-2">&amp;</span>(b <span class="kw">as </span>u8))
+    }
+}
 </code></pre></div></section></main></body></html>

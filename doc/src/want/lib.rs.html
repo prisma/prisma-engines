@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/nix/store/jnqxxv1xi811ni996b002f4jnyz38xck-vendor-cargo-deps/c19b7c6f923b580ac259164a89f2577984ad5ab09ee9d583b888f934adbbe8d0/want-0.3.0/src/lib.rs`."><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-f3501f0f5ae15dfb.css" id="mainThemeStyle"><div id="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="want" data-themes="" data-resource-suffix="" data-rustdoc-version="1.71.0 (8ede3aae2 2023-07-12)" data-search-js="search-4926e5fc22a5646a.js" data-settings-js="settings-de11bff964e9d4e5.js" data-settings-css="settings-8c76f75bfb6bd192.css" data-theme-light-css="light-0f8c037637f9eb3e.css" data-theme-dark-css="dark-1097f8e92a01e3cf.css" data-theme-ayu-css="ayu-614652228113ac93.css" ></div><script src="../../static.files/storage-62ce34ea385b278a.js"></script><script defer src="../../static.files/source-script-11255107d0a65077.js"></script><script defer src="../../source-files.js"></script><script defer src="../../static.files/main-f0540c1d82cde29b.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../../static.files/light-0f8c037637f9eb3e.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../../static.files/dark-1097f8e92a01e3cf.css"><link rel="stylesheet" href="../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../want/index.html"><img class="rust-logo" src="../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/nix/store/yf45a1rayffhnidhgyjynpyhr9lqkd09-vendor-cargo-deps/c19b7c6f923b580ac259164a89f2577984ad5ab09ee9d583b888f934adbbe8d0/want-0.3.1/src/lib.rs`."><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-f3501f0f5ae15dfb.css" id="mainThemeStyle"><div id="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="want" data-themes="" data-resource-suffix="" data-rustdoc-version="1.71.0 (8ede3aae2 2023-07-12)" data-search-js="search-4926e5fc22a5646a.js" data-settings-js="settings-de11bff964e9d4e5.js" data-settings-css="settings-8c76f75bfb6bd192.css" data-theme-light-css="light-0f8c037637f9eb3e.css" data-theme-dark-css="dark-1097f8e92a01e3cf.css" data-theme-ayu-css="ayu-614652228113ac93.css" ></div><script src="../../static.files/storage-62ce34ea385b278a.js"></script><script defer src="../../static.files/source-script-11255107d0a65077.js"></script><script defer src="../../source-files.js"></script><script defer src="../../static.files/main-f0540c1d82cde29b.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../../static.files/light-0f8c037637f9eb3e.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../../static.files/dark-1097f8e92a01e3cf.css"><link rel="stylesheet" href="../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../want/index.html"><img class="rust-logo" src="../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -577,13 +577,7 @@
 <a href="#577" id="577">577</a>
 <a href="#578" id="578">578</a>
 <a href="#579" id="579">579</a>
-<a href="#580" id="580">580</a>
-<a href="#581" id="581">581</a>
-<a href="#582" id="582">582</a>
-<a href="#583" id="583">583</a>
-<a href="#584" id="584">584</a>
-<a href="#585" id="585">585</a>
-</pre></div><pre class="rust"><code><span class="attr">#![doc(html_root_url = <span class="string">&quot;https://docs.rs/want/0.3.0&quot;</span>)]
+</pre></div><pre class="rust"><code><span class="attr">#![doc(html_root_url = <span class="string">&quot;https://docs.rs/want/0.3.1&quot;</span>)]
 #![deny(warnings)]
 #![deny(missing_docs)]
 #![deny(missing_debug_implementations)]
@@ -665,10 +659,7 @@
 //! # fn main() {}
 //! ```
 
-</span><span class="attr">#[macro_use]
-</span><span class="kw">extern crate </span>log;
-
-<span class="kw">use </span>std::fmt;
+</span><span class="kw">use </span>std::fmt;
 <span class="kw">use </span>std::future::Future;
 <span class="kw">use </span>std::mem;
 <span class="kw">use </span>std::pin::Pin;
@@ -691,7 +682,7 @@
     <span class="kw">let </span>inner2 = inner.clone();
     (
         Giver {
-            inner: inner,
+            inner,
         },
         Taker {
             inner: inner2,
@@ -763,7 +754,7 @@
 
 </span><span class="kw">impl </span>Giver {
     <span class="doccomment">/// Returns a `Future` that fulfills when the `Taker` has done some action.
-    </span><span class="kw">pub fn </span>want&lt;<span class="lifetime">&#39;a</span>&gt;(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span><span class="self">self</span>) -&gt; <span class="kw">impl </span>Future&lt;Output = <span class="prelude-ty">Result</span>&lt;(), Closed&gt;&gt; + <span class="lifetime">&#39;a </span>{
+    </span><span class="kw">pub fn </span>want(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="kw">impl </span>Future&lt;Output = <span class="prelude-ty">Result</span>&lt;(), Closed&gt;&gt; + <span class="lifetime">&#39;_ </span>{
         Want(<span class="self">self</span>)
     }
 
@@ -782,37 +773,36 @@
             <span class="kw">let </span>state = <span class="self">self</span>.inner.state.load(SeqCst).into();
             <span class="kw">match </span>state {
                 State::Want =&gt; {
-                    <span class="macro">trace!</span>(<span class="string">&quot;poll_want: taker wants!&quot;</span>);
                     <span class="kw">return </span>Poll::Ready(<span class="prelude-val">Ok</span>(()));
                 },
                 State::Closed =&gt; {
-                    <span class="macro">trace!</span>(<span class="string">&quot;poll_want: closed&quot;</span>);
                     <span class="kw">return </span>Poll::Ready(<span class="prelude-val">Err</span>(Closed { _inner: () }));
                 },
                 State::Idle | State::Give =&gt; {
                     <span class="comment">// Taker doesn&#39;t want anything yet, so park.
-                    </span><span class="kw">if let </span><span class="prelude-val">Some</span>(<span class="kw-2">mut </span>locked) = <span class="self">self</span>.inner.task.try_lock_order(SeqCst, SeqCst) {
+                    </span><span class="kw">if let </span><span class="prelude-val">Some</span>(<span class="kw-2">mut </span>locked) = <span class="self">self</span>.inner.task.try_lock_explicit(SeqCst, SeqCst) {
 
                         <span class="comment">// While we have the lock, try to set to GIVE.
-                        </span><span class="kw">let </span>old = <span class="self">self</span>.inner.state.compare_and_swap(
+                        </span><span class="kw">let </span>old = <span class="self">self</span>.inner.state.compare_exchange(
                             state.into(),
                             State::Give.into(),
                             SeqCst,
+                            SeqCst,
                         );
                         <span class="comment">// If it&#39;s still the first state (Idle or Give), park current task.
-                        </span><span class="kw">if </span>old == state.into() {
+                        </span><span class="kw">if </span>old == <span class="prelude-val">Ok</span>(state.into()) {
                             <span class="kw">let </span>park = locked.as_ref()
                                 .map(|w| !w.will_wake(cx.waker()))
                                 .unwrap_or(<span class="bool-val">true</span>);
                             <span class="kw">if </span>park {
                                 <span class="kw">let </span>old = mem::replace(<span class="kw-2">&amp;mut *</span>locked, <span class="prelude-val">Some</span>(cx.waker().clone()));
                                 drop(locked);
-                                old.map(|prev_task| {
+                                <span class="kw">if let </span><span class="prelude-val">Some</span>(prev_task) = old {
                                     <span class="comment">// there was an old task parked here.
                                     // it might be waiting to be notified,
                                     // so poke it before dropping.
                                     </span>prev_task.wake();
-                                });
+                                };
                             }
                             <span class="kw">return </span>Poll::Pending;
                         }
@@ -835,11 +825,12 @@
     </span><span class="attr">#[inline]
     </span><span class="kw">pub fn </span>give(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
         <span class="comment">// only set to IDLE if it is still Want
-        </span><span class="self">self</span>.inner.state.compare_and_swap(
+        </span><span class="kw">let </span>old = <span class="self">self</span>.inner.state.compare_exchange(
             State::Want.into(),
             State::Idle.into(),
             SeqCst,
-        ) == State::Want.into()
+            SeqCst);
+        old == <span class="prelude-val">Ok</span>(State::Want.into())
     }
 
     <span class="doccomment">/// Check if the `Taker` has called `want()` without parking a task.
@@ -868,7 +859,7 @@
 }
 
 <span class="kw">impl </span>fmt::Debug <span class="kw">for </span>Giver {
-    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter) -&gt; fmt::Result {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
         f.debug_struct(<span class="string">&quot;Giver&quot;</span>)
             .field(<span class="string">&quot;state&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.inner.state())
             .finish()
@@ -896,7 +887,7 @@
 }
 
 <span class="kw">impl </span>fmt::Debug <span class="kw">for </span>SharedGiver {
-    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter) -&gt; fmt::Result {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
         f.debug_struct(<span class="string">&quot;SharedGiver&quot;</span>)
             .field(<span class="string">&quot;state&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.inner.state())
             .finish()
@@ -912,7 +903,6 @@
     /// drop the value yet.
     </span><span class="attr">#[inline]
     </span><span class="kw">pub fn </span>cancel(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
-        <span class="macro">trace!</span>(<span class="string">&quot;signal: {:?}&quot;</span>, State::Closed);
         <span class="self">self</span>.signal(State::Closed)
     }
 
@@ -923,7 +913,6 @@
             <span class="self">self</span>.inner.state.load(SeqCst) != State::Closed.into(),
             <span class="string">&quot;want called after cancel&quot;
         </span>);
-        <span class="macro">trace!</span>(<span class="string">&quot;signal: {:?}&quot;</span>, State::Want);
         <span class="self">self</span>.signal(State::Want)
     }
 
@@ -934,10 +923,9 @@
             State::Idle | State::Want | State::Closed =&gt; (),
             State::Give =&gt; {
                 <span class="kw">loop </span>{
-                    <span class="kw">if let </span><span class="prelude-val">Some</span>(<span class="kw-2">mut </span>locked) = <span class="self">self</span>.inner.task.try_lock_order(SeqCst, SeqCst) {
+                    <span class="kw">if let </span><span class="prelude-val">Some</span>(<span class="kw-2">mut </span>locked) = <span class="self">self</span>.inner.task.try_lock_explicit(SeqCst, SeqCst) {
                         <span class="kw">if let </span><span class="prelude-val">Some</span>(task) = locked.take() {
                             drop(locked);
-                            <span class="macro">trace!</span>(<span class="string">&quot;signal found waiting giver, notifying&quot;</span>);
                             task.wake();
                         }
                         <span class="kw">return</span>;
@@ -961,7 +949,7 @@
 }
 
 <span class="kw">impl </span>fmt::Debug <span class="kw">for </span>Taker {
-    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter) -&gt; fmt::Result {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
         f.debug_struct(<span class="string">&quot;Taker&quot;</span>)
             .field(<span class="string">&quot;state&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.inner.state())
             .finish()
@@ -971,7 +959,7 @@
 <span class="comment">// ===== impl Closed ======
 
 </span><span class="kw">impl </span>fmt::Debug <span class="kw">for </span>Closed {
-    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter) -&gt; fmt::Result {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
         f.debug_struct(<span class="string">&quot;Closed&quot;</span>)
             .finish()
     }

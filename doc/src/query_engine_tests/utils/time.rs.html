@@ -29,6 +29,11 @@
 <a href="#29" id="29">29</a>
 <a href="#30" id="30">30</a>
 <a href="#31" id="31">31</a>
+<a href="#32" id="32">32</a>
+<a href="#33" id="33">33</a>
+<a href="#34" id="34">34</a>
+<a href="#35" id="35">35</a>
+<a href="#36" id="36">36</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>chrono::{TimeZone, Utc};
 
 <span class="doccomment">/// Convenience full date + time string (UTC, RFC 3339) constructor so you don&#39;t have to remember the format.
@@ -41,14 +46,19 @@
     sec: <span class="prelude-ty">Option</span>&lt;u32&gt;,
     millis: <span class="prelude-ty">Option</span>&lt;u32&gt;,
 ) -&gt; String {
-    Utc.ymd(year, month, day)
-        .and_hms_milli(or_zero(hour), or_zero(min), or_zero(sec), or_zero(millis))
-        .to_rfc3339()
+    Utc.with_ymd_and_hms(year, month, day, or_zero(hour), or_zero(min), or_zero(sec))
+        .earliest()
+        .and_then(|dt| dt.timezone().timestamp_millis_opt(or_zero(millis) <span class="kw">as </span>i64).earliest())
+        .map(|dt| dt.to_rfc3339())
+        .unwrap()
 }
 
 <span class="doccomment">/// Convenience date string (UTC, RFC 3339) constructor so you don&#39;t have to remember the format.
 </span><span class="kw">pub fn </span>date_iso_string(year: i32, month: u32, day: u32) -&gt; String {
-    Utc.ymd(year, month, day).and_hms_milli(<span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>).to_rfc3339()
+    Utc.with_ymd_and_hms(year, month, day, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>)
+        .earliest()
+        .map(|dt| dt.to_rfc3339())
+        .unwrap()
 }
 
 <span class="doccomment">/// Convenience date string (UTC, RFC 3339) constructor for the datetime right now,

@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/nix/store/jnqxxv1xi811ni996b002f4jnyz38xck-vendor-cargo-deps/c19b7c6f923b580ac259164a89f2577984ad5ab09ee9d583b888f934adbbe8d0/nom-7.1.1/src/number/streaming.rs`."><title>streaming.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-f3501f0f5ae15dfb.css" id="mainThemeStyle"><div id="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="nom" data-themes="" data-resource-suffix="" data-rustdoc-version="1.71.0 (8ede3aae2 2023-07-12)" data-search-js="search-4926e5fc22a5646a.js" data-settings-js="settings-de11bff964e9d4e5.js" data-settings-css="settings-8c76f75bfb6bd192.css" data-theme-light-css="light-0f8c037637f9eb3e.css" data-theme-dark-css="dark-1097f8e92a01e3cf.css" data-theme-ayu-css="ayu-614652228113ac93.css" ></div><script src="../../../static.files/storage-62ce34ea385b278a.js"></script><script defer src="../../../static.files/source-script-11255107d0a65077.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../static.files/main-f0540c1d82cde29b.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../../../static.files/light-0f8c037637f9eb3e.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../../../static.files/dark-1097f8e92a01e3cf.css"><link rel="stylesheet" href="../../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../../nom/index.html"><img class="rust-logo" src="../../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/nix/store/yf45a1rayffhnidhgyjynpyhr9lqkd09-vendor-cargo-deps/c19b7c6f923b580ac259164a89f2577984ad5ab09ee9d583b888f934adbbe8d0/nom-7.1.3/src/number/streaming.rs`."><title>streaming.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-f3501f0f5ae15dfb.css" id="mainThemeStyle"><div id="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="nom" data-themes="" data-resource-suffix="" data-rustdoc-version="1.71.0 (8ede3aae2 2023-07-12)" data-search-js="search-4926e5fc22a5646a.js" data-settings-js="settings-de11bff964e9d4e5.js" data-settings-css="settings-8c76f75bfb6bd192.css" data-theme-light-css="light-0f8c037637f9eb3e.css" data-theme-dark-css="dark-1097f8e92a01e3cf.css" data-theme-ayu-css="ayu-614652228113ac93.css" ></div><script src="../../../static.files/storage-62ce34ea385b278a.js"></script><script defer src="../../../static.files/source-script-11255107d0a65077.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../static.files/main-f0540c1d82cde29b.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../../../static.files/light-0f8c037637f9eb3e.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../../../static.files/dark-1097f8e92a01e3cf.css"><link rel="stylesheet" href="../../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../../nom/index.html"><img class="rust-logo" src="../../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -2204,18 +2204,6 @@
 <a href="#2204" id="2204">2204</a>
 <a href="#2205" id="2205">2205</a>
 <a href="#2206" id="2206">2206</a>
-<a href="#2207" id="2207">2207</a>
-<a href="#2208" id="2208">2208</a>
-<a href="#2209" id="2209">2209</a>
-<a href="#2210" id="2210">2210</a>
-<a href="#2211" id="2211">2211</a>
-<a href="#2212" id="2212">2212</a>
-<a href="#2213" id="2213">2213</a>
-<a href="#2214" id="2214">2214</a>
-<a href="#2215" id="2215">2215</a>
-<a href="#2216" id="2216">2216</a>
-<a href="#2217" id="2217">2217</a>
-<a href="#2218" id="2218">2218</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Parsers recognizing numbers, streaming version
 
 </span><span class="kw">use </span><span class="kw">crate</span>::branch::alt;
@@ -2229,26 +2217,6 @@
 <span class="kw">use </span><span class="kw">crate</span>::traits::{
   AsBytes, AsChar, Compare, InputIter, InputLength, InputTake, InputTakeAtPosition, Offset, Slice,
 };
-
-<span class="attr">#[doc(hidden)]
-</span><span class="macro">macro_rules! </span>map(
-  <span class="comment">// Internal parser, do not use directly
-  </span>(__impl <span class="macro-nonterminal">$i</span>:expr, <span class="macro-nonterminal">$submac</span>:<span class="macro">ident!</span>( $(<span class="macro-nonterminal">$args</span>:tt)* ), <span class="macro-nonterminal">$g</span>:expr) =&gt; (
-    <span class="macro-nonterminal">$crate::combinator::map</span>(<span class="kw">move </span>|i| {<span class="macro-nonterminal">$</span><span class="macro">submac!</span>(<span class="macro-nonterminal">i</span>, $(<span class="macro-nonterminal">$args</span>)<span class="kw-2">*</span>)}, <span class="macro-nonterminal">$g</span>).parse(<span class="macro-nonterminal">$i</span>)
-  );
-  (<span class="macro-nonterminal">$i</span>:expr, <span class="macro-nonterminal">$submac</span>:<span class="macro">ident!</span>( $(<span class="macro-nonterminal">$args</span>:tt)* ), <span class="macro-nonterminal">$g</span>:expr) =&gt; (
-    <span class="macro">map!</span>(__impl <span class="macro-nonterminal">$i</span>, <span class="macro-nonterminal">$</span><span class="macro">submac!</span>($(<span class="macro-nonterminal">$args</span>)<span class="kw-2">*</span>), <span class="macro-nonterminal">$g</span>)
-  );
-  (<span class="macro-nonterminal">$i</span>:expr, <span class="macro-nonterminal">$f</span>:expr, <span class="macro-nonterminal">$g</span>:expr) =&gt; (
-    <span class="macro">map!</span>(__impl <span class="macro-nonterminal">$i</span>, <span class="macro">call!</span>(<span class="macro-nonterminal">$f</span>), <span class="macro-nonterminal">$g</span>)
-  );
-);
-
-<span class="attr">#[doc(hidden)]
-</span><span class="macro">macro_rules! </span>call (
-  (<span class="macro-nonterminal">$i</span>:expr, <span class="macro-nonterminal">$fun</span>:expr) =&gt; ( <span class="macro-nonterminal">$fun</span>( <span class="macro-nonterminal">$i </span>) );
-  (<span class="macro-nonterminal">$i</span>:expr, <span class="macro-nonterminal">$fun</span>:expr, $(<span class="macro-nonterminal">$args</span>:expr),* ) =&gt; ( <span class="macro-nonterminal">$fun</span>( <span class="macro-nonterminal">$i</span>, $(<span class="macro-nonterminal">$args</span>),* ) );
-);
 
 <span class="doccomment">/// Recognizes an unsigned 1 byte integer.
 ///
@@ -2460,7 +2428,7 @@
 <span class="kw">where
   </span>I: Slice&lt;RangeFrom&lt;usize&gt;&gt; + InputIter&lt;Item = u8&gt; + InputLength,
 {
-  <span class="macro">map!</span>(input, be_u8, |x| x <span class="kw">as </span>i8)
+  be_u8.map(|x| x <span class="kw">as </span>i8).parse(input)
 }
 
 <span class="doccomment">/// Recognizes a big endian signed 2 bytes integer.
@@ -2480,7 +2448,7 @@
 <span class="kw">where
   </span>I: Slice&lt;RangeFrom&lt;usize&gt;&gt; + InputIter&lt;Item = u8&gt; + InputLength,
 {
-  <span class="macro">map!</span>(input, be_u16, |x| x <span class="kw">as </span>i16)
+  be_u16.map(|x| x <span class="kw">as </span>i16).parse(input)
 }
 
 <span class="doccomment">/// Recognizes a big endian signed 3 bytes integer.
@@ -2501,11 +2469,15 @@
   </span>I: Slice&lt;RangeFrom&lt;usize&gt;&gt; + InputIter&lt;Item = u8&gt; + InputLength,
 {
   <span class="comment">// Same as the unsigned version but we need to sign-extend manually here
-  </span><span class="macro">map!</span>(input, be_u24, |x| <span class="kw">if </span>x &amp; <span class="number">0x80_00_00 </span>!= <span class="number">0 </span>{
-    (x | <span class="number">0xff_00_00_00</span>) <span class="kw">as </span>i32
-  } <span class="kw">else </span>{
-    x <span class="kw">as </span>i32
-  })
+  </span>be_u24
+    .map(|x| {
+      <span class="kw">if </span>x &amp; <span class="number">0x80_00_00 </span>!= <span class="number">0 </span>{
+        (x | <span class="number">0xff_00_00_00</span>) <span class="kw">as </span>i32
+      } <span class="kw">else </span>{
+        x <span class="kw">as </span>i32
+      }
+    })
+    .parse(input)
 }
 
 <span class="doccomment">/// Recognizes a big endian signed 4 bytes integer.
@@ -2525,7 +2497,7 @@
 <span class="kw">where
   </span>I: Slice&lt;RangeFrom&lt;usize&gt;&gt; + InputIter&lt;Item = u8&gt; + InputLength,
 {
-  <span class="macro">map!</span>(input, be_u32, |x| x <span class="kw">as </span>i32)
+  be_u32.map(|x| x <span class="kw">as </span>i32).parse(input)
 }
 
 <span class="doccomment">/// Recognizes a big endian signed 8 bytes integer.
@@ -2546,7 +2518,7 @@
 <span class="kw">where
   </span>I: Slice&lt;RangeFrom&lt;usize&gt;&gt; + InputIter&lt;Item = u8&gt; + InputLength,
 {
-  <span class="macro">map!</span>(input, be_u64, |x| x <span class="kw">as </span>i64)
+  be_u64.map(|x| x <span class="kw">as </span>i64).parse(input)
 }
 
 <span class="doccomment">/// Recognizes a big endian signed 16 bytes integer.
@@ -2566,7 +2538,7 @@
 <span class="kw">where
   </span>I: Slice&lt;RangeFrom&lt;usize&gt;&gt; + InputIter&lt;Item = u8&gt; + InputLength,
 {
-  <span class="macro">map!</span>(input, be_u128, |x| x <span class="kw">as </span>i128)
+  be_u128.map(|x| x <span class="kw">as </span>i128).parse(input)
 }
 
 <span class="doccomment">/// Recognizes an unsigned 1 byte integer.
@@ -2778,7 +2750,7 @@
 <span class="kw">where
   </span>I: Slice&lt;RangeFrom&lt;usize&gt;&gt; + InputIter&lt;Item = u8&gt; + InputLength,
 {
-  <span class="macro">map!</span>(input, le_u8, |x| x <span class="kw">as </span>i8)
+  le_u8.map(|x| x <span class="kw">as </span>i8).parse(input)
 }
 
 <span class="doccomment">/// Recognizes a little endian signed 2 bytes integer.
@@ -2801,7 +2773,7 @@
 <span class="kw">where
   </span>I: Slice&lt;RangeFrom&lt;usize&gt;&gt; + InputIter&lt;Item = u8&gt; + InputLength,
 {
-  <span class="macro">map!</span>(input, le_u16, |x| x <span class="kw">as </span>i16)
+  le_u16.map(|x| x <span class="kw">as </span>i16).parse(input)
 }
 
 <span class="doccomment">/// Recognizes a little endian signed 3 bytes integer.
@@ -2825,11 +2797,15 @@
   </span>I: Slice&lt;RangeFrom&lt;usize&gt;&gt; + InputIter&lt;Item = u8&gt; + InputLength,
 {
   <span class="comment">// Same as the unsigned version but we need to sign-extend manually here
-  </span><span class="macro">map!</span>(input, le_u24, |x| <span class="kw">if </span>x &amp; <span class="number">0x80_00_00 </span>!= <span class="number">0 </span>{
-    (x | <span class="number">0xff_00_00_00</span>) <span class="kw">as </span>i32
-  } <span class="kw">else </span>{
-    x <span class="kw">as </span>i32
-  })
+  </span>le_u24
+    .map(|x| {
+      <span class="kw">if </span>x &amp; <span class="number">0x80_00_00 </span>!= <span class="number">0 </span>{
+        (x | <span class="number">0xff_00_00_00</span>) <span class="kw">as </span>i32
+      } <span class="kw">else </span>{
+        x <span class="kw">as </span>i32
+      }
+    })
+    .parse(input)
 }
 
 <span class="doccomment">/// Recognizes a little endian signed 4 bytes integer.
@@ -2852,7 +2828,7 @@
 <span class="kw">where
   </span>I: Slice&lt;RangeFrom&lt;usize&gt;&gt; + InputIter&lt;Item = u8&gt; + InputLength,
 {
-  <span class="macro">map!</span>(input, le_u32, |x| x <span class="kw">as </span>i32)
+  le_u32.map(|x| x <span class="kw">as </span>i32).parse(input)
 }
 
 <span class="doccomment">/// Recognizes a little endian signed 8 bytes integer.
@@ -2875,7 +2851,7 @@
 <span class="kw">where
   </span>I: Slice&lt;RangeFrom&lt;usize&gt;&gt; + InputIter&lt;Item = u8&gt; + InputLength,
 {
-  <span class="macro">map!</span>(input, le_u64, |x| x <span class="kw">as </span>i64)
+  le_u64.map(|x| x <span class="kw">as </span>i64).parse(input)
 }
 
 <span class="doccomment">/// Recognizes a little endian signed 16 bytes integer.
@@ -2898,7 +2874,7 @@
 <span class="kw">where
   </span>I: Slice&lt;RangeFrom&lt;usize&gt;&gt; + InputIter&lt;Item = u8&gt; + InputLength,
 {
-  <span class="macro">map!</span>(input, le_u128, |x| x <span class="kw">as </span>i128)
+  le_u128.map(|x| x <span class="kw">as </span>i128).parse(input)
 }
 
 <span class="doccomment">/// Recognizes an unsigned 1 byte integer
@@ -3149,7 +3125,7 @@
 <span class="kw">where
   </span>I: Slice&lt;RangeFrom&lt;usize&gt;&gt; + InputIter&lt;Item = u8&gt; + InputLength,
 {
-  <span class="macro">map!</span>(i, u8, |x| x <span class="kw">as </span>i8)
+  u8.map(|x| x <span class="kw">as </span>i8).parse(i)
 }
 
 <span class="doccomment">/// Recognizes a signed 2 byte integer
@@ -3785,7 +3761,7 @@
   */
   </span><span class="kw">let </span>(i, s) = recognize_float_or_exceptions(input)<span class="question-mark">?</span>;
   <span class="kw">match </span>s.parse_to() {
-    <span class="prelude-val">Some</span>(f) =&gt; (<span class="prelude-val">Ok</span>((i, f))),
+    <span class="prelude-val">Some</span>(f) =&gt; <span class="prelude-val">Ok</span>((i, f)),
     <span class="prelude-val">None </span>=&gt; <span class="prelude-val">Err</span>(<span class="kw">crate</span>::Err::Error(E::from_error_kind(
       i,
       <span class="kw">crate</span>::error::ErrorKind::Float,
@@ -3839,7 +3815,7 @@
   */
   </span><span class="kw">let </span>(i, s) = recognize_float_or_exceptions(input)<span class="question-mark">?</span>;
   <span class="kw">match </span>s.parse_to() {
-    <span class="prelude-val">Some</span>(f) =&gt; (<span class="prelude-val">Ok</span>((i, f))),
+    <span class="prelude-val">Some</span>(f) =&gt; <span class="prelude-val">Ok</span>((i, f)),
     <span class="prelude-val">None </span>=&gt; <span class="prelude-val">Err</span>(<span class="kw">crate</span>::Err::Error(E::from_error_kind(
       i,
       <span class="kw">crate</span>::error::ErrorKind::Float,
@@ -4409,7 +4385,7 @@
   <span class="attr">#[cfg(feature = <span class="string">&quot;std&quot;</span>)]
   </span><span class="kw">fn </span>parse_f64(i: <span class="kw-2">&amp;</span>str) -&gt; IResult&lt;<span class="kw-2">&amp;</span>str, f64, ()&gt; {
     <span class="kw">use </span><span class="kw">crate</span>::traits::ParseTo;
-    <span class="kw">match </span>recognize_float(i) {
+    <span class="kw">match </span>recognize_float_or_exceptions(i) {
       <span class="prelude-val">Err</span>(e) =&gt; <span class="prelude-val">Err</span>(e),
       <span class="prelude-val">Ok</span>((i, s)) =&gt; {
         <span class="kw">if </span>s.is_empty() {

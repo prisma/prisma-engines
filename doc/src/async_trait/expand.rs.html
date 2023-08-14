@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/nix/store/jnqxxv1xi811ni996b002f4jnyz38xck-vendor-cargo-deps/c19b7c6f923b580ac259164a89f2577984ad5ab09ee9d583b888f934adbbe8d0/async-trait-0.1.57/src/expand.rs`."><title>expand.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-f3501f0f5ae15dfb.css" id="mainThemeStyle"><div id="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="async_trait" data-themes="" data-resource-suffix="" data-rustdoc-version="1.71.0 (8ede3aae2 2023-07-12)" data-search-js="search-4926e5fc22a5646a.js" data-settings-js="settings-de11bff964e9d4e5.js" data-settings-css="settings-8c76f75bfb6bd192.css" data-theme-light-css="light-0f8c037637f9eb3e.css" data-theme-dark-css="dark-1097f8e92a01e3cf.css" data-theme-ayu-css="ayu-614652228113ac93.css" ></div><script src="../../static.files/storage-62ce34ea385b278a.js"></script><script defer src="../../static.files/source-script-11255107d0a65077.js"></script><script defer src="../../source-files.js"></script><script defer src="../../static.files/main-f0540c1d82cde29b.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../../static.files/light-0f8c037637f9eb3e.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../../static.files/dark-1097f8e92a01e3cf.css"><link rel="stylesheet" href="../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../async_trait/index.html"><img class="rust-logo" src="../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/nix/store/yf45a1rayffhnidhgyjynpyhr9lqkd09-vendor-cargo-deps/c19b7c6f923b580ac259164a89f2577984ad5ab09ee9d583b888f934adbbe8d0/async-trait-0.1.72/src/expand.rs`."><title>expand.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-f3501f0f5ae15dfb.css" id="mainThemeStyle"><div id="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="async_trait" data-themes="" data-resource-suffix="" data-rustdoc-version="1.71.0 (8ede3aae2 2023-07-12)" data-search-js="search-4926e5fc22a5646a.js" data-settings-js="settings-de11bff964e9d4e5.js" data-settings-css="settings-8c76f75bfb6bd192.css" data-theme-light-css="light-0f8c037637f9eb3e.css" data-theme-dark-css="dark-1097f8e92a01e3cf.css" data-theme-ayu-css="ayu-614652228113ac93.css" ></div><script src="../../static.files/storage-62ce34ea385b278a.js"></script><script defer src="../../static.files/source-script-11255107d0a65077.js"></script><script defer src="../../source-files.js"></script><script defer src="../../static.files/main-f0540c1d82cde29b.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../../static.files/light-0f8c037637f9eb3e.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../../static.files/dark-1097f8e92a01e3cf.css"><link rel="stylesheet" href="../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../async_trait/index.html"><img class="rust-logo" src="../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -467,9 +467,26 @@
 <a href="#467" id="467">467</a>
 <a href="#468" id="468">468</a>
 <a href="#469" id="469">469</a>
-</pre></div><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::lifetime::{AddLifetimeToImplTrait, CollectLifetimes};
+<a href="#470" id="470">470</a>
+<a href="#471" id="471">471</a>
+<a href="#472" id="472">472</a>
+<a href="#473" id="473">473</a>
+<a href="#474" id="474">474</a>
+<a href="#475" id="475">475</a>
+<a href="#476" id="476">476</a>
+<a href="#477" id="477">477</a>
+<a href="#478" id="478">478</a>
+<a href="#479" id="479">479</a>
+<a href="#480" id="480">480</a>
+<a href="#481" id="481">481</a>
+<a href="#482" id="482">482</a>
+<a href="#483" id="483">483</a>
+<a href="#484" id="484">484</a>
+</pre></div><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::bound::{has_bound, InferredBound, Supertraits};
+<span class="kw">use </span><span class="kw">crate</span>::lifetime::{AddLifetimeToImplTrait, CollectLifetimes};
 <span class="kw">use </span><span class="kw">crate</span>::parse::Item;
 <span class="kw">use </span><span class="kw">crate</span>::receiver::{has_self_in_block, has_self_in_sig, mut_pat, ReplaceSelf};
+<span class="kw">use </span><span class="kw">crate</span>::verbatim::VerbatimFn;
 <span class="kw">use </span>proc_macro2::{Span, TokenStream};
 <span class="kw">use </span>quote::{format_ident, quote, quote_spanned, ToTokens};
 <span class="kw">use </span>std::collections::BTreeSet <span class="kw">as </span>Set;
@@ -477,9 +494,9 @@
 <span class="kw">use </span>syn::punctuated::Punctuated;
 <span class="kw">use </span>syn::visit_mut::{<span class="self">self</span>, VisitMut};
 <span class="kw">use </span>syn::{
-    parse_quote, parse_quote_spanned, Attribute, Block, FnArg, GenericParam, Generics, Ident,
-    ImplItem, Lifetime, LifetimeDef, Pat, PatIdent, Receiver, ReturnType, Signature, Stmt, Token,
-    TraitItem, Type, TypeParamBound, TypePath, WhereClause,
+    parse_quote, parse_quote_spanned, Attribute, Block, FnArg, GenericArgument, GenericParam,
+    Generics, Ident, ImplItem, Lifetime, LifetimeParam, Pat, PatIdent, PathArguments, Receiver,
+    ReturnType, Signature, Token, TraitItem, Type, TypePath, WhereClause,
 };
 
 <span class="kw">impl </span>ToTokens <span class="kw">for </span>Item {
@@ -504,7 +521,7 @@
 }
 
 <span class="kw">impl </span>Context&lt;<span class="lifetime">&#39;_</span>&gt; {
-    <span class="kw">fn </span>lifetimes&lt;<span class="lifetime">&#39;a</span>&gt;(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="self">self</span>, used: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>[Lifetime]) -&gt; <span class="kw">impl </span>Iterator&lt;Item = <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>LifetimeDef&gt; {
+    <span class="kw">fn </span>lifetimes&lt;<span class="lifetime">&#39;a</span>&gt;(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="self">self</span>, used: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>[Lifetime]) -&gt; <span class="kw">impl </span>Iterator&lt;Item = <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>LifetimeParam&gt; {
         <span class="kw">let </span>generics = <span class="kw">match </span><span class="self">self </span>{
             Context::Trait { generics, .. } =&gt; generics,
             Context::Impl { impl_generics, .. } =&gt; impl_generics,
@@ -520,8 +537,6 @@
     }
 }
 
-<span class="kw">type </span>Supertraits = Punctuated&lt;TypeParamBound, <span class="macro">Token!</span>[+]&gt;;
-
 <span class="kw">pub fn </span>expand(input: <span class="kw-2">&amp;mut </span>Item, is_local: bool) {
     <span class="kw">match </span>input {
         Item::Trait(input) =&gt; {
@@ -530,7 +545,7 @@
                 supertraits: <span class="kw-2">&amp;</span>input.supertraits,
             };
             <span class="kw">for </span>inner <span class="kw">in </span><span class="kw-2">&amp;mut </span>input.items {
-                <span class="kw">if let </span>TraitItem::Method(method) = inner {
+                <span class="kw">if let </span>TraitItem::Fn(method) = inner {
                     <span class="kw">let </span>sig = <span class="kw-2">&amp;mut </span>method.sig;
                     <span class="kw">if </span>sig.asyncness.is_some() {
                         <span class="kw">let </span>block = <span class="kw-2">&amp;mut </span>method.default;
@@ -550,13 +565,6 @@
             }
         }
         Item::Impl(input) =&gt; {
-            <span class="kw">let </span><span class="kw-2">mut </span>lifetimes = CollectLifetimes::new(<span class="string">&quot;&#39;impl&quot;</span>, input.impl_token.span);
-            lifetimes.visit_type_mut(<span class="kw-2">&amp;mut *</span>input.self_ty);
-            lifetimes.visit_path_mut(<span class="kw-2">&amp;mut </span>input.trait_.as_mut().unwrap().<span class="number">1</span>);
-            <span class="kw">let </span>params = <span class="kw-2">&amp;</span>input.generics.params;
-            <span class="kw">let </span>elided = lifetimes.elided;
-            input.generics.params = <span class="macro">parse_quote!</span>(#(#elided,)* #params);
-
             <span class="kw">let </span><span class="kw-2">mut </span>associated_type_impl_traits = Set::new();
             <span class="kw">for </span>inner <span class="kw">in </span><span class="kw-2">&amp;</span>input.items {
                 <span class="kw">if let </span>ImplItem::Type(assoc) = inner {
@@ -571,15 +579,27 @@
                 associated_type_impl_traits: <span class="kw-2">&amp;</span>associated_type_impl_traits,
             };
             <span class="kw">for </span>inner <span class="kw">in </span><span class="kw-2">&amp;mut </span>input.items {
-                <span class="kw">if let </span>ImplItem::Method(method) = inner {
-                    <span class="kw">let </span>sig = <span class="kw-2">&amp;mut </span>method.sig;
-                    <span class="kw">if </span>sig.asyncness.is_some() {
+                <span class="kw">match </span>inner {
+                    ImplItem::Fn(method) <span class="kw">if </span>method.sig.asyncness.is_some() =&gt; {
+                        <span class="kw">let </span>sig = <span class="kw-2">&amp;mut </span>method.sig;
                         <span class="kw">let </span>block = <span class="kw-2">&amp;mut </span>method.block;
                         <span class="kw">let </span>has_self = has_self_in_sig(sig) || has_self_in_block(block);
                         transform_block(context, sig, block);
                         transform_sig(context, sig, has_self, <span class="bool-val">false</span>, is_local);
                         method.attrs.push(lint_suppress_with_body());
                     }
+                    ImplItem::Verbatim(tokens) =&gt; {
+                        <span class="kw">let </span><span class="kw-2">mut </span>method = <span class="kw">match </span>syn::parse2::&lt;VerbatimFn&gt;(tokens.clone()) {
+                            <span class="prelude-val">Ok</span>(method) <span class="kw">if </span>method.sig.asyncness.is_some() =&gt; method,
+                            <span class="kw">_ </span>=&gt; <span class="kw">continue</span>,
+                        };
+                        <span class="kw">let </span>sig = <span class="kw-2">&amp;mut </span>method.sig;
+                        <span class="kw">let </span>has_self = has_self_in_sig(sig);
+                        transform_sig(context, sig, has_self, <span class="bool-val">false</span>, is_local);
+                        method.attrs.push(lint_suppress_with_body());
+                        <span class="kw-2">*</span>tokens = <span class="macro">quote!</span>(#method);
+                    }
+                    <span class="kw">_ </span>=&gt; {}
                 }
             }
         }
@@ -589,6 +609,8 @@
 <span class="kw">fn </span>lint_suppress_with_body() -&gt; Attribute {
     <span class="macro">parse_quote! </span>{
         <span class="attr">#[allow(
+            clippy::async_yields_async,
+            clippy::diverging_sub_expression,
             clippy::let_unit_value,
             clippy::no_effect_underscore_binding,
             clippy::shadow_same,
@@ -628,21 +650,16 @@
     has_default: bool,
     is_local: bool,
 ) {
-    sig.fn_token.span = sig.asyncness.take().unwrap().span;
+    <span class="kw">let </span>default_span = sig.asyncness.take().unwrap().span;
+    sig.fn_token.span = default_span;
 
-    <span class="kw">let </span>ret = <span class="kw">match </span><span class="kw-2">&amp;</span>sig.output {
-        ReturnType::Default =&gt; <span class="macro">quote!</span>(()),
-        ReturnType::Type(<span class="kw">_</span>, ret) =&gt; <span class="macro">quote!</span>(#ret),
+    <span class="kw">let </span>(ret_arrow, ret) = <span class="kw">match </span><span class="kw-2">&amp;</span>sig.output {
+        ReturnType::Default =&gt; (<span class="macro">Token!</span>[-&gt;](default_span), <span class="macro">quote_spanned!</span>(default_span=&gt; ())),
+        ReturnType::Type(arrow, ret) =&gt; (<span class="kw-2">*</span>arrow, <span class="macro">quote!</span>(#ret)),
     };
 
-    <span class="kw">let </span>default_span = sig
-        .ident
-        .span()
-        .join(sig.paren_token.span)
-        .unwrap_or_else(|| sig.ident.span());
-
-    <span class="kw">let </span><span class="kw-2">mut </span>lifetimes = CollectLifetimes::new(<span class="string">&quot;&#39;life&quot;</span>, default_span);
-    <span class="kw">for </span>arg <span class="kw">in </span>sig.inputs.iter_mut() {
+    <span class="kw">let </span><span class="kw-2">mut </span>lifetimes = CollectLifetimes::new();
+    <span class="kw">for </span>arg <span class="kw">in </span><span class="kw-2">&amp;mut </span>sig.inputs {
         <span class="kw">match </span>arg {
             FnArg::Receiver(arg) =&gt; lifetimes.visit_receiver_mut(arg),
             FnArg::Typed(arg) =&gt; lifetimes.visit_type_mut(<span class="kw-2">&amp;mut </span>arg.ty),
@@ -689,7 +706,7 @@
         sig.generics.lt_token = <span class="prelude-val">Some</span>(<span class="macro">Token!</span>[&lt;](sig.ident.span()));
     }
     <span class="kw">if </span>sig.generics.gt_token.is_none() {
-        sig.generics.gt_token = <span class="prelude-val">Some</span>(<span class="macro">Token!</span>[&gt;](sig.paren_token.span));
+        sig.generics.gt_token = <span class="prelude-val">Some</span>(<span class="macro">Token!</span>[&gt;](sig.paren_token.span.join()));
     }
 
     <span class="kw">for </span>elided <span class="kw">in </span>lifetimes.elided {
@@ -704,67 +721,89 @@
         .push(<span class="macro">parse_quote_spanned!</span>(default_span=&gt; <span class="lifetime">&#39;async_trait</span>));
 
     <span class="kw">if </span>has_self {
-        <span class="kw">let </span>bound_span = sig.ident.span();
-        <span class="kw">let </span>bound = <span class="kw">match </span>sig.inputs.iter().next() {
-            <span class="prelude-val">Some</span>(FnArg::Receiver(Receiver {
-                reference: <span class="prelude-val">Some</span>(<span class="kw">_</span>),
-                mutability: <span class="prelude-val">None</span>,
-                ..
-            })) =&gt; Ident::new(<span class="string">&quot;Sync&quot;</span>, bound_span),
-            <span class="prelude-val">Some</span>(FnArg::Typed(arg))
-                <span class="kw">if match </span>(arg.pat.as_ref(), arg.ty.as_ref()) {
-                    (Pat::Ident(pat), Type::Reference(ty)) =&gt; {
-                        pat.ident == <span class="string">&quot;self&quot; </span>&amp;&amp; ty.mutability.is_none()
-                    }
-                    <span class="kw">_ </span>=&gt; <span class="bool-val">false</span>,
-                } =&gt;
-            {
-                Ident::new(<span class="string">&quot;Sync&quot;</span>, bound_span)
+        <span class="kw">let </span>bounds: <span class="kw-2">&amp;</span>[InferredBound] = <span class="kw">if let </span><span class="prelude-val">Some</span>(receiver) = sig.receiver() {
+            <span class="kw">match </span>receiver.ty.as_ref() {
+                <span class="comment">// self: &amp;Self
+                </span>Type::Reference(ty) <span class="kw">if </span>ty.mutability.is_none() =&gt; <span class="kw-2">&amp;</span>[InferredBound::Sync],
+                <span class="comment">// self: Arc&lt;Self&gt;
+                </span>Type::Path(ty)
+                    <span class="kw">if </span>{
+                        <span class="kw">let </span>segment = ty.path.segments.last().unwrap();
+                        segment.ident == <span class="string">&quot;Arc&quot;
+                            </span>&amp;&amp; <span class="kw">match </span><span class="kw-2">&amp;</span>segment.arguments {
+                                PathArguments::AngleBracketed(arguments) =&gt; {
+                                    arguments.args.len() == <span class="number">1
+                                        </span>&amp;&amp; <span class="kw">match </span><span class="kw-2">&amp;</span>arguments.args[<span class="number">0</span>] {
+                                            GenericArgument::Type(Type::Path(arg)) =&gt; {
+                                                arg.path.is_ident(<span class="string">&quot;Self&quot;</span>)
+                                            }
+                                            <span class="kw">_ </span>=&gt; <span class="bool-val">false</span>,
+                                        }
+                                }
+                                <span class="kw">_ </span>=&gt; <span class="bool-val">false</span>,
+                            }
+                    } =&gt;
+                {
+                    <span class="kw-2">&amp;</span>[InferredBound::Sync, InferredBound::Send]
+                }
+                <span class="kw">_ </span>=&gt; <span class="kw-2">&amp;</span>[InferredBound::Send],
             }
-            <span class="kw">_ </span>=&gt; Ident::new(<span class="string">&quot;Send&quot;</span>, bound_span),
-        };
-
-        <span class="kw">let </span>assume_bound = <span class="kw">match </span>context {
-            Context::Trait { supertraits, .. } =&gt; !has_default || has_bound(supertraits, <span class="kw-2">&amp;</span>bound),
-            Context::Impl { .. } =&gt; <span class="bool-val">true</span>,
-        };
-
-        <span class="kw">let </span>where_clause = where_clause_or_default(<span class="kw-2">&amp;mut </span>sig.generics.where_clause);
-        where_clause.predicates.push(<span class="kw">if </span>assume_bound || is_local {
-            <span class="macro">parse_quote_spanned!</span>(bound_span=&gt; <span class="self">Self</span>: <span class="lifetime">&#39;async_trait</span>)
         } <span class="kw">else </span>{
-            <span class="macro">parse_quote_spanned!</span>(bound_span=&gt; <span class="self">Self</span>: ::core::marker::#bound + <span class="lifetime">&#39;async_trait</span>)
+            <span class="kw-2">&amp;</span>[InferredBound::Send]
+        };
+
+        <span class="kw">let </span>bounds = bounds.iter().filter_map(|bound| {
+            <span class="kw">let </span>assume_bound = <span class="kw">match </span>context {
+                Context::Trait { supertraits, .. } =&gt; !has_default || has_bound(supertraits, bound),
+                Context::Impl { .. } =&gt; <span class="bool-val">true</span>,
+            };
+            <span class="kw">if </span>assume_bound || is_local {
+                <span class="prelude-val">None
+            </span>} <span class="kw">else </span>{
+                <span class="prelude-val">Some</span>(bound.spanned_path(default_span))
+            }
         });
+
+        where_clause_or_default(<span class="kw-2">&amp;mut </span>sig.generics.where_clause)
+            .predicates
+            .push(<span class="macro">parse_quote_spanned! </span>{default_span=&gt;
+                <span class="self">Self</span>: #(#bounds +)* <span class="lifetime">&#39;async_trait
+            </span>});
     }
 
     <span class="kw">for </span>(i, arg) <span class="kw">in </span>sig.inputs.iter_mut().enumerate() {
         <span class="kw">match </span>arg {
-            FnArg::Receiver(Receiver {
-                reference: <span class="prelude-val">Some</span>(<span class="kw">_</span>), ..
-            }) =&gt; {}
-            FnArg::Receiver(arg) =&gt; arg.mutability = <span class="prelude-val">None</span>,
+            FnArg::Receiver(receiver) =&gt; {
+                <span class="kw">if </span>receiver.reference.is_none() {
+                    receiver.mutability = <span class="prelude-val">None</span>;
+                }
+            }
             FnArg::Typed(arg) =&gt; {
-                <span class="kw">if let </span>Pat::Ident(ident) = <span class="kw-2">&amp;mut *</span>arg.pat {
-                    ident.by_ref = <span class="prelude-val">None</span>;
-                    ident.mutability = <span class="prelude-val">None</span>;
-                } <span class="kw">else </span>{
-                    <span class="kw">let </span>positional = positional_arg(i, <span class="kw-2">&amp;</span>arg.pat);
-                    <span class="kw">let </span>m = mut_pat(<span class="kw-2">&amp;mut </span>arg.pat);
-                    arg.pat = <span class="macro">parse_quote!</span>(#m #positional);
+                <span class="kw">if match </span><span class="kw-2">*</span>arg.ty {
+                    Type::Reference(<span class="kw">_</span>) =&gt; <span class="bool-val">false</span>,
+                    <span class="kw">_ </span>=&gt; <span class="bool-val">true</span>,
+                } {
+                    <span class="kw">if let </span>Pat::Ident(pat) = <span class="kw-2">&amp;mut *</span>arg.pat {
+                        pat.by_ref = <span class="prelude-val">None</span>;
+                        pat.mutability = <span class="prelude-val">None</span>;
+                    } <span class="kw">else </span>{
+                        <span class="kw">let </span>positional = positional_arg(i, <span class="kw-2">&amp;</span>arg.pat);
+                        <span class="kw">let </span>m = mut_pat(<span class="kw-2">&amp;mut </span>arg.pat);
+                        arg.pat = <span class="macro">parse_quote!</span>(#m #positional);
+                    }
                 }
                 AddLifetimeToImplTrait.visit_type_mut(<span class="kw-2">&amp;mut </span>arg.ty);
             }
         }
     }
 
-    <span class="kw">let </span>ret_span = sig.ident.span();
     <span class="kw">let </span>bounds = <span class="kw">if </span>is_local {
-        <span class="macro">quote_spanned!</span>(ret_span=&gt; <span class="lifetime">&#39;async_trait</span>)
+        <span class="macro">quote_spanned!</span>(default_span=&gt; <span class="lifetime">&#39;async_trait</span>)
     } <span class="kw">else </span>{
-        <span class="macro">quote_spanned!</span>(ret_span=&gt; ::core::marker::Send + <span class="lifetime">&#39;async_trait</span>)
+        <span class="macro">quote_spanned!</span>(default_span=&gt; ::core::marker::Send + <span class="lifetime">&#39;async_trait</span>)
     };
-    sig.output = <span class="macro">parse_quote_spanned! </span>{ret_span=&gt;
-        -&gt; ::core::pin::Pin&lt;Box&lt;
+    sig.output = <span class="macro">parse_quote_spanned! </span>{default_span=&gt;
+        #ret_arrow ::core::pin::Pin&lt;Box&lt;
             <span class="kw">dyn </span>::core::future::Future&lt;Output = #ret&gt; + #bounds
         &gt;&gt;
     };
@@ -788,12 +827,6 @@
 //         ___ret
 //     })
 </span><span class="kw">fn </span>transform_block(context: Context, sig: <span class="kw-2">&amp;mut </span>Signature, block: <span class="kw-2">&amp;mut </span>Block) {
-    <span class="kw">if let </span><span class="prelude-val">Some</span>(Stmt::Item(syn::Item::Verbatim(item))) = block.stmts.first() {
-        <span class="kw">if </span>block.stmts.len() == <span class="number">1 </span>&amp;&amp; item.to_string() == <span class="string">&quot;;&quot; </span>{
-            <span class="kw">return</span>;
-        }
-    }
-
     <span class="kw">let </span><span class="kw-2">mut </span>self_span = <span class="prelude-val">None</span>;
     <span class="kw">let </span>decls = sig
         .inputs
@@ -810,24 +843,38 @@
                 <span class="macro">quote!</span>(<span class="kw">let </span>#mutability #ident = #self_token;)
             }
             FnArg::Typed(arg) =&gt; {
-                <span class="kw">if let </span>Pat::Ident(PatIdent {
+                <span class="comment">// If there is a #[cfg(...)] attribute that selectively enables
+                // the parameter, forward it to the variable.
+                //
+                // This is currently not applied to the `self` parameter.
+                </span><span class="kw">let </span>attrs = arg.attrs.iter().filter(|attr| attr.path().is_ident(<span class="string">&quot;cfg&quot;</span>));
+
+                <span class="kw">if let </span>Type::Reference(<span class="kw">_</span>) = <span class="kw-2">*</span>arg.ty {
+                    <span class="macro">quote!</span>()
+                } <span class="kw">else if let </span>Pat::Ident(PatIdent {
                     ident, mutability, ..
                 }) = <span class="kw-2">&amp;*</span>arg.pat
                 {
-                    <span class="kw">if </span>ident == <span class="string">&quot;self&quot; </span>{
-                        self_span = <span class="prelude-val">Some</span>(ident.span());
-                        <span class="kw">let </span>prefixed = Ident::new(<span class="string">&quot;__self&quot;</span>, ident.span());
-                        <span class="macro">quote!</span>(<span class="kw">let </span>#mutability #prefixed = #ident;)
-                    } <span class="kw">else </span>{
-                        <span class="macro">quote!</span>(<span class="kw">let </span>#mutability #ident = #ident;)
+                    <span class="macro">quote! </span>{
+                        #(#attrs)*
+                        <span class="kw">let </span>#mutability #ident = #ident;
                     }
                 } <span class="kw">else </span>{
                     <span class="kw">let </span>pat = <span class="kw-2">&amp;</span>arg.pat;
                     <span class="kw">let </span>ident = positional_arg(i, pat);
                     <span class="kw">if let </span>Pat::Wild(<span class="kw">_</span>) = <span class="kw-2">**</span>pat {
-                        <span class="macro">quote!</span>(<span class="kw">let </span>#ident = #ident;)
+                        <span class="macro">quote! </span>{
+                            #(#attrs)*
+                            <span class="kw">let </span>#ident = #ident;
+                        }
                     } <span class="kw">else </span>{
-                        <span class="macro">quote!</span>(<span class="kw">let </span>#pat = #ident;)
+                        <span class="macro">quote! </span>{
+                            #(#attrs)*
+                            <span class="kw">let </span>#pat = {
+                                <span class="kw">let </span>#ident = #ident;
+                                #ident
+                            };
+                        }
                     }
                 }
             }
@@ -877,23 +924,6 @@
     </span><span class="kw">let </span>span = span.resolved_at(Span::mixed_site());
     <span class="macro">format_ident!</span>(<span class="string">&quot;__arg{}&quot;</span>, i, span = span)
 }
-
-<span class="kw">fn </span>has_bound(supertraits: <span class="kw-2">&amp;</span>Supertraits, marker: <span class="kw-2">&amp;</span>Ident) -&gt; bool {
-    <span class="kw">for </span>bound <span class="kw">in </span>supertraits {
-        <span class="kw">if let </span>TypeParamBound::Trait(bound) = bound {
-            <span class="kw">if </span>bound.path.is_ident(marker)
-                || bound.path.segments.len() == <span class="number">3
-                    </span>&amp;&amp; (bound.path.segments[<span class="number">0</span>].ident == <span class="string">&quot;std&quot;
-                        </span>|| bound.path.segments[<span class="number">0</span>].ident == <span class="string">&quot;core&quot;</span>)
-                    &amp;&amp; bound.path.segments[<span class="number">1</span>].ident == <span class="string">&quot;marker&quot;
-                    </span>&amp;&amp; bound.path.segments[<span class="number">2</span>].ident == <span class="kw-2">*</span>marker
-            {
-                <span class="kw">return </span><span class="bool-val">true</span>;
-            }
-        }
-    }
-    <span class="bool-val">false
-</span>}
 
 <span class="kw">fn </span>contains_associated_type_impl_trait(context: Context, ret: <span class="kw-2">&amp;mut </span>Type) -&gt; bool {
     <span class="kw">struct </span>AssociatedTypeImplTraits&lt;<span class="lifetime">&#39;a</span>&gt; {

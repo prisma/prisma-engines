@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/nix/store/jnqxxv1xi811ni996b002f4jnyz38xck-vendor-cargo-deps/c19b7c6f923b580ac259164a89f2577984ad5ab09ee9d583b888f934adbbe8d0/mongodb-2.3.0/src/cmap/establish/handshake/mod.rs`."><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../../../static.files/rustdoc-f3501f0f5ae15dfb.css" id="mainThemeStyle"><div id="rustdoc-vars" data-root-path="../../../../../" data-static-root-path="../../../../../static.files/" data-current-crate="mongodb" data-themes="" data-resource-suffix="" data-rustdoc-version="1.71.0 (8ede3aae2 2023-07-12)" data-search-js="search-4926e5fc22a5646a.js" data-settings-js="settings-de11bff964e9d4e5.js" data-settings-css="settings-8c76f75bfb6bd192.css" data-theme-light-css="light-0f8c037637f9eb3e.css" data-theme-dark-css="dark-1097f8e92a01e3cf.css" data-theme-ayu-css="ayu-614652228113ac93.css" ></div><script src="../../../../../static.files/storage-62ce34ea385b278a.js"></script><script defer src="../../../../../static.files/source-script-11255107d0a65077.js"></script><script defer src="../../../../../source-files.js"></script><script defer src="../../../../../static.files/main-f0540c1d82cde29b.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../../../../../static.files/light-0f8c037637f9eb3e.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../../../../../static.files/dark-1097f8e92a01e3cf.css"><link rel="stylesheet" href="../../../../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../../../../mongodb/index.html"><img class="rust-logo" src="../../../../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/nix/store/yf45a1rayffhnidhgyjynpyhr9lqkd09-vendor-cargo-deps/c19b7c6f923b580ac259164a89f2577984ad5ab09ee9d583b888f934adbbe8d0/mongodb-2.6.0/src/cmap/establish/handshake/mod.rs`."><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../../../static.files/rustdoc-f3501f0f5ae15dfb.css" id="mainThemeStyle"><div id="rustdoc-vars" data-root-path="../../../../../" data-static-root-path="../../../../../static.files/" data-current-crate="mongodb" data-themes="" data-resource-suffix="" data-rustdoc-version="1.71.0 (8ede3aae2 2023-07-12)" data-search-js="search-4926e5fc22a5646a.js" data-settings-js="settings-de11bff964e9d4e5.js" data-settings-css="settings-8c76f75bfb6bd192.css" data-theme-light-css="light-0f8c037637f9eb3e.css" data-theme-dark-css="dark-1097f8e92a01e3cf.css" data-theme-ayu-css="ayu-614652228113ac93.css" ></div><script src="../../../../../static.files/storage-62ce34ea385b278a.js"></script><script defer src="../../../../../static.files/source-script-11255107d0a65077.js"></script><script defer src="../../../../../source-files.js"></script><script defer src="../../../../../static.files/main-f0540c1d82cde29b.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../../../../../static.files/light-0f8c037637f9eb3e.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../../../../../static.files/dark-1097f8e92a01e3cf.css"><link rel="stylesheet" href="../../../../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../../../../mongodb/index.html"><img class="rust-logo" src="../../../../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -354,24 +354,198 @@
 <a href="#354" id="354">354</a>
 <a href="#355" id="355">355</a>
 <a href="#356" id="356">356</a>
+<a href="#357" id="357">357</a>
+<a href="#358" id="358">358</a>
+<a href="#359" id="359">359</a>
+<a href="#360" id="360">360</a>
+<a href="#361" id="361">361</a>
+<a href="#362" id="362">362</a>
+<a href="#363" id="363">363</a>
+<a href="#364" id="364">364</a>
+<a href="#365" id="365">365</a>
+<a href="#366" id="366">366</a>
+<a href="#367" id="367">367</a>
+<a href="#368" id="368">368</a>
+<a href="#369" id="369">369</a>
+<a href="#370" id="370">370</a>
+<a href="#371" id="371">371</a>
+<a href="#372" id="372">372</a>
+<a href="#373" id="373">373</a>
+<a href="#374" id="374">374</a>
+<a href="#375" id="375">375</a>
+<a href="#376" id="376">376</a>
+<a href="#377" id="377">377</a>
+<a href="#378" id="378">378</a>
+<a href="#379" id="379">379</a>
+<a href="#380" id="380">380</a>
+<a href="#381" id="381">381</a>
+<a href="#382" id="382">382</a>
+<a href="#383" id="383">383</a>
+<a href="#384" id="384">384</a>
+<a href="#385" id="385">385</a>
+<a href="#386" id="386">386</a>
+<a href="#387" id="387">387</a>
+<a href="#388" id="388">388</a>
+<a href="#389" id="389">389</a>
+<a href="#390" id="390">390</a>
+<a href="#391" id="391">391</a>
+<a href="#392" id="392">392</a>
+<a href="#393" id="393">393</a>
+<a href="#394" id="394">394</a>
+<a href="#395" id="395">395</a>
+<a href="#396" id="396">396</a>
+<a href="#397" id="397">397</a>
+<a href="#398" id="398">398</a>
+<a href="#399" id="399">399</a>
+<a href="#400" id="400">400</a>
+<a href="#401" id="401">401</a>
+<a href="#402" id="402">402</a>
+<a href="#403" id="403">403</a>
+<a href="#404" id="404">404</a>
+<a href="#405" id="405">405</a>
+<a href="#406" id="406">406</a>
+<a href="#407" id="407">407</a>
+<a href="#408" id="408">408</a>
+<a href="#409" id="409">409</a>
+<a href="#410" id="410">410</a>
+<a href="#411" id="411">411</a>
+<a href="#412" id="412">412</a>
+<a href="#413" id="413">413</a>
+<a href="#414" id="414">414</a>
+<a href="#415" id="415">415</a>
+<a href="#416" id="416">416</a>
+<a href="#417" id="417">417</a>
+<a href="#418" id="418">418</a>
+<a href="#419" id="419">419</a>
+<a href="#420" id="420">420</a>
+<a href="#421" id="421">421</a>
+<a href="#422" id="422">422</a>
+<a href="#423" id="423">423</a>
+<a href="#424" id="424">424</a>
+<a href="#425" id="425">425</a>
+<a href="#426" id="426">426</a>
+<a href="#427" id="427">427</a>
+<a href="#428" id="428">428</a>
+<a href="#429" id="429">429</a>
+<a href="#430" id="430">430</a>
+<a href="#431" id="431">431</a>
+<a href="#432" id="432">432</a>
+<a href="#433" id="433">433</a>
+<a href="#434" id="434">434</a>
+<a href="#435" id="435">435</a>
+<a href="#436" id="436">436</a>
+<a href="#437" id="437">437</a>
+<a href="#438" id="438">438</a>
+<a href="#439" id="439">439</a>
+<a href="#440" id="440">440</a>
+<a href="#441" id="441">441</a>
+<a href="#442" id="442">442</a>
+<a href="#443" id="443">443</a>
+<a href="#444" id="444">444</a>
+<a href="#445" id="445">445</a>
+<a href="#446" id="446">446</a>
+<a href="#447" id="447">447</a>
+<a href="#448" id="448">448</a>
+<a href="#449" id="449">449</a>
+<a href="#450" id="450">450</a>
+<a href="#451" id="451">451</a>
+<a href="#452" id="452">452</a>
+<a href="#453" id="453">453</a>
+<a href="#454" id="454">454</a>
+<a href="#455" id="455">455</a>
+<a href="#456" id="456">456</a>
+<a href="#457" id="457">457</a>
+<a href="#458" id="458">458</a>
+<a href="#459" id="459">459</a>
+<a href="#460" id="460">460</a>
+<a href="#461" id="461">461</a>
+<a href="#462" id="462">462</a>
+<a href="#463" id="463">463</a>
+<a href="#464" id="464">464</a>
+<a href="#465" id="465">465</a>
+<a href="#466" id="466">466</a>
+<a href="#467" id="467">467</a>
+<a href="#468" id="468">468</a>
+<a href="#469" id="469">469</a>
+<a href="#470" id="470">470</a>
+<a href="#471" id="471">471</a>
+<a href="#472" id="472">472</a>
+<a href="#473" id="473">473</a>
+<a href="#474" id="474">474</a>
+<a href="#475" id="475">475</a>
+<a href="#476" id="476">476</a>
+<a href="#477" id="477">477</a>
+<a href="#478" id="478">478</a>
+<a href="#479" id="479">479</a>
+<a href="#480" id="480">480</a>
+<a href="#481" id="481">481</a>
+<a href="#482" id="482">482</a>
+<a href="#483" id="483">483</a>
+<a href="#484" id="484">484</a>
+<a href="#485" id="485">485</a>
+<a href="#486" id="486">486</a>
+<a href="#487" id="487">487</a>
+<a href="#488" id="488">488</a>
+<a href="#489" id="489">489</a>
+<a href="#490" id="490">490</a>
+<a href="#491" id="491">491</a>
+<a href="#492" id="492">492</a>
+<a href="#493" id="493">493</a>
+<a href="#494" id="494">494</a>
+<a href="#495" id="495">495</a>
+<a href="#496" id="496">496</a>
+<a href="#497" id="497">497</a>
+<a href="#498" id="498">498</a>
+<a href="#499" id="499">499</a>
+<a href="#500" id="500">500</a>
+<a href="#501" id="501">501</a>
+<a href="#502" id="502">502</a>
+<a href="#503" id="503">503</a>
+<a href="#504" id="504">504</a>
+<a href="#505" id="505">505</a>
+<a href="#506" id="506">506</a>
+<a href="#507" id="507">507</a>
+<a href="#508" id="508">508</a>
+<a href="#509" id="509">509</a>
+<a href="#510" id="510">510</a>
+<a href="#511" id="511">511</a>
+<a href="#512" id="512">512</a>
+<a href="#513" id="513">513</a>
+<a href="#514" id="514">514</a>
+<a href="#515" id="515">515</a>
+<a href="#516" id="516">516</a>
+<a href="#517" id="517">517</a>
+<a href="#518" id="518">518</a>
+<a href="#519" id="519">519</a>
+<a href="#520" id="520">520</a>
+<a href="#521" id="521">521</a>
+<a href="#522" id="522">522</a>
+<a href="#523" id="523">523</a>
+<a href="#524" id="524">524</a>
+<a href="#525" id="525">525</a>
+<a href="#526" id="526">526</a>
+<a href="#527" id="527">527</a>
+<a href="#528" id="528">528</a>
+<a href="#529" id="529">529</a>
+<a href="#530" id="530">530</a>
+<a href="#531" id="531">531</a>
+<a href="#532" id="532">532</a>
+<a href="#533" id="533">533</a>
 </pre></div><pre class="rust"><code><span class="attr">#[cfg(test)]
 </span><span class="kw">mod </span>test;
 
-<span class="kw">use </span>std::sync::Arc;
+<span class="kw">use </span>std::env;
 
 <span class="kw">use </span>lazy_static::lazy_static;
-<span class="kw">use </span>os_info::{Type, Version};
 
 <span class="kw">use crate</span>::{
     bson::{doc, Bson, Document},
-    client::auth::{ClientFirst, FirstRound},
-    cmap::{options::ConnectionPoolOptions, Command, Connection, StreamDescription},
+    client::auth::ClientFirst,
+    cmap::{Command, Connection, StreamDescription},
     compression::Compressor,
-    error::{ErrorKind, <span class="prelude-ty">Result</span>},
-    event::sdam::SdamEventHandler,
+    error::Result,
     hello::{hello_command, run_hello, HelloReply},
-    options::{AuthMechanism, ClientOptions, Credential, DriverInfo, ServerApi},
-    sdam::Topology,
+    options::{AuthMechanism, Credential, DriverInfo, ServerApi},
 };
 
 <span class="attr">#[cfg(all(feature = <span class="string">&quot;tokio-runtime&quot;</span>, not(feature = <span class="string">&quot;tokio-sync&quot;</span>)))]
@@ -392,6 +566,7 @@
     driver: DriverMetadata,
     os: OsMetadata,
     platform: String,
+    env: <span class="prelude-ty">Option</span>&lt;FaasEnvironment&gt;,
 }
 
 <span class="attr">#[derive(Clone, Debug)]
@@ -409,8 +584,26 @@
 </span><span class="kw">struct </span>OsMetadata {
     os_type: String,
     name: <span class="prelude-ty">Option</span>&lt;String&gt;,
-    architecture: String,
+    architecture: <span class="prelude-ty">Option</span>&lt;String&gt;,
     version: <span class="prelude-ty">Option</span>&lt;String&gt;,
+}
+
+<span class="attr">#[derive(Clone, Debug)]
+</span><span class="kw">struct </span>FaasEnvironment {
+    name: FaasEnvironmentName,
+    runtime: <span class="prelude-ty">Option</span>&lt;String&gt;,
+    timeout_sec: <span class="prelude-ty">Option</span>&lt;i32&gt;,
+    memory_mb: <span class="prelude-ty">Option</span>&lt;i32&gt;,
+    region: <span class="prelude-ty">Option</span>&lt;String&gt;,
+    url: <span class="prelude-ty">Option</span>&lt;String&gt;,
+}
+
+<span class="attr">#[derive(Copy, Clone, Debug)]
+</span><span class="kw">enum </span>FaasEnvironmentName {
+    AwsLambda,
+    AzureFunc,
+    GcpFunc,
+    Vercel,
 }
 
 <span class="kw">impl </span>From&lt;ClientMetadata&gt; <span class="kw">for </span>Bson {
@@ -432,6 +625,10 @@
         metadata_doc.insert(<span class="string">&quot;os&quot;</span>, metadata.os);
         metadata_doc.insert(<span class="string">&quot;platform&quot;</span>, metadata.platform);
 
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(env) = metadata.env {
+            metadata_doc.insert(<span class="string">&quot;env&quot;</span>, env);
+        }
+
         Bson::Document(metadata_doc)
     }
 }
@@ -444,7 +641,9 @@
             doc.insert(<span class="string">&quot;name&quot;</span>, name);
         }
 
-        doc.insert(<span class="string">&quot;architecture&quot;</span>, metadata.architecture);
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(arch) = metadata.architecture {
+            doc.insert(<span class="string">&quot;architecture&quot;</span>, arch);
+        }
 
         <span class="kw">if let </span><span class="prelude-val">Some</span>(version) = metadata.version {
             doc.insert(<span class="string">&quot;version&quot;</span>, version);
@@ -454,12 +653,151 @@
     }
 }
 
+<span class="kw">impl </span>From&lt;FaasEnvironment&gt; <span class="kw">for </span>Bson {
+    <span class="kw">fn </span>from(env: FaasEnvironment) -&gt; <span class="self">Self </span>{
+        <span class="kw">let </span>FaasEnvironment {
+            name,
+            runtime,
+            timeout_sec,
+            memory_mb,
+            region,
+            url,
+        } = env;
+        <span class="kw">let </span><span class="kw-2">mut </span>out = <span class="macro">doc! </span>{
+            <span class="string">&quot;name&quot;</span>: name.name(),
+        };
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(rt) = runtime {
+            out.insert(<span class="string">&quot;runtime&quot;</span>, rt);
+        }
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(t) = timeout_sec {
+            out.insert(<span class="string">&quot;timeout_sec&quot;</span>, t);
+        }
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(m) = memory_mb {
+            out.insert(<span class="string">&quot;memory_mb&quot;</span>, m);
+        }
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(r) = region {
+            out.insert(<span class="string">&quot;region&quot;</span>, r);
+        }
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(u) = url {
+            out.insert(<span class="string">&quot;url&quot;</span>, u);
+        }
+        Bson::Document(out)
+    }
+}
+
+<span class="kw">impl </span>FaasEnvironment {
+    <span class="kw">const </span>UNSET: <span class="self">Self </span>= FaasEnvironment {
+        name: FaasEnvironmentName::AwsLambda,
+        runtime: <span class="prelude-val">None</span>,
+        timeout_sec: <span class="prelude-val">None</span>,
+        memory_mb: <span class="prelude-val">None</span>,
+        region: <span class="prelude-val">None</span>,
+        url: <span class="prelude-val">None</span>,
+    };
+
+    <span class="kw">fn </span>new() -&gt; <span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>&gt; {
+        <span class="kw">let </span>name = FaasEnvironmentName::new()<span class="question-mark">?</span>;
+        <span class="prelude-val">Some</span>(<span class="kw">match </span>name {
+            FaasEnvironmentName::AwsLambda =&gt; {
+                <span class="kw">let </span>runtime = env::var(<span class="string">&quot;AWS_EXECUTION_ENV&quot;</span>).ok();
+                <span class="kw">let </span>region = env::var(<span class="string">&quot;AWS_REGION&quot;</span>).ok();
+                <span class="kw">let </span>memory_mb = env::var(<span class="string">&quot;AWS_LAMBDA_FUNCTION_MEMORY_SIZE&quot;</span>)
+                    .ok()
+                    .and_then(|s| s.parse().ok());
+                <span class="self">Self </span>{
+                    name,
+                    runtime,
+                    region,
+                    memory_mb,
+                    ..<span class="self">Self</span>::UNSET
+                }
+            }
+            FaasEnvironmentName::AzureFunc =&gt; {
+                <span class="kw">let </span>runtime = env::var(<span class="string">&quot;FUNCTIONS_WORKER_RUNTIME&quot;</span>).ok();
+                <span class="self">Self </span>{
+                    name,
+                    runtime,
+                    ..<span class="self">Self</span>::UNSET
+                }
+            }
+            FaasEnvironmentName::GcpFunc =&gt; {
+                <span class="kw">let </span>memory_mb = env::var(<span class="string">&quot;FUNCTION_MEMORY_MB&quot;</span>)
+                    .ok()
+                    .and_then(|s| s.parse().ok());
+                <span class="kw">let </span>timeout_sec = env::var(<span class="string">&quot;FUNCTION_TIMEOUT_SEC&quot;</span>)
+                    .ok()
+                    .and_then(|s| s.parse().ok());
+                <span class="kw">let </span>region = env::var(<span class="string">&quot;FUNCTION_REGION&quot;</span>).ok();
+                <span class="self">Self </span>{
+                    name,
+                    memory_mb,
+                    timeout_sec,
+                    region,
+                    ..<span class="self">Self</span>::UNSET
+                }
+            }
+            FaasEnvironmentName::Vercel =&gt; {
+                <span class="kw">let </span>region = env::var(<span class="string">&quot;VERCEL_REGION&quot;</span>).ok();
+                <span class="self">Self </span>{
+                    name,
+                    region,
+                    ..<span class="self">Self</span>::UNSET
+                }
+            }
+        })
+    }
+}
+
+<span class="kw">fn </span>var_set(name: <span class="kw-2">&amp;</span>str) -&gt; bool {
+    env::var_os(name).map_or(<span class="bool-val">false</span>, |v| !v.is_empty())
+}
+
+<span class="kw">impl </span>FaasEnvironmentName {
+    <span class="kw">fn </span>new() -&gt; <span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>&gt; {
+        <span class="kw">use </span>FaasEnvironmentName::<span class="kw-2">*</span>;
+        <span class="kw">let </span><span class="kw-2">mut </span>found: <span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>&gt; = <span class="prelude-val">None</span>;
+        <span class="kw">let </span>lambda_env = env::var_os(<span class="string">&quot;AWS_EXECUTION_ENV&quot;</span>)
+            .map_or(<span class="bool-val">false</span>, |v| v.to_string_lossy().starts_with(<span class="string">&quot;AWS_Lambda_&quot;</span>));
+        <span class="kw">if </span>lambda_env || var_set(<span class="string">&quot;AWS_LAMBDA_RUNTIME_API&quot;</span>) {
+            found = <span class="prelude-val">Some</span>(AwsLambda);
+        }
+        <span class="kw">if </span>var_set(<span class="string">&quot;VERCEL&quot;</span>) {
+            <span class="comment">// Vercel takes precedence over AwsLambda.
+            </span>found = <span class="prelude-val">Some</span>(Vercel);
+        }
+        <span class="comment">// Any other conflict is treated as unset.
+        </span><span class="kw">if </span>var_set(<span class="string">&quot;FUNCTIONS_WORKER_RUNTIME&quot;</span>) {
+            <span class="kw">match </span>found {
+                <span class="prelude-val">None </span>=&gt; found = <span class="prelude-val">Some</span>(AzureFunc),
+                <span class="kw">_ </span>=&gt; <span class="kw">return </span><span class="prelude-val">None</span>,
+            }
+        }
+        <span class="kw">if </span>var_set(<span class="string">&quot;K_SERVICE&quot;</span>) || var_set(<span class="string">&quot;FUNCTION_NAME&quot;</span>) {
+            <span class="kw">match </span>found {
+                <span class="prelude-val">None </span>=&gt; found = <span class="prelude-val">Some</span>(GcpFunc),
+                <span class="kw">_ </span>=&gt; <span class="kw">return </span><span class="prelude-val">None</span>,
+            }
+        }
+        found
+    }
+
+    <span class="kw">fn </span>name(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str {
+        <span class="kw">use </span>FaasEnvironmentName::<span class="kw-2">*</span>;
+        <span class="kw">match </span><span class="self">self </span>{
+            AwsLambda =&gt; <span class="string">&quot;aws.lambda&quot;</span>,
+            AzureFunc =&gt; <span class="string">&quot;azure.func&quot;</span>,
+            GcpFunc =&gt; <span class="string">&quot;gcp.func&quot;</span>,
+            Vercel =&gt; <span class="string">&quot;vercel&quot;</span>,
+        }
+    }
+}
+
 <span class="macro">lazy_static! </span>{
     <span class="doccomment">/// Contains the basic handshake information that can be statically determined. This document
     /// (potentially with additional fields added) can be cloned and put in the `client` field of
     /// the `hello` or legacy hello command.
     </span><span class="kw">static </span><span class="kw-2">ref </span>BASE_CLIENT_METADATA: ClientMetadata = {
-        <span class="kw">let </span><span class="kw-2">mut </span>metadata = ClientMetadata {
+        ClientMetadata {
             application: <span class="prelude-val">None</span>,
             driver: DriverMetadata {
                 name: <span class="string">&quot;mongo-rust-driver&quot;</span>.into(),
@@ -467,26 +805,46 @@
             },
             os: OsMetadata {
                 os_type: std::env::consts::OS.into(),
-                architecture: std::env::consts::ARCH.into(),
+                architecture: <span class="prelude-val">Some</span>(std::env::consts::ARCH.into()),
                 name: <span class="prelude-val">None</span>,
                 version: <span class="prelude-val">None</span>,
             },
             platform: <span class="macro">format!</span>(<span class="string">&quot;{} with {}&quot;</span>, rustc_version_runtime::version_meta().short_version_string, RUNTIME_NAME),
-        };
-
-        <span class="kw">let </span>info = os_info::get();
-
-        <span class="kw">if </span>info.os_type() != Type::Unknown {
-            <span class="kw">let </span>version = info.version();
-
-            <span class="kw">if </span><span class="kw-2">*</span>version != Version::Unknown {
-                metadata.os.version = <span class="prelude-val">Some</span>(info.version().to_string());
-            }
+            env: <span class="prelude-val">None</span>,
         }
-
-        metadata
     };
 }
+
+<span class="kw">type </span>Truncation = <span class="kw">fn</span>(<span class="kw-2">&amp;mut </span>ClientMetadata);
+
+<span class="kw">const </span>METADATA_TRUNCATIONS: <span class="kw-2">&amp;</span>[Truncation] = <span class="kw-2">&amp;</span>[
+    <span class="comment">// clear `env.*` except `name`
+    </span>|metadata| {
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(env) = <span class="kw-2">&amp;mut </span>metadata.env {
+            <span class="kw-2">*</span>env = FaasEnvironment {
+                name: env.name,
+                ..FaasEnvironment::UNSET
+            }
+        }
+    },
+    <span class="comment">// clear `os.*` except `type`
+    </span>|metadata| {
+        metadata.os = OsMetadata {
+            os_type: metadata.os.os_type.clone(),
+            architecture: <span class="prelude-val">None</span>,
+            name: <span class="prelude-val">None</span>,
+            version: <span class="prelude-val">None</span>,
+        }
+    },
+    <span class="comment">// clear `env`
+    </span>|metadata| {
+        metadata.env = <span class="prelude-val">None</span>;
+    },
+    <span class="comment">// truncate `platform`
+    </span>|metadata| {
+        metadata.platform = rustc_version_runtime::version_meta().short_version_string;
+    },
+];
 
 <span class="doccomment">/// Contains the logic needed to handshake a connection.
 </span><span class="attr">#[derive(Clone, Debug)]
@@ -495,77 +853,77 @@
     /// given the same pool options, so it can be created at the time the Handshaker is created.
     </span>command: Command,
 
-    credential: <span class="prelude-ty">Option</span>&lt;Credential&gt;,
-
     <span class="comment">// This field is not read without a compression feature flag turned on.
     </span><span class="attr">#[allow(dead_code)]
     </span>compressors: <span class="prelude-ty">Option</span>&lt;Vec&lt;Compressor&gt;&gt;,
+
+    server_api: <span class="prelude-ty">Option</span>&lt;ServerApi&gt;,
+
+    metadata: ClientMetadata,
+
+    <span class="attr">#[cfg(feature = <span class="string">&quot;aws-auth&quot;</span>)]
+    </span>http_client: <span class="kw">crate</span>::runtime::HttpClient,
 }
 
 <span class="kw">impl </span>Handshaker {
     <span class="doccomment">/// Creates a new Handshaker.
-    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>new(options: <span class="prelude-ty">Option</span>&lt;HandshakerOptions&gt;) -&gt; <span class="self">Self </span>{
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>new(options: HandshakerOptions) -&gt; <span class="self">Self </span>{
         <span class="kw">let </span><span class="kw-2">mut </span>metadata = BASE_CLIENT_METADATA.clone();
-        <span class="kw">let </span><span class="kw-2">mut </span>credential = <span class="prelude-val">None</span>;
-
-        <span class="kw">let </span><span class="kw-2">mut </span>compressors = <span class="prelude-val">None</span>;
+        <span class="kw">let </span>compressors = options.compressors;
 
         <span class="kw">let </span><span class="kw-2">mut </span>command = hello_command(
-            options.as_ref().and_then(|opts| opts.server_api.as_ref()),
-            options.as_ref().and_then(|opts| opts.load_balanced.into()),
+            options.server_api.as_ref(),
+            options.load_balanced.into(),
+            <span class="prelude-val">None</span>,
             <span class="prelude-val">None</span>,
         );
 
-        <span class="kw">if let </span><span class="prelude-val">Some</span>(options) = options {
-            <span class="kw">if let </span><span class="prelude-val">Some</span>(app_name) = options.app_name {
-                metadata.application = <span class="prelude-val">Some</span>(AppMetadata { name: app_name });
-            }
-
-            <span class="kw">if let </span><span class="prelude-val">Some</span>(driver_info) = options.driver_info {
-                metadata.driver.name.push(<span class="string">&#39;|&#39;</span>);
-                metadata.driver.name.push_str(<span class="kw-2">&amp;</span>driver_info.name);
-
-                <span class="kw">if let </span><span class="prelude-val">Some</span>(<span class="kw-2">ref </span>version) = driver_info.version {
-                    metadata.driver.version.push(<span class="string">&#39;|&#39;</span>);
-                    metadata.driver.version.push_str(version);
-                }
-
-                <span class="kw">if let </span><span class="prelude-val">Some</span>(<span class="kw-2">ref </span>driver_info_platform) = driver_info.platform {
-                    metadata.platform.push(<span class="string">&#39;|&#39;</span>);
-                    metadata.platform.push_str(driver_info_platform);
-                }
-            }
-
-            <span class="kw">if let </span><span class="prelude-val">Some</span>(cred) = options.credential {
-                cred.append_needed_mechanism_negotiation(<span class="kw-2">&amp;mut </span>command.body);
-                command.target_db = cred.resolved_source().to_string();
-                credential = <span class="prelude-val">Some</span>(cred);
-            }
-
-            <span class="kw">if </span>options.load_balanced {
-                command.body.insert(<span class="string">&quot;loadBalanced&quot;</span>, <span class="bool-val">true</span>);
-            }
-
-            <span class="comment">// Add compressors to handshake.
-            // See https://github.com/mongodb/specifications/blob/master/source/compression/OP_COMPRESSED.rst
-            </span><span class="kw">if let </span><span class="prelude-val">Some</span>(<span class="kw-2">ref </span>compressors) = options.compressors {
-                command.body.insert(
-                    <span class="string">&quot;compression&quot;</span>,
-                    compressors
-                        .iter()
-                        .map(|x| x.name())
-                        .collect::&lt;Vec&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str&gt;&gt;(),
-                );
-            }
-            compressors = options.compressors;
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(app_name) = options.app_name {
+            metadata.application = <span class="prelude-val">Some</span>(AppMetadata { name: app_name });
         }
 
-        command.body.insert(<span class="string">&quot;client&quot;</span>, metadata);
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(driver_info) = options.driver_info {
+            metadata.driver.name.push(<span class="string">&#39;|&#39;</span>);
+            metadata.driver.name.push_str(<span class="kw-2">&amp;</span>driver_info.name);
+
+            <span class="kw">if let </span><span class="prelude-val">Some</span>(<span class="kw-2">ref </span>version) = driver_info.version {
+                metadata.driver.version.push(<span class="string">&#39;|&#39;</span>);
+                metadata.driver.version.push_str(version);
+            }
+
+            <span class="kw">if let </span><span class="prelude-val">Some</span>(<span class="kw-2">ref </span>driver_info_platform) = driver_info.platform {
+                metadata.platform.push(<span class="string">&#39;|&#39;</span>);
+                metadata.platform.push_str(driver_info_platform);
+            }
+        }
+
+        metadata.env = FaasEnvironment::new();
+
+        <span class="kw">if </span>options.load_balanced {
+            command.body.insert(<span class="string">&quot;loadBalanced&quot;</span>, <span class="bool-val">true</span>);
+        }
+
+        <span class="comment">// Add compressors to handshake.
+        // See https://github.com/mongodb/specifications/blob/master/source/compression/OP_COMPRESSED.rst
+        </span><span class="kw">if let </span><span class="prelude-val">Some</span>(<span class="kw-2">ref </span>compressors) = compressors {
+            command.body.insert(
+                <span class="string">&quot;compression&quot;</span>,
+                compressors
+                    .iter()
+                    .map(|x| x.name())
+                    .collect::&lt;Vec&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str&gt;&gt;(),
+            );
+        }
+
+        command.body.insert(<span class="string">&quot;client&quot;</span>, metadata.clone());
 
         <span class="self">Self </span>{
             command,
-            credential,
             compressors,
+            server_api: options.server_api,
+            metadata,
+            <span class="attr">#[cfg(feature = <span class="string">&quot;aws-auth&quot;</span>)]
+            </span>http_client: <span class="kw">crate</span>::runtime::HttpClient::default(),
         }
     }
 
@@ -573,25 +931,29 @@
     </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async fn </span>handshake(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         conn: <span class="kw-2">&amp;mut </span>Connection,
-        topology: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>Topology&gt;,
-        handler: <span class="kw-2">&amp;</span><span class="prelude-ty">Option</span>&lt;Arc&lt;<span class="kw">dyn </span>SdamEventHandler&gt;&gt;,
-    ) -&gt; <span class="prelude-ty">Result</span>&lt;HandshakeResult&gt; {
+        credential: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>Credential&gt;,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;HelloReply&gt; {
         <span class="kw">let </span><span class="kw-2">mut </span>command = <span class="self">self</span>.command.clone();
 
-        <span class="kw">let </span>client_first = set_speculative_auth_info(<span class="kw-2">&amp;mut </span>command.body, <span class="self">self</span>.credential.as_ref())<span class="question-mark">?</span>;
-
-        <span class="kw">let </span><span class="kw-2">mut </span>hello_reply = run_hello(conn, command, topology, handler).<span class="kw">await</span><span class="question-mark">?</span>;
-
-        <span class="kw">if </span><span class="self">self</span>.command.body.contains_key(<span class="string">&quot;loadBalanced&quot;</span>)
-            &amp;&amp; hello_reply.command_response.service_id.is_none()
-        {
-            <span class="kw">return </span><span class="prelude-val">Err</span>(ErrorKind::IncompatibleServer {
-                message: <span class="string">&quot;Driver attempted to initialize in load balancing mode, but the server \
-                          does not support this mode.&quot;
-                    </span>.to_string(),
-            }
-            .into());
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(cred) = credential {
+            cred.append_needed_mechanism_negotiation(<span class="kw-2">&amp;mut </span>command.body);
+            command.target_db = cred.resolved_source().to_string();
         }
+
+        <span class="kw">let </span>client_first = set_speculative_auth_info(<span class="kw-2">&amp;mut </span>command.body, credential)<span class="question-mark">?</span>;
+
+        <span class="kw">let </span>body = <span class="kw-2">&amp;mut </span>command.body;
+        <span class="kw">let </span><span class="kw-2">mut </span>trunc_meta = <span class="self">self</span>.metadata.clone();
+        <span class="kw">for </span>trunc_fn <span class="kw">in </span>METADATA_TRUNCATIONS {
+            <span class="kw">if </span>doc_size(body)<span class="question-mark">? </span>&lt;= MAX_HELLO_SIZE {
+                <span class="kw">break</span>;
+            }
+            trunc_fn(<span class="kw-2">&amp;mut </span>trunc_meta);
+            body.insert(<span class="string">&quot;client&quot;</span>, trunc_meta.clone());
+        }
+
+        <span class="kw">let </span><span class="kw-2">mut </span>hello_reply = run_hello(conn, command).<span class="kw">await</span><span class="question-mark">?</span>;
+
         conn.stream_description = <span class="prelude-val">Some</span>(StreamDescription::from_hello_reply(<span class="kw-2">&amp;</span>hello_reply));
 
         <span class="comment">// Record the client&#39;s message and the server&#39;s response from speculative authentication if
@@ -627,60 +989,44 @@
 
         conn.server_id = hello_reply.command_response.connection_id;
 
-        <span class="prelude-val">Ok</span>(HandshakeResult {
-            hello_reply,
-            first_round,
-        })
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(credential) = credential {
+            credential
+                .authenticate_stream(
+                    conn,
+                    <span class="self">self</span>.server_api.as_ref(),
+                    first_round,
+                    <span class="attr">#[cfg(feature = <span class="string">&quot;aws-auth&quot;</span>)]
+                    </span><span class="kw-2">&amp;</span><span class="self">self</span>.http_client,
+                )
+                .<span class="kw">await</span><span class="question-mark">?
+        </span>}
+
+        <span class="prelude-val">Ok</span>(hello_reply)
     }
-}
-
-<span class="doccomment">/// The information returned from the server as part of the handshake.
-///
-/// Also optionally includes the first round of speculative authentication
-/// if applicable.
-</span><span class="attr">#[derive(Debug)]
-</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>HandshakeResult {
-    <span class="doccomment">/// The response from the server.
-    </span><span class="kw">pub</span>(<span class="kw">crate</span>) hello_reply: HelloReply,
-
-    <span class="doccomment">/// The first round of speculative authentication, if applicable.
-    </span><span class="kw">pub</span>(<span class="kw">crate</span>) first_round: <span class="prelude-ty">Option</span>&lt;FirstRound&gt;,
 }
 
 <span class="attr">#[derive(Debug)]
 </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>HandshakerOptions {
-    app_name: <span class="prelude-ty">Option</span>&lt;String&gt;,
-    credential: <span class="prelude-ty">Option</span>&lt;Credential&gt;,
-    compressors: <span class="prelude-ty">Option</span>&lt;Vec&lt;Compressor&gt;&gt;,
-    driver_info: <span class="prelude-ty">Option</span>&lt;DriverInfo&gt;,
-    server_api: <span class="prelude-ty">Option</span>&lt;ServerApi&gt;,
-    load_balanced: bool,
-}
+    <span class="doccomment">/// The application name specified by the user. This is sent to the server as part of the
+    /// handshake that each connection makes when it&#39;s created.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) app_name: <span class="prelude-ty">Option</span>&lt;String&gt;,
 
-<span class="kw">impl </span>From&lt;ConnectionPoolOptions&gt; <span class="kw">for </span>HandshakerOptions {
-    <span class="kw">fn </span>from(options: ConnectionPoolOptions) -&gt; <span class="self">Self </span>{
-        <span class="self">Self </span>{
-            app_name: options.app_name,
-            compressors: options.compressors,
-            credential: options.credential,
-            driver_info: options.driver_info,
-            server_api: options.server_api,
-            load_balanced: options.load_balanced.unwrap_or(<span class="bool-val">false</span>),
-        }
-    }
-}
+    <span class="doccomment">/// The compressors that the Client is willing to use in the order they are specified
+    /// in the configuration.  The Client sends this list of compressors to the server.
+    /// The server responds with the intersection of its supported list of compressors.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) compressors: <span class="prelude-ty">Option</span>&lt;Vec&lt;Compressor&gt;&gt;,
 
-<span class="kw">impl </span>From&lt;ClientOptions&gt; <span class="kw">for </span>HandshakerOptions {
-    <span class="kw">fn </span>from(options: ClientOptions) -&gt; <span class="self">Self </span>{
-        <span class="self">Self </span>{
-            app_name: options.app_name,
-            compressors: options.compressors,
-            credential: options.credential,
-            driver_info: options.driver_info,
-            server_api: options.server_api,
-            load_balanced: options.load_balanced.unwrap_or(<span class="bool-val">false</span>),
-        }
-    }
+    <span class="doccomment">/// Extra information to append to the driver version in the metadata of the handshake with the
+    /// server. This should be used by libraries wrapping the driver, e.g. ODMs.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) driver_info: <span class="prelude-ty">Option</span>&lt;DriverInfo&gt;,
+
+    <span class="doccomment">/// The declared API version.
+    ///
+    /// The default value is to have no declared API version
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) server_api: <span class="prelude-ty">Option</span>&lt;ServerApi&gt;,
+
+    <span class="doccomment">/// Whether or not the client is connecting to a MongoDB cluster through a load balancer.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) load_balanced: bool,
 }
 
 <span class="doccomment">/// Updates the handshake command document with the speculative authenitication info.
@@ -710,4 +1056,12 @@
 
     <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(client_first))
 }
+
+<span class="kw">fn </span>doc_size(d: <span class="kw-2">&amp;</span>Document) -&gt; <span class="prelude-ty">Result</span>&lt;usize&gt; {
+    <span class="kw">let </span><span class="kw-2">mut </span>tmp = <span class="macro">vec!</span>[];
+    d.to_writer(<span class="kw-2">&amp;mut </span>tmp)<span class="question-mark">?</span>;
+    <span class="prelude-val">Ok</span>(tmp.len())
+}
+
+<span class="kw">const </span>MAX_HELLO_SIZE: usize = <span class="number">512</span>;
 </code></pre></div></section></main></body></html>

@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/nix/store/jnqxxv1xi811ni996b002f4jnyz38xck-vendor-cargo-deps/c19b7c6f923b580ac259164a89f2577984ad5ab09ee9d583b888f934adbbe8d0/tokio-1.25.0/src/runtime/io/registration.rs`."><title>registration.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../../static.files/rustdoc-f3501f0f5ae15dfb.css" id="mainThemeStyle"><div id="rustdoc-vars" data-root-path="../../../../" data-static-root-path="../../../../static.files/" data-current-crate="tokio" data-themes="" data-resource-suffix="" data-rustdoc-version="1.71.0 (8ede3aae2 2023-07-12)" data-search-js="search-4926e5fc22a5646a.js" data-settings-js="settings-de11bff964e9d4e5.js" data-settings-css="settings-8c76f75bfb6bd192.css" data-theme-light-css="light-0f8c037637f9eb3e.css" data-theme-dark-css="dark-1097f8e92a01e3cf.css" data-theme-ayu-css="ayu-614652228113ac93.css" ></div><script src="../../../../static.files/storage-62ce34ea385b278a.js"></script><script defer src="../../../../static.files/source-script-11255107d0a65077.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../static.files/main-f0540c1d82cde29b.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../../../../static.files/light-0f8c037637f9eb3e.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../../../../static.files/dark-1097f8e92a01e3cf.css"><link rel="stylesheet" href="../../../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../../../tokio/index.html"><img class="rust-logo" src="../../../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/nix/store/yf45a1rayffhnidhgyjynpyhr9lqkd09-vendor-cargo-deps/c19b7c6f923b580ac259164a89f2577984ad5ab09ee9d583b888f934adbbe8d0/tokio-1.30.0/src/runtime/io/registration.rs`."><title>registration.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../../static.files/rustdoc-f3501f0f5ae15dfb.css" id="mainThemeStyle"><div id="rustdoc-vars" data-root-path="../../../../" data-static-root-path="../../../../static.files/" data-current-crate="tokio" data-themes="" data-resource-suffix="" data-rustdoc-version="1.71.0 (8ede3aae2 2023-07-12)" data-search-js="search-4926e5fc22a5646a.js" data-settings-js="settings-de11bff964e9d4e5.js" data-settings-css="settings-8c76f75bfb6bd192.css" data-theme-light-css="light-0f8c037637f9eb3e.css" data-theme-dark-css="dark-1097f8e92a01e3cf.css" data-theme-ayu-css="ayu-614652228113ac93.css" ></div><script src="../../../../static.files/storage-62ce34ea385b278a.js"></script><script defer src="../../../../static.files/source-script-11255107d0a65077.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../static.files/main-f0540c1d82cde29b.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../../../../static.files/light-0f8c037637f9eb3e.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../../../../static.files/dark-1097f8e92a01e3cf.css"><link rel="stylesheet" href="../../../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../../../tokio/index.html"><img class="rust-logo" src="../../../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -249,15 +249,18 @@
 <a href="#249" id="249">249</a>
 <a href="#250" id="250">250</a>
 <a href="#251" id="251">251</a>
+<a href="#252" id="252">252</a>
+<a href="#253" id="253">253</a>
+<a href="#254" id="254">254</a>
 </pre></div><pre class="rust"><code><span class="attr">#![cfg_attr(not(feature = <span class="string">&quot;net&quot;</span>), allow(dead_code))]
 
 </span><span class="kw">use </span><span class="kw">crate</span>::io::interest::Interest;
 <span class="kw">use </span><span class="kw">crate</span>::runtime::io::{Direction, Handle, ReadyEvent, ScheduledIo};
 <span class="kw">use </span><span class="kw">crate</span>::runtime::scheduler;
-<span class="kw">use </span><span class="kw">crate</span>::util::slab;
 
 <span class="kw">use </span>mio::event::Source;
 <span class="kw">use </span>std::io;
+<span class="kw">use </span>std::sync::Arc;
 <span class="kw">use </span>std::task::{Context, Poll};
 
 <span class="macro">cfg_io_driver! </span>{
@@ -296,10 +299,12 @@
     </span><span class="attr">#[derive(Debug)]
     </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>Registration {
         <span class="doccomment">/// Handle to the associated runtime.
+        ///
+        /// TODO: this can probably be moved into `ScheduledIo`.
         </span>handle: scheduler::Handle,
 
         <span class="doccomment">/// Reference to state stored by the driver.
-        </span>shared: slab::Ref&lt;ScheduledIo&gt;,
+        </span>shared: Arc&lt;ScheduledIo&gt;,
     }
 }
 
@@ -346,7 +351,7 @@
     ///
     /// `Err` is returned if an error is encountered.
     </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>deregister(<span class="kw-2">&amp;mut </span><span class="self">self</span>, io: <span class="kw-2">&amp;mut </span><span class="kw">impl </span>Source) -&gt; io::Result&lt;()&gt; {
-        <span class="self">self</span>.handle().deregister_source(io)
+        <span class="self">self</span>.handle().deregister_source(<span class="kw-2">&amp;</span><span class="self">self</span>.shared, io)
     }
 
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>clear_readiness(<span class="kw-2">&amp;</span><span class="self">self</span>, event: ReadyEvent) {
@@ -367,7 +372,7 @@
 
     <span class="comment">// Uses the poll path, requiring the caller to ensure mutual exclusion for
     // correctness. Only the last task to call this function is notified.
-    </span><span class="attr">#[cfg(not(tokio_wasi))]
+    </span><span class="attr">#[cfg(not(target_os = <span class="string">&quot;wasi&quot;</span>))]
     </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>poll_read_io&lt;R&gt;(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         cx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;,
@@ -395,6 +400,7 @@
         cx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;,
         direction: Direction,
     ) -&gt; Poll&lt;io::Result&lt;ReadyEvent&gt;&gt; {
+        <span class="macro">ready!</span>(<span class="kw">crate</span>::trace::trace_leaf(cx));
         <span class="comment">// Keep track of task budget
         </span><span class="kw">let </span>coop = <span class="macro">ready!</span>(<span class="kw">crate</span>::runtime::coop::poll_proceed(cx));
         <span class="kw">let </span>ev = <span class="macro">ready!</span>(<span class="self">self</span>.shared.poll_readiness(cx, direction));
@@ -449,6 +455,33 @@
         }
     }
 
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async fn </span>readiness(<span class="kw-2">&amp;</span><span class="self">self</span>, interest: Interest) -&gt; io::Result&lt;ReadyEvent&gt; {
+        <span class="kw">let </span>ev = <span class="self">self</span>.shared.readiness(interest).<span class="kw">await</span>;
+
+        <span class="kw">if </span>ev.is_shutdown {
+            <span class="kw">return </span><span class="prelude-val">Err</span>(gone());
+        }
+
+        <span class="prelude-val">Ok</span>(ev)
+    }
+
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async fn </span>async_io&lt;R&gt;(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        interest: Interest,
+        <span class="kw-2">mut </span>f: <span class="kw">impl </span>FnMut() -&gt; io::Result&lt;R&gt;,
+    ) -&gt; io::Result&lt;R&gt; {
+        <span class="kw">loop </span>{
+            <span class="kw">let </span>event = <span class="self">self</span>.readiness(interest).<span class="kw">await</span><span class="question-mark">?</span>;
+
+            <span class="kw">match </span>f() {
+                <span class="prelude-val">Err</span>(<span class="kw-2">ref </span>e) <span class="kw">if </span>e.kind() == io::ErrorKind::WouldBlock =&gt; {
+                    <span class="self">self</span>.clear_readiness(event);
+                }
+                x =&gt; <span class="kw">return </span>x,
+            }
+        }
+    }
+
     <span class="kw">fn </span>handle(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>Handle {
         <span class="self">self</span>.handle.driver().io()
     }
@@ -472,32 +505,5 @@
         io::ErrorKind::Other,
         <span class="kw">crate</span>::util::error::RUNTIME_SHUTTING_DOWN_ERROR,
     )
-}
-
-<span class="macro">cfg_io_readiness! </span>{
-    <span class="kw">impl </span>Registration {
-        <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async fn </span>readiness(<span class="kw-2">&amp;</span><span class="self">self</span>, interest: Interest) -&gt; io::Result&lt;ReadyEvent&gt; {
-            <span class="kw">let </span>ev = <span class="self">self</span>.shared.readiness(interest).<span class="kw">await</span>;
-
-            <span class="kw">if </span>ev.is_shutdown {
-                <span class="kw">return </span><span class="prelude-val">Err</span>(gone())
-            }
-
-            <span class="prelude-val">Ok</span>(ev)
-        }
-
-        <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async fn </span>async_io&lt;R&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, interest: Interest, <span class="kw-2">mut </span>f: <span class="kw">impl </span>FnMut() -&gt; io::Result&lt;R&gt;) -&gt; io::Result&lt;R&gt; {
-            <span class="kw">loop </span>{
-                <span class="kw">let </span>event = <span class="self">self</span>.readiness(interest).<span class="kw">await</span><span class="question-mark">?</span>;
-
-                <span class="kw">match </span>f() {
-                    <span class="prelude-val">Err</span>(<span class="kw-2">ref </span>e) <span class="kw">if </span>e.kind() == io::ErrorKind::WouldBlock =&gt; {
-                        <span class="self">self</span>.clear_readiness(event);
-                    }
-                    x =&gt; <span class="kw">return </span>x,
-                }
-            }
-        }
-    }
 }
 </code></pre></div></section></main></body></html>

@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"fn":["to_base_36"],"trait":["ToBase36"]};

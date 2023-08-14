@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/nix/store/jnqxxv1xi811ni996b002f4jnyz38xck-vendor-cargo-deps/c19b7c6f923b580ac259164a89f2577984ad5ab09ee9d583b888f934adbbe8d0/chrono-0.4.20/src/format/parsed.rs`."><title>parsed.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-f3501f0f5ae15dfb.css" id="mainThemeStyle"><div id="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="chrono" data-themes="" data-resource-suffix="" data-rustdoc-version="1.71.0 (8ede3aae2 2023-07-12)" data-search-js="search-4926e5fc22a5646a.js" data-settings-js="settings-de11bff964e9d4e5.js" data-settings-css="settings-8c76f75bfb6bd192.css" data-theme-light-css="light-0f8c037637f9eb3e.css" data-theme-dark-css="dark-1097f8e92a01e3cf.css" data-theme-ayu-css="ayu-614652228113ac93.css" ></div><script src="../../../static.files/storage-62ce34ea385b278a.js"></script><script defer src="../../../static.files/source-script-11255107d0a65077.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../static.files/main-f0540c1d82cde29b.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../../../static.files/light-0f8c037637f9eb3e.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../../../static.files/dark-1097f8e92a01e3cf.css"><link rel="stylesheet" href="../../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../../chrono/index.html"><img class="rust-logo" src="../../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/nix/store/yf45a1rayffhnidhgyjynpyhr9lqkd09-vendor-cargo-deps/c19b7c6f923b580ac259164a89f2577984ad5ab09ee9d583b888f934adbbe8d0/chrono-0.4.26/src/format/parsed.rs`."><title>parsed.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-f3501f0f5ae15dfb.css" id="mainThemeStyle"><div id="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="chrono" data-themes="" data-resource-suffix="" data-rustdoc-version="1.71.0 (8ede3aae2 2023-07-12)" data-search-js="search-4926e5fc22a5646a.js" data-settings-js="settings-de11bff964e9d4e5.js" data-settings-css="settings-8c76f75bfb6bd192.css" data-theme-light-css="light-0f8c037637f9eb3e.css" data-theme-dark-css="dark-1097f8e92a01e3cf.css" data-theme-ayu-css="ayu-614652228113ac93.css" ></div><script src="../../../static.files/storage-62ce34ea385b278a.js"></script><script defer src="../../../static.files/source-script-11255107d0a65077.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../static.files/main-f0540c1d82cde29b.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../../../static.files/light-0f8c037637f9eb3e.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../../../static.files/dark-1097f8e92a01e3cf.css"><link rel="stylesheet" href="../../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../../chrono/index.html"><img class="rust-logo" src="../../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -1258,16 +1258,61 @@
 <a href="#1258" id="1258">1258</a>
 <a href="#1259" id="1259">1259</a>
 <a href="#1260" id="1260">1260</a>
+<a href="#1261" id="1261">1261</a>
+<a href="#1262" id="1262">1262</a>
+<a href="#1263" id="1263">1263</a>
+<a href="#1264" id="1264">1264</a>
+<a href="#1265" id="1265">1265</a>
+<a href="#1266" id="1266">1266</a>
+<a href="#1267" id="1267">1267</a>
+<a href="#1268" id="1268">1268</a>
+<a href="#1269" id="1269">1269</a>
+<a href="#1270" id="1270">1270</a>
+<a href="#1271" id="1271">1271</a>
+<a href="#1272" id="1272">1272</a>
+<a href="#1273" id="1273">1273</a>
+<a href="#1274" id="1274">1274</a>
+<a href="#1275" id="1275">1275</a>
+<a href="#1276" id="1276">1276</a>
+<a href="#1277" id="1277">1277</a>
+<a href="#1278" id="1278">1278</a>
+<a href="#1279" id="1279">1279</a>
+<a href="#1280" id="1280">1280</a>
+<a href="#1281" id="1281">1281</a>
+<a href="#1282" id="1282">1282</a>
+<a href="#1283" id="1283">1283</a>
+<a href="#1284" id="1284">1284</a>
+<a href="#1285" id="1285">1285</a>
+<a href="#1286" id="1286">1286</a>
+<a href="#1287" id="1287">1287</a>
+<a href="#1288" id="1288">1288</a>
+<a href="#1289" id="1289">1289</a>
+<a href="#1290" id="1290">1290</a>
+<a href="#1291" id="1291">1291</a>
+<a href="#1292" id="1292">1292</a>
+<a href="#1293" id="1293">1293</a>
+<a href="#1294" id="1294">1294</a>
+<a href="#1295" id="1295">1295</a>
+<a href="#1296" id="1296">1296</a>
+<a href="#1297" id="1297">1297</a>
+<a href="#1298" id="1298">1298</a>
+<a href="#1299" id="1299">1299</a>
+<a href="#1300" id="1300">1300</a>
+<a href="#1301" id="1301">1301</a>
+<a href="#1302" id="1302">1302</a>
+<a href="#1303" id="1303">1303</a>
+<a href="#1304" id="1304">1304</a>
+<a href="#1305" id="1305">1305</a>
+<a href="#1306" id="1306">1306</a>
+<a href="#1307" id="1307">1307</a>
+<a href="#1308" id="1308">1308</a>
 </pre></div><pre class="rust"><code><span class="comment">// This is a part of Chrono.
 // See README.md and LICENSE.txt for details.
 
 </span><span class="doccomment">//! A collection of parsed date and time items.
 //! They can be constructed incrementally while being checked for consistency.
 
-</span><span class="kw">use </span>num_integer::div_rem;
-<span class="kw">use </span>num_traits::ToPrimitive;
-
-<span class="kw">use super</span>::{ParseResult, IMPOSSIBLE, NOT_ENOUGH, OUT_OF_RANGE};
+</span><span class="kw">use super</span>::{ParseResult, IMPOSSIBLE, NOT_ENOUGH, OUT_OF_RANGE};
 <span class="kw">use </span><span class="kw">crate</span>::naive::{NaiveDate, NaiveDateTime, NaiveTime};
 <span class="kw">use </span><span class="kw">crate</span>::offset::{FixedOffset, LocalResult, Offset, TimeZone};
 <span class="kw">use </span><span class="kw">crate</span>::oldtime::Duration <span class="kw">as </span>OldDuration;
@@ -1282,7 +1327,8 @@
 ///
 /// - `to_*` methods try to make a concrete date and time value out of set fields.
 ///   It fully checks any remaining out-of-range conditions and inconsistent/impossible fields.
-</span><span class="attr">#[derive(Clone, PartialEq, Debug, Default)]
+</span><span class="attr">#[allow(clippy::manual_non_exhaustive)]
+#[derive(Clone, PartialEq, Eq, Debug, Default, Hash)]
 </span><span class="kw">pub struct </span>Parsed {
     <span class="doccomment">/// Year.
     ///
@@ -1366,6 +1412,7 @@
     </span><span class="kw">pub </span>offset: <span class="prelude-ty">Option</span>&lt;i32&gt;,
 
     <span class="doccomment">/// A dummy field to make this type not fully destructible (required for API stability).
+    </span><span class="comment">// TODO: Change this to `#[non_exhaustive]` (on the enum) with the next breaking release.
     </span>_dummy: (),
 }
 
@@ -1387,6 +1434,7 @@
 
 <span class="kw">impl </span>Parsed {
     <span class="doccomment">/// Returns the initial value of parsed parts.
+    </span><span class="attr">#[must_use]
     </span><span class="kw">pub fn </span>new() -&gt; Parsed {
         Parsed::default()
     }
@@ -1394,7 +1442,7 @@
     <span class="doccomment">/// Tries to set the [`year`](#structfield.year) field from given value.
     </span><span class="attr">#[inline]
     </span><span class="kw">pub fn </span>set_year(<span class="kw-2">&amp;mut </span><span class="self">self</span>, value: i64) -&gt; ParseResult&lt;()&gt; {
-        set_if_consistent(<span class="kw-2">&amp;mut </span><span class="self">self</span>.year, value.to_i32().ok_or(OUT_OF_RANGE)<span class="question-mark">?</span>)
+        set_if_consistent(<span class="kw-2">&amp;mut </span><span class="self">self</span>.year, i32::try_from(value).map_err(|<span class="kw">_</span>| OUT_OF_RANGE)<span class="question-mark">?</span>)
     }
 
     <span class="doccomment">/// Tries to set the [`year_div_100`](#structfield.year_div_100) field from given value.
@@ -1403,7 +1451,7 @@
         <span class="kw">if </span>value &lt; <span class="number">0 </span>{
             <span class="kw">return </span><span class="prelude-val">Err</span>(OUT_OF_RANGE);
         }
-        set_if_consistent(<span class="kw-2">&amp;mut </span><span class="self">self</span>.year_div_100, value.to_i32().ok_or(OUT_OF_RANGE)<span class="question-mark">?</span>)
+        set_if_consistent(<span class="kw-2">&amp;mut </span><span class="self">self</span>.year_div_100, i32::try_from(value).map_err(|<span class="kw">_</span>| OUT_OF_RANGE)<span class="question-mark">?</span>)
     }
 
     <span class="doccomment">/// Tries to set the [`year_mod_100`](#structfield.year_mod_100) field from given value.
@@ -1412,13 +1460,13 @@
         <span class="kw">if </span>value &lt; <span class="number">0 </span>{
             <span class="kw">return </span><span class="prelude-val">Err</span>(OUT_OF_RANGE);
         }
-        set_if_consistent(<span class="kw-2">&amp;mut </span><span class="self">self</span>.year_mod_100, value.to_i32().ok_or(OUT_OF_RANGE)<span class="question-mark">?</span>)
+        set_if_consistent(<span class="kw-2">&amp;mut </span><span class="self">self</span>.year_mod_100, i32::try_from(value).map_err(|<span class="kw">_</span>| OUT_OF_RANGE)<span class="question-mark">?</span>)
     }
 
     <span class="doccomment">/// Tries to set the [`isoyear`](#structfield.isoyear) field from given value.
     </span><span class="attr">#[inline]
     </span><span class="kw">pub fn </span>set_isoyear(<span class="kw-2">&amp;mut </span><span class="self">self</span>, value: i64) -&gt; ParseResult&lt;()&gt; {
-        set_if_consistent(<span class="kw-2">&amp;mut </span><span class="self">self</span>.isoyear, value.to_i32().ok_or(OUT_OF_RANGE)<span class="question-mark">?</span>)
+        set_if_consistent(<span class="kw-2">&amp;mut </span><span class="self">self</span>.isoyear, i32::try_from(value).map_err(|<span class="kw">_</span>| OUT_OF_RANGE)<span class="question-mark">?</span>)
     }
 
     <span class="doccomment">/// Tries to set the [`isoyear_div_100`](#structfield.isoyear_div_100) field from given value.
@@ -1427,7 +1475,10 @@
         <span class="kw">if </span>value &lt; <span class="number">0 </span>{
             <span class="kw">return </span><span class="prelude-val">Err</span>(OUT_OF_RANGE);
         }
-        set_if_consistent(<span class="kw-2">&amp;mut </span><span class="self">self</span>.isoyear_div_100, value.to_i32().ok_or(OUT_OF_RANGE)<span class="question-mark">?</span>)
+        set_if_consistent(
+            <span class="kw-2">&amp;mut </span><span class="self">self</span>.isoyear_div_100,
+            i32::try_from(value).map_err(|<span class="kw">_</span>| OUT_OF_RANGE)<span class="question-mark">?</span>,
+        )
     }
 
     <span class="doccomment">/// Tries to set the [`isoyear_mod_100`](#structfield.isoyear_mod_100) field from given value.
@@ -1436,31 +1487,34 @@
         <span class="kw">if </span>value &lt; <span class="number">0 </span>{
             <span class="kw">return </span><span class="prelude-val">Err</span>(OUT_OF_RANGE);
         }
-        set_if_consistent(<span class="kw-2">&amp;mut </span><span class="self">self</span>.isoyear_mod_100, value.to_i32().ok_or(OUT_OF_RANGE)<span class="question-mark">?</span>)
+        set_if_consistent(
+            <span class="kw-2">&amp;mut </span><span class="self">self</span>.isoyear_mod_100,
+            i32::try_from(value).map_err(|<span class="kw">_</span>| OUT_OF_RANGE)<span class="question-mark">?</span>,
+        )
     }
 
     <span class="doccomment">/// Tries to set the [`month`](#structfield.month) field from given value.
     </span><span class="attr">#[inline]
     </span><span class="kw">pub fn </span>set_month(<span class="kw-2">&amp;mut </span><span class="self">self</span>, value: i64) -&gt; ParseResult&lt;()&gt; {
-        set_if_consistent(<span class="kw-2">&amp;mut </span><span class="self">self</span>.month, value.to_u32().ok_or(OUT_OF_RANGE)<span class="question-mark">?</span>)
+        set_if_consistent(<span class="kw-2">&amp;mut </span><span class="self">self</span>.month, u32::try_from(value).map_err(|<span class="kw">_</span>| OUT_OF_RANGE)<span class="question-mark">?</span>)
     }
 
     <span class="doccomment">/// Tries to set the [`week_from_sun`](#structfield.week_from_sun) field from given value.
     </span><span class="attr">#[inline]
     </span><span class="kw">pub fn </span>set_week_from_sun(<span class="kw-2">&amp;mut </span><span class="self">self</span>, value: i64) -&gt; ParseResult&lt;()&gt; {
-        set_if_consistent(<span class="kw-2">&amp;mut </span><span class="self">self</span>.week_from_sun, value.to_u32().ok_or(OUT_OF_RANGE)<span class="question-mark">?</span>)
+        set_if_consistent(<span class="kw-2">&amp;mut </span><span class="self">self</span>.week_from_sun, u32::try_from(value).map_err(|<span class="kw">_</span>| OUT_OF_RANGE)<span class="question-mark">?</span>)
     }
 
     <span class="doccomment">/// Tries to set the [`week_from_mon`](#structfield.week_from_mon) field from given value.
     </span><span class="attr">#[inline]
     </span><span class="kw">pub fn </span>set_week_from_mon(<span class="kw-2">&amp;mut </span><span class="self">self</span>, value: i64) -&gt; ParseResult&lt;()&gt; {
-        set_if_consistent(<span class="kw-2">&amp;mut </span><span class="self">self</span>.week_from_mon, value.to_u32().ok_or(OUT_OF_RANGE)<span class="question-mark">?</span>)
+        set_if_consistent(<span class="kw-2">&amp;mut </span><span class="self">self</span>.week_from_mon, u32::try_from(value).map_err(|<span class="kw">_</span>| OUT_OF_RANGE)<span class="question-mark">?</span>)
     }
 
     <span class="doccomment">/// Tries to set the [`isoweek`](#structfield.isoweek) field from given value.
     </span><span class="attr">#[inline]
     </span><span class="kw">pub fn </span>set_isoweek(<span class="kw-2">&amp;mut </span><span class="self">self</span>, value: i64) -&gt; ParseResult&lt;()&gt; {
-        set_if_consistent(<span class="kw-2">&amp;mut </span><span class="self">self</span>.isoweek, value.to_u32().ok_or(OUT_OF_RANGE)<span class="question-mark">?</span>)
+        set_if_consistent(<span class="kw-2">&amp;mut </span><span class="self">self</span>.isoweek, u32::try_from(value).map_err(|<span class="kw">_</span>| OUT_OF_RANGE)<span class="question-mark">?</span>)
     }
 
     <span class="doccomment">/// Tries to set the [`weekday`](#structfield.weekday) field from given value.
@@ -1472,27 +1526,27 @@
     <span class="doccomment">/// Tries to set the [`ordinal`](#structfield.ordinal) field from given value.
     </span><span class="attr">#[inline]
     </span><span class="kw">pub fn </span>set_ordinal(<span class="kw-2">&amp;mut </span><span class="self">self</span>, value: i64) -&gt; ParseResult&lt;()&gt; {
-        set_if_consistent(<span class="kw-2">&amp;mut </span><span class="self">self</span>.ordinal, value.to_u32().ok_or(OUT_OF_RANGE)<span class="question-mark">?</span>)
+        set_if_consistent(<span class="kw-2">&amp;mut </span><span class="self">self</span>.ordinal, u32::try_from(value).map_err(|<span class="kw">_</span>| OUT_OF_RANGE)<span class="question-mark">?</span>)
     }
 
     <span class="doccomment">/// Tries to set the [`day`](#structfield.day) field from given value.
     </span><span class="attr">#[inline]
     </span><span class="kw">pub fn </span>set_day(<span class="kw-2">&amp;mut </span><span class="self">self</span>, value: i64) -&gt; ParseResult&lt;()&gt; {
-        set_if_consistent(<span class="kw-2">&amp;mut </span><span class="self">self</span>.day, value.to_u32().ok_or(OUT_OF_RANGE)<span class="question-mark">?</span>)
+        set_if_consistent(<span class="kw-2">&amp;mut </span><span class="self">self</span>.day, u32::try_from(value).map_err(|<span class="kw">_</span>| OUT_OF_RANGE)<span class="question-mark">?</span>)
     }
 
     <span class="doccomment">/// Tries to set the [`hour_div_12`](#structfield.hour_div_12) field from given value.
     /// (`false` for AM, `true` for PM)
     </span><span class="attr">#[inline]
     </span><span class="kw">pub fn </span>set_ampm(<span class="kw-2">&amp;mut </span><span class="self">self</span>, value: bool) -&gt; ParseResult&lt;()&gt; {
-        set_if_consistent(<span class="kw-2">&amp;mut </span><span class="self">self</span>.hour_div_12, <span class="kw">if </span>value { <span class="number">1 </span>} <span class="kw">else </span>{ <span class="number">0 </span>})
+        set_if_consistent(<span class="kw-2">&amp;mut </span><span class="self">self</span>.hour_div_12, u32::from(value))
     }
 
     <span class="doccomment">/// Tries to set the [`hour_mod_12`](#structfield.hour_mod_12) field from
     /// given hour number in 12-hour clocks.
     </span><span class="attr">#[inline]
     </span><span class="kw">pub fn </span>set_hour12(<span class="kw-2">&amp;mut </span><span class="self">self</span>, value: i64) -&gt; ParseResult&lt;()&gt; {
-        <span class="kw">if </span>value &lt; <span class="number">1 </span>|| value &gt; <span class="number">12 </span>{
+        <span class="kw">if </span>!(<span class="number">1</span>..=<span class="number">12</span>).contains(<span class="kw-2">&amp;</span>value) {
             <span class="kw">return </span><span class="prelude-val">Err</span>(OUT_OF_RANGE);
         }
         set_if_consistent(<span class="kw-2">&amp;mut </span><span class="self">self</span>.hour_mod_12, value <span class="kw">as </span>u32 % <span class="number">12</span>)
@@ -1502,7 +1556,7 @@
     /// [`hour_mod_12`](#structfield.hour_mod_12) fields from given value.
     </span><span class="attr">#[inline]
     </span><span class="kw">pub fn </span>set_hour(<span class="kw-2">&amp;mut </span><span class="self">self</span>, value: i64) -&gt; ParseResult&lt;()&gt; {
-        <span class="kw">let </span>v = value.to_u32().ok_or(OUT_OF_RANGE)<span class="question-mark">?</span>;
+        <span class="kw">let </span>v = u32::try_from(value).map_err(|<span class="kw">_</span>| OUT_OF_RANGE)<span class="question-mark">?</span>;
         set_if_consistent(<span class="kw-2">&amp;mut </span><span class="self">self</span>.hour_div_12, v / <span class="number">12</span>)<span class="question-mark">?</span>;
         set_if_consistent(<span class="kw-2">&amp;mut </span><span class="self">self</span>.hour_mod_12, v % <span class="number">12</span>)<span class="question-mark">?</span>;
         <span class="prelude-val">Ok</span>(())
@@ -1511,19 +1565,19 @@
     <span class="doccomment">/// Tries to set the [`minute`](#structfield.minute) field from given value.
     </span><span class="attr">#[inline]
     </span><span class="kw">pub fn </span>set_minute(<span class="kw-2">&amp;mut </span><span class="self">self</span>, value: i64) -&gt; ParseResult&lt;()&gt; {
-        set_if_consistent(<span class="kw-2">&amp;mut </span><span class="self">self</span>.minute, value.to_u32().ok_or(OUT_OF_RANGE)<span class="question-mark">?</span>)
+        set_if_consistent(<span class="kw-2">&amp;mut </span><span class="self">self</span>.minute, u32::try_from(value).map_err(|<span class="kw">_</span>| OUT_OF_RANGE)<span class="question-mark">?</span>)
     }
 
     <span class="doccomment">/// Tries to set the [`second`](#structfield.second) field from given value.
     </span><span class="attr">#[inline]
     </span><span class="kw">pub fn </span>set_second(<span class="kw-2">&amp;mut </span><span class="self">self</span>, value: i64) -&gt; ParseResult&lt;()&gt; {
-        set_if_consistent(<span class="kw-2">&amp;mut </span><span class="self">self</span>.second, value.to_u32().ok_or(OUT_OF_RANGE)<span class="question-mark">?</span>)
+        set_if_consistent(<span class="kw-2">&amp;mut </span><span class="self">self</span>.second, u32::try_from(value).map_err(|<span class="kw">_</span>| OUT_OF_RANGE)<span class="question-mark">?</span>)
     }
 
     <span class="doccomment">/// Tries to set the [`nanosecond`](#structfield.nanosecond) field from given value.
     </span><span class="attr">#[inline]
     </span><span class="kw">pub fn </span>set_nanosecond(<span class="kw-2">&amp;mut </span><span class="self">self</span>, value: i64) -&gt; ParseResult&lt;()&gt; {
-        set_if_consistent(<span class="kw-2">&amp;mut </span><span class="self">self</span>.nanosecond, value.to_u32().ok_or(OUT_OF_RANGE)<span class="question-mark">?</span>)
+        set_if_consistent(<span class="kw-2">&amp;mut </span><span class="self">self</span>.nanosecond, u32::try_from(value).map_err(|<span class="kw">_</span>| OUT_OF_RANGE)<span class="question-mark">?</span>)
     }
 
     <span class="doccomment">/// Tries to set the [`timestamp`](#structfield.timestamp) field from given value.
@@ -1535,7 +1589,7 @@
     <span class="doccomment">/// Tries to set the [`offset`](#structfield.offset) field from given value.
     </span><span class="attr">#[inline]
     </span><span class="kw">pub fn </span>set_offset(<span class="kw-2">&amp;mut </span><span class="self">self</span>, value: i64) -&gt; ParseResult&lt;()&gt; {
-        set_if_consistent(<span class="kw-2">&amp;mut </span><span class="self">self</span>.offset, value.to_i32().ok_or(OUT_OF_RANGE)<span class="question-mark">?</span>)
+        set_if_consistent(<span class="kw-2">&amp;mut </span><span class="self">self</span>.offset, i32::try_from(value).map_err(|<span class="kw">_</span>| OUT_OF_RANGE)<span class="question-mark">?</span>)
     }
 
     <span class="doccomment">/// Returns a parsed naive date out of given fields.
@@ -1568,7 +1622,8 @@
                     <span class="kw">if </span>y &lt; <span class="number">0 </span>{
                         <span class="kw">return </span><span class="prelude-val">Err</span>(OUT_OF_RANGE);
                     }
-                    <span class="kw">let </span>(q_, r_) = div_rem(y, <span class="number">100</span>);
+                    <span class="kw">let </span>q_ = y / <span class="number">100</span>;
+                    <span class="kw">let </span>r_ = y % <span class="number">100</span>;
                     <span class="kw">if </span>q.unwrap_or(q_) == q_ &amp;&amp; r.unwrap_or(r_) == r_ {
                         <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(y))
                     } <span class="kw">else </span>{
@@ -1603,8 +1658,7 @@
         </span><span class="kw">let </span>verify_ymd = |date: NaiveDate| {
             <span class="kw">let </span>year = date.year();
             <span class="kw">let </span>(year_div_100, year_mod_100) = <span class="kw">if </span>year &gt;= <span class="number">0 </span>{
-                <span class="kw">let </span>(q, r) = div_rem(year, <span class="number">100</span>);
-                (<span class="prelude-val">Some</span>(q), <span class="prelude-val">Some</span>(r))
+                (<span class="prelude-val">Some</span>(year / <span class="number">100</span>), <span class="prelude-val">Some</span>(year % <span class="number">100</span>))
             } <span class="kw">else </span>{
                 (<span class="prelude-val">None</span>, <span class="prelude-val">None</span>) <span class="comment">// they should be empty to be consistent
             </span>};
@@ -1624,8 +1678,7 @@
             <span class="kw">let </span>isoweek = week.week();
             <span class="kw">let </span>weekday = date.weekday();
             <span class="kw">let </span>(isoyear_div_100, isoyear_mod_100) = <span class="kw">if </span>isoyear &gt;= <span class="number">0 </span>{
-                <span class="kw">let </span>(q, r) = div_rem(isoyear, <span class="number">100</span>);
-                (<span class="prelude-val">Some</span>(q), <span class="prelude-val">Some</span>(r))
+                (<span class="prelude-val">Some</span>(isoyear / <span class="number">100</span>), <span class="prelude-val">Some</span>(isoyear % <span class="number">100</span>))
             } <span class="kw">else </span>{
                 (<span class="prelude-val">None</span>, <span class="prelude-val">None</span>) <span class="comment">// they should be empty to be consistent
             </span>};
@@ -1639,9 +1692,8 @@
         <span class="comment">// verify the ordinal and other (non-ISO) week dates.
         </span><span class="kw">let </span>verify_ordinal = |date: NaiveDate| {
             <span class="kw">let </span>ordinal = date.ordinal();
-            <span class="kw">let </span>weekday = date.weekday();
-            <span class="kw">let </span>week_from_sun = (ordinal <span class="kw">as </span>i32 - weekday.num_days_from_sunday() <span class="kw">as </span>i32 + <span class="number">7</span>) / <span class="number">7</span>;
-            <span class="kw">let </span>week_from_mon = (ordinal <span class="kw">as </span>i32 - weekday.num_days_from_monday() <span class="kw">as </span>i32 + <span class="number">7</span>) / <span class="number">7</span>;
+            <span class="kw">let </span>week_from_sun = date.weeks_from(Weekday::Sun);
+            <span class="kw">let </span>week_from_mon = date.weeks_from(Weekday::Mon);
             <span class="self">self</span>.ordinal.unwrap_or(ordinal) == ordinal
                 &amp;&amp; <span class="self">self</span>.week_from_sun.map_or(week_from_sun, |v| v <span class="kw">as </span>i32) == week_from_sun
                 &amp;&amp; <span class="self">self</span>.week_from_mon.map_or(week_from_mon, |v| v <span class="kw">as </span>i32) == week_from_mon
@@ -2042,7 +2094,7 @@
             )
         }
 
-        <span class="kw">let </span>ymd = |y, m, d| <span class="prelude-val">Ok</span>(NaiveDate::from_ymd(y, m, d));
+        <span class="kw">let </span>ymd = |y, m, d| <span class="prelude-val">Ok</span>(NaiveDate::from_ymd_opt(y, m, d).unwrap());
 
         <span class="comment">// ymd: omission of fields
         </span><span class="macro">assert_eq!</span>(<span class="macro">parse!</span>(), <span class="prelude-val">Err</span>(NOT_ENOUGH));
@@ -2229,8 +2281,8 @@
             )
         }
 
-        <span class="kw">let </span>hms = |h, m, s| <span class="prelude-val">Ok</span>(NaiveTime::from_hms(h, m, s));
-        <span class="kw">let </span>hmsn = |h, m, s, n| <span class="prelude-val">Ok</span>(NaiveTime::from_hms_nano(h, m, s, n));
+        <span class="kw">let </span>hms = |h, m, s| <span class="prelude-val">Ok</span>(NaiveTime::from_hms_opt(h, m, s).unwrap());
+        <span class="kw">let </span>hmsn = |h, m, s, n| <span class="prelude-val">Ok</span>(NaiveTime::from_hms_nano_opt(h, m, s, n).unwrap());
 
         <span class="comment">// omission of fields
         </span><span class="macro">assert_eq!</span>(<span class="macro">parse!</span>(), <span class="prelude-val">Err</span>(NOT_ENOUGH));
@@ -2285,9 +2337,12 @@
             ($(<span class="macro-nonterminal">$k</span>:ident: <span class="macro-nonterminal">$v</span>:expr),<span class="kw-2">*</span>) =&gt; (<span class="macro">parse!</span>(offset = <span class="number">0</span>; $(<span class="macro-nonterminal">$k</span>: <span class="macro-nonterminal">$v</span>),<span class="kw-2">*</span>))
         }
 
-        <span class="kw">let </span>ymdhms = |y, m, d, h, n, s| <span class="prelude-val">Ok</span>(NaiveDate::from_ymd(y, m, d).and_hms(h, n, s));
-        <span class="kw">let </span>ymdhmsn =
-            |y, m, d, h, n, s, nano| <span class="prelude-val">Ok</span>(NaiveDate::from_ymd(y, m, d).and_hms_nano(h, n, s, nano));
+        <span class="kw">let </span>ymdhms = |y, m, d, h, n, s| {
+            <span class="prelude-val">Ok</span>(NaiveDate::from_ymd_opt(y, m, d).unwrap().and_hms_opt(h, n, s).unwrap())
+        };
+        <span class="kw">let </span>ymdhmsn = |y, m, d, h, n, s, nano| {
+            <span class="prelude-val">Ok</span>(NaiveDate::from_ymd_opt(y, m, d).unwrap().and_hms_nano_opt(h, n, s, nano).unwrap())
+        };
 
         <span class="comment">// omission of fields
         </span><span class="macro">assert_eq!</span>(<span class="macro">parse!</span>(), <span class="prelude-val">Err</span>(NOT_ENOUGH));
@@ -2341,11 +2396,12 @@
 
         <span class="comment">// more timestamps
         </span><span class="kw">let </span>max_days_from_year_1970 =
-            NaiveDate::MAX.signed_duration_since(NaiveDate::from_ymd(<span class="number">1970</span>, <span class="number">1</span>, <span class="number">1</span>));
-        <span class="kw">let </span>year_0_from_year_1970 =
-            NaiveDate::from_ymd(<span class="number">0</span>, <span class="number">1</span>, <span class="number">1</span>).signed_duration_since(NaiveDate::from_ymd(<span class="number">1970</span>, <span class="number">1</span>, <span class="number">1</span>));
+            NaiveDate::MAX.signed_duration_since(NaiveDate::from_ymd_opt(<span class="number">1970</span>, <span class="number">1</span>, <span class="number">1</span>).unwrap());
+        <span class="kw">let </span>year_0_from_year_1970 = NaiveDate::from_ymd_opt(<span class="number">0</span>, <span class="number">1</span>, <span class="number">1</span>)
+            .unwrap()
+            .signed_duration_since(NaiveDate::from_ymd_opt(<span class="number">1970</span>, <span class="number">1</span>, <span class="number">1</span>).unwrap());
         <span class="kw">let </span>min_days_from_year_1970 =
-            NaiveDate::MIN.signed_duration_since(NaiveDate::from_ymd(<span class="number">1970</span>, <span class="number">1</span>, <span class="number">1</span>));
+            NaiveDate::MIN.signed_duration_since(NaiveDate::from_ymd_opt(<span class="number">1970</span>, <span class="number">1</span>, <span class="number">1</span>).unwrap());
         <span class="macro">assert_eq!</span>(
             <span class="macro">parse!</span>(timestamp: min_days_from_year_1970.num_seconds()),
             ymdhms(NaiveDate::MIN.year(), <span class="number">1</span>, <span class="number">1</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>)
@@ -2435,7 +2491,15 @@
         }
 
         <span class="kw">let </span>ymdhmsn = |y, m, d, h, n, s, nano, off| {
-            <span class="prelude-val">Ok</span>(FixedOffset::east(off).ymd(y, m, d).and_hms_nano(h, n, s, nano))
+            <span class="prelude-val">Ok</span>(FixedOffset::east_opt(off)
+                .unwrap()
+                .from_local_datetime(
+                    <span class="kw-2">&amp;</span>NaiveDate::from_ymd_opt(y, m, d)
+                        .unwrap()
+                        .and_hms_nano_opt(h, n, s, nano)
+                        .unwrap(),
+                )
+                .unwrap())
         };
 
         <span class="macro">assert_eq!</span>(<span class="macro">parse!</span>(offset: <span class="number">0</span>), <span class="prelude-val">Err</span>(NOT_ENOUGH));
@@ -2479,7 +2543,14 @@
             <span class="macro">parse!</span>(Utc;
                           year: <span class="number">2014</span>, ordinal: <span class="number">365</span>, hour_div_12: <span class="number">0</span>, hour_mod_12: <span class="number">4</span>,
                           minute: <span class="number">26</span>, second: <span class="number">40</span>, nanosecond: <span class="number">12_345_678</span>, offset: <span class="number">0</span>),
-            <span class="prelude-val">Ok</span>(Utc.ymd(<span class="number">2014</span>, <span class="number">12</span>, <span class="number">31</span>).and_hms_nano(<span class="number">4</span>, <span class="number">26</span>, <span class="number">40</span>, <span class="number">12_345_678</span>))
+            <span class="prelude-val">Ok</span>(Utc
+                .from_local_datetime(
+                    <span class="kw-2">&amp;</span>NaiveDate::from_ymd_opt(<span class="number">2014</span>, <span class="number">12</span>, <span class="number">31</span>)
+                        .unwrap()
+                        .and_hms_nano_opt(<span class="number">4</span>, <span class="number">26</span>, <span class="number">40</span>, <span class="number">12_345_678</span>)
+                        .unwrap()
+                )
+                .unwrap())
         );
         <span class="macro">assert_eq!</span>(
             <span class="macro">parse!</span>(Utc;
@@ -2488,34 +2559,59 @@
             <span class="prelude-val">Err</span>(IMPOSSIBLE)
         );
         <span class="macro">assert_eq!</span>(
-            <span class="macro">parse!</span>(FixedOffset::east(<span class="number">32400</span>);
+            <span class="macro">parse!</span>(FixedOffset::east_opt(<span class="number">32400</span>).unwrap();
                           year: <span class="number">2014</span>, ordinal: <span class="number">365</span>, hour_div_12: <span class="number">0</span>, hour_mod_12: <span class="number">4</span>,
                           minute: <span class="number">26</span>, second: <span class="number">40</span>, nanosecond: <span class="number">12_345_678</span>, offset: <span class="number">0</span>),
             <span class="prelude-val">Err</span>(IMPOSSIBLE)
         );
         <span class="macro">assert_eq!</span>(
-            <span class="macro">parse!</span>(FixedOffset::east(<span class="number">32400</span>);
+            <span class="macro">parse!</span>(FixedOffset::east_opt(<span class="number">32400</span>).unwrap();
                           year: <span class="number">2014</span>, ordinal: <span class="number">365</span>, hour_div_12: <span class="number">1</span>, hour_mod_12: <span class="number">1</span>,
                           minute: <span class="number">26</span>, second: <span class="number">40</span>, nanosecond: <span class="number">12_345_678</span>, offset: <span class="number">32400</span>),
-            <span class="prelude-val">Ok</span>(FixedOffset::east(<span class="number">32400</span>).ymd(<span class="number">2014</span>, <span class="number">12</span>, <span class="number">31</span>).and_hms_nano(<span class="number">13</span>, <span class="number">26</span>, <span class="number">40</span>, <span class="number">12_345_678</span>))
+            <span class="prelude-val">Ok</span>(FixedOffset::east_opt(<span class="number">32400</span>)
+                .unwrap()
+                .from_local_datetime(
+                    <span class="kw-2">&amp;</span>NaiveDate::from_ymd_opt(<span class="number">2014</span>, <span class="number">12</span>, <span class="number">31</span>)
+                        .unwrap()
+                        .and_hms_nano_opt(<span class="number">13</span>, <span class="number">26</span>, <span class="number">40</span>, <span class="number">12_345_678</span>)
+                        .unwrap()
+                )
+                .unwrap())
         );
 
         <span class="comment">// single result from timestamp
         </span><span class="macro">assert_eq!</span>(
             <span class="macro">parse!</span>(Utc; timestamp: <span class="number">1_420_000_000</span>, offset: <span class="number">0</span>),
-            <span class="prelude-val">Ok</span>(Utc.ymd(<span class="number">2014</span>, <span class="number">12</span>, <span class="number">31</span>).and_hms(<span class="number">4</span>, <span class="number">26</span>, <span class="number">40</span>))
+            <span class="prelude-val">Ok</span>(Utc.with_ymd_and_hms(<span class="number">2014</span>, <span class="number">12</span>, <span class="number">31</span>, <span class="number">4</span>, <span class="number">26</span>, <span class="number">40</span>).unwrap())
         );
         <span class="macro">assert_eq!</span>(<span class="macro">parse!</span>(Utc; timestamp: <span class="number">1_420_000_000</span>, offset: <span class="number">32400</span>), <span class="prelude-val">Err</span>(IMPOSSIBLE));
         <span class="macro">assert_eq!</span>(
-            <span class="macro">parse!</span>(FixedOffset::east(<span class="number">32400</span>); timestamp: <span class="number">1_420_000_000</span>, offset: <span class="number">0</span>),
+            <span class="macro">parse!</span>(FixedOffset::east_opt(<span class="number">32400</span>).unwrap(); timestamp: <span class="number">1_420_000_000</span>, offset: <span class="number">0</span>),
             <span class="prelude-val">Err</span>(IMPOSSIBLE)
         );
         <span class="macro">assert_eq!</span>(
-            <span class="macro">parse!</span>(FixedOffset::east(<span class="number">32400</span>); timestamp: <span class="number">1_420_000_000</span>, offset: <span class="number">32400</span>),
-            <span class="prelude-val">Ok</span>(FixedOffset::east(<span class="number">32400</span>).ymd(<span class="number">2014</span>, <span class="number">12</span>, <span class="number">31</span>).and_hms(<span class="number">13</span>, <span class="number">26</span>, <span class="number">40</span>))
+            <span class="macro">parse!</span>(FixedOffset::east_opt(<span class="number">32400</span>).unwrap(); timestamp: <span class="number">1_420_000_000</span>, offset: <span class="number">32400</span>),
+            <span class="prelude-val">Ok</span>(FixedOffset::east_opt(<span class="number">32400</span>)
+                .unwrap()
+                .with_ymd_and_hms(<span class="number">2014</span>, <span class="number">12</span>, <span class="number">31</span>, <span class="number">13</span>, <span class="number">26</span>, <span class="number">40</span>)
+                .unwrap())
         );
 
         <span class="comment">// TODO test with a variable time zone (for None and Ambiguous cases)
     </span>}
+
+    <span class="attr">#[test]
+    </span><span class="kw">fn </span>issue_551() {
+        <span class="kw">use </span><span class="kw">crate</span>::Weekday;
+        <span class="kw">let </span><span class="kw-2">mut </span>parsed = Parsed::new();
+
+        parsed.year = <span class="prelude-val">Some</span>(<span class="number">2002</span>);
+        parsed.week_from_mon = <span class="prelude-val">Some</span>(<span class="number">22</span>);
+        parsed.weekday = <span class="prelude-val">Some</span>(Weekday::Mon);
+        <span class="macro">assert_eq!</span>(NaiveDate::from_ymd_opt(<span class="number">2002</span>, <span class="number">6</span>, <span class="number">3</span>).unwrap(), parsed.to_naive_date().unwrap());
+
+        parsed.year = <span class="prelude-val">Some</span>(<span class="number">2001</span>);
+        <span class="macro">assert_eq!</span>(NaiveDate::from_ymd_opt(<span class="number">2001</span>, <span class="number">5</span>, <span class="number">28</span>).unwrap(), parsed.to_naive_date().unwrap());
+    }
 }
 </code></pre></div></section></main></body></html>

@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/nix/store/jnqxxv1xi811ni996b002f4jnyz38xck-vendor-cargo-deps/c19b7c6f923b580ac259164a89f2577984ad5ab09ee9d583b888f934adbbe8d0/time-0.3.14/src/offset_date_time.rs`."><title>offset_date_time.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-f3501f0f5ae15dfb.css" id="mainThemeStyle"><div id="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="time" data-themes="" data-resource-suffix="" data-rustdoc-version="1.71.0 (8ede3aae2 2023-07-12)" data-search-js="search-4926e5fc22a5646a.js" data-settings-js="settings-de11bff964e9d4e5.js" data-settings-css="settings-8c76f75bfb6bd192.css" data-theme-light-css="light-0f8c037637f9eb3e.css" data-theme-dark-css="dark-1097f8e92a01e3cf.css" data-theme-ayu-css="ayu-614652228113ac93.css" ></div><script src="../../static.files/storage-62ce34ea385b278a.js"></script><script defer src="../../static.files/source-script-11255107d0a65077.js"></script><script defer src="../../source-files.js"></script><script defer src="../../static.files/main-f0540c1d82cde29b.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../../static.files/light-0f8c037637f9eb3e.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../../static.files/dark-1097f8e92a01e3cf.css"><link rel="stylesheet" href="../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="icon" href="https://avatars0.githubusercontent.com/u/55999857"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../time/index.html"><img src="https://avatars0.githubusercontent.com/u/55999857" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/nix/store/yf45a1rayffhnidhgyjynpyhr9lqkd09-vendor-cargo-deps/c19b7c6f923b580ac259164a89f2577984ad5ab09ee9d583b888f934adbbe8d0/time-0.3.25/src/offset_date_time.rs`."><title>offset_date_time.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-f3501f0f5ae15dfb.css" id="mainThemeStyle"><div id="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="time" data-themes="" data-resource-suffix="" data-rustdoc-version="1.71.0 (8ede3aae2 2023-07-12)" data-search-js="search-4926e5fc22a5646a.js" data-settings-js="settings-de11bff964e9d4e5.js" data-settings-css="settings-8c76f75bfb6bd192.css" data-theme-light-css="light-0f8c037637f9eb3e.css" data-theme-dark-css="dark-1097f8e92a01e3cf.css" data-theme-ayu-css="ayu-614652228113ac93.css" ></div><script src="../../static.files/storage-62ce34ea385b278a.js"></script><script defer src="../../static.files/source-script-11255107d0a65077.js"></script><script defer src="../../source-files.js"></script><script defer src="../../static.files/main-f0540c1d82cde29b.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../../static.files/light-0f8c037637f9eb3e.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../../static.files/dark-1097f8e92a01e3cf.css"><link rel="stylesheet" href="../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="icon" href="https://avatars0.githubusercontent.com/u/55999857"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../time/index.html"><img src="https://avatars0.githubusercontent.com/u/55999857" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -1194,215 +1194,59 @@
 <a href="#1194" id="1194">1194</a>
 <a href="#1195" id="1195">1195</a>
 <a href="#1196" id="1196">1196</a>
-<a href="#1197" id="1197">1197</a>
-<a href="#1198" id="1198">1198</a>
-<a href="#1199" id="1199">1199</a>
-<a href="#1200" id="1200">1200</a>
-<a href="#1201" id="1201">1201</a>
-<a href="#1202" id="1202">1202</a>
-<a href="#1203" id="1203">1203</a>
-<a href="#1204" id="1204">1204</a>
-<a href="#1205" id="1205">1205</a>
-<a href="#1206" id="1206">1206</a>
-<a href="#1207" id="1207">1207</a>
-<a href="#1208" id="1208">1208</a>
-<a href="#1209" id="1209">1209</a>
-<a href="#1210" id="1210">1210</a>
-<a href="#1211" id="1211">1211</a>
-<a href="#1212" id="1212">1212</a>
-<a href="#1213" id="1213">1213</a>
-<a href="#1214" id="1214">1214</a>
-<a href="#1215" id="1215">1215</a>
-<a href="#1216" id="1216">1216</a>
-<a href="#1217" id="1217">1217</a>
-<a href="#1218" id="1218">1218</a>
-<a href="#1219" id="1219">1219</a>
-<a href="#1220" id="1220">1220</a>
-<a href="#1221" id="1221">1221</a>
-<a href="#1222" id="1222">1222</a>
-<a href="#1223" id="1223">1223</a>
-<a href="#1224" id="1224">1224</a>
-<a href="#1225" id="1225">1225</a>
-<a href="#1226" id="1226">1226</a>
-<a href="#1227" id="1227">1227</a>
-<a href="#1228" id="1228">1228</a>
-<a href="#1229" id="1229">1229</a>
-<a href="#1230" id="1230">1230</a>
-<a href="#1231" id="1231">1231</a>
-<a href="#1232" id="1232">1232</a>
-<a href="#1233" id="1233">1233</a>
-<a href="#1234" id="1234">1234</a>
-<a href="#1235" id="1235">1235</a>
-<a href="#1236" id="1236">1236</a>
-<a href="#1237" id="1237">1237</a>
-<a href="#1238" id="1238">1238</a>
-<a href="#1239" id="1239">1239</a>
-<a href="#1240" id="1240">1240</a>
-<a href="#1241" id="1241">1241</a>
-<a href="#1242" id="1242">1242</a>
-<a href="#1243" id="1243">1243</a>
-<a href="#1244" id="1244">1244</a>
-<a href="#1245" id="1245">1245</a>
-<a href="#1246" id="1246">1246</a>
-<a href="#1247" id="1247">1247</a>
-<a href="#1248" id="1248">1248</a>
-<a href="#1249" id="1249">1249</a>
-<a href="#1250" id="1250">1250</a>
-<a href="#1251" id="1251">1251</a>
-<a href="#1252" id="1252">1252</a>
-<a href="#1253" id="1253">1253</a>
-<a href="#1254" id="1254">1254</a>
-<a href="#1255" id="1255">1255</a>
-<a href="#1256" id="1256">1256</a>
-<a href="#1257" id="1257">1257</a>
-<a href="#1258" id="1258">1258</a>
-<a href="#1259" id="1259">1259</a>
-<a href="#1260" id="1260">1260</a>
-<a href="#1261" id="1261">1261</a>
-<a href="#1262" id="1262">1262</a>
-<a href="#1263" id="1263">1263</a>
-<a href="#1264" id="1264">1264</a>
-<a href="#1265" id="1265">1265</a>
-<a href="#1266" id="1266">1266</a>
-<a href="#1267" id="1267">1267</a>
-<a href="#1268" id="1268">1268</a>
-<a href="#1269" id="1269">1269</a>
-<a href="#1270" id="1270">1270</a>
-<a href="#1271" id="1271">1271</a>
-<a href="#1272" id="1272">1272</a>
-<a href="#1273" id="1273">1273</a>
-<a href="#1274" id="1274">1274</a>
-<a href="#1275" id="1275">1275</a>
-<a href="#1276" id="1276">1276</a>
-<a href="#1277" id="1277">1277</a>
-<a href="#1278" id="1278">1278</a>
-<a href="#1279" id="1279">1279</a>
-<a href="#1280" id="1280">1280</a>
-<a href="#1281" id="1281">1281</a>
-<a href="#1282" id="1282">1282</a>
-<a href="#1283" id="1283">1283</a>
-<a href="#1284" id="1284">1284</a>
-<a href="#1285" id="1285">1285</a>
-<a href="#1286" id="1286">1286</a>
-<a href="#1287" id="1287">1287</a>
-<a href="#1288" id="1288">1288</a>
-<a href="#1289" id="1289">1289</a>
-<a href="#1290" id="1290">1290</a>
-<a href="#1291" id="1291">1291</a>
-<a href="#1292" id="1292">1292</a>
-<a href="#1293" id="1293">1293</a>
-<a href="#1294" id="1294">1294</a>
-<a href="#1295" id="1295">1295</a>
-<a href="#1296" id="1296">1296</a>
-<a href="#1297" id="1297">1297</a>
-<a href="#1298" id="1298">1298</a>
-<a href="#1299" id="1299">1299</a>
-<a href="#1300" id="1300">1300</a>
-<a href="#1301" id="1301">1301</a>
-<a href="#1302" id="1302">1302</a>
-<a href="#1303" id="1303">1303</a>
-<a href="#1304" id="1304">1304</a>
-<a href="#1305" id="1305">1305</a>
-<a href="#1306" id="1306">1306</a>
-<a href="#1307" id="1307">1307</a>
-<a href="#1308" id="1308">1308</a>
-<a href="#1309" id="1309">1309</a>
-<a href="#1310" id="1310">1310</a>
-<a href="#1311" id="1311">1311</a>
-<a href="#1312" id="1312">1312</a>
-<a href="#1313" id="1313">1313</a>
-<a href="#1314" id="1314">1314</a>
-<a href="#1315" id="1315">1315</a>
-<a href="#1316" id="1316">1316</a>
-<a href="#1317" id="1317">1317</a>
-<a href="#1318" id="1318">1318</a>
-<a href="#1319" id="1319">1319</a>
-<a href="#1320" id="1320">1320</a>
-<a href="#1321" id="1321">1321</a>
-<a href="#1322" id="1322">1322</a>
-<a href="#1323" id="1323">1323</a>
-<a href="#1324" id="1324">1324</a>
-<a href="#1325" id="1325">1325</a>
-<a href="#1326" id="1326">1326</a>
-<a href="#1327" id="1327">1327</a>
-<a href="#1328" id="1328">1328</a>
-<a href="#1329" id="1329">1329</a>
-<a href="#1330" id="1330">1330</a>
-<a href="#1331" id="1331">1331</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! The [`OffsetDateTime`] struct and its associated `impl`s.
 
+</span><span class="attr">#[cfg(feature = <span class="string">&quot;std&quot;</span>)]
 </span><span class="kw">use </span>core::cmp::Ordering;
 <span class="attr">#[cfg(feature = <span class="string">&quot;std&quot;</span>)]
 </span><span class="kw">use </span>core::convert::From;
 <span class="kw">use </span>core::fmt;
-<span class="kw">use </span>core::hash::{Hash, Hasher};
-<span class="kw">use </span>core::ops::{Add, Sub};
+<span class="kw">use </span>core::hash::Hash;
+<span class="kw">use </span>core::ops::{Add, AddAssign, Sub, SubAssign};
 <span class="kw">use </span>core::time::Duration <span class="kw">as </span>StdDuration;
 <span class="attr">#[cfg(feature = <span class="string">&quot;formatting&quot;</span>)]
 </span><span class="kw">use </span>std::io;
 <span class="attr">#[cfg(feature = <span class="string">&quot;std&quot;</span>)]
 </span><span class="kw">use </span>std::time::SystemTime;
 
-<span class="kw">use </span><span class="kw">crate</span>::date::{MAX_YEAR, MIN_YEAR};
+<span class="kw">use </span><span class="kw">crate</span>::date_time::offset_kind;
 <span class="attr">#[cfg(feature = <span class="string">&quot;formatting&quot;</span>)]
 </span><span class="kw">use </span><span class="kw">crate</span>::formatting::Formattable;
 <span class="attr">#[cfg(feature = <span class="string">&quot;parsing&quot;</span>)]
 </span><span class="kw">use </span><span class="kw">crate</span>::parsing::Parsable;
-<span class="attr">#[cfg(feature = <span class="string">&quot;parsing&quot;</span>)]
-</span><span class="kw">use </span><span class="kw">crate</span>::util;
-<span class="kw">use crate</span>::{error, Date, Duration, Month, PrimitiveDateTime, Time, UtcOffset, Weekday};
+<span class="kw">use crate</span>::{error, Date, DateTime, Duration, Month, PrimitiveDateTime, Time, UtcOffset, Weekday};
 
-<span class="doccomment">/// The Julian day of the Unix epoch.
-</span><span class="kw">const </span>UNIX_EPOCH_JULIAN_DAY: i32 = Date::__from_ordinal_date_unchecked(<span class="number">1970</span>, <span class="number">1</span>).to_julian_day();
+<span class="doccomment">/// The actual type doing all the work.
+</span><span class="kw">type </span>Inner = DateTime&lt;offset_kind::Fixed&gt;;
 
 <span class="doccomment">/// A [`PrimitiveDateTime`] with a [`UtcOffset`].
 ///
 /// All comparisons are performed using the UTC time.
-</span><span class="attr">#[derive(Debug, Clone, Copy, Eq)]
-</span><span class="kw">pub struct </span>OffsetDateTime {
-    <span class="doccomment">/// The [`PrimitiveDateTime`], which is _always_ in the stored offset.
-    </span><span class="kw">pub</span>(<span class="kw">crate</span>) local_datetime: PrimitiveDateTime,
-    <span class="doccomment">/// The [`UtcOffset`], which will be added to the [`PrimitiveDateTime`] as necessary.
-    </span><span class="kw">pub</span>(<span class="kw">crate</span>) offset: UtcOffset,
-}
+</span><span class="attr">#[derive(Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+</span><span class="kw">pub struct </span>OffsetDateTime(<span class="kw">pub</span>(<span class="kw">crate</span>) Inner);
 
 <span class="kw">impl </span>OffsetDateTime {
     <span class="doccomment">/// Midnight, 1 January, 1970 (UTC).
     ///
     /// ```rust
-    /// # use time::{OffsetDateTime, macros::datetime};
+    /// # use time::OffsetDateTime;
+    /// # use time_macros::datetime;
     /// assert_eq!(OffsetDateTime::UNIX_EPOCH, datetime!(1970-01-01 0:00 UTC),);
     /// ```
-    </span><span class="kw">pub const </span>UNIX_EPOCH: <span class="self">Self </span>= Date::__from_ordinal_date_unchecked(<span class="number">1970</span>, <span class="number">1</span>)
-        .midnight()
-        .assume_utc();
+    </span><span class="kw">pub const </span>UNIX_EPOCH: <span class="self">Self </span>= <span class="self">Self</span>(Inner::UNIX_EPOCH);
 
     <span class="comment">// region: now
     </span><span class="doccomment">/// Create a new `OffsetDateTime` with the current date and time in UTC.
     ///
     /// ```rust
-    /// # use time::{OffsetDateTime, macros::offset};
+    /// # use time::OffsetDateTime;
+    /// # use time_macros::offset;
     /// assert!(OffsetDateTime::now_utc().year() &gt;= 2019);
     /// assert_eq!(OffsetDateTime::now_utc().offset(), offset!(UTC));
     /// ```
     </span><span class="attr">#[cfg(feature = <span class="string">&quot;std&quot;</span>)]
-    #[cfg_attr(__time_03_docs, doc(cfg(feature = <span class="string">&quot;std&quot;</span>)))]
     </span><span class="kw">pub fn </span>now_utc() -&gt; <span class="self">Self </span>{
-        <span class="attr">#[cfg(all(
-            target_arch = <span class="string">&quot;wasm32&quot;</span>,
-            not(any(target_os = <span class="string">&quot;emscripten&quot;</span>, target_os = <span class="string">&quot;wasi&quot;</span>)),
-            feature = <span class="string">&quot;wasm-bindgen&quot;
-        </span>))]
-        </span>{
-            js_sys::Date::new_0().into()
-        }
-
-        <span class="attr">#[cfg(not(all(
-            target_arch = <span class="string">&quot;wasm32&quot;</span>,
-            not(any(target_os = <span class="string">&quot;emscripten&quot;</span>, target_os = <span class="string">&quot;wasi&quot;</span>)),
-            feature = <span class="string">&quot;wasm-bindgen&quot;
-        </span>)))]
-        </span>SystemTime::now().into()
+        <span class="self">Self</span>(Inner::now_utc())
     }
 
     <span class="doccomment">/// Attempt to create a new `OffsetDateTime` with the current date and time in the local offset.
@@ -1415,17 +1259,15 @@
     /// # }
     /// ```
     </span><span class="attr">#[cfg(feature = <span class="string">&quot;local-offset&quot;</span>)]
-    #[cfg_attr(__time_03_docs, doc(cfg(feature = <span class="string">&quot;local-offset&quot;</span>)))]
     </span><span class="kw">pub fn </span>now_local() -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, error::IndeterminateOffset&gt; {
-        <span class="kw">let </span>t = <span class="self">Self</span>::now_utc();
-        <span class="prelude-val">Ok</span>(t.to_offset(UtcOffset::local_offset_at(t)<span class="question-mark">?</span>))
+        Inner::now_local().map(<span class="self">Self</span>)
     }
     <span class="comment">// endregion now
 
     </span><span class="doccomment">/// Convert the `OffsetDateTime` from the current [`UtcOffset`] to the provided [`UtcOffset`].
     ///
     /// ```rust
-    /// # use time::macros::{datetime, offset};
+    /// # use time_macros::{datetime, offset};
     /// assert_eq!(
     ///     datetime!(2000-01-01 0:00 UTC)
     ///         .to_offset(offset!(-1))
@@ -1433,7 +1275,7 @@
     ///     1999,
     /// );
     ///
-    /// // Let&#39;s see what time Sydney&#39;s new year&#39;s celebration is in New York // and Los Angeles.
+    /// // Let&#39;s see what time Sydney&#39;s new year&#39;s celebration is in New York and Los Angeles.
     ///
     /// // Construct midnight on new year&#39;s in Sydney.
     /// let sydney = datetime!(2000-01-01 0:00 +11);
@@ -1448,64 +1290,31 @@
     ///
     /// This method panics if the local date-time in the new offset is outside the supported range.
     </span><span class="kw">pub const fn </span>to_offset(<span class="self">self</span>, offset: UtcOffset) -&gt; <span class="self">Self </span>{
-        <span class="kw">if </span><span class="self">self</span>.offset.whole_hours() == offset.whole_hours()
-            &amp;&amp; <span class="self">self</span>.offset.minutes_past_hour() == offset.minutes_past_hour()
-            &amp;&amp; <span class="self">self</span>.offset.seconds_past_minute() == offset.seconds_past_minute()
-        {
-            <span class="kw">return </span><span class="self">self</span>;
-        }
-
-        <span class="kw">let </span>(year, ordinal, time) = <span class="self">self</span>.to_offset_raw(offset);
-
-        <span class="kw">if </span>year &gt; MAX_YEAR || year &lt; MIN_YEAR {
-            <span class="macro">panic!</span>(<span class="string">&quot;local datetime out of valid range&quot;</span>);
-        }
-
-        Date::__from_ordinal_date_unchecked(year, ordinal)
-            .with_time(time)
-            .assume_offset(offset)
+        <span class="self">Self</span>(<span class="self">self</span>.<span class="number">0</span>.to_offset(offset))
     }
 
-    <span class="doccomment">/// Equivalent to `.to_offset(UtcOffset::UTC)`, but returning the year, ordinal, and time. This
-    /// avoids constructing an invalid [`Date`] if the new value is out of range.
-    </span><span class="kw">const fn </span>to_offset_raw(<span class="self">self</span>, offset: UtcOffset) -&gt; (i32, u16, Time) {
-        <span class="kw">let </span>from = <span class="self">self</span>.offset;
-        <span class="kw">let </span>to = offset;
-
-        <span class="comment">// Fast path for when no conversion is necessary.
-        </span><span class="kw">if </span>from.whole_hours() == to.whole_hours()
-            &amp;&amp; from.minutes_past_hour() == to.minutes_past_hour()
-            &amp;&amp; from.seconds_past_minute() == to.seconds_past_minute()
-        {
-            <span class="kw">return </span>(<span class="self">self</span>.year(), <span class="self">self</span>.ordinal(), <span class="self">self</span>.time());
-        }
-
-        <span class="kw">let </span><span class="kw-2">mut </span>second = <span class="self">self</span>.second() <span class="kw">as </span>i16 - from.seconds_past_minute() <span class="kw">as </span>i16
-            + to.seconds_past_minute() <span class="kw">as </span>i16;
-        <span class="kw">let </span><span class="kw-2">mut </span>minute =
-            <span class="self">self</span>.minute() <span class="kw">as </span>i16 - from.minutes_past_hour() <span class="kw">as </span>i16 + to.minutes_past_hour() <span class="kw">as </span>i16;
-        <span class="kw">let </span><span class="kw-2">mut </span>hour = <span class="self">self</span>.hour() <span class="kw">as </span>i8 - from.whole_hours() + to.whole_hours();
-        <span class="kw">let </span>(<span class="kw-2">mut </span>year, <span class="kw-2">mut </span>ordinal) = <span class="self">self</span>.to_ordinal_date();
-
-        <span class="comment">// Cascade the values twice. This is needed because the values are adjusted twice above.
-        </span><span class="macro">cascade!</span>(second <span class="kw">in </span><span class="number">0</span>..<span class="number">60 </span>=&gt; minute);
-        <span class="macro">cascade!</span>(second <span class="kw">in </span><span class="number">0</span>..<span class="number">60 </span>=&gt; minute);
-        <span class="macro">cascade!</span>(minute <span class="kw">in </span><span class="number">0</span>..<span class="number">60 </span>=&gt; hour);
-        <span class="macro">cascade!</span>(minute <span class="kw">in </span><span class="number">0</span>..<span class="number">60 </span>=&gt; hour);
-        <span class="macro">cascade!</span>(hour <span class="kw">in </span><span class="number">0</span>..<span class="number">24 </span>=&gt; ordinal);
-        <span class="macro">cascade!</span>(hour <span class="kw">in </span><span class="number">0</span>..<span class="number">24 </span>=&gt; ordinal);
-        <span class="macro">cascade!</span>(ordinal =&gt; year);
-
-        (
-            year,
-            ordinal,
-            Time::__from_hms_nanos_unchecked(
-                hour <span class="kw">as _</span>,
-                minute <span class="kw">as _</span>,
-                second <span class="kw">as _</span>,
-                <span class="self">self</span>.nanosecond(),
-            ),
-        )
+    <span class="doccomment">/// Convert the `OffsetDateTime` from the current [`UtcOffset`] to the provided [`UtcOffset`],
+    /// returning `None` if the date-time in the resulting offset is invalid.
+    ///
+    /// ```rust
+    /// # use time::PrimitiveDateTime;
+    /// # use time_macros::{datetime, offset};
+    /// assert_eq!(
+    ///     datetime!(2000-01-01 0:00 UTC)
+    ///         .checked_to_offset(offset!(-1))
+    ///         .unwrap()
+    ///         .year(),
+    ///     1999,
+    /// );
+    /// assert_eq!(
+    ///     PrimitiveDateTime::MAX
+    ///         .assume_utc()
+    ///         .checked_to_offset(offset!(+1)),
+    ///     None,
+    /// );
+    /// ```
+    </span><span class="kw">pub const fn </span>checked_to_offset(<span class="self">self</span>, offset: UtcOffset) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>&gt; {
+        <span class="prelude-val">Some</span>(<span class="self">Self</span>(<span class="macro">const_try_opt!</span>(<span class="self">self</span>.<span class="number">0</span>.checked_to_offset(offset))))
     }
 
     <span class="comment">// region: constructors
@@ -1513,7 +1322,8 @@
     /// resulting value is guaranteed to return UTC.
     ///
     /// ```rust
-    /// # use time::{OffsetDateTime, macros::datetime};
+    /// # use time::OffsetDateTime;
+    /// # use time_macros::datetime;
     /// assert_eq!(
     ///     OffsetDateTime::from_unix_timestamp(0),
     ///     Ok(OffsetDateTime::UNIX_EPOCH),
@@ -1537,37 +1347,15 @@
     /// # Ok::&lt;_, time::Error&gt;(())
     /// ```
     </span><span class="kw">pub const fn </span>from_unix_timestamp(timestamp: i64) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, error::ComponentRange&gt; {
-        <span class="attr">#[allow(clippy::missing_docs_in_private_items)]
-        </span><span class="kw">const </span>MIN_TIMESTAMP: i64 = Date::MIN.midnight().assume_utc().unix_timestamp();
-        <span class="attr">#[allow(clippy::missing_docs_in_private_items)]
-        </span><span class="kw">const </span>MAX_TIMESTAMP: i64 = Date::MAX
-            .with_time(Time::__from_hms_nanos_unchecked(<span class="number">23</span>, <span class="number">59</span>, <span class="number">59</span>, <span class="number">999_999_999</span>))
-            .assume_utc()
-            .unix_timestamp();
-
-        <span class="macro">ensure_value_in_range!</span>(timestamp <span class="kw">in </span>MIN_TIMESTAMP =&gt; MAX_TIMESTAMP);
-
-        <span class="comment">// Use the unchecked method here, as the input validity has already been verified.
-        </span><span class="kw">let </span>date = Date::from_julian_day_unchecked(
-            UNIX_EPOCH_JULIAN_DAY + <span class="macro">div_floor!</span>(timestamp, <span class="number">86_400</span>) <span class="kw">as </span>i32,
-        );
-
-        <span class="kw">let </span>seconds_within_day = timestamp.rem_euclid(<span class="number">86_400</span>);
-        <span class="kw">let </span>time = Time::__from_hms_nanos_unchecked(
-            (seconds_within_day / <span class="number">3_600</span>) <span class="kw">as _</span>,
-            ((seconds_within_day % <span class="number">3_600</span>) / <span class="number">60</span>) <span class="kw">as _</span>,
-            (seconds_within_day % <span class="number">60</span>) <span class="kw">as _</span>,
-            <span class="number">0</span>,
-        );
-
-        <span class="prelude-val">Ok</span>(PrimitiveDateTime::new(date, time).assume_utc())
+        <span class="prelude-val">Ok</span>(<span class="self">Self</span>(<span class="macro">const_try!</span>(Inner::from_unix_timestamp(timestamp))))
     }
 
     <span class="doccomment">/// Construct an `OffsetDateTime` from the provided Unix timestamp (in nanoseconds). Calling
     /// `.offset()` on the resulting value is guaranteed to return UTC.
     ///
     /// ```rust
-    /// # use time::{OffsetDateTime, macros::datetime};
+    /// # use time::OffsetDateTime;
+    /// # use time_macros::datetime;
     /// assert_eq!(
     ///     OffsetDateTime::from_unix_timestamp_nanos(0),
     ///     Ok(OffsetDateTime::UNIX_EPOCH),
@@ -1578,19 +1366,9 @@
     /// );
     /// ```
     </span><span class="kw">pub const fn </span>from_unix_timestamp_nanos(timestamp: i128) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, error::ComponentRange&gt; {
-        <span class="kw">let </span>datetime = <span class="macro">const_try!</span>(<span class="self">Self</span>::from_unix_timestamp(
-            <span class="macro">div_floor!</span>(timestamp, <span class="number">1_000_000_000</span>) <span class="kw">as </span>i64
-        ));
-
-        <span class="prelude-val">Ok</span>(datetime
-            .local_datetime
-            .replace_time(Time::__from_hms_nanos_unchecked(
-                datetime.local_datetime.hour(),
-                datetime.local_datetime.minute(),
-                datetime.local_datetime.second(),
-                timestamp.rem_euclid(<span class="number">1_000_000_000</span>) <span class="kw">as </span>u32,
-            ))
-            .assume_utc())
+        <span class="prelude-val">Ok</span>(<span class="self">Self</span>(<span class="macro">const_try!</span>(Inner::from_unix_timestamp_nanos(
+            timestamp
+        ))))
     }
     <span class="comment">// endregion constructors
 
@@ -1598,36 +1376,29 @@
     </span><span class="doccomment">/// Get the [`UtcOffset`].
     ///
     /// ```rust
-    /// # use time::macros::{datetime, offset};
+    /// # use time_macros::{datetime, offset};
     /// assert_eq!(datetime!(2019-01-01 0:00 UTC).offset(), offset!(UTC));
     /// assert_eq!(datetime!(2019-01-01 0:00 +1).offset(), offset!(+1));
     /// ```
     </span><span class="kw">pub const fn </span>offset(<span class="self">self</span>) -&gt; UtcOffset {
-        <span class="self">self</span>.offset
+        <span class="self">self</span>.<span class="number">0</span>.offset()
     }
 
     <span class="doccomment">/// Get the [Unix timestamp](https://en.wikipedia.org/wiki/Unix_time).
     ///
     /// ```rust
-    /// # use time::macros::datetime;
+    /// # use time_macros::datetime;
     /// assert_eq!(datetime!(1970-01-01 0:00 UTC).unix_timestamp(), 0);
     /// assert_eq!(datetime!(1970-01-01 0:00 -1).unix_timestamp(), 3_600);
     /// ```
     </span><span class="kw">pub const fn </span>unix_timestamp(<span class="self">self</span>) -&gt; i64 {
-        <span class="kw">let </span>offset = <span class="self">self</span>.offset.whole_seconds() <span class="kw">as </span>i64;
-
-        <span class="kw">let </span>days =
-            (<span class="self">self</span>.local_datetime.to_julian_day() <span class="kw">as </span>i64 - UNIX_EPOCH_JULIAN_DAY <span class="kw">as </span>i64) * <span class="number">86_400</span>;
-        <span class="kw">let </span>hours = <span class="self">self</span>.local_datetime.hour() <span class="kw">as </span>i64 * <span class="number">3_600</span>;
-        <span class="kw">let </span>minutes = <span class="self">self</span>.local_datetime.minute() <span class="kw">as </span>i64 * <span class="number">60</span>;
-        <span class="kw">let </span>seconds = <span class="self">self</span>.local_datetime.second() <span class="kw">as </span>i64;
-        days + hours + minutes + seconds - offset
+        <span class="self">self</span>.<span class="number">0</span>.unix_timestamp()
     }
 
     <span class="doccomment">/// Get the Unix timestamp in nanoseconds.
     ///
     /// ```rust
-    /// use time::macros::datetime;
+    /// use time_macros::datetime;
     /// assert_eq!(datetime!(1970-01-01 0:00 UTC).unix_timestamp_nanos(), 0);
     /// assert_eq!(
     ///     datetime!(1970-01-01 0:00 -1).unix_timestamp_nanos(),
@@ -1635,13 +1406,13 @@
     /// );
     /// ```
     </span><span class="kw">pub const fn </span>unix_timestamp_nanos(<span class="self">self</span>) -&gt; i128 {
-        <span class="self">self</span>.unix_timestamp() <span class="kw">as </span>i128 * <span class="number">1_000_000_000 </span>+ <span class="self">self</span>.nanosecond() <span class="kw">as </span>i128
+        <span class="self">self</span>.<span class="number">0</span>.unix_timestamp_nanos()
     }
 
     <span class="doccomment">/// Get the [`Date`] in the stored offset.
     ///
     /// ```rust
-    /// # use time::macros::{date, datetime, offset};
+    /// # use time_macros::{date, datetime, offset};
     /// assert_eq!(datetime!(2019-01-01 0:00 UTC).date(), date!(2019-01-01));
     /// assert_eq!(
     ///     datetime!(2019-01-01 0:00 UTC)
@@ -1651,13 +1422,13 @@
     /// );
     /// ```
     </span><span class="kw">pub const fn </span>date(<span class="self">self</span>) -&gt; Date {
-        <span class="self">self</span>.local_datetime.date()
+        <span class="self">self</span>.<span class="number">0</span>.date()
     }
 
     <span class="doccomment">/// Get the [`Time`] in the stored offset.
     ///
     /// ```rust
-    /// # use time::macros::{datetime, offset, time};
+    /// # use time_macros::{datetime, offset, time};
     /// assert_eq!(datetime!(2019-01-01 0:00 UTC).time(), time!(0:00));
     /// assert_eq!(
     ///     datetime!(2019-01-01 0:00 UTC)
@@ -1667,14 +1438,14 @@
     /// );
     /// ```
     </span><span class="kw">pub const fn </span>time(<span class="self">self</span>) -&gt; Time {
-        <span class="self">self</span>.local_datetime.time()
+        <span class="self">self</span>.<span class="number">0</span>.time()
     }
 
     <span class="comment">// region: date getters
     </span><span class="doccomment">/// Get the year of the date in the stored offset.
     ///
     /// ```rust
-    /// # use time::macros::{datetime, offset};
+    /// # use time_macros::{datetime, offset};
     /// assert_eq!(datetime!(2019-01-01 0:00 UTC).year(), 2019);
     /// assert_eq!(
     ///     datetime!(2019-12-31 23:00 UTC)
@@ -1685,14 +1456,14 @@
     /// assert_eq!(datetime!(2020-01-01 0:00 UTC).year(), 2020);
     /// ```
     </span><span class="kw">pub const fn </span>year(<span class="self">self</span>) -&gt; i32 {
-        <span class="self">self</span>.date().year()
+        <span class="self">self</span>.<span class="number">0</span>.year()
     }
 
     <span class="doccomment">/// Get the month of the date in the stored offset.
     ///
     /// ```rust
     /// # use time::Month;
-    /// # use time::macros::{datetime, offset};
+    /// # use time_macros::{datetime, offset};
     /// assert_eq!(datetime!(2019-01-01 0:00 UTC).month(), Month::January);
     /// assert_eq!(
     ///     datetime!(2019-12-31 23:00 UTC)
@@ -1702,7 +1473,7 @@
     /// );
     /// ```
     </span><span class="kw">pub const fn </span>month(<span class="self">self</span>) -&gt; Month {
-        <span class="self">self</span>.date().month()
+        <span class="self">self</span>.<span class="number">0</span>.month()
     }
 
     <span class="doccomment">/// Get the day of the date in the stored offset.
@@ -1710,7 +1481,7 @@
     /// The returned value will always be in the range `1..=31`.
     ///
     /// ```rust
-    /// # use time::macros::{datetime, offset};
+    /// # use time_macros::{datetime, offset};
     /// assert_eq!(datetime!(2019-01-01 0:00 UTC).day(), 1);
     /// assert_eq!(
     ///     datetime!(2019-12-31 23:00 UTC)
@@ -1720,7 +1491,7 @@
     /// );
     /// ```
     </span><span class="kw">pub const fn </span>day(<span class="self">self</span>) -&gt; u8 {
-        <span class="self">self</span>.date().day()
+        <span class="self">self</span>.<span class="number">0</span>.day()
     }
 
     <span class="doccomment">/// Get the day of the year of the date in the stored offset.
@@ -1728,7 +1499,7 @@
     /// The returned value will always be in the range `1..=366`.
     ///
     /// ```rust
-    /// # use time::macros::{datetime, offset};
+    /// # use time_macros::{datetime, offset};
     /// assert_eq!(datetime!(2019-01-01 0:00 UTC).ordinal(), 1);
     /// assert_eq!(
     ///     datetime!(2019-12-31 23:00 UTC)
@@ -1738,7 +1509,7 @@
     /// );
     /// ```
     </span><span class="kw">pub const fn </span>ordinal(<span class="self">self</span>) -&gt; u16 {
-        <span class="self">self</span>.date().ordinal()
+        <span class="self">self</span>.<span class="number">0</span>.ordinal()
     }
 
     <span class="doccomment">/// Get the ISO week number of the date in the stored offset.
@@ -1746,14 +1517,14 @@
     /// The returned value will always be in the range `1..=53`.
     ///
     /// ```rust
-    /// # use time::macros::datetime;
+    /// # use time_macros::datetime;
     /// assert_eq!(datetime!(2019-01-01 0:00 UTC).iso_week(), 1);
     /// assert_eq!(datetime!(2020-01-01 0:00 UTC).iso_week(), 1);
     /// assert_eq!(datetime!(2020-12-31 0:00 UTC).iso_week(), 53);
     /// assert_eq!(datetime!(2021-01-01 0:00 UTC).iso_week(), 53);
     /// ```
     </span><span class="kw">pub const fn </span>iso_week(<span class="self">self</span>) -&gt; u8 {
-        <span class="self">self</span>.date().iso_week()
+        <span class="self">self</span>.<span class="number">0</span>.iso_week()
     }
 
     <span class="doccomment">/// Get the week number where week 1 begins on the first Sunday.
@@ -1761,14 +1532,14 @@
     /// The returned value will always be in the range `0..=53`.
     ///
     /// ```rust
-    /// # use time::macros::datetime;
+    /// # use time_macros::datetime;
     /// assert_eq!(datetime!(2019-01-01 0:00 UTC).sunday_based_week(), 0);
     /// assert_eq!(datetime!(2020-01-01 0:00 UTC).sunday_based_week(), 0);
     /// assert_eq!(datetime!(2020-12-31 0:00 UTC).sunday_based_week(), 52);
     /// assert_eq!(datetime!(2021-01-01 0:00 UTC).sunday_based_week(), 0);
     /// ```
     </span><span class="kw">pub const fn </span>sunday_based_week(<span class="self">self</span>) -&gt; u8 {
-        <span class="self">self</span>.date().sunday_based_week()
+        <span class="self">self</span>.<span class="number">0</span>.sunday_based_week()
     }
 
     <span class="doccomment">/// Get the week number where week 1 begins on the first Monday.
@@ -1776,46 +1547,48 @@
     /// The returned value will always be in the range `0..=53`.
     ///
     /// ```rust
-    /// # use time::macros::datetime;
+    /// # use time_macros::datetime;
     /// assert_eq!(datetime!(2019-01-01 0:00 UTC).monday_based_week(), 0);
     /// assert_eq!(datetime!(2020-01-01 0:00 UTC).monday_based_week(), 0);
     /// assert_eq!(datetime!(2020-12-31 0:00 UTC).monday_based_week(), 52);
     /// assert_eq!(datetime!(2021-01-01 0:00 UTC).monday_based_week(), 0);
     /// ```
     </span><span class="kw">pub const fn </span>monday_based_week(<span class="self">self</span>) -&gt; u8 {
-        <span class="self">self</span>.date().monday_based_week()
+        <span class="self">self</span>.<span class="number">0</span>.monday_based_week()
     }
 
     <span class="doccomment">/// Get the year, month, and day.
     ///
     /// ```rust
-    /// # use time::{macros::datetime, Month};
+    /// # use time::Month;
+    /// # use time_macros::datetime;
     /// assert_eq!(
     ///     datetime!(2019-01-01 0:00 UTC).to_calendar_date(),
     ///     (2019, Month::January, 1)
     /// );
     /// ```
     </span><span class="kw">pub const fn </span>to_calendar_date(<span class="self">self</span>) -&gt; (i32, Month, u8) {
-        <span class="self">self</span>.date().to_calendar_date()
+        <span class="self">self</span>.<span class="number">0</span>.to_calendar_date()
     }
 
     <span class="doccomment">/// Get the year and ordinal day number.
     ///
     /// ```rust
-    /// # use time::macros::datetime;
+    /// # use time_macros::datetime;
     /// assert_eq!(
     ///     datetime!(2019-01-01 0:00 UTC).to_ordinal_date(),
     ///     (2019, 1)
     /// );
     /// ```
     </span><span class="kw">pub const fn </span>to_ordinal_date(<span class="self">self</span>) -&gt; (i32, u16) {
-        <span class="self">self</span>.date().to_ordinal_date()
+        <span class="self">self</span>.<span class="number">0</span>.to_ordinal_date()
     }
 
     <span class="doccomment">/// Get the ISO 8601 year, week number, and weekday.
     ///
     /// ```rust
-    /// # use time::{Weekday::*, macros::datetime};
+    /// # use time::Weekday::*;
+    /// # use time_macros::datetime;
     /// assert_eq!(
     ///     datetime!(2019-01-01 0:00 UTC).to_iso_week_date(),
     ///     (2019, 1, Tuesday)
@@ -1838,19 +1611,20 @@
     /// );
     /// ```
     </span><span class="kw">pub const fn </span>to_iso_week_date(<span class="self">self</span>) -&gt; (i32, u8, Weekday) {
-        <span class="self">self</span>.date().to_iso_week_date()
+        <span class="self">self</span>.<span class="number">0</span>.to_iso_week_date()
     }
 
     <span class="doccomment">/// Get the weekday of the date in the stored offset.
     ///
     /// ```rust
-    /// # use time::{Weekday::*, macros::datetime};
+    /// # use time::Weekday::*;
+    /// # use time_macros::datetime;
     /// assert_eq!(datetime!(2019-01-01 0:00 UTC).weekday(), Tuesday);
     /// assert_eq!(datetime!(2019-02-01 0:00 UTC).weekday(), Friday);
     /// assert_eq!(datetime!(2019-03-01 0:00 UTC).weekday(), Friday);
     /// ```
     </span><span class="kw">pub const fn </span>weekday(<span class="self">self</span>) -&gt; Weekday {
-        <span class="self">self</span>.date().weekday()
+        <span class="self">self</span>.<span class="number">0</span>.weekday()
     }
 
     <span class="doccomment">/// Get the Julian day for the date. The time is not taken into account for this calculation.
@@ -1859,14 +1633,14 @@
     /// freely available [here](https://www.researchgate.net/publication/316558298_Date_Algorithms).
     ///
     /// ```rust
-    /// # use time::macros::datetime;
+    /// # use time_macros::datetime;
     /// assert_eq!(datetime!(-4713-11-24 0:00 UTC).to_julian_day(), 0);
     /// assert_eq!(datetime!(2000-01-01 0:00 UTC).to_julian_day(), 2_451_545);
     /// assert_eq!(datetime!(2019-01-01 0:00 UTC).to_julian_day(), 2_458_485);
     /// assert_eq!(datetime!(2019-12-31 0:00 UTC).to_julian_day(), 2_458_849);
     /// ```
     </span><span class="kw">pub const fn </span>to_julian_day(<span class="self">self</span>) -&gt; i32 {
-        <span class="self">self</span>.date().to_julian_day()
+        <span class="self">self</span>.<span class="number">0</span>.to_julian_day()
     }
     <span class="comment">// endregion date getters
 
@@ -1874,18 +1648,18 @@
     </span><span class="doccomment">/// Get the clock hour, minute, and second.
     ///
     /// ```rust
-    /// # use time::macros::datetime;
+    /// # use time_macros::datetime;
     /// assert_eq!(datetime!(2020-01-01 0:00:00 UTC).to_hms(), (0, 0, 0));
     /// assert_eq!(datetime!(2020-01-01 23:59:59 UTC).to_hms(), (23, 59, 59));
     /// ```
     </span><span class="kw">pub const fn </span>to_hms(<span class="self">self</span>) -&gt; (u8, u8, u8) {
-        <span class="self">self</span>.time().as_hms()
+        <span class="self">self</span>.<span class="number">0</span>.as_hms()
     }
 
     <span class="doccomment">/// Get the clock hour, minute, second, and millisecond.
     ///
     /// ```rust
-    /// # use time::macros::datetime;
+    /// # use time_macros::datetime;
     /// assert_eq!(
     ///     datetime!(2020-01-01 0:00:00 UTC).to_hms_milli(),
     ///     (0, 0, 0, 0)
@@ -1896,13 +1670,13 @@
     /// );
     /// ```
     </span><span class="kw">pub const fn </span>to_hms_milli(<span class="self">self</span>) -&gt; (u8, u8, u8, u16) {
-        <span class="self">self</span>.time().as_hms_milli()
+        <span class="self">self</span>.<span class="number">0</span>.as_hms_milli()
     }
 
     <span class="doccomment">/// Get the clock hour, minute, second, and microsecond.
     ///
     /// ```rust
-    /// # use time::macros::datetime;
+    /// # use time_macros::datetime;
     /// assert_eq!(
     ///     datetime!(2020-01-01 0:00:00 UTC).to_hms_micro(),
     ///     (0, 0, 0, 0)
@@ -1913,13 +1687,13 @@
     /// );
     /// ```
     </span><span class="kw">pub const fn </span>to_hms_micro(<span class="self">self</span>) -&gt; (u8, u8, u8, u32) {
-        <span class="self">self</span>.time().as_hms_micro()
+        <span class="self">self</span>.<span class="number">0</span>.as_hms_micro()
     }
 
     <span class="doccomment">/// Get the clock hour, minute, second, and nanosecond.
     ///
     /// ```rust
-    /// # use time::macros::datetime;
+    /// # use time_macros::datetime;
     /// assert_eq!(
     ///     datetime!(2020-01-01 0:00:00 UTC).to_hms_nano(),
     ///     (0, 0, 0, 0)
@@ -1930,7 +1704,7 @@
     /// );
     /// ```
     </span><span class="kw">pub const fn </span>to_hms_nano(<span class="self">self</span>) -&gt; (u8, u8, u8, u32) {
-        <span class="self">self</span>.time().as_hms_nano()
+        <span class="self">self</span>.<span class="number">0</span>.as_hms_nano()
     }
 
     <span class="doccomment">/// Get the clock hour in the stored offset.
@@ -1938,7 +1712,7 @@
     /// The returned value will always be in the range `0..24`.
     ///
     /// ```rust
-    /// # use time::macros::{datetime, offset};
+    /// # use time_macros::{datetime, offset};
     /// assert_eq!(datetime!(2019-01-01 0:00 UTC).hour(), 0);
     /// assert_eq!(
     ///     datetime!(2019-01-01 23:59:59 UTC)
@@ -1948,7 +1722,7 @@
     /// );
     /// ```
     </span><span class="kw">pub const fn </span>hour(<span class="self">self</span>) -&gt; u8 {
-        <span class="self">self</span>.time().hour()
+        <span class="self">self</span>.<span class="number">0</span>.hour()
     }
 
     <span class="doccomment">/// Get the minute within the hour in the stored offset.
@@ -1956,7 +1730,7 @@
     /// The returned value will always be in the range `0..60`.
     ///
     /// ```rust
-    /// # use time::macros::{datetime, offset};
+    /// # use time_macros::{datetime, offset};
     /// assert_eq!(datetime!(2019-01-01 0:00 UTC).minute(), 0);
     /// assert_eq!(
     ///     datetime!(2019-01-01 23:59:59 UTC)
@@ -1966,7 +1740,7 @@
     /// );
     /// ```
     </span><span class="kw">pub const fn </span>minute(<span class="self">self</span>) -&gt; u8 {
-        <span class="self">self</span>.time().minute()
+        <span class="self">self</span>.<span class="number">0</span>.minute()
     }
 
     <span class="doccomment">/// Get the second within the minute in the stored offset.
@@ -1974,7 +1748,7 @@
     /// The returned value will always be in the range `0..60`.
     ///
     /// ```rust
-    /// # use time::macros::{datetime, offset};
+    /// # use time_macros::{datetime, offset};
     /// assert_eq!(datetime!(2019-01-01 0:00 UTC).second(), 0);
     /// assert_eq!(
     ///     datetime!(2019-01-01 23:59:59 UTC)
@@ -1984,7 +1758,7 @@
     /// );
     /// ```
     </span><span class="kw">pub const fn </span>second(<span class="self">self</span>) -&gt; u8 {
-        <span class="self">self</span>.time().second()
+        <span class="self">self</span>.<span class="number">0</span>.second()
     }
 
     <span class="comment">// Because a `UtcOffset` is limited in resolution to one second, any subsecond value will not
@@ -1995,12 +1769,12 @@
     /// The returned value will always be in the range `0..1_000`.
     ///
     /// ```rust
-    /// # use time::macros::datetime;
+    /// # use time_macros::datetime;
     /// assert_eq!(datetime!(2019-01-01 0:00 UTC).millisecond(), 0);
     /// assert_eq!(datetime!(2019-01-01 23:59:59.999 UTC).millisecond(), 999);
     /// ```
     </span><span class="kw">pub const fn </span>millisecond(<span class="self">self</span>) -&gt; u16 {
-        <span class="self">self</span>.time().millisecond()
+        <span class="self">self</span>.<span class="number">0</span>.millisecond()
     }
 
     <span class="doccomment">/// Get the microseconds within the second in the stored offset.
@@ -2008,7 +1782,7 @@
     /// The returned value will always be in the range `0..1_000_000`.
     ///
     /// ```rust
-    /// # use time::macros::datetime;
+    /// # use time_macros::datetime;
     /// assert_eq!(datetime!(2019-01-01 0:00 UTC).microsecond(), 0);
     /// assert_eq!(
     ///     datetime!(2019-01-01 23:59:59.999_999 UTC).microsecond(),
@@ -2016,7 +1790,7 @@
     /// );
     /// ```
     </span><span class="kw">pub const fn </span>microsecond(<span class="self">self</span>) -&gt; u32 {
-        <span class="self">self</span>.time().microsecond()
+        <span class="self">self</span>.<span class="number">0</span>.microsecond()
     }
 
     <span class="doccomment">/// Get the nanoseconds within the second in the stored offset.
@@ -2024,7 +1798,7 @@
     /// The returned value will always be in the range `0..1_000_000_000`.
     ///
     /// ```rust
-    /// # use time::macros::datetime;
+    /// # use time_macros::datetime;
     /// assert_eq!(datetime!(2019-01-01 0:00 UTC).nanosecond(), 0);
     /// assert_eq!(
     ///     datetime!(2019-01-01 23:59:59.999_999_999 UTC).nanosecond(),
@@ -2032,7 +1806,7 @@
     /// );
     /// ```
     </span><span class="kw">pub const fn </span>nanosecond(<span class="self">self</span>) -&gt; u32 {
-        <span class="self">self</span>.time().nanosecond()
+        <span class="self">self</span>.<span class="number">0</span>.nanosecond()
     }
     <span class="comment">// endregion time getters
     // endregion getters
@@ -2042,7 +1816,7 @@
     ///
     /// ```
     /// # use time::{Date, ext::NumericalDuration};
-    /// # use time::macros::{datetime, offset};
+    /// # use time_macros::{datetime, offset};
     /// let datetime = Date::MIN.midnight().assume_offset(offset!(+10));
     /// assert_eq!(datetime.checked_add((-2).days()), None);
     ///
@@ -2055,14 +1829,14 @@
     /// );
     /// ```
     </span><span class="kw">pub const fn </span>checked_add(<span class="self">self</span>, duration: Duration) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>&gt; {
-        <span class="prelude-val">Some</span>(<span class="macro">const_try_opt!</span>(<span class="self">self</span>.local_datetime.checked_add(duration)).assume_offset(<span class="self">self</span>.offset))
+        <span class="prelude-val">Some</span>(<span class="self">Self</span>(<span class="macro">const_try_opt!</span>(<span class="self">self</span>.<span class="number">0</span>.checked_add(duration))))
     }
 
     <span class="doccomment">/// Computes `self - duration`, returning `None` if an overflow occurred.
     ///
     /// ```
     /// # use time::{Date, ext::NumericalDuration};
-    /// # use time::macros::{datetime, offset};
+    /// # use time_macros::{datetime, offset};
     /// let datetime = Date::MIN.midnight().assume_offset(offset!(+10));
     /// assert_eq!(datetime.checked_sub(2.days()), None);
     ///
@@ -2075,7 +1849,7 @@
     /// );
     /// ```
     </span><span class="kw">pub const fn </span>checked_sub(<span class="self">self</span>, duration: Duration) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>&gt; {
-        <span class="prelude-val">Some</span>(<span class="macro">const_try_opt!</span>(<span class="self">self</span>.local_datetime.checked_sub(duration)).assume_offset(<span class="self">self</span>.offset))
+        <span class="prelude-val">Some</span>(<span class="self">Self</span>(<span class="macro">const_try_opt!</span>(<span class="self">self</span>.<span class="number">0</span>.checked_sub(duration))))
     }
     <span class="comment">// endregion: checked arithmetic
 
@@ -2084,16 +1858,41 @@
     ///
     /// ```
     /// # use time::ext::NumericalDuration;
-    /// # use time::macros::datetime;
+    /// # use time_macros::datetime;
     /// assert_eq!(
-    ///     datetime!(-999999 - 01 - 01 0:00 +10).saturating_add((-2).days()),
-    ///     datetime!(-999999 - 01 - 01 0:00 +10)
-    /// );
+    </span><span class="attr">#[cfg_attr(
+        feature = <span class="string">&quot;large-dates&quot;</span>,
+        doc = <span class="string">&quot;    datetime!(-999999-01-01 0:00 +10).saturating_add((-2).days()),&quot;
+    </span>)]
+    #[cfg_attr(feature = <span class="string">&quot;large-dates&quot;</span>, doc = <span class="string">&quot;    datetime!(-999999-01-01 0:00 +10)&quot;</span>)]
+    #[cfg_attr(
+        not(feature = <span class="string">&quot;large-dates&quot;</span>),
+        doc = <span class="string">&quot;    datetime!(-9999-01-01 0:00 +10).saturating_add((-2).days()),&quot;
+    </span>)]
+    #[cfg_attr(
+        not(feature = <span class="string">&quot;large-dates&quot;</span>),
+        doc = <span class="string">&quot;    datetime!(-9999-01-01 0:00 +10)&quot;
+    </span>)]
+    </span><span class="doccomment">/// );
     ///
     /// assert_eq!(
-    ///     datetime!(+999999 - 12 - 31 23:59:59.999_999_999 +10).saturating_add(2.days()),
-    ///     datetime!(+999999 - 12 - 31 23:59:59.999_999_999 +10)
-    /// );
+    </span><span class="attr">#[cfg_attr(
+        feature = <span class="string">&quot;large-dates&quot;</span>,
+        doc = <span class="string">&quot;    datetime!(+999999-12-31 23:59:59.999_999_999 +10).saturating_add(2.days()),&quot;
+    </span>)]
+    #[cfg_attr(
+        feature = <span class="string">&quot;large-dates&quot;</span>,
+        doc = <span class="string">&quot;    datetime!(+999999-12-31 23:59:59.999_999_999 +10)&quot;
+    </span>)]
+    #[cfg_attr(
+        not(feature = <span class="string">&quot;large-dates&quot;</span>),
+        doc = <span class="string">&quot;    datetime!(+9999-12-31 23:59:59.999_999_999 +10).saturating_add(2.days()),&quot;
+    </span>)]
+    #[cfg_attr(
+        not(feature = <span class="string">&quot;large-dates&quot;</span>),
+        doc = <span class="string">&quot;    datetime!(+9999-12-31 23:59:59.999_999_999 +10)&quot;
+    </span>)]
+    </span><span class="doccomment">/// );
     ///
     /// assert_eq!(
     ///     datetime!(2019 - 11 - 25 15:30 +10).saturating_add(27.hours()),
@@ -2101,30 +1900,48 @@
     /// );
     /// ```
     </span><span class="kw">pub const fn </span>saturating_add(<span class="self">self</span>, duration: Duration) -&gt; <span class="self">Self </span>{
-        <span class="kw">if let </span><span class="prelude-val">Some</span>(datetime) = <span class="self">self</span>.checked_add(duration) {
-            datetime
-        } <span class="kw">else if </span>duration.is_negative() {
-            PrimitiveDateTime::MIN.assume_offset(<span class="self">self</span>.offset)
-        } <span class="kw">else </span>{
-            <span class="macro">debug_assert!</span>(duration.is_positive());
-            PrimitiveDateTime::MAX.assume_offset(<span class="self">self</span>.offset)
-        }
+        <span class="self">Self</span>(<span class="self">self</span>.<span class="number">0</span>.saturating_add(duration))
     }
 
     <span class="doccomment">/// Computes `self - duration`, saturating value on overflow.
     ///
     /// ```
     /// # use time::ext::NumericalDuration;
-    /// # use time::macros::datetime;
+    /// # use time_macros::datetime;
     /// assert_eq!(
-    ///     datetime!(-999999 - 01 - 01 0:00 +10).saturating_sub(2.days()),
-    ///     datetime!(-999999 - 01 - 01 0:00 +10)
-    /// );
+    </span><span class="attr">#[cfg_attr(
+        feature = <span class="string">&quot;large-dates&quot;</span>,
+        doc = <span class="string">&quot;    datetime!(-999999-01-01 0:00 +10).saturating_sub(2.days()),&quot;
+    </span>)]
+    #[cfg_attr(feature = <span class="string">&quot;large-dates&quot;</span>, doc = <span class="string">&quot;    datetime!(-999999-01-01 0:00 +10)&quot;</span>)]
+    #[cfg_attr(
+        not(feature = <span class="string">&quot;large-dates&quot;</span>),
+        doc = <span class="string">&quot;    datetime!(-9999-01-01 0:00 +10).saturating_sub(2.days()),&quot;
+    </span>)]
+    #[cfg_attr(
+        not(feature = <span class="string">&quot;large-dates&quot;</span>),
+        doc = <span class="string">&quot;    datetime!(-9999-01-01 0:00 +10)&quot;
+    </span>)]
+    </span><span class="doccomment">/// );
     ///
     /// assert_eq!(
-    ///     datetime!(+999999 - 12 - 31 23:59:59.999_999_999 +10).saturating_sub((-2).days()),
-    ///     datetime!(+999999 - 12 - 31 23:59:59.999_999_999 +10)
-    /// );
+    </span><span class="attr">#[cfg_attr(
+        feature = <span class="string">&quot;large-dates&quot;</span>,
+        doc = <span class="string">&quot;    datetime!(+999999-12-31 23:59:59.999_999_999 +10).saturating_sub((-2).days()),&quot;
+    </span>)]
+    #[cfg_attr(
+        feature = <span class="string">&quot;large-dates&quot;</span>,
+        doc = <span class="string">&quot;    datetime!(+999999-12-31 23:59:59.999_999_999 +10)&quot;
+    </span>)]
+    #[cfg_attr(
+        not(feature = <span class="string">&quot;large-dates&quot;</span>),
+        doc = <span class="string">&quot;    datetime!(+9999-12-31 23:59:59.999_999_999 +10).saturating_sub((-2).days()),&quot;
+    </span>)]
+    #[cfg_attr(
+        not(feature = <span class="string">&quot;large-dates&quot;</span>),
+        doc = <span class="string">&quot;    datetime!(+9999-12-31 23:59:59.999_999_999 +10)&quot;
+    </span>)]
+    </span><span class="doccomment">/// );
     ///
     /// assert_eq!(
     ///     datetime!(2019 - 11 - 25 15:30 +10).saturating_sub(27.hours()),
@@ -2132,14 +1949,7 @@
     /// );
     /// ```
     </span><span class="kw">pub const fn </span>saturating_sub(<span class="self">self</span>, duration: Duration) -&gt; <span class="self">Self </span>{
-        <span class="kw">if let </span><span class="prelude-val">Some</span>(datetime) = <span class="self">self</span>.checked_sub(duration) {
-            datetime
-        } <span class="kw">else if </span>duration.is_negative() {
-            PrimitiveDateTime::MAX.assume_offset(<span class="self">self</span>.offset)
-        } <span class="kw">else </span>{
-            <span class="macro">debug_assert!</span>(duration.is_positive());
-            PrimitiveDateTime::MIN.assume_offset(<span class="self">self</span>.offset)
-        }
+        <span class="self">Self</span>(<span class="self">self</span>.<span class="number">0</span>.saturating_sub(duration))
     }
     <span class="comment">// endregion: saturating arithmetic
 </span>}
@@ -2151,7 +1961,7 @@
     /// components are unchanged.
     ///
     /// ```rust
-    /// # use time::macros::{datetime, time};
+    /// # use time_macros::{datetime, time};
     /// assert_eq!(
     ///     datetime!(2020-01-01 5:00 UTC).replace_time(time!(12:00)),
     ///     datetime!(2020-01-01 12:00 UTC)
@@ -2167,16 +1977,14 @@
     /// ```
     </span><span class="attr">#[must_use = <span class="string">&quot;This method does not mutate the original `OffsetDateTime`.&quot;</span>]
     </span><span class="kw">pub const fn </span>replace_time(<span class="self">self</span>, time: Time) -&gt; <span class="self">Self </span>{
-        <span class="self">self</span>.local_datetime
-            .replace_time(time)
-            .assume_offset(<span class="self">self</span>.offset)
+        <span class="self">Self</span>(<span class="self">self</span>.<span class="number">0</span>.replace_time(time))
     }
 
     <span class="doccomment">/// Replace the date, which is assumed to be in the stored offset. The time and offset
     /// components are unchanged.
     ///
     /// ```rust
-    /// # use time::macros::{datetime, date};
+    /// # use time_macros::{datetime, date};
     /// assert_eq!(
     ///     datetime!(2020-01-01 12:00 UTC).replace_date(date!(2020-01-30)),
     ///     datetime!(2020-01-30 12:00 UTC)
@@ -2188,16 +1996,14 @@
     /// ```
     </span><span class="attr">#[must_use = <span class="string">&quot;This method does not mutate the original `OffsetDateTime`.&quot;</span>]
     </span><span class="kw">pub const fn </span>replace_date(<span class="self">self</span>, date: Date) -&gt; <span class="self">Self </span>{
-        <span class="self">self</span>.local_datetime
-            .replace_date(date)
-            .assume_offset(<span class="self">self</span>.offset)
+        <span class="self">Self</span>(<span class="self">self</span>.<span class="number">0</span>.replace_date(date))
     }
 
     <span class="doccomment">/// Replace the date and time, which are assumed to be in the stored offset. The offset
     /// component remains unchanged.
     ///
     /// ```rust
-    /// # use time::macros::datetime;
+    /// # use time_macros::datetime;
     /// assert_eq!(
     ///     datetime!(2020-01-01 12:00 UTC).replace_date_time(datetime!(2020-01-30 16:00)),
     ///     datetime!(2020-01-30 16:00 UTC)
@@ -2209,13 +2015,13 @@
     /// ```
     </span><span class="attr">#[must_use = <span class="string">&quot;This method does not mutate the original `OffsetDateTime`.&quot;</span>]
     </span><span class="kw">pub const fn </span>replace_date_time(<span class="self">self</span>, date_time: PrimitiveDateTime) -&gt; <span class="self">Self </span>{
-        date_time.assume_offset(<span class="self">self</span>.offset)
+        <span class="self">Self</span>(<span class="self">self</span>.<span class="number">0</span>.replace_date_time(date_time.<span class="number">0</span>))
     }
 
     <span class="doccomment">/// Replace the offset. The date and time components remain unchanged.
     ///
     /// ```rust
-    /// # use time::macros::{datetime, offset};
+    /// # use time_macros::{datetime, offset};
     /// assert_eq!(
     ///     datetime!(2020-01-01 0:00 UTC).replace_offset(offset!(-5)),
     ///     datetime!(2020-01-01 0:00 -5)
@@ -2223,13 +2029,13 @@
     /// ```
     </span><span class="attr">#[must_use = <span class="string">&quot;This method does not mutate the original `OffsetDateTime`.&quot;</span>]
     </span><span class="kw">pub const fn </span>replace_offset(<span class="self">self</span>, offset: UtcOffset) -&gt; <span class="self">Self </span>{
-        <span class="self">self</span>.local_datetime.assume_offset(offset)
+        <span class="self">Self</span>(<span class="self">self</span>.<span class="number">0</span>.replace_offset(offset))
     }
 
     <span class="doccomment">/// Replace the year. The month and day will be unchanged.
     ///
     /// ```rust
-    /// # use time::macros::datetime;
+    /// # use time_macros::datetime;
     /// assert_eq!(
     ///     datetime!(2022 - 02 - 18 12:00 +01).replace_year(2019),
     ///     Ok(datetime!(2019 - 02 - 18 12:00 +01))
@@ -2238,13 +2044,13 @@
     /// assert!(datetime!(2022 - 02 - 18 12:00 +01).replace_year(1_000_000_000).is_err()); // 1_000_000_000 isn&#39;t a valid year
     /// ```
     </span><span class="kw">pub const fn </span>replace_year(<span class="self">self</span>, year: i32) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, error::ComponentRange&gt; {
-        <span class="prelude-val">Ok</span>(<span class="macro">const_try!</span>(<span class="self">self</span>.local_datetime.replace_year(year)).assume_offset(<span class="self">self</span>.offset))
+        <span class="prelude-val">Ok</span>(<span class="self">Self</span>(<span class="macro">const_try!</span>(<span class="self">self</span>.<span class="number">0</span>.replace_year(year))))
     }
 
     <span class="doccomment">/// Replace the month of the year.
     ///
     /// ```rust
-    /// # use time::macros::datetime;
+    /// # use time_macros::datetime;
     /// # use time::Month;
     /// assert_eq!(
     ///     datetime!(2022 - 02 - 18 12:00 +01).replace_month(Month::January),
@@ -2253,13 +2059,13 @@
     /// assert!(datetime!(2022 - 01 - 30 12:00 +01).replace_month(Month::February).is_err()); // 30 isn&#39;t a valid day in February
     /// ```
     </span><span class="kw">pub const fn </span>replace_month(<span class="self">self</span>, month: Month) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, error::ComponentRange&gt; {
-        <span class="prelude-val">Ok</span>(<span class="macro">const_try!</span>(<span class="self">self</span>.local_datetime.replace_month(month)).assume_offset(<span class="self">self</span>.offset))
+        <span class="prelude-val">Ok</span>(<span class="self">Self</span>(<span class="macro">const_try!</span>(<span class="self">self</span>.<span class="number">0</span>.replace_month(month))))
     }
 
     <span class="doccomment">/// Replace the day of the month.
     ///
     /// ```rust
-    /// # use time::macros::datetime;
+    /// # use time_macros::datetime;
     /// assert_eq!(
     ///     datetime!(2022 - 02 - 18 12:00 +01).replace_day(1),
     ///     Ok(datetime!(2022 - 02 - 01 12:00 +01))
@@ -2268,13 +2074,13 @@
     /// assert!(datetime!(2022 - 02 - 18 12:00 +01).replace_day(30).is_err()); // 30 isn&#39;t a valid day in February
     /// ```
     </span><span class="kw">pub const fn </span>replace_day(<span class="self">self</span>, day: u8) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, error::ComponentRange&gt; {
-        <span class="prelude-val">Ok</span>(<span class="macro">const_try!</span>(<span class="self">self</span>.local_datetime.replace_day(day)).assume_offset(<span class="self">self</span>.offset))
+        <span class="prelude-val">Ok</span>(<span class="self">Self</span>(<span class="macro">const_try!</span>(<span class="self">self</span>.<span class="number">0</span>.replace_day(day))))
     }
 
     <span class="doccomment">/// Replace the clock hour.
     ///
     /// ```rust
-    /// # use time::macros::datetime;
+    /// # use time_macros::datetime;
     /// assert_eq!(
     ///     datetime!(2022 - 02 - 18 01:02:03.004_005_006 +01).replace_hour(7),
     ///     Ok(datetime!(2022 - 02 - 18 07:02:03.004_005_006 +01))
@@ -2282,13 +2088,13 @@
     /// assert!(datetime!(2022 - 02 - 18 01:02:03.004_005_006 +01).replace_hour(24).is_err()); // 24 isn&#39;t a valid hour
     /// ```
     </span><span class="kw">pub const fn </span>replace_hour(<span class="self">self</span>, hour: u8) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, error::ComponentRange&gt; {
-        <span class="prelude-val">Ok</span>(<span class="macro">const_try!</span>(<span class="self">self</span>.local_datetime.replace_hour(hour)).assume_offset(<span class="self">self</span>.offset))
+        <span class="prelude-val">Ok</span>(<span class="self">Self</span>(<span class="macro">const_try!</span>(<span class="self">self</span>.<span class="number">0</span>.replace_hour(hour))))
     }
 
     <span class="doccomment">/// Replace the minutes within the hour.
     ///
     /// ```rust
-    /// # use time::macros::datetime;
+    /// # use time_macros::datetime;
     /// assert_eq!(
     ///     datetime!(2022 - 02 - 18 01:02:03.004_005_006 +01).replace_minute(7),
     ///     Ok(datetime!(2022 - 02 - 18 01:07:03.004_005_006 +01))
@@ -2296,13 +2102,13 @@
     /// assert!(datetime!(2022 - 02 - 18 01:02:03.004_005_006 +01).replace_minute(60).is_err()); // 60 isn&#39;t a valid minute
     /// ```
     </span><span class="kw">pub const fn </span>replace_minute(<span class="self">self</span>, minute: u8) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, error::ComponentRange&gt; {
-        <span class="prelude-val">Ok</span>(<span class="macro">const_try!</span>(<span class="self">self</span>.local_datetime.replace_minute(minute)).assume_offset(<span class="self">self</span>.offset))
+        <span class="prelude-val">Ok</span>(<span class="self">Self</span>(<span class="macro">const_try!</span>(<span class="self">self</span>.<span class="number">0</span>.replace_minute(minute))))
     }
 
     <span class="doccomment">/// Replace the seconds within the minute.
     ///
     /// ```rust
-    /// # use time::macros::datetime;
+    /// # use time_macros::datetime;
     /// assert_eq!(
     ///     datetime!(2022 - 02 - 18 01:02:03.004_005_006 +01).replace_second(7),
     ///     Ok(datetime!(2022 - 02 - 18 01:02:07.004_005_006 +01))
@@ -2310,13 +2116,13 @@
     /// assert!(datetime!(2022 - 02 - 18 01:02:03.004_005_006 +01).replace_second(60).is_err()); // 60 isn&#39;t a valid second
     /// ```
     </span><span class="kw">pub const fn </span>replace_second(<span class="self">self</span>, second: u8) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, error::ComponentRange&gt; {
-        <span class="prelude-val">Ok</span>(<span class="macro">const_try!</span>(<span class="self">self</span>.local_datetime.replace_second(second)).assume_offset(<span class="self">self</span>.offset))
+        <span class="prelude-val">Ok</span>(<span class="self">Self</span>(<span class="macro">const_try!</span>(<span class="self">self</span>.<span class="number">0</span>.replace_second(second))))
     }
 
     <span class="doccomment">/// Replace the milliseconds within the second.
     ///
     /// ```rust
-    /// # use time::macros::datetime;
+    /// # use time_macros::datetime;
     /// assert_eq!(
     ///     datetime!(2022 - 02 - 18 01:02:03.004_005_006 +01).replace_millisecond(7),
     ///     Ok(datetime!(2022 - 02 - 18 01:02:03.007 +01))
@@ -2327,16 +2133,13 @@
         <span class="self">self</span>,
         millisecond: u16,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, error::ComponentRange&gt; {
-        <span class="prelude-val">Ok</span>(
-            <span class="macro">const_try!</span>(<span class="self">self</span>.local_datetime.replace_millisecond(millisecond))
-                .assume_offset(<span class="self">self</span>.offset),
-        )
+        <span class="prelude-val">Ok</span>(<span class="self">Self</span>(<span class="macro">const_try!</span>(<span class="self">self</span>.<span class="number">0</span>.replace_millisecond(millisecond))))
     }
 
     <span class="doccomment">/// Replace the microseconds within the second.
     ///
     /// ```rust
-    /// # use time::macros::datetime;
+    /// # use time_macros::datetime;
     /// assert_eq!(
     ///     datetime!(2022 - 02 - 18 01:02:03.004_005_006 +01).replace_microsecond(7_008),
     ///     Ok(datetime!(2022 - 02 - 18 01:02:03.007_008 +01))
@@ -2347,16 +2150,13 @@
         <span class="self">self</span>,
         microsecond: u32,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, error::ComponentRange&gt; {
-        <span class="prelude-val">Ok</span>(
-            <span class="macro">const_try!</span>(<span class="self">self</span>.local_datetime.replace_microsecond(microsecond))
-                .assume_offset(<span class="self">self</span>.offset),
-        )
+        <span class="prelude-val">Ok</span>(<span class="self">Self</span>(<span class="macro">const_try!</span>(<span class="self">self</span>.<span class="number">0</span>.replace_microsecond(microsecond))))
     }
 
     <span class="doccomment">/// Replace the nanoseconds within the second.
     ///
     /// ```rust
-    /// # use time::macros::datetime;
+    /// # use time_macros::datetime;
     /// assert_eq!(
     ///     datetime!(2022 - 02 - 18 01:02:03.004_005_006 +01).replace_nanosecond(7_008_009),
     ///     Ok(datetime!(2022 - 02 - 18 01:02:03.007_008_009 +01))
@@ -2364,10 +2164,7 @@
     /// assert!(datetime!(2022 - 02 - 18 01:02:03.004_005_006 +01).replace_nanosecond(1_000_000_000).is_err()); // 1_000_000_000 isn&#39;t a valid nanosecond
     /// ```
     </span><span class="kw">pub const fn </span>replace_nanosecond(<span class="self">self</span>, nanosecond: u32) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, error::ComponentRange&gt; {
-        <span class="prelude-val">Ok</span>(
-            <span class="macro">const_try!</span>(<span class="self">self</span>.local_datetime.replace_nanosecond(nanosecond))
-                .assume_offset(<span class="self">self</span>.offset),
-        )
+        <span class="prelude-val">Ok</span>(<span class="self">Self</span>(<span class="macro">const_try!</span>(<span class="self">self</span>.<span class="number">0</span>.replace_nanosecond(nanosecond))))
     }
 }
 <span class="comment">// endregion replacement
@@ -2382,19 +2179,15 @@
         output: <span class="kw-2">&amp;mut </span><span class="kw">impl </span>io::Write,
         format: <span class="kw-2">&amp;</span>(<span class="kw">impl </span>Formattable + <span class="question-mark">?</span>Sized),
     ) -&gt; <span class="prelude-ty">Result</span>&lt;usize, error::Format&gt; {
-        format.format_into(
-            output,
-            <span class="prelude-val">Some</span>(<span class="self">self</span>.date()),
-            <span class="prelude-val">Some</span>(<span class="self">self</span>.time()),
-            <span class="prelude-val">Some</span>(<span class="self">self</span>.offset),
-        )
+        <span class="self">self</span>.<span class="number">0</span>.format_into(output, format)
     }
 
     <span class="doccomment">/// Format the `OffsetDateTime` using the provided [format
     /// description](crate::format_description).
     ///
     /// ```rust
-    /// # use time::{format_description, macros::datetime};
+    /// # use time::format_description;
+    /// # use time_macros::datetime;
     /// let format = format_description::parse(
     ///     &quot;[year]-[month]-[day] [hour]:[minute]:[second] [offset_hour \
     ///          sign:mandatory]:[offset_minute]:[offset_second]&quot;,
@@ -2406,7 +2199,7 @@
     /// # Ok::&lt;_, time::Error&gt;(())
     /// ```
     </span><span class="kw">pub fn </span>format(<span class="self">self</span>, format: <span class="kw-2">&amp;</span>(<span class="kw">impl </span>Formattable + <span class="question-mark">?</span>Sized)) -&gt; <span class="prelude-ty">Result</span>&lt;String, error::Format&gt; {
-        format.format(<span class="prelude-val">Some</span>(<span class="self">self</span>.date()), <span class="prelude-val">Some</span>(<span class="self">self</span>.time()), <span class="prelude-val">Some</span>(<span class="self">self</span>.offset))
+        <span class="self">self</span>.<span class="number">0</span>.format(format)
     }
 }
 
@@ -2416,11 +2209,12 @@
     /// description](crate::format_description).
     ///
     /// ```rust
-    /// # use time::{format_description, macros::datetime, OffsetDateTime};
-    /// let format = format_description::parse(
+    /// # use time::OffsetDateTime;
+    /// # use time_macros::{datetime, format_description};
+    /// let format = format_description!(
     ///     &quot;[year]-[month]-[day] [hour]:[minute]:[second] [offset_hour \
-    ///          sign:mandatory]:[offset_minute]:[offset_second]&quot;,
-    /// )?;
+    ///          sign:mandatory]:[offset_minute]:[offset_second]&quot;
+    /// );
     /// assert_eq!(
     ///     OffsetDateTime::parse(&quot;2020-01-02 03:04:05 +06:07:08&quot;, &amp;format)?,
     ///     datetime!(2020-01-02 03:04:05 +06:07:08)
@@ -2431,139 +2225,94 @@
         input: <span class="kw-2">&amp;</span>str,
         description: <span class="kw-2">&amp;</span>(<span class="kw">impl </span>Parsable + <span class="question-mark">?</span>Sized),
     ) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, error::Parse&gt; {
-        description.parse_offset_date_time(input.as_bytes())
-    }
-
-    <span class="doccomment">/// A helper method to check if the `OffsetDateTime` is a valid representation of a leap second.
-    /// Leap seconds, when parsed, are represented as the preceding nanosecond. However, leap
-    /// seconds can only occur as the last second of a month UTC.
-    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">const fn </span>is_valid_leap_second_stand_in(<span class="self">self</span>) -&gt; bool {
-        <span class="comment">// This comparison doesn&#39;t need to be adjusted for the stored offset, so check it first for
-        // speed.
-        </span><span class="kw">if </span><span class="self">self</span>.nanosecond() != <span class="number">999_999_999 </span>{
-            <span class="kw">return </span><span class="bool-val">false</span>;
-        }
-
-        <span class="kw">let </span>(year, ordinal, time) = <span class="self">self</span>.to_offset_raw(UtcOffset::UTC);
-
-        <span class="kw">let </span>date = <span class="kw">match </span>Date::from_ordinal_date(year, ordinal) {
-            <span class="prelude-val">Ok</span>(date) =&gt; date,
-            <span class="prelude-val">Err</span>(<span class="kw">_</span>) =&gt; <span class="kw">return </span><span class="bool-val">false</span>,
-        };
-
-        time.hour() == <span class="number">23
-            </span>&amp;&amp; time.minute() == <span class="number">59
-            </span>&amp;&amp; time.second() == <span class="number">59
-            </span>&amp;&amp; date.day() == util::days_in_year_month(year, date.month())
+        Inner::parse(input, description).map(<span class="self">Self</span>)
     }
 }
 
 <span class="kw">impl </span>fmt::Display <span class="kw">for </span>OffsetDateTime {
     <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
-        <span class="macro">write!</span>(f, <span class="string">&quot;{} {} {}&quot;</span>, <span class="self">self</span>.date(), <span class="self">self</span>.time(), <span class="self">self</span>.offset)
+        <span class="self">self</span>.<span class="number">0</span>.fmt(f)
+    }
+}
+
+<span class="kw">impl </span>fmt::Debug <span class="kw">for </span>OffsetDateTime {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
+        fmt::Display::fmt(<span class="self">self</span>, f)
     }
 }
 <span class="comment">// endregion formatting &amp; parsing
 
 // region: trait impls
-</span><span class="kw">impl </span>PartialEq <span class="kw">for </span>OffsetDateTime {
-    <span class="kw">fn </span>eq(<span class="kw-2">&amp;</span><span class="self">self</span>, rhs: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; bool {
-        <span class="self">self</span>.to_offset_raw(UtcOffset::UTC) == rhs.to_offset_raw(UtcOffset::UTC)
-    }
-}
-
-<span class="kw">impl </span>PartialOrd <span class="kw">for </span>OffsetDateTime {
-    <span class="kw">fn </span>partial_cmp(<span class="kw-2">&amp;</span><span class="self">self</span>, rhs: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;Ordering&gt; {
-        <span class="prelude-val">Some</span>(<span class="self">self</span>.cmp(rhs))
-    }
-}
-
-<span class="kw">impl </span>Ord <span class="kw">for </span>OffsetDateTime {
-    <span class="kw">fn </span>cmp(<span class="kw-2">&amp;</span><span class="self">self</span>, rhs: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; Ordering {
-        <span class="self">self</span>.to_offset_raw(UtcOffset::UTC)
-            .cmp(<span class="kw-2">&amp;</span>rhs.to_offset_raw(UtcOffset::UTC))
-    }
-}
-
-<span class="kw">impl </span>Hash <span class="kw">for </span>OffsetDateTime {
-    <span class="kw">fn </span>hash&lt;H: Hasher&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, hasher: <span class="kw-2">&amp;mut </span>H) {
-        <span class="comment">// We need to distinguish this from a `PrimitiveDateTime`, which would otherwise conflict.
-        </span>hasher.write(<span class="string">b&quot;OffsetDateTime&quot;</span>);
-        <span class="self">self</span>.to_offset_raw(UtcOffset::UTC).hash(hasher);
-    }
-}
-
-<span class="kw">impl</span>&lt;T&gt; Add&lt;T&gt; <span class="kw">for </span>OffsetDateTime
-<span class="kw">where
-    </span>PrimitiveDateTime: Add&lt;T, Output = PrimitiveDateTime&gt;,
-{
+</span><span class="kw">impl </span>Add&lt;Duration&gt; <span class="kw">for </span>OffsetDateTime {
     <span class="kw">type </span>Output = <span class="self">Self</span>;
 
-    <span class="kw">fn </span>add(<span class="self">self</span>, rhs: T) -&gt; <span class="self">Self</span>::Output {
-        (<span class="self">self</span>.local_datetime + rhs).assume_offset(<span class="self">self</span>.offset)
+    <span class="kw">fn </span>add(<span class="self">self</span>, rhs: Duration) -&gt; <span class="self">Self</span>::Output {
+        <span class="self">Self</span>(<span class="self">self</span>.<span class="number">0</span>.add(rhs))
     }
 }
 
-<span class="macro">impl_add_assign!</span>(OffsetDateTime: Duration, StdDuration);
-
-<span class="kw">impl</span>&lt;T&gt; Sub&lt;T&gt; <span class="kw">for </span>OffsetDateTime
-<span class="kw">where
-    </span>PrimitiveDateTime: Sub&lt;T, Output = PrimitiveDateTime&gt;,
-{
+<span class="kw">impl </span>Add&lt;StdDuration&gt; <span class="kw">for </span>OffsetDateTime {
     <span class="kw">type </span>Output = <span class="self">Self</span>;
 
-    <span class="kw">fn </span>sub(<span class="self">self</span>, rhs: T) -&gt; <span class="self">Self</span>::Output {
-        (<span class="self">self</span>.local_datetime - rhs).assume_offset(<span class="self">self</span>.offset)
+    <span class="kw">fn </span>add(<span class="self">self</span>, rhs: StdDuration) -&gt; <span class="self">Self</span>::Output {
+        <span class="self">Self</span>(<span class="self">self</span>.<span class="number">0</span>.add(rhs))
     }
 }
 
-<span class="macro">impl_sub_assign!</span>(OffsetDateTime: Duration, StdDuration);
+<span class="kw">impl </span>AddAssign&lt;Duration&gt; <span class="kw">for </span>OffsetDateTime {
+    <span class="kw">fn </span>add_assign(<span class="kw-2">&amp;mut </span><span class="self">self</span>, rhs: Duration) {
+        <span class="self">self</span>.<span class="number">0</span>.add_assign(rhs);
+    }
+}
+
+<span class="kw">impl </span>AddAssign&lt;StdDuration&gt; <span class="kw">for </span>OffsetDateTime {
+    <span class="kw">fn </span>add_assign(<span class="kw-2">&amp;mut </span><span class="self">self</span>, rhs: StdDuration) {
+        <span class="self">self</span>.<span class="number">0</span>.add_assign(rhs);
+    }
+}
+
+<span class="kw">impl </span>Sub&lt;Duration&gt; <span class="kw">for </span>OffsetDateTime {
+    <span class="kw">type </span>Output = <span class="self">Self</span>;
+
+    <span class="kw">fn </span>sub(<span class="self">self</span>, rhs: Duration) -&gt; <span class="self">Self</span>::Output {
+        <span class="self">Self</span>(<span class="self">self</span>.<span class="number">0</span>.sub(rhs))
+    }
+}
+
+<span class="kw">impl </span>Sub&lt;StdDuration&gt; <span class="kw">for </span>OffsetDateTime {
+    <span class="kw">type </span>Output = <span class="self">Self</span>;
+
+    <span class="kw">fn </span>sub(<span class="self">self</span>, rhs: StdDuration) -&gt; <span class="self">Self</span>::Output {
+        <span class="self">Self</span>(<span class="self">self</span>.<span class="number">0</span>.sub(rhs))
+    }
+}
+
+<span class="kw">impl </span>SubAssign&lt;Duration&gt; <span class="kw">for </span>OffsetDateTime {
+    <span class="kw">fn </span>sub_assign(<span class="kw-2">&amp;mut </span><span class="self">self</span>, rhs: Duration) {
+        <span class="self">self</span>.<span class="number">0</span>.sub_assign(rhs);
+    }
+}
+
+<span class="kw">impl </span>SubAssign&lt;StdDuration&gt; <span class="kw">for </span>OffsetDateTime {
+    <span class="kw">fn </span>sub_assign(<span class="kw-2">&amp;mut </span><span class="self">self</span>, rhs: StdDuration) {
+        <span class="self">self</span>.<span class="number">0</span>.sub_assign(rhs);
+    }
+}
 
 <span class="kw">impl </span>Sub <span class="kw">for </span>OffsetDateTime {
     <span class="kw">type </span>Output = Duration;
 
     <span class="kw">fn </span>sub(<span class="self">self</span>, rhs: <span class="self">Self</span>) -&gt; <span class="self">Self</span>::Output {
-        <span class="kw">let </span>adjustment =
-            Duration::seconds((<span class="self">self</span>.offset.whole_seconds() - rhs.offset.whole_seconds()) <span class="kw">as </span>i64);
-        <span class="self">self</span>.local_datetime - rhs.local_datetime - adjustment
+        <span class="self">self</span>.<span class="number">0</span>.sub(rhs.<span class="number">0</span>)
     }
 }
-
-<span class="attr">#[cfg(feature = <span class="string">&quot;std&quot;</span>)]
-</span><span class="kw">impl </span>Add&lt;Duration&gt; <span class="kw">for </span>SystemTime {
-    <span class="kw">type </span>Output = <span class="self">Self</span>;
-
-    <span class="kw">fn </span>add(<span class="self">self</span>, duration: Duration) -&gt; <span class="self">Self</span>::Output {
-        <span class="kw">if </span>duration.is_zero() {
-            <span class="self">self
-        </span>} <span class="kw">else if </span>duration.is_positive() {
-            <span class="self">self </span>+ duration.unsigned_abs()
-        } <span class="kw">else </span>{
-            <span class="macro">debug_assert!</span>(duration.is_negative());
-            <span class="self">self </span>- duration.unsigned_abs()
-        }
-    }
-}
-
-<span class="macro">impl_add_assign!</span>(SystemTime: <span class="attr">#[cfg(feature = <span class="string">&quot;std&quot;</span>)] </span>Duration);
-
-<span class="attr">#[cfg(feature = <span class="string">&quot;std&quot;</span>)]
-</span><span class="kw">impl </span>Sub&lt;Duration&gt; <span class="kw">for </span>SystemTime {
-    <span class="kw">type </span>Output = <span class="self">Self</span>;
-
-    <span class="kw">fn </span>sub(<span class="self">self</span>, duration: Duration) -&gt; <span class="self">Self</span>::Output {
-        (OffsetDateTime::from(<span class="self">self</span>) - duration).into()
-    }
-}
-
-<span class="macro">impl_sub_assign!</span>(SystemTime: <span class="attr">#[cfg(feature = <span class="string">&quot;std&quot;</span>)] </span>Duration);
 
 <span class="attr">#[cfg(feature = <span class="string">&quot;std&quot;</span>)]
 </span><span class="kw">impl </span>Sub&lt;SystemTime&gt; <span class="kw">for </span>OffsetDateTime {
     <span class="kw">type </span>Output = Duration;
 
     <span class="kw">fn </span>sub(<span class="self">self</span>, rhs: SystemTime) -&gt; <span class="self">Self</span>::Output {
-        <span class="self">self </span>- <span class="self">Self</span>::from(rhs)
+        <span class="self">self</span>.<span class="number">0</span>.sub(rhs)
     }
 }
 
@@ -2572,90 +2321,71 @@
     <span class="kw">type </span>Output = Duration;
 
     <span class="kw">fn </span>sub(<span class="self">self</span>, rhs: OffsetDateTime) -&gt; <span class="self">Self</span>::Output {
-        OffsetDateTime::from(<span class="self">self</span>) - rhs
+        <span class="self">self</span>.sub(rhs.<span class="number">0</span>)
     }
 }
 
 <span class="attr">#[cfg(feature = <span class="string">&quot;std&quot;</span>)]
 </span><span class="kw">impl </span>PartialEq&lt;SystemTime&gt; <span class="kw">for </span>OffsetDateTime {
     <span class="kw">fn </span>eq(<span class="kw-2">&amp;</span><span class="self">self</span>, rhs: <span class="kw-2">&amp;</span>SystemTime) -&gt; bool {
-        <span class="self">self </span>== <span class="kw-2">&amp;</span><span class="self">Self</span>::from(<span class="kw-2">*</span>rhs)
+        <span class="self">self</span>.<span class="number">0</span>.eq(rhs)
     }
 }
 
 <span class="attr">#[cfg(feature = <span class="string">&quot;std&quot;</span>)]
 </span><span class="kw">impl </span>PartialEq&lt;OffsetDateTime&gt; <span class="kw">for </span>SystemTime {
     <span class="kw">fn </span>eq(<span class="kw-2">&amp;</span><span class="self">self</span>, rhs: <span class="kw-2">&amp;</span>OffsetDateTime) -&gt; bool {
-        <span class="kw-2">&amp;</span>OffsetDateTime::from(<span class="kw-2">*</span><span class="self">self</span>) == rhs
+        <span class="self">self</span>.eq(<span class="kw-2">&amp;</span>rhs.<span class="number">0</span>)
     }
 }
 
 <span class="attr">#[cfg(feature = <span class="string">&quot;std&quot;</span>)]
 </span><span class="kw">impl </span>PartialOrd&lt;SystemTime&gt; <span class="kw">for </span>OffsetDateTime {
     <span class="kw">fn </span>partial_cmp(<span class="kw-2">&amp;</span><span class="self">self</span>, other: <span class="kw-2">&amp;</span>SystemTime) -&gt; <span class="prelude-ty">Option</span>&lt;Ordering&gt; {
-        <span class="self">self</span>.partial_cmp(<span class="kw-2">&amp;</span><span class="self">Self</span>::from(<span class="kw-2">*</span>other))
+        <span class="self">self</span>.<span class="number">0</span>.partial_cmp(other)
     }
 }
 
 <span class="attr">#[cfg(feature = <span class="string">&quot;std&quot;</span>)]
 </span><span class="kw">impl </span>PartialOrd&lt;OffsetDateTime&gt; <span class="kw">for </span>SystemTime {
     <span class="kw">fn </span>partial_cmp(<span class="kw-2">&amp;</span><span class="self">self</span>, other: <span class="kw-2">&amp;</span>OffsetDateTime) -&gt; <span class="prelude-ty">Option</span>&lt;Ordering&gt; {
-        OffsetDateTime::from(<span class="kw-2">*</span><span class="self">self</span>).partial_cmp(other)
+        <span class="self">self</span>.partial_cmp(<span class="kw-2">&amp;</span>other.<span class="number">0</span>)
     }
 }
 
 <span class="attr">#[cfg(feature = <span class="string">&quot;std&quot;</span>)]
 </span><span class="kw">impl </span>From&lt;SystemTime&gt; <span class="kw">for </span>OffsetDateTime {
     <span class="kw">fn </span>from(system_time: SystemTime) -&gt; <span class="self">Self </span>{
-        <span class="kw">match </span>system_time.duration_since(SystemTime::UNIX_EPOCH) {
-            <span class="prelude-val">Ok</span>(duration) =&gt; <span class="self">Self</span>::UNIX_EPOCH + duration,
-            <span class="prelude-val">Err</span>(err) =&gt; <span class="self">Self</span>::UNIX_EPOCH - err.duration(),
-        }
+        <span class="self">Self</span>(Inner::from(system_time))
     }
 }
 
-<span class="attr">#[allow(clippy::fallible_impl_from)] </span><span class="comment">// caused by `debug_assert!`
-</span><span class="attr">#[cfg(feature = <span class="string">&quot;std&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">&quot;std&quot;</span>)]
 </span><span class="kw">impl </span>From&lt;OffsetDateTime&gt; <span class="kw">for </span>SystemTime {
     <span class="kw">fn </span>from(datetime: OffsetDateTime) -&gt; <span class="self">Self </span>{
-        <span class="kw">let </span>duration = datetime - OffsetDateTime::UNIX_EPOCH;
-
-        <span class="kw">if </span>duration.is_zero() {
-            <span class="self">Self</span>::UNIX_EPOCH
-        } <span class="kw">else if </span>duration.is_positive() {
-            <span class="self">Self</span>::UNIX_EPOCH + duration.unsigned_abs()
-        } <span class="kw">else </span>{
-            <span class="macro">debug_assert!</span>(duration.is_negative());
-            <span class="self">Self</span>::UNIX_EPOCH - duration.unsigned_abs()
-        }
+        datetime.<span class="number">0</span>.into()
     }
 }
 
-<span class="attr">#[allow(clippy::fallible_impl_from)]
-#[cfg(all(
-    target_arch = <span class="string">&quot;wasm32&quot;</span>,
+<span class="attr">#[cfg(all(
+    target_family = <span class="string">&quot;wasm&quot;</span>,
     not(any(target_os = <span class="string">&quot;emscripten&quot;</span>, target_os = <span class="string">&quot;wasi&quot;</span>)),
     feature = <span class="string">&quot;wasm-bindgen&quot;
 </span>))]
 </span><span class="kw">impl </span>From&lt;js_sys::Date&gt; <span class="kw">for </span>OffsetDateTime {
     <span class="kw">fn </span>from(js_date: js_sys::Date) -&gt; <span class="self">Self </span>{
-        <span class="comment">// get_time() returns milliseconds
-        </span><span class="kw">let </span>timestamp_nanos = (js_date.get_time() * <span class="number">1_000_000.0</span>) <span class="kw">as </span>i128;
-        <span class="self">Self</span>::from_unix_timestamp_nanos(timestamp_nanos)
-            .expect(<span class="string">&quot;invalid timestamp: Timestamp cannot fit in range&quot;</span>)
+        <span class="self">Self</span>(Inner::from(js_date))
     }
 }
 
 <span class="attr">#[cfg(all(
-    target_arch = <span class="string">&quot;wasm32&quot;</span>,
+    target_family = <span class="string">&quot;wasm&quot;</span>,
     not(any(target_os = <span class="string">&quot;emscripten&quot;</span>, target_os = <span class="string">&quot;wasi&quot;</span>)),
     feature = <span class="string">&quot;wasm-bindgen&quot;
 </span>))]
 </span><span class="kw">impl </span>From&lt;OffsetDateTime&gt; <span class="kw">for </span>js_sys::Date {
     <span class="kw">fn </span>from(datetime: OffsetDateTime) -&gt; <span class="self">Self </span>{
-        <span class="comment">// new Date() takes milliseconds
-        </span><span class="kw">let </span>timestamp = (datetime.unix_timestamp_nanos() / <span class="number">1_000_000</span>) <span class="kw">as </span>f64;
-        js_sys::Date::new(<span class="kw-2">&amp;</span>timestamp.into())
+        datetime.<span class="number">0</span>.into()
     }
 }
 

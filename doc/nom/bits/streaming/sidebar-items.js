@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"fn":["tag","take"]};
+window.SIDEBAR_ITEMS = {"fn":["bool","tag","take"]};

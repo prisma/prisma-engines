@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"enum":["ParserExpr","Rule"],"fn":["consume_rules","parse"],"struct":["ParserNode","ParserRule","PestParser"]};
+window.SIDEBAR_ITEMS = {"enum":["ParserExpr","Rule"],"fn":["consume_rules","parse","rename_meta_rule"],"struct":["ParserNode","ParserRule","PestParser"]};

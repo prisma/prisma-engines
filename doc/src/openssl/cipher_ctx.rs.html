@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/nix/store/jnqxxv1xi811ni996b002f4jnyz38xck-vendor-cargo-deps/c19b7c6f923b580ac259164a89f2577984ad5ab09ee9d583b888f934adbbe8d0/openssl-0.10.55/src/cipher_ctx.rs`."><title>cipher_ctx.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-f3501f0f5ae15dfb.css" id="mainThemeStyle"><div id="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="openssl" data-themes="" data-resource-suffix="" data-rustdoc-version="1.71.0 (8ede3aae2 2023-07-12)" data-search-js="search-4926e5fc22a5646a.js" data-settings-js="settings-de11bff964e9d4e5.js" data-settings-css="settings-8c76f75bfb6bd192.css" data-theme-light-css="light-0f8c037637f9eb3e.css" data-theme-dark-css="dark-1097f8e92a01e3cf.css" data-theme-ayu-css="ayu-614652228113ac93.css" ></div><script src="../../static.files/storage-62ce34ea385b278a.js"></script><script defer src="../../static.files/source-script-11255107d0a65077.js"></script><script defer src="../../source-files.js"></script><script defer src="../../static.files/main-f0540c1d82cde29b.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../../static.files/light-0f8c037637f9eb3e.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../../static.files/dark-1097f8e92a01e3cf.css"><link rel="stylesheet" href="../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../openssl/index.html"><img class="rust-logo" src="../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/nix/store/yf45a1rayffhnidhgyjynpyhr9lqkd09-vendor-cargo-deps/c19b7c6f923b580ac259164a89f2577984ad5ab09ee9d583b888f934adbbe8d0/openssl-0.10.56/src/cipher_ctx.rs`."><title>cipher_ctx.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-f3501f0f5ae15dfb.css" id="mainThemeStyle"><div id="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="openssl" data-themes="" data-resource-suffix="" data-rustdoc-version="1.71.0 (8ede3aae2 2023-07-12)" data-search-js="search-4926e5fc22a5646a.js" data-settings-js="settings-de11bff964e9d4e5.js" data-settings-css="settings-8c76f75bfb6bd192.css" data-theme-light-css="light-0f8c037637f9eb3e.css" data-theme-dark-css="dark-1097f8e92a01e3cf.css" data-theme-ayu-css="ayu-614652228113ac93.css" ></div><script src="../../static.files/storage-62ce34ea385b278a.js"></script><script defer src="../../static.files/source-script-11255107d0a65077.js"></script><script defer src="../../source-files.js"></script><script defer src="../../static.files/main-f0540c1d82cde29b.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../../static.files/light-0f8c037637f9eb3e.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../../static.files/dark-1097f8e92a01e3cf.css"><link rel="stylesheet" href="../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../openssl/index.html"><img class="rust-logo" src="../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -916,6 +916,186 @@
 <a href="#916" id="916">916</a>
 <a href="#917" id="917">917</a>
 <a href="#918" id="918">918</a>
+<a href="#919" id="919">919</a>
+<a href="#920" id="920">920</a>
+<a href="#921" id="921">921</a>
+<a href="#922" id="922">922</a>
+<a href="#923" id="923">923</a>
+<a href="#924" id="924">924</a>
+<a href="#925" id="925">925</a>
+<a href="#926" id="926">926</a>
+<a href="#927" id="927">927</a>
+<a href="#928" id="928">928</a>
+<a href="#929" id="929">929</a>
+<a href="#930" id="930">930</a>
+<a href="#931" id="931">931</a>
+<a href="#932" id="932">932</a>
+<a href="#933" id="933">933</a>
+<a href="#934" id="934">934</a>
+<a href="#935" id="935">935</a>
+<a href="#936" id="936">936</a>
+<a href="#937" id="937">937</a>
+<a href="#938" id="938">938</a>
+<a href="#939" id="939">939</a>
+<a href="#940" id="940">940</a>
+<a href="#941" id="941">941</a>
+<a href="#942" id="942">942</a>
+<a href="#943" id="943">943</a>
+<a href="#944" id="944">944</a>
+<a href="#945" id="945">945</a>
+<a href="#946" id="946">946</a>
+<a href="#947" id="947">947</a>
+<a href="#948" id="948">948</a>
+<a href="#949" id="949">949</a>
+<a href="#950" id="950">950</a>
+<a href="#951" id="951">951</a>
+<a href="#952" id="952">952</a>
+<a href="#953" id="953">953</a>
+<a href="#954" id="954">954</a>
+<a href="#955" id="955">955</a>
+<a href="#956" id="956">956</a>
+<a href="#957" id="957">957</a>
+<a href="#958" id="958">958</a>
+<a href="#959" id="959">959</a>
+<a href="#960" id="960">960</a>
+<a href="#961" id="961">961</a>
+<a href="#962" id="962">962</a>
+<a href="#963" id="963">963</a>
+<a href="#964" id="964">964</a>
+<a href="#965" id="965">965</a>
+<a href="#966" id="966">966</a>
+<a href="#967" id="967">967</a>
+<a href="#968" id="968">968</a>
+<a href="#969" id="969">969</a>
+<a href="#970" id="970">970</a>
+<a href="#971" id="971">971</a>
+<a href="#972" id="972">972</a>
+<a href="#973" id="973">973</a>
+<a href="#974" id="974">974</a>
+<a href="#975" id="975">975</a>
+<a href="#976" id="976">976</a>
+<a href="#977" id="977">977</a>
+<a href="#978" id="978">978</a>
+<a href="#979" id="979">979</a>
+<a href="#980" id="980">980</a>
+<a href="#981" id="981">981</a>
+<a href="#982" id="982">982</a>
+<a href="#983" id="983">983</a>
+<a href="#984" id="984">984</a>
+<a href="#985" id="985">985</a>
+<a href="#986" id="986">986</a>
+<a href="#987" id="987">987</a>
+<a href="#988" id="988">988</a>
+<a href="#989" id="989">989</a>
+<a href="#990" id="990">990</a>
+<a href="#991" id="991">991</a>
+<a href="#992" id="992">992</a>
+<a href="#993" id="993">993</a>
+<a href="#994" id="994">994</a>
+<a href="#995" id="995">995</a>
+<a href="#996" id="996">996</a>
+<a href="#997" id="997">997</a>
+<a href="#998" id="998">998</a>
+<a href="#999" id="999">999</a>
+<a href="#1000" id="1000">1000</a>
+<a href="#1001" id="1001">1001</a>
+<a href="#1002" id="1002">1002</a>
+<a href="#1003" id="1003">1003</a>
+<a href="#1004" id="1004">1004</a>
+<a href="#1005" id="1005">1005</a>
+<a href="#1006" id="1006">1006</a>
+<a href="#1007" id="1007">1007</a>
+<a href="#1008" id="1008">1008</a>
+<a href="#1009" id="1009">1009</a>
+<a href="#1010" id="1010">1010</a>
+<a href="#1011" id="1011">1011</a>
+<a href="#1012" id="1012">1012</a>
+<a href="#1013" id="1013">1013</a>
+<a href="#1014" id="1014">1014</a>
+<a href="#1015" id="1015">1015</a>
+<a href="#1016" id="1016">1016</a>
+<a href="#1017" id="1017">1017</a>
+<a href="#1018" id="1018">1018</a>
+<a href="#1019" id="1019">1019</a>
+<a href="#1020" id="1020">1020</a>
+<a href="#1021" id="1021">1021</a>
+<a href="#1022" id="1022">1022</a>
+<a href="#1023" id="1023">1023</a>
+<a href="#1024" id="1024">1024</a>
+<a href="#1025" id="1025">1025</a>
+<a href="#1026" id="1026">1026</a>
+<a href="#1027" id="1027">1027</a>
+<a href="#1028" id="1028">1028</a>
+<a href="#1029" id="1029">1029</a>
+<a href="#1030" id="1030">1030</a>
+<a href="#1031" id="1031">1031</a>
+<a href="#1032" id="1032">1032</a>
+<a href="#1033" id="1033">1033</a>
+<a href="#1034" id="1034">1034</a>
+<a href="#1035" id="1035">1035</a>
+<a href="#1036" id="1036">1036</a>
+<a href="#1037" id="1037">1037</a>
+<a href="#1038" id="1038">1038</a>
+<a href="#1039" id="1039">1039</a>
+<a href="#1040" id="1040">1040</a>
+<a href="#1041" id="1041">1041</a>
+<a href="#1042" id="1042">1042</a>
+<a href="#1043" id="1043">1043</a>
+<a href="#1044" id="1044">1044</a>
+<a href="#1045" id="1045">1045</a>
+<a href="#1046" id="1046">1046</a>
+<a href="#1047" id="1047">1047</a>
+<a href="#1048" id="1048">1048</a>
+<a href="#1049" id="1049">1049</a>
+<a href="#1050" id="1050">1050</a>
+<a href="#1051" id="1051">1051</a>
+<a href="#1052" id="1052">1052</a>
+<a href="#1053" id="1053">1053</a>
+<a href="#1054" id="1054">1054</a>
+<a href="#1055" id="1055">1055</a>
+<a href="#1056" id="1056">1056</a>
+<a href="#1057" id="1057">1057</a>
+<a href="#1058" id="1058">1058</a>
+<a href="#1059" id="1059">1059</a>
+<a href="#1060" id="1060">1060</a>
+<a href="#1061" id="1061">1061</a>
+<a href="#1062" id="1062">1062</a>
+<a href="#1063" id="1063">1063</a>
+<a href="#1064" id="1064">1064</a>
+<a href="#1065" id="1065">1065</a>
+<a href="#1066" id="1066">1066</a>
+<a href="#1067" id="1067">1067</a>
+<a href="#1068" id="1068">1068</a>
+<a href="#1069" id="1069">1069</a>
+<a href="#1070" id="1070">1070</a>
+<a href="#1071" id="1071">1071</a>
+<a href="#1072" id="1072">1072</a>
+<a href="#1073" id="1073">1073</a>
+<a href="#1074" id="1074">1074</a>
+<a href="#1075" id="1075">1075</a>
+<a href="#1076" id="1076">1076</a>
+<a href="#1077" id="1077">1077</a>
+<a href="#1078" id="1078">1078</a>
+<a href="#1079" id="1079">1079</a>
+<a href="#1080" id="1080">1080</a>
+<a href="#1081" id="1081">1081</a>
+<a href="#1082" id="1082">1082</a>
+<a href="#1083" id="1083">1083</a>
+<a href="#1084" id="1084">1084</a>
+<a href="#1085" id="1085">1085</a>
+<a href="#1086" id="1086">1086</a>
+<a href="#1087" id="1087">1087</a>
+<a href="#1088" id="1088">1088</a>
+<a href="#1089" id="1089">1089</a>
+<a href="#1090" id="1090">1090</a>
+<a href="#1091" id="1091">1091</a>
+<a href="#1092" id="1092">1092</a>
+<a href="#1093" id="1093">1093</a>
+<a href="#1094" id="1094">1094</a>
+<a href="#1095" id="1095">1095</a>
+<a href="#1096" id="1096">1096</a>
+<a href="#1097" id="1097">1097</a>
+<a href="#1098" id="1098">1098</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! The symmetric encryption context.
 //!
 //! # Examples
@@ -973,6 +1153,8 @@
 <span class="attr">#[cfg(not(boringssl))]
 </span><span class="kw">use </span><span class="kw">crate</span>::pkey::{HasPrivate, HasPublic, PKey, PKeyRef};
 <span class="kw">use crate</span>::{cvt, cvt_p};
+<span class="attr">#[cfg(ossl102)]
+</span><span class="kw">use </span>bitflags::bitflags;
 <span class="kw">use </span>cfg_if::cfg_if;
 <span class="kw">use </span>foreign_types::{ForeignType, ForeignTypeRef};
 <span class="kw">use </span>libc::{c_int, c_uchar};
@@ -996,6 +1178,15 @@
     </span><span class="kw">pub struct </span>CipherCtx;
     <span class="doccomment">/// A reference to a [`CipherCtx`].
     </span><span class="kw">pub struct </span>CipherCtxRef;
+}
+
+<span class="attr">#[cfg(ossl102)]
+</span><span class="macro">bitflags! </span>{
+    <span class="doccomment">/// Flags for `EVP_CIPHER_CTX`.
+    </span><span class="kw">pub struct </span>CipherCtxFlags : c_int {
+        <span class="doccomment">/// The flag used to opt into AES key wrap ciphers.
+        </span><span class="kw">const </span>FLAG_WRAP_ALLOW = ffi::EVP_CIPHER_CTX_FLAG_WRAP_ALLOW;
+    }
 }
 
 <span class="kw">impl </span>CipherCtx {
@@ -1427,6 +1618,17 @@
         <span class="prelude-val">Ok</span>(())
     }
 
+    <span class="doccomment">/// Set ctx flags.
+    ///
+    /// This function is currently used to enable AES key wrap feature supported by OpenSSL 1.0.2 or newer.
+    </span><span class="attr">#[corresponds(EVP_CIPHER_CTX_set_flags)]
+    #[cfg(ossl102)]
+    </span><span class="kw">pub fn </span>set_flags(<span class="kw-2">&amp;mut </span><span class="self">self</span>, flags: CipherCtxFlags) {
+        <span class="kw">unsafe </span>{
+            ffi::EVP_CIPHER_CTX_set_flags(<span class="self">self</span>.as_ptr(), flags.bits());
+        }
+    }
+
     <span class="doccomment">/// Writes data into the context.
     ///
     /// Providing no output buffer will cause the input to be considered additional authenticated data (AAD).
@@ -1832,6 +2034,164 @@
 
         ctx.cipher_update(<span class="kw-2">&amp;</span><span class="macro">vec!</span>[<span class="number">0</span>; block_size + <span class="number">1</span>], <span class="prelude-val">Some</span>(<span class="kw-2">&amp;mut </span><span class="macro">vec!</span>[<span class="number">0</span>; block_size - <span class="number">1</span>]))
             .unwrap();
+    }
+
+    <span class="attr">#[cfg(ossl102)]
+    </span><span class="kw">fn </span>cipher_wrap_test(cipher: <span class="kw-2">&amp;</span>CipherRef, pt: <span class="kw-2">&amp;</span>str, ct: <span class="kw-2">&amp;</span>str, key: <span class="kw-2">&amp;</span>str, iv: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt;) {
+        <span class="kw">let </span>pt = hex::decode(pt).unwrap();
+        <span class="kw">let </span>key = hex::decode(key).unwrap();
+        <span class="kw">let </span>expected = hex::decode(ct).unwrap();
+        <span class="kw">let </span>iv = iv.map(|v| hex::decode(v).unwrap());
+        <span class="kw">let </span>padding = <span class="number">8 </span>- pt.len() % <span class="number">8</span>;
+        <span class="kw">let </span><span class="kw-2">mut </span>computed = <span class="macro">vec!</span>[<span class="number">0</span>; pt.len() + padding + cipher.block_size() * <span class="number">2</span>];
+        <span class="kw">let </span><span class="kw-2">mut </span>ctx = CipherCtx::new().unwrap();
+
+        ctx.set_flags(CipherCtxFlags::FLAG_WRAP_ALLOW);
+        ctx.encrypt_init(<span class="prelude-val">Some</span>(cipher), <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span>key), iv.as_deref())
+            .unwrap();
+
+        <span class="kw">let </span>count = ctx.cipher_update(<span class="kw-2">&amp;</span>pt, <span class="prelude-val">Some</span>(<span class="kw-2">&amp;mut </span>computed)).unwrap();
+        <span class="kw">let </span>rest = ctx.cipher_final(<span class="kw-2">&amp;mut </span>computed[count..]).unwrap();
+        computed.truncate(count + rest);
+
+        <span class="kw">if </span>computed != expected {
+            <span class="macro">println!</span>(<span class="string">&quot;Computed: {}&quot;</span>, hex::encode(<span class="kw-2">&amp;</span>computed));
+            <span class="macro">println!</span>(<span class="string">&quot;Expected: {}&quot;</span>, hex::encode(<span class="kw-2">&amp;</span>expected));
+            <span class="kw">if </span>computed.len() != expected.len() {
+                <span class="macro">println!</span>(
+                    <span class="string">&quot;Lengths differ: {} in computed vs {} expected&quot;</span>,
+                    computed.len(),
+                    expected.len()
+                );
+            }
+            <span class="macro">panic!</span>(<span class="string">&quot;test failure&quot;</span>);
+        }
+    }
+
+    <span class="attr">#[test]
+    #[cfg(ossl102)]
+    </span><span class="kw">fn </span>test_aes128_wrap() {
+        <span class="kw">let </span>pt = <span class="string">&quot;00112233445566778899aabbccddeeff&quot;</span>;
+        <span class="kw">let </span>ct = <span class="string">&quot;7940ff694448b5bb5139c959a4896832e55d69aa04daa27e&quot;</span>;
+        <span class="kw">let </span>key = <span class="string">&quot;2b7e151628aed2a6abf7158809cf4f3c&quot;</span>;
+        <span class="kw">let </span>iv = <span class="string">&quot;0001020304050607&quot;</span>;
+
+        cipher_wrap_test(Cipher::aes_128_wrap(), pt, ct, key, <span class="prelude-val">Some</span>(iv));
+    }
+
+    <span class="attr">#[test]
+    #[cfg(ossl102)]
+    </span><span class="kw">fn </span>test_aes128_wrap_default_iv() {
+        <span class="kw">let </span>pt = <span class="string">&quot;00112233445566778899aabbccddeeff&quot;</span>;
+        <span class="kw">let </span>ct = <span class="string">&quot;38f1215f0212526f8a70b51955b9fbdc9fe3041d9832306e&quot;</span>;
+        <span class="kw">let </span>key = <span class="string">&quot;2b7e151628aed2a6abf7158809cf4f3c&quot;</span>;
+
+        cipher_wrap_test(Cipher::aes_128_wrap(), pt, ct, key, <span class="prelude-val">None</span>);
+    }
+
+    <span class="attr">#[test]
+    #[cfg(ossl110)]
+    </span><span class="kw">fn </span>test_aes128_wrap_pad() {
+        <span class="kw">let </span>pt = <span class="string">&quot;00112233445566778899aabbccddee&quot;</span>;
+        <span class="kw">let </span>ct = <span class="string">&quot;f13998f5ab32ef82a1bdbcbe585e1d837385b529572a1e1b&quot;</span>;
+        <span class="kw">let </span>key = <span class="string">&quot;2b7e151628aed2a6abf7158809cf4f3c&quot;</span>;
+        <span class="kw">let </span>iv = <span class="string">&quot;00010203&quot;</span>;
+
+        cipher_wrap_test(Cipher::aes_128_wrap_pad(), pt, ct, key, <span class="prelude-val">Some</span>(iv));
+    }
+
+    <span class="attr">#[test]
+    #[cfg(ossl110)]
+    </span><span class="kw">fn </span>test_aes128_wrap_pad_default_iv() {
+        <span class="kw">let </span>pt = <span class="string">&quot;00112233445566778899aabbccddee&quot;</span>;
+        <span class="kw">let </span>ct = <span class="string">&quot;3a501085fb8cf66f4186b7df851914d471ed823411598add&quot;</span>;
+        <span class="kw">let </span>key = <span class="string">&quot;2b7e151628aed2a6abf7158809cf4f3c&quot;</span>;
+
+        cipher_wrap_test(Cipher::aes_128_wrap_pad(), pt, ct, key, <span class="prelude-val">None</span>);
+    }
+
+    <span class="attr">#[test]
+    #[cfg(ossl102)]
+    </span><span class="kw">fn </span>test_aes192_wrap() {
+        <span class="kw">let </span>pt = <span class="string">&quot;9f6dee187d35302116aecbfd059657efd9f7589c4b5e7f5b&quot;</span>;
+        <span class="kw">let </span>ct = <span class="string">&quot;83b89142dfeeb4871e078bfb81134d33e23fedc19b03a1cf689973d3831b6813&quot;</span>;
+        <span class="kw">let </span>key = <span class="string">&quot;8e73b0f7da0e6452c810f32b809079e562f8ead2522c6b7b&quot;</span>;
+        <span class="kw">let </span>iv = <span class="string">&quot;0001020304050607&quot;</span>;
+
+        cipher_wrap_test(Cipher::aes_192_wrap(), pt, ct, key, <span class="prelude-val">Some</span>(iv));
+    }
+
+    <span class="attr">#[test]
+    #[cfg(ossl102)]
+    </span><span class="kw">fn </span>test_aes192_wrap_default_iv() {
+        <span class="kw">let </span>pt = <span class="string">&quot;9f6dee187d35302116aecbfd059657efd9f7589c4b5e7f5b&quot;</span>;
+        <span class="kw">let </span>ct = <span class="string">&quot;c02c2cf11505d3e4851030d5534cbf5a1d7eca7ba8839adbf239756daf1b43e6&quot;</span>;
+        <span class="kw">let </span>key = <span class="string">&quot;8e73b0f7da0e6452c810f32b809079e562f8ead2522c6b7b&quot;</span>;
+
+        cipher_wrap_test(Cipher::aes_192_wrap(), pt, ct, key, <span class="prelude-val">None</span>);
+    }
+
+    <span class="attr">#[test]
+    #[cfg(ossl110)]
+    </span><span class="kw">fn </span>test_aes192_wrap_pad() {
+        <span class="kw">let </span>pt = <span class="string">&quot;00112233445566778899aabbccddee&quot;</span>;
+        <span class="kw">let </span>ct = <span class="string">&quot;b4f6bb167ef7caf061a74da82b36ad038ca057ab51e98d3a&quot;</span>;
+        <span class="kw">let </span>key = <span class="string">&quot;8e73b0f7da0e6452c810f32b809079e562f8ead2522c6b7b&quot;</span>;
+        <span class="kw">let </span>iv = <span class="string">&quot;00010203&quot;</span>;
+
+        cipher_wrap_test(Cipher::aes_192_wrap_pad(), pt, ct, key, <span class="prelude-val">Some</span>(iv));
+    }
+
+    <span class="attr">#[test]
+    #[cfg(ossl110)]
+    </span><span class="kw">fn </span>test_aes192_wrap_pad_default_iv() {
+        <span class="kw">let </span>pt = <span class="string">&quot;00112233445566778899aabbccddee&quot;</span>;
+        <span class="kw">let </span>ct = <span class="string">&quot;b2c37a28cc602753a7c944a4c2555a2df9c98b2eded5312e&quot;</span>;
+        <span class="kw">let </span>key = <span class="string">&quot;8e73b0f7da0e6452c810f32b809079e562f8ead2522c6b7b&quot;</span>;
+
+        cipher_wrap_test(Cipher::aes_192_wrap_pad(), pt, ct, key, <span class="prelude-val">None</span>);
+    }
+
+    <span class="attr">#[test]
+    #[cfg(ossl102)]
+    </span><span class="kw">fn </span>test_aes256_wrap() {
+        <span class="kw">let </span>pt = <span class="string">&quot;6bc1bee22e409f96e93d7e117393172aae2d8a571e03ac9c9eb76fac45af8e51&quot;</span>;
+        <span class="kw">let </span>ct = <span class="string">&quot;cc05da2a7f56f7dd0c144231f90bce58648fa20a8278f5a6b7d13bba6aa57a33229d4333866b7fd6&quot;</span>;
+        <span class="kw">let </span>key = <span class="string">&quot;603deb1015ca71be2b73aef0857d77811f352c073b6108d72d9810a30914dff4&quot;</span>;
+        <span class="kw">let </span>iv = <span class="string">&quot;0001020304050607&quot;</span>;
+
+        cipher_wrap_test(Cipher::aes_256_wrap(), pt, ct, key, <span class="prelude-val">Some</span>(iv));
+    }
+
+    <span class="attr">#[test]
+    #[cfg(ossl102)]
+    </span><span class="kw">fn </span>test_aes256_wrap_default_iv() {
+        <span class="kw">let </span>pt = <span class="string">&quot;6bc1bee22e409f96e93d7e117393172aae2d8a571e03ac9c9eb76fac45af8e51&quot;</span>;
+        <span class="kw">let </span>ct = <span class="string">&quot;0b24f068b50e52bc6987868411c36e1b03900866ed12af81eb87cef70a8d1911731c1d7abf789d88&quot;</span>;
+        <span class="kw">let </span>key = <span class="string">&quot;603deb1015ca71be2b73aef0857d77811f352c073b6108d72d9810a30914dff4&quot;</span>;
+
+        cipher_wrap_test(Cipher::aes_256_wrap(), pt, ct, key, <span class="prelude-val">None</span>);
+    }
+
+    <span class="attr">#[test]
+    #[cfg(ossl110)]
+    </span><span class="kw">fn </span>test_aes256_wrap_pad() {
+        <span class="kw">let </span>pt = <span class="string">&quot;00112233445566778899aabbccddee&quot;</span>;
+        <span class="kw">let </span>ct = <span class="string">&quot;91594e044ccc06130d60e6c84a996aa4f96a9faff8c5f6e7&quot;</span>;
+        <span class="kw">let </span>key = <span class="string">&quot;603deb1015ca71be2b73aef0857d77811f352c073b6108d72d9810a30914dff4&quot;</span>;
+        <span class="kw">let </span>iv = <span class="string">&quot;00010203&quot;</span>;
+
+        cipher_wrap_test(Cipher::aes_256_wrap_pad(), pt, ct, key, <span class="prelude-val">Some</span>(iv));
+    }
+
+    <span class="attr">#[test]
+    #[cfg(ossl110)]
+    </span><span class="kw">fn </span>test_aes256_wrap_pad_default_iv() {
+        <span class="kw">let </span>pt = <span class="string">&quot;00112233445566778899aabbccddee&quot;</span>;
+        <span class="kw">let </span>ct = <span class="string">&quot;dc3c166a854afd68aea624a4272693554bf2e4fcbae602cd&quot;</span>;
+        <span class="kw">let </span>key = <span class="string">&quot;603deb1015ca71be2b73aef0857d77811f352c073b6108d72d9810a30914dff4&quot;</span>;
+
+        cipher_wrap_test(Cipher::aes_256_wrap_pad(), pt, ct, key, <span class="prelude-val">None</span>);
     }
 }
 </code></pre></div></section></main></body></html>

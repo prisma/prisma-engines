@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"mod":["dns"],"struct":["Connected","HttpConnector","HttpInfo"],"trait":["Connect","Connection"]};
+window.SIDEBAR_ITEMS = {"fn":["capture_connection"],"mod":["dns"],"struct":["CaptureConnection","Connected","HttpConnector","HttpInfo"],"trait":["Connect","Connection"]};

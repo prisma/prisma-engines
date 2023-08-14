@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"struct":["Decimal128"]};
+window.SIDEBAR_ITEMS = {"enum":["ParseError"],"struct":["Decimal128"]};

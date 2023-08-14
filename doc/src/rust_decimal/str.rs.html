@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/nix/store/jnqxxv1xi811ni996b002f4jnyz38xck-vendor-cargo-deps/c19b7c6f923b580ac259164a89f2577984ad5ab09ee9d583b888f934adbbe8d0/rust_decimal-1.26.1/src/str.rs`."><title>str.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-f3501f0f5ae15dfb.css" id="mainThemeStyle"><div id="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="rust_decimal" data-themes="" data-resource-suffix="" data-rustdoc-version="1.71.0 (8ede3aae2 2023-07-12)" data-search-js="search-4926e5fc22a5646a.js" data-settings-js="settings-de11bff964e9d4e5.js" data-settings-css="settings-8c76f75bfb6bd192.css" data-theme-light-css="light-0f8c037637f9eb3e.css" data-theme-dark-css="dark-1097f8e92a01e3cf.css" data-theme-ayu-css="ayu-614652228113ac93.css" ></div><script src="../../static.files/storage-62ce34ea385b278a.js"></script><script defer src="../../static.files/source-script-11255107d0a65077.js"></script><script defer src="../../source-files.js"></script><script defer src="../../static.files/main-f0540c1d82cde29b.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../../static.files/light-0f8c037637f9eb3e.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../../static.files/dark-1097f8e92a01e3cf.css"><link rel="stylesheet" href="../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../rust_decimal/index.html"><img class="rust-logo" src="../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/nix/store/yf45a1rayffhnidhgyjynpyhr9lqkd09-vendor-cargo-deps/c19b7c6f923b580ac259164a89f2577984ad5ab09ee9d583b888f934adbbe8d0/rust_decimal-1.31.0/src/str.rs`."><title>str.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-f3501f0f5ae15dfb.css" id="mainThemeStyle"><div id="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="rust_decimal" data-themes="" data-resource-suffix="" data-rustdoc-version="1.71.0 (8ede3aae2 2023-07-12)" data-search-js="search-4926e5fc22a5646a.js" data-settings-js="settings-de11bff964e9d4e5.js" data-settings-css="settings-8c76f75bfb6bd192.css" data-theme-light-css="light-0f8c037637f9eb3e.css" data-theme-dark-css="dark-1097f8e92a01e3cf.css" data-theme-ayu-css="ayu-614652228113ac93.css" ></div><script src="../../static.files/storage-62ce34ea385b278a.js"></script><script defer src="../../static.files/source-script-11255107d0a65077.js"></script><script defer src="../../source-files.js"></script><script defer src="../../static.files/main-f0540c1d82cde29b.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../../static.files/light-0f8c037637f9eb3e.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../../static.files/dark-1097f8e92a01e3cf.css"><link rel="stylesheet" href="../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../rust_decimal/index.html"><img class="rust-logo" src="../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -906,6 +906,91 @@
 <a href="#906" id="906">906</a>
 <a href="#907" id="907">907</a>
 <a href="#908" id="908">908</a>
+<a href="#909" id="909">909</a>
+<a href="#910" id="910">910</a>
+<a href="#911" id="911">911</a>
+<a href="#912" id="912">912</a>
+<a href="#913" id="913">913</a>
+<a href="#914" id="914">914</a>
+<a href="#915" id="915">915</a>
+<a href="#916" id="916">916</a>
+<a href="#917" id="917">917</a>
+<a href="#918" id="918">918</a>
+<a href="#919" id="919">919</a>
+<a href="#920" id="920">920</a>
+<a href="#921" id="921">921</a>
+<a href="#922" id="922">922</a>
+<a href="#923" id="923">923</a>
+<a href="#924" id="924">924</a>
+<a href="#925" id="925">925</a>
+<a href="#926" id="926">926</a>
+<a href="#927" id="927">927</a>
+<a href="#928" id="928">928</a>
+<a href="#929" id="929">929</a>
+<a href="#930" id="930">930</a>
+<a href="#931" id="931">931</a>
+<a href="#932" id="932">932</a>
+<a href="#933" id="933">933</a>
+<a href="#934" id="934">934</a>
+<a href="#935" id="935">935</a>
+<a href="#936" id="936">936</a>
+<a href="#937" id="937">937</a>
+<a href="#938" id="938">938</a>
+<a href="#939" id="939">939</a>
+<a href="#940" id="940">940</a>
+<a href="#941" id="941">941</a>
+<a href="#942" id="942">942</a>
+<a href="#943" id="943">943</a>
+<a href="#944" id="944">944</a>
+<a href="#945" id="945">945</a>
+<a href="#946" id="946">946</a>
+<a href="#947" id="947">947</a>
+<a href="#948" id="948">948</a>
+<a href="#949" id="949">949</a>
+<a href="#950" id="950">950</a>
+<a href="#951" id="951">951</a>
+<a href="#952" id="952">952</a>
+<a href="#953" id="953">953</a>
+<a href="#954" id="954">954</a>
+<a href="#955" id="955">955</a>
+<a href="#956" id="956">956</a>
+<a href="#957" id="957">957</a>
+<a href="#958" id="958">958</a>
+<a href="#959" id="959">959</a>
+<a href="#960" id="960">960</a>
+<a href="#961" id="961">961</a>
+<a href="#962" id="962">962</a>
+<a href="#963" id="963">963</a>
+<a href="#964" id="964">964</a>
+<a href="#965" id="965">965</a>
+<a href="#966" id="966">966</a>
+<a href="#967" id="967">967</a>
+<a href="#968" id="968">968</a>
+<a href="#969" id="969">969</a>
+<a href="#970" id="970">970</a>
+<a href="#971" id="971">971</a>
+<a href="#972" id="972">972</a>
+<a href="#973" id="973">973</a>
+<a href="#974" id="974">974</a>
+<a href="#975" id="975">975</a>
+<a href="#976" id="976">976</a>
+<a href="#977" id="977">977</a>
+<a href="#978" id="978">978</a>
+<a href="#979" id="979">979</a>
+<a href="#980" id="980">980</a>
+<a href="#981" id="981">981</a>
+<a href="#982" id="982">982</a>
+<a href="#983" id="983">983</a>
+<a href="#984" id="984">984</a>
+<a href="#985" id="985">985</a>
+<a href="#986" id="986">986</a>
+<a href="#987" id="987">987</a>
+<a href="#988" id="988">988</a>
+<a href="#989" id="989">989</a>
+<a href="#990" id="990">990</a>
+<a href="#991" id="991">991</a>
+<a href="#992" id="992">992</a>
+<a href="#993" id="993">993</a>
 </pre></div><pre class="rust"><code><span class="kw">use crate</span>::{
     constants::{BYTES_TO_OVERFLOW_U64, MAX_PRECISION, MAX_STR_BUFFER_SIZE, OVERFLOW_U96, WILL_OVERFLOW_U64},
     error::{tail_error, Error},
@@ -1011,12 +1096,45 @@
 
     </span><span class="kw">let </span>len = chars.len();
     <span class="kw">let </span><span class="kw-2">mut </span>rep;
-    <span class="kw">if </span>len &gt; <span class="number">1 </span>{
-        <span class="kw">if </span>chars.iter().take(len - <span class="number">1</span>).all(|c| <span class="kw-2">*</span>c == <span class="string">&#39;0&#39;</span>) {
-            <span class="comment">// Chomp off the zero&#39;s.
-            </span>rep = chars.iter().skip(len - <span class="number">1</span>).collect::&lt;String&gt;();
+    <span class="comment">// We either are operating with a precision specified, or on defaults. Defaults will perform &quot;smart&quot;
+    // reduction of precision.
+    </span><span class="kw">if let </span><span class="prelude-val">Some</span>(precision) = f.precision() {
+        <span class="kw">if </span>len &gt; <span class="number">1 </span>{
+            <span class="comment">// If we&#39;re zero precision AND it&#39;s trailing zeros then strip them
+            </span><span class="kw">if </span>precision == <span class="number">0 </span>&amp;&amp; chars.iter().take(len - <span class="number">1</span>).all(|c| <span class="kw-2">*</span>c == <span class="string">&#39;0&#39;</span>) {
+                rep = chars.iter().skip(len - <span class="number">1</span>).collect::&lt;String&gt;();
+            } <span class="kw">else </span>{
+                <span class="comment">// We may still be zero precision, however we aren&#39;t trailing zeros
+                </span><span class="kw">if </span>precision &gt; <span class="number">0 </span>{
+                    chars.insert(len - <span class="number">1</span>, <span class="string">&#39;.&#39;</span>);
+                }
+                rep = chars
+                    .iter()
+                    .rev()
+                    <span class="comment">// Add on extra zeros according to the precision. At least one, since we added a decimal place.
+                    </span>.chain(core::iter::repeat(<span class="kw-2">&amp;</span><span class="string">&#39;0&#39;</span>))
+                    .take(<span class="kw">if </span>precision == <span class="number">0 </span>{ <span class="number">1 </span>} <span class="kw">else </span>{ <span class="number">2 </span>+ precision })
+                    .collect::&lt;String&gt;();
+            }
+            exponent += (len - <span class="number">1</span>) <span class="kw">as </span>isize;
+        } <span class="kw">else if </span>precision &gt; <span class="number">0 </span>{
+            <span class="comment">// We have precision that we want to add
+            </span>chars.push(<span class="string">&#39;.&#39;</span>);
+            rep = chars
+                .iter()
+                .chain(core::iter::repeat(<span class="kw-2">&amp;</span><span class="string">&#39;0&#39;</span>))
+                .take(<span class="number">2 </span>+ precision)
+                .collect::&lt;String&gt;();
         } <span class="kw">else </span>{
-            chars.insert(len - <span class="number">1</span>, <span class="string">&#39;.&#39;</span>);
+            rep = chars.iter().collect::&lt;String&gt;();
+        }
+    } <span class="kw">else if </span>len &gt; <span class="number">1 </span>{
+        <span class="comment">// If the number is just trailing zeros then we treat it like 0 precision
+        </span><span class="kw">if </span>chars.iter().take(len - <span class="number">1</span>).all(|c| <span class="kw-2">*</span>c == <span class="string">&#39;0&#39;</span>) {
+            rep = chars.iter().skip(len - <span class="number">1</span>).collect::&lt;String&gt;();
+        } <span class="kw">else </span>{
+            <span class="comment">// Otherwise, we need to insert a decimal place and make it a scientific number
+            </span>chars.insert(len - <span class="number">1</span>, <span class="string">&#39;.&#39;</span>);
             rep = chars.iter().rev().collect::&lt;String&gt;();
         }
         exponent += (len - <span class="number">1</span>) <span class="kw">as </span>isize;
@@ -1031,7 +1149,7 @@
 
 <span class="comment">// dedicated implementation for the most common case.
 </span><span class="attr">#[inline]
-</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>parse_str_radix_10(str: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Result</span>&lt;Decimal, <span class="kw">crate</span>::Error&gt; {
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>parse_str_radix_10(str: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Result</span>&lt;Decimal, Error&gt; {
     <span class="kw">let </span>bytes = str.as_bytes();
     <span class="kw">if </span>bytes.len() &lt; BYTES_TO_OVERFLOW_U64 {
         parse_str_radix_10_dispatch::&lt;<span class="bool-val">false</span>, <span class="bool-val">true</span>&gt;(bytes)
@@ -1041,7 +1159,7 @@
 }
 
 <span class="attr">#[inline]
-</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>parse_str_radix_10_exact(str: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Result</span>&lt;Decimal, <span class="kw">crate</span>::Error&gt; {
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>parse_str_radix_10_exact(str: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Result</span>&lt;Decimal, Error&gt; {
     <span class="kw">let </span>bytes = str.as_bytes();
     <span class="kw">if </span>bytes.len() &lt; BYTES_TO_OVERFLOW_U64 {
         parse_str_radix_10_dispatch::&lt;<span class="bool-val">false</span>, <span class="bool-val">false</span>&gt;(bytes)
@@ -1051,7 +1169,7 @@
 }
 
 <span class="attr">#[inline]
-</span><span class="kw">fn </span>parse_str_radix_10_dispatch&lt;<span class="kw">const </span>BIG: bool, <span class="kw">const </span>ROUND: bool&gt;(bytes: <span class="kw-2">&amp;</span>[u8]) -&gt; <span class="prelude-ty">Result</span>&lt;Decimal, <span class="kw">crate</span>::Error&gt; {
+</span><span class="kw">fn </span>parse_str_radix_10_dispatch&lt;<span class="kw">const </span>BIG: bool, <span class="kw">const </span>ROUND: bool&gt;(bytes: <span class="kw-2">&amp;</span>[u8]) -&gt; <span class="prelude-ty">Result</span>&lt;Decimal, Error&gt; {
     <span class="kw">match </span>bytes {
         [b, rest @ ..] =&gt; byte_dispatch_u64::&lt;<span class="bool-val">false</span>, <span class="bool-val">false</span>, <span class="bool-val">false</span>, BIG, <span class="bool-val">true</span>, ROUND&gt;(rest, <span class="number">0</span>, <span class="number">0</span>, <span class="kw-2">*</span>b),
         [] =&gt; tail_error(<span class="string">&quot;Invalid decimal: empty&quot;</span>),
@@ -1080,7 +1198,7 @@
     bytes: <span class="kw-2">&amp;</span>[u8],
     data64: u64,
     scale: u8,
-) -&gt; <span class="prelude-ty">Result</span>&lt;Decimal, <span class="kw">crate</span>::Error&gt; {
+) -&gt; <span class="prelude-ty">Result</span>&lt;Decimal, Error&gt; {
     <span class="kw">if let </span><span class="prelude-val">Some</span>((next, bytes)) = bytes.split_first() {
         byte_dispatch_u64::&lt;POINT, NEG, HAS, BIG, <span class="bool-val">false</span>, ROUND&gt;(bytes, data64, scale, <span class="kw-2">*</span>next)
     } <span class="kw">else </span>{
@@ -1101,7 +1219,7 @@
     data64: u64,
     scale: u8,
     b: u8,
-) -&gt; <span class="prelude-ty">Result</span>&lt;Decimal, <span class="kw">crate</span>::Error&gt; {
+) -&gt; <span class="prelude-ty">Result</span>&lt;Decimal, Error&gt; {
     <span class="kw">match </span>b {
         <span class="string">b&#39;-&#39; </span><span class="kw">if </span>FIRST &amp;&amp; !HAS =&gt; dispatch_next::&lt;<span class="bool-val">false</span>, <span class="bool-val">true</span>, <span class="bool-val">false</span>, BIG, ROUND&gt;(bytes, data64, scale),
         <span class="string">b&#39;+&#39; </span><span class="kw">if </span>FIRST &amp;&amp; !HAS =&gt; dispatch_next::&lt;<span class="bool-val">false</span>, <span class="bool-val">false</span>, <span class="bool-val">false</span>, BIG, ROUND&gt;(bytes, data64, scale),
@@ -1123,7 +1241,7 @@
     data64: u64,
     scale: u8,
     b: u8,
-) -&gt; <span class="prelude-ty">Result</span>&lt;Decimal, <span class="kw">crate</span>::Error&gt; {
+) -&gt; <span class="prelude-ty">Result</span>&lt;Decimal, Error&gt; {
     <span class="kw">match </span>b {
         <span class="string">b&#39;0&#39;</span>..=<span class="string">b&#39;9&#39; </span>=&gt; handle_digit_64::&lt;POINT, NEG, BIG, ROUND&gt;(bytes, data64, scale, b - <span class="string">b&#39;0&#39;</span>),
         <span class="string">b&#39;.&#39; </span><span class="kw">if </span>!POINT =&gt; handle_point::&lt;NEG, HAS, BIG, ROUND&gt;(bytes, data64, scale),
@@ -1137,7 +1255,7 @@
     data64: u64,
     scale: u8,
     digit: u8,
-) -&gt; <span class="prelude-ty">Result</span>&lt;Decimal, <span class="kw">crate</span>::Error&gt; {
+) -&gt; <span class="prelude-ty">Result</span>&lt;Decimal, Error&gt; {
     <span class="comment">// we have already validated that we cannot overflow
     </span><span class="kw">let </span>data64 = data64 * <span class="number">10 </span>+ digit <span class="kw">as </span>u64;
     <span class="kw">let </span>scale = <span class="kw">if </span>POINT { scale + <span class="number">1 </span>} <span class="kw">else </span>{ <span class="number">0 </span>};
@@ -1148,7 +1266,7 @@
             <span class="kw">if </span>ROUND {
                 maybe_round(data64 <span class="kw">as </span>u128, next, scale, POINT, NEG)
             } <span class="kw">else </span>{
-                <span class="prelude-val">Err</span>(<span class="kw">crate</span>::Error::Underflow)
+                <span class="prelude-val">Err</span>(Error::Underflow)
             }
         } <span class="kw">else if </span>BIG &amp;&amp; overflow_64(data64) {
             handle_full_128::&lt;POINT, NEG, ROUND&gt;(data64 <span class="kw">as </span>u128, bytes, scale, next)
@@ -1167,7 +1285,7 @@
     bytes: <span class="kw-2">&amp;</span>[u8],
     data64: u64,
     scale: u8,
-) -&gt; <span class="prelude-ty">Result</span>&lt;Decimal, <span class="kw">crate</span>::Error&gt; {
+) -&gt; <span class="prelude-ty">Result</span>&lt;Decimal, Error&gt; {
     dispatch_next::&lt;<span class="bool-val">true</span>, NEG, HAS, BIG, ROUND&gt;(bytes, data64, scale)
 }
 
@@ -1176,13 +1294,13 @@
     bytes: <span class="kw-2">&amp;</span>[u8],
     data64: u64,
     scale: u8,
-) -&gt; <span class="prelude-ty">Result</span>&lt;Decimal, <span class="kw">crate</span>::Error&gt; {
+) -&gt; <span class="prelude-ty">Result</span>&lt;Decimal, Error&gt; {
     dispatch_next::&lt;POINT, NEG, <span class="bool-val">true</span>, BIG, ROUND&gt;(bytes, data64, scale)
 }
 
 <span class="attr">#[inline(never)]
 #[cold]
-</span><span class="kw">fn </span>tail_invalid_digit(digit: u8) -&gt; <span class="prelude-ty">Result</span>&lt;Decimal, <span class="kw">crate</span>::Error&gt; {
+</span><span class="kw">fn </span>tail_invalid_digit(digit: u8) -&gt; <span class="prelude-ty">Result</span>&lt;Decimal, Error&gt; {
     <span class="kw">match </span>digit {
         <span class="string">b&#39;.&#39; </span>=&gt; tail_error(<span class="string">&quot;Invalid decimal: two decimal points&quot;</span>),
         <span class="string">b&#39;_&#39; </span>=&gt; tail_error(<span class="string">&quot;Invalid decimal: must start lead with a number&quot;</span>),
@@ -1197,7 +1315,7 @@
     bytes: <span class="kw-2">&amp;</span>[u8],
     scale: u8,
     next_byte: u8,
-) -&gt; <span class="prelude-ty">Result</span>&lt;Decimal, <span class="kw">crate</span>::Error&gt; {
+) -&gt; <span class="prelude-ty">Result</span>&lt;Decimal, Error&gt; {
     <span class="kw">let </span>b = next_byte;
     <span class="kw">match </span>b {
         <span class="string">b&#39;0&#39;</span>..=<span class="string">b&#39;9&#39; </span>=&gt; {
@@ -1211,18 +1329,10 @@
                 }
 
                 <span class="kw">if </span>ROUND {
-                    <span class="kw">if </span>digit &gt;= <span class="number">5 </span>{
-                        data += <span class="number">1</span>;
-
-                        <span class="comment">// Make sure that the mantissa isn&#39;t now overflowing
-                        </span><span class="kw">if </span>overflow_128(data) {
-                            <span class="kw">return </span>tail_error(<span class="string">&quot;Invalid decimal: overflow from mantissa after rounding&quot;</span>);
-                        }
-                    }
+                    maybe_round(data, next_byte, scale, POINT, NEG)
                 } <span class="kw">else </span>{
-                    <span class="kw">return </span><span class="prelude-val">Err</span>(Error::Underflow);
+                    <span class="prelude-val">Err</span>(Error::Underflow)
                 }
-                handle_data::&lt;NEG, <span class="bool-val">true</span>&gt;(data, scale)
             } <span class="kw">else </span>{
                 data = next;
                 <span class="kw">let </span>scale = scale + POINT <span class="kw">as </span>u8;
@@ -1232,7 +1342,7 @@
                         <span class="kw">if </span>ROUND {
                             maybe_round(data, next, scale, POINT, NEG)
                         } <span class="kw">else </span>{
-                            <span class="prelude-val">Err</span>(<span class="kw">crate</span>::Error::Underflow)
+                            <span class="prelude-val">Err</span>(Error::Underflow)
                         }
                     } <span class="kw">else </span>{
                         handle_full_128::&lt;POINT, NEG, ROUND&gt;(data, bytes, scale, next)
@@ -1263,7 +1373,13 @@
 
 <span class="attr">#[inline(never)]
 #[cold]
-</span><span class="kw">fn </span>maybe_round(<span class="kw-2">mut </span>data: u128, next_byte: u8, scale: u8, point: bool, negative: bool) -&gt; <span class="prelude-ty">Result</span>&lt;Decimal, <span class="kw">crate</span>::Error&gt; {
+</span><span class="kw">fn </span>maybe_round(
+    <span class="kw-2">mut </span>data: u128,
+    next_byte: u8,
+    <span class="kw-2">mut </span>scale: u8,
+    point: bool,
+    negative: bool,
+) -&gt; <span class="prelude-ty">Result</span>&lt;Decimal, <span class="kw">crate</span>::Error&gt; {
     <span class="kw">let </span>digit = <span class="kw">match </span>next_byte {
         <span class="string">b&#39;0&#39;</span>..=<span class="string">b&#39;9&#39; </span>=&gt; u32::from(next_byte - <span class="string">b&#39;0&#39;</span>),
         <span class="string">b&#39;_&#39; </span>=&gt; <span class="number">0</span>, <span class="comment">// this should be an invalid string?
@@ -1274,9 +1390,16 @@
     <span class="comment">// Round at midpoint
     </span><span class="kw">if </span>digit &gt;= <span class="number">5 </span>{
         data += <span class="number">1</span>;
-        <span class="kw">if </span>overflow_128(data) {
-            <span class="comment">// Highly unlikely scenario which is more indicative of a bug
-            </span><span class="kw">return </span>tail_error(<span class="string">&quot;Invalid decimal: overflow when rounding&quot;</span>);
+
+        <span class="comment">// If the mantissa is now overflowing, round to the next
+        // next least significant digit and discard precision
+        </span><span class="kw">if </span>overflow_128(data) {
+            <span class="kw">if </span>scale == <span class="number">0 </span>{
+                <span class="kw">return </span>tail_error(<span class="string">&quot;Invalid decimal: overflow from mantissa after rounding&quot;</span>);
+            }
+            data += <span class="number">4</span>;
+            data /= <span class="number">10</span>;
+            scale -= <span class="number">1</span>;
         }
     }
 
@@ -1288,12 +1411,12 @@
 }
 
 <span class="attr">#[inline(never)]
-</span><span class="kw">fn </span>tail_no_has() -&gt; <span class="prelude-ty">Result</span>&lt;Decimal, <span class="kw">crate</span>::Error&gt; {
+</span><span class="kw">fn </span>tail_no_has() -&gt; <span class="prelude-ty">Result</span>&lt;Decimal, Error&gt; {
     tail_error(<span class="string">&quot;Invalid decimal: no digits found&quot;</span>)
 }
 
 <span class="attr">#[inline]
-</span><span class="kw">fn </span>handle_data&lt;<span class="kw">const </span>NEG: bool, <span class="kw">const </span>HAS: bool&gt;(data: u128, scale: u8) -&gt; <span class="prelude-ty">Result</span>&lt;Decimal, <span class="kw">crate</span>::Error&gt; {
+</span><span class="kw">fn </span>handle_data&lt;<span class="kw">const </span>NEG: bool, <span class="kw">const </span>HAS: bool&gt;(data: u128, scale: u8) -&gt; <span class="prelude-ty">Result</span>&lt;Decimal, Error&gt; {
     <span class="macro">debug_assert_eq!</span>(data &gt;&gt; <span class="number">96</span>, <span class="number">0</span>);
     <span class="kw">if </span>!HAS {
         tail_no_has()
@@ -1308,7 +1431,7 @@
     }
 }
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>parse_str_radix_n(str: <span class="kw-2">&amp;</span>str, radix: u32) -&gt; <span class="prelude-ty">Result</span>&lt;Decimal, <span class="kw">crate</span>::Error&gt; {
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>parse_str_radix_n(str: <span class="kw-2">&amp;</span>str, radix: u32) -&gt; <span class="prelude-ty">Result</span>&lt;Decimal, Error&gt; {
     <span class="kw">if </span>str.is_empty() {
         <span class="kw">return </span><span class="prelude-val">Err</span>(Error::from(<span class="string">&quot;Invalid decimal: empty&quot;</span>));
     }
@@ -1580,7 +1703,7 @@
     </span><span class="kw">fn </span>display_does_not_overflow_max_capacity() {
         <span class="kw">let </span>num = Decimal::from_str(<span class="string">&quot;1.2&quot;</span>).unwrap();
         <span class="kw">let </span><span class="kw-2">mut </span>buffer = ArrayString::&lt;<span class="number">64</span>&gt;::new();
-        <span class="kw">let _ </span>= buffer.write_fmt(<span class="macro">format_args!</span>(<span class="string">&quot;{:.31}&quot;</span>, num)).unwrap();
+        buffer.write_fmt(<span class="macro">format_args!</span>(<span class="string">&quot;{num:.31}&quot;</span>)).unwrap();
         <span class="macro">assert_eq!</span>(<span class="string">&quot;1.2000000000000000000000000000000&quot;</span>, buffer.as_str());
     }
 
@@ -1765,6 +1888,53 @@
                 .unwrap()
                 .unpack(),
             Decimal::from_i128_with_scale(<span class="number">10_000_000_000_000_000_000_000_000_000</span>, <span class="number">0</span>).unpack()
+        );
+    }
+
+    <span class="attr">#[test]
+    </span><span class="kw">fn </span>from_str_mantissa_overflow_1() {
+        <span class="comment">// reminder:
+        </span><span class="macro">assert_eq!</span>(OVERFLOW_U96, <span class="number">79_228_162_514_264_337_593_543_950_336</span>);
+        <span class="macro">assert_eq!</span>(
+            parse_str_radix_10(<span class="string">&quot;79_228_162_514_264_337_593_543_950_33.56&quot;</span>)
+                .unwrap()
+                .unpack(),
+            Decimal::from_i128_with_scale(<span class="number">79_228_162_514_264_337_593_543_950_34</span>, <span class="number">0</span>).unpack()
+        );
+        <span class="comment">// This is a mantissa of OVERFLOW_U96 - 1 just before reaching the last digit.
+        // Previously, this would return Err(&quot;overflow from mantissa after rounding&quot;)
+        // instead of successfully rounding.
+    </span>}
+
+    <span class="attr">#[test]
+    </span><span class="kw">fn </span>from_str_mantissa_overflow_2() {
+        <span class="macro">assert_eq!</span>(
+            parse_str_radix_10(<span class="string">&quot;79_228_162_514_264_337_593_543_950_335.6&quot;</span>),
+            <span class="prelude-val">Err</span>(Error::from(<span class="string">&quot;Invalid decimal: overflow from mantissa after rounding&quot;</span>))
+        );
+        <span class="comment">// this case wants to round to 79_228_162_514_264_337_593_543_950_340.
+        // (79_228_162_514_264_337_593_543_950_336 is OVERFLOW_U96 and too large
+        // to fit in 96 bits) which is also too large for the mantissa so fails.
+    </span>}
+
+    <span class="attr">#[test]
+    </span><span class="kw">fn </span>from_str_mantissa_overflow_3() {
+        <span class="comment">// this hits the other avoidable overflow case in maybe_round
+        </span><span class="macro">assert_eq!</span>(
+            parse_str_radix_10(<span class="string">&quot;7.92281625142643375935439503356&quot;</span>).unwrap().unpack(),
+            Decimal::from_i128_with_scale(<span class="number">79_228_162_514_264_337_593_543_950_34</span>, <span class="number">27</span>).unpack()
+        );
+    }
+
+    <span class="attr">#[ignore]
+    #[test]
+    </span><span class="kw">fn </span>from_str_mantissa_overflow_4() {
+        <span class="comment">// Same test as above, however with underscores. This causes issues.
+        </span><span class="macro">assert_eq!</span>(
+            parse_str_radix_10(<span class="string">&quot;7.9_228_162_514_264_337_593_543_950_335_6&quot;</span>)
+                .unwrap()
+                .unpack(),
+            Decimal::from_i128_with_scale(<span class="number">79_228_162_514_264_337_593_543_950_34</span>, <span class="number">27</span>).unpack()
         );
     }
 

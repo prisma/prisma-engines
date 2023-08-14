@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/nix/store/jnqxxv1xi811ni996b002f4jnyz38xck-vendor-cargo-deps/c19b7c6f923b580ac259164a89f2577984ad5ab09ee9d583b888f934adbbe8d0/lock_api-0.4.8/src/remutex.rs`."><title>remutex.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-f3501f0f5ae15dfb.css" id="mainThemeStyle"><div id="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="lock_api" data-themes="" data-resource-suffix="" data-rustdoc-version="1.71.0 (8ede3aae2 2023-07-12)" data-search-js="search-4926e5fc22a5646a.js" data-settings-js="settings-de11bff964e9d4e5.js" data-settings-css="settings-8c76f75bfb6bd192.css" data-theme-light-css="light-0f8c037637f9eb3e.css" data-theme-dark-css="dark-1097f8e92a01e3cf.css" data-theme-ayu-css="ayu-614652228113ac93.css" ></div><script src="../../static.files/storage-62ce34ea385b278a.js"></script><script defer src="../../static.files/source-script-11255107d0a65077.js"></script><script defer src="../../source-files.js"></script><script defer src="../../static.files/main-f0540c1d82cde29b.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../../static.files/light-0f8c037637f9eb3e.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../../static.files/dark-1097f8e92a01e3cf.css"><link rel="stylesheet" href="../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../lock_api/index.html"><img class="rust-logo" src="../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/nix/store/yf45a1rayffhnidhgyjynpyhr9lqkd09-vendor-cargo-deps/c19b7c6f923b580ac259164a89f2577984ad5ab09ee9d583b888f934adbbe8d0/lock_api-0.4.10/src/remutex.rs`."><title>remutex.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-f3501f0f5ae15dfb.css" id="mainThemeStyle"><div id="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="lock_api" data-themes="" data-resource-suffix="" data-rustdoc-version="1.71.0 (8ede3aae2 2023-07-12)" data-search-js="search-4926e5fc22a5646a.js" data-settings-js="settings-de11bff964e9d4e5.js" data-settings-css="settings-8c76f75bfb6bd192.css" data-theme-light-css="light-0f8c037637f9eb3e.css" data-theme-dark-css="dark-1097f8e92a01e3cf.css" data-theme-ayu-css="ayu-614652228113ac93.css" ></div><script src="../../static.files/storage-62ce34ea385b278a.js"></script><script defer src="../../static.files/source-script-11255107d0a65077.js"></script><script defer src="../../source-files.js"></script><script defer src="../../static.files/main-f0540c1d82cde29b.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../../static.files/light-0f8c037637f9eb3e.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../../static.files/dark-1097f8e92a01e3cf.css"><link rel="stylesheet" href="../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../lock_api/index.html"><img class="rust-logo" src="../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -1034,6 +1034,9 @@
 <a href="#1034" id="1034">1034</a>
 <a href="#1035" id="1035">1035</a>
 <a href="#1036" id="1036">1036</a>
+<a href="#1037" id="1037">1037</a>
+<a href="#1038" id="1038">1038</a>
+<a href="#1039" id="1039">1039</a>
 </pre></div><pre class="rust"><code><span class="comment">// Copyright 2018 Amanieu d&#39;Antras
 //
 // Licensed under the Apache License, Version 2.0, &lt;LICENSE-APACHE or
@@ -1635,7 +1638,8 @@
 ///
 /// The data protected by the mutex can be accessed through this guard via its
 /// `Deref` implementation.
-</span><span class="attr">#[must_use = <span class="string">&quot;if unused the ReentrantMutex will immediately unlock&quot;</span>]
+</span><span class="attr">#[clippy::has_significant_drop]
+#[must_use = <span class="string">&quot;if unused the ReentrantMutex will immediately unlock&quot;</span>]
 </span><span class="kw">pub struct </span>ReentrantMutexGuard&lt;<span class="lifetime">&#39;a</span>, R: RawMutex, G: GetThreadId, T: <span class="question-mark">?</span>Sized&gt; {
     remutex: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>ReentrantMutex&lt;R, G, T&gt;,
     marker: PhantomData&lt;(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>T, GuardNoSend)&gt;,
@@ -1682,7 +1686,7 @@
     /// in already locked the mutex.
     ///
     /// This is an associated function that needs to be
-    /// used as `ReentrantMutexGuard::map(...)`. A method would interfere with methods of
+    /// used as `ReentrantMutexGuard::try_map(...)`. A method would interfere with methods of
     /// the same name on the contents of the locked data.
     </span><span class="attr">#[inline]
     </span><span class="kw">pub fn </span>try_map&lt;U: <span class="question-mark">?</span>Sized, F&gt;(
@@ -1690,10 +1694,10 @@
         f: F,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;MappedReentrantMutexGuard&lt;<span class="lifetime">&#39;a</span>, R, G, U&gt;, <span class="self">Self</span>&gt;
     <span class="kw">where
-        </span>F: FnOnce(<span class="kw-2">&amp;mut </span>T) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;mut </span>U&gt;,
+        </span>F: FnOnce(<span class="kw-2">&amp;</span>T) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>U&gt;,
     {
         <span class="kw">let </span>raw = <span class="kw-2">&amp;</span>s.remutex.raw;
-        <span class="kw">let </span>data = <span class="kw">match </span>f(<span class="kw">unsafe </span>{ <span class="kw-2">&amp;mut *</span>s.remutex.data.get() }) {
+        <span class="kw">let </span>data = <span class="kw">match </span>f(<span class="kw">unsafe </span>{ <span class="kw-2">&amp;*</span>s.remutex.data.get() }) {
             <span class="prelude-val">Some</span>(data) =&gt; data,
             <span class="prelude-val">None </span>=&gt; <span class="kw">return </span><span class="prelude-val">Err</span>(s),
         };
@@ -1830,6 +1834,7 @@
 /// `Mutex` it uses an `Arc&lt;ReentrantMutex&gt;`. This has several advantages, most notably that it has an `&#39;static`
 /// lifetime.
 </span><span class="attr">#[cfg(feature = <span class="string">&quot;arc_lock&quot;</span>)]
+#[clippy::has_significant_drop]
 #[must_use = <span class="string">&quot;if unused the ReentrantMutex will immediately unlock&quot;</span>]
 </span><span class="kw">pub struct </span>ArcReentrantMutexGuard&lt;R: RawMutex, G: GetThreadId, T: <span class="question-mark">?</span>Sized&gt; {
     remutex: Arc&lt;ReentrantMutex&lt;R, G, T&gt;&gt;,
@@ -1933,7 +1938,8 @@
 /// former doesn&#39;t support temporarily unlocking and re-locking, since that
 /// could introduce soundness issues if the locked object is modified by another
 /// thread.
-</span><span class="attr">#[must_use = <span class="string">&quot;if unused the ReentrantMutex will immediately unlock&quot;</span>]
+</span><span class="attr">#[clippy::has_significant_drop]
+#[must_use = <span class="string">&quot;if unused the ReentrantMutex will immediately unlock&quot;</span>]
 </span><span class="kw">pub struct </span>MappedReentrantMutexGuard&lt;<span class="lifetime">&#39;a</span>, R: RawMutex, G: GetThreadId, T: <span class="question-mark">?</span>Sized&gt; {
     raw: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>RawReentrantMutex&lt;R, G&gt;,
     data: <span class="kw-2">*const </span>T,
@@ -1978,7 +1984,7 @@
     /// in already locked the mutex.
     ///
     /// This is an associated function that needs to be
-    /// used as `MappedReentrantMutexGuard::map(...)`. A method would interfere with methods of
+    /// used as `MappedReentrantMutexGuard::try_map(...)`. A method would interfere with methods of
     /// the same name on the contents of the locked data.
     </span><span class="attr">#[inline]
     </span><span class="kw">pub fn </span>try_map&lt;U: <span class="question-mark">?</span>Sized, F&gt;(

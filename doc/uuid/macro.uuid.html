@@ -20,7 +20,7 @@ error if it cannot properly be parsed.</p>
 <div class="example-wrap compile_fail"><a href="#" class="tooltip" title="This example deliberately fails to compile">ⓘ</a><pre class="rust rust-example-rendered"><code><span class="kw">let </span>uuid = <span class="macro">uuid!</span>(<span class="string">&quot;F9168C5E-ZEB2-4FAA-B6BF-329BF39FA1E4&quot;</span>);</code></pre></div>
 <p>Enable the feature <code>macro-diagnostics</code> to see the error messages below.</p>
 <p>Provides the following compilation error:</p>
-<div class="example-wrap"><pre class="language-txt"><code>error: invalid character: expected an optional prefix of `urn:uuid:` followed by 0123456789abcdefABCDEF-, found Z at 9
+<div class="example-wrap"><pre class="language-txt"><code>error: invalid character: expected an optional prefix of `urn:uuid:` followed by [0-9a-fA-F-], found Z at 9
     |
     |     let id = uuid!(&quot;F9168C5E-ZEB2-4FAA-B6BF-329BF39FA1E4&quot;);
     |                              ^

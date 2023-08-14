@@ -10,8 +10,8 @@ though its <code>serde</code> implementation does not produce or parse subtype 4
 binary values. Instead, when serialized with <code>bson::to_bson</code>, it produces as a string, and when
 serialized with <code>bson::to_vec</code>, it produces a binary value with subtype <em>0</em> rather than 4.
 Because of this, it is highly recommended to use the <a href="../struct.Uuid.html" title="struct bson::Uuid"><code>crate::Uuid</code></a> type when working with BSON
-instead of the <code>uuid</code> crate’s <code>Uuid</code>, since <a href="../struct.Uuid.html" title="struct bson::Uuid"><code>crate::Uuid</code></a> correctly produces subtype 4 binary
-values via either serialization function.</p>
+instead of the <code>uuid</code> crate’s <a href="../struct.Uuid.html" title="struct bson::Uuid"><code>Uuid</code></a>, since <a href="../struct.Uuid.html" title="struct bson::Uuid"><code>crate::Uuid</code></a> correctly produces subtype 4
+binary values via either serialization function.</p>
 <p>e.g.</p>
 
 <div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use </span>serde::{Serialize, Deserialize};
@@ -32,10 +32,10 @@ values via either serialization function.</p>
     </span>uuid_as_bson: uuid::Uuid,
 }</code></pre></div>
 <h3 id="the-uuid-1-feature-flag"><a href="#the-uuid-1-feature-flag">The <code>uuid-1</code> feature flag</a></h3>
-<p>To facilitate the conversion between <a href="../struct.Uuid.html" title="struct bson::Uuid"><code>crate::Uuid</code></a> values and the <code>uuid</code> crate’s <code>Uuid</code>
+<p>To facilitate the conversion between <a href="../struct.Uuid.html" title="struct bson::Uuid"><code>crate::Uuid</code></a> values and the <code>uuid</code> crate’s <a href="../struct.Uuid.html" title="struct bson::Uuid"><code>Uuid</code></a>
 values, the <code>uuid-1</code> feature flag can be enabled. This flag exposes a number of convenient
 conversions, including the <code>crate::Uuid::to_uuid_1</code> method and the <code>From&lt;uuid::Uuid&gt;</code>
-implementation for <code>Bson</code>, which allows the <code>uuid</code> crate’s <code>Uuid</code> values to be used in the
+implementation for <a href="../enum.Bson.html" title="enum bson::Bson"><code>Bson</code></a>, which allows the <code>uuid</code> crate’s <a href="../struct.Uuid.html" title="struct bson::Uuid"><code>Uuid</code></a> values to be used in the
 <code>doc!</code> and <code>bson!</code> macros.</p>
 
 <div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use </span>bson::doc;
@@ -56,10 +56,10 @@ implementation for <code>Bson</code>, which allows the <code>uuid</code> crate�
 API for interoperation with version 0.8 of the <code>uuid</code> crate.</p>
 <h3 id="the-serde_with-feature-flag"><a href="#the-serde_with-feature-flag">The <code>serde_with</code> feature flag</a></h3>
 <p>The <code>serde_with</code> feature can be enabled to support more ergonomic serde attributes for
-(de)serializing <code>uuid::Uuid</code> from/to BSON via the <a href="https://docs.rs/serde_with/1.11.0/serde_with/"><code>serde_with</code></a>
+(de)serializing <a href="../../uuid/struct.Uuid.html" title="struct uuid::Uuid"><code>uuid::Uuid</code></a> from/to BSON via the <a href="https://docs.rs/serde_with/1.11.0/serde_with/"><code>serde_with</code></a>
 crate. The main benefit of this compared to the regular <code>serde_helpers</code> is that <code>serde_with</code> can
-handle nested <code>uuid::Uuid</code> values (e.g. in <code>Option</code>), whereas the former only works on fields
-that are exactly <code>uuid::Uuid</code>.</p>
+handle nested <a href="../../uuid/struct.Uuid.html" title="struct uuid::Uuid"><code>uuid::Uuid</code></a> values (e.g. in <a href="https://doc.rust-lang.org/1.71.0/core/option/enum.Option.html" title="enum core::option::Option"><code>Option</code></a>), whereas the former only works on
+fields that are exactly <a href="../../uuid/struct.Uuid.html" title="struct uuid::Uuid"><code>uuid::Uuid</code></a>.</p>
 
 <div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use </span>serde::{Deserialize, Serialize};
 <span class="kw">use </span>bson::doc;
@@ -67,7 +67,7 @@ that are exactly <code>uuid::Uuid</code>.</p>
 <span class="attr">#[serde_with::serde_as]
 #[derive(Deserialize, Serialize, PartialEq, Debug)]
 </span><span class="kw">struct </span>Foo {
-  <span class="doccomment">/// Serializes as a BSON binary rather than using `uuid::Uuid`&#39;s serialization
+  <span class="doccomment">/// Serializes as a BSON binary rather than using [`uuid::Uuid`]&#39;s serialization
   </span><span class="attr">#[serde_as(<span class="kw">as </span>= <span class="string">&quot;Option&lt;bson::Uuid&gt;&quot;</span>)]
   </span>as_bson: <span class="prelude-ty">Option</span>&lt;uuid::Uuid&gt;,
 }
@@ -82,7 +82,7 @@ that are exactly <code>uuid::Uuid</code>.</p>
 
 <span class="macro">assert_eq!</span>(bson::to_document(<span class="kw-2">&amp;</span>foo)<span class="question-mark">?</span>, expected);</code></pre></div>
 <h3 id="using-crateuuid-with-non-bson-formats"><a href="#using-crateuuid-with-non-bson-formats">Using <code>crate::Uuid</code> with non-BSON formats</a></h3>
-<p><a href="../struct.Uuid.html" title="struct bson::Uuid"><code>crate::Uuid</code></a>’s <code>serde</code> implementation is the same as <code>uuid::Uuid</code>’s
+<p><a href="../struct.Uuid.html" title="struct bson::Uuid"><code>crate::Uuid</code></a>’s <code>serde</code> implementation is the same as <a href="../../uuid/struct.Uuid.html" title="struct uuid::Uuid"><code>uuid::Uuid</code></a>’s
 for non-BSON formats such as JSON:</p>
 
 <div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use </span>serde_json::json;

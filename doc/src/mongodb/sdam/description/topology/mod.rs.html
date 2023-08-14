@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/nix/store/jnqxxv1xi811ni996b002f4jnyz38xck-vendor-cargo-deps/c19b7c6f923b580ac259164a89f2577984ad5ab09ee9d583b888f934adbbe8d0/mongodb-2.3.0/src/sdam/description/topology/mod.rs`."><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../../../static.files/rustdoc-f3501f0f5ae15dfb.css" id="mainThemeStyle"><div id="rustdoc-vars" data-root-path="../../../../../" data-static-root-path="../../../../../static.files/" data-current-crate="mongodb" data-themes="" data-resource-suffix="" data-rustdoc-version="1.71.0 (8ede3aae2 2023-07-12)" data-search-js="search-4926e5fc22a5646a.js" data-settings-js="settings-de11bff964e9d4e5.js" data-settings-css="settings-8c76f75bfb6bd192.css" data-theme-light-css="light-0f8c037637f9eb3e.css" data-theme-dark-css="dark-1097f8e92a01e3cf.css" data-theme-ayu-css="ayu-614652228113ac93.css" ></div><script src="../../../../../static.files/storage-62ce34ea385b278a.js"></script><script defer src="../../../../../static.files/source-script-11255107d0a65077.js"></script><script defer src="../../../../../source-files.js"></script><script defer src="../../../../../static.files/main-f0540c1d82cde29b.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../../../../../static.files/light-0f8c037637f9eb3e.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../../../../../static.files/dark-1097f8e92a01e3cf.css"><link rel="stylesheet" href="../../../../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../../../../mongodb/index.html"><img class="rust-logo" src="../../../../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/nix/store/yf45a1rayffhnidhgyjynpyhr9lqkd09-vendor-cargo-deps/c19b7c6f923b580ac259164a89f2577984ad5ab09ee9d583b888f934adbbe8d0/mongodb-2.6.0/src/sdam/description/topology/mod.rs`."><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../../../static.files/rustdoc-f3501f0f5ae15dfb.css" id="mainThemeStyle"><div id="rustdoc-vars" data-root-path="../../../../../" data-static-root-path="../../../../../static.files/" data-current-crate="mongodb" data-themes="" data-resource-suffix="" data-rustdoc-version="1.71.0 (8ede3aae2 2023-07-12)" data-search-js="search-4926e5fc22a5646a.js" data-settings-js="settings-de11bff964e9d4e5.js" data-settings-css="settings-8c76f75bfb6bd192.css" data-theme-light-css="light-0f8c037637f9eb3e.css" data-theme-dark-css="dark-1097f8e92a01e3cf.css" data-theme-ayu-css="ayu-614652228113ac93.css" ></div><script src="../../../../../static.files/storage-62ce34ea385b278a.js"></script><script defer src="../../../../../static.files/source-script-11255107d0a65077.js"></script><script defer src="../../../../../source-files.js"></script><script defer src="../../../../../static.files/main-f0540c1d82cde29b.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../../../../../static.files/light-0f8c037637f9eb3e.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../../../../../static.files/dark-1097f8e92a01e3cf.css"><link rel="stylesheet" href="../../../../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../../../../mongodb/index.html"><img class="rust-logo" src="../../../../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -782,94 +782,6 @@
 <a href="#782" id="782">782</a>
 <a href="#783" id="783">783</a>
 <a href="#784" id="784">784</a>
-<a href="#785" id="785">785</a>
-<a href="#786" id="786">786</a>
-<a href="#787" id="787">787</a>
-<a href="#788" id="788">788</a>
-<a href="#789" id="789">789</a>
-<a href="#790" id="790">790</a>
-<a href="#791" id="791">791</a>
-<a href="#792" id="792">792</a>
-<a href="#793" id="793">793</a>
-<a href="#794" id="794">794</a>
-<a href="#795" id="795">795</a>
-<a href="#796" id="796">796</a>
-<a href="#797" id="797">797</a>
-<a href="#798" id="798">798</a>
-<a href="#799" id="799">799</a>
-<a href="#800" id="800">800</a>
-<a href="#801" id="801">801</a>
-<a href="#802" id="802">802</a>
-<a href="#803" id="803">803</a>
-<a href="#804" id="804">804</a>
-<a href="#805" id="805">805</a>
-<a href="#806" id="806">806</a>
-<a href="#807" id="807">807</a>
-<a href="#808" id="808">808</a>
-<a href="#809" id="809">809</a>
-<a href="#810" id="810">810</a>
-<a href="#811" id="811">811</a>
-<a href="#812" id="812">812</a>
-<a href="#813" id="813">813</a>
-<a href="#814" id="814">814</a>
-<a href="#815" id="815">815</a>
-<a href="#816" id="816">816</a>
-<a href="#817" id="817">817</a>
-<a href="#818" id="818">818</a>
-<a href="#819" id="819">819</a>
-<a href="#820" id="820">820</a>
-<a href="#821" id="821">821</a>
-<a href="#822" id="822">822</a>
-<a href="#823" id="823">823</a>
-<a href="#824" id="824">824</a>
-<a href="#825" id="825">825</a>
-<a href="#826" id="826">826</a>
-<a href="#827" id="827">827</a>
-<a href="#828" id="828">828</a>
-<a href="#829" id="829">829</a>
-<a href="#830" id="830">830</a>
-<a href="#831" id="831">831</a>
-<a href="#832" id="832">832</a>
-<a href="#833" id="833">833</a>
-<a href="#834" id="834">834</a>
-<a href="#835" id="835">835</a>
-<a href="#836" id="836">836</a>
-<a href="#837" id="837">837</a>
-<a href="#838" id="838">838</a>
-<a href="#839" id="839">839</a>
-<a href="#840" id="840">840</a>
-<a href="#841" id="841">841</a>
-<a href="#842" id="842">842</a>
-<a href="#843" id="843">843</a>
-<a href="#844" id="844">844</a>
-<a href="#845" id="845">845</a>
-<a href="#846" id="846">846</a>
-<a href="#847" id="847">847</a>
-<a href="#848" id="848">848</a>
-<a href="#849" id="849">849</a>
-<a href="#850" id="850">850</a>
-<a href="#851" id="851">851</a>
-<a href="#852" id="852">852</a>
-<a href="#853" id="853">853</a>
-<a href="#854" id="854">854</a>
-<a href="#855" id="855">855</a>
-<a href="#856" id="856">856</a>
-<a href="#857" id="857">857</a>
-<a href="#858" id="858">858</a>
-<a href="#859" id="859">859</a>
-<a href="#860" id="860">860</a>
-<a href="#861" id="861">861</a>
-<a href="#862" id="862">862</a>
-<a href="#863" id="863">863</a>
-<a href="#864" id="864">864</a>
-<a href="#865" id="865">865</a>
-<a href="#866" id="866">866</a>
-<a href="#867" id="867">867</a>
-<a href="#868" id="868">868</a>
-<a href="#869" id="869">869</a>
-<a href="#870" id="870">870</a>
-<a href="#871" id="871">871</a>
-<a href="#872" id="872">872</a>
 </pre></div><pre class="rust"><code><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">mod </span>server_selection;
 <span class="attr">#[cfg(test)]
 </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">mod </span>test;
@@ -885,6 +797,7 @@
     bson::oid::ObjectId,
     client::ClusterTime,
     cmap::Command,
+    error::{Error, <span class="prelude-ty">Result</span>},
     options::{ClientOptions, ServerAddress},
     sdam::{
         description::server::{ServerDescription, ServerType},
@@ -893,8 +806,10 @@
     selection_criteria::{ReadPreference, SelectionCriteria},
 };
 
+<span class="kw">use </span><span class="self">self</span>::server_selection::IDLE_WRITE_PERIOD;
+
 <span class="doccomment">/// The possible types for a topology.
-</span><span class="attr">#[derive(Debug, Clone, Copy, Eq, PartialEq, Deserialize, Serialize)]
+</span><span class="attr">#[derive(Debug, Clone, Copy, Eq, PartialEq, Deserialize, Serialize, derive_more::Display)]
 #[non_exhaustive]
 </span><span class="kw">pub enum </span>TopologyType {
     <span class="doccomment">/// A single mongod server.
@@ -960,10 +875,8 @@
     /// respective supported wire versions.
     </span><span class="kw">pub</span>(<span class="kw">crate</span>) compatibility_error: <span class="prelude-ty">Option</span>&lt;String&gt;,
 
-    <span class="doccomment">/// Whether or not this topology supports sessions, and if so, what the logicalSessionTimeout
-    /// is for them.
-    </span><span class="attr">#[serde(skip)]
-    </span><span class="kw">pub</span>(<span class="kw">crate</span>) session_support_status: SessionSupportStatus,
+    <span class="doccomment">/// The time that a session remains active after its most recent use.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) logical_session_timeout: <span class="prelude-ty">Option</span>&lt;Duration&gt;,
 
     <span class="doccomment">/// Whether or not this topology supports transactions.
     </span><span class="attr">#[serde(skip)]
@@ -997,16 +910,33 @@
     }
 }
 
-<span class="kw">impl </span>TopologyDescription {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>new(options: ClientOptions) -&gt; <span class="kw">crate</span>::error::Result&lt;<span class="self">Self</span>&gt; {
-        verify_max_staleness(
-            options
-                .selection_criteria
-                .as_ref()
-                .and_then(|criteria| criteria.max_staleness()),
-        )<span class="question-mark">?</span>;
+<span class="kw">impl </span>Default <span class="kw">for </span>TopologyDescription {
+    <span class="kw">fn </span>default() -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{
+            single_seed: <span class="bool-val">false</span>,
+            topology_type: TopologyType::Unknown,
+            set_name: Default::default(),
+            max_set_version: Default::default(),
+            max_election_id: Default::default(),
+            compatibility_error: Default::default(),
+            logical_session_timeout: <span class="prelude-val">None</span>,
+            transaction_support_status: TransactionSupportStatus::Undetermined,
+            cluster_time: Default::default(),
+            local_threshold: Default::default(),
+            heartbeat_freq: Default::default(),
+            servers: Default::default(),
+        }
+    }
+}
 
-        <span class="kw">let </span>topology_type = <span class="kw">if let </span><span class="prelude-val">Some</span>(<span class="bool-val">true</span>) = options.direct_connection {
+<span class="kw">impl </span>TopologyDescription {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>initialize(<span class="kw-2">&amp;mut </span><span class="self">self</span>, options: <span class="kw-2">&amp;</span>ClientOptions) {
+        <span class="macro">debug_assert!</span>(
+            <span class="self">self</span>.servers.is_empty() &amp;&amp; <span class="self">self</span>.topology_type == TopologyType::Unknown,
+            <span class="string">&quot;new TopologyDescriptions should start empty&quot;
+        </span>);
+
+        <span class="self">self</span>.topology_type = <span class="kw">if let </span><span class="prelude-val">Some</span>(<span class="bool-val">true</span>) = options.direct_connection {
             TopologyType::Single
         } <span class="kw">else if </span>options.repl_set_name.is_some() {
             TopologyType::ReplicaSetNoPrimary
@@ -1016,56 +946,21 @@
             TopologyType::Unknown
         };
 
-        <span class="kw">let </span>servers: HashMap&lt;<span class="kw">_</span>, <span class="kw">_</span>&gt; = options
-            .hosts
-            .into_iter()
-            .map(|address| (address.clone(), ServerDescription::new(address, <span class="prelude-val">None</span>)))
-            .collect();
-
-        <span class="kw">let </span>session_support_status = <span class="kw">if </span>topology_type == TopologyType::LoadBalanced {
-            SessionSupportStatus::Supported {
-                logical_session_timeout: <span class="prelude-val">None</span>,
-            }
-        } <span class="kw">else </span>{
-            SessionSupportStatus::Undetermined
-        };
-        <span class="kw">let </span>transaction_support_status = <span class="kw">if </span>topology_type == TopologyType::LoadBalanced {
+        <span class="self">self</span>.transaction_support_status = <span class="kw">if </span><span class="self">self</span>.topology_type == TopologyType::LoadBalanced {
             TransactionSupportStatus::Supported
         } <span class="kw">else </span>{
             TransactionSupportStatus::Undetermined
         };
 
-        <span class="prelude-val">Ok</span>(<span class="self">Self </span>{
-            single_seed: servers.len() == <span class="number">1</span>,
-            topology_type,
-            set_name: options.repl_set_name,
-            max_set_version: <span class="prelude-val">None</span>,
-            max_election_id: <span class="prelude-val">None</span>,
-            compatibility_error: <span class="prelude-val">None</span>,
-            session_support_status,
-            transaction_support_status,
-            cluster_time: <span class="prelude-val">None</span>,
-            local_threshold: options.local_threshold,
-            heartbeat_freq: options.heartbeat_freq,
-            servers,
-        })
-    }
-
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>new_empty() -&gt; <span class="self">Self </span>{
-        <span class="self">Self </span>{
-            single_seed: <span class="bool-val">false</span>,
-            topology_type: TopologyType::Unknown,
-            set_name: <span class="prelude-val">None</span>,
-            max_set_version: <span class="prelude-val">None</span>,
-            max_election_id: <span class="prelude-val">None</span>,
-            compatibility_error: <span class="prelude-val">None</span>,
-            session_support_status: SessionSupportStatus::Undetermined,
-            transaction_support_status: TransactionSupportStatus::Undetermined,
-            cluster_time: <span class="prelude-val">None</span>,
-            local_threshold: <span class="prelude-val">None</span>,
-            heartbeat_freq: <span class="prelude-val">None</span>,
-            servers: HashMap::new(),
+        <span class="kw">for </span>address <span class="kw">in </span>options.hosts.iter() {
+            <span class="kw">let </span>description = ServerDescription::new(address.clone());
+            <span class="self">self</span>.servers.insert(address.to_owned(), description);
         }
+
+        <span class="self">self</span>.single_seed = <span class="self">self</span>.servers.len() == <span class="number">1</span>;
+        <span class="self">self</span>.set_name = options.repl_set_name.clone();
+        <span class="self">self</span>.local_threshold = options.local_threshold;
+        <span class="self">self</span>.heartbeat_freq = options.heartbeat_freq;
     }
 
     <span class="doccomment">/// Gets the topology type of the cluster.
@@ -1176,88 +1071,38 @@
         <span class="self">self</span>.compatibility_error.as_ref()
     }
 
-    <span class="doccomment">/// Update the ServerDescription&#39;s round trip time based on the rolling average.
-    </span><span class="kw">fn </span>update_round_trip_time(<span class="kw-2">&amp;</span><span class="self">self</span>, server_description: <span class="kw-2">&amp;mut </span>ServerDescription) {
-        <span class="kw">if let </span><span class="prelude-val">Some</span>(old_rtt) = <span class="self">self
-            </span>.servers
-            .get(<span class="kw-2">&amp;</span>server_description.address)
-            .and_then(|server_desc| server_desc.average_round_trip_time)
-        {
-            <span class="kw">if let </span><span class="prelude-val">Some</span>(new_rtt) = server_description.average_round_trip_time {
-                server_description.average_round_trip_time =
-                    <span class="prelude-val">Some</span>((new_rtt / <span class="number">5</span>) + (old_rtt * <span class="number">4 </span>/ <span class="number">5</span>));
-            }
-        }
-    }
-
     <span class="doccomment">/// Updates the topology&#39;s logical session timeout value based on the server&#39;s value for it.
-    </span><span class="kw">fn </span>update_session_support_status(<span class="kw-2">&amp;mut </span><span class="self">self</span>, server_description: <span class="kw-2">&amp;</span>ServerDescription) {
+    </span><span class="kw">fn </span>update_logical_session_timeout(<span class="kw-2">&amp;mut </span><span class="self">self</span>, server_description: <span class="kw-2">&amp;</span>ServerDescription) {
         <span class="kw">if </span>!server_description.server_type.is_data_bearing() {
-            <span class="kw">if let </span>TopologyType::Single = <span class="self">self</span>.topology_type {
-                <span class="self">self</span>.session_support_status = SessionSupportStatus::Unsupported {
-                    logical_session_timeout: <span class="prelude-val">None</span>,
-                };
-            }
             <span class="kw">return</span>;
         }
-
         <span class="kw">match </span>server_description.logical_session_timeout().ok().flatten() {
-            <span class="prelude-val">Some</span>(timeout) =&gt; <span class="kw">match </span><span class="self">self</span>.session_support_status {
-                SessionSupportStatus::Supported {
-                    logical_session_timeout: topology_timeout,
-                } =&gt; {
-                    <span class="self">self</span>.session_support_status = SessionSupportStatus::Supported {
-                        logical_session_timeout: std::cmp::min(<span class="prelude-val">Some</span>(timeout), topology_timeout),
-                    };
+            <span class="prelude-val">Some</span>(new_timeout) =&gt; <span class="kw">match </span><span class="self">self</span>.logical_session_timeout {
+                <span class="prelude-val">Some</span>(current_timeout) =&gt; {
+                    <span class="self">self</span>.logical_session_timeout =
+                        <span class="prelude-val">Some</span>(std::cmp::min(current_timeout, new_timeout));
                 }
-                SessionSupportStatus::Undetermined =&gt; {
-                    <span class="self">self</span>.session_support_status = SessionSupportStatus::Supported {
-                        logical_session_timeout: <span class="prelude-val">Some</span>(timeout),
-                    }
-                }
-                SessionSupportStatus::Unsupported { .. } =&gt; {
-                    <span class="comment">// Check if the timeout is now reported on all servers, and, if so, assign the
-                    // topology&#39;s timeout to the minimum.
-                    </span><span class="kw">let </span>min_timeout = <span class="self">self
+                <span class="prelude-val">None </span>=&gt; {
+                    <span class="kw">let </span>min_timeout = <span class="self">self
                         </span>.servers
                         .values()
                         .filter(|s| s.server_type.is_data_bearing())
                         .map(|s| s.logical_session_timeout().ok().flatten())
                         .min()
                         .flatten();
-
-                    <span class="kw">match </span>min_timeout {
-                        <span class="prelude-val">Some</span>(timeout) =&gt; {
-                            <span class="self">self</span>.session_support_status = SessionSupportStatus::Supported {
-                                logical_session_timeout: <span class="prelude-val">Some</span>(timeout),
-                            }
-                        }
-                        <span class="prelude-val">None </span>=&gt; {
-                            <span class="self">self</span>.session_support_status = SessionSupportStatus::Unsupported {
-                                logical_session_timeout: <span class="prelude-val">None</span>,
-                            }
-                        }
-                    }
+                    <span class="self">self</span>.logical_session_timeout = min_timeout;
                 }
             },
-            <span class="prelude-val">None </span><span class="kw">if </span>server_description.server_type.is_data_bearing()
-                || <span class="self">self</span>.topology_type == TopologyType::Single =&gt;
-            {
-                <span class="self">self</span>.session_support_status = SessionSupportStatus::Unsupported {
-                    logical_session_timeout: <span class="prelude-val">None</span>,
-                }
-            }
-            <span class="prelude-val">None </span>=&gt; {}
+            <span class="comment">// If any data-bearing server does not have a value for logicalSessionTimeoutMinutes,
+            // the topology&#39;s value should be None.
+            </span><span class="prelude-val">None </span>=&gt; <span class="self">self</span>.logical_session_timeout = <span class="prelude-val">None</span>,
         }
     }
 
     <span class="doccomment">/// Updates the topology&#39;s transaction support status based on its session support status and
     /// the server description&#39;s max wire version.
     </span><span class="kw">fn </span>update_transaction_support_status(<span class="kw-2">&amp;mut </span><span class="self">self</span>, server_description: <span class="kw-2">&amp;</span>ServerDescription) {
-        <span class="kw">if </span>!<span class="macro">matches!</span>(
-            <span class="self">self</span>.session_support_status,
-            SessionSupportStatus::Supported { .. }
-        ) {
+        <span class="kw">if </span><span class="self">self</span>.logical_session_timeout.is_none() {
             <span class="self">self</span>.transaction_support_status = TransactionSupportStatus::Unsupported;
         }
         <span class="kw">if let </span><span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(max_wire_version)) = server_description.max_wire_version() {
@@ -1322,28 +1167,54 @@
         <span class="self">self</span>.servers.retain(|host, <span class="kw">_</span>| hosts.contains(host));
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>session_support_status(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; SessionSupportStatus {
-        <span class="self">self</span>.session_support_status
-    }
-
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>transaction_support_status(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; TransactionSupportStatus {
         <span class="self">self</span>.transaction_support_status
     }
 
     <span class="doccomment">/// Update the topology based on the new information about the topology contained by the
     /// ServerDescription.
-    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>update(
-        <span class="kw-2">&amp;mut </span><span class="self">self</span>,
-        <span class="kw-2">mut </span>server_description: ServerDescription,
-    ) -&gt; <span class="prelude-ty">Result</span>&lt;(), String&gt; {
-        <span class="comment">// Ignore updates from servers not currently in the cluster.
-        </span><span class="kw">if </span>!<span class="self">self</span>.servers.contains_key(<span class="kw-2">&amp;</span>server_description.address) {
-            <span class="kw">return </span><span class="prelude-val">Ok</span>(());
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>update(<span class="kw-2">&amp;mut </span><span class="self">self</span>, <span class="kw-2">mut </span>server_description: ServerDescription) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
+        <span class="kw">match </span><span class="self">self</span>.servers.get(<span class="kw-2">&amp;</span>server_description.address) {
+            <span class="prelude-val">None </span>=&gt; <span class="kw">return </span><span class="prelude-val">Ok</span>(()),
+            <span class="prelude-val">Some</span>(existing_sd) =&gt; {
+                <span class="comment">// Ignore updates from outdated topology versions.
+                </span><span class="kw">if let </span><span class="prelude-val">Some</span>(existing_tv) = existing_sd.topology_version() {
+                    <span class="kw">if let </span><span class="prelude-val">Some</span>(new_tv) = server_description.topology_version() {
+                        <span class="kw">if </span>existing_tv.process_id == new_tv.process_id
+                            &amp;&amp; new_tv.counter &lt; existing_tv.counter
+                        {
+                            <span class="kw">return </span><span class="prelude-val">Ok</span>(());
+                        }
+                    }
+                }
+            }
         }
 
-        <span class="comment">// Update the round trip time on the server description to the weighted average as described
-        // by the spec.
-        </span><span class="self">self</span>.update_round_trip_time(<span class="kw-2">&amp;mut </span>server_description);
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(expected_name) = <span class="kw-2">&amp;</span><span class="self">self</span>.set_name {
+            <span class="kw">if </span>server_description.is_available() {
+                <span class="kw">let </span>got_name = server_description.set_name();
+                <span class="kw">if </span><span class="self">self</span>.topology_type() == TopologyType::Single
+                    &amp;&amp; !<span class="macro">matches!</span>(
+                        got_name.as_ref().map(|opt| opt.as_ref()),
+                        <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(name)) <span class="kw">if </span>name == expected_name
+                    )
+                {
+                    <span class="kw">let </span>got_display = <span class="kw">match </span>got_name {
+                        <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(s)) =&gt; <span class="macro">format!</span>(<span class="string">&quot;{:?}&quot;</span>, s),
+                        <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>) =&gt; <span class="string">&quot;&lt;none&gt;&quot;</span>.to_string(),
+                        <span class="prelude-val">Err</span>(s) =&gt; <span class="macro">format!</span>(<span class="string">&quot;&lt;error: {}&gt;&quot;</span>, s),
+                    };
+                    <span class="comment">// Mark server as unknown.
+                    </span>server_description = ServerDescription::new_from_error(
+                        server_description.address,
+                        Error::invalid_argument(<span class="macro">format!</span>(
+                            <span class="string">&quot;Connection string replicaSet name {:?} does not match actual name {}&quot;</span>,
+                            expected_name, got_display,
+                        )),
+                    );
+                }
+            }
+        }
 
         <span class="comment">// Replace the old info about the server with the new info.
         </span><span class="self">self</span>.servers.insert(
@@ -1358,7 +1229,7 @@
         }
 
         <span class="comment">// Update the topology&#39;s min logicalSessionTimeout.
-        </span><span class="self">self</span>.update_session_support_status(<span class="kw-2">&amp;</span>server_description);
+        </span><span class="self">self</span>.update_logical_session_timeout(<span class="kw-2">&amp;</span>server_description);
 
         <span class="comment">// Update the topology&#39;s transaction support status.
         </span><span class="self">self</span>.update_transaction_support_status(<span class="kw-2">&amp;</span>server_description);
@@ -1388,10 +1259,7 @@
     }
 
     <span class="doccomment">/// Update the Unknown topology description based on the server description.
-    </span><span class="kw">fn </span>update_unknown_topology(
-        <span class="kw-2">&amp;mut </span><span class="self">self</span>,
-        server_description: ServerDescription,
-    ) -&gt; <span class="prelude-ty">Result</span>&lt;(), String&gt; {
+    </span><span class="kw">fn </span>update_unknown_topology(<span class="kw-2">&amp;mut </span><span class="self">self</span>, server_description: ServerDescription) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
         <span class="kw">match </span>server_description.server_type {
             ServerType::Unknown | ServerType::RsGhost =&gt; {}
             ServerType::Standalone =&gt; {
@@ -1407,7 +1275,7 @@
                 <span class="self">self</span>.update_rs_without_primary_server(server_description)<span class="question-mark">?</span>;
             }
             ServerType::LoadBalancer =&gt; {
-                <span class="kw">return </span><span class="prelude-val">Err</span>(<span class="string">&quot;cannot transition to a load balancer&quot;</span>.to_string())
+                <span class="kw">return </span><span class="prelude-val">Err</span>(Error::internal(<span class="string">&quot;cannot transition to a load balancer&quot;</span>))
             }
         }
 
@@ -1428,7 +1296,7 @@
     </span><span class="kw">fn </span>update_replica_set_no_primary_topology(
         <span class="kw-2">&amp;mut </span><span class="self">self</span>,
         server_description: ServerDescription,
-    ) -&gt; <span class="prelude-ty">Result</span>&lt;(), String&gt; {
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
         <span class="kw">match </span>server_description.server_type {
             ServerType::Unknown | ServerType::RsGhost =&gt; {}
             ServerType::Standalone | ServerType::Mongos =&gt; {
@@ -1442,7 +1310,7 @@
                 <span class="self">self</span>.update_rs_without_primary_server(server_description)<span class="question-mark">?</span>;
             }
             ServerType::LoadBalancer =&gt; {
-                <span class="kw">return </span><span class="prelude-val">Err</span>(<span class="string">&quot;cannot transition to a load balancer&quot;</span>.to_string())
+                <span class="kw">return </span><span class="prelude-val">Err</span>(Error::internal(<span class="string">&quot;cannot transition to a load balancer&quot;</span>))
             }
         }
 
@@ -1453,7 +1321,7 @@
     </span><span class="kw">fn </span>update_replica_set_with_primary_topology(
         <span class="kw-2">&amp;mut </span><span class="self">self</span>,
         server_description: ServerDescription,
-    ) -&gt; <span class="prelude-ty">Result</span>&lt;(), String&gt; {
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
         <span class="kw">match </span>server_description.server_type {
             ServerType::Unknown | ServerType::RsGhost =&gt; {
                 <span class="self">self</span>.record_primary_state();
@@ -1467,7 +1335,7 @@
                 <span class="self">self</span>.update_rs_with_primary_from_member(server_description)<span class="question-mark">?</span>;
             }
             ServerType::LoadBalancer =&gt; {
-                <span class="kw">return </span><span class="prelude-val">Err</span>(<span class="string">&quot;cannot transition to a load balancer&quot;</span>.to_string())
+                <span class="kw">return </span><span class="prelude-val">Err</span>(Error::internal(<span class="string">&quot;cannot transition to a load balancer&quot;</span>));
             }
         }
 
@@ -1488,7 +1356,7 @@
     </span><span class="kw">fn </span>update_rs_without_primary_server(
         <span class="kw-2">&amp;mut </span><span class="self">self</span>,
         server_description: ServerDescription,
-    ) -&gt; <span class="prelude-ty">Result</span>&lt;(), String&gt; {
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
         <span class="kw">if </span><span class="self">self</span>.set_name.is_none() {
             <span class="self">self</span>.set_name = server_description.set_name()<span class="question-mark">?</span>;
         } <span class="kw">else if </span><span class="self">self</span>.set_name != server_description.set_name()<span class="question-mark">? </span>{
@@ -1511,7 +1379,7 @@
     </span><span class="kw">fn </span>update_rs_with_primary_from_member(
         <span class="kw-2">&amp;mut </span><span class="self">self</span>,
         server_description: ServerDescription,
-    ) -&gt; <span class="prelude-ty">Result</span>&lt;(), String&gt; {
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
         <span class="kw">if </span><span class="self">self</span>.set_name != server_description.set_name()<span class="question-mark">? </span>{
             <span class="self">self</span>.servers.remove(<span class="kw-2">&amp;</span>server_description.address);
             <span class="self">self</span>.record_primary_state();
@@ -1533,7 +1401,7 @@
     </span><span class="kw">fn </span>update_rs_from_primary_server(
         <span class="kw-2">&amp;mut </span><span class="self">self</span>,
         server_description: ServerDescription,
-    ) -&gt; <span class="prelude-ty">Result</span>&lt;(), String&gt; {
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
         <span class="kw">if </span><span class="self">self</span>.set_name.is_none() {
             <span class="self">self</span>.set_name = server_description.set_name()<span class="question-mark">?</span>;
         } <span class="kw">else if </span><span class="self">self</span>.set_name != server_description.set_name()<span class="question-mark">? </span>{
@@ -1553,7 +1421,7 @@
                         {
                             <span class="self">self</span>.servers.insert(
                                 server_description.address.clone(),
-                                ServerDescription::new(server_description.address, <span class="prelude-val">None</span>),
+                                ServerDescription::new(server_description.address),
                             );
                             <span class="self">self</span>.record_primary_state();
                             <span class="kw">return </span><span class="prelude-val">Ok</span>(());
@@ -1587,7 +1455,7 @@
 
             <span class="kw">if let </span>ServerType::RsPrimary = <span class="self">self</span>.servers.get(<span class="kw-2">&amp;</span>address).unwrap().server_type {
                 <span class="self">self</span>.servers
-                    .insert(address.clone(), ServerDescription::new(address, <span class="prelude-val">None</span>));
+                    .insert(address.clone(), ServerDescription::new(address));
             }
         }
 
@@ -1622,13 +1490,8 @@
     }
 
     <span class="doccomment">/// Create a new ServerDescription for each address and add it to the topology.
-    </span><span class="kw">fn </span>add_new_servers&lt;<span class="lifetime">&#39;a</span>&gt;(
-        <span class="kw-2">&amp;mut </span><span class="self">self</span>,
-        servers: <span class="kw">impl </span>Iterator&lt;Item = <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>String&gt;,
-    ) -&gt; <span class="prelude-ty">Result</span>&lt;(), String&gt; {
-        <span class="kw">let </span>servers: <span class="prelude-ty">Result</span>&lt;Vec&lt;<span class="kw">_</span>&gt;, String&gt; = servers
-            .map(|server| ServerAddress::parse(server).map_err(|e| e.to_string()))
-            .collect();
+    </span><span class="kw">fn </span>add_new_servers&lt;<span class="lifetime">&#39;a</span>&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, servers: <span class="kw">impl </span>Iterator&lt;Item = <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>String&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
+        <span class="kw">let </span>servers: <span class="prelude-ty">Result</span>&lt;Vec&lt;<span class="kw">_</span>&gt;&gt; = servers.map(ServerAddress::parse).collect();
 
         <span class="self">self</span>.add_new_servers_from_addresses(servers<span class="question-mark">?</span>.iter());
         <span class="prelude-val">Ok</span>(())
@@ -1642,52 +1505,8 @@
         <span class="kw">for </span>server <span class="kw">in </span>servers {
             <span class="kw">if </span>!<span class="self">self</span>.servers.contains_key(server) {
                 <span class="self">self</span>.servers
-                    .insert(server.clone(), ServerDescription::new(server.clone(), <span class="prelude-val">None</span>));
+                    .insert(server.clone(), ServerDescription::new(server.clone()));
             }
-        }
-    }
-}
-
-<span class="doccomment">/// Enum representing whether sessions are supported by the topology.
-</span><span class="attr">#[derive(Debug, Clone, Copy, PartialEq)]
-</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">enum </span>SessionSupportStatus {
-    <span class="doccomment">/// It is not known yet whether the topology supports sessions. This is possible if no
-    /// data-bearing servers have updated the `TopologyDescription` yet.
-    </span>Undetermined,
-
-    <span class="doccomment">/// Sessions are not supported by this topology. This is possible if there is a data-bearing
-    /// server in the deployment that does not support sessions.
-    ///
-    /// While standalones do not support sessions, they still do report a logical session timeout,
-    /// so it is stored here if necessary.
-    </span>Unsupported {
-        logical_session_timeout: <span class="prelude-ty">Option</span>&lt;Duration&gt;,
-    },
-
-    <span class="doccomment">/// Sessions are supported by this topology. This is the minimum timeout of all data-bearing
-    /// servers in the deployment.
-    </span>Supported {
-        logical_session_timeout: <span class="prelude-ty">Option</span>&lt;Duration&gt;,
-    },
-}
-
-<span class="kw">impl </span>Default <span class="kw">for </span>SessionSupportStatus {
-    <span class="kw">fn </span>default() -&gt; <span class="self">Self </span>{
-        <span class="self">Self</span>::Undetermined
-    }
-}
-
-<span class="kw">impl </span>SessionSupportStatus {
-    <span class="attr">#[cfg(test)]
-    </span><span class="kw">fn </span>logical_session_timeout(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;Duration&gt; {
-        <span class="kw">match </span><span class="self">self </span>{
-            <span class="self">Self</span>::Undetermined =&gt; <span class="prelude-val">None</span>,
-            <span class="self">Self</span>::Unsupported {
-                logical_session_timeout,
-            } =&gt; <span class="kw-2">*</span>logical_session_timeout,
-            <span class="self">Self</span>::Supported {
-                logical_session_timeout,
-            } =&gt; <span class="kw-2">*</span>logical_session_timeout,
         }
     }
 }
@@ -1727,17 +1546,22 @@
         HashMap&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>ServerAddress, (<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>ServerDescription, <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>ServerDescription)&gt;,
 }
 
-<span class="kw">fn </span>verify_max_staleness(max_staleness: <span class="prelude-ty">Option</span>&lt;Duration&gt;) -&gt; <span class="kw">crate</span>::error::Result&lt;()&gt; {
-    verify_max_staleness_inner(max_staleness)
-        .map_err(|s| <span class="kw">crate</span>::error::ErrorKind::InvalidArgument { message: s }.into())
-}
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>verify_max_staleness(
+    max_staleness: Duration,
+    heartbeat_frequency: Duration,
+) -&gt; <span class="kw">crate</span>::error::Result&lt;()&gt; {
+    <span class="kw">let </span>smallest_max_staleness = std::cmp::max(
+        Duration::from_secs(<span class="number">90</span>),
+        heartbeat_frequency
+            .checked_add(IDLE_WRITE_PERIOD)
+            .unwrap_or(Duration::MAX),
+    );
 
-<span class="kw">fn </span>verify_max_staleness_inner(max_staleness: <span class="prelude-ty">Option</span>&lt;Duration&gt;) -&gt; std::result::Result&lt;(), String&gt; {
-    <span class="kw">if </span>max_staleness
-        .map(|staleness| staleness &gt; Duration::from_secs(<span class="number">0</span>) &amp;&amp; staleness &lt; Duration::from_secs(<span class="number">90</span>))
-        .unwrap_or(<span class="bool-val">false</span>)
-    {
-        <span class="kw">return </span><span class="prelude-val">Err</span>(<span class="string">&quot;max staleness cannot be both positive and below 90 seconds&quot;</span>.into());
+    <span class="kw">if </span>max_staleness &lt; smallest_max_staleness {
+        <span class="kw">return </span><span class="prelude-val">Err</span>(Error::invalid_argument(<span class="macro">format!</span>(
+            <span class="string">&quot;invalid max_staleness value: must be at least {} seconds&quot;</span>,
+            smallest_max_staleness.as_secs()
+        )));
     }
 
     <span class="prelude-val">Ok</span>(())

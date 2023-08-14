@@ -190,6 +190,18 @@
 <a href="#190" id="190">190</a>
 <a href="#191" id="191">191</a>
 <a href="#192" id="192">192</a>
+<a href="#193" id="193">193</a>
+<a href="#194" id="194">194</a>
+<a href="#195" id="195">195</a>
+<a href="#196" id="196">196</a>
+<a href="#197" id="197">197</a>
+<a href="#198" id="198">198</a>
+<a href="#199" id="199">199</a>
+<a href="#200" id="200">200</a>
+<a href="#201" id="201">201</a>
+<a href="#202" id="202">202</a>
+<a href="#203" id="203">203</a>
+<a href="#204" id="204">204</a>
 </pre></div><pre class="rust"><code><span class="kw">use crate</span>::{
     error::into_quaint_error,
     proxy::{<span class="self">self</span>, Proxy, Query},
@@ -199,6 +211,7 @@
 <span class="kw">use </span>psl::datamodel_connector::Flavour;
 <span class="kw">use </span>quaint::{
     connector::IsolationLevel,
+    error::{Error, ErrorKind},
     prelude::{Query <span class="kw">as </span>QuaintQuery, Queryable <span class="kw">as </span>QuaintQueryable, ResultSet, TransactionCapable},
     visitor::{<span class="self">self</span>, Visitor},
     Value,
@@ -323,14 +336,25 @@
 
     <span class="doccomment">/// Sets the transaction isolation level to given value.
     /// Implementers have to make sure that the passed isolation level is valid for the underlying database.
-    </span><span class="kw">async fn </span>set_tx_isolation_level(<span class="kw-2">&amp;</span><span class="self">self</span>, _isolation_level: IsolationLevel) -&gt; quaint::Result&lt;()&gt; {
+    </span><span class="kw">async fn </span>set_tx_isolation_level(<span class="kw-2">&amp;</span><span class="self">self</span>, isolation_level: IsolationLevel) -&gt; quaint::Result&lt;()&gt; {
+        <span class="kw">if </span><span class="macro">matches!</span>(isolation_level, IsolationLevel::Snapshot) {
+            <span class="kw">return </span><span class="prelude-val">Err</span>(Error::builder(ErrorKind::invalid_isolation_level(<span class="kw-2">&amp;</span>isolation_level)).build());
+        }
+
+        <span class="self">self</span>.raw_cmd(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;SET TRANSACTION ISOLATION LEVEL {isolation_level}&quot;</span>))
+            .<span class="kw">await</span><span class="question-mark">?</span>;
+
         <span class="prelude-val">Ok</span>(())
     }
 
     <span class="doccomment">/// Signals if the isolation level SET needs to happen before or after the tx BEGIN.
     </span><span class="kw">fn </span>requires_isolation_first(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
-        <span class="bool-val">false
-    </span>}
+        <span class="kw">match </span><span class="self">self</span>.flavour {
+            Flavour::Mysql =&gt; <span class="bool-val">true</span>,
+            Flavour::Postgres | Flavour::Sqlite =&gt; <span class="bool-val">false</span>,
+            <span class="kw">_ </span>=&gt; <span class="macro">unreachable!</span>(),
+        }
+    }
 }
 
 <span class="kw">impl </span>JsQueryable {

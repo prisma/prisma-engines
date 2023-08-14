@@ -116,7 +116,7 @@ cancellation safe <code>read_line</code>, there are three options:</p>
 <li>Call <a href="trait.AsyncBufReadExt.html#method.read_until" title="method tokio::io::AsyncBufReadExt::read_until"><code>read_until</code></a> with a newline character and manually perform the utf-8 check.</li>
 <li>The stream returned by <a href="trait.AsyncBufReadExt.html#method.lines"><code>lines</code></a> has a cancellation safe
 <a href="struct.Lines.html#method.next_line" title="method tokio::io::Lines::next_line"><code>next_line</code></a> method.</li>
-<li>Use <a href="https://docs.rs/tokio-util/0.6/tokio_util/codec/struct.LinesCodec.html"><code>tokio_util::codec::LinesCodec</code></a>.</li>
+<li>Use <a href="https://docs.rs/tokio-util/latest/tokio_util/codec/struct.LinesCodec.html"><code>tokio_util::codec::LinesCodec</code></a>.</li>
 </ul>
 <h5 id="examples-1"><a href="#examples-1">Examples</a></h5>
 <p><a href="https://doc.rust-lang.org/1.71.0/std/io/cursor/struct.Cursor.html" title="struct std::io::cursor::Cursor"><code>std::io::Cursor</code></a> is a type that implements

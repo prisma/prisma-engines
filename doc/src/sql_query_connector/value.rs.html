@@ -152,14 +152,14 @@
 
         Value::Date(d) =&gt; d
             .map(|d| {
-                <span class="kw">let </span>dt = DateTime::&lt;Utc&gt;::from_utc(d.and_hms(<span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>), Utc);
+                <span class="kw">let </span>dt = DateTime::&lt;Utc&gt;::from_utc(d.and_hms_opt(<span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>).unwrap(), Utc);
                 PrismaValue::DateTime(dt.into())
             })
             .unwrap_or(PrismaValue::Null),
 
         Value::Time(t) =&gt; t
             .map(|t| {
-                <span class="kw">let </span>d = NaiveDate::from_ymd(<span class="number">1970</span>, <span class="number">1</span>, <span class="number">1</span>);
+                <span class="kw">let </span>d = NaiveDate::from_ymd_opt(<span class="number">1970</span>, <span class="number">1</span>, <span class="number">1</span>).unwrap();
                 <span class="kw">let </span>dt = DateTime::&lt;Utc&gt;::from_utc(d.and_time(t), Utc);
                 PrismaValue::DateTime(dt.into())
             })

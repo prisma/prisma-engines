@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"enum":["ServerType","TopologyType"],"mod":["change_stream","error","event","options","results"],"struct":["Client","ClientSession","ClusterTime","Collection","Cursor","Database","IndexModel","Namespace","ServerInfo","SessionCursor","SessionCursorStream"]};
+window.SIDEBAR_ITEMS = {"enum":["ServerType","TopologyType"],"mod":["change_stream","error","event","gridfs","options","results"],"struct":["Client","ClientSession","ClusterTime","Collection","Cursor","Database","IndexModel","Namespace","ServerInfo","SessionCursor","SessionCursorStream"]};

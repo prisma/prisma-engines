@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"fn":["unwrap_or_report"],"mod":["ast","optimizer","parser","validator"]};
+window.SIDEBAR_ITEMS = {"fn":["parse_and_optimize","unwrap_or_report"],"mod":["ast","optimizer","parser","validator"]};

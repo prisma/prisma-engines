@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/nix/store/jnqxxv1xi811ni996b002f4jnyz38xck-vendor-cargo-deps/c19b7c6f923b580ac259164a89f2577984ad5ab09ee9d583b888f934adbbe8d0/addr2line-0.17.0/src/lib.rs`."><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-f3501f0f5ae15dfb.css" id="mainThemeStyle"><div id="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="addr2line" data-themes="" data-resource-suffix="" data-rustdoc-version="1.71.0 (8ede3aae2 2023-07-12)" data-search-js="search-4926e5fc22a5646a.js" data-settings-js="settings-de11bff964e9d4e5.js" data-settings-css="settings-8c76f75bfb6bd192.css" data-theme-light-css="light-0f8c037637f9eb3e.css" data-theme-dark-css="dark-1097f8e92a01e3cf.css" data-theme-ayu-css="ayu-614652228113ac93.css" ></div><script src="../../static.files/storage-62ce34ea385b278a.js"></script><script defer src="../../static.files/source-script-11255107d0a65077.js"></script><script defer src="../../source-files.js"></script><script defer src="../../static.files/main-f0540c1d82cde29b.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../../static.files/light-0f8c037637f9eb3e.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../../static.files/dark-1097f8e92a01e3cf.css"><link rel="stylesheet" href="../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../addr2line/index.html"><img class="rust-logo" src="../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/nix/store/yf45a1rayffhnidhgyjynpyhr9lqkd09-vendor-cargo-deps/c19b7c6f923b580ac259164a89f2577984ad5ab09ee9d583b888f934adbbe8d0/addr2line-0.20.0/src/lib.rs`."><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-f3501f0f5ae15dfb.css" id="mainThemeStyle"><div id="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="addr2line" data-themes="" data-resource-suffix="" data-rustdoc-version="1.71.0 (8ede3aae2 2023-07-12)" data-search-js="search-4926e5fc22a5646a.js" data-settings-js="settings-de11bff964e9d4e5.js" data-settings-css="settings-8c76f75bfb6bd192.css" data-theme-light-css="light-0f8c037637f9eb3e.css" data-theme-dark-css="dark-1097f8e92a01e3cf.css" data-theme-ayu-css="ayu-614652228113ac93.css" ></div><script src="../../static.files/storage-62ce34ea385b278a.js"></script><script defer src="../../static.files/source-script-11255107d0a65077.js"></script><script defer src="../../source-files.js"></script><script defer src="../../static.files/main-f0540c1d82cde29b.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../../static.files/light-0f8c037637f9eb3e.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../../static.files/dark-1097f8e92a01e3cf.css"><link rel="stylesheet" href="../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../addr2line/index.html"><img class="rust-logo" src="../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -1190,6 +1190,543 @@
 <a href="#1190" id="1190">1190</a>
 <a href="#1191" id="1191">1191</a>
 <a href="#1192" id="1192">1192</a>
+<a href="#1193" id="1193">1193</a>
+<a href="#1194" id="1194">1194</a>
+<a href="#1195" id="1195">1195</a>
+<a href="#1196" id="1196">1196</a>
+<a href="#1197" id="1197">1197</a>
+<a href="#1198" id="1198">1198</a>
+<a href="#1199" id="1199">1199</a>
+<a href="#1200" id="1200">1200</a>
+<a href="#1201" id="1201">1201</a>
+<a href="#1202" id="1202">1202</a>
+<a href="#1203" id="1203">1203</a>
+<a href="#1204" id="1204">1204</a>
+<a href="#1205" id="1205">1205</a>
+<a href="#1206" id="1206">1206</a>
+<a href="#1207" id="1207">1207</a>
+<a href="#1208" id="1208">1208</a>
+<a href="#1209" id="1209">1209</a>
+<a href="#1210" id="1210">1210</a>
+<a href="#1211" id="1211">1211</a>
+<a href="#1212" id="1212">1212</a>
+<a href="#1213" id="1213">1213</a>
+<a href="#1214" id="1214">1214</a>
+<a href="#1215" id="1215">1215</a>
+<a href="#1216" id="1216">1216</a>
+<a href="#1217" id="1217">1217</a>
+<a href="#1218" id="1218">1218</a>
+<a href="#1219" id="1219">1219</a>
+<a href="#1220" id="1220">1220</a>
+<a href="#1221" id="1221">1221</a>
+<a href="#1222" id="1222">1222</a>
+<a href="#1223" id="1223">1223</a>
+<a href="#1224" id="1224">1224</a>
+<a href="#1225" id="1225">1225</a>
+<a href="#1226" id="1226">1226</a>
+<a href="#1227" id="1227">1227</a>
+<a href="#1228" id="1228">1228</a>
+<a href="#1229" id="1229">1229</a>
+<a href="#1230" id="1230">1230</a>
+<a href="#1231" id="1231">1231</a>
+<a href="#1232" id="1232">1232</a>
+<a href="#1233" id="1233">1233</a>
+<a href="#1234" id="1234">1234</a>
+<a href="#1235" id="1235">1235</a>
+<a href="#1236" id="1236">1236</a>
+<a href="#1237" id="1237">1237</a>
+<a href="#1238" id="1238">1238</a>
+<a href="#1239" id="1239">1239</a>
+<a href="#1240" id="1240">1240</a>
+<a href="#1241" id="1241">1241</a>
+<a href="#1242" id="1242">1242</a>
+<a href="#1243" id="1243">1243</a>
+<a href="#1244" id="1244">1244</a>
+<a href="#1245" id="1245">1245</a>
+<a href="#1246" id="1246">1246</a>
+<a href="#1247" id="1247">1247</a>
+<a href="#1248" id="1248">1248</a>
+<a href="#1249" id="1249">1249</a>
+<a href="#1250" id="1250">1250</a>
+<a href="#1251" id="1251">1251</a>
+<a href="#1252" id="1252">1252</a>
+<a href="#1253" id="1253">1253</a>
+<a href="#1254" id="1254">1254</a>
+<a href="#1255" id="1255">1255</a>
+<a href="#1256" id="1256">1256</a>
+<a href="#1257" id="1257">1257</a>
+<a href="#1258" id="1258">1258</a>
+<a href="#1259" id="1259">1259</a>
+<a href="#1260" id="1260">1260</a>
+<a href="#1261" id="1261">1261</a>
+<a href="#1262" id="1262">1262</a>
+<a href="#1263" id="1263">1263</a>
+<a href="#1264" id="1264">1264</a>
+<a href="#1265" id="1265">1265</a>
+<a href="#1266" id="1266">1266</a>
+<a href="#1267" id="1267">1267</a>
+<a href="#1268" id="1268">1268</a>
+<a href="#1269" id="1269">1269</a>
+<a href="#1270" id="1270">1270</a>
+<a href="#1271" id="1271">1271</a>
+<a href="#1272" id="1272">1272</a>
+<a href="#1273" id="1273">1273</a>
+<a href="#1274" id="1274">1274</a>
+<a href="#1275" id="1275">1275</a>
+<a href="#1276" id="1276">1276</a>
+<a href="#1277" id="1277">1277</a>
+<a href="#1278" id="1278">1278</a>
+<a href="#1279" id="1279">1279</a>
+<a href="#1280" id="1280">1280</a>
+<a href="#1281" id="1281">1281</a>
+<a href="#1282" id="1282">1282</a>
+<a href="#1283" id="1283">1283</a>
+<a href="#1284" id="1284">1284</a>
+<a href="#1285" id="1285">1285</a>
+<a href="#1286" id="1286">1286</a>
+<a href="#1287" id="1287">1287</a>
+<a href="#1288" id="1288">1288</a>
+<a href="#1289" id="1289">1289</a>
+<a href="#1290" id="1290">1290</a>
+<a href="#1291" id="1291">1291</a>
+<a href="#1292" id="1292">1292</a>
+<a href="#1293" id="1293">1293</a>
+<a href="#1294" id="1294">1294</a>
+<a href="#1295" id="1295">1295</a>
+<a href="#1296" id="1296">1296</a>
+<a href="#1297" id="1297">1297</a>
+<a href="#1298" id="1298">1298</a>
+<a href="#1299" id="1299">1299</a>
+<a href="#1300" id="1300">1300</a>
+<a href="#1301" id="1301">1301</a>
+<a href="#1302" id="1302">1302</a>
+<a href="#1303" id="1303">1303</a>
+<a href="#1304" id="1304">1304</a>
+<a href="#1305" id="1305">1305</a>
+<a href="#1306" id="1306">1306</a>
+<a href="#1307" id="1307">1307</a>
+<a href="#1308" id="1308">1308</a>
+<a href="#1309" id="1309">1309</a>
+<a href="#1310" id="1310">1310</a>
+<a href="#1311" id="1311">1311</a>
+<a href="#1312" id="1312">1312</a>
+<a href="#1313" id="1313">1313</a>
+<a href="#1314" id="1314">1314</a>
+<a href="#1315" id="1315">1315</a>
+<a href="#1316" id="1316">1316</a>
+<a href="#1317" id="1317">1317</a>
+<a href="#1318" id="1318">1318</a>
+<a href="#1319" id="1319">1319</a>
+<a href="#1320" id="1320">1320</a>
+<a href="#1321" id="1321">1321</a>
+<a href="#1322" id="1322">1322</a>
+<a href="#1323" id="1323">1323</a>
+<a href="#1324" id="1324">1324</a>
+<a href="#1325" id="1325">1325</a>
+<a href="#1326" id="1326">1326</a>
+<a href="#1327" id="1327">1327</a>
+<a href="#1328" id="1328">1328</a>
+<a href="#1329" id="1329">1329</a>
+<a href="#1330" id="1330">1330</a>
+<a href="#1331" id="1331">1331</a>
+<a href="#1332" id="1332">1332</a>
+<a href="#1333" id="1333">1333</a>
+<a href="#1334" id="1334">1334</a>
+<a href="#1335" id="1335">1335</a>
+<a href="#1336" id="1336">1336</a>
+<a href="#1337" id="1337">1337</a>
+<a href="#1338" id="1338">1338</a>
+<a href="#1339" id="1339">1339</a>
+<a href="#1340" id="1340">1340</a>
+<a href="#1341" id="1341">1341</a>
+<a href="#1342" id="1342">1342</a>
+<a href="#1343" id="1343">1343</a>
+<a href="#1344" id="1344">1344</a>
+<a href="#1345" id="1345">1345</a>
+<a href="#1346" id="1346">1346</a>
+<a href="#1347" id="1347">1347</a>
+<a href="#1348" id="1348">1348</a>
+<a href="#1349" id="1349">1349</a>
+<a href="#1350" id="1350">1350</a>
+<a href="#1351" id="1351">1351</a>
+<a href="#1352" id="1352">1352</a>
+<a href="#1353" id="1353">1353</a>
+<a href="#1354" id="1354">1354</a>
+<a href="#1355" id="1355">1355</a>
+<a href="#1356" id="1356">1356</a>
+<a href="#1357" id="1357">1357</a>
+<a href="#1358" id="1358">1358</a>
+<a href="#1359" id="1359">1359</a>
+<a href="#1360" id="1360">1360</a>
+<a href="#1361" id="1361">1361</a>
+<a href="#1362" id="1362">1362</a>
+<a href="#1363" id="1363">1363</a>
+<a href="#1364" id="1364">1364</a>
+<a href="#1365" id="1365">1365</a>
+<a href="#1366" id="1366">1366</a>
+<a href="#1367" id="1367">1367</a>
+<a href="#1368" id="1368">1368</a>
+<a href="#1369" id="1369">1369</a>
+<a href="#1370" id="1370">1370</a>
+<a href="#1371" id="1371">1371</a>
+<a href="#1372" id="1372">1372</a>
+<a href="#1373" id="1373">1373</a>
+<a href="#1374" id="1374">1374</a>
+<a href="#1375" id="1375">1375</a>
+<a href="#1376" id="1376">1376</a>
+<a href="#1377" id="1377">1377</a>
+<a href="#1378" id="1378">1378</a>
+<a href="#1379" id="1379">1379</a>
+<a href="#1380" id="1380">1380</a>
+<a href="#1381" id="1381">1381</a>
+<a href="#1382" id="1382">1382</a>
+<a href="#1383" id="1383">1383</a>
+<a href="#1384" id="1384">1384</a>
+<a href="#1385" id="1385">1385</a>
+<a href="#1386" id="1386">1386</a>
+<a href="#1387" id="1387">1387</a>
+<a href="#1388" id="1388">1388</a>
+<a href="#1389" id="1389">1389</a>
+<a href="#1390" id="1390">1390</a>
+<a href="#1391" id="1391">1391</a>
+<a href="#1392" id="1392">1392</a>
+<a href="#1393" id="1393">1393</a>
+<a href="#1394" id="1394">1394</a>
+<a href="#1395" id="1395">1395</a>
+<a href="#1396" id="1396">1396</a>
+<a href="#1397" id="1397">1397</a>
+<a href="#1398" id="1398">1398</a>
+<a href="#1399" id="1399">1399</a>
+<a href="#1400" id="1400">1400</a>
+<a href="#1401" id="1401">1401</a>
+<a href="#1402" id="1402">1402</a>
+<a href="#1403" id="1403">1403</a>
+<a href="#1404" id="1404">1404</a>
+<a href="#1405" id="1405">1405</a>
+<a href="#1406" id="1406">1406</a>
+<a href="#1407" id="1407">1407</a>
+<a href="#1408" id="1408">1408</a>
+<a href="#1409" id="1409">1409</a>
+<a href="#1410" id="1410">1410</a>
+<a href="#1411" id="1411">1411</a>
+<a href="#1412" id="1412">1412</a>
+<a href="#1413" id="1413">1413</a>
+<a href="#1414" id="1414">1414</a>
+<a href="#1415" id="1415">1415</a>
+<a href="#1416" id="1416">1416</a>
+<a href="#1417" id="1417">1417</a>
+<a href="#1418" id="1418">1418</a>
+<a href="#1419" id="1419">1419</a>
+<a href="#1420" id="1420">1420</a>
+<a href="#1421" id="1421">1421</a>
+<a href="#1422" id="1422">1422</a>
+<a href="#1423" id="1423">1423</a>
+<a href="#1424" id="1424">1424</a>
+<a href="#1425" id="1425">1425</a>
+<a href="#1426" id="1426">1426</a>
+<a href="#1427" id="1427">1427</a>
+<a href="#1428" id="1428">1428</a>
+<a href="#1429" id="1429">1429</a>
+<a href="#1430" id="1430">1430</a>
+<a href="#1431" id="1431">1431</a>
+<a href="#1432" id="1432">1432</a>
+<a href="#1433" id="1433">1433</a>
+<a href="#1434" id="1434">1434</a>
+<a href="#1435" id="1435">1435</a>
+<a href="#1436" id="1436">1436</a>
+<a href="#1437" id="1437">1437</a>
+<a href="#1438" id="1438">1438</a>
+<a href="#1439" id="1439">1439</a>
+<a href="#1440" id="1440">1440</a>
+<a href="#1441" id="1441">1441</a>
+<a href="#1442" id="1442">1442</a>
+<a href="#1443" id="1443">1443</a>
+<a href="#1444" id="1444">1444</a>
+<a href="#1445" id="1445">1445</a>
+<a href="#1446" id="1446">1446</a>
+<a href="#1447" id="1447">1447</a>
+<a href="#1448" id="1448">1448</a>
+<a href="#1449" id="1449">1449</a>
+<a href="#1450" id="1450">1450</a>
+<a href="#1451" id="1451">1451</a>
+<a href="#1452" id="1452">1452</a>
+<a href="#1453" id="1453">1453</a>
+<a href="#1454" id="1454">1454</a>
+<a href="#1455" id="1455">1455</a>
+<a href="#1456" id="1456">1456</a>
+<a href="#1457" id="1457">1457</a>
+<a href="#1458" id="1458">1458</a>
+<a href="#1459" id="1459">1459</a>
+<a href="#1460" id="1460">1460</a>
+<a href="#1461" id="1461">1461</a>
+<a href="#1462" id="1462">1462</a>
+<a href="#1463" id="1463">1463</a>
+<a href="#1464" id="1464">1464</a>
+<a href="#1465" id="1465">1465</a>
+<a href="#1466" id="1466">1466</a>
+<a href="#1467" id="1467">1467</a>
+<a href="#1468" id="1468">1468</a>
+<a href="#1469" id="1469">1469</a>
+<a href="#1470" id="1470">1470</a>
+<a href="#1471" id="1471">1471</a>
+<a href="#1472" id="1472">1472</a>
+<a href="#1473" id="1473">1473</a>
+<a href="#1474" id="1474">1474</a>
+<a href="#1475" id="1475">1475</a>
+<a href="#1476" id="1476">1476</a>
+<a href="#1477" id="1477">1477</a>
+<a href="#1478" id="1478">1478</a>
+<a href="#1479" id="1479">1479</a>
+<a href="#1480" id="1480">1480</a>
+<a href="#1481" id="1481">1481</a>
+<a href="#1482" id="1482">1482</a>
+<a href="#1483" id="1483">1483</a>
+<a href="#1484" id="1484">1484</a>
+<a href="#1485" id="1485">1485</a>
+<a href="#1486" id="1486">1486</a>
+<a href="#1487" id="1487">1487</a>
+<a href="#1488" id="1488">1488</a>
+<a href="#1489" id="1489">1489</a>
+<a href="#1490" id="1490">1490</a>
+<a href="#1491" id="1491">1491</a>
+<a href="#1492" id="1492">1492</a>
+<a href="#1493" id="1493">1493</a>
+<a href="#1494" id="1494">1494</a>
+<a href="#1495" id="1495">1495</a>
+<a href="#1496" id="1496">1496</a>
+<a href="#1497" id="1497">1497</a>
+<a href="#1498" id="1498">1498</a>
+<a href="#1499" id="1499">1499</a>
+<a href="#1500" id="1500">1500</a>
+<a href="#1501" id="1501">1501</a>
+<a href="#1502" id="1502">1502</a>
+<a href="#1503" id="1503">1503</a>
+<a href="#1504" id="1504">1504</a>
+<a href="#1505" id="1505">1505</a>
+<a href="#1506" id="1506">1506</a>
+<a href="#1507" id="1507">1507</a>
+<a href="#1508" id="1508">1508</a>
+<a href="#1509" id="1509">1509</a>
+<a href="#1510" id="1510">1510</a>
+<a href="#1511" id="1511">1511</a>
+<a href="#1512" id="1512">1512</a>
+<a href="#1513" id="1513">1513</a>
+<a href="#1514" id="1514">1514</a>
+<a href="#1515" id="1515">1515</a>
+<a href="#1516" id="1516">1516</a>
+<a href="#1517" id="1517">1517</a>
+<a href="#1518" id="1518">1518</a>
+<a href="#1519" id="1519">1519</a>
+<a href="#1520" id="1520">1520</a>
+<a href="#1521" id="1521">1521</a>
+<a href="#1522" id="1522">1522</a>
+<a href="#1523" id="1523">1523</a>
+<a href="#1524" id="1524">1524</a>
+<a href="#1525" id="1525">1525</a>
+<a href="#1526" id="1526">1526</a>
+<a href="#1527" id="1527">1527</a>
+<a href="#1528" id="1528">1528</a>
+<a href="#1529" id="1529">1529</a>
+<a href="#1530" id="1530">1530</a>
+<a href="#1531" id="1531">1531</a>
+<a href="#1532" id="1532">1532</a>
+<a href="#1533" id="1533">1533</a>
+<a href="#1534" id="1534">1534</a>
+<a href="#1535" id="1535">1535</a>
+<a href="#1536" id="1536">1536</a>
+<a href="#1537" id="1537">1537</a>
+<a href="#1538" id="1538">1538</a>
+<a href="#1539" id="1539">1539</a>
+<a href="#1540" id="1540">1540</a>
+<a href="#1541" id="1541">1541</a>
+<a href="#1542" id="1542">1542</a>
+<a href="#1543" id="1543">1543</a>
+<a href="#1544" id="1544">1544</a>
+<a href="#1545" id="1545">1545</a>
+<a href="#1546" id="1546">1546</a>
+<a href="#1547" id="1547">1547</a>
+<a href="#1548" id="1548">1548</a>
+<a href="#1549" id="1549">1549</a>
+<a href="#1550" id="1550">1550</a>
+<a href="#1551" id="1551">1551</a>
+<a href="#1552" id="1552">1552</a>
+<a href="#1553" id="1553">1553</a>
+<a href="#1554" id="1554">1554</a>
+<a href="#1555" id="1555">1555</a>
+<a href="#1556" id="1556">1556</a>
+<a href="#1557" id="1557">1557</a>
+<a href="#1558" id="1558">1558</a>
+<a href="#1559" id="1559">1559</a>
+<a href="#1560" id="1560">1560</a>
+<a href="#1561" id="1561">1561</a>
+<a href="#1562" id="1562">1562</a>
+<a href="#1563" id="1563">1563</a>
+<a href="#1564" id="1564">1564</a>
+<a href="#1565" id="1565">1565</a>
+<a href="#1566" id="1566">1566</a>
+<a href="#1567" id="1567">1567</a>
+<a href="#1568" id="1568">1568</a>
+<a href="#1569" id="1569">1569</a>
+<a href="#1570" id="1570">1570</a>
+<a href="#1571" id="1571">1571</a>
+<a href="#1572" id="1572">1572</a>
+<a href="#1573" id="1573">1573</a>
+<a href="#1574" id="1574">1574</a>
+<a href="#1575" id="1575">1575</a>
+<a href="#1576" id="1576">1576</a>
+<a href="#1577" id="1577">1577</a>
+<a href="#1578" id="1578">1578</a>
+<a href="#1579" id="1579">1579</a>
+<a href="#1580" id="1580">1580</a>
+<a href="#1581" id="1581">1581</a>
+<a href="#1582" id="1582">1582</a>
+<a href="#1583" id="1583">1583</a>
+<a href="#1584" id="1584">1584</a>
+<a href="#1585" id="1585">1585</a>
+<a href="#1586" id="1586">1586</a>
+<a href="#1587" id="1587">1587</a>
+<a href="#1588" id="1588">1588</a>
+<a href="#1589" id="1589">1589</a>
+<a href="#1590" id="1590">1590</a>
+<a href="#1591" id="1591">1591</a>
+<a href="#1592" id="1592">1592</a>
+<a href="#1593" id="1593">1593</a>
+<a href="#1594" id="1594">1594</a>
+<a href="#1595" id="1595">1595</a>
+<a href="#1596" id="1596">1596</a>
+<a href="#1597" id="1597">1597</a>
+<a href="#1598" id="1598">1598</a>
+<a href="#1599" id="1599">1599</a>
+<a href="#1600" id="1600">1600</a>
+<a href="#1601" id="1601">1601</a>
+<a href="#1602" id="1602">1602</a>
+<a href="#1603" id="1603">1603</a>
+<a href="#1604" id="1604">1604</a>
+<a href="#1605" id="1605">1605</a>
+<a href="#1606" id="1606">1606</a>
+<a href="#1607" id="1607">1607</a>
+<a href="#1608" id="1608">1608</a>
+<a href="#1609" id="1609">1609</a>
+<a href="#1610" id="1610">1610</a>
+<a href="#1611" id="1611">1611</a>
+<a href="#1612" id="1612">1612</a>
+<a href="#1613" id="1613">1613</a>
+<a href="#1614" id="1614">1614</a>
+<a href="#1615" id="1615">1615</a>
+<a href="#1616" id="1616">1616</a>
+<a href="#1617" id="1617">1617</a>
+<a href="#1618" id="1618">1618</a>
+<a href="#1619" id="1619">1619</a>
+<a href="#1620" id="1620">1620</a>
+<a href="#1621" id="1621">1621</a>
+<a href="#1622" id="1622">1622</a>
+<a href="#1623" id="1623">1623</a>
+<a href="#1624" id="1624">1624</a>
+<a href="#1625" id="1625">1625</a>
+<a href="#1626" id="1626">1626</a>
+<a href="#1627" id="1627">1627</a>
+<a href="#1628" id="1628">1628</a>
+<a href="#1629" id="1629">1629</a>
+<a href="#1630" id="1630">1630</a>
+<a href="#1631" id="1631">1631</a>
+<a href="#1632" id="1632">1632</a>
+<a href="#1633" id="1633">1633</a>
+<a href="#1634" id="1634">1634</a>
+<a href="#1635" id="1635">1635</a>
+<a href="#1636" id="1636">1636</a>
+<a href="#1637" id="1637">1637</a>
+<a href="#1638" id="1638">1638</a>
+<a href="#1639" id="1639">1639</a>
+<a href="#1640" id="1640">1640</a>
+<a href="#1641" id="1641">1641</a>
+<a href="#1642" id="1642">1642</a>
+<a href="#1643" id="1643">1643</a>
+<a href="#1644" id="1644">1644</a>
+<a href="#1645" id="1645">1645</a>
+<a href="#1646" id="1646">1646</a>
+<a href="#1647" id="1647">1647</a>
+<a href="#1648" id="1648">1648</a>
+<a href="#1649" id="1649">1649</a>
+<a href="#1650" id="1650">1650</a>
+<a href="#1651" id="1651">1651</a>
+<a href="#1652" id="1652">1652</a>
+<a href="#1653" id="1653">1653</a>
+<a href="#1654" id="1654">1654</a>
+<a href="#1655" id="1655">1655</a>
+<a href="#1656" id="1656">1656</a>
+<a href="#1657" id="1657">1657</a>
+<a href="#1658" id="1658">1658</a>
+<a href="#1659" id="1659">1659</a>
+<a href="#1660" id="1660">1660</a>
+<a href="#1661" id="1661">1661</a>
+<a href="#1662" id="1662">1662</a>
+<a href="#1663" id="1663">1663</a>
+<a href="#1664" id="1664">1664</a>
+<a href="#1665" id="1665">1665</a>
+<a href="#1666" id="1666">1666</a>
+<a href="#1667" id="1667">1667</a>
+<a href="#1668" id="1668">1668</a>
+<a href="#1669" id="1669">1669</a>
+<a href="#1670" id="1670">1670</a>
+<a href="#1671" id="1671">1671</a>
+<a href="#1672" id="1672">1672</a>
+<a href="#1673" id="1673">1673</a>
+<a href="#1674" id="1674">1674</a>
+<a href="#1675" id="1675">1675</a>
+<a href="#1676" id="1676">1676</a>
+<a href="#1677" id="1677">1677</a>
+<a href="#1678" id="1678">1678</a>
+<a href="#1679" id="1679">1679</a>
+<a href="#1680" id="1680">1680</a>
+<a href="#1681" id="1681">1681</a>
+<a href="#1682" id="1682">1682</a>
+<a href="#1683" id="1683">1683</a>
+<a href="#1684" id="1684">1684</a>
+<a href="#1685" id="1685">1685</a>
+<a href="#1686" id="1686">1686</a>
+<a href="#1687" id="1687">1687</a>
+<a href="#1688" id="1688">1688</a>
+<a href="#1689" id="1689">1689</a>
+<a href="#1690" id="1690">1690</a>
+<a href="#1691" id="1691">1691</a>
+<a href="#1692" id="1692">1692</a>
+<a href="#1693" id="1693">1693</a>
+<a href="#1694" id="1694">1694</a>
+<a href="#1695" id="1695">1695</a>
+<a href="#1696" id="1696">1696</a>
+<a href="#1697" id="1697">1697</a>
+<a href="#1698" id="1698">1698</a>
+<a href="#1699" id="1699">1699</a>
+<a href="#1700" id="1700">1700</a>
+<a href="#1701" id="1701">1701</a>
+<a href="#1702" id="1702">1702</a>
+<a href="#1703" id="1703">1703</a>
+<a href="#1704" id="1704">1704</a>
+<a href="#1705" id="1705">1705</a>
+<a href="#1706" id="1706">1706</a>
+<a href="#1707" id="1707">1707</a>
+<a href="#1708" id="1708">1708</a>
+<a href="#1709" id="1709">1709</a>
+<a href="#1710" id="1710">1710</a>
+<a href="#1711" id="1711">1711</a>
+<a href="#1712" id="1712">1712</a>
+<a href="#1713" id="1713">1713</a>
+<a href="#1714" id="1714">1714</a>
+<a href="#1715" id="1715">1715</a>
+<a href="#1716" id="1716">1716</a>
+<a href="#1717" id="1717">1717</a>
+<a href="#1718" id="1718">1718</a>
+<a href="#1719" id="1719">1719</a>
+<a href="#1720" id="1720">1720</a>
+<a href="#1721" id="1721">1721</a>
+<a href="#1722" id="1722">1722</a>
+<a href="#1723" id="1723">1723</a>
+<a href="#1724" id="1724">1724</a>
+<a href="#1725" id="1725">1725</a>
+<a href="#1726" id="1726">1726</a>
+<a href="#1727" id="1727">1727</a>
+<a href="#1728" id="1728">1728</a>
+<a href="#1729" id="1729">1729</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! This crate provides a cross-platform library and binary for translating addresses into
 //! function names, file names and line numbers. Given an address in an executable or an
 //! offset in a section of a relocatable object, it uses the debugging information to
@@ -1217,19 +1754,18 @@
 </span><span class="attr">#![deny(missing_docs)]
 #![no_std]
 
-#[allow(unused_imports)]
+#[cfg(feature = <span class="string">&quot;std&quot;</span>)]
+</span><span class="kw">extern crate </span>std;
+
+<span class="attr">#[allow(unused_imports)]
 #[macro_use]
 </span><span class="kw">extern crate </span>alloc;
 
-<span class="attr">#[cfg(feature = <span class="string">&quot;cpp_demangle&quot;</span>)]
-</span><span class="kw">extern crate </span>cpp_demangle;
 <span class="attr">#[cfg(feature = <span class="string">&quot;fallible-iterator&quot;</span>)]
 </span><span class="kw">pub extern crate </span>fallible_iterator;
 <span class="kw">pub extern crate </span>gimli;
 <span class="attr">#[cfg(feature = <span class="string">&quot;object&quot;</span>)]
 </span><span class="kw">pub extern crate </span>object;
-<span class="attr">#[cfg(feature = <span class="string">&quot;rustc-demangle&quot;</span>)]
-</span><span class="kw">extern crate </span>rustc_demangle;
 
 <span class="kw">use </span>alloc::borrow::Cow;
 <span class="kw">use </span>alloc::boxed::Box;
@@ -1241,8 +1777,10 @@
 
 <span class="kw">use </span>core::cmp::{<span class="self">self</span>, Ordering};
 <span class="kw">use </span>core::iter;
+<span class="kw">use </span>core::marker::PhantomData;
 <span class="kw">use </span>core::mem;
 <span class="kw">use </span>core::num::NonZeroU64;
+<span class="kw">use </span>core::ops::ControlFlow;
 <span class="kw">use </span>core::u64;
 
 <span class="kw">use </span><span class="kw">crate</span>::function::{Function, Functions, InlinedFunction};
@@ -1259,17 +1797,124 @@
     <span class="kw">pub type </span>IntoIter&lt;T&gt; = alloc::vec::IntoIter&lt;T&gt;;
 }
 
+<span class="attr">#[cfg(all(feature = <span class="string">&quot;std&quot;</span>, feature = <span class="string">&quot;object&quot;</span>, feature = <span class="string">&quot;memmap2&quot;</span>))]
+</span><span class="doccomment">/// A simple builtin split DWARF loader.
+</span><span class="kw">pub mod </span>builtin_split_dwarf_loader;
 <span class="kw">mod </span>function;
 <span class="kw">mod </span>lazy;
 
 <span class="kw">type </span>Error = gimli::Error;
+
+<span class="attr">#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+</span><span class="kw">enum </span>DebugFile {
+    Primary,
+    Supplementary,
+    Dwo,
+}
+
+<span class="doccomment">/// Operations that consult debug information may require additional files
+/// to be loaded if split DWARF is being used. This enum returns the result
+/// of the operation in the `Break` variant, or information about the split
+/// DWARF that is required and a continuation to invoke once it is available
+/// in the `Continue` variant.
+///
+/// This enum is intended to be used in a loop like so:
+/// ```no_run
+///   # use addr2line::*;
+///   # use std::sync::Arc;
+///   # let ctx: Context&lt;gimli::EndianRcSlice&lt;gimli::RunTimeEndian&gt;&gt; = todo!();
+///   # let do_split_dwarf_load = |load: SplitDwarfLoad&lt;gimli::EndianRcSlice&lt;gimli::RunTimeEndian&gt;&gt;| -&gt; Option&lt;Arc&lt;gimli::Dwarf&lt;gimli::EndianRcSlice&lt;gimli::RunTimeEndian&gt;&gt;&gt;&gt; { None };
+///   const ADDRESS: u64 = 0xdeadbeef;
+///   let mut r = ctx.find_frames(ADDRESS);
+///   let result = loop {
+///     match r {
+///       LookupResult::Output(result) =&gt; break result,
+///       LookupResult::Load { load, continuation } =&gt; {
+///         let dwo = do_split_dwarf_load(load);
+///         r = continuation.resume(dwo);
+///       }
+///     }
+///   };
+/// ```
+</span><span class="kw">pub enum </span>LookupResult&lt;L: LookupContinuation&gt; {
+    <span class="doccomment">/// The lookup requires split DWARF data to be loaded.
+    </span>Load {
+        <span class="doccomment">/// The information needed to find the split DWARF data.
+        </span>load: SplitDwarfLoad&lt;&lt;L <span class="kw">as </span>LookupContinuation&gt;::Buf&gt;,
+        <span class="doccomment">/// The continuation to resume with the loaded split DWARF data.
+        </span>continuation: L,
+    },
+    <span class="doccomment">/// The lookup has completed and produced an output.
+    </span>Output(&lt;L <span class="kw">as </span>LookupContinuation&gt;::Output),
+}
+
+<span class="doccomment">/// This trait represents a partially complete operation that can be resumed
+/// once a load of needed split DWARF data is completed or abandoned by the
+/// API consumer.
+</span><span class="kw">pub trait </span>LookupContinuation: Sized {
+    <span class="doccomment">/// The final output of this operation.
+    </span><span class="kw">type </span>Output;
+    <span class="doccomment">/// The type of reader used.
+    </span><span class="kw">type </span>Buf: gimli::Reader;
+
+    <span class="doccomment">/// Resumes the operation with the provided data.
+    ///
+    /// After the caller loads the split DWARF data required, call this
+    /// method to resume the operation. The return value of this method
+    /// indicates if the computation has completed or if further data is
+    /// required.
+    ///
+    /// If the additional data cannot be located, or the caller does not
+    /// support split DWARF, `resume(None)` can be used to continue the
+    /// operation with the data that is available.
+    </span><span class="kw">fn </span>resume(<span class="self">self</span>, input: <span class="prelude-ty">Option</span>&lt;Arc&lt;gimli::Dwarf&lt;<span class="self">Self</span>::Buf&gt;&gt;&gt;) -&gt; LookupResult&lt;<span class="self">Self</span>&gt;;
+}
+
+<span class="kw">impl</span>&lt;L: LookupContinuation&gt; LookupResult&lt;L&gt; {
+    <span class="doccomment">/// Callers that do not handle split DWARF can call `skip_all_loads`
+    /// to fast-forward to the end result. This result is produced with
+    /// the data that is available and may be less accurate than the
+    /// the results that would be produced if the caller did properly
+    /// support split DWARF.
+    </span><span class="kw">pub fn </span>skip_all_loads(<span class="kw-2">mut </span><span class="self">self</span>) -&gt; L::Output {
+        <span class="kw">loop </span>{
+            <span class="self">self </span>= <span class="kw">match </span><span class="self">self </span>{
+                LookupResult::Output(t) =&gt; <span class="kw">return </span>t,
+                LookupResult::Load { continuation, .. } =&gt; continuation.resume(<span class="prelude-val">None</span>),
+            };
+        }
+    }
+
+    <span class="kw">fn </span>map&lt;T, F: FnOnce(L::Output) -&gt; T&gt;(<span class="self">self</span>, f: F) -&gt; LookupResult&lt;MappedLookup&lt;T, L, F&gt;&gt; {
+        <span class="kw">match </span><span class="self">self </span>{
+            LookupResult::Output(t) =&gt; LookupResult::Output(f(t)),
+            LookupResult::Load { load, continuation } =&gt; LookupResult::Load {
+                load,
+                continuation: MappedLookup {
+                    original: continuation,
+                    mutator: f,
+                },
+            },
+        }
+    }
+
+    <span class="kw">fn </span>unwrap(<span class="self">self</span>) -&gt; L::Output {
+        <span class="kw">match </span><span class="self">self </span>{
+            LookupResult::Output(t) =&gt; t,
+            LookupResult::Load { .. } =&gt; <span class="macro">unreachable!</span>(<span class="string">&quot;Internal API misuse&quot;</span>),
+        }
+    }
+}
 
 <span class="doccomment">/// The state necessary to perform address to line translation.
 ///
 /// Constructing a `Context` is somewhat costly, so users should aim to reuse `Context`s
 /// when performing lookups for many addresses in the same executable.
 </span><span class="kw">pub struct </span>Context&lt;R: gimli::Reader&gt; {
-    dwarf: ResDwarf&lt;R&gt;,
+    sections: Arc&lt;gimli::Dwarf&lt;R&gt;&gt;,
+    unit_ranges: Vec&lt;UnitRange&gt;,
+    units: Vec&lt;ResUnit&lt;R&gt;&gt;,
+    sup_units: Vec&lt;SupUnit&lt;R&gt;&gt;,
 }
 
 <span class="doccomment">/// The type of `Context` that supports the `new` method.
@@ -1301,7 +1946,7 @@
     /// This means it is not thread safe, has no lifetime constraints (since it copies
     /// the input data), and works for any endianity.
     ///
-    /// Performance sensitive applications may want to use `Context::from_dwarf_with_sup`
+    /// Performance sensitive applications may want to use `Context::from_dwarf`
     /// with a more specialised `gimli::Reader` implementation.
     </span><span class="kw">pub fn </span>new_with_sup&lt;<span class="lifetime">&#39;data</span>: <span class="lifetime">&#39;file</span>, <span class="lifetime">&#39;file</span>, O: object::Object&lt;<span class="lifetime">&#39;data</span>, <span class="lifetime">&#39;file</span>&gt;&gt;(
         file: <span class="kw-2">&amp;</span><span class="lifetime">&#39;file </span>O,
@@ -1368,28 +2013,31 @@
             debug_types: default_section.clone().into(),
             locations: gimli::LocationLists::new(
                 default_section.clone().into(),
-                default_section.clone().into(),
+                default_section.into(),
             ),
             ranges: gimli::RangeLists::new(debug_ranges, debug_rnglists),
             file_type: gimli::DwarfFileType::Main,
             sup: <span class="prelude-val">None</span>,
+            abbreviations_cache: gimli::AbbreviationsCache::new(),
         })
     }
 
     <span class="doccomment">/// Construct a new `Context` from an existing [`gimli::Dwarf`] object.
     </span><span class="attr">#[inline]
-    </span><span class="kw">pub fn </span>from_dwarf(sections: gimli::Dwarf&lt;R&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, Error&gt; {
-        <span class="kw">let </span><span class="kw-2">mut </span>dwarf = ResDwarf::parse(Arc::new(sections))<span class="question-mark">?</span>;
-        dwarf.sup = <span class="kw">match </span>dwarf.sections.sup.clone() {
-            <span class="prelude-val">Some</span>(sup_sections) =&gt; <span class="prelude-val">Some</span>(Box::new(ResDwarf::parse(sup_sections)<span class="question-mark">?</span>)),
-            <span class="prelude-val">None </span>=&gt; <span class="prelude-val">None</span>,
+    </span><span class="kw">pub fn </span>from_dwarf(sections: gimli::Dwarf&lt;R&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;Context&lt;R&gt;, Error&gt; {
+        <span class="kw">let </span>sections = Arc::new(sections);
+        <span class="kw">let </span>(unit_ranges, units) = Context::parse_units(<span class="kw-2">&amp;</span>sections)<span class="question-mark">?</span>;
+        <span class="kw">let </span>sup_units = <span class="kw">if let </span><span class="prelude-val">Some</span>(sup) = sections.sup.as_ref() {
+            Context::parse_sup(sup)<span class="question-mark">?
+        </span>} <span class="kw">else </span>{
+            Vec::new()
         };
-        <span class="prelude-val">Ok</span>(Context { dwarf })
-    }
-
-    <span class="doccomment">/// The dwarf sections associated with this `Context`.
-    </span><span class="kw">pub fn </span>dwarf(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>gimli::Dwarf&lt;R&gt; {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.dwarf.sections
+        <span class="prelude-val">Ok</span>(Context {
+            sections,
+            unit_ranges,
+            units,
+            sup_units,
+        })
     }
 
     <span class="doccomment">/// Finds the CUs for the function address given.
@@ -1420,8 +2068,7 @@
         <span class="comment">// First up find the position in the array which could have our function
         // address.
         </span><span class="kw">let </span>pos = <span class="kw">match </span><span class="self">self
-            </span>.dwarf
-            .unit_ranges
+            </span>.unit_ranges
             .binary_search_by_key(<span class="kw-2">&amp;</span>probe_high, |i| i.range.begin)
         {
             <span class="comment">// Although unlikely, we could find an exact match.
@@ -1435,7 +2082,7 @@
 
         <span class="comment">// Once we have our index we iterate backwards from that position
         // looking for a matching CU.
-        </span><span class="self">self</span>.dwarf.unit_ranges[..pos]
+        </span><span class="self">self</span>.unit_ranges[..pos]
             .iter()
             .rev()
             .take_while(<span class="kw">move </span>|i| {
@@ -1456,25 +2103,51 @@
                 </span><span class="kw">if </span>probe_low &gt;= i.range.end || probe_high &lt;= i.range.begin {
                     <span class="kw">return </span><span class="prelude-val">None</span>;
                 }
-                <span class="prelude-val">Some</span>((<span class="kw-2">&amp;</span><span class="self">self</span>.dwarf.units[i.unit_id], <span class="kw-2">&amp;</span>i.range))
+                <span class="prelude-val">Some</span>((<span class="kw-2">&amp;</span><span class="self">self</span>.units[i.unit_id], <span class="kw-2">&amp;</span>i.range))
             })
     }
 
     <span class="doccomment">/// Find the DWARF unit corresponding to the given virtual memory address.
-    </span><span class="kw">pub fn </span>find_dwarf_unit(<span class="kw-2">&amp;</span><span class="self">self</span>, probe: u64) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>gimli::Unit&lt;R&gt;&gt; {
-        <span class="kw">for </span>unit <span class="kw">in </span><span class="self">self</span>.find_units(probe) {
-            <span class="kw">match </span>unit.find_function_or_location(probe, <span class="kw-2">&amp;</span><span class="self">self</span>.dwarf) {
-                <span class="prelude-val">Ok</span>((<span class="prelude-val">Some</span>(<span class="kw">_</span>), <span class="kw">_</span>)) | <span class="prelude-val">Ok</span>((<span class="kw">_</span>, <span class="prelude-val">Some</span>(<span class="kw">_</span>))) =&gt; <span class="kw">return </span><span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span>unit.dw_unit),
-                <span class="kw">_ </span>=&gt; {}
-            }
+    </span><span class="kw">pub fn </span>find_dwarf_and_unit(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        probe: u64,
+    ) -&gt; LookupResult&lt;
+        <span class="kw">impl </span>LookupContinuation&lt;Output = <span class="prelude-ty">Option</span>&lt;(<span class="kw-2">&amp;</span>gimli::Dwarf&lt;R&gt;, <span class="kw-2">&amp;</span>gimli::Unit&lt;R&gt;)&gt;, Buf = R&gt;,
+    &gt; {
+        <span class="kw">let </span><span class="kw-2">mut </span>units_iter = <span class="self">self</span>.find_units(probe);
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(unit) = units_iter.next() {
+            <span class="kw">return </span>LoopingLookup::new_lookup(
+                unit.find_function_or_location(probe, <span class="self">self</span>),
+                <span class="kw">move </span>|r| {
+                    ControlFlow::Break(<span class="kw">match </span>r {
+                        <span class="prelude-val">Ok</span>((<span class="prelude-val">Some</span>(<span class="kw">_</span>), <span class="kw">_</span>)) | <span class="prelude-val">Ok</span>((<span class="kw">_</span>, <span class="prelude-val">Some</span>(<span class="kw">_</span>))) =&gt; {
+                            <span class="kw">let </span>(_file, sections, unit) = unit
+                                .dwarf_and_unit_dwo(<span class="self">self</span>)
+                                <span class="comment">// We&#39;ve already been through both error cases here to get to this point.
+                                </span>.unwrap()
+                                .unwrap();
+                            <span class="prelude-val">Some</span>((sections, unit))
+                        }
+                        <span class="kw">_ </span>=&gt; <span class="kw">match </span>units_iter.next() {
+                            <span class="prelude-val">Some</span>(next_unit) =&gt; {
+                                <span class="kw">return </span>ControlFlow::Continue(
+                                    next_unit.find_function_or_location(probe, <span class="self">self</span>),
+                                );
+                            }
+                            <span class="prelude-val">None </span>=&gt; <span class="prelude-val">None</span>,
+                        },
+                    })
+                },
+            );
         }
-        <span class="prelude-val">None
-    </span>}
+
+        LoopingLookup::new_complete(<span class="prelude-val">None</span>)
+    }
 
     <span class="doccomment">/// Find the source file and line corresponding to the given virtual memory address.
     </span><span class="kw">pub fn </span>find_location(<span class="kw-2">&amp;</span><span class="self">self</span>, probe: u64) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="prelude-ty">Option</span>&lt;Location&lt;<span class="lifetime">&#39;_</span>&gt;&gt;, Error&gt; {
         <span class="kw">for </span>unit <span class="kw">in </span><span class="self">self</span>.find_units(probe) {
-            <span class="kw">if let </span><span class="prelude-val">Some</span>(location) = unit.find_location(probe, <span class="kw-2">&amp;</span><span class="self">self</span>.dwarf.sections)<span class="question-mark">? </span>{
+            <span class="kw">if let </span><span class="prelude-val">Some</span>(location) = unit.find_location(probe, <span class="kw-2">&amp;</span><span class="self">self</span>.sections)<span class="question-mark">? </span>{
                 <span class="kw">return </span><span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(location));
             }
         }
@@ -1500,33 +2173,95 @@
     /// If the probe address is for an inline function then the first frame corresponds
     /// to the innermost inline function.  Subsequent frames contain the caller and call
     /// location, until an non-inline caller is reached.
-    </span><span class="kw">pub fn </span>find_frames(<span class="kw-2">&amp;</span><span class="self">self</span>, probe: u64) -&gt; <span class="prelude-ty">Result</span>&lt;FrameIter&lt;R&gt;, Error&gt; {
-        <span class="kw">for </span>unit <span class="kw">in </span><span class="self">self</span>.find_units(probe) {
-            <span class="kw">match </span>unit.find_function_or_location(probe, <span class="kw-2">&amp;</span><span class="self">self</span>.dwarf)<span class="question-mark">? </span>{
-                (<span class="prelude-val">Some</span>(function), location) =&gt; {
-                    <span class="kw">let </span>inlined_functions = function.find_inlined_functions(probe);
-                    <span class="kw">return </span><span class="prelude-val">Ok</span>(FrameIter(FrameIterState::Frames(FrameIterFrames {
-                        unit,
-                        sections: <span class="kw-2">&amp;</span><span class="self">self</span>.dwarf.sections,
-                        function,
-                        inlined_functions,
-                        next: location,
-                    })));
-                }
-                (<span class="prelude-val">None</span>, <span class="prelude-val">Some</span>(location)) =&gt; {
-                    <span class="kw">return </span><span class="prelude-val">Ok</span>(FrameIter(FrameIterState::Location(<span class="prelude-val">Some</span>(location))));
-                }
-                <span class="kw">_ </span>=&gt; {}
-            }
+    </span><span class="kw">pub fn </span>find_frames(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        probe: u64,
+    ) -&gt; LookupResult&lt;<span class="kw">impl </span>LookupContinuation&lt;Output = <span class="prelude-ty">Result</span>&lt;FrameIter&lt;<span class="lifetime">&#39;_</span>, R&gt;, Error&gt;, Buf = R&gt;&gt;
+    {
+        <span class="kw">let </span><span class="kw-2">mut </span>units_iter = <span class="self">self</span>.find_units(probe);
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(unit) = units_iter.next() {
+            LoopingLookup::new_lookup(unit.find_function_or_location(probe, <span class="self">self</span>), <span class="kw">move </span>|r| {
+                ControlFlow::Break(<span class="kw">match </span>r {
+                    <span class="prelude-val">Err</span>(e) =&gt; <span class="prelude-val">Err</span>(e),
+                    <span class="prelude-val">Ok</span>((<span class="prelude-val">Some</span>(function), location)) =&gt; {
+                        <span class="kw">let </span>inlined_functions = function.find_inlined_functions(probe);
+                        <span class="prelude-val">Ok</span>(FrameIter(FrameIterState::Frames(FrameIterFrames {
+                            unit,
+                            sections: <span class="kw-2">&amp;</span><span class="self">self</span>.sections,
+                            function,
+                            inlined_functions,
+                            next: location,
+                        })))
+                    }
+                    <span class="prelude-val">Ok</span>((<span class="prelude-val">None</span>, <span class="prelude-val">Some</span>(location))) =&gt; {
+                        <span class="prelude-val">Ok</span>(FrameIter(FrameIterState::Location(<span class="prelude-val">Some</span>(location))))
+                    }
+                    <span class="prelude-val">Ok</span>((<span class="prelude-val">None</span>, <span class="prelude-val">None</span>)) =&gt; <span class="kw">match </span>units_iter.next() {
+                        <span class="prelude-val">Some</span>(next_unit) =&gt; {
+                            <span class="kw">return </span>ControlFlow::Continue(
+                                next_unit.find_function_or_location(probe, <span class="self">self</span>),
+                            );
+                        }
+                        <span class="prelude-val">None </span>=&gt; <span class="prelude-val">Ok</span>(FrameIter(FrameIterState::Empty)),
+                    },
+                })
+            })
+        } <span class="kw">else </span>{
+            LoopingLookup::new_complete(<span class="prelude-val">Ok</span>(FrameIter(FrameIterState::Empty)))
         }
-        <span class="prelude-val">Ok</span>(FrameIter(FrameIterState::Empty))
+    }
+
+    <span class="doccomment">/// Preload units for `probe`.
+    ///
+    /// The iterator returns pairs of `SplitDwarfLoad`s containing the
+    /// information needed to locate and load split DWARF for `probe` and
+    /// a matching callback to invoke once that data is available.
+    ///
+    /// If this method is called, and all of the returned closures are invoked,
+    /// addr2line guarantees that any future API call for the address `probe`
+    /// will not require the loading of any split DWARF.
+    ///
+    /// ```no_run
+    ///   # use addr2line::*;
+    ///   # use std::sync::Arc;
+    ///   # let ctx: Context&lt;gimli::EndianRcSlice&lt;gimli::RunTimeEndian&gt;&gt; = todo!();
+    ///   # let do_split_dwarf_load = |load: SplitDwarfLoad&lt;gimli::EndianRcSlice&lt;gimli::RunTimeEndian&gt;&gt;| -&gt; Option&lt;Arc&lt;gimli::Dwarf&lt;gimli::EndianRcSlice&lt;gimli::RunTimeEndian&gt;&gt;&gt;&gt; { None };
+    ///   const ADDRESS: u64 = 0xdeadbeef;
+    ///   ctx.preload_units(ADDRESS).for_each(|(load, callback)| {
+    ///     let dwo = do_split_dwarf_load(load);
+    ///     callback(dwo);
+    ///   });
+    ///
+    ///   let frames_iter = match ctx.find_frames(ADDRESS) {
+    ///     LookupResult::Output(result) =&gt; result,
+    ///     LookupResult::Load { .. } =&gt; unreachable!(&quot;addr2line promised we wouldn&#39;t get here&quot;),
+    ///   };
+    ///
+    ///   // ...
+    /// ```
+    </span><span class="kw">pub fn </span>preload_units(
+        <span class="kw-2">&amp;</span><span class="lifetime">&#39;_ </span><span class="self">self</span>,
+        probe: u64,
+    ) -&gt; <span class="kw">impl </span>Iterator&lt;
+        Item = (
+            SplitDwarfLoad&lt;R&gt;,
+            <span class="kw">impl </span>FnOnce(<span class="prelude-ty">Option</span>&lt;Arc&lt;gimli::Dwarf&lt;R&gt;&gt;&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;(), gimli::Error&gt; + <span class="lifetime">&#39;_</span>,
+        ),
+    &gt; {
+        <span class="self">self</span>.find_units(probe)
+            .filter_map(<span class="kw">move </span>|unit| <span class="kw">match </span>unit.dwarf_and_unit_dwo(<span class="self">self</span>) {
+                LookupResult::Output(<span class="kw">_</span>) =&gt; <span class="prelude-val">None</span>,
+                LookupResult::Load { load, continuation } =&gt; <span class="prelude-val">Some</span>((load, |result| {
+                    continuation.resume(result).unwrap().map(|<span class="kw">_</span>| ())
+                })),
+            })
     }
 
     <span class="doccomment">/// Initialize all line data structures. This is used for benchmarks.
     </span><span class="attr">#[doc(hidden)]
     </span><span class="kw">pub fn </span>parse_lines(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;(), Error&gt; {
-        <span class="kw">for </span>unit <span class="kw">in </span><span class="kw-2">&amp;</span><span class="self">self</span>.dwarf.units {
-            unit.parse_lines(<span class="kw-2">&amp;</span><span class="self">self</span>.dwarf.sections)<span class="question-mark">?</span>;
+        <span class="kw">for </span>unit <span class="kw">in </span><span class="kw-2">&amp;</span><span class="self">self</span>.units {
+            unit.parse_lines(<span class="kw-2">&amp;</span><span class="self">self</span>.sections)<span class="question-mark">?</span>;
         }
         <span class="prelude-val">Ok</span>(())
     }
@@ -1534,8 +2269,8 @@
     <span class="doccomment">/// Initialize all function data structures. This is used for benchmarks.
     </span><span class="attr">#[doc(hidden)]
     </span><span class="kw">pub fn </span>parse_functions(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;(), Error&gt; {
-        <span class="kw">for </span>unit <span class="kw">in </span><span class="kw-2">&amp;</span><span class="self">self</span>.dwarf.units {
-            unit.parse_functions(<span class="kw-2">&amp;</span><span class="self">self</span>.dwarf)<span class="question-mark">?</span>;
+        <span class="kw">for </span>unit <span class="kw">in </span><span class="kw-2">&amp;</span><span class="self">self</span>.units {
+            unit.parse_functions(<span class="self">self</span>).skip_all_loads()<span class="question-mark">?</span>;
         }
         <span class="prelude-val">Ok</span>(())
     }
@@ -1543,8 +2278,8 @@
     <span class="doccomment">/// Initialize all inlined function data structures. This is used for benchmarks.
     </span><span class="attr">#[doc(hidden)]
     </span><span class="kw">pub fn </span>parse_inlined_functions(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;(), Error&gt; {
-        <span class="kw">for </span>unit <span class="kw">in </span><span class="kw-2">&amp;</span><span class="self">self</span>.dwarf.units {
-            unit.parse_inlined_functions(<span class="kw-2">&amp;</span><span class="self">self</span>.dwarf)<span class="question-mark">?</span>;
+        <span class="kw">for </span>unit <span class="kw">in </span><span class="kw-2">&amp;</span><span class="self">self</span>.units {
+            unit.parse_inlined_functions(<span class="self">self</span>).skip_all_loads()<span class="question-mark">?</span>;
         }
         <span class="prelude-val">Ok</span>(())
     }
@@ -1556,15 +2291,22 @@
     range: gimli::Range,
 }
 
-<span class="kw">struct </span>ResDwarf&lt;R: gimli::Reader&gt; {
-    unit_ranges: Vec&lt;UnitRange&gt;,
-    units: Vec&lt;ResUnit&lt;R&gt;&gt;,
-    sections: Arc&lt;gimli::Dwarf&lt;R&gt;&gt;,
-    sup: <span class="prelude-ty">Option</span>&lt;Box&lt;ResDwarf&lt;R&gt;&gt;&gt;,
+<span class="kw">struct </span>ResUnit&lt;R: gimli::Reader&gt; {
+    offset: gimli::DebugInfoOffset&lt;R::Offset&gt;,
+    dw_unit: gimli::Unit&lt;R&gt;,
+    lang: <span class="prelude-ty">Option</span>&lt;gimli::DwLang&gt;,
+    lines: LazyCell&lt;<span class="prelude-ty">Result</span>&lt;Lines, Error&gt;&gt;,
+    funcs: LazyCell&lt;<span class="prelude-ty">Result</span>&lt;Functions&lt;R&gt;, Error&gt;&gt;,
+    dwo: LazyCell&lt;<span class="prelude-ty">Result</span>&lt;<span class="prelude-ty">Option</span>&lt;Box&lt;(Arc&lt;gimli::Dwarf&lt;R&gt;&gt;, gimli::Unit&lt;R&gt;)&gt;&gt;, Error&gt;&gt;,
 }
 
-<span class="kw">impl</span>&lt;R: gimli::Reader&gt; ResDwarf&lt;R&gt; {
-    <span class="kw">fn </span>parse(sections: Arc&lt;gimli::Dwarf&lt;R&gt;&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, Error&gt; {
+<span class="kw">struct </span>SupUnit&lt;R: gimli::Reader&gt; {
+    offset: gimli::DebugInfoOffset&lt;R::Offset&gt;,
+    dw_unit: gimli::Unit&lt;R&gt;,
+}
+
+<span class="kw">impl</span>&lt;R: gimli::Reader&gt; Context&lt;R&gt; {
+    <span class="kw">fn </span>parse_units(sections: <span class="kw-2">&amp;</span>gimli::Dwarf&lt;R&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;(Vec&lt;UnitRange&gt;, Vec&lt;ResUnit&lt;R&gt;&gt;), Error&gt; {
         <span class="comment">// Find all the references to compilation units in .debug_aranges.
         // Note that we always also iterate through all of .debug_info to
         // find compilation units, because .debug_aranges may be missing some.
@@ -1596,6 +2338,7 @@
             };
 
             <span class="kw">let </span><span class="kw-2">mut </span>lang = <span class="prelude-val">None</span>;
+            <span class="kw">let </span><span class="kw-2">mut </span>have_unit_range = <span class="bool-val">false</span>;
             {
                 <span class="kw">let </span><span class="kw-2">mut </span>entries = dw_unit.entries_raw(<span class="prelude-val">None</span>)<span class="question-mark">?</span>;
 
@@ -1608,13 +2351,18 @@
                 <span class="kw">for </span>spec <span class="kw">in </span>abbrev.attributes() {
                     <span class="kw">let </span>attr = entries.read_attribute(<span class="kw-2">*</span>spec)<span class="question-mark">?</span>;
                     <span class="kw">match </span>attr.name() {
-                        gimli::DW_AT_low_pc =&gt; {
-                            <span class="kw">if let </span>gimli::AttributeValue::Addr(val) = attr.value() {
-                                ranges.low_pc = <span class="prelude-val">Some</span>(val);
+                        gimli::DW_AT_low_pc =&gt; <span class="kw">match </span>attr.value() {
+                            gimli::AttributeValue::Addr(val) =&gt; ranges.low_pc = <span class="prelude-val">Some</span>(val),
+                            gimli::AttributeValue::DebugAddrIndex(index) =&gt; {
+                                ranges.low_pc = <span class="prelude-val">Some</span>(sections.address(<span class="kw-2">&amp;</span>dw_unit, index)<span class="question-mark">?</span>);
                             }
-                        }
+                            <span class="kw">_ </span>=&gt; {}
+                        },
                         gimli::DW_AT_high_pc =&gt; <span class="kw">match </span>attr.value() {
                             gimli::AttributeValue::Addr(val) =&gt; ranges.high_pc = <span class="prelude-val">Some</span>(val),
+                            gimli::AttributeValue::DebugAddrIndex(index) =&gt; {
+                                ranges.high_pc = <span class="prelude-val">Some</span>(sections.address(<span class="kw-2">&amp;</span>dw_unit, index)<span class="question-mark">?</span>);
+                            }
                             gimli::AttributeValue::Udata(val) =&gt; ranges.size = <span class="prelude-val">Some</span>(val),
                             <span class="kw">_ </span>=&gt; {}
                         },
@@ -1664,11 +2412,12 @@
                                     unit_id,
                                     max_end: <span class="number">0</span>,
                                 });
+                                have_unit_range = <span class="bool-val">true</span>;
                             }
                         }
                     }
                 } <span class="kw">else </span>{
-                    ranges.for_each_range(<span class="kw-2">&amp;</span>sections, <span class="kw-2">&amp;</span>dw_unit, |range| {
+                    have_unit_range |= ranges.for_each_range(sections, <span class="kw-2">&amp;</span>dw_unit, |range| {
                         unit_ranges.push(UnitRange {
                             range,
                             unit_id,
@@ -1678,12 +2427,36 @@
                 }
             }
 
+            <span class="kw">let </span>lines = LazyCell::new();
+            <span class="kw">if </span>!have_unit_range {
+                <span class="comment">// The unit did not declare any ranges.
+                // Try to get some ranges from the line program sequences.
+                </span><span class="kw">if let </span><span class="prelude-val">Some</span>(<span class="kw-2">ref </span>ilnp) = dw_unit.line_program {
+                    <span class="kw">if let </span><span class="prelude-val">Ok</span>(lines) = lines
+                        .borrow_with(|| Lines::parse(<span class="kw-2">&amp;</span>dw_unit, ilnp.clone(), sections))
+                        .as_ref()
+                    {
+                        <span class="kw">for </span>sequence <span class="kw">in </span>lines.sequences.iter() {
+                            unit_ranges.push(UnitRange {
+                                range: gimli::Range {
+                                    begin: sequence.start,
+                                    end: sequence.end,
+                                },
+                                unit_id,
+                                max_end: <span class="number">0</span>,
+                            })
+                        }
+                    }
+                }
+            }
+
             res_units.push(ResUnit {
                 offset,
                 dw_unit,
                 lang,
-                lines: LazyCell::new(),
+                lines,
                 funcs: LazyCell::new(),
+                dwo: LazyCell::new(),
             });
         }
 
@@ -1698,29 +2471,171 @@
             i.max_end = max;
         }
 
-        <span class="prelude-val">Ok</span>(ResDwarf {
-            units: res_units,
-            unit_ranges,
-            sections,
-            sup: <span class="prelude-val">None</span>,
-        })
+        <span class="prelude-val">Ok</span>((unit_ranges, res_units))
     }
 
-    <span class="kw">fn </span>find_unit(<span class="kw-2">&amp;</span><span class="self">self</span>, offset: gimli::DebugInfoOffset&lt;R::Offset&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="kw-2">&amp;</span>ResUnit&lt;R&gt;, Error&gt; {
-        <span class="kw">match </span><span class="self">self
-            </span>.units
-            .binary_search_by_key(<span class="kw-2">&amp;</span>offset.<span class="number">0</span>, |unit| unit.offset.<span class="number">0</span>)
-        {
-            <span class="comment">// There is never a DIE at the unit offset or before the first unit.
-            </span><span class="prelude-val">Ok</span>(<span class="kw">_</span>) | <span class="prelude-val">Err</span>(<span class="number">0</span>) =&gt; <span class="prelude-val">Err</span>(gimli::Error::NoEntryAtGivenOffset),
-            <span class="prelude-val">Err</span>(i) =&gt; <span class="prelude-val">Ok</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.units[i - <span class="number">1</span>]),
+    <span class="kw">fn </span>parse_sup(sections: <span class="kw-2">&amp;</span>gimli::Dwarf&lt;R&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;SupUnit&lt;R&gt;&gt;, Error&gt; {
+        <span class="kw">let </span><span class="kw-2">mut </span>sup_units = Vec::new();
+        <span class="kw">let </span><span class="kw-2">mut </span>units = sections.units();
+        <span class="kw">while let </span><span class="prelude-val">Some</span>(header) = units.next()<span class="question-mark">? </span>{
+            <span class="kw">let </span>offset = <span class="kw">match </span>header.offset().as_debug_info_offset() {
+                <span class="prelude-val">Some</span>(offset) =&gt; offset,
+                <span class="prelude-val">None </span>=&gt; <span class="kw">continue</span>,
+            };
+            <span class="kw">let </span>dw_unit = <span class="kw">match </span>sections.unit(header) {
+                <span class="prelude-val">Ok</span>(dw_unit) =&gt; dw_unit,
+                <span class="prelude-val">Err</span>(<span class="kw">_</span>) =&gt; <span class="kw">continue</span>,
+            };
+            sup_units.push(SupUnit { dw_unit, offset });
         }
+        <span class="prelude-val">Ok</span>(sup_units)
+    }
+
+    <span class="comment">// Find the unit containing the given offset, and convert the offset into a unit offset.
+    </span><span class="kw">fn </span>find_unit(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        offset: gimli::DebugInfoOffset&lt;R::Offset&gt;,
+        file: DebugFile,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;(<span class="kw-2">&amp;</span>gimli::Unit&lt;R&gt;, gimli::UnitOffset&lt;R::Offset&gt;), Error&gt; {
+        <span class="kw">let </span>unit = <span class="kw">match </span>file {
+            DebugFile::Primary =&gt; {
+                <span class="kw">match </span><span class="self">self
+                    </span>.units
+                    .binary_search_by_key(<span class="kw-2">&amp;</span>offset.<span class="number">0</span>, |unit| unit.offset.<span class="number">0</span>)
+                {
+                    <span class="comment">// There is never a DIE at the unit offset or before the first unit.
+                    </span><span class="prelude-val">Ok</span>(<span class="kw">_</span>) | <span class="prelude-val">Err</span>(<span class="number">0</span>) =&gt; <span class="kw">return </span><span class="prelude-val">Err</span>(gimli::Error::NoEntryAtGivenOffset),
+                    <span class="prelude-val">Err</span>(i) =&gt; <span class="kw-2">&amp;</span><span class="self">self</span>.units[i - <span class="number">1</span>].dw_unit,
+                }
+            }
+            DebugFile::Supplementary =&gt; {
+                <span class="kw">match </span><span class="self">self
+                    </span>.sup_units
+                    .binary_search_by_key(<span class="kw-2">&amp;</span>offset.<span class="number">0</span>, |unit| unit.offset.<span class="number">0</span>)
+                {
+                    <span class="comment">// There is never a DIE at the unit offset or before the first unit.
+                    </span><span class="prelude-val">Ok</span>(<span class="kw">_</span>) | <span class="prelude-val">Err</span>(<span class="number">0</span>) =&gt; <span class="kw">return </span><span class="prelude-val">Err</span>(gimli::Error::NoEntryAtGivenOffset),
+                    <span class="prelude-val">Err</span>(i) =&gt; <span class="kw-2">&amp;</span><span class="self">self</span>.sup_units[i - <span class="number">1</span>].dw_unit,
+                }
+            }
+            DebugFile::Dwo =&gt; <span class="kw">return </span><span class="prelude-val">Err</span>(gimli::Error::NoEntryAtGivenOffset),
+        };
+
+        <span class="kw">let </span>unit_offset = offset
+            .to_unit_offset(<span class="kw-2">&amp;</span>unit.header)
+            .ok_or(gimli::Error::NoEntryAtGivenOffset)<span class="question-mark">?</span>;
+        <span class="prelude-val">Ok</span>((unit, unit_offset))
     }
 }
 
 <span class="kw">struct </span>Lines {
     files: Box&lt;[String]&gt;,
     sequences: Box&lt;[LineSequence]&gt;,
+}
+
+<span class="kw">impl </span>Lines {
+    <span class="kw">fn </span>parse&lt;R: gimli::Reader&gt;(
+        dw_unit: <span class="kw-2">&amp;</span>gimli::Unit&lt;R&gt;,
+        ilnp: gimli::IncompleteLineProgram&lt;R, R::Offset&gt;,
+        sections: <span class="kw-2">&amp;</span>gimli::Dwarf&lt;R&gt;,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, Error&gt; {
+        <span class="kw">let </span><span class="kw-2">mut </span>sequences = Vec::new();
+        <span class="kw">let </span><span class="kw-2">mut </span>sequence_rows = Vec::&lt;LineRow&gt;::new();
+        <span class="kw">let </span><span class="kw-2">mut </span>rows = ilnp.rows();
+        <span class="kw">while let </span><span class="prelude-val">Some</span>((<span class="kw">_</span>, row)) = rows.next_row()<span class="question-mark">? </span>{
+            <span class="kw">if </span>row.end_sequence() {
+                <span class="kw">if let </span><span class="prelude-val">Some</span>(start) = sequence_rows.first().map(|x| x.address) {
+                    <span class="kw">let </span>end = row.address();
+                    <span class="kw">let </span><span class="kw-2">mut </span>rows = Vec::new();
+                    mem::swap(<span class="kw-2">&amp;mut </span>rows, <span class="kw-2">&amp;mut </span>sequence_rows);
+                    sequences.push(LineSequence {
+                        start,
+                        end,
+                        rows: rows.into_boxed_slice(),
+                    });
+                }
+                <span class="kw">continue</span>;
+            }
+
+            <span class="kw">let </span>address = row.address();
+            <span class="kw">let </span>file_index = row.file_index();
+            <span class="kw">let </span>line = row.line().map(NonZeroU64::get).unwrap_or(<span class="number">0</span>) <span class="kw">as </span>u32;
+            <span class="kw">let </span>column = <span class="kw">match </span>row.column() {
+                gimli::ColumnType::LeftEdge =&gt; <span class="number">0</span>,
+                gimli::ColumnType::Column(x) =&gt; x.get() <span class="kw">as </span>u32,
+            };
+
+            <span class="kw">if let </span><span class="prelude-val">Some</span>(last_row) = sequence_rows.last_mut() {
+                <span class="kw">if </span>last_row.address == address {
+                    last_row.file_index = file_index;
+                    last_row.line = line;
+                    last_row.column = column;
+                    <span class="kw">continue</span>;
+                }
+            }
+
+            sequence_rows.push(LineRow {
+                address,
+                file_index,
+                line,
+                column,
+            });
+        }
+        sequences.sort_by_key(|x| x.start);
+
+        <span class="kw">let </span><span class="kw-2">mut </span>files = Vec::new();
+        <span class="kw">let </span>header = rows.header();
+        <span class="kw">match </span>header.file(<span class="number">0</span>) {
+            <span class="prelude-val">Some</span>(file) =&gt; files.push(render_file(dw_unit, file, header, sections)<span class="question-mark">?</span>),
+            <span class="prelude-val">None </span>=&gt; files.push(String::from(<span class="string">&quot;&quot;</span>)), <span class="comment">// DWARF version &lt;= 4 may not have 0th index
+        </span>}
+        <span class="kw">let </span><span class="kw-2">mut </span>index = <span class="number">1</span>;
+        <span class="kw">while let </span><span class="prelude-val">Some</span>(file) = header.file(index) {
+            files.push(render_file(dw_unit, file, header, sections)<span class="question-mark">?</span>);
+            index += <span class="number">1</span>;
+        }
+
+        <span class="prelude-val">Ok</span>(<span class="self">Self </span>{
+            files: files.into_boxed_slice(),
+            sequences: sequences.into_boxed_slice(),
+        })
+    }
+}
+
+<span class="kw">fn </span>render_file&lt;R: gimli::Reader&gt;(
+    dw_unit: <span class="kw-2">&amp;</span>gimli::Unit&lt;R&gt;,
+    file: <span class="kw-2">&amp;</span>gimli::FileEntry&lt;R, R::Offset&gt;,
+    header: <span class="kw-2">&amp;</span>gimli::LineProgramHeader&lt;R, R::Offset&gt;,
+    sections: <span class="kw-2">&amp;</span>gimli::Dwarf&lt;R&gt;,
+) -&gt; <span class="prelude-ty">Result</span>&lt;String, gimli::Error&gt; {
+    <span class="kw">let </span><span class="kw-2">mut </span>path = <span class="kw">if let </span><span class="prelude-val">Some</span>(<span class="kw-2">ref </span>comp_dir) = dw_unit.comp_dir {
+        comp_dir.to_string_lossy()<span class="question-mark">?</span>.into_owned()
+    } <span class="kw">else </span>{
+        String::new()
+    };
+
+    <span class="comment">// The directory index 0 is defined to correspond to the compilation unit directory.
+    </span><span class="kw">if </span>file.directory_index() != <span class="number">0 </span>{
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(directory) = file.directory(header) {
+            path_push(
+                <span class="kw-2">&amp;mut </span>path,
+                sections
+                    .attr_string(dw_unit, directory)<span class="question-mark">?
+                    </span>.to_string_lossy()<span class="question-mark">?
+                    </span>.as_ref(),
+            );
+        }
+    }
+
+    path_push(
+        <span class="kw-2">&amp;mut </span>path,
+        sections
+            .attr_string(dw_unit, file.path_name())<span class="question-mark">?
+            </span>.to_string_lossy()<span class="question-mark">?
+            </span>.as_ref(),
+    );
+
+    <span class="prelude-val">Ok</span>(path)
 }
 
 <span class="kw">struct </span>LineSequence {
@@ -1736,101 +2651,291 @@
     column: u32,
 }
 
-<span class="kw">struct </span>ResUnit&lt;R: gimli::Reader&gt; {
-    offset: gimli::DebugInfoOffset&lt;R::Offset&gt;,
-    dw_unit: gimli::Unit&lt;R&gt;,
-    lang: <span class="prelude-ty">Option</span>&lt;gimli::DwLang&gt;,
-    lines: LazyCell&lt;<span class="prelude-ty">Result</span>&lt;Lines, Error&gt;&gt;,
-    funcs: LazyCell&lt;<span class="prelude-ty">Result</span>&lt;Functions&lt;R&gt;, Error&gt;&gt;,
+<span class="doccomment">/// This struct contains the information needed to find split DWARF data
+/// and to produce a `gimli::Dwarf&lt;R&gt;` for it.
+</span><span class="kw">pub struct </span>SplitDwarfLoad&lt;R&gt; {
+    <span class="doccomment">/// The dwo id, for looking up in a DWARF package, or for
+    /// verifying an unpacked dwo found on the file system
+    </span><span class="kw">pub </span>dwo_id: gimli::DwoId,
+    <span class="doccomment">/// The compilation directory `path` is relative to.
+    </span><span class="kw">pub </span>comp_dir: <span class="prelude-ty">Option</span>&lt;R&gt;,
+    <span class="doccomment">/// A path on the filesystem, relative to `comp_dir` to find this dwo.
+    </span><span class="kw">pub </span>path: <span class="prelude-ty">Option</span>&lt;R&gt;,
+    <span class="doccomment">/// Once the split DWARF data is loaded, the loader is expected
+    /// to call [make_dwo(parent)](gimli::read::Dwarf::make_dwo) before
+    /// returning the data.
+    </span><span class="kw">pub </span>parent: Arc&lt;gimli::Dwarf&lt;R&gt;&gt;,
+}
+
+<span class="kw">struct </span>SimpleLookup&lt;T, R, F&gt;
+<span class="kw">where
+    </span>F: FnOnce(<span class="prelude-ty">Option</span>&lt;Arc&lt;gimli::Dwarf&lt;R&gt;&gt;&gt;) -&gt; T,
+    R: gimli::Reader,
+{
+    f: F,
+    phantom: PhantomData&lt;(T, R)&gt;,
+}
+
+<span class="kw">impl</span>&lt;T, R, F&gt; SimpleLookup&lt;T, R, F&gt;
+<span class="kw">where
+    </span>F: FnOnce(<span class="prelude-ty">Option</span>&lt;Arc&lt;gimli::Dwarf&lt;R&gt;&gt;&gt;) -&gt; T,
+    R: gimli::Reader,
+{
+    <span class="kw">fn </span>new_complete(t: F::Output) -&gt; LookupResult&lt;SimpleLookup&lt;T, R, F&gt;&gt; {
+        LookupResult::Output(t)
+    }
+
+    <span class="kw">fn </span>new_needs_load(load: SplitDwarfLoad&lt;R&gt;, f: F) -&gt; LookupResult&lt;SimpleLookup&lt;T, R, F&gt;&gt; {
+        LookupResult::Load {
+            load,
+            continuation: SimpleLookup {
+                f,
+                phantom: PhantomData,
+            },
+        }
+    }
+}
+
+<span class="kw">impl</span>&lt;T, R, F&gt; LookupContinuation <span class="kw">for </span>SimpleLookup&lt;T, R, F&gt;
+<span class="kw">where
+    </span>F: FnOnce(<span class="prelude-ty">Option</span>&lt;Arc&lt;gimli::Dwarf&lt;R&gt;&gt;&gt;) -&gt; T,
+    R: gimli::Reader,
+{
+    <span class="kw">type </span>Output = T;
+    <span class="kw">type </span>Buf = R;
+
+    <span class="kw">fn </span>resume(<span class="self">self</span>, v: <span class="prelude-ty">Option</span>&lt;Arc&lt;gimli::Dwarf&lt;<span class="self">Self</span>::Buf&gt;&gt;&gt;) -&gt; LookupResult&lt;<span class="self">Self</span>&gt; {
+        LookupResult::Output((<span class="self">self</span>.f)(v))
+    }
+}
+
+<span class="kw">struct </span>MappedLookup&lt;T, L, F&gt;
+<span class="kw">where
+    </span>L: LookupContinuation,
+    F: FnOnce(L::Output) -&gt; T,
+{
+    original: L,
+    mutator: F,
+}
+
+<span class="kw">impl</span>&lt;T, L, F&gt; LookupContinuation <span class="kw">for </span>MappedLookup&lt;T, L, F&gt;
+<span class="kw">where
+    </span>L: LookupContinuation,
+    F: FnOnce(L::Output) -&gt; T,
+{
+    <span class="kw">type </span>Output = T;
+    <span class="kw">type </span>Buf = L::Buf;
+
+    <span class="kw">fn </span>resume(<span class="self">self</span>, v: <span class="prelude-ty">Option</span>&lt;Arc&lt;gimli::Dwarf&lt;<span class="self">Self</span>::Buf&gt;&gt;&gt;) -&gt; LookupResult&lt;<span class="self">Self</span>&gt; {
+        <span class="kw">match </span><span class="self">self</span>.original.resume(v) {
+            LookupResult::Output(t) =&gt; LookupResult::Output((<span class="self">self</span>.mutator)(t)),
+            LookupResult::Load { load, continuation } =&gt; LookupResult::Load {
+                load,
+                continuation: MappedLookup {
+                    original: continuation,
+                    mutator: <span class="self">self</span>.mutator,
+                },
+            },
+        }
+    }
+}
+
+<span class="doccomment">/// Some functions (e.g. `find_frames`) require considering multiple
+/// compilation units, each of which might require their own split DWARF
+/// lookup (and thus produce a continuation).
+///
+/// We store the underlying continuation here as well as a mutator function
+/// that will either a) decide that the result of this continuation is
+/// what is needed and mutate it to the final result or b) produce another
+/// `LookupResult`. `new_lookup` will in turn eagerly drive any non-continuation
+/// `LookupResult` with successive invocations of the mutator, until a new
+/// continuation or a final result is produced. And finally, the impl of
+/// `LookupContinuation::resume` will call `new_lookup` each time the
+/// computation is resumed.
+</span><span class="kw">struct </span>LoopingLookup&lt;T, L, F&gt;
+<span class="kw">where
+    </span>L: LookupContinuation,
+    F: FnMut(L::Output) -&gt; ControlFlow&lt;T, LookupResult&lt;L&gt;&gt;,
+{
+    continuation: L,
+    mutator: F,
+}
+
+<span class="kw">impl</span>&lt;T, L, F&gt; LoopingLookup&lt;T, L, F&gt;
+<span class="kw">where
+    </span>L: LookupContinuation,
+    F: FnMut(L::Output) -&gt; ControlFlow&lt;T, LookupResult&lt;L&gt;&gt;,
+{
+    <span class="kw">fn </span>new_complete(t: T) -&gt; LookupResult&lt;<span class="self">Self</span>&gt; {
+        LookupResult::Output(t)
+    }
+
+    <span class="kw">fn </span>new_lookup(<span class="kw-2">mut </span>r: LookupResult&lt;L&gt;, <span class="kw-2">mut </span>mutator: F) -&gt; LookupResult&lt;<span class="self">Self</span>&gt; {
+        <span class="comment">// Drive the loop eagerly so that we only ever have to represent one state
+        // (the r == ControlFlow::Continue state) in LoopingLookup.
+        </span><span class="kw">loop </span>{
+            <span class="kw">match </span>r {
+                LookupResult::Output(l) =&gt; <span class="kw">match </span>mutator(l) {
+                    ControlFlow::Break(t) =&gt; <span class="kw">return </span>LookupResult::Output(t),
+                    ControlFlow::Continue(r2) =&gt; {
+                        r = r2;
+                    }
+                },
+                LookupResult::Load { load, continuation } =&gt; {
+                    <span class="kw">return </span>LookupResult::Load {
+                        load,
+                        continuation: LoopingLookup {
+                            continuation,
+                            mutator,
+                        },
+                    };
+                }
+            }
+        }
+    }
+}
+
+<span class="kw">impl</span>&lt;T, L, F&gt; LookupContinuation <span class="kw">for </span>LoopingLookup&lt;T, L, F&gt;
+<span class="kw">where
+    </span>L: LookupContinuation,
+    F: FnMut(L::Output) -&gt; ControlFlow&lt;T, LookupResult&lt;L&gt;&gt;,
+{
+    <span class="kw">type </span>Output = T;
+    <span class="kw">type </span>Buf = L::Buf;
+
+    <span class="kw">fn </span>resume(<span class="self">self</span>, v: <span class="prelude-ty">Option</span>&lt;Arc&lt;gimli::Dwarf&lt;<span class="self">Self</span>::Buf&gt;&gt;&gt;) -&gt; LookupResult&lt;<span class="self">Self</span>&gt; {
+        <span class="kw">let </span>r = <span class="self">self</span>.continuation.resume(v);
+        LoopingLookup::new_lookup(r, <span class="self">self</span>.mutator)
+    }
 }
 
 <span class="kw">impl</span>&lt;R: gimli::Reader&gt; ResUnit&lt;R&gt; {
+    <span class="kw">fn </span>dwarf_and_unit_dwo&lt;<span class="lifetime">&#39;unit</span>, <span class="lifetime">&#39;ctx</span>: <span class="lifetime">&#39;unit</span>&gt;(
+        <span class="kw-2">&amp;</span><span class="lifetime">&#39;unit </span><span class="self">self</span>,
+        ctx: <span class="kw-2">&amp;</span><span class="lifetime">&#39;ctx </span>Context&lt;R&gt;,
+    ) -&gt; LookupResult&lt;
+        SimpleLookup&lt;
+            <span class="prelude-ty">Result</span>&lt;(DebugFile, <span class="kw-2">&amp;</span><span class="lifetime">&#39;unit </span>gimli::Dwarf&lt;R&gt;, <span class="kw-2">&amp;</span><span class="lifetime">&#39;unit </span>gimli::Unit&lt;R&gt;), Error&gt;,
+            R,
+            <span class="kw">impl </span>FnOnce(
+                <span class="prelude-ty">Option</span>&lt;Arc&lt;gimli::Dwarf&lt;R&gt;&gt;&gt;,
+            )
+                -&gt; <span class="prelude-ty">Result</span>&lt;(DebugFile, <span class="kw-2">&amp;</span><span class="lifetime">&#39;unit </span>gimli::Dwarf&lt;R&gt;, <span class="kw-2">&amp;</span><span class="lifetime">&#39;unit </span>gimli::Unit&lt;R&gt;), Error&gt;,
+        &gt;,
+    &gt; {
+        <span class="kw">loop </span>{
+            <span class="kw">break </span>SimpleLookup::new_complete(<span class="kw">match </span><span class="self">self</span>.dwo.borrow() {
+                <span class="prelude-val">Some</span>(<span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(v))) =&gt; <span class="prelude-val">Ok</span>((DebugFile::Dwo, <span class="kw-2">&amp;*</span>v.<span class="number">0</span>, <span class="kw-2">&amp;</span>v.<span class="number">1</span>)),
+                <span class="prelude-val">Some</span>(<span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>)) =&gt; <span class="prelude-val">Ok</span>((DebugFile::Primary, <span class="kw-2">&amp;*</span>ctx.sections, <span class="kw-2">&amp;</span><span class="self">self</span>.dw_unit)),
+                <span class="prelude-val">Some</span>(<span class="prelude-val">Err</span>(e)) =&gt; <span class="prelude-val">Err</span>(<span class="kw-2">*</span>e),
+                <span class="prelude-val">None </span>=&gt; {
+                    <span class="kw">let </span>dwo_id = <span class="kw">match </span><span class="self">self</span>.dw_unit.dwo_id {
+                        <span class="prelude-val">None </span>=&gt; {
+                            <span class="self">self</span>.dwo.borrow_with(|| <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>));
+                            <span class="kw">continue</span>;
+                        }
+                        <span class="prelude-val">Some</span>(dwo_id) =&gt; dwo_id,
+                    };
+
+                    <span class="kw">let </span>comp_dir = <span class="self">self</span>.dw_unit.comp_dir.clone();
+
+                    <span class="kw">let </span>dwo_name = <span class="self">self</span>.dw_unit.dwo_name().and_then(|s| {
+                        <span class="kw">if let </span><span class="prelude-val">Some</span>(s) = s {
+                            <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(ctx.sections.attr_string(<span class="kw-2">&amp;</span><span class="self">self</span>.dw_unit, s)<span class="question-mark">?</span>))
+                        } <span class="kw">else </span>{
+                            <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>)
+                        }
+                    });
+
+                    <span class="kw">let </span>path = <span class="kw">match </span>dwo_name {
+                        <span class="prelude-val">Ok</span>(v) =&gt; v,
+                        <span class="prelude-val">Err</span>(e) =&gt; {
+                            <span class="self">self</span>.dwo.borrow_with(|| <span class="prelude-val">Err</span>(e));
+                            <span class="kw">continue</span>;
+                        }
+                    };
+
+                    <span class="kw">let </span>process_dwo = <span class="kw">move </span>|dwo_dwarf: <span class="prelude-ty">Option</span>&lt;Arc&lt;gimli::Dwarf&lt;R&gt;&gt;&gt;| {
+                        <span class="kw">let </span>dwo_dwarf = <span class="kw">match </span>dwo_dwarf {
+                            <span class="prelude-val">None </span>=&gt; <span class="kw">return </span><span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>),
+                            <span class="prelude-val">Some</span>(dwo_dwarf) =&gt; dwo_dwarf,
+                        };
+                        <span class="kw">let </span><span class="kw-2">mut </span>dwo_units = dwo_dwarf.units();
+                        <span class="kw">let </span>dwo_header = <span class="kw">match </span>dwo_units.next()<span class="question-mark">? </span>{
+                            <span class="prelude-val">Some</span>(dwo_header) =&gt; dwo_header,
+                            <span class="prelude-val">None </span>=&gt; <span class="kw">return </span><span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>),
+                        };
+
+                        <span class="kw">let </span><span class="kw-2">mut </span>dwo_unit = dwo_dwarf.unit(dwo_header)<span class="question-mark">?</span>;
+                        dwo_unit.copy_relocated_attributes(<span class="kw-2">&amp;</span><span class="self">self</span>.dw_unit);
+                        <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(Box::new((dwo_dwarf, dwo_unit))))
+                    };
+
+                    <span class="kw">return </span>SimpleLookup::new_needs_load(
+                        SplitDwarfLoad {
+                            dwo_id,
+                            comp_dir,
+                            path,
+                            parent: ctx.sections.clone(),
+                        },
+                        <span class="kw">move </span>|dwo_dwarf| <span class="kw">match </span><span class="self">self</span>.dwo.borrow_with(|| process_dwo(dwo_dwarf)) {
+                            <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(v)) =&gt; <span class="prelude-val">Ok</span>((DebugFile::Dwo, <span class="kw-2">&amp;*</span>v.<span class="number">0</span>, <span class="kw-2">&amp;</span>v.<span class="number">1</span>)),
+                            <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>) =&gt; <span class="prelude-val">Ok</span>((DebugFile::Primary, <span class="kw-2">&amp;*</span>ctx.sections, <span class="kw-2">&amp;</span><span class="self">self</span>.dw_unit)),
+                            <span class="prelude-val">Err</span>(e) =&gt; <span class="prelude-val">Err</span>(<span class="kw-2">*</span>e),
+                        },
+                    );
+                }
+            });
+        }
+    }
+
     <span class="kw">fn </span>parse_lines(<span class="kw-2">&amp;</span><span class="self">self</span>, sections: <span class="kw-2">&amp;</span>gimli::Dwarf&lt;R&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>Lines&gt;, Error&gt; {
-        <span class="kw">let </span>ilnp = <span class="kw">match </span><span class="self">self</span>.dw_unit.line_program {
+        <span class="comment">// NB: line information is always stored in the main debug file so this does not need
+        // to handle DWOs.
+        </span><span class="kw">let </span>ilnp = <span class="kw">match </span><span class="self">self</span>.dw_unit.line_program {
             <span class="prelude-val">Some</span>(<span class="kw-2">ref </span>ilnp) =&gt; ilnp,
             <span class="prelude-val">None </span>=&gt; <span class="kw">return </span><span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>),
         };
         <span class="self">self</span>.lines
-            .borrow_with(|| {
-                <span class="kw">let </span><span class="kw-2">mut </span>sequences = Vec::new();
-                <span class="kw">let </span><span class="kw-2">mut </span>sequence_rows = Vec::&lt;LineRow&gt;::new();
-                <span class="kw">let </span><span class="kw-2">mut </span>rows = ilnp.clone().rows();
-                <span class="kw">while let </span><span class="prelude-val">Some</span>((<span class="kw">_</span>, row)) = rows.next_row()<span class="question-mark">? </span>{
-                    <span class="kw">if </span>row.end_sequence() {
-                        <span class="kw">if let </span><span class="prelude-val">Some</span>(start) = sequence_rows.first().map(|x| x.address) {
-                            <span class="kw">let </span>end = row.address();
-                            <span class="kw">let </span><span class="kw-2">mut </span>rows = Vec::new();
-                            mem::swap(<span class="kw-2">&amp;mut </span>rows, <span class="kw-2">&amp;mut </span>sequence_rows);
-                            sequences.push(LineSequence {
-                                start,
-                                end,
-                                rows: rows.into_boxed_slice(),
-                            });
-                        }
-                        <span class="kw">continue</span>;
-                    }
-
-                    <span class="kw">let </span>address = row.address();
-                    <span class="kw">let </span>file_index = row.file_index();
-                    <span class="kw">let </span>line = row.line().map(NonZeroU64::get).unwrap_or(<span class="number">0</span>) <span class="kw">as </span>u32;
-                    <span class="kw">let </span>column = <span class="kw">match </span>row.column() {
-                        gimli::ColumnType::LeftEdge =&gt; <span class="number">0</span>,
-                        gimli::ColumnType::Column(x) =&gt; x.get() <span class="kw">as </span>u32,
-                    };
-
-                    <span class="kw">if let </span><span class="prelude-val">Some</span>(last_row) = sequence_rows.last_mut() {
-                        <span class="kw">if </span>last_row.address == address {
-                            last_row.file_index = file_index;
-                            last_row.line = line;
-                            last_row.column = column;
-                            <span class="kw">continue</span>;
-                        }
-                    }
-
-                    sequence_rows.push(LineRow {
-                        address,
-                        file_index,
-                        line,
-                        column,
-                    });
-                }
-                sequences.sort_by_key(|x| x.start);
-
-                <span class="kw">let </span><span class="kw-2">mut </span>files = Vec::new();
-                <span class="kw">let </span>header = ilnp.header();
-                <span class="kw">match </span>header.file(<span class="number">0</span>) {
-                    <span class="prelude-val">Some</span>(file) =&gt; files.push(<span class="self">self</span>.render_file(file, header, sections)<span class="question-mark">?</span>),
-                    <span class="prelude-val">None </span>=&gt; files.push(String::from(<span class="string">&quot;&quot;</span>)), <span class="comment">// DWARF version &lt;= 4 may not have 0th index
-                </span>}
-                <span class="kw">let </span><span class="kw-2">mut </span>index = <span class="number">1</span>;
-                <span class="kw">while let </span><span class="prelude-val">Some</span>(file) = header.file(index) {
-                    files.push(<span class="self">self</span>.render_file(file, header, sections)<span class="question-mark">?</span>);
-                    index += <span class="number">1</span>;
-                }
-
-                <span class="prelude-val">Ok</span>(Lines {
-                    files: files.into_boxed_slice(),
-                    sequences: sequences.into_boxed_slice(),
-                })
-            })
+            .borrow_with(|| Lines::parse(<span class="kw-2">&amp;</span><span class="self">self</span>.dw_unit, ilnp.clone(), sections))
             .as_ref()
             .map(<span class="prelude-val">Some</span>)
             .map_err(Error::clone)
     }
 
-    <span class="kw">fn </span>parse_functions(<span class="kw-2">&amp;</span><span class="self">self</span>, dwarf: <span class="kw-2">&amp;</span>ResDwarf&lt;R&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="kw-2">&amp;</span>Functions&lt;R&gt;, Error&gt; {
+    <span class="kw">fn </span>parse_functions_dwarf_and_unit(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        unit: <span class="kw-2">&amp;</span>gimli::Unit&lt;R&gt;,
+        sections: <span class="kw-2">&amp;</span>gimli::Dwarf&lt;R&gt;,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="kw-2">&amp;</span>Functions&lt;R&gt;, Error&gt; {
         <span class="self">self</span>.funcs
-            .borrow_with(|| Functions::parse(<span class="kw-2">&amp;</span><span class="self">self</span>.dw_unit, dwarf))
+            .borrow_with(|| Functions::parse(unit, sections))
             .as_ref()
             .map_err(Error::clone)
     }
 
-    <span class="kw">fn </span>parse_inlined_functions(<span class="kw-2">&amp;</span><span class="self">self</span>, dwarf: <span class="kw-2">&amp;</span>ResDwarf&lt;R&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;(), Error&gt; {
-        <span class="self">self</span>.funcs
-            .borrow_with(|| Functions::parse(<span class="kw-2">&amp;</span><span class="self">self</span>.dw_unit, dwarf))
-            .as_ref()
-            .map_err(Error::clone)<span class="question-mark">?
-            </span>.parse_inlined_functions(<span class="kw-2">&amp;</span><span class="self">self</span>.dw_unit, dwarf)
+    <span class="kw">fn </span>parse_functions&lt;<span class="lifetime">&#39;unit</span>, <span class="lifetime">&#39;ctx</span>: <span class="lifetime">&#39;unit</span>&gt;(
+        <span class="kw-2">&amp;</span><span class="lifetime">&#39;unit </span><span class="self">self</span>,
+        ctx: <span class="kw-2">&amp;</span><span class="lifetime">&#39;ctx </span>Context&lt;R&gt;,
+    ) -&gt; LookupResult&lt;<span class="kw">impl </span>LookupContinuation&lt;Output = <span class="prelude-ty">Result</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;unit </span>Functions&lt;R&gt;, Error&gt;, Buf = R&gt;&gt;
+    {
+        <span class="self">self</span>.dwarf_and_unit_dwo(ctx).map(<span class="kw">move </span>|r| {
+            <span class="kw">let </span>(_file, sections, unit) = r<span class="question-mark">?</span>;
+            <span class="self">self</span>.parse_functions_dwarf_and_unit(unit, sections)
+        })
+    }
+    <span class="kw">fn </span>parse_inlined_functions&lt;<span class="lifetime">&#39;unit</span>, <span class="lifetime">&#39;ctx</span>: <span class="lifetime">&#39;unit</span>&gt;(
+        <span class="kw-2">&amp;</span><span class="lifetime">&#39;unit </span><span class="self">self</span>,
+        ctx: <span class="kw-2">&amp;</span><span class="lifetime">&#39;ctx </span>Context&lt;R&gt;,
+    ) -&gt; LookupResult&lt;<span class="kw">impl </span>LookupContinuation&lt;Output = <span class="prelude-ty">Result</span>&lt;(), Error&gt;, Buf = R&gt; + <span class="lifetime">&#39;unit</span>&gt; {
+        <span class="self">self</span>.dwarf_and_unit_dwo(ctx).map(<span class="kw">move </span>|r| {
+            <span class="kw">let </span>(file, sections, unit) = r<span class="question-mark">?</span>;
+            <span class="self">self</span>.funcs
+                .borrow_with(|| Functions::parse(unit, sections))
+                .as_ref()
+                .map_err(Error::clone)<span class="question-mark">?
+                </span>.parse_inlined_functions(file, unit, ctx, sections)
+        })
     }
 
     <span class="kw">fn </span>find_location(
@@ -1858,60 +2963,35 @@
         LocationRangeUnitIter::new(<span class="self">self</span>, sections, probe_low, probe_high)
     }
 
-    <span class="kw">fn </span>find_function_or_location(
-        <span class="kw-2">&amp;</span><span class="self">self</span>,
+    <span class="kw">fn </span>find_function_or_location&lt;<span class="lifetime">&#39;unit</span>, <span class="lifetime">&#39;ctx</span>: <span class="lifetime">&#39;unit</span>&gt;(
+        <span class="kw-2">&amp;</span><span class="lifetime">&#39;unit </span><span class="self">self</span>,
         probe: u64,
-        dwarf: <span class="kw-2">&amp;</span>ResDwarf&lt;R&gt;,
-    ) -&gt; <span class="prelude-ty">Result</span>&lt;(<span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>Function&lt;R&gt;&gt;, <span class="prelude-ty">Option</span>&lt;Location&lt;<span class="lifetime">&#39;_</span>&gt;&gt;), Error&gt; {
-        <span class="kw">let </span>functions = <span class="self">self</span>.parse_functions(dwarf)<span class="question-mark">?</span>;
-        <span class="kw">let </span>function = <span class="kw">match </span>functions.find_address(probe) {
-            <span class="prelude-val">Some</span>(address) =&gt; {
-                <span class="kw">let </span>function_index = functions.addresses[address].function;
-                <span class="kw">let </span>(offset, <span class="kw-2">ref </span>function) = functions.functions[function_index];
-                <span class="prelude-val">Some</span>(
-                    function
-                        .borrow_with(|| Function::parse(offset, <span class="kw-2">&amp;</span><span class="self">self</span>.dw_unit, dwarf))
-                        .as_ref()
-                        .map_err(Error::clone)<span class="question-mark">?</span>,
-                )
-            }
-            <span class="prelude-val">None </span>=&gt; <span class="prelude-val">None</span>,
-        };
-        <span class="kw">let </span>location = <span class="self">self</span>.find_location(probe, <span class="kw-2">&amp;</span>dwarf.sections)<span class="question-mark">?</span>;
-        <span class="prelude-val">Ok</span>((function, location))
-    }
-
-    <span class="kw">fn </span>render_file(
-        <span class="kw-2">&amp;</span><span class="self">self</span>,
-        file: <span class="kw-2">&amp;</span>gimli::FileEntry&lt;R, R::Offset&gt;,
-        header: <span class="kw-2">&amp;</span>gimli::LineProgramHeader&lt;R, R::Offset&gt;,
-        sections: <span class="kw-2">&amp;</span>gimli::Dwarf&lt;R&gt;,
-    ) -&gt; <span class="prelude-ty">Result</span>&lt;String, gimli::Error&gt; {
-        <span class="kw">let </span><span class="kw-2">mut </span>path = <span class="kw">if let </span><span class="prelude-val">Some</span>(<span class="kw-2">ref </span>comp_dir) = <span class="self">self</span>.dw_unit.comp_dir {
-            comp_dir.to_string_lossy()<span class="question-mark">?</span>.into_owned()
-        } <span class="kw">else </span>{
-            String::new()
-        };
-
-        <span class="kw">if let </span><span class="prelude-val">Some</span>(directory) = file.directory(header) {
-            path_push(
-                <span class="kw-2">&amp;mut </span>path,
-                sections
-                    .attr_string(<span class="kw-2">&amp;</span><span class="self">self</span>.dw_unit, directory)<span class="question-mark">?
-                    </span>.to_string_lossy()<span class="question-mark">?
-                    </span>.as_ref(),
-            );
-        }
-
-        path_push(
-            <span class="kw-2">&amp;mut </span>path,
-            sections
-                .attr_string(<span class="kw-2">&amp;</span><span class="self">self</span>.dw_unit, file.path_name())<span class="question-mark">?
-                </span>.to_string_lossy()<span class="question-mark">?
-                </span>.as_ref(),
-        );
-
-        <span class="prelude-val">Ok</span>(path)
+        ctx: <span class="kw-2">&amp;</span><span class="lifetime">&#39;ctx </span>Context&lt;R&gt;,
+    ) -&gt; LookupResult&lt;
+        <span class="kw">impl </span>LookupContinuation&lt;
+            Output = <span class="prelude-ty">Result</span>&lt;(<span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;unit </span>Function&lt;R&gt;&gt;, <span class="prelude-ty">Option</span>&lt;Location&lt;<span class="lifetime">&#39;unit</span>&gt;&gt;), Error&gt;,
+            Buf = R,
+        &gt;,
+    &gt; {
+        <span class="self">self</span>.dwarf_and_unit_dwo(ctx).map(<span class="kw">move </span>|r| {
+            <span class="kw">let </span>(file, sections, unit) = r<span class="question-mark">?</span>;
+            <span class="kw">let </span>functions = <span class="self">self</span>.parse_functions_dwarf_and_unit(unit, sections)<span class="question-mark">?</span>;
+            <span class="kw">let </span>function = <span class="kw">match </span>functions.find_address(probe) {
+                <span class="prelude-val">Some</span>(address) =&gt; {
+                    <span class="kw">let </span>function_index = functions.addresses[address].function;
+                    <span class="kw">let </span>(offset, <span class="kw-2">ref </span>function) = functions.functions[function_index];
+                    <span class="prelude-val">Some</span>(
+                        function
+                            .borrow_with(|| Function::parse(offset, file, unit, ctx, sections))
+                            .as_ref()
+                            .map_err(Error::clone)<span class="question-mark">?</span>,
+                    )
+                }
+                <span class="prelude-val">None </span>=&gt; <span class="prelude-val">None</span>,
+            };
+            <span class="kw">let </span>location = <span class="self">self</span>.find_location(probe, sections)<span class="question-mark">?</span>;
+            <span class="prelude-val">Ok</span>((function, location))
+        })
     }
 }
 
@@ -1928,7 +3008,7 @@
 <span class="kw">impl</span>&lt;<span class="lifetime">&#39;ctx</span>, R: gimli::Reader&gt; LocationRangeIter&lt;<span class="lifetime">&#39;ctx</span>, R&gt; {
     <span class="attr">#[inline]
     </span><span class="kw">fn </span>new(ctx: <span class="kw-2">&amp;</span><span class="lifetime">&#39;ctx </span>Context&lt;R&gt;, probe_low: u64, probe_high: u64) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, Error&gt; {
-        <span class="kw">let </span>sections = <span class="kw-2">&amp;</span>ctx.dwarf.sections;
+        <span class="kw">let </span>sections = <span class="kw-2">&amp;</span>ctx.sections;
         <span class="kw">let </span>unit_iter = ctx.find_units_range(probe_low, probe_high);
         <span class="prelude-val">Ok</span>(<span class="self">Self </span>{
             unit_iter: Box::new(unit_iter),
@@ -2029,12 +3109,11 @@
 
             <span class="kw">let </span>row_idx = <span class="kw">if let </span><span class="prelude-val">Some</span>(seq) = lines.sequences.get(seq_idx) {
                 <span class="kw">let </span>idx = seq.rows.binary_search_by(|row| row.address.cmp(<span class="kw-2">&amp;</span>probe_low));
-                <span class="kw">let </span>idx = <span class="kw">match </span>idx {
+                <span class="kw">match </span>idx {
                     <span class="prelude-val">Ok</span>(x) =&gt; x,
                     <span class="prelude-val">Err</span>(<span class="number">0</span>) =&gt; <span class="number">0</span>, <span class="comment">// probe below sequence, but range could overlap
                     </span><span class="prelude-val">Err</span>(x) =&gt; x - <span class="number">1</span>,
-                };
-                idx
+                }
             } <span class="kw">else </span>{
                 <span class="number">0
             </span>};
@@ -2056,12 +3135,7 @@
     <span class="kw">type </span>Item = (u64, u64, Location&lt;<span class="lifetime">&#39;ctx</span>&gt;);
 
     <span class="kw">fn </span>next(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;(u64, u64, Location&lt;<span class="lifetime">&#39;ctx</span>&gt;)&gt; {
-        <span class="kw">loop </span>{
-            <span class="kw">let </span>seq = <span class="kw">match </span><span class="self">self</span>.seqs.get(<span class="self">self</span>.seq_idx) {
-                <span class="prelude-val">Some</span>(seq) =&gt; seq,
-                <span class="prelude-val">None </span>=&gt; <span class="kw">break</span>,
-            };
-
+        <span class="kw">while let </span><span class="prelude-val">Some</span>(seq) = <span class="self">self</span>.seqs.get(<span class="self">self</span>.seq_idx) {
             <span class="kw">if </span>seq.start &gt;= <span class="self">self</span>.probe_high {
                 <span class="kw">break</span>;
             }
@@ -2120,7 +3194,7 @@
             <span class="string">&#39;/&#39;
         </span>};
 
-        <span class="kw">if </span>!path.ends_with(dir_separator) {
+        <span class="kw">if </span>!path.is_empty() &amp;&amp; !path.ends_with(dir_separator) {
             path.push(dir_separator);
         }
         <span class="kw-2">*</span>path += p;
@@ -2188,11 +3262,11 @@
 <span class="doccomment">/// An iterator over function frames.
 </span><span class="kw">pub struct </span>FrameIter&lt;<span class="lifetime">&#39;ctx</span>, R&gt;(FrameIterState&lt;<span class="lifetime">&#39;ctx</span>, R&gt;)
 <span class="kw">where
-    </span>R: gimli::Reader + <span class="lifetime">&#39;ctx</span>;
+    </span>R: gimli::Reader;
 
 <span class="kw">enum </span>FrameIterState&lt;<span class="lifetime">&#39;ctx</span>, R&gt;
 <span class="kw">where
-    </span>R: gimli::Reader + <span class="lifetime">&#39;ctx</span>,
+    </span>R: gimli::Reader,
 {
     Empty,
     Location(<span class="prelude-ty">Option</span>&lt;Location&lt;<span class="lifetime">&#39;ctx</span>&gt;&gt;),
@@ -2201,7 +3275,7 @@
 
 <span class="kw">struct </span>FrameIterFrames&lt;<span class="lifetime">&#39;ctx</span>, R&gt;
 <span class="kw">where
-    </span>R: gimli::Reader + <span class="lifetime">&#39;ctx</span>,
+    </span>R: gimli::Reader,
 {
     unit: <span class="kw-2">&amp;</span><span class="lifetime">&#39;ctx </span>ResUnit&lt;R&gt;,
     sections: <span class="kw-2">&amp;</span><span class="lifetime">&#39;ctx </span>gimli::Dwarf&lt;R&gt;,
@@ -2261,9 +3335,9 @@
                 <span class="prelude-val">None
             </span>},
         };
-        <span class="kw">if </span>func.call_file != <span class="number">0 </span>{
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(call_file) = func.call_file {
             <span class="kw">if let </span><span class="prelude-val">Some</span>(lines) = frames.unit.parse_lines(frames.sections)<span class="question-mark">? </span>{
-                next.file = lines.files.get(func.call_file <span class="kw">as </span>usize).map(String::as_str);
+                next.file = lines.files.get(call_file <span class="kw">as </span>usize).map(String::as_str);
             }
         }
         frames.next = <span class="prelude-val">Some</span>(next);
@@ -2313,12 +3387,12 @@
 
 <span class="kw">impl</span>&lt;R: gimli::Reader&gt; FunctionName&lt;R&gt; {
     <span class="doccomment">/// The raw name of this function before demangling.
-    </span><span class="kw">pub fn </span>raw_name(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;Cow&lt;str&gt;, Error&gt; {
+    </span><span class="kw">pub fn </span>raw_name(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;Cow&lt;<span class="lifetime">&#39;_</span>, str&gt;, Error&gt; {
         <span class="self">self</span>.name.to_string_lossy()
     }
 
     <span class="doccomment">/// The name of this function after demangling (if applicable).
-    </span><span class="kw">pub fn </span>demangle(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;Cow&lt;str&gt;, Error&gt; {
+    </span><span class="kw">pub fn </span>demangle(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;Cow&lt;<span class="lifetime">&#39;_</span>, str&gt;, Error&gt; {
         <span class="self">self</span>.raw_name().map(|x| demangle_auto(x, <span class="self">self</span>.language))
     }
 }
@@ -2354,7 +3428,7 @@
 /// demangle the name. Currently, these heuristics are very basic.
 ///
 /// If demangling fails or is not required, then `name` is returned unchanged.
-</span><span class="kw">pub fn </span>demangle_auto(name: Cow&lt;str&gt;, language: <span class="prelude-ty">Option</span>&lt;gimli::DwLang&gt;) -&gt; Cow&lt;str&gt; {
+</span><span class="kw">pub fn </span>demangle_auto(name: Cow&lt;<span class="lifetime">&#39;_</span>, str&gt;, language: <span class="prelude-ty">Option</span>&lt;gimli::DwLang&gt;) -&gt; Cow&lt;<span class="lifetime">&#39;_</span>, str&gt; {
     <span class="kw">match </span>language {
         <span class="prelude-val">Some</span>(language) =&gt; demangle(name.as_ref(), language),
         <span class="prelude-val">None </span>=&gt; demangle(name.as_ref(), gimli::DW_LANG_Rust)
@@ -2379,7 +3453,7 @@
     <span class="attr">#[test]
     </span><span class="kw">fn </span>context_is_send() {
         <span class="kw">fn </span>assert_is_send&lt;T: Send&gt;() {}
-        assert_is_send::&lt;<span class="kw">crate</span>::Context&lt;gimli::read::EndianSlice&lt;gimli::LittleEndian&gt;&gt;&gt;();
+        assert_is_send::&lt;<span class="kw">crate</span>::Context&lt;gimli::read::EndianSlice&lt;<span class="lifetime">&#39;_</span>, gimli::LittleEndian&gt;&gt;&gt;();
     }
 }
 </code></pre></div></section></main></body></html>

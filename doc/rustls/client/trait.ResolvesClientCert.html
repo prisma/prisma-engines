@@ -3,7 +3,7 @@
     fn <a href="#tymethod.resolve" class="fn">resolve</a>(
         &amp;self,
         acceptable_issuers: &amp;[&amp;[<a class="primitive" href="https://doc.rust-lang.org/1.71.0/std/primitive.u8.html">u8</a>]],
-        sigschemes: &amp;[<a class="enum" href="../internal/msgs/enums/enum.SignatureScheme.html" title="enum rustls::internal::msgs::enums::SignatureScheme">SignatureScheme</a>]
+        sigschemes: &amp;[<a class="enum" href="../enum.SignatureScheme.html" title="enum rustls::SignatureScheme">SignatureScheme</a>]
     ) -&gt; <a class="enum" href="https://doc.rust-lang.org/1.71.0/core/option/enum.Option.html" title="enum core::option::Option">Option</a>&lt;<a class="struct" href="https://doc.rust-lang.org/1.71.0/alloc/sync/struct.Arc.html" title="struct alloc::sync::Arc">Arc</a>&lt;<a class="struct" href="../sign/struct.CertifiedKey.html" title="struct rustls::sign::CertifiedKey">CertifiedKey</a>&gt;&gt;;
 <span class="item-spacer"></span>    fn <a href="#tymethod.has_certs" class="fn">has_certs</a>(&amp;self) -&gt; <a class="primitive" href="https://doc.rust-lang.org/1.71.0/std/primitive.bool.html">bool</a>;
 }</code></pre><details class="toggle top-doc" open><summary class="hideme"><span>Expand description</span></summary><div class="docblock"><p>A trait for the ability to choose a certificate chain and
@@ -11,7 +11,7 @@ private key for the purposes of client authentication.</p>
 </div></details><h2 id="required-methods" class="small-section-header">Required Methods<a href="#required-methods" class="anchor">§</a></h2><div class="methods"><details class="toggle method-toggle" open><summary><section id="tymethod.resolve" class="method"><a class="srclink rightside" href="../../src/rustls/client/client_conn.rs.html#66-70">source</a><h4 class="code-header">fn <a href="#tymethod.resolve" class="fn">resolve</a>(
     &amp;self,
     acceptable_issuers: &amp;[&amp;[<a class="primitive" href="https://doc.rust-lang.org/1.71.0/std/primitive.u8.html">u8</a>]],
-    sigschemes: &amp;[<a class="enum" href="../internal/msgs/enums/enum.SignatureScheme.html" title="enum rustls::internal::msgs::enums::SignatureScheme">SignatureScheme</a>]
+    sigschemes: &amp;[<a class="enum" href="../enum.SignatureScheme.html" title="enum rustls::SignatureScheme">SignatureScheme</a>]
 ) -&gt; <a class="enum" href="https://doc.rust-lang.org/1.71.0/core/option/enum.Option.html" title="enum core::option::Option">Option</a>&lt;<a class="struct" href="https://doc.rust-lang.org/1.71.0/alloc/sync/struct.Arc.html" title="struct alloc::sync::Arc">Arc</a>&lt;<a class="struct" href="../sign/struct.CertifiedKey.html" title="struct rustls::sign::CertifiedKey">CertifiedKey</a>&gt;&gt;</h4></section></summary><div class="docblock"><p>With the server-supplied acceptable issuers in <code>acceptable_issuers</code>,
 the server’s supported signature schemes in <code>sigschemes</code>,
 return a certificate chain and signing key to authenticate.</p>

@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/nix/store/jnqxxv1xi811ni996b002f4jnyz38xck-vendor-cargo-deps/c19b7c6f923b580ac259164a89f2577984ad5ab09ee9d583b888f934adbbe8d0/tokio-1.25.0/src/util/rand.rs`."><title>rand.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-f3501f0f5ae15dfb.css" id="mainThemeStyle"><div id="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="tokio" data-themes="" data-resource-suffix="" data-rustdoc-version="1.71.0 (8ede3aae2 2023-07-12)" data-search-js="search-4926e5fc22a5646a.js" data-settings-js="settings-de11bff964e9d4e5.js" data-settings-css="settings-8c76f75bfb6bd192.css" data-theme-light-css="light-0f8c037637f9eb3e.css" data-theme-dark-css="dark-1097f8e92a01e3cf.css" data-theme-ayu-css="ayu-614652228113ac93.css" ></div><script src="../../../static.files/storage-62ce34ea385b278a.js"></script><script defer src="../../../static.files/source-script-11255107d0a65077.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../static.files/main-f0540c1d82cde29b.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../../../static.files/light-0f8c037637f9eb3e.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../../../static.files/dark-1097f8e92a01e3cf.css"><link rel="stylesheet" href="../../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../../tokio/index.html"><img class="rust-logo" src="../../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/nix/store/yf45a1rayffhnidhgyjynpyhr9lqkd09-vendor-cargo-deps/c19b7c6f923b580ac259164a89f2577984ad5ab09ee9d583b888f934adbbe8d0/tokio-1.30.0/src/util/rand.rs`."><title>rand.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-f3501f0f5ae15dfb.css" id="mainThemeStyle"><div id="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="tokio" data-themes="" data-resource-suffix="" data-rustdoc-version="1.71.0 (8ede3aae2 2023-07-12)" data-search-js="search-4926e5fc22a5646a.js" data-settings-js="settings-de11bff964e9d4e5.js" data-settings-css="settings-8c76f75bfb6bd192.css" data-theme-light-css="light-0f8c037637f9eb3e.css" data-theme-dark-css="dark-1097f8e92a01e3cf.css" data-theme-ayu-css="ayu-614652228113ac93.css" ></div><script src="../../../static.files/storage-62ce34ea385b278a.js"></script><script defer src="../../../static.files/source-script-11255107d0a65077.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../static.files/main-f0540c1d82cde29b.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../../../static.files/light-0f8c037637f9eb3e.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../../../static.files/dark-1097f8e92a01e3cf.css"><link rel="stylesheet" href="../../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../../tokio/index.html"><img class="rust-logo" src="../../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -93,114 +93,12 @@
 <a href="#93" id="93">93</a>
 <a href="#94" id="94">94</a>
 <a href="#95" id="95">95</a>
-<a href="#96" id="96">96</a>
-<a href="#97" id="97">97</a>
-<a href="#98" id="98">98</a>
-<a href="#99" id="99">99</a>
-<a href="#100" id="100">100</a>
-<a href="#101" id="101">101</a>
-<a href="#102" id="102">102</a>
-<a href="#103" id="103">103</a>
-<a href="#104" id="104">104</a>
-<a href="#105" id="105">105</a>
-<a href="#106" id="106">106</a>
-<a href="#107" id="107">107</a>
-<a href="#108" id="108">108</a>
-<a href="#109" id="109">109</a>
-<a href="#110" id="110">110</a>
-<a href="#111" id="111">111</a>
-<a href="#112" id="112">112</a>
-<a href="#113" id="113">113</a>
-<a href="#114" id="114">114</a>
-<a href="#115" id="115">115</a>
-<a href="#116" id="116">116</a>
-<a href="#117" id="117">117</a>
-<a href="#118" id="118">118</a>
-<a href="#119" id="119">119</a>
-<a href="#120" id="120">120</a>
-<a href="#121" id="121">121</a>
-<a href="#122" id="122">122</a>
-<a href="#123" id="123">123</a>
-<a href="#124" id="124">124</a>
-<a href="#125" id="125">125</a>
-<a href="#126" id="126">126</a>
-<a href="#127" id="127">127</a>
-<a href="#128" id="128">128</a>
-<a href="#129" id="129">129</a>
-<a href="#130" id="130">130</a>
-<a href="#131" id="131">131</a>
-<a href="#132" id="132">132</a>
-<a href="#133" id="133">133</a>
-<a href="#134" id="134">134</a>
-<a href="#135" id="135">135</a>
-<a href="#136" id="136">136</a>
-<a href="#137" id="137">137</a>
-<a href="#138" id="138">138</a>
-<a href="#139" id="139">139</a>
-<a href="#140" id="140">140</a>
-<a href="#141" id="141">141</a>
-<a href="#142" id="142">142</a>
-<a href="#143" id="143">143</a>
-<a href="#144" id="144">144</a>
-<a href="#145" id="145">145</a>
-<a href="#146" id="146">146</a>
-<a href="#147" id="147">147</a>
-<a href="#148" id="148">148</a>
-<a href="#149" id="149">149</a>
-<a href="#150" id="150">150</a>
-<a href="#151" id="151">151</a>
-<a href="#152" id="152">152</a>
-<a href="#153" id="153">153</a>
-<a href="#154" id="154">154</a>
-<a href="#155" id="155">155</a>
-<a href="#156" id="156">156</a>
-<a href="#157" id="157">157</a>
-<a href="#158" id="158">158</a>
-</pre></div><pre class="rust"><code><span class="kw">use </span>std::cell::Cell;
+</pre></div><pre class="rust"><code><span class="macro">cfg_rt! </span>{
+    <span class="kw">mod </span>rt;
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use </span>rt::RngSeedGenerator;
 
-<span class="macro">cfg_rt! </span>{
-    <span class="kw">use </span>std::sync::Mutex;
-
-    <span class="doccomment">/// A deterministic generator for seeds (and other generators).
-    ///
-    /// Given the same initial seed, the generator will output the same sequence of seeds.
-    ///
-    /// Since the seed generator will be kept in a runtime handle, we need to wrap `FastRand`
-    /// in a Mutex to make it thread safe. Different to the `FastRand` that we keep in a
-    /// thread local store, the expectation is that seed generation will not need to happen
-    /// very frequently, so the cost of the mutex should be minimal.
-    </span><span class="attr">#[derive(Debug)]
-    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>RngSeedGenerator {
-        <span class="doccomment">/// Internal state for the seed generator. We keep it in a Mutex so that we can safely
-        /// use it across multiple threads.
-        </span>state: Mutex&lt;FastRand&gt;,
-    }
-
-    <span class="kw">impl </span>RngSeedGenerator {
-        <span class="doccomment">/// Returns a new generator from the provided seed.
-        </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>new(seed: RngSeed) -&gt; <span class="self">Self </span>{
-            <span class="self">Self </span>{
-                state: Mutex::new(FastRand::new(seed)),
-            }
-        }
-
-        <span class="doccomment">/// Returns the next seed in the sequence.
-        </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>next_seed(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; RngSeed {
-            <span class="kw">let </span>rng = <span class="self">self
-                </span>.state
-                .lock()
-                .expect(<span class="string">&quot;RNG seed generator is internally corrupt&quot;</span>);
-
-            <span class="kw">let </span>s = rng.fastrand();
-            <span class="kw">let </span>r = rng.fastrand();
-
-            RngSeed::from_pair(s, r)
-        }
-
-        <span class="doccomment">/// Directly creates a generator using the next seed.
-        </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>next_generator(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="self">Self </span>{
-            RngSeedGenerator::new(<span class="self">self</span>.next_seed())
-        }
+    <span class="macro">cfg_unstable! </span>{
+        <span class="kw">mod </span>rt_unstable;
     }
 }
 
@@ -215,29 +113,23 @@
     r: u32,
 }
 
+<span class="doccomment">/// Fast random number generate.
+///
+/// Implement xorshift64+: 2 32-bit xorshift sequences added together.
+/// Shift triplet `[17,7,16]` was calculated as indicated in Marsaglia&#39;s
+/// Xorshift paper: &lt;https://www.jstatsoft.org/article/view/v008i14/xorshift.pdf&gt;
+/// This generator passes the SmallCrush suite, part of TestU01 framework:
+/// &lt;http://simul.iro.umontreal.ca/testu01/tu01.html&gt;
+</span><span class="attr">#[derive(Clone, Copy, Debug)]
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>FastRand {
+    one: u32,
+    two: u32,
+}
+
 <span class="kw">impl </span>RngSeed {
     <span class="doccomment">/// Creates a random seed using loom internally.
     </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>new() -&gt; <span class="self">Self </span>{
         <span class="self">Self</span>::from_u64(<span class="kw">crate</span>::loom::rand::seed())
-    }
-
-    <span class="macro">cfg_unstable! </span>{
-        <span class="doccomment">/// Generates a seed from the provided byte slice.
-        ///
-        /// # Example
-        ///
-        /// ```
-        /// # use tokio::runtime::RngSeed;
-        /// let seed = RngSeed::from_bytes(b&quot;make me a seed&quot;);
-        /// ```
-        </span><span class="attr">#[cfg(feature = <span class="string">&quot;rt&quot;</span>)]
-        </span><span class="kw">pub fn </span>from_bytes(bytes: <span class="kw-2">&amp;</span>[u8]) -&gt; <span class="self">Self </span>{
-            <span class="kw">use </span>std::{collections::hash_map::DefaultHasher, hash::Hasher};
-
-            <span class="kw">let </span><span class="kw-2">mut </span>hasher = DefaultHasher::default();
-            hasher.write(bytes);
-            <span class="self">Self</span>::from_u64(hasher.finish())
-        }
     }
 
     <span class="kw">fn </span>from_u64(seed: u64) -&gt; <span class="self">Self </span>{
@@ -256,60 +148,42 @@
         <span class="self">Self </span>{ s, r }
     }
 }
-<span class="doccomment">/// Fast random number generate.
-///
-/// Implement xorshift64+: 2 32-bit xorshift sequences added together.
-/// Shift triplet `[17,7,16]` was calculated as indicated in Marsaglia&#39;s
-/// Xorshift paper: &lt;https://www.jstatsoft.org/article/view/v008i14/xorshift.pdf&gt;
-/// This generator passes the SmallCrush suite, part of TestU01 framework:
-/// &lt;http://simul.iro.umontreal.ca/testu01/tu01.html&gt;
-</span><span class="attr">#[derive(Debug)]
-</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>FastRand {
-    one: Cell&lt;u32&gt;,
-    two: Cell&lt;u32&gt;,
-}
 
 <span class="kw">impl </span>FastRand {
+    <span class="doccomment">/// Initialize a new fast random number generator using the default source of entropy.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>new() -&gt; FastRand {
+        FastRand::from_seed(RngSeed::new())
+    }
+
     <span class="doccomment">/// Initializes a new, thread-local, fast random number generator.
-    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>new(seed: RngSeed) -&gt; FastRand {
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>from_seed(seed: RngSeed) -&gt; FastRand {
         FastRand {
-            one: Cell::new(seed.s),
-            two: Cell::new(seed.r),
+            one: seed.s,
+            two: seed.r,
         }
     }
 
-    <span class="doccomment">/// Replaces the state of the random number generator with the provided seed, returning
-    /// the seed that represents the previous state of the random number generator.
-    ///
-    /// The random number generator will become equivalent to one created with
-    /// the same seed.
-    </span><span class="attr">#[cfg(feature = <span class="string">&quot;rt&quot;</span>)]
-    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>replace_seed(<span class="kw-2">&amp;</span><span class="self">self</span>, seed: RngSeed) -&gt; RngSeed {
-        <span class="kw">let </span>old_seed = RngSeed::from_pair(<span class="self">self</span>.one.get(), <span class="self">self</span>.two.get());
-
-        <span class="self">self</span>.one.replace(seed.s);
-        <span class="self">self</span>.two.replace(seed.r);
-
-        old_seed
-    }
-
-    <span class="attr">#[cfg(any(feature = <span class="string">&quot;macros&quot;</span>, feature = <span class="string">&quot;rt-multi-thread&quot;</span>))]
-    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>fastrand_n(<span class="kw-2">&amp;</span><span class="self">self</span>, n: u32) -&gt; u32 {
+    <span class="attr">#[cfg(any(
+        feature = <span class="string">&quot;macros&quot;</span>,
+        feature = <span class="string">&quot;rt-multi-thread&quot;</span>,
+        all(feature = <span class="string">&quot;sync&quot;</span>, feature = <span class="string">&quot;rt&quot;</span>)
+    ))]
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>fastrand_n(<span class="kw-2">&amp;mut </span><span class="self">self</span>, n: u32) -&gt; u32 {
         <span class="comment">// This is similar to fastrand() % n, but faster.
         // See https://lemire.me/blog/2016/06/27/a-fast-alternative-to-the-modulo-reduction/
         </span><span class="kw">let </span>mul = (<span class="self">self</span>.fastrand() <span class="kw">as </span>u64).wrapping_mul(n <span class="kw">as </span>u64);
         (mul &gt;&gt; <span class="number">32</span>) <span class="kw">as </span>u32
     }
 
-    <span class="kw">fn </span>fastrand(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; u32 {
-        <span class="kw">let </span><span class="kw-2">mut </span>s1 = <span class="self">self</span>.one.get();
-        <span class="kw">let </span>s0 = <span class="self">self</span>.two.get();
+    <span class="kw">fn </span>fastrand(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; u32 {
+        <span class="kw">let </span><span class="kw-2">mut </span>s1 = <span class="self">self</span>.one;
+        <span class="kw">let </span>s0 = <span class="self">self</span>.two;
 
         s1 ^= s1 &lt;&lt; <span class="number">17</span>;
         s1 = s1 ^ s0 ^ s1 &gt;&gt; <span class="number">7 </span>^ s0 &gt;&gt; <span class="number">16</span>;
 
-        <span class="self">self</span>.one.set(s0);
-        <span class="self">self</span>.two.set(s1);
+        <span class="self">self</span>.one = s0;
+        <span class="self">self</span>.two = s1;
 
         s0.wrapping_add(s1)
     }

@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/nix/store/jnqxxv1xi811ni996b002f4jnyz38xck-vendor-cargo-deps/c19b7c6f923b580ac259164a89f2577984ad5ab09ee9d583b888f934adbbe8d0/bigdecimal-0.3.0/src/lib.rs`."><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-f3501f0f5ae15dfb.css" id="mainThemeStyle"><div id="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="bigdecimal" data-themes="" data-resource-suffix="" data-rustdoc-version="1.71.0 (8ede3aae2 2023-07-12)" data-search-js="search-4926e5fc22a5646a.js" data-settings-js="settings-de11bff964e9d4e5.js" data-settings-css="settings-8c76f75bfb6bd192.css" data-theme-light-css="light-0f8c037637f9eb3e.css" data-theme-dark-css="dark-1097f8e92a01e3cf.css" data-theme-ayu-css="ayu-614652228113ac93.css" ></div><script src="../../static.files/storage-62ce34ea385b278a.js"></script><script defer src="../../static.files/source-script-11255107d0a65077.js"></script><script defer src="../../source-files.js"></script><script defer src="../../static.files/main-f0540c1d82cde29b.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../../static.files/light-0f8c037637f9eb3e.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../../static.files/dark-1097f8e92a01e3cf.css"><link rel="stylesheet" href="../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../bigdecimal/index.html"><img class="rust-logo" src="../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/nix/store/yf45a1rayffhnidhgyjynpyhr9lqkd09-vendor-cargo-deps/c19b7c6f923b580ac259164a89f2577984ad5ab09ee9d583b888f934adbbe8d0/bigdecimal-0.3.1/src/lib.rs`."><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-f3501f0f5ae15dfb.css" id="mainThemeStyle"><div id="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="bigdecimal" data-themes="" data-resource-suffix="" data-rustdoc-version="1.71.0 (8ede3aae2 2023-07-12)" data-search-js="search-4926e5fc22a5646a.js" data-settings-js="settings-de11bff964e9d4e5.js" data-settings-css="settings-8c76f75bfb6bd192.css" data-theme-light-css="light-0f8c037637f9eb3e.css" data-theme-dark-css="dark-1097f8e92a01e3cf.css" data-theme-ayu-css="ayu-614652228113ac93.css" ></div><script src="../../static.files/storage-62ce34ea385b278a.js"></script><script defer src="../../static.files/source-script-11255107d0a65077.js"></script><script defer src="../../source-files.js"></script><script defer src="../../static.files/main-f0540c1d82cde29b.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../../static.files/light-0f8c037637f9eb3e.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../../static.files/dark-1097f8e92a01e3cf.css"><link rel="stylesheet" href="../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../bigdecimal/index.html"><img class="rust-logo" src="../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -2948,6 +2948,175 @@
 <a href="#2948" id="2948">2948</a>
 <a href="#2949" id="2949">2949</a>
 <a href="#2950" id="2950">2950</a>
+<a href="#2951" id="2951">2951</a>
+<a href="#2952" id="2952">2952</a>
+<a href="#2953" id="2953">2953</a>
+<a href="#2954" id="2954">2954</a>
+<a href="#2955" id="2955">2955</a>
+<a href="#2956" id="2956">2956</a>
+<a href="#2957" id="2957">2957</a>
+<a href="#2958" id="2958">2958</a>
+<a href="#2959" id="2959">2959</a>
+<a href="#2960" id="2960">2960</a>
+<a href="#2961" id="2961">2961</a>
+<a href="#2962" id="2962">2962</a>
+<a href="#2963" id="2963">2963</a>
+<a href="#2964" id="2964">2964</a>
+<a href="#2965" id="2965">2965</a>
+<a href="#2966" id="2966">2966</a>
+<a href="#2967" id="2967">2967</a>
+<a href="#2968" id="2968">2968</a>
+<a href="#2969" id="2969">2969</a>
+<a href="#2970" id="2970">2970</a>
+<a href="#2971" id="2971">2971</a>
+<a href="#2972" id="2972">2972</a>
+<a href="#2973" id="2973">2973</a>
+<a href="#2974" id="2974">2974</a>
+<a href="#2975" id="2975">2975</a>
+<a href="#2976" id="2976">2976</a>
+<a href="#2977" id="2977">2977</a>
+<a href="#2978" id="2978">2978</a>
+<a href="#2979" id="2979">2979</a>
+<a href="#2980" id="2980">2980</a>
+<a href="#2981" id="2981">2981</a>
+<a href="#2982" id="2982">2982</a>
+<a href="#2983" id="2983">2983</a>
+<a href="#2984" id="2984">2984</a>
+<a href="#2985" id="2985">2985</a>
+<a href="#2986" id="2986">2986</a>
+<a href="#2987" id="2987">2987</a>
+<a href="#2988" id="2988">2988</a>
+<a href="#2989" id="2989">2989</a>
+<a href="#2990" id="2990">2990</a>
+<a href="#2991" id="2991">2991</a>
+<a href="#2992" id="2992">2992</a>
+<a href="#2993" id="2993">2993</a>
+<a href="#2994" id="2994">2994</a>
+<a href="#2995" id="2995">2995</a>
+<a href="#2996" id="2996">2996</a>
+<a href="#2997" id="2997">2997</a>
+<a href="#2998" id="2998">2998</a>
+<a href="#2999" id="2999">2999</a>
+<a href="#3000" id="3000">3000</a>
+<a href="#3001" id="3001">3001</a>
+<a href="#3002" id="3002">3002</a>
+<a href="#3003" id="3003">3003</a>
+<a href="#3004" id="3004">3004</a>
+<a href="#3005" id="3005">3005</a>
+<a href="#3006" id="3006">3006</a>
+<a href="#3007" id="3007">3007</a>
+<a href="#3008" id="3008">3008</a>
+<a href="#3009" id="3009">3009</a>
+<a href="#3010" id="3010">3010</a>
+<a href="#3011" id="3011">3011</a>
+<a href="#3012" id="3012">3012</a>
+<a href="#3013" id="3013">3013</a>
+<a href="#3014" id="3014">3014</a>
+<a href="#3015" id="3015">3015</a>
+<a href="#3016" id="3016">3016</a>
+<a href="#3017" id="3017">3017</a>
+<a href="#3018" id="3018">3018</a>
+<a href="#3019" id="3019">3019</a>
+<a href="#3020" id="3020">3020</a>
+<a href="#3021" id="3021">3021</a>
+<a href="#3022" id="3022">3022</a>
+<a href="#3023" id="3023">3023</a>
+<a href="#3024" id="3024">3024</a>
+<a href="#3025" id="3025">3025</a>
+<a href="#3026" id="3026">3026</a>
+<a href="#3027" id="3027">3027</a>
+<a href="#3028" id="3028">3028</a>
+<a href="#3029" id="3029">3029</a>
+<a href="#3030" id="3030">3030</a>
+<a href="#3031" id="3031">3031</a>
+<a href="#3032" id="3032">3032</a>
+<a href="#3033" id="3033">3033</a>
+<a href="#3034" id="3034">3034</a>
+<a href="#3035" id="3035">3035</a>
+<a href="#3036" id="3036">3036</a>
+<a href="#3037" id="3037">3037</a>
+<a href="#3038" id="3038">3038</a>
+<a href="#3039" id="3039">3039</a>
+<a href="#3040" id="3040">3040</a>
+<a href="#3041" id="3041">3041</a>
+<a href="#3042" id="3042">3042</a>
+<a href="#3043" id="3043">3043</a>
+<a href="#3044" id="3044">3044</a>
+<a href="#3045" id="3045">3045</a>
+<a href="#3046" id="3046">3046</a>
+<a href="#3047" id="3047">3047</a>
+<a href="#3048" id="3048">3048</a>
+<a href="#3049" id="3049">3049</a>
+<a href="#3050" id="3050">3050</a>
+<a href="#3051" id="3051">3051</a>
+<a href="#3052" id="3052">3052</a>
+<a href="#3053" id="3053">3053</a>
+<a href="#3054" id="3054">3054</a>
+<a href="#3055" id="3055">3055</a>
+<a href="#3056" id="3056">3056</a>
+<a href="#3057" id="3057">3057</a>
+<a href="#3058" id="3058">3058</a>
+<a href="#3059" id="3059">3059</a>
+<a href="#3060" id="3060">3060</a>
+<a href="#3061" id="3061">3061</a>
+<a href="#3062" id="3062">3062</a>
+<a href="#3063" id="3063">3063</a>
+<a href="#3064" id="3064">3064</a>
+<a href="#3065" id="3065">3065</a>
+<a href="#3066" id="3066">3066</a>
+<a href="#3067" id="3067">3067</a>
+<a href="#3068" id="3068">3068</a>
+<a href="#3069" id="3069">3069</a>
+<a href="#3070" id="3070">3070</a>
+<a href="#3071" id="3071">3071</a>
+<a href="#3072" id="3072">3072</a>
+<a href="#3073" id="3073">3073</a>
+<a href="#3074" id="3074">3074</a>
+<a href="#3075" id="3075">3075</a>
+<a href="#3076" id="3076">3076</a>
+<a href="#3077" id="3077">3077</a>
+<a href="#3078" id="3078">3078</a>
+<a href="#3079" id="3079">3079</a>
+<a href="#3080" id="3080">3080</a>
+<a href="#3081" id="3081">3081</a>
+<a href="#3082" id="3082">3082</a>
+<a href="#3083" id="3083">3083</a>
+<a href="#3084" id="3084">3084</a>
+<a href="#3085" id="3085">3085</a>
+<a href="#3086" id="3086">3086</a>
+<a href="#3087" id="3087">3087</a>
+<a href="#3088" id="3088">3088</a>
+<a href="#3089" id="3089">3089</a>
+<a href="#3090" id="3090">3090</a>
+<a href="#3091" id="3091">3091</a>
+<a href="#3092" id="3092">3092</a>
+<a href="#3093" id="3093">3093</a>
+<a href="#3094" id="3094">3094</a>
+<a href="#3095" id="3095">3095</a>
+<a href="#3096" id="3096">3096</a>
+<a href="#3097" id="3097">3097</a>
+<a href="#3098" id="3098">3098</a>
+<a href="#3099" id="3099">3099</a>
+<a href="#3100" id="3100">3100</a>
+<a href="#3101" id="3101">3101</a>
+<a href="#3102" id="3102">3102</a>
+<a href="#3103" id="3103">3103</a>
+<a href="#3104" id="3104">3104</a>
+<a href="#3105" id="3105">3105</a>
+<a href="#3106" id="3106">3106</a>
+<a href="#3107" id="3107">3107</a>
+<a href="#3108" id="3108">3108</a>
+<a href="#3109" id="3109">3109</a>
+<a href="#3110" id="3110">3110</a>
+<a href="#3111" id="3111">3111</a>
+<a href="#3112" id="3112">3112</a>
+<a href="#3113" id="3113">3113</a>
+<a href="#3114" id="3114">3114</a>
+<a href="#3115" id="3115">3115</a>
+<a href="#3116" id="3116">3116</a>
+<a href="#3117" id="3117">3117</a>
+<a href="#3118" id="3118">3118</a>
+<a href="#3119" id="3119">3119</a>
 </pre></div><pre class="rust"><code><span class="comment">// Copyright 2016 Adam Sunderland
 //           2016-2017 Andrew Kubera
 //           2017 Ruben De Smet
@@ -2994,6 +3163,7 @@
 #![allow(clippy::suspicious_arithmetic_impl)]
 #![allow(clippy::suspicious_op_assign_impl)]
 #![allow(clippy::redundant_field_names)]
+#![allow(clippy::match_like_matches_macro)] </span><span class="comment">// requires Rust 1.42.0
 
 </span><span class="kw">pub extern crate </span>num_bigint;
 <span class="kw">pub extern crate </span>num_traits;
@@ -3017,7 +3187,8 @@
 <span class="kw">use </span>num_integer::Integer <span class="kw">as </span>IntegerTrait;
 <span class="kw">pub use </span>num_traits::{FromPrimitive, Num, One, Signed, ToPrimitive, Zero};
 
-<span class="kw">const </span>LOG2_10: f64 = <span class="number">3.321928094887362_f64</span>;
+<span class="attr">#[allow(clippy::approx_constant)] </span><span class="comment">// requires Rust 1.43.0
+</span><span class="kw">const </span>LOG2_10: f64 = <span class="number">3.321928094887362_f64</span>;
 
 <span class="attr">#[macro_use]
 </span><span class="kw">mod </span>macros;
@@ -3048,10 +3219,11 @@
     <span class="kw">if </span>int.is_zero() {
         <span class="kw">return </span><span class="number">1</span>;
     }
+    <span class="kw">let </span>uint = int.magnitude();
+    <span class="kw">let </span><span class="kw-2">mut </span>digits = (uint.bits() <span class="kw">as </span>f64 / LOG2_10) <span class="kw">as </span>u64;
     <span class="comment">// guess number of digits based on number of bits in UInt
-    </span><span class="kw">let </span><span class="kw-2">mut </span>digits = (int.bits() <span class="kw">as </span>f64 / LOG2_10) <span class="kw">as </span>u64;
-    <span class="kw">let </span><span class="kw-2">mut </span>num = ten_to_the(digits);
-    <span class="kw">while </span><span class="kw-2">*</span>int &gt;= num {
+    </span><span class="kw">let </span><span class="kw-2">mut </span>num = ten_to_the(digits).to_biguint().expect(<span class="string">&quot;Ten to power is negative&quot;</span>);
+    <span class="kw">while </span><span class="kw-2">*</span>uint &gt;= num {
         num <span class="kw-2">*</span>= <span class="number">10u8</span>;
         digits += <span class="number">1</span>;
     }
@@ -3143,35 +3315,38 @@
             <span class="kw">return </span>BigDecimal::new(BigInt::zero(), new_scale);
         }
 
-        <span class="kw">if </span>new_scale &gt; <span class="self">self</span>.scale {
-            <span class="kw">let </span>scale_diff = new_scale - <span class="self">self</span>.scale;
-            <span class="kw">let </span>int_val = <span class="kw-2">&amp;</span><span class="self">self</span>.int_val * ten_to_the(scale_diff <span class="kw">as </span>u64);
-            BigDecimal::new(int_val, new_scale)
-        } <span class="kw">else if </span>new_scale &lt; <span class="self">self</span>.scale {
-            <span class="kw">let </span>scale_diff = <span class="self">self</span>.scale - new_scale;
-            <span class="kw">let </span>int_val = <span class="kw-2">&amp;</span><span class="self">self</span>.int_val / ten_to_the(scale_diff <span class="kw">as </span>u64);
-            BigDecimal::new(int_val, new_scale)
-        } <span class="kw">else </span>{
-            <span class="self">self</span>.clone()
+        <span class="kw">match </span>new_scale.cmp(<span class="kw-2">&amp;</span><span class="self">self</span>.scale) {
+            Ordering::Greater =&gt; {
+                <span class="kw">let </span>scale_diff = new_scale - <span class="self">self</span>.scale;
+                <span class="kw">let </span>int_val = <span class="kw-2">&amp;</span><span class="self">self</span>.int_val * ten_to_the(scale_diff <span class="kw">as </span>u64);
+                BigDecimal::new(int_val, new_scale)
+            }
+            Ordering::Less =&gt; {
+                <span class="kw">let </span>scale_diff = <span class="self">self</span>.scale - new_scale;
+                <span class="kw">let </span>int_val = <span class="kw-2">&amp;</span><span class="self">self</span>.int_val / ten_to_the(scale_diff <span class="kw">as </span>u64);
+                BigDecimal::new(int_val, new_scale)
+            }
+            Ordering::Equal =&gt; <span class="self">self</span>.clone(),
         }
     }
 
     <span class="attr">#[inline(always)]
     </span><span class="kw">fn </span>take_and_scale(<span class="kw-2">mut </span><span class="self">self</span>, new_scale: i64) -&gt; BigDecimal {
-        <span class="comment">// let foo = bar.moved_and_scaled_to()
-        </span><span class="kw">if </span><span class="self">self</span>.int_val.is_zero() {
+        <span class="kw">if </span><span class="self">self</span>.int_val.is_zero() {
             <span class="kw">return </span>BigDecimal::new(BigInt::zero(), new_scale);
         }
 
-        <span class="kw">if </span>new_scale &gt; <span class="self">self</span>.scale {
-            <span class="self">self</span>.int_val <span class="kw-2">*</span>= ten_to_the((new_scale - <span class="self">self</span>.scale) <span class="kw">as </span>u64);
-            BigDecimal::new(<span class="self">self</span>.int_val, new_scale)
-        } <span class="kw">else if </span>new_scale &lt; <span class="self">self</span>.scale {
-            <span class="self">self</span>.int_val /= ten_to_the((<span class="self">self</span>.scale - new_scale) <span class="kw">as </span>u64);
-            BigDecimal::new(<span class="self">self</span>.int_val, new_scale)
-        } <span class="kw">else </span>{
-            <span class="self">self
-        </span>}
+        <span class="kw">match </span>new_scale.cmp(<span class="kw-2">&amp;</span><span class="self">self</span>.scale) {
+            Ordering::Greater =&gt; {
+                <span class="self">self</span>.int_val <span class="kw-2">*</span>= ten_to_the((new_scale - <span class="self">self</span>.scale) <span class="kw">as </span>u64);
+                BigDecimal::new(<span class="self">self</span>.int_val, new_scale)
+            }
+            Ordering::Less =&gt; {
+                <span class="self">self</span>.int_val /= ten_to_the((<span class="self">self</span>.scale - new_scale) <span class="kw">as </span>u64);
+                BigDecimal::new(<span class="self">self</span>.int_val, new_scale)
+            }
+            Ordering::Equal =&gt; <span class="self">self</span>,
+        }
     }
 
     <span class="doccomment">/// Return a new BigDecimal object with precision set to new value
@@ -3180,28 +3355,30 @@
     </span><span class="kw">pub fn </span>with_prec(<span class="kw-2">&amp;</span><span class="self">self</span>, prec: u64) -&gt; BigDecimal {
         <span class="kw">let </span>digits = <span class="self">self</span>.digits();
 
-        <span class="kw">if </span>digits &gt; prec {
-            <span class="kw">let </span>diff = digits - prec;
-            <span class="kw">let </span>p = ten_to_the(diff);
-            <span class="kw">let </span>(<span class="kw-2">mut </span>q, r) = <span class="self">self</span>.int_val.div_rem(<span class="kw-2">&amp;</span>p);
+        <span class="kw">match </span>digits.cmp(<span class="kw-2">&amp;</span>prec) {
+            Ordering::Greater =&gt; {
+                <span class="kw">let </span>diff = digits - prec;
+                <span class="kw">let </span>p = ten_to_the(diff);
+                <span class="kw">let </span>(<span class="kw-2">mut </span>q, r) = <span class="self">self</span>.int_val.div_rem(<span class="kw-2">&amp;</span>p);
 
-            <span class="comment">// check for &quot;leading zero&quot; in remainder term; otherwise round
-            </span><span class="kw">if </span>p &lt; <span class="number">10 </span>* <span class="kw-2">&amp;</span>r {
-                q += get_rounding_term(<span class="kw-2">&amp;</span>r);
-            }
+                <span class="comment">// check for &quot;leading zero&quot; in remainder term; otherwise round
+                </span><span class="kw">if </span>p &lt; <span class="number">10 </span>* <span class="kw-2">&amp;</span>r {
+                    q += get_rounding_term(<span class="kw-2">&amp;</span>r);
+                }
 
-            BigDecimal {
-                int_val: q,
-                scale: <span class="self">self</span>.scale - diff <span class="kw">as </span>i64,
+                BigDecimal {
+                    int_val: q,
+                    scale: <span class="self">self</span>.scale - diff <span class="kw">as </span>i64,
+                }
             }
-        } <span class="kw">else if </span>digits &lt; prec {
-            <span class="kw">let </span>diff = prec - digits;
-            BigDecimal {
-                int_val: <span class="kw-2">&amp;</span><span class="self">self</span>.int_val * ten_to_the(diff),
-                scale: <span class="self">self</span>.scale + diff <span class="kw">as </span>i64,
+            Ordering::Less =&gt; {
+                <span class="kw">let </span>diff = prec - digits;
+                BigDecimal {
+                    int_val: <span class="kw-2">&amp;</span><span class="self">self</span>.int_val * ten_to_the(diff),
+                    scale: <span class="self">self</span>.scale + diff <span class="kw">as </span>i64,
+                }
             }
-        } <span class="kw">else </span>{
-            <span class="self">self</span>.clone()
+            Ordering::Equal =&gt; <span class="self">self</span>.clone(),
         }
     }
 
@@ -3541,8 +3718,8 @@
             <span class="kw">return </span><span class="self">self</span>.clone();
         }
 
-        <span class="kw">let </span><span class="kw-2">mut </span>number = bigint.to_i128().unwrap();
-        <span class="kw">if </span>number &lt; <span class="number">0 </span>{
+        <span class="kw">let </span><span class="kw-2">mut </span>number = bigint.clone();
+        <span class="kw">if </span>number &lt; BigInt::zero() {
             number = -number;
         }
         <span class="kw">for _ in </span><span class="number">0</span>..(need_to_round_digits - <span class="number">1</span>) {
@@ -3550,7 +3727,7 @@
         }
         <span class="kw">let </span>digit = number % <span class="number">10</span>;
 
-        <span class="kw">if </span>digit &lt;= <span class="number">4 </span>{
+        <span class="kw">if </span>digit &lt;= BigInt::from(<span class="number">4</span>) {
             <span class="self">self</span>.with_scale(round_digits)
         } <span class="kw">else if </span>bigint.is_negative() {
             <span class="self">self</span>.with_scale(round_digits) - BigDecimal::new(BigInt::from(<span class="number">1</span>), round_digits)
@@ -3675,7 +3852,7 @@
 <span class="attr">#[allow(deprecated)] </span><span class="comment">// trim_right_match -&gt; trim_end_match
 </span><span class="kw">impl </span>Hash <span class="kw">for </span>BigDecimal {
     <span class="kw">fn </span>hash&lt;H: Hasher&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, state: <span class="kw-2">&amp;mut </span>H) {
-        <span class="kw">let </span><span class="kw-2">mut </span>dec_str = <span class="self">self</span>.int_val.to_str_radix(<span class="number">10</span>).to_string();
+        <span class="kw">let </span><span class="kw-2">mut </span>dec_str = <span class="self">self</span>.int_val.to_str_radix(<span class="number">10</span>);
         <span class="kw">let </span>scale = <span class="self">self</span>.scale;
         <span class="kw">let </span>zero = <span class="self">self</span>.int_val.is_zero();
         <span class="kw">if </span>scale &gt; <span class="number">0 </span>&amp;&amp; !zero {
@@ -3745,14 +3922,16 @@
     <span class="attr">#[inline]
     </span><span class="kw">fn </span>eq(<span class="kw-2">&amp;</span><span class="self">self</span>, rhs: <span class="kw-2">&amp;</span>BigDecimal) -&gt; bool {
         <span class="comment">// fix scale and test equality
-        </span><span class="kw">if </span><span class="self">self</span>.scale &gt; rhs.scale {
-            <span class="kw">let </span>scaled_int_val = <span class="kw-2">&amp;</span>rhs.int_val * ten_to_the((<span class="self">self</span>.scale - rhs.scale) <span class="kw">as </span>u64);
-            <span class="self">self</span>.int_val == scaled_int_val
-        } <span class="kw">else if </span><span class="self">self</span>.scale &lt; rhs.scale {
-            <span class="kw">let </span>scaled_int_val = <span class="kw-2">&amp;</span><span class="self">self</span>.int_val * ten_to_the((rhs.scale - <span class="self">self</span>.scale) <span class="kw">as </span>u64);
-            scaled_int_val == rhs.int_val
-        } <span class="kw">else </span>{
-            <span class="self">self</span>.int_val == rhs.int_val
+        </span><span class="kw">match </span><span class="self">self</span>.scale.cmp(<span class="kw-2">&amp;</span>rhs.scale) {
+            Ordering::Greater =&gt; {
+                <span class="kw">let </span>scaled_int_val = <span class="kw-2">&amp;</span>rhs.int_val * ten_to_the((<span class="self">self</span>.scale - rhs.scale) <span class="kw">as </span>u64);
+                <span class="self">self</span>.int_val == scaled_int_val
+            }
+            Ordering::Less =&gt; {
+                <span class="kw">let </span>scaled_int_val = <span class="kw-2">&amp;</span><span class="self">self</span>.int_val * ten_to_the((rhs.scale - <span class="self">self</span>.scale) <span class="kw">as </span>u64);
+                scaled_int_val == rhs.int_val
+            }
+            Ordering::Equal =&gt; <span class="self">self</span>.int_val == rhs.int_val,
         }
     }
 }
@@ -3834,12 +4013,10 @@
     <span class="attr">#[inline]
     </span><span class="kw">fn </span>add(<span class="self">self</span>, rhs: <span class="kw-2">&amp;</span>BigDecimal) -&gt; BigDecimal {
         <span class="kw">let </span>lhs = <span class="self">self</span>;
-        <span class="kw">if </span><span class="self">self</span>.scale &lt; rhs.scale {
-            lhs.with_scale(rhs.scale) + rhs
-        } <span class="kw">else if </span><span class="self">self</span>.scale &gt; rhs.scale {
-            rhs.with_scale(lhs.scale) + lhs
-        } <span class="kw">else </span>{
-            BigDecimal::new(lhs.int_val.clone() + <span class="kw-2">&amp;</span>rhs.int_val, lhs.scale)
+        <span class="kw">match </span><span class="self">self</span>.scale.cmp(<span class="kw-2">&amp;</span>rhs.scale) {
+            Ordering::Less =&gt; lhs.with_scale(rhs.scale) + rhs,
+            Ordering::Greater =&gt; rhs.with_scale(lhs.scale) + lhs,
+            Ordering::Equal =&gt; BigDecimal::new(lhs.int_val.clone() + <span class="kw-2">&amp;</span>rhs.int_val, lhs.scale),
         }
     }
 }
@@ -3909,15 +4086,19 @@
 <span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; AddAssign&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>BigDecimal&gt; <span class="kw">for </span>BigDecimal {
     <span class="attr">#[inline]
     </span><span class="kw">fn </span>add_assign(<span class="kw-2">&amp;mut </span><span class="self">self</span>, rhs: <span class="kw-2">&amp;</span>BigDecimal) {
-        <span class="kw">if </span><span class="self">self</span>.scale &lt; rhs.scale {
-            <span class="kw">let </span>scaled = <span class="self">self</span>.with_scale(rhs.scale);
-            <span class="self">self</span>.int_val = scaled.int_val + <span class="kw-2">&amp;</span>rhs.int_val;
-            <span class="self">self</span>.scale = rhs.scale;
-        } <span class="kw">else if </span><span class="self">self</span>.scale &gt; rhs.scale {
-            <span class="kw">let </span>scaled = rhs.with_scale(<span class="self">self</span>.scale);
-            <span class="self">self</span>.int_val += scaled.int_val;
-        } <span class="kw">else </span>{
-            <span class="self">self</span>.int_val += <span class="kw-2">&amp;</span>rhs.int_val;
+        <span class="kw">match </span><span class="self">self</span>.scale.cmp(<span class="kw-2">&amp;</span>rhs.scale) {
+            Ordering::Less =&gt; {
+                <span class="kw">let </span>scaled = <span class="self">self</span>.with_scale(rhs.scale);
+                <span class="self">self</span>.int_val = scaled.int_val + <span class="kw-2">&amp;</span>rhs.int_val;
+                <span class="self">self</span>.scale = rhs.scale;
+            }
+            Ordering::Greater =&gt; {
+                <span class="kw">let </span>scaled = rhs.with_scale(<span class="self">self</span>.scale);
+                <span class="self">self</span>.int_val += scaled.int_val;
+            }
+            Ordering::Equal =&gt; {
+                <span class="self">self</span>.int_val += <span class="kw-2">&amp;</span>rhs.int_val;
+            }
         }
     }
 }
@@ -3932,18 +4113,7 @@
 <span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; AddAssign&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>BigInt&gt; <span class="kw">for </span>BigDecimal {
     <span class="attr">#[inline]
     </span><span class="kw">fn </span>add_assign(<span class="kw-2">&amp;mut </span><span class="self">self</span>, rhs: <span class="kw-2">&amp;</span>BigInt) {
-        <span class="comment">/* // which one looks best?
-        if self.scale == 0 {
-            self.int_val += rhs;
-        } else if self.scale &gt; 0 {
-            self.int_val += rhs * ten_to_the(self.scale as u64);
-        } else {
-            self.int_val *= ten_to_the((-self.scale) as u64);
-            self.int_val += rhs;
-            self.scale = 0;
-        }
-         */
-        </span><span class="kw">match </span><span class="self">self</span>.scale.cmp(<span class="kw-2">&amp;</span><span class="number">0</span>) {
+        <span class="kw">match </span><span class="self">self</span>.scale.cmp(<span class="kw-2">&amp;</span><span class="number">0</span>) {
             Ordering::Equal =&gt; <span class="self">self</span>.int_val += rhs,
             Ordering::Greater =&gt; <span class="self">self</span>.int_val += rhs * ten_to_the(<span class="self">self</span>.scale <span class="kw">as </span>u64),
             Ordering::Less =&gt; {
@@ -4008,13 +4178,13 @@
 
     <span class="attr">#[inline]
     </span><span class="kw">fn </span>sub(<span class="self">self</span>, rhs: <span class="kw-2">&amp;</span>BigDecimal) -&gt; BigDecimal {
-        <span class="kw">if </span><span class="self">self</span>.scale &lt; rhs.scale {
-            <span class="self">self</span>.with_scale(rhs.scale) - rhs
-        } <span class="kw">else if </span><span class="self">self</span>.scale &gt; rhs.scale {
-            <span class="kw">let </span>rhs = rhs.with_scale(<span class="self">self</span>.scale);
-            <span class="self">self </span>- rhs
-        } <span class="kw">else </span>{
-            BigDecimal::new(<span class="kw-2">&amp;</span><span class="self">self</span>.int_val - <span class="kw-2">&amp;</span>rhs.int_val, <span class="self">self</span>.scale)
+        <span class="kw">match </span><span class="self">self</span>.scale.cmp(<span class="kw-2">&amp;</span>rhs.scale) {
+            Ordering::Greater =&gt; {
+                <span class="kw">let </span>rhs = rhs.with_scale(<span class="self">self</span>.scale);
+                <span class="self">self </span>- rhs
+            }
+            Ordering::Less =&gt; <span class="self">self</span>.with_scale(rhs.scale) - rhs,
+            Ordering::Equal =&gt; BigDecimal::new(<span class="kw-2">&amp;</span><span class="self">self</span>.int_val - <span class="kw-2">&amp;</span>rhs.int_val, <span class="self">self</span>.scale),
         }
     }
 }
@@ -4084,14 +4254,18 @@
 <span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; SubAssign&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>BigDecimal&gt; <span class="kw">for </span>BigDecimal {
     <span class="attr">#[inline]
     </span><span class="kw">fn </span>sub_assign(<span class="kw-2">&amp;mut </span><span class="self">self</span>, rhs: <span class="kw-2">&amp;</span>BigDecimal) {
-        <span class="kw">if </span><span class="self">self</span>.scale &lt; rhs.scale {
-            <span class="kw">let </span>lhs = <span class="self">self</span>.with_scale(rhs.scale);
-            <span class="self">self</span>.int_val = lhs.int_val - <span class="kw-2">&amp;</span>rhs.int_val;
-            <span class="self">self</span>.scale = rhs.scale;
-        } <span class="kw">else if </span><span class="self">self</span>.scale &gt; rhs.scale {
-            <span class="self">self</span>.int_val -= rhs.with_scale(<span class="self">self</span>.scale).int_val;
-        } <span class="kw">else </span>{
-            <span class="self">self</span>.int_val = <span class="kw-2">&amp;</span><span class="self">self</span>.int_val - <span class="kw-2">&amp;</span>rhs.int_val;
+        <span class="kw">match </span><span class="self">self</span>.scale.cmp(<span class="kw-2">&amp;</span>rhs.scale) {
+            Ordering::Less =&gt; {
+                <span class="kw">let </span>lhs = <span class="self">self</span>.with_scale(rhs.scale);
+                <span class="self">self</span>.int_val = lhs.int_val - <span class="kw-2">&amp;</span>rhs.int_val;
+                <span class="self">self</span>.scale = rhs.scale;
+            }
+            Ordering::Greater =&gt; {
+                <span class="self">self</span>.int_val -= rhs.with_scale(<span class="self">self</span>.scale).int_val;
+            }
+            Ordering::Equal =&gt; {
+                <span class="self">self</span>.int_val = <span class="kw-2">&amp;</span><span class="self">self</span>.int_val - <span class="kw-2">&amp;</span>rhs.int_val;
+            }
         }
     }
 }
@@ -4123,10 +4297,16 @@
 
     <span class="attr">#[inline]
     </span><span class="kw">fn </span>mul(<span class="kw-2">mut </span><span class="self">self</span>, rhs: BigDecimal) -&gt; BigDecimal {
-        <span class="self">self</span>.scale += rhs.scale;
-        <span class="self">self</span>.int_val <span class="kw-2">*</span>= rhs.int_val;
-        <span class="self">self
-    </span>}
+        <span class="kw">if </span><span class="self">self</span>.is_one() {
+            rhs
+        } <span class="kw">else if </span>rhs.is_one() {
+            <span class="self">self
+        </span>} <span class="kw">else </span>{
+            <span class="self">self</span>.scale += rhs.scale;
+            <span class="self">self</span>.int_val <span class="kw-2">*</span>= rhs.int_val;
+            <span class="self">self
+        </span>}
+    }
 }
 
 <span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; Mul&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>BigDecimal&gt; <span class="kw">for </span>BigDecimal {
@@ -4134,10 +4314,19 @@
 
     <span class="attr">#[inline]
     </span><span class="kw">fn </span>mul(<span class="kw-2">mut </span><span class="self">self</span>, rhs: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>BigDecimal) -&gt; BigDecimal {
-        <span class="self">self</span>.scale += rhs.scale;
-        MulAssign::mul_assign(<span class="kw-2">&amp;mut </span><span class="self">self</span>.int_val, <span class="kw-2">&amp;</span>rhs.int_val);
-        <span class="self">self
-    </span>}
+        <span class="kw">if </span><span class="self">self</span>.is_one() {
+            <span class="self">self</span>.scale = rhs.scale;
+            <span class="self">self</span>.int_val.set_zero();
+            <span class="self">self</span>.int_val.add_assign(<span class="kw-2">&amp;</span>rhs.int_val);
+            <span class="self">self
+        </span>} <span class="kw">else if </span>rhs.is_one() {
+            <span class="self">self
+        </span>} <span class="kw">else </span>{
+            <span class="self">self</span>.scale += rhs.scale;
+            MulAssign::mul_assign(<span class="kw-2">&amp;mut </span><span class="self">self</span>.int_val, <span class="kw-2">&amp;</span>rhs.int_val);
+            <span class="self">self
+        </span>}
+    }
 }
 
 <span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; Mul&lt;BigDecimal&gt; <span class="kw">for </span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>BigDecimal {
@@ -4154,8 +4343,14 @@
 
     <span class="attr">#[inline]
     </span><span class="kw">fn </span>mul(<span class="self">self</span>, rhs: <span class="kw-2">&amp;</span>BigDecimal) -&gt; BigDecimal {
-        <span class="kw">let </span>scale = <span class="self">self</span>.scale + rhs.scale;
-        BigDecimal::new(<span class="kw-2">&amp;</span><span class="self">self</span>.int_val * <span class="kw-2">&amp;</span>rhs.int_val, scale)
+        <span class="kw">if </span><span class="self">self</span>.is_one() {
+            rhs.normalized()
+        } <span class="kw">else if </span>rhs.is_one() {
+            <span class="self">self</span>.normalized()
+        } <span class="kw">else </span>{
+            <span class="kw">let </span>scale = <span class="self">self</span>.scale + rhs.scale;
+            BigDecimal::new(<span class="kw-2">&amp;</span><span class="self">self</span>.int_val * <span class="kw-2">&amp;</span>rhs.int_val, scale)
+        }
     }
 }
 
@@ -4194,20 +4389,117 @@
 
     <span class="attr">#[inline]
     </span><span class="kw">fn </span>mul(<span class="self">self</span>, rhs: <span class="kw-2">&amp;</span>BigInt) -&gt; BigDecimal {
-        <span class="kw">let </span>value = <span class="kw-2">&amp;</span><span class="self">self</span>.int_val * rhs;
-        BigDecimal::new(value, <span class="self">self</span>.scale)
+        <span class="kw">if </span>rhs.is_one() {
+            <span class="self">self</span>.normalized()
+        } <span class="kw">else if </span><span class="self">self</span>.is_one() {
+            BigDecimal::new(rhs.clone(), <span class="number">0</span>)
+        } <span class="kw">else </span>{
+            <span class="kw">let </span>value = <span class="kw-2">&amp;</span><span class="self">self</span>.int_val * rhs;
+            BigDecimal::new(value, <span class="self">self</span>.scale)
+        }
     }
 }
+
+<span class="kw">impl </span>Mul&lt;BigDecimal&gt; <span class="kw">for </span>BigInt {
+    <span class="kw">type </span>Output = BigDecimal;
+
+    <span class="attr">#[inline]
+    </span><span class="kw">fn </span>mul(<span class="kw-2">mut </span><span class="self">self</span>, <span class="kw-2">mut </span>rhs: BigDecimal) -&gt; BigDecimal {
+        <span class="kw">if </span>rhs.is_one() {
+            rhs.scale = <span class="number">0</span>;
+            std::mem::swap(<span class="kw-2">&amp;mut </span>rhs.int_val, <span class="kw-2">&amp;mut </span><span class="self">self</span>);
+        } <span class="kw">else if </span>!<span class="self">self</span>.is_one() {
+            rhs.int_val <span class="kw-2">*</span>= <span class="self">self</span>;
+        }
+        rhs
+    }
+}
+
+
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; Mul&lt;BigDecimal&gt; <span class="kw">for </span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>BigInt {
+    <span class="kw">type </span>Output = BigDecimal;
+
+    <span class="attr">#[inline]
+    </span><span class="kw">fn </span>mul(<span class="self">self</span>, <span class="kw-2">mut </span>rhs: BigDecimal) -&gt; BigDecimal {
+        <span class="kw">if </span><span class="self">self</span>.is_one() {
+            rhs.normalized()
+        } <span class="kw">else if </span>rhs.is_one() {
+            rhs.int_val.set_zero();
+            rhs.int_val += <span class="self">self</span>;
+            rhs.scale = <span class="number">0</span>;
+            rhs
+        } <span class="kw">else </span>{
+            rhs.int_val <span class="kw-2">*</span>= <span class="self">self</span>;
+            rhs
+        }
+    }
+}
+
+
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span>&gt; Mul&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>BigDecimal&gt; <span class="kw">for </span><span class="kw-2">&amp;</span><span class="lifetime">&#39;b </span>BigInt {
+    <span class="kw">type </span>Output = BigDecimal;
+
+    <span class="attr">#[inline]
+    </span><span class="kw">fn </span>mul(<span class="self">self</span>, rhs: <span class="kw-2">&amp;</span>BigDecimal) -&gt; BigDecimal {
+        <span class="kw">if </span><span class="self">self</span>.is_one() {
+            rhs.normalized()
+        } <span class="kw">else if </span>rhs.is_one() {
+            BigDecimal::new(<span class="self">self</span>.clone(), <span class="number">0</span>)
+        } <span class="kw">else </span>{
+            <span class="kw">let </span>value = <span class="kw-2">&amp;</span>rhs.int_val * <span class="self">self</span>;
+            BigDecimal::new(value, rhs.scale)
+        }
+    }
+}
+
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; Mul&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>BigDecimal&gt; <span class="kw">for </span>BigInt {
+    <span class="kw">type </span>Output = BigDecimal;
+
+    <span class="attr">#[inline]
+    </span><span class="kw">fn </span>mul(<span class="kw-2">mut </span><span class="self">self</span>, rhs: <span class="kw-2">&amp;</span>BigDecimal) -&gt; BigDecimal {
+        <span class="kw">if </span><span class="self">self</span>.is_one() {
+            rhs.normalized()
+        } <span class="kw">else if </span>rhs.is_one() {
+            BigDecimal::new(<span class="self">self</span>, <span class="number">0</span>)
+        } <span class="kw">else </span>{
+            <span class="self">self </span><span class="kw-2">*</span>= <span class="kw-2">&amp;</span>rhs.int_val;
+            BigDecimal::new(<span class="self">self</span>, rhs.scale)
+        }
+    }
+}
+
 
 <span class="macro">forward_val_assignop!</span>(<span class="kw">impl </span>MulAssign <span class="kw">for </span>BigDecimal, mul_assign);
 
 <span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; MulAssign&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>BigDecimal&gt; <span class="kw">for </span>BigDecimal {
     <span class="attr">#[inline]
     </span><span class="kw">fn </span>mul_assign(<span class="kw-2">&amp;mut </span><span class="self">self</span>, rhs: <span class="kw-2">&amp;</span>BigDecimal) {
+        <span class="kw">if </span>rhs.is_one() {
+            <span class="kw">return</span>;
+        }
         <span class="self">self</span>.scale += rhs.scale;
         <span class="self">self</span>.int_val = <span class="kw-2">&amp;</span><span class="self">self</span>.int_val * <span class="kw-2">&amp;</span>rhs.int_val;
     }
 }
+
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; MulAssign&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>BigInt&gt; <span class="kw">for </span>BigDecimal {
+    <span class="attr">#[inline]
+    </span><span class="kw">fn </span>mul_assign(<span class="kw-2">&amp;mut </span><span class="self">self</span>, rhs: <span class="kw-2">&amp;</span>BigInt) {
+        <span class="kw">if </span>rhs.is_one() {
+            <span class="kw">return</span>;
+        }
+        <span class="self">self</span>.int_val <span class="kw-2">*</span>= rhs;
+    }
+}
+
+<span class="kw">impl </span>MulAssign&lt;BigInt&gt; <span class="kw">for </span>BigDecimal {
+    <span class="attr">#[inline]
+    </span><span class="kw">fn </span>mul_assign(<span class="kw-2">&amp;mut </span><span class="self">self</span>, rhs: BigInt) {
+        <span class="kw-2">*</span><span class="self">self </span><span class="kw-2">*</span>= <span class="kw-2">&amp;</span>rhs
+    }
+}
+
+
 
 <span class="macro">impl_div_for_primitives!</span>();
 
@@ -4348,7 +4640,7 @@
 
         <span class="kw">let </span>max_precision = <span class="number">100</span>;
 
-        <span class="kw">return </span>impl_division(num_int.clone(), <span class="kw-2">&amp;</span>den_int, scale, max_precision);
+        <span class="kw">return </span>impl_division(num_int.clone(), den_int, scale, max_precision);
     }
 }
 
@@ -4599,7 +4891,7 @@
         };
 
         <span class="comment">// TEMPORARY: Test for emptiness - remove once BigInt supports similar error
-        </span><span class="kw">if </span>base_part == <span class="string">&quot;&quot; </span>{
+        </span><span class="kw">if </span>base_part.is_empty() {
             <span class="kw">return </span><span class="prelude-val">Err</span>(ParseBigDecimalError::Empty);
         }
 
@@ -5125,7 +5417,8 @@
         }
     }
 
-    <span class="attr">#[test]
+    <span class="doccomment">/// Test multiplication of two bigdecimals
+    </span><span class="attr">#[test]
     </span><span class="kw">fn </span>test_mul() {
 
         <span class="kw">let </span>vals = <span class="macro">vec!</span>[
@@ -5135,6 +5428,10 @@
             (<span class="string">&quot;3&quot;</span>, <span class="string">&quot;.333333&quot;</span>, <span class="string">&quot;0.999999&quot;</span>),
             (<span class="string">&quot;2389472934723&quot;</span>, <span class="string">&quot;209481029831&quot;</span>, <span class="string">&quot;500549251119075878721813&quot;</span>),
             (<span class="string">&quot;1e-450&quot;</span>, <span class="string">&quot;1e500&quot;</span>, <span class="string">&quot;.1e51&quot;</span>),
+            (<span class="string">&quot;-995052931372975485719.533153137&quot;</span>, <span class="string">&quot;4.523087321&quot;</span>, <span class="string">&quot;-4500711297616988541501.836966993116075977&quot;</span>),
+            (<span class="string">&quot;995052931372975485719.533153137&quot;</span>, <span class="string">&quot;-4.523087321&quot;</span>, <span class="string">&quot;-4500711297616988541501.836966993116075977&quot;</span>),
+            (<span class="string">&quot;-8.37664968&quot;</span>, <span class="string">&quot;-1.9086963714056968482094712882596748&quot;</span>, <span class="string">&quot;15.988480848752691653730876239769592670324064&quot;</span>),
+            (<span class="string">&quot;-8.37664968&quot;</span>, <span class="string">&quot;0&quot;</span>, <span class="string">&quot;0&quot;</span>),
         ];
 
         <span class="kw">for </span><span class="kw-2">&amp;</span>(x, y, z) <span class="kw">in </span>vals.iter() {
@@ -5150,6 +5447,37 @@
 
             a <span class="kw-2">*</span>= b;
             <span class="macro">assert_eq!</span>(a, c);
+        }
+    }
+
+    <span class="doccomment">/// Test multiplication between big decimal and big integer
+    </span><span class="attr">#[test]
+    </span><span class="kw">fn </span>test_mul_bigint() {
+        <span class="kw">let </span>vals = <span class="macro">vec!</span>[
+            (<span class="string">&quot;2&quot;</span>, <span class="string">&quot;1&quot;</span>, <span class="string">&quot;2&quot;</span>),
+            (<span class="string">&quot;8.561&quot;</span>, <span class="string">&quot;10&quot;</span>, <span class="string">&quot;85.61&quot;</span>),
+            (<span class="string">&quot;1.0000&quot;</span>, <span class="string">&quot;638655273892892437&quot;</span>, <span class="string">&quot;638655273892892437&quot;</span>),
+            (<span class="string">&quot;10000&quot;</span>, <span class="string">&quot;638655273892892437&quot;</span>, <span class="string">&quot;6386552738928924370000&quot;</span>),
+            (<span class="string">&quot;.0005&quot;</span>, <span class="string">&quot;368408638655273892892437473&quot;</span>, <span class="string">&quot;184204319327636946446218.7365&quot;</span>),
+            (<span class="string">&quot;9e-1&quot;</span>, <span class="string">&quot;368408638655273892892437473&quot;</span>, <span class="string">&quot;331567774789746503603193725.7&quot;</span>),
+            (<span class="string">&quot;-1.175470587012343730098&quot;</span>, <span class="string">&quot;577575785&quot;</span>, <span class="string">&quot;-678923347.038065234601180476930&quot;</span>),
+            (<span class="string">&quot;-1.175470587012343730098&quot;</span>, <span class="string">&quot;-76527768352678&quot;</span>, <span class="string">&quot;89956140788267.069799533723307502444&quot;</span>),
+            (<span class="string">&quot;-1.175470587012343730098&quot;</span>, <span class="string">&quot;0&quot;</span>, <span class="string">&quot;0&quot;</span>),
+        ];
+
+        <span class="kw">for </span><span class="kw-2">&amp;</span>(x, y, z) <span class="kw">in </span>vals.iter() {
+            <span class="kw">let </span>a = BigDecimal::from_str(x).unwrap();
+            <span class="kw">let </span>b = num_bigint::BigInt::from_str(y).unwrap();
+            <span class="kw">let </span>c = BigDecimal::from_str(z).unwrap();
+
+            <span class="macro">assert_eq!</span>(a.clone() * b.clone(), c);
+            <span class="macro">assert_eq!</span>(b.clone() * a.clone(), c);
+            <span class="macro">assert_eq!</span>(a.clone() * <span class="kw-2">&amp;</span>b, c);
+            <span class="macro">assert_eq!</span>(b.clone() * <span class="kw-2">&amp;</span>a, c);
+            <span class="macro">assert_eq!</span>(<span class="kw-2">&amp;</span>a * b.clone(), c);
+            <span class="macro">assert_eq!</span>(<span class="kw-2">&amp;</span>b * a.clone(), c);
+            <span class="macro">assert_eq!</span>(<span class="kw-2">&amp;</span>a * <span class="kw-2">&amp;</span>b, c);
+            <span class="macro">assert_eq!</span>(<span class="kw-2">&amp;</span>b * <span class="kw-2">&amp;</span>a, c);
         }
     }
 
@@ -5492,6 +5820,10 @@
             (<span class="string">&quot;199999911199999999999999999999999999999999999999999999999999999999999999999999999999999999999000&quot;</span>, <span class="number">96</span>),
             (<span class="string">&quot;999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999991&quot;</span>, <span class="number">192</span>),
             (<span class="string">&quot;199999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999&quot;</span>, <span class="number">192</span>),
+            (<span class="string">&quot;-1&quot;</span>, <span class="number">1</span>),
+            (<span class="string">&quot;-6&quot;</span>, <span class="number">1</span>),
+            (<span class="string">&quot;-10&quot;</span>, <span class="number">2</span>),
+            (<span class="string">&quot;-999999999999999999999999&quot;</span>, <span class="number">24</span>),
         ];
         <span class="kw">for </span><span class="kw-2">&amp;</span>(x, y) <span class="kw">in </span>vals.iter() {
             <span class="kw">let </span>a = BigInt::from_str(x).unwrap();
@@ -5540,11 +5872,17 @@
             (<span class="string">&quot;1.449999999&quot;</span>, <span class="number">1</span>, <span class="string">&quot;1.4&quot;</span>),
             (<span class="string">&quot;-9999.444455556666&quot;</span>, <span class="number">10</span>, <span class="string">&quot;-9999.4444555567&quot;</span>),
             (<span class="string">&quot;-12345678987654321.123456789&quot;</span>, <span class="number">8</span>, <span class="string">&quot;-12345678987654321.12345679&quot;</span>),
+            (<span class="string">&quot;0.33333333333333333333333333333333333333333333333333333333333333333333333333333333333333&quot;</span>, <span class="number">0</span>, <span class="string">&quot;0&quot;</span>),
+            (<span class="string">&quot;0.1165085714285714285714285714285714285714&quot;</span>, <span class="number">0</span>, <span class="string">&quot;0&quot;</span>),
+            (<span class="string">&quot;0.1165085714285714285714285714285714285714&quot;</span>, <span class="number">2</span>, <span class="string">&quot;0.12&quot;</span>),
+            (<span class="string">&quot;0.1165085714285714285714285714285714285714&quot;</span>, <span class="number">5</span>, <span class="string">&quot;0.11651&quot;</span>),
+            (<span class="string">&quot;0.1165085714285714285714285714285714285714&quot;</span>, <span class="number">8</span>, <span class="string">&quot;0.11650857&quot;</span>),
         ];
         <span class="kw">for </span><span class="kw-2">&amp;</span>(x, digits, y) <span class="kw">in </span>test_cases.iter() {
             <span class="kw">let </span>a = BigDecimal::from_str(x).unwrap();
             <span class="kw">let </span>b = BigDecimal::from_str(y).unwrap();
-            <span class="macro">assert_eq!</span>(a.round(digits), b);
+            <span class="kw">let </span>rounded = a.round(digits);
+            <span class="macro">assert_eq!</span>(rounded, b);
         }
     }
 

@@ -59,7 +59,7 @@ not found in the range.</p>
 <p>The default implementation uses <code>read_bytes</code>, and returns an error if
 <code>read_bytes</code> does not return bytes with the correct alignment for <code>T</code>.
 Implementors may want to provide their own implementation that ensures
-the alignment can be satisified. Alternatively, only use this method with
+the alignment can be satisfied. Alternatively, only use this method with
 types that do not need alignment (see the <code>unaligned</code> feature of this crate).</p>
 </div></details><details class="toggle method-toggle" open><summary><section id="method.read_at" class="method"><a class="srclink rightside" href="../../src/object/read/read_ref.rs.html#84-86">source</a><h4 class="code-header">fn <a href="#method.read_at" class="fn">read_at</a>&lt;T: <a class="trait" href="../pod/trait.Pod.html" title="trait object::pod::Pod">Pod</a>&gt;(self, offset: <a class="primitive" href="https://doc.rust-lang.org/1.71.0/std/primitive.u64.html">u64</a>) -&gt; <a class="enum" href="https://doc.rust-lang.org/1.71.0/core/result/enum.Result.html" title="enum core::result::Result">Result</a>&lt;<a class="primitive" href="https://doc.rust-lang.org/1.71.0/std/primitive.reference.html">&amp;'a T</a>, <a class="primitive" href="https://doc.rust-lang.org/1.71.0/std/primitive.unit.html">()</a>&gt;</h4></section></summary><div class="docblock"><p>Get a reference to a <code>Pod</code> type at the given offset.</p>
 <p>Returns an error if offset or size are out of bounds.</p>

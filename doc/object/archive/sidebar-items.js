@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"constant":["MAGIC","TERMINATOR","THIN_MAGIC"],"struct":["Header"]};
+window.SIDEBAR_ITEMS = {"constant":["AIX_BIG_MAGIC","MAGIC","TERMINATOR","THIN_MAGIC"],"struct":["AixFileHeader","AixHeader","AixMemberOffset","Header"]};

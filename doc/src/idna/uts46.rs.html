@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/nix/store/jnqxxv1xi811ni996b002f4jnyz38xck-vendor-cargo-deps/c19b7c6f923b580ac259164a89f2577984ad5ab09ee9d583b888f934adbbe8d0/idna-0.2.3/src/uts46.rs`."><title>uts46.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-f3501f0f5ae15dfb.css" id="mainThemeStyle"><div id="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="idna" data-themes="" data-resource-suffix="" data-rustdoc-version="1.71.0 (8ede3aae2 2023-07-12)" data-search-js="search-4926e5fc22a5646a.js" data-settings-js="settings-de11bff964e9d4e5.js" data-settings-css="settings-8c76f75bfb6bd192.css" data-theme-light-css="light-0f8c037637f9eb3e.css" data-theme-dark-css="dark-1097f8e92a01e3cf.css" data-theme-ayu-css="ayu-614652228113ac93.css" ></div><script src="../../static.files/storage-62ce34ea385b278a.js"></script><script defer src="../../static.files/source-script-11255107d0a65077.js"></script><script defer src="../../source-files.js"></script><script defer src="../../static.files/main-f0540c1d82cde29b.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../../static.files/light-0f8c037637f9eb3e.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../../static.files/dark-1097f8e92a01e3cf.css"><link rel="stylesheet" href="../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../idna/index.html"><img class="rust-logo" src="../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/nix/store/yf45a1rayffhnidhgyjynpyhr9lqkd09-vendor-cargo-deps/c19b7c6f923b580ac259164a89f2577984ad5ab09ee9d583b888f934adbbe8d0/idna-0.4.0/src/uts46.rs`."><title>uts46.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-f3501f0f5ae15dfb.css" id="mainThemeStyle"><div id="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="idna" data-themes="" data-resource-suffix="" data-rustdoc-version="1.71.0 (8ede3aae2 2023-07-12)" data-search-js="search-4926e5fc22a5646a.js" data-settings-js="settings-de11bff964e9d4e5.js" data-settings-css="settings-8c76f75bfb6bd192.css" data-theme-light-css="light-0f8c037637f9eb3e.css" data-theme-dark-css="dark-1097f8e92a01e3cf.css" data-theme-ayu-css="ayu-614652228113ac93.css" ></div><script src="../../static.files/storage-62ce34ea385b278a.js"></script><script defer src="../../static.files/source-script-11255107d0a65077.js"></script><script defer src="../../source-files.js"></script><script defer src="../../static.files/main-f0540c1d82cde29b.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../../static.files/light-0f8c037637f9eb3e.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../../static.files/dark-1097f8e92a01e3cf.css"><link rel="stylesheet" href="../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../idna/index.html"><img class="rust-logo" src="../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -725,6 +725,19 @@
 <a href="#725" id="725">725</a>
 <a href="#726" id="726">726</a>
 <a href="#727" id="727">727</a>
+<a href="#728" id="728">728</a>
+<a href="#729" id="729">729</a>
+<a href="#730" id="730">730</a>
+<a href="#731" id="731">731</a>
+<a href="#732" id="732">732</a>
+<a href="#733" id="733">733</a>
+<a href="#734" id="734">734</a>
+<a href="#735" id="735">735</a>
+<a href="#736" id="736">736</a>
+<a href="#737" id="737">737</a>
+<a href="#738" id="738">738</a>
+<a href="#739" id="739">739</a>
+<a href="#740" id="740">740</a>
 </pre></div><pre class="rust"><code><span class="comment">// Copyright 2013-2014 The rust-url developers.
 //
 // Licensed under the Apache License, Version 2.0 &lt;LICENSE-APACHE or
@@ -738,7 +751,9 @@
 
 </span><span class="kw">use </span><span class="self">self</span>::Mapping::<span class="kw-2">*</span>;
 <span class="kw">use </span><span class="kw">crate</span>::punycode;
-<span class="kw">use </span>std::{error::Error <span class="kw">as </span>StdError, fmt};
+
+<span class="kw">use </span>alloc::string::String;
+<span class="kw">use </span>core::fmt;
 <span class="kw">use </span>unicode_bidi::{bidi_class, BidiClass};
 <span class="kw">use </span>unicode_normalization::char::is_combining_mark;
 <span class="kw">use </span>unicode_normalization::{is_nfc, UnicodeNormalization};
@@ -797,10 +812,10 @@
 }
 
 <span class="kw">struct </span>Mapper&lt;<span class="lifetime">&#39;a</span>&gt; {
-    chars: std::str::Chars&lt;<span class="lifetime">&#39;a</span>&gt;,
+    chars: core::str::Chars&lt;<span class="lifetime">&#39;a</span>&gt;,
     config: Config,
     errors: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span>Errors,
-    slice: <span class="prelude-ty">Option</span>&lt;std::str::Chars&lt;<span class="lifetime">&#39;static</span>&gt;&gt;,
+    slice: <span class="prelude-ty">Option</span>&lt;core::str::Chars&lt;<span class="lifetime">&#39;static</span>&gt;&gt;,
 }
 
 <span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; Iterator <span class="kw">for </span>Mapper&lt;<span class="lifetime">&#39;a</span>&gt; {
@@ -883,7 +898,7 @@
         <span class="comment">// LTR label
         </span>BidiClass::L =&gt; {
             <span class="comment">// Rule 5
-            </span><span class="kw">while let </span><span class="prelude-val">Some</span>(c) = chars.next() {
+            </span><span class="kw">for </span>c <span class="kw">in </span>chars.by_ref() {
                 <span class="kw">if </span>!<span class="macro">matches!</span>(
                     bidi_class(c),
                     BidiClass::L
@@ -1001,7 +1016,7 @@
 /// http://www.unicode.org/reports/tr46/#Validity_Criteria
 </span><span class="kw">fn </span>check_validity(label: <span class="kw-2">&amp;</span>str, config: Config, errors: <span class="kw-2">&amp;mut </span>Errors) {
     <span class="kw">let </span>first_char = label.chars().next();
-    <span class="kw">if </span>first_char == <span class="prelude-val">None </span>{
+    <span class="kw">if </span>first_char.is_none() {
         <span class="comment">// Empty string, pass
         </span><span class="kw">return</span>;
     }
@@ -1045,51 +1060,48 @@
     // V8: Bidi rules are checked inside `processing()`
 </span>}
 
-<span class="doccomment">/// http://www.unicode.org/reports/tr46/#Processing
-</span><span class="attr">#[allow(clippy::manual_strip)] </span><span class="comment">// introduced in 1.45, MSRV is 1.36
-</span><span class="kw">fn </span>processing(
-    domain: <span class="kw-2">&amp;</span>str,
-    config: Config,
-    normalized: <span class="kw-2">&amp;mut </span>String,
-    output: <span class="kw-2">&amp;mut </span>String,
-) -&gt; Errors {
-    <span class="comment">// Weed out the simple cases: only allow all lowercase ASCII characters and digits where none
-    // of the labels start with PUNYCODE_PREFIX and labels don&#39;t start or end with hyphen.
-    </span><span class="kw">let </span>(<span class="kw-2">mut </span>prev, <span class="kw-2">mut </span>simple, <span class="kw-2">mut </span>puny_prefix) = (<span class="string">&#39;?&#39;</span>, !domain.is_empty(), <span class="number">0</span>);
+<span class="comment">// Detect simple cases: all lowercase ASCII characters and digits where none
+// of the labels start with PUNYCODE_PREFIX and labels don&#39;t start or end with hyphen.
+</span><span class="kw">fn </span>is_simple(domain: <span class="kw-2">&amp;</span>str) -&gt; bool {
+    <span class="kw">if </span>domain.is_empty() {
+        <span class="kw">return </span><span class="bool-val">false</span>;
+    }
+    <span class="kw">let </span>(<span class="kw-2">mut </span>prev, <span class="kw-2">mut </span>puny_prefix) = (<span class="string">&#39;?&#39;</span>, <span class="number">0</span>);
     <span class="kw">for </span>c <span class="kw">in </span>domain.chars() {
         <span class="kw">if </span>c == <span class="string">&#39;.&#39; </span>{
             <span class="kw">if </span>prev == <span class="string">&#39;-&#39; </span>{
-                simple = <span class="bool-val">false</span>;
-                <span class="kw">break</span>;
+                <span class="kw">return </span><span class="bool-val">false</span>;
             }
             puny_prefix = <span class="number">0</span>;
             <span class="kw">continue</span>;
         } <span class="kw">else if </span>puny_prefix == <span class="number">0 </span>&amp;&amp; c == <span class="string">&#39;-&#39; </span>{
-            simple = <span class="bool-val">false</span>;
-            <span class="kw">break</span>;
+            <span class="kw">return </span><span class="bool-val">false</span>;
         } <span class="kw">else if </span>puny_prefix &lt; <span class="number">5 </span>{
             <span class="kw">if </span>c == [<span class="string">&#39;x&#39;</span>, <span class="string">&#39;n&#39;</span>, <span class="string">&#39;-&#39;</span>, <span class="string">&#39;-&#39;</span>][puny_prefix] {
                 puny_prefix += <span class="number">1</span>;
                 <span class="kw">if </span>puny_prefix == <span class="number">4 </span>{
-                    simple = <span class="bool-val">false</span>;
-                    <span class="kw">break</span>;
+                    <span class="kw">return </span><span class="bool-val">false</span>;
                 }
             } <span class="kw">else </span>{
                 puny_prefix = <span class="number">5</span>;
             }
         }
         <span class="kw">if </span>!c.is_ascii_lowercase() &amp;&amp; !c.is_ascii_digit() {
-            simple = <span class="bool-val">false</span>;
-            <span class="kw">break</span>;
+            <span class="kw">return </span><span class="bool-val">false</span>;
         }
         prev = c;
     }
 
-    <span class="kw">if </span>simple {
-        output.push_str(domain);
-        <span class="kw">return </span>Errors::default();
-    }
+    <span class="bool-val">true
+</span>}
 
+<span class="doccomment">/// http://www.unicode.org/reports/tr46/#Processing
+</span><span class="kw">fn </span>processing(
+    domain: <span class="kw-2">&amp;</span>str,
+    config: Config,
+    normalized: <span class="kw-2">&amp;mut </span>String,
+    output: <span class="kw-2">&amp;mut </span>String,
+) -&gt; Errors {
     normalized.clear();
     <span class="kw">let </span><span class="kw-2">mut </span>errors = Errors::default();
     <span class="kw">let </span>offset = output.len();
@@ -1111,8 +1123,8 @@
             output.push(<span class="string">&#39;.&#39;</span>);
         }
         first = <span class="bool-val">false</span>;
-        <span class="kw">if </span>label.starts_with(PUNYCODE_PREFIX) {
-            <span class="kw">match </span>decoder.decode(<span class="kw-2">&amp;</span>label[PUNYCODE_PREFIX.len()..]) {
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(remainder) = label.strip_prefix(PUNYCODE_PREFIX) {
+            <span class="kw">match </span>decoder.decode(remainder) {
                 <span class="prelude-val">Ok</span>(decode) =&gt; {
                     <span class="kw">let </span>start = output.len();
                     output.extend(decode);
@@ -1123,7 +1135,7 @@
                     }
 
                     <span class="kw">if </span>!errors.is_err() {
-                        <span class="kw">if </span>!is_nfc(<span class="kw-2">&amp;</span>decoded_label) {
+                        <span class="kw">if </span>!is_nfc(decoded_label) {
                             errors.nfc = <span class="bool-val">true</span>;
                         } <span class="kw">else </span>{
                             check_validity(decoded_label, non_transitional, <span class="kw-2">&amp;mut </span>errors);
@@ -1175,11 +1187,13 @@
         }
     }
 
-    <span class="doccomment">/// http://www.unicode.org/reports/tr46/#ToASCII
-    </span><span class="attr">#[allow(clippy::wrong_self_convention)]
-    </span><span class="kw">pub fn </span>to_ascii&lt;<span class="lifetime">&#39;a</span>&gt;(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span><span class="self">self</span>, domain: <span class="kw-2">&amp;</span>str, out: <span class="kw-2">&amp;mut </span>String) -&gt; <span class="prelude-ty">Result</span>&lt;(), Errors&gt; {
-        <span class="kw">let </span><span class="kw-2">mut </span>errors = processing(domain, <span class="self">self</span>.config, <span class="kw-2">&amp;mut </span><span class="self">self</span>.normalized, <span class="kw-2">&amp;mut </span><span class="self">self</span>.output);
-
+    <span class="kw">pub fn </span>to_ascii_inner(<span class="kw-2">&amp;mut </span><span class="self">self</span>, domain: <span class="kw-2">&amp;</span>str, out: <span class="kw-2">&amp;mut </span>String) -&gt; Errors {
+        <span class="kw">if </span>is_simple(domain) {
+            out.push_str(domain);
+            <span class="kw">return </span>Errors::default();
+        }
+        <span class="kw">let </span><span class="kw-2">mut </span>errors = processing(domain, <span class="self">self</span>.config, <span class="kw-2">&amp;mut </span><span class="self">self</span>.normalized, out);
+        <span class="self">self</span>.output = std::mem::replace(out, String::with_capacity(out.len()));
         <span class="kw">let </span><span class="kw-2">mut </span>first = <span class="bool-val">true</span>;
         <span class="kw">for </span>label <span class="kw">in </span><span class="self">self</span>.output.split(<span class="string">&#39;.&#39;</span>) {
             <span class="kw">if </span>!first {
@@ -1198,6 +1212,13 @@
                 }
             }
         }
+        errors
+    }
+
+    <span class="doccomment">/// http://www.unicode.org/reports/tr46/#ToASCII
+    </span><span class="attr">#[allow(clippy::wrong_self_convention)]
+    </span><span class="kw">pub fn </span>to_ascii(<span class="kw-2">&amp;mut </span><span class="self">self</span>, domain: <span class="kw-2">&amp;</span>str, out: <span class="kw-2">&amp;mut </span>String) -&gt; <span class="prelude-ty">Result</span>&lt;(), Errors&gt; {
+        <span class="kw">let </span><span class="kw-2">mut </span>errors = <span class="self">self</span>.to_ascii_inner(domain, out);
 
         <span class="kw">if </span><span class="self">self</span>.config.verify_dns_length {
             <span class="kw">let </span>domain = <span class="kw">if </span>out.ends_with(<span class="string">&#39;.&#39;</span>) {
@@ -1218,7 +1239,11 @@
 
     <span class="doccomment">/// http://www.unicode.org/reports/tr46/#ToUnicode
     </span><span class="attr">#[allow(clippy::wrong_self_convention)]
-    </span><span class="kw">pub fn </span>to_unicode&lt;<span class="lifetime">&#39;a</span>&gt;(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span><span class="self">self</span>, domain: <span class="kw-2">&amp;</span>str, out: <span class="kw-2">&amp;mut </span>String) -&gt; <span class="prelude-ty">Result</span>&lt;(), Errors&gt; {
+    </span><span class="kw">pub fn </span>to_unicode(<span class="kw-2">&amp;mut </span><span class="self">self</span>, domain: <span class="kw-2">&amp;</span>str, out: <span class="kw-2">&amp;mut </span>String) -&gt; <span class="prelude-ty">Result</span>&lt;(), Errors&gt; {
+        <span class="kw">if </span>is_simple(domain) {
+            out.push_str(domain);
+            <span class="kw">return </span>Errors::default().into();
+        }
         processing(domain, <span class="self">self</span>.config, <span class="kw-2">&amp;mut </span><span class="self">self</span>.normalized, out).into()
     }
 }
@@ -1282,7 +1307,7 @@
 
     <span class="doccomment">/// http://www.unicode.org/reports/tr46/#ToASCII
     </span><span class="kw">pub fn </span>to_ascii(<span class="self">self</span>, domain: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Result</span>&lt;String, Errors&gt; {
-        <span class="kw">let </span><span class="kw-2">mut </span>result = String::new();
+        <span class="kw">let </span><span class="kw-2">mut </span>result = String::with_capacity(domain.len());
         <span class="kw">let </span><span class="kw-2">mut </span>codec = Idna::new(<span class="self">self</span>);
         codec.to_ascii(domain, <span class="kw-2">&amp;mut </span>result).map(|()| result)
     }
@@ -1402,7 +1427,7 @@
                 <span class="kw">if </span>!empty {
                     f.write_str(<span class="string">&quot;, &quot;</span>)<span class="question-mark">?</span>;
                 }
-                f.write_str(<span class="kw-2">*</span>name)<span class="question-mark">?</span>;
+                f.write_str(name)<span class="question-mark">?</span>;
                 empty = <span class="bool-val">false</span>;
             }
         }
@@ -1425,7 +1450,8 @@
     }
 }
 
-<span class="kw">impl </span>StdError <span class="kw">for </span>Errors {}
+<span class="attr">#[cfg(feature = <span class="string">&quot;std&quot;</span>)]
+</span><span class="kw">impl </span>std::error::Error <span class="kw">for </span>Errors {}
 
 <span class="kw">impl </span>fmt::Display <span class="kw">for </span>Errors {
     <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {

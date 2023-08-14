@@ -17,7 +17,7 @@ or the whole input if no terminating token is found (a non digit character).</p>
 <div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">fn </span>parser(input: <span class="kw-2">&amp;</span>str) -&gt; IResult&lt;<span class="kw-2">&amp;</span>str, u32&gt; {
   map_res(digit1, str::parse)(input)
 }
- 
+
 <span class="macro">assert_eq!</span>(parser(<span class="string">&quot;416&quot;</span>), <span class="prelude-val">Ok</span>((<span class="string">&quot;&quot;</span>, <span class="number">416</span>)));
 <span class="macro">assert_eq!</span>(parser(<span class="string">&quot;12b&quot;</span>), <span class="prelude-val">Ok</span>((<span class="string">&quot;b&quot;</span>, <span class="number">12</span>)));
 <span class="macro">assert!</span>(parser(<span class="string">&quot;b&quot;</span>).is_err());</code></pre></div>

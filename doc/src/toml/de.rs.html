@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/nix/store/jnqxxv1xi811ni996b002f4jnyz38xck-vendor-cargo-deps/c19b7c6f923b580ac259164a89f2577984ad5ab09ee9d583b888f934adbbe8d0/toml-0.5.9/src/de.rs`."><title>de.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-f3501f0f5ae15dfb.css" id="mainThemeStyle"><div id="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="toml" data-themes="" data-resource-suffix="" data-rustdoc-version="1.71.0 (8ede3aae2 2023-07-12)" data-search-js="search-4926e5fc22a5646a.js" data-settings-js="settings-de11bff964e9d4e5.js" data-settings-css="settings-8c76f75bfb6bd192.css" data-theme-light-css="light-0f8c037637f9eb3e.css" data-theme-dark-css="dark-1097f8e92a01e3cf.css" data-theme-ayu-css="ayu-614652228113ac93.css" ></div><script src="../../static.files/storage-62ce34ea385b278a.js"></script><script defer src="../../static.files/source-script-11255107d0a65077.js"></script><script defer src="../../source-files.js"></script><script defer src="../../static.files/main-f0540c1d82cde29b.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../../static.files/light-0f8c037637f9eb3e.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../../static.files/dark-1097f8e92a01e3cf.css"><link rel="stylesheet" href="../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../toml/index.html"><img class="rust-logo" src="../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/nix/store/yf45a1rayffhnidhgyjynpyhr9lqkd09-vendor-cargo-deps/c19b7c6f923b580ac259164a89f2577984ad5ab09ee9d583b888f934adbbe8d0/toml-0.5.11/src/de.rs`."><title>de.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-f3501f0f5ae15dfb.css" id="mainThemeStyle"><div id="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="toml" data-themes="" data-resource-suffix="" data-rustdoc-version="1.71.0 (8ede3aae2 2023-07-12)" data-search-js="search-4926e5fc22a5646a.js" data-settings-js="settings-de11bff964e9d4e5.js" data-settings-css="settings-8c76f75bfb6bd192.css" data-theme-light-css="light-0f8c037637f9eb3e.css" data-theme-dark-css="dark-1097f8e92a01e3cf.css" data-theme-ayu-css="ayu-614652228113ac93.css" ></div><script src="../../static.files/storage-62ce34ea385b278a.js"></script><script defer src="../../static.files/source-script-11255107d0a65077.js"></script><script defer src="../../source-files.js"></script><script defer src="../../static.files/main-f0540c1d82cde29b.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../../static.files/light-0f8c037637f9eb3e.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../../static.files/dark-1097f8e92a01e3cf.css"><link rel="stylesheet" href="../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../toml/index.html"><img class="rust-logo" src="../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -2244,22 +2244,6 @@
 <a href="#2244" id="2244">2244</a>
 <a href="#2245" id="2245">2245</a>
 <a href="#2246" id="2246">2246</a>
-<a href="#2247" id="2247">2247</a>
-<a href="#2248" id="2248">2248</a>
-<a href="#2249" id="2249">2249</a>
-<a href="#2250" id="2250">2250</a>
-<a href="#2251" id="2251">2251</a>
-<a href="#2252" id="2252">2252</a>
-<a href="#2253" id="2253">2253</a>
-<a href="#2254" id="2254">2254</a>
-<a href="#2255" id="2255">2255</a>
-<a href="#2256" id="2256">2256</a>
-<a href="#2257" id="2257">2257</a>
-<a href="#2258" id="2258">2258</a>
-<a href="#2259" id="2259">2259</a>
-<a href="#2260" id="2260">2260</a>
-<a href="#2261" id="2261">2261</a>
-<a href="#2262" id="2262">2262</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Deserializing TOML into Rust structures.
 //!
 //! This module contains all the Serde support for deserializing TOML documents
@@ -2322,17 +2306,15 @@
 ///     name: String,
 /// }
 ///
-/// fn main() {
-///     let config: Config = toml::from_str(r#&quot;
-///         title = &#39;TOML Example&#39;
+/// let config: Config = toml::from_str(r#&quot;
+///     title = &#39;TOML Example&#39;
 ///
-///         [owner]
-///         name = &#39;Lisa&#39;
-///     &quot;#).unwrap();
+///     [owner]
+///     name = &#39;Lisa&#39;
+/// &quot;#).unwrap();
 ///
-///     assert_eq!(config.title, &quot;TOML Example&quot;);
-///     assert_eq!(config.owner.name, &quot;Lisa&quot;);
-/// }
+/// assert_eq!(config.title, &quot;TOML Example&quot;);
+/// assert_eq!(config.owner.name, &quot;Lisa&quot;);
 /// ```
 </span><span class="kw">pub fn </span>from_str&lt;<span class="lifetime">&#39;de</span>, T&gt;(s: <span class="kw-2">&amp;</span><span class="lifetime">&#39;de </span>str) -&gt; <span class="prelude-ty">Result</span>&lt;T, Error&gt;
 <span class="kw">where
@@ -2362,6 +2344,7 @@
 
 <span class="doccomment">/// Errors that can occur when deserializing a type.
 </span><span class="attr">#[derive(Debug, PartialEq, Eq, Clone)]
+#[non_exhaustive]
 </span><span class="kw">enum </span>ErrorKind {
     <span class="doccomment">/// EOF was reached when looking for a value
     </span>UnexpectedEof,
@@ -2455,9 +2438,6 @@
 
     <span class="doccomment">/// Unquoted string was found when quoted one was expected
     </span>UnquotedString,
-
-    <span class="attr">#[doc(hidden)]
-    </span>__Nonexhaustive,
 }
 
 <span class="doccomment">/// Deserialization implementation for TOML.
@@ -2590,7 +2570,7 @@
 // by their index in the passed slice. We use a list as the implementation
 // uses this data structure for arrays as well as tables,
 // so if any top level [[name]] array contains multiple entries,
-// there are multiple entires in the list.
+// there are multiple entries in the list.
 // The lookup is performed in the `SeqAccess` implementation of `MapVisitor`.
 // The lists are ordered, which we exploit in the search code by using
 // bisection.
@@ -2789,8 +2769,8 @@
             cur: <span class="number">0</span>,
             max: <span class="self">self</span>.max,
             array,
-            table_indices: <span class="kw-2">&amp;*</span><span class="self">self</span>.table_indices,
-            table_pindices: <span class="kw-2">&amp;*</span><span class="self">self</span>.table_pindices,
+            table_indices: <span class="self">self</span>.table_indices,
+            table_pindices: <span class="self">self</span>.table_pindices,
             tables: <span class="kw-2">&amp;mut *</span><span class="self">self</span>.tables,
             de: <span class="kw-2">&amp;mut *</span><span class="self">self</span>.de,
         });
@@ -2851,10 +2831,10 @@
             max: next,
             cur: <span class="number">0</span>,
             array: <span class="bool-val">false</span>,
-            table_indices: <span class="kw-2">&amp;*</span><span class="self">self</span>.table_indices,
-            table_pindices: <span class="kw-2">&amp;*</span><span class="self">self</span>.table_pindices,
-            tables: <span class="kw-2">&amp;mut </span><span class="self">self</span>.tables,
-            de: <span class="kw-2">&amp;mut </span><span class="self">self</span>.de,
+            table_indices: <span class="self">self</span>.table_indices,
+            table_pindices: <span class="self">self</span>.table_pindices,
+            tables: <span class="self">self</span>.tables,
+            de: <span class="self">self</span>.de,
         })<span class="question-mark">?</span>;
         <span class="self">self</span>.cur_parent = next;
         <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(ret))
@@ -2906,7 +2886,7 @@
     {
         <span class="kw">if </span>name == spanned::NAME
             &amp;&amp; fields == [spanned::START, spanned::END, spanned::VALUE]
-            &amp;&amp; !(<span class="self">self</span>.array &amp;&amp; !<span class="self">self</span>.values.peek().is_none())
+            &amp;&amp; !(<span class="self">self</span>.array &amp;&amp; <span class="self">self</span>.values.peek().is_some())
         {
             <span class="comment">// TODO we can&#39;t actually emit spans here for the *entire* table/array
             // due to the format that toml uses. Setting the start and end to 0 is
@@ -2983,7 +2963,7 @@
     }
 }
 
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span>&gt; de::IntoDeserializer&lt;<span class="lifetime">&#39;a</span>, Error&gt; <span class="kw">for </span>StrDeserializer&lt;<span class="lifetime">&#39;a</span>&gt; {
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; de::IntoDeserializer&lt;<span class="lifetime">&#39;a</span>, Error&gt; <span class="kw">for </span>StrDeserializer&lt;<span class="lifetime">&#39;a</span>&gt; {
     <span class="kw">type </span>Deserializer = <span class="self">Self</span>;
 
     <span class="kw">fn </span>into_deserializer(<span class="self">self</span>) -&gt; <span class="self">Self</span>::Deserializer {
@@ -3537,30 +3517,20 @@
         }
     }
 
-    <span class="doccomment">/// The `Deserializer::end` method should be called after a value has been
-    /// fully deserialized.  This allows the `Deserializer` to validate that the
-    /// input stream is at the end or that it only has trailing
-    /// whitespace/comments.
+    <span class="attr">#[doc(hidden)]
+    #[deprecated(since = <span class="string">&quot;0.5.11&quot;</span>)]
     </span><span class="kw">pub fn </span>end(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;(), Error&gt; {
         <span class="prelude-val">Ok</span>(())
     }
 
-    <span class="doccomment">/// Historical versions of toml-rs accidentally allowed a newline after a
-    /// table definition, but the TOML spec requires a newline after a table
-    /// definition header.
-    ///
-    /// This option can be set to `false` (the default is `true`) to emulate
-    /// this behavior for backwards compatibility with older toml-rs versions.
+    <span class="attr">#[doc(hidden)]
+    #[deprecated(since = <span class="string">&quot;0.5.11&quot;</span>)]
     </span><span class="kw">pub fn </span>set_require_newline_after_table(<span class="kw-2">&amp;mut </span><span class="self">self</span>, require: bool) {
         <span class="self">self</span>.require_newline_after_table = require;
     }
 
-    <span class="doccomment">/// Historical versions of toml-rs accidentally allowed a duplicate table
-    /// header after a longer table header was previously defined. This is
-    /// invalid according to the TOML spec, however.
-    ///
-    /// This option can be set to `true` (the default is `false`) to emulate
-    /// this behavior for backwards compatibility with older toml-rs versions.
+    <span class="attr">#[doc(hidden)]
+    #[deprecated(since = <span class="string">&quot;0.5.11&quot;</span>)]
     </span><span class="kw">pub fn </span>set_allow_duplicate_after_longer_table(<span class="kw-2">&amp;mut </span><span class="self">self</span>, allow: bool) {
         <span class="self">self</span>.allow_duplciate_after_longer_table = allow;
     }
@@ -3798,7 +3768,7 @@
                     .unwrap_or_else(|| header.<span class="number">1</span>.len());
                 <span class="prelude-val">Ok</span>((
                     Value {
-                        e: E::DottedTable(table.values.unwrap_or_else(Vec::new)),
+                        e: E::DottedTable(table.values.unwrap_or_default()),
                         start,
                         end,
                     },
@@ -3816,12 +3786,12 @@
             start,
             end,
         };
-        <span class="kw">if </span>s.starts_with(<span class="string">&quot;0x&quot;</span>) {
-            <span class="self">self</span>.integer(<span class="kw-2">&amp;</span>s[<span class="number">2</span>..], <span class="number">16</span>).map(to_integer)
-        } <span class="kw">else if </span>s.starts_with(<span class="string">&quot;0o&quot;</span>) {
-            <span class="self">self</span>.integer(<span class="kw-2">&amp;</span>s[<span class="number">2</span>..], <span class="number">8</span>).map(to_integer)
-        } <span class="kw">else if </span>s.starts_with(<span class="string">&quot;0b&quot;</span>) {
-            <span class="self">self</span>.integer(<span class="kw-2">&amp;</span>s[<span class="number">2</span>..], <span class="number">2</span>).map(to_integer)
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(value) = s.strip_prefix(<span class="string">&quot;0x&quot;</span>) {
+            <span class="self">self</span>.integer(value, <span class="number">16</span>).map(to_integer)
+        } <span class="kw">else if let </span><span class="prelude-val">Some</span>(value) = s.strip_prefix(<span class="string">&quot;0o&quot;</span>) {
+            <span class="self">self</span>.integer(value, <span class="number">8</span>).map(to_integer)
+        } <span class="kw">else if let </span><span class="prelude-val">Some</span>(value) = s.strip_prefix(<span class="string">&quot;0b&quot;</span>) {
+            <span class="self">self</span>.integer(value, <span class="number">2</span>).map(to_integer)
         } <span class="kw">else if </span>s.contains(<span class="string">&#39;e&#39;</span>) || s.contains(<span class="string">&#39;E&#39;</span>) {
             <span class="self">self</span>.float(s, <span class="prelude-val">None</span>).map(|f| Value {
                 e: E::Float(f),
@@ -3882,10 +3852,10 @@
         <span class="kw">let </span>allow_leading_zeros = radix != <span class="number">10</span>;
         <span class="kw">let </span>(prefix, suffix) = <span class="self">self</span>.parse_integer(s, allow_sign, allow_leading_zeros, radix)<span class="question-mark">?</span>;
         <span class="kw">let </span>start = <span class="self">self</span>.tokens.substr_offset(s);
-        <span class="kw">if </span>suffix != <span class="string">&quot;&quot; </span>{
+        <span class="kw">if </span>!suffix.is_empty() {
             <span class="kw">return </span><span class="prelude-val">Err</span>(<span class="self">self</span>.error(start, ErrorKind::NumberInvalid));
         }
-        i64::from_str_radix(<span class="kw-2">&amp;</span>prefix.replace(<span class="string">&quot;_&quot;</span>, <span class="string">&quot;&quot;</span>).trim_start_matches(<span class="string">&#39;+&#39;</span>), radix)
+        i64::from_str_radix(prefix.replace(<span class="string">&#39;_&#39;</span>, <span class="string">&quot;&quot;</span>).trim_start_matches(<span class="string">&#39;+&#39;</span>), radix)
             .map_err(|_e| <span class="self">self</span>.error(start, ErrorKind::NumberInvalid))
     }
 
@@ -3937,7 +3907,7 @@
 
         <span class="kw">let </span><span class="kw-2">mut </span>fraction = <span class="prelude-val">None</span>;
         <span class="kw">if let </span><span class="prelude-val">Some</span>(after) = after_decimal {
-            <span class="kw">if </span>suffix != <span class="string">&quot;&quot; </span>{
+            <span class="kw">if </span>!suffix.is_empty() {
                 <span class="kw">return </span><span class="prelude-val">Err</span>(<span class="self">self</span>.error(start, ErrorKind::NumberInvalid));
             }
             <span class="kw">let </span>(a, b) = <span class="self">self</span>.parse_integer(after, <span class="bool-val">false</span>, <span class="bool-val">true</span>, <span class="number">10</span>)<span class="question-mark">?</span>;
@@ -3956,7 +3926,7 @@
             } <span class="kw">else </span>{
                 <span class="self">self</span>.parse_integer(<span class="kw-2">&amp;</span>suffix[<span class="number">1</span>..], <span class="bool-val">true</span>, <span class="bool-val">true</span>, <span class="number">10</span>)<span class="question-mark">?
             </span>};
-            <span class="kw">if </span>b != <span class="string">&quot;&quot; </span>{
+            <span class="kw">if </span>!b.is_empty() {
                 <span class="kw">return </span><span class="prelude-val">Err</span>(<span class="self">self</span>.error(start, ErrorKind::NumberInvalid));
             }
             exponent = <span class="prelude-val">Some</span>(a);
@@ -3970,11 +3940,11 @@
             .filter(|c| <span class="kw-2">*</span>c != <span class="string">&#39;_&#39;</span>)
             .collect::&lt;String&gt;();
         <span class="kw">if let </span><span class="prelude-val">Some</span>(fraction) = fraction {
-            number.push_str(<span class="string">&quot;.&quot;</span>);
+            number.push(<span class="string">&#39;.&#39;</span>);
             number.extend(fraction.chars().filter(|c| <span class="kw-2">*</span>c != <span class="string">&#39;_&#39;</span>));
         }
         <span class="kw">if let </span><span class="prelude-val">Some</span>(exponent) = exponent {
-            number.push_str(<span class="string">&quot;E&quot;</span>);
+            number.push(<span class="string">&#39;E&#39;</span>);
             number.extend(exponent.chars().filter(|c| <span class="kw-2">*</span>c != <span class="string">&#39;_&#39;</span>));
         }
         number
@@ -4116,8 +4086,7 @@
     }
 
     <span class="kw">fn </span>dotted_key(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;(Span, Cow&lt;<span class="lifetime">&#39;a</span>, str&gt;)&gt;, Error&gt; {
-        <span class="kw">let </span><span class="kw-2">mut </span>result = Vec::new();
-        result.push(<span class="self">self</span>.table_key()<span class="question-mark">?</span>);
+        <span class="kw">let </span><span class="kw-2">mut </span>result = <span class="macro">vec!</span>[<span class="self">self</span>.table_key()<span class="question-mark">?</span>];
         <span class="self">self</span>.eat_whitespace()<span class="question-mark">?</span>;
         <span class="kw">while </span><span class="self">self</span>.eat(Token::Period)<span class="question-mark">? </span>{
             <span class="self">self</span>.eat_whitespace()<span class="question-mark">?</span>;
@@ -4127,7 +4096,7 @@
         <span class="prelude-val">Ok</span>(result)
     }
 
-    <span class="doccomment">/// Stores a value in the appropriate hierachical structure positioned based on the dotted key.
+    <span class="doccomment">/// Stores a value in the appropriate hierarchical structure positioned based on the dotted key.
     ///
     /// Given the following definition: `multi.part.key = &quot;value&quot;`, `multi` and `part` are
     /// intermediate parts which are mapped to the relevant fields in the deserialized type&#39;s data
@@ -4411,7 +4380,6 @@
                 f,
                 <span class="string">&quot;invalid TOML value, did you mean to use a quoted string?&quot;
             </span>)<span class="question-mark">?</span>,
-            ErrorKind::__Nonexhaustive =&gt; <span class="macro">panic!</span>(),
         }
 
         <span class="kw">if </span>!<span class="self">self</span>.inner.key.is_empty() {
@@ -4473,7 +4441,7 @@
         <span class="kw">if </span><span class="self">self</span>.first || <span class="self">self</span>.tokens.eat(Token::Period)<span class="question-mark">? </span>{
             <span class="self">self</span>.first = <span class="bool-val">false</span>;
             <span class="self">self</span>.tokens.eat_whitespace()<span class="question-mark">?</span>;
-            <span class="self">self</span>.tokens.table_key().map(|t| t).map(<span class="prelude-val">Some</span>)
+            <span class="self">self</span>.tokens.table_key().map(<span class="prelude-val">Some</span>)
         } <span class="kw">else </span>{
             <span class="self">self</span>.tokens.expect(Token::RightBracket)<span class="question-mark">?</span>;
             <span class="kw">if </span><span class="self">self</span>.array {

@@ -1,15 +1,16 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="pest. The Elegant Parser"><title>pest_derive - Rust</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../static.files/rustdoc-f3501f0f5ae15dfb.css" id="mainThemeStyle"><div id="rustdoc-vars" data-root-path="../" data-static-root-path="../static.files/" data-current-crate="pest_derive" data-themes="" data-resource-suffix="" data-rustdoc-version="1.71.0 (8ede3aae2 2023-07-12)" data-search-js="search-4926e5fc22a5646a.js" data-settings-js="settings-de11bff964e9d4e5.js" data-settings-css="settings-8c76f75bfb6bd192.css" data-theme-light-css="light-0f8c037637f9eb3e.css" data-theme-dark-css="dark-1097f8e92a01e3cf.css" data-theme-ayu-css="ayu-614652228113ac93.css" ></div><script src="../static.files/storage-62ce34ea385b278a.js"></script><script defer src="../crates.js"></script><script defer src="../static.files/main-f0540c1d82cde29b.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../static.files/light-0f8c037637f9eb3e.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../static.files/dark-1097f8e92a01e3cf.css"><link rel="stylesheet" href="../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc mod crate"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="logo-container" href="../pest_derive/index.html"><img class="rust-logo" src="../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><h2></h2></nav><nav class="sidebar"><a class="logo-container" href="../pest_derive/index.html"><img class="rust-logo" src="../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><h2 class="location"><a href="#">Crate pest_derive</a></h2><div class="sidebar-elems"><ul class="block"><li class="version">Version 2.3.0</li><li><a id="all-types" href="all.html">All Items</a></li></ul><section><ul class="block"><li><a href="#derives">Derive Macros</a></li></ul></section></div></nav><main><div class="width-limiter"><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="main-heading"><h1>Crate <a class="mod" href="#">pest_derive</a><button id="copy-path" title="Copy item path to clipboard"><img src="../static.files/clipboard-7571035ce49a181d.svg" width="19" height="18" alt="Copy item path"></button></h1><span class="out-of-band"><a class="srclink" href="../src/pest_derive/lib.rs.html#10-301">source</a> · <button id="toggle-all-docs" title="collapse all docs">[<span>&#x2212;</span>]</button></span></div><details class="toggle top-doc" open><summary class="hideme"><span>Expand description</span></summary><div class="docblock"><h2 id="pest-the-elegant-parser"><a href="#pest-the-elegant-parser">pest. The Elegant Parser</a></h2>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="pest. The Elegant Parser"><title>pest_derive - Rust</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../static.files/rustdoc-f3501f0f5ae15dfb.css" id="mainThemeStyle"><div id="rustdoc-vars" data-root-path="../" data-static-root-path="../static.files/" data-current-crate="pest_derive" data-themes="" data-resource-suffix="" data-rustdoc-version="1.71.0 (8ede3aae2 2023-07-12)" data-search-js="search-4926e5fc22a5646a.js" data-settings-js="settings-de11bff964e9d4e5.js" data-settings-css="settings-8c76f75bfb6bd192.css" data-theme-light-css="light-0f8c037637f9eb3e.css" data-theme-dark-css="dark-1097f8e92a01e3cf.css" data-theme-ayu-css="ayu-614652228113ac93.css" ></div><script src="../static.files/storage-62ce34ea385b278a.js"></script><script defer src="../crates.js"></script><script defer src="../static.files/main-f0540c1d82cde29b.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../static.files/light-0f8c037637f9eb3e.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../static.files/dark-1097f8e92a01e3cf.css"><link rel="stylesheet" href="../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="icon" href="https://raw.githubusercontent.com/pest-parser/pest/master/pest-logo.svg"></head><body class="rustdoc mod crate"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="logo-container" href="../pest_derive/index.html"><img src="https://raw.githubusercontent.com/pest-parser/pest/master/pest-logo.svg" alt="logo"></a><h2></h2></nav><nav class="sidebar"><a class="logo-container" href="../pest_derive/index.html"><img src="https://raw.githubusercontent.com/pest-parser/pest/master/pest-logo.svg" alt="logo"></a><h2 class="location"><a href="#">Crate pest_derive</a></h2><div class="sidebar-elems"><ul class="block"><li class="version">Version 2.7.2</li><li><a id="all-types" href="all.html">All Items</a></li></ul><section><ul class="block"><li><a href="#derives">Derive Macros</a></li></ul></section></div></nav><main><div class="width-limiter"><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="main-heading"><h1>Crate <a class="mod" href="#">pest_derive</a><button id="copy-path" title="Copy item path to clipboard"><img src="../static.files/clipboard-7571035ce49a181d.svg" width="19" height="18" alt="Copy item path"></button></h1><span class="out-of-band"><a class="srclink" href="../src/pest_derive/lib.rs.html#9-325">source</a> · <button id="toggle-all-docs" title="collapse all docs">[<span>&#x2212;</span>]</button></span></div><details class="toggle top-doc" open><summary class="hideme"><span>Expand description</span></summary><div class="docblock"><h2 id="pest-the-elegant-parser"><a href="#pest-the-elegant-parser">pest. The Elegant Parser</a></h2>
 <p>pest is a general purpose parser written in Rust with a focus on accessibility, correctness,
 and performance. It uses parsing expression grammars (or <a href="https://en.wikipedia.org/wiki/Parsing_expression_grammar">PEG</a>) as input, which are similar in
 spirit to regular expressions, but which offer the enhanced expressivity needed to parse
 complex languages.</p>
 <h3 id="getting-started"><a href="#getting-started">Getting started</a></h3>
-<p>The recommended way to start parsing with pest is to read the official <a href="https://pest-parser.github.io/book">book</a>.</p>
+<p>The recommended way to start parsing with pest is to read the official <a href="https://pest.rs/book">book</a>.</p>
 <p>Other helpful resources:</p>
 <ul>
 <li>API reference on <a href="https://docs.rs/pest">docs.rs</a></li>
-<li>play with grammars and share them on our <a href="https://pest-parser.github.io/#editor">fiddle</a></li>
-<li>leave feedback, ask questions, or greet us on <a href="https://gitter.im/dragostis/pest">Gitter</a></li>
+<li>play with grammars and share them on our <a href="https://pest.rs/#editor">fiddle</a></li>
+<li>find previous common questions answered or ask questions on <a href="https://github.com/pest-parser/pest/discussions">GitHub Discussions</a></li>
+<li>leave feedback, ask questions, or greet us on <a href="https://gitter.im/pest-parser/pest">Gitter</a> or <a href="https://discord.gg/XEGACtWpT2">Discord</a></li>
 </ul>
 <h3 id="pest-files"><a href="#pest-files"><code>.pest</code> files</a></h3>
 <p>Grammar definitions reside in custom <code>.pest</code> files located in the <code>src</code> directory. Their path is
@@ -88,47 +89,59 @@ WHITESPACE = <span class="kw">_</span>{ <span class="string">&quot; &quot; </spa
 <h5 id="expressions"><a href="#expressions">Expressions</a></h5>
 <p>Expressions can be either terminals or non-terminals.</p>
 <ol>
-<li>
-<p>Terminals</p>
-<p>| Terminal   | Usage                                                          |
-|————|––––––––––––––––––––––––––––––––|
-| <code>&quot;a&quot;</code>      | matches the exact string <code>&quot;a&quot;</code>                                 |
-| <code>^&quot;a&quot;</code>     | matches the exact string <code>&quot;a&quot;</code> case insensitively (ASCII only) |
-| <code>'a'..'z'</code> | matches one character between <code>'a'</code> and <code>'z'</code>                  |
-| <code>a</code>        | matches rule <code>a</code>                                               |</p>
-</li>
+<li>Terminals</li>
 </ol>
+<div><table><thead><tr><th>Terminal</th><th>Usage</th></tr></thead><tbody>
+<tr><td><code>&quot;a&quot;</code></td><td>matches the exact string <code>&quot;a&quot;</code></td></tr>
+<tr><td><code>^&quot;a&quot;</code></td><td>matches the exact string <code>&quot;a&quot;</code> case insensitively (ASCII only)</td></tr>
+<tr><td><code>'a'..'z'</code></td><td>matches one character between <code>'a'</code> and <code>'z'</code></td></tr>
+<tr><td><code>a</code></td><td>matches rule <code>a</code></td></tr>
+</tbody></table>
+</div>
 <p>Strings and characters follow
 <a href="https://doc.rust-lang.org/reference/tokens.html#byte-escapes">Rust’s escape mechanisms</a>, while
 identifiers can contain alphanumeric characters and underscores (<code>_</code>), as long as they do not
 start with a digit.</p>
 <ol start="2">
-<li>
-<p>Non-terminals</p>
-<p>| Non-terminal          | Usage                                                      |
-|———————–|————————————————————|
-| <code>(e)</code>                 | matches <code>e</code>                                                |
-| <code>e1 ~ e2</code>             | matches the sequence <code>e1</code> <code>e2</code>                             |
-| <code>e1 | e2</code> | matches either <code>e1</code> or <code>e2</code>                                |
-| <code>e*</code>                  | matches <code>e</code> zero or more times                             |
-| <code>e+</code>                  | matches <code>e</code> one or more times                              |
-| <code>e{n}</code>                | matches <code>e</code> exactly <code>n</code> times                              |
-| <code>e{, n}</code>              | matches <code>e</code> at most <code>n</code> times                              |
-| <code>e{n,} </code>              | matches <code>e</code> at least <code>n</code> times                             |
-| <code>e{m, n}</code>             | matches <code>e</code> between <code>m</code> and <code>n</code> times inclusively          |
-| <code>e?</code>                  | optionally matches <code>e</code>                                     |
-| <code>&amp;e</code>                  | matches <code>e</code> without making progress                        |
-| <code>!e</code>                  | matches if <code>e</code> doesn’t match without making progress       |
-| <code>PUSH(e)</code>             | matches <code>e</code> and pushes it’s captured string down the stack |</p>
-<p>where <code>e</code>, <code>e1</code>, and <code>e2</code> are expressions.</p>
-</li>
+<li>Non-terminals</li>
 </ol>
+<div><table><thead><tr><th>Non-terminal</th><th>Usage</th></tr></thead><tbody>
+<tr><td><code>(e)</code></td><td>matches <code>e</code></td></tr>
+<tr><td><code>e1 ~ e2</code></td><td>matches the sequence <code>e1</code> <code>e2</code></td></tr>
+<tr><td><code>e1 | e2</code></td><td>matches either <code>e1</code> or <code>e2</code></td></tr>
+<tr><td><code>e*</code></td><td>matches <code>e</code> zero or more times</td></tr>
+<tr><td><code>e+</code></td><td>matches <code>e</code> one or more times</td></tr>
+<tr><td><code>e{n}</code></td><td>matches <code>e</code> exactly <code>n</code> times</td></tr>
+<tr><td><code>e{, n}</code></td><td>matches <code>e</code> at most <code>n</code> times</td></tr>
+<tr><td><code>e{n,}</code></td><td>matches <code>e</code> at least <code>n</code> times</td></tr>
+<tr><td><code>e{m, n}</code></td><td>matches <code>e</code> between <code>m</code> and <code>n</code> times inclusively</td></tr>
+<tr><td><code>e?</code></td><td>optionally matches <code>e</code></td></tr>
+<tr><td><code>&amp;e</code></td><td>matches <code>e</code> without making progress</td></tr>
+<tr><td><code>!e</code></td><td>matches if <code>e</code> doesn’t match without making progress</td></tr>
+<tr><td><code>PUSH(e)</code></td><td>matches <code>e</code> and pushes it’s captured string down the stack</td></tr>
+</tbody></table>
+</div>
+<p>where <code>e</code>, <code>e1</code>, and <code>e2</code> are expressions.</p>
+<p>Matching is greedy, without backtracking.  Note the difference in behavior for
+these two rules in matching identifiers that don’t end in an underscore:</p>
+
+<div class="example-wrap ignore"><a href="#" class="tooltip" title="This example is not tested">ⓘ</a><pre class="rust rust-example-rendered"><code><span class="comment">// input: ab_bb_b
+
+</span>identifier = @{ <span class="string">&quot;a&quot; </span>~ (<span class="string">&quot;b&quot;</span>|<span class="string">&quot;_&quot;</span>)* ~ <span class="string">&quot;b&quot; </span>}
+<span class="comment">// matches:      a     b_bb_b       nothing -&gt; error!      
+
+</span>identifier = @{ <span class="string">&quot;a&quot; </span>~ (<span class="string">&quot;_&quot;</span>* ~ <span class="string">&quot;b&quot;</span>)* }
+<span class="comment">// matches:      a     b, _bb, _b   in three repetitions</span></code></pre></div>
 <p>Expressions can modify the stack only if they match the input. For example,
 if <code>e1</code> in the compound expression <code>e1 | e2</code> does not match the input, then
 it does not modify the stack, so <code>e2</code> sees the stack in the same state as
 <code>e1</code> did. Repetitions and optionals (<code>e*</code>, <code>e+</code>, <code>e{, n}</code>, <code>e{n,}</code>,
 <code>e{m,n}</code>, <code>e?</code>) can modify the stack each time <code>e</code> matches. The <code>!e</code> and <code>&amp;e</code>
-expressions are a special case; they never modify the stack.</p>
+expressions are a special case; they never modify the stack.
+Many languages have “keyword” tokens (e.g. if, for, while) as well as general
+tokens (e.g. identifier) that matches any word. In order to match a keyword,
+generally, you may need to restrict that is not immediately followed by another
+letter or digit (otherwise it would be matched as an identifier).</p>
 <h3 id="special-rules"><a href="#special-rules">Special rules</a></h3>
 <p>Special rules can be called within the grammar. They are:</p>
 <ul>
@@ -207,4 +220,5 @@ implements <code>pest</code>’s <code>RuleType</code> and can be used throughou
 <li><code>ASCII</code> - matches a character from \x00..\x7f</li>
 <li><code>NEWLINE</code> - matches either “\n” or “\r\n” or “\r”</li>
 </ul>
-</div></details><h2 id="derives" class="small-section-header"><a href="#derives">Derive Macros</a></h2><ul class="item-table"><li><div class="item-name"><a class="derive" href="derive.Parser.html" title="derive pest_derive::Parser">Parser</a></div></li></ul></section></div></main></body></html>
+</div></details><h2 id="derives" class="small-section-header"><a href="#derives">Derive Macros</a></h2><ul class="item-table"><li><div class="item-name"><a class="derive" href="derive.Parser.html" title="derive pest_derive::Parser">Parser</a></div><div class="desc docblock-short">The main method that’s called by the proc macro
+(a wrapper around <code>pest_generator::derive_parser</code>)</div></li></ul></section></div></main></body></html>

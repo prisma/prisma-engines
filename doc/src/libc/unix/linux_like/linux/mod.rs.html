@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/nix/store/jnqxxv1xi811ni996b002f4jnyz38xck-vendor-cargo-deps/c19b7c6f923b580ac259164a89f2577984ad5ab09ee9d583b888f934adbbe8d0/libc-0.2.140/src/unix/linux_like/linux/mod.rs`."><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../../../static.files/rustdoc-f3501f0f5ae15dfb.css" id="mainThemeStyle"><div id="rustdoc-vars" data-root-path="../../../../../" data-static-root-path="../../../../../static.files/" data-current-crate="libc" data-themes="" data-resource-suffix="" data-rustdoc-version="1.71.0 (8ede3aae2 2023-07-12)" data-search-js="search-4926e5fc22a5646a.js" data-settings-js="settings-de11bff964e9d4e5.js" data-settings-css="settings-8c76f75bfb6bd192.css" data-theme-light-css="light-0f8c037637f9eb3e.css" data-theme-dark-css="dark-1097f8e92a01e3cf.css" data-theme-ayu-css="ayu-614652228113ac93.css" ></div><script src="../../../../../static.files/storage-62ce34ea385b278a.js"></script><script defer src="../../../../../static.files/source-script-11255107d0a65077.js"></script><script defer src="../../../../../source-files.js"></script><script defer src="../../../../../static.files/main-f0540c1d82cde29b.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../../../../../static.files/light-0f8c037637f9eb3e.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../../../../../static.files/dark-1097f8e92a01e3cf.css"><link rel="stylesheet" href="../../../../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../../../../libc/index.html"><img class="rust-logo" src="../../../../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/nix/store/yf45a1rayffhnidhgyjynpyhr9lqkd09-vendor-cargo-deps/c19b7c6f923b580ac259164a89f2577984ad5ab09ee9d583b888f934adbbe8d0/libc-0.2.147/src/unix/linux_like/linux/mod.rs`."><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../../../static.files/rustdoc-f3501f0f5ae15dfb.css" id="mainThemeStyle"><div id="rustdoc-vars" data-root-path="../../../../../" data-static-root-path="../../../../../static.files/" data-current-crate="libc" data-themes="" data-resource-suffix="" data-rustdoc-version="1.71.0 (8ede3aae2 2023-07-12)" data-search-js="search-4926e5fc22a5646a.js" data-settings-js="settings-de11bff964e9d4e5.js" data-settings-css="settings-8c76f75bfb6bd192.css" data-theme-light-css="light-0f8c037637f9eb3e.css" data-theme-dark-css="dark-1097f8e92a01e3cf.css" data-theme-ayu-css="ayu-614652228113ac93.css" ></div><script src="../../../../../static.files/storage-62ce34ea385b278a.js"></script><script defer src="../../../../../static.files/source-script-11255107d0a65077.js"></script><script defer src="../../../../../source-files.js"></script><script defer src="../../../../../static.files/main-f0540c1d82cde29b.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../../../../../static.files/light-0f8c037637f9eb3e.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../../../../../static.files/dark-1097f8e92a01e3cf.css"><link rel="stylesheet" href="../../../../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../../../../libc/index.html"><img class="rust-logo" src="../../../../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -4782,6 +4782,143 @@
 <a href="#4782" id="4782">4782</a>
 <a href="#4783" id="4783">4783</a>
 <a href="#4784" id="4784">4784</a>
+<a href="#4785" id="4785">4785</a>
+<a href="#4786" id="4786">4786</a>
+<a href="#4787" id="4787">4787</a>
+<a href="#4788" id="4788">4788</a>
+<a href="#4789" id="4789">4789</a>
+<a href="#4790" id="4790">4790</a>
+<a href="#4791" id="4791">4791</a>
+<a href="#4792" id="4792">4792</a>
+<a href="#4793" id="4793">4793</a>
+<a href="#4794" id="4794">4794</a>
+<a href="#4795" id="4795">4795</a>
+<a href="#4796" id="4796">4796</a>
+<a href="#4797" id="4797">4797</a>
+<a href="#4798" id="4798">4798</a>
+<a href="#4799" id="4799">4799</a>
+<a href="#4800" id="4800">4800</a>
+<a href="#4801" id="4801">4801</a>
+<a href="#4802" id="4802">4802</a>
+<a href="#4803" id="4803">4803</a>
+<a href="#4804" id="4804">4804</a>
+<a href="#4805" id="4805">4805</a>
+<a href="#4806" id="4806">4806</a>
+<a href="#4807" id="4807">4807</a>
+<a href="#4808" id="4808">4808</a>
+<a href="#4809" id="4809">4809</a>
+<a href="#4810" id="4810">4810</a>
+<a href="#4811" id="4811">4811</a>
+<a href="#4812" id="4812">4812</a>
+<a href="#4813" id="4813">4813</a>
+<a href="#4814" id="4814">4814</a>
+<a href="#4815" id="4815">4815</a>
+<a href="#4816" id="4816">4816</a>
+<a href="#4817" id="4817">4817</a>
+<a href="#4818" id="4818">4818</a>
+<a href="#4819" id="4819">4819</a>
+<a href="#4820" id="4820">4820</a>
+<a href="#4821" id="4821">4821</a>
+<a href="#4822" id="4822">4822</a>
+<a href="#4823" id="4823">4823</a>
+<a href="#4824" id="4824">4824</a>
+<a href="#4825" id="4825">4825</a>
+<a href="#4826" id="4826">4826</a>
+<a href="#4827" id="4827">4827</a>
+<a href="#4828" id="4828">4828</a>
+<a href="#4829" id="4829">4829</a>
+<a href="#4830" id="4830">4830</a>
+<a href="#4831" id="4831">4831</a>
+<a href="#4832" id="4832">4832</a>
+<a href="#4833" id="4833">4833</a>
+<a href="#4834" id="4834">4834</a>
+<a href="#4835" id="4835">4835</a>
+<a href="#4836" id="4836">4836</a>
+<a href="#4837" id="4837">4837</a>
+<a href="#4838" id="4838">4838</a>
+<a href="#4839" id="4839">4839</a>
+<a href="#4840" id="4840">4840</a>
+<a href="#4841" id="4841">4841</a>
+<a href="#4842" id="4842">4842</a>
+<a href="#4843" id="4843">4843</a>
+<a href="#4844" id="4844">4844</a>
+<a href="#4845" id="4845">4845</a>
+<a href="#4846" id="4846">4846</a>
+<a href="#4847" id="4847">4847</a>
+<a href="#4848" id="4848">4848</a>
+<a href="#4849" id="4849">4849</a>
+<a href="#4850" id="4850">4850</a>
+<a href="#4851" id="4851">4851</a>
+<a href="#4852" id="4852">4852</a>
+<a href="#4853" id="4853">4853</a>
+<a href="#4854" id="4854">4854</a>
+<a href="#4855" id="4855">4855</a>
+<a href="#4856" id="4856">4856</a>
+<a href="#4857" id="4857">4857</a>
+<a href="#4858" id="4858">4858</a>
+<a href="#4859" id="4859">4859</a>
+<a href="#4860" id="4860">4860</a>
+<a href="#4861" id="4861">4861</a>
+<a href="#4862" id="4862">4862</a>
+<a href="#4863" id="4863">4863</a>
+<a href="#4864" id="4864">4864</a>
+<a href="#4865" id="4865">4865</a>
+<a href="#4866" id="4866">4866</a>
+<a href="#4867" id="4867">4867</a>
+<a href="#4868" id="4868">4868</a>
+<a href="#4869" id="4869">4869</a>
+<a href="#4870" id="4870">4870</a>
+<a href="#4871" id="4871">4871</a>
+<a href="#4872" id="4872">4872</a>
+<a href="#4873" id="4873">4873</a>
+<a href="#4874" id="4874">4874</a>
+<a href="#4875" id="4875">4875</a>
+<a href="#4876" id="4876">4876</a>
+<a href="#4877" id="4877">4877</a>
+<a href="#4878" id="4878">4878</a>
+<a href="#4879" id="4879">4879</a>
+<a href="#4880" id="4880">4880</a>
+<a href="#4881" id="4881">4881</a>
+<a href="#4882" id="4882">4882</a>
+<a href="#4883" id="4883">4883</a>
+<a href="#4884" id="4884">4884</a>
+<a href="#4885" id="4885">4885</a>
+<a href="#4886" id="4886">4886</a>
+<a href="#4887" id="4887">4887</a>
+<a href="#4888" id="4888">4888</a>
+<a href="#4889" id="4889">4889</a>
+<a href="#4890" id="4890">4890</a>
+<a href="#4891" id="4891">4891</a>
+<a href="#4892" id="4892">4892</a>
+<a href="#4893" id="4893">4893</a>
+<a href="#4894" id="4894">4894</a>
+<a href="#4895" id="4895">4895</a>
+<a href="#4896" id="4896">4896</a>
+<a href="#4897" id="4897">4897</a>
+<a href="#4898" id="4898">4898</a>
+<a href="#4899" id="4899">4899</a>
+<a href="#4900" id="4900">4900</a>
+<a href="#4901" id="4901">4901</a>
+<a href="#4902" id="4902">4902</a>
+<a href="#4903" id="4903">4903</a>
+<a href="#4904" id="4904">4904</a>
+<a href="#4905" id="4905">4905</a>
+<a href="#4906" id="4906">4906</a>
+<a href="#4907" id="4907">4907</a>
+<a href="#4908" id="4908">4908</a>
+<a href="#4909" id="4909">4909</a>
+<a href="#4910" id="4910">4910</a>
+<a href="#4911" id="4911">4911</a>
+<a href="#4912" id="4912">4912</a>
+<a href="#4913" id="4913">4913</a>
+<a href="#4914" id="4914">4914</a>
+<a href="#4915" id="4915">4915</a>
+<a href="#4916" id="4916">4916</a>
+<a href="#4917" id="4917">4917</a>
+<a href="#4918" id="4918">4918</a>
+<a href="#4919" id="4919">4919</a>
+<a href="#4920" id="4920">4920</a>
+<a href="#4921" id="4921">4921</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Linux-specific definitions for linux-like values
 
 </span><span class="kw">pub type </span>useconds_t = u32;
@@ -4845,11 +4982,6 @@
 }
 
 <span class="macro">s! </span>{
-    <span class="kw">pub struct </span>rlimit64 {
-        <span class="kw">pub </span>rlim_cur: rlim64_t,
-        <span class="kw">pub </span>rlim_max: rlim64_t,
-    }
-
     <span class="kw">pub struct </span>glob_t {
         <span class="kw">pub </span>gl_pathc: ::size_t,
         <span class="kw">pub </span>gl_pathv: <span class="kw-2">*mut *mut </span>c_char,
@@ -5469,6 +5601,11 @@
     <span class="kw">pub struct </span>sctp_authinfo {
         <span class="kw">pub </span>auth_keynumber: ::__u16,
     }
+
+    <span class="kw">pub struct </span>rlimit64 {
+        <span class="kw">pub </span>rlim_cur: rlim64_t,
+        <span class="kw">pub </span>rlim_max: rlim64_t,
+    }
 }
 
 <span class="macro">s_no_extra_traits! </span>{
@@ -5482,14 +5619,6 @@
     <span class="kw">pub struct </span>dirent {
         <span class="kw">pub </span>d_ino: ::ino_t,
         <span class="kw">pub </span>d_off: ::off_t,
-        <span class="kw">pub </span>d_reclen: ::c_ushort,
-        <span class="kw">pub </span>d_type: ::c_uchar,
-        <span class="kw">pub </span>d_name: [::c_char; <span class="number">256</span>],
-    }
-
-    <span class="kw">pub struct </span>dirent64 {
-        <span class="kw">pub </span>d_ino: ::ino64_t,
-        <span class="kw">pub </span>d_off: ::off64_t,
         <span class="kw">pub </span>d_reclen: ::c_ushort,
         <span class="kw">pub </span>d_type: ::c_uchar,
         <span class="kw">pub </span>d_name: [::c_char; <span class="number">256</span>],
@@ -5581,6 +5710,20 @@
         </span><span class="kw">pub </span>ifr_ifru: __c_anonymous_ifr_ifru,
         <span class="attr">#[cfg(not(libc_union))]
         </span><span class="kw">pub </span>ifr_ifru: ::sockaddr,
+    }
+
+    <span class="kw">pub struct </span>hwtstamp_config {
+        <span class="kw">pub </span>flags: ::c_int,
+        <span class="kw">pub </span>tx_type: ::c_int,
+        <span class="kw">pub </span>rx_filter: ::c_int,
+    }
+
+    <span class="kw">pub struct </span>dirent64 {
+        <span class="kw">pub </span>d_ino: ::ino64_t,
+        <span class="kw">pub </span>d_off: ::off64_t,
+        <span class="kw">pub </span>d_reclen: ::c_ushort,
+        <span class="kw">pub </span>d_type: ::c_uchar,
+        <span class="kw">pub </span>d_name: [::c_char; <span class="number">256</span>],
     }
 }
 
@@ -6003,6 +6146,31 @@
                     .field(<span class="string">&quot;ifr_name&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.ifr_name)
                     .field(<span class="string">&quot;ifr_ifru&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.ifr_ifru)
                     .finish()
+            }
+        }
+
+        <span class="kw">impl </span>::fmt::Debug <span class="kw">for </span>hwtstamp_config {
+            <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>::fmt::Formatter) -&gt; ::fmt::Result {
+                f.debug_struct(<span class="string">&quot;hwtstamp_config&quot;</span>)
+                    .field(<span class="string">&quot;flags&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.flags)
+                    .field(<span class="string">&quot;tx_type&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.tx_type)
+                    .field(<span class="string">&quot;rx_filter&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.rx_filter)
+                    .finish()
+            }
+        }
+        <span class="kw">impl </span>PartialEq <span class="kw">for </span>hwtstamp_config {
+            <span class="kw">fn </span>eq(<span class="kw-2">&amp;</span><span class="self">self</span>, other: <span class="kw-2">&amp;</span>hwtstamp_config) -&gt; bool {
+                <span class="self">self</span>.flags == other.flags &amp;&amp;
+                <span class="self">self</span>.tx_type == other.tx_type &amp;&amp;
+                <span class="self">self</span>.rx_filter == other.rx_filter
+            }
+        }
+        <span class="kw">impl </span>Eq <span class="kw">for </span>hwtstamp_config {}
+        <span class="kw">impl </span>::hash::Hash <span class="kw">for </span>hwtstamp_config {
+            <span class="kw">fn </span>hash&lt;H: ::hash::Hasher&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, state: <span class="kw-2">&amp;mut </span>H) {
+                <span class="self">self</span>.flags.hash(state);
+                <span class="self">self</span>.tx_type.hash(state);
+                <span class="self">self</span>.rx_filter.hash(state);
             }
         }
     }
@@ -6686,9 +6854,7 @@
 <span class="comment">// netinet/in.h
 // NOTE: These are in addition to the constants defined in src/unix/mod.rs
 
-</span><span class="doccomment">/// Multipath TCP
-</span><span class="kw">pub const </span>IPPROTO_MPTCP: ::c_int = <span class="number">262</span>;
-<span class="attr">#[deprecated(
+</span><span class="attr">#[deprecated(
     since = <span class="string">&quot;0.2.80&quot;</span>,
     note = <span class="string">&quot;This value was increased in the newer kernel \
             and we&#39;ll change this following upstream in the future release. \
@@ -7555,6 +7721,8 @@
 <span class="kw">pub const </span>SIOCSRARP: ::c_ulong = <span class="number">0x00008962</span>;
 <span class="kw">pub const </span>SIOCGIFMAP: ::c_ulong = <span class="number">0x00008970</span>;
 <span class="kw">pub const </span>SIOCSIFMAP: ::c_ulong = <span class="number">0x00008971</span>;
+<span class="kw">pub const </span>SIOCSHWTSTAMP: ::c_ulong = <span class="number">0x000089b0</span>;
+<span class="kw">pub const </span>SIOCGHWTSTAMP: ::c_ulong = <span class="number">0x000089b1</span>;
 
 <span class="kw">pub const </span>IPTOS_TOS_MASK: u8 = <span class="number">0x1E</span>;
 <span class="kw">pub const </span>IPTOS_PREC_MASK: u8 = <span class="number">0xE0</span>;
@@ -7826,6 +7994,14 @@
 <span class="kw">pub const </span>ARPD_FLUSH: ::c_ushort = <span class="number">0x03</span>;
 <span class="kw">pub const </span>ATF_MAGIC: ::c_int = <span class="number">0x80</span>;
 
+<span class="kw">pub const </span>RTEXT_FILTER_VF: ::c_int = <span class="number">1 </span>&lt;&lt; <span class="number">0</span>;
+<span class="kw">pub const </span>RTEXT_FILTER_BRVLAN: ::c_int = <span class="number">1 </span>&lt;&lt; <span class="number">1</span>;
+<span class="kw">pub const </span>RTEXT_FILTER_BRVLAN_COMPRESSED: ::c_int = <span class="number">1 </span>&lt;&lt; <span class="number">2</span>;
+<span class="kw">pub const </span>RTEXT_FILTER_SKIP_STATS: ::c_int = <span class="number">1 </span>&lt;&lt; <span class="number">3</span>;
+<span class="kw">pub const </span>RTEXT_FILTER_MRP: ::c_int = <span class="number">1 </span>&lt;&lt; <span class="number">4</span>;
+<span class="kw">pub const </span>RTEXT_FILTER_CFM_CONFIG: ::c_int = <span class="number">1 </span>&lt;&lt; <span class="number">5</span>;
+<span class="kw">pub const </span>RTEXT_FILTER_CFM_STATUS: ::c_int = <span class="number">1 </span>&lt;&lt; <span class="number">6</span>;
+
 <span class="comment">// userspace compat definitions for RTNLGRP_*
 </span><span class="kw">pub const </span>RTMGRP_LINK: ::c_int = <span class="number">0x00001</span>;
 <span class="kw">pub const </span>RTMGRP_NOTIFY: ::c_int = <span class="number">0x00002</span>;
@@ -7905,6 +8081,28 @@
 <span class="kw">pub const </span>SOF_TXTIME_DEADLINE_MODE: u32 = <span class="number">1 </span>&lt;&lt; <span class="number">0</span>;
 <span class="kw">pub const </span>SOF_TXTIME_REPORT_ERRORS: u32 = <span class="number">1 </span>&lt;&lt; <span class="number">1</span>;
 
+<span class="kw">pub const </span>HWTSTAMP_TX_OFF: ::c_uint = <span class="number">0</span>;
+<span class="kw">pub const </span>HWTSTAMP_TX_ON: ::c_uint = <span class="number">1</span>;
+<span class="kw">pub const </span>HWTSTAMP_TX_ONESTEP_SYNC: ::c_uint = <span class="number">2</span>;
+<span class="kw">pub const </span>HWTSTAMP_TX_ONESTEP_P2P: ::c_uint = <span class="number">3</span>;
+
+<span class="kw">pub const </span>HWTSTAMP_FILTER_NONE: ::c_uint = <span class="number">0</span>;
+<span class="kw">pub const </span>HWTSTAMP_FILTER_ALL: ::c_uint = <span class="number">1</span>;
+<span class="kw">pub const </span>HWTSTAMP_FILTER_SOME: ::c_uint = <span class="number">2</span>;
+<span class="kw">pub const </span>HWTSTAMP_FILTER_PTP_V1_L4_EVENT: ::c_uint = <span class="number">3</span>;
+<span class="kw">pub const </span>HWTSTAMP_FILTER_PTP_V1_L4_SYNC: ::c_uint = <span class="number">4</span>;
+<span class="kw">pub const </span>HWTSTAMP_FILTER_PTP_V1_L4_DELAY_REQ: ::c_uint = <span class="number">5</span>;
+<span class="kw">pub const </span>HWTSTAMP_FILTER_PTP_V2_L4_EVENT: ::c_uint = <span class="number">6</span>;
+<span class="kw">pub const </span>HWTSTAMP_FILTER_PTP_V2_L4_SYNC: ::c_uint = <span class="number">7</span>;
+<span class="kw">pub const </span>HWTSTAMP_FILTER_PTP_V2_L4_DELAY_REQ: ::c_uint = <span class="number">8</span>;
+<span class="kw">pub const </span>HWTSTAMP_FILTER_PTP_V2_L2_EVENT: ::c_uint = <span class="number">9</span>;
+<span class="kw">pub const </span>HWTSTAMP_FILTER_PTP_V2_L2_SYNC: ::c_uint = <span class="number">10</span>;
+<span class="kw">pub const </span>HWTSTAMP_FILTER_PTP_V2_L2_DELAY_REQ: ::c_uint = <span class="number">11</span>;
+<span class="kw">pub const </span>HWTSTAMP_FILTER_PTP_V2_EVENT: ::c_uint = <span class="number">12</span>;
+<span class="kw">pub const </span>HWTSTAMP_FILTER_PTP_V2_SYNC: ::c_uint = <span class="number">13</span>;
+<span class="kw">pub const </span>HWTSTAMP_FILTER_PTP_V2_DELAY_REQ: ::c_uint = <span class="number">14</span>;
+<span class="kw">pub const </span>HWTSTAMP_FILTER_NTP_ALL: ::c_uint = <span class="number">15</span>;
+
 <span class="comment">// linux/if_alg.h
 </span><span class="kw">pub const </span>ALG_SET_KEY: ::c_int = <span class="number">1</span>;
 <span class="kw">pub const </span>ALG_SET_IV: ::c_int = <span class="number">2</span>;
@@ -7914,6 +8112,19 @@
 
 <span class="kw">pub const </span>ALG_OP_DECRYPT: ::c_int = <span class="number">0</span>;
 <span class="kw">pub const </span>ALG_OP_ENCRYPT: ::c_int = <span class="number">1</span>;
+
+<span class="comment">// include/uapi/linux/if.h
+</span><span class="kw">pub const </span>IF_OPER_UNKNOWN: ::c_int = <span class="number">0</span>;
+<span class="kw">pub const </span>IF_OPER_NOTPRESENT: ::c_int = <span class="number">1</span>;
+<span class="kw">pub const </span>IF_OPER_DOWN: ::c_int = <span class="number">2</span>;
+<span class="kw">pub const </span>IF_OPER_LOWERLAYERDOWN: ::c_int = <span class="number">3</span>;
+<span class="kw">pub const </span>IF_OPER_TESTING: ::c_int = <span class="number">4</span>;
+<span class="kw">pub const </span>IF_OPER_DORMANT: ::c_int = <span class="number">5</span>;
+<span class="kw">pub const </span>IF_OPER_UP: ::c_int = <span class="number">6</span>;
+
+<span class="kw">pub const </span>IF_LINK_MODE_DEFAULT: ::c_int = <span class="number">0</span>;
+<span class="kw">pub const </span>IF_LINK_MODE_DORMANT: ::c_int = <span class="number">1</span>;
+<span class="kw">pub const </span>IF_LINK_MODE_TESTING: ::c_int = <span class="number">2</span>;
 
 <span class="comment">// include/uapi/linux/udp.h
 </span><span class="kw">pub const </span>UDP_CORK: ::c_int = <span class="number">1</span>;
@@ -8334,6 +8545,14 @@
     ((op &amp; <span class="number">0xf</span>) &lt;&lt; <span class="number">28</span>) | ((cmp &amp; <span class="number">0xf</span>) &lt;&lt; <span class="number">24</span>) | ((oparg &amp; <span class="number">0xfff</span>) &lt;&lt; <span class="number">12</span>) | (cmparg &amp; <span class="number">0xfff</span>)
 }
 
+<span class="comment">// linux/kexec.h
+</span><span class="kw">pub const </span>KEXEC_ON_CRASH: ::c_int = <span class="number">0x00000001</span>;
+<span class="kw">pub const </span>KEXEC_PRESERVE_CONTEXT: ::c_int = <span class="number">0x00000002</span>;
+<span class="kw">pub const </span>KEXEC_ARCH_MASK: ::c_int = <span class="number">0xffff0000</span>;
+<span class="kw">pub const </span>KEXEC_FILE_UNLOAD: ::c_int = <span class="number">0x00000001</span>;
+<span class="kw">pub const </span>KEXEC_FILE_ON_CRASH: ::c_int = <span class="number">0x00000002</span>;
+<span class="kw">pub const </span>KEXEC_FILE_NO_INITRAMFS: ::c_int = <span class="number">0x00000004</span>;
+
 <span class="comment">// linux/reboot.h
 </span><span class="kw">pub const </span>LINUX_REBOOT_MAGIC1: ::c_int = <span class="number">0xfee1dead</span>;
 <span class="kw">pub const </span>LINUX_REBOOT_MAGIC2: ::c_int = <span class="number">672274793</span>;
@@ -8425,9 +8644,11 @@
 <span class="kw">pub const </span>CAN_SFF_MASK: canid_t = <span class="number">0x000007FF</span>;
 <span class="kw">pub const </span>CAN_EFF_MASK: canid_t = <span class="number">0x1FFFFFFF</span>;
 <span class="kw">pub const </span>CAN_ERR_MASK: canid_t = <span class="number">0x1FFFFFFF</span>;
+<span class="kw">pub const </span>CANXL_PRIO_MASK: ::canid_t = CAN_SFF_MASK;
 
 <span class="kw">pub const </span>CAN_SFF_ID_BITS: ::c_int = <span class="number">11</span>;
 <span class="kw">pub const </span>CAN_EFF_ID_BITS: ::c_int = <span class="number">29</span>;
+<span class="kw">pub const </span>CANXL_PRIO_BITS: ::c_int = CAN_SFF_ID_BITS;
 
 <span class="kw">pub const </span>CAN_MAX_DLC: ::c_int = <span class="number">8</span>;
 <span class="kw">pub const </span>CAN_MAX_DLEN: usize = <span class="number">8</span>;
@@ -8437,10 +8658,26 @@
 <span class="kw">pub const </span>CANFD_BRS: ::c_int = <span class="number">0x01</span>;
 <span class="kw">pub const </span>CANFD_ESI: ::c_int = <span class="number">0x02</span>;
 
+<span class="kw">pub const </span>CANXL_MIN_DLC: ::c_int = <span class="number">0</span>;
+<span class="kw">pub const </span>CANXL_MAX_DLC: ::c_int = <span class="number">2047</span>;
+<span class="kw">pub const </span>CANXL_MAX_DLC_MASK: ::c_int = <span class="number">0x07FF</span>;
+<span class="kw">pub const </span>CANXL_MIN_DLEN: usize = <span class="number">1</span>;
+<span class="kw">pub const </span>CANXL_MAX_DLEN: usize = <span class="number">2048</span>;
+
+<span class="kw">pub const </span>CANXL_XLF: ::c_int = <span class="number">0x80</span>;
+<span class="kw">pub const </span>CANXL_SEC: ::c_int = <span class="number">0x01</span>;
+
 <span class="macro">cfg_if! </span>{
     <span class="kw">if </span><span class="attr">#[cfg(libc_align)] </span>{
         <span class="kw">pub const </span>CAN_MTU: usize = ::mem::size_of::&lt;can_frame&gt;();
         <span class="kw">pub const </span>CANFD_MTU: usize = ::mem::size_of::&lt;canfd_frame&gt;();
+        <span class="kw">pub const </span>CANXL_MTU: usize = ::mem::size_of::&lt;canxl_frame&gt;();
+        <span class="comment">// FIXME: use `core::mem::offset_of!` once that is available
+        // https://github.com/rust-lang/rfcs/pull/3308
+        // pub const CANXL_HDR_SIZE: usize = core::mem::offset_of!(canxl_frame, data);
+        </span><span class="kw">pub const </span>CANXL_HDR_SIZE: usize = <span class="number">12</span>;
+        <span class="kw">pub const </span>CANXL_MIN_MTU: usize = CANXL_HDR_SIZE + <span class="number">64</span>;
+        <span class="kw">pub const </span>CANXL_MAX_MTU: usize = CANXL_MTU;
     }
 }
 
@@ -8466,6 +8703,7 @@
 <span class="kw">pub const </span>CAN_RAW_RECV_OWN_MSGS: ::c_int = <span class="number">4</span>;
 <span class="kw">pub const </span>CAN_RAW_FD_FRAMES: ::c_int = <span class="number">5</span>;
 <span class="kw">pub const </span>CAN_RAW_JOIN_FILTERS: ::c_int = <span class="number">6</span>;
+<span class="kw">pub const </span>CAN_RAW_XL_FRAMES: ::c_int = <span class="number">7</span>;
 
 <span class="comment">// linux/can/j1939.h
 </span><span class="kw">pub const </span>SOL_CAN_J1939: ::c_int = SOL_CAN_BASE + CAN_J1939;
@@ -8583,6 +8821,27 @@
 <span class="kw">pub const </span>SCTP_PR_SCTP_ALL: ::c_int = <span class="number">1 </span>&lt;&lt; <span class="number">7</span>;
 <span class="kw">pub const </span>SCTP_NOTIFICATION: ::c_int = MSG_NOTIFICATION;
 <span class="kw">pub const </span>SCTP_EOF: ::c_int = ::MSG_FIN;
+
+<span class="comment">/* DCCP socket options */
+</span><span class="kw">pub const </span>DCCP_SOCKOPT_PACKET_SIZE: ::c_int = <span class="number">1</span>;
+<span class="kw">pub const </span>DCCP_SOCKOPT_SERVICE: ::c_int = <span class="number">2</span>;
+<span class="kw">pub const </span>DCCP_SOCKOPT_CHANGE_L: ::c_int = <span class="number">3</span>;
+<span class="kw">pub const </span>DCCP_SOCKOPT_CHANGE_R: ::c_int = <span class="number">4</span>;
+<span class="kw">pub const </span>DCCP_SOCKOPT_GET_CUR_MPS: ::c_int = <span class="number">5</span>;
+<span class="kw">pub const </span>DCCP_SOCKOPT_SERVER_TIMEWAIT: ::c_int = <span class="number">6</span>;
+<span class="kw">pub const </span>DCCP_SOCKOPT_SEND_CSCOV: ::c_int = <span class="number">10</span>;
+<span class="kw">pub const </span>DCCP_SOCKOPT_RECV_CSCOV: ::c_int = <span class="number">11</span>;
+<span class="kw">pub const </span>DCCP_SOCKOPT_AVAILABLE_CCIDS: ::c_int = <span class="number">12</span>;
+<span class="kw">pub const </span>DCCP_SOCKOPT_CCID: ::c_int = <span class="number">13</span>;
+<span class="kw">pub const </span>DCCP_SOCKOPT_TX_CCID: ::c_int = <span class="number">14</span>;
+<span class="kw">pub const </span>DCCP_SOCKOPT_RX_CCID: ::c_int = <span class="number">15</span>;
+<span class="kw">pub const </span>DCCP_SOCKOPT_QPOLICY_ID: ::c_int = <span class="number">16</span>;
+<span class="kw">pub const </span>DCCP_SOCKOPT_QPOLICY_TXQLEN: ::c_int = <span class="number">17</span>;
+<span class="kw">pub const </span>DCCP_SOCKOPT_CCID_RX_INFO: ::c_int = <span class="number">128</span>;
+<span class="kw">pub const </span>DCCP_SOCKOPT_CCID_TX_INFO: ::c_int = <span class="number">192</span>;
+
+<span class="doccomment">/// maximum number of services provided on the same listening port
+</span><span class="kw">pub const </span>DCCP_SERVICE_LIST_MAX_LEN: ::c_int = <span class="number">32</span>;
 
 <span class="macro">f! </span>{
     <span class="kw">pub fn </span>NLA_ALIGN(len: ::c_int) -&gt; ::c_int {
@@ -8961,21 +9220,8 @@
     <span class="kw">pub fn </span>mprotect(addr: <span class="kw-2">*mut </span>::c_void, len: ::size_t, prot: ::c_int) -&gt; ::c_int;
     <span class="kw">pub fn </span>__errno_location() -&gt; <span class="kw-2">*mut </span>::c_int;
 
-    <span class="kw">pub fn </span>fopen64(filename: <span class="kw-2">*const </span>c_char, mode: <span class="kw-2">*const </span>c_char) -&gt; <span class="kw-2">*mut </span>::FILE;
-    <span class="kw">pub fn </span>freopen64(
-        filename: <span class="kw-2">*const </span>c_char,
-        mode: <span class="kw-2">*const </span>c_char,
-        file: <span class="kw-2">*mut </span>::FILE,
-    ) -&gt; <span class="kw-2">*mut </span>::FILE;
-    <span class="kw">pub fn </span>tmpfile64() -&gt; <span class="kw-2">*mut </span>::FILE;
-    <span class="kw">pub fn </span>fgetpos64(stream: <span class="kw-2">*mut </span>::FILE, ptr: <span class="kw-2">*mut </span>fpos64_t) -&gt; ::c_int;
-    <span class="kw">pub fn </span>fsetpos64(stream: <span class="kw-2">*mut </span>::FILE, ptr: <span class="kw-2">*const </span>fpos64_t) -&gt; ::c_int;
-    <span class="kw">pub fn </span>fseeko64(stream: <span class="kw-2">*mut </span>::FILE, offset: ::off64_t, whence: ::c_int) -&gt; ::c_int;
-    <span class="kw">pub fn </span>ftello64(stream: <span class="kw-2">*mut </span>::FILE) -&gt; ::off64_t;
     <span class="kw">pub fn </span>fallocate(fd: ::c_int, mode: ::c_int, offset: ::off_t, len: ::off_t) -&gt; ::c_int;
-    <span class="kw">pub fn </span>fallocate64(fd: ::c_int, mode: ::c_int, offset: ::off64_t, len: ::off64_t) -&gt; ::c_int;
     <span class="kw">pub fn </span>posix_fallocate(fd: ::c_int, offset: ::off_t, len: ::off_t) -&gt; ::c_int;
-    <span class="kw">pub fn </span>posix_fallocate64(fd: ::c_int, offset: ::off64_t, len: ::off64_t) -&gt; ::c_int;
     <span class="kw">pub fn </span>readahead(fd: ::c_int, offset: ::off64_t, count: ::size_t) -&gt; ::ssize_t;
     <span class="kw">pub fn </span>getxattr(
         path: <span class="kw-2">*const </span>c_char,
@@ -9276,12 +9522,6 @@
         offset: <span class="kw-2">*mut </span>off_t,
         count: ::size_t,
     ) -&gt; ::ssize_t;
-    <span class="kw">pub fn </span>sendfile64(
-        out_fd: ::c_int,
-        in_fd: ::c_int,
-        offset: <span class="kw-2">*mut </span>off64_t,
-        count: ::size_t,
-    ) -&gt; ::ssize_t;
     <span class="kw">pub fn </span>sigsuspend(mask: <span class="kw-2">*const </span>::sigset_t) -&gt; ::c_int;
     <span class="kw">pub fn </span>getgrgid_r(
         gid: ::gid_t,
@@ -9531,6 +9771,40 @@
         len: ::size_t,
         flags: ::c_uint,
     ) -&gt; ::ssize_t;
+}
+
+<span class="comment">// LFS64 extensions
+//
+// * musl has 64-bit versions only so aliases the LFS64 symbols to the standard ones
+</span><span class="macro">cfg_if! </span>{
+    <span class="kw">if </span><span class="attr">#[cfg(not(target_env = <span class="string">&quot;musl&quot;</span>))] </span>{
+        <span class="kw">extern </span><span class="string">&quot;C&quot; </span>{
+            <span class="kw">pub fn </span>fallocate64(
+                fd: ::c_int,
+                mode: ::c_int,
+                offset: ::off64_t,
+                len: ::off64_t
+            ) -&gt; ::c_int;
+            <span class="kw">pub fn </span>fgetpos64(stream: <span class="kw-2">*mut </span>::FILE, ptr: <span class="kw-2">*mut </span>fpos64_t) -&gt; ::c_int;
+            <span class="kw">pub fn </span>fopen64(filename: <span class="kw-2">*const </span>c_char, mode: <span class="kw-2">*const </span>c_char) -&gt; <span class="kw-2">*mut </span>::FILE;
+            <span class="kw">pub fn </span>freopen64(
+                filename: <span class="kw-2">*const </span>c_char,
+                mode: <span class="kw-2">*const </span>c_char,
+                file: <span class="kw-2">*mut </span>::FILE,
+            ) -&gt; <span class="kw-2">*mut </span>::FILE;
+            <span class="kw">pub fn </span>fseeko64(stream: <span class="kw-2">*mut </span>::FILE, offset: ::off64_t, whence: ::c_int) -&gt; ::c_int;
+            <span class="kw">pub fn </span>fsetpos64(stream: <span class="kw-2">*mut </span>::FILE, ptr: <span class="kw-2">*const </span>fpos64_t) -&gt; ::c_int;
+            <span class="kw">pub fn </span>ftello64(stream: <span class="kw-2">*mut </span>::FILE) -&gt; ::off64_t;
+            <span class="kw">pub fn </span>posix_fallocate64(fd: ::c_int, offset: ::off64_t, len: ::off64_t) -&gt; ::c_int;
+            <span class="kw">pub fn </span>sendfile64(
+                out_fd: ::c_int,
+                in_fd: ::c_int,
+                offset: <span class="kw-2">*mut </span>off64_t,
+                count: ::size_t,
+            ) -&gt; ::ssize_t;
+            <span class="kw">pub fn </span>tmpfile64() -&gt; <span class="kw-2">*mut </span>::FILE;
+        }
+    }
 }
 
 <span class="macro">cfg_if! </span>{

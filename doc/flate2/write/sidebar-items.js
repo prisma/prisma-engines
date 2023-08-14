@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"struct":["DeflateDecoder","DeflateEncoder","GzDecoder","GzEncoder","ZlibDecoder","ZlibEncoder"]};
+window.SIDEBAR_ITEMS = {"struct":["DeflateDecoder","DeflateEncoder","GzDecoder","GzEncoder","MultiGzDecoder","ZlibDecoder","ZlibEncoder"]};

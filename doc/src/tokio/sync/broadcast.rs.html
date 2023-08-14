@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/nix/store/jnqxxv1xi811ni996b002f4jnyz38xck-vendor-cargo-deps/c19b7c6f923b580ac259164a89f2577984ad5ab09ee9d583b888f934adbbe8d0/tokio-1.25.0/src/sync/broadcast.rs`."><title>broadcast.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-f3501f0f5ae15dfb.css" id="mainThemeStyle"><div id="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="tokio" data-themes="" data-resource-suffix="" data-rustdoc-version="1.71.0 (8ede3aae2 2023-07-12)" data-search-js="search-4926e5fc22a5646a.js" data-settings-js="settings-de11bff964e9d4e5.js" data-settings-css="settings-8c76f75bfb6bd192.css" data-theme-light-css="light-0f8c037637f9eb3e.css" data-theme-dark-css="dark-1097f8e92a01e3cf.css" data-theme-ayu-css="ayu-614652228113ac93.css" ></div><script src="../../../static.files/storage-62ce34ea385b278a.js"></script><script defer src="../../../static.files/source-script-11255107d0a65077.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../static.files/main-f0540c1d82cde29b.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../../../static.files/light-0f8c037637f9eb3e.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../../../static.files/dark-1097f8e92a01e3cf.css"><link rel="stylesheet" href="../../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../../tokio/index.html"><img class="rust-logo" src="../../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/nix/store/yf45a1rayffhnidhgyjynpyhr9lqkd09-vendor-cargo-deps/c19b7c6f923b580ac259164a89f2577984ad5ab09ee9d583b888f934adbbe8d0/tokio-1.30.0/src/sync/broadcast.rs`."><title>broadcast.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-f3501f0f5ae15dfb.css" id="mainThemeStyle"><div id="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="tokio" data-themes="" data-resource-suffix="" data-rustdoc-version="1.71.0 (8ede3aae2 2023-07-12)" data-search-js="search-4926e5fc22a5646a.js" data-settings-js="settings-de11bff964e9d4e5.js" data-settings-css="settings-8c76f75bfb6bd192.css" data-theme-light-css="light-0f8c037637f9eb3e.css" data-theme-dark-css="dark-1097f8e92a01e3cf.css" data-theme-ayu-css="ayu-614652228113ac93.css" ></div><script src="../../../static.files/storage-62ce34ea385b278a.js"></script><script defer src="../../../static.files/source-script-11255107d0a65077.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../static.files/main-f0540c1d82cde29b.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../../../static.files/light-0f8c037637f9eb3e.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../../../static.files/dark-1097f8e92a01e3cf.css"><link rel="stylesheet" href="../../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../../tokio/index.html"><img class="rust-logo" src="../../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -1252,13 +1252,199 @@
 <a href="#1252" id="1252">1252</a>
 <a href="#1253" id="1253">1253</a>
 <a href="#1254" id="1254">1254</a>
+<a href="#1255" id="1255">1255</a>
+<a href="#1256" id="1256">1256</a>
+<a href="#1257" id="1257">1257</a>
+<a href="#1258" id="1258">1258</a>
+<a href="#1259" id="1259">1259</a>
+<a href="#1260" id="1260">1260</a>
+<a href="#1261" id="1261">1261</a>
+<a href="#1262" id="1262">1262</a>
+<a href="#1263" id="1263">1263</a>
+<a href="#1264" id="1264">1264</a>
+<a href="#1265" id="1265">1265</a>
+<a href="#1266" id="1266">1266</a>
+<a href="#1267" id="1267">1267</a>
+<a href="#1268" id="1268">1268</a>
+<a href="#1269" id="1269">1269</a>
+<a href="#1270" id="1270">1270</a>
+<a href="#1271" id="1271">1271</a>
+<a href="#1272" id="1272">1272</a>
+<a href="#1273" id="1273">1273</a>
+<a href="#1274" id="1274">1274</a>
+<a href="#1275" id="1275">1275</a>
+<a href="#1276" id="1276">1276</a>
+<a href="#1277" id="1277">1277</a>
+<a href="#1278" id="1278">1278</a>
+<a href="#1279" id="1279">1279</a>
+<a href="#1280" id="1280">1280</a>
+<a href="#1281" id="1281">1281</a>
+<a href="#1282" id="1282">1282</a>
+<a href="#1283" id="1283">1283</a>
+<a href="#1284" id="1284">1284</a>
+<a href="#1285" id="1285">1285</a>
+<a href="#1286" id="1286">1286</a>
+<a href="#1287" id="1287">1287</a>
+<a href="#1288" id="1288">1288</a>
+<a href="#1289" id="1289">1289</a>
+<a href="#1290" id="1290">1290</a>
+<a href="#1291" id="1291">1291</a>
+<a href="#1292" id="1292">1292</a>
+<a href="#1293" id="1293">1293</a>
+<a href="#1294" id="1294">1294</a>
+<a href="#1295" id="1295">1295</a>
+<a href="#1296" id="1296">1296</a>
+<a href="#1297" id="1297">1297</a>
+<a href="#1298" id="1298">1298</a>
+<a href="#1299" id="1299">1299</a>
+<a href="#1300" id="1300">1300</a>
+<a href="#1301" id="1301">1301</a>
+<a href="#1302" id="1302">1302</a>
+<a href="#1303" id="1303">1303</a>
+<a href="#1304" id="1304">1304</a>
+<a href="#1305" id="1305">1305</a>
+<a href="#1306" id="1306">1306</a>
+<a href="#1307" id="1307">1307</a>
+<a href="#1308" id="1308">1308</a>
+<a href="#1309" id="1309">1309</a>
+<a href="#1310" id="1310">1310</a>
+<a href="#1311" id="1311">1311</a>
+<a href="#1312" id="1312">1312</a>
+<a href="#1313" id="1313">1313</a>
+<a href="#1314" id="1314">1314</a>
+<a href="#1315" id="1315">1315</a>
+<a href="#1316" id="1316">1316</a>
+<a href="#1317" id="1317">1317</a>
+<a href="#1318" id="1318">1318</a>
+<a href="#1319" id="1319">1319</a>
+<a href="#1320" id="1320">1320</a>
+<a href="#1321" id="1321">1321</a>
+<a href="#1322" id="1322">1322</a>
+<a href="#1323" id="1323">1323</a>
+<a href="#1324" id="1324">1324</a>
+<a href="#1325" id="1325">1325</a>
+<a href="#1326" id="1326">1326</a>
+<a href="#1327" id="1327">1327</a>
+<a href="#1328" id="1328">1328</a>
+<a href="#1329" id="1329">1329</a>
+<a href="#1330" id="1330">1330</a>
+<a href="#1331" id="1331">1331</a>
+<a href="#1332" id="1332">1332</a>
+<a href="#1333" id="1333">1333</a>
+<a href="#1334" id="1334">1334</a>
+<a href="#1335" id="1335">1335</a>
+<a href="#1336" id="1336">1336</a>
+<a href="#1337" id="1337">1337</a>
+<a href="#1338" id="1338">1338</a>
+<a href="#1339" id="1339">1339</a>
+<a href="#1340" id="1340">1340</a>
+<a href="#1341" id="1341">1341</a>
+<a href="#1342" id="1342">1342</a>
+<a href="#1343" id="1343">1343</a>
+<a href="#1344" id="1344">1344</a>
+<a href="#1345" id="1345">1345</a>
+<a href="#1346" id="1346">1346</a>
+<a href="#1347" id="1347">1347</a>
+<a href="#1348" id="1348">1348</a>
+<a href="#1349" id="1349">1349</a>
+<a href="#1350" id="1350">1350</a>
+<a href="#1351" id="1351">1351</a>
+<a href="#1352" id="1352">1352</a>
+<a href="#1353" id="1353">1353</a>
+<a href="#1354" id="1354">1354</a>
+<a href="#1355" id="1355">1355</a>
+<a href="#1356" id="1356">1356</a>
+<a href="#1357" id="1357">1357</a>
+<a href="#1358" id="1358">1358</a>
+<a href="#1359" id="1359">1359</a>
+<a href="#1360" id="1360">1360</a>
+<a href="#1361" id="1361">1361</a>
+<a href="#1362" id="1362">1362</a>
+<a href="#1363" id="1363">1363</a>
+<a href="#1364" id="1364">1364</a>
+<a href="#1365" id="1365">1365</a>
+<a href="#1366" id="1366">1366</a>
+<a href="#1367" id="1367">1367</a>
+<a href="#1368" id="1368">1368</a>
+<a href="#1369" id="1369">1369</a>
+<a href="#1370" id="1370">1370</a>
+<a href="#1371" id="1371">1371</a>
+<a href="#1372" id="1372">1372</a>
+<a href="#1373" id="1373">1373</a>
+<a href="#1374" id="1374">1374</a>
+<a href="#1375" id="1375">1375</a>
+<a href="#1376" id="1376">1376</a>
+<a href="#1377" id="1377">1377</a>
+<a href="#1378" id="1378">1378</a>
+<a href="#1379" id="1379">1379</a>
+<a href="#1380" id="1380">1380</a>
+<a href="#1381" id="1381">1381</a>
+<a href="#1382" id="1382">1382</a>
+<a href="#1383" id="1383">1383</a>
+<a href="#1384" id="1384">1384</a>
+<a href="#1385" id="1385">1385</a>
+<a href="#1386" id="1386">1386</a>
+<a href="#1387" id="1387">1387</a>
+<a href="#1388" id="1388">1388</a>
+<a href="#1389" id="1389">1389</a>
+<a href="#1390" id="1390">1390</a>
+<a href="#1391" id="1391">1391</a>
+<a href="#1392" id="1392">1392</a>
+<a href="#1393" id="1393">1393</a>
+<a href="#1394" id="1394">1394</a>
+<a href="#1395" id="1395">1395</a>
+<a href="#1396" id="1396">1396</a>
+<a href="#1397" id="1397">1397</a>
+<a href="#1398" id="1398">1398</a>
+<a href="#1399" id="1399">1399</a>
+<a href="#1400" id="1400">1400</a>
+<a href="#1401" id="1401">1401</a>
+<a href="#1402" id="1402">1402</a>
+<a href="#1403" id="1403">1403</a>
+<a href="#1404" id="1404">1404</a>
+<a href="#1405" id="1405">1405</a>
+<a href="#1406" id="1406">1406</a>
+<a href="#1407" id="1407">1407</a>
+<a href="#1408" id="1408">1408</a>
+<a href="#1409" id="1409">1409</a>
+<a href="#1410" id="1410">1410</a>
+<a href="#1411" id="1411">1411</a>
+<a href="#1412" id="1412">1412</a>
+<a href="#1413" id="1413">1413</a>
+<a href="#1414" id="1414">1414</a>
+<a href="#1415" id="1415">1415</a>
+<a href="#1416" id="1416">1416</a>
+<a href="#1417" id="1417">1417</a>
+<a href="#1418" id="1418">1418</a>
+<a href="#1419" id="1419">1419</a>
+<a href="#1420" id="1420">1420</a>
+<a href="#1421" id="1421">1421</a>
+<a href="#1422" id="1422">1422</a>
+<a href="#1423" id="1423">1423</a>
+<a href="#1424" id="1424">1424</a>
+<a href="#1425" id="1425">1425</a>
+<a href="#1426" id="1426">1426</a>
+<a href="#1427" id="1427">1427</a>
+<a href="#1428" id="1428">1428</a>
+<a href="#1429" id="1429">1429</a>
+<a href="#1430" id="1430">1430</a>
+<a href="#1431" id="1431">1431</a>
+<a href="#1432" id="1432">1432</a>
+<a href="#1433" id="1433">1433</a>
+<a href="#1434" id="1434">1434</a>
+<a href="#1435" id="1435">1435</a>
+<a href="#1436" id="1436">1436</a>
+<a href="#1437" id="1437">1437</a>
+<a href="#1438" id="1438">1438</a>
+<a href="#1439" id="1439">1439</a>
+<a href="#1440" id="1440">1440</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! A multi-producer, multi-consumer broadcast queue. Each sent value is seen by
 //! all consumers.
 //!
 //! A [`Sender`] is used to broadcast values to **all** connected [`Receiver`]
 //! values. [`Sender`] handles are clone-able, allowing concurrent send and
 //! receive actions. [`Sender`] and [`Receiver`] are both `Send` and `Sync` as
-//! long as `T` is also `Send` or `Sync` respectively.
+//! long as `T` is `Send`.
 //!
 //! When a value is sent, **all** [`Receiver`] handles are notified and will
 //! receive the value. The value is stored once inside the channel and cloned on
@@ -1307,6 +1493,10 @@
 //! sent. At this point, the channel is &quot;closed&quot;. Once a receiver has received
 //! all values retained by the channel, the next call to [`recv`] will return
 //! with [`RecvError::Closed`].
+//!
+//! When a [`Receiver`] handle is dropped, any messages not read by the receiver
+//! will be marked as read. If this receiver was the only one not to have read
+//! that message, the message will be dropped at this point.
 //!
 //! [`Sender`]: crate::sync::broadcast::Sender
 //! [`Sender::subscribe`]: crate::sync::broadcast::Sender::subscribe
@@ -1368,8 +1558,9 @@
 
 </span><span class="kw">use </span><span class="kw">crate</span>::loom::cell::UnsafeCell;
 <span class="kw">use </span><span class="kw">crate</span>::loom::sync::atomic::AtomicUsize;
-<span class="kw">use </span><span class="kw">crate</span>::loom::sync::{Arc, Mutex, RwLock, RwLockReadGuard};
+<span class="kw">use </span><span class="kw">crate</span>::loom::sync::{Arc, Mutex, MutexGuard, RwLock, RwLockReadGuard};
 <span class="kw">use </span><span class="kw">crate</span>::util::linked_list::{<span class="self">self</span>, LinkedList};
+<span class="kw">use </span><span class="kw">crate</span>::util::WakeList;
 
 <span class="kw">use </span>std::fmt;
 <span class="kw">use </span>std::future::Future;
@@ -1693,42 +1884,13 @@
 /// This will panic if `capacity` is equal to `0` or larger
 /// than `usize::MAX / 2`.
 </span><span class="attr">#[track_caller]
-</span><span class="kw">pub fn </span>channel&lt;T: Clone&gt;(<span class="kw-2">mut </span>capacity: usize) -&gt; (Sender&lt;T&gt;, Receiver&lt;T&gt;) {
-    <span class="macro">assert!</span>(capacity &gt; <span class="number">0</span>, <span class="string">&quot;capacity is empty&quot;</span>);
-    <span class="macro">assert!</span>(capacity &lt;= usize::MAX &gt;&gt; <span class="number">1</span>, <span class="string">&quot;requested capacity too large&quot;</span>);
-
-    <span class="comment">// Round to a power of two
-    </span>capacity = capacity.next_power_of_two();
-
-    <span class="kw">let </span><span class="kw-2">mut </span>buffer = Vec::with_capacity(capacity);
-
-    <span class="kw">for </span>i <span class="kw">in </span><span class="number">0</span>..capacity {
-        buffer.push(RwLock::new(Slot {
-            rem: AtomicUsize::new(<span class="number">0</span>),
-            pos: (i <span class="kw">as </span>u64).wrapping_sub(capacity <span class="kw">as </span>u64),
-            val: UnsafeCell::new(<span class="prelude-val">None</span>),
-        }));
-    }
-
-    <span class="kw">let </span>shared = Arc::new(Shared {
-        buffer: buffer.into_boxed_slice(),
-        mask: capacity - <span class="number">1</span>,
-        tail: Mutex::new(Tail {
-            pos: <span class="number">0</span>,
-            rx_cnt: <span class="number">1</span>,
-            closed: <span class="bool-val">false</span>,
-            waiters: LinkedList::new(),
-        }),
-        num_tx: AtomicUsize::new(<span class="number">1</span>),
-    });
-
+</span><span class="kw">pub fn </span>channel&lt;T: Clone&gt;(capacity: usize) -&gt; (Sender&lt;T&gt;, Receiver&lt;T&gt;) {
+    <span class="comment">// SAFETY: In the line below we are creating one extra receiver, so there will be 1 in total.
+    </span><span class="kw">let </span>tx = <span class="kw">unsafe </span>{ Sender::new_with_receiver_count(<span class="number">1</span>, capacity) };
     <span class="kw">let </span>rx = Receiver {
-        shared: shared.clone(),
+        shared: tx.shared.clone(),
         next: <span class="number">0</span>,
     };
-
-    <span class="kw">let </span>tx = Sender { shared };
-
     (tx, rx)
 }
 
@@ -1739,6 +1901,65 @@
 <span class="kw">unsafe impl</span>&lt;T: Send&gt; Sync <span class="kw">for </span>Receiver&lt;T&gt; {}
 
 <span class="kw">impl</span>&lt;T&gt; Sender&lt;T&gt; {
+    <span class="doccomment">/// Creates the sending-half of the [`broadcast`] channel.
+    ///
+    /// See documentation of [`broadcast::channel`] for errors when calling this function.
+    ///
+    /// [`broadcast`]: crate::sync::broadcast
+    /// [`broadcast::channel`]: crate::sync::broadcast
+    </span><span class="attr">#[track_caller]
+    </span><span class="kw">pub fn </span>new(capacity: usize) -&gt; <span class="self">Self </span>{
+        <span class="comment">// SAFETY: We don&#39;t create extra receivers, so there are 0.
+        </span><span class="kw">unsafe </span>{ <span class="self">Self</span>::new_with_receiver_count(<span class="number">0</span>, capacity) }
+    }
+
+    <span class="doccomment">/// Creates the sending-half of the [`broadcast`](self) channel, and provide the receiver
+    /// count.
+    ///
+    /// See the documentation of [`broadcast::channel`](self::channel) for more errors when
+    /// calling this function.
+    ///
+    /// # Safety:
+    ///
+    /// The caller must ensure that the amount of receivers for this Sender is correct before
+    /// the channel functionalities are used, the count is zero by default, as this function
+    /// does not create any receivers by itself.
+    </span><span class="attr">#[track_caller]
+    </span><span class="kw">unsafe fn </span>new_with_receiver_count(receiver_count: usize, <span class="kw-2">mut </span>capacity: usize) -&gt; <span class="self">Self </span>{
+        <span class="macro">assert!</span>(capacity &gt; <span class="number">0</span>, <span class="string">&quot;broadcast channel capacity cannot be zero&quot;</span>);
+        <span class="macro">assert!</span>(
+            capacity &lt;= usize::MAX &gt;&gt; <span class="number">1</span>,
+            <span class="string">&quot;broadcast channel capacity exceeded `usize::MAX / 2`&quot;
+        </span>);
+
+        <span class="comment">// Round to a power of two
+        </span>capacity = capacity.next_power_of_two();
+
+        <span class="kw">let </span><span class="kw-2">mut </span>buffer = Vec::with_capacity(capacity);
+
+        <span class="kw">for </span>i <span class="kw">in </span><span class="number">0</span>..capacity {
+            buffer.push(RwLock::new(Slot {
+                rem: AtomicUsize::new(<span class="number">0</span>),
+                pos: (i <span class="kw">as </span>u64).wrapping_sub(capacity <span class="kw">as </span>u64),
+                val: UnsafeCell::new(<span class="prelude-val">None</span>),
+            }));
+        }
+
+        <span class="kw">let </span>shared = Arc::new(Shared {
+            buffer: buffer.into_boxed_slice(),
+            mask: capacity - <span class="number">1</span>,
+            tail: Mutex::new(Tail {
+                pos: <span class="number">0</span>,
+                rx_cnt: receiver_count,
+                closed: <span class="bool-val">false</span>,
+                waiters: LinkedList::new(),
+            }),
+            num_tx: AtomicUsize::new(<span class="number">1</span>),
+        });
+
+        Sender { shared }
+    }
+
     <span class="doccomment">/// Attempts to send a value to all active [`Receiver`] handles, returning
     /// it back if it could not be sent.
     ///
@@ -1750,7 +1971,8 @@
     ///
     /// On success, the number of subscribed [`Receiver`] handles is returned.
     /// This does not mean that this number of receivers will see the message as
-    /// a receiver may drop before receiving the message.
+    /// a receiver may drop or lag ([see lagging](self#lagging)) before receiving
+    /// the message.
     ///
     /// # Note
     ///
@@ -1819,12 +2041,10 @@
         <span class="comment">// Release the slot lock before notifying the receivers.
         </span>drop(slot);
 
-        tail.notify_rx();
-
-        <span class="comment">// Release the mutex. This must happen after the slot lock is released,
-        // otherwise the writer lock bit could be cleared while another thread
-        // is in the critical section.
-        </span>drop(tail);
+        <span class="comment">// Notify and release the mutex. This must happen after the slot lock is
+        // released, otherwise the writer lock bit could be cleared while another
+        // thread is in the critical section.
+        </span><span class="self">self</span>.shared.notify_rx(tail);
 
         <span class="prelude-val">Ok</span>(rem)
     }
@@ -1989,11 +2209,34 @@
         tail.rx_cnt
     }
 
+    <span class="doccomment">/// Returns `true` if senders belong to the same channel.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use tokio::sync::broadcast;
+    ///
+    /// #[tokio::main]
+    /// async fn main() {
+    ///     let (tx, _rx) = broadcast::channel::&lt;()&gt;(16);
+    ///     let tx2 = tx.clone();
+    ///
+    ///     assert!(tx.same_channel(&amp;tx2));
+    ///
+    ///     let (tx3, _rx3) = broadcast::channel::&lt;()&gt;(16);
+    ///
+    ///     assert!(!tx3.same_channel(&amp;tx2));
+    /// }
+    /// ```
+    </span><span class="kw">pub fn </span>same_channel(<span class="kw-2">&amp;</span><span class="self">self</span>, other: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; bool {
+        Arc::ptr_eq(<span class="kw-2">&amp;</span><span class="self">self</span>.shared, <span class="kw-2">&amp;</span>other.shared)
+    }
+
     <span class="kw">fn </span>close_channel(<span class="kw-2">&amp;</span><span class="self">self</span>) {
         <span class="kw">let </span><span class="kw-2">mut </span>tail = <span class="self">self</span>.shared.tail.lock();
         tail.closed = <span class="bool-val">true</span>;
 
-        tail.notify_rx();
+        <span class="self">self</span>.shared.notify_rx(tail);
     }
 }
 
@@ -2014,18 +2257,47 @@
     Receiver { shared, next }
 }
 
-<span class="kw">impl </span>Tail {
-    <span class="kw">fn </span>notify_rx(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
-        <span class="kw">while let </span><span class="prelude-val">Some</span>(<span class="kw-2">mut </span>waiter) = <span class="self">self</span>.waiters.pop_back() {
-            <span class="comment">// Safety: `waiters` lock is still held.
-            </span><span class="kw">let </span>waiter = <span class="kw">unsafe </span>{ waiter.as_mut() };
+<span class="kw">impl</span>&lt;T&gt; Shared&lt;T&gt; {
+    <span class="kw">fn </span>notify_rx&lt;<span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span>: <span class="lifetime">&#39;a</span>&gt;(<span class="kw-2">&amp;</span><span class="lifetime">&#39;b </span><span class="self">self</span>, <span class="kw-2">mut </span>tail: MutexGuard&lt;<span class="lifetime">&#39;a</span>, Tail&gt;) {
+        <span class="kw">let </span><span class="kw-2">mut </span>wakers = WakeList::new();
+        <span class="lifetime">&#39;outer</span>: <span class="kw">loop </span>{
+            <span class="kw">while </span>wakers.can_push() {
+                <span class="kw">match </span>tail.waiters.pop_back() {
+                    <span class="prelude-val">Some</span>(<span class="kw-2">mut </span>waiter) =&gt; {
+                        <span class="comment">// Safety: `tail` lock is still held.
+                        </span><span class="kw">let </span>waiter = <span class="kw">unsafe </span>{ waiter.as_mut() };
 
-            <span class="macro">assert!</span>(waiter.queued);
-            waiter.queued = <span class="bool-val">false</span>;
+                        <span class="macro">assert!</span>(waiter.queued);
+                        waiter.queued = <span class="bool-val">false</span>;
 
-            <span class="kw">let </span>waker = waiter.waker.take().unwrap();
-            waker.wake();
+                        <span class="kw">if let </span><span class="prelude-val">Some</span>(waker) = waiter.waker.take() {
+                            wakers.push(waker);
+                        }
+                    }
+                    <span class="prelude-val">None </span>=&gt; {
+                        <span class="kw">break </span><span class="lifetime">&#39;outer</span>;
+                    }
+                }
+            }
+
+            <span class="comment">// Release the lock before waking.
+            </span>drop(tail);
+
+            <span class="comment">// Before we acquire the lock again all sorts of things can happen:
+            // some waiters may remove themselves from the list and new waiters
+            // may be added. This is fine since at worst we will unnecessarily
+            // wake up waiters which will then queue themselves again.
+
+            </span>wakers.wake_all();
+
+            <span class="comment">// Acquire the lock again.
+            </span>tail = <span class="self">self</span>.tail.lock();
         }
+
+        <span class="comment">// Release the lock before waking.
+        </span>drop(tail);
+
+        wakers.wake_all();
     }
 }
 
@@ -2114,6 +2386,29 @@
         <span class="self">self</span>.len() == <span class="number">0
     </span>}
 
+    <span class="doccomment">/// Returns `true` if receivers belong to the same channel.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use tokio::sync::broadcast;
+    ///
+    /// #[tokio::main]
+    /// async fn main() {
+    ///     let (tx, rx) = broadcast::channel::&lt;()&gt;(16);
+    ///     let rx2 = tx.subscribe();
+    ///
+    ///     assert!(rx.same_channel(&amp;rx2));
+    ///
+    ///     let (_tx3, rx3) = broadcast::channel::&lt;()&gt;(16);
+    ///
+    ///     assert!(!rx3.same_channel(&amp;rx2));
+    /// }
+    /// ```
+    </span><span class="kw">pub fn </span>same_channel(<span class="kw-2">&amp;</span><span class="self">self</span>, other: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; bool {
+        Arc::ptr_eq(<span class="kw-2">&amp;</span><span class="self">self</span>.shared, <span class="kw-2">&amp;</span>other.shared)
+    }
+
     <span class="doccomment">/// Locks the next value if there is one.
     </span><span class="kw">fn </span>recv_ref(
         <span class="kw-2">&amp;mut </span><span class="self">self</span>,
@@ -2133,6 +2428,8 @@
             // while `send2` acquired the `tail` lock and attempts to acquire
             // the slot lock.
             </span>drop(slot);
+
+            <span class="kw">let </span><span class="kw-2">mut </span>old_waker = <span class="prelude-val">None</span>;
 
             <span class="kw">let </span><span class="kw-2">mut </span>tail = <span class="self">self</span>.shared.tail.lock();
 
@@ -2166,7 +2463,10 @@
                                 </span><span class="kw">match </span>(<span class="kw-2">*</span>ptr).waker {
                                     <span class="prelude-val">Some</span>(<span class="kw-2">ref </span>w) <span class="kw">if </span>w.will_wake(waker) =&gt; {}
                                     <span class="kw">_ </span>=&gt; {
-                                        (<span class="kw-2">*</span>ptr).waker = <span class="prelude-val">Some</span>(waker.clone());
+                                        old_waker = std::mem::replace(
+                                            <span class="kw-2">&amp;mut </span>(<span class="kw-2">*</span>ptr).waker,
+                                            <span class="prelude-val">Some</span>(waker.clone()),
+                                        );
                                     }
                                 }
 
@@ -2177,6 +2477,11 @@
                             });
                         }
                     }
+
+                    <span class="comment">// Drop the old waker after releasing the locks.
+                    </span>drop(slot);
+                    drop(tail);
+                    drop(old_waker);
 
                     <span class="kw">return </span><span class="prelude-val">Err</span>(TryRecvError::Empty);
                 }
@@ -2360,6 +2665,33 @@
         <span class="kw">let </span>guard = <span class="self">self</span>.recv_ref(<span class="prelude-val">None</span>)<span class="question-mark">?</span>;
         guard.clone_value().ok_or(TryRecvError::Closed)
     }
+
+    <span class="doccomment">/// Blocking receive to call outside of asynchronous contexts.
+    ///
+    /// # Panics
+    ///
+    /// This function panics if called within an asynchronous execution
+    /// context.
+    ///
+    /// # Examples
+    /// ```
+    /// use std::thread;
+    /// use tokio::sync::broadcast;
+    ///
+    /// #[tokio::main]
+    /// async fn main() {
+    ///     let (tx, mut rx) = broadcast::channel(16);
+    ///
+    ///     let sync_code = thread::spawn(move || {
+    ///         assert_eq!(rx.blocking_recv(), Ok(10));
+    ///     });
+    ///
+    ///     let _ = tx.send(10);
+    ///     sync_code.join().unwrap();
+    /// }
+    </span><span class="kw">pub fn </span>blocking_recv(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;T, RecvError&gt; {
+        <span class="kw">crate</span>::future::block_on(<span class="self">self</span>.recv())
+    }
 }
 
 <span class="kw">impl</span>&lt;T&gt; Drop <span class="kw">for </span>Receiver&lt;T&gt; {
@@ -2418,6 +2750,8 @@
     <span class="kw">type </span>Output = <span class="prelude-ty">Result</span>&lt;T, RecvError&gt;;
 
     <span class="kw">fn </span>poll(<span class="self">self</span>: Pin&lt;<span class="kw-2">&amp;mut </span><span class="self">Self</span>&gt;, cx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; Poll&lt;<span class="prelude-ty">Result</span>&lt;T, RecvError&gt;&gt; {
+        <span class="macro">ready!</span>(<span class="kw">crate</span>::trace::trace_leaf(cx));
+
         <span class="kw">let </span>(receiver, waiter) = <span class="self">self</span>.project();
 
         <span class="kw">let </span>guard = <span class="kw">match </span>receiver.recv_ref(<span class="prelude-val">Some</span>((waiter, cx.waker()))) {
@@ -2506,4 +2840,42 @@
 }
 
 <span class="kw">fn </span>is_unpin&lt;T: Unpin&gt;() {}
+
+<span class="attr">#[cfg(not(loom))]
+#[cfg(test)]
+</span><span class="kw">mod </span>tests {
+    <span class="kw">use super</span>::<span class="kw-2">*</span>;
+
+    <span class="attr">#[test]
+    </span><span class="kw">fn </span>receiver_count_on_sender_constructor() {
+        <span class="kw">let </span>sender = Sender::&lt;i32&gt;::new(<span class="number">16</span>);
+        <span class="macro">assert_eq!</span>(sender.receiver_count(), <span class="number">0</span>);
+
+        <span class="kw">let </span>rx_1 = sender.subscribe();
+        <span class="macro">assert_eq!</span>(sender.receiver_count(), <span class="number">1</span>);
+
+        <span class="kw">let </span>rx_2 = rx_1.resubscribe();
+        <span class="macro">assert_eq!</span>(sender.receiver_count(), <span class="number">2</span>);
+
+        <span class="kw">let </span>rx_3 = sender.subscribe();
+        <span class="macro">assert_eq!</span>(sender.receiver_count(), <span class="number">3</span>);
+
+        drop(rx_3);
+        drop(rx_1);
+        <span class="macro">assert_eq!</span>(sender.receiver_count(), <span class="number">1</span>);
+
+        drop(rx_2);
+        <span class="macro">assert_eq!</span>(sender.receiver_count(), <span class="number">0</span>);
+    }
+
+    <span class="attr">#[cfg(not(loom))]
+    #[test]
+    </span><span class="kw">fn </span>receiver_count_on_channel_constructor() {
+        <span class="kw">let </span>(sender, rx) = channel::&lt;i32&gt;(<span class="number">16</span>);
+        <span class="macro">assert_eq!</span>(sender.receiver_count(), <span class="number">1</span>);
+
+        <span class="kw">let </span>_rx_2 = rx.resubscribe();
+        <span class="macro">assert_eq!</span>(sender.receiver_count(), <span class="number">2</span>);
+    }
+}
 </code></pre></div></section></main></body></html>

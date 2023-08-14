@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/nix/store/jnqxxv1xi811ni996b002f4jnyz38xck-vendor-cargo-deps/c19b7c6f923b580ac259164a89f2577984ad5ab09ee9d583b888f934adbbe8d0/bumpalo-3.12.0/src/lib.rs`."><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-f3501f0f5ae15dfb.css" id="mainThemeStyle"><div id="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="bumpalo" data-themes="" data-resource-suffix="" data-rustdoc-version="1.71.0 (8ede3aae2 2023-07-12)" data-search-js="search-4926e5fc22a5646a.js" data-settings-js="settings-de11bff964e9d4e5.js" data-settings-css="settings-8c76f75bfb6bd192.css" data-theme-light-css="light-0f8c037637f9eb3e.css" data-theme-dark-css="dark-1097f8e92a01e3cf.css" data-theme-ayu-css="ayu-614652228113ac93.css" ></div><script src="../../static.files/storage-62ce34ea385b278a.js"></script><script defer src="../../static.files/source-script-11255107d0a65077.js"></script><script defer src="../../source-files.js"></script><script defer src="../../static.files/main-f0540c1d82cde29b.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../../static.files/light-0f8c037637f9eb3e.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../../static.files/dark-1097f8e92a01e3cf.css"><link rel="stylesheet" href="../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../bumpalo/index.html"><img class="rust-logo" src="../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/nix/store/yf45a1rayffhnidhgyjynpyhr9lqkd09-vendor-cargo-deps/c19b7c6f923b580ac259164a89f2577984ad5ab09ee9d583b888f934adbbe8d0/bumpalo-3.13.0/src/lib.rs`."><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-f3501f0f5ae15dfb.css" id="mainThemeStyle"><div id="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="bumpalo" data-themes="" data-resource-suffix="" data-rustdoc-version="1.71.0 (8ede3aae2 2023-07-12)" data-search-js="search-4926e5fc22a5646a.js" data-settings-js="settings-de11bff964e9d4e5.js" data-settings-css="settings-8c76f75bfb6bd192.css" data-theme-light-css="light-0f8c037637f9eb3e.css" data-theme-dark-css="dark-1097f8e92a01e3cf.css" data-theme-ayu-css="ayu-614652228113ac93.css" ></div><script src="../../static.files/storage-62ce34ea385b278a.js"></script><script defer src="../../static.files/source-script-11255107d0a65077.js"></script><script defer src="../../source-files.js"></script><script defer src="../../static.files/main-f0540c1d82cde29b.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../../static.files/light-0f8c037637f9eb3e.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../../static.files/dark-1097f8e92a01e3cf.css"><link rel="stylesheet" href="../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../bumpalo/index.html"><img class="rust-logo" src="../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -2021,14 +2021,12 @@
 <a href="#2021" id="2021">2021</a>
 <a href="#2022" id="2022">2022</a>
 <a href="#2023" id="2023">2023</a>
+<a href="#2024" id="2024">2024</a>
 </pre></div><pre class="rust"><code><span class="attr">#![doc = <span class="macro">include_str!</span>(<span class="string">&quot;../README.md&quot;</span>)]
 #![deny(missing_debug_implementations)]
 #![deny(missing_docs)]
 #![no_std]
-#![cfg_attr(
-    feature = <span class="string">&quot;allocator_api&quot;</span>,
-    feature(allocator_api, nonnull_slice_from_raw_parts)
-)]
+#![cfg_attr(feature = <span class="string">&quot;allocator_api&quot;</span>, feature(allocator_api))]
 
 #[doc(hidden)]
 </span><span class="kw">pub extern crate </span>alloc <span class="kw">as </span>core_alloc;
@@ -2049,8 +2047,12 @@
 <span class="kw">use </span>core::slice;
 <span class="kw">use </span>core::str;
 <span class="kw">use </span>core_alloc::alloc::{alloc, dealloc, Layout};
+
 <span class="attr">#[cfg(feature = <span class="string">&quot;allocator_api&quot;</span>)]
 </span><span class="kw">use </span>core_alloc::alloc::{AllocError, Allocator};
+
+<span class="attr">#[cfg(all(feature = <span class="string">&quot;allocator-api2&quot;</span>, not(feature = <span class="string">&quot;allocator_api&quot;</span>)))]
+</span><span class="kw">use </span>allocator_api2::alloc::{AllocError, Allocator};
 
 <span class="kw">pub use </span>alloc::AllocErr;
 
@@ -2377,7 +2379,7 @@
 
 <span class="kw">impl </span>EmptyChunkFooter {
     <span class="kw">fn </span>get(<span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span><span class="self">self</span>) -&gt; NonNull&lt;ChunkFooter&gt; {
-        <span class="kw">unsafe </span>{ NonNull::new_unchecked(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0 </span><span class="kw">as </span><span class="kw-2">*const </span>ChunkFooter <span class="kw">as </span><span class="kw-2">*mut </span>ChunkFooter) }
+        NonNull::from(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0</span>)
     }
 }
 
@@ -2486,23 +2488,13 @@
 
 <span class="doccomment">/// Wrapper around `Layout::from_size_align` that adds debug assertions.
 </span><span class="attr">#[inline]
-</span><span class="kw">unsafe fn </span>layout_from_size_align(size: usize, align: usize) -&gt; Layout {
-    <span class="kw">if </span><span class="macro">cfg!</span>(debug_assertions) {
-        Layout::from_size_align(size, align).unwrap()
-    } <span class="kw">else </span>{
-        Layout::from_size_align_unchecked(size, align)
-    }
+</span><span class="kw">fn </span>layout_from_size_align(size: usize, align: usize) -&gt; <span class="prelude-ty">Result</span>&lt;Layout, AllocErr&gt; {
+    Layout::from_size_align(size, align).map_err(|<span class="kw">_</span>| AllocErr)
 }
 
 <span class="attr">#[inline(never)]
 </span><span class="kw">fn </span>allocation_size_overflow&lt;T&gt;() -&gt; T {
     <span class="macro">panic!</span>(<span class="string">&quot;requested allocation size overflowed&quot;</span>)
-}
-
-<span class="comment">// This can be migrated to directly use `usize::abs_diff` when the MSRV
-// reaches `1.60`
-</span><span class="kw">fn </span>abs_diff(a: usize, b: usize) -&gt; usize {
-    usize::max(a, b) - usize::min(a, b)
 }
 
 <span class="kw">impl </span>Bump {
@@ -2558,7 +2550,7 @@
             });
         }
 
-        <span class="kw">let </span>layout = <span class="kw">unsafe </span>{ layout_from_size_align(capacity, <span class="number">1</span>) };
+        <span class="kw">let </span>layout = layout_from_size_align(capacity, <span class="number">1</span>)<span class="question-mark">?</span>;
 
         <span class="kw">let </span>chunk_footer = <span class="kw">unsafe </span>{
             <span class="self">Self</span>::new_chunk(
@@ -2623,7 +2615,7 @@
             <span class="kw">if </span>allocated_bytes &gt; allocation_limit {
                 <span class="prelude-val">None
             </span>} <span class="kw">else </span>{
-                <span class="prelude-val">Some</span>(abs_diff(allocation_limit, allocated_bytes))
+                <span class="prelude-val">Some</span>(usize::abs_diff(allocation_limit, allocated_bytes))
             }
         })
     }
@@ -2705,7 +2697,7 @@
             size,
         } = new_chunk_memory_details;
 
-        <span class="kw">let </span>layout = layout_from_size_align(size, align);
+        <span class="kw">let </span>layout = layout_from_size_align(size, align).ok()<span class="question-mark">?</span>;
 
         <span class="macro">debug_assert!</span>(size &gt;= requested_layout.size());
 
@@ -3493,6 +3485,7 @@
     <span class="doccomment">/// Slow path allocation for when we need to allocate a new chunk from the
     /// parent bump set because there isn&#39;t enough room in our current chunk.
     </span><span class="attr">#[inline(never)]
+    #[cold]
     </span><span class="kw">fn </span>alloc_layout_slow(<span class="kw-2">&amp;</span><span class="self">self</span>, layout: Layout) -&gt; <span class="prelude-ty">Option</span>&lt;NonNull&lt;u8&gt;&gt; {
         <span class="kw">unsafe </span>{
             <span class="kw">let </span>size = layout.size();
@@ -3511,21 +3504,14 @@
                 .checked_mul(<span class="number">2</span>)<span class="question-mark">?
                 </span>.max(min_new_chunk_size);
             <span class="kw">let </span>chunk_memory_details = iter::from_fn(|| {
-                <span class="kw">let </span>bypass_min_chunk_size_for_small_limits = <span class="kw">match </span><span class="self">self</span>.allocation_limit() {
-                    <span class="prelude-val">Some</span>(limit)
-                        <span class="kw">if </span>layout.size() &lt; limit
+                <span class="kw">let </span>bypass_min_chunk_size_for_small_limits = <span class="macro">matches!</span>(<span class="self">self</span>.allocation_limit(), <span class="prelude-val">Some</span>(limit) <span class="kw">if </span>layout.size() &lt; limit
                             &amp;&amp; base_size &gt;= layout.size()
                             &amp;&amp; limit &lt; DEFAULT_CHUNK_SIZE_WITHOUT_FOOTER
-                            &amp;&amp; <span class="self">self</span>.allocated_bytes() == <span class="number">0 </span>=&gt;
-                    {
-                        <span class="bool-val">true
-                    </span>}
-                    <span class="kw">_ </span>=&gt; <span class="bool-val">false</span>,
-                };
+                            &amp;&amp; <span class="self">self</span>.allocated_bytes() == <span class="number">0</span>);
 
                 <span class="kw">if </span>base_size &gt;= min_new_chunk_size || bypass_min_chunk_size_for_small_limits {
                     <span class="kw">let </span>size = base_size;
-                    base_size = base_size / <span class="number">2</span>;
+                    base_size /= <span class="number">2</span>;
                     Bump::new_chunk_memory_details(<span class="prelude-val">Some</span>(size), layout)
                 } <span class="kw">else </span>{
                     <span class="prelude-val">None
@@ -3719,6 +3705,16 @@
         <span class="kw">unsafe </span>{ footer.as_ref().allocated_bytes }
     }
 
+    <span class="doccomment">/// Calculates the number of bytes requested from the Rust allocator for this `Bump`.
+    ///
+    /// This number is equal to the [`allocated_bytes()`](Self::allocated_bytes) plus
+    /// the size of the bump metadata.
+    </span><span class="kw">pub fn </span>allocated_bytes_including_metadata(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; usize {
+        <span class="kw">let </span>metadata_size =
+            <span class="kw">unsafe </span>{ <span class="self">self</span>.iter_allocated_chunks_raw().count() * mem::size_of::&lt;ChunkFooter&gt;() };
+        <span class="self">self</span>.allocated_bytes() + metadata_size
+    }
+
     <span class="attr">#[inline]
     </span><span class="kw">unsafe fn </span>is_last_allocation(<span class="kw-2">&amp;</span><span class="self">self</span>, ptr: NonNull&lt;u8&gt;) -&gt; bool {
         <span class="kw">let </span>footer = <span class="self">self</span>.current_chunk_footer.get();
@@ -3773,9 +3769,9 @@
             // in the `if` condition.
             </span>ptr::copy_nonoverlapping(ptr.as_ptr(), new_ptr.as_ptr(), new_size);
 
-            <span class="kw">return </span><span class="prelude-val">Ok</span>(new_ptr);
+            <span class="prelude-val">Ok</span>(new_ptr)
         } <span class="kw">else </span>{
-            <span class="kw">return </span><span class="prelude-val">Ok</span>(ptr);
+            <span class="prelude-val">Ok</span>(ptr)
         }
     }
 
@@ -3795,7 +3791,7 @@
             // reuse the currently allocated space.
             </span><span class="kw">let </span>delta = new_size - old_size;
             <span class="kw">if let </span><span class="prelude-val">Some</span>(p) =
-                <span class="self">self</span>.try_alloc_layout_fast(layout_from_size_align(delta, old_layout.align()))
+                <span class="self">self</span>.try_alloc_layout_fast(layout_from_size_align(delta, old_layout.align())<span class="question-mark">?</span>)
             {
                 ptr::copy(ptr.as_ptr(), p.as_ptr(), old_size);
                 <span class="kw">return </span><span class="prelude-val">Ok</span>(p);
@@ -3906,7 +3902,7 @@
             <span class="kw">return </span><span class="self">self</span>.try_alloc_layout(layout);
         }
 
-        <span class="kw">let </span>new_layout = layout_from_size_align(new_size, layout.align());
+        <span class="kw">let </span>new_layout = layout_from_size_align(new_size, layout.align())<span class="question-mark">?</span>;
         <span class="kw">if </span>new_size &lt;= old_size {
             <span class="self">self</span>.shrink(ptr, layout, new_layout)
         } <span class="kw">else </span>{
@@ -3915,11 +3911,13 @@
     }
 }
 
-<span class="attr">#[cfg(feature = <span class="string">&quot;allocator_api&quot;</span>)]
+<span class="attr">#[cfg(any(feature = <span class="string">&quot;allocator_api&quot;</span>, feature = <span class="string">&quot;allocator-api2&quot;</span>))]
 </span><span class="kw">unsafe impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; Allocator <span class="kw">for </span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>Bump {
     <span class="kw">fn </span>allocate(<span class="kw-2">&amp;</span><span class="self">self</span>, layout: Layout) -&gt; <span class="prelude-ty">Result</span>&lt;NonNull&lt;[u8]&gt;, AllocError&gt; {
         <span class="self">self</span>.try_alloc_layout(layout)
-            .map(|p| NonNull::slice_from_raw_parts(p, layout.size()))
+            .map(|p| <span class="kw">unsafe </span>{
+                NonNull::new_unchecked(ptr::slice_from_raw_parts_mut(p.as_ptr(), layout.size()))
+            })
             .map_err(|<span class="kw">_</span>| AllocError)
     }
 
@@ -3934,7 +3932,9 @@
         new_layout: Layout,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;NonNull&lt;[u8]&gt;, AllocError&gt; {
         Bump::shrink(<span class="self">self</span>, ptr, old_layout, new_layout)
-            .map(|p| NonNull::slice_from_raw_parts(p, new_layout.size()))
+            .map(|p| <span class="kw">unsafe </span>{
+                NonNull::new_unchecked(ptr::slice_from_raw_parts_mut(p.as_ptr(), new_layout.size()))
+            })
             .map_err(|<span class="kw">_</span>| AllocError)
     }
 
@@ -3945,7 +3945,9 @@
         new_layout: Layout,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;NonNull&lt;[u8]&gt;, AllocError&gt; {
         Bump::grow(<span class="self">self</span>, ptr, old_layout, new_layout)
-            .map(|p| NonNull::slice_from_raw_parts(p, new_layout.size()))
+            .map(|p| <span class="kw">unsafe </span>{
+                NonNull::new_unchecked(ptr::slice_from_raw_parts_mut(p.as_ptr(), new_layout.size()))
+            })
             .map_err(|<span class="kw">_</span>| AllocError)
     }
 

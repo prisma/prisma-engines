@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/nix/store/jnqxxv1xi811ni996b002f4jnyz38xck-vendor-cargo-deps/c19b7c6f923b580ac259164a89f2577984ad5ab09ee9d583b888f934adbbe8d0/rustls-0.20.6/src/msgs/codec.rs`."><title>codec.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-f3501f0f5ae15dfb.css" id="mainThemeStyle"><div id="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="rustls" data-themes="" data-resource-suffix="" data-rustdoc-version="1.71.0 (8ede3aae2 2023-07-12)" data-search-js="search-4926e5fc22a5646a.js" data-settings-js="settings-de11bff964e9d4e5.js" data-settings-css="settings-8c76f75bfb6bd192.css" data-theme-light-css="light-0f8c037637f9eb3e.css" data-theme-dark-css="dark-1097f8e92a01e3cf.css" data-theme-ayu-css="ayu-614652228113ac93.css" ></div><script src="../../../static.files/storage-62ce34ea385b278a.js"></script><script defer src="../../../static.files/source-script-11255107d0a65077.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../static.files/main-f0540c1d82cde29b.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../../../static.files/light-0f8c037637f9eb3e.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../../../static.files/dark-1097f8e92a01e3cf.css"><link rel="stylesheet" href="../../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../../rustls/index.html"><img class="rust-logo" src="../../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/nix/store/yf45a1rayffhnidhgyjynpyhr9lqkd09-vendor-cargo-deps/c19b7c6f923b580ac259164a89f2577984ad5ab09ee9d583b888f934adbbe8d0/rustls-0.20.8/src/msgs/codec.rs`."><title>codec.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-f3501f0f5ae15dfb.css" id="mainThemeStyle"><div id="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="rustls" data-themes="" data-resource-suffix="" data-rustdoc-version="1.71.0 (8ede3aae2 2023-07-12)" data-search-js="search-4926e5fc22a5646a.js" data-settings-js="settings-de11bff964e9d4e5.js" data-settings-css="settings-8c76f75bfb6bd192.css" data-theme-light-css="light-0f8c037637f9eb3e.css" data-theme-dark-css="dark-1097f8e92a01e3cf.css" data-theme-ayu-css="ayu-614652228113ac93.css" ></div><script src="../../../static.files/storage-62ce34ea385b278a.js"></script><script defer src="../../../static.files/source-script-11255107d0a65077.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../static.files/main-f0540c1d82cde29b.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../../../static.files/light-0f8c037637f9eb3e.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../../../static.files/dark-1097f8e92a01e3cf.css"><link rel="stylesheet" href="../../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../../rustls/index.html"><img class="rust-logo" src="../../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -259,82 +259,139 @@
 <a href="#259" id="259">259</a>
 <a href="#260" id="260">260</a>
 <a href="#261" id="261">261</a>
+<a href="#262" id="262">262</a>
+<a href="#263" id="263">263</a>
+<a href="#264" id="264">264</a>
+<a href="#265" id="265">265</a>
+<a href="#266" id="266">266</a>
+<a href="#267" id="267">267</a>
+<a href="#268" id="268">268</a>
+<a href="#269" id="269">269</a>
+<a href="#270" id="270">270</a>
+<a href="#271" id="271">271</a>
+<a href="#272" id="272">272</a>
+<a href="#273" id="273">273</a>
+<a href="#274" id="274">274</a>
+<a href="#275" id="275">275</a>
+<a href="#276" id="276">276</a>
+<a href="#277" id="277">277</a>
+<a href="#278" id="278">278</a>
+<a href="#279" id="279">279</a>
+<a href="#280" id="280">280</a>
+<a href="#281" id="281">281</a>
+<a href="#282" id="282">282</a>
+<a href="#283" id="283">283</a>
+<a href="#284" id="284">284</a>
+<a href="#285" id="285">285</a>
+<a href="#286" id="286">286</a>
+<a href="#287" id="287">287</a>
+<a href="#288" id="288">288</a>
+<a href="#289" id="289">289</a>
+<a href="#290" id="290">290</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::convert::TryInto;
 <span class="kw">use </span>std::fmt::Debug;
 
-<span class="doccomment">/// Read from a byte slice.
+<span class="doccomment">/// Wrapper over a slice of bytes that allows reading chunks from
+/// with the current position state held using a cursor.
+///
+/// A new reader for a sub section of the the buffer can be created
+/// using the `sub` function or a section of a certain length can
+/// be obtained using the `take` function
 </span><span class="kw">pub struct </span>Reader&lt;<span class="lifetime">&#39;a</span>&gt; {
-    buf: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>[u8],
-    offs: usize,
+    <span class="doccomment">/// The underlying buffer storing the readers content
+    </span>buffer: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>[u8],
+    <span class="doccomment">/// Stores the current reading position for the buffer
+    </span>cursor: usize,
 }
 
 <span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; Reader&lt;<span class="lifetime">&#39;a</span>&gt; {
-    <span class="kw">pub fn </span>init(bytes: <span class="kw-2">&amp;</span>[u8]) -&gt; Reader {
+    <span class="doccomment">/// Creates a new Reader of the provided `bytes` slice with
+    /// the initial cursor position of zero.
+    </span><span class="kw">pub fn </span>init(bytes: <span class="kw-2">&amp;</span>[u8]) -&gt; Reader {
         Reader {
-            buf: bytes,
-            offs: <span class="number">0</span>,
+            buffer: bytes,
+            cursor: <span class="number">0</span>,
         }
     }
 
-    <span class="kw">pub fn </span>rest(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[u8] {
-        <span class="kw">let </span>ret = <span class="kw-2">&amp;</span><span class="self">self</span>.buf[<span class="self">self</span>.offs..];
-        <span class="self">self</span>.offs = <span class="self">self</span>.buf.len();
-        ret
+    <span class="doccomment">/// Attempts to create a new Reader on a sub section of this
+    /// readers bytes by taking a slice of the provided `length`
+    /// will return None if there is not enough bytes
+    </span><span class="kw">pub fn </span>sub(<span class="kw-2">&amp;mut </span><span class="self">self</span>, length: usize) -&gt; <span class="prelude-ty">Option</span>&lt;Reader&gt; {
+        <span class="self">self</span>.take(length).map(Reader::init)
     }
 
-    <span class="kw">pub fn </span>take(<span class="kw-2">&amp;mut </span><span class="self">self</span>, len: usize) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>[u8]&gt; {
-        <span class="kw">if </span><span class="self">self</span>.left() &lt; len {
+    <span class="doccomment">/// Borrows a slice of all the remaining bytes
+    /// that appear after the cursor position.
+    ///
+    /// Moves the cursor to the end of the buffer length.
+    </span><span class="kw">pub fn </span>rest(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[u8] {
+        <span class="kw">let </span>rest = <span class="kw-2">&amp;</span><span class="self">self</span>.buffer[<span class="self">self</span>.cursor..];
+        <span class="self">self</span>.cursor = <span class="self">self</span>.buffer.len();
+        rest
+    }
+
+    <span class="doccomment">/// Attempts to borrow a slice of bytes from the current
+    /// cursor position of `length` if there is not enough
+    /// bytes remaining after the cursor to take the length
+    /// then None is returned instead.
+    </span><span class="kw">pub fn </span>take(<span class="kw-2">&amp;mut </span><span class="self">self</span>, length: usize) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>[u8]&gt; {
+        <span class="kw">if </span><span class="self">self</span>.left() &lt; length {
             <span class="kw">return </span><span class="prelude-val">None</span>;
         }
-
-        <span class="kw">let </span>current = <span class="self">self</span>.offs;
-        <span class="self">self</span>.offs += len;
-        <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.buf[current..current + len])
+        <span class="kw">let </span>current = <span class="self">self</span>.cursor;
+        <span class="self">self</span>.cursor += length;
+        <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.buffer[current..current + length])
     }
 
-    <span class="kw">pub fn </span>any_left(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
-        <span class="self">self</span>.offs &lt; <span class="self">self</span>.buf.len()
+    <span class="doccomment">/// Used to check whether the reader has any content left
+    /// after the cursor (cursor has not reached end of buffer)
+    </span><span class="kw">pub fn </span>any_left(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.cursor &lt; <span class="self">self</span>.buffer.len()
     }
 
-    <span class="kw">pub fn </span>left(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; usize {
-        <span class="self">self</span>.buf.len() - <span class="self">self</span>.offs
+    <span class="doccomment">/// Returns the cursor position which is also the number
+    /// of bytes that have been read from the buffer.
+    </span><span class="kw">pub fn </span>used(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; usize {
+        <span class="self">self</span>.cursor
     }
 
-    <span class="kw">pub fn </span>used(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; usize {
-        <span class="self">self</span>.offs
-    }
-
-    <span class="kw">pub fn </span>sub(<span class="kw-2">&amp;mut </span><span class="self">self</span>, len: usize) -&gt; <span class="prelude-ty">Option</span>&lt;Reader&gt; {
-        <span class="self">self</span>.take(len).map(Reader::init)
+    <span class="doccomment">/// Returns the number of bytes that are still able to be
+    /// read (The number of remaining takes)
+    </span><span class="kw">pub fn </span>left(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; usize {
+        <span class="self">self</span>.buffer.len() - <span class="self">self</span>.cursor
     }
 }
 
-<span class="doccomment">/// Things we can encode and read from a Reader.
+<span class="doccomment">/// Trait for implementing encoding and decoding functionality
+/// on something.
 </span><span class="kw">pub trait </span>Codec: Debug + Sized {
-    <span class="doccomment">/// Encode yourself by appending onto `bytes`.
+    <span class="doccomment">/// Function for encoding itself by appending itself to
+    /// the provided vec of bytes.
     </span><span class="kw">fn </span>encode(<span class="kw-2">&amp;</span><span class="self">self</span>, bytes: <span class="kw-2">&amp;mut </span>Vec&lt;u8&gt;);
 
-    <span class="doccomment">/// Decode yourself by fiddling with the `Reader`.
-    /// Return Some if it worked, None if not.
+    <span class="doccomment">/// Function for decoding itself from the provided reader
+    /// will return Some if the decoding was successful or
+    /// None if it was not.
     </span><span class="kw">fn </span>read(<span class="kw">_</span>: <span class="kw-2">&amp;mut </span>Reader) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>&gt;;
 
-    <span class="doccomment">/// Convenience function to get the results of `encode()`.
+    <span class="doccomment">/// Convenience function for encoding the implementation
+    /// into a vec and returning it
     </span><span class="kw">fn </span>get_encoding(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Vec&lt;u8&gt; {
-        <span class="kw">let </span><span class="kw-2">mut </span>ret = Vec::new();
-        <span class="self">self</span>.encode(<span class="kw-2">&amp;mut </span>ret);
-        ret
+        <span class="kw">let </span><span class="kw-2">mut </span>bytes = Vec::new();
+        <span class="self">self</span>.encode(<span class="kw-2">&amp;mut </span>bytes);
+        bytes
     }
 
-    <span class="doccomment">/// Read one of these from the front of `bytes` and
-    /// return it.
+    <span class="doccomment">/// Function for wrapping a call to the read function in
+    /// a Reader for the slice of bytes provided
     </span><span class="kw">fn </span>read_bytes(bytes: <span class="kw-2">&amp;</span>[u8]) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>&gt; {
-        <span class="kw">let </span><span class="kw-2">mut </span>rd = Reader::init(bytes);
-        <span class="self">Self</span>::read(<span class="kw-2">&amp;mut </span>rd)
+        <span class="kw">let </span><span class="kw-2">mut </span>reader = Reader::init(bytes);
+        <span class="self">Self</span>::read(<span class="kw-2">&amp;mut </span>reader)
     }
 }
 
-<span class="comment">// Encoding functions.
-</span><span class="kw">fn </span>decode_u8(bytes: <span class="kw-2">&amp;</span>[u8]) -&gt; <span class="prelude-ty">Option</span>&lt;u8&gt; {
+<span class="kw">fn </span>decode_u8(bytes: <span class="kw-2">&amp;</span>[u8]) -&gt; <span class="prelude-ty">Option</span>&lt;u8&gt; {
     <span class="kw">let </span>[value]: [u8; <span class="number">1</span>] = bytes.try_into().ok()<span class="question-mark">?</span>;
     <span class="prelude-val">Some</span>(value)
 }
@@ -343,6 +400,7 @@
     <span class="kw">fn </span>encode(<span class="kw-2">&amp;</span><span class="self">self</span>, bytes: <span class="kw-2">&amp;mut </span>Vec&lt;u8&gt;) {
         bytes.push(<span class="kw-2">*</span><span class="self">self</span>);
     }
+
     <span class="kw">fn </span>read(r: <span class="kw-2">&amp;mut </span>Reader) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>&gt; {
         r.take(<span class="number">1</span>).and_then(decode_u8)
     }
@@ -406,7 +464,7 @@
 
 <span class="kw">impl </span>Codec <span class="kw">for </span>u32 {
     <span class="kw">fn </span>encode(<span class="kw-2">&amp;</span><span class="self">self</span>, bytes: <span class="kw-2">&amp;mut </span>Vec&lt;u8&gt;) {
-        bytes.extend(<span class="kw-2">&amp;</span><span class="self">Self</span>::to_be_bytes(<span class="kw-2">*</span><span class="self">self</span>))
+        bytes.extend(<span class="self">Self</span>::to_be_bytes(<span class="kw-2">*</span><span class="self">self</span>))
     }
 
     <span class="kw">fn </span>read(r: <span class="kw-2">&amp;mut </span>Reader) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>&gt; {
@@ -450,7 +508,7 @@
 
 <span class="kw">pub fn </span>encode_vec_u16&lt;T: Codec&gt;(bytes: <span class="kw-2">&amp;mut </span>Vec&lt;u8&gt;, items: <span class="kw-2">&amp;</span>[T]) {
     <span class="kw">let </span>len_offset = bytes.len();
-    bytes.extend(<span class="kw-2">&amp;</span>[<span class="number">0</span>, <span class="number">0</span>]);
+    bytes.extend([<span class="number">0</span>, <span class="number">0</span>]);
 
     <span class="kw">for </span>i <span class="kw">in </span>items {
         i.encode(bytes);
@@ -466,7 +524,7 @@
 
 <span class="kw">pub fn </span>encode_vec_u24&lt;T: Codec&gt;(bytes: <span class="kw-2">&amp;mut </span>Vec&lt;u8&gt;, items: <span class="kw-2">&amp;</span>[T]) {
     <span class="kw">let </span>len_offset = bytes.len();
-    bytes.extend(<span class="kw-2">&amp;</span>[<span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>]);
+    bytes.extend([<span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>]);
 
     <span class="kw">for </span>i <span class="kw">in </span>items {
         i.encode(bytes);

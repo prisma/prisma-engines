@@ -577,7 +577,7 @@
                 <span class="kw">let </span>ts = value.as_integer().unwrap();
                 <span class="kw">let </span>nsecs = ((ts % <span class="number">1000</span>) * <span class="number">1_000_000</span>) <span class="kw">as </span>u32;
                 <span class="kw">let </span>secs = ts / <span class="number">1000</span>;
-                <span class="kw">let </span>naive = chrono::NaiveDateTime::from_timestamp(secs, nsecs);
+                <span class="kw">let </span>naive = chrono::NaiveDateTime::from_timestamp_opt(secs, nsecs).unwrap();
                 <span class="kw">let </span>datetime: DateTime&lt;Utc&gt; = DateTime::from_utc(naive, Utc);
 
                 PrismaValue::DateTime(datetime.into())
@@ -591,11 +591,11 @@
                 PrismaValue::DateTime(dt.with_timezone(<span class="kw-2">&amp;</span>Utc).into())
             }
             Value::Date(<span class="prelude-val">Some</span>(d)) =&gt; {
-                <span class="kw">let </span>dt = DateTime::&lt;Utc&gt;::from_utc(d.and_hms(<span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>), Utc);
+                <span class="kw">let </span>dt = DateTime::&lt;Utc&gt;::from_utc(d.and_hms_opt(<span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>).unwrap(), Utc);
                 PrismaValue::DateTime(dt.into())
             }
             Value::Time(<span class="prelude-val">Some</span>(t)) =&gt; {
-                <span class="kw">let </span>d = NaiveDate::from_ymd(<span class="number">1970</span>, <span class="number">1</span>, <span class="number">1</span>);
+                <span class="kw">let </span>d = NaiveDate::from_ymd_opt(<span class="number">1970</span>, <span class="number">1</span>, <span class="number">1</span>).unwrap();
                 <span class="kw">let </span>dt = DateTime::&lt;Utc&gt;::from_utc(d.and_time(t), Utc);
                 PrismaValue::DateTime(dt.into())
             }

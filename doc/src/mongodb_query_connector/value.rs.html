@@ -850,7 +850,7 @@
         <span class="comment">// DateTime
         </span>(TypeIdentifier::DateTime, Bson::DateTime(dt)) =&gt; PrismaValue::DateTime(dt.to_chrono().into()),
         (TypeIdentifier::DateTime, Bson::Timestamp(ts)) =&gt; {
-            PrismaValue::DateTime(Utc.timestamp(ts.time <span class="kw">as </span>i64, <span class="number">0</span>).into())
+            PrismaValue::DateTime(Utc.timestamp_opt(ts.time <span class="kw">as </span>i64, <span class="number">0</span>).unwrap().into())
         }
 
         <span class="comment">// Bytes

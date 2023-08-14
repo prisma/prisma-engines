@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/nix/store/jnqxxv1xi811ni996b002f4jnyz38xck-vendor-cargo-deps/c19b7c6f923b580ac259164a89f2577984ad5ab09ee9d583b888f934adbbe8d0/tokio-1.25.0/src/task/task_local.rs`."><title>task_local.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-f3501f0f5ae15dfb.css" id="mainThemeStyle"><div id="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="tokio" data-themes="" data-resource-suffix="" data-rustdoc-version="1.71.0 (8ede3aae2 2023-07-12)" data-search-js="search-4926e5fc22a5646a.js" data-settings-js="settings-de11bff964e9d4e5.js" data-settings-css="settings-8c76f75bfb6bd192.css" data-theme-light-css="light-0f8c037637f9eb3e.css" data-theme-dark-css="dark-1097f8e92a01e3cf.css" data-theme-ayu-css="ayu-614652228113ac93.css" ></div><script src="../../../static.files/storage-62ce34ea385b278a.js"></script><script defer src="../../../static.files/source-script-11255107d0a65077.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../static.files/main-f0540c1d82cde29b.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../../../static.files/light-0f8c037637f9eb3e.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../../../static.files/dark-1097f8e92a01e3cf.css"><link rel="stylesheet" href="../../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../../tokio/index.html"><img class="rust-logo" src="../../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/nix/store/yf45a1rayffhnidhgyjynpyhr9lqkd09-vendor-cargo-deps/c19b7c6f923b580ac259164a89f2577984ad5ab09ee9d583b888f934adbbe8d0/tokio-1.30.0/src/task/task_local.rs`."><title>task_local.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-f3501f0f5ae15dfb.css" id="mainThemeStyle"><div id="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="tokio" data-themes="" data-resource-suffix="" data-rustdoc-version="1.71.0 (8ede3aae2 2023-07-12)" data-search-js="search-4926e5fc22a5646a.js" data-settings-js="settings-de11bff964e9d4e5.js" data-settings-css="settings-8c76f75bfb6bd192.css" data-theme-light-css="light-0f8c037637f9eb3e.css" data-theme-dark-css="dark-1097f8e92a01e3cf.css" data-theme-ayu-css="ayu-614652228113ac93.css" ></div><script src="../../../static.files/storage-62ce34ea385b278a.js"></script><script defer src="../../../static.files/source-script-11255107d0a65077.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../static.files/main-f0540c1d82cde29b.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../../../static.files/light-0f8c037637f9eb3e.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../../../static.files/dark-1097f8e92a01e3cf.css"><link rel="stylesheet" href="../../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../../tokio/index.html"><img class="rust-logo" src="../../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -432,21 +432,8 @@
 <a href="#432" id="432">432</a>
 <a href="#433" id="433">433</a>
 <a href="#434" id="434">434</a>
-<a href="#435" id="435">435</a>
-<a href="#436" id="436">436</a>
-<a href="#437" id="437">437</a>
-<a href="#438" id="438">438</a>
-<a href="#439" id="439">439</a>
-<a href="#440" id="440">440</a>
-<a href="#441" id="441">441</a>
-<a href="#442" id="442">442</a>
-<a href="#443" id="443">443</a>
-<a href="#444" id="444">444</a>
-<a href="#445" id="445">445</a>
-<a href="#446" id="446">446</a>
-<a href="#447" id="447">447</a>
-<a href="#448" id="448">448</a>
-</pre></div><pre class="rust"><code><span class="kw">use </span>std::cell::RefCell;
+</pre></div><pre class="rust"><code><span class="kw">use </span>pin_project_lite::pin_project;
+<span class="kw">use </span>std::cell::RefCell;
 <span class="kw">use </span>std::error::Error;
 <span class="kw">use </span>std::future::Future;
 <span class="kw">use </span>std::marker::PhantomPinned;
@@ -495,7 +482,6 @@
 }
 
 <span class="attr">#[doc(hidden)]
-#[cfg(not(tokio_no_const_thread_local))]
 #[macro_export]
 </span><span class="macro">macro_rules! </span>__task_local_inner {
     ($(<span class="attr">#[<span class="macro-nonterminal">$attr</span>:meta]</span>)* <span class="macro-nonterminal">$vis</span>:vis <span class="macro-nonterminal">$name</span>:ident, <span class="macro-nonterminal">$t</span>:ty) =&gt; {
@@ -503,22 +489,6 @@
         <span class="macro-nonterminal">$vis </span><span class="kw">static </span><span class="macro-nonterminal">$name</span>: <span class="macro-nonterminal">$crate::task::LocalKey</span>&lt;<span class="macro-nonterminal">$t</span>&gt; = {
             <span class="macro">std::thread_local! </span>{
                 <span class="kw">static </span>__KEY: std::cell::RefCell&lt;<span class="prelude-ty">Option</span>&lt;<span class="macro-nonterminal">$t</span>&gt;&gt; = <span class="kw">const </span>{ std::cell::RefCell::new(<span class="prelude-val">None</span>) };
-            }
-
-            <span class="macro-nonterminal">$crate::task::LocalKey </span>{ inner: __KEY }
-        };
-    };
-}
-
-<span class="attr">#[doc(hidden)]
-#[cfg(tokio_no_const_thread_local)]
-#[macro_export]
-</span><span class="macro">macro_rules! </span>__task_local_inner {
-    ($(<span class="attr">#[<span class="macro-nonterminal">$attr</span>:meta]</span>)* <span class="macro-nonterminal">$vis</span>:vis <span class="macro-nonterminal">$name</span>:ident, <span class="macro-nonterminal">$t</span>:ty) =&gt; {
-        $(<span class="attr">#[<span class="macro-nonterminal">$attr</span>]</span>)*
-        <span class="macro-nonterminal">$vis </span><span class="kw">static </span><span class="macro-nonterminal">$name</span>: <span class="macro-nonterminal">$crate::task::LocalKey</span>&lt;<span class="macro-nonterminal">$t</span>&gt; = {
-            <span class="macro">std::thread_local! </span>{
-                <span class="kw">static </span>__KEY: std::cell::RefCell&lt;<span class="prelude-ty">Option</span>&lt;<span class="macro-nonterminal">$t</span>&gt;&gt; = std::cell::RefCell::new(<span class="prelude-val">None</span>);
             }
 
             <span class="macro-nonterminal">$crate::task::LocalKey </span>{ inner: __KEY }
@@ -747,36 +717,53 @@
     }
 }
 
-<span class="doccomment">/// A future that sets a value `T` of a task local for the future `F` during
-/// its execution.
-///
-/// The value of the task-local must be `&#39;static` and will be dropped on the
-/// completion of the future.
-///
-/// Created by the function [`LocalKey::scope`](self::LocalKey::scope).
-///
-/// ### Examples
-///
-/// ```
-/// # async fn dox() {
-/// tokio::task_local! {
-///     static NUMBER: u32;
-/// }
-///
-/// NUMBER.scope(1, async move {
-///     println!(&quot;task local value: {}&quot;, NUMBER.get());
-/// }).await;
-/// # }
-/// ```
-</span><span class="comment">// Doesn&#39;t use pin_project due to custom Drop.
-</span><span class="kw">pub struct </span>TaskLocalFuture&lt;T, F&gt;
-<span class="kw">where
-    </span>T: <span class="lifetime">&#39;static</span>,
-{
-    local: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>LocalKey&lt;T&gt;,
-    slot: <span class="prelude-ty">Option</span>&lt;T&gt;,
-    future: <span class="prelude-ty">Option</span>&lt;F&gt;,
-    _pinned: PhantomPinned,
+<span class="macro">pin_project! </span>{
+    <span class="doccomment">/// A future that sets a value `T` of a task local for the future `F` during
+    /// its execution.
+    ///
+    /// The value of the task-local must be `&#39;static` and will be dropped on the
+    /// completion of the future.
+    ///
+    /// Created by the function [`LocalKey::scope`](self::LocalKey::scope).
+    ///
+    /// ### Examples
+    ///
+    /// ```
+    /// # async fn dox() {
+    /// tokio::task_local! {
+    ///     static NUMBER: u32;
+    /// }
+    ///
+    /// NUMBER.scope(1, async move {
+    ///     println!(&quot;task local value: {}&quot;, NUMBER.get());
+    /// }).await;
+    /// # }
+    /// ```
+    </span><span class="kw">pub struct </span>TaskLocalFuture&lt;T, F&gt;
+    <span class="kw">where
+        </span>T: <span class="lifetime">&#39;static</span>,
+    {
+        local: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>LocalKey&lt;T&gt;,
+        slot: <span class="prelude-ty">Option</span>&lt;T&gt;,
+        <span class="attr">#[pin]
+        </span>future: <span class="prelude-ty">Option</span>&lt;F&gt;,
+        <span class="attr">#[pin]
+        </span>_pinned: PhantomPinned,
+    }
+
+    <span class="kw">impl</span>&lt;T: <span class="lifetime">&#39;static</span>, F&gt; PinnedDrop <span class="kw">for </span>TaskLocalFuture&lt;T, F&gt; {
+        <span class="kw">fn </span>drop(this: Pin&lt;<span class="kw-2">&amp;mut </span><span class="self">Self</span>&gt;) {
+            <span class="kw">let </span>this = this.project();
+            <span class="kw">if </span>mem::needs_drop::&lt;F&gt;() &amp;&amp; this.future.is_some() {
+                <span class="comment">// Drop the future while the task-local is set, if possible. Otherwise
+                // the future is dropped normally when the `Option&lt;F&gt;` field drops.
+                </span><span class="kw">let </span><span class="kw-2">mut </span>future = this.future;
+                <span class="kw">let _ </span>= this.local.scope_inner(this.slot, || {
+                    future.set(<span class="prelude-val">None</span>);
+                });
+            }
+        }
+    }
 }
 
 <span class="kw">impl</span>&lt;T: <span class="lifetime">&#39;static</span>, F: Future&gt; Future <span class="kw">for </span>TaskLocalFuture&lt;T, F&gt; {
@@ -784,41 +771,26 @@
 
     <span class="attr">#[track_caller]
     </span><span class="kw">fn </span>poll(<span class="self">self</span>: Pin&lt;<span class="kw-2">&amp;mut </span><span class="self">Self</span>&gt;, cx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; Poll&lt;<span class="self">Self</span>::Output&gt; {
-        <span class="comment">// safety: The TaskLocalFuture struct is `!Unpin` so there is no way to
-        // move `self.future` from now on.
-        </span><span class="kw">let </span>this = <span class="kw">unsafe </span>{ Pin::into_inner_unchecked(<span class="self">self</span>) };
-        <span class="kw">let </span><span class="kw-2">mut </span>future_opt = <span class="kw">unsafe </span>{ Pin::new_unchecked(<span class="kw-2">&amp;mut </span>this.future) };
+        <span class="kw">let </span>this = <span class="self">self</span>.project();
+        <span class="kw">let </span><span class="kw-2">mut </span>future_opt = this.future;
 
-        <span class="kw">let </span>res =
-            this.local
-                .scope_inner(<span class="kw-2">&amp;mut </span>this.slot, || <span class="kw">match </span>future_opt.as_mut().as_pin_mut() {
-                    <span class="prelude-val">Some</span>(fut) =&gt; {
-                        <span class="kw">let </span>res = fut.poll(cx);
-                        <span class="kw">if </span>res.is_ready() {
-                            future_opt.set(<span class="prelude-val">None</span>);
-                        }
-                        <span class="prelude-val">Some</span>(res)
+        <span class="kw">let </span>res = this
+            .local
+            .scope_inner(this.slot, || <span class="kw">match </span>future_opt.as_mut().as_pin_mut() {
+                <span class="prelude-val">Some</span>(fut) =&gt; {
+                    <span class="kw">let </span>res = fut.poll(cx);
+                    <span class="kw">if </span>res.is_ready() {
+                        future_opt.set(<span class="prelude-val">None</span>);
                     }
-                    <span class="prelude-val">None </span>=&gt; <span class="prelude-val">None</span>,
-                });
+                    <span class="prelude-val">Some</span>(res)
+                }
+                <span class="prelude-val">None </span>=&gt; <span class="prelude-val">None</span>,
+            });
 
         <span class="kw">match </span>res {
             <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(res)) =&gt; res,
             <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>) =&gt; <span class="macro">panic!</span>(<span class="string">&quot;`TaskLocalFuture` polled after completion&quot;</span>),
             <span class="prelude-val">Err</span>(err) =&gt; err.panic(),
-        }
-    }
-}
-
-<span class="kw">impl</span>&lt;T: <span class="lifetime">&#39;static</span>, F&gt; Drop <span class="kw">for </span>TaskLocalFuture&lt;T, F&gt; {
-    <span class="kw">fn </span>drop(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
-        <span class="kw">if </span>mem::needs_drop::&lt;F&gt;() &amp;&amp; <span class="self">self</span>.future.is_some() {
-            <span class="comment">// Drop the future while the task-local is set, if possible. Otherwise
-            // the future is dropped normally when the `Option&lt;F&gt;` field drops.
-            </span><span class="kw">let </span>future = <span class="kw-2">&amp;mut </span><span class="self">self</span>.future;
-            <span class="kw">let _ </span>= <span class="self">self</span>.local.scope_inner(<span class="kw-2">&amp;mut </span><span class="self">self</span>.slot, || {
-                <span class="kw-2">*</span>future = <span class="prelude-val">None</span>;
-            });
         }
     }
 }

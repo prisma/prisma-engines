@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/nix/store/jnqxxv1xi811ni996b002f4jnyz38xck-vendor-cargo-deps/c19b7c6f923b580ac259164a89f2577984ad5ab09ee9d583b888f934adbbe8d0/object-0.29.0/src/read/mod.rs`."><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-f3501f0f5ae15dfb.css" id="mainThemeStyle"><div id="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="object" data-themes="" data-resource-suffix="" data-rustdoc-version="1.71.0 (8ede3aae2 2023-07-12)" data-search-js="search-4926e5fc22a5646a.js" data-settings-js="settings-de11bff964e9d4e5.js" data-settings-css="settings-8c76f75bfb6bd192.css" data-theme-light-css="light-0f8c037637f9eb3e.css" data-theme-dark-css="dark-1097f8e92a01e3cf.css" data-theme-ayu-css="ayu-614652228113ac93.css" ></div><script src="../../../static.files/storage-62ce34ea385b278a.js"></script><script defer src="../../../static.files/source-script-11255107d0a65077.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../static.files/main-f0540c1d82cde29b.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../../../static.files/light-0f8c037637f9eb3e.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../../../static.files/dark-1097f8e92a01e3cf.css"><link rel="stylesheet" href="../../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../../object/index.html"><img class="rust-logo" src="../../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/nix/store/yf45a1rayffhnidhgyjynpyhr9lqkd09-vendor-cargo-deps/c19b7c6f923b580ac259164a89f2577984ad5ab09ee9d583b888f934adbbe8d0/object-0.31.1/src/read/mod.rs`."><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-f3501f0f5ae15dfb.css" id="mainThemeStyle"><div id="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="object" data-themes="" data-resource-suffix="" data-rustdoc-version="1.71.0 (8ede3aae2 2023-07-12)" data-search-js="search-4926e5fc22a5646a.js" data-settings-js="settings-de11bff964e9d4e5.js" data-settings-css="settings-8c76f75bfb6bd192.css" data-theme-light-css="light-0f8c037637f9eb3e.css" data-theme-dark-css="dark-1097f8e92a01e3cf.css" data-theme-ayu-css="ayu-614652228113ac93.css" ></div><script src="../../../static.files/storage-62ce34ea385b278a.js"></script><script defer src="../../../static.files/source-script-11255107d0a65077.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../static.files/main-f0540c1d82cde29b.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../../../static.files/light-0f8c037637f9eb3e.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../../../static.files/dark-1097f8e92a01e3cf.css"><link rel="stylesheet" href="../../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../../object/index.html"><img class="rust-logo" src="../../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -708,6 +708,56 @@
 <a href="#708" id="708">708</a>
 <a href="#709" id="709">709</a>
 <a href="#710" id="710">710</a>
+<a href="#711" id="711">711</a>
+<a href="#712" id="712">712</a>
+<a href="#713" id="713">713</a>
+<a href="#714" id="714">714</a>
+<a href="#715" id="715">715</a>
+<a href="#716" id="716">716</a>
+<a href="#717" id="717">717</a>
+<a href="#718" id="718">718</a>
+<a href="#719" id="719">719</a>
+<a href="#720" id="720">720</a>
+<a href="#721" id="721">721</a>
+<a href="#722" id="722">722</a>
+<a href="#723" id="723">723</a>
+<a href="#724" id="724">724</a>
+<a href="#725" id="725">725</a>
+<a href="#726" id="726">726</a>
+<a href="#727" id="727">727</a>
+<a href="#728" id="728">728</a>
+<a href="#729" id="729">729</a>
+<a href="#730" id="730">730</a>
+<a href="#731" id="731">731</a>
+<a href="#732" id="732">732</a>
+<a href="#733" id="733">733</a>
+<a href="#734" id="734">734</a>
+<a href="#735" id="735">735</a>
+<a href="#736" id="736">736</a>
+<a href="#737" id="737">737</a>
+<a href="#738" id="738">738</a>
+<a href="#739" id="739">739</a>
+<a href="#740" id="740">740</a>
+<a href="#741" id="741">741</a>
+<a href="#742" id="742">742</a>
+<a href="#743" id="743">743</a>
+<a href="#744" id="744">744</a>
+<a href="#745" id="745">745</a>
+<a href="#746" id="746">746</a>
+<a href="#747" id="747">747</a>
+<a href="#748" id="748">748</a>
+<a href="#749" id="749">749</a>
+<a href="#750" id="750">750</a>
+<a href="#751" id="751">751</a>
+<a href="#752" id="752">752</a>
+<a href="#753" id="753">753</a>
+<a href="#754" id="754">754</a>
+<a href="#755" id="755">755</a>
+<a href="#756" id="756">756</a>
+<a href="#757" id="757">757</a>
+<a href="#758" id="758">758</a>
+<a href="#759" id="759">759</a>
+<a href="#760" id="760">760</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Interface for reading object files.
 
 </span><span class="kw">use </span>alloc::borrow::Cow;
@@ -732,7 +782,8 @@
     feature = <span class="string">&quot;elf&quot;</span>,
     feature = <span class="string">&quot;macho&quot;</span>,
     feature = <span class="string">&quot;pe&quot;</span>,
-    feature = <span class="string">&quot;wasm&quot;
+    feature = <span class="string">&quot;wasm&quot;</span>,
+    feature = <span class="string">&quot;xcoff&quot;
 </span>))]
 </span><span class="kw">mod </span>any;
 <span class="attr">#[cfg(any(
@@ -740,7 +791,8 @@
     feature = <span class="string">&quot;elf&quot;</span>,
     feature = <span class="string">&quot;macho&quot;</span>,
     feature = <span class="string">&quot;pe&quot;</span>,
-    feature = <span class="string">&quot;wasm&quot;
+    feature = <span class="string">&quot;wasm&quot;</span>,
+    feature = <span class="string">&quot;xcoff&quot;
 </span>))]
 </span><span class="kw">pub use </span>any::<span class="kw-2">*</span>;
 
@@ -759,11 +811,14 @@
 <span class="attr">#[cfg(feature = <span class="string">&quot;pe&quot;</span>)]
 </span><span class="kw">pub mod </span>pe;
 
-<span class="kw">mod </span>traits;
-<span class="kw">pub use </span>traits::<span class="kw-2">*</span>;
-
 <span class="attr">#[cfg(feature = <span class="string">&quot;wasm&quot;</span>)]
 </span><span class="kw">pub mod </span>wasm;
+
+<span class="attr">#[cfg(feature = <span class="string">&quot;xcoff&quot;</span>)]
+</span><span class="kw">pub mod </span>xcoff;
+
+<span class="kw">mod </span>traits;
+<span class="kw">pub use </span>traits::<span class="kw-2">*</span>;
 
 <span class="kw">mod </span>private {
     <span class="kw">pub trait </span>Sealed {}
@@ -775,7 +830,7 @@
 
 <span class="kw">impl </span>fmt::Display <span class="kw">for </span>Error {
     <span class="attr">#[inline]
-    </span><span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter) -&gt; fmt::Result {
+    </span><span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
         f.write_str(<span class="self">self</span>.<span class="number">0</span>)
     }
 }
@@ -856,6 +911,11 @@
     <span class="doccomment">/// A COFF object file.
     </span><span class="attr">#[cfg(feature = <span class="string">&quot;coff&quot;</span>)]
     </span>Coff,
+    <span class="doccomment">/// A COFF bigobj object file.
+    ///
+    /// This supports a larger number of sections.
+    </span><span class="attr">#[cfg(feature = <span class="string">&quot;coff&quot;</span>)]
+    </span>CoffBig,
     <span class="doccomment">/// A dyld cache file containing Mach-O images.
     </span><span class="attr">#[cfg(feature = <span class="string">&quot;macho&quot;</span>)]
     </span>DyldCache,
@@ -886,6 +946,12 @@
     <span class="doccomment">/// A Wasm file.
     </span><span class="attr">#[cfg(feature = <span class="string">&quot;wasm&quot;</span>)]
     </span>Wasm,
+    <span class="doccomment">/// A 32-bit XCOFF file.
+    </span><span class="attr">#[cfg(feature = <span class="string">&quot;xcoff&quot;</span>)]
+    </span>Xcoff32,
+    <span class="doccomment">/// A 64-bit XCOFF file.
+    </span><span class="attr">#[cfg(feature = <span class="string">&quot;xcoff&quot;</span>)]
+    </span>Xcoff64,
 }
 
 <span class="kw">impl </span>FileKind {
@@ -925,7 +991,7 @@
             <span class="attr">#[cfg(feature = <span class="string">&quot;wasm&quot;</span>)]
             </span>[<span class="number">0x00</span>, <span class="string">b&#39;a&#39;</span>, <span class="string">b&#39;s&#39;</span>, <span class="string">b&#39;m&#39;</span>, ..] =&gt; FileKind::Wasm,
             <span class="attr">#[cfg(feature = <span class="string">&quot;pe&quot;</span>)]
-            </span>[<span class="string">b&#39;M&#39;</span>, <span class="string">b&#39;Z&#39;</span>, ..] =&gt; {
+            </span>[<span class="string">b&#39;M&#39;</span>, <span class="string">b&#39;Z&#39;</span>, ..] <span class="kw">if </span>offset == <span class="number">0 </span>=&gt; {
                 <span class="kw">match </span>pe::optional_header_magic(data) {
                     <span class="prelude-val">Ok</span>(<span class="kw">crate</span>::pe::IMAGE_NT_OPTIONAL_HDR32_MAGIC) =&gt; {
                         FileKind::Pe32
@@ -946,6 +1012,17 @@
             </span>| [<span class="number">0x4c</span>, <span class="number">0x01</span>, ..]
             <span class="comment">// COFF x86-64
             </span>| [<span class="number">0x64</span>, <span class="number">0x86</span>, ..] =&gt; FileKind::Coff,
+            <span class="attr">#[cfg(feature = <span class="string">&quot;coff&quot;</span>)]
+            </span>[<span class="number">0x00</span>, <span class="number">0x00</span>, <span class="number">0xff</span>, <span class="number">0xff</span>, <span class="number">0x02</span>, <span class="number">0x00</span>, ..] <span class="kw">if </span>offset == <span class="number">0 </span>=&gt; {
+                <span class="kw">match </span>coff::anon_object_class_id(data) {
+                    <span class="prelude-val">Ok</span>(<span class="kw">crate</span>::pe::ANON_OBJECT_HEADER_BIGOBJ_CLASS_ID) =&gt; FileKind::CoffBig,
+                    <span class="kw">_ </span>=&gt; <span class="kw">return </span><span class="prelude-val">Err</span>(Error(<span class="string">&quot;Unknown anon object file&quot;</span>)),
+                }
+            }
+            <span class="attr">#[cfg(feature = <span class="string">&quot;xcoff&quot;</span>)]
+            </span>[<span class="number">0x01</span>, <span class="number">0xDF</span>, ..] =&gt; FileKind::Xcoff32,
+            <span class="attr">#[cfg(feature = <span class="string">&quot;xcoff&quot;</span>)]
+            </span>[<span class="number">0x01</span>, <span class="number">0xF7</span>, ..] =&gt; FileKind::Xcoff64,
             <span class="kw">_ </span>=&gt; <span class="kw">return </span><span class="prelude-val">Err</span>(Error(<span class="string">&quot;Unknown file magic&quot;</span>)),
         };
         <span class="prelude-val">Ok</span>(kind)
@@ -1315,6 +1392,10 @@
     ///
     /// Used for ELF compression and GNU compressed debug information.
     </span>Zlib,
+    <span class="doccomment">/// Zstandard.
+    ///
+    /// Used for ELF compression.
+    </span>Zstandard,
 }
 
 <span class="doccomment">/// A range in a file that may be compressed.
@@ -1412,6 +1493,25 @@
                     )
                     .ok()
                     .read_error(<span class="string">&quot;Invalid zlib compressed data&quot;</span>)<span class="question-mark">?</span>;
+                <span class="prelude-val">Ok</span>(Cow::Owned(decompressed))
+            }
+            <span class="attr">#[cfg(feature = <span class="string">&quot;compression&quot;</span>)]
+            </span>CompressionFormat::Zstandard =&gt; {
+                <span class="kw">use </span>core::convert::TryInto;
+                <span class="kw">use </span>std::io::Read;
+                <span class="kw">let </span>size = <span class="self">self
+                    </span>.uncompressed_size
+                    .try_into()
+                    .ok()
+                    .read_error(<span class="string">&quot;Uncompressed data size is too large.&quot;</span>)<span class="question-mark">?</span>;
+                <span class="kw">let </span><span class="kw-2">mut </span>decompressed = Vec::with_capacity(size);
+                <span class="kw">let </span><span class="kw-2">mut </span>decoder = ruzstd::StreamingDecoder::new(<span class="self">self</span>.data)
+                    .ok()
+                    .read_error(<span class="string">&quot;Invalid zstd compressed data&quot;</span>)<span class="question-mark">?</span>;
+                decoder
+                    .read_to_end(<span class="kw-2">&amp;mut </span>decompressed)
+                    .ok()
+                    .read_error(<span class="string">&quot;Invalid zstd compressed data&quot;</span>)<span class="question-mark">?</span>;
                 <span class="prelude-val">Ok</span>(Cow::Owned(decompressed))
             }
             <span class="kw">_ </span>=&gt; <span class="prelude-val">Err</span>(Error(<span class="string">&quot;Unsupported compressed data.&quot;</span>)),

@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/nix/store/jnqxxv1xi811ni996b002f4jnyz38xck-vendor-cargo-deps/c19b7c6f923b580ac259164a89f2577984ad5ab09ee9d583b888f934adbbe8d0/regex-automata-0.1.10/src/lib.rs`."><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-f3501f0f5ae15dfb.css" id="mainThemeStyle"><div id="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="regex_automata" data-themes="" data-resource-suffix="" data-rustdoc-version="1.71.0 (8ede3aae2 2023-07-12)" data-search-js="search-4926e5fc22a5646a.js" data-settings-js="settings-de11bff964e9d4e5.js" data-settings-css="settings-8c76f75bfb6bd192.css" data-theme-light-css="light-0f8c037637f9eb3e.css" data-theme-dark-css="dark-1097f8e92a01e3cf.css" data-theme-ayu-css="ayu-614652228113ac93.css" ></div><script src="../../static.files/storage-62ce34ea385b278a.js"></script><script defer src="../../static.files/source-script-11255107d0a65077.js"></script><script defer src="../../source-files.js"></script><script defer src="../../static.files/main-f0540c1d82cde29b.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../../static.files/light-0f8c037637f9eb3e.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../../static.files/dark-1097f8e92a01e3cf.css"><link rel="stylesheet" href="../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../regex_automata/index.html"><img class="rust-logo" src="../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/nix/store/yf45a1rayffhnidhgyjynpyhr9lqkd09-vendor-cargo-deps/c19b7c6f923b580ac259164a89f2577984ad5ab09ee9d583b888f934adbbe8d0/regex-automata-0.3.6/src/lib.rs`."><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-f3501f0f5ae15dfb.css" id="mainThemeStyle"><div id="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="regex_automata" data-themes="" data-resource-suffix="" data-rustdoc-version="1.71.0 (8ede3aae2 2023-07-12)" data-search-js="search-4926e5fc22a5646a.js" data-settings-js="settings-de11bff964e9d4e5.js" data-settings-css="settings-8c76f75bfb6bd192.css" data-theme-light-css="light-0f8c037637f9eb3e.css" data-theme-dark-css="dark-1097f8e92a01e3cf.css" data-theme-ayu-css="ayu-614652228113ac93.css" ></div><script src="../../static.files/storage-62ce34ea385b278a.js"></script><script defer src="../../static.files/source-script-11255107d0a65077.js"></script><script defer src="../../source-files.js"></script><script defer src="../../static.files/main-f0540c1d82cde29b.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../../static.files/light-0f8c037637f9eb3e.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../../static.files/dark-1097f8e92a01e3cf.css"><link rel="stylesheet" href="../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../regex_automata/index.html"><img class="rust-logo" src="../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -358,364 +358,940 @@
 <a href="#358" id="358">358</a>
 <a href="#359" id="359">359</a>
 <a href="#360" id="360">360</a>
+<a href="#361" id="361">361</a>
+<a href="#362" id="362">362</a>
+<a href="#363" id="363">363</a>
+<a href="#364" id="364">364</a>
+<a href="#365" id="365">365</a>
+<a href="#366" id="366">366</a>
+<a href="#367" id="367">367</a>
+<a href="#368" id="368">368</a>
+<a href="#369" id="369">369</a>
+<a href="#370" id="370">370</a>
+<a href="#371" id="371">371</a>
+<a href="#372" id="372">372</a>
+<a href="#373" id="373">373</a>
+<a href="#374" id="374">374</a>
+<a href="#375" id="375">375</a>
+<a href="#376" id="376">376</a>
+<a href="#377" id="377">377</a>
+<a href="#378" id="378">378</a>
+<a href="#379" id="379">379</a>
+<a href="#380" id="380">380</a>
+<a href="#381" id="381">381</a>
+<a href="#382" id="382">382</a>
+<a href="#383" id="383">383</a>
+<a href="#384" id="384">384</a>
+<a href="#385" id="385">385</a>
+<a href="#386" id="386">386</a>
+<a href="#387" id="387">387</a>
+<a href="#388" id="388">388</a>
+<a href="#389" id="389">389</a>
+<a href="#390" id="390">390</a>
+<a href="#391" id="391">391</a>
+<a href="#392" id="392">392</a>
+<a href="#393" id="393">393</a>
+<a href="#394" id="394">394</a>
+<a href="#395" id="395">395</a>
+<a href="#396" id="396">396</a>
+<a href="#397" id="397">397</a>
+<a href="#398" id="398">398</a>
+<a href="#399" id="399">399</a>
+<a href="#400" id="400">400</a>
+<a href="#401" id="401">401</a>
+<a href="#402" id="402">402</a>
+<a href="#403" id="403">403</a>
+<a href="#404" id="404">404</a>
+<a href="#405" id="405">405</a>
+<a href="#406" id="406">406</a>
+<a href="#407" id="407">407</a>
+<a href="#408" id="408">408</a>
+<a href="#409" id="409">409</a>
+<a href="#410" id="410">410</a>
+<a href="#411" id="411">411</a>
+<a href="#412" id="412">412</a>
+<a href="#413" id="413">413</a>
+<a href="#414" id="414">414</a>
+<a href="#415" id="415">415</a>
+<a href="#416" id="416">416</a>
+<a href="#417" id="417">417</a>
+<a href="#418" id="418">418</a>
+<a href="#419" id="419">419</a>
+<a href="#420" id="420">420</a>
+<a href="#421" id="421">421</a>
+<a href="#422" id="422">422</a>
+<a href="#423" id="423">423</a>
+<a href="#424" id="424">424</a>
+<a href="#425" id="425">425</a>
+<a href="#426" id="426">426</a>
+<a href="#427" id="427">427</a>
+<a href="#428" id="428">428</a>
+<a href="#429" id="429">429</a>
+<a href="#430" id="430">430</a>
+<a href="#431" id="431">431</a>
+<a href="#432" id="432">432</a>
+<a href="#433" id="433">433</a>
+<a href="#434" id="434">434</a>
+<a href="#435" id="435">435</a>
+<a href="#436" id="436">436</a>
+<a href="#437" id="437">437</a>
+<a href="#438" id="438">438</a>
+<a href="#439" id="439">439</a>
+<a href="#440" id="440">440</a>
+<a href="#441" id="441">441</a>
+<a href="#442" id="442">442</a>
+<a href="#443" id="443">443</a>
+<a href="#444" id="444">444</a>
+<a href="#445" id="445">445</a>
+<a href="#446" id="446">446</a>
+<a href="#447" id="447">447</a>
+<a href="#448" id="448">448</a>
+<a href="#449" id="449">449</a>
+<a href="#450" id="450">450</a>
+<a href="#451" id="451">451</a>
+<a href="#452" id="452">452</a>
+<a href="#453" id="453">453</a>
+<a href="#454" id="454">454</a>
+<a href="#455" id="455">455</a>
+<a href="#456" id="456">456</a>
+<a href="#457" id="457">457</a>
+<a href="#458" id="458">458</a>
+<a href="#459" id="459">459</a>
+<a href="#460" id="460">460</a>
+<a href="#461" id="461">461</a>
+<a href="#462" id="462">462</a>
+<a href="#463" id="463">463</a>
+<a href="#464" id="464">464</a>
+<a href="#465" id="465">465</a>
+<a href="#466" id="466">466</a>
+<a href="#467" id="467">467</a>
+<a href="#468" id="468">468</a>
+<a href="#469" id="469">469</a>
+<a href="#470" id="470">470</a>
+<a href="#471" id="471">471</a>
+<a href="#472" id="472">472</a>
+<a href="#473" id="473">473</a>
+<a href="#474" id="474">474</a>
+<a href="#475" id="475">475</a>
+<a href="#476" id="476">476</a>
+<a href="#477" id="477">477</a>
+<a href="#478" id="478">478</a>
+<a href="#479" id="479">479</a>
+<a href="#480" id="480">480</a>
+<a href="#481" id="481">481</a>
+<a href="#482" id="482">482</a>
+<a href="#483" id="483">483</a>
+<a href="#484" id="484">484</a>
+<a href="#485" id="485">485</a>
+<a href="#486" id="486">486</a>
+<a href="#487" id="487">487</a>
+<a href="#488" id="488">488</a>
+<a href="#489" id="489">489</a>
+<a href="#490" id="490">490</a>
+<a href="#491" id="491">491</a>
+<a href="#492" id="492">492</a>
+<a href="#493" id="493">493</a>
+<a href="#494" id="494">494</a>
+<a href="#495" id="495">495</a>
+<a href="#496" id="496">496</a>
+<a href="#497" id="497">497</a>
+<a href="#498" id="498">498</a>
+<a href="#499" id="499">499</a>
+<a href="#500" id="500">500</a>
+<a href="#501" id="501">501</a>
+<a href="#502" id="502">502</a>
+<a href="#503" id="503">503</a>
+<a href="#504" id="504">504</a>
+<a href="#505" id="505">505</a>
+<a href="#506" id="506">506</a>
+<a href="#507" id="507">507</a>
+<a href="#508" id="508">508</a>
+<a href="#509" id="509">509</a>
+<a href="#510" id="510">510</a>
+<a href="#511" id="511">511</a>
+<a href="#512" id="512">512</a>
+<a href="#513" id="513">513</a>
+<a href="#514" id="514">514</a>
+<a href="#515" id="515">515</a>
+<a href="#516" id="516">516</a>
+<a href="#517" id="517">517</a>
+<a href="#518" id="518">518</a>
+<a href="#519" id="519">519</a>
+<a href="#520" id="520">520</a>
+<a href="#521" id="521">521</a>
+<a href="#522" id="522">522</a>
+<a href="#523" id="523">523</a>
+<a href="#524" id="524">524</a>
+<a href="#525" id="525">525</a>
+<a href="#526" id="526">526</a>
+<a href="#527" id="527">527</a>
+<a href="#528" id="528">528</a>
+<a href="#529" id="529">529</a>
+<a href="#530" id="530">530</a>
+<a href="#531" id="531">531</a>
+<a href="#532" id="532">532</a>
+<a href="#533" id="533">533</a>
+<a href="#534" id="534">534</a>
+<a href="#535" id="535">535</a>
+<a href="#536" id="536">536</a>
+<a href="#537" id="537">537</a>
+<a href="#538" id="538">538</a>
+<a href="#539" id="539">539</a>
+<a href="#540" id="540">540</a>
+<a href="#541" id="541">541</a>
+<a href="#542" id="542">542</a>
+<a href="#543" id="543">543</a>
+<a href="#544" id="544">544</a>
+<a href="#545" id="545">545</a>
+<a href="#546" id="546">546</a>
+<a href="#547" id="547">547</a>
+<a href="#548" id="548">548</a>
+<a href="#549" id="549">549</a>
+<a href="#550" id="550">550</a>
+<a href="#551" id="551">551</a>
+<a href="#552" id="552">552</a>
+<a href="#553" id="553">553</a>
+<a href="#554" id="554">554</a>
+<a href="#555" id="555">555</a>
+<a href="#556" id="556">556</a>
+<a href="#557" id="557">557</a>
+<a href="#558" id="558">558</a>
+<a href="#559" id="559">559</a>
+<a href="#560" id="560">560</a>
+<a href="#561" id="561">561</a>
+<a href="#562" id="562">562</a>
+<a href="#563" id="563">563</a>
+<a href="#564" id="564">564</a>
+<a href="#565" id="565">565</a>
+<a href="#566" id="566">566</a>
+<a href="#567" id="567">567</a>
+<a href="#568" id="568">568</a>
+<a href="#569" id="569">569</a>
+<a href="#570" id="570">570</a>
+<a href="#571" id="571">571</a>
+<a href="#572" id="572">572</a>
+<a href="#573" id="573">573</a>
+<a href="#574" id="574">574</a>
+<a href="#575" id="575">575</a>
+<a href="#576" id="576">576</a>
+<a href="#577" id="577">577</a>
+<a href="#578" id="578">578</a>
+<a href="#579" id="579">579</a>
+<a href="#580" id="580">580</a>
+<a href="#581" id="581">581</a>
+<a href="#582" id="582">582</a>
+<a href="#583" id="583">583</a>
+<a href="#584" id="584">584</a>
+<a href="#585" id="585">585</a>
+<a href="#586" id="586">586</a>
+<a href="#587" id="587">587</a>
+<a href="#588" id="588">588</a>
+<a href="#589" id="589">589</a>
+<a href="#590" id="590">590</a>
+<a href="#591" id="591">591</a>
+<a href="#592" id="592">592</a>
+<a href="#593" id="593">593</a>
+<a href="#594" id="594">594</a>
+<a href="#595" id="595">595</a>
+<a href="#596" id="596">596</a>
+<a href="#597" id="597">597</a>
+<a href="#598" id="598">598</a>
+<a href="#599" id="599">599</a>
+<a href="#600" id="600">600</a>
+<a href="#601" id="601">601</a>
+<a href="#602" id="602">602</a>
+<a href="#603" id="603">603</a>
+<a href="#604" id="604">604</a>
+<a href="#605" id="605">605</a>
+<a href="#606" id="606">606</a>
+<a href="#607" id="607">607</a>
+<a href="#608" id="608">608</a>
+<a href="#609" id="609">609</a>
+<a href="#610" id="610">610</a>
+<a href="#611" id="611">611</a>
+<a href="#612" id="612">612</a>
+<a href="#613" id="613">613</a>
+<a href="#614" id="614">614</a>
+<a href="#615" id="615">615</a>
+<a href="#616" id="616">616</a>
+<a href="#617" id="617">617</a>
+<a href="#618" id="618">618</a>
+<a href="#619" id="619">619</a>
+<a href="#620" id="620">620</a>
+<a href="#621" id="621">621</a>
+<a href="#622" id="622">622</a>
+<a href="#623" id="623">623</a>
+<a href="#624" id="624">624</a>
+<a href="#625" id="625">625</a>
+<a href="#626" id="626">626</a>
+<a href="#627" id="627">627</a>
+<a href="#628" id="628">628</a>
+<a href="#629" id="629">629</a>
+<a href="#630" id="630">630</a>
+<a href="#631" id="631">631</a>
+<a href="#632" id="632">632</a>
+<a href="#633" id="633">633</a>
+<a href="#634" id="634">634</a>
+<a href="#635" id="635">635</a>
+<a href="#636" id="636">636</a>
+<a href="#637" id="637">637</a>
+<a href="#638" id="638">638</a>
+<a href="#639" id="639">639</a>
+<a href="#640" id="640">640</a>
+<a href="#641" id="641">641</a>
+<a href="#642" id="642">642</a>
+<a href="#643" id="643">643</a>
+<a href="#644" id="644">644</a>
+<a href="#645" id="645">645</a>
+<a href="#646" id="646">646</a>
+<a href="#647" id="647">647</a>
+<a href="#648" id="648">648</a>
 </pre></div><pre class="rust"><code><span class="doccomment">/*!
-A low level regular expression library that uses deterministic finite automata.
-It supports a rich syntax with Unicode support, has extensive options for
-configuring the best space vs time trade off for your use case and provides
-support for cheap deserialization of automata for use in `no_std` environments.
+This crate exposes a variety of regex engines used by the `regex` crate.
+It provides a vast, sprawling and &quot;expert&quot; level API to each regex engine.
+The regex engines provided by this crate focus heavily on finite automata
+implementations and specifically guarantee worst case `O(m * n)` time
+complexity for all searches. (Where `m ~ len(regex)` and `n ~ len(haystack)`.)
 
-# Overview
+The primary goal of this crate is to serve as an implementation detail for the
+`regex` crate. A secondary goal is to make its internals available for use by
+others.
 
-This section gives a brief overview of the primary types in this crate:
+# Table of contents
 
-* A [`Regex`](struct.Regex.html) provides a way to search for matches of a
-  regular expression. This includes iterating over matches with both the start
-  and end positions of each match.
-* A [`RegexBuilder`](struct.RegexBuilder.html) provides a way configure many
-  compilation options for a regex.
-* A [`DenseDFA`](enum.DenseDFA.html) provides low level access to a DFA that
-  uses a dense representation (uses lots of space, but fast searching).
-* A [`SparseDFA`](enum.SparseDFA.html) provides the same API as a `DenseDFA`,
-  but uses a sparse representation (uses less space, but slower matching).
-* A [`DFA`](trait.DFA.html) trait that defines an interface that all DFAs must
-  implement.
-* Both dense DFAs and sparse DFAs support
-  [serialization to raw bytes](enum.DenseDFA.html#method.to_bytes_little_endian)
-  and
-  [cheap deserialization](enum.DenseDFA.html#method.from_bytes).
+* [Should I be using this crate?](#should-i-be-using-this-crate) gives some
+reasons for and against using this crate.
+* [Examples](#examples) provides a small selection of things you can do with
+this crate.
+* [Available regex engines](#available-regex-engines) provides a hyperlinked
+list of all regex engines in this crate.
+* [API themes](#api-themes) discusses common elements used throughout this
+crate.
+* [Crate features](#crate-features) documents the extensive list of Cargo
+features available.
 
-# Example: basic regex searching
+# Should I be using this crate?
 
-This example shows how to compile a regex using the default configuration
-and then use it to find matches in a byte string:
+If you find yourself here because you just want to use regexes, then you should
+first check out whether the [`regex` crate](https://docs.rs/regex) meets
+your needs. It provides a streamlined and difficult-to-misuse API for regex
+searching.
 
-```
-use regex_automata::Regex;
+If you&#39;re here because there is something specific you want to do that can&#39;t
+be easily done with `regex` crate, then you are perhaps in the right place.
+It&#39;s most likely that the first stop you&#39;ll want to make is to explore the
+[`meta` regex APIs](meta). Namely, the `regex` crate is just a light wrapper
+over a [`meta::Regex`], so its API will probably be the easiest to transition
+to. In contrast to the `regex` crate, the `meta::Regex` API supports more
+search parameters and does multi-pattern searches. However, it isn&#39;t quite as
+ergonomic.
 
-let re = Regex::new(r&quot;[0-9]{4}-[0-9]{2}-[0-9]{2}&quot;).unwrap();
-let text = b&quot;2018-12-24 2016-10-08&quot;;
-let matches: Vec&lt;(usize, usize)&gt; = re.find_iter(text).collect();
-assert_eq!(matches, vec![(0, 10), (11, 21)]);
-```
+Otherwise, the following is an inexhaustive list of reasons to use this crate:
 
-# Example: use sparse DFAs
+* You want to analyze or use a [Thompson `NFA`](nfa::thompson::NFA) directly.
+* You want more powerful multi-pattern search than what is provided by
+`RegexSet` in the `regex` crate. All regex engines in this crate support
+multi-pattern searches.
+* You want to use one of the `regex` crate&#39;s internal engines directly because
+of some interesting configuration that isn&#39;t possible via the `regex` crate.
+For example, a [lazy DFA&#39;s configuration](hybrid::dfa::Config) exposes a
+dizzying number of options for controlling its execution.
+* You want to use the lower level search APIs. For example, both the [lazy
+DFA](hybrid::dfa) and [fully compiled DFAs](dfa) support searching by exploring
+the automaton one state at a time. This might be useful, for example, for
+stream searches or searches of strings stored in non-contiguous in memory.
+* You want to build a fully compiled DFA and then [use zero-copy
+deserialization](dfa::dense::DFA::from_bytes) to load it into memory and use
+it for searching. This use case is supported in core-only no-std/no-alloc
+environments.
+* You want to run [anchored searches](Input::anchored) without using the `^`
+anchor in your regex pattern.
+* You need to work-around contention issues with
+sharing a regex across multiple threads. The
+[`meta::Regex::search_with`](meta::Regex::search_with) API permits bypassing
+any kind of synchronization at all by requiring the caller to provide the
+mutable scratch spaced needed during a search.
+* You want to build your own regex engine on top of the `regex` crate&#39;s
+infrastructure.
 
-By default, compiling a regex will use dense DFAs internally. This uses more
-memory, but executes searches more quickly. If you can abide slower searches
-(somewhere around 3-5x), then sparse DFAs might make more sense since they can
-use significantly less space.
+# Examples
 
-Using sparse DFAs is as easy as using `Regex::new_sparse` instead of
-`Regex::new`:
+This section tries to identify a few interesting things you can do with this
+crate and demonstrates them.
 
-```
-use regex_automata::Regex;
+### Multi-pattern searches with capture groups
 
-# fn example() -&gt; Result&lt;(), regex_automata::Error&gt; {
-let re = Regex::new_sparse(r&quot;[0-9]{4}-[0-9]{2}-[0-9]{2}&quot;).unwrap();
-let text = b&quot;2018-12-24 2016-10-08&quot;;
-let matches: Vec&lt;(usize, usize)&gt; = re.find_iter(text).collect();
-assert_eq!(matches, vec![(0, 10), (11, 21)]);
-# Ok(()) }; example().unwrap()
-```
+One of the more frustrating limitations of `RegexSet` in the `regex` crate
+(at the time of writing) is that it doesn&#39;t report match positions. With this
+crate, multi-pattern support was intentionally designed in from the beginning,
+which means it works in all regex engines and even for capture groups as well.
 
-If you already have dense DFAs for some reason, they can be converted to sparse
-DFAs and used to build a new `Regex`. For example:
-
-```
-use regex_automata::Regex;
-
-# fn example() -&gt; Result&lt;(), regex_automata::Error&gt; {
-let dense_re = Regex::new(r&quot;[0-9]{4}-[0-9]{2}-[0-9]{2}&quot;).unwrap();
-let sparse_re = Regex::from_dfas(
-    dense_re.forward().to_sparse()?,
-    dense_re.reverse().to_sparse()?,
-);
-let text = b&quot;2018-12-24 2016-10-08&quot;;
-let matches: Vec&lt;(usize, usize)&gt; = sparse_re.find_iter(text).collect();
-assert_eq!(matches, vec![(0, 10), (11, 21)]);
-# Ok(()) }; example().unwrap()
-```
-
-# Example: deserialize a DFA
-
-This shows how to first serialize a DFA into raw bytes, and then deserialize
-those raw bytes back into a DFA. While this particular example is a bit
-contrived, this same technique can be used in your program to deserialize a
-DFA at start up time or by memory mapping a file. In particular,
-deserialization is guaranteed to be cheap because it will always be a constant
-time operation.
+This example shows how to search for matches of multiple regexes, where each
+regex uses the same capture group names to parse different key-value formats.
 
 ```
-use regex_automata::{DenseDFA, Regex};
+use regex_automata::{meta::Regex, PatternID};
 
-# fn example() -&gt; Result&lt;(), regex_automata::Error&gt; {
-let re1 = Regex::new(r&quot;[0-9]{4}-[0-9]{2}-[0-9]{2}&quot;).unwrap();
-// serialize both the forward and reverse DFAs, see note below
-let fwd_bytes = re1.forward().to_u16()?.to_bytes_native_endian()?;
-let rev_bytes = re1.reverse().to_u16()?.to_bytes_native_endian()?;
-// now deserialize both---we need to specify the correct type!
-let fwd: DenseDFA&lt;&amp;[u16], u16&gt; = unsafe { DenseDFA::from_bytes(&amp;fwd_bytes) };
-let rev: DenseDFA&lt;&amp;[u16], u16&gt; = unsafe { DenseDFA::from_bytes(&amp;rev_bytes) };
-// finally, reconstruct our regex
-let re2 = Regex::from_dfas(fwd, rev);
+let re = Regex::new_many(&amp;[
+    r#&quot;(?m)^(?&lt;key&gt;[[:word:]]+)=(?&lt;val&gt;[[:word:]]+)$&quot;#,
+    r#&quot;(?m)^(?&lt;key&gt;[[:word:]]+)=&quot;(?&lt;val&gt;[^&quot;]+)&quot;$&quot;#,
+    r#&quot;(?m)^(?&lt;key&gt;[[:word:]]+)=&#39;(?&lt;val&gt;[^&#39;]+)&#39;$&quot;#,
+    r#&quot;(?m)^(?&lt;key&gt;[[:word:]]+):\s*(?&lt;val&gt;[[:word:]]+)$&quot;#,
+])?;
+let hay = r#&quot;
+best_album=&quot;Blow Your Face Out&quot;
+best_quote=&#39;&quot;then as it was, then again it will be&quot;&#39;
+best_year=1973
+best_simpsons_episode: HOMR
+&quot;#;
+let mut kvs = vec![];
+for caps in re.captures_iter(hay) {
+    // N.B. One could use capture indices &#39;1&#39; and &#39;2&#39; here
+    // as well. Capture indices are local to each pattern.
+    // (Just like names are.)
+    let key = &amp;hay[caps.get_group_by_name(&quot;key&quot;).unwrap()];
+    let val = &amp;hay[caps.get_group_by_name(&quot;val&quot;).unwrap()];
+    kvs.push((key, val));
+}
+assert_eq!(kvs, vec![
+    (&quot;best_album&quot;, &quot;Blow Your Face Out&quot;),
+    (&quot;best_quote&quot;, &quot;\&quot;then as it was, then again it will be\&quot;&quot;),
+    (&quot;best_year&quot;, &quot;1973&quot;),
+    (&quot;best_simpsons_episode&quot;, &quot;HOMR&quot;),
+]);
 
-// we can use it like normal
-let text = b&quot;2018-12-24 2016-10-08&quot;;
-let matches: Vec&lt;(usize, usize)&gt; = re2.find_iter(text).collect();
-assert_eq!(matches, vec![(0, 10), (11, 21)]);
-# Ok(()) }; example().unwrap()
+# Ok::&lt;(), Box&lt;dyn std::error::Error&gt;&gt;(())
 ```
 
-There are a few points worth noting here:
+### Build a full DFA and walk it manually
 
-* We need to extract the raw DFAs used by the regex and serialize those. You
-  can build the DFAs manually yourself using
-  [`dense::Builder`](dense/struct.Builder.html), but using the DFAs from a
-  `Regex` guarantees that the DFAs are built correctly.
-* We specifically convert the dense DFA to a representation that uses `u16`
-  for its state identifiers using
-  [`DenseDFA::to_u16`](enum.DenseDFA.html#method.to_u16). While this isn&#39;t
-  strictly necessary, if we skipped this step, then the serialized bytes would
-  use `usize` for state identifiers, which does not have a fixed size. Using
-  `u16` ensures that we can deserialize this DFA even on platforms with a
-  smaller pointer size. If our DFA is too big for `u16` state identifiers, then
-  one can use `u32` or `u64`.
-* To convert the DFA to raw bytes, we use the `to_bytes_native_endian`
-  method. In practice, you&#39;ll want to use either
-  [`DenseDFA::to_bytes_little_endian`](enum.DenseDFA.html#method.to_bytes_little_endian)
-  or
-  [`DenseDFA::to_bytes_big_endian`](enum.DenseDFA.html#method.to_bytes_big_endian),
-  depending on which platform you&#39;re deserializing your DFA from. If you intend
-  to deserialize on either platform, then you&#39;ll need to serialize both and
-  deserialize the right one depending on your target&#39;s endianness.
-* Deserializing a DFA requires the use of `unsafe` because the raw bytes must
-  be *trusted*. In particular, while some degree of sanity checks are
-  performed, nothing guarantees the integrity of the DFA&#39;s transition table
-  since deserialization is a constant time operation. Since searching with a
-  DFA must be able to follow transitions blindly for performance reasons,
-  giving incorrect bytes to the deserialization API can result in memory
-  unsafety.
-
-The same process can be achieved with sparse DFAs as well:
+One of the regex engines in this crate is a fully compiled DFA. It takes worst
+case exponential time to build, but once built, it can be easily explored and
+used for searches. Here&#39;s a simple example that uses its lower level APIs to
+implement a simple anchored search by hand.
 
 ```
-use regex_automata::{SparseDFA, Regex};
+use regex_automata::{dfa::{Automaton, dense}, Input};
 
-# fn example() -&gt; Result&lt;(), regex_automata::Error&gt; {
-let re1 = Regex::new(r&quot;[0-9]{4}-[0-9]{2}-[0-9]{2}&quot;).unwrap();
-// serialize both
-let fwd_bytes = re1.forward().to_u16()?.to_sparse()?.to_bytes_native_endian()?;
-let rev_bytes = re1.reverse().to_u16()?.to_sparse()?.to_bytes_native_endian()?;
-// now deserialize both---we need to specify the correct type!
-let fwd: SparseDFA&lt;&amp;[u8], u16&gt; = unsafe { SparseDFA::from_bytes(&amp;fwd_bytes) };
-let rev: SparseDFA&lt;&amp;[u8], u16&gt; = unsafe { SparseDFA::from_bytes(&amp;rev_bytes) };
-// finally, reconstruct our regex
-let re2 = Regex::from_dfas(fwd, rev);
+let dfa = dense::DFA::new(r&quot;(?-u)\b[A-Z]\w+z\b&quot;)?;
+let haystack = &quot;Quartz&quot;;
 
-// we can use it like normal
-let text = b&quot;2018-12-24 2016-10-08&quot;;
-let matches: Vec&lt;(usize, usize)&gt; = re2.find_iter(text).collect();
-assert_eq!(matches, vec![(0, 10), (11, 21)]);
-# Ok(()) }; example().unwrap()
+// The start state is determined by inspecting the position and the
+// initial bytes of the haystack.
+let mut state = dfa.start_state_forward(&amp;Input::new(haystack))?;
+// Walk all the bytes in the haystack.
+for &amp;b in haystack.as_bytes().iter() {
+    state = dfa.next_state(state, b);
+}
+// DFAs in this crate require an explicit
+// end-of-input transition if a search reaches
+// the end of a haystack.
+state = dfa.next_eoi_state(state);
+assert!(dfa.is_match_state(state));
+
+# Ok::&lt;(), Box&lt;dyn std::error::Error&gt;&gt;(())
 ```
 
-Note that unlike dense DFAs, sparse DFAs have no alignment requirements.
-Conversely, dense DFAs must be be aligned to the same alignment as their
-state identifier representation.
+Or do the same with a lazy DFA that avoids exponential worst case compile time,
+but requires mutable scratch space to lazily build the DFA during the search.
 
-# Support for `no_std`
+```
+use regex_automata::{hybrid::dfa::DFA, Input};
 
-This crate comes with a `std` feature that is enabled by default. When the
-`std` feature is enabled, the API of this crate will include the facilities
-necessary for compiling, serializing, deserializing and searching with regular
-expressions. When the `std` feature is disabled, the API of this crate will
-shrink such that it only includes the facilities necessary for deserializing
-and searching with regular expressions.
+let dfa = DFA::new(r&quot;(?-u)\b[A-Z]\w+z\b&quot;)?;
+let mut cache = dfa.create_cache();
+let hay = &quot;Quartz&quot;;
 
-The intended workflow for `no_std` environments is thus as follows:
+// The start state is determined by inspecting the position and the
+// initial bytes of the haystack.
+let mut state = dfa.start_state_forward(&amp;mut cache, &amp;Input::new(hay))?;
+// Walk all the bytes in the haystack.
+for &amp;b in hay.as_bytes().iter() {
+    state = dfa.next_state(&amp;mut cache, state, b)?;
+}
+// DFAs in this crate require an explicit
+// end-of-input transition if a search reaches
+// the end of a haystack.
+state = dfa.next_eoi_state(&amp;mut cache, state)?;
+assert!(state.is_match());
 
-* Write a program with the `std` feature that compiles and serializes a
-  regular expression. Serialization should only happen after first converting
-  the DFAs to use a fixed size state identifier instead of the default `usize`.
-  You may also need to serialize both little and big endian versions of each
-  DFA. (So that&#39;s 4 DFAs in total for each regex.)
-* In your `no_std` environment, follow the examples above for deserializing
-  your previously serialized DFAs into regexes. You can then search with them
-  as you would any regex.
+# Ok::&lt;(), Box&lt;dyn std::error::Error&gt;&gt;(())
+```
 
-Deserialization can happen anywhere. For example, with bytes embedded into a
-binary or with a file memory mapped at runtime.
+### Find all overlapping matches
 
-Note that the
-[`ucd-generate`](https://github.com/BurntSushi/ucd-generate)
-tool will do the first step for you with its `dfa` or `regex` sub-commands.
+This example shows how to build a DFA and use it to find all possible matches,
+including overlapping matches. A similar example will work with a lazy DFA as
+well. This also works with multiple patterns and will report all matches at the
+same position where multiple patterns match.
 
-# Syntax
+```
+use regex_automata::{
+    dfa::{dense, Automaton, OverlappingState},
+    Input, MatchKind,
+};
 
-This crate supports the same syntax as the `regex` crate, since they share the
-same parser. You can find an exhaustive list of supported syntax in the
-[documentation for the `regex` crate](https://docs.rs/regex/1.1/regex/#syntax).
+let dfa = dense::DFA::builder()
+    .configure(dense::DFA::config().match_kind(MatchKind::All))
+    .build(r&quot;(?-u)\w{3,}&quot;)?;
+let input = Input::new(&quot;homer marge bart lisa maggie&quot;);
+let mut state = OverlappingState::start();
 
-Currently, there are a couple limitations. In general, this crate does not
-support zero-width assertions, although they may be added in the future. This
-includes:
+let mut matches = vec![];
+while let Some(hm) = {
+    dfa.try_search_overlapping_fwd(&amp;input, &amp;mut state)?;
+    state.get_match()
+} {
+    matches.push(hm.offset());
+}
+assert_eq!(matches, vec![
+    3, 4, 5,        // hom, home, homer
+    9, 10, 11,      // mar, marg, marge
+    15, 16,         // bar, bart
+    20, 21,         // lis, lisa
+    25, 26, 27, 28, // mag, magg, maggi, maggie
+]);
 
-* Anchors such as `^`, `$`, `\A` and `\z`.
-* Word boundary assertions such as `\b` and `\B`.
+# Ok::&lt;(), Box&lt;dyn std::error::Error&gt;&gt;(())
+```
 
-It is possible to run a search that is anchored at the beginning of the input.
-To do that, set the
-[`RegexBuilder::anchored`](struct.RegexBuilder.html#method.anchored)
-option when building a regex. By default, all searches are unanchored.
+# Available regex engines
 
-# Differences with the regex crate
+The following is a complete list of all regex engines provided by this crate,
+along with a very brief description of it and why you might want to use it.
 
-The main goal of the [`regex`](https://docs.rs/regex) crate is to serve as a
-general purpose regular expression engine. It aims to automatically balance low
-compile times, fast search times and low memory usage, while also providing
-a convenient API for users. In contrast, this crate provides a lower level
-regular expression interface that is a bit less convenient while providing more
-explicit control over memory usage and search times.
+* [`dfa::regex::Regex`] is a regex engine that works on top of either
+[dense](dfa::dense) or [sparse](dfa::sparse) fully compiled DFAs. You might
+use a DFA if you need the fastest possible regex engine in this crate and can
+afford the exorbitant memory usage usually required by DFAs. Low level APIs on
+fully compiled DFAs are provided by the [`Automaton` trait](dfa::Automaton).
+Fully compiled dense DFAs can handle all regexes except for searching a regex
+with a Unicode word boundary on non-ASCII haystacks. A fully compiled DFA based
+regex can only report the start and end of each match.
+* [`hybrid::regex::Regex`] is a regex engine that works on top of a lazily
+built DFA. Its performance profile is very similar to that of fully compiled
+DFAs, but can be slower in some pathological cases. Fully compiled DFAs are
+also amenable to more optimizations, such as state acceleration, that aren&#39;t
+available in a lazy DFA. You might use this lazy DFA if you can&#39;t abide the
+worst case exponential compile time of a full DFA, but still want the DFA
+search performance in the vast majority of cases. A lazy DFA based regex can
+only report the start and end of each match.
+* [`dfa::onepass::DFA`] is a regex engine that is implemented as a DFA, but
+can report the matches of each capture group in addition to the start and end
+of each match. The catch is that it only works on a somewhat small subset of
+regexes known as &quot;one-pass.&quot; You&#39;ll want to use this for cases when you need
+capture group matches and the regex is one-pass since it is likely to be faster
+than any alternative. A one-pass DFA can handle all types of regexes, but does
+have some reasonable limits on the number of capture groups it can handle.
+* [`nfa::thompson::backtrack::BoundedBacktracker`] is a regex engine that uses
+backtracking, but keeps track of the work it has done to avoid catastrophic
+backtracking. Like the one-pass DFA, it provides the matches of each capture
+group. It retains the `O(m * n)` worst case time bound. This tends to be slower
+than the one-pass DFA regex engine, but faster than the PikeVM. It can handle
+all types of regexes, but usually only works well with small haystacks and
+small regexes due to the memory required to avoid redoing work.
+* [`nfa::thompson::pikevm::PikeVM`] is a regex engine that can handle all
+regexes, of all sizes and provides capture group matches. It tends to be a tool
+of last resort because it is also usually the slowest regex engine.
+* [`meta::Regex`] is the meta regex engine that combines *all* of the above
+engines into one. The reason for this is that each of the engines above have
+their own caveats such as, &quot;only handles a subset of regexes&quot; or &quot;is generally
+slow.&quot; The meta regex engine accounts for all of these caveats and composes
+the engines in a way that attempts to mitigate each engine&#39;s weaknesses while
+emphasizing its strengths. For example, it will attempt to run a lazy DFA even
+if it might fail. In which case, it will restart the search with a likely
+slower but more capable regex engine. The meta regex engine is what you should
+default to. Use one of the above engines directly only if you have a specific
+reason to.
 
-Here are some specific negative differences:
+# API themes
 
-* **Compilation can take an exponential amount of time and space** in the size
-  of the regex pattern. While most patterns do not exhibit worst case
-  exponential time, such patterns do exist. For example, `[01]*1[01]{N}` will
-  build a DFA with `2^(N+1)` states. For this reason, untrusted patterns should
-  not be compiled with this library. (In the future, the API may expose an
-  option to return an error if the DFA gets too big.)
-* This crate does not support sub-match extraction, which can be achieved with
-  the regex crate&#39;s &quot;captures&quot; API. This may be added in the future, but is
-  unlikely.
-* While the regex crate doesn&#39;t necessarily sport fast compilation times, the
-  regexes in this crate are almost universally slow to compile, especially when
-  they contain large Unicode character classes. For example, on my system,
-  compiling `\w{3}` with byte classes enabled takes just over 1 second and
-  almost 5MB of memory! (Compiling a sparse regex takes about the same time
-  but only uses about 500KB of memory.) Conversly, compiling the same regex
-  without Unicode support, e.g., `(?-u)\w{3}`, takes under 1 millisecond and
-  less than 5KB of memory. For this reason, you should only use Unicode
-  character classes if you absolutely need them!
-* This crate does not support regex sets.
-* This crate does not support zero-width assertions such as `^`, `$`, `\b` or
-  `\B`.
-* As a lower level crate, this library does not do literal optimizations. In
-  exchange, you get predictable performance regardless of input. The
-  philosophy here is that literal optimizations should be applied at a higher
-  level, although there is no easy support for this in the ecosystem yet.
-* There is no `&amp;str` API like in the regex crate. In this crate, all APIs
-  operate on `&amp;[u8]`. By default, match indices are guaranteed to fall on
-  UTF-8 boundaries, unless
-  [`RegexBuilder::allow_invalid_utf8`](struct.RegexBuilder.html#method.allow_invalid_utf8)
-  is enabled.
+While each regex engine has its own APIs and configuration options, there are
+some general themes followed by all of them.
 
-With some of the downsides out of the way, here are some positive differences:
+### The `Input` abstraction
 
-* Both dense and sparse DFAs can be serialized to raw bytes, and then cheaply
-  deserialized. Deserialization always takes constant time since searching can
-  be performed directly on the raw serialized bytes of a DFA.
-* This crate was specifically designed so that the searching phase of a DFA has
-  minimal runtime requirements, and can therefore be used in `no_std`
-  environments. While `no_std` environments cannot compile regexes, they can
-  deserialize pre-compiled regexes.
-* Since this crate builds DFAs ahead of time, it will generally out-perform
-  the `regex` crate on equivalent tasks. The performance difference is likely
-  not large. However, because of a complex set of optimizations in the regex
-  crate (like literal optimizations), an accurate performance comparison may be
-  difficult to do.
-* Sparse DFAs provide a way to build a DFA ahead of time that sacrifices search
-  performance a small amount, but uses much less storage space. Potentially
-  even less than what the regex crate uses.
-* This crate exposes DFAs directly, such as
-  [`DenseDFA`](enum.DenseDFA.html) and [`SparseDFA`](enum.SparseDFA.html),
-  which enables one to do less work in some cases. For example, if you only
-  need the end of a match and not the start of a match, then you can use a DFA
-  directly without building a `Regex`, which always requires a second DFA to
-  find the start of a match.
-* Aside from choosing between dense and sparse DFAs, there are several options
-  for configuring the space usage vs search time trade off. These include
-  things like choosing a smaller state identifier representation, to
-  premultiplying state identifiers and splitting a DFA&#39;s alphabet into
-  equivalence classes. Finally, DFA minimization is also provided, but can
-  increase compilation times dramatically.
+Most search routines in this crate accept anything that implements
+`Into&lt;Input&gt;`. Both `&amp;str` and `&amp;[u8]` haystacks satisfy this constraint, which
+means that things like `engine.search(&quot;foo&quot;)` will work as you would expect.
+
+By virtue of accepting an `Into&lt;Input&gt;` though, callers can provide more than
+just a haystack. Indeed, the [`Input`] type has more details, but briefly,
+callers can use it to configure various aspects of the search:
+
+* The span of the haystack to search via [`Input::span`] or [`Input::range`],
+which might be a substring of the haystack.
+* Whether to run an anchored search or not via [`Input::anchored`]. This
+permits one to require matches to start at the same offset that the search
+started.
+* Whether to ask the regex engine to stop as soon as a match is seen via
+[`Input::earliest`]. This can be used to find the offset of a match as soon
+as it is known without waiting for the full leftmost-first match to be found.
+This can also be used to avoid the worst case `O(m * n^2)` time complexity
+of iteration.
+
+Some lower level search routines accept an `&amp;Input` for performance reasons.
+In which case, `&amp;Input::new(&quot;haystack&quot;)` can be used for a simple search.
+
+### Error reporting
+
+Most, but not all, regex engines in this crate can fail to execute a search.
+When a search fails, callers cannot determine whether or not a match exists.
+That is, the result is indeterminate.
+
+Search failure, in all cases in this crate, is represented by a [`MatchError`].
+Routines that can fail start with the `try_` prefix in their name. For example,
+[`hybrid::regex::Regex::try_search`] can fail for a number of reasons.
+Conversely, routines that either can&#39;t fail or can panic on failure lack the
+`try_` prefix. For example, [`hybrid::regex::Regex::find`] will panic in
+cases where [`hybrid::regex::Regex::try_search`] would return an error, and
+[`meta::Regex::find`] will never panic. Therefore, callers need to pay close
+attention to the panicking conditions in the documentation.
+
+In most cases, the reasons that a search fails are either predictable or
+configurable, albeit at some additional cost.
+
+An example of predictable failure is
+[`BoundedBacktracker::try_search`](nfa::thompson::backtrack::BoundedBacktracker::try_search).
+Namely, it fails whenever the multiplication of the haystack, the regex and some
+constant exceeds the
+[configured visited capacity](nfa::thompson::backtrack::Config::visited_capacity).
+Callers can predict the failure in terms of haystack length via the
+[`BoundedBacktracker::max_haystack_len`](nfa::thompson::backtrack::BoundedBacktracker::max_haystack_len)
+method. While this form of failure is technically avoidable by increasing the
+visited capacity, it isn&#39;t practical to do so for all inputs because the
+memory usage required for larger haystacks becomes impractically large. So in
+practice, if one is using the bounded backtracker, you really do have to deal
+with the failure.
+
+An example of configurable failure happens when one enables heuristic support
+for Unicode word boundaries in a DFA. Namely, since the DFAs in this crate
+(except for the one-pass DFA) do not support Unicode word boundaries on
+non-ASCII haystacks, building a DFA from an NFA that contains a Unicode word
+boundary will itself fail. However, one can configure DFAs to still be built in
+this case by
+[configuring heuristic support for Unicode word boundaries](hybrid::dfa::Config::unicode_word_boundary).
+If the NFA the DFA is built from contains a Unicode word boundary, then the
+DFA will still be built, but special transitions will be added to every state
+that cause the DFA to fail if any non-ASCII byte is seen. This failure happens
+at search time and it requires the caller to opt into this.
+
+There are other ways for regex engines to fail in this crate, but the above
+two should represent the general theme of failures one can find. Dealing
+with these failures is, in part, one the responsibilities of the [meta regex
+engine](meta). Notice, for example, that the meta regex engine exposes an API
+that never returns an error nor panics. It carefully manages all of the ways
+in which the regex engines can fail and either avoids the predictable ones
+entirely (e.g., the bounded backtracker) or reacts to configured failures by
+falling back to a different engine (e.g., the lazy DFA quitting because it saw
+a non-ASCII byte).
+
+### Configuration and Builders
+
+Most of the regex engines in this crate come with two types to facilitate
+building the regex engine: a `Config` and a `Builder`. A `Config` is usually
+specific to that particular regex engine, but other objects such as parsing and
+NFA compilation have `Config` types too. A `Builder` is the thing responsible
+for taking inputs (either pattern strings or already-parsed patterns or even
+NFAs directly) and turning them into an actual regex engine that can be used
+for searching.
+
+The main reason why building a regex engine is a bit complicated is because
+of the desire to permit composition with de-coupled components. For example,
+you might want to [manually construct a Thompson NFA](nfa::thompson::Builder)
+and then build a regex engine from it without ever using a regex parser
+at all. On the other hand, you might also want to build a regex engine directly
+from the concrete syntax. This demonstrates why regex engine construction is
+so flexible: it needs to support not just convenient construction, but also
+construction from parts built elsewhere.
+
+This is also in turn why there are many different `Config` structs in this
+crate. Let&#39;s look more closely at an example: [`hybrid::regex::Builder`]. It
+accepts three different `Config` types for configuring construction of a lazy
+DFA regex:
+
+* [`hybrid::regex::Builder::syntax`] accepts a
+[`util::syntax::Config`] for configuring the options found in the
+[`regex-syntax`](regex_syntax) crate. For example, whether to match
+case insensitively.
+* [`hybrid::regex::Builder::thompson`] accepts a [`nfa::thompson::Config`] for
+configuring construction of a [Thompson NFA](nfa::thompson::NFA). For example,
+whether to build an NFA that matches the reverse language described by the
+regex.
+* [`hybrid::regex::Builder::dfa`] accept a [`hybrid::dfa::Config`] for
+configuring construction of the pair of underlying lazy DFAs that make up the
+lazy DFA regex engine. For example, changing the capacity of the cache used to
+store the transition table.
+
+The lazy DFA regex engine uses all three of those configuration objects for
+methods like [`hybrid::regex::Builder::build`], which accepts a pattern
+string containing the concrete syntax of your regex. It uses the syntax
+configuration to parse it into an AST and translate it into an HIR. Then the
+NFA configuration when compiling the HIR into an NFA. And then finally the DFA
+configuration when lazily determinizing the NFA into a DFA.
+
+Notice though that the builder also has a
+[`hybrid::regex::Builder::build_from_dfas`] constructor. This permits callers
+to build the underlying pair of lazy DFAs themselves (one for the forward
+searching to find the end of a match and one for the reverse searching to find
+the start of a match), and then build the regex engine from them. The lazy
+DFAs, in turn, have their own builder that permits [construction directly from
+a Thompson NFA](hybrid::dfa::Builder::build_from_nfa). Continuing down the
+rabbit hole, a Thompson NFA has its own compiler that permits [construction
+directly from an HIR](nfa::thompson::Compiler::build_from_hir). The lazy DFA
+regex engine builder lets you follow this rabbit hole all the way down, but
+also provides convenience routines that do it for you when you don&#39;t need
+precise control over every component.
+
+The [meta regex engine](meta) is a good example of something that utilizes the
+full flexibility of these builders. It often needs not only precise control
+over each component, but also shares them across multiple regex engines.
+(Most sharing is done by internal reference accounting. For example, an
+[`NFA`](nfa::thompson::NFA) is reference counted internally which makes cloning
+cheap.)
+
+### Size limits
+
+Unlike the `regex` crate, the `regex-automata` crate specifically does not
+enable any size limits by default. That means users of this crate need to
+be quite careful when using untrusted patterns. Namely, because bounded
+repetitions can grow exponentially by stacking them, it is possible to build a
+very large internal regex object from just a small pattern string. For example,
+the NFA built from the pattern `a{10}{10}{10}{10}{10}{10}{10}` is over 240MB.
+
+There are multiple size limit options in this crate. If one or more size limits
+are relevant for the object you&#39;re building, they will be configurable via
+methods on a corresponding `Config` type.
+
+# Crate features
+
+This crate has a dizzying number of features. The main idea is to be able to
+control how much stuff you pull in for your specific use case, since the full
+crate is quite large and can dramatically increase compile times and binary
+size.
+
+The most barebones but useful configuration is to disable all default features
+and enable only `dfa-search`. This will bring in just the DFA deserialization
+and search routines without any dependency on `std` or `alloc`. This does
+require generating and serializing a DFA, and then storing it somewhere, but
+it permits regex searches in freestanding or embedded environments.
+
+Because there are so many features, they are split into a few groups.
+
+The default set of features is: `std`, `syntax`, `perf`, `unicode`, `meta`,
+`nfa`, `dfa` and `hybrid`. Basically, the default is to enable everything
+except for development related features like `logging`.
+
+### Ecosystem features
+
+* **std** - Enables use of the standard library. In terms of APIs, this usually
+just means that error types implement the `std::error::Error` trait. Otherwise,
+`std` sometimes enables the code to be faster, for example, using a `HashMap`
+instead of a `BTreeMap`. (The `std` feature matters more for dependencies like
+`aho-corasick` and `memchr`, where `std` is required to enable certain classes
+of SIMD optimizations.) Enabling `std` automatically enables `alloc`.
+* **alloc** - Enables use of the `alloc` library. This is required for most
+APIs in this crate. The main exception is deserializing and searching with
+fully compiled DFAs.
+* **logging** - Adds a dependency on the `log` crate and makes this crate emit
+log messages of varying degrees of utility. The log messages are especially
+useful in trying to understand what the meta regex engine is doing.
+
+### Performance features
+
+* **perf** - Enables all of the below features.
+* **perf-inline** - When enabled, `inline(always)` is used in (many) strategic
+locations to help performance at the expense of longer compile times and
+increased binary size.
+* **perf-literal** - Enables all literal related optimizations.
+    * **perf-literal-substring** - Enables all single substring literal
+    optimizations. This includes adding a dependency on the `memchr` crate.
+    * **perf-literal-multisubstring** - Enables all multiple substring literal
+    optimizations. This includes adding a dependency on the `aho-corasick`
+    crate.
+
+### Unicode features
+
+* **unicode** -
+  Enables all Unicode features. This feature is enabled by default, and will
+  always cover all Unicode features, even if more are added in the future.
+* **unicode-age** -
+  Provide the data for the
+  [Unicode `Age` property](https://www.unicode.org/reports/tr44/tr44-24.html#Character_Age).
+  This makes it possible to use classes like `\p{Age:6.0}` to refer to all
+  codepoints first introduced in Unicode 6.0
+* **unicode-bool** -
+  Provide the data for numerous Unicode boolean properties. The full list
+  is not included here, but contains properties like `Alphabetic`, `Emoji`,
+  `Lowercase`, `Math`, `Uppercase` and `White_Space`.
+* **unicode-case** -
+  Provide the data for case insensitive matching using
+  [Unicode&#39;s &quot;simple loose matches&quot; specification](https://www.unicode.org/reports/tr18/#Simple_Loose_Matches).
+* **unicode-gencat** -
+  Provide the data for
+  [Unicode general categories](https://www.unicode.org/reports/tr44/tr44-24.html#General_Category_Values).
+  This includes, but is not limited to, `Decimal_Number`, `Letter`,
+  `Math_Symbol`, `Number` and `Punctuation`.
+* **unicode-perl** -
+  Provide the data for supporting the Unicode-aware Perl character classes,
+  corresponding to `\w`, `\s` and `\d`. This is also necessary for using
+  Unicode-aware word boundary assertions. Note that if this feature is
+  disabled, the `\s` and `\d` character classes are still available if the
+  `unicode-bool` and `unicode-gencat` features are enabled, respectively.
+* **unicode-script** -
+  Provide the data for
+  [Unicode scripts and script extensions](https://www.unicode.org/reports/tr24/).
+  This includes, but is not limited to, `Arabic`, `Cyrillic`, `Hebrew`,
+  `Latin` and `Thai`.
+* **unicode-segment** -
+  Provide the data necessary to provide the properties used to implement the
+  [Unicode text segmentation algorithms](https://www.unicode.org/reports/tr29/).
+  This enables using classes like `\p{gcb=Extend}`, `\p{wb=Katakana}` and
+  `\p{sb=ATerm}`.
+* **unicode-word-boundary** -
+  Enables support for Unicode word boundaries, i.e., `\b`, in regexes. When
+  this and `unicode-perl` are enabled, then data tables from `regex-syntax` are
+  used to implement Unicode word boundaries. However, if `regex-syntax` isn&#39;t
+  enabled as a dependency then one can still enable this feature. It will
+  cause `regex-automata` to bundle its own data table that would otherwise be
+  redundant with `regex-syntax`&#39;s table.
+
+### Regex engine features
+
+* **syntax** - Enables a dependency on `regex-syntax`. This makes APIs
+for building regex engines from pattern strings available. Without the
+`regex-syntax` dependency, the only way to build a regex engine is generally
+to deserialize a previously built DFA or to hand assemble an NFA using its
+[builder API](nfa::thompson::Builder). Once you have an NFA, you can build any
+of the regex engines in this crate. The `syntax` feature also enables `alloc`.
+* **meta** - Enables the meta regex engine. This also enables the `syntax` and
+`nfa-pikevm` features, as both are the minimal requirements needed. The meta
+regex engine benefits from enabling any of the other regex engines and will
+use them automatically when appropriate.
+* **nfa** - Enables all NFA related features below.
+    * **nfa-thompson** - Enables the Thompson NFA APIs. This enables `alloc`.
+    * **nfa-pikevm** - Enables the PikeVM regex engine. This enables
+    `nfa-thompson`.
+    * **nfa-backtrack** - Enables the bounded backtracker regex engine. This
+    enables `nfa-thompson`.
+* **dfa** - Enables all DFA related features below.
+    * **dfa-build** - Enables APIs for determinizing DFAs from NFAs. This
+    enables `nfa-thompson` and `dfa-search`.
+    * **dfa-search** - Enables APIs for searching with DFAs.
+    * **dfa-onepass** - Enables the one-pass DFA API. This enables
+    `nfa-thompson`.
+* **hybrid** - Enables the hybrid NFA/DFA or &quot;lazy DFA&quot; regex engine. This
+enables `alloc` and `nfa-thompson`.
+
 */
 
+</span><span class="comment">// We are no_std.
+</span><span class="attr">#![no_std]
+</span><span class="comment">// All APIs need docs!
 </span><span class="attr">#![deny(missing_docs)]
-#![cfg_attr(not(feature = <span class="string">&quot;std&quot;</span>), no_std)]
+</span><span class="comment">// Some intra-doc links are broken when certain features are disabled, so we
+// only bleat about it when most (all?) features are enabled. But when we do,
+// we block the build. Links need to work.
+</span><span class="attr">#![cfg_attr(
+    all(
+        feature = <span class="string">&quot;std&quot;</span>,
+        feature = <span class="string">&quot;nfa&quot;</span>,
+        feature = <span class="string">&quot;dfa&quot;</span>,
+        feature = <span class="string">&quot;hybrid&quot;
+    </span>),
+    deny(rustdoc::broken_intra_doc_links)
+)]
+</span><span class="comment">// Broken rustdoc links are very easy to come by when you start disabling
+// features. Namely, features tend to change imports, and imports change what&#39;s
+// available to link to.
+//
+// Basically, we just don&#39;t support rustdoc for anything other than the maximal
+// feature configuration. Other configurations will work, they just won&#39;t be
+// perfect.
+//
+// So here, we specifically allow them so we don&#39;t even get warned about them.
+</span><span class="attr">#![cfg_attr(
+    not(all(
+        feature = <span class="string">&quot;std&quot;</span>,
+        feature = <span class="string">&quot;nfa&quot;</span>,
+        feature = <span class="string">&quot;dfa&quot;</span>,
+        feature = <span class="string">&quot;hybrid&quot;
+    </span>)),
+    allow(rustdoc::broken_intra_doc_links)
+)]
+</span><span class="comment">// Kinda similar, but eliminating all of the dead code and unused import
+// warnings for every feature combo is a fool&#39;s errand. Instead, we just
+// suppress those, but still let them through in a common configuration when we
+// build most of everything.
+//
+// This does actually suggest that when features are disabled, we are actually
+// compiling more code than we need to be. And this is perhaps not so great
+// because disabling features is usually done in order to reduce compile times
+// by reducing the amount of code one compiles... However, usually, most of the
+// time this dead code is a relatively small amount from the &#39;util&#39; module.
+// But... I confess... There isn&#39;t a ton of visibility on this.
+//
+// I&#39;m happy to try to address this in a different way, but &quot;let&#39;s annotate
+// every function in &#39;util&#39; with some non-local combination of features&quot; just
+// cannot be the way forward.
+</span><span class="attr">#![cfg_attr(
+    not(all(
+        feature = <span class="string">&quot;std&quot;</span>,
+        feature = <span class="string">&quot;nfa&quot;</span>,
+        feature = <span class="string">&quot;dfa&quot;</span>,
+        feature = <span class="string">&quot;hybrid&quot;</span>,
+        feature = <span class="string">&quot;perf-literal-substring&quot;</span>,
+        feature = <span class="string">&quot;perf-literal-multisubstring&quot;</span>,
+    )),
+    allow(dead_code, unused_imports, unused_variables)
+)]
+</span><span class="comment">// We generally want all types to impl Debug.
+</span><span class="attr">#![warn(missing_debug_implementations)]
+</span><span class="comment">// No clue why this thing is still unstable because it&#39;s pretty amazing. This
+// adds Cargo feature annotations to items in the rustdoc output. Which is
+// sadly hugely beneficial for this crate due to the number of features.
+</span><span class="attr">#![cfg_attr(docsrs, feature(doc_auto_cfg))]
 
-#[cfg(feature = <span class="string">&quot;std&quot;</span>)]
-</span><span class="kw">extern crate </span>core;
+</span><span class="comment">// I have literally never tested this crate on 16-bit, so it is quite
+// suspicious to advertise support for it. But... the regex crate, at time
+// of writing, at least claims to support it by not doing any conditional
+// compilation based on the target pointer width. So I guess I remain
+// consistent with that here.
+//
+// If you are here because you&#39;re on a 16-bit system and you were somehow using
+// the regex crate previously, please file an issue. Please be prepared to
+// provide some kind of reproduction or carve out some path to getting 16-bit
+// working in CI. (Via qemu?)
+</span><span class="attr">#[cfg(not(any(
+    target_pointer_width = <span class="string">&quot;16&quot;</span>,
+    target_pointer_width = <span class="string">&quot;32&quot;</span>,
+    target_pointer_width = <span class="string">&quot;64&quot;
+</span>)))]
+</span><span class="macro">compile_error!</span>(<span class="string">&quot;not supported on non-{16,32,64}, please file an issue&quot;</span>);
 
-<span class="attr">#[cfg(all(test, feature = <span class="string">&quot;transducer&quot;</span>))]
-</span><span class="kw">extern crate </span>bstr;
-<span class="attr">#[cfg(feature = <span class="string">&quot;transducer&quot;</span>)]
-</span><span class="kw">extern crate </span>fst;
-<span class="attr">#[cfg(feature = <span class="string">&quot;std&quot;</span>)]
-</span><span class="kw">extern crate </span>regex_syntax;
+<span class="attr">#[cfg(any(test, feature = <span class="string">&quot;std&quot;</span>))]
+</span><span class="kw">extern crate </span>std;
 
-<span class="kw">pub use </span>dense::DenseDFA;
-<span class="kw">pub use </span>dfa::DFA;
-<span class="attr">#[cfg(feature = <span class="string">&quot;std&quot;</span>)]
-</span><span class="kw">pub use </span>error::{Error, ErrorKind};
-<span class="kw">pub use </span>regex::Regex;
-<span class="attr">#[cfg(feature = <span class="string">&quot;std&quot;</span>)]
-</span><span class="kw">pub use </span>regex::RegexBuilder;
-<span class="kw">pub use </span>sparse::SparseDFA;
-<span class="kw">pub use </span>state_id::StateID;
+<span class="attr">#[cfg(feature = <span class="string">&quot;alloc&quot;</span>)]
+</span><span class="kw">extern crate </span>alloc;
 
-<span class="kw">mod </span>byteorder;
-<span class="kw">mod </span>classes;
-<span class="attr">#[path = <span class="string">&quot;dense.rs&quot;</span>]
-</span><span class="kw">mod </span>dense_imp;
-<span class="attr">#[cfg(feature = <span class="string">&quot;std&quot;</span>)]
-</span><span class="kw">mod </span>determinize;
-<span class="kw">mod </span>dfa;
-<span class="attr">#[cfg(feature = <span class="string">&quot;std&quot;</span>)]
-</span><span class="kw">mod </span>error;
-<span class="attr">#[cfg(feature = <span class="string">&quot;std&quot;</span>)]
-</span><span class="kw">mod </span>minimize;
-<span class="attr">#[cfg(feature = <span class="string">&quot;std&quot;</span>)]
-#[doc(hidden)]
+<span class="attr">#[cfg(doctest)]
+</span><span class="macro">doc_comment::doctest!</span>(<span class="string">&quot;../README.md&quot;</span>);
+
+<span class="attr">#[doc(inline)]
+</span><span class="kw">pub use </span><span class="kw">crate</span>::util::primitives::PatternID;
+<span class="kw">pub use </span><span class="kw">crate</span>::util::search::<span class="kw-2">*</span>;
+
+<span class="attr">#[macro_use]
+</span><span class="kw">mod </span>macros;
+
+<span class="attr">#[cfg(any(feature = <span class="string">&quot;dfa-search&quot;</span>, feature = <span class="string">&quot;dfa-onepass&quot;</span>))]
+</span><span class="kw">pub mod </span>dfa;
+<span class="attr">#[cfg(feature = <span class="string">&quot;hybrid&quot;</span>)]
+</span><span class="kw">pub mod </span>hybrid;
+<span class="attr">#[cfg(feature = <span class="string">&quot;meta&quot;</span>)]
+</span><span class="kw">pub mod </span>meta;
+<span class="attr">#[cfg(feature = <span class="string">&quot;nfa-thompson&quot;</span>)]
 </span><span class="kw">pub mod </span>nfa;
-<span class="kw">mod </span>regex;
-<span class="attr">#[path = <span class="string">&quot;sparse.rs&quot;</span>]
-</span><span class="kw">mod </span>sparse_imp;
-<span class="attr">#[cfg(feature = <span class="string">&quot;std&quot;</span>)]
-</span><span class="kw">mod </span>sparse_set;
-<span class="kw">mod </span>state_id;
-<span class="attr">#[cfg(feature = <span class="string">&quot;transducer&quot;</span>)]
-</span><span class="kw">mod </span>transducer;
-
-<span class="doccomment">/// Types and routines specific to dense DFAs.
-///
-/// This module is the home of [`DenseDFA`](enum.DenseDFA.html) and each of its
-/// corresponding variant DFA types, such as [`Standard`](struct.Standard.html)
-/// and [`ByteClass`](struct.ByteClass.html).
-///
-/// This module also contains a [builder](struct.Builder.html) for
-/// configuring the construction of a dense DFA.
-</span><span class="kw">pub mod </span>dense {
-    <span class="kw">pub use </span>dense_imp::<span class="kw-2">*</span>;
-}
-
-<span class="doccomment">/// Types and routines specific to sparse DFAs.
-///
-/// This module is the home of [`SparseDFA`](enum.SparseDFA.html) and each of
-/// its corresponding variant DFA types, such as
-/// [`Standard`](struct.Standard.html) and
-/// [`ByteClass`](struct.ByteClass.html).
-///
-/// Unlike the [`dense`](../dense/index.html) module, this module does not
-/// contain a builder specific for sparse DFAs. Instead, the intended way to
-/// build a sparse DFA is either by using a default configuration with its
-/// [constructor](enum.SparseDFA.html#method.new),
-/// or by first
-/// [configuring the construction of a dense DFA](../dense/struct.Builder.html)
-/// and then calling
-/// [`DenseDFA::to_sparse`](../enum.DenseDFA.html#method.to_sparse).
-</span><span class="kw">pub mod </span>sparse {
-    <span class="kw">pub use </span>sparse_imp::<span class="kw-2">*</span>;
-}
+<span class="kw">pub mod </span>util;
 </code></pre></div></section></main></body></html>

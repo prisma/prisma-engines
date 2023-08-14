@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/nix/store/jnqxxv1xi811ni996b002f4jnyz38xck-vendor-cargo-deps/c19b7c6f923b580ac259164a89f2577984ad5ab09ee9d583b888f934adbbe8d0/chrono-0.4.20/src/naive/time/mod.rs`."><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../../static.files/rustdoc-f3501f0f5ae15dfb.css" id="mainThemeStyle"><div id="rustdoc-vars" data-root-path="../../../../" data-static-root-path="../../../../static.files/" data-current-crate="chrono" data-themes="" data-resource-suffix="" data-rustdoc-version="1.71.0 (8ede3aae2 2023-07-12)" data-search-js="search-4926e5fc22a5646a.js" data-settings-js="settings-de11bff964e9d4e5.js" data-settings-css="settings-8c76f75bfb6bd192.css" data-theme-light-css="light-0f8c037637f9eb3e.css" data-theme-dark-css="dark-1097f8e92a01e3cf.css" data-theme-ayu-css="ayu-614652228113ac93.css" ></div><script src="../../../../static.files/storage-62ce34ea385b278a.js"></script><script defer src="../../../../static.files/source-script-11255107d0a65077.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../static.files/main-f0540c1d82cde29b.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../../../../static.files/light-0f8c037637f9eb3e.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../../../../static.files/dark-1097f8e92a01e3cf.css"><link rel="stylesheet" href="../../../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../../../chrono/index.html"><img class="rust-logo" src="../../../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/nix/store/yf45a1rayffhnidhgyjynpyhr9lqkd09-vendor-cargo-deps/c19b7c6f923b580ac259164a89f2577984ad5ab09ee9d583b888f934adbbe8d0/chrono-0.4.26/src/naive/time/mod.rs`."><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../../static.files/rustdoc-f3501f0f5ae15dfb.css" id="mainThemeStyle"><div id="rustdoc-vars" data-root-path="../../../../" data-static-root-path="../../../../static.files/" data-current-crate="chrono" data-themes="" data-resource-suffix="" data-rustdoc-version="1.71.0 (8ede3aae2 2023-07-12)" data-search-js="search-4926e5fc22a5646a.js" data-settings-js="settings-de11bff964e9d4e5.js" data-settings-css="settings-8c76f75bfb6bd192.css" data-theme-light-css="light-0f8c037637f9eb3e.css" data-theme-dark-css="dark-1097f8e92a01e3cf.css" data-theme-ayu-css="ayu-614652228113ac93.css" ></div><script src="../../../../static.files/storage-62ce34ea385b278a.js"></script><script defer src="../../../../static.files/source-script-11255107d0a65077.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../static.files/main-f0540c1d82cde29b.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../../../../static.files/light-0f8c037637f9eb3e.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../../../../static.files/dark-1097f8e92a01e3cf.css"><link rel="stylesheet" href="../../../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../../../chrono/index.html"><img class="rust-logo" src="../../../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -1412,6 +1412,26 @@
 <a href="#1412" id="1412">1412</a>
 <a href="#1413" id="1413">1413</a>
 <a href="#1414" id="1414">1414</a>
+<a href="#1415" id="1415">1415</a>
+<a href="#1416" id="1416">1416</a>
+<a href="#1417" id="1417">1417</a>
+<a href="#1418" id="1418">1418</a>
+<a href="#1419" id="1419">1419</a>
+<a href="#1420" id="1420">1420</a>
+<a href="#1421" id="1421">1421</a>
+<a href="#1422" id="1422">1422</a>
+<a href="#1423" id="1423">1423</a>
+<a href="#1424" id="1424">1424</a>
+<a href="#1425" id="1425">1425</a>
+<a href="#1426" id="1426">1426</a>
+<a href="#1427" id="1427">1427</a>
+<a href="#1428" id="1428">1428</a>
+<a href="#1429" id="1429">1429</a>
+<a href="#1430" id="1430">1430</a>
+<a href="#1431" id="1431">1431</a>
+<a href="#1432" id="1432">1432</a>
+<a href="#1433" id="1433">1433</a>
+<a href="#1434" id="1434">1434</a>
 </pre></div><pre class="rust"><code><span class="comment">// This is a part of Chrono.
 // See README.md and LICENSE.txt for details.
 
@@ -1422,14 +1442,15 @@
 <span class="kw">use </span>core::ops::{Add, AddAssign, Sub, SubAssign};
 <span class="kw">use </span>core::{fmt, str};
 
-<span class="kw">use </span>num_integer::div_mod_floor;
 <span class="attr">#[cfg(feature = <span class="string">&quot;rkyv&quot;</span>)]
 </span><span class="kw">use </span>rkyv::{Archive, Deserialize, Serialize};
 
 <span class="attr">#[cfg(any(feature = <span class="string">&quot;alloc&quot;</span>, feature = <span class="string">&quot;std&quot;</span>, test))]
 </span><span class="kw">use </span><span class="kw">crate</span>::format::DelayedFormat;
-<span class="kw">use </span><span class="kw">crate</span>::format::{parse, ParseError, ParseResult, Parsed, StrftimeItems};
-<span class="kw">use </span><span class="kw">crate</span>::format::{Fixed, Item, Numeric, Pad};
+<span class="kw">use </span><span class="kw">crate</span>::format::{
+    parse, parse_and_remainder, write_hundreds, Fixed, Item, Numeric, Pad, ParseError, ParseResult,
+    Parsed, StrftimeItems,
+};
 <span class="kw">use </span><span class="kw">crate</span>::oldtime::Duration <span class="kw">as </span>OldDuration;
 <span class="kw">use </span><span class="kw">crate</span>::Timelike;
 
@@ -1488,13 +1509,13 @@
 /// All methods accepting fractional seconds will accept such values.
 ///
 /// ```
-/// use chrono::{NaiveDate, NaiveTime, Utc, TimeZone};
+/// use chrono::{NaiveDate, NaiveTime, Utc};
 ///
-/// let t = NaiveTime::from_hms_milli(8, 59, 59, 1_000);
+/// let t = NaiveTime::from_hms_milli_opt(8, 59, 59, 1_000).unwrap();
 ///
-/// let dt1 = NaiveDate::from_ymd(2015, 7, 1).and_hms_micro(8, 59, 59, 1_000_000);
+/// let dt1 = NaiveDate::from_ymd_opt(2015, 7, 1).unwrap().and_hms_micro_opt(8, 59, 59, 1_000_000).unwrap();
 ///
-/// let dt2 = Utc.ymd(2015, 6, 30).and_hms_nano(23, 59, 59, 1_000_000_000);
+/// let dt2 = NaiveDate::from_ymd_opt(2015, 6, 30).unwrap().and_hms_nano_opt(23, 59, 59, 1_000_000_000).unwrap().and_local_timezone(Utc).unwrap();
 /// # let _ = (t, dt1, dt2);
 /// ```
 ///
@@ -1575,9 +1596,9 @@
 /// will be represented as the second part being 60, as required by ISO 8601.
 ///
 /// ```
-/// use chrono::{Utc, TimeZone};
+/// use chrono::{Utc, NaiveDate};
 ///
-/// let dt = Utc.ymd(2015, 6, 30).and_hms_milli(23, 59, 59, 1_000);
+/// let dt = NaiveDate::from_ymd_opt(2015, 6, 30).unwrap().and_hms_milli_opt(23, 59, 59, 1_000).unwrap().and_local_timezone(Utc).unwrap();
 /// assert_eq!(format!(&quot;{:?}&quot;, dt), &quot;2015-06-30T23:59:60Z&quot;);
 /// ```
 ///
@@ -1589,12 +1610,12 @@
 /// and would be read back to the next non-leap second.
 ///
 /// ```
-/// use chrono::{DateTime, Utc, TimeZone};
+/// use chrono::{DateTime, Utc, TimeZone, NaiveDate};
 ///
-/// let dt = Utc.ymd(2015, 6, 30).and_hms_milli(23, 56, 4, 1_000);
+/// let dt = NaiveDate::from_ymd_opt(2015, 6, 30).unwrap().and_hms_milli_opt(23, 56, 4, 1_000).unwrap().and_local_timezone(Utc).unwrap();
 /// assert_eq!(format!(&quot;{:?}&quot;, dt), &quot;2015-06-30T23:56:05Z&quot;);
 ///
-/// let dt = Utc.ymd(2015, 6, 30).and_hms(23, 56, 5);
+/// let dt = Utc.with_ymd_and_hms(2015, 6, 30, 23, 56, 5).unwrap();
 /// assert_eq!(format!(&quot;{:?}&quot;, dt), &quot;2015-06-30T23:56:05Z&quot;);
 /// assert_eq!(DateTime::parse_from_rfc3339(&quot;2015-06-30T23:56:05Z&quot;).unwrap(), dt);
 /// ```
@@ -1608,6 +1629,17 @@
     frac: u32,
 }
 
+<span class="attr">#[cfg(feature = <span class="string">&quot;arbitrary&quot;</span>)]
+</span><span class="kw">impl </span>arbitrary::Arbitrary&lt;<span class="lifetime">&#39;_</span>&gt; <span class="kw">for </span>NaiveTime {
+    <span class="kw">fn </span>arbitrary(u: <span class="kw-2">&amp;mut </span>arbitrary::Unstructured) -&gt; arbitrary::Result&lt;NaiveTime&gt; {
+        <span class="kw">let </span>secs = u.int_in_range(<span class="number">0</span>..=<span class="number">86_399</span>)<span class="question-mark">?</span>;
+        <span class="kw">let </span>nano = u.int_in_range(<span class="number">0</span>..=<span class="number">1_999_999_999</span>)<span class="question-mark">?</span>;
+        <span class="kw">let </span>time = NaiveTime::from_num_seconds_from_midnight_opt(secs, nano)
+            .expect(<span class="string">&quot;Could not generate a valid chrono::NaiveTime. It looks like implementation of Arbitrary for NaiveTime is erroneous.&quot;</span>);
+        <span class="prelude-val">Ok</span>(time)
+    }
+}
+
 <span class="kw">impl </span>NaiveTime {
     <span class="doccomment">/// Makes a new `NaiveTime` from hour, minute and second.
     ///
@@ -1615,19 +1647,9 @@
     /// use `NaiveTime::from_hms_*` methods with a subsecond parameter instead.
     ///
     /// Panics on invalid hour, minute and/or second.
-    ///
-    /// # Example
-    ///
-    /// ```
-    /// use chrono::{NaiveTime, Timelike};
-    ///
-    /// let t = NaiveTime::from_hms(23, 56, 4);
-    /// assert_eq!(t.hour(), 23);
-    /// assert_eq!(t.minute(), 56);
-    /// assert_eq!(t.second(), 4);
-    /// assert_eq!(t.nanosecond(), 0);
-    /// ```
-    </span><span class="attr">#[inline]
+    </span><span class="attr">#[deprecated(since = <span class="string">&quot;0.4.23&quot;</span>, note = <span class="string">&quot;use `from_hms_opt()` instead&quot;</span>)]
+    #[inline]
+    #[must_use]
     </span><span class="kw">pub fn </span>from_hms(hour: u32, min: u32, sec: u32) -&gt; NaiveTime {
         NaiveTime::from_hms_opt(hour, min, sec).expect(<span class="string">&quot;invalid time&quot;</span>)
     }
@@ -1653,7 +1675,8 @@
     /// assert!(from_hms_opt(23, 59, 60).is_none());
     /// ```
     </span><span class="attr">#[inline]
-    </span><span class="kw">pub fn </span>from_hms_opt(hour: u32, min: u32, sec: u32) -&gt; <span class="prelude-ty">Option</span>&lt;NaiveTime&gt; {
+    #[must_use]
+    </span><span class="kw">pub const fn </span>from_hms_opt(hour: u32, min: u32, sec: u32) -&gt; <span class="prelude-ty">Option</span>&lt;NaiveTime&gt; {
         NaiveTime::from_hms_nano_opt(hour, min, sec, <span class="number">0</span>)
     }
 
@@ -1663,19 +1686,9 @@
     /// in order to represent the [leap second](#leap-second-handling).
     ///
     /// Panics on invalid hour, minute, second and/or millisecond.
-    ///
-    /// # Example
-    ///
-    /// ```
-    /// use chrono::{NaiveTime, Timelike};
-    ///
-    /// let t = NaiveTime::from_hms_milli(23, 56, 4, 12);
-    /// assert_eq!(t.hour(), 23);
-    /// assert_eq!(t.minute(), 56);
-    /// assert_eq!(t.second(), 4);
-    /// assert_eq!(t.nanosecond(), 12_000_000);
-    /// ```
-    </span><span class="attr">#[inline]
+    </span><span class="attr">#[deprecated(since = <span class="string">&quot;0.4.23&quot;</span>, note = <span class="string">&quot;use `from_hms_milli_opt()` instead&quot;</span>)]
+    #[inline]
+    #[must_use]
     </span><span class="kw">pub fn </span>from_hms_milli(hour: u32, min: u32, sec: u32, milli: u32) -&gt; NaiveTime {
         NaiveTime::from_hms_milli_opt(hour, min, sec, milli).expect(<span class="string">&quot;invalid time&quot;</span>)
     }
@@ -1703,6 +1716,7 @@
     /// assert!(from_hmsm_opt(23, 59, 59, 2_000).is_none());
     /// ```
     </span><span class="attr">#[inline]
+    #[must_use]
     </span><span class="kw">pub fn </span>from_hms_milli_opt(hour: u32, min: u32, sec: u32, milli: u32) -&gt; <span class="prelude-ty">Option</span>&lt;NaiveTime&gt; {
         milli
             .checked_mul(<span class="number">1_000_000</span>)
@@ -1715,19 +1729,9 @@
     /// in order to represent the [leap second](#leap-second-handling).
     ///
     /// Panics on invalid hour, minute, second and/or microsecond.
-    ///
-    /// # Example
-    ///
-    /// ```
-    /// use chrono::{NaiveTime, Timelike};
-    ///
-    /// let t = NaiveTime::from_hms_micro(23, 56, 4, 12_345);
-    /// assert_eq!(t.hour(), 23);
-    /// assert_eq!(t.minute(), 56);
-    /// assert_eq!(t.second(), 4);
-    /// assert_eq!(t.nanosecond(), 12_345_000);
-    /// ```
-    </span><span class="attr">#[inline]
+    </span><span class="attr">#[deprecated(since = <span class="string">&quot;0.4.23&quot;</span>, note = <span class="string">&quot;use `from_hms_micro_opt()` instead&quot;</span>)]
+    #[inline]
+    #[must_use]
     </span><span class="kw">pub fn </span>from_hms_micro(hour: u32, min: u32, sec: u32, micro: u32) -&gt; NaiveTime {
         NaiveTime::from_hms_micro_opt(hour, min, sec, micro).expect(<span class="string">&quot;invalid time&quot;</span>)
     }
@@ -1755,6 +1759,7 @@
     /// assert!(from_hmsu_opt(23, 59, 59, 2_000_000).is_none());
     /// ```
     </span><span class="attr">#[inline]
+    #[must_use]
     </span><span class="kw">pub fn </span>from_hms_micro_opt(hour: u32, min: u32, sec: u32, micro: u32) -&gt; <span class="prelude-ty">Option</span>&lt;NaiveTime&gt; {
         micro.checked_mul(<span class="number">1_000</span>).and_then(|nano| NaiveTime::from_hms_nano_opt(hour, min, sec, nano))
     }
@@ -1765,19 +1770,9 @@
     /// in order to represent the [leap second](#leap-second-handling).
     ///
     /// Panics on invalid hour, minute, second and/or nanosecond.
-    ///
-    /// # Example
-    ///
-    /// ```
-    /// use chrono::{NaiveTime, Timelike};
-    ///
-    /// let t = NaiveTime::from_hms_nano(23, 56, 4, 12_345_678);
-    /// assert_eq!(t.hour(), 23);
-    /// assert_eq!(t.minute(), 56);
-    /// assert_eq!(t.second(), 4);
-    /// assert_eq!(t.nanosecond(), 12_345_678);
-    /// ```
-    </span><span class="attr">#[inline]
+    </span><span class="attr">#[deprecated(since = <span class="string">&quot;0.4.23&quot;</span>, note = <span class="string">&quot;use `from_hms_nano_opt()` instead&quot;</span>)]
+    #[inline]
+    #[must_use]
     </span><span class="kw">pub fn </span>from_hms_nano(hour: u32, min: u32, sec: u32, nano: u32) -&gt; NaiveTime {
         NaiveTime::from_hms_nano_opt(hour, min, sec, nano).expect(<span class="string">&quot;invalid time&quot;</span>)
     }
@@ -1805,7 +1800,8 @@
     /// assert!(from_hmsn_opt(23, 59, 59, 2_000_000_000).is_none());
     /// ```
     </span><span class="attr">#[inline]
-    </span><span class="kw">pub fn </span>from_hms_nano_opt(hour: u32, min: u32, sec: u32, nano: u32) -&gt; <span class="prelude-ty">Option</span>&lt;NaiveTime&gt; {
+    #[must_use]
+    </span><span class="kw">pub const fn </span>from_hms_nano_opt(hour: u32, min: u32, sec: u32, nano: u32) -&gt; <span class="prelude-ty">Option</span>&lt;NaiveTime&gt; {
         <span class="kw">if </span>hour &gt;= <span class="number">24 </span>|| min &gt;= <span class="number">60 </span>|| sec &gt;= <span class="number">60 </span>|| nano &gt;= <span class="number">2_000_000_000 </span>{
             <span class="kw">return </span><span class="prelude-val">None</span>;
         }
@@ -1819,19 +1815,9 @@
     /// in order to represent the [leap second](#leap-second-handling).
     ///
     /// Panics on invalid number of seconds and/or nanosecond.
-    ///
-    /// # Example
-    ///
-    /// ```
-    /// use chrono::{NaiveTime, Timelike};
-    ///
-    /// let t = NaiveTime::from_num_seconds_from_midnight(86164, 12_345_678);
-    /// assert_eq!(t.hour(), 23);
-    /// assert_eq!(t.minute(), 56);
-    /// assert_eq!(t.second(), 4);
-    /// assert_eq!(t.nanosecond(), 12_345_678);
-    /// ```
-    </span><span class="attr">#[inline]
+    </span><span class="attr">#[deprecated(since = <span class="string">&quot;0.4.23&quot;</span>, note = <span class="string">&quot;use `from_num_seconds_from_midnight_opt()` instead&quot;</span>)]
+    #[inline]
+    #[must_use]
     </span><span class="kw">pub fn </span>from_num_seconds_from_midnight(secs: u32, nano: u32) -&gt; NaiveTime {
         NaiveTime::from_num_seconds_from_midnight_opt(secs, nano).expect(<span class="string">&quot;invalid time&quot;</span>)
     }
@@ -1857,7 +1843,8 @@
     /// assert!(from_nsecs_opt(86399, 2_000_000_000).is_none());
     /// ```
     </span><span class="attr">#[inline]
-    </span><span class="kw">pub fn </span>from_num_seconds_from_midnight_opt(secs: u32, nano: u32) -&gt; <span class="prelude-ty">Option</span>&lt;NaiveTime&gt; {
+    #[must_use]
+    </span><span class="kw">pub const fn </span>from_num_seconds_from_midnight_opt(secs: u32, nano: u32) -&gt; <span class="prelude-ty">Option</span>&lt;NaiveTime&gt; {
         <span class="kw">if </span>secs &gt;= <span class="number">86_400 </span>|| nano &gt;= <span class="number">2_000_000_000 </span>{
             <span class="kw">return </span><span class="prelude-val">None</span>;
         }
@@ -1876,9 +1863,9 @@
     /// let parse_from_str = NaiveTime::parse_from_str;
     ///
     /// assert_eq!(parse_from_str(&quot;23:56:04&quot;, &quot;%H:%M:%S&quot;),
-    ///            Ok(NaiveTime::from_hms(23, 56, 4)));
+    ///            Ok(NaiveTime::from_hms_opt(23, 56, 4).unwrap()));
     /// assert_eq!(parse_from_str(&quot;pm012345.6789&quot;, &quot;%p%I%M%S%.f&quot;),
-    ///            Ok(NaiveTime::from_hms_micro(13, 23, 45, 678_900)));
+    ///            Ok(NaiveTime::from_hms_micro_opt(13, 23, 45, 678_900).unwrap()));
     /// ```
     ///
     /// Date and offset is ignored for the purpose of parsing.
@@ -1887,7 +1874,7 @@
     /// # use chrono::NaiveTime;
     /// # let parse_from_str = NaiveTime::parse_from_str;
     /// assert_eq!(parse_from_str(&quot;2014-5-17T12:34:56+09:30&quot;, &quot;%Y-%m-%dT%H:%M:%S%z&quot;),
-    ///            Ok(NaiveTime::from_hms(12, 34, 56)));
+    ///            Ok(NaiveTime::from_hms_opt(12, 34, 56).unwrap()));
     /// ```
     ///
     /// [Leap seconds](#leap-second-handling) are correctly handled by
@@ -1898,7 +1885,7 @@
     /// # use chrono::NaiveTime;
     /// # let parse_from_str = NaiveTime::parse_from_str;
     /// assert_eq!(parse_from_str(&quot;08:59:60.123&quot;, &quot;%H:%M:%S%.f&quot;),
-    ///            Ok(NaiveTime::from_hms_milli(8, 59, 59, 1_123)));
+    ///            Ok(NaiveTime::from_hms_milli_opt(8, 59, 59, 1_123).unwrap()));
     /// ```
     ///
     /// Missing seconds are assumed to be zero,
@@ -1908,7 +1895,7 @@
     /// # use chrono::NaiveTime;
     /// # let parse_from_str = NaiveTime::parse_from_str;
     /// assert_eq!(parse_from_str(&quot;7:15&quot;, &quot;%H:%M&quot;),
-    ///            Ok(NaiveTime::from_hms(7, 15, 0)));
+    ///            Ok(NaiveTime::from_hms_opt(7, 15, 0).unwrap()));
     ///
     /// assert!(parse_from_str(&quot;04m33s&quot;, &quot;%Mm%Ss&quot;).is_err());
     /// assert!(parse_from_str(&quot;12&quot;, &quot;%H&quot;).is_err());
@@ -1931,6 +1918,28 @@
         parsed.to_naive_time()
     }
 
+    <span class="doccomment">/// Parses a string from a user-specified format into a new `NaiveTime` value, and a slice with
+    /// the remaining portion of the string.
+    /// See the [`format::strftime` module](../format/strftime/index.html)
+    /// on the supported escape sequences.
+    ///
+    /// Similar to [`parse_from_str`](#method.parse_from_str).
+    ///
+    /// # Example
+    ///
+    /// ```rust
+    /// # use chrono::{NaiveTime};
+    /// let (time, remainder) = NaiveTime::parse_and_remainder(
+    ///     &quot;3h4m33s trailing text&quot;, &quot;%-Hh%-Mm%-Ss&quot;).unwrap();
+    /// assert_eq!(time, NaiveTime::from_hms_opt(3, 4, 33).unwrap());
+    /// assert_eq!(remainder, &quot; trailing text&quot;);
+    /// ```
+    </span><span class="kw">pub fn </span>parse_and_remainder&lt;<span class="lifetime">&#39;a</span>&gt;(s: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str, fmt: <span class="kw-2">&amp;</span>str) -&gt; ParseResult&lt;(NaiveTime, <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str)&gt; {
+        <span class="kw">let </span><span class="kw-2">mut </span>parsed = Parsed::new();
+        <span class="kw">let </span>remainder = parse_and_remainder(<span class="kw-2">&amp;mut </span>parsed, s, StrftimeItems::new(fmt))<span class="question-mark">?</span>;
+        parsed.to_naive_time().map(|t| (t, remainder))
+    }
+
     <span class="doccomment">/// Adds given `Duration` to the current time,
     /// and also returns the number of *seconds*
     /// in the integral number of days ignored from the addition.
@@ -1941,7 +1950,7 @@
     /// ```
     /// use chrono::{Duration, NaiveTime};
     ///
-    /// let from_hms = NaiveTime::from_hms;
+    /// let from_hms = |h, m, s| { NaiveTime::from_hms_opt(h, m, s).unwrap() };
     ///
     /// assert_eq!(from_hms(3, 4, 5).overflowing_add_signed(Duration::hours(11)),
     ///            (from_hms(14, 4, 5), 0));
@@ -1950,7 +1959,7 @@
     /// assert_eq!(from_hms(3, 4, 5).overflowing_add_signed(Duration::hours(-7)),
     ///            (from_hms(20, 4, 5), -86_400));
     /// ```
-    </span><span class="attr">#[cfg_attr(feature = <span class="string">&quot;cargo-clippy&quot;</span>, allow(cyclomatic_complexity))]
+    </span><span class="attr">#[must_use]
     </span><span class="kw">pub fn </span>overflowing_add_signed(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="kw-2">mut </span>rhs: OldDuration) -&gt; (NaiveTime, i64) {
         <span class="kw">let </span><span class="kw-2">mut </span>secs = <span class="self">self</span>.secs;
         <span class="kw">let </span><span class="kw-2">mut </span>frac = <span class="self">self</span>.frac;
@@ -1999,8 +2008,8 @@
             frac -= <span class="number">1_000_000_000</span>;
             secs += <span class="number">1</span>;
         }
-        <span class="macro">debug_assert!</span>(-<span class="number">86_400 </span>&lt;= secs &amp;&amp; secs &lt; <span class="number">2 </span>* <span class="number">86_400</span>);
-        <span class="macro">debug_assert!</span>(<span class="number">0 </span>&lt;= frac &amp;&amp; frac &lt; <span class="number">1_000_000_000</span>);
+        <span class="macro">debug_assert!</span>((-<span class="number">86_400</span>..<span class="number">2 </span>* <span class="number">86_400</span>).contains(<span class="kw-2">&amp;</span>secs));
+        <span class="macro">debug_assert!</span>((<span class="number">0</span>..<span class="number">1_000_000_000</span>).contains(<span class="kw-2">&amp;</span>frac));
 
         <span class="kw">if </span>secs &lt; <span class="number">0 </span>{
             secs += <span class="number">86_400</span>;
@@ -2009,7 +2018,7 @@
             secs -= <span class="number">86_400</span>;
             morerhssecs += <span class="number">86_400</span>;
         }
-        <span class="macro">debug_assert!</span>(<span class="number">0 </span>&lt;= secs &amp;&amp; secs &lt; <span class="number">86_400</span>);
+        <span class="macro">debug_assert!</span>((<span class="number">0</span>..<span class="number">86_400</span>).contains(<span class="kw-2">&amp;</span>secs));
 
         (NaiveTime { secs: secs <span class="kw">as </span>u32, frac: frac <span class="kw">as </span>u32 }, morerhssecs)
     }
@@ -2024,7 +2033,7 @@
     /// ```
     /// use chrono::{Duration, NaiveTime};
     ///
-    /// let from_hms = NaiveTime::from_hms;
+    /// let from_hms = |h, m, s| { NaiveTime::from_hms_opt(h, m, s).unwrap() };
     ///
     /// assert_eq!(from_hms(3, 4, 5).overflowing_sub_signed(Duration::hours(2)),
     ///            (from_hms(1, 4, 5), 0));
@@ -2034,6 +2043,7 @@
     ///            (from_hms(1, 4, 5), -86_400));
     /// ```
     </span><span class="attr">#[inline]
+    #[must_use]
     </span><span class="kw">pub fn </span>overflowing_sub_signed(<span class="kw-2">&amp;</span><span class="self">self</span>, rhs: OldDuration) -&gt; (NaiveTime, i64) {
         <span class="kw">let </span>(time, rhs) = <span class="self">self</span>.overflowing_add_signed(-rhs);
         (time, -rhs) <span class="comment">// safe to negate, rhs is within +/- (2^63 / 1000)
@@ -2054,7 +2064,7 @@
     /// ```
     /// use chrono::{Duration, NaiveTime};
     ///
-    /// let from_hmsm = NaiveTime::from_hms_milli;
+    /// let from_hmsm = |h, m, s, milli| { NaiveTime::from_hms_milli_opt(h, m, s, milli).unwrap() };
     /// let since = NaiveTime::signed_duration_since;
     ///
     /// assert_eq!(since(from_hmsm(3, 5, 7, 900), from_hmsm(3, 5, 7, 900)),
@@ -2080,7 +2090,7 @@
     ///
     /// ```
     /// # use chrono::{Duration, NaiveTime};
-    /// # let from_hmsm = NaiveTime::from_hms_milli;
+    /// # let from_hmsm = |h, m, s, milli| { NaiveTime::from_hms_milli_opt(h, m, s, milli).unwrap() };
     /// # let since = NaiveTime::signed_duration_since;
     /// assert_eq!(since(from_hmsm(3, 0, 59, 1_000), from_hmsm(3, 0, 59, 0)),
     ///            Duration::seconds(1));
@@ -2093,6 +2103,7 @@
     /// assert_eq!(since(from_hmsm(3, 0, 59, 1_000), from_hmsm(2, 59, 59, 1_000)),
     ///            Duration::seconds(61));
     /// ```
+    </span><span class="attr">#[must_use]
     </span><span class="kw">pub fn </span>signed_duration_since(<span class="self">self</span>, rhs: NaiveTime) -&gt; OldDuration {
         <span class="comment">//     |    |    :leap|    |    |    |    |    |    |    :leap|    |
         //     |    |    :    |    |    |    |    |    |    |    :    |    |
@@ -2111,13 +2122,7 @@
 
         <span class="comment">// `secs` may contain a leap second yet to be counted
         </span><span class="kw">let </span>adjust = <span class="kw">match </span><span class="self">self</span>.secs.cmp(<span class="kw-2">&amp;</span>rhs.secs) {
-            Ordering::Greater =&gt; {
-                <span class="kw">if </span>rhs.frac &gt;= <span class="number">1_000_000_000 </span>{
-                    <span class="number">1
-                </span>} <span class="kw">else </span>{
-                    <span class="number">0
-                </span>}
-            }
+            Ordering::Greater =&gt; i64::from(rhs.frac &gt;= <span class="number">1_000_000_000</span>),
             Ordering::Equal =&gt; <span class="number">0</span>,
             Ordering::Less =&gt; {
                 <span class="kw">if </span><span class="self">self</span>.frac &gt;= <span class="number">1_000_000_000 </span>{
@@ -2144,7 +2149,7 @@
     /// use chrono::format::strftime::StrftimeItems;
     ///
     /// let fmt = StrftimeItems::new(&quot;%H:%M:%S&quot;);
-    /// let t = NaiveTime::from_hms(23, 56, 4);
+    /// let t = NaiveTime::from_hms_opt(23, 56, 4).unwrap();
     /// assert_eq!(t.format_with_items(fmt.clone()).to_string(), &quot;23:56:04&quot;);
     /// assert_eq!(t.format(&quot;%H:%M:%S&quot;).to_string(),             &quot;23:56:04&quot;);
     /// ```
@@ -2155,11 +2160,13 @@
     /// # use chrono::NaiveTime;
     /// # use chrono::format::strftime::StrftimeItems;
     /// # let fmt = StrftimeItems::new(&quot;%H:%M:%S&quot;).clone();
-    /// # let t = NaiveTime::from_hms(23, 56, 4);
+    /// # let t = NaiveTime::from_hms_opt(23, 56, 4).unwrap();
     /// assert_eq!(format!(&quot;{}&quot;, t.format_with_items(fmt)), &quot;23:56:04&quot;);
     /// ```
     </span><span class="attr">#[cfg(any(feature = <span class="string">&quot;alloc&quot;</span>, feature = <span class="string">&quot;std&quot;</span>, test))]
+    #[cfg_attr(docsrs, doc(cfg(any(feature = <span class="string">&quot;alloc&quot;</span>, feature = <span class="string">&quot;std&quot;</span>))))]
     #[inline]
+    #[must_use]
     </span><span class="kw">pub fn </span>format_with_items&lt;<span class="lifetime">&#39;a</span>, I, B&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, items: I) -&gt; DelayedFormat&lt;I&gt;
     <span class="kw">where
         </span>I: Iterator&lt;Item = B&gt; + Clone,
@@ -2187,7 +2194,7 @@
     /// ```
     /// use chrono::NaiveTime;
     ///
-    /// let t = NaiveTime::from_hms_nano(23, 56, 4, 12_345_678);
+    /// let t = NaiveTime::from_hms_nano_opt(23, 56, 4, 12_345_678).unwrap();
     /// assert_eq!(t.format(&quot;%H:%M:%S&quot;).to_string(), &quot;23:56:04&quot;);
     /// assert_eq!(t.format(&quot;%H:%M:%S%.6f&quot;).to_string(), &quot;23:56:04.012345&quot;);
     /// assert_eq!(t.format(&quot;%-I:%M %p&quot;).to_string(), &quot;11:56 PM&quot;);
@@ -2197,25 +2204,30 @@
     ///
     /// ```
     /// # use chrono::NaiveTime;
-    /// # let t = NaiveTime::from_hms_nano(23, 56, 4, 12_345_678);
+    /// # let t = NaiveTime::from_hms_nano_opt(23, 56, 4, 12_345_678).unwrap();
     /// assert_eq!(format!(&quot;{}&quot;, t.format(&quot;%H:%M:%S&quot;)), &quot;23:56:04&quot;);
     /// assert_eq!(format!(&quot;{}&quot;, t.format(&quot;%H:%M:%S%.6f&quot;)), &quot;23:56:04.012345&quot;);
     /// assert_eq!(format!(&quot;{}&quot;, t.format(&quot;%-I:%M %p&quot;)), &quot;11:56 PM&quot;);
     /// ```
     </span><span class="attr">#[cfg(any(feature = <span class="string">&quot;alloc&quot;</span>, feature = <span class="string">&quot;std&quot;</span>, test))]
+    #[cfg_attr(docsrs, doc(cfg(any(feature = <span class="string">&quot;alloc&quot;</span>, feature = <span class="string">&quot;std&quot;</span>))))]
     #[inline]
+    #[must_use]
     </span><span class="kw">pub fn </span>format&lt;<span class="lifetime">&#39;a</span>&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, fmt: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str) -&gt; DelayedFormat&lt;StrftimeItems&lt;<span class="lifetime">&#39;a</span>&gt;&gt; {
         <span class="self">self</span>.format_with_items(StrftimeItems::new(fmt))
     }
 
     <span class="doccomment">/// Returns a triple of the hour, minute and second numbers.
     </span><span class="kw">fn </span>hms(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; (u32, u32, u32) {
-        <span class="kw">let </span>(mins, sec) = div_mod_floor(<span class="self">self</span>.secs, <span class="number">60</span>);
-        <span class="kw">let </span>(hour, min) = div_mod_floor(mins, <span class="number">60</span>);
+        <span class="kw">let </span>sec = <span class="self">self</span>.secs % <span class="number">60</span>;
+        <span class="kw">let </span>mins = <span class="self">self</span>.secs / <span class="number">60</span>;
+        <span class="kw">let </span>min = mins % <span class="number">60</span>;
+        <span class="kw">let </span>hour = mins / <span class="number">60</span>;
         (hour, min, sec)
     }
 
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">const </span>MIN: <span class="self">Self </span>= <span class="self">Self </span>{ secs: <span class="number">0</span>, frac: <span class="number">0 </span>};
+    <span class="doccomment">/// The earliest possible `NaiveTime`
+    </span><span class="kw">pub const </span>MIN: <span class="self">Self </span>= <span class="self">Self </span>{ secs: <span class="number">0</span>, frac: <span class="number">0 </span>};
     <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">const </span>MAX: <span class="self">Self </span>= <span class="self">Self </span>{ secs: <span class="number">23 </span>* <span class="number">3600 </span>+ <span class="number">59 </span>* <span class="number">60 </span>+ <span class="number">59</span>, frac: <span class="number">999_999_999 </span>};
 }
 
@@ -2227,8 +2239,8 @@
     /// ```
     /// use chrono::{NaiveTime, Timelike};
     ///
-    /// assert_eq!(NaiveTime::from_hms(0, 0, 0).hour(), 0);
-    /// assert_eq!(NaiveTime::from_hms_nano(23, 56, 4, 12_345_678).hour(), 23);
+    /// assert_eq!(NaiveTime::from_hms_opt(0, 0, 0).unwrap().hour(), 0);
+    /// assert_eq!(NaiveTime::from_hms_nano_opt(23, 56, 4, 12_345_678).unwrap().hour(), 23);
     /// ```
     </span><span class="attr">#[inline]
     </span><span class="kw">fn </span>hour(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; u32 {
@@ -2242,8 +2254,8 @@
     /// ```
     /// use chrono::{NaiveTime, Timelike};
     ///
-    /// assert_eq!(NaiveTime::from_hms(0, 0, 0).minute(), 0);
-    /// assert_eq!(NaiveTime::from_hms_nano(23, 56, 4, 12_345_678).minute(), 56);
+    /// assert_eq!(NaiveTime::from_hms_opt(0, 0, 0).unwrap().minute(), 0);
+    /// assert_eq!(NaiveTime::from_hms_nano_opt(23, 56, 4, 12_345_678).unwrap().minute(), 56);
     /// ```
     </span><span class="attr">#[inline]
     </span><span class="kw">fn </span>minute(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; u32 {
@@ -2257,17 +2269,18 @@
     /// ```
     /// use chrono::{NaiveTime, Timelike};
     ///
-    /// assert_eq!(NaiveTime::from_hms(0, 0, 0).second(), 0);
-    /// assert_eq!(NaiveTime::from_hms_nano(23, 56, 4, 12_345_678).second(), 4);
+    /// assert_eq!(NaiveTime::from_hms_opt(0, 0, 0).unwrap().second(), 0);
+    /// assert_eq!(NaiveTime::from_hms_nano_opt(23, 56, 4, 12_345_678).unwrap().second(), 4);
     /// ```
     ///
     /// This method never returns 60 even when it is a leap second.
     /// ([Why?](#leap-second-handling))
     /// Use the proper [formatting method](#method.format) to get a human-readable representation.
     ///
-    /// ```
-    /// # use chrono::{NaiveTime, Timelike};
-    /// let leap = NaiveTime::from_hms_milli(23, 59, 59, 1_000);
+    </span><span class="attr">#[cfg_attr(not(feature = <span class="string">&quot;std&quot;</span>), doc = <span class="string">&quot;```ignore&quot;</span>)]
+    #[cfg_attr(feature = <span class="string">&quot;std&quot;</span>, doc = <span class="string">&quot;```&quot;</span>)]
+    </span><span class="doccomment">/// # use chrono::{NaiveTime, Timelike};
+    /// let leap = NaiveTime::from_hms_milli_opt(23, 59, 59, 1_000).unwrap();
     /// assert_eq!(leap.second(), 59);
     /// assert_eq!(leap.format(&quot;%H:%M:%S&quot;).to_string(), &quot;23:59:60&quot;);
     /// ```
@@ -2285,17 +2298,18 @@
     /// ```
     /// use chrono::{NaiveTime, Timelike};
     ///
-    /// assert_eq!(NaiveTime::from_hms(0, 0, 0).nanosecond(), 0);
-    /// assert_eq!(NaiveTime::from_hms_nano(23, 56, 4, 12_345_678).nanosecond(), 12_345_678);
+    /// assert_eq!(NaiveTime::from_hms_opt(0, 0, 0).unwrap().nanosecond(), 0);
+    /// assert_eq!(NaiveTime::from_hms_nano_opt(23, 56, 4, 12_345_678).unwrap().nanosecond(), 12_345_678);
     /// ```
     ///
     /// Leap seconds may have seemingly out-of-range return values.
     /// You can reduce the range with `time.nanosecond() % 1_000_000_000`, or
     /// use the proper [formatting method](#method.format) to get a human-readable representation.
     ///
-    /// ```
-    /// # use chrono::{NaiveTime, Timelike};
-    /// let leap = NaiveTime::from_hms_milli(23, 59, 59, 1_000);
+    </span><span class="attr">#[cfg_attr(not(feature = <span class="string">&quot;std&quot;</span>), doc = <span class="string">&quot;```ignore&quot;</span>)]
+    #[cfg_attr(feature = <span class="string">&quot;std&quot;</span>, doc = <span class="string">&quot;```&quot;</span>)]
+    </span><span class="doccomment">/// # use chrono::{NaiveTime, Timelike};
+    /// let leap = NaiveTime::from_hms_milli_opt(23, 59, 59, 1_000).unwrap();
     /// assert_eq!(leap.nanosecond(), 1_000_000_000);
     /// assert_eq!(leap.format(&quot;%H:%M:%S%.9f&quot;).to_string(), &quot;23:59:60.000000000&quot;);
     /// ```
@@ -2313,8 +2327,8 @@
     /// ```
     /// use chrono::{NaiveTime, Timelike};
     ///
-    /// let dt = NaiveTime::from_hms_nano(23, 56, 4, 12_345_678);
-    /// assert_eq!(dt.with_hour(7), Some(NaiveTime::from_hms_nano(7, 56, 4, 12_345_678)));
+    /// let dt = NaiveTime::from_hms_nano_opt(23, 56, 4, 12_345_678).unwrap();
+    /// assert_eq!(dt.with_hour(7), Some(NaiveTime::from_hms_nano_opt(7, 56, 4, 12_345_678).unwrap()));
     /// assert_eq!(dt.with_hour(24), None);
     /// ```
     </span><span class="attr">#[inline]
@@ -2335,8 +2349,8 @@
     /// ```
     /// use chrono::{NaiveTime, Timelike};
     ///
-    /// let dt = NaiveTime::from_hms_nano(23, 56, 4, 12_345_678);
-    /// assert_eq!(dt.with_minute(45), Some(NaiveTime::from_hms_nano(23, 45, 4, 12_345_678)));
+    /// let dt = NaiveTime::from_hms_nano_opt(23, 56, 4, 12_345_678).unwrap();
+    /// assert_eq!(dt.with_minute(45), Some(NaiveTime::from_hms_nano_opt(23, 45, 4, 12_345_678).unwrap()));
     /// assert_eq!(dt.with_minute(60), None);
     /// ```
     </span><span class="attr">#[inline]
@@ -2359,8 +2373,8 @@
     /// ```
     /// use chrono::{NaiveTime, Timelike};
     ///
-    /// let dt = NaiveTime::from_hms_nano(23, 56, 4, 12_345_678);
-    /// assert_eq!(dt.with_second(17), Some(NaiveTime::from_hms_nano(23, 56, 17, 12_345_678)));
+    /// let dt = NaiveTime::from_hms_nano_opt(23, 56, 4, 12_345_678).unwrap();
+    /// assert_eq!(dt.with_second(17), Some(NaiveTime::from_hms_nano_opt(23, 56, 17, 12_345_678).unwrap()));
     /// assert_eq!(dt.with_second(60), None);
     /// ```
     </span><span class="attr">#[inline]
@@ -2383,9 +2397,9 @@
     /// ```
     /// use chrono::{NaiveTime, Timelike};
     ///
-    /// let dt = NaiveTime::from_hms_nano(23, 56, 4, 12_345_678);
+    /// let dt = NaiveTime::from_hms_nano_opt(23, 56, 4, 12_345_678).unwrap();
     /// assert_eq!(dt.with_nanosecond(333_333_333),
-    ///            Some(NaiveTime::from_hms_nano(23, 56, 4, 333_333_333)));
+    ///            Some(NaiveTime::from_hms_nano_opt(23, 56, 4, 333_333_333).unwrap()));
     /// assert_eq!(dt.with_nanosecond(2_000_000_000), None);
     /// ```
     ///
@@ -2396,9 +2410,9 @@
     ///
     /// ```
     /// # use chrono::{NaiveTime, Timelike};
-    /// # let dt = NaiveTime::from_hms_nano(23, 56, 4, 12_345_678);
+    /// # let dt = NaiveTime::from_hms_nano_opt(23, 56, 4, 12_345_678).unwrap();
     /// assert_eq!(dt.with_nanosecond(1_333_333_333),
-    ///            Some(NaiveTime::from_hms_nano(23, 56, 4, 1_333_333_333)));
+    ///            Some(NaiveTime::from_hms_nano_opt(23, 56, 4, 1_333_333_333).unwrap()));
     /// ```
     </span><span class="attr">#[inline]
     </span><span class="kw">fn </span>with_nanosecond(<span class="kw-2">&amp;</span><span class="self">self</span>, nano: u32) -&gt; <span class="prelude-ty">Option</span>&lt;NaiveTime&gt; {
@@ -2415,11 +2429,11 @@
     /// ```
     /// use chrono::{NaiveTime, Timelike};
     ///
-    /// assert_eq!(NaiveTime::from_hms(1, 2, 3).num_seconds_from_midnight(),
+    /// assert_eq!(NaiveTime::from_hms_opt(1, 2, 3).unwrap().num_seconds_from_midnight(),
     ///            3723);
-    /// assert_eq!(NaiveTime::from_hms_nano(23, 56, 4, 12_345_678).num_seconds_from_midnight(),
+    /// assert_eq!(NaiveTime::from_hms_nano_opt(23, 56, 4, 12_345_678).unwrap().num_seconds_from_midnight(),
     ///            86164);
-    /// assert_eq!(NaiveTime::from_hms_milli(23, 59, 59, 1_000).num_seconds_from_midnight(),
+    /// assert_eq!(NaiveTime::from_hms_milli_opt(23, 59, 59, 1_000).unwrap().num_seconds_from_midnight(),
     ///            86399);
     /// ```
     </span><span class="attr">#[inline]
@@ -2431,17 +2445,16 @@
 <span class="doccomment">/// An addition of `Duration` to `NaiveTime` wraps around and never overflows or underflows.
 /// In particular the addition ignores integral number of days.
 ///
-/// As a part of Chrono&#39;s [leap second handling](#leap-second-handling),
-/// the addition assumes that **there is no leap second ever**,
-/// except when the `NaiveTime` itself represents a leap second
-/// in which case the assumption becomes that **there is exactly a single leap second ever**.
+/// As a part of Chrono&#39;s [leap second handling], the addition assumes that **there is no leap
+/// second ever**, except when the `NaiveTime` itself represents a leap second in which case the
+/// assumption becomes that **there is exactly a single leap second ever**.
 ///
 /// # Example
 ///
 /// ```
 /// use chrono::{Duration, NaiveTime};
 ///
-/// let from_hmsm = NaiveTime::from_hms_milli;
+/// let from_hmsm = |h, m, s, milli| { NaiveTime::from_hms_milli_opt(h, m, s, milli).unwrap() };
 ///
 /// assert_eq!(from_hmsm(3, 5, 7, 0) + Duration::zero(),                  from_hmsm(3, 5, 7, 0));
 /// assert_eq!(from_hmsm(3, 5, 7, 0) + Duration::seconds(1),              from_hmsm(3, 5, 8, 0));
@@ -2457,7 +2470,7 @@
 ///
 /// ```
 /// # use chrono::{Duration, NaiveTime};
-/// # let from_hmsm = NaiveTime::from_hms_milli;
+/// # let from_hmsm = |h, m, s, milli| { NaiveTime::from_hms_milli_opt(h, m, s, milli).unwrap() };
 /// assert_eq!(from_hmsm(3, 5, 7, 0) + Duration::seconds(22*60*60), from_hmsm(1, 5, 7, 0));
 /// assert_eq!(from_hmsm(3, 5, 7, 0) + Duration::seconds(-8*60*60), from_hmsm(19, 5, 7, 0));
 /// assert_eq!(from_hmsm(3, 5, 7, 0) + Duration::days(800),         from_hmsm(3, 5, 7, 0));
@@ -2467,7 +2480,7 @@
 ///
 /// ```
 /// # use chrono::{Duration, NaiveTime};
-/// # let from_hmsm = NaiveTime::from_hms_milli;
+/// # let from_hmsm = |h, m, s, milli| { NaiveTime::from_hms_milli_opt(h, m, s, milli).unwrap() };
 /// let leap = from_hmsm(3, 5, 59, 1_300);
 /// assert_eq!(leap + Duration::zero(),             from_hmsm(3, 5, 59, 1_300));
 /// assert_eq!(leap + Duration::milliseconds(-500), from_hmsm(3, 5, 59, 800));
@@ -2477,6 +2490,8 @@
 /// assert_eq!(leap + Duration::seconds(-10),       from_hmsm(3, 5, 50, 300));
 /// assert_eq!(leap + Duration::days(1),            from_hmsm(3, 5, 59, 300));
 /// ```
+///
+/// [leap second handling]: crate::NaiveTime#leap-second-handling
 </span><span class="kw">impl </span>Add&lt;OldDuration&gt; <span class="kw">for </span>NaiveTime {
     <span class="kw">type </span>Output = NaiveTime;
 
@@ -2497,17 +2512,16 @@
 /// In particular the addition ignores integral number of days.
 /// It is the same as the addition with a negated `Duration`.
 ///
-/// As a part of Chrono&#39;s [leap second handling](#leap-second-handling),
-/// the addition assumes that **there is no leap second ever**,
-/// except when the `NaiveTime` itself represents a leap second
-/// in which case the assumption becomes that **there is exactly a single leap second ever**.
+/// As a part of Chrono&#39;s [leap second handling], the subtraction assumes that **there is no leap
+/// second ever**, except when the `NaiveTime` itself represents a leap second in which case the
+/// assumption becomes that **there is exactly a single leap second ever**.
 ///
 /// # Example
 ///
 /// ```
 /// use chrono::{Duration, NaiveTime};
 ///
-/// let from_hmsm = NaiveTime::from_hms_milli;
+/// let from_hmsm = |h, m, s, milli| { NaiveTime::from_hms_milli_opt(h, m, s, milli).unwrap() };
 ///
 /// assert_eq!(from_hmsm(3, 5, 7, 0) - Duration::zero(),                  from_hmsm(3, 5, 7, 0));
 /// assert_eq!(from_hmsm(3, 5, 7, 0) - Duration::seconds(1),              from_hmsm(3, 5, 6, 0));
@@ -2521,7 +2535,7 @@
 ///
 /// ```
 /// # use chrono::{Duration, NaiveTime};
-/// # let from_hmsm = NaiveTime::from_hms_milli;
+/// # let from_hmsm = |h, m, s, milli| { NaiveTime::from_hms_milli_opt(h, m, s, milli).unwrap() };
 /// assert_eq!(from_hmsm(3, 5, 7, 0) - Duration::seconds(8*60*60), from_hmsm(19, 5, 7, 0));
 /// assert_eq!(from_hmsm(3, 5, 7, 0) - Duration::days(800),        from_hmsm(3, 5, 7, 0));
 /// ```
@@ -2530,7 +2544,7 @@
 ///
 /// ```
 /// # use chrono::{Duration, NaiveTime};
-/// # let from_hmsm = NaiveTime::from_hms_milli;
+/// # let from_hmsm = |h, m, s, milli| { NaiveTime::from_hms_milli_opt(h, m, s, milli).unwrap() };
 /// let leap = from_hmsm(3, 5, 59, 1_300);
 /// assert_eq!(leap - Duration::zero(),            from_hmsm(3, 5, 59, 1_300));
 /// assert_eq!(leap - Duration::milliseconds(200), from_hmsm(3, 5, 59, 1_100));
@@ -2538,6 +2552,8 @@
 /// assert_eq!(leap - Duration::seconds(60),       from_hmsm(3, 5, 0, 300));
 /// assert_eq!(leap - Duration::days(1),           from_hmsm(3, 6, 0, 300));
 /// ```
+///
+/// [leap second handling]: crate::NaiveTime#leap-second-handling
 </span><span class="kw">impl </span>Sub&lt;OldDuration&gt; <span class="kw">for </span>NaiveTime {
     <span class="kw">type </span>Output = NaiveTime;
 
@@ -2572,7 +2588,7 @@
 /// ```
 /// use chrono::{Duration, NaiveTime};
 ///
-/// let from_hmsm = NaiveTime::from_hms_milli;
+/// let from_hmsm = |h, m, s, milli| { NaiveTime::from_hms_milli_opt(h, m, s, milli).unwrap() };
 ///
 /// assert_eq!(from_hmsm(3, 5, 7, 900) - from_hmsm(3, 5, 7, 900), Duration::zero());
 /// assert_eq!(from_hmsm(3, 5, 7, 900) - from_hmsm(3, 5, 7, 875), Duration::milliseconds(25));
@@ -2590,7 +2606,7 @@
 ///
 /// ```
 /// # use chrono::{Duration, NaiveTime};
-/// # let from_hmsm = NaiveTime::from_hms_milli;
+/// # let from_hmsm = |h, m, s, milli| { NaiveTime::from_hms_milli_opt(h, m, s, milli).unwrap() };
 /// assert_eq!(from_hmsm(3, 0, 59, 1_000) - from_hmsm(3, 0, 59, 0), Duration::seconds(1));
 /// assert_eq!(from_hmsm(3, 0, 59, 1_500) - from_hmsm(3, 0, 59, 0),
 ///            Duration::milliseconds(1500));
@@ -2624,17 +2640,17 @@
 /// ```
 /// use chrono::NaiveTime;
 ///
-/// assert_eq!(format!(&quot;{:?}&quot;, NaiveTime::from_hms(23, 56, 4)),              &quot;23:56:04&quot;);
-/// assert_eq!(format!(&quot;{:?}&quot;, NaiveTime::from_hms_milli(23, 56, 4, 12)),    &quot;23:56:04.012&quot;);
-/// assert_eq!(format!(&quot;{:?}&quot;, NaiveTime::from_hms_micro(23, 56, 4, 1234)),  &quot;23:56:04.001234&quot;);
-/// assert_eq!(format!(&quot;{:?}&quot;, NaiveTime::from_hms_nano(23, 56, 4, 123456)), &quot;23:56:04.000123456&quot;);
+/// assert_eq!(format!(&quot;{:?}&quot;, NaiveTime::from_hms_opt(23, 56, 4).unwrap()),              &quot;23:56:04&quot;);
+/// assert_eq!(format!(&quot;{:?}&quot;, NaiveTime::from_hms_milli_opt(23, 56, 4, 12).unwrap()),    &quot;23:56:04.012&quot;);
+/// assert_eq!(format!(&quot;{:?}&quot;, NaiveTime::from_hms_micro_opt(23, 56, 4, 1234).unwrap()),  &quot;23:56:04.001234&quot;);
+/// assert_eq!(format!(&quot;{:?}&quot;, NaiveTime::from_hms_nano_opt(23, 56, 4, 123456).unwrap()), &quot;23:56:04.000123456&quot;);
 /// ```
 ///
 /// Leap seconds may also be used.
 ///
 /// ```
 /// # use chrono::NaiveTime;
-/// assert_eq!(format!(&quot;{:?}&quot;, NaiveTime::from_hms_milli(6, 59, 59, 1_500)), &quot;06:59:60.500&quot;);
+/// assert_eq!(format!(&quot;{:?}&quot;, NaiveTime::from_hms_milli_opt(6, 59, 59, 1_500).unwrap()), &quot;06:59:60.500&quot;);
 /// ```
 </span><span class="kw">impl </span>fmt::Debug <span class="kw">for </span>NaiveTime {
     <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter) -&gt; fmt::Result {
@@ -2645,7 +2661,13 @@
             (sec, <span class="self">self</span>.frac)
         };
 
-        <span class="macro">write!</span>(f, <span class="string">&quot;{:02}:{:02}:{:02}&quot;</span>, hour, min, sec)<span class="question-mark">?</span>;
+        <span class="kw">use </span>core::fmt::Write;
+        write_hundreds(f, hour <span class="kw">as </span>u8)<span class="question-mark">?</span>;
+        f.write_char(<span class="string">&#39;:&#39;</span>)<span class="question-mark">?</span>;
+        write_hundreds(f, min <span class="kw">as </span>u8)<span class="question-mark">?</span>;
+        f.write_char(<span class="string">&#39;:&#39;</span>)<span class="question-mark">?</span>;
+        write_hundreds(f, sec <span class="kw">as </span>u8)<span class="question-mark">?</span>;
+
         <span class="kw">if </span>nano == <span class="number">0 </span>{
             <span class="prelude-val">Ok</span>(())
         } <span class="kw">else if </span>nano % <span class="number">1_000_000 </span>== <span class="number">0 </span>{
@@ -2674,17 +2696,17 @@
 /// ```
 /// use chrono::NaiveTime;
 ///
-/// assert_eq!(format!(&quot;{}&quot;, NaiveTime::from_hms(23, 56, 4)),              &quot;23:56:04&quot;);
-/// assert_eq!(format!(&quot;{}&quot;, NaiveTime::from_hms_milli(23, 56, 4, 12)),    &quot;23:56:04.012&quot;);
-/// assert_eq!(format!(&quot;{}&quot;, NaiveTime::from_hms_micro(23, 56, 4, 1234)),  &quot;23:56:04.001234&quot;);
-/// assert_eq!(format!(&quot;{}&quot;, NaiveTime::from_hms_nano(23, 56, 4, 123456)), &quot;23:56:04.000123456&quot;);
+/// assert_eq!(format!(&quot;{}&quot;, NaiveTime::from_hms_opt(23, 56, 4).unwrap()),              &quot;23:56:04&quot;);
+/// assert_eq!(format!(&quot;{}&quot;, NaiveTime::from_hms_milli_opt(23, 56, 4, 12).unwrap()),    &quot;23:56:04.012&quot;);
+/// assert_eq!(format!(&quot;{}&quot;, NaiveTime::from_hms_micro_opt(23, 56, 4, 1234).unwrap()),  &quot;23:56:04.001234&quot;);
+/// assert_eq!(format!(&quot;{}&quot;, NaiveTime::from_hms_nano_opt(23, 56, 4, 123456).unwrap()), &quot;23:56:04.000123456&quot;);
 /// ```
 ///
 /// Leap seconds may also be used.
 ///
 /// ```
 /// # use chrono::NaiveTime;
-/// assert_eq!(format!(&quot;{}&quot;, NaiveTime::from_hms_milli(6, 59, 59, 1_500)), &quot;06:59:60.500&quot;);
+/// assert_eq!(format!(&quot;{}&quot;, NaiveTime::from_hms_milli_opt(6, 59, 59, 1_500).unwrap()), &quot;06:59:60.500&quot;);
 /// ```
 </span><span class="kw">impl </span>fmt::Display <span class="kw">for </span>NaiveTime {
     <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter) -&gt; fmt::Result {
@@ -2700,13 +2722,13 @@
 /// ```
 /// use chrono::NaiveTime;
 ///
-/// let t = NaiveTime::from_hms(23, 56, 4);
+/// let t = NaiveTime::from_hms_opt(23, 56, 4).unwrap();
 /// assert_eq!(&quot;23:56:04&quot;.parse::&lt;NaiveTime&gt;(), Ok(t));
 ///
-/// let t = NaiveTime::from_hms_nano(23, 56, 4, 12_345_678);
+/// let t = NaiveTime::from_hms_nano_opt(23, 56, 4, 12_345_678).unwrap();
 /// assert_eq!(&quot;23:56:4.012345678&quot;.parse::&lt;NaiveTime&gt;(), Ok(t));
 ///
-/// let t = NaiveTime::from_hms_nano(23, 59, 59, 1_234_567_890); // leap second
+/// let t = NaiveTime::from_hms_nano_opt(23, 59, 59, 1_234_567_890).unwrap(); // leap second
 /// assert_eq!(&quot;23:59:60.23456789&quot;.parse::&lt;NaiveTime&gt;(), Ok(t));
 ///
 /// assert!(&quot;foo&quot;.parse::&lt;NaiveTime&gt;().is_err());
@@ -2741,11 +2763,11 @@
 /// use chrono::NaiveTime;
 ///
 /// let default_time = NaiveTime::default();
-/// assert_eq!(default_time, NaiveTime::from_hms(0, 0, 0));
+/// assert_eq!(default_time, NaiveTime::from_hms_opt(0, 0, 0).unwrap());
 /// ```
 </span><span class="kw">impl </span>Default <span class="kw">for </span>NaiveTime {
     <span class="kw">fn </span>default() -&gt; <span class="self">Self </span>{
-        NaiveTime::from_hms(<span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>)
+        NaiveTime::from_hms_opt(<span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>).unwrap()
     }
 }
 
@@ -2755,27 +2777,36 @@
     </span>F: Fn(<span class="kw-2">&amp;</span>NaiveTime) -&gt; <span class="prelude-ty">Result</span>&lt;String, E&gt;,
     E: ::std::fmt::Debug,
 {
-    <span class="macro">assert_eq!</span>(to_string(<span class="kw-2">&amp;</span>NaiveTime::from_hms(<span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>)).ok(), <span class="prelude-val">Some</span>(<span class="string">r#&quot;&quot;00:00:00&quot;&quot;#</span>.into()));
     <span class="macro">assert_eq!</span>(
-        to_string(<span class="kw-2">&amp;</span>NaiveTime::from_hms_milli(<span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">950</span>)).ok(),
+        to_string(<span class="kw-2">&amp;</span>NaiveTime::from_hms_opt(<span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>).unwrap()).ok(),
+        <span class="prelude-val">Some</span>(<span class="string">r#&quot;&quot;00:00:00&quot;&quot;#</span>.into())
+    );
+    <span class="macro">assert_eq!</span>(
+        to_string(<span class="kw-2">&amp;</span>NaiveTime::from_hms_milli_opt(<span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">950</span>).unwrap()).ok(),
         <span class="prelude-val">Some</span>(<span class="string">r#&quot;&quot;00:00:00.950&quot;&quot;#</span>.into())
     );
     <span class="macro">assert_eq!</span>(
-        to_string(<span class="kw-2">&amp;</span>NaiveTime::from_hms_milli(<span class="number">0</span>, <span class="number">0</span>, <span class="number">59</span>, <span class="number">1_000</span>)).ok(),
+        to_string(<span class="kw-2">&amp;</span>NaiveTime::from_hms_milli_opt(<span class="number">0</span>, <span class="number">0</span>, <span class="number">59</span>, <span class="number">1_000</span>).unwrap()).ok(),
         <span class="prelude-val">Some</span>(<span class="string">r#&quot;&quot;00:00:60&quot;&quot;#</span>.into())
     );
-    <span class="macro">assert_eq!</span>(to_string(<span class="kw-2">&amp;</span>NaiveTime::from_hms(<span class="number">0</span>, <span class="number">1</span>, <span class="number">2</span>)).ok(), <span class="prelude-val">Some</span>(<span class="string">r#&quot;&quot;00:01:02&quot;&quot;#</span>.into()));
     <span class="macro">assert_eq!</span>(
-        to_string(<span class="kw-2">&amp;</span>NaiveTime::from_hms_nano(<span class="number">3</span>, <span class="number">5</span>, <span class="number">7</span>, <span class="number">98765432</span>)).ok(),
+        to_string(<span class="kw-2">&amp;</span>NaiveTime::from_hms_opt(<span class="number">0</span>, <span class="number">1</span>, <span class="number">2</span>).unwrap()).ok(),
+        <span class="prelude-val">Some</span>(<span class="string">r#&quot;&quot;00:01:02&quot;&quot;#</span>.into())
+    );
+    <span class="macro">assert_eq!</span>(
+        to_string(<span class="kw-2">&amp;</span>NaiveTime::from_hms_nano_opt(<span class="number">3</span>, <span class="number">5</span>, <span class="number">7</span>, <span class="number">98765432</span>).unwrap()).ok(),
         <span class="prelude-val">Some</span>(<span class="string">r#&quot;&quot;03:05:07.098765432&quot;&quot;#</span>.into())
     );
-    <span class="macro">assert_eq!</span>(to_string(<span class="kw-2">&amp;</span>NaiveTime::from_hms(<span class="number">7</span>, <span class="number">8</span>, <span class="number">9</span>)).ok(), <span class="prelude-val">Some</span>(<span class="string">r#&quot;&quot;07:08:09&quot;&quot;#</span>.into()));
     <span class="macro">assert_eq!</span>(
-        to_string(<span class="kw-2">&amp;</span>NaiveTime::from_hms_micro(<span class="number">12</span>, <span class="number">34</span>, <span class="number">56</span>, <span class="number">789</span>)).ok(),
+        to_string(<span class="kw-2">&amp;</span>NaiveTime::from_hms_opt(<span class="number">7</span>, <span class="number">8</span>, <span class="number">9</span>).unwrap()).ok(),
+        <span class="prelude-val">Some</span>(<span class="string">r#&quot;&quot;07:08:09&quot;&quot;#</span>.into())
+    );
+    <span class="macro">assert_eq!</span>(
+        to_string(<span class="kw-2">&amp;</span>NaiveTime::from_hms_micro_opt(<span class="number">12</span>, <span class="number">34</span>, <span class="number">56</span>, <span class="number">789</span>).unwrap()).ok(),
         <span class="prelude-val">Some</span>(<span class="string">r#&quot;&quot;12:34:56.000789&quot;&quot;#</span>.into())
     );
     <span class="macro">assert_eq!</span>(
-        to_string(<span class="kw-2">&amp;</span>NaiveTime::from_hms_nano(<span class="number">23</span>, <span class="number">59</span>, <span class="number">59</span>, <span class="number">1_999_999_999</span>)).ok(),
+        to_string(<span class="kw-2">&amp;</span>NaiveTime::from_hms_nano_opt(<span class="number">23</span>, <span class="number">59</span>, <span class="number">59</span>, <span class="number">1_999_999_999</span>).unwrap()).ok(),
         <span class="prelude-val">Some</span>(<span class="string">r#&quot;&quot;23:59:60.999999999&quot;&quot;#</span>.into())
     );
 }
@@ -2786,28 +2817,37 @@
     </span>F: Fn(<span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Result</span>&lt;NaiveTime, E&gt;,
     E: ::std::fmt::Debug,
 {
-    <span class="macro">assert_eq!</span>(from_str(<span class="string">r#&quot;&quot;00:00:00&quot;&quot;#</span>).ok(), <span class="prelude-val">Some</span>(NaiveTime::from_hms(<span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>)));
-    <span class="macro">assert_eq!</span>(from_str(<span class="string">r#&quot;&quot;0:0:0&quot;&quot;#</span>).ok(), <span class="prelude-val">Some</span>(NaiveTime::from_hms(<span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>)));
-    <span class="macro">assert_eq!</span>(from_str(<span class="string">r#&quot;&quot;00:00:00.950&quot;&quot;#</span>).ok(), <span class="prelude-val">Some</span>(NaiveTime::from_hms_milli(<span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">950</span>)));
-    <span class="macro">assert_eq!</span>(from_str(<span class="string">r#&quot;&quot;0:0:0.95&quot;&quot;#</span>).ok(), <span class="prelude-val">Some</span>(NaiveTime::from_hms_milli(<span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">950</span>)));
-    <span class="macro">assert_eq!</span>(from_str(<span class="string">r#&quot;&quot;00:00:60&quot;&quot;#</span>).ok(), <span class="prelude-val">Some</span>(NaiveTime::from_hms_milli(<span class="number">0</span>, <span class="number">0</span>, <span class="number">59</span>, <span class="number">1_000</span>)));
-    <span class="macro">assert_eq!</span>(from_str(<span class="string">r#&quot;&quot;00:01:02&quot;&quot;#</span>).ok(), <span class="prelude-val">Some</span>(NaiveTime::from_hms(<span class="number">0</span>, <span class="number">1</span>, <span class="number">2</span>)));
+    <span class="macro">assert_eq!</span>(from_str(<span class="string">r#&quot;&quot;00:00:00&quot;&quot;#</span>).ok(), <span class="prelude-val">Some</span>(NaiveTime::from_hms_opt(<span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>).unwrap()));
+    <span class="macro">assert_eq!</span>(from_str(<span class="string">r#&quot;&quot;0:0:0&quot;&quot;#</span>).ok(), <span class="prelude-val">Some</span>(NaiveTime::from_hms_opt(<span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>).unwrap()));
+    <span class="macro">assert_eq!</span>(
+        from_str(<span class="string">r#&quot;&quot;00:00:00.950&quot;&quot;#</span>).ok(),
+        <span class="prelude-val">Some</span>(NaiveTime::from_hms_milli_opt(<span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">950</span>).unwrap())
+    );
+    <span class="macro">assert_eq!</span>(
+        from_str(<span class="string">r#&quot;&quot;0:0:0.95&quot;&quot;#</span>).ok(),
+        <span class="prelude-val">Some</span>(NaiveTime::from_hms_milli_opt(<span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">950</span>).unwrap())
+    );
+    <span class="macro">assert_eq!</span>(
+        from_str(<span class="string">r#&quot;&quot;00:00:60&quot;&quot;#</span>).ok(),
+        <span class="prelude-val">Some</span>(NaiveTime::from_hms_milli_opt(<span class="number">0</span>, <span class="number">0</span>, <span class="number">59</span>, <span class="number">1_000</span>).unwrap())
+    );
+    <span class="macro">assert_eq!</span>(from_str(<span class="string">r#&quot;&quot;00:01:02&quot;&quot;#</span>).ok(), <span class="prelude-val">Some</span>(NaiveTime::from_hms_opt(<span class="number">0</span>, <span class="number">1</span>, <span class="number">2</span>).unwrap()));
     <span class="macro">assert_eq!</span>(
         from_str(<span class="string">r#&quot;&quot;03:05:07.098765432&quot;&quot;#</span>).ok(),
-        <span class="prelude-val">Some</span>(NaiveTime::from_hms_nano(<span class="number">3</span>, <span class="number">5</span>, <span class="number">7</span>, <span class="number">98765432</span>))
+        <span class="prelude-val">Some</span>(NaiveTime::from_hms_nano_opt(<span class="number">3</span>, <span class="number">5</span>, <span class="number">7</span>, <span class="number">98765432</span>).unwrap())
     );
-    <span class="macro">assert_eq!</span>(from_str(<span class="string">r#&quot;&quot;07:08:09&quot;&quot;#</span>).ok(), <span class="prelude-val">Some</span>(NaiveTime::from_hms(<span class="number">7</span>, <span class="number">8</span>, <span class="number">9</span>)));
+    <span class="macro">assert_eq!</span>(from_str(<span class="string">r#&quot;&quot;07:08:09&quot;&quot;#</span>).ok(), <span class="prelude-val">Some</span>(NaiveTime::from_hms_opt(<span class="number">7</span>, <span class="number">8</span>, <span class="number">9</span>).unwrap()));
     <span class="macro">assert_eq!</span>(
         from_str(<span class="string">r#&quot;&quot;12:34:56.000789&quot;&quot;#</span>).ok(),
-        <span class="prelude-val">Some</span>(NaiveTime::from_hms_micro(<span class="number">12</span>, <span class="number">34</span>, <span class="number">56</span>, <span class="number">789</span>))
+        <span class="prelude-val">Some</span>(NaiveTime::from_hms_micro_opt(<span class="number">12</span>, <span class="number">34</span>, <span class="number">56</span>, <span class="number">789</span>).unwrap())
     );
     <span class="macro">assert_eq!</span>(
         from_str(<span class="string">r#&quot;&quot;23:59:60.999999999&quot;&quot;#</span>).ok(),
-        <span class="prelude-val">Some</span>(NaiveTime::from_hms_nano(<span class="number">23</span>, <span class="number">59</span>, <span class="number">59</span>, <span class="number">1_999_999_999</span>))
+        <span class="prelude-val">Some</span>(NaiveTime::from_hms_nano_opt(<span class="number">23</span>, <span class="number">59</span>, <span class="number">59</span>, <span class="number">1_999_999_999</span>).unwrap())
     );
     <span class="macro">assert_eq!</span>(
         from_str(<span class="string">r#&quot;&quot;23:59:60.9999999999997&quot;&quot;#</span>).ok(), <span class="comment">// excess digits are ignored
-        </span><span class="prelude-val">Some</span>(NaiveTime::from_hms_nano(<span class="number">23</span>, <span class="number">59</span>, <span class="number">59</span>, <span class="number">1_999_999_999</span>))
+        </span><span class="prelude-val">Some</span>(NaiveTime::from_hms_nano_opt(<span class="number">23</span>, <span class="number">59</span>, <span class="number">59</span>, <span class="number">1_999_999_999</span>).unwrap())
     );
 
     <span class="comment">// bad formats

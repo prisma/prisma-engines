@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/nix/store/jnqxxv1xi811ni996b002f4jnyz38xck-vendor-cargo-deps/c19b7c6f923b580ac259164a89f2577984ad5ab09ee9d583b888f934adbbe8d0/bson-2.4.0/src/datetime.rs`."><title>datetime.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-f3501f0f5ae15dfb.css" id="mainThemeStyle"><div id="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="bson" data-themes="" data-resource-suffix="" data-rustdoc-version="1.71.0 (8ede3aae2 2023-07-12)" data-search-js="search-4926e5fc22a5646a.js" data-settings-js="settings-de11bff964e9d4e5.js" data-settings-css="settings-8c76f75bfb6bd192.css" data-theme-light-css="light-0f8c037637f9eb3e.css" data-theme-dark-css="dark-1097f8e92a01e3cf.css" data-theme-ayu-css="ayu-614652228113ac93.css" ></div><script src="../../static.files/storage-62ce34ea385b278a.js"></script><script defer src="../../static.files/source-script-11255107d0a65077.js"></script><script defer src="../../source-files.js"></script><script defer src="../../static.files/main-f0540c1d82cde29b.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../../static.files/light-0f8c037637f9eb3e.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../../static.files/dark-1097f8e92a01e3cf.css"><link rel="stylesheet" href="../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../bson/index.html"><img class="rust-logo" src="../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/nix/store/yf45a1rayffhnidhgyjynpyhr9lqkd09-vendor-cargo-deps/c19b7c6f923b580ac259164a89f2577984ad5ab09ee9d583b888f934adbbe8d0/bson-2.6.1/src/datetime.rs`."><title>datetime.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-f3501f0f5ae15dfb.css" id="mainThemeStyle"><div id="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="bson" data-themes="" data-resource-suffix="" data-rustdoc-version="1.71.0 (8ede3aae2 2023-07-12)" data-search-js="search-4926e5fc22a5646a.js" data-settings-js="settings-de11bff964e9d4e5.js" data-settings-css="settings-8c76f75bfb6bd192.css" data-theme-light-css="light-0f8c037637f9eb3e.css" data-theme-dark-css="dark-1097f8e92a01e3cf.css" data-theme-ayu-css="ayu-614652228113ac93.css" ></div><script src="../../static.files/storage-62ce34ea385b278a.js"></script><script defer src="../../static.files/source-script-11255107d0a65077.js"></script><script defer src="../../source-files.js"></script><script defer src="../../static.files/main-f0540c1d82cde29b.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../../static.files/light-0f8c037637f9eb3e.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../../static.files/dark-1097f8e92a01e3cf.css"><link rel="stylesheet" href="../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../bson/index.html"><img class="rust-logo" src="../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -473,7 +473,70 @@
 <a href="#473" id="473">473</a>
 <a href="#474" id="474">474</a>
 <a href="#475" id="475">475</a>
-</pre></div><pre class="rust"><code><span class="doccomment">//! BSON DateTime
+<a href="#476" id="476">476</a>
+<a href="#477" id="477">477</a>
+<a href="#478" id="478">478</a>
+<a href="#479" id="479">479</a>
+<a href="#480" id="480">480</a>
+<a href="#481" id="481">481</a>
+<a href="#482" id="482">482</a>
+<a href="#483" id="483">483</a>
+<a href="#484" id="484">484</a>
+<a href="#485" id="485">485</a>
+<a href="#486" id="486">486</a>
+<a href="#487" id="487">487</a>
+<a href="#488" id="488">488</a>
+<a href="#489" id="489">489</a>
+<a href="#490" id="490">490</a>
+<a href="#491" id="491">491</a>
+<a href="#492" id="492">492</a>
+<a href="#493" id="493">493</a>
+<a href="#494" id="494">494</a>
+<a href="#495" id="495">495</a>
+<a href="#496" id="496">496</a>
+<a href="#497" id="497">497</a>
+<a href="#498" id="498">498</a>
+<a href="#499" id="499">499</a>
+<a href="#500" id="500">500</a>
+<a href="#501" id="501">501</a>
+<a href="#502" id="502">502</a>
+<a href="#503" id="503">503</a>
+<a href="#504" id="504">504</a>
+<a href="#505" id="505">505</a>
+<a href="#506" id="506">506</a>
+<a href="#507" id="507">507</a>
+<a href="#508" id="508">508</a>
+<a href="#509" id="509">509</a>
+<a href="#510" id="510">510</a>
+<a href="#511" id="511">511</a>
+<a href="#512" id="512">512</a>
+<a href="#513" id="513">513</a>
+<a href="#514" id="514">514</a>
+<a href="#515" id="515">515</a>
+<a href="#516" id="516">516</a>
+<a href="#517" id="517">517</a>
+<a href="#518" id="518">518</a>
+<a href="#519" id="519">519</a>
+<a href="#520" id="520">520</a>
+<a href="#521" id="521">521</a>
+<a href="#522" id="522">522</a>
+<a href="#523" id="523">523</a>
+<a href="#524" id="524">524</a>
+<a href="#525" id="525">525</a>
+<a href="#526" id="526">526</a>
+<a href="#527" id="527">527</a>
+<a href="#528" id="528">528</a>
+<a href="#529" id="529">529</a>
+<a href="#530" id="530">530</a>
+<a href="#531" id="531">531</a>
+<a href="#532" id="532">532</a>
+<a href="#533" id="533">533</a>
+<a href="#534" id="534">534</a>
+<a href="#535" id="535">535</a>
+<a href="#536" id="536">536</a>
+<a href="#537" id="537">537</a>
+</pre></div><pre class="rust"><code><span class="doccomment">//! Module containing functionality related to BSON DateTimes.
+//! For more information, see the documentation for the [`DateTime`] type.
 
 </span><span class="kw">use </span>std::{
     convert::TryInto,
@@ -532,12 +595,68 @@
 /// # }
 /// ```
 ///
+/// ## Serde integration
+///
 /// This type differs from [`chrono::DateTime`] in that it serializes to and deserializes from a
-/// BSON datetime rather than an RFC 3339 formatted string. Additionally, in non-BSON formats, it
-/// will serialize to and deserialize from that format&#39;s equivalent of the
-/// [extended JSON representation](https://www.mongodb.com/docs/manual/reference/mongodb-extended-json/) of a datetime.
-/// To serialize a [`chrono::DateTime`] as a BSON datetime, you can use
-/// [`crate::serde_helpers::chrono_datetime_as_bson_datetime`].
+/// BSON datetime rather than an RFC 3339 formatted string.
+///
+/// e.g.
+/// ```rust
+/// use serde::{Serialize, Deserialize};
+///
+/// #[derive(Serialize, Deserialize)]
+/// struct Foo {
+///     // serializes as a BSON datetime.
+///     date_time: bson::DateTime,
+///
+///     // serializes as an RFC 3339 / ISO-8601 string.
+///     chrono_datetime: chrono::DateTime&lt;chrono::Utc&gt;,
+/// }
+///
+/// # fn main() -&gt; bson::ser::Result&lt;()&gt; {
+/// let f = Foo { date_time: bson::DateTime::now(), chrono_datetime: chrono::Utc::now() };
+/// println!(&quot;{:?}&quot;, bson::to_document(&amp;f)?);
+/// # Ok(())
+/// # }
+/// ```
+/// Produces the following output:
+/// ```js
+/// { &quot;date_time&quot;: DateTime(&quot;2023-01-23 20:11:47.316 +00:00:00&quot;), &quot;chrono_datetime&quot;: &quot;2023-01-23T20:11:47.316114543Z&quot; }
+/// ```
+///
+/// Additionally, in non-BSON formats, it will serialize to and deserialize from that format&#39;s
+/// equivalent of the [extended JSON representation](https://www.mongodb.com/docs/manual/reference/mongodb-extended-json/) of a datetime.
+///
+/// e.g.
+/// ```rust
+/// # use serde::Serialize;
+/// # #[derive(Serialize)]
+/// # struct Foo {
+/// #    // serializes as a BSON datetime.
+/// #    date_time: bson::DateTime,
+/// #
+/// #   // serializes as an RFC 3339 / ISO-8601 string.
+/// #   chrono_datetime: chrono::DateTime&lt;chrono::Utc&gt;,
+/// # }
+/// # fn main() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {
+/// let f = Foo { date_time: bson::DateTime::now(), chrono_datetime: chrono::Utc::now() };
+/// println!(&quot;{}&quot;, serde_json::to_string(&amp;f)?);
+/// # Ok(())
+/// # }
+/// ```
+/// Produces the following output:
+/// ```js
+/// {&quot;date_time&quot;:{&quot;$date&quot;:{&quot;$numberLong&quot;:&quot;1674504029491&quot;}},&quot;chrono_datetime&quot;:&quot;2023-01-23T20:00:29.491791120Z&quot;}
+/// ```
+///
+/// ### `serde_helpers`
+/// The `bson` crate provides a number of useful helpers for serializing and deserializing
+/// various datetime types to and from different formats. For example, to serialize a
+/// [`chrono::DateTime`] as a BSON datetime, you can use
+/// [`crate::serde_helpers::chrono_datetime_as_bson_datetime`]. Similarly, to serialize a BSON
+/// [`DateTime`] to a string, you can use [`crate::serde_helpers::bson_datetime_as_rfc3339_string`].
+/// Check out the [`crate::serde_helpers`] module documentation for a list of all of the helpers
+/// offered by the crate.
 ///
 /// ```rust
 /// # #[cfg(feature = &quot;chrono-0_4&quot;)]
@@ -556,16 +675,20 @@
 ///     // this requires the &quot;chrono-0_4&quot; feature flag
 ///     #[serde(with = &quot;bson::serde_helpers::chrono_datetime_as_bson_datetime&quot;)]
 ///     chrono_as_bson: chrono::DateTime&lt;chrono::Utc&gt;,
+///
+///     // serializes as an RFC 3339 / ISO-8601 string.
+///     #[serde(with = &quot;bson::serde_helpers::bson_datetime_as_rfc3339_string&quot;)]
+///     bson_as_string: bson::DateTime,
 /// }
 /// # }
 /// ```
-/// ## The `serde_with` feature flag
+/// ### The `serde_with` feature flag
 ///
 /// The `serde_with` feature can be enabled to support more ergonomic serde attributes for
-/// (de)serializing `chrono::DateTime` from/to BSON via the [`serde_with`](https://docs.rs/serde_with/1.11.0/serde_with/)
+/// (de)serializing [`chrono::DateTime`] from/to BSON via the [`serde_with`](https://docs.rs/serde_with/1.11.0/serde_with/)
 /// crate. The main benefit of this compared to the regular `serde_helpers` is that `serde_with` can
-/// handle nested `chrono::DateTime` values (e.g. in `Option`), whereas the former only works on
-/// fields that are exactly `chrono::DateTime`.
+/// handle nested [`chrono::DateTime`] values (e.g. in [`Option`]), whereas the former only works on
+/// fields that are exactly [`chrono::DateTime`].
 /// ```
 /// # #[cfg(all(feature = &quot;chrono-0_4&quot;, feature = &quot;serde_with&quot;))]
 /// # {
@@ -575,7 +698,7 @@
 /// #[serde_with::serde_as]
 /// #[derive(Deserialize, Serialize, PartialEq, Debug)]
 /// struct Foo {
-///   /// Serializes as a BSON datetime rather than using `chrono::DateTime`&#39;s serialization
+///   /// Serializes as a BSON datetime rather than using [`chrono::DateTime`]&#39;s serialization
 ///   #[serde_as(as = &quot;Option&lt;bson::DateTime&gt;&quot;)]
 ///   as_bson: Option&lt;chrono::DateTime&lt;chrono::Utc&gt;&gt;,
 /// }
@@ -614,8 +737,8 @@
         <span class="self">Self</span>::from_system_time(SystemTime::now())
     }
 
-    <span class="doccomment">/// Convert the given `chrono::DateTime` into a `bson::DateTime`, truncating it to millisecond
-    /// precision.
+    <span class="doccomment">/// Convert the given [`chrono::DateTime`] into a [`bson::DateTime`](DateTime), truncating it to
+    /// millisecond precision.
     </span><span class="attr">#[cfg(feature = <span class="string">&quot;chrono-0_4&quot;</span>)]
     #[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;chrono-0_4&quot;</span>)))]
     </span><span class="kw">pub fn </span>from_chrono&lt;T: chrono::TimeZone&gt;(dt: chrono::DateTime&lt;T&gt;) -&gt; <span class="self">Self </span>{
@@ -634,7 +757,8 @@
     <span class="doccomment">/// Convert this [`DateTime`] to a [`chrono::DateTime&lt;Utc&gt;`].
     ///
     /// Note: Not every BSON datetime can be represented as a [`chrono::DateTime`]. For such dates,
-    /// [`chrono::MIN_DATETIME`] or [`chrono::MAX_DATETIME`] will be returned, whichever is closer.
+    /// [`chrono::DateTime::MIN_UTC`] or [`chrono::DateTime::MAX_UTC`] will be returned, whichever
+    /// is closer.
     ///
     /// ```
     /// let bson_dt = bson::DateTime::now();
@@ -643,7 +767,7 @@
     ///
     /// let big = bson::DateTime::from_millis(i64::MAX);
     /// let chrono_big = big.to_chrono();
-    /// assert_eq!(chrono_big, chrono::MAX_DATETIME)
+    /// assert_eq!(chrono_big, chrono::DateTime::&lt;chrono::Utc&gt;::MAX_UTC)
     /// ```
     </span><span class="attr">#[cfg(feature = <span class="string">&quot;chrono-0_4&quot;</span>)]
     #[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;chrono-0_4&quot;</span>)))]
@@ -652,9 +776,9 @@
             LocalResult::Single(dt) =&gt; dt,
             <span class="kw">_ </span>=&gt; {
                 <span class="kw">if </span><span class="self">self</span>.<span class="number">0 </span>&lt; <span class="number">0 </span>{
-                    chrono::MIN_DATETIME
+                    chrono::DateTime::&lt;Utc&gt;::MIN_UTC
                 } <span class="kw">else </span>{
-                    chrono::MAX_DATETIME
+                    chrono::DateTime::&lt;Utc&gt;::MAX_UTC
                 }
             }
         }
@@ -680,8 +804,8 @@
         <span class="self">Self</span>::from_time_private(dt)
     }
 
-    <span class="doccomment">/// Convert the given `time::OffsetDateTime` into a `bson::DateTime`, truncating it to
-    /// millisecond precision.
+    <span class="doccomment">/// Convert the given [`time::OffsetDateTime`] into a [`bson::DateTime`](DateTime), truncating
+    /// it to millisecond precision.
     ///
     /// If the provided time is too far in the future or too far in the past to be represented
     /// by a BSON datetime, either [`DateTime::MAX`] or [`DateTime::MIN`] will be
@@ -929,7 +1053,7 @@
     <span class="doccomment">/// Error returned when an invalid datetime format is provided to a conversion method.
     </span><span class="attr">#[non_exhaustive]
     </span>InvalidTimestamp { message: String },
-    <span class="doccomment">/// Error returned when a `DateTime` cannot be represented in a particular format.
+    <span class="doccomment">/// Error returned when a [`DateTime`] cannot be represented in a particular format.
     </span><span class="attr">#[non_exhaustive]
     </span>CannotFormat { message: String },
 }

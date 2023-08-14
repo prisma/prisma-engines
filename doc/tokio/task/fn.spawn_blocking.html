@@ -43,7 +43,7 @@ parameters at creation time and return a single value (or struct/tuple, etc.).</
 the synchronous context, the <a href="../sync/mpsc/index.html" title="mod tokio::sync::mpsc"><code>mpsc channel</code></a> has <code>blocking_send</code> and
 <code>blocking_recv</code> methods for use in non-async code such as the thread created
 by <code>spawn_blocking</code>.</p>
-<p>Another option is <a href="https://docs.rs/tokio-util/0.6/tokio_util/io/struct.SyncIoBridge.html"><code>SyncIoBridge</code></a> for cases where the synchronous context
+<p>Another option is <a href="https://docs.rs/tokio-util/latest/tokio_util/io/struct.SyncIoBridge.html"><code>SyncIoBridge</code></a> for cases where the synchronous context
 is operating on byte streams.  For example, you might use an asynchronous
 HTTP client such as <a href="https://docs.rs/hyper">hyper</a> to fetch data, but perform complex parsing
 of the payload body using a library written for synchronous I/O.</p>

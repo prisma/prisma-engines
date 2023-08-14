@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/nix/store/jnqxxv1xi811ni996b002f4jnyz38xck-vendor-cargo-deps/c19b7c6f923b580ac259164a89f2577984ad5ab09ee9d583b888f934adbbe8d0/chrono-0.4.20/src/format/strftime.rs`."><title>strftime.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-f3501f0f5ae15dfb.css" id="mainThemeStyle"><div id="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="chrono" data-themes="" data-resource-suffix="" data-rustdoc-version="1.71.0 (8ede3aae2 2023-07-12)" data-search-js="search-4926e5fc22a5646a.js" data-settings-js="settings-de11bff964e9d4e5.js" data-settings-css="settings-8c76f75bfb6bd192.css" data-theme-light-css="light-0f8c037637f9eb3e.css" data-theme-dark-css="dark-1097f8e92a01e3cf.css" data-theme-ayu-css="ayu-614652228113ac93.css" ></div><script src="../../../static.files/storage-62ce34ea385b278a.js"></script><script defer src="../../../static.files/source-script-11255107d0a65077.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../static.files/main-f0540c1d82cde29b.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../../../static.files/light-0f8c037637f9eb3e.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../../../static.files/dark-1097f8e92a01e3cf.css"><link rel="stylesheet" href="../../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../../chrono/index.html"><img class="rust-logo" src="../../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/nix/store/yf45a1rayffhnidhgyjynpyhr9lqkd09-vendor-cargo-deps/c19b7c6f923b580ac259164a89f2577984ad5ab09ee9d583b888f934adbbe8d0/chrono-0.4.26/src/format/strftime.rs`."><title>strftime.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-f3501f0f5ae15dfb.css" id="mainThemeStyle"><div id="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="chrono" data-themes="" data-resource-suffix="" data-rustdoc-version="1.71.0 (8ede3aae2 2023-07-12)" data-search-js="search-4926e5fc22a5646a.js" data-settings-js="settings-de11bff964e9d4e5.js" data-settings-css="settings-8c76f75bfb6bd192.css" data-theme-light-css="light-0f8c037637f9eb3e.css" data-theme-dark-css="dark-1097f8e92a01e3cf.css" data-theme-ayu-css="ayu-614652228113ac93.css" ></div><script src="../../../static.files/storage-62ce34ea385b278a.js"></script><script defer src="../../../static.files/source-script-11255107d0a65077.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../static.files/main-f0540c1d82cde29b.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../../../static.files/light-0f8c037637f9eb3e.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../../../static.files/dark-1097f8e92a01e3cf.css"><link rel="stylesheet" href="../../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../../chrono/index.html"><img class="rust-logo" src="../../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -640,6 +640,84 @@
 <a href="#640" id="640">640</a>
 <a href="#641" id="641">641</a>
 <a href="#642" id="642">642</a>
+<a href="#643" id="643">643</a>
+<a href="#644" id="644">644</a>
+<a href="#645" id="645">645</a>
+<a href="#646" id="646">646</a>
+<a href="#647" id="647">647</a>
+<a href="#648" id="648">648</a>
+<a href="#649" id="649">649</a>
+<a href="#650" id="650">650</a>
+<a href="#651" id="651">651</a>
+<a href="#652" id="652">652</a>
+<a href="#653" id="653">653</a>
+<a href="#654" id="654">654</a>
+<a href="#655" id="655">655</a>
+<a href="#656" id="656">656</a>
+<a href="#657" id="657">657</a>
+<a href="#658" id="658">658</a>
+<a href="#659" id="659">659</a>
+<a href="#660" id="660">660</a>
+<a href="#661" id="661">661</a>
+<a href="#662" id="662">662</a>
+<a href="#663" id="663">663</a>
+<a href="#664" id="664">664</a>
+<a href="#665" id="665">665</a>
+<a href="#666" id="666">666</a>
+<a href="#667" id="667">667</a>
+<a href="#668" id="668">668</a>
+<a href="#669" id="669">669</a>
+<a href="#670" id="670">670</a>
+<a href="#671" id="671">671</a>
+<a href="#672" id="672">672</a>
+<a href="#673" id="673">673</a>
+<a href="#674" id="674">674</a>
+<a href="#675" id="675">675</a>
+<a href="#676" id="676">676</a>
+<a href="#677" id="677">677</a>
+<a href="#678" id="678">678</a>
+<a href="#679" id="679">679</a>
+<a href="#680" id="680">680</a>
+<a href="#681" id="681">681</a>
+<a href="#682" id="682">682</a>
+<a href="#683" id="683">683</a>
+<a href="#684" id="684">684</a>
+<a href="#685" id="685">685</a>
+<a href="#686" id="686">686</a>
+<a href="#687" id="687">687</a>
+<a href="#688" id="688">688</a>
+<a href="#689" id="689">689</a>
+<a href="#690" id="690">690</a>
+<a href="#691" id="691">691</a>
+<a href="#692" id="692">692</a>
+<a href="#693" id="693">693</a>
+<a href="#694" id="694">694</a>
+<a href="#695" id="695">695</a>
+<a href="#696" id="696">696</a>
+<a href="#697" id="697">697</a>
+<a href="#698" id="698">698</a>
+<a href="#699" id="699">699</a>
+<a href="#700" id="700">700</a>
+<a href="#701" id="701">701</a>
+<a href="#702" id="702">702</a>
+<a href="#703" id="703">703</a>
+<a href="#704" id="704">704</a>
+<a href="#705" id="705">705</a>
+<a href="#706" id="706">706</a>
+<a href="#707" id="707">707</a>
+<a href="#708" id="708">708</a>
+<a href="#709" id="709">709</a>
+<a href="#710" id="710">710</a>
+<a href="#711" id="711">711</a>
+<a href="#712" id="712">712</a>
+<a href="#713" id="713">713</a>
+<a href="#714" id="714">714</a>
+<a href="#715" id="715">715</a>
+<a href="#716" id="716">716</a>
+<a href="#717" id="717">717</a>
+<a href="#718" id="718">718</a>
+<a href="#719" id="719">719</a>
+<a href="#720" id="720">720</a>
 </pre></div><pre class="rust"><code><span class="comment">// This is a part of Chrono.
 // See README.md and LICENSE.txt for details.
 
@@ -653,9 +731,9 @@ The following specifiers are available both to formatting and parsing.
 | Spec. | Example  | Description                                                                |
 |-------|----------|----------------------------------------------------------------------------|
 |       |          | **DATE SPECIFIERS:**                                                       |
-| `%Y`  | `2001`   | The full proleptic Gregorian year, zero-padded to 4 digits. [^1]           |
-| `%C`  | `20`     | The proleptic Gregorian year divided by 100, zero-padded to 2 digits. [^2] |
-| `%y`  | `01`     | The proleptic Gregorian year modulo 100, zero-padded to 2 digits. [^2]     |
+| `%Y`  | `2001`   | The full proleptic Gregorian year, zero-padded to 4 digits. chrono supports years from -262144 to 262143. Note: years before 1 BCE or after 9999 CE, require an initial sign (+/-).|
+| `%C`  | `20`     | The proleptic Gregorian year divided by 100, zero-padded to 2 digits. [^1] |
+| `%y`  | `01`     | The proleptic Gregorian year modulo 100, zero-padded to 2 digits. [^1]     |
 |       |          |                                                                            |
 | `%m`  | `07`     | Month number (01--12), zero-padded to 2 digits.                            |
 | `%b`  | `Jul`    | Abbreviated month name. Always 3 letters.                                  |
@@ -670,12 +748,12 @@ The following specifiers are available both to formatting and parsing.
 | `%w`  | `0`      | Sunday = 0, Monday = 1, ..., Saturday = 6.                                 |
 | `%u`  | `7`      | Monday = 1, Tuesday = 2, ..., Sunday = 7. (ISO 8601)                       |
 |       |          |                                                                            |
-| `%U`  | `28`     | Week number starting with Sunday (00--53), zero-padded to 2 digits. [^3]   |
+| `%U`  | `28`     | Week number starting with Sunday (00--53), zero-padded to 2 digits. [^2]   |
 | `%W`  | `27`     | Same as `%U`, but week 1 starts with the first Monday in that year instead.|
 |       |          |                                                                            |
-| `%G`  | `2001`   | Same as `%Y` but uses the year number in ISO 8601 week date. [^4]          |
-| `%g`  | `01`     | Same as `%y` but uses the year number in ISO 8601 week date. [^4]          |
-| `%V`  | `27`     | Same as `%U` but uses the week number in ISO 8601 week date (01--53). [^4] |
+| `%G`  | `2001`   | Same as `%Y` but uses the year number in ISO 8601 week date. [^3]          |
+| `%g`  | `01`     | Same as `%y` but uses the year number in ISO 8601 week date. [^3]          |
+| `%V`  | `27`     | Same as `%U` but uses the week number in ISO 8601 week date (01--53). [^3] |
 |       |          |                                                                            |
 | `%j`  | `189`    | Day of the year (001--366), zero-padded to 3 digits.                       |
 |       |          |                                                                            |
@@ -694,15 +772,15 @@ The following specifiers are available both to formatting and parsing.
 | `%p`  | `AM`     | `AM` or `PM` in 12-hour clocks.                                            |
 |       |          |                                                                            |
 | `%M`  | `34`     | Minute number (00--59), zero-padded to 2 digits.                           |
-| `%S`  | `60`     | Second number (00--60), zero-padded to 2 digits. [^5]                      |
-| `%f`  | `026490000`   | The fractional seconds (in nanoseconds) since last whole second. [^8] |
-| `%.f` | `.026490`| Similar to `.%f` but left-aligned. These all consume the leading dot. [^8] |
-| `%.3f`| `.026`        | Similar to `.%f` but left-aligned but fixed to a length of 3. [^8]    |
-| `%.6f`| `.026490`     | Similar to `.%f` but left-aligned but fixed to a length of 6. [^8]    |
-| `%.9f`| `.026490000`  | Similar to `.%f` but left-aligned but fixed to a length of 9. [^8]    |
-| `%3f` | `026`         | Similar to `%.3f` but without the leading dot. [^8]                   |
-| `%6f` | `026490`      | Similar to `%.6f` but without the leading dot. [^8]                   |
-| `%9f` | `026490000`   | Similar to `%.9f` but without the leading dot. [^8]                   |
+| `%S`  | `60`     | Second number (00--60), zero-padded to 2 digits. [^4]                      |
+| `%f`  | `026490000`   | The fractional seconds (in nanoseconds) since last whole second. [^7] |
+| `%.f` | `.026490`| Similar to `.%f` but left-aligned. These all consume the leading dot. [^7] |
+| `%.3f`| `.026`        | Similar to `.%f` but left-aligned but fixed to a length of 3. [^7]    |
+| `%.6f`| `.026490`     | Similar to `.%f` but left-aligned but fixed to a length of 6. [^7]    |
+| `%.9f`| `.026490000`  | Similar to `.%f` but left-aligned but fixed to a length of 9. [^7]    |
+| `%3f` | `026`         | Similar to `%.3f` but without the leading dot. [^7]                   |
+| `%6f` | `026490`      | Similar to `%.6f` but without the leading dot. [^7]                   |
+| `%9f` | `026490000`   | Similar to `%.9f` but without the leading dot. [^7]                   |
 |       |               |                                                                       |
 | `%R`  | `00:34`       | Hour-minute format. Same as `%H:%M`.                                  |
 | `%T`  | `00:34:60`    | Hour-minute-second format. Same as `%H:%M:%S`.                        |
@@ -710,16 +788,18 @@ The following specifiers are available both to formatting and parsing.
 | `%r`  | `12:34:60 AM` | Hour-minute-second format in 12-hour clocks. Same as `%I:%M:%S %p`.   |
 |       |          |                                                                            |
 |       |          | **TIME ZONE SPECIFIERS:**                                                  |
-| `%Z`  | `ACST`   | Local time zone name. Skips all non-whitespace characters during parsing. [^9] |
+| `%Z`  | `ACST`   | Local time zone name. Skips all non-whitespace characters during parsing. Identical to `%:z` when formatting. [^8] |
 | `%z`  | `+0930`  | Offset from the local time to UTC (with UTC being `+0000`).                |
 | `%:z` | `+09:30` | Same as `%z` but with a colon.                                             |
+|`%::z`|`+09:30:00`| Offset from the local time to UTC with seconds.                            |
+|`%:::z`| `+09`    | Offset from the local time to UTC without minutes.                         |
 | `%#z` | `+09`    | *Parsing only:* Same as `%z` but allows minutes to be missing or present.  |
 |       |          |                                                                            |
 |       |          | **DATE &amp; TIME SPECIFIERS:**                                                |
 |`%c`|`Sun Jul  8 00:34:60 2001`|Locale&#39;s date and time (e.g., Thu Mar  3 23:05:25 2005).       |
-| `%+`  | `2001-07-08T00:34:60.026490+09:30` | ISO 8601 / RFC 3339 date &amp; time format. [^6]     |
+| `%+`  | `2001-07-08T00:34:60.026490+09:30` | ISO 8601 / RFC 3339 date &amp; time format. [^5]     |
 |       |               |                                                                       |
-| `%s`  | `994518299`   | UNIX timestamp, the number of seconds since 1970-01-01 00:00 UTC. [^7]|
+| `%s`  | `994518299`   | UNIX timestamp, the number of seconds since 1970-01-01 00:00 UTC. [^6]|
 |       |          |                                                                            |
 |       |          | **SPECIAL SPECIFIERS:**                                                    |
 | `%t`  |          | Literal tab (`\t`).                                                        |
@@ -737,25 +817,29 @@ Modifier | Description
 
 Notes:
 
-[^1]: `%Y`:
-   Negative years are allowed in formatting but not in parsing.
-
-[^2]: `%C`, `%y`:
+[^1]: `%C`, `%y`:
    This is floor division, so 100 BCE (year number -99) will print `-1` and `99` respectively.
 
-[^3]: `%U`:
+[^2]: `%U`:
    Week 1 starts with the first Sunday in that year.
    It is possible to have week 0 for days before the first Sunday.
 
-[^4]: `%G`, `%g`, `%V`:
+[^3]: `%G`, `%g`, `%V`:
    Week 1 is the first week with at least 4 days in that year.
    Week 0 does not exist, so this should be used with `%G` or `%g`.
 
-[^5]: `%S`:
+[^4]: `%S`:
    It accounts for leap seconds, so `60` is possible.
 
-[^6]: `%+`: Same as `%Y-%m-%dT%H:%M:%S%.f%:z`, i.e. 0, 3, 6 or 9 fractional
+[^5]: `%+`: Same as `%Y-%m-%dT%H:%M:%S%.f%:z`, i.e. 0, 3, 6 or 9 fractional
    digits for seconds and colons in the time zone offset.
+   &lt;br&gt;
+   &lt;br&gt;
+   This format also supports having a `Z` or `UTC` in place of `%:z`. They
+   are equivalent to `+00:00`.
+   &lt;br&gt;
+   &lt;br&gt;
+   Note that all `T`, `Z`, and `UTC` are parsed case-insensitively.
    &lt;br&gt;
    &lt;br&gt;
    The typical `strftime` implementations have different (and locale-dependent)
@@ -763,12 +847,12 @@ Notes:
    stable, it is best to avoid this specifier if you want to control the exact
    output.
 
-[^7]: `%s`:
+[^6]: `%s`:
    This is not padded and can be negative.
    For the purpose of Chrono, it only accounts for non-leap seconds
    so it slightly differs from ISO C `strftime` behavior.
 
-[^8]: `%f`, `%.f`, `%.3f`, `%.6f`, `%.9f`, `%3f`, `%6f`, `%9f`:
+[^7]: `%f`, `%.f`, `%.3f`, `%.6f`, `%.9f`, `%3f`, `%6f`, `%9f`:
    &lt;br&gt;
    The default `%f` is right-aligned and always zero-padded to 9 digits
    for the compatibility with glibc and others,
@@ -799,7 +883,13 @@ Notes:
    and parsing `07`, `070000` etc. will yield the same.
    Note that they can read nothing if the fractional part is zero.
 
-[^9]: `%Z`:
+[^8]: `%Z`:
+   Since `chrono` is not aware of timezones beyond their offsets, this specifier
+   **only prints the offset** when used for formatting. The timezone abbreviation
+   will NOT be printed. See [this issue](https://github.com/chronotope/chrono/issues/960)
+   for more information.
+   &lt;br&gt;
+   &lt;br&gt;
    Offset will not be populated from the parsed data, nor will it be validated.
    Timezone is completely ignored. Similar to the glibc `strptime` treatment of
    this format code.
@@ -811,6 +901,12 @@ Notes:
 */
 
 </span><span class="attr">#[cfg(feature = <span class="string">&quot;unstable-locales&quot;</span>)]
+</span><span class="kw">extern crate </span>alloc;
+
+<span class="attr">#[cfg(feature = <span class="string">&quot;unstable-locales&quot;</span>)]
+</span><span class="kw">use </span>alloc::vec::Vec;
+
+<span class="attr">#[cfg(feature = <span class="string">&quot;unstable-locales&quot;</span>)]
 </span><span class="kw">use super</span>::{locales, Locale};
 <span class="kw">use super</span>::{Fixed, InternalFixed, InternalInternal, Item, Numeric, Pad};
 
@@ -857,12 +953,15 @@ Notes:
 
 <span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; StrftimeItems&lt;<span class="lifetime">&#39;a</span>&gt; {
     <span class="doccomment">/// Creates a new parsing iterator from the `strftime`-like format string.
+    </span><span class="attr">#[must_use]
     </span><span class="kw">pub fn </span>new(s: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str) -&gt; StrftimeItems&lt;<span class="lifetime">&#39;a</span>&gt; {
         <span class="self">Self</span>::with_remainer(s)
     }
 
     <span class="doccomment">/// Creates a new parsing iterator from the `strftime`-like format string.
     </span><span class="attr">#[cfg(feature = <span class="string">&quot;unstable-locales&quot;</span>)]
+    #[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;unstable-locales&quot;</span>)))]
+    #[must_use]
     </span><span class="kw">pub fn </span>new_with_locale(s: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str, locale: Locale) -&gt; StrftimeItems&lt;<span class="lifetime">&#39;a</span>&gt; {
         <span class="kw">let </span>d_fmt = StrftimeItems::new(locales::d_fmt(locale)).collect();
         <span class="kw">let </span>d_t_fmt = StrftimeItems::new(locales::d_t_fmt(locale)).collect();
@@ -1042,10 +1141,20 @@ Notes:
                         }
                     }
                     <span class="string">&#39;+&#39; </span>=&gt; <span class="macro">fix!</span>(RFC3339),
-                    <span class="string">&#39;:&#39; </span>=&gt; <span class="kw">match </span><span class="macro">next!</span>() {
-                        <span class="string">&#39;z&#39; </span>=&gt; <span class="macro">fix!</span>(TimezoneOffsetColon),
-                        <span class="kw">_ </span>=&gt; Item::Error,
-                    },
+                    <span class="string">&#39;:&#39; </span>=&gt; {
+                        <span class="kw">if </span><span class="self">self</span>.remainder.starts_with(<span class="string">&quot;::z&quot;</span>) {
+                            <span class="self">self</span>.remainder = <span class="kw-2">&amp;</span><span class="self">self</span>.remainder[<span class="number">3</span>..];
+                            <span class="macro">fix!</span>(TimezoneOffsetTripleColon)
+                        } <span class="kw">else if </span><span class="self">self</span>.remainder.starts_with(<span class="string">&quot;:z&quot;</span>) {
+                            <span class="self">self</span>.remainder = <span class="kw-2">&amp;</span><span class="self">self</span>.remainder[<span class="number">2</span>..];
+                            <span class="macro">fix!</span>(TimezoneOffsetDoubleColon)
+                        } <span class="kw">else if </span><span class="self">self</span>.remainder.starts_with(<span class="string">&#39;z&#39;</span>) {
+                            <span class="self">self</span>.remainder = <span class="kw-2">&amp;</span><span class="self">self</span>.remainder[<span class="number">1</span>..];
+                            <span class="macro">fix!</span>(TimezoneOffsetColon)
+                        } <span class="kw">else </span>{
+                            Item::Error
+                        }
+                    }
                     <span class="string">&#39;.&#39; </span>=&gt; <span class="kw">match </span><span class="macro">next!</span>() {
                         <span class="string">&#39;3&#39; </span>=&gt; <span class="kw">match </span><span class="macro">next!</span>() {
                             <span class="string">&#39;f&#39; </span>=&gt; <span class="macro">fix!</span>(Nanosecond3),
@@ -1175,9 +1284,18 @@ Notes:
 <span class="attr">#[cfg(test)]
 #[test]
 </span><span class="kw">fn </span>test_strftime_docs() {
-    <span class="kw">use crate</span>::{FixedOffset, TimeZone, Timelike};
+    <span class="kw">use </span><span class="kw">crate</span>::NaiveDate;
+    <span class="kw">use crate</span>::{DateTime, FixedOffset, TimeZone, Timelike, Utc};
 
-    <span class="kw">let </span>dt = FixedOffset::east(<span class="number">34200</span>).ymd(<span class="number">2001</span>, <span class="number">7</span>, <span class="number">8</span>).and_hms_nano(<span class="number">0</span>, <span class="number">34</span>, <span class="number">59</span>, <span class="number">1_026_490_708</span>);
+    <span class="kw">let </span>dt = FixedOffset::east_opt(<span class="number">34200</span>)
+        .unwrap()
+        .from_local_datetime(
+            <span class="kw-2">&amp;</span>NaiveDate::from_ymd_opt(<span class="number">2001</span>, <span class="number">7</span>, <span class="number">8</span>)
+                .unwrap()
+                .and_hms_nano_opt(<span class="number">0</span>, <span class="number">34</span>, <span class="number">59</span>, <span class="number">1_026_490_708</span>)
+                .unwrap(),
+        )
+        .unwrap();
 
     <span class="comment">// date specifiers
     </span><span class="macro">assert_eq!</span>(dt.format(<span class="string">&quot;%Y&quot;</span>).to_string(), <span class="string">&quot;2001&quot;</span>);
@@ -1194,7 +1312,7 @@ Notes:
     <span class="macro">assert_eq!</span>(dt.format(<span class="string">&quot;%A&quot;</span>).to_string(), <span class="string">&quot;Sunday&quot;</span>);
     <span class="macro">assert_eq!</span>(dt.format(<span class="string">&quot;%w&quot;</span>).to_string(), <span class="string">&quot;0&quot;</span>);
     <span class="macro">assert_eq!</span>(dt.format(<span class="string">&quot;%u&quot;</span>).to_string(), <span class="string">&quot;7&quot;</span>);
-    <span class="macro">assert_eq!</span>(dt.format(<span class="string">&quot;%U&quot;</span>).to_string(), <span class="string">&quot;28&quot;</span>);
+    <span class="macro">assert_eq!</span>(dt.format(<span class="string">&quot;%U&quot;</span>).to_string(), <span class="string">&quot;27&quot;</span>);
     <span class="macro">assert_eq!</span>(dt.format(<span class="string">&quot;%W&quot;</span>).to_string(), <span class="string">&quot;27&quot;</span>);
     <span class="macro">assert_eq!</span>(dt.format(<span class="string">&quot;%G&quot;</span>).to_string(), <span class="string">&quot;2001&quot;</span>);
     <span class="macro">assert_eq!</span>(dt.format(<span class="string">&quot;%g&quot;</span>).to_string(), <span class="string">&quot;01&quot;</span>);
@@ -1234,10 +1352,30 @@ Notes:
     //assert_eq!(dt.format(&quot;%Z&quot;).to_string(), &quot;ACST&quot;);
     </span><span class="macro">assert_eq!</span>(dt.format(<span class="string">&quot;%z&quot;</span>).to_string(), <span class="string">&quot;+0930&quot;</span>);
     <span class="macro">assert_eq!</span>(dt.format(<span class="string">&quot;%:z&quot;</span>).to_string(), <span class="string">&quot;+09:30&quot;</span>);
+    <span class="macro">assert_eq!</span>(dt.format(<span class="string">&quot;%::z&quot;</span>).to_string(), <span class="string">&quot;+09:30:00&quot;</span>);
+    <span class="macro">assert_eq!</span>(dt.format(<span class="string">&quot;%:::z&quot;</span>).to_string(), <span class="string">&quot;+09&quot;</span>);
 
     <span class="comment">// date &amp; time specifiers
     </span><span class="macro">assert_eq!</span>(dt.format(<span class="string">&quot;%c&quot;</span>).to_string(), <span class="string">&quot;Sun Jul  8 00:34:60 2001&quot;</span>);
     <span class="macro">assert_eq!</span>(dt.format(<span class="string">&quot;%+&quot;</span>).to_string(), <span class="string">&quot;2001-07-08T00:34:60.026490708+09:30&quot;</span>);
+
+    <span class="macro">assert_eq!</span>(
+        dt.with_timezone(<span class="kw-2">&amp;</span>Utc).format(<span class="string">&quot;%+&quot;</span>).to_string(),
+        <span class="string">&quot;2001-07-07T15:04:60.026490708+00:00&quot;
+    </span>);
+    <span class="macro">assert_eq!</span>(
+        dt.with_timezone(<span class="kw-2">&amp;</span>Utc),
+        DateTime::parse_from_str(<span class="string">&quot;2001-07-07T15:04:60.026490708Z&quot;</span>, <span class="string">&quot;%+&quot;</span>).unwrap()
+    );
+    <span class="macro">assert_eq!</span>(
+        dt.with_timezone(<span class="kw-2">&amp;</span>Utc),
+        DateTime::parse_from_str(<span class="string">&quot;2001-07-07T15:04:60.026490708UTC&quot;</span>, <span class="string">&quot;%+&quot;</span>).unwrap()
+    );
+    <span class="macro">assert_eq!</span>(
+        dt.with_timezone(<span class="kw-2">&amp;</span>Utc),
+        DateTime::parse_from_str(<span class="string">&quot;2001-07-07t15:04:60.026490708utc&quot;</span>, <span class="string">&quot;%+&quot;</span>).unwrap()
+    );
+
     <span class="macro">assert_eq!</span>(
         dt.with_nanosecond(<span class="number">1_026_490_000</span>).unwrap().format(<span class="string">&quot;%+&quot;</span>).to_string(),
         <span class="string">&quot;2001-07-08T00:34:60.026490+09:30&quot;
@@ -1253,9 +1391,14 @@ Notes:
 <span class="attr">#[cfg(feature = <span class="string">&quot;unstable-locales&quot;</span>)]
 #[test]
 </span><span class="kw">fn </span>test_strftime_docs_localized() {
-    <span class="kw">use crate</span>::{FixedOffset, TimeZone};
+    <span class="kw">use crate</span>::{FixedOffset, NaiveDate, TimeZone};
 
-    <span class="kw">let </span>dt = FixedOffset::east(<span class="number">34200</span>).ymd(<span class="number">2001</span>, <span class="number">7</span>, <span class="number">8</span>).and_hms_nano(<span class="number">0</span>, <span class="number">34</span>, <span class="number">59</span>, <span class="number">1_026_490_708</span>);
+    <span class="kw">let </span>dt = FixedOffset::east_opt(<span class="number">34200</span>).unwrap().ymd_opt(<span class="number">2001</span>, <span class="number">7</span>, <span class="number">8</span>).unwrap().and_hms_nano(
+        <span class="number">0</span>,
+        <span class="number">34</span>,
+        <span class="number">59</span>,
+        <span class="number">1_026_490_708</span>,
+    );
 
     <span class="comment">// date specifiers
     </span><span class="macro">assert_eq!</span>(dt.format_localized(<span class="string">&quot;%b&quot;</span>, Locale::fr_BE).to_string(), <span class="string">&quot;jui&quot;</span>);
@@ -1281,5 +1424,18 @@ Notes:
         dt.format_localized(<span class="string">&quot;%c&quot;</span>, Locale::fr_BE).to_string(),
         <span class="string">&quot;dim 08 jui 2001 00:34:60 +09:30&quot;
     </span>);
+
+    <span class="kw">let </span>nd = NaiveDate::from_ymd_opt(<span class="number">2001</span>, <span class="number">7</span>, <span class="number">8</span>).unwrap();
+
+    <span class="comment">// date specifiers
+    </span><span class="macro">assert_eq!</span>(nd.format_localized(<span class="string">&quot;%b&quot;</span>, Locale::de_DE).to_string(), <span class="string">&quot;Jul&quot;</span>);
+    <span class="macro">assert_eq!</span>(nd.format_localized(<span class="string">&quot;%B&quot;</span>, Locale::de_DE).to_string(), <span class="string">&quot;Juli&quot;</span>);
+    <span class="macro">assert_eq!</span>(nd.format_localized(<span class="string">&quot;%h&quot;</span>, Locale::de_DE).to_string(), <span class="string">&quot;Jul&quot;</span>);
+    <span class="macro">assert_eq!</span>(nd.format_localized(<span class="string">&quot;%a&quot;</span>, Locale::de_DE).to_string(), <span class="string">&quot;So&quot;</span>);
+    <span class="macro">assert_eq!</span>(nd.format_localized(<span class="string">&quot;%A&quot;</span>, Locale::de_DE).to_string(), <span class="string">&quot;Sonntag&quot;</span>);
+    <span class="macro">assert_eq!</span>(nd.format_localized(<span class="string">&quot;%D&quot;</span>, Locale::de_DE).to_string(), <span class="string">&quot;07/08/01&quot;</span>);
+    <span class="macro">assert_eq!</span>(nd.format_localized(<span class="string">&quot;%x&quot;</span>, Locale::de_DE).to_string(), <span class="string">&quot;08.07.2001&quot;</span>);
+    <span class="macro">assert_eq!</span>(nd.format_localized(<span class="string">&quot;%F&quot;</span>, Locale::de_DE).to_string(), <span class="string">&quot;2001-07-08&quot;</span>);
+    <span class="macro">assert_eq!</span>(nd.format_localized(<span class="string">&quot;%v&quot;</span>, Locale::de_DE).to_string(), <span class="string">&quot; 8-Jul-2001&quot;</span>);
 }
 </code></pre></div></section></main></body></html>

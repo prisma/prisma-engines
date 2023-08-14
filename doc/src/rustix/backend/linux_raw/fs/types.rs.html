@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/nix/store/jnqxxv1xi811ni996b002f4jnyz38xck-vendor-cargo-deps/c19b7c6f923b580ac259164a89f2577984ad5ab09ee9d583b888f934adbbe8d0/rustix-0.36.13/src/backend/linux_raw/fs/types.rs`."><title>types.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../../../static.files/rustdoc-f3501f0f5ae15dfb.css" id="mainThemeStyle"><div id="rustdoc-vars" data-root-path="../../../../../" data-static-root-path="../../../../../static.files/" data-current-crate="rustix" data-themes="" data-resource-suffix="" data-rustdoc-version="1.71.0 (8ede3aae2 2023-07-12)" data-search-js="search-4926e5fc22a5646a.js" data-settings-js="settings-de11bff964e9d4e5.js" data-settings-css="settings-8c76f75bfb6bd192.css" data-theme-light-css="light-0f8c037637f9eb3e.css" data-theme-dark-css="dark-1097f8e92a01e3cf.css" data-theme-ayu-css="ayu-614652228113ac93.css" ></div><script src="../../../../../static.files/storage-62ce34ea385b278a.js"></script><script defer src="../../../../../static.files/source-script-11255107d0a65077.js"></script><script defer src="../../../../../source-files.js"></script><script defer src="../../../../../static.files/main-f0540c1d82cde29b.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../../../../../static.files/light-0f8c037637f9eb3e.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../../../../../static.files/dark-1097f8e92a01e3cf.css"><link rel="stylesheet" href="../../../../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../../../../rustix/index.html"><img class="rust-logo" src="../../../../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/nix/store/yf45a1rayffhnidhgyjynpyhr9lqkd09-vendor-cargo-deps/c19b7c6f923b580ac259164a89f2577984ad5ab09ee9d583b888f934adbbe8d0/rustix-0.38.8/src/backend/linux_raw/fs/types.rs`."><title>types.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../../../static.files/rustdoc-f3501f0f5ae15dfb.css" id="mainThemeStyle"><div id="rustdoc-vars" data-root-path="../../../../../" data-static-root-path="../../../../../static.files/" data-current-crate="rustix" data-themes="" data-resource-suffix="" data-rustdoc-version="1.71.0 (8ede3aae2 2023-07-12)" data-search-js="search-4926e5fc22a5646a.js" data-settings-js="settings-de11bff964e9d4e5.js" data-settings-css="settings-8c76f75bfb6bd192.css" data-theme-light-css="light-0f8c037637f9eb3e.css" data-theme-dark-css="dark-1097f8e92a01e3cf.css" data-theme-ayu-css="ayu-614652228113ac93.css" ></div><script src="../../../../../static.files/storage-62ce34ea385b278a.js"></script><script defer src="../../../../../static.files/source-script-11255107d0a65077.js"></script><script defer src="../../../../../source-files.js"></script><script defer src="../../../../../static.files/main-f0540c1d82cde29b.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../../../../../static.files/light-0f8c037637f9eb3e.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../../../../../static.files/dark-1097f8e92a01e3cf.css"><link rel="stylesheet" href="../../../../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../../../../rustix/index.html"><img class="rust-logo" src="../../../../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -704,39 +704,15 @@
 <a href="#704" id="704">704</a>
 <a href="#705" id="705">705</a>
 <a href="#706" id="706">706</a>
-<a href="#707" id="707">707</a>
-<a href="#708" id="708">708</a>
-<a href="#709" id="709">709</a>
-<a href="#710" id="710">710</a>
-<a href="#711" id="711">711</a>
-<a href="#712" id="712">712</a>
-<a href="#713" id="713">713</a>
-<a href="#714" id="714">714</a>
-<a href="#715" id="715">715</a>
-<a href="#716" id="716">716</a>
-<a href="#717" id="717">717</a>
-<a href="#718" id="718">718</a>
-<a href="#719" id="719">719</a>
-<a href="#720" id="720">720</a>
-<a href="#721" id="721">721</a>
-<a href="#722" id="722">722</a>
-<a href="#723" id="723">723</a>
-<a href="#724" id="724">724</a>
-<a href="#725" id="725">725</a>
-<a href="#726" id="726">726</a>
-<a href="#727" id="727">727</a>
-<a href="#728" id="728">728</a>
-<a href="#729" id="729">729</a>
-<a href="#730" id="730">730</a>
-<a href="#731" id="731">731</a>
-<a href="#732" id="732">732</a>
-</pre></div><pre class="rust"><code><span class="kw">use </span><span class="kw">super</span>::<span class="kw">super</span>::c;
+</pre></div><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::backend::c;
 <span class="kw">use </span>bitflags::bitflags;
 
 <span class="macro">bitflags! </span>{
     <span class="doccomment">/// `*_OK` constants for use with [`accessat`].
     ///
     /// [`accessat`]: fn.accessat.html
+    </span><span class="attr">#[repr(transparent)]
+    #[derive(Copy, Clone, Eq, PartialEq, Hash, Debug)]
     </span><span class="kw">pub struct </span>Access: c::c_uint {
         <span class="doccomment">/// `R_OK`
         </span><span class="kw">const </span>READ_OK = linux_raw_sys::general::R_OK;
@@ -758,21 +734,26 @@
     ///
     /// [`openat`]: crate::fs::openat
     /// [`statat`]: crate::fs::statat
+    </span><span class="attr">#[repr(transparent)]
+    #[derive(Copy, Clone, Eq, PartialEq, Hash, Debug)]
     </span><span class="kw">pub struct </span>AtFlags: c::c_uint {
+        <span class="doccomment">/// `AT_SYMLINK_NOFOLLOW`
+        </span><span class="kw">const </span>SYMLINK_NOFOLLOW = linux_raw_sys::general::AT_SYMLINK_NOFOLLOW;
+
+        <span class="doccomment">/// `AT_EACCESS`
+        </span><span class="kw">const </span>EACCESS = linux_raw_sys::general::AT_EACCESS;
+
         <span class="doccomment">/// `AT_REMOVEDIR`
         </span><span class="kw">const </span>REMOVEDIR = linux_raw_sys::general::AT_REMOVEDIR;
 
         <span class="doccomment">/// `AT_SYMLINK_FOLLOW`
         </span><span class="kw">const </span>SYMLINK_FOLLOW = linux_raw_sys::general::AT_SYMLINK_FOLLOW;
 
-        <span class="doccomment">/// `AT_SYMLINK_NOFOLLOW`
-        </span><span class="kw">const </span>SYMLINK_NOFOLLOW = linux_raw_sys::general::AT_SYMLINK_NOFOLLOW;
+        <span class="doccomment">/// `AT_NO_AUTOMOUNT`
+        </span><span class="kw">const </span>NO_AUTOMOUNT = linux_raw_sys::general::AT_NO_AUTOMOUNT;
 
         <span class="doccomment">/// `AT_EMPTY_PATH`
         </span><span class="kw">const </span>EMPTY_PATH = linux_raw_sys::general::AT_EMPTY_PATH;
-
-        <span class="doccomment">/// `AT_EACCESS`
-        </span><span class="kw">const </span>EACCESS = linux_raw_sys::general::AT_EACCESS;
 
         <span class="doccomment">/// `AT_STATX_SYNC_AS_STAT`
         </span><span class="kw">const </span>STATX_SYNC_AS_STAT = linux_raw_sys::general::AT_STATX_SYNC_AS_STAT;
@@ -791,6 +772,8 @@
     /// [`openat`]: crate::fs::openat
     /// [`chmodat`]: crate::fs::chmodat
     /// [`fchmod`]: crate::fs::fchmod
+    </span><span class="attr">#[repr(transparent)]
+    #[derive(Copy, Clone, Eq, PartialEq, Hash, Debug)]
     </span><span class="kw">pub struct </span>Mode: RawMode {
         <span class="doccomment">/// `S_IRWXU`
         </span><span class="kw">const </span>RWXU = linux_raw_sys::general::S_IRWXU;
@@ -854,10 +837,38 @@
     }
 }
 
+<span class="kw">impl </span>From&lt;RawMode&gt; <span class="kw">for </span>Mode {
+    <span class="doccomment">/// Support conversions from raw mode values to `Mode`.
+    ///
+    /// ```
+    /// use rustix::fs::{Mode, RawMode};
+    /// assert_eq!(Mode::from(0o700), Mode::RWXU);
+    /// ```
+    </span><span class="attr">#[inline]
+    </span><span class="kw">fn </span>from(st_mode: RawMode) -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>::from_raw_mode(st_mode)
+    }
+}
+
+<span class="kw">impl </span>From&lt;Mode&gt; <span class="kw">for </span>RawMode {
+    <span class="doccomment">/// Support conversions from `Mode` to raw mode values.
+    ///
+    /// ```
+    /// use rustix::fs::{Mode, RawMode};
+    /// assert_eq!(RawMode::from(Mode::RWXU), 0o700);
+    /// ```
+    </span><span class="attr">#[inline]
+    </span><span class="kw">fn </span>from(mode: Mode) -&gt; <span class="self">Self </span>{
+        mode.as_raw_mode()
+    }
+}
+
 <span class="macro">bitflags! </span>{
     <span class="doccomment">/// `O_*` constants for use with [`openat`].
     ///
     /// [`openat`]: crate::fs::openat
+    </span><span class="attr">#[repr(transparent)]
+    #[derive(Copy, Clone, Eq, PartialEq, Hash, Debug)]
     </span><span class="kw">pub struct </span>OFlags: c::c_uint {
         <span class="doccomment">/// `O_ACCMODE`
         </span><span class="kw">const </span>ACCMODE = linux_raw_sys::general::O_ACCMODE;
@@ -905,6 +916,8 @@
         </span><span class="kw">const </span>WRONLY = linux_raw_sys::general::O_WRONLY;
 
         <span class="doccomment">/// `O_RDWR`
+        ///
+        /// This is not equal to `RDONLY | WRONLY`. It&#39;s a distinct flag.
         </span><span class="kw">const </span>RDWR = linux_raw_sys::general::O_RDWR;
 
         <span class="doccomment">/// `O_NOCTTY`
@@ -940,7 +953,8 @@
     <span class="doccomment">/// `RESOLVE_*` constants for use with [`openat2`].
     ///
     /// [`openat2`]: crate::fs::openat2
-    </span><span class="attr">#[derive(Default)]
+    </span><span class="attr">#[repr(transparent)]
+    #[derive(Default, Copy, Clone, Eq, PartialEq, Hash, Debug)]
     </span><span class="kw">pub struct </span>ResolveFlags: u64 {
         <span class="doccomment">/// `RESOLVE_NO_XDEV`
         </span><span class="kw">const </span>NO_XDEV = linux_raw_sys::general::RESOLVE_NO_XDEV <span class="kw">as </span>u64;
@@ -966,6 +980,8 @@
     <span class="doccomment">/// `RENAME_*` constants for use with [`renameat_with`].
     ///
     /// [`renameat_with`]: crate::fs::renameat_with
+    </span><span class="attr">#[repr(transparent)]
+    #[derive(Copy, Clone, Eq, PartialEq, Hash, Debug)]
     </span><span class="kw">pub struct </span>RenameFlags: c::c_uint {
         <span class="doccomment">/// `RENAME_EXCHANGE`
         </span><span class="kw">const </span>EXCHANGE = linux_raw_sys::general::RENAME_EXCHANGE;
@@ -994,6 +1010,7 @@
     </span>Symlink = linux_raw_sys::general::S_IFLNK <span class="kw">as </span>isize,
 
     <span class="doccomment">/// `S_IFIFO`
+    </span><span class="attr">#[doc(alias = <span class="string">&quot;IFO&quot;</span>)]
     </span>Fifo = linux_raw_sys::general::S_IFIFO <span class="kw">as </span>isize,
 
     <span class="doccomment">/// `S_IFSOCK`
@@ -1041,7 +1058,7 @@
         }
     }
 
-    <span class="doccomment">/// Construct a `FileType` from the `d_type` field of a `dirent`.
+    <span class="doccomment">/// Construct a `FileType` from the `d_type` field of a `c::dirent`.
     </span><span class="attr">#[inline]
     </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">const fn </span>from_dirent_d_type(d_type: u8) -&gt; <span class="self">Self </span>{
         <span class="kw">match </span>d_type <span class="kw">as </span>u32 {
@@ -1087,6 +1104,8 @@
     <span class="doccomment">/// `MFD_*` constants for use with [`memfd_create`].
     ///
     /// [`memfd_create`]: crate::fs::memfd_create
+    </span><span class="attr">#[repr(transparent)]
+    #[derive(Copy, Clone, Eq, PartialEq, Hash, Debug)]
     </span><span class="kw">pub struct </span>MemfdFlags: c::c_uint {
         <span class="doccomment">/// `MFD_CLOEXEC`
         </span><span class="kw">const </span>CLOEXEC = linux_raw_sys::general::MFD_CLOEXEC;
@@ -1130,6 +1149,8 @@
     ///
     /// [`fcntl_add_seals`]: crate::fs::fcntl_add_seals
     /// [`fcntl_get_seals`]: crate::fs::fcntl_get_seals
+    </span><span class="attr">#[repr(transparent)]
+    #[derive(Copy, Clone, Eq, PartialEq, Hash, Debug)]
     </span><span class="kw">pub struct </span>SealFlags: u32 {
        <span class="doccomment">/// `F_SEAL_SEAL`.
        </span><span class="kw">const </span>SEAL = linux_raw_sys::general::F_SEAL_SEAL;
@@ -1148,6 +1169,8 @@
     <span class="doccomment">/// `STATX_*` constants for use with [`statx`].
     ///
     /// [`statx`]: crate::fs::statx
+    </span><span class="attr">#[repr(transparent)]
+    #[derive(Copy, Clone, Eq, PartialEq, Hash, Debug)]
     </span><span class="kw">pub struct </span>StatxFlags: u32 {
         <span class="doccomment">/// `STATX_TYPE`
         </span><span class="kw">const </span>TYPE = linux_raw_sys::general::STATX_TYPE;
@@ -1191,6 +1214,9 @@
         <span class="doccomment">/// `STATX_MNT_ID` (since Linux 5.8)
         </span><span class="kw">const </span>MNT_ID = linux_raw_sys::general::STATX_MNT_ID;
 
+        <span class="doccomment">/// `STATX_DIOALIGN` (since Linux 6.1)
+        </span><span class="kw">const </span>DIOALIGN = linux_raw_sys::general::STATX_DIOALIGN;
+
         <span class="doccomment">/// `STATX_ALL`
         </span><span class="kw">const </span>ALL = linux_raw_sys::general::STATX_ALL;
     }
@@ -1200,6 +1226,8 @@
     <span class="doccomment">/// `FALLOC_FL_*` constants for use with [`fallocate`].
     ///
     /// [`fallocate`]: crate::fs::fallocate
+    </span><span class="attr">#[repr(transparent)]
+    #[derive(Copy, Clone, Eq, PartialEq, Hash, Debug)]
     </span><span class="kw">pub struct </span>FallocateFlags: u32 {
         <span class="doccomment">/// `FALLOC_FL_KEEP_SIZE`
         </span><span class="kw">const </span>KEEP_SIZE = linux_raw_sys::general::FALLOC_FL_KEEP_SIZE;
@@ -1220,6 +1248,8 @@
 
 <span class="macro">bitflags! </span>{
     <span class="doccomment">/// `ST_*` constants for use with [`StatVfs`].
+    </span><span class="attr">#[repr(transparent)]
+    #[derive(Copy, Clone, Eq, PartialEq, Hash, Debug)]
     </span><span class="kw">pub struct </span>StatVfsMountFlags: u64 {
         <span class="doccomment">/// `ST_MANDLOCK`
         </span><span class="kw">const </span>MANDLOCK = linux_raw_sys::general::MS_MANDLOCK <span class="kw">as </span>u64;
@@ -1250,9 +1280,10 @@
     }
 }
 
-<span class="doccomment">/// `LOCK_*` constants for use with [`flock`]
+<span class="doccomment">/// `LOCK_*` constants for use with [`flock`] and [`fcntl_lock`].
 ///
 /// [`flock`]: crate::fs::flock
+/// [`fcntl_lock`]: crate::fs::fcntl_lock
 </span><span class="attr">#[derive(Clone, Copy, Debug, PartialEq, Eq)]
 #[repr(u32)]
 </span><span class="kw">pub enum </span>FlockOperation {
@@ -1277,7 +1308,11 @@
 </span><span class="comment">// On 32-bit, and mips64, Linux&#39;s `struct stat64` has a 32-bit `st_mtime` and
 // friends, so we use our own struct, populated from `statx` where possible, to
 // avoid the y2038 bug.
-</span><span class="attr">#[cfg(any(target_pointer_width = <span class="string">&quot;32&quot;</span>, target_arch = <span class="string">&quot;mips64&quot;</span>))]
+</span><span class="attr">#[cfg(any(
+    target_pointer_width = <span class="string">&quot;32&quot;</span>,
+    target_arch = <span class="string">&quot;mips64&quot;</span>,
+    target_arch = <span class="string">&quot;mips64r6&quot;
+</span>))]
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 #[allow(missing_docs)]
@@ -1304,7 +1339,11 @@
 ///
 /// [`statat`]: crate::fs::statat
 /// [`fstat`]: crate::fs::fstat
-</span><span class="attr">#[cfg(all(target_pointer_width = <span class="string">&quot;64&quot;</span>, not(target_arch = <span class="string">&quot;mips64&quot;</span>)))]
+</span><span class="attr">#[cfg(all(
+    target_pointer_width = <span class="string">&quot;64&quot;</span>,
+    not(target_arch = <span class="string">&quot;mips64&quot;</span>),
+    not(target_arch = <span class="string">&quot;mips64r6&quot;</span>)
+))]
 </span><span class="kw">pub type </span>Stat = linux_raw_sys::general::stat;
 
 <span class="doccomment">/// `struct statfs` for use with [`statfs`] and [`fstatfs`].
@@ -1350,7 +1389,7 @@
 )))]
 </span><span class="kw">pub type </span>RawMode = linux_raw_sys::general::__kernel_mode_t;
 
-<span class="doccomment">/// `mode_t
+<span class="doccomment">/// `mode_t`
 </span><span class="attr">#[cfg(any(
     target_arch = <span class="string">&quot;x86&quot;</span>,
     target_arch = <span class="string">&quot;sparc&quot;</span>,
@@ -1365,101 +1404,10 @@
 </span><span class="kw">pub type </span>Dev = u64;
 
 <span class="doccomment">/// `__fsword_t`
-</span><span class="attr">#[cfg(not(target_arch = <span class="string">&quot;mips64&quot;</span>))]
+</span><span class="attr">#[cfg(not(any(target_arch = <span class="string">&quot;mips64&quot;</span>, target_arch = <span class="string">&quot;mips64r6&quot;</span>)))]
 </span><span class="kw">pub type </span>FsWord = linux_raw_sys::general::__fsword_t;
 
 <span class="doccomment">/// `__fsword_t`
-</span><span class="attr">#[cfg(target_arch = <span class="string">&quot;mips64&quot;</span>)]
+</span><span class="attr">#[cfg(any(target_arch = <span class="string">&quot;mips64&quot;</span>, target_arch = <span class="string">&quot;mips64r6&quot;</span>))]
 </span><span class="kw">pub type </span>FsWord = i64;
-
-<span class="kw">pub use </span>linux_raw_sys::general::{UTIME_NOW, UTIME_OMIT};
-
-<span class="doccomment">/// `PROC_SUPER_MAGIC`—The magic number for the procfs filesystem.
-</span><span class="kw">pub const </span>PROC_SUPER_MAGIC: FsWord = linux_raw_sys::general::PROC_SUPER_MAGIC <span class="kw">as </span>FsWord;
-
-<span class="doccomment">/// `NFS_SUPER_MAGIC`—The magic number for the NFS filesystem.
-</span><span class="kw">pub const </span>NFS_SUPER_MAGIC: FsWord = linux_raw_sys::general::NFS_SUPER_MAGIC <span class="kw">as </span>FsWord;
-
-<span class="attr">#[cfg(any(target_os = <span class="string">&quot;android&quot;</span>, target_os = <span class="string">&quot;linux&quot;</span>))]
-</span><span class="macro">bitflags! </span>{
-    <span class="doccomment">/// `MS_*` constants for use with [`mount`][crate::fs::mount].
-    </span><span class="kw">pub struct </span>MountFlags: c::c_uint {
-        <span class="doccomment">/// `MS_BIND`
-        </span><span class="kw">const </span>BIND = linux_raw_sys::general::MS_BIND;
-
-        <span class="doccomment">/// `MS_DIRSYNC`
-        </span><span class="kw">const </span>DIRSYNC = linux_raw_sys::general::MS_DIRSYNC;
-
-        <span class="doccomment">/// `MS_LAZYTIME`
-        </span><span class="kw">const </span>LAZYTIME = linux_raw_sys::general::MS_LAZYTIME;
-
-        <span class="doccomment">/// `MS_MANDLOCK`
-        </span><span class="attr">#[doc(alias = <span class="string">&quot;MANDLOCK&quot;</span>)]
-        </span><span class="kw">const </span>PERMIT_MANDATORY_FILE_LOCKING = linux_raw_sys::general::MS_MANDLOCK;
-
-        <span class="doccomment">/// `MS_NOATIME`
-        </span><span class="kw">const </span>NOATIME = linux_raw_sys::general::MS_NOATIME;
-
-        <span class="doccomment">/// `MS_NODEV`
-        </span><span class="kw">const </span>NODEV = linux_raw_sys::general::MS_NODEV;
-
-        <span class="doccomment">/// `MS_NODIRATIME`
-        </span><span class="kw">const </span>NODIRATIME = linux_raw_sys::general::MS_NODIRATIME;
-
-        <span class="doccomment">/// `MS_NOEXEC`
-        </span><span class="kw">const </span>NOEXEC = linux_raw_sys::general::MS_NOEXEC;
-
-        <span class="doccomment">/// `MS_NOSUID`
-        </span><span class="kw">const </span>NOSUID = linux_raw_sys::general::MS_NOSUID;
-
-        <span class="doccomment">/// `MS_RDONLY`
-        </span><span class="kw">const </span>RDONLY = linux_raw_sys::general::MS_RDONLY;
-
-        <span class="doccomment">/// `MS_REC`
-        </span><span class="kw">const </span>REC = linux_raw_sys::general::MS_REC;
-
-        <span class="doccomment">/// `MS_RELATIME`
-        </span><span class="kw">const </span>RELATIME = linux_raw_sys::general::MS_RELATIME;
-
-        <span class="doccomment">/// `MS_SILENT`
-        </span><span class="kw">const </span>SILENT = linux_raw_sys::general::MS_SILENT;
-
-        <span class="doccomment">/// `MS_STRICTATIME`
-        </span><span class="kw">const </span>STRICTATIME = linux_raw_sys::general::MS_STRICTATIME;
-
-        <span class="doccomment">/// `MS_SYNCHRONOUS`
-        </span><span class="kw">const </span>SYNCHRONOUS = linux_raw_sys::general::MS_SYNCHRONOUS;
-
-        <span class="doccomment">/// `MS_NOSYMFOLLOW`
-        </span><span class="kw">const </span>NOSYMFOLLOW = linux_raw_sys::general::MS_NOSYMFOLLOW;
-    }
-}
-
-<span class="attr">#[cfg(any(target_os = <span class="string">&quot;android&quot;</span>, target_os = <span class="string">&quot;linux&quot;</span>))]
-</span><span class="macro">bitflags! </span>{
-    <span class="doccomment">/// `MS_*` constants for use with [`change_mount`][crate::fs::mount::change_mount].
-    </span><span class="kw">pub struct </span>MountPropagationFlags: c::c_uint {
-        <span class="doccomment">/// `MS_SHARED`
-        </span><span class="kw">const </span>SHARED = linux_raw_sys::general::MS_SHARED;
-        <span class="doccomment">/// `MS_PRIVATE`
-        </span><span class="kw">const </span>PRIVATE = linux_raw_sys::general::MS_PRIVATE;
-        <span class="doccomment">/// `MS_SLAVE`
-        </span><span class="kw">const </span>SLAVE = linux_raw_sys::general::MS_SLAVE;
-        <span class="doccomment">/// `MS_UNBINDABLE`
-        </span><span class="kw">const </span>UNBINDABLE = linux_raw_sys::general::MS_UNBINDABLE;
-        <span class="doccomment">/// `MS_REC`
-        </span><span class="kw">const </span>REC = linux_raw_sys::general::MS_REC;
-    }
-}
-
-<span class="attr">#[cfg(any(target_os = <span class="string">&quot;android&quot;</span>, target_os = <span class="string">&quot;linux&quot;</span>))]
-</span><span class="macro">bitflags! </span>{
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>InternalMountFlags: c::c_uint {
-        <span class="kw">const </span>REMOUNT = linux_raw_sys::general::MS_REMOUNT;
-        <span class="kw">const </span>MOVE = linux_raw_sys::general::MS_MOVE;
-    }
-}
-
-<span class="attr">#[cfg(any(target_os = <span class="string">&quot;android&quot;</span>, target_os = <span class="string">&quot;linux&quot;</span>))]
-</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>MountFlagsArg(<span class="kw">pub</span>(<span class="kw">crate</span>) c::c_uint);
 </code></pre></div></section></main></body></html>

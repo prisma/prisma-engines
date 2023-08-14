@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/nix/store/jnqxxv1xi811ni996b002f4jnyz38xck-vendor-cargo-deps/c19b7c6f923b580ac259164a89f2577984ad5ab09ee9d583b888f934adbbe8d0/pest-2.3.0/src/error.rs`."><title>error.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-f3501f0f5ae15dfb.css" id="mainThemeStyle"><div id="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="pest" data-themes="" data-resource-suffix="" data-rustdoc-version="1.71.0 (8ede3aae2 2023-07-12)" data-search-js="search-4926e5fc22a5646a.js" data-settings-js="settings-de11bff964e9d4e5.js" data-settings-css="settings-8c76f75bfb6bd192.css" data-theme-light-css="light-0f8c037637f9eb3e.css" data-theme-dark-css="dark-1097f8e92a01e3cf.css" data-theme-ayu-css="ayu-614652228113ac93.css" ></div><script src="../../static.files/storage-62ce34ea385b278a.js"></script><script defer src="../../static.files/source-script-11255107d0a65077.js"></script><script defer src="../../source-files.js"></script><script defer src="../../static.files/main-f0540c1d82cde29b.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../../static.files/light-0f8c037637f9eb3e.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../../static.files/dark-1097f8e92a01e3cf.css"><link rel="stylesheet" href="../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../pest/index.html"><img class="rust-logo" src="../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/nix/store/yf45a1rayffhnidhgyjynpyhr9lqkd09-vendor-cargo-deps/c19b7c6f923b580ac259164a89f2577984ad5ab09ee9d583b888f934adbbe8d0/pest-2.7.2/src/error.rs`."><title>error.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-f3501f0f5ae15dfb.css" id="mainThemeStyle"><div id="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="pest" data-themes="" data-resource-suffix="" data-rustdoc-version="1.71.0 (8ede3aae2 2023-07-12)" data-search-js="search-4926e5fc22a5646a.js" data-settings-js="settings-de11bff964e9d4e5.js" data-settings-css="settings-8c76f75bfb6bd192.css" data-theme-light-css="light-0f8c037637f9eb3e.css" data-theme-dark-css="dark-1097f8e92a01e3cf.css" data-theme-ayu-css="ayu-614652228113ac93.css" ></div><script src="../../static.files/storage-62ce34ea385b278a.js"></script><script defer src="../../static.files/source-script-11255107d0a65077.js"></script><script defer src="../../source-files.js"></script><script defer src="../../static.files/main-f0540c1d82cde29b.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../../static.files/light-0f8c037637f9eb3e.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../../static.files/dark-1097f8e92a01e3cf.css"><link rel="stylesheet" href="../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="icon" href="https://raw.githubusercontent.com/pest-parser/pest/master/pest-logo.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../pest/index.html"><img src="https://raw.githubusercontent.com/pest-parser/pest/master/pest-logo.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -893,6 +893,41 @@
 <a href="#893" id="893">893</a>
 <a href="#894" id="894">894</a>
 <a href="#895" id="895">895</a>
+<a href="#896" id="896">896</a>
+<a href="#897" id="897">897</a>
+<a href="#898" id="898">898</a>
+<a href="#899" id="899">899</a>
+<a href="#900" id="900">900</a>
+<a href="#901" id="901">901</a>
+<a href="#902" id="902">902</a>
+<a href="#903" id="903">903</a>
+<a href="#904" id="904">904</a>
+<a href="#905" id="905">905</a>
+<a href="#906" id="906">906</a>
+<a href="#907" id="907">907</a>
+<a href="#908" id="908">908</a>
+<a href="#909" id="909">909</a>
+<a href="#910" id="910">910</a>
+<a href="#911" id="911">911</a>
+<a href="#912" id="912">912</a>
+<a href="#913" id="913">913</a>
+<a href="#914" id="914">914</a>
+<a href="#915" id="915">915</a>
+<a href="#916" id="916">916</a>
+<a href="#917" id="917">917</a>
+<a href="#918" id="918">918</a>
+<a href="#919" id="919">919</a>
+<a href="#920" id="920">920</a>
+<a href="#921" id="921">921</a>
+<a href="#922" id="922">922</a>
+<a href="#923" id="923">923</a>
+<a href="#924" id="924">924</a>
+<a href="#925" id="925">925</a>
+<a href="#926" id="926">926</a>
+<a href="#927" id="927">927</a>
+<a href="#928" id="928">928</a>
+<a href="#929" id="929">929</a>
+<a href="#930" id="930">930</a>
 </pre></div><pre class="rust"><code><span class="comment">// pest. The Elegant Parser
 // Copyright (c) 2018 Dragoș Tiselice
 //
@@ -969,6 +1004,19 @@
     </span>Span((usize, usize), (usize, usize)),
 }
 
+<span class="kw">impl </span>From&lt;Position&lt;<span class="lifetime">&#39;_</span>&gt;&gt; <span class="kw">for </span>LineColLocation {
+    <span class="kw">fn </span>from(value: Position&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>::Pos(value.line_col())
+    }
+}
+
+<span class="kw">impl </span>From&lt;Span&lt;<span class="lifetime">&#39;_</span>&gt;&gt; <span class="kw">for </span>LineColLocation {
+    <span class="kw">fn </span>from(value: Span&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; <span class="self">Self </span>{
+        <span class="kw">let </span>(start, end) = value.split();
+        <span class="self">Self</span>::Span(start.line_col(), end.line_col())
+    }
+}
+
 <span class="kw">impl</span>&lt;R: RuleType&gt; Error&lt;R&gt; {
     <span class="doccomment">/// Creates `Error` from `ErrorVariant` and `Position`.
     ///
@@ -996,7 +1044,7 @@
     ///
     /// println!(&quot;{}&quot;, error);
     /// ```
-    </span><span class="kw">pub fn </span>new_from_pos(variant: ErrorVariant&lt;R&gt;, pos: Position) -&gt; Error&lt;R&gt; {
+    </span><span class="kw">pub fn </span>new_from_pos(variant: ErrorVariant&lt;R&gt;, pos: Position&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; Error&lt;R&gt; {
         <span class="kw">let </span>visualize_ws = pos.match_char(<span class="string">&#39;\n&#39;</span>) || pos.match_char(<span class="string">&#39;\r&#39;</span>);
         <span class="kw">let </span>line_of = pos.line_of();
         <span class="kw">let </span>line = <span class="kw">if </span>visualize_ws {
@@ -1042,7 +1090,7 @@
     ///
     /// println!(&quot;{}&quot;, error);
     /// ```
-    </span><span class="kw">pub fn </span>new_from_span(variant: ErrorVariant&lt;R&gt;, span: Span) -&gt; Error&lt;R&gt; {
+    </span><span class="kw">pub fn </span>new_from_span(variant: ErrorVariant&lt;R&gt;, span: Span&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; Error&lt;R&gt; {
         <span class="kw">let </span>end = span.end_pos();
         <span class="kw">let </span><span class="kw-2">mut </span>end_line_col = end.line_col();
         <span class="comment">// end position is after a \n, so we want to point to the visual lf symbol
@@ -1065,7 +1113,7 @@
         };
         <span class="kw">let </span>ll = line_iter.last();
         <span class="kw">let </span>continued_line = <span class="kw">if </span>visualize_ws {
-            ll.map(<span class="kw-2">&amp;</span>str::to_owned)
+            ll.map(str::to_owned)
         } <span class="kw">else </span>{
             ll.map(visualize_whitespace)
         };
@@ -1313,7 +1361,7 @@
             .unwrap_or_default();
 
         <span class="kw">let </span>pair = (<span class="self">self</span>.line_col.clone(), <span class="kw-2">&amp;</span><span class="self">self</span>.continued_line);
-        <span class="kw">if let </span>(LineColLocation::Span(<span class="kw">_</span>, end), <span class="kw-2">&amp;</span><span class="prelude-val">Some</span>(<span class="kw-2">ref </span>continued_line)) = pair {
+        <span class="kw">if let </span>(LineColLocation::Span(<span class="kw">_</span>, end), <span class="prelude-val">Some</span>(<span class="kw-2">ref </span>continued_line)) = pair {
             <span class="kw">let </span>has_line_gap = end.<span class="number">0 </span>- <span class="self">self</span>.start().<span class="number">0 </span>&gt; <span class="number">1</span>;
             <span class="kw">if </span>has_line_gap {
                 <span class="macro">format!</span>(
@@ -1400,7 +1448,7 @@
     /// };
     ///
     /// println!(&quot;{}&quot;, variant.message());
-    </span><span class="kw">pub fn </span>message(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Cow&lt;str&gt; {
+    </span><span class="kw">pub fn </span>message(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Cow&lt;<span class="lifetime">&#39;_</span>, str&gt; {
         <span class="kw">match </span><span class="self">self </span>{
             ErrorVariant::ParsingError {
                 <span class="kw-2">ref </span>positives,
@@ -1414,13 +1462,13 @@
 }
 
 <span class="kw">impl</span>&lt;R: RuleType&gt; fmt::Display <span class="kw">for </span>Error&lt;R&gt; {
-    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter) -&gt; fmt::Result {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
         <span class="macro">write!</span>(f, <span class="string">&quot;{}&quot;</span>, <span class="self">self</span>.format())
     }
 }
 
 <span class="kw">impl</span>&lt;R: RuleType&gt; fmt::Display <span class="kw">for </span>ErrorVariant&lt;R&gt; {
-    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter) -&gt; fmt::Result {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
         <span class="kw">match </span><span class="self">self </span>{
             ErrorVariant::ParsingError { .. } =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;parsing error: {}&quot;</span>, <span class="self">self</span>.message()),
             ErrorVariant::CustomError { .. } =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;{}&quot;</span>, <span class="self">self</span>.message()),
@@ -1785,6 +1833,28 @@
                 <span class="string">&quot;  = unexpected 4, 5, or 6; expected 1, 2, or 3&quot;</span>,
             ]
             .join(<span class="string">&quot;\n&quot;</span>)
+        );
+    }
+
+    <span class="attr">#[test]
+    </span><span class="kw">fn </span>pos_to_lcl_conversion() {
+        <span class="kw">let </span>input = <span class="string">&quot;input&quot;</span>;
+
+        <span class="kw">let </span>pos = Position::new(input, <span class="number">2</span>).unwrap();
+
+        <span class="macro">assert_eq!</span>(LineColLocation::Pos(pos.line_col()), pos.into());
+    }
+
+    <span class="attr">#[test]
+    </span><span class="kw">fn </span>span_to_lcl_conversion() {
+        <span class="kw">let </span>input = <span class="string">&quot;input&quot;</span>;
+
+        <span class="kw">let </span>span = Span::new(input, <span class="number">2</span>, <span class="number">4</span>).unwrap();
+        <span class="kw">let </span>(start, end) = span.split();
+
+        <span class="macro">assert_eq!</span>(
+            LineColLocation::Span(start.line_col(), end.line_col()),
+            span.into()
         );
     }
 }

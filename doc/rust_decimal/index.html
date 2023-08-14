@@ -1,19 +1,26 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="A Decimal number implementation written in pure Rust suitable for financial calculations that require significant integral and fractional digits with no round-off errors."><title>rust_decimal - Rust</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../static.files/rustdoc-f3501f0f5ae15dfb.css" id="mainThemeStyle"><div id="rustdoc-vars" data-root-path="../" data-static-root-path="../static.files/" data-current-crate="rust_decimal" data-themes="" data-resource-suffix="" data-rustdoc-version="1.71.0 (8ede3aae2 2023-07-12)" data-search-js="search-4926e5fc22a5646a.js" data-settings-js="settings-de11bff964e9d4e5.js" data-settings-css="settings-8c76f75bfb6bd192.css" data-theme-light-css="light-0f8c037637f9eb3e.css" data-theme-dark-css="dark-1097f8e92a01e3cf.css" data-theme-ayu-css="ayu-614652228113ac93.css" ></div><script src="../static.files/storage-62ce34ea385b278a.js"></script><script defer src="../crates.js"></script><script defer src="../static.files/main-f0540c1d82cde29b.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../static.files/light-0f8c037637f9eb3e.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../static.files/dark-1097f8e92a01e3cf.css"><link rel="stylesheet" href="../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc mod crate"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="logo-container" href="../rust_decimal/index.html"><img class="rust-logo" src="../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><h2></h2></nav><nav class="sidebar"><a class="logo-container" href="../rust_decimal/index.html"><img class="rust-logo" src="../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><h2 class="location"><a href="#">Crate rust_decimal</a></h2><div class="sidebar-elems"><ul class="block"><li class="version">Version 1.26.1</li><li><a id="all-types" href="all.html">All Items</a></li></ul><section><ul class="block"><li><a href="#modules">Modules</a></li><li><a href="#structs">Structs</a></li><li><a href="#enums">Enums</a></li><li><a href="#types">Type Definitions</a></li></ul></section></div></nav><main><div class="width-limiter"><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="main-heading"><h1>Crate <a class="mod" href="#">rust_decimal</a><button id="copy-path" title="Copy item path to clipboard"><img src="../static.files/clipboard-7571035ce49a181d.svg" width="19" height="18" alt="Copy item path"></button></h1><span class="out-of-band"><a class="srclink" href="../src/rust_decimal/lib.rs.html#1-75">source</a> · <button id="toggle-all-docs" title="collapse all docs">[<span>&#x2212;</span>]</button></span></div><details class="toggle top-doc" open><summary class="hideme"><span>Expand description</span></summary><div class="docblock"><p>A Decimal number implementation written in pure Rust suitable for financial calculations that require significant integral and fractional digits with no round-off errors.</p>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="A Decimal number implementation written in pure Rust suitable for financial calculations that require significant integral and fractional digits with no round-off errors."><title>rust_decimal - Rust</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../static.files/rustdoc-f3501f0f5ae15dfb.css" id="mainThemeStyle"><div id="rustdoc-vars" data-root-path="../" data-static-root-path="../static.files/" data-current-crate="rust_decimal" data-themes="" data-resource-suffix="" data-rustdoc-version="1.71.0 (8ede3aae2 2023-07-12)" data-search-js="search-4926e5fc22a5646a.js" data-settings-js="settings-de11bff964e9d4e5.js" data-settings-css="settings-8c76f75bfb6bd192.css" data-theme-light-css="light-0f8c037637f9eb3e.css" data-theme-dark-css="dark-1097f8e92a01e3cf.css" data-theme-ayu-css="ayu-614652228113ac93.css" ></div><script src="../static.files/storage-62ce34ea385b278a.js"></script><script defer src="../crates.js"></script><script defer src="../static.files/main-f0540c1d82cde29b.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../static.files/light-0f8c037637f9eb3e.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../static.files/dark-1097f8e92a01e3cf.css"><link rel="stylesheet" href="../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc mod crate"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="logo-container" href="../rust_decimal/index.html"><img class="rust-logo" src="../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><h2></h2></nav><nav class="sidebar"><a class="logo-container" href="../rust_decimal/index.html"><img class="rust-logo" src="../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><h2 class="location"><a href="#">Crate rust_decimal</a></h2><div class="sidebar-elems"><ul class="block"><li class="version">Version 1.31.0</li><li><a id="all-types" href="all.html">All Items</a></li></ul><section><ul class="block"><li><a href="#modules">Modules</a></li><li><a href="#structs">Structs</a></li><li><a href="#enums">Enums</a></li><li><a href="#types">Type Definitions</a></li></ul></section></div></nav><main><div class="width-limiter"><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="main-heading"><h1>Crate <a class="mod" href="#">rust_decimal</a><button id="copy-path" title="Copy item path to clipboard"><img src="../static.files/clipboard-7571035ce49a181d.svg" width="19" height="18" alt="Copy item path"></button></h1><span class="out-of-band"><a class="srclink" href="../src/rust_decimal/lib.rs.html#1-78">source</a> · <button id="toggle-all-docs" title="collapse all docs">[<span>&#x2212;</span>]</button></span></div><details class="toggle top-doc" open><summary class="hideme"><span>Expand description</span></summary><div class="docblock"><p>A Decimal number implementation written in pure Rust suitable for financial calculations that require significant integral and fractional digits with no round-off errors.</p>
 <p>The binary representation consists of a 96 bit integer number, a scaling factor used to specify the decimal fraction and a 1 bit sign. Because of this representation, trailing zeros are preserved and may be exposed when in string form. These can be truncated using the <code>normalize</code> or <code>round_dp</code> functions.</p>
-<h3 id="getting-started"><a href="#getting-started">Getting started</a></h3>
-<p>To get started, add <code>rust_decimal</code> and optionally <code>rust_decimal_macros</code> to your <code>Cargo.toml</code>:</p>
+<h3 id="installing"><a href="#installing">Installing</a></h3>
+<p>Using <a href="https://crates.io/crates/cargo-edit"><code>cargo-edit</code></a>:</p>
+<div class="example-wrap"><pre class="language-sh"><code>$ cargo add rust_decimal
+</code></pre></div>
+<p>In addition, if you would like to use the optimized macro for convenient creation of decimals:</p>
+<div class="example-wrap"><pre class="language-sh"><code>$ cargo add rust_decimal_macros
+</code></pre></div>
+<p>Alternatively, you can edit your <code>Cargo.toml</code> directly and run <code>cargo update</code>:</p>
 <div class="example-wrap"><pre class="language-toml"><code>[dependencies]
-rust_decimal = &quot;1.26&quot;
-rust_decimal_macros = &quot;1.26&quot;
+rust_decimal = &quot;1.31&quot;
+rust_decimal_macros = &quot;1.31&quot;
 </code></pre></div><h3 id="usage"><a href="#usage">Usage</a></h3>
 <p>Decimal numbers can be created in a few distinct ways. The easiest and most efficient method of creating a Decimal is to use the procedural macro within the <code>rust_decimal_macros</code> crate:</p>
 
 <div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="comment">// Procedural macros need importing directly
 </span><span class="kw">use </span>rust_decimal_macros::dec;
 
-<span class="kw">let </span>number = <span class="macro">dec!</span>(-<span class="number">1.23</span>);
-<span class="macro">assert_eq!</span>(<span class="string">&quot;-1.23&quot;</span>, number.to_string());</code></pre></div>
-<p>Alternatively you can also use one of the Decimal number convenience functions:</p>
+<span class="kw">let </span>number = <span class="macro">dec!</span>(-<span class="number">1.23</span>) + <span class="macro">dec!</span>(<span class="number">3.45</span>);
+<span class="macro">assert_eq!</span>(number, <span class="macro">dec!</span>(<span class="number">2.22</span>));
+<span class="macro">assert_eq!</span>(number.to_string(), <span class="string">&quot;2.22&quot;</span>);</code></pre></div>
+<p>Alternatively you can also use one of the Decimal number convenience functions (<a href="https://docs.rs/rust_decimal/">see the docs</a> for more details):</p>
 
 <div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="comment">// Using the prelude can help importing trait based functions (e.g. core::str::FromStr).
 </span><span class="kw">use </span>rust_decimal::prelude::<span class="kw-2">*</span>;
@@ -21,6 +28,10 @@ rust_decimal_macros = &quot;1.26&quot;
 <span class="comment">// Using an integer followed by the decimal points
 </span><span class="kw">let </span>scaled = Decimal::new(<span class="number">202</span>, <span class="number">2</span>);
 <span class="macro">assert_eq!</span>(<span class="string">&quot;2.02&quot;</span>, scaled.to_string());
+
+<span class="comment">// From a 128 bit integer
+</span><span class="kw">let </span>balance = Decimal::from_i128_with_scale(<span class="number">5_897_932_384_626_433_832</span>, <span class="number">2</span>);
+<span class="macro">assert_eq!</span>(<span class="string">&quot;58979323846264338.32&quot;</span>, balance.to_string());
 
 <span class="comment">// From a string representation
 </span><span class="kw">let </span>from_string = Decimal::from_str(<span class="string">&quot;2.02&quot;</span>).unwrap();
@@ -30,21 +41,26 @@ rust_decimal_macros = &quot;1.26&quot;
 </span><span class="kw">let </span>from_string_base16 = Decimal::from_str_radix(<span class="string">&quot;ffff&quot;</span>, <span class="number">16</span>).unwrap();
 <span class="macro">assert_eq!</span>(<span class="string">&quot;65535&quot;</span>, from_string_base16.to_string());
 
+<span class="comment">// From scientific notation
+</span><span class="kw">let </span>sci = Decimal::from_scientific(<span class="string">&quot;9.7e-7&quot;</span>).unwrap();
+<span class="macro">assert_eq!</span>(<span class="string">&quot;0.00000097&quot;</span>, sci.to_string());
+
 <span class="comment">// Using the `Into` trait
-</span><span class="kw">let </span>my_int: Decimal = <span class="number">3i32</span>.into();
+</span><span class="kw">let </span>my_int: Decimal = <span class="number">3_i32</span>.into();
 <span class="macro">assert_eq!</span>(<span class="string">&quot;3&quot;</span>, my_int.to_string());
 
 <span class="comment">// Using the raw decimal representation
-</span><span class="kw">let </span>pi = Decimal::from_parts(<span class="number">1102470952</span>, <span class="number">185874565</span>, <span class="number">1703060790</span>, <span class="bool-val">false</span>, <span class="number">28</span>);
+</span><span class="kw">let </span>pi = Decimal::from_parts(<span class="number">1_102_470_952</span>, <span class="number">185_874_565</span>, <span class="number">1_703_060_790</span>, <span class="bool-val">false</span>, <span class="number">28</span>);
 <span class="macro">assert_eq!</span>(<span class="string">&quot;3.1415926535897932384626433832&quot;</span>, pi.to_string());</code></pre></div>
 <p>Once you have instantiated your <code>Decimal</code> number you can perform calculations with it just like any other number:</p>
 
 <div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use </span>rust_decimal::prelude::<span class="kw-2">*</span>;
+<span class="kw">use </span>rust_decimal_macros::dec;
 
-<span class="kw">let </span>amount = Decimal::from_str(<span class="string">&quot;25.12&quot;</span>).unwrap();
-<span class="kw">let </span>tax = Decimal::from_str(<span class="string">&quot;0.085&quot;</span>).unwrap();
-<span class="kw">let </span>total = amount + (amount * tax).round_dp(<span class="number">2</span>);
-<span class="macro">assert_eq!</span>(total.to_string(), <span class="string">&quot;27.26&quot;</span>);</code></pre></div>
+<span class="kw">let </span>amount = <span class="macro">dec!</span>(<span class="number">25.12</span>);
+<span class="kw">let </span>tax_percentage = <span class="macro">dec!</span>(<span class="number">0.085</span>);
+<span class="kw">let </span>total = amount + (amount * tax_percentage).round_dp(<span class="number">2</span>);
+<span class="macro">assert_eq!</span>(total, <span class="macro">dec!</span>(<span class="number">27.26</span>));</code></pre></div>
 <h3 id="features"><a href="#features">Features</a></h3>
 <p><strong>Behavior / Functionality</strong></p>
 <ul>
@@ -52,6 +68,7 @@ rust_decimal_macros = &quot;1.26&quot;
 <li><a href="#c-repr">c-repr</a></li>
 <li><a href="#legacy-ops">legacy-ops</a></li>
 <li><a href="#maths">maths</a></li>
+<li><a href="#ndarray">ndarray</a></li>
 <li><a href="#rkyv">rkyv</a></li>
 <li><a href="#rocket-traits">rocket-traits</a></li>
 <li><a href="#rust-fuzz">rust-fuzz</a></li>
@@ -83,13 +100,13 @@ type by transparently serializing/deserializing into the <code>NUMERIC</code> da
 <h4 id="db-tokio-postgres"><a href="#db-tokio-postgres"><code>db-tokio-postgres</code></a></h4>
 <p>Enables the tokio postgres module allowing for async communication with PostgreSQL.</p>
 <h4 id="db-diesel-postgres"><a href="#db-diesel-postgres"><code>db-diesel-postgres</code></a></h4>
-<p>Enable <code>diesel</code> PostgreSQL support. By default, this enables version <code>1.4</code> of <code>diesel</code>. If you wish to use the <code>diesel</code>
-release candidates then you can do so by using <code>db-diesel2-postgres</code>. Please note, the <code>db-diesel2-*</code> features are considered
-unstable and will be upgraded as and when new <code>diesel 2.x</code> features are released.</p>
+<p>Enable <code>diesel</code> PostgreSQL support. By default, this enables version <code>1.4</code> of <code>diesel</code>. If you wish to use the <code>2.0</code> 
+version of <code>diesel</code> then you can do so by using the feature <code>db-diesel2-postgres</code>. Please note, if both features are 
+enabled then version 2 will supersede version 1.</p>
 <h4 id="db-diesel-mysql"><a href="#db-diesel-mysql"><code>db-diesel-mysql</code></a></h4>
-<p>Enable <code>diesel</code> MySQL support. By default, this enables version <code>1.4</code> of <code>diesel</code>. If you wish to use the <code>diesel</code>
-release candidates then you can do so by using <code>db-diesel2-mysql</code>. Please note, the <code>db-diesel2-*</code> features are considered
-unstable and will be upgraded as and when new <code>diesel 2.x</code> features are released.</p>
+<p>Enable <code>diesel</code> MySQL support. By default, this enables version <code>1.4</code> of <code>diesel</code>. If you wish to use the <code>2.0</code> 
+version of <code>diesel</code> then you can do so by using the feature <code>db-diesel2-mysql</code>. Please note, if both features are
+enabled then version 2 will supersede version 1.</p>
 <h4 id="legacy-ops"><a href="#legacy-ops"><code>legacy-ops</code></a></h4>
 <p><strong>Warning:</strong> This is deprecated and will be removed from a future versions.</p>
 <p>As of <code>1.10</code> the algorithms used to perform basic operations have changed which has benefits of significant speed improvements.
@@ -99,8 +116,12 @@ To maintain backwards compatibility this can be opted out of by enabling the <co
 Documentation detailing the additional functions can be found on the
 <a href="https://docs.rs/rust_decimal/latest/rust_decimal/trait.MathematicalOps.html"><code>MathematicalOps</code></a> trait.</p>
 <p>Please note that <code>ln</code> and <code>log10</code> will panic on invalid input with <code>checked_ln</code> and <code>checked_log10</code> the preferred functions
-to curb against this. When the <code>maths</code> feature was first developed the library would return <code>0</code> on invalid input. To re-enable this
+to curb against this. When the <code>maths</code> feature was first developed the library would instead return <code>0</code> on invalid input. To re-enable this
 non-panicking behavior, please use the feature: <code>maths-nopanic</code>.</p>
+<h4 id="ndarray"><a href="#ndarray"><code>ndarray</code></a></h4>
+<p>Enables arithmetic operations using <a href="https://github.com/rust-ndarray/ndarray"><code>ndarray</code></a> on arrays of <code>Decimal</code>.</p>
+<h4 id="proptest"><a href="#proptest"><code>proptest</code></a></h4>
+<p>Enables a <a href="https://github.com/proptest-rs/proptest"><code>proptest</code></a> strategy to generate values for Rust Decimal.</p>
 <h4 id="rand"><a href="#rand"><code>rand</code></a></h4>
 <p>Implements <code>rand::distributions::Distribution&lt;Decimal&gt;</code> to allow the creation of random instances.</p>
 <p>Note: When using <code>rand::Rng</code> trait to generate a decimal between a range of two other decimals, the scale of the randomly-generated
@@ -184,8 +205,8 @@ libraries, this crate can be compiled with <code>--no-default-features</code>.</
 <h3 id="building"><a href="#building">Building</a></h3>
 <p>Please refer to the <a href="https://github.com/paupino/rust-decimal/blob/master/BUILD.md">Build document</a> for more information on building and testing Rust Decimal.</p>
 <h3 id="minimum-rust-compiler-version"><a href="#minimum-rust-compiler-version">Minimum Rust Compiler Version</a></h3>
-<p>The current <em>minimum</em> compiler version is <a href="https://github.com/rust-lang/rust/blob/master/RELEASES.md#version-1560-2021-10-21"><code>1.56.0</code></a>
-which was released on <code>2021-10-21</code>.</p>
+<p>The current <em>minimum</em> compiler version is <a href="https://github.com/rust-lang/rust/blob/master/RELEASES.md#version-1600-2022-04-07"><code>1.60.0</code></a>
+which was released on <code>2022-04-07</code>.</p>
 <p>This library maintains support for rust compiler versions that are 4 minor versions away from the current stable rust compiler version.
 For example, if the current stable compiler version is <code>1.50.0</code> then we will guarantee support up to and including <code>1.46.0</code>.
 Of note, we will only update the minimum supported version if and when required.</p>

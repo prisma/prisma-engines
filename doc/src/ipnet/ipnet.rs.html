@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/nix/store/jnqxxv1xi811ni996b002f4jnyz38xck-vendor-cargo-deps/c19b7c6f923b580ac259164a89f2577984ad5ab09ee9d583b888f934adbbe8d0/ipnet-2.5.0/src/ipnet.rs`."><title>ipnet.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-f3501f0f5ae15dfb.css" id="mainThemeStyle"><div id="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="ipnet" data-themes="" data-resource-suffix="" data-rustdoc-version="1.71.0 (8ede3aae2 2023-07-12)" data-search-js="search-4926e5fc22a5646a.js" data-settings-js="settings-de11bff964e9d4e5.js" data-settings-css="settings-8c76f75bfb6bd192.css" data-theme-light-css="light-0f8c037637f9eb3e.css" data-theme-dark-css="dark-1097f8e92a01e3cf.css" data-theme-ayu-css="ayu-614652228113ac93.css" ></div><script src="../../static.files/storage-62ce34ea385b278a.js"></script><script defer src="../../static.files/source-script-11255107d0a65077.js"></script><script defer src="../../source-files.js"></script><script defer src="../../static.files/main-f0540c1d82cde29b.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../../static.files/light-0f8c037637f9eb3e.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../../static.files/dark-1097f8e92a01e3cf.css"><link rel="stylesheet" href="../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../ipnet/index.html"><img class="rust-logo" src="../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/nix/store/yf45a1rayffhnidhgyjynpyhr9lqkd09-vendor-cargo-deps/c19b7c6f923b580ac259164a89f2577984ad5ab09ee9d583b888f934adbbe8d0/ipnet-2.8.0/src/ipnet.rs`."><title>ipnet.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-f3501f0f5ae15dfb.css" id="mainThemeStyle"><div id="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="ipnet" data-themes="" data-resource-suffix="" data-rustdoc-version="1.71.0 (8ede3aae2 2023-07-12)" data-search-js="search-4926e5fc22a5646a.js" data-settings-js="settings-de11bff964e9d4e5.js" data-settings-css="settings-8c76f75bfb6bd192.css" data-theme-light-css="light-0f8c037637f9eb3e.css" data-theme-dark-css="dark-1097f8e92a01e3cf.css" data-theme-ayu-css="ayu-614652228113ac93.css" ></div><script src="../../static.files/storage-62ce34ea385b278a.js"></script><script defer src="../../static.files/source-script-11255107d0a65077.js"></script><script defer src="../../source-files.js"></script><script defer src="../../static.files/main-f0540c1d82cde29b.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../../static.files/light-0f8c037637f9eb3e.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../../static.files/dark-1097f8e92a01e3cf.css"><link rel="stylesheet" href="../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../ipnet/index.html"><img class="rust-logo" src="../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -1760,16 +1760,145 @@
 <a href="#1760" id="1760">1760</a>
 <a href="#1761" id="1761">1761</a>
 <a href="#1762" id="1762">1762</a>
-</pre></div><pre class="rust"><code><span class="kw">use </span>std::cmp::{min, max};
-<span class="kw">use </span>std::cmp::Ordering::{Less, Equal};
-<span class="kw">use </span>std::convert::From;
-<span class="kw">use </span>std::error::Error;
-<span class="kw">use </span>std::fmt;
-<span class="kw">use </span>std::iter::FusedIterator;
-<span class="kw">use </span>std::net::{IpAddr, Ipv4Addr, Ipv6Addr};
-<span class="kw">use </span>std::option::Option::{<span class="prelude-val">Some</span>, <span class="prelude-val">None</span>};
+<a href="#1763" id="1763">1763</a>
+<a href="#1764" id="1764">1764</a>
+<a href="#1765" id="1765">1765</a>
+<a href="#1766" id="1766">1766</a>
+<a href="#1767" id="1767">1767</a>
+<a href="#1768" id="1768">1768</a>
+<a href="#1769" id="1769">1769</a>
+<a href="#1770" id="1770">1770</a>
+<a href="#1771" id="1771">1771</a>
+<a href="#1772" id="1772">1772</a>
+<a href="#1773" id="1773">1773</a>
+<a href="#1774" id="1774">1774</a>
+<a href="#1775" id="1775">1775</a>
+<a href="#1776" id="1776">1776</a>
+<a href="#1777" id="1777">1777</a>
+<a href="#1778" id="1778">1778</a>
+<a href="#1779" id="1779">1779</a>
+<a href="#1780" id="1780">1780</a>
+<a href="#1781" id="1781">1781</a>
+<a href="#1782" id="1782">1782</a>
+<a href="#1783" id="1783">1783</a>
+<a href="#1784" id="1784">1784</a>
+<a href="#1785" id="1785">1785</a>
+<a href="#1786" id="1786">1786</a>
+<a href="#1787" id="1787">1787</a>
+<a href="#1788" id="1788">1788</a>
+<a href="#1789" id="1789">1789</a>
+<a href="#1790" id="1790">1790</a>
+<a href="#1791" id="1791">1791</a>
+<a href="#1792" id="1792">1792</a>
+<a href="#1793" id="1793">1793</a>
+<a href="#1794" id="1794">1794</a>
+<a href="#1795" id="1795">1795</a>
+<a href="#1796" id="1796">1796</a>
+<a href="#1797" id="1797">1797</a>
+<a href="#1798" id="1798">1798</a>
+<a href="#1799" id="1799">1799</a>
+<a href="#1800" id="1800">1800</a>
+<a href="#1801" id="1801">1801</a>
+<a href="#1802" id="1802">1802</a>
+<a href="#1803" id="1803">1803</a>
+<a href="#1804" id="1804">1804</a>
+<a href="#1805" id="1805">1805</a>
+<a href="#1806" id="1806">1806</a>
+<a href="#1807" id="1807">1807</a>
+<a href="#1808" id="1808">1808</a>
+<a href="#1809" id="1809">1809</a>
+<a href="#1810" id="1810">1810</a>
+<a href="#1811" id="1811">1811</a>
+<a href="#1812" id="1812">1812</a>
+<a href="#1813" id="1813">1813</a>
+<a href="#1814" id="1814">1814</a>
+<a href="#1815" id="1815">1815</a>
+<a href="#1816" id="1816">1816</a>
+<a href="#1817" id="1817">1817</a>
+<a href="#1818" id="1818">1818</a>
+<a href="#1819" id="1819">1819</a>
+<a href="#1820" id="1820">1820</a>
+<a href="#1821" id="1821">1821</a>
+<a href="#1822" id="1822">1822</a>
+<a href="#1823" id="1823">1823</a>
+<a href="#1824" id="1824">1824</a>
+<a href="#1825" id="1825">1825</a>
+<a href="#1826" id="1826">1826</a>
+<a href="#1827" id="1827">1827</a>
+<a href="#1828" id="1828">1828</a>
+<a href="#1829" id="1829">1829</a>
+<a href="#1830" id="1830">1830</a>
+<a href="#1831" id="1831">1831</a>
+<a href="#1832" id="1832">1832</a>
+<a href="#1833" id="1833">1833</a>
+<a href="#1834" id="1834">1834</a>
+<a href="#1835" id="1835">1835</a>
+<a href="#1836" id="1836">1836</a>
+<a href="#1837" id="1837">1837</a>
+<a href="#1838" id="1838">1838</a>
+<a href="#1839" id="1839">1839</a>
+<a href="#1840" id="1840">1840</a>
+<a href="#1841" id="1841">1841</a>
+<a href="#1842" id="1842">1842</a>
+<a href="#1843" id="1843">1843</a>
+<a href="#1844" id="1844">1844</a>
+<a href="#1845" id="1845">1845</a>
+<a href="#1846" id="1846">1846</a>
+<a href="#1847" id="1847">1847</a>
+<a href="#1848" id="1848">1848</a>
+<a href="#1849" id="1849">1849</a>
+<a href="#1850" id="1850">1850</a>
+<a href="#1851" id="1851">1851</a>
+<a href="#1852" id="1852">1852</a>
+<a href="#1853" id="1853">1853</a>
+<a href="#1854" id="1854">1854</a>
+<a href="#1855" id="1855">1855</a>
+<a href="#1856" id="1856">1856</a>
+<a href="#1857" id="1857">1857</a>
+<a href="#1858" id="1858">1858</a>
+<a href="#1859" id="1859">1859</a>
+<a href="#1860" id="1860">1860</a>
+<a href="#1861" id="1861">1861</a>
+<a href="#1862" id="1862">1862</a>
+<a href="#1863" id="1863">1863</a>
+<a href="#1864" id="1864">1864</a>
+<a href="#1865" id="1865">1865</a>
+<a href="#1866" id="1866">1866</a>
+<a href="#1867" id="1867">1867</a>
+<a href="#1868" id="1868">1868</a>
+<a href="#1869" id="1869">1869</a>
+<a href="#1870" id="1870">1870</a>
+<a href="#1871" id="1871">1871</a>
+<a href="#1872" id="1872">1872</a>
+<a href="#1873" id="1873">1873</a>
+<a href="#1874" id="1874">1874</a>
+<a href="#1875" id="1875">1875</a>
+<a href="#1876" id="1876">1876</a>
+<a href="#1877" id="1877">1877</a>
+<a href="#1878" id="1878">1878</a>
+<a href="#1879" id="1879">1879</a>
+<a href="#1880" id="1880">1880</a>
+<a href="#1881" id="1881">1881</a>
+<a href="#1882" id="1882">1882</a>
+<a href="#1883" id="1883">1883</a>
+</pre></div><pre class="rust"><code><span class="kw">use </span>alloc::vec::Vec;
+<span class="kw">use </span>core::cmp::{min, max};
+<span class="kw">use </span>core::cmp::Ordering::{Less, Equal};
+<span class="kw">use </span>core::convert::From;
+<span class="kw">use </span>core::fmt;
+<span class="kw">use </span>core::iter::FusedIterator;
+<span class="kw">use </span>core::option::Option::{<span class="prelude-val">Some</span>, <span class="prelude-val">None</span>};
+<span class="attr">#[cfg(not(feature = <span class="string">&quot;std&quot;</span>))]
+</span><span class="kw">use </span>core::error::Error;
+<span class="attr">#[cfg(feature = <span class="string">&quot;std&quot;</span>)]
+</span><span class="kw">use </span>std::error::Error;
+<span class="attr">#[cfg(not(feature = <span class="string">&quot;std&quot;</span>))]
+</span><span class="kw">use </span>core::net::{IpAddr, Ipv4Addr, Ipv6Addr};
+<span class="attr">#[cfg(feature = <span class="string">&quot;std&quot;</span>)]
+</span><span class="kw">use </span>std::net::{IpAddr, Ipv4Addr, Ipv6Addr};
 
 <span class="kw">use </span><span class="kw">crate</span>::ipext::{IpAdd, IpSub, IpStep, IpAddrRange, Ipv4AddrRange, Ipv6AddrRange};
+<span class="kw">use </span><span class="kw">crate</span>::mask::{ip_mask_to_prefix, ipv4_mask_to_prefix, ipv6_mask_to_prefix};
 
 <span class="doccomment">/// An IP network address, either IPv4 or IPv6.
 ///
@@ -1825,7 +1954,11 @@
 /// # Examples
 ///
 /// ```
-/// use std::net::Ipv4Addr;
+/// # #![cfg_attr(not(feature = &quot;std&quot;), feature(ip_in_core))]
+/// # #[cfg(feature = &quot;std&quot;)]
+/// # use std::net::Ipv6Addr;
+/// # #[cfg(not(feature = &quot;std&quot;))]
+/// # use core::net::Ipv6Addr;
 /// use ipnet::Ipv4Net;
 ///
 /// let net: Ipv4Net = &quot;10.1.1.0/24&quot;.parse().unwrap();
@@ -1902,6 +2035,25 @@
             IpAddr::V4(a) =&gt; Ipv4Net::new(a, prefix_len)<span class="question-mark">?</span>.into(),
             IpAddr::V6(a) =&gt; Ipv6Net::new(a, prefix_len)<span class="question-mark">?</span>.into(),
         })
+    }
+
+    <span class="doccomment">/// Creates a new IP network address from an `IpAddr` and netmask.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use std::net::Ipv6Addr;
+    /// use ipnet::{IpNet, PrefixLenError};
+    ///
+    /// let net = IpNet::with_netmask(Ipv6Addr::LOCALHOST.into(), Ipv6Addr::from(0xffff_ffff_ffff_0000_0000_0000_0000_0000).into());
+    /// assert!(net.is_ok());
+    ///
+    /// let bad_prefix_len = IpNet::with_netmask(Ipv6Addr::LOCALHOST.into(), Ipv6Addr::from(0xffff_ffff_ffff_0000_0001_0000_0000_0000).into());
+    /// assert_eq!(bad_prefix_len, Err(PrefixLenError));
+    /// ```
+    </span><span class="kw">pub fn </span>with_netmask(ip: IpAddr, netmask: IpAddr) -&gt; <span class="prelude-ty">Result</span>&lt;IpNet, PrefixLenError&gt; {
+        <span class="kw">let </span>prefix = ip_mask_to_prefix(netmask)<span class="question-mark">?</span>;
+        <span class="self">Self</span>::new(ip, prefix)
     }
 
     <span class="doccomment">/// Returns a copy of the network with the address truncated to the
@@ -2320,11 +2472,31 @@
     /// let bad_prefix_len = Ipv4Net::new(Ipv4Addr::new(10, 1, 1, 0), 33);
     /// assert_eq!(bad_prefix_len, Err(PrefixLenError));
     /// ```
-    </span><span class="kw">pub fn </span>new(ip: Ipv4Addr, prefix_len: u8) -&gt; <span class="prelude-ty">Result</span>&lt;Ipv4Net, PrefixLenError&gt; {
+    </span><span class="attr">#[inline]
+    </span><span class="kw">pub const fn </span>new(ip: Ipv4Addr, prefix_len: u8) -&gt; <span class="prelude-ty">Result</span>&lt;Ipv4Net, PrefixLenError&gt; {
         <span class="kw">if </span>prefix_len &gt; <span class="number">32 </span>{
             <span class="kw">return </span><span class="prelude-val">Err</span>(PrefixLenError);
         }
         <span class="prelude-val">Ok</span>(Ipv4Net { addr: ip, prefix_len: prefix_len })
+    }
+
+    <span class="doccomment">/// Creates a new IPv4 network address from an `Ipv4Addr` and netmask.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use std::net::Ipv4Addr;
+    /// use ipnet::{Ipv4Net, PrefixLenError};
+    ///
+    /// let net = Ipv4Net::with_netmask(Ipv4Addr::new(10, 1, 1, 0), Ipv4Addr::new(255, 255, 255, 0));
+    /// assert!(net.is_ok());
+    ///
+    /// let bad_prefix_len = Ipv4Net::with_netmask(Ipv4Addr::new(10, 1, 1, 0), Ipv4Addr::new(255, 255, 0, 1));
+    /// assert_eq!(bad_prefix_len, Err(PrefixLenError));
+    /// ```
+    </span><span class="kw">pub fn </span>with_netmask(ip: Ipv4Addr, netmask: Ipv4Addr) -&gt; <span class="prelude-ty">Result</span>&lt;Ipv4Net, PrefixLenError&gt; {
+        <span class="kw">let </span>prefix = ipv4_mask_to_prefix(netmask)<span class="question-mark">?</span>;
+        <span class="self">Self</span>::new(ip, prefix)
     }
 
     <span class="doccomment">/// Returns a copy of the network with the address truncated to the
@@ -2345,17 +2517,20 @@
     }
 
     <span class="doccomment">/// Returns the address.
-    </span><span class="kw">pub fn </span>addr(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Ipv4Addr {
+    </span><span class="attr">#[inline]
+    </span><span class="kw">pub const fn </span>addr(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Ipv4Addr {
         <span class="self">self</span>.addr
     }
 
     <span class="doccomment">/// Returns the prefix length.
-    </span><span class="kw">pub fn </span>prefix_len(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; u8 {
+    </span><span class="attr">#[inline]
+    </span><span class="kw">pub const fn </span>prefix_len(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; u8 {
         <span class="self">self</span>.prefix_len
     }
 
     <span class="doccomment">/// Returns the maximum valid prefix length.
-    </span><span class="kw">pub fn </span>max_prefix_len(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; u8 {
+    </span><span class="attr">#[inline]
+    </span><span class="kw">pub const fn </span>max_prefix_len(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; u8 {
         <span class="number">32
     </span>}
     
@@ -2600,8 +2775,11 @@
         intervals = merge_intervals(intervals);
         <span class="kw">let </span><span class="kw-2">mut </span>res: Vec&lt;Ipv4Net&gt; = Vec::new();
         
-        <span class="kw">for </span>(start, end) <span class="kw">in </span>intervals {
-            <span class="kw">let </span>iter = Ipv4Subnets::new(start.into(), end.saturating_sub(<span class="number">1</span>).into(), <span class="number">0</span>);
+        <span class="kw">for </span>(start, <span class="kw-2">mut </span>end) <span class="kw">in </span>intervals {
+            <span class="kw">if </span>end != core::u32::MAX {
+                end = end.saturating_sub(<span class="number">1</span>)
+            }
+            <span class="kw">let </span>iter = Ipv4Subnets::new(start.into(), end.into(), <span class="number">0</span>);
             res.extend(iter);
         }
         res
@@ -2651,11 +2829,31 @@
     /// let bad_prefix_len = Ipv6Net::new(Ipv6Addr::new(0xfd, 0, 0, 0, 0, 0, 0, 0), 129);
     /// assert_eq!(bad_prefix_len, Err(PrefixLenError));
     /// ```
-    </span><span class="kw">pub fn </span>new(ip: Ipv6Addr, prefix_len: u8) -&gt; <span class="prelude-ty">Result</span>&lt;Ipv6Net, PrefixLenError&gt; {
+    </span><span class="attr">#[inline]
+    </span><span class="kw">pub const fn </span>new(ip: Ipv6Addr, prefix_len: u8) -&gt; <span class="prelude-ty">Result</span>&lt;Ipv6Net, PrefixLenError&gt; {
         <span class="kw">if </span>prefix_len &gt; <span class="number">128 </span>{
             <span class="kw">return </span><span class="prelude-val">Err</span>(PrefixLenError);
         }
         <span class="prelude-val">Ok</span>(Ipv6Net { addr: ip, prefix_len: prefix_len })
+    }
+
+    <span class="doccomment">/// Creates a new IPv6 network address from an `Ipv6Addr` and netmask.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use std::net::Ipv6Addr;
+    /// use ipnet::{Ipv6Net, PrefixLenError};
+    ///
+    /// let net = Ipv6Net::with_netmask(Ipv6Addr::new(0xfd, 0, 0, 0, 0, 0, 0, 0), Ipv6Addr::from(0xffff_ff00_0000_0000_0000_0000_0000_0000));
+    /// assert!(net.is_ok());
+    ///
+    /// let bad_prefix_len = Ipv6Net::with_netmask(Ipv6Addr::new(0xfd, 0, 0, 0, 0, 0, 0, 0), Ipv6Addr::from(0xffff_ff00_0000_0000_0001_0000_0000_0000));
+    /// assert_eq!(bad_prefix_len, Err(PrefixLenError));
+    /// ```
+    </span><span class="kw">pub fn </span>with_netmask(ip: Ipv6Addr, netmask: Ipv6Addr) -&gt; <span class="prelude-ty">Result</span>&lt;Ipv6Net, PrefixLenError&gt; {
+        <span class="kw">let </span>prefix = ipv6_mask_to_prefix(netmask)<span class="question-mark">?</span>;
+        <span class="self">Self</span>::new(ip, prefix)
     }
 
     <span class="doccomment">/// Returns a copy of the network with the address truncated to the
@@ -2676,17 +2874,20 @@
     }
     
     <span class="doccomment">/// Returns the address.
-    </span><span class="kw">pub fn </span>addr(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Ipv6Addr {
+    </span><span class="attr">#[inline]
+    </span><span class="kw">pub const fn </span>addr(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Ipv6Addr {
         <span class="self">self</span>.addr
     }
 
     <span class="doccomment">/// Returns the prefix length.
-    </span><span class="kw">pub fn </span>prefix_len(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; u8 {
+    </span><span class="attr">#[inline]
+    </span><span class="kw">pub const fn </span>prefix_len(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; u8 {
         <span class="self">self</span>.prefix_len
     }
     
     <span class="doccomment">/// Returns the maximum valid prefix length.
-    </span><span class="kw">pub fn </span>max_prefix_len(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; u8 {
+    </span><span class="attr">#[inline]
+    </span><span class="kw">pub const fn </span>max_prefix_len(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; u8 {
         <span class="number">128
     </span>}
 
@@ -2919,8 +3120,11 @@
         intervals = merge_intervals(intervals);
         <span class="kw">let </span><span class="kw-2">mut </span>res: Vec&lt;Ipv6Net&gt; = Vec::new();
 
-        <span class="kw">for </span>(start, end) <span class="kw">in </span>intervals {
-            <span class="kw">let </span>iter = Ipv6Subnets::new(start.into(), end.saturating_sub(<span class="number">1</span>).into(), <span class="number">0</span>);
+        <span class="kw">for </span>(start, <span class="kw-2">mut </span>end) <span class="kw">in </span>intervals {
+            <span class="kw">if </span>end != core::u128::MAX {
+                end = end.saturating_sub(<span class="number">1</span>)
+            }
+            <span class="kw">let </span>iter = Ipv6Subnets::new(start.into(), end.into(), <span class="number">0</span>);
             res.extend(iter);
         }
         res
@@ -3197,20 +3401,31 @@
 
 <span class="kw">fn </span>next_ipv4_subnet(start: Ipv4Addr, end: Ipv4Addr, min_prefix_len: u8) -&gt; Ipv4Net {
     <span class="kw">let </span>range = end.saturating_sub(start).saturating_add(<span class="number">1</span>);
-    <span class="kw">let </span>range_bits = <span class="number">32u32</span>.saturating_sub(range.leading_zeros()).saturating_sub(<span class="number">1</span>);
-    <span class="kw">let </span>start_tz = u32::from(start).trailing_zeros();
-    <span class="kw">let </span>new_prefix_len = <span class="number">32 </span>- min(range_bits, start_tz);
-    <span class="kw">let </span>next_prefix_len = max(new_prefix_len <span class="kw">as </span>u8, min_prefix_len);
-    Ipv4Net::new(start, next_prefix_len).unwrap()
+    <span class="kw">if </span>range == core::u32::MAX &amp;&amp; min_prefix_len == <span class="number">0 </span>{
+        Ipv4Net::new(start, min_prefix_len).unwrap()
+    }
+    <span class="kw">else </span>{
+        <span class="kw">let </span>range_bits = <span class="number">32u32</span>.saturating_sub(range.leading_zeros()).saturating_sub(<span class="number">1</span>);
+        <span class="kw">let </span>start_tz = u32::from(start).trailing_zeros();
+        <span class="kw">let </span>new_prefix_len = <span class="number">32 </span>- min(range_bits, start_tz);
+        <span class="kw">let </span>next_prefix_len = max(new_prefix_len <span class="kw">as </span>u8, min_prefix_len);
+        Ipv4Net::new(start, next_prefix_len).unwrap()
+    }
 }
 
 <span class="kw">fn </span>next_ipv6_subnet(start: Ipv6Addr, end: Ipv6Addr, min_prefix_len: u8) -&gt; Ipv6Net {
     <span class="kw">let </span>range = end.saturating_sub(start).saturating_add(<span class="number">1</span>);
-    <span class="kw">let </span>range_bits = <span class="number">128u32</span>.saturating_sub(range.leading_zeros()).saturating_sub(<span class="number">1</span>);
-    <span class="kw">let </span>start_tz = u128::from(start).trailing_zeros();
-    <span class="kw">let </span>new_prefix_len = <span class="number">128 </span>- min(range_bits, start_tz);
-    <span class="kw">let </span>next_prefix_len = max(new_prefix_len <span class="kw">as </span>u8, min_prefix_len);
-    Ipv6Net::new(start, next_prefix_len).unwrap()
+    <span class="kw">if </span>range == core::u128::MAX &amp;&amp; min_prefix_len == <span class="number">0 </span>{
+        Ipv6Net::new(start, min_prefix_len).unwrap()
+    }
+    <span class="kw">else </span>{
+        <span class="kw">let </span>range = end.saturating_sub(start).saturating_add(<span class="number">1</span>);
+        <span class="kw">let </span>range_bits = <span class="number">128u32</span>.saturating_sub(range.leading_zeros()).saturating_sub(<span class="number">1</span>);
+        <span class="kw">let </span>start_tz = u128::from(start).trailing_zeros();
+        <span class="kw">let </span>new_prefix_len = <span class="number">128 </span>- min(range_bits, start_tz);
+        <span class="kw">let </span>next_prefix_len = max(new_prefix_len <span class="kw">as </span>u8, min_prefix_len);
+        Ipv6Net::new(start, next_prefix_len).unwrap()
+    }
 }
 
 <span class="kw">impl </span>Iterator <span class="kw">for </span>Ipv4Subnets {
@@ -3403,6 +3618,12 @@
     );
 
     <span class="macro">make_ipv4_subnets_test!</span>(
+        test_ipv4_subnets_zero_max,
+        <span class="string">&quot;0.0.0.0&quot;</span>, <span class="string">&quot;255.255.255.255&quot;</span>, <span class="number">0</span>,
+        <span class="string">&quot;0.0.0.0/0&quot;</span>,
+    );
+
+    <span class="macro">make_ipv4_subnets_test!</span>(
         test_ipv4_subnets_max_max,
         <span class="string">&quot;255.255.255.255&quot;</span>, <span class="string">&quot;255.255.255.255&quot;</span>, <span class="number">0</span>,
         <span class="string">&quot;255.255.255.255/32&quot;</span>,
@@ -3439,6 +3660,12 @@
         test_ipv6_subnets_zero_zero,
         <span class="string">&quot;::&quot;</span>, <span class="string">&quot;::&quot;</span>, <span class="number">0</span>,
         <span class="string">&quot;::/128&quot;</span>,
+    );
+
+    <span class="macro">make_ipv6_subnets_test!</span>(
+        test_ipv6_subnets_zero_max,
+        <span class="string">&quot;::&quot;</span>, <span class="string">&quot;ffff:ffff:ffff:ffff:ffff:ffff:ffff:ffff&quot;</span>, <span class="number">0</span>,
+        <span class="string">&quot;::/0&quot;</span>,
     );
 
     <span class="macro">make_ipv6_subnets_test!</span>(
@@ -3502,6 +3729,21 @@
         <span class="macro">assert_eq!</span>(IpNet::aggregate(<span class="kw-2">&amp;</span>ip_nets), ip_aggs);
         <span class="macro">assert_eq!</span>(Ipv4Net::aggregate(<span class="kw-2">&amp;</span>ipv4_nets), ipv4_aggs);
         <span class="macro">assert_eq!</span>(Ipv6Net::aggregate(<span class="kw-2">&amp;</span>ipv6_nets), ipv6_aggs);
+    }
+    
+    <span class="attr">#[test]
+    </span><span class="kw">fn </span>test_aggregate_issue44() {
+        <span class="kw">let </span>nets: Vec&lt;Ipv4Net&gt; = <span class="macro">vec!</span>[<span class="string">&quot;128.0.0.0/1&quot;</span>.parse().unwrap()];
+        <span class="macro">assert_eq!</span>(Ipv4Net::aggregate(<span class="kw-2">&amp;</span>nets), nets);
+
+        <span class="kw">let </span>nets: Vec&lt;Ipv4Net&gt; = <span class="macro">vec!</span>[<span class="string">&quot;0.0.0.0/1&quot;</span>.parse().unwrap(), <span class="string">&quot;128.0.0.0/1&quot;</span>.parse().unwrap()];
+        <span class="macro">assert_eq!</span>(Ipv4Net::aggregate(<span class="kw-2">&amp;</span>nets), <span class="macro">vec!</span>[<span class="string">&quot;0.0.0.0/0&quot;</span>.parse().unwrap()]);
+
+        <span class="kw">let </span>nets: Vec&lt;Ipv6Net&gt; = <span class="macro">vec!</span>[<span class="string">&quot;8000::/1&quot;</span>.parse().unwrap()];
+        <span class="macro">assert_eq!</span>(Ipv6Net::aggregate(<span class="kw-2">&amp;</span>nets), nets);
+
+        <span class="kw">let </span>nets: Vec&lt;Ipv6Net&gt; = <span class="macro">vec!</span>[<span class="string">&quot;::/1&quot;</span>.parse().unwrap(), <span class="string">&quot;8000::/1&quot;</span>.parse().unwrap()];
+        <span class="macro">assert_eq!</span>(Ipv6Net::aggregate(<span class="kw-2">&amp;</span>nets), <span class="macro">vec!</span>[<span class="string">&quot;::/0&quot;</span>.parse().unwrap()]);
     }
 
     <span class="attr">#[test]

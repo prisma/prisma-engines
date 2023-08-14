@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/nix/store/jnqxxv1xi811ni996b002f4jnyz38xck-vendor-cargo-deps/c19b7c6f923b580ac259164a89f2577984ad5ab09ee9d583b888f934adbbe8d0/bitflags-2.1.0/src/public.rs`."><title>public.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-f3501f0f5ae15dfb.css" id="mainThemeStyle"><div id="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="bitflags" data-themes="" data-resource-suffix="" data-rustdoc-version="1.71.0 (8ede3aae2 2023-07-12)" data-search-js="search-4926e5fc22a5646a.js" data-settings-js="settings-de11bff964e9d4e5.js" data-settings-css="settings-8c76f75bfb6bd192.css" data-theme-light-css="light-0f8c037637f9eb3e.css" data-theme-dark-css="dark-1097f8e92a01e3cf.css" data-theme-ayu-css="ayu-614652228113ac93.css" ></div><script src="../../static.files/storage-62ce34ea385b278a.js"></script><script defer src="../../static.files/source-script-11255107d0a65077.js"></script><script defer src="../../source-files.js"></script><script defer src="../../static.files/main-f0540c1d82cde29b.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../../static.files/light-0f8c037637f9eb3e.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../../static.files/dark-1097f8e92a01e3cf.css"><link rel="stylesheet" href="../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../bitflags/index.html"><img class="rust-logo" src="../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/nix/store/yf45a1rayffhnidhgyjynpyhr9lqkd09-vendor-cargo-deps/c19b7c6f923b580ac259164a89f2577984ad5ab09ee9d583b888f934adbbe8d0/bitflags-2.4.0/src/public.rs`."><title>public.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-f3501f0f5ae15dfb.css" id="mainThemeStyle"><div id="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="bitflags" data-themes="" data-resource-suffix="" data-rustdoc-version="1.71.0 (8ede3aae2 2023-07-12)" data-search-js="search-4926e5fc22a5646a.js" data-settings-js="settings-de11bff964e9d4e5.js" data-settings-css="settings-8c76f75bfb6bd192.css" data-theme-light-css="light-0f8c037637f9eb3e.css" data-theme-dark-css="dark-1097f8e92a01e3cf.css" data-theme-ayu-css="ayu-614652228113ac93.css" ></div><script src="../../static.files/storage-62ce34ea385b278a.js"></script><script defer src="../../static.files/source-script-11255107d0a65077.js"></script><script defer src="../../source-files.js"></script><script defer src="../../static.files/main-f0540c1d82cde29b.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../../static.files/light-0f8c037637f9eb3e.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../../static.files/dark-1097f8e92a01e3cf.css"><link rel="stylesheet" href="../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../bitflags/index.html"><img class="rust-logo" src="../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -465,6 +465,82 @@
 <a href="#465" id="465">465</a>
 <a href="#466" id="466">466</a>
 <a href="#467" id="467">467</a>
+<a href="#468" id="468">468</a>
+<a href="#469" id="469">469</a>
+<a href="#470" id="470">470</a>
+<a href="#471" id="471">471</a>
+<a href="#472" id="472">472</a>
+<a href="#473" id="473">473</a>
+<a href="#474" id="474">474</a>
+<a href="#475" id="475">475</a>
+<a href="#476" id="476">476</a>
+<a href="#477" id="477">477</a>
+<a href="#478" id="478">478</a>
+<a href="#479" id="479">479</a>
+<a href="#480" id="480">480</a>
+<a href="#481" id="481">481</a>
+<a href="#482" id="482">482</a>
+<a href="#483" id="483">483</a>
+<a href="#484" id="484">484</a>
+<a href="#485" id="485">485</a>
+<a href="#486" id="486">486</a>
+<a href="#487" id="487">487</a>
+<a href="#488" id="488">488</a>
+<a href="#489" id="489">489</a>
+<a href="#490" id="490">490</a>
+<a href="#491" id="491">491</a>
+<a href="#492" id="492">492</a>
+<a href="#493" id="493">493</a>
+<a href="#494" id="494">494</a>
+<a href="#495" id="495">495</a>
+<a href="#496" id="496">496</a>
+<a href="#497" id="497">497</a>
+<a href="#498" id="498">498</a>
+<a href="#499" id="499">499</a>
+<a href="#500" id="500">500</a>
+<a href="#501" id="501">501</a>
+<a href="#502" id="502">502</a>
+<a href="#503" id="503">503</a>
+<a href="#504" id="504">504</a>
+<a href="#505" id="505">505</a>
+<a href="#506" id="506">506</a>
+<a href="#507" id="507">507</a>
+<a href="#508" id="508">508</a>
+<a href="#509" id="509">509</a>
+<a href="#510" id="510">510</a>
+<a href="#511" id="511">511</a>
+<a href="#512" id="512">512</a>
+<a href="#513" id="513">513</a>
+<a href="#514" id="514">514</a>
+<a href="#515" id="515">515</a>
+<a href="#516" id="516">516</a>
+<a href="#517" id="517">517</a>
+<a href="#518" id="518">518</a>
+<a href="#519" id="519">519</a>
+<a href="#520" id="520">520</a>
+<a href="#521" id="521">521</a>
+<a href="#522" id="522">522</a>
+<a href="#523" id="523">523</a>
+<a href="#524" id="524">524</a>
+<a href="#525" id="525">525</a>
+<a href="#526" id="526">526</a>
+<a href="#527" id="527">527</a>
+<a href="#528" id="528">528</a>
+<a href="#529" id="529">529</a>
+<a href="#530" id="530">530</a>
+<a href="#531" id="531">531</a>
+<a href="#532" id="532">532</a>
+<a href="#533" id="533">533</a>
+<a href="#534" id="534">534</a>
+<a href="#535" id="535">535</a>
+<a href="#536" id="536">536</a>
+<a href="#537" id="537">537</a>
+<a href="#538" id="538">538</a>
+<a href="#539" id="539">539</a>
+<a href="#540" id="540">540</a>
+<a href="#541" id="541">541</a>
+<a href="#542" id="542">542</a>
+<a href="#543" id="543">543</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Generate the user-facing flags type.
 //!
 //! The code here belongs to the end-user, so new trait implementations and methods can&#39;t be
@@ -478,10 +554,112 @@
 </span><span class="macro">macro_rules! </span>__declare_public_bitflags {
     (
         $(<span class="attr">#[<span class="macro-nonterminal">$outer</span>:meta]</span>)*
-        <span class="macro-nonterminal">$vis</span>:vis <span class="kw">struct </span><span class="macro-nonterminal">$BitFlags</span>:ident;
+        <span class="macro-nonterminal">$vis</span>:vis <span class="kw">struct </span><span class="macro-nonterminal">$PublicBitFlags</span>:ident
     ) =&gt; {
         $(<span class="attr">#[<span class="macro-nonterminal">$outer</span>]</span>)*
-        <span class="macro-nonterminal">$vis </span><span class="kw">struct </span><span class="macro-nonterminal">$BitFlags</span>(&lt;<span class="self">Self </span><span class="kw">as </span><span class="macro-nonterminal">$crate::__private::PublicFlags</span>&gt;::Internal);
+        <span class="macro-nonterminal">$vis </span><span class="kw">struct </span><span class="macro-nonterminal">$PublicBitFlags</span>(&lt;<span class="macro-nonterminal">$PublicBitFlags </span><span class="kw">as </span><span class="macro-nonterminal">$crate::__private::PublicFlags</span>&gt;::Internal);
+    };
+}
+
+<span class="doccomment">/// Implement functions on the public (user-facing) bitflags type.
+///
+/// We need to be careful about adding new methods and trait implementations here because they
+/// could conflict with items added by the end-user.
+</span><span class="attr">#[macro_export(local_inner_macros)]
+#[doc(hidden)]
+</span><span class="macro">macro_rules! </span>__impl_public_bitflags_forward {
+    (
+        <span class="macro-nonterminal">$PublicBitFlags</span>:ident: <span class="macro-nonterminal">$T</span>:ty, <span class="macro-nonterminal">$InternalBitFlags</span>:ident
+    ) =&gt; {
+        <span class="macro">__impl_bitflags! </span>{
+            <span class="macro-nonterminal">$PublicBitFlags</span>: <span class="macro-nonterminal">$T </span>{
+                <span class="kw">fn </span>empty() {
+                    <span class="self">Self</span>(<span class="macro-nonterminal">$InternalBitFlags::empty</span>())
+                }
+
+                <span class="kw">fn </span>all() {
+                    <span class="self">Self</span>(<span class="macro-nonterminal">$InternalBitFlags::all</span>())
+                }
+
+                <span class="kw">fn </span>bits(f) {
+                    f.<span class="number">0</span>.bits()
+                }
+
+                <span class="kw">fn </span>from_bits(bits) {
+                    <span class="kw">match </span><span class="macro-nonterminal">$InternalBitFlags::from_bits</span>(bits) {
+                        <span class="macro-nonterminal">$crate::__private::core::option::Option::Some</span>(bits) =&gt; <span class="macro-nonterminal">$crate::__private::core::option::Option::Some</span>(<span class="self">Self</span>(bits)),
+                        <span class="macro-nonterminal">$crate::__private::core::option::Option::None </span>=&gt; <span class="macro-nonterminal">$crate::__private::core::option::Option::None</span>,
+                    }
+                }
+
+                <span class="kw">fn </span>from_bits_truncate(bits) {
+                    <span class="self">Self</span>(<span class="macro-nonterminal">$InternalBitFlags::from_bits_truncate</span>(bits))
+                }
+
+                <span class="kw">fn </span>from_bits_retain(bits) {
+                    <span class="self">Self</span>(<span class="macro-nonterminal">$InternalBitFlags::from_bits_retain</span>(bits))
+                }
+
+                <span class="kw">fn </span>from_name(name) {
+                    <span class="kw">match </span><span class="macro-nonterminal">$InternalBitFlags::from_name</span>(name) {
+                        <span class="macro-nonterminal">$crate::__private::core::option::Option::Some</span>(bits) =&gt; <span class="macro-nonterminal">$crate::__private::core::option::Option::Some</span>(<span class="self">Self</span>(bits)),
+                        <span class="macro-nonterminal">$crate::__private::core::option::Option::None </span>=&gt; <span class="macro-nonterminal">$crate::__private::core::option::Option::None</span>,
+                    }
+                }
+
+                <span class="kw">fn </span>is_empty(f) {
+                    f.<span class="number">0</span>.is_empty()
+                }
+
+                <span class="kw">fn </span>is_all(f) {
+                    f.<span class="number">0</span>.is_all()
+                }
+
+                <span class="kw">fn </span>intersects(f, other) {
+                    f.<span class="number">0</span>.intersects(other.<span class="number">0</span>)
+                }
+
+                <span class="kw">fn </span>contains(f, other) {
+                    f.<span class="number">0</span>.contains(other.<span class="number">0</span>)
+                }
+
+                <span class="kw">fn </span>insert(f, other) {
+                    f.<span class="number">0</span>.insert(other.<span class="number">0</span>)
+                }
+
+                <span class="kw">fn </span>remove(f, other) {
+                    f.<span class="number">0</span>.remove(other.<span class="number">0</span>)
+                }
+
+                <span class="kw">fn </span>toggle(f, other) {
+                    f.<span class="number">0</span>.toggle(other.<span class="number">0</span>)
+                }
+
+                <span class="kw">fn </span>set(f, other, value) {
+                    f.<span class="number">0</span>.set(other.<span class="number">0</span>, value)
+                }
+
+                <span class="kw">fn </span>intersection(f, other) {
+                    <span class="self">Self</span>(f.<span class="number">0</span>.intersection(other.<span class="number">0</span>))
+                }
+
+                <span class="kw">fn </span>union(f, other) {
+                    <span class="self">Self</span>(f.<span class="number">0</span>.union(other.<span class="number">0</span>))
+                }
+
+                <span class="kw">fn </span>difference(f, other) {
+                    <span class="self">Self</span>(f.<span class="number">0</span>.difference(other.<span class="number">0</span>))
+                }
+
+                <span class="kw">fn </span>symmetric_difference(f, other) {
+                    <span class="self">Self</span>(f.<span class="number">0</span>.symmetric_difference(other.<span class="number">0</span>))
+                }
+
+                <span class="kw">fn </span>complement(f) {
+                    <span class="self">Self</span>(f.<span class="number">0</span>.complement())
+                }
+            }
+        }
     };
 }
 
@@ -493,241 +671,234 @@
 #[doc(hidden)]
 </span><span class="macro">macro_rules! </span>__impl_public_bitflags {
     (
-        <span class="macro-nonterminal">$PublicBitFlags</span>:ident: <span class="macro-nonterminal">$T</span>:ty, <span class="macro-nonterminal">$InternalBitFlags</span>:ident, <span class="macro-nonterminal">$Iter</span>:ident, <span class="macro-nonterminal">$IterNames</span>:ident;
+        <span class="macro-nonterminal">$BitFlags</span>:ident: <span class="macro-nonterminal">$T</span>:ty, <span class="macro-nonterminal">$PublicBitFlags</span>:ident {
+            $(
+                $(<span class="attr">#[<span class="macro-nonterminal">$inner</span>:ident $(<span class="macro-nonterminal">$args</span>:tt)<span class="kw-2">*</span>]</span>)*
+                <span class="kw">const </span><span class="macro-nonterminal">$Flag</span>:tt = <span class="macro-nonterminal">$value</span>:expr;
+            )*
+        }
     ) =&gt; {
+        <span class="macro">__impl_bitflags! </span>{
+            <span class="macro-nonterminal">$BitFlags</span>: <span class="macro-nonterminal">$T </span>{
+                <span class="kw">fn </span>empty() {
+                    <span class="self">Self</span>(&lt;<span class="macro-nonterminal">$T </span><span class="kw">as </span><span class="macro-nonterminal">$crate::Bits</span>&gt;::EMPTY)
+                }
+
+                <span class="kw">fn </span>all() {
+                    <span class="kw">let </span><span class="kw-2">mut </span>truncated = &lt;<span class="macro-nonterminal">$T </span><span class="kw">as </span><span class="macro-nonterminal">$crate::Bits</span>&gt;::EMPTY;
+                    <span class="kw">let </span><span class="kw-2">mut </span>i = <span class="number">0</span>;
+
+                    $(
+                        <span class="macro">__bitflags_expr_safe_attrs!</span>(
+                            $(<span class="attr">#[<span class="macro-nonterminal">$inner </span>$(<span class="macro-nonterminal">$args</span>)<span class="kw-2">*</span>]</span>)*
+                            {{
+                                <span class="kw">let </span>flag = &lt;<span class="macro-nonterminal">$PublicBitFlags </span><span class="kw">as </span><span class="macro-nonterminal">$crate::Flags</span>&gt;::FLAGS[i].value().bits();
+
+                                truncated = truncated | flag;
+                                i += <span class="number">1</span>;
+                            }}
+                        );
+                    )*
+
+                    <span class="kw">let _ </span>= i;
+                    <span class="self">Self</span>::from_bits_retain(truncated)
+                }
+
+                <span class="kw">fn </span>bits(f) {
+                    f.<span class="number">0
+                </span>}
+
+                <span class="kw">fn </span>from_bits(bits) {
+                    <span class="kw">let </span>truncated = <span class="self">Self</span>::from_bits_truncate(bits).<span class="number">0</span>;
+
+                    <span class="kw">if </span>truncated == bits {
+                        <span class="macro-nonterminal">$crate::__private::core::option::Option::Some</span>(<span class="self">Self</span>(bits))
+                    } <span class="kw">else </span>{
+                        <span class="macro-nonterminal">$crate::__private::core::option::Option::None
+                    </span>}
+                }
+
+                <span class="kw">fn </span>from_bits_truncate(bits) {
+                    <span class="self">Self</span>(bits &amp; <span class="self">Self</span>::all().bits())
+                }
+
+                <span class="kw">fn </span>from_bits_retain(bits) {
+                    <span class="self">Self</span>(bits)
+                }
+
+                <span class="kw">fn </span>from_name(name) {
+                    $(
+                        <span class="macro">__bitflags_flag!</span>({
+                            name: <span class="macro-nonterminal">$Flag</span>,
+                            named: {
+                                <span class="macro">__bitflags_expr_safe_attrs!</span>(
+                                    $(<span class="attr">#[<span class="macro-nonterminal">$inner </span>$(<span class="macro-nonterminal">$args</span>)<span class="kw-2">*</span>]</span>)*
+                                    {
+                                        <span class="kw">if </span>name == <span class="macro-nonterminal">$</span><span class="macro">crate::__private::core::stringify!</span>(<span class="macro-nonterminal">$Flag</span>) {
+                                            <span class="kw">return </span><span class="macro-nonterminal">$crate::__private::core::option::Option::Some</span>(<span class="self">Self</span>(<span class="macro-nonterminal">$PublicBitFlags</span>::<span class="macro-nonterminal">$Flag</span>.bits()));
+                                        }
+                                    }
+                                );
+                            },
+                            unnamed: {},
+                        });
+                    )*
+
+                    <span class="kw">let _ </span>= name;
+                    <span class="macro-nonterminal">$crate::__private::core::option::Option::None
+                </span>}
+
+                <span class="kw">fn </span>is_empty(f) {
+                    f.bits() == &lt;<span class="macro-nonterminal">$T </span><span class="kw">as </span><span class="macro-nonterminal">$crate::Bits</span>&gt;::EMPTY
+                }
+
+                <span class="kw">fn </span>is_all(f) {
+                    <span class="comment">// NOTE: We check against `Self::all` here, not `Self::Bits::ALL`
+                    // because the set of all flags may not use all bits
+                    </span><span class="self">Self</span>::all().bits() | f.bits() == f.bits()
+                }
+
+                <span class="kw">fn </span>intersects(f, other) {
+                    f.bits() &amp; other.bits() != &lt;<span class="macro-nonterminal">$T </span><span class="kw">as </span><span class="macro-nonterminal">$crate::Bits</span>&gt;::EMPTY
+                }
+
+                <span class="kw">fn </span>contains(f, other) {
+                    f.bits() &amp; other.bits() == other.bits()
+                }
+
+                <span class="kw">fn </span>insert(f, other) {
+                    <span class="kw-2">*</span>f = <span class="self">Self</span>::from_bits_retain(f.bits()).union(other);
+                }
+
+                <span class="kw">fn </span>remove(f, other) {
+                    <span class="kw-2">*</span>f = <span class="self">Self</span>::from_bits_retain(f.bits()).difference(other);
+                }
+
+                <span class="kw">fn </span>toggle(f, other) {
+                    <span class="kw-2">*</span>f = <span class="self">Self</span>::from_bits_retain(f.bits()).symmetric_difference(other);
+                }
+
+                <span class="kw">fn </span>set(f, other, value) {
+                    <span class="kw">if </span>value {
+                        f.insert(other);
+                    } <span class="kw">else </span>{
+                        f.remove(other);
+                    }
+                }
+
+                <span class="kw">fn </span>intersection(f, other) {
+                    <span class="self">Self</span>::from_bits_retain(f.bits() &amp; other.bits())
+                }
+
+                <span class="kw">fn </span>union(f, other) {
+                    <span class="self">Self</span>::from_bits_retain(f.bits() | other.bits())
+                }
+
+                <span class="kw">fn </span>difference(f, other) {
+                    <span class="self">Self</span>::from_bits_retain(f.bits() &amp; !other.bits())
+                }
+
+                <span class="kw">fn </span>symmetric_difference(f, other) {
+                    <span class="self">Self</span>::from_bits_retain(f.bits() ^ other.bits())
+                }
+
+                <span class="kw">fn </span>complement(f) {
+                    <span class="self">Self</span>::from_bits_truncate(!f.bits())
+                }
+            }
+        }
+    };
+}
+
+<span class="doccomment">/// Implement iterators on the public (user-facing) bitflags type.
+</span><span class="attr">#[macro_export(local_inner_macros)]
+#[doc(hidden)]
+</span><span class="macro">macro_rules! </span>__impl_public_bitflags_iter {
+    (<span class="macro-nonterminal">$BitFlags</span>:ident: <span class="macro-nonterminal">$T</span>:ty, <span class="macro-nonterminal">$PublicBitFlags</span>:ident) =&gt; {
+        <span class="kw">impl </span><span class="macro-nonterminal">$BitFlags </span>{
+            <span class="doccomment">/// Yield a set of contained flags values.
+            ///
+            /// Each yielded flags value will correspond to a defined named flag. Any unknown bits
+            /// will be yielded together as a final flags value.
+            </span><span class="attr">#[inline]
+            </span><span class="kw">pub const fn </span>iter(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="macro-nonterminal">$crate::iter::Iter</span>&lt;<span class="macro-nonterminal">$PublicBitFlags</span>&gt; {
+                <span class="macro-nonterminal">$crate::iter::Iter::__private_const_new</span>(
+                    &lt;<span class="macro-nonterminal">$PublicBitFlags </span><span class="kw">as </span><span class="macro-nonterminal">$crate::Flags</span>&gt;::FLAGS,
+                    <span class="macro-nonterminal">$PublicBitFlags::from_bits_retain</span>(<span class="self">self</span>.bits()),
+                    <span class="macro-nonterminal">$PublicBitFlags::from_bits_retain</span>(<span class="self">self</span>.bits()),
+                )
+            }
+
+            <span class="doccomment">/// Yield a set of contained named flags values.
+            ///
+            /// This method is like [`iter`](#method.iter), except only yields bits in contained named flags.
+            /// Any unknown bits, or bits not corresponding to a contained flag will not be yielded.
+            </span><span class="attr">#[inline]
+            </span><span class="kw">pub const fn </span>iter_names(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="macro-nonterminal">$crate::iter::IterNames</span>&lt;<span class="macro-nonterminal">$PublicBitFlags</span>&gt; {
+                <span class="macro-nonterminal">$crate::iter::IterNames::__private_const_new</span>(
+                    &lt;<span class="macro-nonterminal">$PublicBitFlags </span><span class="kw">as </span><span class="macro-nonterminal">$crate::Flags</span>&gt;::FLAGS,
+                    <span class="macro-nonterminal">$PublicBitFlags::from_bits_retain</span>(<span class="self">self</span>.bits()),
+                    <span class="macro-nonterminal">$PublicBitFlags::from_bits_retain</span>(<span class="self">self</span>.bits()),
+                )
+            }
+        }
+
+        <span class="kw">impl </span><span class="macro-nonterminal">$crate::__private::core::iter::IntoIterator </span><span class="kw">for </span><span class="macro-nonterminal">$BitFlags </span>{
+            <span class="kw">type </span>Item = <span class="macro-nonterminal">$PublicBitFlags</span>;
+            <span class="kw">type </span>IntoIter = <span class="macro-nonterminal">$crate::iter::Iter</span>&lt;<span class="macro-nonterminal">$PublicBitFlags</span>&gt;;
+
+            <span class="kw">fn </span>into_iter(<span class="self">self</span>) -&gt; <span class="self">Self</span>::IntoIter {
+                <span class="self">self</span>.iter()
+            }
+        }
+    };
+}
+
+<span class="doccomment">/// Implement traits on the public (user-facing) bitflags type.
+</span><span class="attr">#[macro_export(local_inner_macros)]
+#[doc(hidden)]
+</span><span class="macro">macro_rules! </span>__impl_public_bitflags_ops {
+    (<span class="macro-nonterminal">$PublicBitFlags</span>:ident) =&gt; {
         <span class="kw">impl </span><span class="macro-nonterminal">$crate::__private::core::fmt::Binary </span><span class="kw">for </span><span class="macro-nonterminal">$PublicBitFlags </span>{
-            <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span><span class="macro-nonterminal">$crate::__private::core::fmt::Formatter</span>) -&gt; <span class="macro-nonterminal">$crate::__private::core::fmt::Result </span>{
+            <span class="kw">fn </span>fmt(
+                <span class="kw-2">&amp;</span><span class="self">self</span>,
+                f: <span class="kw-2">&amp;mut </span><span class="macro-nonterminal">$crate::__private::core::fmt::Formatter</span>,
+            ) -&gt; <span class="macro-nonterminal">$crate::__private::core::fmt::Result </span>{
                 <span class="macro-nonterminal">$crate::__private::core::fmt::Binary::fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0</span>, f)
             }
         }
 
         <span class="kw">impl </span><span class="macro-nonterminal">$crate::__private::core::fmt::Octal </span><span class="kw">for </span><span class="macro-nonterminal">$PublicBitFlags </span>{
-            <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span><span class="macro-nonterminal">$crate::__private::core::fmt::Formatter</span>) -&gt; <span class="macro-nonterminal">$crate::__private::core::fmt::Result </span>{
+            <span class="kw">fn </span>fmt(
+                <span class="kw-2">&amp;</span><span class="self">self</span>,
+                f: <span class="kw-2">&amp;mut </span><span class="macro-nonterminal">$crate::__private::core::fmt::Formatter</span>,
+            ) -&gt; <span class="macro-nonterminal">$crate::__private::core::fmt::Result </span>{
                 <span class="macro-nonterminal">$crate::__private::core::fmt::Octal::fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0</span>, f)
             }
         }
 
         <span class="kw">impl </span><span class="macro-nonterminal">$crate::__private::core::fmt::LowerHex </span><span class="kw">for </span><span class="macro-nonterminal">$PublicBitFlags </span>{
-            <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span><span class="macro-nonterminal">$crate::__private::core::fmt::Formatter</span>) -&gt; <span class="macro-nonterminal">$crate::__private::core::fmt::Result </span>{
+            <span class="kw">fn </span>fmt(
+                <span class="kw-2">&amp;</span><span class="self">self</span>,
+                f: <span class="kw-2">&amp;mut </span><span class="macro-nonterminal">$crate::__private::core::fmt::Formatter</span>,
+            ) -&gt; <span class="macro-nonterminal">$crate::__private::core::fmt::Result </span>{
                 <span class="macro-nonterminal">$crate::__private::core::fmt::LowerHex::fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0</span>, f)
             }
         }
 
         <span class="kw">impl </span><span class="macro-nonterminal">$crate::__private::core::fmt::UpperHex </span><span class="kw">for </span><span class="macro-nonterminal">$PublicBitFlags </span>{
-            <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span><span class="macro-nonterminal">$crate::__private::core::fmt::Formatter</span>) -&gt; <span class="macro-nonterminal">$crate::__private::core::fmt::Result </span>{
+            <span class="kw">fn </span>fmt(
+                <span class="kw-2">&amp;</span><span class="self">self</span>,
+                f: <span class="kw-2">&amp;mut </span><span class="macro-nonterminal">$crate::__private::core::fmt::Formatter</span>,
+            ) -&gt; <span class="macro-nonterminal">$crate::__private::core::fmt::Result </span>{
                 <span class="macro-nonterminal">$crate::__private::core::fmt::UpperHex::fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0</span>, f)
-            }
-        }
-
-        <span class="kw">impl </span><span class="macro-nonterminal">$PublicBitFlags </span>{
-            <span class="doccomment">/// Returns an empty set of flags.
-            </span><span class="attr">#[inline]
-            </span><span class="kw">pub const fn </span>empty() -&gt; <span class="self">Self </span>{
-                <span class="self">Self</span>(<span class="macro-nonterminal">$InternalBitFlags::empty</span>())
-            }
-
-            <span class="doccomment">/// Returns the set containing all flags.
-            </span><span class="attr">#[inline]
-            </span><span class="kw">pub const fn </span>all() -&gt; <span class="self">Self </span>{
-                <span class="self">Self</span>(<span class="macro-nonterminal">$InternalBitFlags::all</span>())
-            }
-
-            <span class="doccomment">/// Returns the raw value of the flags currently stored.
-            </span><span class="attr">#[inline]
-            </span><span class="kw">pub const fn </span>bits(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="macro-nonterminal">$T </span>{
-                <span class="self">self</span>.<span class="number">0</span>.bits()
-            }
-
-            <span class="doccomment">/// Convert from underlying bit representation, unless that
-            /// representation contains bits that do not correspond to a flag.
-            </span><span class="attr">#[inline]
-            </span><span class="kw">pub const fn </span>from_bits(bits: <span class="macro-nonterminal">$T</span>) -&gt; <span class="macro-nonterminal">$crate::__private::core::option::Option</span>&lt;<span class="self">Self</span>&gt; {
-                <span class="kw">match </span><span class="macro-nonterminal">$InternalBitFlags::from_bits</span>(bits) {
-                    <span class="macro-nonterminal">$crate::__private::core::option::Option::Some</span>(bits) =&gt; <span class="macro-nonterminal">$crate::__private::core::option::Option::Some</span>(<span class="self">Self</span>(bits)),
-                    <span class="macro-nonterminal">$crate::__private::core::option::Option::None </span>=&gt; <span class="macro-nonterminal">$crate::__private::core::option::Option::None</span>,
-                }
-            }
-
-            <span class="doccomment">/// Convert from underlying bit representation, dropping any bits
-            /// that do not correspond to flags.
-            </span><span class="attr">#[inline]
-            </span><span class="kw">pub const fn </span>from_bits_truncate(bits: <span class="macro-nonterminal">$T</span>) -&gt; <span class="self">Self </span>{
-                <span class="self">Self</span>(<span class="macro-nonterminal">$InternalBitFlags::from_bits_truncate</span>(bits))
-            }
-
-            <span class="doccomment">/// Convert from underlying bit representation, preserving all
-            /// bits (even those not corresponding to a defined flag).
-            </span><span class="attr">#[inline]
-            </span><span class="kw">pub const fn </span>from_bits_retain(bits: <span class="macro-nonterminal">$T</span>) -&gt; <span class="self">Self </span>{
-                <span class="self">Self</span>(<span class="macro-nonterminal">$InternalBitFlags::from_bits_retain</span>(bits))
-            }
-
-            <span class="doccomment">/// Get the value for a flag from its stringified name.
-            ///
-            /// Names are _case-sensitive_, so must correspond exactly to
-            /// the identifier given to the flag.
-            </span><span class="attr">#[inline]
-            </span><span class="kw">pub fn </span>from_name(name: <span class="kw-2">&amp;</span>str) -&gt; <span class="macro-nonterminal">$crate::__private::core::option::Option</span>&lt;<span class="self">Self</span>&gt; {
-                <span class="kw">match </span><span class="macro-nonterminal">$InternalBitFlags::from_name</span>(name) {
-                    <span class="macro-nonterminal">$crate::__private::core::option::Option::Some</span>(bits) =&gt; <span class="macro-nonterminal">$crate::__private::core::option::Option::Some</span>(<span class="self">Self</span>(bits)),
-                    <span class="macro-nonterminal">$crate::__private::core::option::Option::None </span>=&gt; <span class="macro-nonterminal">$crate::__private::core::option::Option::None</span>,
-                }
-            }
-
-            <span class="doccomment">/// Iterate over enabled flag values.
-            </span><span class="attr">#[inline]
-            </span><span class="kw">pub const fn </span>iter(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="macro-nonterminal">$Iter </span>{
-                <span class="self">self</span>.<span class="number">0</span>.iter()
-            }
-
-            <span class="doccomment">/// Iterate over enabled flag values with their stringified names.
-            </span><span class="attr">#[inline]
-            </span><span class="kw">pub const fn </span>iter_names(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="macro-nonterminal">$IterNames </span>{
-                <span class="self">self</span>.<span class="number">0</span>.iter_names()
-            }
-
-            <span class="doccomment">/// Returns `true` if no flags are currently stored.
-            </span><span class="attr">#[inline]
-            </span><span class="kw">pub const fn </span>is_empty(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
-                <span class="self">self</span>.<span class="number">0</span>.is_empty()
-            }
-
-            <span class="doccomment">/// Returns `true` if all flags are currently set.
-            </span><span class="attr">#[inline]
-            </span><span class="kw">pub const fn </span>is_all(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
-                <span class="self">self</span>.<span class="number">0</span>.is_all()
-            }
-
-            <span class="doccomment">/// Returns `true` if there are flags common to both `self` and `other`.
-            </span><span class="attr">#[inline]
-            </span><span class="kw">pub const fn </span>intersects(<span class="kw-2">&amp;</span><span class="self">self</span>, other: <span class="self">Self</span>) -&gt; bool {
-                <span class="self">self</span>.<span class="number">0</span>.intersects(other.<span class="number">0</span>)
-            }
-
-            <span class="doccomment">/// Returns `true` if all of the flags in `other` are contained within `self`.
-            </span><span class="attr">#[inline]
-            </span><span class="kw">pub const fn </span>contains(<span class="kw-2">&amp;</span><span class="self">self</span>, other: <span class="self">Self</span>) -&gt; bool {
-                <span class="self">self</span>.<span class="number">0</span>.contains(other.<span class="number">0</span>)
-            }
-
-            <span class="doccomment">/// Inserts the specified flags in-place.
-            </span><span class="attr">#[inline]
-            </span><span class="kw">pub fn </span>insert(<span class="kw-2">&amp;mut </span><span class="self">self</span>, other: <span class="self">Self</span>) {
-                <span class="self">self</span>.<span class="number">0</span>.insert(other.<span class="number">0</span>)
-            }
-
-            <span class="doccomment">/// Removes the specified flags in-place.
-            </span><span class="attr">#[inline]
-            </span><span class="kw">pub fn </span>remove(<span class="kw-2">&amp;mut </span><span class="self">self</span>, other: <span class="self">Self</span>) {
-                <span class="self">self</span>.<span class="number">0</span>.remove(other.<span class="number">0</span>)
-            }
-
-            <span class="doccomment">/// Toggles the specified flags in-place.
-            </span><span class="attr">#[inline]
-            </span><span class="kw">pub fn </span>toggle(<span class="kw-2">&amp;mut </span><span class="self">self</span>, other: <span class="self">Self</span>) {
-                <span class="self">self</span>.<span class="number">0</span>.toggle(other.<span class="number">0</span>)
-            }
-
-            <span class="doccomment">/// Inserts or removes the specified flags depending on the passed value.
-            </span><span class="attr">#[inline]
-            </span><span class="kw">pub fn </span>set(<span class="kw-2">&amp;mut </span><span class="self">self</span>, other: <span class="self">Self</span>, value: bool) {
-                <span class="self">self</span>.<span class="number">0</span>.set(other.<span class="number">0</span>, value)
-            }
-
-            <span class="doccomment">/// Returns the intersection between the flags in `self` and
-            /// `other`.
-            ///
-            /// Specifically, the returned set contains only the flags which are
-            /// present in *both* `self` *and* `other`.
-            ///
-            /// This is equivalent to using the `&amp;` operator (e.g.
-            /// [`ops::BitAnd`]), as in `flags &amp; other`.
-            ///
-            /// [`ops::BitAnd`]: https://doc.rust-lang.org/std/ops/trait.BitAnd.html
-            </span><span class="attr">#[inline]
-            #[must_use]
-            </span><span class="kw">pub const fn </span>intersection(<span class="self">self</span>, other: <span class="self">Self</span>) -&gt; <span class="self">Self </span>{
-                <span class="self">Self</span>(<span class="self">self</span>.<span class="number">0</span>.intersection(other.<span class="number">0</span>))
-            }
-
-            <span class="doccomment">/// Returns the union of between the flags in `self` and `other`.
-            ///
-            /// Specifically, the returned set contains all flags which are
-            /// present in *either* `self` *or* `other`, including any which are
-            /// present in both (see [`Self::symmetric_difference`] if that
-            /// is undesirable).
-            ///
-            /// This is equivalent to using the `|` operator (e.g.
-            /// [`ops::BitOr`]), as in `flags | other`.
-            ///
-            /// [`ops::BitOr`]: https://doc.rust-lang.org/std/ops/trait.BitOr.html
-            </span><span class="attr">#[inline]
-            #[must_use]
-            </span><span class="kw">pub const fn </span>union(<span class="self">self</span>, other: <span class="self">Self</span>) -&gt; <span class="self">Self </span>{
-                <span class="self">Self</span>(<span class="self">self</span>.<span class="number">0</span>.union(other.<span class="number">0</span>))
-            }
-
-            <span class="doccomment">/// Returns the difference between the flags in `self` and `other`.
-            ///
-            /// Specifically, the returned set contains all flags present in
-            /// `self`, except for the ones present in `other`.
-            ///
-            /// It is also conceptually equivalent to the &quot;bit-clear&quot; operation:
-            /// `flags &amp; !other` (and this syntax is also supported).
-            ///
-            /// This is equivalent to using the `-` operator (e.g.
-            /// [`ops::Sub`]), as in `flags - other`.
-            ///
-            /// [`ops::Sub`]: https://doc.rust-lang.org/std/ops/trait.Sub.html
-            </span><span class="attr">#[inline]
-            #[must_use]
-            </span><span class="kw">pub const fn </span>difference(<span class="self">self</span>, other: <span class="self">Self</span>) -&gt; <span class="self">Self </span>{
-                <span class="self">Self</span>(<span class="self">self</span>.<span class="number">0</span>.difference(other.<span class="number">0</span>))
-            }
-
-            <span class="doccomment">/// Returns the [symmetric difference][sym-diff] between the flags
-            /// in `self` and `other`.
-            ///
-            /// Specifically, the returned set contains the flags present which
-            /// are present in `self` or `other`, but that are not present in
-            /// both. Equivalently, it contains the flags present in *exactly
-            /// one* of the sets `self` and `other`.
-            ///
-            /// This is equivalent to using the `^` operator (e.g.
-            /// [`ops::BitXor`]), as in `flags ^ other`.
-            ///
-            /// [sym-diff]: https://en.wikipedia.org/wiki/Symmetric_difference
-            /// [`ops::BitXor`]: https://doc.rust-lang.org/std/ops/trait.BitXor.html
-            </span><span class="attr">#[inline]
-            #[must_use]
-            </span><span class="kw">pub const fn </span>symmetric_difference(<span class="self">self</span>, other: <span class="self">Self</span>) -&gt; <span class="self">Self </span>{
-                <span class="self">Self</span>(<span class="self">self</span>.<span class="number">0</span>.symmetric_difference(other.<span class="number">0</span>))
-            }
-
-            <span class="doccomment">/// Returns the complement of this set of flags.
-            ///
-            /// Specifically, the returned set contains all the flags which are
-            /// not set in `self`, but which are allowed for this type.
-            ///
-            /// Alternatively, it can be thought of as the set difference
-            /// between [`Self::all()`] and `self` (e.g. `Self::all() - self`)
-            ///
-            /// This is equivalent to using the `!` operator (e.g.
-            /// [`ops::Not`]), as in `!flags`.
-            ///
-            /// [`Self::all()`]: Self::all
-            /// [`ops::Not`]: https://doc.rust-lang.org/std/ops/trait.Not.html
-            </span><span class="attr">#[inline]
-            #[must_use]
-            </span><span class="kw">pub const fn </span>complement(<span class="self">self</span>) -&gt; <span class="self">Self </span>{
-                <span class="self">Self</span>(<span class="self">self</span>.<span class="number">0</span>.complement())
             }
         }
 
         <span class="kw">impl </span><span class="macro-nonterminal">$crate::__private::core::ops::BitOr </span><span class="kw">for </span><span class="macro-nonterminal">$PublicBitFlags </span>{
             <span class="kw">type </span>Output = <span class="self">Self</span>;
 
-            <span class="doccomment">/// Returns the union of the two sets of flags.
+            <span class="doccomment">/// The bitwise or (`|`) of the bits in two flags values.
             </span><span class="attr">#[inline]
             </span><span class="kw">fn </span>bitor(<span class="self">self</span>, other: <span class="macro-nonterminal">$PublicBitFlags</span>) -&gt; <span class="self">Self </span>{
                 <span class="self">self</span>.union(other)
@@ -735,17 +906,17 @@
         }
 
         <span class="kw">impl </span><span class="macro-nonterminal">$crate::__private::core::ops::BitOrAssign </span><span class="kw">for </span><span class="macro-nonterminal">$PublicBitFlags </span>{
-            <span class="doccomment">/// Adds the set of flags.
+            <span class="doccomment">/// The bitwise or (`|`) of the bits in two flags values.
             </span><span class="attr">#[inline]
             </span><span class="kw">fn </span>bitor_assign(<span class="kw-2">&amp;mut </span><span class="self">self</span>, other: <span class="self">Self</span>) {
-                <span class="self">self</span>.<span class="number">0 </span>= <span class="self">self</span>.<span class="number">0</span>.union(other.<span class="number">0</span>);
+                <span class="self">self</span>.insert(other);
             }
         }
 
         <span class="kw">impl </span><span class="macro-nonterminal">$crate::__private::core::ops::BitXor </span><span class="kw">for </span><span class="macro-nonterminal">$PublicBitFlags </span>{
             <span class="kw">type </span>Output = <span class="self">Self</span>;
 
-            <span class="doccomment">/// Returns the left flags, but with all the right flags toggled.
+            <span class="doccomment">/// The bitwise exclusive-or (`^`) of the bits in two flags values.
             </span><span class="attr">#[inline]
             </span><span class="kw">fn </span>bitxor(<span class="self">self</span>, other: <span class="self">Self</span>) -&gt; <span class="self">Self </span>{
                 <span class="self">self</span>.symmetric_difference(other)
@@ -753,17 +924,17 @@
         }
 
         <span class="kw">impl </span><span class="macro-nonterminal">$crate::__private::core::ops::BitXorAssign </span><span class="kw">for </span><span class="macro-nonterminal">$PublicBitFlags </span>{
-            <span class="doccomment">/// Toggles the set of flags.
+            <span class="doccomment">/// The bitwise exclusive-or (`^`) of the bits in two flags values.
             </span><span class="attr">#[inline]
             </span><span class="kw">fn </span>bitxor_assign(<span class="kw-2">&amp;mut </span><span class="self">self</span>, other: <span class="self">Self</span>) {
-                <span class="self">self</span>.<span class="number">0 </span>= <span class="self">self</span>.<span class="number">0</span>.symmetric_difference(other.<span class="number">0</span>);
+                <span class="self">self</span>.toggle(other);
             }
         }
 
         <span class="kw">impl </span><span class="macro-nonterminal">$crate::__private::core::ops::BitAnd </span><span class="kw">for </span><span class="macro-nonterminal">$PublicBitFlags </span>{
             <span class="kw">type </span>Output = <span class="self">Self</span>;
 
-            <span class="doccomment">/// Returns the intersection between the two sets of flags.
+            <span class="doccomment">/// The bitwise and (`&amp;`) of the bits in two flags values.
             </span><span class="attr">#[inline]
             </span><span class="kw">fn </span>bitand(<span class="self">self</span>, other: <span class="self">Self</span>) -&gt; <span class="self">Self </span>{
                 <span class="self">self</span>.intersection(other)
@@ -771,17 +942,20 @@
         }
 
         <span class="kw">impl </span><span class="macro-nonterminal">$crate::__private::core::ops::BitAndAssign </span><span class="kw">for </span><span class="macro-nonterminal">$PublicBitFlags </span>{
-            <span class="doccomment">/// Disables all flags disabled in the set.
+            <span class="doccomment">/// The bitwise and (`&amp;`) of the bits in two flags values.
             </span><span class="attr">#[inline]
             </span><span class="kw">fn </span>bitand_assign(<span class="kw-2">&amp;mut </span><span class="self">self</span>, other: <span class="self">Self</span>) {
-                <span class="self">self</span>.<span class="number">0 </span>= <span class="self">self</span>.<span class="number">0</span>.intersection(other.<span class="number">0</span>);
+                <span class="kw-2">*</span><span class="self">self </span>= <span class="self">Self</span>::from_bits_retain(<span class="self">self</span>.bits()).intersection(other);
             }
         }
 
         <span class="kw">impl </span><span class="macro-nonterminal">$crate::__private::core::ops::Sub </span><span class="kw">for </span><span class="macro-nonterminal">$PublicBitFlags </span>{
             <span class="kw">type </span>Output = <span class="self">Self</span>;
 
-            <span class="doccomment">/// Returns the set difference of the two sets of flags.
+            <span class="doccomment">/// The intersection of a source flags value with the complement of a target flags value (`&amp;!`).
+            ///
+            /// This method is not equivalent to `self &amp; !other` when `other` has unknown bits set.
+            /// `difference` won&#39;t truncate `other`, but the `!` operator will.
             </span><span class="attr">#[inline]
             </span><span class="kw">fn </span>sub(<span class="self">self</span>, other: <span class="self">Self</span>) -&gt; <span class="self">Self </span>{
                 <span class="self">self</span>.difference(other)
@@ -789,17 +963,20 @@
         }
 
         <span class="kw">impl </span><span class="macro-nonterminal">$crate::__private::core::ops::SubAssign </span><span class="kw">for </span><span class="macro-nonterminal">$PublicBitFlags </span>{
-            <span class="doccomment">/// Disables all flags enabled in the set.
+            <span class="doccomment">/// The intersection of a source flags value with the complement of a target flags value (`&amp;!`).
+            ///
+            /// This method is not equivalent to `self &amp; !other` when `other` has unknown bits set.
+            /// `difference` won&#39;t truncate `other`, but the `!` operator will.
             </span><span class="attr">#[inline]
             </span><span class="kw">fn </span>sub_assign(<span class="kw-2">&amp;mut </span><span class="self">self</span>, other: <span class="self">Self</span>) {
-                <span class="self">self</span>.<span class="number">0 </span>= <span class="self">self</span>.<span class="number">0</span>.difference(other.<span class="number">0</span>);
+                <span class="self">self</span>.remove(other);
             }
         }
 
         <span class="kw">impl </span><span class="macro-nonterminal">$crate::__private::core::ops::Not </span><span class="kw">for </span><span class="macro-nonterminal">$PublicBitFlags </span>{
             <span class="kw">type </span>Output = <span class="self">Self</span>;
 
-            <span class="doccomment">/// Returns the complement of this set of flags.
+            <span class="doccomment">/// The bitwise negation (`!`) of the bits in a flags value, truncating the result.
             </span><span class="attr">#[inline]
             </span><span class="kw">fn </span>not(<span class="self">self</span>) -&gt; <span class="self">Self </span>{
                 <span class="self">self</span>.complement()
@@ -807,7 +984,11 @@
         }
 
         <span class="kw">impl </span><span class="macro-nonterminal">$crate::__private::core::iter::Extend</span>&lt;<span class="macro-nonterminal">$PublicBitFlags</span>&gt; <span class="kw">for </span><span class="macro-nonterminal">$PublicBitFlags </span>{
-            <span class="kw">fn </span>extend&lt;T: <span class="macro-nonterminal">$crate::__private::core::iter::IntoIterator</span>&lt;Item=<span class="self">Self</span>&gt;&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, iterator: T) {
+            <span class="doccomment">/// The bitwise or (`|`) of the bits in each flags value.
+            </span><span class="kw">fn </span>extend&lt;T: <span class="macro-nonterminal">$crate::__private::core::iter::IntoIterator</span>&lt;Item = <span class="self">Self</span>&gt;&gt;(
+                <span class="kw-2">&amp;mut </span><span class="self">self</span>,
+                iterator: T,
+            ) {
                 <span class="kw">for </span>item <span class="kw">in </span>iterator {
                     <span class="self">self</span>.insert(item)
                 }
@@ -815,7 +996,10 @@
         }
 
         <span class="kw">impl </span><span class="macro-nonterminal">$crate::__private::core::iter::FromIterator</span>&lt;<span class="macro-nonterminal">$PublicBitFlags</span>&gt; <span class="kw">for </span><span class="macro-nonterminal">$PublicBitFlags </span>{
-            <span class="kw">fn </span>from_iter&lt;T: <span class="macro-nonterminal">$crate::__private::core::iter::IntoIterator</span>&lt;Item=<span class="self">Self</span>&gt;&gt;(iterator: T) -&gt; <span class="self">Self </span>{
+            <span class="doccomment">/// The bitwise or (`|`) of the bits in each flags value.
+            </span><span class="kw">fn </span>from_iter&lt;T: <span class="macro-nonterminal">$crate::__private::core::iter::IntoIterator</span>&lt;Item = <span class="self">Self</span>&gt;&gt;(
+                iterator: T,
+            ) -&gt; <span class="self">Self </span>{
                 <span class="kw">use </span><span class="macro-nonterminal">$crate::__private::core::iter::Extend</span>;
 
                 <span class="kw">let </span><span class="kw-2">mut </span>result = <span class="self">Self</span>::empty();
@@ -823,92 +1007,6 @@
                 result
             }
         }
-
-        <span class="kw">impl </span><span class="macro-nonterminal">$crate::__private::core::iter::IntoIterator </span><span class="kw">for </span><span class="macro-nonterminal">$PublicBitFlags </span>{
-            <span class="kw">type </span>Item = <span class="self">Self</span>;
-            <span class="kw">type </span>IntoIter = <span class="macro-nonterminal">$Iter</span>;
-
-            <span class="kw">fn </span>into_iter(<span class="self">self</span>) -&gt; <span class="self">Self</span>::IntoIter {
-                <span class="self">self</span>.<span class="number">0</span>.iter()
-            }
-        }
-
-        <span class="kw">impl </span><span class="macro-nonterminal">$crate::BitFlags </span><span class="kw">for </span><span class="macro-nonterminal">$PublicBitFlags </span>{
-            <span class="kw">type </span>Bits = <span class="macro-nonterminal">$T</span>;
-
-            <span class="kw">type </span>Iter = <span class="macro-nonterminal">$Iter</span>;
-            <span class="kw">type </span>IterNames = <span class="macro-nonterminal">$IterNames</span>;
-
-            <span class="kw">fn </span>empty() -&gt; <span class="self">Self </span>{
-                <span class="macro-nonterminal">$PublicBitFlags::empty</span>()
-            }
-
-            <span class="kw">fn </span>all() -&gt; <span class="self">Self </span>{
-                <span class="macro-nonterminal">$PublicBitFlags::all</span>()
-            }
-
-            <span class="kw">fn </span>bits(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="macro-nonterminal">$T </span>{
-                <span class="macro-nonterminal">$PublicBitFlags::bits</span>(<span class="self">self</span>)
-            }
-
-            <span class="kw">fn </span>from_bits(bits: <span class="macro-nonterminal">$T</span>) -&gt; <span class="macro-nonterminal">$crate::__private::core::option::Option</span>&lt;<span class="macro-nonterminal">$PublicBitFlags</span>&gt; {
-                <span class="macro-nonterminal">$PublicBitFlags::from_bits</span>(bits)
-            }
-
-            <span class="kw">fn </span>from_bits_truncate(bits: <span class="macro-nonterminal">$T</span>) -&gt; <span class="macro-nonterminal">$PublicBitFlags </span>{
-                <span class="macro-nonterminal">$PublicBitFlags::from_bits_truncate</span>(bits)
-            }
-
-            <span class="kw">fn </span>from_bits_retain(bits: <span class="macro-nonterminal">$T</span>) -&gt; <span class="macro-nonterminal">$PublicBitFlags </span>{
-                <span class="macro-nonterminal">$PublicBitFlags::from_bits_retain</span>(bits)
-            }
-
-            <span class="kw">fn </span>from_name(name: <span class="kw-2">&amp;</span>str) -&gt; <span class="macro-nonterminal">$crate::__private::core::option::Option</span>&lt;<span class="macro-nonterminal">$PublicBitFlags</span>&gt; {
-                <span class="macro-nonterminal">$PublicBitFlags::from_name</span>(name)
-            }
-
-            <span class="kw">fn </span>iter(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="self">Self</span>::Iter {
-                <span class="macro-nonterminal">$PublicBitFlags::iter</span>(<span class="self">self</span>)
-            }
-
-            <span class="kw">fn </span>iter_names(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="self">Self</span>::IterNames {
-                <span class="macro-nonterminal">$PublicBitFlags::iter_names</span>(<span class="self">self</span>)
-            }
-
-            <span class="kw">fn </span>is_empty(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
-                <span class="macro-nonterminal">$PublicBitFlags::is_empty</span>(<span class="self">self</span>)
-            }
-
-            <span class="kw">fn </span>is_all(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
-                <span class="macro-nonterminal">$PublicBitFlags::is_all</span>(<span class="self">self</span>)
-            }
-
-            <span class="kw">fn </span>intersects(<span class="kw-2">&amp;</span><span class="self">self</span>, other: <span class="macro-nonterminal">$PublicBitFlags</span>) -&gt; bool {
-                <span class="macro-nonterminal">$PublicBitFlags::intersects</span>(<span class="self">self</span>, other)
-            }
-
-            <span class="kw">fn </span>contains(<span class="kw-2">&amp;</span><span class="self">self</span>, other: <span class="macro-nonterminal">$PublicBitFlags</span>) -&gt; bool {
-                <span class="macro-nonterminal">$PublicBitFlags::contains</span>(<span class="self">self</span>, other)
-            }
-
-            <span class="kw">fn </span>insert(<span class="kw-2">&amp;mut </span><span class="self">self</span>, other: <span class="macro-nonterminal">$PublicBitFlags</span>) {
-                <span class="macro-nonterminal">$PublicBitFlags::insert</span>(<span class="self">self</span>, other)
-            }
-
-            <span class="kw">fn </span>remove(<span class="kw-2">&amp;mut </span><span class="self">self</span>, other: <span class="macro-nonterminal">$PublicBitFlags</span>) {
-                <span class="macro-nonterminal">$PublicBitFlags::remove</span>(<span class="self">self</span>, other)
-            }
-
-            <span class="kw">fn </span>toggle(<span class="kw-2">&amp;mut </span><span class="self">self</span>, other: <span class="macro-nonterminal">$PublicBitFlags</span>) {
-                <span class="macro-nonterminal">$PublicBitFlags::toggle</span>(<span class="self">self</span>, other)
-            }
-
-            <span class="kw">fn </span>set(<span class="kw-2">&amp;mut </span><span class="self">self</span>, other: <span class="macro-nonterminal">$PublicBitFlags</span>, value: bool) {
-                <span class="macro-nonterminal">$PublicBitFlags::set</span>(<span class="self">self</span>, other, value)
-            }
-        }
-
-        <span class="kw">impl </span><span class="macro-nonterminal">$crate::__private::ImplementedByBitFlagsMacro </span><span class="kw">for </span><span class="macro-nonterminal">$PublicBitFlags </span>{}
     };
 }
 
@@ -917,18 +1015,72 @@
 #[doc(hidden)]
 </span><span class="macro">macro_rules! </span>__impl_public_bitflags_consts {
     (
-        <span class="macro-nonterminal">$PublicBitFlags</span>:ident {
+        <span class="macro-nonterminal">$PublicBitFlags</span>:ident: <span class="macro-nonterminal">$T</span>:ty {
             $(
-                $(<span class="attr">#[<span class="macro-nonterminal">$attr</span>:ident $(<span class="macro-nonterminal">$args</span>:tt)<span class="kw-2">*</span>]</span>)*
-                <span class="macro-nonterminal">$Flag</span>:ident = <span class="macro-nonterminal">$value</span>:expr;
+                $(<span class="attr">#[<span class="macro-nonterminal">$inner</span>:ident $(<span class="macro-nonterminal">$args</span>:tt)<span class="kw-2">*</span>]</span>)*
+                <span class="kw">const </span><span class="macro-nonterminal">$Flag</span>:tt = <span class="macro-nonterminal">$value</span>:expr;
             )*
         }
     ) =&gt; {
         <span class="kw">impl </span><span class="macro-nonterminal">$PublicBitFlags </span>{
             $(
-                $(<span class="attr">#[<span class="macro-nonterminal">$attr </span>$(<span class="macro-nonterminal">$args</span>)<span class="kw-2">*</span>]</span>)*
-                <span class="kw">pub const </span><span class="macro-nonterminal">$Flag</span>: <span class="self">Self </span>= <span class="self">Self</span>::from_bits_retain(<span class="macro-nonterminal">$value</span>);
+                <span class="macro">__bitflags_flag!</span>({
+                    name: <span class="macro-nonterminal">$Flag</span>,
+                    named: {
+                        $(<span class="attr">#[<span class="macro-nonterminal">$inner </span>$(<span class="macro-nonterminal">$args</span>)<span class="kw-2">*</span>]</span>)*
+                        <span class="attr">#[allow(
+                            deprecated,
+                            non_upper_case_globals,
+                        )]
+                        </span><span class="kw">pub const </span><span class="macro-nonterminal">$Flag</span>: <span class="self">Self </span>= <span class="self">Self</span>::from_bits_retain(<span class="macro-nonterminal">$value</span>);
+                    },
+                    unnamed: {},
+                });
             )*
+        }
+
+        <span class="kw">impl </span><span class="macro-nonterminal">$crate::Flags </span><span class="kw">for </span><span class="macro-nonterminal">$PublicBitFlags </span>{
+            <span class="kw">const </span>FLAGS: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>[<span class="macro-nonterminal">$crate::Flag</span>&lt;<span class="macro-nonterminal">$PublicBitFlags</span>&gt;] = <span class="kw-2">&amp;</span>[
+                $(
+                    <span class="macro">__bitflags_flag!</span>({
+                        name: <span class="macro-nonterminal">$Flag</span>,
+                        named: {
+                            <span class="macro">__bitflags_expr_safe_attrs!</span>(
+                                $(<span class="attr">#[<span class="macro-nonterminal">$inner </span>$(<span class="macro-nonterminal">$args</span>)<span class="kw-2">*</span>]</span>)*
+                                {
+                                    <span class="attr">#[allow(
+                                        deprecated,
+                                        non_upper_case_globals,
+                                    )]
+                                    </span><span class="macro-nonterminal">$crate::Flag::new</span>(<span class="macro-nonterminal">$</span><span class="macro">crate::__private::core::stringify!</span>(<span class="macro-nonterminal">$Flag</span>), <span class="macro-nonterminal">$PublicBitFlags</span>::<span class="macro-nonterminal">$Flag</span>)
+                                }
+                            )
+                        },
+                        unnamed: {
+                            <span class="macro">__bitflags_expr_safe_attrs!</span>(
+                                $(<span class="attr">#[<span class="macro-nonterminal">$inner </span>$(<span class="macro-nonterminal">$args</span>)<span class="kw-2">*</span>]</span>)*
+                                {
+                                    <span class="attr">#[allow(
+                                        deprecated,
+                                        non_upper_case_globals,
+                                    )]
+                                    </span><span class="macro-nonterminal">$crate::Flag::new</span>(<span class="string">&quot;&quot;</span>, <span class="macro-nonterminal">$PublicBitFlags::from_bits_retain</span>(<span class="macro-nonterminal">$value</span>))
+                                }
+                            )
+                        },
+                    }),
+                )*
+            ];
+
+            <span class="kw">type </span>Bits = <span class="macro-nonterminal">$T</span>;
+
+            <span class="kw">fn </span>bits(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="macro-nonterminal">$T </span>{
+                <span class="macro-nonterminal">$PublicBitFlags::bits</span>(<span class="self">self</span>)
+            }
+
+            <span class="kw">fn </span>from_bits_retain(bits: <span class="macro-nonterminal">$T</span>) -&gt; <span class="macro-nonterminal">$PublicBitFlags </span>{
+                <span class="macro-nonterminal">$PublicBitFlags::from_bits_retain</span>(bits)
+            }
         }
     };
 }

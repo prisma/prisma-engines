@@ -117,6 +117,7 @@
 <a href="#117" id="117">117</a>
 <a href="#118" id="118">118</a>
 <a href="#119" id="119">119</a>
+<a href="#120" id="120">120</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::CoreError;
 <span class="kw">use </span>connector::Transaction;
 <span class="kw">use </span>std::fmt::Display;
@@ -163,7 +164,8 @@
 
 <span class="kw">impl </span>Default <span class="kw">for </span>TxId {
     <span class="kw">fn </span>default() -&gt; <span class="self">Self </span>{
-        <span class="self">Self</span>(cuid::cuid().unwrap())
+        <span class="attr">#[allow(deprecated)]
+        </span><span class="self">Self</span>(cuid::cuid().unwrap())
     }
 }
 

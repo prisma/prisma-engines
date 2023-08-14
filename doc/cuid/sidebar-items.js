@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"enum":["CuidError"],"fn":["cuid","is_cuid","is_slug","slug"]};
+window.SIDEBAR_ITEMS = {"enum":["CuidError"],"fn":["cuid","cuid2","is_cuid","is_slug","slug"]};

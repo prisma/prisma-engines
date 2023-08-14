@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/nix/store/jnqxxv1xi811ni996b002f4jnyz38xck-vendor-cargo-deps/c19b7c6f923b580ac259164a89f2577984ad5ab09ee9d583b888f934adbbe8d0/object-0.29.0/src/read/coff/comdat.rs`."><title>comdat.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../../static.files/rustdoc-f3501f0f5ae15dfb.css" id="mainThemeStyle"><div id="rustdoc-vars" data-root-path="../../../../" data-static-root-path="../../../../static.files/" data-current-crate="object" data-themes="" data-resource-suffix="" data-rustdoc-version="1.71.0 (8ede3aae2 2023-07-12)" data-search-js="search-4926e5fc22a5646a.js" data-settings-js="settings-de11bff964e9d4e5.js" data-settings-css="settings-8c76f75bfb6bd192.css" data-theme-light-css="light-0f8c037637f9eb3e.css" data-theme-dark-css="dark-1097f8e92a01e3cf.css" data-theme-ayu-css="ayu-614652228113ac93.css" ></div><script src="../../../../static.files/storage-62ce34ea385b278a.js"></script><script defer src="../../../../static.files/source-script-11255107d0a65077.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../static.files/main-f0540c1d82cde29b.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../../../../static.files/light-0f8c037637f9eb3e.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../../../../static.files/dark-1097f8e92a01e3cf.css"><link rel="stylesheet" href="../../../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../../../object/index.html"><img class="rust-logo" src="../../../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/nix/store/yf45a1rayffhnidhgyjynpyhr9lqkd09-vendor-cargo-deps/c19b7c6f923b580ac259164a89f2577984ad5ab09ee9d583b888f934adbbe8d0/object-0.31.1/src/read/coff/comdat.rs`."><title>comdat.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../../static.files/rustdoc-f3501f0f5ae15dfb.css" id="mainThemeStyle"><div id="rustdoc-vars" data-root-path="../../../../" data-static-root-path="../../../../static.files/" data-current-crate="object" data-themes="" data-resource-suffix="" data-rustdoc-version="1.71.0 (8ede3aae2 2023-07-12)" data-search-js="search-4926e5fc22a5646a.js" data-settings-js="settings-de11bff964e9d4e5.js" data-settings-css="settings-8c76f75bfb6bd192.css" data-theme-light-css="light-0f8c037637f9eb3e.css" data-theme-dark-css="dark-1097f8e92a01e3cf.css" data-theme-ayu-css="ayu-614652228113ac93.css" ></div><script src="../../../../static.files/storage-62ce34ea385b278a.js"></script><script defer src="../../../../static.files/source-script-11255107d0a65077.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../static.files/main-f0540c1d82cde29b.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../../../../static.files/light-0f8c037637f9eb3e.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../../../../static.files/dark-1097f8e92a01e3cf.css"><link rel="stylesheet" href="../../../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../../../object/index.html"><img class="rust-logo" src="../../../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -165,6 +165,46 @@
 <a href="#165" id="165">165</a>
 <a href="#166" id="166">166</a>
 <a href="#167" id="167">167</a>
+<a href="#168" id="168">168</a>
+<a href="#169" id="169">169</a>
+<a href="#170" id="170">170</a>
+<a href="#171" id="171">171</a>
+<a href="#172" id="172">172</a>
+<a href="#173" id="173">173</a>
+<a href="#174" id="174">174</a>
+<a href="#175" id="175">175</a>
+<a href="#176" id="176">176</a>
+<a href="#177" id="177">177</a>
+<a href="#178" id="178">178</a>
+<a href="#179" id="179">179</a>
+<a href="#180" id="180">180</a>
+<a href="#181" id="181">181</a>
+<a href="#182" id="182">182</a>
+<a href="#183" id="183">183</a>
+<a href="#184" id="184">184</a>
+<a href="#185" id="185">185</a>
+<a href="#186" id="186">186</a>
+<a href="#187" id="187">187</a>
+<a href="#188" id="188">188</a>
+<a href="#189" id="189">189</a>
+<a href="#190" id="190">190</a>
+<a href="#191" id="191">191</a>
+<a href="#192" id="192">192</a>
+<a href="#193" id="193">193</a>
+<a href="#194" id="194">194</a>
+<a href="#195" id="195">195</a>
+<a href="#196" id="196">196</a>
+<a href="#197" id="197">197</a>
+<a href="#198" id="198">198</a>
+<a href="#199" id="199">199</a>
+<a href="#200" id="200">200</a>
+<a href="#201" id="201">201</a>
+<a href="#202" id="202">202</a>
+<a href="#203" id="203">203</a>
+<a href="#204" id="204">204</a>
+<a href="#205" id="205">205</a>
+<a href="#206" id="206">206</a>
+<a href="#207" id="207">207</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>core::str;
 
 <span class="kw">use </span><span class="kw">crate</span>::endian::LittleEndian <span class="kw">as </span>LE;
@@ -173,23 +213,34 @@
     <span class="self">self</span>, ComdatKind, ObjectComdat, ReadError, ReadRef, <span class="prelude-ty">Result</span>, SectionIndex, SymbolIndex,
 };
 
-<span class="kw">use </span><span class="kw">super</span>::CoffFile;
+<span class="kw">use super</span>::{CoffFile, CoffHeader, ImageSymbol};
+
+<span class="doccomment">/// An iterator over the COMDAT section groups of a `CoffBigFile`.
+</span><span class="kw">pub type </span>CoffBigComdatIterator&lt;<span class="lifetime">&#39;data</span>, <span class="lifetime">&#39;file</span>, R = <span class="kw-2">&amp;</span><span class="lifetime">&#39;data </span>[u8]&gt; =
+    CoffComdatIterator&lt;<span class="lifetime">&#39;data</span>, <span class="lifetime">&#39;file</span>, R, pe::AnonObjectHeaderBigobj&gt;;
 
 <span class="doccomment">/// An iterator over the COMDAT section groups of a `CoffFile`.
 </span><span class="attr">#[derive(Debug)]
-</span><span class="kw">pub struct </span>CoffComdatIterator&lt;<span class="lifetime">&#39;data</span>, <span class="lifetime">&#39;file</span>, R: ReadRef&lt;<span class="lifetime">&#39;data</span>&gt; = <span class="kw-2">&amp;</span><span class="lifetime">&#39;data </span>[u8]&gt; {
-    <span class="kw">pub</span>(<span class="kw">super</span>) file: <span class="kw-2">&amp;</span><span class="lifetime">&#39;file </span>CoffFile&lt;<span class="lifetime">&#39;data</span>, R&gt;,
+</span><span class="kw">pub struct </span>CoffComdatIterator&lt;
+    <span class="lifetime">&#39;data</span>,
+    <span class="lifetime">&#39;file</span>,
+    R: ReadRef&lt;<span class="lifetime">&#39;data</span>&gt; = <span class="kw-2">&amp;</span><span class="lifetime">&#39;data </span>[u8],
+    Coff: CoffHeader = pe::ImageFileHeader,
+&gt; {
+    <span class="kw">pub</span>(<span class="kw">super</span>) file: <span class="kw-2">&amp;</span><span class="lifetime">&#39;file </span>CoffFile&lt;<span class="lifetime">&#39;data</span>, R, Coff&gt;,
     <span class="kw">pub</span>(<span class="kw">super</span>) index: usize,
 }
 
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;data</span>, <span class="lifetime">&#39;file</span>, R: ReadRef&lt;<span class="lifetime">&#39;data</span>&gt;&gt; Iterator <span class="kw">for </span>CoffComdatIterator&lt;<span class="lifetime">&#39;data</span>, <span class="lifetime">&#39;file</span>, R&gt; {
-    <span class="kw">type </span>Item = CoffComdat&lt;<span class="lifetime">&#39;data</span>, <span class="lifetime">&#39;file</span>, R&gt;;
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;data</span>, <span class="lifetime">&#39;file</span>, R: ReadRef&lt;<span class="lifetime">&#39;data</span>&gt;, Coff: CoffHeader&gt; Iterator
+    <span class="kw">for </span>CoffComdatIterator&lt;<span class="lifetime">&#39;data</span>, <span class="lifetime">&#39;file</span>, R, Coff&gt;
+{
+    <span class="kw">type </span>Item = CoffComdat&lt;<span class="lifetime">&#39;data</span>, <span class="lifetime">&#39;file</span>, R, Coff&gt;;
 
     <span class="kw">fn </span>next(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>::Item&gt; {
         <span class="kw">loop </span>{
             <span class="kw">let </span>index = <span class="self">self</span>.index;
             <span class="kw">let </span>symbol = <span class="self">self</span>.file.common.symbols.symbol(index).ok()<span class="question-mark">?</span>;
-            <span class="self">self</span>.index += <span class="number">1 </span>+ symbol.number_of_aux_symbols <span class="kw">as </span>usize;
+            <span class="self">self</span>.index += <span class="number">1 </span>+ symbol.number_of_aux_symbols() <span class="kw">as </span>usize;
             <span class="kw">if let </span><span class="prelude-val">Some</span>(comdat) = CoffComdat::parse(<span class="self">self</span>.file, symbol, index) {
                 <span class="kw">return </span><span class="prelude-val">Some</span>(comdat);
             }
@@ -197,21 +248,30 @@
     }
 }
 
+<span class="doccomment">/// A COMDAT section group of a `CoffBigFile`.
+</span><span class="kw">pub type </span>CoffBigComdat&lt;<span class="lifetime">&#39;data</span>, <span class="lifetime">&#39;file</span>, R = <span class="kw-2">&amp;</span><span class="lifetime">&#39;data </span>[u8]&gt; =
+    CoffComdat&lt;<span class="lifetime">&#39;data</span>, <span class="lifetime">&#39;file</span>, R, pe::AnonObjectHeaderBigobj&gt;;
+
 <span class="doccomment">/// A COMDAT section group of a `CoffFile`.
 </span><span class="attr">#[derive(Debug)]
-</span><span class="kw">pub struct </span>CoffComdat&lt;<span class="lifetime">&#39;data</span>, <span class="lifetime">&#39;file</span>, R: ReadRef&lt;<span class="lifetime">&#39;data</span>&gt; = <span class="kw-2">&amp;</span><span class="lifetime">&#39;data </span>[u8]&gt; {
-    file: <span class="kw-2">&amp;</span><span class="lifetime">&#39;file </span>CoffFile&lt;<span class="lifetime">&#39;data</span>, R&gt;,
+</span><span class="kw">pub struct </span>CoffComdat&lt;
+    <span class="lifetime">&#39;data</span>,
+    <span class="lifetime">&#39;file</span>,
+    R: ReadRef&lt;<span class="lifetime">&#39;data</span>&gt; = <span class="kw-2">&amp;</span><span class="lifetime">&#39;data </span>[u8],
+    Coff: CoffHeader = pe::ImageFileHeader,
+&gt; {
+    file: <span class="kw-2">&amp;</span><span class="lifetime">&#39;file </span>CoffFile&lt;<span class="lifetime">&#39;data</span>, R, Coff&gt;,
     symbol_index: SymbolIndex,
-    symbol: <span class="kw-2">&amp;</span><span class="lifetime">&#39;data </span>pe::ImageSymbol,
+    symbol: <span class="kw-2">&amp;</span><span class="lifetime">&#39;data </span>Coff::ImageSymbol,
     selection: u8,
 }
 
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;data</span>, <span class="lifetime">&#39;file</span>, R: ReadRef&lt;<span class="lifetime">&#39;data</span>&gt;&gt; CoffComdat&lt;<span class="lifetime">&#39;data</span>, <span class="lifetime">&#39;file</span>, R&gt; {
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;data</span>, <span class="lifetime">&#39;file</span>, R: ReadRef&lt;<span class="lifetime">&#39;data</span>&gt;, Coff: CoffHeader&gt; CoffComdat&lt;<span class="lifetime">&#39;data</span>, <span class="lifetime">&#39;file</span>, R, Coff&gt; {
     <span class="kw">fn </span>parse(
-        file: <span class="kw-2">&amp;</span><span class="lifetime">&#39;file </span>CoffFile&lt;<span class="lifetime">&#39;data</span>, R&gt;,
-        section_symbol: <span class="kw-2">&amp;</span><span class="lifetime">&#39;data </span>pe::ImageSymbol,
+        file: <span class="kw-2">&amp;</span><span class="lifetime">&#39;file </span>CoffFile&lt;<span class="lifetime">&#39;data</span>, R, Coff&gt;,
+        section_symbol: <span class="kw-2">&amp;</span><span class="lifetime">&#39;data </span>Coff::ImageSymbol,
         index: usize,
-    ) -&gt; <span class="prelude-ty">Option</span>&lt;CoffComdat&lt;<span class="lifetime">&#39;data</span>, <span class="lifetime">&#39;file</span>, R&gt;&gt; {
+    ) -&gt; <span class="prelude-ty">Option</span>&lt;CoffComdat&lt;<span class="lifetime">&#39;data</span>, <span class="lifetime">&#39;file</span>, R, Coff&gt;&gt; {
         <span class="comment">// Must be a section symbol.
         </span><span class="kw">if </span>!section_symbol.has_aux_section() {
             <span class="kw">return </span><span class="prelude-val">None</span>;
@@ -227,11 +287,11 @@
         <span class="comment">// Find the COMDAT symbol.
         </span><span class="kw">let </span><span class="kw-2">mut </span>symbol_index = index;
         <span class="kw">let </span><span class="kw-2">mut </span>symbol = section_symbol;
-        <span class="kw">let </span>section_number = section_symbol.section_number.get(LE);
+        <span class="kw">let </span>section_number = section_symbol.section_number();
         <span class="kw">loop </span>{
-            symbol_index += <span class="number">1 </span>+ symbol.number_of_aux_symbols <span class="kw">as </span>usize;
+            symbol_index += <span class="number">1 </span>+ symbol.number_of_aux_symbols() <span class="kw">as </span>usize;
             symbol = file.common.symbols.symbol(symbol_index).ok()<span class="question-mark">?</span>;
-            <span class="kw">if </span>section_number == symbol.section_number.get(LE) {
+            <span class="kw">if </span>section_number == symbol.section_number() {
                 <span class="kw">break</span>;
             }
         }
@@ -245,10 +305,15 @@
     }
 }
 
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;data</span>, <span class="lifetime">&#39;file</span>, R: ReadRef&lt;<span class="lifetime">&#39;data</span>&gt;&gt; read::private::Sealed <span class="kw">for </span>CoffComdat&lt;<span class="lifetime">&#39;data</span>, <span class="lifetime">&#39;file</span>, R&gt; {}
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;data</span>, <span class="lifetime">&#39;file</span>, R: ReadRef&lt;<span class="lifetime">&#39;data</span>&gt;, Coff: CoffHeader&gt; read::private::Sealed
+    <span class="kw">for </span>CoffComdat&lt;<span class="lifetime">&#39;data</span>, <span class="lifetime">&#39;file</span>, R, Coff&gt;
+{
+}
 
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;data</span>, <span class="lifetime">&#39;file</span>, R: ReadRef&lt;<span class="lifetime">&#39;data</span>&gt;&gt; ObjectComdat&lt;<span class="lifetime">&#39;data</span>&gt; <span class="kw">for </span>CoffComdat&lt;<span class="lifetime">&#39;data</span>, <span class="lifetime">&#39;file</span>, R&gt; {
-    <span class="kw">type </span>SectionIterator = CoffComdatSectionIterator&lt;<span class="lifetime">&#39;data</span>, <span class="lifetime">&#39;file</span>, R&gt;;
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;data</span>, <span class="lifetime">&#39;file</span>, R: ReadRef&lt;<span class="lifetime">&#39;data</span>&gt;, Coff: CoffHeader&gt; ObjectComdat&lt;<span class="lifetime">&#39;data</span>&gt;
+    <span class="kw">for </span>CoffComdat&lt;<span class="lifetime">&#39;data</span>, <span class="lifetime">&#39;file</span>, R, Coff&gt;
+{
+    <span class="kw">type </span>SectionIterator = CoffComdatSectionIterator&lt;<span class="lifetime">&#39;data</span>, <span class="lifetime">&#39;file</span>, R, Coff&gt;;
 
     <span class="attr">#[inline]
     </span><span class="kw">fn </span>kind(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; ComdatKind {
@@ -286,21 +351,32 @@
     </span><span class="kw">fn </span>sections(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="self">Self</span>::SectionIterator {
         CoffComdatSectionIterator {
             file: <span class="self">self</span>.file,
-            section_number: <span class="self">self</span>.symbol.section_number.get(LE),
+            section_number: <span class="self">self</span>.symbol.section_number(),
             index: <span class="number">0</span>,
         }
     }
 }
 
+<span class="doccomment">/// An iterator over the sections in a COMDAT section group of a `CoffBigFile`.
+</span><span class="kw">pub type </span>CoffBigComdatSectionIterator&lt;<span class="lifetime">&#39;data</span>, <span class="lifetime">&#39;file</span>, R = <span class="kw-2">&amp;</span><span class="lifetime">&#39;data </span>[u8]&gt; =
+    CoffComdatSectionIterator&lt;<span class="lifetime">&#39;data</span>, <span class="lifetime">&#39;file</span>, R, pe::AnonObjectHeaderBigobj&gt;;
+
 <span class="doccomment">/// An iterator over the sections in a COMDAT section group of a `CoffFile`.
 </span><span class="attr">#[derive(Debug)]
-</span><span class="kw">pub struct </span>CoffComdatSectionIterator&lt;<span class="lifetime">&#39;data</span>, <span class="lifetime">&#39;file</span>, R: ReadRef&lt;<span class="lifetime">&#39;data</span>&gt; = <span class="kw-2">&amp;</span><span class="lifetime">&#39;data </span>[u8]&gt; {
-    file: <span class="kw-2">&amp;</span><span class="lifetime">&#39;file </span>CoffFile&lt;<span class="lifetime">&#39;data</span>, R&gt;,
-    section_number: u16,
+</span><span class="kw">pub struct </span>CoffComdatSectionIterator&lt;
+    <span class="lifetime">&#39;data</span>,
+    <span class="lifetime">&#39;file</span>,
+    R: ReadRef&lt;<span class="lifetime">&#39;data</span>&gt; = <span class="kw-2">&amp;</span><span class="lifetime">&#39;data </span>[u8],
+    Coff: CoffHeader = pe::ImageFileHeader,
+&gt; {
+    file: <span class="kw-2">&amp;</span><span class="lifetime">&#39;file </span>CoffFile&lt;<span class="lifetime">&#39;data</span>, R, Coff&gt;,
+    section_number: i32,
     index: usize,
 }
 
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;data</span>, <span class="lifetime">&#39;file</span>, R: ReadRef&lt;<span class="lifetime">&#39;data</span>&gt;&gt; Iterator <span class="kw">for </span>CoffComdatSectionIterator&lt;<span class="lifetime">&#39;data</span>, <span class="lifetime">&#39;file</span>, R&gt; {
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;data</span>, <span class="lifetime">&#39;file</span>, R: ReadRef&lt;<span class="lifetime">&#39;data</span>&gt;, Coff: CoffHeader&gt; Iterator
+    <span class="kw">for </span>CoffComdatSectionIterator&lt;<span class="lifetime">&#39;data</span>, <span class="lifetime">&#39;file</span>, R, Coff&gt;
+{
     <span class="kw">type </span>Item = SectionIndex;
 
     <span class="kw">fn </span>next(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>::Item&gt; {
@@ -309,19 +385,23 @@
         </span><span class="kw">loop </span>{
             <span class="kw">let </span>index = <span class="self">self</span>.index;
             <span class="kw">let </span>symbol = <span class="self">self</span>.file.common.symbols.symbol(index).ok()<span class="question-mark">?</span>;
-            <span class="self">self</span>.index += <span class="number">1 </span>+ symbol.number_of_aux_symbols <span class="kw">as </span>usize;
+            <span class="self">self</span>.index += <span class="number">1 </span>+ symbol.number_of_aux_symbols() <span class="kw">as </span>usize;
 
             <span class="comment">// Must be a section symbol.
             </span><span class="kw">if </span>!symbol.has_aux_section() {
                 <span class="kw">continue</span>;
             }
 
-            <span class="kw">let </span>section_number = symbol.section_number.get(LE);
+            <span class="kw">let </span>section_number = symbol.section_number();
 
             <span class="kw">let </span>aux = <span class="self">self</span>.file.common.symbols.aux_section(index).ok()<span class="question-mark">?</span>;
             <span class="kw">if </span>aux.selection == pe::IMAGE_COMDAT_SELECT_ASSOCIATIVE {
-                <span class="comment">// TODO: use high_number for bigobj
-                </span><span class="kw">if </span>aux.number.get(LE) == <span class="self">self</span>.section_number {
+                <span class="kw">let </span>number = <span class="kw">if </span>Coff::is_type_bigobj() {
+                    u32::from(aux.number.get(LE)) | (u32::from(aux.high_number.get(LE)) &lt;&lt; <span class="number">16</span>)
+                } <span class="kw">else </span>{
+                    u32::from(aux.number.get(LE))
+                };
+                <span class="kw">if </span>number <span class="kw">as </span>i32 == <span class="self">self</span>.section_number {
                     <span class="kw">return </span><span class="prelude-val">Some</span>(SectionIndex(section_number <span class="kw">as </span>usize));
                 }
             } <span class="kw">else if </span>aux.selection != <span class="number">0 </span>{

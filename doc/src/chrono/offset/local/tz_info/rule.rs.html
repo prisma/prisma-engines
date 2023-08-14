@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/nix/store/jnqxxv1xi811ni996b002f4jnyz38xck-vendor-cargo-deps/c19b7c6f923b580ac259164a89f2577984ad5ab09ee9d583b888f934adbbe8d0/chrono-0.4.20/src/offset/local/tz_info/rule.rs`."><title>rule.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../../../static.files/rustdoc-f3501f0f5ae15dfb.css" id="mainThemeStyle"><div id="rustdoc-vars" data-root-path="../../../../../" data-static-root-path="../../../../../static.files/" data-current-crate="chrono" data-themes="" data-resource-suffix="" data-rustdoc-version="1.71.0 (8ede3aae2 2023-07-12)" data-search-js="search-4926e5fc22a5646a.js" data-settings-js="settings-de11bff964e9d4e5.js" data-settings-css="settings-8c76f75bfb6bd192.css" data-theme-light-css="light-0f8c037637f9eb3e.css" data-theme-dark-css="dark-1097f8e92a01e3cf.css" data-theme-ayu-css="ayu-614652228113ac93.css" ></div><script src="../../../../../static.files/storage-62ce34ea385b278a.js"></script><script defer src="../../../../../static.files/source-script-11255107d0a65077.js"></script><script defer src="../../../../../source-files.js"></script><script defer src="../../../../../static.files/main-f0540c1d82cde29b.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../../../../../static.files/light-0f8c037637f9eb3e.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../../../../../static.files/dark-1097f8e92a01e3cf.css"><link rel="stylesheet" href="../../../../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../../../../chrono/index.html"><img class="rust-logo" src="../../../../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/nix/store/yf45a1rayffhnidhgyjynpyhr9lqkd09-vendor-cargo-deps/c19b7c6f923b580ac259164a89f2577984ad5ab09ee9d583b888f934adbbe8d0/chrono-0.4.26/src/offset/local/tz_info/rule.rs`."><title>rule.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../../../static.files/rustdoc-f3501f0f5ae15dfb.css" id="mainThemeStyle"><div id="rustdoc-vars" data-root-path="../../../../../" data-static-root-path="../../../../../static.files/" data-current-crate="chrono" data-themes="" data-resource-suffix="" data-rustdoc-version="1.71.0 (8ede3aae2 2023-07-12)" data-search-js="search-4926e5fc22a5646a.js" data-settings-js="settings-de11bff964e9d4e5.js" data-settings-css="settings-8c76f75bfb6bd192.css" data-theme-light-css="light-0f8c037637f9eb3e.css" data-theme-dark-css="dark-1097f8e92a01e3cf.css" data-theme-ayu-css="ayu-614652228113ac93.css" ></div><script src="../../../../../static.files/storage-62ce34ea385b278a.js"></script><script defer src="../../../../../static.files/source-script-11255107d0a65077.js"></script><script defer src="../../../../../source-files.js"></script><script defer src="../../../../../static.files/main-f0540c1d82cde29b.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../../../../../static.files/light-0f8c037637f9eb3e.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../../../../../static.files/dark-1097f8e92a01e3cf.css"><link rel="stylesheet" href="../../../../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../../../../chrono/index.html"><img class="rust-logo" src="../../../../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -1043,13 +1043,12 @@
 <a href="#1043" id="1043">1043</a>
 <a href="#1044" id="1044">1044</a>
 <a href="#1045" id="1045">1045</a>
-<a href="#1046" id="1046">1046</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::cmp::Ordering;
 
 <span class="kw">use </span><span class="kw">super</span>::parser::Cursor;
 <span class="kw">use </span><span class="kw">super</span>::timezone::{LocalTimeType, SECONDS_PER_WEEK};
 <span class="kw">use super</span>::{
-    rem_euclid, Error, CUMUL_DAY_IN_MONTHS_NORMAL_YEAR, DAYS_PER_WEEK, DAY_IN_MONTHS_NORMAL_YEAR,
+    Error, CUMUL_DAY_IN_MONTHS_NORMAL_YEAR, DAYS_PER_WEEK, DAY_IN_MONTHS_NORMAL_YEAR,
     SECONDS_PER_DAY,
 };
 
@@ -1173,7 +1172,7 @@
 
 <span class="kw">impl </span>AlternateTime {
     <span class="doccomment">/// Construct a transition rule representing alternate local time types
-    </span><span class="kw">fn </span>new(
+    </span><span class="kw">const fn </span>new(
         std: LocalTimeType,
         dst: LocalTimeType,
         dst_start: RuleDay,
@@ -1411,13 +1410,13 @@
 </span><span class="kw">fn </span>parse_offset(cursor: <span class="kw-2">&amp;mut </span>Cursor) -&gt; <span class="prelude-ty">Result</span>&lt;i32, Error&gt; {
     <span class="kw">let </span>(sign, hour, minute, second) = parse_signed_hhmmss(cursor)<span class="question-mark">?</span>;
 
-    <span class="kw">if </span>hour &lt; <span class="number">0 </span>|| hour &gt; <span class="number">24 </span>{
+    <span class="kw">if </span>!(<span class="number">0</span>..=<span class="number">24</span>).contains(<span class="kw-2">&amp;</span>hour) {
         <span class="kw">return </span><span class="prelude-val">Err</span>(Error::InvalidTzString(<span class="string">&quot;invalid offset hour&quot;</span>));
     }
-    <span class="kw">if </span>minute &lt; <span class="number">0 </span>|| minute &gt; <span class="number">59 </span>{
+    <span class="kw">if </span>!(<span class="number">0</span>..=<span class="number">59</span>).contains(<span class="kw-2">&amp;</span>minute) {
         <span class="kw">return </span><span class="prelude-val">Err</span>(Error::InvalidTzString(<span class="string">&quot;invalid offset minute&quot;</span>));
     }
-    <span class="kw">if </span>second &lt; <span class="number">0 </span>|| second &gt; <span class="number">59 </span>{
+    <span class="kw">if </span>!(<span class="number">0</span>..=<span class="number">59</span>).contains(<span class="kw-2">&amp;</span>second) {
         <span class="kw">return </span><span class="prelude-val">Err</span>(Error::InvalidTzString(<span class="string">&quot;invalid offset second&quot;</span>));
     }
 
@@ -1428,13 +1427,13 @@
 </span><span class="kw">fn </span>parse_rule_time(cursor: <span class="kw-2">&amp;mut </span>Cursor) -&gt; <span class="prelude-ty">Result</span>&lt;i32, Error&gt; {
     <span class="kw">let </span>(hour, minute, second) = parse_hhmmss(cursor)<span class="question-mark">?</span>;
 
-    <span class="kw">if </span>hour &lt; <span class="number">0 </span>|| hour &gt; <span class="number">24 </span>{
+    <span class="kw">if </span>!(<span class="number">0</span>..=<span class="number">24</span>).contains(<span class="kw-2">&amp;</span>hour) {
         <span class="kw">return </span><span class="prelude-val">Err</span>(Error::InvalidTzString(<span class="string">&quot;invalid day time hour&quot;</span>));
     }
-    <span class="kw">if </span>minute &lt; <span class="number">0 </span>|| minute &gt; <span class="number">59 </span>{
+    <span class="kw">if </span>!(<span class="number">0</span>..=<span class="number">59</span>).contains(<span class="kw-2">&amp;</span>minute) {
         <span class="kw">return </span><span class="prelude-val">Err</span>(Error::InvalidTzString(<span class="string">&quot;invalid day time minute&quot;</span>));
     }
-    <span class="kw">if </span>second &lt; <span class="number">0 </span>|| second &gt; <span class="number">59 </span>{
+    <span class="kw">if </span>!(<span class="number">0</span>..=<span class="number">59</span>).contains(<span class="kw-2">&amp;</span>second) {
         <span class="kw">return </span><span class="prelude-val">Err</span>(Error::InvalidTzString(<span class="string">&quot;invalid day time second&quot;</span>));
     }
 
@@ -1445,13 +1444,13 @@
 </span><span class="kw">fn </span>parse_rule_time_extended(cursor: <span class="kw-2">&amp;mut </span>Cursor) -&gt; <span class="prelude-ty">Result</span>&lt;i32, Error&gt; {
     <span class="kw">let </span>(sign, hour, minute, second) = parse_signed_hhmmss(cursor)<span class="question-mark">?</span>;
 
-    <span class="kw">if </span>hour &lt; -<span class="number">167 </span>|| hour &gt; <span class="number">167 </span>{
+    <span class="kw">if </span>!(-<span class="number">167</span>..=<span class="number">167</span>).contains(<span class="kw-2">&amp;</span>hour) {
         <span class="kw">return </span><span class="prelude-val">Err</span>(Error::InvalidTzString(<span class="string">&quot;invalid day time hour&quot;</span>));
     }
-    <span class="kw">if </span>minute &lt; <span class="number">0 </span>|| minute &gt; <span class="number">59 </span>{
+    <span class="kw">if </span>!(<span class="number">0</span>..=<span class="number">59</span>).contains(<span class="kw-2">&amp;</span>minute) {
         <span class="kw">return </span><span class="prelude-val">Err</span>(Error::InvalidTzString(<span class="string">&quot;invalid day time minute&quot;</span>));
     }
-    <span class="kw">if </span>second &lt; <span class="number">0 </span>|| second &gt; <span class="number">59 </span>{
+    <span class="kw">if </span>!(<span class="number">0</span>..=<span class="number">59</span>).contains(<span class="kw-2">&amp;</span>second) {
         <span class="kw">return </span><span class="prelude-val">Err</span>(Error::InvalidTzString(<span class="string">&quot;invalid day time second&quot;</span>));
     }
 
@@ -1542,7 +1541,7 @@
 
     <span class="doccomment">/// Construct a transition rule day represented by a Julian day in `[1, 365]`, without taking occasional Feb 29 into account, which is not referenceable
     </span><span class="kw">fn </span>julian_1(julian_day_1: u16) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, Error&gt; {
-        <span class="kw">if </span>julian_day_1 &lt; <span class="number">1 </span>|| julian_day_1 &gt; <span class="number">365 </span>{
+        <span class="kw">if </span>!(<span class="number">1</span>..=<span class="number">365</span>).contains(<span class="kw-2">&amp;</span>julian_day_1) {
             <span class="kw">return </span><span class="prelude-val">Err</span>(Error::TransitionRule(<span class="string">&quot;invalid rule day julian day&quot;</span>));
         }
 
@@ -1550,7 +1549,7 @@
     }
 
     <span class="doccomment">/// Construct a transition rule day represented by a zero-based Julian day in `[0, 365]`, taking occasional Feb 29 into account
-    </span><span class="kw">fn </span>julian_0(julian_day_0: u16) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, Error&gt; {
+    </span><span class="kw">const fn </span>julian_0(julian_day_0: u16) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, Error&gt; {
         <span class="kw">if </span>julian_day_0 &gt; <span class="number">365 </span>{
             <span class="kw">return </span><span class="prelude-val">Err</span>(Error::TransitionRule(<span class="string">&quot;invalid rule day julian day&quot;</span>));
         }
@@ -1560,11 +1559,11 @@
 
     <span class="doccomment">/// Construct a transition rule day represented by a month, a month week and a week day
     </span><span class="kw">fn </span>month_weekday(month: u8, week: u8, week_day: u8) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, Error&gt; {
-        <span class="kw">if </span>month &lt; <span class="number">1 </span>|| month &gt; <span class="number">12 </span>{
+        <span class="kw">if </span>!(<span class="number">1</span>..=<span class="number">12</span>).contains(<span class="kw-2">&amp;</span>month) {
             <span class="kw">return </span><span class="prelude-val">Err</span>(Error::TransitionRule(<span class="string">&quot;invalid rule day month&quot;</span>));
         }
 
-        <span class="kw">if </span>week &lt; <span class="number">1 </span>|| week &gt; <span class="number">5 </span>{
+        <span class="kw">if </span>!(<span class="number">1</span>..=<span class="number">5</span>).contains(<span class="kw-2">&amp;</span>week) {
             <span class="kw">return </span><span class="prelude-val">Err</span>(Error::TransitionRule(<span class="string">&quot;invalid rule day week&quot;</span>));
         }
 
@@ -1635,9 +1634,9 @@
                 }
 
                 <span class="kw">let </span>week_day_of_first_month_day =
-                    rem_euclid(<span class="number">4 </span>+ days_since_unix_epoch(year, month, <span class="number">1</span>), DAYS_PER_WEEK);
+                    (<span class="number">4 </span>+ days_since_unix_epoch(year, month, <span class="number">1</span>)).rem_euclid(DAYS_PER_WEEK);
                 <span class="kw">let </span>first_week_day_occurence_in_month =
-                    <span class="number">1 </span>+ rem_euclid(week_day <span class="kw">as </span>i64 - week_day_of_first_month_day, DAYS_PER_WEEK);
+                    <span class="number">1 </span>+ (week_day <span class="kw">as </span>i64 - week_day_of_first_month_day).rem_euclid(DAYS_PER_WEEK);
 
                 <span class="kw">let </span><span class="kw-2">mut </span>month_day =
                     first_week_day_occurence_in_month + (week <span class="kw">as </span>i64 - <span class="number">1</span>) * DAYS_PER_WEEK;
@@ -1783,7 +1782,7 @@
 /// * `year`: Year
 /// * `month`: Month in `[1, 12]`
 /// * `month_day`: Day of the month in `[1, 31]`
-</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>days_since_unix_epoch(year: i32, month: usize, month_day: i64) -&gt; i64 {
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">const fn </span>days_since_unix_epoch(year: i32, month: usize, month_day: i64) -&gt; i64 {
     <span class="kw">let </span>is_leap_year = is_leap_year(year);
 
     <span class="kw">let </span>year = year <span class="kw">as </span>i64;
@@ -1814,7 +1813,7 @@
 }
 
 <span class="doccomment">/// Check if a year is a leap year
-</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>is_leap_year(year: i32) -&gt; bool {
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">const fn </span>is_leap_year(year: i32) -&gt; bool {
     year % <span class="number">400 </span>== <span class="number">0 </span>|| (year % <span class="number">4 </span>== <span class="number">0 </span>&amp;&amp; year % <span class="number">100 </span>!= <span class="number">0</span>)
 }
 
@@ -1823,7 +1822,6 @@
     <span class="kw">use </span><span class="kw">super</span>::<span class="kw">super</span>::timezone::Transition;
     <span class="kw">use </span><span class="kw">super</span>::<span class="kw">super</span>::{Error, TimeZone};
     <span class="kw">use super</span>::{AlternateTime, LocalTimeType, RuleDay, TransitionRule};
-    <span class="kw">use </span><span class="kw">crate</span>::matches;
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>test_quoted() -&gt; <span class="prelude-ty">Result</span>&lt;(), Error&gt; {

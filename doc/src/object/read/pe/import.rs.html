@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/nix/store/jnqxxv1xi811ni996b002f4jnyz38xck-vendor-cargo-deps/c19b7c6f923b580ac259164a89f2577984ad5ab09ee9d583b888f934adbbe8d0/object-0.29.0/src/read/pe/import.rs`."><title>import.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../../static.files/rustdoc-f3501f0f5ae15dfb.css" id="mainThemeStyle"><div id="rustdoc-vars" data-root-path="../../../../" data-static-root-path="../../../../static.files/" data-current-crate="object" data-themes="" data-resource-suffix="" data-rustdoc-version="1.71.0 (8ede3aae2 2023-07-12)" data-search-js="search-4926e5fc22a5646a.js" data-settings-js="settings-de11bff964e9d4e5.js" data-settings-css="settings-8c76f75bfb6bd192.css" data-theme-light-css="light-0f8c037637f9eb3e.css" data-theme-dark-css="dark-1097f8e92a01e3cf.css" data-theme-ayu-css="ayu-614652228113ac93.css" ></div><script src="../../../../static.files/storage-62ce34ea385b278a.js"></script><script defer src="../../../../static.files/source-script-11255107d0a65077.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../static.files/main-f0540c1d82cde29b.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../../../../static.files/light-0f8c037637f9eb3e.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../../../../static.files/dark-1097f8e92a01e3cf.css"><link rel="stylesheet" href="../../../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../../../object/index.html"><img class="rust-logo" src="../../../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/nix/store/yf45a1rayffhnidhgyjynpyhr9lqkd09-vendor-cargo-deps/c19b7c6f923b580ac259164a89f2577984ad5ab09ee9d583b888f934adbbe8d0/object-0.31.1/src/read/pe/import.rs`."><title>import.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../../static.files/rustdoc-f3501f0f5ae15dfb.css" id="mainThemeStyle"><div id="rustdoc-vars" data-root-path="../../../../" data-static-root-path="../../../../static.files/" data-current-crate="object" data-themes="" data-resource-suffix="" data-rustdoc-version="1.71.0 (8ede3aae2 2023-07-12)" data-search-js="search-4926e5fc22a5646a.js" data-settings-js="settings-de11bff964e9d4e5.js" data-settings-css="settings-8c76f75bfb6bd192.css" data-theme-light-css="light-0f8c037637f9eb3e.css" data-theme-dark-css="dark-1097f8e92a01e3cf.css" data-theme-ayu-css="ayu-614652228113ac93.css" ></div><script src="../../../../static.files/storage-62ce34ea385b278a.js"></script><script defer src="../../../../static.files/source-script-11255107d0a65077.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../static.files/main-f0540c1d82cde29b.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../../../../static.files/light-0f8c037637f9eb3e.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../../../../static.files/dark-1097f8e92a01e3cf.css"><link rel="stylesheet" href="../../../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../../../object/index.html"><img class="rust-logo" src="../../../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -216,6 +216,120 @@
 <a href="#216" id="216">216</a>
 <a href="#217" id="217">217</a>
 <a href="#218" id="218">218</a>
+<a href="#219" id="219">219</a>
+<a href="#220" id="220">220</a>
+<a href="#221" id="221">221</a>
+<a href="#222" id="222">222</a>
+<a href="#223" id="223">223</a>
+<a href="#224" id="224">224</a>
+<a href="#225" id="225">225</a>
+<a href="#226" id="226">226</a>
+<a href="#227" id="227">227</a>
+<a href="#228" id="228">228</a>
+<a href="#229" id="229">229</a>
+<a href="#230" id="230">230</a>
+<a href="#231" id="231">231</a>
+<a href="#232" id="232">232</a>
+<a href="#233" id="233">233</a>
+<a href="#234" id="234">234</a>
+<a href="#235" id="235">235</a>
+<a href="#236" id="236">236</a>
+<a href="#237" id="237">237</a>
+<a href="#238" id="238">238</a>
+<a href="#239" id="239">239</a>
+<a href="#240" id="240">240</a>
+<a href="#241" id="241">241</a>
+<a href="#242" id="242">242</a>
+<a href="#243" id="243">243</a>
+<a href="#244" id="244">244</a>
+<a href="#245" id="245">245</a>
+<a href="#246" id="246">246</a>
+<a href="#247" id="247">247</a>
+<a href="#248" id="248">248</a>
+<a href="#249" id="249">249</a>
+<a href="#250" id="250">250</a>
+<a href="#251" id="251">251</a>
+<a href="#252" id="252">252</a>
+<a href="#253" id="253">253</a>
+<a href="#254" id="254">254</a>
+<a href="#255" id="255">255</a>
+<a href="#256" id="256">256</a>
+<a href="#257" id="257">257</a>
+<a href="#258" id="258">258</a>
+<a href="#259" id="259">259</a>
+<a href="#260" id="260">260</a>
+<a href="#261" id="261">261</a>
+<a href="#262" id="262">262</a>
+<a href="#263" id="263">263</a>
+<a href="#264" id="264">264</a>
+<a href="#265" id="265">265</a>
+<a href="#266" id="266">266</a>
+<a href="#267" id="267">267</a>
+<a href="#268" id="268">268</a>
+<a href="#269" id="269">269</a>
+<a href="#270" id="270">270</a>
+<a href="#271" id="271">271</a>
+<a href="#272" id="272">272</a>
+<a href="#273" id="273">273</a>
+<a href="#274" id="274">274</a>
+<a href="#275" id="275">275</a>
+<a href="#276" id="276">276</a>
+<a href="#277" id="277">277</a>
+<a href="#278" id="278">278</a>
+<a href="#279" id="279">279</a>
+<a href="#280" id="280">280</a>
+<a href="#281" id="281">281</a>
+<a href="#282" id="282">282</a>
+<a href="#283" id="283">283</a>
+<a href="#284" id="284">284</a>
+<a href="#285" id="285">285</a>
+<a href="#286" id="286">286</a>
+<a href="#287" id="287">287</a>
+<a href="#288" id="288">288</a>
+<a href="#289" id="289">289</a>
+<a href="#290" id="290">290</a>
+<a href="#291" id="291">291</a>
+<a href="#292" id="292">292</a>
+<a href="#293" id="293">293</a>
+<a href="#294" id="294">294</a>
+<a href="#295" id="295">295</a>
+<a href="#296" id="296">296</a>
+<a href="#297" id="297">297</a>
+<a href="#298" id="298">298</a>
+<a href="#299" id="299">299</a>
+<a href="#300" id="300">300</a>
+<a href="#301" id="301">301</a>
+<a href="#302" id="302">302</a>
+<a href="#303" id="303">303</a>
+<a href="#304" id="304">304</a>
+<a href="#305" id="305">305</a>
+<a href="#306" id="306">306</a>
+<a href="#307" id="307">307</a>
+<a href="#308" id="308">308</a>
+<a href="#309" id="309">309</a>
+<a href="#310" id="310">310</a>
+<a href="#311" id="311">311</a>
+<a href="#312" id="312">312</a>
+<a href="#313" id="313">313</a>
+<a href="#314" id="314">314</a>
+<a href="#315" id="315">315</a>
+<a href="#316" id="316">316</a>
+<a href="#317" id="317">317</a>
+<a href="#318" id="318">318</a>
+<a href="#319" id="319">319</a>
+<a href="#320" id="320">320</a>
+<a href="#321" id="321">321</a>
+<a href="#322" id="322">322</a>
+<a href="#323" id="323">323</a>
+<a href="#324" id="324">324</a>
+<a href="#325" id="325">325</a>
+<a href="#326" id="326">326</a>
+<a href="#327" id="327">327</a>
+<a href="#328" id="328">328</a>
+<a href="#329" id="329">329</a>
+<a href="#330" id="330">330</a>
+<a href="#331" id="331">331</a>
+<a href="#332" id="332">332</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>core::fmt::Debug;
 <span class="kw">use </span>core::mem;
 
@@ -433,5 +547,119 @@
     <span class="kw">fn </span>address(<span class="self">self</span>) -&gt; u32 {
         <span class="self">self</span>.<span class="number">0</span>.get(LE) &amp; <span class="number">0x7fff_ffff
     </span>}
+}
+
+<span class="doccomment">/// Information for parsing a PE delay-load import table.
+</span><span class="attr">#[derive(Debug, Clone)]
+</span><span class="kw">pub struct </span>DelayLoadImportTable&lt;<span class="lifetime">&#39;data</span>&gt; {
+    section_data: Bytes&lt;<span class="lifetime">&#39;data</span>&gt;,
+    section_address: u32,
+    import_address: u32,
+}
+
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;data</span>&gt; DelayLoadImportTable&lt;<span class="lifetime">&#39;data</span>&gt; {
+    <span class="doccomment">/// Create a new delay load import table parser.
+    ///
+    /// The import descriptors start at `import_address`.
+    /// This table works in the same way the import table does: descriptors will be
+    /// parsed until a null entry.
+    ///
+    /// `section_data` should be from the section containing `import_address`, and
+    /// `section_address` should be the address of that section. Pointers within the
+    /// descriptors and thunks may point to anywhere within the section data.
+    </span><span class="kw">pub fn </span>new(section_data: <span class="kw-2">&amp;</span><span class="lifetime">&#39;data </span>[u8], section_address: u32, import_address: u32) -&gt; <span class="self">Self </span>{
+        DelayLoadImportTable {
+            section_data: Bytes(section_data),
+            section_address,
+            import_address,
+        }
+    }
+
+    <span class="doccomment">/// Return an iterator for the import descriptors.
+    </span><span class="kw">pub fn </span>descriptors(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;DelayLoadDescriptorIterator&lt;<span class="lifetime">&#39;data</span>&gt;&gt; {
+        <span class="kw">let </span>offset = <span class="self">self</span>.import_address.wrapping_sub(<span class="self">self</span>.section_address);
+        <span class="kw">let </span><span class="kw-2">mut </span>data = <span class="self">self</span>.section_data;
+        data.skip(offset <span class="kw">as </span>usize)
+            .read_error(<span class="string">&quot;Invalid PE delay-load import descriptor address&quot;</span>)<span class="question-mark">?</span>;
+        <span class="prelude-val">Ok</span>(DelayLoadDescriptorIterator { data })
+    }
+
+    <span class="doccomment">/// Return a library name given its address.
+    ///
+    /// This address may be from [`pe::ImageDelayloadDescriptor::dll_name_rva`].
+    </span><span class="kw">pub fn </span>name(<span class="kw-2">&amp;</span><span class="self">self</span>, address: u32) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;data </span>[u8]&gt; {
+        <span class="self">self</span>.section_data
+            .read_string_at(address.wrapping_sub(<span class="self">self</span>.section_address) <span class="kw">as </span>usize)
+            .read_error(<span class="string">&quot;Invalid PE import descriptor name&quot;</span>)
+    }
+
+    <span class="doccomment">/// Return a list of thunks given its address.
+    ///
+    /// This address may be from the INT, i.e. from
+    /// [`pe::ImageDelayloadDescriptor::import_name_table_rva`].
+    ///
+    /// Please note that others RVA values from [`pe::ImageDelayloadDescriptor`] are used
+    /// by the delay loader at runtime to store values, and thus do not point inside the same
+    /// section as the INT. Calling this function on those addresses will fail.
+    </span><span class="kw">pub fn </span>thunks(<span class="kw-2">&amp;</span><span class="self">self</span>, address: u32) -&gt; <span class="prelude-ty">Result</span>&lt;ImportThunkList&lt;<span class="lifetime">&#39;data</span>&gt;&gt; {
+        <span class="kw">let </span>offset = address.wrapping_sub(<span class="self">self</span>.section_address);
+        <span class="kw">let </span><span class="kw-2">mut </span>data = <span class="self">self</span>.section_data;
+        data.skip(offset <span class="kw">as </span>usize)
+            .read_error(<span class="string">&quot;Invalid PE delay load import thunk table address&quot;</span>)<span class="question-mark">?</span>;
+        <span class="prelude-val">Ok</span>(ImportThunkList { data })
+    }
+
+    <span class="doccomment">/// Parse a thunk.
+    </span><span class="kw">pub fn </span>import&lt;Pe: ImageNtHeaders&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, thunk: Pe::ImageThunkData) -&gt; <span class="prelude-ty">Result</span>&lt;Import&lt;<span class="lifetime">&#39;data</span>&gt;&gt; {
+        <span class="kw">if </span>thunk.is_ordinal() {
+            <span class="prelude-val">Ok</span>(Import::Ordinal(thunk.ordinal()))
+        } <span class="kw">else </span>{
+            <span class="kw">let </span>(hint, name) = <span class="self">self</span>.hint_name(thunk.address())<span class="question-mark">?</span>;
+            <span class="prelude-val">Ok</span>(Import::Name(hint, name))
+        }
+    }
+
+    <span class="doccomment">/// Return the hint and name at the given address.
+    ///
+    /// This address may be from [`pe::ImageThunkData32`] or [`pe::ImageThunkData64`].
+    ///
+    /// The hint is an index into the export name pointer table in the target library.
+    </span><span class="kw">pub fn </span>hint_name(<span class="kw-2">&amp;</span><span class="self">self</span>, address: u32) -&gt; <span class="prelude-ty">Result</span>&lt;(u16, <span class="kw-2">&amp;</span><span class="lifetime">&#39;data </span>[u8])&gt; {
+        <span class="kw">let </span>offset = address.wrapping_sub(<span class="self">self</span>.section_address);
+        <span class="kw">let </span><span class="kw-2">mut </span>data = <span class="self">self</span>.section_data;
+        data.skip(offset <span class="kw">as </span>usize)
+            .read_error(<span class="string">&quot;Invalid PE delay load import thunk address&quot;</span>)<span class="question-mark">?</span>;
+        <span class="kw">let </span>hint = data
+            .read::&lt;U16Bytes&lt;LE&gt;&gt;()
+            .read_error(<span class="string">&quot;Missing PE delay load import thunk hint&quot;</span>)<span class="question-mark">?
+            </span>.get(LE);
+        <span class="kw">let </span>name = data
+            .read_string()
+            .read_error(<span class="string">&quot;Missing PE delay load import thunk name&quot;</span>)<span class="question-mark">?</span>;
+        <span class="prelude-val">Ok</span>((hint, name))
+    }
+}
+
+<span class="doccomment">/// A fallible iterator for the descriptors in the delay-load data directory.
+</span><span class="attr">#[derive(Debug, Clone)]
+</span><span class="kw">pub struct </span>DelayLoadDescriptorIterator&lt;<span class="lifetime">&#39;data</span>&gt; {
+    data: Bytes&lt;<span class="lifetime">&#39;data</span>&gt;,
+}
+
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;data</span>&gt; DelayLoadDescriptorIterator&lt;<span class="lifetime">&#39;data</span>&gt; {
+    <span class="doccomment">/// Return the next descriptor.
+    ///
+    /// Returns `Ok(None)` when a null descriptor is found.
+    </span><span class="kw">pub fn </span>next(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;data </span>pe::ImageDelayloadDescriptor&gt;&gt; {
+        <span class="kw">let </span>import_desc = <span class="self">self
+            </span>.data
+            .read::&lt;pe::ImageDelayloadDescriptor&gt;()
+            .read_error(<span class="string">&quot;Missing PE null delay-load import descriptor&quot;</span>)<span class="question-mark">?</span>;
+        <span class="kw">if </span>import_desc.is_null() {
+            <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>)
+        } <span class="kw">else </span>{
+            <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(import_desc))
+        }
+    }
 }
 </code></pre></div></section></main></body></html>

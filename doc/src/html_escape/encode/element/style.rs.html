@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/nix/store/jnqxxv1xi811ni996b002f4jnyz38xck-vendor-cargo-deps/c19b7c6f923b580ac259164a89f2577984ad5ab09ee9d583b888f934adbbe8d0/html-escape-0.2.12/src/encode/element/style.rs`."><title>style.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../../static.files/rustdoc-f3501f0f5ae15dfb.css" id="mainThemeStyle"><div id="rustdoc-vars" data-root-path="../../../../" data-static-root-path="../../../../static.files/" data-current-crate="html_escape" data-themes="" data-resource-suffix="" data-rustdoc-version="1.71.0 (8ede3aae2 2023-07-12)" data-search-js="search-4926e5fc22a5646a.js" data-settings-js="settings-de11bff964e9d4e5.js" data-settings-css="settings-8c76f75bfb6bd192.css" data-theme-light-css="light-0f8c037637f9eb3e.css" data-theme-dark-css="dark-1097f8e92a01e3cf.css" data-theme-ayu-css="ayu-614652228113ac93.css" ></div><script src="../../../../static.files/storage-62ce34ea385b278a.js"></script><script defer src="../../../../static.files/source-script-11255107d0a65077.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../static.files/main-f0540c1d82cde29b.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../../../../static.files/light-0f8c037637f9eb3e.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../../../../static.files/dark-1097f8e92a01e3cf.css"><link rel="stylesheet" href="../../../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../../../html_escape/index.html"><img class="rust-logo" src="../../../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/nix/store/yf45a1rayffhnidhgyjynpyhr9lqkd09-vendor-cargo-deps/c19b7c6f923b580ac259164a89f2577984ad5ab09ee9d583b888f934adbbe8d0/html-escape-0.2.13/src/encode/element/style.rs`."><title>style.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../../static.files/rustdoc-f3501f0f5ae15dfb.css" id="mainThemeStyle"><div id="rustdoc-vars" data-root-path="../../../../" data-static-root-path="../../../../static.files/" data-current-crate="html_escape" data-themes="" data-resource-suffix="" data-rustdoc-version="1.71.0 (8ede3aae2 2023-07-12)" data-search-js="search-4926e5fc22a5646a.js" data-settings-js="settings-de11bff964e9d4e5.js" data-settings-css="settings-8c76f75bfb6bd192.css" data-theme-light-css="light-0f8c037637f9eb3e.css" data-theme-dark-css="dark-1097f8e92a01e3cf.css" data-theme-ayu-css="ayu-614652228113ac93.css" ></div><script src="../../../../static.files/storage-62ce34ea385b278a.js"></script><script defer src="../../../../static.files/source-script-11255107d0a65077.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../static.files/main-f0540c1d82cde29b.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../../../../static.files/light-0f8c037637f9eb3e.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../../../../static.files/dark-1097f8e92a01e3cf.css"><link rel="stylesheet" href="../../../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../../../html_escape/index.html"><img class="rust-logo" src="../../../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -194,6 +194,36 @@
 <a href="#194" id="194">194</a>
 <a href="#195" id="195">195</a>
 <a href="#196" id="196">196</a>
+<a href="#197" id="197">197</a>
+<a href="#198" id="198">198</a>
+<a href="#199" id="199">199</a>
+<a href="#200" id="200">200</a>
+<a href="#201" id="201">201</a>
+<a href="#202" id="202">202</a>
+<a href="#203" id="203">203</a>
+<a href="#204" id="204">204</a>
+<a href="#205" id="205">205</a>
+<a href="#206" id="206">206</a>
+<a href="#207" id="207">207</a>
+<a href="#208" id="208">208</a>
+<a href="#209" id="209">209</a>
+<a href="#210" id="210">210</a>
+<a href="#211" id="211">211</a>
+<a href="#212" id="212">212</a>
+<a href="#213" id="213">213</a>
+<a href="#214" id="214">214</a>
+<a href="#215" id="215">215</a>
+<a href="#216" id="216">216</a>
+<a href="#217" id="217">217</a>
+<a href="#218" id="218">218</a>
+<a href="#219" id="219">219</a>
+<a href="#220" id="220">220</a>
+<a href="#221" id="221">221</a>
+<a href="#222" id="222">222</a>
+<a href="#223" id="223">223</a>
+<a href="#224" id="224">224</a>
+<a href="#225" id="225">225</a>
+<a href="#226" id="226">226</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>core::str::from_utf8_unchecked;
 
 <span class="kw">use </span>alloc::borrow::Cow;
@@ -203,13 +233,13 @@
 <span class="attr">#[cfg(feature = <span class="string">&quot;std&quot;</span>)]
 </span><span class="kw">use </span>std::io::{<span class="self">self</span>, Write};
 
-<span class="macro">macro_rules! </span>parse_style {
-    (<span class="macro-nonterminal">$e</span>:expr, <span class="macro-nonterminal">$step</span>:ident, <span class="macro-nonterminal">$b</span>:block, <span class="macro-nonterminal">$bq</span>:block $(, $(<span class="macro-nonterminal">$addi</span>:expr),+)<span class="question-mark">?</span>) =&gt; {
+<span class="macro">macro_rules! </span>parse_style_comment {
+    (<span class="macro-nonterminal">$e</span>:expr, <span class="macro-nonterminal">$step</span>:ident, <span class="macro-nonterminal">$b</span>:block, <span class="macro-nonterminal">$bq</span>:block, <span class="macro-nonterminal">$bc</span>:block $(, $(<span class="macro-nonterminal">$addi</span>:expr),+)<span class="question-mark">?</span>) =&gt; {
         <span class="kw">match </span><span class="macro-nonterminal">$step </span>{
             <span class="number">0 </span>=&gt; {
                 <span class="kw">match </span><span class="macro-nonterminal">$e </span>{
                     <span class="string">b&#39;&lt;&#39; </span>=&gt; <span class="macro-nonterminal">$step </span>= <span class="number">1</span>,
-                    $(<span class="string">b&#39;\\&#39; </span>=&gt; <span class="macro-nonterminal">$step </span>= <span class="number">10</span>,
+                    $(<span class="string">b&#39;\\&#39; </span>=&gt; <span class="macro-nonterminal">$step </span>= <span class="number">100</span>,
                     $(| <span class="macro-nonterminal">$addi</span>)+ =&gt; <span class="macro-nonterminal">$bq</span>,)<span class="question-mark">?
                     </span><span class="kw">_ </span>=&gt; (),
                 }
@@ -217,7 +247,8 @@
             <span class="number">1 </span>=&gt; {
                 <span class="kw">match </span><span class="macro-nonterminal">$e </span>{
                     <span class="string">b&#39;/&#39; </span>=&gt; <span class="macro-nonterminal">$step </span>= <span class="number">2</span>,
-                    $(<span class="string">b&#39;\\&#39; </span>=&gt; <span class="macro-nonterminal">$step </span>= <span class="number">10</span>,
+                    <span class="string">b&#39;!&#39; </span>=&gt; <span class="macro-nonterminal">$step </span>= <span class="number">10</span>,
+                    $(<span class="string">b&#39;\\&#39; </span>=&gt; <span class="macro-nonterminal">$step </span>= <span class="number">100</span>,
                     $(| <span class="macro-nonterminal">$addi</span>)+ =&gt; {
                         <span class="macro-nonterminal">$step </span>= <span class="number">0</span>;
                         <span class="macro-nonterminal">$bq
@@ -228,7 +259,7 @@
             <span class="number">2 </span>=&gt; {
                 <span class="kw">match </span><span class="macro-nonterminal">$e </span>{
                     <span class="string">b&#39;s&#39; </span>| <span class="string">b&#39;S&#39; </span>=&gt; <span class="macro-nonterminal">$step </span>= <span class="number">3</span>,
-                    $(<span class="string">b&#39;\\&#39; </span>=&gt; <span class="macro-nonterminal">$step </span>= <span class="number">10</span>,
+                    $(<span class="string">b&#39;\\&#39; </span>=&gt; <span class="macro-nonterminal">$step </span>= <span class="number">100</span>,
                     $(| <span class="macro-nonterminal">$addi</span>)+ =&gt; {
                         <span class="macro-nonterminal">$step </span>= <span class="number">0</span>;
                         <span class="macro-nonterminal">$bq
@@ -239,7 +270,7 @@
             <span class="number">3 </span>=&gt; {
                 <span class="kw">match </span><span class="macro-nonterminal">$e </span>{
                     <span class="string">b&#39;t&#39; </span>| <span class="string">b&#39;T&#39; </span>=&gt; <span class="macro-nonterminal">$step </span>= <span class="number">4</span>,
-                    $(<span class="string">b&#39;\\&#39; </span>=&gt; <span class="macro-nonterminal">$step </span>= <span class="number">10</span>,
+                    $(<span class="string">b&#39;\\&#39; </span>=&gt; <span class="macro-nonterminal">$step </span>= <span class="number">100</span>,
                     $(| <span class="macro-nonterminal">$addi</span>)+ =&gt; {
                         <span class="macro-nonterminal">$step </span>= <span class="number">0</span>;
                         <span class="macro-nonterminal">$bq
@@ -250,7 +281,7 @@
             <span class="number">4 </span>=&gt; {
                 <span class="kw">match </span><span class="macro-nonterminal">$e </span>{
                     <span class="string">b&#39;y&#39; </span>| <span class="string">b&#39;Y&#39; </span>=&gt; <span class="macro-nonterminal">$step </span>= <span class="number">5</span>,
-                    $(<span class="string">b&#39;\\&#39; </span>=&gt; <span class="macro-nonterminal">$step </span>= <span class="number">10</span>,
+                    $(<span class="string">b&#39;\\&#39; </span>=&gt; <span class="macro-nonterminal">$step </span>= <span class="number">100</span>,
                     $(| <span class="macro-nonterminal">$addi</span>)+ =&gt; {
                         <span class="macro-nonterminal">$step </span>= <span class="number">0</span>;
                         <span class="macro-nonterminal">$bq
@@ -261,7 +292,7 @@
             <span class="number">5 </span>=&gt; {
                 <span class="kw">match </span><span class="macro-nonterminal">$e </span>{
                     <span class="string">b&#39;l&#39; </span>| <span class="string">b&#39;L&#39; </span>=&gt; <span class="macro-nonterminal">$step </span>= <span class="number">6</span>,
-                    $(<span class="string">b&#39;\\&#39; </span>=&gt; <span class="macro-nonterminal">$step </span>= <span class="number">10</span>,
+                    $(<span class="string">b&#39;\\&#39; </span>=&gt; <span class="macro-nonterminal">$step </span>= <span class="number">100</span>,
                     $(| <span class="macro-nonterminal">$addi</span>)+ =&gt; {
                         <span class="macro-nonterminal">$step </span>= <span class="number">0</span>;
                         <span class="macro-nonterminal">$bq
@@ -272,7 +303,7 @@
             <span class="number">6 </span>=&gt; {
                 <span class="kw">match </span><span class="macro-nonterminal">$e </span>{
                     <span class="string">b&#39;e&#39; </span>| <span class="string">b&#39;E&#39; </span>=&gt; <span class="macro-nonterminal">$step </span>= <span class="number">7</span>,
-                    $(<span class="string">b&#39;\\&#39; </span>=&gt; <span class="macro-nonterminal">$step </span>= <span class="number">10</span>,
+                    $(<span class="string">b&#39;\\&#39; </span>=&gt; <span class="macro-nonterminal">$step </span>= <span class="number">100</span>,
                     $(| <span class="macro-nonterminal">$addi</span>)+ =&gt; {
                         <span class="macro-nonterminal">$step </span>= <span class="number">0</span>;
                         <span class="macro-nonterminal">$bq
@@ -286,7 +317,7 @@
                         <span class="macro-nonterminal">$step </span>= <span class="number">0</span>;
                         <span class="macro-nonterminal">$b
                     </span>},
-                    $(<span class="string">b&#39;\\&#39; </span>=&gt; <span class="macro-nonterminal">$step </span>= <span class="number">10</span>,
+                    $(<span class="string">b&#39;\\&#39; </span>=&gt; <span class="macro-nonterminal">$step </span>= <span class="number">100</span>,
                     $(| <span class="macro-nonterminal">$addi</span>)+ =&gt; {
                         <span class="macro-nonterminal">$step </span>= <span class="number">0</span>;
                         <span class="macro-nonterminal">$bq
@@ -295,6 +326,31 @@
                 }
             }
             <span class="number">10 </span>=&gt; {
+                <span class="kw">match </span><span class="macro-nonterminal">$e </span>{
+                    <span class="string">b&#39;-&#39; </span>=&gt; <span class="macro-nonterminal">$step </span>= <span class="number">11</span>,
+                    $(<span class="string">b&#39;\\&#39; </span>=&gt; <span class="macro-nonterminal">$step </span>= <span class="number">100</span>,
+                    $(| <span class="macro-nonterminal">$addi</span>)+ =&gt; {
+                        <span class="macro-nonterminal">$step </span>= <span class="number">0</span>;
+                        <span class="macro-nonterminal">$bq
+                    </span>},)<span class="question-mark">?
+                    </span><span class="kw">_ </span>=&gt; <span class="macro-nonterminal">$step </span>= <span class="number">0</span>,
+                }
+            }
+            <span class="number">11 </span>=&gt; {
+                <span class="kw">match </span><span class="macro-nonterminal">$e </span>{
+                    <span class="string">b&#39;-&#39; </span>=&gt; {
+                        <span class="macro-nonterminal">$step </span>= <span class="number">0</span>;
+                        <span class="macro-nonterminal">$bc
+                    </span>},
+                    $(<span class="string">b&#39;\\&#39; </span>=&gt; <span class="macro-nonterminal">$step </span>= <span class="number">100</span>,
+                    $(| <span class="macro-nonterminal">$addi</span>)+ =&gt; {
+                        <span class="macro-nonterminal">$step </span>= <span class="number">0</span>;
+                        <span class="macro-nonterminal">$bq
+                    </span>},)<span class="question-mark">?
+                    </span><span class="kw">_ </span>=&gt; <span class="macro-nonterminal">$step </span>= <span class="number">0</span>,
+                }
+            }
+            <span class="number">100 </span>=&gt; {
                 <span class="kw">match </span><span class="macro-nonterminal">$e </span>{
                     <span class="string">b&#39;&lt;&#39; </span>=&gt; <span class="macro-nonterminal">$step </span>= <span class="number">1</span>,
                     <span class="kw">_ </span>=&gt; <span class="macro-nonterminal">$step </span>= <span class="number">0</span>,
@@ -305,21 +361,21 @@
     };
 }
 
-<span class="macro">macro_rules! </span>parse_style_single_quoted_text {
-    (<span class="macro-nonterminal">$e</span>:expr, <span class="macro-nonterminal">$step</span>:ident, <span class="macro-nonterminal">$b</span>:block, <span class="macro-nonterminal">$bq</span>:block) =&gt; {
-        <span class="macro">parse_style!</span>(<span class="macro-nonterminal">$e</span>, <span class="macro-nonterminal">$step</span>, <span class="macro-nonterminal">$b</span>, <span class="macro-nonterminal">$bq</span>, <span class="string">b&#39;\&#39;&#39;</span>);
+<span class="macro">macro_rules! </span>parse_style_comment_single_quoted_text {
+    (<span class="macro-nonterminal">$e</span>:expr, <span class="macro-nonterminal">$step</span>:ident, <span class="macro-nonterminal">$b</span>:block, <span class="macro-nonterminal">$bq</span>:block, <span class="macro-nonterminal">$bc</span>:block) =&gt; {
+        <span class="macro">parse_style_comment!</span>(<span class="macro-nonterminal">$e</span>, <span class="macro-nonterminal">$step</span>, <span class="macro-nonterminal">$b</span>, <span class="macro-nonterminal">$bq</span>, <span class="macro-nonterminal">$bc</span>, <span class="string">b&#39;\&#39;&#39;</span>);
     };
 }
 
-<span class="macro">macro_rules! </span>parse_style_double_quoted_text {
-    (<span class="macro-nonterminal">$e</span>:expr, <span class="macro-nonterminal">$step</span>:ident, <span class="macro-nonterminal">$b</span>:block, <span class="macro-nonterminal">$bq</span>:block) =&gt; {
-        <span class="macro">parse_style!</span>(<span class="macro-nonterminal">$e</span>, <span class="macro-nonterminal">$step</span>, <span class="macro-nonterminal">$b</span>, <span class="macro-nonterminal">$bq</span>, <span class="string">b&#39;&quot;&#39;</span>);
+<span class="macro">macro_rules! </span>parse_style_comment_double_quoted_text {
+    (<span class="macro-nonterminal">$e</span>:expr, <span class="macro-nonterminal">$step</span>:ident, <span class="macro-nonterminal">$b</span>:block, <span class="macro-nonterminal">$bq</span>:block, <span class="macro-nonterminal">$bc</span>:block) =&gt; {
+        <span class="macro">parse_style_comment!</span>(<span class="macro-nonterminal">$e</span>, <span class="macro-nonterminal">$step</span>, <span class="macro-nonterminal">$b</span>, <span class="macro-nonterminal">$bq</span>, <span class="macro-nonterminal">$bc</span>, <span class="string">b&#39;&quot;&#39;</span>);
     };
 }
 
-<span class="macro">macro_rules! </span>parse_style_quoted_text {
-    (<span class="macro-nonterminal">$e</span>:expr, <span class="macro-nonterminal">$step</span>:ident, <span class="macro-nonterminal">$b</span>:block, <span class="macro-nonterminal">$bq</span>:block) =&gt; {
-        <span class="macro">parse_style!</span>(<span class="macro-nonterminal">$e</span>, <span class="macro-nonterminal">$step</span>, <span class="macro-nonterminal">$b</span>, <span class="macro-nonterminal">$bq</span>, <span class="string">b&#39;\&#39;&#39;</span>, <span class="string">b&#39;&quot;&#39;</span>);
+<span class="macro">macro_rules! </span>parse_style_comment_quoted_text {
+    (<span class="macro-nonterminal">$e</span>:expr, <span class="macro-nonterminal">$step</span>:ident, <span class="macro-nonterminal">$b</span>:block, <span class="macro-nonterminal">$bq</span>:block, <span class="macro-nonterminal">$bc</span>:block) =&gt; {
+        <span class="macro">parse_style_comment!</span>(<span class="macro-nonterminal">$e</span>, <span class="macro-nonterminal">$step</span>, <span class="macro-nonterminal">$b</span>, <span class="macro-nonterminal">$bq</span>, <span class="macro-nonterminal">$bc</span>, <span class="string">b&#39;\&#39;&#39;</span>, <span class="string">b&#39;&quot;&#39;</span>);
     };
 }
 
@@ -328,7 +384,8 @@
     <span class="doccomment">/// The following substring is escaped:
     ///
     /// * `&lt;/style&gt;` =&gt; `&lt;\/style&gt;`
-    </span>parse_style;
+    /// * `&lt;!--` =&gt; `&lt;\!--`
+    </span>parse_style_comment;
     <span class="doccomment">/// Encode text used in the `&lt;style&gt;` element.
     </span>encode_style;
     <span class="doccomment">/// Write text used in the `&lt;style&gt;` element to a mutable `String` reference and return the encoded string slice.
@@ -345,7 +402,8 @@
     ///
     /// * `&lt;/style&gt;` =&gt; `&lt;\/style&gt;`
     /// * `&#39;` =&gt; `\&#39;`
-    </span>parse_style_single_quoted_text;
+    /// * `&lt;!--` =&gt; `&lt;\!--`
+    </span>parse_style_comment_single_quoted_text;
     <span class="doccomment">/// Encode text used in a single quoted text in the `&lt;style&gt;` element.
     </span>encode_style_single_quoted_text;
     <span class="doccomment">/// Write text used in a single quoted text in the `&lt;style&gt;` element to a mutable `String` reference and return the encoded string slice.
@@ -362,7 +420,8 @@
     ///
     /// * `&lt;/style&gt;` =&gt; `&lt;\/style&gt;`
     /// * `&quot;` =&gt; `\&quot;`
-    </span>parse_style_double_quoted_text;
+    /// * `&lt;!--` =&gt; `&lt;\!--`
+    </span>parse_style_comment_double_quoted_text;
     <span class="doccomment">/// Encode text used in a double quoted text in the `&lt;style&gt;` element.
     </span>encode_style_double_quoted_text;
     <span class="doccomment">/// Write text used in a double quoted text in the `&lt;style&gt;` element to a mutable `String` reference and return the encoded string slice.
@@ -380,7 +439,8 @@
     /// * `&lt;/style&gt;` =&gt; `&lt;\/style&gt;`
     /// * `&quot;` =&gt; `\&quot;`
     /// * `&#39;` =&gt; `\&#39;`
-    </span>parse_style_quoted_text;
+    /// * `&lt;!--` =&gt; `&lt;\!--`
+    </span>parse_style_comment_quoted_text;
     <span class="doccomment">/// Encode text used in a quoted text in the `&lt;style&gt;` element.
     </span>encode_style_quoted_text;
     <span class="doccomment">/// Write text used in a quoted text in the `&lt;style&gt;` element to a mutable `String` reference and return the encoded string slice.

@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/nix/store/jnqxxv1xi811ni996b002f4jnyz38xck-vendor-cargo-deps/c19b7c6f923b580ac259164a89f2577984ad5ab09ee9d583b888f934adbbe8d0/mongodb-2.3.0/src/cmap/conn/mod.rs`."><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../../static.files/rustdoc-f3501f0f5ae15dfb.css" id="mainThemeStyle"><div id="rustdoc-vars" data-root-path="../../../../" data-static-root-path="../../../../static.files/" data-current-crate="mongodb" data-themes="" data-resource-suffix="" data-rustdoc-version="1.71.0 (8ede3aae2 2023-07-12)" data-search-js="search-4926e5fc22a5646a.js" data-settings-js="settings-de11bff964e9d4e5.js" data-settings-css="settings-8c76f75bfb6bd192.css" data-theme-light-css="light-0f8c037637f9eb3e.css" data-theme-dark-css="dark-1097f8e92a01e3cf.css" data-theme-ayu-css="ayu-614652228113ac93.css" ></div><script src="../../../../static.files/storage-62ce34ea385b278a.js"></script><script defer src="../../../../static.files/source-script-11255107d0a65077.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../static.files/main-f0540c1d82cde29b.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../../../../static.files/light-0f8c037637f9eb3e.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../../../../static.files/dark-1097f8e92a01e3cf.css"><link rel="stylesheet" href="../../../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../../../mongodb/index.html"><img class="rust-logo" src="../../../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/nix/store/yf45a1rayffhnidhgyjynpyhr9lqkd09-vendor-cargo-deps/c19b7c6f923b580ac259164a89f2577984ad5ab09ee9d583b888f934adbbe8d0/mongodb-2.6.0/src/cmap/conn/mod.rs`."><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../../static.files/rustdoc-f3501f0f5ae15dfb.css" id="mainThemeStyle"><div id="rustdoc-vars" data-root-path="../../../../" data-static-root-path="../../../../static.files/" data-current-crate="mongodb" data-themes="" data-resource-suffix="" data-rustdoc-version="1.71.0 (8ede3aae2 2023-07-12)" data-search-js="search-4926e5fc22a5646a.js" data-settings-js="settings-de11bff964e9d4e5.js" data-settings-css="settings-8c76f75bfb6bd192.css" data-theme-light-css="light-0f8c037637f9eb3e.css" data-theme-dark-css="dark-1097f8e92a01e3cf.css" data-theme-ayu-css="ayu-614652228113ac93.css" ></div><script src="../../../../static.files/storage-62ce34ea385b278a.js"></script><script defer src="../../../../static.files/source-script-11255107d0a65077.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../static.files/main-f0540c1d82cde29b.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../../../../static.files/light-0f8c037637f9eb3e.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../../../../static.files/dark-1097f8e92a01e3cf.css"><link rel="stylesheet" href="../../../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../../../mongodb/index.html"><img class="rust-logo" src="../../../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -544,6 +544,71 @@
 <a href="#544" id="544">544</a>
 <a href="#545" id="545">545</a>
 <a href="#546" id="546">546</a>
+<a href="#547" id="547">547</a>
+<a href="#548" id="548">548</a>
+<a href="#549" id="549">549</a>
+<a href="#550" id="550">550</a>
+<a href="#551" id="551">551</a>
+<a href="#552" id="552">552</a>
+<a href="#553" id="553">553</a>
+<a href="#554" id="554">554</a>
+<a href="#555" id="555">555</a>
+<a href="#556" id="556">556</a>
+<a href="#557" id="557">557</a>
+<a href="#558" id="558">558</a>
+<a href="#559" id="559">559</a>
+<a href="#560" id="560">560</a>
+<a href="#561" id="561">561</a>
+<a href="#562" id="562">562</a>
+<a href="#563" id="563">563</a>
+<a href="#564" id="564">564</a>
+<a href="#565" id="565">565</a>
+<a href="#566" id="566">566</a>
+<a href="#567" id="567">567</a>
+<a href="#568" id="568">568</a>
+<a href="#569" id="569">569</a>
+<a href="#570" id="570">570</a>
+<a href="#571" id="571">571</a>
+<a href="#572" id="572">572</a>
+<a href="#573" id="573">573</a>
+<a href="#574" id="574">574</a>
+<a href="#575" id="575">575</a>
+<a href="#576" id="576">576</a>
+<a href="#577" id="577">577</a>
+<a href="#578" id="578">578</a>
+<a href="#579" id="579">579</a>
+<a href="#580" id="580">580</a>
+<a href="#581" id="581">581</a>
+<a href="#582" id="582">582</a>
+<a href="#583" id="583">583</a>
+<a href="#584" id="584">584</a>
+<a href="#585" id="585">585</a>
+<a href="#586" id="586">586</a>
+<a href="#587" id="587">587</a>
+<a href="#588" id="588">588</a>
+<a href="#589" id="589">589</a>
+<a href="#590" id="590">590</a>
+<a href="#591" id="591">591</a>
+<a href="#592" id="592">592</a>
+<a href="#593" id="593">593</a>
+<a href="#594" id="594">594</a>
+<a href="#595" id="595">595</a>
+<a href="#596" id="596">596</a>
+<a href="#597" id="597">597</a>
+<a href="#598" id="598">598</a>
+<a href="#599" id="599">599</a>
+<a href="#600" id="600">600</a>
+<a href="#601" id="601">601</a>
+<a href="#602" id="602">602</a>
+<a href="#603" id="603">603</a>
+<a href="#604" id="604">604</a>
+<a href="#605" id="605">605</a>
+<a href="#606" id="606">606</a>
+<a href="#607" id="607">607</a>
+<a href="#608" id="608">608</a>
+<a href="#609" id="609">609</a>
+<a href="#610" id="610">610</a>
+<a href="#611" id="611">611</a>
 </pre></div><pre class="rust"><code><span class="kw">mod </span>command;
 <span class="kw">mod </span>stream_description;
 <span class="kw">mod </span>wire;
@@ -555,20 +620,20 @@
 
 <span class="kw">use </span>derivative::Derivative;
 <span class="kw">use </span>serde::Serialize;
-<span class="kw">use </span>tokio::sync::{mpsc, Mutex};
+<span class="kw">use </span>tokio::{
+    io::BufStream,
+    sync::{mpsc, Mutex},
+};
 
-<span class="kw">use </span><span class="self">self</span>::wire::Message;
+<span class="kw">use </span><span class="self">self</span>::wire::{Message, MessageFlags};
 <span class="kw">use </span><span class="kw">super</span>::manager::PoolManager;
 <span class="kw">use crate</span>::{
     bson::oid::ObjectId,
-    cmap::{
-        options::{ConnectionOptions, StreamOptions},
-        PoolGeneration,
-    },
+    cmap::PoolGeneration,
     compression::Compressor,
     error::{load_balanced_mode_mismatch, Error, ErrorKind, <span class="prelude-ty">Result</span>},
     event::cmap::{
-        CmapEventHandler,
+        CmapEventEmitter,
         ConnectionCheckedInEvent,
         ConnectionCheckedOutEvent,
         ConnectionClosedEvent,
@@ -576,7 +641,7 @@
         ConnectionCreatedEvent,
         ConnectionReadyEvent,
     },
-    options::{ServerAddress, TlsOptions},
+    options::ServerAddress,
     runtime::AsyncStream,
 };
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use </span>command::{Command, RawCommand, RawCommandResponse};
@@ -593,7 +658,14 @@
 
     <span class="doccomment">/// A server-generated identifier that uniquely identifies the connection. Available on server
     /// versions 4.2+. This may be used to correlate driver connections with server logs.
+    /// If the connection ID sent by the server is too large for an i32, this will be a truncated
+    /// value.
     </span><span class="kw">pub </span>server_id: <span class="prelude-ty">Option</span>&lt;i32&gt;,
+
+    <span class="doccomment">/// A server-generated identifier that uniquely identifies the connection. Available on server
+    /// versions 4.2+. This may be used to correlate driver connections with server logs. This
+    /// value will not be truncated and should be used rather than `server_id`.
+    </span><span class="kw">pub </span>server_id_i64: <span class="prelude-ty">Option</span>&lt;i64&gt;,
 
     <span class="doccomment">/// The address that the connection is connected to.
     </span><span class="kw">pub </span>address: ServerAddress,
@@ -606,7 +678,7 @@
     <span class="doccomment">/// Driver-generated ID for the connection.
     </span><span class="kw">pub</span>(<span class="kw">super</span>) id: u32,
     <span class="doccomment">/// Server-generated ID for the connection.
-    </span><span class="kw">pub</span>(<span class="kw">crate</span>) server_id: <span class="prelude-ty">Option</span>&lt;i32&gt;,
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) server_id: <span class="prelude-ty">Option</span>&lt;i64&gt;,
 
     <span class="kw">pub</span>(<span class="kw">crate</span>) address: ServerAddress,
     <span class="kw">pub</span>(<span class="kw">crate</span>) generation: ConnectionGeneration,
@@ -627,12 +699,18 @@
     /// been read.
     </span>command_executing: bool,
 
-    <span class="doccomment">/// Whether or not this connection has experienced a network error while reading or writing.
-    /// Once the connection has received an error, it should not be used again or checked back
-    /// into a pool.
-    </span>error: bool,
+    <span class="doccomment">/// Stores a network error encountered while reading or writing. Once the connection has
+    /// received an error, it should not be used again and will be closed upon check-in to the
+    /// pool.
+    </span>error: <span class="prelude-ty">Option</span>&lt;Error&gt;,
 
-    stream: AsyncStream,
+    <span class="doccomment">/// Whether the most recently received message included the moreToCome flag, indicating the
+    /// server may send more responses without any additional requests. Attempting to send new
+    /// messages on this connection while this value is true will return an error. This value
+    /// will remain true until a server response does not include the moreToComeFlag.
+    </span>more_to_come: bool,
+
+    stream: BufStream&lt;AsyncStream&gt;,
 
     <span class="doccomment">/// Compressor that the client will use before sending messages.
     /// This compressor does not get used to decompress server messages.
@@ -646,98 +724,75 @@
     /// connection to the pin holder.
     </span>pinned_sender: <span class="prelude-ty">Option</span>&lt;mpsc::Sender&lt;Connection&gt;&gt;,
 
-    <span class="attr">#[derivative(Debug = <span class="string">&quot;ignore&quot;</span>)]
-    </span>handler: <span class="prelude-ty">Option</span>&lt;Arc&lt;<span class="kw">dyn </span>CmapEventHandler&gt;&gt;,
+    <span class="doccomment">/// Type responsible for emitting events related to this connection. This is None for
+    /// monitoring connections as we do not emit events for those.
+    </span><span class="attr">#[derivative(Debug = <span class="string">&quot;ignore&quot;</span>)]
+    </span>event_emitter: <span class="prelude-ty">Option</span>&lt;CmapEventEmitter&gt;,
 }
 
 <span class="kw">impl </span>Connection {
-    <span class="kw">async fn </span>new(
-        id: u32,
+    <span class="kw">fn </span>new(
         address: ServerAddress,
-        generation: u32,
-        options: <span class="prelude-ty">Option</span>&lt;ConnectionOptions&gt;,
-    ) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>&gt; {
-        <span class="kw">let </span>stream_options = StreamOptions {
-            address: address.clone(),
-            connect_timeout: options.as_ref().and_then(|opts| opts.connect_timeout),
-            tls_options: options.as_ref().and_then(|opts| opts.tls_options.clone()),
-        };
-
-        <span class="kw">let </span>conn = <span class="self">Self </span>{
+        stream: AsyncStream,
+        id: u32,
+        generation: ConnectionGeneration,
+    ) -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{
             id,
             server_id: <span class="prelude-val">None</span>,
-            generation: ConnectionGeneration::Normal(generation),
+            generation,
             pool_manager: <span class="prelude-val">None</span>,
             command_executing: <span class="bool-val">false</span>,
             ready_and_available_time: <span class="prelude-val">None</span>,
-            stream: AsyncStream::connect(stream_options).<span class="kw">await</span><span class="question-mark">?</span>,
+            stream: BufStream::new(stream),
             address,
-            handler: options.and_then(|options| options.event_handler),
+            event_emitter: <span class="prelude-val">None</span>,
             stream_description: <span class="prelude-val">None</span>,
-            error: <span class="bool-val">false</span>,
+            error: <span class="prelude-val">None</span>,
             pinned_sender: <span class="prelude-val">None</span>,
             compressor: <span class="prelude-val">None</span>,
-        };
-
-        <span class="prelude-val">Ok</span>(conn)
+            more_to_come: <span class="bool-val">false</span>,
+        }
     }
 
-    <span class="doccomment">/// Constructs and connects a new connection.
-    </span><span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">async fn </span>connect(pending_connection: PendingConnection) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>&gt; {
+    <span class="doccomment">/// Create a connection intended to be stored in a connection pool for operation execution.
+    /// TODO: RUST-1454 Remove this from `Connection`, instead wrap a `Connection` type in a
+    /// separate type specific to pool.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>new_pooled(pending_connection: PendingConnection, stream: AsyncStream) -&gt; <span class="self">Self </span>{
         <span class="kw">let </span>generation = <span class="kw">match </span>pending_connection.generation {
-            PoolGeneration::Normal(gen) =&gt; gen,
-            PoolGeneration::LoadBalanced(<span class="kw">_</span>) =&gt; <span class="number">0</span>, <span class="comment">/* Placeholder; will be overwritten in
-                                                   * `ConnectionEstablisher::
-                                                   * establish_connection`. */
-        </span>};
-        <span class="self">Self</span>::new(
+            PoolGeneration::Normal(gen) =&gt; ConnectionGeneration::Normal(gen),
+            PoolGeneration::LoadBalanced(<span class="kw">_</span>) =&gt; ConnectionGeneration::LoadBalanced(<span class="prelude-val">None</span>),
+        };
+        <span class="kw">let </span><span class="kw-2">mut </span>conn = <span class="self">Self</span>::new(
+            pending_connection.address,
+            stream,
             pending_connection.id,
-            pending_connection.address.clone(),
             generation,
-            pending_connection.options,
-        )
-        .<span class="kw">await
-    </span>}
+        );
+        conn.event_emitter = <span class="prelude-val">Some</span>(pending_connection.event_emitter);
+        conn
+    }
 
-    <span class="doccomment">/// Construct and connect a new connection used for monitoring.
-    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async fn </span>connect_monitoring(
-        address: ServerAddress,
-        connect_timeout: <span class="prelude-ty">Option</span>&lt;Duration&gt;,
-        tls_options: <span class="prelude-ty">Option</span>&lt;TlsOptions&gt;,
-    ) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>&gt; {
-        <span class="self">Self</span>::new(
-            <span class="number">0</span>,
-            address,
-            <span class="number">0</span>,
-            <span class="prelude-val">Some</span>(ConnectionOptions {
-                connect_timeout,
-                tls_options,
-                event_handler: <span class="prelude-val">None</span>,
-            }),
-        )
-        .<span class="kw">await
-    </span>}
-
-    <span class="attr">#[cfg(test)]
-    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async fn </span>new_testing(
-        id: u32,
-        address: ServerAddress,
-        generation: u32,
-        options: <span class="prelude-ty">Option</span>&lt;ConnectionOptions&gt;,
-    ) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>&gt; {
-        <span class="self">Self</span>::new(id, address, generation, options).<span class="kw">await
-    </span>}
+    <span class="doccomment">/// Create a connection intended for monitoring purposes.
+    /// TODO: RUST-1454 Rename this to just `new`, drop the pooling-specific data.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>new_monitoring(address: ServerAddress, stream: AsyncStream) -&gt; <span class="self">Self </span>{
+        <span class="comment">// Monitoring connections don&#39;t have IDs, so just use 0 as a placeholder here.
+        </span><span class="self">Self</span>::new(address, stream, <span class="number">0</span>, ConnectionGeneration::Monitoring)
+    }
 
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>info(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; ConnectionInfo {
         ConnectionInfo {
             id: <span class="self">self</span>.id,
-            server_id: <span class="self">self</span>.server_id,
+            server_id: <span class="self">self</span>.server_id.map(|value| value <span class="kw">as </span>i32),
+            server_id_i64: <span class="self">self</span>.server_id,
             address: <span class="self">self</span>.address.clone(),
         }
     }
 
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>service_id(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;ObjectId&gt; {
-        <span class="self">self</span>.generation.service_id()
+        <span class="self">self</span>.stream_description
+            .as_ref()
+            .and_then(|sd| sd.service_id)
     }
 
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>address(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>ServerAddress {
@@ -777,7 +832,7 @@
 
     <span class="doccomment">/// Checks if the connection experienced a network error and should be closed.
     </span><span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>has_errored(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
-        <span class="self">self</span>.error
+        <span class="self">self</span>.error.is_some()
     }
 
     <span class="doccomment">/// Helper to create a `ConnectionCheckedOutEvent` for the connection.
@@ -810,6 +865,8 @@
             address: <span class="self">self</span>.address.clone(),
             connection_id: <span class="self">self</span>.id,
             reason,
+            <span class="attr">#[cfg(feature = <span class="string">&quot;tracing-unstable&quot;</span>)]
+            </span>error: <span class="self">self</span>.error.clone(),
         }
     }
 
@@ -818,6 +875,13 @@
         message: Message,
         to_compress: bool,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;RawCommandResponse&gt; {
+        <span class="kw">if </span><span class="self">self</span>.more_to_come {
+            <span class="kw">return </span><span class="prelude-val">Err</span>(Error::internal(<span class="macro">format!</span>(
+                <span class="string">&quot;attempted to send a new message to {} but moreToCome bit was set&quot;</span>,
+                <span class="self">self</span>.address()
+            )));
+        }
+
         <span class="self">self</span>.command_executing = <span class="bool-val">true</span>;
 
         <span class="comment">// If the client has agreed on a compressor with the server, and the command
@@ -831,7 +895,9 @@
             <span class="kw">_ </span>=&gt; message.write_to(<span class="kw-2">&amp;mut </span><span class="self">self</span>.stream).<span class="kw">await</span>,
         };
 
-        <span class="self">self</span>.error = write_result.is_err();
+        <span class="kw">if let </span><span class="prelude-val">Err</span>(<span class="kw-2">ref </span>err) = write_result {
+            <span class="self">self</span>.error = <span class="prelude-val">Some</span>(err.clone());
+        }
         write_result<span class="question-mark">?</span>;
 
         <span class="kw">let </span>response_message_result = Message::read_from(
@@ -842,9 +908,14 @@
         )
         .<span class="kw">await</span>;
         <span class="self">self</span>.command_executing = <span class="bool-val">false</span>;
-        <span class="self">self</span>.error = response_message_result.is_err();
+        <span class="kw">if let </span><span class="prelude-val">Err</span>(<span class="kw-2">ref </span>err) = response_message_result {
+            <span class="self">self</span>.error = <span class="prelude-val">Some</span>(err.clone());
+        }
 
-        RawCommandResponse::new(<span class="self">self</span>.address.clone(), response_message_result<span class="question-mark">?</span>)
+        <span class="kw">let </span>response_message = response_message_result<span class="question-mark">?</span>;
+        <span class="self">self</span>.more_to_come = response_message.flags.contains(MessageFlags::MORE_TO_COME);
+
+        RawCommandResponse::new(<span class="self">self</span>.address.clone(), response_message)
     }
 
     <span class="doccomment">/// Executes a `Command` and returns a `CommandResponse` containing the result from the server.
@@ -877,6 +948,36 @@
         <span class="kw">let </span>message = Message::with_raw_command(command, request_id.into());
         <span class="self">self</span>.send_message(message, to_compress).<span class="kw">await
     </span>}
+
+    <span class="doccomment">/// Receive the next message from the connection.
+    /// This will return an error if the previous response on this connection did not include the
+    /// moreToCome flag.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async fn </span>receive_message(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;RawCommandResponse&gt; {
+        <span class="kw">if </span>!<span class="self">self</span>.more_to_come {
+            <span class="kw">return </span><span class="prelude-val">Err</span>(Error::internal(<span class="macro">format!</span>(
+                <span class="string">&quot;attempted to stream response from connection to {} but moreToCome bit was not set&quot;</span>,
+                <span class="self">self</span>.address()
+            )));
+        }
+
+        <span class="self">self</span>.command_executing = <span class="bool-val">true</span>;
+        <span class="kw">let </span>response_message_result = Message::read_from(
+            <span class="kw-2">&amp;mut </span><span class="self">self</span>.stream,
+            <span class="self">self</span>.stream_description
+                .as_ref()
+                .map(|d| d.max_message_size_bytes),
+        )
+        .<span class="kw">await</span>;
+        <span class="self">self</span>.command_executing = <span class="bool-val">false</span>;
+        <span class="kw">if let </span><span class="prelude-val">Err</span>(<span class="kw-2">ref </span>err) = response_message_result {
+            <span class="self">self</span>.error = <span class="prelude-val">Some</span>(err.clone());
+        }
+
+        <span class="kw">let </span>response_message = response_message_result<span class="question-mark">?</span>;
+        <span class="self">self</span>.more_to_come = response_message.flags.contains(MessageFlags::MORE_TO_COME);
+
+        RawCommandResponse::new(<span class="self">self</span>.address.clone(), response_message)
+    }
 
     <span class="doccomment">/// Gets the connection&#39;s StreamDescription.
     </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>stream_description(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="kw-2">&amp;</span>StreamDescription&gt; {
@@ -918,8 +1019,8 @@
     <span class="doccomment">/// Close this connection, emitting a `ConnectionClosedEvent` with the supplied reason.
     </span><span class="kw">fn </span>close(<span class="kw-2">&amp;mut </span><span class="self">self</span>, reason: ConnectionClosedReason) {
         <span class="self">self</span>.pool_manager.take();
-        <span class="kw">if let </span><span class="prelude-val">Some</span>(<span class="kw-2">ref </span>handler) = <span class="self">self</span>.handler {
-            handler.handle_connection_closed_event(<span class="self">self</span>.closed_event(reason));
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(<span class="kw-2">ref </span>event_emitter) = <span class="self">self</span>.event_emitter {
+            event_emitter.emit_event(|| <span class="self">self</span>.closed_event(reason).into());
         }
     }
 
@@ -930,17 +1031,32 @@
             id: <span class="self">self</span>.id,
             server_id: <span class="self">self</span>.server_id,
             address: <span class="self">self</span>.address.clone(),
-            generation: <span class="self">self</span>.generation.clone(),
-            stream: std::mem::replace(<span class="kw-2">&amp;mut </span><span class="self">self</span>.stream, AsyncStream::Null),
-            handler: <span class="self">self</span>.handler.take(),
+            generation: <span class="self">self</span>.generation,
+            stream: std::mem::replace(<span class="kw-2">&amp;mut </span><span class="self">self</span>.stream, BufStream::new(AsyncStream::Null)),
+            event_emitter: <span class="self">self</span>.event_emitter.take(),
             stream_description: <span class="self">self</span>.stream_description.take(),
             command_executing: <span class="self">self</span>.command_executing,
-            error: <span class="self">self</span>.error,
+            error: <span class="self">self</span>.error.take(),
             pool_manager: <span class="prelude-val">None</span>,
             ready_and_available_time: <span class="prelude-val">None</span>,
             pinned_sender: <span class="self">self</span>.pinned_sender.clone(),
             compressor: <span class="self">self</span>.compressor.clone(),
+            more_to_come: <span class="bool-val">false</span>,
         }
+    }
+
+    <span class="doccomment">/// Whether or not the previous command response indicated that the server may send
+    /// more responses without another request.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>is_streaming(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.more_to_come
+    }
+
+    <span class="doccomment">/// Whether the connection supports sessions.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>supports_sessions(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.stream_description
+            .as_ref()
+            .and_then(|sd| sd.logical_session_timeout)
+            .is_some()
     }
 }
 
@@ -1036,35 +1152,50 @@
     }
 }
 
-<span class="attr">#[derive(Debug, Clone)]
+<span class="attr">#[derive(Debug, Clone, Copy)]
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>LoadBalancedGeneration {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) generation: u32,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) service_id: ObjectId,
+}
+
+<span class="doccomment">/// TODO: RUST-1454 Once we have separate types for pooled and non-pooled connections, the
+/// monitoring case and the Option&lt;&gt; wrapper can be dropped from this.
+</span><span class="attr">#[derive(Debug, Clone, Copy)]
 </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">enum </span>ConnectionGeneration {
+    Monitoring,
     Normal(u32),
-    LoadBalanced {
-        generation: u32,
-        service_id: ObjectId,
-    },
+    LoadBalanced(<span class="prelude-ty">Option</span>&lt;LoadBalancedGeneration&gt;),
 }
 
 <span class="kw">impl </span>ConnectionGeneration {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>service_id(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;ObjectId&gt; {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>service_id(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;ObjectId&gt; {
         <span class="kw">match </span><span class="self">self </span>{
-            ConnectionGeneration::Normal(<span class="kw">_</span>) =&gt; <span class="prelude-val">None</span>,
-            ConnectionGeneration::LoadBalanced { service_id, .. } =&gt; <span class="prelude-val">Some</span>(<span class="kw-2">*</span>service_id),
+            ConnectionGeneration::LoadBalanced(<span class="prelude-val">Some</span>(gen)) =&gt; <span class="prelude-val">Some</span>(gen.service_id),
+            <span class="kw">_ </span>=&gt; <span class="prelude-val">None</span>,
         }
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>is_stale(<span class="kw-2">&amp;</span><span class="self">self</span>, current_generation: <span class="kw-2">&amp;</span>PoolGeneration) -&gt; bool {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>is_stale(<span class="self">self</span>, current_generation: <span class="kw-2">&amp;</span>PoolGeneration) -&gt; bool {
         <span class="kw">match </span>(<span class="self">self</span>, current_generation) {
-            (ConnectionGeneration::Normal(cgen), PoolGeneration::Normal(pgen)) =&gt; cgen != pgen,
-            (
-                ConnectionGeneration::LoadBalanced {
-                    generation: cgen,
-                    service_id,
-                },
-                PoolGeneration::LoadBalanced(gen_map),
-            ) =&gt; cgen != gen_map.get(service_id).unwrap_or(<span class="kw-2">&amp;</span><span class="number">0</span>),
+            (ConnectionGeneration::Normal(cgen), PoolGeneration::Normal(pgen)) =&gt; cgen != <span class="kw-2">*</span>pgen,
+            (ConnectionGeneration::LoadBalanced(cgen), PoolGeneration::LoadBalanced(gen_map)) =&gt; {
+                <span class="kw">if let </span><span class="prelude-val">Some</span>(cgen) = cgen {
+                    cgen.generation != <span class="kw-2">*</span>gen_map.get(<span class="kw-2">&amp;</span>cgen.service_id).unwrap_or(<span class="kw-2">&amp;</span><span class="number">0</span>)
+                } <span class="kw">else </span>{
+                    <span class="comment">// In the event that an error occurred during handshake and no serviceId was
+                    // returned, just ignore the error for SDAM purposes, since
+                    // we won&#39;t know which serviceId to clear for.
+                    </span><span class="bool-val">false
+                </span>}
+            }
             <span class="kw">_ </span>=&gt; <span class="macro">load_balanced_mode_mismatch!</span>(<span class="bool-val">false</span>),
         }
+    }
+}
+
+<span class="kw">impl </span>From&lt;LoadBalancedGeneration&gt; <span class="kw">for </span>ConnectionGeneration {
+    <span class="kw">fn </span>from(gen: LoadBalancedGeneration) -&gt; <span class="self">Self </span>{
+        ConnectionGeneration::LoadBalanced(<span class="prelude-val">Some</span>(gen))
     }
 }
 
@@ -1073,12 +1204,11 @@
 /// Creating a `PendingConnection` contributes towards the total connection count of a pool, despite
 /// not actually making a TCP connection to the pool&#39;s endpoint. This models a &quot;pending&quot; Connection
 /// from the CMAP specification.
-</span><span class="attr">#[derive(Debug)]
-</span><span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">struct </span>PendingConnection {
-    <span class="kw">pub</span>(<span class="kw">super</span>) id: u32,
-    <span class="kw">pub</span>(<span class="kw">super</span>) address: ServerAddress,
-    <span class="kw">pub</span>(<span class="kw">super</span>) generation: PoolGeneration,
-    <span class="kw">pub</span>(<span class="kw">super</span>) options: <span class="prelude-ty">Option</span>&lt;ConnectionOptions&gt;,
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>PendingConnection {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) id: u32,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) address: ServerAddress,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) generation: PoolGeneration,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) event_emitter: CmapEventEmitter,
 }
 
 <span class="kw">impl </span>PendingConnection {

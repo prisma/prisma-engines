@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/nix/store/jnqxxv1xi811ni996b002f4jnyz38xck-vendor-cargo-deps/c19b7c6f923b580ac259164a89f2577984ad5ab09ee9d583b888f934adbbe8d0/enum_dispatch-0.3.8/src/expansion.rs`."><title>expansion.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-f3501f0f5ae15dfb.css" id="mainThemeStyle"><div id="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="enum_dispatch" data-themes="" data-resource-suffix="" data-rustdoc-version="1.71.0 (8ede3aae2 2023-07-12)" data-search-js="search-4926e5fc22a5646a.js" data-settings-js="settings-de11bff964e9d4e5.js" data-settings-css="settings-8c76f75bfb6bd192.css" data-theme-light-css="light-0f8c037637f9eb3e.css" data-theme-dark-css="dark-1097f8e92a01e3cf.css" data-theme-ayu-css="ayu-614652228113ac93.css" ></div><script src="../../static.files/storage-62ce34ea385b278a.js"></script><script defer src="../../static.files/source-script-11255107d0a65077.js"></script><script defer src="../../source-files.js"></script><script defer src="../../static.files/main-f0540c1d82cde29b.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../../static.files/light-0f8c037637f9eb3e.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../../static.files/dark-1097f8e92a01e3cf.css"><link rel="stylesheet" href="../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="icon" href="https://gitlab.com/antonok/enum_dispatch/raw/master/enum_dispatch.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../enum_dispatch/index.html"><img src="https://gitlab.com/antonok/enum_dispatch/raw/master/enum_dispatch.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/nix/store/yf45a1rayffhnidhgyjynpyhr9lqkd09-vendor-cargo-deps/c19b7c6f923b580ac259164a89f2577984ad5ab09ee9d583b888f934adbbe8d0/enum_dispatch-0.3.12/src/expansion.rs`."><title>expansion.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-f3501f0f5ae15dfb.css" id="mainThemeStyle"><div id="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="enum_dispatch" data-themes="" data-resource-suffix="" data-rustdoc-version="1.71.0 (8ede3aae2 2023-07-12)" data-search-js="search-4926e5fc22a5646a.js" data-settings-js="settings-de11bff964e9d4e5.js" data-settings-css="settings-8c76f75bfb6bd192.css" data-theme-light-css="light-0f8c037637f9eb3e.css" data-theme-dark-css="dark-1097f8e92a01e3cf.css" data-theme-ayu-css="ayu-614652228113ac93.css" ></div><script src="../../static.files/storage-62ce34ea385b278a.js"></script><script defer src="../../static.files/source-script-11255107d0a65077.js"></script><script defer src="../../source-files.js"></script><script defer src="../../static.files/main-f0540c1d82cde29b.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../../static.files/light-0f8c037637f9eb3e.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../../static.files/dark-1097f8e92a01e3cf.css"><link rel="stylesheet" href="../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="icon" href="https://gitlab.com/antonok/enum_dispatch/raw/master/enum_dispatch.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../enum_dispatch/index.html"><img src="https://gitlab.com/antonok/enum_dispatch/raw/master/enum_dispatch.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -421,9 +421,53 @@
 <a href="#421" id="421">421</a>
 <a href="#422" id="422">422</a>
 <a href="#423" id="423">423</a>
+<a href="#424" id="424">424</a>
+<a href="#425" id="425">425</a>
+<a href="#426" id="426">426</a>
+<a href="#427" id="427">427</a>
+<a href="#428" id="428">428</a>
+<a href="#429" id="429">429</a>
+<a href="#430" id="430">430</a>
+<a href="#431" id="431">431</a>
+<a href="#432" id="432">432</a>
+<a href="#433" id="433">433</a>
+<a href="#434" id="434">434</a>
+<a href="#435" id="435">435</a>
+<a href="#436" id="436">436</a>
+<a href="#437" id="437">437</a>
+<a href="#438" id="438">438</a>
+<a href="#439" id="439">439</a>
+<a href="#440" id="440">440</a>
+<a href="#441" id="441">441</a>
+<a href="#442" id="442">442</a>
+<a href="#443" id="443">443</a>
+<a href="#444" id="444">444</a>
+<a href="#445" id="445">445</a>
+<a href="#446" id="446">446</a>
+<a href="#447" id="447">447</a>
+<a href="#448" id="448">448</a>
+<a href="#449" id="449">449</a>
+<a href="#450" id="450">450</a>
+<a href="#451" id="451">451</a>
+<a href="#452" id="452">452</a>
+<a href="#453" id="453">453</a>
+<a href="#454" id="454">454</a>
+<a href="#455" id="455">455</a>
+<a href="#456" id="456">456</a>
+<a href="#457" id="457">457</a>
+<a href="#458" id="458">458</a>
+<a href="#459" id="459">459</a>
+<a href="#460" id="460">460</a>
+<a href="#461" id="461">461</a>
+<a href="#462" id="462">462</a>
+<a href="#463" id="463">463</a>
+<a href="#464" id="464">464</a>
+<a href="#465" id="465">465</a>
+<a href="#466" id="466">466</a>
+<a href="#467" id="467">467</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Provides a utility for generating `enum_dispatch` impl blocks given `EnumDispatchItem` and
 //! `syn::ItemTrait` definitions.
-</span><span class="kw">use crate</span>::{cache, proc_macro};
+</span><span class="kw">use </span><span class="kw">crate</span>::cache;
 <span class="kw">use </span>quote::{quote, ToTokens};
 <span class="kw">use </span>syn::spanned::Spanned;
 
@@ -501,7 +545,7 @@
 <span class="doccomment">/// Returns whether or not an attribute from an enum variant should be applied to other usages of
 /// that variant&#39;s identifier.
 </span><span class="kw">fn </span>use_attribute(attr: &amp;&amp;syn::Attribute) -&gt; bool {
-    attr.path.is_ident(<span class="string">&quot;cfg&quot;</span>)
+    attr.path().is_ident(<span class="string">&quot;cfg&quot;</span>)
 }
 
 <span class="doccomment">/// Generates impls of core::convert::From for each enum variant.
@@ -641,10 +685,10 @@
 <span class="doccomment">/// Creates a method call that can be used in the match arms of all non-static method
 /// implementations.
 </span><span class="kw">fn </span>create_trait_fn_call(
-    trait_method: <span class="kw-2">&amp;</span>syn::TraitItemMethod,
+    trait_method: <span class="kw-2">&amp;</span>syn::TraitItemFn,
     trait_generics: <span class="kw-2">&amp;</span>syn::TypeGenerics,
     trait_name: <span class="kw-2">&amp;</span>syn::Ident,
-) -&gt; syn::ExprCall {
+) -&gt; syn::Expr {
     <span class="kw">let </span>trait_args = trait_method.to_owned().sig.inputs;
     <span class="kw">let </span>(method_type, <span class="kw-2">mut </span>args) = extract_fn_args(trait_args);
 
@@ -652,7 +696,7 @@
     </span><span class="kw">let </span>explicit_self_arg = syn::Ident::new(FIELDNAME, trait_method.span());
     args.insert(<span class="number">0</span>, plain_identifier_expr(explicit_self_arg));
 
-    syn::ExprCall {
+    <span class="kw">let </span><span class="kw-2">mut </span>call = syn::Expr::from(syn::ExprCall {
         attrs: <span class="macro">vec!</span>[],
         func: {
             <span class="kw">if let </span>MethodType::Static = method_type {
@@ -692,13 +736,24 @@
         },
         paren_token: Default::default(),
         args,
+    });
+
+    <span class="kw">if </span>trait_method.sig.asyncness.is_some() {
+        call = syn::Expr::from(syn::ExprAwait {
+            attrs: Default::default(),
+            base: Box::new(call),
+            dot_token: Default::default(),
+            await_token: Default::default(),
+        });
     }
+
+    call
 }
 
 <span class="doccomment">/// Constructs a match expression that matches on all variants of the specified enum, creating a
 /// binding to their single field and calling the provided trait method on each.
 </span><span class="kw">fn </span>create_match_expr(
-    trait_method: <span class="kw-2">&amp;</span>syn::TraitItemMethod,
+    trait_method: <span class="kw-2">&amp;</span>syn::TraitItemFn,
     trait_generics: <span class="kw-2">&amp;</span>syn::TypeGenerics,
     trait_name: <span class="kw-2">&amp;</span>syn::Ident,
     enum_name: <span class="kw-2">&amp;</span>syn::Ident,
@@ -706,10 +761,35 @@
 ) -&gt; syn::Expr {
     <span class="kw">let </span>trait_fn_call = create_trait_fn_call(trait_method, trait_generics, trait_name);
 
+    <span class="kw">let </span>is_self_return = <span class="kw">if let </span>syn::ReturnType::Type(<span class="kw">_</span>, returntype) = <span class="kw-2">&amp;</span>trait_method.sig.output {
+        <span class="kw">match </span>returntype.as_ref() {
+            syn::Type::Path(p) =&gt; {
+                <span class="kw">if let </span><span class="prelude-val">Some</span>(i) = p.path.get_ident() {
+                    i.to_string() == <span class="string">&quot;Self&quot;
+                </span>} <span class="kw">else </span>{
+                    <span class="bool-val">false
+                </span>}
+            },
+            <span class="kw">_ </span>=&gt; <span class="bool-val">false</span>,
+        }
+    } <span class="kw">else </span>{
+        <span class="bool-val">false
+    </span>};
+
     <span class="comment">// Creates a Vec containing a match arm for every enum variant
     </span><span class="kw">let </span>match_arms = enumvariants
         .iter()
         .map(|variant| {
+            <span class="kw">let </span><span class="kw-2">mut </span>call = trait_fn_call.to_owned();
+
+            <span class="kw">if </span>is_self_return {
+                <span class="kw">let </span>variant_type = <span class="kw-2">&amp;</span>variant.ty;
+                <span class="kw">let </span>from_call: syn::ExprCall = <span class="macro">syn::parse_quote! </span>{
+                    &lt;<span class="self">Self </span><span class="kw">as </span>::core::convert::From::&lt;#variant_type&gt;&gt;::from(#call)
+                };
+                call = syn::Expr::from(from_call);
+            }
+
             <span class="kw">let </span>variant_name = <span class="kw-2">&amp;</span>variant.ident;
             <span class="kw">let </span>attrs = variant
                 .attrs
@@ -725,7 +805,7 @@
                 },
                 guard: <span class="prelude-val">None</span>,
                 fat_arrow_token: Default::default(),
-                body: Box::new(syn::Expr::from(trait_fn_call.to_owned())),
+                body: Box::new(call),
                 comma: <span class="prelude-val">Some</span>(Default::default()),
             }
         })
@@ -753,7 +833,7 @@
     enumvariants: <span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span>EnumDispatchVariant],
 ) -&gt; syn::ImplItem {
     <span class="kw">match </span>trait_item {
-        syn::TraitItem::Method(<span class="kw-2">mut </span>trait_method) =&gt; {
+        syn::TraitItem::Fn(<span class="kw-2">mut </span>trait_method) =&gt; {
             identify_signature_arguments(<span class="kw-2">&amp;mut </span>trait_method.sig);
 
             <span class="kw">let </span>match_expr = create_match_expr(
@@ -770,18 +850,17 @@
                 pound_token: Default::default(),
                 style: syn::AttrStyle::Outer,
                 bracket_token: Default::default(),
-                path: syn::parse_str(<span class="string">&quot;inline&quot;</span>).unwrap(),
-                tokens: proc_macro::TokenStream::new().into(),
+                meta: syn::Meta::Path(syn::parse_str(<span class="string">&quot;inline&quot;</span>).unwrap()),
             });
 
-            syn::ImplItem::Method(syn::ImplItemMethod {
+            syn::ImplItem::Fn(syn::ImplItemFn {
                 attrs: impl_attrs,
                 vis: syn::Visibility::Inherited,
                 defaultness: <span class="prelude-val">None</span>,
                 sig: trait_method.sig,
                 block: syn::Block {
                     brace_token: Default::default(),
-                    stmts: <span class="macro">vec!</span>[syn::Stmt::Expr(match_expr)],
+                    stmts: <span class="macro">vec!</span>[syn::Stmt::Expr(match_expr, <span class="prelude-val">None</span>)],
                 },
             })
         }
@@ -817,8 +896,7 @@
                     ..pat_ident.clone()
                 }),
                 <span class="comment">// Some of these aren&#39;t valid Rust syntax, but why not support all of them anyways!
-                </span>syn::Pat::Box(syn::PatBox { attrs, .. })
-                | syn::Pat::Lit(syn::PatLit { attrs, .. })
+                </span>syn::Pat::Lit(syn::PatLit { attrs, .. })
                 | syn::Pat::Macro(syn::PatMacro { attrs, .. })
                 | syn::Pat::Or(syn::PatOr { attrs, .. })
                 | syn::Pat::Path(syn::PatPath { attrs, .. })
@@ -830,8 +908,18 @@
                 | syn::Pat::Tuple(syn::PatTuple { attrs, .. })
                 | syn::Pat::TupleStruct(syn::PatTupleStruct { attrs, .. })
                 | syn::Pat::Type(syn::PatType { attrs, .. })
+                | syn::Pat::Const(syn::PatConst { attrs, .. })
+                | syn::Pat::Paren(syn::PatParen { attrs, .. })
                 | syn::Pat::Wild(syn::PatWild { attrs, .. }) =&gt; syn::Pat::Ident(syn::PatIdent {
                     attrs: attrs.to_owned(),
+                    by_ref: <span class="prelude-val">None</span>,
+                    mutability: <span class="prelude-val">None</span>,
+                    ident: new_arg_ident(span, <span class="kw-2">&amp;mut </span>arg_counter),
+                    subpat: <span class="prelude-val">None</span>,
+                }),
+                <span class="comment">// This can occur for `box foo` syntax, which is no longer supported by syn 2.0.
+                </span>syn::Pat::Verbatim(<span class="kw">_</span>) =&gt; syn::Pat::Ident(syn::PatIdent {
+                    attrs: Default::default(),
                     by_ref: <span class="prelude-val">None</span>,
                     mutability: <span class="prelude-val">None</span>,
                     ident: new_arg_ident(span, <span class="kw-2">&amp;mut </span>arg_counter),

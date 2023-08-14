@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"enum":["TryReserveError"],"mod":["hash_map","hash_set"],"struct":["HashMap","HashSet"],"trait":["Equivalent"]};
+window.SIDEBAR_ITEMS = {"enum":["TryReserveError"],"mod":["hash_map","hash_set","raw"],"struct":["HashMap","HashSet"],"trait":["Equivalent"]};

@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/nix/store/jnqxxv1xi811ni996b002f4jnyz38xck-vendor-cargo-deps/c19b7c6f923b580ac259164a89f2577984ad5ab09ee9d583b888f934adbbe8d0/tokio-1.25.0/src/runtime/task/list.rs`."><title>list.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../../static.files/rustdoc-f3501f0f5ae15dfb.css" id="mainThemeStyle"><div id="rustdoc-vars" data-root-path="../../../../" data-static-root-path="../../../../static.files/" data-current-crate="tokio" data-themes="" data-resource-suffix="" data-rustdoc-version="1.71.0 (8ede3aae2 2023-07-12)" data-search-js="search-4926e5fc22a5646a.js" data-settings-js="settings-de11bff964e9d4e5.js" data-settings-css="settings-8c76f75bfb6bd192.css" data-theme-light-css="light-0f8c037637f9eb3e.css" data-theme-dark-css="dark-1097f8e92a01e3cf.css" data-theme-ayu-css="ayu-614652228113ac93.css" ></div><script src="../../../../static.files/storage-62ce34ea385b278a.js"></script><script defer src="../../../../static.files/source-script-11255107d0a65077.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../static.files/main-f0540c1d82cde29b.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../../../../static.files/light-0f8c037637f9eb3e.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../../../../static.files/dark-1097f8e92a01e3cf.css"><link rel="stylesheet" href="../../../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../../../tokio/index.html"><img class="rust-logo" src="../../../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/nix/store/yf45a1rayffhnidhgyjynpyhr9lqkd09-vendor-cargo-deps/c19b7c6f923b580ac259164a89f2577984ad5ab09ee9d583b888f934adbbe8d0/tokio-1.30.0/src/runtime/task/list.rs`."><title>list.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../../static.files/rustdoc-f3501f0f5ae15dfb.css" id="mainThemeStyle"><div id="rustdoc-vars" data-root-path="../../../../" data-static-root-path="../../../../static.files/" data-current-crate="tokio" data-themes="" data-resource-suffix="" data-rustdoc-version="1.71.0 (8ede3aae2 2023-07-12)" data-search-js="search-4926e5fc22a5646a.js" data-settings-js="settings-de11bff964e9d4e5.js" data-settings-css="settings-8c76f75bfb6bd192.css" data-theme-light-css="light-0f8c037637f9eb3e.css" data-theme-dark-css="dark-1097f8e92a01e3cf.css" data-theme-ayu-css="ayu-614652228113ac93.css" ></div><script src="../../../../static.files/storage-62ce34ea385b278a.js"></script><script defer src="../../../../static.files/source-script-11255107d0a65077.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../static.files/main-f0540c1d82cde29b.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../../../../static.files/light-0f8c037637f9eb3e.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../../../../static.files/dark-1097f8e92a01e3cf.css"><link rel="stylesheet" href="../../../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../../../tokio/index.html"><img class="rust-logo" src="../../../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -297,6 +297,29 @@
 <a href="#297" id="297">297</a>
 <a href="#298" id="298">298</a>
 <a href="#299" id="299">299</a>
+<a href="#300" id="300">300</a>
+<a href="#301" id="301">301</a>
+<a href="#302" id="302">302</a>
+<a href="#303" id="303">303</a>
+<a href="#304" id="304">304</a>
+<a href="#305" id="305">305</a>
+<a href="#306" id="306">306</a>
+<a href="#307" id="307">307</a>
+<a href="#308" id="308">308</a>
+<a href="#309" id="309">309</a>
+<a href="#310" id="310">310</a>
+<a href="#311" id="311">311</a>
+<a href="#312" id="312">312</a>
+<a href="#313" id="313">313</a>
+<a href="#314" id="314">314</a>
+<a href="#315" id="315">315</a>
+<a href="#316" id="316">316</a>
+<a href="#317" id="317">317</a>
+<a href="#318" id="318">318</a>
+<a href="#319" id="319">319</a>
+<a href="#320" id="320">320</a>
+<a href="#321" id="321">321</a>
+<a href="#322" id="322">322</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! This module has containers for storing the tasks spawned on a scheduler. The
 //! `OwnedTasks` container is thread-safe but can only store tasks that
 //! implement Send. The `LocalOwnedTasks` container is not thread safe, but can
@@ -309,13 +332,14 @@
 <span class="kw">use </span><span class="kw">crate</span>::loom::cell::UnsafeCell;
 <span class="kw">use </span><span class="kw">crate</span>::loom::sync::Mutex;
 <span class="kw">use </span><span class="kw">crate</span>::runtime::task::{JoinHandle, LocalNotified, Notified, Schedule, Task};
-<span class="kw">use </span><span class="kw">crate</span>::util::linked_list::{Link, LinkedList};
+<span class="kw">use </span><span class="kw">crate</span>::util::linked_list::{CountedLinkedList, Link, LinkedList};
 
 <span class="kw">use </span>std::marker::PhantomData;
+<span class="kw">use </span>std::num::NonZeroU64;
 
 <span class="comment">// The id from the module below is used to verify whether a given task is stored
 // in this OwnedTasks, or some other task. The counter starts at one so we can
-// use zero for tasks not owned by any list.
+// use `None` for tasks not owned by any list.
 //
 // The safety checks in this file can technically be violated if the counter is
 // overflown, but the checks are not supposed to ever fail unless there is a
@@ -327,10 +351,10 @@
 
     <span class="kw">static </span>NEXT_OWNED_TASKS_ID: AtomicU64 = AtomicU64::new(<span class="number">1</span>);
 
-    <span class="kw">fn </span>get_next_id() -&gt; u64 {
+    <span class="kw">fn </span>get_next_id() -&gt; NonZeroU64 {
         <span class="kw">loop </span>{
             <span class="kw">let </span>id = NEXT_OWNED_TASKS_ID.fetch_add(<span class="number">1</span>, Ordering::Relaxed);
-            <span class="kw">if </span>id != <span class="number">0 </span>{
+            <span class="kw">if let </span><span class="prelude-val">Some</span>(id) = NonZeroU64::new(id) {
                 <span class="kw">return </span>id;
             }
         }
@@ -342,23 +366,27 @@
 
     <span class="kw">static </span>NEXT_OWNED_TASKS_ID: AtomicU32 = AtomicU32::new(<span class="number">1</span>);
 
-    <span class="kw">fn </span>get_next_id() -&gt; u64 {
+    <span class="kw">fn </span>get_next_id() -&gt; NonZeroU64 {
         <span class="kw">loop </span>{
             <span class="kw">let </span>id = NEXT_OWNED_TASKS_ID.fetch_add(<span class="number">1</span>, Ordering::Relaxed);
-            <span class="kw">if </span>id != <span class="number">0 </span>{
-                <span class="kw">return </span>u64::from(id);
+            <span class="kw">if let </span><span class="prelude-val">Some</span>(id) = NonZeroU64::new(u64::from(id)) {
+                <span class="kw">return </span>id;
             }
         }
     }
 }
 
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>OwnedTasks&lt;S: <span class="lifetime">&#39;static</span>&gt; {
-    inner: Mutex&lt;OwnedTasksInner&lt;S&gt;&gt;,
-    id: u64,
+    inner: Mutex&lt;CountedOwnedTasksInner&lt;S&gt;&gt;,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) id: NonZeroU64,
+}
+<span class="kw">struct </span>CountedOwnedTasksInner&lt;S: <span class="lifetime">&#39;static</span>&gt; {
+    list: CountedLinkedList&lt;Task&lt;S&gt;, &lt;Task&lt;S&gt; <span class="kw">as </span>Link&gt;::Target&gt;,
+    closed: bool,
 }
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>LocalOwnedTasks&lt;S: <span class="lifetime">&#39;static</span>&gt; {
     inner: UnsafeCell&lt;OwnedTasksInner&lt;S&gt;&gt;,
-    id: u64,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) id: NonZeroU64,
     _not_send_or_sync: PhantomData&lt;<span class="kw-2">*const </span>()&gt;,
 }
 <span class="kw">struct </span>OwnedTasksInner&lt;S: <span class="lifetime">&#39;static</span>&gt; {
@@ -369,8 +397,8 @@
 <span class="kw">impl</span>&lt;S: <span class="lifetime">&#39;static</span>&gt; OwnedTasks&lt;S&gt; {
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>new() -&gt; <span class="self">Self </span>{
         <span class="self">Self </span>{
-            inner: Mutex::new(OwnedTasksInner {
-                list: LinkedList::new(),
+            inner: Mutex::new(CountedOwnedTasksInner {
+                list: CountedLinkedList::new(),
                 closed: <span class="bool-val">false</span>,
             }),
             id: get_next_id(),
@@ -391,7 +419,15 @@
         T::Output: Send + <span class="lifetime">&#39;static</span>,
     {
         <span class="kw">let </span>(task, notified, join) = <span class="kw">super</span>::new_task(task, scheduler, id);
+        <span class="kw">let </span>notified = <span class="kw">unsafe </span>{ <span class="self">self</span>.bind_inner(task, notified) };
+        (join, notified)
+    }
 
+    <span class="doccomment">/// The part of `bind` that&#39;s the same for every type of future.
+    </span><span class="kw">unsafe fn </span>bind_inner(<span class="kw-2">&amp;</span><span class="self">self</span>, task: Task&lt;S&gt;, notified: Notified&lt;S&gt;) -&gt; <span class="prelude-ty">Option</span>&lt;Notified&lt;S&gt;&gt;
+    <span class="kw">where
+        </span>S: Schedule,
+    {
         <span class="kw">unsafe </span>{
             <span class="comment">// safety: We just created the task, so we have exclusive access
             // to the field.
@@ -403,10 +439,10 @@
             drop(lock);
             drop(notified);
             task.shutdown();
-            (join, <span class="prelude-val">None</span>)
-        } <span class="kw">else </span>{
+            <span class="prelude-val">None
+        </span>} <span class="kw">else </span>{
             lock.list.push_front(task);
-            (join, <span class="prelude-val">Some</span>(notified))
+            <span class="prelude-val">Some</span>(notified)
         }
     }
 
@@ -414,7 +450,7 @@
     /// a LocalNotified, giving the thread permission to poll this task.
     </span><span class="attr">#[inline]
     </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>assert_owner(<span class="kw-2">&amp;</span><span class="self">self</span>, task: Notified&lt;S&gt;) -&gt; LocalNotified&lt;S&gt; {
-        <span class="macro">assert_eq!</span>(task.header().get_owner_id(), <span class="self">self</span>.id);
+        <span class="macro">debug_assert_eq!</span>(task.header().get_owner_id(), <span class="prelude-val">Some</span>(<span class="self">self</span>.id));
 
         <span class="comment">// safety: All tasks bound to this OwnedTasks are Send, so it is safe
         // to poll it on this thread no matter what thread we are on.
@@ -452,12 +488,14 @@
         }
     }
 
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>active_tasks_count(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; usize {
+        <span class="self">self</span>.inner.lock().list.count()
+    }
+
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>remove(<span class="kw-2">&amp;</span><span class="self">self</span>, task: <span class="kw-2">&amp;</span>Task&lt;S&gt;) -&gt; <span class="prelude-ty">Option</span>&lt;Task&lt;S&gt;&gt; {
-        <span class="kw">let </span>task_id = task.header().get_owner_id();
-        <span class="kw">if </span>task_id == <span class="number">0 </span>{
-            <span class="comment">// The task is unowned.
-            </span><span class="kw">return </span><span class="prelude-val">None</span>;
-        }
+        <span class="comment">// If the task&#39;s owner ID is `None` then it is not part of any list and
+        // doesn&#39;t need removing.
+        </span><span class="kw">let </span>task_id = task.header().get_owner_id()<span class="question-mark">?</span>;
 
         <span class="macro">assert_eq!</span>(task_id, <span class="self">self</span>.id);
 
@@ -468,6 +506,18 @@
 
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>is_empty(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
         <span class="self">self</span>.inner.lock().list.is_empty()
+    }
+}
+
+<span class="macro">cfg_taskdump! </span>{
+    <span class="kw">impl</span>&lt;S: <span class="lifetime">&#39;static</span>&gt; OwnedTasks&lt;S&gt; {
+        <span class="doccomment">/// Locks the tasks, and calls `f` on an iterator over them.
+        </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>for_each&lt;F&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, f: F)
+        <span class="kw">where
+            </span>F: FnMut(<span class="kw-2">&amp;</span>Task&lt;S&gt;)
+        {
+            <span class="self">self</span>.inner.lock().list.for_each(f)
+        }
     }
 }
 
@@ -528,11 +578,9 @@
     }
 
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>remove(<span class="kw-2">&amp;</span><span class="self">self</span>, task: <span class="kw-2">&amp;</span>Task&lt;S&gt;) -&gt; <span class="prelude-ty">Option</span>&lt;Task&lt;S&gt;&gt; {
-        <span class="kw">let </span>task_id = task.header().get_owner_id();
-        <span class="kw">if </span>task_id == <span class="number">0 </span>{
-            <span class="comment">// The task is unowned.
-            </span><span class="kw">return </span><span class="prelude-val">None</span>;
-        }
+        <span class="comment">// If the task&#39;s owner ID is `None` then it is not part of any list and
+        // doesn&#39;t need removing.
+        </span><span class="kw">let </span>task_id = task.header().get_owner_id()<span class="question-mark">?</span>;
 
         <span class="macro">assert_eq!</span>(task_id, <span class="self">self</span>.id);
 
@@ -546,7 +594,7 @@
     /// it to a LocalNotified, giving the thread permission to poll this task.
     </span><span class="attr">#[inline]
     </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>assert_owner(<span class="kw-2">&amp;</span><span class="self">self</span>, task: Notified&lt;S&gt;) -&gt; LocalNotified&lt;S&gt; {
-        <span class="macro">assert_eq!</span>(task.header().get_owner_id(), <span class="self">self</span>.id);
+        <span class="macro">assert_eq!</span>(task.header().get_owner_id(), <span class="prelude-val">Some</span>(<span class="self">self</span>.id));
 
         <span class="comment">// safety: The task was bound to this LocalOwnedTasks, and the
         // LocalOwnedTasks is not Send or Sync, so we are on the right thread
@@ -577,7 +625,7 @@
     }
 }
 
-<span class="attr">#[cfg(all(test))]
+<span class="attr">#[cfg(test)]
 </span><span class="kw">mod </span>tests {
     <span class="kw">use super</span>::<span class="kw-2">*</span>;
 
@@ -586,11 +634,9 @@
     </span><span class="attr">#[test]
     </span><span class="kw">fn </span>test_id_not_broken() {
         <span class="kw">let </span><span class="kw-2">mut </span>last_id = get_next_id();
-        <span class="macro">assert_ne!</span>(last_id, <span class="number">0</span>);
 
         <span class="kw">for _ in </span><span class="number">0</span>..<span class="number">1000 </span>{
             <span class="kw">let </span>next_id = get_next_id();
-            <span class="macro">assert_ne!</span>(next_id, <span class="number">0</span>);
             <span class="macro">assert!</span>(last_id &lt; next_id);
             last_id = next_id;
         }

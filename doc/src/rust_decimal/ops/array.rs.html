@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/nix/store/jnqxxv1xi811ni996b002f4jnyz38xck-vendor-cargo-deps/c19b7c6f923b580ac259164a89f2577984ad5ab09ee9d583b888f934adbbe8d0/rust_decimal-1.26.1/src/ops/array.rs`."><title>array.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-f3501f0f5ae15dfb.css" id="mainThemeStyle"><div id="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="rust_decimal" data-themes="" data-resource-suffix="" data-rustdoc-version="1.71.0 (8ede3aae2 2023-07-12)" data-search-js="search-4926e5fc22a5646a.js" data-settings-js="settings-de11bff964e9d4e5.js" data-settings-css="settings-8c76f75bfb6bd192.css" data-theme-light-css="light-0f8c037637f9eb3e.css" data-theme-dark-css="dark-1097f8e92a01e3cf.css" data-theme-ayu-css="ayu-614652228113ac93.css" ></div><script src="../../../static.files/storage-62ce34ea385b278a.js"></script><script defer src="../../../static.files/source-script-11255107d0a65077.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../static.files/main-f0540c1d82cde29b.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../../../static.files/light-0f8c037637f9eb3e.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../../../static.files/dark-1097f8e92a01e3cf.css"><link rel="stylesheet" href="../../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../../rust_decimal/index.html"><img class="rust-logo" src="../../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/nix/store/yf45a1rayffhnidhgyjynpyhr9lqkd09-vendor-cargo-deps/c19b7c6f923b580ac259164a89f2577984ad5ab09ee9d583b888f934adbbe8d0/rust_decimal-1.31.0/src/ops/array.rs`."><title>array.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-f3501f0f5ae15dfb.css" id="mainThemeStyle"><div id="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="rust_decimal" data-themes="" data-resource-suffix="" data-rustdoc-version="1.71.0 (8ede3aae2 2023-07-12)" data-search-js="search-4926e5fc22a5646a.js" data-settings-js="settings-de11bff964e9d4e5.js" data-settings-css="settings-8c76f75bfb6bd192.css" data-theme-light-css="light-0f8c037637f9eb3e.css" data-theme-dark-css="dark-1097f8e92a01e3cf.css" data-theme-ayu-css="ayu-614652228113ac93.css" ></div><script src="../../../static.files/storage-62ce34ea385b278a.js"></script><script defer src="../../../static.files/source-script-11255107d0a65077.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../static.files/main-f0540c1d82cde29b.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../../../static.files/light-0f8c037637f9eb3e.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../../../static.files/dark-1097f8e92a01e3cf.css"><link rel="stylesheet" href="../../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../../rust_decimal/index.html"><img class="rust-logo" src="../../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -366,19 +366,48 @@
 <a href="#366" id="366">366</a>
 <a href="#367" id="367">367</a>
 <a href="#368" id="368">368</a>
-</pre></div><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::constants::{POWERS_10, U32_MASK};
+<a href="#369" id="369">369</a>
+<a href="#370" id="370">370</a>
+<a href="#371" id="371">371</a>
+<a href="#372" id="372">372</a>
+<a href="#373" id="373">373</a>
+<a href="#374" id="374">374</a>
+<a href="#375" id="375">375</a>
+<a href="#376" id="376">376</a>
+<a href="#377" id="377">377</a>
+<a href="#378" id="378">378</a>
+<a href="#379" id="379">379</a>
+<a href="#380" id="380">380</a>
+<a href="#381" id="381">381</a>
+<a href="#382" id="382">382</a>
+<a href="#383" id="383">383</a>
+<a href="#384" id="384">384</a>
+<a href="#385" id="385">385</a>
+<a href="#386" id="386">386</a>
+<a href="#387" id="387">387</a>
+<a href="#388" id="388">388</a>
+<a href="#389" id="389">389</a>
+<a href="#390" id="390">390</a>
+<a href="#391" id="391">391</a>
+<a href="#392" id="392">392</a>
+</pre></div><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::constants::{MAX_PRECISION_U32, POWERS_10, U32_MASK};
 
 <span class="doccomment">/// Rescales the given decimal to new scale.
 /// e.g. with 1.23 and new scale 3 rescale the value to 1.230
-</span><span class="attr">#[inline(always)]
+</span><span class="attr">#[inline]
 </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>rescale_internal(value: <span class="kw-2">&amp;mut </span>[u32; <span class="number">3</span>], value_scale: <span class="kw-2">&amp;mut </span>u32, new_scale: u32) {
+    rescale::&lt;<span class="bool-val">true</span>&gt;(value, value_scale, new_scale);
+}
+
+<span class="attr">#[inline(always)]
+</span><span class="kw">fn </span>rescale&lt;<span class="kw">const </span>ROUND: bool&gt;(value: <span class="kw-2">&amp;mut </span>[u32; <span class="number">3</span>], value_scale: <span class="kw-2">&amp;mut </span>u32, new_scale: u32) {
     <span class="kw">if </span><span class="kw-2">*</span>value_scale == new_scale {
         <span class="comment">// Nothing to do
         </span><span class="kw">return</span>;
     }
 
     <span class="kw">if </span>is_all_zero(value) {
-        <span class="kw-2">*</span>value_scale = new_scale;
+        <span class="kw-2">*</span>value_scale = new_scale.min(MAX_PRECISION_U32);
         <span class="kw">return</span>;
     }
 
@@ -400,7 +429,7 @@
             <span class="comment">// Any remainder is discarded if diff &gt; 0 still (i.e. lost precision)
             </span>remainder = div_by_u32(value, <span class="number">10</span>);
         }
-        <span class="kw">if </span>remainder &gt;= <span class="number">5 </span>{
+        <span class="kw">if </span>ROUND &amp;&amp; remainder &gt;= <span class="number">5 </span>{
             <span class="kw">for </span>part <span class="kw">in </span>value.iter_mut() {
                 <span class="kw">let </span>digit = u64::from(<span class="kw-2">*</span>part) + <span class="number">1u64</span>;
                 remainder = <span class="kw">if </span>digit &gt; U32_MASK { <span class="number">1 </span>} <span class="kw">else </span>{ <span class="number">0 </span>};
@@ -424,6 +453,11 @@
         }
         <span class="kw-2">*</span>value_scale = new_scale.wrapping_sub(diff);
     }
+}
+
+<span class="attr">#[inline]
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>truncate_internal(value: <span class="kw-2">&amp;mut </span>[u32; <span class="number">3</span>], value_scale: <span class="kw-2">&amp;mut </span>u32, desired_scale: u32) {
+    rescale::&lt;<span class="bool-val">false</span>&gt;(value, value_scale, desired_scale);
 }
 
 <span class="attr">#[cfg(feature = <span class="string">&quot;legacy-ops&quot;</span>)]
@@ -604,9 +638,11 @@
     }
 }
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>div_by_1x(bits: <span class="kw-2">&amp;mut </span>[u32; <span class="number">3</span>], power: usize) -&gt; u32 {
+<span class="comment">// This function should be used with caution. It unwraps the standard divide loop - it is intended
+// for small inputs (&lt;10) and is optimized to be left as unchecked.
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>div_by_power&lt;<span class="kw">const </span>POWER: usize&gt;(bits: <span class="kw-2">&amp;mut </span>[u32; <span class="number">3</span>]) -&gt; u32 {
     <span class="kw">let </span><span class="kw-2">mut </span>remainder = <span class="number">0u32</span>;
-    <span class="kw">let </span>divisor = POWERS_10[power] <span class="kw">as </span>u64;
+    <span class="kw">let </span>divisor = POWERS_10[POWER] <span class="kw">as </span>u64;
     <span class="kw">let </span>temp = ((remainder <span class="kw">as </span>u64) &lt;&lt; <span class="number">32</span>) + (bits[<span class="number">2</span>] <span class="kw">as </span>u64);
     remainder = (temp % divisor) <span class="kw">as </span>u32;
     bits[<span class="number">2</span>] = (temp / divisor) <span class="kw">as </span>u32;
@@ -659,37 +695,49 @@
     </span><span class="kw">use super</span>::<span class="kw-2">*</span>;
     <span class="kw">use </span><span class="kw">crate</span>::prelude::<span class="kw-2">*</span>;
 
+    <span class="kw">fn </span>to_mantissa_array_with_scale(value: <span class="kw-2">&amp;</span>str) -&gt; ([u32; <span class="number">3</span>], u32) {
+        <span class="kw">let </span>v = Decimal::from_str(value).unwrap();
+        (v.mantissa_array3(), v.scale())
+    }
+
     <span class="attr">#[test]
     </span><span class="kw">fn </span>it_can_rescale_internal() {
-        <span class="kw">fn </span>extract(value: <span class="kw-2">&amp;</span>str) -&gt; ([u32; <span class="number">3</span>], u32) {
-            <span class="kw">let </span>v = Decimal::from_str(value).unwrap();
-            (v.mantissa_array3(), v.scale())
-        }
-
         <span class="kw">let </span>tests = <span class="kw-2">&amp;</span>[
-            (<span class="string">&quot;1&quot;</span>, <span class="number">0</span>, <span class="string">&quot;1&quot;</span>),
-            (<span class="string">&quot;1&quot;</span>, <span class="number">1</span>, <span class="string">&quot;1.0&quot;</span>),
-            (<span class="string">&quot;1&quot;</span>, <span class="number">5</span>, <span class="string">&quot;1.00000&quot;</span>),
-            (<span class="string">&quot;1&quot;</span>, <span class="number">10</span>, <span class="string">&quot;1.0000000000&quot;</span>),
-            (<span class="string">&quot;1&quot;</span>, <span class="number">20</span>, <span class="string">&quot;1.00000000000000000000&quot;</span>),
-            (<span class="string">&quot;0.6386554621848739495798319328&quot;</span>, <span class="number">27</span>, <span class="string">&quot;0.638655462184873949579831933&quot;</span>),
+            (<span class="string">&quot;1&quot;</span>, <span class="number">0</span>, <span class="string">&quot;1&quot;</span>, <span class="number">0</span>),
+            (<span class="string">&quot;1&quot;</span>, <span class="number">1</span>, <span class="string">&quot;1.0&quot;</span>, <span class="number">1</span>),
+            (<span class="string">&quot;1&quot;</span>, <span class="number">5</span>, <span class="string">&quot;1.00000&quot;</span>, <span class="number">5</span>),
+            (<span class="string">&quot;1&quot;</span>, <span class="number">10</span>, <span class="string">&quot;1.0000000000&quot;</span>, <span class="number">10</span>),
+            (<span class="string">&quot;1&quot;</span>, <span class="number">20</span>, <span class="string">&quot;1.00000000000000000000&quot;</span>, <span class="number">20</span>),
             (
-                <span class="string">&quot;843.65000000&quot;</span>,                  <span class="comment">// Scale 8
-                </span><span class="number">25</span>,                              <span class="comment">// 25
-                </span><span class="string">&quot;843.6500000000000000000000000&quot;</span>, <span class="comment">// 25
-            </span>),
+                <span class="string">&quot;0.6386554621848739495798319328&quot;</span>,
+                <span class="number">27</span>,
+                <span class="string">&quot;0.638655462184873949579831933&quot;</span>,
+                <span class="number">27</span>,
+            ),
             (
-                <span class="string">&quot;843.65000000&quot;</span>,                     <span class="comment">// Scale 8
-                </span><span class="number">30</span>,                                 <span class="comment">// 30
-                </span><span class="string">&quot;843.6500000000000000000000000000&quot;</span>, <span class="comment">// 28
+                <span class="string">&quot;843.65000000&quot;</span>, <span class="comment">// Scale 8
+                </span><span class="number">25</span>,
+                <span class="string">&quot;843.6500000000000000000000000&quot;</span>,
+                <span class="number">25</span>,
+            ),
+            (
+                <span class="string">&quot;843.65000000&quot;</span>, <span class="comment">// Scale 8
+                </span><span class="number">30</span>,
+                <span class="string">&quot;843.6500000000000000000000000&quot;</span>,
+                <span class="number">25</span>, <span class="comment">// Only fits 25
             </span>),
+            (<span class="string">&quot;0&quot;</span>, <span class="number">130</span>, <span class="string">&quot;0.000000000000000000000000000000&quot;</span>, <span class="number">28</span>),
         ];
 
-        <span class="kw">for </span><span class="kw-2">&amp;</span>(value_raw, new_scale, expected_value) <span class="kw">in </span>tests {
-            <span class="kw">let </span>(expected_value, <span class="kw">_</span>) = extract(expected_value);
-            <span class="kw">let </span>(<span class="kw-2">mut </span>value, <span class="kw-2">mut </span>value_scale) = extract(value_raw);
+        <span class="kw">for </span><span class="kw-2">&amp;</span>(value_raw, new_scale, expected_value, expected_scale) <span class="kw">in </span>tests {
+            <span class="kw">let </span>(expected_value, <span class="kw">_</span>) = to_mantissa_array_with_scale(expected_value);
+            <span class="kw">let </span>(<span class="kw-2">mut </span>value, <span class="kw-2">mut </span>value_scale) = to_mantissa_array_with_scale(value_raw);
             rescale_internal(<span class="kw-2">&amp;mut </span>value, <span class="kw-2">&amp;mut </span>value_scale, new_scale);
             <span class="macro">assert_eq!</span>(value, expected_value);
+            <span class="macro">assert_eq!</span>(
+                value_scale, expected_scale,
+                <span class="string">&quot;value: {value_raw}, requested scale: {new_scale}&quot;
+            </span>);
         }
     }
 

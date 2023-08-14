@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/nix/store/jnqxxv1xi811ni996b002f4jnyz38xck-vendor-cargo-deps/c19b7c6f923b580ac259164a89f2577984ad5ab09ee9d583b888f934adbbe8d0/url-2.3.0/src/lib.rs`."><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-f3501f0f5ae15dfb.css" id="mainThemeStyle"><div id="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="url" data-themes="" data-resource-suffix="" data-rustdoc-version="1.71.0 (8ede3aae2 2023-07-12)" data-search-js="search-4926e5fc22a5646a.js" data-settings-js="settings-de11bff964e9d4e5.js" data-settings-css="settings-8c76f75bfb6bd192.css" data-theme-light-css="light-0f8c037637f9eb3e.css" data-theme-dark-css="dark-1097f8e92a01e3cf.css" data-theme-ayu-css="ayu-614652228113ac93.css" ></div><script src="../../static.files/storage-62ce34ea385b278a.js"></script><script defer src="../../static.files/source-script-11255107d0a65077.js"></script><script defer src="../../source-files.js"></script><script defer src="../../static.files/main-f0540c1d82cde29b.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../../static.files/light-0f8c037637f9eb3e.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../../static.files/dark-1097f8e92a01e3cf.css"><link rel="stylesheet" href="../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../url/index.html"><img class="rust-logo" src="../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/nix/store/yf45a1rayffhnidhgyjynpyhr9lqkd09-vendor-cargo-deps/c19b7c6f923b580ac259164a89f2577984ad5ab09ee9d583b888f934adbbe8d0/url-2.4.0/src/lib.rs`."><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-f3501f0f5ae15dfb.css" id="mainThemeStyle"><div id="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="url" data-themes="" data-resource-suffix="" data-rustdoc-version="1.71.0 (8ede3aae2 2023-07-12)" data-search-js="search-4926e5fc22a5646a.js" data-settings-js="settings-de11bff964e9d4e5.js" data-settings-css="settings-8c76f75bfb6bd192.css" data-theme-light-css="light-0f8c037637f9eb3e.css" data-theme-dark-css="dark-1097f8e92a01e3cf.css" data-theme-ayu-css="ayu-614652228113ac93.css" ></div><script src="../../static.files/storage-62ce34ea385b278a.js"></script><script defer src="../../static.files/source-script-11255107d0a65077.js"></script><script defer src="../../source-files.js"></script><script defer src="../../static.files/main-f0540c1d82cde29b.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../../static.files/light-0f8c037637f9eb3e.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../../static.files/dark-1097f8e92a01e3cf.css"><link rel="stylesheet" href="../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../url/index.html"><img class="rust-logo" src="../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -2921,6 +2921,108 @@
 <a href="#2921" id="2921">2921</a>
 <a href="#2922" id="2922">2922</a>
 <a href="#2923" id="2923">2923</a>
+<a href="#2924" id="2924">2924</a>
+<a href="#2925" id="2925">2925</a>
+<a href="#2926" id="2926">2926</a>
+<a href="#2927" id="2927">2927</a>
+<a href="#2928" id="2928">2928</a>
+<a href="#2929" id="2929">2929</a>
+<a href="#2930" id="2930">2930</a>
+<a href="#2931" id="2931">2931</a>
+<a href="#2932" id="2932">2932</a>
+<a href="#2933" id="2933">2933</a>
+<a href="#2934" id="2934">2934</a>
+<a href="#2935" id="2935">2935</a>
+<a href="#2936" id="2936">2936</a>
+<a href="#2937" id="2937">2937</a>
+<a href="#2938" id="2938">2938</a>
+<a href="#2939" id="2939">2939</a>
+<a href="#2940" id="2940">2940</a>
+<a href="#2941" id="2941">2941</a>
+<a href="#2942" id="2942">2942</a>
+<a href="#2943" id="2943">2943</a>
+<a href="#2944" id="2944">2944</a>
+<a href="#2945" id="2945">2945</a>
+<a href="#2946" id="2946">2946</a>
+<a href="#2947" id="2947">2947</a>
+<a href="#2948" id="2948">2948</a>
+<a href="#2949" id="2949">2949</a>
+<a href="#2950" id="2950">2950</a>
+<a href="#2951" id="2951">2951</a>
+<a href="#2952" id="2952">2952</a>
+<a href="#2953" id="2953">2953</a>
+<a href="#2954" id="2954">2954</a>
+<a href="#2955" id="2955">2955</a>
+<a href="#2956" id="2956">2956</a>
+<a href="#2957" id="2957">2957</a>
+<a href="#2958" id="2958">2958</a>
+<a href="#2959" id="2959">2959</a>
+<a href="#2960" id="2960">2960</a>
+<a href="#2961" id="2961">2961</a>
+<a href="#2962" id="2962">2962</a>
+<a href="#2963" id="2963">2963</a>
+<a href="#2964" id="2964">2964</a>
+<a href="#2965" id="2965">2965</a>
+<a href="#2966" id="2966">2966</a>
+<a href="#2967" id="2967">2967</a>
+<a href="#2968" id="2968">2968</a>
+<a href="#2969" id="2969">2969</a>
+<a href="#2970" id="2970">2970</a>
+<a href="#2971" id="2971">2971</a>
+<a href="#2972" id="2972">2972</a>
+<a href="#2973" id="2973">2973</a>
+<a href="#2974" id="2974">2974</a>
+<a href="#2975" id="2975">2975</a>
+<a href="#2976" id="2976">2976</a>
+<a href="#2977" id="2977">2977</a>
+<a href="#2978" id="2978">2978</a>
+<a href="#2979" id="2979">2979</a>
+<a href="#2980" id="2980">2980</a>
+<a href="#2981" id="2981">2981</a>
+<a href="#2982" id="2982">2982</a>
+<a href="#2983" id="2983">2983</a>
+<a href="#2984" id="2984">2984</a>
+<a href="#2985" id="2985">2985</a>
+<a href="#2986" id="2986">2986</a>
+<a href="#2987" id="2987">2987</a>
+<a href="#2988" id="2988">2988</a>
+<a href="#2989" id="2989">2989</a>
+<a href="#2990" id="2990">2990</a>
+<a href="#2991" id="2991">2991</a>
+<a href="#2992" id="2992">2992</a>
+<a href="#2993" id="2993">2993</a>
+<a href="#2994" id="2994">2994</a>
+<a href="#2995" id="2995">2995</a>
+<a href="#2996" id="2996">2996</a>
+<a href="#2997" id="2997">2997</a>
+<a href="#2998" id="2998">2998</a>
+<a href="#2999" id="2999">2999</a>
+<a href="#3000" id="3000">3000</a>
+<a href="#3001" id="3001">3001</a>
+<a href="#3002" id="3002">3002</a>
+<a href="#3003" id="3003">3003</a>
+<a href="#3004" id="3004">3004</a>
+<a href="#3005" id="3005">3005</a>
+<a href="#3006" id="3006">3006</a>
+<a href="#3007" id="3007">3007</a>
+<a href="#3008" id="3008">3008</a>
+<a href="#3009" id="3009">3009</a>
+<a href="#3010" id="3010">3010</a>
+<a href="#3011" id="3011">3011</a>
+<a href="#3012" id="3012">3012</a>
+<a href="#3013" id="3013">3013</a>
+<a href="#3014" id="3014">3014</a>
+<a href="#3015" id="3015">3015</a>
+<a href="#3016" id="3016">3016</a>
+<a href="#3017" id="3017">3017</a>
+<a href="#3018" id="3018">3018</a>
+<a href="#3019" id="3019">3019</a>
+<a href="#3020" id="3020">3020</a>
+<a href="#3021" id="3021">3021</a>
+<a href="#3022" id="3022">3022</a>
+<a href="#3023" id="3023">3023</a>
+<a href="#3024" id="3024">3024</a>
+<a href="#3025" id="3025">3025</a>
 </pre></div><pre class="rust"><code><span class="comment">// Copyright 2013-2015 The rust-url developers.
 //
 // Licensed under the Apache License, Version 2.0 &lt;LICENSE-APACHE or
@@ -3044,7 +3146,7 @@ url = { version = &quot;2&quot;, features = [&quot;serde&quot;] }
 
 */
 
-</span><span class="attr">#![doc(html_root_url = <span class="string">&quot;https://docs.rs/url/2.3.0&quot;</span>)]
+</span><span class="attr">#![doc(html_root_url = <span class="string">&quot;https://docs.rs/url/2.4.0&quot;</span>)]
 #![cfg_attr(
     feature = <span class="string">&quot;debugger_visualizer&quot;</span>,
     feature(debugger_visualizer),
@@ -3243,6 +3345,32 @@ url = { version = &quot;2&quot;, features = [&quot;serde&quot;] }
         }
 
         url
+    }
+
+    <span class="doccomment">/// https://url.spec.whatwg.org/#potentially-strip-trailing-spaces-from-an-opaque-path
+    </span><span class="kw">fn </span>strip_trailing_spaces_from_opaque_path(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
+        <span class="kw">if </span>!<span class="self">self</span>.cannot_be_a_base() {
+            <span class="kw">return</span>;
+        }
+
+        <span class="kw">if </span><span class="self">self</span>.fragment_start.is_some() {
+            <span class="kw">return</span>;
+        }
+
+        <span class="kw">if </span><span class="self">self</span>.query_start.is_some() {
+            <span class="kw">return</span>;
+        }
+
+        <span class="kw">let </span>trailing_space_count = <span class="self">self
+            </span>.serialization
+            .chars()
+            .rev()
+            .take_while(|c| <span class="kw-2">*</span>c == <span class="string">&#39; &#39;</span>)
+            .count();
+
+        <span class="kw">let </span>start = <span class="self">self</span>.serialization.len() - trailing_space_count;
+
+        <span class="self">self</span>.serialization.truncate(start);
     }
 
     <span class="doccomment">/// Parse a string as an URL, with this URL as the base URL.
@@ -3524,7 +3652,7 @@ url = { version = &quot;2&quot;, features = [&quot;serde&quot;] }
         }
 
         <span class="macro">assert!</span>(<span class="self">self</span>.scheme_end &gt;= <span class="number">1</span>);
-        <span class="macro">assert!</span>(<span class="macro">matches!</span>(<span class="self">self</span>.byte_at(<span class="number">0</span>), <span class="string">b&#39;a&#39;</span>..=<span class="string">b&#39;z&#39; </span>| <span class="string">b&#39;A&#39;</span>..=<span class="string">b&#39;Z&#39;</span>));
+        <span class="macro">assert!</span>(<span class="self">self</span>.byte_at(<span class="number">0</span>).is_ascii_alphabetic());
         <span class="macro">assert!</span>(<span class="self">self
             </span>.slice(<span class="number">1</span>..<span class="self">self</span>.scheme_end)
             .chars()
@@ -3580,7 +3708,14 @@ url = { version = &quot;2&quot;, features = [&quot;serde&quot;] }
             <span class="macro">assert_eq!</span>(<span class="self">self</span>.host_end, <span class="self">self</span>.scheme_end + <span class="number">1</span>);
             <span class="macro">assert_eq!</span>(<span class="self">self</span>.host, HostInternal::None);
             <span class="macro">assert_eq!</span>(<span class="self">self</span>.port, <span class="prelude-val">None</span>);
-            <span class="macro">assert_eq!</span>(<span class="self">self</span>.path_start, <span class="self">self</span>.scheme_end + <span class="number">1</span>);
+            <span class="kw">if </span><span class="self">self</span>.path().starts_with(<span class="string">&quot;//&quot;</span>) {
+                <span class="comment">// special case when first path segment is empty
+                </span><span class="macro">assert_eq!</span>(<span class="self">self</span>.byte_at(<span class="self">self</span>.scheme_end + <span class="number">1</span>), <span class="string">b&#39;/&#39;</span>);
+                <span class="macro">assert_eq!</span>(<span class="self">self</span>.byte_at(<span class="self">self</span>.scheme_end + <span class="number">2</span>), <span class="string">b&#39;.&#39;</span>);
+                <span class="macro">assert_eq!</span>(<span class="self">self</span>.path_start, <span class="self">self</span>.scheme_end + <span class="number">3</span>);
+            } <span class="kw">else </span>{
+                <span class="macro">assert_eq!</span>(<span class="self">self</span>.path_start, <span class="self">self</span>.scheme_end + <span class="number">1</span>);
+            }
         }
         <span class="kw">if let </span><span class="prelude-val">Some</span>(start) = <span class="self">self</span>.query_start {
             <span class="macro">assert!</span>(start &gt;= <span class="self">self</span>.path_start);
@@ -3709,11 +3844,34 @@ url = { version = &quot;2&quot;, features = [&quot;serde&quot;] }
         <span class="self">self</span>.slice(..<span class="self">self</span>.scheme_end)
     }
 
+    <span class="doccomment">/// Return whether the URL is special (has a special scheme)
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use url::Url;
+    /// # use url::ParseError;
+    ///
+    /// # fn run() -&gt; Result&lt;(), ParseError&gt; {
+    /// assert!(Url::parse(&quot;http:///tmp/foo&quot;)?.is_special());
+    /// assert!(Url::parse(&quot;file:///tmp/foo&quot;)?.is_special());
+    /// assert!(!Url::parse(&quot;moz:///tmp/foo&quot;)?.is_special());
+    /// # Ok(())
+    /// # }
+    /// # run().unwrap();
+    /// ```
+    </span><span class="kw">pub fn </span>is_special(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="kw">let </span>scheme_type = SchemeType::from(<span class="self">self</span>.scheme());
+        scheme_type.is_special()
+    }
+
     <span class="doccomment">/// Return whether the URL has an &#39;authority&#39;,
     /// which can contain a username, password, host, and port number.
     ///
     /// URLs that do *not* are either path-only like `unix:/run/foo.socket`
     /// or cannot-be-a-base like `data:text/plain,Stuff`.
+    ///
+    /// See also the `authority` method.
     ///
     /// # Examples
     ///
@@ -3738,6 +3896,47 @@ url = { version = &quot;2&quot;, features = [&quot;serde&quot;] }
     </span><span class="kw">pub fn </span>has_authority(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
         <span class="macro">debug_assert!</span>(<span class="self">self</span>.byte_at(<span class="self">self</span>.scheme_end) == <span class="string">b&#39;:&#39;</span>);
         <span class="self">self</span>.slice(<span class="self">self</span>.scheme_end..).starts_with(<span class="string">&quot;://&quot;</span>)
+    }
+
+    <span class="doccomment">/// Return the authority of this URL as an ASCII string.
+    ///
+    /// Non-ASCII domains are punycode-encoded per IDNA if this is the host
+    /// of a special URL, or percent encoded for non-special URLs.
+    /// IPv6 addresses are given between `[` and `]` brackets.
+    /// Ports are omitted if they match the well known port of a special URL.
+    ///
+    /// Username and password are percent-encoded.
+    ///
+    /// See also the `has_authority` method.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use url::Url;
+    /// # use url::ParseError;
+    ///
+    /// # fn run() -&gt; Result&lt;(), ParseError&gt; {
+    /// let url = Url::parse(&quot;unix:/run/foo.socket&quot;)?;
+    /// assert_eq!(url.authority(), &quot;&quot;);
+    /// let url = Url::parse(&quot;file:///tmp/foo&quot;)?;
+    /// assert_eq!(url.authority(), &quot;&quot;);
+    /// let url = Url::parse(&quot;https://user:password@example.com/tmp/foo&quot;)?;
+    /// assert_eq!(url.authority(), &quot;user:password@example.com&quot;);
+    /// let url = Url::parse(&quot;irc://àlex.рф.example.com:6667/foo&quot;)?;
+    /// assert_eq!(url.authority(), &quot;%C3%A0lex.%D1%80%D1%84.example.com:6667&quot;);
+    /// let url = Url::parse(&quot;http://àlex.рф.example.com:80/foo&quot;)?;
+    /// assert_eq!(url.authority(), &quot;xn--lex-8ka.xn--p1ai.example.com&quot;);
+    /// # Ok(())
+    /// # }
+    /// # run().unwrap();
+    /// ```
+    </span><span class="kw">pub fn </span>authority(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>str {
+        <span class="kw">let </span>scheme_separator_len = <span class="string">&quot;://&quot;</span>.len() <span class="kw">as </span>u32;
+        <span class="kw">if </span><span class="self">self</span>.has_authority() &amp;&amp; <span class="self">self</span>.path_start &gt; <span class="self">self</span>.scheme_end + scheme_separator_len {
+            <span class="self">self</span>.slice(<span class="self">self</span>.scheme_end + scheme_separator_len..<span class="self">self</span>.path_start)
+        } <span class="kw">else </span>{
+            <span class="string">&quot;&quot;
+        </span>}
     }
 
     <span class="doccomment">/// Return whether this URL is a cannot-be-a-base URL,
@@ -4314,8 +4513,9 @@ url = { version = &quot;2&quot;, features = [&quot;serde&quot;] }
             <span class="self">self</span>.serialization.push(<span class="string">&#39;#&#39;</span>);
             <span class="self">self</span>.mutate(|parser| parser.parse_fragment(parser::Input::no_trim(input)))
         } <span class="kw">else </span>{
-            <span class="self">self</span>.fragment_start = <span class="prelude-val">None
-        </span>}
+            <span class="self">self</span>.fragment_start = <span class="prelude-val">None</span>;
+            <span class="self">self</span>.strip_trailing_spaces_from_opaque_path();
+        }
     }
 
     <span class="kw">fn </span>take_fragment(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;String&gt; {
@@ -4377,6 +4577,9 @@ url = { version = &quot;2&quot;, features = [&quot;serde&quot;] }
                     parser::Input::trim_tab_and_newlines(input, vfn),
                 )
             });
+        } <span class="kw">else </span>{
+            <span class="self">self</span>.query_start = <span class="prelude-val">None</span>;
+            <span class="self">self</span>.strip_trailing_spaces_from_opaque_path();
         }
 
         <span class="self">self</span>.restore_already_parsed_fragment(fragment);
@@ -4912,7 +5115,8 @@ url = { version = &quot;2&quot;, features = [&quot;serde&quot;] }
         </span><span class="kw">if </span>!<span class="self">self</span>.has_host() || <span class="self">self</span>.host() == <span class="prelude-val">Some</span>(Host::Domain(<span class="string">&quot;&quot;</span>)) || <span class="self">self</span>.scheme() == <span class="string">&quot;file&quot; </span>{
             <span class="kw">return </span><span class="prelude-val">Err</span>(());
         }
-        <span class="kw">if let </span><span class="prelude-val">Some</span>(password) = password {
+        <span class="kw">let </span>password = password.unwrap_or_default();
+        <span class="kw">if </span>!password.is_empty() {
             <span class="kw">let </span>host_and_after = <span class="self">self</span>.slice(<span class="self">self</span>.host_start..).to_owned();
             <span class="self">self</span>.serialization.truncate(<span class="self">self</span>.username_end <span class="kw">as </span>usize);
             <span class="self">self</span>.serialization.push(<span class="string">&#39;:&#39;</span>);
@@ -5728,7 +5932,7 @@ url = { version = &quot;2&quot;, features = [&quot;serde&quot;] }
 
     <span class="comment">// A windows drive letter must end with a slash.
     </span><span class="kw">if </span>bytes.len() &gt; <span class="number">2
-        </span>&amp;&amp; <span class="macro">matches!</span>(bytes[bytes.len() - <span class="number">2</span>], <span class="string">b&#39;a&#39;</span>..=<span class="string">b&#39;z&#39; </span>| <span class="string">b&#39;A&#39;</span>..=<span class="string">b&#39;Z&#39;</span>)
+        </span>&amp;&amp; bytes[bytes.len() - <span class="number">2</span>].is_ascii_alphabetic()
         &amp;&amp; <span class="macro">matches!</span>(bytes[bytes.len() - <span class="number">1</span>], <span class="string">b&#39;:&#39; </span>| <span class="string">b&#39;|&#39;</span>)
     {
         bytes.push(<span class="string">b&#39;/&#39;</span>);
