@@ -116,7 +116,7 @@ pub(crate) async fn get_many_records(
             }
 
             if !order.is_empty() {
-                records.order_by(&order)
+                records.order_by(&order, reversed)
             }
         }
         _ => {

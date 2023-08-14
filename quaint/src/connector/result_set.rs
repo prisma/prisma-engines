@@ -28,8 +28,7 @@ impl ResultSet {
         }
     }
 
-    #[cfg(any(feature = "sqlite-connector", feature = "mysql-connector"))]
-    pub(crate) fn set_last_insert_id(&mut self, id: u64) {
+    pub fn set_last_insert_id(&mut self, id: u64) {
         self.last_insert_id = Some(id);
     }
 

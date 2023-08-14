@@ -45,6 +45,7 @@ const MINIMUM_TX_ID_LENGTH: usize = 24;
 #[cfg(feature = "native")]
 impl Default for TxId {
     fn default() -> Self {
+        #[allow(deprecated)]
         Self(cuid::cuid().unwrap())
     }
 }

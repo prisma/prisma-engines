@@ -2,7 +2,7 @@ import { Client, neon, neonConfig } from '@neondatabase/serverless'
 import type { NeonConfig, NeonQueryFunction } from '@neondatabase/serverless'
 import ws from 'ws'
 import { binder, isConnectionUnhealthy, Debug } from '@jkomyno/prisma-js-connector-utils'
-import type { Closeable, Connector, ResultSet, Query, ConnectorConfig } from '@jkomyno/prisma-js-connector-utils'
+import type { Connector, ResultSet, Query, ConnectorConfig } from '@jkomyno/prisma-js-connector-utils'
 import { fieldToColumnType } from './conversion'
 
 neonConfig.webSocketConstructor = ws
@@ -42,7 +42,7 @@ type ModeSpecificDriver
     client: Client
   }
 
-class PrismaNeon implements Connector, Closeable {
+class PrismaNeon implements Connector {
   readonly flavour = 'postgres'
 
   private driver: ModeSpecificDriver
@@ -78,7 +78,7 @@ class PrismaNeon implements Connector, Closeable {
   }
 
   /**
-   * Returns false, if connection is considered to not be in a working state.
+   * Returns true, if connection is considered to be in a working state.
    */
   isHealthy(): boolean {
     return this.isRunning && this._isHealthy
@@ -187,7 +187,7 @@ class PrismaNeon implements Connector, Closeable {
   }
 }
 
-export const createNeonConnector = (config: PrismaNeonConfig): Connector & Closeable => {
+export const createNeonConnector = (config: PrismaNeonConfig): Connector => {
   const db = new PrismaNeon(config)
   return binder(db)
 }

@@ -3,9 +3,8 @@ generator client {
 }
 
 datasource db {
-  provider          = "@prisma/planetscale"
-  url               = env("JS_PLANETSCALE_DATABASE_URL")
-  shadowDatabaseUrl = env("JS_PLANETSCALE_SHADOW_DATABASE_URL")
+  provider = "@prisma/planetscale"
+  url      = env("JS_PLANETSCALE_DATABASE_URL")
 }
 
 model type_test {
@@ -91,4 +90,13 @@ model Parent {
   id         String  @id
 
   @@unique([p_1, p_2])
+}
+
+model Author {
+  id        Int             @id @default(autoincrement())
+  firstName String
+  lastName  String
+  age       Int
+
+  @@map("authors")
 }

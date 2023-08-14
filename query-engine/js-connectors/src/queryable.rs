@@ -1,12 +1,13 @@
 use crate::{
     error::into_quaint_error,
-    proxy::{self, FlavourSpecificResultSet, JSResultSet, Proxy, Query},
+    proxy::{self, Proxy, Query},
 };
 use async_trait::async_trait;
 use napi::JsObject;
 use psl::datamodel_connector::Flavour;
 use quaint::{
     connector::IsolationLevel,
+    error::{Error, ErrorKind},
     prelude::{Query as QuaintQuery, Queryable as QuaintQueryable, ResultSet, TransactionCapable},
     visitor::{self, Visitor},
     Value,
@@ -131,13 +132,24 @@ impl QuaintQueryable for JsQueryable {
 
     /// Sets the transaction isolation level to given value.
     /// Implementers have to make sure that the passed isolation level is valid for the underlying database.
-    async fn set_tx_isolation_level(&self, _isolation_level: IsolationLevel) -> quaint::Result<()> {
+    async fn set_tx_isolation_level(&self, isolation_level: IsolationLevel) -> quaint::Result<()> {
+        if matches!(isolation_level, IsolationLevel::Snapshot) {
+            return Err(Error::builder(ErrorKind::invalid_isolation_level(&isolation_level)).build());
+        }
+
+        self.raw_cmd(&format!("SET TRANSACTION ISOLATION LEVEL {isolation_level}"))
+            .await?;
+
         Ok(())
     }
 
     /// Signals if the isolation level SET needs to happen before or after the tx BEGIN.
     fn requires_isolation_first(&self) -> bool {
-        false
+        match self.flavour {
+            Flavour::Mysql => true,
+            Flavour::Postgres | Flavour::Sqlite => false,
+            _ => unreachable!(),
+        }
     }
 }
 
@@ -146,11 +158,6 @@ impl JsQueryable {
         let sql: String = sql.to_string();
         let args = values.iter().map(|v| v.clone().into()).collect();
         Query { sql, args }
-    }
-
-    async fn transform_result_set(flavour: Flavour, result_set: JSResultSet) -> quaint::Result<ResultSet> {
-        let flavoured_js_result_set = FlavourSpecificResultSet((flavour, result_set));
-        Ok(ResultSet::from(flavoured_js_result_set))
     }
 
     async fn do_query_raw(&self, sql: &str, params: &[Value<'_>]) -> quaint::Result<ResultSet> {
@@ -167,10 +174,8 @@ impl JsQueryable {
             .map_err(into_quaint_error)?;
 
         let len = result_set.len();
-        let deserialization_span = info_span!("js:query:result", user_facing = true, "length" = %len);
-        Self::transform_result_set(self.flavour, result_set)
-            .instrument(deserialization_span)
-            .await
+        let _deserialization_span = info_span!("js:query:result", user_facing = true, "length" = %len).entered();
+        Ok(ResultSet::from(result_set))
     }
 
     async fn do_execute_raw(&self, sql: &str, params: &[Value<'_>]) -> quaint::Result<u64> {

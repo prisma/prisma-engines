@@ -82,7 +82,7 @@ pub struct Error {
     original_message: Option<String>,
 }
 
-pub(crate) struct ErrorBuilder {
+pub struct ErrorBuilder {
     kind: ErrorKind,
     original_code: Option<String>,
     original_message: Option<String>,
@@ -99,7 +99,7 @@ impl ErrorBuilder {
         self
     }
 
-    pub(crate) fn build(self) -> Error {
+    pub fn build(self) -> Error {
         Error {
             kind: self.kind,
             original_code: self.original_code,
@@ -109,7 +109,7 @@ impl ErrorBuilder {
 }
 
 impl Error {
-    pub(crate) fn builder(kind: ErrorKind) -> ErrorBuilder {
+    pub fn builder(kind: ErrorKind) -> ErrorBuilder {
         ErrorBuilder {
             kind,
             original_code: None,
@@ -301,7 +301,7 @@ impl ErrorKind {
         }
     }
 
-    pub(crate) fn invalid_isolation_level(isolation_level: &IsolationLevel) -> Self {
+    pub fn invalid_isolation_level(isolation_level: &IsolationLevel) -> Self {
         Self::InvalidIsolationLevel(isolation_level.to_string())
     }
 }

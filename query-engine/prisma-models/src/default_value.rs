@@ -284,6 +284,7 @@ impl ValueGeneratorFn {
 
     #[cfg(feature = "default_generators")]
     fn generate_cuid() -> PrismaValue {
+        #[allow(deprecated)]
         PrismaValue::String(cuid::cuid().unwrap())
     }
 
