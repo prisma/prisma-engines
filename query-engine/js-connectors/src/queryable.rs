@@ -7,6 +7,7 @@ use napi::JsObject;
 use psl::datamodel_connector::Flavour;
 use quaint::{
     connector::IsolationLevel,
+    error::{Error, ErrorKind},
     prelude::{Query as QuaintQuery, Queryable as QuaintQueryable, ResultSet, TransactionCapable},
     visitor::{self, Visitor},
     Value,
@@ -131,13 +132,24 @@ impl QuaintQueryable for JsQueryable {
 
     /// Sets the transaction isolation level to given value.
     /// Implementers have to make sure that the passed isolation level is valid for the underlying database.
-    async fn set_tx_isolation_level(&self, _isolation_level: IsolationLevel) -> quaint::Result<()> {
+    async fn set_tx_isolation_level(&self, isolation_level: IsolationLevel) -> quaint::Result<()> {
+        if matches!(isolation_level, IsolationLevel::Snapshot) {
+            return Err(Error::builder(ErrorKind::invalid_isolation_level(&isolation_level)).build());
+        }
+
+        self.raw_cmd(&format!("SET TRANSACTION ISOLATION LEVEL {isolation_level}"))
+            .await?;
+
         Ok(())
     }
 
     /// Signals if the isolation level SET needs to happen before or after the tx BEGIN.
     fn requires_isolation_first(&self) -> bool {
-        false
+        match self.flavour {
+            Flavour::Mysql => true,
+            Flavour::Postgres | Flavour::Sqlite => false,
+            _ => unreachable!(),
+        }
     }
 }
 
