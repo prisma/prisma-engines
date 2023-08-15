@@ -85,7 +85,7 @@ impl<'a> Transaction for DefaultTransaction<'a> {
         Ok(())
     }
 
-    fn as_queryable<'b>(&'b self) -> &'b dyn Queryable {
+    fn as_queryable(&self) -> &dyn Queryable {
         self
     }
 }
