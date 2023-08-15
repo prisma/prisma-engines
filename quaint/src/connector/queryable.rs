@@ -82,7 +82,7 @@ pub trait Queryable: Send + Sync {
     }
 
     /// Execute an arbitrary function in the beginning of each transaction.
-    async fn server_reset_query(&self, _: &DefaultTransaction<'_>) -> crate::Result<()> {
+    async fn server_reset_query(&self, _: &dyn Transaction) -> crate::Result<()> {
         Ok(())
     }
 
