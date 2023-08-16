@@ -2,7 +2,7 @@ import * as planetScale from '@planetscale/database'
 import type { Config as PlanetScaleConfig } from '@planetscale/database'
 import { EventEmitter } from 'node:events'
 import { setImmediate } from 'node:timers/promises'
-import { binder, isConnectionUnhealthy, Debug } from '@jkomyno/prisma-js-connector-utils'
+import { binder, Debug } from '@jkomyno/prisma-js-connector-utils'
 import type { Connector, ResultSet, Query, ConnectorConfig } from '@jkomyno/prisma-js-connector-utils'
 import { type PlanetScaleColumnType, fieldToColumnType } from './conversion'
 
@@ -43,8 +43,6 @@ class PrismaPlanetScale implements Connector {
   
   private driver: TransactionCapableDriver
   private isRunning: boolean = true
-  private _isHealthy: boolean = true
-  private _version: string | undefined = undefined
   private txEmitter = new EventEmitter()
 
   constructor(config: PrismaPlanetScaleConfig) {
@@ -61,13 +59,6 @@ class PrismaPlanetScale implements Connector {
     if (this.isRunning) {
       this.isRunning = false
     }
-  }
-
-  /**
-   * Returns true, if connection is considered to be in a working state.
-   */
-  isHealthy(): boolean {
-    return this.isRunning && this._isHealthy
   }
 
   /**
@@ -158,22 +149,6 @@ class PrismaPlanetScale implements Connector {
   }
 
   /**
-   * Return the version of the underlying database, queried directly from the
-   * source. This corresponds to the `version()` function on PostgreSQL for
-   * example. The version string is returned directly without any form of
-   * parsing or normalization.
-   */
-  async version(): Promise<string | undefined> {
-    if (this._version) {
-      return Promise.resolve(this._version)
-    }
-
-    const { rows } = await this.performIO({ sql: 'SELECT @@version', args: [] })
-    this._version = rows[0]['@@version'] as string
-    return this._version
-  }
-
-  /**
    * Run a query against the database, returning the result set.
    * Should the query fail due to a connection error, the connection is
    * marked as unhealthy.
@@ -181,17 +156,7 @@ class PrismaPlanetScale implements Connector {
   private async performIO(query: Query) {
     const { sql, args: values } = query
 
-    try {
-      return await this.driver.client.execute(sql, values)
-    } catch (e) {
-      const error = e as Error & { code: string }
-      
-      if (isConnectionUnhealthy(error.code)) {
-        this._isHealthy = false
-      }
-
-      throw e
-    }
+    return await this.driver.client.execute(sql, values)
   }
 }
 

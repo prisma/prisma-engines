@@ -53,17 +53,6 @@ export type Connector = {
   executeRaw: (params: Query) => Promise<number>
 
   /**
-   * Return the version of the underlying database, queried directly from the
-   * source.
-   */
-  version: () => Promise<string | undefined>
-
-  /**
-   * Returns true, if connection is considered to be in a working state.
-   */
-  isHealthy: () => boolean
-
-  /**
    * Closes the connection to the database, if any.
    */
   close: () => Promise<void>
