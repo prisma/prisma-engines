@@ -1,4 +1,4 @@
-import { setImmediate, setTimeout } from 'node:timers/promises'
+import { setImmediate } from 'node:timers/promises'
 import type { Connector } from '@jkomyno/prisma-js-connector-utils'
 import type { QueryEngineInstance } from './engines/types/Library'
 import { initQueryEngine } from './util'
@@ -32,18 +32,16 @@ export async function smokeTest(db: Connector, prismaSchemaRelativePath: string)
   await engine.connect('trace')
   console.log('[nodejs] re-connecting')
 
-  await setTimeout(0)
-
   console.log('[nodejs] re-disconnecting...')
   await engine.disconnect('trace')
   console.log('[nodejs] re-disconnected')
 
   // Close the database connection. This is required to prevent the process from hanging.
   console.log('[nodejs] closing database connection...')
-  await db.close()
   console.log('[nodejs] closed database connection')
-
-  process.exit(0)
+ 
+  // await db.close()
+  // process.exit(0)
 }
 
 class SmokeTest {
