@@ -197,17 +197,12 @@
 <a href="#197" id="197">197</a>
 <a href="#198" id="198">198</a>
 <a href="#199" id="199">199</a>
-<a href="#200" id="200">200</a>
-<a href="#201" id="201">201</a>
-<a href="#202" id="202">202</a>
-<a href="#203" id="203">203</a>
-<a href="#204" id="204">204</a>
 </pre></div><pre class="rust"><code><span class="kw">use crate</span>::{
     error::into_quaint_error,
     proxy::{<span class="self">self</span>, Proxy, Query},
 };
 <span class="kw">use </span>async_trait::async_trait;
-<span class="kw">use </span>napi::JsObject;
+<span class="kw">use </span>napi::{Env, JsObject};
 <span class="kw">use </span>psl::datamodel_connector::Flavour;
 <span class="kw">use </span>quaint::{
     connector::IsolationLevel,
@@ -231,7 +226,6 @@
 /// into a `quaint::connector::result_set::ResultSet`. A quaint `ResultSet` is basically a vector
 /// of `quaint::Value` but said type is a tagged enum, with non-unit variants that cannot be converted to javascript as is.
 ///
-</span><span class="attr">#[derive(Clone)]
 </span><span class="kw">pub struct </span>JsQueryable {
     <span class="kw">pub</span>(<span class="kw">crate</span>) proxy: Proxy,
     <span class="kw">pub</span>(<span class="kw">crate</span>) flavour: Flavour,
@@ -397,13 +391,9 @@
 
 <span class="kw">impl </span>TransactionCapable <span class="kw">for </span>JsQueryable {}
 
-<span class="kw">impl </span>From&lt;JsObject&gt; <span class="kw">for </span>JsQueryable {
-    <span class="kw">fn </span>from(driver: JsObject) -&gt; <span class="self">Self </span>{
-        <span class="kw">let </span>driver = proxy::reify(driver).unwrap();
-        <span class="self">Self </span>{
-            flavour: driver.flavour.parse().unwrap(),
-            proxy: driver,
-        }
-    }
+<span class="kw">pub fn </span>from_napi(napi_env: <span class="kw-2">&amp;</span>Env, driver: JsObject) -&gt; JsQueryable {
+    <span class="kw">let </span>driver = proxy::reify(napi_env, driver).unwrap();
+    <span class="kw">let </span>flavour = driver.flavour.parse().unwrap();
+    JsQueryable::new(driver, flavour)
 }
 </code></pre></div></section></main></body></html>

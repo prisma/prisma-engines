@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"struct":["JsQueryable"]};
+window.SIDEBAR_ITEMS = {"fn":["from_napi"],"struct":["JsQueryable"]};
