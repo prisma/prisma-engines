@@ -63,7 +63,8 @@ impl PrismaContext {
 
             let url = data_source.load_url(|key| env::var(key).ok())?;
             // Load executor
-            let executor = load_executor(data_source, preview_features, &url).await?;
+            let connector_mode = psl::ConnectorMode::Rust;
+            let executor = load_executor(connector_mode, data_source, preview_features, &url).await?;
             executor.primary_connector().get_connection().await?;
             PrismaResult::<_>::Ok(executor)
         });

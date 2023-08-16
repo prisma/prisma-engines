@@ -30,7 +30,7 @@ use tracing::{info_span, Instrument};
 #[derive(Clone)]
 pub struct JsQueryable {
     pub(crate) proxy: Proxy,
-    pub(crate) flavour: Flavour,
+    pub flavour: Flavour,
 }
 
 impl JsQueryable {

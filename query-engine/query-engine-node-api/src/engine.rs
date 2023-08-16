@@ -27,6 +27,7 @@ use user_facing_errors::Error;
 /// The main query engine used by JS
 #[napi]
 pub struct QueryEngine {
+    connector_mode: psl::ConnectorMode,
     inner: RwLock<Inner>,
     logger: Logger,
 }
@@ -164,18 +165,25 @@ impl QueryEngine {
 
         let env = stringify_env_values(env)?; // we cannot trust anything JS sends us from process.env
         let overrides: Vec<(_, _)> = datasource_overrides.into_iter().collect();
+
         let mut schema = psl::validate(datamodel.into());
-        let config = &mut schema.configuration;
-        let provider_name = schema.connector.provider_name();
+        let mut connector_mode = psl::ConnectorMode::Rust;
 
         #[cfg(feature = "js-connectors")]
         if let Some(driver) = maybe_driver {
-            let queryable = js_connectors::JsQueryable::from(driver);
-            match sql_connector::register_js_connector(provider_name, Arc::new(queryable)) {
-                Ok(_) => tracing::info!("Registered js connector for {provider_name}"),
+            let js_queryable = js_connectors::JsQueryable::from(driver);
+            let provider_name = schema.connector.provider_name();
+
+            match sql_connector::register_js_connector(provider_name, Arc::new(js_queryable)) {
+                Ok(_) => {
+                    connector_mode = psl::ConnectorMode::Js;
+                    tracing::info!("Registered js connector for {provider_name}")
+                }
                 Err(err) => tracing::error!("Failed to registered js connector for {provider_name}. {err}"),
             }
         }
+
+        let config = &mut schema.configuration;
 
         schema
             .diagnostics
@@ -224,6 +232,7 @@ impl QueryEngine {
         }
 
         Ok(Self {
+            connector_mode,
             inner: RwLock::new(Inner::Builder(builder)),
             logger,
         })
@@ -266,7 +275,7 @@ impl QueryEngine {
                 let preview_features = arced_schema.configuration.preview_features();
 
                 let executor_fut = async {
-                    let executor = load_executor(data_source, preview_features, &url).await?;
+                    let executor = load_executor(self.connector_mode, data_source, preview_features, &url).await?;
                     let connector = executor.primary_connector();
 
                     let conn_span = tracing::info_span!(
