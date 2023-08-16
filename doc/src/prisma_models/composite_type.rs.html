@@ -20,8 +20,9 @@
 <a href="#20" id="20">20</a>
 <a href="#21" id="21">21</a>
 <a href="#22" id="22">22</a>
-</pre></div><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::Field;
-<span class="kw">use </span>psl::schema_ast::ast;
+<a href="#23" id="23">23</a>
+<a href="#24" id="24">24</a>
+</pre></div><pre class="rust"><code><span class="kw">use crate</span>::{ast, Field};
 
 <span class="kw">pub type </span>CompositeType = <span class="kw">crate</span>::Zipper&lt;ast::CompositeTypeId&gt;;
 
@@ -31,7 +32,10 @@
     }
 
     <span class="kw">pub fn </span>fields(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw">impl </span>Iterator&lt;Item = Field&gt; + <span class="lifetime">&#39;_ </span>{
-        <span class="self">self</span>.walker().fields().map(|f| Field::from((<span class="self">self</span>.dm.clone(), f)))
+        <span class="self">self</span>.walker()
+            .fields()
+            .filter(|f| !<span class="macro">matches!</span>(f.ast_field().field_type, ast::FieldType::Unsupported(..)))
+            .map(|f| Field::from((<span class="self">self</span>.dm.clone(), f)))
     }
 
     <span class="kw">pub fn </span>find_field(<span class="kw-2">&amp;</span><span class="self">self</span>, prisma_name: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Option</span>&lt;Field&gt; {
