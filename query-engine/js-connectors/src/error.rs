@@ -26,6 +26,7 @@ where
 
 /// catches a panic thrown during the execution of a closure and transforms it into a the Error
 /// variant of a napi::Result.
+#[allow(dead_code)]
 pub(crate) fn unwinding_panic<F, R>(f: F) -> napi::Result<R>
 where
     F: Fn() -> napi::Result<R>,
