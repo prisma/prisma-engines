@@ -143,6 +143,9 @@ start-cockroach_21_2_0_patched:
 dev-cockroach_21_2_0_patched: start-cockroach_21_2_0_patched
 	cp $(CONFIG_PATH)/cockroach_21_2_0_patched $(CONFIG_FILE)
 
+dev-js:
+	cp $(CONFIG_PATH)/js $(CONFIG_FILE)
+
 dev-pgbouncer:
 	docker compose -f docker-compose.yml up -d --remove-orphans pgbouncer postgres11
 
