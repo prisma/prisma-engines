@@ -5,7 +5,7 @@ use std::sync::{Arc, Condvar, Mutex};
 use crate::error::*;
 use napi::bindgen_prelude::{FromNapiValue, Promise as JsPromise, ToNapiValue};
 use napi::threadsafe_function::{ErrorStrategy, ThreadsafeFunction};
-use napi::{JsObject, JsString};
+use napi::{Env, JsObject, JsString};
 use napi_derive::napi;
 use quaint::connector::ResultSet as QuaintResultSet;
 use quaint::Value as QuaintValue;
@@ -18,7 +18,6 @@ use chrono::{NaiveDate, NaiveTime};
 /// Proxy is a struct wrapping a javascript object that exhibits basic primitives for
 /// querying and executing SQL (i.e. a client connector). The Proxy uses NAPI ThreadSafeFunction to
 /// invoke the code within the node runtime that implements the client connector.
-#[derive(Clone)]
 pub struct Proxy {
     /// Execute a query given as SQL, interpolating the given parameters.
     query_raw: ThreadsafeFunction<Query, ErrorStrategy::Fatal>,
@@ -48,13 +47,25 @@ pub struct Proxy {
 }
 
 /// Reify creates a Rust proxy to access the JS driver passed in as a parameter.
-pub fn reify(js_connector: JsObject) -> napi::Result<Proxy> {
-    let query_raw = js_connector.get_named_property("queryRaw")?;
-    let execute_raw = js_connector.get_named_property("executeRaw")?;
-    let version = js_connector.get_named_property("version")?;
-    let close: ThreadsafeFunction<(), ErrorStrategy::Fatal> = js_connector.get_named_property("close")?;
-    let is_healthy = js_connector.get_named_property("isHealthy")?;
+pub fn reify(napi_env: &Env, js_connector: JsObject) -> napi::Result<Proxy> {
+    let mut query_raw =
+        js_connector.get_named_property::<ThreadsafeFunction<Query, ErrorStrategy::Fatal>>("queryRaw")?;
+    let mut execute_raw =
+        js_connector.get_named_property::<ThreadsafeFunction<Query, ErrorStrategy::Fatal>>("executeRaw")?;
+    let mut version = js_connector.get_named_property::<ThreadsafeFunction<(), ErrorStrategy::Fatal>>("version")?;
+    let mut close = js_connector.get_named_property::<ThreadsafeFunction<(), ErrorStrategy::Fatal>>("close")?;
+    let mut is_healthy =
+        js_connector.get_named_property::<ThreadsafeFunction<(), ErrorStrategy::Fatal>>("isHealthy")?;
+
+    // Note: calling `unref` on every ThreadsafeFunction is necessary to avoid hanging the JS event loop.
+    query_raw.unref(napi_env)?;
+    execute_raw.unref(napi_env)?;
+    version.unref(napi_env)?;
+    close.unref(napi_env)?;
+    is_healthy.unref(napi_env)?;
+
     let flavour: JsString = js_connector.get_named_property("flavour")?;
+    let flavour: String = flavour.into_utf8()?.as_str()?.to_owned();
 
     let driver = Proxy {
         query_raw,
@@ -62,7 +73,7 @@ pub fn reify(js_connector: JsObject) -> napi::Result<Proxy> {
         version,
         close,
         is_healthy,
-        flavour: flavour.into_utf8()?.as_str()?.to_owned(),
+        flavour,
     };
     Ok(driver)
 }

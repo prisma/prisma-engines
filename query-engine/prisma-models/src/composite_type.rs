@@ -1,5 +1,4 @@
-use crate::Field;
-use psl::schema_ast::ast;
+use crate::{ast, Field};
 
 pub type CompositeType = crate::Zipper<ast::CompositeTypeId>;
 
@@ -9,7 +8,10 @@ impl CompositeType {
     }
 
     pub fn fields(&self) -> impl Iterator<Item = Field> + '_ {
-        self.walker().fields().map(|f| Field::from((self.dm.clone(), f)))
+        self.walker()
+            .fields()
+            .filter(|f| !matches!(f.ast_field().field_type, ast::FieldType::Unsupported(..)))
+            .map(|f| Field::from((self.dm.clone(), f)))
     }
 
     pub fn find_field(&self, prisma_name: &str) -> Option<Field> {

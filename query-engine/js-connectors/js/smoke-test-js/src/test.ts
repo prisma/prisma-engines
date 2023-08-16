@@ -38,12 +38,12 @@ export async function smokeTest(db: Connector, prismaSchemaRelativePath: string)
   await engine.disconnect('trace')
   console.log('[nodejs] re-disconnected')
 
-  // Close the database connection. This is required to prevent the process from hanging.
+  // Close the database connection.
   console.log('[nodejs] closing database connection...')
   await db.close()
   console.log('[nodejs] closed database connection')
-
-  process.exit(0)
+ 
+  // process.exit(0)
 }
 
 class SmokeTest {
@@ -54,8 +54,11 @@ class SmokeTest {
     await this.testFindManyTypeTestPostgres()
   }
 
-  @withFlavor({ only: ['mysql'] })
   private async testFindManyTypeTestMySQL() {
+    if (this.flavour !== 'mysql') {
+      return
+    }
+
     const resultSet = await this.engine.query(`
       {
         "action": "findMany",
@@ -92,8 +95,11 @@ class SmokeTest {
     return resultSet
   }
 
-  @withFlavor({ only: ['postgres'] })
   private async testFindManyTypeTestPostgres() {
+    if (this.flavour !== 'postgres') {
+      return
+    }
+
     const resultSet = await this.engine.query(`
       {
         "action": "findMany",
@@ -273,27 +279,5 @@ class SmokeTest {
       }
     `, 'trace', undefined)
     console.log('[nodejs] resultDeleteMany', JSON.stringify(JSON.parse(resultDeleteMany), null, 2))
-  }
-}
-
-type WithFlavorInput
-  = { only: Array<Flavor>, exclude?: never }
-  | { exclude: Array<Flavor>, only?: never }
-
-function withFlavor({ only, exclude }: WithFlavorInput) {
-  return function decorator(originalMethod: () => any, _ctx: ClassMethodDecoratorContext<SmokeTest, () => unknown>) {
-    return function replacement(this: SmokeTest) {
-      if ((exclude || []).includes(this.flavour)) {
-        console.log(`[nodejs::exclude] Skipping test "${originalMethod.name}" with flavour: ${this.flavour}`)
-        return
-      }
-
-      if ((only || []).length > 0 && !(only || []).includes(this.flavour)) {
-        console.log(`[nodejs::only] Skipping test "${originalMethod.name}" with flavour: ${this.flavour}`)
-        return
-      }
-
-      return originalMethod.call(this)
-    }
   }
 }

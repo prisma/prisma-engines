@@ -171,7 +171,7 @@ impl QueryEngine {
 
         #[cfg(feature = "js-connectors")]
         if let Some(driver) = maybe_driver {
-            let js_queryable = js_connectors::JsQueryable::from(driver);
+            let js_queryable = js_connectors::from_napi(&napi_env, driver);
             let provider_name = schema.connector.provider_name();
 
             match sql_connector::register_js_connector(provider_name, Arc::new(js_queryable)) {
