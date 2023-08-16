@@ -10,4 +10,4 @@
 mod error;
 mod proxy;
 mod queryable;
-pub use queryable::JsQueryable;
+pub use queryable::{from_napi, JsQueryable};

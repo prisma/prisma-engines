@@ -3,7 +3,7 @@ use crate::{
     proxy::{self, Proxy, Query},
 };
 use async_trait::async_trait;
-use napi::JsObject;
+use napi::{Env, JsObject};
 use psl::datamodel_connector::Flavour;
 use quaint::{
     connector::IsolationLevel,
@@ -27,7 +27,6 @@ use tracing::{info_span, Instrument};
 /// into a `quaint::connector::result_set::ResultSet`. A quaint `ResultSet` is basically a vector
 /// of `quaint::Value` but said type is a tagged enum, with non-unit variants that cannot be converted to javascript as is.
 ///
-#[derive(Clone)]
 pub struct JsQueryable {
     pub(crate) proxy: Proxy,
     pub(crate) flavour: Flavour,
@@ -193,12 +192,8 @@ impl JsQueryable {
 
 impl TransactionCapable for JsQueryable {}
 
-impl From<JsObject> for JsQueryable {
-    fn from(driver: JsObject) -> Self {
-        let driver = proxy::reify(driver).unwrap();
-        Self {
-            flavour: driver.flavour.parse().unwrap(),
-            proxy: driver,
-        }
-    }
+pub fn from_napi(napi_env: &Env, driver: JsObject) -> JsQueryable {
+    let driver = proxy::reify(napi_env, driver).unwrap();
+    let flavour = driver.flavour.parse().unwrap();
+    JsQueryable::new(driver, flavour)
 }
