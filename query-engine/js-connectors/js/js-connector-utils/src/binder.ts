@@ -6,8 +6,6 @@ import type { Connector } from './types';
 export const binder = (queryable: Connector): Connector => ({
   queryRaw: queryable.queryRaw.bind(queryable),
   executeRaw: queryable.executeRaw.bind(queryable),
-  version: queryable.version.bind(queryable),
-  isHealthy: queryable.isHealthy.bind(queryable),
   close: queryable.close.bind(queryable),
   flavour: queryable.flavour,
 })

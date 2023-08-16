@@ -84,13 +84,13 @@ impl QuaintQueryable for JsBaseQueryable {
     }
 
     async fn version(&self) -> quaint::Result<Option<String>> {
-        // Todo: convert napi::Error to quaint::error::Error.
-        let version = self.proxy.version().await.unwrap();
-        Ok(version)
+        // Note: JS Connectors don't use this method.
+        Ok(None)
     }
 
     fn is_healthy(&self) -> bool {
-        self.proxy.is_healthy().unwrap_or(false)
+        // Note: JS Connectors don't use this method.
+        true
     }
 
     /// Sets the transaction isolation level to given value.

@@ -1,6 +1,5 @@
 use core::panic;
 use std::str::FromStr;
-use std::sync::{Arc, Condvar, Mutex};
 
 use crate::error::*;
 use crate::transaction::JsTransaction;
@@ -27,20 +26,9 @@ pub struct CommonProxy {
     /// returning the number of affected rows.
     execute_raw: ThreadsafeFunction<Query, ErrorStrategy::Fatal>,
 
-    /// Return the version of the underlying database, queried directly from the
-    /// source.
-    version: ThreadsafeFunction<(), ErrorStrategy::Fatal>,
-
     /// Closes the underlying database connection.
     #[allow(dead_code)]
     close: ThreadsafeFunction<(), ErrorStrategy::Fatal>,
-
-    /// Return true iff the underlying database connection is healthy.
-    /// Note: we already attempted turning `is_healthy` into just a `JsFunction`
-    /// (which would result in a simpler `call` API), but any call to it panics,
-    /// and `unsafe impl Send/Sync` for `Proxy` become necessary.
-    /// Moreover, `JsFunction` is not `Clone`.
-    is_healthy: ThreadsafeFunction<(), ErrorStrategy::Fatal>,
 
     /// Return the flavour for this driver.
     pub(crate) flavour: String,
@@ -315,17 +303,13 @@ impl CommonProxy {
     pub fn new(object: &JsObject, env: &Env) -> napi::Result<Self> {
         let query_raw = object.get_named_property("queryRaw")?;
         let execute_raw = object.get_named_property("executeRaw")?;
-        let version = object.get_named_property("version")?;
-        let close: ThreadsafeFunction<(), ErrorStrategy::Fatal> = object.get_named_property("close")?;
-        let is_healthy = object.get_named_property("isHealthy")?;
+        let close = object.get_named_property("close")?;
         let flavour: JsString = object.get_named_property("flavour")?;
 
         let mut result = Self {
             query_raw,
             execute_raw,
-            version,
             close,
-            is_healthy,
             flavour: flavour.into_utf8()?.as_str()?.to_owned(),
         };
 
@@ -356,50 +340,9 @@ impl CommonProxy {
         .await
     }
 
-    pub async fn version(&self) -> napi::Result<Option<String>> {
-        async_unwinding_panic(async {
-            let version = self.version.call_async::<Option<String>>(()).await?;
-            Ok(version)
-        })
-        .await
-    }
-
     #[allow(dead_code)]
     pub async fn close(&self) -> napi::Result<()> {
         async_unwinding_panic(async { self.close.call_async::<()>(()).await }).await
-    }
-
-    pub fn is_healthy(&self) -> napi::Result<bool> {
-        unwinding_panic(|| {
-            let result_arc = Arc::new((Mutex::new(None), Condvar::new()));
-            let result_arc_clone: Arc<(Mutex<Option<bool>>, Condvar)> = result_arc.clone();
-
-            let set_value_callback = move |value: bool| {
-                let (lock, cvar) = &*result_arc_clone;
-                let mut result_guard = lock.lock().unwrap();
-                *result_guard = Some(value);
-                cvar.notify_one();
-
-                Ok(())
-            };
-
-            // Should anyone find a less mind-boggling way to retrieve the result of a synchronous JS
-            // function, please do so.
-            self.is_healthy.call_with_return_value(
-                (),
-                napi::threadsafe_function::ThreadsafeFunctionCallMode::Blocking,
-                set_value_callback,
-            );
-
-            // wait for `set_value_callback` to be called and to set the result
-            let (lock, cvar) = &*result_arc;
-            let mut result_guard = lock.lock().unwrap();
-            while result_guard.is_none() {
-                result_guard = cvar.wait(result_guard).unwrap();
-            }
-
-            Ok(result_guard.unwrap_or_default())
-        })
     }
 }
 

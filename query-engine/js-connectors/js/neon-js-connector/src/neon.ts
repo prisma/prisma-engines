@@ -1,7 +1,7 @@
 import { Client, neon, neonConfig } from '@neondatabase/serverless'
 import type { NeonConfig, NeonQueryFunction } from '@neondatabase/serverless'
 import ws from 'ws'
-import { binder, isConnectionUnhealthy, Debug } from '@jkomyno/prisma-js-connector-utils'
+import { binder, Debug } from '@jkomyno/prisma-js-connector-utils'
 import type { Connector, ResultSet, Query, ConnectorConfig } from '@jkomyno/prisma-js-connector-utils'
 import { fieldToColumnType } from './conversion'
 
@@ -48,8 +48,6 @@ class PrismaNeon implements Connector {
   private driver: ModeSpecificDriver
   private isRunning: boolean = true
   private inTransaction: boolean = false
-  private _isHealthy: boolean = true
-  private _version: string | undefined = undefined
 
   constructor(config: PrismaNeonConfig) {
     const { url: connectionString, httpMode, ...rest } = config
@@ -75,13 +73,6 @@ class PrismaNeon implements Connector {
       }
       this.isRunning = false
     }
-  }
-
-  /**
-   * Returns true, if connection is considered to be in a working state.
-   */
-  isHealthy(): boolean {
-    return this.isRunning && this._isHealthy
   }
 
   /**
@@ -146,22 +137,6 @@ class PrismaNeon implements Connector {
   }
 
   /**
-   * Return the version of the underlying database, queried directly from the
-   * source. This corresponds to the `version()` function on PostgreSQL for
-   * example. The version string is returned directly without any form of
-   * parsing or normalization.
-   */
-  async version(): Promise<string | undefined> {
-    if (this._version) {
-      return Promise.resolve(this._version)
-    }
-
-    const { rows } = await this.performIO({ sql: 'SELECT VERSION()', args: [] })
-    this._version = rows[0]['version'] as string
-    return this._version
-  }
-
-  /**
    * Run a query against the database, returning the result set.
    * Should the query fail due to a connection error, the connection is
    * marked as unhealthy.
@@ -169,20 +144,10 @@ class PrismaNeon implements Connector {
   private async performIO(query: Query) {
     const { sql, args: values } = query
 
-    try {
-      if (this.driver.mode === 'ws') {
-        return await this.driver.client.query(sql, values)
-      } else {
-        return await this.driver.client(sql, values)
-      }
-    } catch (e) {
-      const error = e as Error & { code: string }
-
-      if (isConnectionUnhealthy(error.code)) {
-        this._isHealthy = false
-      }
-
-      throw e
+    if (this.driver.mode === 'ws') {
+      return await this.driver.client.query(sql, values)
+    } else {
+      return await this.driver.client(sql, values)
     }
   }
 }
