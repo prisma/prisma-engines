@@ -309,9 +309,6 @@ impl CommonProxy {
 
         result.query_raw.unref(env)?;
         result.execute_raw.unref(env)?;
-        result.version.unref(env)?;
-        result.close.unref(env)?;
-        result.is_healthy.unref(env)?;
 
         Ok(result)
     }

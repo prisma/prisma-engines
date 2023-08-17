@@ -11,38 +11,8 @@ const debug = Debug('prisma:js-connector:neon')
 
 export type PrismaNeonConfig = ConnectorConfig & Partial<Omit<NeonConfig, 'connectionString'>> & { httpMode?: boolean }
 
-const TRANSACTION_BEGIN = 'BEGIN'
-const TRANSACTION_COMMIT = 'COMMIT'
-const TRANSACTION_ROLLBACK = 'ROLLBACK'
-
 type ARRAY_MODE_DISABLED = false
 type FULL_RESULTS_ENABLED = true
-
-
-type ModeSpecificDriver
-  = {
-    /**
-     * Indicates that we're using the HTTP mode.
-     */
-    mode: 'http'
-
-    /**
-     * The Neon HTTP client, without transaction support.
-     */
-    client: NeonQueryFunction<ARRAY_MODE_DISABLED, FULL_RESULTS_ENABLED>
-  }
-  | {
-    /**
-     * Indicates that we're using the WebSocket mode.
-     */
-    mode: 'ws'
-
-    /**
-     * The standard Neon client, with transaction support.
-     */
-    client: Client
-  }
-
 
 type PerformIOResult = QueryResult<any> | FullQueryResults<ARRAY_MODE_DISABLED> 
 
@@ -113,6 +83,7 @@ class NeonTransaction extends NeonWsQueryable<PoolClient> implements Transaction
 }
 
 class NeonWsConnector extends NeonWsQueryable<Pool> implements Connector {
+  private isRunning = true
   constructor(config: PrismaNeonConfig) {
     const { url: connectionString, httpMode, ...rest } = config
     super(new Pool({ connectionString, ...rest }))
@@ -122,10 +93,18 @@ class NeonWsConnector extends NeonWsQueryable<Pool> implements Connector {
     const connection = await this.client.connect()
     await connection.query('BEGIN')
     if (isolationLevel) {
-      await connection.query('SET TRANSACTION ISOLATION LEVEL $1', [isolationLevel])
+      await connection.query(`SET TRANSACTION ISOLATION LEVEL ${isolationLevel}`)
     }
 
     return bindTransaction(new NeonTransaction(connection))
+  }
+
+  async close() {
+    this.client.on('error', e => console.log(e))
+    if (this.isRunning) {
+      await this.client.end()
+      this.isRunning = false
+    }
   }
 }
 
@@ -146,6 +125,8 @@ class NeonHttpConnector extends NeonQueryable implements Connector {
   startTransaction(): Promise<Transaction> {
     throw new Error('Transactions are not supported in HTTP mod')
   }
+
+  async close() {}
 
 }
 

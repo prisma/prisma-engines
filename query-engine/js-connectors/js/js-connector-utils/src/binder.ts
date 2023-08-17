@@ -7,7 +7,8 @@ export const bindConnector = (connector: Connector): Connector => ({
   queryRaw: connector.queryRaw.bind(connector),
   executeRaw: connector.executeRaw.bind(connector),
   flavour: connector.flavour,
-  startTransaction: connector.startTransaction.bind(connector)
+  startTransaction: connector.startTransaction.bind(connector),
+  close: connector.close.bind(connector)
 })
 
 export const bindTransaction = (transaction: Transaction): Transaction => {

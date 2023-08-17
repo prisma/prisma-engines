@@ -123,6 +123,8 @@ class PrismaPlanetScale extends PlanetScaleQueryable<planetScale.Connection> imp
       });
     })
   }
+
+  async close() {}
 }
 
 export const createPlanetScaleConnector = (config: PrismaPlanetScaleConfig): Connector => {
