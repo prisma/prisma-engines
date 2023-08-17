@@ -1,8 +1,5 @@
 use crate::postgres_datamodel_connector;
-use psl_core::{
-    datamodel_connector::{Flavour, RelationMode},
-    js_connector::JsConnector,
-};
+use psl_core::{datamodel_connector::Flavour, js_connector::JsConnector};
 
 pub(crate) static NEON_SERVERLESS: JsConnector = JsConnector {
     flavour: Flavour::Postgres,
@@ -10,6 +7,5 @@ pub(crate) static NEON_SERVERLESS: JsConnector = JsConnector {
 
     provider_name: "@prisma/neon",
     name: "neon serverless (pg-compatible)",
-    enforced_relation_mode: Some(RelationMode::Prisma),
     allowed_protocols: Some(&["postgres"]),
 };
