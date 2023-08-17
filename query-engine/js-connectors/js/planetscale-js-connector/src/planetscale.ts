@@ -104,7 +104,7 @@ class PrismaPlanetScale extends PlanetScaleQueryable<planetScale.Connection> imp
     return new Promise<Transaction>((resolve) => {
       const txResultPromise = this.client.transaction(async tx => {
         if (isolationLevel) {
-          await tx.execute('SET TRANSACTION ISOLATION LEVEL ?', [isolationLevel])
+          await tx.execute(`SET TRANSACTION ISOLATION LEVEL ${isolationLevel}`)
         }
         const [txDeferred, deferredPromise] = createDeferred<void>()
         const txWrapper = new PlanetScaleTransaction(tx, txDeferred, txResultPromise)
