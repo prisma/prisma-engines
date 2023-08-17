@@ -8,7 +8,7 @@ use connector_interface::{
 };
 use once_cell::sync::Lazy;
 use quaint::{
-    connector::IsolationLevel,
+    connector::{IsolationLevel, Transaction},
     prelude::{Queryable as QuaintQueryable, *},
 };
 use std::{
@@ -32,7 +32,7 @@ fn registered_js_connector(provider: &str) -> connector::Result<JsConnector> {
         .map(|conn_ref| conn_ref.to_owned())
 }
 
-pub fn register_js_connector(provider: &str, connector: Arc<dyn QuaintQueryable>) -> Result<(), String> {
+pub fn register_js_connector(provider: &str, connector: Arc<dyn TransactionCapable>) -> Result<(), String> {
     let mut lock = REGISTRY.lock().unwrap();
     let entry = lock.entry(provider.to_string());
     match entry {
@@ -128,7 +128,7 @@ impl Connector for Js {
 // in this object, and implementing TransactionCapable (and quaint::Queryable) explicitly for it.
 #[derive(Clone)]
 struct JsConnector {
-    connector: Arc<dyn QuaintQueryable>,
+    connector: Arc<dyn TransactionCapable>,
 }
 
 #[async_trait]
@@ -183,4 +183,12 @@ impl QuaintQueryable for JsConnector {
     }
 }
 
-impl TransactionCapable for JsConnector {}
+#[async_trait]
+impl TransactionCapable for JsConnector {
+    async fn start_transaction<'a>(
+        &'a self,
+        isolation: Option<IsolationLevel>,
+    ) -> quaint::Result<Box<dyn Transaction + 'a>> {
+        self.connector.start_transaction(isolation).await
+    }
+}

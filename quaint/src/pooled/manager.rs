@@ -6,7 +6,7 @@ use crate::connector::MysqlUrl;
 use crate::connector::PostgresUrl;
 use crate::{
     ast,
-    connector::{self, IsolationLevel, Queryable, Transaction, TransactionCapable},
+    connector::{self, impl_default_TransactionCapable, IsolationLevel, Queryable, Transaction, TransactionCapable},
     error::Error,
 };
 use async_trait::async_trait;
@@ -18,7 +18,7 @@ pub struct PooledConnection {
     pub(crate) inner: MobcPooled<QuaintManager>,
 }
 
-impl TransactionCapable for PooledConnection {}
+impl_default_TransactionCapable!(PooledConnection);
 
 #[async_trait]
 impl Queryable for PooledConnection {

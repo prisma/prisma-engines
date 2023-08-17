@@ -32,8 +32,8 @@ export type Query = {
   args: Array<unknown>
 }
 
-export type Connector = {
-  readonly flavour: 'mysql' | 'postgres',
+export interface Queryable  {
+  readonly flavour: 'mysql' | 'postgres'
 
   /**
    * Execute a query given as SQL, interpolating the given parameters,
@@ -41,7 +41,7 @@ export type Connector = {
    * 
    * This is the preferred way of executing `SELECT` queries.
    */
-  queryRaw: (params: Query) => Promise<ResultSet>
+  queryRaw(params: Query): Promise<ResultSet>
 
   /**
    * Execute a query given as SQL, interpolating the given parameters,
@@ -50,12 +50,26 @@ export type Connector = {
    * This is the preferred way of executing `INSERT`, `UPDATE`, `DELETE` queries,
    * as well as transactional queries.
    */
-  executeRaw: (params: Query) => Promise<number>
+  executeRaw(params: Query): Promise<number>
+}
 
+export interface Connector extends Queryable {
   /**
-   * Closes the connection to the database, if any.
+   * Starts new transation with the specified isolation level
+   * @param isolationLevel 
    */
-  close: () => Promise<void>
+  startTransaction(isolationLevel?: string): Promise<Transaction>
+}
+
+export interface Transaction extends Queryable {
+  /**
+   * Commit the transaction
+   */
+  commit(): Promise<void>
+  /**
+   * Roll back the transaction
+   */
+  rollback(): Promise<void>
 }
 
 /**

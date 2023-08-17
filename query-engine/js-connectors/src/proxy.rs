@@ -26,10 +26,6 @@ pub struct CommonProxy {
     /// returning the number of affected rows.
     execute_raw: ThreadsafeFunction<Query, ErrorStrategy::Fatal>,
 
-    /// Closes the underlying database connection.
-    #[allow(dead_code)]
-    close: ThreadsafeFunction<(), ErrorStrategy::Fatal>,
-
     /// Return the flavour for this driver.
     pub(crate) flavour: String,
 }
@@ -303,13 +299,11 @@ impl CommonProxy {
     pub fn new(object: &JsObject, env: &Env) -> napi::Result<Self> {
         let query_raw = object.get_named_property("queryRaw")?;
         let execute_raw = object.get_named_property("executeRaw")?;
-        let close = object.get_named_property("close")?;
         let flavour: JsString = object.get_named_property("flavour")?;
 
         let mut result = Self {
             query_raw,
             execute_raw,
-            close,
             flavour: flavour.into_utf8()?.as_str()?.to_owned(),
         };
 
@@ -339,16 +333,11 @@ impl CommonProxy {
         })
         .await
     }
-
-    #[allow(dead_code)]
-    pub async fn close(&self) -> napi::Result<()> {
-        async_unwinding_panic(async { self.close.call_async::<()>(()).await }).await
-    }
 }
 
 impl DriverProxy {
     pub fn new(js_connector: &JsObject, env: &Env) -> napi::Result<Self> {
-        let start_transaction = js_connector.get_named_property("starTransaction")?;
+        let start_transaction = js_connector.get_named_property("startTransaction")?;
         let mut result = Self { start_transaction };
         result.start_transaction.unref(env)?;
 
@@ -383,10 +372,18 @@ impl TransactionProxy {
     }
 
     pub async fn commit(&self) -> napi::Result<()> {
-        async_unwinding_panic(self.commit.call_async(())).await
+        async_unwinding_panic(async move {
+            let promise = self.commit.call_async::<JsPromise<()>>(()).await?;
+            promise.await
+        })
+        .await
     }
     pub async fn rollback(&self) -> napi::Result<()> {
-        async_unwinding_panic(self.rollback.call_async(())).await
+        async_unwinding_panic(async move {
+            let promise = self.rollback.call_async::<JsPromise<()>>(()).await?;
+            promise.await
+        })
+        .await
     }
 }
 

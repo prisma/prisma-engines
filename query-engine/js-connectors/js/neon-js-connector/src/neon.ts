@@ -1,7 +1,7 @@
 import { Client, neon, neonConfig } from '@neondatabase/serverless'
 import type { NeonConfig, NeonQueryFunction } from '@neondatabase/serverless'
 import ws from 'ws'
-import { binder, Debug } from '@jkomyno/prisma-js-connector-utils'
+import { bindConnector, Debug } from '@jkomyno/prisma-js-connector-utils'
 import type { Connector, ResultSet, Query, ConnectorConfig } from '@jkomyno/prisma-js-connector-utils'
 import { fieldToColumnType } from './conversion'
 
@@ -73,6 +73,10 @@ class PrismaNeon implements Connector {
       }
       this.isRunning = false
     }
+  }
+
+  async startTransaction(isolationLevel?: string) {
+    return {} as any
   }
 
   /**
@@ -154,5 +158,5 @@ class PrismaNeon implements Connector {
 
 export const createNeonConnector = (config: PrismaNeonConfig): Connector => {
   const db = new PrismaNeon(config)
-  return binder(db)
+  return bindConnector(db)
 }

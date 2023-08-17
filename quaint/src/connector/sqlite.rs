@@ -167,7 +167,7 @@ impl Sqlite {
     }
 }
 
-impl TransactionCapable for Sqlite {}
+impl_default_TransactionCapable!(Sqlite);
 
 #[async_trait]
 impl Queryable for Sqlite {

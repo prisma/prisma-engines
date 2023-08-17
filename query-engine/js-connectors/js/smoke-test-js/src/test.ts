@@ -37,13 +37,6 @@ export async function smokeTest(db: Connector, prismaSchemaRelativePath: string)
   console.log('[nodejs] re-disconnecting...')
   await engine.disconnect('trace')
   console.log('[nodejs] re-disconnected')
-
-  // Close the database connection.
-  console.log('[nodejs] closing database connection...')
-  await db.close()
-  console.log('[nodejs] closed database connection')
- 
-  // process.exit(0)
 }
 
 class SmokeTest {
