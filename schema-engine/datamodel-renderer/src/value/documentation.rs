@@ -5,8 +5,16 @@ use std::{borrow::Cow, fmt};
 pub struct Documentation<'a>(pub(crate) Cow<'a, str>);
 
 impl<'a> Documentation<'a> {
-    pub(crate) fn push(&mut self, docs: impl Into<Cow<'a, str>>) {
-        self.0 = Cow::Owned(format!("{}\n{}", self.0, docs.into()));
+    pub(crate) fn push(&mut self, docs: Cow<'a, str>) {
+        match &mut self.0 {
+            Cow::Owned(d) => {
+                d.push('\n');
+                d.push_str(docs.as_ref());
+            }
+            Cow::Borrowed(existing) => {
+                self.0 = Cow::Owned(format!("{existing}\n{}", docs));
+            }
+        }
     }
 }
 
