@@ -9,15 +9,8 @@
 <a href="#9" id="9">9</a>
 <a href="#10" id="10">10</a>
 <a href="#11" id="11">11</a>
-<a href="#12" id="12">12</a>
-<a href="#13" id="13">13</a>
-<a href="#14" id="14">14</a>
-<a href="#15" id="15">15</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::mysql_datamodel_connector;
-<span class="kw">use </span>psl_core::{
-    datamodel_connector::{Flavour, RelationMode},
-    js_connector::JsConnector,
-};
+<span class="kw">use </span>psl_core::{datamodel_connector::Flavour, js_connector::JsConnector};
 
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">static </span>PLANETSCALE_SERVERLESS: JsConnector = JsConnector {
     flavour: Flavour::Mysql,
@@ -25,7 +18,6 @@
 
     provider_name: <span class="string">&quot;@prisma/planetscale&quot;</span>,
     name: <span class="string">&quot;planetscale serverless&quot;</span>,
-    enforced_relation_mode: <span class="prelude-val">Some</span>(RelationMode::Prisma),
     allowed_protocols: <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span>[<span class="string">&quot;mysql&quot;</span>, <span class="string">&quot;https&quot;</span>, <span class="string">&quot;mysqls&quot;</span>]),
 };
 </code></pre></div></section></main></body></html>

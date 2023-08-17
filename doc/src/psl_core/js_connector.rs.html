@@ -123,15 +123,6 @@
 <a href="#123" id="123">123</a>
 <a href="#124" id="124">124</a>
 <a href="#125" id="125">125</a>
-<a href="#126" id="126">126</a>
-<a href="#127" id="127">127</a>
-<a href="#128" id="128">128</a>
-<a href="#129" id="129">129</a>
-<a href="#130" id="130">130</a>
-<a href="#131" id="131">131</a>
-<a href="#132" id="132">132</a>
-<a href="#133" id="133">133</a>
-<a href="#134" id="134">134</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::datamodel_connector::<span class="kw-2">*</span>;
 <span class="kw">use </span>enumflags2::BitFlags;
 
@@ -153,7 +144,6 @@
 
     <span class="kw">pub </span>provider_name: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str,
     <span class="kw">pub </span>name: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str,
-    <span class="kw">pub </span>enforced_relation_mode: <span class="prelude-ty">Option</span>&lt;RelationMode&gt;,
     <span class="kw">pub </span>allowed_protocols: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>[<span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str]&gt;,
 }
 
@@ -247,19 +237,11 @@
     }
 
     <span class="kw">fn </span>default_relation_mode(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; RelationMode {
-        <span class="kw">if let </span><span class="prelude-val">Some</span>(relation_mode) = <span class="self">self</span>.enforced_relation_mode {
-            relation_mode
-        } <span class="kw">else </span>{
-            <span class="self">self</span>.canonical_connector.default_relation_mode()
-        }
+        <span class="self">self</span>.canonical_connector.default_relation_mode()
     }
 
     <span class="kw">fn </span>allowed_relation_mode_settings(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; BitFlags&lt;RelationMode&gt; {
-        <span class="kw">if let </span><span class="prelude-val">Some</span>(relation_mode) = <span class="self">self</span>.enforced_relation_mode {
-            BitFlags::from(relation_mode)
-        } <span class="kw">else </span>{
-            <span class="self">self</span>.canonical_connector.allowed_relation_mode_settings()
-        }
+        <span class="self">self</span>.canonical_connector.allowed_relation_mode_settings()
     }
 
     <span class="kw">fn </span>flavour(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Flavour {
