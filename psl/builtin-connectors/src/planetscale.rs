@@ -1,8 +1,5 @@
 use crate::mysql_datamodel_connector;
-use psl_core::{
-    datamodel_connector::{Flavour, RelationMode},
-    js_connector::JsConnector,
-};
+use psl_core::{datamodel_connector::Flavour, js_connector::JsConnector};
 
 pub(crate) static PLANETSCALE_SERVERLESS: JsConnector = JsConnector {
     flavour: Flavour::Mysql,
@@ -10,6 +7,5 @@ pub(crate) static PLANETSCALE_SERVERLESS: JsConnector = JsConnector {
 
     provider_name: "@prisma/planetscale",
     name: "planetscale serverless",
-    enforced_relation_mode: Some(RelationMode::Prisma),
     allowed_protocols: Some(&["mysql", "https", "mysqls"]),
 };
