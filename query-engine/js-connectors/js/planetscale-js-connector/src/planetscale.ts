@@ -9,6 +9,17 @@ const debug = Debug('prisma:js-connector:planetscale')
 
 export type PrismaPlanetScaleConfig = ConnectorConfig & Partial<PlanetScaleConfig>
 
+class RollbackError extends Error {
+  constructor() {
+    super('ROLLBACK')
+    this.name = 'RollbackError'
+
+    if (Error.captureStackTrace) {
+      Error.captureStackTrace(this, RollbackError);
+    }
+  }
+}
+
 
 class PlanetScaleQueryable<ClientT extends planetScale.Connection | planetScale.Transaction> implements Queryable {
   readonly flavour = 'mysql'
@@ -75,11 +86,8 @@ class PlanetScaleTransaction extends PlanetScaleQueryable<planetScale.Transactio
   rollback(): Promise<void> {
     const tag = '[js::rollback]'
     debug(`${tag} rolling back the transaction`)
-    this.txDeferred.reject('rollback')
-    return this.txResultPromise.then(value => {
-      console.log({ value })
-      return value
-    });
+    this.txDeferred.reject(new RollbackError())
+    return this.txResultPromise;
   }
 
 }
@@ -104,6 +112,14 @@ class PrismaPlanetScale extends PlanetScaleQueryable<planetScale.Connection> imp
         resolve(bindTransaction(txWrapper));
 
         return deferredPromise
+      }).catch(error => {
+        // Rollback error is ignored (so that tx.rollback() won't crash)
+        // any other error is legit and is re-thrown
+        if (!(error instanceof RollbackError)) {
+          return Promise.reject(error)
+        }
+        
+        return undefined
       });
     })
   }
