@@ -1,4 +1,5 @@
 mod cockroachdb;
+mod js;
 mod mongodb;
 mod mysql;
 mod postgres;
@@ -6,6 +7,8 @@ mod sql_server;
 mod sqlite;
 mod vitess;
 
+pub use js::*;
+pub use mongodb::*;
 pub use mysql::*;
 
 pub(crate) use cockroachdb::*;
