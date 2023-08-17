@@ -377,6 +377,18 @@
 <a href="#377" id="377">377</a>
 <a href="#378" id="378">378</a>
 <a href="#379" id="379">379</a>
+<a href="#380" id="380">380</a>
+<a href="#381" id="381">381</a>
+<a href="#382" id="382">382</a>
+<a href="#383" id="383">383</a>
+<a href="#384" id="384">384</a>
+<a href="#385" id="385">385</a>
+<a href="#386" id="386">386</a>
+<a href="#387" id="387">387</a>
+<a href="#388" id="388">388</a>
+<a href="#389" id="389">389</a>
+<a href="#390" id="390">390</a>
+<a href="#391" id="391">391</a>
 </pre></div><pre class="rust"><code><span class="kw">mod </span>relation;
 
 <span class="kw">pub use </span>relation::Relation;
@@ -438,8 +450,9 @@
         }
     }
 
-    <span class="doccomment">/// Documentation of the model. If called repeteadly,
-    /// adds the new docs to the end with a newline.
+    <span class="doccomment">/// Documentation of the model. If called repeatedly, adds the new docs to the end with a
+    /// newline. This method is also responsible for avoiding to add the same comment twice (mainly
+    /// in reintrospection).
     ///
     /// ```ignore
     /// /// This is the documentation.
@@ -447,10 +460,21 @@
     ///   ....
     /// }
     /// ```
-    </span><span class="kw">pub fn </span>documentation(<span class="kw-2">&amp;mut </span><span class="self">self</span>, documentation: <span class="kw">impl </span>Into&lt;Cow&lt;<span class="lifetime">&#39;a</span>, str&gt;&gt;) {
+    </span><span class="kw">pub fn </span>documentation(<span class="kw-2">&amp;mut </span><span class="self">self</span>, new_documentation: <span class="kw">impl </span>Into&lt;Cow&lt;<span class="lifetime">&#39;a</span>, str&gt;&gt;) {
+        <span class="kw">let </span>new_documentation: Cow&lt;<span class="lifetime">&#39;_</span>, str&gt; = new_documentation.into();
+
+        <span class="kw">if </span><span class="self">self
+            </span>.documentation
+            .as_ref()
+            .map(|d| d.<span class="number">0</span>.contains(new_documentation.as_ref()))
+            .unwrap_or_default()
+        {
+            <span class="kw">return</span>;
+        }
+
         <span class="kw">match </span><span class="self">self</span>.documentation.as_mut() {
-            <span class="prelude-val">Some</span>(docs) =&gt; docs.push(documentation),
-            <span class="prelude-val">None </span>=&gt; <span class="self">self</span>.documentation = <span class="prelude-val">Some</span>(Documentation(documentation.into())),
+            <span class="prelude-val">Some</span>(documentation) =&gt; documentation.push(new_documentation),
+            <span class="prelude-val">None </span>=&gt; <span class="self">self</span>.documentation = <span class="prelude-val">Some</span>(Documentation(new_documentation)),
         }
     }
 

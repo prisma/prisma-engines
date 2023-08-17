@@ -26,6 +26,14 @@
 <a href="#26" id="26">26</a>
 <a href="#27" id="27">27</a>
 <a href="#28" id="28">28</a>
+<a href="#29" id="29">29</a>
+<a href="#30" id="30">30</a>
+<a href="#31" id="31">31</a>
+<a href="#32" id="32">32</a>
+<a href="#33" id="33">33</a>
+<a href="#34" id="34">34</a>
+<a href="#35" id="35">35</a>
+<a href="#36" id="36">36</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::{borrow::Cow, fmt};
 
 <span class="doccomment">/// A documentation block on top of an item in the PSL.
@@ -33,8 +41,16 @@
 </span><span class="kw">pub struct </span>Documentation&lt;<span class="lifetime">&#39;a</span>&gt;(<span class="kw">pub</span>(<span class="kw">crate</span>) Cow&lt;<span class="lifetime">&#39;a</span>, str&gt;);
 
 <span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; Documentation&lt;<span class="lifetime">&#39;a</span>&gt; {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>push(<span class="kw-2">&amp;mut </span><span class="self">self</span>, docs: <span class="kw">impl </span>Into&lt;Cow&lt;<span class="lifetime">&#39;a</span>, str&gt;&gt;) {
-        <span class="self">self</span>.<span class="number">0 </span>= Cow::Owned(<span class="macro">format!</span>(<span class="string">&quot;{}\n{}&quot;</span>, <span class="self">self</span>.<span class="number">0</span>, docs.into()));
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>push(<span class="kw-2">&amp;mut </span><span class="self">self</span>, docs: Cow&lt;<span class="lifetime">&#39;a</span>, str&gt;) {
+        <span class="kw">match </span><span class="kw-2">&amp;mut </span><span class="self">self</span>.<span class="number">0 </span>{
+            Cow::Owned(d) =&gt; {
+                d.push(<span class="string">&#39;\n&#39;</span>);
+                d.push_str(docs.as_ref());
+            }
+            Cow::Borrowed(existing) =&gt; {
+                <span class="self">self</span>.<span class="number">0 </span>= Cow::Owned(<span class="macro">format!</span>(<span class="string">&quot;{existing}\n{}&quot;</span>, docs));
+            }
+        }
     }
 }
 

@@ -354,8 +354,8 @@
         }
     }
 
-    <span class="doccomment">/// Documentation of the view. If called repeteadly,
-    /// adds the new docs to the end with a newline.
+    <span class="doccomment">/// Documentation of the view. If called repeatedly, adds the new docs to the end with a
+    /// newline.
     ///
     /// ```ignore
     /// /// This is the documentation.
@@ -365,7 +365,7 @@
     /// ```
     </span><span class="kw">pub fn </span>documentation(<span class="kw-2">&amp;mut </span><span class="self">self</span>, documentation: <span class="kw">impl </span>Into&lt;Cow&lt;<span class="lifetime">&#39;a</span>, str&gt;&gt;) {
         <span class="kw">match </span><span class="self">self</span>.documentation.as_mut() {
-            <span class="prelude-val">Some</span>(docs) =&gt; docs.push(documentation),
+            <span class="prelude-val">Some</span>(docs) =&gt; docs.push(documentation.into()),
             <span class="prelude-val">None </span>=&gt; <span class="self">self</span>.documentation = <span class="prelude-val">Some</span>(Documentation(documentation.into())),
         }
     }
