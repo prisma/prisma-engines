@@ -1,8 +1,8 @@
-import { Client, neon, neonConfig } from '@neondatabase/serverless'
-import type { NeonConfig, NeonQueryFunction } from '@neondatabase/serverless'
+import { Client, FullQueryResults, PoolClient, neon, neonConfig } from '@neondatabase/serverless'
+import { NeonConfig, NeonQueryFunction, Pool, QueryResult } from '@neondatabase/serverless'
 import ws from 'ws'
-import { bindConnector, Debug } from '@jkomyno/prisma-js-connector-utils'
-import type { Connector, ResultSet, Query, ConnectorConfig } from '@jkomyno/prisma-js-connector-utils'
+import { bindConnector, bindTransaction, Debug } from '@jkomyno/prisma-js-connector-utils'
+import type { Connector, ResultSet, Query, ConnectorConfig, Queryable, Transaction } from '@jkomyno/prisma-js-connector-utils'
 import { fieldToColumnType } from './conversion'
 
 neonConfig.webSocketConstructor = ws
@@ -17,6 +17,7 @@ const TRANSACTION_ROLLBACK = 'ROLLBACK'
 
 type ARRAY_MODE_DISABLED = false
 type FULL_RESULTS_ENABLED = true
+
 
 type ModeSpecificDriver
   = {
@@ -42,46 +43,15 @@ type ModeSpecificDriver
     client: Client
   }
 
-class PrismaNeon implements Connector {
-  readonly flavour = 'postgres'
 
-  private driver: ModeSpecificDriver
-  private isRunning: boolean = true
-  private inTransaction: boolean = false
+type PerformIOResult = QueryResult<any> | FullQueryResults<ARRAY_MODE_DISABLED> 
 
-  constructor(config: PrismaNeonConfig) {
-    const { url: connectionString, httpMode, ...rest } = config
-    if (!httpMode) {
-      this.driver = {
-        mode: 'ws',
-        client: new Client({ connectionString, ...rest })
-      }
-      // connect the client in the background, all requests will be queued until connection established
-      this.driver.client.connect()
-    } else {
-      this.driver = {
-        mode: 'http',
-        client: neon(connectionString, { fullResults: true, ...rest })
-      }
-    }
-  }
+/**
+ * Base class for http client, ws client and ws transaction
+ */
+abstract class NeonQueryable implements Queryable {
+  flavour = 'postgres' as const
 
-  async close(): Promise<void> {
-    if (this.isRunning) {
-      if (this.driver.mode === 'ws') {
-        await this.driver.client.end()
-      }
-      this.isRunning = false
-    }
-  }
-
-  async startTransaction(isolationLevel?: string) {
-    return {} as any
-  }
-
-  /**
-   * Execute a query given as SQL, interpolating the given parameters.
-   */
   async queryRaw(query: Query): Promise<ResultSet> {
     const tag = '[js::query_raw]'
     debug(`${tag} %O`, query)
@@ -98,65 +68,88 @@ class PrismaNeon implements Connector {
     return resultSet
   }
 
-  /**
-   * Execute a query given as SQL, interpolating the given parameters and
-   * returning the number of affected rows.
-   * Note: Queryable expects a u64, but napi.rs only supports u32.
-   */
   async executeRaw(query: Query): Promise<number> {
     const tag = '[js::execute_raw]'
     debug(`${tag} %O`, query)
 
-    switch (query.sql) {
-      case TRANSACTION_BEGIN: {
-        if (this.driver.mode === 'http') {
-          throw new Error('Transactions are not supported in HTTP mode')
-        }
-
-        // check if a transaction is already in progress
-        if (this.inTransaction) {
-          throw new Error('A transaction is already in progress')
-        }
-
-        this.inTransaction = true
-        debug(`${tag} transaction began`)
-
-        return Promise.resolve(-1)
-      }
-      case TRANSACTION_COMMIT: {
-        this.inTransaction = false
-        debug(`${tag} transaction ended successfully`)
-        return Promise.resolve(-1)
-      }
-      case TRANSACTION_ROLLBACK: {
-        this.inTransaction = false
-        debug(`${tag} transaction ended with error`)
-        return Promise.reject(query.sql)
-      }
-      default: {
-        const { rowCount: rowsAffected } = await this.performIO(query)
-        return rowsAffected
-      }
-    }
+    const { rowCount: rowsAffected } = await this.performIO(query)
+    return rowsAffected
   }
 
-  /**
-   * Run a query against the database, returning the result set.
-   * Should the query fail due to a connection error, the connection is
-   * marked as unhealthy.
-   */
-  private async performIO(query: Query) {
-    const { sql, args: values } = query
+  abstract performIO(query: Query): Promise<PerformIOResult>
+}
 
-    if (this.driver.mode === 'ws') {
-      return await this.driver.client.query(sql, values)
-    } else {
-      return await this.driver.client(sql, values)
-    }
+/**
+ * Base class for WS-based queryables: top-level client and transaction
+ */
+class NeonWsQueryable<ClientT extends Pool|PoolClient> extends NeonQueryable {
+  constructor(protected client: ClientT) {
+    super()
+  }
+
+  override performIO(query: Query): Promise<PerformIOResult> {
+    const { sql, args: values } = query
+    return this.client.query(sql, values)
   }
 }
 
+class NeonTransaction extends NeonWsQueryable<PoolClient> implements Transaction {
+  async commit(): Promise<void> {
+    try {
+      await this.client.query('COMMIT');
+    } finally {
+      this.client.release()
+    }
+  }
+
+  async rollback(): Promise<void> {
+    try {
+      await this.client.query('ROLLBACK');
+    } finally {
+      this.client.release()
+    }
+  }
+
+}
+
+class NeonWsConnector extends NeonWsQueryable<Pool> implements Connector {
+  constructor(config: PrismaNeonConfig) {
+    const { url: connectionString, httpMode, ...rest } = config
+    super(new Pool({ connectionString, ...rest }))
+  }
+
+  async startTransaction(isolationLevel?: string | undefined): Promise<Transaction> {
+    const connection = await this.client.connect()
+    await connection.query('BEGIN')
+    if (isolationLevel) {
+      await connection.query('SET TRANSACTION ISOLATION LEVEL $1', [isolationLevel])
+    }
+
+    return bindTransaction(new NeonTransaction(connection))
+  }
+}
+
+class NeonHttpConnector extends NeonQueryable implements Connector {
+  private client: NeonQueryFunction<ARRAY_MODE_DISABLED, FULL_RESULTS_ENABLED>
+
+  constructor(config: PrismaNeonConfig) {
+    super()
+    const { url: connectionString, httpMode, ...rest } = config
+    this.client = neon(connectionString, { fullResults: true, ...rest})
+  }
+
+  override async performIO(query: Query): Promise<PerformIOResult> {
+    const { sql, args: values } = query
+      return await this.client(sql, values)
+  }
+
+  startTransaction(): Promise<Transaction> {
+    throw new Error('Transactions are not supported in HTTP mod')
+  }
+
+}
+
 export const createNeonConnector = (config: PrismaNeonConfig): Connector => {
-  const db = new PrismaNeon(config)
+  const db = config.httpMode ? new NeonHttpConnector(config) : new NeonWsConnector(config)
   return bindConnector(db)
 }
