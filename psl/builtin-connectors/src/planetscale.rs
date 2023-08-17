@@ -7,6 +7,5 @@ pub(crate) static PLANETSCALE_SERVERLESS: JsConnector = JsConnector {
 
     provider_name: "@prisma/planetscale",
     name: "planetscale serverless",
-    enforced_relation_mode: None,
     allowed_protocols: Some(&["mysql", "https", "mysqls"]),
 };

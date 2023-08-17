@@ -19,7 +19,6 @@ pub struct JsConnector {
 
     pub provider_name: &'static str,
     pub name: &'static str,
-    pub enforced_relation_mode: Option<RelationMode>,
     pub allowed_protocols: Option<&'static [&'static str]>,
 }
 
@@ -113,19 +112,11 @@ impl Connector for JsConnector {
     }
 
     fn default_relation_mode(&self) -> RelationMode {
-        if let Some(relation_mode) = self.enforced_relation_mode {
-            relation_mode
-        } else {
-            self.canonical_connector.default_relation_mode()
-        }
+        self.canonical_connector.default_relation_mode()
     }
 
     fn allowed_relation_mode_settings(&self) -> BitFlags<RelationMode> {
-        if let Some(relation_mode) = self.enforced_relation_mode {
-            BitFlags::from(relation_mode)
-        } else {
-            self.canonical_connector.allowed_relation_mode_settings()
-        }
+        self.canonical_connector.allowed_relation_mode_settings()
     }
 
     fn flavour(&self) -> Flavour {

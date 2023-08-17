@@ -7,6 +7,5 @@ pub(crate) static NEON_SERVERLESS: JsConnector = JsConnector {
 
     provider_name: "@prisma/neon",
     name: "neon serverless (pg-compatible)",
-    enforced_relation_mode: None,
     allowed_protocols: Some(&["postgres"]),
 };
