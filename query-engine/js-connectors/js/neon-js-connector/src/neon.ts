@@ -1,4 +1,4 @@
-import { Client, FullQueryResults, PoolClient, neon, neonConfig } from '@neondatabase/serverless'
+import { FullQueryResults, PoolClient, neon, neonConfig } from '@neondatabase/serverless'
 import { NeonConfig, NeonQueryFunction, Pool, QueryResult } from '@neondatabase/serverless'
 import ws from 'ws'
 import { bindConnector, bindTransaction, Debug } from '@jkomyno/prisma-js-connector-utils'
