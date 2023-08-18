@@ -8,6 +8,7 @@ diagnostics = { path = "../diagnostics" }
 parser-database = { path = "../parser-database" }
 prisma-value = { path = "../../libs/prisma-value" }
 schema-ast = { path = "../schema-ast" }
+convert_case = "0.6.0"
 
 bigdecimal = "0.3"
 chrono = { version = "0.4.6", default_features = false }
