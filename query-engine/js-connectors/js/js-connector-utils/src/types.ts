@@ -72,7 +72,7 @@ export interface Transaction extends Queryable {
    */
   commit(): Promise<void>
   /**
-   * Roll back the transaction
+   * Rolls back the transaction.
    */
   rollback(): Promise<void>
 }
