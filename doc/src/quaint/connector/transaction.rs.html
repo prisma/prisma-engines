@@ -178,6 +178,25 @@
 <a href="#178" id="178">178</a>
 <a href="#179" id="179">179</a>
 <a href="#180" id="180">180</a>
+<a href="#181" id="181">181</a>
+<a href="#182" id="182">182</a>
+<a href="#183" id="183">183</a>
+<a href="#184" id="184">184</a>
+<a href="#185" id="185">185</a>
+<a href="#186" id="186">186</a>
+<a href="#187" id="187">187</a>
+<a href="#188" id="188">188</a>
+<a href="#189" id="189">189</a>
+<a href="#190" id="190">190</a>
+<a href="#191" id="191">191</a>
+<a href="#192" id="192">192</a>
+<a href="#193" id="193">193</a>
+<a href="#194" id="194">194</a>
+<a href="#195" id="195">195</a>
+<a href="#196" id="196">196</a>
+<a href="#197" id="197">197</a>
+<a href="#198" id="198">198</a>
+<a href="#199" id="199">199</a>
 </pre></div><pre class="rust"><code><span class="kw">use super</span>::<span class="kw-2">*</span>;
 <span class="kw">use crate</span>::{
     ast::<span class="kw-2">*</span>,
@@ -189,6 +208,18 @@
 
 <span class="kw">extern crate </span>metrics <span class="kw">as </span>metrics;
 
+<span class="attr">#[async_trait]
+</span><span class="kw">pub trait </span>Transaction: Queryable {
+    <span class="doccomment">/// Commit the changes to the database and consume the transaction.
+    </span><span class="kw">async fn </span>commit(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw">crate</span>::Result&lt;()&gt;;
+
+    <span class="doccomment">/// Rolls back the changes to the database.
+    </span><span class="kw">async fn </span>rollback(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw">crate</span>::Result&lt;()&gt;;
+
+    <span class="doccomment">/// workaround for lack of upcasting between traits https://github.com/rust-lang/rust/issues/65991
+    </span><span class="kw">fn </span>as_queryable(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw">dyn </span>Queryable;
+}
+
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>TransactionOptions {
     <span class="doccomment">/// The isolation level to use.
     </span><span class="kw">pub</span>(<span class="kw">crate</span>) isolation_level: <span class="prelude-ty">Option</span>&lt;IsolationLevel&gt;,
@@ -197,21 +228,21 @@
     </span><span class="kw">pub</span>(<span class="kw">crate</span>) isolation_first: bool,
 }
 
-<span class="doccomment">/// A representation of an SQL database transaction. If not commited, a
+<span class="doccomment">/// A default representation of an SQL database transaction. If not commited, a
 /// transaction will be rolled back by default when dropped.
 ///
 /// Currently does not support nesting, so starting a new transaction using the
 /// transaction object will panic.
-</span><span class="kw">pub struct </span>Transaction&lt;<span class="lifetime">&#39;a</span>&gt; {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) inner: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw">dyn </span>Queryable,
+</span><span class="kw">pub struct </span>DefaultTransaction&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="kw">pub </span>inner: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw">dyn </span>Queryable,
 }
 
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; Transaction&lt;<span class="lifetime">&#39;a</span>&gt; {
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; DefaultTransaction&lt;<span class="lifetime">&#39;a</span>&gt; {
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async fn </span>new(
         inner: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw">dyn </span>Queryable,
         begin_stmt: <span class="kw-2">&amp;</span>str,
         tx_opts: TransactionOptions,
-    ) -&gt; <span class="kw">crate</span>::Result&lt;Transaction&lt;<span class="lifetime">&#39;a</span>&gt;&gt; {
+    ) -&gt; <span class="kw">crate</span>::Result&lt;DefaultTransaction&lt;<span class="lifetime">&#39;a</span>&gt;&gt; {
         <span class="kw">let </span>this = <span class="self">Self </span>{ inner };
 
         <span class="kw">if </span>tx_opts.isolation_first {
@@ -233,9 +264,12 @@
         <span class="macro">increment_gauge!</span>(<span class="string">&quot;prisma_client_queries_active&quot;</span>, <span class="number">1.0</span>);
         <span class="prelude-val">Ok</span>(this)
     }
+}
 
+<span class="attr">#[async_trait]
+</span><span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; Transaction <span class="kw">for </span>DefaultTransaction&lt;<span class="lifetime">&#39;a</span>&gt; {
     <span class="doccomment">/// Commit the changes to the database and consume the transaction.
-    </span><span class="kw">pub async fn </span>commit(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw">crate</span>::Result&lt;()&gt; {
+    </span><span class="kw">async fn </span>commit(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw">crate</span>::Result&lt;()&gt; {
         <span class="macro">decrement_gauge!</span>(<span class="string">&quot;prisma_client_queries_active&quot;</span>, <span class="number">1.0</span>);
         <span class="self">self</span>.inner.raw_cmd(<span class="string">&quot;COMMIT&quot;</span>).<span class="kw">await</span><span class="question-mark">?</span>;
 
@@ -243,16 +277,20 @@
     }
 
     <span class="doccomment">/// Rolls back the changes to the database.
-    </span><span class="kw">pub async fn </span>rollback(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw">crate</span>::Result&lt;()&gt; {
+    </span><span class="kw">async fn </span>rollback(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw">crate</span>::Result&lt;()&gt; {
         <span class="macro">decrement_gauge!</span>(<span class="string">&quot;prisma_client_queries_active&quot;</span>, <span class="number">1.0</span>);
         <span class="self">self</span>.inner.raw_cmd(<span class="string">&quot;ROLLBACK&quot;</span>).<span class="kw">await</span><span class="question-mark">?</span>;
 
         <span class="prelude-val">Ok</span>(())
     }
+
+    <span class="kw">fn </span>as_queryable(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw">dyn </span>Queryable {
+        <span class="self">self
+    </span>}
 }
 
 <span class="attr">#[async_trait]
-</span><span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; Queryable <span class="kw">for </span>Transaction&lt;<span class="lifetime">&#39;a</span>&gt; {
+</span><span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; Queryable <span class="kw">for </span>DefaultTransaction&lt;<span class="lifetime">&#39;a</span>&gt; {
     <span class="kw">async fn </span>query(<span class="kw-2">&amp;</span><span class="self">self</span>, q: Query&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; <span class="kw">crate</span>::Result&lt;ResultSet&gt; {
         <span class="self">self</span>.inner.query(q).<span class="kw">await
     </span>}
@@ -351,7 +389,7 @@
     }
 }
 <span class="kw">impl </span>TransactionOptions {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>new(isolation_level: <span class="prelude-ty">Option</span>&lt;IsolationLevel&gt;, isolation_first: bool) -&gt; <span class="self">Self </span>{
+    <span class="kw">pub fn </span>new(isolation_level: <span class="prelude-ty">Option</span>&lt;IsolationLevel&gt;, isolation_first: bool) -&gt; <span class="self">Self </span>{
         <span class="self">Self </span>{
             isolation_level,
             isolation_first,

@@ -1600,7 +1600,7 @@
 
 <span class="kw">use crate</span>::{
     ast::{Query, Value},
-    connector::{metrics, queryable::<span class="kw-2">*</span>, ResultSet, Transaction},
+    connector::{metrics, queryable::<span class="kw-2">*</span>, ResultSet},
     error::{Error, ErrorKind},
     visitor::{<span class="self">self</span>, Visitor},
 };
@@ -1631,7 +1631,7 @@
 </span><span class="attr">#[cfg(feature = <span class="string">&quot;expose-drivers&quot;</span>)]
 </span><span class="kw">pub use </span>tokio_postgres;
 
-<span class="kw">use </span><span class="kw">super</span>::IsolationLevel;
+<span class="kw">use super</span>::{IsolationLevel, Transaction};
 
 <span class="attr">#[derive(Clone)]
 </span><span class="kw">struct </span>Hidden&lt;T&gt;(T);
@@ -2362,7 +2362,7 @@
     }
 }
 
-<span class="kw">impl </span>TransactionCapable <span class="kw">for </span>PostgreSql {}
+<span class="macro">impl_default_TransactionCapable!</span>(PostgreSql);
 
 <span class="attr">#[async_trait]
 </span><span class="kw">impl </span>Queryable <span class="kw">for </span>PostgreSql {
@@ -2509,7 +2509,7 @@
         <span class="self">self</span>.is_healthy.load(Ordering::SeqCst)
     }
 
-    <span class="kw">async fn </span>server_reset_query(<span class="kw-2">&amp;</span><span class="self">self</span>, tx: <span class="kw-2">&amp;</span>Transaction&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; <span class="kw">crate</span>::Result&lt;()&gt; {
+    <span class="kw">async fn </span>server_reset_query(<span class="kw-2">&amp;</span><span class="self">self</span>, tx: <span class="kw-2">&amp;</span><span class="kw">dyn </span>Transaction) -&gt; <span class="kw">crate</span>::Result&lt;()&gt; {
         <span class="kw">if </span><span class="self">self</span>.pg_bouncer {
             tx.raw_cmd(<span class="string">&quot;DEALLOCATE ALL&quot;</span>).<span class="kw">await
         </span>} <span class="kw">else </span>{

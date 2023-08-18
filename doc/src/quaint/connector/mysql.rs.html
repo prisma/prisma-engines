@@ -1141,7 +1141,7 @@
     }
 }
 
-<span class="kw">impl </span>TransactionCapable <span class="kw">for </span>Mysql {}
+<span class="macro">impl_default_TransactionCapable!</span>(Mysql);
 
 <span class="attr">#[async_trait]
 </span><span class="kw">impl </span>Queryable <span class="kw">for </span>Mysql {

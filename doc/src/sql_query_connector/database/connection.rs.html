@@ -363,7 +363,7 @@
         <span class="kw">let </span>fut_tx = <span class="self">self</span>.inner.start_transaction(isolation_level);
 
         catch(<span class="self">self</span>.connection_info.clone(), <span class="kw">async move </span>{
-            <span class="kw">let </span>tx: quaint::connector::Transaction = fut_tx.<span class="kw">await</span>.map_err(SqlError::from)<span class="question-mark">?</span>;
+            <span class="kw">let </span>tx = fut_tx.<span class="kw">await</span>.map_err(SqlError::from)<span class="question-mark">?</span>;
 
             <span class="prelude-val">Ok</span>(Box::new(SqlConnectorTransaction::new(tx, connection_info, features)) <span class="kw">as </span>Box&lt;<span class="kw">dyn </span>Transaction&gt;)
         })

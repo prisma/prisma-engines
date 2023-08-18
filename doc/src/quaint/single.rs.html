@@ -247,7 +247,7 @@
 </span><span class="kw">use </span><span class="kw">crate</span>::connector::DEFAULT_SQLITE_SCHEMA_NAME;
 <span class="kw">use crate</span>::{
     ast,
-    connector::{<span class="self">self</span>, ConnectionInfo, IsolationLevel, Queryable, TransactionCapable},
+    connector::{<span class="self">self</span>, impl_default_TransactionCapable, ConnectionInfo, IsolationLevel, Queryable, TransactionCapable},
 };
 <span class="kw">use </span>async_trait::async_trait;
 <span class="kw">use </span>std::{fmt, sync::Arc};
@@ -268,7 +268,7 @@
     }
 }
 
-<span class="kw">impl </span>TransactionCapable <span class="kw">for </span>Quaint {}
+<span class="macro">impl_default_TransactionCapable!</span>(Quaint);
 
 <span class="kw">impl </span>Quaint {
     <span class="doccomment">/// Create a new connection to the database. The connection string

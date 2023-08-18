@@ -111,7 +111,24 @@
 <a href="#111" id="111">111</a>
 <a href="#112" id="112">112</a>
 <a href="#113" id="113">113</a>
-</pre></div><pre class="rust"><code><span class="kw">use super</span>::{IsolationLevel, ResultSet, Transaction, TransactionOptions};
+<a href="#114" id="114">114</a>
+<a href="#115" id="115">115</a>
+<a href="#116" id="116">116</a>
+<a href="#117" id="117">117</a>
+<a href="#118" id="118">118</a>
+<a href="#119" id="119">119</a>
+<a href="#120" id="120">120</a>
+<a href="#121" id="121">121</a>
+<a href="#122" id="122">122</a>
+<a href="#123" id="123">123</a>
+<a href="#124" id="124">124</a>
+<a href="#125" id="125">125</a>
+<a href="#126" id="126">126</a>
+<a href="#127" id="127">127</a>
+<a href="#128" id="128">128</a>
+<a href="#129" id="129">129</a>
+<a href="#130" id="130">130</a>
+</pre></div><pre class="rust"><code><span class="kw">use super</span>::{IsolationLevel, ResultSet, Transaction};
 <span class="kw">use </span><span class="kw">crate</span>::ast::<span class="kw-2">*</span>;
 <span class="kw">use </span>async_trait::async_trait;
 
@@ -195,7 +212,7 @@
     }
 
     <span class="doccomment">/// Execute an arbitrary function in the beginning of each transaction.
-    </span><span class="kw">async fn </span>server_reset_query(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="kw">_</span>: <span class="kw-2">&amp;</span>Transaction&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; <span class="kw">crate</span>::Result&lt;()&gt; {
+    </span><span class="kw">async fn </span>server_reset_query(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="kw">_</span>: <span class="kw-2">&amp;</span><span class="kw">dyn </span>Transaction) -&gt; <span class="kw">crate</span>::Result&lt;()&gt; {
         <span class="prelude-val">Ok</span>(())
     }
 
@@ -214,14 +231,31 @@
 
 <span class="doccomment">/// A thing that can start a new transaction.
 </span><span class="attr">#[async_trait]
-</span><span class="kw">pub trait </span>TransactionCapable: Queryable
-<span class="kw">where
-    </span><span class="self">Self</span>: Sized,
-{
+</span><span class="kw">pub trait </span>TransactionCapable: Queryable {
     <span class="doccomment">/// Starts a new transaction
-    </span><span class="kw">async fn </span>start_transaction(<span class="kw-2">&amp;</span><span class="self">self</span>, isolation: <span class="prelude-ty">Option</span>&lt;IsolationLevel&gt;) -&gt; <span class="kw">crate</span>::Result&lt;Transaction&lt;<span class="lifetime">&#39;_</span>&gt;&gt; {
-        <span class="kw">let </span>opts = TransactionOptions::new(isolation, <span class="self">self</span>.requires_isolation_first());
-        Transaction::new(<span class="self">self</span>, <span class="self">self</span>.begin_statement(), opts).<span class="kw">await
-    </span>}
+    </span><span class="kw">async fn </span>start_transaction&lt;<span class="lifetime">&#39;a</span>&gt;(
+        <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="self">self</span>,
+        isolation: <span class="prelude-ty">Option</span>&lt;IsolationLevel&gt;,
+    ) -&gt; <span class="kw">crate</span>::Result&lt;Box&lt;<span class="kw">dyn </span>Transaction + <span class="lifetime">&#39;a</span>&gt;&gt;;
 }
+
+<span class="macro">macro_rules! </span>impl_default_TransactionCapable {
+    (<span class="macro-nonterminal">$t</span>:ty) =&gt; {
+        <span class="attr">#[async_trait]
+        </span><span class="kw">impl </span>TransactionCapable <span class="kw">for </span><span class="macro-nonterminal">$t </span>{
+            <span class="kw">async fn </span>start_transaction&lt;<span class="lifetime">&#39;a</span>&gt;(
+                <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="self">self</span>,
+                isolation: <span class="prelude-ty">Option</span>&lt;IsolationLevel&gt;,
+            ) -&gt; <span class="kw">crate</span>::Result&lt;Box&lt;<span class="kw">dyn </span><span class="kw">crate</span>::connector::Transaction + <span class="lifetime">&#39;a</span>&gt;&gt; {
+                <span class="kw">let </span>opts = <span class="kw">crate</span>::connector::TransactionOptions::new(isolation, <span class="self">self</span>.requires_isolation_first());
+
+                <span class="prelude-val">Ok</span>(Box::new(
+                    <span class="kw">crate</span>::connector::DefaultTransaction::new(<span class="self">self</span>, <span class="self">self</span>.begin_statement(), opts).<span class="kw">await</span><span class="question-mark">?</span>,
+                ))
+            }
+        }
+    };
+}
+
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use </span>impl_default_TransactionCapable;
 </code></pre></div></section></main></body></html>
