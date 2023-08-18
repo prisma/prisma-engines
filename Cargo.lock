@@ -3687,6 +3687,7 @@ dependencies = [
  "indexmap 1.9.3",
  "indoc",
  "itertools",
+ "jsonrpc-core",
  "nom",
  "once_cell",
  "parse-hyperlinks",
