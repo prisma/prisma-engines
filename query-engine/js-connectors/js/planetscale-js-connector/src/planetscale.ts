@@ -26,7 +26,7 @@ class PlanetScaleQueryable<ClientT extends planetScale.Connection | planetScale.
   constructor(protected client: ClientT) {
   }
 
-    /**
+  /**
    * Execute a query given as SQL, interpolating the given parameters.
    */
   async queryRaw(query: Query): Promise<ResultSet> {
