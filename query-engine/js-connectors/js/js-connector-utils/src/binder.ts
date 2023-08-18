@@ -11,6 +11,8 @@ export const bindConnector = (connector: Connector): Connector => ({
   close: connector.close.bind(connector)
 })
 
+// *.bind(transaction) is required to preserve the `this` context of functions whose
+// execution is delegated to napi.rs.
 export const bindTransaction = (transaction: Transaction): Transaction => {
   return ({
     flavour: transaction.flavour,
