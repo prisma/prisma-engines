@@ -1,0 +1,29 @@
+{
+  "name": "@jkomyno/prisma-pg-js-connector",
+  "version": "0.0.1",
+  "description": "Prisma's JS Connector for \"pr-promise\"",
+  "main": "dist/index.js",
+  "module": "dist/index.mjs",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsup ./src/index.ts --format cjs,esm --dts",
+    "lint": "tsc -p ./tsconfig.build.json"
+  },
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "keywords": [],
+  "author": "Alberto Schiabel <schiabel@prisma.io>",
+  "license": "Apache-2.0",
+  "sideEffects": false,
+  "dependencies": {
+    "@jkomyno/prisma-js-connector-utils": "workspace:*",
+    "pg": "^8.11.2",
+    "pg-promise": "^11.5.3"
+  },
+  "devDependencies": {
+    "@types/pg": "^8.10.2",
+    "ts-node": "^10.9.1"
+  }
+}

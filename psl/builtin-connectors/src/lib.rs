@@ -10,12 +10,14 @@ pub use mssql_datamodel_connector::{MsSqlType, MsSqlTypeParameter};
 pub use mysql_datamodel_connector::MySqlType;
 pub use postgres_datamodel_connector::{PostgresDatasourceProperties, PostgresType};
 pub use psl_core::js_connector::JsConnector;
+pub use pg_js::PG_JS;
 
 mod mongodb;
 mod mssql_datamodel_connector;
 mod mysql_datamodel_connector;
 mod native_type_definition;
 mod neon;
+mod pg_js;
 mod planetscale;
 mod postgres_datamodel_connector;
 mod sqlite_datamodel_connector;
@@ -37,6 +39,7 @@ pub static BUILTIN_CONNECTORS: ConnectorRegistry = &[
     SQLITE,
     MSSQL,
     COCKROACH,
+    &PG_JS,
     MONGODB,
     PLANETSCALE_SERVERLESS,
     NEON_SERVERLESS,
