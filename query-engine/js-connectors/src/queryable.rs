@@ -1,12 +1,12 @@
 use crate::{
     error::into_quaint_error,
-    proxy::{self, Proxy, Query},
+    proxy::{CommonProxy, DriverProxy, Query},
 };
 use async_trait::async_trait;
 use napi::{Env, JsObject};
 use psl::datamodel_connector::Flavour;
 use quaint::{
-    connector::IsolationLevel,
+    connector::{IsolationLevel, Transaction},
     error::{Error, ErrorKind},
     prelude::{Query as QuaintQuery, Queryable as QuaintQueryable, ResultSet, TransactionCapable},
     visitor::{self, Visitor},
@@ -27,13 +27,14 @@ use tracing::{info_span, Instrument};
 /// into a `quaint::connector::result_set::ResultSet`. A quaint `ResultSet` is basically a vector
 /// of `quaint::Value` but said type is a tagged enum, with non-unit variants that cannot be converted to javascript as is.
 ///
-pub struct JsQueryable {
-    pub(crate) proxy: Proxy,
+pub struct JsBaseQueryable {
+    pub(crate) proxy: CommonProxy,
     pub(crate) flavour: Flavour,
 }
 
-impl JsQueryable {
-    pub fn new(proxy: Proxy, flavour: Flavour) -> Self {
+impl JsBaseQueryable {
+    pub fn new(proxy: CommonProxy) -> Self {
+        let flavour: Flavour = proxy.flavour.to_owned().parse().unwrap();
         Self { proxy, flavour }
     }
 
@@ -47,86 +48,49 @@ impl JsQueryable {
     }
 }
 
-impl std::fmt::Display for JsQueryable {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "JSQueryable(driver)")
-    }
-}
-
-impl std::fmt::Debug for JsQueryable {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "JSQueryable(driver)")
-    }
-}
-
 #[async_trait]
-impl QuaintQueryable for JsQueryable {
-    /// Execute the given query.
+impl QuaintQueryable for JsBaseQueryable {
     async fn query(&self, q: QuaintQuery<'_>) -> quaint::Result<ResultSet> {
         let (sql, params) = self.visit_query(q)?;
         self.query_raw(&sql, &params).await
     }
 
-    /// Execute a query given as SQL, interpolating the given parameters.
     async fn query_raw(&self, sql: &str, params: &[Value<'_>]) -> quaint::Result<ResultSet> {
         let span = info_span!("js:query", user_facing = true);
         self.do_query_raw(sql, params).instrument(span).await
     }
 
-    /// Execute a query given as SQL, interpolating the given parameters.
-    ///
-    /// On Postgres, query parameters types will be inferred from the values
-    /// instead of letting Postgres infer them based on their usage in the SQL query.
-    ///
-    /// NOTE: This method will eventually be removed & merged into Queryable::query_raw().
     async fn query_raw_typed(&self, sql: &str, params: &[Value<'_>]) -> quaint::Result<ResultSet> {
         self.query_raw(sql, params).await
     }
 
-    /// Execute the given query, returning the number of affected rows.
     async fn execute(&self, q: QuaintQuery<'_>) -> quaint::Result<u64> {
         let (sql, params) = self.visit_query(q)?;
         self.execute_raw(&sql, &params).await
     }
 
-    /// Execute a query given as SQL, interpolating the given parameters and
-    /// returning the number of affected rows.
     async fn execute_raw(&self, sql: &str, params: &[Value<'_>]) -> quaint::Result<u64> {
         let span = info_span!("js:query", user_facing = true);
         self.do_execute_raw(sql, params).instrument(span).await
     }
 
-    /// Execute a query given as SQL, interpolating the given parameters and
-    /// returning the number of affected rows.
-    ///
-    /// On Postgres, query parameters types will be inferred from the values
-    /// instead of letting Postgres infer them based on their usage in the SQL query.
-    ///
-    /// NOTE: This method will eventually be removed & merged into Queryable::query_raw().
     async fn execute_raw_typed(&self, sql: &str, params: &[Value<'_>]) -> quaint::Result<u64> {
         self.execute_raw(sql, params).await
     }
 
-    /// Run a command in the database, for queries that can't be run using
-    /// prepared statements.
     async fn raw_cmd(&self, cmd: &str) -> quaint::Result<()> {
         self.execute_raw(cmd, &[]).await?;
         Ok(())
     }
 
-    /// Return the version of the underlying database, queried directly from the
-    /// source. This corresponds to the `version()` function on PostgreSQL for
-    /// example. The version string is returned directly without any form of
-    /// parsing or normalization.
     async fn version(&self) -> quaint::Result<Option<String>> {
-        // Todo: convert napi::Error to quaint::error::Error.
-        let version = self.proxy.version().await.unwrap();
-        Ok(version)
+        // Note: JS Connectors don't use this method.
+        Ok(None)
     }
 
-    /// Returns false, if connection is considered to not be in a working state.
     fn is_healthy(&self) -> bool {
-        self.proxy.is_healthy().unwrap_or(false)
+        // Note: JS Connectors don't use this method.
+        true
     }
 
     /// Sets the transaction isolation level to given value.
@@ -137,12 +101,9 @@ impl QuaintQueryable for JsQueryable {
         }
 
         self.raw_cmd(&format!("SET TRANSACTION ISOLATION LEVEL {isolation_level}"))
-            .await?;
-
-        Ok(())
+            .await
     }
 
-    /// Signals if the isolation level SET needs to happen before or after the tx BEGIN.
     fn requires_isolation_first(&self) -> bool {
         match self.flavour {
             Flavour::Mysql => true,
@@ -152,7 +113,7 @@ impl QuaintQueryable for JsQueryable {
     }
 }
 
-impl JsQueryable {
+impl JsBaseQueryable {
     async fn build_query(sql: &str, values: &[quaint::Value<'_>]) -> Query {
         let sql: String = sql.to_string();
         let args = values.iter().map(|v| v.clone().into()).collect();
@@ -190,10 +151,105 @@ impl JsQueryable {
     }
 }
 
-impl TransactionCapable for JsQueryable {}
+/// A JsQueryable adapts a Proxy to implement quaint's Queryable interface. It has the
+/// responsibility of transforming inputs and outputs of `query` and `execute` methods from quaint
+/// types to types that can be translated into javascript and viceversa. This is to let the rest of
+/// the query engine work as if it was using quaint itself. The aforementioned transformations are:
+///
+/// Transforming a `quaint::ast::Query` into SQL by visiting it for the specific flavour of SQL
+/// expected by the client connector. (eg. using the mysql visitor for the Planetscale client
+/// connector)
+///
+/// Transforming a `JSResultSet` (what client connectors implemented in javascript provide)
+/// into a `quaint::connector::result_set::ResultSet`. A quaint `ResultSet` is basically a vector
+/// of `quaint::Value` but said type is a tagged enum, with non-unit variants that cannot be converted to javascript as is.
+///
+pub struct JsQueryable {
+    inner: JsBaseQueryable,
+    driver_proxy: DriverProxy,
+}
+
+impl std::fmt::Display for JsQueryable {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "JSQueryable(driver)")
+    }
+}
+
+impl std::fmt::Debug for JsQueryable {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "JSQueryable(driver)")
+    }
+}
+
+#[async_trait]
+impl QuaintQueryable for JsQueryable {
+    async fn query(&self, q: QuaintQuery<'_>) -> quaint::Result<ResultSet> {
+        self.inner.query(q).await
+    }
+
+    async fn query_raw(&self, sql: &str, params: &[Value<'_>]) -> quaint::Result<ResultSet> {
+        self.inner.query_raw(sql, params).await
+    }
+
+    async fn query_raw_typed(&self, sql: &str, params: &[Value<'_>]) -> quaint::Result<ResultSet> {
+        self.inner.query_raw_typed(sql, params).await
+    }
+
+    async fn execute(&self, q: QuaintQuery<'_>) -> quaint::Result<u64> {
+        self.inner.execute(q).await
+    }
+
+    async fn execute_raw(&self, sql: &str, params: &[Value<'_>]) -> quaint::Result<u64> {
+        self.inner.execute_raw(sql, params).await
+    }
+
+    async fn execute_raw_typed(&self, sql: &str, params: &[Value<'_>]) -> quaint::Result<u64> {
+        self.inner.execute_raw_typed(sql, params).await
+    }
+
+    async fn raw_cmd(&self, cmd: &str) -> quaint::Result<()> {
+        self.inner.raw_cmd(cmd).await
+    }
+
+    async fn version(&self) -> quaint::Result<Option<String>> {
+        self.inner.version().await
+    }
+
+    fn is_healthy(&self) -> bool {
+        self.inner.is_healthy()
+    }
+
+    async fn set_tx_isolation_level(&self, isolation_level: IsolationLevel) -> quaint::Result<()> {
+        self.inner.set_tx_isolation_level(isolation_level).await
+    }
+
+    fn requires_isolation_first(&self) -> bool {
+        self.inner.requires_isolation_first()
+    }
+}
+
+#[async_trait]
+impl TransactionCapable for JsQueryable {
+    async fn start_transaction<'a>(
+        &'a self,
+        isolation: Option<IsolationLevel>,
+    ) -> quaint::Result<Box<dyn Transaction + 'a>> {
+        let tx = self
+            .driver_proxy
+            .start_transaction(isolation)
+            .await
+            .map_err(into_quaint_error)?;
+
+        Ok(tx)
+    }
+}
 
 pub fn from_napi(napi_env: &Env, driver: JsObject) -> JsQueryable {
-    let driver = proxy::reify(napi_env, driver).unwrap();
-    let flavour = driver.flavour.parse().unwrap();
-    JsQueryable::new(driver, flavour)
+    let common = CommonProxy::new(&driver, napi_env).unwrap();
+    let driver_proxy = DriverProxy::new(&driver, napi_env).unwrap();
+
+    JsQueryable {
+        inner: JsBaseQueryable::new(common),
+        driver_proxy,
+    }
 }
