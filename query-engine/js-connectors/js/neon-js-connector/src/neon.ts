@@ -123,7 +123,7 @@ class NeonHttpConnector extends NeonQueryable implements Connector {
   }
 
   startTransaction(): Promise<Transaction> {
-    throw new Error('Transactions are not supported in HTTP mod')
+    return Promise.reject(new Error('Transactions are not supported in HTTP mode'))
   }
 
   async close() {}
