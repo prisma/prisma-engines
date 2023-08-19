@@ -229,6 +229,12 @@ start-vitess_8_0:
 dev-vitess_8_0: start-vitess_8_0
 	cp $(CONFIG_PATH)/vitess_8_0 $(CONFIG_FILE)
 
+start-yugabyte:
+	docker compose -f docker-compose.yml up -d --remove-orphans yugabyte
+
+dev-yugabyte: start-yugabyte
+	cp $(CONFIG_PATH)/yugabyte $(CONFIG_FILE)
+
 ######################
 # Local dev commands #
 ######################

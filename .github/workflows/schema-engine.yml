@@ -86,6 +86,8 @@ jobs:
             url: "postgresql://postgres:prisma@localhost:5438"
           - name: cockroach_22_2
             url: "postgresql://prisma@localhost:26259"
+          - name: yugabyte
+            url: "postgresql://yugabyte:yugabyte@localhost:5433"
           - name: cockroach_22_1_0
             url: "postgresql://prisma@localhost:26257"
           - name: sqlite

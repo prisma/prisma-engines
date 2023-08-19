@@ -1,5 +1,17 @@
 version: "3"
+
 services:
+  yugabyte:
+    image: yugabytedb/yugabyte:latest
+    restart: always
+    command: bin/yugabyted start --daemon=false
+    ports:
+      - "7000:7000"
+      - "9000:9000"
+      - "5433:5433"
+      - "9042:9042"
+    networks:
+      - databases  
   cockroach_22_2:
     image: prismagraphql/cockroachdb-custom:22.2
     restart: always
