@@ -1,7 +1,7 @@
 use crate::postgres_datamodel_connector;
 use psl_core::{datamodel_connector::Flavour, js_connector::JsConnector};
 
-pub static PG_JS: JsConnector = JsConnector {
+pub(crate) static PG_JS: JsConnector = JsConnector {
     flavour: Flavour::Postgres,
     canonical_connector: &postgres_datamodel_connector::PostgresDatamodelConnector,
 
