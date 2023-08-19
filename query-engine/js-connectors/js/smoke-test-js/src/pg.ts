@@ -6,7 +6,6 @@ async function pg() {
 
   const db = createPgConnector({
     url: connectionString,
-    httpMode: false,
   })
 
   await smokeTest(db, '../prisma/postgres-pg/schema.prisma')
