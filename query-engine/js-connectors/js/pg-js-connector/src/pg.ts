@@ -7,11 +7,12 @@ const debug = Debug('prisma:js-connector:pg')
 
 export type PrismaPgConfig = ConnectorConfig
 
-type PgTransactionCapable = { client: pg.Pool, isTransaction: false } | { client: pg.PoolClient, isTransaction: true }
+type StdClient = pg.Pool
+type TransactionClient = pg.PoolClient
 
-class PgQueryable implements Queryable {
+class PgQueryable<ClientT extends StdClient | TransactionClient> implements Queryable {
     readonly flavour = 'postgres'
-    constructor(protected readonly driver: PgTransactionCapable) {
+    constructor(protected readonly client: ClientT) {
     }
 
     /**
@@ -54,22 +55,22 @@ class PgQueryable implements Queryable {
     private async performIO(query: Query) {
         const { sql, args: values } = query
 
-        return await this.driver.client.query(sql, values)
+        return await this.client.query(sql, values)
     }
 }
 
-class PgTransaction extends PgQueryable implements Transaction {
-    constructor(connection: pg.PoolClient) {
-        super({ client: connection, isTransaction: true })
+class PgTransaction extends PgQueryable<TransactionClient> implements Transaction {
+    constructor(client: pg.PoolClient) {
+        super(client)
     }
 
     async commit(): Promise<void> {
         const tag = '[js::commit]'
         debug(`${tag} committing transaction`)
         try {
-            await this.driver.client.query('COMMIT');
+            await this.client.query('COMMIT');
         } finally {
-            (this.driver.client as pg.PoolClient).release()
+            this.client.release()
         }
 
     }
@@ -78,14 +79,14 @@ class PgTransaction extends PgQueryable implements Transaction {
         const tag = '[js::rollback]'
         debug(`${tag} rolling back the transaction`)
         try {
-            await this.driver.client.query('ROLLBACK');
+            await this.client.query('ROLLBACK');
         } finally {
-            (this.driver.client as pg.PoolClient).release()
+            this.client.release()
         }
     }
 }
 
-class PrismaPg extends PgQueryable implements Connector {
+class PrismaPg extends PgQueryable<StdClient> implements Connector {
 
     constructor(config: PrismaPgConfig) {
         const { url: connectionString } = config;
@@ -95,11 +96,11 @@ class PrismaPg extends PgQueryable implements Connector {
                 rejectUnauthorized: false,
             },
         })
-        super({ client, isTransaction: false })
+        super(client)
     }
 
     async startTransaction(isolationLevel?: string): Promise<Transaction> {
-        const connection = await (this.driver.client as pg.Pool).connect()
+        const connection = await this.client.connect()
         await connection.query('BEGIN')
         if (isolationLevel) {
             await connection.query(`SET TRANSACTION ISOLATION LEVEL ${isolationLevel}`)
