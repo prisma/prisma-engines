@@ -8,7 +8,6 @@ mod sqlite;
 mod vitess;
 
 pub use js::*;
-pub use mongodb::*;
 pub use mysql::*;
 
 pub(crate) use cockroachdb::*;
@@ -27,7 +26,7 @@ pub trait ConnectorTagInterface {
 
     /// The name of the datamodel provider for this connector.
     /// Must match valid datamodel provider strings.
-    fn datamodel_provider(&self) -> &'static str;
+    fn datamodel_provider(&self) -> &str;
 
     /// Returns the renderer to be used for templating the datamodel (the models portion).
     fn datamodel_renderer(&self) -> Box<dyn DatamodelRenderer>;
@@ -38,7 +37,7 @@ pub trait ConnectorTagInterface {
     /// Defines where relational constraints are handled:
     ///   - "prisma" is handled in the Query Engine core
     ///   - "foreignKeys" lets the database handle them
-    fn relation_mode(&self) -> &'static str {
+    fn relation_mode(&self) -> &str {
         "foreignKeys"
     }
 }
