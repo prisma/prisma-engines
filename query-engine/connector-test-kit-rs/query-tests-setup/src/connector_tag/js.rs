@@ -44,9 +44,15 @@ impl ConnectorTagInterface for NodeDrivers {
 
 type ReqImpl = (jsonrpc_core::MethodCall, oneshot::Sender<jsonrpc_core::Response>);
 
+#[derive(Default, Deserialize)]
+struct ProcessConfig {
+    datamodel_provider: String,
+}
+
 struct NodeProcess {
     task_handle: mpsc::Sender<ReqImpl>,
     request_id_counter: u64,
+    config: ProcessConfig,
 }
 
 impl NodeProcess {
