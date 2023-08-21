@@ -10,7 +10,11 @@
     "prisma:db:push:neon": "prisma db push --schema ./prisma/postgres-neon/schema.prisma --force-reset",
     "prisma:db:execute:neon": "prisma db execute --schema ./prisma/postgres-neon/schema.prisma --file ./prisma/postgres-neon/commands/type_test/insert.sql",
     "prisma:neon": "pnpm prisma:db:push:neon && pnpm prisma:db:execute:neon",
+    "prisma:db:push:pg": "prisma db push --schema ./prisma/postgres-pg/schema.prisma --force-reset",
+    "prisma:db:execute:pg": "prisma db execute --schema ./prisma/postgres-pg/schema.prisma --file ./prisma/postgres-pg/commands/type_test/insert.sql",
+    "prisma:pg": "pnpm prisma:db:push:pg && pnpm prisma:db:execute:pg",
     "neon": "tsx ./src/neon.ts",
+    "pg": "tsx ./src/pg.ts",
     "planetscale": "tsx ./src/planetscale.ts"
   },
   "keywords": [],
@@ -19,6 +23,7 @@
   "sideEffects": true,
   "dependencies": {
     "@jkomyno/prisma-js-connector-utils": "workspace:*",
+    "@jkomyno/prisma-pg-js-connector": "workspace:*",
     "@jkomyno/prisma-neon-js-connector": "workspace:*",
     "@jkomyno/prisma-planetscale-js-connector": "workspace:*",
     "@prisma/client": "5.2.0-dev.30"
