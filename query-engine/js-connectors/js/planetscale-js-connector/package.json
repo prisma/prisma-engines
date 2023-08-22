@@ -1,6 +1,6 @@
 {
   "name": "@jkomyno/prisma-planetscale-js-connector",
-  "version": "0.0.1",
+  "version": "0.0.8",
   "description": "Prisma's JS Connector for \"@planetscale/database\"",
   "main": "dist/index.js",
   "module": "dist/index.mjs",
