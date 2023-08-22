@@ -89,9 +89,7 @@ impl JoinsContext {
             }))
             .collect();
 
-        let res = self.get_from_hops(hops.as_slice());
-
-        res
+        self.get_from_hops(hops.as_slice())
     }
 
     fn get_from_hops(&self, hops: &[IRJoinStage]) -> Option<Vec<&AliasedJoin>> {
