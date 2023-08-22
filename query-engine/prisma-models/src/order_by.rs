@@ -34,8 +34,8 @@ impl OrderBy {
     pub fn path(&self) -> Option<&[OrderByHop]> {
         match self {
             OrderBy::Scalar(o) => Some(&o.path),
-            OrderBy::ScalarAggregation(o) => Some(&o.path),
             OrderBy::ToManyAggregation(o) => Some(&o.path),
+            OrderBy::ScalarAggregation(_) => None,
             OrderBy::Relevance(_) => None,
         }
     }
@@ -79,15 +79,9 @@ impl OrderBy {
         })
     }
 
-    pub fn scalar_aggregation(
-        field: ScalarFieldRef,
-        path: Vec<OrderByHop>,
-        sort_order: SortOrder,
-        sort_aggregation: SortAggregation,
-    ) -> Self {
+    pub fn scalar_aggregation(field: ScalarFieldRef, sort_order: SortOrder, sort_aggregation: SortAggregation) -> Self {
         Self::ScalarAggregation(OrderByScalarAggregation {
             field,
-            path,
             sort_order,
             sort_aggregation,
         })
@@ -131,7 +125,7 @@ impl std::fmt::Debug for OrderByHop {
 }
 
 impl OrderByHop {
-    pub fn into_relation_hop(&self) -> Option<&RelationFieldRef> {
+    pub fn as_relation_hop(&self) -> Option<&RelationFieldRef> {
         match self {
             OrderByHop::Relation(rf) => Some(rf),
             OrderByHop::Composite(_) => None,
@@ -171,10 +165,15 @@ pub struct OrderByScalar {
     pub nulls_order: Option<NullsOrder>,
 }
 
+impl OrderByScalar {
+    pub fn relation_hops(&self) -> Vec<&RelationFieldRef> {
+        self.path.iter().filter_map(|hop| hop.as_relation_hop()).collect()
+    }
+}
+
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct OrderByScalarAggregation {
     pub field: ScalarFieldRef,
-    pub path: Vec<OrderByHop>,
     pub sort_order: SortOrder,
     pub sort_aggregation: SortAggregation,
 }
@@ -184,6 +183,12 @@ pub struct OrderByToManyAggregation {
     pub path: Vec<OrderByHop>,
     pub sort_order: SortOrder,
     pub sort_aggregation: SortAggregation,
+}
+
+impl OrderByToManyAggregation {
+    pub fn relation_hops(&self) -> Vec<&RelationFieldRef> {
+        self.path.iter().filter_map(|hop| hop.as_relation_hop()).collect()
+    }
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
