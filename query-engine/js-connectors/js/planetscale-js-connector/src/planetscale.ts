@@ -67,7 +67,14 @@ class PlanetScaleQueryable<ClientT extends planetScale.Connection | planetScale.
   private async performIO(query: Query) {
     const { sql, args: values } = query
 
-    return await this.client.execute(sql, values)
+    try {
+      const result = await this.client.execute(sql, values)
+      return result
+    } catch (e) {
+      const error = e as Error
+      debug('Error in performIO: %O', error)
+      throw error
+    }
   }
 }
 
