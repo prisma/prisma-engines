@@ -14,7 +14,7 @@ macro_rules! match_connector_result {
 
         let connector = $runner.connector_version();
 
-        let mut results = match connector {
+        let mut results = match &connector {
             $(
                 $( $matcher )|+ $( if $pred )? => $result
             ),*
