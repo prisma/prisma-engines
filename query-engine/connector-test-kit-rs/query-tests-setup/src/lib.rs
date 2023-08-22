@@ -26,7 +26,6 @@ use psl::datamodel_connector::ConnectorCapabilities;
 use query_engine_metrics::MetricRegistry;
 use std::future::Future;
 use std::sync::Once;
-use tokio::runtime::Builder;
 use tokio::sync::mpsc::{unbounded_channel, UnboundedReceiver, UnboundedSender};
 use tracing_futures::WithSubscriber;
 
@@ -49,11 +48,14 @@ async fn teardown_project(datamodel: &str, db_schemas: &[&str]) -> TestResult<()
 
 /// Helper method to allow a sync shell function to run the async test blocks.
 fn run_with_tokio<O, F: std::future::Future<Output = O>>(fut: F) -> O {
-    Builder::new_current_thread()
-        .enable_all()
-        .build()
-        .unwrap()
-        .block_on(fut)
+    static RT: Lazy<tokio::runtime::Runtime> = Lazy::new(|| {
+        tokio::runtime::Builder::new_multi_thread()
+            .enable_all()
+            .build()
+            .unwrap()
+    });
+
+    RT.block_on(fut)
 }
 
 static METRIC_RECORDER: Once = Once::new();
