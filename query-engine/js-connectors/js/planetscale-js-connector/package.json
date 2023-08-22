@@ -18,7 +18,7 @@
   "license": "Apache-2.0",
   "sideEffects": false,
   "dependencies": {
-    "@planetscale/database": "^1.10.0",
-    "@jkomyno/prisma-js-connector-utils": "workspace:*"
+    "@jkomyno/prisma-js-connector-utils": "workspace:*",
+    "@planetscale/database": "^1.11.0"
   }
 }
