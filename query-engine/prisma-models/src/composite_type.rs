@@ -25,6 +25,6 @@ impl CompositeType {
 
 impl std::fmt::Debug for CompositeType {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        f.debug_tuple("CompositeType").field(&self.name().to_string()).finish()
+        f.debug_tuple("CompositeType").field(&self.name()).finish()
     }
 }
