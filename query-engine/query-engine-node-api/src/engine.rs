@@ -369,7 +369,7 @@ impl QueryEngine {
                 let handler = RequestHandler::new(engine.executor(), engine.query_schema(), engine.engine_protocol());
                 let response = handler.handle(query, tx_id.map(TxId::from), trace_id).await;
 
-                let serde_span = tracing::info_span!("prisma:engine:json", user_facing = true);
+                let serde_span = tracing::info_span!("prisma:engine:response_json_serialization", user_facing = true);
                 Ok(serde_span.in_scope(|| serde_json::to_string(&response))?)
             }
             .instrument(span)
