@@ -205,13 +205,6 @@
 <a href="#205" id="205">205</a>
 <a href="#206" id="206">206</a>
 <a href="#207" id="207">207</a>
-<a href="#208" id="208">208</a>
-<a href="#209" id="209">209</a>
-<a href="#210" id="210">210</a>
-<a href="#211" id="211">211</a>
-<a href="#212" id="212">212</a>
-<a href="#213" id="213">213</a>
-<a href="#214" id="214">214</a>
 </pre></div><pre class="rust"><code><span class="kw">use crate</span>::{CompositeFieldRef, RelationFieldRef, ScalarFieldRef};
 <span class="kw">use </span>std::string::ToString;
 
@@ -248,8 +241,8 @@
     <span class="kw">pub fn </span>path(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>[OrderByHop]&gt; {
         <span class="kw">match </span><span class="self">self </span>{
             OrderBy::Scalar(o) =&gt; <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span>o.path),
-            OrderBy::ScalarAggregation(o) =&gt; <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span>o.path),
             OrderBy::ToManyAggregation(o) =&gt; <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span>o.path),
+            OrderBy::ScalarAggregation(<span class="kw">_</span>) =&gt; <span class="prelude-val">None</span>,
             OrderBy::Relevance(<span class="kw">_</span>) =&gt; <span class="prelude-val">None</span>,
         }
     }
@@ -293,15 +286,9 @@
         })
     }
 
-    <span class="kw">pub fn </span>scalar_aggregation(
-        field: ScalarFieldRef,
-        path: Vec&lt;OrderByHop&gt;,
-        sort_order: SortOrder,
-        sort_aggregation: SortAggregation,
-    ) -&gt; <span class="self">Self </span>{
+    <span class="kw">pub fn </span>scalar_aggregation(field: ScalarFieldRef, sort_order: SortOrder, sort_aggregation: SortAggregation) -&gt; <span class="self">Self </span>{
         <span class="self">Self</span>::ScalarAggregation(OrderByScalarAggregation {
             field,
-            path,
             sort_order,
             sort_aggregation,
         })
@@ -345,7 +332,7 @@
 }
 
 <span class="kw">impl </span>OrderByHop {
-    <span class="kw">pub fn </span>into_relation_hop(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>RelationFieldRef&gt; {
+    <span class="kw">pub fn </span>as_relation_hop(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>RelationFieldRef&gt; {
         <span class="kw">match </span><span class="self">self </span>{
             OrderByHop::Relation(rf) =&gt; <span class="prelude-val">Some</span>(rf),
             OrderByHop::Composite(<span class="kw">_</span>) =&gt; <span class="prelude-val">None</span>,
@@ -388,7 +375,6 @@
 <span class="attr">#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 </span><span class="kw">pub struct </span>OrderByScalarAggregation {
     <span class="kw">pub </span>field: ScalarFieldRef,
-    <span class="kw">pub </span>path: Vec&lt;OrderByHop&gt;,
     <span class="kw">pub </span>sort_order: SortOrder,
     <span class="kw">pub </span>sort_aggregation: SortAggregation,
 }

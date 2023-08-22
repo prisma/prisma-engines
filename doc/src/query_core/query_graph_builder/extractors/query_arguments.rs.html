@@ -494,7 +494,7 @@
 
                     <span class="kw">if let </span><span class="prelude-val">Some</span>(sort_aggr) = parent_sort_aggregation {
                         <span class="comment">// If the parent is a sort aggregation then this scalar is part of that one.
-                        </span><span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(OrderBy::scalar_aggregation(sf, <span class="macro">vec!</span>[], sort_order, sort_aggr)))
+                        </span><span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(OrderBy::scalar_aggregation(sf, sort_order, sort_aggr)))
                     } <span class="kw">else </span>{
                         <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(OrderBy::scalar(sf, path, sort_order, nulls_order)))
                     }

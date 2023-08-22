@@ -79,6 +79,14 @@
 <a href="#79" id="79">79</a>
 <a href="#80" id="80">80</a>
 <a href="#81" id="81">81</a>
+<a href="#82" id="82">82</a>
+<a href="#83" id="83">83</a>
+<a href="#84" id="84">84</a>
+<a href="#85" id="85">85</a>
+<a href="#86" id="86">86</a>
+<a href="#87" id="87">87</a>
+<a href="#88" id="88">88</a>
+<a href="#89" id="89">89</a>
 </pre></div><pre class="rust"><code><span class="kw">use crate</span>::{parent_container::ParentContainer, CompositeType};
 <span class="kw">use </span>psl::{
     parser_database::ScalarFieldId,
@@ -158,6 +166,14 @@
 <span class="kw">impl </span>Display <span class="kw">for </span>CompositeField {
     <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>std::fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; std::fmt::Result {
         <span class="macro">write!</span>(f, <span class="string">&quot;{}.{}&quot;</span>, <span class="self">self</span>.container().name(), <span class="self">self</span>.name())
+    }
+}
+
+<span class="kw">impl </span>std::fmt::Debug <span class="kw">for </span>CompositeField {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>std::fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; std::fmt::Result {
+        f.debug_tuple(<span class="string">&quot;CompositeField&quot;</span>)
+            .field(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;{}.{}&quot;</span>, <span class="self">self</span>.container().name(), <span class="self">self</span>.name()))
+            .finish()
     }
 }
 </code></pre></div></section></main></body></html>

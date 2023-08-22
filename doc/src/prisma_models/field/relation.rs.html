@@ -150,6 +150,14 @@
 <a href="#150" id="150">150</a>
 <a href="#151" id="151">151</a>
 <a href="#152" id="152">152</a>
+<a href="#153" id="153">153</a>
+<a href="#154" id="154">154</a>
+<a href="#155" id="155">155</a>
+<a href="#156" id="156">156</a>
+<a href="#157" id="157">157</a>
+<a href="#158" id="158">158</a>
+<a href="#159" id="159">159</a>
+<a href="#160" id="160">160</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::prelude::<span class="kw-2">*</span>;
 <span class="kw">use </span>psl::parser_database::{
     ast::FieldArity,
@@ -300,6 +308,14 @@
     <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>std::fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; std::fmt::Result {
         <span class="kw">let </span>walker = <span class="self">self</span>.walker();
         <span class="macro">write!</span>(f, <span class="string">&quot;{}.{}&quot;</span>, walker.model().name(), walker.name())
+    }
+}
+
+<span class="kw">impl </span>std::fmt::Debug <span class="kw">for </span>RelationField {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>std::fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; std::fmt::Result {
+        f.debug_tuple(<span class="string">&quot;RelationField&quot;</span>)
+            .field(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;{}.{}&quot;</span>, <span class="self">self</span>.model().name(), <span class="self">self</span>.name(),))
+            .finish()
     }
 }
 </code></pre></div></section></main></body></html>

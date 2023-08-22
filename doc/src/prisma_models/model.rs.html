@@ -59,6 +59,12 @@
 <a href="#59" id="59">59</a>
 <a href="#60" id="60">60</a>
 <a href="#61" id="61">61</a>
+<a href="#62" id="62">62</a>
+<a href="#63" id="63">63</a>
+<a href="#64" id="64">64</a>
+<a href="#65" id="65">65</a>
+<a href="#66" id="66">66</a>
+<a href="#67" id="67">67</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::prelude::<span class="kw-2">*</span>;
 <span class="kw">use </span>psl::{parser_database::walkers, schema_ast::ast};
 
@@ -118,6 +124,12 @@
             .indexes()
             .filter(|idx| idx.is_unique())
             .filter(|index| !index.fields().any(|f| f.is_unsupported()))
+    }
+}
+
+<span class="kw">impl </span>std::fmt::Debug <span class="kw">for </span>Model {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>std::fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; std::fmt::Result {
+        f.debug_tuple(<span class="string">&quot;Model&quot;</span>).field(<span class="kw-2">&amp;</span><span class="self">self</span>.name()).finish()
     }
 }
 </code></pre></div></section></main></body></html>

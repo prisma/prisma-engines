@@ -22,6 +22,12 @@
 <a href="#22" id="22">22</a>
 <a href="#23" id="23">23</a>
 <a href="#24" id="24">24</a>
+<a href="#25" id="25">25</a>
+<a href="#26" id="26">26</a>
+<a href="#27" id="27">27</a>
+<a href="#28" id="28">28</a>
+<a href="#29" id="29">29</a>
+<a href="#30" id="30">30</a>
 </pre></div><pre class="rust"><code><span class="kw">use crate</span>::{ast, Field};
 
 <span class="kw">pub type </span>CompositeType = <span class="kw">crate</span>::Zipper&lt;ast::CompositeTypeId&gt;;
@@ -44,6 +50,12 @@
 
     <span class="kw">pub fn </span>find_field_by_db_name(<span class="kw-2">&amp;</span><span class="self">self</span>, db_name: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Option</span>&lt;Field&gt; {
         <span class="self">self</span>.fields().find(|f| f.db_name() == db_name)
+    }
+}
+
+<span class="kw">impl </span>std::fmt::Debug <span class="kw">for </span>CompositeType {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>std::fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; std::fmt::Result {
+        f.debug_tuple(<span class="string">&quot;CompositeType&quot;</span>).field(<span class="kw-2">&amp;</span><span class="self">self</span>.name()).finish()
     }
 }
 </code></pre></div></section></main></body></html>
