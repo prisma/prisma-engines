@@ -1,16 +1,21 @@
 use super::*;
 use once_cell::sync::Lazy;
 use query_core::{executor::TransactionManager, QueryExecutor};
+use serde::Deserialize;
 use std::{collections::HashMap, io::Write};
 use tokio::{
     io::{AsyncBufReadExt, AsyncWriteExt, BufReader},
-    sync::{mpsc, oneshot},
+    sync::{mpsc, oneshot, OnceCell},
 };
 
 #[derive(Debug, Default, Clone, PartialEq)]
 pub struct NodeDrivers;
 
 impl ConnectorTagInterface for NodeDrivers {
+    fn raw_execute<'a>(&'a self, query: &'a str, connection_url: &'a str) -> BoxFuture<'a, Result<(), TestError>> {
+        todo!()
+    }
+
     fn datamodel_provider(&self) -> &'static str {
         todo!()
     }
@@ -19,25 +24,7 @@ impl ConnectorTagInterface for NodeDrivers {
         todo!()
     }
 
-    fn connection_string(
-        &self,
-        test_database: &str,
-        is_ci: bool,
-        is_multi_schema: bool,
-        isolation_level: Option<&'static str>,
-    ) -> String {
-        todo!()
-    }
-
     fn capabilities(&self) -> ConnectorCapabilities {
-        todo!()
-    }
-
-    fn as_parse_pair(&self) -> (String, Option<String>) {
-        todo!()
-    }
-
-    fn is_versioned(&self) -> bool {
         todo!()
     }
 }
