@@ -10,3 +10,11 @@ impl InternalEnum {
         self.dm.walk(self.id).name()
     }
 }
+
+impl std::fmt::Debug for InternalEnum {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.debug_tuple("InternalEnum")
+            .field(&self.name())
+            .finish()
+    }
+}

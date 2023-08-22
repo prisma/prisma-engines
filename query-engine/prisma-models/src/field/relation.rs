@@ -8,6 +8,14 @@ use std::fmt::Display;
 pub type RelationField = crate::Zipper<RelationFieldId>;
 pub type RelationFieldRef = RelationField;
 
+impl std::fmt::Debug for RelationField {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.debug_tuple("RelationField")
+            .field(&format!("{}.{}", self.model().name(), self.name(),))
+            .finish()
+    }
+}
+
 impl RelationField {
     pub fn borrowed_name<'a>(&self, schema: &'a psl::ValidatedSchema) -> &'a str {
         schema.db.walk(self.id).name()
