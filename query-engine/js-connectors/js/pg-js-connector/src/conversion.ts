@@ -1,7 +1,7 @@
 import { ColumnTypeEnum, type ColumnType } from '@jkomyno/prisma-js-connector-utils'
 import { types } from 'pg'
 
-const NeonColumnType = types.builtins
+const PgColumnType = types.builtins
 
 /**
  * This is a simplification of quaint's value inference logic. Take a look at quaint's conversion.rs
@@ -10,31 +10,31 @@ const NeonColumnType = types.builtins
  */
 export function fieldToColumnType(fieldTypeId: number): ColumnType {
   switch (fieldTypeId) {
-    case NeonColumnType['INT2']:
-    case NeonColumnType['INT4']:
+    case PgColumnType['INT2']:
+    case PgColumnType['INT4']:
       return ColumnTypeEnum.Int32
-    case NeonColumnType['INT8']:
+    case PgColumnType['INT8']:
       return ColumnTypeEnum.Int64
-    case NeonColumnType['FLOAT4']:
+    case PgColumnType['FLOAT4']:
       return ColumnTypeEnum.Float
-    case NeonColumnType['FLOAT8']:
+    case PgColumnType['FLOAT8']:
       return ColumnTypeEnum.Double
-    case NeonColumnType['BOOL']:
+    case PgColumnType['BOOL']:
       return ColumnTypeEnum.Boolean
-    case NeonColumnType['DATE']:
+    case PgColumnType['DATE']:
       return ColumnTypeEnum.Date
-    case NeonColumnType['TIME']:
+    case PgColumnType['TIME']:
       return ColumnTypeEnum.Time
-    case NeonColumnType['TIMESTAMP']:
+    case PgColumnType['TIMESTAMP']:
       return ColumnTypeEnum.DateTime
-    case NeonColumnType['NUMERIC']:
+    case PgColumnType['NUMERIC']:
       return ColumnTypeEnum.Numeric
-    case NeonColumnType['BPCHAR']:
+    case PgColumnType['BPCHAR']:
       return ColumnTypeEnum.Char
-    case NeonColumnType['TEXT']:
-    case NeonColumnType['VARCHAR']:
+    case PgColumnType['TEXT']:
+    case PgColumnType['VARCHAR']:
       return ColumnTypeEnum.Text
-    case NeonColumnType['JSONB']:
+    case PgColumnType['JSONB']:
       return ColumnTypeEnum.Json
     default:
       if (fieldTypeId >= 10000) {
@@ -46,6 +46,6 @@ export function fieldToColumnType(fieldTypeId: number): ColumnType {
 }
 
 // return string instead of JavaScript Date object
-types.setTypeParser(NeonColumnType.DATE, date => date)
-types.setTypeParser(NeonColumnType.TIME, date => date)
-types.setTypeParser(NeonColumnType.TIMESTAMP, date => date)
+types.setTypeParser(PgColumnType.DATE, date => date)
+types.setTypeParser(PgColumnType.TIME, date => date)
+types.setTypeParser(PgColumnType.TIMESTAMP, date => date)
