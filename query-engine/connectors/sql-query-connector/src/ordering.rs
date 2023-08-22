@@ -146,12 +146,7 @@ impl OrderByBuilder {
         for (i, hop) in rest_hops.iter().enumerate() {
             let previous_join = if i > 0 { joins.get(i - 1) } else { None };
 
-            let join = compute_one2m_join(
-                hop.into_relation_hop().unwrap(),
-                &self.join_prefix(),
-                previous_join,
-                ctx,
-            );
+            let join = compute_one2m_join(hop.as_relation_hop().unwrap(), &self.join_prefix(), previous_join, ctx);
 
             joins.push(join);
         }
@@ -163,7 +158,7 @@ impl OrderByBuilder {
 
         // We perform the aggregation on the last join
         let last_aggr_join = compute_aggr_join(
-            last_hop.into_relation_hop().unwrap(),
+            last_hop.as_relation_hop().unwrap(),
             aggregation_type,
             None,
             ORDER_AGGREGATOR_ALIAS,
@@ -190,12 +185,7 @@ impl OrderByBuilder {
 
         for (i, hop) in order_by.path.iter().enumerate() {
             let previous_join = if i > 0 { joins.get(i - 1) } else { None };
-            let join = compute_one2m_join(
-                hop.into_relation_hop().unwrap(),
-                &self.join_prefix(),
-                previous_join,
-                ctx,
-            );
+            let join = compute_one2m_join(hop.as_relation_hop().unwrap(), &self.join_prefix(), previous_join, ctx);
 
             joins.push(join);
         }
