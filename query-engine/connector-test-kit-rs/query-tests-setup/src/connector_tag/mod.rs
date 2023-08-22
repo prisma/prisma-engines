@@ -19,7 +19,7 @@ pub(crate) use vitess::*;
 
 use crate::{datamodel_rendering::DatamodelRenderer, BoxFuture, TestError, CONFIG};
 use psl::datamodel_connector::ConnectorCapabilities;
-use std::{convert::TryFrom, fmt};
+use std::{convert::TryFrom, fmt, future::Future};
 
 pub trait ConnectorTagInterface {
     fn raw_execute<'a>(&'a self, query: &'a str, connection_url: &'a str) -> BoxFuture<'a, Result<(), TestError>>;
