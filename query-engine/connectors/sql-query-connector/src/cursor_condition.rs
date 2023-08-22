@@ -11,7 +11,7 @@ use prisma_models::*;
 use quaint::ast::*;
 
 #[derive(Debug)]
-struct CursorOrderDefinition {
+struct CursorOrderDefinition<'a> {
     /// Direction of the sort
     pub(crate) sort_order: SortOrder,
     /// Column on which the top-level ORDER BY is performed
@@ -20,6 +20,8 @@ struct CursorOrderDefinition {
     pub(crate) order_fks: Option<Vec<CursorOrderForeignKey>>,
     /// Indicates whether the ordering is performed on nullable field(s)
     pub(crate) on_nullable_fields: bool,
+    /// Joins necessary to the subquery of the definition.
+    pub(crate) joins: Vec<&'a AliasedJoin>,
 }
 
 #[derive(Debug)]
@@ -223,11 +225,6 @@ pub(crate) fn build(
             // Subquery to find the value of the order field(s) that we need for comparison.
             let order_subquery = Select::from_table(model.as_table(ctx)).so_that(cursor_condition);
 
-            let order_subquery = order_by_defs
-                .iter()
-                .flat_map(|j| &j.joins)
-                .fold(order_subquery, |acc, join| acc.left_join(join.data.clone()));
-
             let len = definitions.len();
             let reverse = query_arguments.needs_reversed_order();
 
@@ -315,7 +312,8 @@ fn map_orderby_condition(
     include_eq: bool,
     ctx: &Context<'_>,
 ) -> Expression<'static> {
-    let cmp_column = order_subquery.clone().value(order_definition.order_column.clone());
+    let cmp_column =
+        build_joined_subquery(order_definition, order_subquery.clone()).value(order_definition.order_column.clone());
     let cloned_cmp_column = cmp_column.clone();
     let order_column = order_definition.order_column.clone();
     let cloned_order_column = order_column.clone();
@@ -393,7 +391,8 @@ fn map_equality_condition(
     order_subquery: &Select<'static>,
     order_definition: &CursorOrderDefinition,
 ) -> Expression<'static> {
-    let cmp_column = order_subquery.clone().value(order_definition.order_column.clone());
+    let cmp_column =
+        build_joined_subquery(order_definition, order_subquery.clone()).value(order_definition.order_column.clone());
     let order_column = order_definition.order_column.to_owned();
 
     // If we have null values in the ordering or comparison row, those are automatically included because we can't make a
@@ -410,12 +409,12 @@ fn map_equality_condition(
     }
 }
 
-fn order_definitions(
+fn order_definitions<'a>(
     query_arguments: &QueryArguments,
     model: &Model,
-    order_by_defs: &[OrderByDefinition],
+    order_by_defs: &'a [OrderByDefinition],
     ctx: &Context<'_>,
-) -> Vec<CursorOrderDefinition> {
+) -> Vec<CursorOrderDefinition<'a>> {
     if query_arguments.order_by.len() != order_by_defs.len() {
         unreachable!("There must be an equal amount of order by definition than there are order bys")
     }
@@ -431,6 +430,7 @@ fn order_definitions(
                 order_column: f.as_column(ctx).into(),
                 order_fks: None,
                 on_nullable_fields: !f.is_required(),
+                joins: vec![],
             })
             .collect();
     }
@@ -438,9 +438,8 @@ fn order_definitions(
     query_arguments
         .order_by
         .iter()
-        .enumerate()
         .zip(order_by_defs.iter())
-        .map(|((_, order_by), order_by_def)| match order_by {
+        .map(|(order_by, order_by_def)| match order_by {
             OrderBy::Scalar(order_by) => cursor_order_def_scalar(order_by, order_by_def),
             OrderBy::ScalarAggregation(order_by) => cursor_order_def_aggregation_scalar(order_by, order_by_def),
             OrderBy::ToManyAggregation(order_by) => cursor_order_def_aggregation_rel(order_by, order_by_def),
@@ -450,25 +449,29 @@ fn order_definitions(
 }
 
 /// Build a CursorOrderDefinition for an order by scalar
-fn cursor_order_def_scalar(order_by: &OrderByScalar, order_by_def: &OrderByDefinition) -> CursorOrderDefinition {
+fn cursor_order_def_scalar<'a>(
+    order_by: &OrderByScalar,
+    order_by_def: &'a OrderByDefinition,
+) -> CursorOrderDefinition<'a> {
     // If there are any ordering hops, this finds the foreign key fields for the _last_ hop (we look for the last one because the ordering is done the last one).
     // These fk fields are needed to check whether they are nullable
     // cf: part #2 of the SQL query above, when a field is nullable.
-    let fks = foreign_keys_from_order_path(&order_by.path, &order_by_def.joins);
+    let fks = foreign_keys_from_order_path(&order_by.path, order_by_def.joins.as_slice());
 
     CursorOrderDefinition {
         sort_order: order_by.sort_order,
         order_column: order_by_def.order_column.clone(),
         order_fks: fks,
         on_nullable_fields: !order_by.field.is_required(),
+        joins: order_by_def.joins.clone(),
     }
 }
 
 /// Build a CursorOrderDefinition for an order by aggregation scalar
-fn cursor_order_def_aggregation_scalar(
+fn cursor_order_def_aggregation_scalar<'a>(
     order_by: &OrderByScalarAggregation,
-    order_by_def: &OrderByDefinition,
-) -> CursorOrderDefinition {
+    order_by_def: &'a OrderByDefinition,
+) -> CursorOrderDefinition<'a> {
     let coalesce_exprs: Vec<Expression> = vec![order_by_def.order_column.clone(), Value::integer(0).into()];
 
     // We coalesce the order column to 0 when it's compared to the cmp table since the aggregations joins
@@ -480,14 +483,15 @@ fn cursor_order_def_aggregation_scalar(
         order_column: order_column.clone(),
         order_fks: None,
         on_nullable_fields: false,
+        joins: order_by_def.joins.clone(),
     }
 }
 
 /// Build a CursorOrderDefinition for an order by aggregation on relations
-fn cursor_order_def_aggregation_rel(
+fn cursor_order_def_aggregation_rel<'a>(
     order_by: &OrderByToManyAggregation,
-    order_by_def: &OrderByDefinition,
-) -> CursorOrderDefinition {
+    order_by_def: &'a OrderByDefinition,
+) -> CursorOrderDefinition<'a> {
     // If there are any ordering hop, this finds the foreign key fields for the _last_ hop (we look for the last one because the ordering is done the last one).
     // These fk fields are needed to check whether they are nullable
     // cf: part #2 of the SQL query above, when a field is nullable.
@@ -503,11 +507,15 @@ fn cursor_order_def_aggregation_rel(
         order_column: order_column.clone(),
         order_fks: fks,
         on_nullable_fields: false,
+        joins: order_by_def.joins.clone(),
     }
 }
 
 /// Build a CursorOrderDefinition for an order by relevance
-fn cursor_order_def_relevance(order_by: &OrderByRelevance, order_by_def: &OrderByDefinition) -> CursorOrderDefinition {
+fn cursor_order_def_relevance<'a>(
+    order_by: &OrderByRelevance,
+    order_by_def: &'a OrderByDefinition,
+) -> CursorOrderDefinition<'a> {
     let order_column = &order_by_def.order_column;
 
     CursorOrderDefinition {
@@ -515,10 +523,11 @@ fn cursor_order_def_relevance(order_by: &OrderByRelevance, order_by_def: &OrderB
         order_column: order_column.clone(),
         order_fks: None,
         on_nullable_fields: false,
+        joins: order_by_def.joins.clone(),
     }
 }
 
-fn foreign_keys_from_order_path(path: &[OrderByHop], joins: &[AliasedJoin]) -> Option<Vec<CursorOrderForeignKey>> {
+fn foreign_keys_from_order_path(path: &[OrderByHop], joins: &[&AliasedJoin]) -> Option<Vec<CursorOrderForeignKey>> {
     let (before_last_hop, last_hop) = take_last_two_elem(path);
 
     last_hop.map(|hop| {
@@ -581,4 +590,13 @@ fn take_last_two_elem<T>(slice: &[T]) -> (Option<&T>, Option<&T>) {
         1 => (None, slice.get(0)),
         _ => (slice.get(len - 2), slice.get(len - 1)),
     }
+}
+
+fn build_joined_subquery<'a>(order_definition: &CursorOrderDefinition<'_>, order_subquery: Select<'a>) -> Select<'a> {
+    let order_subquery = order_definition
+        .joins
+        .iter()
+        .fold(order_subquery, |acc, join| acc.join(join.data.clone()));
+
+    order_subquery
 }
