@@ -170,7 +170,7 @@ impl QueryEngine {
 
         #[cfg(feature = "js-connectors")]
         if let Some(driver) = maybe_driver {
-            let queryable = js_connectors::JsQueryable::from(driver);
+            let queryable = js_connectors::from_napi(&napi_env, driver);
             match sql_connector::register_js_connector(provider_name, Arc::new(queryable)) {
                 Ok(_) => tracing::info!("Registered js connector for {provider_name}"),
                 Err(err) => tracing::error!("Failed to registered js connector for {provider_name}. {err}"),

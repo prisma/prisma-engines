@@ -4,7 +4,7 @@
 use crate::connector::DEFAULT_SQLITE_SCHEMA_NAME;
 use crate::{
     ast,
-    connector::{self, ConnectionInfo, IsolationLevel, Queryable, TransactionCapable},
+    connector::{self, impl_default_TransactionCapable, ConnectionInfo, IsolationLevel, Queryable, TransactionCapable},
 };
 use async_trait::async_trait;
 use std::{fmt, sync::Arc};
@@ -25,7 +25,7 @@ impl fmt::Debug for Quaint {
     }
 }
 
-impl TransactionCapable for Quaint {}
+impl_default_TransactionCapable!(Quaint);
 
 impl Quaint {
     /// Create a new connection to the database. The connection string

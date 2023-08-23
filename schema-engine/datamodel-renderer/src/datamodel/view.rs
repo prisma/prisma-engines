@@ -42,8 +42,8 @@ impl<'a> View<'a> {
         }
     }
 
-    /// Documentation of the view. If called repeteadly,
-    /// adds the new docs to the end with a newline.
+    /// Documentation of the view. If called repeatedly, adds the new docs to the end with a
+    /// newline.
     ///
     /// ```ignore
     /// /// This is the documentation.
@@ -53,7 +53,7 @@ impl<'a> View<'a> {
     /// ```
     pub fn documentation(&mut self, documentation: impl Into<Cow<'a, str>>) {
         match self.documentation.as_mut() {
-            Some(docs) => docs.push(documentation),
+            Some(docs) => docs.push(documentation.into()),
             None => self.documentation = Some(Documentation(documentation.into())),
         }
     }

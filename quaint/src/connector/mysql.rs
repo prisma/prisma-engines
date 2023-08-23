@@ -472,7 +472,7 @@ impl Mysql {
     }
 }
 
-impl TransactionCapable for Mysql {}
+impl_default_TransactionCapable!(Mysql);
 
 #[async_trait]
 impl Queryable for Mysql {

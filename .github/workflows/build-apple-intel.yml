@@ -15,7 +15,7 @@ jobs:
 
       # minimum supported version of macOS
       MACOSX_DEPLOYMENT_TARGET: 10.15
-    runs-on: macos-11
+    runs-on: macos-13
 
     steps:
       - name: Output link to real commit

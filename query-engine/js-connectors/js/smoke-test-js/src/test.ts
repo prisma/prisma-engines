@@ -22,6 +22,7 @@ export async function smokeTest(db: Connector, prismaSchemaRelativePath: string)
   await test.testFindManyTypeTest()
   await test.createAutoIncrement()
   await test.testCreateAndDeleteChildParent()
+  await test.testTransaction()
 
   // Note: calling `engine.disconnect` won't actually close the database connection.
   console.log('[nodejs] disconnecting...')
@@ -42,8 +43,6 @@ export async function smokeTest(db: Connector, prismaSchemaRelativePath: string)
   console.log('[nodejs] closing database connection...')
   await db.close()
   console.log('[nodejs] closed database connection')
-
-  process.exit(0)
 }
 
 class SmokeTest {
@@ -54,8 +53,11 @@ class SmokeTest {
     await this.testFindManyTypeTestPostgres()
   }
 
-  @withFlavor({ only: ['mysql'] })
   private async testFindManyTypeTestMySQL() {
+    if (this.flavour !== 'mysql') {
+      return
+    }
+
     const resultSet = await this.engine.query(`
       {
         "action": "findMany",
@@ -92,8 +94,11 @@ class SmokeTest {
     return resultSet
   }
 
-  @withFlavor({ only: ['postgres'] })
   private async testFindManyTypeTestPostgres() {
+    if (this.flavour !== 'postgres') {
+      return
+    }
+
     const resultSet = await this.engine.query(`
       {
         "action": "findMany",
@@ -274,26 +279,24 @@ class SmokeTest {
     `, 'trace', undefined)
     console.log('[nodejs] resultDeleteMany', JSON.stringify(JSON.parse(resultDeleteMany), null, 2))
   }
-}
 
-type WithFlavorInput
-  = { only: Array<Flavor>, exclude?: never }
-  | { exclude: Array<Flavor>, only?: never }
+  async testTransaction() {
+    const startResponse = await this.engine.startTransaction(JSON.stringify({ isolation_level: 'Serializable', max_wait: 5000, timeout: 15000 }), 'trace')
 
-function withFlavor({ only, exclude }: WithFlavorInput) {
-  return function decorator(originalMethod: () => any, _ctx: ClassMethodDecoratorContext<SmokeTest, () => unknown>) {
-    return function replacement(this: SmokeTest) {
-      if ((exclude || []).includes(this.flavour)) {
-        console.log(`[nodejs::exclude] Skipping test "${originalMethod.name}" with flavour: ${this.flavour}`)
-        return
+    const tx_id = JSON.parse(startResponse).id
+
+    console.log('[nodejs] transaction id', tx_id)
+    await this.engine.query(`
+    {
+      "action": "findMany",
+      "modelName": "Author",
+      "query": {
+        "selection": { "$scalars": true }
       }
-
-      if ((only || []).length > 0 && !(only || []).includes(this.flavour)) {
-        console.log(`[nodejs::only] Skipping test "${originalMethod.name}" with flavour: ${this.flavour}`)
-        return
-      }
-
-      return originalMethod.call(this)
     }
+    `, 'trace', tx_id)
+
+    const commitResponse = await this.engine.commitTransaction(tx_id, 'trace')
+    console.log('[nodejs] commited', commitResponse)
   }
 }

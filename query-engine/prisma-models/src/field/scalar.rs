@@ -260,3 +260,11 @@ pub fn dml_default_kind(default_value: &ast::Expression, scalar_type: Option<Sca
         other => unreachable!("{:?}", other),
     }
 }
+
+impl std::fmt::Debug for ScalarField {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.debug_tuple("ScalarField")
+            .field(&format!("{}.{}", self.container().name(), self.name()))
+            .finish()
+    }
+}

@@ -3,7 +3,7 @@ mod error;
 
 use crate::{
     ast::{Query, Value},
-    connector::{metrics, queryable::*, ResultSet, Transaction},
+    connector::{metrics, queryable::*, ResultSet},
     error::{Error, ErrorKind},
     visitor::{self, Visitor},
 };
@@ -34,7 +34,7 @@ pub(crate) const DEFAULT_SCHEMA: &str = "public";
 #[cfg(feature = "expose-drivers")]
 pub use tokio_postgres;
 
-use super::IsolationLevel;
+use super::{IsolationLevel, Transaction};
 
 #[derive(Clone)]
 struct Hidden<T>(T);
@@ -765,7 +765,7 @@ impl Display for SetSearchPath<'_> {
     }
 }
 
-impl TransactionCapable for PostgreSql {}
+impl_default_TransactionCapable!(PostgreSql);
 
 #[async_trait]
 impl Queryable for PostgreSql {
@@ -912,7 +912,7 @@ impl Queryable for PostgreSql {
         self.is_healthy.load(Ordering::SeqCst)
     }
 
-    async fn server_reset_query(&self, tx: &Transaction<'_>) -> crate::Result<()> {
+    async fn server_reset_query(&self, tx: &dyn Transaction) -> crate::Result<()> {
         if self.pg_bouncer {
             tx.raw_cmd("DEALLOCATE ALL").await
         } else {

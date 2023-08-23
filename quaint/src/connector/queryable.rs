@@ -1,4 +1,4 @@
-use super::{IsolationLevel, ResultSet, Transaction, TransactionOptions};
+use super::{IsolationLevel, ResultSet, Transaction};
 use crate::ast::*;
 use async_trait::async_trait;
 
@@ -82,7 +82,7 @@ pub trait Queryable: Send + Sync {
     }
 
     /// Execute an arbitrary function in the beginning of each transaction.
-    async fn server_reset_query(&self, _: &Transaction<'_>) -> crate::Result<()> {
+    async fn server_reset_query(&self, _: &dyn Transaction) -> crate::Result<()> {
         Ok(())
     }
 
@@ -101,13 +101,30 @@ pub trait Queryable: Send + Sync {
 
 /// A thing that can start a new transaction.
 #[async_trait]
-pub trait TransactionCapable: Queryable
-where
-    Self: Sized,
-{
+pub trait TransactionCapable: Queryable {
     /// Starts a new transaction
-    async fn start_transaction(&self, isolation: Option<IsolationLevel>) -> crate::Result<Transaction<'_>> {
-        let opts = TransactionOptions::new(isolation, self.requires_isolation_first());
-        Transaction::new(self, self.begin_statement(), opts).await
-    }
+    async fn start_transaction<'a>(
+        &'a self,
+        isolation: Option<IsolationLevel>,
+    ) -> crate::Result<Box<dyn Transaction + 'a>>;
 }
+
+macro_rules! impl_default_TransactionCapable {
+    ($t:ty) => {
+        #[async_trait]
+        impl TransactionCapable for $t {
+            async fn start_transaction<'a>(
+                &'a self,
+                isolation: Option<IsolationLevel>,
+            ) -> crate::Result<Box<dyn crate::connector::Transaction + 'a>> {
+                let opts = crate::connector::TransactionOptions::new(isolation, self.requires_isolation_first());
+
+                Ok(Box::new(
+                    crate::connector::DefaultTransaction::new(self, self.begin_statement(), opts).await?,
+                ))
+            }
+        }
+    };
+}
+
+pub(crate) use impl_default_TransactionCapable;
