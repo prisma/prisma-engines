@@ -100,12 +100,11 @@ class PgTransaction extends PgQueryable<TransactionClient>
 class PrismaPg extends PgQueryable<StdClient> implements Connector {
   constructor(config: PrismaPgConfig) {
     const { url: connectionString } = config
+    
     const client = new pg.Pool({
       connectionString,
-      ssl: {
-        rejectUnauthorized: false,
-      },
     })
+
     super(client)
   }
 
