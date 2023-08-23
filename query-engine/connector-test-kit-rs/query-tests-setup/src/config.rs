@@ -1,4 +1,7 @@
-use crate::{ConnectorTag, ConnectorTagInterface, TestResult};
+use crate::{
+    CockroachDbConnectorTag, ConnectorTag, ConnectorVersion, MongoDbConnectorTag, MySqlConnectorTag,
+    PostgresConnectorTag, SqlServerConnectorTag, SqliteConnectorTag, TestResult, VitessConnectorTag,
+};
 use serde::Deserialize;
 use std::{convert::TryFrom, env, fs::File, io::Read, path::PathBuf};
 
@@ -117,11 +120,22 @@ impl TestConfig {
             exit_with_message("A test connector is required but was not set.");
         }
 
-        match self.test_connector_tag() {
-            Ok(tag) if tag.is_versioned() && self.connector_version.is_none() => {
+        match self.test_connector().map(|(_, v)| v) {
+            Ok(ConnectorVersion::Vitess(None))
+            | Ok(ConnectorVersion::MySql(None))
+            | Ok(ConnectorVersion::SqlServer(None))
+            | Ok(ConnectorVersion::MongoDb(None))
+            | Ok(ConnectorVersion::CockroachDb(None))
+            | Ok(ConnectorVersion::Postgres(None)) => {
                 exit_with_message("The current test connector requires a version to be set to run.");
             }
-            Ok(_) => (),
+            Ok(ConnectorVersion::Vitess(Some(_)))
+            | Ok(ConnectorVersion::MySql(Some(_)))
+            | Ok(ConnectorVersion::SqlServer(Some(_)))
+            | Ok(ConnectorVersion::MongoDb(Some(_)))
+            | Ok(ConnectorVersion::CockroachDb(Some(_)))
+            | Ok(ConnectorVersion::Postgres(Some(_)))
+            | Ok(ConnectorVersion::Sqlite) => (),
             Err(err) => exit_with_message(&err.to_string()),
         }
     }
@@ -130,7 +144,7 @@ impl TestConfig {
         self.connector.as_str()
     }
 
-    pub fn connector_version(&self) -> Option<&str> {
+    pub(crate) fn connector_version(&self) -> Option<&str> {
         self.connector_version.as_ref().map(AsRef::as_ref)
     }
 
@@ -138,8 +152,19 @@ impl TestConfig {
         self.is_ci
     }
 
-    pub fn test_connector_tag(&self) -> TestResult<ConnectorTag> {
-        ConnectorTag::try_from((self.connector(), self.connector_version()))
+    pub fn test_connector(&self) -> TestResult<(ConnectorTag, ConnectorVersion)> {
+        let version = ConnectorVersion::try_from((self.connector(), self.connector_version()))?;
+        let tag = match version {
+            ConnectorVersion::SqlServer(_) => &SqlServerConnectorTag as ConnectorTag,
+            ConnectorVersion::Postgres(_) => &PostgresConnectorTag,
+            ConnectorVersion::MySql(_) => &MySqlConnectorTag,
+            ConnectorVersion::MongoDb(_) => &MongoDbConnectorTag,
+            ConnectorVersion::Sqlite => &SqliteConnectorTag,
+            ConnectorVersion::CockroachDb(_) => &CockroachDbConnectorTag,
+            ConnectorVersion::Vitess(_) => &VitessConnectorTag,
+        };
+
+        Ok((tag, version))
     }
 }
 

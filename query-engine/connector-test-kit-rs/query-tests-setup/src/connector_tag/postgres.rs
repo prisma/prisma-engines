@@ -1,12 +1,18 @@
 use super::*;
-use crate::{datamodel_rendering::SqlDatamodelRenderer, TestError, TestResult};
+use crate::{datamodel_rendering::SqlDatamodelRenderer, BoxFuture, TestError};
+use quaint::{prelude::Queryable, single::Quaint};
 
 #[derive(Debug, Default, Clone)]
-pub struct PostgresConnectorTag {
-    version: Option<PostgresVersion>,
-}
+pub(crate) struct PostgresConnectorTag;
 
 impl ConnectorTagInterface for PostgresConnectorTag {
+    fn raw_execute<'a>(&'a self, query: &'a str, connection_url: &'a str) -> BoxFuture<'a, Result<(), TestError>> {
+        Box::pin(async move {
+            let conn = Quaint::new(connection_url).await?;
+            Ok(conn.raw_cmd(query).await?)
+        })
+    }
+
     fn datamodel_provider(&self) -> &'static str {
         "postgres"
     }
@@ -15,65 +21,8 @@ impl ConnectorTagInterface for PostgresConnectorTag {
         Box::new(SqlDatamodelRenderer::new())
     }
 
-    fn connection_string(&self, database: &str, is_ci: bool, is_multi_schema: bool, _: Option<&'static str>) -> String {
-        let database = if is_multi_schema {
-            database.to_string()
-        } else {
-            format!("db?schema={database}")
-        };
-
-        match self.version {
-            Some(PostgresVersion::V9) if is_ci => {
-                format!("postgresql://postgres:prisma@test-db-postgres-9:5432/{database}")
-            }
-            Some(PostgresVersion::V10) if is_ci => {
-                format!("postgresql://postgres:prisma@test-db-postgres-10:5432/{database}")
-            }
-            Some(PostgresVersion::V11) if is_ci => {
-                format!("postgresql://postgres:prisma@test-db-postgres-11:5432/{database}")
-            }
-            Some(PostgresVersion::V12) if is_ci => {
-                format!("postgresql://postgres:prisma@test-db-postgres-12:5432/{database}")
-            }
-            Some(PostgresVersion::V13) if is_ci => {
-                format!("postgresql://postgres:prisma@test-db-postgres-13:5432/{database}")
-            }
-            Some(PostgresVersion::V14) if is_ci => {
-                format!("postgresql://postgres:prisma@test-db-postgres-14:5432/{database}")
-            }
-            Some(PostgresVersion::V15) if is_ci => {
-                format!("postgresql://postgres:prisma@test-db-postgres-15:5432/{database}")
-            }
-            Some(PostgresVersion::PgBouncer) if is_ci => {
-                format!("postgresql://postgres:prisma@test-db-pgbouncer:6432/{database}&pgbouncer=true")
-            }
-
-            Some(PostgresVersion::V9) => format!("postgresql://postgres:prisma@127.0.0.1:5431/{database}"),
-            Some(PostgresVersion::V10) => format!("postgresql://postgres:prisma@127.0.0.1:5432/{database}"),
-            Some(PostgresVersion::V11) => format!("postgresql://postgres:prisma@127.0.0.1:5433/{database}"),
-            Some(PostgresVersion::V12) => format!("postgresql://postgres:prisma@127.0.0.1:5434/{database}"),
-            Some(PostgresVersion::V13) => format!("postgresql://postgres:prisma@127.0.0.1:5435/{database}"),
-            Some(PostgresVersion::V14) => format!("postgresql://postgres:prisma@127.0.0.1:5437/{database}"),
-            Some(PostgresVersion::V15) => format!("postgresql://postgres:prisma@127.0.0.1:5438/{database}"),
-            Some(PostgresVersion::PgBouncer) => {
-                format!("postgresql://postgres:prisma@127.0.0.1:6432/db?{database}&pgbouncer=true")
-            }
-
-            None => unreachable!("A versioned connector must have a concrete version to run."),
-        }
-    }
-
     fn capabilities(&self) -> ConnectorCapabilities {
         psl::builtin_connectors::POSTGRES.capabilities()
-    }
-
-    fn as_parse_pair(&self) -> (String, Option<String>) {
-        let version = self.version.as_ref().map(ToString::to_string);
-        ("postgres".to_owned(), version)
-    }
-
-    fn is_versioned(&self) -> bool {
-        true
     }
 }
 
@@ -87,61 +36,6 @@ pub enum PostgresVersion {
     V14,
     V15,
     PgBouncer,
-}
-
-impl PostgresConnectorTag {
-    pub fn new(version: Option<&str>) -> TestResult<Self> {
-        let version = match version {
-            Some(v) => Some(PostgresVersion::try_from(v)?),
-            None => None,
-        };
-
-        Ok(Self { version })
-    }
-
-    /// Returns all versions of this connector.
-    pub fn all() -> Vec<Self> {
-        vec![
-            Self {
-                version: Some(PostgresVersion::V9),
-            },
-            Self {
-                version: Some(PostgresVersion::V10),
-            },
-            Self {
-                version: Some(PostgresVersion::V11),
-            },
-            Self {
-                version: Some(PostgresVersion::V12),
-            },
-            Self {
-                version: Some(PostgresVersion::V13),
-            },
-            Self {
-                version: Some(PostgresVersion::V14),
-            },
-            Self {
-                version: Some(PostgresVersion::V15),
-            },
-            Self {
-                version: Some(PostgresVersion::PgBouncer),
-            },
-        ]
-    }
-
-    /// Get a reference to the postgres connector tag's version.
-    pub fn version(&self) -> Option<PostgresVersion> {
-        self.version
-    }
-}
-
-impl PartialEq for PostgresConnectorTag {
-    fn eq(&self, other: &Self) -> bool {
-        match (self.version, other.version) {
-            (None, None) | (Some(_), None) | (None, Some(_)) => true,
-            (Some(v1), Some(v2)) => v1 == v2,
-        }
-    }
 }
 
 impl TryFrom<&str> for PostgresVersion {

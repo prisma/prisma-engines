@@ -30,7 +30,7 @@ mod metrics {
             Sqlite => assert_eq!(total_queries, 9),
             SqlServer(_) => assert_eq!(total_queries, 17),
             MongoDb(_) => assert_eq!(total_queries, 5),
-            CockroachDb => (), // not deterministic
+            CockroachDb(_) => (), // not deterministic
             MySql(_) => assert_eq!(total_queries, 12),
             Vitess(_) => assert_eq!(total_queries, 11),
             Postgres(_) => assert_eq!(total_queries, 7),
