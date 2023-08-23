@@ -26,10 +26,10 @@
     "@jkomyno/prisma-pg-js-connector": "workspace:*",
     "@jkomyno/prisma-neon-js-connector": "workspace:*",
     "@jkomyno/prisma-planetscale-js-connector": "workspace:*",
-    "@prisma/client": "5.2.0-dev.30"
+    "@prisma/client": "5.2.0"
   },
   "devDependencies": {
-    "prisma": "5.2.0-dev.30",
+    "prisma": "5.2.0",
     "tsx": "^3.12.7"
   }
 }

@@ -57,7 +57,14 @@ class PgQueryable<ClientT extends StdClient | TransactionClient>
   private async performIO(query: Query) {
     const { sql, args: values } = query
 
-    return await this.client.query(sql, values)
+    try {
+      const result = await this.client.query(sql, values)
+      return result
+    } catch (e) {
+      const error = e as Error
+      debug('Error in performIO: %O', error)
+      throw error
+    }
   }
 }
 
