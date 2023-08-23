@@ -1,6 +1,6 @@
 use query_engine_tests::*;
 
-#[test_suite(only(Mysql))]
+#[test_suite(only(Mysql, TiDB))]
 mod mysql {
     use indoc::indoc;
     use query_engine_tests::run_query;

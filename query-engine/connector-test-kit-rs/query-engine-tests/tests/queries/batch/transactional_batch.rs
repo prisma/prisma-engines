@@ -104,11 +104,23 @@ mod transactional {
         Ok(())
     }
 
-    #[connector_test(exclude(MongoDb))]
+    #[connector_test(exclude(MongoDb, TiDB))]
     async fn valid_isolation_level(runner: Runner) -> TestResult<()> {
         let queries = vec![r#"mutation { createOneModelB(data: { id: 1 }) { id }}"#.to_string()];
 
         let batch_results = runner.batch(queries, true, Some("Serializable".into())).await?;
+
+        insta::assert_snapshot!(batch_results.to_string(), @r###"{"batchResult":[{"data":{"createOneModelB":{"id":1}}}]}"###);
+
+        Ok(())
+    }
+
+    // TiDB supports repeatable read isolation level, but doesn't support serializable isolation level.
+    #[connector_test(only(TiDB))]
+    async fn valid_isolation_level_tidb(runner: Runner) -> TestResult<()> {
+        let queries = vec![r#"mutation { createOneModelB(data: { id: 1 }) { id }}"#.to_string()];
+
+        let batch_results = runner.batch(queries, true, Some("RepeatableRead".into())).await?;
 
         insta::assert_snapshot!(batch_results.to_string(), @r###"{"batchResult":[{"data":{"createOneModelB":{"id":1}}}]}"###);
 

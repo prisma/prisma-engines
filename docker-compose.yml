@@ -189,6 +189,16 @@ services:
       - databases
     tmpfs: /var/lib/mariadb
 
+  tidb:
+    image: pingcap/tidb:v7.1.0
+    restart: always
+    platform: linux/x86_64
+    ports:
+      - "4000:4000"
+    networks:
+      - databases
+    tmpfs: /var/lib/tidb
+
   vitess-test-5_7:
     image: vitess/vttestserver:mysql57@sha256:53eea9d0189168b51bd8882f3684021fb1fc6bf40c919c18d9d667eded5ffbcb
     restart: always

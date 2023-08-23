@@ -430,6 +430,7 @@ pub(crate) enum Circumstances {
     IsMysql57,
     IsMariadb,
     IsVitess,
+    IsTiDB,
 }
 
 fn check_datamodel_for_mysql_5_6(datamodel: &ValidatedSchema, errors: &mut Vec<String>) {
@@ -547,6 +548,10 @@ where
 
                             if global_version.contains("MariaDB") {
                                 circumstances |= Circumstances::IsMariadb;
+                            }
+
+                            if version.contains("TiDB") {
+                                circumstances |= Circumstances::IsTiDB;
                             }
                         }
 

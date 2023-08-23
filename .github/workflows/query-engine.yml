@@ -51,7 +51,11 @@ jobs:
             single_threaded: false
             connector: "cockroachdb"
             version: "22.1"
+          - name: "tidb"
+            single_threaded: false
+            connector: "tidb"
         engine_protocol: [graphql, json]
+
 
     env:
       LOG_LEVEL: "info"

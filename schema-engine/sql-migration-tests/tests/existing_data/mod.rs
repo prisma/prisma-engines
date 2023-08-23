@@ -784,8 +784,9 @@ fn set_default_current_timestamp_on_existing_column_works(api: TestApi) {
 
 // Excluding Vitess because schema changes being asynchronous messes with our assertions
 // (dump_table).
+// Exclude TiDB, unsupported drop primary key when the table is using clustered index.
 // exclude: there is a cockroach-specific test. It's unexecutable there.
-#[test_connector(exclude(CockroachDb, Vitess))]
+#[test_connector(exclude(CockroachDb, Vitess, TiDB))]
 fn primary_key_migrations_do_not_cause_data_loss(api: TestApi) {
     let dm1 = r#"
         model Dog {

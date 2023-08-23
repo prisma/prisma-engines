@@ -39,7 +39,7 @@ mod having_filter {
               string2
             }
           }"#,
-          MongoDb(_) => vec![
+          MongoDb(_) | TiDB => vec![
             r#"{"data":{"groupByTestModel":[{"string":"group1","string2":"group1"},{"string":"group2","string2":"group2"}]}}"#,
             r#"{"data":{"groupByTestModel":[{"string":"group2","string2":"group2"},{"string":"group1","string2":"group1"}]}}"#
           ],

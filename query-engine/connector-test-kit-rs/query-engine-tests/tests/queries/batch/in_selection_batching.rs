@@ -35,7 +35,9 @@ mod isb {
     }
 
     // "batching of IN queries" should "work when having more than the specified amount of items"
-    #[connector_test]
+    // Exclude TiDB, TiDB does not guarantee the order of results returned when the `ORDER BY`
+    // clause is not specified
+    #[connector_test(exclude(TiDB))]
     async fn in_more_items(runner: Runner) -> TestResult<()> {
         create_test_data(&runner).await?;
 

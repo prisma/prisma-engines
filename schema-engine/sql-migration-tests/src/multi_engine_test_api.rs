@@ -148,6 +148,11 @@ impl TestApi {
         self.tags().contains(Tags::CockroachDb)
     }
 
+    /// Returns true only when testing on tidb.
+    pub fn is_tidb(&self) -> bool {
+        self.tags().contains(Tags::TiDB)
+    }
+
     /// Returns true only when testing on sqlite.
     pub fn is_sqlite(&self) -> bool {
         self.tags().contains(Tags::Sqlite)

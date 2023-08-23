@@ -32,6 +32,7 @@ mod metrics {
             MongoDb(_) => assert_eq!(total_queries, 5),
             CockroachDb => (), // not deterministic
             MySql(_) => assert_eq!(total_queries, 12),
+            TiDB => assert_eq!(total_queries, 12),
             Vitess(_) => assert_eq!(total_queries, 11),
             Postgres(_) => assert_eq!(total_queries, 7),
         }
