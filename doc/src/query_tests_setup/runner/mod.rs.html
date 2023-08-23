@@ -279,16 +279,12 @@
 <a href="#279" id="279">279</a>
 <a href="#280" id="280">280</a>
 <a href="#281" id="281">281</a>
-<a href="#282" id="282">282</a>
-<a href="#283" id="283">283</a>
-<a href="#284" id="284">284</a>
 </pre></div><pre class="rust"><code><span class="kw">mod </span>json_adapter;
 
 <span class="kw">pub use </span>json_adapter::<span class="kw-2">*</span>;
 
 <span class="kw">use crate</span>::{ConnectorTag, ConnectorVersion, QueryResult, TestLogCapture, TestResult, ENGINE_PROTOCOL};
 <span class="kw">use </span>colored::Colorize;
-<span class="kw">use </span>quaint::{prelude::Queryable, single::Quaint};
 <span class="kw">use </span>query_core::{
     protocol::EngineProtocol,
     schema::{<span class="self">self</span>, QuerySchemaRef},
@@ -309,6 +305,7 @@
 </span><span class="kw">pub struct </span>Runner {
     executor: Executor,
     query_schema: QuerySchemaRef,
+    version: ConnectorVersion,
     connector_tag: ConnectorTag,
     connection_url: String,
     current_tx_id: <span class="prelude-ty">Option</span>&lt;TxId&gt;,
@@ -325,6 +322,7 @@
     <span class="kw">pub async fn </span>load(
         datamodel: String,
         db_schemas: <span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span>str],
+        connector_version: ConnectorVersion,
         connector_tag: ConnectorTag,
         metrics: MetricRegistry,
         log_capture: TestLogCapture,
@@ -339,6 +337,7 @@
         <span class="kw">let </span>query_schema: QuerySchemaRef = Arc::new(schema::build(Arc::new(schema), <span class="bool-val">true</span>));
 
         <span class="prelude-val">Ok</span>(<span class="self">Self </span>{
+            version: connector_version,
             executor,
             query_schema,
             connector_tag,
@@ -427,12 +426,7 @@
         <span class="kw">let </span>query = query.into();
         <span class="macro">tracing::debug!</span>(<span class="string">&quot;Raw execute: {}&quot;</span>, query.clone().green());
 
-        <span class="kw">if </span><span class="macro">matches!</span>(<span class="self">self</span>.connector_tag, ConnectorTag::MongoDb(<span class="kw">_</span>)) {
-            <span class="macro">panic!</span>(<span class="string">&quot;raw_execute is not supported for MongoDB yet&quot;</span>);
-        }
-
-        <span class="kw">let </span>conn = Quaint::new(<span class="kw-2">&amp;</span><span class="self">self</span>.connection_url).<span class="kw">await</span><span class="question-mark">?</span>;
-        conn.raw_cmd(<span class="kw-2">&amp;</span>query).<span class="kw">await</span><span class="question-mark">?</span>;
+        <span class="self">self</span>.connector_tag.raw_execute(<span class="kw-2">&amp;</span>query, <span class="kw-2">&amp;</span><span class="self">self</span>.connection_url).<span class="kw">await</span><span class="question-mark">?</span>;
 
         <span class="prelude-val">Ok</span>(())
     }
@@ -558,8 +552,8 @@
         <span class="self">self</span>.log_capture.get_logs().<span class="kw">await
     </span>}
 
-    <span class="kw">pub fn </span>connector_version(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; ConnectorVersion {
-        ConnectorVersion::from(<span class="self">self</span>.connector())
+    <span class="kw">pub fn </span>connector_version(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>ConnectorVersion {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.version
     }
 
     <span class="kw">pub fn </span>protocol(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; EngineProtocol {

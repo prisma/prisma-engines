@@ -660,6 +660,9 @@
 <a href="#660" id="660">660</a>
 <a href="#661" id="661">661</a>
 <a href="#662" id="662">662</a>
+<a href="#663" id="663">663</a>
+<a href="#664" id="664">664</a>
+<a href="#665" id="665">665</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>core::panic;
 <span class="kw">use </span>std::str::FromStr;
 
@@ -1253,7 +1256,7 @@
         <span class="kw">let </span>json_value = serde_json::Value::String(s.to_string());
         <span class="kw">let </span>quaint_value = js_value_to_quaint(json_value, column_type);
 
-        <span class="kw">let </span>date = NaiveDate::from_ymd(<span class="number">2023</span>, <span class="number">01</span>, <span class="number">01</span>);
+        <span class="kw">let </span>date = NaiveDate::from_ymd_opt(<span class="number">2023</span>, <span class="number">01</span>, <span class="number">01</span>).unwrap();
         <span class="macro">assert_eq!</span>(quaint_value, QuaintValue::Date(<span class="prelude-val">Some</span>(date)));
     }
 
@@ -1268,7 +1271,7 @@
         <span class="kw">let </span>json_value = serde_json::Value::String(s.to_string());
         <span class="kw">let </span>quaint_value = js_value_to_quaint(json_value, column_type);
 
-        <span class="kw">let </span>time: NaiveTime = NaiveTime::from_hms(<span class="number">23</span>, <span class="number">59</span>, <span class="number">59</span>);
+        <span class="kw">let </span>time: NaiveTime = NaiveTime::from_hms_opt(<span class="number">23</span>, <span class="number">59</span>, <span class="number">59</span>).unwrap();
         <span class="macro">assert_eq!</span>(quaint_value, QuaintValue::Time(<span class="prelude-val">Some</span>(time)));
     }
 
@@ -1283,7 +1286,10 @@
         <span class="kw">let </span>json_value = serde_json::Value::String(s.to_string());
         <span class="kw">let </span>quaint_value = js_value_to_quaint(json_value, column_type);
 
-        <span class="kw">let </span>datetime = NaiveDate::from_ymd(<span class="number">2023</span>, <span class="number">01</span>, <span class="number">01</span>).and_hms(<span class="number">23</span>, <span class="number">59</span>, <span class="number">59</span>);
+        <span class="kw">let </span>datetime = NaiveDate::from_ymd_opt(<span class="number">2023</span>, <span class="number">01</span>, <span class="number">01</span>)
+            .unwrap()
+            .and_hms_opt(<span class="number">23</span>, <span class="number">59</span>, <span class="number">59</span>)
+            .unwrap();
         <span class="kw">let </span>datetime = DateTime::from_utc(datetime, Utc);
         <span class="macro">assert_eq!</span>(quaint_value, QuaintValue::DateTime(<span class="prelude-val">Some</span>(datetime)));
     }
@@ -1304,7 +1310,7 @@
                 null
             ]
         });
-        <span class="kw">let </span>json_value = serde_json::Value::from(json.clone());
+        <span class="kw">let </span>json_value = json.clone();
         <span class="kw">let </span>quaint_value = js_value_to_quaint(json_value, column_type);
         <span class="macro">assert_eq!</span>(quaint_value, QuaintValue::Json(<span class="prelude-val">Some</span>(json.clone())));
     }

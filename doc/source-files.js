@@ -73,7 +73,6 @@ var sourcesIndex = JSON.parse('{\
 "encoding_index_tests":["",[],["index_tests.rs"]],\
 "encoding_index_tradchinese":["",[],["big5.rs","lib.rs"]],\
 "enum_as_inner":["",[],["lib.rs"]],\
-"enum_dispatch":["",[],["attributed_parser.rs","cache.rs","enum_dispatch_arg_list.rs","enum_dispatch_item.rs","enum_dispatch_variant.rs","expansion.rs","filter_attrs.rs","lib.rs","supported_generics.rs","syn_utils.rs"]],\
 "enumflags2":["",[],["fallible.rs","formatting.rs","lib.rs"]],\
 "enumflags2_derive":["",[],["lib.rs"]],\
 "equivalent":["",[],["lib.rs"]],\

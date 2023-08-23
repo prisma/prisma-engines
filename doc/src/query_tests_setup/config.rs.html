@@ -147,7 +147,35 @@
 <a href="#147" id="147">147</a>
 <a href="#148" id="148">148</a>
 <a href="#149" id="149">149</a>
-</pre></div><pre class="rust"><code><span class="kw">use crate</span>::{ConnectorTag, ConnectorTagInterface, TestResult};
+<a href="#150" id="150">150</a>
+<a href="#151" id="151">151</a>
+<a href="#152" id="152">152</a>
+<a href="#153" id="153">153</a>
+<a href="#154" id="154">154</a>
+<a href="#155" id="155">155</a>
+<a href="#156" id="156">156</a>
+<a href="#157" id="157">157</a>
+<a href="#158" id="158">158</a>
+<a href="#159" id="159">159</a>
+<a href="#160" id="160">160</a>
+<a href="#161" id="161">161</a>
+<a href="#162" id="162">162</a>
+<a href="#163" id="163">163</a>
+<a href="#164" id="164">164</a>
+<a href="#165" id="165">165</a>
+<a href="#166" id="166">166</a>
+<a href="#167" id="167">167</a>
+<a href="#168" id="168">168</a>
+<a href="#169" id="169">169</a>
+<a href="#170" id="170">170</a>
+<a href="#171" id="171">171</a>
+<a href="#172" id="172">172</a>
+<a href="#173" id="173">173</a>
+<a href="#174" id="174">174</a>
+</pre></div><pre class="rust"><code><span class="kw">use crate</span>::{
+    CockroachDbConnectorTag, ConnectorTag, ConnectorVersion, MongoDbConnectorTag, MySqlConnectorTag,
+    PostgresConnectorTag, SqlServerConnectorTag, SqliteConnectorTag, TestResult, VitessConnectorTag,
+};
 <span class="kw">use </span>serde::Deserialize;
 <span class="kw">use </span>std::{convert::TryFrom, env, fs::File, io::Read, path::PathBuf};
 
@@ -266,11 +294,22 @@ Use the Makefile.
             exit_with_message(<span class="string">&quot;A test connector is required but was not set.&quot;</span>);
         }
 
-        <span class="kw">match </span><span class="self">self</span>.test_connector_tag() {
-            <span class="prelude-val">Ok</span>(tag) <span class="kw">if </span>tag.is_versioned() &amp;&amp; <span class="self">self</span>.connector_version.is_none() =&gt; {
+        <span class="kw">match </span><span class="self">self</span>.test_connector().map(|(<span class="kw">_</span>, v)| v) {
+            <span class="prelude-val">Ok</span>(ConnectorVersion::Vitess(<span class="prelude-val">None</span>))
+            | <span class="prelude-val">Ok</span>(ConnectorVersion::MySql(<span class="prelude-val">None</span>))
+            | <span class="prelude-val">Ok</span>(ConnectorVersion::SqlServer(<span class="prelude-val">None</span>))
+            | <span class="prelude-val">Ok</span>(ConnectorVersion::MongoDb(<span class="prelude-val">None</span>))
+            | <span class="prelude-val">Ok</span>(ConnectorVersion::CockroachDb(<span class="prelude-val">None</span>))
+            | <span class="prelude-val">Ok</span>(ConnectorVersion::Postgres(<span class="prelude-val">None</span>)) =&gt; {
                 exit_with_message(<span class="string">&quot;The current test connector requires a version to be set to run.&quot;</span>);
             }
-            <span class="prelude-val">Ok</span>(<span class="kw">_</span>) =&gt; (),
+            <span class="prelude-val">Ok</span>(ConnectorVersion::Vitess(<span class="prelude-val">Some</span>(<span class="kw">_</span>)))
+            | <span class="prelude-val">Ok</span>(ConnectorVersion::MySql(<span class="prelude-val">Some</span>(<span class="kw">_</span>)))
+            | <span class="prelude-val">Ok</span>(ConnectorVersion::SqlServer(<span class="prelude-val">Some</span>(<span class="kw">_</span>)))
+            | <span class="prelude-val">Ok</span>(ConnectorVersion::MongoDb(<span class="prelude-val">Some</span>(<span class="kw">_</span>)))
+            | <span class="prelude-val">Ok</span>(ConnectorVersion::CockroachDb(<span class="prelude-val">Some</span>(<span class="kw">_</span>)))
+            | <span class="prelude-val">Ok</span>(ConnectorVersion::Postgres(<span class="prelude-val">Some</span>(<span class="kw">_</span>)))
+            | <span class="prelude-val">Ok</span>(ConnectorVersion::Sqlite) =&gt; (),
             <span class="prelude-val">Err</span>(err) =&gt; exit_with_message(<span class="kw-2">&amp;</span>err.to_string()),
         }
     }
@@ -279,7 +318,7 @@ Use the Makefile.
         <span class="self">self</span>.connector.as_str()
     }
 
-    <span class="kw">pub fn </span>connector_version(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt; {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>connector_version(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt; {
         <span class="self">self</span>.connector_version.as_ref().map(AsRef::as_ref)
     }
 
@@ -287,8 +326,19 @@ Use the Makefile.
         <span class="self">self</span>.is_ci
     }
 
-    <span class="kw">pub fn </span>test_connector_tag(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; TestResult&lt;ConnectorTag&gt; {
-        ConnectorTag::try_from((<span class="self">self</span>.connector(), <span class="self">self</span>.connector_version()))
+    <span class="kw">pub fn </span>test_connector(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; TestResult&lt;(ConnectorTag, ConnectorVersion)&gt; {
+        <span class="kw">let </span>version = ConnectorVersion::try_from((<span class="self">self</span>.connector(), <span class="self">self</span>.connector_version()))<span class="question-mark">?</span>;
+        <span class="kw">let </span>tag = <span class="kw">match </span>version {
+            ConnectorVersion::SqlServer(<span class="kw">_</span>) =&gt; <span class="kw-2">&amp;</span>SqlServerConnectorTag <span class="kw">as </span>ConnectorTag,
+            ConnectorVersion::Postgres(<span class="kw">_</span>) =&gt; <span class="kw-2">&amp;</span>PostgresConnectorTag,
+            ConnectorVersion::MySql(<span class="kw">_</span>) =&gt; <span class="kw-2">&amp;</span>MySqlConnectorTag,
+            ConnectorVersion::MongoDb(<span class="kw">_</span>) =&gt; <span class="kw-2">&amp;</span>MongoDbConnectorTag,
+            ConnectorVersion::Sqlite =&gt; <span class="kw-2">&amp;</span>SqliteConnectorTag,
+            ConnectorVersion::CockroachDb(<span class="kw">_</span>) =&gt; <span class="kw-2">&amp;</span>CockroachDbConnectorTag,
+            ConnectorVersion::Vitess(<span class="kw">_</span>) =&gt; <span class="kw-2">&amp;</span>VitessConnectorTag,
+        };
+
+        <span class="prelude-val">Ok</span>((tag, version))
     }
 }
 

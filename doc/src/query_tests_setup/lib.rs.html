@@ -301,6 +301,13 @@
 <a href="#301" id="301">301</a>
 <a href="#302" id="302">302</a>
 <a href="#303" id="303">303</a>
+<a href="#304" id="304">304</a>
+<a href="#305" id="305">305</a>
+<a href="#306" id="306">306</a>
+<a href="#307" id="307">307</a>
+<a href="#308" id="308">308</a>
+<a href="#309" id="309">309</a>
+<a href="#310" id="310">310</a>
 </pre></div><pre class="rust"><code><span class="kw">mod </span>config;
 <span class="kw">mod </span>connector_tag;
 <span class="kw">mod </span>datamodel_rendering;
@@ -451,12 +458,12 @@
         <span class="kw">let </span>test_db_name = <span class="macro">format!</span>(<span class="string">&quot;{suite_name}_{test_name}_{i}&quot;</span>);
         <span class="kw">let </span>template = dm.datamodel().to_owned();
 
-        <span class="kw">if </span>!ConnectorTag::should_run(only, exclude, required_capabilities_for_test) {
+        <span class="kw">if </span>!should_run(only, exclude, required_capabilities_for_test) {
             <span class="kw">continue</span>;
         }
 
         <span class="kw">let </span>datamodel = render_test_datamodel(<span class="kw-2">&amp;</span>test_db_name, template, <span class="kw-2">&amp;</span>[], <span class="prelude-val">None</span>, Default::default(), <span class="prelude-val">None</span>);
-        <span class="kw">let </span>connector = CONFIG.test_connector_tag().unwrap();
+        <span class="kw">let </span>(connector_tag, version) = CONFIG.test_connector().unwrap();
         <span class="kw">let </span>metrics = setup_metrics();
         <span class="kw">let </span>metrics_for_subscriber = metrics.clone();
         <span class="kw">let </span>(log_capture, log_tx) = TestLogCapture::new();
@@ -464,7 +471,7 @@
         run_with_tokio(
             <span class="kw">async move </span>{
                 <span class="macro">println!</span>(<span class="string">&quot;Used datamodel:\n {}&quot;</span>, datamodel.yellow());
-                <span class="kw">let </span>runner = Runner::load(datamodel.clone(), <span class="kw-2">&amp;</span>[], connector, metrics, log_capture)
+                <span class="kw">let </span>runner = Runner::load(datamodel.clone(), <span class="kw-2">&amp;</span>[], version, connector_tag, metrics, log_capture)
                     .<span class="kw">await
                     </span>.unwrap();
 
@@ -546,7 +553,7 @@
     referential_override: <span class="prelude-ty">Option</span>&lt;String&gt;,
     test_fn: <span class="kw-2">&amp;</span><span class="kw">dyn </span>Fn(Runner) -&gt; BoxFuture&lt;<span class="lifetime">&#39;static</span>, TestResult&lt;()&gt;&gt;,
 ) {
-    <span class="kw">if </span>!ConnectorTag::should_run(only, exclude, capabilities) {
+    <span class="kw">if </span>!should_run(only, exclude, capabilities) {
         <span class="kw">return</span>;
     }
 
@@ -559,7 +566,7 @@
         db_schemas,
         <span class="prelude-val">None</span>,
     );
-    <span class="kw">let </span>connector = CONFIG.test_connector_tag().unwrap();
+    <span class="kw">let </span>(connector_tag, version) = CONFIG.test_connector().unwrap();
     <span class="kw">let </span>metrics = <span class="kw">crate</span>::setup_metrics();
     <span class="kw">let </span>metrics_for_subscriber = metrics.clone();
 
@@ -568,9 +575,16 @@
     <span class="kw">crate</span>::run_with_tokio(
         <span class="kw">async </span>{
             <span class="macro">println!</span>(<span class="string">&quot;Used datamodel:\n {}&quot;</span>, datamodel.yellow());
-            <span class="kw">let </span>runner = Runner::load(datamodel.clone(), db_schemas, connector, metrics, log_capture)
-                .<span class="kw">await
-                </span>.unwrap();
+            <span class="kw">let </span>runner = Runner::load(
+                datamodel.clone(),
+                db_schemas,
+                version,
+                connector_tag,
+                metrics,
+                log_capture,
+            )
+            .<span class="kw">await
+            </span>.unwrap();
 
             test_fn(runner).<span class="kw">await</span>.unwrap();
 
