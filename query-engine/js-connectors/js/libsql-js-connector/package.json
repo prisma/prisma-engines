@@ -19,6 +19,7 @@
   "sideEffects": false,
   "dependencies": {
     "@jkomyno/prisma-js-connector-utils": "workspace:*",
+    "@libsql/client": "^0.3.1",
     "pg": "^8.11.3"
   },
   "devDependencies": {

@@ -1,4 +1,4 @@
-import * as pg from 'pg'
+import { createClient } from "@libsql/client";
 import { bindConnector, bindTransaction, Debug } from '@jkomyno/prisma-js-connector-utils'
 import type { Connector, ConnectorConfig, Query, Queryable, ResultSet, Transaction } from '@jkomyno/prisma-js-connector-utils'
 import { fieldToColumnType } from './conversion'
