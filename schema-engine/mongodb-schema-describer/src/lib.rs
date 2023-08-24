@@ -31,7 +31,7 @@ pub async fn describe(client: &mongodb::Client, db_name: &str) -> mongodb::error
         let has_schema = options.validator.is_some();
         let is_capped = options.capped.is_some();
 
-        if collection_type == mongodb::results::CollectionType::View{
+        if collection_type == mongodb::results::CollectionType::View {
             continue;
         }
 
