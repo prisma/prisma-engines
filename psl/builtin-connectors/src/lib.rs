@@ -17,6 +17,7 @@ mod mysql_datamodel_connector;
 mod native_type_definition;
 mod neon;
 mod pg_js;
+mod libsql;
 mod planetscale;
 mod postgres_datamodel_connector;
 mod sqlite_datamodel_connector;
@@ -32,6 +33,7 @@ pub const MONGODB: &'static dyn Connector = &mongodb::MongoDbDatamodelConnector;
 pub static PLANETSCALE_SERVERLESS: &'static dyn Connector = &planetscale::PLANETSCALE_SERVERLESS;
 pub static NEON_SERVERLESS: &'static dyn Connector = &neon::NEON_SERVERLESS;
 pub static PG_JS: &'static dyn Connector = &pg_js::PG_JS;
+pub static LIBSQL: &'static dyn Connector = &libsql::LIBSQL;
 
 pub static BUILTIN_CONNECTORS: ConnectorRegistry = &[
     POSTGRES,
@@ -43,4 +45,5 @@ pub static BUILTIN_CONNECTORS: ConnectorRegistry = &[
     MONGODB,
     PLANETSCALE_SERVERLESS,
     NEON_SERVERLESS,
+    LIBSQL
 ];
