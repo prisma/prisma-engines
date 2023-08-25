@@ -96,7 +96,8 @@ fn failing_step_in_migration_dropping_data(api: TestApi) {
     expectation.assert_eq(&err);
 }
 
-#[test_connector(tags(CockroachDb))]
+// Skipped on CRDB 23.1 because of https://github.com/prisma/prisma/issues/20851
+#[test_connector(tags(CockroachDb), exclude(CockroachDb231))]
 fn multiple_alter_tables_in_one_migration_works(api: TestApi) {
     let migrations = &[
         r#"
