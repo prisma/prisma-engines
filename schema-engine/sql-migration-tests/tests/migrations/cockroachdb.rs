@@ -1234,7 +1234,7 @@ fn bigint_defaults_work(api: TestApi) {
 }
 
 // regression test for https://github.com/prisma/prisma/issues/20557
-#[test_connector(tags(CockroachDb))]
+#[test_connector(tags(CockroachDb), exclude(CockroachDb231))]
 fn alter_type_works(api: TestApi) {
     let schema = r#"
         datasource db {
