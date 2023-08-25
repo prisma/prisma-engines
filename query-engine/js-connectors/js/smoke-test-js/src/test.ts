@@ -22,6 +22,7 @@ export async function smokeTest(db: Connector, prismaSchemaRelativePath: string)
   await test.testFindManyTypeTest()
   await test.createAutoIncrement()
   await test.testCreateAndDeleteChildParent()
+  await test.testTransaction()
 
   // Note: calling `engine.disconnect` won't actually close the database connection.
   console.log('[nodejs] disconnecting...')
@@ -38,12 +39,10 @@ export async function smokeTest(db: Connector, prismaSchemaRelativePath: string)
   await engine.disconnect('trace')
   console.log('[nodejs] re-disconnected')
 
-  // Close the database connection.
+  // Close the database connection. This is required to prevent the process from hanging.
   console.log('[nodejs] closing database connection...')
   await db.close()
   console.log('[nodejs] closed database connection')
- 
-  // process.exit(0)
 }
 
 class SmokeTest {
@@ -279,5 +278,25 @@ class SmokeTest {
       }
     `, 'trace', undefined)
     console.log('[nodejs] resultDeleteMany', JSON.stringify(JSON.parse(resultDeleteMany), null, 2))
+  }
+
+  async testTransaction() {
+    const startResponse = await this.engine.startTransaction(JSON.stringify({ isolation_level: 'Serializable', max_wait: 5000, timeout: 15000 }), 'trace')
+
+    const tx_id = JSON.parse(startResponse).id
+
+    console.log('[nodejs] transaction id', tx_id)
+    await this.engine.query(`
+    {
+      "action": "findMany",
+      "modelName": "Author",
+      "query": {
+        "selection": { "$scalars": true }
+      }
+    }
+    `, 'trace', tx_id)
+
+    const commitResponse = await this.engine.commitTransaction(tx_id, 'trace')
+    console.log('[nodejs] commited', commitResponse)
   }
 }

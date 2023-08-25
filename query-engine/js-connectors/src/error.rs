@@ -24,18 +24,6 @@ where
         .unwrap_or_else(panic_to_napi_err)
 }
 
-/// catches a panic thrown during the execution of a closure and transforms it into a the Error
-/// variant of a napi::Result.
-pub(crate) fn unwinding_panic<F, R>(f: F) -> napi::Result<R>
-where
-    F: Fn() -> napi::Result<R>,
-{
-    match std::panic::catch_unwind(std::panic::AssertUnwindSafe(f)) {
-        Ok(result) => result,
-        Err(panic_payload) => panic_to_napi_err(panic_payload),
-    }
-}
-
 fn panic_to_napi_err<R>(panic_payload: Box<dyn Any + Send>) -> napi::Result<R> {
     panic_payload
         .downcast_ref::<&str>()

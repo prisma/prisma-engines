@@ -1,6 +1,6 @@
 {
   "name": "@jkomyno/prisma-js-connector-utils",
-  "version": "0.0.1",
+  "version": "0.0.8",
   "description": "Internal set of utilities and types for Prisma's JS Connectors.",
   "main": "dist/index.js",
   "module": "dist/index.mjs",

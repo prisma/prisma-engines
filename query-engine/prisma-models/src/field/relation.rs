@@ -150,3 +150,11 @@ impl Display for RelationField {
         write!(f, "{}.{}", walker.model().name(), walker.name())
     }
 }
+
+impl std::fmt::Debug for RelationField {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.debug_tuple("RelationField")
+            .field(&format!("{}.{}", self.model().name(), self.name(),))
+            .finish()
+    }
+}

@@ -10,4 +10,5 @@
 mod error;
 mod proxy;
 mod queryable;
+mod transaction;
 pub use queryable::{from_napi, JsQueryable};
