@@ -179,7 +179,7 @@ pub(crate) fn where_unique_object_type(ctx: &'_ QuerySchema, model: Model) -> In
         );
         fields.extend(compound_id_field);
 
-        fields.extend(boolean_operators.into_iter());
+        fields.extend(boolean_operators);
         fields.extend(
             rest_fields
                 .into_iter()

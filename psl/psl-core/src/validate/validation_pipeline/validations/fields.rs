@@ -325,13 +325,13 @@ pub(super) fn validate_unsupported_field_type(field: ScalarFieldWalker<'_>, ctx:
     let source = if let Some(s) = ctx.datasource { s } else { return };
 
     static TYPE_REGEX: Lazy<Regex> = Lazy::new(|| {
-        Regex::new(r#"(?x)
+        Regex::new(r"(?x)
     ^                           # beginning of the string
     (?P<prefix>[^(]+)           # a required prefix that is any character until the first opening brace
     (?:\((?P<params>.*?)\))?    # (optional) an opening parenthesis, a closing parenthesis and captured params in-between
     (?P<suffix>.+)?             # (optional) captured suffix after the params until the end of the string
     $                           # end of the string
-    "#).unwrap()
+    ").unwrap()
     });
 
     let connector = source.active_connector;
