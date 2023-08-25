@@ -30,27 +30,8 @@ fn collection_with_view() {
     res.expect_warnings(&expected_warning);
 
     let expected_doc = expect![[r#"
-        type System.viewsPipeline {
-        lookup System.viewsPipeline$lookup @map("$lookup")
-        }
-
-        type System.viewsPipeline$lookup {
-        as String
-        foreignField String
-        from String
-        localField String
-        }
-
         model A {
           id String @id @default(auto()) @map("_id") @db.ObjectId
-        }
-
-        model system_views {
-          id     String @id @map("_id")
-          pipeline System.viewsPipeline[]
-          viewOn String
-
-          @@map("system.views")
         }
     "#]];
     expected_doc.assert_eq(res.datamodel());
