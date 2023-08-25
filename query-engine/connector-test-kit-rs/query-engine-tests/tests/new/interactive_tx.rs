@@ -357,7 +357,7 @@ mod interactive_tx {
         // Mongo for example doesn't read the inner commit value.
         is_one_of!(
             run_query!(&runner, r#"query { findManyTestModel { id }}"#),
-            vec![
+            [
                 r#"{"data":{"findManyTestModel":[{"id":1}]}}"#,
                 r#"{"data":{"findManyTestModel":[{"id":1},{"id":2}]}}"#
             ]

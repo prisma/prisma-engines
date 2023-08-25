@@ -1,9 +1,9 @@
 use core::fmt;
+use napi::threadsafe_function::{ErrorStrategy, ThreadsafeFunction, ThreadsafeFunctionCallMode};
 use query_core::telemetry;
 use query_engine_metrics::MetricRegistry;
 use serde_json::Value;
 use std::collections::BTreeMap;
-use std::sync::Arc;
 use tracing::{
     field::{Field, Visit},
     level_filters::LevelFilter,
@@ -15,7 +15,7 @@ use tracing_subscriber::{
     Layer, Registry,
 };
 
-use crate::log_callback::LogCallback;
+pub(crate) type LogCallback = ThreadsafeFunction<String, ErrorStrategy::Fatal>;
 
 pub(crate) struct Logger {
     dispatcher: Dispatch,
@@ -47,9 +47,8 @@ impl Logger {
             FilterExt::boxed(log_level)
         };
 
-        let log_callback_arc = Arc::new(log_callback);
         let is_user_trace = filter_fn(telemetry::helpers::user_facing_span_only_filter);
-        let tracer = crate::tracer::new_pipeline().install_simple(Arc::clone(&log_callback_arc));
+        let tracer = crate::tracer::new_pipeline().install_simple(log_callback.clone());
         let telemetry = if enable_tracing {
             let telemetry = tracing_opentelemetry::layer()
                 .with_tracer(tracer)
@@ -59,7 +58,7 @@ impl Logger {
             None
         };
 
-        let layer = CallbackLayer::new(log_callback_arc).with_filter(filters);
+        let layer = CallbackLayer::new(log_callback.clone()).with_filter(filters);
 
         let metrics = if enable_metrics {
             query_engine_metrics::setup();
@@ -136,11 +135,11 @@ impl<'a> ToString for JsonVisitor<'a> {
 }
 
 pub(crate) struct CallbackLayer {
-    callback: Arc<LogCallback>,
+    callback: LogCallback,
 }
 
 impl CallbackLayer {
-    pub fn new(callback: Arc<LogCallback>) -> Self {
+    pub fn new(callback: LogCallback) -> Self {
         CallbackLayer { callback }
     }
 }
@@ -151,6 +150,8 @@ impl<S: Subscriber> Layer<S> for CallbackLayer {
         let mut visitor = JsonVisitor::new(event.metadata().level(), event.metadata().target());
         event.record(&mut visitor);
 
-        let _ = self.callback.call(visitor.to_string());
+        let _ = self
+            .callback
+            .call(visitor.to_string(), ThreadsafeFunctionCallMode::Blocking);
     }
 }

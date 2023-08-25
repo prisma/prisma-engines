@@ -1,7 +1,7 @@
 use crate::helpers::*;
 use query_engine_tests::*;
 
-const JSON_QUERY: &str = r###"
+const JSON_QUERY: &str = r#"
 {
     "action": "findMany",
     "modelName": "Person",
@@ -13,15 +13,15 @@ const JSON_QUERY: &str = r###"
         }
     }
 }
-"###;
+"#;
 
-const GRAPHQL_QUERY: &str = r###"
+const GRAPHQL_QUERY: &str = r#"
 {
   "operationName": null,
   "variables": {},
   "query": "{\n  findManyPerson {\n    id\n  }\n}\n"
 }
-"###;
+"#;
 
 #[test_suite(schema(schema))]
 mod mismatched {

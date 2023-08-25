@@ -768,7 +768,7 @@ impl<'a> SqlSchemaDescriber<'a> {
     }
 
     fn extract_precision(input: &str) -> Option<u32> {
-        static RE: Lazy<Regex> = Lazy::new(|| Regex::new(r#".*\(([1-9])\)"#).unwrap());
+        static RE: Lazy<Regex> = Lazy::new(|| Regex::new(r".*\(([1-9])\)").unwrap());
         RE.captures(input)
             .and_then(|cap| cap.get(1).map(|precision| precision.as_str().parse::<u32>().unwrap()))
     }
@@ -778,8 +778,8 @@ impl<'a> SqlSchemaDescriber<'a> {
     // In addition, MariaDB will return string literals with the quotes and extra backslashes around
     // control characters like `\n`.
     fn unescape_and_unquote_default_string(default: String, flavour: &Flavour) -> String {
-        static MYSQL_ESCAPING_RE: Lazy<Regex> = Lazy::new(|| Regex::new(r#"\\('|\\[^\\])|'(')"#).unwrap());
-        static MARIADB_NEWLINE_RE: Lazy<Regex> = Lazy::new(|| Regex::new(r#"\\n"#).unwrap());
+        static MYSQL_ESCAPING_RE: Lazy<Regex> = Lazy::new(|| Regex::new(r"\\('|\\[^\\])|'(')").unwrap());
+        static MARIADB_NEWLINE_RE: Lazy<Regex> = Lazy::new(|| Regex::new(r"\\n").unwrap());
         static MARIADB_DEFAULT_QUOTE_UNESCAPE_RE: Lazy<Regex> = Lazy::new(|| Regex::new(r#"'(.*)'"#).unwrap());
 
         let maybe_unquoted: Cow<'_, str> = if matches!(flavour, Flavour::MariaDb) {
@@ -799,7 +799,7 @@ impl<'a> SqlSchemaDescriber<'a> {
     /// Tests whether an introspected default value should be categorized as current_timestamp.
     fn default_is_current_timestamp(default_str: &str) -> bool {
         static MYSQL_CURRENT_TIMESTAMP_RE: Lazy<Regex> =
-            Lazy::new(|| Regex::new(r#"(?i)^current_timestamp(\([0-9]*\))?$"#).unwrap());
+            Lazy::new(|| Regex::new(r"(?i)^current_timestamp(\([0-9]*\))?$").unwrap());
 
         MYSQL_CURRENT_TIMESTAMP_RE.is_match(default_str)
     }

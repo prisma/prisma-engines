@@ -591,7 +591,7 @@ mod proxy_test {
         let json_value = serde_json::Value::String(s.to_string());
         let quaint_value = js_value_to_quaint(json_value, column_type);
 
-        let date = NaiveDate::from_ymd_opt(2023, 01, 01).unwrap();
+        let date = NaiveDate::from_ymd_opt(2023, 1, 1).unwrap();
         assert_eq!(quaint_value, QuaintValue::Date(Some(date)));
     }
 
@@ -621,7 +621,7 @@ mod proxy_test {
         let json_value = serde_json::Value::String(s.to_string());
         let quaint_value = js_value_to_quaint(json_value, column_type);
 
-        let datetime = NaiveDate::from_ymd_opt(2023, 01, 01)
+        let datetime = NaiveDate::from_ymd_opt(2023, 1, 1)
             .unwrap()
             .and_hms_opt(23, 59, 59)
             .unwrap();
