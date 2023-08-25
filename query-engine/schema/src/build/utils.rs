@@ -81,7 +81,7 @@ pub(crate) fn input_field<'a>(
 
 /// Appends an option of type T to a vector over T if the option is Some.
 pub(crate) fn append_opt<T>(vec: &mut Vec<T>, opt: Option<T>) {
-    vec.extend(opt.into_iter())
+    vec.extend(opt)
 }
 
 /// Computes a compound field name based on an index.

@@ -715,7 +715,7 @@ impl QueryDocumentParser {
             })
             .collect::<QueryParserResult<ParsedInputMap<'a>>>()?;
 
-        map.extend(defaults.into_iter());
+        map.extend(defaults);
 
         // Ensure the constraints are upheld. If any `fields` are specified, then the constraints should be upheld against those only.
         // If no `fields` are specified, then the constraints should be upheld against all fields of the object.

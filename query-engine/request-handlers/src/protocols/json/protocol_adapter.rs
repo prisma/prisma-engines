@@ -414,6 +414,7 @@ impl<'a> JsonProtocolAdapter<'a> {
 }
 
 #[cfg(test)]
+#[allow(clippy::needless_raw_string_hashes)]
 mod tests {
     use super::*;
     use insta::assert_debug_snapshot;

@@ -315,7 +315,7 @@ pub trait Visitor<'a> {
 
         {
             self.write(" SET ")?;
-            let pairs = update.columns.into_iter().zip(update.values.into_iter());
+            let pairs = update.columns.into_iter().zip(update.values);
             let len = pairs.len();
 
             for (i, (key, value)) in pairs.enumerate() {
@@ -365,7 +365,7 @@ pub trait Visitor<'a> {
     }
 
     fn visit_update_set(&mut self, update: Update<'a>) -> Result {
-        let pairs = update.columns.into_iter().zip(update.values.into_iter());
+        let pairs = update.columns.into_iter().zip(update.values);
         let len = pairs.len();
 
         for (i, (key, value)) in pairs.enumerate() {
