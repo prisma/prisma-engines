@@ -175,9 +175,9 @@ impl SchemaConnector for SqlSchemaConnector {
         // If the env is set and non empty or set to `0`, we disable the lock.
         let disable_lock: bool = std::env::var("PRISMA_SCHEMA_DISABLE_ADVISORY_LOCK")
             .ok()
-            .and_then(|value: String| match &value as &str {
-                "0" | "" => Some(false),
-                _ => Some(true),
+            .map(|value| match value.as_str() {
+                "0" | "" => false,
+                _ => true,
             })
             .unwrap_or(false);
 
