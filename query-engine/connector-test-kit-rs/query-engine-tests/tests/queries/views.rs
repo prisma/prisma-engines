@@ -136,23 +136,23 @@ mod views {
 
     // schema name must be the name of the test in which it's called.
     async fn migrate_view_sql(runner: &Runner, schema_name: &str) -> String {
-        match runner.connector() {
-            ConnectorTag::Postgres(_)
-            | ConnectorTag::Cockroach(_)
+        match runner.connector_version() {
+            ConnectorVersion::Postgres(_)
+            | ConnectorVersion::CockroachDb(_)
              => {
                 r#"CREATE VIEW "TestView" AS SELECT "TestModel".id, "TestModel"."firstName", "TestModel"."lastName", CONCAT("TestModel"."firstName", ' ', "TestModel"."lastName") as "fullName" From "TestModel""#.to_owned()
             }
-            ConnectorTag::MySql(_) | ConnectorTag::Vitess(_)
+            ConnectorVersion::MySql(_) | ConnectorVersion::Vitess(_)
              => {
               r#"CREATE VIEW TestView AS SELECT TestModel.*, CONCAT(TestModel.firstName, ' ', TestModel.lastName) AS "fullName" FROM TestModel"#.to_owned()
             },
-            ConnectorTag::Sqlite(_) => {
+            ConnectorVersion::Sqlite => {
               r#"CREATE VIEW TestView AS SELECT TestModel.*, TestModel.firstName || ' ' || TestModel.lastName AS "fullName" FROM TestModel"#.to_owned()
             }
-            ConnectorTag::SqlServer(_) => {
+            ConnectorVersion::SqlServer(_) => {
               format!(r#"CREATE VIEW [views_{schema_name}].[TestView] AS SELECT [views_{schema_name}].[TestModel].[id], [views_{schema_name}].[TestModel].[firstName], [views_{schema_name}].[TestModel].[lastName], CONCAT([views_{schema_name}].[TestModel].[firstName], ' ', [views_{schema_name}].[TestModel].[lastName]) as "fullName" FROM [views_{schema_name}].[TestModel];"#)
             },
-            ConnectorTag::MongoDb(_) => unreachable!(),
+            ConnectorVersion::MongoDb(_) => unreachable!(),
         }
     }
 

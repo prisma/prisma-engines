@@ -591,7 +591,7 @@ mod proxy_test {
         let json_value = serde_json::Value::String(s.to_string());
         let quaint_value = js_value_to_quaint(json_value, column_type);
 
-        let date = NaiveDate::from_ymd(2023, 01, 01);
+        let date = NaiveDate::from_ymd_opt(2023, 01, 01).unwrap();
         assert_eq!(quaint_value, QuaintValue::Date(Some(date)));
     }
 
@@ -606,7 +606,7 @@ mod proxy_test {
         let json_value = serde_json::Value::String(s.to_string());
         let quaint_value = js_value_to_quaint(json_value, column_type);
 
-        let time: NaiveTime = NaiveTime::from_hms(23, 59, 59);
+        let time: NaiveTime = NaiveTime::from_hms_opt(23, 59, 59).unwrap();
         assert_eq!(quaint_value, QuaintValue::Time(Some(time)));
     }
 
@@ -621,7 +621,10 @@ mod proxy_test {
         let json_value = serde_json::Value::String(s.to_string());
         let quaint_value = js_value_to_quaint(json_value, column_type);
 
-        let datetime = NaiveDate::from_ymd(2023, 01, 01).and_hms(23, 59, 59);
+        let datetime = NaiveDate::from_ymd_opt(2023, 01, 01)
+            .unwrap()
+            .and_hms_opt(23, 59, 59)
+            .unwrap();
         let datetime = DateTime::from_utc(datetime, Utc);
         assert_eq!(quaint_value, QuaintValue::DateTime(Some(datetime)));
     }
@@ -642,7 +645,7 @@ mod proxy_test {
                 null
             ]
         });
-        let json_value = serde_json::Value::from(json.clone());
+        let json_value = json.clone();
         let quaint_value = js_value_to_quaint(json_value, column_type);
         assert_eq!(quaint_value, QuaintValue::Json(Some(json.clone())));
     }

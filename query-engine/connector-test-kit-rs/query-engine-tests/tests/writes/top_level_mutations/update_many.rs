@@ -4,7 +4,7 @@ use query_engine_tests::*;
 #[test_suite(schema(schema))]
 mod update_many {
     use indoc::indoc;
-    use query_engine_tests::{is_one_of, run_query, run_query_json, ConnectorTag};
+    use query_engine_tests::{is_one_of, run_query, run_query_json};
 
     fn schema() -> String {
         let schema = indoc! {
@@ -297,7 +297,7 @@ mod update_many {
         let count = &res["data"]["updateManyTestModel"]["count"];
 
         // MySql does not count incrementing a null so the count is different
-        if !matches!(runner.connector(), ConnectorTag::MySql(_)) {
+        if !matches!(runner.connector_version(), ConnectorVersion::MySql(_)) {
             assert_eq!(count, 3);
         }
 
