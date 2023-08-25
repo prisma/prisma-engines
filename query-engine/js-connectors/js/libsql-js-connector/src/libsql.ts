@@ -1,16 +1,16 @@
-import { createClient } from "@libsql/client";
+import { createClient, Client } from "@libsql/client";
 import { bindConnector, bindTransaction, Debug } from '@jkomyno/prisma-js-connector-utils'
 import type { Connector, ConnectorConfig, Query, Queryable, ResultSet, Transaction } from '@jkomyno/prisma-js-connector-utils'
 import { fieldToColumnType } from './conversion'
 
-const debug = Debug('prisma:js-connector:pg')
+const debug = Debug('prisma:js-connector:libsql')
 
-export type PrismaPgConfig = ConnectorConfig
+export type PrismaLibsqlConfig = ConnectorConfig
 
-type StdClient = pg.Pool
-type TransactionClient = pg.PoolClient
+type StdClient = Client
+type TransactionClient = Client // TODO was: pg.PoolClient
 
-class PgQueryable<ClientT extends StdClient | TransactionClient>
+class LibsqlQueryable<ClientT extends StdClient | TransactionClient>
   implements Queryable {
   readonly flavour = 'postgres'
 
@@ -24,7 +24,7 @@ class PgQueryable<ClientT extends StdClient | TransactionClient>
     const tag = '[js::query_raw]'
     debug(`${tag} %O`, query)
 
-    const { fields, rows: results } = await this.performIO(query)
+    const { columns: fields, rows: results } = await this.performIO(query)
 
     const columns = fields.map((field) => field.name)
     const resultSet: ResultSet = {
@@ -45,8 +45,8 @@ class PgQueryable<ClientT extends StdClient | TransactionClient>
     const tag = '[js::execute_raw]'
     debug(`${tag} %O`, query)
 
-    const { rowCount } = await this.performIO(query)
-    return rowCount
+    const { rowsAffected } = await this.performIO(query)
+    return rowsAffected
   }
 
   /**
@@ -58,7 +58,7 @@ class PgQueryable<ClientT extends StdClient | TransactionClient>
     const { sql, args: values } = query
 
     try {
-      const result = await this.client.query(sql, values)
+      const result = await this.client.execute({ sql: sql, args: values })
       return result
     } catch (e) {
       const error = e as Error
@@ -68,9 +68,9 @@ class PgQueryable<ClientT extends StdClient | TransactionClient>
   }
 }
 
-class PgTransaction extends PgQueryable<TransactionClient>
+class LibsqlTransaction extends LibsqlQueryable<TransactionClient>
   implements Transaction {
-  constructor(client: pg.PoolClient) {
+  constructor(client: TransactionClient) {
     super(client)
   }
 
@@ -79,7 +79,7 @@ class PgTransaction extends PgQueryable<TransactionClient>
     debug(`${tag} committing transaction`)
 
     try {
-      await this.client.query('COMMIT')
+      await this.client.execute('COMMIT')
     } finally {
       this.client.release()
     }
@@ -90,19 +90,20 @@ class PgTransaction extends PgQueryable<TransactionClient>
     debug(`${tag} rolling back the transaction`)
 
     try {
-      await this.client.query('ROLLBACK')
+      await this.client.execute('ROLLBACK')
     } finally {
       this.client.release()
     }
   }
 }
 
-class PrismaPg extends PgQueryable<StdClient> implements Connector {
-  constructor(config: PrismaPgConfig) {
+class PrismaLibsql extends LibsqlQueryable<StdClient> implements Connector {
+  constructor(config: PrismaLibsqlConfig) {
     const { url: connectionString } = config
     
-    const client = new pg.Pool({
-      connectionString,
+    const client = createClient({
+      url: connectionString,
+      authToken: authToken // TODO
     })
 
     super(client)
@@ -118,13 +119,13 @@ class PrismaPg extends PgQueryable<StdClient> implements Connector {
       )
     }
 
-    return bindTransaction(new PgTransaction(connection))
+    return bindTransaction(new LibsqlTransaction(connection))
   }
 
   async close() {}
 }
 
-export const createPgConnector = (config: PrismaPgConfig): Connector => {
-  const db = new PrismaPg(config)
+export const createPgConnector = (config: PrismaLibsqlConfig): Connector => {
+  const db = new PrismaLibsql(config)
   return bindConnector(db)
 }
