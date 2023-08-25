@@ -31,7 +31,16 @@ pub async fn describe(client: &mongodb::Client, db_name: &str) -> mongodb::error
         let has_schema = options.validator.is_some();
         let is_capped = options.capped.is_some();
 
+        println!("collection: {}, type: {:?}", collection_name, collection_type);
+
+        // We need to skip views, we do not support introspecting them yet.
         if collection_type == mongodb::results::CollectionType::View {
+            continue;
+        }
+
+        // We need to skip system collections, they are only used by MongoDB internally.
+        // https://www.mongodb.com/docs/manual/reference/system-collections/
+        if collection_type == mongodb::results::CollectionType::Collection && collection_name.starts_with("system.") {
             continue;
         }
 
@@ -53,6 +62,8 @@ pub async fn describe(client: &mongodb::Client, db_name: &str) -> mongodb::error
                 (_, Some(_)) => IndexType::Fulltext,
                 _ => IndexType::Normal,
             };
+
+            println!("name: {}, type: {:?}", name, r#type);
 
             if name == "_id_" {
                 continue; // do not introspect or diff these
