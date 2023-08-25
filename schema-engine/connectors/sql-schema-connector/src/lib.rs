@@ -23,7 +23,7 @@ use psl::ValidatedSchema;
 use schema_connector::{migrations_directory::MigrationDirectory, *};
 use sql_migration::{DropUserDefinedType, DropView, SqlMigration, SqlMigrationStep};
 use sql_schema_describer as sql;
-use std::sync::Arc;
+use std::{future, sync::Arc};
 
 const MIGRATIONS_TABLE_NAME: &str = "_prisma_migrations";
 
@@ -172,6 +172,21 @@ impl SchemaConnector for SqlSchemaConnector {
     }
 
     fn acquire_lock(&mut self) -> BoxFuture<'_, ConnectorResult<()>> {
+        // If the env is set and non empty or set to `0`, we disable the lock.
+        let disable_lock: bool = std::env::var("PRISMA_SCHEMA_DISABLE_ADVISORY_LOCK")
+            .ok()
+            .and_then(|value: String| match &value as &str {
+                "0" | "" => Some(false),
+                _ => Some(true),
+            })
+            .unwrap_or(false);
+
+        if disable_lock {
+            tracing::info!(
+                "PRISMA_SCHEMA_DISABLE_ADVISORY_LOCK environnement variable is set. Advisory lock is disabled."
+            );
+            return Box::pin(future::ready(Ok(())));
+        }
         Box::pin(self.flavour.acquire_lock())
     }
 
