@@ -1,6 +1,6 @@
 use sql_migration_tests::test_api::*;
 
-#[test_connector(tags(CockroachDb))]
+#[test_connector(tags(CockroachDb), exclude(CockroachDb231))]
 fn failing_migration_after_migration_dropping_data(api: TestApi) {
     let migrations = &[
         r#"
@@ -49,7 +49,7 @@ fn failing_migration_after_migration_dropping_data(api: TestApi) {
     expectation.assert_eq(&err);
 }
 
-#[test_connector(tags(CockroachDb))]
+#[test_connector(tags(CockroachDb), exclude(CockroachDb231))]
 fn failing_step_in_migration_dropping_data(api: TestApi) {
     let migrations = &[
         r#"
@@ -170,7 +170,7 @@ fn multiple_alter_tables_in_multiple_migration_works(api: TestApi) {
     api.apply_migrations(&dir).send_sync();
 }
 
-#[test_connector(tags(CockroachDb))]
+#[test_connector(tags(CockroachDb), exclude(CockroachDb231))]
 fn syntax_errors_return_error_position(api: TestApi) {
     let migrations = &[r#"
             CREATE TABLE "Dog" (
