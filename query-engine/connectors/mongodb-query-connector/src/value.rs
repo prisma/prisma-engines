@@ -139,7 +139,7 @@ impl IntoBson for (&MongoDbType, PrismaValue) {
                 }
 
                 let mut bytes: [u8; 12] = [0x0; 12];
-                bytes.iter_mut().set_from(b.into_iter());
+                bytes.iter_mut().set_from(b);
 
                 Bson::ObjectId(ObjectId::from_bytes(bytes))
             }

@@ -559,7 +559,7 @@ mod tests {
                 global_labels.insert("global_one".to_string(), "one".to_string());
 
                 let prometheus = metrics.to_prometheus(global_labels);
-                let snapshot = expect_test::expect![[r##"
+                let snapshot = expect_test::expect![[r#"
                     # HELP counter_1 
                     # TYPE counter_1 counter
                     counter_1{global_one="one",global_two="two",label="one"} 4
@@ -608,7 +608,7 @@ mod tests {
                     histogram_2_sum{global_one="one",global_two="two"} 1000
                     histogram_2_count{global_one="one",global_two="two"} 1
 
-                "##]];
+                "#]];
 
                 snapshot.assert_eq(&prometheus);
             }

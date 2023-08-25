@@ -208,7 +208,7 @@ mod json_filters {
         // MySQL has slightly different semantics and also coerces null to [null].
         is_one_of!(
             run_query!(runner, jsonq(&runner, r#"array_contains: "null""#, None)),
-            vec![
+            [
                 r#"{"data":{"findManyTestModel":[{"id":7}]}}"#,
                 r#"{"data":{"findManyTestModel":[{"id":7},{"id":8}]}}"#
             ]
@@ -216,7 +216,7 @@ mod json_filters {
 
         is_one_of!(
             run_query!(runner, jsonq(&runner, r#"array_contains: "[null]""#, None)),
-            vec![
+            [
                 r#"{"data":{"findManyTestModel":[{"id":7}]}}"#,
                 r#"{"data":{"findManyTestModel":[{"id":7},{"id":8}]}}"#
             ]

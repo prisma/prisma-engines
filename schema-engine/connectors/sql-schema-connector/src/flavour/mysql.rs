@@ -17,7 +17,7 @@ use std::future;
 use url::Url;
 
 const ADVISORY_LOCK_TIMEOUT: std::time::Duration = std::time::Duration::from_secs(10);
-static QUALIFIED_NAME_RE: Lazy<Regex> = Lazy::new(|| Regex::new(r#"`[^ ]+`\.`[^ ]+`"#).unwrap());
+static QUALIFIED_NAME_RE: Lazy<Regex> = Lazy::new(|| Regex::new(r"`[^ ]+`\.`[^ ]+`").unwrap());
 
 type State = super::State<Params, (BitFlags<Circumstances>, Connection)>;
 

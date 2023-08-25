@@ -378,7 +378,7 @@ fn sql_server_absolute_windows_ca_file_should_not_be_modified() {
         .unwrap();
 
     assert_eq!(
-        r#"sqlserver://localhost:1433;trustServerCertificateCA=C:{\\}path{\}customCA.crt"#,
+        r"sqlserver://localhost:1433;trustServerCertificateCA=C:{\\}path{\}customCA.crt",
         url
     )
 }
