@@ -179,7 +179,7 @@ impl SqlSchemaAssertionsExt for SqlSchema {
     }
 
     fn assert_not_namespace(&self, namespace_name: &str) -> &Self {
-        if let Some(_) = self.walk_namespaces().find(|ns| ns.name() == namespace_name) {
+        if self.walk_namespaces().any(|ns| ns.name() == namespace_name) {
             panic!("Found unexpected namespace '{namespace_name}'")
         }
         self
