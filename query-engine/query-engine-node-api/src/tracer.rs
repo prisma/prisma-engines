@@ -90,6 +90,5 @@ impl SpanExporter for ClientSpanExporter {
         }
 
         Ok(())
-        // .map_err(|err| T))
     }
 }
