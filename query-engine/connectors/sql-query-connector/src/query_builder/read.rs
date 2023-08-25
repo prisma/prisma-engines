@@ -1,6 +1,6 @@
 use crate::{
-    cursor_condition, filter_conversion::AliasedCondition, model_extensions::*, nested_aggregations,
-    ordering::OrderByBuilder, sql_trace::SqlTraceComment, Context,
+    cursor_condition, filter_conversion::AliasedCondition, join_utils::IRJoinsTree, model_extensions::*, ordering,
+    sql_trace::SqlTraceComment, Context,
 };
 use connector_interface::{filter::Filter, AggregationSelection, QueryArguments, RelAggregationSelection};
 use itertools::Itertools;
@@ -58,12 +58,31 @@ impl SelectDefinition for QueryArguments {
         aggr_selections: &[RelAggregationSelection],
         ctx: &Context<'_>,
     ) -> (Select<'static>, Vec<Expression<'static>>) {
-        let order_by_definitions = OrderByBuilder::default().build(&self, ctx);
+        let joins_ctx = IRJoinsTree::new()
+            .with_order_by(&self.order_by)
+            .with_rel_aggregation_selections(aggr_selections)
+            .build(ctx);
+
+        let selections = joins_ctx.selections();
+
+        let order_by_definitions = ordering::build(&self, &joins_ctx, ctx);
         let cursor_condition = cursor_condition::build(&self, model, &order_by_definitions, ctx);
-        let aggregation_joins = nested_aggregations::build(aggr_selections, ctx);
 
         let limit = if self.ignore_take { None } else { self.take_abs() };
         let skip = if self.ignore_skip { 0 } else { self.skip.unwrap_or(0) };
+
+        let joined_table = joins_ctx
+            .iter_joins()
+            .fold(model.as_table(ctx), |acc, join| acc.join(join.data));
+
+        let select_ast = Select::from_table(joined_table)
+            .offset(skip as usize)
+            .append_trace(&Span::current())
+            .add_trace_id(ctx.trace_id);
+
+        let select_ast = order_by_definitions
+            .iter()
+            .fold(select_ast, |acc, o| acc.order_by(o.order_definition.clone()));
 
         let filter: ConditionTree = self
             .filter
@@ -76,31 +95,11 @@ impl SelectDefinition for QueryArguments {
             (filter, cursor) => ConditionTree::and(filter, cursor),
         };
 
-        // Add joins necessary to the ordering
-        let joined_table = order_by_definitions
-            .iter()
-            .flat_map(|j| &j.joins)
-            .fold(model.as_table(ctx), |acc, join| acc.left_join(join.clone().data));
-
-        // Add joins necessary to the nested aggregations
-        let joined_table = aggregation_joins
-            .joins
-            .into_iter()
-            .fold(joined_table, |acc, join| acc.left_join(join.data));
-
-        let select_ast = Select::from_table(joined_table)
-            .so_that(conditions)
-            .offset(skip as usize)
-            .append_trace(&Span::current())
-            .add_trace_id(ctx.trace_id);
-
-        let select_ast = order_by_definitions
-            .iter()
-            .fold(select_ast, |acc, o| acc.order_by(o.order_definition.clone()));
+        let select_ast = select_ast.so_that(conditions);
 
         match limit {
-            Some(limit) => (select_ast.limit(limit as usize), aggregation_joins.columns),
-            None => (select_ast, aggregation_joins.columns),
+            Some(limit) => (select_ast.limit(limit as usize), selections),
+            None => (select_ast, selections),
         }
     }
 }
@@ -117,12 +116,11 @@ where
 {
     let (select, additional_selection_set) = query.into_select(model, aggr_selections, ctx);
     let select = columns.fold(select, |acc, col| acc.column(col));
-
-    let select = select.append_trace(&Span::current()).add_trace_id(ctx.trace_id);
-
-    additional_selection_set
+    let select = additional_selection_set
         .into_iter()
-        .fold(select, |acc, col| acc.value(col))
+        .fold(select, |acc, col| acc.value(col));
+
+    select.append_trace(&Span::current()).add_trace_id(ctx.trace_id)
 }
 
 /// Generates a query of the form:

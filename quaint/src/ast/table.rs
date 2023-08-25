@@ -128,6 +128,19 @@ impl<'a> Table<'a> {
         Ok(result)
     }
 
+    /// Adds a `LEFT` or `RIGHT` or `INNER` or `FULL` JOIN clause to the query.
+    pub fn join<J>(self, join: J) -> Self
+    where
+        J: Into<Join<'a>>,
+    {
+        match join.into() {
+            Join::Inner(x) => self.inner_join(x),
+            Join::Left(x) => self.left_join(x),
+            Join::Right(x) => self.right_join(x),
+            Join::Full(x) => self.full_join(x),
+        }
+    }
+
     /// Adds a `LEFT JOIN` clause to the query, specifically for that table.
     /// Useful to positionally add a JOIN clause in case you are selecting from multiple tables.
     ///

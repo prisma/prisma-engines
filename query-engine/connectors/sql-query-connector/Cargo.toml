@@ -25,6 +25,7 @@ uuid.workspace = true
 opentelemetry = { version = "0.17", features = ["tokio"] }
 tracing-opentelemetry = "0.17.3"
 quaint.workspace = true
+indexmap = "1.7"
 
 [dependencies.connector-interface]
 package = "query-connector"

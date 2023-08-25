@@ -165,6 +165,12 @@ pub struct OrderByScalar {
     pub nulls_order: Option<NullsOrder>,
 }
 
+impl OrderByScalar {
+    pub fn relation_hops(&self) -> Vec<&RelationFieldRef> {
+        self.path.iter().filter_map(|hop| hop.as_relation_hop()).collect()
+    }
+}
+
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct OrderByScalarAggregation {
     pub field: ScalarFieldRef,
@@ -177,6 +183,12 @@ pub struct OrderByToManyAggregation {
     pub path: Vec<OrderByHop>,
     pub sort_order: SortOrder,
     pub sort_aggregation: SortAggregation,
+}
+
+impl OrderByToManyAggregation {
+    pub fn relation_hops(&self) -> Vec<&RelationFieldRef> {
+        self.path.iter().filter_map(|hop| hop.as_relation_hop()).collect()
+    }
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
