@@ -1666,7 +1666,7 @@
             })
             .collect::&lt;QueryParserResult&lt;ParsedInputMap&lt;<span class="lifetime">&#39;a</span>&gt;&gt;&gt;()<span class="question-mark">?</span>;
 
-        map.extend(defaults.into_iter());
+        map.extend(defaults);
 
         <span class="comment">// Ensure the constraints are upheld. If any `fields` are specified, then the constraints should be upheld against those only.
         // If no `fields` are specified, then the constraints should be upheld against all fields of the object.

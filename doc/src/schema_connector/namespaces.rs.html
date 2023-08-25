@@ -73,7 +73,7 @@
     <span class="kw">type </span>IntoIter = std::iter::Chain&lt;std::iter::Once&lt;String&gt;, &lt;Vec&lt;String&gt; <span class="kw">as </span>IntoIterator&gt;::IntoIter&gt;;
 
     <span class="kw">fn </span>into_iter(<span class="self">self</span>) -&gt; <span class="self">Self</span>::IntoIter {
-        std::iter::once(<span class="self">self</span>.<span class="number">0</span>).chain(<span class="self">self</span>.<span class="number">1</span>.into_iter())
+        std::iter::once(<span class="self">self</span>.<span class="number">0</span>).chain(<span class="self">self</span>.<span class="number">1</span>)
     }
 }
 </code></pre></div></section></main></body></html>

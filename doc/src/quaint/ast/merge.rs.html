@@ -267,7 +267,7 @@
 
         <span class="kw">let </span>query = <span class="kw">match </span>insert.values.kind {
             ExpressionKind::Row(row) =&gt; {
-                <span class="kw">let </span>cols_vals = columns.iter().zip(row.values.into_iter());
+                <span class="kw">let </span>cols_vals = columns.iter().zip(row.values);
 
                 <span class="kw">let </span>select = cols_vals.fold(Select::default(), |query, (col, val)| {
                     query.value(val.alias(col.name.clone()))
@@ -278,14 +278,14 @@
             ExpressionKind::Values(values) =&gt; {
                 <span class="kw">let </span><span class="kw-2">mut </span>rows = values.rows;
                 <span class="kw">let </span>row = rows.pop().unwrap();
-                <span class="kw">let </span>cols_vals = columns.iter().zip(row.values.into_iter());
+                <span class="kw">let </span>cols_vals = columns.iter().zip(row.values);
 
                 <span class="kw">let </span>select = cols_vals.fold(Select::default(), |query, (col, val)| {
                     query.value(val.alias(col.name.clone()))
                 });
 
                 <span class="kw">let </span>union = rows.into_iter().fold(Union::new(select), |union, row| {
-                    <span class="kw">let </span>cols_vals = columns.iter().zip(row.values.into_iter());
+                    <span class="kw">let </span>cols_vals = columns.iter().zip(row.values);
 
                     <span class="kw">let </span>select = cols_vals.fold(Select::default(), |query, (col, val)| {
                         query.value(val.alias(col.name.clone()))

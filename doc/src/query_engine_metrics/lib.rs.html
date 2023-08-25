@@ -1178,7 +1178,7 @@
                 global_labels.insert(<span class="string">&quot;global_one&quot;</span>.to_string(), <span class="string">&quot;one&quot;</span>.to_string());
 
                 <span class="kw">let </span>prometheus = metrics.to_prometheus(global_labels);
-                <span class="kw">let </span>snapshot = <span class="macro">expect_test::expect!</span>[[<span class="string">r##&quot;
+                <span class="kw">let </span>snapshot = <span class="macro">expect_test::expect!</span>[[<span class="string">r#&quot;
                     # HELP counter_1 
                     # TYPE counter_1 counter
                     counter_1{global_one=&quot;one&quot;,global_two=&quot;two&quot;,label=&quot;one&quot;} 4
@@ -1227,7 +1227,7 @@
                     histogram_2_sum{global_one=&quot;one&quot;,global_two=&quot;two&quot;} 1000
                     histogram_2_count{global_one=&quot;one&quot;,global_two=&quot;two&quot;} 1
 
-                &quot;##</span>]];
+                &quot;#</span>]];
 
                 snapshot.assert_eq(<span class="kw-2">&amp;</span>prometheus);
             }

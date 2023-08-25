@@ -630,17 +630,17 @@
     <span class="kw">use </span><span class="kw">super</span>::is_leftwise_included_it;
     <span class="attr">#[test]
     </span><span class="kw">fn </span>test_is_left_wise_included() {
-        <span class="kw">let </span>item = <span class="macro">vec!</span>[<span class="number">1</span>, <span class="number">2</span>];
-        <span class="kw">let </span>group = <span class="macro">vec!</span>[<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>];
+        <span class="kw">let </span>item = [<span class="number">1</span>, <span class="number">2</span>];
+        <span class="kw">let </span>group = [<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>];
         <span class="macro">assert!</span>(is_leftwise_included_it(item.iter(), group.iter()));
-        <span class="kw">let </span>item = <span class="macro">vec!</span>[<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>];
-        <span class="kw">let </span>group = <span class="macro">vec!</span>[<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>];
+        <span class="kw">let </span>item = [<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>];
+        <span class="kw">let </span>group = [<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>];
         <span class="macro">assert!</span>(is_leftwise_included_it(item.iter(), group.iter()));
-        <span class="kw">let </span>item = <span class="macro">vec!</span>[<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>];
-        <span class="kw">let </span>group = <span class="macro">vec!</span>[<span class="number">1</span>, <span class="number">2</span>];
+        <span class="kw">let </span>item = [<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>];
+        <span class="kw">let </span>group = [<span class="number">1</span>, <span class="number">2</span>];
         <span class="macro">assert!</span>(!is_leftwise_included_it(item.iter(), group.iter()));
-        <span class="kw">let </span>item = <span class="macro">vec!</span>[<span class="number">2</span>, <span class="number">3</span>];
-        <span class="kw">let </span>group = <span class="macro">vec!</span>[<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>];
+        <span class="kw">let </span>item = [<span class="number">2</span>, <span class="number">3</span>];
+        <span class="kw">let </span>group = [<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>];
         <span class="macro">assert!</span>(!is_leftwise_included_it(item.iter(), group.iter()));
     }
 }

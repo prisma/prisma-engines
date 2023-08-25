@@ -151,7 +151,7 @@
         field
             .explicit_on_delete_span()
             .into_iter()
-            .chain(field.explicit_on_update_span().into_iter())
+            .chain(field.explicit_on_update_span())
     });
 
     <span class="kw">for </span>span <span class="kw">in </span>referential_action_spans {

@@ -1698,7 +1698,7 @@
     }
 
     <span class="kw">fn </span>extract_precision(input: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Option</span>&lt;u32&gt; {
-        <span class="kw">static </span>RE: Lazy&lt;Regex&gt; = Lazy::new(|| Regex::new(<span class="string">r#&quot;.*\(([1-9])\)&quot;#</span>).unwrap());
+        <span class="kw">static </span>RE: Lazy&lt;Regex&gt; = Lazy::new(|| Regex::new(<span class="string">r&quot;.*\(([1-9])\)&quot;</span>).unwrap());
         RE.captures(input)
             .and_then(|cap| cap.get(<span class="number">1</span>).map(|precision| precision.as_str().parse::&lt;u32&gt;().unwrap()))
     }
@@ -1708,8 +1708,8 @@
     // In addition, MariaDB will return string literals with the quotes and extra backslashes around
     // control characters like `\n`.
     </span><span class="kw">fn </span>unescape_and_unquote_default_string(default: String, flavour: <span class="kw-2">&amp;</span>Flavour) -&gt; String {
-        <span class="kw">static </span>MYSQL_ESCAPING_RE: Lazy&lt;Regex&gt; = Lazy::new(|| Regex::new(<span class="string">r#&quot;\\(&#39;|\\[^\\])|&#39;(&#39;)&quot;#</span>).unwrap());
-        <span class="kw">static </span>MARIADB_NEWLINE_RE: Lazy&lt;Regex&gt; = Lazy::new(|| Regex::new(<span class="string">r#&quot;\\n&quot;#</span>).unwrap());
+        <span class="kw">static </span>MYSQL_ESCAPING_RE: Lazy&lt;Regex&gt; = Lazy::new(|| Regex::new(<span class="string">r&quot;\\(&#39;|\\[^\\])|&#39;(&#39;)&quot;</span>).unwrap());
+        <span class="kw">static </span>MARIADB_NEWLINE_RE: Lazy&lt;Regex&gt; = Lazy::new(|| Regex::new(<span class="string">r&quot;\\n&quot;</span>).unwrap());
         <span class="kw">static </span>MARIADB_DEFAULT_QUOTE_UNESCAPE_RE: Lazy&lt;Regex&gt; = Lazy::new(|| Regex::new(<span class="string">r#&quot;&#39;(.*)&#39;&quot;#</span>).unwrap());
 
         <span class="kw">let </span>maybe_unquoted: Cow&lt;<span class="lifetime">&#39;_</span>, str&gt; = <span class="kw">if </span><span class="macro">matches!</span>(flavour, Flavour::MariaDb) {
@@ -1729,7 +1729,7 @@
     <span class="doccomment">/// Tests whether an introspected default value should be categorized as current_timestamp.
     </span><span class="kw">fn </span>default_is_current_timestamp(default_str: <span class="kw-2">&amp;</span>str) -&gt; bool {
         <span class="kw">static </span>MYSQL_CURRENT_TIMESTAMP_RE: Lazy&lt;Regex&gt; =
-            Lazy::new(|| Regex::new(<span class="string">r#&quot;(?i)^current_timestamp(\([0-9]*\))?$&quot;#</span>).unwrap());
+            Lazy::new(|| Regex::new(<span class="string">r&quot;(?i)^current_timestamp(\([0-9]*\))?$&quot;</span>).unwrap());
 
         MYSQL_CURRENT_TIMESTAMP_RE.is_match(default_str)
     }

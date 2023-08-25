@@ -1442,7 +1442,7 @@
 
         <span class="kw">if </span><span class="self">self</span>.is_cockroachdb() {
             <span class="kw">let </span><span class="kw-2">mut </span>out = Vec::with_capacity(before_statements.len() + after_statements.len() + lines.len());
-            out.extend(before_statements.into_iter());
+            out.extend(before_statements);
             <span class="kw">for </span>line <span class="kw">in </span>lines {
                 out.push(<span class="macro">format!</span>(
                     <span class="string">&quot;ALTER TABLE {} {}&quot;</span>,
@@ -1450,7 +1450,7 @@
                     line
                 ))
             }
-            out.extend(after_statements.into_iter());
+            out.extend(after_statements);
             out
         } <span class="kw">else </span>{
             <span class="kw">let </span>alter_table = <span class="macro">format!</span>(
@@ -1462,7 +1462,7 @@
             before_statements
                 .into_iter()
                 .chain(std::iter::once(alter_table))
-                .chain(after_statements.into_iter())
+                .chain(after_statements)
                 .collect()
         }
     }

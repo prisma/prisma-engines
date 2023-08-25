@@ -625,7 +625,7 @@
                 }
 
                 <span class="kw">let </span><span class="kw-2">mut </span>bytes: [u8; <span class="number">12</span>] = [<span class="number">0x0</span>; <span class="number">12</span>];
-                bytes.iter_mut().set_from(b.into_iter());
+                bytes.iter_mut().set_from(b);
 
                 Bson::ObjectId(ObjectId::from_bytes(bytes))
             }

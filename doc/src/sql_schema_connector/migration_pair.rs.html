@@ -112,7 +112,7 @@
     {
         f(<span class="kw-2">&amp;</span><span class="self">self</span>.previous)
             .into_iter()
-            .zip(f(<span class="kw-2">&amp;</span><span class="self">self</span>.next).into_iter())
+            .zip(f(<span class="kw-2">&amp;</span><span class="self">self</span>.next))
             .map(MigrationPair::from)
     }
 

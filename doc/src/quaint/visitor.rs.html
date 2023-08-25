@@ -1462,7 +1462,7 @@
 
         {
             <span class="self">self</span>.write(<span class="string">&quot; SET &quot;</span>)<span class="question-mark">?</span>;
-            <span class="kw">let </span>pairs = update.columns.into_iter().zip(update.values.into_iter());
+            <span class="kw">let </span>pairs = update.columns.into_iter().zip(update.values);
             <span class="kw">let </span>len = pairs.len();
 
             <span class="kw">for </span>(i, (key, value)) <span class="kw">in </span>pairs.enumerate() {
@@ -1512,7 +1512,7 @@
     }
 
     <span class="kw">fn </span>visit_update_set(<span class="kw-2">&amp;mut </span><span class="self">self</span>, update: Update&lt;<span class="lifetime">&#39;a</span>&gt;) -&gt; <span class="prelude-ty">Result </span>{
-        <span class="kw">let </span>pairs = update.columns.into_iter().zip(update.values.into_iter());
+        <span class="kw">let </span>pairs = update.columns.into_iter().zip(update.values);
         <span class="kw">let </span>len = pairs.len();
 
         <span class="kw">for </span>(i, (key, value)) <span class="kw">in </span>pairs.enumerate() {

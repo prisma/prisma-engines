@@ -297,9 +297,6 @@
 <a href="#297" id="297">297</a>
 <a href="#298" id="298">298</a>
 <a href="#299" id="299">299</a>
-<a href="#300" id="300">300</a>
-<a href="#301" id="301">301</a>
-<a href="#302" id="302">302</a>
 </pre></div><pre class="rust"><code><span class="kw">use crate</span>::{ArgumentValue, ArgumentValueObject};
 <span class="kw">use </span>indexmap::IndexMap;
 <span class="kw">use </span>itertools::Itertools;
@@ -498,18 +495,15 @@
     <span class="kw">fn </span>from(other: In&lt;<span class="lifetime">&#39;a</span>&gt;) -&gt; <span class="self">Self </span>{
         <span class="kw">match </span>other.selection_set {
             SelectionSet::Multi(key_sets, val_sets) =&gt; {
-                <span class="kw">let </span>key_vals = key_sets.into_iter().zip(val_sets.into_iter());
+                <span class="kw">let </span>key_vals = key_sets.into_iter().zip(val_sets);
 
                 <span class="kw">let </span>conjuctive = key_vals.fold(Conjuctive::new(), |acc, (keys, vals)| {
-                    <span class="kw">let </span>ands = keys
-                        .into_iter()
-                        .zip(vals.into_iter())
-                        .fold(Conjuctive::new(), |acc, (key, val)| {
-                            <span class="kw">let </span><span class="kw-2">mut </span>argument = IndexMap::new();
-                            argument.insert(key.into_owned(), val);
+                    <span class="kw">let </span>ands = keys.into_iter().zip(vals).fold(Conjuctive::new(), |acc, (key, val)| {
+                        <span class="kw">let </span><span class="kw-2">mut </span>argument = IndexMap::new();
+                        argument.insert(key.into_owned(), val);
 
-                            acc.and(argument)
-                        });
+                        acc.and(argument)
+                    });
 
                     acc.or(ands)
                 });

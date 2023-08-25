@@ -1231,7 +1231,7 @@
             </span><span class="kw">let </span>base_select = <span class="kw">super</span>::Select::from_table(ident).column(selected_columns.remove(<span class="number">0</span>));
 
             <span class="comment">// We know we have the same amount of columns on both sides,
-            </span><span class="kw">let </span>column_pairs = cols.into_iter().zip(selected_columns.into_iter());
+            </span><span class="kw">let </span>column_pairs = cols.into_iter().zip(selected_columns);
 
             <span class="comment">// Adding to the new select a condition to filter out the rest of
             // the tuple, so if our tuple is `(a, b) IN (SELECT x, y ..)`, this

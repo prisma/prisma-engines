@@ -1870,6 +1870,7 @@
 <a href="#1870" id="1870">1870</a>
 <a href="#1871" id="1871">1871</a>
 <a href="#1872" id="1872">1872</a>
+<a href="#1873" id="1873">1873</a>
 </pre></div><pre class="rust"><code><span class="kw">use crate</span>::{FieldQuery, HandlerError, JsonSingleQuery, SelectionSet};
 <span class="kw">use </span>bigdecimal::{BigDecimal, FromPrimitive};
 <span class="kw">use </span>indexmap::IndexMap;
@@ -2286,6 +2287,7 @@
 }
 
 <span class="attr">#[cfg(test)]
+#[allow(clippy::needless_raw_string_hashes)]
 </span><span class="kw">mod </span>tests {
     <span class="kw">use super</span>::<span class="kw-2">*</span>;
     <span class="kw">use </span>insta::assert_debug_snapshot;

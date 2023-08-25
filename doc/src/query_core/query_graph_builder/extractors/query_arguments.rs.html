@@ -349,10 +349,6 @@
 <a href="#349" id="349">349</a>
 <a href="#350" id="350">350</a>
 <a href="#351" id="351">351</a>
-<a href="#352" id="352">352</a>
-<a href="#353" id="353">353</a>
-<a href="#354" id="354">354</a>
-<a href="#355" id="355">355</a>
 </pre></div><pre class="rust"><code><span class="kw">use super</span>::<span class="kw-2">*</span>;
 <span class="kw">use crate</span>::{
     query_document::{ParsedArgument, ParsedInputMap},
@@ -370,51 +366,47 @@
     arguments: Vec&lt;ParsedArgument&lt;<span class="lifetime">&#39;_</span>&gt;&gt;,
     model: <span class="kw-2">&amp;</span>Model,
 ) -&gt; QueryGraphBuilderResult&lt;QueryArguments&gt; {
-    <span class="kw">let </span>query_args = arguments.into_iter().fold(
-        <span class="prelude-val">Ok</span>(QueryArguments::new(model.clone())),
-        |result: QueryGraphBuilderResult&lt;QueryArguments&gt;, arg| {
-            <span class="kw">if let </span><span class="prelude-val">Ok</span>(res) = result {
-                <span class="kw">match </span>arg.name.as_str() {
-                    args::CURSOR =&gt; <span class="prelude-val">Ok</span>(QueryArguments {
-                        cursor: extract_cursor(arg.value, model)<span class="question-mark">?</span>,
-                        ..res
-                    }),
+    <span class="kw">let </span>query_args = arguments.into_iter().try_fold(
+        QueryArguments::new(model.clone()),
+        |result, arg| -&gt; QueryGraphBuilderResult&lt;QueryArguments&gt; {
+            <span class="kw">match </span>arg.name.as_str() {
+                args::CURSOR =&gt; <span class="prelude-val">Ok</span>(QueryArguments {
+                    cursor: extract_cursor(arg.value, model)<span class="question-mark">?</span>,
+                    ..result
+                }),
 
-                    args::TAKE =&gt; <span class="prelude-val">Ok</span>(QueryArguments {
-                        take: arg.value.try_into()<span class="question-mark">?</span>,
-                        ..res
-                    }),
+                args::TAKE =&gt; <span class="prelude-val">Ok</span>(QueryArguments {
+                    take: arg.value.try_into()<span class="question-mark">?</span>,
+                    ..result
+                }),
 
-                    args::SKIP =&gt; <span class="prelude-val">Ok</span>(QueryArguments {
-                        skip: extract_skip(arg.value)<span class="question-mark">?</span>,
-                        ..res
-                    }),
+                args::SKIP =&gt; <span class="prelude-val">Ok</span>(QueryArguments {
+                    skip: extract_skip(arg.value)<span class="question-mark">?</span>,
+                    ..result
+                }),
 
-                    args::ORDER_BY =&gt; <span class="prelude-val">Ok</span>(QueryArguments {
-                        order_by: extract_order_by(<span class="kw-2">&amp;</span>model.into(), arg.value)<span class="question-mark">?</span>,
-                        ..res
-                    }),
+                args::ORDER_BY =&gt; <span class="prelude-val">Ok</span>(QueryArguments {
+                    order_by: extract_order_by(<span class="kw-2">&amp;</span>model.into(), arg.value)<span class="question-mark">?</span>,
+                    ..result
+                }),
 
-                    args::DISTINCT =&gt; <span class="prelude-val">Ok</span>(QueryArguments {
-                        distinct: <span class="prelude-val">Some</span>(extract_distinct(arg.value)<span class="question-mark">?</span>),
-                        ..res
-                    }),
+                args::DISTINCT =&gt; <span class="prelude-val">Ok</span>(QueryArguments {
+                    distinct: <span class="prelude-val">Some</span>(extract_distinct(arg.value)<span class="question-mark">?</span>),
+                    ..result
+                }),
 
-                    args::WHERE =&gt; {
-                        <span class="kw">let </span>val: <span class="prelude-ty">Option</span>&lt;ParsedInputMap&lt;<span class="lifetime">&#39;_</span>&gt;&gt; = arg.value.try_into()<span class="question-mark">?</span>;
-                        <span class="kw">match </span>val {
-                            <span class="prelude-val">Some</span>(m) =&gt; {
-                                <span class="kw">let </span>filter = <span class="prelude-val">Some</span>(extract_filter(m, model)<span class="question-mark">?</span>);
-                                <span class="prelude-val">Ok</span>(QueryArguments { filter, ..res })
-                            }
-                            <span class="prelude-val">None </span>=&gt; <span class="prelude-val">Ok</span>(res),
+                args::WHERE =&gt; {
+                    <span class="kw">let </span>val: <span class="prelude-ty">Option</span>&lt;ParsedInputMap&lt;<span class="lifetime">&#39;_</span>&gt;&gt; = arg.value.try_into()<span class="question-mark">?</span>;
+                    <span class="kw">match </span>val {
+                        <span class="prelude-val">Some</span>(m) =&gt; {
+                            <span class="kw">let </span>filter = <span class="prelude-val">Some</span>(extract_filter(m, model)<span class="question-mark">?</span>);
+                            <span class="prelude-val">Ok</span>(QueryArguments { filter, ..result })
                         }
+                        <span class="prelude-val">None </span>=&gt; <span class="prelude-val">Ok</span>(result),
                     }
-
-                    <span class="kw">_ </span>=&gt; <span class="prelude-val">Ok</span>(res),
                 }
-            } <span class="kw">else </span>{
-                result
+
+                <span class="kw">_ </span>=&gt; <span class="prelude-val">Ok</span>(result),
             }
         },
     )<span class="question-mark">?</span>;

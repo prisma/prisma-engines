@@ -734,13 +734,13 @@
     <span class="kw">let </span>source = <span class="kw">if let </span><span class="prelude-val">Some</span>(s) = ctx.datasource { s } <span class="kw">else </span>{ <span class="kw">return </span>};
 
     <span class="kw">static </span>TYPE_REGEX: Lazy&lt;Regex&gt; = Lazy::new(|| {
-        Regex::new(<span class="string">r#&quot;(?x)
+        Regex::new(<span class="string">r&quot;(?x)
     ^                           # beginning of the string
     (?P&lt;prefix&gt;[^(]+)           # a required prefix that is any character until the first opening brace
     (?:\((?P&lt;params&gt;.*?)\))?    # (optional) an opening parenthesis, a closing parenthesis and captured params in-between
     (?P&lt;suffix&gt;.+)?             # (optional) captured suffix after the params until the end of the string
     $                           # end of the string
-    &quot;#</span>).unwrap()
+    &quot;</span>).unwrap()
     });
 
     <span class="kw">let </span>connector = source.active_connector;

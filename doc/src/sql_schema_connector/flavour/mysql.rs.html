@@ -610,7 +610,7 @@
 <span class="kw">use </span>url::Url;
 
 <span class="kw">const </span>ADVISORY_LOCK_TIMEOUT: std::time::Duration = std::time::Duration::from_secs(<span class="number">10</span>);
-<span class="kw">static </span>QUALIFIED_NAME_RE: Lazy&lt;Regex&gt; = Lazy::new(|| Regex::new(<span class="string">r#&quot;`[^ ]+`\.`[^ ]+`&quot;#</span>).unwrap());
+<span class="kw">static </span>QUALIFIED_NAME_RE: Lazy&lt;Regex&gt; = Lazy::new(|| Regex::new(<span class="string">r&quot;`[^ ]+`\.`[^ ]+`&quot;</span>).unwrap());
 
 <span class="kw">type </span>State = <span class="kw">super</span>::State&lt;Params, (BitFlags&lt;Circumstances&gt;, Connection)&gt;;
 
