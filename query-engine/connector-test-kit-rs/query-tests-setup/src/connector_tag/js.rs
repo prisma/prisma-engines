@@ -5,7 +5,7 @@ use serde::Deserialize;
 use std::{collections::HashMap, io::Write};
 use tokio::{
     io::{AsyncBufReadExt, AsyncWriteExt, BufReader},
-    sync::{mpsc, oneshot, OnceCell},
+    sync::{mpsc, oneshot},
 };
 
 #[derive(Debug, Default, Clone, PartialEq)]
@@ -37,6 +37,7 @@ struct ProcessConfig {
 }
 
 struct NodeProcess {
+    client: jsonrpsee_core::async_client::Client,
     task_handle: mpsc::Sender<ReqImpl>,
     request_id_counter: u64,
     config: ProcessConfig,
