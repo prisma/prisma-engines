@@ -410,7 +410,9 @@ and prod databases, data migrations triggering unique constraint
 violations/foreign key errors/nullability errors, failing type casts, etc. can
 cause the same migration to fail in one environment and succeed in another.
 
-Note: There is one exception for SQL Server where migrate is wrapping a generated migration with a transaction.
+As noted above, the migration engine will never _implicitly_ wrap migrations in a transaction, but `BEGIN;` and `COMMIT;` statements can be contained in a migration.
+
+We currently (ca8f3da9f74523f1c4b16dc99b81f058c07a8413) do not generate these statements by default in new migrations on any connector except SQL Server, because it is the overwhelming default among other ORMs there. On SQL Server, the default is different, but since there is no implicit behaviour, users are completely free to remove the transaction from their migrations.
 
 ### Could Migrate detect when multiple incompatible changes are developed in different branches?
 
