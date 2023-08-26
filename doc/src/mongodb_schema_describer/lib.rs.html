@@ -125,6 +125,18 @@
 <a href="#125" id="125">125</a>
 <a href="#126" id="126">126</a>
 <a href="#127" id="127">127</a>
+<a href="#128" id="128">128</a>
+<a href="#129" id="129">129</a>
+<a href="#130" id="130">130</a>
+<a href="#131" id="131">131</a>
+<a href="#132" id="132">132</a>
+<a href="#133" id="133">133</a>
+<a href="#134" id="134">134</a>
+<a href="#135" id="135">135</a>
+<a href="#136" id="136">136</a>
+<a href="#137" id="137">137</a>
+<a href="#138" id="138">138</a>
+<a href="#139" id="139">139</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! The MongoDB Schema describer.
 //!
 //! A common place to query all the possible schema data we can from a MongoDB instance.
@@ -154,8 +166,20 @@
     <span class="kw">while let </span><span class="prelude-val">Some</span>(collection) = cursor.try_next().<span class="kw">await</span><span class="question-mark">? </span>{
         <span class="kw">let </span>collection_name = collection.name;
         <span class="kw">let </span>options = collection.options;
+        <span class="kw">let </span>collection_type = collection.collection_type;
         <span class="kw">let </span>has_schema = options.validator.is_some();
         <span class="kw">let </span>is_capped = options.capped.is_some();
+
+        <span class="comment">// We need to skip views, we do not support introspecting them yet.
+        </span><span class="kw">if </span>collection_type == mongodb::results::CollectionType::View {
+            <span class="kw">continue</span>;
+        }
+
+        <span class="comment">// We need to skip system collections, they are only used by MongoDB internally.
+        // https://www.mongodb.com/docs/manual/reference/system-collections/
+        </span><span class="kw">if </span>collection_type == mongodb::results::CollectionType::Collection &amp;&amp; collection_name.starts_with(<span class="string">&quot;system.&quot;</span>) {
+            <span class="kw">continue</span>;
+        }
 
         <span class="kw">let </span>collection = database.collection::&lt;Document&gt;(<span class="kw-2">&amp;</span>collection_name);
         <span class="kw">let </span>collection_id = schema.push_collection(collection_name, has_schema, is_capped);
