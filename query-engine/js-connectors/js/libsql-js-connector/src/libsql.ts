@@ -123,13 +123,13 @@ class PrismaLibsql extends LibsqlQueryable<StdClient> implements Connector {
   constructor(config: PrismaLibsqlConfig) {
     const { url: connectionString, token: authToken } = config
     
-    console.log("### PrismaLibsql", connectionString, authToken)
+    // console.log("### PrismaLibsql", connectionString, authToken)
 
     const client = createClient({
       url: connectionString,
       authToken: authToken
     })
-    console.log("Libsql client", client)
+    // console.log("Libsql client", client)
 
     super(client)
   }
