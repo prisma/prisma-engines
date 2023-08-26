@@ -10,12 +10,13 @@ It contains a subset of `@prisma/client`, plus some handy executable smoke tests
 We assume Node.js `v18.16.1`+ is installed. If not, run `nvm use` in the current directory.
 This is very important to double-check if you have multiple versions installed, as PlanetScale requires either Node.js `v18.16.1`+ or a custom `fetch` function.
 
-- Create a `.envrc` starting from `.envrc.example`, and fill in the missing values following the given template
+- Create a `.envrc` (in this folder) starting from `.envrc.example`, and fill in the missing values following the given template
 - Install Node.js dependencies via
   ```bash
   pnpm i
   ```
 - Run `cargo build -p query-engine-node-api` to compile the `libquery` Query Engine
+- Build the JS Connectors: `cd .. && pnpm run -r build`
 
 ### PlanetScale
 
@@ -25,8 +26,6 @@ This is very important to double-check if you have multiple versions installed, 
 In the current directory:
 - Run `pnpm prisma:planetscale` to push the Prisma schema and insert the test data.
 - Run `pnpm planetscale` to run smoke tests against the PlanetScale database.
-
-Note: you used to be able to run these Prisma commands without changing the provider name, but [#4074](https://github.com/prisma/prisma-engines/pull/4074) changed that (see https://github.com/prisma/prisma-engines/pull/4074#issuecomment-1649942475).
 
 ### Neon
 
