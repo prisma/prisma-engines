@@ -16,7 +16,7 @@ This is very important to double-check if you have multiple versions installed, 
   pnpm i
   ```
 - Run `cargo build -p query-engine-node-api` to compile the `libquery` Query Engine
-- Build the JS Connectors: `cd .. && pnpm run -r build`
+- Build the JS Connectors: `pnpm run -r build`
 
 ### PlanetScale
 
