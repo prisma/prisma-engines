@@ -163,6 +163,7 @@ fn js_value_to_quaint(json_value: serde_json::Value, column_type: ColumnType) ->
     //  Note for the future: it may be worth revisiting how much bloat so many panics with different static
     // strings add to the compiled artefact, and in case we should come up with a restricted set of panic
     // messages, or even find a way of removing them altogether.
+    println!("js_value_to_quaint: {} / {:?}", json_value, column_type);
     match column_type {
         ColumnType::Int32 => match json_value {
             serde_json::Value::Number(n) => {

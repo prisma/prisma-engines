@@ -1,7 +1,7 @@
-import { createClient, Client, Transaction as LibsqlClientTransaction } from "@libsql/client";
+import { createClient, Client, Transaction as LibsqlClientTransaction, InArgs } from "@libsql/client";
 import { bindConnector, bindTransaction, Debug } from '@jkomyno/prisma-js-connector-utils'
 import type { Connector, ConnectorConfig, Query, Queryable, ResultSet, Transaction } from '@jkomyno/prisma-js-connector-utils'
-import { fieldToColumnType } from './conversion'
+import { resultToColumnType } from './conversion'
 
 const debug = Debug('prisma:js-connector:libsql')
 
@@ -26,17 +26,30 @@ class LibsqlQueryable<ClientT extends StdClient | TransactionClient>
    * Execute a query given as SQL, interpolating the given parameters.
    */
   async queryRaw(query: Query): Promise<ResultSet> {
+    console.log("### queryRaw")
     const tag = '[js::query_raw]'
     debug(`${tag} %O`, query)
 
     const { columns: fields, rows: results } = await this.performIO(query)
+    console.log("returned", fields, results)
 
-    const columns = fields //.map((field) => field.name) TODO
-    const resultSet: ResultSet = {
-      columnNames: columns,
-      columnTypes: fields.map((field) => fieldToColumnType(1)), //field.dataTypeID)), TODO
-      rows: results.map((result) => columns.map((column) => result[column])),
+    // output JS types
+    for (const propName in results[0]) {
+      if (results[0].hasOwnProperty(propName)) {
+        console.log(`${propName}: ${typeof results[0][propName]}`);
+      }
     }
+
+    let firstResult = {}
+    firstResult = results[0]
+
+    const resultSet: ResultSet = {
+      columnNames: fields,
+      columnTypes: Object.keys(firstResult).map(key => resultToColumnType(key, firstResult[key])),
+      rows: results.map((result) => fields.map((column) => result[column])),
+    }
+
+    console.log("resultSet", resultSet)
 
     return resultSet
   }
@@ -47,6 +60,7 @@ class LibsqlQueryable<ClientT extends StdClient | TransactionClient>
    * Note: Queryable expects a u64, but napi.rs only supports u32.
    */
   async executeRaw(query: Query): Promise<number> {
+    console.log("### executeRaw")
     const tag = '[js::execute_raw]'
     debug(`${tag} %O`, query)
 
@@ -62,8 +76,11 @@ class LibsqlQueryable<ClientT extends StdClient | TransactionClient>
   private async performIO(query: Query) {
     const { sql, args: values } = query
 
+    // console.log("### performIO", query)
+
     try {
-      const result = await this.client.execute(sql) // { sql: sql, args: values }) TODO
+      const result = await this.client.execute({ sql: sql, args: values as InArgs })
+      // console.log("result", result)
       return result
     } catch (e) {
       const error = e as Error
@@ -112,6 +129,7 @@ class PrismaLibsql extends LibsqlQueryable<StdClient> implements Connector {
       url: connectionString,
       authToken: authToken
     })
+    console.log("Libsql client", client)
 
     super(client)
   }
