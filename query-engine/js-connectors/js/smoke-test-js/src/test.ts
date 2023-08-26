@@ -2,7 +2,6 @@ import { setImmediate, setTimeout } from 'node:timers/promises'
 import type { Connector } from '@jkomyno/prisma-js-connector-utils'
 import type { QueryEngineInstance } from './engines/types/Library'
 import { initQueryEngine } from './util'
-import { exit } from 'node:process'
 
 type Flavor = Connector['flavour']
 
@@ -21,7 +20,6 @@ export async function smokeTest(db: Connector, prismaSchemaRelativePath: string)
   const test = new SmokeTest(engine, db.flavour)
 
   await test.testFindManyTypeTest()
-  exit(0)
   await test.createAutoIncrement()
   await test.testCreateAndDeleteChildParent()
   await test.testTransaction()
