@@ -7,5 +7,5 @@ pub(crate) static LIBSQL: JsConnector = JsConnector {
 
     provider_name: "@prisma/libsql",
     name: "LibSQL (Turso) connector",
-    allowed_protocols: Some(&["https", "http"]),
+    allowed_protocols: Some(&["libsql", "file"]),
 };

@@ -5,14 +5,19 @@ import { fieldToColumnType } from './conversion'
 
 const debug = Debug('prisma:js-connector:libsql')
 
-export type PrismaLibsqlConfig = ConnectorConfig
+export type PrismaLibsqlConfig = 
+{
+  url: string;
+  token: string;
+};
+//ConnectorConfig
 
 type StdClient = Client
 type TransactionClient = LibsqlClientTransaction
 
 class LibsqlQueryable<ClientT extends StdClient | TransactionClient>
   implements Queryable {
-  readonly flavour = 'postgres'
+  readonly flavour = 'sqlite'
 
   constructor(protected readonly client: ClientT) {
   }
@@ -99,11 +104,13 @@ class LibsqlTransaction extends LibsqlQueryable<TransactionClient>
 
 class PrismaLibsql extends LibsqlQueryable<StdClient> implements Connector {
   constructor(config: PrismaLibsqlConfig) {
-    const { url: connectionString } = config
+    const { url: connectionString, token: authToken } = config
     
+    console.log("### PrismaLibsql", connectionString, authToken)
+
     const client = createClient({
       url: connectionString,
-      // authToken: authToken // TODO
+      authToken: authToken
     })
 
     super(client)

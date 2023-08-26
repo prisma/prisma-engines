@@ -4,7 +4,7 @@ generator client {
 
 datasource db {
   provider = "@prisma/libsql"
-  url      = env("JS_LIBSQL_DATABASE_URL")
+  url      = "file:foo.bar?foo=bar" // env("JS_LIBSQL_DATABASE_URL") // TODO Figure out why random key-value pair is needed not to crash here
 }
 
 model type_test {

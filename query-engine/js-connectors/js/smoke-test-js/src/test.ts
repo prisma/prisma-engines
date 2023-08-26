@@ -51,6 +51,8 @@ class SmokeTest {
   async testFindManyTypeTest() {
     await this.testFindManyTypeTestMySQL()
     await this.testFindManyTypeTestPostgres()
+    await this.testFindManyTypeTestSqlite()
+    // TODO warn if no implementation for flavour exists
   }
 
   private async testFindManyTypeTestMySQL() {
@@ -121,6 +123,32 @@ class SmokeTest {
             "timestamp_column": true,
             "json_column": true,
             "enum_column": true
+          }
+        } 
+      }
+    `, 'trace', undefined)
+    console.log('[nodejs] findMany resultSet', JSON.stringify(JSON.parse(resultSet), null, 2))
+  
+    return resultSet
+  }
+
+  private async testFindManyTypeTestSqlite() {
+    if (this.flavour !== 'sqlite') {
+      return
+    }
+
+    const resultSet = await this.engine.query(`
+      {
+        "action": "findMany",
+        "modelName": "type_test",
+        "query": {
+          "selection": {
+            "int_column": true,
+            "bigint_column": true,
+            "double_column": true,
+            "boolean_column": true,
+            "text_column": true,
+            "datetime_column": true
           }
         } 
       }
