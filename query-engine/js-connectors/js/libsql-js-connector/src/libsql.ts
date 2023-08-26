@@ -26,19 +26,19 @@ class LibsqlQueryable<ClientT extends StdClient | TransactionClient>
    * Execute a query given as SQL, interpolating the given parameters.
    */
   async queryRaw(query: Query): Promise<ResultSet> {
-    console.log("### queryRaw")
+    // console.log("### queryRaw")
     const tag = '[js::query_raw]'
     debug(`${tag} %O`, query)
 
     const { columns: fields, rows: results } = await this.performIO(query)
-    console.log("returned", fields, results)
+    // console.log("returned", fields, results)
 
     // output JS types
-    for (const propName in results[0]) {
-      if (results[0].hasOwnProperty(propName)) {
-        console.log(`${propName}: ${typeof results[0][propName]}`);
-      }
-    }
+    // for (const propName in results[0]) {
+    //   if (results[0].hasOwnProperty(propName)) {
+    //     console.log(`${propName}: ${typeof results[0][propName]}`);
+    //   }
+    // }
 
     let firstResult = {}
     firstResult = results[0]
@@ -49,7 +49,7 @@ class LibsqlQueryable<ClientT extends StdClient | TransactionClient>
       rows: results.map((result) => fields.map((column) => result[column])),
     }
 
-    console.log("resultSet", resultSet)
+    // console.log("resultSet", resultSet)
 
     return resultSet
   }
@@ -60,7 +60,7 @@ class LibsqlQueryable<ClientT extends StdClient | TransactionClient>
    * Note: Queryable expects a u64, but napi.rs only supports u32.
    */
   async executeRaw(query: Query): Promise<number> {
-    console.log("### executeRaw")
+    // console.log("### executeRaw")
     const tag = '[js::execute_raw]'
     debug(`${tag} %O`, query)
 
