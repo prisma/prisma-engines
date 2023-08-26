@@ -196,18 +196,15 @@ impl<'a> From<In<'a>> for ArgumentValue {
     fn from(other: In<'a>) -> Self {
         match other.selection_set {
             SelectionSet::Multi(key_sets, val_sets) => {
-                let key_vals = key_sets.into_iter().zip(val_sets.into_iter());
+                let key_vals = key_sets.into_iter().zip(val_sets);
 
                 let conjuctive = key_vals.fold(Conjuctive::new(), |acc, (keys, vals)| {
-                    let ands = keys
-                        .into_iter()
-                        .zip(vals.into_iter())
-                        .fold(Conjuctive::new(), |acc, (key, val)| {
-                            let mut argument = IndexMap::new();
-                            argument.insert(key.into_owned(), val);
+                    let ands = keys.into_iter().zip(vals).fold(Conjuctive::new(), |acc, (key, val)| {
+                        let mut argument = IndexMap::new();
+                        argument.insert(key.into_owned(), val);
 
-                            acc.and(argument)
-                        });
+                        acc.and(argument)
+                    });
 
                     acc.or(ands)
                 });

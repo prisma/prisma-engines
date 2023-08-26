@@ -69,3 +69,9 @@ impl Relation {
             .unwrap_or(ReferentialAction::Cascade)
     }
 }
+
+impl std::fmt::Debug for Relation {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.debug_tuple("Relation").field(&self.name()).finish()
+    }
+}

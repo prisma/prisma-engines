@@ -21,20 +21,3 @@ export const ColumnTypeEnum = {
   // 'Array': 15,
   // ...
 } as const
-
-export const connectionHealthErrorCodes = [
-  // Unable to resolve the domain name to an IP address.
-  'ENOTFOUND',
-
-  // Failed to get a response from the DNS server.
-  'EAI_AGAIN',
-
-  // The connection was refused by the database server.
-  'ECONNREFUSED',
-
-  // The connection attempt timed out.
-  'ETIMEDOUT',
-
-  // The connection was unexpectedly closed by the database server.
-  'ECONNRESET',
-] as const

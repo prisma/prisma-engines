@@ -1,8 +1,5 @@
-use crate::{psl::parser_database::walkers::Walker, InternalDataModelRef};
-use std::{
-    fmt,
-    hash::{Hash, Hasher},
-};
+use crate::{psl::parser_database::walkers::Walker, InternalDataModelRef, TypeIdentifier};
+use std::hash::{Hash, Hasher};
 
 // Invariant: InternalDataModel must not contain any Zipper, this would be a reference counting
 // cycle (memory leak).
@@ -10,12 +7,6 @@ use std::{
 pub struct Zipper<I> {
     pub id: I,
     pub dm: InternalDataModelRef,
-}
-
-impl<I: fmt::Debug> fmt::Debug for Zipper<I> {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        self.id.fmt(f)
-    }
 }
 
 impl<I: PartialEq> PartialEq for Zipper<I> {
@@ -35,5 +26,13 @@ impl<I: Copy> Zipper<I> {
 impl<I: Hash> Hash for Zipper<I> {
     fn hash<H: Hasher>(&self, state: &mut H) {
         self.id.hash(state)
+    }
+}
+
+impl std::fmt::Debug for Zipper<TypeIdentifier> {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.debug_tuple("TypeIdentifier")
+            .field(&format!("{:?}", self.id))
+            .finish()
     }
 }

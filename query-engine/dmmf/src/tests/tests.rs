@@ -61,6 +61,32 @@ fn enum_docs() {
     }
 }
 
+// Regression test for https://github.com/prisma/prisma/issues/19694
+#[test]
+fn unsupported_in_composite_type() {
+    let schema = r#"
+        generator client {
+            provider = "prisma-client-js"
+        }
+
+        datasource db {
+            provider = "mongodb"
+            url      = env("DATABASE_URL")
+        }
+
+        type NestedType {
+            this_causes_error Unsupported("RegularExpression")
+        }
+
+        model sample_model {
+            id         String     @id @default(auto()) @map("_id") @db.ObjectId
+            some_field NestedType
+        }
+    "#;
+
+    dmmf_from_schema(schema);
+}
+
 const SNAPSHOTS_PATH: &str = concat!(
     env!("CARGO_MANIFEST_DIR"),
     "/src",

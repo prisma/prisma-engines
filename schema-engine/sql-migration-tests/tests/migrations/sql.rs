@@ -155,7 +155,7 @@ fn reserved_sql_keywords_must_work(api: TestApi) {
 
 #[test_connector(capabilities(Enums))]
 fn enum_value_with_database_names_must_work(api: TestApi) {
-    let dm = r##"
+    let dm = r#"
         model Cat {
             id String @id
             mood CatMood
@@ -165,7 +165,7 @@ fn enum_value_with_database_names_must_work(api: TestApi) {
             ANGRY
             HUNGRY @map("hongry")
         }
-    "##;
+    "#;
 
     api.schema_push_w_datasource(dm)
         .migration_id(Some("initial"))
@@ -182,7 +182,7 @@ fn enum_value_with_database_names_must_work(api: TestApi) {
             .assert_enum("CatMood", |enm| enm.assert_values(&["ANGRY", "hongry"]));
     }
 
-    let dm = r##"
+    let dm = r#"
         model Cat {
             id String @id
             mood CatMood
@@ -192,7 +192,7 @@ fn enum_value_with_database_names_must_work(api: TestApi) {
             ANGRY
             HUNGRY @map("hongery")
         }
-    "##;
+    "#;
 
     if api.is_mysql() {
         api.schema_push_w_datasource(dm).force(true).send().assert_warnings(&["The values [hongry] on the enum `Cat_mood` will be removed. If these variants are still used in the database, this will fail.".into()]);
@@ -210,7 +210,7 @@ fn enum_value_with_database_names_must_work(api: TestApi) {
 
 #[test_connector(capabilities(Enums))]
 fn enum_defaults_must_work(api: TestApi) {
-    let dm = r##"
+    let dm = r#"
         model Cat {
             id String @id
             mood CatMood @default(HUNGRY)
@@ -221,7 +221,7 @@ fn enum_defaults_must_work(api: TestApi) {
             ANGRY
             HUNGRY @map("hongry")
         }
-    "##;
+    "#;
 
     api.schema_push_w_datasource(dm)
         .migration_id(Some("initial"))
@@ -318,7 +318,7 @@ fn multi_field_id_as_part_of_relation_must_work(api: TestApi) {
 
 #[test_connector(exclude(Vitess))]
 fn remapped_multi_field_id_as_part_of_relation_must_work(api: TestApi) {
-    let dm = r##"
+    let dm = r#"
         model Cat {
             nemesis_name String @map("dogname")
             nemesis_weight Int @map("dogweight")
@@ -334,7 +334,7 @@ fn remapped_multi_field_id_as_part_of_relation_must_work(api: TestApi) {
 
             @@id([name, weight])
         }
-    "##;
+    "#;
 
     api.schema_push_w_datasource(dm).send().assert_green();
 

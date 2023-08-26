@@ -79,3 +79,11 @@ impl Display for CompositeField {
         write!(f, "{}.{}", self.container().name(), self.name())
     }
 }
+
+impl std::fmt::Debug for CompositeField {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.debug_tuple("CompositeField")
+            .field(&format!("{}.{}", self.container().name(), self.name()))
+            .finish()
+    }
+}

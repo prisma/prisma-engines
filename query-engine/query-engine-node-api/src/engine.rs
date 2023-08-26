@@ -1,6 +1,6 @@
-use crate::{error::ApiError, log_callback::LogCallback, logger::Logger};
+use crate::{error::ApiError, logger::Logger};
 use futures::FutureExt;
-use napi::{Env, JsFunction, JsObject, JsUnknown};
+use napi::{threadsafe_function::ThreadSafeCallContext, Env, JsFunction, JsObject, JsUnknown};
 use napi_derive::napi;
 use psl::PreviewFeature;
 use query_core::{
@@ -148,7 +148,9 @@ impl QueryEngine {
         callback: JsFunction,
         maybe_driver: Option<JsObject>,
     ) -> napi::Result<Self> {
-        let log_callback = LogCallback::new(napi_env, callback)?;
+        let mut log_callback = callback.create_threadsafe_function(0usize, |ctx: ThreadSafeCallContext<String>| {
+            Ok(vec![ctx.env.create_string(&ctx.value)?])
+        })?;
         log_callback.unref(&napi_env)?;
 
         let ConstructorOptions {
@@ -170,7 +172,7 @@ impl QueryEngine {
 
         #[cfg(feature = "js-connectors")]
         if let Some(driver) = maybe_driver {
-            let queryable = js_connectors::JsQueryable::from(driver);
+            let queryable = js_connectors::from_napi(&napi_env, driver);
             match sql_connector::register_js_connector(provider_name, Arc::new(queryable)) {
                 Ok(_) => tracing::info!("Registered js connector for {provider_name}"),
                 Err(err) => tracing::error!("Failed to registered js connector for {provider_name}. {err}"),

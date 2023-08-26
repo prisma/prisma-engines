@@ -233,7 +233,7 @@ mod interactive_tx {
 
         let res = runner.commit_tx(tx_id.clone()).await?;
 
-        if matches!(runner.connector(), ConnectorTag::MongoDb(_)) {
+        if matches!(runner.connector_version(), ConnectorVersion::MongoDb(_)) {
             assert!(res.is_err());
             let err = res.err().unwrap();
             let known_err = err.as_known().unwrap();
@@ -248,7 +248,7 @@ mod interactive_tx {
           &runner,
           "query { findManyTestModel { id }}",
           // Postgres and Mongo abort transactions, data is lost.
-          Postgres(_) | MongoDb(_) | CockroachDb => vec![r#"{"data":{"findManyTestModel":[]}}"#],
+          Postgres(_) | MongoDb(_) | CockroachDb(_) => vec![r#"{"data":{"findManyTestModel":[]}}"#],
           // Partial data still there because a batch will not be auto-rolled back by other connectors.
           _ => vec![r#"{"data":{"findManyTestModel":[{"id":1},{"id":2}]}}"#]
         );
@@ -357,7 +357,7 @@ mod interactive_tx {
         // Mongo for example doesn't read the inner commit value.
         is_one_of!(
             run_query!(&runner, r#"query { findManyTestModel { id }}"#),
-            vec![
+            [
                 r#"{"data":{"findManyTestModel":[{"id":1}]}}"#,
                 r#"{"data":{"findManyTestModel":[{"id":1},{"id":2}]}}"#
             ]

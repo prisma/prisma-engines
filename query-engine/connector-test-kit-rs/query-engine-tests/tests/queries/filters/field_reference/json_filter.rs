@@ -462,7 +462,7 @@ mod json_filter {
 
     fn json_path(runner: &Runner) -> &'static str {
         match runner.connector_version() {
-            ConnectorVersion::Postgres(_) | ConnectorVersion::CockroachDb => r#"path: ["a", "b"]"#,
+            ConnectorVersion::Postgres(_) | ConnectorVersion::CockroachDb(_) => r#"path: ["a", "b"]"#,
             ConnectorVersion::MySql(_) => r#"path: "$.a.b""#,
             x => unreachable!("JSON filtering is not supported on {:?}", x),
         }

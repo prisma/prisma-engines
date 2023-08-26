@@ -15,51 +15,47 @@ pub fn extract_query_args(
     arguments: Vec<ParsedArgument<'_>>,
     model: &Model,
 ) -> QueryGraphBuilderResult<QueryArguments> {
-    let query_args = arguments.into_iter().fold(
-        Ok(QueryArguments::new(model.clone())),
-        |result: QueryGraphBuilderResult<QueryArguments>, arg| {
-            if let Ok(res) = result {
-                match arg.name.as_str() {
-                    args::CURSOR => Ok(QueryArguments {
-                        cursor: extract_cursor(arg.value, model)?,
-                        ..res
-                    }),
+    let query_args = arguments.into_iter().try_fold(
+        QueryArguments::new(model.clone()),
+        |result, arg| -> QueryGraphBuilderResult<QueryArguments> {
+            match arg.name.as_str() {
+                args::CURSOR => Ok(QueryArguments {
+                    cursor: extract_cursor(arg.value, model)?,
+                    ..result
+                }),
 
-                    args::TAKE => Ok(QueryArguments {
-                        take: arg.value.try_into()?,
-                        ..res
-                    }),
+                args::TAKE => Ok(QueryArguments {
+                    take: arg.value.try_into()?,
+                    ..result
+                }),
 
-                    args::SKIP => Ok(QueryArguments {
-                        skip: extract_skip(arg.value)?,
-                        ..res
-                    }),
+                args::SKIP => Ok(QueryArguments {
+                    skip: extract_skip(arg.value)?,
+                    ..result
+                }),
 
-                    args::ORDER_BY => Ok(QueryArguments {
-                        order_by: extract_order_by(&model.into(), arg.value)?,
-                        ..res
-                    }),
+                args::ORDER_BY => Ok(QueryArguments {
+                    order_by: extract_order_by(&model.into(), arg.value)?,
+                    ..result
+                }),
 
-                    args::DISTINCT => Ok(QueryArguments {
-                        distinct: Some(extract_distinct(arg.value)?),
-                        ..res
-                    }),
+                args::DISTINCT => Ok(QueryArguments {
+                    distinct: Some(extract_distinct(arg.value)?),
+                    ..result
+                }),
 
-                    args::WHERE => {
-                        let val: Option<ParsedInputMap<'_>> = arg.value.try_into()?;
-                        match val {
-                            Some(m) => {
-                                let filter = Some(extract_filter(m, model)?);
-                                Ok(QueryArguments { filter, ..res })
-                            }
-                            None => Ok(res),
+                args::WHERE => {
+                    let val: Option<ParsedInputMap<'_>> = arg.value.try_into()?;
+                    match val {
+                        Some(m) => {
+                            let filter = Some(extract_filter(m, model)?);
+                            Ok(QueryArguments { filter, ..result })
                         }
+                        None => Ok(result),
                     }
-
-                    _ => Ok(res),
                 }
-            } else {
-                result
+
+                _ => Ok(result),
             }
         },
     )?;
@@ -139,7 +135,7 @@ fn process_order_object(
 
                     if let Some(sort_aggr) = parent_sort_aggregation {
                         // If the parent is a sort aggregation then this scalar is part of that one.
-                        Ok(Some(OrderBy::scalar_aggregation(sf, vec![], sort_order, sort_aggr)))
+                        Ok(Some(OrderBy::scalar_aggregation(sf, sort_order, sort_aggr)))
                     } else {
                         Ok(Some(OrderBy::scalar(sf, path, sort_order, nulls_order)))
                     }
