@@ -1,5 +1,5 @@
 {
-  "name": "@jkomyno/prisma-libsql-connector",
+  "name": "@jkomyno/prisma-libsql-js-connector",
   "version": "0.0.8",
   "description": "Prisma's JS Connector for LibSQL/Turso",
   "main": "dist/index.js",

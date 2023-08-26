@@ -1,4 +1,4 @@
-import { createClient, Client } from "@libsql/client";
+import { createClient, Client, Transaction as LibsqlClientTransaction } from "@libsql/client";
 import { bindConnector, bindTransaction, Debug } from '@jkomyno/prisma-js-connector-utils'
 import type { Connector, ConnectorConfig, Query, Queryable, ResultSet, Transaction } from '@jkomyno/prisma-js-connector-utils'
 import { fieldToColumnType } from './conversion'
@@ -8,7 +8,7 @@ const debug = Debug('prisma:js-connector:libsql')
 export type PrismaLibsqlConfig = ConnectorConfig
 
 type StdClient = Client
-type TransactionClient = Client // TODO was: pg.PoolClient
+type TransactionClient = LibsqlClientTransaction
 
 class LibsqlQueryable<ClientT extends StdClient | TransactionClient>
   implements Queryable {
@@ -26,10 +26,10 @@ class LibsqlQueryable<ClientT extends StdClient | TransactionClient>
 
     const { columns: fields, rows: results } = await this.performIO(query)
 
-    const columns = fields.map((field) => field.name)
+    const columns = fields //.map((field) => field.name) TODO
     const resultSet: ResultSet = {
       columnNames: columns,
-      columnTypes: fields.map((field) => fieldToColumnType(field.dataTypeID)),
+      columnTypes: fields.map((field) => fieldToColumnType(1)), //field.dataTypeID)), TODO
       rows: results.map((result) => columns.map((column) => result[column])),
     }
 
@@ -58,7 +58,7 @@ class LibsqlQueryable<ClientT extends StdClient | TransactionClient>
     const { sql, args: values } = query
 
     try {
-      const result = await this.client.execute({ sql: sql, args: values })
+      const result = await this.client.execute(sql) // { sql: sql, args: values }) TODO
       return result
     } catch (e) {
       const error = e as Error
@@ -81,7 +81,7 @@ class LibsqlTransaction extends LibsqlQueryable<TransactionClient>
     try {
       await this.client.execute('COMMIT')
     } finally {
-      this.client.release()
+      //this.client.release()
     }
   }
 
@@ -92,7 +92,7 @@ class LibsqlTransaction extends LibsqlQueryable<TransactionClient>
     try {
       await this.client.execute('ROLLBACK')
     } finally {
-      this.client.release()
+      //this.client.release()
     }
   }
 }
@@ -103,29 +103,31 @@ class PrismaLibsql extends LibsqlQueryable<StdClient> implements Connector {
     
     const client = createClient({
       url: connectionString,
-      authToken: authToken // TODO
+      // authToken: authToken // TODO
     })
 
     super(client)
   }
 
   async startTransaction(isolationLevel?: string): Promise<Transaction> {
-    const connection = await this.client.connect()
-    await connection.query('BEGIN')
+    const transaction = await this.client.transaction("write");
+    
+    //const connection = await this.client.connect()
+    // await connection.query('BEGIN')
 
-    if (isolationLevel) {
-      await connection.query(
-        `SET TRANSACTION ISOLATION LEVEL ${isolationLevel}`,
-      )
-    }
+    // if (isolationLevel) {
+    //   await connection.query(
+    //     `SET TRANSACTION ISOLATION LEVEL ${isolationLevel}`,
+    //   )
+    // }
 
-    return bindTransaction(new LibsqlTransaction(connection))
+    return bindTransaction(new LibsqlTransaction(transaction))
   }
 
   async close() {}
 }
 
-export const createPgConnector = (config: PrismaLibsqlConfig): Connector => {
+export const createLibsqlConnector = (config: PrismaLibsqlConfig): Connector => {
   const db = new PrismaLibsql(config)
   return bindConnector(db)
 }

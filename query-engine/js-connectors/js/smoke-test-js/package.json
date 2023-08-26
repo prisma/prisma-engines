@@ -23,7 +23,7 @@
     "neon": "tsx ./src/neon.ts",
     "pg": "tsx ./src/pg.ts",
     "planetscale": "tsx ./src/planetscale.ts",
-    "libsql": "tsx .src/libsql.ts"
+    "libsql": "tsx ./src/libsql.ts"
   },
   "keywords": [],
   "author": "Alberto Schiabel <schiabel@prisma.io>",

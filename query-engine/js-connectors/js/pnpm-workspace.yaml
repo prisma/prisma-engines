@@ -3,4 +3,5 @@ packages:
   - './pg-js-connector'
   - './planetscale-js-connector'
   - './neon-js-connector'
+  - './libsql-js-connector'
   - './smoke-test-js'
