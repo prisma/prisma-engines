@@ -1,2 +1,2 @@
-export { createLibSQLConnector } from './libsql'
-export type { PrismaLibSQLConfig } from './libsql'
+export { createLibsqlConnector } from './libsql'
+export type { PrismaLibsqlConfig } from './libsql'

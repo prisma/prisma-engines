@@ -4,6 +4,7 @@ This is a playground for testing the `libquery` client with the experimental Nod
 It contains a subset of `@prisma/client`, plus some handy executable smoke tests:
 - [`./src/planetscale.ts`](./src/planetscale.ts)
 - [`./src/neon.ts`](./src/neon.ts)
+- [`./src/libsql.ts`](./src/libsql.ts)
 
 ## How to setup
 
@@ -16,6 +17,7 @@ This is very important to double-check if you have multiple versions installed, 
   pnpm i
   ```
 - Run `cargo build -p query-engine-node-api` to compile the `libquery` Query Engine
+- Build the JS Connectors: `cd .. && pnpm run -r build`
 
 ### PlanetScale
 
@@ -26,8 +28,6 @@ In the current directory:
 - Run `pnpm prisma:planetscale` to push the Prisma schema and insert the test data.
 - Run `pnpm planetscale` to run smoke tests against the PlanetScale database.
 
-Note: you used to be able to run these Prisma commands without changing the provider name, but [#4074](https://github.com/prisma/prisma-engines/pull/4074) changed that (see https://github.com/prisma/prisma-engines/pull/4074#issuecomment-1649942475).
-
 ### Neon
 
 - Create a new database with Neon CLI `npx neonctl projects create` or in [Neon Console](https://neon.tech).
@@ -36,3 +36,12 @@ Note: you used to be able to run these Prisma commands without changing the prov
 In the current directory:
 - Run `pnpm prisma:neon` to push the Prisma schema and insert the test data.
 - Run `pnpm neon` to run smoke tests against the Neon database.
+
+### libsql/Turso
+
+- Create a new database with [Turso CLI](https://docs.libsql.tech/reference/libsql-cli) `libsql db create` and then get connection string and authentication token: `libsql db show ...` + `libsql db tokens create ...`
+- Store both in `JS_LIBSQL_DATABASE_URL` and `JS_LIBSQL_TOKEN`. 
+
+In the current directory:
+- Run `pnpm prisma:libsql` to push the Prisma schema and insert the test data.
+- Run `pnpm libsql` to run smoke tests against the LibSQL/Turso database.

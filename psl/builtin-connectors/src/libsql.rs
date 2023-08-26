@@ -6,6 +6,6 @@ pub(crate) static LIBSQL: JsConnector = JsConnector {
     canonical_connector: &sqlite_datamodel_connector::SqliteDatamodelConnector,
 
     provider_name: "@prisma/libsql",
-    name: "libSQL (Turso) connector",
+    name: "LibSQL (Turso) connector",
     allowed_protocols: Some(&["https", "http"]),
 };
