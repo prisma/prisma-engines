@@ -159,7 +159,6 @@ pub struct Query {
 /// This is used for most data types, except those that require connector-specific handling, e.g., `ColumnType::Boolean`.
 /// In the future, after https://github.com/prisma/team-orm/issues/257, every connector-specific handling should be moved
 /// out of Rust and into TypeScript.
-/// TODO: print column_type & column_name in the panic message.
 fn js_value_to_quaint(
     json_value: serde_json::Value,
     column_type: ColumnType,
