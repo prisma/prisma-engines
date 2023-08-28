@@ -407,6 +407,18 @@
 <a href="#407" id="407">407</a>
 <a href="#408" id="408">408</a>
 <a href="#409" id="409">409</a>
+<a href="#410" id="410">410</a>
+<a href="#411" id="411">411</a>
+<a href="#412" id="412">412</a>
+<a href="#413" id="413">413</a>
+<a href="#414" id="414">414</a>
+<a href="#415" id="415">415</a>
+<a href="#416" id="416">416</a>
+<a href="#417" id="417">417</a>
+<a href="#418" id="418">418</a>
+<a href="#419" id="419">419</a>
+<a href="#420" id="420">420</a>
+<a href="#421" id="421">421</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! The SQL migration connector.
 
 </span><span class="attr">#![deny(rust_2018_idioms, unsafe_code, missing_docs)]
@@ -432,7 +444,7 @@
 <span class="kw">use </span>schema_connector::{migrations_directory::MigrationDirectory, <span class="kw-2">*</span>};
 <span class="kw">use </span>sql_migration::{DropUserDefinedType, DropView, SqlMigration, SqlMigrationStep};
 <span class="kw">use </span>sql_schema_describer <span class="kw">as </span>sql;
-<span class="kw">use </span>std::sync::Arc;
+<span class="kw">use </span>std::{future, sync::Arc};
 
 <span class="kw">const </span>MIGRATIONS_TABLE_NAME: <span class="kw-2">&amp;</span>str = <span class="string">&quot;_prisma_migrations&quot;</span>;
 
@@ -581,6 +593,18 @@
     }
 
     <span class="kw">fn </span>acquire_lock(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; BoxFuture&lt;<span class="lifetime">&#39;_</span>, ConnectorResult&lt;()&gt;&gt; {
+        <span class="comment">// If the env is set and non empty or set to `0`, we disable the lock.
+        </span><span class="kw">let </span>disable_lock: bool = std::env::var(<span class="string">&quot;PRISMA_SCHEMA_DISABLE_ADVISORY_LOCK&quot;</span>)
+            .ok()
+            .map(|value| !<span class="macro">matches!</span>(value.as_str(), <span class="string">&quot;0&quot; </span>| <span class="string">&quot;&quot;</span>))
+            .unwrap_or(<span class="bool-val">false</span>);
+
+        <span class="kw">if </span>disable_lock {
+            <span class="macro">tracing::info!</span>(
+                <span class="string">&quot;PRISMA_SCHEMA_DISABLE_ADVISORY_LOCK environnement variable is set. Advisory lock is disabled.&quot;
+            </span>);
+            <span class="kw">return </span>Box::pin(future::ready(<span class="prelude-val">Ok</span>(())));
+        }
         Box::pin(<span class="self">self</span>.flavour.acquire_lock())
     }
 
