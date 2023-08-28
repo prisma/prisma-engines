@@ -1,6 +1,6 @@
-use crate::{error::ApiError, log_callback::LogCallback, logger::Logger};
+use crate::{error::ApiError, logger::Logger};
 use futures::FutureExt;
-use napi::{Env, JsFunction, JsObject, JsUnknown};
+use napi::{threadsafe_function::ThreadSafeCallContext, Env, JsFunction, JsObject, JsUnknown};
 use napi_derive::napi;
 use psl::PreviewFeature;
 use query_core::{
@@ -149,7 +149,9 @@ impl QueryEngine {
         callback: JsFunction,
         maybe_driver: Option<JsObject>,
     ) -> napi::Result<Self> {
-        let log_callback = LogCallback::new(napi_env, callback)?;
+        let mut log_callback = callback.create_threadsafe_function(0usize, |ctx: ThreadSafeCallContext<String>| {
+            Ok(vec![ctx.env.create_string(&ctx.value)?])
+        })?;
         log_callback.unref(&napi_env)?;
 
         let ConstructorOptions {

@@ -26,7 +26,7 @@ mod smoke_tests {
             let res = client
                 .post("http://0.0.0.0:57582/")
                 .body(
-                    r###"
+                    r#"
                     {
                         "action": "findMany",
                         "modelName": "Person",
@@ -38,7 +38,7 @@ mod smoke_tests {
                             }
                         }
                     }
-                    "###,
+                    "#,
                 )
                 .send()
                 .await

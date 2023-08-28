@@ -27,8 +27,20 @@ pub async fn describe(client: &mongodb::Client, db_name: &str) -> mongodb::error
     while let Some(collection) = cursor.try_next().await? {
         let collection_name = collection.name;
         let options = collection.options;
+        let collection_type = collection.collection_type;
         let has_schema = options.validator.is_some();
         let is_capped = options.capped.is_some();
+
+        // We need to skip views, we do not support introspecting them yet.
+        if collection_type == mongodb::results::CollectionType::View {
+            continue;
+        }
+
+        // We need to skip system collections, they are only used by MongoDB internally.
+        // https://www.mongodb.com/docs/manual/reference/system-collections/
+        if collection_type == mongodb::results::CollectionType::Collection && collection_name.starts_with("system.") {
+            continue;
+        }
 
         let collection = database.collection::<Document>(&collection_name);
         let collection_id = schema.push_collection(collection_name, has_schema, is_capped);

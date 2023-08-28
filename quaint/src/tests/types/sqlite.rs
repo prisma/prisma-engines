@@ -175,7 +175,7 @@ async fn test_get_int64_from_int32_field_fails(api: &mut dyn TestApi) -> crate::
     let select = Select::from_table(&table).column("value").order_by("id".descend());
     let res = api.conn().select(select).await;
 
-    assert!(matches!(res, Err(_)));
+    assert!(res.is_err());
 
     Ok(())
 }
