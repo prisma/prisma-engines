@@ -8,14 +8,16 @@ use url::Url;
 #[cfg(feature = "mongodb")]
 use mongodb_query_connector::MongoDb;
 
+use super::ConnectorMode;
+
 /// Loads a query executor based on the parsed Prisma schema (datasource).
 pub async fn load(
-    connector_mode: psl::ConnectorMode,
+    connector_mode: ConnectorMode,
     source: &Datasource,
     features: PreviewFeatures,
     url: &str,
 ) -> query_core::Result<Box<dyn QueryExecutor + Send + Sync + 'static>> {
-    if connector_mode == psl::ConnectorMode::Js {
+    if connector_mode == ConnectorMode::Js {
         #[cfg(feature = "js-connectors")]
         return jsconnector(source, url, features).await;
     }

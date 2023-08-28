@@ -6,7 +6,6 @@ pub use psl_core::{
     datamodel_connector,
     diagnostics::{self, Diagnostics},
     is_reserved_type_name,
-    js_connector::ConnectorMode,
     mcf::config_to_mcf_json_value as get_config,
     mcf::{generators_to_json, render_sources_to_json}, // for tests
     parser_database::{self, SourceFile},

@@ -9,7 +9,7 @@ use query_core::{
     telemetry, QueryExecutor, TransactionOptions, TxId,
 };
 use query_engine_metrics::{MetricFormat, MetricRegistry};
-use request_handlers::{dmmf, load_executor, render_graphql_schema, RequestBody, RequestHandler};
+use request_handlers::{dmmf, load_executor, render_graphql_schema, ConnectorMode, RequestBody, RequestHandler};
 use serde::{Deserialize, Serialize};
 use serde_json::json;
 use std::{
@@ -27,7 +27,7 @@ use user_facing_errors::Error;
 /// The main query engine used by JS
 #[napi]
 pub struct QueryEngine {
-    connector_mode: psl::ConnectorMode,
+    connector_mode: ConnectorMode,
     inner: RwLock<Inner>,
     logger: Logger,
 }
@@ -169,7 +169,7 @@ impl QueryEngine {
         let overrides: Vec<(_, _)> = datasource_overrides.into_iter().collect();
 
         let mut schema = psl::validate(datamodel.into());
-        let mut connector_mode = psl::ConnectorMode::Rust;
+        let mut connector_mode = ConnectorMode::Rust;
 
         #[cfg(feature = "js-connectors")]
         if let Some(driver) = maybe_driver {
@@ -178,13 +178,14 @@ impl QueryEngine {
 
             match sql_connector::register_js_connector(provider_name, Arc::new(js_queryable)) {
                 Ok(_) => {
-                    connector_mode = psl::ConnectorMode::Js;
+                    connector_mode = ConnectorMode::Js;
                     tracing::info!("Registered js connector for {provider_name}")
                 }
                 Err(err) => tracing::error!("Failed to registered js connector for {provider_name}. {err}"),
             }
         }
 
+        let connector_mode = connector_mode;
         let config = &mut schema.configuration;
 
         schema

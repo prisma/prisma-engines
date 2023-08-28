@@ -9,7 +9,7 @@ use query_core::{
 };
 use query_engine_metrics::setup as metric_setup;
 use query_engine_metrics::MetricRegistry;
-use request_handlers::load_executor;
+use request_handlers::{load_executor, ConnectorMode};
 use std::{env, fmt, sync::Arc};
 use tracing::Instrument;
 
@@ -63,7 +63,7 @@ impl PrismaContext {
 
             let url = data_source.load_url(|key| env::var(key).ok())?;
             // Load executor
-            let connector_mode = psl::ConnectorMode::Rust;
+            let connector_mode = ConnectorMode::Rust;
             let executor = load_executor(connector_mode, data_source, preview_features, &url).await?;
             executor.primary_connector().get_connection().await?;
             PrismaResult::<_>::Ok(executor)
