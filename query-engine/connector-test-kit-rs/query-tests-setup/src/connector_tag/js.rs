@@ -16,7 +16,7 @@ impl ConnectorTagInterface for NodeDrivers {
         todo!()
     }
 
-    fn datamodel_provider(&self) -> &'static str {
+    fn datamodel_provider(&self) -> &str {
         todo!()
     }
 
@@ -29,7 +29,10 @@ impl ConnectorTagInterface for NodeDrivers {
     }
 }
 
-type ReqImpl = (jsonrpc_core::MethodCall, oneshot::Sender<jsonrpc_core::Response>);
+type ReqImpl = (
+    jsonrpsee::types::Request<'static>,
+    oneshot::Sender<Box<serde_json::value::RawValue>>,
+);
 
 #[derive(Default, Deserialize)]
 struct ProcessConfig {
@@ -37,87 +40,99 @@ struct ProcessConfig {
 }
 
 struct NodeProcess {
-    client: jsonrpsee_core::async_client::Client,
     task_handle: mpsc::Sender<ReqImpl>,
     request_id_counter: u64,
     config: ProcessConfig,
 }
 
-impl NodeProcess {
-    fn new() -> std::io::Result<NodeProcess> {
-        use std::process::Stdio;
-        use tokio::process::Command;
+fn start_rpc_thread(receiver: mpsc::Receiver<ReqImpl>) -> std::io::Result<()> {
+    use std::process::Stdio;
+    use tokio::process::Command;
 
-        let env_var =
-            std::env::var("NODE_TEST_ADAPTER").map_err(|err| std::io::Error::new(std::io::ErrorKind::Other, err))?;
-        let process = Command::new(env_var)
-            .stdin(Stdio::piped())
-            .stdout(Stdio::piped())
-            .spawn()?;
+    let env_var =
+        std::env::var("NODE_TEST_ADAPTER").map_err(|err| std::io::Error::new(std::io::ErrorKind::Other, err))?;
+    let process = Command::new(env_var)
+        .stdin(Stdio::piped())
+        .stdout(Stdio::piped())
+        .spawn()?;
 
-        let (sender, receiver) = mpsc::channel::<ReqImpl>(300);
+    tokio::spawn(async move {
+        let stdout = BufReader::new(process.stdout.unwrap()).lines();
+        let stdin = process.stdin.unwrap();
+        let pending_requests = HashMap::new();
 
-        tokio::spawn(async move {
-            let stdout = BufReader::new(process.stdout.unwrap()).lines();
-            let stdin = process.stdin.unwrap();
-            let pending_requests = HashMap::new();
+        loop {
+            tokio::select! {
+                line = stdout.next_line() => {
+                    match line {
+                        Ok(Some(line)) => // new response
+                        {
+                            let response = match serde_json::from_str(&line) {
+                                Ok(response) => response,
+                                Err(err) => // log it
+                                {
+                                    tracing::error!(%err, "Error when decoding response from child node process");
+                                    continue
+                                }
+                            };
 
-            loop {
-                tokio::select! {
-                    line = stdout.next_line() => {
-                        match line {
-                            Ok(Some(line)) => // new response
-                            {
-                                let response = match serde_json::from_str(&line) {
-                                    Ok(response) => response,
-                                    Err(err) => // log it
-                                    {
-                                        tracing::error!(%err, "Error when decoding response from child node process");
-                                        continue
-                                    }
-                                };
-
-                            }
-                            Ok(None) => // end of the stream
-                            {
-                                tracing::warn!("child node process stdout closed")
-                            }
-                            Err(err) => // log it
-                            {
-                                tracing::error!(%err, "Error when reading from child node process");
-                            }
                         }
-                    }
-                    request = receiver.recv() => {
-                        match request {
-                            None => // channel closed
-                            {
-                                tracing::error!("The json-rpc client channel was closed");
-                            }
-                            Some((request, response_sender)) => {
-                                pending_requests.insert(request.id, response_sender);
-                                let mut req = serde_json::to_vec(&request).unwrap();
-                                req.push(b'\n');
-                                stdin.write_all(&req).await.unwrap();
-                            }
+                        Ok(None) => // end of the stream
+                        {
+                            tracing::warn!("child node process stdout closed")
+                        }
+                        Err(err) => // log it
+                        {
+                            tracing::error!(%err, "Error when reading from child node process");
                         }
                     }
                 }
+                request = receiver.recv() => {
+                    match request {
+                        None => // channel closed
+                        {
+                            tracing::error!("The json-rpc client channel was closed");
+                        }
+                        Some((request, response_sender)) => {
+                            pending_requests.insert(request.id, response_sender);
+                            let mut req = serde_json::to_vec(&request).unwrap();
+                            req.push(b'\n');
+                            stdin.write_all(&req).await.unwrap();
+                        }
+                    }
+                }
+            }
+        }
+    });
+
+    Ok(())
+}
+
+impl NodeProcess {
+    fn new() -> std::io::Result<NodeProcess> {
+        let (sender, receiver) = mpsc::channel::<ReqImpl>(300);
+
+        std::thread::spawn(|| match start_rpc_thread(receiver) {
+            Ok(()) => (),
+            Err(err) => {
+                tracing::error!("{err}"); // TODO print to stdout
+                std::process::exit(1);
             }
         });
 
         Ok(NodeProcess {
             task_handle: sender,
             request_id_counter: 0,
+            config: panic!(),
         })
     }
 
     /// Convenient façade. Allocates more than necessary, but this is only for testing.
-    async fn request(
+    async fn request<T: Deserialize>(
         &mut self,
         method: &str,
         params: serde_json::Value,
-    ) -> Result<jsonrpc_core::Response, Box<dyn std::error::Error>> {
+    ) -> Result<T, Box<dyn std::error::Error>> {
         let (sender, receiver) = oneshot::channel();
         let params = if let serde_json::Value::Object(params) = params {
             params
