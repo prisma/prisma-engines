@@ -1,0 +1,1 @@
+export { PlanetScaleAdapter } from './planetscale'

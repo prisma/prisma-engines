@@ -1,11 +1,15 @@
-import * as pg from 'pg'
-import { bindConnector, bindTransaction, Debug } from '@jkomyno/prisma-js-connector-utils'
-import type { Connector, ConnectorConfig, Query, Queryable, ResultSet, Transaction } from '@jkomyno/prisma-js-connector-utils'
+import type pg from 'pg'
+import { bindTransaction, Debug } from '@jkomyno/prisma-js-connector-utils'
+import type {
+  Connector,
+  Query,
+  Queryable,
+  ResultSet,
+  Transaction,
+} from '@jkomyno/prisma-js-connector-utils'
 import { fieldToColumnType } from './conversion'
 
 const debug = Debug('prisma:js-connector:pg')
-
-export type PrismaPgConfig = ConnectorConfig
 
 type StdClient = pg.Pool
 type TransactionClient = pg.PoolClient
@@ -97,14 +101,8 @@ class PgTransaction extends PgQueryable<TransactionClient>
   }
 }
 
-class PrismaPg extends PgQueryable<StdClient> implements Connector {
-  constructor(config: PrismaPgConfig) {
-    const { url: connectionString } = config
-    
-    const client = new pg.Pool({
-      connectionString,
-    })
-
+export class PgAdapter extends PgQueryable<StdClient> implements Connector {
+  constructor(client: pg.Pool) {
     super(client)
   }
 
@@ -122,9 +120,4 @@ class PrismaPg extends PgQueryable<StdClient> implements Connector {
   }
 
   async close() {}
-}
-
-export const createPgConnector = (config: PrismaPgConfig): Connector => {
-  const db = new PrismaPg(config)
-  return bindConnector(db)
 }

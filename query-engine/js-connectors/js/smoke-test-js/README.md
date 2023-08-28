@@ -1,9 +1,11 @@
 # @prisma/smoke-test-js
 
-This is a playground for testing the `libquery` client with the experimental Node.js drivers.
+This is a playground for testing the `libquery` client with the experimental Node.js Drivers / Driver Adapters.
 It contains a subset of `@prisma/client`, plus some handy executable smoke tests:
+- [`./src/neon.ws.ts`](./src/neon.ws.ts)
+- [`./src/neon.http.ts`](./src/neon.http.ts)
 - [`./src/planetscale.ts`](./src/planetscale.ts)
-- [`./src/neon.ts`](./src/neon.ts)
+- [`./src/pg.ts`](./src/pg.ts)
 
 ## How to setup
 
@@ -35,4 +37,14 @@ Note: you used to be able to run these Prisma commands without changing the prov
 
 In the current directory:
 - Run `pnpm prisma:neon` to push the Prisma schema and insert the test data.
-- Run `pnpm neon` to run smoke tests against the Neon database.
+- Run `pnpm neon:ws` to run smoke tests against the Neon database using WebSockets under the hood.
+- Run `pnpm neon:ws` to run smoke tests against the Neon database using HTTP under the hood. Note: this currently results in errors.
+
+### Postgres
+
+- Create a new Postgres database with [Prisma Provision](https://db-provision.cloud.prisma.io/) or from a local `postgres` Docker instance.
+- Paste the connection string to `JS_PG_DATABASE_URL`. Note: connections strings that use a remote host require `?sslmode=disable` to work with the Postgres adapter.
+
+In the current directory:
+- Run `pnpm prisma:pg` to push the Prisma schema and insert the test data.
+- Run `pnpm pg` to run smoke tests against the Postgres database.

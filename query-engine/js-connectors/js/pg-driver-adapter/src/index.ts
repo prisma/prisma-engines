@@ -1,0 +1,1 @@
+export { PgAdapter } from './pg'

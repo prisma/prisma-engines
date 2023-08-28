@@ -1,13 +1,16 @@
-import * as planetScale from '@planetscale/database'
-import type { Config as PlanetScaleConfig } from '@planetscale/database'
-import { bindConnector, bindTransaction, Debug } from '@jkomyno/prisma-js-connector-utils'
-import type { Connector, ResultSet, Query, ConnectorConfig, Queryable, Transaction } from '@jkomyno/prisma-js-connector-utils'
-import { type PlanetScaleColumnType, fieldToColumnType } from './conversion'
+import type planetScale from '@planetscale/database'
+import { bindTransaction, Debug } from '@jkomyno/prisma-js-connector-utils'
+import type {
+  Connector,
+  Query,
+  Queryable,
+  ResultSet,
+  Transaction,
+} from '@jkomyno/prisma-js-connector-utils'
+import { fieldToColumnType, type PlanetScaleColumnType } from './conversion'
 import { createDeferred, Deferred } from './deferred'
 
 const debug = Debug('prisma:js-connector:planetscale')
-
-export type PrismaPlanetScaleConfig = ConnectorConfig & Partial<PlanetScaleConfig>
 
 class RollbackError extends Error {
   constructor() {
@@ -15,13 +18,14 @@ class RollbackError extends Error {
     this.name = 'RollbackError'
 
     if (Error.captureStackTrace) {
-      Error.captureStackTrace(this, RollbackError);
+      Error.captureStackTrace(this, RollbackError)
     }
   }
 }
 
-
-class PlanetScaleQueryable<ClientT extends planetScale.Connection | planetScale.Transaction> implements Queryable {
+class PlanetScaleQueryable<
+  ClientT extends planetScale.Connection | planetScale.Transaction,
+> implements Queryable {
   readonly flavour = 'mysql'
   constructor(protected client: ClientT) {
   }
@@ -33,13 +37,16 @@ class PlanetScaleQueryable<ClientT extends planetScale.Connection | planetScale.
     const tag = '[js::query_raw]'
     debug(`${tag} %O`, query)
 
-    const { fields, insertId: lastInsertId, rows: results } = await this.performIO(query)
+    const { fields, insertId: lastInsertId, rows: results } = await this
+      .performIO(query)
 
-    const columns = fields.map(field => field.name)
+    const columns = fields.map((field) => field.name)
     const resultSet: ResultSet = {
       columnNames: columns,
-      columnTypes: fields.map(field => fieldToColumnType(field.type as PlanetScaleColumnType)),
-      rows: results.map(result => columns.map(column => result[column])),
+      columnTypes: fields.map((field) =>
+        fieldToColumnType(field.type as PlanetScaleColumnType)
+      ),
+      rows: results.map((result) => columns.map((column) => result[column])),
       lastInsertId,
     }
 
@@ -78,8 +85,14 @@ class PlanetScaleQueryable<ClientT extends planetScale.Connection | planetScale.
   }
 }
 
-class PlanetScaleTransaction extends PlanetScaleQueryable<planetScale.Transaction> implements Transaction {
-  constructor(tx: planetScale.Transaction, private txDeferred: Deferred<void>, private txResultPromise: Promise<void>) {
+class PlanetScaleTransaction
+  extends PlanetScaleQueryable<planetScale.Transaction>
+  implements Transaction {
+  constructor(
+    tx: planetScale.Transaction,
+    private txDeferred: Deferred<void>,
+    private txResultPromise: Promise<void>,
+  ) {
     super(tx)
   }
 
@@ -87,54 +100,51 @@ class PlanetScaleTransaction extends PlanetScaleQueryable<planetScale.Transactio
     const tag = '[js::commit]'
     debug(`${tag} committing transaction`)
     this.txDeferred.resolve()
-    return this.txResultPromise;
+    return this.txResultPromise
   }
 
   rollback(): Promise<void> {
     const tag = '[js::rollback]'
     debug(`${tag} rolling back the transaction`)
     this.txDeferred.reject(new RollbackError())
-    return this.txResultPromise;
+    return this.txResultPromise
   }
-
 }
 
-class PrismaPlanetScale extends PlanetScaleQueryable<planetScale.Connection> implements Connector {
-  constructor(config: PrismaPlanetScaleConfig) {
-    const client = planetScale.connect(config)
-
+export class PlanetScaleAdapter
+  extends PlanetScaleQueryable<planetScale.Connection>
+  implements Connector {
+  constructor(client: planetScale.Connection) {
     super(client)
-    
   }
 
   async startTransaction(isolationLevel?: string) {
     return new Promise<Transaction>((resolve) => {
-      const txResultPromise = this.client.transaction(async tx => {
+      const txResultPromise = this.client.transaction(async (tx) => {
         if (isolationLevel) {
           await tx.execute(`SET TRANSACTION ISOLATION LEVEL ${isolationLevel}`)
         }
         const [txDeferred, deferredPromise] = createDeferred<void>()
-        const txWrapper = new PlanetScaleTransaction(tx, txDeferred, txResultPromise)
+        const txWrapper = new PlanetScaleTransaction(
+          tx,
+          txDeferred,
+          txResultPromise,
+        )
 
-        resolve(bindTransaction(txWrapper));
+        resolve(bindTransaction(txWrapper))
 
         return deferredPromise
-      }).catch(error => {
+      }).catch((error) => {
         // Rollback error is ignored (so that tx.rollback() won't crash)
         // any other error is legit and is re-thrown
         if (!(error instanceof RollbackError)) {
           return Promise.reject(error)
         }
-        
+
         return undefined
-      });
+      })
     })
   }
 
   async close() {}
-}
-
-export const createPlanetScaleConnector = (config: PrismaPlanetScaleConfig): Connector => {
-  const db = new PrismaPlanetScale(config)
-  return bindConnector(db)
 }

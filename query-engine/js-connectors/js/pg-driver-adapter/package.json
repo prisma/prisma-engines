@@ -1,7 +1,7 @@
 {
-  "name": "@jkomyno/prisma-pg-js-connector",
-  "version": "0.0.8",
-  "description": "Prisma's JS Connector for \"pg\"",
+  "name": "@jkomyno/prisma-pg-driver-adapter",
+  "version": "0.1.0",
+  "description": "Prisma's Driver Adapter for \"pg\"",
   "main": "dist/index.js",
   "module": "dist/index.mjs",
   "types": "dist/index.d.ts",
@@ -18,10 +18,13 @@
   "license": "Apache-2.0",
   "sideEffects": false,
   "dependencies": {
-    "@jkomyno/prisma-js-connector-utils": "workspace:*",
-    "pg": "^8.11.3"
+    "@jkomyno/prisma-js-connector-utils": "workspace:*"
   },
   "devDependencies": {
+    "pg": "^8.11.3",
     "@types/pg": "^8.10.2"
+  },
+  "peerDependencies": {
+    "pg": "^8.11.3"
   }
 }
