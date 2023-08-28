@@ -61,6 +61,9 @@
 <a href="#61" id="61">61</a>
 <a href="#62" id="62">62</a>
 <a href="#63" id="63">63</a>
+<a href="#64" id="64">64</a>
+<a href="#65" id="65">65</a>
+<a href="#66" id="66">66</a>
 </pre></div><pre class="rust"><code><span class="kw">use super</span>::<span class="kw-2">*</span>;
 <span class="kw">use crate</span>::{datamodel_rendering::SqlDatamodelRenderer, BoxFuture};
 <span class="kw">use </span>psl::datamodel_connector::ConnectorCapabilities;
@@ -71,6 +74,7 @@
 
 <span class="attr">#[derive(Debug, Clone, Copy, PartialEq)]
 </span><span class="kw">pub enum </span>CockroachDbVersion {
+    V231,
     V222,
     V221,
 }
@@ -82,6 +86,7 @@
         <span class="kw">let </span>version = <span class="kw">match </span>s {
             <span class="string">&quot;22.1&quot; </span>=&gt; <span class="self">Self</span>::V221,
             <span class="string">&quot;22.2&quot; </span>=&gt; <span class="self">Self</span>::V222,
+            <span class="string">&quot;23.1&quot; </span>=&gt; <span class="self">Self</span>::V231,
             <span class="kw">_ </span>=&gt; <span class="kw">return </span><span class="prelude-val">Err</span>(TestError::parse_error(<span class="macro">format!</span>(<span class="string">&quot;Unknown CockroachDB version `{s}`&quot;</span>))),
         };
 
@@ -92,6 +97,7 @@
 <span class="kw">impl </span>fmt::Display <span class="kw">for </span>CockroachDbVersion {
     <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
         <span class="kw">match </span><span class="self">self </span>{
+            CockroachDbVersion::V231 =&gt; f.write_str(<span class="string">&quot;23.1&quot;</span>),
             CockroachDbVersion::V222 =&gt; f.write_str(<span class="string">&quot;22.2&quot;</span>),
             CockroachDbVersion::V221 =&gt; f.write_str(<span class="string">&quot;22.1&quot;</span>),
         }

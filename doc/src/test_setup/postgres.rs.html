@@ -87,6 +87,8 @@
 <a href="#87" id="87">87</a>
 <a href="#88" id="88">88</a>
 <a href="#89" id="89">89</a>
+<a href="#90" id="90">90</a>
+<a href="#91" id="91">91</a>
 </pre></div><pre class="rust"><code><span class="kw">use crate</span>::{runtime::run_with_thread_local_runtime <span class="kw">as </span>tok, AnyError, Tags};
 <span class="kw">use </span>enumflags2::BitFlags;
 <span class="kw">use </span>quaint::{prelude::Queryable, single::Quaint};
@@ -120,10 +122,12 @@
                 }
 
                 <span class="kw">if </span>version.contains(<span class="string">&quot;CockroachDB&quot;</span>) {
-                    <span class="kw">if </span>version.contains(<span class="string">&quot;v22.2&quot;</span>) {
-                        tags |= Tags::CockroachDb222
+                    <span class="kw">if </span>version.contains(<span class="string">&quot;v23.1&quot;</span>) {
+                        tags |= Tags::CockroachDb231;
+                    } <span class="kw">else if </span>version.contains(<span class="string">&quot;v22.2&quot;</span>) {
+                        tags |= Tags::CockroachDb222;
                     } <span class="kw">else if </span>version.contains(<span class="string">&quot;v21.2&quot;</span>) {
-                        tags |= Tags::CockroachDb221
+                        tags |= Tags::CockroachDb221;
                     }
 
                     tags |= Tags::CockroachDb;
