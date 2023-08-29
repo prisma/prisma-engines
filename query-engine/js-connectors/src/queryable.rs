@@ -32,7 +32,7 @@ use tracing::{info_span, Instrument};
 ///
 pub struct JsBaseQueryable {
     pub(crate) proxy: CommonProxy,
-    pub(crate) flavour: Flavour,
+    pub flavour: Flavour,
 }
 
 impl JsBaseQueryable {

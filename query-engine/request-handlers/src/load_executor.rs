@@ -8,12 +8,20 @@ use url::Url;
 #[cfg(feature = "mongodb")]
 use mongodb_query_connector::MongoDb;
 
+use super::ConnectorMode;
+
 /// Loads a query executor based on the parsed Prisma schema (datasource).
 pub async fn load(
+    connector_mode: ConnectorMode,
     source: &Datasource,
     features: PreviewFeatures,
     url: &str,
 ) -> query_core::Result<Box<dyn QueryExecutor + Send + Sync + 'static>> {
+    if connector_mode == ConnectorMode::Js {
+        #[cfg(feature = "js-connectors")]
+        return jsconnector(source, url, features).await;
+    }
+
     match source.active_provider {
         p if SQLITE.is_provider(p) => sqlite(source, url, features).await,
         p if MYSQL.is_provider(p) => mysql(source, url, features).await,
@@ -23,9 +31,6 @@ pub async fn load(
 
         #[cfg(feature = "mongodb")]
         p if MONGODB.is_provider(p) => mongodb(source, url, features).await,
-
-        #[cfg(feature = "js-connectors")]
-        p if JsConnector::is_provider(p) => jsconnector(source, url, features).await,
 
         x => Err(query_core::CoreError::ConfigurationError(format!(
             "Unsupported connector type: {x}"

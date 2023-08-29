@@ -51,7 +51,6 @@ pub struct Js {
     connector: JsConnector,
     connection_info: ConnectionInfo,
     features: psl::PreviewFeatures,
-    psl_connector: psl::builtin_connectors::JsConnector,
 }
 
 fn get_connection_info(url: &str) -> connector::Result<ConnectionInfo> {
@@ -70,23 +69,14 @@ impl FromSource for Js {
         url: &str,
         features: psl::PreviewFeatures,
     ) -> connector_interface::Result<Js> {
-        match source.active_connector.as_js_connector() {
-            Some(psl_connector) => {
-                let connector = registered_js_connector(source.active_provider)?;
-                let connection_info = get_connection_info(url)?;
+        let connector = registered_js_connector(source.active_provider)?;
+        let connection_info = get_connection_info(url)?;
 
-                Ok(Js {
-                    connector,
-                    connection_info,
-                    features,
-                    psl_connector,
-                })
-            }
-            None => panic!(
-                "Connector for provider {} is not a JsConnector",
-                source.active_connector.provider_name()
-            ),
-        }
+        Ok(Js {
+            connector,
+            connection_info,
+            features,
+        })
     }
 }
 
@@ -101,7 +91,7 @@ impl Connector for Js {
     }
 
     fn name(&self) -> &'static str {
-        self.psl_connector.name
+        "js"
     }
 
     fn should_retry_on_transient_error(&self) -> bool {
