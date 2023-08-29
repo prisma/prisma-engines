@@ -19,10 +19,10 @@ export async function smokeTest(db: Connector, prismaSchemaRelativePath: string)
 
   const test = new SmokeTest(engine, db.flavour)
 
-  // await test.testFindManyTypeTest()
+  await test.testFindManyTypeTest()
   await test.createAutoIncrement()
-  // await test.testCreateAndDeleteChildParent()
-  // await test.testTransaction()
+  await test.testCreateAndDeleteChildParent()
+  await test.testTransaction()
 
   // Note: calling `engine.disconnect` won't actually close the database connection.
   console.log('[nodejs] disconnecting...')
