@@ -287,6 +287,8 @@ impl QueryEngine {
                         "db.type" = connector.name(),
                     );
 
+                    // When self.connector_mode == ConnectorMode::JS, this invokes the
+                    // JS connector's `connect()` method.
                     connector.get_connection().instrument(conn_span).await?;
 
                     crate::Result::<_>::Ok(executor)
@@ -334,11 +336,15 @@ impl QueryEngine {
             let span = tracing::info_span!("prisma:engine:disconnect");
             let _ = telemetry::helpers::set_parent_context_from_json_str(&span, &trace);
 
-            // TODO: when using Node Drivers, we need to call Driver::close() here.
-
             async {
                 let mut inner = self.inner.write().await;
                 let engine = inner.as_engine()?;
+
+                let connector = engine.executor().primary_connector();
+
+                // When self.connector_mode == ConnectorMode::JS, this invokes the
+                // JS connector's `disconnect()` method.
+                connector.disconnect().await.map_err(|err| ApiError::from(err))?;
 
                 let builder = EngineBuilder {
                     schema: engine.schema.clone(),

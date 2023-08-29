@@ -33,7 +33,14 @@ pub struct CommonProxy {
 /// This is a JS proxy for accessing the methods specific to top level
 /// JS driver objects
 pub struct DriverProxy {
+    /// Start a transaction.
     start_transaction: ThreadsafeFunction<Option<String>, ErrorStrategy::Fatal>,
+
+    /// Connect to the database.
+    connect: ThreadsafeFunction<(), ErrorStrategy::Fatal>,
+
+    /// Disconnect from the database.
+    disconnect: ThreadsafeFunction<(), ErrorStrategy::Fatal>,
 }
 /// This a JS proxy for accessing the methods, specific
 /// to JS transaction objects
@@ -335,8 +342,18 @@ impl CommonProxy {
 impl DriverProxy {
     pub fn new(js_connector: &JsObject, env: &Env) -> napi::Result<Self> {
         let start_transaction = js_connector.get_named_property("startTransaction")?;
-        let mut result = Self { start_transaction };
+        let connect = js_connector.get_named_property("connect")?;
+        let disconnect = js_connector.get_named_property("disconnect")?;
+
+        let mut result = Self {
+            start_transaction,
+            connect,
+            disconnect,
+        };
+
         result.start_transaction.unref(env)?;
+        result.connect.unref(env)?;
+        result.disconnect.unref(env)?;
 
         Ok(result)
     }
@@ -350,6 +367,23 @@ impl DriverProxy {
 
             let tx = promise.await?;
             Ok(Box::new(tx))
+        })
+        .await
+    }
+
+    pub async fn connect(&self) -> napi::Result<()> {
+        async_unwinding_panic(async {
+            let promise = self.connect.call_async::<JsPromise<()>>(()).await?;
+            let value = promise.await?;
+            Ok(value)
+        })
+        .await
+    }
+
+    pub async fn disconnect(&self) -> napi::Result<()> {
+        async_unwinding_panic(async {
+            let promise = self.disconnect.call_async::<JsPromise<()>>(()).await?;
+            promise.await
         })
         .await
     }

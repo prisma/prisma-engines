@@ -6,9 +6,9 @@ use async_trait::async_trait;
 use napi::{Env, JsObject};
 use psl::datamodel_connector::Flavour;
 use quaint::{
-    connector::{IsolationLevel, Transaction},
+    connector::{IsolationLevel, JsConnectorLike, Transaction},
     error::{Error, ErrorKind},
-    prelude::{Query as QuaintQuery, Queryable as QuaintQueryable, ResultSet, TransactionCapable},
+    prelude::{Connectable, Query as QuaintQuery, Queryable as QuaintQueryable, ResultSet, TransactionCapable},
     visitor::{self, Visitor},
     Value,
 };
@@ -243,6 +243,19 @@ impl TransactionCapable for JsQueryable {
         Ok(tx)
     }
 }
+
+#[async_trait]
+impl Connectable for JsQueryable {
+    async fn connect(&self) -> quaint::Result<()> {
+        self.driver_proxy.connect().await.map_err(into_quaint_error)
+    }
+
+    async fn disconnect(&self) -> quaint::Result<()> {
+        self.driver_proxy.disconnect().await.map_err(into_quaint_error)
+    }
+}
+
+impl JsConnectorLike for JsQueryable {}
 
 pub fn from_napi(napi_env: &Env, driver: JsObject) -> JsQueryable {
     let common = CommonProxy::new(&driver, napi_env).unwrap();

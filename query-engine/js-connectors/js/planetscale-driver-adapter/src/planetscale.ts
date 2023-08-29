@@ -146,5 +146,11 @@ export class PlanetScaleAdapter
     })
   }
 
-  async close() {}
+  async connect() {
+    debug('[js::connect]')
+  }
+
+  async disconnect() {
+    debug('[js::disconnect]')
+  }
 }

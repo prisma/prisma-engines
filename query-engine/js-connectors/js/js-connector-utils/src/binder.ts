@@ -7,7 +7,8 @@ export const bindConnector = (connector: Connector): Connector => ({
   executeRaw: connector.executeRaw.bind(connector),
   flavour: connector.flavour,
   startTransaction: connector.startTransaction.bind(connector),
-  close: connector.close.bind(connector)
+  connect: connector.connect.bind(connector),
+  disconnect: connector.disconnect.bind(connector),
 })
 
 // *.bind(transaction) is required to preserve the `this` context of functions whose
@@ -18,6 +19,6 @@ export const bindTransaction = (transaction: Transaction): Transaction => {
     queryRaw: transaction.queryRaw.bind(transaction),
     executeRaw: transaction.executeRaw.bind(transaction),
     commit: transaction.commit.bind(transaction),
-    rollback: transaction.rollback.bind(transaction)
+    rollback: transaction.rollback.bind(transaction),
   });
 }
