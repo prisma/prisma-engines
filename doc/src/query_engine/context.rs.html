@@ -135,6 +135,7 @@
 <a href="#135" id="135">135</a>
 <a href="#136" id="136">136</a>
 <a href="#137" id="137">137</a>
+<a href="#138" id="138">138</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::features::{EnabledFeatures, Feature};
 <span class="kw">use crate</span>::{logger::Logger, opt::PrismaOpt};
 <span class="kw">use crate</span>::{PrismaError, PrismaResult};
@@ -146,7 +147,7 @@
 };
 <span class="kw">use </span>query_engine_metrics::setup <span class="kw">as </span>metric_setup;
 <span class="kw">use </span>query_engine_metrics::MetricRegistry;
-<span class="kw">use </span>request_handlers::load_executor;
+<span class="kw">use </span>request_handlers::{load_executor, ConnectorMode};
 <span class="kw">use </span>std::{env, fmt, sync::Arc};
 <span class="kw">use </span>tracing::Instrument;
 
@@ -200,7 +201,8 @@
 
             <span class="kw">let </span>url = data_source.load_url(|key| env::var(key).ok())<span class="question-mark">?</span>;
             <span class="comment">// Load executor
-            </span><span class="kw">let </span>executor = load_executor(data_source, preview_features, <span class="kw-2">&amp;</span>url).<span class="kw">await</span><span class="question-mark">?</span>;
+            </span><span class="kw">let </span>connector_mode = ConnectorMode::Rust;
+            <span class="kw">let </span>executor = load_executor(connector_mode, data_source, preview_features, <span class="kw-2">&amp;</span>url).<span class="kw">await</span><span class="question-mark">?</span>;
             executor.primary_connector().get_connection().<span class="kw">await</span><span class="question-mark">?</span>;
             PrismaResult::&lt;<span class="kw">_</span>&gt;::Ok(executor)
         });

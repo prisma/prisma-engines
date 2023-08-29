@@ -116,6 +116,11 @@
 <a href="#116" id="116">116</a>
 <a href="#117" id="117">117</a>
 <a href="#118" id="118">118</a>
+<a href="#119" id="119">119</a>
+<a href="#120" id="120">120</a>
+<a href="#121" id="121">121</a>
+<a href="#122" id="122">122</a>
+<a href="#123" id="123">123</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>psl::{builtin_connectors::<span class="kw-2">*</span>, Datasource, PreviewFeatures};
 <span class="kw">use </span>query_core::{executor::InterpretingExecutor, Connector, QueryExecutor};
 <span class="kw">use </span>sql_query_connector::<span class="kw-2">*</span>;
@@ -126,12 +131,20 @@
 <span class="attr">#[cfg(feature = <span class="string">&quot;mongodb&quot;</span>)]
 </span><span class="kw">use </span>mongodb_query_connector::MongoDb;
 
+<span class="kw">use </span><span class="kw">super</span>::ConnectorMode;
+
 <span class="doccomment">/// Loads a query executor based on the parsed Prisma schema (datasource).
 </span><span class="kw">pub async fn </span>load(
+    connector_mode: ConnectorMode,
     source: <span class="kw-2">&amp;</span>Datasource,
     features: PreviewFeatures,
     url: <span class="kw-2">&amp;</span>str,
 ) -&gt; query_core::Result&lt;Box&lt;<span class="kw">dyn </span>QueryExecutor + Send + Sync + <span class="lifetime">&#39;static</span>&gt;&gt; {
+    <span class="kw">if </span>connector_mode == ConnectorMode::Js {
+        <span class="attr">#[cfg(feature = <span class="string">&quot;js-connectors&quot;</span>)]
+        </span><span class="kw">return </span>jsconnector(source, url, features).<span class="kw">await</span>;
+    }
+
     <span class="kw">match </span>source.active_provider {
         p <span class="kw">if </span>SQLITE.is_provider(p) =&gt; sqlite(source, url, features).<span class="kw">await</span>,
         p <span class="kw">if </span>MYSQL.is_provider(p) =&gt; mysql(source, url, features).<span class="kw">await</span>,
@@ -141,9 +154,6 @@
 
         <span class="attr">#[cfg(feature = <span class="string">&quot;mongodb&quot;</span>)]
         </span>p <span class="kw">if </span>MONGODB.is_provider(p) =&gt; mongodb(source, url, features).<span class="kw">await</span>,
-
-        <span class="attr">#[cfg(feature = <span class="string">&quot;js-connectors&quot;</span>)]
-        </span>p <span class="kw">if </span>JsConnector::is_provider(p) =&gt; jsconnector(source, url, features).<span class="kw">await</span>,
 
         x =&gt; <span class="prelude-val">Err</span>(query_core::CoreError::ConfigurationError(<span class="macro">format!</span>(
             <span class="string">&quot;Unsupported connector type: {x}&quot;

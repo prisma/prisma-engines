@@ -279,6 +279,14 @@
 <a href="#279" id="279">279</a>
 <a href="#280" id="280">280</a>
 <a href="#281" id="281">281</a>
+<a href="#282" id="282">282</a>
+<a href="#283" id="283">283</a>
+<a href="#284" id="284">284</a>
+<a href="#285" id="285">285</a>
+<a href="#286" id="286">286</a>
+<a href="#287" id="287">287</a>
+<a href="#288" id="288">288</a>
+<a href="#289" id="289">289</a>
 </pre></div><pre class="rust"><code><span class="kw">mod </span>json_adapter;
 
 <span class="kw">pub use </span>json_adapter::<span class="kw-2">*</span>;
@@ -292,8 +300,8 @@
 };
 <span class="kw">use </span>query_engine_metrics::MetricRegistry;
 <span class="kw">use </span>request_handlers::{
-    load_executor, BatchTransactionOption, GraphqlBody, JsonBatchQuery, JsonBody, JsonSingleQuery, MultiQuery,
-    RequestBody, RequestHandler,
+    load_executor, BatchTransactionOption, ConnectorMode, GraphqlBody, JsonBatchQuery, JsonBody, JsonSingleQuery,
+    MultiQuery, RequestBody, RequestHandler,
 };
 <span class="kw">use </span>std::{env, sync::Arc};
 
@@ -333,7 +341,15 @@
         <span class="kw">let </span>schema = psl::parse_schema(datamodel).unwrap();
         <span class="kw">let </span>data_source = schema.configuration.datasources.first().unwrap();
         <span class="kw">let </span>url = data_source.load_url(|key| env::var(key).ok()).unwrap();
-        <span class="kw">let </span>executor = load_executor(data_source, schema.configuration.preview_features(), <span class="kw-2">&amp;</span>url).<span class="kw">await</span><span class="question-mark">?</span>;
+
+        <span class="kw">let </span>connector_mode = ConnectorMode::Rust;
+        <span class="kw">let </span>executor = load_executor(
+            connector_mode,
+            data_source,
+            schema.configuration.preview_features(),
+            <span class="kw-2">&amp;</span>url,
+        )
+        .<span class="kw">await</span><span class="question-mark">?</span>;
         <span class="kw">let </span>query_schema: QuerySchemaRef = Arc::new(schema::build(Arc::new(schema), <span class="bool-val">true</span>));
 
         <span class="prelude-val">Ok</span>(<span class="self">Self </span>{
