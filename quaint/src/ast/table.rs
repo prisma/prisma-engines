@@ -3,7 +3,7 @@ use crate::{
     ast::{Expression, Row, Select, Values},
     error::{Error, ErrorKind},
 };
-use std::borrow::Cow;
+use std::{borrow::Cow, sync::Arc};
 
 /// An object that can be aliased.
 pub trait Aliasable<'a> {
@@ -30,7 +30,7 @@ pub struct Table<'a> {
     pub typ: TableType<'a>,
     pub alias: Option<Cow<'a, str>>,
     pub database: Option<Cow<'a, str>>,
-    pub(crate) index_definitions: Vec<IndexDefinition<'a>>,
+    pub(crate) index_definitions: Option<Arc<Vec<IndexDefinition<'a>>>>,
 }
 
 impl<'a> PartialEq for Table<'a> {
@@ -57,11 +57,10 @@ impl<'a> Table<'a> {
         }
     }
 
-    /// Add unique index definition.
-    pub fn add_unique_index(mut self, i: impl Into<IndexDefinition<'a>>) -> Self {
-        let definition = i.into();
-        self.index_definitions.push(definition.set_table(self.clone()));
-        self
+    /// Add unique index definitions.
+    pub fn set_unique_indexes(&mut self, indexes: Arc<Vec<IndexDefinition<'a>>>) {
+        debug_assert!(self.index_definitions.is_none());
+        self.index_definitions = Some(indexes);
     }
 
     /// Conditions for Microsoft T-SQL MERGE using the table metadata.
@@ -95,7 +94,7 @@ impl<'a> Table<'a> {
             Ok::<Option<ConditionTree>, Error>(cond)
         };
 
-        for index in self.index_definitions.iter() {
+        for index in self.index_definitions.iter().flat_map(|idxs| idxs.iter()) {
             match index {
                 IndexDefinition::Single(column) => {
                     if let Some(right_cond) = join_cond(column)? {
@@ -323,7 +322,7 @@ impl<'a> From<&'a str> for Table<'a> {
             typ: TableType::Table(s.into()),
             alias: None,
             database: None,
-            index_definitions: Vec::new(),
+            index_definitions: None,
         }
     }
 }
@@ -334,7 +333,7 @@ impl<'a> From<&'a String> for Table<'a> {
             typ: TableType::Table(s.into()),
             alias: None,
             database: None,
-            index_definitions: Vec::new(),
+            index_definitions: None,
         }
     }
 }
@@ -373,7 +372,7 @@ impl<'a> From<String> for Table<'a> {
             typ: TableType::Table(s.into()),
             alias: None,
             database: None,
-            index_definitions: Vec::new(),
+            index_definitions: None,
         }
     }
 }
@@ -390,7 +389,7 @@ impl<'a> From<Values<'a>> for Table<'a> {
             typ: TableType::Values(values),
             alias: None,
             database: None,
-            index_definitions: Vec::new(),
+            index_definitions: None,
         }
     }
 }
@@ -408,7 +407,7 @@ impl<'a> From<Select<'a>> for Table<'a> {
             typ: TableType::Query(Box::new(select)),
             alias: None,
             database: None,
-            index_definitions: Vec::new(),
+            index_definitions: None,
         }
     }
 }

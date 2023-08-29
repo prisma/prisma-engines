@@ -97,7 +97,7 @@ impl<'a> TryFrom<Insert<'a>> for Merge<'a> {
             Error::builder(kind).build()
         })?;
 
-        if table.index_definitions.is_empty() {
+        if table.index_definitions.is_none() {
             let kind = ErrorKind::conversion("Insert table needs schema metadata for conversion to Merge.");
             return Err(Error::builder(kind).build());
         }

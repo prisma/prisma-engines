@@ -1,4 +1,4 @@
-use super::{Column, Table};
+use super::Column;
 
 /// A definition of a database index.
 ///
@@ -10,22 +10,6 @@ pub enum IndexDefinition<'a> {
 }
 
 impl<'a> IndexDefinition<'a> {
-    pub(crate) fn set_table<T>(self, table: T) -> Self
-    where
-        T: Into<Table<'a>>,
-    {
-        let table = table.into();
-
-        match self {
-            Self::Compound(columns) => {
-                let cols = columns.into_iter().map(|c| c.table(table.clone())).collect();
-
-                Self::Compound(cols)
-            }
-            Self::Single(column) => Self::Single(Box::new(column.table(table))),
-        }
-    }
-
     /// At least one of the index columns has automatically generated default
     /// value in the database.
     pub fn has_autogen(&self) -> bool {

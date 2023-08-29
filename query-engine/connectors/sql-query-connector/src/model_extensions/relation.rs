@@ -1,9 +1,14 @@
+use std::sync::Arc;
+
 use crate::{
     model_extensions::{AsColumns, AsTable, ColumnIterator},
     Context,
 };
 use prisma_models::{walkers, ModelProjection, Relation, RelationField};
-use quaint::{ast::Table, prelude::Column};
+use quaint::{
+    ast::Table,
+    prelude::{Column, IndexDefinition},
+};
 
 pub(crate) trait RelationFieldExt {
     fn m2m_columns(&self, ctx: &Context<'_>) -> Vec<Column<'static>>;
@@ -75,9 +80,13 @@ impl AsTable for Relation {
             walkers::RefinedRelationWalker::ImplicitManyToMany(ref m) => {
                 let model_a = m.model_a();
                 let prefix = model_a.schema_name().unwrap_or_else(|| ctx.schema_name()).to_owned();
-                let table: Table = (prefix, m.table_name().to_string()).into();
+                let mut table: Table = (prefix, m.table_name().to_string()).into();
 
-                table.add_unique_index(vec![Column::from("A"), Column::from("B")])
+                table.set_unique_indexes(Arc::new(vec![IndexDefinition::Compound(vec![
+                    Column::from("A"),
+                    Column::from("B"),
+                ])]));
+                table
             }
             walkers::RefinedRelationWalker::Inline(ref m) => {
                 self.dm.find_model_by_id(m.referencing_model().id).as_table(ctx)
