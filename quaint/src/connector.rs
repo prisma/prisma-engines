@@ -10,7 +10,7 @@
 //! querying interface.
 
 mod connection_info;
-pub(crate) mod metrics;
+pub mod metrics;
 mod queryable;
 mod result_set;
 #[cfg(any(feature = "mssql", feature = "postgresql", feature = "mysql"))]
