@@ -374,8 +374,7 @@ impl DriverProxy {
     pub async fn connect(&self) -> napi::Result<()> {
         async_unwinding_panic(async {
             let promise = self.connect.call_async::<JsPromise<()>>(()).await?;
-            let value = promise.await?;
-            Ok(value)
+            promise.await
         })
         .await
     }
