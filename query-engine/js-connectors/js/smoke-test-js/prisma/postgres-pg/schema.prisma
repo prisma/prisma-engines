@@ -3,7 +3,7 @@ generator client {
 }
 
 datasource db {
-  provider = "@prisma/pg"
+  provider = "postgres"
   url      = env("JS_PG_DATABASE_URL")
 }
 
