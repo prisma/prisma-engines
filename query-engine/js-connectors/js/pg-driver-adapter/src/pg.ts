@@ -119,5 +119,11 @@ export class PgAdapter extends PgQueryable<StdClient> implements Connector {
     return bindTransaction(new PgTransaction(connection))
   }
 
-  async close() {}
+  async connect() {
+    debug('[js::connect]')
+  }
+
+  async disconnect() {
+    debug('[js::disconnect]')
+  }
 }

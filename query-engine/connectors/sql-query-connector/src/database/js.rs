@@ -8,7 +8,7 @@ use connector_interface::{
 };
 use once_cell::sync::Lazy;
 use quaint::{
-    connector::{IsolationLevel, Transaction},
+    connector::{IsolationLevel, JsConnectorLike, Transaction},
     prelude::{Queryable as QuaintQueryable, *},
 };
 use std::{
@@ -32,7 +32,7 @@ fn registered_js_connector(provider: &str) -> connector::Result<JsConnector> {
         .map(|conn_ref| conn_ref.to_owned())
 }
 
-pub fn register_js_connector(provider: &str, connector: Arc<dyn TransactionCapable>) -> Result<(), String> {
+pub fn register_js_connector(provider: &str, connector: Arc<dyn JsConnectorLike>) -> Result<(), String> {
     let mut lock = REGISTRY.lock().unwrap();
     let entry = lock.entry(provider.to_string());
     match entry {
@@ -84,8 +84,17 @@ impl FromSource for Js {
 impl Connector for Js {
     async fn get_connection<'a>(&'a self) -> connector::Result<Box<dyn Connection + Send + Sync + 'static>> {
         super::catch(self.connection_info.clone(), async move {
+            self.connector.connect().await?;
             let sql_conn = SqlConnection::new(self.connector.clone(), &self.connection_info, self.features);
             Ok(Box::new(sql_conn) as Box<dyn Connection + Send + Sync + 'static>)
+        })
+        .await
+    }
+
+    async fn disconnect(&self) -> connector::Result<()> {
+        super::catch(self.connection_info.clone(), async move {
+            self.connector.disconnect().await?;
+            Ok(())
         })
         .await
     }
@@ -118,7 +127,7 @@ impl Connector for Js {
 // in this object, and implementing TransactionCapable (and quaint::Queryable) explicitly for it.
 #[derive(Clone)]
 struct JsConnector {
-    connector: Arc<dyn TransactionCapable>,
+    connector: Arc<dyn JsConnectorLike>,
 }
 
 #[async_trait]
@@ -180,5 +189,16 @@ impl TransactionCapable for JsConnector {
         isolation: Option<IsolationLevel>,
     ) -> quaint::Result<Box<dyn Transaction + 'a>> {
         self.connector.start_transaction(isolation).await
+    }
+}
+
+#[async_trait]
+impl Connectable for JsConnector {
+    async fn connect(&self) -> quaint::Result<()> {
+        self.connector.connect().await
+    }
+
+    async fn disconnect(&self) -> quaint::Result<()> {
+        self.connector.disconnect().await
     }
 }

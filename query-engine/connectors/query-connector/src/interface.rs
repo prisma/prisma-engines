@@ -9,6 +9,11 @@ pub trait Connector {
     /// Returns a connection to a data source.
     async fn get_connection(&self) -> crate::Result<Box<dyn Connection + Send + Sync>>;
 
+    /// Disconnects from the data source.
+    async fn disconnect(&self) -> crate::Result<()> {
+        Ok(())
+    }
+
     /// Returns the name of the connector.
     fn name(&self) -> &'static str;
 

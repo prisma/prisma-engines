@@ -61,9 +61,14 @@ export interface Connector extends Queryable {
   startTransaction(isolationLevel?: string): Promise<Transaction>
 
   /**
+   * Opens a connection to the database.
+   */
+  connect: () => Promise<void>
+
+  /**
    * Closes the connection to the database, if any.
    */
-  close: () => Promise<void>
+  disconnect: () => Promise<void>
 }
 
 export interface Transaction extends Queryable {

@@ -99,6 +99,17 @@ pub trait Queryable: Send + Sync {
     fn requires_isolation_first(&self) -> bool;
 }
 
+#[async_trait]
+pub trait Connectable: Queryable {
+    async fn connect(&self) -> crate::Result<()> {
+        Ok(())
+    }
+
+    async fn disconnect(&self) -> crate::Result<()> {
+        Ok(())
+    }
+}
+
 /// A thing that can start a new transaction.
 #[async_trait]
 pub trait TransactionCapable: Queryable {
@@ -128,3 +139,5 @@ macro_rules! impl_default_TransactionCapable {
 }
 
 pub(crate) use impl_default_TransactionCapable;
+
+pub trait JsConnectorLike: TransactionCapable + Connectable {}

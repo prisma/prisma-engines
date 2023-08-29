@@ -90,8 +90,6 @@ class NeonTransaction extends NeonWsQueryable<neon.PoolClient>
 }
 
 export class NeonWSAdapter extends NeonWsQueryable<neon.Pool> implements Connector {
-  private isRunning = true
-
   constructor(pool: neon.Pool) {
     super(pool)
   }
@@ -110,12 +108,12 @@ export class NeonWSAdapter extends NeonWsQueryable<neon.Pool> implements Connect
     return bindTransaction(new NeonTransaction(connection))
   }
 
-  async close() {
-    this.client.on('error', (e) => console.log(e))
-    if (this.isRunning) {
-      await this.client.end()
-      this.isRunning = false
-    }
+  async connect() {
+    debug('[js::connect]')
+  }
+
+  async disconnect() {
+    debug('[js::disconnect]')
   }
 }
 
@@ -140,5 +138,11 @@ export class NeonHTTPAdapter extends NeonQueryable implements Connector {
     )
   }
 
-  async close() {}
+  async connect() {
+    debug('[js::connect]')
+  }
+
+  async disconnect() {
+    debug('[js::disconnect]')
+  }
 }
