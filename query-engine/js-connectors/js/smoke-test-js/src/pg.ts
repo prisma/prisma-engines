@@ -8,7 +8,7 @@ async function pg() {
     url: connectionString,
   })
 
-  await smokeTest(db, '../prisma/postgres-pg/schema.prisma')
+  await smokeTest(db, '../prisma/postgres/schema.prisma')
 }
 
 pg().catch((e) => {
