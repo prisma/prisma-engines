@@ -1,4 +1,5 @@
 use crate::{
+    conversion,
     error::into_quaint_error,
     proxy::{CommonProxy, DriverProxy, Query},
 };
@@ -114,16 +115,16 @@ impl QuaintQueryable for JsBaseQueryable {
 }
 
 impl JsBaseQueryable {
-    async fn build_query(sql: &str, values: &[quaint::Value<'_>]) -> Query {
+    async fn build_query(sql: &str, values: &[quaint::Value<'_>]) -> quaint::Result<Query> {
         let sql: String = sql.to_string();
-        let args = values.iter().map(|v| v.clone().into()).collect();
-        Query { sql, args }
+        let args = conversion::conv_params(values)?;
+        Ok(Query { sql, args })
     }
 
     async fn do_query_raw(&self, sql: &str, params: &[Value<'_>]) -> quaint::Result<ResultSet> {
         let len = params.len();
         let serialization_span = info_span!("js:query:args", user_facing = true, "length" = %len);
-        let query = Self::build_query(sql, params).instrument(serialization_span).await;
+        let query = Self::build_query(sql, params).instrument(serialization_span).await?;
 
         let sql_span = info_span!("js:query:sql", user_facing = true, "db.statement" = %sql);
         let result_set = self
@@ -141,7 +142,7 @@ impl JsBaseQueryable {
     async fn do_execute_raw(&self, sql: &str, params: &[Value<'_>]) -> quaint::Result<u64> {
         let len = params.len();
         let serialization_span = info_span!("js:query:args", user_facing = true, "length" = %len);
-        let query = Self::build_query(sql, params).instrument(serialization_span).await;
+        let query = Self::build_query(sql, params).instrument(serialization_span).await?;
 
         // Todo: convert napi::Error to quaint::error::Error.
         let sql_span = info_span!("js:query:sql", user_facing = true, "db.statement" = %sql);

@@ -19,6 +19,7 @@ export async function smokeTest(db: Connector, prismaSchemaRelativePath: string)
 
   const test = new SmokeTest(engine, db.flavour)
 
+  await test.testJSON()
   await test.testFindManyTypeTest()
   await test.createAutoIncrement()
   await test.testCreateAndDeleteChildParent()
@@ -47,6 +48,64 @@ export async function smokeTest(db: Connector, prismaSchemaRelativePath: string)
 
 class SmokeTest {
   constructor(private readonly engine: QueryEngineInstance, readonly flavour: Connector['flavour']) {}
+
+  async testJSON() {
+    const json = JSON.stringify({
+      foo: 'bar',
+      baz: 1,
+    })
+
+    const created = await this.engine.query(`
+      {
+        "action": "createOne",
+        "modelName": "Product",
+        "query": {
+          "arguments": {
+            "data": {
+              "properties": ${json},
+              "properties_null": null
+            }
+          },
+          "selection": {
+            "properties": true
+          }
+        }
+      }
+    `, 'trace', undefined)
+    console.log('[nodejs] created', JSON.stringify(JSON.parse(created), null, 2))
+
+    const resultSet = await this.engine.query(`
+      {
+        "action": "findMany",
+        "modelName": "Product",
+        "query": {
+          "selection": {
+            "id": true,
+            "properties": true,
+            "properties_null": true
+          }
+        } 
+      }
+    `, 'trace', undefined)
+    console.log('[nodejs] findMany resultSet', JSON.stringify(JSON.parse(resultSet), null, 2))
+  
+    await this.engine.query(`
+      {
+        "action": "deleteMany",
+        "modelName": "Product",
+        "query": {
+          "arguments": {
+            "where": {}
+          },
+          "selection": {
+            "count": true
+          }
+        }
+      }
+    `, 'trace', undefined)
+
+    return resultSet
+  }
 
   async testFindManyTypeTest() {
     await this.testFindManyTypeTestMySQL()

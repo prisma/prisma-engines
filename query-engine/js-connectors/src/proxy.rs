@@ -1,6 +1,7 @@
 use core::panic;
 use std::str::FromStr;
 
+use crate::conversion::JSArg;
 use crate::error::*;
 use crate::transaction::JsTransaction;
 use napi::bindgen_prelude::{FromNapiValue, Promise as JsPromise, ToNapiValue};
@@ -153,12 +154,11 @@ pub enum ColumnType {
 #[derive(Debug)]
 pub struct Query {
     pub sql: String,
-    pub args: Vec<serde_json::Value>,
+    pub args: Vec<JSArg>,
 }
+
 /// Handle data-type conversion from a JSON value to a Quaint value.
 /// This is used for most data types, except those that require connector-specific handling, e.g., `ColumnType::Boolean`.
-/// In the future, after https://github.com/prisma/team-orm/issues/257, every connector-specific handling should be moved
-/// out of Rust and into TypeScript.
 fn js_value_to_quaint(json_value: serde_json::Value, column_type: ColumnType) -> QuaintValue<'static> {
     //  Note for the future: it may be worth revisiting how much bloat so many panics with different static
     // strings add to the compiled artefact, and in case we should come up with a restricted set of panic

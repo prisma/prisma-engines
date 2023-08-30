@@ -93,10 +93,16 @@ model Parent {
 }
 
 model Author {
-  id        Int             @id @default(autoincrement())
+  id        Int    @id @default(autoincrement())
   firstName String
   lastName  String
   age       Int
 
   @@map("authors")
+}
+
+model Product {
+  id              String @id @default(cuid())
+  properties      Json
+  properties_null Json?
 }
