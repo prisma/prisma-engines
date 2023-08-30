@@ -10,7 +10,7 @@
 //! querying interface.
 
 mod connection_info;
-pub(crate) mod metrics;
+pub mod metrics;
 mod queryable;
 mod result_set;
 #[cfg(any(feature = "mssql", feature = "postgresql", feature = "mysql"))]
@@ -42,3 +42,5 @@ pub use transaction::*;
 #[cfg(any(feature = "sqlite", feature = "mysql", feature = "postgresql"))]
 #[allow(unused_imports)]
 pub(crate) use type_identifier::*;
+
+pub use self::metrics::query;
