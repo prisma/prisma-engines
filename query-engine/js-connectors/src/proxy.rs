@@ -233,7 +233,7 @@ fn js_value_to_quaint(json_value: serde_json::Value, column_type: ColumnType) ->
         },
         ColumnType::DateTime => match json_value {
             serde_json::Value::String(s) => {
-                let datetime = chrono::NaiveDateTime::parse_from_str(&s, "%Y-%m-%d %H:%M:%S")
+                let datetime = chrono::NaiveDateTime::parse_from_str(&s, "%Y-%m-%d %H:%M:%S%.f")
                     .unwrap_or_else(|_| panic!("Expected a datetime string, found {:?}", &s));
                 let datetime: DateTime<Utc> = DateTime::from_utc(datetime, Utc);
                 QuaintValue::datetime(datetime)
@@ -617,13 +617,35 @@ mod proxy_test {
         // null
         test_null(QuaintValue::DateTime(None), column_type);
 
+        let s = "2023-01-01 23:59:59.415";
+        let json_value = serde_json::Value::String(s.to_string());
+        let quaint_value = js_value_to_quaint(json_value, column_type);
+
+        let datetime = NaiveDate::from_ymd_opt(2023, 1, 1)
+            .unwrap()
+            .and_hms_milli_opt(23, 59, 59, 415)
+            .unwrap();
+        let datetime = DateTime::from_utc(datetime, Utc);
+        assert_eq!(quaint_value, QuaintValue::DateTime(Some(datetime)));
+
+        let s = "2023-01-01 23:59:59.123456";
+        let json_value = serde_json::Value::String(s.to_string());
+        let quaint_value = js_value_to_quaint(json_value, column_type);
+
+        let datetime = NaiveDate::from_ymd_opt(2023, 1, 1)
+            .unwrap()
+            .and_hms_micro_opt(23, 59, 59, 123_456)
+            .unwrap();
+        let datetime = DateTime::from_utc(datetime, Utc);
+        assert_eq!(quaint_value, QuaintValue::DateTime(Some(datetime)));
+
         let s = "2023-01-01 23:59:59";
         let json_value = serde_json::Value::String(s.to_string());
         let quaint_value = js_value_to_quaint(json_value, column_type);
 
         let datetime = NaiveDate::from_ymd_opt(2023, 1, 1)
             .unwrap()
-            .and_hms_opt(23, 59, 59)
+            .and_hms_milli_opt(23, 59, 59, 0)
             .unwrap();
         let datetime = DateTime::from_utc(datetime, Utc);
         assert_eq!(quaint_value, QuaintValue::DateTime(Some(datetime)));
