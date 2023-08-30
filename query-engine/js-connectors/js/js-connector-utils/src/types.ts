@@ -1,4 +1,5 @@
 import { ColumnTypeEnum } from './const'
+import { ErrorRegistry } from './errors'
 
 export type ColumnType = typeof ColumnTypeEnum[keyof typeof ColumnTypeEnum]
 
@@ -32,6 +33,19 @@ export type Query = {
   args: Array<unknown>
 }
 
+export type Error = {
+  kind: 'JsError',
+  id: number
+}
+
+export type Result<T> = {
+  ok: true,
+  result: T
+} | {
+  ok: false,
+  error: Error
+}
+
 export interface Queryable  {
   readonly flavour: 'mysql' | 'postgres'
 
@@ -41,7 +55,7 @@ export interface Queryable  {
    * 
    * This is the preferred way of executing `SELECT` queries.
    */
-  queryRaw(params: Query): Promise<ResultSet>
+  queryRaw(params: Query): Promise<Result<ResultSet>>
 
   /**
    * Execute a query given as SQL, interpolating the given parameters,
@@ -50,7 +64,7 @@ export interface Queryable  {
    * This is the preferred way of executing `INSERT`, `UPDATE`, `DELETE` queries,
    * as well as transactional queries.
    */
-  executeRaw(params: Query): Promise<number>
+  executeRaw(params: Query): Promise<Result<number>>
 }
 
 export interface Connector extends Queryable {
@@ -58,23 +72,27 @@ export interface Connector extends Queryable {
    * Starts new transation with the specified isolation level
    * @param isolationLevel 
    */
-  startTransaction(isolationLevel?: string): Promise<Transaction>
+  startTransaction(isolationLevel?: string): Promise<Result<Transaction>>
 
   /**
    * Closes the connection to the database, if any.
    */
-  close: () => Promise<void>
+  close: () => Promise<Result<void>>
 }
 
 export interface Transaction extends Queryable {
   /**
    * Commit the transaction
    */
-  commit(): Promise<void>
+  commit(): Promise<Result<void>>
   /**
    * Rolls back the transaction.
    */
-  rollback(): Promise<void>
+  rollback(): Promise<Result<void>>
+}
+
+export interface BoundConnector extends Connector {
+  readonly errorRegistry: ErrorRegistry
 }
 
 /**

@@ -113,6 +113,9 @@ impl ConnectorError {
                     message: message.clone(),
                 },
             )),
+            ErrorKind::ExternalError(id) => Some(user_facing_errors::KnownError::new(
+                user_facing_errors::query_engine::ExternalError { id: id.to_owned() },
+            )),
             _ => None,
         };
 
@@ -266,6 +269,9 @@ pub enum ErrorKind {
 
     #[error("Unsupported connector: {0}")]
     UnsupportedConnector(String),
+
+    #[error("External connector error")]
+    ExternalError(i32),
 }
 
 impl From<DomainError> for ConnectorError {

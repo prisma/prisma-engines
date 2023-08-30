@@ -1,4 +1,5 @@
-export { bindConnector, bindTransaction } from './binder'
+export { bindConnector } from './binder'
 export { ColumnTypeEnum } from './const'
+export type { ErrorRegistry } from './errors'
 export { Debug } from './debug'
 export type * from './types'

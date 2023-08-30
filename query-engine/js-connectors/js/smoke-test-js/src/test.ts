@@ -1,11 +1,12 @@
 import { setImmediate, setTimeout } from 'node:timers/promises'
-import type { Connector } from '@jkomyno/prisma-js-connector-utils'
+import type { BoundConnector, Connector } from '@jkomyno/prisma-js-connector-utils'
 import type { QueryEngineInstance } from './engines/types/Library'
 import { initQueryEngine } from './util'
+import { JsonQuery } from './engines/types/JsonProtocol'
 
 type Flavor = Connector['flavour']
 
-export async function smokeTest(db: Connector, prismaSchemaRelativePath: string) {
+export async function smokeTest(db: BoundConnector, prismaSchemaRelativePath: string) {
   // wait for the database pool to be initialized
   await setImmediate(0)
   
@@ -17,7 +18,7 @@ export async function smokeTest(db: Connector, prismaSchemaRelativePath: string)
 
   // console.log('[nodejs] isHealthy', await conn.isHealthy())
 
-  const test = new SmokeTest(engine, db.flavour)
+  const test = new SmokeTest(engine, db, db.flavour)
 
   await test.testFindManyTypeTest()
   await test.createAutoIncrement()
@@ -46,7 +47,7 @@ export async function smokeTest(db: Connector, prismaSchemaRelativePath: string)
 }
 
 class SmokeTest {
-  constructor(private readonly engine: QueryEngineInstance, readonly flavour: Connector['flavour']) {}
+  constructor(private readonly engine: QueryEngineInstance, private readonly connector: BoundConnector, readonly flavour: Flavor) {}
 
   async testFindManyTypeTest() {
     await this.testFindManyTypeTestMySQL()
@@ -58,7 +59,7 @@ class SmokeTest {
       return
     }
 
-    const resultSet = await this.engine.query(`
+    const resultSet = await this.doQuery(
       {
         "action": "findMany",
         "modelName": "type_test",
@@ -87,9 +88,9 @@ class SmokeTest {
             "blob_column": true
           }
         } 
-      }
-    `, 'trace', undefined)
-    console.log('[nodejs] findMany resultSet', JSON.stringify(JSON.parse(resultSet), null, 2))
+      })
+
+    console.log('[nodejs] findMany resultSet', JSON.stringify(resultSet, null, 2))
   
     return resultSet
   }
@@ -99,7 +100,7 @@ class SmokeTest {
       return
     }
 
-    const resultSet = await this.engine.query(`
+    const resultSet = await this.doQuery(
       {
         "action": "findMany",
         "modelName": "type_test",
@@ -124,14 +125,14 @@ class SmokeTest {
           }
         } 
       }
-    `, 'trace', undefined)
-    console.log('[nodejs] findMany resultSet', JSON.stringify(JSON.parse(resultSet), null, 2))
+    )
+    console.log('[nodejs] findMany resultSet', JSON.stringify((resultSet), null, 2))
   
     return resultSet
   }
 
   async createAutoIncrement() {
-    await this.engine.query(`
+    await this.doQuery(
       {
         "modelName": "Author",
         "action": "deleteMany",
@@ -144,9 +145,9 @@ class SmokeTest {
           }
         }
       }
-    `, 'trace', undefined)
+    )
 
-    const author = await this.engine.query(`
+    const author = await this.doQuery(
       {
         "modelName": "Author",
         "action": "createOne",
@@ -165,8 +166,8 @@ class SmokeTest {
           }
         }
       }
-    `, 'trace', undefined)
-    console.log('[nodejs] author', JSON.stringify(JSON.parse(author), null, 2))
+    )
+    console.log('[nodejs] author', JSON.stringify(author, null, 2))
   }
 
   async testCreateAndDeleteChildParent() {
@@ -286,17 +287,34 @@ class SmokeTest {
     const tx_id = JSON.parse(startResponse).id
 
     console.log('[nodejs] transaction id', tx_id)
-    await this.engine.query(`
-    {
-      "action": "findMany",
-      "modelName": "Author",
-      "query": {
-        "selection": { "$scalars": true }
-      }
-    }
-    `, 'trace', tx_id)
+    await this.doQuery(
+      {
+        "action": "findMany",
+        "modelName": "Author",
+        "query": {
+          "selection": { "$scalars": true }
+        }
+      },
+      tx_id
+    )
 
     const commitResponse = await this.engine.commitTransaction(tx_id, 'trace')
     console.log('[nodejs] commited', commitResponse)
+  }
+
+  private async doQuery(query: JsonQuery, tx_id?: string) {
+    const result = await this.engine.query(JSON.stringify(query), 'trace', tx_id)
+    const parsedResult = JSON.parse(result)
+    if (parsedResult.errors) {
+      const error = parsedResult.errors[0]?.user_facing_error
+      if (error.error_code === 'P2036') {
+        const jsError =  this.connector.errorRegistry.consumeError(error.meta.id)
+        if (!jsError) {
+          throw new Error(`Something went wrong. Engine reported external error with id ${error.meta.id}, but it was not registered.`)
+        }
+        throw jsError.error
+      }
+    }
+    return parsedResult
   }
 }

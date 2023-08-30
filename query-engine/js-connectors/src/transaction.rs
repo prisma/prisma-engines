@@ -1,5 +1,5 @@
 use async_trait::async_trait;
-use napi::{bindgen_prelude::FromNapiValue, Env, JsObject};
+use napi::{bindgen_prelude::FromNapiValue, JsObject};
 use quaint::{
     connector::{IsolationLevel, Transaction as QuaintTransaction},
     prelude::{Query as QuaintQuery, Queryable, ResultSet},
@@ -7,7 +7,6 @@ use quaint::{
 };
 
 use crate::{
-    error::into_quaint_error,
     proxy::{CommonProxy, TransactionProxy},
     queryable::JsBaseQueryable,
 };
@@ -15,13 +14,13 @@ use crate::{
 // Wrapper around JS transaction objects that implements Queryable
 // and quaint::Transaction. Can be used in place of quaint transaction,
 // but delegates most operations to JS
-pub struct JsTransaction {
+pub(crate) struct JsTransaction {
     tx_proxy: TransactionProxy,
     inner: JsBaseQueryable,
 }
 
 impl JsTransaction {
-    pub fn new(inner: JsBaseQueryable, tx_proxy: TransactionProxy) -> Self {
+    pub(crate) fn new(inner: JsBaseQueryable, tx_proxy: TransactionProxy) -> Self {
         Self { inner, tx_proxy }
     }
 }
@@ -29,11 +28,11 @@ impl JsTransaction {
 #[async_trait]
 impl QuaintTransaction for JsTransaction {
     async fn commit(&self) -> quaint::Result<()> {
-        self.tx_proxy.commit().await.map_err(into_quaint_error)
+        self.tx_proxy.commit().await
     }
 
     async fn rollback(&self) -> quaint::Result<()> {
-        self.tx_proxy.rollback().await.map_err(into_quaint_error)
+        self.tx_proxy.rollback().await
     }
 
     fn as_queryable(&self) -> &dyn Queryable {
@@ -95,9 +94,8 @@ impl Queryable for JsTransaction {
 impl FromNapiValue for JsTransaction {
     unsafe fn from_napi_value(env: napi::sys::napi_env, napi_val: napi::sys::napi_value) -> napi::Result<Self> {
         let object = JsObject::from_napi_value(env, napi_val)?;
-        let env_safe = Env::from_raw(env);
-        let common_proxy = CommonProxy::new(&object, &env_safe)?;
-        let tx_proxy = TransactionProxy::new(&object, &env_safe)?;
+        let common_proxy = CommonProxy::new(&object)?;
+        let tx_proxy = TransactionProxy::new(&object)?;
 
         Ok(Self::new(JsBaseQueryable::new(common_proxy), tx_proxy))
     }

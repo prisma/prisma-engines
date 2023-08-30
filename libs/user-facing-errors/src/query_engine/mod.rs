@@ -328,3 +328,10 @@ pub struct DatabaseAssertionViolation {
     /// Database error returned by the underlying connector driver.
     pub database_error: String,
 }
+
+#[derive(Debug, UserFacingError, Serialize)]
+#[user_facing(code = "P2036", message = "Error in external connector (id {id})")]
+pub struct ExternalError {
+    /// id of the error in external system, which would allow to retrieve it later
+    pub id: i32,
+}
