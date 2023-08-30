@@ -1,20 +1,18 @@
 use super::*;
 use once_cell::sync::Lazy;
-use query_core::{
-    executor::TransactionManager, protocol::EngineProtocol, response_ir::ResponseData, schema::QuerySchemaRef,
-    BatchDocumentTransaction, Connector, Operation, QueryExecutor, TransactionOptions, TxId,
-};
 use serde::de::DeserializeOwned;
-use std::{io::Write, sync::atomic::Ordering};
+use std::{
+    io::{self, Write},
+    sync::atomic::Ordering,
+};
 use tokio::sync::{mpsc, oneshot};
 
-struct ExecutorThread {}
-
 impl ExecutorProcess {
-    fn new() -> std::io::Result<ExecutorProcess> {
+    fn new() -> std::io::Result<(ExecutorProcess, ProcessConfig)> {
         let (sender, receiver) = mpsc::channel::<ReqImpl>(300);
+        let (init_sender, init_receiver) = oneshot::channel::<ProcessConfig>();
 
-        std::thread::spawn(|| match start_rpc_thread(receiver) {
+        std::thread::spawn(|| match start_rpc_thread(receiver, init_sender) {
             Ok(()) => (),
             Err(err) => {
                 tracing::error!("{err}"); // TODO print to stdout
@@ -22,11 +20,15 @@ impl ExecutorProcess {
             }
         });
 
-        Ok(ExecutorProcess {
+        let process = ExecutorProcess {
             task_handle: sender,
             request_id_counter: Default::default(),
-            config: panic!(),
-        })
+        };
+        let config = init_receiver
+            .blocking_recv()
+            .map_err(|err| io::Error::new(io::ErrorKind::Other, err))?;
+
+        Ok((process, config))
     }
 
     /// Convenient façade. Allocates more than necessary, but this is only for testing.
@@ -55,12 +57,12 @@ impl ExecutorProcess {
     }
 }
 
-pub(crate) static NODE_PROCESS: Lazy<ExecutorProcess> =
+pub(super) static NODE_PROCESS: Lazy<(ExecutorProcess, ProcessConfig)> =
     Lazy::new(|| match std::panic::catch_unwind(ExecutorProcess::new) {
         Ok(Ok(process)) => process,
         Ok(Err(err)) => {
             let mut stdout = std::io::stdout();
-            writeln!(stdout, "Failed to start node process. Details: {err}");
+            writeln!(stdout, "Failed to start node process. Details: {err}").unwrap();
             std::process::exit(1);
         }
         Err(_) => {
@@ -70,70 +72,22 @@ pub(crate) static NODE_PROCESS: Lazy<ExecutorProcess> =
         }
     });
 
-#[async_trait::async_trait]
-impl TransactionManager for ExecutorProcess {
-    async fn start_tx(
-        &self,
-        query_schema: QuerySchemaRef,
-        engine_protocol: EngineProtocol,
-        opts: TransactionOptions,
-    ) -> query_core::Result<TxId> {
-        todo!()
-    }
-
-    async fn commit_tx(&self, tx_id: TxId) -> Result<(), query_core::CoreError> {
-        todo!()
-    }
-
-    async fn rollback_tx(&self, tx_id: TxId) -> Result<(), query_core::CoreError> {
-        todo!()
-    }
-}
-
-#[async_trait::async_trait]
-impl QueryExecutor for ExecutorProcess {
-    async fn execute(
-        &self,
-        tx_id: Option<TxId>,
-        operation: Operation,
-        query_schema: QuerySchemaRef,
-        trace_id: Option<String>,
-        engine_protocol: EngineProtocol,
-    ) -> query_core::Result<ResponseData> {
-        todo!()
-    }
-
-    async fn execute_all(
-        &self,
-        tx_id: Option<TxId>,
-        operations: Vec<Operation>,
-        transaction: Option<BatchDocumentTransaction>,
-        query_schema: QuerySchemaRef,
-        trace_id: Option<String>,
-        engine_protocol: EngineProtocol,
-    ) -> query_core::Result<Vec<query_core::Result<ResponseData>>> {
-        todo!()
-    }
-
-    fn primary_connector(&self) -> &(dyn Connector + Send + Sync) {
-        todo!()
-    }
-}
-
 type ReqImpl = (jsonrpc_core::MethodCall, oneshot::Sender<serde_json::value::Value>);
 
 #[derive(Default, Deserialize)]
-struct ProcessConfig {
-    datamodel_provider: String,
+pub(super) struct ProcessConfig {
+    pub(super) datamodel_provider: String,
 }
 
 pub(crate) struct ExecutorProcess {
     task_handle: mpsc::Sender<ReqImpl>,
     request_id_counter: AtomicU64,
-    config: ProcessConfig,
 }
 
-fn start_rpc_thread(mut receiver: mpsc::Receiver<ReqImpl>) -> std::io::Result<()> {
+fn start_rpc_thread(
+    mut receiver: mpsc::Receiver<ReqImpl>,
+    init_sender: oneshot::Sender<ProcessConfig>,
+) -> std::io::Result<()> {
     use std::process::Stdio;
     use tokio::process::Command;
 

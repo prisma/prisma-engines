@@ -18,6 +18,7 @@ impl ConnectorTagInterface for NodeDrivers {
     fn raw_execute<'a>(&'a self, query: &'a str, connection_url: &'a str) -> BoxFuture<'a, Result<(), TestError>> {
         Box::pin(async move {
             NODE_PROCESS
+                .0
                 .request::<()>(
                     "rawExecute",
                     json!({
@@ -32,7 +33,7 @@ impl ConnectorTagInterface for NodeDrivers {
     }
 
     fn datamodel_provider(&self) -> &str {
-        &NODE_PROCESS.config.datamodel_provider
+        &NODE_PROCESS.1.datamodel_provider
     }
 
     fn datamodel_renderer(&self) -> Box<dyn DatamodelRenderer> {
