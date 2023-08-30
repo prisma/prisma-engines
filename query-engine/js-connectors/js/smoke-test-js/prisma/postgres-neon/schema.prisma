@@ -3,7 +3,7 @@ generator client {
 }
 
 datasource db {
-  provider = "@prisma/neon"
+  provider = "postgres"
   url      = env("JS_NEON_DATABASE_URL")
 }
 
