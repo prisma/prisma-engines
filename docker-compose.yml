@@ -190,7 +190,7 @@ services:
     tmpfs: /var/lib/mariadb
 
   vitess-test-5_7:
-    image: vitess/vttestserver:mysql57@sha256:53eea9d0189168b51bd8882f3684021fb1fc6bf40c919c18d9d667eded5ffbcb
+    image: vitess/vttestserver:mysql57@sha256:23863a518b34330109c502ac61a396008f5f023e96263bcb2bb1b0f7f7d5dc7f
     restart: always
     ports:
       - 33577:33577
@@ -203,7 +203,7 @@ services:
       ENABLE_ONLINE_DDL: false
 
   vitess-test-8_0:
-    image: vitess/vttestserver:mysql80@sha256:64fb0a0e8a6d747f2c6cfab375413cd4c1defc0d03796bc40424878ab4ce9bf8
+    image: vitess/vttestserver:mysql80@sha256:8bec2644d83cb322eb2cdd596d33c0f858243ba6ade9164c95dfcc519643094e
     restart: always
     ports:
       - 33807:33807
@@ -217,7 +217,7 @@ services:
       ENABLE_ONLINE_DDL: false
 
   vitess-shadow-5_7:
-    image: vitess/vttestserver:mysql57@sha256:53eea9d0189168b51bd8882f3684021fb1fc6bf40c919c18d9d667eded5ffbcb
+    image: vitess/vttestserver:mysql57@sha256:23863a518b34330109c502ac61a396008f5f023e96263bcb2bb1b0f7f7d5dc7f
     restart: always
     ports:
       - 33578:33577
@@ -230,7 +230,7 @@ services:
       ENABLE_ONLINE_DDL: false
 
   vitess-shadow-8_0:
-    image: vitess/vttestserver:mysql80@sha256:64fb0a0e8a6d747f2c6cfab375413cd4c1defc0d03796bc40424878ab4ce9bf8
+    image: vitess/vttestserver:mysql80@sha256:8bec2644d83cb322eb2cdd596d33c0f858243ba6ade9164c95dfcc519643094e
     restart: always
     ports:
       - 33808:33807
