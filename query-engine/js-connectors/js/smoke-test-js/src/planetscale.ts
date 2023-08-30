@@ -8,7 +8,7 @@ async function planetscale() {
     url: connectionString,
   })
 
-  await smokeTest(db, '../prisma/mysql-planetscale/schema.prisma')
+  await smokeTest(db, '../prisma/mysql/schema.prisma')
 }
 
 planetscale().catch((e) => {
