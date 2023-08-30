@@ -41,7 +41,7 @@ model type_test {
   time_column_null      DateTime?                   @db.Time(0)
   year_column           Int                         @db.Year
   year_column_null      Int?                        @db.Year
-  datetime_column       DateTime                    @default(now()) @db.DateTime(3)
+  datetime_column       DateTime                    @db.DateTime(3)
   datetime_column_null  DateTime?                   @db.DateTime(3)
   timestamp_column      DateTime                    @db.Timestamp(0)
   timestamp_column_null DateTime?                   @db.Timestamp(0)
