@@ -42,3 +42,5 @@ pub use transaction::*;
 #[cfg(any(feature = "sqlite", feature = "mysql", feature = "postgresql"))]
 #[allow(unused_imports)]
 pub(crate) use type_identifier::*;
+
+pub use self::metrics::query;
