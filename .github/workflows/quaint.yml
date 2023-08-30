@@ -8,22 +8,6 @@ on:
       - 'quaint/**'
   
 jobs:
-  clippy:
-    runs-on: ubuntu-latest
-    env:
-      RUSTFLAGS: "-Dwarnings"
-    steps:
-      - uses: actions/checkout@v3
-      - uses: dtolnay/rust-toolchain@stable
-        with:
-          components: clippy
-
-      - name: Install dependencies
-        run: sudo apt install -y openssl libkrb5-dev
-      - uses: actions-rs/clippy-check@v1
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          args: --features=all --manifest-path quaint/Cargo.toml
   tests:
     runs-on: ubuntu-latest
 
@@ -52,11 +36,7 @@ jobs:
 
     steps:
       - uses: actions/checkout@v3
-
-      - uses: actions-rs/toolchain@v1
-        with:
-          toolchain: stable
-          override: true
+      - uses: dtolnay/rust-toolchain@stable
 
       - uses: actions/cache@v3
         with:
@@ -76,5 +56,4 @@ jobs:
           time: 20s
 
       - name: Run tests
-        run: cargo test ${{ matrix.features }}
-        working-directory: ./quaint
+        run: cargo test -p quaint ${{ matrix.features }}
