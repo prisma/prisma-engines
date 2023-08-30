@@ -7,6 +7,17 @@ use std::{
 };
 use tokio::sync::{mpsc, oneshot};
 
+pub(crate) struct ExecutorProcess {
+    task_handle: mpsc::Sender<ReqImpl>,
+    request_id_counter: AtomicU64,
+}
+
+fn exit_with_message(status_code: i32, message: &str) -> ! {
+    let stdout = std::io::stdout();
+    stdout.lock().write_all(message.as_bytes()).unwrap();
+    std::process::exit(1)
+}
+
 impl ExecutorProcess {
     fn new() -> std::io::Result<(ExecutorProcess, ProcessConfig)> {
         let (sender, receiver) = mpsc::channel::<ReqImpl>(300);
@@ -15,8 +26,7 @@ impl ExecutorProcess {
         std::thread::spawn(|| match start_rpc_thread(receiver, init_sender) {
             Ok(()) => (),
             Err(err) => {
-                tracing::error!("{err}"); // TODO print to stdout
-                std::process::exit(1);
+                exit_with_message(1, &err.to_string());
             }
         });
 
@@ -60,16 +70,8 @@ impl ExecutorProcess {
 pub(super) static NODE_PROCESS: Lazy<(ExecutorProcess, ProcessConfig)> =
     Lazy::new(|| match std::panic::catch_unwind(ExecutorProcess::new) {
         Ok(Ok(process)) => process,
-        Ok(Err(err)) => {
-            let mut stdout = std::io::stdout();
-            writeln!(stdout, "Failed to start node process. Details: {err}").unwrap();
-            std::process::exit(1);
-        }
-        Err(_) => {
-            let mut stdout = std::io::stdout();
-            stdout.write_all(b"Panic while trying to start node process.").unwrap();
-            std::process::exit(1);
-        }
+        Ok(Err(err)) => exit_with_message(1, &format!("Failed to start node process. Details: {err}")),
+        Err(_) => exit_with_message(1, "Panic while trying to start node process."),
     });
 
 type ReqImpl = (jsonrpc_core::MethodCall, oneshot::Sender<serde_json::value::Value>);
@@ -77,11 +79,6 @@ type ReqImpl = (jsonrpc_core::MethodCall, oneshot::Sender<serde_json::value::Val
 #[derive(Default, Deserialize)]
 pub(super) struct ProcessConfig {
     pub(super) datamodel_provider: String,
-}
-
-pub(crate) struct ExecutorProcess {
-    task_handle: mpsc::Sender<ReqImpl>,
-    request_id_counter: AtomicU64,
 }
 
 fn start_rpc_thread(
@@ -131,7 +128,7 @@ fn start_rpc_thread(
                         }
                         Ok(None) => // end of the stream
                         {
-                            tracing::warn!("child node process stdout closed")
+                            exit_with_message(1, "child node process stdout closed")
                         }
                         Err(err) => // log it
                         {
@@ -143,7 +140,7 @@ fn start_rpc_thread(
                     match request {
                         None => // channel closed
                         {
-                            tracing::error!("The json-rpc client channel was closed");
+                            exit_with_message(1, "The json-rpc client channel was closed");
                         }
                         Some((request, response_sender)) => {
                             pending_requests.insert(request.id.clone(), response_sender);

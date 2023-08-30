@@ -37,7 +37,10 @@ impl ConnectorTagInterface for NodeDrivers {
     }
 
     fn datamodel_renderer(&self) -> Box<dyn DatamodelRenderer> {
-        todo!()
+        match self.datamodel_provider() {
+            "postgresql" => todo!(),
+            provider => todo!("provider: {provider}"),
+        }
     }
 
     fn capabilities(&self) -> ConnectorCapabilities {
@@ -53,7 +56,13 @@ impl TransactionManager for ExecutorProcess {
         engine_protocol: EngineProtocol,
         opts: TransactionOptions,
     ) -> query_core::Result<TxId> {
-        todo!()
+        let txid: String = NODE_PROCESS
+            .0
+            .request("startTx", json!(null))
+            .await
+            .map_err(|err| query_core::CoreError::ConnectorError(query_core::ConnectorError::from_kind(query_core::ConnectorErrorKind::ForeignKeyConstraintViolation)))?;
+
+        Ok(txid.into())
     }
 
     async fn commit_tx(&self, tx_id: TxId) -> Result<(), query_core::CoreError> {
