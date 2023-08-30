@@ -3,8 +3,6 @@ import type { Connector } from '@jkomyno/prisma-js-connector-utils'
 import type { QueryEngineInstance } from './engines/types/Library'
 import { initQueryEngine } from './util'
 
-type Flavor = Connector['flavour']
-
 export async function smokeTest(db: Connector, prismaSchemaRelativePath: string) {
   // wait for the database pool to be initialized
   await setImmediate(0)
@@ -19,6 +17,7 @@ export async function smokeTest(db: Connector, prismaSchemaRelativePath: string)
 
   const test = new SmokeTest(engine, db.flavour)
 
+  await test.testTypeTest2()
   await test.testFindManyTypeTest()
   await test.createAutoIncrement()
   await test.testCreateAndDeleteChildParent()
@@ -48,6 +47,61 @@ export async function smokeTest(db: Connector, prismaSchemaRelativePath: string)
 class SmokeTest {
   constructor(private readonly engine: QueryEngineInstance, readonly flavour: Connector['flavour']) {}
 
+  async testTypeTest2() {
+    const create = await this.engine.query(`
+      {
+        "action": "createOne",
+        "modelName": "type_test_2",
+        "query": {
+          "arguments": {
+            "data": {}
+          },
+          "selection": {
+            "id": true,
+            "datetime_column": true,
+            "datetime_column_null": true
+          }
+        }
+      }
+    `, 'trace', undefined)
+
+    console.log('[nodejs] create', JSON.stringify(JSON.parse(create), null, 2))
+
+    const findMany = await this.engine.query(`
+      {
+        "action": "findMany",
+        "modelName": "type_test_2",
+        "query": {
+          "selection": {
+            "id": true,
+            "datetime_column": true,
+            "datetime_column_null": true
+          },
+          "arguments": {
+            "where": {}
+          }
+        }
+      }
+    `, 'trace', undefined)
+
+    console.log('[nodejs] findMany', JSON.stringify(JSON.parse(findMany), null, 2))
+
+    await this.engine.query(`
+      {
+        "action": "deleteMany",
+        "modelName": "type_test_2",
+        "query": {
+          "arguments": {
+            "where": {}
+          },
+          "selection": {
+            "count": true
+          }
+        }
+      }
+    `, 'trace', undefined)
+  }
+  
   async testFindManyTypeTest() {
     await this.testFindManyTypeTestMySQL()
     await this.testFindManyTypeTestPostgres()
