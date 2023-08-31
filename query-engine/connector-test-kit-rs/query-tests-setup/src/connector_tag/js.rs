@@ -3,18 +3,33 @@ mod node_process;
 use super::*;
 use node_process::*;
 use query_core::{
-    executor::TransactionManager, protocol::EngineProtocol, response_ir::ResponseData, schema::QuerySchemaRef,
-    BatchDocumentTransaction, Connector, Operation, QueryExecutor, TransactionOptions, TxId,
+    executor::TransactionManager, protocol::EngineProtocol, schema::QuerySchemaRef, TransactionOptions, TxId,
 };
-use serde::Deserialize;
+use serde::{de::DeserializeOwned, Deserialize};
 use serde_json::json;
 use std::{collections::HashMap, sync::atomic::AtomicU64};
 use tokio::io::{AsyncBufReadExt, AsyncWriteExt, BufReader};
+
+pub(crate) async fn executor_process_request<T: DeserializeOwned>(
+    method: &str,
+    params: serde_json::Value,
+) -> Result<T, Box<dyn std::error::Error>> {
+    NODE_PROCESS.0.request(method, params).await
+}
 
 #[derive(Debug, Default, Clone, PartialEq)]
 pub struct NodeDrivers;
 
 impl ConnectorTagInterface for NodeDrivers {
+    fn new_executor<'a>(
+        &'a self,
+        _data_source: &'a psl::Datasource,
+        _preview_features: PreviewFeatures,
+        _url: &'a str,
+    ) -> BoxFuture<'a, TestResult<RunnerExecutor>> {
+        Box::pin(std::future::ready(Ok(RunnerExecutor::External)))
+    }
+
     fn raw_execute<'a>(&'a self, query: &'a str, connection_url: &'a str) -> BoxFuture<'a, Result<(), TestError>> {
         Box::pin(async move {
             NODE_PROCESS

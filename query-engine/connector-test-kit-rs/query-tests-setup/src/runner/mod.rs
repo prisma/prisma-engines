@@ -2,7 +2,10 @@ mod json_adapter;
 
 pub use json_adapter::*;
 
-use crate::{ConnectorTag, ConnectorVersion, NodeDrivers, QueryResult, TestLogCapture, TestResult, ENGINE_PROTOCOL};
+use crate::{
+    executor_process_request, ConnectorTag, ConnectorVersion, NodeDrivers, QueryResult, TestLogCapture, TestResult,
+    ENGINE_PROTOCOL,
+};
 use colored::Colorize;
 use query_core::{
     protocol::EngineProtocol,
@@ -11,9 +14,10 @@ use query_core::{
 };
 use query_engine_metrics::MetricRegistry;
 use request_handlers::{
-    load_executor, BatchTransactionOption, ConnectorMode, GraphqlBody, JsonBatchQuery, JsonBody, JsonSingleQuery,
-    MultiQuery, RequestBody, RequestHandler,
+    BatchTransactionOption, ConnectorMode, GraphqlBody, JsonBatchQuery, JsonBody, JsonSingleQuery, MultiQuery,
+    RequestBody, RequestHandler,
 };
+use serde_json::json;
 use std::{env, sync::Arc};
 
 pub type TxResult = Result<(), user_facing_errors::Error>;
@@ -58,14 +62,8 @@ impl Runner {
         let data_source = schema.configuration.datasources.first().unwrap();
         let url = data_source.load_url(|key| env::var(key).ok()).unwrap();
 
-        let connector_mode = ConnectorMode::Rust;
         let executor = connector_tag
-            .new_executor(
-                connector_mode,
-                data_source,
-                schema.configuration.preview_features(),
-                &url,
-            )
+            .new_executor(data_source, schema.configuration.preview_features(), &url)
             .await?;
         let query_schema: QuerySchemaRef = Arc::new(schema::build(Arc::new(schema), true));
 
@@ -90,7 +88,7 @@ impl Runner {
 
         let executor = match &self.executor {
             RunnerExecutor::Builtin(e) => e,
-            RunnerExecutor::External => todo!(),
+            RunnerExecutor::External => return Ok(executor_process_request("query", json!({ "query": query })).await?),
         };
 
         tracing::debug!("Querying: {}", query.clone().green());
@@ -140,7 +138,9 @@ impl Runner {
 
         let executor = match &self.executor {
             RunnerExecutor::Builtin(e) => e,
-            RunnerExecutor::External => todo!(),
+            RunnerExecutor::External => {
+                return Ok(executor_process_request("queryJson", json!({ "query": query })).await?)
+            }
         };
 
         let handler = RequestHandler::new(&**executor, &self.query_schema, EngineProtocol::Json);

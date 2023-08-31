@@ -25,14 +25,13 @@ use std::{convert::TryFrom, fmt};
 pub trait ConnectorTagInterface {
     fn new_executor<'a>(
         &'a self,
-        connector_mode: ConnectorMode,
         data_source: &'a psl::Datasource,
         preview_features: PreviewFeatures,
         url: &'a str,
     ) -> BoxFuture<'a, TestResult<RunnerExecutor>> {
         Box::pin(async move {
             Ok(RunnerExecutor::Builtin(
-                load_executor(connector_mode, data_source, preview_features, &url).await?,
+                load_executor(ConnectorMode::Rust, data_source, preview_features, &url).await?,
             ))
         })
     }
