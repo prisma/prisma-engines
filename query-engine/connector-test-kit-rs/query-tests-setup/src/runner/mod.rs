@@ -11,8 +11,8 @@ use query_core::{
 };
 use query_engine_metrics::MetricRegistry;
 use request_handlers::{
-    load_executor, BatchTransactionOption, GraphqlBody, JsonBatchQuery, JsonBody, JsonSingleQuery, MultiQuery,
-    RequestBody, RequestHandler,
+    load_executor, BatchTransactionOption, ConnectorMode, GraphqlBody, JsonBatchQuery, JsonBody, JsonSingleQuery,
+    MultiQuery, RequestBody, RequestHandler,
 };
 use std::{env, sync::Arc};
 
@@ -52,7 +52,15 @@ impl Runner {
         let schema = psl::parse_schema(datamodel).unwrap();
         let data_source = schema.configuration.datasources.first().unwrap();
         let url = data_source.load_url(|key| env::var(key).ok()).unwrap();
-        let executor = load_executor(data_source, schema.configuration.preview_features(), &url).await?;
+
+        let connector_mode = ConnectorMode::Rust;
+        let executor = load_executor(
+            connector_mode,
+            data_source,
+            schema.configuration.preview_features(),
+            &url,
+        )
+        .await?;
         let query_schema: QuerySchemaRef = Arc::new(schema::build(Arc::new(schema), true));
 
         Ok(Self {

@@ -3,7 +3,6 @@
 #![allow(clippy::derive_partial_eq_without_eq)]
 
 pub mod datamodel_connector;
-pub mod js_connector;
 
 /// `mcf`: Turns a collection of `configuration::Datasource` and `configuration::Generator` into a
 /// JSON representation. This is the `get_config()` representation.

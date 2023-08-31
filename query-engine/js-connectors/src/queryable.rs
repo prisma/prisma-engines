@@ -6,7 +6,10 @@ use async_trait::async_trait;
 use napi::{Env, JsObject};
 use psl::datamodel_connector::Flavour;
 use quaint::{
-    connector::{IsolationLevel, Transaction},
+    connector::{
+        metrics::{self},
+        IsolationLevel, Transaction,
+    },
     error::{Error, ErrorKind},
     prelude::{Query as QuaintQuery, Queryable as QuaintQueryable, ResultSet, TransactionCapable},
     visitor::{self, Visitor},
@@ -29,7 +32,7 @@ use tracing::{info_span, Instrument};
 ///
 pub struct JsBaseQueryable {
     pub(crate) proxy: CommonProxy,
-    pub(crate) flavour: Flavour,
+    pub flavour: Flavour,
 }
 
 impl JsBaseQueryable {
@@ -56,8 +59,10 @@ impl QuaintQueryable for JsBaseQueryable {
     }
 
     async fn query_raw(&self, sql: &str, params: &[Value<'_>]) -> quaint::Result<ResultSet> {
-        let span = info_span!("js:query", user_facing = true);
-        self.do_query_raw(sql, params).instrument(span).await
+        metrics::query("js.query_raw", sql, params, move || async move {
+            self.do_query_raw(sql, params).await
+        })
+        .await
     }
 
     async fn query_raw_typed(&self, sql: &str, params: &[Value<'_>]) -> quaint::Result<ResultSet> {
@@ -70,8 +75,10 @@ impl QuaintQueryable for JsBaseQueryable {
     }
 
     async fn execute_raw(&self, sql: &str, params: &[Value<'_>]) -> quaint::Result<u64> {
-        let span = info_span!("js:query", user_facing = true);
-        self.do_execute_raw(sql, params).instrument(span).await
+        metrics::query("js.execute_raw", sql, params, move || async move {
+            self.do_execute_raw(sql, params).await
+        })
+        .await
     }
 
     async fn execute_raw_typed(&self, sql: &str, params: &[Value<'_>]) -> quaint::Result<u64> {
@@ -79,8 +86,12 @@ impl QuaintQueryable for JsBaseQueryable {
     }
 
     async fn raw_cmd(&self, cmd: &str) -> quaint::Result<()> {
-        self.execute_raw(cmd, &[]).await?;
-        Ok(())
+        let params = &[];
+        metrics::query("js.raw_cmd", cmd, params, move || async move {
+            self.do_execute_raw(cmd, params).await?;
+            Ok(())
+        })
+        .await
     }
 
     async fn version(&self) -> quaint::Result<Option<String>> {
