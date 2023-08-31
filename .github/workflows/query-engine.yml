@@ -43,6 +43,10 @@ jobs:
             single_threaded: true
             connector: "mongodb"
             version: "4.2"
+          - name: "cockroach_23_1"
+            single_threaded: false
+            connector: "cockroachdb"
+            version: "23.1"
           - name: "cockroach_22_2"
             single_threaded: false
             connector: "cockroachdb"

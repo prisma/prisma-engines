@@ -1,8 +1,8 @@
 import { FullQueryResults, PoolClient, neon, neonConfig } from '@neondatabase/serverless'
 import { NeonConfig, NeonQueryFunction, Pool, QueryResult } from '@neondatabase/serverless'
 import ws from 'ws'
-import { bindConnector, bindTransaction, Debug } from '@jkomyno/prisma-js-connector-utils'
-import type { Connector, ResultSet, Query, ConnectorConfig, Queryable, Transaction } from '@jkomyno/prisma-js-connector-utils'
+import { bindConnector, Debug } from '@jkomyno/prisma-js-connector-utils'
+import type { Connector, ResultSet, Query, ConnectorConfig, Queryable, Transaction, Result, ErrorCapturingConnector } from '@jkomyno/prisma-js-connector-utils'
 import { fieldToColumnType } from './conversion'
 
 neonConfig.webSocketConstructor = ws
@@ -22,7 +22,7 @@ type PerformIOResult = QueryResult<any> | FullQueryResults<ARRAY_MODE_DISABLED>
 abstract class NeonQueryable implements Queryable {
   flavour = 'postgres' as const
 
-  async queryRaw(query: Query): Promise<ResultSet> {
+  async queryRaw(query: Query): Promise<Result<ResultSet>> {
     const tag = '[js::query_raw]'
     debug(`${tag} %O`, query)
 
@@ -35,15 +35,15 @@ abstract class NeonQueryable implements Queryable {
       rows: results.map(result => columns.map(column => result[column])),
     }
 
-    return resultSet
+    return { ok: true, value: resultSet }
   }
 
-  async executeRaw(query: Query): Promise<number> {
+  async executeRaw(query: Query): Promise<Result<number>> {
     const tag = '[js::execute_raw]'
     debug(`${tag} %O`, query)
 
     const { rowCount: rowsAffected } = await this.performIO(query)
-    return rowsAffected
+    return { ok: true, value: rowsAffected }
   }
 
   abstract performIO(query: Query): Promise<PerformIOResult>
@@ -57,24 +57,33 @@ class NeonWsQueryable<ClientT extends Pool|PoolClient> extends NeonQueryable {
     super()
   }
 
-  override performIO(query: Query): Promise<PerformIOResult> {
+  override async performIO(query: Query): Promise<PerformIOResult> {
     const { sql, args: values } = query
-    return this.client.query(sql, values)
+
+    try {
+      return await this.client.query(sql, values)
+    } catch (e) {
+      const error = e as Error
+      debug('Error in performIO: %O', error)
+      throw error
+    }
   }
 }
 
 class NeonTransaction extends NeonWsQueryable<PoolClient> implements Transaction {
-  async commit(): Promise<void> {
+  async commit(): Promise<Result<void>> {
     try {
       await this.client.query('COMMIT');
+      return { ok: true, value: undefined }
     } finally {
       this.client.release()
     }
   }
 
-  async rollback(): Promise<void> {
+  async rollback(): Promise<Result<void>> {
     try {
       await this.client.query('ROLLBACK');
+      return { ok: true, value: undefined }
     } finally {
       this.client.release()
     }
@@ -89,22 +98,22 @@ class NeonWsConnector extends NeonWsQueryable<Pool> implements Connector {
     super(new Pool({ connectionString, ...rest }))
   }
 
-  async startTransaction(isolationLevel?: string | undefined): Promise<Transaction> {
+  async startTransaction(isolationLevel?: string | undefined): Promise<Result<Transaction>> {
     const connection = await this.client.connect()
     await connection.query('BEGIN')
     if (isolationLevel) {
       await connection.query(`SET TRANSACTION ISOLATION LEVEL ${isolationLevel}`)
     }
 
-    return bindTransaction(new NeonTransaction(connection))
+    return { ok: true, value: new NeonTransaction(connection) }
   }
 
   async close() {
-    this.client.on('error', e => console.log(e))
     if (this.isRunning) {
       await this.client.end()
       this.isRunning = false
     }
+    return { ok: true as const, value: undefined }
   }
 }
 
@@ -122,15 +131,17 @@ class NeonHttpConnector extends NeonQueryable implements Connector {
       return await this.client(sql, values)
   }
 
-  startTransaction(): Promise<Transaction> {
+  startTransaction(): Promise<Result<Transaction>> {
     return Promise.reject(new Error('Transactions are not supported in HTTP mode'))
   }
 
-  async close() {}
+  async close() {
+    return { ok: true as const, value: undefined }
+  }
 
 }
 
-export const createNeonConnector = (config: PrismaNeonConfig): Connector => {
+export const createNeonConnector = (config: PrismaNeonConfig): ErrorCapturingConnector => {
   const db = config.httpMode ? new NeonHttpConnector(config) : new NeonWsConnector(config)
   return bindConnector(db)
 }

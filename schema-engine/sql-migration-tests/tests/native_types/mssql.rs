@@ -198,7 +198,7 @@ static SAFE_CASTS: Lazy<Vec<(&str, Value, &[&str])>> = Lazy::new(|| {
         ),
         (
             "Date",
-            Value::date(Utc::today().naive_utc()),
+            Value::date(Utc::now().naive_utc().date()),
             &[
                 "DateTime",
                 "DateTime2",
@@ -728,7 +728,7 @@ static RISKY_CASTS: Lazy<Vec<(&str, Value, &[&str])>> = Lazy::new(|| {
                 "NVarChar",
             ],
         ),
-        ("Date", Value::date(Utc::today().naive_utc()), &["SmallDateTime"]),
+        ("Date", Value::date(Utc::now().naive_utc().date()), &["SmallDateTime"]),
         (
             "Time",
             Value::time(Utc::now().naive_utc().time()),
@@ -1537,7 +1537,7 @@ static NOT_CASTABLE: Lazy<Vec<(&str, Value, &[&str])>> = Lazy::new(|| {
         ),
         (
             "Date",
-            Value::date(Utc::today().naive_utc()),
+            Value::date(Utc::now().naive_utc().date()),
             &[
                 "TinyInt",
                 "SmallInt",

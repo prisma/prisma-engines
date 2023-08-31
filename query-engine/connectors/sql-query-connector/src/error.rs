@@ -175,6 +175,9 @@ pub enum SqlError {
 
     #[error("Cannot find a fulltext index to use for the search")]
     MissingFullTextSearchIndex,
+
+    #[error("External connector error")]
+    ExternalError(i32),
 }
 
 impl SqlError {
@@ -254,6 +257,7 @@ impl SqlError {
             }
             SqlError::MissingFullTextSearchIndex => ConnectorError::from_kind(ErrorKind::MissingFullTextSearchIndex),
             SqlError::InvalidIsolationLevel(msg) => ConnectorError::from_kind(ErrorKind::InternalConversionError(msg)),
+            SqlError::ExternalError(error_id) => ConnectorError::from_kind(ErrorKind::ExternalError(error_id)),
         }
     }
 }
@@ -295,6 +299,7 @@ impl From<quaint::error::Error> for SqlError {
             QuaintKind::InvalidIsolationLevel(msg) => Self::InvalidIsolationLevel(msg),
             QuaintKind::TransactionWriteConflict => Self::TransactionWriteConflict,
             QuaintKind::RollbackWithoutBegin => Self::RollbackWithoutBegin,
+            QuaintKind::ExternalError(error_id) => Self::ExternalError(error_id),
             e @ QuaintKind::UnsupportedColumnType { .. } => SqlError::ConversionError(e.into()),
             e @ QuaintKind::TransactionAlreadyClosed(_) => SqlError::TransactionAlreadyClosed(format!("{e}")),
             e @ QuaintKind::IncorrectNumberOfParameters { .. } => SqlError::QueryError(e.into()),

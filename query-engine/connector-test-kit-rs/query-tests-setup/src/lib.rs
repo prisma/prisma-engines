@@ -148,12 +148,12 @@ fn run_relation_link_test_impl(
         let test_db_name = format!("{suite_name}_{test_name}_{i}");
         let template = dm.datamodel().to_owned();
 
-        if !ConnectorTag::should_run(only, exclude, required_capabilities_for_test) {
+        if !should_run(only, exclude, required_capabilities_for_test) {
             continue;
         }
 
         let datamodel = render_test_datamodel(&test_db_name, template, &[], None, Default::default(), None);
-        let connector = CONFIG.test_connector_tag().unwrap();
+        let (connector_tag, version) = CONFIG.test_connector().unwrap();
         let metrics = setup_metrics();
         let metrics_for_subscriber = metrics.clone();
         let (log_capture, log_tx) = TestLogCapture::new();
@@ -161,7 +161,7 @@ fn run_relation_link_test_impl(
         run_with_tokio(
             async move {
                 println!("Used datamodel:\n {}", datamodel.yellow());
-                let runner = Runner::load(datamodel.clone(), &[], connector, metrics, log_capture)
+                let runner = Runner::load(datamodel.clone(), &[], version, connector_tag, metrics, log_capture)
                     .await
                     .unwrap();
 
@@ -243,7 +243,7 @@ fn run_connector_test_impl(
     referential_override: Option<String>,
     test_fn: &dyn Fn(Runner) -> BoxFuture<'static, TestResult<()>>,
 ) {
-    if !ConnectorTag::should_run(only, exclude, capabilities) {
+    if !should_run(only, exclude, capabilities) {
         return;
     }
 
@@ -256,7 +256,7 @@ fn run_connector_test_impl(
         db_schemas,
         None,
     );
-    let connector = CONFIG.test_connector_tag().unwrap();
+    let (connector_tag, version) = CONFIG.test_connector().unwrap();
     let metrics = crate::setup_metrics();
     let metrics_for_subscriber = metrics.clone();
 
@@ -265,9 +265,16 @@ fn run_connector_test_impl(
     crate::run_with_tokio(
         async {
             println!("Used datamodel:\n {}", datamodel.yellow());
-            let runner = Runner::load(datamodel.clone(), db_schemas, connector, metrics, log_capture)
-                .await
-                .unwrap();
+            let runner = Runner::load(
+                datamodel.clone(),
+                db_schemas,
+                version,
+                connector_tag,
+                metrics,
+                log_capture,
+            )
+            .await
+            .unwrap();
 
             test_fn(runner).await.unwrap();
 

@@ -1,6 +1,6 @@
 import * as pg from 'pg'
-import { bindConnector, bindTransaction, Debug } from '@jkomyno/prisma-js-connector-utils'
-import type { Connector, ConnectorConfig, Query, Queryable, ResultSet, Transaction } from '@jkomyno/prisma-js-connector-utils'
+import { bindConnector, Debug } from '@jkomyno/prisma-js-connector-utils'
+import type { ErrorCapturingConnector, Connector, ConnectorConfig, Query, Queryable, Result, ResultSet, Transaction } from '@jkomyno/prisma-js-connector-utils'
 import { fieldToColumnType } from './conversion'
 
 const debug = Debug('prisma:js-connector:pg')
@@ -20,7 +20,7 @@ class PgQueryable<ClientT extends StdClient | TransactionClient>
   /**
    * Execute a query given as SQL, interpolating the given parameters.
    */
-  async queryRaw(query: Query): Promise<ResultSet> {
+  async queryRaw(query: Query): Promise<Result<ResultSet>> {
     const tag = '[js::query_raw]'
     debug(`${tag} %O`, query)
 
@@ -33,7 +33,7 @@ class PgQueryable<ClientT extends StdClient | TransactionClient>
       rows: results.map((result) => columns.map((column) => result[column])),
     }
 
-    return resultSet
+    return { ok: true, value: resultSet }
   }
 
   /**
@@ -41,12 +41,12 @@ class PgQueryable<ClientT extends StdClient | TransactionClient>
    * returning the number of affected rows.
    * Note: Queryable expects a u64, but napi.rs only supports u32.
    */
-  async executeRaw(query: Query): Promise<number> {
+  async executeRaw(query: Query): Promise<Result<number>> {
     const tag = '[js::execute_raw]'
     debug(`${tag} %O`, query)
 
     const { rowCount } = await this.performIO(query)
-    return rowCount
+    return { ok: true, value: rowCount }
   }
 
   /**
@@ -57,7 +57,14 @@ class PgQueryable<ClientT extends StdClient | TransactionClient>
   private async performIO(query: Query) {
     const { sql, args: values } = query
 
-    return await this.client.query(sql, values)
+    try {
+      const result = await this.client.query(sql, values)
+      return result
+    } catch (e) {
+      const error = e as Error
+      debug('Error in performIO: %O', error)
+      throw error
+    }
   }
 }
 
@@ -67,23 +74,25 @@ class PgTransaction extends PgQueryable<TransactionClient>
     super(client)
   }
 
-  async commit(): Promise<void> {
+  async commit(): Promise<Result<void>> {
     const tag = '[js::commit]'
     debug(`${tag} committing transaction`)
 
     try {
       await this.client.query('COMMIT')
+      return { ok: true, value: undefined }
     } finally {
       this.client.release()
     }
   }
 
-  async rollback(): Promise<void> {
+  async rollback(): Promise<Result<void>> {
     const tag = '[js::rollback]'
     debug(`${tag} rolling back the transaction`)
 
     try {
       await this.client.query('ROLLBACK')
+      return { ok: true, value: undefined }
     } finally {
       this.client.release()
     }
@@ -93,16 +102,15 @@ class PgTransaction extends PgQueryable<TransactionClient>
 class PrismaPg extends PgQueryable<StdClient> implements Connector {
   constructor(config: PrismaPgConfig) {
     const { url: connectionString } = config
+    
     const client = new pg.Pool({
       connectionString,
-      ssl: {
-        rejectUnauthorized: false,
-      },
     })
+
     super(client)
   }
 
-  async startTransaction(isolationLevel?: string): Promise<Transaction> {
+  async startTransaction(isolationLevel?: string): Promise<Result<Transaction>> {
     const connection = await this.client.connect()
     await connection.query('BEGIN')
 
@@ -112,13 +120,15 @@ class PrismaPg extends PgQueryable<StdClient> implements Connector {
       )
     }
 
-    return bindTransaction(new PgTransaction(connection))
+    return { ok: true, value: new PgTransaction(connection) }
   }
 
-  async close() {}
+  async close() {
+    return { ok: true as const, value: undefined }
+  }
 }
 
-export const createPgConnector = (config: PrismaPgConfig): Connector => {
+export const createPgConnector = (config: PrismaPgConfig): ErrorCapturingConnector => {
   const db = new PrismaPg(config)
   return bindConnector(db)
 }

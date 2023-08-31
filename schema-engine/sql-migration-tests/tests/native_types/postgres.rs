@@ -107,7 +107,7 @@ static SAFE_CASTS: Lazy<Vec<(&str, Value, &[&str])>> = Lazy::new(|| {
         ),
         (
             "Date",
-            Value::date(Utc::today().naive_utc()),
+            Value::date(Utc::now().naive_utc().date()),
             &["VarChar(53)", "Char(28)", "Text", "Timestamp(3)", "Timestamptz(3)"],
         ),
         (
@@ -498,7 +498,7 @@ static NOT_CASTABLE: Lazy<Vec<(&str, Value, &[&str])>> = Lazy::new(|| {
         ),
         (
             "Date",
-            Value::date(Utc::today().naive_utc()),
+            Value::date(Utc::now().naive_utc().date()),
             &[
                 "SmallInt",
                 "Integer",
@@ -1083,7 +1083,7 @@ static SAFE_CASTS_NON_LIST_TO_STRING: CastList = Lazy::new(|| {
                 ("ByteA", Value::array(vec![Value::bytes(b"DEAD".to_vec())])),
                 ("Timestamp(3)", Value::array(vec![Value::datetime(Utc::now())])),
                 ("Timestamptz(3)", Value::array(vec![Value::datetime(Utc::now())])),
-                ("Date", Value::array(vec![Value::date(Utc::today().naive_utc())])),
+                ("Date", Value::array(vec![Value::date(Utc::now().naive_utc().date())])),
                 (
                     "Time(3)",
                     Value::array(vec![Value::time(Utc::now().naive_utc().time())]),
@@ -1122,7 +1122,7 @@ static SAFE_CASTS_NON_LIST_TO_STRING: CastList = Lazy::new(|| {
                 ("ByteA", Value::array(vec![Value::bytes(b"DEAD".to_vec())])),
                 ("Timestamp(3)", Value::array(vec![Value::datetime(Utc::now())])),
                 ("Timestamptz(3)", Value::array(vec![Value::datetime(Utc::now())])),
-                ("Date", Value::array(vec![Value::date(Utc::today().naive_utc())])),
+                ("Date", Value::array(vec![Value::date(Utc::now().naive_utc().date())])),
                 (
                     "Time(3)",
                     Value::array(vec![Value::time(Utc::now().naive_utc().time())]),
