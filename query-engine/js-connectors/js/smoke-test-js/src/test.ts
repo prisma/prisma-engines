@@ -1,10 +1,10 @@
 import { setImmediate, setTimeout } from 'node:timers/promises'
-import type { BoundConnector } from '@jkomyno/prisma-js-connector-utils'
+import type { ErrorCapturingConnector } from '@jkomyno/prisma-js-connector-utils'
 import type { QueryEngineInstance } from './engines/types/Library'
 import { initQueryEngine } from './util'
 import { JsonQuery } from './engines/types/JsonProtocol'
 
-export async function smokeTest(db: BoundConnector, prismaSchemaRelativePath: string) {
+export async function smokeTest(db: ErrorCapturingConnector, prismaSchemaRelativePath: string) {
   // wait for the database pool to be initialized
   await setImmediate(0)
   
@@ -46,7 +46,7 @@ export async function smokeTest(db: BoundConnector, prismaSchemaRelativePath: st
 }
 
 class SmokeTest {
-  constructor(private readonly engine: QueryEngineInstance, private readonly connector: BoundConnector, readonly flavour: BoundConnector['flavour']) {}
+  constructor(private readonly engine: QueryEngineInstance, private readonly connector: ErrorCapturingConnector, readonly flavour: ErrorCapturingConnector['flavour']) {}
 
   async testTypeTest2() {
     const create = await this.engine.query(`

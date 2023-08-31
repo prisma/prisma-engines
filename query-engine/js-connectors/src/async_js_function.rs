@@ -31,6 +31,18 @@ where
     ArgType: ToNapiValue + 'static,
     ReturnType: FromNapiValue + 'static,
 {
+    fn from_threadsafe_function(
+        mut threadsafe_fn: ThreadsafeFunction<ArgType, ErrorStrategy::Fatal>,
+        env: Env,
+    ) -> napi::Result<Self> {
+        threadsafe_fn.unref(&env)?;
+
+        Ok(AsyncJsFunction {
+            threadsafe_fn,
+            _phantom: PhantomData,
+        })
+    }
+
     pub(crate) async fn call(&self, arg: ArgType) -> quaint::Result<ReturnType> {
         let js_result = async_unwinding_panic(async {
             let promise = self
@@ -52,12 +64,7 @@ where
 {
     unsafe fn from_napi_value(napi_env: napi::sys::napi_env, napi_val: napi::sys::napi_value) -> napi::Result<Self> {
         let env = Env::from_raw(napi_env);
-        let mut threadsafe_fn = ThreadsafeFunction::from_napi_value(napi_env, napi_val)?;
-        threadsafe_fn.unref(&env)?;
-
-        Ok(AsyncJsFunction {
-            threadsafe_fn,
-            _phantom: PhantomData,
-        })
+        let threadsafe_fn = ThreadsafeFunction::from_napi_value(napi_env, napi_val)?;
+        Self::from_threadsafe_function(threadsafe_fn, env)
     }
 }

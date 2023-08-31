@@ -1,5 +1,4 @@
 import { ColumnTypeEnum } from './const'
-import { ErrorRegistry } from './errors'
 
 export type ColumnType = typeof ColumnTypeEnum[keyof typeof ColumnTypeEnum]
 
@@ -34,13 +33,13 @@ export type Query = {
 }
 
 export type Error = {
-  kind: 'JsError',
+  kind: 'GenericJsError',
   id: number
 }
 
 export type Result<T> = {
   ok: true,
-  result: T
+  value: T
 } | {
   ok: false,
   error: Error
@@ -91,7 +90,7 @@ export interface Transaction extends Queryable {
   rollback(): Promise<Result<void>>
 }
 
-export interface BoundConnector extends Connector {
+export interface ErrorCapturingConnector extends Connector {
   readonly errorRegistry: ErrorRegistry
 }
 
@@ -104,3 +103,9 @@ export type ConnectorConfig = {
    */
   url: string,
 }
+
+export interface ErrorRegistry {
+  consumeError(id: number): ErrorRecord | undefined
+}
+
+export type ErrorRecord = { error: unknown }

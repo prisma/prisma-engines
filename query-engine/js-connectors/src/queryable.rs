@@ -146,7 +146,6 @@ impl JsBaseQueryable {
         let serialization_span = info_span!("js:query:args", user_facing = true, "length" = %len);
         let query = Self::build_query(sql, params).instrument(serialization_span).await;
 
-        // Todo: convert napi::Error to quaint::error::Error.
         let sql_span = info_span!("js:query:sql", user_facing = true, "db.statement" = %sql);
         let affected_rows = self.proxy.execute_raw(query).instrument(sql_span).await?;
 

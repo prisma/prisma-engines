@@ -2,7 +2,7 @@ import { FullQueryResults, PoolClient, neon, neonConfig } from '@neondatabase/se
 import { NeonConfig, NeonQueryFunction, Pool, QueryResult } from '@neondatabase/serverless'
 import ws from 'ws'
 import { bindConnector, Debug } from '@jkomyno/prisma-js-connector-utils'
-import type { Connector, ResultSet, Query, ConnectorConfig, Queryable, Transaction, Result, BoundConnector } from '@jkomyno/prisma-js-connector-utils'
+import type { Connector, ResultSet, Query, ConnectorConfig, Queryable, Transaction, Result, ErrorCapturingConnector } from '@jkomyno/prisma-js-connector-utils'
 import { fieldToColumnType } from './conversion'
 
 neonConfig.webSocketConstructor = ws
@@ -35,7 +35,7 @@ abstract class NeonQueryable implements Queryable {
       rows: results.map(result => columns.map(column => result[column])),
     }
 
-    return { ok: true, result: resultSet }
+    return { ok: true, value: resultSet }
   }
 
   async executeRaw(query: Query): Promise<Result<number>> {
@@ -43,7 +43,7 @@ abstract class NeonQueryable implements Queryable {
     debug(`${tag} %O`, query)
 
     const { rowCount: rowsAffected } = await this.performIO(query)
-    return { ok: true, result: rowsAffected }
+    return { ok: true, value: rowsAffected }
   }
 
   abstract performIO(query: Query): Promise<PerformIOResult>
@@ -74,7 +74,7 @@ class NeonTransaction extends NeonWsQueryable<PoolClient> implements Transaction
   async commit(): Promise<Result<void>> {
     try {
       await this.client.query('COMMIT');
-      return { ok: true, result: undefined }
+      return { ok: true, value: undefined }
     } finally {
       this.client.release()
     }
@@ -83,7 +83,7 @@ class NeonTransaction extends NeonWsQueryable<PoolClient> implements Transaction
   async rollback(): Promise<Result<void>> {
     try {
       await this.client.query('ROLLBACK');
-      return { ok: true, result: undefined }
+      return { ok: true, value: undefined }
     } finally {
       this.client.release()
     }
@@ -105,7 +105,7 @@ class NeonWsConnector extends NeonWsQueryable<Pool> implements Connector {
       await connection.query(`SET TRANSACTION ISOLATION LEVEL ${isolationLevel}`)
     }
 
-    return { ok: true, result: new NeonTransaction(connection) }
+    return { ok: true, value: new NeonTransaction(connection) }
   }
 
   async close() {
@@ -113,7 +113,7 @@ class NeonWsConnector extends NeonWsQueryable<Pool> implements Connector {
       await this.client.end()
       this.isRunning = false
     }
-    return { ok: true as const, result: undefined }
+    return { ok: true as const, value: undefined }
   }
 }
 
@@ -136,12 +136,12 @@ class NeonHttpConnector extends NeonQueryable implements Connector {
   }
 
   async close() {
-    return { ok: true as const, result: undefined }
+    return { ok: true as const, value: undefined }
   }
 
 }
 
-export const createNeonConnector = (config: PrismaNeonConfig): BoundConnector => {
+export const createNeonConnector = (config: PrismaNeonConfig): ErrorCapturingConnector => {
   const db = config.httpMode ? new NeonHttpConnector(config) : new NeonWsConnector(config)
   return bindConnector(db)
 }

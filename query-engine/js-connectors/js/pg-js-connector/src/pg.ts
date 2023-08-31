@@ -1,6 +1,6 @@
 import * as pg from 'pg'
 import { bindConnector, Debug } from '@jkomyno/prisma-js-connector-utils'
-import type { BoundConnector, Connector, ConnectorConfig, Query, Queryable, Result, ResultSet, Transaction } from '@jkomyno/prisma-js-connector-utils'
+import type { ErrorCapturingConnector, Connector, ConnectorConfig, Query, Queryable, Result, ResultSet, Transaction } from '@jkomyno/prisma-js-connector-utils'
 import { fieldToColumnType } from './conversion'
 
 const debug = Debug('prisma:js-connector:pg')
@@ -33,7 +33,7 @@ class PgQueryable<ClientT extends StdClient | TransactionClient>
       rows: results.map((result) => columns.map((column) => result[column])),
     }
 
-    return { ok: true, result: resultSet }
+    return { ok: true, value: resultSet }
   }
 
   /**
@@ -46,7 +46,7 @@ class PgQueryable<ClientT extends StdClient | TransactionClient>
     debug(`${tag} %O`, query)
 
     const { rowCount } = await this.performIO(query)
-    return { ok: true, result: rowCount }
+    return { ok: true, value: rowCount }
   }
 
   /**
@@ -80,7 +80,7 @@ class PgTransaction extends PgQueryable<TransactionClient>
 
     try {
       await this.client.query('COMMIT')
-      return { ok: true, result: undefined }
+      return { ok: true, value: undefined }
     } finally {
       this.client.release()
     }
@@ -92,7 +92,7 @@ class PgTransaction extends PgQueryable<TransactionClient>
 
     try {
       await this.client.query('ROLLBACK')
-      return { ok: true, result: undefined }
+      return { ok: true, value: undefined }
     } finally {
       this.client.release()
     }
@@ -120,15 +120,15 @@ class PrismaPg extends PgQueryable<StdClient> implements Connector {
       )
     }
 
-    return { ok: true, result: new PgTransaction(connection) }
+    return { ok: true, value: new PgTransaction(connection) }
   }
 
   async close() {
-    return { ok: true as const, result: undefined }
+    return { ok: true as const, value: undefined }
   }
 }
 
-export const createPgConnector = (config: PrismaPgConfig): BoundConnector => {
+export const createPgConnector = (config: PrismaPgConfig): ErrorCapturingConnector => {
   const db = new PrismaPg(config)
   return bindConnector(db)
 }

@@ -1,7 +1,7 @@
 import * as planetScale from '@planetscale/database'
 import type { Config as PlanetScaleConfig } from '@planetscale/database'
 import { bindConnector, Debug } from '@jkomyno/prisma-js-connector-utils'
-import type { Connector, ResultSet, Query, ConnectorConfig, Queryable, Transaction, Result, BoundConnector } from '@jkomyno/prisma-js-connector-utils'
+import type { Connector, ResultSet, Query, ConnectorConfig, Queryable, Transaction, Result, ErrorCapturingConnector } from '@jkomyno/prisma-js-connector-utils'
 import { type PlanetScaleColumnType, fieldToColumnType } from './conversion'
 import { createDeferred, Deferred } from './deferred'
 
@@ -43,7 +43,7 @@ class PlanetScaleQueryable<ClientT extends planetScale.Connection | planetScale.
       lastInsertId,
     }
 
-    return { ok: true, result: resultSet }
+    return { ok: true, value: resultSet }
   }
 
   /**
@@ -56,7 +56,7 @@ class PlanetScaleQueryable<ClientT extends planetScale.Connection | planetScale.
     debug(`${tag} %O`, query)
 
     const { rowsAffected } = await this.performIO(query)
-    return { ok: true, result: rowsAffected }
+    return { ok: true, value: rowsAffected }
   }
 
   /**
@@ -87,14 +87,14 @@ class PlanetScaleTransaction extends PlanetScaleQueryable<planetScale.Transactio
     const tag = '[js::commit]'
     debug(`${tag} committing transaction`)
     this.txDeferred.resolve()
-    return { ok: true, result: await this.txResultPromise };
+    return { ok: true, value: await this.txResultPromise };
   }
 
   async rollback(): Promise<Result<void>> {
     const tag = '[js::rollback]'
     debug(`${tag} rolling back the transaction`)
     this.txDeferred.reject(new RollbackError())
-    return { ok: true, result: await this.txResultPromise };
+    return { ok: true, value: await this.txResultPromise };
   }
 
 }
@@ -116,7 +116,7 @@ class PrismaPlanetScale extends PlanetScaleQueryable<planetScale.Connection> imp
         const [txDeferred, deferredPromise] = createDeferred<void>()
         const txWrapper = new PlanetScaleTransaction(tx, txDeferred, txResultPromise)
 
-        resolve({ ok: true, result: txWrapper });
+        resolve({ ok: true, value: txWrapper });
 
         return deferredPromise
       }).catch(error => {
@@ -132,11 +132,11 @@ class PrismaPlanetScale extends PlanetScaleQueryable<planetScale.Connection> imp
   }
 
   async close() {
-    return { ok: true as const, result: undefined }
+    return { ok: true as const, value: undefined }
   }
 }
 
-export const createPlanetScaleConnector = (config: PrismaPlanetScaleConfig): BoundConnector => {
+export const createPlanetScaleConnector = (config: PrismaPlanetScaleConfig): ErrorCapturingConnector => {
   const db = new PrismaPlanetScale(config)
   return bindConnector(db)
 }

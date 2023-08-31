@@ -8,7 +8,7 @@ use serde::Deserialize;
 /// See js-connectors/js-connector-utils/types file for example
 pub(crate) enum JsConnectorError {
     /// Unexpected JS exception
-    JsError { id: i32 },
+    GenericJsError { id: i32 },
     // in the future, expected errors that map to known user errors with PXXX codes will also go here
 }
 
@@ -23,7 +23,8 @@ impl FromNapiValue for JsConnectorError {
 impl From<JsConnectorError> for QuaintError {
     fn from(value: JsConnectorError) -> Self {
         match value {
-            JsConnectorError::JsError { id } => QuaintError::external_error(id),
+            JsConnectorError::GenericJsError { id } => QuaintError::external_error(id),
+            // in future, more error types would be added and we'll need to convert them to proper QuaintErrors here
         }
     }
 }
@@ -38,20 +39,29 @@ where
     Err(JsConnectorError),
 }
 
+impl<T> JsResult<T>
+where
+    T: FromNapiValue,
+{
+    fn from_js_unknown(unknown: JsUnknown) -> napi::Result<Self> {
+        let object = unknown.coerce_to_object()?;
+        let ok: bool = object.get_named_property("ok")?;
+        if ok {
+            let value: JsUnknown = object.get_named_property("value")?;
+            return Ok(Self::Ok(T::from_unknown(value)?));
+        }
+
+        let error = object.get_named_property("error")?;
+        Ok(Self::Err(error))
+    }
+}
+
 impl<T> FromNapiValue for JsResult<T>
 where
     T: FromNapiValue,
 {
     unsafe fn from_napi_value(napi_env: napi::sys::napi_env, napi_val: napi::sys::napi_value) -> napi::Result<Self> {
-        let value = JsUnknown::from_raw(napi_env, napi_val)?.coerce_to_object()?;
-        let ok: bool = value.get_named_property("ok")?;
-        if ok {
-            let result_prop: JsUnknown = value.get_named_property("result")?;
-            return Ok(Self::Ok(T::from_unknown(result_prop)?));
-        }
-
-        let error = value.get_named_property("error")?;
-        Ok(Self::Err(error))
+        Self::from_js_unknown(JsUnknown::from_raw(napi_env, napi_val)?)
     }
 }
 
