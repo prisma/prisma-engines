@@ -167,7 +167,7 @@ pub fn describe_metrics() {
         "Number of currently active Prisma Client queries"
     );
 
-    gause!(PRISMA_POOL_CONNECTIONS_OPEN, 0.0);
+    gauge!(PRISMA_POOL_CONNECTIONS_OPEN, 0.0);
     gauge!(PRISMA_POOL_CONNECTIONS_BUSY, 0.0);
     gauge!(PRISMA_POOL_CONNECTIONS_IDLE, 0.0);
     gauge!(PRISMA_CLIENT_QUERIES_WAIT, 0.0);
