@@ -342,6 +342,11 @@
 <a href="#342" id="342">342</a>
 <a href="#343" id="343">343</a>
 <a href="#344" id="344">344</a>
+<a href="#345" id="345">345</a>
+<a href="#346" id="346">346</a>
+<a href="#347" id="347">347</a>
+<a href="#348" id="348">348</a>
+<a href="#349" id="349">349</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>connector_interface::{error::<span class="kw-2">*</span>, Filter};
 <span class="kw">use </span>prisma_models::prelude::DomainError;
 <span class="kw">use </span>quaint::error::ErrorKind <span class="kw">as </span>QuaintKind;
@@ -519,6 +524,9 @@
 
     <span class="attr">#[error(<span class="string">&quot;Cannot find a fulltext index to use for the search&quot;</span>)]
     </span>MissingFullTextSearchIndex,
+
+    <span class="attr">#[error(<span class="string">&quot;External connector error&quot;</span>)]
+    </span>ExternalError(i32),
 }
 
 <span class="kw">impl </span>SqlError {
@@ -598,6 +606,7 @@
             }
             SqlError::MissingFullTextSearchIndex =&gt; ConnectorError::from_kind(ErrorKind::MissingFullTextSearchIndex),
             SqlError::InvalidIsolationLevel(msg) =&gt; ConnectorError::from_kind(ErrorKind::InternalConversionError(msg)),
+            SqlError::ExternalError(error_id) =&gt; ConnectorError::from_kind(ErrorKind::ExternalError(error_id)),
         }
     }
 }
@@ -639,6 +648,7 @@
             QuaintKind::InvalidIsolationLevel(msg) =&gt; <span class="self">Self</span>::InvalidIsolationLevel(msg),
             QuaintKind::TransactionWriteConflict =&gt; <span class="self">Self</span>::TransactionWriteConflict,
             QuaintKind::RollbackWithoutBegin =&gt; <span class="self">Self</span>::RollbackWithoutBegin,
+            QuaintKind::ExternalError(error_id) =&gt; <span class="self">Self</span>::ExternalError(error_id),
             e @ QuaintKind::UnsupportedColumnType { .. } =&gt; SqlError::ConversionError(e.into()),
             e @ QuaintKind::TransactionAlreadyClosed(<span class="kw">_</span>) =&gt; SqlError::TransactionAlreadyClosed(<span class="macro">format!</span>(<span class="string">&quot;{e}&quot;</span>)),
             e @ QuaintKind::IncorrectNumberOfParameters { .. } =&gt; SqlError::QueryError(e.into()),

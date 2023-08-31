@@ -100,10 +100,8 @@
 <a href="#100" id="100">100</a>
 <a href="#101" id="101">101</a>
 <a href="#102" id="102">102</a>
-<a href="#103" id="103">103</a>
-<a href="#104" id="104">104</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>async_trait::async_trait;
-<span class="kw">use </span>napi::{bindgen_prelude::FromNapiValue, Env, JsObject};
+<span class="kw">use </span>napi::{bindgen_prelude::FromNapiValue, JsObject};
 <span class="kw">use </span>quaint::{
     connector::{IsolationLevel, Transaction <span class="kw">as </span>QuaintTransaction},
     prelude::{Query <span class="kw">as </span>QuaintQuery, Queryable, ResultSet},
@@ -111,7 +109,6 @@
 };
 
 <span class="kw">use crate</span>::{
-    error::into_quaint_error,
     proxy::{CommonProxy, TransactionProxy},
     queryable::JsBaseQueryable,
 };
@@ -119,13 +116,13 @@
 <span class="comment">// Wrapper around JS transaction objects that implements Queryable
 // and quaint::Transaction. Can be used in place of quaint transaction,
 // but delegates most operations to JS
-</span><span class="kw">pub struct </span>JsTransaction {
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>JsTransaction {
     tx_proxy: TransactionProxy,
     inner: JsBaseQueryable,
 }
 
 <span class="kw">impl </span>JsTransaction {
-    <span class="kw">pub fn </span>new(inner: JsBaseQueryable, tx_proxy: TransactionProxy) -&gt; <span class="self">Self </span>{
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>new(inner: JsBaseQueryable, tx_proxy: TransactionProxy) -&gt; <span class="self">Self </span>{
         <span class="self">Self </span>{ inner, tx_proxy }
     }
 }
@@ -133,12 +130,12 @@
 <span class="attr">#[async_trait]
 </span><span class="kw">impl </span>QuaintTransaction <span class="kw">for </span>JsTransaction {
     <span class="kw">async fn </span>commit(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; quaint::Result&lt;()&gt; {
-        <span class="self">self</span>.tx_proxy.commit().<span class="kw">await</span>.map_err(into_quaint_error)
-    }
+        <span class="self">self</span>.tx_proxy.commit().<span class="kw">await
+    </span>}
 
     <span class="kw">async fn </span>rollback(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; quaint::Result&lt;()&gt; {
-        <span class="self">self</span>.tx_proxy.rollback().<span class="kw">await</span>.map_err(into_quaint_error)
-    }
+        <span class="self">self</span>.tx_proxy.rollback().<span class="kw">await
+    </span>}
 
     <span class="kw">fn </span>as_queryable(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw">dyn </span>Queryable {
         <span class="self">self
@@ -199,9 +196,8 @@
 </span><span class="kw">impl </span>FromNapiValue <span class="kw">for </span>JsTransaction {
     <span class="kw">unsafe fn </span>from_napi_value(env: napi::sys::napi_env, napi_val: napi::sys::napi_value) -&gt; napi::Result&lt;<span class="self">Self</span>&gt; {
         <span class="kw">let </span>object = JsObject::from_napi_value(env, napi_val)<span class="question-mark">?</span>;
-        <span class="kw">let </span>env_safe = Env::from_raw(env);
-        <span class="kw">let </span>common_proxy = CommonProxy::new(<span class="kw-2">&amp;</span>object, <span class="kw-2">&amp;</span>env_safe)<span class="question-mark">?</span>;
-        <span class="kw">let </span>tx_proxy = TransactionProxy::new(<span class="kw-2">&amp;</span>object, <span class="kw-2">&amp;</span>env_safe)<span class="question-mark">?</span>;
+        <span class="kw">let </span>common_proxy = CommonProxy::new(<span class="kw-2">&amp;</span>object)<span class="question-mark">?</span>;
+        <span class="kw">let </span>tx_proxy = TransactionProxy::new(<span class="kw-2">&amp;</span>object)<span class="question-mark">?</span>;
 
         <span class="prelude-val">Ok</span>(<span class="self">Self</span>::new(JsBaseQueryable::new(common_proxy), tx_proxy))
     }

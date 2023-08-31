@@ -661,49 +661,13 @@
 <a href="#661" id="661">661</a>
 <a href="#662" id="662">662</a>
 <a href="#663" id="663">663</a>
-<a href="#664" id="664">664</a>
-<a href="#665" id="665">665</a>
-<a href="#666" id="666">666</a>
-<a href="#667" id="667">667</a>
-<a href="#668" id="668">668</a>
-<a href="#669" id="669">669</a>
-<a href="#670" id="670">670</a>
-<a href="#671" id="671">671</a>
-<a href="#672" id="672">672</a>
-<a href="#673" id="673">673</a>
-<a href="#674" id="674">674</a>
-<a href="#675" id="675">675</a>
-<a href="#676" id="676">676</a>
-<a href="#677" id="677">677</a>
-<a href="#678" id="678">678</a>
-<a href="#679" id="679">679</a>
-<a href="#680" id="680">680</a>
-<a href="#681" id="681">681</a>
-<a href="#682" id="682">682</a>
-<a href="#683" id="683">683</a>
-<a href="#684" id="684">684</a>
-<a href="#685" id="685">685</a>
-<a href="#686" id="686">686</a>
-<a href="#687" id="687">687</a>
-<a href="#688" id="688">688</a>
-<a href="#689" id="689">689</a>
-<a href="#690" id="690">690</a>
-<a href="#691" id="691">691</a>
-<a href="#692" id="692">692</a>
-<a href="#693" id="693">693</a>
-<a href="#694" id="694">694</a>
-<a href="#695" id="695">695</a>
-<a href="#696" id="696">696</a>
-<a href="#697" id="697">697</a>
-<a href="#698" id="698">698</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>core::panic;
 <span class="kw">use </span>std::str::FromStr;
 
-<span class="kw">use </span><span class="kw">crate</span>::error::<span class="kw-2">*</span>;
+<span class="kw">use </span><span class="kw">crate</span>::async_js_function::AsyncJsFunction;
 <span class="kw">use </span><span class="kw">crate</span>::transaction::JsTransaction;
-<span class="kw">use </span>napi::bindgen_prelude::{FromNapiValue, Promise <span class="kw">as </span>JsPromise, ToNapiValue};
-<span class="kw">use </span>napi::threadsafe_function::{ErrorStrategy, ThreadsafeFunction};
-<span class="kw">use </span>napi::{Env, JsObject, JsString};
+<span class="kw">use </span>napi::bindgen_prelude::{FromNapiValue, ToNapiValue};
+<span class="kw">use </span>napi::{JsObject, JsString};
 <span class="kw">use </span>napi_derive::napi;
 <span class="kw">use </span>quaint::connector::{IsolationLevel, ResultSet <span class="kw">as </span>QuaintResultSet};
 <span class="kw">use </span>quaint::Value <span class="kw">as </span>QuaintValue;
@@ -716,13 +680,13 @@
 <span class="doccomment">/// Proxy is a struct wrapping a javascript object that exhibits basic primitives for
 /// querying and executing SQL (i.e. a client connector). The Proxy uses NAPI ThreadSafeFunction to
 /// invoke the code within the node runtime that implements the client connector.
-</span><span class="kw">pub struct </span>CommonProxy {
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>CommonProxy {
     <span class="doccomment">/// Execute a query given as SQL, interpolating the given parameters.
-    </span>query_raw: ThreadsafeFunction&lt;Query, ErrorStrategy::Fatal&gt;,
+    </span>query_raw: AsyncJsFunction&lt;Query, JSResultSet&gt;,
 
     <span class="doccomment">/// Execute a query given as SQL, interpolating the given parameters and
     /// returning the number of affected rows.
-    </span>execute_raw: ThreadsafeFunction&lt;Query, ErrorStrategy::Fatal&gt;,
+    </span>execute_raw: AsyncJsFunction&lt;Query, u32&gt;,
 
     <span class="doccomment">/// Return the flavour for this driver.
     </span><span class="kw">pub</span>(<span class="kw">crate</span>) flavour: String,
@@ -730,17 +694,17 @@
 
 <span class="doccomment">/// This is a JS proxy for accessing the methods specific to top level
 /// JS driver objects
-</span><span class="kw">pub struct </span>DriverProxy {
-    start_transaction: ThreadsafeFunction&lt;<span class="prelude-ty">Option</span>&lt;String&gt;, ErrorStrategy::Fatal&gt;,
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>DriverProxy {
+    start_transaction: AsyncJsFunction&lt;<span class="prelude-ty">Option</span>&lt;String&gt;, JsTransaction&gt;,
 }
 <span class="doccomment">/// This a JS proxy for accessing the methods, specific
 /// to JS transaction objects
-</span><span class="kw">pub struct </span>TransactionProxy {
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>TransactionProxy {
     <span class="doccomment">/// commit transaction
-    </span>commit: ThreadsafeFunction&lt;(), ErrorStrategy::Fatal&gt;,
+    </span>commit: AsyncJsFunction&lt;(), ()&gt;,
 
     <span class="doccomment">/// rollback transcation
-    </span>rollback: ThreadsafeFunction&lt;(), ErrorStrategy::Fatal&gt;,
+    </span>rollback: AsyncJsFunction&lt;(), ()&gt;,
 }
 
 <span class="doccomment">/// This result set is more convenient to be manipulated from both Rust and NodeJS.
@@ -1005,91 +969,57 @@
 }
 
 <span class="kw">impl </span>CommonProxy {
-    <span class="kw">pub fn </span>new(object: <span class="kw-2">&amp;</span>JsObject, env: <span class="kw-2">&amp;</span>Env) -&gt; napi::Result&lt;<span class="self">Self</span>&gt; {
-        <span class="kw">let </span>query_raw = object.get_named_property(<span class="string">&quot;queryRaw&quot;</span>)<span class="question-mark">?</span>;
-        <span class="kw">let </span>execute_raw = object.get_named_property(<span class="string">&quot;executeRaw&quot;</span>)<span class="question-mark">?</span>;
+    <span class="kw">pub fn </span>new(object: <span class="kw-2">&amp;</span>JsObject) -&gt; napi::Result&lt;<span class="self">Self</span>&gt; {
         <span class="kw">let </span>flavour: JsString = object.get_named_property(<span class="string">&quot;flavour&quot;</span>)<span class="question-mark">?</span>;
 
-        <span class="kw">let </span><span class="kw-2">mut </span>result = <span class="self">Self </span>{
-            query_raw,
-            execute_raw,
+        <span class="prelude-val">Ok</span>(<span class="self">Self </span>{
+            query_raw: object.get_named_property(<span class="string">&quot;queryRaw&quot;</span>)<span class="question-mark">?</span>,
+            execute_raw: object.get_named_property(<span class="string">&quot;executeRaw&quot;</span>)<span class="question-mark">?</span>,
             flavour: flavour.into_utf8()<span class="question-mark">?</span>.as_str()<span class="question-mark">?</span>.to_owned(),
-        };
-
-        result.query_raw.unref(env)<span class="question-mark">?</span>;
-        result.execute_raw.unref(env)<span class="question-mark">?</span>;
-
-        <span class="prelude-val">Ok</span>(result)
+        })
     }
 
-    <span class="kw">pub async fn </span>query_raw(<span class="kw-2">&amp;</span><span class="self">self</span>, params: Query) -&gt; napi::Result&lt;JSResultSet&gt; {
-        async_unwinding_panic(<span class="kw">async </span>{
-            <span class="kw">let </span>promise = <span class="self">self</span>.query_raw.call_async::&lt;JsPromise&lt;JSResultSet&gt;&gt;(params).<span class="kw">await</span><span class="question-mark">?</span>;
-            <span class="kw">let </span>value = promise.<span class="kw">await</span><span class="question-mark">?</span>;
-            <span class="prelude-val">Ok</span>(value)
-        })
-        .<span class="kw">await
+    <span class="kw">pub async fn </span>query_raw(<span class="kw-2">&amp;</span><span class="self">self</span>, params: Query) -&gt; quaint::Result&lt;JSResultSet&gt; {
+        <span class="self">self</span>.query_raw.call(params).<span class="kw">await
     </span>}
 
-    <span class="kw">pub async fn </span>execute_raw(<span class="kw-2">&amp;</span><span class="self">self</span>, params: Query) -&gt; napi::Result&lt;u32&gt; {
-        async_unwinding_panic(<span class="kw">async </span>{
-            <span class="kw">let </span>promise = <span class="self">self</span>.execute_raw.call_async::&lt;JsPromise&lt;u32&gt;&gt;(params).<span class="kw">await</span><span class="question-mark">?</span>;
-            <span class="kw">let </span>value = promise.<span class="kw">await</span><span class="question-mark">?</span>;
-            <span class="prelude-val">Ok</span>(value)
-        })
-        .<span class="kw">await
+    <span class="kw">pub async fn </span>execute_raw(<span class="kw-2">&amp;</span><span class="self">self</span>, params: Query) -&gt; quaint::Result&lt;u32&gt; {
+        <span class="self">self</span>.execute_raw.call(params).<span class="kw">await
     </span>}
 }
 
 <span class="kw">impl </span>DriverProxy {
-    <span class="kw">pub fn </span>new(js_connector: <span class="kw-2">&amp;</span>JsObject, env: <span class="kw-2">&amp;</span>Env) -&gt; napi::Result&lt;<span class="self">Self</span>&gt; {
-        <span class="kw">let </span>start_transaction = js_connector.get_named_property(<span class="string">&quot;startTransaction&quot;</span>)<span class="question-mark">?</span>;
-        <span class="kw">let </span><span class="kw-2">mut </span>result = <span class="self">Self </span>{ start_transaction };
-        result.start_transaction.unref(env)<span class="question-mark">?</span>;
-
-        <span class="prelude-val">Ok</span>(result)
+    <span class="kw">pub fn </span>new(js_connector: <span class="kw-2">&amp;</span>JsObject) -&gt; napi::Result&lt;<span class="self">Self</span>&gt; {
+        <span class="prelude-val">Ok</span>(<span class="self">Self </span>{
+            start_transaction: js_connector.get_named_property(<span class="string">&quot;startTransaction&quot;</span>)<span class="question-mark">?</span>,
+        })
     }
 
-    <span class="kw">pub async fn </span>start_transaction(<span class="kw-2">&amp;</span><span class="self">self</span>, isolation_level: <span class="prelude-ty">Option</span>&lt;IsolationLevel&gt;) -&gt; napi::Result&lt;Box&lt;JsTransaction&gt;&gt; {
-        async_unwinding_panic(<span class="kw">async move </span>{
-            <span class="kw">let </span>promise = <span class="self">self
-                </span>.start_transaction
-                .call_async::&lt;JsPromise&lt;JsTransaction&gt;&gt;(isolation_level.map(|l| l.to_string()))
-                .<span class="kw">await</span><span class="question-mark">?</span>;
-
-            <span class="kw">let </span>tx = promise.<span class="kw">await</span><span class="question-mark">?</span>;
-            <span class="prelude-val">Ok</span>(Box::new(tx))
-        })
-        .<span class="kw">await
-    </span>}
+    <span class="kw">pub async fn </span>start_transaction(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        isolation_level: <span class="prelude-ty">Option</span>&lt;IsolationLevel&gt;,
+    ) -&gt; quaint::Result&lt;Box&lt;JsTransaction&gt;&gt; {
+        <span class="kw">let </span>tx = <span class="self">self
+            </span>.start_transaction
+            .call(isolation_level.map(|l| l.to_string()))
+            .<span class="kw">await</span><span class="question-mark">?</span>;
+        <span class="prelude-val">Ok</span>(Box::new(tx))
+    }
 }
 
 <span class="kw">impl </span>TransactionProxy {
-    <span class="kw">pub fn </span>new(js_transaction: <span class="kw-2">&amp;</span>JsObject, env: <span class="kw-2">&amp;</span>Env) -&gt; napi::Result&lt;<span class="self">Self</span>&gt; {
+    <span class="kw">pub fn </span>new(js_transaction: <span class="kw-2">&amp;</span>JsObject) -&gt; napi::Result&lt;<span class="self">Self</span>&gt; {
         <span class="kw">let </span>commit = js_transaction.get_named_property(<span class="string">&quot;commit&quot;</span>)<span class="question-mark">?</span>;
         <span class="kw">let </span>rollback = js_transaction.get_named_property(<span class="string">&quot;rollback&quot;</span>)<span class="question-mark">?</span>;
 
-        <span class="kw">let </span><span class="kw-2">mut </span>result = <span class="self">Self </span>{ commit, rollback };
-
-        result.commit.unref(env)<span class="question-mark">?</span>;
-        result.rollback.unref(env)<span class="question-mark">?</span>;
-
-        <span class="prelude-val">Ok</span>(result)
+        <span class="prelude-val">Ok</span>(<span class="self">Self </span>{ commit, rollback })
     }
 
-    <span class="kw">pub async fn </span>commit(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; napi::Result&lt;()&gt; {
-        async_unwinding_panic(<span class="kw">async move </span>{
-            <span class="kw">let </span>promise = <span class="self">self</span>.commit.call_async::&lt;JsPromise&lt;()&gt;&gt;(()).<span class="kw">await</span><span class="question-mark">?</span>;
-            promise.<span class="kw">await
-        </span>})
-        .<span class="kw">await
+    <span class="kw">pub async fn </span>commit(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; quaint::Result&lt;()&gt; {
+        <span class="self">self</span>.commit.call(()).<span class="kw">await
     </span>}
-    <span class="kw">pub async fn </span>rollback(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; napi::Result&lt;()&gt; {
-        async_unwinding_panic(<span class="kw">async move </span>{
-            <span class="kw">let </span>promise = <span class="self">self</span>.rollback.call_async::&lt;JsPromise&lt;()&gt;&gt;(()).<span class="kw">await</span><span class="question-mark">?</span>;
-            promise.<span class="kw">await
-        </span>})
-        .<span class="kw">await
+    <span class="kw">pub async fn </span>rollback(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; quaint::Result&lt;()&gt; {
+        <span class="self">self</span>.rollback.call(()).<span class="kw">await
     </span>}
 }
 
