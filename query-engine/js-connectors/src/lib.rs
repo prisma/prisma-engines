@@ -8,6 +8,7 @@
 //!
 
 mod async_js_function;
+mod conversion;
 mod error;
 mod proxy;
 mod queryable;

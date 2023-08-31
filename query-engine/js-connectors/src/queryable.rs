@@ -1,4 +1,7 @@
-use crate::proxy::{CommonProxy, DriverProxy, Query};
+use crate::{
+    conversion,
+    proxy::{CommonProxy, DriverProxy, Query},
+};
 use async_trait::async_trait;
 use napi::JsObject;
 use psl::datamodel_connector::Flavour;
@@ -122,16 +125,16 @@ impl QuaintQueryable for JsBaseQueryable {
 }
 
 impl JsBaseQueryable {
-    async fn build_query(sql: &str, values: &[quaint::Value<'_>]) -> Query {
+    async fn build_query(sql: &str, values: &[quaint::Value<'_>]) -> quaint::Result<Query> {
         let sql: String = sql.to_string();
-        let args = values.iter().map(|v| v.clone().into()).collect();
-        Query { sql, args }
+        let args = conversion::conv_params(values)?;
+        Ok(Query { sql, args })
     }
 
     async fn do_query_raw(&self, sql: &str, params: &[Value<'_>]) -> quaint::Result<ResultSet> {
         let len = params.len();
         let serialization_span = info_span!("js:query:args", user_facing = true, "length" = %len);
-        let query = Self::build_query(sql, params).instrument(serialization_span).await;
+        let query = Self::build_query(sql, params).instrument(serialization_span).await?;
 
         let sql_span = info_span!("js:query:sql", user_facing = true, "db.statement" = %sql);
         let result_set = self.proxy.query_raw(query).instrument(sql_span).await?;
@@ -144,7 +147,7 @@ impl JsBaseQueryable {
     async fn do_execute_raw(&self, sql: &str, params: &[Value<'_>]) -> quaint::Result<u64> {
         let len = params.len();
         let serialization_span = info_span!("js:query:args", user_facing = true, "length" = %len);
-        let query = Self::build_query(sql, params).instrument(serialization_span).await;
+        let query = Self::build_query(sql, params).instrument(serialization_span).await?;
 
         let sql_span = info_span!("js:query:sql", user_facing = true, "db.statement" = %sql);
         let affected_rows = self.proxy.execute_raw(query).instrument(sql_span).await?;

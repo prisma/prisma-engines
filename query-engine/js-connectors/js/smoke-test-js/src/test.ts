@@ -14,10 +14,9 @@ export async function smokeTest(db: ErrorCapturingConnector, prismaSchemaRelativ
   await engine.connect('trace')
   console.log('[nodejs] connected')
 
-  // console.log('[nodejs] isHealthy', await conn.isHealthy())
+  const test = new SmokeTest(engine, db)
 
-  const test = new SmokeTest(engine, db, db.flavour)
-
+  await test.testJSON()
   await test.testTypeTest2()
   await test.testFindManyTypeTest()
   await test.createAutoIncrement()
@@ -46,7 +45,70 @@ export async function smokeTest(db: ErrorCapturingConnector, prismaSchemaRelativ
 }
 
 class SmokeTest {
-  constructor(private readonly engine: QueryEngineInstance, private readonly connector: ErrorCapturingConnector, readonly flavour: ErrorCapturingConnector['flavour']) {}
+  readonly flavour: ErrorCapturingConnector['flavour']
+
+  constructor(private readonly engine: QueryEngineInstance, private readonly connector: ErrorCapturingConnector) {
+    this.flavour = connector.flavour
+  }
+
+  async testJSON() {
+    const json = JSON.stringify({
+      foo: 'bar',
+      baz: 1,
+    })
+
+    const created = await this.engine.query(`
+      {
+        "action": "createOne",
+        "modelName": "Product",
+        "query": {
+          "arguments": {
+            "data": {
+              "properties": ${json},
+              "properties_null": null
+            }
+          },
+          "selection": {
+            "properties": true
+          }
+        }
+      }
+    `, 'trace', undefined)
+
+    console.log('[nodejs] created', JSON.stringify(JSON.parse(created), null, 2))
+
+    const resultSet = await this.engine.query(`
+      {
+        "action": "findMany",
+        "modelName": "Product",
+        "query": {
+          "selection": {
+            "id": true,
+            "properties": true,
+            "properties_null": true
+          }
+        } 
+      }
+    `, 'trace', undefined)
+    console.log('[nodejs] findMany resultSet', JSON.stringify(JSON.parse(resultSet), null, 2))
+
+    await this.engine.query(`
+      {
+        "action": "deleteMany",
+        "modelName": "Product",
+        "query": {
+          "arguments": {
+            "where": {}
+          },
+          "selection": {
+            "count": true
+          }
+        }
+      }
+    `, 'trace', undefined)
+
+    return resultSet
+  }
 
   async testTypeTest2() {
     const create = await this.engine.query(`
@@ -68,7 +130,7 @@ class SmokeTest {
 
     console.log('[nodejs] create', JSON.stringify(JSON.parse(create), null, 2))
 
-    const findMany = await this.engine.query(`
+    const resultSet = await this.engine.query(`
       {
         "action": "findMany",
         "modelName": "type_test_2",
@@ -85,7 +147,7 @@ class SmokeTest {
       }
     `, 'trace', undefined)
 
-    console.log('[nodejs] findMany', JSON.stringify(JSON.parse(findMany), null, 2))
+    console.log('[nodejs] resultSet', JSON.stringify(JSON.parse(resultSet), null, 2))
 
     await this.engine.query(`
       {
@@ -101,8 +163,10 @@ class SmokeTest {
         }
       }
     `, 'trace', undefined)
+
+    return resultSet
   }
-  
+
   async testFindManyTypeTest() {
     await this.testFindManyTypeTestMySQL()
     await this.testFindManyTypeTestPostgres()

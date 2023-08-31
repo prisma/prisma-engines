@@ -107,3 +107,9 @@ model Author {
 
   @@map("authors")
 }
+
+model Product {
+  id              String @id @default(cuid())
+  properties      Json
+  properties_null Json?
+}
