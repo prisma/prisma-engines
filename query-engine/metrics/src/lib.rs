@@ -121,7 +121,6 @@ pub fn setup() {
 // a new metric registry for a Query Instance the descriptions
 // will be in place
 pub fn describe_metrics() {
-
     // counters
     describe_counter!(
         PRISMA_CLIENT_QUERIES_TOTAL,
@@ -186,7 +185,6 @@ pub fn describe_metrics() {
         PRISMA_CLIENT_QUERIES_DURATION_HISTOGRAM_MS,
         "Histogram of the duration of all executed Prisma Client queries in ms"
     );
-
 }
 
 static METRIC_RECORDER: Once = Once::new();
