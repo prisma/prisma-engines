@@ -427,6 +427,35 @@
 <a href="#427" id="427">427</a>
 <a href="#428" id="428">428</a>
 <a href="#429" id="429">429</a>
+<a href="#430" id="430">430</a>
+<a href="#431" id="431">431</a>
+<a href="#432" id="432">432</a>
+<a href="#433" id="433">433</a>
+<a href="#434" id="434">434</a>
+<a href="#435" id="435">435</a>
+<a href="#436" id="436">436</a>
+<a href="#437" id="437">437</a>
+<a href="#438" id="438">438</a>
+<a href="#439" id="439">439</a>
+<a href="#440" id="440">440</a>
+<a href="#441" id="441">441</a>
+<a href="#442" id="442">442</a>
+<a href="#443" id="443">443</a>
+<a href="#444" id="444">444</a>
+<a href="#445" id="445">445</a>
+<a href="#446" id="446">446</a>
+<a href="#447" id="447">447</a>
+<a href="#448" id="448">448</a>
+<a href="#449" id="449">449</a>
+<a href="#450" id="450">450</a>
+<a href="#451" id="451">451</a>
+<a href="#452" id="452">452</a>
+<a href="#453" id="453">453</a>
+<a href="#454" id="454">454</a>
+<a href="#455" id="455">455</a>
+<a href="#456" id="456">456</a>
+<a href="#457" id="457">457</a>
+<a href="#458" id="458">458</a>
 </pre></div><pre class="rust"><code><span class="kw">use super</span>::{Column, Comparable, ConditionTree, DefaultValue, ExpressionKind, IndexDefinition, Join, JoinData};
 <span class="kw">use crate</span>::{
     ast::{Expression, Row, Select, Values},
@@ -489,7 +518,36 @@
     <span class="doccomment">/// Add unique index definition.
     </span><span class="kw">pub fn </span>add_unique_index(<span class="kw-2">mut </span><span class="self">self</span>, i: <span class="kw">impl </span>Into&lt;IndexDefinition&lt;<span class="lifetime">&#39;a</span>&gt;&gt;) -&gt; <span class="self">Self </span>{
         <span class="kw">let </span>definition = i.into();
-        <span class="self">self</span>.index_definitions.push(definition.set_table(<span class="self">self</span>.clone()));
+
+        <span class="comment">// FIXME: the whole circular dependency (Table -&gt; IndexDefinition -&gt; Column), and cloning
+        // of tables inside each column.
+        //
+        // We can&#39;t clone `self` here, as that would lead to cycles. The following happened:
+        // `add_unique_index()` clones the table, including all previous index definitions, and
+        // adds the cloned table to the new index definition. On models with multiple unique
+        // indexes/criterias (including PKs), we repeatedly called `add_unique_index()`. Each time,
+        // we clone one more index, that itself contains copies of all previous indexes. Each
+        // column in each of these previous indexes contains a partial copy of the `Table` with
+        // the indexes on the table at the point of the `add_unique_index()` call that created that
+        // copy.
+        //
+        // If we make the simplifying assumption that all the indexes have a single column, one
+        // call to `add_unique_index()` would cause `(index_definitions.len() + 1)!` clones and
+        // allocations of `Table`s with `IndexDefinition` arrays. That quickly leads to exhausting
+        // available memory. With multiple columns per index, that adds a factor to each step in
+        // the factorial.
+        //
+        // For symptoms of the previous naive clone, see
+        // https://github.com/prisma/prisma/issues/20799 and the corresponding regression test in
+        // connector-test-kit.
+        </span><span class="kw">let </span>table = Table {
+            typ: <span class="self">self</span>.typ.clone(),
+            alias: <span class="self">self</span>.alias.clone(),
+            database: <span class="self">self</span>.database.clone(),
+            index_definitions: Vec::new(),
+        };
+
+        <span class="self">self</span>.index_definitions.push(definition.set_table(table));
         <span class="self">self
     </span>}
 
