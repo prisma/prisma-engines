@@ -132,3 +132,18 @@ impl QueryExecutor for ExecutorProcess {
         registered_js_connector(NodeDrivers.datamodel_provider())
     }
 }
+
+#[async_trait]
+impl Connector for NodeDrivers {
+    async fn get_connection(&self) -> crate::Result<Box<dyn Connection + Send + Sync>> {
+        todo!();
+    }
+
+    fn name(&self) -> &'static str {
+        self.datamodel_provider()
+    }
+
+    fn should_retry_on_transient_error(&self) -> bool {
+        false
+    }
+}
