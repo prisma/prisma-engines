@@ -1,10 +1,8 @@
 import { setImmediate, setTimeout } from 'node:timers/promises'
-import type { BoundConnector, Connector } from '@jkomyno/prisma-js-connector-utils'
+import type { BoundConnector } from '@jkomyno/prisma-js-connector-utils'
 import type { QueryEngineInstance } from './engines/types/Library'
 import { initQueryEngine } from './util'
 import { JsonQuery } from './engines/types/JsonProtocol'
-
-type Flavor = Connector['flavour']
 
 export async function smokeTest(db: BoundConnector, prismaSchemaRelativePath: string) {
   // wait for the database pool to be initialized
@@ -20,6 +18,7 @@ export async function smokeTest(db: BoundConnector, prismaSchemaRelativePath: st
 
   const test = new SmokeTest(engine, db, db.flavour)
 
+  await test.testTypeTest2()
   await test.testFindManyTypeTest()
   await test.createAutoIncrement()
   await test.testCreateAndDeleteChildParent()
@@ -47,8 +46,63 @@ export async function smokeTest(db: BoundConnector, prismaSchemaRelativePath: st
 }
 
 class SmokeTest {
-  constructor(private readonly engine: QueryEngineInstance, private readonly connector: BoundConnector, readonly flavour: Flavor) {}
+  constructor(private readonly engine: QueryEngineInstance, private readonly connector: BoundConnector, readonly flavour: BoundConnector['flavour']) {}
 
+  async testTypeTest2() {
+    const create = await this.engine.query(`
+      {
+        "action": "createOne",
+        "modelName": "type_test_2",
+        "query": {
+          "arguments": {
+            "data": {}
+          },
+          "selection": {
+            "id": true,
+            "datetime_column": true,
+            "datetime_column_null": true
+          }
+        }
+      }
+    `, 'trace', undefined)
+
+    console.log('[nodejs] create', JSON.stringify(JSON.parse(create), null, 2))
+
+    const findMany = await this.engine.query(`
+      {
+        "action": "findMany",
+        "modelName": "type_test_2",
+        "query": {
+          "selection": {
+            "id": true,
+            "datetime_column": true,
+            "datetime_column_null": true
+          },
+          "arguments": {
+            "where": {}
+          }
+        }
+      }
+    `, 'trace', undefined)
+
+    console.log('[nodejs] findMany', JSON.stringify(JSON.parse(findMany), null, 2))
+
+    await this.engine.query(`
+      {
+        "action": "deleteMany",
+        "modelName": "type_test_2",
+        "query": {
+          "arguments": {
+            "where": {}
+          },
+          "selection": {
+            "count": true
+          }
+        }
+      }
+    `, 'trace', undefined)
+  }
+  
   async testFindManyTypeTest() {
     await this.testFindManyTypeTestMySQL()
     await this.testFindManyTypeTestPostgres()
