@@ -665,6 +665,7 @@
 <span class="kw">use </span>std::str::FromStr;
 
 <span class="kw">use </span><span class="kw">crate</span>::async_js_function::AsyncJsFunction;
+<span class="kw">use </span><span class="kw">crate</span>::conversion::JSArg;
 <span class="kw">use </span><span class="kw">crate</span>::transaction::JsTransaction;
 <span class="kw">use </span>napi::bindgen_prelude::{FromNapiValue, ToNapiValue};
 <span class="kw">use </span>napi::{JsObject, JsString};
@@ -815,12 +816,11 @@
 #[derive(Debug)]
 </span><span class="kw">pub struct </span>Query {
     <span class="kw">pub </span>sql: String,
-    <span class="kw">pub </span>args: Vec&lt;serde_json::Value&gt;,
+    <span class="kw">pub </span>args: Vec&lt;JSArg&gt;,
 }
+
 <span class="doccomment">/// Handle data-type conversion from a JSON value to a Quaint value.
 /// This is used for most data types, except those that require connector-specific handling, e.g., `ColumnType::Boolean`.
-/// In the future, after https://github.com/prisma/team-orm/issues/257, every connector-specific handling should be moved
-/// out of Rust and into TypeScript.
 </span><span class="kw">fn </span>js_value_to_quaint(
     json_value: serde_json::Value,
     column_type: ColumnType,

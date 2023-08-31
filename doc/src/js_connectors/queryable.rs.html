@@ -251,7 +251,13 @@
 <a href="#251" id="251">251</a>
 <a href="#252" id="252">252</a>
 <a href="#253" id="253">253</a>
-</pre></div><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::proxy::{CommonProxy, DriverProxy, Query};
+<a href="#254" id="254">254</a>
+<a href="#255" id="255">255</a>
+<a href="#256" id="256">256</a>
+</pre></div><pre class="rust"><code><span class="kw">use crate</span>::{
+    conversion,
+    proxy::{CommonProxy, DriverProxy, Query},
+};
 <span class="kw">use </span>async_trait::async_trait;
 <span class="kw">use </span>napi::JsObject;
 <span class="kw">use </span>psl::datamodel_connector::Flavour;
@@ -375,16 +381,16 @@
 }
 
 <span class="kw">impl </span>JsBaseQueryable {
-    <span class="kw">async fn </span>build_query(sql: <span class="kw-2">&amp;</span>str, values: <span class="kw-2">&amp;</span>[quaint::Value&lt;<span class="lifetime">&#39;_</span>&gt;]) -&gt; Query {
+    <span class="kw">async fn </span>build_query(sql: <span class="kw-2">&amp;</span>str, values: <span class="kw-2">&amp;</span>[quaint::Value&lt;<span class="lifetime">&#39;_</span>&gt;]) -&gt; quaint::Result&lt;Query&gt; {
         <span class="kw">let </span>sql: String = sql.to_string();
-        <span class="kw">let </span>args = values.iter().map(|v| v.clone().into()).collect();
-        Query { sql, args }
+        <span class="kw">let </span>args = conversion::conv_params(values)<span class="question-mark">?</span>;
+        <span class="prelude-val">Ok</span>(Query { sql, args })
     }
 
     <span class="kw">async fn </span>do_query_raw(<span class="kw-2">&amp;</span><span class="self">self</span>, sql: <span class="kw-2">&amp;</span>str, params: <span class="kw-2">&amp;</span>[Value&lt;<span class="lifetime">&#39;_</span>&gt;]) -&gt; quaint::Result&lt;ResultSet&gt; {
         <span class="kw">let </span>len = params.len();
         <span class="kw">let </span>serialization_span = <span class="macro">info_span!</span>(<span class="string">&quot;js:query:args&quot;</span>, user_facing = <span class="bool-val">true</span>, <span class="string">&quot;length&quot; </span>= %len);
-        <span class="kw">let </span>query = <span class="self">Self</span>::build_query(sql, params).instrument(serialization_span).<span class="kw">await</span>;
+        <span class="kw">let </span>query = <span class="self">Self</span>::build_query(sql, params).instrument(serialization_span).<span class="kw">await</span><span class="question-mark">?</span>;
 
         <span class="kw">let </span>sql_span = <span class="macro">info_span!</span>(<span class="string">&quot;js:query:sql&quot;</span>, user_facing = <span class="bool-val">true</span>, <span class="string">&quot;db.statement&quot; </span>= %sql);
         <span class="kw">let </span>result_set = <span class="self">self</span>.proxy.query_raw(query).instrument(sql_span).<span class="kw">await</span><span class="question-mark">?</span>;
@@ -397,7 +403,7 @@
     <span class="kw">async fn </span>do_execute_raw(<span class="kw-2">&amp;</span><span class="self">self</span>, sql: <span class="kw-2">&amp;</span>str, params: <span class="kw-2">&amp;</span>[Value&lt;<span class="lifetime">&#39;_</span>&gt;]) -&gt; quaint::Result&lt;u64&gt; {
         <span class="kw">let </span>len = params.len();
         <span class="kw">let </span>serialization_span = <span class="macro">info_span!</span>(<span class="string">&quot;js:query:args&quot;</span>, user_facing = <span class="bool-val">true</span>, <span class="string">&quot;length&quot; </span>= %len);
-        <span class="kw">let </span>query = <span class="self">Self</span>::build_query(sql, params).instrument(serialization_span).<span class="kw">await</span>;
+        <span class="kw">let </span>query = <span class="self">Self</span>::build_query(sql, params).instrument(serialization_span).<span class="kw">await</span><span class="question-mark">?</span>;
 
         <span class="kw">let </span>sql_span = <span class="macro">info_span!</span>(<span class="string">&quot;js:query:sql&quot;</span>, user_facing = <span class="bool-val">true</span>, <span class="string">&quot;db.statement&quot; </span>= %sql);
         <span class="kw">let </span>affected_rows = <span class="self">self</span>.proxy.execute_raw(query).instrument(sql_span).<span class="kw">await</span><span class="question-mark">?</span>;
