@@ -15,7 +15,7 @@ pub struct GQLResponse {
     pub errors: Vec<GQLError>,
 
     #[serde(skip_serializing_if = "IndexMap::is_empty")]
-    extensions: Map,
+    pub extensions: Map,
 }
 
 #[derive(Debug, serde::Serialize, Default, PartialEq)]
@@ -28,7 +28,7 @@ pub struct GQLBatchResponse {
     pub errors: Vec<GQLError>,
 
     #[serde(skip_serializing_if = "IndexMap::is_empty")]
-    extensions: Map,
+    pub extensions: Map,
 }
 
 #[derive(Debug, serde::Serialize, serde::Deserialize, PartialEq)]

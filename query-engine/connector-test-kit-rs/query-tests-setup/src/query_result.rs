@@ -5,12 +5,14 @@ use serde::{Deserialize, Serialize};
 struct SimpleGqlResponse {
     data: serde_json::Value,
     errors: Vec<GQLError>,
+    extensions: serde_json::Value,
 }
 
 #[derive(Serialize, Deserialize, Debug)]
 struct SimpleGqlBatchResponse {
     batch_result: Vec<SimpleGqlResponse>,
     errors: Vec<GQLError>,
+    extensions: serde_json::Value,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -122,6 +124,7 @@ impl From<PrismaResponse> for QueryResult {
                 response: Response::Single(SimpleGqlResponse {
                     data: serde_json::to_value(res.data).unwrap(),
                     errors: res.errors,
+                    extensions: serde_json::to_value(&res.extensions).unwrap(),
                 }),
             },
             PrismaResponse::Multi(reses) => QueryResult {
@@ -130,11 +133,13 @@ impl From<PrismaResponse> for QueryResult {
                         .batch_result
                         .into_iter()
                         .map(|res| SimpleGqlResponse {
-                            data: serde_json::to_value(&response.data).unwrap(),
+                            data: serde_json::to_value(&res.data).unwrap(),
                             errors: res.errors,
+                            extensions: serde_json::to_value(&res.extensions).unwrap(),
                         })
                         .collect(),
                     errors: reses.errors,
+                    extensions: serde_json::to_value(&reses.extensions).unwrap(),
                 }),
             },
         }
