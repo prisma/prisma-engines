@@ -26,9 +26,9 @@ pub trait ConnectorTagInterface {
     fn new_executor<'a>(
         &'a self,
         connector_mode: ConnectorMode,
-        data_source: &psl::Datasource,
+        data_source: &'a psl::Datasource,
         preview_features: PreviewFeatures,
-        url: &str,
+        url: &'a str,
     ) -> BoxFuture<'a, TestResult<RunnerExecutor>> {
         Box::pin(async move {
             Ok(RunnerExecutor::Builtin(

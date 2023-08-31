@@ -20,7 +20,7 @@ pub type TxResult = Result<(), user_facing_errors::Error>;
 
 pub(crate) type Executor = Box<dyn QueryExecutor + Send + Sync>;
 
-pub(crate) enum RunnerExecutor {
+pub enum RunnerExecutor {
     Builtin(Executor),
     External,
 }
@@ -88,9 +88,14 @@ impl Runner {
     {
         let query = query.into();
 
+        let executor = match &self.executor {
+            RunnerExecutor::Builtin(e) => e,
+            RunnerExecutor::External => todo!(),
+        };
+
         tracing::debug!("Querying: {}", query.clone().green());
 
-        let handler = RequestHandler::new(self.executor, &self.query_schema, self.protocol);
+        let handler = RequestHandler::new(&**executor, &self.query_schema, self.protocol);
 
         let request_body = match self.protocol {
             EngineProtocol::Json => {
@@ -133,7 +138,12 @@ impl Runner {
 
         println!("{}", query.bright_green());
 
-        let handler = RequestHandler::new(&*self.executor, &self.query_schema, EngineProtocol::Json);
+        let executor = match &self.executor {
+            RunnerExecutor::Builtin(e) => e,
+            RunnerExecutor::External => todo!(),
+        };
+
+        let handler = RequestHandler::new(&**executor, &self.query_schema, EngineProtocol::Json);
 
         let serialized_query: JsonSingleQuery = serde_json::from_str(&query).unwrap();
         let request_body = RequestBody::Json(JsonBody::Single(serialized_query));
@@ -170,7 +180,12 @@ impl Runner {
         transaction: bool,
         isolation_level: Option<String>,
     ) -> TestResult<crate::QueryResult> {
-        let handler = RequestHandler::new(&*self.executor, &self.query_schema, self.protocol);
+        let executor = match &self.executor {
+            RunnerExecutor::External => todo!(),
+            RunnerExecutor::Builtin(e) => e,
+        };
+
+        let handler = RequestHandler::new(&**executor, &self.query_schema, self.protocol);
         let body = RequestBody::Json(JsonBody::Batch(JsonBatchQuery {
             batch: queries
                 .into_iter()
@@ -190,7 +205,12 @@ impl Runner {
         transaction: bool,
         isolation_level: Option<String>,
     ) -> TestResult<crate::QueryResult> {
-        let handler = RequestHandler::new(&*self.executor, &self.query_schema, self.protocol);
+        let executor = match &self.executor {
+            RunnerExecutor::External => todo!(),
+            RunnerExecutor::Builtin(e) => e,
+        };
+
+        let handler = RequestHandler::new(&**executor, &self.query_schema, self.protocol);
         let body = match self.protocol {
             EngineProtocol::Json => {
                 // Translate the GraphQL query to JSON
@@ -232,17 +252,25 @@ impl Runner {
         valid_for_millis: u64,
         isolation_level: Option<String>,
     ) -> TestResult<TxId> {
+        let executor = match &self.executor {
+            RunnerExecutor::Builtin(e) => e,
+            RunnerExecutor::External => todo!(),
+        };
+
         let tx_opts = TransactionOptions::new(max_acquisition_millis, valid_for_millis, isolation_level);
 
-        let id = self
-            .executor
+        let id = executor
             .start_tx(self.query_schema.clone(), self.protocol, tx_opts)
             .await?;
         Ok(id)
     }
 
     pub async fn commit_tx(&self, tx_id: TxId) -> TestResult<TxResult> {
-        let res = self.executor.commit_tx(tx_id).await;
+        let executor = match &self.executor {
+            RunnerExecutor::Builtin(e) => e,
+            RunnerExecutor::External => todo!(),
+        };
+        let res = executor.commit_tx(tx_id).await;
 
         if let Err(error) = res {
             Ok(Err(error.into()))
@@ -252,7 +280,11 @@ impl Runner {
     }
 
     pub async fn rollback_tx(&self, tx_id: TxId) -> TestResult<TxResult> {
-        let res = self.executor.rollback_tx(tx_id).await;
+        let executor = match &self.executor {
+            RunnerExecutor::Builtin(e) => e,
+            RunnerExecutor::External => todo!(),
+        };
+        let res = executor.rollback_tx(tx_id).await;
 
         if let Err(error) = res {
             Ok(Err(error.into()))

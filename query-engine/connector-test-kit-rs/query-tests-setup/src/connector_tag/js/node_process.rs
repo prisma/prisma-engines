@@ -15,15 +15,15 @@ pub(crate) struct ExecutorProcess {
 fn exit_with_message(status_code: i32, message: &str) -> ! {
     let stdout = std::io::stdout();
     stdout.lock().write_all(message.as_bytes()).unwrap();
-    std::process::exit(1)
+    std::process::exit(status_code)
 }
 
 impl ExecutorProcess {
     fn new() -> std::io::Result<(ExecutorProcess, ProcessConfig)> {
         let (sender, receiver) = mpsc::channel::<ReqImpl>(300);
-        let (init_sender, init_receiver) = oneshot::channel::<ProcessConfig>();
+        let (init_sender, init_receiver) = oneshot::channel::<serde_json::Value>();
 
-        std::thread::spawn(|| match start_rpc_thread(receiver, init_sender) {
+        std::thread::spawn(|| match start_rpc_thread(receiver) {
             Ok(()) => (),
             Err(err) => {
                 exit_with_message(1, &err.to_string());
@@ -34,9 +34,24 @@ impl ExecutorProcess {
             task_handle: sender,
             request_id_counter: Default::default(),
         };
-        let config = init_receiver
+
+        process
+            .task_handle
+            .blocking_send((
+                jsonrpc_core::MethodCall {
+                    jsonrpc: Some(jsonrpc_core::Version::V2),
+                    method: "initialize".to_owned(),
+                    params: jsonrpc_core::Params::Map(Default::default()),
+                    id: jsonrpc_core::Id::Num(process.request_id_counter.fetch_add(1, Ordering::Relaxed)),
+                },
+                init_sender,
+            ))
+            .unwrap();
+
+        let config_json = init_receiver
             .blocking_recv()
             .map_err(|err| io::Error::new(io::ErrorKind::Other, err))?;
+        let config = serde_json::from_value(config_json).unwrap();
 
         Ok((process, config))
     }
@@ -81,10 +96,7 @@ pub(super) struct ProcessConfig {
     pub(super) datamodel_provider: String,
 }
 
-fn start_rpc_thread(
-    mut receiver: mpsc::Receiver<ReqImpl>,
-    init_sender: oneshot::Sender<ProcessConfig>,
-) -> std::io::Result<()> {
+fn start_rpc_thread(mut receiver: mpsc::Receiver<ReqImpl>) -> std::io::Result<()> {
     use std::process::Stdio;
     use tokio::process::Command;
 
