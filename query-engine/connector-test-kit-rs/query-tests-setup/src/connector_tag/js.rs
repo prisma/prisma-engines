@@ -13,7 +13,7 @@ use tokio::io::{AsyncBufReadExt, AsyncWriteExt, BufReader};
 pub(crate) async fn executor_process_request<T: DeserializeOwned>(
     method: &str,
     params: serde_json::Value,
-) -> Result<T, Box<dyn std::error::Error>> {
+) -> Result<T, Box<dyn std::error::Error + Send + Sync>> {
     NODE_PROCESS.0.request(method, params).await
 }
 

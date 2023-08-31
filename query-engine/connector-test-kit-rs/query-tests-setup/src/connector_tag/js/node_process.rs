@@ -61,7 +61,7 @@ impl ExecutorProcess {
         &self,
         method: &str,
         params: serde_json::Value,
-    ) -> Result<T, Box<dyn std::error::Error>> {
+    ) -> Result<T, Box<dyn std::error::Error + Send + Sync>> {
         let (sender, receiver) = oneshot::channel();
         let params = if let serde_json::Value::Object(params) = params {
             params

@@ -3,8 +3,7 @@ mod json_adapter;
 pub use json_adapter::*;
 
 use crate::{
-    executor_process_request, ConnectorTag, ConnectorVersion, NodeDrivers, QueryResult, TestLogCapture, TestResult,
-    ENGINE_PROTOCOL,
+    executor_process_request, ConnectorTag, ConnectorVersion, QueryResult, TestLogCapture, TestResult, ENGINE_PROTOCOL,
 };
 use colored::Colorize;
 use query_core::{
@@ -14,8 +13,8 @@ use query_core::{
 };
 use query_engine_metrics::MetricRegistry;
 use request_handlers::{
-    BatchTransactionOption, ConnectorMode, GraphqlBody, JsonBatchQuery, JsonBody, JsonSingleQuery, MultiQuery,
-    RequestBody, RequestHandler,
+    BatchTransactionOption, GraphqlBody, JsonBatchQuery, JsonBody, JsonSingleQuery, MultiQuery, RequestBody,
+    RequestHandler,
 };
 use serde_json::json;
 use std::{env, sync::Arc};

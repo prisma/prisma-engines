@@ -26,6 +26,9 @@ pub enum TestError {
 
     #[error("Raw execute error: {0}")]
     RawExecute(QuaintError),
+
+    #[error("External process error: {0}")]
+    External(#[from] Box<dyn std::error::Error + Send + Sync>),
 }
 
 impl TestError {
