@@ -7,9 +7,11 @@
 //! plus some transformation of types to adhere to what a quaint::Value expresses.
 //!
 
+mod async_js_function;
 mod conversion;
 mod error;
 mod proxy;
 mod queryable;
+mod result;
 mod transaction;
 pub use queryable::{from_napi, JsQueryable};

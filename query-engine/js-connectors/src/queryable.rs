@@ -1,10 +1,9 @@
 use crate::{
     conversion,
-    error::into_quaint_error,
     proxy::{CommonProxy, DriverProxy, Query},
 };
 use async_trait::async_trait;
-use napi::{Env, JsObject};
+use napi::JsObject;
 use psl::datamodel_connector::Flavour;
 use quaint::{
     connector::{
@@ -31,13 +30,13 @@ use tracing::{info_span, Instrument};
 /// into a `quaint::connector::result_set::ResultSet`. A quaint `ResultSet` is basically a vector
 /// of `quaint::Value` but said type is a tagged enum, with non-unit variants that cannot be converted to javascript as is.
 ///
-pub struct JsBaseQueryable {
+pub(crate) struct JsBaseQueryable {
     pub(crate) proxy: CommonProxy,
     pub flavour: Flavour,
 }
 
 impl JsBaseQueryable {
-    pub fn new(proxy: CommonProxy) -> Self {
+    pub(crate) fn new(proxy: CommonProxy) -> Self {
         let flavour: Flavour = proxy.flavour.to_owned().parse().unwrap();
         Self { proxy, flavour }
     }
@@ -138,12 +137,7 @@ impl JsBaseQueryable {
         let query = Self::build_query(sql, params).instrument(serialization_span).await?;
 
         let sql_span = info_span!("js:query:sql", user_facing = true, "db.statement" = %sql);
-        let result_set = self
-            .proxy
-            .query_raw(query)
-            .instrument(sql_span)
-            .await
-            .map_err(into_quaint_error)?;
+        let result_set = self.proxy.query_raw(query).instrument(sql_span).await?;
 
         let len = result_set.len();
         let _deserialization_span = info_span!("js:query:result", user_facing = true, "length" = %len).entered();
@@ -155,9 +149,8 @@ impl JsBaseQueryable {
         let serialization_span = info_span!("js:query:args", user_facing = true, "length" = %len);
         let query = Self::build_query(sql, params).instrument(serialization_span).await?;
 
-        // Todo: convert napi::Error to quaint::error::Error.
         let sql_span = info_span!("js:query:sql", user_facing = true, "db.statement" = %sql);
-        let affected_rows = self.proxy.execute_raw(query).instrument(sql_span).await.unwrap();
+        let affected_rows = self.proxy.execute_raw(query).instrument(sql_span).await?;
 
         Ok(affected_rows as u64)
     }
@@ -246,19 +239,15 @@ impl TransactionCapable for JsQueryable {
         &'a self,
         isolation: Option<IsolationLevel>,
     ) -> quaint::Result<Box<dyn Transaction + 'a>> {
-        let tx = self
-            .driver_proxy
-            .start_transaction(isolation)
-            .await
-            .map_err(into_quaint_error)?;
+        let tx = self.driver_proxy.start_transaction(isolation).await?;
 
         Ok(tx)
     }
 }
 
-pub fn from_napi(napi_env: &Env, driver: JsObject) -> JsQueryable {
-    let common = CommonProxy::new(&driver, napi_env).unwrap();
-    let driver_proxy = DriverProxy::new(&driver, napi_env).unwrap();
+pub fn from_napi(driver: JsObject) -> JsQueryable {
+    let common = CommonProxy::new(&driver).unwrap();
+    let driver_proxy = DriverProxy::new(&driver).unwrap();
 
     JsQueryable {
         inner: JsBaseQueryable::new(common),

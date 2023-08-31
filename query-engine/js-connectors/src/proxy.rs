@@ -1,12 +1,11 @@
 use core::panic;
 use std::str::FromStr;
 
+use crate::async_js_function::AsyncJsFunction;
 use crate::conversion::JSArg;
-use crate::error::*;
 use crate::transaction::JsTransaction;
-use napi::bindgen_prelude::{FromNapiValue, Promise as JsPromise, ToNapiValue};
-use napi::threadsafe_function::{ErrorStrategy, ThreadsafeFunction};
-use napi::{Env, JsObject, JsString};
+use napi::bindgen_prelude::{FromNapiValue, ToNapiValue};
+use napi::{JsObject, JsString};
 use napi_derive::napi;
 use quaint::connector::{IsolationLevel, ResultSet as QuaintResultSet};
 use quaint::Value as QuaintValue;
@@ -19,13 +18,13 @@ use chrono::{NaiveDate, NaiveTime};
 /// Proxy is a struct wrapping a javascript object that exhibits basic primitives for
 /// querying and executing SQL (i.e. a client connector). The Proxy uses NAPI ThreadSafeFunction to
 /// invoke the code within the node runtime that implements the client connector.
-pub struct CommonProxy {
+pub(crate) struct CommonProxy {
     /// Execute a query given as SQL, interpolating the given parameters.
-    query_raw: ThreadsafeFunction<Query, ErrorStrategy::Fatal>,
+    query_raw: AsyncJsFunction<Query, JSResultSet>,
 
     /// Execute a query given as SQL, interpolating the given parameters and
     /// returning the number of affected rows.
-    execute_raw: ThreadsafeFunction<Query, ErrorStrategy::Fatal>,
+    execute_raw: AsyncJsFunction<Query, u32>,
 
     /// Return the flavour for this driver.
     pub(crate) flavour: String,
@@ -33,17 +32,17 @@ pub struct CommonProxy {
 
 /// This is a JS proxy for accessing the methods specific to top level
 /// JS driver objects
-pub struct DriverProxy {
-    start_transaction: ThreadsafeFunction<Option<String>, ErrorStrategy::Fatal>,
+pub(crate) struct DriverProxy {
+    start_transaction: AsyncJsFunction<Option<String>, JsTransaction>,
 }
 /// This a JS proxy for accessing the methods, specific
 /// to JS transaction objects
-pub struct TransactionProxy {
+pub(crate) struct TransactionProxy {
     /// commit transaction
-    commit: ThreadsafeFunction<(), ErrorStrategy::Fatal>,
+    commit: AsyncJsFunction<(), ()>,
 
     /// rollback transcation
-    rollback: ThreadsafeFunction<(), ErrorStrategy::Fatal>,
+    rollback: AsyncJsFunction<(), ()>,
 }
 
 /// This result set is more convenient to be manipulated from both Rust and NodeJS.
@@ -307,91 +306,57 @@ impl From<JSResultSet> for QuaintResultSet {
 }
 
 impl CommonProxy {
-    pub fn new(object: &JsObject, env: &Env) -> napi::Result<Self> {
-        let query_raw = object.get_named_property("queryRaw")?;
-        let execute_raw = object.get_named_property("executeRaw")?;
+    pub fn new(object: &JsObject) -> napi::Result<Self> {
         let flavour: JsString = object.get_named_property("flavour")?;
 
-        let mut result = Self {
-            query_raw,
-            execute_raw,
+        Ok(Self {
+            query_raw: object.get_named_property("queryRaw")?,
+            execute_raw: object.get_named_property("executeRaw")?,
             flavour: flavour.into_utf8()?.as_str()?.to_owned(),
-        };
-
-        result.query_raw.unref(env)?;
-        result.execute_raw.unref(env)?;
-
-        Ok(result)
+        })
     }
 
-    pub async fn query_raw(&self, params: Query) -> napi::Result<JSResultSet> {
-        async_unwinding_panic(async {
-            let promise = self.query_raw.call_async::<JsPromise<JSResultSet>>(params).await?;
-            let value = promise.await?;
-            Ok(value)
-        })
-        .await
+    pub async fn query_raw(&self, params: Query) -> quaint::Result<JSResultSet> {
+        self.query_raw.call(params).await
     }
 
-    pub async fn execute_raw(&self, params: Query) -> napi::Result<u32> {
-        async_unwinding_panic(async {
-            let promise = self.execute_raw.call_async::<JsPromise<u32>>(params).await?;
-            let value = promise.await?;
-            Ok(value)
-        })
-        .await
+    pub async fn execute_raw(&self, params: Query) -> quaint::Result<u32> {
+        self.execute_raw.call(params).await
     }
 }
 
 impl DriverProxy {
-    pub fn new(js_connector: &JsObject, env: &Env) -> napi::Result<Self> {
-        let start_transaction = js_connector.get_named_property("startTransaction")?;
-        let mut result = Self { start_transaction };
-        result.start_transaction.unref(env)?;
-
-        Ok(result)
+    pub fn new(js_connector: &JsObject) -> napi::Result<Self> {
+        Ok(Self {
+            start_transaction: js_connector.get_named_property("startTransaction")?,
+        })
     }
 
-    pub async fn start_transaction(&self, isolation_level: Option<IsolationLevel>) -> napi::Result<Box<JsTransaction>> {
-        async_unwinding_panic(async move {
-            let promise = self
-                .start_transaction
-                .call_async::<JsPromise<JsTransaction>>(isolation_level.map(|l| l.to_string()))
-                .await?;
-
-            let tx = promise.await?;
-            Ok(Box::new(tx))
-        })
-        .await
+    pub async fn start_transaction(
+        &self,
+        isolation_level: Option<IsolationLevel>,
+    ) -> quaint::Result<Box<JsTransaction>> {
+        let tx = self
+            .start_transaction
+            .call(isolation_level.map(|l| l.to_string()))
+            .await?;
+        Ok(Box::new(tx))
     }
 }
 
 impl TransactionProxy {
-    pub fn new(js_transaction: &JsObject, env: &Env) -> napi::Result<Self> {
+    pub fn new(js_transaction: &JsObject) -> napi::Result<Self> {
         let commit = js_transaction.get_named_property("commit")?;
         let rollback = js_transaction.get_named_property("rollback")?;
 
-        let mut result = Self { commit, rollback };
-
-        result.commit.unref(env)?;
-        result.rollback.unref(env)?;
-
-        Ok(result)
+        Ok(Self { commit, rollback })
     }
 
-    pub async fn commit(&self) -> napi::Result<()> {
-        async_unwinding_panic(async move {
-            let promise = self.commit.call_async::<JsPromise<()>>(()).await?;
-            promise.await
-        })
-        .await
+    pub async fn commit(&self) -> quaint::Result<()> {
+        self.commit.call(()).await
     }
-    pub async fn rollback(&self) -> napi::Result<()> {
-        async_unwinding_panic(async move {
-            let promise = self.rollback.call_async::<JsPromise<()>>(()).await?;
-            promise.await
-        })
-        .await
+    pub async fn rollback(&self) -> quaint::Result<()> {
+        self.rollback.call(()).await
     }
 }
 
