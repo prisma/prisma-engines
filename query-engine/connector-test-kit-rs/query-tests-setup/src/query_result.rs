@@ -13,7 +13,7 @@ struct SimpleGqlBatchResponse {
     errors: Vec<GQLError>,
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Serialize, Deserialize)]
 #[serde(untagged)]
 enum Response {
     Single(SimpleGqlResponse),
@@ -91,8 +91,12 @@ impl QueryResult {
 
     pub fn errors(&self) -> Vec<&GQLError> {
         match self.response {
-            PrismaResponse::Single(ref s) => s.errors().collect(),
-            PrismaResponse::Multi(ref m) => m.errors().collect(),
+            Response::Single(ref s) => s.errors.iter().collect(),
+            Response::Multi(ref m) => m
+                .errors
+                .iter()
+                .chain(m.batch_result.iter().flat_map(|res| res.errors.iter()))
+                .collect(),
         }
     }
 
@@ -121,15 +125,17 @@ impl From<PrismaResponse> for QueryResult {
                 }),
             },
             PrismaResponse::Multi(reses) => QueryResult {
-                response: Response::Multi(
-                    reses
+                response: Response::Multi(SimpleGqlBatchResponse {
+                    batch_result: reses
+                        .batch_result
                         .into_iter()
                         .map(|res| SimpleGqlResponse {
                             data: serde_json::to_value(&response.data).unwrap(),
                             errors: res.errors,
                         })
                         .collect(),
-                ),
+                    errors: reses.errors,
+                }),
             },
         }
     }

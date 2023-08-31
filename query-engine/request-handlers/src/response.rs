@@ -22,10 +22,10 @@ pub struct GQLResponse {
 #[serde(rename_all = "camelCase")]
 pub struct GQLBatchResponse {
     #[serde(skip_serializing_if = "Vec::is_empty")]
-    batch_result: Vec<GQLResponse>,
+    pub batch_result: Vec<GQLResponse>,
 
     #[serde(skip_serializing_if = "Vec::is_empty")]
-    errors: Vec<GQLError>,
+    pub errors: Vec<GQLError>,
 
     #[serde(skip_serializing_if = "IndexMap::is_empty")]
     extensions: Map,
