@@ -1,15 +1,36 @@
 use request_handlers::{GQLError, PrismaResponse};
+use serde::{Deserialize, Serialize};
 
-#[derive(Debug)]
+#[derive(Serialize, Deserialize, Debug)]
+struct SimpleGqlResponse {
+    data: serde_json::Value,
+    errors: Vec<GQLError>,
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+struct SimpleGqlBatchResponse {
+    batch_result: Vec<SimpleGqlResponse>,
+    errors: Vec<GQLError>,
+}
+
+#[derive(Debug, Deserialize)]
+#[serde(untagged)]
+enum Response {
+    Single(SimpleGqlResponse),
+    Multi(SimpleGqlBatchResponse),
+}
+
+#[derive(Debug, Deserialize)]
+#[serde(transparent)]
 pub struct QueryResult {
-    response: PrismaResponse,
+    response: Response,
 }
 
 impl QueryResult {
     pub fn failed(&self) -> bool {
         match self.response {
-            PrismaResponse::Single(ref s) => s.errors().next().is_some(),
-            PrismaResponse::Multi(ref m) => m.errors().next().is_some(),
+            Response::Single(ref s) => !s.errors.is_empty(),
+            Response::Multi(ref m) => !(m.errors.is_empty() && m.batch_result.iter().all(|res| res.errors.is_empty())),
         }
     }
 
@@ -92,6 +113,24 @@ impl ToString for QueryResult {
 
 impl From<PrismaResponse> for QueryResult {
     fn from(response: PrismaResponse) -> Self {
-        Self { response }
+        match response {
+            PrismaResponse::Single(res) => QueryResult {
+                response: Response::Single(SimpleGqlResponse {
+                    data: serde_json::to_value(res.data).unwrap(),
+                    errors: res.errors,
+                }),
+            },
+            PrismaResponse::Multi(reses) => QueryResult {
+                response: Response::Multi(
+                    reses
+                        .into_iter()
+                        .map(|res| SimpleGqlResponse {
+                            data: serde_json::to_value(&response.data).unwrap(),
+                            errors: res.errors,
+                        })
+                        .collect(),
+                ),
+            },
+        }
     }
 }

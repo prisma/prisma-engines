@@ -9,10 +9,10 @@ use crate::HandlerError;
 #[derive(Debug, serde::Serialize, Default, PartialEq)]
 pub struct GQLResponse {
     #[serde(skip_serializing_if = "IndexMap::is_empty")]
-    data: Map,
+    pub data: Map,
 
     #[serde(skip_serializing_if = "Vec::is_empty")]
-    errors: Vec<GQLError>,
+    pub errors: Vec<GQLError>,
 
     #[serde(skip_serializing_if = "IndexMap::is_empty")]
     extensions: Map,
