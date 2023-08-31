@@ -3702,6 +3702,7 @@ dependencies = [
  "request-handlers",
  "serde",
  "serde_json",
+ "sql-query-connector",
  "strip-ansi-escapes",
  "thiserror",
  "tokio",

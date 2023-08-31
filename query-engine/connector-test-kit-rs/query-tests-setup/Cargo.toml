@@ -11,6 +11,7 @@ qe-setup = { path = "../qe-setup" }
 request-handlers = { path = "../../request-handlers" }
 tokio.workspace = true
 query-core = { path = "../../core" }
+sql-query-connector = { path = "../../connectors/sql-query-connector" }
 query-engine = { path = "../../query-engine"}
 psl.workspace = true
 user-facing-errors = { path = "../../../libs/user-facing-errors" }

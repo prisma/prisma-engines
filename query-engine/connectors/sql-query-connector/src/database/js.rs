@@ -22,7 +22,7 @@ type Registry = HashMap<String, DriverAdapter>;
 /// REGISTRY is the global registry of Driver Adapters.
 static REGISTRY: Lazy<Mutex<Registry>> = Lazy::new(|| Mutex::new(HashMap::new()));
 
-fn registered_driver_adapter(provider: &str) -> connector::Result<DriverAdapter> {
+pub fn registered_driver_adapter(provider: &str) -> connector::Result<DriverAdapter> {
     let lock = REGISTRY.lock().unwrap();
     lock.get(provider)
         .ok_or(ConnectorError::from_kind(ErrorKind::UnsupportedConnector(format!(
@@ -117,7 +117,7 @@ impl Connector for Js {
 // declaration, so finally I couldn't come up with anything better then wrapping a QuaintQueryable
 // in this object, and implementing TransactionCapable (and quaint::Queryable) explicitly for it.
 #[derive(Clone)]
-struct DriverAdapter {
+pub struct DriverAdapter {
     connector: Arc<dyn TransactionCapable>,
 }
 

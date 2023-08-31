@@ -52,25 +52,54 @@ impl ConnectorTagInterface for NodeDrivers {
 impl TransactionManager for ExecutorProcess {
     async fn start_tx(
         &self,
-        query_schema: QuerySchemaRef,
-        engine_protocol: EngineProtocol,
-        opts: TransactionOptions,
+        _query_schema: QuerySchemaRef,
+        _engine_protocol: EngineProtocol,
+        _opts: TransactionOptions,
     ) -> query_core::Result<TxId> {
-        let txid: String = NODE_PROCESS
-            .0
-            .request("startTx", json!(null))
-            .await
-            .map_err(|err| query_core::CoreError::ConnectorError(query_core::ConnectorError::from_kind(query_core::ConnectorErrorKind::ForeignKeyConstraintViolation)))?;
+        let txid: String = NODE_PROCESS.0.request("startTx", json!(null)).await.map_err(|err| {
+            query_core::CoreError::ConnectorError(query_core::ConnectorError::from_kind(
+                query_core::ConnectorErrorKind::RawDatabaseError {
+                    code: String::from("0"),
+                    message: err.to_string(),
+                },
+            ))
+        })?;
 
         Ok(txid.into())
     }
 
     async fn commit_tx(&self, tx_id: TxId) -> Result<(), query_core::CoreError> {
-        todo!()
+        NODE_PROCESS
+            .0
+            .request("commitTx", json!({ "txId": tx_id.to_string() }))
+            .await
+            .map_err(|err| {
+                query_core::CoreError::ConnectorError(query_core::ConnectorError::from_kind(
+                    query_core::ConnectorErrorKind::RawDatabaseError {
+                        code: String::from("0"),
+                        message: err.to_string(),
+                    },
+                ))
+            })?;
+
+        Ok(())
     }
 
     async fn rollback_tx(&self, tx_id: TxId) -> Result<(), query_core::CoreError> {
-        todo!()
+        NODE_PROCESS
+            .0
+            .request("rollbackTx", json!({ "txId": tx_id.to_string() }))
+            .await
+            .map_err(|err| {
+                query_core::CoreError::ConnectorError(query_core::ConnectorError::from_kind(
+                    query_core::ConnectorErrorKind::RawDatabaseError {
+                        code: String::from("0"),
+                        message: err.to_string(),
+                    },
+                ))
+            })?;
+
+        Ok(())
     }
 }
 
@@ -100,6 +129,6 @@ impl QueryExecutor for ExecutorProcess {
     }
 
     fn primary_connector(&self) -> &(dyn Connector + Send + Sync) {
-        todo!()
+        registered_js_connector(NodeDrivers.datamodel_provider())
     }
 }
