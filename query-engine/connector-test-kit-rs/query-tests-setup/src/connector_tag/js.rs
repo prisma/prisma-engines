@@ -103,47 +103,47 @@ impl TransactionManager for ExecutorProcess {
     }
 }
 
-#[async_trait::async_trait]
-impl QueryExecutor for ExecutorProcess {
-    async fn execute(
-        &self,
-        tx_id: Option<TxId>,
-        operation: Operation,
-        query_schema: QuerySchemaRef,
-        trace_id: Option<String>,
-        engine_protocol: EngineProtocol,
-    ) -> query_core::Result<ResponseData> {
-        todo!()
-    }
+// #[async_trait::async_trait]
+// impl QueryExecutor for ExecutorProcess {
+//     async fn execute(
+//         &self,
+//         tx_id: Option<TxId>,
+//         operation: Operation,
+//         query_schema: QuerySchemaRef,
+//         trace_id: Option<String>,
+//         engine_protocol: EngineProtocol,
+//     ) -> query_core::Result<ResponseData> {
+//         todo!()
+//     }
 
-    async fn execute_all(
-        &self,
-        tx_id: Option<TxId>,
-        operations: Vec<Operation>,
-        transaction: Option<BatchDocumentTransaction>,
-        query_schema: QuerySchemaRef,
-        trace_id: Option<String>,
-        engine_protocol: EngineProtocol,
-    ) -> query_core::Result<Vec<query_core::Result<ResponseData>>> {
-        todo!()
-    }
+//     async fn execute_all(
+//         &self,
+//         tx_id: Option<TxId>,
+//         operations: Vec<Operation>,
+//         transaction: Option<BatchDocumentTransaction>,
+//         query_schema: QuerySchemaRef,
+//         trace_id: Option<String>,
+//         engine_protocol: EngineProtocol,
+//     ) -> query_core::Result<Vec<query_core::Result<ResponseData>>> {
+//         todo!()
+//     }
 
-    fn primary_connector(&self) -> &(dyn Connector + Send + Sync) {
-        registered_js_connector(NodeDrivers.datamodel_provider())
-    }
-}
+//     fn primary_connector(&self) -> &(dyn Connector + Send + Sync) {
+//         registered_js_connector(NodeDrivers.datamodel_provider())
+//     }
+// }
 
-#[async_trait]
-impl Connector for NodeDrivers {
-    async fn get_connection(&self) -> crate::Result<Box<dyn Connection + Send + Sync>> {
-        todo!();
-    }
+// #[async_trait]
+// impl Connector for NodeDrivers {
+//     async fn get_connection(&self) -> crate::Result<Box<dyn Connection + Send + Sync>> {
+//         todo!();
+//     }
 
-    fn name(&self) -> &'static str {
-        self.datamodel_provider()
-    }
+//     fn name(&self) -> &'static str {
+//         self.datamodel_provider()
+//     }
 
-    fn should_retry_on_transient_error(&self) -> bool {
-        false
-    }
-}
+//     fn should_retry_on_transient_error(&self) -> bool {
+//         false
+//     }
+// }

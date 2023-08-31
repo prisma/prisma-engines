@@ -2,7 +2,7 @@ mod json_adapter;
 
 pub use json_adapter::*;
 
-use crate::{ConnectorTag, ConnectorVersion, QueryResult, TestLogCapture, TestResult, ENGINE_PROTOCOL};
+use crate::{ConnectorTag, ConnectorVersion, NodeDrivers, QueryResult, TestLogCapture, TestResult, ENGINE_PROTOCOL};
 use colored::Colorize;
 use query_core::{
     protocol::EngineProtocol,
@@ -20,9 +20,14 @@ pub type TxResult = Result<(), user_facing_errors::Error>;
 
 pub(crate) type Executor = Box<dyn QueryExecutor + Send + Sync>;
 
+pub(crate) enum RunnerExecutor {
+    Builtin(Executor),
+    External,
+}
+
 /// Direct engine runner.
 pub struct Runner {
-    executor: Executor,
+    executor: RunnerExecutor,
     query_schema: QuerySchemaRef,
     version: ConnectorVersion,
     connector_tag: ConnectorTag,
@@ -54,13 +59,14 @@ impl Runner {
         let url = data_source.load_url(|key| env::var(key).ok()).unwrap();
 
         let connector_mode = ConnectorMode::Rust;
-        let executor = load_executor(
-            connector_mode,
-            data_source,
-            schema.configuration.preview_features(),
-            &url,
-        )
-        .await?;
+        let executor = connector_tag
+            .new_executor(
+                connector_mode,
+                data_source,
+                schema.configuration.preview_features(),
+                &url,
+            )
+            .await?;
         let query_schema: QuerySchemaRef = Arc::new(schema::build(Arc::new(schema), true));
 
         Ok(Self {
@@ -84,7 +90,7 @@ impl Runner {
 
         tracing::debug!("Querying: {}", query.clone().green());
 
-        let handler = RequestHandler::new(&*self.executor, &self.query_schema, self.protocol);
+        let handler = RequestHandler::new(self.executor, &self.query_schema, self.protocol);
 
         let request_body = match self.protocol {
             EngineProtocol::Json => {
