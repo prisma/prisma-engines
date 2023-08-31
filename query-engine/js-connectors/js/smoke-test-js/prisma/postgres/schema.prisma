@@ -33,14 +33,21 @@ model type_test {
   date_column_null      DateTime?                   @db.Date
   time_column           DateTime                    @db.Time(0)
   time_column_null      DateTime?                   @db.Time(0)
-  datetime_column       DateTime
-  datetime_column_null  DateTime?
+  datetime_column       DateTime                    @db.Timestamp(3)
+  datetime_column_null  DateTime?                   @db.Timestamp(3)
   timestamp_column      DateTime                    @db.Timestamp(0)
   timestamp_column_null DateTime?                   @db.Timestamp(0)
   json_column           Json
   json_column_null      Json?
   enum_column           type_test_enum_column
   enum_column_null      type_test_enum_column_null?
+}
+
+// This will eventually supersede type_test
+model type_test_2 {
+  id                   String    @id @default(cuid())
+  datetime_column      DateTime  @default(now()) @db.Timestamp(3)
+  datetime_column_null DateTime? @db.Timestamp(3)
 }
 
 model Child {

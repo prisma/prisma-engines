@@ -3,8 +3,6 @@ import type { Connector } from '@jkomyno/prisma-js-connector-utils'
 import type { QueryEngineInstance } from './engines/types/Library'
 import { initQueryEngine } from './util'
 
-type Flavor = Connector['flavour']
-
 export async function smokeTest(db: Connector, prismaSchemaRelativePath: string) {
   // wait for the database pool to be initialized
   await setImmediate(0)
@@ -15,11 +13,10 @@ export async function smokeTest(db: Connector, prismaSchemaRelativePath: string)
   await engine.connect('trace')
   console.log('[nodejs] connected')
 
-  // console.log('[nodejs] isHealthy', await conn.isHealthy())
-
   const test = new SmokeTest(engine, db.flavour)
 
   await test.testJSON()
+  await test.testTypeTest2()
   await test.testFindManyTypeTest()
   await test.createAutoIncrement()
   await test.testCreateAndDeleteChildParent()
@@ -72,6 +69,7 @@ class SmokeTest {
         }
       }
     `, 'trace', undefined)
+
     console.log('[nodejs] created', JSON.stringify(JSON.parse(created), null, 2))
 
     const resultSet = await this.engine.query(`
@@ -88,11 +86,68 @@ class SmokeTest {
       }
     `, 'trace', undefined)
     console.log('[nodejs] findMany resultSet', JSON.stringify(JSON.parse(resultSet), null, 2))
-  
+
     await this.engine.query(`
       {
         "action": "deleteMany",
         "modelName": "Product",
+        "query": {
+          "arguments": {
+            "where": {}
+          },
+          "selection": {
+            "count": true
+          }
+        }
+      }
+    `, 'trace', undefined)
+
+    return resultSet
+  }
+
+  async testTypeTest2() {
+    const create = await this.engine.query(`
+      {
+        "action": "createOne",
+        "modelName": "type_test_2",
+        "query": {
+          "arguments": {
+            "data": {}
+          },
+          "selection": {
+            "id": true,
+            "datetime_column": true,
+            "datetime_column_null": true
+          }
+        }
+      }
+    `, 'trace', undefined)
+
+    console.log('[nodejs] create', JSON.stringify(JSON.parse(create), null, 2))
+
+    const resultSet = await this.engine.query(`
+      {
+        "action": "findMany",
+        "modelName": "type_test_2",
+        "query": {
+          "selection": {
+            "id": true,
+            "datetime_column": true,
+            "datetime_column_null": true
+          },
+          "arguments": {
+            "where": {}
+          }
+        }
+      }
+    `, 'trace', undefined)
+
+    console.log('[nodejs] resultSet', JSON.stringify(JSON.parse(resultSet), null, 2))
+
+    await this.engine.query(`
+      {
+        "action": "deleteMany",
+        "modelName": "type_test_2",
         "query": {
           "arguments": {
             "where": {}
