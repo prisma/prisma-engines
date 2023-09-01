@@ -30,24 +30,43 @@ async function main(): Promise<void> {
                     message: err.toString(),
                 })
             }
-        } catch (_) { 
+        } catch (_) {
             // skip non-JSON line
         }
 
     });
 }
 
-async function handleRequest(method: string, _params: unknown): Promise<unknown> {
+const schemas: Record<number, engines.QueryEngineInstance> = {}
+
+async function handleRequest(method: string, params: unknown): Promise<unknown> {
     switch (method) {
         case 'initialize': {
             return { datamodel_provider: "postgresql" }
         }
-        case 'query': {
-            // interface QueryPayload {
-            //     query: string
-            // }
+        case 'initializeSchema': {
+            interface InitializeSchemaParams {
+                schema: string
+                schemaId: number
+                url: string
+            }
 
-            return { data: [] }
+            const castParams = params as InitializeSchemaParams;
+            const engine = await initQe(castParams.url, castParams.schema);
+            await engine.connect("")
+            schemas[castParams.schemaId] = engine
+            return null
+        }
+        case 'query': {
+            interface QueryPayload {
+                query: string
+                schemaId: number
+            }
+
+            const castParams = params as QueryPayload;
+            const result = await schemas[castParams.schemaId].query(castParams.query, "")
+
+            return JSON.parse(result)
         }
         default: {
             throw new Error(`Unknown method: \`${method}\``)

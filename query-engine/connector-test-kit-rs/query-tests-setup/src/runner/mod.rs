@@ -32,9 +32,17 @@ pub enum RunnerExecutor {
 }
 
 impl RunnerExecutor {
-    fn new_external() -> RunnerExecutor {
+    async fn new_external(url: &str, schema: &str) -> TestResult<RunnerExecutor> {
         static COUNTER: AtomicUsize = AtomicUsize::new(0);
-        RunnerExecutor::External(COUNTER.fetch_add(1, std::sync::atomic::Ordering::Relaxed))
+        let id = COUNTER.fetch_add(1, std::sync::atomic::Ordering::Relaxed);
+
+        executor_process_request(
+            "initializeSchema",
+            json!({ "schema": schema, "schemaId": id, "url": url }),
+        )
+        .await?;
+
+        Ok(RunnerExecutor::External(id))
     }
 }
 
@@ -67,12 +75,12 @@ impl Runner {
         qe_setup::setup(&datamodel, db_schemas).await?;
 
         let protocol = EngineProtocol::from(&ENGINE_PROTOCOL.to_string());
-        let schema = psl::parse_schema(datamodel).unwrap();
+        let schema = psl::parse_schema(&datamodel).unwrap();
         let data_source = schema.configuration.datasources.first().unwrap();
         let url = data_source.load_url(|key| env::var(key).ok()).unwrap();
 
         let executor = match crate::NODE_TEST_EXECUTOR.as_ref() {
-            Some(_) => RunnerExecutor::new_external(),
+            Some(_) => RunnerExecutor::new_external(&url, &datamodel).await?,
             None => RunnerExecutor::Builtin(
                 request_handlers::load_executor(
                     ConnectorMode::Rust,
@@ -106,8 +114,8 @@ impl Runner {
 
         let executor = match &self.executor {
             RunnerExecutor::Builtin(e) => e,
-            RunnerExecutor::External(_) => {
-                return Ok(executor_process_request("query", json!({ "query": query })).await?)
+            RunnerExecutor::External(schema_id) => {
+                return Ok(executor_process_request("query", json!({ "query": query, "schemaId": schema_id })).await?)
             }
         };
 

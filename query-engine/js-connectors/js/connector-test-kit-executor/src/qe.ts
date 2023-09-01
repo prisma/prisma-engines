@@ -1,13 +1,15 @@
 import * as pg from '@jkomyno/prisma-pg-js-connector'
 import * as lib from './engines/Library'
+import * as os from 'node:os'
+import * as path from 'node:path'
+import * as fs from 'node:fs'
 
-export function initQueryEngine(driver: pg.Connector, prismaSchemaRelativePath: string): lib.QueryEngineInstance {
+export function initQueryEngine(driver: pg.Connector, schemaPath: string): lib.QueryEngineInstance {
     // I assume nobody will run this on Windows ¯\_(ツ)_/¯
     const libExt = os.platform() === 'darwin' ? 'dylib' : 'so'
     const dirname = path.dirname(new URL(import.meta.url).pathname)
 
     const libQueryEnginePath = path.join(dirname, `../../../../../target/debug/libquery_engine.${libExt}`)
-    const schemaPath = path.join(dirname, prismaSchemaRelativePath)
 
     console.log('[nodejs] read Prisma schema from', schemaPath)
 

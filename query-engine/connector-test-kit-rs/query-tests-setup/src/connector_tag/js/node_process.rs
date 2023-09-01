@@ -71,8 +71,8 @@ impl ExecutorProcess {
     }
 
     /// Convenient façade. Allocates more than necessary, but this is only for testing.
+    #[tracing::instrument(skip(self))]
     pub(crate) async fn request<T: DeserializeOwned>(&self, method: &str, params: serde_json::Value) -> Result<T> {
-        dbg!("here");
         let (sender, receiver) = oneshot::channel();
         let params = if let serde_json::Value::Object(params) = params {
             params
@@ -88,7 +88,6 @@ impl ExecutorProcess {
 
         self.task_handle.send((method_call, sender)).await?;
         let raw_response = receiver.await?;
-        dbg!(&raw_response);
         tracing::debug!(%raw_response);
         let response = serde_json::from_value(raw_response)?;
         Ok(response)
