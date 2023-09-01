@@ -45,10 +45,11 @@ export const bindConnector = (connector: Connector): ErrorCapturingConnector => 
 const bindTransaction = (errorRegistry: ErrorRegistryInternal, transaction: Transaction): Transaction => {
   return ({
     flavour: transaction.flavour,
+    options: transaction.options,
     queryRaw: wrapAsync(errorRegistry, transaction.queryRaw.bind(transaction)),
     executeRaw: wrapAsync(errorRegistry, transaction.executeRaw.bind(transaction)),
     commit: wrapAsync(errorRegistry, transaction.commit.bind(transaction)),
-    rollback: wrapAsync(errorRegistry, transaction.rollback.bind(transaction))
+    rollback: wrapAsync(errorRegistry, transaction.rollback.bind(transaction)),
   });
 }
 

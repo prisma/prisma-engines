@@ -38,6 +38,9 @@ pub(crate) struct DriverProxy {
 /// This a JS proxy for accessing the methods, specific
 /// to JS transaction objects
 pub(crate) struct TransactionProxy {
+    /// transaction options
+    options: TransactionOptions,
+
     /// commit transaction
     commit: AsyncJsFunction<(), ()>,
 
@@ -344,12 +347,35 @@ impl DriverProxy {
     }
 }
 
+#[derive(Debug)]
+#[napi(object)]
+pub struct TransactionOptions {
+    /// The isolation level to use.
+    pub isolation_level: Option<String>,
+
+    /// Whether or not to put the isolation level `SET` before or after the `BEGIN`.
+    pub isolation_first: bool,
+
+    /// Whether or not to run a phantom query (i.e., a query that only influences Prisma event logs, but not the database itself)
+    /// before opening a transaction, committing, or rollbacking.
+    pub use_phantom_query: bool,
+}
+
 impl TransactionProxy {
     pub fn new(js_transaction: &JsObject) -> napi::Result<Self> {
         let commit = js_transaction.get_named_property("commit")?;
         let rollback = js_transaction.get_named_property("rollback")?;
+        let options: TransactionOptions = js_transaction.get_named_property("options")?;
 
-        Ok(Self { commit, rollback })
+        Ok(Self {
+            commit,
+            rollback,
+            options,
+        })
+    }
+
+    pub fn options(&self) -> &TransactionOptions {
+        &self.options
     }
 
     pub async fn commit(&self) -> quaint::Result<()> {

@@ -79,9 +79,19 @@ export interface Connector extends Queryable {
   close: () => Promise<Result<void>>
 }
 
+export type TransactionOptions = {
+  isolationLevel: string | undefined
+  isolationFirst: boolean
+  usePhantomQuery: boolean
+}
+
 export interface Transaction extends Queryable {
   /**
-   * Commit the transaction
+   * Transaction options.
+   */
+  readonly options: TransactionOptions
+  /**
+   * Commit the transaction.
    */
   commit(): Promise<Result<void>>
   /**

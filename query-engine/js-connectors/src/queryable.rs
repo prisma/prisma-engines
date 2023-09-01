@@ -241,6 +241,30 @@ impl TransactionCapable for JsQueryable {
     ) -> quaint::Result<Box<dyn Transaction + 'a>> {
         let tx = self.driver_proxy.start_transaction(isolation).await?;
 
+        let tx_opts = tx.options();
+
+        if tx_opts.isolation_first {
+            if let Some(isolation) = isolation {
+                tx.set_tx_isolation_level(isolation).await?;
+            }
+        }
+
+        let begin_stmt = tx.begin_statement();
+
+        if tx_opts.use_phantom_query {
+            tx.raw_phantom_cmd(begin_stmt).await?;
+        } else {
+            tx.raw_cmd(begin_stmt).await?;
+        }
+
+        if !tx_opts.isolation_first {
+            if let Some(isolation) = isolation {
+                tx.set_tx_isolation_level(isolation).await?;
+            }
+        }
+
+        self.server_reset_query(tx.as_ref()).await?;
+
         Ok(tx)
     }
 }
