@@ -1,0 +1,7 @@
+packages:
+  - './js-connector-utils'
+  - './pg-js-connector'
+  - './planetscale-js-connector'
+  - './neon-js-connector'
+  - './smoke-test-js'
+  - './connector-test-kit-executor'

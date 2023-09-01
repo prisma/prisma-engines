@@ -1,0 +1,18 @@
+{
+  "name": "connector-test-kit-executor",
+  "version": "1.0.0",
+  "description": "",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "tsup ./src/index.ts --format cjs,esm --dts",
+    "lint": "tsc -p ./tsconfig.build.json"
+  },
+  "keywords": [],
+  "author": "",
+  "sideEffects": false,
+  "license": "Apache-2.0",
+  "dependencies": {
+    "@jkomyno/prisma-pg-js-connector": "workspace:*",
+    "tempy": "^3"
+  }
+}
