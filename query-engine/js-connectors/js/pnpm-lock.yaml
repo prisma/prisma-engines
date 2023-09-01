@@ -83,6 +83,9 @@ importers:
         specifier: ^1.13.1
         version: 1.13.1
     devDependencies:
+      '@types/node':
+        specifier: ^20.5.1
+        version: 20.5.1
       cross-env:
         specifier: ^7.0.3
         version: 7.0.3

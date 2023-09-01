@@ -1,17 +1,13 @@
 import { createPgConnector } from '@jkomyno/prisma-pg-js-connector'
+import { describe } from 'node:test'
 import { smokeTestClient } from './client'
 
-async function pg() {
-  const connectionString = `${process.env.DATABASE_URL as string}`
+describe('pg with @prisma/client', async () => {
+  const connectionString = `${process.env.JS_PG_DATABASE_URL as string}`
 
   const jsConnector = createPgConnector({
     url: connectionString,
   })
 
-  await smokeTestClient(jsConnector)
-}
-
-pg().catch((e) => {
-  console.error(e)
-  process.exit(1)
+  smokeTestClient(jsConnector)
 })

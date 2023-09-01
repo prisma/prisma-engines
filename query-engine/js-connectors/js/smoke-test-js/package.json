@@ -6,22 +6,17 @@
   "scripts": {
     "prisma:db:push:postgres": "prisma db push --schema ./prisma/postgres/schema.prisma --force-reset",
     "prisma:db:execute:postgres": "prisma db execute --schema ./prisma/postgres/schema.prisma --file ./prisma/postgres/commands/type_test/insert.sql",
-    
     "prisma:db:push:mysql": "prisma db push --schema ./prisma/mysql/schema.prisma --force-reset",
     "prisma:db:execute:mysql": "prisma db execute --schema ./prisma/mysql/schema.prisma --file ./prisma/mysql/commands/type_test/insert.sql",
-    
     "prisma:neon": "cross-env-shell DATABASE_URL=\"${JS_NEON_DATABASE_URL}\" \"pnpm prisma:db:push:postgres && pnpm prisma:db:execute:postgres\"",
     "neon": "cross-env-shell DATABASE_URL=\"${JS_NEON_DATABASE_URL}\" \"tsx ./src/libquery/neon.ts\"",
-    "neon:client": "cross-env-shell DATABASE_URL=\"${JS_NEON_DATABASE_URL}\" \"tsx ./src/client/neon.ts\"",
-    
+    "neon:client": "DATABASE_URL=\"${JS_NEON_DATABASE_URL}\" node --test --loader=tsx ./src/client/neon.test.ts",
     "prisma:pg": "cross-env-shell DATABASE_URL=\"${JS_PG_DATABASE_URL}\" \"pnpm prisma:db:push:postgres && pnpm prisma:db:execute:postgres\"",
     "pg": "cross-env-shell DATABASE_URL=\"${JS_PG_DATABASE_URL}\" \"tsx ./src/libquery/pg.ts\"",
-    "pg:client": "cross-env-shell DATABASE_URL=\"${JS_PG_DATABASE_URL}\" \"tsx ./src/client/pg.ts\"",
-    
+    "pg:client": "DATABASE_URL=\"${JS_PG_DATABASE_URL}\" node --test --loader=tsx ./src/client/pg.test.ts",
     "prisma:planetscale": "cross-env-shell DATABASE_URL=\"${JS_PLANETSCALE_DATABASE_URL}\" \"pnpm prisma:db:push:mysql && pnpm prisma:db:execute:mysql\"",
     "planetscale": "cross-env-shell DATABASE_URL=\"${JS_PLANETSCALE_DATABASE_URL}\" \"tsx ./src/libquery/planetscale.ts\"",
-    
-    "planetscale:client": "cross-env-shell DATABASE_URL=\"${JS_PLANETSCALE_DATABASE_URL}\" \"tsx ./src/client/planetscale.ts\""
+    "planetscale:client": "DATABASE_URL=\"${JS_PLANETSCALE_DATABASE_URL}\" node --test --loader=tsx ./src/client/planetscale.test.ts"
   },
   "keywords": [],
   "author": "Alberto Schiabel <schiabel@prisma.io>",
@@ -36,6 +31,7 @@
     "superjson": "^1.13.1"
   },
   "devDependencies": {
+    "@types/node": "^20.5.1",
     "cross-env": "^7.0.3",
     "prisma": "5.3.0-integration-feat-js-connectors-in-client.13",
     "tsx": "^3.12.7"
