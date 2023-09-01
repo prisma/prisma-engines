@@ -287,7 +287,7 @@
 <span class="kw">use </span>connector::{Connection, ConnectionLike, Connector};
 <span class="kw">use </span>futures::future;
 <span class="kw">use </span>query_engine_metrics::{
-    histogram, increment_counter, metrics, PRISMA_CLIENT_QUERIES_HISTOGRAM_MS, PRISMA_CLIENT_QUERIES_TOTAL,
+    histogram, increment_counter, metrics, PRISMA_CLIENT_QUERIES_DURATION_HISTOGRAM_MS, PRISMA_CLIENT_QUERIES_TOTAL,
 };
 <span class="kw">use </span>schema::{QuerySchema, QuerySchemaRef};
 <span class="kw">use </span>std::time::{Duration, Instant};
@@ -305,7 +305,7 @@
     <span class="kw">let </span>(graph, serializer) = build_graph(<span class="kw-2">&amp;</span>query_schema, operation.clone())<span class="question-mark">?</span>;
     <span class="kw">let </span>result = execute_on(conn, graph, serializer, query_schema.as_ref(), trace_id).<span class="kw">await</span>;
 
-    <span class="macro">histogram!</span>(PRISMA_CLIENT_QUERIES_HISTOGRAM_MS, operation_timer.elapsed());
+    <span class="macro">histogram!</span>(PRISMA_CLIENT_QUERIES_DURATION_HISTOGRAM_MS, operation_timer.elapsed());
 
     result
 }
@@ -326,7 +326,7 @@
     <span class="kw">for </span>(i, (graph, serializer)) <span class="kw">in </span>queries.into_iter().enumerate() {
         <span class="kw">let </span>operation_timer = Instant::now();
         <span class="kw">let </span>result = execute_on(conn, graph, serializer, query_schema.as_ref(), trace_id.clone()).<span class="kw">await</span>;
-        <span class="macro">histogram!</span>(PRISMA_CLIENT_QUERIES_HISTOGRAM_MS, operation_timer.elapsed());
+        <span class="macro">histogram!</span>(PRISMA_CLIENT_QUERIES_DURATION_HISTOGRAM_MS, operation_timer.elapsed());
 
         <span class="kw">match </span>result {
             <span class="prelude-val">Ok</span>(result) =&gt; results.push(<span class="prelude-val">Ok</span>(result)),
@@ -439,7 +439,7 @@
         execute_self_contained_without_retry(conn, graph, serializer, force_transactions, <span class="kw-2">&amp;</span>query_schema, trace_id).<span class="kw">await
     </span>};
 
-    <span class="macro">histogram!</span>(PRISMA_CLIENT_QUERIES_HISTOGRAM_MS, operation_timer.elapsed());
+    <span class="macro">histogram!</span>(PRISMA_CLIENT_QUERIES_DURATION_HISTOGRAM_MS, operation_timer.elapsed());
 
     result
 }
