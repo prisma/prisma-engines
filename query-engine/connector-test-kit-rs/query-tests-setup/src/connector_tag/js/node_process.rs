@@ -2,10 +2,24 @@ use super::*;
 use once_cell::sync::Lazy;
 use serde::de::DeserializeOwned;
 use std::{
+    fmt::Display,
     io::{self, Write},
     sync::atomic::Ordering,
 };
 use tokio::sync::{mpsc, oneshot};
+
+type Result<T> = std::result::Result<T, Box<dyn std::error::Error + Send + Sync>>;
+
+#[derive(Debug)]
+struct GenericError(String);
+
+impl Display for GenericError {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        self.0.fmt(f)
+    }
+}
+
+impl std::error::Error for GenericError {}
 
 pub(crate) struct ExecutorProcess {
     task_handle: mpsc::Sender<ReqImpl>,
@@ -19,7 +33,7 @@ fn exit_with_message(status_code: i32, message: &str) -> ! {
 }
 
 impl ExecutorProcess {
-    fn new() -> std::io::Result<(ExecutorProcess, ProcessConfig)> {
+    fn new() -> Result<(ExecutorProcess, ProcessConfig)> {
         let (sender, receiver) = mpsc::channel::<ReqImpl>(300);
         let (init_sender, init_receiver) = oneshot::channel::<serde_json::Value>();
 
@@ -57,11 +71,7 @@ impl ExecutorProcess {
     }
 
     /// Convenient façade. Allocates more than necessary, but this is only for testing.
-    pub(crate) async fn request<T: DeserializeOwned>(
-        &self,
-        method: &str,
-        params: serde_json::Value,
-    ) -> Result<T, Box<dyn std::error::Error + Send + Sync>> {
+    pub(crate) async fn request<T: DeserializeOwned>(&self, method: &str, params: serde_json::Value) -> Result<T> {
         let (sender, receiver) = oneshot::channel();
         let params = if let serde_json::Value::Object(params) = params {
             params
@@ -83,10 +93,13 @@ impl ExecutorProcess {
 }
 
 pub(super) static NODE_PROCESS: Lazy<(ExecutorProcess, ProcessConfig)> =
-    Lazy::new(|| match std::panic::catch_unwind(ExecutorProcess::new) {
+    Lazy::new(|| match std::thread::spawn(ExecutorProcess::new).join() {
         Ok(Ok(process)) => process,
         Ok(Err(err)) => exit_with_message(1, &format!("Failed to start node process. Details: {err}")),
-        Err(_) => exit_with_message(1, "Panic while trying to start node process."),
+        Err(err) => {
+            let err = err.downcast_ref::<String>().map(ToOwned::to_owned).unwrap_or_default();
+            exit_with_message(1, &format!("Panic while trying to start node process.\nDetails: {err}"))
+        }
     });
 
 type ReqImpl = (jsonrpc_core::MethodCall, oneshot::Sender<serde_json::value::Value>);
@@ -96,7 +109,7 @@ pub(super) struct ProcessConfig {
     pub(super) datamodel_provider: String,
 }
 
-fn start_rpc_thread(mut receiver: mpsc::Receiver<ReqImpl>) -> std::io::Result<()> {
+fn start_rpc_thread(mut receiver: mpsc::Receiver<ReqImpl>) -> Result<()> {
     use std::process::Stdio;
     use tokio::process::Command;
 
@@ -104,10 +117,12 @@ fn start_rpc_thread(mut receiver: mpsc::Receiver<ReqImpl>) -> std::io::Result<()
         Some(env_var) => env_var,
         None => exit_with_message(1, "start_rpc_thread() error: NODE_TEST_EXECUTOR env var is not defined"),
     };
+    eprintln!("Spawning test executor process at `{env_var}`");
     let process = Command::new(env_var)
         .stdin(Stdio::piped())
         .stdout(Stdio::piped())
-        .spawn()?;
+        .spawn()
+        .map_err(|err| GenericError(format!("Failed to spawn node executor process.\nDetails: {err}\n")))?;
 
     tokio::spawn(async move {
         let mut stdout = BufReader::new(process.stdout.unwrap()).lines();
@@ -129,7 +144,7 @@ fn start_rpc_thread(mut receiver: mpsc::Receiver<ReqImpl>) -> std::io::Result<()
                                 }
                             };
 
-                            let sender= pending_requests.remove(response.id()).unwrap();
+                            let sender = pending_requests.remove(response.id()).unwrap();
                             match response {
                                 jsonrpc_core::Output::Success(success) => {
                                     sender.send(success.result).unwrap();

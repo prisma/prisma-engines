@@ -21,15 +21,6 @@ pub(crate) async fn executor_process_request<T: DeserializeOwned>(
 pub struct NodeDrivers;
 
 impl ConnectorTagInterface for NodeDrivers {
-    fn new_executor<'a>(
-        &'a self,
-        _data_source: &'a psl::Datasource,
-        _preview_features: PreviewFeatures,
-        _url: &'a str,
-    ) -> BoxFuture<'a, TestResult<RunnerExecutor>> {
-        Box::pin(std::future::ready(Ok(RunnerExecutor::External)))
-    }
-
     fn raw_execute<'a>(&'a self, query: &'a str, connection_url: &'a str) -> BoxFuture<'a, Result<(), TestError>> {
         Box::pin(async move {
             NODE_PROCESS

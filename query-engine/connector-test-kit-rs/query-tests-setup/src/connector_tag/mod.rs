@@ -17,25 +17,11 @@ pub(crate) use sql_server::*;
 pub(crate) use sqlite::*;
 pub(crate) use vitess::*;
 
-use crate::{datamodel_rendering::DatamodelRenderer, BoxFuture, RunnerExecutor, TestError, TestResult, CONFIG};
-use psl::{datamodel_connector::ConnectorCapabilities, PreviewFeatures};
-use request_handlers::{load_executor, ConnectorMode};
+use crate::{datamodel_rendering::DatamodelRenderer, BoxFuture, TestError, CONFIG};
+use psl::datamodel_connector::ConnectorCapabilities;
 use std::{convert::TryFrom, fmt};
 
 pub trait ConnectorTagInterface {
-    fn new_executor<'a>(
-        &'a self,
-        data_source: &'a psl::Datasource,
-        preview_features: PreviewFeatures,
-        url: &'a str,
-    ) -> BoxFuture<'a, TestResult<RunnerExecutor>> {
-        Box::pin(async move {
-            Ok(RunnerExecutor::Builtin(
-                load_executor(ConnectorMode::Rust, data_source, preview_features, &url).await?,
-            ))
-        })
-    }
-
     fn raw_execute<'a>(&'a self, query: &'a str, connection_url: &'a str) -> BoxFuture<'a, Result<(), TestError>>;
 
     /// The name of the datamodel provider for this connector.

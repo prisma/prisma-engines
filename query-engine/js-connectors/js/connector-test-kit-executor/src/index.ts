@@ -37,7 +37,7 @@ async function main(): Promise<void> {
     });
 }
 
-async function handleRequest(method: string, params: unknown): Promise<unknown> {
+async function handleRequest(method: string, _params: unknown): Promise<unknown> {
     switch (method) {
         case 'initialize': {
             return { datamodel_provider: "postgresql" }

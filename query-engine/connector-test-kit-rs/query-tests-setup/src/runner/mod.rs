@@ -13,8 +13,8 @@ use query_core::{
 };
 use query_engine_metrics::MetricRegistry;
 use request_handlers::{
-    BatchTransactionOption, GraphqlBody, JsonBatchQuery, JsonBody, JsonSingleQuery, MultiQuery, RequestBody,
-    RequestHandler,
+    BatchTransactionOption, ConnectorMode, GraphqlBody, JsonBatchQuery, JsonBody, JsonSingleQuery, MultiQuery,
+    RequestBody, RequestHandler,
 };
 use serde_json::json;
 use std::{env, sync::Arc};
@@ -61,9 +61,18 @@ impl Runner {
         let data_source = schema.configuration.datasources.first().unwrap();
         let url = data_source.load_url(|key| env::var(key).ok()).unwrap();
 
-        let executor = connector_tag
-            .new_executor(data_source, schema.configuration.preview_features(), &url)
-            .await?;
+        let executor = match crate::NODE_TEST_EXECUTOR.as_ref() {
+            Some(_) => RunnerExecutor::External,
+            None => RunnerExecutor::Builtin(
+                request_handlers::load_executor(
+                    ConnectorMode::Rust,
+                    data_source,
+                    schema.configuration.preview_features(),
+                    &url,
+                )
+                .await?,
+            ),
+        };
         let query_schema: QuerySchemaRef = Arc::new(schema::build(Arc::new(schema), true));
 
         Ok(Self {

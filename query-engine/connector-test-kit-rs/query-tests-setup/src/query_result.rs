@@ -4,15 +4,19 @@ use serde::{Deserialize, Serialize};
 #[derive(Serialize, Deserialize, Debug)]
 struct SimpleGqlResponse {
     data: serde_json::Value,
+    #[serde(skip_serializing_if = "Vec::is_empty")]
     errors: Vec<GQLError>,
-    extensions: serde_json::Value,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    extensions: Option<serde_json::Value>,
 }
 
 #[derive(Serialize, Deserialize, Debug)]
 struct SimpleGqlBatchResponse {
     batch_result: Vec<SimpleGqlResponse>,
+    #[serde(skip_serializing_if = "Vec::is_empty")]
     errors: Vec<GQLError>,
-    extensions: serde_json::Value,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    extensions: Option<serde_json::Value>,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -124,7 +128,7 @@ impl From<PrismaResponse> for QueryResult {
                 response: Response::Single(SimpleGqlResponse {
                     data: serde_json::to_value(res.data).unwrap(),
                     errors: res.errors,
-                    extensions: serde_json::to_value(&res.extensions).unwrap(),
+                    extensions: (!res.extensions.is_empty()).then(|| serde_json::to_value(&res.extensions).unwrap()),
                 }),
             },
             PrismaResponse::Multi(reses) => QueryResult {
@@ -135,11 +139,13 @@ impl From<PrismaResponse> for QueryResult {
                         .map(|res| SimpleGqlResponse {
                             data: serde_json::to_value(&res.data).unwrap(),
                             errors: res.errors,
-                            extensions: serde_json::to_value(&res.extensions).unwrap(),
+                            extensions: (!res.extensions.is_empty())
+                                .then(|| serde_json::to_value(&res.extensions).unwrap()),
                         })
                         .collect(),
                     errors: reses.errors,
-                    extensions: serde_json::to_value(&reses.extensions).unwrap(),
+                    extensions: (!reses.extensions.is_empty())
+                        .then(|| serde_json::to_value(&reses.extensions).unwrap()),
                 }),
             },
         }
