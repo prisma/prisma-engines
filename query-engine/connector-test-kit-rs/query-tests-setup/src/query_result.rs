@@ -5,6 +5,7 @@ use serde::{Deserialize, Serialize};
 struct SimpleGqlResponse {
     data: serde_json::Value,
     #[serde(skip_serializing_if = "Vec::is_empty")]
+    #[serde(default)]
     errors: Vec<GQLError>,
     #[serde(skip_serializing_if = "Option::is_none")]
     extensions: Option<serde_json::Value>,
@@ -14,6 +15,7 @@ struct SimpleGqlResponse {
 struct SimpleGqlBatchResponse {
     batch_result: Vec<SimpleGqlResponse>,
     #[serde(skip_serializing_if = "Vec::is_empty")]
+    #[serde(default)]
     errors: Vec<GQLError>,
     #[serde(skip_serializing_if = "Option::is_none")]
     extensions: Option<serde_json::Value>,

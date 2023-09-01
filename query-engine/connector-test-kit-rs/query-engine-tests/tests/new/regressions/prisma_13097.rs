@@ -38,7 +38,6 @@ model Opp {
             runner,
             r#"{groupByApp(by: [categories], orderBy: { categories: "desc" }) { _count { slug } categories }}"#
         );
-        dbg!(&result);
         assert_eq!(result, "{\"data\":{\"groupByApp\":[{\"_count\":{\"slug\":1},\"categories\":[\"messaging\",\"payment\"]},{\"_count\":{\"slug\":2},\"categories\":[\"calendar\",\"other\"]},{\"_count\":{\"slug\":1},\"categories\":[]}]}}");
 
         let result = run_query!(

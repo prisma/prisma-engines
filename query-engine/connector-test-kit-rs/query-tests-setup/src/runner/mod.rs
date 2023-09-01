@@ -17,7 +17,10 @@ use request_handlers::{
     RequestBody, RequestHandler,
 };
 use serde_json::json;
-use std::{env, sync::Arc};
+use std::{
+    env,
+    sync::{atomic::AtomicUsize, Arc},
+};
 
 pub type TxResult = Result<(), user_facing_errors::Error>;
 
@@ -25,7 +28,14 @@ pub(crate) type Executor = Box<dyn QueryExecutor + Send + Sync>;
 
 pub enum RunnerExecutor {
     Builtin(Executor),
-    External,
+    External(usize),
+}
+
+impl RunnerExecutor {
+    fn new_external() -> RunnerExecutor {
+        static COUNTER: AtomicUsize = AtomicUsize::new(0);
+        RunnerExecutor::External(COUNTER.fetch_add(1, std::sync::atomic::Ordering::Relaxed))
+    }
 }
 
 /// Direct engine runner.
@@ -62,7 +72,7 @@ impl Runner {
         let url = data_source.load_url(|key| env::var(key).ok()).unwrap();
 
         let executor = match crate::NODE_TEST_EXECUTOR.as_ref() {
-            Some(_) => RunnerExecutor::External,
+            Some(_) => RunnerExecutor::new_external(),
             None => RunnerExecutor::Builtin(
                 request_handlers::load_executor(
                     ConnectorMode::Rust,
@@ -96,7 +106,9 @@ impl Runner {
 
         let executor = match &self.executor {
             RunnerExecutor::Builtin(e) => e,
-            RunnerExecutor::External => return Ok(executor_process_request("query", json!({ "query": query })).await?),
+            RunnerExecutor::External(_) => {
+                return Ok(executor_process_request("query", json!({ "query": query })).await?)
+            }
         };
 
         tracing::debug!("Querying: {}", query.clone().green());
@@ -146,7 +158,7 @@ impl Runner {
 
         let executor = match &self.executor {
             RunnerExecutor::Builtin(e) => e,
-            RunnerExecutor::External => {
+            RunnerExecutor::External(_) => {
                 return Ok(executor_process_request("queryJson", json!({ "query": query })).await?)
             }
         };
@@ -189,7 +201,7 @@ impl Runner {
         isolation_level: Option<String>,
     ) -> TestResult<crate::QueryResult> {
         let executor = match &self.executor {
-            RunnerExecutor::External => todo!(),
+            RunnerExecutor::External(_) => todo!(),
             RunnerExecutor::Builtin(e) => e,
         };
 
@@ -214,7 +226,7 @@ impl Runner {
         isolation_level: Option<String>,
     ) -> TestResult<crate::QueryResult> {
         let executor = match &self.executor {
-            RunnerExecutor::External => todo!(),
+            RunnerExecutor::External(_) => todo!(),
             RunnerExecutor::Builtin(e) => e,
         };
 
@@ -262,7 +274,7 @@ impl Runner {
     ) -> TestResult<TxId> {
         let executor = match &self.executor {
             RunnerExecutor::Builtin(e) => e,
-            RunnerExecutor::External => todo!(),
+            RunnerExecutor::External(_) => todo!(),
         };
 
         let tx_opts = TransactionOptions::new(max_acquisition_millis, valid_for_millis, isolation_level);
@@ -276,7 +288,7 @@ impl Runner {
     pub async fn commit_tx(&self, tx_id: TxId) -> TestResult<TxResult> {
         let executor = match &self.executor {
             RunnerExecutor::Builtin(e) => e,
-            RunnerExecutor::External => todo!(),
+            RunnerExecutor::External(_) => todo!(),
         };
         let res = executor.commit_tx(tx_id).await;
 
@@ -290,7 +302,7 @@ impl Runner {
     pub async fn rollback_tx(&self, tx_id: TxId) -> TestResult<TxResult> {
         let executor = match &self.executor {
             RunnerExecutor::Builtin(e) => e,
-            RunnerExecutor::External => todo!(),
+            RunnerExecutor::External(_) => todo!(),
         };
         let res = executor.rollback_tx(tx_id).await;
 

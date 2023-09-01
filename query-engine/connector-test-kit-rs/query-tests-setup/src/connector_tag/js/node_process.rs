@@ -60,7 +60,7 @@ impl ExecutorProcess {
                 },
                 init_sender,
             ))
-            .unwrap();
+            .expect("Failed to blocking send the initialize method");
 
         let config_json = init_receiver
             .blocking_recv()
@@ -72,6 +72,7 @@ impl ExecutorProcess {
 
     /// Convenient façade. Allocates more than necessary, but this is only for testing.
     pub(crate) async fn request<T: DeserializeOwned>(&self, method: &str, params: serde_json::Value) -> Result<T> {
+        dbg!("here");
         let (sender, receiver) = oneshot::channel();
         let params = if let serde_json::Value::Object(params) = params {
             params
@@ -87,6 +88,8 @@ impl ExecutorProcess {
 
         self.task_handle.send((method_call, sender)).await?;
         let raw_response = receiver.await?;
+        dbg!(&raw_response);
+        tracing::debug!(%raw_response);
         let response = serde_json::from_value(raw_response)?;
         Ok(response)
     }
@@ -117,71 +120,81 @@ fn start_rpc_thread(mut receiver: mpsc::Receiver<ReqImpl>) -> Result<()> {
         Some(env_var) => env_var,
         None => exit_with_message(1, "start_rpc_thread() error: NODE_TEST_EXECUTOR env var is not defined"),
     };
-    eprintln!("Spawning test executor process at `{env_var}`");
-    let process = Command::new(env_var)
-        .stdin(Stdio::piped())
-        .stdout(Stdio::piped())
-        .spawn()
-        .map_err(|err| GenericError(format!("Failed to spawn node executor process.\nDetails: {err}\n")))?;
 
-    tokio::spawn(async move {
-        let mut stdout = BufReader::new(process.stdout.unwrap()).lines();
-        let mut stdin = process.stdin.unwrap();
-        let mut pending_requests: HashMap<jsonrpc_core::Id, oneshot::Sender<serde_json::value::Value>> = HashMap::new();
+    tokio::runtime::Builder::new_current_thread()
+        .enable_io()
+        .build()
+        .unwrap()
+        .block_on(async move {
+            eprintln!("Spawning test executor process at `{env_var}`");
+            let process = match Command::new(env_var)
+                .stdin(Stdio::piped())
+                .stdout(Stdio::piped())
+                .spawn()
+            {
+                Ok(process) => process,
+                Err(err) => exit_with_message(1, &format!("Failed to spawn the executor process.\nDetails: {err}\n")),
+            };
+            // .map_err(|err| GenericError(format!("Failed to spawn node executor process.\nDetails: {err}\n")))?;
 
-        loop {
-            tokio::select! {
-                line = stdout.next_line() => {
-                    match line {
-                        Ok(Some(line)) => // new response
-                        {
-                            let response: jsonrpc_core::Output = match serde_json::from_str(&line) {
-                                Ok(response) => response,
-                                Err(err) => // log it
-                                {
-                                    tracing::error!(%err, "Error when decoding response from child node process");
-                                    continue
-                                }
-                            };
+            let mut stdout = BufReader::new(process.stdout.unwrap()).lines();
+            let mut stdin = process.stdin.unwrap();
+            let mut pending_requests: HashMap<jsonrpc_core::Id, oneshot::Sender<serde_json::value::Value>> =
+                HashMap::new();
 
-                            let sender = pending_requests.remove(response.id()).unwrap();
-                            match response {
-                                jsonrpc_core::Output::Success(success) => {
-                                    sender.send(success.result).unwrap();
+            loop {
+                tokio::select! {
+                    line = stdout.next_line() => {
+                        match line {
+                            Ok(Some(line)) => // new response
+                            {
+                                let response: jsonrpc_core::Output = match serde_json::from_str(&line) {
+                                    Ok(response) => response,
+                                    Err(err) => // log it
+                                    {
+                                        tracing::error!(%err, "Error when decoding response from child node process");
+                                        continue
+                                    }
+                                };
+
+                                let sender = pending_requests.remove(response.id()).unwrap();
+                                match response {
+                                    jsonrpc_core::Output::Success(success) => {
+                                        sender.send(success.result).unwrap();
+                                    }
+                                    jsonrpc_core::Output::Failure(err) => {
+                                        panic!("error response from jsonrpc: {err:?}")
+                                    }
                                 }
-                                jsonrpc_core::Output::Failure(err) => {
-                                    panic!("error response from jsonrpc: {err:?}")
-                                }
+
                             }
-
-                        }
-                        Ok(None) => // end of the stream
-                        {
-                            exit_with_message(1, "child node process stdout closed")
-                        }
-                        Err(err) => // log it
-                        {
-                            tracing::error!(%err, "Error when reading from child node process");
+                            Ok(None) => // end of the stream
+                            {
+                                exit_with_message(1, "child node process stdout closed")
+                            }
+                            Err(err) => // log it
+                            {
+                                tracing::error!(%err, "Error when reading from child node process");
+                            }
                         }
                     }
-                }
-                request = receiver.recv() => {
-                    match request {
-                        None => // channel closed
-                        {
-                            exit_with_message(1, "The json-rpc client channel was closed");
-                        }
-                        Some((request, response_sender)) => {
-                            pending_requests.insert(request.id.clone(), response_sender);
-                            let mut req = serde_json::to_vec(&request).unwrap();
-                            req.push(b'\n');
-                            stdin.write_all(&req).await.unwrap();
+                    request = receiver.recv() => {
+                        match request {
+                            None => // channel closed
+                            {
+                                exit_with_message(1, "The json-rpc client channel was closed");
+                            }
+                            Some((request, response_sender)) => {
+                                pending_requests.insert(request.id.clone(), response_sender);
+                                let mut req = serde_json::to_vec(&request).unwrap();
+                                req.push(b'\n');
+                                stdin.write_all(&req).await.unwrap();
+                            }
                         }
                     }
                 }
             }
-        }
-    });
+        });
 
     Ok(())
 }
