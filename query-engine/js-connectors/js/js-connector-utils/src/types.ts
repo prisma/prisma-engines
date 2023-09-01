@@ -80,8 +80,6 @@ export interface Connector extends Queryable {
 }
 
 export type TransactionOptions = {
-  isolationLevel: string | undefined
-  isolationFirst: boolean
   usePhantomQuery: boolean
 }
 

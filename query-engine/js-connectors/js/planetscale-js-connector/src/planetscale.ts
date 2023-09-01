@@ -113,8 +113,6 @@ class PrismaPlanetScale extends PlanetScaleQueryable<planetScale.Connection> imp
 
   async startTransaction(isolationLevel?: string) {
     const options: TransactionOptions = {
-      isolationLevel,
-      isolationFirst: true,
       usePhantomQuery: true,
     }
     

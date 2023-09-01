@@ -350,9 +350,6 @@ impl DriverProxy {
 #[derive(Debug)]
 #[napi(object)]
 pub struct TransactionOptions {
-    /// Whether or not to put the isolation level `SET` before or after the `BEGIN`.
-    pub isolation_first: bool,
-
     /// Whether or not to run a phantom query (i.e., a query that only influences Prisma event logs, but not the database itself)
     /// before opening a transaction, committing, or rollbacking.
     pub use_phantom_query: bool,

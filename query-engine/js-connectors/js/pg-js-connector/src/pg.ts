@@ -104,8 +104,6 @@ class PrismaPg extends PgQueryable<StdClient> implements Connector {
 
   async startTransaction(isolationLevel?: string): Promise<Result<Transaction>> {
     const options: TransactionOptions = {
-      isolationLevel,
-      isolationFirst: false,
       usePhantomQuery: false,
     }
 

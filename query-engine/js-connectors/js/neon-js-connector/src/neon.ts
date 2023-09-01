@@ -101,8 +101,6 @@ class NeonWsConnector extends NeonWsQueryable<Pool> implements Connector {
 
   async startTransaction(isolationLevel?: string | undefined): Promise<Result<Transaction>> {
     const options: TransactionOptions = {
-      isolationLevel,
-      isolationFirst: false,
       usePhantomQuery: false,
     }
     
