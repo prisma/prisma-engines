@@ -100,8 +100,10 @@ fn start_rpc_thread(mut receiver: mpsc::Receiver<ReqImpl>) -> std::io::Result<()
     use std::process::Stdio;
     use tokio::process::Command;
 
-    let env_var =
-        std::env::var("NODE_TEST_ADAPTER").map_err(|err| std::io::Error::new(std::io::ErrorKind::Other, err))?;
+    let env_var = match crate::NODE_TEST_EXECUTOR.as_ref() {
+        Some(env_var) => env_var,
+        None => exit_with_message(1, "start_rpc_thread() error: NODE_TEST_EXECUTOR env var is not defined"),
+    };
     let process = Command::new(env_var)
         .stdin(Stdio::piped())
         .stdout(Stdio::piped())
