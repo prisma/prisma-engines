@@ -45,8 +45,10 @@ class PgQueryable<ClientT extends StdClient | TransactionClient>
     const tag = '[js::execute_raw]'
     debug(`${tag} %O`, query)
 
-    const { rowCount } = await this.performIO(query)
-    return { ok: true, value: rowCount }
+    const { rowCount: rowsAffected } = await this.performIO(query)
+    
+    // Note: `rowsAffected` can sometimes be null (e.g., when executing `"BEGIN"`)
+    return { ok: true, value: rowsAffected ?? 0 }
   }
 
   /**
@@ -75,27 +77,17 @@ class PgTransaction extends PgQueryable<TransactionClient>
   }
 
   async commit(): Promise<Result<void>> {
-    const tag = '[js::commit]'
-    debug(`${tag} committing transaction`)
+    debug(`[js::commit]`)
 
-    try {
-      await this.client.query('COMMIT')
-      return { ok: true, value: undefined }
-    } finally {
-      this.client.release()
-    }
+    this.client.release()
+    return Promise.resolve({ ok: true, value: undefined })
   }
 
   async rollback(): Promise<Result<void>> {
-    const tag = '[js::rollback]'
-    debug(`${tag} rolling back the transaction`)
+    debug(`[js::rollback]`)
 
-    try {
-      await this.client.query('ROLLBACK')
-      return { ok: true, value: undefined }
-    } finally {
-      this.client.release()
-    }
+    this.client.release()
+    return Promise.resolve({ ok: true, value: undefined })
   }
 }
 

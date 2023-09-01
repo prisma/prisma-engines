@@ -350,9 +350,6 @@ impl DriverProxy {
 #[derive(Debug)]
 #[napi(object)]
 pub struct TransactionOptions {
-    /// The isolation level to use.
-    pub isolation_level: Option<String>,
-
     /// Whether or not to put the isolation level `SET` before or after the `BEGIN`.
     pub isolation_first: bool,
 

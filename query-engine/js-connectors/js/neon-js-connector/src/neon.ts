@@ -78,23 +78,18 @@ class NeonTransaction extends NeonWsQueryable<PoolClient> implements Transaction
   }
 
   async commit(): Promise<Result<void>> {
-    try {
-      await this.client.query('COMMIT');
-      return { ok: true, value: undefined }
-    } finally {
-      this.client.release()
-    }
+    debug(`[js::commit]`)
+
+    this.client.release()
+    return Promise.resolve({ ok: true, value: undefined })
   }
 
   async rollback(): Promise<Result<void>> {
-    try {
-      await this.client.query('ROLLBACK');
-      return { ok: true, value: undefined }
-    } finally {
-      this.client.release()
-    }
-  }
+    debug(`[js::rollback]`)
 
+    this.client.release()
+    return Promise.resolve({ ok: true, value: undefined })
+  }
 }
 
 class NeonWsConnector extends NeonWsQueryable<Pool> implements Connector {
@@ -110,10 +105,10 @@ class NeonWsConnector extends NeonWsQueryable<Pool> implements Connector {
       isolationFirst: false,
       usePhantomQuery: false,
     }
-
+    
     const tag = '[js::startTransaction]'
     debug(`${tag} options: %O`, options)
-
+    
     const connection = await this.client.connect()
     return { ok: true, value: new NeonTransaction(connection, options) }
   }

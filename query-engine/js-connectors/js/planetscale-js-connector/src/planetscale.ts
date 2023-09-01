@@ -89,17 +89,17 @@ class PlanetScaleTransaction extends PlanetScaleQueryable<planetScale.Transactio
   }
 
   async commit(): Promise<Result<void>> {
-    const tag = '[js::commit]'
-    debug(`${tag} committing transaction`)
+    debug(`[js::commit]`)
+
     this.txDeferred.resolve()
-    return { ok: true, value: await this.txResultPromise };
+    return Promise.resolve({ ok: true, value: await this.txResultPromise })
   }
 
   async rollback(): Promise<Result<void>> {
-    const tag = '[js::rollback]'
-    debug(`${tag} rolling back the transaction`)
+    debug(`[js::rollback]`)
+    
     this.txDeferred.reject(new RollbackError())
-    return { ok: true, value: await this.txResultPromise };
+    return Promise.resolve({ ok: true, value: await this.txResultPromise })
   }
 
 }
@@ -121,7 +121,7 @@ class PrismaPlanetScale extends PlanetScaleQueryable<planetScale.Connection> imp
     const tag = '[js::startTransaction]'
     debug(`${tag} options: %O`, options)
 
-    return new Promise<Result<Transaction>>((resolve) => {
+    return new Promise<Result<Transaction>>((resolve, reject) => {
       const txResultPromise = this.client.transaction(async tx => {
         const [txDeferred, deferredPromise] = createDeferred<void>()
         const txWrapper = new PlanetScaleTransaction(tx, options, txDeferred, txResultPromise)
@@ -132,11 +132,11 @@ class PrismaPlanetScale extends PlanetScaleQueryable<planetScale.Connection> imp
         // Rollback error is ignored (so that tx.rollback() won't crash)
         // any other error is legit and is re-thrown
         if (!(error instanceof RollbackError)) {
-          return Promise.reject(error)
+          return reject(error)
         }
         
         return undefined
-      });
+      })
     })
   }
 

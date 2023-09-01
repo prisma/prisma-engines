@@ -42,8 +42,12 @@ impl QuaintTransaction for JsTransaction {
     async fn commit(&self) -> quaint::Result<()> {
         decrement_gauge!("prisma_client_queries_active", 1.0);
 
+        let commit_stmt = "COMMIT";
+
         if self.options().use_phantom_query {
-            self.raw_phantom_cmd("COMMIT").await?;
+            self.raw_phantom_cmd(commit_stmt).await?;
+        } else {
+            self.inner.raw_cmd(commit_stmt).await?;
         }
 
         self.tx_proxy.commit().await
@@ -52,8 +56,12 @@ impl QuaintTransaction for JsTransaction {
     async fn rollback(&self) -> quaint::Result<()> {
         decrement_gauge!("prisma_client_queries_active", 1.0);
 
+        let rollback_stmt = "ROLLBACK";
+
         if self.options().use_phantom_query {
-            self.raw_phantom_cmd("ROLLBACK").await?;
+            self.raw_phantom_cmd(rollback_stmt).await?;
+        } else {
+            self.inner.raw_cmd(rollback_stmt).await?;
         }
 
         self.tx_proxy.rollback().await
