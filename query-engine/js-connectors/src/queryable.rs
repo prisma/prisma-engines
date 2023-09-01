@@ -239,7 +239,7 @@ impl TransactionCapable for JsQueryable {
         &'a self,
         isolation: Option<IsolationLevel>,
     ) -> quaint::Result<Box<dyn Transaction + 'a>> {
-        let tx = self.driver_proxy.start_transaction(isolation).await?;
+        let tx = self.driver_proxy.start_transaction().await?;
 
         let isolation_first = tx.requires_isolation_first();
 

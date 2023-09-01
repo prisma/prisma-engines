@@ -7,7 +7,7 @@ use crate::transaction::JsTransaction;
 use napi::bindgen_prelude::{FromNapiValue, ToNapiValue};
 use napi::{JsObject, JsString};
 use napi_derive::napi;
-use quaint::connector::{IsolationLevel, ResultSet as QuaintResultSet};
+use quaint::connector::ResultSet as QuaintResultSet;
 use quaint::Value as QuaintValue;
 
 // TODO(jkomyno): import these 3rd-party crates from the `quaint-core` crate.
@@ -33,7 +33,7 @@ pub(crate) struct CommonProxy {
 /// This is a JS proxy for accessing the methods specific to top level
 /// JS driver objects
 pub(crate) struct DriverProxy {
-    start_transaction: AsyncJsFunction<Option<String>, JsTransaction>,
+    start_transaction: AsyncJsFunction<(), JsTransaction>,
 }
 /// This a JS proxy for accessing the methods, specific
 /// to JS transaction objects
@@ -335,14 +335,8 @@ impl DriverProxy {
         })
     }
 
-    pub async fn start_transaction(
-        &self,
-        isolation_level: Option<IsolationLevel>,
-    ) -> quaint::Result<Box<JsTransaction>> {
-        let tx = self
-            .start_transaction
-            .call(isolation_level.map(|l| l.to_string()))
-            .await?;
+    pub async fn start_transaction(&self) -> quaint::Result<Box<JsTransaction>> {
+        let tx = self.start_transaction.call(()).await?;
         Ok(Box::new(tx))
     }
 }

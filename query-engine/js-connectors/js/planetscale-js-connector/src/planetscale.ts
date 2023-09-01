@@ -111,7 +111,7 @@ class PrismaPlanetScale extends PlanetScaleQueryable<planetScale.Connection> imp
     super(client)
   }
 
-  async startTransaction(isolationLevel?: string) {
+  async startTransaction() {
     const options: TransactionOptions = {
       usePhantomQuery: true,
     }

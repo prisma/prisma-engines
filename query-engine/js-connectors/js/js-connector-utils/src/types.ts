@@ -68,10 +68,9 @@ export interface Queryable  {
 
 export interface Connector extends Queryable {
   /**
-   * Starts new transation with the specified isolation level
-   * @param isolationLevel 
+   * Starts new transation.
    */
-  startTransaction(isolationLevel?: string): Promise<Result<Transaction>>
+  startTransaction(): Promise<Result<Transaction>>
 
   /**
    * Closes the connection to the database, if any.
