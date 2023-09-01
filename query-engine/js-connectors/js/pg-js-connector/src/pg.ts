@@ -1,6 +1,6 @@
 import * as pg from 'pg'
 import { bindConnector, Debug } from '@jkomyno/prisma-js-connector-utils'
-import type { ErrorCapturingConnector, Connector, ConnectorConfig, Query, Queryable, Result, ResultSet, Transaction } from '@jkomyno/prisma-js-connector-utils'
+import type { ErrorCapturingConnector, Connector, ConnectorConfig, Query, Queryable, Result, ResultSet, Transaction, TransactionOptions } from '@jkomyno/prisma-js-connector-utils'
 import { fieldToColumnType } from './conversion'
 
 const debug = Debug('prisma:js-connector:pg')
@@ -70,7 +70,7 @@ class PgQueryable<ClientT extends StdClient | TransactionClient>
 
 class PgTransaction extends PgQueryable<TransactionClient>
   implements Transaction {
-  constructor(client: pg.PoolClient) {
+  constructor(client: pg.PoolClient, readonly options: TransactionOptions) {
     super(client)
   }
 
@@ -111,16 +111,17 @@ class PrismaPg extends PgQueryable<StdClient> implements Connector {
   }
 
   async startTransaction(isolationLevel?: string): Promise<Result<Transaction>> {
-    const connection = await this.client.connect()
-    await connection.query('BEGIN')
-
-    if (isolationLevel) {
-      await connection.query(
-        `SET TRANSACTION ISOLATION LEVEL ${isolationLevel}`,
-      )
+    const options: TransactionOptions = {
+      isolationLevel,
+      isolationFirst: false,
+      usePhantomQuery: false,
     }
 
-    return { ok: true, value: new PgTransaction(connection) }
+    const tag = '[js::startTransaction]'
+    debug(`${tag} options: %O`, options)
+
+    const connection = await this.client.connect()
+    return { ok: true, value: new PgTransaction(connection, options) }
   }
 
   async close() {
