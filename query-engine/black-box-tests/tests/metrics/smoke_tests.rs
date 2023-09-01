@@ -55,15 +55,21 @@ mod smoke_tests {
                 .await
                 .unwrap();
 
+            // counters
             assert!(metrics.contains("prisma_client_queries_total counter"));
             assert!(metrics.contains("prisma_datasource_queries_total counter"));
-            assert!(metrics.contains("prisma_pool_connections_open counter"));
-            assert!(metrics.contains("prisma_client_queries_active gauge"));
-            assert!(metrics.contains("prisma_client_queries_wait gauge"));
+            assert!(metrics.contains("prisma_pool_connections_opened_total counter"));
+            assert!(metrics.contains("prisma_pool_connections_closed_total counter"));
+            //gauges
+            assert!(metrics.contains("prisma_pool_connections_open gauge"));
             assert!(metrics.contains("prisma_pool_connections_busy gauge"));
             assert!(metrics.contains("prisma_pool_connections_idle gauge"));
-            assert!(metrics.contains("prisma_pool_connections_opened_total gauge"));
-            assert!(metrics.contains("prisma_datasource_queries_duration_histogram_ms_bucket"));
+            assert!(metrics.contains("prisma_client_queries_active gauge"));
+            assert!(metrics.contains("prisma_client_queries_wait gauge"));
+            //histograms
+            assert!(metrics.contains("prisma_client_queries_duration_histogram_ms histogram"));
+            assert!(metrics.contains("prisma_client_queries_wait_histogram_ms histogram"));
+            assert!(metrics.contains("prisma_datasource_queries_duration_histogram_ms histogram"));
         })
         .await
     }
