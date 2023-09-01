@@ -1,5 +1,5 @@
 import { createNeonConnector } from '@jkomyno/prisma-neon-js-connector'
-import { smokeTest } from './test'
+import { smokeTestLibquery } from './libquery' 
 
 async function neon() {
   const connectionString = `${process.env.JS_NEON_DATABASE_URL as string}`
@@ -9,7 +9,7 @@ async function neon() {
     httpMode: false,
   })
 
-  await smokeTest(db, '../prisma/postgres/schema.prisma')
+  await smokeTestLibquery(db, '../../prisma/postgres/schema.prisma')
 }
 
 neon().catch((e) => {
