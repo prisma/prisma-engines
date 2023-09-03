@@ -3,7 +3,7 @@ generator client {
 }
 
 datasource db {
-  provider = "@prisma/libsql"
+  provider = "sqlite"
   url      = "file:foo.bar?foo=bar" // env("JS_LIBSQL_DATABASE_URL") // TODO Figure out why random key-value pair is needed not to crash here
 }
 
