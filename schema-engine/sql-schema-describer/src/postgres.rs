@@ -1004,7 +1004,7 @@ impl<'a> SqlSchemaDescriber<'a> {
         let (character_maximum_length, numeric_precision, numeric_scale, time_precision) =
             if matches!(col.get_expect_string("data_type").as_str(), "ARRAY") {
                 fn get_single(formatted_type: &str) -> Option<u32> {
-                    static SINGLE_REGEX: Lazy<Regex> = Lazy::new(|| Regex::new(r#".*\(([0-9]*)\).*\[\]$"#).unwrap());
+                    static SINGLE_REGEX: Lazy<Regex> = Lazy::new(|| Regex::new(r".*\(([0-9]*)\).*\[\]$").unwrap());
 
                     SINGLE_REGEX
                         .captures(formatted_type)
@@ -1014,7 +1014,7 @@ impl<'a> SqlSchemaDescriber<'a> {
 
                 fn get_dual(formatted_type: &str) -> (Option<u32>, Option<u32>) {
                     static DUAL_REGEX: Lazy<Regex> =
-                        Lazy::new(|| Regex::new(r#"numeric\(([0-9]*),([0-9]*)\)\[\]$"#).unwrap());
+                        Lazy::new(|| Regex::new(r"numeric\(([0-9]*),([0-9]*)\)\[\]$").unwrap());
                     let first = DUAL_REGEX
                         .captures(formatted_type)
                         .and_then(|cap| cap.get(1).and_then(|precision| precision.as_str().parse().ok()));

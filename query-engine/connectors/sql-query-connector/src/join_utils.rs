@@ -98,7 +98,7 @@ fn compute_aggr_join_one2m(
     // + GROUP BY Child.<fk>
     let query = right_fields.iter().fold(query, |acc, f| acc.group_by(f.as_column(ctx)));
 
-    let pairs = left_fields.into_iter().zip(right_fields.into_iter());
+    let pairs = left_fields.into_iter().zip(right_fields);
     let on_conditions: Vec<Expression> = pairs
         .map(|(a, b)| {
             let col_a = match previous_join {
@@ -238,7 +238,7 @@ pub(crate) fn compute_one2m_join(
     let right_table_alias = format!("{}_{}", join_prefix, rf.related_model().name());
 
     let related_model = rf.related_model();
-    let pairs = left_fields.into_iter().zip(right_fields.into_iter());
+    let pairs = left_fields.into_iter().zip(right_fields);
 
     let on_conditions: Vec<Expression> = pairs
         .map(|(a, b)| {

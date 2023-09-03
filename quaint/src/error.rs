@@ -138,6 +138,11 @@ impl Error {
     pub fn raw_connector_error(status: String, reason: String) -> Error {
         Error::builder(ErrorKind::RawConnectorError { status, reason }).build()
     }
+
+    // Builds an error from an externally stored error
+    pub fn external_error(error_id: i32) -> Error {
+        Error::builder(ErrorKind::ExternalError(error_id)).build()
+    }
 }
 
 impl fmt::Display for Error {
@@ -272,6 +277,9 @@ pub enum ErrorKind {
 
     #[error("Column type '{}' could not be deserialized from the database.", column_type)]
     UnsupportedColumnType { column_type: String },
+
+    #[error("External error id#{}", _0)]
+    ExternalError(i32),
 }
 
 impl ErrorKind {

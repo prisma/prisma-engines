@@ -1,7 +1,7 @@
 import * as planetScale from '@planetscale/database'
 import type { Config as PlanetScaleConfig } from '@planetscale/database'
-import { bindConnector, bindTransaction, Debug } from '@jkomyno/prisma-js-connector-utils'
-import type { Connector, ResultSet, Query, ConnectorConfig, Queryable, Transaction } from '@jkomyno/prisma-js-connector-utils'
+import { bindConnector, Debug } from '@jkomyno/prisma-js-connector-utils'
+import type { Connector, ResultSet, Query, ConnectorConfig, Queryable, Transaction, Result, ErrorCapturingConnector } from '@jkomyno/prisma-js-connector-utils'
 import { type PlanetScaleColumnType, fieldToColumnType } from './conversion'
 import { createDeferred, Deferred } from './deferred'
 
@@ -29,7 +29,7 @@ class PlanetScaleQueryable<ClientT extends planetScale.Connection | planetScale.
   /**
    * Execute a query given as SQL, interpolating the given parameters.
    */
-  async queryRaw(query: Query): Promise<ResultSet> {
+  async queryRaw(query: Query): Promise<Result<ResultSet>> {
     const tag = '[js::query_raw]'
     debug(`${tag} %O`, query)
 
@@ -43,7 +43,7 @@ class PlanetScaleQueryable<ClientT extends planetScale.Connection | planetScale.
       lastInsertId,
     }
 
-    return resultSet
+    return { ok: true, value: resultSet }
   }
 
   /**
@@ -51,12 +51,12 @@ class PlanetScaleQueryable<ClientT extends planetScale.Connection | planetScale.
    * returning the number of affected rows.
    * Note: Queryable expects a u64, but napi.rs only supports u32.
    */
-  async executeRaw(query: Query): Promise<number> {
+  async executeRaw(query: Query): Promise<Result<number>> {
     const tag = '[js::execute_raw]'
     debug(`${tag} %O`, query)
 
     const { rowsAffected } = await this.performIO(query)
-    return rowsAffected
+    return { ok: true, value: rowsAffected }
   }
 
   /**
@@ -83,18 +83,18 @@ class PlanetScaleTransaction extends PlanetScaleQueryable<planetScale.Transactio
     super(tx)
   }
 
-  commit(): Promise<void> {
+  async commit(): Promise<Result<void>> {
     const tag = '[js::commit]'
     debug(`${tag} committing transaction`)
     this.txDeferred.resolve()
-    return this.txResultPromise;
+    return { ok: true, value: await this.txResultPromise };
   }
 
-  rollback(): Promise<void> {
+  async rollback(): Promise<Result<void>> {
     const tag = '[js::rollback]'
     debug(`${tag} rolling back the transaction`)
     this.txDeferred.reject(new RollbackError())
-    return this.txResultPromise;
+    return { ok: true, value: await this.txResultPromise };
   }
 
 }
@@ -108,7 +108,7 @@ class PrismaPlanetScale extends PlanetScaleQueryable<planetScale.Connection> imp
   }
 
   async startTransaction(isolationLevel?: string) {
-    return new Promise<Transaction>((resolve) => {
+    return new Promise<Result<Transaction>>((resolve) => {
       const txResultPromise = this.client.transaction(async tx => {
         if (isolationLevel) {
           await tx.execute(`SET TRANSACTION ISOLATION LEVEL ${isolationLevel}`)
@@ -116,7 +116,7 @@ class PrismaPlanetScale extends PlanetScaleQueryable<planetScale.Connection> imp
         const [txDeferred, deferredPromise] = createDeferred<void>()
         const txWrapper = new PlanetScaleTransaction(tx, txDeferred, txResultPromise)
 
-        resolve(bindTransaction(txWrapper));
+        resolve({ ok: true, value: txWrapper });
 
         return deferredPromise
       }).catch(error => {
@@ -131,10 +131,12 @@ class PrismaPlanetScale extends PlanetScaleQueryable<planetScale.Connection> imp
     })
   }
 
-  async close() {}
+  async close() {
+    return { ok: true as const, value: undefined }
+  }
 }
 
-export const createPlanetScaleConnector = (config: PrismaPlanetScaleConfig): Connector => {
+export const createPlanetScaleConnector = (config: PrismaPlanetScaleConfig): ErrorCapturingConnector => {
   const db = new PrismaPlanetScale(config)
   return bindConnector(db)
 }

@@ -9,7 +9,7 @@ async function neon() {
     httpMode: false,
   })
 
-  await smokeTest(db, '../prisma/postgres-neon/schema.prisma')
+  await smokeTest(db, '../prisma/postgres/schema.prisma')
 }
 
 neon().catch((e) => {
