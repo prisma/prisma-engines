@@ -18,7 +18,8 @@ function isDateTimeString(input: string) {
  * the correct quaint::Value variant.
  */
 export function resultToColumnType(key, value): ColumnType {
-  // console.log("resultToColumnType", key, value, typeof value)
+  if(!value)
+    return ColumnTypeEnum.Text
 
   switch (typeof value) {
     case "string":
@@ -47,6 +48,7 @@ export function resultToColumnType(key, value): ColumnType {
       */
 
     default:
+      console.log("conversion.ts: !!! Unsupported column type", typeof value, value)
       throw new Error(`Unsupported column type: ${typeof value}`)
   }
 }

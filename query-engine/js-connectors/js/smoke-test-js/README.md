@@ -39,9 +39,11 @@ In the current directory:
 
 ### libsql/Turso
 
-- Create a new database with [Turso CLI](https://docs.libsql.tech/reference/libsql-cli) `libsql db create` and then get connection string and authentication token: `libsql db show ...` + `libsql db tokens create ...`
+- Create a new database with [Turso CLI](https://docs.turso.tech/reference/libsql-cli) `turso db create` and then get connection string and authentication token: `turso db show ...` + `turso db tokens create ...`
 - Store both in `JS_LIBSQL_DATABASE_URL` and `JS_LIBSQL_TOKEN`. 
 
 In the current directory:
-- Run `pnpm prisma:libsql` to push the Prisma schema and insert the test data.
+- ~~Run `pnpm prisma:libsql` to push the Prisma schema and insert the test data.~~
+  - Manually run `migrations/20230903101652_init/migration.sql` and `commands/type_test/insert.sql` via `turso db shell`
+    - Migration was originally created via `pnpm prisma migrate dev --schema ./prisma/sqlite-libsql/schema.prisma`
 - Run `pnpm libsql` to run smoke tests against the LibSQL/Turso database.

@@ -1,6 +1,6 @@
 import { createClient, Client, Transaction as LibsqlClientTransaction, InArgs } from "@libsql/client";
-import { bindConnector, bindTransaction, Debug } from '@jkomyno/prisma-js-connector-utils'
-import type { Connector, ConnectorConfig, Query, Queryable, ResultSet, Transaction } from '@jkomyno/prisma-js-connector-utils'
+import { bindConnector, Debug } from '@jkomyno/prisma-js-connector-utils'
+import type { ErrorCapturingConnector, Connector, ConnectorConfig, Query, Queryable, Result, ResultSet, Transaction } from '@jkomyno/prisma-js-connector-utils'
 import { resultToColumnType } from './conversion'
 
 const debug = Debug('prisma:js-connector:libsql')
@@ -25,7 +25,7 @@ class LibsqlQueryable<ClientT extends StdClient | TransactionClient>
   /**
    * Execute a query given as SQL, interpolating the given parameters.
    */
-  async queryRaw(query: Query): Promise<ResultSet> {
+  async queryRaw(query: Query): Promise<Result<ResultSet>> {
     // console.log("### queryRaw")
     const tag = '[js::query_raw]'
     debug(`${tag} %O`, query)
@@ -43,15 +43,21 @@ class LibsqlQueryable<ClientT extends StdClient | TransactionClient>
     let firstResult = {}
     firstResult = results[0]
 
-    const resultSet: ResultSet = {
-      columnNames: fields,
-      columnTypes: Object.keys(firstResult).map(key => resultToColumnType(key, firstResult[key])),
-      rows: results.map((result) => fields.map((column) => result[column])),
+    let resultSet: ResultSet
+    // Handle no results case explicitly TODO Really needed?
+    if(firstResult) {
+      resultSet = {
+        columnNames: fields,
+        columnTypes: Object.keys(firstResult).map((key) => resultToColumnType(key, firstResult[key])),
+        rows: results.map((result) => fields.map((column) => result[column]))
+      };
+    } else {
+      resultSet = { columnNames: [], columnTypes: [], rows: [] }
     }
 
     // console.log("resultSet", resultSet)
 
-    return resultSet
+    return { ok: true, value: resultSet }
   }
 
   /**
@@ -59,13 +65,14 @@ class LibsqlQueryable<ClientT extends StdClient | TransactionClient>
    * returning the number of affected rows.
    * Note: Queryable expects a u64, but napi.rs only supports u32.
    */
-  async executeRaw(query: Query): Promise<number> {
+  async executeRaw(query: Query): Promise<Result<number>> {
     // console.log("### executeRaw")
     const tag = '[js::execute_raw]'
     debug(`${tag} %O`, query)
 
     const { rowsAffected } = await this.performIO(query)
-    return rowsAffected
+    return { ok: true, value: rowsAffected }
+
   }
 
   /**
@@ -96,23 +103,25 @@ class LibsqlTransaction extends LibsqlQueryable<TransactionClient>
     super(client)
   }
 
-  async commit(): Promise<void> {
+  async commit(): Promise<Result<void>> {
     const tag = '[js::commit]'
     debug(`${tag} committing transaction`)
 
     try {
       await this.client.execute('COMMIT')
+      return { ok: true, value: undefined }
     } finally {
       //this.client.release()
     }
   }
 
-  async rollback(): Promise<void> {
+  async rollback(): Promise<Result<void>> {
     const tag = '[js::rollback]'
     debug(`${tag} rolling back the transaction`)
 
     try {
       await this.client.execute('ROLLBACK')
+      return { ok: true, value: undefined }
     } finally {
       //this.client.release()
     }
@@ -134,10 +143,11 @@ class PrismaLibsql extends LibsqlQueryable<StdClient> implements Connector {
     super(client)
   }
 
-  async startTransaction(isolationLevel?: string): Promise<Transaction> {
+  async startTransaction(isolationLevel?: string): Promise<Result<Transaction>> {
     const transaction = await this.client.transaction("write");
-    
-    //const connection = await this.client.connect()
+    // console.log("startTransaction")
+  
+    // const connection = await this.client.connect()
     // await connection.query('BEGIN')
 
     // if (isolationLevel) {
@@ -146,13 +156,15 @@ class PrismaLibsql extends LibsqlQueryable<StdClient> implements Connector {
     //   )
     // }
 
-    return bindTransaction(new LibsqlTransaction(transaction))
+    return { ok: true, value: new LibsqlTransaction(transaction) }
   }
 
-  async close() {}
+  async close() {
+    return { ok: true as const, value: undefined }
+  }
 }
 
-export const createLibsqlConnector = (config: PrismaLibsqlConfig): Connector => {
+export const createLibsqlConnector = (config: PrismaLibsqlConfig): ErrorCapturingConnector => {
   const db = new PrismaLibsql(config)
   return bindConnector(db)
 }

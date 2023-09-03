@@ -16,6 +16,13 @@ CREATE TABLE "type_test" (
 );
 
 -- CreateTable
+CREATE TABLE "type_test_2" (
+    "id" TEXT NOT NULL PRIMARY KEY,
+    "datetime_column" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "datetime_column_null" DATETIME
+);
+
+-- CreateTable
 CREATE TABLE "Child" (
     "c" TEXT NOT NULL,
     "c_1" TEXT NOT NULL,
@@ -40,6 +47,11 @@ CREATE TABLE "authors" (
     "firstName" TEXT NOT NULL,
     "lastName" TEXT NOT NULL,
     "age" INTEGER NOT NULL
+);
+
+-- CreateTable
+CREATE TABLE "Product" (
+    "id" TEXT NOT NULL PRIMARY KEY
 );
 
 -- CreateIndex

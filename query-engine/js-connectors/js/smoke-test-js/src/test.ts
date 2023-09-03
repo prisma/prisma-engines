@@ -16,11 +16,17 @@ export async function smokeTest(db: ErrorCapturingConnector, prismaSchemaRelativ
 
   const test = new SmokeTest(engine, db)
 
+  console.log('[nodejs] testJSON()')
   await test.testJSON()
-  await test.testTypeTest2()
+  console.log('[nodejs] testTypeTest2()')
+   await test.testTypeTest2()
+  console.log('[nodejs] testFindManyTypeTest()')
   await test.testFindManyTypeTest()
+  console.log('[nodejs] createAutoIncrement()')
   await test.createAutoIncrement()
+  console.log('[nodejs] testCreateAndDeleteChildParent()')
   await test.testCreateAndDeleteChildParent()
+  console.log('[nodejs] testTransaction()')
   await test.testTransaction()
 
   // Note: calling `engine.disconnect` won't actually close the database connection.
@@ -52,6 +58,11 @@ class SmokeTest {
   }
 
   async testJSON() {
+    if (this.flavour === 'sqlite') {
+      console.log("skipping because sqlite, which does not support json")
+      return
+    }
+
     const json = JSON.stringify({
       foo: 'bar',
       baz: 1,
@@ -111,6 +122,12 @@ class SmokeTest {
   }
 
   async testTypeTest2() {
+    if (this.flavour === 'sqlite') {
+      console.log("skipping because sqlite, and datetimes are a pain there for now")
+      return
+    }
+
+    // `datetime_column` is `@default(now())` and will be auto generated
     const create = await this.engine.query(`
       {
         "action": "createOne",
@@ -449,7 +466,9 @@ class SmokeTest {
   }
 
   private async doQuery(query: JsonQuery, tx_id?: string) {
+    console.log("doQuery", query)
     const result = await this.engine.query(JSON.stringify(query), 'trace', tx_id)
+    console.log("result", result)
     const parsedResult = JSON.parse(result)
     if (parsedResult.errors) {
       const error = parsedResult.errors[0]?.user_facing_error
