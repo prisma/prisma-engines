@@ -4,6 +4,11 @@ function isDateTimeString(input: string) {
   // Regular expression to match the format "YYYY-MM-DD HH:MM:SS"
   const dateRegex = /^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$/;
 
+  /* Alternative that matches the SQLite DateTime format as well
+  // Regular expression to match the format "YYYY-MM-DD(T)HH:MM:SS(.xxx+00:00)"
+  // const dateRegex = /^\d{4}-\d{2}-\d{2}( |T)\d{2}:\d{2}:\d{2}(\.\d{3}\+00:00)?$/;
+  */
+
   if (!dateRegex.test(input)) {
     return false; // Doesn't match the expected format
   }
