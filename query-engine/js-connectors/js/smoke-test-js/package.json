@@ -1,0 +1,38 @@
+{
+  "name": "@jkomyno/smoke-test-js",
+  "private": true,
+  "version": "0.0.0",
+  "description": "",
+  "scripts": {
+    "prisma:db:push:postgres": "prisma db push --schema ./prisma/postgres/schema.prisma --force-reset",
+    "prisma:db:execute:postgres": "prisma db execute --schema ./prisma/postgres/schema.prisma --file ./prisma/postgres/commands/type_test/insert.sql",
+    "prisma:db:push:mysql": "prisma db push --schema ./prisma/mysql/schema.prisma --force-reset",
+    "prisma:db:execute:mysql": "prisma db execute --schema ./prisma/mysql/schema.prisma --file ./prisma/mysql/commands/type_test/insert.sql",
+    "prisma:neon": "cross-env-shell DATABASE_URL=\"${JS_NEON_DATABASE_URL}\" \"pnpm prisma:db:push:postgres && pnpm prisma:db:execute:postgres\"",
+    "neon": "cross-env-shell DATABASE_URL=\"${JS_NEON_DATABASE_URL}\" \"tsx ./src/neon.ts\"",
+    "prisma:pg": "cross-env-shell DATABASE_URL=\"${JS_PG_DATABASE_URL}\" \"pnpm prisma:db:push:postgres && pnpm prisma:db:execute:postgres\"",
+    "pg": "cross-env-shell DATABASE_URL=\"${JS_PG_DATABASE_URL}\" \"tsx ./src/pg.ts\"",
+    "prisma:planetscale": "cross-env-shell DATABASE_URL=\"${JS_PLANETSCALE_DATABASE_URL}\" \"pnpm prisma:db:push:mysql && pnpm prisma:db:execute:mysql\"",
+    "planetscale": "cross-env-shell DATABASE_URL=\"${JS_PLANETSCALE_DATABASE_URL}\" \"tsx ./src/planetscale.ts\"",
+    "xata": "cross-env-shell DATABASE_URL=\"postgres://TODO\" \"tsx ./src/xata.ts\""
+  },
+  "keywords": [],
+  "author": "Alberto Schiabel <schiabel@prisma.io>",
+  "license": "Apache-2.0",
+  "sideEffects": true,
+  "dependencies": {
+    "@jkomyno/prisma-js-connector-utils": "workspace:*",
+    "@jkomyno/prisma-neon-js-connector": "workspace:*",
+    "@jkomyno/prisma-pg-js-connector": "workspace:*",
+    "@jkomyno/prisma-planetscale-js-connector": "workspace:*",
+    "@jkomyno/prisma-xata-js-connector": "workspace:*",
+    "@prisma/client": "5.2.0",
+    "@xata.io/cli": "^0.13.9",
+    "@xata.io/client": "^0.26.3"
+  },
+  "devDependencies": {
+    "cross-env": "^7.0.3",
+    "prisma": "5.2.0",
+    "tsx": "^3.12.7"
+  }
+}

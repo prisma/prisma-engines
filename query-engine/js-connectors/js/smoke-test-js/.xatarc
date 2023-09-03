@@ -1,0 +1,6 @@
+{
+  "databaseURL": "https://Prisma-dlq8pi.us-east-1.xata.sh/db/js-connector",
+  "codegen": {
+    "output": "src/xata_gen.ts"
+  }
+}
