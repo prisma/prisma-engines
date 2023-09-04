@@ -41,9 +41,6 @@ const schemas: Record<number, engines.QueryEngineInstance> = {}
 
 async function handleRequest(method: string, params: unknown): Promise<unknown> {
     switch (method) {
-        case 'initialize': {
-            return { datamodel_provider: "postgresql" }
-        }
         case 'initializeSchema': {
             interface InitializeSchemaParams {
                 schema: string

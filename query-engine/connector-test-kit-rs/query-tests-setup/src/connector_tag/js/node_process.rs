@@ -1,11 +1,7 @@
 use super::*;
 use once_cell::sync::Lazy;
 use serde::de::DeserializeOwned;
-use std::{
-    fmt::Display,
-    io::{self, Write},
-    sync::atomic::Ordering,
-};
+use std::{fmt::Display, io::Write as _, sync::atomic::Ordering};
 use tokio::sync::{mpsc, oneshot};
 
 type Result<T> = std::result::Result<T, Box<dyn std::error::Error + Send + Sync>>;
@@ -33,9 +29,8 @@ fn exit_with_message(status_code: i32, message: &str) -> ! {
 }
 
 impl ExecutorProcess {
-    fn new() -> Result<(ExecutorProcess, ProcessConfig)> {
+    fn new() -> Result<ExecutorProcess> {
         let (sender, receiver) = mpsc::channel::<ReqImpl>(300);
-        let (init_sender, init_receiver) = oneshot::channel::<serde_json::Value>();
 
         std::thread::spawn(|| match start_rpc_thread(receiver) {
             Ok(()) => (),
@@ -44,30 +39,10 @@ impl ExecutorProcess {
             }
         });
 
-        let process = ExecutorProcess {
+        Ok(ExecutorProcess {
             task_handle: sender,
             request_id_counter: Default::default(),
-        };
-
-        process
-            .task_handle
-            .blocking_send((
-                jsonrpc_core::MethodCall {
-                    jsonrpc: Some(jsonrpc_core::Version::V2),
-                    method: "initialize".to_owned(),
-                    params: jsonrpc_core::Params::Map(Default::default()),
-                    id: jsonrpc_core::Id::Num(process.request_id_counter.fetch_add(1, Ordering::Relaxed)),
-                },
-                init_sender,
-            ))
-            .expect("Failed to blocking send the initialize method");
-
-        let config_json = init_receiver
-            .blocking_recv()
-            .map_err(|err| io::Error::new(io::ErrorKind::Other, err))?;
-        let config = serde_json::from_value(config_json).unwrap();
-
-        Ok((process, config))
+        })
     }
 
     /// Convenient façade. Allocates more than necessary, but this is only for testing.
@@ -94,7 +69,7 @@ impl ExecutorProcess {
     }
 }
 
-pub(super) static NODE_PROCESS: Lazy<(ExecutorProcess, ProcessConfig)> =
+pub(super) static NODE_PROCESS: Lazy<ExecutorProcess> =
     Lazy::new(|| match std::thread::spawn(ExecutorProcess::new).join() {
         Ok(Ok(process)) => process,
         Ok(Err(err)) => exit_with_message(1, &format!("Failed to start node process. Details: {err}")),
@@ -105,11 +80,6 @@ pub(super) static NODE_PROCESS: Lazy<(ExecutorProcess, ProcessConfig)> =
     });
 
 type ReqImpl = (jsonrpc_core::MethodCall, oneshot::Sender<serde_json::value::Value>);
-
-#[derive(Default, Deserialize)]
-pub(super) struct ProcessConfig {
-    pub(super) datamodel_provider: String,
-}
 
 fn start_rpc_thread(mut receiver: mpsc::Receiver<ReqImpl>) -> Result<()> {
     use std::process::Stdio;
@@ -148,7 +118,6 @@ fn start_rpc_thread(mut receiver: mpsc::Receiver<ReqImpl>) -> Result<()> {
                         match line {
                             Ok(Some(line)) => // new response
                             {
-                                dbg!(&line);
                                 let response: jsonrpc_core::Output = match serde_json::from_str(&line) {
                                     Ok(response) => response,
                                     Err(err) => // log it
@@ -189,7 +158,6 @@ fn start_rpc_thread(mut receiver: mpsc::Receiver<ReqImpl>) -> Result<()> {
                                 pending_requests.insert(request.id.clone(), response_sender);
                                 let mut req = serde_json::to_vec(&request).unwrap();
                                 req.push(b'\n');
-                                dbg!(std::str::from_utf8( &req));
                                 stdin.write_all(&req).await.unwrap();
                             }
                         }

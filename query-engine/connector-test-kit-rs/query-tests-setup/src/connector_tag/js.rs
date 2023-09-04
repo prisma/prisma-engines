@@ -5,7 +5,7 @@ use node_process::*;
 use query_core::{
     executor::TransactionManager, protocol::EngineProtocol, schema::QuerySchemaRef, TransactionOptions, TxId,
 };
-use serde::{de::DeserializeOwned, Deserialize};
+use serde::de::DeserializeOwned;
 use serde_json::json;
 use std::{collections::HashMap, sync::atomic::AtomicU64};
 use tokio::io::{AsyncBufReadExt, AsyncWriteExt, BufReader};
@@ -14,44 +14,7 @@ pub(crate) async fn executor_process_request<T: DeserializeOwned>(
     method: &str,
     params: serde_json::Value,
 ) -> Result<T, Box<dyn std::error::Error + Send + Sync>> {
-    NODE_PROCESS.0.request(method, params).await
-}
-
-#[derive(Debug, Default, Clone, PartialEq)]
-pub struct NodeDrivers;
-
-impl ConnectorTagInterface for NodeDrivers {
-    fn raw_execute<'a>(&'a self, query: &'a str, connection_url: &'a str) -> BoxFuture<'a, Result<(), TestError>> {
-        Box::pin(async move {
-            NODE_PROCESS
-                .0
-                .request::<()>(
-                    "rawExecute",
-                    json!({
-                        "query": query,
-                        "connection_url": connection_url,
-                    }),
-                )
-                .await
-                .unwrap();
-            Ok(())
-        })
-    }
-
-    fn datamodel_provider(&self) -> &str {
-        &NODE_PROCESS.1.datamodel_provider
-    }
-
-    fn datamodel_renderer(&self) -> Box<dyn DatamodelRenderer> {
-        match self.datamodel_provider() {
-            "postgresql" => todo!(),
-            provider => todo!("provider: {provider}"),
-        }
-    }
-
-    fn capabilities(&self) -> ConnectorCapabilities {
-        todo!()
-    }
+    NODE_PROCESS.request(method, params).await
 }
 
 #[async_trait::async_trait]
@@ -62,7 +25,7 @@ impl TransactionManager for ExecutorProcess {
         _engine_protocol: EngineProtocol,
         _opts: TransactionOptions,
     ) -> query_core::Result<TxId> {
-        let txid: String = NODE_PROCESS.0.request("startTx", json!(null)).await.map_err(|err| {
+        let txid: String = NODE_PROCESS.request("startTx", json!(null)).await.map_err(|err| {
             query_core::CoreError::ConnectorError(query_core::ConnectorError::from_kind(
                 query_core::ConnectorErrorKind::RawDatabaseError {
                     code: String::from("0"),
@@ -76,7 +39,6 @@ impl TransactionManager for ExecutorProcess {
 
     async fn commit_tx(&self, tx_id: TxId) -> Result<(), query_core::CoreError> {
         NODE_PROCESS
-            .0
             .request("commitTx", json!({ "txId": tx_id.to_string() }))
             .await
             .map_err(|err| {
@@ -93,7 +55,6 @@ impl TransactionManager for ExecutorProcess {
 
     async fn rollback_tx(&self, tx_id: TxId) -> Result<(), query_core::CoreError> {
         NODE_PROCESS
-            .0
             .request("rollbackTx", json!({ "txId": tx_id.to_string() }))
             .await
             .map_err(|err| {

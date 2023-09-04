@@ -7,11 +7,12 @@ mod sql_server;
 mod sqlite;
 mod vitess;
 
-pub use js::*;
-pub use mysql::*;
+pub use mysql::MySqlVersion;
 
 pub(crate) use cockroachdb::*;
+pub(crate) use js::*;
 pub(crate) use mongodb::*;
+pub(crate) use mysql::*;
 pub(crate) use postgres::*;
 pub(crate) use sql_server::*;
 pub(crate) use sqlite::*;
