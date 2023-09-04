@@ -19,6 +19,7 @@ export async function smokeTestLibquery(db: ErrorCapturingConnector, prismaSchem
   await test.createAutoIncrement()
   await test.testCreateAndDeleteChildParent()
   await test.testTransaction()
+  await test.testRawError()
 
   // Note: calling `engine.disconnect` won't actually close the database connection.
   console.log('[nodejs] disconnecting...')
@@ -415,6 +416,25 @@ class SmokeTest {
 
     const commitResponse = await this.engine.commitTransaction(tx_id, 'trace')
     console.log('[nodejs] commited', commitResponse)
+  }
+
+  async testRawError() {
+    try {
+      await this.doQuery({
+        action: 'queryRaw',
+        query: {
+          selection: { $scalars: true },
+          arguments: {
+            query: 'NOT A VALID SQL, THIS WILL FAIL',
+            parameters: '[]'
+          }
+        }
+      })
+      console.log(`[nodejs] expected exception, but query succeeded`)
+    } catch (error) {
+      console.log('[nodejs] caught expected error', error)
+    }
+
   }
 
   private async doQuery(query: JsonQuery, tx_id?: string) {

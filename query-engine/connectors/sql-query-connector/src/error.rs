@@ -19,6 +19,9 @@ pub(crate) enum RawError {
     UnsupportedColumnType {
         column_type: String,
     },
+    External {
+        id: i32,
+    },
 }
 
 impl From<RawError> for SqlError {
@@ -39,6 +42,7 @@ impl From<RawError> for SqlError {
                 code: code.unwrap_or_else(|| String::from("N/A")),
                 message: message.unwrap_or_else(|| String::from("N/A")),
             },
+            RawError::External { id } => Self::ExternalError(id),
         }
     }
 }
@@ -57,6 +61,7 @@ impl From<quaint::error::Error> for RawError {
                 column_type: column_type.to_owned(),
             },
             quaint::error::ErrorKind::QueryInvalidInput(message) => Self::QueryInvalidInput(message.to_owned()),
+            quaint::error::ErrorKind::ExternalError(id) => Self::External { id: *id },
             _ => Self::Database {
                 code: e.original_code().map(ToString::to_string),
                 message: e.original_message().map(ToString::to_string),
