@@ -89,8 +89,29 @@ class PgTransaction extends PgQueryable<TransactionClient>
   }
 }
 
+<<<<<<< HEAD:query-engine/driver-adapters/js/adapter-pg/src/pg.ts
 export class PrismaPg extends PgQueryable<StdClient> implements DriverAdapter {
   constructor(client: pg.Pool) {
+||||||| parent of 792f6fa29f (end-to-end baseline correctness on query()):query-engine/js-connectors/js/pg-js-connector/src/pg.ts
+class PrismaPg extends PgQueryable<StdClient> implements Connector {
+  constructor(config: PrismaPgConfig) {
+    const { url: connectionString } = config
+    
+    const client = new pg.Pool({
+      connectionString,
+    })
+
+=======
+class PrismaPg extends PgQueryable<StdClient> implements Connector {
+  constructor(config: PrismaPgConfig) {
+    const { url: connectionString } = config
+    
+    console.error("Starting a postgres pool")
+    const client = new pg.Pool({
+      connectionString,
+    })
+
+>>>>>>> 792f6fa29f (end-to-end baseline correctness on query()):query-engine/js-connectors/js/pg-js-connector/src/pg.ts
     super(client)
   }
 

@@ -129,6 +129,7 @@ fn start_rpc_thread(mut receiver: mpsc::Receiver<ReqImpl>) -> Result<()> {
             let process = match Command::new(env_var)
                 .stdin(Stdio::piped())
                 .stdout(Stdio::piped())
+                .stderr(Stdio::inherit())
                 .spawn()
             {
                 Ok(process) => process,
@@ -147,6 +148,7 @@ fn start_rpc_thread(mut receiver: mpsc::Receiver<ReqImpl>) -> Result<()> {
                         match line {
                             Ok(Some(line)) => // new response
                             {
+                                dbg!(&line);
                                 let response: jsonrpc_core::Output = match serde_json::from_str(&line) {
                                     Ok(response) => response,
                                     Err(err) => // log it
@@ -187,6 +189,7 @@ fn start_rpc_thread(mut receiver: mpsc::Receiver<ReqImpl>) -> Result<()> {
                                 pending_requests.insert(request.id.clone(), response_sender);
                                 let mut req = serde_json::to_vec(&request).unwrap();
                                 req.push(b'\n');
+                                dbg!(std::str::from_utf8( &req));
                                 stdin.write_all(&req).await.unwrap();
                             }
                         }

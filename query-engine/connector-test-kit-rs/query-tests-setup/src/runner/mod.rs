@@ -115,7 +115,8 @@ impl Runner {
         let executor = match &self.executor {
             RunnerExecutor::Builtin(e) => e,
             RunnerExecutor::External(schema_id) => {
-                return Ok(executor_process_request("query", json!({ "query": query, "schemaId": schema_id })).await?)
+                let json_query = JsonRequest::from_graphql(&query, self.query_schema()).unwrap();
+                return Ok(executor_process_request("query", json!({ "query": json_query, "schemaId": schema_id })).await?);
             }
         };
 
@@ -167,7 +168,7 @@ impl Runner {
         let executor = match &self.executor {
             RunnerExecutor::Builtin(e) => e,
             RunnerExecutor::External(_) => {
-                return Ok(executor_process_request("queryJson", json!({ "query": query })).await?)
+                return Ok(executor_process_request("query", json!({ "query": query })).await?)
             }
         };
 

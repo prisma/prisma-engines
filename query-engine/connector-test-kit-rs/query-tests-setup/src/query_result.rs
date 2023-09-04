@@ -8,6 +8,7 @@ struct SimpleGqlResponse {
     #[serde(default)]
     errors: Vec<GQLError>,
     #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
     extensions: Option<serde_json::Value>,
 }
 

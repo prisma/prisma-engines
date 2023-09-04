@@ -22,11 +22,20 @@ importers:
     dependencies:
       '@jkomyno/prisma-driver-adapter-utils':
         specifier: workspace:*
+<<<<<<< HEAD:query-engine/driver-adapters/js/pnpm-lock.yaml
         version: link:../driver-adapter-utils
     devDependencies:
       '@neondatabase/serverless':
         specifier: ^0.6.0
         version: 0.6.0
+||||||| parent of 792f6fa29f (end-to-end baseline correctness on query()):query-engine/js-connectors/js/pnpm-lock.yaml
+        version: link:../pg-js-connector
+      tempy:
+        specifier: ^3
+        version: 3.0.0
+=======
+        version: link:../pg-js-connector
+>>>>>>> 792f6fa29f (end-to-end baseline correctness on query()):query-engine/js-connectors/js/pnpm-lock.yaml
 
   adapter-pg:
     dependencies:
@@ -753,11 +762,20 @@ packages:
     engines: {node: '>=8'}
     dev: true
 
+<<<<<<< HEAD:query-engine/driver-adapters/js/pnpm-lock.yaml
   /is-what@4.1.15:
     resolution: {integrity: sha512-uKua1wfy3Yt+YqsD6mTUEa2zSi3G1oPlqTflgaPJ7z63vUGN5pxFpnQfeSLMFnJDEsdvOtkp1rUWkYjB4YfhgA==}
     engines: {node: '>=12.13'}
     dev: false
 
+||||||| parent of 792f6fa29f (end-to-end baseline correctness on query()):query-engine/js-connectors/js/pnpm-lock.yaml
+  /is-stream@3.0.0:
+    resolution: {integrity: sha512-LnQR4bZ9IADDRSkvpqMGvt/tEJWclzklNgSw48V5EAaAeDd6qGvN8ei6k5p0tvxSR171VmGyHuTiAOfxAbr8kA==}
+    engines: {node: ^12.20.0 || ^14.13.1 || >=16.0.0}
+    dev: false
+
+=======
+>>>>>>> 792f6fa29f (end-to-end baseline correctness on query()):query-engine/js-connectors/js/pnpm-lock.yaml
   /isexe@2.0.0:
     resolution: {integrity: sha512-RHxMLp9lnKHGHRng9QFhRCMbYAcVpn69smSGcq3f36xjgVVWThj4qqLbTLlq7Ssj8B+fIQ1EuCEGI2lKsyQeIw==}
     dev: true
@@ -1140,6 +1158,7 @@ packages:
       ts-interface-checker: 0.1.13
     dev: true
 
+<<<<<<< HEAD:query-engine/driver-adapters/js/pnpm-lock.yaml
   /superjson@1.13.1:
     resolution: {integrity: sha512-AVH2eknm9DEd3qvxM4Sq+LTCkSXE2ssfh1t11MHMXyYXFQyQ1HLgVvV+guLTsaQnJU3gnaVo34TohHPulY/wLg==}
     engines: {node: '>=10'}
@@ -1147,6 +1166,24 @@ packages:
       copy-anything: 3.0.5
     dev: false
 
+||||||| parent of 792f6fa29f (end-to-end baseline correctness on query()):query-engine/js-connectors/js/pnpm-lock.yaml
+  /temp-dir@2.0.0:
+    resolution: {integrity: sha512-aoBAniQmmwtcKp/7BzsH8Cxzv8OL736p7v1ihGb5e9DJ9kTwGWHrQrVB5+lfVDzfGrdRzXch+ig7LHaY1JTOrg==}
+    engines: {node: '>=8'}
+    dev: false
+
+  /tempy@3.0.0:
+    resolution: {integrity: sha512-B2I9X7+o2wOaW4r/CWMkpOO9mdiTRCxXNgob6iGvPmfPWgH/KyUD6Uy5crtWBxIBe3YrNZKR2lSzv1JJKWD4vA==}
+    engines: {node: '>=14.16'}
+    dependencies:
+      is-stream: 3.0.0
+      temp-dir: 2.0.0
+      type-fest: 2.19.0
+      unique-string: 3.0.0
+    dev: false
+
+=======
+>>>>>>> 792f6fa29f (end-to-end baseline correctness on query()):query-engine/js-connectors/js/pnpm-lock.yaml
   /thenify-all@1.6.0:
     resolution: {integrity: sha512-RNxQH/qI8/t3thXJDwcstUO4zeqo64+Uy/+sNVRBx4Xn2OX+OZ9oP+iJnNFqplFra2ZUVeKCSa2oVWi3T4uVmA==}
     engines: {node: '>=0.8'}
@@ -1235,6 +1272,7 @@ packages:
     hasBin: true
     dev: true
 
+<<<<<<< HEAD:query-engine/driver-adapters/js/pnpm-lock.yaml
   /undici@5.23.0:
     resolution: {integrity: sha512-1D7w+fvRsqlQ9GscLBwcAJinqcZGHUKjbOmXdlE/v8BvEGXjeWAax+341q44EuTcHXXnfyKNbKRq4Lg7OzhMmg==}
     engines: {node: '>=14.0'}
@@ -1242,6 +1280,16 @@ packages:
       busboy: 1.6.0
     dev: false
 
+||||||| parent of 792f6fa29f (end-to-end baseline correctness on query()):query-engine/js-connectors/js/pnpm-lock.yaml
+  /unique-string@3.0.0:
+    resolution: {integrity: sha512-VGXBUVwxKMBUznyffQweQABPRRW1vHZAbadFZud4pLFAqRGvv/96vafgjWFqzourzr8YonlQiPgH0YCJfawoGQ==}
+    engines: {node: '>=12'}
+    dependencies:
+      crypto-random-string: 4.0.0
+    dev: false
+
+=======
+>>>>>>> 792f6fa29f (end-to-end baseline correctness on query()):query-engine/js-connectors/js/pnpm-lock.yaml
   /webidl-conversions@4.0.2:
     resolution: {integrity: sha512-YQ+BmxuTgd6UXZW3+ICGfyqRyHXVlD5GtQr5+qjiNW7bF0cqrzX500HVXPBOvgXb5YnzDd+h0zqyv61KUD7+Sg==}
     dev: true
