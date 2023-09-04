@@ -1,6 +1,7 @@
 {
   "name": "@jkomyno/smoke-test-js",
   "private": true,
+  "type": "module",
   "version": "0.0.0",
   "description": "",
   "scripts": {
