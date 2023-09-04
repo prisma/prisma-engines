@@ -45,7 +45,8 @@ impl QuaintTransaction for JsTransaction {
         let commit_stmt = "COMMIT";
 
         if self.options().use_phantom_query {
-            self.raw_phantom_cmd(commit_stmt).await?;
+            let commit_stmt = JsBaseQueryable::phantom_query_message(commit_stmt);
+            self.raw_phantom_cmd(commit_stmt.as_str()).await?;
         } else {
             self.inner.raw_cmd(commit_stmt).await?;
         }
@@ -59,7 +60,8 @@ impl QuaintTransaction for JsTransaction {
         let rollback_stmt = "ROLLBACK";
 
         if self.options().use_phantom_query {
-            self.raw_phantom_cmd(rollback_stmt).await?;
+            let rollback_stmt = JsBaseQueryable::phantom_query_message(rollback_stmt);
+            self.raw_phantom_cmd(rollback_stmt.as_str()).await?;
         } else {
             self.inner.raw_cmd(rollback_stmt).await?;
         }
