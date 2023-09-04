@@ -116,7 +116,10 @@ impl Runner {
             RunnerExecutor::Builtin(e) => e,
             RunnerExecutor::External(schema_id) => {
                 let json_query = JsonRequest::from_graphql(&query, self.query_schema()).unwrap();
-                return Ok(executor_process_request("query", json!({ "query": json_query, "schemaId": schema_id })).await?);
+                let mut response: QueryResult =
+                    executor_process_request("query", json!({ "query": json_query, "schemaId": schema_id })).await?;
+                response.detag();
+                return Ok(response);
             }
         };
 

@@ -6,12 +6,6 @@ import * as jsonRpc from './jsonRpc'
 import * as tempy from 'tempy'
 
 async function main(): Promise<void> {
-    const url = process.env["TEST_DATABASE_URL"]
-
-    if (!url) {
-        throw new Error("The TEST_DATABASE_URL environment variable is not defined.")
-    }
-
     const iface = readline.createInterface({
         input: process.stdin,
         output: process.stdout,

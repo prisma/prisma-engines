@@ -1,3 +1,4 @@
+use query_core::constants::custom_types;
 use request_handlers::{GQLError, PrismaResponse};
 use serde::{Deserialize, Serialize};
 
@@ -116,6 +117,17 @@ impl QueryResult {
     pub fn to_string_pretty(&self) -> String {
         serde_json::to_string_pretty(&self.response).unwrap()
     }
+
+    pub(crate) fn detag(&mut self) {
+        match &mut self.response {
+            Response::Single(res) => detag_value(&mut res.data),
+            Response::Multi(res) => {
+                for res in &mut res.batch_result {
+                    detag_value(&mut res.data)
+                }
+            }
+        }
+    }
 }
 
 impl ToString for QueryResult {
@@ -152,5 +164,27 @@ impl From<PrismaResponse> for QueryResult {
                 }),
             },
         }
+    }
+}
+
+fn detag_value(val: &mut serde_json::Value) {
+    match val {
+        serde_json::Value::Object(obj) => {
+            if obj.len() == 2 && obj.contains_key(custom_types::TYPE) && obj.contains_key(custom_types::VALUE) {
+                let mut new_val = obj.remove(custom_types::VALUE).unwrap();
+                detag_value(&mut new_val);
+                *val = new_val;
+            } else {
+                for elem in obj.values_mut() {
+                    detag_value(elem);
+                }
+            }
+        }
+        serde_json::Value::Array(arr) => {
+            for elem in arr {
+                detag_value(elem)
+            }
+        }
+        _ => (),
     }
 }
