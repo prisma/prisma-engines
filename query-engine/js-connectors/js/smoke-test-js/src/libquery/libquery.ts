@@ -1,13 +1,10 @@
-import { setImmediate, setTimeout } from 'node:timers/promises'
+import { setTimeout } from 'node:timers/promises'
 import type { ErrorCapturingConnector } from '@jkomyno/prisma-js-connector-utils'
-import type { QueryEngineInstance } from './engines/types/Library'
+import type { QueryEngineInstance } from '../engines/types/Library'
 import { initQueryEngine } from './util'
-import { JsonQuery } from './engines/types/JsonProtocol'
+import { JsonQuery } from '../engines/types/JsonProtocol'
 
-export async function smokeTest(db: ErrorCapturingConnector, prismaSchemaRelativePath: string) {
-  // wait for the database pool to be initialized
-  await setImmediate(0)
-  
+export async function smokeTestLibquery(db: ErrorCapturingConnector, prismaSchemaRelativePath: string) {
   const engine = initQueryEngine(db, prismaSchemaRelativePath)
 
   console.log('[nodejs] connecting...')

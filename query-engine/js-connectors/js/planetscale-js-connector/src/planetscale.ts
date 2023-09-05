@@ -1,7 +1,7 @@
 import * as planetScale from '@planetscale/database'
 import type { Config as PlanetScaleConfig } from '@planetscale/database'
 import { bindConnector, Debug } from '@jkomyno/prisma-js-connector-utils'
-import type { Connector, ResultSet, Query, ConnectorConfig, Queryable, Transaction, Result, ErrorCapturingConnector } from '@jkomyno/prisma-js-connector-utils'
+import type { Connector, ResultSet, Query, ConnectorConfig, Queryable, Transaction, Result, ErrorCapturingConnector, TransactionOptions } from '@jkomyno/prisma-js-connector-utils'
 import { type PlanetScaleColumnType, fieldToColumnType } from './conversion'
 import { createDeferred, Deferred } from './deferred'
 
@@ -79,22 +79,27 @@ class PlanetScaleQueryable<ClientT extends planetScale.Connection | planetScale.
 }
 
 class PlanetScaleTransaction extends PlanetScaleQueryable<planetScale.Transaction> implements Transaction {
-  constructor(tx: planetScale.Transaction, private txDeferred: Deferred<void>, private txResultPromise: Promise<void>) {
+  constructor(
+    tx: planetScale.Transaction,
+    readonly options: TransactionOptions,
+    private txDeferred: Deferred<void>,
+    private txResultPromise: Promise<void>,
+  ) {
     super(tx)
   }
 
   async commit(): Promise<Result<void>> {
-    const tag = '[js::commit]'
-    debug(`${tag} committing transaction`)
+    debug(`[js::commit]`)
+
     this.txDeferred.resolve()
-    return { ok: true, value: await this.txResultPromise };
+    return Promise.resolve({ ok: true, value: await this.txResultPromise })
   }
 
   async rollback(): Promise<Result<void>> {
-    const tag = '[js::rollback]'
-    debug(`${tag} rolling back the transaction`)
+    debug(`[js::rollback]`)
+    
     this.txDeferred.reject(new RollbackError())
-    return { ok: true, value: await this.txResultPromise };
+    return Promise.resolve({ ok: true, value: await this.txResultPromise })
   }
 
 }
@@ -104,30 +109,32 @@ class PrismaPlanetScale extends PlanetScaleQueryable<planetScale.Connection> imp
     const client = planetScale.connect(config)
 
     super(client)
-    
   }
 
-  async startTransaction(isolationLevel?: string) {
-    return new Promise<Result<Transaction>>((resolve) => {
+  async startTransaction() {
+    const options: TransactionOptions = {
+      usePhantomQuery: true,
+    }
+    
+    const tag = '[js::startTransaction]'
+    debug(`${tag} options: %O`, options)
+
+    return new Promise<Result<Transaction>>((resolve, reject) => {
       const txResultPromise = this.client.transaction(async tx => {
-        if (isolationLevel) {
-          await tx.execute(`SET TRANSACTION ISOLATION LEVEL ${isolationLevel}`)
-        }
         const [txDeferred, deferredPromise] = createDeferred<void>()
-        const txWrapper = new PlanetScaleTransaction(tx, txDeferred, txResultPromise)
+        const txWrapper = new PlanetScaleTransaction(tx, options, txDeferred, txResultPromise)
 
-        resolve({ ok: true, value: txWrapper });
-
+        resolve({ ok: true, value: txWrapper })
         return deferredPromise
       }).catch(error => {
         // Rollback error is ignored (so that tx.rollback() won't crash)
         // any other error is legit and is re-thrown
         if (!(error instanceof RollbackError)) {
-          return Promise.reject(error)
+          return reject(error)
         }
         
         return undefined
-      });
+      })
     })
   }
 

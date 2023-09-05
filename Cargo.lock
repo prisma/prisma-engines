@@ -1878,6 +1878,7 @@ dependencies = [
  "chrono",
  "expect-test",
  "futures",
+ "metrics 0.18.1",
  "napi",
  "napi-derive",
  "num-bigint",

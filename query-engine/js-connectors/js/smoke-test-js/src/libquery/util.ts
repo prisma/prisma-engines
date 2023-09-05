@@ -1,15 +1,15 @@
 import path from 'node:path'
 import os from 'node:os'
 import fs from 'node:fs'
-import type { Connector } from '@jkomyno/prisma-js-connector-utils'
-import { Library, QueryEngineInstance } from './engines/types/Library'
+import type { ErrorCapturingConnector } from '@jkomyno/prisma-js-connector-utils'
+import { Library, QueryEngineInstance } from '../engines/types/Library'
 
-export function initQueryEngine(driver: Connector, prismaSchemaRelativePath: string): QueryEngineInstance {
+export function initQueryEngine(driver: ErrorCapturingConnector, prismaSchemaRelativePath: string): QueryEngineInstance {
   // I assume nobody will run this on Windows ¯\_(ツ)_/¯
   const libExt = os.platform() === 'darwin' ? 'dylib' : 'so'
   const dirname = path.dirname(new URL(import.meta.url).pathname)
 
-  const libQueryEnginePath = path.join(dirname, `../../../../../target/debug/libquery_engine.${libExt}`)
+  const libQueryEnginePath = path.join(dirname, `../../../../../../target/debug/libquery_engine.${libExt}`)
   const schemaPath = path.join(dirname, prismaSchemaRelativePath)
 
   console.log('[nodejs] read Prisma schema from', schemaPath)
@@ -33,6 +33,7 @@ export function initQueryEngine(driver: Connector, prismaSchemaRelativePath: str
   const logCallback = (...args) => {
     console.log(args)
   }
+
   const engine = new QueryEngine(queryEngineOptions, logCallback, driver)
 
   return engine

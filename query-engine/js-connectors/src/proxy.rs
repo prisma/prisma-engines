@@ -7,7 +7,7 @@ use crate::transaction::JsTransaction;
 use napi::bindgen_prelude::{FromNapiValue, ToNapiValue};
 use napi::{JsObject, JsString};
 use napi_derive::napi;
-use quaint::connector::{IsolationLevel, ResultSet as QuaintResultSet};
+use quaint::connector::ResultSet as QuaintResultSet;
 use quaint::Value as QuaintValue;
 
 // TODO(jkomyno): import these 3rd-party crates from the `quaint-core` crate.
@@ -33,11 +33,14 @@ pub(crate) struct CommonProxy {
 /// This is a JS proxy for accessing the methods specific to top level
 /// JS driver objects
 pub(crate) struct DriverProxy {
-    start_transaction: AsyncJsFunction<Option<String>, JsTransaction>,
+    start_transaction: AsyncJsFunction<(), JsTransaction>,
 }
 /// This a JS proxy for accessing the methods, specific
 /// to JS transaction objects
 pub(crate) struct TransactionProxy {
+    /// transaction options
+    options: TransactionOptions,
+
     /// commit transaction
     commit: AsyncJsFunction<(), ()>,
 
@@ -332,24 +335,35 @@ impl DriverProxy {
         })
     }
 
-    pub async fn start_transaction(
-        &self,
-        isolation_level: Option<IsolationLevel>,
-    ) -> quaint::Result<Box<JsTransaction>> {
-        let tx = self
-            .start_transaction
-            .call(isolation_level.map(|l| l.to_string()))
-            .await?;
+    pub async fn start_transaction(&self) -> quaint::Result<Box<JsTransaction>> {
+        let tx = self.start_transaction.call(()).await?;
         Ok(Box::new(tx))
     }
+}
+
+#[derive(Debug)]
+#[napi(object)]
+pub struct TransactionOptions {
+    /// Whether or not to run a phantom query (i.e., a query that only influences Prisma event logs, but not the database itself)
+    /// before opening a transaction, committing, or rollbacking.
+    pub use_phantom_query: bool,
 }
 
 impl TransactionProxy {
     pub fn new(js_transaction: &JsObject) -> napi::Result<Self> {
         let commit = js_transaction.get_named_property("commit")?;
         let rollback = js_transaction.get_named_property("rollback")?;
+        let options: TransactionOptions = js_transaction.get_named_property("options")?;
 
-        Ok(Self { commit, rollback })
+        Ok(Self {
+            commit,
+            rollback,
+            options,
+        })
+    }
+
+    pub fn options(&self) -> &TransactionOptions {
+        &self.options
     }
 
     pub async fn commit(&self) -> quaint::Result<()> {

@@ -125,6 +125,10 @@ impl QuaintQueryable for JsBaseQueryable {
 }
 
 impl JsBaseQueryable {
+    pub fn phantom_query_message(stmt: &str) -> String {
+        format!(r#"-- Implicit "{}" query via underlying driver"#, stmt)
+    }
+
     async fn build_query(sql: &str, values: &[quaint::Value<'_>]) -> quaint::Result<Query> {
         let sql: String = sql.to_string();
         let args = conversion::conv_params(values)?;
@@ -239,7 +243,33 @@ impl TransactionCapable for JsQueryable {
         &'a self,
         isolation: Option<IsolationLevel>,
     ) -> quaint::Result<Box<dyn Transaction + 'a>> {
-        let tx = self.driver_proxy.start_transaction(isolation).await?;
+        let tx = self.driver_proxy.start_transaction().await?;
+
+        let isolation_first = tx.requires_isolation_first();
+
+        if isolation_first {
+            if let Some(isolation) = isolation {
+                tx.set_tx_isolation_level(isolation).await?;
+            }
+        }
+
+        let begin_stmt = tx.begin_statement();
+
+        let tx_opts = tx.options();
+        if tx_opts.use_phantom_query {
+            let begin_stmt = JsBaseQueryable::phantom_query_message(begin_stmt);
+            tx.raw_phantom_cmd(begin_stmt.as_str()).await?;
+        } else {
+            tx.raw_cmd(begin_stmt).await?;
+        }
+
+        if !isolation_first {
+            if let Some(isolation) = isolation {
+                tx.set_tx_isolation_level(isolation).await?;
+            }
+        }
+
+        self.server_reset_query(tx.as_ref()).await?;
 
         Ok(tx)
     }

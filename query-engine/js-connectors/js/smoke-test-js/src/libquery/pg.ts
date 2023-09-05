@@ -1,5 +1,5 @@
 import { createPgConnector } from '@jkomyno/prisma-pg-js-connector'
-import { smokeTest } from './test'
+import { smokeTestLibquery } from './libquery' 
 
 async function pg() {
   const connectionString = `${process.env.JS_PG_DATABASE_URL as string}`
@@ -8,7 +8,7 @@ async function pg() {
     url: connectionString,
   })
 
-  await smokeTest(db, '../prisma/postgres/schema.prisma')
+  await smokeTestLibquery(db, '../../prisma/postgres/schema.prisma')
 }
 
 pg().catch((e) => {

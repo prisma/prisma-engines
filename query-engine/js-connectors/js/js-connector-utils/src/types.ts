@@ -68,10 +68,9 @@ export interface Queryable  {
 
 export interface Connector extends Queryable {
   /**
-   * Starts new transation with the specified isolation level
-   * @param isolationLevel 
+   * Starts new transation.
    */
-  startTransaction(isolationLevel?: string): Promise<Result<Transaction>>
+  startTransaction(): Promise<Result<Transaction>>
 
   /**
    * Closes the connection to the database, if any.
@@ -79,9 +78,17 @@ export interface Connector extends Queryable {
   close: () => Promise<Result<void>>
 }
 
+export type TransactionOptions = {
+  usePhantomQuery: boolean
+}
+
 export interface Transaction extends Queryable {
   /**
-   * Commit the transaction
+   * Transaction options.
+   */
+  readonly options: TransactionOptions
+  /**
+   * Commit the transaction.
    */
   commit(): Promise<Result<void>>
   /**

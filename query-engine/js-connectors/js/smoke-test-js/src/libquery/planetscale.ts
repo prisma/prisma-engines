@@ -1,5 +1,5 @@
 import { createPlanetScaleConnector } from '@jkomyno/prisma-planetscale-js-connector'
-import { smokeTest } from './test' 
+import { smokeTestLibquery } from './libquery' 
 
 async function planetscale() {
   const connectionString = `${process.env.JS_PLANETSCALE_DATABASE_URL as string}`
@@ -8,7 +8,7 @@ async function planetscale() {
     url: connectionString,
   })
 
-  await smokeTest(db, '../prisma/mysql/schema.prisma')
+  await smokeTestLibquery(db, '../../prisma/mysql/schema.prisma')
 }
 
 planetscale().catch((e) => {

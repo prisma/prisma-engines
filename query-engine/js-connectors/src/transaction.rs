@@ -1,4 +1,5 @@
 use async_trait::async_trait;
+use metrics::{decrement_gauge, increment_gauge};
 use napi::{bindgen_prelude::FromNapiValue, JsObject};
 use quaint::{
     connector::{IsolationLevel, Transaction as QuaintTransaction},
@@ -7,7 +8,7 @@ use quaint::{
 };
 
 use crate::{
-    proxy::{CommonProxy, TransactionProxy},
+    proxy::{CommonProxy, TransactionOptions, TransactionProxy},
     queryable::JsBaseQueryable,
 };
 
@@ -21,17 +22,50 @@ pub(crate) struct JsTransaction {
 
 impl JsTransaction {
     pub(crate) fn new(inner: JsBaseQueryable, tx_proxy: TransactionProxy) -> Self {
+        increment_gauge!("prisma_client_queries_active", 1.0);
+
         Self { inner, tx_proxy }
+    }
+
+    pub fn options(&self) -> &TransactionOptions {
+        self.tx_proxy.options()
+    }
+
+    pub async fn raw_phantom_cmd(&self, cmd: &str) -> quaint::Result<()> {
+        let params = &[];
+        quaint::connector::metrics::query("js.raw_phantom_cmd", cmd, params, move || async move { Ok(()) }).await
     }
 }
 
 #[async_trait]
 impl QuaintTransaction for JsTransaction {
     async fn commit(&self) -> quaint::Result<()> {
+        decrement_gauge!("prisma_client_queries_active", 1.0);
+
+        let commit_stmt = "COMMIT";
+
+        if self.options().use_phantom_query {
+            let commit_stmt = JsBaseQueryable::phantom_query_message(commit_stmt);
+            self.raw_phantom_cmd(commit_stmt.as_str()).await?;
+        } else {
+            self.inner.raw_cmd(commit_stmt).await?;
+        }
+
         self.tx_proxy.commit().await
     }
 
     async fn rollback(&self) -> quaint::Result<()> {
+        decrement_gauge!("prisma_client_queries_active", 1.0);
+
+        let rollback_stmt = "ROLLBACK";
+
+        if self.options().use_phantom_query {
+            let rollback_stmt = JsBaseQueryable::phantom_query_message(rollback_stmt);
+            self.raw_phantom_cmd(rollback_stmt.as_str()).await?;
+        } else {
+            self.inner.raw_cmd(rollback_stmt).await?;
+        }
+
         self.tx_proxy.rollback().await
     }
 

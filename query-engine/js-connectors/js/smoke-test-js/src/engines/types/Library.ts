@@ -1,4 +1,4 @@
-import type { Connector } from '@jkomyno/prisma-js-connector-utils'
+import type { ErrorCapturingConnector } from '@jkomyno/prisma-js-connector-utils'
 import type { QueryEngineConfig } from './QueryEngine'
 
 export type QueryEngineInstance = {
@@ -18,7 +18,7 @@ export type QueryEngineInstance = {
 }
 
 export interface QueryEngineConstructor {
-  new(config: QueryEngineConfig, logger: (log: string) => void, nodejsFnCtx?: Connector): QueryEngineInstance
+  new(config: QueryEngineConfig, logger: (log: string) => void, nodejsFnCtx?: ErrorCapturingConnector): QueryEngineInstance
 }
 
 export interface LibraryLoader {

@@ -1,6 +1,6 @@
 import * as pg from 'pg'
 import { bindConnector, Debug } from '@jkomyno/prisma-js-connector-utils'
-import type { ErrorCapturingConnector, Connector, ConnectorConfig, Query, Queryable, Result, ResultSet, Transaction } from '@jkomyno/prisma-js-connector-utils'
+import type { ErrorCapturingConnector, Connector, ConnectorConfig, Query, Queryable, Result, ResultSet, Transaction, TransactionOptions } from '@jkomyno/prisma-js-connector-utils'
 import { fieldToColumnType } from './conversion'
 
 const debug = Debug('prisma:js-connector:pg')
@@ -45,8 +45,10 @@ class PgQueryable<ClientT extends StdClient | TransactionClient>
     const tag = '[js::execute_raw]'
     debug(`${tag} %O`, query)
 
-    const { rowCount } = await this.performIO(query)
-    return { ok: true, value: rowCount }
+    const { rowCount: rowsAffected } = await this.performIO(query)
+    
+    // Note: `rowsAffected` can sometimes be null (e.g., when executing `"BEGIN"`)
+    return { ok: true, value: rowsAffected ?? 0 }
   }
 
   /**
@@ -70,32 +72,22 @@ class PgQueryable<ClientT extends StdClient | TransactionClient>
 
 class PgTransaction extends PgQueryable<TransactionClient>
   implements Transaction {
-  constructor(client: pg.PoolClient) {
+  constructor(client: pg.PoolClient, readonly options: TransactionOptions) {
     super(client)
   }
 
   async commit(): Promise<Result<void>> {
-    const tag = '[js::commit]'
-    debug(`${tag} committing transaction`)
+    debug(`[js::commit]`)
 
-    try {
-      await this.client.query('COMMIT')
-      return { ok: true, value: undefined }
-    } finally {
-      this.client.release()
-    }
+    this.client.release()
+    return Promise.resolve({ ok: true, value: undefined })
   }
 
   async rollback(): Promise<Result<void>> {
-    const tag = '[js::rollback]'
-    debug(`${tag} rolling back the transaction`)
+    debug(`[js::rollback]`)
 
-    try {
-      await this.client.query('ROLLBACK')
-      return { ok: true, value: undefined }
-    } finally {
-      this.client.release()
-    }
+    this.client.release()
+    return Promise.resolve({ ok: true, value: undefined })
   }
 }
 
@@ -110,17 +102,16 @@ class PrismaPg extends PgQueryable<StdClient> implements Connector {
     super(client)
   }
 
-  async startTransaction(isolationLevel?: string): Promise<Result<Transaction>> {
-    const connection = await this.client.connect()
-    await connection.query('BEGIN')
-
-    if (isolationLevel) {
-      await connection.query(
-        `SET TRANSACTION ISOLATION LEVEL ${isolationLevel}`,
-      )
+  async startTransaction(): Promise<Result<Transaction>> {
+    const options: TransactionOptions = {
+      usePhantomQuery: false,
     }
 
-    return { ok: true, value: new PgTransaction(connection) }
+    const tag = '[js::startTransaction]'
+    debug(`${tag} options: %O`, options)
+
+    const connection = await this.client.connect()
+    return { ok: true, value: new PgTransaction(connection, options) }
   }
 
   async close() {
