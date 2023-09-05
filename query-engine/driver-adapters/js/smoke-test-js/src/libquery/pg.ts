@@ -1,6 +1,6 @@
 import pg from 'pg'
 import { PrismaPostgres } from '@jkomyno/prisma-adapter-pg'
-import { bindAdapter } from '@jkomyno/prisma-adapter-utils'
+import { bindAdapter } from '@jkomyno/prisma-driver-adapter-utils'
 import { smokeTestLibquery } from './libquery.js'
 
 async function main() {

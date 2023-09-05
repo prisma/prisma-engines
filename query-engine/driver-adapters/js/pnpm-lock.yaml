@@ -20,9 +20,9 @@ importers:
 
   adapter-neon:
     dependencies:
-      '@jkomyno/prisma-adapter-utils':
+      '@jkomyno/prisma-driver-adapter-utils':
         specifier: workspace:*
-        version: link:../adapter-utils
+        version: link:../driver-adapter-utils
     devDependencies:
       '@neondatabase/serverless':
         specifier: ^0.6.0
@@ -30,9 +30,9 @@ importers:
 
   adapter-pg:
     dependencies:
-      '@jkomyno/prisma-adapter-utils':
+      '@jkomyno/prisma-driver-adapter-utils':
         specifier: workspace:*
-        version: link:../adapter-utils
+        version: link:../driver-adapter-utils
     devDependencies:
       '@types/pg':
         specifier: ^8.10.2
@@ -43,15 +43,15 @@ importers:
 
   adapter-planetscale:
     dependencies:
-      '@jkomyno/prisma-adapter-utils':
+      '@jkomyno/prisma-driver-adapter-utils':
         specifier: workspace:*
-        version: link:../adapter-utils
+        version: link:../driver-adapter-utils
     devDependencies:
       '@planetscale/database':
         specifier: ^1.11.0
         version: 1.11.0
 
-  adapter-utils:
+  driver-adapter-utils:
     dependencies:
       debug:
         specifier: ^4.3.4
@@ -72,9 +72,9 @@ importers:
       '@jkomyno/prisma-adapter-planetscale':
         specifier: workspace:*
         version: link:../adapter-planetscale
-      '@jkomyno/prisma-adapter-utils':
+      '@jkomyno/prisma-driver-adapter-utils':
         specifier: workspace:*
-        version: link:../adapter-utils
+        version: link:../driver-adapter-utils
       '@neondatabase/serverless':
         specifier: ^0.6.0
         version: 0.6.0

@@ -29,7 +29,7 @@
     "@jkomyno/prisma-adapter-neon": "workspace:*",
     "@jkomyno/prisma-adapter-planetscale": "workspace:*",
     "@jkomyno/prisma-adapter-pg": "workspace:*",
-    "@jkomyno/prisma-adapter-utils": "workspace:*",
+    "@jkomyno/prisma-driver-adapter-utils": "workspace:*",
     "@neondatabase/serverless": "^0.6.0",
     "@planetscale/database": "^1.11.0",
     "@prisma/client": "5.3.0-integration-feat-js-connectors-in-client.14",

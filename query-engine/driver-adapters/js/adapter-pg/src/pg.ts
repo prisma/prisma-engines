@@ -1,6 +1,6 @@
 import type pg from 'pg'
-import { Debug } from '@jkomyno/prisma-adapter-utils'
-import type { DriverAdapter, Query, Queryable, Result, ResultSet, Transaction, TransactionOptions } from '@jkomyno/prisma-adapter-utils'
+import { Debug } from '@jkomyno/prisma-driver-adapter-utils'
+import type { DriverAdapter, Query, Queryable, Result, ResultSet, Transaction, TransactionOptions } from '@jkomyno/prisma-driver-adapter-utils'
 import { fieldToColumnType } from './conversion'
 
 const debug = Debug('prisma:driver-adapter:pg')

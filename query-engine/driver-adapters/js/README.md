@@ -1,7 +1,7 @@
 # Prisma Driver Adapters
 
 This TypeScript monorepo contains the following packages:
-- `@jkomyno/prisma-adapter-utils` (later: `@prisma/adapter-utils`)
+- `@jkomyno/prisma-driver-adapter-utils` (later: `@prisma/driver-adapter-utils`)
   - Internal set of utilities and types for Prisma's driver adapters.
 - `@jkomyno/prisma-adapter-neon` (later: `@prisma/adapter-neon`)
   - Prisma's Driver Adapter that wraps the `@neondatabase/serverless` driver

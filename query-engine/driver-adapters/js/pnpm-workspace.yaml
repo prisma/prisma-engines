@@ -2,5 +2,5 @@ packages:
   - './adapter-neon'
   - './adapter-planetscale'
   - './adapter-pg'
-  - './adapter-utils'
+  - './driver-adapter-utils'
   - './smoke-test-js'

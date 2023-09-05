@@ -1,5 +1,5 @@
 import { PrismaNeonHTTP } from '@jkomyno/prisma-adapter-neon'
-import { bindAdapter } from '@jkomyno/prisma-adapter-utils'
+import { bindAdapter } from '@jkomyno/prisma-driver-adapter-utils'
 import { neon } from '@neondatabase/serverless'
 import { smokeTestLibquery } from './libquery.js' 
 

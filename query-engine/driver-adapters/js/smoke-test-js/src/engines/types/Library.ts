@@ -1,4 +1,4 @@
-import type { ErrorCapturingDriverAdapter } from '@jkomyno/prisma-adapter-utils'
+import type { ErrorCapturingDriverAdapter } from '@jkomyno/prisma-driver-adapter-utils'
 import type { QueryEngineConfig } from './QueryEngine.js'
 
 export type QueryEngineInstance = {

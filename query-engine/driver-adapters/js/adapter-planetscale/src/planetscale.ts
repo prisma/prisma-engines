@@ -1,6 +1,6 @@
 import type planetScale from '@planetscale/database'
-import { Debug } from '@jkomyno/prisma-adapter-utils'
-import type { DriverAdapter, ResultSet, Query, Queryable, Transaction, Result, TransactionOptions } from '@jkomyno/prisma-adapter-utils'
+import { Debug } from '@jkomyno/prisma-driver-adapter-utils'
+import type { DriverAdapter, ResultSet, Query, Queryable, Transaction, Result, TransactionOptions } from '@jkomyno/prisma-driver-adapter-utils'
 import { type PlanetScaleColumnType, fieldToColumnType } from './conversion'
 import { createDeferred, Deferred } from './deferred'
 

@@ -1,5 +1,5 @@
 import { setTimeout } from 'node:timers/promises'
-import type { ErrorCapturingDriverAdapter } from '@jkomyno/prisma-adapter-utils'
+import type { ErrorCapturingDriverAdapter } from '@jkomyno/prisma-driver-adapter-utils'
 import type { QueryEngineInstance } from '../engines/types/Library.js'
 import { initQueryEngine } from './util.js'
 import { JsonQuery } from '../engines/types/JsonProtocol.js'
