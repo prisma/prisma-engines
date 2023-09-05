@@ -64,6 +64,7 @@ var sourcesIndex = JSON.parse('{\
 "digest":["",[["core_api",[],["ct_variable.rs","rt_variable.rs","wrapper.rs","xof_reader.rs"]]],["core_api.rs","digest.rs","lib.rs","mac.rs"]],\
 "dissimilar":["",[],["find.rs","lib.rs","range.rs"]],\
 "dmmf":["",[["ast_builders",[["schema_ast_builder",[],["enum_renderer.rs","field_renderer.rs","mod.rs","object_renderer.rs","schema_renderer.rs","type_renderer.rs"]]],["datamodel_ast_builder.rs","mod.rs"]],["serialization_ast",[],["datamodel_ast.rs","mappings_ast.rs","mod.rs","schema_ast.rs"]]],["lib.rs"]],\
+"driver_adapters":["",[],["async_js_function.rs","conversion.rs","error.rs","lib.rs","proxy.rs","queryable.rs","result.rs","transaction.rs"]],\
 "either":["",[],["lib.rs"]],\
 "encoding":["",[["codec",[],["ascii.rs","error.rs","japanese.rs","korean.rs","simpchinese.rs","singlebyte.rs","tradchinese.rs","utf_16.rs","utf_8.rs","whatwg.rs"]]],["all.rs","label.rs","lib.rs","types.rs","util.rs"]],\
 "encoding_index_japanese":["",[],["jis0208.rs","jis0212.rs","lib.rs"]],\
@@ -131,7 +132,6 @@ var sourcesIndex = JSON.parse('{\
 "is_terminal":["",[],["lib.rs"]],\
 "itertools":["",[["adaptors",[],["coalesce.rs","map.rs","mod.rs","multi_product.rs"]]],["combinations.rs","combinations_with_replacement.rs","concat_impl.rs","cons_tuples_impl.rs","diff.rs","duplicates_impl.rs","either_or_both.rs","exactly_one_err.rs","extrema_set.rs","flatten_ok.rs","format.rs","free.rs","group_map.rs","groupbylazy.rs","grouping_map.rs","impl_macros.rs","intersperse.rs","k_smallest.rs","kmerge_impl.rs","lazy_buffer.rs","lib.rs","merge_join.rs","minmax.rs","multipeek_impl.rs","pad_tail.rs","peek_nth.rs","peeking_take_while.rs","permutations.rs","powerset.rs","process_results_impl.rs","put_back_n_impl.rs","rciter_impl.rs","repeatn.rs","size_hint.rs","sources.rs","tee.rs","tuple_impl.rs","unique_impl.rs","unziptuple.rs","with_position.rs","zip_eq_impl.rs","zip_longest.rs","ziptuple.rs"]],\
 "itoa":["",[],["lib.rs","udiv128.rs"]],\
-"js_connectors":["",[],["async_js_function.rs","conversion.rs","error.rs","lib.rs","proxy.rs","queryable.rs","result.rs","transaction.rs"]],\
 "json_rpc_api_build":["",[],["error.rs","lib.rs","rust_crate.rs"]],\
 "jsonrpc_core":["",[["types",[],["error.rs","id.rs","mod.rs","params.rs","request.rs","response.rs","version.rs"]]],["calls.rs","delegates.rs","io.rs","lib.rs","middleware.rs"]],\
 "keccak":["",[],["lib.rs","unroll.rs"]],\

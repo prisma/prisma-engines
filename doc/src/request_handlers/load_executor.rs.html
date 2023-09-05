@@ -141,8 +141,8 @@
     url: <span class="kw-2">&amp;</span>str,
 ) -&gt; query_core::Result&lt;Box&lt;<span class="kw">dyn </span>QueryExecutor + Send + Sync + <span class="lifetime">&#39;static</span>&gt;&gt; {
     <span class="kw">if </span>connector_mode == ConnectorMode::Js {
-        <span class="attr">#[cfg(feature = <span class="string">&quot;js-connectors&quot;</span>)]
-        </span><span class="kw">return </span>jsconnector(source, url, features).<span class="kw">await</span>;
+        <span class="attr">#[cfg(feature = <span class="string">&quot;driver-adapters&quot;</span>)]
+        </span><span class="kw">return </span>driver_adapter(source, url, features).<span class="kw">await</span>;
     }
 
     <span class="kw">match </span>source.active_provider {
@@ -233,15 +233,15 @@
     <span class="prelude-val">Ok</span>(executor_for(mongo, <span class="bool-val">false</span>))
 }
 
-<span class="attr">#[cfg(feature = <span class="string">&quot;js-connectors&quot;</span>)]
-</span><span class="kw">async fn </span>jsconnector(
+<span class="attr">#[cfg(feature = <span class="string">&quot;driver-adapters&quot;</span>)]
+</span><span class="kw">async fn </span>driver_adapter(
     source: <span class="kw-2">&amp;</span>Datasource,
     url: <span class="kw-2">&amp;</span>str,
     features: PreviewFeatures,
 ) -&gt; <span class="prelude-ty">Result</span>&lt;Box&lt;<span class="kw">dyn </span>QueryExecutor + Send + Sync&gt;, query_core::CoreError&gt; {
-    <span class="macro">trace!</span>(<span class="string">&quot;Loading js connector ...&quot;</span>);
+    <span class="macro">trace!</span>(<span class="string">&quot;Loading driver adapter...&quot;</span>);
     <span class="kw">let </span>js = Js::from_source(source, url, features).<span class="kw">await</span><span class="question-mark">?</span>;
-    <span class="macro">trace!</span>(<span class="string">&quot;Loaded js connector ...&quot;</span>);
+    <span class="macro">trace!</span>(<span class="string">&quot;Loaded driver adapter...&quot;</span>);
     <span class="prelude-val">Ok</span>(executor_for(js, <span class="bool-val">false</span>))
 }
 </code></pre></div></section></main></body></html>

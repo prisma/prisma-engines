@@ -200,39 +200,39 @@
     sync::{Arc, Mutex},
 };
 
-<span class="doccomment">/// Registry is the type for the global registry of Js connectors.
-</span><span class="kw">type </span>Registry = HashMap&lt;String, JsConnector&gt;;
+<span class="doccomment">/// Registry is the type for the global registry of driver adapters.
+</span><span class="kw">type </span>Registry = HashMap&lt;String, DriverAdapter&gt;;
 
-<span class="doccomment">/// REGISTRY is the global registry of JsConnectors
+<span class="doccomment">/// REGISTRY is the global registry of Driver Adapters.
 </span><span class="kw">static </span>REGISTRY: Lazy&lt;Mutex&lt;Registry&gt;&gt; = Lazy::new(|| Mutex::new(HashMap::new()));
 
-<span class="kw">fn </span>registered_js_connector(provider: <span class="kw-2">&amp;</span>str) -&gt; connector::Result&lt;JsConnector&gt; {
+<span class="kw">fn </span>registered_driver_adapter(provider: <span class="kw-2">&amp;</span>str) -&gt; connector::Result&lt;DriverAdapter&gt; {
     <span class="kw">let </span>lock = REGISTRY.lock().unwrap();
     lock.get(provider)
         .ok_or(ConnectorError::from_kind(ErrorKind::UnsupportedConnector(<span class="macro">format!</span>(
-            <span class="string">&quot;A Javascript connector proxy for {} was not registered&quot;</span>,
+            <span class="string">&quot;A driver adapter for {} was not registered&quot;</span>,
             provider
         ))))
         .map(|conn_ref| conn_ref.to_owned())
 }
 
-<span class="kw">pub fn </span>register_js_connector(provider: <span class="kw-2">&amp;</span>str, connector: Arc&lt;<span class="kw">dyn </span>TransactionCapable&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;(), String&gt; {
+<span class="kw">pub fn </span>register_driver_adapter(provider: <span class="kw-2">&amp;</span>str, connector: Arc&lt;<span class="kw">dyn </span>TransactionCapable&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;(), String&gt; {
     <span class="kw">let </span><span class="kw-2">mut </span>lock = REGISTRY.lock().unwrap();
     <span class="kw">let </span>entry = lock.entry(provider.to_string());
     <span class="kw">match </span>entry {
         Entry::Occupied(<span class="kw">_</span>) =&gt; <span class="prelude-val">Err</span>(<span class="macro">format!</span>(
-            <span class="string">&quot;A Javascript connector proxy for {} was already registered, and cannot be overridden.&quot;</span>,
+            <span class="string">&quot;A driver adapter for {} was already registered, and cannot be overridden.&quot;</span>,
             provider
         )),
         Entry::Vacant(v) =&gt; {
-            v.insert(JsConnector { connector });
+            v.insert(DriverAdapter { connector });
             <span class="prelude-val">Ok</span>(())
         }
     }
 }
 
 <span class="kw">pub struct </span>Js {
-    connector: JsConnector,
+    connector: DriverAdapter,
     connection_info: ConnectionInfo,
     features: psl::PreviewFeatures,
 }
@@ -253,7 +253,7 @@
         url: <span class="kw-2">&amp;</span>str,
         features: psl::PreviewFeatures,
     ) -&gt; connector_interface::Result&lt;Js&gt; {
-        <span class="kw">let </span>connector = registered_js_connector(source.active_provider)<span class="question-mark">?</span>;
+        <span class="kw">let </span>connector = registered_driver_adapter(source.active_provider)<span class="question-mark">?</span>;
         <span class="kw">let </span>connection_info = get_connection_info(url)<span class="question-mark">?</span>;
 
         <span class="prelude-val">Ok</span>(Js {
@@ -286,11 +286,11 @@
 <span class="comment">// TODO: miguelff: I haven´t found a better way to do this, yet... please continue reading.
 //
 // There is a bug in NAPI-rs by wich compiling a binary crate that links code using napi-rs
-// bindings breaks. We could have used a JsQueryable from the `js-connectors` crate directly, as the
-// `connection` field of a `Js` connector, but that will imply using napi-rs transitively, and break
+// bindings breaks. We could have used a JsQueryable from the `driver-adapters` crate directly, as the
+// `connection` field of a driver adapter, but that will imply using napi-rs transitively, and break
 // the tests (which are compiled as binary creates)
 //
-// To avoid the problem above I separated interface from implementation, making JsConnector
+// To avoid the problem above I separated interface from implementation, making DriverAdapter
 // independent on napi-rs. Initially, I tried having a field Arc&lt;&amp;dyn TransactionCabable&gt; to hold
 // JsQueryable at runtime. I did this, because TransactionCapable is the trait bounds required to
 // create a value of  `SqlConnection` (see [SqlConnection::new])) to actually performt the queries.
@@ -301,12 +301,12 @@
 // declaration, so finally I couldn&#39;t come up with anything better then wrapping a QuaintQueryable
 // in this object, and implementing TransactionCapable (and quaint::Queryable) explicitly for it.
 </span><span class="attr">#[derive(Clone)]
-</span><span class="kw">struct </span>JsConnector {
+</span><span class="kw">struct </span>DriverAdapter {
     connector: Arc&lt;<span class="kw">dyn </span>TransactionCapable&gt;,
 }
 
 <span class="attr">#[async_trait]
-</span><span class="kw">impl </span>QuaintQueryable <span class="kw">for </span>JsConnector {
+</span><span class="kw">impl </span>QuaintQueryable <span class="kw">for </span>DriverAdapter {
     <span class="kw">async fn </span>query(<span class="kw-2">&amp;</span><span class="self">self</span>, q: Query&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; quaint::Result&lt;quaint::prelude::ResultSet&gt; {
         <span class="self">self</span>.connector.query(q).<span class="kw">await
     </span>}
@@ -358,7 +358,7 @@
 }
 
 <span class="attr">#[async_trait]
-</span><span class="kw">impl </span>TransactionCapable <span class="kw">for </span>JsConnector {
+</span><span class="kw">impl </span>TransactionCapable <span class="kw">for </span>DriverAdapter {
     <span class="kw">async fn </span>start_transaction&lt;<span class="lifetime">&#39;a</span>&gt;(
         <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="self">self</span>,
         isolation: <span class="prelude-ty">Option</span>&lt;IsolationLevel&gt;,

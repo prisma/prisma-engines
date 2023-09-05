@@ -50,7 +50,7 @@
 <a href="#50" id="50">50</a>
 <a href="#51" id="51">51</a>
 </pre></div><pre class="rust"><code><span class="kw">mod </span>connection;
-<span class="attr">#[cfg(feature = <span class="string">&quot;js-connectors&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">&quot;driver-adapters&quot;</span>)]
 </span><span class="kw">mod </span>js;
 <span class="kw">mod </span>mssql;
 <span class="kw">mod </span>mysql;
@@ -63,7 +63,7 @@
 <span class="kw">use </span>async_trait::async_trait;
 <span class="kw">use </span>connector_interface::{error::ConnectorError, Connector};
 
-<span class="attr">#[cfg(feature = <span class="string">&quot;js-connectors&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">&quot;driver-adapters&quot;</span>)]
 </span><span class="kw">pub use </span>js::<span class="kw-2">*</span>;
 <span class="kw">pub use </span>mssql::<span class="kw-2">*</span>;
 <span class="kw">pub use </span>mysql::<span class="kw-2">*</span>;
