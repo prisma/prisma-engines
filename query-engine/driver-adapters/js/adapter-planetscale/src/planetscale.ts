@@ -4,7 +4,7 @@ import type { DriverAdapter, ResultSet, Query, Queryable, Transaction, Result, T
 import { type PlanetScaleColumnType, fieldToColumnType } from './conversion'
 import { createDeferred, Deferred } from './deferred'
 
-const debug = Debug('prisma:js-connector:planetscale')
+const debug = Debug('prisma:driver-adapter:planetscale')
 
 class RollbackError extends Error {
   constructor() {

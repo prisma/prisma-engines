@@ -3,7 +3,7 @@ import { Debug } from '@jkomyno/prisma-adapter-utils'
 import type { DriverAdapter, ResultSet, Query, Queryable, Transaction, Result, TransactionOptions } from '@jkomyno/prisma-adapter-utils'
 import { fieldToColumnType } from './conversion'
 
-const debug = Debug('prisma:js-connector:neon')
+const debug = Debug('prisma:driver-adapter:neon')
 
 type ARRAY_MODE_DISABLED = false
 type FULL_RESULTS_ENABLED = true

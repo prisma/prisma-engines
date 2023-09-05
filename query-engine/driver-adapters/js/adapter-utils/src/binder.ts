@@ -15,7 +15,6 @@ class ErrorRegistryInternal implements ErrorRegistry {
     this.registeredErrors[i] = { error }
     return i
   }
-
 }
 
 // *.bind(adapter) is required to preserve the `this` context of functions whose

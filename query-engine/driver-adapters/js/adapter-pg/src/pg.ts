@@ -3,7 +3,7 @@ import { Debug } from '@jkomyno/prisma-adapter-utils'
 import type { DriverAdapter, Query, Queryable, Result, ResultSet, Transaction, TransactionOptions } from '@jkomyno/prisma-adapter-utils'
 import { fieldToColumnType } from './conversion'
 
-const debug = Debug('prisma:js-connector:pg')
+const debug = Debug('prisma:driver-adapter:pg')
 
 type StdClient = pg.Pool
 type TransactionClient = pg.PoolClient

@@ -1,14 +1,20 @@
 # Prisma Driver Adapters
 
 This TypeScript monorepo contains the following packages:
-- `@jkomyno/prisma-js-connector-utils` (later: `@prisma/js-connector-utils`)
+- `@jkomyno/prisma-adapter-utils` (later: `@prisma/adapter-utils`)
   - Internal set of utilities and types for Prisma's JS Connectors.
-- `@jkomyno/prisma-neon-js-connector` (later: `@prisma/neon-js-connector`)
-  - Prisma's JS Connector that wraps the `@neondatabase/serverless` driver
-  - Exposes debug logs via `DEBUG="prisma:js-connector:neon"`
-- `@jkomyno/prisma-planetscale-js-connector` (later: `@prisma/planetscale-js-connector`)
-  - Prisma's JS Connector that wraps the `@planetscale/database` driver
-  - Exposes debug logs via `DEBUG="prisma:js-connector:planetscale"`
+- `@jkomyno/prisma-adapter-neon` (later: `@prisma/adapter-neon`)
+  - Prisma's Driver Adapter that wraps the `@neondatabase/serverless` driver
+  - It uses `provider = "postgres"`
+  - It exposes debug logs via `DEBUG="prisma:driver-adapter:neon"`
+- `@jkomyno/prisma-adapter-planetscale` (later: `@prisma/adapter-planetscale`)
+  - Prisma's Driver Adapter that wraps the `@planetscale/database` driver
+  - It uses `provider = "mysql"`
+  - It exposes debug logs via `DEBUG="prisma:driver-adapter:planetscale"`
+- `@jkomyno/prisma-adapter-pg` (later: `@prisma/adapter-pg`)
+  - Prisma's Driver Adapter that wraps the `pg` driver
+  - It uses `provider = "postgres"`
+  - It exposes debug logs via `DEBUG="prisma:driver-adapter:pg"`
 
 ## Get Started
 
