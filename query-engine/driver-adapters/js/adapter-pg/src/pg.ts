@@ -89,7 +89,7 @@ class PgTransaction extends PgQueryable<TransactionClient>
   }
 }
 
-export class PrismaPostgres extends PgQueryable<StdClient> implements DriverAdapter {
+export class PrismaPg extends PgQueryable<StdClient> implements DriverAdapter {
   constructor(client: pg.Pool) {
     super(client)
   }

@@ -1,1 +1,1 @@
-export { PrismaPostgres } from './pg'
+export { PrismaPg } from './pg'
