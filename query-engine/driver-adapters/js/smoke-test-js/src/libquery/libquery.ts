@@ -1,10 +1,10 @@
 import { setTimeout } from 'node:timers/promises'
-import type { ErrorCapturingConnector } from '@jkomyno/prisma-js-connector-utils'
-import type { QueryEngineInstance } from '../engines/types/Library'
-import { initQueryEngine } from './util'
-import { JsonQuery } from '../engines/types/JsonProtocol'
+import type { ErrorCapturingDriverAdapter } from '@jkomyno/prisma-adapter-utils'
+import type { QueryEngineInstance } from '../engines/types/Library.js'
+import { initQueryEngine } from './util.js'
+import { JsonQuery } from '../engines/types/JsonProtocol.js'
 
-export async function smokeTestLibquery(db: ErrorCapturingConnector, prismaSchemaRelativePath: string) {
+export async function smokeTestLibquery(db: ErrorCapturingDriverAdapter, prismaSchemaRelativePath: string) {
   const engine = initQueryEngine(db, prismaSchemaRelativePath)
 
   console.log('[nodejs] connecting...')
@@ -43,9 +43,9 @@ export async function smokeTestLibquery(db: ErrorCapturingConnector, prismaSchem
 }
 
 class SmokeTest {
-  readonly flavour: ErrorCapturingConnector['flavour']
+  readonly flavour: ErrorCapturingDriverAdapter['flavour']
 
-  constructor(private readonly engine: QueryEngineInstance, private readonly connector: ErrorCapturingConnector) {
+  constructor(private readonly engine: QueryEngineInstance, private readonly connector: ErrorCapturingDriverAdapter) {
     this.flavour = connector.flavour
   }
 

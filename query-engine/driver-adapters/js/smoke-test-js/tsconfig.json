@@ -5,7 +5,7 @@
     "module": "ESNext",
     "lib": ["ES2020", "ES2021.WeakRef"],
     "moduleResolution": "NodeNext",
-    "esModuleInterop": true,
+    "esModuleInterop": false,
     "isolatedModules": true,
     "sourceMap": true,
     "declaration": true,

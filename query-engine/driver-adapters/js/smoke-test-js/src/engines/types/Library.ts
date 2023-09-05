@@ -1,5 +1,5 @@
-import type { ErrorCapturingConnector } from '@jkomyno/prisma-js-connector-utils'
-import type { QueryEngineConfig } from './QueryEngine'
+import type { ErrorCapturingDriverAdapter } from '@jkomyno/prisma-adapter-utils'
+import type { QueryEngineConfig } from './QueryEngine.js'
 
 export type QueryEngineInstance = {
   connect(headers: string): Promise<void>
@@ -18,7 +18,11 @@ export type QueryEngineInstance = {
 }
 
 export interface QueryEngineConstructor {
-  new(config: QueryEngineConfig, logger: (log: string) => void, nodejsFnCtx?: ErrorCapturingConnector): QueryEngineInstance
+  new(
+    config: QueryEngineConfig,
+    logger: (log: string) => void,
+    driverAdapter?: ErrorCapturingDriverAdapter,
+  ): QueryEngineInstance
 }
 
 export interface LibraryLoader {

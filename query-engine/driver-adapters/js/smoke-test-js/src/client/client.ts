@@ -1,9 +1,9 @@
 import { describe, it } from 'node:test'
 import assert from 'node:assert'
 import { PrismaClient } from '@prisma/client'
-import { ErrorCapturingConnector } from '@jkomyno/prisma-js-connector-utils'
+import type { DriverAdapter } from '@jkomyno/prisma-adapter-utils'
 
-export async function smokeTestClient(connector: ErrorCapturingConnector) {
+export async function smokeTestClient(connector: DriverAdapter) {
   const provider = connector.flavour
 
   const log = [
@@ -18,6 +18,7 @@ export async function smokeTestClient(connector: ErrorCapturingConnector) {
     describe(isUsingJsConnector ? `using JS Connectors` : `using Rust drivers`, () => {
       it('batch queries', async () => {
         const prisma = new PrismaClient({
+          // @ts-ignore
           jsConnector,
           log,
         })
@@ -73,6 +74,7 @@ export async function smokeTestClient(connector: ErrorCapturingConnector) {
     
       it('applies isolation level when using batch $transaction', async () => {
         const prisma = new PrismaClient({
+          // @ts-ignore
           jsConnector,
           log,
         })

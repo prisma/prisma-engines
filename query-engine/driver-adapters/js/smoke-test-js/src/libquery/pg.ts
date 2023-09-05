@@ -1,17 +1,19 @@
-import { createPgConnector } from '@jkomyno/prisma-pg-js-connector'
-import { smokeTestLibquery } from './libquery' 
+import pg from 'pg'
+import { PrismaPostgres } from '@jkomyno/prisma-adapter-pg'
+import { bindAdapter } from '@jkomyno/prisma-adapter-utils'
+import { smokeTestLibquery } from './libquery.js'
 
-async function pg() {
+async function main() {
   const connectionString = `${process.env.JS_PG_DATABASE_URL as string}`
 
-  const db = createPgConnector({
-    url: connectionString,
-  })
+  const pool = new pg.Pool({ connectionString })
+  const adapter = new PrismaPostgres(pool)
+  const driverAdapter = bindAdapter(adapter)
 
-  await smokeTestLibquery(db, '../../prisma/postgres/schema.prisma')
+  await smokeTestLibquery(driverAdapter, '../../prisma/postgres/schema.prisma')
 }
 
-pg().catch((e) => {
+main().catch((e) => {
   console.error(e)
   process.exit(1)
 })

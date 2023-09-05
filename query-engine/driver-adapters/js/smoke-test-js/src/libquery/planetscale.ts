@@ -1,17 +1,19 @@
-import { createPlanetScaleConnector } from '@jkomyno/prisma-planetscale-js-connector'
-import { smokeTestLibquery } from './libquery' 
+import { connect } from '@planetscale/database'
+import { PrismaPlanetScale } from '@jkomyno/prisma-adapter-planetscale'
+import { bindAdapter } from '@jkomyno/prisma-adapter-utils'
+import { smokeTestLibquery } from './libquery.js' 
 
-async function planetscale() {
+async function main() {
   const connectionString = `${process.env.JS_PLANETSCALE_DATABASE_URL as string}`
 
-  const db = createPlanetScaleConnector({
-    url: connectionString,
-  })
+  const planetscale = connect({ url: connectionString })
+  const adapter = new PrismaPlanetScale(planetscale)
+  const driverAdapter = bindAdapter(adapter)
 
-  await smokeTestLibquery(db, '../../prisma/mysql/schema.prisma')
+  await smokeTestLibquery(driverAdapter, '../../prisma/mysql/schema.prisma')
 }
 
-planetscale().catch((e) => {
+main().catch((e) => {
   console.error(e)
   process.exit(1)
 })

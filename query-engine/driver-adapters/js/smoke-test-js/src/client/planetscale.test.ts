@@ -1,13 +1,13 @@
-import { createPlanetScaleConnector } from '@jkomyno/prisma-planetscale-js-connector'
+import { connect } from '@planetscale/database'
+import { PrismaPlanetScale } from '@jkomyno/prisma-adapter-planetscale'
 import { describe } from 'node:test'
-import { smokeTestClient } from './client'
+import { smokeTestClient } from './client.js'
 
 describe('planetscale with @prisma/client', async () => {
   const connectionString = `${process.env.JS_PLANETSCALE_DATABASE_URL as string}`
 
-  const jsConnector = createPlanetScaleConnector({
-    url: connectionString,
-  })
-
-  smokeTestClient(jsConnector)
+  const connnection = connect({ url: connectionString })
+  const adapter = new PrismaPlanetScale(connnection)
+  
+  smokeTestClient(adapter)
 })
