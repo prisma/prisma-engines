@@ -1,5 +1,5 @@
 mod connection;
-#[cfg(feature = "js-connectors")]
+#[cfg(feature = "driver-adapters")]
 mod js;
 mod mssql;
 mod mysql;
@@ -12,7 +12,7 @@ pub(crate) mod operations;
 use async_trait::async_trait;
 use connector_interface::{error::ConnectorError, Connector};
 
-#[cfg(feature = "js-connectors")]
+#[cfg(feature = "driver-adapters")]
 pub use js::*;
 pub use mssql::*;
 pub use mysql::*;

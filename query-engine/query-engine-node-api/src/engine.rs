@@ -169,24 +169,33 @@ impl QueryEngine {
         let overrides: Vec<(_, _)> = datasource_overrides.into_iter().collect();
 
         let mut schema = psl::validate(datamodel.into());
+        let config = &mut schema.configuration;
+        let preview_features = config.preview_features();
+
         let mut connector_mode = ConnectorMode::Rust;
 
-        #[cfg(feature = "js-connectors")]
-        if let Some(driver) = maybe_driver {
-            let js_queryable = js_connectors::from_napi(driver);
-            let provider_name = schema.connector.provider_name();
+        if !preview_features.contains(PreviewFeature::DriverAdapters) {
+            tracing::info!(
+                "Please enable the {} preview feature to use driver adapters.",
+                PreviewFeature::DriverAdapters
+            );
+        } else {
+            #[cfg(feature = "driver-adapters")]
+            if let Some(driver) = maybe_driver {
+                let js_queryable = driver_adapters::from_napi(driver);
+                let provider_name = schema.connector.provider_name();
 
-            match sql_connector::register_js_connector(provider_name, Arc::new(js_queryable)) {
-                Ok(_) => {
-                    connector_mode = ConnectorMode::Js;
-                    tracing::info!("Registered js connector for {provider_name}")
+                match sql_connector::register_driver_adapter(provider_name, Arc::new(js_queryable)) {
+                    Ok(_) => {
+                        connector_mode = ConnectorMode::Js;
+                        tracing::info!("Registered driver adapter for {provider_name}.")
+                    }
+                    Err(err) => tracing::error!("Failed to register driver adapter for {provider_name}. {err}"),
                 }
-                Err(err) => tracing::error!("Failed to registered js connector for {provider_name}. {err}"),
             }
         }
 
         let connector_mode = connector_mode;
-        let config = &mut schema.configuration;
 
         schema
             .diagnostics

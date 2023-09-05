@@ -35,7 +35,7 @@ codspeed-criterion-compat = "1.1.0"
 default = ["mongodb", "sql"]
 mongodb = ["mongodb-query-connector"]
 sql = ["sql-query-connector"]
-js-connectors = ["sql-query-connector"]
+driver-adapters = ["sql-query-connector"]
 
 [[bench]]
 name = "query_planning_bench"
