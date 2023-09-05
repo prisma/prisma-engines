@@ -1,5 +1,5 @@
 import type { ErrorCapturingDriverAdapter } from '@jkomyno/prisma-driver-adapter-utils'
-import type { QueryEngineConfig } from './QueryEngine.js'
+import type { QueryEngineConfig } from './QueryEngine'
 
 export type QueryEngineInstance = {
   connect(headers: string): Promise<void>

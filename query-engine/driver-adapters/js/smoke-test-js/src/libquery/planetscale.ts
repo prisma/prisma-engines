@@ -1,7 +1,7 @@
 import { connect } from '@planetscale/database'
 import { PrismaPlanetScale } from '@jkomyno/prisma-adapter-planetscale'
 import { bindAdapter } from '@jkomyno/prisma-driver-adapter-utils'
-import { smokeTestLibquery } from './libquery.js' 
+import { smokeTestLibquery } from './libquery' 
 
 async function main() {
   const connectionString = `${process.env.JS_PLANETSCALE_DATABASE_URL as string}`

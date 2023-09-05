@@ -1,7 +1,7 @@
 import { describe } from 'node:test'
 import { neon } from '@neondatabase/serverless'
 import { PrismaNeonHTTP } from '@jkomyno/prisma-adapter-neon'
-import { smokeTestClient } from './client.js'
+import { smokeTestClient } from './client'
 
 describe('neon with @prisma/client', async () => {
   const connectionString = `${process.env.JS_NEON_DATABASE_URL as string}`

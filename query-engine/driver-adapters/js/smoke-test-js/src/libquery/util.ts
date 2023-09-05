@@ -1,10 +1,10 @@
 import path from 'node:path'
 import os from 'node:os'
 import fs from 'node:fs'
-import type { ErrorCapturingConnector } from '@jkomyno/prisma-js-connector-utils'
+import type { ErrorCapturingDriverAdapter } from '@jkomyno/prisma-driver-adapter-utils'
 import { Library, QueryEngineInstance } from '../engines/types/Library'
 
-export function initQueryEngine(driver: ErrorCapturingConnector, prismaSchemaRelativePath: string): QueryEngineInstance {
+export function initQueryEngine(driver: ErrorCapturingDriverAdapter, prismaSchemaRelativePath: string): QueryEngineInstance {
   // I assume nobody will run this on Windows ¯\_(ツ)_/¯
   const libExt = os.platform() === 'darwin' ? 'dylib' : 'so'
   const dirname = path.dirname(new URL(import.meta.url).pathname)
