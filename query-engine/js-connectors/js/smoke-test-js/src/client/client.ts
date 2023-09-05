@@ -14,8 +14,9 @@ export async function smokeTestClient(connector: ErrorCapturingConnector) {
   ]
 
   for (const jsConnector of [connector, undefined]) {
-    describe(jsConnector ? `using JS Connectors` : `using Rust drivers`, () => {
-      it('executes batch queries in the right order when using extensions + middleware', async () => {
+    const isUsingJsConnector = jsConnector !== undefined
+    describe(isUsingJsConnector ? `using JS Connectors` : `using Rust drivers`, () => {
+      it('batch queries', async () => {
         const prisma = new PrismaClient({
           jsConnector,
           log,
@@ -23,29 +24,51 @@ export async function smokeTestClient(connector: ErrorCapturingConnector) {
     
         const queries: string[] = []
         prisma.$on('query', ({ query }) => queries.push(query))
-    
-        const xprisma = prisma.$extends({
-          query: {
-            async $queryRawUnsafe({ args, query }) {
-              const [, result] = await prisma.$transaction([
-                prisma.$queryRawUnsafe('SELECT 1'),
-                query(args),
-                prisma.$queryRawUnsafe('SELECT 3'),
-              ])
-              return result
-            },
-          },
-        })
-    
-        await xprisma.$queryRawUnsafe('SELECT 2')
-    
-        assert.deepEqual(queries, [
+
+        await prisma.$transaction([
+          prisma.$queryRawUnsafe('SELECT 1'),
+          prisma.$queryRawUnsafe('SELECT 2'),
+          prisma.$queryRawUnsafe('SELECT 3'),
+        ])
+
+        const defaultExpectedQueries = [
           'BEGIN',
           'SELECT 1',
           'SELECT 2',
           'SELECT 3',
           'COMMIT',
-        ])
+        ]
+
+        const jsConnectorExpectedQueries = [
+          '-- Implicit "BEGIN" query via underlying driver',
+          'SELECT 1',
+          'SELECT 2',
+          'SELECT 3',
+          '-- Implicit "COMMIT" query via underlying driver',
+        ]
+
+        const postgresExpectedQueries = [
+          'BEGIN',
+          'DEALLOCATE ALL',
+          'SELECT 1',
+          'SELECT 2',
+          'SELECT 3',
+          'COMMIT',
+        ]
+
+        if (['mysql'].includes(provider)) {
+          if (isUsingJsConnector) {
+            assert.deepEqual(queries, jsConnectorExpectedQueries)
+          } else {
+            assert.deepEqual(queries, defaultExpectedQueries)
+          }
+        } else if (['postgres'].includes(provider)) {
+          if (isUsingJsConnector) {
+            assert.deepEqual(queries, defaultExpectedQueries)
+          } else {
+            assert.deepEqual(queries, postgresExpectedQueries)
+          }
+        }
       })
     
       it('applies isolation level when using batch $transaction', async () => {

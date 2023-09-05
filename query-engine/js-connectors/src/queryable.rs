@@ -125,6 +125,10 @@ impl QuaintQueryable for JsBaseQueryable {
 }
 
 impl JsBaseQueryable {
+    pub fn phantom_query_message(stmt: &str) -> String {
+        format!(r#"-- Implicit "{}" query via underlying driver"#, stmt)
+    }
+
     async fn build_query(sql: &str, values: &[quaint::Value<'_>]) -> quaint::Result<Query> {
         let sql: String = sql.to_string();
         let args = conversion::conv_params(values)?;
@@ -253,7 +257,8 @@ impl TransactionCapable for JsQueryable {
 
         let tx_opts = tx.options();
         if tx_opts.use_phantom_query {
-            tx.raw_phantom_cmd(begin_stmt).await?;
+            let begin_stmt = JsBaseQueryable::phantom_query_message(begin_stmt);
+            tx.raw_phantom_cmd(begin_stmt.as_str()).await?;
         } else {
             tx.raw_cmd(begin_stmt).await?;
         }
