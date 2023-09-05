@@ -1,13 +1,40 @@
 use query_core::constants::custom_types;
-use request_handlers::{GQLError, PrismaResponse};
+use request_handlers::PrismaResponse;
 use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug)]
+pub struct SimpleGqlError {
+    error: String,
+    #[serde(default)]
+    meta: Option<serde_json::Value>,
+    #[serde(default)]
+    user_facing_error: Option<serde_json::Value>,
+}
+
+impl SimpleGqlError {
+    fn code(&self) -> Option<&str> {
+        self.user_facing_error.as_ref()?["error_code"].as_str()
+    }
+
+    fn message(&self) -> &str {
+        self.user_facing_error
+            .as_ref()
+            .and_then(|err| err["message"].as_str())
+            .unwrap_or(&self.error)
+    }
+
+    pub fn batch_request_idx(&self) -> Option<usize> {
+        todo!()
+    }
+}
+
+#[derive(Serialize, Deserialize, Debug)]
 struct SimpleGqlResponse {
+    #[serde(default)]
     data: serde_json::Value,
     #[serde(skip_serializing_if = "Vec::is_empty")]
     #[serde(default)]
-    errors: Vec<GQLError>,
+    errors: Vec<SimpleGqlError>,
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(default)]
     extensions: Option<serde_json::Value>,
@@ -15,10 +42,11 @@ struct SimpleGqlResponse {
 
 #[derive(Serialize, Deserialize, Debug)]
 struct SimpleGqlBatchResponse {
+    #[serde(default)]
     batch_result: Vec<SimpleGqlResponse>,
     #[serde(skip_serializing_if = "Vec::is_empty")]
     #[serde(default)]
-    errors: Vec<GQLError>,
+    errors: Vec<SimpleGqlError>,
     #[serde(skip_serializing_if = "Option::is_none")]
     extensions: Option<serde_json::Value>,
 }
@@ -74,7 +102,7 @@ impl QueryResult {
         let err_exists = self.errors().into_iter().any(|err| {
             let code_matches = err.code() == err_code.as_deref();
             let msg_matches = match msg_contains.as_ref() {
-                Some(msg) => err.message().contains(msg),
+                Some(msg) => dbg!(err.message()).contains(msg),
                 None => true,
             };
 
@@ -99,7 +127,7 @@ impl QueryResult {
         }
     }
 
-    pub fn errors(&self) -> Vec<&GQLError> {
+    pub fn errors(&self) -> Vec<&SimpleGqlError> {
         match self.response {
             Response::Single(ref s) => s.errors.iter().collect(),
             Response::Multi(ref m) => m
@@ -142,7 +170,7 @@ impl From<PrismaResponse> for QueryResult {
             PrismaResponse::Single(res) => QueryResult {
                 response: Response::Single(SimpleGqlResponse {
                     data: serde_json::to_value(res.data).unwrap(),
-                    errors: res.errors,
+                    errors: res.errors.into_iter().map(|err| convert_gql_error(&err)).collect(),
                     extensions: (!res.extensions.is_empty()).then(|| serde_json::to_value(&res.extensions).unwrap()),
                 }),
             },
@@ -153,12 +181,12 @@ impl From<PrismaResponse> for QueryResult {
                         .into_iter()
                         .map(|res| SimpleGqlResponse {
                             data: serde_json::to_value(&res.data).unwrap(),
-                            errors: res.errors,
+                            errors: res.errors.into_iter().map(|err| convert_gql_error(&err)).collect(),
                             extensions: (!res.extensions.is_empty())
                                 .then(|| serde_json::to_value(&res.extensions).unwrap()),
                         })
                         .collect(),
-                    errors: reses.errors,
+                    errors: reses.errors.into_iter().map(|err| convert_gql_error(&err)).collect(),
                     extensions: (!reses.extensions.is_empty())
                         .then(|| serde_json::to_value(&reses.extensions).unwrap()),
                 }),
@@ -186,5 +214,23 @@ fn detag_value(val: &mut serde_json::Value) {
             }
         }
         _ => (),
+    }
+}
+
+fn convert_gql_error(err: &request_handlers::GQLError) -> SimpleGqlError {
+    SimpleGqlError {
+        error: err.message().to_owned(),
+        meta: err.code().map(|code| {
+            serde_json::json!({
+                "code": code,
+                "message": err.message()
+            })
+        }),
+        user_facing_error: err.code().map(|code| {
+            serde_json::json!({
+                "code": code,
+                "message": err.message()
+            })
+        }),
     }
 }

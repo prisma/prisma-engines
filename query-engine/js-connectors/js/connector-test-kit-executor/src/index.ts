@@ -15,6 +15,7 @@ async function main(): Promise<void> {
     iface.on('line', async (line) => {
         try {
             const request: jsonRpc.Request = JSON.parse(line); // todo: validate
+            console.error(`Got a request: ${request}`)
             try {
                 const response = await handleRequest(request.method, request.params)
                 respondOk(request.id, response)
