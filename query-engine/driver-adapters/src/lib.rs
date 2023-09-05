@@ -1,4 +1,4 @@
-//! Query Engine JS Connectors
+//! Query Engine Driver Adapters
 //! This crate is responsible for defining a quaint::Connector implementation that uses functions
 //! exposed by client connectors via N-API.
 //!

@@ -2,7 +2,7 @@
 
 This TypeScript monorepo contains the following packages:
 - `@jkomyno/prisma-adapter-utils` (later: `@prisma/adapter-utils`)
-  - Internal set of utilities and types for Prisma's JS Connectors.
+  - Internal set of utilities and types for Prisma's driver adapters.
 - `@jkomyno/prisma-adapter-neon` (later: `@prisma/adapter-neon`)
   - Prisma's Driver Adapter that wraps the `@neondatabase/serverless` driver
   - It uses `provider = "postgres"`

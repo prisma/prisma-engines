@@ -3,8 +3,8 @@ import assert from 'node:assert'
 import { PrismaClient } from '@prisma/client'
 import type { DriverAdapter } from '@jkomyno/prisma-adapter-utils'
 
-export async function smokeTestClient(connector: DriverAdapter) {
-  const provider = connector.flavour
+export async function smokeTestClient(driverAdapter: DriverAdapter) {
+  const provider = driverAdapter.flavour
 
   const log = [
     {
@@ -13,13 +13,13 @@ export async function smokeTestClient(connector: DriverAdapter) {
     } as const,
   ]
 
-  for (const jsConnector of [connector, undefined]) {
-    const isUsingJsConnector = jsConnector !== undefined
-    describe(isUsingJsConnector ? `using JS Connectors` : `using Rust drivers`, () => {
+  for (const adapter of [driverAdapter, undefined]) {
+    const isUsingDriverAdapters = adapter !== undefined
+    describe(isUsingDriverAdapters ? `using Driver Adapters` : `using Rust drivers`, () => {
       it('batch queries', async () => {
         const prisma = new PrismaClient({
           // @ts-ignore
-          jsConnector,
+          jsConnector: adapter,
           log,
         })
     
@@ -40,7 +40,7 @@ export async function smokeTestClient(connector: DriverAdapter) {
           'COMMIT',
         ]
 
-        const jsConnectorExpectedQueries = [
+        const driverAdapterExpectedQueries = [
           '-- Implicit "BEGIN" query via underlying driver',
           'SELECT 1',
           'SELECT 2',
@@ -58,13 +58,13 @@ export async function smokeTestClient(connector: DriverAdapter) {
         ]
 
         if (['mysql'].includes(provider)) {
-          if (isUsingJsConnector) {
-            assert.deepEqual(queries, jsConnectorExpectedQueries)
+          if (isUsingDriverAdapters) {
+            assert.deepEqual(queries, driverAdapterExpectedQueries)
           } else {
             assert.deepEqual(queries, defaultExpectedQueries)
           }
         } else if (['postgres'].includes(provider)) {
-          if (isUsingJsConnector) {
+          if (isUsingDriverAdapters) {
             assert.deepEqual(queries, defaultExpectedQueries)
           } else {
             assert.deepEqual(queries, postgresExpectedQueries)
@@ -75,7 +75,7 @@ export async function smokeTestClient(connector: DriverAdapter) {
       it('applies isolation level when using batch $transaction', async () => {
         const prisma = new PrismaClient({
           // @ts-ignore
-          jsConnector,
+          jsConnector: adapter,
           log,
         })
     
