@@ -174,23 +174,23 @@ impl QueryEngine {
 
         let mut connector_mode = ConnectorMode::Rust;
 
-        if !preview_features.contains(PreviewFeature::JsConnectors) {
+        if !preview_features.contains(PreviewFeature::DriverAdapters) {
             tracing::info!(
-                "Please enable the {} preview feature to use JS connectors",
-                PreviewFeature::JsConnectors
+                "Please enable the {} preview feature to use driver adapters.",
+                PreviewFeature::DriverAdapters
             );
         } else {
-            #[cfg(feature = "js-connectors")]
+            #[cfg(feature = "driver-adapters")]
             if let Some(driver) = maybe_driver {
-                let js_queryable = js_connectors::from_napi(driver);
+                let js_queryable = driver_adapters::from_napi(driver);
                 let provider_name = schema.connector.provider_name();
 
-                match sql_connector::register_js_connector(provider_name, Arc::new(js_queryable)) {
+                match sql_connector::register_driver_adapter(provider_name, Arc::new(js_queryable)) {
                     Ok(_) => {
                         connector_mode = ConnectorMode::Js;
-                        tracing::info!("Registered js connector for {provider_name}")
+                        tracing::info!("Registered driver adapter for {provider_name}.")
                     }
-                    Err(err) => tracing::error!("Failed to registered js connector for {provider_name}. {err}"),
+                    Err(err) => tracing::error!("Failed to register driver adapter for {provider_name}. {err}"),
                 }
             }
         }

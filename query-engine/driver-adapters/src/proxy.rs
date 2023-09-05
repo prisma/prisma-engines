@@ -329,9 +329,9 @@ impl CommonProxy {
 }
 
 impl DriverProxy {
-    pub fn new(js_connector: &JsObject) -> napi::Result<Self> {
+    pub fn new(driver_adapter: &JsObject) -> napi::Result<Self> {
         Ok(Self {
-            start_transaction: js_connector.get_named_property("startTransaction")?,
+            start_transaction: driver_adapter.get_named_property("startTransaction")?,
         })
     }
 

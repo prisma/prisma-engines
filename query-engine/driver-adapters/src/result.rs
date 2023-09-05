@@ -5,14 +5,14 @@ use serde::Deserialize;
 #[derive(Deserialize, Debug)]
 #[serde(tag = "kind")]
 /// Wrapper for JS-side errors
-/// See js-connectors/js-connector-utils/types file for example
-pub(crate) enum JsConnectorError {
+/// See driver-adapters/js-connector-utils/types file for example
+pub(crate) enum DriverAdapterError {
     /// Unexpected JS exception
     GenericJsError { id: i32 },
     // in the future, expected errors that map to known user errors with PXXX codes will also go here
 }
 
-impl FromNapiValue for JsConnectorError {
+impl FromNapiValue for DriverAdapterError {
     unsafe fn from_napi_value(napi_env: napi::sys::napi_env, napi_val: napi::sys::napi_value) -> napi::Result<Self> {
         let env = Env::from_raw(napi_env);
         let value = JsUnknown::from_raw(napi_env, napi_val)?;
@@ -20,23 +20,23 @@ impl FromNapiValue for JsConnectorError {
     }
 }
 
-impl From<JsConnectorError> for QuaintError {
-    fn from(value: JsConnectorError) -> Self {
+impl From<DriverAdapterError> for QuaintError {
+    fn from(value: DriverAdapterError) -> Self {
         match value {
-            JsConnectorError::GenericJsError { id } => QuaintError::external_error(id),
+            DriverAdapterError::GenericJsError { id } => QuaintError::external_error(id),
             // in future, more error types would be added and we'll need to convert them to proper QuaintErrors here
         }
     }
 }
 
 /// Wrapper for JS-side result type
-/// See js-connectors/js-connector-utils/types file for example
+/// See driver-adapterss/js-connector-utils/types file for example
 pub(crate) enum JsResult<T>
 where
     T: FromNapiValue,
 {
     Ok(T),
-    Err(JsConnectorError),
+    Err(DriverAdapterError),
 }
 
 impl<T> JsResult<T>

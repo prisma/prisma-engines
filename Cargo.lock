@@ -1047,6 +1047,29 @@ dependencies = [
 ]
 
 [[package]]
+name = "driver-adapters"
+version = "0.1.0"
+dependencies = [
+ "async-trait",
+ "bigdecimal",
+ "chrono",
+ "expect-test",
+ "futures",
+ "metrics 0.18.1",
+ "napi",
+ "napi-derive",
+ "num-bigint",
+ "once_cell",
+ "psl",
+ "quaint",
+ "serde",
+ "serde_json",
+ "tokio",
+ "tracing",
+ "tracing-core",
+]
+
+[[package]]
 name = "either"
 version = "1.9.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1868,29 +1891,6 @@ name = "itoa"
 version = "1.0.9"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "af150ab688ff2122fcef229be89cb50dd66af9e01a4ff320cc137eecc9bacc38"
-
-[[package]]
-name = "js-connectors"
-version = "0.1.0"
-dependencies = [
- "async-trait",
- "bigdecimal",
- "chrono",
- "expect-test",
- "futures",
- "metrics 0.18.1",
- "napi",
- "napi-derive",
- "num-bigint",
- "once_cell",
- "psl",
- "quaint",
- "serde",
- "serde_json",
- "tokio",
- "tracing",
- "tracing-core",
-]
 
 [[package]]
 name = "js-sys"
@@ -3614,8 +3614,8 @@ dependencies = [
  "anyhow",
  "async-trait",
  "connection-string",
+ "driver-adapters",
  "futures",
- "js-connectors",
  "napi",
  "napi-build",
  "napi-derive",

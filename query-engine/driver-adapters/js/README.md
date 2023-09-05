@@ -1,4 +1,4 @@
-# Prisma JS Connectors
+# Prisma Driver Adapters
 
 This TypeScript monorepo contains the following packages:
 - `@jkomyno/prisma-js-connector-utils` (later: `@prisma/js-connector-utils`)

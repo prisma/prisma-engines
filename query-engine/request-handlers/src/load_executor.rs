@@ -18,8 +18,8 @@ pub async fn load(
     url: &str,
 ) -> query_core::Result<Box<dyn QueryExecutor + Send + Sync + 'static>> {
     if connector_mode == ConnectorMode::Js {
-        #[cfg(feature = "js-connectors")]
-        return jsconnector(source, url, features).await;
+        #[cfg(feature = "driver-adapters")]
+        return driver_adapter(source, url, features).await;
     }
 
     match source.active_provider {
@@ -110,14 +110,14 @@ async fn mongodb(
     Ok(executor_for(mongo, false))
 }
 
-#[cfg(feature = "js-connectors")]
-async fn jsconnector(
+#[cfg(feature = "driver-adapters")]
+async fn driver_adapter(
     source: &Datasource,
     url: &str,
     features: PreviewFeatures,
 ) -> Result<Box<dyn QueryExecutor + Send + Sync>, query_core::CoreError> {
-    trace!("Loading js connector ...");
+    trace!("Loading driver adapter...");
     let js = Js::from_source(source, url, features).await?;
-    trace!("Loaded js connector ...");
+    trace!("Loaded driver adapter...");
     Ok(executor_for(js, false))
 }
