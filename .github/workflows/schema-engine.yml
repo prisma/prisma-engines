@@ -33,7 +33,7 @@ jobs:
             url: "mongodb://prisma:prisma@localhost:27018/?authSource=admin&retryWrites=true"
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - uses: dtolnay/rust-toolchain@stable
 
       - name: Login to Docker Hub
@@ -105,7 +105,7 @@ jobs:
 
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - uses: dtolnay/rust-toolchain@stable
 
       - name: Login to Docker Hub
@@ -209,7 +209,7 @@ jobs:
     name: "Test ${{ matrix.db.name }} on Windows"
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - uses: dtolnay/rust-toolchain@stable
 
       - uses: actions/cache@v3
