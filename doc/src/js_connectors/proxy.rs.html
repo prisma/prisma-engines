@@ -661,6 +661,20 @@
 <a href="#661" id="661">661</a>
 <a href="#662" id="662">662</a>
 <a href="#663" id="663">663</a>
+<a href="#664" id="664">664</a>
+<a href="#665" id="665">665</a>
+<a href="#666" id="666">666</a>
+<a href="#667" id="667">667</a>
+<a href="#668" id="668">668</a>
+<a href="#669" id="669">669</a>
+<a href="#670" id="670">670</a>
+<a href="#671" id="671">671</a>
+<a href="#672" id="672">672</a>
+<a href="#673" id="673">673</a>
+<a href="#674" id="674">674</a>
+<a href="#675" id="675">675</a>
+<a href="#676" id="676">676</a>
+<a href="#677" id="677">677</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>core::panic;
 <span class="kw">use </span>std::str::FromStr;
 
@@ -670,7 +684,7 @@
 <span class="kw">use </span>napi::bindgen_prelude::{FromNapiValue, ToNapiValue};
 <span class="kw">use </span>napi::{JsObject, JsString};
 <span class="kw">use </span>napi_derive::napi;
-<span class="kw">use </span>quaint::connector::{IsolationLevel, ResultSet <span class="kw">as </span>QuaintResultSet};
+<span class="kw">use </span>quaint::connector::ResultSet <span class="kw">as </span>QuaintResultSet;
 <span class="kw">use </span>quaint::Value <span class="kw">as </span>QuaintValue;
 
 <span class="comment">// TODO(jkomyno): import these 3rd-party crates from the `quaint-core` crate.
@@ -696,11 +710,14 @@
 <span class="doccomment">/// This is a JS proxy for accessing the methods specific to top level
 /// JS driver objects
 </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>DriverProxy {
-    start_transaction: AsyncJsFunction&lt;<span class="prelude-ty">Option</span>&lt;String&gt;, JsTransaction&gt;,
+    start_transaction: AsyncJsFunction&lt;(), JsTransaction&gt;,
 }
 <span class="doccomment">/// This a JS proxy for accessing the methods, specific
 /// to JS transaction objects
 </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>TransactionProxy {
+    <span class="doccomment">/// transaction options
+    </span>options: TransactionOptions,
+
     <span class="doccomment">/// commit transaction
     </span>commit: AsyncJsFunction&lt;(), ()&gt;,
 
@@ -995,24 +1012,35 @@
         })
     }
 
-    <span class="kw">pub async fn </span>start_transaction(
-        <span class="kw-2">&amp;</span><span class="self">self</span>,
-        isolation_level: <span class="prelude-ty">Option</span>&lt;IsolationLevel&gt;,
-    ) -&gt; quaint::Result&lt;Box&lt;JsTransaction&gt;&gt; {
-        <span class="kw">let </span>tx = <span class="self">self
-            </span>.start_transaction
-            .call(isolation_level.map(|l| l.to_string()))
-            .<span class="kw">await</span><span class="question-mark">?</span>;
+    <span class="kw">pub async fn </span>start_transaction(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; quaint::Result&lt;Box&lt;JsTransaction&gt;&gt; {
+        <span class="kw">let </span>tx = <span class="self">self</span>.start_transaction.call(()).<span class="kw">await</span><span class="question-mark">?</span>;
         <span class="prelude-val">Ok</span>(Box::new(tx))
     }
+}
+
+<span class="attr">#[derive(Debug)]
+#[napi(object)]
+</span><span class="kw">pub struct </span>TransactionOptions {
+    <span class="doccomment">/// Whether or not to run a phantom query (i.e., a query that only influences Prisma event logs, but not the database itself)
+    /// before opening a transaction, committing, or rollbacking.
+    </span><span class="kw">pub </span>use_phantom_query: bool,
 }
 
 <span class="kw">impl </span>TransactionProxy {
     <span class="kw">pub fn </span>new(js_transaction: <span class="kw-2">&amp;</span>JsObject) -&gt; napi::Result&lt;<span class="self">Self</span>&gt; {
         <span class="kw">let </span>commit = js_transaction.get_named_property(<span class="string">&quot;commit&quot;</span>)<span class="question-mark">?</span>;
         <span class="kw">let </span>rollback = js_transaction.get_named_property(<span class="string">&quot;rollback&quot;</span>)<span class="question-mark">?</span>;
+        <span class="kw">let </span>options: TransactionOptions = js_transaction.get_named_property(<span class="string">&quot;options&quot;</span>)<span class="question-mark">?</span>;
 
-        <span class="prelude-val">Ok</span>(<span class="self">Self </span>{ commit, rollback })
+        <span class="prelude-val">Ok</span>(<span class="self">Self </span>{
+            commit,
+            rollback,
+            options,
+        })
+    }
+
+    <span class="kw">pub fn </span>options(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>TransactionOptions {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.options
     }
 
     <span class="kw">pub async fn </span>commit(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; quaint::Result&lt;()&gt; {

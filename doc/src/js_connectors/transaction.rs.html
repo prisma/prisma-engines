@@ -100,7 +100,42 @@
 <a href="#100" id="100">100</a>
 <a href="#101" id="101">101</a>
 <a href="#102" id="102">102</a>
+<a href="#103" id="103">103</a>
+<a href="#104" id="104">104</a>
+<a href="#105" id="105">105</a>
+<a href="#106" id="106">106</a>
+<a href="#107" id="107">107</a>
+<a href="#108" id="108">108</a>
+<a href="#109" id="109">109</a>
+<a href="#110" id="110">110</a>
+<a href="#111" id="111">111</a>
+<a href="#112" id="112">112</a>
+<a href="#113" id="113">113</a>
+<a href="#114" id="114">114</a>
+<a href="#115" id="115">115</a>
+<a href="#116" id="116">116</a>
+<a href="#117" id="117">117</a>
+<a href="#118" id="118">118</a>
+<a href="#119" id="119">119</a>
+<a href="#120" id="120">120</a>
+<a href="#121" id="121">121</a>
+<a href="#122" id="122">122</a>
+<a href="#123" id="123">123</a>
+<a href="#124" id="124">124</a>
+<a href="#125" id="125">125</a>
+<a href="#126" id="126">126</a>
+<a href="#127" id="127">127</a>
+<a href="#128" id="128">128</a>
+<a href="#129" id="129">129</a>
+<a href="#130" id="130">130</a>
+<a href="#131" id="131">131</a>
+<a href="#132" id="132">132</a>
+<a href="#133" id="133">133</a>
+<a href="#134" id="134">134</a>
+<a href="#135" id="135">135</a>
+<a href="#136" id="136">136</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>async_trait::async_trait;
+<span class="kw">use </span>metrics::{decrement_gauge, increment_gauge};
 <span class="kw">use </span>napi::{bindgen_prelude::FromNapiValue, JsObject};
 <span class="kw">use </span>quaint::{
     connector::{IsolationLevel, Transaction <span class="kw">as </span>QuaintTransaction},
@@ -109,7 +144,7 @@
 };
 
 <span class="kw">use crate</span>::{
-    proxy::{CommonProxy, TransactionProxy},
+    proxy::{CommonProxy, TransactionOptions, TransactionProxy},
     queryable::JsBaseQueryable,
 };
 
@@ -123,17 +158,50 @@
 
 <span class="kw">impl </span>JsTransaction {
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>new(inner: JsBaseQueryable, tx_proxy: TransactionProxy) -&gt; <span class="self">Self </span>{
+        <span class="macro">increment_gauge!</span>(<span class="string">&quot;prisma_client_queries_active&quot;</span>, <span class="number">1.0</span>);
+
         <span class="self">Self </span>{ inner, tx_proxy }
     }
+
+    <span class="kw">pub fn </span>options(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>TransactionOptions {
+        <span class="self">self</span>.tx_proxy.options()
+    }
+
+    <span class="kw">pub async fn </span>raw_phantom_cmd(<span class="kw-2">&amp;</span><span class="self">self</span>, cmd: <span class="kw-2">&amp;</span>str) -&gt; quaint::Result&lt;()&gt; {
+        <span class="kw">let </span>params = <span class="kw-2">&amp;</span>[];
+        quaint::connector::metrics::query(<span class="string">&quot;js.raw_phantom_cmd&quot;</span>, cmd, params, <span class="kw">move </span>|| <span class="kw">async move </span>{ <span class="prelude-val">Ok</span>(()) }).<span class="kw">await
+    </span>}
 }
 
 <span class="attr">#[async_trait]
 </span><span class="kw">impl </span>QuaintTransaction <span class="kw">for </span>JsTransaction {
     <span class="kw">async fn </span>commit(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; quaint::Result&lt;()&gt; {
+        <span class="macro">decrement_gauge!</span>(<span class="string">&quot;prisma_client_queries_active&quot;</span>, <span class="number">1.0</span>);
+
+        <span class="kw">let </span>commit_stmt = <span class="string">&quot;COMMIT&quot;</span>;
+
+        <span class="kw">if </span><span class="self">self</span>.options().use_phantom_query {
+            <span class="kw">let </span>commit_stmt = JsBaseQueryable::phantom_query_message(commit_stmt);
+            <span class="self">self</span>.raw_phantom_cmd(commit_stmt.as_str()).<span class="kw">await</span><span class="question-mark">?</span>;
+        } <span class="kw">else </span>{
+            <span class="self">self</span>.inner.raw_cmd(commit_stmt).<span class="kw">await</span><span class="question-mark">?</span>;
+        }
+
         <span class="self">self</span>.tx_proxy.commit().<span class="kw">await
     </span>}
 
     <span class="kw">async fn </span>rollback(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; quaint::Result&lt;()&gt; {
+        <span class="macro">decrement_gauge!</span>(<span class="string">&quot;prisma_client_queries_active&quot;</span>, <span class="number">1.0</span>);
+
+        <span class="kw">let </span>rollback_stmt = <span class="string">&quot;ROLLBACK&quot;</span>;
+
+        <span class="kw">if </span><span class="self">self</span>.options().use_phantom_query {
+            <span class="kw">let </span>rollback_stmt = JsBaseQueryable::phantom_query_message(rollback_stmt);
+            <span class="self">self</span>.raw_phantom_cmd(rollback_stmt.as_str()).<span class="kw">await</span><span class="question-mark">?</span>;
+        } <span class="kw">else </span>{
+            <span class="self">self</span>.inner.raw_cmd(rollback_stmt).<span class="kw">await</span><span class="question-mark">?</span>;
+        }
+
         <span class="self">self</span>.tx_proxy.rollback().<span class="kw">await
     </span>}
 
