@@ -1,13 +1,10 @@
-import * as planetScale from '@planetscale/database'
-import type { Config as PlanetScaleConfig } from '@planetscale/database'
-import { bindConnector, Debug } from '@jkomyno/prisma-js-connector-utils'
-import type { Connector, ResultSet, Query, ConnectorConfig, Queryable, Transaction, Result, ErrorCapturingConnector, TransactionOptions } from '@jkomyno/prisma-js-connector-utils'
+import type planetScale from '@planetscale/database'
+import { Debug } from '@jkomyno/prisma-adapter-utils'
+import type { DriverAdapter, ResultSet, Query, Queryable, Transaction, Result, TransactionOptions } from '@jkomyno/prisma-adapter-utils'
 import { type PlanetScaleColumnType, fieldToColumnType } from './conversion'
 import { createDeferred, Deferred } from './deferred'
 
 const debug = Debug('prisma:js-connector:planetscale')
-
-export type PrismaPlanetScaleConfig = ConnectorConfig & Partial<PlanetScaleConfig>
 
 class RollbackError extends Error {
   constructor() {
@@ -15,7 +12,7 @@ class RollbackError extends Error {
     this.name = 'RollbackError'
 
     if (Error.captureStackTrace) {
-      Error.captureStackTrace(this, RollbackError);
+      Error.captureStackTrace(this, RollbackError)
     }
   }
 }
@@ -97,17 +94,15 @@ class PlanetScaleTransaction extends PlanetScaleQueryable<planetScale.Transactio
 
   async rollback(): Promise<Result<void>> {
     debug(`[js::rollback]`)
-    
+
     this.txDeferred.reject(new RollbackError())
     return Promise.resolve({ ok: true, value: await this.txResultPromise })
   }
 
 }
 
-class PrismaPlanetScale extends PlanetScaleQueryable<planetScale.Connection> implements Connector {
-  constructor(config: PrismaPlanetScaleConfig) {
-    const client = planetScale.connect(config)
-
+export class PrismaPlanetScale extends PlanetScaleQueryable<planetScale.Connection> implements DriverAdapter {
+  constructor(client: planetScale.Connection) {
     super(client)
   }
 
@@ -115,7 +110,7 @@ class PrismaPlanetScale extends PlanetScaleQueryable<planetScale.Connection> imp
     const options: TransactionOptions = {
       usePhantomQuery: true,
     }
-    
+
     const tag = '[js::startTransaction]'
     debug(`${tag} options: %O`, options)
 
@@ -132,7 +127,7 @@ class PrismaPlanetScale extends PlanetScaleQueryable<planetScale.Connection> imp
         if (!(error instanceof RollbackError)) {
           return reject(error)
         }
-        
+
         return undefined
       })
     })
@@ -141,9 +136,4 @@ class PrismaPlanetScale extends PlanetScaleQueryable<planetScale.Connection> imp
   async close() {
     return { ok: true as const, value: undefined }
   }
-}
-
-export const createPlanetScaleConnector = (config: PrismaPlanetScaleConfig): ErrorCapturingConnector => {
-  const db = new PrismaPlanetScale(config)
-  return bindConnector(db)
 }

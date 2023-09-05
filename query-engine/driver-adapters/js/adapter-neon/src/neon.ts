@@ -1,26 +1,20 @@
-import { FullQueryResults, PoolClient, neon, neonConfig } from '@neondatabase/serverless'
-import { NeonConfig, NeonQueryFunction, Pool, QueryResult } from '@neondatabase/serverless'
-import ws from 'ws'
-import { bindConnector, Debug } from '@jkomyno/prisma-js-connector-utils'
-import type { Connector, ResultSet, Query, ConnectorConfig, Queryable, Transaction, Result, ErrorCapturingConnector, TransactionOptions } from '@jkomyno/prisma-js-connector-utils'
+import type neon from '@neondatabase/serverless'
+import { Debug } from '@jkomyno/prisma-adapter-utils'
+import type { DriverAdapter, ResultSet, Query, Queryable, Transaction, Result, TransactionOptions } from '@jkomyno/prisma-adapter-utils'
 import { fieldToColumnType } from './conversion'
 
-neonConfig.webSocketConstructor = ws
-
 const debug = Debug('prisma:js-connector:neon')
-
-export type PrismaNeonConfig = ConnectorConfig & Partial<Omit<NeonConfig, 'connectionString'>> & { httpMode?: boolean }
 
 type ARRAY_MODE_DISABLED = false
 type FULL_RESULTS_ENABLED = true
 
-type PerformIOResult = QueryResult<any> | FullQueryResults<ARRAY_MODE_DISABLED> 
+type PerformIOResult = neon.QueryResult<any> | neon.FullQueryResults<ARRAY_MODE_DISABLED>
 
 /**
  * Base class for http client, ws client and ws transaction
  */
 abstract class NeonQueryable implements Queryable {
-  flavour = 'postgres' as const
+  readonly flavour = 'postgres'
 
   async queryRaw(query: Query): Promise<Result<ResultSet>> {
     const tag = '[js::query_raw]'
@@ -43,7 +37,7 @@ abstract class NeonQueryable implements Queryable {
     debug(`${tag} %O`, query)
 
     const { rowCount: rowsAffected } = await this.performIO(query)
-    
+
     // Note: `rowsAffected` can sometimes be null (e.g., when executing `"BEGIN"`)
     return { ok: true, value: rowsAffected ?? 0 }
   }
@@ -54,7 +48,7 @@ abstract class NeonQueryable implements Queryable {
 /**
  * Base class for WS-based queryables: top-level client and transaction
  */
-class NeonWsQueryable<ClientT extends Pool|PoolClient> extends NeonQueryable {
+class NeonWsQueryable<ClientT extends neon.Pool | neon.PoolClient> extends NeonQueryable {
   constructor(protected client: ClientT) {
     super()
   }
@@ -72,8 +66,8 @@ class NeonWsQueryable<ClientT extends Pool|PoolClient> extends NeonQueryable {
   }
 }
 
-class NeonTransaction extends NeonWsQueryable<PoolClient> implements Transaction {
-  constructor(client: PoolClient, readonly options: TransactionOptions) {
+class NeonTransaction extends NeonWsQueryable<neon.PoolClient> implements Transaction {
+  constructor(client: neon.PoolClient, readonly options: TransactionOptions) {
     super(client)
   }
 
@@ -92,21 +86,21 @@ class NeonTransaction extends NeonWsQueryable<PoolClient> implements Transaction
   }
 }
 
-class NeonWsConnector extends NeonWsQueryable<Pool> implements Connector {
+export class PrismaNeon extends NeonWsQueryable<neon.Pool> implements DriverAdapter {
   private isRunning = true
-  constructor(config: PrismaNeonConfig) {
-    const { url: connectionString, httpMode, ...rest } = config
-    super(new Pool({ connectionString, ...rest }))
+
+  constructor(pool: neon.Pool) {
+    super(pool)
   }
 
   async startTransaction(): Promise<Result<Transaction>> {
     const options: TransactionOptions = {
       usePhantomQuery: false,
     }
-    
+
     const tag = '[js::startTransaction]'
     debug(`${tag} options: %O`, options)
-    
+
     const connection = await this.client.connect()
     return { ok: true, value: new NeonTransaction(connection, options) }
   }
@@ -120,18 +114,17 @@ class NeonWsConnector extends NeonWsQueryable<Pool> implements Connector {
   }
 }
 
-class NeonHttpConnector extends NeonQueryable implements Connector {
-  private client: NeonQueryFunction<ARRAY_MODE_DISABLED, FULL_RESULTS_ENABLED>
-
-  constructor(config: PrismaNeonConfig) {
+export class PrismaNeonHTTP extends NeonQueryable implements DriverAdapter {
+  constructor(private client: neon.NeonQueryFunction<
+    ARRAY_MODE_DISABLED,
+    FULL_RESULTS_ENABLED
+  >) {
     super()
-    const { url: connectionString, httpMode, ...rest } = config
-    this.client = neon(connectionString, { fullResults: true, ...rest})
   }
 
   override async performIO(query: Query): Promise<PerformIOResult> {
     const { sql, args: values } = query
-      return await this.client(sql, values)
+    return await this.client(sql, values)
   }
 
   startTransaction(): Promise<Result<Transaction>> {
@@ -141,10 +134,4 @@ class NeonHttpConnector extends NeonQueryable implements Connector {
   async close() {
     return { ok: true as const, value: undefined }
   }
-
-}
-
-export const createNeonConnector = (config: PrismaNeonConfig): ErrorCapturingConnector => {
-  const db = config.httpMode ? new NeonHttpConnector(config) : new NeonWsConnector(config)
-  return bindConnector(db)
 }

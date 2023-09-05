@@ -1,0 +1,1 @@
+export { PrismaPostgres } from './pg'

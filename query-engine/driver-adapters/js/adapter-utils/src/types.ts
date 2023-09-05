@@ -66,7 +66,7 @@ export interface Queryable  {
   executeRaw(params: Query): Promise<Result<number>>
 }
 
-export interface Connector extends Queryable {
+export interface DriverAdapter extends Queryable {
   /**
    * Starts new transation.
    */
@@ -97,18 +97,8 @@ export interface Transaction extends Queryable {
   rollback(): Promise<Result<void>>
 }
 
-export interface ErrorCapturingConnector extends Connector {
+export interface ErrorCapturingDriverAdapter extends DriverAdapter {
   readonly errorRegistry: ErrorRegistry
-}
-
-/**
- * Base configuration for a connector.
- */
-export type ConnectorConfig = {
-  /**
-   * The connection string of the database server to connect to.
-   */
-  url: string,
 }
 
 export interface ErrorRegistry {

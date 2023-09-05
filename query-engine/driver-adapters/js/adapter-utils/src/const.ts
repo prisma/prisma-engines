@@ -1,4 +1,4 @@
-// Same order as in rust js-connectors' `ColumnType`.
+// Same order as in rust driver-adapters' `ColumnType`.
 // Note: exporting const enums causes lots of problems with bundlers, so we emulate
 // them via regular dictionaries.
 // See: https://hackmd.io/@dzearing/Sk3xV0cLs

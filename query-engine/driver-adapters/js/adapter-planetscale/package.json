@@ -1,7 +1,7 @@
 {
-  "name": "@jkomyno/prisma-neon-js-connector",
+  "name": "@jkomyno/prisma-adapter-planetscale",
   "version": "0.0.8",
-  "description": "Prisma's JS Connector for \"@neondatabase/serverless\"",
+  "description": "Prisma's driver adapter for \"@planetscale/database\"",
   "main": "dist/index.js",
   "module": "dist/index.mjs",
   "types": "dist/index.d.ts",
@@ -18,8 +18,12 @@
   "license": "Apache-2.0",
   "sideEffects": false,
   "dependencies": {
-    "@jkomyno/prisma-js-connector-utils": "workspace:*",
-    "@neondatabase/serverless": "^0.6.0",
-    "ws": "^8.13.0"
+    "@jkomyno/prisma-adapter-utils": "workspace:*"
+  },
+  "devDependencies": {
+    "@planetscale/database": "^1.11.0"
+  },
+  "peerDependencies": {
+    "@planetscale/database": "^1.11.0"
   }
 }

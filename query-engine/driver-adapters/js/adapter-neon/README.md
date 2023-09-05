@@ -1,3 +1,3 @@
-# @prisma/js-connectors-utils
+# @prisma/adapter-neon
 
 **INTERNAL PACKAGE, DO NOT USE**

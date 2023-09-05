@@ -1,4 +1,4 @@
-import { ColumnTypeEnum, type ColumnType } from '@jkomyno/prisma-js-connector-utils'
+import { ColumnTypeEnum, type ColumnType } from '@jkomyno/prisma-adapter-utils'
 import { types } from 'pg'
 
 const PgColumnType = types.builtins

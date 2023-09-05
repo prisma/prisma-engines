@@ -1,3 +1,3 @@
-# @prisma/neon-js-connector
+# @prisma/adapter-planetscale
 
 **INTERNAL PACKAGE, DO NOT USE**
