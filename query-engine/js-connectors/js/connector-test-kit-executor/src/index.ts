@@ -38,7 +38,7 @@ async function handleRequest(method: string, params: unknown): Promise<unknown> 
         case 'initializeSchema': {
             interface InitializeSchemaParams {
                 schema: string
-                schemaId: number
+                schemaId: string
                 url: string
             }
 
@@ -58,6 +58,17 @@ async function handleRequest(method: string, params: unknown): Promise<unknown> 
             const result = await schemas[castParams.schemaId].query(castParams.query, "")
 
             return JSON.parse(result)
+        }
+        case 'teardown': {
+            interface TeardownPayload {
+                schemaId: number
+            }
+
+            const castParams = params as TeardownPayload;
+            await schemas[castParams.schemaId].disconnect("")
+            delete schemas[castParams.schemaId]
+            return {}
+
         }
         default: {
             throw new Error(`Unknown method: \`${method}\``)

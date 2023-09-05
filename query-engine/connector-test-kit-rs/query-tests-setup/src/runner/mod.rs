@@ -60,6 +60,13 @@ pub struct Runner {
 }
 
 impl Runner {
+    pub(crate) fn schema_id(&self) -> Option<usize> {
+        match self.executor {
+            RunnerExecutor::Builtin(_) => None,
+            RunnerExecutor::External(schema_id) => Some(schema_id),
+        }
+    }
+
     pub fn prisma_dml(&self) -> &str {
         self.query_schema.internal_data_model.schema.db.source()
     }
