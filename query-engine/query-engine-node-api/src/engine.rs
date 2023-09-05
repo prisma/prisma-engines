@@ -174,10 +174,11 @@ impl QueryEngine {
 
         let mut connector_mode = ConnectorMode::Rust;
 
-        if !preview_features.contains(PreviewFeature::DriverAdapters) {
+        // TODO: https://github.com/prisma/team-orm/issues/340
+        if !preview_features.contains(PreviewFeature::JsConnectors) {
             tracing::info!(
                 "Please enable the {} preview feature to use driver adapters.",
-                PreviewFeature::DriverAdapters
+                PreviewFeature::JsConnectors
             );
         } else {
             #[cfg(feature = "driver-adapters")]

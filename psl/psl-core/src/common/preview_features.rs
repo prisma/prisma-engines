@@ -64,7 +64,7 @@ features!(
     NamedConstraints,
     NApi,
     NativeTypes,
-    DriverAdapters,
+    JsConnectors,
     OrderByAggregateGroup,
     OrderByNulls,
     OrderByRelation,
@@ -124,7 +124,7 @@ pub const ALL_PREVIEW_FEATURES: FeatureMap = FeatureMap {
         | UncheckedScalarInputs
     }),
     hidden: enumflags2::make_bitflags!(PreviewFeature::{
-        DriverAdapters
+        JsConnectors
     }),
 };
 
