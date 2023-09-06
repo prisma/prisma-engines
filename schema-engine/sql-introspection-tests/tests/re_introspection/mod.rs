@@ -984,6 +984,10 @@ async fn virtual_cuid_default(api: &mut TestApi) {
                 t.add_column("id", types::varchar(21).primary(true));
             });
 
+            migration.create_table("User4", |t| {
+                t.add_column("id", types::varchar(25).primary(true));
+            });
+
             migration.create_table("Unrelated", |t| {
                 t.add_column("id", types::primary());
             });
