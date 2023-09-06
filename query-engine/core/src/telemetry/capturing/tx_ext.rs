@@ -60,15 +60,9 @@ mod test {
     #[test]
     fn test_txid_into_traceid() {
         let fixture = vec![
-            ("clct0q6ma0000rb04768tiqbj", "71366d6130303030373638746971626a"),
-            // counter changed, trace id changed:
-            ("clct0q6ma0002rb04cpa6zkmx", "71366d6130303032637061367a6b6d78"),
-            // fingerprint changed, trace id did not change, as that chunk is ignored:
-            ("clct0q6ma00020000cpa6zkmx", "71366d6130303032637061367a6b6d78"),
-            // first 5 bytes changed, trace id did not change, as that chunk is ignored:
-            ("00000q6ma00020000cpa6zkmx", "71366d6130303032637061367a6b6d78"),
-            // 6 th byte changed, trace id changed, as that chunk is part of the lsb of the timestamp
-            ("0000006ma00020000cpa6zkmx", "30366d6130303032637061367a6b6d78"),
+            ("tz4a98xxat96iws9", "7a3461393878786174393669777339"),
+            ("pfh0haxfpzowht3o", "66683068617866707a6f776874336f"),
+            ("nc6bzmkmd014706r", "6336627a6d6b6d6430313437303672"),
         ];
 
         for (txid, expected_trace_id) in fixture {
