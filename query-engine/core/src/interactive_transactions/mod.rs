@@ -40,12 +40,13 @@ pub(crate) use messages::*;
 #[derive(Debug, Clone, Hash, Eq, PartialEq)]
 pub struct TxId(String);
 
-const MINIMUM_TX_ID_LENGTH: usize = 24;
+const MINIMUM_TX_ID_LENGTH: usize = 17;
+
+const CUID2_CONSTRUCTOR: cuid2::CuidConstructor = cuid2::CuidConstructor::new();
 
 impl Default for TxId {
     fn default() -> Self {
-        #[allow(deprecated)]
-        Self(cuid::cuid().unwrap())
+        Self(CUID2_CONSTRUCTOR.create_id())
     }
 }
 

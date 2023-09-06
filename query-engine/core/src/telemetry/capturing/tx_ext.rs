@@ -7,30 +7,22 @@ pub trait TxTraceExt {
 }
 
 impl TxTraceExt for crate::TxId {
-    // in order to convert a TxId (a 48 bytes cuid) into a TraceId (16 bytes), we remove the first byte,
-    // (always 'c') and get the next 16 bytes, which are random enough to be used as a trace id.
-    // this is a typical cuid: "c-lct0q6ma-0004-rb04-h6en1roa"
-    //
-    // - first letter is always the same
-    // - next 7-8 byte are random a timestamp. There's more entropy in the least significative bytes
-    // - next 4 bytes are a counter since the server started
-    // - next 4 bytes are a system fingerprint, invariant for the same server instance
-    // - least significative 8 bytes. Totally random.
-    //
-    // We want the most entropic slice of 16 bytes that's deterministicly determined
+    // in order to convert a TxId (a 17 bytes cuid2) into a TraceId (16 bytes), we remove the first byte,
+    // which is a random letter.
+    // We want the most entropic slice of 16 bytes that's deterministicly determined: leveraging `cuid2`'s
+    // properties, we can just grab the next 16 bytes after the first one.
     fn into_trace_id(self) -> opentelemetry::trace::TraceId {
-        let mut buffer = [0; 16];
-        let str = self.to_string();
-        let tx_id_bytes = str.as_bytes();
-        let len = tx_id_bytes.len();
+        let tx_id_str = self.to_string();
+        let tx_id_bytes = tx_id_str.as_bytes();
 
-        // bytes [len-20  to len-12): least significative 4 bytes of the timestamp + 4 bytes counter
-        for (i, source_idx) in (len - 20..len - 12).enumerate() {
-            buffer[i] = tx_id_bytes[source_idx];
-        }
-        // bytes [len-8 to len):  the random blocks
-        for (i, source_idx) in (len - 8..len).enumerate() {
-            buffer[i + 8] = tx_id_bytes[source_idx];
+        let mut buffer = [0; 16];
+
+        // Iterate over the tx_id_bytes starting from the second byte (index 1)
+        for (i, &byte) in tx_id_bytes.iter().skip(1).enumerate() {
+            if i >= 16 {
+                break;
+            }
+            buffer[i] = byte;
         }
 
         opentelemetry::trace::TraceId::from_bytes(buffer)
