@@ -1,9 +1,5 @@
 use lsp_types::{CodeAction, CodeActionKind, CodeActionOrCommand};
-use psl::{
-    schema_ast::ast::SourceConfig,
-    Configuration,
-    parser_database::walkers::CompleteInlineRelationWalker
-};
+use psl::{parser_database::walkers::CompleteInlineRelationWalker, schema_ast::ast::SourceConfig, Configuration};
 
 pub(crate) fn edit_referential_integrity(
     actions: &mut Vec<CodeActionOrCommand>,
