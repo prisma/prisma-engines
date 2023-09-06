@@ -10,7 +10,16 @@ serde.workspace = true
 serde_json.workspace = true
 schema = { path = "../schema" }
 indexmap = { version = "1.7", features = ["serde-1"] }
-prisma-models = { path = "../prisma-models" }
+
+[dependencies.prisma-models]
+path = "../prisma-models"
+default-features = false
+features = ["wasm_generators"]
+
+[target.'cfg(not(target_family = "wasm"))'.dependencies.prisma-models]
+path = "../prisma-models"
+default-features = false
+features = ["all"]
 
 [dev-dependencies]
 expect-test = "1.2.2"

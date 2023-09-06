@@ -71,7 +71,6 @@ impl DefaultKind {
 
     /// Returns either a copy of the contained single value or produces a new
     /// value as defined by the expression.
-    #[cfg(feature = "default_generators")]
     pub fn get(&self) -> Option<PrismaValue> {
         match self {
             DefaultKind::Single(ref v) => Some(v.clone()),
@@ -234,7 +233,6 @@ impl ValueGenerator {
         self.args.get(0).and_then(|v| v.1.as_string())
     }
 
-    #[cfg(feature = "default_generators")]
     pub fn generate(&self) -> Option<PrismaValue> {
         self.generator.invoke()
     }
@@ -250,8 +248,9 @@ impl ValueGenerator {
 
 #[derive(Clone, Copy, PartialEq)]
 pub enum ValueGeneratorFn {
-    Uuid,
+    #[cfg(feature = "cuid")]
     Cuid,
+    Uuid,
     Cuid2,
     Nanoid(Option<u8>),
     Now,
@@ -263,6 +262,7 @@ pub enum ValueGeneratorFn {
 impl ValueGeneratorFn {
     fn new(name: &str) -> std::result::Result<Self, String> {
         match name {
+            #[cfg(feature = "cuid")]
             "cuid" => Ok(Self::Cuid),
             "cuid2" => Ok(Self::Cuid2),
             "uuid" => Ok(Self::Uuid),
@@ -276,12 +276,12 @@ impl ValueGeneratorFn {
         }
     }
 
-    #[cfg(feature = "default_generators")]
     fn invoke(&self) -> Option<PrismaValue> {
         match self {
-            Self::Uuid => Some(Self::generate_uuid()),
+            #[cfg(feature = "cuid")]
             Self::Cuid => Some(Self::generate_cuid()),
             Self::Cuid2 => Some(Self::generate_cuid2()),
+            Self::Uuid => Some(Self::generate_uuid()),
             Self::Nanoid(length) => Some(Self::generate_nanoid(length)),
             Self::Now => Some(Self::generate_now()),
             Self::Autoincrement => None,
@@ -290,23 +290,20 @@ impl ValueGeneratorFn {
         }
     }
 
-    #[cfg(feature = "default_generators")]
+    #[cfg(feature = "cuid")]
     fn generate_cuid() -> PrismaValue {
         #[allow(deprecated)]
         PrismaValue::String(cuid::cuid().unwrap())
     }
 
-    #[cfg(feature = "default_generators")]
     fn generate_cuid2() -> PrismaValue {
         PrismaValue::String(cuid2::cuid())
     }
 
-    #[cfg(feature = "default_generators")]
     fn generate_uuid() -> PrismaValue {
         PrismaValue::Uuid(uuid::Uuid::new_v4())
     }
 
-    #[cfg(feature = "default_generators")]
     fn generate_nanoid(length: &Option<u8>) -> PrismaValue {
         if length.is_some() {
             let value: usize = usize::from(length.unwrap());
@@ -316,7 +313,6 @@ impl ValueGeneratorFn {
         }
     }
 
-    #[cfg(feature = "default_generators")]
     fn generate_now() -> PrismaValue {
         PrismaValue::DateTime(chrono::Utc::now().into())
     }

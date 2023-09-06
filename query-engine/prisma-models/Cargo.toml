@@ -15,12 +15,17 @@ cuid = { version = "1.2", optional = true }
 cuid2 = { version = "0.1.2", optional = true } 
 nanoid = { version = "0.4.0", optional = true }
 chrono = { version = "0.4.6", features = ["serde"] }
+getrandom = { version = "0.2" }
 
 [features]
-# Support for generating default UUID, CUID, nanoid and datetime values. This
-# implies random number generation works, so it won't compile on targets like
-# wasm32.
-# Note: this feature flag should be removed. It's fully possible to implement
-# some of these default generators in wasm32. We just need to conditionally
-# import the `getrandom` crate with the `js` feature when on `wasm32` arch.
-default_generators = ["uuid/v4", "cuid", "cuid2", "nanoid"]
+default = ["all"]
+all = ["wasm_generators", "sys_generators"]
+
+# Support for generating default UUID, CUID, nanoid and datetime values.
+sys_generators = ["cuid"]
+wasm_generators = ["uuid", "cuid2", "nanoid", "getrandom/js"]
+
+cuid = ["dep:cuid"]
+nanoid = ["dep:nanoid"]
+cuid2 = ["dep:cuid2"]
+uuid = ["uuid/v4"]
