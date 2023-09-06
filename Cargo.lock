@@ -3249,6 +3249,7 @@ dependencies = [
  "bigdecimal",
  "chrono",
  "cuid",
+ "cuid2",
  "itertools",
  "nanoid",
  "prisma-value",

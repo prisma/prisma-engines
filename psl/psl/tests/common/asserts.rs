@@ -83,6 +83,7 @@ pub(crate) trait DefaultValueAssert {
     fn assert_bytes(&self, val: &[u8]) -> &Self;
     fn assert_now(&self) -> &Self;
     fn assert_cuid(&self) -> &Self;
+    fn assert_cuid2(&self) -> &Self;
     fn assert_uuid(&self) -> &Self;
     fn assert_dbgenerated(&self, val: &str) -> &Self;
     fn assert_mapped_name(&self, val: &str) -> &Self;
@@ -434,6 +435,12 @@ impl<'a> DefaultValueAssert for walkers::DefaultValueWalker<'a> {
     }
 
     #[track_caller]
+    fn assert_cuid2(&self) -> &Self {
+        self.value().assert_cuid2();
+        self
+    }
+
+    #[track_caller]
     fn assert_uuid(&self) -> &Self {
         self.value().assert_uuid();
         self
@@ -624,6 +631,15 @@ impl DefaultValueAssert for ast::Expression {
     fn assert_cuid(&self) -> &Self {
         assert!(
             matches!(self, ast::Expression::Function(name, args, _) if name == "cuid" && args.arguments.is_empty())
+        );
+
+        self
+    }
+
+    #[track_caller]
+    fn assert_cuid2(&self) -> &Self {
+        assert!(
+            matches!(self, ast::Expression::Function(name, args, _) if name == "cuid2" && args.arguments.is_empty())
         );
 
         self

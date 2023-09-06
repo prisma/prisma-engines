@@ -1004,6 +1004,11 @@ async fn virtual_cuid_default(api: &mut TestApi) {
         model User3 {
             id        String    @id @default(nanoid(7)) @db.VarChar(21)
         }
+
+        model User4 {
+            id        String    @id @default(cuid2()) @db.VarChar(25)
+            non_id    String    @default(cuid2()) @db.VarChar(25)
+        }
         "#;
 
     let final_dm = indoc! {r#"
@@ -1018,6 +1023,11 @@ async fn virtual_cuid_default(api: &mut TestApi) {
 
         model User3 {
             id        String    @id @default(nanoid(7)) @db.VarChar(21)
+        }
+
+        model User4 {
+            id        String    @id @default(cuid2()) @db.VarChar(25)
+            non_id    String    @default(cuid2()) @db.VarChar(25)
         }
 
         model Unrelated {

@@ -51,6 +51,26 @@ fn should_allow_string_ids_with_cuid() {
 }
 
 #[test]
+fn should_allow_string_ids_with_cuid2() {
+    let dml = indoc! {r#"
+        model Model {
+          id String @id @default(cuid2())
+        }
+    "#};
+
+    let schema = psl::parse_schema(dml).unwrap();
+    let model = schema.assert_has_model("Model");
+
+    model
+        .assert_has_scalar_field("id")
+        .assert_scalar_type(ScalarType::String)
+        .assert_default_value()
+        .assert_cuid2();
+
+    model.assert_id_on_fields(&["id"]);
+}
+
+#[test]
 fn should_allow_string_ids_with_uuid() {
     let dml = indoc! {r#"
         model Model {
