@@ -8,7 +8,7 @@ import type {
   Transaction,
   TransactionOptions,
 } from '@prisma/driver-adapter-utils'
-import type { Client as LibsqlClientRaw, Transaction as LibsqlTransactionRaw } from '@libsql/client'
+import type { InStatement, Client as LibsqlClientRaw, Transaction as LibsqlTransactionRaw } from '@libsql/client'
 import { fieldToColumnType } from './conversion'
 
 const debug = Debug('prisma:driver-adapter:libsql')
@@ -63,7 +63,12 @@ class LibsqlQueryable<ClientT extends StdClient | TransactionClient> implements 
    */
   private async performIO(query: Query) {
     try {
-      const result = await this.client.execute(query)
+      // TODO: type assertion: are driver adapter query args always compatible with libsql's InValue?
+      // ```
+      // export type Value = null | string | number | bigint | ArrayBuffer;
+      // export type InValue = Value | boolean | Uint8Array | Date;
+      // ```
+      const result = await this.client.execute(query as InStatement)
       return result
     } catch (e) {
       const error = e as Error
@@ -74,10 +79,7 @@ class LibsqlQueryable<ClientT extends StdClient | TransactionClient> implements 
 }
 
 class LibsqlTransaction extends LibsqlQueryable<TransactionClient> implements Transaction {
-  constructor(
-    client: TransactionClient,
-    readonly options: TransactionOptions,
-  ) {
+  constructor(client: TransactionClient, readonly options: TransactionOptions) {
     super(client)
   }
 
