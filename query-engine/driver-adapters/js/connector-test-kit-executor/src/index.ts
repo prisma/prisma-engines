@@ -1,4 +1,4 @@
-import * as pgDriver from 'pg'
+import pgDriver from 'pg'
 import * as pg from '@jkomyno/prisma-adapter-pg'
 import * as qe from './qe'
 import * as engines from './engines/Library'
