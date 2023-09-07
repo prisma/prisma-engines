@@ -27,8 +27,6 @@ In the current directory:
 - Run `pnpm planetscale` to run smoke tests using `libquery` against the PlanetScale database.
 - Run `pnpm planetscale:client` to run smoke tests using `@prisma/client` against the PlanetScale database.
 
-Note: you used to be able to run these Prisma commands without changing the provider name, but [#4074](https://github.com/prisma/prisma-engines/pull/4074) changed that (see https://github.com/prisma/prisma-engines/pull/4074#issuecomment-1649942475).
-
 ### Neon
 
 - Create a new database with Neon CLI `npx neonctl projects create` or in [Neon Console](https://neon.tech).
