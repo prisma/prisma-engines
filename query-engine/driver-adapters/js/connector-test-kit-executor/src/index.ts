@@ -1,9 +1,9 @@
-import * as pg from '@jkomyno/prisma-pg-js-connector'
+import * as pgDriver from 'pg'
+import * as pg from '@jkomyno/prisma-adapter-pg'
 import * as qe from './qe'
 import * as engines from './engines/Library'
 import * as readline from 'node:readline'
 import * as jsonRpc from './jsonRpc'
-import * as tempy from 'tempy'
 
 async function main(): Promise<void> {
     const iface = readline.createInterface({
@@ -97,11 +97,9 @@ function respondOk(requestId: number, payload: unknown) {
 }
 
 async function initQe(url: string, prismaSchema: string): Promise<engines.QueryEngineInstance> {
-    const connector = pg.createPgConnector({
-        url,
-    });
-    const schemaPath: string = await tempy.temporaryWrite(prismaSchema);
-    return qe.initQueryEngine(connector, schemaPath)
+    const pool = new pgDriver.Pool({ connectionString: url })
+    const adapter = new pg.PrismaPg(pool)
+    return qe.initQueryEngine(adapter, prismaSchema)
 }
 
 main().catch(console.error)
