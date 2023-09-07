@@ -15,7 +15,7 @@ async function main(): Promise<void> {
     iface.on('line', async (line) => {
         try {
             const request: jsonRpc.Request = JSON.parse(line); // todo: validate
-            console.error(`Got a request: ${request}`)
+            console.error(`Got a request: ${line}`)
             try {
                 const response = await handleRequest(request.method, request.params)
                 respondOk(request.id, response)
@@ -55,8 +55,9 @@ async function handleRequest(method: string, params: unknown): Promise<unknown> 
                 schemaId: number
             }
 
+            console.error("Got `query`", params)
             const castParams = params as QueryPayload;
-            const result = await schemas[castParams.schemaId].query(castParams.query, "")
+            const result = await schemas[castParams.schemaId].query(JSON.stringify(castParams.query), "")
 
             return JSON.parse(result)
         }

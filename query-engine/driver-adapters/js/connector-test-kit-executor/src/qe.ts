@@ -20,14 +20,14 @@ export function initQueryEngine(driver: pg.PrismaPg, datamodel: string): lib.Que
         datamodel,
         configDir: '.',
         engineProtocol: 'json' as const,
-        logLevel: 'info' as const,
-        logQueries: false,
+        logLevel: process.env["RUST_LOG"] as any,
+        logQueries: true,
         env: process.env,
         ignoreEnvVarErrors: false,
     }
 
-    const logCallback = (...args) => {
-        console.log(args)
+    const logCallback = (...args: any[]) => {
+        console.error(args)
     }
     const engine = new QueryEngine(queryEngineOptions, logCallback, driver)
 
