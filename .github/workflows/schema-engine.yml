@@ -33,7 +33,7 @@ jobs:
             url: "mongodb://prisma:prisma@localhost:27018/?authSource=admin&retryWrites=true"
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - uses: dtolnay/rust-toolchain@stable
 
       - name: Login to Docker Hub
@@ -84,6 +84,8 @@ jobs:
             url: "postgresql://postgres:prisma@localhost:5437"
           - name: postgres15
             url: "postgresql://postgres:prisma@localhost:5438"
+          - name: cockroach_23_1
+            url: "postgresql://prisma@localhost:26260"
           - name: cockroach_22_2
             url: "postgresql://prisma@localhost:26259"
           - name: cockroach_22_1_0
@@ -103,7 +105,7 @@ jobs:
 
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - uses: dtolnay/rust-toolchain@stable
 
       - name: Login to Docker Hub
@@ -207,7 +209,7 @@ jobs:
     name: "Test ${{ matrix.db.name }} on Windows"
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - uses: dtolnay/rust-toolchain@stable
 
       - uses: actions/cache@v3

@@ -1,6 +1,6 @@
-use crate::{error::ApiError, log_callback::LogCallback, logger::Logger};
+use crate::{error::ApiError, logger::Logger};
 use futures::FutureExt;
-use napi::{Env, JsFunction, JsObject, JsUnknown};
+use napi::{threadsafe_function::ThreadSafeCallContext, Env, JsFunction, JsObject, JsUnknown};
 use napi_derive::napi;
 use psl::PreviewFeature;
 use query_core::{
@@ -9,7 +9,7 @@ use query_core::{
     telemetry, QueryExecutor, TransactionOptions, TxId,
 };
 use query_engine_metrics::{MetricFormat, MetricRegistry};
-use request_handlers::{dmmf, load_executor, render_graphql_schema, RequestBody, RequestHandler};
+use request_handlers::{dmmf, load_executor, render_graphql_schema, ConnectorMode, RequestBody, RequestHandler};
 use serde::{Deserialize, Serialize};
 use serde_json::json;
 use std::{
@@ -27,6 +27,7 @@ use user_facing_errors::Error;
 /// The main query engine used by JS
 #[napi]
 pub struct QueryEngine {
+    connector_mode: ConnectorMode,
     inner: RwLock<Inner>,
     logger: Logger,
 }
@@ -148,7 +149,9 @@ impl QueryEngine {
         callback: JsFunction,
         maybe_driver: Option<JsObject>,
     ) -> napi::Result<Self> {
-        let log_callback = LogCallback::new(napi_env, callback)?;
+        let mut log_callback = callback.create_threadsafe_function(0usize, |ctx: ThreadSafeCallContext<String>| {
+            Ok(vec![ctx.env.create_string(&ctx.value)?])
+        })?;
         log_callback.unref(&napi_env)?;
 
         let ConstructorOptions {
@@ -164,18 +167,35 @@ impl QueryEngine {
 
         let env = stringify_env_values(env)?; // we cannot trust anything JS sends us from process.env
         let overrides: Vec<(_, _)> = datasource_overrides.into_iter().collect();
+
         let mut schema = psl::validate(datamodel.into());
         let config = &mut schema.configuration;
-        let provider_name = schema.connector.provider_name();
+        let preview_features = config.preview_features();
 
-        #[cfg(feature = "js-connectors")]
-        if let Some(driver) = maybe_driver {
-            let queryable = js_connectors::from_napi(&napi_env, driver);
-            match sql_connector::register_js_connector(provider_name, Arc::new(queryable)) {
-                Ok(_) => tracing::info!("Registered js connector for {provider_name}"),
-                Err(err) => tracing::error!("Failed to registered js connector for {provider_name}. {err}"),
+        let mut connector_mode = ConnectorMode::Rust;
+
+        if !preview_features.contains(PreviewFeature::DriverAdapters) {
+            tracing::info!(
+                "Please enable the {} preview feature to use driver adapters.",
+                PreviewFeature::DriverAdapters
+            );
+        } else {
+            #[cfg(feature = "driver-adapters")]
+            if let Some(driver) = maybe_driver {
+                let js_queryable = driver_adapters::from_napi(driver);
+                let provider_name = schema.connector.provider_name();
+
+                match sql_connector::register_driver_adapter(provider_name, Arc::new(js_queryable)) {
+                    Ok(_) => {
+                        connector_mode = ConnectorMode::Js;
+                        tracing::info!("Registered driver adapter for {provider_name}.")
+                    }
+                    Err(err) => tracing::error!("Failed to register driver adapter for {provider_name}. {err}"),
+                }
             }
         }
+
+        let connector_mode = connector_mode;
 
         schema
             .diagnostics
@@ -224,6 +244,7 @@ impl QueryEngine {
         }
 
         Ok(Self {
+            connector_mode,
             inner: RwLock::new(Inner::Builder(builder)),
             logger,
         })
@@ -266,7 +287,7 @@ impl QueryEngine {
                 let preview_features = arced_schema.configuration.preview_features();
 
                 let executor_fut = async {
-                    let executor = load_executor(data_source, preview_features, &url).await?;
+                    let executor = load_executor(self.connector_mode, data_source, preview_features, &url).await?;
                     let connector = executor.primary_connector();
 
                     let conn_span = tracing::info_span!(

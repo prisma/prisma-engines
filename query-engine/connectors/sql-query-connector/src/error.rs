@@ -19,6 +19,9 @@ pub(crate) enum RawError {
     UnsupportedColumnType {
         column_type: String,
     },
+    External {
+        id: i32,
+    },
 }
 
 impl From<RawError> for SqlError {
@@ -39,6 +42,7 @@ impl From<RawError> for SqlError {
                 code: code.unwrap_or_else(|| String::from("N/A")),
                 message: message.unwrap_or_else(|| String::from("N/A")),
             },
+            RawError::External { id } => Self::ExternalError(id),
         }
     }
 }
@@ -57,6 +61,7 @@ impl From<quaint::error::Error> for RawError {
                 column_type: column_type.to_owned(),
             },
             quaint::error::ErrorKind::QueryInvalidInput(message) => Self::QueryInvalidInput(message.to_owned()),
+            quaint::error::ErrorKind::ExternalError(id) => Self::External { id: *id },
             _ => Self::Database {
                 code: e.original_code().map(ToString::to_string),
                 message: e.original_message().map(ToString::to_string),
@@ -175,6 +180,9 @@ pub enum SqlError {
 
     #[error("Cannot find a fulltext index to use for the search")]
     MissingFullTextSearchIndex,
+
+    #[error("External connector error")]
+    ExternalError(i32),
 }
 
 impl SqlError {
@@ -254,6 +262,7 @@ impl SqlError {
             }
             SqlError::MissingFullTextSearchIndex => ConnectorError::from_kind(ErrorKind::MissingFullTextSearchIndex),
             SqlError::InvalidIsolationLevel(msg) => ConnectorError::from_kind(ErrorKind::InternalConversionError(msg)),
+            SqlError::ExternalError(error_id) => ConnectorError::from_kind(ErrorKind::ExternalError(error_id)),
         }
     }
 }
@@ -295,6 +304,7 @@ impl From<quaint::error::Error> for SqlError {
             QuaintKind::InvalidIsolationLevel(msg) => Self::InvalidIsolationLevel(msg),
             QuaintKind::TransactionWriteConflict => Self::TransactionWriteConflict,
             QuaintKind::RollbackWithoutBegin => Self::RollbackWithoutBegin,
+            QuaintKind::ExternalError(error_id) => Self::ExternalError(error_id),
             e @ QuaintKind::UnsupportedColumnType { .. } => SqlError::ConversionError(e.into()),
             e @ QuaintKind::TransactionAlreadyClosed(_) => SqlError::TransactionAlreadyClosed(format!("{e}")),
             e @ QuaintKind::IncorrectNumberOfParameters { .. } => SqlError::QueryError(e.into()),

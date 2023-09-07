@@ -1374,7 +1374,8 @@ fn multi_schema_tests(_api: TestApi) {
 async fn migration_with_shadow_database() {
     let conn_str = std::env::var("TEST_DATABASE_URL").unwrap();
 
-    if !conn_str.starts_with("postgres") || conn_str.contains("localhost:2625") {
+    let is_cockroach = conn_str.contains("localhost:2625") || conn_str.contains("localhost:26260");
+    if !conn_str.starts_with("postgres") || is_cockroach {
         return;
     }
 

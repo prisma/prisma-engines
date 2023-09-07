@@ -16,42 +16,41 @@ use std::{
     sync::{Arc, Mutex},
 };
 
-/// Registry is the type for the global registry of Js connectors.
-type Registry = HashMap<String, JsConnector>;
+/// Registry is the type for the global registry of driver adapters.
+type Registry = HashMap<String, DriverAdapter>;
 
-/// REGISTRY is the global registry of JsConnectors
+/// REGISTRY is the global registry of Driver Adapters.
 static REGISTRY: Lazy<Mutex<Registry>> = Lazy::new(|| Mutex::new(HashMap::new()));
 
-fn registered_js_connector(provider: &str) -> connector::Result<JsConnector> {
+fn registered_driver_adapter(provider: &str) -> connector::Result<DriverAdapter> {
     let lock = REGISTRY.lock().unwrap();
     lock.get(provider)
         .ok_or(ConnectorError::from_kind(ErrorKind::UnsupportedConnector(format!(
-            "A Javascript connector proxy for {} was not registered",
+            "A driver adapter for {} was not registered",
             provider
         ))))
         .map(|conn_ref| conn_ref.to_owned())
 }
 
-pub fn register_js_connector(provider: &str, connector: Arc<dyn TransactionCapable>) -> Result<(), String> {
+pub fn register_driver_adapter(provider: &str, connector: Arc<dyn TransactionCapable>) -> Result<(), String> {
     let mut lock = REGISTRY.lock().unwrap();
     let entry = lock.entry(provider.to_string());
     match entry {
         Entry::Occupied(_) => Err(format!(
-            "A Javascript connector proxy for {} was already registered, and cannot be overridden.",
+            "A driver adapter for {} was already registered, and cannot be overridden.",
             provider
         )),
         Entry::Vacant(v) => {
-            v.insert(JsConnector { connector });
+            v.insert(DriverAdapter { connector });
             Ok(())
         }
     }
 }
 
 pub struct Js {
-    connector: JsConnector,
+    connector: DriverAdapter,
     connection_info: ConnectionInfo,
     features: psl::PreviewFeatures,
-    psl_connector: psl::builtin_connectors::JsConnector,
 }
 
 fn get_connection_info(url: &str) -> connector::Result<ConnectionInfo> {
@@ -70,23 +69,14 @@ impl FromSource for Js {
         url: &str,
         features: psl::PreviewFeatures,
     ) -> connector_interface::Result<Js> {
-        match source.active_connector.as_js_connector() {
-            Some(psl_connector) => {
-                let connector = registered_js_connector(source.active_provider)?;
-                let connection_info = get_connection_info(url)?;
+        let connector = registered_driver_adapter(source.active_provider)?;
+        let connection_info = get_connection_info(url)?;
 
-                Ok(Js {
-                    connector,
-                    connection_info,
-                    features,
-                    psl_connector,
-                })
-            }
-            None => panic!(
-                "Connector for provider {} is not a JsConnector",
-                source.active_connector.provider_name()
-            ),
-        }
+        Ok(Js {
+            connector,
+            connection_info,
+            features,
+        })
     }
 }
 
@@ -101,7 +91,7 @@ impl Connector for Js {
     }
 
     fn name(&self) -> &'static str {
-        self.psl_connector.name
+        "js"
     }
 
     fn should_retry_on_transient_error(&self) -> bool {
@@ -112,11 +102,11 @@ impl Connector for Js {
 // TODO: miguelff: I haven´t found a better way to do this, yet... please continue reading.
 //
 // There is a bug in NAPI-rs by wich compiling a binary crate that links code using napi-rs
-// bindings breaks. We could have used a JsQueryable from the `js-connectors` crate directly, as the
-// `connection` field of a `Js` connector, but that will imply using napi-rs transitively, and break
+// bindings breaks. We could have used a JsQueryable from the `driver-adapters` crate directly, as the
+// `connection` field of a driver adapter, but that will imply using napi-rs transitively, and break
 // the tests (which are compiled as binary creates)
 //
-// To avoid the problem above I separated interface from implementation, making JsConnector
+// To avoid the problem above I separated interface from implementation, making DriverAdapter
 // independent on napi-rs. Initially, I tried having a field Arc<&dyn TransactionCabable> to hold
 // JsQueryable at runtime. I did this, because TransactionCapable is the trait bounds required to
 // create a value of  `SqlConnection` (see [SqlConnection::new])) to actually performt the queries.
@@ -127,12 +117,12 @@ impl Connector for Js {
 // declaration, so finally I couldn't come up with anything better then wrapping a QuaintQueryable
 // in this object, and implementing TransactionCapable (and quaint::Queryable) explicitly for it.
 #[derive(Clone)]
-struct JsConnector {
+struct DriverAdapter {
     connector: Arc<dyn TransactionCapable>,
 }
 
 #[async_trait]
-impl QuaintQueryable for JsConnector {
+impl QuaintQueryable for DriverAdapter {
     async fn query(&self, q: Query<'_>) -> quaint::Result<quaint::prelude::ResultSet> {
         self.connector.query(q).await
     }
@@ -184,7 +174,7 @@ impl QuaintQueryable for JsConnector {
 }
 
 #[async_trait]
-impl TransactionCapable for JsConnector {
+impl TransactionCapable for DriverAdapter {
     async fn start_transaction<'a>(
         &'a self,
         isolation: Option<IsolationLevel>,

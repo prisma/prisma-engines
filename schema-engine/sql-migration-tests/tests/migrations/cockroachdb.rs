@@ -1233,6 +1233,49 @@ fn bigint_defaults_work(api: TestApi) {
     api.schema_push(schema).send().assert_green().assert_no_steps();
 }
 
+// regression test for https://github.com/prisma/prisma/issues/20557
+#[test_connector(tags(CockroachDb), exclude(CockroachDb231))]
+fn alter_type_works(api: TestApi) {
+    let schema = r#"
+        datasource db {
+            provider = "cockroachdb"
+            url = env("TEST_DATABASE_URL")
+        }
+
+        model test {
+            id Int @id
+            one BigInt
+            two BigInt
+        }
+
+    "#;
+    api.schema_push(schema).send().assert_green();
+    api.schema_push(schema).send().assert_green().assert_no_steps();
+
+    let to_schema = r#"
+        datasource db {
+            provider = "cockroachdb"
+            url = env("TEST_DATABASE_URL")
+        }
+
+        model test {
+            id Int @id
+            one Int
+            two Int
+        }
+
+    "#;
+
+    let migration = api.connector_diff(
+        DiffTarget::Datamodel(schema.into()),
+        DiffTarget::Datamodel(to_schema.into()),
+        None,
+    );
+
+    // panic!("{migration}");
+    api.raw_cmd(&migration);
+}
+
 #[test_connector(tags(CockroachDb))]
 fn schema_from_introspection_docs_works(api: TestApi) {
     let sql = r#"

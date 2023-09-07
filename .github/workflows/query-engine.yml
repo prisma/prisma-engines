@@ -43,6 +43,10 @@ jobs:
             single_threaded: true
             connector: "mongodb"
             version: "4.2"
+          - name: "cockroach_23_1"
+            single_threaded: false
+            connector: "cockroachdb"
+            version: "23.1"
           - name: "cockroach_22_2"
             single_threaded: false
             connector: "cockroachdb"
@@ -69,7 +73,7 @@ jobs:
 
     runs-on: buildjet-16vcpu-ubuntu-2004
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: Login to Docker Hub
         uses: docker/login-action@v2

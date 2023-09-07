@@ -194,7 +194,7 @@ pub(crate) fn validate_no_referential_actions(
         field
             .explicit_on_delete_span()
             .into_iter()
-            .chain(field.explicit_on_update_span().into_iter())
+            .chain(field.explicit_on_update_span())
     });
 
     for span in referential_action_spans {

@@ -3,12 +3,7 @@ use tracing::{info_span, Instrument};
 use crate::ast::{Params, Value};
 use std::{future::Future, time::Instant};
 
-pub(crate) async fn query<'a, F, T, U>(
-    tag: &'static str,
-    query: &'a str,
-    params: &'a [Value<'_>],
-    f: F,
-) -> crate::Result<T>
+pub async fn query<'a, F, T, U>(tag: &'static str, query: &'a str, params: &'a [Value<'_>], f: F) -> crate::Result<T>
 where
     F: FnOnce() -> U + 'a,
     U: Future<Output = crate::Result<T>>,

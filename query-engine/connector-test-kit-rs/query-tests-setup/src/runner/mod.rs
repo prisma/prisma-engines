@@ -4,7 +4,6 @@ pub use json_adapter::*;
 
 use crate::{ConnectorTag, ConnectorVersion, QueryResult, TestLogCapture, TestResult, ENGINE_PROTOCOL};
 use colored::Colorize;
-use quaint::{prelude::Queryable, single::Quaint};
 use query_core::{
     protocol::EngineProtocol,
     schema::{self, QuerySchemaRef},
@@ -12,8 +11,8 @@ use query_core::{
 };
 use query_engine_metrics::MetricRegistry;
 use request_handlers::{
-    load_executor, BatchTransactionOption, GraphqlBody, JsonBatchQuery, JsonBody, JsonSingleQuery, MultiQuery,
-    RequestBody, RequestHandler,
+    load_executor, BatchTransactionOption, ConnectorMode, GraphqlBody, JsonBatchQuery, JsonBody, JsonSingleQuery,
+    MultiQuery, RequestBody, RequestHandler,
 };
 use std::{env, sync::Arc};
 
@@ -25,6 +24,7 @@ pub(crate) type Executor = Box<dyn QueryExecutor + Send + Sync>;
 pub struct Runner {
     executor: Executor,
     query_schema: QuerySchemaRef,
+    version: ConnectorVersion,
     connector_tag: ConnectorTag,
     connection_url: String,
     current_tx_id: Option<TxId>,
@@ -41,6 +41,7 @@ impl Runner {
     pub async fn load(
         datamodel: String,
         db_schemas: &[&str],
+        connector_version: ConnectorVersion,
         connector_tag: ConnectorTag,
         metrics: MetricRegistry,
         log_capture: TestLogCapture,
@@ -51,10 +52,19 @@ impl Runner {
         let schema = psl::parse_schema(datamodel).unwrap();
         let data_source = schema.configuration.datasources.first().unwrap();
         let url = data_source.load_url(|key| env::var(key).ok()).unwrap();
-        let executor = load_executor(data_source, schema.configuration.preview_features(), &url).await?;
+
+        let connector_mode = ConnectorMode::Rust;
+        let executor = load_executor(
+            connector_mode,
+            data_source,
+            schema.configuration.preview_features(),
+            &url,
+        )
+        .await?;
         let query_schema: QuerySchemaRef = Arc::new(schema::build(Arc::new(schema), true));
 
         Ok(Self {
+            version: connector_version,
             executor,
             query_schema,
             connector_tag,
@@ -143,12 +153,7 @@ impl Runner {
         let query = query.into();
         tracing::debug!("Raw execute: {}", query.clone().green());
 
-        if matches!(self.connector_tag, ConnectorTag::MongoDb(_)) {
-            panic!("raw_execute is not supported for MongoDB yet");
-        }
-
-        let conn = Quaint::new(&self.connection_url).await?;
-        conn.raw_cmd(&query).await?;
+        self.connector_tag.raw_execute(&query, &self.connection_url).await?;
 
         Ok(())
     }
@@ -274,8 +279,8 @@ impl Runner {
         self.log_capture.get_logs().await
     }
 
-    pub fn connector_version(&self) -> ConnectorVersion {
-        ConnectorVersion::from(self.connector())
+    pub fn connector_version(&self) -> &ConnectorVersion {
+        &self.version
     }
 
     pub fn protocol(&self) -> EngineProtocol {

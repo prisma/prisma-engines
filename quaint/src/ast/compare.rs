@@ -126,7 +126,7 @@ impl<'a> Compare<'a> {
             let base_select = super::Select::from_table(ident).column(selected_columns.remove(0));
 
             // We know we have the same amount of columns on both sides,
-            let column_pairs = cols.into_iter().zip(selected_columns.into_iter());
+            let column_pairs = cols.into_iter().zip(selected_columns);
 
             // Adding to the new select a condition to filter out the rest of
             // the tuple, so if our tuple is `(a, b) IN (SELECT x, y ..)`, this
