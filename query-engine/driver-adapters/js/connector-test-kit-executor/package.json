@@ -11,8 +11,5 @@
   "author": "",
   "sideEffects": false,
   "license": "Apache-2.0",
-  "dependencies": {
-    "@jkomyno/prisma-pg-js-connector": "workspace:*",
-    "tempy": "^3"
-  }
+  "dependencies": { "@jkomyno/prisma-adapter-pg": "workspace:*" }
 }
