@@ -39,9 +39,11 @@ export type Error = {
 } | {
   kind: 'PostgresError'
   code: string,
+  severity: string
   message: string
-  detail: string
-  column: string
+  detail: string | undefined
+  column: string | undefined
+  hint: string | undefined
 }
 
 export interface Queryable {
