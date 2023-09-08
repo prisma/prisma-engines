@@ -15,13 +15,15 @@ cuid = { git = "https://github.com/jkomyno/cuid-rust", branch = "jkomyno/wasm32"
 nanoid = { version = "0.4.0", optional = true }
 chrono = { version = "0.4.6", features = ["serde"] }
 
+[target.'cfg(target_arch = "wasm32")'.dependencies.getrandom]
+version = "0.2"
+features = ["js"]
+
 [features]
-default = ["all"]
-all = ["wasm_generators", "sys_generators"]
+default = []
 
 # Support for generating default UUID, CUID, nanoid and datetime values.
-sys_generators = []
-wasm_generators = ["cuid", "uuid", "nanoid", "getrandom/js"]
+default_generators = ["cuid", "uuid", "nanoid"]
 
 cuid = ["dep:cuid"]
 nanoid = ["dep:nanoid"]
