@@ -5,43 +5,36 @@ import * as Transaction from './Transaction'
 export type QueryEngineEvent = QueryEngineLogEvent | QueryEngineQueryEvent | QueryEnginePanicEvent
 
 export type QueryEngineLogEvent = {
-  level: string
-  module_path: string
-  message: string
-  span?: boolean
+    level: string
+    module_path: string
+    message: string
+    span?: boolean
 }
 
 export type QueryEngineQueryEvent = {
-  level: 'info'
-  module_path: string
-  query: string
-  item_type: 'query'
-  params: string
-  duration_ms: string
-  result: string
+    level: 'info'
+    module_path: string
+    query: string
+    item_type: 'query'
+    params: string
+    duration_ms: string
+    result: string
 }
 
 export type QueryEnginePanicEvent = {
-  level: 'error'
-  module_path: string
-  message: 'PANIC'
-  reason: string
-  file: string
-  line: string
-  column: string
+    level: 'error'
+    module_path: string
+    message: 'PANIC'
+    reason: string
+    file: string
+    line: string
+    column: string
 }
 
-// Configuration
-export type QueryEngineLogLevel = 'trace' | 'debug' | 'info' | 'warn' | 'error' | 'off'
-
-export type QueryEngineTelemetry = {
-  enabled: Boolean
-  endpoint: string
-}
 
 export type GraphQLQuery = {
-  query: string
-  variables: object
+    query: string
+    variables: object
 }
 
 export type EngineProtocol = 'graphql' | 'json'
@@ -50,48 +43,47 @@ export type EngineQuery = GraphQLQuery | JsonQuery
 export type EngineBatchQueries = GraphQLQuery[] | JsonQuery[]
 
 export type QueryEngineConfig = {
-  // TODO rename datamodel here and other places
-  datamodel: string
-  configDir: string
-  logQueries: boolean
-  ignoreEnvVarErrors: boolean
-  datasourceOverrides?: Record<string, string>
-  env: Record<string, string | undefined>
-  logLevel: QueryEngineLogLevel
-  telemetry?: QueryEngineTelemetry
-  engineProtocol: EngineProtocol
+    // TODO rename datamodel here and other places
+    datamodel: string
+    configDir: string
+    logQueries: boolean
+    ignoreEnvVarErrors: boolean
+    datasourceOverrides?: Record<string, string>
+    env: Record<string, string | undefined>
+    logLevel?: string
+    engineProtocol: EngineProtocol
 }
 
 // Errors
 export type SyncRustError = {
-  is_panic: boolean
-  message: string
-  meta: {
-    full_error: string
-  }
-  error_code: string
+    is_panic: boolean
+    message: string
+    meta: {
+        full_error: string
+    }
+    error_code: string
 }
 
 export type RustRequestError = {
-  is_panic: boolean
-  message: string
-  backtrace: string
+    is_panic: boolean
+    message: string
+    backtrace: string
 }
 
 export type QueryEngineResult<T> = {
-  data: T
-  elapsed: number
+    data: T
+    elapsed: number
 }
 
 export type QueryEngineBatchRequest = QueryEngineBatchGraphQLRequest | JsonBatchQuery
 
 export type QueryEngineBatchGraphQLRequest = {
-  batch: QueryEngineRequest[]
-  transaction?: boolean
-  isolationLevel?: Transaction.IsolationLevel
+    batch: QueryEngineRequest[]
+    transaction?: boolean
+    isolationLevel?: Transaction.IsolationLevel
 }
 
 export type QueryEngineRequest = {
-  query: string
-  variables: Object
+    query: string
+    variables: Object
 }

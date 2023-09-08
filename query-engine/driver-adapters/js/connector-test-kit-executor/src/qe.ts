@@ -27,7 +27,7 @@ export function initQueryEngine(driver: pg.PrismaPg, datamodel: string): lib.Que
     }
 
     const logCallback = (...args: any[]) => {
-        console.error(args)
+        console.error("[nodejs] ", args)
     }
     const engine = new QueryEngine(queryEngineOptions, logCallback, driver)
 

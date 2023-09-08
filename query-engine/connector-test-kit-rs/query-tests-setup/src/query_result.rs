@@ -41,6 +41,7 @@ struct SimpleGqlResponse {
 }
 
 #[derive(Serialize, Deserialize, Debug)]
+#[serde(rename_all = "camelCase")]
 struct SimpleGqlBatchResponse {
     #[serde(default)]
     batch_result: Vec<SimpleGqlResponse>,

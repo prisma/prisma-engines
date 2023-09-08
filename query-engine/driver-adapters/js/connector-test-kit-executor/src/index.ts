@@ -20,6 +20,7 @@ async function main(): Promise<void> {
                 const response = await handleRequest(request.method, request.params)
                 respondOk(request.id, response)
             } catch (err) {
+                console.error("[nodejs] Error from request handler: ", err)
                 respondErr(request.id, {
                     code: 1,
                     message: err.toString(),
