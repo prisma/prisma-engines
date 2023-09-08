@@ -237,10 +237,8 @@ impl<'a> ExpressionKind<'a> {
     #[cfg(feature = "geometry")]
     pub(crate) fn is_geometry_expr(&self) -> bool {
         match self {
-            Self::Parameterized(Value::Geometry(_)) => true,
-            Self::Parameterized(Value::Geography(_)) => true,
-            Self::RawValue(Raw(Value::Geometry(_))) => true,
-            Self::RawValue(Raw(Value::Geography(_))) => true,
+            Self::Parameterized(Value::Geometry(_) | Value::Geography(_)) => true,
+            Self::RawValue(Raw(Value::Geometry(_) | Value::Geography(_))) => true,
             Self::Column(c) if matches!(c.type_family, Some(TypeFamily::Geography(_) | TypeFamily::Geometry(_))) => {
                 true
             }
