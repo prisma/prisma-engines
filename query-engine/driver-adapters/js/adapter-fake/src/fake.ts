@@ -27,6 +27,7 @@ class FakeQueryable
       rows: results.map((result) => columns.map((column) => result[column])),
     }
 
+    console.log("resultSet", resultSet)
     return { ok: true, value: resultSet }
   }
 
@@ -55,6 +56,7 @@ class FakeQueryable
 
     try {
       const result = await this.client.query(sql, values)
+      console.log("performIO", result)
       return result
     } catch (e) {
       const error = e as Error
@@ -87,6 +89,7 @@ class FakeTransaction extends FakeQueryable
 
 export class PrismaFake extends FakeQueryable implements DriverAdapter {
   constructor(client) {
+    console.log("client", client)
     super(client)
   }
 
