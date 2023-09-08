@@ -62,8 +62,10 @@ pub(crate) fn replace_set_default_mysql(
         None => return,
     };
 
-    let diagnostics = 
-        match super::filter_diagnostics(span_diagnostics, "MySQL does not actually support the `SetDefault` referential action, so using it may result in unexpected errors.") {
+    let diagnostics = match
+        super::filter_diagnostics(
+            span_diagnostics,
+            "MySQL does not actually support the `SetDefault` referential action, so using it may result in unexpected errors.") {
             Some(value) => value,
             None => return,
         };
