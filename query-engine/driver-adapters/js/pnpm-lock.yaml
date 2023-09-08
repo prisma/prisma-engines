@@ -56,6 +56,9 @@ importers:
       '@jkomyno/prisma-adapter-pg':
         specifier: workspace:*
         version: link:../adapter-pg
+      '@jkomyno/prisma-driver-adapter-utils':
+        specifier: workspace:*
+        version: link:../driver-adapter-utils
       '@types/pg':
         specifier: ^8.10.2
         version: 8.10.2

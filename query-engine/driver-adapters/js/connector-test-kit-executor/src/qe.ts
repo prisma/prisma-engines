@@ -1,4 +1,5 @@
 import * as pg from '@jkomyno/prisma-adapter-pg'
+import { bindAdapter } from '@jkomyno/prisma-driver-adapter-utils'
 import * as lib from './engines/Library'
 import * as os from 'node:os'
 import * as path from 'node:path'
@@ -29,7 +30,7 @@ export function initQueryEngine(driver: pg.PrismaPg, datamodel: string): lib.Que
     const logCallback = (...args: any[]) => {
         console.error("[nodejs] ", args)
     }
-    const engine = new QueryEngine(queryEngineOptions, logCallback, driver)
+    const engine = new QueryEngine(queryEngineOptions, logCallback, bindAdapter(driver))
 
     return engine
 }
