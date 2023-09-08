@@ -14,7 +14,7 @@ type LoggerResult<T> = Result<T, SetGlobalDefaultError>;
 
 /// An installer for a global logger.
 #[derive(Debug, Clone)]
-pub struct Logger {
+pub(crate) struct Logger {
     service_name: &'static str,
     log_format: LogFormat,
     log_queries: bool,

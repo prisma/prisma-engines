@@ -246,7 +246,7 @@ mod occ {
 
         // MongoDB is different here and seems to only do one create with all the upserts
         // where as all the sql databases will do one create and one upsert
-        let expected = if matches!(runner.connector(), ConnectorTag::MongoDb(_)) {
+        let expected = if matches!(runner.connector_version(), ConnectorVersion::MongoDb(_)) {
             serde_json::json!({
                 "data": {
                 "findFirstResource": {

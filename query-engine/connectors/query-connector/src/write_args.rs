@@ -4,7 +4,7 @@ use crate::{
 };
 use indexmap::{map::Keys, IndexMap};
 use prisma_models::{
-    CompositeFieldRef, Field, ModelProjection, ModelRef, PrismaValue, ScalarFieldRef, SelectedField, SelectionResult,
+    CompositeFieldRef, Field, Model, ModelProjection, PrismaValue, ScalarFieldRef, SelectedField, SelectionResult,
 };
 use std::{borrow::Borrow, convert::TryInto, ops::Deref};
 
@@ -392,7 +392,7 @@ impl WriteArgs {
     }
 
     // @updatedAt
-    pub fn add_datetimes(&mut self, model: &ModelRef) {
+    pub fn add_datetimes(&mut self, model: &Model) {
         let updated_at_fields = model.fields().updated_at();
         let value = &self.request_now;
 
@@ -403,13 +403,13 @@ impl WriteArgs {
         }
     }
 
-    pub fn update_datetimes(&mut self, model: &ModelRef) {
+    pub fn update_datetimes(&mut self, model: &Model) {
         if !self.args.is_empty() {
             self.add_datetimes(model)
         }
     }
 
-    pub fn as_record_projection(&self, model_projection: ModelProjection) -> Option<SelectionResult> {
+    pub fn as_selection_result(&self, model_projection: ModelProjection) -> Option<SelectionResult> {
         let pairs: Vec<_> = model_projection
             .scalar_fields()
             .map(|field| {
@@ -470,9 +470,8 @@ pub fn merge_write_args(loaded_ids: Vec<SelectionResult>, incoming_args: WriteAr
         .into_iter()
         .map(|mut id| {
             for (position, write_op) in positions.iter() {
-                let current_val = id.pairs[position.to_owned()].1.clone();
-                id.pairs[position.to_owned()].1 =
-                    apply_expression(current_val, (*write_op.as_scalar().unwrap()).clone());
+                let current_val = id.pairs[*position].1.clone();
+                id.pairs[*position].1 = apply_expression(current_val, (*write_op.as_scalar().unwrap()).clone());
             }
 
             id

@@ -1,11 +1,14 @@
+use super::update::*;
+use crate::column_metadata;
 use crate::filter_conversion::AliasedCondition;
-use crate::query_builder::write::{build_update_and_set_query, chunk_update_with_ids};
+use crate::row::ToSqlRow;
 use crate::{
     error::SqlError, model_extensions::*, query_builder::write, sql_trace::SqlTraceComment, Context, QueryExt,
+    Queryable,
 };
 use connector_interface::*;
 use itertools::Itertools;
-use prisma_models::{dml::prisma_value::PrismaValue, *};
+use prisma_models::*;
 use quaint::{
     error::ErrorKind,
     prelude::{native_uuid, uuid_to_bin, uuid_to_bin_swapped, Aliasable, Select, SqlFamily},
@@ -19,16 +22,16 @@ use tracing::log::trace;
 use user_facing_errors::query_engine::DatabaseConstraint;
 
 async fn generate_id(
-    conn: &dyn QueryExt,
-    primary_key: &FieldSelection,
+    conn: &dyn Queryable,
+    id_field: &FieldSelection,
     args: &WriteArgs,
     ctx: &Context<'_>,
 ) -> crate::Result<Option<SelectionResult>> {
     // Go through all the values and generate a select statement with the correct MySQL function
-    let (pk_select, need_select) = primary_key
+    let (id_select, need_select) = id_field
         .selections()
         .filter_map(|field| match field {
-            SelectedField::Scalar(x) if x.default_value().is_some() && !args.has_arg_for(x.db_name()) => x
+            SelectedField::Scalar(sf) if sf.default_value().is_some() && !args.has_arg_for(sf.db_name()) => sf
                 .default_value()
                 .unwrap()
                 .to_dbgenerated_func()
@@ -49,9 +52,9 @@ async fn generate_id(
 
     // db generate values only if needed
     if need_select {
-        let pk_select = pk_select.add_trace_id(ctx.trace_id);
+        let pk_select = id_select.add_trace_id(ctx.trace_id);
         let pk_result = conn.query(pk_select.into()).await?;
-        let result = try_convert(&(primary_key.into()), pk_result)?;
+        let result = try_convert(&(id_field.into()), pk_result)?;
 
         Ok(Some(result))
     } else {
@@ -62,21 +65,22 @@ async fn generate_id(
 /// Create a single record to the database defined in `conn`, resulting into a
 /// `RecordProjection` as an identifier pointing to the just-created record.
 pub(crate) async fn create_record(
-    conn: &dyn QueryExt,
+    conn: &dyn Queryable,
     sql_family: &SqlFamily,
-    model: &ModelRef,
+    model: &Model,
     mut args: WriteArgs,
+    selected_fields: FieldSelection,
     ctx: &Context<'_>,
-) -> crate::Result<SelectionResult> {
-    let pk = model.primary_identifier();
+) -> crate::Result<SingleRecord> {
+    let id_field: FieldSelection = model.primary_identifier();
 
     let returned_id = if *sql_family == SqlFamily::Mysql {
-        generate_id(conn, &pk, &args, ctx).await?
+        generate_id(conn, &id_field, &args, ctx)
+            .await?
+            .or_else(|| args.as_selection_result(ModelProjection::from(id_field)))
     } else {
-        args.as_record_projection(pk.clone().into())
+        args.as_selection_result(ModelProjection::from(id_field))
     };
-
-    let returned_id = returned_id.or_else(|| args.as_record_projection(pk.clone().into()));
 
     let args = match returned_id {
         Some(ref pk) if *sql_family == SqlFamily::Mysql => {
@@ -90,7 +94,7 @@ pub(crate) async fn create_record(
         _ => args,
     };
 
-    let insert = write::create_record(model, args, ctx);
+    let insert = write::create_record(model, args, &ModelProjection::from(&selected_fields), ctx);
 
     let result_set = match conn.insert(insert).await {
         Ok(id) => id,
@@ -136,16 +140,34 @@ pub(crate) async fn create_record(
     };
 
     match (returned_id, result_set.len(), result_set.last_insert_id()) {
-        // All values provided in the write arrghs
-        (Some(identifier), _, _) if !identifier.misses_autogen_value() => Ok(identifier),
-
         // with a working RETURNING statement
-        (_, n, _) if n > 0 => Ok(try_convert(&model.primary_identifier().into(), result_set)?),
+        (_, n, _) if n > 0 => {
+            let row = result_set.into_single()?;
+            let field_names: Vec<_> = selected_fields.db_names().collect();
+            let idents = ModelProjection::from(&selected_fields).type_identifiers_with_arities();
+            let meta = column_metadata::create(&field_names, &idents);
+            let sql_row = row.to_sql_row(&meta)?;
+            let record = Record::from(sql_row);
+
+            Ok(SingleRecord { record, field_names })
+        }
+
+        // All values provided in the write args
+        (Some(identifier), _, _) if !identifier.misses_autogen_value() => {
+            let field_names = identifier.db_names().map(ToOwned::to_owned).collect();
+            let record = Record::from(identifier);
+
+            Ok(SingleRecord { record, field_names })
+        }
 
         // We have an auto-incremented id that we got from MySQL or SQLite
         (Some(mut identifier), _, Some(num)) if identifier.misses_autogen_value() => {
             identifier.add_autogen_value(num as i64);
-            Ok(identifier)
+
+            let field_names = identifier.db_names().map(ToOwned::to_owned).collect();
+            let record = Record::from(identifier);
+
+            Ok(SingleRecord { record, field_names })
         }
 
         (_, _, _) => panic!("Could not figure out an ID in create"),
@@ -153,8 +175,8 @@ pub(crate) async fn create_record(
 }
 
 pub(crate) async fn create_records(
-    conn: &dyn QueryExt,
-    model: &ModelRef,
+    conn: &dyn Queryable,
+    model: &Model,
     args: Vec<WriteArgs>,
     skip_duplicates: bool,
     ctx: &Context<'_>,
@@ -170,14 +192,7 @@ pub(crate) async fn create_records(
     #[allow(clippy::mutable_key_type)]
     let affected_fields: HashSet<ScalarFieldRef> = fields
         .into_iter()
-        .map(|dsfn| {
-            model
-                .fields()
-                .scalar()
-                .into_iter()
-                .find(|sf| sf.db_name() == dsfn.deref())
-                .unwrap()
-        })
+        .map(|dsfn| model.fields().scalar().find(|sf| sf.db_name() == dsfn.deref()).unwrap())
         .collect();
 
     if affected_fields.is_empty() {
@@ -191,8 +206,8 @@ pub(crate) async fn create_records(
 /// Standard create many records, requires `affected_fields` to be non-empty.
 #[allow(clippy::mutable_key_type)]
 async fn create_many_nonempty(
-    conn: &dyn QueryExt,
-    model: &ModelRef,
+    conn: &dyn Queryable,
+    model: &Model,
     args: Vec<WriteArgs>,
     skip_duplicates: bool,
     affected_fields: HashSet<ScalarFieldRef>,
@@ -279,8 +294,8 @@ async fn create_many_nonempty(
 
 /// Creates many empty (all default values) rows.
 async fn create_many_empty(
-    conn: &dyn QueryExt,
-    model: &ModelRef,
+    conn: &dyn Queryable,
+    model: &Model,
     num_records: usize,
     skip_duplicates: bool,
     ctx: &Context<'_>,
@@ -299,76 +314,18 @@ async fn create_many_empty(
 /// defined in `args`, resulting the identifiers that were modified in the
 /// operation.
 pub(crate) async fn update_record(
-    conn: &dyn QueryExt,
-    model: &ModelRef,
+    conn: &dyn Queryable,
+    model: &Model,
     record_filter: RecordFilter,
     args: WriteArgs,
+    selected_fields: Option<FieldSelection>,
     ctx: &Context<'_>,
-) -> crate::Result<Vec<SelectionResult>> {
-    let id_args = pick_args(&model.primary_identifier().into(), &args);
-
-    // This is to match the behaviour expected but it seems a bit strange to me
-    // This comes across as if the update happened even if it didn't
-    if args.args.is_empty() {
-        let ids: Vec<SelectionResult> = conn.filter_selectors(model, record_filter.clone(), ctx).await?;
-
-        return Ok(ids);
+) -> crate::Result<Option<SingleRecord>> {
+    if let Some(selected_fields) = selected_fields {
+        update_one_with_selection(conn, model, record_filter, args, selected_fields, ctx).await
+    } else {
+        update_one_without_selection(conn, model, record_filter, args, ctx).await
     }
-
-    let (_, ids) = update_records_from_ids_and_filter(conn, model, record_filter, args, ctx).await?;
-
-    Ok(merge_write_args(ids, id_args))
-}
-
-// Generates a query like this:
-//  UPDATE "public"."User" SET "name" = $1 WHERE "public"."User"."id" IN ($2,$3,$4,$5,$6,$7,$8,$9,$10,$11) AND "public"."User"."age" > $1
-async fn update_records_from_ids_and_filter(
-    conn: &dyn QueryExt,
-    model: &ModelRef,
-    record_filter: RecordFilter,
-    args: WriteArgs,
-    ctx: &Context<'_>,
-) -> crate::Result<(usize, Vec<SelectionResult>)> {
-    let filter_condition = record_filter.clone().filter.aliased_condition_from(None, false, ctx);
-    let ids: Vec<SelectionResult> = conn.filter_selectors(model, record_filter, ctx).await?;
-
-    if ids.is_empty() {
-        return Ok((0, Vec::new()));
-    }
-
-    let update = build_update_and_set_query(model, args, ctx);
-
-    let updates = {
-        let ids: Vec<&SelectionResult> = ids.iter().collect();
-        chunk_update_with_ids(update, model, &ids, filter_condition, ctx)?
-    };
-
-    let mut count = 0;
-    for update in updates {
-        let update_count = conn.execute(update).await?;
-
-        count += update_count;
-    }
-
-    Ok((count as usize, ids))
-}
-
-// Generates a query like this:
-//  UPDATE "public"."User" SET "name" = $1 WHERE "public"."User"."age" > $1
-async fn update_records_from_filter(
-    conn: &dyn QueryExt,
-    model: &ModelRef,
-    record_filter: RecordFilter,
-    args: WriteArgs,
-    ctx: &Context<'_>,
-) -> crate::Result<usize> {
-    let update = build_update_and_set_query(model, args, ctx);
-    let filter_condition = record_filter.filter.aliased_condition_from(None, false, ctx);
-
-    let update = update.so_that(filter_condition);
-    let count = conn.execute(update.into()).await?;
-
-    Ok(count as usize)
 }
 
 /// Update multiple records in a database defined in `conn` and the records
@@ -376,8 +333,8 @@ async fn update_records_from_filter(
 /// This works via two ways, when there are ids in record_filter.selectors, it uses that to update
 /// Otherwise it used the passed down arguments to update.
 pub(crate) async fn update_records(
-    conn: &dyn QueryExt,
-    model: &ModelRef,
+    conn: &dyn Queryable,
+    model: &Model,
     record_filter: RecordFilter,
     args: WriteArgs,
     ctx: &Context<'_>,
@@ -387,17 +344,20 @@ pub(crate) async fn update_records(
     }
 
     if record_filter.has_selectors() {
-        let (count, _) = update_records_from_ids_and_filter(conn, model, record_filter, args, ctx).await?;
+        let (count, _) = update_many_from_ids_and_filter(conn, model, record_filter, args, ctx).await?;
+
         Ok(count)
     } else {
-        update_records_from_filter(conn, model, record_filter, args, ctx).await
+        let count = update_many_from_filter(conn, model, record_filter, args, ctx).await?;
+
+        Ok(count)
     }
 }
 
 /// Delete multiple records in `conn`, defined in the `Filter`. Result is the number of items deleted.
 pub(crate) async fn delete_records(
-    conn: &dyn QueryExt,
-    model: &ModelRef,
+    conn: &dyn Queryable,
+    model: &Model,
     record_filter: RecordFilter,
     ctx: &Context<'_>,
 ) -> crate::Result<usize> {
@@ -424,7 +384,7 @@ pub(crate) async fn delete_records(
 /// Connect relations defined in `child_ids` to a parent defined in `parent_id`.
 /// The relation information is in the `RelationFieldRef`.
 pub(crate) async fn m2m_connect(
-    conn: &dyn QueryExt,
+    conn: &dyn Queryable,
     field: &RelationFieldRef,
     parent_id: &SelectionResult,
     child_ids: &[SelectionResult],
@@ -439,7 +399,7 @@ pub(crate) async fn m2m_connect(
 /// Disconnect relations defined in `child_ids` to a parent defined in `parent_id`.
 /// The relation information is in the `RelationFieldRef`.
 pub(crate) async fn m2m_disconnect(
-    conn: &dyn QueryExt,
+    conn: &dyn Queryable,
     field: &RelationFieldRef,
     parent_id: &SelectionResult,
     child_ids: &[SelectionResult],
@@ -454,7 +414,7 @@ pub(crate) async fn m2m_disconnect(
 /// Execute a plain SQL query with the given parameters, returning the number of
 /// affected rows.
 pub(crate) async fn execute_raw(
-    conn: &dyn QueryExt,
+    conn: &dyn Queryable,
     features: psl::PreviewFeatures,
     inputs: HashMap<String, PrismaValue>,
 ) -> crate::Result<usize> {
@@ -466,7 +426,7 @@ pub(crate) async fn execute_raw(
 /// Execute a plain SQL query with the given parameters, returning the answer as
 /// a JSON `Value`.
 pub(crate) async fn query_raw(
-    conn: &dyn QueryExt,
+    conn: &dyn Queryable,
     inputs: HashMap<String, PrismaValue>,
 ) -> crate::Result<serde_json::Value> {
     Ok(conn.raw_json(inputs).await?)

@@ -1,6 +1,5 @@
 db/*
 !.placeholder
-build/
 .DS_Store
 current_connector
 prisma-gpg-private.asc
@@ -40,9 +39,10 @@ datamodel_v2.prisma
 dev_datamodel.prisma
 .tmp/
 /target/
+/target-alternatives/
 /result
 
 dmmf.json
 graph.dot
 
-prisma-fmt-wasm/nodejs
+prisma-schema-wasm/nodejs

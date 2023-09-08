@@ -129,7 +129,7 @@ impl IntoBson for (&MongoDbType, PrismaValue) {
     fn into_bson(self) -> crate::Result<Bson> {
         Ok(match self {
             // ObjectId
-            (MongoDbType::ObjectId, PrismaValue::String(s)) => Bson::ObjectId(ObjectId::parse_str(&s)?),
+            (MongoDbType::ObjectId, PrismaValue::String(s)) => Bson::ObjectId(ObjectId::parse_str(s)?),
             (MongoDbType::ObjectId, PrismaValue::Bytes(b)) => {
                 if b.len() != 12 {
                     return Err(MongoError::MalformedObjectId(format!(
@@ -139,7 +139,7 @@ impl IntoBson for (&MongoDbType, PrismaValue) {
                 }
 
                 let mut bytes: [u8; 12] = [0x0; 12];
-                bytes.iter_mut().set_from(b.into_iter());
+                bytes.iter_mut().set_from(b);
 
                 Bson::ObjectId(ObjectId::from_bytes(bytes))
             }
@@ -271,7 +271,6 @@ impl IntoBson for (&TypeIdentifier, PrismaValue) {
             ),
 
             // Unhandled mappings
-            (TypeIdentifier::Xml, _) => return Err(MongoError::Unsupported("Mongo doesn't support XML.".to_owned())),
             (TypeIdentifier::Unsupported, _) => unreachable!("Unsupported types should never hit the connector."),
 
             (ident, val) => {
@@ -365,7 +364,7 @@ fn read_scalar_value(bson: Bson, meta: &ScalarOutputMeta) -> crate::Result<Prism
         // DateTime
         (TypeIdentifier::DateTime, Bson::DateTime(dt)) => PrismaValue::DateTime(dt.to_chrono().into()),
         (TypeIdentifier::DateTime, Bson::Timestamp(ts)) => {
-            PrismaValue::DateTime(Utc.timestamp(ts.time as i64, 0).into())
+            PrismaValue::DateTime(Utc.timestamp_opt(ts.time as i64, 0).unwrap().into())
         }
 
         // Bytes

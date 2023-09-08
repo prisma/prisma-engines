@@ -2,12 +2,15 @@
 
 pub mod dmmf;
 
+mod connector_mode;
 mod error;
 mod handler;
+mod load_executor;
 mod protocols;
 mod response;
 
-pub use error::HandlerError;
+pub use self::{error::HandlerError, load_executor::load as load_executor};
+pub use connector_mode::ConnectorMode;
 pub use handler::*;
 pub use protocols::{graphql::*, json::*, RequestBody};
 pub use response::*;

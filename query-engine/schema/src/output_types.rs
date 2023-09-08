@@ -1,140 +1,151 @@
 use super::*;
 use fmt::Debug;
-use once_cell::sync::OnceCell;
-use prisma_models::ModelRef;
-use std::{fmt, sync::Arc};
+use once_cell::sync::Lazy;
+use prisma_models::ast::ModelId;
+use std::{borrow::Cow, fmt};
 
 #[derive(Debug, Clone)]
-pub enum OutputType {
-    Enum(EnumTypeWeakRef),
-    List(OutputTypeRef),
-    Object(ObjectTypeWeakRef),
+pub struct OutputType<'a> {
+    is_list: bool,
+    pub inner: InnerOutputType<'a>,
+}
+
+#[derive(Debug, Clone)]
+pub enum InnerOutputType<'a> {
+    Enum(EnumType),
+    Object(ObjectType<'a>),
     Scalar(ScalarType),
 }
 
-impl OutputType {
-    pub fn list(containing: OutputType) -> OutputType {
-        OutputType::List(Arc::new(containing))
+impl<'a> OutputType<'a> {
+    pub fn non_list(inner: InnerOutputType<'a>) -> Self {
+        OutputType { is_list: false, inner }
     }
 
-    pub fn object(containing: ObjectTypeWeakRef) -> OutputType {
-        OutputType::Object(containing)
+    pub(crate) fn list(containing: InnerOutputType<'a>) -> Self {
+        OutputType {
+            is_list: true,
+            inner: containing,
+        }
     }
 
-    pub fn string() -> OutputType {
-        OutputType::Scalar(ScalarType::String)
+    pub fn object(containing: ObjectType<'a>) -> Self {
+        OutputType::non_list(InnerOutputType::Object(containing))
     }
 
-    pub fn int() -> OutputType {
-        OutputType::Scalar(ScalarType::Int)
+    pub(crate) fn string() -> InnerOutputType<'a> {
+        InnerOutputType::Scalar(ScalarType::String)
     }
 
-    pub fn bigint() -> OutputType {
-        OutputType::Scalar(ScalarType::BigInt)
+    pub(crate) fn int() -> InnerOutputType<'a> {
+        InnerOutputType::Scalar(ScalarType::Int)
     }
 
-    pub fn float() -> OutputType {
-        OutputType::Scalar(ScalarType::Float)
+    pub(crate) fn bigint() -> InnerOutputType<'a> {
+        InnerOutputType::Scalar(ScalarType::BigInt)
     }
 
-    pub fn decimal() -> OutputType {
-        OutputType::Scalar(ScalarType::Decimal)
+    pub(crate) fn float() -> InnerOutputType<'a> {
+        InnerOutputType::Scalar(ScalarType::Float)
     }
 
-    pub fn boolean() -> OutputType {
-        OutputType::Scalar(ScalarType::Boolean)
+    pub(crate) fn decimal() -> InnerOutputType<'a> {
+        InnerOutputType::Scalar(ScalarType::Decimal)
     }
 
-    pub fn enum_type(containing: EnumTypeWeakRef) -> OutputType {
-        OutputType::Enum(containing)
+    pub(crate) fn boolean() -> InnerOutputType<'a> {
+        InnerOutputType::Scalar(ScalarType::Boolean)
     }
 
-    pub fn date_time() -> OutputType {
-        OutputType::Scalar(ScalarType::DateTime)
+    pub(crate) fn enum_type(containing: EnumType) -> InnerOutputType<'a> {
+        InnerOutputType::Enum(containing)
     }
 
-    pub fn json() -> OutputType {
-        OutputType::Scalar(ScalarType::Json)
+    pub(crate) fn date_time() -> InnerOutputType<'a> {
+        InnerOutputType::Scalar(ScalarType::DateTime)
     }
 
-    pub fn uuid() -> OutputType {
-        OutputType::Scalar(ScalarType::UUID)
+    pub(crate) fn json() -> InnerOutputType<'a> {
+        InnerOutputType::Scalar(ScalarType::Json)
     }
 
-    pub fn xml() -> OutputType {
-        OutputType::Scalar(ScalarType::Xml)
+    pub(crate) fn uuid() -> InnerOutputType<'a> {
+        InnerOutputType::Scalar(ScalarType::UUID)
     }
 
-    pub fn bytes() -> OutputType {
-        OutputType::Scalar(ScalarType::Bytes)
+    pub(crate) fn bytes() -> InnerOutputType<'a> {
+        InnerOutputType::Scalar(ScalarType::Bytes)
     }
 
     /// Attempts to recurse through the type until an object type is found.
     /// Returns Some(ObjectTypeStrongRef) if ab object type is found, None otherwise.
-    pub fn as_object_type(&self) -> Option<ObjectTypeStrongRef> {
-        match self {
-            OutputType::Enum(_) => None,
-            OutputType::List(inner) => inner.as_object_type(),
-            OutputType::Object(obj) => Some(obj.into_arc()),
-            OutputType::Scalar(_) => None,
+    pub fn as_object_type<'b>(&'b self) -> Option<&'b ObjectType<'a>> {
+        match &self.inner {
+            InnerOutputType::Object(obj) => Some(obj),
+            _ => None,
         }
     }
 
     pub fn is_list(&self) -> bool {
-        matches!(self, OutputType::List(_))
+        self.is_list
     }
 
     pub fn is_object(&self) -> bool {
-        matches!(self, OutputType::Object(_))
+        matches!(self.inner, InnerOutputType::Object(_))
     }
 
     pub fn is_scalar(&self) -> bool {
-        matches!(self, OutputType::Scalar(_))
+        matches!(self.inner, InnerOutputType::Scalar(_))
     }
 
     pub fn is_enum(&self) -> bool {
-        matches!(self, OutputType::Enum(_))
+        matches!(self.inner, InnerOutputType::Enum(_))
     }
 
     pub fn is_scalar_list(&self) -> bool {
-        match self {
-            OutputType::List(typ) => typ.is_scalar(),
-            _ => false,
-        }
+        self.is_list() && self.is_scalar()
     }
 
     pub fn is_enum_list(&self) -> bool {
-        match self {
-            OutputType::List(typ) => typ.is_enum(),
-            _ => false,
-        }
+        self.is_list() && self.is_enum()
     }
 }
 
-pub struct ObjectType {
-    pub identifier: Identifier,
-    fields: OnceCell<Vec<OutputFieldRef>>,
+type OutputObjectFields<'a> =
+    Arc<Lazy<Vec<OutputField<'a>>, Box<dyn FnOnce() -> Vec<OutputField<'a>> + Send + Sync + 'a>>>;
+
+#[derive(Clone)]
+pub struct ObjectType<'a> {
+    pub(crate) identifier: Identifier,
+    pub(crate) fields: OutputObjectFields<'a>,
 
     // Object types can directly map to models.
-    model: Option<ModelRef>,
+    pub(crate) model: Option<ModelId>,
+    _heh: (),
 }
 
-impl Debug for ObjectType {
+impl Debug for ObjectType<'_> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         f.debug_struct("ObjectType")
             .field("identifier", &self.identifier)
-            .field("fields", &"#Fields Cell#")
             .field("model", &self.model)
             .finish()
     }
 }
 
-impl ObjectType {
-    pub fn new(ident: Identifier, model: Option<ModelRef>) -> Self {
-        Self {
-            identifier: ident,
-            fields: OnceCell::new(),
-            model,
+impl<'a> ObjectType<'a> {
+    pub(crate) fn new(
+        identifier: Identifier,
+        fields: impl FnOnce() -> Vec<OutputField<'a>> + Send + Sync + 'a,
+    ) -> Self {
+        let lazy = Lazy::<Vec<OutputField<'_>>, _>::new(
+            Box::new(fields) as Box<dyn FnOnce() -> Vec<OutputField<'a>> + Send + Sync + 'a>
+        );
+        ObjectType {
+            identifier,
+            fields: Arc::new(lazy),
+            model: None,
+            _heh: (),
         }
     }
 
@@ -142,53 +153,61 @@ impl ObjectType {
         &self.identifier
     }
 
-    pub fn add_field(&mut self, field: OutputField) {
-        self.fields.get_mut().unwrap().push(Arc::new(field));
+    pub fn name(&self) -> String {
+        self.identifier.name()
     }
 
-    pub fn get_fields(&self) -> &Vec<OutputFieldRef> {
-        self.fields.get().unwrap()
+    pub fn get_fields(&self) -> &[OutputField<'a>] {
+        (*self.fields).as_ref()
     }
 
-    pub fn set_fields(&self, fields: Vec<OutputField>) {
-        self.fields.set(fields.into_iter().map(Arc::new).collect()).unwrap();
-    }
-
-    pub fn find_field(&self, name: &str) -> Option<OutputFieldRef> {
-        self.get_fields().iter().find(|f| f.name == name).cloned()
-    }
-
-    /// True if fields are empty, false otherwise.
-    pub fn is_empty(&self) -> bool {
-        self.get_fields().is_empty()
+    pub fn find_field(&self, name: &str) -> Option<&OutputField<'a>> {
+        self.get_fields().iter().find(|f| f.name == name)
     }
 }
 
-#[derive(Debug)]
-pub struct OutputField {
-    pub name: String,
-    pub field_type: OutputTypeRef,
-    pub deprecation: Option<Deprecation>,
+type OutputFieldArguments<'a> =
+    Option<Arc<Lazy<Vec<InputField<'a>>, Box<dyn FnOnce() -> Vec<InputField<'a>> + Send + Sync + 'a>>>>;
+
+#[derive(Clone)]
+pub struct OutputField<'a> {
+    pub(crate) name: Cow<'a, str>,
+    pub field_type: OutputType<'a>,
 
     /// Arguments are input fields, but positioned in context of an output field
     /// instead of being attached to an input object.
-    pub arguments: Vec<InputFieldRef>,
+    pub(super) arguments: OutputFieldArguments<'a>,
 
     /// Indicates the presence of the field on the higher output objects.
     /// States whether or not the field can be null.
     pub is_nullable: bool,
 
-    /// Relevant for resolving top level queries.
-    pub query_info: Option<QueryInfo>,
+    pub(super) query_info: Option<QueryInfo>,
 }
 
-impl OutputField {
-    pub fn nullable(mut self) -> Self {
+impl Debug for OutputField<'_> {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.debug_struct("OutputField<'_>")
+            .field("name", &self.name)
+            .finish_non_exhaustive()
+    }
+}
+
+impl<'a> OutputField<'a> {
+    pub fn name(&self) -> &Cow<'a, str> {
+        &self.name
+    }
+
+    pub fn arguments(&self) -> &[InputField<'a>] {
+        self.arguments.as_ref().map(|f| (**f).as_slice()).unwrap_or(&[])
+    }
+
+    pub(crate) fn nullable(mut self) -> Self {
         self.is_nullable = true;
         self
     }
 
-    pub fn nullable_if(self, condition: bool) -> Self {
+    pub(crate) fn nullable_if(self, condition: bool) -> Self {
         if condition {
             self.nullable()
         } else {
@@ -196,28 +215,22 @@ impl OutputField {
         }
     }
 
-    pub fn deprecate<T, S>(mut self, reason: T, since_version: S, planned_removal_version: Option<String>) -> Self
-    where
-        T: Into<String>,
-        S: Into<String>,
-    {
-        self.deprecation = Some(Deprecation {
-            reason: reason.into(),
-            since_version: since_version.into(),
-            planned_removal_version,
-        });
-
-        self
+    pub fn model(&self) -> Option<ModelId> {
+        self.query_info.as_ref().and_then(|info| info.model)
     }
 
-    pub fn model(&self) -> Option<&ModelRef> {
-        self.query_info.as_ref().and_then(|info| info.model.as_ref())
+    pub fn field_type(&self) -> &OutputType<'a> {
+        &self.field_type
     }
 
     pub fn is_find_unique(&self) -> bool {
-        matches!(self.query_tag(), Some(&QueryTag::FindUnique))
+        matches!(
+            self.query_tag(),
+            Some(&QueryTag::FindUnique | QueryTag::FindUniqueOrThrow)
+        )
     }
 
+    /// Relevant for resolving top level queries.
     pub fn query_info(&self) -> Option<&QueryInfo> {
         self.query_info.as_ref()
     }

@@ -4,4 +4,4 @@ mod schema_renderer;
 
 pub use body::*;
 pub use protocol_adapter::*;
-pub use schema_renderer::*;
+pub use schema_renderer::render_graphql_schema;

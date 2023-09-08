@@ -1,0 +1,24 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+model Kattbjorn {
+  // As of now, the code action won't appear here until the other validation
+  // error is fixed. The reason is the implementation of this code action
+  // relies on the parser database to be fully populated and all attributes
+  // to be resolved, however when there are name and type resolution errors,
+  // the attributes are not currently resolved and only an empty stub for
+  // model attributes is constructed. This may change in the future, and this
+  // test expectation would need to be updated correspondingly then.
+  //
+  // Note that the validation error itself does not appear here too until the
+  // error on the next line is fixed (due to these being separate validation
+  // passes), so the behaviour is consistent.
+  id  String @id
+  bar
+}

@@ -74,7 +74,7 @@ fn invalid_file_path_error(file_path: &str, connection_info: &ConnectionInfo) ->
     SqlError::ConnectionError(QuaintKind::DatabaseUrlIsInvalid(format!(
         "\"{file_path}\" is not a valid sqlite file path"
     )))
-    .into_connector_error(&connection_info)
+    .into_connector_error(connection_info)
 }
 
 #[async_trait]

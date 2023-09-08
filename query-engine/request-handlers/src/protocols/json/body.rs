@@ -4,6 +4,7 @@ use query_core::{
     BatchDocument, BatchDocumentTransaction, Operation, QueryDocument,
 };
 use serde::{Deserialize, Serialize};
+use tracing::info_span;
 
 use super::protocol_adapter::JsonProtocolAdapter;
 
@@ -17,17 +18,19 @@ pub enum JsonBody {
 impl JsonBody {
     /// Convert a `JsonBody` into a `QueryDocument`.
     pub fn into_doc(self, query_schema: &QuerySchemaRef) -> crate::Result<QueryDocument> {
+        let _span = info_span!("prisma:engine:into_doc").entered();
         match self {
             JsonBody::Single(query) => {
-                let operation = JsonProtocolAdapter::convert_single(query, query_schema)?;
+                let operation = JsonProtocolAdapter::new(query_schema).convert_single(query)?;
 
                 Ok(QueryDocument::Single(operation))
             }
             JsonBody::Batch(query) => {
+                let mut protocol_adapter = JsonProtocolAdapter::new(query_schema);
                 let operations: crate::Result<Vec<Operation>> = query
                     .batch
                     .into_iter()
-                    .map(|single_query| JsonProtocolAdapter::convert_single(single_query, query_schema))
+                    .map(|single_query| protocol_adapter.convert_single(single_query))
                     .collect();
 
                 let transaction = if let Some(opts) = query.transaction {
@@ -124,8 +127,8 @@ impl SelectionSet {
         key == ALL_COMPOSITES
     }
 
-    pub fn selection(self) -> Vec<(String, SelectionSetValue)> {
-        self.0.into_iter().filter(|(_, v)| v.is_selected()).collect::<Vec<_>>()
+    pub(crate) fn into_selection(self) -> impl Iterator<Item = (String, SelectionSetValue)> {
+        self.0.into_iter().filter(|(_, v)| v.is_selected())
     }
 }
 
@@ -151,7 +154,7 @@ impl<'de> Deserialize<'de> for Action {
         D: serde::Deserializer<'de>,
     {
         let action = String::deserialize(deserializer)?;
-        let query_tag = QueryTag::from(action);
+        let query_tag = QueryTag::from(action.as_str());
 
         Ok(Action(query_tag))
     }

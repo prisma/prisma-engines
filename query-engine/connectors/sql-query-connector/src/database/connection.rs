@@ -1,5 +1,5 @@
 use super::{catch, transaction::SqlConnectorTransaction};
-use crate::{database::operations::*, Context, QueryExt, SqlError};
+use crate::{database::operations::*, Context, SqlError};
 use async_trait::async_trait;
 use connector::{ConnectionLike, RelAggregationSelection};
 use connector_interface::{
@@ -10,7 +10,7 @@ use prisma_models::{prelude::*, SelectionResult};
 use prisma_value::PrismaValue;
 use quaint::{
     connector::{IsolationLevel, TransactionCapable},
-    prelude::ConnectionInfo,
+    prelude::{ConnectionInfo, Queryable},
 };
 use std::{collections::HashMap, str::FromStr};
 
@@ -22,7 +22,7 @@ pub(crate) struct SqlConnection<C> {
 
 impl<C> SqlConnection<C>
 where
-    C: QueryExt + Send + Sync + 'static,
+    C: TransactionCapable + Send + Sync + 'static,
 {
     pub fn new(inner: C, connection_info: &ConnectionInfo, features: psl::PreviewFeatures) -> Self {
         let connection_info = connection_info.clone();
@@ -35,12 +35,12 @@ where
     }
 }
 
-impl<C> ConnectionLike for SqlConnection<C> where C: QueryExt + TransactionCapable + Send + Sync + 'static {}
+impl<C> ConnectionLike for SqlConnection<C> where C: Queryable + TransactionCapable + Send + Sync + 'static {}
 
 #[async_trait]
 impl<C> Connection for SqlConnection<C>
 where
-    C: QueryExt + TransactionCapable + Send + Sync + 'static,
+    C: Queryable + TransactionCapable + Send + Sync + 'static,
 {
     async fn start_transaction<'a>(
         &'a mut self,
@@ -52,7 +52,7 @@ where
             Some(level) => {
                 let transformed = IsolationLevel::from_str(&level)
                     .map_err(SqlError::from)
-                    .map_err(|err| err.into_connector_error(&connection_info))?;
+                    .map_err(|err| err.into_connector_error(connection_info))?;
 
                 Some(transformed)
             }
@@ -62,7 +62,7 @@ where
         let fut_tx = self.inner.start_transaction(isolation_level);
 
         catch(self.connection_info.clone(), async move {
-            let tx: quaint::connector::Transaction = fut_tx.await.map_err(SqlError::from)?;
+            let tx = fut_tx.await.map_err(SqlError::from)?;
 
             Ok(Box::new(SqlConnectorTransaction::new(tx, connection_info, features)) as Box<dyn Transaction>)
         })
@@ -77,11 +77,11 @@ where
 #[async_trait]
 impl<C> ReadOperations for SqlConnection<C>
 where
-    C: QueryExt + Send + Sync + 'static,
+    C: Queryable + Send + Sync + 'static,
 {
     async fn get_single_record(
         &mut self,
-        model: &ModelRef,
+        model: &Model,
         filter: &Filter,
         selected_fields: &FieldSelection,
         aggr_selections: &[RelAggregationSelection],
@@ -105,7 +105,7 @@ where
 
     async fn get_many_records(
         &mut self,
-        model: &ModelRef,
+        model: &Model,
         query_arguments: QueryArguments,
         selected_fields: &FieldSelection,
         aggr_selections: &[RelAggregationSelection],
@@ -141,7 +141,7 @@ where
 
     async fn aggregate_records(
         &mut self,
-        model: &ModelRef,
+        model: &Model,
         query_arguments: QueryArguments,
         selections: Vec<AggregationSelection>,
         group_by: Vec<ScalarFieldRef>,
@@ -159,24 +159,33 @@ where
 #[async_trait]
 impl<C> WriteOperations for SqlConnection<C>
 where
-    C: QueryExt + Send + Sync + 'static,
+    C: Queryable + Send + Sync + 'static,
 {
     async fn create_record(
         &mut self,
-        model: &ModelRef,
+        model: &Model,
         args: WriteArgs,
+        selected_fields: FieldSelection,
         trace_id: Option<String>,
-    ) -> connector::Result<SelectionResult> {
+    ) -> connector::Result<SingleRecord> {
         catch(self.connection_info.clone(), async move {
             let ctx = Context::new(&self.connection_info, trace_id.as_deref());
-            write::create_record(&self.inner, &self.connection_info.sql_family(), model, args, &ctx).await
+            write::create_record(
+                &self.inner,
+                &self.connection_info.sql_family(),
+                model,
+                args,
+                selected_fields,
+                &ctx,
+            )
+            .await
         })
         .await
     }
 
     async fn create_records(
         &mut self,
-        model: &ModelRef,
+        model: &Model,
         args: Vec<WriteArgs>,
         skip_duplicates: bool,
         trace_id: Option<String>,
@@ -190,7 +199,7 @@ where
 
     async fn update_records(
         &mut self,
-        model: &ModelRef,
+        model: &Model,
         record_filter: RecordFilter,
         args: WriteArgs,
         trace_id: Option<String>,
@@ -204,22 +213,23 @@ where
 
     async fn update_record(
         &mut self,
-        model: &ModelRef,
+        model: &Model,
         record_filter: RecordFilter,
         args: WriteArgs,
+        selected_fields: Option<FieldSelection>,
         trace_id: Option<String>,
-    ) -> connector::Result<Option<SelectionResult>> {
+    ) -> connector::Result<Option<SingleRecord>> {
         catch(self.connection_info.clone(), async move {
             let ctx = Context::new(&self.connection_info, trace_id.as_deref());
-            let mut res = write::update_record(&self.inner, model, record_filter, args, &ctx).await?;
-            Ok(res.pop())
+
+            write::update_record(&self.inner, model, record_filter, args, selected_fields, &ctx).await
         })
         .await
     }
 
     async fn delete_records(
         &mut self,
-        model: &ModelRef,
+        model: &Model,
         record_filter: RecordFilter,
         trace_id: Option<String>,
     ) -> connector::Result<usize> {
@@ -279,7 +289,7 @@ where
 
     async fn query_raw(
         &mut self,
-        _model: Option<&ModelRef>,
+        _model: Option<&Model>,
         inputs: HashMap<String, PrismaValue>,
         _query_type: Option<String>,
     ) -> connector::Result<serde_json::Value> {

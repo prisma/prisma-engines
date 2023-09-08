@@ -5,7 +5,8 @@ use connector_interface::{
     error::{ConnectorError, ErrorKind},
     Connection, Connector,
 };
-use quaint::{pooled::Quaint, prelude::ConnectionInfo};
+use psl::builtin_connectors::COCKROACH;
+use quaint::{connector::PostgresFlavour, pooled::Quaint, prelude::ConnectionInfo};
 use std::time::Duration;
 
 pub struct PostgreSql {
@@ -24,13 +25,14 @@ impl PostgreSql {
 #[async_trait]
 impl FromSource for PostgreSql {
     async fn from_source(
-        _source: &psl::Datasource,
+        source: &psl::Datasource,
         url: &str,
         features: psl::PreviewFeatures,
     ) -> connector_interface::Result<Self> {
         let database_str = url;
 
-        let connection_info = ConnectionInfo::from_url(database_str).map_err(|err| {
+        // This connection info is only used for error rendering. It does not matter that the flavour is not set.
+        let err_conn_info = ConnectionInfo::from_url(url).map_err(|err| {
             ConnectorError::from_kind(ErrorKind::InvalidDatabaseUrl {
                 details: err.to_string(),
                 url: database_str.to_string(),
@@ -39,8 +41,16 @@ impl FromSource for PostgreSql {
 
         let mut builder = Quaint::builder(url)
             .map_err(SqlError::from)
-            .map_err(|sql_error| sql_error.into_connector_error(&connection_info))?;
+            .map_err(|sql_error| sql_error.into_connector_error(&err_conn_info))?;
 
+        let flavour = if COCKROACH.is_provider(source.active_provider) {
+            PostgresFlavour::Cockroach
+        } else {
+            PostgresFlavour::Postgres
+        };
+
+        // The postgres flavour is set in order to avoid a network roundtrip when connecting to the database.
+        builder.set_postgres_flavour(flavour);
         builder.health_check_interval(Duration::from_secs(15));
         builder.test_on_check_out(true);
 

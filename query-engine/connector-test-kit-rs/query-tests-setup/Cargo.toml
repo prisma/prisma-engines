@@ -6,8 +6,7 @@ edition = "2021"
 [dependencies]
 serde_json.workspace = true
 prisma-models = { path = "../../prisma-models" }
-lazy_static = "1.4"
-enum_dispatch = "0.3"
+once_cell = "1"
 qe-setup = { path = "../qe-setup" }
 request-handlers = { path = "../../request-handlers" }
 tokio.workspace = true
@@ -26,7 +25,7 @@ tracing-futures = "0.2"
 tracing-subscriber = { version = "0.3", features = ["fmt", "env-filter"] }
 tracing-error = "0.2"
 colored = "2"
-indoc = "1.0"
+indoc.workspace = true
 enumflags2 = "0.7"
 hyper = { version = "0.14", features = ["full"] }
 indexmap = { version = "1.0", features = ["serde-1"] }

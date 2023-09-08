@@ -1,4 +1,4 @@
-use crate::datamodel_connector::*;
+pub(crate) use crate::datamodel_connector::*;
 use diagnostics::{DatamodelError, Span};
 use enumflags2::BitFlags;
 
@@ -19,14 +19,14 @@ impl Connector for EmptyDatamodelConnector {
         BitFlags::all()
     }
 
-    fn capabilities(&self) -> &'static [ConnectorCapability] {
-        &[
-            ConnectorCapability::AutoIncrement,
-            ConnectorCapability::CompoundIds,
-            ConnectorCapability::Enums,
-            ConnectorCapability::Json,
-            ConnectorCapability::ImplicitManyToManyRelation,
-        ]
+    fn capabilities(&self) -> ConnectorCapabilities {
+        enumflags2::make_bitflags!(ConnectorCapability::{
+            AutoIncrement |
+            CompoundIds |
+            Enums |
+            Json |
+            ImplicitManyToManyRelation
+        })
     }
 
     fn max_identifier_length(&self) -> usize {
@@ -70,6 +70,10 @@ impl Connector for EmptyDatamodelConnector {
 
     fn validate_url(&self, _url: &str) -> Result<(), String> {
         Ok(())
+    }
+
+    fn flavour(&self) -> Flavour {
+        unreachable!()
     }
 }
 

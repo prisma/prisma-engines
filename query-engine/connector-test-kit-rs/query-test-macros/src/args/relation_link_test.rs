@@ -1,27 +1,35 @@
-use super::*;
-use crate::IntoDarlingError;
+use super::{connector_test::*, *};
 use darling::FromMeta;
-use query_tests_setup::{ConnectorTag, RelationField};
-use std::convert::TryFrom;
 use syn::{Meta, Path};
 
+#[derive(Debug)]
+pub(crate) struct RelationField(String, bool);
+
+impl darling::ToTokens for RelationField {
+    fn to_tokens(&self, tokens: &mut proc_macro2::TokenStream) {
+        let s = &self.0;
+        let b = &self.1;
+        tokens.extend(quote::quote! { &::query_tests_setup::RelationField::try_from((#s, #b)).unwrap() })
+    }
+}
+
 #[derive(Debug, FromMeta)]
-pub struct RelationLinkTestArgs {
+pub(crate) struct RelationLinkTestArgs {
     #[darling(default)]
     pub suite: Option<String>,
 
     #[darling(default)]
-    pub only: OnlyConnectorTags,
+    pub only: ConnectorTags,
 
-    pub on_child: OnChild,
+    pub(crate) on_child: OnChild,
 
-    pub on_parent: OnParent,
-
-    #[darling(default)]
-    pub id_only: bool,
+    pub(crate) on_parent: OnParent,
 
     #[darling(default)]
-    pub exclude: ExcludeConnectorTags,
+    pub(crate) id_only: bool,
+
+    #[darling(default)]
+    pub(crate) exclude: ConnectorTags,
 
     #[darling(default)]
     pub capabilities: RunOnlyForCapabilities,
@@ -29,37 +37,18 @@ pub struct RelationLinkTestArgs {
 
 impl RelationLinkTestArgs {
     pub fn validate(&self, on_module: bool) -> Result<(), darling::Error> {
-        validate_suite(&self.suite, on_module)?;
-
-        Ok(())
-    }
-
-    /// Returns all the connectors that the test is valid for.
-    pub fn connectors_to_test(&self) -> Vec<ConnectorTag> {
-        connectors_to_test(&self.only, &self.exclude)
+        utils::validate_suite(&self.suite, on_module)
     }
 }
 
 #[derive(Debug)]
-pub struct OnChild {
-    relation_field: RelationField,
-}
-
-impl OnChild {
-    pub fn relation_field(&self) -> &RelationField {
-        &self.relation_field
-    }
+pub(crate) struct OnChild {
+    pub(crate) relation_field: RelationField,
 }
 
 #[derive(Debug)]
-pub struct OnParent {
-    relation_field: RelationField,
-}
-
-impl OnParent {
-    pub fn relation_field(&self) -> &RelationField {
-        &self.relation_field
-    }
+pub(crate) struct OnParent {
+    pub(crate) relation_field: RelationField,
 }
 
 impl darling::FromMeta for OnChild {
@@ -113,5 +102,5 @@ fn parse_relation_field(lit_str: &syn::LitStr, child: bool) -> Result<RelationFi
         )))
     }?;
 
-    RelationField::try_from((tag.as_str(), child)).into_darling_error(&lit_str.span())
+    Ok(RelationField(tag, child))
 }

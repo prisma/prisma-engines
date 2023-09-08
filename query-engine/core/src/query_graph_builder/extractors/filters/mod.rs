@@ -16,13 +16,13 @@ use filter_fold::*;
 use filter_grouping::*;
 use indexmap::IndexMap;
 use prisma_models::{
-    prelude::ParentContainer, CompositeFieldRef, Field, ModelRef, PrismaValue, RelationFieldRef, ScalarFieldRef,
+    prelude::ParentContainer, CompositeFieldRef, Field, Model, PrismaValue, RelationFieldRef, ScalarFieldRef,
 };
-use schema_builder::constants::filters;
-use std::{collections::HashMap, convert::TryInto, str::FromStr};
+use schema::constants::filters;
+use std::{borrow::Cow, collections::HashMap, convert::TryInto, str::FromStr};
 
 /// Extracts a filter for a unique selector, i.e. a filter that selects exactly one record.
-pub fn extract_unique_filter(value_map: ParsedInputMap, model: &ModelRef) -> QueryGraphBuilderResult<Filter> {
+pub fn extract_unique_filter(value_map: ParsedInputMap<'_>, model: &Model) -> QueryGraphBuilderResult<Filter> {
     let tag = value_map.tag.clone();
     // Partition the input into a map containing only the unique fields and one containing all the other filters
     // so that we can parse them separately and ensure we AND both filters
@@ -46,10 +46,10 @@ pub fn extract_unique_filter(value_map: ParsedInputMap, model: &ModelRef) -> Que
 
 /// Extracts a filter for a unique selector, i.e. a filter that selects exactly one record.
 /// The input map must only contain unique & compound unique fields.
-fn internal_extract_unique_filter(value_map: ParsedInputMap, model: &ModelRef) -> QueryGraphBuilderResult<Filter> {
+fn internal_extract_unique_filter(value_map: ParsedInputMap<'_>, model: &Model) -> QueryGraphBuilderResult<Filter> {
     let filters = value_map
         .into_iter()
-        .map(|(field_name, value): (String, ParsedInputValue)| {
+        .map(|(field_name, value): (Cow<'_, str>, ParsedInputValue<'_>)| {
             // Always try to resolve regular fields first. If that fails, try to resolve compound fields.
             match model.fields().find_from_scalar(&field_name) {
                 Ok(field) => {
@@ -72,8 +72,8 @@ fn internal_extract_unique_filter(value_map: ParsedInputMap, model: &ModelRef) -
     Ok(Filter::and(filters))
 }
 
-fn handle_compound_field(fields: Vec<ScalarFieldRef>, value: ParsedInputValue) -> QueryGraphBuilderResult<Filter> {
-    let mut input_map: ParsedInputMap = value.try_into()?;
+fn handle_compound_field(fields: Vec<ScalarFieldRef>, value: ParsedInputValue<'_>) -> QueryGraphBuilderResult<Filter> {
+    let mut input_map: ParsedInputMap<'_> = value.try_into()?;
 
     let filters: Vec<Filter> = fields
         .into_iter()
@@ -98,7 +98,7 @@ fn handle_compound_field(fields: Vec<ScalarFieldRef>, value: ParsedInputValue) -
 /// | OR   | return empty list | validate single filter | validate all filters |
 /// | AND  | return all items  | validate single filter | validate all filters |
 /// | NOT  | return all items  | validate single filter | validate all filters |
-pub fn extract_filter<T>(value_map: ParsedInputMap, container: T) -> QueryGraphBuilderResult<Filter>
+pub fn extract_filter<T>(value_map: ParsedInputMap<'_>, container: T) -> QueryGraphBuilderResult<Filter>
 where
     T: Into<ParentContainer>,
 {
@@ -107,7 +107,7 @@ where
     // We define an internal function so we can track the recursion depth. Empty
     // filters at the root layer cannot always be removed.
     fn extract_filter(
-        value_map: ParsedInputMap,
+        value_map: ParsedInputMap<'_>,
         container: &ParentContainer,
         depth: usize,
     ) -> QueryGraphBuilderResult<Filter> {
@@ -276,7 +276,7 @@ fn fold_search_filters(filters: &[Filter]) -> Vec<Filter> {
 
 /// Field is the field the filter is refering to and `value` is the passed filter. E.g. `where: { <field>: <value> }.
 /// `value` can be either a flat scalar (for shorthand filter notation) or an object (full filter syntax).
-fn extract_scalar_filters(field: &ScalarFieldRef, value: ParsedInputValue) -> QueryGraphBuilderResult<Vec<Filter>> {
+fn extract_scalar_filters(field: &ScalarFieldRef, value: ParsedInputValue<'_>) -> QueryGraphBuilderResult<Vec<Filter>> {
     match value {
         ParsedInputValue::Single(pv) => Ok(vec![field.equals(pv)]),
         ParsedInputValue::Map(mut filter_map) => {
@@ -298,7 +298,10 @@ fn extract_scalar_filters(field: &ScalarFieldRef, value: ParsedInputValue) -> Qu
 
 /// Field is the field the filter is refering to and `value` is the passed filter. E.g. `where: { <field>: <value> }.
 /// `value` can be either a filter object (for shorthand filter notation) or an object (full filter syntax).
-fn extract_relation_filters(field: &RelationFieldRef, value: ParsedInputValue) -> QueryGraphBuilderResult<Vec<Filter>> {
+fn extract_relation_filters(
+    field: &RelationFieldRef,
+    value: ParsedInputValue<'_>,
+) -> QueryGraphBuilderResult<Vec<Filter>> {
     match value {
         // Implicit is null filter (`where: { <field>: null }`)
         ParsedInputValue::Single(PrismaValue::Null) => Ok(vec![field.one_relation_is_null()]),
@@ -320,7 +323,7 @@ fn extract_relation_filters(field: &RelationFieldRef, value: ParsedInputValue) -
     }
 }
 
-fn parse_query_mode(input: ParsedInputValue) -> QueryGraphBuilderResult<QueryMode> {
+fn parse_query_mode(input: ParsedInputValue<'_>) -> QueryGraphBuilderResult<QueryMode> {
     let value: PrismaValue = input.try_into()?;
     let s = match value {
         PrismaValue::Enum(s) => s,
@@ -339,7 +342,7 @@ fn parse_query_mode(input: ParsedInputValue) -> QueryGraphBuilderResult<QueryMod
 /// `value` can be either a flat scalar (for shorthand filter notation) or an object (full filter syntax).
 fn extract_composite_filters(
     field: &CompositeFieldRef,
-    value: ParsedInputValue,
+    value: ParsedInputValue<'_>,
 ) -> QueryGraphBuilderResult<Vec<Filter>> {
     match value {
         ParsedInputValue::Single(val) => Ok(vec![field.equals(val)]), // Todo: Do we want to do coercions here? (list, object)

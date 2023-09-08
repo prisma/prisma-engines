@@ -5,17 +5,16 @@ use crate::{
     ArgumentListLookup, FilteredQuery, ParsedField,
 };
 use connector::filter::Filter;
-use prisma_models::ModelRef;
-use schema::ConnectorContext;
-use schema_builder::constants::args;
+use prisma_models::Model;
+use schema::{constants::args, QuerySchema};
 use std::convert::TryInto;
 
 /// Creates a top level delete record query and adds it to the query graph.
-pub fn delete_record(
+pub(crate) fn delete_record(
     graph: &mut QueryGraph,
-    connector_ctx: &ConnectorContext,
-    model: ModelRef,
-    mut field: ParsedField,
+    query_schema: &QuerySchema,
+    model: Model,
+    mut field: ParsedField<'_>,
 ) -> QueryGraphBuilderResult<()> {
     graph.flag_transactional();
 
@@ -33,7 +32,7 @@ pub fn delete_record(
     }));
 
     let delete_node = graph.create_node(delete_query);
-    utils::insert_emulated_on_delete(graph, connector_ctx, &model, &read_node, &delete_node)?;
+    utils::insert_emulated_on_delete(graph, query_schema, &model, &read_node, &delete_node)?;
 
     graph.create_edge(
         &read_node,
@@ -59,9 +58,9 @@ pub fn delete_record(
 /// Creates a top level delete many records query and adds it to the query graph.
 pub fn delete_many_records(
     graph: &mut QueryGraph,
-    connector_ctx: &ConnectorContext,
-    model: ModelRef,
-    mut field: ParsedField,
+    query_schema: &QuerySchema,
+    model: Model,
+    mut field: ParsedField<'_>,
 ) -> QueryGraphBuilderResult<()> {
     graph.flag_transactional();
 
@@ -81,7 +80,7 @@ pub fn delete_many_records(
     let read_query_node = graph.create_node(read_query);
     let delete_many_node = graph.create_node(Query::Write(delete_many));
 
-    utils::insert_emulated_on_delete(graph, connector_ctx, &model, &read_query_node, &delete_many_node)?;
+    utils::insert_emulated_on_delete(graph, query_schema, &model, &read_query_node, &delete_many_node)?;
 
     graph.create_edge(
         &read_query_node,

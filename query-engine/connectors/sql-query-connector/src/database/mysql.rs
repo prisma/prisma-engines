@@ -22,21 +22,27 @@ impl Mysql {
     }
 }
 
+fn get_connection_info(url: &str) -> connector::Result<ConnectionInfo> {
+    let database_str = url;
+
+    let connection_info = ConnectionInfo::from_url(database_str).map_err(|err| {
+        ConnectorError::from_kind(ErrorKind::InvalidDatabaseUrl {
+            details: err.to_string(),
+            url: database_str.to_string(),
+        })
+    })?;
+
+    Ok(connection_info)
+}
+
 #[async_trait]
 impl FromSource for Mysql {
     async fn from_source(
-        _source: &psl::Datasource,
+        _: &psl::Datasource,
         url: &str,
         features: psl::PreviewFeatures,
     ) -> connector_interface::Result<Mysql> {
-        let database_str = url;
-
-        let connection_info = ConnectionInfo::from_url(database_str).map_err(|err| {
-            ConnectorError::from_kind(ErrorKind::InvalidDatabaseUrl {
-                details: err.to_string(),
-                url: database_str.to_string(),
-            })
-        })?;
+        let connection_info = get_connection_info(url)?;
 
         let mut builder = Quaint::builder(url)
             .map_err(SqlError::from)
@@ -60,10 +66,12 @@ impl FromSource for Mysql {
 impl Connector for Mysql {
     async fn get_connection<'a>(&'a self) -> connector::Result<Box<dyn Connection + Send + Sync + 'static>> {
         super::catch(self.connection_info.clone(), async move {
-            let conn = self.pool.check_out().await.map_err(SqlError::from)?;
-            let conn = SqlConnection::new(conn, &self.connection_info, self.features);
+            let runtime_conn = self.pool.check_out().await?;
 
-            Ok(Box::new(conn) as Box<dyn Connection + Send + Sync + 'static>)
+            // Note: `runtime_conn` must be `Sized`, as that's required by `TransactionCapable`
+            let sql_conn = SqlConnection::new(runtime_conn, &self.connection_info, self.features);
+
+            Ok(Box::new(sql_conn) as Box<dyn Connection + Send + Sync + 'static>)
         })
         .await
     }

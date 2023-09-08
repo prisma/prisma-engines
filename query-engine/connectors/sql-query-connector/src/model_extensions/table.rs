@@ -3,8 +3,12 @@ use prisma_models::Model;
 use quaint::ast::{Column, Table};
 
 pub(crate) fn db_name_with_schema(model: &Model, ctx: &Context<'_>) -> Table<'static> {
-    let schema_prefix = model.schema_name().unwrap_or_else(|| ctx.schema_name().to_owned());
-    let model_db_name = model.db_name().to_string();
+    let schema_prefix = model
+        .walker()
+        .schema_name()
+        .map(ToOwned::to_owned)
+        .unwrap_or_else(|| ctx.schema_name().to_owned());
+    let model_db_name = model.db_name().to_owned();
     (schema_prefix, model_db_name).into()
 }
 

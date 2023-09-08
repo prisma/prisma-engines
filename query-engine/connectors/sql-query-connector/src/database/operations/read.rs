@@ -3,7 +3,7 @@ use crate::{
     model_extensions::*,
     query_arguments_ext::QueryArgumentsExt,
     query_builder::{self, read},
-    Context, QueryExt, SqlError,
+    Context, QueryExt, Queryable, SqlError,
 };
 use connector_interface::*;
 use futures::stream::{FuturesUnordered, StreamExt};
@@ -11,8 +11,8 @@ use prisma_models::*;
 use quaint::ast::*;
 
 pub(crate) async fn get_single_record(
-    conn: &dyn QueryExt,
-    model: &ModelRef,
+    conn: &dyn Queryable,
+    model: &Model,
     filter: &Filter,
     selected_fields: &ModelProjection,
     aggr_selections: &[RelAggregationSelection],
@@ -48,8 +48,8 @@ pub(crate) async fn get_single_record(
 }
 
 pub(crate) async fn get_many_records(
-    conn: &dyn QueryExt,
-    model: &ModelRef,
+    conn: &dyn Queryable,
+    model: &Model,
     mut query_arguments: QueryArguments,
     selected_fields: &ModelProjection,
     aggr_selections: &[RelAggregationSelection],
@@ -116,7 +116,7 @@ pub(crate) async fn get_many_records(
             }
 
             if !order.is_empty() {
-                records.order_by(&order)
+                records.order_by(&order, reversed)
             }
         }
         _ => {
@@ -142,7 +142,7 @@ pub(crate) async fn get_many_records(
 }
 
 pub(crate) async fn get_related_m2m_record_ids(
-    conn: &dyn QueryExt,
+    conn: &dyn Queryable,
     from_field: &RelationFieldRef,
     from_record_ids: &[SelectionResult],
     ctx: &Context<'_>,
@@ -166,7 +166,7 @@ pub(crate) async fn get_related_m2m_record_ids(
 
     // [DTODO] To verify: We might need chunked fetch here (too many parameters in the query).
     let select = Select::from_table(table)
-        .so_that(query_builder::conditions(&from_columns, from_record_ids))
+        .so_that(query_builder::in_conditions(&from_columns, from_record_ids))
         .columns(from_columns.into_iter().chain(to_columns.into_iter()));
 
     let parent_model_id = from_field.model().primary_identifier();
@@ -211,8 +211,8 @@ pub(crate) async fn get_related_m2m_record_ids(
 }
 
 pub(crate) async fn aggregate(
-    conn: &dyn QueryExt,
-    model: &ModelRef,
+    conn: &dyn Queryable,
+    model: &Model,
     query_arguments: QueryArguments,
     selections: Vec<AggregationSelection>,
     group_by: Vec<ScalarFieldRef>,
@@ -229,8 +229,8 @@ pub(crate) async fn aggregate(
 }
 
 async fn plain_aggregate(
-    conn: &dyn QueryExt,
-    model: &ModelRef,
+    conn: &dyn Queryable,
+    model: &Model,
     query_arguments: QueryArguments,
     selections: Vec<AggregationSelection>,
     ctx: &Context<'_>,
@@ -254,8 +254,8 @@ async fn plain_aggregate(
 }
 
 async fn group_by_aggregate(
-    conn: &dyn QueryExt,
-    model: &ModelRef,
+    conn: &dyn Queryable,
+    model: &Model,
     query_arguments: QueryArguments,
     selections: Vec<AggregationSelection>,
     group_by: Vec<ScalarFieldRef>,

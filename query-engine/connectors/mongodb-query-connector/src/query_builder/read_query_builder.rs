@@ -17,7 +17,7 @@ use mongodb::{
     options::AggregateOptions,
     ClientSession, Collection,
 };
-use prisma_models::{FieldSelection, ModelRef, ScalarFieldRef};
+use prisma_models::{FieldSelection, Model, ScalarFieldRef};
 use std::convert::TryFrom;
 
 // Mongo Driver broke usage of the simple API, can't be used by us anymore.
@@ -48,7 +48,7 @@ impl ReadQuery {
 /// Translated query arguments ready to use in mongo find or aggregation queries.
 #[derive(Debug)]
 pub(crate) struct MongoReadQueryBuilder {
-    pub(crate) model: ModelRef,
+    pub(crate) model: Model,
 
     /// Pre-join, "normal" filters.
     pub(crate) query: Option<Document>,
@@ -102,7 +102,7 @@ pub(crate) struct MongoReadQueryBuilder {
 }
 
 impl MongoReadQueryBuilder {
-    pub fn new(model: ModelRef) -> Self {
+    pub fn new(model: Model) -> Self {
         Self {
             model,
             query: None,

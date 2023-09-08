@@ -5,22 +5,21 @@ version = "0.1.0"
 
 [features]
 default = ["sql", "mongodb"]
-mongodb = ["mongodb-connector", "query-core/mongodb"]
+mongodb = ["mongodb-connector"]
 sql = ["sql-connector"]
-vendored-openssl = ["quaint/vendored-openssl"]
+vendored-openssl = ["sql-connector/vendored-openssl"]
 
 [dependencies]
 tokio.workspace = true
 anyhow = "1.0"
 async-trait = "0.1"
-base64 = "0.12"
-connection-string = "0.1.10"
+base64 = "0.13"
+connection-string.workspace = true
 connector = { path = "../connectors/query-connector", package = "query-connector" }
 enumflags2 = { version = "0.7"}
 psl.workspace = true
 graphql-parser = { git = "https://github.com/prisma/graphql-parser" }
 mongodb-connector = { path = "../connectors/mongodb-query-connector", optional = true, package = "mongodb-query-connector" }
-prisma-models = { path = "../prisma-models" }
 query-core = { path = "../core" }
 request-handlers = { path = "../request-handlers" }
 serde.workspace = true
@@ -40,6 +39,6 @@ query-engine-metrics = {path = "../metrics"}
 user-facing-errors = {path = "../../libs/user-facing-errors"}
 
 [dev-dependencies]
-indoc = "1"
 serial_test = "*"
 quaint.workspace = true
+indoc.workspace = true

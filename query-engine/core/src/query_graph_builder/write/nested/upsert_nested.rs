@@ -7,7 +7,7 @@ use crate::{
 };
 use connector::Filter;
 use prisma_models::RelationFieldRef;
-use schema_builder::constants::args;
+use schema::constants::args;
 use std::convert::TryInto;
 
 /// Handles a nested upsert.
@@ -95,10 +95,10 @@ use std::convert::TryInto;
 /// Todo split this mess up and clean up the code.
 pub fn nested_upsert(
     graph: &mut QueryGraph,
-    connector_ctx: &ConnectorContext,
+    query_schema: &QuerySchema,
     parent_node: NodeRef,
     parent_relation_field: &RelationFieldRef,
-    value: ParsedInputValue,
+    value: ParsedInputValue<'_>,
 ) -> QueryGraphBuilderResult<()> {
     let child_model = parent_relation_field.related_model();
     let child_model_identifier = child_model.primary_identifier();
@@ -107,7 +107,7 @@ pub fn nested_upsert(
         let parent_link = parent_relation_field.linking_fields();
         let child_link = parent_relation_field.related_field().linking_fields();
 
-        let mut as_map: ParsedInputMap = value.try_into()?;
+        let mut as_map: ParsedInputMap<'_> = value.try_into()?;
         let create_input = as_map.remove(args::CREATE).expect("create argument is missing");
         let update_input = as_map.remove(args::UPDATE).expect("update argument is missing");
         let where_input = as_map.remove(args::WHERE);
@@ -116,7 +116,7 @@ pub fn nested_upsert(
         let filter = match (where_input, parent_relation_field.is_list()) {
             // On a to-many relation the filter is a WhereUniqueInput
             (Some(where_input), true) => {
-                let where_input: ParsedInputMap = where_input.try_into()?;
+                let where_input: ParsedInputMap<'_> = where_input.try_into()?;
 
                 extract_unique_filter(where_input, &child_model)?
             }
@@ -124,7 +124,7 @@ pub fn nested_upsert(
             (None, true) => unreachable!("where argument is missing"),
             // On a to-one relation, the filter is a WhereInput (because the record is pinned by the QE automatically)
             (Some(where_input), false) => {
-                let where_input: ParsedInputMap = where_input.try_into()?;
+                let where_input: ParsedInputMap<'_> = where_input.try_into()?;
 
                 extract_filter(where_input, &child_model)?
             }
@@ -137,13 +137,14 @@ pub fn nested_upsert(
 
         let if_node = graph.create_node(Flow::default_if());
         let create_node =
-            create::create_record_node(graph, connector_ctx, child_model.clone(), create_input.try_into()?)?;
+            create::create_record_node(graph, query_schema, child_model.clone(), create_input.try_into()?)?;
         let update_node = update::update_record_node(
             graph,
-            connector_ctx,
+            query_schema,
             filter.clone(),
             child_model.clone(),
             update_input.try_into()?,
+            None,
         )?;
 
         graph.create_edge(
@@ -194,7 +195,7 @@ pub fn nested_upsert(
         // the emulation node and the update node.
         let then_node = if let Some(emulation_node) = utils::insert_emulated_on_update_with_intermediary_node(
             graph,
-            connector_ctx,
+            query_schema,
             &child_model,
             &read_children_node,
             &update_node,

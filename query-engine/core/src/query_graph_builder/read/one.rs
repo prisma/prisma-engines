@@ -1,27 +1,27 @@
 use super::*;
 use crate::{query_document::*, QueryOption, QueryOptions, ReadQuery, RecordQuery};
-use prisma_models::ModelRef;
-use schema_builder::constants::args;
+use prisma_models::Model;
+use schema::constants::args;
 use std::convert::TryInto;
 
-pub(crate) fn find_unique(field: ParsedField, model: ModelRef) -> QueryGraphBuilderResult<ReadQuery> {
+pub(crate) fn find_unique(field: ParsedField<'_>, model: Model) -> QueryGraphBuilderResult<ReadQuery> {
     find_unique_with_options(field, model, QueryOptions::none())
 }
 
-pub(crate) fn find_unique_or_throw(field: ParsedField, model: ModelRef) -> QueryGraphBuilderResult<ReadQuery> {
+pub(crate) fn find_unique_or_throw(field: ParsedField<'_>, model: Model) -> QueryGraphBuilderResult<ReadQuery> {
     find_unique_with_options(field, model, QueryOption::ThrowOnEmpty.into())
 }
 
 /// Builds a read query from a parsed incoming read query field.
 #[inline]
 fn find_unique_with_options(
-    mut field: ParsedField,
-    model: ModelRef,
+    mut field: ParsedField<'_>,
+    model: Model,
     options: QueryOptions,
 ) -> QueryGraphBuilderResult<ReadQuery> {
     let filter = match field.arguments.lookup(args::WHERE) {
         Some(where_arg) => {
-            let arg: ParsedInputMap = where_arg.value.try_into()?;
+            let arg: ParsedInputMap<'_> = where_arg.value.try_into()?;
             Some(extractors::extract_unique_filter(arg, &model)?)
         }
         None => None,

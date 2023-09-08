@@ -4,8 +4,8 @@ mod diagnose_migration_history;
 
 use anyhow::Context;
 use colored::Colorize;
-use migration_connector::BoxFuture;
-use migration_core::json_rpc::types::*;
+use schema_connector::BoxFuture;
+use schema_core::json_rpc::types::*;
 use std::{fmt, fs::File, io::Read, str::FromStr, sync::Arc};
 use structopt::*;
 
@@ -204,7 +204,7 @@ async fn main() -> anyhow::Result<()> {
                 unreachable!()
             };
 
-            let api = migration_core::migration_api(Some(schema.clone()), None)?;
+            let api = schema_core::schema_api(Some(schema.clone()), None)?;
 
             let params = IntrospectParams {
                 schema,
@@ -231,13 +231,13 @@ async fn main() -> anyhow::Result<()> {
         }
         Command::ResetDatabase(cmd) => {
             let schema = read_datamodel_from_file(&cmd.schema_path).context("Error reading the schema from file")?;
-            let api = migration_core::migration_api(Some(schema), None)?;
+            let api = schema_core::schema_api(Some(schema), None)?;
 
             api.reset().await?;
         }
         Command::CreateDatabase(cmd) => {
             let schema = read_datamodel_from_file(&cmd.schema_path).context("Error reading the schema from file")?;
-            let api = migration_core::migration_api(Some(schema.clone()), None)?;
+            let api = schema_core::schema_api(Some(schema.clone()), None)?;
 
             api.create_database(CreateDatabaseParams {
                 datasource: DatasourceParam::SchemaString(SchemaContainer { schema }),
@@ -248,7 +248,7 @@ async fn main() -> anyhow::Result<()> {
             let prisma_schema =
                 read_datamodel_from_file(&cmd.schema_path).context("Error reading the schema from file")?;
 
-            let api = migration_core::migration_api(Some(prisma_schema.clone()), None)?;
+            let api = schema_core::schema_api(Some(prisma_schema.clone()), None)?;
 
             let input = CreateMigrationInput {
                 migrations_directory_path: cmd.migrations_path,
@@ -263,7 +263,7 @@ async fn main() -> anyhow::Result<()> {
             let prisma_schema =
                 read_datamodel_from_file(&cmd.schema_path).context("Error reading the schema from file")?;
 
-            let api = migration_core::migration_api(Some(prisma_schema), None)?;
+            let api = schema_core::schema_api(Some(prisma_schema), None)?;
             api.apply_migrations(cmd.into()).await?;
         }
     }
@@ -312,7 +312,7 @@ async fn generate_dmmf(cmd: &DmmfCommand) -> anyhow::Result<()> {
         if let Some(url) = cmd.url.as_ref() {
             let skeleton = minimal_schema_from_url(url)?;
 
-            let api = migration_core::migration_api(Some(skeleton.clone()), None)?;
+            let api = schema_core::schema_api(Some(skeleton.clone()), None)?;
 
             let params = IntrospectParams {
                 schema: skeleton,
@@ -351,7 +351,7 @@ async fn generate_dmmf(cmd: &DmmfCommand) -> anyhow::Result<()> {
 
 async fn schema_push(cmd: &SchemaPush) -> anyhow::Result<()> {
     let schema = read_datamodel_from_file(&cmd.schema_path).context("Error reading the schema from file")?;
-    let api = migration_core::migration_api(Some(schema.clone()), None)?;
+    let api = schema_core::schema_api(Some(schema.clone()), None)?;
 
     let response = api
         .schema_push(SchemaPushInput {
@@ -402,17 +402,17 @@ async fn schema_push(cmd: &SchemaPush) -> anyhow::Result<()> {
 
 struct DiffHost;
 
-impl migration_connector::ConnectorHost for DiffHost {
-    fn print(&self, s: &str) -> BoxFuture<'_, migration_core::CoreResult<()>> {
+impl schema_connector::ConnectorHost for DiffHost {
+    fn print(&self, s: &str) -> BoxFuture<'_, schema_core::CoreResult<()>> {
         print!("{s}");
         Box::pin(std::future::ready(Ok(())))
     }
 }
 
 async fn migrate_diff(cmd: &MigrateDiff) -> anyhow::Result<()> {
-    use migration_core::json_rpc::types::*;
+    use schema_core::json_rpc::types::*;
 
-    let api = migration_core::migration_api(None, Some(Arc::new(DiffHost)))?;
+    let api = schema_core::schema_api(None, Some(Arc::new(DiffHost)))?;
     let to = if let Some(to_schema_datamodel) = &cmd.to_schema_datamodel {
         DiffTarget::SchemaDatamodel(SchemaContainer {
             schema: to_schema_datamodel.clone(),
@@ -451,7 +451,7 @@ fn init_logger() {
         .with_writer(std::io::stderr)
         .finish()
         .with(ErrorLayer::default())
-        .with(migration_core::TimingsLayer::default());
+        .with(schema_core::TimingsLayer);
 
     tracing::subscriber::set_global_default(subscriber)
         .map_err(|err| eprintln!("Error initializing the global logger: {err}"))

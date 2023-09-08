@@ -1,4 +1,5 @@
 use crate::{protocol::EngineProtocol, ClosedTx, Operation, ResponseData};
+use connector::Connection;
 use lru::LruCache;
 use once_cell::sync::Lazy;
 use schema::QuerySchemaRef;
@@ -12,7 +13,7 @@ use tokio::{
     time::Duration,
 };
 
-use super::{spawn_client_list_clear_actor, spawn_itx_actor, ITXClient, OpenTx, TransactionError, TxId};
+use super::{spawn_client_list_clear_actor, spawn_itx_actor, ITXClient, TransactionError, TxId};
 
 pub static CLOSED_TX_CACHE_SIZE: Lazy<usize> = Lazy::new(|| match std::env::var("CLOSED_TX_CACHE_SIZE") {
     Ok(size) => size.parse().unwrap_or(100),
@@ -23,10 +24,10 @@ static CHANNEL_SIZE: usize = 100;
 
 pub struct TransactionActorManager {
     /// Map of active ITx clients
-    pub clients: Arc<RwLock<HashMap<TxId, ITXClient>>>,
+    pub(crate) clients: Arc<RwLock<HashMap<TxId, ITXClient>>>,
     /// Cache of closed transactions. We keep the last N closed transactions in memory to
     /// return better error messages if operations are performed on closed transactions.
-    pub closed_txs: Arc<RwLock<LruCache<TxId, Option<ClosedTx>>>>,
+    pub(crate) closed_txs: Arc<RwLock<LruCache<TxId, Option<ClosedTx>>>>,
     /// Channel used to signal an ITx is closed and can be moved to the list of closed transactions.
     send_done: Sender<(TxId, Option<ClosedTx>)>,
     /// Handle to the task in charge of clearing actors.
@@ -63,25 +64,29 @@ impl TransactionActorManager {
         }
     }
 
-    pub async fn create_tx(
+    pub(crate) async fn create_tx(
         &self,
         query_schema: QuerySchemaRef,
         tx_id: TxId,
-        value: OpenTx,
+        conn: Box<dyn Connection + Send + Sync>,
+        isolation_level: Option<String>,
         timeout: Duration,
         engine_protocol: EngineProtocol,
-    ) {
+    ) -> crate::Result<()> {
         let client = spawn_itx_actor(
             query_schema.clone(),
             tx_id.clone(),
-            value,
+            conn,
+            isolation_level,
             timeout,
             CHANNEL_SIZE,
             self.send_done.clone(),
             engine_protocol,
-        );
+        )
+        .await?;
 
         self.clients.write().await.insert(tx_id, client);
+        Ok(())
     }
 
     async fn get_client(&self, tx_id: &TxId, from_operation: &str) -> crate::Result<ITXClient> {

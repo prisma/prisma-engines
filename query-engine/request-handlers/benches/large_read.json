@@ -1,0 +1,60 @@
+{
+    "action": "findMany",
+    "modelName": "website",
+    "query": {
+        "selection": {
+            "id": true,
+            "name": true,
+            "company_id": true,
+            "default_lang_id": true,
+            "default_lang_code": true,
+            "social_twitter": true,
+            "auto_redirect_lang": true,
+            "social_github": true,
+            "base_language_install_website_rel": {
+                "selection": {
+                    "base_language_install": {
+                        "selection": {
+                            "overwrite": true,
+                            "state": true,
+                            "create_uid": true,
+                            "create_date": true,
+                            "write_date": true,
+                            "write_uid": true,
+                            "lang": true
+                        }
+                    }
+                }
+            },
+            "website_page_website_page_website_idTowebsite": {
+                "selection": {
+                    "id": true,
+                    "is_published": true,
+                    "url": true,
+                    "view_id": true,
+                    "website_indexed": true,
+                    "date_publish": true,
+                    "header_overlay": true,
+                    "website_id": true,
+                    "create_uid": true,
+                    "create_date": true,
+                    "theme_template_id": true,
+                    "res_users_website_page_create_uidTores_users": {
+                        "selection": {
+                            "id": true,
+                            "company_id": true,
+                            "login": true,
+                            "company_id": true,
+                            "partner_id": true,
+                            "create_date": true,
+                            "signature": true,
+                            "action_id": true,
+                            "action_id": true,
+                            "create_uid": true
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

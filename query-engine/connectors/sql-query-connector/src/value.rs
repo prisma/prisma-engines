@@ -59,14 +59,14 @@ pub fn to_prisma_value(quaint_value: Value<'_>) -> crate::Result<PrismaValue> {
 
         Value::Date(d) => d
             .map(|d| {
-                let dt = DateTime::<Utc>::from_utc(d.and_hms(0, 0, 0), Utc);
+                let dt = DateTime::<Utc>::from_utc(d.and_hms_opt(0, 0, 0).unwrap(), Utc);
                 PrismaValue::DateTime(dt.into())
             })
             .unwrap_or(PrismaValue::Null),
 
         Value::Time(t) => t
             .map(|t| {
-                let d = NaiveDate::from_ymd(1970, 1, 1);
+                let d = NaiveDate::from_ymd_opt(1970, 1, 1).unwrap();
                 let dt = DateTime::<Utc>::from_utc(d.and_time(t), Utc);
                 PrismaValue::DateTime(dt.into())
             })
@@ -84,7 +84,9 @@ pub fn to_prisma_value(quaint_value: Value<'_>) -> crate::Result<PrismaValue> {
             .map(|b| PrismaValue::Bytes(b.into_owned()))
             .unwrap_or(PrismaValue::Null),
 
-        Value::Xml(s) => s.map(|s| PrismaValue::Xml(s.into_owned())).unwrap_or(PrismaValue::Null),
+        Value::Xml(s) => s
+            .map(|s| PrismaValue::String(s.into_owned()))
+            .unwrap_or(PrismaValue::Null),
     };
 
     Ok(val)

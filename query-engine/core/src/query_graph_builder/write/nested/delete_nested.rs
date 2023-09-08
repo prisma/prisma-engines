@@ -5,7 +5,7 @@ use crate::{
     ParsedInputMap, ParsedInputValue,
 };
 use connector::{Filter, RecordFilter};
-use prisma_models::{ModelRef, PrismaValue, RelationFieldRef};
+use prisma_models::{Model, PrismaValue, RelationFieldRef};
 use std::convert::TryInto;
 
 /// Adds a delete (single) record node to the graph and connects it to the parent.
@@ -22,19 +22,19 @@ use std::convert::TryInto;
 /// We always need to make sure that the records are connected before deletion.
 pub fn nested_delete(
     graph: &mut QueryGraph,
-    connector_ctx: &ConnectorContext,
+    query_schema: &QuerySchema,
     parent_node: &NodeRef,
     parent_relation_field: &RelationFieldRef,
-    value: ParsedInputValue,
-    child_model: &ModelRef,
+    value: ParsedInputValue<'_>,
+    child_model: &Model,
 ) -> QueryGraphBuilderResult<()> {
     let child_model_identifier = parent_relation_field.related_model().primary_identifier();
 
     if parent_relation_field.is_list() {
         let filters: Vec<Filter> = utils::coerce_vec(value)
             .into_iter()
-            .map(|value: ParsedInputValue| {
-                let value: ParsedInputMap = value.try_into()?;
+            .map(|value: ParsedInputValue<'_>| {
+                let value: ParsedInputMap<'_> = value.try_into()?;
                 extract_unique_filter(value, child_model)
             })
             .collect::<QueryGraphBuilderResult<Vec<Filter>>>()?;
@@ -52,7 +52,7 @@ pub fn nested_delete(
 
         utils::insert_emulated_on_delete(
             graph,
-            connector_ctx,
+            query_schema,
             child_model,
             &find_child_records_node,
             &delete_many_node,
@@ -107,7 +107,7 @@ pub fn nested_delete(
 
             utils::insert_emulated_on_delete(
                 graph,
-                connector_ctx,
+                query_schema,
                 child_model,
                 &find_child_records_node,
                 &delete_record_node,
@@ -145,16 +145,16 @@ pub fn nested_delete(
 
 pub fn nested_delete_many(
     graph: &mut QueryGraph,
-    connector_ctx: &ConnectorContext,
+    query_schema: &QuerySchema,
     parent: &NodeRef,
     parent_relation_field: &RelationFieldRef,
-    value: ParsedInputValue,
-    child_model: &ModelRef,
+    value: ParsedInputValue<'_>,
+    child_model: &Model,
 ) -> QueryGraphBuilderResult<()> {
     let child_model_identifier = parent_relation_field.related_model().primary_identifier();
 
     for value in utils::coerce_vec(value) {
-        let as_map: ParsedInputMap = value.try_into()?;
+        let as_map: ParsedInputMap<'_> = value.try_into()?;
         let filter = extract_filter(as_map, child_model)?;
 
         let find_child_records_node =
@@ -168,7 +168,7 @@ pub fn nested_delete_many(
         let delete_many_node = graph.create_node(Query::Write(delete_many));
         utils::insert_emulated_on_delete(
             graph,
-            connector_ctx,
+            query_schema,
             child_model,
             &find_child_records_node,
             &delete_many_node,

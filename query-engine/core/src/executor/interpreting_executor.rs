@@ -1,7 +1,7 @@
 use super::execute_operation::{execute_many_operations, execute_many_self_contained, execute_single_self_contained};
 use super::request_context;
 use crate::{
-    protocol::EngineProtocol, BatchDocumentTransaction, CoreError, OpenTx, Operation, QueryExecutor, ResponseData,
+    protocol::EngineProtocol, BatchDocumentTransaction, CoreError, Operation, QueryExecutor, ResponseData,
     TransactionActorManager, TransactionError, TransactionManager, TransactionOptions, TxId,
 };
 
@@ -170,17 +170,17 @@ where
             .await;
 
             let conn = conn.map_err(|_| TransactionError::AcquisitionTimeout)??;
-            let c_tx = OpenTx::start(conn, isolation_level).await?;
 
             self.itx_manager
                 .create_tx(
                     query_schema.clone(),
                     id.clone(),
-                    c_tx,
+                    conn,
+                    isolation_level,
                     Duration::from_millis(valid_for_millis),
                     engine_protocol,
                 )
-                .await;
+                .await?;
 
             debug!("[{}] Started.", id);
             Ok(id)

@@ -1,12 +1,7 @@
 use crate::error::ApiError;
-use napi::{bindgen_prelude::*, JsUnknown};
 use napi_derive::napi;
-use query_core::{schema::QuerySchemaRef, schema_builder};
 use request_handlers::dmmf;
-use std::{
-    collections::{BTreeMap, HashMap},
-    sync::Arc,
-};
+use std::sync::Arc;
 
 #[derive(serde::Serialize, Clone, Copy)]
 #[napi(object)]
@@ -32,50 +27,10 @@ pub fn dmmf(datamodel_string: String) -> napi::Result<String> {
         .to_result()
         .map_err(|errors| ApiError::conversion(errors, schema.db.source()))?;
 
-    let internal_data_model = prisma_models::convert(Arc::new(schema));
-    let query_schema: QuerySchemaRef = Arc::new(schema_builder::build(internal_data_model, true));
-    let dmmf = dmmf::render_dmmf(query_schema);
+    let query_schema = query_core::schema::build(Arc::new(schema), true);
+    let dmmf = dmmf::render_dmmf(&query_schema);
 
     Ok(serde_json::to_string(&dmmf)?)
-}
-
-#[napi]
-pub fn get_config(js_env: Env, options: JsUnknown) -> napi::Result<JsUnknown> {
-    #[derive(serde::Deserialize)]
-    #[serde(rename_all = "camelCase")]
-    struct GetConfigOptions {
-        datamodel: String,
-        #[serde(default)]
-        ignore_env_var_errors: bool,
-        #[serde(default)]
-        datasource_overrides: BTreeMap<String, String>,
-        #[serde(default)]
-        env: HashMap<String, String>,
-    }
-
-    let options: GetConfigOptions = js_env.from_js_value(options)?;
-
-    let GetConfigOptions {
-        datamodel,
-        ignore_env_var_errors,
-        datasource_overrides,
-        env,
-    } = options;
-
-    let overrides: Vec<(_, _)> = datasource_overrides.into_iter().collect();
-    let mut config = psl::parse_configuration(&datamodel).map_err(|errors| ApiError::conversion(errors, &datamodel))?;
-
-    config
-        .resolve_datasource_urls_query_engine(
-            &overrides,
-            |key| env.get(key).map(ToString::to_string),
-            ignore_env_var_errors,
-        )
-        .map_err(|errors| ApiError::conversion(errors, &datamodel))?;
-
-    let serialized = psl::get_config::config_to_mcf_json_value(&config);
-
-    js_env.to_js_value(&serialized)
 }
 
 #[napi]

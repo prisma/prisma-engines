@@ -8,7 +8,8 @@ use enumflags2::BitFlags;
 use lsp_types::{CompletionItem, CompletionItemKind, CompletionList};
 use psl_core::{
     datamodel_connector::{
-        Connector, ConnectorCapability, ConstraintScope, NativeTypeConstructor, NativeTypeInstance, RelationMode,
+        Connector, ConnectorCapabilities, ConnectorCapability, ConstraintScope, Flavour, NativeTypeConstructor,
+        NativeTypeInstance, RelationMode,
     },
     diagnostics::{Diagnostics, Span},
     parser_database::{self, ast, ParserDatabase, ReferentialAction, ScalarType},
@@ -26,32 +27,33 @@ const CONSTRAINT_SCOPES: &[ConstraintScope] = &[
     ConstraintScope::ModelPrimaryKeyKeyIndex,
 ];
 
-const CAPABILITIES: &[ConnectorCapability] = &[
-    ConnectorCapability::AnyId,
-    ConnectorCapability::AutoIncrement,
-    ConnectorCapability::AutoIncrementAllowedOnNonId,
-    ConnectorCapability::AutoIncrementMultipleAllowed,
-    ConnectorCapability::AutoIncrementNonIndexedAllowed,
-    ConnectorCapability::CompoundIds,
-    ConnectorCapability::CreateMany,
-    ConnectorCapability::MultiSchema,
-    ConnectorCapability::NamedDefaultValues,
-    ConnectorCapability::NamedForeignKeys,
-    ConnectorCapability::NamedPrimaryKeys,
-    ConnectorCapability::SqlQueryRaw,
-    ConnectorCapability::ReferenceCycleDetection,
-    ConnectorCapability::UpdateableId,
-    ConnectorCapability::PrimaryKeySortOrderDefinition,
-    ConnectorCapability::ImplicitManyToManyRelation,
-    ConnectorCapability::DecimalType,
-    ConnectorCapability::ClusteringSetting,
-    ConnectorCapability::OrderByNullsFirstLast,
-    ConnectorCapability::SupportsTxIsolationReadUncommitted,
-    ConnectorCapability::SupportsTxIsolationReadCommitted,
-    ConnectorCapability::SupportsTxIsolationRepeatableRead,
-    ConnectorCapability::SupportsTxIsolationSerializable,
-    ConnectorCapability::SupportsTxIsolationSnapshot,
-];
+const CAPABILITIES: ConnectorCapabilities = enumflags2::make_bitflags!(ConnectorCapability::{
+    AnyId |
+    AutoIncrement |
+    AutoIncrementAllowedOnNonId |
+    AutoIncrementMultipleAllowed |
+    AutoIncrementNonIndexedAllowed |
+    CompoundIds |
+    CreateMany |
+    MultiSchema |
+    NamedDefaultValues |
+    NamedForeignKeys |
+    NamedPrimaryKeys |
+    SqlQueryRaw |
+    ReferenceCycleDetection |
+    UpdateableId |
+    PrimaryKeySortOrderDefinition |
+    ImplicitManyToManyRelation |
+    DecimalType |
+    ClusteringSetting |
+    OrderByNullsFirstLast |
+    FilteredInlineChildNestedToOneDisconnect |
+    SupportsTxIsolationReadUncommitted |
+    SupportsTxIsolationReadCommitted |
+    SupportsTxIsolationRepeatableRead |
+    SupportsTxIsolationSerializable |
+    SupportsTxIsolationSnapshot
+});
 
 pub(crate) struct MsSqlDatamodelConnector;
 
@@ -82,7 +84,7 @@ impl Connector for MsSqlDatamodelConnector {
         "SQL Server"
     }
 
-    fn capabilities(&self) -> &'static [ConnectorCapability] {
+    fn capabilities(&self) -> ConnectorCapabilities {
         CAPABILITIES
     }
 
@@ -307,6 +309,10 @@ impl Connector for MsSqlDatamodelConnector {
         if config.preview_features().contains(PreviewFeature::MultiSchema) && !ds.schemas_defined() {
             completions::schemas_completion(completion_list);
         }
+    }
+
+    fn flavour(&self) -> Flavour {
+        Flavour::Sqlserver
     }
 }
 

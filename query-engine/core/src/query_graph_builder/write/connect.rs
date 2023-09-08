@@ -33,7 +33,7 @@ use prisma_models::RelationFieldRef;
 /// └─▶│     Connect     │
 ///    └─────────────────┘
 /// ```
-pub fn connect_records_node(
+pub(crate) fn connect_records_node(
     graph: &mut QueryGraph,
     parent_node: &NodeRef,
     child_node: &NodeRef,

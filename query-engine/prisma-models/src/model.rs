@@ -2,17 +2,10 @@ use crate::prelude::*;
 use psl::{parser_database::walkers, schema_ast::ast};
 
 pub type Model = crate::Zipper<ast::ModelId>;
-pub type ModelRef = Model;
 
 impl Model {
     pub fn name(&self) -> &str {
         self.walker().name()
-    }
-
-    /// Returns the schema name for the model
-    /// which is the contents of the @@schema("...") attribute
-    pub fn schema_name(&self) -> Option<String> {
-        self.walker().schema_name().map(ToOwned::to_owned)
     }
 
     /// Returns the set of fields to be used as the primary identifier for a record of that model.
@@ -36,14 +29,13 @@ impl Model {
         FieldSelection::from(fields)
     }
 
-    pub fn fields(&self) -> Fields {
-        Fields::new(self.clone())
+    pub fn fields(&self) -> Fields<'_> {
+        Fields::new(self)
     }
 
     pub fn supports_create_operation(&self) -> bool {
-        let dm = self.internal_data_model();
-        let walker = dm.walk(self.id);
-        let has_unsupported_field = walker
+        let has_unsupported_field = self
+            .walker()
             .scalar_fields()
             .any(|sf| sf.ast_field().arity.is_required() && sf.is_unsupported() && sf.default_value().is_none());
 
@@ -60,11 +52,16 @@ impl Model {
         self.walker().mapped_name()
     }
 
-    pub fn internal_data_model(&self) -> InternalDataModelRef {
-        self.dm.clone()
-    }
-
     pub fn unique_indexes(&self) -> impl Iterator<Item = walkers::IndexWalker<'_>> {
-        self.walker().indexes().filter(|idx| idx.is_unique())
+        self.walker()
+            .indexes()
+            .filter(|idx| idx.is_unique())
+            .filter(|index| !index.fields().any(|f| f.is_unsupported()))
+    }
+}
+
+impl std::fmt::Debug for Model {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.debug_tuple("Model").field(&self.name()).finish()
     }
 }

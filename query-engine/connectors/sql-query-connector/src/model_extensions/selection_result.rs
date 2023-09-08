@@ -2,7 +2,7 @@ use super::ScalarFieldExt;
 use prisma_models::{PrismaValue, SelectedField, SelectionResult};
 use quaint::Value;
 
-pub trait SelectionResultExt {
+pub(crate) trait SelectionResultExt {
     fn misses_autogen_value(&self) -> bool;
     fn db_values<'a>(&self) -> Vec<Value<'a>>;
 

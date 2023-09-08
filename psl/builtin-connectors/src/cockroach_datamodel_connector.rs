@@ -7,8 +7,8 @@ use enumflags2::BitFlags;
 use lsp_types::{CompletionItem, CompletionItemKind, CompletionList};
 use psl_core::{
     datamodel_connector::{
-        Connector, ConnectorCapability, ConstraintScope, NativeTypeConstructor, NativeTypeInstance, RelationMode,
-        StringFilter,
+        Connector, ConnectorCapabilities, ConnectorCapability, ConstraintScope, Flavour, NativeTypeConstructor,
+        NativeTypeInstance, RelationMode, StringFilter,
     },
     diagnostics::{DatamodelError, Diagnostics},
     parser_database::{
@@ -26,36 +26,39 @@ use crate::completions;
 
 const CONSTRAINT_SCOPES: &[ConstraintScope] = &[ConstraintScope::ModelPrimaryKeyKeyIndexForeignKey];
 
-const CAPABILITIES: &[ConnectorCapability] = &[
-    ConnectorCapability::AdvancedJsonNullability,
-    ConnectorCapability::AnyId,
-    ConnectorCapability::AutoIncrement,
-    ConnectorCapability::AutoIncrementAllowedOnNonId,
-    ConnectorCapability::AutoIncrementMultipleAllowed,
-    ConnectorCapability::AutoIncrementNonIndexedAllowed,
-    ConnectorCapability::CompoundIds,
-    ConnectorCapability::CreateMany,
-    ConnectorCapability::CreateManyWriteableAutoIncId,
-    ConnectorCapability::CreateSkipDuplicates,
-    ConnectorCapability::Enums,
-    ConnectorCapability::InsensitiveFilters,
-    ConnectorCapability::Json,
-    ConnectorCapability::JsonFiltering,
-    ConnectorCapability::JsonFilteringArrayPath,
-    ConnectorCapability::NamedPrimaryKeys,
-    ConnectorCapability::NamedForeignKeys,
-    ConnectorCapability::SqlQueryRaw,
-    ConnectorCapability::RelationFieldsInArbitraryOrder,
-    ConnectorCapability::ScalarLists,
-    ConnectorCapability::UpdateableId,
-    ConnectorCapability::WritableAutoincField,
-    ConnectorCapability::ImplicitManyToManyRelation,
-    ConnectorCapability::DecimalType,
-    ConnectorCapability::OrderByNullsFirstLast,
-    ConnectorCapability::SupportsTxIsolationSerializable,
-    ConnectorCapability::NativeUpsert,
-    ConnectorCapability::MultiSchema,
-];
+const CAPABILITIES: ConnectorCapabilities = enumflags2::make_bitflags!(ConnectorCapability::{
+    AdvancedJsonNullability |
+    AnyId |
+    AutoIncrement |
+    AutoIncrementAllowedOnNonId |
+    AutoIncrementMultipleAllowed |
+    AutoIncrementNonIndexedAllowed |
+    CompoundIds |
+    CreateMany |
+    CreateManyWriteableAutoIncId |
+    CreateSkipDuplicates |
+    Enums |
+    InsensitiveFilters |
+    Json |
+    JsonFiltering |
+    JsonFilteringArrayPath |
+    NamedPrimaryKeys |
+    NamedForeignKeys |
+    SqlQueryRaw |
+    RelationFieldsInArbitraryOrder |
+    ScalarLists |
+    UpdateableId |
+    WritableAutoincField |
+    ImplicitManyToManyRelation |
+    DecimalType |
+    OrderByNullsFirstLast |
+    SupportsTxIsolationSerializable |
+    NativeUpsert |
+    MultiSchema |
+    FilteredInlineChildNestedToOneDisconnect |
+    InsertReturning |
+    UpdateReturning
+});
 
 const SCALAR_TYPE_DEFAULTS: &[(ScalarType, CockroachType)] = &[
     (ScalarType::Int, CockroachType::Int4),
@@ -80,7 +83,7 @@ impl Connector for CockroachDatamodelConnector {
         "CockroachDB"
     }
 
-    fn capabilities(&self) -> &'static [ConnectorCapability] {
+    fn capabilities(&self) -> ConnectorCapabilities {
         CAPABILITIES
     }
 
@@ -297,6 +300,10 @@ impl Connector for CockroachDatamodelConnector {
         if config.preview_features().contains(PreviewFeature::MultiSchema) && !ds.schemas_defined() {
             completions::schemas_completion(completion_list);
         }
+    }
+
+    fn flavour(&self) -> Flavour {
+        Flavour::Cockroach
     }
 }
 

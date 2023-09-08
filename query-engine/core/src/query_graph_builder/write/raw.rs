@@ -1,21 +1,20 @@
 use super::*;
 use crate::{query_ast::*, query_graph::QueryGraph, ParsedField};
-use prisma_models::ModelRef;
-use prisma_value::PrismaValue;
+use prisma_models::{Model, PrismaValue};
 use std::{collections::HashMap, convert::TryInto};
 
-pub fn execute_raw(graph: &mut QueryGraph, field: ParsedField) -> QueryGraphBuilderResult<()> {
+pub(crate) fn execute_raw(graph: &mut QueryGraph, field: ParsedField<'_>) -> QueryGraphBuilderResult<()> {
     let raw_query = Query::Write(WriteQuery::ExecuteRaw(raw_query(None, None, field)?));
 
     graph.create_node(raw_query);
     Ok(())
 }
 
-pub fn query_raw(
+pub(crate) fn query_raw(
     graph: &mut QueryGraph,
-    model: Option<ModelRef>,
+    model: Option<Model>,
     query_type: Option<String>,
-    field: ParsedField,
+    field: ParsedField<'_>,
 ) -> QueryGraphBuilderResult<()> {
     let raw_query = Query::Write(WriteQuery::QueryRaw(raw_query(model, query_type, field)?));
 
@@ -24,9 +23,9 @@ pub fn query_raw(
 }
 
 fn raw_query(
-    model: Option<ModelRef>,
+    model: Option<Model>,
     query_type: Option<String>,
-    field: ParsedField,
+    field: ParsedField<'_>,
 ) -> QueryGraphBuilderResult<RawQuery> {
     let inputs = field
         .arguments

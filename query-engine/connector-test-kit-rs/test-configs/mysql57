@@ -1,3 +1,4 @@
 {
-    "connector": "mysql",
-    "version": "5.7"}
+  "connector": "mysql",
+  "version": "5.7"
+}

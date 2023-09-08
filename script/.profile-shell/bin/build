@@ -1,0 +1,4 @@
+#/bin/bash
+CMD="cargo build --profile=profiling --examples --benches"
+echo "==> Running command: $CMD"
+cd /prisma-engines && eval "$CMD"

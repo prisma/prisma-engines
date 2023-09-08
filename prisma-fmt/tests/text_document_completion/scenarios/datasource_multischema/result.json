@@ -28,7 +28,7 @@
         "kind": "markdown",
         "value": "```prisma\nrelationMode = \"foreignKeys\" | \"prisma\"\n```\n___\nSet the global relation mode for all relations. Values can be either \"foreignKeys\" (Default), or \"prisma\". [Learn more](https://pris.ly/d/relation-mode)\n\n"
       },
-      "insertText": "relationmode = $0",
+      "insertText": "relationMode = $0",
       "insertTextFormat": 2
     },
     {

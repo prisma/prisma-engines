@@ -1,22 +1,22 @@
 mod json_adapter;
 
-use std::{env, sync::Arc};
+pub use json_adapter::*;
 
 use crate::{ConnectorTag, ConnectorVersion, QueryResult, TestLogCapture, TestResult, ENGINE_PROTOCOL};
-pub use json_adapter::*;
-use quaint::{prelude::Queryable, single::Quaint};
+use colored::Colorize;
 use query_core::{
-    executor, protocol::EngineProtocol, schema::QuerySchemaRef, schema_builder, QueryExecutor, TransactionOptions, TxId,
+    protocol::EngineProtocol,
+    schema::{self, QuerySchemaRef},
+    QueryExecutor, TransactionOptions, TxId,
 };
 use query_engine_metrics::MetricRegistry;
+use request_handlers::{
+    load_executor, BatchTransactionOption, ConnectorMode, GraphqlBody, JsonBatchQuery, JsonBody, JsonSingleQuery,
+    MultiQuery, RequestBody, RequestHandler,
+};
+use std::{env, sync::Arc};
 
 pub type TxResult = Result<(), user_facing_errors::Error>;
-
-use colored::Colorize;
-use request_handlers::{
-    BatchTransactionOption, GraphqlBody, JsonBatchQuery, JsonBody, JsonSingleQuery, MultiQuery, RequestBody,
-    RequestHandler,
-};
 
 pub(crate) type Executor = Box<dyn QueryExecutor + Send + Sync>;
 
@@ -24,6 +24,7 @@ pub(crate) type Executor = Box<dyn QueryExecutor + Send + Sync>;
 pub struct Runner {
     executor: Executor,
     query_schema: QuerySchemaRef,
+    version: ConnectorVersion,
     connector_tag: ConnectorTag,
     connection_url: String,
     current_tx_id: Option<TxId>,
@@ -33,22 +34,37 @@ pub struct Runner {
 }
 
 impl Runner {
+    pub fn prisma_dml(&self) -> &str {
+        self.query_schema.internal_data_model.schema.db.source()
+    }
+
     pub async fn load(
         datamodel: String,
+        db_schemas: &[&str],
+        connector_version: ConnectorVersion,
         connector_tag: ConnectorTag,
         metrics: MetricRegistry,
         log_capture: TestLogCapture,
     ) -> TestResult<Self> {
+        qe_setup::setup(&datamodel, db_schemas).await?;
+
         let protocol = EngineProtocol::from(&ENGINE_PROTOCOL.to_string());
         let schema = psl::parse_schema(datamodel).unwrap();
         let data_source = schema.configuration.datasources.first().unwrap();
         let url = data_source.load_url(|key| env::var(key).ok()).unwrap();
-        let executor = executor::load(data_source, schema.configuration.preview_features(), &url).await?;
-        let internal_data_model = prisma_models::convert(Arc::new(schema));
 
-        let query_schema: QuerySchemaRef = Arc::new(schema_builder::build(internal_data_model, true));
+        let connector_mode = ConnectorMode::Rust;
+        let executor = load_executor(
+            connector_mode,
+            data_source,
+            schema.configuration.preview_features(),
+            &url,
+        )
+        .await?;
+        let query_schema: QuerySchemaRef = Arc::new(schema::build(Arc::new(schema), true));
 
         Ok(Self {
+            version: connector_version,
             executor,
             query_schema,
             connector_tag,
@@ -137,14 +153,29 @@ impl Runner {
         let query = query.into();
         tracing::debug!("Raw execute: {}", query.clone().green());
 
-        if matches!(self.connector_tag, ConnectorTag::MongoDb(_)) {
-            panic!("raw_execute is not supported for MongoDB yet");
-        }
-
-        let conn = Quaint::new(&self.connection_url).await?;
-        conn.raw_cmd(&query).await?;
+        self.connector_tag.raw_execute(&query, &self.connection_url).await?;
 
         Ok(())
+    }
+
+    pub async fn batch_json(
+        &self,
+        queries: Vec<String>,
+        transaction: bool,
+        isolation_level: Option<String>,
+    ) -> TestResult<crate::QueryResult> {
+        let handler = RequestHandler::new(&*self.executor, &self.query_schema, self.protocol);
+        let body = RequestBody::Json(JsonBody::Batch(JsonBatchQuery {
+            batch: queries
+                .into_iter()
+                .map(|q| serde_json::from_str::<JsonSingleQuery>(&q).unwrap())
+                .collect(),
+            transaction: transaction.then_some(BatchTransactionOption { isolation_level }),
+        }));
+
+        let res = handler.handle(body, self.current_tx_id.clone(), None).await;
+
+        Ok(res.into())
     }
 
     pub async fn batch(
@@ -248,8 +279,8 @@ impl Runner {
         self.log_capture.get_logs().await
     }
 
-    pub fn connector_version(&self) -> ConnectorVersion {
-        ConnectorVersion::from(self.connector())
+    pub fn connector_version(&self) -> &ConnectorVersion {
+        &self.version
     }
 
     pub fn protocol(&self) -> EngineProtocol {

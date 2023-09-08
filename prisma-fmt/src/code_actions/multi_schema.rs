@@ -37,7 +37,7 @@ pub(super) fn add_schema_block_attribute_model(
             None => return,
         };
 
-    let formatted_attribute = super::format_attribute(
+    let formatted_attribute = super::format_block_attribute(
         "schema()",
         model.indentation(),
         model.newline(),
@@ -89,7 +89,7 @@ pub(super) fn add_schema_block_attribute_enum(
         None => return,
     };
 
-    let formatted_attribute = super::format_attribute(
+    let formatted_attribute = super::format_block_attribute(
         "schema()",
         enumerator.indentation(),
         enumerator.newline(),

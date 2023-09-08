@@ -1,6 +1,6 @@
-use migration_core::migration_connector::{ConnectorError, ConnectorResult};
 use once_cell::sync::OnceCell;
 use quaint::{prelude::Queryable, single::Quaint};
+use schema_core::schema_connector::{ConnectorError, ConnectorResult};
 use std::{future::Future, pin::Pin, sync::mpsc};
 use test_setup::{mysql::mysql_safe_identifier, runtime::run_with_thread_local_runtime as tok};
 use url::Url;

@@ -30,13 +30,6 @@ impl RequestBody {
             EngineProtocol::Json => serde_json::from_slice::<json::JsonBody>(val).map(Self::from),
         }
     }
-
-    pub fn try_as_bytes(&self) -> Result<Vec<u8>, serde_json::Error> {
-        match self {
-            RequestBody::Graphql(body) => serde_json::to_vec(body),
-            RequestBody::Json(body) => serde_json::to_vec(body),
-        }
-    }
 }
 
 impl From<graphql::GraphqlBody> for RequestBody {

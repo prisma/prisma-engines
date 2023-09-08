@@ -12,21 +12,18 @@ jobs:
     env:
       SQLITE_MAX_VARIABLE_NUMBER: 250000
       SQLITE_MAX_EXPR_DEPTH: 10000
-    runs-on: macos-11
+    runs-on: macos-13
 
     steps:
       - name: Output link to real commit
         run: echo ${{ github.repository }}/commit/${{ github.event.inputs.commit }}
 
       - name: Checkout ${{ github.event.inputs.commit }}
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           ref: ${{ github.event.inputs.commit }}
 
-      - uses: actions-rs/toolchain@v1
-        with:
-          toolchain: stable
-          default: true
+      - uses: dtolnay/rust-toolchain@stable
 
       - name: Install aarch64 toolchain
         run: rustup target add aarch64-apple-darwin
@@ -42,13 +39,13 @@ jobs:
       - run: xcodebuild -showsdks
 
       - run: |
-          cargo build --target=aarch64-apple-darwin --release -p query-engine -p query-engine-node-api -p migration-engine-cli -p prisma-fmt
+          cargo build --target=aarch64-apple-darwin --release -p query-engine -p query-engine-node-api -p schema-engine-cli -p prisma-fmt
 
       - uses: actions/upload-artifact@v3
         with:
           name: binaries
           path: |
-            ${{ github.workspace }}/target/aarch64-apple-darwin/release/migration-engine
+            ${{ github.workspace }}/target/aarch64-apple-darwin/release/schema-engine
             ${{ github.workspace }}/target/aarch64-apple-darwin/release/prisma-fmt
             ${{ github.workspace }}/target/aarch64-apple-darwin/release/query-engine
             ${{ github.workspace }}/target/aarch64-apple-darwin/release/libquery_engine.dylib

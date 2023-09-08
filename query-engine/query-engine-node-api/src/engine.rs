@@ -1,11 +1,15 @@
-use crate::{engine::executor::TransactionOptions, error::ApiError, log_callback::LogCallback, logger::Logger};
+use crate::{error::ApiError, logger::Logger};
 use futures::FutureExt;
+use napi::{threadsafe_function::ThreadSafeCallContext, Env, JsFunction, JsObject, JsUnknown};
+use napi_derive::napi;
 use psl::PreviewFeature;
 use query_core::{
-    executor, protocol::EngineProtocol, schema::QuerySchema, schema_builder, telemetry, QueryExecutor, TxId,
+    protocol::EngineProtocol,
+    schema::{self, QuerySchema},
+    telemetry, QueryExecutor, TransactionOptions, TxId,
 };
 use query_engine_metrics::{MetricFormat, MetricRegistry};
-use request_handlers::{dmmf, render_graphql_schema, RequestBody, RequestHandler};
+use request_handlers::{dmmf, load_executor, render_graphql_schema, ConnectorMode, RequestBody, RequestHandler};
 use serde::{Deserialize, Serialize};
 use serde_json::json;
 use std::{
@@ -20,12 +24,10 @@ use tracing::{field, instrument::WithSubscriber, Instrument, Span};
 use tracing_subscriber::filter::LevelFilter;
 use user_facing_errors::Error;
 
-use napi::{Env, JsFunction, JsUnknown};
-use napi_derive::napi;
-
 /// The main query engine used by JS
 #[napi]
 pub struct QueryEngine {
+    connector_mode: ConnectorMode,
     inner: RwLock<Inner>,
     logger: Logger,
 }
@@ -137,9 +139,19 @@ impl Inner {
 #[napi]
 impl QueryEngine {
     /// Parse a validated datamodel and configuration to allow connecting later on.
+    /// Note: any new method added to this struct should be added to
+    /// `query_engine_node_api::node_drivers::engine::QueryEngineNodeDrivers` as well.
+    /// Unfortunately the `#[napi]` macro does not support deriving traits.
     #[napi(constructor)]
-    pub fn new(napi_env: Env, options: JsUnknown, callback: JsFunction) -> napi::Result<Self> {
-        let log_callback = LogCallback::new(napi_env, callback)?;
+    pub fn new(
+        napi_env: Env,
+        options: JsUnknown,
+        callback: JsFunction,
+        maybe_driver: Option<JsObject>,
+    ) -> napi::Result<Self> {
+        let mut log_callback = callback.create_threadsafe_function(0usize, |ctx: ThreadSafeCallContext<String>| {
+            Ok(vec![ctx.env.create_string(&ctx.value)?])
+        })?;
         log_callback.unref(&napi_env)?;
 
         let ConstructorOptions {
@@ -155,8 +167,35 @@ impl QueryEngine {
 
         let env = stringify_env_values(env)?; // we cannot trust anything JS sends us from process.env
         let overrides: Vec<(_, _)> = datasource_overrides.into_iter().collect();
+
         let mut schema = psl::validate(datamodel.into());
         let config = &mut schema.configuration;
+        let preview_features = config.preview_features();
+
+        let mut connector_mode = ConnectorMode::Rust;
+
+        if !preview_features.contains(PreviewFeature::DriverAdapters) {
+            tracing::info!(
+                "Please enable the {} preview feature to use driver adapters.",
+                PreviewFeature::DriverAdapters
+            );
+        } else {
+            #[cfg(feature = "driver-adapters")]
+            if let Some(driver) = maybe_driver {
+                let js_queryable = driver_adapters::from_napi(driver);
+                let provider_name = schema.connector.provider_name();
+
+                match sql_connector::register_driver_adapter(provider_name, Arc::new(js_queryable)) {
+                    Ok(_) => {
+                        connector_mode = ConnectorMode::Js;
+                        tracing::info!("Registered driver adapter for {provider_name}.")
+                    }
+                    Err(err) => tracing::error!("Failed to register driver adapter for {provider_name}. {err}"),
+                }
+            }
+        }
+
+        let connector_mode = connector_mode;
 
         schema
             .diagnostics
@@ -177,13 +216,7 @@ impl QueryEngine {
 
         let enable_metrics = config.preview_features().contains(PreviewFeature::Metrics);
         let enable_tracing = config.preview_features().contains(PreviewFeature::Tracing);
-        let engine_protocol =
-            engine_protocol.unwrap_or_else(
-                || match config.preview_features().contains(PreviewFeature::JsonProtocol) {
-                    true => EngineProtocol::Json,
-                    false => EngineProtocol::Graphql,
-                },
-            );
+        let engine_protocol = engine_protocol.unwrap_or(EngineProtocol::Json);
 
         let builder = EngineBuilder {
             schema: Arc::new(schema),
@@ -211,6 +244,7 @@ impl QueryEngine {
         }
 
         Ok(Self {
+            connector_mode,
             inner: RwLock::new(Inner::Builder(builder)),
             logger,
         })
@@ -227,35 +261,60 @@ impl QueryEngine {
 
             let mut inner = self.inner.write().await;
             let builder = inner.as_builder()?;
+            let arced_schema = Arc::clone(&builder.schema);
+            let arced_schema_2 = Arc::clone(&builder.schema);
 
-            let engine = async move {
-                // We only support one data source & generator at the moment, so take the first one (default not exposed yet).
+            let url = {
                 let data_source = builder
                     .schema
                     .configuration
                     .datasources
                     .first()
                     .ok_or_else(|| ApiError::configuration("No valid data source found"))?;
-
-                let preview_features = builder.schema.configuration.preview_features();
-                let url = data_source
+                data_source
                     .load_url_with_config_dir(&builder.config_dir, |key| builder.env.get(key).map(ToString::to_string))
-                    .map_err(|err| crate::error::ApiError::Conversion(err, builder.schema.db.source().to_owned()))?;
+                    .map_err(|err| crate::error::ApiError::Conversion(err, builder.schema.db.source().to_owned()))?
+            };
 
-                let executor = executor::load(data_source, preview_features, &url).await?;
-                let connector = executor.primary_connector();
-                connector.get_connection().await?;
+            let engine = async move {
+                // We only support one data source & generator at the moment, so take the first one (default not exposed yet).
+                let data_source = arced_schema
+                    .configuration
+                    .datasources
+                    .first()
+                    .ok_or_else(|| ApiError::configuration("No valid data source found"))?;
 
-                // Build internal data model
-                let internal_data_model = prisma_models::convert(Arc::clone(&builder.schema));
+                let preview_features = arced_schema.configuration.preview_features();
 
-                let enable_raw_queries = true;
-                let query_schema = schema_builder::build(internal_data_model, enable_raw_queries);
+                let executor_fut = async {
+                    let executor = load_executor(self.connector_mode, data_source, preview_features, &url).await?;
+                    let connector = executor.primary_connector();
+
+                    let conn_span = tracing::info_span!(
+                        "prisma:engine:connection",
+                        user_facing = true,
+                        "db.type" = connector.name(),
+                    );
+
+                    connector.get_connection().instrument(conn_span).await?;
+
+                    crate::Result::<_>::Ok(executor)
+                };
+
+                let query_schema_span = tracing::info_span!("prisma:engine:schema");
+                let query_schema_fut = tokio::runtime::Handle::current()
+                    .spawn_blocking(move || {
+                        let enable_raw_queries = true;
+                        schema::build(arced_schema_2, enable_raw_queries)
+                    })
+                    .instrument(query_schema_span);
+
+                let (query_schema, executor) = tokio::join!(query_schema_fut, executor_fut);
 
                 Ok(ConnectedEngine {
                     schema: builder.schema.clone(),
-                    query_schema: Arc::new(query_schema),
-                    executor,
+                    query_schema: Arc::new(query_schema.unwrap()),
+                    executor: executor?,
                     config_dir: builder.config_dir.clone(),
                     env: builder.env.clone(),
                     metrics: self.logger.metrics(),
@@ -283,6 +342,8 @@ impl QueryEngine {
         async_panic_to_js_error(async {
             let span = tracing::info_span!("prisma:engine:disconnect");
             let _ = telemetry::helpers::set_parent_context_from_json_str(&span, &trace);
+
+            // TODO: when using Node Drivers, we need to call Driver::close() here.
 
             async {
                 let mut inner = self.inner.write().await;
@@ -392,13 +453,26 @@ impl QueryEngine {
     }
 
     #[napi]
-    pub async fn dmmf(&self) -> napi::Result<String> {
+    pub async fn dmmf(&self, trace: String) -> napi::Result<String> {
         async_panic_to_js_error(async {
             let inner = self.inner.read().await;
             let engine = inner.as_engine()?;
-            let dmmf = dmmf::render_dmmf(engine.query_schema.clone());
 
-            Ok(serde_json::to_string(&dmmf)?)
+            let dispatcher = self.logger.dispatcher();
+
+            tracing::dispatcher::with_default(&dispatcher, || {
+                let span = tracing::info_span!("prisma:engine:dmmf");
+                let _ = telemetry::helpers::set_parent_context_from_json_str(&span, &trace);
+                let _guard = span.enter();
+                let dmmf = dmmf::render_dmmf(&engine.query_schema);
+
+                let json = {
+                    let _span = tracing::info_span!("prisma:engine:dmmf_to_json").entered();
+                    serde_json::to_string(&dmmf)?
+                };
+
+                Ok(json)
+            })
         })
         .await
     }
@@ -431,7 +505,7 @@ impl QueryEngine {
             let inner = self.inner.read().await;
             let engine = inner.as_engine()?;
 
-            Ok(render_graphql_schema(engine.query_schema().clone()))
+            Ok(render_graphql_schema(engine.query_schema()))
         })
         .await
     }

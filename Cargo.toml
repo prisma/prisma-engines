@@ -1,14 +1,15 @@
 [workspace]
 resolver = "2"
 members = [
-  "introspection-engine/connectors/*",
-  "introspection-engine/datamodel-renderer",
-  "introspection-engine/introspection-engine-tests",
-  "migration-engine/cli",
-  "migration-engine/connectors/*",
-  "migration-engine/core",
-  "migration-engine/json-rpc-api-build",
-  "migration-engine/migration-engine-tests",
+  "schema-engine/cli",
+  "schema-engine/core",
+  "schema-engine/connectors/*",
+  "schema-engine/datamodel-renderer",
+  "schema-engine/json-rpc-api-build",
+  "schema-engine/sql-migration-tests",
+  "schema-engine/sql-introspection-tests",
+  "schema-engine/mongodb-schema-describer",
+  "schema-engine/sql-schema-describer",
   "query-engine/connectors/*",
   "query-engine/connector-test-kit-rs/qe-setup",
   "query-engine/connector-test-kit-rs/query-engine-tests",
@@ -16,18 +17,27 @@ members = [
   "query-engine/connector-test-kit-rs/query-tests-setup",
   "query-engine/core",
   "query-engine/core-tests",
+  "query-engine/black-box-tests",
   "query-engine/dmmf",
+  "query-engine/driver-adapters",
   "query-engine/metrics",
   "query-engine/prisma-models",
   "query-engine/query-engine",
   "query-engine/query-engine-node-api",
   "query-engine/request-handlers",
   "query-engine/schema",
-  "query-engine/schema-builder",
   "libs/*",
   "prisma-fmt",
-  "prisma-fmt-wasm",
+  "prisma-schema-wasm",
   "psl/*",
+]
+
+# All path dependencies residing in the workspace directory automatically become members.
+# The following shouldn't be considered members but embedded dependencies.
+exclude = [
+  "quaint",
+  "quaint/test-macros",
+  "quaint/test-setup"
 ]
 
 [workspace.dependencies]
@@ -37,9 +47,13 @@ serde = { version = "1", features = ["derive"] }
 tokio = { version = "1.25", features = ["rt-multi-thread", "macros", "sync", "io-std", "io-util", "parking_lot", "time"] }
 user-facing-errors = { path = "./libs/user-facing-errors" }
 uuid = { version = "1", features = ["serde"] }
+indoc = "2.0.1"
+connection-string = "0.2"
+napi = { version = "2.12.4", default-features = false, features = ["napi8", "tokio_rt", "serde-json"] }
+napi-derive = "2.12.4"
 
 [workspace.dependencies.quaint]
-git = "https://github.com/prisma/quaint"
+path = "quaint"
 features = [
   "bigdecimal",
   "chrono",
@@ -67,3 +81,7 @@ strip = "symbols"
 lto = "fat"
 codegen-units = 1
 opt-level = 's' # Optimize for size.
+
+[profile.profiling]
+inherits = "release"
+debug = true

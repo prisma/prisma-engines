@@ -1,5 +1,5 @@
 use super::*;
-use psl::datamodel_connector::ConnectorCapability;
+use psl::datamodel_connector::{ConnectorCapabilities, ConnectorCapability};
 use serde::{Deserialize, Serialize};
 use std::{convert::TryFrom, str::FromStr};
 
@@ -43,9 +43,9 @@ impl TryFrom<DatamodelWithParams> for String {
     }
 }
 
-pub type DatamodelsAndCapabilities = (Vec<DatamodelWithParams>, Vec<Vec<ConnectorCapability>>);
+pub type DatamodelsAndCapabilities = (Vec<DatamodelWithParams>, Vec<ConnectorCapabilities>);
 
-pub fn schema_with_relation(
+pub(crate) fn schema_with_relation(
     on_parent: &RelationField,
     on_child: &RelationField,
     id_only: bool,
@@ -120,7 +120,7 @@ pub fn schema_with_relation(
     // Reduces the amount of generated tests when `true`
     let simple_test_mode = std::env::var("SIMPLE_TEST_MODE").is_ok();
     let mut datamodels: Vec<DatamodelWithParams> = vec![];
-    let mut required_capabilities: Vec<Vec<ConnectorCapability>> = vec![];
+    let mut required_capabilities: Vec<ConnectorCapabilities> = vec![];
 
     for parent_id in id_options.iter() {
         for child_id in id_options.iter() {
@@ -188,14 +188,14 @@ pub fn schema_with_relation(
                                 }}
                             "};
 
-                            let mut required_capabilities_for_dm = vec![];
+                            let mut required_capabilities_for_dm = ConnectorCapabilities::default();
 
                             match (parent_id, child_id) {
                                 (Identifier::Compound, _) | (_, Identifier::Compound) => {
-                                    required_capabilities_for_dm.push(ConnectorCapability::CompoundIds)
+                                    required_capabilities_for_dm |= ConnectorCapability::CompoundIds;
                                 }
                                 (Identifier::None, _) | (_, Identifier::None) => {
-                                    required_capabilities_for_dm.push(ConnectorCapability::AnyId)
+                                    required_capabilities_for_dm |= ConnectorCapability::AnyId;
                                 }
                                 _ => (),
                             }

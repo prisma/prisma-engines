@@ -1,6 +1,8 @@
-use crate::{ast, parent_container::ParentContainer, prelude::*};
-use dml::{FieldArity, NativeTypeInstance};
-use psl::parser_database::{walkers, ScalarFieldType};
+use crate::{ast, parent_container::ParentContainer, prelude::*, DefaultKind, NativeTypeInstance, ValueGenerator};
+use psl::{
+    parser_database::{walkers, ScalarFieldType, ScalarType},
+    schema_ast::ast::FieldArity,
+};
 use std::fmt::{Debug, Display};
 
 pub type ScalarField = crate::Zipper<ScalarFieldId>;
@@ -67,6 +69,13 @@ impl ScalarField {
         }
     }
 
+    pub fn borrowed_name<'a>(&self, schema: &'a psl::ValidatedSchema) -> &'a str {
+        match self.id {
+            ScalarFieldId::InModel(id) => schema.db.walk(id).name(),
+            ScalarFieldId::InCompositeType(id) => schema.db.walk(id).name(),
+        }
+    }
+
     pub fn name(&self) -> &str {
         match self.id {
             ScalarFieldId::InModel(id) => self.dm.walk(id).name(),
@@ -103,19 +112,19 @@ impl ScalarField {
         Some(self.dm.clone().zip(enum_id))
     }
 
-    pub fn default_value(&self) -> Option<dml::DefaultKind> {
+    pub fn default_value(&self) -> Option<DefaultKind> {
         match self.id {
             ScalarFieldId::InModel(id) => {
                 let walker = self.dm.walk(id);
-                walker.default_value().map(|dv| {
-                    dml::dml_default_kind(&dv.ast_attribute().arguments.arguments[0].value, walker.scalar_type())
-                })
+                walker
+                    .default_value()
+                    .map(|dv| dml_default_kind(&dv.ast_attribute().arguments.arguments[0].value, walker.scalar_type()))
             }
             ScalarFieldId::InCompositeType(id) => {
                 let walker = self.dm.walk(id);
                 walker
                     .default_value()
-                    .map(|dv| dml::dml_default_kind(dv, walker.scalar_type()))
+                    .map(|dv| dml_default_kind(dv, walker.scalar_type()))
             }
         }
     }
@@ -153,7 +162,7 @@ impl ScalarField {
             .parse_native_type(name, args, span, &mut Default::default())
             .unwrap();
 
-        Some(dml::NativeTypeInstance {
+        Some(NativeTypeInstance {
             native_type: nt,
             connector,
         })
@@ -179,5 +188,83 @@ impl From<(InternalDataModelRef, walkers::IndexFieldWalker<'_>)> for ScalarField
             walkers::IndexFieldWalker::Scalar(sf) => dm.zip(ScalarFieldId::InModel(sf.id)),
             walkers::IndexFieldWalker::Composite(cf) => dm.zip(ScalarFieldId::InCompositeType(cf.id)),
         }
+    }
+}
+
+pub fn dml_default_kind(default_value: &ast::Expression, scalar_type: Option<ScalarType>) -> DefaultKind {
+    // This has all been validated in parser-database, so unwrapping is always safe.
+    match default_value {
+        ast::Expression::Function(funcname, args, _) if funcname == "dbgenerated" => {
+            DefaultKind::Expression(ValueGenerator::new_dbgenerated(
+                args.arguments
+                    .get(0)
+                    .and_then(|arg| arg.value.as_string_value())
+                    .map(|(val, _)| val.to_owned())
+                    .unwrap_or_else(String::new),
+            ))
+        }
+        ast::Expression::Function(funcname, _, _) if funcname == "auto" => {
+            DefaultKind::Expression(ValueGenerator::new_auto())
+        }
+        ast::Expression::Function(funcname, _args, _) if funcname == "autoincrement" => {
+            DefaultKind::Expression(ValueGenerator::new_autoincrement())
+        }
+        ast::Expression::Function(funcname, _args, _) if funcname == "sequence" => {
+            DefaultKind::Expression(ValueGenerator::new_sequence(Vec::new()))
+        }
+        ast::Expression::Function(funcname, _args, _) if funcname == "uuid" => {
+            DefaultKind::Expression(ValueGenerator::new_uuid())
+        }
+        ast::Expression::Function(funcname, _args, _) if funcname == "cuid" => {
+            DefaultKind::Expression(ValueGenerator::new_cuid())
+        }
+        ast::Expression::Function(funcname, args, _) if funcname == "nanoid" => {
+            DefaultKind::Expression(ValueGenerator::new_nanoid(
+                args.arguments
+                    .get(0)
+                    .and_then(|arg| arg.value.as_numeric_value())
+                    .map(|(val, _)| val.parse::<u8>().unwrap()),
+            ))
+        }
+        ast::Expression::Function(funcname, _args, _) if funcname == "now" => {
+            DefaultKind::Expression(ValueGenerator::new_now())
+        }
+        ast::Expression::NumericValue(num, _) => match scalar_type {
+            Some(ScalarType::Int) => DefaultKind::Single(PrismaValue::Int(num.parse().unwrap())),
+            Some(ScalarType::BigInt) => DefaultKind::Single(PrismaValue::BigInt(num.parse().unwrap())),
+            Some(ScalarType::Float) => DefaultKind::Single(PrismaValue::Float(num.parse().unwrap())),
+            Some(ScalarType::Decimal) => DefaultKind::Single(PrismaValue::Float(num.parse().unwrap())),
+            other => unreachable!("{:?}", other),
+        },
+        ast::Expression::ConstantValue(v, _) => match scalar_type {
+            Some(ScalarType::Boolean) => DefaultKind::Single(PrismaValue::Boolean(v.parse().unwrap())),
+            None => DefaultKind::Single(PrismaValue::Enum(v.to_owned())),
+            other => unreachable!("{:?}", other),
+        },
+        ast::Expression::StringValue(v, _) => match scalar_type {
+            Some(ScalarType::DateTime) => DefaultKind::Single(PrismaValue::DateTime(v.parse().unwrap())),
+            Some(ScalarType::String) => DefaultKind::Single(PrismaValue::String(v.parse().unwrap())),
+            Some(ScalarType::Json) => DefaultKind::Single(PrismaValue::Json(v.parse().unwrap())),
+            Some(ScalarType::Decimal) => DefaultKind::Single(PrismaValue::Float(v.parse().unwrap())),
+            Some(ScalarType::Bytes) => DefaultKind::Single(PrismaValue::Bytes(prisma_value::decode_bytes(v).unwrap())),
+            other => unreachable!("{:?}", other),
+        },
+        ast::Expression::Array(values, _) => {
+            let values = values
+                .iter()
+                .map(|expr| dml_default_kind(expr, scalar_type).unwrap_single())
+                .collect();
+
+            DefaultKind::Single(PrismaValue::List(values))
+        }
+        other => unreachable!("{:?}", other),
+    }
+}
+
+impl std::fmt::Debug for ScalarField {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.debug_tuple("ScalarField")
+            .field(&format!("{}.{}", self.container().name(), self.name()))
+            .finish()
     }
 }

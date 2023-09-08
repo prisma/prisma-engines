@@ -1,0 +1,56 @@
+{
+    "action": "updateOne",
+    "modelName": "website",
+    "query": {
+        "arguments": {
+            "where": { "id": 9999999 },
+            "data": {
+                "domain": "bad.horse",
+                "google_maps_api_key": "0000000000000000000000000000000000000000000000000",
+                "social_instagram": "@badhorse",
+                "cdn_activated": false,
+                "auth_signup_uninvited": "rude, just rude",
+                "specific_user_account": true,
+                "res_config_settings": {
+                    "update": {
+                        "where": { "id": 33 },
+                        "data": {
+                            "module_base_import": false,
+                            "module_google_calendar": true
+                        }
+                    }
+                },
+                "res_company": {
+                    "update": {
+                        "res_currency": { "create": { "name": "JPY", "symbol": "¥" } },
+                        "ir_property": {
+                            "create": []
+                        }
+                    }
+                },
+                "res_users_res_users_website_idTowebsite": {
+                    "upsert": {
+                        "where": { "id": 200},
+                        "update": {
+                            "login": "Evil Corp"
+                        },
+                        "create": {
+                            "login": "Evil Corp",
+                            "notification_type": "meowing",
+                            "odoobot_state": "it's aight",
+                            "res_company_res_users_company_idTores_company": {
+                                "connect": { "id": 210390 }
+                            },
+                            "res_partner_res_users_partner_idTores_partner": {
+                                "connect": { "id": 810390 }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "selection": {
+            "id": true
+        }
+    }
+}

@@ -32,7 +32,7 @@ use prisma_models::RelationFieldRef;
 /// └─▶│   Disconnect    │
 ///    └─────────────────┘
 /// ```
-pub fn disconnect_records_node(
+pub(crate) fn disconnect_records_node(
     graph: &mut QueryGraph,
     parent_node: &NodeRef,
     child_node: &NodeRef,

@@ -1,6 +1,8 @@
 use crate::{parent_container::ParentContainer, CompositeType};
-use dml::FieldArity;
-use psl::{parser_database::ScalarFieldId, schema_ast::ast};
+use psl::{
+    parser_database::ScalarFieldId,
+    schema_ast::ast::{self, FieldArity},
+};
 use std::fmt::{Debug, Display};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
@@ -13,7 +15,14 @@ pub type CompositeField = crate::Zipper<CompositeFieldId>;
 pub type CompositeFieldRef = CompositeField;
 
 impl CompositeField {
-    fn arity(&self) -> FieldArity {
+    pub fn borrowed_name<'a>(&self, schema: &'a psl::ValidatedSchema) -> &'a str {
+        match self.id {
+            CompositeFieldId::InModel(sfid) => schema.db.walk(sfid).name(),
+            CompositeFieldId::InCompositeType(id) => schema.db.walk(id).name(),
+        }
+    }
+
+    pub fn arity(&self) -> FieldArity {
         match self.id {
             CompositeFieldId::InModel(sfid) => self.dm.walk(sfid).ast_field().arity,
             CompositeFieldId::InCompositeType(id) => self.dm.walk(id).arity(),
@@ -68,5 +77,13 @@ impl CompositeField {
 impl Display for CompositeField {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}.{}", self.container().name(), self.name())
+    }
+}
+
+impl std::fmt::Debug for CompositeField {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.debug_tuple("CompositeField")
+            .field(&format!("{}.{}", self.container().name(), self.name()))
+            .finish()
     }
 }

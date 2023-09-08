@@ -12,21 +12,19 @@ jobs:
     env:
       SQLITE_MAX_VARIABLE_NUMBER: 250000
       SQLITE_MAX_EXPR_DEPTH: 10000
+      RUSTFLAGS: "-C target-feature=+crt-static"
     runs-on: windows-latest
-    
+
     steps:
       - name: Output link to real commit
         run: echo ${{ github.repository }}/commit/${{ github.event.inputs.commit }}
 
       - name: Checkout ${{ github.event.inputs.commit }}
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           ref: ${{ github.event.inputs.commit }}
 
-      - uses: actions-rs/toolchain@v1
-        with:
-          toolchain: stable
-          default: true
+      - uses: dtolnay/rust-toolchain@stable
 
       - uses: actions/cache@v3
         with:
@@ -36,10 +34,7 @@ jobs:
             target
           key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
 
-      - uses: actions-rs/cargo@v1
-        with:
-          command: build
-          args: --release
+      - run: cargo build --release
 
       - uses: actions/upload-artifact@v3
         with:

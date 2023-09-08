@@ -1,4 +1,3 @@
-use enumflags2::BitFlags;
 use serde::{Serialize, Serializer};
 use std::fmt;
 
@@ -37,93 +36,96 @@ macro_rules! features {
 
 // (Usually) Append-only list of features.
 features!(
-    ConnectOrCreate,
-    TransactionApi,
-    NativeTypes,
-    GroupBy,
-    CreateMany,
-    AtomicNumberOperations,
     AggregateApi,
-    Middlewares,
-    Distinct,
-    UncheckedScalarInputs,
-    MicrosoftSqlServer,
-    OrderByRelation,
-    MongoDb,
-    NApi,
-    SelectRelationCount,
-    OrderByAggregateGroup,
-    FilterJson,
-    ReferentialIntegrity,
-    ReferentialActions,
-    InteractiveTransactions,
-    NamedConstraints,
-    FullTextSearch,
-    FullTextIndex,
-    DataProxy,
-    ExtendedIndexes,
-    Cockroachdb,
-    Tracing,
-    ImprovedQueryRaw,
-    Metrics,
-    OrderByNulls,
-    MultiSchema,
-    FilteredRelationCount,
-    FieldReference,
-    PostgresqlExtensions,
+    AtomicNumberOperations,
     ClientExtensions,
+    Cockroachdb,
+    ConnectOrCreate,
+    CreateMany,
+    DataProxy,
     Deno,
+    Distinct,
+    ExtendedIndexes,
     ExtendedWhereUnique,
+    FieldReference,
+    FilteredRelationCount,
+    FilterJson,
+    FullTextIndex,
+    FullTextSearch,
+    GroupBy,
+    ImprovedQueryRaw,
+    InteractiveTransactions,
+    JsonProtocol,
+    Metrics,
+    MicrosoftSqlServer,
+    Middlewares,
+    MongoDb,
+    MultiSchema,
+    NamedConstraints,
+    NApi,
+    NativeTypes,
+    DriverAdapters,
+    OrderByAggregateGroup,
+    OrderByNulls,
+    OrderByRelation,
+    PostgresqlExtensions,
+    ReferentialActions,
+    ReferentialIntegrity,
+    SelectRelationCount,
+    Tracing,
+    TransactionApi,
+    UncheckedScalarInputs,
     Views,
-    JsonProtocol
 );
 
 /// Generator preview features
 pub const ALL_PREVIEW_FEATURES: FeatureMap = FeatureMap {
     active: enumflags2::make_bitflags!(PreviewFeature::{
         Deno
-         | FullTextSearch
          | FullTextIndex
-         | Tracing
+         | FullTextSearch
          | Metrics
-         | OrderByNulls
-         | FilteredRelationCount
-         | FieldReference
-         | PostgresqlExtensions
-         | ExtendedWhereUnique
-         | ClientExtensions
          | MultiSchema
+         | PostgresqlExtensions
+         | Tracing
          | Views
-         | JsonProtocol
     }),
     deprecated: enumflags2::make_bitflags!(PreviewFeature::{
         AtomicNumberOperations
         | AggregateApi
+        | ClientExtensions
         | Cockroachdb
-        | ExtendedIndexes
-        | FilterJson
-        | Middlewares
-        | NamedConstraints
-        | NativeTypes
-        | Distinct
         | ConnectOrCreate
-        | TransactionApi
-        | UncheckedScalarInputs
-        | GroupBy
         | CreateMany
+        | DataProxy
+        | Distinct
+        | ExtendedIndexes
+        | ExtendedWhereUnique
+        | FieldReference
+        | FilteredRelationCount
+        | FilterJson
+        | GroupBy
+        | ImprovedQueryRaw
+        | InteractiveTransactions
+        | JsonProtocol
         | MicrosoftSqlServer
-        | SelectRelationCount
+        | Middlewares
         | MongoDb
+        | NamedConstraints
+        | NApi
+        | NativeTypes
         | OrderByAggregateGroup
+        | OrderByNulls
         | OrderByRelation
         | ReferentialActions
         | ReferentialIntegrity
-        | NApi
-        | ImprovedQueryRaw
-        | DataProxy
-        | InteractiveTransactions
+        | SelectRelationCount
+        | TransactionApi
+        | UncheckedScalarInputs
     }),
-    hidden: BitFlags::EMPTY,
+    hidden: enumflags2::make_bitflags!(PreviewFeature::{
+        DriverAdapters
+    }),
 };
 
 #[derive(Debug)]

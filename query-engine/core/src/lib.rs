@@ -1,4 +1,4 @@
-#![deny(rust_2018_idioms)]
+#![deny(unsafe_code, rust_2018_idioms)]
 
 #[macro_use]
 extern crate tracing;
@@ -18,6 +18,7 @@ pub use self::{
     query_document::*,
     telemetry::*,
 };
+pub use connector::{error::ConnectorError, Connector};
 
 mod error;
 mod interactive_transactions;
@@ -42,4 +43,3 @@ pub type Result<T> = std::result::Result<T, CoreError>;
 
 // Re-exports
 pub use schema;
-pub use schema_builder;

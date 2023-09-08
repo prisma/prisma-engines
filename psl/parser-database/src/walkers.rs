@@ -60,6 +60,15 @@ impl crate::ParserDatabase {
             .map(|enum_id| self.walk(enum_id))
     }
 
+    /// Find a model by name.
+    pub fn find_model<'db>(&'db self, name: &str) -> Option<ModelWalker<'db>> {
+        self.interner
+            .lookup(name)
+            .and_then(|name_id| self.names.tops.get(&name_id))
+            .and_then(|top_id| top_id.as_model_id())
+            .map(|model_id| self.walk(model_id))
+    }
+
     /// Traverse a schema element by id.
     pub fn walk<I>(&self, id: I) -> Walker<'_, I> {
         Walker { db: self, id }

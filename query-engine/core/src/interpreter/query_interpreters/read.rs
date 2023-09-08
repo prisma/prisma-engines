@@ -1,8 +1,6 @@
 use super::*;
 use crate::{interpreter::InterpretationResult, query_ast::*, result_ast::*};
-use connector::{
-    self, error::ConnectorError, ConnectionLike, QueryArguments, RelAggregationRow, RelAggregationSelection,
-};
+use connector::{self, error::ConnectorError, ConnectionLike, RelAggregationRow, RelAggregationSelection};
 use futures::future::{BoxFuture, FutureExt};
 use inmemory_record_processor::InMemoryRecordProcessor;
 use prisma_models::ManyRecords;
@@ -58,7 +56,6 @@ fn read_one(
                     fields: query.selection_order,
                     scalars,
                     nested,
-                    query_arguments: QueryArguments::new(model.clone()),
                     model,
                     aggregation_rows,
                 }
@@ -67,15 +64,14 @@ fn read_one(
 
             None if query.options.contains(QueryOption::ThrowOnEmpty) => record_not_found(),
 
-            None => Ok(QueryResult::RecordSelection(Box::new(RecordSelection {
+            None => Ok(QueryResult::RecordSelection(Some(Box::new(RecordSelection {
                 name: query.name,
                 fields: query.selection_order,
                 scalars: ManyRecords::default(),
                 nested: vec![],
-                query_arguments: QueryArguments::new(model.clone()),
                 model,
                 aggregation_rows: None,
-            }))),
+            })))),
         }
     };
 
@@ -127,7 +123,6 @@ fn read_many(
                 fields: query.selection_order,
                 scalars,
                 nested,
-                query_arguments: query.args,
                 model: query.model,
                 aggregation_rows,
             }
@@ -147,10 +142,9 @@ fn read_related<'conn>(
 ) -> BoxFuture<'conn, InterpretationResult<QueryResult>> {
     let fut = async move {
         let relation = query.parent_field.relation();
-        let processor = InMemoryRecordProcessor::new_from_query_args(&mut query.args);
 
         let (scalars, aggregation_rows) = if relation.is_many_to_many() {
-            nested_read::m2m(tx, &query, parent_result, processor, trace_id).await?
+            nested_read::m2m(tx, &mut query, parent_result, trace_id).await?
         } else {
             nested_read::one2m(
                 tx,
@@ -160,7 +154,6 @@ fn read_related<'conn>(
                 query.args.clone(),
                 &query.selected_fields,
                 query.aggregation_selections,
-                processor,
                 trace_id,
             )
             .await?
@@ -173,7 +166,6 @@ fn read_related<'conn>(
             fields: query.selection_order,
             scalars,
             nested,
-            query_arguments: query.args,
             model,
             aggregation_rows,
         }

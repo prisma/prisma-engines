@@ -1,31 +1,40 @@
 use super::*;
 use fmt::Debug;
-use once_cell::sync::OnceCell;
-use prisma_models::{dml, prelude::ParentContainer};
-use std::{boxed::Box, fmt, sync::Arc};
+use once_cell::sync::Lazy;
+use prisma_models::{prelude::ParentContainer, DefaultKind};
+use std::{borrow::Cow, boxed::Box, fmt};
 
-#[derive(PartialEq)]
-pub struct InputObjectType {
+type InputObjectFields<'a> =
+    Option<Arc<Lazy<Vec<InputField<'a>>, Box<dyn FnOnce() -> Vec<InputField<'a>> + Send + Sync + 'a>>>>;
+
+#[derive(Clone)]
+pub struct InputObjectType<'a> {
     pub identifier: Identifier,
-    pub constraints: InputObjectTypeConstraints,
-    pub fields: OnceCell<Vec<InputFieldRef>>,
-    pub tag: Option<ObjectTag>,
+    pub constraints: InputObjectTypeConstraints<'a>,
+    pub(crate) fields: InputObjectFields<'a>,
+    pub(crate) tag: Option<ObjectTag<'a>>,
+}
+
+impl PartialEq for InputObjectType<'_> {
+    fn eq(&self, other: &Self) -> bool {
+        self.identifier.eq(&other.identifier)
+    }
 }
 
 /// Object tags help differentiating objects during parsing / raw input data processing,
 /// especially if complex object unions are present.
-#[derive(Debug, PartialEq, Clone)]
-pub enum ObjectTag {
+#[derive(Debug, Clone, PartialEq)]
+pub enum ObjectTag<'a> {
     CompositeEnvelope,
     RelationEnvelope,
     // Holds the type against which a field can be compared
-    FieldRefType(InputType),
+    FieldRefType(Box<InputType<'a>>),
     WhereInputType(ParentContainer),
     NestedToOneUpdateEnvelope,
 }
 
-#[derive(Debug, Default, PartialEq)]
-pub struct InputObjectTypeConstraints {
+#[derive(Debug, Default, PartialEq, Clone)]
+pub struct InputObjectTypeConstraints<'a> {
     /// The maximum number of fields that can be provided.
     pub min_num_fields: Option<usize>,
 
@@ -34,10 +43,10 @@ pub struct InputObjectTypeConstraints {
 
     /// The fields against which the constraints should be applied.
     /// If `None`, constraints should be applied on _all_ fields on the input object type.
-    pub fields: Option<Vec<String>>,
+    pub fields: Option<Vec<Cow<'a, str>>>,
 }
 
-impl Debug for InputObjectType {
+impl Debug for InputObjectType<'_> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         f.debug_struct("InputObjectType")
             .field("identifier", &self.identifier)
@@ -47,111 +56,107 @@ impl Debug for InputObjectType {
     }
 }
 
-impl InputObjectType {
-    pub fn get_fields(&self) -> &Vec<InputFieldRef> {
-        self.fields.get().unwrap()
+impl<'a> InputObjectType<'a> {
+    pub fn get_fields(&self) -> &[InputField<'a>] {
+        self.fields.as_ref().map(|f| -> &[_] { f }).unwrap_or(&[])
     }
 
-    pub fn set_fields(&self, fields: Vec<InputField>) {
-        self.fields
-            .set(fields.into_iter().map(Arc::new).collect())
-            .unwrap_or_else(|_| panic!("Fields of {:?} are already set", self.identifier));
+    pub(crate) fn set_fields(&mut self, f: impl FnOnce() -> Vec<InputField<'a>> + Send + Sync + 'a) {
+        self.fields = Some(Arc::new(Lazy::new(Box::new(f))));
     }
 
-    /// True if fields are empty, false otherwise.
-    pub fn is_empty(&self) -> bool {
-        self.get_fields().is_empty()
+    pub fn tag(&self) -> Option<&ObjectTag<'a>> {
+        self.tag.as_ref()
     }
 
-    pub fn find_field<T>(&self, name: T) -> Option<InputFieldRef>
-    where
-        T: Into<String>,
-    {
-        let name = name.into();
-        self.get_fields().iter().find(|f| f.name == name).cloned()
+    pub fn find_field(&self, name: &str) -> Option<&InputField<'a>> {
+        self.get_fields().iter().find(|f| f.name == name)
     }
 
     /// Require exactly one field of the possible ones to be in the input.
-    pub fn require_exactly_one_field(&mut self) {
+    pub(crate) fn require_exactly_one_field(&mut self) {
         self.set_max_fields(1);
         self.set_min_fields(1);
     }
 
     /// Require at least one field of the possible ones to be in the input.
-    pub fn require_at_least_one_field(&mut self) {
+    pub(crate) fn require_at_least_one_field(&mut self) {
         self.set_min_fields(1);
     }
 
     /// Require at most one field of the possible ones to be in the input.
-    pub fn require_at_most_one_field(&mut self) {
+    pub(crate) fn require_at_most_one_field(&mut self) {
         self.set_max_fields(1);
         self.set_min_fields(0);
     }
 
     /// Require a maximum of `max` fields to be present in the input.
-    pub fn set_max_fields(&mut self, max: usize) {
+    pub(crate) fn set_max_fields(&mut self, max: usize) {
         self.constraints.max_num_fields = Some(max);
     }
 
     /// Require a minimum of `min` fields to be present in the input.
-    pub fn set_min_fields(&mut self, min: usize) {
+    pub(crate) fn set_min_fields(&mut self, min: usize) {
         self.constraints.min_num_fields = Some(min);
     }
 
-    pub fn apply_constraints_on_fields(&mut self, fields: Vec<String>) {
+    pub(crate) fn apply_constraints_on_fields(&mut self, fields: Vec<Cow<'a, str>>) {
         self.constraints.fields = Some(fields);
     }
 
-    pub fn set_tag(&mut self, tag: ObjectTag) {
+    pub(crate) fn set_tag(&mut self, tag: ObjectTag<'a>) {
         self.tag = Some(tag);
     }
 }
 
-#[derive(Debug, PartialEq)]
-pub struct InputField {
-    pub name: String,
-    pub default_value: Option<dml::DefaultKind>,
-    pub deprecation: Option<Deprecation>,
+#[derive(Debug, Clone)]
+pub struct InputField<'a> {
+    pub name: Cow<'a, str>,
+    pub default_value: Option<DefaultKind>,
 
-    /// Possible field types, represented as a union of input types, but only one can be provided at any time.
-    /// Slice expressed as (start, len).
-    field_types: Option<(usize, usize)>,
-
-    /// Indicates if the presence of the field on the higher input objects
-    /// is required, but doesn't state whether or not the input can be null.
-    pub is_required: bool,
+    field_types: Vec<InputType<'a>>,
+    is_required: bool,
 }
 
-impl InputField {
-    pub fn new(name: String, default_value: Option<dml::DefaultKind>, is_required: bool) -> InputField {
+impl<'a> InputField<'a> {
+    pub(crate) fn new(
+        name: Cow<'a, str>,
+        field_types: Vec<InputType<'a>>,
+        default_value: Option<DefaultKind>,
+        is_required: bool,
+    ) -> InputField<'a> {
         InputField {
             name,
             default_value,
-            deprecation: None,
-            field_types: None,
+            field_types,
             is_required,
         }
     }
 
-    pub fn field_types<'a>(&self, query_schema: &'a QuerySchema) -> &'a [InputType] {
-        let (start, len) = self.field_types.unwrap_or_default();
-        &query_schema.input_field_types[start..(start + len)]
+    pub fn field_types(&self) -> &[InputType<'a>] {
+        &self.field_types
+    }
+
+    /// Indicates if the presence of the field on the higher input objects
+    /// is required, but doesn't state whether or not the input can be null.
+    pub fn is_required(&self) -> bool {
+        self.is_required
     }
 
     /// Sets the field as optional (not required to be present on the input).
-    pub fn optional(mut self) -> Self {
+    pub(crate) fn optional(mut self) -> Self {
         self.is_required = false;
         self
     }
 
     /// Sets the field as optional (not required to be present on the input).
-    pub fn required(mut self) -> Self {
+    pub(crate) fn required(mut self) -> Self {
         self.is_required = true;
         self
     }
 
     /// Sets the field as optional if the condition is true.
-    pub fn optional_if(self, condition: bool) -> Self {
+    pub(crate) fn optional_if(self, condition: bool) -> Self {
         if condition {
             self.optional()
         } else {
@@ -160,79 +165,51 @@ impl InputField {
     }
 
     /// Sets the field as nullable (accepting null inputs).
-    pub fn nullable(self, input_types: &mut Vec<InputType>) -> Self {
-        self.add_type(InputType::null(), input_types)
+    pub(crate) fn nullable(mut self) -> Self {
+        // self.field_types = Box::new(|| {
+        //     let f = &self.field_types;
+        //     let mut fields = f();
+        //     fields.push(InputType::null());
+        //     fields
+        // });
+        self.field_types.push(InputType::null());
+        self
     }
 
     /// Sets the field as nullable if the condition is true.
-    pub fn nullable_if(self, condition: bool, input_types: &mut Vec<InputType>) -> Self {
+    pub(crate) fn nullable_if(self, condition: bool) -> Self {
         if condition {
-            self.nullable(input_types)
+            self.nullable()
         } else {
             self
         }
     }
-
-    pub fn push_type(&mut self, typ: InputType, input_types: &mut Vec<InputType>) {
-        match &mut self.field_types {
-            Some((_start, len)) => {
-                *len += 1;
-                input_types.push(typ);
-            }
-            None => {
-                self.field_types = Some((input_types.len(), 1));
-                input_types.push(typ);
-            }
-        }
-    }
-
-    /// Adds possible input type to this input field's type union.
-    pub fn add_type(mut self, typ: InputType, input_types: &mut Vec<InputType>) -> Self {
-        self.push_type(typ, input_types);
-        self
-    }
-
-    pub fn deprecate<T, S>(mut self, reason: T, since_version: S, planned_removal_version: Option<S>) -> Self
-    where
-        T: Into<String>,
-        S: Into<String>,
-    {
-        self.deprecation = Some(Deprecation {
-            reason: reason.into(),
-            since_version: since_version.into(),
-            planned_removal_version: planned_removal_version.map(Into::into),
-        });
-
-        self
-    }
 }
 
 #[derive(Clone)]
-pub enum InputType {
+pub enum InputType<'a> {
     Scalar(ScalarType),
-    Enum(EnumTypeWeakRef),
-    List(Box<InputType>),
-    Object(InputObjectTypeWeakRef),
+    Enum(EnumType),
+    List(Box<InputType<'a>>),
+    Object(InputObjectType<'a>),
 }
 
-impl PartialEq for InputType {
+impl<'a> PartialEq for InputType<'a> {
     fn eq(&self, other: &Self) -> bool {
         match (self, other) {
             (InputType::Scalar(st), InputType::Scalar(ost)) => st.eq(ost),
             (InputType::Enum(_), InputType::Enum(_)) => true,
             (InputType::List(lt), InputType::List(olt)) => lt.eq(olt),
-            (InputType::Object(obj), InputType::Object(oobj)) => {
-                obj.into_arc().identifier == oobj.into_arc().identifier
-            }
+            (InputType::Object(obj), InputType::Object(oobj)) => obj == oobj,
             _ => false,
         }
     }
 }
 
-impl Debug for InputType {
+impl<'a> Debug for InputType<'a> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
-            Self::Object(obj) => write!(f, "Object({})", obj.into_arc().identifier.name()),
+            Self::Object(obj) => write!(f, "Object({obj:?})"),
             Self::Scalar(s) => write!(f, "{s:?}"),
             Self::Enum(e) => write!(f, "{e:?}"),
             Self::List(l) => write!(f, "{l:?}"),
@@ -240,78 +217,65 @@ impl Debug for InputType {
     }
 }
 
-impl InputType {
-    pub fn list(containing: InputType) -> InputType {
+impl<'a> InputType<'a> {
+    pub(crate) fn list(containing: InputType<'a>) -> InputType<'a> {
         InputType::List(Box::new(containing))
     }
 
-    pub fn object(containing: InputObjectTypeWeakRef) -> InputType {
+    pub(crate) fn object(containing: InputObjectType<'a>) -> InputType<'a> {
         InputType::Object(containing)
     }
 
-    pub fn string() -> InputType {
+    pub(crate) fn string() -> InputType<'a> {
         InputType::Scalar(ScalarType::String)
     }
 
-    pub fn int() -> InputType {
+    pub(crate) fn int() -> InputType<'a> {
         InputType::Scalar(ScalarType::Int)
     }
 
-    pub fn bigint() -> InputType {
+    pub(crate) fn bigint() -> InputType<'a> {
         InputType::Scalar(ScalarType::BigInt)
     }
 
-    pub fn float() -> InputType {
+    pub(crate) fn float() -> InputType<'a> {
         InputType::Scalar(ScalarType::Float)
     }
 
-    pub fn decimal() -> InputType {
+    pub(crate) fn decimal() -> InputType<'a> {
         InputType::Scalar(ScalarType::Decimal)
     }
 
-    pub fn boolean() -> InputType {
+    pub(crate) fn boolean() -> InputType<'a> {
         InputType::Scalar(ScalarType::Boolean)
     }
 
-    pub fn date_time() -> InputType {
+    pub(crate) fn date_time() -> InputType<'a> {
         InputType::Scalar(ScalarType::DateTime)
     }
 
-    pub fn json() -> InputType {
+    pub(crate) fn json() -> InputType<'a> {
         InputType::Scalar(ScalarType::Json)
     }
 
-    pub fn json_list() -> InputType {
+    pub(crate) fn json_list() -> InputType<'a> {
         InputType::Scalar(ScalarType::JsonList)
     }
 
-    pub fn uuid() -> InputType {
+    pub(crate) fn uuid() -> InputType<'a> {
         InputType::Scalar(ScalarType::UUID)
     }
 
-    pub fn xml() -> InputType {
-        InputType::Scalar(ScalarType::Xml)
-    }
-
-    pub fn bytes() -> InputType {
+    pub(crate) fn bytes() -> InputType<'a> {
         InputType::Scalar(ScalarType::Bytes)
     }
 
-    pub fn null() -> InputType {
+    pub(crate) fn null() -> InputType<'a> {
         InputType::Scalar(ScalarType::Null)
     }
 
-    pub fn enum_type(containing: EnumTypeWeakRef) -> InputType {
+    pub(crate) fn enum_type(containing: EnumType) -> InputType<'a> {
         InputType::Enum(containing)
-    }
-
-    pub fn is_empty(&self) -> bool {
-        match self {
-            Self::Scalar(_) => false,
-            Self::Enum(_) => false,
-            Self::List(inner) => inner.is_empty(),
-            Self::Object(weak) => weak.into_arc().is_empty(),
-        }
     }
 
     pub fn is_json(&self) -> bool {
@@ -321,28 +285,26 @@ impl InputType {
         )
     }
 
-    pub fn as_object(&self) -> Option<InputObjectTypeStrongRef> {
+    pub fn as_object(&self) -> Option<&InputObjectType<'a>> {
         if let Self::Object(v) = self {
-            Some(v.into_arc())
+            Some(v)
         } else {
             None
         }
     }
 
-    pub fn as_list(&self) -> Option<&InputType> {
+    pub fn as_list(&self) -> Option<&InputType<'a>> {
         if let Self::List(list) = self {
             Some(list)
         } else {
             None
         }
     }
-}
 
-impl IntoIterator for InputType {
-    type Item = InputType;
-    type IntoIter = std::iter::Once<InputType>;
-
-    fn into_iter(self) -> Self::IntoIter {
-        std::iter::once(self)
+    pub fn into_object(self) -> Option<InputObjectType<'a>> {
+        match self {
+            InputType::Object(obj) => Some(obj),
+            _ => None,
+        }
     }
 }

@@ -32,6 +32,20 @@ mod distinct {
     }
 
     #[connector_test]
+    async fn shorthand_works(runner: Runner) -> TestResult<()> {
+        test_user(&runner, r#"{ id: 1, first_name: "Joe", last_name: "Doe", email: "1" }"#).await?;
+        test_user(&runner, r#"{ id: 2, first_name: "Joe", last_name: "Doe", email: "2" }"#).await?;
+
+        assert_query!(
+            runner,
+            "query { findManyUser(distinct: first_name) { id } }",
+            r#"{"data":{"findManyUser":[{"id":1}]}}"#
+        );
+
+        Ok(())
+    }
+
+    #[connector_test]
     async fn with_duplicates(runner: Runner) -> TestResult<()> {
         test_user(&runner, r#"{ id: 1, first_name: "Joe", last_name: "Doe", email: "1" }"#).await?;
         test_user(

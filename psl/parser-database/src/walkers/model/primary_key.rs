@@ -65,7 +65,7 @@ impl<'db> PrimaryKeyWalker<'db> {
     }
 
     /// The scalar fields constrained by the id.
-    pub fn fields(self) -> impl ExactSizeIterator<Item = ScalarFieldWalker<'db>> + 'db {
+    pub fn fields(self) -> impl ExactSizeIterator<Item = ScalarFieldWalker<'db>> + Clone + 'db {
         self.attribute
             .fields
             .iter()

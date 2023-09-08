@@ -4,17 +4,15 @@ mod sql_renderer;
 pub use mongodb_renderer::*;
 pub use sql_renderer::*;
 
-use crate::{templating, ConnectorTagInterface, DatamodelFragment, IdFragment, M2mFragment, TestConfig};
+use crate::{connection_string, templating, DatamodelFragment, IdFragment, M2mFragment, CONFIG};
 use indoc::indoc;
 use itertools::Itertools;
-use lazy_static::lazy_static;
+use once_cell::sync::Lazy;
 use psl::ALL_PREVIEW_FEATURES;
 use regex::Regex;
 
-lazy_static! {
-    /// Test configuration, loaded once at runtime.
-    static ref FRAGMENT_RE: Regex = Regex::new(r"#.*").unwrap();
-}
+/// Test configuration, loaded once at runtime.
+static FRAGMENT_RE: Lazy<Regex> = Lazy::new(|| Regex::new(r"#.*").unwrap());
 
 /// The main trait a datamodel renderer for a connector has to implement.
 pub trait DatamodelRenderer {
@@ -31,7 +29,6 @@ pub trait DatamodelRenderer {
 
 /// Render the complete datamodel with all bells and whistles.
 pub fn render_test_datamodel(
-    config: &TestConfig,
     test_database: &str,
     template: String,
     excluded_features: &[&str],
@@ -39,7 +36,7 @@ pub fn render_test_datamodel(
     db_schemas: &[&str],
     isolation_level: Option<&'static str>,
 ) -> String {
-    let tag = config.test_connector_tag().unwrap();
+    let (tag, version) = CONFIG.test_connector().unwrap();
     let preview_features = render_preview_features(excluded_features);
 
     let is_multi_schema = !db_schemas.is_empty();
@@ -65,7 +62,13 @@ pub fn render_test_datamodel(
             }}
         "#},
         tag.datamodel_provider(),
-        tag.connection_string(test_database, config.is_ci(), is_multi_schema, isolation_level),
+        connection_string(
+            &version,
+            test_database,
+            CONFIG.is_ci(),
+            is_multi_schema,
+            isolation_level
+        ),
         relation_mode_override.unwrap_or_else(|| tag.relation_mode().to_string()),
         schema_def,
         preview_features

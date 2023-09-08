@@ -1,6 +1,9 @@
 use enumflags2::BitFlags;
 use psl_core::{
-    datamodel_connector::{Connector, ConnectorCapability, ConstraintScope, NativeTypeConstructor, NativeTypeInstance},
+    datamodel_connector::{
+        Connector, ConnectorCapabilities, ConnectorCapability, ConstraintScope, Flavour, NativeTypeConstructor,
+        NativeTypeInstance,
+    },
     diagnostics::{DatamodelError, Diagnostics, Span},
     parser_database::{ReferentialAction, ScalarType},
 };
@@ -8,20 +11,24 @@ use std::borrow::Cow;
 
 const NATIVE_TYPE_CONSTRUCTORS: &[NativeTypeConstructor] = &[];
 const CONSTRAINT_SCOPES: &[ConstraintScope] = &[ConstraintScope::GlobalKeyIndex];
-const CAPABILITIES: &[ConnectorCapability] = &[
-    ConnectorCapability::AnyId,
-    ConnectorCapability::AutoIncrement,
-    ConnectorCapability::CompoundIds,
-    ConnectorCapability::SqlQueryRaw,
-    ConnectorCapability::RelationFieldsInArbitraryOrder,
-    ConnectorCapability::UpdateableId,
-    ConnectorCapability::ImplicitManyToManyRelation,
-    ConnectorCapability::DecimalType,
-    ConnectorCapability::BackwardCompatibleQueryRaw,
-    ConnectorCapability::OrderByNullsFirstLast,
-    ConnectorCapability::SupportsTxIsolationSerializable,
-    ConnectorCapability::NativeUpsert,
-];
+const CAPABILITIES: ConnectorCapabilities = enumflags2::make_bitflags!(ConnectorCapability::{
+    AnyId |
+    AutoIncrement |
+    CompoundIds |
+    SqlQueryRaw |
+    RelationFieldsInArbitraryOrder |
+    UpdateableId |
+    ImplicitManyToManyRelation |
+    DecimalType |
+    BackwardCompatibleQueryRaw |
+    OrderByNullsFirstLast |
+    SupportsTxIsolationSerializable |
+    NativeUpsert |
+    FilteredInlineChildNestedToOneDisconnect
+    // InsertReturning - While SQLite does support RETURNING, it does not return column information on the way back from the database.
+    // This column type information is necessary in order to preserve consistency for some data types such as int, where values could overflow.
+    // Since we care to stay consistent with reads, it is not enabled.
+});
 
 pub struct SqliteDatamodelConnector;
 
@@ -34,7 +41,7 @@ impl Connector for SqliteDatamodelConnector {
         "sqlite"
     }
 
-    fn capabilities(&self) -> &'static [ConnectorCapability] {
+    fn capabilities(&self) -> ConnectorCapabilities {
         CAPABILITIES
     }
 
@@ -120,5 +127,9 @@ impl Connector for SqliteDatamodelConnector {
         }
 
         Ok(())
+    }
+
+    fn flavour(&self) -> Flavour {
+        Flavour::Sqlite
     }
 }

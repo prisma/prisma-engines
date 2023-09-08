@@ -257,6 +257,97 @@ mod singular_batch {
         Ok(())
     }
 
+    fn bigint_id() -> String {
+        let schema = indoc! {
+            r#" model TestModel {
+                #id(id, BigInt, @id)
+            }"#
+        };
+
+        schema.to_owned()
+    }
+
+    // Regression test for https://github.com/prisma/prisma/issues/18096
+    #[connector_test(schema(bigint_id))]
+    async fn batch_bigint_id(runner: Runner) -> TestResult<()> {
+        run_query!(&runner, r#"mutation { createOneTestModel(data: { id: 1 }) { id } }"#);
+        run_query!(&runner, r#"mutation { createOneTestModel(data: { id: 2 }) { id } }"#);
+        run_query!(&runner, r#"mutation { createOneTestModel(data: { id: 3 }) { id } }"#);
+
+        match runner.protocol() {
+            EngineProtocol::Graphql => {
+                let queries = vec![
+                    r#"query { findUniqueTestModel(where: { id: 1 }) { id }}"#.to_string(),
+                    r#"query { findUniqueTestModel(where: { id: 2 }) { id }}"#.to_string(),
+                    r#"query { findUniqueTestModel(where: { id: 3 }) { id }}"#.to_string(),
+                ];
+
+                let batch_results = runner.batch(queries, false, None).await?;
+
+                insta::assert_snapshot!(
+                    batch_results.to_string(),
+                    @r###"{"batchResult":[{"data":{"findUniqueTestModel":{"id":"1"}}},{"data":{"findUniqueTestModel":{"id":"2"}}},{"data":{"findUniqueTestModel":{"id":"3"}}}]}"###
+                );
+            }
+            EngineProtocol::Json => {
+                let queries = vec![
+                    r#"{ "modelName": "TestModel", "action": "findUnique", "query": { "arguments": { "where": { "id": { "$type": "BigInt", "value": "1" } } }, "selection": { "$scalars": true } } }"#.to_string(),
+                    r#"{ "modelName": "TestModel", "action": "findUnique", "query": { "arguments": { "where": { "id": { "$type": "BigInt", "value": "2" } } }, "selection": { "$scalars": true } } }"#.to_string(),
+                    r#"{ "modelName": "TestModel", "action": "findUnique", "query": { "arguments": { "where": { "id": { "$type": "BigInt", "value": "3" } } }, "selection": { "$scalars": true } } }"#.to_string(),
+                ];
+
+                let batch_results = runner.batch_json(queries, false, None).await?;
+
+                insta::assert_snapshot!(
+                    batch_results.to_string(),
+                    @r###"{"batchResult":[{"data":{"findUniqueTestModel":{"id":{"$type":"BigInt","value":"1"}}}},{"data":{"findUniqueTestModel":{"id":{"$type":"BigInt","value":"2"}}}},{"data":{"findUniqueTestModel":{"id":{"$type":"BigInt","value":"3"}}}}]}"###
+                );
+            }
+        }
+
+        Ok(())
+    }
+
+    fn enum_id() -> String {
+        let schema = indoc! {
+            r#"
+            enum IdEnum {
+                A
+                B
+            }
+
+            model TestModel {
+                #id(id, IdEnum, @id)
+            }
+            "#
+        };
+
+        schema.to_owned()
+    }
+
+    #[connector_test(schema(enum_id), capabilities(Enums))]
+    async fn batch_enum(runner: Runner) -> TestResult<()> {
+        run_query!(&runner, r#"mutation { createOneTestModel(data: { id: "A" }) { id } }"#);
+        run_query!(&runner, r#"mutation { createOneTestModel(data: { id: "B" }) { id } }"#);
+
+        let (res, compact_doc) = compact_batch(
+            &runner,
+            vec![
+                r#"{ findUniqueTestModel(where: { id: "A" }) { id } }"#.to_string(),
+                r#"{ findUniqueTestModel(where: { id: "B" }) { id } }"#.to_string(),
+            ],
+        )
+        .await?;
+
+        insta::assert_snapshot!(
+          res.to_string(),
+          @r###"{"batchResult":[{"data":{"findUniqueTestModel":{"id":"A"}}},{"data":{"findUniqueTestModel":{"id":"B"}}}]}"###
+        );
+        assert!(compact_doc.is_compact());
+
+        Ok(())
+    }
+
     // Regression test for https://github.com/prisma/prisma/issues/16548
     #[connector_test(schema(schemas::generic))]
     async fn repro_16548(runner: Runner) -> TestResult<()> {
@@ -276,7 +367,7 @@ mod singular_batch {
             res.to_string(),
             @r###"{"batchResult":[{"data":{"findUniqueTestModelOrThrow":{"id":1}}},{"data":{"findUniqueTestModelOrThrow":{"id":2}}}]}"###
         );
-        assert!(!compact_doc.is_compact());
+        assert!(compact_doc.is_compact());
 
         // Failing case
         let (res, compact_doc) = compact_batch(
@@ -289,9 +380,9 @@ mod singular_batch {
         .await?;
         insta::assert_snapshot!(
           res.to_string(),
-          @r###"{"batchResult":[{"data":{"findUniqueTestModelOrThrow":{"id":2}}},{"errors":[{"error":"Error occurred during query execution:\nConnectorError(ConnectorError { user_facing_error: Some(KnownError { message: \"An operation failed because it depends on one or more records that were required but not found. Expected a record, found none.\", meta: Object {\"cause\": String(\"Expected a record, found none.\")}, error_code: \"P2025\" }), kind: RecordDoesNotExist, transient: false })","user_facing_error":{"is_panic":false,"message":"An operation failed because it depends on one or more records that were required but not found. Expected a record, found none.","meta":{"cause":"Expected a record, found none."},"error_code":"P2025"}}]}]}"###
+          @r###"{"batchResult":[{"data":{"findUniqueTestModelOrThrow":{"id":2}}},{"errors":[{"error":"An operation failed because it depends on one or more records that were required but not found. Expected a record, found none.","user_facing_error":{"is_panic":false,"message":"An operation failed because it depends on one or more records that were required but not found. Expected a record, found none.","meta":{"cause":"Expected a record, found none."},"error_code":"P2025"}}]}]}"###
         );
-        assert!(!compact_doc.is_compact());
+        assert!(compact_doc.is_compact());
 
         // Mix of findUnique & findUniqueOrThrow
         let (res, compact_doc) = compact_batch(

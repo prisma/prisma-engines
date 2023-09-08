@@ -3,7 +3,7 @@ use crate::{
     query_ast::*,
     QueryResult, RecordSelection,
 };
-use connector::{ConnectionLike, NativeUpsert, QueryArguments};
+use connector::{ConnectionLike, NativeUpsert};
 
 pub(crate) async fn execute(
     tx: &mut dyn ConnectionLike,
@@ -43,9 +43,16 @@ async fn create_one(
     q: CreateRecord,
     trace_id: Option<String>,
 ) -> InterpretationResult<QueryResult> {
-    let res = tx.create_record(&q.model, q.args, trace_id).await?;
+    let res = tx.create_record(&q.model, q.args, q.selected_fields, trace_id).await?;
 
-    Ok(QueryResult::Id(Some(res)))
+    Ok(QueryResult::RecordSelection(Some(Box::new(RecordSelection {
+        name: q.name,
+        fields: q.selection_order,
+        aggregation_rows: None,
+        model: q.model,
+        scalars: res.into(),
+        nested: vec![],
+    }))))
 }
 
 async fn create_many(
@@ -63,9 +70,46 @@ async fn update_one(
     q: UpdateRecord,
     trace_id: Option<String>,
 ) -> InterpretationResult<QueryResult> {
-    let res = tx.update_record(&q.model, q.record_filter, q.args, trace_id).await?;
+    let res = tx
+        .update_record(
+            q.model(),
+            q.record_filter().clone(),
+            q.args().clone(),
+            q.selected_fields(),
+            trace_id,
+        )
+        .await?;
 
-    Ok(QueryResult::Id(res))
+    match q {
+        UpdateRecord::WithSelection(q) if q.name.is_some() => {
+            let res = res
+                .map(|res| RecordSelection {
+                    name: q.name.unwrap(),
+                    fields: q.selection_order,
+                    scalars: res.into(),
+                    nested: vec![],
+                    model: q.model,
+                    aggregation_rows: None,
+                })
+                .map(Box::new);
+
+            Ok(QueryResult::RecordSelection(res))
+        }
+        UpdateRecord::WithSelection(q) => {
+            let res = res
+                .map(|record| record.extract_selection_result(&q.selected_fields))
+                .transpose()?;
+
+            Ok(QueryResult::Id(res))
+        }
+        UpdateRecord::WithoutSelection(_) => {
+            let res = res
+                .map(|record| record.extract_selection_result(&q.model().primary_identifier()))
+                .transpose()?;
+
+            Ok(QueryResult::Id(res))
+        }
+    }
 }
 
 async fn native_upsert(
@@ -80,7 +124,6 @@ async fn native_upsert(
         fields: query.selection_order().to_owned(),
         scalars: scalars.into(),
         nested: Vec::new(),
-        query_arguments: QueryArguments::new(query.model().clone()),
         model: query.model().clone(),
         aggregation_rows: None,
     }

@@ -9,9 +9,8 @@ colored = "2"
 structopt = "0.3.8"
 enumflags2 = "0.7"
 dmmf = { path = "../../query-engine/dmmf" }
-migration-core = { path = "../../migration-engine/core" }
-migration-connector = { path = "../../migration-engine/connectors/migration-connector" }
-introspection-connector = { path = "../../introspection-engine/connectors/introspection-connector" }
+schema-core = { path = "../../schema-engine/core" }
+schema-connector = { path = "../../schema-engine/connectors/schema-connector" }
 psl.workspace = true
 tokio.workspace = true
 serde_json = { version = "1.0", features = ["float_roundtrip"] }

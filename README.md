@@ -1,8 +1,8 @@
 # Prisma Engines
 
 [![Query Engine](https://github.com/prisma/prisma-engines/actions/workflows/query-engine.yml/badge.svg)](https://github.com/prisma/prisma-engines/actions/workflows/query-engine.yml)
-[![Introspection Engine + Migration Engine + sql_schema_describer](https://github.com/prisma/prisma-engines/actions/workflows/migration-engine.yml/badge.svg)](https://github.com/prisma/prisma-engines/actions/workflows/migration-engine.yml)
-[![Cargo docs](https://github.com/prisma/prisma-engines/actions/workflows/cargo-doc.yml/badge.svg)](https://github.com/prisma/prisma-engines/actions/workflows/cargo-doc.yml)
+[![Schema Engine + sql_schema_describer](https://github.com/prisma/prisma-engines/actions/workflows/schema-engine.yml/badge.svg)](https://github.com/prisma/prisma-engines/actions/workflows/schema-engine.yml)
+[![Cargo docs](https://github.com/prisma/prisma-engines/actions/workflows/on-push-to-main.yml/badge.svg)](https://github.com/prisma/prisma-engines/actions/workflows/on-push-to-main.yml)
 
 This repository contains a collection of engines that power the core stack for
 [Prisma](https://github.com/prisma/prisma), most prominently [Prisma
@@ -20,7 +20,7 @@ and test them.
 This repository contains four engines:
 
 - *Query engine*, used by the client to run database queries from Prisma Client
-- *Migration engine*, used to create and run migrations and introspection
+- *Schema engine*, used to create and run migrations and introspection
 - *Prisma Format*, used to format prisma files
 
 Additionally, the *psl* (Prisma Schema Language) is the library that defines how
@@ -46,7 +46,7 @@ published on our fabulous repo page.
 
 **Prerequisites:**
 
-- Installed the stable Rust toolchain, at least version 1.52.0. You can get the
+- Installed the latest stable version of the Rust toolchain. You can get the
   toolchain at [rustup](https://rustup.rs/) or the package manager of your
   choice.
 - Linux only: OpenSSL is required to be installed.
@@ -68,12 +68,11 @@ Depending on how you invoked `cargo` in the previous step, you can find the
 compiled binaries inside the repository root in the `target/debug` (without
 `--release`) or `target/release` directories (with `--release`):
 
-| Prisma Component     | Path to Binary                                   |
-| -------------------- | ------------------------------------------------ |
-| Query Engine         | `./target/[debug\|release]/query-engine`         |
-| Migration Engine     | `./target/[debug\|release]/migration-engine`     |
-| Introspection Engine | `./target/[debug\|release]/introspection-engine` |
-| Prisma Format        | `./target/[debug\|release]/prisma-fmt`           |
+| Prisma Component | Path to Binary                            |
+| ---------------- | ----------------------------------------- |
+| Query Engine     | `./target/[debug\|release]/query-engine`  |
+| Schema Engine    | `./target/[debug\|release]/schema-engine` |
+| Prisma Format    | `./target/[debug\|release]/prisma-fmt`    |
 
 ## Prisma Schema Language
 
@@ -81,7 +80,7 @@ The *Prisma Schema Language* is a library which defines the data structures and
 parsing rules for prisma files, including the available database connectors. For
 more technical details, please check the [library README](./psl/README.md).
 
-The PSL is used throughout the migration and introspection engines, as well as
+The PSL is used throughout the schema engine, as well as
 prisma format. The DataModeL (DML), which is an annotated version of the PSL is
 also used as input for the query engine.
 
@@ -98,7 +97,7 @@ description of what it does:
     returns GraphQL responses, and
 - handles all connections and communication with the native databases.
 
-When used through the Prisma Client, there are two ways for the Query Engine to
+When used through Prisma Client, there are two ways for the Query Engine to
 be executed:
 - as a binary, downloaded during installation, launched at runtime;
     communication happens via HTTP (`./query-engine/query-engine`)
@@ -146,40 +145,25 @@ Prometheus will scrape the `/metrics` endpoint to collect the engine's metrics
 
 Navigate to `http://localhost:3000` to view the Grafana dashboard.
 
-## Migration Engine
+## Schema Engine
 
-The *Migration Engine* does a couple of things:
+The *Schema Engine* does a couple of things:
 - creates new migrations by comparing the prisma file with the current state of
     the database, in order to bring the database in sync with the prisma file
 - run these migrations and keeps track of which migrations have been executed
+- (re-)generate a prisma schema file starting from a live database
 
 The engine uses:
 - the prisma files, as the source of truth
 - the database it connects to, for diffing and running migrations, as well as
-    keeping track of migrations in the `_prisma_migrations` table
+  keeping track of migrations in the `_prisma_migrations` table
 - the `prisma/migrations` directory which acts as a database of existing
-    migrations
-
-For more information about the migrations engine, check the [crate
-README](./migration-engine/README.md).
-
-## Introspection Engine
-
-The *Introspection Engine* is able to (re-)generate a prisma file starting from
-a live database.
-
-In a way, it's the opposite of the migration engine: whereas the migration
-engine uses the prisma file as the source of truth to update the database, the
-introspection engine reverses that dependency. It inspects the database, and
-generates a prisma schema file as a result.
-
-For more information about the introspection engine, check the [crate README
-](./introspection-engine/README.md).
+  migrations
 
 ## Prisma format
 
 Prisma format can format prisma schema files. It also comes as a WASM module via
-a node package. You can read more [here](./prisma-fmt-wasm/README.md).
+a node package. You can read more [here](./prisma-schema-wasm/README.md).
 
 ## Debugging
 
@@ -241,8 +225,8 @@ the correct values for the following variables:
 - `WORKSPACE_ROOT` should point to the root directory of `prisma-engines` project.
 - `PRISMA_BINARY_PATH` is usually
   `%WORKSPACE_ROOT%\target\release\query-engine.exe`.
-- `MIGRATION_ENGINE_BINARY_PATH` should be
-  `%WORKSPACE_ROOT%\target\release\migration-engine.exe`.
+- `SCHEMA_ENGINE_BINARY_PATH` should be
+  `%WORKSPACE_ROOT%\target\release\schema-engine.exe`.
 
 Other variables may or may not be useful.
 

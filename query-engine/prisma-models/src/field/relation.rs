@@ -9,6 +9,10 @@ pub type RelationField = crate::Zipper<RelationFieldId>;
 pub type RelationFieldRef = RelationField;
 
 impl RelationField {
+    pub fn borrowed_name<'a>(&self, schema: &'a psl::ValidatedSchema) -> &'a str {
+        schema.db.walk(self.id).name()
+    }
+
     pub fn name(&self) -> &str {
         self.walker().name()
     }
@@ -41,7 +45,7 @@ impl RelationField {
         !self.is_required()
     }
 
-    pub fn model(&self) -> ModelRef {
+    pub fn model(&self) -> Model {
         self.dm.find_model_by_id(self.walker().model().id)
     }
 
@@ -55,9 +59,8 @@ impl RelationField {
     }
 
     pub fn relation(&self) -> Relation {
-        let internal_data_model = self.model().internal_data_model();
-        let relation_id = internal_data_model.walk(self.id).relation().id;
-        internal_data_model.zip(relation_id)
+        let relation_id = self.dm.walk(self.id).relation().id;
+        self.dm.clone().zip(relation_id)
     }
 
     /// Alias for more clarity (in most cases, doesn't add more clarity for self-relations);
@@ -77,7 +80,7 @@ impl RelationField {
         self.relation().is_inline_relation() && !self.relation_is_inlined_in_parent()
     }
 
-    pub fn related_model(&self) -> ModelRef {
+    pub fn related_model(&self) -> Model {
         self.dm.find_model_by_id(self.walker().related_model().id)
     }
 
@@ -115,6 +118,7 @@ impl RelationField {
     fn linking_fields_impl(&self) -> Vec<ScalarFieldRef> {
         let walker = self.walker();
         let relation = walker.relation();
+
         match relation.refine() {
             walkers::RefinedRelationWalker::Inline(rel) => {
                 let forward = rel.forward_relation_field().unwrap();
@@ -144,5 +148,13 @@ impl Display for RelationField {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let walker = self.walker();
         write!(f, "{}.{}", walker.model().name(), walker.name())
+    }
+}
+
+impl std::fmt::Debug for RelationField {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.debug_tuple("RelationField")
+            .field(&format!("{}.{}", self.model().name(), self.name(),))
+            .finish()
     }
 }

@@ -111,7 +111,8 @@ impl<'a> RequestHandler<'a> {
     ) -> PrismaResponse {
         let plural_name = document.plural_name();
         let singular_name = document.single_name();
-        let keys = document.keys;
+        let throw_on_empty = document.throw_on_empty();
+        let keys: Vec<String> = document.keys;
         let arguments = document.arguments;
         let nested_selection = document.nested_selection;
 
@@ -171,9 +172,13 @@ impl<'a> RequestHandler<'a> {
 
                                 responses.insert_data(&singular_name, Item::Map(result));
                             }
-                            _ => {
-                                responses.insert_data(&singular_name, Item::null());
-                            }
+                            None if throw_on_empty => responses.insert_error(GQLError::from_user_facing_error(
+                                user_facing_errors::query_engine::RecordRequiredButNotFound {
+                                    cause: "Expected a record, found none.".to_owned(),
+                                }
+                                .into(),
+                            )),
+                            None => responses.insert_data(&singular_name, Item::null()),
                         }
 
                         responses
@@ -225,9 +230,13 @@ impl<'a> RequestHandler<'a> {
         })
     }
 
-    /// Compares two PrismaValues but treats DateTime and String as equal when their parsed/stringified versions are equal.
+    /// Compares two PrismaValues with special comparisons rules needed because user-inputted values are coerced differently than response values.
     /// We need this when comparing user-inputted values with query response values in the context of compacted queries.
-    /// User-inputted datetimes are coerced as `PrismaValue::DateTime` but response (and thus serialized) datetimes are `PrismaValue::String`.
+    /// Here are the cases covered:
+    /// - DateTime/String: User-input: DateTime / Response: String
+    /// - Int/BigInt: User-input: Int / Response: BigInt
+    /// - (JSON protocol only) Custom types (eg: { "$type": "BigInt", value: "1" }): User-input: Scalar / Response: Object
+    /// - (JSON protocol only) String/Enum: User-input: String / Response: Enum
     /// This should likely _not_ be used outside of this specific context.
     fn compare_values(left: &ArgumentValue, right: &ArgumentValue) -> bool {
         match (left, right) {
@@ -236,6 +245,14 @@ impl<'a> RequestHandler<'a> {
                 parse_datetime(t1)
                     .map(|t1| &t1 == t2)
                     .unwrap_or_else(|_| t1 == stringify_datetime(t2).as_str())
+            }
+            (ArgumentValue::Scalar(PrismaValue::Int(i1)), ArgumentValue::Scalar(PrismaValue::BigInt(i2)))
+            | (ArgumentValue::Scalar(PrismaValue::BigInt(i2)), ArgumentValue::Scalar(PrismaValue::Int(i1))) => {
+                *i1 == *i2
+            }
+            (ArgumentValue::Scalar(PrismaValue::Enum(s1)), ArgumentValue::Scalar(PrismaValue::String(s2)))
+            | (ArgumentValue::Scalar(PrismaValue::String(s1)), ArgumentValue::Scalar(PrismaValue::Enum(s2))) => {
+                *s1 == *s2
             }
             (ArgumentValue::Object(t1), t2) | (t2, ArgumentValue::Object(t1)) => match Self::unwrap_value(t1) {
                 Some(t1) => Self::compare_values(t1, t2),

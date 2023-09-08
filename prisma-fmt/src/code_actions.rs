@@ -1,3 +1,4 @@
+mod mongodb;
 mod multi_schema;
 mod relation_mode;
 mod relations;
@@ -28,10 +29,13 @@ pub(crate) fn available_actions(schema: String, params: CodeActionParams) -> Vec
 
     let config = &validated_schema.configuration;
 
+    let datasource = config.datasources.first();
+
     for source in validated_schema.db.ast().sources() {
         relation_mode::edit_referential_integrity(&mut actions, &params, validated_schema.db.source(), source)
     }
 
+    // models AND views
     for model in validated_schema
         .db
         .walk_models()
@@ -45,6 +49,10 @@ pub(crate) fn available_actions(schema: String, params: CodeActionParams) -> Vec
                 config,
                 model,
             )
+        }
+
+        if matches!(datasource, Some(ds) if ds.active_provider == "mongodb") {
+            mongodb::add_at_map_for_id(&mut actions, &params, validated_schema.db.source(), model);
         }
     }
 
@@ -154,7 +162,7 @@ fn create_missing_attribute<'a>(
 
         let attribute = format!("{attribute_name}([{fields}])");
 
-        let formatted_attribute = format_attribute(
+        let formatted_attribute = format_block_attribute(
             &attribute,
             model.indentation(),
             model.newline(),
@@ -182,11 +190,16 @@ fn span_to_range(schema: &str, span: Span) -> Range {
     Range { start, end }
 }
 
-fn format_attribute(
+fn format_field_attribute(attribute: &str) -> String {
+    // ? (soph) rust doesn't recognise \s
+    format!(" {attribute}\n")
+}
+
+fn format_block_attribute(
     attribute: &str,
     indentation: IndentationType,
     newline: NewlineType,
-    attributes: &Vec<Attribute>,
+    attributes: &[Attribute],
 ) -> String {
     let separator = if attributes.is_empty() { newline.as_ref() } else { "" };
 

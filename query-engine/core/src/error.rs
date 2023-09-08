@@ -1,15 +1,13 @@
-use crate::{InterpreterError, QueryGraphBuilderError, QueryGraphError, RelationViolation, TransactionError};
-use bigdecimal::BigDecimal;
+use crate::{InterpreterError, QueryGraphBuilderError, RelationViolation, TransactionError};
 use connector::error::ConnectorError;
 use prisma_models::DomainError;
 use thiserror::Error;
-use user_facing_errors::{query_engine::validation::ValidationError, UnknownError};
+use user_facing_errors::UnknownError;
 
 #[derive(Debug, Error)]
 #[error(
     "Error converting field \"{field}\" of expected non-nullable type \"{expected_type}\", found incompatible value of \"{found}\"."
 )]
-
 pub struct FieldConversionError {
     pub field: String,
     pub expected_type: String,
@@ -17,7 +15,7 @@ pub struct FieldConversionError {
 }
 
 impl FieldConversionError {
-    pub fn create(field: String, expected_type: String, found: String) -> CoreError {
+    pub(crate) fn create(field: String, expected_type: String, found: String) -> CoreError {
         CoreError::FieldConversionError(Self {
             field,
             expected_type,
@@ -26,23 +24,16 @@ impl FieldConversionError {
     }
 }
 
-// TODO: Cleanup unused errors after refactorings.
 #[derive(Debug, Error)]
 pub enum CoreError {
-    #[error("Error in query graph construction: {:?}", _0)]
-    QueryGraphError(QueryGraphError),
-
     #[error("Error in query graph construction: {:?}", _0)]
     QueryGraphBuilderError(QueryGraphBuilderError),
 
     #[error("Error in connector: {}", _0)]
-    ConnectorError(ConnectorError),
+    ConnectorError(#[from] ConnectorError),
 
     #[error("Error in domain logic: {}", _0)]
     DomainError(DomainError),
-
-    #[error("{0}")]
-    QueryParserError(ValidationError),
 
     #[error("Unsupported feature: {}", _0)]
     UnsupportedFeatureError(String),
@@ -74,21 +65,13 @@ pub enum CoreError {
 }
 
 impl CoreError {
-    pub fn null_serialization_error(field_name: &str) -> Self {
+    pub(crate) fn null_serialization_error(field_name: &str) -> Self {
         CoreError::SerializationError(format!(
             "Inconsistent query result: Field {field_name} is required to return data, got `null` instead."
         ))
     }
 
-    pub fn decimal_conversion_error(decimal: &BigDecimal, to_type: &str) -> Self {
-        CoreError::ConversionError {
-            value: decimal.to_string(),
-            from_type: "BigDecimal".into(),
-            to_type: to_type.into(),
-        }
-    }
-
-    pub fn is_transient(&self) -> bool {
+    pub(crate) fn is_transient(&self) -> bool {
         match self {
             CoreError::InterpreterError(InterpreterError::ConnectorError(err)) => err.is_transient(),
             CoreError::ConnectorError(err) => err.is_transient(),
@@ -103,45 +86,15 @@ impl From<QueryGraphBuilderError> for CoreError {
     }
 }
 
-impl From<QueryGraphError> for CoreError {
-    fn from(e: QueryGraphError) -> CoreError {
-        CoreError::QueryGraphError(e)
-    }
-}
-
-impl From<ConnectorError> for CoreError {
-    fn from(e: ConnectorError) -> CoreError {
-        CoreError::ConnectorError(e)
-    }
-}
-
 impl From<DomainError> for CoreError {
     fn from(e: DomainError) -> CoreError {
         CoreError::DomainError(e)
     }
 }
 
-impl From<ValidationError> for CoreError {
-    fn from(e: ValidationError) -> CoreError {
-        CoreError::QueryParserError(e)
-    }
-}
-
 impl From<InterpreterError> for CoreError {
     fn from(e: InterpreterError) -> CoreError {
         CoreError::InterpreterError(e)
-    }
-}
-
-impl From<url::ParseError> for CoreError {
-    fn from(e: url::ParseError) -> Self {
-        Self::ConfigurationError(format!("Error parsing connection string: {e}"))
-    }
-}
-
-impl From<connection_string::Error> for CoreError {
-    fn from(e: connection_string::Error) -> Self {
-        Self::ConfigurationError(format!("Error parsing connection string: {e}"))
     }
 }
 
@@ -164,8 +117,7 @@ impl From<CoreError> for user_facing_errors::Error {
                 ..
             })) => user_facing_error.into(),
 
-            CoreError::QueryParserError(err)
-            | CoreError::QueryGraphBuilderError(QueryGraphBuilderError::QueryParserError(err)) => {
+            CoreError::QueryGraphBuilderError(QueryGraphBuilderError::QueryParserError(err)) => {
                 user_facing_errors::Error::from(err)
             }
 

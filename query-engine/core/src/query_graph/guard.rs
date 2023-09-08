@@ -12,8 +12,7 @@ impl<T> Guard<T> {
     }
 
     pub fn unset(&mut self) -> T {
-        let content = std::mem::replace(&mut self.content, None);
-        match content {
+        match self.content.take() {
             Some(c) => c,
             None => panic!("Logic error: Attempted to unset empty graph guard."),
         }
@@ -21,6 +20,10 @@ impl<T> Guard<T> {
 
     pub fn borrow(&self) -> Option<&T> {
         self.content.as_ref()
+    }
+
+    pub fn borrow_mut(&mut self) -> Option<&mut T> {
+        self.content.as_mut()
     }
 
     pub fn into_inner(self) -> Option<T> {

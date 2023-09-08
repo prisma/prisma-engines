@@ -1,8 +1,6 @@
-use crate::prelude::*;
-use dml::ReferentialAction;
 use psl::{
     datamodel_connector::walker_ext_traits::*,
-    parser_database::{walkers, RelationId},
+    parser_database::{walkers, ReferentialAction, RelationId},
 };
 
 pub type Relation = crate::Zipper<RelationId>;
@@ -69,5 +67,11 @@ impl Relation {
             .relation_fields()
             .find_map(|rf| rf.explicit_on_update())
             .unwrap_or(ReferentialAction::Cascade)
+    }
+}
+
+impl std::fmt::Debug for Relation {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.debug_tuple("Relation").field(&self.name()).finish()
     }
 }

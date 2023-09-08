@@ -5,6 +5,8 @@ use std::{fmt, str::FromStr};
 macro_rules! capabilities {
     ($( $variant:ident $(,)? ),*) => {
         #[derive(Debug, Clone, Copy, PartialEq)]
+        #[enumflags2::bitflags]
+        #[repr(u64)]
         pub enum ConnectorCapability {
             $(
                 $variant,
@@ -19,7 +21,7 @@ macro_rules! capabilities {
                     )*
                 };
 
-                write!(f, "{}", name)
+                f.write_str(name)
             }
         }
 
@@ -91,79 +93,17 @@ capabilities!(
     DecimalType,                // Connector supports Prisma Decimal type.
     BackwardCompatibleQueryRaw, // Temporary SQLite specific capability. Should be removed once https://github.com/prisma/prisma/issues/12784 is fixed,
     OrderByNullsFirstLast,      // Connector supports ORDER BY NULLS LAST/FIRST
+    FilteredInlineChildNestedToOneDisconnect, // Connector supports a filtered nested disconnect on both sides of a to-one relation.
     // Block of isolation levels.
     SupportsTxIsolationReadUncommitted,
     SupportsTxIsolationReadCommitted,
     SupportsTxIsolationRepeatableRead,
     SupportsTxIsolationSerializable,
     SupportsTxIsolationSnapshot,
-    NativeUpsert
+    NativeUpsert,
+    InsertReturning,
+    UpdateReturning,
 );
 
 /// Contains all capabilities that the connector is able to serve.
-#[derive(Debug)]
-pub struct ConnectorCapabilities {
-    pub capabilities: Vec<ConnectorCapability>,
-}
-
-impl ConnectorCapabilities {
-    pub fn empty() -> Self {
-        Self { capabilities: vec![] }
-    }
-
-    pub fn new(capabilities: Vec<ConnectorCapability>) -> Self {
-        Self { capabilities }
-    }
-
-    pub fn contains(&self, capability: ConnectorCapability) -> bool {
-        self.capabilities.contains(&capability)
-    }
-
-    pub fn supports_any(&self, capabilities: &[ConnectorCapability]) -> bool {
-        self.capabilities
-            .iter()
-            .any(|connector_capability| capabilities.contains(connector_capability))
-    }
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn test_empty_cap_does_not_contain() {
-        let cap = ConnectorCapabilities::empty();
-        assert!(!cap.supports_any(&[ConnectorCapability::JsonFilteringJsonPath]));
-    }
-
-    #[test]
-    fn test_cap_with_others_does_not_contain() {
-        let cap = ConnectorCapabilities::new(vec![
-            ConnectorCapability::PrimaryKeySortOrderDefinition,
-            ConnectorCapability::JsonFilteringArrayPath,
-        ]);
-        assert!(!cap.supports_any(&[ConnectorCapability::JsonFilteringJsonPath]));
-    }
-
-    #[test]
-    fn test_cap_with_others_does_contain() {
-        let cap = ConnectorCapabilities::new(vec![
-            ConnectorCapability::PrimaryKeySortOrderDefinition,
-            ConnectorCapability::JsonFilteringJsonPath,
-            ConnectorCapability::JsonFilteringArrayPath,
-        ]);
-        assert!(cap.supports_any(&[
-            ConnectorCapability::JsonFilteringJsonPath,
-            ConnectorCapability::JsonFilteringArrayPath,
-        ]));
-    }
-
-    #[test]
-    fn test_does_contain() {
-        let cap = ConnectorCapabilities::new(vec![
-            ConnectorCapability::PrimaryKeySortOrderDefinition,
-            ConnectorCapability::JsonFilteringArrayPath,
-        ]);
-        assert!(!cap.supports_any(&[ConnectorCapability::JsonFilteringJsonPath]));
-    }
-}
+pub type ConnectorCapabilities = enumflags2::BitFlags<ConnectorCapability>;

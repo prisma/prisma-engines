@@ -1,14 +1,19 @@
 use super::*;
-use crate::{SqlDatamodelRenderer, TestResult};
+use crate::{BoxFuture, SqlDatamodelRenderer};
+use quaint::{prelude::Queryable, single::Quaint};
 use std::{fmt::Display, str::FromStr};
 
 #[derive(Debug, Default, Clone)]
-pub struct VitessConnectorTag {
-    capabilities: Vec<ConnectorCapability>,
-    version: Option<VitessVersion>,
-}
+pub(crate) struct VitessConnectorTag;
 
 impl ConnectorTagInterface for VitessConnectorTag {
+    fn raw_execute<'a>(&'a self, query: &'a str, connection_url: &'a str) -> BoxFuture<'a, Result<(), TestError>> {
+        Box::pin(async move {
+            let conn = Quaint::new(connection_url).await?;
+            Ok(conn.raw_cmd(query).await?)
+        })
+    }
+
     fn datamodel_provider(&self) -> &'static str {
         "mysql"
     }
@@ -17,31 +22,8 @@ impl ConnectorTagInterface for VitessConnectorTag {
         Box::new(SqlDatamodelRenderer::new())
     }
 
-    fn connection_string(
-        &self,
-        _database: &str,
-        _is_ci: bool,
-        _is_multi_schema: bool,
-        _: Option<&'static str>,
-    ) -> String {
-        match self.version {
-            Some(VitessVersion::V5_7) => "mysql://root@localhost:33577/test".into(),
-            Some(VitessVersion::V8_0) => "mysql://root@localhost:33807/test".into(),
-            None => unreachable!("A versioned connector must have a concrete version to run."),
-        }
-    }
-
-    fn capabilities(&self) -> &[ConnectorCapability] {
-        &self.capabilities
-    }
-
-    fn as_parse_pair(&self) -> (String, Option<String>) {
-        let version = self.version.as_ref().map(ToString::to_string);
-        ("vitess".to_owned(), version)
-    }
-
-    fn is_versioned(&self) -> bool {
-        true
+    fn capabilities(&self) -> ConnectorCapabilities {
+        psl::builtin_connectors::MYSQL.capabilities()
     }
 
     fn relation_mode(&self) -> &'static str {
@@ -53,50 +35,6 @@ impl ConnectorTagInterface for VitessConnectorTag {
 pub enum VitessVersion {
     V5_7,
     V8_0,
-}
-
-impl VitessConnectorTag {
-    pub fn new(version: Option<&str>) -> TestResult<Self> {
-        let version = match version {
-            Some(v) => Some(v.parse()?),
-            None => None,
-        };
-
-        Ok(Self {
-            version,
-            capabilities: vitess_capabilities(),
-        })
-    }
-
-    /// Returns all versions of this connector.
-    pub fn all() -> Vec<Self> {
-        let capabilities = vitess_capabilities();
-
-        vec![
-            Self {
-                version: Some(VitessVersion::V5_7),
-                capabilities: capabilities.clone(),
-            },
-            Self {
-                version: Some(VitessVersion::V8_0),
-                capabilities,
-            },
-        ]
-    }
-
-    /// Get a reference to the vitess connector tag's version.
-    pub fn version(&self) -> Option<VitessVersion> {
-        self.version
-    }
-}
-
-impl PartialEq for VitessConnectorTag {
-    fn eq(&self, other: &Self) -> bool {
-        match (self.version, other.version) {
-            (None, None) | (Some(_), None) | (None, Some(_)) => true,
-            (Some(v1), Some(v2)) => v1 == v2,
-        }
-    }
 }
 
 impl FromStr for VitessVersion {
@@ -120,8 +58,4 @@ impl Display for VitessVersion {
             Self::V8_0 => write!(f, "8.0"),
         }
     }
-}
-
-fn vitess_capabilities() -> Vec<ConnectorCapability> {
-    psl::builtin_connectors::MYSQL.capabilities().to_owned()
 }

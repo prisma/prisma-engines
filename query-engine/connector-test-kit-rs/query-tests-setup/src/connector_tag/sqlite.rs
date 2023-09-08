@@ -1,12 +1,18 @@
 use super::*;
-use crate::SqlDatamodelRenderer;
+use crate::{BoxFuture, SqlDatamodelRenderer};
+use quaint::{prelude::Queryable, single::Quaint};
 
-#[derive(Debug, Default, Clone, PartialEq)]
-pub struct SqliteConnectorTag {
-    capabilities: Vec<ConnectorCapability>,
-}
+#[derive(Debug, Default)]
+pub struct SqliteConnectorTag;
 
 impl ConnectorTagInterface for SqliteConnectorTag {
+    fn raw_execute<'a>(&'a self, query: &'a str, connection_url: &'a str) -> BoxFuture<'a, Result<(), TestError>> {
+        Box::pin(async move {
+            let conn = Quaint::new(connection_url).await?;
+            Ok(conn.raw_cmd(query).await?)
+        })
+    }
+
     fn datamodel_provider(&self) -> &'static str {
         "sqlite"
     }
@@ -15,47 +21,7 @@ impl ConnectorTagInterface for SqliteConnectorTag {
         Box::new(SqlDatamodelRenderer::new())
     }
 
-    fn connection_string(
-        &self,
-        database: &str,
-        _is_ci: bool,
-        _is_multi_schema: bool,
-        _: Option<&'static str>,
-    ) -> String {
-        let workspace_root = std::env::var("WORKSPACE_ROOT")
-            .unwrap_or_else(|_| ".".to_owned())
-            .trim_end_matches('/')
-            .to_owned();
-
-        format!("file://{workspace_root}/db/{database}.db")
+    fn capabilities(&self) -> ConnectorCapabilities {
+        psl::builtin_connectors::SQLITE.capabilities()
     }
-
-    fn capabilities(&self) -> &[ConnectorCapability] {
-        &self.capabilities
-    }
-
-    fn as_parse_pair(&self) -> (String, Option<String>) {
-        ("sqlite".to_owned(), None)
-    }
-
-    fn is_versioned(&self) -> bool {
-        false
-    }
-}
-
-impl SqliteConnectorTag {
-    pub fn new() -> Self {
-        Self {
-            capabilities: sqlite_capabilities(),
-        }
-    }
-
-    /// Returns all versions of this connector.
-    pub fn all() -> Vec<Self> {
-        vec![Self::new()]
-    }
-}
-
-fn sqlite_capabilities() -> Vec<ConnectorCapability> {
-    psl::builtin_connectors::SQLITE.capabilities().to_owned()
 }

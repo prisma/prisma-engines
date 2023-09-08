@@ -6,8 +6,8 @@ use crate::{
     ParsedInputList, ParsedInputValue,
 };
 use connector::{Filter, IntoFilter};
-use prisma_models::{ModelRef, RelationFieldRef};
-use schema_builder::constants::args;
+use prisma_models::{Model, RelationFieldRef};
+use schema::constants::args;
 use std::convert::TryInto;
 
 /// Handles nested create one cases.
@@ -15,18 +15,18 @@ use std::convert::TryInto;
 /// Information on the graph shapes can be found on the individual handlers.
 pub fn nested_create(
     graph: &mut QueryGraph,
-    connector_ctx: &ConnectorContext,
+    query_schema: &QuerySchema,
     parent_node: NodeRef,
     parent_relation_field: &RelationFieldRef,
-    value: ParsedInputValue,
-    child_model: &ModelRef,
+    value: ParsedInputValue<'_>,
+    child_model: &Model,
 ) -> QueryGraphBuilderResult<()> {
     let relation = parent_relation_field.relation();
 
     // Build all create nodes upfront.
     let creates: Vec<NodeRef> = utils::coerce_vec(value)
         .into_iter()
-        .map(|value| create::create_record_node(graph, connector_ctx, child_model.clone(), value.try_into()?))
+        .map(|value| create::create_record_node(graph, query_schema, child_model.clone(), value.try_into()?))
         .collect::<QueryGraphBuilderResult<Vec<NodeRef>>>()?;
 
     if relation.is_many_to_many() {
@@ -421,13 +421,13 @@ pub fn nested_create_many(
     graph: &mut QueryGraph,
     parent_node: NodeRef,
     parent_relation_field: &RelationFieldRef,
-    value: ParsedInputValue,
-    child_model: &ModelRef,
+    value: ParsedInputValue<'_>,
+    child_model: &Model,
 ) -> QueryGraphBuilderResult<()> {
     // Nested input is an object of { data: [...], skipDuplicates: bool }
-    let mut obj: ParsedInputMap = value.try_into()?;
+    let mut obj: ParsedInputMap<'_> = value.try_into()?;
 
-    let data_list: ParsedInputList = utils::coerce_vec(obj.remove(args::DATA).unwrap());
+    let data_list: ParsedInputList<'_> = utils::coerce_vec(obj.remove(args::DATA).unwrap());
     let skip_duplicates: bool = match obj.remove(args::SKIP_DUPLICATES) {
         Some(val) => val.try_into()?,
         None => false,

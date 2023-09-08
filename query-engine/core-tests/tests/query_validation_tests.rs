@@ -19,14 +19,9 @@ fn run_query_validation_test(query_file_path: &str) {
         .chain(ALL_PREVIEW_FEATURES.hidden_features())
         .collect();
     let parsed_schema = psl::parse_schema(schema).unwrap();
-    let prisma_models_schema = prisma_models::convert(Arc::new(parsed_schema));
-    let schema = Arc::new(schema_builder::build_with_features(
-        prisma_models_schema,
-        all_features,
-        true,
-    ));
+    let schema = Arc::new(schema::build_with_features(Arc::new(parsed_schema), all_features, true));
 
-    let err_string = match validate(&query, schema) {
+    let err_string = match validate(&query, &schema) {
         Ok(()) => panic!("these tests are only for errors, the query should fail to validate, but it did not"),
         Err(err) => {
             let value = json!(user_facing_errors::Error::from(err));
@@ -45,7 +40,7 @@ fn run_query_validation_test(query_file_path: &str) {
 
     let snapshot = std::fs::read_to_string(&snapshot_path).unwrap_or_default();
 
-    if err_string == snapshot {
+    if err_string.trim_end_matches('\n') == snapshot.trim_end_matches('\n') {
         return; // test passed
     }
 
@@ -88,9 +83,10 @@ fn format_chunks(chunks: Vec<dissimilar::Chunk<'_>>) -> String {
     buf
 }
 
-fn validate(query: &str, schema: schema::QuerySchemaRef) -> Result<(), request_handlers::HandlerError> {
+fn validate(query: &str, schema: &schema::QuerySchema) -> Result<(), request_handlers::HandlerError> {
     let json_request: JsonSingleQuery = serde_json::from_str(query).unwrap();
-    let operation = request_handlers::JsonProtocolAdapter::convert_single(json_request, &schema)?;
+    let mut adapter = request_handlers::JsonProtocolAdapter::new(schema);
+    let operation = adapter.convert_single(json_request)?;
     QueryGraphBuilder::new(schema)
         .build(operation)
         .map_err(query_core::CoreError::from)?;

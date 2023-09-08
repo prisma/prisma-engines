@@ -50,16 +50,18 @@ impl Connection for MongoDbConnection {
 impl WriteOperations for MongoDbConnection {
     async fn create_record(
         &mut self,
-        model: &ModelRef,
+        model: &Model,
         args: WriteArgs,
+        // The field selection on a create is never used on MongoDB as it cannot return more than the ID.
+        _selected_fields: FieldSelection,
         _trace_id: Option<String>,
-    ) -> connector_interface::Result<SelectionResult> {
+    ) -> connector_interface::Result<SingleRecord> {
         catch(async move { write::create_record(&self.database, &mut self.session, model, args).await }).await
     }
 
     async fn create_records(
         &mut self,
-        model: &ModelRef,
+        model: &Model,
         args: Vec<WriteArgs>,
         skip_duplicates: bool,
         _trace_id: Option<String>,
@@ -72,7 +74,7 @@ impl WriteOperations for MongoDbConnection {
 
     async fn update_records(
         &mut self,
-        model: &ModelRef,
+        model: &Model,
         record_filter: connector_interface::RecordFilter,
         args: WriteArgs,
         _trace_id: Option<String>,
@@ -95,13 +97,14 @@ impl WriteOperations for MongoDbConnection {
 
     async fn update_record(
         &mut self,
-        model: &ModelRef,
+        model: &Model,
         record_filter: connector_interface::RecordFilter,
         args: WriteArgs,
+        selected_fields: Option<FieldSelection>,
         _trace_id: Option<String>,
-    ) -> connector_interface::Result<Option<SelectionResult>> {
+    ) -> connector_interface::Result<Option<SingleRecord>> {
         catch(async move {
-            let mut res = write::update_records(
+            let result = write::update_records(
                 &self.database,
                 &mut self.session,
                 model,
@@ -110,14 +113,23 @@ impl WriteOperations for MongoDbConnection {
                 UpdateType::One,
             )
             .await?;
-            Ok(res.pop())
+
+            let record = result.into_iter().next().map(|id| SingleRecord {
+                record: Record::from(id),
+                field_names: selected_fields
+                    .unwrap_or_else(|| model.primary_identifier())
+                    .db_names()
+                    .collect(),
+            });
+
+            Ok(record)
         })
         .await
     }
 
     async fn delete_records(
         &mut self,
-        model: &ModelRef,
+        model: &Model,
         record_filter: connector_interface::RecordFilter,
         _trace_id: Option<String>,
     ) -> connector_interface::Result<usize> {
@@ -154,7 +166,7 @@ impl WriteOperations for MongoDbConnection {
 
     async fn query_raw(
         &mut self,
-        model: Option<&ModelRef>,
+        model: Option<&Model>,
         inputs: HashMap<String, PrismaValue>,
         query_type: Option<String>,
     ) -> connector_interface::Result<serde_json::Value> {
@@ -174,7 +186,7 @@ impl WriteOperations for MongoDbConnection {
 impl ReadOperations for MongoDbConnection {
     async fn get_single_record(
         &mut self,
-        model: &ModelRef,
+        model: &Model,
         filter: &connector_interface::Filter,
         selected_fields: &FieldSelection,
         aggr_selections: &[RelAggregationSelection],
@@ -196,7 +208,7 @@ impl ReadOperations for MongoDbConnection {
 
     async fn get_many_records(
         &mut self,
-        model: &ModelRef,
+        model: &Model,
         query_arguments: connector_interface::QueryArguments,
         selected_fields: &FieldSelection,
         aggregation_selections: &[RelAggregationSelection],
@@ -230,7 +242,7 @@ impl ReadOperations for MongoDbConnection {
 
     async fn aggregate_records(
         &mut self,
-        model: &ModelRef,
+        model: &Model,
         query_arguments: connector_interface::QueryArguments,
         selections: Vec<connector_interface::AggregationSelection>,
         group_by: Vec<ScalarFieldRef>,

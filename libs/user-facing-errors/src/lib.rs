@@ -4,11 +4,10 @@
 mod panic_hook;
 
 pub mod common;
-pub mod introspection_engine;
-pub mod migration_engine;
 #[cfg(feature = "sql")]
 pub mod quaint;
 pub mod query_engine;
+pub mod schema_engine;
 
 use serde::{Deserialize, Serialize};
 use std::borrow::Cow;

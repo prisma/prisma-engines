@@ -2,7 +2,7 @@ use crate::{column_metadata::ColumnMetadata, error::SqlError, value::to_prisma_v
 use bigdecimal::{BigDecimal, FromPrimitive, ToPrimitive};
 use chrono::{DateTime, NaiveDate, Utc};
 use connector_interface::{coerce_null_to_zero_value, AggregationResult, AggregationSelection};
-use prisma_models::{dml::FieldArity, ConversionFailure, PrismaValue, Record, TypeIdentifier};
+use prisma_models::{ConversionFailure, FieldArity, PrismaValue, Record, TypeIdentifier};
 use quaint::{ast::Value, connector::ResultRow};
 use std::{io, str::FromStr};
 use uuid::Uuid;
@@ -174,7 +174,7 @@ fn row_value_to_prisma_value(p_value: Value, meta: ColumnMetadata<'_>) -> Result
                 let ts = value.as_integer().unwrap();
                 let nsecs = ((ts % 1000) * 1_000_000) as u32;
                 let secs = ts / 1000;
-                let naive = chrono::NaiveDateTime::from_timestamp(secs, nsecs);
+                let naive = chrono::NaiveDateTime::from_timestamp_opt(secs, nsecs).unwrap();
                 let datetime: DateTime<Utc> = DateTime::from_utc(naive, Utc);
 
                 PrismaValue::DateTime(datetime.into())
@@ -188,11 +188,11 @@ fn row_value_to_prisma_value(p_value: Value, meta: ColumnMetadata<'_>) -> Result
                 PrismaValue::DateTime(dt.with_timezone(&Utc).into())
             }
             Value::Date(Some(d)) => {
-                let dt = DateTime::<Utc>::from_utc(d.and_hms(0, 0, 0), Utc);
+                let dt = DateTime::<Utc>::from_utc(d.and_hms_opt(0, 0, 0).unwrap(), Utc);
                 PrismaValue::DateTime(dt.into())
             }
             Value::Time(Some(t)) => {
-                let d = NaiveDate::from_ymd(1970, 1, 1);
+                let d = NaiveDate::from_ymd_opt(1970, 1, 1).unwrap();
                 let dt = DateTime::<Utc>::from_utc(d.and_time(t), Utc);
                 PrismaValue::DateTime(dt.into())
             }
@@ -285,12 +285,6 @@ fn row_value_to_prisma_value(p_value: Value, meta: ColumnMetadata<'_>) -> Result
         TypeIdentifier::Bytes => match p_value {
             value if value.is_null() => PrismaValue::Null,
             Value::Bytes(Some(bytes)) => PrismaValue::Bytes(bytes.into()),
-            _ => return Err(create_error(&p_value)),
-        },
-        TypeIdentifier::Xml => match p_value {
-            value if value.is_null() => PrismaValue::Null,
-            Value::Xml(Some(xml)) => PrismaValue::Xml(xml.to_string()),
-            Value::Text(Some(s)) => PrismaValue::Xml(s.into_owned()),
             _ => return Err(create_error(&p_value)),
         },
         TypeIdentifier::Unsupported => unreachable!("No unsupported field should reach that path"),

@@ -1,8 +1,7 @@
-use std::fmt::Display;
-
 use crate::filter::Filter;
 use itertools::Itertools;
 use prisma_models::prelude::DomainError;
+use std::fmt::Display;
 use thiserror::Error;
 use user_facing_errors::{query_engine::DatabaseConstraint, KnownError};
 
@@ -113,6 +112,9 @@ impl ConnectorError {
                     code: code.clone(),
                     message: message.clone(),
                 },
+            )),
+            ErrorKind::ExternalError(id) => Some(user_facing_errors::KnownError::new(
+                user_facing_errors::query_engine::ExternalError { id: id.to_owned() },
             )),
             _ => None,
         };
@@ -264,6 +266,12 @@ pub enum ErrorKind {
 
     #[error("Replica Set required for Transactions")]
     MongoReplicaSetRequired,
+
+    #[error("Unsupported connector: {0}")]
+    UnsupportedConnector(String),
+
+    #[error("External connector error")]
+    ExternalError(i32),
 }
 
 impl From<DomainError> for ConnectorError {

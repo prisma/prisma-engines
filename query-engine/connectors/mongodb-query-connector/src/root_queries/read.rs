@@ -12,7 +12,7 @@ use tracing::{info_span, Instrument};
 pub async fn get_single_record<'conn>(
     database: &Database,
     session: &mut ClientSession,
-    model: &ModelRef,
+    model: &Model,
     filter: &Filter,
     selected_fields: &FieldSelection,
     aggregation_selections: &[RelAggregationSelection],
@@ -58,7 +58,7 @@ pub async fn get_single_record<'conn>(
 pub async fn get_many_records<'conn>(
     database: &Database,
     session: &mut ClientSession,
-    model: &ModelRef,
+    model: &Model,
     query_arguments: QueryArguments,
     selected_fields: &FieldSelection,
     aggregation_selections: &[RelAggregationSelection],

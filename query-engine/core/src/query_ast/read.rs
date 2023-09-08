@@ -16,17 +16,38 @@ pub(crate) enum ReadQuery {
 }
 
 impl ReadQuery {
-    /// Checks whether or not this query returns a specific set of fields from the underlying data source model.
-    pub fn returns(&self, field_selection: &FieldSelection) -> bool {
+    /// Checks whether or not the field selection of this query satisfies the inputted field selection.
+    pub fn satisfies(&self, expected: &FieldSelection) -> bool {
+        self.returns().map(|sel| sel.is_superset_of(expected)).unwrap_or(false)
+    }
+
+    /// Returns the field selection of a read query.
+    fn returns(&self) -> Option<&FieldSelection> {
         match self {
-            ReadQuery::RecordQuery(x) => x.selected_fields.is_superset_of(field_selection),
-            ReadQuery::ManyRecordsQuery(x) => x.selected_fields.is_superset_of(field_selection),
-            ReadQuery::RelatedRecordsQuery(x) => x.selected_fields.is_superset_of(field_selection),
-            ReadQuery::AggregateRecordsQuery(_x) => false,
+            ReadQuery::RecordQuery(x) => Some(&x.selected_fields),
+            ReadQuery::ManyRecordsQuery(x) => Some(&x.selected_fields),
+            ReadQuery::RelatedRecordsQuery(x) => Some(&x.selected_fields),
+            ReadQuery::AggregateRecordsQuery(_x) => None,
         }
     }
 
-    pub fn model(&self) -> ModelRef {
+    /// Updates the field selection of the query to satisfy the inputted FieldSelection.
+    pub fn satisfy_dependency(&mut self, field_selection: FieldSelection) {
+        match self {
+            ReadQuery::RecordQuery(x) => {
+                x.selected_fields = x.selected_fields.clone().merge(field_selection);
+            }
+            ReadQuery::ManyRecordsQuery(x) => {
+                x.selected_fields = x.selected_fields.clone().merge(field_selection);
+            }
+            ReadQuery::RelatedRecordsQuery(x) => {
+                x.selected_fields = x.selected_fields.clone().merge(field_selection);
+            }
+            ReadQuery::AggregateRecordsQuery(_) => (),
+        }
+    }
+
+    pub fn model(&self) -> Model {
         match self {
             ReadQuery::RecordQuery(x) => x.model.clone(),
             ReadQuery::ManyRecordsQuery(x) => x.model.clone(),
@@ -72,7 +93,7 @@ impl Display for ReadQuery {
             ),
             Self::RelatedRecordsQuery(q) => write!(
                 f,
-                "RelatedRecordsQuery(name: '{}', parent model: '{}', parent relation field: {}, selection: {})",
+                "RelatedRecordsQuery(name: '{}', parent model: '{}', parent relation field: '{}', selection: {})",
                 q.name,
                 q.parent_field.model().name(),
                 q.parent_field.name(),
@@ -144,7 +165,7 @@ impl QueryOptions {
 pub struct RecordQuery {
     pub name: String,
     pub alias: Option<String>,
-    pub model: ModelRef,
+    pub model: Model,
     pub filter: Option<Filter>,
     pub selected_fields: FieldSelection,
     pub(crate) nested: Vec<ReadQuery>,
@@ -157,7 +178,7 @@ pub struct RecordQuery {
 pub struct ManyRecordsQuery {
     pub name: String,
     pub alias: Option<String>,
-    pub model: ModelRef,
+    pub model: Model,
     pub args: QueryArguments,
     pub selected_fields: FieldSelection,
     pub(crate) nested: Vec<ReadQuery>,
@@ -186,7 +207,7 @@ pub struct RelatedRecordsQuery {
 pub struct AggregateRecordsQuery {
     pub name: String,
     pub alias: Option<String>,
-    pub model: ModelRef,
+    pub model: Model,
     pub selection_order: Vec<(String, Option<Vec<String>>)>,
     pub args: QueryArguments,
     pub selectors: Vec<AggregationSelection>,

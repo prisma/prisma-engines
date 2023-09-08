@@ -2,39 +2,41 @@ use super::{
     type_renderer::{render_input_types, render_output_type},
     DmmfInputField, DmmfOutputField, RenderContext,
 };
-use schema::{InputFieldRef, InputType, OutputFieldRef, ScalarType};
+use schema::{InputField, InputType, OutputField, ScalarType};
 
-pub(super) fn render_input_field(input_field: &InputFieldRef, ctx: &mut RenderContext) -> DmmfInputField {
-    let type_references = render_input_types(input_field.field_types(ctx.query_schema), ctx);
+pub(super) fn render_input_field<'a>(input_field: &InputField<'a>, ctx: &mut RenderContext<'a>) -> DmmfInputField {
+    let type_references = render_input_types(input_field.field_types(), ctx);
     let nullable = input_field
-        .field_types(ctx.query_schema)
+        .field_types()
         .iter()
         .any(|typ| matches!(typ, InputType::Scalar(ScalarType::Null)));
 
-    let field = DmmfInputField {
-        name: input_field.name.clone(),
+    DmmfInputField {
+        name: input_field.name.to_string(),
         input_types: type_references,
-        is_required: input_field.is_required,
+        is_required: input_field.is_required(),
         is_nullable: nullable,
-        deprecation: input_field.deprecation.as_ref().map(Into::into),
-    };
-
-    field
+        deprecation: None,
+    }
 }
 
-pub(super) fn render_output_field(field: &OutputFieldRef, ctx: &mut RenderContext) -> DmmfOutputField {
-    let rendered_inputs = field.arguments.iter().map(|arg| render_input_field(arg, ctx)).collect();
-    let output_type = render_output_type(&field.field_type, ctx);
+pub(super) fn render_output_field<'a>(field: &OutputField<'a>, ctx: &mut RenderContext<'a>) -> DmmfOutputField {
+    let rendered_inputs = field
+        .arguments()
+        .iter()
+        .map(|arg| render_input_field(arg, ctx))
+        .collect();
+    let output_type = render_output_type(field.field_type(), ctx);
 
     let output_field = DmmfOutputField {
-        name: field.name.clone(),
+        name: field.name().clone().into_owned(),
         args: rendered_inputs,
         output_type,
         is_nullable: field.is_nullable,
-        deprecation: field.deprecation.as_ref().map(Into::into),
+        deprecation: None,
     };
 
-    ctx.add_mapping(field.name.clone(), field.query_info.as_ref());
+    ctx.add_mapping(field.name().clone().into_owned(), field.query_info());
 
     output_field
 }

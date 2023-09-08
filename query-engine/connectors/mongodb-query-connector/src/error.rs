@@ -290,6 +290,6 @@ impl<T> DecorateErrorWithFieldInformationExtension for crate::Result<T> {
     }
 
     fn decorate_with_composite_field_info(self, cf: &CompositeFieldRef) -> Self {
-        self.map_err(|err| err.decorate_with_field_name(&cf.name()))
+        self.map_err(|err| err.decorate_with_field_name(cf.name()))
     }
 }

@@ -31,29 +31,6 @@ mod to_many {
           @r###"{"data":{"findManyTestModel":[{"id":5}]}}"###
         );
 
-        // Implicit equal shorthand (equivalent to the one above)
-        insta::assert_snapshot!(
-            run_query!(runner, r#"{
-                    findManyTestModel(where: {
-                        to_many_as: { a_1: "Test", a_2: 0 }
-                    }) {
-                        id
-                    }
-                }"#),
-            @r###"{"data":{"findManyTestModel":[{"id":5}]}}"###
-        );
-
-        insta::assert_snapshot!(
-            run_query!(runner, r#"{
-                    findManyTestModel(where: {
-                        to_many_as: { equals: { a_1: "Test", a_2: 0 } }
-                    }) {
-                        id
-                    }
-                }"#),
-            @r###"{"data":{"findManyTestModel":[{"id":5}]}}"###
-        );
-
         insta::assert_snapshot!(
           run_query!(runner, r#"{
                     findManyTestModel(where: {
@@ -234,81 +211,19 @@ mod to_many {
     // No object coercion
     // TODO: This test is ignored because the JSON protocol required to enable the object syntax for equality on composite lists.
     // TODO: It should be enabled again once we remove the object shorthand syntaxes.
-    // #[connector_test]
-    // async fn single_object(runner: Runner) -> TestResult<()> {
-    //     create_to_many_test_data(&runner).await?;
+    #[connector_test]
+    async fn single_object(runner: Runner) -> TestResult<()> {
+        create_to_many_test_data(&runner).await?;
 
-    //     assert_error!(
-    //         runner,
-    //         r#"{
-    //             findManyTestModel(where: { to_many_as: { equals: { a_1: "Test", a_2: 0 } }}) {
-    //                 id
-    //             }
-    //         }"#,
-    //         2009,
-    //         "Invalid argument type"
-    //     );
-
-    //     Ok(())
-    // }
-
-    fn deep_equality_schema() -> String {
-        let schema = indoc! {
-            r#"
-              model CommentRequiredList {
-                #id(id, Int, @id)
-            
-                country String?
-                contents CommentContent[]
-              }
-            
-              type CommentContent {
-                text    String
-                upvotes CommentContentUpvotes[]
-              }
-            
-              type CommentContentUpvotes {
-                vote Boolean
-                userId String
-              }"#
-        };
-
-        schema.to_owned()
-    }
-
-    #[connector_test(schema(deep_equality_schema))]
-    async fn deep_equality_shorthand_should_work(runner: Runner) -> TestResult<()> {
-        run_query!(
-            &runner,
-            r#"mutation {
-                createOneCommentRequiredList(data: {
-                    id: 1,
-                    contents: {
-                        text: "hello world",
-                        upvotes: { vote: true, userId: "10" }
-                    }
-                }) {
+        assert_error!(
+            runner,
+            r#"{
+                findManyTestModel(where: { to_many_as: { equals: { a_1: "Test", a_2: 0 } }}) {
                     id
                 }
-            }"#
-        );
-
-        insta::assert_snapshot!(
-            run_query!(&runner, r#"{
-                findManyCommentRequiredList(
-                    where: {
-                        contents: {
-                            equals: {
-                                text: "hello world",
-                                upvotes: { vote: true, userId: "10" }
-                            }
-                        }
-                    }
-                ) {
-                    id
-                }
-            }"#),
-            @r###"{"data":{"findManyCommentRequiredList":[{"id":1}]}}"###
+            }"#,
+            2009,
+            "Invalid argument type"
         );
 
         Ok(())

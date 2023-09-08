@@ -9,7 +9,9 @@ crate-type = ["cdylib"]
 name = "query_engine"
 
 [features]
+default = ["driver-adapters"]
 vendored-openssl = ["sql-connector/vendored-openssl"]
+driver-adapters = ["request-handlers/driver-adapters", "sql-connector/driver-adapters"]
 
 [dependencies]
 anyhow = "1"
@@ -21,12 +23,12 @@ user-facing-errors = { path = "../../libs/user-facing-errors" }
 psl.workspace = true
 sql-connector = { path = "../connectors/sql-query-connector", package = "sql-query-connector" }
 prisma-models = { path = "../prisma-models" }
-
-napi = { version = "2.10.4", default-features = false, features = ["napi8", "tokio_rt", "serde-json"] }
-napi-derive = "2.9.3"
+driver-adapters = { path = "../driver-adapters" }
+napi.workspace = true
+napi-derive.workspace = true
 
 thiserror = "1"
-connection-string = "0.1"
+connection-string.workspace = true 
 url = "2"
 serde_json.workspace = true
 serde.workspace = true
@@ -37,6 +39,7 @@ tracing-futures = "0.2"
 tracing-opentelemetry = "0.17.3"
 opentelemetry = { version = "0.17"}
 
+quaint.workspace = true
 tokio.workspace = true
 futures = "0.3"
 query-engine-metrics = {path = "../metrics"}

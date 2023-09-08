@@ -1,12 +1,6 @@
 use crate::filter::Filter;
 use prisma_models::*;
 
-#[derive(Debug, Clone, Copy, PartialEq)]
-pub struct SkipAndLimit {
-    pub skip: usize,
-    pub limit: Option<usize>,
-}
-
 /// `QueryArguments` define various constraints queried data should fulfill:
 /// - `cursor`, `take`, `skip` page through the data.
 /// - `filter` scopes the data by defining conditions (akin to `WHERE` in SQL).
@@ -21,7 +15,7 @@ pub struct SkipAndLimit {
 /// a single model (e.g. the cursor projection, distinct projection, orderby, ...).
 #[derive(Clone)]
 pub struct QueryArguments {
-    pub model: ModelRef,
+    pub model: Model,
     pub cursor: Option<SelectionResult>,
     pub take: Option<i64>,
     pub skip: Option<i64>,
@@ -49,7 +43,7 @@ impl std::fmt::Debug for QueryArguments {
 }
 
 impl QueryArguments {
-    pub fn new(model: ModelRef) -> Self {
+    pub fn new(model: Model) -> Self {
         Self {
             model,
             cursor: None,
@@ -159,12 +153,12 @@ impl QueryArguments {
 
         let has_optional_hop = on_relation.iter().any(|o| {
             o.path.iter().any(|hop| match hop {
-                OrderByHop::Relation(rf) => rf.arity() == dml::FieldArity::Optional,
+                OrderByHop::Relation(rf) => rf.arity().is_optional(),
                 OrderByHop::Composite(cf) => !cf.is_required(),
             })
         });
 
-        // [Dom] I'm not entirely sure why we're doing this, but I assume that optionals introduce NULLs that make the ordering inherently unstable?
+        // Optional hops introduce NULLs that make the ordering inherently unstable.
         if has_optional_hop {
             return false;
         }
@@ -227,16 +221,16 @@ impl QueryArguments {
         }
     }
 
-    pub fn model(&self) -> &ModelRef {
+    pub fn model(&self) -> &Model {
         &self.model
     }
 }
 
-impl<T> From<(ModelRef, T)> for QueryArguments
+impl<T> From<(Model, T)> for QueryArguments
 where
     T: Into<Filter>,
 {
-    fn from(model_filter: (ModelRef, T)) -> Self {
+    fn from(model_filter: (Model, T)) -> Self {
         let mut query_arguments = Self::new(model_filter.0);
         query_arguments.filter = Some(model_filter.1.into());
         query_arguments

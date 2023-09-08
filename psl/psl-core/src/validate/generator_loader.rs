@@ -1,7 +1,7 @@
 use crate::{
     ast::WithSpan,
     common::{FeatureMap, PreviewFeature, ALL_PREVIEW_FEATURES},
-    configuration::{Generator, StringFromEnvVar},
+    configuration::{Generator, GeneratorConfigValue, StringFromEnvVar},
     diagnostics::*,
 };
 use enumflags2::BitFlags;
@@ -15,17 +15,10 @@ use std::collections::HashMap;
 const PROVIDER_KEY: &str = "provider";
 const OUTPUT_KEY: &str = "output";
 const BINARY_TARGETS_KEY: &str = "binaryTargets";
-const EXPERIMENTAL_FEATURES_KEY: &str = "experimentalFeatures";
 const PREVIEW_FEATURES_KEY: &str = "previewFeatures";
 const ENGINE_TYPE_KEY: &str = "engineType";
 
-const FIRST_CLASS_PROPERTIES: &[&str] = &[
-    PROVIDER_KEY,
-    OUTPUT_KEY,
-    BINARY_TARGETS_KEY,
-    EXPERIMENTAL_FEATURES_KEY,
-    PREVIEW_FEATURES_KEY,
-];
+const FIRST_CLASS_PROPERTIES: &[&str] = &[PROVIDER_KEY, OUTPUT_KEY, BINARY_TARGETS_KEY, PREVIEW_FEATURES_KEY];
 
 /// Load and validate Generators defined in an AST.
 pub(crate) fn load_generators_from_ast(ast_schema: &ast::SchemaAst, diagnostics: &mut Diagnostics) -> Vec<Generator> {
@@ -87,7 +80,7 @@ fn lift_generator(ast_generator: &ast::GeneratorConfig, diagnostics: &mut Diagno
         .get(OUTPUT_KEY)
         .and_then(|v| StringFromEnvVar::coerce(v, diagnostics));
 
-    let mut properties: HashMap<String, String> = HashMap::new();
+    let mut properties = HashMap::new();
 
     let binary_targets = args
         .get(BINARY_TARGETS_KEY)
@@ -97,7 +90,6 @@ fn lift_generator(ast_generator: &ast::GeneratorConfig, diagnostics: &mut Diagno
     // for compatibility reasons we still accept the old experimental key
     let preview_features = args
         .get(PREVIEW_FEATURES_KEY)
-        .or_else(|| args.get(EXPERIMENTAL_FEATURES_KEY))
         .and_then(|v| coerce_array(v, &coerce::string, diagnostics).map(|arr| (arr, v.span())))
         .map(|(arr, span)| parse_and_validate_preview_features(arr, &ALL_PREVIEW_FEATURES, span, diagnostics));
 
@@ -108,13 +100,7 @@ fn lift_generator(ast_generator: &ast::GeneratorConfig, diagnostics: &mut Diagno
         }
 
         let value = match &prop.value {
-            Some(val) => match val {
-                ast::Expression::NumericValue(val, _) => val.clone(),
-                ast::Expression::StringValue(val, _) => val.clone(),
-                ast::Expression::ConstantValue(val, _) => val.clone(),
-                ast::Expression::Function(_, _, _) => String::from("(function)"),
-                ast::Expression::Array(_, _) => String::from("(array)"),
-            },
+            Some(val) => GeneratorConfigValue::from(val),
             None => {
                 diagnostics.push_error(DatamodelError::new_config_property_missing_value_error(
                     &prop.name.name,
@@ -122,7 +108,6 @@ fn lift_generator(ast_generator: &ast::GeneratorConfig, diagnostics: &mut Diagno
                     "generator",
                     prop.span,
                 ));
-
                 continue;
             }
         };

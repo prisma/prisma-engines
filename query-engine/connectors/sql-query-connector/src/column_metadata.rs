@@ -1,4 +1,4 @@
-use prisma_models::{dml::FieldArity, TypeIdentifier};
+use prisma_models::{FieldArity, TypeIdentifier};
 
 /// Helps dealing with column value conversion and possible error resolution.
 #[derive(Clone, Debug, Copy)]

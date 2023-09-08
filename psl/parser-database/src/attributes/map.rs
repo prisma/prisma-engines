@@ -43,11 +43,14 @@ pub(super) fn scalar_field(
         ));
     }
 
-    if let Some(field_id) = ctx.names.model_fields.get(&(model_id, mapped_name)) {
+    if let Some(dup_field_id) = ctx.names.model_fields.get(&(model_id, mapped_name)) {
         match ctx
             .types
             .range_model_scalar_fields(model_id)
-            .find(|(_, sf)| sf.field_id == *field_id)
+            // Do not compare field to itself
+            .filter(|(_, sf)| sf.field_id != field_id)
+            // Find the field with the given mapped name.
+            .find(|(_, sf)| sf.field_id == *dup_field_id)
             .map(|(_, sf)| sf.mapped_name)
         {
             // @map only conflicts with _scalar_ fields
@@ -78,7 +81,7 @@ pub(super) fn composite_type_field(
     };
 
     {
-        let mut field = ctx.types.composite_type_fields.get_mut(&(ctid, field_id)).unwrap();
+        let field = ctx.types.composite_type_fields.get_mut(&(ctid, field_id)).unwrap();
         field.mapped_name = Some(mapped_name_id);
     }
 

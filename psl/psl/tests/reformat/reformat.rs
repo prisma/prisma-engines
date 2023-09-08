@@ -808,7 +808,7 @@ fn reformatting_ignore_with_relations_works() {
           client_id                 Int                         @id
         }
 
-        /// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by the Prisma Client.
+        /// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
         model order {
           client_id                  Int?
           client                     client?  @relation(fields: [client_id], references: [client_id])
@@ -816,7 +816,7 @@ fn reformatting_ignore_with_relations_works() {
           @@ignore
         }
 
-        /// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by the Prisma Client.
+        /// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
         model bill {
           client_id                  Int?
           client                     client?  @relation(fields: [client_id], references: [client_id])
@@ -832,7 +832,7 @@ fn reformatting_ignore_with_relations_works() {
           bill      bill[]  @ignore
         }
 
-        /// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by the Prisma Client.
+        /// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
         model order {
           client_id Int?
           client    client? @relation(fields: [client_id], references: [client_id])
@@ -840,7 +840,7 @@ fn reformatting_ignore_with_relations_works() {
           @@ignore
         }
 
-        /// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by the Prisma Client.
+        /// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
         model bill {
           client_id Int?
           client    client? @relation(fields: [client_id], references: [client_id])

@@ -75,3 +75,9 @@ impl From<HandlerError> for user_facing_errors::Error {
         }
     }
 }
+
+impl From<query_core::ConnectorError> for HandlerError {
+    fn from(value: query_core::ConnectorError) -> Self {
+        HandlerError::Core(value.into())
+    }
+}

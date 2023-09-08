@@ -1,9 +1,4 @@
-#![allow(
-    clippy::wrong_self_convention,
-    clippy::branches_sharing_code,
-    clippy::needless_borrow,
-    clippy::needless_collect
-)]
+#![allow(clippy::wrong_self_convention)]
 #![deny(unsafe_code)]
 
 mod column_metadata;
@@ -25,7 +20,10 @@ mod value;
 mod value_ext;
 
 use self::{column_metadata::*, context::Context, filter_conversion::*, query_ext::QueryExt, row::*};
+use quaint::prelude::Queryable;
 
+#[cfg(feature = "driver-adapters")]
+pub use database::{register_driver_adapter, Js};
 pub use database::{FromSource, Mssql, Mysql, PostgreSql, Sqlite};
 pub use error::SqlError;
 

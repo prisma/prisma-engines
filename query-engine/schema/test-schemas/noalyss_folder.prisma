@@ -1,0 +1,1011 @@
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DB_URL")
+}
+
+model action {
+  ac_id          Int            @id
+  ac_description String
+  ac_module      String?
+  ac_code        String?        @db.VarChar(30)
+  user_sec_act   user_sec_act[]
+}
+
+model action_detail {
+  ad_id           Int            @id @default(autoincrement())
+  f_id            BigInt?
+  ad_text         String?
+  ad_pu           Decimal?       @default(0) @db.Decimal(20, 4)
+  ad_quant        Decimal?       @default(0) @db.Decimal(20, 4)
+  ad_tva_id       Int?           @default(0)
+  ad_tva_amount   Decimal?       @default(0) @db.Decimal(20, 4)
+  ad_total_amount Decimal?       @default(0) @db.Decimal(20, 4)
+  ag_id           Int            @default(0)
+  action_gestion  action_gestion @relation(fields: [ag_id], references: [ag_id], onDelete: Cascade)
+}
+
+model action_gestion {
+  ag_id                                                                      Int                        @id @default(autoincrement())
+  ag_type                                                                    Int?
+  f_id_dest                                                                  Int?
+  ag_title                                                                   String?
+  ag_timestamp                                                               DateTime?                  @default(now()) @db.Timestamp(6)
+  ag_ref                                                                     String?                    @unique(map: "k_ag_ref")
+  ag_hour                                                                    String?
+  ag_priority                                                                Int?                       @default(2)
+  ag_dest                                                                    BigInt                     @default(-1)
+  ag_owner                                                                   String?
+  ag_contact                                                                 BigInt?
+  ag_state                                                                   Int?
+  ag_remind_date                                                             DateTime?                  @db.Date
+  action_detail                                                              action_detail[]
+  fiche                                                                      fiche?                     @relation(fields: [f_id_dest], references: [f_id], onDelete: NoAction, onUpdate: NoAction, map: "fiche_f_id_fk3")
+  document_type                                                              document_type?             @relation(fields: [ag_type], references: [dt_id], onDelete: NoAction, onUpdate: NoAction, map: "fk_action_gestion_document_type")
+  profile                                                                    profile                    @relation(fields: [ag_dest], references: [p_id], onDelete: SetNull, onUpdate: SetNull, map: "profile_fkey")
+  action_gestion_comment                                                     action_gestion_comment[]
+  action_gestion_operation                                                   action_gestion_operation[]
+  action_gestion_related_action_gestion_related_aga_greatestToaction_gestion action_gestion_related[]   @relation("action_gestion_related_aga_greatestToaction_gestion")
+  action_gestion_related_action_gestion_related_aga_leastToaction_gestion    action_gestion_related[]   @relation("action_gestion_related_aga_leastToaction_gestion")
+  action_person                                                              action_person[]
+  action_tags                                                                action_tags[]
+}
+
+model action_gestion_comment {
+  agc_id         BigInt          @id @default(autoincrement())
+  ag_id          BigInt?
+  agc_date       DateTime?       @default(now()) @db.Timestamptz(6)
+  agc_comment    String?
+  tech_user      String?
+  action_gestion action_gestion? @relation(fields: [ag_id], references: [ag_id], onDelete: Cascade)
+}
+
+model action_gestion_operation {
+  ago_id         BigInt          @id(map: "action_comment_operation_pkey") @default(autoincrement())
+  ag_id          BigInt?
+  jr_id          BigInt?
+  action_gestion action_gestion? @relation(fields: [ag_id], references: [ag_id], onDelete: Cascade, map: "action_comment_operation_ag_id_fkey")
+  jrn            jrn?            @relation(fields: [jr_id], references: [jr_id], onDelete: Cascade, map: "action_comment_operation_jr_id_fkey")
+}
+
+model action_gestion_related {
+  aga_id                                                             BigInt            @id @default(autoincrement())
+  aga_least                                                          BigInt
+  aga_greatest                                                       BigInt
+  aga_type                                                           BigInt?
+  action_gestion_action_gestion_related_aga_greatestToaction_gestion action_gestion    @relation("action_gestion_related_aga_greatestToaction_gestion", fields: [aga_greatest], references: [ag_id], onDelete: Cascade)
+  action_gestion_action_gestion_related_aga_leastToaction_gestion    action_gestion    @relation("action_gestion_related_aga_leastToaction_gestion", fields: [aga_least], references: [ag_id], onDelete: Cascade)
+  link_action_type                                                   link_action_type? @relation(fields: [aga_type], references: [l_id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@unique([aga_least, aga_greatest], map: "ux_aga_least_aga_greatest")
+  @@index([aga_type], map: "link_action_type_fki")
+}
+
+model action_person {
+  ap_id          Int            @id @default(autoincrement())
+  ag_id          Int
+  f_id           Int
+  action_gestion action_gestion @relation(fields: [ag_id], references: [ag_id], onDelete: NoAction, onUpdate: NoAction, map: "action_gestion_ag_id_fk2")
+  fiche          fiche          @relation(fields: [f_id], references: [f_id], onDelete: Cascade)
+
+  @@index([ag_id], map: "fk_action_person_action_gestion")
+  @@index([f_id], map: "fk_action_person_fiche")
+}
+
+model action_tags {
+  at_id          Int             @id @default(autoincrement())
+  t_id           Int?
+  ag_id          Int?
+  action_gestion action_gestion? @relation(fields: [ag_id], references: [ag_id], onDelete: Cascade)
+  tags           tags?           @relation(fields: [t_id], references: [t_id], onDelete: Cascade)
+}
+
+model attr_def {
+  ad_id        Int            @id @default(autoincrement())
+  ad_text      String?
+  ad_type      String?
+  ad_size      String
+  ad_extra     String?
+  attr_min     attr_min[]
+  fiche_detail fiche_detail[]
+  jnt_fic_attr jnt_fic_attr[]
+}
+
+model attr_min {
+  frd_id        Int
+  ad_id         Int
+  fiche_def_ref fiche_def_ref @relation(fields: [frd_id], references: [frd_id], onDelete: NoAction, onUpdate: NoAction, map: "$1")
+  attr_def      attr_def      @relation(fields: [ad_id], references: [ad_id], onDelete: NoAction, onUpdate: NoAction, map: "$2")
+
+  @@id([frd_id, ad_id], map: "frd_ad_attr_min_pk")
+}
+
+model bilan {
+  b_id            Int     @id @default(autoincrement())
+  b_name          String  @unique
+  b_file_template String
+  b_file_form     String?
+  b_type          String
+}
+
+model bookmark {
+  b_id     Int     @id @default(autoincrement())
+  b_order  Int?    @default(1)
+  b_action String?
+  login    String?
+}
+
+model centralized {
+  c_id          Int       @id @default(autoincrement())
+  c_j_id        Int?
+  c_date        DateTime  @db.Date
+  c_internal    String
+  c_montant     Decimal   @db.Decimal(20, 4)
+  c_debit       Boolean?  @default(true)
+  c_jrn_def     Int
+  c_poste       String?   @db.VarChar(40)
+  c_description String?
+  c_grp         Int
+  c_comment     String?
+  c_rapt        String?
+  c_periode     Int?
+  c_order       Int?
+  jrn_def       jrn_def   @relation(fields: [c_jrn_def], references: [jrn_def_id], onDelete: NoAction, onUpdate: NoAction, map: "$1")
+  tmp_pcmn      tmp_pcmn? @relation(fields: [c_poste], references: [pcm_val], onDelete: NoAction, onUpdate: NoAction, map: "fk_pcmn_val")
+}
+
+model del_action {
+  del_id   Int       @id @default(autoincrement())
+  del_name String
+  del_time DateTime? @db.Timestamp(6)
+}
+
+model del_jrn {
+  jr_id        Int
+  jr_def_id    Int?
+  jr_montant   Decimal?  @db.Decimal(20, 4)
+  jr_comment   String?
+  jr_date      DateTime? @db.Date
+  jr_grpt_id   Int?
+  jr_internal  String?
+  jr_tech_date DateTime? @db.Timestamp(6)
+  jr_tech_per  Int?
+  jrn_ech      DateTime? @db.Date
+  jr_ech       DateTime? @db.Date
+  jr_rapt      String?
+  jr_valid     Boolean?
+  jr_opid      Int?
+  jr_c_opid    Int?
+  jr_pj        Int?      @db.Oid
+  jr_pj_name   String?
+  jr_pj_type   String?
+  del_jrn_date DateTime? @db.Timestamp(6)
+  jr_pj_number String?
+  dj_id        Int       @id(map: "dj_id") @default(autoincrement())
+}
+
+model del_jrnx {
+  j_id          Int
+  j_date        DateTime? @db.Date
+  j_montant     Decimal?  @db.Decimal(20, 4)
+  j_poste       String?   @db.VarChar(40)
+  j_grpt        Int?
+  j_rapt        String?
+  j_jrn_def     Int?
+  j_debit       Boolean?
+  j_text        String?
+  j_centralized Boolean?
+  j_internal    String?
+  j_tech_user   String?
+  j_tech_date   DateTime? @db.Timestamp(6)
+  j_tech_per    Int?
+  j_qcode       String?
+  djx_id        Int       @id(map: "djx_id") @default(autoincrement())
+  f_id          BigInt?
+}
+
+model document {
+  d_id          Int     @id @default(autoincrement())
+  ag_id         Int
+  d_lob         Int?    @db.Oid
+  d_number      BigInt
+  d_filename    String?
+  d_mimetype    String?
+  d_description String?
+}
+
+model document_modele {
+  md_id         Int           @id @default(autoincrement())
+  md_name       String
+  md_lob        Int?          @db.Oid
+  md_type       Int
+  md_filename   String?
+  md_mimetype   String?
+  md_affect     String        @db.VarChar(3)
+  document_type document_type @relation(fields: [md_type], references: [dt_id], onDelete: NoAction, onUpdate: NoAction, map: "md_type")
+}
+
+model document_state {
+  s_id     Int     @id @default(autoincrement())
+  s_value  String  @db.VarChar(50)
+  s_status String? @db.Char(1)
+}
+
+model document_type {
+  dt_id           Int               @id @default(autoincrement())
+  dt_value        String?           @db.VarChar(80)
+  dt_prefix       String?
+  action_gestion  action_gestion[]
+  document_modele document_modele[]
+}
+
+model extension {
+  ex_id     Int     @id(map: "pk_extension") @default(autoincrement())
+  ex_name   String  @db.VarChar(30)
+  ex_code   String  @unique(map: "idx_ex_code") @db.VarChar(15)
+  ex_desc   String? @db.VarChar(250)
+  ex_file   String  @db.VarChar
+  ex_enable String  @default("Y") @db.Char
+}
+
+model fiche {
+  f_id                                Int                    @id @default(autoincrement())
+  fd_id                               Int?
+  action_gestion                      action_gestion[]
+  action_person                       action_person[]
+  fiche_def                           fiche_def?             @relation(fields: [fd_id], references: [fd_id], onDelete: NoAction, onUpdate: NoAction, map: "$1")
+  fiche_detail                        fiche_detail[]
+  forecast_item                       forecast_item[]
+  jrnx                                jrnx[]
+  operation_analytique                operation_analytique[]
+  quant_fin_quant_fin_qf_bankTofiche  quant_fin[]            @relation("quant_fin_qf_bankTofiche")
+  quant_fin_quant_fin_qf_otherTofiche quant_fin[]            @relation("quant_fin_qf_otherTofiche")
+  stock_goods                         stock_goods[]
+}
+
+model fiche_def {
+  fd_id             Int            @id @default(autoincrement())
+  fd_class_base     String?
+  fd_label          String
+  fd_create_account Boolean?       @default(false)
+  frd_id            Int
+  fd_description    String?
+  fiche             fiche[]
+  fiche_def_ref     fiche_def_ref  @relation(fields: [frd_id], references: [frd_id], onDelete: NoAction, onUpdate: NoAction, map: "$1")
+  jnt_fic_attr      jnt_fic_attr[]
+  mod_payment       mod_payment[]
+}
+
+model fiche_def_ref {
+  frd_id         Int         @id @default(autoincrement())
+  frd_text       String?
+  frd_class_base String?     @db.VarChar(40)
+  attr_min       attr_min[]
+  fiche_def      fiche_def[]
+}
+
+model fiche_detail {
+  jft_id   Int       @id(map: "jnt_fic_att_value_pkey") @default(autoincrement())
+  f_id     Int?
+  ad_id    Int?
+  ad_value String?
+  fiche    fiche?    @relation(fields: [f_id], references: [f_id], onDelete: NoAction, onUpdate: NoAction, map: "$1")
+  attr_def attr_def? @relation(fields: [ad_id], references: [ad_id], onDelete: Cascade, map: "fiche_detail_attr_def_fk")
+
+  @@unique([f_id, ad_id], map: "fiche_detail_f_id_ad_id")
+  @@index([f_id], map: "jnt_fic_att_value_fd_id_idx")
+}
+
+model forecast {
+  f_id                                             Int            @id(map: "forecast_pk") @default(autoincrement())
+  f_name                                           String
+  f_start_date                                     BigInt?
+  f_end_date                                       BigInt?
+  parm_periode_forecast_f_end_dateToparm_periode   parm_periode?  @relation("forecast_f_end_dateToparm_periode", fields: [f_end_date], references: [p_id], onUpdate: SetNull)
+  parm_periode_forecast_f_start_dateToparm_periode parm_periode?  @relation("forecast_f_start_dateToparm_periode", fields: [f_start_date], references: [p_id], onUpdate: SetNull)
+  forecast_cat                                     forecast_cat[]
+
+  @@index([f_end_date], map: "fki_f_end_date")
+  @@index([f_start_date], map: "fki_f_start_date")
+}
+
+model forecast_cat {
+  fc_id         Int             @id(map: "forecast_cat_pk") @default(autoincrement())
+  fc_desc       String
+  f_id          BigInt?
+  fc_order      Int             @default(0)
+  forecast      forecast?       @relation(fields: [f_id], references: [f_id], onDelete: Cascade, map: "forecast_child")
+  forecast_item forecast_item[]
+}
+
+model forecast_item {
+  fi_id        Int           @id @default(autoincrement())
+  fi_text      String?
+  fi_account   String?
+  fi_card      Int?
+  fi_order     Int?
+  fc_id        Int?
+  fi_amount    Decimal?      @default(0) @db.Decimal(20, 4)
+  fi_debit     String        @default("d") @db.Char
+  fi_pid       Int?
+  fiche        fiche?        @relation(fields: [fi_card], references: [f_id], onDelete: Cascade, map: "card")
+  forecast_cat forecast_cat? @relation(fields: [fc_id], references: [fc_id], onDelete: Cascade, map: "fk_forecast")
+}
+
+model form {
+  fo_id      Int      @id @default(autoincrement())
+  fo_fr_id   Int?
+  fo_pos     Int?
+  fo_label   String?
+  fo_formula String?
+  formdef    formdef? @relation(fields: [fo_fr_id], references: [fr_id], onDelete: Cascade, map: "formdef_fk")
+}
+
+model formdef {
+  fr_id    Int     @id @default(autoincrement())
+  fr_label String?
+  form     form[]
+}
+
+model groupe_analytique {
+  ga_id           String           @id(map: "pk_ga_id") @db.VarChar(10)
+  pa_id           Int?
+  ga_description  String?
+  plan_analytique plan_analytique? @relation(fields: [pa_id], references: [pa_id], onDelete: Cascade, onUpdate: NoAction, map: "fk_pa_id")
+}
+
+model info_def {
+  id_type        String     @id
+  id_description String?
+  jrn_info       jrn_info[]
+}
+
+model jnt_fic_attr {
+  fd_id     Int?
+  ad_id     Int?
+  jnt_id    BigInt     @id(map: "pk_jnt_fic_attr") @default(autoincrement())
+  jnt_order Int
+  fiche_def fiche_def? @relation(fields: [fd_id], references: [fd_id], onDelete: NoAction, onUpdate: NoAction, map: "$1")
+  attr_def  attr_def?  @relation(fields: [ad_id], references: [ad_id], onDelete: Cascade, map: "jnt_fic_attr_attr_def_fk")
+
+  @@unique([fd_id, ad_id], map: "fd_id_ad_id_x")
+  @@index([fd_id])
+}
+
+model jnt_letter {
+  jl_id       Int           @id(map: "jnt_letter_pk") @default(autoincrement())
+  letter_cred letter_cred[]
+  letter_deb  letter_deb[]
+}
+
+model jrn {
+  jr_id                                Int                        @unique(map: "x_jrn_jr_id") @default(autoincrement())
+  jr_def_id                            Int
+  jr_montant                           Decimal                    @db.Decimal(20, 4)
+  jr_comment                           String?
+  jr_date                              DateTime?                  @db.Date
+  jr_grpt_id                           Int
+  jr_internal                          String?                    @unique(map: "ux_internal")
+  jr_tech_date                         DateTime                   @default(now()) @db.Timestamp(6)
+  jr_tech_per                          Int
+  jrn_ech                              DateTime?                  @db.Date
+  jr_ech                               DateTime?                  @db.Date
+  jr_rapt                              String?
+  jr_valid                             Boolean?                   @default(true)
+  jr_opid                              Int?
+  jr_c_opid                            Int?
+  jr_pj                                Int?                       @db.Oid
+  jr_pj_name                           String?
+  jr_pj_type                           String?
+  jr_pj_number                         String?
+  jr_mt                                String?
+  jr_date_paid                         DateTime?                  @db.Date
+  jr_optype                            String?                    @default("NOR") @db.VarChar(3)
+  action_gestion_operation             action_gestion_operation[]
+  jrn_def                              jrn_def                    @relation(fields: [jr_def_id], references: [jrn_def_id], onDelete: NoAction, onUpdate: NoAction, map: "$1")
+  jrn_info                             jrn_info[]
+  jrn_note                             jrn_note[]
+  jrn_rapt_jrn_rapt_jr_idTojrn         jrn_rapt[]                 @relation("jrn_rapt_jr_idTojrn")
+  jrn_rapt_jrn_rapt_jra_concernedTojrn jrn_rapt[]                 @relation("jrn_rapt_jra_concernedTojrn")
+  quant_fin                            quant_fin?
+  quant_purchase                       quant_purchase[]
+  quant_sold                           quant_sold[]
+
+  @@id([jr_id, jr_def_id])
+  @@index([jr_grpt_id], map: "fki_jrn_jr_grpt_id")
+  @@index([jr_mt], map: "x_mt")
+}
+
+model jrn_def {
+  jrn_def_id                                     Int                       @id @default(autoincrement())
+  jrn_def_name                                   String                    @unique
+  jrn_def_class_deb                              String?
+  jrn_def_class_cred                             String?
+  jrn_def_fiche_deb                              String?
+  jrn_def_fiche_cred                             String?
+  jrn_deb_max_line                               Int?                      @default(1)
+  jrn_cred_max_line                              Int?                      @default(1)
+  jrn_def_ech                                    Boolean?                  @default(false)
+  jrn_def_ech_lib                                String?
+  jrn_def_type                                   String                    @db.Char(3)
+  jrn_def_code                                   String
+  jrn_def_pj_pref                                String?
+  jrn_def_bank                                   BigInt?
+  jrn_def_num_op                                 Int?
+  jrn_def_description                            String?
+  jrn_enable                                     Int?                      @default(1)
+  centralized                                    centralized[]
+  jrn                                            jrn[]
+  jrn_type                                       jrn_type                  @relation(fields: [jrn_def_type], references: [jrn_type_id], onDelete: NoAction, onUpdate: NoAction, map: "$1")
+  jrn_periode                                    jrn_periode[]
+  jrnx                                           jrnx[]
+  key_distribution_ledger                        key_distribution_ledger[]
+  mod_payment_mod_payment_jrn_def_idTojrn_def    mod_payment[]             @relation("mod_payment_jrn_def_idTojrn_def")
+  mod_payment_mod_payment_mp_jrn_def_idTojrn_def mod_payment[]             @relation("mod_payment_mp_jrn_def_idTojrn_def")
+  op_predef                                      op_predef[]
+  user_sec_jrn                                   user_sec_jrn[]
+}
+
+model jrn_info {
+  ji_id    Int      @id @default(autoincrement())
+  jr_id    Int
+  id_type  String
+  ji_value String?
+  info_def info_def @relation(fields: [id_type], references: [id_type], onDelete: Cascade, map: "fk_info_def")
+  jrn      jrn      @relation(fields: [jr_id], references: [jr_id], onDelete: Cascade, map: "fk_jrn")
+}
+
+model jrn_note {
+  n_id   Int     @id(map: "jrnx_note_pkey") @default(autoincrement())
+  n_text String?
+  jr_id  BigInt
+  jrn    jrn     @relation(fields: [jr_id], references: [jr_id], onDelete: Cascade, map: "jrnx_note_j_id_fkey")
+}
+
+model jrn_periode {
+  jrn_def_id   Int
+  p_id         Int
+  status       String?
+  id           BigInt       @id(map: "jrn_periode_pk") @default(autoincrement())
+  jrn_def      jrn_def      @relation(fields: [jrn_def_id], references: [jrn_def_id], onDelete: Cascade, map: "jrn_per_jrn_def_id")
+  parm_periode parm_periode @relation(fields: [p_id], references: [p_id], onDelete: Cascade, map: "jrn_periode_p_id")
+
+  @@unique([jrn_def_id, p_id], map: "jrn_periode_periode_ledger")
+}
+
+model jrn_rapt {
+  jra_id                          Int @id @default(autoincrement())
+  jr_id                           Int
+  jra_concerned                   Int
+  jrn_jrn_rapt_jr_idTojrn         jrn @relation("jrn_rapt_jr_idTojrn", fields: [jr_id], references: [jr_id], onDelete: Cascade)
+  jrn_jrn_rapt_jra_concernedTojrn jrn @relation("jrn_rapt_jra_concernedTojrn", fields: [jra_concerned], references: [jr_id], onDelete: Cascade)
+}
+
+model jrn_type {
+  jrn_type_id String    @id @db.Char(3)
+  jrn_desc    String?
+  jrn_def     jrn_def[]
+}
+
+model jrnx {
+  j_id                 Int                    @id @default(autoincrement())
+  j_date               DateTime?              @default(now()) @db.Date
+  j_montant            Decimal?               @default(0) @db.Decimal(20, 4)
+  j_poste              String                 @db.VarChar(40)
+  j_grpt               Int
+  j_rapt               String?
+  j_jrn_def            Int
+  j_debit              Boolean?               @default(true)
+  j_text               String?
+  j_centralized        Boolean?               @default(false)
+  j_internal           String?
+  j_tech_user          String
+  j_tech_date          DateTime               @default(now()) @db.Timestamp(6)
+  j_tech_per           Int
+  j_qcode              String?
+  f_id                 BigInt?
+  jrn_def              jrn_def                @relation(fields: [j_jrn_def], references: [jrn_def_id], onDelete: NoAction, onUpdate: NoAction, map: "$2")
+  tmp_pcmn             tmp_pcmn               @relation(fields: [j_poste], references: [pcm_val], onDelete: NoAction, onUpdate: NoAction, map: "fk_pcmn_val")
+  fiche                fiche?                 @relation(fields: [f_id], references: [f_id], onDelete: NoAction)
+  letter_cred          letter_cred?
+  letter_deb           letter_deb?
+  operation_analytique operation_analytique[]
+  quant_purchase       quant_purchase?
+  quant_sold           quant_sold?
+  stock_goods          stock_goods[]
+
+  @@index([f_id], map: "fki_jrnx_f_id")
+  @@index([j_grpt], map: "fki_jrnx_j_grpt")
+  @@index([j_qcode], map: "jrnx_j_qcode_ix")
+  @@index([j_poste], map: "x_poste")
+}
+
+model key_distribution {
+  kd_id                   Int                       @id @default(autoincrement())
+  kd_name                 String?
+  kd_description          String?
+  key_distribution_detail key_distribution_detail[]
+  key_distribution_ledger key_distribution_ledger[]
+}
+
+model key_distribution_activity {
+  ka_id                   Int                     @id @default(autoincrement())
+  ke_id                   BigInt
+  po_id                   BigInt?
+  pa_id                   BigInt
+  key_distribution_detail key_distribution_detail @relation(fields: [ke_id], references: [ke_id], onDelete: Cascade)
+  plan_analytique         plan_analytique         @relation(fields: [pa_id], references: [pa_id], onDelete: Cascade)
+  poste_analytique        poste_analytique?       @relation(fields: [po_id], references: [po_id], onDelete: Cascade)
+}
+
+model key_distribution_detail {
+  ke_id                     Int                         @id @default(autoincrement())
+  kd_id                     BigInt
+  ke_row                    Int
+  ke_percent                Decimal                     @db.Decimal(20, 4)
+  key_distribution_activity key_distribution_activity[]
+  key_distribution          key_distribution            @relation(fields: [kd_id], references: [kd_id], onDelete: Cascade)
+}
+
+model key_distribution_ledger {
+  kl_id            Int              @id @default(autoincrement())
+  kd_id            BigInt
+  jrn_def_id       BigInt
+  jrn_def          jrn_def          @relation(fields: [jrn_def_id], references: [jrn_def_id], onDelete: Cascade)
+  key_distribution key_distribution @relation(fields: [kd_id], references: [kd_id], onDelete: Cascade)
+}
+
+model letter_cred {
+  lc_id      Int        @id(map: "letter_cred_pk") @default(autoincrement())
+  j_id       BigInt     @unique
+  jl_id      BigInt
+  jnt_letter jnt_letter @relation(fields: [jl_id], references: [jl_id], onDelete: Cascade, map: "jnt_cred_fk")
+  jrnx       jrnx       @relation(fields: [j_id], references: [j_id], onDelete: Cascade, map: "letter_cred_fk")
+}
+
+model letter_deb {
+  ld_id      Int        @id(map: "letter_deb_pk") @default(autoincrement())
+  j_id       BigInt     @unique
+  jl_id      BigInt
+  jnt_letter jnt_letter @relation(fields: [jl_id], references: [jl_id], onDelete: Cascade, map: "jnt_deb_fk")
+  jrnx       jrnx       @relation(fields: [j_id], references: [j_id], onDelete: Cascade, map: "letter_deb_fk")
+}
+
+model link_action_type {
+  l_id                   BigInt                   @id @default(autoincrement())
+  l_desc                 String?                  @db.VarChar
+  action_gestion_related action_gestion_related[]
+}
+
+model menu_default {
+  md_id   Int    @id @default(autoincrement())
+  md_code String @unique
+  me_code String
+}
+
+model menu_ref {
+  me_code                String         @id
+  me_menu                String?
+  me_file                String?
+  me_url                 String?
+  me_description         String?
+  me_parameter           String?
+  me_javascript          String?
+  me_type                String?        @db.VarChar(2)
+  me_description_etendue String?
+  profile_menu           profile_menu[]
+}
+
+model mod_payment {
+  mp_id                                      Int        @id @default(autoincrement())
+  mp_lib                                     String
+  mp_jrn_def_id                              Int
+  mp_fd_id                                   BigInt?
+  mp_qcode                                   String?
+  jrn_def_id                                 BigInt?
+  jrn_def_mod_payment_jrn_def_idTojrn_def    jrn_def?   @relation("mod_payment_jrn_def_idTojrn_def", fields: [jrn_def_id], references: [jrn_def_id], onDelete: Cascade, map: "mod_payment_jrn_def_id_fk")
+  fiche_def                                  fiche_def? @relation(fields: [mp_fd_id], references: [fd_id], onDelete: Cascade)
+  jrn_def_mod_payment_mp_jrn_def_idTojrn_def jrn_def    @relation("mod_payment_mp_jrn_def_idTojrn_def", fields: [mp_jrn_def_id], references: [jrn_def_id], onDelete: Cascade)
+}
+
+model op_predef {
+  od_id          Int     @id(map: "op_def_pkey") @default(autoincrement())
+  jrn_def_id     Int
+  od_name        String
+  od_item        Int
+  od_jrn_type    String
+  od_direct      Boolean
+  od_description String?
+  jrn_def        jrn_def @relation(fields: [jrn_def_id], references: [jrn_def_id], onDelete: Cascade, map: "jrn_def_id_fk")
+
+  @@unique([od_name, jrn_def_id], map: "op_def_op_name_key")
+}
+
+model op_predef_detail {
+  opd_id         Int      @id @default(autoincrement())
+  od_id          Int
+  opd_poste      String
+  opd_amount     Decimal? @db.Decimal(20, 4)
+  opd_tva_id     Int?
+  opd_quantity   Decimal? @db.Decimal(20, 4)
+  opd_debit      Boolean
+  opd_tva_amount Decimal? @db.Decimal(20, 4)
+  opd_comment    String?
+  opd_qc         Boolean?
+}
+
+model operation_analytique {
+  oa_id             Int              @id(map: "historique_analytique_pkey") @default(autoincrement())
+  po_id             Int
+  oa_amount         Decimal          @db.Decimal(20, 4)
+  oa_description    String?
+  oa_debit          Boolean          @default(true)
+  j_id              Int?
+  oa_group          Int              @default(autoincrement())
+  oa_date           DateTime         @db.Date
+  oa_row            Int?
+  oa_jrnx_id_source BigInt?
+  oa_positive       String           @default("Y") @db.Char(1)
+  f_id              BigInt?
+  fiche             fiche?           @relation(fields: [f_id], references: [f_id], onDelete: Cascade, map: "operation_analytique_fiche_id_fk")
+  jrnx              jrnx?            @relation(fields: [j_id], references: [j_id], onDelete: Cascade)
+  poste_analytique  poste_analytique @relation(fields: [po_id], references: [po_id], onDelete: Cascade)
+}
+
+model parameter {
+  pr_id    String  @id
+  pr_value String?
+}
+
+model parm_code {
+  p_code    String  @id
+  p_value   String?
+  p_comment String?
+}
+
+model parm_money {
+  pm_id   Int?     @default(autoincrement())
+  pm_code String   @id @db.Char(3)
+  pm_rate Decimal? @db.Decimal(20, 4)
+}
+
+model parm_periode {
+  p_id                                         Int           @id @default(autoincrement())
+  p_start                                      DateTime      @db.Date
+  p_end                                        DateTime      @db.Date
+  p_exercice                                   String        @default(dbgenerated("to_char(now(), 'YYYY'::text)"))
+  p_closed                                     Boolean?      @default(false)
+  p_central                                    Boolean?      @default(false)
+  forecast_forecast_f_end_dateToparm_periode   forecast[]    @relation("forecast_f_end_dateToparm_periode")
+  forecast_forecast_f_start_dateToparm_periode forecast[]    @relation("forecast_f_start_dateToparm_periode")
+  jrn_periode                                  jrn_periode[]
+
+  @@unique([p_start, p_end], map: "x_periode")
+}
+
+model parm_poste {
+  p_value String @id @db.VarChar(40)
+  p_type  String
+}
+
+model plan_analytique {
+  pa_id                     Int                         @id @default(autoincrement())
+  pa_name                   String                      @unique @default("Sans Nom")
+  pa_description            String?
+  groupe_analytique         groupe_analytique[]
+  key_distribution_activity key_distribution_activity[]
+  poste_analytique          poste_analytique[]
+}
+
+model poste_analytique {
+  po_id                     Int                         @id @default(autoincrement())
+  po_name                   String                      @unique(map: "ux_po_name")
+  pa_id                     Int
+  po_amount                 Decimal                     @default(0.0) @db.Decimal(20, 4)
+  po_description            String?
+  ga_id                     String?                     @db.VarChar(10)
+  key_distribution_activity key_distribution_activity[]
+  operation_analytique      operation_analytique[]
+  plan_analytique           plan_analytique             @relation(fields: [pa_id], references: [pa_id], onDelete: Cascade)
+}
+
+model profile {
+  p_name                                                             String
+  p_id                                                               Int                       @id @default(autoincrement())
+  p_desc                                                             String?
+  with_calc                                                          Boolean?                  @default(true)
+  with_direct_form                                                   Boolean?                  @default(true)
+  action_gestion                                                     action_gestion[]
+  profile_menu                                                       profile_menu[]
+  profile_sec_repository                                             profile_sec_repository[]
+  profile_user                                                       profile_user[]
+  user_sec_action_profile_user_sec_action_profile_p_grantedToprofile user_sec_action_profile[] @relation("user_sec_action_profile_p_grantedToprofile")
+  user_sec_action_profile_user_sec_action_profile_p_idToprofile      user_sec_action_profile[] @relation("user_sec_action_profile_p_idToprofile")
+}
+
+model profile_menu {
+  pm_id             Int               @id @default(autoincrement())
+  me_code           String?
+  me_code_dep       String?
+  p_id              Int?
+  p_order           Int?
+  p_type_display    String
+  pm_default        Int?
+  pm_id_dep         BigInt?
+  menu_ref          menu_ref?         @relation(fields: [me_code], references: [me_code], onDelete: Cascade)
+  profile           profile?          @relation(fields: [p_id], references: [p_id], onDelete: Cascade)
+  profile_menu_type profile_menu_type @relation(fields: [p_type_display], references: [pm_type], onDelete: NoAction, onUpdate: NoAction, map: "profile_menu_type_fkey")
+
+  @@index([me_code], map: "fki_profile_menu_me_code")
+  @@index([p_id], map: "fki_profile_menu_profile")
+  @@index([p_type_display], map: "fki_profile_menu_type_fkey")
+}
+
+model profile_menu_type {
+  pm_type      String         @id
+  pm_desc      String?
+  profile_menu profile_menu[]
+}
+
+model profile_sec_repository {
+  ur_id            BigInt            @id @default(autoincrement())
+  p_id             BigInt?
+  r_id             BigInt?
+  ur_right         String?           @db.Char(1)
+  profile          profile?          @relation(fields: [p_id], references: [p_id], onDelete: Cascade)
+  stock_repository stock_repository? @relation(fields: [r_id], references: [r_id], onDelete: Cascade)
+
+  @@unique([r_id, p_id], map: "profile_sec_repository_r_id_p_id_u")
+}
+
+model profile_user {
+  user_name String
+  pu_id     Int      @id @default(autoincrement())
+  p_id      Int?
+  profile   profile? @relation(fields: [p_id], references: [p_id], onDelete: Cascade)
+
+  @@unique([user_name, p_id], map: "profile_user_user_name_key")
+}
+
+model quant_fin {
+  qf_id                           BigInt   @id(map: "quant_fin_pk") @default(autoincrement())
+  qf_bank                         BigInt?
+  jr_id                           BigInt?  @unique(map: "qf_jr_id")
+  qf_other                        BigInt?
+  qf_amount                       Decimal? @default(0) @db.Decimal(20, 4)
+  fiche_quant_fin_qf_bankTofiche  fiche?   @relation("quant_fin_qf_bankTofiche", fields: [qf_bank], references: [f_id], onDelete: Cascade, map: "fk_card")
+  fiche_quant_fin_qf_otherTofiche fiche?   @relation("quant_fin_qf_otherTofiche", fields: [qf_other], references: [f_id], onDelete: Cascade, map: "fk_card_other")
+  jrn                             jrn?     @relation(fields: [jr_id], references: [jr_id], onDelete: Cascade, map: "fk_jrn")
+}
+
+model quant_purchase {
+  qp_id           Int       @id(map: "qp_id_pk") @default(autoincrement())
+  qp_internal     String?
+  j_id            Int       @unique(map: "qp_j_id")
+  qp_fiche        Int
+  qp_quantite     Decimal   @db.Decimal(20, 4)
+  qp_price        Decimal?  @db.Decimal(20, 4)
+  qp_vat          Decimal?  @default(0.0) @db.Decimal(20, 4)
+  qp_vat_code     Int?
+  qp_nd_amount    Decimal?  @default(0.0) @db.Decimal(20, 4)
+  qp_nd_tva       Decimal?  @default(0.0) @db.Decimal(20, 4)
+  qp_nd_tva_recup Decimal?  @default(0.0) @db.Decimal(20, 4)
+  qp_supplier     Int
+  qp_valid        String    @default("Y") @db.Char(1)
+  qp_dep_priv     Decimal?  @default(0.0) @db.Decimal(20, 4)
+  qp_vat_sided    Decimal?  @default(0.0) @db.Decimal(20, 4)
+  qp_unit         Decimal?  @default(0) @db.Decimal(20, 4)
+  tva_rate        tva_rate? @relation(fields: [qp_vat_code], references: [tva_id], onDelete: NoAction, onUpdate: NoAction, map: "qp_vat_code_fk")
+  jrnx            jrnx      @relation(fields: [j_id], references: [j_id], onDelete: Cascade)
+  jrn             jrn?      @relation(fields: [qp_internal], references: [jr_internal], onDelete: Cascade)
+
+  @@index([qp_internal], map: "quant_purchase_jrn_fki")
+}
+
+model quant_sold {
+  qs_id        Int       @id(map: "qs_id_pk") @default(autoincrement())
+  qs_internal  String?
+  qs_fiche     Int
+  qs_quantite  Decimal   @db.Decimal(20, 4)
+  qs_price     Decimal?  @db.Decimal(20, 4)
+  qs_vat       Decimal?  @db.Decimal(20, 4)
+  qs_vat_code  Int?
+  qs_client    Int
+  qs_valid     String    @default("Y") @db.Char(1)
+  j_id         Int       @unique(map: "qs_j_id")
+  qs_vat_sided Decimal?  @default(0.0) @db.Decimal(20, 4)
+  qs_unit      Decimal?  @default(0) @db.Decimal(20, 4)
+  tva_rate     tva_rate? @relation(fields: [qs_vat_code], references: [tva_id], onDelete: NoAction, onUpdate: NoAction, map: "qs_vat_code_fk")
+  jrnx         jrnx      @relation(fields: [j_id], references: [j_id], onDelete: Cascade)
+  jrn          jrn?      @relation(fields: [qs_internal], references: [jr_internal], onDelete: Cascade)
+
+  @@index([qs_internal], map: "idx_qs_internal")
+  @@index([qs_internal], map: "quant_sold_jrn_fki")
+}
+
+model stock_change {
+  c_id             BigInt            @id @default(autoincrement())
+  c_comment        String?
+  c_date           DateTime?         @db.Date
+  tech_user        String?
+  r_id             BigInt?
+  tech_date        DateTime          @default(now()) @db.Time(6)
+  stock_repository stock_repository? @relation(fields: [r_id], references: [r_id], onDelete: Cascade)
+  stock_goods      stock_goods[]
+}
+
+model stock_goods {
+  sg_id        Int           @id @default(autoincrement())
+  j_id         Int?
+  f_id         Int?
+  sg_code      String?
+  sg_quantity  Decimal?      @default(0) @db.Decimal(8, 4)
+  sg_type      String        @default("c") @db.Char(1)
+  sg_date      DateTime?     @db.Date
+  sg_tech_date DateTime?     @default(now()) @db.Date
+  sg_tech_user String?
+  sg_comment   String?       @db.VarChar(80)
+  sg_exercice  String?       @db.VarChar(4)
+  r_id         BigInt?
+  c_id         BigInt?
+  fiche        fiche?        @relation(fields: [f_id], references: [f_id], onDelete: Cascade, map: "fk_stock_good_f_id")
+  stock_change stock_change? @relation(fields: [c_id], references: [c_id], onDelete: Cascade)
+  jrnx         jrnx?         @relation(fields: [j_id], references: [j_id], onDelete: Cascade)
+
+  @@index([r_id], map: "fk_stock_good_repository_r_id")
+  @@index([f_id], map: "fk_stock_goods_f_id")
+  @@index([j_id], map: "fk_stock_goods_j_id")
+}
+
+model stock_repository {
+  r_id                   BigInt                   @id @default(autoincrement())
+  r_name                 String?
+  r_adress               String?
+  r_country              String?
+  r_city                 String?
+  r_phone                String?
+  profile_sec_repository profile_sec_repository[]
+  stock_change           stock_change[]
+}
+
+model tags {
+  t_id          Int           @id @default(autoincrement())
+  t_tag         String
+  t_description String?
+  t_actif       String?       @default("Y") @db.Char(1)
+  action_tags   action_tags[]
+}
+
+model tmp_pcmn {
+  pcm_val        String        @id @db.VarChar(40)
+  pcm_lib        String?
+  pcm_val_parent String?       @default(dbgenerated("0")) @db.VarChar(40)
+  pcm_type       String?
+  id             BigInt        @unique(map: "id_ux") @default(autoincrement())
+  pcm_direct_use String        @default("Y") @db.VarChar(1)
+  centralized    centralized[]
+  jrnx           jrnx[]
+}
+
+model tmp_stockgood {
+  s_id                 BigInt                 @id @default(autoincrement())
+  s_date               DateTime?              @default(now()) @db.Timestamp(6)
+  tmp_stockgood_detail tmp_stockgood_detail[]
+}
+
+model tmp_stockgood_detail {
+  d_id          BigInt         @id @default(autoincrement())
+  s_id          BigInt?
+  sg_code       String?
+  s_qin         Decimal?       @db.Decimal(20, 4)
+  s_qout        Decimal?       @db.Decimal(20, 4)
+  r_id          BigInt?
+  f_id          BigInt?
+  tmp_stockgood tmp_stockgood? @relation(fields: [s_id], references: [s_id], onDelete: Cascade, onUpdate: NoAction)
+}
+
+model todo_list {
+  tl_id            Int                @id @default(autoincrement())
+  tl_date          DateTime           @db.Date
+  tl_title         String
+  tl_desc          String?
+  use_login        String
+  is_public        String             @default("N") @db.Char(1)
+  todo_list_shared todo_list_shared[]
+}
+
+model todo_list_shared {
+  id           Int       @id @default(autoincrement())
+  todo_list_id Int
+  use_login    String
+  todo_list    todo_list @relation(fields: [todo_list_id], references: [tl_id], onDelete: NoAction, onUpdate: NoAction, map: "fk_todo_list_shared_todo_list")
+
+  @@unique([todo_list_id, use_login], map: "unique_todo_list_id_login")
+}
+
+model tool_uos {
+  uos_value BigInt @id @default(autoincrement())
+}
+
+model tva_rate {
+  tva_id         Int              @id(map: "tva_id_pk") @default(autoincrement())
+  tva_label      String
+  tva_rate       Decimal          @default(0.0) @db.Decimal(8, 4)
+  tva_comment    String?
+  tva_poste      String?
+  tva_both_side  Int?             @default(0)
+  quant_purchase quant_purchase[]
+  quant_sold     quant_sold[]
+}
+
+model user_active_security {
+  id        Int    @id(map: "user_active_security_pk") @default(autoincrement())
+  us_login  String
+  us_ledger String @db.VarChar(1)
+  us_action String @db.VarChar(1)
+}
+
+model user_filter {
+  id              BigInt   @id @default(autoincrement())
+  login           String?
+  nb_jrn          Int?
+  date_start      String?  @db.VarChar(10)
+  date_end        String?  @db.VarChar(10)
+  description     String?
+  amount_min      Decimal? @db.Decimal(20, 4)
+  amount_max      Decimal? @db.Decimal(20, 4)
+  qcode           String?
+  accounting      String?
+  r_jrn           String?
+  date_paid_start String?  @db.VarChar(10)
+  date_paid_end   String?  @db.VarChar(10)
+  ledger_type     String?  @db.VarChar(5)
+  all_ledger      Int?
+  filter_name     String
+  unpaid          String?  @db.VarChar
+}
+
+model user_local_pref {
+  user_id         String
+  parameter_type  String
+  parameter_value String?
+
+  @@id([user_id, parameter_type], map: "pk_user_local_pref")
+}
+
+model user_sec_act {
+  ua_id     Int     @id @default(autoincrement())
+  ua_login  String?
+  ua_act_id Int?
+  action    action? @relation(fields: [ua_act_id], references: [ac_id], onDelete: NoAction, onUpdate: NoAction, map: "$1")
+}
+
+model user_sec_action_profile {
+  ua_id                                              BigInt   @id @default(autoincrement())
+  p_id                                               BigInt?
+  p_granted                                          BigInt?
+  ua_right                                           String?  @db.Char(1)
+  profile_user_sec_action_profile_p_grantedToprofile profile? @relation("user_sec_action_profile_p_grantedToprofile", fields: [p_granted], references: [p_id], onDelete: Cascade)
+  profile_user_sec_action_profile_p_idToprofile      profile? @relation("user_sec_action_profile_p_idToprofile", fields: [p_id], references: [p_id], onDelete: Cascade)
+
+  @@unique([p_id, p_granted], map: "user_sec_action_profile_p_id_p_granted_u")
+}
+
+model user_sec_jrn {
+  uj_id     Int      @id @default(autoincrement())
+  uj_login  String?
+  uj_jrn_id Int?
+  uj_priv   String?
+  jrn_def   jrn_def? @relation(fields: [uj_jrn_id], references: [jrn_def_id], onDelete: Cascade, map: "uj_priv_id_fkey")
+
+  @@unique([uj_login, uj_jrn_id], map: "uj_login_uj_jrn_id")
+  @@unique([uj_login, uj_jrn_id], map: "uniq_user_ledger")
+}
+
+model version {
+  val           Int       @id
+  v_description String?
+  v_date        DateTime? @default(now()) @db.Timestamp(6)
+}
+
+

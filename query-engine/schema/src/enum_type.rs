@@ -15,7 +15,7 @@ pub enum EnumType {
 }
 
 impl EnumType {
-    pub fn name(&self) -> &str {
+    pub fn name(&self) -> String {
         self.identifier().name()
     }
 
@@ -45,8 +45,8 @@ impl EnumType {
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct StringEnumType {
-    pub identifier: Identifier,
-    pub values: Vec<String>,
+    identifier: Identifier,
+    values: Vec<String>,
 }
 
 impl StringEnumType {
@@ -66,8 +66,8 @@ impl StringEnumType {
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct DatabaseEnumType {
-    pub identifier: Identifier,
-    pub internal_enum: InternalEnum,
+    identifier: Identifier,
+    internal_enum: InternalEnum,
 }
 
 impl DatabaseEnumType {
@@ -105,8 +105,8 @@ impl DatabaseEnumType {
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct FieldRefEnumType {
-    pub identifier: Identifier,
-    pub values: Vec<(String, ScalarFieldRef)>,
+    identifier: Identifier,
+    values: Vec<(String, ScalarFieldRef)>,
 }
 
 impl FieldRefEnumType {

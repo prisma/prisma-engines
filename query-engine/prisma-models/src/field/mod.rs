@@ -6,7 +6,7 @@ pub use composite::*;
 pub use relation::*;
 pub use scalar::*;
 
-use crate::{ast, ModelRef};
+use crate::{ast, parent_container::ParentContainer, Model};
 use psl::parser_database::{walkers, ScalarType};
 use std::{borrow::Cow, hash::Hash};
 
@@ -18,6 +18,14 @@ pub enum Field {
 }
 
 impl Field {
+    pub fn borrowed_name<'a>(&self, schema: &'a psl::ValidatedSchema) -> &'a str {
+        match self {
+            Field::Relation(rf) => schema.db.walk(rf.id).name(),
+            Field::Scalar(sf) => sf.borrowed_name(schema),
+            Field::Composite(cf) => cf.borrowed_name(schema),
+        }
+    }
+
     pub fn name(&self) -> &str {
         match self {
             Field::Scalar(ref sf) => sf.name(),
@@ -69,13 +77,6 @@ impl Field {
         }
     }
 
-    pub fn try_into_scalar(self) -> Option<ScalarFieldRef> {
-        match self {
-            Field::Scalar(scalar) => Some(scalar),
-            _ => None,
-        }
-    }
-
     pub fn is_required(&self) -> bool {
         match self {
             Field::Scalar(ref sf) => sf.is_required(),
@@ -92,7 +93,7 @@ impl Field {
         }
     }
 
-    pub fn model(&self) -> Option<ModelRef> {
+    pub fn model(&self) -> Option<Model> {
         match self {
             Self::Scalar(sf) => sf.container().as_model(),
             Self::Relation(rf) => Some(rf.model()),
@@ -123,9 +124,17 @@ impl Field {
             None
         }
     }
+
+    pub fn related_container(&self) -> ParentContainer {
+        match self {
+            Field::Relation(rf) => ParentContainer::from(rf.related_model()),
+            Field::Scalar(sf) => sf.container(),
+            Field::Composite(cf) => ParentContainer::from(cf.typ()),
+        }
+    }
 }
 
-#[derive(Clone, Debug, PartialEq, Eq, Hash)]
+#[derive(Clone, Debug, PartialEq, Eq, Hash, Copy)]
 #[allow(clippy::upper_case_acronyms)]
 pub enum TypeIdentifier {
     String,
@@ -137,7 +146,6 @@ pub enum TypeIdentifier {
     Enum(ast::EnumId),
     UUID,
     Json,
-    Xml,
     DateTime,
     Bytes,
     Unsupported,
@@ -165,7 +173,6 @@ impl TypeIdentifier {
             }
             TypeIdentifier::UUID => "UUID".into(),
             TypeIdentifier::Json => "Json".into(),
-            TypeIdentifier::Xml => "Xml".into(),
             TypeIdentifier::DateTime => "DateTime".into(),
             TypeIdentifier::Bytes => "Bytes".into(),
             TypeIdentifier::Unsupported => "Unsupported".into(),

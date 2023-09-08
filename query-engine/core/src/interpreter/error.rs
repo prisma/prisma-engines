@@ -1,4 +1,4 @@
-use crate::{CoreError, QueryGraphBuilderError, QueryGraphError};
+use crate::{QueryGraphBuilderError, QueryGraphError};
 use connector::error::ConnectorError;
 use prisma_models::DomainError;
 use std::fmt;
@@ -31,12 +31,6 @@ impl fmt::Display for InterpreterError {
             Self::QueryGraphBuilderError(e) => write!(f, "{e:?}"),
             _ => write!(f, "Error occurred during query execution:\n{self:?}"),
         }
-    }
-}
-
-impl From<CoreError> for InterpreterError {
-    fn from(e: CoreError) -> Self {
-        InterpreterError::Generic(format!("{e:?}"))
     }
 }
 

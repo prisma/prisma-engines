@@ -3,14 +3,13 @@ use crate::{
     opt::{CliOpt, PrismaOpt, Subcommand},
     PrismaResult,
 };
-use query_core::{schema::QuerySchema, schema_builder};
+use query_core::schema::{self, QuerySchema};
 use serial_test::serial;
 use std::sync::Arc;
 
 pub fn get_query_schema(datamodel_string: &str) -> QuerySchema {
     let dm = psl::parse_schema(datamodel_string).unwrap();
-    let internal_ref = prisma_models::convert(Arc::new(dm));
-    schema_builder::build(internal_ref, false)
+    schema::build(Arc::new(dm), false)
 }
 
 // Tests in this file run serially because the function `get_query_schema` depends on setting an env var.
@@ -29,7 +28,7 @@ fn must_not_fail_on_missing_env_vars_in_a_datasource() {
         }
     "#;
     let query_schema = get_query_schema(dm);
-    let dmmf = request_handlers::dmmf::render_dmmf(Arc::new(query_schema));
+    let dmmf = request_handlers::dmmf::render_dmmf(&query_schema);
     let inputs = &dmmf.schema.input_object_types;
 
     assert!(!inputs.is_empty());

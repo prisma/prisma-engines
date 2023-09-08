@@ -1,0 +1,61 @@
+{
+    "action": "findMany",
+    "modelName": "website",
+    "query": {
+        "selection": {
+            "id": true,
+            "base_language_install_website_rel": {
+                "selection": {
+                    "base_language_install": {
+                        "selection": {
+                            "overwrite": true,
+                            "write_uid": true,
+                            "lang": true
+                        }
+                    }
+                }
+            },
+            "website_page_website_page_website_idTowebsite": {
+                "selection": {
+                    "id": true,
+                    "res_users_website_page_create_uidTores_users": {
+                        "selection": {
+                            "id": true,
+                            "company_id": true,
+                            "create_uid": true,
+                            "res_users_log_res_users_log_create_uidTores_users": {
+                                "selection": {
+                                    "id": true
+                                }
+                            },
+                            "snailmail_letter_snailmail_letter_create_uidTores_users": {
+                                "selection": {
+                                    "id": true,
+                                    "duplex": true,
+                                    "ir_attachment": {
+                                        "selection": {
+                                            "id": true,
+                                            "res_id": true,
+                                            "type": true,
+                                            "mail_channel": {
+                                                "selection": {
+                                                    "id": true,
+                                                    "mail_moderation": {
+                                                        "selection": {
+                                                            "id": true,
+                                                            "email": true
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

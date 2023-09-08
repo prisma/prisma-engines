@@ -4,31 +4,40 @@ use indexmap::IndexMap;
 use prisma_models::{decode_bytes, parse_datetime, prelude::ParentContainer, Field};
 use query_core::{
     constants::custom_types,
-    schema::{ObjectTypeStrongRef, OutputFieldRef, QuerySchemaRef},
+    schema::{ObjectType, OutputField, QuerySchema},
     ArgumentValue, Operation, Selection,
 };
 use serde_json::Value as JsonValue;
-use std::{collections::HashSet, str::FromStr};
+use std::str::FromStr;
 
 enum OperationType {
     Read,
     Write,
 }
 
-pub struct JsonProtocolAdapter;
+pub struct JsonProtocolAdapter<'a> {
+    query_schema: &'a QuerySchema,
+}
 
-impl JsonProtocolAdapter {
-    pub fn convert_single(query: JsonSingleQuery, query_schema: &QuerySchemaRef) -> crate::Result<Operation> {
+impl<'a> JsonProtocolAdapter<'a> {
+    pub fn new(query_schema: &'a QuerySchema) -> Self {
+        JsonProtocolAdapter { query_schema }
+    }
+
+    pub fn convert_single(&mut self, query: JsonSingleQuery) -> crate::Result<Operation> {
         let JsonSingleQuery {
             model_name,
             action,
             query,
         } = query;
 
-        let (operation_type, field) = Self::find_schema_field(query_schema, model_name, action)?;
-        let container = field.model().map(ParentContainer::from);
+        let (operation_type, field) = self.find_schema_field(model_name, action)?;
+        let container = field
+            .model()
+            .map(|id| self.query_schema.internal_data_model.clone().zip(id))
+            .map(ParentContainer::from);
 
-        let selection = Self::convert_selection(field, container.as_ref(), query)?;
+        let selection = self.convert_selection(&field, container.as_ref(), query)?;
 
         match operation_type {
             OperationType::Read => Ok(Operation::Read(selection)),
@@ -37,7 +46,8 @@ impl JsonProtocolAdapter {
     }
 
     fn convert_selection(
-        field: &OutputFieldRef,
+        &mut self,
+        field: &OutputField<'a>,
         container: Option<&ParentContainer>,
         query: FieldQuery,
     ) -> crate::Result<Selection> {
@@ -54,60 +64,58 @@ impl JsonProtocolAdapter {
         let all_scalars_set = query_selection.all_scalars();
         let all_composites_set = query_selection.all_composites();
 
-        let mut selection = Selection::new(&field.name, None, arguments, Vec::new());
+        let mut selection = Selection::new(field.name().clone(), None, arguments, Vec::new());
 
-        let json_selection = query_selection.selection();
-
-        for (selection_name, selected) in json_selection {
+        for (selection_name, selected) in query_selection.into_selection() {
             match selected {
                 // $scalars: true
                 crate::SelectionSetValue::Shorthand(true) if SelectionSet::is_all_scalars(&selection_name) => {
-                    if let Some(schema_object) = field.field_type.as_object_type() {
-                        Self::default_scalar_selection(&schema_object, &mut selection);
+                    if let Some(schema_object) = field.field_type().as_object_type() {
+                        Self::default_scalar_selection(schema_object, &mut selection);
                     }
                 }
                 // $composites: true
                 crate::SelectionSetValue::Shorthand(true) if SelectionSet::is_all_composites(&selection_name) => {
-                    if let Some(schema_object) = field.field_type.as_object_type() {
+                    if let Some(schema_object) = field.field_type().as_object_type() {
                         if let Some(container) = container {
                             Self::default_composite_selection(
                                 &mut selection,
                                 container,
-                                &schema_object,
-                                &mut HashSet::<String>::new(),
+                                schema_object,
+                                &mut Vec::<String>::new(),
                             )?;
                         }
                     }
                 }
                 // <field_name>: true
                 crate::SelectionSetValue::Shorthand(true) => {
-                    if all_scalars_set {
-                        return Err(HandlerError::query_conversion(format!(
-                            "Cannot select both '$scalars: true' and a specific scalar field '{selection_name}'.",
-                        )));
-                    }
-
-                    selection.push_nested_selection(Selection::with_name(selection_name));
+                    selection.push_nested_selection(self.create_shorthand_selection(
+                        field,
+                        &selection_name,
+                        container,
+                        all_scalars_set,
+                    )?);
                 }
                 // <field_name>: false
                 crate::SelectionSetValue::Shorthand(false) => (),
                 // <field_name>: { selection: { ... }, arguments: { ... } }
                 crate::SelectionSetValue::Nested(nested_query) => {
-                    if let Some(schema_object) = field.field_type.as_object_type() {
-                        let schema_field = schema_object.find_field(&selection_name).ok_or_else(|| {
-                            HandlerError::query_conversion(format!(
-                                "Unknown nested field '{}' for operation {} does not match any query.",
-                                selection_name, &field.name
-                            ))
-                        })?;
+                    if field.field_type().as_object_type().is_some() {
+                        let schema_field = field
+                            .field_type()
+                            .as_object_type()
+                            .and_then(|t| t.find_field(selection_name.as_str()))
+                            .ok_or_else(|| {
+                                HandlerError::query_conversion(format!(
+                                    "Unknown nested field '{}' for operation {} does not match any query.",
+                                    selection_name,
+                                    field.name()
+                                ))
+                            })?;
 
-                        let field = container.and_then(|container| container.find_field(&schema_field.name));
+                        let field = container.and_then(|container| container.find_field(schema_field.name()));
                         let is_composite_field = field.as_ref().map(|f| f.is_composite()).unwrap_or(false);
-                        let nested_container = field.map(|f| match f {
-                            Field::Relation(rf) => ParentContainer::from(rf.related_model()),
-                            Field::Scalar(sf) => sf.container(),
-                            Field::Composite(cf) => ParentContainer::from(cf.typ()),
-                        });
+                        let nested_container = field.map(|f| f.related_container());
 
                         if is_composite_field && all_composites_set {
                             return Err(HandlerError::query_conversion(format!(
@@ -115,8 +123,8 @@ impl JsonProtocolAdapter {
                             )));
                         }
 
-                        selection.push_nested_selection(Self::convert_selection(
-                            &schema_field,
+                        selection.push_nested_selection(self.convert_selection(
+                            schema_field,
                             nested_container.as_ref(),
                             nested_query,
                         )?);
@@ -245,22 +253,61 @@ impl JsonProtocolAdapter {
         }
     }
 
-    fn default_scalar_selection(schema_object: &ObjectTypeStrongRef, selection: &mut Selection) {
+    fn create_shorthand_selection(
+        &mut self,
+        parent_field: &OutputField<'a>,
+        nested_field_name: &str,
+        container: Option<&ParentContainer>,
+        all_scalars_set: bool,
+    ) -> crate::Result<Selection> {
+        let nested_object_type = parent_field
+            .field_type()
+            .as_object_type()
+            .and_then(|parent_object| self.get_output_field(parent_object, nested_field_name))
+            .and_then(|nested_field| nested_field.field_type.as_object_type());
+
+        if let Some(nested_object_type) = nested_object_type {
+            // case for a relation - we select all nested scalar fields and composite fields
+            let mut nested_selection = Selection::new(nested_field_name, None, vec![], vec![]);
+            let nested_container = container
+                .and_then(|c| c.find_field(nested_field_name))
+                .map(|f| f.related_container());
+
+            Self::default_scalar_and_composite_selection(
+                &mut nested_selection,
+                nested_object_type,
+                nested_container.as_ref(),
+            )?;
+
+            return Ok(nested_selection);
+        }
+
+        // case for a scalar - just picking the specified field without any nested selections
+        if all_scalars_set {
+            return Err(HandlerError::query_conversion(format!(
+                "Cannot select both '$scalars: true' and a specific scalar field '{nested_field_name}'.",
+            )));
+        }
+
+        Ok(Selection::with_name(nested_field_name))
+    }
+
+    fn default_scalar_selection(schema_object: &ObjectType, selection: &mut Selection) {
         for scalar in schema_object.get_fields().iter().filter(|f| {
-            f.field_type.is_scalar()
-                || f.field_type.is_scalar_list()
-                || f.field_type.is_enum()
-                || f.field_type.is_enum_list()
+            f.field_type().is_scalar()
+                || f.field_type().is_scalar_list()
+                || f.field_type().is_enum()
+                || f.field_type().is_enum_list()
         }) {
-            selection.push_nested_selection(Selection::with_name(scalar.name.to_owned()));
+            selection.push_nested_selection(Selection::with_name(scalar.name().clone()));
         }
     }
 
     fn default_composite_selection(
         selection: &mut Selection,
         container: &ParentContainer,
-        schema_object: &ObjectTypeStrongRef,
-        walked_types: &mut HashSet<String>,
+        schema_object: &ObjectType,
+        walked_types_stack: &mut Vec<String>,
     ) -> crate::Result<()> {
         match container {
             ParentContainer::Model(model) => {
@@ -273,8 +320,8 @@ impl JsonProtocolAdapter {
                         Self::default_composite_selection(
                             &mut nested_selection,
                             &ParentContainer::from(cf.typ()),
-                            &schema_field.field_type.as_object_type().unwrap(),
-                            walked_types,
+                            schema_field.field_type.as_object_type().unwrap(),
+                            walked_types_stack,
                         )?;
 
                         selection.push_nested_selection(nested_selection);
@@ -282,16 +329,17 @@ impl JsonProtocolAdapter {
                 }
             }
             ParentContainer::CompositeType(ct) => {
-                if walked_types.contains(ct.name()) {
+                let composite_type_name = ct.name().to_owned();
+                if walked_types_stack.contains(&composite_type_name) {
                     return Err(HandlerError::query_conversion(
                         "$composites: true does not support recursive composite types.",
                     ));
                 }
-
-                walked_types.insert(ct.name().to_owned());
-
+                walked_types_stack.push(composite_type_name);
                 for f in ct.fields() {
-                    let schema_field = schema_object.find_field(f.name());
+                    let field_name = f.name().to_owned();
+
+                    let schema_field = schema_object.find_field(&field_name);
 
                     if let Some(schema_field) = schema_field {
                         match f {
@@ -304,8 +352,8 @@ impl JsonProtocolAdapter {
                                 Self::default_composite_selection(
                                     &mut nested_selection,
                                     &ParentContainer::from(cf.typ()),
-                                    &schema_field.field_type.as_object_type().unwrap(),
-                                    walked_types,
+                                    schema_field.field_type.as_object_type().unwrap(),
+                                    walked_types_stack,
                                 )?;
 
                                 selection.push_nested_selection(nested_selection);
@@ -314,22 +362,41 @@ impl JsonProtocolAdapter {
                         }
                     }
                 }
+                let _ = walked_types_stack.pop();
             }
         }
 
         Ok(())
     }
 
+    fn default_scalar_and_composite_selection(
+        selection: &mut Selection,
+        schema_object: &ObjectType,
+        container: Option<&ParentContainer>,
+    ) -> crate::Result<()> {
+        Self::default_scalar_selection(schema_object, selection);
+        if let Some(container) = container {
+            Self::default_composite_selection(selection, container, schema_object, &mut Vec::<String>::new())?;
+        }
+
+        Ok(())
+    }
+
     fn find_schema_field(
-        query_schema: &QuerySchemaRef,
+        &mut self,
         model_name: Option<String>,
         action: crate::Action,
-    ) -> crate::Result<(OperationType, &OutputFieldRef)> {
-        if let Some(field) = query_schema.find_query_field_by_model_and_action(model_name.as_deref(), action.value()) {
+    ) -> crate::Result<(OperationType, OutputField<'a>)> {
+        if let Some(field) = self
+            .query_schema
+            .find_query_field_by_model_and_action(model_name.as_deref(), action.value())
+        {
             return Ok((OperationType::Read, field));
         };
 
-        if let Some(field) = query_schema.find_mutation_field_by_model_and_action(model_name.as_deref(), action.value())
+        if let Some(field) = self
+            .query_schema
+            .find_mutation_field_by_model_and_action(model_name.as_deref(), action.value())
         {
             return Ok((OperationType::Write, field));
         };
@@ -340,16 +407,21 @@ impl JsonProtocolAdapter {
             model_name.unwrap_or_else(|| "None".to_string())
         )))
     }
+
+    fn get_output_field<'b>(&mut self, ty: &'b ObjectType<'a>, name: &str) -> Option<&'b OutputField<'a>> {
+        ty.find_field(name)
+    }
 }
 
 #[cfg(test)]
+#[allow(clippy::needless_raw_string_hashes)]
 mod tests {
     use super::*;
     use insta::assert_debug_snapshot;
     use query_core::schema;
     use std::sync::Arc;
 
-    fn schema() -> schema::QuerySchemaRef {
+    fn schema() -> schema::QuerySchema {
         let schema_str = r#"
           generator client {
             provider        = "prisma-client-js"
@@ -392,9 +464,7 @@ mod tests {
 
         schema.diagnostics.to_result().unwrap();
 
-        let internal_data_model = prisma_models::convert(Arc::new(schema));
-
-        Arc::new(schema_builder::build(internal_data_model, true))
+        schema::build(Arc::new(schema), true)
     }
 
     #[test]
@@ -410,7 +480,7 @@ mod tests {
         )
         .unwrap();
 
-        let operation = JsonProtocolAdapter::convert_single(query, &schema()).unwrap();
+        let operation = JsonProtocolAdapter::new(&schema()).convert_single(query).unwrap();
 
         assert_debug_snapshot!(operation, @r###"
         Read(
@@ -462,7 +532,7 @@ mod tests {
     }
 
     #[test]
-    pub fn default_composite_selection() {
+    fn default_composite_selection() {
         let query: JsonSingleQuery = serde_json::from_str(
             r#"{
             "modelName": "User",
@@ -474,7 +544,7 @@ mod tests {
         )
         .unwrap();
 
-        let operation = JsonProtocolAdapter::convert_single(query, &schema()).unwrap();
+        let operation = JsonProtocolAdapter::new(&schema()).convert_single(query).unwrap();
 
         assert_debug_snapshot!(operation, @r###"
         Write(
@@ -515,7 +585,7 @@ mod tests {
     }
 
     #[test]
-    pub fn explicit_select() {
+    fn explicit_select() {
         let query: JsonSingleQuery = serde_json::from_str(
             r#"{
             "modelName": "User",
@@ -530,7 +600,7 @@ mod tests {
         )
         .unwrap();
 
-        let operation = JsonProtocolAdapter::convert_single(query, &schema()).unwrap();
+        let operation = JsonProtocolAdapter::new(&schema()).convert_single(query).unwrap();
 
         assert_debug_snapshot!(operation, @r###"
         Read(
@@ -552,7 +622,103 @@ mod tests {
     }
 
     #[test]
-    pub fn arguments() {
+    fn relation_shorthand() {
+        let query: JsonSingleQuery = serde_json::from_str(
+            r#"{
+            "modelName": "Post",
+            "action": "findFirst",
+            "query": {
+                "selection": {
+                    "user": true
+                }
+            }
+        }"#,
+        )
+        .unwrap();
+        let operation = JsonProtocolAdapter::new(&schema()).convert_single(query).unwrap();
+        assert_debug_snapshot!(operation, @r###"
+        Read(
+            Selection {
+                name: "findFirstPost",
+                alias: None,
+                arguments: [],
+                nested_selections: [
+                    Selection {
+                        name: "user",
+                        alias: None,
+                        arguments: [],
+                        nested_selections: [
+                            Selection {
+                                name: "id",
+                                alias: None,
+                                arguments: [],
+                                nested_selections: [],
+                            },
+                            Selection {
+                                name: "name",
+                                alias: None,
+                                arguments: [],
+                                nested_selections: [],
+                            },
+                            Selection {
+                                name: "email",
+                                alias: None,
+                                arguments: [],
+                                nested_selections: [],
+                            },
+                            Selection {
+                                name: "role",
+                                alias: None,
+                                arguments: [],
+                                nested_selections: [],
+                            },
+                            Selection {
+                                name: "roles",
+                                alias: None,
+                                arguments: [],
+                                nested_selections: [],
+                            },
+                            Selection {
+                                name: "tags",
+                                alias: None,
+                                arguments: [],
+                                nested_selections: [],
+                            },
+                            Selection {
+                                name: "address",
+                                alias: None,
+                                arguments: [],
+                                nested_selections: [
+                                    Selection {
+                                        name: "number",
+                                        alias: None,
+                                        arguments: [],
+                                        nested_selections: [],
+                                    },
+                                    Selection {
+                                        name: "street",
+                                        alias: None,
+                                        arguments: [],
+                                        nested_selections: [],
+                                    },
+                                    Selection {
+                                        name: "zipCode",
+                                        alias: None,
+                                        arguments: [],
+                                        nested_selections: [],
+                                    },
+                                ],
+                            },
+                        ],
+                    },
+                ],
+            },
+        )
+        "###);
+    }
+
+    #[test]
+    fn arguments() {
         let query: JsonSingleQuery = serde_json::from_str(
             r#"{
             "modelName": "User",
@@ -569,7 +735,7 @@ mod tests {
         )
         .unwrap();
 
-        let operation = JsonProtocolAdapter::convert_single(query, &schema()).unwrap();
+        let operation = JsonProtocolAdapter::new(&schema()).convert_single(query).unwrap();
 
         assert_debug_snapshot!(operation, @r###"
         Read(
@@ -634,7 +800,7 @@ mod tests {
     }
 
     #[test]
-    pub fn nested_arguments() {
+    fn nested_arguments() {
         let query: JsonSingleQuery = serde_json::from_str(
             r#"{
             "modelName": "User",
@@ -654,7 +820,7 @@ mod tests {
         )
         .unwrap();
 
-        let operation = JsonProtocolAdapter::convert_single(query, &schema()).unwrap();
+        let operation = JsonProtocolAdapter::new(&schema()).convert_single(query).unwrap();
 
         assert_debug_snapshot!(operation, @r###"
         Read(
@@ -744,7 +910,7 @@ mod tests {
     }
 
     #[test]
-    pub fn composite_selection_should_be_based_on_schema_1() {
+    fn composite_selection_should_be_based_on_schema_1() {
         let query: JsonSingleQuery = serde_json::from_str(
             r#"{
             "modelName": "User",
@@ -759,7 +925,7 @@ mod tests {
         )
         .unwrap();
 
-        let operation = JsonProtocolAdapter::convert_single(query, &schema()).unwrap();
+        let operation = JsonProtocolAdapter::new(&schema()).convert_single(query).unwrap();
 
         assert_debug_snapshot!(operation, @r###"
         Write(
@@ -781,7 +947,7 @@ mod tests {
     }
 
     #[test]
-    pub fn simple_mutation() {
+    fn simple_mutation() {
         let query: JsonSingleQuery = serde_json::from_str(
             r#"{
             "modelName": "User",
@@ -796,7 +962,7 @@ mod tests {
         )
         .unwrap();
 
-        let operation = JsonProtocolAdapter::convert_single(query, &schema()).unwrap();
+        let operation = JsonProtocolAdapter::new(&schema()).convert_single(query).unwrap();
 
         assert_debug_snapshot!(operation, @r###"
         Write(
@@ -818,7 +984,7 @@ mod tests {
     }
 
     #[test]
-    pub fn scalar_wildcard_and_scalar_selection() {
+    fn scalar_wildcard_and_scalar_selection() {
         let query: JsonSingleQuery = serde_json::from_str(
             r#"{
             "modelName": "User",
@@ -834,7 +1000,7 @@ mod tests {
         )
         .unwrap();
 
-        let operation = JsonProtocolAdapter::convert_single(query, &schema());
+        let operation = JsonProtocolAdapter::new(&schema()).convert_single(query);
 
         assert_debug_snapshot!(operation, @r###"
         Err(
@@ -846,7 +1012,7 @@ mod tests {
     }
 
     #[test]
-    pub fn composite_wildcard_and_composite_selection() {
+    fn composite_wildcard_and_composite_selection() {
         let query: JsonSingleQuery = serde_json::from_str(
             r#"{
             "modelName": "User",
@@ -865,7 +1031,7 @@ mod tests {
         )
         .unwrap();
 
-        let operation = JsonProtocolAdapter::convert_single(query, &schema());
+        let operation = JsonProtocolAdapter::new(&schema()).convert_single(query);
 
         assert_debug_snapshot!(operation, @r###"
         Err(
@@ -877,7 +1043,7 @@ mod tests {
     }
 
     #[test]
-    pub fn composite_wildcard_and_scalar_selection() {
+    fn composite_wildcard_and_scalar_selection() {
         let query: JsonSingleQuery = serde_json::from_str(
             r#"{
             "modelName": "User",
@@ -893,7 +1059,7 @@ mod tests {
         )
         .unwrap();
 
-        let operation = JsonProtocolAdapter::convert_single(query, &schema());
+        let operation = JsonProtocolAdapter::new(&schema()).convert_single(query);
 
         assert_debug_snapshot!(operation, @r###"
         Ok(
@@ -942,7 +1108,7 @@ mod tests {
     }
 
     #[test]
-    pub fn custom_arg_datetime() {
+    fn custom_arg_datetime() {
         let query: JsonSingleQuery = serde_json::from_str(
             r#"{
             "modelName": "User",
@@ -961,7 +1127,7 @@ mod tests {
         )
         .unwrap();
 
-        let operation = JsonProtocolAdapter::convert_single(query, &schema()).unwrap();
+        let operation = JsonProtocolAdapter::new(&schema()).convert_single(query).unwrap();
 
         assert_debug_snapshot!(operation.arguments()[0].1, @r###"
         Object(
@@ -977,7 +1143,7 @@ mod tests {
     }
 
     #[test]
-    pub fn custom_arg_bigint() {
+    fn custom_arg_bigint() {
         let query: JsonSingleQuery = serde_json::from_str(
             r#"{
             "modelName": "User",
@@ -997,7 +1163,7 @@ mod tests {
         )
         .unwrap();
 
-        let operation = JsonProtocolAdapter::convert_single(query, &schema()).unwrap();
+        let operation = JsonProtocolAdapter::new(&schema()).convert_single(query).unwrap();
 
         assert_debug_snapshot!(operation.arguments(), @r###"
         [
@@ -1023,7 +1189,7 @@ mod tests {
     }
 
     #[test]
-    pub fn custom_arg_decimal() {
+    fn custom_arg_decimal() {
         let query: JsonSingleQuery = serde_json::from_str(
             r#"{
             "modelName": "User",
@@ -1042,7 +1208,7 @@ mod tests {
         )
         .unwrap();
 
-        let operation = JsonProtocolAdapter::convert_single(query, &schema()).unwrap();
+        let operation = JsonProtocolAdapter::new(&schema()).convert_single(query).unwrap();
 
         assert_debug_snapshot!(operation.arguments()[0].1, @r###"
         Object(
@@ -1058,7 +1224,7 @@ mod tests {
     }
 
     #[test]
-    pub fn custom_arg_bytes() {
+    fn custom_arg_bytes() {
         let query: JsonSingleQuery = serde_json::from_str(
             r#"{
             "modelName": "User",
@@ -1077,7 +1243,7 @@ mod tests {
         )
         .unwrap();
 
-        let operation = JsonProtocolAdapter::convert_single(query, &schema()).unwrap();
+        let operation = JsonProtocolAdapter::new(&schema()).convert_single(query).unwrap();
 
         assert_debug_snapshot!(operation.arguments()[0].1, @r###"
         Object(
@@ -1098,7 +1264,7 @@ mod tests {
     }
 
     #[test]
-    pub fn custom_arg_json() {
+    fn custom_arg_json() {
         let query: JsonSingleQuery = serde_json::from_str(
             r#"{
             "modelName": "User",
@@ -1117,7 +1283,7 @@ mod tests {
         )
         .unwrap();
 
-        let operation = JsonProtocolAdapter::convert_single(query, &schema()).unwrap();
+        let operation = JsonProtocolAdapter::new(&schema()).convert_single(query).unwrap();
 
         assert_debug_snapshot!(operation.arguments()[0].1, @r###"
         Object(
@@ -1133,7 +1299,7 @@ mod tests {
     }
 
     #[test]
-    pub fn unknown_custom_arg() {
+    fn unknown_custom_arg() {
         let query: JsonSingleQuery = serde_json::from_str(
             r#"{
             "modelName": "User",
@@ -1152,7 +1318,7 @@ mod tests {
         )
         .unwrap();
 
-        let operation = JsonProtocolAdapter::convert_single(query, &schema()).unwrap();
+        let operation = JsonProtocolAdapter::new(&schema()).convert_single(query).unwrap();
 
         assert_debug_snapshot!(operation.arguments()[0].1, @r###"
         Object(
@@ -1177,7 +1343,7 @@ mod tests {
     }
 
     #[test]
-    pub fn invalid_operation() {
+    fn invalid_operation() {
         let query: JsonSingleQuery = serde_json::from_str(
             r#"{
             "modelName": "User",
@@ -1194,7 +1360,7 @@ mod tests {
         )
         .unwrap();
 
-        let operation = JsonProtocolAdapter::convert_single(query, &schema());
+        let operation = JsonProtocolAdapter::new(&schema()).convert_single(query);
 
         assert_debug_snapshot!(operation, @r###"
         Err(
@@ -1206,7 +1372,7 @@ mod tests {
     }
 
     #[test]
-    pub fn query_raw() {
+    fn query_raw() {
         let query: JsonSingleQuery = serde_json::from_str(
             r#"{
             "action": "runCommandRaw",
@@ -1224,7 +1390,7 @@ mod tests {
         )
         .unwrap();
 
-        let operation = JsonProtocolAdapter::convert_single(query, &schema());
+        let operation = JsonProtocolAdapter::new(&schema()).convert_single(query);
 
         assert_debug_snapshot!(operation, @r###"
         Ok(
@@ -1253,7 +1419,7 @@ mod tests {
         "###);
     }
 
-    fn composite_schema() -> schema::QuerySchemaRef {
+    fn composite_schema() -> schema::QuerySchema {
         let schema_str = r#"
           generator client {
             provider        = "prisma-client-js"
@@ -1285,9 +1451,7 @@ mod tests {
 
         schema.diagnostics.to_result().unwrap();
 
-        let internal_data_model = prisma_models::convert(Arc::new(schema));
-
-        Arc::new(schema_builder::build(internal_data_model, true))
+        schema::build(Arc::new(schema), true)
     }
 
     #[test]
@@ -1307,7 +1471,8 @@ mod tests {
         )
         .unwrap();
 
-        let selection = JsonProtocolAdapter::convert_single(query, &composite_schema())
+        let selection = JsonProtocolAdapter::new(&composite_schema())
+            .convert_single(query)
             .unwrap()
             .into_selection();
 
@@ -1362,7 +1527,7 @@ mod tests {
     }
 
     #[test]
-    pub fn nested_composite_wildcard_and_composite_selection() {
+    fn nested_composite_wildcard_and_composite_selection() {
         let query: JsonSingleQuery = serde_json::from_str(
             r#"{
                 "modelName": "Comment",
@@ -1383,12 +1548,324 @@ mod tests {
         )
         .unwrap();
 
-        let operation = JsonProtocolAdapter::convert_single(query, &composite_schema());
+        let operation = JsonProtocolAdapter::new(&composite_schema()).convert_single(query);
 
         assert_debug_snapshot!(operation, @r###"
         Err(
             Configuration(
                 "Cannot select both '$composites: true' and a specific composite field 'upvotes'.",
+            ),
+        )
+        "###);
+    }
+
+    fn recursive_composite_schema() -> schema::QuerySchema {
+        let schema_str = r#"
+          generator client {
+            provider        = "prisma-client-js"
+          }
+          
+          datasource db {
+            provider = "mongodb"
+            url      = "mongodb://"
+          }
+          
+          model List {
+            id String @id @default(auto()) @map("_id") @db.ObjectId
+            head ListNode?
+          }
+          
+          type ListNode  {
+            value Int
+            next ListNode? 
+          }        
+        "#;
+        let mut schema = psl::validate(schema_str.into());
+
+        schema.diagnostics.to_result().unwrap();
+
+        schema::build(Arc::new(schema), true)
+    }
+
+    #[test]
+    fn recursive_composites() {
+        let query: JsonSingleQuery = serde_json::from_str(
+            r#"{
+                "modelName": "List",
+                "action": "createOne",
+                "query": {
+                  "selection": {
+                    "$composites": true
+                  }
+                }
+              }"#,
+        )
+        .unwrap();
+
+        let operation = JsonProtocolAdapter::new(&recursive_composite_schema()).convert_single(query);
+
+        assert_debug_snapshot!(operation, @r###"
+        Err(
+            Configuration(
+                "$composites: true does not support recursive composite types.",
+            ),
+        )
+        "###);
+    }
+
+    fn sibling_composite_schema() -> schema::QuerySchema {
+        let schema_str = r#"
+          generator client {
+            provider        = "prisma-client-js"
+          }
+          
+          datasource db {
+            provider = "mongodb"
+            url      = "mongodb://"
+          }
+          
+          model User {
+            id String @id @default(auto()) @map("_id") @db.ObjectId
+          
+            billingAddress Address
+            shippingAddress Address
+          }
+          
+          type Address {
+            number Int
+            street String
+            zipCode Int
+          }        
+        "#;
+        let mut schema = psl::validate(schema_str.into());
+
+        schema.diagnostics.to_result().unwrap();
+
+        schema::build(Arc::new(schema), true)
+    }
+
+    #[test]
+    fn sibling_composites() {
+        let query: JsonSingleQuery = serde_json::from_str(
+            r#"{
+                "modelName": "User",
+                "action": "createOne",
+                "query": {
+                  "selection": {
+                    "$composites": true
+                  }
+                }
+              }"#,
+        )
+        .unwrap();
+
+        let operation = JsonProtocolAdapter::new(&sibling_composite_schema()).convert_single(query);
+
+        assert_debug_snapshot!(operation, @r###"
+        Ok(
+            Write(
+                Selection {
+                    name: "createOneUser",
+                    alias: None,
+                    arguments: [],
+                    nested_selections: [
+                        Selection {
+                            name: "billingAddress",
+                            alias: None,
+                            arguments: [],
+                            nested_selections: [
+                                Selection {
+                                    name: "number",
+                                    alias: None,
+                                    arguments: [],
+                                    nested_selections: [],
+                                },
+                                Selection {
+                                    name: "street",
+                                    alias: None,
+                                    arguments: [],
+                                    nested_selections: [],
+                                },
+                                Selection {
+                                    name: "zipCode",
+                                    alias: None,
+                                    arguments: [],
+                                    nested_selections: [],
+                                },
+                            ],
+                        },
+                        Selection {
+                            name: "shippingAddress",
+                            alias: None,
+                            arguments: [],
+                            nested_selections: [
+                                Selection {
+                                    name: "number",
+                                    alias: None,
+                                    arguments: [],
+                                    nested_selections: [],
+                                },
+                                Selection {
+                                    name: "street",
+                                    alias: None,
+                                    arguments: [],
+                                    nested_selections: [],
+                                },
+                                Selection {
+                                    name: "zipCode",
+                                    alias: None,
+                                    arguments: [],
+                                    nested_selections: [],
+                                },
+                            ],
+                        },
+                    ],
+                },
+            ),
+        )
+        "###);
+    }
+
+    fn nested_sibling_composite_schema() -> schema::QuerySchema {
+        let schema_str = r#"
+          generator client {
+            provider        = "prisma-client-js"
+          }
+          
+          datasource db {
+            provider = "mongodb"
+            url      = "mongodb://"
+          }
+          
+          model User {
+            id         String    @id @default(auto()) @map("_id") @db.ObjectId
+            billingAddress Address
+            shippingAddress Address
+          }
+          
+          type Address {
+            streetAddress StreetAddress
+            zipCode String
+            city String
+          }
+          
+          type StreetAddress {
+            streetName String
+            houseNumber String
+          }       
+        "#;
+        let mut schema = psl::validate(schema_str.into());
+
+        schema.diagnostics.to_result().unwrap();
+
+        schema::build(Arc::new(schema), true)
+    }
+
+    #[test]
+    pub fn nested_sibling_composites() {
+        let query: JsonSingleQuery = serde_json::from_str(
+            r#"{
+                "modelName": "User",
+                "action": "createOne",
+                "query": {
+                  "selection": {
+                    "$composites": true
+                  }
+                }
+              }"#,
+        )
+        .unwrap();
+
+        let schema = nested_sibling_composite_schema();
+        let mut adapter = JsonProtocolAdapter::new(&schema);
+        let operation = adapter.convert_single(query);
+
+        assert_debug_snapshot!(operation, @r###"
+        Ok(
+            Write(
+                Selection {
+                    name: "createOneUser",
+                    alias: None,
+                    arguments: [],
+                    nested_selections: [
+                        Selection {
+                            name: "billingAddress",
+                            alias: None,
+                            arguments: [],
+                            nested_selections: [
+                                Selection {
+                                    name: "streetAddress",
+                                    alias: None,
+                                    arguments: [],
+                                    nested_selections: [
+                                        Selection {
+                                            name: "streetName",
+                                            alias: None,
+                                            arguments: [],
+                                            nested_selections: [],
+                                        },
+                                        Selection {
+                                            name: "houseNumber",
+                                            alias: None,
+                                            arguments: [],
+                                            nested_selections: [],
+                                        },
+                                    ],
+                                },
+                                Selection {
+                                    name: "zipCode",
+                                    alias: None,
+                                    arguments: [],
+                                    nested_selections: [],
+                                },
+                                Selection {
+                                    name: "city",
+                                    alias: None,
+                                    arguments: [],
+                                    nested_selections: [],
+                                },
+                            ],
+                        },
+                        Selection {
+                            name: "shippingAddress",
+                            alias: None,
+                            arguments: [],
+                            nested_selections: [
+                                Selection {
+                                    name: "streetAddress",
+                                    alias: None,
+                                    arguments: [],
+                                    nested_selections: [
+                                        Selection {
+                                            name: "streetName",
+                                            alias: None,
+                                            arguments: [],
+                                            nested_selections: [],
+                                        },
+                                        Selection {
+                                            name: "houseNumber",
+                                            alias: None,
+                                            arguments: [],
+                                            nested_selections: [],
+                                        },
+                                    ],
+                                },
+                                Selection {
+                                    name: "zipCode",
+                                    alias: None,
+                                    arguments: [],
+                                    nested_selections: [],
+                                },
+                                Selection {
+                                    name: "city",
+                                    alias: None,
+                                    arguments: [],
+                                    nested_selections: [],
+                                },
+                            ],
+                        },
+                    ],
+                },
             ),
         )
         "###);

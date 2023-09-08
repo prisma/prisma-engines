@@ -10,5 +10,4 @@ pub use crate::projections::*;
 pub use crate::record::*;
 pub use crate::relation::*;
 pub use crate::selection_result::*;
-
-pub use dml::{self, prisma_value::*};
+pub use prisma_value::*;

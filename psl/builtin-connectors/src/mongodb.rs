@@ -7,30 +7,31 @@ use enumflags2::BitFlags;
 use mongodb_types::*;
 use psl_core::{
     datamodel_connector::{
-        Connector, ConnectorCapability, ConstraintScope, NativeTypeConstructor, NativeTypeInstance, RelationMode,
+        Connector, ConnectorCapabilities, ConnectorCapability, ConstraintScope, Flavour, NativeTypeConstructor,
+        NativeTypeInstance, RelationMode,
     },
     diagnostics::{Diagnostics, Span},
     parser_database::{walkers::*, ReferentialAction, ScalarType},
 };
 use std::result::Result as StdResult;
 
-const CAPABILITIES: &[ConnectorCapability] = &[
-    ConnectorCapability::Json,
-    ConnectorCapability::Enums,
-    ConnectorCapability::EnumArrayPush,
-    ConnectorCapability::RelationFieldsInArbitraryOrder,
-    ConnectorCapability::CreateMany,
-    ConnectorCapability::ScalarLists,
-    ConnectorCapability::JsonLists,
-    ConnectorCapability::InsensitiveFilters,
-    ConnectorCapability::CompositeTypes,
-    ConnectorCapability::FullTextIndex,
-    ConnectorCapability::SortOrderInFullTextIndex,
-    ConnectorCapability::MongoDbQueryRaw,
-    ConnectorCapability::DefaultValueAuto,
-    ConnectorCapability::TwoWayEmbeddedManyToManyRelation,
-    ConnectorCapability::UndefinedType,
-];
+const CAPABILITIES: ConnectorCapabilities = enumflags2::make_bitflags!(ConnectorCapability::{
+    Json |
+    Enums |
+    EnumArrayPush |
+    RelationFieldsInArbitraryOrder |
+    CreateMany |
+    ScalarLists |
+    JsonLists |
+    InsensitiveFilters |
+    CompositeTypes |
+    FullTextIndex |
+    SortOrderInFullTextIndex |
+    MongoDbQueryRaw |
+    DefaultValueAuto |
+    TwoWayEmbeddedManyToManyRelation |
+    UndefinedType
+});
 
 pub(crate) struct MongoDbDatamodelConnector;
 
@@ -43,7 +44,7 @@ impl Connector for MongoDbDatamodelConnector {
         "MongoDB"
     }
 
-    fn capabilities(&self) -> &'static [ConnectorCapability] {
+    fn capabilities(&self) -> ConnectorCapabilities {
         CAPABILITIES
     }
 
@@ -144,5 +145,9 @@ impl Connector for MongoDbDatamodelConnector {
     /// Avoid checking whether the fields appearing in a `@relation` attribute are included in an index.
     fn should_suggest_missing_referencing_fields_indexes(&self) -> bool {
         false
+    }
+
+    fn flavour(&self) -> Flavour {
+        Flavour::Mongo
     }
 }

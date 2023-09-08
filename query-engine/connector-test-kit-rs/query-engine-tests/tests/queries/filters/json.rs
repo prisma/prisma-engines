@@ -43,7 +43,7 @@ mod json {
         if runner
             .connector()
             .capabilities()
-            .contains(&ConnectorCapability::AdvancedJsonNullability)
+            .contains(ConnectorCapability::AdvancedJsonNullability)
         {
             insta::assert_snapshot!(
               run_query!(&runner, r#"query { findManyTestModel(where: { json: { equals: DbNull }}) { id }}"#),
@@ -85,7 +85,7 @@ mod json {
         if runner
             .connector()
             .capabilities()
-            .contains(&ConnectorCapability::AdvancedJsonNullability)
+            .contains(ConnectorCapability::AdvancedJsonNullability)
         {
             insta::assert_snapshot!(
                 run_query!(&runner, r#"query { findManyTestModel(where: { NOT: [{ json: { equals: DbNull } }]}) { id }}"#),
@@ -128,7 +128,7 @@ mod json {
         if runner
             .connector()
             .capabilities()
-            .contains(&ConnectorCapability::AdvancedJsonNullability)
+            .contains(ConnectorCapability::AdvancedJsonNullability)
         {
             runner
                 .query("mutation { createOneTestModel(data: { id: 1, json: DbNull}) { id }}")
@@ -176,7 +176,7 @@ mod json {
         if runner
             .connector()
             .capabilities()
-            .contains(&ConnectorCapability::AdvancedJsonNullability)
+            .contains(ConnectorCapability::AdvancedJsonNullability)
         {
             // Should work, but not useful with req. fields.
             insta::assert_snapshot!(

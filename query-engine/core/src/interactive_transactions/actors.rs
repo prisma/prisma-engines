@@ -1,8 +1,9 @@
 use super::{CachedTx, TransactionError, TxOpRequest, TxOpRequestMsg, TxOpResponse};
 use crate::{
     execute_many_operations, execute_single_operation, protocol::EngineProtocol,
-    telemetry::helpers::set_span_link_from_traceparent, ClosedTx, OpenTx, Operation, ResponseData, TxId,
+    telemetry::helpers::set_span_link_from_traceparent, ClosedTx, Operation, ResponseData, TxId,
 };
+use connector::Connection;
 use schema::QuerySchemaRef;
 use std::{collections::HashMap, sync::Arc};
 use tokio::{
@@ -23,18 +24,18 @@ enum RunState {
     Finished,
 }
 
-pub struct ITXServer {
+pub struct ITXServer<'a> {
     id: TxId,
-    pub cached_tx: CachedTx,
+    pub cached_tx: CachedTx<'a>,
     pub timeout: Duration,
     receive: Receiver<TxOpRequest>,
     query_schema: QuerySchemaRef,
 }
 
-impl ITXServer {
+impl<'a> ITXServer<'a> {
     pub fn new(
         id: TxId,
-        tx: CachedTx,
+        tx: CachedTx<'a>,
         timeout: Duration,
         receive: Receiver<TxOpRequest>,
         query_schema: QuerySchemaRef,
@@ -111,22 +112,22 @@ impl ITXServer {
         .await
     }
 
-    pub async fn commit(&mut self) -> crate::Result<()> {
+    pub(crate) async fn commit(&mut self) -> crate::Result<()> {
         if let CachedTx::Open(_) = self.cached_tx {
             let open_tx = self.cached_tx.as_open()?;
             trace!("[{}] committing.", self.id.to_string());
-            open_tx.tx.commit().await?;
+            open_tx.commit().await?;
             self.cached_tx = CachedTx::Committed;
         }
 
         Ok(())
     }
 
-    pub async fn rollback(&mut self, was_timeout: bool) -> crate::Result<()> {
+    pub(crate) async fn rollback(&mut self, was_timeout: bool) -> crate::Result<()> {
         debug!("[{}] rolling back, was timed out = {was_timeout}", self.name());
         if let CachedTx::Open(_) = self.cached_tx {
             let open_tx = self.cached_tx.as_open()?;
-            open_tx.tx.rollback().await?;
+            open_tx.rollback().await?;
             if was_timeout {
                 trace!("[{}] Expired Rolling back", self.id.to_string());
                 self.cached_tx = CachedTx::Expired;
@@ -139,7 +140,7 @@ impl ITXServer {
         Ok(())
     }
 
-    pub fn name(&self) -> String {
+    pub(crate) fn name(&self) -> String {
         format!("itx-{:?}", self.id.to_string())
     }
 }
@@ -151,7 +152,7 @@ pub struct ITXClient {
 }
 
 impl ITXClient {
-    pub async fn commit(&self) -> crate::Result<()> {
+    pub(crate) async fn commit(&self) -> crate::Result<()> {
         let msg = self.send_and_receive(TxOpRequestMsg::Commit).await?;
 
         if let TxOpResponse::Committed(resp) = msg {
@@ -162,7 +163,7 @@ impl ITXClient {
         }
     }
 
-    pub async fn rollback(&self) -> crate::Result<()> {
+    pub(crate) async fn rollback(&self) -> crate::Result<()> {
         let msg = self.send_and_receive(TxOpRequestMsg::Rollback).await?;
 
         if let TxOpResponse::RolledBack(resp) = msg {
@@ -183,7 +184,7 @@ impl ITXClient {
         }
     }
 
-    pub async fn batch_execute(
+    pub(crate) async fn batch_execute(
         &self,
         operations: Vec<Operation>,
         traceparent: Option<String>,
@@ -243,37 +244,53 @@ impl ITXClient {
     }
 }
 
-pub fn spawn_itx_actor(
+#[allow(clippy::too_many_arguments)]
+pub(crate) async fn spawn_itx_actor(
     query_schema: QuerySchemaRef,
     tx_id: TxId,
-    value: OpenTx,
+    mut conn: Box<dyn Connection + Send + Sync>,
+    isolation_level: Option<String>,
     timeout: Duration,
     channel_size: usize,
     send_done: Sender<(TxId, Option<ClosedTx>)>,
     engine_protocol: EngineProtocol,
-) -> ITXClient {
-    let (tx_to_server, rx_from_client) = channel::<TxOpRequest>(channel_size);
+) -> crate::Result<ITXClient> {
+    let span = Span::current();
+    let tx_id_str = tx_id.to_string();
+    span.record("itx_id", tx_id_str.as_str());
+    let dispatcher = crate::get_current_dispatcher();
 
+    let (tx_to_server, rx_from_client) = channel::<TxOpRequest>(channel_size);
     let client = ITXClient {
         send: tx_to_server,
         tx_id: tx_id.clone(),
     };
-
-    let mut server = ITXServer::new(
-        tx_id.clone(),
-        CachedTx::Open(value),
-        timeout,
-        rx_from_client,
-        query_schema,
-    );
-    let dispatcher = crate::get_current_dispatcher();
-    let span = Span::current();
-
-    let tx_id_str = tx_id.to_string();
-    span.record("itx_id", tx_id_str.as_str());
+    let (open_transaction_send, open_transaction_rcv) = oneshot::channel();
 
     tokio::task::spawn(
         crate::executor::with_request_context(engine_protocol, async move {
+            // We match on the result in order to send the error to the parent task and abort this
+            // task, on error. This is a separate task (actor), not a function where we can just bubble up the
+            // result.
+            let c_tx = match conn.start_transaction(isolation_level).await {
+                Ok(c_tx) => {
+                    open_transaction_send.send(Ok(())).unwrap();
+                    c_tx
+                }
+                Err(err) => {
+                    open_transaction_send.send(Err(err)).unwrap();
+                    return;
+                }
+            };
+
+            let mut server = ITXServer::new(
+                tx_id.clone(),
+                CachedTx::Open(c_tx),
+                timeout,
+                rx_from_client,
+                query_schema,
+            );
+
             let start_time = Instant::now();
             let sleep = time::sleep(timeout);
             tokio::pin!(sleep);
@@ -312,7 +329,9 @@ pub fn spawn_itx_actor(
         .with_subscriber(dispatcher),
     );
 
-    client
+    open_transaction_rcv.await.unwrap()?;
+
+    Ok(client)
 }
 
 /// Spawn the client list clear actor
@@ -356,7 +375,7 @@ pub fn spawn_itx_actor(
         }
    ```
 */
-pub fn spawn_client_list_clear_actor(
+pub(crate) fn spawn_client_list_clear_actor(
     clients: Arc<RwLock<HashMap<TxId, ITXClient>>>,
     closed_txs: Arc<RwLock<lru::LruCache<TxId, Option<ClosedTx>>>>,
     mut rx: Receiver<(TxId, Option<ClosedTx>)>,

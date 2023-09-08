@@ -3,11 +3,9 @@ pub(crate) mod index_fields;
 use crate::{context::Context, interner::StringId, walkers::IndexFieldWalker, DatamodelError};
 use either::Either;
 use enumflags2::bitflags;
+use rustc_hash::FxHashMap as HashMap;
 use schema_ast::ast::{self, WithName};
-use std::{
-    collections::{BTreeMap, HashMap},
-    fmt,
-};
+use std::{collections::BTreeMap, fmt};
 
 pub(super) fn resolve_types(ctx: &mut Context<'_>) {
     for (top_id, top) in ctx.ast.iter_tops() {
@@ -51,7 +49,7 @@ impl Types {
     pub(super) fn range_model_scalar_fields(
         &self,
         model_id: ast::ModelId,
-    ) -> impl Iterator<Item = (ScalarFieldId, &ScalarField)> {
+    ) -> impl Iterator<Item = (ScalarFieldId, &ScalarField)> + Clone {
         let start = self.scalar_fields.partition_point(|sf| sf.model_id < model_id);
         self.scalar_fields[start..]
             .iter()

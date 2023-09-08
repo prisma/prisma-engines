@@ -61,6 +61,10 @@ impl SelectionResult {
         self.len() == 0
     }
 
+    pub fn db_names(&self) -> impl Iterator<Item = &str> + '_ {
+        self.pairs.iter().map(|(field, _)| field.db_name())
+    }
+
     /// Consumes this `SelectionResult` and splits it into a set of `SelectionResult`s based on the passed
     /// `FieldSelection`s. Assumes that the transformation can be done.
     pub fn split_into(self, field_selections: &[FieldSelection]) -> Vec<SelectionResult> {

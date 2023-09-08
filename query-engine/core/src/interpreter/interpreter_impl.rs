@@ -5,7 +5,6 @@ use super::{
 };
 use crate::{Query, QueryResult};
 use connector::ConnectionLike;
-use crossbeam_queue::SegQueue;
 use futures::future::BoxFuture;
 use prisma_models::prelude::*;
 use std::{collections::HashMap, fmt};
@@ -66,13 +65,14 @@ impl ExpressionResult {
                 },
 
                 // We always select IDs, the unwraps are safe.
-                QueryResult::RecordSelection(rs) => Some(
+                QueryResult::RecordSelection(Some(rs)) => Some(
                     rs.scalars
                         .extract_selection_results(field_selection)
                         .expect("Expected record selection to contain required model ID fields.")
                         .into_iter()
                         .collect(),
                 ),
+                QueryResult::RecordSelection(None) => Some(vec![]),
 
                 _ => None,
             },
@@ -140,9 +140,9 @@ impl Env {
     }
 }
 
-pub struct QueryInterpreter<'conn> {
+pub(crate) struct QueryInterpreter<'conn> {
     pub(crate) conn: &'conn mut dyn ConnectionLike,
-    log: SegQueue<String>,
+    log: Vec<String>,
 }
 
 impl<'conn> fmt::Debug for QueryInterpreter<'conn> {
@@ -156,8 +156,8 @@ impl<'conn> QueryInterpreter<'conn> {
         tracing::level_filters::STATIC_MAX_LEVEL == tracing::level_filters::LevelFilter::TRACE
     }
 
-    pub fn new(conn: &'conn mut dyn ConnectionLike) -> QueryInterpreter<'_> {
-        let log = SegQueue::new();
+    pub(crate) fn new(conn: &'conn mut dyn ConnectionLike) -> QueryInterpreter<'conn> {
+        let mut log = Vec::new();
 
         if Self::log_enabled() {
             log.push("\n".to_string());
@@ -287,17 +287,17 @@ impl<'conn> QueryInterpreter<'conn> {
         }
     }
 
-    pub fn log_output(&self) -> String {
+    pub(crate) fn log_output(&self) -> String {
         let mut output = String::with_capacity(self.log.len() * 30);
 
-        while let Some(s) = self.log.pop() {
-            output.push_str(&s);
+        for s in self.log.iter().rev() {
+            output.push_str(s)
         }
 
         output
     }
 
-    fn log_line<F, S>(&self, level: usize, f: F)
+    fn log_line<F, S>(&mut self, level: usize, f: F)
     where
         S: AsRef<str>,
         F: FnOnce() -> S,

@@ -80,9 +80,7 @@ impl Datasource {
     }
 
     pub fn capabilities(&self) -> ConnectorCapabilities {
-        let capabilities = self.active_connector.capabilities().to_owned();
-
-        ConnectorCapabilities::new(capabilities)
+        self.active_connector.capabilities()
     }
 
     /// The applicable relation mode for this datasource.
@@ -105,7 +103,8 @@ impl Datasource {
                 let s = indoc::formatdoc! {"
                     {err_str}
 
-                    To use a URL with protocol `prisma://` the Data Proxy must be enabled via `prisma generate --data-proxy`.
+                    To use a URL with protocol `prisma://`, you need to either enable Accelerate or the Data Proxy.
+                    Enable Accelerate via `prisma generate --accelerate` or the Data Proxy via `prisma generate --data-proxy.`
 
                     More information about Data Proxy: https://pris.ly/d/data-proxy
                 "};

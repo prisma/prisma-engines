@@ -1,4 +1,4 @@
-use crate::{CompositeType, Field, InternalDataModelRef, Model, ModelRef};
+use crate::{CompositeType, Field, InternalDataModelRef, Model};
 use std::fmt::Debug;
 use std::hash::{Hash, Hasher};
 
@@ -17,7 +17,7 @@ impl ParentContainer {
         }
     }
 
-    pub fn as_model(&self) -> Option<ModelRef> {
+    pub fn as_model(&self) -> Option<Model> {
         match self {
             ParentContainer::Model(m) => Some(m.clone()),
             ParentContainer::CompositeType(_) => None,
@@ -40,7 +40,7 @@ impl ParentContainer {
 
     pub fn fields(&self) -> Vec<Field> {
         match self {
-            ParentContainer::Model(model) => model.fields().filter_all(|_| true),
+            ParentContainer::Model(model) => model.fields().all().collect(),
             ParentContainer::CompositeType(composite) => composite.fields().collect(),
         }
     }
@@ -48,7 +48,6 @@ impl ParentContainer {
     pub fn find_field(&self, prisma_name: &str) -> Option<Field> {
         match self {
             ParentContainer::Model(model) => model.fields().find_from_all(prisma_name).ok(),
-
             ParentContainer::CompositeType(ct) => ct.fields().find(|field| field.name() == prisma_name),
         }
     }
@@ -62,14 +61,14 @@ impl ParentContainer {
     }
 }
 
-impl From<&ModelRef> for ParentContainer {
-    fn from(model: &ModelRef) -> Self {
+impl From<&Model> for ParentContainer {
+    fn from(model: &Model) -> Self {
         Self::Model(model.clone())
     }
 }
 
-impl From<ModelRef> for ParentContainer {
-    fn from(model: ModelRef) -> Self {
+impl From<Model> for ParentContainer {
+    fn from(model: Model) -> Self {
         Self::Model(model)
     }
 }
