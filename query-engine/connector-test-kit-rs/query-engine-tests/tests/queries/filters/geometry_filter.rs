@@ -1,10 +1,6 @@
 use query_engine_tests::*;
 
-#[test_suite(
-    schema(schema),
-    capabilities(GeoJsonGeometry),
-    exclude(Postgres(9, 10, 11, 12, 13, 14, 15, "pgbouncer"))
-)]
+#[test_suite(capabilities(GeoJsonGeometry))]
 mod geometry_filter_spec {
     use query_engine_tests::run_query;
 
@@ -21,8 +17,21 @@ mod geometry_filter_spec {
         schema.to_owned()
     }
 
-    #[connector_test]
-    async fn basic_where(runner: Runner) -> TestResult<()> {
+    fn schema_postgres() -> String {
+        let schema = indoc! {
+            r#"
+            model TestModel {
+              @@schema("test")
+              #id(id, Int, @id)
+              geom GeoJson?
+            }
+          "#
+        };
+
+        schema.to_owned()
+    }
+
+    async fn basic_where_test(runner: Runner) -> TestResult<()> {
         test_data(&runner).await?;
 
         insta::assert_snapshot!(
@@ -43,8 +52,7 @@ mod geometry_filter_spec {
         Ok(())
     }
 
-    #[connector_test]
-    async fn where_shorthands(runner: Runner) -> TestResult<()> {
+    async fn where_shorthands_test(runner: Runner) -> TestResult<()> {
         test_data(&runner).await?;
 
         insta::assert_snapshot!(
@@ -63,8 +71,7 @@ mod geometry_filter_spec {
         Ok(())
     }
 
-    #[connector_test(capabilities(GeometryFiltering))]
-    async fn geometric_comparison_filters(runner: Runner) -> TestResult<()> {
+    async fn geometric_comparison_filters_test(runner: Runner) -> TestResult<()> {
         test_data(&runner).await?;
 
         // geoWithin
@@ -92,6 +99,36 @@ mod geometry_filter_spec {
         );
 
         Ok(())
+    }
+
+    #[connector_test(schema(schema), exclude(Postgres))]
+    async fn basic_where(runner: Runner) -> TestResult<()> {
+        basic_where_test(runner).await
+    }
+
+    #[connector_test(schema(schema), exclude(Postgres))]
+    async fn where_shorthands(runner: Runner) -> TestResult<()> {
+        where_shorthands_test(runner).await
+    }
+
+    #[connector_test(schema(schema), exclude(Postgres))]
+    async fn geometric_comparison_filters(runner: Runner) -> TestResult<()> {
+        geometric_comparison_filters_test(runner).await
+    }
+
+    #[connector_test(schema(schema_postgres), db_schemas("public", "test"), only(Postgres("15-postgis")))]
+    async fn basic_where_postgres(runner: Runner) -> TestResult<()> {
+        basic_where_test(runner).await
+    }
+
+    #[connector_test(schema(schema_postgres), db_schemas("public", "test"), only(Postgres("15-postgis")))]
+    async fn where_shorthands_postgres(runner: Runner) -> TestResult<()> {
+        where_shorthands_test(runner).await
+    }
+
+    #[connector_test(schema(schema_postgres), db_schemas("public", "test"), only(Postgres("15-postgis")))]
+    async fn geometric_comparison_filters_postgres(runner: Runner) -> TestResult<()> {
+        geometric_comparison_filters_test(runner).await
     }
 
     async fn test_data(runner: &Runner) -> TestResult<()> {

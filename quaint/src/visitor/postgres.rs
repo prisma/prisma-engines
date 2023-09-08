@@ -384,7 +384,7 @@ impl<'a> Visitor<'a> for Postgres<'a> {
         // TODO@geometry: file a bug report to PostGIS ? (ERROR:  operator is not unique: geometry <> geometry)
         if left.is_geometry_expr() && right.is_geometry_expr() {
             self.write("NOT ")?;
-            return self.visit_equals(left, right)
+            return self.visit_equals(left, right);
         }
 
         self.visit_expression(left)?;

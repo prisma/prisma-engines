@@ -425,16 +425,11 @@ mod mapped_create {
     }
 }
 
-#[test_suite(
-    schema(geometry_opt),
-    capabilities(GeoJsonGeometry),
-    exclude(Postgres(9, 10, 11, 12, 13, 14, 15, "pgbouncer"))
-)]
+#[test_suite(capabilities(GeoJsonGeometry))]
 mod geometry_create {
     use query_engine_tests::run_query;
 
-    #[connector_test]
-    async fn create_geometry(runner: Runner) -> TestResult<()> {
+    async fn create_geometry_test(runner: Runner) -> TestResult<()> {
         // TODO@geometry: ideally, make geojson generation consistent with SQL connectors
         match_connector_result!(
           &runner,
@@ -455,5 +450,42 @@ mod geometry_create {
         );
 
         Ok(())
+    }
+
+    fn geometry_opt() -> String {
+        let schema = indoc! {
+            r#"model TestModel {
+              #id(id, Int, @id)
+              geometry GeoJson?
+          }"#
+        };
+
+        schema.to_owned()
+    }
+
+    fn geometry_opt_postgres() -> String {
+        let schema = indoc! {
+            r#"model TestModel {
+              @@schema("test")
+              #id(id, Int, @id)
+              geometry GeoJson?
+          }"#
+        };
+
+        schema.to_owned()
+    }
+
+    #[connector_test(schema(geometry_opt), exclude(Postgres))]
+    async fn create_geometry(runner: Runner) -> TestResult<()> {
+        create_geometry_test(runner).await
+    }
+
+    #[connector_test(
+        schema(geometry_opt_postgres),
+        db_schemas("public", "test"),
+        only(Postgres("15-postgis"))
+    )]
+    async fn create_geometry_postgres(runner: Runner) -> TestResult<()> {
+        create_geometry_test(runner).await
     }
 }
