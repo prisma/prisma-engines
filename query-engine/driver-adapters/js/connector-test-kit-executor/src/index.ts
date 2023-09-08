@@ -54,13 +54,57 @@ async function handleRequest(method: string, params: unknown): Promise<unknown> 
             interface QueryPayload {
                 query: string
                 schemaId: number
+                txId?: string
             }
 
             console.error("Got `query`", params)
             const castParams = params as QueryPayload;
-            const result = await schemas[castParams.schemaId].query(JSON.stringify(castParams.query), "")
+            const result = await schemas[castParams.schemaId].query(JSON.stringify(castParams.query), "", castParams.txId)
             console.error("[nodejs] got response from engine: ", result)
 
+            return JSON.parse(result)
+        }
+
+        case 'startTx': {
+            interface StartTxPayload {
+                schemaId: number,
+                options: unknown
+            }
+            console.error("Got `startTx", params)
+            const { schemaId, options } = params as StartTxPayload
+            try {
+                const result = await schemas[schemaId].startTransaction(JSON.stringify(options), "")
+                console.error('!!!!', { result })
+                return JSON.parse(result)
+
+            } catch (error) {
+                console.error('!!!', error)
+                return {}
+
+            }
+
+        }
+
+        case 'commitTx': {
+            interface CommitTxPayload {
+                schemaId: number,
+                txId: string,
+            }
+            console.error("Got `commitTx", params)
+            const { schemaId, txId } = params as CommitTxPayload
+            const result = await schemas[schemaId].commitTransaction(txId, '{}')
+            console.error('!!!', result)
+            return JSON.parse(result)
+        }
+
+        case 'rollbackTx': {
+            interface RollbackTxPayload {
+                schemaId: number,
+                txId: string,
+            }
+            console.error("Got `rollbackTx", params)
+            const { schemaId, txId } = params as RollbackTxPayload
+            const result = await schemas[schemaId].rollbackTransaction(txId, '{}')
             return JSON.parse(result)
         }
         case 'teardown': {

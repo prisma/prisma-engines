@@ -1,6 +1,7 @@
 mod json_adapter;
 
 pub use json_adapter::*;
+use serde::Deserialize;
 
 use crate::{
     executor_process_request, ConnectorTag, ConnectorVersion, QueryResult, TestLogCapture, TestResult, ENGINE_PROTOCOL,
@@ -25,6 +26,25 @@ use std::{
 pub type TxResult = Result<(), user_facing_errors::Error>;
 
 pub(crate) type Executor = Box<dyn QueryExecutor + Send + Sync>;
+
+#[derive(Deserialize, Debug)]
+struct Empty {}
+
+#[derive(Deserialize, Debug)]
+#[serde(untagged)]
+enum TransactionEndResponse {
+    Error(user_facing_errors::Error),
+    Ok(Empty),
+}
+
+impl From<TransactionEndResponse> for TxResult {
+    fn from(value: TransactionEndResponse) -> Self {
+        match value {
+            TransactionEndResponse::Ok(_) => Ok(()),
+            TransactionEndResponse::Error(error) => Err(error),
+        }
+    }
+}
 
 pub enum RunnerExecutor {
     Builtin(Executor),
@@ -124,7 +144,7 @@ impl Runner {
             RunnerExecutor::External(schema_id) => {
                 let json_query = JsonRequest::from_graphql(&query, self.query_schema()).unwrap();
                 let mut response: QueryResult =
-                    executor_process_request("query", json!({ "query": json_query, "schemaId": schema_id })).await?;
+                    executor_process_request("query", json!({ "query": json_query, "schemaId": schema_id, "txId": self.current_tx_id.as_ref().map(ToString::to_string) })).await?;
                 response.detag();
                 return Ok(response);
             }
@@ -178,7 +198,11 @@ impl Runner {
         let executor = match &self.executor {
             RunnerExecutor::Builtin(e) => e,
             RunnerExecutor::External(_) => {
-                return Ok(executor_process_request("query", json!({ "query": query })).await?)
+                return Ok(executor_process_request(
+                    "query",
+                    json!({ "query": query, "txId": self.current_tx_id.as_ref().map(ToString::to_string) }),
+                )
+                .await?)
             }
         };
 
@@ -257,8 +281,10 @@ impl Runner {
                     false => None,
                 };
                 let json_query = JsonBody::Batch(JsonBatchQuery { batch, transaction });
-                let mut response: QueryResult =
-                    executor_process_request("query", json!({ "query": json_query, "schemaId": schema_id })).await?;
+                let mut response: QueryResult = executor_process_request(
+                        "query", 
+                        json!({ "query": json_query, "schemaId": schema_id, "txId": self.current_tx_id.as_ref().map(ToString::to_string) })
+                    ).await?;
                 response.detag();
                 return Ok(response);
             }
@@ -307,44 +333,75 @@ impl Runner {
         valid_for_millis: u64,
         isolation_level: Option<String>,
     ) -> TestResult<TxId> {
-        let executor = match &self.executor {
-            RunnerExecutor::Builtin(e) => e,
-            RunnerExecutor::External(_) => todo!(),
-        };
-
         let tx_opts = TransactionOptions::new(max_acquisition_millis, valid_for_millis, isolation_level);
+        match &self.executor {
+            RunnerExecutor::Builtin(executor) => {
+                let id = executor
+                    .start_tx(self.query_schema.clone(), self.protocol, tx_opts)
+                    .await?;
+                Ok(id)
+            }
+            RunnerExecutor::External(schema_id) => {
+                #[derive(Deserialize, Debug)]
+                #[serde(untagged)]
+                enum StartTransactionResponse {
+                    Ok { id: String },
+                    Error(user_facing_errors::Error),
+                }
+                let response: StartTransactionResponse =
+                    executor_process_request("startTx", json!({ "schemaId": schema_id, "options": tx_opts })).await?;
 
-        let id = executor
-            .start_tx(self.query_schema.clone(), self.protocol, tx_opts)
-            .await?;
-        Ok(id)
+                match response {
+                    StartTransactionResponse::Ok { id } => Ok(id.into()),
+                    StartTransactionResponse::Error(err) => {
+                        Err(crate::TestError::InteractiveTransactionError(err.message().into()))
+                    }
+                }
+            }
+        }
     }
 
     pub async fn commit_tx(&self, tx_id: TxId) -> TestResult<TxResult> {
-        let executor = match &self.executor {
-            RunnerExecutor::Builtin(e) => e,
-            RunnerExecutor::External(_) => todo!(),
-        };
-        let res = executor.commit_tx(tx_id).await;
+        match &self.executor {
+            RunnerExecutor::Builtin(executor) => {
+                let res = executor.commit_tx(tx_id).await;
 
-        if let Err(error) = res {
-            Ok(Err(error.into()))
-        } else {
-            Ok(Ok(()))
+                if let Err(error) = res {
+                    Ok(Err(error.into()))
+                } else {
+                    Ok(Ok(()))
+                }
+            }
+            RunnerExecutor::External(schema_id) => {
+                let response: TransactionEndResponse =
+                    executor_process_request("commitTx", json!({ "schemaId": schema_id, "txId": tx_id.to_string() }))
+                        .await?;
+
+                Ok(response.into())
+            }
         }
     }
 
     pub async fn rollback_tx(&self, tx_id: TxId) -> TestResult<TxResult> {
-        let executor = match &self.executor {
-            RunnerExecutor::Builtin(e) => e,
-            RunnerExecutor::External(_) => todo!(),
-        };
-        let res = executor.rollback_tx(tx_id).await;
+        match &self.executor {
+            RunnerExecutor::Builtin(executor) => {
+                let res = executor.rollback_tx(tx_id).await;
 
-        if let Err(error) = res {
-            Ok(Err(error.into()))
-        } else {
-            Ok(Ok(()))
+                if let Err(error) = res {
+                    Ok(Err(error.into()))
+                } else {
+                    Ok(Ok(()))
+                }
+            }
+            RunnerExecutor::External(schema_id) => {
+                let response: TransactionEndResponse = executor_process_request(
+                    "rollbackTx",
+                    json!({ "schemaId": schema_id, "txId": tx_id.to_string() }),
+                )
+                .await?;
+
+                Ok(response.into())
+            }
         }
     }
 
