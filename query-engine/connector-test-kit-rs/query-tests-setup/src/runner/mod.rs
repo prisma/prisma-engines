@@ -143,8 +143,9 @@ impl Runner {
             RunnerExecutor::Builtin(e) => e,
             RunnerExecutor::External(schema_id) => {
                 let json_query = JsonRequest::from_graphql(&query, self.query_schema()).unwrap();
-                let mut response: QueryResult =
+                let response_str: String =
                     executor_process_request("query", json!({ "query": json_query, "schemaId": schema_id, "txId": self.current_tx_id.as_ref().map(ToString::to_string) })).await?;
+                let mut response: QueryResult = serde_json::from_str(&response_str).unwrap();
                 response.detag();
                 return Ok(response);
             }
@@ -198,11 +199,13 @@ impl Runner {
         let executor = match &self.executor {
             RunnerExecutor::Builtin(e) => e,
             RunnerExecutor::External(_) => {
-                return Ok(executor_process_request(
+                let response_str: String = executor_process_request(
                     "query",
                     json!({ "query": query, "txId": self.current_tx_id.as_ref().map(ToString::to_string) }),
                 )
-                .await?)
+                .await?;
+                let response: QueryResult = serde_json::from_str(&response_str).unwrap();
+                return Ok(response);
             }
         };
 
@@ -281,10 +284,12 @@ impl Runner {
                     false => None,
                 };
                 let json_query = JsonBody::Batch(JsonBatchQuery { batch, transaction });
-                let mut response: QueryResult = executor_process_request(
+                let response_str: String = executor_process_request(
                         "query", 
                         json!({ "query": json_query, "schemaId": schema_id, "txId": self.current_tx_id.as_ref().map(ToString::to_string) })
                     ).await?;
+
+                let mut response: QueryResult = serde_json::from_str(&response_str).unwrap();
                 response.detag();
                 return Ok(response);
             }

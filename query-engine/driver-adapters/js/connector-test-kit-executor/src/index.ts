@@ -66,7 +66,9 @@ async function handleRequest(method: string, params: unknown): Promise<unknown> 
             const result = await schemas[castParams.schemaId].query(JSON.stringify(castParams.query), "", castParams.txId)
             console.error("[nodejs] got response from engine: ", result)
 
-            return JSON.parse(result)
+            // returning unparsed string: otherwise, some information gots lost during this round-trip. 
+            // In particular, floating point without decimal part turn into integers
+            return result
         }
 
         case 'startTx': {
@@ -76,16 +78,10 @@ async function handleRequest(method: string, params: unknown): Promise<unknown> 
             }
             console.error("Got `startTx", params)
             const { schemaId, options } = params as StartTxPayload
-            try {
-                const result = await schemas[schemaId].startTransaction(JSON.stringify(options), "")
-                console.error('!!!!', { result })
-                return JSON.parse(result)
+            const result = await schemas[schemaId].startTransaction(JSON.stringify(options), "")
+            return JSON.parse(result)
 
-            } catch (error) {
-                console.error('!!!', error)
-                return {}
-
-            }
+            
 
         }
 
@@ -97,7 +93,6 @@ async function handleRequest(method: string, params: unknown): Promise<unknown> 
             console.error("Got `commitTx", params)
             const { schemaId, txId } = params as CommitTxPayload
             const result = await schemas[schemaId].commitTransaction(txId, '{}')
-            console.error('!!!', result)
             return JSON.parse(result)
         }
 
