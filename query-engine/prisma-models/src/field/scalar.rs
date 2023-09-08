@@ -218,6 +218,9 @@ pub fn dml_default_kind(default_value: &ast::Expression, scalar_type: Option<Sca
         ast::Expression::Function(funcname, _args, _) if funcname == "cuid" => {
             DefaultKind::Expression(ValueGenerator::new_cuid())
         }
+        ast::Expression::Function(funcname, _args, _) if funcname == "cuid2" => {
+            DefaultKind::Expression(ValueGenerator::new_cuid2())
+        }
         ast::Expression::Function(funcname, args, _) if funcname == "nanoid" => {
             DefaultKind::Expression(ValueGenerator::new_nanoid(
                 args.arguments

@@ -12,6 +12,7 @@ thiserror = "1.0"
 getrandom = { version = "0.2" }
 uuid = { workspace = true, optional = true }
 cuid = { git = "https://github.com/jkomyno/cuid-rust", branch = "jkomyno/wasm32", optional = true }
+cuid2 = { git = "https://github.com/jkomyno/cuid-rust", branch = "jkomyno/wasm32", optional = true }
 nanoid = { version = "0.4.0", optional = true }
 chrono = { version = "0.4.6", features = ["serde"] }
 
@@ -23,8 +24,9 @@ features = ["js"]
 default = []
 
 # Support for generating default UUID, CUID, nanoid and datetime values.
-default_generators = ["cuid", "uuid", "nanoid"]
+default_generators = ["cuid", "cuid2", "uuid", "nanoid"]
 
 cuid = ["dep:cuid"]
+cuid2 = ["dep:cuid2"]
 nanoid = ["dep:nanoid"]
 uuid = ["uuid/v4"]

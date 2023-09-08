@@ -3281,6 +3281,7 @@ dependencies = [
  "bigdecimal",
  "chrono",
  "cuid 1.3.2 (git+https://github.com/jkomyno/cuid-rust?branch=jkomyno/wasm32)",
+ "cuid2 0.1.2 (git+https://github.com/jkomyno/cuid-rust?branch=jkomyno/wasm32)",
  "getrandom 0.2.10",
  "itertools",
  "nanoid",
