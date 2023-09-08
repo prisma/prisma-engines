@@ -606,6 +606,13 @@
 <a href="#606" id="606">606</a>
 <a href="#607" id="607">607</a>
 <a href="#608" id="608">608</a>
+<a href="#609" id="609">609</a>
+<a href="#610" id="610">610</a>
+<a href="#611" id="611">611</a>
+<a href="#612" id="612">612</a>
+<a href="#613" id="613">613</a>
+<a href="#614" id="614">614</a>
+<a href="#615" id="615">615</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Query Engine Metrics
 //! This crate is responsible for capturing and recording metrics in the Query Engine.
 //! Metrics is broken into two parts, `MetricsRecorder` and `MetricsRegistry`, and uses our tracing framework to communicate.
@@ -687,11 +694,18 @@
     MOBC_POOL_CONNECTIONS_IDLE,
     MOBC_POOL_WAIT_COUNT,
     MOBC_POOL_WAIT_DURATION,
-    PRISMA_CLIENT_QUERIES_DURATION_HISTOGRAM_MS,
     PRISMA_CLIENT_QUERIES_TOTAL,
-    PRISMA_DATASOURCE_QUERIES_DURATION_HISTOGRAM_MS,
     PRISMA_DATASOURCE_QUERIES_TOTAL,
+    PRISMA_POOL_CONNECTIONS_OPENED_TOTAL,
+    PRISMA_POOL_CONNECTIONS_CLOSED_TOTAL,
+    PRISMA_POOL_CONNECTIONS_OPEN,
+    PRISMA_POOL_CONNECTIONS_BUSY,
+    PRISMA_POOL_CONNECTIONS_IDLE,
+    PRISMA_CLIENT_QUERIES_WAIT,
     PRISMA_CLIENT_QUERIES_ACTIVE,
+    PRISMA_CLIENT_QUERIES_DURATION_HISTOGRAM_MS,
+    PRISMA_CLIENT_QUERIES_WAIT_HISTOGRAM_MS,
+    PRISMA_DATASOURCE_QUERIES_DURATION_HISTOGRAM_MS,
 ];
 
 <span class="comment">// Some of the metrics we receive have their internal names, and we need to expose them under a different
