@@ -971,16 +971,21 @@ async fn multiple_changed_relation_names_due_to_mapped_models(api: &mut TestApi)
 async fn virtual_cuid_default(api: &mut TestApi) {
     api.barrel()
         .execute(|migration| {
-            migration.create_table("User", |t| {
+            migration.create_table("UserCuid", |t| {
                 t.add_column("id", types::varchar(30).primary(true));
                 t.add_column("non_id", types::varchar(30));
             });
 
-            migration.create_table("User2", |t| {
+            migration.create_table("UserCuid2", |t| {
+                t.add_column("id", types::varchar(25).primary(true));
+                t.add_column("non_id", types::varchar(25));
+            });
+
+            migration.create_table("UserUuid", |t| {
                 t.add_column("id", types::varchar(36).primary(true));
             });
 
-            migration.create_table("User3", |t| {
+            migration.create_table("UserNanoid", |t| {
                 t.add_column("id", types::varchar(21).primary(true));
             });
 
@@ -992,31 +997,41 @@ async fn virtual_cuid_default(api: &mut TestApi) {
         .unwrap();
 
     let input_dm = r#"
-        model User {
+        model UserCuid {
             id        String    @id @default(cuid()) @db.VarChar(30)
             non_id    String    @default(cuid()) @db.VarChar(30)
         }
 
-        model User2 {
+        model UserCuid2 {
+            id        String    @id @default(cuid2()) @db.VarChar(25)
+            non_id    String    @default(cuid2()) @db.VarChar(25)
+        }
+
+        model UserUuid {
             id        String    @id @default(uuid()) @db.VarChar(36)
         }
 
-        model User3 {
+        model UserNanoid {
             id        String    @id @default(nanoid(7)) @db.VarChar(21)
         }
         "#;
 
     let final_dm = indoc! {r#"
-        model User {
+        model UserCuid {
             id        String    @id @default(cuid()) @db.VarChar(30)
             non_id    String    @default(cuid()) @db.VarChar(30)
         }
 
-        model User2 {
+        model UserCuid2 {
+            id        String    @id @default(cuid2()) @db.VarChar(25)
+            non_id    String    @default(cuid2()) @db.VarChar(25)
+        }
+
+        model UserUuid {
             id        String    @id @default(uuid()) @db.VarChar(36)
         }
 
-        model User3 {
+        model UserNanoid {
             id        String    @id @default(nanoid(7)) @db.VarChar(21)
         }
 

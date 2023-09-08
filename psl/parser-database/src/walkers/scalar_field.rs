@@ -192,6 +192,11 @@ impl<'db> DefaultValueWalker<'db> {
         matches!(self.value(), ast::Expression::Function(name, _, _) if name == "cuid")
     }
 
+    /// Is this an `@default(cuid2())`?
+    pub fn is_cuid2(self) -> bool {
+        matches!(self.value(), ast::Expression::Function(name, _, _) if name == "cuid2")
+    }
+
     /// Is this an `@default(nanoid())`?
     pub fn is_nanoid(self) -> bool {
         matches!(self.value(), ast::Expression::Function(name, _, _) if name == "nanoid")

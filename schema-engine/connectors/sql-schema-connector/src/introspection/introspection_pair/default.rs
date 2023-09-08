@@ -16,6 +16,7 @@ pub(crate) enum DefaultKind<'a> {
     Autoincrement,
     Uuid,
     Cuid,
+    Cuid2,
     Nanoid(Option<u8>),
     Now,
     String(&'a str),
@@ -117,6 +118,7 @@ impl<'a> DefaultValuePair<'a> {
 
             (None, sql::ColumnTypeFamily::String | sql::ColumnTypeFamily::Uuid) => match self.previous {
                 Some(previous) if previous.is_cuid() => Some(DefaultKind::Cuid),
+                Some(previous) if previous.is_cuid2() => Some(DefaultKind::Cuid2),
                 Some(previous) if previous.is_uuid() => Some(DefaultKind::Uuid),
                 Some(previous) if previous.is_nanoid() => {
                     let length = previous.value().as_function().and_then(|(_, args, _)| {

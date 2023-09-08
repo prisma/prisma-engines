@@ -3248,6 +3248,7 @@ dependencies = [
  "bigdecimal",
  "chrono",
  "cuid",
+ "cuid2",
  "getrandom 0.2.10",
  "itertools",
  "nanoid",

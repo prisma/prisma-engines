@@ -38,6 +38,24 @@ fn correctly_handle_server_side_cuid_function() {
 }
 
 #[test]
+fn correctly_handle_server_side_cuid2_function() {
+    let dml = indoc! {r#"
+        model User {
+          id Int @id
+          someId String @default(cuid2())
+        }
+    "#};
+
+    psl::parse_schema(dml)
+        .unwrap()
+        .assert_has_model("User")
+        .assert_has_scalar_field("someId")
+        .assert_scalar_type(ScalarType::String)
+        .assert_default_value()
+        .assert_cuid2();
+}
+
+#[test]
 fn correctly_handle_server_side_uuid_function() {
     let dml = indoc! {r#"
         model User {

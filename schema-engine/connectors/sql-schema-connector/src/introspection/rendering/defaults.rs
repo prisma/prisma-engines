@@ -47,6 +47,7 @@ pub(crate) fn render(default: DefaultValuePair<'_>) -> Option<renderer::DefaultV
             DefaultKind::Autoincrement => Some(renderer::DefaultValue::function(Function::new("autoincrement"))),
             DefaultKind::Uuid => Some(renderer::DefaultValue::function(Function::new("uuid"))),
             DefaultKind::Cuid => Some(renderer::DefaultValue::function(Function::new("cuid"))),
+            DefaultKind::Cuid2 => Some(renderer::DefaultValue::function(Function::new("cuid2"))),
             DefaultKind::Nanoid(length) => {
                 let mut fun = Function::new("nanoid");
 
