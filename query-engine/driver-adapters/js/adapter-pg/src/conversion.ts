@@ -41,9 +41,6 @@ export function fieldToColumnType(fieldTypeId: number): ColumnType {
         // Postgres Custom Types
         return ColumnTypeEnum.Enum
       }
-    case 1007:
-      return ColumnTypeEnum.Array
-    default:
       throw new Error(`Unsupported column type: ${fieldTypeId}`)
   }
 }
