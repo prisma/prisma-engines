@@ -4,10 +4,19 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-prisma-models = { path = "../prisma-models" }
 psl.workspace = true
 rustc-hash = "1.1.0"
 once_cell = "1"
+
+[dependencies.prisma-models]
+path = "../prisma-models"
+default-features = false
+features = ["wasm_generators"]
+
+[target.'cfg(not(target_family = "wasm"))'.dependencies.prisma-models]
+path = "../prisma-models"
+default-features = false
+features = ["all"]
 
 [dev-dependencies]
 codspeed-criterion-compat = "1.1.0"
