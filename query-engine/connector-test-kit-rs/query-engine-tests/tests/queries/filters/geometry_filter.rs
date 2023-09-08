@@ -111,7 +111,7 @@ mod geometry_filter_spec {
         where_shorthands_test(runner).await
     }
 
-    #[connector_test(schema(schema), exclude(Postgres))]
+    #[connector_test(schema(schema), exclude(Postgres), capabilities(GeometryFiltering))]
     async fn geometric_comparison_filters(runner: Runner) -> TestResult<()> {
         geometric_comparison_filters_test(runner).await
     }
