@@ -874,11 +874,11 @@ dependencies = [
 [[package]]
 name = "cuid"
 version = "1.3.2"
-source = "git+https://github.com/jkomyno/cuid-rust?branch=jkomyno/wasm32#4f9ce0f3c3991167c7fe7648bc1f2c220fe266b9"
+source = "git+https://github.com/prisma/cuid-rust?branch=jkomyno/wasm32#4f9ce0f3c3991167c7fe7648bc1f2c220fe266b9"
 dependencies = [
  "base36",
- "cuid-util 0.1.0 (git+https://github.com/jkomyno/cuid-rust?branch=jkomyno/wasm32)",
- "cuid2 0.1.2 (git+https://github.com/jkomyno/cuid-rust?branch=jkomyno/wasm32)",
+ "cuid-util 0.1.0 (git+https://github.com/prisma/cuid-rust?branch=jkomyno/wasm32)",
+ "cuid2 0.1.2 (git+https://github.com/prisma/cuid-rust?branch=jkomyno/wasm32)",
  "num",
  "once_cell",
  "rand 0.8.5",
@@ -894,7 +894,7 @@ checksum = "5ea2bfe0336ff1b7ca74819b2df8dfae9afea358aff6b1688baa5c181d8c3713"
 [[package]]
 name = "cuid-util"
 version = "0.1.0"
-source = "git+https://github.com/jkomyno/cuid-rust?branch=jkomyno/wasm32#4f9ce0f3c3991167c7fe7648bc1f2c220fe266b9"
+source = "git+https://github.com/prisma/cuid-rust?branch=jkomyno/wasm32#4f9ce0f3c3991167c7fe7648bc1f2c220fe266b9"
 
 [[package]]
 name = "cuid2"
@@ -911,9 +911,9 @@ dependencies = [
 [[package]]
 name = "cuid2"
 version = "0.1.2"
-source = "git+https://github.com/jkomyno/cuid-rust?branch=jkomyno/wasm32#4f9ce0f3c3991167c7fe7648bc1f2c220fe266b9"
+source = "git+https://github.com/prisma/cuid-rust?branch=jkomyno/wasm32#4f9ce0f3c3991167c7fe7648bc1f2c220fe266b9"
 dependencies = [
- "cuid-util 0.1.0 (git+https://github.com/jkomyno/cuid-rust?branch=jkomyno/wasm32)",
+ "cuid-util 0.1.0 (git+https://github.com/prisma/cuid-rust?branch=jkomyno/wasm32)",
  "num",
  "rand 0.8.5",
  "sha3",
@@ -3280,7 +3280,7 @@ version = "0.0.0"
 dependencies = [
  "bigdecimal",
  "chrono",
- "cuid 1.3.2 (git+https://github.com/jkomyno/cuid-rust?branch=jkomyno/wasm32)",
+ "cuid 1.3.2 (git+https://github.com/prisma/cuid-rust?branch=jkomyno/wasm32)",
  "getrandom 0.2.10",
  "itertools",
  "nanoid",
@@ -3561,7 +3561,7 @@ dependencies = [
  "chrono",
  "connection-string",
  "crossbeam-channel",
- "cuid 1.3.2 (git+https://github.com/jkomyno/cuid-rust?branch=jkomyno/wasm32)",
+ "cuid 1.3.2 (git+https://github.com/prisma/cuid-rust?branch=jkomyno/wasm32)",
  "enumflags2",
  "futures",
  "indexmap 1.9.3",
