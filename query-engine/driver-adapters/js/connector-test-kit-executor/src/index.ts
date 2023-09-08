@@ -59,6 +59,7 @@ async function handleRequest(method: string, params: unknown): Promise<unknown> 
             console.error("Got `query`", params)
             const castParams = params as QueryPayload;
             const result = await schemas[castParams.schemaId].query(JSON.stringify(castParams.query), "")
+            console.error("[nodejs] got response from engine: ", result)
 
             return JSON.parse(result)
         }

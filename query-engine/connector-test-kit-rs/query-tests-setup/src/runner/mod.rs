@@ -245,7 +245,23 @@ impl Runner {
         isolation_level: Option<String>,
     ) -> TestResult<crate::QueryResult> {
         let executor = match &self.executor {
-            RunnerExecutor::External(_) => todo!(),
+            RunnerExecutor::External(schema_id) => {
+                // Translate the GraphQL query to JSON
+                let batch = queries
+                    .into_iter()
+                    .map(|query| JsonRequest::from_graphql(&query, self.query_schema()))
+                    .collect::<TestResult<Vec<_>>>()
+                    .unwrap();
+                let transaction = match transaction {
+                    true => Some(BatchTransactionOption { isolation_level }),
+                    false => None,
+                };
+                let json_query = JsonBody::Batch(JsonBatchQuery { batch, transaction });
+                let mut response: QueryResult =
+                    executor_process_request("query", json!({ "query": json_query, "schemaId": schema_id })).await?;
+                response.detag();
+                return Ok(response);
+            }
             RunnerExecutor::Builtin(e) => e,
         };
 

@@ -29,8 +29,13 @@ impl SimpleGqlError {
 }
 
 #[derive(Serialize, Deserialize, Debug)]
+struct SimpleGqlErrorResponse {
+    #[serde(skip_serializing_if = "Vec::is_empty")]
+    errors: Vec<SimpleGqlError>,
+}
+
+#[derive(Serialize, Deserialize, Debug)]
 struct SimpleGqlResponse {
-    #[serde(default)]
     data: serde_json::Value,
     #[serde(skip_serializing_if = "Vec::is_empty")]
     #[serde(default)]
@@ -43,7 +48,6 @@ struct SimpleGqlResponse {
 #[derive(Serialize, Deserialize, Debug)]
 #[serde(rename_all = "camelCase")]
 struct SimpleGqlBatchResponse {
-    #[serde(default)]
     batch_result: Vec<SimpleGqlResponse>,
     #[serde(skip_serializing_if = "Vec::is_empty")]
     #[serde(default)]
@@ -55,6 +59,7 @@ struct SimpleGqlBatchResponse {
 #[derive(Debug, Serialize, Deserialize)]
 #[serde(untagged)]
 enum Response {
+    Error(SimpleGqlErrorResponse),
     Single(SimpleGqlResponse),
     Multi(SimpleGqlBatchResponse),
 }
@@ -68,6 +73,7 @@ pub struct QueryResult {
 impl QueryResult {
     pub fn failed(&self) -> bool {
         match self.response {
+            Response::Error(ref s) => !s.errors.is_empty(),
             Response::Single(ref s) => !s.errors.is_empty(),
             Response::Multi(ref m) => !(m.errors.is_empty() && m.batch_result.iter().all(|res| res.errors.is_empty())),
         }
@@ -130,6 +136,7 @@ impl QueryResult {
 
     pub fn errors(&self) -> Vec<&SimpleGqlError> {
         match self.response {
+            Response::Error(ref s) => s.errors.iter().collect(),
             Response::Single(ref s) => s.errors.iter().collect(),
             Response::Multi(ref m) => m
                 .errors
@@ -147,8 +154,11 @@ impl QueryResult {
         serde_json::to_string_pretty(&self.response).unwrap()
     }
 
+    /// Transform a JSON protocol response to a GraphQL protocol response, by removing the type
+    /// tags.
     pub(crate) fn detag(&mut self) {
         match &mut self.response {
+            Response::Error(_) => (),
             Response::Single(res) => detag_value(&mut res.data),
             Response::Multi(res) => {
                 for res in &mut res.batch_result {
