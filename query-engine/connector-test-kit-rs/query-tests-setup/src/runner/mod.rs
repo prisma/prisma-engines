@@ -426,7 +426,18 @@ impl Runner {
     }
 
     pub async fn get_logs(&mut self) -> Vec<String> {
-        self.log_capture.get_logs().await
+        let mut logs = self.log_capture.get_logs().await;
+        match &self.executor {
+            RunnerExecutor::Builtin(_) => logs,
+            RunnerExecutor::External(schema_id) => {
+                let mut external_logs: Vec<String> =
+                    executor_process_request("getLogs", json!({ "schemaId": schema_id }))
+                        .await
+                        .unwrap();
+                logs.append(&mut external_logs);
+                logs
+            }
+        }
     }
 
     pub fn connector_version(&self) -> &ConnectorVersion {

@@ -4,7 +4,9 @@ import * as lib from './engines/Library'
 import * as os from 'node:os'
 import * as path from 'node:path'
 
-export function initQueryEngine(driver: pg.PrismaPg, datamodel: string): lib.QueryEngineInstance {
+export type QueryLogCallback = (log: string) => void
+
+export function initQueryEngine(driver: pg.PrismaPg, datamodel: string, queryLogCallback: QueryLogCallback): lib.QueryEngineInstance {
     // I assume nobody will run this on Windows ¯\_(ツ)_/¯
     const libExt = os.platform() === 'darwin' ? 'dylib' : 'so'
     const dirname = path.dirname(new URL(import.meta.url).pathname)
@@ -27,8 +29,12 @@ export function initQueryEngine(driver: pg.PrismaPg, datamodel: string): lib.Que
         ignoreEnvVarErrors: false,
     }
 
-    const logCallback = (...args: any[]) => {
-        console.error("[nodejs] ", args)
+    const logCallback = (event: any) => {
+        const parsed = JSON.parse(event)
+        if (parsed.is_query) {
+            queryLogCallback(parsed.query)
+        }
+        console.error("[nodejs] ", parsed)
     }
     const engine = new QueryEngine(queryEngineOptions, logCallback, bindAdapter(driver))
 

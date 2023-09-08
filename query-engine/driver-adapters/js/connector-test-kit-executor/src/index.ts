@@ -34,6 +34,7 @@ async function main(): Promise<void> {
 }
 
 const schemas: Record<number, engines.QueryEngineInstance> = {}
+const queryLogs: Record<number, string[]> = []
 
 async function handleRequest(method: string, params: unknown): Promise<unknown> {
     switch (method) {
@@ -45,7 +46,10 @@ async function handleRequest(method: string, params: unknown): Promise<unknown> 
             }
 
             const castParams = params as InitializeSchemaParams;
-            const engine = await initQe(castParams.url, castParams.schema);
+            const logs = queryLogs[castParams.schemaId] = [] as string[]
+            const engine = await initQe(castParams.url, castParams.schema, (log) => {
+                logs.push(log)
+            });
             await engine.connect("")
             schemas[castParams.schemaId] = engine
             return null
@@ -115,8 +119,17 @@ async function handleRequest(method: string, params: unknown): Promise<unknown> 
             const castParams = params as TeardownPayload;
             await schemas[castParams.schemaId].disconnect("")
             delete schemas[castParams.schemaId]
+            delete queryLogs[castParams.schemaId]
             return {}
 
+        }
+
+        case 'getLogs': {
+            interface GetLogsPayload {
+                schemaId: number
+            }
+            const castParams = params as GetLogsPayload
+            return queryLogs[castParams.schemaId] ?? []
         }
         default: {
             throw new Error(`Unknown method: \`${method}\``)
@@ -143,10 +156,10 @@ function respondOk(requestId: number, payload: unknown) {
     console.log(JSON.stringify(msg))
 }
 
-async function initQe(url: string, prismaSchema: string): Promise<engines.QueryEngineInstance> {
+async function initQe(url: string, prismaSchema: string, logCallback: qe.QueryLogCallback): Promise<engines.QueryEngineInstance> {
     const pool = new pgDriver.Pool({ connectionString: url })
     const adapter = new pg.PrismaPg(pool)
-    return qe.initQueryEngine(adapter, prismaSchema)
+    return qe.initQueryEngine(adapter, prismaSchema, logCallback)
 }
 
 main().catch(console.error)
