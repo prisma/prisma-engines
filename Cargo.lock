@@ -859,26 +859,11 @@ dependencies = [
 [[package]]
 name = "cuid"
 version = "1.3.2"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "51294db11d38eb763c92936c5c88425d0090e27dce21dd15748134af9e53e739"
-dependencies = [
- "base36",
- "cuid-util 0.1.0 (registry+https://github.com/rust-lang/crates.io-index)",
- "cuid2 0.1.2 (registry+https://github.com/rust-lang/crates.io-index)",
- "hostname",
- "num",
- "once_cell",
- "rand 0.8.5",
-]
-
-[[package]]
-name = "cuid"
-version = "1.3.2"
 source = "git+https://github.com/prisma/cuid-rust?branch=jkomyno/wasm32#4f9ce0f3c3991167c7fe7648bc1f2c220fe266b9"
 dependencies = [
  "base36",
- "cuid-util 0.1.0 (git+https://github.com/prisma/cuid-rust?branch=jkomyno/wasm32)",
- "cuid2 0.1.2 (git+https://github.com/prisma/cuid-rust?branch=jkomyno/wasm32)",
+ "cuid-util",
+ "cuid2",
  "num",
  "once_cell",
  "rand 0.8.5",
@@ -888,32 +873,14 @@ dependencies = [
 [[package]]
 name = "cuid-util"
 version = "0.1.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "5ea2bfe0336ff1b7ca74819b2df8dfae9afea358aff6b1688baa5c181d8c3713"
-
-[[package]]
-name = "cuid-util"
-version = "0.1.0"
 source = "git+https://github.com/prisma/cuid-rust?branch=jkomyno/wasm32#4f9ce0f3c3991167c7fe7648bc1f2c220fe266b9"
-
-[[package]]
-name = "cuid2"
-version = "0.1.2"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "47d99cacd52fd67db7490ad051c8c1973fb75520174d69aabbae08c534c9d0e8"
-dependencies = [
- "cuid-util 0.1.0 (registry+https://github.com/rust-lang/crates.io-index)",
- "num",
- "rand 0.8.5",
- "sha3",
-]
 
 [[package]]
 name = "cuid2"
 version = "0.1.2"
 source = "git+https://github.com/prisma/cuid-rust?branch=jkomyno/wasm32#4f9ce0f3c3991167c7fe7648bc1f2c220fe266b9"
 dependencies = [
- "cuid-util 0.1.0 (git+https://github.com/prisma/cuid-rust?branch=jkomyno/wasm32)",
+ "cuid-util",
  "num",
  "rand 0.8.5",
  "sha3",
@@ -2423,7 +2390,7 @@ dependencies = [
  "bigdecimal",
  "bson",
  "chrono",
- "cuid 1.3.2 (registry+https://github.com/rust-lang/crates.io-index)",
+ "cuid",
  "futures",
  "indexmap 1.9.3",
  "itertools",
@@ -3280,7 +3247,7 @@ version = "0.0.0"
 dependencies = [
  "bigdecimal",
  "chrono",
- "cuid 1.3.2 (git+https://github.com/prisma/cuid-rust?branch=jkomyno/wasm32)",
+ "cuid",
  "getrandom 0.2.10",
  "itertools",
  "nanoid",
@@ -3561,7 +3528,7 @@ dependencies = [
  "chrono",
  "connection-string",
  "crossbeam-channel",
- "cuid 1.3.2 (git+https://github.com/prisma/cuid-rust?branch=jkomyno/wasm32)",
+ "cuid",
  "enumflags2",
  "futures",
  "indexmap 1.9.3",
@@ -4720,7 +4687,7 @@ dependencies = [
  "async-trait",
  "bigdecimal",
  "chrono",
- "cuid 1.3.2 (registry+https://github.com/rust-lang/crates.io-index)",
+ "cuid",
  "futures",
  "itertools",
  "once_cell",
