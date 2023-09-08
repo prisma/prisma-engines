@@ -285,6 +285,11 @@ impl<'a> Visitor<'a> for Mysql<'a> {
         }
     }
 
+    fn visit_parameterized(&mut self, value: Value<'a>) -> visitor::Result {
+        self.add_parameter(value);
+        self.parameter_substitution()
+    }
+
     fn parameter_substitution(&mut self) -> visitor::Result {
         self.write("?")
     }
