@@ -20,6 +20,8 @@
     "prisma:planetscale": "cross-env-shell DATABASE_URL=\"${JS_PLANETSCALE_DATABASE_URL}\" \"pnpm prisma:db:push:mysql && pnpm prisma:db:execute:mysql\"",
     "planetscale": "cross-env-shell DATABASE_URL=\"${JS_PLANETSCALE_DATABASE_URL}\" \"tsx ./src/libquery/planetscale.ts\"",
     "planetscale:client": "DATABASE_URL=\"${JS_PLANETSCALE_DATABASE_URL}\" node --test --loader=tsx ./src/client/planetscale.test.ts",
+    
+    "prisma:generate:fake": "prisma generate --schema ./prisma/postgres/schema.prisma",
     "fake": "tsx ./src/libquery/fake.ts",
     "fake:client": "node --test --loader=tsx ./src/client/fake.test.ts"
   },
