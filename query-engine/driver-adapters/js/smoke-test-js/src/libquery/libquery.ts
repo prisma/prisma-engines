@@ -13,12 +13,19 @@ export async function smokeTestLibquery(db: ErrorCapturingDriverAdapter, prismaS
 
   const test = new SmokeTest(engine, db)
 
+  console.log("[libquery smoke test] testJSON")
   await test.testJSON()
+  console.log("[libquery smoke test] testTypeTest2")
   await test.testTypeTest2()
+  console.log("[libquery smoke test] testFindManyTypeTest")
   await test.testFindManyTypeTest()
+  console.log("[libquery smoke test] createAutoIncrement")
   await test.createAutoIncrement()
+  console.log("[libquery smoke test] testCreateAndDeleteChildParent")
   await test.testCreateAndDeleteChildParent()
+  console.log("[libquery smoke test] testTransaction")
   await test.testTransaction()
+  console.log("[libquery smoke test] testRawError")
   await test.testRawError()
 
   // Note: calling `engine.disconnect` won't actually close the database connection.

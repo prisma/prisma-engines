@@ -6,7 +6,8 @@ describe('fake with @prisma/client', async () => {
   // const connectionString = `${process.env.JS_PG_DATABASE_URL as string}`
 
   // const pool = new pg.Pool({ connectionString })
-  const adapter = new PrismaFake(undefined)
+  const driver = { query: "foo" }
+  const adapter = new PrismaFake(driver)
   
   smokeTestClient(adapter)
 })
