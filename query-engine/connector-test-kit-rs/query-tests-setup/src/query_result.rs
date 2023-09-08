@@ -23,8 +23,8 @@ impl SimpleGqlError {
             .unwrap_or(&self.error)
     }
 
-    pub fn batch_request_idx(&self) -> Option<usize> {
-        todo!()
+    pub fn batch_request_idx(&self) -> Option<u64> {
+        self.user_facing_error.as_ref()?["batch_request_idx"].as_u64()
     }
 }
 
