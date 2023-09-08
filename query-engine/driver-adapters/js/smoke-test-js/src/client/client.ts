@@ -19,7 +19,7 @@ export async function smokeTestClient(driverAdapter: DriverAdapter) {
       it('batch queries', async () => {
         const prisma = new PrismaClient({
           // @ts-ignore
-          jsConnector: adapter,
+          adapter,
           log,
         })
     
@@ -75,7 +75,7 @@ export async function smokeTestClient(driverAdapter: DriverAdapter) {
       it('applies isolation level when using batch $transaction', async () => {
         const prisma = new PrismaClient({
           // @ts-ignore
-          jsConnector: adapter,
+          adapter,
           log,
         })
     
