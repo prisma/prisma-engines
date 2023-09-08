@@ -19,7 +19,9 @@
     "pg:client": "DATABASE_URL=\"${JS_PG_DATABASE_URL}\" node --test --loader=tsx ./src/client/pg.test.ts",
     "prisma:planetscale": "cross-env-shell DATABASE_URL=\"${JS_PLANETSCALE_DATABASE_URL}\" \"pnpm prisma:db:push:mysql && pnpm prisma:db:execute:mysql\"",
     "planetscale": "cross-env-shell DATABASE_URL=\"${JS_PLANETSCALE_DATABASE_URL}\" \"tsx ./src/libquery/planetscale.ts\"",
-    "planetscale:client": "DATABASE_URL=\"${JS_PLANETSCALE_DATABASE_URL}\" node --test --loader=tsx ./src/client/planetscale.test.ts"
+    "planetscale:client": "DATABASE_URL=\"${JS_PLANETSCALE_DATABASE_URL}\" node --test --loader=tsx ./src/client/planetscale.test.ts",
+    "fake": "tsx ./src/libquery/fake.ts",
+    "fake:client": "node --test --loader=tsx ./src/client/fake.test.ts"
   },
   "keywords": [],
   "author": "Alberto Schiabel <schiabel@prisma.io>",
@@ -29,6 +31,7 @@
     "@jkomyno/prisma-adapter-neon": "workspace:*",
     "@jkomyno/prisma-adapter-planetscale": "workspace:*",
     "@jkomyno/prisma-adapter-pg": "workspace:*",
+    "@jkomyno/prisma-adapter-fake": "workspace:*",
     "@jkomyno/prisma-driver-adapter-utils": "workspace:*",
     "@neondatabase/serverless": "^0.6.0",
     "@planetscale/database": "^1.11.0",

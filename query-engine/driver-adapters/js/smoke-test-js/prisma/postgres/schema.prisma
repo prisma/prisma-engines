@@ -5,7 +5,7 @@ generator client {
 
 datasource db {
   provider = "postgres"
-  url      = env("DATABASE_URL")
+  url      = "postgres://fake"
 }
 
 model type_test {

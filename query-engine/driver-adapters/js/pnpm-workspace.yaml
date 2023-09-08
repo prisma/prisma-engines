@@ -4,3 +4,4 @@ packages:
   - './adapter-pg'
   - './driver-adapter-utils'
   - './smoke-test-js'
+  - './adapter-fake'

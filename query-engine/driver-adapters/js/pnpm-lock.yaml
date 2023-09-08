@@ -18,6 +18,12 @@ importers:
         specifier: ^5.1.6
         version: 5.1.6
 
+  adapter-fake:
+    dependencies:
+      '@jkomyno/prisma-driver-adapter-utils':
+        specifier: workspace:*
+        version: link:../driver-adapter-utils
+
   adapter-neon:
     dependencies:
       '@jkomyno/prisma-driver-adapter-utils':
@@ -63,6 +69,9 @@ importers:
 
   smoke-test-js:
     dependencies:
+      '@jkomyno/prisma-adapter-fake':
+        specifier: workspace:*
+        version: link:../adapter-fake
       '@jkomyno/prisma-adapter-neon':
         specifier: workspace:*
         version: link:../adapter-neon
