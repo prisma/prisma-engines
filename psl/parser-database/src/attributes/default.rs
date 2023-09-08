@@ -243,7 +243,7 @@ fn validate_composite_builtin_scalar_type_default(
     match (scalar_type, value) {
         // Functions
         (ScalarType::String, ast::Expression::Function(funcname, funcargs, _))
-            if funcname == FN_UUID || funcname == FN_CUID || funcname == FN_CUID =>
+            if [FN_UUID, FN_CUID, FN_CUID2].contains(&funcname.as_str()) =>
         {
             validate_empty_function_args(funcname, &funcargs.arguments, accept, ctx)
         }
