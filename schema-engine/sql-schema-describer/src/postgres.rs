@@ -1006,7 +1006,6 @@ impl<'a> SqlSchemaDescriber<'a> {
         static GEOM_REGEX: Lazy<Regex> =
             Lazy::new(|| Regex::new(r"^(?P<class>geometry|geography)(\((?P<type>.+?)(,(?P<srid>\d+))?\))?$").unwrap());
         GEOM_REGEX.captures(col).and_then(|capture| {
-            let is_geography = capture.name("class").map(|c| c.as_str() == "geography").unwrap();
             let geom_type = capture
                 .name("type")
                 .map(|t| GeometryType::from_str(t.as_str()))
