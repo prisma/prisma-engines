@@ -976,7 +976,10 @@ impl<'a> SqlSchemaDescriber<'a> {
         Ok(())
     }
 
-    fn get_geometry_info(col: &str) -> Option<GeometryParams> {
+    fn get_geometry_info(col: &str, circumstances: &BitFlags<Circumstances>) -> Option<GeometryParams> {
+        if !circumstances.contains(Circumstances::HasPostGIS) {
+            return None;
+        }
         static GEOM_REGEX: Lazy<Regex> =
             Lazy::new(|| Regex::new(r"^(?P<class>geometry|geography)(\((?P<type>.+?)(,(?P<srid>\d+))?\))?$").unwrap());
         GEOM_REGEX.captures(col).and_then(|capture| {
@@ -984,7 +987,12 @@ impl<'a> SqlSchemaDescriber<'a> {
                 .name("type")
                 .map(|t| GeometryType::from_str(t.as_str()))
                 .unwrap_or(Ok(GeometryType::default()));
-            let srid = capture.name("srid").map(|v| v.as_str().parse::<i32>()).unwrap_or(Ok(0));
+            let is_cockroach = circumstances.contains(Circumstances::Cockroach);
+            let is_geography = capture.name("class").map(|c| c.as_str() == "geography").unwrap();
+            let srid = capture
+                .name("srid")
+                .map(|v| v.as_str().parse::<i32>())
+                .unwrap_or(Ok(if is_geography && !is_cockroach { 4326 } else { 0 }));
             match (geom_type, srid) {
                 (Ok(ty), Ok(srid)) => Some(GeometryParams { ty, srid }),
                 _ => None,
@@ -1572,10 +1580,7 @@ fn get_column_type_postgresql(
         false => ColumnArity::Nullable,
     };
 
-    let geometry = match circumstances.contains(Circumstances::HasPostGIS) {
-        true => SqlSchemaDescriber::get_geometry_info(&formatted_type),
-        false => None,
-    };
+    let geometry = SqlSchemaDescriber::get_geometry_info(&formatted_type, circumstances);
     let precision = SqlSchemaDescriber::get_precision(row);
     let unsupported_type = || (Unsupported(full_data_type.clone()), None);
     let enum_id: Option<_> = match data_type.as_str() {
@@ -1681,10 +1686,7 @@ fn get_column_type_cockroachdb(
         false => ColumnArity::Nullable,
     };
 
-    let geometry_type = match circumstances.contains(Circumstances::HasPostGIS) {
-        true => SqlSchemaDescriber::get_geometry_info(&data_type),
-        false => None,
-    };
+    let geometry_type = SqlSchemaDescriber::get_geometry_info(&data_type, circumstances);
     let precision = SqlSchemaDescriber::get_precision(row);
     let unsupported_type = || (Unsupported(full_data_type.clone()), None);
     let enum_id: Option<_> = match data_type.as_str() {
