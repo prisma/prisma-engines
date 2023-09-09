@@ -39,7 +39,6 @@ const TYPES: &[(&str, &str)] = &[
 const GEOMETRY_TYPES: &[(&str, &str)] = &[
     ("geometry", "Geometry"),
     ("geometry_geometry", "Geometry(Geometry)"),
-    ("geometry_geometry_srid", "Geometry(Geometry, 4326)"),
     ("geometry_geometry_m", "Geometry(GeometryM)"),
     ("geometry_geometry_z", "Geometry(GeometryZ)"),
     ("geometry_geometry_zm", "Geometry(GeometryZM)"),
@@ -73,7 +72,6 @@ const GEOMETRY_TYPES: &[(&str, &str)] = &[
     ("geometry_geometrycollection_zm", "Geometry(GeometryCollectionZM)"),
     ("geography", "Geography"),
     ("geography_geometry", "Geography(Geometry)"),
-    ("geography_geometry_srid", "Geography(Geometry, 4326)"),
     ("geography_geometry_m", "Geography(GeometryM)"),
     ("geography_geometry_z", "Geography(GeometryZ)"),
     ("geography_geometry_zm", "Geography(GeometryZM)"),
@@ -140,38 +138,38 @@ const GEOMETRY_EXTRA_TYPES: &[(&str, &str)] = &[
     ("geometry_tinm", "Geometry(TinM)"),
     ("geometry_tinz", "Geometry(TinZ)"),
     ("geometry_tinzm", "Geometry(TinZM)"),
-    ("geography_circularstring", "Geography(CircularString)"),
-    ("geography_circularstringm", "Geography(CircularStringM)"),
-    ("geography_circularstringz", "Geography(CircularStringZ)"),
-    ("geography_circularstringzm", "Geography(CircularStringZM)"),
-    ("geography_compoundcurve", "Geography(CompoundCurve)"),
-    ("geography_compoundcurvem", "Geography(CompoundCurveM)"),
-    ("geography_compoundcurvez", "Geography(CompoundCurveZ)"),
-    ("geography_compoundcurvezm", "Geography(CompoundCurveZM)"),
-    ("geography_curvepolygon", "Geography(CurvePolygon)"),
-    ("geography_curvepolygonm", "Geography(CurvePolygonM)"),
-    ("geography_curvepolygonz", "Geography(CurvePolygonZ)"),
-    ("geography_curvepolygonzm", "Geography(CurvePolygonZM)"),
-    ("geography_multicurve", "Geography(MultiCurve)"),
-    ("geography_multicurvem", "Geography(MultiCurveM)"),
-    ("geography_multicurvez", "Geography(MultiCurveZ)"),
-    ("geography_multicurvezm", "Geography(MultiCurveZM)"),
-    ("geography_multisurface", "Geography(MultiSurface)"),
-    ("geography_multisurfacem", "Geography(MultiSurfaceM)"),
-    ("geography_multisurfacez", "Geography(MultiSurfaceZ)"),
-    ("geography_multisurfacezm", "Geography(MultiSurfaceZM)"),
-    ("geography_polyhedralsurface", "Geography(PolyhedralSurface)"),
-    ("geography_polyhedralsurfacem", "Geography(PolyhedralSurfaceM)"),
-    ("geography_polyhedralsurfacez", "Geography(PolyhedralSurfaceZ)"),
-    ("geography_polyhedralsurfacezm", "Geography(PolyhedralSurfaceZM)"),
-    ("geography_triangle", "Geography(Triangle)"),
-    ("geography_trianglem", "Geography(TriangleM)"),
-    ("geography_trianglez", "Geography(TriangleZ)"),
-    ("geography_trianglezm", "Geography(TriangleZM)"),
-    ("geography_tin", "Geography(Tin)"),
-    ("geography_tinm", "Geography(TinM)"),
-    ("geography_tinz", "Geography(TinZ)"),
-    ("geography_tinzm", "Geography(TinZM)"),
+    ("geography_circularstring", "Geography(CircularString, 4326)"),
+    ("geography_circularstringm", "Geography(CircularStringM, 4326)"),
+    ("geography_circularstringz", "Geography(CircularStringZ, 4326)"),
+    ("geography_circularstringzm", "Geography(CircularStringZM, 4326)"),
+    ("geography_compoundcurve", "Geography(CompoundCurve, 4326)"),
+    ("geography_compoundcurvem", "Geography(CompoundCurveM, 4326)"),
+    ("geography_compoundcurvez", "Geography(CompoundCurveZ, 4326)"),
+    ("geography_compoundcurvezm", "Geography(CompoundCurveZM, 4326)"),
+    ("geography_curvepolygon", "Geography(CurvePolygon, 4326)"),
+    ("geography_curvepolygonm", "Geography(CurvePolygonM, 4326)"),
+    ("geography_curvepolygonz", "Geography(CurvePolygonZ, 4326)"),
+    ("geography_curvepolygonzm", "Geography(CurvePolygonZM, 4326)"),
+    ("geography_multicurve", "Geography(MultiCurve, 4326)"),
+    ("geography_multicurvem", "Geography(MultiCurveM, 4326)"),
+    ("geography_multicurvez", "Geography(MultiCurveZ, 4326)"),
+    ("geography_multicurvezm", "Geography(MultiCurveZM, 4326)"),
+    ("geography_multisurface", "Geography(MultiSurface, 4326)"),
+    ("geography_multisurfacem", "Geography(MultiSurfaceM, 4326)"),
+    ("geography_multisurfacez", "Geography(MultiSurfaceZ, 4326)"),
+    ("geography_multisurfacezm", "Geography(MultiSurfaceZM, 4326)"),
+    ("geography_polyhedralsurface", "Geography(PolyhedralSurface, 4326)"),
+    ("geography_polyhedralsurfacem", "Geography(PolyhedralSurfaceM, 4326)"),
+    ("geography_polyhedralsurfacez", "Geography(PolyhedralSurfaceZ, 4326)"),
+    ("geography_polyhedralsurfacezm", "Geography(PolyhedralSurfaceZM, 4326)"),
+    ("geography_triangle", "Geography(Triangle, 4326)"),
+    ("geography_trianglem", "Geography(TriangleM, 4326)"),
+    ("geography_trianglez", "Geography(TriangleZ, 4326)"),
+    ("geography_trianglezm", "Geography(TriangleZM, 4326)"),
+    ("geography_tin", "Geography(Tin, 4326)"),
+    ("geography_tinm", "Geography(TinM, 4326)"),
+    ("geography_tinz", "Geography(TinZ, 4326)"),
+    ("geography_tinzm", "Geography(TinZM, 4326)"),
 ];
 
 #[test_connector(tags(Postgres), exclude(PostGIS, CockroachDb))]
@@ -263,7 +261,6 @@ async fn native_type_spatial_columns_feature_on(api: &mut TestApi) -> TestResult
             id                              Int      @id
             geometry                        Geometry
             geometry_geometry               Geometry
-            geometry_geometry_srid          Geometry @db.Geometry(Geometry, 4326)
             geometry_geometry_m             Geometry @db.Geometry(GeometryM)
             geometry_geometry_z             Geometry @db.Geometry(GeometryZ)
             geometry_geometry_zm            Geometry @db.Geometry(GeometryZM)
@@ -297,7 +294,6 @@ async fn native_type_spatial_columns_feature_on(api: &mut TestApi) -> TestResult
             geometry_geometrycollection_zm  Geometry @db.Geometry(GeometryCollectionZM)
             geography                       Geometry @db.Geography(Geometry, 4326)
             geography_geometry              Geometry @db.Geography(Geometry, 4326)
-            geography_geometry_srid         Geometry @db.Geography(Geometry, 4326)
             geography_geometry_m            Geometry @db.Geography(GeometryM, 4326)
             geography_geometry_z            Geometry @db.Geography(GeometryZ, 4326)
             geography_geometry_zm           Geometry @db.Geography(GeometryZM, 4326)
