@@ -38,7 +38,7 @@ const TYPES: &[(&str, &str)] = &[
 
 const GEOMETRY_TYPES: &[(&str, &str)] = &[
     ("geometry", "Geometry"),
-    ("geometry_geometry", "Geometry(Geometry)"),
+    ("geometry_srid", "Geometry(Geometry, 3857)"),
     ("geometry_geometry_m", "Geometry(GeometryM)"),
     ("geometry_geometry_z", "Geometry(GeometryZ)"),
     ("geometry_geometry_zm", "Geometry(GeometryZM)"),
@@ -70,39 +70,38 @@ const GEOMETRY_TYPES: &[(&str, &str)] = &[
     ("geometry_geometrycollection_m", "Geometry(GeometryCollectionM)"),
     ("geometry_geometrycollection_z", "Geometry(GeometryCollectionZ)"),
     ("geometry_geometrycollection_zm", "Geometry(GeometryCollectionZM)"),
-    ("geography", "Geography"),
-    ("geography_geometry", "Geography(Geometry)"),
-    ("geography_geometry_m", "Geography(GeometryM)"),
-    ("geography_geometry_z", "Geography(GeometryZ)"),
-    ("geography_geometry_zm", "Geography(GeometryZM)"),
-    ("geography_point", "Geography(Point)"),
-    ("geography_point_m", "Geography(PointM)"),
-    ("geography_point_z", "Geography(PointZ)"),
-    ("geography_point_zm", "Geography(PointZM)"),
-    ("geography_linestring", "Geography(LineString)"),
-    ("geography_linestring_m", "Geography(LineStringM)"),
-    ("geography_linestring_z", "Geography(LineStringZ)"),
-    ("geography_linestring_zm", "Geography(LineStringZM)"),
-    ("geography_polygon", "Geography(Polygon)"),
-    ("geography_polygon_m", "Geography(PolygonM)"),
-    ("geography_polygon_z", "Geography(PolygonZ)"),
-    ("geography_polygon_zm", "Geography(PolygonZM)"),
-    ("geography_multipoint", "Geography(MultiPoint)"),
-    ("geography_multipoint_m", "Geography(MultiPointM)"),
-    ("geography_multipoint_z", "Geography(MultiPointZ)"),
-    ("geography_multipoint_zm", "Geography(MultiPointZM)"),
-    ("geography_multilinestring", "Geography(MultiLineString)"),
-    ("geography_multilinestring_m", "Geography(MultiLineStringM)"),
-    ("geography_multilinestring_z", "Geography(MultiLineStringZ)"),
-    ("geography_multilinestring_zm", "Geography(MultiLineStringZM)"),
-    ("geography_multipolygon", "Geography(MultiPolygon)"),
-    ("geography_multipolygon_m", "Geography(MultiPolygonM)"),
-    ("geography_multipolygon_z", "Geography(MultiPolygonZ)"),
-    ("geography_multipolygon_zm", "Geography(MultiPolygonZM)"),
-    ("geography_geometrycollection", "Geography(GeometryCollection)"),
-    ("geography_geometrycollection_m", "Geography(GeometryCollectionM)"),
-    ("geography_geometrycollection_z", "Geography(GeometryCollectionZ)"),
-    ("geography_geometrycollection_zm", "Geography(GeometryCollectionZM)"),
+    ("geography_geometry", "Geography(Geometry, 4326)"),
+    ("geography_geometry_m", "Geography(GeometryM, 4326)"),
+    ("geography_geometry_z", "Geography(GeometryZ, 4326)"),
+    ("geography_geometry_zm", "Geography(GeometryZM, 4326)"),
+    ("geography_point", "Geography(Point, 4326)"),
+    ("geography_point_m", "Geography(PointM, 4326)"),
+    ("geography_point_z", "Geography(PointZ, 4326)"),
+    ("geography_point_zm", "Geography(PointZM, 4326)"),
+    ("geography_linestring", "Geography(LineString, 4326)"),
+    ("geography_linestring_m", "Geography(LineStringM, 4326)"),
+    ("geography_linestring_z", "Geography(LineStringZ, 4326)"),
+    ("geography_linestring_zm", "Geography(LineStringZM, 4326)"),
+    ("geography_polygon", "Geography(Polygon, 4326)"),
+    ("geography_polygon_m", "Geography(PolygonM, 4326)"),
+    ("geography_polygon_z", "Geography(PolygonZ, 4326)"),
+    ("geography_polygon_zm", "Geography(PolygonZM, 4326)"),
+    ("geography_multipoint", "Geography(MultiPoint, 4326)"),
+    ("geography_multipoint_m", "Geography(MultiPointM, 4326)"),
+    ("geography_multipoint_z", "Geography(MultiPointZ, 4326)"),
+    ("geography_multipoint_zm", "Geography(MultiPointZM, 4326)"),
+    ("geography_multilinestring", "Geography(MultiLineString, 4326)"),
+    ("geography_multilinestring_m", "Geography(MultiLineStringM, 4326)"),
+    ("geography_multilinestring_z", "Geography(MultiLineStringZ, 4326)"),
+    ("geography_multilinestring_zm", "Geography(MultiLineStringZM, 4326)"),
+    ("geography_multipolygon", "Geography(MultiPolygon, 4326)"),
+    ("geography_multipolygon_m", "Geography(MultiPolygonM, 4326)"),
+    ("geography_multipolygon_z", "Geography(MultiPolygonZ, 4326)"),
+    ("geography_multipolygon_zm", "Geography(MultiPolygonZM, 4326)"),
+    ("geography_geometrycollection", "Geography(GeometryCollection, 4326)"),
+    ("geography_geometrycollection_m", "Geography(GeometryCollectionM, 4326)"),
+    ("geography_geometrycollection_z", "Geography(GeometryCollectionZ, 4326)"),
+    ("geography_geometrycollection_zm", "Geography(GeometryCollectionZM, 4326)"),
 ];
 
 const GEOMETRY_EXTRA_TYPES: &[(&str, &str)] = &[
@@ -260,7 +259,7 @@ async fn native_type_spatial_columns_feature_on(api: &mut TestApi) -> TestResult
          model Spatial {
             id                              Int      @id
             geometry                        Geometry
-            geometry_geometry               Geometry
+            geometry_srid                   Geometry @db.Geometry(Geometry, 3857)
             geometry_geometry_m             Geometry @db.Geometry(GeometryM)
             geometry_geometry_z             Geometry @db.Geometry(GeometryZ)
             geometry_geometry_zm            Geometry @db.Geometry(GeometryZM)
@@ -292,7 +291,6 @@ async fn native_type_spatial_columns_feature_on(api: &mut TestApi) -> TestResult
             geometry_geometrycollection_m   Geometry @db.Geometry(GeometryCollectionM)
             geometry_geometrycollection_z   Geometry @db.Geometry(GeometryCollectionZ)
             geometry_geometrycollection_zm  Geometry @db.Geometry(GeometryCollectionZM)
-            geography                       Geometry @db.Geography(Geometry, 4326)
             geography_geometry              Geometry @db.Geography(Geometry, 4326)
             geography_geometry_m            Geometry @db.Geography(GeometryM, 4326)
             geography_geometry_z            Geometry @db.Geography(GeometryZ, 4326)
