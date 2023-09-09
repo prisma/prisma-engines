@@ -985,10 +985,7 @@ impl<'a> SqlSchemaDescriber<'a> {
                 .name("type")
                 .map(|t| GeometryType::from_str(t.as_str()))
                 .unwrap_or(Ok(GeometryType::default()));
-            let srid = capture
-                .name("srid")
-                .map(|v| v.as_str().parse::<i32>())
-                .unwrap_or(Ok(if is_geography { 4326 } else { 0 }));
+            let srid = capture.name("srid").map(|v| v.as_str().parse::<i32>()).unwrap_or(Ok(0));
             match (geom_type, srid) {
                 (Ok(ty), Ok(srid)) => Some(GeometryParams { ty, srid }),
                 _ => None,
