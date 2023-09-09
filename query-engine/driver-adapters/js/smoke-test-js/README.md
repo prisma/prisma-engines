@@ -7,34 +7,43 @@ It contains a subset of `@prisma/client`, plus some handy executable smoke tests
 
 ## How to setup
 
-We assume Node.js `v20.5.1`+ is installed. If not, run `nvm use` in the current directory.
+We assume recent Node.js is installed. If not, run `nvm use` in the current directory.
 It's very important to double-check if you have multiple versions installed, as both PlanetScale and Neon requires either Node.js `v18`+ or a custom `fetch` function.
 
+In the current directoy:
 - Create a `.envrc` starting from `.envrc.example`, and fill in the missing values following the given template
 - Install Node.js dependencies via
   ```bash
   pnpm i
   ```
+
+Anywhere in the repository: 
 - Run `cargo build -p query-engine-node-api` to compile the `libquery` Query Engine
+
+One level up from this file: 
+- Build the driver adapters with `pnpm -r build` (or the needed one in its sub folder with `pnpm build`
 
 ### PlanetScale
 
-- Create a new database on [PlanetScale](https://planetscale.com/)
-- Go to `Settings` > `Passwords`, and create a new password for the `main` database branch. Select the `Prisma` template and copy the generated URL (comprising username, password, etc). Paste it in the `JS_PLANETSCALE_DATABASE_URL` environment variable in `.envrc`.
+If you don't have a connection string yet:
+
+- [Follow the Notion document](https://www.notion.so/How-to-get-a-PlanetScale-and-Neon-database-for-testing-93d978061f9c4ffc80ebfed36896af16) or create a new database on [PlanetScale](https://planetscale.com/)
+- Go to `Settings` > `Passwords`, and create a new password for the `main` database branch. Select the `Prisma` template and copy the generated URL (comprising username, password, etc). 
+- Paste it in the `JS_PLANETSCALE_DATABASE_URL` environment variable in `.envrc`.
 
 In the current directory:
 - Run `pnpm prisma:planetscale` to push the Prisma schema and insert the test data.
 - Run `pnpm planetscale` to run smoke tests using `libquery` against the PlanetScale database.
 - Run `pnpm planetscale:client` to run smoke tests using `@prisma/client` against the PlanetScale database.
 
-Note: you used to be able to run these Prisma commands without changing the provider name, but [#4074](https://github.com/prisma/prisma-engines/pull/4074) changed that (see https://github.com/prisma/prisma-engines/pull/4074#issuecomment-1649942475).
-
 ### Neon
 
-- Create a new database with Neon CLI `npx neonctl projects create` or in [Neon Console](https://neon.tech).
+If you don't have a connection string yet:
+
+- [Follow the Notion document](https://www.notion.so/How-to-get-a-PlanetScale-and-Neon-database-for-testing-93d978061f9c4ffc80ebfed36896af16) or create a new database with Neon CLI `npx neonctl projects create` or in [Neon Console](https://neon.tech).
 - Paste the connection string to `JS_NEON_DATABASE_URL`. 
 
 In the current directory:
 - Run `pnpm prisma:neon` to push the Prisma schema and insert the test data.
-- Run `pnpm neon` to run smoke tests using `libquery` against the Neon database.
-- Run `pnpm neon:client` to run smoke tests using `@prisma/client` against the Neon database.
+- Run `pnpm neon:ws` to run smoke tests using `libquery` against the Neon database.
+- Run `pnpm neon:ws:client` to run smoke tests using `@prisma/client` against the Neon database.
