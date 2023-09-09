@@ -101,7 +101,10 @@ const GEOMETRY_TYPES: &[(&str, &str)] = &[
     ("geography_geometrycollection", "Geography(GeometryCollection, 4326)"),
     ("geography_geometrycollection_m", "Geography(GeometryCollectionM, 4326)"),
     ("geography_geometrycollection_z", "Geography(GeometryCollectionZ, 4326)"),
-    ("geography_geometrycollection_zm", "Geography(GeometryCollectionZM, 4326)"),
+    (
+        "geography_geometrycollection_zm",
+        "Geography(GeometryCollectionZM, 4326)",
+    ),
 ];
 
 const GEOMETRY_EXTRA_TYPES: &[(&str, &str)] = &[
