@@ -9,7 +9,7 @@ use crate::{
     error::{Error, ErrorKind},
 };
 
-#[cfg(feature = "geometry")]
+#[cfg(feature = "gis")]
 use geozero::{wkb::SpatiaLiteWkb, ToWkt};
 use rusqlite::{
     types::{Null, ToSql, ToSqlOutput, ValueRef},
@@ -168,7 +168,7 @@ impl<'a> GetRow for SqliteRow<'a> {
                     #[cfg(feature = "chrono")]
                     c if c.is_date() => Value::Date(None),
                     c if c.is_bool() => Value::Boolean(None),
-                    #[cfg(feature = "geometry")]
+                    #[cfg(feature = "gis")]
                     c if c.is_geometry() => Value::Geometry(None),
                     c => match c.decl_type() {
                         Some(n) => {
@@ -247,7 +247,7 @@ impl<'a> GetRow for SqliteRow<'a> {
                             })
                     })?
                 }
-                #[cfg(feature = "geometry")]
+                #[cfg(feature = "gis")]
                 ValueRef::Blob(bytes) if column.is_geometry() => SpatiaLiteWkb(bytes.to_vec())
                     .to_ewkt(None)
                     .map(Value::text)
@@ -327,9 +327,9 @@ impl<'a> ToSql for Value<'a> {
                     date.and_hms_opt(time.hour(), time.minute(), time.second())
                 })
                 .map(|dt| ToSqlOutput::from(dt.timestamp_millis())),
-            #[cfg(feature = "geometry")]
+            #[cfg(feature = "gis")]
             Value::Geometry(_) => panic!("Cannot handle raw Geometry"),
-            #[cfg(feature = "geometry")]
+            #[cfg(feature = "gis")]
             Value::Geography(_) => panic!("Cannot handle raw Geography"),
         };
 

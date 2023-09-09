@@ -32,7 +32,7 @@ expose-drivers = []
 all = [
   "chrono",
   "json",
-  "geometry",
+  "gis",
   "mssql",
   "mysql",
   "pooled",
@@ -60,8 +60,8 @@ postgresql = [
   "byteorder",
 ]
 
+gis = ["geozero", "regex", "once_cell"]
 json = ["serde_json", "base64"]
-geometry = ["geozero", "regex", "once_cell"]
 mssql = ["tiberius", "uuid", "chrono", "tokio-util", "tokio/time", "tokio/net", "either"]
 mysql = ["mysql_async", "tokio/time", "lru-cache"]
 pooled = ["mobc"]

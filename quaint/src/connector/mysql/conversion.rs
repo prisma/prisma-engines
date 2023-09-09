@@ -5,7 +5,7 @@ use crate::{
 };
 #[cfg(feature = "chrono")]
 use chrono::{DateTime, Datelike, NaiveDate, NaiveDateTime, NaiveTime, Timelike, Utc};
-#[cfg(feature = "geometry")]
+#[cfg(feature = "gis")]
 use geozero::{wkb::MySQLWkb, wkt::WktStr, ToWkb, ToWkt};
 use mysql_async::{
     self as my,
@@ -76,7 +76,7 @@ pub fn conv_params(params: &[Value<'_>]) -> crate::Result<my::Params> {
                         dt.timestamp_subsec_micros(),
                     )
                 }),
-                #[cfg(feature = "geometry")]
+                #[cfg(feature = "gis")]
                 Value::Geometry(g) | Value::Geography(g) => g.as_ref().map(|g| {
                     // TODO@geometry: Improve WKB serialization error handling
                     WktStr(&g.wkt)
@@ -277,7 +277,7 @@ impl TakeRow for my::Row {
                     [0] => Value::boolean(false),
                     _ => Value::boolean(true),
                 },
-                #[cfg(feature = "geometry")]
+                #[cfg(feature = "gis")]
                 my::Value::Bytes(b) if column.is_geometry() => {
                     MySQLWkb(b).to_ewkt(None).map(Value::text).map_err(|_| {
                         let msg = "Could not convert geometry blob to Ewkt";
@@ -353,7 +353,7 @@ impl TakeRow for my::Row {
                     t if t.is_date() => Value::Date(None),
                     #[cfg(feature = "json")]
                     t if t.is_json() => Value::Json(None),
-                    #[cfg(feature = "geometry")]
+                    #[cfg(feature = "gis")]
                     t if t.is_geometry() => Value::Geometry(None),
                     typ => {
                         let msg = format!("Value of type {typ:?} is not supported with the current configuration");

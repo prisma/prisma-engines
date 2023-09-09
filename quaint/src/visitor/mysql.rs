@@ -161,9 +161,9 @@ impl<'a> Visitor<'a> for Mysql<'a> {
                 }
                 None => None,
             },
-            #[cfg(feature = "geometry")]
+            #[cfg(feature = "gis")]
             Value::Geometry(g) => g.map(|g| self.visit_function(geom_from_text(g.wkt.raw(), g.srid.raw(), false))),
-            #[cfg(feature = "geometry")]
+            #[cfg(feature = "gis")]
             Value::Geography(g) => g.map(|g| self.visit_function(geom_from_text(g.wkt.raw(), g.srid.raw(), true))),
             #[cfg(feature = "uuid")]
             Value::Uuid(uuid) => uuid.map(|uuid| self.write(format!("'{}'", uuid.hyphenated()))),
@@ -478,7 +478,7 @@ impl<'a> Visitor<'a> for Mysql<'a> {
         self.write(")")
     }
 
-    #[cfg(feature = "geometry")]
+    #[cfg(feature = "gis")]
     fn visit_geometry_type_equals(
         &mut self,
         left: Expression<'a>,
@@ -651,7 +651,7 @@ impl<'a> Visitor<'a> for Mysql<'a> {
         Ok(())
     }
 
-    #[cfg(feature = "geometry")]
+    #[cfg(feature = "gis")]
     fn visit_geom_as_text(&mut self, geom: GeomAsText<'a>) -> visitor::Result {
         self.surround_with("CONCAT(", ")", |ref mut s| {
             s.write("'SRID=',")?;
@@ -664,7 +664,7 @@ impl<'a> Visitor<'a> for Mysql<'a> {
         })
     }
 
-    #[cfg(feature = "geometry")]
+    #[cfg(feature = "gis")]
     fn visit_geom_from_text(&mut self, geom: GeomFromText<'a>) -> visitor::Result {
         self.surround_with("ST_GeomFromText(", ")", |ref mut s| {
             s.visit_expression(*geom.wkt_expression)?;
@@ -872,7 +872,7 @@ mod tests {
     }
 
     #[test]
-    #[cfg(feature = "geometry")]
+    #[cfg(feature = "gis")]
     fn test_raw_geometry() {
         let (sql, params) = Mysql::build(
             Select::default().value(Value::geometry(GeometryValue::from_str("SRID=4326;POINT(0 0)").unwrap()).raw()),
@@ -883,7 +883,7 @@ mod tests {
     }
 
     #[test]
-    #[cfg(feature = "geometry")]
+    #[cfg(feature = "gis")]
     fn test_raw_geography() {
         let (sql, params) = Mysql::build(
             Select::default().value(Value::geography(GeometryValue::from_str("SRID=4326;POINT(0 0)").unwrap()).raw()),

@@ -51,7 +51,7 @@ pub use select::Select;
 pub use table::*;
 pub use union::Union;
 pub use update::*;
-#[cfg(feature = "geometry")]
+#[cfg(feature = "gis")]
 pub use values::GeometryValue;
 pub(crate) use values::Params;
 pub use values::{IntoRaw, Raw, Value, Values};

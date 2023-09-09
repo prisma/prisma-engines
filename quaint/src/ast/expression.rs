@@ -1,4 +1,4 @@
-#[cfg(feature = "geometry")]
+#[cfg(feature = "gis")]
 use super::compare::{GeometryCompare, GeometryType};
 #[cfg(all(feature = "json", any(feature = "postgresql", feature = "mysql")))]
 use super::compare::{JsonCompare, JsonType};
@@ -96,7 +96,7 @@ impl<'a> Expression<'a> {
     }
 
     #[allow(dead_code)]
-    #[cfg(feature = "geometry")]
+    #[cfg(feature = "gis")]
     pub(crate) fn is_geometry_expr(&self) -> bool {
         self.kind.is_geometry_expr()
     }
@@ -234,7 +234,7 @@ impl<'a> ExpressionKind<'a> {
             _ => false,
         }
     }
-    #[cfg(feature = "geometry")]
+    #[cfg(feature = "gis")]
     pub(crate) fn is_geometry_expr(&self) -> bool {
         match self {
             Self::Parameterized(Value::Geometry(_) | Value::Geography(_)) => true,
@@ -520,27 +520,27 @@ impl<'a> Comparable<'a> for Expression<'a> {
         Compare::JsonCompare(JsonCompare::TypeNotEquals(Box::new(self), json_type.into()))
     }
 
-    #[cfg(feature = "geometry")]
+    #[cfg(feature = "gis")]
     fn geometry_is_empty(self) -> Compare<'a> {
         Compare::GeometryCompare(GeometryCompare::Empty(Box::new(self)))
     }
 
-    #[cfg(feature = "geometry")]
+    #[cfg(feature = "gis")]
     fn geometry_is_not_empty(self) -> Compare<'a> {
         Compare::GeometryCompare(GeometryCompare::NotEmpty(Box::new(self)))
     }
 
-    #[cfg(feature = "geometry")]
+    #[cfg(feature = "gis")]
     fn geometry_is_valid(self) -> Compare<'a> {
         Compare::GeometryCompare(GeometryCompare::Valid(Box::new(self)))
     }
 
-    #[cfg(feature = "geometry")]
+    #[cfg(feature = "gis")]
     fn geometry_is_not_valid(self) -> Compare<'a> {
         Compare::GeometryCompare(GeometryCompare::NotValid(Box::new(self)))
     }
 
-    #[cfg(feature = "geometry")]
+    #[cfg(feature = "gis")]
     fn geometry_type_equals<T>(self, geometry_type: T) -> Compare<'a>
     where
         T: Into<GeometryType<'a>>,
@@ -548,7 +548,7 @@ impl<'a> Comparable<'a> for Expression<'a> {
         Compare::GeometryCompare(GeometryCompare::TypeEquals(Box::new(self), geometry_type.into()))
     }
 
-    #[cfg(feature = "geometry")]
+    #[cfg(feature = "gis")]
     fn geometry_type_not_equals<T>(self, geometry_type: T) -> Compare<'a>
     where
         T: Into<GeometryType<'a>>,
@@ -556,7 +556,7 @@ impl<'a> Comparable<'a> for Expression<'a> {
         Compare::GeometryCompare(GeometryCompare::TypeNotEquals(Box::new(self), geometry_type.into()))
     }
 
-    #[cfg(feature = "geometry")]
+    #[cfg(feature = "gis")]
     fn geometry_within<T>(self, geom: T) -> Compare<'a>
     where
         T: Into<Expression<'a>>,
@@ -564,7 +564,7 @@ impl<'a> Comparable<'a> for Expression<'a> {
         Compare::GeometryCompare(GeometryCompare::Within(Box::new(self), Box::new(geom.into())))
     }
 
-    #[cfg(feature = "geometry")]
+    #[cfg(feature = "gis")]
     fn geometry_not_within<T>(self, geom: T) -> Compare<'a>
     where
         T: Into<Expression<'a>>,
@@ -572,7 +572,7 @@ impl<'a> Comparable<'a> for Expression<'a> {
         Compare::GeometryCompare(GeometryCompare::NotWithin(Box::new(self), Box::new(geom.into())))
     }
 
-    #[cfg(feature = "geometry")]
+    #[cfg(feature = "gis")]
     fn geometry_intersects<T>(self, geom: T) -> Compare<'a>
     where
         T: Into<Expression<'a>>,
@@ -580,7 +580,7 @@ impl<'a> Comparable<'a> for Expression<'a> {
         Compare::GeometryCompare(GeometryCompare::Intersects(Box::new(self), Box::new(geom.into())))
     }
 
-    #[cfg(feature = "geometry")]
+    #[cfg(feature = "gis")]
     fn geometry_not_intersects<T>(self, geom: T) -> Compare<'a>
     where
         T: Into<Expression<'a>>,

@@ -16,11 +16,11 @@ use std::{
 #[cfg(feature = "uuid")]
 use uuid::Uuid;
 
-#[cfg(feature = "geometry")]
+#[cfg(feature = "gis")]
 use once_cell::sync::Lazy;
-#[cfg(feature = "geometry")]
+#[cfg(feature = "gis")]
 use regex::Regex;
-#[cfg(feature = "geometry")]
+#[cfg(feature = "gis")]
 use std::fmt::{Display, Formatter};
 
 /// A value written to the query as-is without parameterization.
@@ -43,14 +43,14 @@ where
     }
 }
 
-#[cfg(feature = "geometry")]
+#[cfg(feature = "gis")]
 #[derive(Debug, Clone, Eq, PartialEq, Hash, PartialOrd, Ord)]
 pub struct GeometryValue {
     pub wkt: String,
     pub srid: i32,
 }
 
-#[cfg(feature = "geometry")]
+#[cfg(feature = "gis")]
 impl Display for GeometryValue {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         match self.srid {
@@ -61,7 +61,7 @@ impl Display for GeometryValue {
     }
 }
 
-#[cfg(feature = "geometry")]
+#[cfg(feature = "gis")]
 impl FromStr for GeometryValue {
     type Err = String;
 
@@ -116,12 +116,12 @@ pub enum Value<'a> {
     #[cfg_attr(feature = "docs", doc(cfg(feature = "json")))]
     /// A JSON value.
     Json(Option<serde_json::Value>),
-    #[cfg(feature = "geometry")]
-    #[cfg_attr(feature = "docs", doc(cfg(feature = "geometry")))]
+    #[cfg(feature = "gis")]
+    #[cfg_attr(feature = "docs", doc(cfg(feature = "gis")))]
     /// A Geometry value.
     Geometry(Option<GeometryValue>),
-    #[cfg(feature = "geometry")]
-    #[cfg_attr(feature = "docs", doc(cfg(feature = "geometry")))]
+    #[cfg(feature = "gis")]
+    #[cfg_attr(feature = "docs", doc(cfg(feature = "gis")))]
     /// A Geography value.
     Geography(Option<GeometryValue>),
     /// A XML value.
@@ -200,9 +200,9 @@ impl<'a> fmt::Display for Value<'a> {
             Value::Date(val) => val.map(|v| write!(f, "\"{v}\"")),
             #[cfg(feature = "chrono")]
             Value::Time(val) => val.map(|v| write!(f, "\"{v}\"")),
-            #[cfg(feature = "geometry")]
+            #[cfg(feature = "gis")]
             Value::Geometry(val) => val.as_ref().map(|v| write!(f, "\"{v}\"")),
-            #[cfg(feature = "geometry")]
+            #[cfg(feature = "gis")]
             Value::Geography(val) => val.as_ref().map(|v| write!(f, "\"{v}\"")),
         };
 
@@ -247,9 +247,9 @@ impl<'a> From<Value<'a>> for serde_json::Value {
             Value::Numeric(d) => d.map(|d| serde_json::to_value(d.to_f64().unwrap()).unwrap()),
             #[cfg(feature = "json")]
             Value::Json(v) => v,
-            #[cfg(feature = "geometry")]
+            #[cfg(feature = "gis")]
             Value::Geometry(g) => g.map(|g| serde_json::Value::String(g.to_string())),
-            #[cfg(feature = "geometry")]
+            #[cfg(feature = "gis")]
             Value::Geography(g) => g.map(|g| serde_json::Value::String(g.to_string())),
             #[cfg(feature = "uuid")]
             Value::Uuid(u) => u.map(|u| serde_json::Value::String(u.hyphenated().to_string())),
@@ -395,8 +395,8 @@ impl<'a> Value<'a> {
     }
 
     /// Creates a new geometry value.
-    #[cfg(feature = "geometry")]
-    #[cfg_attr(feature = "docs", doc(cfg(feature = "geometry")))]
+    #[cfg(feature = "gis")]
+    #[cfg_attr(feature = "docs", doc(cfg(feature = "gis")))]
     pub fn geometry<T>(value: T) -> Self
     where
         T: Into<GeometryValue>,
@@ -405,8 +405,8 @@ impl<'a> Value<'a> {
     }
 
     /// Creates a new geometry value.
-    #[cfg(feature = "geometry")]
-    #[cfg_attr(feature = "docs", doc(cfg(feature = "geometry")))]
+    #[cfg(feature = "gis")]
+    #[cfg_attr(feature = "docs", doc(cfg(feature = "gis")))]
     pub fn geography<T>(value: T) -> Self
     where
         T: Into<GeometryValue>,
@@ -448,9 +448,9 @@ impl<'a> Value<'a> {
             Value::Time(t) => t.is_none(),
             #[cfg(feature = "json")]
             Value::Json(json) => json.is_none(),
-            #[cfg(feature = "geometry")]
+            #[cfg(feature = "gis")]
             Value::Geometry(s) => s.is_none(),
-            #[cfg(feature = "geometry")]
+            #[cfg(feature = "gis")]
             Value::Geography(s) => s.is_none(),
         }
     }

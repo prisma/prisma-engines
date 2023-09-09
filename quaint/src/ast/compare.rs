@@ -40,7 +40,7 @@ pub enum Compare<'a> {
     #[cfg(all(feature = "json", any(feature = "postgresql", feature = "mysql")))]
     JsonCompare(JsonCompare<'a>),
     /// All geometry related comparators
-    #[cfg(feature = "geometry")]
+    #[cfg(feature = "gis")]
     GeometryCompare(GeometryCompare<'a>),
     /// `left` @@ to_tsquery(`value`)
     #[cfg(feature = "postgresql")]
@@ -815,7 +815,7 @@ pub trait Comparable<'a> {
     /// # Ok(())
     /// # }
     /// ```
-    #[cfg(feature = "geometry")]
+    #[cfg(feature = "gis")]
     fn geometry_is_empty(self) -> Compare<'a>;
 
     /// Tests if the geometry value is not empty.
@@ -830,7 +830,7 @@ pub trait Comparable<'a> {
     /// # Ok(())
     /// # }
     /// ```
-    #[cfg(feature = "geometry")]
+    #[cfg(feature = "gis")]
     fn geometry_is_not_empty(self) -> Compare<'a>;
 
     /// Tests if the geometry value is valid.
@@ -845,7 +845,7 @@ pub trait Comparable<'a> {
     /// # Ok(())
     /// # }
     /// ```
-    #[cfg(feature = "geometry")]
+    #[cfg(feature = "gis")]
     fn geometry_is_valid(self) -> Compare<'a>;
 
     /// Tests if the geometry value is not valid.
@@ -860,7 +860,7 @@ pub trait Comparable<'a> {
     /// # Ok(())
     /// # }
     /// ```
-    #[cfg(feature = "geometry")]
+    #[cfg(feature = "gis")]
     fn geometry_is_not_valid(self) -> Compare<'a>;
 
     /// Tests if the left side geometry contains the right side geometry.
@@ -881,7 +881,7 @@ pub trait Comparable<'a> {
     /// # Ok(())
     /// # }
     /// ```
-    #[cfg(feature = "geometry")]
+    #[cfg(feature = "gis")]
     fn geometry_within<T>(self, geom: T) -> Compare<'a>
     where
         T: Into<Expression<'a>>;
@@ -904,7 +904,7 @@ pub trait Comparable<'a> {
     /// # Ok(())
     /// # }
     /// ```
-    #[cfg(feature = "geometry")]
+    #[cfg(feature = "gis")]
     fn geometry_not_within<T>(self, geom: T) -> Compare<'a>
     where
         T: Into<Expression<'a>>;
@@ -927,7 +927,7 @@ pub trait Comparable<'a> {
     /// # Ok(())
     /// # }
     /// ```
-    #[cfg(feature = "geometry")]
+    #[cfg(feature = "gis")]
     fn geometry_intersects<T>(self, geom: T) -> Compare<'a>
     where
         T: Into<Expression<'a>>;
@@ -950,7 +950,7 @@ pub trait Comparable<'a> {
     /// # Ok(())
     /// # }
     /// ```
-    #[cfg(feature = "geometry")]
+    #[cfg(feature = "gis")]
     fn geometry_not_intersects<T>(self, geom: T) -> Compare<'a>
     where
         T: Into<Expression<'a>>;
@@ -969,7 +969,7 @@ pub trait Comparable<'a> {
     /// # Ok(())
     /// # }
     /// ```
-    #[cfg(feature = "geometry")]
+    #[cfg(feature = "gis")]
     fn geometry_type_equals<T>(self, geom_type: T) -> Compare<'a>
     where
         T: Into<GeometryType<'a>>;
@@ -988,7 +988,7 @@ pub trait Comparable<'a> {
     /// # Ok(())
     /// # }
     /// ```
-    #[cfg(feature = "geometry")]
+    #[cfg(feature = "gis")]
     fn geometry_type_not_equals<T>(self, geom_type: T) -> Compare<'a>
     where
         T: Into<GeometryType<'a>>;
@@ -1322,7 +1322,7 @@ where
     }
 
     #[allow(clippy::wrong_self_convention)]
-    #[cfg(feature = "geometry")]
+    #[cfg(feature = "gis")]
     fn geometry_is_empty(self) -> Compare<'a> {
         let col: Column<'a> = self.into();
         let val: Expression<'a> = col.into();
@@ -1330,7 +1330,7 @@ where
     }
 
     #[allow(clippy::wrong_self_convention)]
-    #[cfg(feature = "geometry")]
+    #[cfg(feature = "gis")]
     fn geometry_is_not_empty(self) -> Compare<'a> {
         let col: Column<'a> = self.into();
         let val: Expression<'a> = col.into();
@@ -1338,7 +1338,7 @@ where
     }
 
     #[allow(clippy::wrong_self_convention)]
-    #[cfg(feature = "geometry")]
+    #[cfg(feature = "gis")]
     fn geometry_is_valid(self) -> Compare<'a> {
         let col: Column<'a> = self.into();
         let val: Expression<'a> = col.into();
@@ -1346,14 +1346,14 @@ where
     }
 
     #[allow(clippy::wrong_self_convention)]
-    #[cfg(feature = "geometry")]
+    #[cfg(feature = "gis")]
     fn geometry_is_not_valid(self) -> Compare<'a> {
         let col: Column<'a> = self.into();
         let val: Expression<'a> = col.into();
         val.geometry_is_not_valid()
     }
 
-    #[cfg(feature = "geometry")]
+    #[cfg(feature = "gis")]
     fn geometry_within<T>(self, geom: T) -> Compare<'a>
     where
         T: Into<Expression<'a>>,
@@ -1363,7 +1363,7 @@ where
         val.geometry_within(geom)
     }
 
-    #[cfg(feature = "geometry")]
+    #[cfg(feature = "gis")]
     fn geometry_not_within<T>(self, geom: T) -> Compare<'a>
     where
         T: Into<Expression<'a>>,
@@ -1373,7 +1373,7 @@ where
         val.geometry_not_within(geom)
     }
 
-    #[cfg(feature = "geometry")]
+    #[cfg(feature = "gis")]
     fn geometry_intersects<T>(self, geom: T) -> Compare<'a>
     where
         T: Into<Expression<'a>>,
@@ -1383,7 +1383,7 @@ where
         val.geometry_intersects(geom)
     }
 
-    #[cfg(feature = "geometry")]
+    #[cfg(feature = "gis")]
     fn geometry_not_intersects<T>(self, geom: T) -> Compare<'a>
     where
         T: Into<Expression<'a>>,
@@ -1393,7 +1393,7 @@ where
         val.geometry_not_intersects(geom)
     }
 
-    #[cfg(feature = "geometry")]
+    #[cfg(feature = "gis")]
     fn geometry_type_equals<T>(self, geom_type: T) -> Compare<'a>
     where
         T: Into<GeometryType<'a>>,
@@ -1403,7 +1403,7 @@ where
         val.geometry_type_equals(geom_type)
     }
 
-    #[cfg(feature = "geometry")]
+    #[cfg(feature = "gis")]
     fn geometry_type_not_equals<T>(self, geom_type: T) -> Compare<'a>
     where
         T: Into<GeometryType<'a>>,

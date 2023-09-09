@@ -140,14 +140,14 @@ impl<'de> Deserializer<'de> for ValueDeserializer<'de> {
             #[cfg(feature = "uuid")]
             Value::Uuid(None) => visitor.visit_none(),
 
-            #[cfg(feature = "geometry")]
+            #[cfg(feature = "gis")]
             Value::Geometry(Some(geom)) => visitor.visit_string(geom.to_string()),
-            #[cfg(feature = "geometry")]
+            #[cfg(feature = "gis")]
             Value::Geometry(None) => visitor.visit_none(),
 
-            #[cfg(feature = "geometry")]
+            #[cfg(feature = "gis")]
             Value::Geography(Some(geom)) => visitor.visit_string(geom.to_string()),
-            #[cfg(feature = "geometry")]
+            #[cfg(feature = "gis")]
             Value::Geography(None) => visitor.visit_none(),
 
             #[cfg(feature = "json")]

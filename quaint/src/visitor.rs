@@ -139,16 +139,16 @@ pub trait Visitor<'a> {
     #[cfg(all(feature = "json", any(feature = "postgresql", feature = "mysql")))]
     fn visit_json_unquote(&mut self, json_unquote: JsonUnquote<'a>) -> Result;
 
-    #[cfg(feature = "geometry")]
+    #[cfg(feature = "gis")]
     fn visit_geom_as_text(&mut self, geom: GeomAsText<'a>) -> Result;
 
-    #[cfg(feature = "geometry")]
+    #[cfg(feature = "gis")]
     fn visit_geom_from_text(&mut self, geom: GeomFromText<'a>) -> Result;
 
-    #[cfg(feature = "geometry")]
+    #[cfg(feature = "gis")]
     fn visit_geometry_type_equals(&mut self, left: Expression<'a>, right: GeometryType<'a>, not: bool) -> Result;
 
-    #[cfg(feature = "geometry")]
+    #[cfg(feature = "gis")]
     fn visit_geometry_empty(&mut self, left: Expression<'a>, not: bool) -> Result {
         if not {
             self.write("NOT ")?;
@@ -156,7 +156,7 @@ pub trait Visitor<'a> {
         self.surround_with("ST_IsEmpty(", ")", |s| s.visit_expression(left))
     }
 
-    #[cfg(feature = "geometry")]
+    #[cfg(feature = "gis")]
     fn visit_geometry_valid(&mut self, left: Expression<'a>, not: bool) -> Result {
         if not {
             self.write("NOT ")?;
@@ -164,7 +164,7 @@ pub trait Visitor<'a> {
         self.surround_with("ST_IsValid(", ")", |s| s.visit_expression(left))
     }
 
-    #[cfg(feature = "geometry")]
+    #[cfg(feature = "gis")]
     fn visit_geometry_within(&mut self, left: Expression<'a>, right: Expression<'a>, not: bool) -> Result {
         if not {
             self.write("NOT ")?;
@@ -176,7 +176,7 @@ pub trait Visitor<'a> {
         })
     }
 
-    #[cfg(feature = "geometry")]
+    #[cfg(feature = "gis")]
     fn visit_geometry_intersects(&mut self, left: Expression<'a>, right: Expression<'a>, not: bool) -> Result {
         if not {
             self.write("NOT ")?;
@@ -200,13 +200,13 @@ pub trait Visitor<'a> {
     /// A visit to a value we parameterize
     fn visit_parameterized(&mut self, value: Value<'a>) -> Result {
         match value {
-            #[cfg(feature = "geometry")]
+            #[cfg(feature = "gis")]
             Value::Geometry(Some(geom)) => self.visit_function(geom_from_text(geom.wkt, geom.srid, false)),
-            #[cfg(feature = "geometry")]
+            #[cfg(feature = "gis")]
             Value::Geography(Some(geom)) => self.visit_function(geom_from_text(geom.wkt, geom.srid, true)),
-            #[cfg(feature = "geometry")]
+            #[cfg(feature = "gis")]
             Value::Geometry(None) => self.write("NULL"),
-            #[cfg(feature = "geometry")]
+            #[cfg(feature = "gis")]
             Value::Geography(None) => self.write("NULL"),
             _ => {
                 self.add_parameter(value);
@@ -983,7 +983,7 @@ pub trait Visitor<'a> {
                 JsonCompare::TypeEquals(left, json_type) => self.visit_json_type_equals(*left, json_type, false),
                 JsonCompare::TypeNotEquals(left, json_type) => self.visit_json_type_equals(*left, json_type, true),
             },
-            #[cfg(feature = "geometry")]
+            #[cfg(feature = "gis")]
             Compare::GeometryCompare(geom_compare) => match geom_compare {
                 GeometryCompare::Empty(left) => self.visit_geometry_empty(*left, false),
                 GeometryCompare::NotEmpty(left) => self.visit_geometry_empty(*left, true),
@@ -1144,11 +1144,11 @@ pub trait Visitor<'a> {
             FunctionType::Concat(concat) => {
                 self.visit_concat(concat)?;
             }
-            #[cfg(feature = "geometry")]
+            #[cfg(feature = "gis")]
             FunctionType::GeomAsText(geom) => {
                 self.visit_geom_as_text(geom)?;
             }
-            #[cfg(feature = "geometry")]
+            #[cfg(feature = "gis")]
             FunctionType::GeomFromText(geom) => {
                 self.visit_geom_from_text(geom)?;
             }

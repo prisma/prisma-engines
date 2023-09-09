@@ -177,7 +177,7 @@ impl<'a> Mssql<'a> {
         Ok(())
     }
 
-    #[cfg(feature = "geometry")]
+    #[cfg(feature = "gis")]
     fn visit_geometry_equals(&mut self, left: Expression<'a>, right: Expression<'a>, not: bool) -> visitor::Result {
         self.surround_with("(", ")", |s| s.visit_expression(left))?;
         self.surround_with(".STEquals(", ")", |s| s.visit_expression(right))?;
@@ -238,7 +238,7 @@ impl<'a> Visitor<'a> for Mssql<'a> {
             (left_kind, right_kind) => {
                 let (l_alias, r_alias) = (left.alias, right.alias);
                 let (left_xml, right_xml) = (left_kind.is_xml_value(), right_kind.is_xml_value());
-                #[cfg(feature = "geometry")]
+                #[cfg(feature = "gis")]
                 let (left_geom, right_geom) = (left_kind.is_geometry_expr(), right_kind.is_geometry_expr());
 
                 let mut left = Expression::from(left_kind);
@@ -253,7 +253,7 @@ impl<'a> Visitor<'a> for Mssql<'a> {
                     right = right.alias(alias);
                 }
 
-                #[cfg(feature = "geometry")]
+                #[cfg(feature = "gis")]
                 if left_geom {
                     return self.visit_geometry_equals(left, right, false);
                 } else if right_geom {
@@ -288,7 +288,7 @@ impl<'a> Visitor<'a> for Mssql<'a> {
             (left_kind, right_kind) => {
                 let (l_alias, r_alias) = (left.alias, right.alias);
                 let (left_xml, right_xml) = (left_kind.is_xml_value(), right_kind.is_xml_value());
-                #[cfg(feature = "geometry")]
+                #[cfg(feature = "gis")]
                 let (left_geom, right_geom) = (left_kind.is_geometry_expr(), right_kind.is_geometry_expr());
 
                 let mut left = Expression::from(left_kind);
@@ -303,7 +303,7 @@ impl<'a> Visitor<'a> for Mssql<'a> {
                     right = right.alias(alias);
                 }
 
-                #[cfg(feature = "geometry")]
+                #[cfg(feature = "gis")]
                 if left_geom {
                     return self.visit_geometry_equals(left, right, true);
                 } else if right_geom {
@@ -359,9 +359,9 @@ impl<'a> Visitor<'a> for Mssql<'a> {
 
                 return Err(builder.build());
             }
-            #[cfg(feature = "geometry")]
+            #[cfg(feature = "gis")]
             Value::Geometry(g) => g.map(|g| self.visit_function(geom_from_text(g.wkt.raw(), g.srid.raw(), false))),
-            #[cfg(feature = "geometry")]
+            #[cfg(feature = "gis")]
             Value::Geography(g) => g.map(|g| self.visit_function(geom_from_text(g.wkt.raw(), g.srid.raw(), true))),
             #[cfg(feature = "json")]
             Value::Json(j) => j.map(|j| self.write(format!("'{}'", serde_json::to_string(&j).unwrap()))),
@@ -664,7 +664,7 @@ impl<'a> Visitor<'a> for Mssql<'a> {
         Ok(())
     }
 
-    #[cfg(feature = "geometry")]
+    #[cfg(feature = "gis")]
     fn visit_geometry_type_equals(
         &mut self,
         left: Expression<'a>,
@@ -687,26 +687,26 @@ impl<'a> Visitor<'a> for Mssql<'a> {
         }
     }
 
-    #[cfg(feature = "geometry")]
+    #[cfg(feature = "gis")]
     fn visit_geometry_empty(&mut self, left: Expression<'a>, not: bool) -> visitor::Result {
         self.surround_with("(", ").STIsEmpty()", |s| s.visit_expression(left))?;
         self.write(if not { " = 0" } else { " = 1" })
     }
 
-    #[cfg(feature = "geometry")]
+    #[cfg(feature = "gis")]
     fn visit_geometry_valid(&mut self, left: Expression<'a>, not: bool) -> visitor::Result {
         self.surround_with("(", ").STIsValid()", |s| s.visit_expression(left))?;
         self.write(if not { " = 0" } else { " = 1" })
     }
 
-    #[cfg(feature = "geometry")]
+    #[cfg(feature = "gis")]
     fn visit_geometry_within(&mut self, left: Expression<'a>, right: Expression<'a>, not: bool) -> visitor::Result {
         self.surround_with("(", ")", |s| s.visit_expression(left))?;
         self.surround_with(".STWithin(", ")", |s| s.visit_expression(right))?;
         self.write(if not { " = 0" } else { " = 1" })
     }
 
-    #[cfg(feature = "geometry")]
+    #[cfg(feature = "gis")]
     fn visit_geometry_intersects(&mut self, left: Expression<'a>, right: Expression<'a>, not: bool) -> visitor::Result {
         self.surround_with("(", ")", |s| s.visit_expression(left))?;
         self.surround_with(".STIntersects(", ")", |s| s.visit_expression(right))?;
@@ -777,7 +777,7 @@ impl<'a> Visitor<'a> for Mssql<'a> {
         unimplemented!("JSON filtering is not yet supported on MSSQL")
     }
 
-    #[cfg(feature = "geometry")]
+    #[cfg(feature = "gis")]
     fn visit_geom_as_text(&mut self, geom: GeomAsText<'a>) -> visitor::Result {
         self.write("CASE WHEN ")?;
         self.visit_expression(*geom.expression.clone())?;
@@ -797,7 +797,7 @@ impl<'a> Visitor<'a> for Mssql<'a> {
         Ok(())
     }
 
-    #[cfg(feature = "geometry")]
+    #[cfg(feature = "gis")]
     fn visit_geom_from_text(&mut self, geom: GeomFromText<'a>) -> visitor::Result {
         self.write(if geom.geography { "geography" } else { "geometry" })?;
         self.surround_with("::STGeomFromText(", ")", |ref mut s| {
@@ -1389,7 +1389,7 @@ mod tests {
     }
 
     #[test]
-    #[cfg(feature = "geometry")]
+    #[cfg(feature = "gis")]
     fn test_raw_geometry() {
         let geom = GeometryValue::from_str("SRID=4326;POINT(0 0)").unwrap();
         let (sql, params) = Mssql::build(Select::default().value(Value::geometry(geom).raw())).unwrap();
@@ -1398,7 +1398,7 @@ mod tests {
     }
 
     #[test]
-    #[cfg(feature = "geometry")]
+    #[cfg(feature = "gis")]
     fn test_raw_geography() {
         let geom = GeometryValue::from_str("SRID=4326;POINT(0 0)").unwrap();
         let (sql, params) = Mssql::build(Select::default().value(Value::geography(geom).raw())).unwrap();

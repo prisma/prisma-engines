@@ -20,9 +20,9 @@ mod search;
 mod sum;
 mod upper;
 
-#[cfg(feature = "geometry")]
+#[cfg(feature = "gis")]
 mod geom_as_text;
-#[cfg(feature = "geometry")]
+#[cfg(feature = "gis")]
 mod geom_from_text;
 
 #[cfg(feature = "mysql")]
@@ -50,9 +50,9 @@ pub use search::*;
 pub use sum::*;
 pub use upper::*;
 
-#[cfg(feature = "geometry")]
+#[cfg(feature = "gis")]
 pub use geom_as_text::*;
-#[cfg(feature = "geometry")]
+#[cfg(feature = "gis")]
 pub use geom_from_text::*;
 
 #[cfg(feature = "mysql")]
@@ -84,7 +84,7 @@ impl<'a> Function<'a> {
     }
     pub fn returns_geometry(&self) -> bool {
         match self.typ_ {
-            #[cfg(feature = "geometry")]
+            #[cfg(feature = "gis")]
             FunctionType::GeomFromText(_) => true,
             _ => false,
         }
@@ -125,9 +125,9 @@ pub(crate) enum FunctionType<'a> {
     UuidToBinSwapped,
     #[cfg(feature = "mysql")]
     Uuid,
-    #[cfg(feature = "geometry")]
+    #[cfg(feature = "gis")]
     GeomAsText(GeomAsText<'a>),
-    #[cfg(feature = "geometry")]
+    #[cfg(feature = "gis")]
     GeomFromText(GeomFromText<'a>),
 }
 
@@ -178,5 +178,5 @@ function!(
     Concat
 );
 
-#[cfg(feature = "geometry")]
+#[cfg(feature = "gis")]
 function!(GeomAsText, GeomFromText);
