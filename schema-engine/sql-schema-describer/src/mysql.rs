@@ -369,25 +369,9 @@ impl<'a> SqlSchemaDescriber<'a> {
         // information schema column names became upper-case in MySQL 8, causing the code fetching
         // the result values by column name below to fail.
         let sql_geometry_srid_column = if self.supports_srid_constraints() {
-            "geom.srs_id"
+            "srs_id"
         } else {
             "NULL"
-        };
-
-        let sql_geometry_information_table = if matches!(flavour, Flavour::MariaDb) {
-            "
-            LEFT JOIN information_schema.geometry_columns geom
-                ON table_schema = geom.g_table_schema
-                AND table_name = geom.g_table_name
-                AND column_name = geom.g_geometry_column
-            "
-        } else if self.supports_srid_constraints() {
-            "
-            LEFT JOIN information_schema.st_geometry_columns geom
-                USING (table_schema, table_name, column_name)
-            "
-        } else {
-            ""
         };
 
         let sql = format!(
@@ -407,7 +391,6 @@ impl<'a> SqlSchemaDescriber<'a> {
                 table_name table_name,
                 NULLIF(column_comment, '') AS column_comment
             FROM information_schema.columns
-            {sql_geometry_information_table}
             WHERE table_schema = ?
             ORDER BY ordinal_position
         "
