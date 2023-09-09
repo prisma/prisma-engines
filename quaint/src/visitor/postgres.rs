@@ -272,6 +272,7 @@ impl<'a> Visitor<'a> for Postgres<'a> {
         };
 
         // TODO@geometry: file a bug report to PostGIS ? (ERROR:  operator is not unique: geometry <> geometry)
+        #[cfg(feature = "gis")]
         if left.is_geometry_expr() && right.is_geometry_expr() {
             self.write("NOT ")?;
             return self.visit_equals(left, right);
