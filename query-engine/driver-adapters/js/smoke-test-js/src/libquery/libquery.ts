@@ -1,7 +1,5 @@
-import { setTimeout } from 'node:timers/promises'
 import { describe, it, before, after } from 'node:test'
 import assert from 'node:assert'
-import superjson from 'superjson'
 import type { ErrorCapturingDriverAdapter } from '@jkomyno/prisma-driver-adapter-utils'
 import type { QueryEngineInstance } from '../engines/types/Library'
 import { initQueryEngine } from './util'
@@ -404,10 +402,6 @@ export function smokeTestLibquery(adapter: ErrorCapturingDriverAdapter, prismaSc
       }
     })
   })
-
-  // const test = new SmokeTest(engine, adapter)
-
-  // await test.testFindManyTypeTest()
 }
 
 class SmokeTest {
