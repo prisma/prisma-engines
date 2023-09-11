@@ -31,7 +31,7 @@ fn registered_driver_adapter(provider: &str) -> connector::Result<DriverAdapter>
         ))))
 }
 
-pub fn register_driver_adapter(connector: Arc<dyn TransactionCapable>) -> () {
+pub fn register_driver_adapter(connector: Arc<dyn TransactionCapable>) {
     let mut lock = REGISTRY.lock().unwrap();
 
     *lock = Some(DriverAdapter { connector });
