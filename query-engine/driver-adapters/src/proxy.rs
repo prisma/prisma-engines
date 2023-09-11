@@ -44,7 +44,7 @@ pub(crate) struct TransactionProxy {
     /// commit transaction
     commit: AsyncJsFunction<(), ()>,
 
-    /// rollback transcation
+    /// rollback transaction
     rollback: AsyncJsFunction<(), ()>,
 }
 
@@ -353,7 +353,7 @@ impl TransactionProxy {
     pub fn new(js_transaction: &JsObject) -> napi::Result<Self> {
         let commit = js_transaction.get_named_property("commit")?;
         let rollback = js_transaction.get_named_property("rollback")?;
-        let options: TransactionOptions = js_transaction.get_named_property("options")?;
+        let options = js_transaction.get_named_property("options")?;
 
         Ok(Self {
             commit,
