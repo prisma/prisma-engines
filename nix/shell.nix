@@ -1,7 +1,7 @@
-{ self', pkgs, ... }:
+{ self', pkgs, rustToolchain, ... }:
 
 let
-  devToolchain = pkgs.rustToolchain.default.override { extensions = [ "rust-analyzer" "rust-src" ]; };
+  devToolchain = rustToolchain.default.override { extensions = [ "rust-analyzer" "rust-src" ]; };
   nodejs = pkgs.nodejs_latest;
 in
 {
