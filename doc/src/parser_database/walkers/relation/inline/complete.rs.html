@@ -73,10 +73,16 @@
 <a href="#73" id="73">73</a>
 <a href="#74" id="74">74</a>
 <a href="#75" id="75">75</a>
+<a href="#76" id="76">76</a>
+<a href="#77" id="77">77</a>
+<a href="#78" id="78">78</a>
+<a href="#79" id="79">79</a>
+<a href="#80" id="80">80</a>
 </pre></div><pre class="rust"><code><span class="kw">use crate</span>::{
     walkers::{ModelWalker, RelationFieldId, RelationFieldWalker, ScalarFieldWalker},
     ParserDatabase, ReferentialAction,
 };
+<span class="kw">use </span>diagnostics::Span;
 <span class="kw">use </span>schema_ast::ast;
 
 <span class="doccomment">/// Represents a relation that has fields and references defined in one of the
@@ -138,6 +144,10 @@
             .on_update
             .map(|(action, <span class="kw">_</span>)| action)
             .unwrap_or(Cascade)
+    }
+
+    <span class="kw">pub fn </span>on_update_span(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;Span&gt; {
+        <span class="self">self</span>.referencing_field().attributes().on_update.map(|(<span class="kw">_</span>, span)| span)
     }
 
     <span class="doccomment">/// Prisma allows setting the relation field as optional, even if one of the
