@@ -167,21 +167,6 @@
 <a href="#167" id="167">167</a>
 <a href="#168" id="168">168</a>
 <a href="#169" id="169">169</a>
-<a href="#170" id="170">170</a>
-<a href="#171" id="171">171</a>
-<a href="#172" id="172">172</a>
-<a href="#173" id="173">173</a>
-<a href="#174" id="174">174</a>
-<a href="#175" id="175">175</a>
-<a href="#176" id="176">176</a>
-<a href="#177" id="177">177</a>
-<a href="#178" id="178">178</a>
-<a href="#179" id="179">179</a>
-<a href="#180" id="180">180</a>
-<a href="#181" id="181">181</a>
-<a href="#182" id="182">182</a>
-<a href="#183" id="183">183</a>
-<a href="#184" id="184">184</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span><span class="kw">super</span>::connection::SqlConnection;
 <span class="kw">use </span><span class="kw">crate</span>::FromSource;
 <span class="kw">use </span>async_trait::async_trait;
@@ -195,40 +180,25 @@
     connector::{IsolationLevel, Transaction},
     prelude::{Queryable <span class="kw">as </span>QuaintQueryable, <span class="kw-2">*</span>},
 };
-<span class="kw">use </span>std::{
-    collections::{hash_map::Entry, HashMap},
-    sync::{Arc, Mutex},
-};
+<span class="kw">use </span>std::sync::{Arc, Mutex};
 
-<span class="doccomment">/// Registry is the type for the global registry of driver adapters.
-</span><span class="kw">type </span>Registry = HashMap&lt;String, DriverAdapter&gt;;
+<span class="kw">static </span>ACTIVE_DRIVER_ADAPTER: Lazy&lt;Mutex&lt;<span class="prelude-ty">Option</span>&lt;DriverAdapter&gt;&gt;&gt; = Lazy::new(|| Mutex::new(<span class="prelude-val">None</span>));
 
-<span class="doccomment">/// REGISTRY is the global registry of Driver Adapters.
-</span><span class="kw">static </span>REGISTRY: Lazy&lt;Mutex&lt;Registry&gt;&gt; = Lazy::new(|| Mutex::new(HashMap::new()));
+<span class="kw">fn </span>active_driver_adapter(provider: <span class="kw-2">&amp;</span>str) -&gt; connector::Result&lt;DriverAdapter&gt; {
+    <span class="kw">let </span>lock = ACTIVE_DRIVER_ADAPTER.lock().unwrap();
 
-<span class="kw">fn </span>registered_driver_adapter(provider: <span class="kw-2">&amp;</span>str) -&gt; connector::Result&lt;DriverAdapter&gt; {
-    <span class="kw">let </span>lock = REGISTRY.lock().unwrap();
-    lock.get(provider)
+    lock.as_ref()
+        .map(|conn_ref| conn_ref.to_owned())
         .ok_or(ConnectorError::from_kind(ErrorKind::UnsupportedConnector(<span class="macro">format!</span>(
             <span class="string">&quot;A driver adapter for {} was not registered&quot;</span>,
             provider
         ))))
-        .map(|conn_ref| conn_ref.to_owned())
 }
 
-<span class="kw">pub fn </span>register_driver_adapter(provider: <span class="kw-2">&amp;</span>str, connector: Arc&lt;<span class="kw">dyn </span>TransactionCapable&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;(), String&gt; {
-    <span class="kw">let </span><span class="kw-2">mut </span>lock = REGISTRY.lock().unwrap();
-    <span class="kw">let </span>entry = lock.entry(provider.to_string());
-    <span class="kw">match </span>entry {
-        Entry::Occupied(<span class="kw">_</span>) =&gt; <span class="prelude-val">Err</span>(<span class="macro">format!</span>(
-            <span class="string">&quot;A driver adapter for {} was already registered, and cannot be overridden.&quot;</span>,
-            provider
-        )),
-        Entry::Vacant(v) =&gt; {
-            v.insert(DriverAdapter { connector });
-            <span class="prelude-val">Ok</span>(())
-        }
-    }
+<span class="kw">pub fn </span>activate_driver_adapter(connector: Arc&lt;<span class="kw">dyn </span>TransactionCapable&gt;) {
+    <span class="kw">let </span><span class="kw-2">mut </span>lock = ACTIVE_DRIVER_ADAPTER.lock().unwrap();
+
+    <span class="kw-2">*</span>lock = <span class="prelude-val">Some</span>(DriverAdapter { connector });
 }
 
 <span class="kw">pub struct </span>Js {
@@ -253,7 +223,7 @@
         url: <span class="kw-2">&amp;</span>str,
         features: psl::PreviewFeatures,
     ) -&gt; connector_interface::Result&lt;Js&gt; {
-        <span class="kw">let </span>connector = registered_driver_adapter(source.active_provider)<span class="question-mark">?</span>;
+        <span class="kw">let </span>connector = active_driver_adapter(source.active_provider)<span class="question-mark">?</span>;
         <span class="kw">let </span>connection_info = get_connection_info(url)<span class="question-mark">?</span>;
 
         <span class="prelude-val">Ok</span>(Js {
