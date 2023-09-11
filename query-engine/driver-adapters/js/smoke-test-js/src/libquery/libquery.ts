@@ -357,6 +357,27 @@ export function smokeTestLibquery(adapter: ErrorCapturingDriverAdapter, prismaSc
           })
           console.log('[nodejs] findMany resultSet', JSON.stringify(resultSet, null, 2))
         })
+      } else if (['sqlite'].includes(flavour)) {
+        it('sqlite', async () => {
+          const resultSet = await doQuery(
+            {
+              "action": "findMany",
+              "modelName": "type_test",
+              "query": {
+                "selection": {
+                  "int_column": true,
+                  "bigint_column": true,
+                  "double_column": true,
+                  "decimal_column": true,
+                  "boolean_column": true,
+                  "text_column": true,
+                  "datetime_column": true,
+                }
+              }
+            }
+          )
+          console.log('[nodejs] findMany resultSet', JSON.stringify((resultSet), null, 2))
+        })
       } else {
         throw new Error(`Missing test for flavour ${flavour}`)
       }

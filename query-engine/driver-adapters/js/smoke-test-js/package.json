@@ -10,6 +10,8 @@
     "prisma:studio:postgres": "prisma studio --schema ./prisma/postgres/schema.prisma",
     "prisma:db:push:mysql": "prisma db push --schema ./prisma/mysql/schema.prisma --force-reset",
     "prisma:db:execute:mysql": "prisma db execute --schema ./prisma/mysql/schema.prisma --file ./prisma/mysql/commands/type_test/insert.sql",
+    "prisma:db:push:sqlite": "prisma db push --schema ./prisma/sqlite/schema.prisma --force-reset",
+    "prisma:db:execute:sqlite": "prisma db execute --schema ./prisma/sqlite/schema.prisma --file ./prisma/sqlite/commands/type_test/insert.sql",
     "prisma:studio:mysql": "prisma studio --schema ./prisma/mysql/schema.prisma",
     "prisma:neon": "cross-env-shell DATABASE_URL=\"${JS_NEON_DATABASE_URL}\" \"pnpm prisma:db:push:postgres && pnpm prisma:db:execute:postgres\"",
     "studio:neon": "cross-env-shell DATABASE_URL=\"${JS_NEON_DATABASE_URL}\" \"pnpm prisma:studio:postgres\"",
@@ -29,7 +31,10 @@
     "studio:planetscale": "cross-env-shell DATABASE_URL=\"${JS_PLANETSCALE_DATABASE_URL}\" \"pnpm prisma:studio:mysql\"",
     "planetscale:libquery": "DATABASE_URL=\"${JS_PLANETSCALE_DATABASE_URL}\" node --test --loader=tsx ./src/libquery/planetscale.test.ts",
     "planetscale:client": "DATABASE_URL=\"${JS_PLANETSCALE_DATABASE_URL}\" node --test --loader=tsx ./src/client/planetscale.test.ts",
-    "planetscale": "pnpm planetscale:libquery && pnpm planetscale:client"
+    "planetscale": "pnpm planetscale:libquery && pnpm planetscale:client",
+    "libsql:libquery": "cross-env-shell DATABASE_URL=\"${JS_LIBSQL_DATABASE_URL}\" node --test --loader=tsx ./src/libquery/libsql.test.ts",
+    "libsql:client": "cross-env-shell DATABASE_URL=\"${JS_LIBSQL_DATABASE_URL}\" node --test --loader=tsx ./src/client/libsql.test.ts",
+    "libsql": "pnpm libsql:libquery && pnpm libsql:client"
   },
   "keywords": [],
   "author": "Alberto Schiabel <schiabel@prisma.io>",
