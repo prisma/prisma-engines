@@ -4,6 +4,6 @@ export JS_NEON_DATABASE_URL="postgres://USER:PASSWORD@DATABASE-pooler.eu-central
 # Note: if you use hosted Postgres instances (e.g., from PDP provision), you need `?sslmode=disable`
 export JS_PG_DATABASE_URL="postgres://postgres:prisma@localhost:5438"
 
-export JS_LIBSQL_DATABASE_URL="file:libsql.db"
+export JS_LIBSQL_DATABASE_URL="file:${PWD}/libsql.db"
 # Set this when using a remote Turso database
 # export JS_LIBSQL_AUTH_TOKEN=""
