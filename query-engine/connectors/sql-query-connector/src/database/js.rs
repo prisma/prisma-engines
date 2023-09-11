@@ -11,41 +11,30 @@ use quaint::{
     connector::{IsolationLevel, Transaction},
     prelude::{Queryable as QuaintQueryable, *},
 };
-use std::{
-    collections::{hash_map::Entry, HashMap},
-    sync::{Arc, Mutex},
-};
+use std::sync::{Arc, Mutex};
 
 /// Registry is the type for the global registry of driver adapters.
-type Registry = HashMap<String, DriverAdapter>;
+/// Only one driver adapter can be registered at a time.
+type Registry = Option<DriverAdapter>;
 
 /// REGISTRY is the global registry of Driver Adapters.
-static REGISTRY: Lazy<Mutex<Registry>> = Lazy::new(|| Mutex::new(HashMap::new()));
+static REGISTRY: Lazy<Mutex<Registry>> = Lazy::new(|| Mutex::new(None));
 
 fn registered_driver_adapter(provider: &str) -> connector::Result<DriverAdapter> {
     let lock = REGISTRY.lock().unwrap();
-    lock.get(provider)
+
+    lock.as_ref()
+        .map(|conn_ref| conn_ref.to_owned())
         .ok_or(ConnectorError::from_kind(ErrorKind::UnsupportedConnector(format!(
             "A driver adapter for {} was not registered",
             provider
         ))))
-        .map(|conn_ref| conn_ref.to_owned())
 }
 
-pub fn register_driver_adapter(provider: &str, connector: Arc<dyn TransactionCapable>) {
+pub fn register_driver_adapter(connector: Arc<dyn TransactionCapable>) -> () {
     let mut lock = REGISTRY.lock().unwrap();
-    let entry = lock.entry(provider.to_string());
 
-    let driver_adapter = DriverAdapter { connector };
-
-    match entry {
-        Entry::Occupied(occupied_entry) => {
-            *occupied_entry.into_mut() = driver_adapter;
-        }
-        Entry::Vacant(vacant_entry) => {
-            vacant_entry.insert(driver_adapter);
-        }
-    };
+    *lock = Some(DriverAdapter { connector });
 }
 
 pub struct Js {
