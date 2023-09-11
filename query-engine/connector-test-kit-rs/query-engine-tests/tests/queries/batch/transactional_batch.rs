@@ -72,7 +72,7 @@ mod transactional {
         let batch_results = runner.batch(queries, true, None).await?;
         let batch_request_idx = batch_results.errors().get(0).unwrap().batch_request_idx();
 
-        assert_eq!(batch_request_idx, Some(1u64));
+        assert_eq!(batch_request_idx, Some(1));
 
         Ok(())
     }
