@@ -105,7 +105,7 @@ export class PrismaLibsql extends LibsqlQueryable<StdClient> implements DriverAd
 
   async startTransaction(): Promise<Result<Transaction>> {
     const options: TransactionOptions = {
-      usePhantomQuery: false,
+      usePhantomQuery: true,
     }
 
     const tag = '[js::startTransaction]'
