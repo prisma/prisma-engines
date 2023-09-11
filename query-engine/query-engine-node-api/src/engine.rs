@@ -185,13 +185,9 @@ impl QueryEngine {
                 let js_queryable = driver_adapters::from_napi(driver);
                 let provider_name = schema.connector.provider_name();
 
-                match sql_connector::register_driver_adapter(provider_name, Arc::new(js_queryable)) {
-                    Ok(_) => {
-                        connector_mode = ConnectorMode::Js;
-                        tracing::info!("Registered driver adapter for {provider_name}.")
-                    }
-                    Err(err) => tracing::error!("Failed to register driver adapter for {provider_name}. {err}"),
-                }
+                sql_connector::register_driver_adapter(provider_name, Arc::new(js_queryable));
+                connector_mode = ConnectorMode::Js;
+                tracing::info!("Registered driver adapter for {provider_name}.");
             }
         }
 

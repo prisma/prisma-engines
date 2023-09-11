@@ -32,19 +32,20 @@ fn registered_driver_adapter(provider: &str) -> connector::Result<DriverAdapter>
         .map(|conn_ref| conn_ref.to_owned())
 }
 
-pub fn register_driver_adapter(provider: &str, connector: Arc<dyn TransactionCapable>) -> Result<(), String> {
+pub fn register_driver_adapter(provider: &str, connector: Arc<dyn TransactionCapable>) -> () {
     let mut lock = REGISTRY.lock().unwrap();
     let entry = lock.entry(provider.to_string());
+
+    let driver_adapter = DriverAdapter { connector };
+
     match entry {
-        Entry::Occupied(_) => Err(format!(
-            "A driver adapter for {} was already registered, and cannot be overridden.",
-            provider
-        )),
-        Entry::Vacant(v) => {
-            v.insert(DriverAdapter { connector });
-            Ok(())
+        Entry::Occupied(occupied_entry) => {
+            *occupied_entry.into_mut() = driver_adapter;
         }
-    }
+        Entry::Vacant(vacant_entry) => {
+            vacant_entry.insert(driver_adapter);
+        }
+    };
 }
 
 pub struct Js {
