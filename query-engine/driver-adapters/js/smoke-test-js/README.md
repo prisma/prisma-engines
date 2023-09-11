@@ -25,7 +25,9 @@ It's very important to double-check if you have multiple versions installed, as 
 In the current directory:
 - Run `pnpm prisma:planetscale` to push the Prisma schema and insert the test data.
 - Run `pnpm planetscale` to run smoke tests using `libquery` against the PlanetScale database.
-- Run `pnpm planetscale:client` to run smoke tests using `@prisma/client` against the PlanetScale database.
+  For more fine-grained control:
+  - Run `pnpm planetscale:libquery` to test using `libquery`
+  - Run `pnpm planetscale:client` to test using `@prisma/client`
 
 ### Neon
 
@@ -35,4 +37,6 @@ In the current directory:
 In the current directory:
 - Run `pnpm prisma:neon` to push the Prisma schema and insert the test data.
 - Run `pnpm neon` to run smoke tests using `libquery` against the Neon database.
-- Run `pnpm neon:client` to run smoke tests using `@prisma/client` against the Neon database.
+  For more fine-grained control:
+  - Run `pnpm neon:libquery` to test using `libquery`
+  - Run `pnpm neon:client` to test using `@prisma/client`
