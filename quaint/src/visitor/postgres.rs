@@ -787,10 +787,11 @@ mod tests {
 
     #[test]
     fn test_distinct_on() {
-        let expected_sql = "SELECT DISTINCT ON (\"bar\") \"bar\" FROM \"test\"";
-        let query = Select::from_table("test")
-            .column(Column::new("bar"))
-            .distinct_on(vec![Expression::from(Column::from("bar"))]);
+        let expected_sql = "SELECT DISTINCT ON (\"bar\", \"foo\") \"bar\" FROM \"test\"";
+        let query = Select::from_table("test").column(Column::new("bar")).distinct_on(vec![
+            Expression::from(Column::from("bar")),
+            Expression::from(Column::from("foo")),
+        ]);
 
         let (sql, _) = Postgres::build(query).unwrap();
 
