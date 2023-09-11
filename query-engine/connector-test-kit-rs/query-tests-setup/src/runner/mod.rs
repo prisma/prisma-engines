@@ -4,7 +4,8 @@ pub use json_adapter::*;
 use serde::Deserialize;
 
 use crate::{
-    executor_process_request, ConnectorTag, ConnectorVersion, QueryResult, TestLogCapture, TestResult, ENGINE_PROTOCOL,
+    executor_process_request, ConnectorTag, ConnectorVersion, QueryResult, TestError, TestLogCapture, TestResult,
+    ENGINE_PROTOCOL,
 };
 use colored::Colorize;
 use query_core::{
@@ -141,14 +142,26 @@ impl Runner {
 
         let executor = match &self.executor {
             RunnerExecutor::Builtin(e) => e,
-            RunnerExecutor::External(schema_id) => {
-                let json_query = JsonRequest::from_graphql(&query, self.query_schema()).unwrap();
-                let response_str: String =
+            RunnerExecutor::External(schema_id) => match JsonRequest::from_graphql(&query, self.query_schema()) {
+                Ok(json_query) => {
+                    let response_str: String =
                     executor_process_request("query", json!({ "query": json_query, "schemaId": schema_id, "txId": self.current_tx_id.as_ref().map(ToString::to_string) })).await?;
-                let mut response: QueryResult = serde_json::from_str(&response_str).unwrap();
-                response.detag();
-                return Ok(response);
-            }
+                    let mut response: QueryResult = serde_json::from_str(&response_str).unwrap();
+                    response.detag();
+                    return Ok(response);
+                }
+                // Conversion from graphql to JSON might fail, and in that case we should consider the error
+                // (a Handler error) as an error response.
+                Err(TestError::RequestHandlerError(err)) => {
+                    let gql_err = request_handlers::GQLError::from_handler_error(err);
+                    let gql_res = request_handlers::GQLResponse::from(gql_err);
+                    let prisma_res = request_handlers::PrismaResponse::Single(gql_res);
+                    let mut response = QueryResult::from(prisma_res);
+                    response.detag();
+                    return Ok(response);
+                }
+                Err(err) => return Err(err),
+            },
         };
 
         tracing::debug!("Querying: {}", query.clone().green());

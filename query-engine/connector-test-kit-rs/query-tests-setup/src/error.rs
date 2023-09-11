@@ -6,6 +6,9 @@ use thiserror::Error;
 #[allow(clippy::large_enum_variant)]
 #[derive(Debug, Error)]
 pub enum TestError {
+    #[error("Handler Error: {0}")]
+    RequestHandlerError(request_handlers::HandlerError),
+
     #[error("Parse error: {0}")]
     ParseError(String),
 

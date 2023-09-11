@@ -233,13 +233,13 @@ fn convert_gql_error(err: &request_handlers::GQLError) -> SimpleGqlError {
         error: err.message().to_owned(),
         meta: err.code().map(|code| {
             serde_json::json!({
-                "code": code,
+                "error_code": code,
                 "message": err.message()
             })
         }),
         user_facing_error: err.code().map(|code| {
             serde_json::json!({
-                "code": code,
+                "error_code": code,
                 "message": err.message()
             })
         }),
