@@ -21,7 +21,7 @@ export async function smokeTestClient(driverAdapter: DriverAdapter) {
           adapter,
           log,
         })
-    
+
         const queries: string[] = []
         prisma.$on('query', ({ query }) => queries.push(query))
 
@@ -58,41 +58,61 @@ export async function smokeTestClient(driverAdapter: DriverAdapter) {
           assert.deepEqual(queries.at(0), defaultExpectedQueries.at(0))
           assert.deepEqual(
             queries.filter((q) => q !== 'DEALLOCATE ALL'),
-            defaultExpectedQueries
+            defaultExpectedQueries,
           )
         }
       })
-    
-      it('applies isolation level when using batch $transaction', async () => {
-        const prisma = new PrismaClient({
-          adapter,
-          log,
+
+      if (provider !== 'sqlite') {
+        it('applies isolation level when using batch $transaction', async () => {
+          const prisma = new PrismaClient({ adapter, log })
+
+          const queries: string[] = []
+          prisma.$on('query', ({ query }) => queries.push(query))
+
+          await prisma.$transaction([prisma.child.findMany(), prisma.child.count()], {
+            isolationLevel: 'ReadCommitted',
+          })
+
+          if (['mysql'].includes(provider)) {
+            assert.deepEqual(queries.slice(0, 2), ['SET TRANSACTION ISOLATION LEVEL READ COMMITTED', 'BEGIN'])
+          } else if (['postgres'].includes(provider)) {
+            assert.deepEqual(queries.slice(0, 2), ['BEGIN', 'SET TRANSACTION ISOLATION LEVEL READ COMMITTED'])
+          }
+
+          assert.deepEqual(queries.at(-1), 'COMMIT')
         })
-    
-        const queries: string[] = []
-        prisma.$on('query', ({ query }) => queries.push(query))
-    
-        await prisma.$transaction([
-          prisma.child.findMany(),
-          prisma.child.count(),
-        ], {
-          isolationLevel: 'ReadCommitted',
+      } else {
+        describe('isolation levels with sqlite', () => {
+          it('accepts Serializable as a no-op', async () => {
+            const prisma = new PrismaClient({ adapter, log })
+
+            const queries: string[] = []
+            prisma.$on('query', ({ query }) => queries.push(query))
+
+            await prisma.$transaction([prisma.child.findMany(), prisma.child.count()], {
+              isolationLevel: 'Serializable',
+            })
+
+            assert.equal(queries.at(0), 'BEGIN')
+            assert.equal(queries.at(-1), 'COMMIT')
+            assert(!queries.find((q) => q.includes('SET TRANSACTION ISOLATION LEVEL')))
+          })
+
+          it('throws on unsupported isolation levels', async () => {
+            const prisma = new PrismaClient({ adapter, log })
+
+            const queries: string[] = []
+            prisma.$on('query', ({ query }) => queries.push(query))
+
+            assert.rejects(
+              prisma.$transaction([prisma.child.findMany(), prisma.child.count()], {
+                isolationLevel: 'ReadCommitted',
+              }),
+            )
+          })
         })
-    
-        if (['mysql'].includes(provider)) {
-          assert.deepEqual(queries.slice(0, 2), [
-            'SET TRANSACTION ISOLATION LEVEL READ COMMITTED',
-            'BEGIN',
-          ])
-        } else if (['postgres'].includes(provider)) {
-          assert.deepEqual(queries.slice(0, 2), [
-            'BEGIN',
-            'SET TRANSACTION ISOLATION LEVEL READ COMMITTED',
-          ])
-        }
-    
-        assert.deepEqual(queries.at(-1), 'COMMIT')
-      })
+      }
     })
   }
 }
