@@ -75,7 +75,7 @@ export function smokeTestLibquery(adapter: ErrorCapturingDriverAdapter, prismaSc
           }
         })
 
-      assert.strictEqual(created['data']['createOneProduct']['properties']['$type'], 'Json')
+      assert.strictEqual(created.data.createOneProduct.properties.$type, 'Json')
       console.log('[nodejs] created', JSON.stringify(created, null, 2))
 
       const resultSet = await doQuery(
