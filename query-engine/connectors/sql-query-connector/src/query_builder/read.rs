@@ -1,6 +1,6 @@
 use crate::{
-    cursor_condition, filter_conversion::AliasedCondition, model_extensions::*, nested_aggregations,
-    ordering::OrderByBuilder, sql_trace::SqlTraceComment, Context,
+    cursor_condition, filter::FilterBuilder, model_extensions::*, nested_aggregations, ordering::OrderByBuilder,
+    sql_trace::SqlTraceComment, Context,
 };
 use connector_interface::{filter::Filter, AggregationSelection, QueryArguments, RelAggregationSelection};
 use itertools::Itertools;
@@ -65,10 +65,10 @@ impl SelectDefinition for QueryArguments {
         let limit = if self.ignore_take { None } else { self.take_abs() };
         let skip = if self.ignore_skip { 0 } else { self.skip.unwrap_or(0) };
 
-        let filter: ConditionTree = self
+        let (filter, filter_joins) = self
             .filter
-            .map(|f| f.aliased_condition_from(None, false, ctx))
-            .unwrap_or(ConditionTree::NoCondition);
+            .map(|f| FilterBuilder::with_joins().visit_filter(f, ctx))
+            .unwrap_or((ConditionTree::NoCondition, None));
 
         let conditions = match (filter, cursor_condition) {
             (ConditionTree::NoCondition, cursor) => cursor,
@@ -80,13 +80,21 @@ impl SelectDefinition for QueryArguments {
         let joined_table = order_by_definitions
             .iter()
             .flat_map(|j| &j.joins)
-            .fold(model.as_table(ctx), |acc, join| acc.left_join(join.clone().data));
+            .fold(model.as_table(ctx), |acc, join| acc.join(join.clone().data));
 
         // Add joins necessary to the nested aggregations
         let joined_table = aggregation_joins
             .joins
             .into_iter()
-            .fold(joined_table, |acc, join| acc.left_join(join.data));
+            .fold(joined_table, |acc, join| acc.join(join.data));
+
+        let joined_table = if let Some(filter_joins) = filter_joins {
+            filter_joins
+                .into_iter()
+                .fold(joined_table, |acc, join| acc.join(join.data))
+        } else {
+            joined_table
+        };
 
         let select_ast = Select::from_table(joined_table)
             .so_that(conditions)
@@ -247,7 +255,11 @@ pub(crate) fn group_by_aggregate(
     );
 
     match having {
-        Some(filter) => grouped.having(filter.aliased_condition_from(None, false, ctx)),
+        Some(filter) => {
+            let cond = FilterBuilder::without_joins().visit_filter(filter, ctx);
+
+            grouped.having(cond)
+        }
         None => grouped,
     }
 }

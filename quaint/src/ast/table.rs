@@ -344,6 +344,20 @@ impl<'a> Table<'a> {
 
         self
     }
+
+    pub fn join<J>(self, join: J) -> Self
+    where
+        J: Into<Join<'a>>,
+    {
+        let join: Join = join.into();
+
+        match join {
+            Join::Inner(x) => self.inner_join(x),
+            Join::Left(x) => self.left_join(x),
+            Join::Right(x) => self.right_join(x),
+            Join::Full(x) => self.full_join(x),
+        }
+    }
 }
 
 impl<'a> From<&'a str> for Table<'a> {

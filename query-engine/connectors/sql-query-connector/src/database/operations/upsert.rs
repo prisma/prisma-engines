@@ -1,6 +1,6 @@
 use crate::{
     column_metadata,
-    filter_conversion::AliasedCondition,
+    filter::FilterBuilder,
     model_extensions::AsColumns,
     query_builder::write::{build_update_and_set_query, create_record},
     row::ToSqlRow,
@@ -21,7 +21,7 @@ pub(crate) async fn native_upsert(
 
     let meta = column_metadata::create(&field_names, &idents);
 
-    let where_condition = upsert.filter().aliased_condition_from(None, false, ctx);
+    let where_condition = FilterBuilder::without_joins().visit_filter(upsert.filter().clone(), ctx);
     let update =
         build_update_and_set_query(upsert.model(), upsert.update().clone(), None, ctx).so_that(where_condition);
 
