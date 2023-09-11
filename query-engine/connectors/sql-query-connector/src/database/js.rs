@@ -13,15 +13,10 @@ use quaint::{
 };
 use std::sync::{Arc, Mutex};
 
-/// Registry is the type for the global registry of driver adapters.
-/// Only one driver adapter can be registered at a time.
-type Registry = Option<DriverAdapter>;
+static ACTIVE_DRIVER_ADAPTER: Lazy<Mutex<Option<DriverAdapter>>> = Lazy::new(|| Mutex::new(None));
 
-/// REGISTRY is the global registry of Driver Adapters.
-static REGISTRY: Lazy<Mutex<Registry>> = Lazy::new(|| Mutex::new(None));
-
-fn registered_driver_adapter(provider: &str) -> connector::Result<DriverAdapter> {
-    let lock = REGISTRY.lock().unwrap();
+fn active_driver_adapter(provider: &str) -> connector::Result<DriverAdapter> {
+    let lock = ACTIVE_DRIVER_ADAPTER.lock().unwrap();
 
     lock.as_ref()
         .map(|conn_ref| conn_ref.to_owned())
@@ -31,8 +26,8 @@ fn registered_driver_adapter(provider: &str) -> connector::Result<DriverAdapter>
         ))))
 }
 
-pub fn register_driver_adapter(connector: Arc<dyn TransactionCapable>) {
-    let mut lock = REGISTRY.lock().unwrap();
+pub fn activate_driver_adapter(connector: Arc<dyn TransactionCapable>) {
+    let mut lock = ACTIVE_DRIVER_ADAPTER.lock().unwrap();
 
     *lock = Some(DriverAdapter { connector });
 }
@@ -59,7 +54,7 @@ impl FromSource for Js {
         url: &str,
         features: psl::PreviewFeatures,
     ) -> connector_interface::Result<Js> {
-        let connector = registered_driver_adapter(source.active_provider)?;
+        let connector = active_driver_adapter(source.active_provider)?;
         let connection_info = get_connection_info(url)?;
 
         Ok(Js {

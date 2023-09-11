@@ -184,7 +184,7 @@ impl QueryEngine {
             if let Some(driver) = maybe_driver {
                 let js_queryable = driver_adapters::from_napi(driver);
 
-                sql_connector::register_driver_adapter(Arc::new(js_queryable));
+                sql_connector::activate_driver_adapter(Arc::new(js_queryable));
                 connector_mode = ConnectorMode::Js;
 
                 let provider_name = schema.connector.provider_name();
