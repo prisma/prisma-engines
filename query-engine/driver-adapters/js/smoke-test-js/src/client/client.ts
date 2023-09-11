@@ -47,15 +47,6 @@ export async function smokeTestClient(driverAdapter: DriverAdapter) {
           '-- Implicit "COMMIT" query via underlying driver',
         ]
 
-        const postgresExpectedQueries = [
-          'BEGIN',
-          'DEALLOCATE ALL',
-          'SELECT 1',
-          'SELECT 2',
-          'SELECT 3',
-          'COMMIT',
-        ]
-
         if (['mysql'].includes(provider)) {
           if (isUsingDriverAdapters) {
             assert.deepEqual(queries, driverAdapterExpectedQueries)
