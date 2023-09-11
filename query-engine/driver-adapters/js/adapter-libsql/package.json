@@ -24,6 +24,6 @@
     "@libsql/client": "github:libsql/libsql-client-ts"
   },
   "peerDependencies": {
-    "@libsql/client": "^0.3.3"
+    "@libsql/client": "^0.3.4"
   }
 }
