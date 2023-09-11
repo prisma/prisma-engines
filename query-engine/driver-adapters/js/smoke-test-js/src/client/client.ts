@@ -56,7 +56,10 @@ export async function smokeTestClient(driverAdapter: DriverAdapter) {
         } else if (['postgres'].includes(provider)) {
           // Note: the "DEALLOCATE ALL" query is only present after "BEGIN" when using Rust Postgres with pgbouncer.
           assert.deepEqual(queries.at(0), defaultExpectedQueries.at(0))
-          assert.deepEqual(queries.slice(-4), defaultExpectedQueries.slice(-4))
+          assert.deepEqual(
+            queries.filter((q) => q !== 'DEALLOCATE ALL'),
+            defaultExpectedQueries
+          )
         }
       })
     
