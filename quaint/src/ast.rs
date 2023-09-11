@@ -49,7 +49,7 @@ pub use ordering::{IntoOrderDefinition, Order, OrderDefinition, Orderable, Order
 pub use over::*;
 pub use query::{Query, SelectQuery};
 pub use row::Row;
-pub use select::Select;
+pub use select::{DistinctType, Select};
 pub use table::*;
 pub use union::Union;
 pub use update::*;
