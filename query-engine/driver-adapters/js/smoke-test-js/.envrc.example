@@ -1,3 +1,4 @@
+# This will load the .envrc at the root of the `prisma-engines` repository before loading this one
 source_up
 
 export JS_PLANETSCALE_DATABASE_URL="mysql://USER:PASSWORD@aws.connect.psdb.cloud/DATABASE?sslaccept=strict"
