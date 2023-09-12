@@ -94,8 +94,14 @@ export async function smokeTestClient(driverAdapter: DriverAdapter) {
               isolationLevel: 'Serializable',
             })
 
-            assert.equal(queries.at(0), 'BEGIN')
-            assert.equal(queries.at(-1), 'COMMIT')
+            if (isUsingDriverAdapters) {
+              assert.equal(queries.at(0), '-- Implicit "BEGIN" query via underlying driver')
+              assert.equal(queries.at(-1), '-- Implicit "COMMIT" query via underlying driver')
+            } else {
+              assert.equal(queries.at(0), 'BEGIN')
+              assert.equal(queries.at(-1), 'COMMIT')
+            }
+
             assert(!queries.find((q) => q.includes('SET TRANSACTION ISOLATION LEVEL')))
           })
 
