@@ -9,7 +9,7 @@ function connect(): PrismaLibsql {
   return new PrismaLibsql(client)
 }
 
-it('declared types', async () => {
+it('checks declared types', async () => {
   const client = connect()
 
   await client.executeRaw({
@@ -51,7 +51,7 @@ it('declared types', async () => {
   ])
 })
 
-it('inferred types', async () => {
+it('infers types when sqlite decltype is not available', async () => {
   const client = connect()
 
   const result = await client.queryRaw({
