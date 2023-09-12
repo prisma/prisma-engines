@@ -37,7 +37,7 @@ export function fieldToColumnType(fieldValue: Value): ColumnType {
 
 function inferNumericType(value: number): ColumnType {
   if (!Number.isInteger(value)) {
-    return ColumnType.Double
+    return ColumnTypeEnum.Double
   }
   if (value >= -0x80000000 && value <= 0x7fffffff) {
     return ColumnTypeEnum.Int32
