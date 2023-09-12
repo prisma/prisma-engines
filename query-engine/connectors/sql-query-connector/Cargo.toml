@@ -25,7 +25,7 @@ uuid.workspace = true
 opentelemetry = { version = "0.17", features = ["tokio"] }
 tracing-opentelemetry = "0.17.3"
 quaint.workspace = true
-cuid = { git = "https://github.com/prisma/cuid-rust", branch = "jkomyno/wasm32" }
+cuid = { git = "https://github.com/prisma/cuid-rust", branch = "wasm32" }
 
 [dependencies.connector-interface]
 package = "query-connector"

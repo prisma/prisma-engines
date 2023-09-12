@@ -859,7 +859,7 @@ dependencies = [
 [[package]]
 name = "cuid"
 version = "1.3.2"
-source = "git+https://github.com/prisma/cuid-rust?branch=jkomyno/wasm32#4f9ce0f3c3991167c7fe7648bc1f2c220fe266b9"
+source = "git+https://github.com/prisma/cuid-rust?branch=wasm32#4f9ce0f3c3991167c7fe7648bc1f2c220fe266b9"
 dependencies = [
  "base36",
  "cuid-util",
@@ -873,12 +873,12 @@ dependencies = [
 [[package]]
 name = "cuid-util"
 version = "0.1.0"
-source = "git+https://github.com/prisma/cuid-rust?branch=jkomyno/wasm32#4f9ce0f3c3991167c7fe7648bc1f2c220fe266b9"
+source = "git+https://github.com/prisma/cuid-rust?branch=wasm32#4f9ce0f3c3991167c7fe7648bc1f2c220fe266b9"
 
 [[package]]
 name = "cuid2"
 version = "0.1.2"
-source = "git+https://github.com/prisma/cuid-rust?branch=jkomyno/wasm32#4f9ce0f3c3991167c7fe7648bc1f2c220fe266b9"
+source = "git+https://github.com/prisma/cuid-rust?branch=wasm32#4f9ce0f3c3991167c7fe7648bc1f2c220fe266b9"
 dependencies = [
  "cuid-util",
  "num",

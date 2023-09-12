@@ -22,7 +22,7 @@ tracing-futures = "0.2"
 uuid.workspace = true
 indexmap = "1.7"
 query-engine-metrics = {path = "../../metrics"}
-cuid = { git = "https://github.com/prisma/cuid-rust", branch = "jkomyno/wasm32" }
+cuid = { git = "https://github.com/prisma/cuid-rust", branch = "wasm32" }
 
 [dependencies.prisma-models]
 path = "../../prisma-models"
