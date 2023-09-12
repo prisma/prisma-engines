@@ -1,8 +1,7 @@
-use super::*;
+use super::{inmemory_record_processor::InMemoryRecordProcessor, *};
 use crate::{interpreter::InterpretationResult, query_ast::*, result_ast::*};
 use connector::{self, error::ConnectorError, ConnectionLike, RelAggregationRow, RelAggregationSelection};
 use futures::future::{BoxFuture, FutureExt};
-use inmemory_record_processor::InMemoryRecordProcessor;
 use query_structure::ManyRecords;
 use std::collections::HashMap;
 use user_facing_errors::KnownError;
@@ -86,14 +85,30 @@ fn read_one(
 /// -> Unstable cursors can't reliably be fetched by the underlying datasource, so we need to process part of it in-memory.
 fn read_many(
     tx: &mut dyn ConnectionLike,
-    mut query: ManyRecordsQuery,
+    query: ManyRecordsQuery,
     trace_id: Option<String>,
 ) -> BoxFuture<'_, InterpretationResult<QueryResult>> {
-    let processor = if query.args.requires_inmemory_processing() {
-        Some(InMemoryRecordProcessor::new_from_query_args(&mut query.args))
-    } else {
-        None
-    };
+    // let req_inmem_proc = query.args.requires_inmemory_processing();
+
+    // let processor = if req_inmem_proc {
+    //     let inm_builder = InMemoryRecordProcessorBuilder::new(
+    //         query.args.model.clone(),
+    //         query.args.order_by.clone(),
+    //         query.args.ignore_skip.clone(),
+    //         query.args.ignore_take.clone(),
+    //     );
+
+    //     let inmemory_record_processor = match query.args.distinct {
+    //         Some(ref fs) => inm_builder.distinct(fs.clone()).build(),
+    //         None => inm_builder.build(),
+    //     };
+
+    //     Some(inmemory_record_processor)
+    // } else {
+    //     None
+    // };
+
+    let processor: Option<InMemoryRecordProcessor> = None;
 
     let fut = async move {
         let scalars = tx
