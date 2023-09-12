@@ -1,15 +1,16 @@
 use query_core::constants::custom_types;
 use request_handlers::{GQLError, PrismaResponse};
 use serde::{Deserialize, Serialize};
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug, PartialEq)]
 struct SimpleGqlErrorResponse {
     #[serde(skip_serializing_if = "Vec::is_empty")]
     errors: Vec<GQLError>,
 }
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug, PartialEq)]
 struct SimpleGqlResponse {
     #[serde(skip_serializing_if = "SimpleGqlResponse::data_is_empty")]
+    #[serde(default)]
     data: serde_json::Value,
     #[serde(skip_serializing_if = "Vec::is_empty")]
     #[serde(default)]
@@ -23,12 +24,13 @@ impl SimpleGqlResponse {
     fn data_is_empty(data: &serde_json::Value) -> bool {
         match data {
             serde_json::Value::Object(o) => o.is_empty(),
+            serde_json::Value::Null => true,
             _ => false,
         }
     }
 }
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug, PartialEq)]
 #[serde(rename_all = "camelCase")]
 struct SimpleGqlBatchResponse {
     batch_result: Vec<SimpleGqlResponse>,
@@ -39,15 +41,15 @@ struct SimpleGqlBatchResponse {
     extensions: Option<serde_json::Value>,
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, PartialEq)]
 #[serde(untagged)]
 enum Response {
     Error(SimpleGqlErrorResponse),
-    Single(SimpleGqlResponse),
     Multi(SimpleGqlBatchResponse),
+    Single(SimpleGqlResponse),
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, PartialEq)]
 #[serde(transparent)]
 pub struct QueryResult {
     response: Response,
@@ -92,7 +94,7 @@ impl QueryResult {
         let err_exists = self.errors().into_iter().any(|err| {
             let code_matches = err.code() == err_code.as_deref();
             let msg_matches = match msg_contains.as_ref() {
-                Some(msg) => dbg!(err.message()).contains(msg),
+                Some(msg) => err.message().contains(msg),
                 None => true,
             };
 
@@ -208,5 +210,101 @@ fn detag_value(val: &mut serde_json::Value) {
             }
         }
         _ => (),
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use serde_json::json;
+
+    #[test]
+    fn test_deserializing_successful_batch_response() {
+        let response = "{\"batchResult\":[{\"data\":{\"findUniqueTestModelOrThrow\":{\"id\":1}}},{\"data\":{\"findUniqueTestModelOrThrow\":{\"id\":2}}}]}";
+        let result: QueryResult = serde_json::from_str(response).unwrap();
+
+        let expected = QueryResult {
+            response: Response::Multi(SimpleGqlBatchResponse {
+                batch_result: vec![
+                    SimpleGqlResponse {
+                        data: json!({
+                            "findUniqueTestModelOrThrow": {
+                                "id": 1,
+                            },
+                        }),
+                        errors: vec![],
+                        extensions: None,
+                    },
+                    SimpleGqlResponse {
+                        data: json!({
+                            "findUniqueTestModelOrThrow": {
+                                "id": 2,
+                            },
+                        }),
+                        errors: vec![],
+                        extensions: None,
+                    },
+                ],
+                errors: vec![],
+                extensions: None,
+            }),
+        };
+        assert_eq!(result, expected);
+    }
+
+    #[test]
+    fn test_deserializing_error_batch_response() {
+        let response = r###"
+{
+   "batchResult":[
+      {
+         "data":{
+            "findUniqueTestModelOrThrow":{
+               "id":2
+            }
+         }
+      },
+      {
+         "errors":[
+            {
+               "error":"An operation failed because it depends on one or more records that were required but not found. Expected a record, found none.",
+               "user_facing_error":{
+                  "is_panic":false,
+                  "message":"An operation failed because it depends on one or more records that were required but not found. Expected a record, found none.",
+                  "meta":{
+                     "cause":"Expected a record, found none."
+                  },
+                  "error_code":"P2025"
+               }
+            }
+         ]
+      }
+   ]
+}"###;
+        let result: QueryResult = serde_json::from_str(response).unwrap();
+
+        let expected = QueryResult {
+            response: Response::Multi(SimpleGqlBatchResponse {
+                batch_result: vec![
+                    SimpleGqlResponse {
+                        data: json!({"findUniqueTestModelOrThrow": {"id": 2}}),
+                        errors: vec![],
+                        extensions: None,
+                    },
+                    SimpleGqlResponse {
+                        data: serde_json::Value::Null,
+                        errors: vec![GQLError::from_user_facing_error(user_facing_errors::KnownError {
+                            message: "An operation failed because it depends on one or more records that were required but not found. Expected a record, found none.".to_string(),
+                            meta: json!({"cause": "Expected a record, found none."}),
+                            error_code: std::borrow::Cow::from("P2025"),
+                        }.into())],
+                        extensions: None,
+                    },
+                ],
+                errors: vec![],
+                extensions: None,
+            }),
+        };
+        assert_eq!(result, expected);
     }
 }

@@ -12,4 +12,5 @@ pnpm i && pnpm build
 cd $SCRIPT_DIR
 
 # Run cargo test for query-engine-tests
-NODE_TEST_EXECUTOR=$SCRIPT_DIR/start.sh cargo test -p query-engine-tests "$@"
+export NODE_TEST_EXECUTOR=$SCRIPT_DIR/start.sh
+cargo test -p query-engine-tests query-engine-tests
