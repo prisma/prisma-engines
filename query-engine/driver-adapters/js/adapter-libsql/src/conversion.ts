@@ -1,25 +1,98 @@
-import { ColumnTypeEnum, ColumnType } from '@prisma/driver-adapter-utils'
-import { Value } from '@libsql/client'
+import { ColumnTypeEnum, ColumnType, Debug } from '@prisma/driver-adapter-utils'
+import { Row, Value } from '@libsql/client'
 
-class UnexpectedTypeError extends Error {
-  name = 'UnexpectedTypeError'
-  constructor(value: unknown) {
-    const type = typeof value
-    const repr = type === 'object' ? JSON.stringify(value) : String(value)
-    super(`unexpected value of type ${type}: ${repr}`)
+const debug = Debug('prisma:driver-adapter:libsql:conversion')
+
+// Mirrors sqlite/conversion.rs in quaint
+function mapDeclType(declType: string): ColumnType | null {
+  switch (declType.toUpperCase()) {
+    case '':
+      return null
+    case 'DECIMAL':
+      return ColumnTypeEnum.Numeric
+    case 'FLOAT':
+      return ColumnTypeEnum.Float
+    case 'DOUBLE':
+    case 'DOUBLE PRECISION':
+    case 'NUMERIC':
+    case 'REAL':
+      return ColumnTypeEnum.Double
+    case 'TINYINT':
+    case 'SMALLINT':
+    case 'MEDIUMINT':
+    case 'INT':
+    case 'INTEGER':
+    case 'SERIAL':
+    case 'INT2':
+      return ColumnTypeEnum.Int32
+    case 'BIGINT':
+    case 'UNSIGNED BIG INT':
+    case 'INT8':
+      return ColumnTypeEnum.Int64
+    case 'DATETIME':
+    case 'TIMESTAMP':
+      return ColumnTypeEnum.DateTime
+    case 'TIME':
+      return ColumnTypeEnum.Time
+    case 'DATE':
+      return ColumnTypeEnum.Date
+    case 'TEXT':
+    case 'CLOB':
+    case 'CHARACTER':
+    case 'VARCHAR':
+    case 'VARYING CHARACTER':
+    case 'NCHAR':
+    case 'NATIVE CHARACTER':
+    case 'NVARCHAR':
+      return ColumnTypeEnum.Text
+    case 'BLOB':
+      return ColumnTypeEnum.Bytes
+    case 'BOOLEAN':
+      return ColumnTypeEnum.Boolean
+    default:
+      debug('unknown decltype:', declType)
+      return null
   }
 }
 
-/**
- * This is currently based on the values since libsql doesn't expose column types.
- */
-export function fieldToColumnType(fieldValue: Value): ColumnType {
-  if (fieldValue === null) {
-    // TODO: not much we can do without decltype
-    return ColumnTypeEnum.Int32
+function mapDeclaredColumnTypes(columntTypes: string[]): [out: Array<ColumnType | null>, empty: Set<number>] {
+  const emptyIndices = new Set<number>()
+  const result = columntTypes.map((typeName, index) => {
+    const mappedType = mapDeclType(typeName)
+    if (mappedType === null) {
+      emptyIndices.add(index)
+    }
+    return mappedType
+  })
+  return [result, emptyIndices]
+}
+
+export function getColumnTypes(declaredTypes: string[], rows: Row[]): ColumnType[] {
+  const [columnTypes, emptyIndices] = mapDeclaredColumnTypes(declaredTypes)
+
+  if (emptyIndices.size === 0) {
+    return columnTypes as ColumnType[]
   }
 
-  switch (typeof fieldValue) {
+  columnLoop: for (const columnIndex of emptyIndices) {
+    // No declared column type in db schema, infer using first non-null value
+    for (let rowIndex = 0; rowIndex < rows.length; rowIndex++) {
+      const candidateValue = rows[rowIndex][columnIndex]
+      if (candidateValue !== null) {
+        columnTypes[columnIndex] = inferColumnType(candidateValue)
+        continue columnLoop
+      }
+    }
+
+    // No non-null value found for this column, fall back to int32 to mimic what quaint does
+    columnTypes[columnIndex] = ColumnTypeEnum.Int32
+  }
+
+  return columnTypes as ColumnType[]
+}
+
+function inferColumnType(value: NonNullable<Value>): ColumnType {
+  switch (typeof value) {
     case 'string':
       return ColumnTypeEnum.Text
     case 'bigint':
@@ -27,22 +100,19 @@ export function fieldToColumnType(fieldValue: Value): ColumnType {
     case 'boolean':
       return ColumnTypeEnum.Boolean
     case 'number':
-      return inferNumericType(fieldValue)
+      return inferNumericType(value)
     case 'object':
-      return inferObjectType(fieldValue)
+      return inferObjectType(value)
     default:
-      throw new UnexpectedTypeError(fieldValue)
+      throw new UnexpectedTypeError(value)
   }
 }
 
 function inferNumericType(value: number): ColumnType {
-  if (!Number.isInteger(value)) {
-    return ColumnTypeEnum.Double
-  }
-  if (value >= -0x80000000 && value <= 0x7fffffff) {
-    return ColumnTypeEnum.Int32
-  } else {
+  if (Number.isInteger(value)) {
     return ColumnTypeEnum.Int64
+  } else {
+    return ColumnTypeEnum.Double
   }
 }
 
@@ -51,4 +121,13 @@ function inferObjectType(value: {}): ColumnType {
     return ColumnTypeEnum.Bytes
   }
   throw new UnexpectedTypeError(value)
+}
+
+class UnexpectedTypeError extends Error {
+  name = 'UnexpectedTypeError'
+  constructor(value: unknown) {
+    const type = typeof value
+    const repr = type === 'object' ? JSON.stringify(value) : String(value)
+    super(`unexpected value of type ${type}: ${repr}`)
+  }
 }

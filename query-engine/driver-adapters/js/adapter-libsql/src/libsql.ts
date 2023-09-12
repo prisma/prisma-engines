@@ -1,4 +1,4 @@
-import { ColumnTypeEnum, Debug } from '@prisma/driver-adapter-utils'
+import { Debug } from '@prisma/driver-adapter-utils'
 import type {
   DriverAdapter,
   Query,
@@ -9,7 +9,7 @@ import type {
   TransactionOptions,
 } from '@prisma/driver-adapter-utils'
 import type { InStatement, Client as LibsqlClientRaw, Transaction as LibsqlTransactionRaw } from '@libsql/client'
-import { fieldToColumnType } from './conversion'
+import { getColumnTypes } from './conversion'
 
 const debug = Debug('prisma:driver-adapter:libsql')
 
@@ -28,11 +28,9 @@ class LibsqlQueryable<ClientT extends StdClient | TransactionClient> implements 
     const tag = '[js::query_raw]'
     debug(`${tag} %O`, query)
 
-    const { columns, rows } = await this.performIO(query)
+    const { columns, rows, columnTypes: declaredColumnTypes } = await this.performIO(query)
 
-    // HACK: since decltype isn't exposed, we have no way to even infer types if there are no rows
-    const columnTypes =
-      rows.length > 0 ? Array.from(rows[0]).map(fieldToColumnType) : columns.map(() => ColumnTypeEnum.Int32)
+    const columnTypes = getColumnTypes(declaredColumnTypes, rows)
 
     const resultSet: ResultSet = {
       columnNames: columns,
@@ -79,7 +77,10 @@ class LibsqlQueryable<ClientT extends StdClient | TransactionClient> implements 
 }
 
 class LibsqlTransaction extends LibsqlQueryable<TransactionClient> implements Transaction {
-  constructor(client: TransactionClient, readonly options: TransactionOptions) {
+  constructor(
+    client: TransactionClient,
+    readonly options: TransactionOptions,
+  ) {
     super(client)
   }
 
