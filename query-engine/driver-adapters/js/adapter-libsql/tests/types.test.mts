@@ -102,6 +102,9 @@ describe('int64 with different intMode', () => {
 
     assert(result.ok)
     assert.equal(result.value.columnTypes[0], ColumnTypeEnum.Int64)
+
+    // TODO: this needs to change as it's not supported by napi.rs,
+    // we need to either map it to string or implement i64 bigint support in napi.rs
     assert.equal(result.value.rows[0][0], N)
   })
 
