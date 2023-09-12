@@ -257,7 +257,6 @@ async fn ms_my_foreign_key_constraint_violation(api: &mut dyn TestApi) -> crate:
     Ok(())
 }
 
-#[cfg(feature = "chrono")]
 #[test_each_connector(tags("mysql"))]
 async fn garbage_datetime_values(api: &mut dyn TestApi) -> crate::Result<()> {
     api.conn()

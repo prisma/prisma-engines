@@ -348,17 +348,14 @@ impl<'a> Visitor<'a> for Mssql<'a> {
                 let s = format!("CONVERT(uniqueidentifier, N'{}')", uuid.hyphenated());
                 self.write(s)
             }),
-            #[cfg(feature = "chrono")]
             Value::DateTime(dt) => dt.map(|dt| {
                 let s = format!("CONVERT(datetimeoffset, N'{}')", dt.to_rfc3339());
                 self.write(s)
             }),
-            #[cfg(feature = "chrono")]
             Value::Date(date) => date.map(|date| {
                 let s = format!("CONVERT(date, N'{date}')");
                 self.write(s)
             }),
-            #[cfg(feature = "chrono")]
             Value::Time(time) => time.map(|time| {
                 let s = format!("CONVERT(time, N'{time}')");
                 self.write(s)
@@ -1270,7 +1267,6 @@ mod tests {
     }
 
     #[test]
-    #[cfg(feature = "chrono")]
     fn test_raw_datetime() {
         let dt = chrono::Utc::now();
         let (sql, params) = Mssql::build(Select::default().value(dt.raw())).unwrap();

@@ -216,13 +216,11 @@ test_type!(json(
     Value::json(serde_json::json!({"this": "is", "a": "json", "number": 2}))
 ));
 
-#[cfg(feature = "chrono")]
 test_type!(date(mysql, "date", Value::Date(None), {
     let dt = chrono::DateTime::parse_from_rfc3339("2020-04-20T00:00:00Z").unwrap();
     Value::datetime(dt.with_timezone(&chrono::Utc))
 }));
 
-#[cfg(feature = "chrono")]
 test_type!(time(
     mysql,
     "time",
@@ -230,13 +228,11 @@ test_type!(time(
     Value::time(chrono::NaiveTime::from_hms_opt(16, 20, 00).unwrap())
 ));
 
-#[cfg(feature = "chrono")]
 test_type!(datetime(mysql, "datetime", Value::DateTime(None), {
     let dt = chrono::DateTime::parse_from_rfc3339("2020-02-27T19:10:22Z").unwrap();
     Value::datetime(dt.with_timezone(&chrono::Utc))
 }));
 
-#[cfg(feature = "chrono")]
 test_type!(timestamp(mysql, "timestamp", {
     let dt = chrono::DateTime::parse_from_rfc3339("2020-02-27T19:10:22Z").unwrap();
     Value::datetime(dt.with_timezone(&chrono::Utc))

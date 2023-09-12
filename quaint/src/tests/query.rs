@@ -3085,7 +3085,6 @@ async fn query_raw_typed_numeric(api: &mut dyn TestApi) -> crate::Result<()> {
     Ok(())
 }
 
-#[cfg(feature = "chrono")]
 #[test_each_connector(tags("postgresql"))]
 async fn query_raw_typed_date(api: &mut dyn TestApi) -> crate::Result<()> {
     use chrono::DateTime;
