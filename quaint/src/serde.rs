@@ -135,9 +135,7 @@ impl<'de> Deserializer<'de> for ValueDeserializer<'de> {
             #[cfg(feature = "bigdecimal")]
             Value::Numeric(None) => visitor.visit_none(),
 
-            #[cfg(feature = "uuid")]
             Value::Uuid(Some(uuid)) => visitor.visit_string(uuid.to_string()),
-            #[cfg(feature = "uuid")]
             Value::Uuid(None) => visitor.visit_none(),
 
             #[cfg(feature = "json")]

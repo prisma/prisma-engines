@@ -353,7 +353,6 @@ async fn should_execute_multi_statement_queries_with_raw_cmd(api: &mut dyn TestA
     Ok(())
 }
 
-#[cfg(feature = "uuid")]
 #[test_each_connector(tags("postgresql"))]
 async fn uuid_length_error(api: &mut dyn TestApi) -> crate::Result<()> {
     let table = api.create_temp_table("value uuid").await?;

@@ -26,7 +26,6 @@ impl<'a> IntoSql<'a> for &'a Value<'a> {
             Value::Numeric(val) => (*val).to_sql(),
             #[cfg(feature = "json")]
             Value::Json(val) => val.as_ref().map(|val| serde_json::to_string(&val).unwrap()).into_sql(),
-            #[cfg(feature = "uuid")]
             Value::Uuid(val) => val.into_sql(),
             Value::DateTime(val) => val.into_sql(),
             Value::Date(val) => val.into_sql(),

@@ -12,7 +12,6 @@ use std::{
     fmt,
     str::FromStr,
 };
-#[cfg(feature = "uuid")]
 use uuid::Uuid;
 
 /// A value written to the query as-is without parameterization.
@@ -70,7 +69,6 @@ pub enum Value<'a> {
     Json(Option<serde_json::Value>),
     /// A XML value.
     Xml(Option<Cow<'a, str>>),
-    #[cfg(feature = "uuid")]
     #[cfg_attr(feature = "docs", doc(cfg(feature = "uuid")))]
     /// An UUID value.
     Uuid(Option<Uuid>),
@@ -130,7 +128,6 @@ impl<'a> fmt::Display for Value<'a> {
             Value::Numeric(val) => val.as_ref().map(|v| write!(f, "{v}")),
             #[cfg(feature = "json")]
             Value::Json(val) => val.as_ref().map(|v| write!(f, "{v}")),
-            #[cfg(feature = "uuid")]
             Value::Uuid(val) => val.map(|v| write!(f, "\"{v}\"")),
             Value::DateTime(val) => val.map(|v| write!(f, "\"{v}\"")),
             Value::Date(val) => val.map(|v| write!(f, "\"{v}\"")),
@@ -178,7 +175,6 @@ impl<'a> From<Value<'a>> for serde_json::Value {
             Value::Numeric(d) => d.map(|d| serde_json::to_value(d.to_f64().unwrap()).unwrap()),
             #[cfg(feature = "json")]
             Value::Json(v) => v,
-            #[cfg(feature = "uuid")]
             Value::Uuid(u) => u.map(|u| serde_json::Value::String(u.hyphenated().to_string())),
             Value::DateTime(dt) => dt.map(|dt| serde_json::Value::String(dt.to_rfc3339())),
             Value::Date(date) => date.map(|date| serde_json::Value::String(format!("{date}"))),
@@ -284,7 +280,6 @@ impl<'a> Value<'a> {
     }
 
     /// Creates a new uuid value.
-    #[cfg(feature = "uuid")]
     #[cfg_attr(feature = "docs", doc(cfg(feature = "uuid")))]
     pub const fn uuid(value: Uuid) -> Self {
         Value::Uuid(Some(value))
@@ -336,7 +331,6 @@ impl<'a> Value<'a> {
             Value::Xml(s) => s.is_none(),
             #[cfg(feature = "bigdecimal")]
             Value::Numeric(r) => r.is_none(),
-            #[cfg(feature = "uuid")]
             Value::Uuid(u) => u.is_none(),
             Value::DateTime(dt) => dt.is_none(),
             Value::Date(d) => d.is_none(),
@@ -525,14 +519,12 @@ impl<'a> Value<'a> {
     }
 
     /// `true` if the `Value` is of UUID type.
-    #[cfg(feature = "uuid")]
     #[cfg_attr(feature = "docs", doc(cfg(feature = "uuid")))]
     pub const fn is_uuid(&self) -> bool {
         matches!(self, Value::Uuid(_))
     }
 
     /// Returns an UUID if the value is of UUID type, otherwise `None`.
-    #[cfg(feature = "uuid")]
     #[cfg_attr(feature = "docs", doc(cfg(feature = "uuid")))]
     pub const fn as_uuid(&self) -> Option<Uuid> {
         match self {
@@ -660,7 +652,6 @@ value!(val: chrono::NaiveDate, Date, val);
 value!(val: BigDecimal, Numeric, val);
 #[cfg(feature = "json")]
 value!(val: JsonValue, Json, val);
-#[cfg(feature = "uuid")]
 value!(val: Uuid, Uuid, val);
 
 impl<'a> TryFrom<Value<'a>> for i64 {
@@ -766,7 +757,6 @@ impl<'a> TryFrom<&Value<'a>> for Option<std::net::IpAddr> {
     }
 }
 
-#[cfg(feature = "uuid")]
 impl<'a> TryFrom<&Value<'a>> for Option<uuid::Uuid> {
     type Error = Error;
 
@@ -964,7 +954,6 @@ mod tests {
     }
 
     #[test]
-    #[cfg(feature = "uuid")]
     fn display_format_for_uuid() {
         let id = Uuid::from_str("67e5504410b1426f9247bb680e5fe0c8").unwrap();
         let pv = Value::uuid(id);

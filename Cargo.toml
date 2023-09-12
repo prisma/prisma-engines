@@ -64,7 +64,6 @@ features = [
   "pooled",
   "postgresql",
   "sqlite",
-  "uuid",
 ]
 
 [profile.dev.package.backtrace]
