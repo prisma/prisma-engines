@@ -47,6 +47,8 @@ export async function smokeTestClient(driverAdapter: DriverAdapter) {
           '-- Implicit "COMMIT" query via underlying driver',
         ]
 
+        // TODO: sqlite should be here too but it's too flaky the way the test is currently written,
+        // only a subset of logs arrives on time (from 2 to 4 out of 5)
         if (['mysql'].includes(provider)) {
           if (isUsingDriverAdapters) {
             assert.deepEqual(queries, driverAdapterExpectedQueries)
