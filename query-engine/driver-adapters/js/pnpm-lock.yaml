@@ -14,6 +14,9 @@ importers:
       tsup:
         specifier: ^7.2.0
         version: 7.2.0(typescript@5.1.6)
+      tsx:
+        specifier: ^3.12.7
+        version: 3.12.7
       typescript:
         specifier: ^5.1.6
         version: 5.1.6
@@ -146,9 +149,6 @@ importers:
       prisma:
         specifier: 5.3.0-integration-feat-driver-adapters-in-client.3
         version: 5.3.0-integration-feat-driver-adapters-in-client.3
-      tsx:
-        specifier: ^3.12.7
-        version: 3.12.7
 
 packages:
 

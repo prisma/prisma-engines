@@ -58,7 +58,6 @@
     "@types/node": "^20.5.1",
     "@types/pg": "^8.10.2",
     "cross-env": "^7.0.3",
-    "prisma": "5.3.0-integration-feat-driver-adapters-in-client.3",
-    "tsx": "^3.12.7"
+    "prisma": "5.3.0-integration-feat-driver-adapters-in-client.3"
   }
 }
