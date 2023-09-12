@@ -57,7 +57,7 @@ mod distinct {
 
         assert_query!(
             runner,
-            "query { findManyUser(distinct: [first_name, last_name]) { id, first_name, last_name } }",
+            "query { findManyUser(distinct: [first_name, last_name], orderBy: {id: asc}) { id, first_name, last_name } }",
             r#"{"data":{"findManyUser":[{"id":1,"first_name":"Joe","last_name":"Doe"},{"id":2,"first_name":"Hans","last_name":"Wurst"}]}}"#
         );
 
