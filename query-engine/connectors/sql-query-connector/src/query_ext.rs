@@ -127,7 +127,7 @@ impl<Q: Queryable + ?Sized> QueryExt for Q {
     ) -> crate::Result<Vec<SelectionResult>> {
         let model_id: ModelProjection = model.primary_identifier().into();
         let id_cols: Vec<Column<'static>> = model_id.as_columns(ctx).collect();
-        let condition = FilterBuilder::without_joins().visit_filter(filter, ctx);
+        let condition = FilterBuilder::without_top_level_joins().visit_filter(filter, ctx);
 
         let select = Select::from_table(model.as_table(ctx))
             .columns(id_cols)

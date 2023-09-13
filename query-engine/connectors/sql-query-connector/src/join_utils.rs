@@ -78,7 +78,7 @@ fn compute_aggr_join_one2m(
     };
     let select_columns = right_fields.iter().map(|f| f.as_column(ctx));
     let (conditions, joins) = filter
-        .map(|f| FilterBuilder::with_joins().visit_filter(f, ctx))
+        .map(|f| FilterBuilder::with_top_level_joins().visit_filter(f, ctx))
         .unwrap_or((ConditionTree::NoCondition, None));
 
     // + SELECT Child.<fk> FROM Child WHERE <FILTER>
@@ -162,7 +162,7 @@ fn compute_aggr_join_m2m(
     let parent_ids: ModelProjection = rf.model().primary_identifier().into();
     // Rendered filters
     let (conditions, joins) = filter
-        .map(|f| FilterBuilder::with_joins().visit_filter(f, ctx))
+        .map(|f| FilterBuilder::with_top_level_joins().visit_filter(f, ctx))
         .unwrap_or((ConditionTree::NoCondition, None));
 
     // + SELECT _ParentToChild.ChildId FROM Child WHERE <FILTER>

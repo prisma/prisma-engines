@@ -67,7 +67,7 @@ impl SelectDefinition for QueryArguments {
 
         let (filter, filter_joins) = self
             .filter
-            .map(|f| FilterBuilder::with_joins().visit_filter(f, ctx))
+            .map(|f| FilterBuilder::with_top_level_joins().visit_filter(f, ctx))
             .unwrap_or((ConditionTree::NoCondition, None));
 
         let conditions = match (filter, cursor_condition) {
@@ -256,7 +256,7 @@ pub(crate) fn group_by_aggregate(
 
     match having {
         Some(filter) => {
-            let cond = FilterBuilder::without_joins().visit_filter(filter, ctx);
+            let cond = FilterBuilder::without_top_level_joins().visit_filter(filter, ctx);
 
             grouped.having(cond)
         }

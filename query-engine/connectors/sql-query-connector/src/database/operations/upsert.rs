@@ -21,7 +21,7 @@ pub(crate) async fn native_upsert(
 
     let meta = column_metadata::create(&field_names, &idents);
 
-    let where_condition = FilterBuilder::without_joins().visit_filter(upsert.filter().clone(), ctx);
+    let where_condition = FilterBuilder::without_top_level_joins().visit_filter(upsert.filter().clone(), ctx);
     let update =
         build_update_and_set_query(upsert.model(), upsert.update().clone(), None, ctx).so_that(where_condition);
 

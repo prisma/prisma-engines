@@ -31,7 +31,7 @@ pub(crate) async fn update_one_with_selection(
         return get_single_record(conn, model, &filter, &selected_fields, &[], ctx).await;
     }
 
-    let cond = FilterBuilder::without_joins().visit_filter(build_update_one_filter(record_filter), ctx);
+    let cond = FilterBuilder::without_top_level_joins().visit_filter(build_update_one_filter(record_filter), ctx);
 
     let update = build_update_and_set_query(model, args, Some(&selected_fields), ctx).so_that(cond);
 
@@ -102,7 +102,7 @@ pub(crate) async fn update_many_from_filter(
     ctx: &Context<'_>,
 ) -> crate::Result<usize> {
     let update = build_update_and_set_query(model, args, None, ctx);
-    let filter_condition = FilterBuilder::without_joins().visit_filter(record_filter.filter, ctx);
+    let filter_condition = FilterBuilder::without_top_level_joins().visit_filter(record_filter.filter, ctx);
     let update = update.so_that(filter_condition);
     let count = conn.execute(update.into()).await?;
 
@@ -118,7 +118,7 @@ pub(crate) async fn update_many_from_ids_and_filter(
     args: WriteArgs,
     ctx: &Context<'_>,
 ) -> crate::Result<(usize, Vec<SelectionResult>)> {
-    let filter_condition = FilterBuilder::without_joins().visit_filter(record_filter.filter.clone(), ctx);
+    let filter_condition = FilterBuilder::without_top_level_joins().visit_filter(record_filter.filter.clone(), ctx);
     let ids: Vec<SelectionResult> = conn.filter_selectors(model, record_filter, ctx).await?;
 
     if ids.is_empty() {

@@ -28,40 +28,34 @@ pub(crate) trait FilterVisitorExt {
 
 #[derive(Debug, Clone, Default)]
 pub(crate) struct FilterVisitor {
-    reverse: bool,
+    /// The last alias that's been rendered.
     last_alias: Option<Alias>,
+    /// The parent alias, used when rendering nested filters so that a child filter can refer to its join.
     parent_alias: Option<Alias>,
-    with_joins: bool,
+    /// Whether filters can return top-level joins.
+    with_top_level_joins: bool,
+    /// Whether this visitor traverses nested filters.
+    is_nested: bool,
+    /// Whether the visitor is in a NOT clause.
+    reverse: bool,
 }
 
 impl FilterVisitor {
-    pub fn with_joins() -> Self {
+    pub fn with_top_level_joins() -> Self {
         Self {
-            with_joins: true,
+            with_top_level_joins: true,
             ..Default::default()
         }
     }
 
-    pub fn without_joins() -> Self {
+    pub fn without_top_level_joins() -> Self {
         Self {
-            with_joins: false,
+            with_top_level_joins: false,
             ..Default::default()
         }
     }
 
-    fn invert_reverse(&mut self) -> &mut Self {
-        self.reverse = !self.reverse;
-        self
-    }
-
-    fn reverse(&self) -> bool {
-        self.reverse
-    }
-
-    fn last_alias(&self) -> Option<Alias> {
-        self.last_alias
-    }
-
+    /// Returns the next join/table alias by increasing the counter of the last alias.
     fn next_alias(&mut self, mode: AliasMode) -> Alias {
         let next_alias = self.last_alias.unwrap_or_default().inc(mode);
         self.last_alias = Some(next_alias);
@@ -69,21 +63,42 @@ impl FilterVisitor {
         next_alias
     }
 
-    fn set_opt_last_alias(&mut self, alias: Option<Alias>) -> &mut Self {
-        if let Some(alias) = alias {
+    /// Returns the parent alias, if there's one set, so that nested filters can refer to the parent join/table.
+    fn parent_alias(&self) -> Option<Alias> {
+        self.parent_alias
+    }
+
+    /// A top-level join can be rendered if we're explicitly allowing it or if we're in a nested visitor.
+    fn should_render_join(&self) -> bool {
+        self.with_top_level_joins || self.is_nested
+    }
+
+    /// Returns whether the visitor is in a NOT clause.
+    fn reverse(&self) -> bool {
+        self.reverse
+    }
+
+    fn invert_reverse<T>(&mut self, f: impl FnOnce(&mut Self) -> T) -> T {
+        self.reverse = !self.reverse;
+        let res = f(self);
+        self.reverse = !self.reverse;
+        res
+    }
+
+    fn update_last_alias(&mut self, nested_visitor: &Self) -> &mut Self {
+        if let Some(alias) = nested_visitor.last_alias {
             self.last_alias = Some(alias);
         }
 
         self
     }
 
-    fn set_parent_alias(&mut self, alias: Alias) -> &mut Self {
-        self.parent_alias = Some(alias);
-        self
-    }
+    fn create_nested_visitor(&self, parent_alias: Alias) -> Self {
+        let mut nested_visitor = self.clone();
+        nested_visitor.is_nested = true;
+        nested_visitor.parent_alias = Some(parent_alias);
 
-    fn parent_alias(&self) -> Option<Alias> {
-        self.parent_alias
+        nested_visitor
     }
 
     fn visit_nested_filter(
@@ -93,35 +108,28 @@ impl FilterVisitor {
         invert_reverse: bool,
         ctx: &Context<'_>,
     ) -> (ConditionTree<'static>, Option<Vec<AliasedJoin>>) {
-        // We clone the visitor to avoid side-effects when building the nested joins.
-        // For instance, we don't want the `parent_alias` to be set for the current visitor.
-        let mut nested_visitor = self.clone();
+        let mut nested_visitor = self.create_nested_visitor(parent_alias);
 
-        let nested_visitor = if invert_reverse {
-            nested_visitor.invert_reverse()
+        let (nested_conditions, nested_joins) = if invert_reverse {
+            nested_visitor.invert_reverse(|this| this.visit_filter(filter, ctx))
         } else {
-            &mut nested_visitor
+            nested_visitor.visit_filter(filter, ctx)
         };
 
-        // Sets the parent alias for the nested visitor.
-        nested_visitor.set_parent_alias(parent_alias);
+        // Ensures the alias counter is updated after building the nested filter so that we don't render duplicate aliases.
+        self.update_last_alias(&nested_visitor);
 
-        let (cond, joins) = nested_visitor.visit_filter(filter, ctx);
-
-        // Ensures the counter is updated after building the nested filter.
-        self.set_opt_last_alias(nested_visitor.last_alias());
-
-        (cond, joins)
+        (nested_conditions, nested_joins)
     }
 
     fn visit_relation_filter_select(&mut self, filter: RelationFilter, ctx: &Context<'_>) -> Select<'static> {
         let alias = self.next_alias(AliasMode::Table);
         let condition = filter.condition;
 
-        // Perf: We can skip on a join if the related is inline, meaning that it's just a link between two `RelationField`s.
+        // Perf: We can skip a join if the relation is inlined on the related model.
         // In this case, we can select the related table's foreign key instead of joining.
         // This is not possible in the case of M2M implicit relations.
-        if filter.field.relation().is_inline_relation() {
+        if filter.field.related_field().is_inlined_on_enclosing_model() {
             let related_table = filter.field.related_model().as_table(ctx);
             let related_columns: Vec<_> = ModelProjection::from(filter.field.related_field().linking_fields())
                 .as_columns(ctx)
@@ -203,8 +211,8 @@ impl FilterVisitorExt for FilterVisitor {
                 n if n == 0 => (ConditionTree::NoCondition, None),
                 n if n == 1 => self.visit_filter(filters.pop().unwrap(), ctx),
                 _ => {
-                    let mut exprs = vec![];
-                    let mut joins = vec![];
+                    let mut exprs = Vec::with_capacity(filters.len());
+                    let mut top_level_joins = vec![];
 
                     for filter in filters {
                         let (conditions, nested_joins) = self.visit_filter(filter, ctx);
@@ -212,19 +220,19 @@ impl FilterVisitorExt for FilterVisitor {
                         exprs.push(Expression::from(conditions));
 
                         if let Some(nested_joins) = nested_joins {
-                            joins.extend(nested_joins);
+                            top_level_joins.extend(nested_joins);
                         }
                     }
 
-                    (ConditionTree::And(exprs), Some(joins))
+                    (ConditionTree::And(exprs), Some(top_level_joins))
                 }
             },
             Filter::Or(mut filters) => match filters.len() {
                 n if n == 0 => (ConditionTree::NegativeCondition, None),
                 n if n == 1 => self.visit_filter(filters.pop().unwrap(), ctx),
                 _ => {
-                    let mut exprs = vec![];
-                    let mut joins = vec![];
+                    let mut exprs = Vec::with_capacity(filters.len());
+                    let mut top_level_joins = vec![];
 
                     for filter in filters {
                         let (conditions, nested_joins) = self.visit_filter(filter, ctx);
@@ -232,39 +240,36 @@ impl FilterVisitorExt for FilterVisitor {
                         exprs.push(Expression::from(conditions));
 
                         if let Some(nested_joins) = nested_joins {
-                            joins.extend(nested_joins);
+                            top_level_joins.extend(nested_joins);
                         }
                     }
 
-                    (ConditionTree::Or(exprs), Some(joins))
+                    (ConditionTree::Or(exprs), Some(top_level_joins))
                 }
             },
             Filter::Not(mut filters) => match filters.len() {
                 n if n == 0 => (ConditionTree::NoCondition, None),
                 n if n == 1 => {
-                    self.invert_reverse();
-                    let (cond, joins) = self.visit_filter(filters.pop().unwrap(), ctx);
+                    let (cond, joins) = self.invert_reverse(|this| this.visit_filter(filters.pop().unwrap(), ctx));
 
                     (cond.not(), joins)
                 }
                 _ => {
-                    let mut exprs = vec![];
-                    let mut joins = vec![];
-
-                    self.invert_reverse();
+                    let mut exprs = Vec::with_capacity(filters.len());
+                    let mut top_level_joins = vec![];
 
                     for filter in filters {
-                        let (conditions, nested_joins) = self.visit_filter(filter, ctx);
-                        let inverted_condition = conditions.not();
+                        let (conditions, nested_joins) = self.invert_reverse(|this| this.visit_filter(filter, ctx));
+                        let inverted_conditions = conditions.not();
 
-                        exprs.push(Expression::from(inverted_condition));
+                        exprs.push(Expression::from(inverted_conditions));
 
                         if let Some(nested_joins) = nested_joins {
-                            joins.extend(nested_joins);
+                            top_level_joins.extend(nested_joins);
                         }
                     }
 
-                    (ConditionTree::And(exprs), Some(joins))
+                    (ConditionTree::And(exprs), Some(top_level_joins))
                 }
             },
             Filter::Scalar(filter) => (self.visit_scalar_filter(filter, ctx), None),
@@ -330,7 +335,7 @@ impl FilterVisitorExt for FilterVisitor {
         let parent_alias = self.parent_alias().map(|a| a.to_string(None));
 
         match &filter.condition {
-            RelationCondition::NoRelatedRecord if self.with_joins && !filter.field.is_list() => {
+            RelationCondition::NoRelatedRecord if self.should_render_join() && !filter.field.is_list() => {
                 let alias = self.next_alias(AliasMode::Join);
 
                 let join = compute_one2m_join(
@@ -350,7 +355,7 @@ impl FilterVisitorExt for FilterVisitor {
 
                 (conditions.not(), Some(output_joins))
             }
-            RelationCondition::ToOneRelatedRecord if self.with_joins && !filter.field.is_list() => {
+            RelationCondition::ToOneRelatedRecord if self.should_render_join() && !filter.field.is_list() => {
                 let alias = self.next_alias(AliasMode::Join);
 
                 let linking_fields: Vec<_> = ModelProjection::from(filter.field.model().primary_identifier())
@@ -403,79 +408,99 @@ impl FilterVisitorExt for FilterVisitor {
         let parent_alias = self.parent_alias();
         let parent_alias_string = parent_alias.as_ref().map(|a| a.to_string(None));
 
+        // If the relation is inlined, we simply check whether the linking fields are null.
+        //
+        // ```sql
+        //  SELECT "Parent"."id" FROM "Parent"
+        //    WHERE "Parent"."childId" IS NULL;
+        // ```
         if filter.field.is_inlined_on_enclosing_model() {
-            let columns: Vec<_> = filter
-                .field
+            let columns: Vec<_> = ModelProjection::from(filter.field.linking_fields())
                 .as_columns(ctx)
                 .map(|c| c.opt_table(parent_alias_string.clone()))
                 .collect();
             let condition = Row::from(columns).is_null();
 
-            (ConditionTree::single(condition), None)
-        } else {
-            if self.with_joins {
-                let alias = self.next_alias(AliasMode::Join);
-
-                let id_columns: Vec<_> = ModelProjection::from(filter.field.model().primary_identifier())
-                    .as_columns(ctx)
-                    .map(|c| c.aliased_col(Some(alias), ctx))
-                    .collect();
-
-                let join = compute_one2m_join(
-                    &filter.field,
-                    alias.to_string(None).as_str(),
-                    parent_alias_string.as_deref(),
-                    ctx,
-                );
-
-                (ConditionTree::single(Row::from(id_columns).is_null()), Some(vec![join]))
-            } else {
-                let relation = filter.field.relation();
-                let table = relation.as_table(ctx);
-                let relation_table = match parent_alias {
-                    Some(ref alias) => table.alias(alias.to_string(None)),
-                    None => table,
-                };
-
-                let columns_not_null =
-                    filter
-                        .field
-                        .related_field()
-                        .as_columns(ctx)
-                        .fold(ConditionTree::NoCondition, |acc, column| {
-                            let column_is_not_null = column.opt_table(parent_alias_string.clone()).is_not_null();
-
-                            match acc {
-                                ConditionTree::NoCondition => column_is_not_null.into(),
-                                cond => cond.and(column_is_not_null),
-                            }
-                        });
-
-                // If the table is aliased, we need to use that alias in the SELECT too
-                // eg: SELECT <alias>.x FROM table AS <alias>
-                let columns: Vec<_> = filter
-                    .field
-                    .related_field()
-                    .scalar_fields()
-                    .iter()
-                    .map(|f| f.as_column(ctx).opt_table(parent_alias_string.clone()))
-                    .collect();
-
-                let sub_select = Select::from_table(relation_table)
-                    .columns(columns)
-                    .and_where(columns_not_null);
-
-                let id_columns: Vec<Column<'static>> = ModelProjection::from(filter.field.linking_fields())
-                    .as_columns(ctx)
-                    .map(|c| c.opt_table(parent_alias_string.clone()))
-                    .collect();
-
-                (
-                    ConditionTree::single(Row::from(id_columns).not_in_selection(sub_select)),
-                    None,
-                )
-            }
+            return (ConditionTree::single(condition), None);
         }
+
+        // If the relation is not inlined and we can use joins, then we join the relation and check whether the related linking fields are null.
+        //
+        // ```sql
+        //  SELECT "Parent"."id" FROM "Parent"
+        //    LEFT JOIN "Child" AS "j1" ON ("j1"."parentId" = "Parent"."id")
+        //  WHERE "j1"."parentId" IS NULL OFFSET;
+        // ```
+        if self.should_render_join() {
+            let alias = self.next_alias(AliasMode::Join);
+
+            let id_columns: Vec<_> = ModelProjection::from(filter.field.related_field().linking_fields())
+                .as_columns(ctx)
+                .map(|c| c.aliased_col(Some(alias), ctx))
+                .collect();
+
+            let join = compute_one2m_join(
+                &filter.field,
+                alias.to_string(None).as_str(),
+                parent_alias_string.as_deref(),
+                ctx,
+            );
+
+            return (ConditionTree::single(Row::from(id_columns).is_null()), Some(vec![join]));
+        }
+
+        // Otherwise, we use a NOT IN clause and a subselect to find the related records that are nulls.
+        //
+        // ```sql
+        //  SELECT "Parent"."id" FROM "Parent"
+        //    WHERE ("Parent".id) NOT IN (
+        //      SELECT "Child"."parentId" FROM "Child" WHERE "Child"."parentId" IS NOT NULL
+        //    )
+        // ```
+        let relation = filter.field.relation();
+        let table = relation.as_table(ctx);
+        let relation_table = match parent_alias {
+            Some(ref alias) => table.alias(alias.to_string(None)),
+            None => table,
+        };
+
+        let columns_not_null =
+            filter
+                .field
+                .related_field()
+                .as_columns(ctx)
+                .fold(ConditionTree::NoCondition, |acc, column| {
+                    let column_is_not_null = column.opt_table(parent_alias_string.clone()).is_not_null();
+
+                    match acc {
+                        ConditionTree::NoCondition => column_is_not_null.into(),
+                        cond => cond.and(column_is_not_null),
+                    }
+                });
+
+        // If the table is aliased, we need to use that alias in the SELECT too
+        // eg: SELECT <alias>.x FROM table AS <alias>
+        let columns: Vec<_> = filter
+            .field
+            .related_field()
+            .scalar_fields()
+            .iter()
+            .map(|f| f.as_column(ctx).opt_table(parent_alias_string.clone()))
+            .collect();
+
+        let sub_select = Select::from_table(relation_table)
+            .columns(columns)
+            .and_where(columns_not_null);
+
+        let id_columns: Vec<Column<'static>> = ModelProjection::from(filter.field.linking_fields())
+            .as_columns(ctx)
+            .map(|c| c.opt_table(parent_alias_string.clone()))
+            .collect();
+
+        (
+            ConditionTree::single(Row::from(id_columns).not_in_selection(sub_select)),
+            None,
+        )
     }
 
     fn visit_aggregation_filter(&mut self, filter: AggregationFilter, ctx: &Context<'_>) -> ConditionTree<'static> {
@@ -493,8 +518,37 @@ impl FilterVisitorExt for FilterVisitor {
 
     fn visit_scalar_list_filter(&mut self, filter: ScalarListFilter, ctx: &Context<'_>) -> ConditionTree<'static> {
         let comparable: Expression = filter.field.aliased_col(self.parent_alias(), ctx).into();
+        let cond = filter.condition;
+        let field = &filter.field;
+        let alias = self.parent_alias();
 
-        convert_scalar_list_filter(comparable, filter.condition, &filter.field, self.parent_alias(), ctx)
+        let condition = match cond {
+            ScalarListCondition::Contains(ConditionValue::Value(val)) => {
+                comparable.compare_raw("@>", convert_list_pv(field, vec![val]))
+            }
+            ScalarListCondition::Contains(ConditionValue::FieldRef(field_ref)) => {
+                let field_ref_expr: Expression = field_ref.aliased_col(alias, ctx).into();
+
+                // This code path is only reachable for connectors with `ScalarLists` capability
+                field_ref_expr.equals(comparable.any())
+            }
+            ScalarListCondition::ContainsEvery(ConditionListValue::List(vals)) => {
+                comparable.compare_raw("@>", convert_list_pv(field, vals))
+            }
+            ScalarListCondition::ContainsEvery(ConditionListValue::FieldRef(field_ref)) => {
+                comparable.compare_raw("@>", field_ref.aliased_col(alias, ctx))
+            }
+            ScalarListCondition::ContainsSome(ConditionListValue::List(vals)) => {
+                comparable.compare_raw("&&", convert_list_pv(field, vals))
+            }
+            ScalarListCondition::ContainsSome(ConditionListValue::FieldRef(field_ref)) => {
+                comparable.compare_raw("&&", field_ref.aliased_col(alias, ctx))
+            }
+            ScalarListCondition::IsEmpty(true) => comparable.compare_raw("=", Value::Array(Some(vec![])).raw()),
+            ScalarListCondition::IsEmpty(false) => comparable.compare_raw("<>", Value::Array(Some(vec![])).raw()),
+        };
+
+        ConditionTree::single(condition)
     }
 }
 
@@ -531,42 +585,6 @@ fn scalar_filter_aliased_cond(
     }
 }
 
-fn convert_scalar_list_filter(
-    comparable: Expression<'static>,
-    cond: ScalarListCondition,
-    field: &ScalarFieldRef,
-    alias: Option<Alias>,
-    ctx: &Context<'_>,
-) -> ConditionTree<'static> {
-    let condition = match cond {
-        ScalarListCondition::Contains(ConditionValue::Value(val)) => {
-            comparable.compare_raw("@>", convert_list_pv(field, vec![val]))
-        }
-        ScalarListCondition::Contains(ConditionValue::FieldRef(field_ref)) => {
-            let field_ref_expr: Expression = field_ref.aliased_col(alias, ctx).into();
-
-            // This code path is only reachable for connectors with `ScalarLists` capability
-            field_ref_expr.equals(comparable.any())
-        }
-        ScalarListCondition::ContainsEvery(ConditionListValue::List(vals)) => {
-            comparable.compare_raw("@>", convert_list_pv(field, vals))
-        }
-        ScalarListCondition::ContainsEvery(ConditionListValue::FieldRef(field_ref)) => {
-            comparable.compare_raw("@>", field_ref.aliased_col(alias, ctx))
-        }
-        ScalarListCondition::ContainsSome(ConditionListValue::List(vals)) => {
-            comparable.compare_raw("&&", convert_list_pv(field, vals))
-        }
-        ScalarListCondition::ContainsSome(ConditionListValue::FieldRef(field_ref)) => {
-            comparable.compare_raw("&&", field_ref.aliased_col(alias, ctx))
-        }
-        ScalarListCondition::IsEmpty(true) => comparable.compare_raw("=", Value::Array(Some(vec![])).raw()),
-        ScalarListCondition::IsEmpty(false) => comparable.compare_raw("<>", Value::Array(Some(vec![])).raw()),
-    };
-
-    ConditionTree::single(condition)
-}
-
 fn aggregate_conditions<T>(
     filter: Filter,
     alias: Option<Alias>,
@@ -577,10 +595,7 @@ fn aggregate_conditions<T>(
 where
     T: Fn(Column) -> Expression,
 {
-    let sf = match filter {
-        Filter::Scalar(sf) => sf,
-        _ => unimplemented!(),
-    };
+    let sf = filter.into_scalar().unwrap();
 
     match sf.projection {
         ScalarProjection::Compound(_) => {
