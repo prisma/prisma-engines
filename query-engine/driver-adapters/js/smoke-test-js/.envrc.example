@@ -7,3 +7,6 @@ export JS_PG_DATABASE_URL="postgres://postgres:prisma@localhost:5438"
 export JS_LIBSQL_DATABASE_URL="file:${PWD}/libsql.db"
 # Set this when using a remote Turso database
 # export JS_LIBSQL_AUTH_TOKEN=""
+
+# Can be one of "number" (the default when nothing is specified), "bigint" or "string". "bigint" works best with Prisma.
+export JS_LIBSQL_INT_MODE="bigint"

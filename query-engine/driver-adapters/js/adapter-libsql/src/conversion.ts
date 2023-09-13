@@ -131,3 +131,16 @@ class UnexpectedTypeError extends Error {
     super(`unexpected value of type ${type}: ${repr}`)
   }
 }
+
+export function mapRow(row: Row): Value[] {
+  // `Row` doesn't have map, so we copy the array once and modify it in-place
+  // to avoid allocating and copying twice if we used `Array.from(row).map(...)`.
+  const result = Array.from(row)
+  for (let i = 0; i < result.length; i++) {
+    const value = result[i]
+    if (typeof value === 'bigint') {
+      result[i] = value.toString()
+    }
+  }
+  return result
+}

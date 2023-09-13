@@ -103,9 +103,9 @@ describe('int64 with different intMode', () => {
     assert(result.ok)
     assert.equal(result.value.columnTypes[0], ColumnTypeEnum.Int64)
 
-    // TODO: this needs to change as it's not supported by napi.rs,
-    // we need to either map it to string or implement i64 bigint support in napi.rs
-    assert.equal(result.value.rows[0][0], N)
+    // bigints are converted to strings because we can't currently pass a bigint
+    // to rust due to a napi.rs limitation
+    assert.equal(result.value.rows[0][0], N.toString())
   })
 
   it('correctly infers int64 with intMode=string when we have decltype', async () => {

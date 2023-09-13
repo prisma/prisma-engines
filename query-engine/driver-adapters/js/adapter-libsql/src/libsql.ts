@@ -9,7 +9,7 @@ import type {
   TransactionOptions,
 } from '@prisma/driver-adapter-utils'
 import type { InStatement, Client as LibsqlClientRaw, Transaction as LibsqlTransactionRaw } from '@libsql/client'
-import { getColumnTypes } from './conversion'
+import { getColumnTypes, mapRow } from './conversion'
 
 const debug = Debug('prisma:driver-adapter:libsql')
 
@@ -35,7 +35,7 @@ class LibsqlQueryable<ClientT extends StdClient | TransactionClient> implements 
     const resultSet: ResultSet = {
       columnNames: columns,
       columnTypes,
-      rows: rows.map((row) => Array.from(row)),
+      rows: rows.map(mapRow),
     }
 
     return { ok: true, value: resultSet }
