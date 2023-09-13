@@ -1200,6 +1200,29 @@
 <a href="#1200" id="1200">1200</a>
 <a href="#1201" id="1201">1201</a>
 <a href="#1202" id="1202">1202</a>
+<a href="#1203" id="1203">1203</a>
+<a href="#1204" id="1204">1204</a>
+<a href="#1205" id="1205">1205</a>
+<a href="#1206" id="1206">1206</a>
+<a href="#1207" id="1207">1207</a>
+<a href="#1208" id="1208">1208</a>
+<a href="#1209" id="1209">1209</a>
+<a href="#1210" id="1210">1210</a>
+<a href="#1211" id="1211">1211</a>
+<a href="#1212" id="1212">1212</a>
+<a href="#1213" id="1213">1213</a>
+<a href="#1214" id="1214">1214</a>
+<a href="#1215" id="1215">1215</a>
+<a href="#1216" id="1216">1216</a>
+<a href="#1217" id="1217">1217</a>
+<a href="#1218" id="1218">1218</a>
+<a href="#1219" id="1219">1219</a>
+<a href="#1220" id="1220">1220</a>
+<a href="#1221" id="1221">1221</a>
+<a href="#1222" id="1222">1222</a>
+<a href="#1223" id="1223">1223</a>
+<a href="#1224" id="1224">1224</a>
+<a href="#1225" id="1225">1225</a>
 </pre></div><pre class="rust"><code><span class="kw">use crate</span>::{model_extensions::<span class="kw-2">*</span>, Context};
 <span class="kw">use </span>connector_interface::filter::<span class="kw-2">*</span>;
 <span class="kw">use </span>prisma_models::prelude::<span class="kw-2">*</span>;
@@ -1532,43 +1555,66 @@
         <span class="kw">let </span>alias = alias.unwrap_or_default();
         <span class="kw">let </span>condition = <span class="self">self</span>.condition;
 
-        <span class="kw">let </span>table = <span class="self">self</span>.field.as_table(ctx);
-        <span class="kw">let </span>selected_identifier: Vec&lt;Column&gt; = <span class="self">self
-            </span>.field
-            .identifier_columns(ctx)
-            .map(|col| col.aliased_col(<span class="prelude-val">Some</span>(alias), ctx))
-            .collect();
+        <span class="comment">// Performance can be improved by using fields in related table which skip a join table operation
+        </span><span class="kw">if </span><span class="self">self</span>.field.related_field().walker().fields().is_some() {
+            <span class="kw">let </span>related_table = <span class="self">self</span>.field.related_model().as_table(ctx);
+            <span class="kw">let </span>related_columns: Vec&lt;<span class="kw">_</span>&gt; = ModelProjection::from(<span class="self">self</span>.field.related_field().linking_fields())
+                .as_columns(ctx)
+                .map(|col| col.aliased_col(<span class="prelude-val">Some</span>(alias), ctx))
+                .collect();
 
-        <span class="kw">let </span>join_columns: Vec&lt;Column&gt; = <span class="self">self
-            </span>.field
-            .join_columns(ctx)
-            .map(|c| c.aliased_col(<span class="prelude-val">Some</span>(alias), ctx))
-            .collect();
+            <span class="kw">let </span>nested_conditions = <span class="self">self
+                </span>.nested_filter
+                .aliased_condition_from(<span class="prelude-val">Some</span>(alias), <span class="bool-val">false</span>, ctx)
+                .invert_if(condition.invert_of_subselect());
 
-        <span class="kw">let </span>related_table = <span class="self">self</span>.field.related_model().as_table(ctx);
-        <span class="kw">let </span>related_join_columns: Vec&lt;<span class="kw">_</span>&gt; = ModelProjection::from(<span class="self">self</span>.field.related_field().linking_fields())
-            .as_columns(ctx)
-            .map(|col| col.aliased_col(<span class="prelude-val">Some</span>(alias.flip(AliasMode::Join)), ctx))
-            .collect();
+            <span class="kw">let </span>conditions = related_columns
+                .clone()
+                .into_iter()
+                .fold(nested_conditions, |acc, column| acc.and(column.is_not_null()));
 
-        <span class="kw">let </span>nested_conditions = <span class="self">self
-            </span>.nested_filter
-            .aliased_condition_from(<span class="prelude-val">Some</span>(alias.flip(AliasMode::Join)), <span class="bool-val">false</span>, ctx)
-            .invert_if(condition.invert_of_subselect());
+            Select::from_table(related_table.alias(alias.to_string(<span class="prelude-val">Some</span>(AliasMode::Table))))
+                .columns(related_columns)
+                .so_that(conditions)
+        } <span class="kw">else </span>{
+            <span class="kw">let </span>table = <span class="self">self</span>.field.as_table(ctx);
+            <span class="kw">let </span>selected_identifier: Vec&lt;Column&gt; = <span class="self">self
+                </span>.field
+                .identifier_columns(ctx)
+                .map(|col| col.aliased_col(<span class="prelude-val">Some</span>(alias), ctx))
+                .collect();
 
-        <span class="kw">let </span>conditions = selected_identifier
-            .clone()
-            .into_iter()
-            .fold(nested_conditions, |acc, column| acc.and(column.is_not_null()));
+            <span class="kw">let </span>join_columns: Vec&lt;Column&gt; = <span class="self">self
+                </span>.field
+                .join_columns(ctx)
+                .map(|c| c.aliased_col(<span class="prelude-val">Some</span>(alias), ctx))
+                .collect();
 
-        <span class="kw">let </span>join = related_table
-            .alias(alias.to_string(<span class="prelude-val">Some</span>(AliasMode::Join)))
-            .on(Row::from(related_join_columns).equals(Row::from(join_columns)));
+            <span class="kw">let </span>related_table = <span class="self">self</span>.field.related_model().as_table(ctx);
+            <span class="kw">let </span>related_join_columns: Vec&lt;<span class="kw">_</span>&gt; = ModelProjection::from(<span class="self">self</span>.field.related_field().linking_fields())
+                .as_columns(ctx)
+                .map(|col| col.aliased_col(<span class="prelude-val">Some</span>(alias.flip(AliasMode::Join)), ctx))
+                .collect();
 
-        Select::from_table(table.alias(alias.to_string(<span class="prelude-val">Some</span>(AliasMode::Table))))
-            .columns(selected_identifier)
-            .inner_join(join)
-            .so_that(conditions)
+            <span class="kw">let </span>nested_conditions = <span class="self">self
+                </span>.nested_filter
+                .aliased_condition_from(<span class="prelude-val">Some</span>(alias.flip(AliasMode::Join)), <span class="bool-val">false</span>, ctx)
+                .invert_if(condition.invert_of_subselect());
+
+            <span class="kw">let </span>conditions = selected_identifier
+                .clone()
+                .into_iter()
+                .fold(nested_conditions, |acc, column| acc.and(column.is_not_null()));
+
+            <span class="kw">let </span>join = related_table
+                .alias(alias.to_string(<span class="prelude-val">Some</span>(AliasMode::Join)))
+                .on(Row::from(related_join_columns).equals(Row::from(join_columns)));
+
+            Select::from_table(table.alias(alias.to_string(<span class="prelude-val">Some</span>(AliasMode::Table))))
+                .columns(selected_identifier)
+                .inner_join(join)
+                .so_that(conditions)
+        }
     }
 }
 
