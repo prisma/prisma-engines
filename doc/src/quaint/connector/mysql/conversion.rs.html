@@ -339,9 +339,6 @@
 <a href="#339" id="339">339</a>
 <a href="#340" id="340">340</a>
 <a href="#341" id="341">341</a>
-<a href="#342" id="342">342</a>
-<a href="#343" id="343">343</a>
-<a href="#344" id="344">344</a>
 </pre></div><pre class="rust"><code><span class="kw">use crate</span>::{
     ast::Value,
     connector::{queryable::TakeRow, TypeIdentifier},
@@ -385,8 +382,7 @@
                 }
                 <span class="attr">#[cfg(feature = <span class="string">&quot;bigdecimal&quot;</span>)]
                 </span>Value::Numeric(f) =&gt; f.as_ref().map(|f| my::Value::Bytes(f.to_string().as_bytes().to_vec())),
-                <span class="attr">#[cfg(feature = <span class="string">&quot;json&quot;</span>)]
-                </span>Value::Json(s) =&gt; <span class="kw">match </span>s {
+                Value::Json(s) =&gt; <span class="kw">match </span>s {
                     <span class="prelude-val">Some</span>(<span class="kw-2">ref </span>s) =&gt; {
                         <span class="kw">let </span>json = serde_json::to_string(s)<span class="question-mark">?</span>;
                         <span class="kw">let </span>bytes = json.into_bytes();
@@ -567,7 +563,6 @@
 
             <span class="kw">let </span>res = <span class="kw">match </span>value {
                 <span class="comment">// JSON is returned as bytes.
-                </span><span class="attr">#[cfg(feature = <span class="string">&quot;json&quot;</span>)]
                 </span>my::Value::Bytes(b) <span class="kw">if </span>column.is_json() =&gt; {
                     serde_json::from_slice(<span class="kw-2">&amp;</span>b).map(Value::json).map_err(|<span class="kw">_</span>| {
                         <span class="kw">let </span>msg = <span class="string">&quot;Unable to convert bytes to JSON&quot;</span>;
@@ -663,8 +658,7 @@
                     t <span class="kw">if </span>t.is_datetime() =&gt; Value::DateTime(<span class="prelude-val">None</span>),
                     t <span class="kw">if </span>t.is_time() =&gt; Value::Time(<span class="prelude-val">None</span>),
                     t <span class="kw">if </span>t.is_date() =&gt; Value::Date(<span class="prelude-val">None</span>),
-                    <span class="attr">#[cfg(feature = <span class="string">&quot;json&quot;</span>)]
-                    </span>t <span class="kw">if </span>t.is_json() =&gt; Value::Json(<span class="prelude-val">None</span>),
+                    t <span class="kw">if </span>t.is_json() =&gt; Value::Json(<span class="prelude-val">None</span>),
                     typ =&gt; {
                         <span class="kw">let </span>msg = <span class="macro">format!</span>(<span class="string">&quot;Value of type {typ:?} is not supported with the current configuration&quot;</span>);
 

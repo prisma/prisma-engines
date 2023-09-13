@@ -944,13 +944,6 @@
 <a href="#944" id="944">944</a>
 <a href="#945" id="945">945</a>
 <a href="#946" id="946">946</a>
-<a href="#947" id="947">947</a>
-<a href="#948" id="948">948</a>
-<a href="#949" id="949">949</a>
-<a href="#950" id="950">950</a>
-<a href="#951" id="951">951</a>
-<a href="#952" id="952">952</a>
-<a href="#953" id="953">953</a>
 </pre></div><pre class="rust"><code><span class="attr">#[cfg(feature = <span class="string">&quot;bigdecimal&quot;</span>)]
 </span><span class="kw">mod </span>decimal;
 
@@ -1004,8 +997,7 @@
                 Value::Char(<span class="kw">_</span>) =&gt; PostgresType::CHAR,
                 <span class="attr">#[cfg(feature = <span class="string">&quot;bigdecimal&quot;</span>)]
                 </span>Value::Numeric(<span class="kw">_</span>) =&gt; PostgresType::NUMERIC,
-                <span class="attr">#[cfg(feature = <span class="string">&quot;json&quot;</span>)]
-                </span>Value::Json(<span class="kw">_</span>) =&gt; PostgresType::JSONB,
+                Value::Json(<span class="kw">_</span>) =&gt; PostgresType::JSONB,
                 Value::Xml(<span class="kw">_</span>) =&gt; PostgresType::XML,
                 <span class="attr">#[cfg(feature = <span class="string">&quot;uuid&quot;</span>)]
                 </span>Value::Uuid(<span class="kw">_</span>) =&gt; PostgresType::UUID,
@@ -1043,8 +1035,7 @@
                         Value::Char(<span class="kw">_</span>) =&gt; PostgresType::CHAR_ARRAY,
                         <span class="attr">#[cfg(feature = <span class="string">&quot;bigdecimal&quot;</span>)]
                         </span>Value::Numeric(<span class="kw">_</span>) =&gt; PostgresType::NUMERIC_ARRAY,
-                        <span class="attr">#[cfg(feature = <span class="string">&quot;json&quot;</span>)]
-                        </span>Value::Json(<span class="kw">_</span>) =&gt; PostgresType::JSONB_ARRAY,
+                        Value::Json(<span class="kw">_</span>) =&gt; PostgresType::JSONB_ARRAY,
                         Value::Xml(<span class="kw">_</span>) =&gt; PostgresType::XML_ARRAY,
                         <span class="attr">#[cfg(feature = <span class="string">&quot;uuid&quot;</span>)]
                         </span>Value::Uuid(<span class="kw">_</span>) =&gt; PostgresType::UUID_ARRAY,
@@ -1240,8 +1231,7 @@
                     }
                     <span class="prelude-val">None </span>=&gt; Value::Array(<span class="prelude-val">None</span>),
                 },
-                <span class="attr">#[cfg(feature = <span class="string">&quot;json&quot;</span>)]
-                </span>PostgresType::JSON | PostgresType::JSONB =&gt; Value::Json(row.try_get(i)<span class="question-mark">?</span>),
+                PostgresType::JSON | PostgresType::JSONB =&gt; Value::Json(row.try_get(i)<span class="question-mark">?</span>),
                 PostgresType::INT2_ARRAY =&gt; <span class="kw">match </span>row.try_get(i)<span class="question-mark">? </span>{
                     <span class="prelude-val">Some</span>(val) =&gt; {
                         <span class="kw">let </span>val: Vec&lt;<span class="prelude-ty">Option</span>&lt;i16&gt;&gt; = val;
@@ -1386,8 +1376,7 @@
                     }
                     <span class="prelude-val">None </span>=&gt; Value::Array(<span class="prelude-val">None</span>),
                 },
-                <span class="attr">#[cfg(feature = <span class="string">&quot;json&quot;</span>)]
-                </span>PostgresType::JSON_ARRAY =&gt; <span class="kw">match </span>row.try_get(i)<span class="question-mark">? </span>{
+                PostgresType::JSON_ARRAY =&gt; <span class="kw">match </span>row.try_get(i)<span class="question-mark">? </span>{
                     <span class="prelude-val">Some</span>(val) =&gt; {
                         <span class="kw">let </span>val: Vec&lt;<span class="prelude-ty">Option</span>&lt;serde_json::Value&gt;&gt; = val;
                         <span class="kw">let </span>jsons = val.into_iter().map(Value::Json);
@@ -1396,8 +1385,7 @@
                     }
                     <span class="prelude-val">None </span>=&gt; Value::Array(<span class="prelude-val">None</span>),
                 },
-                <span class="attr">#[cfg(feature = <span class="string">&quot;json&quot;</span>)]
-                </span>PostgresType::JSONB_ARRAY =&gt; <span class="kw">match </span>row.try_get(i)<span class="question-mark">? </span>{
+                PostgresType::JSONB_ARRAY =&gt; <span class="kw">match </span>row.try_get(i)<span class="question-mark">? </span>{
                     <span class="prelude-val">Some</span>(val) =&gt; {
                         <span class="kw">let </span>val: Vec&lt;<span class="prelude-ty">Option</span>&lt;serde_json::Value&gt;&gt; = val;
                         <span class="kw">let </span>jsons = val.into_iter().map(Value::Json);
@@ -1775,8 +1763,7 @@
                     parsed_ip_addr.to_sql(ty, out)
                 })
             }
-            <span class="attr">#[cfg(feature = <span class="string">&quot;json&quot;</span>)]
-            </span>(Value::Text(string), <span class="kw-2">&amp;</span>PostgresType::JSON) | (Value::Text(string), <span class="kw-2">&amp;</span>PostgresType::JSONB) =&gt; string
+            (Value::Text(string), <span class="kw-2">&amp;</span>PostgresType::JSON) | (Value::Text(string), <span class="kw-2">&amp;</span>PostgresType::JSONB) =&gt; string
                 .as_ref()
                 .map(|string| serde_json::from_str::&lt;serde_json::Value&gt;(string)<span class="question-mark">?</span>.to_sql(ty, out)),
             (Value::Text(string), <span class="kw-2">&amp;</span>PostgresType::BIT) | (Value::Text(string), <span class="kw-2">&amp;</span>PostgresType::VARBIT) =&gt; {
@@ -1814,8 +1801,7 @@
 
                 <span class="kw">return </span><span class="prelude-val">Err</span>(Error::builder(kind).build().into());
             }
-            <span class="attr">#[cfg(feature = <span class="string">&quot;json&quot;</span>)]
-            </span>(Value::Json(value), <span class="kw">_</span>) =&gt; value.as_ref().map(|value| value.to_sql(ty, out)),
+            (Value::Json(value), <span class="kw">_</span>) =&gt; value.as_ref().map(|value| value.to_sql(ty, out)),
             (Value::Xml(value), <span class="kw">_</span>) =&gt; value.as_ref().map(|value| value.to_sql(ty, out)),
             <span class="attr">#[cfg(feature = <span class="string">&quot;uuid&quot;</span>)]
             </span>(Value::Uuid(value), <span class="kw">_</span>) =&gt; value.map(|value| value.to_sql(ty, out)),

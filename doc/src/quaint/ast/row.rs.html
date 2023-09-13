@@ -397,7 +397,7 @@
 <a href="#397" id="397">397</a>
 <a href="#398" id="398">398</a>
 <a href="#399" id="399">399</a>
-</pre></div><pre class="rust"><code><span class="attr">#[cfg(all(feature = <span class="string">&quot;json&quot;</span>, any(feature = <span class="string">&quot;postgresql&quot;</span>, feature = <span class="string">&quot;mysql&quot;</span>)))]
+</pre></div><pre class="rust"><code><span class="attr">#[cfg(any(feature = <span class="string">&quot;postgresql&quot;</span>, feature = <span class="string">&quot;mysql&quot;</span>))]
 </span><span class="kw">use </span><span class="kw">super</span>::compare::JsonType;
 <span class="kw">use </span><span class="kw">crate</span>::ast::{Comparable, Compare, Expression};
 <span class="kw">use </span>std::borrow::Cow;
@@ -682,7 +682,7 @@
         value.compare_raw(raw_comparator, right)
     }
 
-    <span class="attr">#[cfg(all(feature = <span class="string">&quot;json&quot;</span>, any(feature = <span class="string">&quot;postgresql&quot;</span>, feature = <span class="string">&quot;mysql&quot;</span>)))]
+    <span class="attr">#[cfg(any(feature = <span class="string">&quot;postgresql&quot;</span>, feature = <span class="string">&quot;mysql&quot;</span>))]
     </span><span class="kw">fn </span>json_array_contains&lt;T&gt;(<span class="self">self</span>, item: T) -&gt; Compare&lt;<span class="lifetime">&#39;a</span>&gt;
     <span class="kw">where
         </span>T: Into&lt;Expression&lt;<span class="lifetime">&#39;a</span>&gt;&gt;,
@@ -692,7 +692,7 @@
         value.json_array_contains(item)
     }
 
-    <span class="attr">#[cfg(all(feature = <span class="string">&quot;json&quot;</span>, any(feature = <span class="string">&quot;postgresql&quot;</span>, feature = <span class="string">&quot;mysql&quot;</span>)))]
+    <span class="attr">#[cfg(any(feature = <span class="string">&quot;postgresql&quot;</span>, feature = <span class="string">&quot;mysql&quot;</span>))]
     </span><span class="kw">fn </span>json_array_not_contains&lt;T&gt;(<span class="self">self</span>, item: T) -&gt; Compare&lt;<span class="lifetime">&#39;a</span>&gt;
     <span class="kw">where
         </span>T: Into&lt;Expression&lt;<span class="lifetime">&#39;a</span>&gt;&gt;,
@@ -702,7 +702,7 @@
         value.json_array_not_contains(item)
     }
 
-    <span class="attr">#[cfg(all(feature = <span class="string">&quot;json&quot;</span>, any(feature = <span class="string">&quot;postgresql&quot;</span>, feature = <span class="string">&quot;mysql&quot;</span>)))]
+    <span class="attr">#[cfg(any(feature = <span class="string">&quot;postgresql&quot;</span>, feature = <span class="string">&quot;mysql&quot;</span>))]
     </span><span class="kw">fn </span>json_array_begins_with&lt;T&gt;(<span class="self">self</span>, item: T) -&gt; Compare&lt;<span class="lifetime">&#39;a</span>&gt;
     <span class="kw">where
         </span>T: Into&lt;Expression&lt;<span class="lifetime">&#39;a</span>&gt;&gt;,
@@ -712,7 +712,7 @@
         value.json_array_begins_with(item)
     }
 
-    <span class="attr">#[cfg(all(feature = <span class="string">&quot;json&quot;</span>, any(feature = <span class="string">&quot;postgresql&quot;</span>, feature = <span class="string">&quot;mysql&quot;</span>)))]
+    <span class="attr">#[cfg(any(feature = <span class="string">&quot;postgresql&quot;</span>, feature = <span class="string">&quot;mysql&quot;</span>))]
     </span><span class="kw">fn </span>json_array_not_begins_with&lt;T&gt;(<span class="self">self</span>, item: T) -&gt; Compare&lt;<span class="lifetime">&#39;a</span>&gt;
     <span class="kw">where
         </span>T: Into&lt;Expression&lt;<span class="lifetime">&#39;a</span>&gt;&gt;,
@@ -722,7 +722,7 @@
         value.json_array_not_begins_with(item)
     }
 
-    <span class="attr">#[cfg(all(feature = <span class="string">&quot;json&quot;</span>, any(feature = <span class="string">&quot;postgresql&quot;</span>, feature = <span class="string">&quot;mysql&quot;</span>)))]
+    <span class="attr">#[cfg(any(feature = <span class="string">&quot;postgresql&quot;</span>, feature = <span class="string">&quot;mysql&quot;</span>))]
     </span><span class="kw">fn </span>json_array_ends_into&lt;T&gt;(<span class="self">self</span>, item: T) -&gt; Compare&lt;<span class="lifetime">&#39;a</span>&gt;
     <span class="kw">where
         </span>T: Into&lt;Expression&lt;<span class="lifetime">&#39;a</span>&gt;&gt;,
@@ -732,7 +732,7 @@
         value.json_array_ends_into(item)
     }
 
-    <span class="attr">#[cfg(all(feature = <span class="string">&quot;json&quot;</span>, any(feature = <span class="string">&quot;postgresql&quot;</span>, feature = <span class="string">&quot;mysql&quot;</span>)))]
+    <span class="attr">#[cfg(any(feature = <span class="string">&quot;postgresql&quot;</span>, feature = <span class="string">&quot;mysql&quot;</span>))]
     </span><span class="kw">fn </span>json_array_not_ends_into&lt;T&gt;(<span class="self">self</span>, item: T) -&gt; Compare&lt;<span class="lifetime">&#39;a</span>&gt;
     <span class="kw">where
         </span>T: Into&lt;Expression&lt;<span class="lifetime">&#39;a</span>&gt;&gt;,
@@ -742,7 +742,7 @@
         value.json_array_not_ends_into(item)
     }
 
-    <span class="attr">#[cfg(all(feature = <span class="string">&quot;json&quot;</span>, any(feature = <span class="string">&quot;postgresql&quot;</span>, feature = <span class="string">&quot;mysql&quot;</span>)))]
+    <span class="attr">#[cfg(any(feature = <span class="string">&quot;postgresql&quot;</span>, feature = <span class="string">&quot;mysql&quot;</span>))]
     </span><span class="kw">fn </span>json_type_equals&lt;T&gt;(<span class="self">self</span>, json_type: T) -&gt; Compare&lt;<span class="lifetime">&#39;a</span>&gt;
     <span class="kw">where
         </span>T: Into&lt;JsonType&lt;<span class="lifetime">&#39;a</span>&gt;&gt;,
@@ -752,7 +752,7 @@
         value.json_type_equals(json_type)
     }
 
-    <span class="attr">#[cfg(all(feature = <span class="string">&quot;json&quot;</span>, any(feature = <span class="string">&quot;postgresql&quot;</span>, feature = <span class="string">&quot;mysql&quot;</span>)))]
+    <span class="attr">#[cfg(any(feature = <span class="string">&quot;postgresql&quot;</span>, feature = <span class="string">&quot;mysql&quot;</span>))]
     </span><span class="kw">fn </span>json_type_not_equals&lt;T&gt;(<span class="self">self</span>, json_type: T) -&gt; Compare&lt;<span class="lifetime">&#39;a</span>&gt;
     <span class="kw">where
         </span>T: Into&lt;JsonType&lt;<span class="lifetime">&#39;a</span>&gt;&gt;,

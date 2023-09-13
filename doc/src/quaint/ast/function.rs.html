@@ -161,17 +161,17 @@
 <span class="kw">mod </span>coalesce;
 <span class="kw">mod </span>concat;
 <span class="kw">mod </span>count;
-<span class="attr">#[cfg(all(feature = <span class="string">&quot;json&quot;</span>, any(feature = <span class="string">&quot;postgresql&quot;</span>, feature = <span class="string">&quot;mysql&quot;</span>)))]
+<span class="attr">#[cfg(any(feature = <span class="string">&quot;postgresql&quot;</span>, feature = <span class="string">&quot;mysql&quot;</span>))]
 </span><span class="kw">mod </span>json_extract;
-<span class="attr">#[cfg(all(feature = <span class="string">&quot;json&quot;</span>, any(feature = <span class="string">&quot;postgresql&quot;</span>, feature = <span class="string">&quot;mysql&quot;</span>)))]
+<span class="attr">#[cfg(any(feature = <span class="string">&quot;postgresql&quot;</span>, feature = <span class="string">&quot;mysql&quot;</span>))]
 </span><span class="kw">mod </span>json_extract_array;
-<span class="attr">#[cfg(all(feature = <span class="string">&quot;json&quot;</span>, any(feature = <span class="string">&quot;postgresql&quot;</span>, feature = <span class="string">&quot;mysql&quot;</span>)))]
+<span class="attr">#[cfg(any(feature = <span class="string">&quot;postgresql&quot;</span>, feature = <span class="string">&quot;mysql&quot;</span>))]
 </span><span class="kw">mod </span>json_unquote;
 <span class="kw">mod </span>lower;
 <span class="kw">mod </span>maximum;
 <span class="kw">mod </span>minimum;
 <span class="kw">mod </span>row_number;
-<span class="attr">#[cfg(all(feature = <span class="string">&quot;json&quot;</span>, feature = <span class="string">&quot;postgresql&quot;</span>))]
+<span class="attr">#[cfg(feature = <span class="string">&quot;postgresql&quot;</span>)]
 </span><span class="kw">mod </span>row_to_json;
 <span class="attr">#[cfg(any(feature = <span class="string">&quot;postgresql&quot;</span>, feature = <span class="string">&quot;mysql&quot;</span>))]
 </span><span class="kw">mod </span>search;
@@ -186,19 +186,19 @@
 <span class="kw">pub use </span>coalesce::<span class="kw-2">*</span>;
 <span class="kw">pub use </span>concat::<span class="kw-2">*</span>;
 <span class="kw">pub use </span>count::<span class="kw-2">*</span>;
-<span class="attr">#[cfg(all(feature = <span class="string">&quot;json&quot;</span>, any(feature = <span class="string">&quot;postgresql&quot;</span>, feature = <span class="string">&quot;mysql&quot;</span>)))]
+<span class="attr">#[cfg(any(feature = <span class="string">&quot;postgresql&quot;</span>, feature = <span class="string">&quot;mysql&quot;</span>))]
 </span><span class="kw">pub use </span>json_extract::<span class="kw-2">*</span>;
-<span class="attr">#[cfg(all(feature = <span class="string">&quot;json&quot;</span>, any(feature = <span class="string">&quot;postgresql&quot;</span>, feature = <span class="string">&quot;mysql&quot;</span>)))]
+<span class="attr">#[cfg(any(feature = <span class="string">&quot;postgresql&quot;</span>, feature = <span class="string">&quot;mysql&quot;</span>))]
 </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use </span>json_extract_array::<span class="kw-2">*</span>;
-<span class="attr">#[cfg(all(feature = <span class="string">&quot;json&quot;</span>, any(feature = <span class="string">&quot;postgresql&quot;</span>, feature = <span class="string">&quot;mysql&quot;</span>)))]
+<span class="attr">#[cfg(any(feature = <span class="string">&quot;postgresql&quot;</span>, feature = <span class="string">&quot;mysql&quot;</span>))]
 </span><span class="kw">pub use </span>json_unquote::<span class="kw-2">*</span>;
 <span class="kw">pub use </span>lower::<span class="kw-2">*</span>;
 <span class="kw">pub use </span>maximum::<span class="kw-2">*</span>;
 <span class="kw">pub use </span>minimum::<span class="kw-2">*</span>;
 <span class="kw">pub use </span>row_number::<span class="kw-2">*</span>;
-<span class="attr">#[cfg(all(feature = <span class="string">&quot;json&quot;</span>, feature = <span class="string">&quot;postgresql&quot;</span>))]
+<span class="attr">#[cfg(feature = <span class="string">&quot;postgresql&quot;</span>)]
 </span><span class="kw">pub use </span>row_to_json::<span class="kw-2">*</span>;
-<span class="attr">#[cfg(any(feature = <span class="string">&quot;postgresql&quot;</span>, feature = <span class="string">&quot;mysql&quot;</span>))]
+<span class="attr">#[cfg(feature = <span class="string">&quot;mysql&quot;</span>)]
 </span><span class="kw">pub use </span>search::<span class="kw-2">*</span>;
 <span class="kw">pub use </span>sum::<span class="kw-2">*</span>;
 <span class="kw">pub use </span>upper::<span class="kw-2">*</span>;
@@ -219,13 +219,13 @@
 <span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; Function&lt;<span class="lifetime">&#39;a</span>&gt; {
     <span class="kw">pub fn </span>returns_json(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
         <span class="kw">match </span><span class="self">self</span>.typ_ {
-            <span class="attr">#[cfg(all(feature = <span class="string">&quot;json&quot;</span>, feature = <span class="string">&quot;postgresql&quot;</span>))]
+            <span class="attr">#[cfg(feature = <span class="string">&quot;postgresql&quot;</span>)]
             </span>FunctionType::RowToJson(<span class="kw">_</span>) =&gt; <span class="bool-val">true</span>,
-            <span class="attr">#[cfg(all(feature = <span class="string">&quot;json&quot;</span>, any(feature = <span class="string">&quot;postgresql&quot;</span>, feature = <span class="string">&quot;mysql&quot;</span>)))]
+            <span class="attr">#[cfg(feature = <span class="string">&quot;mysql&quot;</span>)]
             </span>FunctionType::JsonExtract(<span class="kw">_</span>) =&gt; <span class="bool-val">true</span>,
-            <span class="attr">#[cfg(all(feature = <span class="string">&quot;json&quot;</span>, any(feature = <span class="string">&quot;postgresql&quot;</span>, feature = <span class="string">&quot;mysql&quot;</span>)))]
+            <span class="attr">#[cfg(any(feature = <span class="string">&quot;postgresql&quot;</span>, feature = <span class="string">&quot;mysql&quot;</span>))]
             </span>FunctionType::JsonExtractLastArrayElem(<span class="kw">_</span>) =&gt; <span class="bool-val">true</span>,
-            <span class="attr">#[cfg(all(feature = <span class="string">&quot;json&quot;</span>, any(feature = <span class="string">&quot;postgresql&quot;</span>, feature = <span class="string">&quot;mysql&quot;</span>)))]
+            <span class="attr">#[cfg(any(feature = <span class="string">&quot;postgresql&quot;</span>, feature = <span class="string">&quot;mysql&quot;</span>))]
             </span>FunctionType::JsonExtractFirstArrayElem(<span class="kw">_</span>) =&gt; <span class="bool-val">true</span>,
             <span class="kw">_ </span>=&gt; <span class="bool-val">false</span>,
         }
@@ -235,7 +235,7 @@
 <span class="doccomment">/// A database function type
 </span><span class="attr">#[derive(Debug, Clone, PartialEq)]
 </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">enum </span>FunctionType&lt;<span class="lifetime">&#39;a</span>&gt; {
-    <span class="attr">#[cfg(all(feature = <span class="string">&quot;json&quot;</span>, feature = <span class="string">&quot;postgresql&quot;</span>))]
+    <span class="attr">#[cfg(feature = <span class="string">&quot;postgresql&quot;</span>)]
     </span>RowToJson(RowToJson&lt;<span class="lifetime">&#39;a</span>&gt;),
     RowNumber(RowNumber&lt;<span class="lifetime">&#39;a</span>&gt;),
     Count(Count&lt;<span class="lifetime">&#39;a</span>&gt;),
@@ -248,13 +248,13 @@
     Maximum(Maximum&lt;<span class="lifetime">&#39;a</span>&gt;),
     Coalesce(Coalesce&lt;<span class="lifetime">&#39;a</span>&gt;),
     Concat(Concat&lt;<span class="lifetime">&#39;a</span>&gt;),
-    <span class="attr">#[cfg(all(feature = <span class="string">&quot;json&quot;</span>, any(feature = <span class="string">&quot;postgresql&quot;</span>, feature = <span class="string">&quot;mysql&quot;</span>)))]
+    <span class="attr">#[cfg(any(feature = <span class="string">&quot;postgresql&quot;</span>, feature = <span class="string">&quot;mysql&quot;</span>))]
     </span>JsonExtract(JsonExtract&lt;<span class="lifetime">&#39;a</span>&gt;),
-    <span class="attr">#[cfg(all(feature = <span class="string">&quot;json&quot;</span>, any(feature = <span class="string">&quot;postgresql&quot;</span>, feature = <span class="string">&quot;mysql&quot;</span>)))]
+    <span class="attr">#[cfg(any(feature = <span class="string">&quot;postgresql&quot;</span>, feature = <span class="string">&quot;mysql&quot;</span>))]
     </span>JsonExtractLastArrayElem(JsonExtractLastArrayElem&lt;<span class="lifetime">&#39;a</span>&gt;),
-    <span class="attr">#[cfg(all(feature = <span class="string">&quot;json&quot;</span>, any(feature = <span class="string">&quot;postgresql&quot;</span>, feature = <span class="string">&quot;mysql&quot;</span>)))]
+    <span class="attr">#[cfg(any(feature = <span class="string">&quot;postgresql&quot;</span>, feature = <span class="string">&quot;mysql&quot;</span>))]
     </span>JsonExtractFirstArrayElem(JsonExtractFirstArrayElem&lt;<span class="lifetime">&#39;a</span>&gt;),
-    <span class="attr">#[cfg(all(feature = <span class="string">&quot;json&quot;</span>, any(feature = <span class="string">&quot;postgresql&quot;</span>, feature = <span class="string">&quot;mysql&quot;</span>)))]
+    <span class="attr">#[cfg(any(feature = <span class="string">&quot;postgresql&quot;</span>, feature = <span class="string">&quot;mysql&quot;</span>))]
     </span>JsonUnquote(JsonUnquote&lt;<span class="lifetime">&#39;a</span>&gt;),
     <span class="attr">#[cfg(any(feature = <span class="string">&quot;postgresql&quot;</span>, feature = <span class="string">&quot;mysql&quot;</span>))]
     </span>TextSearch(TextSearch&lt;<span class="lifetime">&#39;a</span>&gt;),
@@ -280,19 +280,19 @@
     </span>}
 }
 
-<span class="attr">#[cfg(all(feature = <span class="string">&quot;json&quot;</span>, feature = <span class="string">&quot;postgresql&quot;</span>))]
+<span class="attr">#[cfg(feature = <span class="string">&quot;postgresql&quot;</span>)]
 </span><span class="macro">function!</span>(RowToJson);
 
-<span class="attr">#[cfg(all(feature = <span class="string">&quot;json&quot;</span>, any(feature = <span class="string">&quot;postgresql&quot;</span>, feature = <span class="string">&quot;mysql&quot;</span>)))]
+<span class="attr">#[cfg(any(feature = <span class="string">&quot;postgresql&quot;</span>, feature = <span class="string">&quot;mysql&quot;</span>))]
 </span><span class="macro">function!</span>(JsonExtract);
 
-<span class="attr">#[cfg(all(feature = <span class="string">&quot;json&quot;</span>, any(feature = <span class="string">&quot;postgresql&quot;</span>, feature = <span class="string">&quot;mysql&quot;</span>)))]
+<span class="attr">#[cfg(any(feature = <span class="string">&quot;postgresql&quot;</span>, feature = <span class="string">&quot;mysql&quot;</span>))]
 </span><span class="macro">function!</span>(JsonExtractLastArrayElem);
 
-<span class="attr">#[cfg(all(feature = <span class="string">&quot;json&quot;</span>, any(feature = <span class="string">&quot;postgresql&quot;</span>, feature = <span class="string">&quot;mysql&quot;</span>)))]
+<span class="attr">#[cfg(any(feature = <span class="string">&quot;postgresql&quot;</span>, feature = <span class="string">&quot;mysql&quot;</span>))]
 </span><span class="macro">function!</span>(JsonExtractFirstArrayElem);
 
-<span class="attr">#[cfg(all(feature = <span class="string">&quot;json&quot;</span>, any(feature = <span class="string">&quot;postgresql&quot;</span>, feature = <span class="string">&quot;mysql&quot;</span>)))]
+<span class="attr">#[cfg(any(feature = <span class="string">&quot;postgresql&quot;</span>, feature = <span class="string">&quot;mysql&quot;</span>))]
 </span><span class="macro">function!</span>(JsonUnquote);
 
 <span class="attr">#[cfg(any(feature = <span class="string">&quot;postgresql&quot;</span>, feature = <span class="string">&quot;mysql&quot;</span>))]

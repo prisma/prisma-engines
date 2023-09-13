@@ -1268,22 +1268,22 @@
     <span class="doccomment">/// Visit a non-parameterized value.
     </span><span class="kw">fn </span>visit_raw_value(<span class="kw-2">&amp;mut </span><span class="self">self</span>, value: Value&lt;<span class="lifetime">&#39;a</span>&gt;) -&gt; <span class="prelude-ty">Result</span>;
 
-    <span class="attr">#[cfg(all(feature = <span class="string">&quot;json&quot;</span>, any(feature = <span class="string">&quot;postgresql&quot;</span>, feature = <span class="string">&quot;mysql&quot;</span>)))]
+    <span class="attr">#[cfg(any(feature = <span class="string">&quot;postgresql&quot;</span>, feature = <span class="string">&quot;mysql&quot;</span>))]
     </span><span class="kw">fn </span>visit_json_extract(<span class="kw-2">&amp;mut </span><span class="self">self</span>, json_extract: JsonExtract&lt;<span class="lifetime">&#39;a</span>&gt;) -&gt; <span class="prelude-ty">Result</span>;
 
-    <span class="attr">#[cfg(all(feature = <span class="string">&quot;json&quot;</span>, any(feature = <span class="string">&quot;postgresql&quot;</span>, feature = <span class="string">&quot;mysql&quot;</span>)))]
+    <span class="attr">#[cfg(any(feature = <span class="string">&quot;postgresql&quot;</span>, feature = <span class="string">&quot;mysql&quot;</span>))]
     </span><span class="kw">fn </span>visit_json_extract_last_array_item(<span class="kw-2">&amp;mut </span><span class="self">self</span>, extract: JsonExtractLastArrayElem&lt;<span class="lifetime">&#39;a</span>&gt;) -&gt; <span class="prelude-ty">Result</span>;
 
-    <span class="attr">#[cfg(all(feature = <span class="string">&quot;json&quot;</span>, any(feature = <span class="string">&quot;postgresql&quot;</span>, feature = <span class="string">&quot;mysql&quot;</span>)))]
+    <span class="attr">#[cfg(any(feature = <span class="string">&quot;postgresql&quot;</span>, feature = <span class="string">&quot;mysql&quot;</span>))]
     </span><span class="kw">fn </span>visit_json_extract_first_array_item(<span class="kw-2">&amp;mut </span><span class="self">self</span>, extract: JsonExtractFirstArrayElem&lt;<span class="lifetime">&#39;a</span>&gt;) -&gt; <span class="prelude-ty">Result</span>;
 
-    <span class="attr">#[cfg(all(feature = <span class="string">&quot;json&quot;</span>, any(feature = <span class="string">&quot;postgresql&quot;</span>, feature = <span class="string">&quot;mysql&quot;</span>)))]
+    <span class="attr">#[cfg(any(feature = <span class="string">&quot;postgresql&quot;</span>, feature = <span class="string">&quot;mysql&quot;</span>))]
     </span><span class="kw">fn </span>visit_json_array_contains(<span class="kw-2">&amp;mut </span><span class="self">self</span>, left: Expression&lt;<span class="lifetime">&#39;a</span>&gt;, right: Expression&lt;<span class="lifetime">&#39;a</span>&gt;, not: bool) -&gt; <span class="prelude-ty">Result</span>;
 
-    <span class="attr">#[cfg(all(feature = <span class="string">&quot;json&quot;</span>, any(feature = <span class="string">&quot;postgresql&quot;</span>, feature = <span class="string">&quot;mysql&quot;</span>)))]
+    <span class="attr">#[cfg(any(feature = <span class="string">&quot;postgresql&quot;</span>, feature = <span class="string">&quot;mysql&quot;</span>))]
     </span><span class="kw">fn </span>visit_json_type_equals(<span class="kw-2">&amp;mut </span><span class="self">self</span>, left: Expression&lt;<span class="lifetime">&#39;a</span>&gt;, right: JsonType&lt;<span class="lifetime">&#39;a</span>&gt;, not: bool) -&gt; <span class="prelude-ty">Result</span>;
 
-    <span class="attr">#[cfg(all(feature = <span class="string">&quot;json&quot;</span>, any(feature = <span class="string">&quot;postgresql&quot;</span>, feature = <span class="string">&quot;mysql&quot;</span>)))]
+    <span class="attr">#[cfg(any(feature = <span class="string">&quot;postgresql&quot;</span>, feature = <span class="string">&quot;mysql&quot;</span>))]
     </span><span class="kw">fn </span>visit_json_unquote(<span class="kw-2">&amp;mut </span><span class="self">self</span>, json_unquote: JsonUnquote&lt;<span class="lifetime">&#39;a</span>&gt;) -&gt; <span class="prelude-ty">Result</span>;
 
     <span class="attr">#[cfg(any(feature = <span class="string">&quot;postgresql&quot;</span>, feature = <span class="string">&quot;mysql&quot;</span>))]
@@ -2062,7 +2062,7 @@
                 <span class="self">self</span>.write(<span class="string">&quot; &quot;</span>)<span class="question-mark">?</span>;
                 <span class="self">self</span>.visit_expression(<span class="kw-2">*</span>right)
             }
-            <span class="attr">#[cfg(all(feature = <span class="string">&quot;json&quot;</span>, any(feature = <span class="string">&quot;postgresql&quot;</span>, feature = <span class="string">&quot;mysql&quot;</span>)))]
+            <span class="attr">#[cfg(any(feature = <span class="string">&quot;postgresql&quot;</span>, feature = <span class="string">&quot;mysql&quot;</span>))]
             </span>Compare::JsonCompare(json_compare) =&gt; <span class="kw">match </span>json_compare {
                 JsonCompare::ArrayContains(left, right) =&gt; <span class="self">self</span>.visit_json_array_contains(<span class="kw-2">*</span>left, <span class="kw-2">*</span>right, <span class="bool-val">false</span>),
                 JsonCompare::ArrayNotContains(left, right) =&gt; <span class="self">self</span>.visit_json_array_contains(<span class="kw-2">*</span>left, <span class="kw-2">*</span>right, <span class="bool-val">true</span>),
@@ -2144,7 +2144,7 @@
             FunctionType::AggregateToString(agg) =&gt; {
                 <span class="self">self</span>.visit_aggregate_to_string(agg.value.as_ref().clone())<span class="question-mark">?</span>;
             }
-            <span class="attr">#[cfg(all(feature = <span class="string">&quot;json&quot;</span>, feature = <span class="string">&quot;postgresql&quot;</span>))]
+            <span class="attr">#[cfg(feature = <span class="string">&quot;postgresql&quot;</span>)]
             </span>FunctionType::RowToJson(row_to_json) =&gt; {
                 <span class="self">self</span>.write(<span class="string">&quot;ROW_TO_JSON&quot;</span>)<span class="question-mark">?</span>;
                 <span class="self">self</span>.surround_with(<span class="string">&quot;(&quot;</span>, <span class="string">&quot;)&quot;</span>, |<span class="kw-2">ref mut </span>s| s.visit_table(row_to_json.expr, <span class="bool-val">false</span>))<span class="question-mark">?
@@ -2176,19 +2176,19 @@
                 <span class="self">self</span>.write(<span class="string">&quot;COALESCE&quot;</span>)<span class="question-mark">?</span>;
                 <span class="self">self</span>.surround_with(<span class="string">&quot;(&quot;</span>, <span class="string">&quot;)&quot;</span>, |s| s.visit_columns(coalesce.exprs))<span class="question-mark">?</span>;
             }
-            <span class="attr">#[cfg(all(feature = <span class="string">&quot;json&quot;</span>, any(feature = <span class="string">&quot;postgresql&quot;</span>, feature = <span class="string">&quot;mysql&quot;</span>)))]
+            <span class="attr">#[cfg(any(feature = <span class="string">&quot;postgresql&quot;</span>, feature = <span class="string">&quot;mysql&quot;</span>))]
             </span>FunctionType::JsonExtract(json_extract) =&gt; {
                 <span class="self">self</span>.visit_json_extract(json_extract)<span class="question-mark">?</span>;
             }
-            <span class="attr">#[cfg(all(feature = <span class="string">&quot;json&quot;</span>, any(feature = <span class="string">&quot;postgresql&quot;</span>, feature = <span class="string">&quot;mysql&quot;</span>)))]
+            <span class="attr">#[cfg(any(feature = <span class="string">&quot;postgresql&quot;</span>, feature = <span class="string">&quot;mysql&quot;</span>))]
             </span>FunctionType::JsonExtractFirstArrayElem(extract) =&gt; {
                 <span class="self">self</span>.visit_json_extract_first_array_item(extract)<span class="question-mark">?</span>;
             }
-            <span class="attr">#[cfg(all(feature = <span class="string">&quot;json&quot;</span>, any(feature = <span class="string">&quot;postgresql&quot;</span>, feature = <span class="string">&quot;mysql&quot;</span>)))]
+            <span class="attr">#[cfg(any(feature = <span class="string">&quot;postgresql&quot;</span>, feature = <span class="string">&quot;mysql&quot;</span>))]
             </span>FunctionType::JsonExtractLastArrayElem(extract) =&gt; {
                 <span class="self">self</span>.visit_json_extract_last_array_item(extract)<span class="question-mark">?</span>;
             }
-            <span class="attr">#[cfg(all(feature = <span class="string">&quot;json&quot;</span>, any(feature = <span class="string">&quot;postgresql&quot;</span>, feature = <span class="string">&quot;mysql&quot;</span>)))]
+            <span class="attr">#[cfg(any(feature = <span class="string">&quot;postgresql&quot;</span>, feature = <span class="string">&quot;mysql&quot;</span>))]
             </span>FunctionType::JsonUnquote(unquote) =&gt; {
                 <span class="self">self</span>.visit_json_unquote(unquote)<span class="question-mark">?</span>;
             }

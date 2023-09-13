@@ -960,22 +960,6 @@
 <a href="#960" id="960">960</a>
 <a href="#961" id="961">961</a>
 <a href="#962" id="962">962</a>
-<a href="#963" id="963">963</a>
-<a href="#964" id="964">964</a>
-<a href="#965" id="965">965</a>
-<a href="#966" id="966">966</a>
-<a href="#967" id="967">967</a>
-<a href="#968" id="968">968</a>
-<a href="#969" id="969">969</a>
-<a href="#970" id="970">970</a>
-<a href="#971" id="971">971</a>
-<a href="#972" id="972">972</a>
-<a href="#973" id="973">973</a>
-<a href="#974" id="974">974</a>
-<a href="#975" id="975">975</a>
-<a href="#976" id="976">976</a>
-<a href="#977" id="977">977</a>
-<a href="#978" id="978">978</a>
 </pre></div><pre class="rust"><code><span class="kw">use crate</span>::{
     ast::<span class="kw-2">*</span>,
     error::{Error, ErrorKind},
@@ -1012,8 +996,7 @@
     }
 
     <span class="kw">fn </span>visit_numeric_comparison(<span class="kw-2">&amp;mut </span><span class="self">self</span>, left: Expression&lt;<span class="lifetime">&#39;a</span>&gt;, right: Expression&lt;<span class="lifetime">&#39;a</span>&gt;, sign: <span class="kw-2">&amp;</span>str) -&gt; visitor::Result {
-        <span class="attr">#[cfg(feature = <span class="string">&quot;json&quot;</span>)]
-        </span><span class="kw">fn </span>json_to_quaint_value&lt;<span class="lifetime">&#39;a</span>&gt;(json: serde_json::Value) -&gt; <span class="kw">crate</span>::Result&lt;Value&lt;<span class="lifetime">&#39;a</span>&gt;&gt; {
+        <span class="kw">fn </span>json_to_quaint_value&lt;<span class="lifetime">&#39;a</span>&gt;(json: serde_json::Value) -&gt; <span class="kw">crate</span>::Result&lt;Value&lt;<span class="lifetime">&#39;a</span>&gt;&gt; {
             <span class="kw">match </span>json {
                 serde_json::Value::String(str) =&gt; <span class="prelude-val">Ok</span>(Value::text(str)),
                 serde_json::Value::Number(number) =&gt; {
@@ -1039,16 +1022,15 @@
         }
 
         <span class="kw">match </span>(left, right) {
-            <span class="attr">#[cfg(feature = <span class="string">&quot;json&quot;</span>)]
-            </span>(left, right) <span class="kw">if </span>left.is_json_value() &amp;&amp; right.is_fun_retuning_json() =&gt; {
+            (left, right) <span class="kw">if </span>left.is_json_value() &amp;&amp; right.is_fun_retuning_json() =&gt; {
                 <span class="kw">let </span>quaint_value = json_to_quaint_value(left.into_json_value().unwrap())<span class="question-mark">?</span>;
 
                 <span class="self">self</span>.visit_parameterized(quaint_value)<span class="question-mark">?</span>;
                 <span class="self">self</span>.write(<span class="macro">format!</span>(<span class="string">&quot; {sign} &quot;</span>))<span class="question-mark">?</span>;
                 <span class="self">self</span>.visit_expression(right)<span class="question-mark">?</span>;
             }
-            <span class="attr">#[cfg(feature = <span class="string">&quot;json&quot;</span>)]
-            </span>(left, right) <span class="kw">if </span>left.is_fun_retuning_json() &amp;&amp; right.is_json_value() =&gt; {
+
+            (left, right) <span class="kw">if </span>left.is_fun_retuning_json() &amp;&amp; right.is_json_value() =&gt; {
                 <span class="kw">let </span>quaint_value = json_to_quaint_value(right.into_json_value().unwrap())<span class="question-mark">?</span>;
 
                 <span class="self">self</span>.visit_expression(left)<span class="question-mark">?</span>;
@@ -1131,8 +1113,8 @@
             }
             <span class="attr">#[cfg(feature = <span class="string">&quot;bigdecimal&quot;</span>)]
             </span>Value::Numeric(r) =&gt; r.map(|r| <span class="self">self</span>.write(r)),
-            <span class="attr">#[cfg(feature = <span class="string">&quot;json&quot;</span>)]
-            </span>Value::Json(j) =&gt; <span class="kw">match </span>j {
+
+            Value::Json(j) =&gt; <span class="kw">match </span>j {
                 <span class="prelude-val">Some</span>(<span class="kw-2">ref </span>j) =&gt; {
                     <span class="kw">let </span>s = serde_json::to_string(<span class="kw-2">&amp;</span>j)<span class="question-mark">?</span>;
                     <span class="prelude-val">Some</span>(<span class="self">self</span>.write(<span class="macro">format!</span>(<span class="string">&quot;CONVERT(&#39;{s}&#39;, JSON)&quot;</span>)))
@@ -1296,8 +1278,7 @@
     }
 
     <span class="kw">fn </span>visit_equals(<span class="kw-2">&amp;mut </span><span class="self">self</span>, left: Expression&lt;<span class="lifetime">&#39;a</span>&gt;, right: Expression&lt;<span class="lifetime">&#39;a</span>&gt;) -&gt; visitor::Result {
-        <span class="attr">#[cfg(feature = <span class="string">&quot;json&quot;</span>)]
-        </span>{
+        {
             <span class="kw">if </span>right.is_json_expr() || left.is_json_expr() {
                 <span class="self">self</span>.surround_with(<span class="string">&quot;(&quot;</span>, <span class="string">&quot;)&quot;</span>, |<span class="kw-2">ref mut </span>s| {
                     s.write(<span class="string">&quot;JSON_CONTAINS&quot;</span>)<span class="question-mark">?</span>;
@@ -1320,16 +1301,10 @@
                 <span class="self">self</span>.visit_regular_equality_comparison(left, right)
             }
         }
-
-        <span class="attr">#[cfg(not(feature = <span class="string">&quot;json&quot;</span>))]
-        </span>{
-            <span class="self">self</span>.visit_regular_equality_comparison(left, right)
-        }
     }
 
     <span class="kw">fn </span>visit_not_equals(<span class="kw-2">&amp;mut </span><span class="self">self</span>, left: Expression&lt;<span class="lifetime">&#39;a</span>&gt;, right: Expression&lt;<span class="lifetime">&#39;a</span>&gt;) -&gt; visitor::Result {
-        <span class="attr">#[cfg(feature = <span class="string">&quot;json&quot;</span>)]
-        </span>{
+        {
             <span class="kw">if </span>right.is_json_expr() || left.is_json_expr() {
                 <span class="self">self</span>.surround_with(<span class="string">&quot;(&quot;</span>, <span class="string">&quot;)&quot;</span>, |<span class="kw-2">ref mut </span>s| {
                     s.write(<span class="string">&quot;NOT JSON_CONTAINS&quot;</span>)<span class="question-mark">?</span>;
@@ -1352,14 +1327,9 @@
                 <span class="self">self</span>.visit_regular_difference_comparison(left, right)
             }
         }
-
-        <span class="attr">#[cfg(not(feature = <span class="string">&quot;json&quot;</span>))]
-        </span>{
-            <span class="self">self</span>.visit_regular_difference_comparison(left, right)
-        }
     }
 
-    <span class="attr">#[cfg(all(feature = <span class="string">&quot;json&quot;</span>, any(feature = <span class="string">&quot;postgresql&quot;</span>, feature = <span class="string">&quot;mysql&quot;</span>)))]
+    <span class="attr">#[cfg(any(feature = <span class="string">&quot;postgresql&quot;</span>, feature = <span class="string">&quot;mysql&quot;</span>))]
     </span><span class="kw">fn </span>visit_json_extract(<span class="kw-2">&amp;mut </span><span class="self">self</span>, json_extract: JsonExtract&lt;<span class="lifetime">&#39;a</span>&gt;) -&gt; visitor::Result {
         <span class="kw">if </span>json_extract.extract_as_string {
             <span class="self">self</span>.write(<span class="string">&quot;JSON_UNQUOTE(&quot;</span>)<span class="question-mark">?</span>;
@@ -1384,7 +1354,7 @@
         <span class="prelude-val">Ok</span>(())
     }
 
-    <span class="attr">#[cfg(all(feature = <span class="string">&quot;json&quot;</span>, any(feature = <span class="string">&quot;postgresql&quot;</span>, feature = <span class="string">&quot;mysql&quot;</span>)))]
+    <span class="attr">#[cfg(any(feature = <span class="string">&quot;postgresql&quot;</span>, feature = <span class="string">&quot;mysql&quot;</span>))]
     </span><span class="kw">fn </span>visit_json_array_contains(<span class="kw-2">&amp;mut </span><span class="self">self</span>, left: Expression&lt;<span class="lifetime">&#39;a</span>&gt;, right: Expression&lt;<span class="lifetime">&#39;a</span>&gt;, not: bool) -&gt; visitor::Result {
         <span class="self">self</span>.write(<span class="string">&quot;JSON_CONTAINS(&quot;</span>)<span class="question-mark">?</span>;
         <span class="self">self</span>.visit_expression(left)<span class="question-mark">?</span>;
@@ -1399,7 +1369,7 @@
         <span class="prelude-val">Ok</span>(())
     }
 
-    <span class="attr">#[cfg(all(feature = <span class="string">&quot;json&quot;</span>, any(feature = <span class="string">&quot;postgresql&quot;</span>, feature = <span class="string">&quot;mysql&quot;</span>)))]
+    <span class="attr">#[cfg(any(feature = <span class="string">&quot;postgresql&quot;</span>, feature = <span class="string">&quot;mysql&quot;</span>))]
     </span><span class="kw">fn </span>visit_json_type_equals(<span class="kw-2">&amp;mut </span><span class="self">self</span>, left: Expression&lt;<span class="lifetime">&#39;a</span>&gt;, json_type: JsonType&lt;<span class="lifetime">&#39;a</span>&gt;, not: bool) -&gt; visitor::Result {
         <span class="self">self</span>.write(<span class="string">&quot;(&quot;</span>)<span class="question-mark">?</span>;
         <span class="self">self</span>.write(<span class="string">&quot;JSON_TYPE&quot;</span>)<span class="question-mark">?</span>;
@@ -1511,7 +1481,7 @@
         <span class="prelude-val">Ok</span>(())
     }
 
-    <span class="attr">#[cfg(all(feature = <span class="string">&quot;json&quot;</span>, any(feature = <span class="string">&quot;postgresql&quot;</span>, feature = <span class="string">&quot;mysql&quot;</span>)))]
+    <span class="attr">#[cfg(any(feature = <span class="string">&quot;postgresql&quot;</span>, feature = <span class="string">&quot;mysql&quot;</span>))]
     </span><span class="kw">fn </span>visit_json_extract_last_array_item(<span class="kw-2">&amp;mut </span><span class="self">self</span>, extract: JsonExtractLastArrayElem&lt;<span class="lifetime">&#39;a</span>&gt;) -&gt; visitor::Result {
         <span class="self">self</span>.write(<span class="string">&quot;JSON_EXTRACT(&quot;</span>)<span class="question-mark">?</span>;
         <span class="self">self</span>.visit_expression(<span class="kw-2">*</span>extract.expr.clone())<span class="question-mark">?</span>;
@@ -1524,7 +1494,7 @@
         <span class="prelude-val">Ok</span>(())
     }
 
-    <span class="attr">#[cfg(all(feature = <span class="string">&quot;json&quot;</span>, any(feature = <span class="string">&quot;postgresql&quot;</span>, feature = <span class="string">&quot;mysql&quot;</span>)))]
+    <span class="attr">#[cfg(any(feature = <span class="string">&quot;postgresql&quot;</span>, feature = <span class="string">&quot;mysql&quot;</span>))]
     </span><span class="kw">fn </span>visit_json_extract_first_array_item(<span class="kw-2">&amp;mut </span><span class="self">self</span>, extract: JsonExtractFirstArrayElem&lt;<span class="lifetime">&#39;a</span>&gt;) -&gt; visitor::Result {
         <span class="self">self</span>.write(<span class="string">&quot;JSON_EXTRACT(&quot;</span>)<span class="question-mark">?</span>;
         <span class="self">self</span>.visit_expression(<span class="kw-2">*</span>extract.expr)<span class="question-mark">?</span>;
@@ -1535,7 +1505,7 @@
         <span class="prelude-val">Ok</span>(())
     }
 
-    <span class="attr">#[cfg(all(feature = <span class="string">&quot;json&quot;</span>, any(feature = <span class="string">&quot;postgresql&quot;</span>, feature = <span class="string">&quot;mysql&quot;</span>)))]
+    <span class="attr">#[cfg(any(feature = <span class="string">&quot;postgresql&quot;</span>, feature = <span class="string">&quot;mysql&quot;</span>))]
     </span><span class="kw">fn </span>visit_json_unquote(<span class="kw-2">&amp;mut </span><span class="self">self</span>, json_unquote: JsonUnquote&lt;<span class="lifetime">&#39;a</span>&gt;) -&gt; visitor::Result {
         <span class="self">self</span>.write(<span class="string">&quot;JSON_UNQUOTE(&quot;</span>)<span class="question-mark">?</span>;
         <span class="self">self</span>.visit_expression(<span class="kw-2">*</span>json_unquote.expr)<span class="question-mark">?</span>;
@@ -1702,8 +1672,7 @@
         );
     }
 
-    <span class="attr">#[cfg(feature = <span class="string">&quot;json&quot;</span>)]
-    #[test]
+    <span class="attr">#[test]
     </span><span class="kw">fn </span>equality_with_a_json_value() {
         <span class="kw">let </span>expected = expected_values(
             <span class="string">r#&quot;SELECT `users`.* FROM `users` WHERE (JSON_CONTAINS(`jsonField`, ?) AND JSON_CONTAINS(?, `jsonField`))&quot;#</span>,
@@ -1717,8 +1686,7 @@
         <span class="macro">assert_eq!</span>(expected.<span class="number">1</span>, params);
     }
 
-    <span class="attr">#[cfg(feature = <span class="string">&quot;json&quot;</span>)]
-    #[test]
+    <span class="attr">#[test]
     </span><span class="kw">fn </span>difference_with_a_json_value() {
         <span class="kw">let </span>expected = expected_values(
             <span class="string">r#&quot;SELECT `users`.* FROM `users` WHERE (NOT JSON_CONTAINS(`jsonField`, ?) OR NOT JSON_CONTAINS(?, `jsonField`))&quot;#</span>,
@@ -1834,7 +1802,7 @@
     }
 
     <span class="attr">#[test]
-    #[cfg(feature = <span class="string">&quot;json&quot;</span>)]
+
     </span><span class="kw">fn </span>test_raw_json() {
         <span class="kw">let </span>(sql, params) = Mysql::build(Select::default().value(<span class="macro">serde_json::json!</span>({ <span class="string">&quot;foo&quot;</span>: <span class="string">&quot;bar&quot; </span>}).raw())).unwrap();
         <span class="macro">assert_eq!</span>(<span class="string">&quot;SELECT CONVERT(&#39;{\&quot;foo\&quot;:\&quot;bar\&quot;}&#39;, JSON)&quot;</span>, sql);
@@ -1889,7 +1857,7 @@
     }
 
     <span class="attr">#[test]
-    #[cfg(feature = <span class="string">&quot;json&quot;</span>)]
+
     </span><span class="kw">fn </span>test_json_negation() {
         <span class="kw">let </span>conditions = ConditionTree::not(<span class="string">&quot;json&quot;</span>.equals(Value::Json(<span class="prelude-val">Some</span>(serde_json::Value::Null))));
         <span class="kw">let </span>(sql, <span class="kw">_</span>) = Mysql::build(Select::from_table(<span class="string">&quot;test&quot;</span>).so_that(conditions)).unwrap();
@@ -1901,7 +1869,7 @@
     }
 
     <span class="attr">#[test]
-    #[cfg(feature = <span class="string">&quot;json&quot;</span>)]
+
     </span><span class="kw">fn </span>test_json_not_negation() {
         <span class="kw">let </span>conditions = ConditionTree::not(<span class="string">&quot;json&quot;</span>.not_equals(Value::Json(<span class="prelude-val">Some</span>(serde_json::Value::Null))));
         <span class="kw">let </span>(sql, <span class="kw">_</span>) = Mysql::build(Select::from_table(<span class="string">&quot;test&quot;</span>).so_that(conditions)).unwrap();

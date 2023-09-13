@@ -1105,8 +1105,8 @@
 
                 <span class="kw">return </span><span class="prelude-val">Err</span>(builder.build());
             }
-            <span class="attr">#[cfg(feature = <span class="string">&quot;json&quot;</span>)]
-            </span>Value::Json(j) =&gt; <span class="kw">match </span>j {
+
+            Value::Json(j) =&gt; <span class="kw">match </span>j {
                 <span class="prelude-val">Some</span>(<span class="kw-2">ref </span>j) =&gt; {
                     <span class="kw">let </span>s = serde_json::to_string(j)<span class="question-mark">?</span>;
                     <span class="prelude-val">Some</span>(<span class="self">self</span>.write(<span class="macro">format!</span>(<span class="string">&quot;&#39;{s}&#39;&quot;</span>)))
@@ -1278,12 +1278,12 @@
         })
     }
 
-    <span class="attr">#[cfg(all(feature = <span class="string">&quot;json&quot;</span>, any(feature = <span class="string">&quot;postgresql&quot;</span>, feature = <span class="string">&quot;mysql&quot;</span>)))]
+    <span class="attr">#[cfg(any(feature = <span class="string">&quot;postgresql&quot;</span>, feature = <span class="string">&quot;mysql&quot;</span>))]
     </span><span class="kw">fn </span>visit_json_extract(<span class="kw-2">&amp;mut </span><span class="self">self</span>, _json_extract: JsonExtract&lt;<span class="lifetime">&#39;a</span>&gt;) -&gt; visitor::Result {
         <span class="macro">unimplemented!</span>(<span class="string">&quot;JSON filtering is not yet supported on SQLite&quot;</span>)
     }
 
-    <span class="attr">#[cfg(all(feature = <span class="string">&quot;json&quot;</span>, any(feature = <span class="string">&quot;postgresql&quot;</span>, feature = <span class="string">&quot;mysql&quot;</span>)))]
+    <span class="attr">#[cfg(any(feature = <span class="string">&quot;postgresql&quot;</span>, feature = <span class="string">&quot;mysql&quot;</span>))]
     </span><span class="kw">fn </span>visit_json_array_contains(
         <span class="kw-2">&amp;mut </span><span class="self">self</span>,
         _left: Expression&lt;<span class="lifetime">&#39;a</span>&gt;,
@@ -1293,7 +1293,7 @@
         <span class="macro">unimplemented!</span>(<span class="string">&quot;JSON filtering is not yet supported on SQLite&quot;</span>)
     }
 
-    <span class="attr">#[cfg(all(feature = <span class="string">&quot;json&quot;</span>, any(feature = <span class="string">&quot;postgresql&quot;</span>, feature = <span class="string">&quot;mysql&quot;</span>)))]
+    <span class="attr">#[cfg(any(feature = <span class="string">&quot;postgresql&quot;</span>, feature = <span class="string">&quot;mysql&quot;</span>))]
     </span><span class="kw">fn </span>visit_json_type_equals(<span class="kw-2">&amp;mut </span><span class="self">self</span>, _left: Expression&lt;<span class="lifetime">&#39;a</span>&gt;, _json_type: JsonType, _not: bool) -&gt; visitor::Result {
         <span class="macro">unimplemented!</span>(<span class="string">&quot;JSON_TYPE is not yet supported on SQLite&quot;</span>)
     }
@@ -1318,17 +1318,17 @@
         <span class="macro">unimplemented!</span>(<span class="string">&quot;Full-text search is not yet supported on SQLite&quot;</span>)
     }
 
-    <span class="attr">#[cfg(all(feature = <span class="string">&quot;json&quot;</span>, any(feature = <span class="string">&quot;postgresql&quot;</span>, feature = <span class="string">&quot;mysql&quot;</span>)))]
+    <span class="attr">#[cfg(any(feature = <span class="string">&quot;postgresql&quot;</span>, feature = <span class="string">&quot;mysql&quot;</span>))]
     </span><span class="kw">fn </span>visit_json_extract_last_array_item(<span class="kw-2">&amp;mut </span><span class="self">self</span>, _extract: JsonExtractLastArrayElem&lt;<span class="lifetime">&#39;a</span>&gt;) -&gt; visitor::Result {
         <span class="macro">unimplemented!</span>(<span class="string">&quot;JSON filtering is not yet supported on SQLite&quot;</span>)
     }
 
-    <span class="attr">#[cfg(all(feature = <span class="string">&quot;json&quot;</span>, any(feature = <span class="string">&quot;postgresql&quot;</span>, feature = <span class="string">&quot;mysql&quot;</span>)))]
+    <span class="attr">#[cfg(any(feature = <span class="string">&quot;postgresql&quot;</span>, feature = <span class="string">&quot;mysql&quot;</span>))]
     </span><span class="kw">fn </span>visit_json_extract_first_array_item(<span class="kw-2">&amp;mut </span><span class="self">self</span>, _extract: JsonExtractFirstArrayElem&lt;<span class="lifetime">&#39;a</span>&gt;) -&gt; visitor::Result {
         <span class="macro">unimplemented!</span>(<span class="string">&quot;JSON filtering is not yet supported on SQLite&quot;</span>)
     }
 
-    <span class="attr">#[cfg(all(feature = <span class="string">&quot;json&quot;</span>, any(feature = <span class="string">&quot;postgresql&quot;</span>, feature = <span class="string">&quot;mysql&quot;</span>)))]
+    <span class="attr">#[cfg(any(feature = <span class="string">&quot;postgresql&quot;</span>, feature = <span class="string">&quot;mysql&quot;</span>))]
     </span><span class="kw">fn </span>visit_json_unquote(<span class="kw-2">&amp;mut </span><span class="self">self</span>, _json_unquote: JsonUnquote&lt;<span class="lifetime">&#39;a</span>&gt;) -&gt; visitor::Result {
         <span class="macro">unimplemented!</span>(<span class="string">&quot;JSON filtering is not yet supported on SQLite&quot;</span>)
     }
@@ -1915,7 +1915,7 @@
     }
 
     <span class="attr">#[test]
-    #[cfg(feature = <span class="string">&quot;json&quot;</span>)]
+
     </span><span class="kw">fn </span>test_raw_json() {
         <span class="kw">let </span>(sql, params) = Sqlite::build(Select::default().value(<span class="macro">serde_json::json!</span>({ <span class="string">&quot;foo&quot;</span>: <span class="string">&quot;bar&quot; </span>}).raw())).unwrap();
         <span class="macro">assert_eq!</span>(<span class="string">&quot;SELECT &#39;{\&quot;foo\&quot;:\&quot;bar\&quot;}&#39;&quot;</span>, sql);

@@ -57,7 +57,7 @@
 
 <span class="attr">#[derive(Debug, Clone, PartialEq)]
 #[cfg_attr(feature = <span class="string">&quot;docs&quot;</span>, doc(cfg(feature = <span class="string">&quot;postgresql&quot;</span>)))]
-#[cfg(all(feature = <span class="string">&quot;json&quot;</span>, feature = <span class="string">&quot;postgresql&quot;</span>))]
+#[cfg(feature = <span class="string">&quot;postgresql&quot;</span>)]
 </span><span class="doccomment">/// A representation of the `ROW_TO_JSON` function in the database.
 /// Only for `Postgresql`
 </span><span class="kw">pub struct </span>RowToJson&lt;<span class="lifetime">&#39;a</span>&gt; {
@@ -94,7 +94,7 @@
 /// # }
 /// ```
 </span><span class="attr">#[cfg_attr(feature = <span class="string">&quot;docs&quot;</span>, doc(cfg(feature = <span class="string">&quot;postgresql&quot;</span>)))]
-#[cfg(all(feature = <span class="string">&quot;json&quot;</span>, feature = <span class="string">&quot;postgresql&quot;</span>))]
+#[cfg(feature = <span class="string">&quot;postgresql&quot;</span>)]
 </span><span class="kw">pub fn </span>row_to_json&lt;<span class="lifetime">&#39;a</span>, T&gt;(expr: T, pretty_print: bool) -&gt; Function&lt;<span class="lifetime">&#39;a</span>&gt;
 <span class="kw">where
     </span>T: Into&lt;Table&lt;<span class="lifetime">&#39;a</span>&gt;&gt;,

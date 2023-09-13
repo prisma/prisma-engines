@@ -1805,7 +1805,7 @@
 <a href="#1805" id="1805">1805</a>
 <a href="#1806" id="1806">1806</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span><span class="kw">super</span>::Visitor;
-<span class="attr">#[cfg(all(feature = <span class="string">&quot;json&quot;</span>, any(feature = <span class="string">&quot;postgresql&quot;</span>, feature = <span class="string">&quot;mysql&quot;</span>)))]
+<span class="attr">#[cfg(any(feature = <span class="string">&quot;postgresql&quot;</span>, feature = <span class="string">&quot;mysql&quot;</span>))]
 </span><span class="kw">use </span><span class="kw">crate</span>::prelude::{JsonExtract, JsonType, JsonUnquote};
 <span class="kw">use crate</span>::{
     ast::{
@@ -2145,8 +2145,8 @@
 
                 <span class="kw">return </span><span class="prelude-val">Err</span>(builder.build());
             }
-            <span class="attr">#[cfg(feature = <span class="string">&quot;json&quot;</span>)]
-            </span>Value::Json(j) =&gt; j.map(|j| <span class="self">self</span>.write(<span class="macro">format!</span>(<span class="string">&quot;&#39;{}&#39;&quot;</span>, serde_json::to_string(<span class="kw-2">&amp;</span>j).unwrap()))),
+
+            Value::Json(j) =&gt; j.map(|j| <span class="self">self</span>.write(<span class="macro">format!</span>(<span class="string">&quot;&#39;{}&#39;&quot;</span>, serde_json::to_string(<span class="kw-2">&amp;</span>j).unwrap()))),
             <span class="attr">#[cfg(feature = <span class="string">&quot;bigdecimal&quot;</span>)]
             </span>Value::Numeric(r) =&gt; r.map(|r| <span class="self">self</span>.write(r)),
             <span class="attr">#[cfg(feature = <span class="string">&quot;uuid&quot;</span>)]
@@ -2439,12 +2439,12 @@
         <span class="prelude-val">Ok</span>(())
     }
 
-    <span class="attr">#[cfg(all(feature = <span class="string">&quot;json&quot;</span>, any(feature = <span class="string">&quot;postgresql&quot;</span>, feature = <span class="string">&quot;mysql&quot;</span>)))]
+    <span class="attr">#[cfg(any(feature = <span class="string">&quot;postgresql&quot;</span>, feature = <span class="string">&quot;mysql&quot;</span>))]
     </span><span class="kw">fn </span>visit_json_extract(<span class="kw-2">&amp;mut </span><span class="self">self</span>, _json_extract: JsonExtract&lt;<span class="lifetime">&#39;a</span>&gt;) -&gt; visitor::Result {
         <span class="macro">unimplemented!</span>(<span class="string">&quot;JSON filtering is not yet supported on MSSQL&quot;</span>)
     }
 
-    <span class="attr">#[cfg(all(feature = <span class="string">&quot;json&quot;</span>, any(feature = <span class="string">&quot;postgresql&quot;</span>, feature = <span class="string">&quot;mysql&quot;</span>)))]
+    <span class="attr">#[cfg(any(feature = <span class="string">&quot;postgresql&quot;</span>, feature = <span class="string">&quot;mysql&quot;</span>))]
     </span><span class="kw">fn </span>visit_json_array_contains(
         <span class="kw-2">&amp;mut </span><span class="self">self</span>,
         _left: Expression&lt;<span class="lifetime">&#39;a</span>&gt;,
@@ -2454,12 +2454,12 @@
         <span class="macro">unimplemented!</span>(<span class="string">&quot;JSON filtering is not yet supported on MSSQL&quot;</span>)
     }
 
-    <span class="attr">#[cfg(all(feature = <span class="string">&quot;json&quot;</span>, any(feature = <span class="string">&quot;postgresql&quot;</span>, feature = <span class="string">&quot;mysql&quot;</span>)))]
+    <span class="attr">#[cfg(any(feature = <span class="string">&quot;postgresql&quot;</span>, feature = <span class="string">&quot;mysql&quot;</span>))]
     </span><span class="kw">fn </span>visit_json_type_equals(<span class="kw-2">&amp;mut </span><span class="self">self</span>, _left: Expression&lt;<span class="lifetime">&#39;a</span>&gt;, _json_type: JsonType, _not: bool) -&gt; visitor::Result {
         <span class="macro">unimplemented!</span>(<span class="string">&quot;JSON_TYPE is not yet supported on MSSQL&quot;</span>)
     }
 
-    <span class="attr">#[cfg(all(feature = <span class="string">&quot;json&quot;</span>, any(feature = <span class="string">&quot;postgresql&quot;</span>, feature = <span class="string">&quot;mysql&quot;</span>)))]
+    <span class="attr">#[cfg(any(feature = <span class="string">&quot;postgresql&quot;</span>, feature = <span class="string">&quot;mysql&quot;</span>))]
     </span><span class="kw">fn </span>visit_json_unquote(<span class="kw-2">&amp;mut </span><span class="self">self</span>, _json_unquote: JsonUnquote&lt;<span class="lifetime">&#39;a</span>&gt;) -&gt; visitor::Result {
         <span class="macro">unimplemented!</span>(<span class="string">&quot;JSON filtering is not yet supported on MSSQL&quot;</span>)
     }
@@ -2487,7 +2487,7 @@
         <span class="macro">unimplemented!</span>(<span class="string">&quot;Full-text search is not yet supported on MSSQL&quot;</span>)
     }
 
-    <span class="attr">#[cfg(all(feature = <span class="string">&quot;json&quot;</span>, any(feature = <span class="string">&quot;postgresql&quot;</span>, feature = <span class="string">&quot;mysql&quot;</span>)))]
+    <span class="attr">#[cfg(any(feature = <span class="string">&quot;postgresql&quot;</span>, feature = <span class="string">&quot;mysql&quot;</span>))]
     </span><span class="kw">fn </span>visit_json_extract_last_array_item(
         <span class="kw-2">&amp;mut </span><span class="self">self</span>,
         _extract: <span class="kw">crate</span>::prelude::JsonExtractLastArrayElem&lt;<span class="lifetime">&#39;a</span>&gt;,
@@ -2495,7 +2495,7 @@
         <span class="macro">unimplemented!</span>(<span class="string">&quot;JSON filtering is not yet supported on MSSQL&quot;</span>)
     }
 
-    <span class="attr">#[cfg(all(feature = <span class="string">&quot;json&quot;</span>, any(feature = <span class="string">&quot;postgresql&quot;</span>, feature = <span class="string">&quot;mysql&quot;</span>)))]
+    <span class="attr">#[cfg(any(feature = <span class="string">&quot;postgresql&quot;</span>, feature = <span class="string">&quot;mysql&quot;</span>))]
     </span><span class="kw">fn </span>visit_json_extract_first_array_item(
         <span class="kw-2">&amp;mut </span><span class="self">self</span>,
         _extract: <span class="kw">crate</span>::prelude::JsonExtractFirstArrayElem&lt;<span class="lifetime">&#39;a</span>&gt;,
@@ -3051,7 +3051,7 @@
     }
 
     <span class="attr">#[test]
-    #[cfg(feature = <span class="string">&quot;json&quot;</span>)]
+
     </span><span class="kw">fn </span>test_raw_json() {
         <span class="kw">let </span>(sql, params) = Mssql::build(Select::default().value(<span class="macro">serde_json::json!</span>({ <span class="string">&quot;foo&quot;</span>: <span class="string">&quot;bar&quot; </span>}).raw())).unwrap();
         <span class="macro">assert_eq!</span>(<span class="string">&quot;SELECT &#39;{\&quot;foo\&quot;:\&quot;bar\&quot;}&#39;&quot;</span>, sql);
