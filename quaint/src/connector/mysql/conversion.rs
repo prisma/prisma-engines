@@ -3,7 +3,6 @@ use crate::{
     connector::{queryable::TakeRow, TypeIdentifier},
     error::{Error, ErrorKind},
 };
-#[cfg(feature = "chrono")]
 use chrono::{DateTime, Datelike, NaiveDate, NaiveDateTime, NaiveTime, Timelike, Utc};
 use mysql_async::{
     self as my,
@@ -54,15 +53,12 @@ pub fn conv_params(params: &[Value<'_>]) -> crate::Result<my::Params> {
                 },
                 #[cfg(feature = "uuid")]
                 Value::Uuid(u) => u.map(|u| my::Value::Bytes(u.hyphenated().to_string().into_bytes())),
-                #[cfg(feature = "chrono")]
                 Value::Date(d) => {
                     d.map(|d| my::Value::Date(d.year() as u16, d.month() as u8, d.day() as u8, 0, 0, 0, 0))
                 }
-                #[cfg(feature = "chrono")]
                 Value::Time(t) => {
                     t.map(|t| my::Value::Time(false, 0, t.hour() as u8, t.minute() as u8, t.second() as u8, 0))
                 }
-                #[cfg(feature = "chrono")]
                 Value::DateTime(dt) => dt.map(|dt| {
                     my::Value::Date(
                         dt.year() as u16,
@@ -276,7 +272,6 @@ impl TakeRow for my::Row {
                 })?),
                 my::Value::Float(f) => Value::from(f),
                 my::Value::Double(f) => Value::from(f),
-                #[cfg(feature = "chrono")]
                 my::Value::Date(year, month, day, hour, min, sec, micro) => {
                     if day == 0 || month == 0 {
                         let msg = format!(
@@ -294,7 +289,6 @@ impl TakeRow for my::Row {
 
                     Value::datetime(DateTime::<Utc>::from_utc(dt, Utc))
                 }
-                #[cfg(feature = "chrono")]
                 my::Value::Time(is_neg, days, hours, minutes, seconds, micros) => {
                     if is_neg {
                         let kind = ErrorKind::conversion("Failed to convert a negative time");
@@ -322,11 +316,8 @@ impl TakeRow for my::Row {
                     t if t.is_bytes() => Value::Bytes(None),
                     #[cfg(feature = "bigdecimal")]
                     t if t.is_real() => Value::Numeric(None),
-                    #[cfg(feature = "chrono")]
                     t if t.is_datetime() => Value::DateTime(None),
-                    #[cfg(feature = "chrono")]
                     t if t.is_time() => Value::Time(None),
-                    #[cfg(feature = "chrono")]
                     t if t.is_date() => Value::Date(None),
                     #[cfg(feature = "json")]
                     t if t.is_json() => Value::Json(None),
@@ -337,16 +328,6 @@ impl TakeRow for my::Row {
                         return Err(Error::builder(kind).build());
                     }
                 },
-                #[cfg(not(feature = "chrono"))]
-                typ => {
-                    let msg = format!(
-                        "Value of type {:?} is not supported with the current configuration",
-                        typ
-                    );
-
-                    let kind = ErrorKind::conversion(msg);
-                    Err(Error::builder(kind).build())?
-                }
             };
 
             Ok(res)

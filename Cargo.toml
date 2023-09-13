@@ -56,7 +56,6 @@ napi-derive = "2.12.4"
 path = "quaint"
 features = [
   "bigdecimal",
-  "chrono",
   "expose-drivers",
   "fmt-sql",
   "json",

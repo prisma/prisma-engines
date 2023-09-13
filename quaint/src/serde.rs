@@ -153,19 +153,13 @@ impl<'de> Deserializer<'de> for ValueDeserializer<'de> {
             Value::Xml(Some(s)) => visitor.visit_string(s.into_owned()),
             Value::Xml(None) => visitor.visit_none(),
 
-            #[cfg(feature = "chrono")]
             Value::DateTime(Some(dt)) => visitor.visit_string(dt.to_rfc3339()),
-            #[cfg(feature = "chrono")]
             Value::DateTime(None) => visitor.visit_none(),
 
-            #[cfg(feature = "chrono")]
             Value::Date(Some(d)) => visitor.visit_string(format!("{d}")),
-            #[cfg(feature = "chrono")]
             Value::Date(None) => visitor.visit_none(),
 
-            #[cfg(feature = "chrono")]
             Value::Time(Some(t)) => visitor.visit_string(format!("{t}")),
-            #[cfg(feature = "chrono")]
             Value::Time(None) => visitor.visit_none(),
 
             Value::Array(Some(values)) => {

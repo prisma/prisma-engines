@@ -115,11 +115,8 @@ impl<'a> Visitor<'a> for Sqlite<'a> {
             Value::Numeric(r) => r.map(|r| self.write(r)),
             #[cfg(feature = "uuid")]
             Value::Uuid(uuid) => uuid.map(|uuid| self.write(format!("'{}'", uuid.hyphenated()))),
-            #[cfg(feature = "chrono")]
             Value::DateTime(dt) => dt.map(|dt| self.write(format!("'{}'", dt.to_rfc3339(),))),
-            #[cfg(feature = "chrono")]
             Value::Date(date) => date.map(|date| self.write(format!("'{date}'"))),
-            #[cfg(feature = "chrono")]
             Value::Time(time) => time.map(|time| self.write(format!("'{time}'"))),
             Value::Xml(cow) => cow.map(|cow| self.write(format!("'{cow}'"))),
         };
@@ -935,7 +932,6 @@ mod tests {
     }
 
     #[test]
-    #[cfg(feature = "chrono")]
     fn test_raw_datetime() {
         let dt = chrono::Utc::now();
         let (sql, params) = Sqlite::build(Select::default().value(dt.raw())).unwrap();
