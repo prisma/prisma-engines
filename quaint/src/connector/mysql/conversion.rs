@@ -41,7 +41,6 @@ pub fn conv_params(params: &[Value<'_>]) -> crate::Result<my::Params> {
                 }
                 #[cfg(feature = "bigdecimal")]
                 Value::Numeric(f) => f.as_ref().map(|f| my::Value::Bytes(f.to_string().as_bytes().to_vec())),
-                #[cfg(feature = "json")]
                 Value::Json(s) => match s {
                     Some(ref s) => {
                         let json = serde_json::to_string(s)?;
@@ -223,7 +222,6 @@ impl TakeRow for my::Row {
 
             let res = match value {
                 // JSON is returned as bytes.
-                #[cfg(feature = "json")]
                 my::Value::Bytes(b) if column.is_json() => {
                     serde_json::from_slice(&b).map(Value::json).map_err(|_| {
                         let msg = "Unable to convert bytes to JSON";
@@ -319,7 +317,6 @@ impl TakeRow for my::Row {
                     t if t.is_datetime() => Value::DateTime(None),
                     t if t.is_time() => Value::Time(None),
                     t if t.is_date() => Value::Date(None),
-                    #[cfg(feature = "json")]
                     t if t.is_json() => Value::Json(None),
                     typ => {
                         let msg = format!("Value of type {typ:?} is not supported with the current configuration");

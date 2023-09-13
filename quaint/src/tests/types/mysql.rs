@@ -208,7 +208,6 @@ test_type!(enum(
     Value::enum_variant("pollicle_dogs")
 ));
 
-#[cfg(feature = "json")]
 test_type!(json(
     mysql,
     "json",

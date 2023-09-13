@@ -4,7 +4,6 @@ use crate::error::{Error, ErrorKind};
 #[cfg(feature = "bigdecimal")]
 use bigdecimal::{BigDecimal, FromPrimitive, ToPrimitive};
 use chrono::{DateTime, NaiveDate, NaiveTime, Utc};
-#[cfg(feature = "json")]
 use serde_json::{Number, Value as JsonValue};
 use std::{
     borrow::{Borrow, Cow},
@@ -64,8 +63,6 @@ pub enum Value<'a> {
     #[cfg(feature = "bigdecimal")]
     #[cfg_attr(feature = "docs", doc(cfg(feature = "bigdecimal")))]
     Numeric(Option<BigDecimal>),
-    #[cfg(feature = "json")]
-    #[cfg_attr(feature = "docs", doc(cfg(feature = "json")))]
     /// A JSON value.
     Json(Option<serde_json::Value>),
     /// A XML value.
@@ -128,7 +125,6 @@ impl<'a> fmt::Display for Value<'a> {
             Value::Xml(val) => val.as_ref().map(|v| write!(f, "{v}")),
             #[cfg(feature = "bigdecimal")]
             Value::Numeric(val) => val.as_ref().map(|v| write!(f, "{v}")),
-            #[cfg(feature = "json")]
             Value::Json(val) => val.as_ref().map(|v| write!(f, "{v}")),
             #[cfg(feature = "uuid")]
             Value::Uuid(val) => val.map(|v| write!(f, "\"{v}\"")),
@@ -144,8 +140,6 @@ impl<'a> fmt::Display for Value<'a> {
     }
 }
 
-#[cfg(feature = "json")]
-#[cfg_attr(feature = "docs", doc(cfg(feature = "json")))]
 impl<'a> From<Value<'a>> for serde_json::Value {
     fn from(pv: Value<'a>) -> Self {
         let res = match pv {
@@ -176,7 +170,6 @@ impl<'a> From<Value<'a>> for serde_json::Value {
             }
             #[cfg(feature = "bigdecimal")]
             Value::Numeric(d) => d.map(|d| serde_json::to_value(d.to_f64().unwrap()).unwrap()),
-            #[cfg(feature = "json")]
             Value::Json(v) => v,
             #[cfg(feature = "uuid")]
             Value::Uuid(u) => u.map(|u| serde_json::Value::String(u.hyphenated().to_string())),
@@ -306,8 +299,6 @@ impl<'a> Value<'a> {
     }
 
     /// Creates a new JSON value.
-    #[cfg(feature = "json")]
-    #[cfg_attr(feature = "docs", doc(cfg(feature = "json")))]
     pub const fn json(value: serde_json::Value) -> Self {
         Value::Json(Some(value))
     }
@@ -341,7 +332,6 @@ impl<'a> Value<'a> {
             Value::DateTime(dt) => dt.is_none(),
             Value::Date(d) => d.is_none(),
             Value::Time(t) => t.is_none(),
-            #[cfg(feature = "json")]
             Value::Json(json) => json.is_none(),
         }
     }
@@ -581,15 +571,11 @@ impl<'a> Value<'a> {
     }
 
     /// `true` if the `Value` is a JSON value.
-    #[cfg(feature = "json")]
-    #[cfg_attr(feature = "docs", doc(cfg(feature = "json")))]
     pub const fn is_json(&self) -> bool {
         matches!(self, Value::Json(_))
     }
 
     /// Returns a reference to a JSON Value if of Json type, otherwise `None`.
-    #[cfg(feature = "json")]
-    #[cfg_attr(feature = "docs", doc(cfg(feature = "json")))]
     pub const fn as_json(&self) -> Option<&serde_json::Value> {
         match self {
             Value::Json(Some(j)) => Some(j),
@@ -598,8 +584,6 @@ impl<'a> Value<'a> {
     }
 
     /// Transforms to a JSON Value if of Json type, otherwise `None`.
-    #[cfg(feature = "json")]
-    #[cfg_attr(feature = "docs", doc(cfg(feature = "json")))]
     pub fn into_json(self) -> Option<serde_json::Value> {
         match self {
             Value::Json(Some(j)) => Some(j),
@@ -658,7 +642,6 @@ value!(val: chrono::NaiveTime, Time, val);
 value!(val: chrono::NaiveDate, Date, val);
 #[cfg(feature = "bigdecimal")]
 value!(val: BigDecimal, Numeric, val);
-#[cfg(feature = "json")]
 value!(val: JsonValue, Json, val);
 #[cfg(feature = "uuid")]
 value!(val: Uuid, Uuid, val);
