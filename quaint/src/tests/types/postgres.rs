@@ -260,7 +260,6 @@ test_type!(inet_array(
     ])
 ));
 
-#[cfg(feature = "json")]
 test_type!(json(
     postgresql,
     "json",
@@ -268,7 +267,6 @@ test_type!(json(
     Value::json(serde_json::json!({"foo": "bar"}))
 ));
 
-#[cfg(feature = "json")]
 test_type!(json_array(
     postgresql,
     "json[]",
@@ -280,7 +278,6 @@ test_type!(json_array(
     ])
 ));
 
-#[cfg(feature = "json")]
 test_type!(jsonb(
     postgresql,
     "jsonb",
@@ -288,7 +285,6 @@ test_type!(jsonb(
     Value::json(serde_json::json!({"foo": "bar"}))
 ));
 
-#[cfg(feature = "json")]
 test_type!(jsonb_array(
     postgresql,
     "jsonb[]",

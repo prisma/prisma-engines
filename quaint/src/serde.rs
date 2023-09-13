@@ -140,14 +140,12 @@ impl<'de> Deserializer<'de> for ValueDeserializer<'de> {
             #[cfg(feature = "uuid")]
             Value::Uuid(None) => visitor.visit_none(),
 
-            #[cfg(feature = "json")]
             Value::Json(Some(value)) => {
                 let de = value.into_deserializer();
 
                 de.deserialize_any(visitor)
                     .map_err(|err| serde::de::value::Error::custom(format!("Error deserializing JSON value: {err}")))
             }
-            #[cfg(feature = "json")]
             Value::Json(None) => visitor.visit_none(),
 
             Value::Xml(Some(s)) => visitor.visit_string(s.into_owned()),
