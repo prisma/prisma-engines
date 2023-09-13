@@ -185,7 +185,10 @@ fn js_value_to_quaint(
                 QuaintValue::int64(n)
             }
             serde_json::Value::Null => QuaintValue::Int64(None),
-            mismatch => panic!("Expected a string or number in column {}, found {}", column_name, mismatch),
+            mismatch => panic!(
+                "Expected a string or number in column {}, found {}",
+                column_name, mismatch
+            ),
         },
         ColumnType::Float => match json_value {
             // n.as_f32() is not implemented, so we need to downcast from f64 instead.
@@ -244,8 +247,9 @@ fn js_value_to_quaint(
         ColumnType::DateTime => match json_value {
             serde_json::Value::String(s) => {
                 let datetime = chrono::NaiveDateTime::parse_from_str(&s, "%Y-%m-%d %H:%M:%S%.f")
+                    .map(|dt| DateTime::from_utc(dt, Utc))
+                    .or_else(|_| DateTime::parse_from_rfc3339(&s).map(DateTime::<Utc>::from))
                     .unwrap_or_else(|_| panic!("Expected a datetime string, found {:?}", &s));
-                let datetime: DateTime<Utc> = DateTime::from_utc(datetime, Utc);
                 QuaintValue::datetime(datetime)
             }
             serde_json::Value::Null => QuaintValue::DateTime(None),
