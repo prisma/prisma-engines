@@ -233,45 +233,28 @@ fn compute_aggr_join_m2m(
 }
 
 pub(crate) fn compute_one2m_join(
-    rf: &RelationFieldRef,
-    join_prefix: &str,
-    previous_join: Option<&str>,
+    field: &RelationFieldRef,
+    alias: &str,
+    parent_alias: Option<&str>,
     ctx: &Context<'_>,
 ) -> AliasedJoin {
-    let (left_fields, right_fields) = if rf.is_inlined_on_enclosing_model() {
-        (rf.scalar_fields(), rf.referenced_fields())
-    } else {
-        (
-            rf.related_field().referenced_fields(),
-            rf.related_field().scalar_fields(),
-        )
-    };
+    let join_columns: Vec<Column> = field
+        .join_columns(ctx)
+        .map(|c| c.opt_table(parent_alias.map(ToOwned::to_owned)))
+        .collect();
 
-    let right_table_alias = join_prefix.to_owned();
+    let related_table = field.related_model().as_table(ctx);
+    let related_join_columns: Vec<_> = ModelProjection::from(field.related_field().linking_fields())
+        .as_columns(ctx)
+        .map(|col| col.table(alias.to_owned()))
+        .collect();
 
-    let related_model = rf.related_model();
-    let pairs = left_fields.into_iter().zip(right_fields);
-
-    let on_conditions: Vec<Expression> = pairs
-        .map(|(a, b)| {
-            let a_col = match previous_join {
-                Some(prev_join) => Column::from((prev_join.to_owned(), a.db_name().to_owned())),
-                None => a.as_column(ctx),
-            };
-
-            let b_col = Column::from((right_table_alias.clone(), b.db_name().to_owned()));
-
-            a_col.equals(b_col).into()
-        })
-        .collect::<Vec<_>>();
+    let join = related_table
+        .alias(alias.to_owned())
+        .on(Row::from(related_join_columns).equals(Row::from(join_columns)));
 
     AliasedJoin {
-        alias: right_table_alias.to_owned(),
-        data: Join::Left(
-            related_model
-                .as_table(ctx)
-                .alias(right_table_alias)
-                .on(ConditionTree::And(on_conditions)),
-        ),
+        alias: alias.to_owned(),
+        data: Join::Left(join),
     }
 }
