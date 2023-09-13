@@ -101,25 +101,13 @@ impl FilterVisitor {
         nested_visitor
     }
 
-    fn visit_nested_filter(
-        &mut self,
-        filter: Filter,
-        parent_alias: Alias,
-        invert_reverse: bool,
-        ctx: &Context<'_>,
-    ) -> (ConditionTree<'static>, Option<Vec<AliasedJoin>>) {
+    fn visit_nested_filter<T>(&mut self, parent_alias: Alias, f: impl FnOnce(&mut Self) -> T) -> T {
         let mut nested_visitor = self.create_nested_visitor(parent_alias);
-
-        let (nested_conditions, nested_joins) = if invert_reverse {
-            nested_visitor.invert_reverse(|this| this.visit_filter(filter, ctx))
-        } else {
-            nested_visitor.visit_filter(filter, ctx)
-        };
-
+        let res = f(&mut nested_visitor);
         // Ensures the alias counter is updated after building the nested filter so that we don't render duplicate aliases.
         self.update_last_alias(&nested_visitor);
 
-        (nested_conditions, nested_joins)
+        res
     }
 
     fn visit_relation_filter_select(&mut self, filter: RelationFilter, ctx: &Context<'_>) -> Select<'static> {
@@ -136,7 +124,8 @@ impl FilterVisitor {
                 .map(|col| col.aliased_col(Some(alias), ctx))
                 .collect();
 
-            let (nested_conditions, nested_joins) = self.visit_nested_filter(*filter.nested_filter, alias, false, ctx);
+            let (nested_conditions, nested_joins) =
+                self.visit_nested_filter(alias, |this| this.visit_filter(*filter.nested_filter, ctx));
             let nested_conditions = nested_conditions.invert_if(condition.invert_of_subselect());
 
             let conditions = related_columns
@@ -173,8 +162,10 @@ impl FilterVisitor {
                 .map(|col| col.aliased_col(Some(alias.flip(AliasMode::Join)), ctx))
                 .collect();
 
-            let (nested_conditions, nested_joins) =
-                self.visit_nested_filter(*filter.nested_filter, alias.flip(AliasMode::Join), false, ctx);
+            let (nested_conditions, nested_joins) = self
+                .visit_nested_filter(alias.flip(AliasMode::Join), |nested_visitor| {
+                    nested_visitor.visit_filter(*filter.nested_filter, ctx)
+                });
 
             let nested_conditions = nested_conditions.invert_if(condition.invert_of_subselect());
             let nested_conditons = selected_identifier
@@ -347,7 +338,10 @@ impl FilterVisitorExt for FilterVisitor {
 
                 let mut output_joins = vec![join];
 
-                let (conditions, nested_joins) = self.visit_nested_filter(*filter.nested_filter, alias, true, ctx);
+                let (conditions, nested_joins) = self.visit_nested_filter(alias, |nested_visitor| {
+                    nested_visitor
+                        .invert_reverse(|nested_visitor| nested_visitor.visit_filter(*filter.nested_filter, ctx))
+                });
 
                 if let Some(nested_joins) = nested_joins {
                     output_joins.extend(nested_joins);
@@ -372,7 +366,9 @@ impl FilterVisitorExt for FilterVisitor {
                 );
                 let mut output_joins = vec![join];
 
-                let (conditions, nested_joins) = self.visit_nested_filter(*filter.nested_filter, alias, false, ctx);
+                let (conditions, nested_joins) = self.visit_nested_filter(alias, |nested_visitor| {
+                    nested_visitor.visit_filter(*filter.nested_filter, ctx)
+                });
 
                 if let Some(nested_joins) = nested_joins {
                     output_joins.extend(nested_joins);
