@@ -298,15 +298,6 @@
 <a href="#298" id="298">298</a>
 <a href="#299" id="299">299</a>
 <a href="#300" id="300">300</a>
-<a href="#301" id="301">301</a>
-<a href="#302" id="302">302</a>
-<a href="#303" id="303">303</a>
-<a href="#304" id="304">304</a>
-<a href="#305" id="305">305</a>
-<a href="#306" id="306">306</a>
-<a href="#307" id="307">307</a>
-<a href="#308" id="308">308</a>
-<a href="#309" id="309">309</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::convert::TryFrom;
 
 <span class="kw">use crate</span>::{
@@ -323,8 +314,7 @@
     Column, Error <span class="kw">as </span>RusqlError, Row <span class="kw">as </span>SqliteRow, Rows <span class="kw">as </span>SqliteRows,
 };
 
-<span class="attr">#[cfg(feature = <span class="string">&quot;chrono&quot;</span>)]
-</span><span class="kw">use </span>chrono::TimeZone;
+<span class="kw">use </span>chrono::TimeZone;
 
 <span class="kw">impl </span>TypeIdentifier <span class="kw">for </span>Column&lt;<span class="lifetime">&#39;_</span>&gt; {
     <span class="kw">fn </span>is_real(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
@@ -456,10 +446,8 @@
                     c <span class="kw">if </span>c.is_double() =&gt; Value::Double(<span class="prelude-val">None</span>),
                     <span class="attr">#[cfg(feature = <span class="string">&quot;bigdecimal&quot;</span>)]
                     </span>c <span class="kw">if </span>c.is_real() =&gt; Value::Numeric(<span class="prelude-val">None</span>),
-                    <span class="attr">#[cfg(feature = <span class="string">&quot;chrono&quot;</span>)]
-                    </span>c <span class="kw">if </span>c.is_datetime() =&gt; Value::DateTime(<span class="prelude-val">None</span>),
-                    <span class="attr">#[cfg(feature = <span class="string">&quot;chrono&quot;</span>)]
-                    </span>c <span class="kw">if </span>c.is_date() =&gt; Value::Date(<span class="prelude-val">None</span>),
+                    c <span class="kw">if </span>c.is_datetime() =&gt; Value::DateTime(<span class="prelude-val">None</span>),
+                    c <span class="kw">if </span>c.is_date() =&gt; Value::Date(<span class="prelude-val">None</span>),
                     c <span class="kw">if </span>c.is_bool() =&gt; Value::Boolean(<span class="prelude-val">None</span>),
                     c =&gt; <span class="kw">match </span>c.decl_type() {
                         <span class="prelude-val">Some</span>(n) =&gt; {
@@ -481,13 +469,11 @@
                                 Value::boolean(<span class="bool-val">true</span>)
                             }
                         }
-                        <span class="attr">#[cfg(feature = <span class="string">&quot;chrono&quot;</span>)]
-                        </span>c <span class="kw">if </span>c.is_date() =&gt; {
+                        c <span class="kw">if </span>c.is_date() =&gt; {
                             <span class="kw">let </span>dt = chrono::NaiveDateTime::from_timestamp_opt(i / <span class="number">1000</span>, <span class="number">0</span>).unwrap();
                             Value::date(dt.date())
                         }
-                        <span class="attr">#[cfg(feature = <span class="string">&quot;chrono&quot;</span>)]
-                        </span>c <span class="kw">if </span>c.is_datetime() =&gt; {
+                        c <span class="kw">if </span>c.is_datetime() =&gt; {
                             <span class="kw">let </span>dt = chrono::Utc.timestamp_millis_opt(i).unwrap();
                             Value::datetime(dt)
                         }
@@ -512,8 +498,7 @@
                     Value::numeric(BigDecimal::from_f64(f).unwrap())
                 }
                 ValueRef::Real(f) =&gt; Value::double(f),
-                <span class="attr">#[cfg(feature = <span class="string">&quot;chrono&quot;</span>)]
-                </span>ValueRef::Text(bytes) <span class="kw">if </span>column.is_datetime() =&gt; {
+                ValueRef::Text(bytes) <span class="kw">if </span>column.is_datetime() =&gt; {
                     <span class="kw">let </span>parse_res = std::str::from_utf8(bytes).map_err(|<span class="kw">_</span>| {
                         <span class="kw">let </span>builder = Error::builder(ErrorKind::ConversionError(
                             <span class="string">&quot;Failed to read contents of SQLite datetime column as UTF-8&quot;</span>.into(),
@@ -594,14 +579,11 @@
             Value::Xml(cow) =&gt; cow.as_ref().map(|cow| ToSqlOutput::from(cow.as_ref())),
             <span class="attr">#[cfg(feature = <span class="string">&quot;uuid&quot;</span>)]
             </span>Value::Uuid(value) =&gt; value.map(|value| ToSqlOutput::from(value.hyphenated().to_string())),
-            <span class="attr">#[cfg(feature = <span class="string">&quot;chrono&quot;</span>)]
-            </span>Value::DateTime(value) =&gt; value.map(|value| ToSqlOutput::from(value.timestamp_millis())),
-            <span class="attr">#[cfg(feature = <span class="string">&quot;chrono&quot;</span>)]
-            </span>Value::Date(date) =&gt; date
+            Value::DateTime(value) =&gt; value.map(|value| ToSqlOutput::from(value.timestamp_millis())),
+            Value::Date(date) =&gt; date
                 .and_then(|date| date.and_hms_opt(<span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>))
                 .map(|dt| ToSqlOutput::from(dt.timestamp_millis())),
-            <span class="attr">#[cfg(feature = <span class="string">&quot;chrono&quot;</span>)]
-            </span>Value::Time(time) =&gt; time
+            Value::Time(time) =&gt; time
                 .and_then(|time| chrono::NaiveDate::from_ymd_opt(<span class="number">1970</span>, <span class="number">1</span>, <span class="number">1</span>).map(|d| (d, time)))
                 .and_then(|(date, time)| {
                     <span class="kw">use </span>chrono::Timelike;

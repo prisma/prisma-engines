@@ -1804,10 +1804,6 @@
 <a href="#1804" id="1804">1804</a>
 <a href="#1805" id="1805">1805</a>
 <a href="#1806" id="1806">1806</a>
-<a href="#1807" id="1807">1807</a>
-<a href="#1808" id="1808">1808</a>
-<a href="#1809" id="1809">1809</a>
-<a href="#1810" id="1810">1810</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span><span class="kw">super</span>::Visitor;
 <span class="attr">#[cfg(all(feature = <span class="string">&quot;json&quot;</span>, any(feature = <span class="string">&quot;postgresql&quot;</span>, feature = <span class="string">&quot;mysql&quot;</span>)))]
 </span><span class="kw">use </span><span class="kw">crate</span>::prelude::{JsonExtract, JsonType, JsonUnquote};
@@ -2158,18 +2154,15 @@
                 <span class="kw">let </span>s = <span class="macro">format!</span>(<span class="string">&quot;CONVERT(uniqueidentifier, N&#39;{}&#39;)&quot;</span>, uuid.hyphenated());
                 <span class="self">self</span>.write(s)
             }),
-            <span class="attr">#[cfg(feature = <span class="string">&quot;chrono&quot;</span>)]
-            </span>Value::DateTime(dt) =&gt; dt.map(|dt| {
+            Value::DateTime(dt) =&gt; dt.map(|dt| {
                 <span class="kw">let </span>s = <span class="macro">format!</span>(<span class="string">&quot;CONVERT(datetimeoffset, N&#39;{}&#39;)&quot;</span>, dt.to_rfc3339());
                 <span class="self">self</span>.write(s)
             }),
-            <span class="attr">#[cfg(feature = <span class="string">&quot;chrono&quot;</span>)]
-            </span>Value::Date(date) =&gt; date.map(|date| {
+            Value::Date(date) =&gt; date.map(|date| {
                 <span class="kw">let </span>s = <span class="macro">format!</span>(<span class="string">&quot;CONVERT(date, N&#39;{date}&#39;)&quot;</span>);
                 <span class="self">self</span>.write(s)
             }),
-            <span class="attr">#[cfg(feature = <span class="string">&quot;chrono&quot;</span>)]
-            </span>Value::Time(time) =&gt; time.map(|time| {
+            Value::Time(time) =&gt; time.map(|time| {
                 <span class="kw">let </span>s = <span class="macro">format!</span>(<span class="string">&quot;CONVERT(time, N&#39;{time}&#39;)&quot;</span>);
                 <span class="self">self</span>.write(s)
             }),
@@ -3080,7 +3073,6 @@
     }
 
     <span class="attr">#[test]
-    #[cfg(feature = <span class="string">&quot;chrono&quot;</span>)]
     </span><span class="kw">fn </span>test_raw_datetime() {
         <span class="kw">let </span>dt = chrono::Utc::now();
         <span class="kw">let </span>(sql, params) = Mssql::build(Select::default().value(dt.raw())).unwrap();

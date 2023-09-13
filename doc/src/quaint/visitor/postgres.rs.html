@@ -1041,10 +1041,6 @@
 <a href="#1041" id="1041">1041</a>
 <a href="#1042" id="1042">1042</a>
 <a href="#1043" id="1043">1043</a>
-<a href="#1044" id="1044">1044</a>
-<a href="#1045" id="1045">1045</a>
-<a href="#1046" id="1046">1046</a>
-<a href="#1047" id="1047">1047</a>
 </pre></div><pre class="rust"><code><span class="kw">use crate</span>::{
     ast::<span class="kw-2">*</span>,
     visitor::{<span class="self">self</span>, Visitor},
@@ -1158,12 +1154,9 @@
             </span>Value::Numeric(r) =&gt; r.map(|r| <span class="self">self</span>.write(r)),
             <span class="attr">#[cfg(feature = <span class="string">&quot;uuid&quot;</span>)]
             </span>Value::Uuid(uuid) =&gt; uuid.map(|uuid| <span class="self">self</span>.write(<span class="macro">format!</span>(<span class="string">&quot;&#39;{}&#39;&quot;</span>, uuid.hyphenated()))),
-            <span class="attr">#[cfg(feature = <span class="string">&quot;chrono&quot;</span>)]
-            </span>Value::DateTime(dt) =&gt; dt.map(|dt| <span class="self">self</span>.write(<span class="macro">format!</span>(<span class="string">&quot;&#39;{}&#39;&quot;</span>, dt.to_rfc3339(),))),
-            <span class="attr">#[cfg(feature = <span class="string">&quot;chrono&quot;</span>)]
-            </span>Value::Date(date) =&gt; date.map(|date| <span class="self">self</span>.write(<span class="macro">format!</span>(<span class="string">&quot;&#39;{date}&#39;&quot;</span>))),
-            <span class="attr">#[cfg(feature = <span class="string">&quot;chrono&quot;</span>)]
-            </span>Value::Time(time) =&gt; time.map(|time| <span class="self">self</span>.write(<span class="macro">format!</span>(<span class="string">&quot;&#39;{time}&#39;&quot;</span>))),
+            Value::DateTime(dt) =&gt; dt.map(|dt| <span class="self">self</span>.write(<span class="macro">format!</span>(<span class="string">&quot;&#39;{}&#39;&quot;</span>, dt.to_rfc3339(),))),
+            Value::Date(date) =&gt; date.map(|date| <span class="self">self</span>.write(<span class="macro">format!</span>(<span class="string">&quot;&#39;{date}&#39;&quot;</span>))),
+            Value::Time(time) =&gt; time.map(|time| <span class="self">self</span>.write(<span class="macro">format!</span>(<span class="string">&quot;&#39;{time}&#39;&quot;</span>))),
         };
 
         <span class="kw">match </span>res {
@@ -1968,7 +1961,6 @@
     }
 
     <span class="attr">#[test]
-    #[cfg(feature = <span class="string">&quot;chrono&quot;</span>)]
     </span><span class="kw">fn </span>test_raw_datetime() {
         <span class="kw">let </span>dt = chrono::Utc::now();
         <span class="kw">let </span>(sql, params) = Postgres::build(Select::default().value(dt.raw())).unwrap();

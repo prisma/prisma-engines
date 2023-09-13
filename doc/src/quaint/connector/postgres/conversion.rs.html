@@ -951,31 +951,6 @@
 <a href="#951" id="951">951</a>
 <a href="#952" id="952">952</a>
 <a href="#953" id="953">953</a>
-<a href="#954" id="954">954</a>
-<a href="#955" id="955">955</a>
-<a href="#956" id="956">956</a>
-<a href="#957" id="957">957</a>
-<a href="#958" id="958">958</a>
-<a href="#959" id="959">959</a>
-<a href="#960" id="960">960</a>
-<a href="#961" id="961">961</a>
-<a href="#962" id="962">962</a>
-<a href="#963" id="963">963</a>
-<a href="#964" id="964">964</a>
-<a href="#965" id="965">965</a>
-<a href="#966" id="966">966</a>
-<a href="#967" id="967">967</a>
-<a href="#968" id="968">968</a>
-<a href="#969" id="969">969</a>
-<a href="#970" id="970">970</a>
-<a href="#971" id="971">971</a>
-<a href="#972" id="972">972</a>
-<a href="#973" id="973">973</a>
-<a href="#974" id="974">974</a>
-<a href="#975" id="975">975</a>
-<a href="#976" id="976">976</a>
-<a href="#977" id="977">977</a>
-<a href="#978" id="978">978</a>
 </pre></div><pre class="rust"><code><span class="attr">#[cfg(feature = <span class="string">&quot;bigdecimal&quot;</span>)]
 </span><span class="kw">mod </span>decimal;
 
@@ -988,8 +963,7 @@
 </span><span class="kw">use </span>bigdecimal::{num_bigint::BigInt, BigDecimal, FromPrimitive, ToPrimitive};
 <span class="kw">use </span>bit_vec::BitVec;
 <span class="kw">use </span>bytes::BytesMut;
-<span class="attr">#[cfg(feature = <span class="string">&quot;chrono&quot;</span>)]
-</span><span class="kw">use </span>chrono::{DateTime, NaiveDateTime, Utc};
+<span class="kw">use </span>chrono::{DateTime, NaiveDateTime, Utc};
 <span class="attr">#[cfg(feature = <span class="string">&quot;bigdecimal&quot;</span>)]
 </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use </span>decimal::DecimalWrapper;
 <span class="kw">use </span>postgres_types::{FromSql, ToSql, WrongType};
@@ -1035,12 +1009,9 @@
                 Value::Xml(<span class="kw">_</span>) =&gt; PostgresType::XML,
                 <span class="attr">#[cfg(feature = <span class="string">&quot;uuid&quot;</span>)]
                 </span>Value::Uuid(<span class="kw">_</span>) =&gt; PostgresType::UUID,
-                <span class="attr">#[cfg(feature = <span class="string">&quot;chrono&quot;</span>)]
-                </span>Value::DateTime(<span class="kw">_</span>) =&gt; PostgresType::TIMESTAMPTZ,
-                <span class="attr">#[cfg(feature = <span class="string">&quot;chrono&quot;</span>)]
-                </span>Value::Date(<span class="kw">_</span>) =&gt; PostgresType::TIMESTAMP,
-                <span class="attr">#[cfg(feature = <span class="string">&quot;chrono&quot;</span>)]
-                </span>Value::Time(<span class="kw">_</span>) =&gt; PostgresType::TIME,
+                Value::DateTime(<span class="kw">_</span>) =&gt; PostgresType::TIMESTAMPTZ,
+                Value::Date(<span class="kw">_</span>) =&gt; PostgresType::TIMESTAMP,
+                Value::Time(<span class="kw">_</span>) =&gt; PostgresType::TIME,
                 Value::Array(<span class="kw-2">ref </span>arr) =&gt; {
                     <span class="kw">let </span>arr = arr.as_ref().unwrap();
 
@@ -1077,12 +1048,9 @@
                         Value::Xml(<span class="kw">_</span>) =&gt; PostgresType::XML_ARRAY,
                         <span class="attr">#[cfg(feature = <span class="string">&quot;uuid&quot;</span>)]
                         </span>Value::Uuid(<span class="kw">_</span>) =&gt; PostgresType::UUID_ARRAY,
-                        <span class="attr">#[cfg(feature = <span class="string">&quot;chrono&quot;</span>)]
-                        </span>Value::DateTime(<span class="kw">_</span>) =&gt; PostgresType::TIMESTAMPTZ_ARRAY,
-                        <span class="attr">#[cfg(feature = <span class="string">&quot;chrono&quot;</span>)]
-                        </span>Value::Date(<span class="kw">_</span>) =&gt; PostgresType::TIMESTAMP_ARRAY,
-                        <span class="attr">#[cfg(feature = <span class="string">&quot;chrono&quot;</span>)]
-                        </span>Value::Time(<span class="kw">_</span>) =&gt; PostgresType::TIME_ARRAY,
+                        Value::DateTime(<span class="kw">_</span>) =&gt; PostgresType::TIMESTAMPTZ_ARRAY,
+                        Value::Date(<span class="kw">_</span>) =&gt; PostgresType::TIMESTAMP_ARRAY,
+                        Value::Time(<span class="kw">_</span>) =&gt; PostgresType::TIME_ARRAY,
                         <span class="comment">// In the case of nested arrays, we let PG infer the type
                         </span>Value::Array(<span class="kw">_</span>) =&gt; PostgresType::UNKNOWN,
                     }
@@ -1120,11 +1088,9 @@
     </span>}
 }
 
-<span class="attr">#[cfg(feature = <span class="string">&quot;chrono&quot;</span>)]
-</span><span class="kw">struct </span>TimeTz(chrono::NaiveTime);
+<span class="kw">struct </span>TimeTz(chrono::NaiveTime);
 
-<span class="attr">#[cfg(feature = <span class="string">&quot;chrono&quot;</span>)]
-</span><span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; FromSql&lt;<span class="lifetime">&#39;a</span>&gt; <span class="kw">for </span>TimeTz {
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; FromSql&lt;<span class="lifetime">&#39;a</span>&gt; <span class="kw">for </span>TimeTz {
     <span class="kw">fn </span>from_sql(_ty: <span class="kw-2">&amp;</span>PostgresType, raw: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>[u8]) -&gt; <span class="prelude-ty">Result</span>&lt;TimeTz, Box&lt;<span class="kw">dyn </span>std::error::Error + Sync + Send&gt;&gt; {
         <span class="comment">// We assume UTC.
         </span><span class="kw">let </span>time: chrono::NaiveTime = chrono::NaiveTime::from_sql(<span class="kw-2">&amp;</span>PostgresType::TIMETZ, <span class="kw-2">&amp;</span>raw[..<span class="number">8</span>])<span class="question-mark">?</span>;
@@ -1226,8 +1192,7 @@
                     }
                     <span class="prelude-val">None </span>=&gt; Value::Numeric(<span class="prelude-val">None</span>),
                 },
-                <span class="attr">#[cfg(feature = <span class="string">&quot;chrono&quot;</span>)]
-                </span>PostgresType::TIMESTAMP =&gt; <span class="kw">match </span>row.try_get(i)<span class="question-mark">? </span>{
+                PostgresType::TIMESTAMP =&gt; <span class="kw">match </span>row.try_get(i)<span class="question-mark">? </span>{
                     <span class="prelude-val">Some</span>(val) =&gt; {
                         <span class="kw">let </span>ts: NaiveDateTime = val;
                         <span class="kw">let </span>dt = DateTime::&lt;Utc&gt;::from_utc(ts, Utc);
@@ -1235,26 +1200,22 @@
                     }
                     <span class="prelude-val">None </span>=&gt; Value::DateTime(<span class="prelude-val">None</span>),
                 },
-                <span class="attr">#[cfg(feature = <span class="string">&quot;chrono&quot;</span>)]
-                </span>PostgresType::TIMESTAMPTZ =&gt; <span class="kw">match </span>row.try_get(i)<span class="question-mark">? </span>{
+                PostgresType::TIMESTAMPTZ =&gt; <span class="kw">match </span>row.try_get(i)<span class="question-mark">? </span>{
                     <span class="prelude-val">Some</span>(val) =&gt; {
                         <span class="kw">let </span>ts: DateTime&lt;Utc&gt; = val;
                         Value::datetime(ts)
                     }
                     <span class="prelude-val">None </span>=&gt; Value::DateTime(<span class="prelude-val">None</span>),
                 },
-                <span class="attr">#[cfg(feature = <span class="string">&quot;chrono&quot;</span>)]
-                </span>PostgresType::DATE =&gt; <span class="kw">match </span>row.try_get(i)<span class="question-mark">? </span>{
+                PostgresType::DATE =&gt; <span class="kw">match </span>row.try_get(i)<span class="question-mark">? </span>{
                     <span class="prelude-val">Some</span>(val) =&gt; Value::date(val),
                     <span class="prelude-val">None </span>=&gt; Value::Date(<span class="prelude-val">None</span>),
                 },
-                <span class="attr">#[cfg(feature = <span class="string">&quot;chrono&quot;</span>)]
-                </span>PostgresType::TIME =&gt; <span class="kw">match </span>row.try_get(i)<span class="question-mark">? </span>{
+                PostgresType::TIME =&gt; <span class="kw">match </span>row.try_get(i)<span class="question-mark">? </span>{
                     <span class="prelude-val">Some</span>(val) =&gt; Value::time(val),
                     <span class="prelude-val">None </span>=&gt; Value::Time(<span class="prelude-val">None</span>),
                 },
-                <span class="attr">#[cfg(feature = <span class="string">&quot;chrono&quot;</span>)]
-                </span>PostgresType::TIMETZ =&gt; <span class="kw">match </span>row.try_get(i)<span class="question-mark">? </span>{
+                PostgresType::TIMETZ =&gt; <span class="kw">match </span>row.try_get(i)<span class="question-mark">? </span>{
                     <span class="prelude-val">Some</span>(val) =&gt; {
                         <span class="kw">let </span>time: TimeTz = val;
                         Value::time(time.<span class="number">0</span>)
@@ -1335,8 +1296,7 @@
                     }
                     <span class="prelude-val">None </span>=&gt; Value::Array(<span class="prelude-val">None</span>),
                 },
-                <span class="attr">#[cfg(feature = <span class="string">&quot;chrono&quot;</span>)]
-                </span>PostgresType::TIMESTAMP_ARRAY =&gt; <span class="kw">match </span>row.try_get(i)<span class="question-mark">? </span>{
+                PostgresType::TIMESTAMP_ARRAY =&gt; <span class="kw">match </span>row.try_get(i)<span class="question-mark">? </span>{
                     <span class="prelude-val">Some</span>(val) =&gt; {
                         <span class="kw">let </span>val: Vec&lt;<span class="prelude-ty">Option</span>&lt;NaiveDateTime&gt;&gt; = val;
 
@@ -1390,8 +1350,7 @@
                     }
                     <span class="prelude-val">None </span>=&gt; Value::Array(<span class="prelude-val">None</span>),
                 },
-                <span class="attr">#[cfg(feature = <span class="string">&quot;chrono&quot;</span>)]
-                </span>PostgresType::TIMESTAMPTZ_ARRAY =&gt; <span class="kw">match </span>row.try_get(i)<span class="question-mark">? </span>{
+                PostgresType::TIMESTAMPTZ_ARRAY =&gt; <span class="kw">match </span>row.try_get(i)<span class="question-mark">? </span>{
                     <span class="prelude-val">Some</span>(val) =&gt; {
                         <span class="kw">let </span>val: Vec&lt;<span class="prelude-ty">Option</span>&lt;DateTime&lt;Utc&gt;&gt;&gt; = val;
                         <span class="kw">let </span>dates = val.into_iter().map(Value::DateTime);
@@ -1400,8 +1359,7 @@
                     }
                     <span class="prelude-val">None </span>=&gt; Value::Array(<span class="prelude-val">None</span>),
                 },
-                <span class="attr">#[cfg(feature = <span class="string">&quot;chrono&quot;</span>)]
-                </span>PostgresType::DATE_ARRAY =&gt; <span class="kw">match </span>row.try_get(i)<span class="question-mark">? </span>{
+                PostgresType::DATE_ARRAY =&gt; <span class="kw">match </span>row.try_get(i)<span class="question-mark">? </span>{
                     <span class="prelude-val">Some</span>(val) =&gt; {
                         <span class="kw">let </span>val: Vec&lt;<span class="prelude-ty">Option</span>&lt;chrono::NaiveDate&gt;&gt; = val;
                         <span class="kw">let </span>dates = val.into_iter().map(Value::Date);
@@ -1410,8 +1368,7 @@
                     }
                     <span class="prelude-val">None </span>=&gt; Value::Array(<span class="prelude-val">None</span>),
                 },
-                <span class="attr">#[cfg(feature = <span class="string">&quot;chrono&quot;</span>)]
-                </span>PostgresType::TIME_ARRAY =&gt; <span class="kw">match </span>row.try_get(i)<span class="question-mark">? </span>{
+                PostgresType::TIME_ARRAY =&gt; <span class="kw">match </span>row.try_get(i)<span class="question-mark">? </span>{
                     <span class="prelude-val">Some</span>(val) =&gt; {
                         <span class="kw">let </span>val: Vec&lt;<span class="prelude-ty">Option</span>&lt;chrono::NaiveTime&gt;&gt; = val;
                         <span class="kw">let </span>times = val.into_iter().map(Value::Time);
@@ -1420,8 +1377,7 @@
                     }
                     <span class="prelude-val">None </span>=&gt; Value::Array(<span class="prelude-val">None</span>),
                 },
-                <span class="attr">#[cfg(feature = <span class="string">&quot;chrono&quot;</span>)]
-                </span>PostgresType::TIMETZ_ARRAY =&gt; <span class="kw">match </span>row.try_get(i)<span class="question-mark">? </span>{
+                PostgresType::TIMETZ_ARRAY =&gt; <span class="kw">match </span>row.try_get(i)<span class="question-mark">? </span>{
                     <span class="prelude-val">Some</span>(val) =&gt; {
                         <span class="kw">let </span>val: Vec&lt;<span class="prelude-ty">Option</span>&lt;TimeTz&gt;&gt; = val;
                         <span class="kw">let </span>timetzs = val.into_iter().map(|time| Value::Time(time.map(|time| time.<span class="number">0</span>)));
@@ -1863,23 +1819,17 @@
             (Value::Xml(value), <span class="kw">_</span>) =&gt; value.as_ref().map(|value| value.to_sql(ty, out)),
             <span class="attr">#[cfg(feature = <span class="string">&quot;uuid&quot;</span>)]
             </span>(Value::Uuid(value), <span class="kw">_</span>) =&gt; value.map(|value| value.to_sql(ty, out)),
-            <span class="attr">#[cfg(feature = <span class="string">&quot;chrono&quot;</span>)]
-            </span>(Value::DateTime(value), <span class="kw-2">&amp;</span>PostgresType::DATE) =&gt; value.map(|value| value.date_naive().to_sql(ty, out)),
-            <span class="attr">#[cfg(feature = <span class="string">&quot;chrono&quot;</span>)]
-            </span>(Value::Date(value), <span class="kw">_</span>) =&gt; value.map(|value| value.to_sql(ty, out)),
-            <span class="attr">#[cfg(feature = <span class="string">&quot;chrono&quot;</span>)]
-            </span>(Value::Time(value), <span class="kw">_</span>) =&gt; value.map(|value| value.to_sql(ty, out)),
-            <span class="attr">#[cfg(feature = <span class="string">&quot;chrono&quot;</span>)]
-            </span>(Value::DateTime(value), <span class="kw-2">&amp;</span>PostgresType::TIME) =&gt; value.map(|value| value.time().to_sql(ty, out)),
-            <span class="attr">#[cfg(feature = <span class="string">&quot;chrono&quot;</span>)]
-            </span>(Value::DateTime(value), <span class="kw-2">&amp;</span>PostgresType::TIMETZ) =&gt; value.map(|value| {
+            (Value::DateTime(value), <span class="kw-2">&amp;</span>PostgresType::DATE) =&gt; value.map(|value| value.date_naive().to_sql(ty, out)),
+            (Value::Date(value), <span class="kw">_</span>) =&gt; value.map(|value| value.to_sql(ty, out)),
+            (Value::Time(value), <span class="kw">_</span>) =&gt; value.map(|value| value.to_sql(ty, out)),
+            (Value::DateTime(value), <span class="kw-2">&amp;</span>PostgresType::TIME) =&gt; value.map(|value| value.time().to_sql(ty, out)),
+            (Value::DateTime(value), <span class="kw-2">&amp;</span>PostgresType::TIMETZ) =&gt; value.map(|value| {
                 <span class="kw">let </span>result = value.time().to_sql(ty, out)<span class="question-mark">?</span>;
                 <span class="comment">// We assume UTC. see https://www.postgresql.org/docs/9.5/datatype-datetime.html
                 </span>out.extend_from_slice(<span class="kw-2">&amp;</span>[<span class="number">0</span>; <span class="number">4</span>]);
                 <span class="prelude-val">Ok</span>(result)
             }),
-            <span class="attr">#[cfg(feature = <span class="string">&quot;chrono&quot;</span>)]
-            </span>(Value::DateTime(value), <span class="kw">_</span>) =&gt; value.map(|value| value.naive_utc().to_sql(ty, out)),
+            (Value::DateTime(value), <span class="kw">_</span>) =&gt; value.map(|value| value.naive_utc().to_sql(ty, out)),
         };
 
         <span class="kw">match </span>res {
