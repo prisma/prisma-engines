@@ -79,7 +79,7 @@ impl InMemoryRecordProcessor {
         records.records.first().map(|x| x.parent_id.is_some()).unwrap_or(false)
     }
 
-    fn apply_distinct(&self, mut records: ManyRecords) -> ManyRecords {
+    pub(crate) fn apply_distinct(&self, mut records: ManyRecords) -> ManyRecords {
         let field_names = &records.field_names;
 
         let distinct_selection = if let Some(ref distinct) = self.distinct {
@@ -186,5 +186,55 @@ impl InMemoryRecordProcessor {
 
     fn must_apply_pagination(&self) -> bool {
         self.take.or(self.skip).is_some() || self.cursor.is_some()
+    }
+}
+
+pub struct InMemoryRecordProcessorBuilder {
+    args: QueryArguments,
+}
+
+impl InMemoryRecordProcessorBuilder {
+    pub fn new(model: Model, order_by: Vec<OrderBy>, ignore_skip: bool, ignore_take: bool) -> Self {
+        Self {
+            args: QueryArguments {
+                model,
+                cursor: None,
+                take: None,
+                skip: None,
+                filter: None,
+                order_by,
+                distinct: None,
+                ignore_skip,
+                ignore_take,
+            },
+        }
+    }
+    pub fn _cursor(mut self, cursor: SelectionResult) -> Self {
+        self.args.cursor = Some(cursor);
+        self
+    }
+
+    pub fn _take(mut self, take: i64) -> Self {
+        self.args.take = Some(take);
+        self
+    }
+
+    pub fn _skip(mut self, skip: i64) -> Self {
+        self.args.skip = Some(skip);
+        self
+    }
+
+    pub fn _filter(mut self, filter: Filter) -> Self {
+        self.args.filter = Some(filter);
+        self
+    }
+
+    pub fn distinct(mut self, distinct: FieldSelection) -> Self {
+        self.args.distinct = Some(distinct);
+        self
+    }
+
+    pub fn build(self) -> InMemoryRecordProcessor {
+        InMemoryRecordProcessor { args: self.args }
     }
 }

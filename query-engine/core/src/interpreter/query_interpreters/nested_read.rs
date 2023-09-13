@@ -1,4 +1,4 @@
-use super::{inmemory_record_processor::InMemoryRecordProcessor, read};
+use super::{inmemory_record_processor::InMemoryRecordProcessorBuilder, read};
 use crate::{interpreter::InterpretationResult, query_ast::*};
 use connector::{self, ConnectionLike, RelAggregationRow, RelAggregationSelection};
 use query_structure::*;
@@ -10,7 +10,25 @@ pub(crate) async fn m2m(
     parent_result: Option<&ManyRecords>,
     trace_id: Option<String>,
 ) -> InterpretationResult<(ManyRecords, Option<Vec<RelAggregationRow>>)> {
-    let processor = InMemoryRecordProcessor::new_from_query_args(&mut query.args);
+    let inm_builder = InMemoryRecordProcessorBuilder::new(
+        query.args.model.clone(),
+        query.args.order_by.clone(),
+        query.args.ignore_skip,
+        query.args.ignore_take,
+    );
+
+    let processor = match query.args.distinct {
+        Some(ref fs) => {
+            if query.args.requires_inmemory_distinct() {
+                inm_builder.distinct(fs.clone())
+            } else {
+                inm_builder
+            }
+        }
+        None => inm_builder,
+    }
+    .build();
+
     let parent_field = &query.parent_field;
     let child_link_id = parent_field.related_field().linking_fields();
 
@@ -135,7 +153,7 @@ pub async fn one2m(
     parent_field: &RelationFieldRef,
     parent_selections: Option<Vec<SelectionResult>>,
     parent_result: Option<&ManyRecords>,
-    mut query_args: QueryArguments,
+    query_args: QueryArguments,
     selected_fields: &FieldSelection,
     aggr_selections: Vec<RelAggregationSelection>,
     trace_id: Option<String>,
@@ -189,10 +207,31 @@ pub async fn one2m(
     // If we're fetching related records from a single parent, then we can apply normal pagination instead of in-memory processing.
     // However, we can't just apply a LIMIT/OFFSET for multiple parents as we need N related records PER parent.
     // We could use ROW_NUMBER() but it requires further refactoring so we're still using in-memory processing for now.
+
+    let req_inmem_distinct = query_args.requires_inmemory_distinct();
+
     let processor = if uniq_selections.len() == 1 && !query_args.requires_inmemory_processing() {
         None
     } else {
-        Some(InMemoryRecordProcessor::new_from_query_args(&mut query_args))
+        let inm_builder = InMemoryRecordProcessorBuilder::new(
+            query_args.model.clone(),
+            query_args.order_by.clone(),
+            query_args.ignore_skip,
+            query_args.ignore_take,
+        );
+
+        let inm_builder = match query_args.distinct {
+            Some(ref fs) => {
+                if req_inmem_distinct {
+                    inm_builder.distinct(fs.clone())
+                } else {
+                    inm_builder
+                }
+            }
+            None => inm_builder,
+        };
+
+        Some(inm_builder.build())
     };
 
     let mut scalars = {
@@ -262,6 +301,12 @@ pub async fn one2m(
     }
 
     let scalars = if let Some(processor) = processor {
+        let scalars = if req_inmem_distinct {
+            processor.apply_distinct(scalars)
+        } else {
+            scalars
+        };
+
         processor.apply(scalars)
     } else {
         scalars

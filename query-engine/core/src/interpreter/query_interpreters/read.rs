@@ -1,4 +1,4 @@
-use super::{inmemory_record_processor::InMemoryRecordProcessor, *};
+use super::{inmemory_record_processor::InMemoryRecordProcessorBuilder, *};
 use crate::{interpreter::InterpretationResult, query_ast::*, result_ast::*};
 use connector::{self, error::ConnectorError, ConnectionLike, RelAggregationRow, RelAggregationSelection};
 use futures::future::{BoxFuture, FutureExt};
@@ -88,27 +88,31 @@ fn read_many(
     query: ManyRecordsQuery,
     trace_id: Option<String>,
 ) -> BoxFuture<'_, InterpretationResult<QueryResult>> {
-    // let req_inmem_proc = query.args.requires_inmemory_processing();
+    let req_inmem_distinct = query.args.requires_inmemory_distinct();
 
-    // let processor = if req_inmem_proc {
-    //     let inm_builder = InMemoryRecordProcessorBuilder::new(
-    //         query.args.model.clone(),
-    //         query.args.order_by.clone(),
-    //         query.args.ignore_skip.clone(),
-    //         query.args.ignore_take.clone(),
-    //     );
+    let processor = if query.args.requires_inmemory_processing() {
+        let inm_builder = InMemoryRecordProcessorBuilder::new(
+            query.args.model.clone(),
+            query.args.order_by.clone(),
+            query.args.ignore_skip,
+            query.args.ignore_take,
+        );
 
-    //     let inmemory_record_processor = match query.args.distinct {
-    //         Some(ref fs) => inm_builder.distinct(fs.clone()).build(),
-    //         None => inm_builder.build(),
-    //     };
+        let inm_builder = match query.args.distinct {
+            Some(ref fs) => {
+                if req_inmem_distinct {
+                    inm_builder.distinct(fs.clone())
+                } else {
+                    inm_builder
+                }
+            }
+            None => inm_builder,
+        };
 
-    //     Some(inmemory_record_processor)
-    // } else {
-    //     None
-    // };
-
-    let processor: Option<InMemoryRecordProcessor> = None;
+        Some(inm_builder.build())
+    } else {
+        None
+    };
 
     let fut = async move {
         let scalars = tx
@@ -122,6 +126,12 @@ fn read_many(
             .await?;
 
         let scalars = if let Some(p) = processor {
+            let scalars = if req_inmem_distinct {
+                p.apply_distinct(scalars)
+            } else {
+                scalars
+            };
+
             p.apply(scalars)
         } else {
             scalars
