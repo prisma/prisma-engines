@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/nix/store/890blpn0wsym4lg1byd79nyxb3r6i2hw-vendor-cargo-deps/c19b7c6f923b580ac259164a89f2577984ad5ab09ee9d583b888f934adbbe8d0/wasm-bindgen-0.2.84/src/lib.rs`."><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-9bb858ba049f1f21.css" id="mainThemeStyle"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="wasm_bindgen" data-themes="" data-resource-suffix="" data-rustdoc-version="1.72.0 (5680fa18f 2023-08-23)" data-channel="1.72.0" data-search-js="search-f6292fe389d70017.js" data-settings-js="settings-de11bff964e9d4e5.js" data-settings-css="settings-8c76f75bfb6bd192.css" data-theme-light-css="light-0f8c037637f9eb3e.css" data-theme-dark-css="dark-1097f8e92a01e3cf.css" data-theme-ayu-css="ayu-614652228113ac93.css" ><script src="../../static.files/storage-59fd9b8ccb335783.js"></script><script defer src="../../static.files/source-script-106908c7a7964ba4.js"></script><script defer src="../../source-files.js"></script><script defer src="../../static.files/main-0795b7d26be81095.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../../static.files/light-0f8c037637f9eb3e.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../../static.files/dark-1097f8e92a01e3cf.css"><link rel="stylesheet" href="../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../wasm_bindgen/index.html"><img class="rust-logo" src="../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/nix/store/pv7cia5y492261g2vcqc0vlv986l96pc-vendor-cargo-deps/c19b7c6f923b580ac259164a89f2577984ad5ab09ee9d583b888f934adbbe8d0/wasm-bindgen-0.2.87/src/lib.rs`."><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-9bb858ba049f1f21.css" id="mainThemeStyle"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="wasm_bindgen" data-themes="" data-resource-suffix="" data-rustdoc-version="1.72.0 (5680fa18f 2023-08-23) (built from a source tarball)" data-channel="1.72.0" data-search-js="search-f6292fe389d70017.js" data-settings-js="settings-de11bff964e9d4e5.js" data-settings-css="settings-8c76f75bfb6bd192.css" data-theme-light-css="light-0f8c037637f9eb3e.css" data-theme-dark-css="dark-1097f8e92a01e3cf.css" data-theme-ayu-css="ayu-614652228113ac93.css" ><script src="../../static.files/storage-59fd9b8ccb335783.js"></script><script defer src="../../static.files/source-script-106908c7a7964ba4.js"></script><script defer src="../../source-files.js"></script><script defer src="../../static.files/main-0795b7d26be81095.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../../static.files/light-0f8c037637f9eb3e.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../../static.files/dark-1097f8e92a01e3cf.css"><link rel="stylesheet" href="../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../wasm_bindgen/index.html"><img class="rust-logo" src="../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -1846,6 +1846,49 @@
 <a href="#1846" id="1846">1846</a>
 <a href="#1847" id="1847">1847</a>
 <a href="#1848" id="1848">1848</a>
+<a href="#1849" id="1849">1849</a>
+<a href="#1850" id="1850">1850</a>
+<a href="#1851" id="1851">1851</a>
+<a href="#1852" id="1852">1852</a>
+<a href="#1853" id="1853">1853</a>
+<a href="#1854" id="1854">1854</a>
+<a href="#1855" id="1855">1855</a>
+<a href="#1856" id="1856">1856</a>
+<a href="#1857" id="1857">1857</a>
+<a href="#1858" id="1858">1858</a>
+<a href="#1859" id="1859">1859</a>
+<a href="#1860" id="1860">1860</a>
+<a href="#1861" id="1861">1861</a>
+<a href="#1862" id="1862">1862</a>
+<a href="#1863" id="1863">1863</a>
+<a href="#1864" id="1864">1864</a>
+<a href="#1865" id="1865">1865</a>
+<a href="#1866" id="1866">1866</a>
+<a href="#1867" id="1867">1867</a>
+<a href="#1868" id="1868">1868</a>
+<a href="#1869" id="1869">1869</a>
+<a href="#1870" id="1870">1870</a>
+<a href="#1871" id="1871">1871</a>
+<a href="#1872" id="1872">1872</a>
+<a href="#1873" id="1873">1873</a>
+<a href="#1874" id="1874">1874</a>
+<a href="#1875" id="1875">1875</a>
+<a href="#1876" id="1876">1876</a>
+<a href="#1877" id="1877">1877</a>
+<a href="#1878" id="1878">1878</a>
+<a href="#1879" id="1879">1879</a>
+<a href="#1880" id="1880">1880</a>
+<a href="#1881" id="1881">1881</a>
+<a href="#1882" id="1882">1882</a>
+<a href="#1883" id="1883">1883</a>
+<a href="#1884" id="1884">1884</a>
+<a href="#1885" id="1885">1885</a>
+<a href="#1886" id="1886">1886</a>
+<a href="#1887" id="1887">1887</a>
+<a href="#1888" id="1888">1888</a>
+<a href="#1889" id="1889">1889</a>
+<a href="#1890" id="1890">1890</a>
+<a href="#1891" id="1891">1891</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Runtime support for the `wasm-bindgen` tool
 //!
 //! This crate contains the runtime support necessary for `wasm-bindgen` the
@@ -1943,7 +1986,7 @@
 </span>}
 
 <span class="kw">const </span>JSIDX_OFFSET: u32 = <span class="number">128</span>; <span class="comment">// keep in sync with js/mod.rs
-</span><span class="kw">const </span>JSIDX_UNDEFINED: u32 = JSIDX_OFFSET + <span class="number">0</span>;
+</span><span class="kw">const </span>JSIDX_UNDEFINED: u32 = JSIDX_OFFSET;
 <span class="kw">const </span>JSIDX_NULL: u32 = JSIDX_OFFSET + <span class="number">1</span>;
 <span class="kw">const </span>JSIDX_TRUE: u32 = JSIDX_OFFSET + <span class="number">2</span>;
 <span class="kw">const </span>JSIDX_FALSE: u32 = JSIDX_OFFSET + <span class="number">3</span>;
@@ -1951,31 +1994,19 @@
 
 <span class="kw">impl </span>JsValue {
     <span class="doccomment">/// The `null` JS value constant.
-    </span><span class="kw">pub const </span>NULL: JsValue = JsValue {
-        idx: JSIDX_NULL,
-        _marker: marker::PhantomData,
-    };
+    </span><span class="kw">pub const </span>NULL: JsValue = JsValue::_new(JSIDX_NULL);
 
     <span class="doccomment">/// The `undefined` JS value constant.
-    </span><span class="kw">pub const </span>UNDEFINED: JsValue = JsValue {
-        idx: JSIDX_UNDEFINED,
-        _marker: marker::PhantomData,
-    };
+    </span><span class="kw">pub const </span>UNDEFINED: JsValue = JsValue::_new(JSIDX_UNDEFINED);
 
     <span class="doccomment">/// The `true` JS value constant.
-    </span><span class="kw">pub const </span>TRUE: JsValue = JsValue {
-        idx: JSIDX_TRUE,
-        _marker: marker::PhantomData,
-    };
+    </span><span class="kw">pub const </span>TRUE: JsValue = JsValue::_new(JSIDX_TRUE);
 
     <span class="doccomment">/// The `false` JS value constant.
-    </span><span class="kw">pub const </span>FALSE: JsValue = JsValue {
-        idx: JSIDX_FALSE,
-        _marker: marker::PhantomData,
-    };
+    </span><span class="kw">pub const </span>FALSE: JsValue = JsValue::_new(JSIDX_FALSE);
 
     <span class="attr">#[inline]
-    </span><span class="kw">fn </span>_new(idx: u32) -&gt; JsValue {
+    </span><span class="kw">const fn </span>_new(idx: u32) -&gt; JsValue {
         JsValue {
             idx,
             _marker: marker::PhantomData,
@@ -1986,6 +2017,7 @@
     ///
     /// The utf-8 string provided is copied to the JS heap and the string will
     /// be owned by the JS garbage collector.
+    </span><span class="attr">#[allow(clippy::should_implement_trait)] </span><span class="comment">// cannot fix without breaking change
     </span><span class="attr">#[inline]
     </span><span class="kw">pub fn </span>from_str(s: <span class="kw-2">&amp;</span>str) -&gt; JsValue {
         <span class="kw">unsafe </span>{ JsValue::_new(__wbindgen_string_new(s.as_ptr(), s.len())) }
@@ -2014,7 +2046,7 @@
     /// This function creates a JS object representing a boolean (a heap
     /// allocated boolean) and returns a handle to the JS version of it.
     </span><span class="attr">#[inline]
-    </span><span class="kw">pub fn </span>from_bool(b: bool) -&gt; JsValue {
+    </span><span class="kw">pub const fn </span>from_bool(b: bool) -&gt; JsValue {
         <span class="kw">if </span>b {
             JsValue::TRUE
         } <span class="kw">else </span>{
@@ -2024,13 +2056,13 @@
 
     <span class="doccomment">/// Creates a new JS value representing `undefined`.
     </span><span class="attr">#[inline]
-    </span><span class="kw">pub fn </span>undefined() -&gt; JsValue {
+    </span><span class="kw">pub const fn </span>undefined() -&gt; JsValue {
         JsValue::UNDEFINED
     }
 
     <span class="doccomment">/// Creates a new JS value representing `null`.
     </span><span class="attr">#[inline]
-    </span><span class="kw">pub fn </span>null() -&gt; JsValue {
+    </span><span class="kw">pub const fn </span>null() -&gt; JsValue {
         JsValue::NULL
     }
 
@@ -2468,10 +2500,10 @@
     </span><span class="attr">#[inline]
     </span><span class="kw">fn </span>try_from(val: <span class="kw-2">&amp;</span>JsValue) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, <span class="self">Self</span>::Error&gt; {
         <span class="kw">let </span>jsval = <span class="kw">unsafe </span>{ JsValue::_new(__wbindgen_try_into_number(val.idx)) };
-        <span class="kw">return match </span>jsval.as_f64() {
+        <span class="kw">match </span>jsval.as_f64() {
             <span class="prelude-val">Some</span>(num) =&gt; <span class="prelude-val">Ok</span>(num),
             <span class="prelude-val">None </span>=&gt; <span class="prelude-val">Err</span>(jsval),
-        };
+        }
     }
 }
 
@@ -2930,6 +2962,7 @@
 
         <span class="kw">fn </span>__wbindgen_not(idx: u32) -&gt; u32;
 
+        <span class="kw">fn </span>__wbindgen_exports() -&gt; u32;
         <span class="kw">fn </span>__wbindgen_memory() -&gt; u32;
         <span class="kw">fn </span>__wbindgen_module() -&gt; u32;
         <span class="kw">fn </span>__wbindgen_function_table() -&gt; u32;
@@ -3156,18 +3189,32 @@
 </span><span class="kw">pub trait </span>UnwrapThrowExt&lt;T&gt;: Sized {
     <span class="doccomment">/// Unwrap this `Option` or `Result`, but instead of panicking on failure,
     /// throw an exception to JavaScript.
+    </span><span class="attr">#[cfg_attr(debug_assertions, track_caller)]
     </span><span class="kw">fn </span>unwrap_throw(<span class="self">self</span>) -&gt; T {
-        <span class="self">self</span>.expect_throw(<span class="string">&quot;`unwrap_throw` failed&quot;</span>)
+        <span class="kw">if </span><span class="macro">cfg!</span>(all(debug_assertions, feature = <span class="string">&quot;std&quot;</span>)) {
+            <span class="kw">let </span>loc = core::panic::Location::caller();
+            <span class="kw">let </span>msg = <span class="macro">std::format!</span>(
+                <span class="string">&quot;`unwrap_throw` failed ({}:{}:{})&quot;</span>,
+                loc.file(),
+                loc.line(),
+                loc.column()
+            );
+            <span class="self">self</span>.expect_throw(<span class="kw-2">&amp;</span>msg)
+        } <span class="kw">else </span>{
+            <span class="self">self</span>.expect_throw(<span class="string">&quot;`unwrap_throw` failed&quot;</span>)
+        }
     }
 
     <span class="doccomment">/// Unwrap this container&#39;s `T` value, or throw an error to JS with the
     /// given message if the `T` value is unavailable (e.g. an `Option&lt;T&gt;` is
     /// `None`).
+    </span><span class="attr">#[cfg_attr(debug_assertions, track_caller)]
     </span><span class="kw">fn </span>expect_throw(<span class="self">self</span>, message: <span class="kw-2">&amp;</span>str) -&gt; T;
 }
 
 <span class="kw">impl</span>&lt;T&gt; UnwrapThrowExt&lt;T&gt; <span class="kw">for </span><span class="prelude-ty">Option</span>&lt;T&gt; {
-    <span class="kw">fn </span>expect_throw(<span class="self">self</span>, message: <span class="kw-2">&amp;</span>str) -&gt; T {
+    <span class="attr">#[cfg_attr(debug_assertions, track_caller)]
+    </span><span class="kw">fn </span>expect_throw(<span class="self">self</span>, message: <span class="kw-2">&amp;</span>str) -&gt; T {
         <span class="kw">if </span><span class="macro">cfg!</span>(all(target_arch = <span class="string">&quot;wasm32&quot;</span>, not(target_os = <span class="string">&quot;emscripten&quot;</span>))) {
             <span class="kw">match </span><span class="self">self </span>{
                 <span class="prelude-val">Some</span>(val) =&gt; val,
@@ -3183,7 +3230,8 @@
 <span class="kw">where
     </span>E: core::fmt::Debug,
 {
-    <span class="kw">fn </span>expect_throw(<span class="self">self</span>, message: <span class="kw-2">&amp;</span>str) -&gt; T {
+    <span class="attr">#[cfg_attr(debug_assertions, track_caller)]
+    </span><span class="kw">fn </span>expect_throw(<span class="self">self</span>, message: <span class="kw-2">&amp;</span>str) -&gt; T {
         <span class="kw">if </span><span class="macro">cfg!</span>(all(target_arch = <span class="string">&quot;wasm32&quot;</span>, not(target_os = <span class="string">&quot;emscripten&quot;</span>))) {
             <span class="kw">match </span><span class="self">self </span>{
                 <span class="prelude-val">Ok</span>(val) =&gt; val,
@@ -3206,6 +3254,11 @@
     <span class="kw">unsafe </span>{ JsValue::_new(__wbindgen_module()) }
 }
 
+<span class="doccomment">/// Returns a handle to this wasm instance&#39;s `WebAssembly.Instance.prototype.exports`
+</span><span class="kw">pub fn </span>exports() -&gt; JsValue {
+    <span class="kw">unsafe </span>{ JsValue::_new(__wbindgen_exports()) }
+}
+
 <span class="doccomment">/// Returns a handle to this wasm instance&#39;s `WebAssembly.Memory`
 </span><span class="kw">pub fn </span>memory() -&gt; JsValue {
     <span class="kw">unsafe </span>{ JsValue::_new(__wbindgen_memory()) }
@@ -3222,6 +3275,7 @@
     <span class="kw">use </span><span class="kw">crate</span>::JsValue;
     <span class="kw">use </span>core::borrow::{Borrow, BorrowMut};
     <span class="kw">use </span>core::cell::{Cell, UnsafeCell};
+    <span class="kw">use </span>core::convert::Infallible;
     <span class="kw">use </span>core::ops::{Deref, DerefMut};
 
     <span class="kw">pub extern crate </span>core;
@@ -3403,11 +3457,9 @@
 
     <span class="macro">if_std! </span>{
         <span class="kw">use </span>std::alloc::{alloc, dealloc, realloc, Layout};
-        <span class="kw">use </span>std::mem;
 
         <span class="attr">#[no_mangle]
-        </span><span class="kw">pub extern </span><span class="string">&quot;C&quot; </span><span class="kw">fn </span>__wbindgen_malloc(size: usize) -&gt; <span class="kw-2">*mut </span>u8 {
-            <span class="kw">let </span>align = mem::align_of::&lt;usize&gt;();
+        </span><span class="kw">pub extern </span><span class="string">&quot;C&quot; </span><span class="kw">fn </span>__wbindgen_malloc(size: usize, align: usize) -&gt; <span class="kw-2">*mut </span>u8 {
             <span class="kw">if let </span><span class="prelude-val">Ok</span>(layout) = Layout::from_size_align(size, align) {
                 <span class="kw">unsafe </span>{
                     <span class="kw">if </span>layout.size() &gt; <span class="number">0 </span>{
@@ -3425,8 +3477,7 @@
         }
 
         <span class="attr">#[no_mangle]
-        </span><span class="kw">pub unsafe extern </span><span class="string">&quot;C&quot; </span><span class="kw">fn </span>__wbindgen_realloc(ptr: <span class="kw-2">*mut </span>u8, old_size: usize, new_size: usize) -&gt; <span class="kw-2">*mut </span>u8 {
-            <span class="kw">let </span>align = mem::align_of::&lt;usize&gt;();
+        </span><span class="kw">pub unsafe extern </span><span class="string">&quot;C&quot; </span><span class="kw">fn </span>__wbindgen_realloc(ptr: <span class="kw-2">*mut </span>u8, old_size: usize, new_size: usize, align: usize) -&gt; <span class="kw-2">*mut </span>u8 {
             <span class="macro">debug_assert!</span>(old_size &gt; <span class="number">0</span>);
             <span class="macro">debug_assert!</span>(new_size &gt; <span class="number">0</span>);
             <span class="kw">if let </span><span class="prelude-val">Ok</span>(layout) = Layout::from_size_align(old_size, align) {
@@ -3448,13 +3499,12 @@
         }
 
         <span class="attr">#[no_mangle]
-        </span><span class="kw">pub unsafe extern </span><span class="string">&quot;C&quot; </span><span class="kw">fn </span>__wbindgen_free(ptr: <span class="kw-2">*mut </span>u8, size: usize) {
+        </span><span class="kw">pub unsafe extern </span><span class="string">&quot;C&quot; </span><span class="kw">fn </span>__wbindgen_free(ptr: <span class="kw-2">*mut </span>u8, size: usize, align: usize) {
             <span class="comment">// This happens for zero-length slices, and in that case `ptr` is
             // likely bogus so don&#39;t actually send this to the system allocator
             </span><span class="kw">if </span>size == <span class="number">0 </span>{
                 <span class="kw">return
             </span>}
-            <span class="kw">let </span>align = mem::align_of::&lt;usize&gt;();
             <span class="kw">let </span>layout = Layout::from_size_align_unchecked(size, align);
             dealloc(ptr, layout);
         }
@@ -3515,7 +3565,7 @@
             };
             GLOBAL_EXNDATA[<span class="number">0</span>] = <span class="number">0</span>;
             GLOBAL_EXNDATA[<span class="number">1</span>] = <span class="number">0</span>;
-            <span class="kw">return </span>ret;
+            ret
         }
     }
 
@@ -3573,6 +3623,42 @@
         </span><span class="kw">fn </span>start(<span class="self">self</span>) {
             <span class="kw">if let </span><span class="prelude-val">Err</span>(e) = <span class="self">self </span>{
                 <span class="kw">crate</span>::throw_val(e.into());
+            }
+        }
+    }
+
+    <span class="doccomment">/// An internal helper struct for usage in `#[wasm_bindgen(main)]`
+    /// functions to throw the error (if it is `Err`).
+    </span><span class="kw">pub struct </span>MainWrapper&lt;T&gt;(<span class="kw">pub </span><span class="prelude-ty">Option</span>&lt;T&gt;);
+
+    <span class="kw">pub trait </span>Main {
+        <span class="kw">fn </span>__wasm_bindgen_main(<span class="kw-2">&amp;mut </span><span class="self">self</span>);
+    }
+
+    <span class="kw">impl </span>Main <span class="kw">for </span><span class="kw-2">&amp;mut &amp;mut </span>MainWrapper&lt;()&gt; {
+        <span class="attr">#[inline]
+        </span><span class="kw">fn </span>__wasm_bindgen_main(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {}
+    }
+
+    <span class="kw">impl </span>Main <span class="kw">for </span><span class="kw-2">&amp;mut &amp;mut </span>MainWrapper&lt;Infallible&gt; {
+        <span class="attr">#[inline]
+        </span><span class="kw">fn </span>__wasm_bindgen_main(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {}
+    }
+
+    <span class="kw">impl</span>&lt;E: Into&lt;JsValue&gt;&gt; Main <span class="kw">for </span><span class="kw-2">&amp;mut &amp;mut </span>MainWrapper&lt;<span class="prelude-ty">Result</span>&lt;(), E&gt;&gt; {
+        <span class="attr">#[inline]
+        </span><span class="kw">fn </span>__wasm_bindgen_main(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
+            <span class="kw">if let </span><span class="prelude-val">Err</span>(e) = <span class="self">self</span>.<span class="number">0</span>.take().unwrap() {
+                <span class="kw">crate</span>::throw_val(e.into());
+            }
+        }
+    }
+
+    <span class="kw">impl</span>&lt;E: std::fmt::Debug&gt; Main <span class="kw">for </span><span class="kw-2">&amp;mut </span>MainWrapper&lt;<span class="prelude-ty">Result</span>&lt;(), E&gt;&gt; {
+        <span class="attr">#[inline]
+        </span><span class="kw">fn </span>__wasm_bindgen_main(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
+            <span class="kw">if let </span><span class="prelude-val">Err</span>(e) = <span class="self">self</span>.<span class="number">0</span>.take().unwrap() {
+                <span class="kw">crate</span>::throw_str(<span class="kw-2">&amp;</span><span class="macro">std::format!</span>(<span class="string">&quot;{:?}&quot;</span>, e));
             }
         }
     }
