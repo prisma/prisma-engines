@@ -352,11 +352,13 @@ impl FilterVisitorExt for FilterVisitor {
             RelationCondition::ToOneRelatedRecord if self.should_render_join() && !filter.field.is_list() => {
                 let alias = self.next_alias(AliasMode::Join);
 
-                let linking_fields: Vec<_> = ModelProjection::from(filter.field.model().primary_identifier())
+                let linking_fields_not_null: Vec<_> = ModelProjection::from(filter.field.model().primary_identifier())
                     .as_columns(ctx)
                     .map(|c| c.aliased_col(Some(alias), ctx))
+                    .map(|c| c.is_not_null())
+                    .map(Expression::from)
                     .collect();
-                let no_id_null_filter = Row::from(linking_fields).is_not_null();
+                let not_null_filter = ConditionTree::And(linking_fields_not_null);
 
                 let join = compute_one2m_join(
                     &filter.field,
@@ -374,7 +376,7 @@ impl FilterVisitorExt for FilterVisitor {
                     output_joins.extend(nested_joins);
                 };
 
-                (conditions.and(no_id_null_filter), Some(output_joins))
+                (conditions.and(not_null_filter), Some(output_joins))
             }
 
             _ => {
@@ -411,13 +413,14 @@ impl FilterVisitorExt for FilterVisitor {
         //    WHERE "Parent"."childId" IS NULL;
         // ```
         if filter.field.is_inlined_on_enclosing_model() {
-            let columns: Vec<_> = ModelProjection::from(filter.field.linking_fields())
+            let conditions: Vec<_> = ModelProjection::from(filter.field.linking_fields())
                 .as_columns(ctx)
                 .map(|c| c.opt_table(parent_alias_string.clone()))
+                .map(|c| c.is_null())
+                .map(Expression::from)
                 .collect();
-            let condition = Row::from(columns).is_null();
 
-            return (ConditionTree::single(condition), None);
+            return (ConditionTree::And(conditions), None);
         }
 
         // If the relation is not inlined and we can use joins, then we join the relation and check whether the related linking fields are null.
@@ -430,9 +433,11 @@ impl FilterVisitorExt for FilterVisitor {
         if self.should_render_join() {
             let alias = self.next_alias(AliasMode::Join);
 
-            let id_columns: Vec<_> = ModelProjection::from(filter.field.related_field().linking_fields())
+            let conditions: Vec<_> = ModelProjection::from(filter.field.related_field().linking_fields())
                 .as_columns(ctx)
                 .map(|c| c.aliased_col(Some(alias), ctx))
+                .map(|c| c.is_null())
+                .map(Expression::from)
                 .collect();
 
             let join = compute_one2m_join(
@@ -442,7 +447,7 @@ impl FilterVisitorExt for FilterVisitor {
                 ctx,
             );
 
-            return (ConditionTree::single(Row::from(id_columns).is_null()), Some(vec![join]));
+            return (ConditionTree::And(conditions), Some(vec![join]));
         }
 
         // Otherwise, we use a NOT IN clause and a subselect to find the related records that are nulls.
