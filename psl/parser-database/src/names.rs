@@ -5,7 +5,7 @@ pub use reserved_model_names::is_reserved_type_name;
 use crate::{
     ast::{self, ConfigBlockProperty, TopId, WithAttributes, WithIdentifier, WithName, WithSpan},
     types::ScalarType,
-    Context, DatamodelError, StringId,
+    Context, DatamodelError, SchemaId, StringId,
 };
 use reserved_model_names::{validate_enum_name, validate_model_name};
 use rustc_hash::{FxHashMap as HashMap, FxHashSet as HashSet};
@@ -14,13 +14,13 @@ use rustc_hash::{FxHashMap as HashMap, FxHashSet as HashSet};
 #[derive(Default)]
 pub(super) struct Names {
     /// Models, enums, composite types and type aliases
-    pub(super) tops: HashMap<StringId, TopId>,
+    pub(super) tops: HashMap<StringId, (SchemaId, TopId)>,
     /// Generators have their own namespace.
-    pub(super) generators: HashMap<StringId, TopId>,
+    pub(super) generators: HashMap<StringId, (SchemaId, TopId)>,
     /// Datasources have their own namespace.
-    pub(super) datasources: HashMap<StringId, TopId>,
-    pub(super) model_fields: HashMap<(ast::ModelId, StringId), ast::FieldId>,
-    pub(super) composite_type_fields: HashMap<(ast::CompositeTypeId, StringId), ast::FieldId>,
+    pub(super) datasources: HashMap<StringId, (SchemaId, TopId)>,
+    pub(super) model_fields: HashMap<(SchemaId, ast::ModelId, StringId), ast::FieldId>,
+    pub(super) composite_type_fields: HashMap<(SchemaId, ast::CompositeTypeId, StringId), ast::FieldId>,
 }
 
 /// `resolve_names()` is responsible for populating `ParserDatabase.names` and
@@ -35,7 +35,7 @@ pub(super) fn resolve_names(ctx: &mut Context<'_>) {
     let mut tmp_names: HashSet<&str> = HashSet::default(); // throwaway container for duplicate checking
     let mut names = Names::default();
 
-    for (top_id, top) in ctx.ast.iter_tops() {
+    for (schema_id, top_id, top) in ctx.iter_tops() {
         assert_is_not_a_reserved_scalar_type(top.identifier(), ctx);
 
         let namespace = match (top_id, top) {
@@ -70,7 +70,11 @@ pub(super) fn resolve_names(ctx: &mut Context<'_>) {
                     validate_attribute_identifiers(field, ctx);
                     let field_name_id = ctx.interner.intern(field.name());
 
-                    if names.model_fields.insert((model_id, field_name_id), field_id).is_some() {
+                    if names
+                        .model_fields
+                        .insert((schema_id, model_id, field_name_id), field_id)
+                        .is_some()
+                    {
                         ctx.push_error(DatamodelError::new_duplicate_field_error(
                             model.name(),
                             field.name(),
@@ -92,7 +96,11 @@ pub(super) fn resolve_names(ctx: &mut Context<'_>) {
                     validate_attribute_identifiers(field, ctx);
                     let field_name_id = ctx.interner.intern(field.name());
 
-                    if names.model_fields.insert((model_id, field_name_id), field_id).is_some() {
+                    if names
+                        .model_fields
+                        .insert((schema_id, model_id, field_name_id), field_id)
+                        .is_some()
+                    {
                         ctx.push_error(DatamodelError::new_duplicate_field_error(
                             model.name(),
                             field.name(),
@@ -112,7 +120,7 @@ pub(super) fn resolve_names(ctx: &mut Context<'_>) {
                     // Check that there is no duplicate field on the composite type
                     if names
                         .composite_type_fields
-                        .insert((ctid, field_name_id), field_id)
+                        .insert((schema_id, ctid, field_name_id), field_id)
                         .is_some()
                     {
                         ctx.push_error(DatamodelError::new_composite_type_duplicate_field_error(
@@ -136,16 +144,22 @@ pub(super) fn resolve_names(ctx: &mut Context<'_>) {
             _ => unreachable!(),
         };
 
-        insert_name(top_id, top, namespace, ctx)
+        insert_name(schema_id, top_id, top, namespace, ctx)
     }
 
     let _ = std::mem::replace(ctx.names, names);
 }
 
-fn insert_name(top_id: TopId, top: &ast::Top, namespace: &mut HashMap<StringId, TopId>, ctx: &mut Context<'_>) {
+fn insert_name(
+    schema_id: SchemaId,
+    top_id: TopId,
+    top: &ast::Top,
+    namespace: &mut HashMap<StringId, (SchemaId, TopId)>,
+    ctx: &mut Context<'_>,
+) {
     let name = ctx.interner.intern(top.name());
-    if let Some(existing) = namespace.insert(name, top_id) {
-        ctx.push_error(duplicate_top_error(&ctx.ast[existing], top));
+    if let Some((existing_schema, existing_top)) = namespace.insert(name, (schema_id, top_id)) {
+        ctx.push_error(duplicate_top_error(&ctx.asts[&existing_schema][existing_top], top));
     }
 }
 

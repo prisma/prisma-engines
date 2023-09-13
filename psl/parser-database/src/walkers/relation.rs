@@ -14,7 +14,7 @@ pub type RelationWalker<'db> = Walker<'db, RelationId>;
 
 impl<'db> RelationWalker<'db> {
     /// The models at each end of the relation. [model A, model B]. Can be the same model twice.
-    pub fn models(self) -> [ast::ModelId; 2] {
+    pub fn models(self) -> [(SchemaId, ast::ModelId); 2] {
         let rel = self.get();
         [rel.model_a, rel.model_b]
     }

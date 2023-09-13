@@ -12,11 +12,12 @@ use super::{
 use crate::{
     ast::{self, WithName},
     types::ModelAttributes,
+    SchemaId,
 };
 use schema_ast::ast::{IndentationType, NewlineType, WithSpan};
 
 /// A `model` declaration in the Prisma schema.
-pub type ModelWalker<'db> = super::Walker<'db, ast::ModelId>;
+pub type ModelWalker<'db> = super::Walker<'db, (SchemaId, ast::ModelId)>;
 
 impl<'db> ModelWalker<'db> {
     /// The name of the model.
@@ -61,12 +62,12 @@ impl<'db> ModelWalker<'db> {
 
     /// The ID of the model in the db
     pub fn model_id(self) -> ast::ModelId {
-        self.id
+        self.id.1
     }
 
     /// The AST node.
     pub fn ast_model(self) -> &'db ast::Model {
-        &self.db.ast[self.id]
+        &self.db.asts[&self.id.0][self.id.1]
     }
 
     /// The parsed attributes.
@@ -86,7 +87,7 @@ impl<'db> ModelWalker<'db> {
         self.attributes()
             .mapped_name
             .map(|id| &self.db[id])
-            .unwrap_or_else(|| self.db.ast[self.id].name())
+            .unwrap_or_else(|| self.ast_model().name())
     }
 
     /// Used in validation. True only if the model has a single field id.

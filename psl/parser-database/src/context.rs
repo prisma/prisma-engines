@@ -3,7 +3,7 @@ mod attributes;
 use self::attributes::AttributesValidationState;
 use crate::{
     ast, interner::StringInterner, names::Names, relations::Relations, types::Types, DatamodelError, Diagnostics,
-    StringId,
+    SchemaId, StringId,
 };
 use schema_ast::ast::{Expression, WithName};
 use std::collections::{HashMap, HashSet};
@@ -21,7 +21,7 @@ use std::collections::{HashMap, HashSet};
 ///
 /// See `visit_attributes()`.
 pub(crate) struct Context<'db> {
-    pub(crate) ast: &'db ast::SchemaAst,
+    pub(crate) asts: &'db HashMap<SchemaId, ast::SchemaAst>,
     pub(crate) interner: &'db mut StringInterner,
     pub(crate) names: &'db mut Names,
     pub(crate) types: &'db mut Types,
@@ -38,7 +38,7 @@ pub(crate) struct Context<'db> {
 
 impl<'db> Context<'db> {
     pub(super) fn new(
-        ast: &'db ast::SchemaAst,
+        asts: &'db HashMap<SchemaId, ast::SchemaAst>,
         interner: &'db mut StringInterner,
         names: &'db mut Names,
         types: &'db mut Types,
@@ -46,7 +46,7 @@ impl<'db> Context<'db> {
         diagnostics: &'db mut Diagnostics,
     ) -> Self {
         Context {
-            ast,
+            asts,
             interner,
             names,
             types,
@@ -68,7 +68,7 @@ impl<'db> Context<'db> {
     /// Return the attribute currently being validated. Panics if the context is not in the right
     /// state.
     #[track_caller]
-    pub(crate) fn current_attribute_id(&self) -> ast::AttributeId {
+    pub(crate) fn current_attribute_id(&self) -> (SchemaId, ast::AttributeId) {
         self.attributes.attribute.unwrap()
     }
 
@@ -76,8 +76,8 @@ impl<'db> Context<'db> {
     /// state.
     #[track_caller]
     pub(crate) fn current_attribute(&self) -> &'db ast::Attribute {
-        let id = self.attributes.attribute.unwrap();
-        &self.ast[id]
+        let (schema, attr) = self.attributes.attribute.unwrap();
+        &self.asts[&schema][attr]
     }
 
     /// Discard arguments without validation.
@@ -102,8 +102,13 @@ impl<'db> Context<'db> {
     ///
     /// Other than for this peculiarity, this method is identical to
     /// `visit_attributes()`.
-    pub(super) fn visit_scalar_field_attributes(&mut self, model_id: ast::ModelId, field_id: ast::FieldId) {
-        self.visit_attributes((model_id, field_id).into());
+    pub(super) fn visit_scalar_field_attributes(
+        &mut self,
+        schema_id: SchemaId,
+        model_id: ast::ModelId,
+        field_id: ast::FieldId,
+    ) {
+        self.visit_attributes(schema_id, (model_id, field_id).into());
     }
 
     /// All attribute validation should go through `visit_attributes()`. It lets
@@ -116,7 +121,7 @@ impl<'db> Context<'db> {
     ///   `validate_visited_arguments()`. Otherwise, Context will helpfully panic.
     /// - When you are done validating an attribute set, you must call
     ///   `validate_visited_attributes()`. Otherwise, Context will helpfully panic.
-    pub(super) fn visit_attributes(&mut self, ast_attributes: ast::AttributeContainer) {
+    pub(super) fn visit_attributes(&mut self, schema_id: SchemaId, ast_attributes: ast::AttributeContainer) {
         if !self.attributes.attributes.is_empty() || !self.attributes.unused_attributes.is_empty() {
             panic!(
                 "`ctx.visit_attributes() called with {:?} while the Context is still validating previous attribute set on {:?}`",
@@ -127,7 +132,8 @@ impl<'db> Context<'db> {
 
         self.attributes.attributes.clear();
         self.attributes.unused_attributes.clear();
-        self.attributes.extend_attributes(ast_attributes, self.ast);
+        self.attributes
+            .extend_attributes(ast_attributes, &self.asts[&schema_id]);
     }
 
     /// Look for an optional attribute with a name of the form
@@ -267,8 +273,8 @@ impl<'db> Context<'db> {
     /// This must be called at the end of arguments validation. It will report errors for each argument that was not used by the validators. The Drop impl will helpfully panic
     /// otherwise.
     pub(crate) fn validate_visited_arguments(&mut self) {
-        let attr = if let Some(attrid) = self.attributes.attribute {
-            &self.ast[attrid]
+        let attr = if let Some((schema_id, attrid)) = self.attributes.attribute {
+            &self.asts[&schema_id][attrid]
         } else {
             panic!("State error: missing attribute in validate_visited_arguments.")
         };
@@ -325,6 +331,12 @@ impl<'db> Context<'db> {
             .composite_type_fields
             .get(&(composite_type_id, name))
             .cloned()
+    }
+
+    pub(crate) fn iter_tops(&self) -> impl Iterator<Item = (SchemaId, ast::TopId, &ast::Top)> {
+        self.asts
+            .iter()
+            .flat_map(|(schema_id, ast)| ast.iter_tops().map(|(top_id, top)| (schema_id, top_id, top)))
     }
 
     /// Starts validating the arguments for an attribute, checking for duplicate arguments in the

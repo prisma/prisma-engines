@@ -8,7 +8,7 @@ pub(super) struct AttributesValidationState {
     pub(super) unused_attributes: HashSet<ast::AttributeId>, // the _remaining_ attributes
 
     /// The attribute being validated.
-    pub(super) attribute: Option<ast::AttributeId>,
+    pub(super) attribute: Option<(SchemaId, ast::AttributeId)>,
     pub(super) args: HashMap<Option<StringId>, usize>, // the _remaining_ arguments of `attribute`
 }
 

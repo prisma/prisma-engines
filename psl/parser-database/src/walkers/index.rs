@@ -5,13 +5,13 @@ use crate::{
     ast,
     types::{IndexAlgorithm, IndexAttribute},
     walkers::{ModelWalker, ScalarFieldAttributeWalker, ScalarFieldWalker},
-    ParserDatabase, ScalarFieldType,
+    ParserDatabase, ScalarFieldType, SchemaId,
 };
 
 /// An index, unique or fulltext attribute.
 #[derive(Copy, Clone)]
 pub struct IndexWalker<'db> {
-    pub(crate) model_id: ast::ModelId,
+    pub(crate) model_id: crate::ModelId,
     pub(crate) index: ast::AttributeId,
     pub(crate) db: &'db ParserDatabase,
     pub(crate) index_attribute: &'db IndexAttribute,
@@ -69,7 +69,7 @@ impl<'db> IndexWalker<'db> {
 
     /// The AST node of the index/unique attribute.
     pub fn ast_attribute(self) -> &'db ast::Attribute {
-        &self.db.ast[self.index]
+        &self.db.ast(&self.schema_id)[self.index]
     }
 
     pub(crate) fn attribute(self) -> &'db IndexAttribute {
@@ -180,7 +180,7 @@ impl<'db> IndexWalker<'db> {
 
     /// The model the index is defined on.
     pub fn model(self) -> ModelWalker<'db> {
-        self.db.walk(self.model_id)
+        self.db.walk((self.schema_id, self.model_id))
     }
 
     /// The field the model was defined on, if any.

@@ -28,6 +28,10 @@ pub mod get_config {
     pub use psl_core::mcf::{config_to_mcf_json_value as get_config, *};
 }
 
+pub fn parse_configuration_multi_schema(schema_files: HashMap<String, String>) -> Result<Configuration, Diagnostics> {
+    psl_core::parse_configuration_multi_schema(schema, builtin_connectors::BUILTIN_CONNECTORS)
+}
+
 /// Parses and validate a schema, but skip analyzing everything except datasource and generator
 /// blocks.
 pub fn parse_configuration(schema: &str) -> Result<Configuration, Diagnostics> {

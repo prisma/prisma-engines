@@ -25,6 +25,8 @@ pub use relation::*;
 pub use relation_field::*;
 pub use scalar_field::*;
 
+use crate::{ast, SchemaId};
+
 /// A generic walker. Only walkers intantiated with a concrete ID type (`I`) are useful.
 #[derive(Clone, Copy)]
 pub struct Walker<'db, I> {
@@ -51,12 +53,18 @@ where
 }
 
 impl crate::ParserDatabase {
+    fn iter_tops(&self) -> impl Iterator<Item = (SchemaId, ast::TopId, &ast::Top)> + '_ {
+        self.asts
+            .iter()
+            .flat_map(move |(schema_id, ast)| ast.iter_tops().map(|(top_id, top)| (*schema_id, top_id, top)))
+    }
+
     /// Find an enum by name.
     pub fn find_enum<'db>(&'db self, name: &str) -> Option<EnumWalker<'db>> {
         self.interner
             .lookup(name)
             .and_then(|name_id| self.names.tops.get(&name_id))
-            .and_then(|top_id| top_id.as_enum_id())
+            .and_then(|(schema_id, top_id)| top_id.as_enum_id().map(|id| (*schema_id, id)))
             .map(|enum_id| self.walk(enum_id))
     }
 
@@ -65,7 +73,7 @@ impl crate::ParserDatabase {
         self.interner
             .lookup(name)
             .and_then(|name_id| self.names.tops.get(&name_id))
-            .and_then(|top_id| top_id.as_model_id())
+            .and_then(|(schema_id, top_id)| top_id.as_model_id().map(|id| (*schema_id, id)))
             .map(|model_id| self.walk(model_id))
     }
 
@@ -76,35 +84,31 @@ impl crate::ParserDatabase {
 
     /// Walk all enums in the schema.
     pub fn walk_enums(&self) -> impl Iterator<Item = EnumWalker<'_>> {
-        self.ast()
-            .iter_tops()
-            .filter_map(|(top_id, _)| top_id.as_enum_id())
-            .map(move |enum_id| Walker { db: self, id: enum_id })
+        self.iter_tops()
+            .filter_map(|(schema_id, top_id, _)| top_id.as_enum_id().map(|id| (schema_id, id)))
+            .map(move |enum_id| self.walk(enum_id))
     }
 
     /// Walk all the models in the schema.
     pub fn walk_models(&self) -> impl Iterator<Item = ModelWalker<'_>> + '_ {
-        self.ast()
-            .iter_tops()
-            .filter_map(|(top_id, _)| top_id.as_model_id())
-            .map(move |model_id| self.walk(model_id))
+        self.iter_tops()
+            .filter_map(|(schema_id, top_id, _)| top_id.as_model_id().map(|id| (schema_id, id)))
+            .map(move |(schema_id, model_id)| self.walk((schema_id, model_id)))
             .filter(|m| !m.ast_model().is_view())
     }
 
     /// Walk all the views in the schema.
     pub fn walk_views(&self) -> impl Iterator<Item = ModelWalker<'_>> + '_ {
-        self.ast()
-            .iter_tops()
-            .filter_map(|(top_id, _)| top_id.as_model_id())
+        self.iter_tops()
+            .filter_map(|(schema_id, top_id, _)| top_id.as_model_id().map(|id| (schema_id, id)))
             .map(move |model_id| self.walk(model_id))
             .filter(|m| m.ast_model().is_view())
     }
 
     /// Walk all the composite types in the schema.
     pub fn walk_composite_types(&self) -> impl Iterator<Item = CompositeTypeWalker<'_>> + '_ {
-        self.ast()
-            .iter_tops()
-            .filter_map(|(top_id, _)| top_id.as_composite_type_id())
+        self.iter_tops()
+            .filter_map(|(schema_id, top_id, _)| top_id.as_composite_type_id().map(|id| (schema_id, id)))
             .map(|id| self.walk(id))
     }
 

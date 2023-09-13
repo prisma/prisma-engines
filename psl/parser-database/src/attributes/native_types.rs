@@ -1,4 +1,4 @@
-use crate::{ast, context::Context, ScalarFieldId, StringId};
+use crate::{ast, context::Context, ScalarFieldId, SchemaId, StringId};
 
 pub(super) fn visit_model_field_native_type_attribute(
     id: ScalarFieldId,
@@ -14,7 +14,7 @@ pub(super) fn visit_model_field_native_type_attribute(
 }
 
 pub(super) fn visit_composite_type_field_native_type_attribute(
-    id: (ast::CompositeTypeId, ast::FieldId),
+    id: (SchemaId, ast::CompositeTypeId, ast::FieldId),
     datasource_name: StringId,
     type_name: StringId,
     attr: &ast::Attribute,

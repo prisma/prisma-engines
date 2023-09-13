@@ -18,8 +18,13 @@ impl<'db> ScalarFieldWalker<'db> {
 
     /// The field node in the AST.
     pub fn ast_field(self) -> &'db ast::Field {
-        let ScalarField { model_id, field_id, .. } = self.attributes();
-        &self.db.ast[*model_id][*field_id]
+        let ScalarField {
+            schema_id,
+            model_id,
+            field_id,
+            ..
+        } = self.attributes();
+        &self.db.asts[schema_id][*model_id][*field_id]
     }
 
     /// Is this field unique? This method will return true if:

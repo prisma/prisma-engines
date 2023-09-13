@@ -1,5 +1,5 @@
 use super::Walker;
-use crate::{ast, ScalarFieldType, ScalarType};
+use crate::{ast, ScalarFieldType, ScalarType, SchemaId};
 use diagnostics::Span;
 use schema_ast::ast::{WithDocumentation, WithName};
 
@@ -17,20 +17,20 @@ use schema_ast::ast::{WithDocumentation, WithName};
 ///     countryCode String
 /// }
 /// ```
-pub type CompositeTypeWalker<'db> = Walker<'db, ast::CompositeTypeId>;
+pub type CompositeTypeWalker<'db> = Walker<'db, (SchemaId, ast::CompositeTypeId)>;
 
 /// A field in a composite type.
-pub type CompositeTypeFieldWalker<'db> = Walker<'db, (ast::CompositeTypeId, ast::FieldId)>;
+pub type CompositeTypeFieldWalker<'db> = Walker<'db, (SchemaId, ast::CompositeTypeId, ast::FieldId)>;
 
 impl<'db> CompositeTypeWalker<'db> {
     /// The ID of the composite type node in the AST.
-    pub fn composite_type_id(self) -> ast::CompositeTypeId {
+    pub fn composite_type_id(self) -> (SchemaId, ast::CompositeTypeId) {
         self.id
     }
 
     /// The composite type node in the AST.
     pub fn ast_composite_type(self) -> &'db ast::CompositeType {
-        &self.db.ast()[self.id]
+        &self.db.asts[&self.id.0][self.id.1]
     }
 
     /// The name of the composite type in the schema.
@@ -42,7 +42,7 @@ impl<'db> CompositeTypeWalker<'db> {
     pub fn fields(self) -> impl ExactSizeIterator<Item = CompositeTypeFieldWalker<'db>> + Clone {
         self.ast_composite_type()
             .iter_fields()
-            .map(move |(id, _)| self.walk((self.id, id)))
+            .map(move |(id, _)| self.walk((self.id.0, self.id.1, id)))
     }
 }
 
@@ -53,12 +53,12 @@ impl<'db> CompositeTypeFieldWalker<'db> {
 
     /// The AST node for the field.
     pub fn ast_field(self) -> &'db ast::Field {
-        &self.db.ast[self.id.0][self.id.1]
+        &self.db.asts[&self.id.0][self.id.1][self.id.2]
     }
 
     /// The composite type containing the field.
     pub fn composite_type(self) -> CompositeTypeWalker<'db> {
-        self.db.walk(self.id.0)
+        self.db.walk((self.id.0, self.id.1))
     }
 
     /// The optional documentation string of the field.
@@ -73,7 +73,7 @@ impl<'db> CompositeTypeFieldWalker<'db> {
 
     /// The ID of the field in the AST.
     pub fn field_id(self) -> ast::FieldId {
-        self.id.1
+        self.id.2
     }
 
     /// The name of the field.
@@ -101,7 +101,10 @@ impl<'db> CompositeTypeFieldWalker<'db> {
 
     /// The `@default()` AST attribute on the field, if any.
     pub fn default_attribute(self) -> Option<&'db ast::Attribute> {
-        self.field().default.as_ref().map(|d| &self.db.ast[d.default_attribute])
+        self.field()
+            .default
+            .as_ref()
+            .map(|d| &self.db.ast(&self.id.0)[d.default_attribute])
     }
 
     /// (attribute scope, native type name, arguments, span)

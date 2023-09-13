@@ -31,12 +31,14 @@ pub mod walkers;
 mod attributes;
 mod coerce_expression;
 mod context;
+mod ids;
 mod interner;
 mod names;
 mod relations;
 mod types;
 
 pub use coerce_expression::{coerce, coerce_array, coerce_opt};
+pub use ids::*;
 pub use names::is_reserved_type_name;
 pub use relations::{ManyToManyRelationId, ReferentialAction, RelationId};
 pub use schema_ast::{ast, SourceFile};
@@ -48,6 +50,7 @@ pub use types::{
 use self::{context::Context, interner::StringId, relations::Relations, types::Types};
 use diagnostics::{DatamodelError, Diagnostics};
 use names::Names;
+use std::collections::HashMap;
 
 /// ParserDatabase is a container for a Schema AST, together with information
 /// gathered during schema validation. Each validation step enriches the
@@ -69,8 +72,8 @@ use names::Names;
 /// - Global validations are then performed on the mostly validated schema.
 ///   Currently only index name collisions.
 pub struct ParserDatabase {
-    ast: ast::SchemaAst,
-    file: schema_ast::SourceFile,
+    schemas: Vec<(String, schema_ast::SourceFile)>,
+    asts: HashMap<SchemaId, ast::SchemaAst>, // todo: combine schemas and ASTs
     interner: interner::StringInterner,
     names: Names,
     types: Types,
@@ -79,14 +82,30 @@ pub struct ParserDatabase {
 
 impl ParserDatabase {
     /// See the docs on [ParserDatabase](/struct.ParserDatabase.html).
-    pub fn new(file: schema_ast::SourceFile, diagnostics: &mut Diagnostics) -> Self {
-        let ast = schema_ast::parse_schema(file.as_str(), diagnostics);
+    pub fn new(schemas: Vec<(String, schema_ast::SourceFile)>, diagnostics: &mut Diagnostics) -> Self {
+        let asts: HashMap<_, _> = schemas
+            .iter()
+            .enumerate()
+            .map(|(schema_idx, (_path, schema))| {
+                (
+                    SchemaId(schema_idx),
+                    schema_ast::parse_schema(schema.as_str(), diagnostics),
+                )
+            })
+            .collect();
 
         let mut interner = Default::default();
         let mut names = Default::default();
         let mut types = Default::default();
         let mut relations = Default::default();
-        let mut ctx = Context::new(&ast, &mut interner, &mut names, &mut types, &mut relations, diagnostics);
+        let mut ctx = Context::new(
+            &asts,
+            &mut interner,
+            &mut names,
+            &mut types,
+            &mut relations,
+            diagnostics,
+        );
 
         // First pass: resolve names.
         names::resolve_names(&mut ctx);
@@ -96,8 +115,8 @@ impl ParserDatabase {
             attributes::create_default_attributes(&mut ctx);
 
             return ParserDatabase {
-                ast,
-                file,
+                asts,
+                schemas,
                 interner,
                 names,
                 types,
@@ -113,8 +132,8 @@ impl ParserDatabase {
             attributes::create_default_attributes(&mut ctx);
 
             return ParserDatabase {
-                ast,
-                file,
+                asts,
+                schemas,
                 interner,
                 names,
                 types,
@@ -131,8 +150,8 @@ impl ParserDatabase {
         relations::infer_relations(&mut ctx);
 
         ParserDatabase {
-            ast,
-            file,
+            asts,
+            schemas,
             interner,
             names,
             types,
@@ -140,9 +159,9 @@ impl ParserDatabase {
         }
     }
 
-    /// The parsed AST.
-    pub fn ast(&self) -> &ast::SchemaAst {
-        &self.ast
+    /// A parsed AST.
+    pub fn ast(&self, schema_id: &SchemaId) -> &ast::SchemaAst {
+        &self.asts[schema_id]
     }
 
     /// The total number of enums in the schema. This is O(1).
@@ -156,8 +175,8 @@ impl ParserDatabase {
     }
 
     /// The source file contents.
-    pub fn source(&self) -> &str {
-        self.file.as_str()
+    pub fn source(&self, schema_id: SchemaId) -> &str {
+        self.schemas[schema_id.0].1.as_str()
     }
 }
 

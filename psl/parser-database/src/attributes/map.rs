@@ -3,7 +3,7 @@ use crate::{
     coerce,
     context::Context,
     types::ModelAttributes,
-    DatamodelError, ScalarFieldId, StringId,
+    DatamodelError, ScalarFieldId, SchemaId, StringId,
 };
 
 pub(super) fn model(model_attributes: &mut ModelAttributes, ctx: &mut Context<'_>) {
@@ -19,6 +19,7 @@ pub(super) fn scalar_field(
     sfid: ScalarFieldId,
     ast_model: &ast::Model,
     ast_field: &ast::Field,
+    schema_id: SchemaId,
     model_id: ast::ModelId,
     field_id: ast::FieldId,
     ctx: &mut Context<'_>,
@@ -43,10 +44,10 @@ pub(super) fn scalar_field(
         ));
     }
 
-    if let Some(dup_field_id) = ctx.names.model_fields.get(&(model_id, mapped_name)) {
+    if let Some(dup_field_id) = ctx.names.model_fields.get(&(schema_id, model_id, mapped_name)) {
         match ctx
             .types
-            .range_model_scalar_fields(model_id)
+            .range_model_scalar_fields((schema_id, model_id))
             // Do not compare field to itself
             .filter(|(_, sf)| sf.field_id != field_id)
             // Find the field with the given mapped name.
