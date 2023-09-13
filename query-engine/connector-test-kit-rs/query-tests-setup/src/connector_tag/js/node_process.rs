@@ -85,7 +85,7 @@ fn start_rpc_thread(mut receiver: mpsc::Receiver<ReqImpl>) -> Result<()> {
     use std::process::Stdio;
     use tokio::process::Command;
 
-    let env_var = match crate::NODE_TEST_EXECUTOR.as_ref() {
+    let env_var = match crate::EXTERNAL_TEST_EXECUTOR.as_ref() {
         Some(env_var) => env_var,
         None => exit_with_message(1, "start_rpc_thread() error: NODE_TEST_EXECUTOR env var is not defined"),
     };
