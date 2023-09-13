@@ -175,6 +175,10 @@ fn js_value_to_quaint(
                 // n.as_i32() is not implemented, so we need to downcast from i64 instead
                 QuaintValue::int32(n.as_i64().expect("number must be an i32") as i32)
             }
+            serde_json::Value::String(s) => {
+                let n = s.parse::<i32>().expect("string-encoded number must be an i32");
+                QuaintValue::int32(n)
+            }
             serde_json::Value::Null => QuaintValue::Int32(None),
             mismatch => panic!("Expected an i32 number in column {}, found {}", column_name, mismatch),
         },
