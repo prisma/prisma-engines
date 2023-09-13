@@ -36,7 +36,7 @@
     "@jkomyno/prisma-driver-adapter-utils": "workspace:*",
     "@neondatabase/serverless": "^0.6.0",
     "@planetscale/database": "^1.11.0",
-    "@prisma/client": "5.3.0-integration-feat-driver-adapters-in-client.3",
+    "@prisma/client": "5.3.0",
     "pg": "^8.11.3",
     "superjson": "^1.13.1",
     "undici": "^5.23.0"
@@ -45,7 +45,7 @@
     "@types/node": "^20.5.1",
     "@types/pg": "^8.10.2",
     "cross-env": "^7.0.3",
-    "prisma": "5.3.0-integration-feat-driver-adapters-in-client.3",
+    "prisma": "5.3.0",
     "tsx": "^3.12.7"
   }
 }
