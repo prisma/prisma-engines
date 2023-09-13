@@ -118,48 +118,76 @@ impl FilterVisitor {
         let alias = self.next_alias(AliasMode::Table);
         let condition = filter.condition;
 
-        let table = filter.field.as_table(ctx);
-        let selected_identifier: Vec<Column> = filter
-            .field
-            .identifier_columns(ctx)
-            .map(|col| col.aliased_col(Some(alias), ctx))
-            .collect();
+        // Perf: We can skip on a join if the related is inline, meaning that it's just a link between two `RelationField`s.
+        // In this case, we can select the related table's foreign key instead of joining.
+        // This is not possible in the case of M2M implicit relations.
+        if filter.field.relation().is_inline_relation() {
+            let related_table = filter.field.related_model().as_table(ctx);
+            let related_columns: Vec<_> = ModelProjection::from(filter.field.related_field().linking_fields())
+                .as_columns(ctx)
+                .map(|col| col.aliased_col(Some(alias), ctx))
+                .collect();
 
-        let join_columns: Vec<Column> = filter
-            .field
-            .join_columns(ctx)
-            .map(|c| c.aliased_col(Some(alias), ctx))
-            .collect();
+            let (nested_conditions, nested_joins) = self.visit_nested_filter(*filter.nested_filter, alias, false, ctx);
+            let nested_conditions = nested_conditions.invert_if(condition.invert_of_subselect());
 
-        let related_table = filter.field.related_model().as_table(ctx);
-        let related_join_columns: Vec<_> = ModelProjection::from(filter.field.related_field().linking_fields())
-            .as_columns(ctx)
-            .map(|col| col.aliased_col(Some(alias.flip(AliasMode::Join)), ctx))
-            .collect();
+            let conditions = related_columns
+                .clone()
+                .into_iter()
+                .fold(nested_conditions, |acc, column| acc.and(column.is_not_null()));
 
-        let (nested_conditions, joins) =
-            self.visit_nested_filter(*filter.nested_filter, alias.flip(AliasMode::Join), false, ctx);
+            let select = Select::from_table(related_table.alias(alias.to_string(Some(AliasMode::Table))))
+                .columns(related_columns)
+                .so_that(conditions);
 
-        let conditions = nested_conditions.invert_if(condition.invert_of_subselect());
-
-        let conditions = selected_identifier
-            .clone()
-            .into_iter()
-            .fold(conditions, |acc, column| acc.and(column.is_not_null()));
-
-        let join = related_table
-            .alias(alias.to_string(Some(AliasMode::Join)))
-            .on(Row::from(related_join_columns).equals(Row::from(join_columns)));
-
-        let select = Select::from_table(table.alias(alias.to_string(Some(AliasMode::Table))))
-            .columns(selected_identifier)
-            .inner_join(join)
-            .so_that(conditions);
-
-        if let Some(joins) = joins {
-            joins.into_iter().fold(select, |acc, join| acc.join(join.data))
+            if let Some(nested_joins) = nested_joins {
+                nested_joins.into_iter().fold(select, |acc, join| acc.join(join.data))
+            } else {
+                select
+            }
         } else {
-            select
+            let table = filter.field.as_table(ctx);
+            let selected_identifier: Vec<Column> = filter
+                .field
+                .identifier_columns(ctx)
+                .map(|col| col.aliased_col(Some(alias), ctx))
+                .collect();
+
+            let join_columns: Vec<Column> = filter
+                .field
+                .join_columns(ctx)
+                .map(|c| c.aliased_col(Some(alias), ctx))
+                .collect();
+
+            let related_table = filter.field.related_model().as_table(ctx);
+            let related_join_columns: Vec<_> = ModelProjection::from(filter.field.related_field().linking_fields())
+                .as_columns(ctx)
+                .map(|col| col.aliased_col(Some(alias.flip(AliasMode::Join)), ctx))
+                .collect();
+
+            let (nested_conditions, nested_joins) =
+                self.visit_nested_filter(*filter.nested_filter, alias.flip(AliasMode::Join), false, ctx);
+
+            let nested_conditions = nested_conditions.invert_if(condition.invert_of_subselect());
+            let nested_conditons = selected_identifier
+                .clone()
+                .into_iter()
+                .fold(nested_conditions, |acc, column| acc.and(column.is_not_null()));
+
+            let join = related_table
+                .alias(alias.to_string(Some(AliasMode::Join)))
+                .on(Row::from(related_join_columns).equals(Row::from(join_columns)));
+
+            let select = Select::from_table(table.alias(alias.to_string(Some(AliasMode::Table))))
+                .columns(selected_identifier)
+                .inner_join(join)
+                .so_that(nested_conditons);
+
+            if let Some(nested_joins) = nested_joins {
+                nested_joins.into_iter().fold(select, |acc, join| acc.join(join.data))
+            } else {
+                select
+            }
         }
     }
 }
@@ -299,7 +327,7 @@ impl FilterVisitorExt for FilterVisitor {
         filter: RelationFilter,
         ctx: &Context<'_>,
     ) -> (ConditionTree<'static>, Option<Vec<AliasedJoin>>) {
-        let parent_alias = self.parent_alias().map(|a| a.to_string(Some(AliasMode::Join)));
+        let parent_alias = self.parent_alias().map(|a| a.to_string(None));
 
         match &filter.condition {
             RelationCondition::NoRelatedRecord if self.with_joins && !filter.field.is_list() => {
