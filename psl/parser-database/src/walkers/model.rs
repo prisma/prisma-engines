@@ -12,12 +12,12 @@ use super::{
 use crate::{
     ast::{self, WithName},
     types::ModelAttributes,
-    SchemaId,
+    FileId,
 };
 use schema_ast::ast::{IndentationType, NewlineType, WithSpan};
 
 /// A `model` declaration in the Prisma schema.
-pub type ModelWalker<'db> = super::Walker<'db, (SchemaId, ast::ModelId)>;
+pub type ModelWalker<'db> = super::Walker<'db, (FileId, ast::ModelId)>;
 
 impl<'db> ModelWalker<'db> {
     /// The name of the model.

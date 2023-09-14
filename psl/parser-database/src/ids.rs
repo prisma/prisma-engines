@@ -2,15 +2,15 @@ use schema_ast::ast;
 
 /// The stable identifier for a PSL file.
 #[derive(Debug, PartialEq, Clone, Copy, Hash, Eq, PartialOrd, Ord)]
-pub struct SchemaId(pub(crate) usize);
+pub struct FileId(pub(crate) usize);
 
-impl SchemaId {
-    pub(crate) const ZERO: SchemaId = SchemaId(0);
-    pub(crate) const MAX: SchemaId = SchemaId(usize::MAX);
+impl FileId {
+    pub(crate) const ZERO: FileId = FileId(0);
+    pub(crate) const MAX: FileId = FileId(usize::MAX);
 }
 
 /// An AST identifier with the accompanyin file ID.
-pub type InFile<Id> = (SchemaId, Id);
+pub type InFile<Id> = (FileId, Id);
 
 /// See [ast::ModelId]
 pub type ModelId = InFile<ast::ModelId>;

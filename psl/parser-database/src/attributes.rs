@@ -25,14 +25,14 @@ pub(super) fn resolve_attributes(ctx: &mut Context<'_>) {
 
     for top in ctx.iter_tops() {
         match top {
-            ((schema_id, ast::TopId::Model(model_id)), ast::Top::Model(_)) => {
-                resolve_model_attributes((schema_id, model_id), ctx)
+            ((file_id, ast::TopId::Model(model_id)), ast::Top::Model(_)) => {
+                resolve_model_attributes((file_id, model_id), ctx)
             }
-            ((schema_id, ast::TopId::Enum(enum_id)), ast::Top::Enum(ast_enum)) => {
-                resolve_enum_attributes((schema_id, enum_id), ast_enum, ctx)
+            ((file_id, ast::TopId::Enum(enum_id)), ast::Top::Enum(ast_enum)) => {
+                resolve_enum_attributes((file_id, enum_id), ast_enum, ctx)
             }
-            ((schema_id, ast::TopId::CompositeType(ctid)), ast::Top::CompositeType(ct)) => {
-                resolve_composite_type_attributes((schema_id, ctid), ct, ctx)
+            ((file_id, ast::TopId::CompositeType(ctid)), ast::Top::CompositeType(ct)) => {
+                resolve_composite_type_attributes((file_id, ctid), ct, ctx)
             }
             _ => (),
         }
@@ -603,9 +603,9 @@ fn common_index_validations(
             if !unresolvable_fields.is_empty() {
                 let fields = unresolvable_fields
                     .iter()
-                    .map(|((schema_id, top_id), field_name)| match top_id {
+                    .map(|((file_id, top_id), field_name)| match top_id {
                         ast::TopId::CompositeType(ctid) => {
-                            let composite_type = &ctx.asts[(*schema_id, *ctid)].name();
+                            let composite_type = &ctx.asts[(*file_id, *ctid)].name();
 
                             Cow::from(format!("{field_name} in type {composite_type}"))
                         }
@@ -825,7 +825,7 @@ fn resolve_field_array_without_args<'db>(
     model_id: crate::ModelId,
     ctx: &mut Context<'db>,
 ) -> Result<Vec<ScalarFieldId>, FieldResolutionError<'db>> {
-    let schema_id = model_id.0;
+    let file_id = model_id.0;
     let constant_array = match coerce_array(values, &coerce::constant, ctx.diagnostics) {
         Some(values) => values,
         None => {
@@ -840,7 +840,7 @@ fn resolve_field_array_without_args<'db>(
 
     for field_name in constant_array {
         if field_name.contains('.') {
-            unknown_fields.push(((schema_id, ast::TopId::Model(model_id.1)), field_name));
+            unknown_fields.push(((file_id, ast::TopId::Model(model_id.1)), field_name));
             continue;
         }
 
@@ -848,7 +848,7 @@ fn resolve_field_array_without_args<'db>(
         let field_id = if let Some(field_id) = ctx.find_model_field(model_id, field_name) {
             field_id
         } else {
-            unknown_fields.push(((schema_id, ast::TopId::Model(model_id.1)), field_name));
+            unknown_fields.push(((file_id, ast::TopId::Model(model_id.1)), field_name));
             continue;
         };
 
@@ -909,7 +909,7 @@ fn resolve_field_array_with_args<'db>(
     resolving: FieldResolvingSetup,
     ctx: &mut Context<'db>,
 ) -> Result<Vec<FieldWithArgs>, FieldResolutionError<'db>> {
-    let schema_id = model_id.0;
+    let file_id = model_id.0;
     let constant_array = match crate::types::index_fields::coerce_field_array_with_args(values, ctx.diagnostics) {
         Some(values) => values,
         None => return Err(FieldResolutionError::AlreadyDealtWith),
@@ -924,7 +924,7 @@ fn resolve_field_array_with_args<'db>(
     'fields: for attrs in &constant_array {
         let path = if attrs.field_name.contains('.') {
             if !resolving.follow_composites() {
-                unknown_fields.push(((schema_id, ast::TopId::Model(model_id.1)), attrs.field_name));
+                unknown_fields.push(((file_id, ast::TopId::Model(model_id.1)), attrs.field_name));
                 continue 'fields;
             }
 
@@ -936,7 +936,7 @@ fn resolve_field_array_with_args<'db>(
                     let field_id = match ctx.find_model_field(model_id, field_shard) {
                         Some(field_id) => field_id,
                         None => {
-                            unknown_fields.push(((schema_id, ast::TopId::Model(model_id.1)), field_shard));
+                            unknown_fields.push(((file_id, ast::TopId::Model(model_id.1)), field_shard));
                             continue 'fields;
                         }
                     };
@@ -951,7 +951,7 @@ fn resolve_field_array_with_args<'db>(
                     match &ctx.types[sfid].r#type {
                         ScalarFieldType::CompositeType(ctid) => (IndexFieldPath::new(sfid), ctid),
                         _ => {
-                            unknown_fields.push(((schema_id, ast::TopId::Model(model_id.1)), attrs.field_name));
+                            unknown_fields.push(((file_id, ast::TopId::Model(model_id.1)), attrs.field_name));
                             continue 'fields;
                         }
                     }
@@ -1103,17 +1103,17 @@ fn validate_clustering_setting(ctx: &mut Context<'_>) -> Option<bool> {
 /// access their corresponding entries in the attributes map in the database even in the presence
 /// of name and type resolution errors. This is useful for the language tools.
 pub(super) fn create_default_attributes(ctx: &mut Context<'_>) {
-    for ((schema_id, top), _) in ctx.iter_tops() {
+    for ((file_id, top), _) in ctx.iter_tops() {
         match top {
             ast::TopId::Model(model_id) => {
                 ctx.types
                     .model_attributes
-                    .insert((schema_id, model_id), ModelAttributes::default());
+                    .insert((file_id, model_id), ModelAttributes::default());
             }
             ast::TopId::Enum(enum_id) => {
                 ctx.types
                     .enum_attributes
-                    .insert((schema_id, enum_id), EnumAttributes::default());
+                    .insert((file_id, enum_id), EnumAttributes::default());
             }
             _ => (),
         }

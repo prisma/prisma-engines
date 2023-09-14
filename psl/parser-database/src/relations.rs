@@ -2,7 +2,7 @@ use crate::{
     ast::{self, WithName},
     interner::StringId,
     walkers::RelationFieldId,
-    DatamodelError, Diagnostics, SchemaId,
+    DatamodelError, Diagnostics, FileId,
     {context::Context, types::RelationField},
 };
 use enumflags2::bitflags;
@@ -75,11 +75,11 @@ pub(crate) struct Relations {
     /// (model_a, model_b, relation_idx)
     ///
     /// This can be interpreted as the relations _from_ a model.
-    forward: BTreeSet<((SchemaId, ast::ModelId), (SchemaId, ast::ModelId), RelationId)>,
+    forward: BTreeSet<((FileId, ast::ModelId), (FileId, ast::ModelId), RelationId)>,
     /// (model_b, model_a, relation_idx)
     ///
     /// This can be interpreted as the relations _to_ a model.
-    back: BTreeSet<((SchemaId, ast::ModelId), (SchemaId, ast::ModelId), RelationId)>,
+    back: BTreeSet<((FileId, ast::ModelId), (FileId, ast::ModelId), RelationId)>,
 }
 
 impl std::ops::Index<RelationId> for Relations {
@@ -117,22 +117,22 @@ impl Relations {
     /// Iterator over relations where the provided model is model A, or the forward side of the
     /// relation.
     #[allow(clippy::wrong_self_convention)] // this is the name we want
-    pub(crate) fn from_model(&self, model_a_id: (SchemaId, ast::ModelId)) -> impl Iterator<Item = RelationId> + '_ {
+    pub(crate) fn from_model(&self, model_a_id: (FileId, ast::ModelId)) -> impl Iterator<Item = RelationId> + '_ {
         self.forward
             .range(
-                (model_a_id, (SchemaId::ZERO, ast::ModelId::ZERO), RelationId::MIN)
-                    ..(model_a_id, (SchemaId::MAX, ast::ModelId::MAX), RelationId::MAX),
+                (model_a_id, (FileId::ZERO, ast::ModelId::ZERO), RelationId::MIN)
+                    ..(model_a_id, (FileId::MAX, ast::ModelId::MAX), RelationId::MAX),
             )
             .map(move |(_, _, relation_id)| *relation_id)
     }
 
     /// Iterator over relationss where the provided model is model B, or the backrelation side of
     /// the relation.
-    pub(crate) fn to_model(&self, model_a_id: (SchemaId, ast::ModelId)) -> impl Iterator<Item = RelationId> + '_ {
+    pub(crate) fn to_model(&self, model_a_id: (FileId, ast::ModelId)) -> impl Iterator<Item = RelationId> + '_ {
         self.back
             .range(
-                (model_a_id, (SchemaId::ZERO, ast::ModelId::ZERO), RelationId::MIN)
-                    ..(model_a_id, (SchemaId::MAX, ast::ModelId::MAX), RelationId::MAX),
+                (model_a_id, (FileId::ZERO, ast::ModelId::ZERO), RelationId::MIN)
+                    ..(model_a_id, (FileId::MAX, ast::ModelId::MAX), RelationId::MAX),
             )
             .map(move |(_, _, relation_id)| *relation_id)
     }
@@ -186,8 +186,8 @@ pub(crate) struct Relation {
     /// The `name` argument in `@relation`.
     pub(super) relation_name: Option<StringId>,
     pub(super) attributes: RelationAttributes,
-    pub(super) model_a: (SchemaId, ast::ModelId),
-    pub(super) model_b: (SchemaId, ast::ModelId),
+    pub(super) model_a: (FileId, ast::ModelId),
+    pub(super) model_b: (FileId, ast::ModelId),
 }
 
 impl Relation {

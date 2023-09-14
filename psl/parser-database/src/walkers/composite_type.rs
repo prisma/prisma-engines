@@ -1,5 +1,5 @@
 use super::Walker;
-use crate::{ast, ScalarFieldType, ScalarType, SchemaId};
+use crate::{ast, ScalarFieldType, ScalarType, FileId};
 use diagnostics::Span;
 use schema_ast::ast::{WithDocumentation, WithName};
 
@@ -24,7 +24,7 @@ pub type CompositeTypeFieldWalker<'db> = Walker<'db, (crate::CompositeTypeId, as
 
 impl<'db> CompositeTypeWalker<'db> {
     /// The ID of the composite type node in the AST.
-    pub fn composite_type_id(self) -> (SchemaId, ast::CompositeTypeId) {
+    pub fn composite_type_id(self) -> (FileId, ast::CompositeTypeId) {
         self.id
     }
 

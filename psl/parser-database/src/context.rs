@@ -335,7 +335,7 @@ impl<'db> Context<'db> {
         self.asts
             .0
             .iter()
-            .flat_map(|(schema_id, ast)| ast.iter_tops().map(|(top_id, top)| ((*schema_id, top_id), top)))
+            .flat_map(|(file_id, ast)| ast.iter_tops().map(|(top_id, top)| ((*file_id, top_id), top)))
     }
 
     /// Starts validating the arguments for an attribute, checking for duplicate arguments in the
@@ -447,8 +447,8 @@ fn iter_attributes<'a, 'ast: 'a>(
     attrs
         .into_iter()
         .flat_map(move |container| asts[*container].iter().enumerate().map(|a| (a, *container)))
-        .map(|((idx, attr), (schema_id, container))| {
-            ((schema_id, ast::AttributeId::new_in_container(container, idx)), attr)
+        .map(|((idx, attr), (file_id, container))| {
+            ((file_id, ast::AttributeId::new_in_container(container, idx)), attr)
         })
 }
 

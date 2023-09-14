@@ -1,13 +1,13 @@
-use crate::SchemaId;
+use crate::FileId;
 use schema_ast::ast;
 use std::{collections::HashMap, ops::Index};
 
-pub(crate) struct Files(pub(super) HashMap<SchemaId, ast::SchemaAst>);
+pub(crate) struct Files(pub(super) HashMap<FileId, ast::SchemaAst>);
 
-impl Index<crate::SchemaId> for Files {
+impl Index<crate::FileId> for Files {
     type Output = ast::SchemaAst;
 
-    fn index(&self, index: crate::SchemaId) -> &Self::Output {
+    fn index(&self, index: crate::FileId) -> &Self::Output {
         &self.0[&index]
     }
 }

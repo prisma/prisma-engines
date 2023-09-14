@@ -29,9 +29,9 @@ pub(super) fn model(model_data: &mut ModelAttributes, model_id: crate::ModelId, 
             if !unresolvable_fields.is_empty() {
                 let fields_str = unresolvable_fields
                     .into_iter()
-                    .map(|((schema_id, top_id), field_name)| match top_id {
+                    .map(|((file_id, top_id), field_name)| match top_id {
                         ast::TopId::CompositeType(ctid) => {
-                            let ct_name = ctx.asts[(schema_id, ctid)].name();
+                            let ct_name = ctx.asts[(file_id, ctid)].name();
 
                             Cow::from(format!("{field_name} in type {ct_name}"))
                         }

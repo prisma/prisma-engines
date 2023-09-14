@@ -92,9 +92,9 @@ impl ParserDatabase {
         let asts: HashMap<_, _> = schemas
             .iter()
             .enumerate()
-            .map(|(schema_idx, (_path, schema))| {
+            .map(|(file_idx, (_path, schema))| {
                 (
-                    SchemaId(schema_idx),
+                    FileId(file_idx),
                     schema_ast::parse_schema(schema.as_str(), diagnostics),
                 )
             })
@@ -176,8 +176,8 @@ impl ParserDatabase {
     }
 
     /// A parsed AST.
-    pub fn ast(&self, schema_id: SchemaId) -> &ast::SchemaAst {
-        &self.asts[schema_id]
+    pub fn ast(&self, file_id: FileId) -> &ast::SchemaAst {
+        &self.asts[file_id]
     }
 
     /// The total number of enums in the schema. This is O(1).
@@ -200,7 +200,7 @@ impl ParserDatabase {
     }
 
     /// The source file contents.
-    pub(crate) fn source(&self, file_id: SchemaId) -> &str {
+    pub(crate) fn source(&self, file_id: FileId) -> &str {
         self.schemas[file_id.0].1.as_str()
     }
 }
