@@ -152,10 +152,6 @@ impl MysqlUrl {
         self.query_params.max_idle_connection_lifetime
     }
 
-    fn statement_cache_size(&self) -> usize {
-        self.query_params.statement_cache_size
-    }
-
     pub(crate) fn cache(&self) -> LruCache<String, my::Statement> {
         LruCache::new(self.query_params.statement_cache_size)
     }
@@ -406,71 +402,23 @@ impl Mysql {
         F: Future<Output = crate::Result<T>>,
         U: Fn(my::Statement) -> F,
     {
-        if self.url.statement_cache_size() == 0 {
-            self.perform_io(|| async move {
-                let stmt = {
-                    let mut conn = self.conn.lock().await;
-                    conn.prep(sql).await?
-                };
-
-                let res = op(stmt.clone()).await;
-
-                {
-                    let mut conn = self.conn.lock().await;
-                    conn.close(stmt).await?;
-                }
-
-                res
-            })
-            .await
-        } else {
-            self.perform_io(|| async move {
-                let stmt = self.fetch_cached(sql).await?;
-                op(stmt).await
-            })
-            .await
-        }
-    }
-
-    async fn fetch_cached(&self, sql: &str) -> crate::Result<my::Statement> {
-        let mut cache = self.statement_cache.lock().await;
-        let capacity = cache.capacity();
-        let stored = cache.len();
-
-        match cache.get_mut(sql) {
-            Some(stmt) => {
-                tracing::trace!(
-                    message = "CACHE HIT!",
-                    query = sql,
-                    capacity = capacity,
-                    stored = stored,
-                );
-
-                Ok(stmt.clone()) // arc'd
-            }
-            None => {
-                tracing::trace!(
-                    message = "CACHE MISS!",
-                    query = sql,
-                    capacity = capacity,
-                    stored = stored,
-                );
-
+        self.perform_io(|| async move {
+            let stmt = {
                 let mut conn = self.conn.lock().await;
-                if cache.capacity() == cache.len() {
-                    if let Some((_, stmt)) = cache.remove_lru() {
-                        conn.close(stmt).await?;
-                    }
-                }
+                conn.prep(sql).await?
+            };
 
-                let stmt = conn.prep(sql).await?;
-                cache.insert(sql.to_string(), stmt.clone());
+            let res = op(stmt.clone()).await;
 
-                Ok(stmt)
+            {
+                let mut conn = self.conn.lock().await;
+                conn.close(stmt).await?;
             }
-        }
+
+            res
+        })
+        .await
     }
-}
 
 impl_default_TransactionCapable!(Mysql);
 
@@ -498,6 +446,8 @@ impl Queryable for Mysql {
                 if let Some(id) = last_id {
                     result_set.set_last_insert_id(id);
                 };
+
+                conn.exec_drop(stmt, conversion::conv_params(params)?).await?;
 
                 Ok(result_set)
             })
