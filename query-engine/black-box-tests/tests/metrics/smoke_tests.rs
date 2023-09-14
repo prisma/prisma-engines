@@ -15,6 +15,7 @@ mod smoke_tests {
     }
 
     #[connector_test]
+    #[rustfmt::skip]
     async fn expected_metrics_rendered(r: Runner) -> TestResult<()> {
         let mut qe_cmd = query_engine_cmd(r.prisma_dml(), "57582");
         qe_cmd.arg("--enable-metrics");
@@ -56,21 +57,20 @@ mod smoke_tests {
                 .unwrap();
 
             // counters
-            assert!(metrics.contains("prisma_client_queries_total counter"));
-            assert!(metrics.contains("prisma_datasource_queries_total counter"));
-            assert!(metrics.contains("prisma_pool_connections_opened_total counter"));
-            assert!(metrics.contains("prisma_pool_connections_closed_total counter"));
+            assert_eq!(metrics.matches("prisma_client_queries_total counter").count(), 1);
+            assert_eq!(metrics.matches("prisma_datasource_queries_total counter").count(), 1);
+            assert_eq!(metrics.matches("prisma_pool_connections_opened_total counter").count(), 1);
+            assert_eq!(metrics.matches("prisma_pool_connections_closed_total counter").count(), 1);
             // gauges
-            assert!(metrics.contains("prisma_pool_connections_open gauge"));
-            assert!(metrics.contains("prisma_pool_connections_busy gauge"));
-            assert!(metrics.contains("prisma_pool_connections_idle gauge"));
-            assert!(metrics.contains("prisma_client_queries_active gauge"));
-            assert!(metrics.contains("prisma_client_queries_wait gauge"));
+            assert_eq!(metrics.matches("prisma_pool_connections_open gauge").count(), 1);
+            assert_eq!(metrics.matches("prisma_pool_connections_busy gauge").count(), 1);
+            assert_eq!(metrics.matches("prisma_pool_connections_idle gauge").count(), 1);
+            assert_eq!(metrics.matches("prisma_client_queries_active gauge").count(), 1);
+            assert_eq!(metrics.matches("prisma_client_queries_wait gauge").count(), 1);
             // histograms
-            assert!(metrics.contains("prisma_client_queries_duration_histogram_ms histogram"));
-            assert!(metrics.contains("prisma_client_queries_wait_histogram_ms histogram"));
-            assert!(metrics.contains("prisma_datasource_queries_duration_histogram_ms histogram"));
-        })
-        .await
+            assert_eq!(metrics.matches("prisma_client_queries_duration_histogram_ms histogram").count(), 1);
+            assert_eq!(metrics.matches("prisma_client_queries_wait_histogram_ms histogram").count(), 1);
+            assert_eq!(metrics.matches("prisma_datasource_queries_duration_histogram_ms histogram").count(), 1)
+        }).await
     }
 }
