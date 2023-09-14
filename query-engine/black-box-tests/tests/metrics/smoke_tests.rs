@@ -55,8 +55,9 @@ mod smoke_tests {
                 .text()
                 .await
                 .unwrap();
-
-            println!("{}", &metrics);
+            
+            // I would have loved to use insta in here and check the snapshot but the order of the metrics is not guaranteed
+            // And I opted for the manual checking of invariant data that provided enough confidence instead
 
             assert_eq!(metrics.matches("# HELP prisma_client_queries_total The total number of Prisma Client queries executed").count(), 1);
             assert_eq!(metrics.matches("# TYPE prisma_client_queries_total counter").count(), 1);
