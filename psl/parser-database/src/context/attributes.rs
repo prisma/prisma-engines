@@ -4,7 +4,7 @@ use crate::interner::StringId;
 #[derive(Default, Debug)]
 pub(super) struct AttributesValidationState {
     /// The attributes list being validated.
-    pub(super) attributes: Option<(SchemaId, Vec<ast::AttributeContainer>)>,
+    pub(super) attributes: Option<crate::AttributeContainer>,
     pub(super) unused_attributes: HashSet<ast::AttributeId>, // the _remaining_ attributes
 
     /// The attribute being validated.
@@ -13,15 +13,11 @@ pub(super) struct AttributesValidationState {
 }
 
 impl AttributesValidationState {
-    pub(super) fn extend_attributes(
-        &mut self,
-        schema_id: SchemaId,
-        attributes: ast::AttributeContainer,
-        ast: &ast::SchemaAst,
-    ) {
+    pub(super) fn set_attributes(&mut self, attributes: crate::AttributeContainer, ast: &ast::SchemaAst) {
         let attribute_ids = (0..ast[attributes].len()).map(|idx| ast::AttributeId::new_in_container(attributes, idx));
+        self.unused_attributes.clear();
         self.unused_attributes.extend(attribute_ids);
 
-        self.attributes.push(attributes);
+        self.attributes = Some(attributes);
     }
 }

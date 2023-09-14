@@ -120,7 +120,7 @@ impl<'db> Context<'db> {
     /// - When you are done validating an attribute set, you must call
     ///   `validate_visited_attributes()`. Otherwise, Context will helpfully panic.
     pub(super) fn visit_attributes(&mut self, ast_attributes: crate::AttributeContainer) {
-        if !self.attributes.attributes.is_empty() || !self.attributes.unused_attributes.is_empty() {
+        if self.attributes.attributes.is_some() || !self.attributes.unused_attributes.is_empty() {
             panic!(
                 "`ctx.visit_attributes() called with {:?} while the Context is still validating previous attribute set on {:?}`",
                 ast_attributes,
@@ -128,10 +128,7 @@ impl<'db> Context<'db> {
             );
         }
 
-        self.attributes.attributes.clear();
-        self.attributes.unused_attributes.clear();
-        self.attributes
-            .extend_attributes(ast_attributes.1, &self.asts[&ast_attributes.0]);
+        self.attributes.set_attributes(ast_attributes, self.ast);
     }
 
     /// Look for an optional attribute with a name of the form
@@ -177,7 +174,8 @@ impl<'db> Context<'db> {
     /// is defined.
     #[must_use]
     pub(crate) fn visit_optional_single_attr(&mut self, name: &'static str) -> bool {
-        let mut attrs = iter_attributes(&self.attributes.attributes, self.ast).filter(|(_, a)| a.name.name == name);
+        let mut attrs =
+            iter_attributes(self.attributes.attributes.as_ref(), self.ast).filter(|(_, a)| a.name.name == name);
         let (first_idx, first) = match attrs.next() {
             Some(first) => first,
             None => return false,
@@ -186,7 +184,7 @@ impl<'db> Context<'db> {
 
         if attrs.next().is_some() {
             for (idx, attr) in
-                iter_attributes(&self.attributes.attributes, self.ast).filter(|(_, a)| a.name.name == name)
+                iter_attributes(self.attributes.attributes.as_ref(), self.ast).filter(|(_, a)| a.name.name == name)
             {
                 diagnostics.push_error(DatamodelError::new_duplicate_attribute_error(
                     &attr.name.name,
@@ -210,7 +208,7 @@ impl<'db> Context<'db> {
         let mut has_valid_attribute = false;
 
         while !has_valid_attribute {
-            let first_attr = iter_attributes(&self.attributes.attributes, self.ast)
+            let first_attr = iter_attributes(self.attributes.attributes.as_ref(), self.ast)
                 .filter(|(_, attr)| attr.name.name == name)
                 .find(|(attr_id, _)| self.attributes.unused_attributes.contains(attr_id));
             let (attr_id, attr) = if let Some(first_attr) = first_attr {
@@ -301,7 +299,8 @@ impl<'db> Context<'db> {
                 attribute.span,
             ))
         }
-        self.attributes.attributes.clear();
+
+        self.attributes.attributes = None;
         self.attributes.unused_attributes.clear();
     }
 
@@ -480,14 +479,13 @@ impl Index<crate::CompositeTypeId> for Context<'_> {
 
 // Implementation detail. Used for arguments validation.
 fn iter_attributes<'a, 'ast: 'a>(
-    schema_id: SchemaId,
-    attrs: &'a [ast::AttributeContainer],
-    asts: &'ast HashMap<SchemaId, ast::SchemaAst>,
+    attrs: Option<&'a crate::AttributeContainer>,
+    ast: &'ast ast::SchemaAst,
 ) -> impl Iterator<Item = (ast::AttributeId, &'ast ast::Attribute)> + 'a {
     let ast = asts[&schema_id];
     attrs
-        .iter()
-        .flat_map(move |container| ast[container].iter().enumerate().map(|a| (a, *container)))
+        .into_iter()
+        .flat_map(move |container| ast[*container].iter().enumerate().map(|a| (a, *container)))
         .map(|((idx, attr), container)| (ast::AttributeId::new_in_container(container, idx), attr))
 }
 
