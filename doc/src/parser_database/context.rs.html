@@ -565,7 +565,7 @@
     /// - When you are done validating an attribute set, you must call
     ///   `validate_visited_attributes()`. Otherwise, Context will helpfully panic.
     </span><span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>visit_attributes(<span class="kw-2">&amp;mut </span><span class="self">self</span>, ast_attributes: ast::AttributeContainer) {
-        <span class="kw">if </span>!<span class="self">self</span>.attributes.attributes.is_empty() || !<span class="self">self</span>.attributes.unused_attributes.is_empty() {
+        <span class="kw">if </span><span class="self">self</span>.attributes.attributes.is_some() || !<span class="self">self</span>.attributes.unused_attributes.is_empty() {
             <span class="macro">panic!</span>(
                 <span class="string">&quot;`ctx.visit_attributes() called with {:?} while the Context is still validating previous attribute set on {:?}`&quot;</span>,
                 ast_attributes,
@@ -573,9 +573,7 @@
             );
         }
 
-        <span class="self">self</span>.attributes.attributes.clear();
-        <span class="self">self</span>.attributes.unused_attributes.clear();
-        <span class="self">self</span>.attributes.extend_attributes(ast_attributes, <span class="self">self</span>.ast);
+        <span class="self">self</span>.attributes.set_attributes(ast_attributes, <span class="self">self</span>.ast);
     }
 
     <span class="doccomment">/// Look for an optional attribute with a name of the form
@@ -587,8 +585,8 @@
     /// with a default that can be first, but with native types, arguments are
     /// purely positional.
     </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>visit_datasource_scoped(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;(StringId, StringId, ast::AttributeId)&gt; {
-        <span class="kw">let </span>attrs =
-            iter_attributes(<span class="kw-2">&amp;</span><span class="self">self</span>.attributes.attributes, <span class="self">self</span>.ast).filter(|(<span class="kw">_</span>, attr)| attr.name.name.contains(<span class="string">&#39;.&#39;</span>));
+        <span class="kw">let </span>attrs = iter_attributes(<span class="self">self</span>.attributes.attributes.as_ref(), <span class="self">self</span>.ast)
+            .filter(|(<span class="kw">_</span>, attr)| attr.name.name.contains(<span class="string">&#39;.&#39;</span>));
         <span class="kw">let </span><span class="kw-2">mut </span>native_type_attr = <span class="prelude-val">None</span>;
         <span class="kw">let </span>diagnostics = <span class="kw-2">&amp;mut </span><span class="self">self</span>.diagnostics;
 
@@ -621,7 +619,8 @@
     /// is defined.
     </span><span class="attr">#[must_use]
     </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>visit_optional_single_attr(<span class="kw-2">&amp;mut </span><span class="self">self</span>, name: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str) -&gt; bool {
-        <span class="kw">let </span><span class="kw-2">mut </span>attrs = iter_attributes(<span class="kw-2">&amp;</span><span class="self">self</span>.attributes.attributes, <span class="self">self</span>.ast).filter(|(<span class="kw">_</span>, a)| a.name.name == name);
+        <span class="kw">let </span><span class="kw-2">mut </span>attrs =
+            iter_attributes(<span class="self">self</span>.attributes.attributes.as_ref(), <span class="self">self</span>.ast).filter(|(<span class="kw">_</span>, a)| a.name.name == name);
         <span class="kw">let </span>(first_idx, first) = <span class="kw">match </span>attrs.next() {
             <span class="prelude-val">Some</span>(first) =&gt; first,
             <span class="prelude-val">None </span>=&gt; <span class="kw">return </span><span class="bool-val">false</span>,
@@ -630,7 +629,7 @@
 
         <span class="kw">if </span>attrs.next().is_some() {
             <span class="kw">for </span>(idx, attr) <span class="kw">in
-                </span>iter_attributes(<span class="kw-2">&amp;</span><span class="self">self</span>.attributes.attributes, <span class="self">self</span>.ast).filter(|(<span class="kw">_</span>, a)| a.name.name == name)
+                </span>iter_attributes(<span class="self">self</span>.attributes.attributes.as_ref(), <span class="self">self</span>.ast).filter(|(<span class="kw">_</span>, a)| a.name.name == name)
             {
                 diagnostics.push_error(DatamodelError::new_duplicate_attribute_error(
                     <span class="kw-2">&amp;</span>attr.name.name,
@@ -654,7 +653,7 @@
         <span class="kw">let </span><span class="kw-2">mut </span>has_valid_attribute = <span class="bool-val">false</span>;
 
         <span class="kw">while </span>!has_valid_attribute {
-            <span class="kw">let </span>first_attr = iter_attributes(<span class="kw-2">&amp;</span><span class="self">self</span>.attributes.attributes, <span class="self">self</span>.ast)
+            <span class="kw">let </span>first_attr = iter_attributes(<span class="self">self</span>.attributes.attributes.as_ref(), <span class="self">self</span>.ast)
                 .filter(|(<span class="kw">_</span>, attr)| attr.name.name == name)
                 .find(|(attr_id, <span class="kw">_</span>)| <span class="self">self</span>.attributes.unused_attributes.contains(attr_id));
             <span class="kw">let </span>(attr_id, attr) = <span class="kw">if let </span><span class="prelude-val">Some</span>(first_attr) = first_attr {
@@ -745,7 +744,8 @@
                 attribute.span,
             ))
         }
-        <span class="self">self</span>.attributes.attributes.clear();
+
+        <span class="self">self</span>.attributes.attributes = <span class="prelude-val">None</span>;
         <span class="self">self</span>.attributes.unused_attributes.clear();
     }
 
@@ -878,11 +878,11 @@
 
 <span class="comment">// Implementation detail. Used for arguments validation.
 </span><span class="kw">fn </span>iter_attributes&lt;<span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;ast</span>: <span class="lifetime">&#39;a</span>&gt;(
-    attrs: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>[ast::AttributeContainer],
+    attrs: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>ast::AttributeContainer&gt;,
     ast: <span class="kw-2">&amp;</span><span class="lifetime">&#39;ast </span>ast::SchemaAst,
 ) -&gt; <span class="kw">impl </span>Iterator&lt;Item = (ast::AttributeId, <span class="kw-2">&amp;</span><span class="lifetime">&#39;ast </span>ast::Attribute)&gt; + <span class="lifetime">&#39;a </span>{
     attrs
-        .iter()
+        .into_iter()
         .flat_map(<span class="kw">move </span>|container| ast[<span class="kw-2">*</span>container].iter().enumerate().map(|a| (a, <span class="kw-2">*</span>container)))
         .map(|((idx, attr), container)| (ast::AttributeId::new_in_container(container, idx), attr))
 }

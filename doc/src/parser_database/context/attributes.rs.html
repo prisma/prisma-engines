@@ -20,13 +20,14 @@
 <a href="#20" id="20">20</a>
 <a href="#21" id="21">21</a>
 <a href="#22" id="22">22</a>
+<a href="#23" id="23">23</a>
 </pre></div><pre class="rust"><code><span class="kw">use super</span>::<span class="kw-2">*</span>;
 <span class="kw">use </span><span class="kw">crate</span>::interner::StringId;
 
 <span class="attr">#[derive(Default, Debug)]
 </span><span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">struct </span>AttributesValidationState {
     <span class="doccomment">/// The attributes list being validated.
-    </span><span class="kw">pub</span>(<span class="kw">super</span>) attributes: Vec&lt;ast::AttributeContainer&gt;,
+    </span><span class="kw">pub</span>(<span class="kw">super</span>) attributes: <span class="prelude-ty">Option</span>&lt;ast::AttributeContainer&gt;,
     <span class="kw">pub</span>(<span class="kw">super</span>) unused_attributes: HashSet&lt;ast::AttributeId&gt;, <span class="comment">// the _remaining_ attributes
 
     </span><span class="doccomment">/// The attribute being validated.
@@ -35,11 +36,12 @@
 </span>}
 
 <span class="kw">impl </span>AttributesValidationState {
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>extend_attributes(<span class="kw-2">&amp;mut </span><span class="self">self</span>, attributes: ast::AttributeContainer, ast: <span class="kw-2">&amp;</span>ast::SchemaAst) {
+    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>set_attributes(<span class="kw-2">&amp;mut </span><span class="self">self</span>, attributes: ast::AttributeContainer, ast: <span class="kw-2">&amp;</span>ast::SchemaAst) {
         <span class="kw">let </span>attribute_ids = (<span class="number">0</span>..ast[attributes].len()).map(|idx| ast::AttributeId::new_in_container(attributes, idx));
+        <span class="self">self</span>.unused_attributes.clear();
         <span class="self">self</span>.unused_attributes.extend(attribute_ids);
 
-        <span class="self">self</span>.attributes.push(attributes);
+        <span class="self">self</span>.attributes = <span class="prelude-val">Some</span>(attributes);
     }
 }
 </code></pre></div></section></main></body></html>
