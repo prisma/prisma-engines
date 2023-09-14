@@ -79,11 +79,11 @@ const ACCEPT_LIST: &[&str] = &[
     MOBC_POOL_CONNECTIONS_IDLE,
     MOBC_POOL_WAIT_COUNT,
     MOBC_POOL_WAIT_DURATION,
-    PRISMA_CLIENT_QUERIES_DURATION_HISTOGRAM_MS,
     PRISMA_CLIENT_QUERIES_TOTAL,
-    PRISMA_DATASOURCE_QUERIES_DURATION_HISTOGRAM_MS,
     PRISMA_DATASOURCE_QUERIES_TOTAL,
     PRISMA_CLIENT_QUERIES_ACTIVE,
+    PRISMA_CLIENT_QUERIES_DURATION_HISTOGRAM_MS,
+    PRISMA_DATASOURCE_QUERIES_DURATION_HISTOGRAM_MS,
 ];
 
 // Some of the metrics we receive have their internal names, and we need to expose them under a different
@@ -141,8 +141,8 @@ pub fn describe_metrics() {
 
     absolute_counter!(PRISMA_CLIENT_QUERIES_TOTAL, 0);
     absolute_counter!(PRISMA_DATASOURCE_QUERIES_TOTAL, 0);
-    absolute_counter!(PRISMA_POOL_CONNECTIONS_OPENED_TOTAL, 0);
-    absolute_counter!(PRISMA_POOL_CONNECTIONS_CLOSED_TOTAL, 0);
+    absolute_counter!(MOBC_POOL_CONNECTIONS_OPENED_TOTAL, 0);
+    absolute_counter!(MOBC_POOL_CONNECTIONS_CLOSED_TOTAL, 0);
 
     // gauges
     describe_gauge!(
@@ -166,9 +166,9 @@ pub fn describe_metrics() {
         "Number of currently active Prisma Client queries"
     );
 
-    gauge!(PRISMA_POOL_CONNECTIONS_OPEN, 0.0);
-    gauge!(PRISMA_POOL_CONNECTIONS_BUSY, 0.0);
-    gauge!(PRISMA_POOL_CONNECTIONS_IDLE, 0.0);
+    gauge!(MOBC_POOL_CONNECTIONS_OPEN, 0.0);
+    gauge!(MOBC_POOL_CONNECTIONS_BUSY, 0.0);
+    gauge!(MOBC_POOL_CONNECTIONS_IDLE, 0.0);
     gauge!(PRISMA_CLIENT_QUERIES_WAIT, 0.0);
     gauge!(PRISMA_CLIENT_QUERIES_ACTIVE, 0.0);
 

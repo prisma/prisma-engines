@@ -99,6 +99,16 @@ pub(crate) fn available_actions(schema: String, params: CodeActionParams) -> Vec
                     complete_relation.referencing_field(),
                 );
             }
+
+            if validated_schema.relation_mode().uses_foreign_keys() {
+                relation_mode::replace_set_default_mysql(
+                    &mut actions,
+                    &params,
+                    validated_schema.db.source(),
+                    complete_relation,
+                    config,
+                )
+            }
         }
     }
 
