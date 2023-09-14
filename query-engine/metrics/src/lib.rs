@@ -128,7 +128,7 @@ pub fn describe_metrics() {
     );
     describe_counter!(
         PRISMA_DATASOURCE_QUERIES_TOTAL,
-        "Total number of Datasource Queries executed"
+        "Total number of datasource queries executed"
     );
     describe_counter!(
         PRISMA_POOL_CONNECTIONS_OPENED_TOTAL,
@@ -179,7 +179,7 @@ pub fn describe_metrics() {
     );
     describe_histogram!(
         PRISMA_DATASOURCE_QUERIES_DURATION_HISTOGRAM_MS,
-        "Histogram of the duration of all executed Datasource Queries in ms"
+        "Histogram of the duration of all executed datasource queries in ms"
     );
     describe_histogram!(
         PRISMA_CLIENT_QUERIES_DURATION_HISTOGRAM_MS,
