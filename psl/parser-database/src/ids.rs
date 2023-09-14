@@ -1,13 +1,5 @@
 use schema_ast::ast;
-
-/// The stable identifier for a PSL file.
-#[derive(Debug, PartialEq, Clone, Copy, Hash, Eq, PartialOrd, Ord)]
-pub struct FileId(pub(crate) usize);
-
-impl FileId {
-    pub(crate) const ZERO: FileId = FileId(0);
-    pub(crate) const MAX: FileId = FileId(usize::MAX);
-}
+use diagnostics::FileId;
 
 /// An AST identifier with the accompanyin file ID.
 pub type InFile<Id> = (FileId, Id);

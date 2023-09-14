@@ -39,6 +39,7 @@ mod relations;
 mod types;
 
 pub use coerce_expression::{coerce, coerce_array, coerce_opt};
+pub use diagnostics::FileId;
 pub use ids::*;
 pub use names::is_reserved_type_name;
 pub use relations::{ManyToManyRelationId, ReferentialAction, RelationId};
@@ -93,7 +94,10 @@ impl ParserDatabase {
             .iter()
             .enumerate()
             .map(|(file_idx, (_path, schema))| {
-                (FileId(file_idx), schema_ast::parse_schema(schema.as_str(), diagnostics))
+                (
+                    FileId(file_idx),
+                    schema_ast::parse_schema(schema.as_str(), diagnostics, FileId(file_idx)),
+                )
             })
             .collect();
         let asts = Files(asts);

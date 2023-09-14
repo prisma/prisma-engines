@@ -75,7 +75,7 @@ pub fn parse_configuration(
     connectors: ConnectorRegistry,
 ) -> Result<Configuration, diagnostics::Diagnostics> {
     let mut diagnostics = Diagnostics::default();
-    let ast = schema_ast::parse_schema(schema, &mut diagnostics);
+    let ast = schema_ast::parse_schema(schema, &mut diagnostics, diagnostics::FileId::ZERO);
     let out = validate_configuration(&ast, &mut diagnostics, connectors);
     diagnostics.to_result().map(|_| out)
 }
