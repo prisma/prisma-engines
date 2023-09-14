@@ -75,11 +75,11 @@ pub(crate) struct Relations {
     /// (model_a, model_b, relation_idx)
     ///
     /// This can be interpreted as the relations _from_ a model.
-    forward: BTreeSet<((FileId, ast::ModelId), (FileId, ast::ModelId), RelationId)>,
+    forward: BTreeSet<(crate::ModelId, crate::ModelId, RelationId)>,
     /// (model_b, model_a, relation_idx)
     ///
     /// This can be interpreted as the relations _to_ a model.
-    back: BTreeSet<((FileId, ast::ModelId), (FileId, ast::ModelId), RelationId)>,
+    back: BTreeSet<(crate::ModelId, crate::ModelId, RelationId)>,
 }
 
 impl std::ops::Index<RelationId> for Relations {

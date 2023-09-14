@@ -1,5 +1,5 @@
 use super::Walker;
-use crate::{ast, ScalarFieldType, ScalarType, FileId};
+use crate::{ast, FileId, ScalarFieldType, ScalarType};
 use diagnostics::Span;
 use schema_ast::ast::{WithDocumentation, WithName};
 

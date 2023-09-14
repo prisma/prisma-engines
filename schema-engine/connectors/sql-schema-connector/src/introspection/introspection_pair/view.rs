@@ -1,7 +1,7 @@
 use super::{IdPair, IndexPair, IntrospectionPair, RelationFieldPair, ScalarFieldPair};
 use psl::{
     parser_database::{self as db, walkers},
-    schema_ast::ast::{self, WithDocumentation},
+    schema_ast::ast::WithDocumentation,
 };
 use sql_schema_describer as sql;
 use std::borrow::Cow;

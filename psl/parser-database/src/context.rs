@@ -141,7 +141,7 @@ impl<'db> Context<'db> {
     /// with a default that can be first, but with native types, arguments are
     /// purely positional.
     pub(crate) fn visit_datasource_scoped(&mut self) -> Option<(StringId, StringId, crate::AttributeId)> {
-        let attrs = iter_attributes(self.attributes.attributes.as_ref(), &self.asts)
+        let attrs = iter_attributes(self.attributes.attributes.as_ref(), self.asts)
             .filter(|(_, attr)| attr.name.name.contains('.'));
         let mut native_type_attr = None;
         let diagnostics = &mut self.diagnostics;
@@ -176,7 +176,7 @@ impl<'db> Context<'db> {
     #[must_use]
     pub(crate) fn visit_optional_single_attr(&mut self, name: &'static str) -> bool {
         let mut attrs =
-            iter_attributes(self.attributes.attributes.as_ref(), &self.asts).filter(|(_, a)| a.name.name == name);
+            iter_attributes(self.attributes.attributes.as_ref(), self.asts).filter(|(_, a)| a.name.name == name);
         let (first_idx, first) = match attrs.next() {
             Some(first) => first,
             None => return false,
@@ -185,7 +185,7 @@ impl<'db> Context<'db> {
 
         if attrs.next().is_some() {
             for (idx, attr) in
-                iter_attributes(self.attributes.attributes.as_ref(), &self.asts).filter(|(_, a)| a.name.name == name)
+                iter_attributes(self.attributes.attributes.as_ref(), self.asts).filter(|(_, a)| a.name.name == name)
             {
                 diagnostics.push_error(DatamodelError::new_duplicate_attribute_error(
                     &attr.name.name,
@@ -209,9 +209,9 @@ impl<'db> Context<'db> {
         let mut has_valid_attribute = false;
 
         while !has_valid_attribute {
-            let first_attr = iter_attributes(self.attributes.attributes.as_ref(), &self.asts)
+            let first_attr = iter_attributes(self.attributes.attributes.as_ref(), self.asts)
                 .filter(|(_, attr)| attr.name.name == name)
-                .find(|(attr_id, _)| self.attributes.unused_attributes.contains(&attr_id));
+                .find(|(attr_id, _)| self.attributes.unused_attributes.contains(attr_id));
             let (attr_id, attr) = if let Some(first_attr) = first_attr {
                 first_attr
             } else {

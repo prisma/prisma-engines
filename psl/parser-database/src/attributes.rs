@@ -127,7 +127,7 @@ fn resolve_model_attributes(model_id: crate::ModelId, ctx: &mut Context<'_>) {
     }
 
     // Resolve all the attributes defined on the model itself **in isolation**.
-    ctx.visit_attributes(model_id.into());
+    ctx.visit_attributes(model_id);
 
     // @@ignore
     if ctx.visit_optional_single_attr("ignore") {
