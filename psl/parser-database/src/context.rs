@@ -6,7 +6,10 @@ use crate::{
     SchemaId, StringId,
 };
 use schema_ast::ast::{Expression, WithName};
-use std::collections::{HashMap, HashSet};
+use std::{
+    collections::{HashMap, HashSet},
+    ops::Index,
+};
 
 /// Validation context. This is an implementation detail of ParserDatabase. It
 /// contains the database itself, as well as context that is discarded after
@@ -30,10 +33,10 @@ pub(crate) struct Context<'db> {
     attributes: AttributesValidationState, // state machine for attribute validation
 
     // @map'ed names indexes. These are not in the db because they are only used for validation.
-    pub(super) mapped_model_scalar_field_names: HashMap<(ast::ModelId, StringId), ast::FieldId>,
-    pub(super) mapped_composite_type_names: HashMap<(ast::CompositeTypeId, StringId), ast::FieldId>,
-    pub(super) mapped_enum_names: HashMap<StringId, ast::EnumId>,
-    pub(super) mapped_enum_value_names: HashMap<(ast::EnumId, StringId), u32>,
+    pub(super) mapped_model_scalar_field_names: HashMap<(crate::ModelId, StringId), ast::FieldId>,
+    pub(super) mapped_composite_type_names: HashMap<(crate::CompositeTypeId, StringId), ast::FieldId>,
+    pub(super) mapped_enum_names: HashMap<StringId, crate::EnumId>,
+    pub(super) mapped_enum_value_names: HashMap<(crate::EnumId, StringId), u32>,
 }
 
 impl<'db> Context<'db> {
@@ -68,7 +71,7 @@ impl<'db> Context<'db> {
     /// Return the attribute currently being validated. Panics if the context is not in the right
     /// state.
     #[track_caller]
-    pub(crate) fn current_attribute_id(&self) -> (SchemaId, ast::AttributeId) {
+    pub(crate) fn current_attribute_id(&self) -> crate::AttributeId {
         self.attributes.attribute.unwrap()
     }
 
@@ -102,13 +105,8 @@ impl<'db> Context<'db> {
     ///
     /// Other than for this peculiarity, this method is identical to
     /// `visit_attributes()`.
-    pub(super) fn visit_scalar_field_attributes(
-        &mut self,
-        schema_id: SchemaId,
-        model_id: ast::ModelId,
-        field_id: ast::FieldId,
-    ) {
-        self.visit_attributes(schema_id, (model_id, field_id).into());
+    pub(super) fn visit_scalar_field_attributes(&mut self, model_id: crate::ModelId, field_id: ast::FieldId) {
+        self.visit_attributes((model_id.0, (model_id.1, field_id).into()));
     }
 
     /// All attribute validation should go through `visit_attributes()`. It lets
@@ -121,7 +119,7 @@ impl<'db> Context<'db> {
     ///   `validate_visited_arguments()`. Otherwise, Context will helpfully panic.
     /// - When you are done validating an attribute set, you must call
     ///   `validate_visited_attributes()`. Otherwise, Context will helpfully panic.
-    pub(super) fn visit_attributes(&mut self, schema_id: SchemaId, ast_attributes: ast::AttributeContainer) {
+    pub(super) fn visit_attributes(&mut self, ast_attributes: crate::AttributeContainer) {
         if !self.attributes.attributes.is_empty() || !self.attributes.unused_attributes.is_empty() {
             panic!(
                 "`ctx.visit_attributes() called with {:?} while the Context is still validating previous attribute set on {:?}`",
@@ -133,7 +131,7 @@ impl<'db> Context<'db> {
         self.attributes.attributes.clear();
         self.attributes.unused_attributes.clear();
         self.attributes
-            .extend_attributes(ast_attributes, &self.asts[&schema_id]);
+            .extend_attributes(ast_attributes.1, &self.asts[&ast_attributes.0]);
     }
 
     /// Look for an optional attribute with a name of the form
@@ -144,7 +142,7 @@ impl<'db> Context<'db> {
     /// arguments to other attributes: everywhere else, attributes are named,
     /// with a default that can be first, but with native types, arguments are
     /// purely positional.
-    pub(crate) fn visit_datasource_scoped(&mut self) -> Option<(StringId, StringId, ast::AttributeId)> {
+    pub(crate) fn visit_datasource_scoped(&mut self) -> Option<(StringId, StringId, crate::AttributeId)> {
         let attrs =
             iter_attributes(&self.attributes.attributes, self.ast).filter(|(_, attr)| attr.name.name.contains('.'));
         let mut native_type_attr = None;
@@ -440,14 +438,56 @@ impl<'db> Context<'db> {
     }
 }
 
+impl Index<crate::EnumId> for Context<'_> {
+    type Output = ast::Enum;
+
+    fn index(&self, index: crate::EnumId) -> &Self::Output {
+        &self.asts[&index.0][index.1]
+    }
+}
+
+impl Index<crate::AttributeId> for Context<'_> {
+    type Output = ast::Attribute;
+
+    fn index(&self, index: crate::AttributeId) -> &Self::Output {
+        &self.asts[&index.0][index.1]
+    }
+}
+
+impl Index<crate::SchemaId> for Context<'_> {
+    type Output = ast::SchemaAst;
+
+    fn index(&self, index: crate::SchemaId) -> &Self::Output {
+        &self.asts[&index]
+    }
+}
+
+impl Index<crate::ModelId> for Context<'_> {
+    type Output = ast::Model;
+
+    fn index(&self, index: crate::ModelId) -> &Self::Output {
+        &self[index.0][index.1]
+    }
+}
+
+impl Index<crate::CompositeTypeId> for Context<'_> {
+    type Output = ast::CompositeType;
+
+    fn index(&self, index: crate::CompositeTypeId) -> &Self::Output {
+        &self[index.0][index.1]
+    }
+}
+
 // Implementation detail. Used for arguments validation.
 fn iter_attributes<'a, 'ast: 'a>(
+    schema_id: SchemaId,
     attrs: &'a [ast::AttributeContainer],
-    ast: &'ast ast::SchemaAst,
+    asts: &'ast HashMap<SchemaId, ast::SchemaAst>,
 ) -> impl Iterator<Item = (ast::AttributeId, &'ast ast::Attribute)> + 'a {
+    let ast = asts[&schema_id];
     attrs
         .iter()
-        .flat_map(move |container| ast[*container].iter().enumerate().map(|a| (a, *container)))
+        .flat_map(move |container| ast[container].iter().enumerate().map(|a| (a, *container)))
         .map(|((idx, attr), container)| (ast::AttributeId::new_in_container(container, idx), attr))
 }
 

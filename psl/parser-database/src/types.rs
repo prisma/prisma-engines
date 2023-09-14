@@ -13,7 +13,7 @@ pub(super) fn resolve_types(ctx: &mut Context<'_>) {
             (ast::TopId::Model(model_id), ast::Top::Model(model)) => visit_model(schema_id, model_id, model, ctx),
             (ast::TopId::Enum(_), ast::Top::Enum(enm)) => visit_enum(enm, ctx),
             (ast::TopId::CompositeType(ct_id), ast::Top::CompositeType(ct)) => {
-                visit_composite_type(schema_id, ct_id, ct, ctx)
+                visit_composite_type((schema_id, ct_id), ct, ctx)
             }
             (_, ast::Top::Source(_)) | (_, ast::Top::Generator(_)) => (),
             _ => unreachable!(),
@@ -23,7 +23,7 @@ pub(super) fn resolve_types(ctx: &mut Context<'_>) {
 
 #[derive(Debug, Default)]
 pub(super) struct Types {
-    pub(super) composite_type_fields: BTreeMap<(SchemaId, ast::CompositeTypeId, ast::FieldId), CompositeTypeField>,
+    pub(super) composite_type_fields: BTreeMap<(crate::CompositeTypeId, ast::FieldId), CompositeTypeField>,
     scalar_fields: Vec<ScalarField>,
     /// This contains only the relation fields actually present in the schema
     /// source text.
@@ -263,7 +263,7 @@ impl ScalarFieldType {
 pub(crate) struct DefaultAttribute {
     pub(crate) mapped_name: Option<StringId>,
     pub(crate) argument_idx: usize,
-    pub(crate) default_attribute: ast::AttributeId,
+    pub(crate) default_attribute: crate::AttributeId,
 }
 
 #[derive(Debug)]
@@ -493,7 +493,7 @@ impl IndexAttribute {
 pub(crate) struct IdAttribute {
     pub(crate) fields: Vec<FieldWithArgs>,
     pub(super) source_field: Option<ast::FieldId>,
-    pub(super) source_attribute: ast::AttributeId,
+    pub(super) source_attribute: crate::AttributeId,
     pub(super) name: Option<StringId>,
     pub(super) mapped_name: Option<StringId>,
     pub(super) clustered: Option<bool>,
@@ -603,10 +603,10 @@ impl IndexFieldPath {
     /// or in a composite type embedded in the model. Returns the same value as
     /// the [`root`](Self::root()) method if the field is in a model rather than in a
     /// composite type.
-    pub fn field_in_index(&self) -> Either<ScalarFieldId, (SchemaId, ast::CompositeTypeId, ast::FieldId)> {
+    pub fn field_in_index(&self) -> Either<ScalarFieldId, (crate::CompositeTypeId, ast::FieldId)> {
         self.path
             .last()
-            .map(|id| Either::Right(*id))
+            .map(|(mut schema, mut ct, mut field)| Either::Right(((schema, ct), field)))
             .unwrap_or(Either::Left(self.root))
     }
 }
@@ -658,12 +658,7 @@ fn visit_model<'db>(schema_id: SchemaId, model_id: ast::ModelId, ast_model: &'db
     }
 }
 
-fn visit_composite_type<'db>(
-    schema_id: SchemaId,
-    ct_id: ast::CompositeTypeId,
-    ct: &'db ast::CompositeType,
-    ctx: &mut Context<'db>,
-) {
+fn visit_composite_type<'db>(ct_id: crate::CompositeTypeId, ct: &'db ast::CompositeType, ctx: &mut Context<'db>) {
     for (field_id, ast_field) in ct.iter_fields() {
         match field_type(ast_field, ctx) {
             Ok(FieldType::Scalar(scalar_type)) => {
@@ -673,9 +668,7 @@ fn visit_composite_type<'db>(
                     default: None,
                     native_type: None,
                 };
-                ctx.types
-                    .composite_type_fields
-                    .insert((schema_id, ct_id, field_id), field);
+                ctx.types.composite_type_fields.insert((ct_id, field_id), field);
             }
             Ok(FieldType::Model((referenced_model_schema, referenced_model_id))) => {
                 let referenced_model_name = ctx.asts[&referenced_model_schema][referenced_model_id].name();

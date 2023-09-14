@@ -9,6 +9,10 @@ impl SchemaId {
 }
 
 pub type InFile<Id> = (SchemaId, Id);
+
 pub(crate) type ModelId = InFile<ast::ModelId>;
 pub(crate) type EnumId = InFile<ast::EnumId>;
 pub(crate) type CompositeTypeId = InFile<ast::CompositeTypeId>;
+pub(crate) type TopId = InFile<ast::TopId>;
+pub(crate) type AttributeId = InFile<ast::AttributeId>;
+pub(crate) type AttributeContainer = InFile<ast::AttributeContainer>;

@@ -23,12 +23,14 @@ pub(super) fn resolve_attributes(ctx: &mut Context<'_>) {
         visit_relation_field_attributes(rfid, ctx);
     }
 
-    for top in ctx.ast.iter_tops() {
+    for top in ctx.iter_tops() {
         match top {
-            (ast::TopId::Model(model_id), ast::Top::Model(_)) => resolve_model_attributes(model_id, ctx),
-            (ast::TopId::Enum(enum_id), ast::Top::Enum(ast_enum)) => resolve_enum_attributes(enum_id, ast_enum, ctx),
-            (ast::TopId::CompositeType(ctid), ast::Top::CompositeType(ct)) => {
-                resolve_composite_type_attributes(ctid, ct, ctx)
+            (schema_id, ast::TopId::Model(model_id), ast::Top::Model(_)) => resolve_model_attributes(model_id, ctx),
+            (schema_id, ast::TopId::Enum(enum_id), ast::Top::Enum(ast_enum)) => {
+                resolve_enum_attributes(enum_id, ast_enum, ctx)
+            }
+            (schema_id, ast::TopId::CompositeType(ctid), ast::Top::CompositeType(ct)) => {
+                resolve_composite_type_attributes((schema_id, ctid), ct, ctx)
             }
             _ => (),
         }
@@ -36,14 +38,14 @@ pub(super) fn resolve_attributes(ctx: &mut Context<'_>) {
 }
 
 fn resolve_composite_type_attributes<'db>(
-    ctid: ast::CompositeTypeId,
+    ctid: crate::CompositeTypeId,
     ct: &'db ast::CompositeType,
     ctx: &mut Context<'db>,
 ) {
     for (field_id, field) in ct.iter_fields() {
         let CompositeTypeField { r#type, .. } = ctx.types.composite_type_fields[&(ctid, field_id)];
 
-        ctx.visit_attributes((ctid, field_id).into());
+        ctx.visit_attributes((ctid.0, (ctid.1, field_id).into()));
 
         if let ScalarFieldType::BuiltInScalar(_scalar_type) = r#type {
             // native type attributes
@@ -52,7 +54,7 @@ fn resolve_composite_type_attributes<'db>(
                     (ctid, field_id),
                     datasource_name,
                     type_name,
-                    &ctx.ast[args],
+                    &ctx[args],
                     ctx,
                 )
             }
@@ -806,7 +808,7 @@ enum FieldResolutionError<'ast> {
     AlreadyDealtWith,
     ProblematicFields {
         /// Fields that do not exist on the model.
-        unknown_fields: Vec<(ast::TopId, &'ast str)>,
+        unknown_fields: Vec<(crate::TopId, &'ast str)>,
         /// Fields that exist on the model but are relation fields.
         relation_fields: Vec<(&'ast ast::Field, ast::FieldId)>,
     },
@@ -900,7 +902,7 @@ impl FieldResolvingSetup {
 fn resolve_field_array_with_args<'db>(
     values: &'db ast::Expression,
     attribute_span: ast::Span,
-    model_id: ast::ModelId,
+    model_id: crate::ModelId,
     resolving: FieldResolvingSetup,
     ctx: &mut Context<'db>,
 ) -> Result<Vec<FieldWithArgs>, FieldResolutionError<'db>> {
@@ -913,7 +915,7 @@ fn resolve_field_array_with_args<'db>(
     let mut unknown_fields = Vec::new();
     let mut relation_fields = Vec::new();
 
-    let ast_model = &ctx.ast[model_id];
+    let ast_model = &ctx[model_id];
 
     'fields: for attrs in &constant_array {
         let path = if attrs.field_name.contains('.') {

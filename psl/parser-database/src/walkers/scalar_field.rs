@@ -18,13 +18,8 @@ impl<'db> ScalarFieldWalker<'db> {
 
     /// The field node in the AST.
     pub fn ast_field(self) -> &'db ast::Field {
-        let ScalarField {
-            schema_id,
-            model_id,
-            field_id,
-            ..
-        } = self.attributes();
-        &self.db.asts[schema_id][*model_id][*field_id]
+        let ScalarField { model_id, field_id, .. } = self.attributes();
+        &self.db.asts[&model_id.0][model_id.1][*field_id]
     }
 
     /// Is this field unique? This method will return true if:
@@ -58,7 +53,7 @@ impl<'db> ScalarFieldWalker<'db> {
             .default
             .as_ref()
             .map(|d| d.default_attribute)
-            .map(|id| &self.db.ast[id])
+            .map(|id| &self.db.asts[&id.0][id.1])
     }
 
     /// The final database name of the field. See crate docs for explanations on database names.

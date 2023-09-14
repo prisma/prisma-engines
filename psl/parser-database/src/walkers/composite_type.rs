@@ -17,10 +17,10 @@ use schema_ast::ast::{WithDocumentation, WithName};
 ///     countryCode String
 /// }
 /// ```
-pub type CompositeTypeWalker<'db> = Walker<'db, (SchemaId, ast::CompositeTypeId)>;
+pub type CompositeTypeWalker<'db> = Walker<'db, crate::CompositeTypeId>;
 
 /// A field in a composite type.
-pub type CompositeTypeFieldWalker<'db> = Walker<'db, (SchemaId, ast::CompositeTypeId, ast::FieldId)>;
+pub type CompositeTypeFieldWalker<'db> = Walker<'db, (crate::CompositeTypeId, ast::FieldId)>;
 
 impl<'db> CompositeTypeWalker<'db> {
     /// The ID of the composite type node in the AST.
@@ -42,7 +42,7 @@ impl<'db> CompositeTypeWalker<'db> {
     pub fn fields(self) -> impl ExactSizeIterator<Item = CompositeTypeFieldWalker<'db>> + Clone {
         self.ast_composite_type()
             .iter_fields()
-            .map(move |(id, _)| self.walk((self.id.0, self.id.1, id)))
+            .map(move |(id, _)| self.walk((self.id, id)))
     }
 }
 
@@ -53,12 +53,12 @@ impl<'db> CompositeTypeFieldWalker<'db> {
 
     /// The AST node for the field.
     pub fn ast_field(self) -> &'db ast::Field {
-        &self.db.asts[&self.id.0][self.id.1][self.id.2]
+        &self.db.asts[&self.id.0 .0][self.id.0 .1][self.id.1]
     }
 
     /// The composite type containing the field.
     pub fn composite_type(self) -> CompositeTypeWalker<'db> {
-        self.db.walk((self.id.0, self.id.1))
+        self.db.walk(self.id.0)
     }
 
     /// The optional documentation string of the field.
@@ -73,7 +73,7 @@ impl<'db> CompositeTypeFieldWalker<'db> {
 
     /// The ID of the field in the AST.
     pub fn field_id(self) -> ast::FieldId {
-        self.id.2
+        self.id.1
     }
 
     /// The name of the field.
@@ -104,7 +104,7 @@ impl<'db> CompositeTypeFieldWalker<'db> {
         self.field()
             .default
             .as_ref()
-            .map(|d| &self.db.ast(&self.id.0)[d.default_attribute])
+            .map(|d| &self.db.ast(&self.id.0 .0)[d.default_attribute.1])
     }
 
     /// (attribute scope, native type name, arguments, span)
