@@ -1,5 +1,6 @@
 use schema_ast::ast;
 
+/// The stable identifier for a PSL file.
 #[derive(Debug, PartialEq, Clone, Copy, Hash, Eq, PartialOrd, Ord)]
 pub struct SchemaId(pub(crate) usize);
 
@@ -8,11 +9,23 @@ impl SchemaId {
     pub(crate) const MAX: SchemaId = SchemaId(usize::MAX);
 }
 
+/// An AST identifier with the accompanyin file ID.
 pub type InFile<Id> = (SchemaId, Id);
 
-pub(crate) type ModelId = InFile<ast::ModelId>;
-pub(crate) type EnumId = InFile<ast::EnumId>;
-pub(crate) type CompositeTypeId = InFile<ast::CompositeTypeId>;
-pub(crate) type TopId = InFile<ast::TopId>;
-pub(crate) type AttributeId = InFile<ast::AttributeId>;
-pub(crate) type AttributeContainer = InFile<ast::AttributeContainer>;
+/// See [ast::ModelId]
+pub type ModelId = InFile<ast::ModelId>;
+
+/// See [ast::EnumId]
+pub type EnumId = InFile<ast::EnumId>;
+
+/// See [ast::CompositeTypeId]
+pub type CompositeTypeId = InFile<ast::CompositeTypeId>;
+
+/// See [ast::TopId]
+pub type TopId = InFile<ast::TopId>;
+
+/// See [ast::AttributeId]
+pub type AttributeId = InFile<ast::AttributeId>;
+
+/// See [ast::AttributeContainer]
+pub type AttributeContainer = InFile<ast::AttributeContainer>;

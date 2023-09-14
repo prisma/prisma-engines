@@ -19,7 +19,7 @@ pub(super) fn visit_model_field_default(
         Err(err) => return ctx.push_error(err),
     };
 
-    let ast_model = &ctx[model_id];
+    let ast_model = &ctx.asts[model_id];
     let ast_field = &ast_model[field_id];
 
     let mapped_name = default_attribute_mapped_name(ctx);
@@ -84,7 +84,7 @@ pub(super) fn visit_composite_field_default(
         Err(err) => return ctx.push_error(err),
     };
 
-    let ast_model = &ctx[ct_id];
+    let ast_model = &ctx.asts[ct_id];
     let ast_field = &ast_model[field_id];
 
     if ctx.visit_optional_arg("map").is_some() {
@@ -184,7 +184,7 @@ fn validate_model_builtin_scalar_type_default(
     field_id: (crate::ModelId, ast::FieldId),
     ctx: &mut Context<'_>,
 ) {
-    let arity = ctx[field_id.0][field_id.1].arity;
+    let arity = ctx.asts[field_id.0][field_id.1].arity;
     match (scalar_type, value) {
         // Functions
         (_, ast::Expression::Function(funcname, _, _)) if funcname == FN_AUTOINCREMENT && mapped_name.is_some() => {
@@ -330,7 +330,7 @@ fn validate_default_value_on_composite_type(
     ctx: &mut Context<'_>,
 ) {
     let attr = ctx.current_attribute();
-    let ct_name = ctx[ctid].name();
+    let ct_name = ctx.asts[ctid].name();
 
     ctx.push_error(DatamodelError::new_composite_type_field_validation_error(
         "Defaults on fields of type composite are not supported. Please remove the `@default` attribute.",
@@ -405,7 +405,7 @@ fn validate_enum_default(
 ) {
     match found_value {
         ast::Expression::ConstantValue(enum_value, _) => {
-            if ctx[enum_id].values.iter().any(|v| v.name() == enum_value) {
+            if ctx.asts[enum_id].values.iter().any(|v| v.name() == enum_value) {
                 accept(ctx)
             } else {
                 validate_invalid_default_enum_value(enum_value, ctx);

@@ -30,7 +30,7 @@ impl<'db> CompositeTypeWalker<'db> {
 
     /// The composite type node in the AST.
     pub fn ast_composite_type(self) -> &'db ast::CompositeType {
-        &self.db.asts[&self.id.0][self.id.1]
+        &self.db.asts[self.id]
     }
 
     /// The name of the composite type in the schema.
@@ -53,7 +53,7 @@ impl<'db> CompositeTypeFieldWalker<'db> {
 
     /// The AST node for the field.
     pub fn ast_field(self) -> &'db ast::Field {
-        &self.db.asts[&self.id.0 .0][self.id.0 .1][self.id.1]
+        &self.db.asts[self.id.0][self.id.1]
     }
 
     /// The composite type containing the field.
@@ -104,7 +104,7 @@ impl<'db> CompositeTypeFieldWalker<'db> {
         self.field()
             .default
             .as_ref()
-            .map(|d| &self.db.ast(&self.id.0 .0)[d.default_attribute.1])
+            .map(|d| &self.db.asts[self.id.0 .0][d.default_attribute.1])
     }
 
     /// (attribute scope, native type name, arguments, span)

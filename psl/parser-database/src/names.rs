@@ -35,7 +35,7 @@ pub(super) fn resolve_names(ctx: &mut Context<'_>) {
     let mut tmp_names: HashSet<&str> = HashSet::default(); // throwaway container for duplicate checking
     let mut names = Names::default();
 
-    for (schema_id, top_id, top) in ctx.iter_tops() {
+    for ((schema_id, top_id), top) in ctx.iter_tops() {
         assert_is_not_a_reserved_scalar_type(top.identifier(), ctx);
 
         let namespace = match (top_id, top) {
@@ -158,8 +158,8 @@ fn insert_name(
     ctx: &mut Context<'_>,
 ) {
     let name = ctx.interner.intern(top.name());
-    if let Some((existing_schema, existing_top)) = namespace.insert(name, (schema_id, top_id)) {
-        ctx.push_error(duplicate_top_error(&ctx.asts[&existing_schema][existing_top], top));
+    if let Some(existing_top) = namespace.insert(name, (schema_id, top_id)) {
+        ctx.push_error(duplicate_top_error(&ctx.asts[existing_top], top));
     }
 }
 

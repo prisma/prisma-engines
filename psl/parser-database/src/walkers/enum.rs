@@ -19,7 +19,7 @@ impl<'db> EnumWalker<'db> {
 
     /// The AST node.
     pub fn ast_enum(self) -> &'db ast::Enum {
-        &self.db.asts[&self.id.0][self.id.1]
+        &self.db.asts[self.id]
     }
 
     /// The database name of the enum.

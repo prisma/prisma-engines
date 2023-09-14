@@ -11,7 +11,7 @@ pub type FieldWalker<'db> = Walker<'db, (crate::ModelId, ast::FieldId)>;
 impl<'db> FieldWalker<'db> {
     /// The AST node for the field.
     pub fn ast_field(self) -> &'db ast::Field {
-        &self.db.ast(&self.id.0 .0)[self.id.0 .1][self.id.1]
+        &self.db.asts[self.id.0][self.id.1]
     }
 
     /// The field name.

@@ -60,14 +60,9 @@ impl<'db> ModelWalker<'db> {
             .is_some()
     }
 
-    /// The ID of the model in the db
-    pub fn model_id(self) -> ast::ModelId {
-        self.id.1
-    }
-
     /// The AST node.
     pub fn ast_model(self) -> &'db ast::Model {
-        &self.db.asts[&self.id.0][self.id.1]
+        &self.db.asts[self.id]
     }
 
     /// The parsed attributes.
@@ -217,7 +212,7 @@ impl<'db> ModelWalker<'db> {
             None => return IndentationType::default(),
         };
 
-        let src = self.db.source();
+        let src = self.db.source(self.id.0);
         let start = field.ast_field().span().start;
 
         let mut spaces = 0;
@@ -242,7 +237,7 @@ impl<'db> ModelWalker<'db> {
             None => return NewlineType::default(),
         };
 
-        let src = self.db.source();
+        let src = self.db.source(self.id.0);
         let start = field.ast_field().span().end - 2;
 
         match src.chars().nth(start) {

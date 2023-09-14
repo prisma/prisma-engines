@@ -27,13 +27,8 @@ impl<'db> RelationFieldWalker<'db> {
 
     /// The AST node of the field.
     pub fn ast_field(self) -> &'db ast::Field {
-        let RelationField {
-            schema_id,
-            model_id,
-            field_id,
-            ..
-        } = self.db.types[self.id];
-        &self.db.ast(&schema_id)[model_id][field_id]
+        let RelationField { model_id, field_id, .. } = self.db.types[self.id];
+        &self.db.asts[model_id][field_id]
     }
 
     pub(crate) fn attributes(self) -> &'db RelationField {
@@ -77,7 +72,7 @@ impl<'db> RelationFieldWalker<'db> {
 
     /// The model containing the field.
     pub fn model(self) -> ModelWalker<'db> {
-        self.walk((self.attributes().schema_id, self.attributes().model_id))
+        self.walk(self.attributes().model_id)
     }
 
     /// A valid relation is defined by two relation fields. This method returns the _other_
@@ -89,18 +84,17 @@ impl<'db> RelationFieldWalker<'db> {
     /// The `@relation` attribute in the field AST.
     pub fn relation_attribute(self) -> Option<&'db ast::Attribute> {
         let attrs = self.attributes();
-        attrs.relation_attribute.map(|id| &self.db.ast(&attrs.schema_id)[id])
+        attrs.relation_attribute.map(|id| &self.db.asts[attrs.model_id.0][id])
     }
 
     /// Does the relation field reference the passed in model?
-    pub fn references_model(self, other: ast::ModelId) -> bool {
+    pub fn references_model(self, other: crate::ModelId) -> bool {
         self.attributes().referenced_model == other
     }
 
     /// The model referenced by the relation.
     pub fn related_model(self) -> ModelWalker<'db> {
-        let attrs = self.attributes();
-        self.db.walk((attrs.referenced_model_schema, attrs.referenced_model))
+        self.db.walk(self.attributes().referenced_model)
     }
 
     /// The fields in the `@relation(references: ...)` argument.

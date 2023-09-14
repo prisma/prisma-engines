@@ -21,7 +21,7 @@ pub(super) fn validate_client_name(field: FieldWalker<'_>, names: &Names<'_>, ct
         "model"
     };
 
-    for taken in names.name_taken(model.model_id(), field.name()).into_iter() {
+    for taken in names.name_taken(model.id, field.name()).into_iter() {
         match taken {
             NameTaken::Index => {
                 let message = format!(
@@ -82,7 +82,7 @@ pub(super) fn has_a_unique_default_constraint_name(
     };
 
     for violation in names.constraint_namespace.constraint_name_scope_violations(
-        field.model().model_id(),
+        field.model().id,
         ConstraintName::Default(name.as_ref()),
         ctx,
     ) {

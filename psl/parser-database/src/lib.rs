@@ -31,6 +31,7 @@ pub mod walkers;
 mod attributes;
 mod coerce_expression;
 mod context;
+mod files;
 mod ids;
 mod interner;
 mod names;
@@ -47,7 +48,7 @@ pub use types::{
     ScalarType, SortOrder,
 };
 
-use self::{context::Context, interner::StringId, relations::Relations, types::Types};
+use self::{context::Context, files::Files, interner::StringId, relations::Relations, types::Types};
 use diagnostics::{DatamodelError, Diagnostics};
 use names::Names;
 use std::collections::HashMap;
@@ -73,7 +74,7 @@ use std::collections::HashMap;
 ///   Currently only index name collisions.
 pub struct ParserDatabase {
     schemas: Vec<(String, schema_ast::SourceFile)>,
-    asts: HashMap<SchemaId, ast::SchemaAst>, // todo: combine schemas and ASTs
+    asts: Files, // todo: combine schemas and ASTs
     interner: interner::StringInterner,
     names: Names,
     types: Types,
@@ -93,6 +94,7 @@ impl ParserDatabase {
                 )
             })
             .collect();
+        let asts = Files(asts);
 
         let mut interner = Default::default();
         let mut names = Default::default();
@@ -160,7 +162,7 @@ impl ParserDatabase {
     }
 
     /// A parsed AST.
-    pub fn ast(&self, schema_id: &SchemaId) -> &ast::SchemaAst {
+    pub fn ast(&self, schema_id: SchemaId) -> &ast::SchemaAst {
         &self.asts[schema_id]
     }
 

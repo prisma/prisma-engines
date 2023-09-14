@@ -55,6 +55,7 @@ where
 impl crate::ParserDatabase {
     fn iter_tops(&self) -> impl Iterator<Item = (SchemaId, ast::TopId, &ast::Top)> + '_ {
         self.asts
+            .0
             .iter()
             .flat_map(move |(schema_id, ast)| ast.iter_tops().map(|(top_id, top)| (*schema_id, top_id, top)))
     }

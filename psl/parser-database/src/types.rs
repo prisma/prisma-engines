@@ -8,7 +8,7 @@ use schema_ast::ast::{self, WithName};
 use std::{collections::BTreeMap, fmt};
 
 pub(super) fn resolve_types(ctx: &mut Context<'_>) {
-    for (schema_id, top_id, top) in ctx.iter_tops() {
+    for ((schema_id, top_id), top) in ctx.iter_tops() {
         match (top_id, top) {
             (ast::TopId::Model(model_id), ast::Top::Model(model)) => visit_model(schema_id, model_id, model, ctx),
             (ast::TopId::Enum(_), ast::Top::Enum(enm)) => visit_enum(enm, ctx),
@@ -547,7 +547,7 @@ pub struct IndexFieldPath {
     /// //           ^this one is the path. in this case a vector of one element
     /// }
     /// ```
-    path: Vec<(SchemaId, ast::CompositeTypeId, ast::FieldId)>,
+    path: Vec<(crate::CompositeTypeId, ast::FieldId)>,
 }
 
 impl IndexFieldPath {
@@ -555,8 +555,8 @@ impl IndexFieldPath {
         Self { root, path: Vec::new() }
     }
 
-    pub(crate) fn push_field(&mut self, schema_id: SchemaId, ctid: ast::CompositeTypeId, field_id: ast::FieldId) {
-        self.path.push((schema_id, ctid, field_id));
+    pub(crate) fn push_field(&mut self, ctid: crate::CompositeTypeId, field_id: ast::FieldId) {
+        self.path.push((ctid, field_id));
     }
 
     /// The starting point of the index path. If the indexed field is not in a
@@ -595,7 +595,7 @@ impl IndexFieldPath {
     ///   @@index([a.field])
     /// }
     /// ```
-    pub fn path(&self) -> &[(SchemaId, ast::CompositeTypeId, ast::FieldId)] {
+    pub fn path(&self) -> &[(crate::CompositeTypeId, ast::FieldId)] {
         &self.path
     }
 
@@ -606,7 +606,7 @@ impl IndexFieldPath {
     pub fn field_in_index(&self) -> Either<ScalarFieldId, (crate::CompositeTypeId, ast::FieldId)> {
         self.path
             .last()
-            .map(|(mut schema, mut ct, mut field)| Either::Right(((schema, ct), field)))
+            .map(|(ct, field)| Either::Right((*ct, *field)))
             .unwrap_or(Either::Left(self.root))
     }
 }
@@ -670,8 +670,8 @@ fn visit_composite_type<'db>(ct_id: crate::CompositeTypeId, ct: &'db ast::Compos
                 };
                 ctx.types.composite_type_fields.insert((ct_id, field_id), field);
             }
-            Ok(FieldType::Model((referenced_model_schema, referenced_model_id))) => {
-                let referenced_model_name = ctx.asts[&referenced_model_schema][referenced_model_id].name();
+            Ok(FieldType::Model(referenced_model_id)) => {
+                let referenced_model_name = ctx.asts[referenced_model_id].name();
                 ctx.push_error(DatamodelError::new_composite_type_validation_error(&format!("{referenced_model_name} refers to a model, making this a relation field. Relation fields inside composite types are not supported."), ct.name(), ast_field.field_type.span()))
             }
             Err(supported) => ctx.push_error(DatamodelError::new_type_not_found_error(
@@ -709,7 +709,7 @@ fn field_type<'db>(field: &'db ast::Field, ctx: &mut Context<'db>) -> Result<Fie
         .names
         .tops
         .get(&supported_string_id)
-        .map(|id| (id.0, id.1, &ctx.asts[&id.0][id.1]))
+        .map(|id| (id.0, id.1, &ctx.asts[*id]))
     {
         Some((schema_id, ast::TopId::Model(model_id), ast::Top::Model(_))) => {
             Ok(FieldType::Model((schema_id, model_id)))
