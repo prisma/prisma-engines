@@ -56,7 +56,7 @@ impl ValidatedSchema {
 pub fn validate(file: SourceFile, connectors: ConnectorRegistry) -> ValidatedSchema {
     let mut diagnostics = Diagnostics::new();
     let db = ParserDatabase::new_single_file(file, &mut diagnostics);
-    let configuration = validate_configuration(db.ast(), &mut diagnostics, connectors);
+    let configuration = validate_configuration(db.ast_assert_single(), &mut diagnostics, connectors);
     let datasources = &configuration.datasources;
     let out = validate::validate(db, datasources, configuration.preview_features(), diagnostics);
 

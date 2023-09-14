@@ -167,6 +167,12 @@ impl ParserDatabase {
     }
 
     /// A parsed AST.
+    pub fn ast_assert_single(&self) -> &ast::SchemaAst {
+        assert_eq!(self.asts.0.len(), 1);
+        self.asts.0.iter().next().unwrap().1
+    }
+
+    /// A parsed AST.
     pub fn ast(&self, schema_id: SchemaId) -> &ast::SchemaAst {
         &self.asts[schema_id]
     }
@@ -182,8 +188,14 @@ impl ParserDatabase {
     }
 
     /// The source file contents.
-    pub fn source(&self, schema_id: SchemaId) -> &str {
-        self.schemas[schema_id.0].1.as_str()
+    pub fn source_assert_single(&self) -> &str {
+        assert_eq!(self.schemas.len(), 1);
+        self.schemas[0].1.as_str()
+    }
+
+    /// The source file contents.
+    pub(crate) fn source(&self, file_id: SchemaId) -> &str {
+        self.schemas[file_id.0].1.as_str()
     }
 }
 

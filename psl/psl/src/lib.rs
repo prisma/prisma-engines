@@ -1,6 +1,8 @@
 #![doc = include_str!("../README.md")]
 #![deny(rust_2018_idioms, unsafe_code, missing_docs)]
 
+use std::collections::HashMap;
+
 pub use builtin_psl_connectors as builtin_connectors;
 pub use psl_core::{
     datamodel_connector,
@@ -28,10 +30,6 @@ pub mod get_config {
     pub use psl_core::mcf::{config_to_mcf_json_value as get_config, *};
 }
 
-pub fn parse_configuration_multi_schema(schema_files: HashMap<String, String>) -> Result<Configuration, Diagnostics> {
-    psl_core::parse_configuration_multi_schema(schema, builtin_connectors::BUILTIN_CONNECTORS)
-}
-
 /// Parses and validate a schema, but skip analyzing everything except datasource and generator
 /// blocks.
 pub fn parse_configuration(schema: &str) -> Result<Configuration, Diagnostics> {
@@ -44,7 +42,7 @@ pub fn parse_schema(file: impl Into<SourceFile>) -> Result<ValidatedSchema, Stri
     schema
         .diagnostics
         .to_result()
-        .map_err(|err| err.to_pretty_string("schema.prisma", schema.db.source()))?;
+        .map_err(|err| err.to_pretty_string("schema.prisma", schema.db.source_assert_single()))?;
     Ok(schema)
 }
 
