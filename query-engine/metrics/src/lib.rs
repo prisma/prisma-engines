@@ -96,7 +96,6 @@ static METRIC_RENAMES: Lazy<HashMap<&'static str, (&'static str, &'static str)>>
 
 pub fn setup() {
     set_recorder();
-    describe_first_party_metrics();
     initialize_metrics();
 }
 
@@ -108,10 +107,16 @@ fn set_recorder() {
     });
 }
 
+/// Initialize metrics descriptions and values
+pub fn initialize_metrics() {
+    initialize_metrics_descriptions();
+    initialize_metrics_values();
+}
+
 /// Describe all first-party metrics that we record in prisma-engines. Metrics recorded by third-parties
 /// --like mobc-- are described by such third parties, but ignored, and replaced by the descriptions in the
 /// METRICS_RENAMES map.
-pub fn describe_first_party_metrics() {
+fn initialize_metrics_descriptions() {
     describe_counter!(
         PRISMA_CLIENT_QUERIES_TOTAL,
         "The total number of Prisma Client queries executed"
@@ -134,10 +139,12 @@ pub fn describe_first_party_metrics() {
     );
 }
 
-/// Initialize all metrics that we record in prisma-engines.
+/// Initialize all metrics values (first and third-party)
+///
+/// FIXME: https://github.com/prisma/prisma/issues/21070
 /// Histograms are excluded, as their initialization will alter the histogram values.
 /// (i.e. histograms don't have a neutral value, like counters or gauges)
-pub fn initialize_metrics() {
+fn initialize_metrics_values() {
     absolute_counter!(PRISMA_CLIENT_QUERIES_TOTAL, 0);
     absolute_counter!(PRISMA_DATASOURCE_QUERIES_TOTAL, 0);
     gauge!(PRISMA_CLIENT_QUERIES_ACTIVE, 0.0);
