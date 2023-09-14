@@ -141,6 +141,9 @@ mod smoke_tests {
             assert_eq!(metrics.matches("prisma_datasource_queries_duration_histogram_ms_bucket{le=\"+Inf\"}").count(), 1);
             assert_eq!(metrics.matches("prisma_datasource_queries_duration_histogram_ms_sum").count(), 1);
             assert_eq!(metrics.matches("prisma_datasource_queries_duration_histogram_ms_count").count(), 1);
+
+            assert_eq!(metrics.matches("# TYPE").count(), query_engine_metrics::ACCEPT_LIST.len());
+            
         }).await
     }
 }

@@ -60,7 +60,7 @@ const MOBC_POOL_WAIT_COUNT: &str = "mobc_client_queries_wait"; // gauge
 const MOBC_POOL_WAIT_DURATION: &str = "mobc_client_queries_wait_histogram_ms"; // histogram
 
 /// Accept list: both first-party (emitted by the query engine) and third-party (emitted) metrics
-const ACCEPT_LIST: &[&str] = &[
+pub const ACCEPT_LIST: &[&str] = &[
     // first-party
     PRISMA_CLIENT_QUERIES_TOTAL,
     PRISMA_DATASOURCE_QUERIES_TOTAL,

@@ -4,3 +4,5 @@ mod helpers;
 
 mod metrics;
 mod protocols;
+
+use query_engine_metrics;
