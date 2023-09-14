@@ -11,7 +11,7 @@ use crate::introspection::{
 use psl::{
     builtin_connectors::*,
     datamodel_connector::Connector,
-    parser_database::{ast, walkers},
+    parser_database::{self as db, walkers},
     Configuration, PreviewFeature,
 };
 use quaint::prelude::SqlFamily;
@@ -363,11 +363,11 @@ impl<'a> DatamodelCalculatorContext<'a> {
         self.introspection_map.relation_names.m2m_relation_name(id)
     }
 
-    pub(crate) fn table_missing_for_model(&self, id: &ast::ModelId) -> bool {
+    pub(crate) fn table_missing_for_model(&self, id: &db::ModelId) -> bool {
         self.introspection_map.missing_tables_for_previous_models.contains(id)
     }
 
-    pub(crate) fn view_missing_for_model(&self, id: &ast::ModelId) -> bool {
+    pub(crate) fn view_missing_for_model(&self, id: &db::ModelId) -> bool {
         self.introspection_map.missing_views_for_previous_models.contains(id)
     }
 

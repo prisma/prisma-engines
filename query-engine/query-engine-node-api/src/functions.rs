@@ -25,7 +25,7 @@ pub fn dmmf(datamodel_string: String) -> napi::Result<String> {
     schema
         .diagnostics
         .to_result()
-        .map_err(|errors| ApiError::conversion(errors, schema.db.source()))?;
+        .map_err(|errors| ApiError::conversion(errors, schema.db.source_assert_single()))?;
 
     let query_schema = query_core::schema::build(Arc::new(schema), true);
     let dmmf = dmmf::render_dmmf(&query_schema);

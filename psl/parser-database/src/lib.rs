@@ -166,7 +166,10 @@ impl ParserDatabase {
         }
     }
 
-    /// A parsed AST.
+    /// The parsed AST. This methods asserts that there is a single prisma schema file. As
+    /// multi-file schemas are implemented, calls to this methods should be replaced with
+    /// `ParserDatabase::ast()` and `ParserDatabase::iter_sources()`.
+    #[deprecated]
     pub fn ast_assert_single(&self) -> &ast::SchemaAst {
         assert_eq!(self.asts.0.len(), 1);
         self.asts.0.iter().next().unwrap().1
@@ -187,7 +190,10 @@ impl ParserDatabase {
         self.types.model_attributes.len()
     }
 
-    /// The source file contents.
+    /// The source file contents. This methods asserts that there is a single prisma schema file.
+    /// As multi-file schemas are implemented, calls to this methods should be replaced with
+    /// `ParserDatabase::source()` and `ParserDatabase::iter_sources()`.
+    #[deprecated]
     pub fn source_assert_single(&self) -> &str {
         assert_eq!(self.schemas.len(), 1);
         self.schemas[0].1.as_str()

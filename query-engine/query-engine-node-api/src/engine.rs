@@ -197,7 +197,7 @@ impl QueryEngine {
         schema
             .diagnostics
             .to_result()
-            .map_err(|err| ApiError::conversion(err, schema.db.source()))?;
+            .map_err(|err| ApiError::conversion(err, schema.db.source_assert_single()))?;
 
         config
             .resolve_datasource_urls_query_engine(
@@ -205,11 +205,11 @@ impl QueryEngine {
                 |key| env.get(key).map(ToString::to_string),
                 ignore_env_var_errors,
             )
-            .map_err(|err| ApiError::conversion(err, schema.db.source()))?;
+            .map_err(|err| ApiError::conversion(err, schema.db.source_assert_single()))?;
 
         config
             .validate_that_one_datasource_is_provided()
-            .map_err(|errors| ApiError::conversion(errors, schema.db.source()))?;
+            .map_err(|errors| ApiError::conversion(errors, schema.db.source_assert_single()))?;
 
         let enable_metrics = config.preview_features().contains(PreviewFeature::Metrics);
         let enable_tracing = config.preview_features().contains(PreviewFeature::Tracing);
@@ -270,7 +270,9 @@ impl QueryEngine {
                     .ok_or_else(|| ApiError::configuration("No valid data source found"))?;
                 data_source
                     .load_url_with_config_dir(&builder.config_dir, |key| builder.env.get(key).map(ToString::to_string))
-                    .map_err(|err| crate::error::ApiError::Conversion(err, builder.schema.db.source().to_owned()))?
+                    .map_err(|err| {
+                        crate::error::ApiError::Conversion(err, builder.schema.db.source_assert_single().to_owned())
+                    })?
             };
 
             let engine = async move {

@@ -1,8 +1,8 @@
 use crate::{IdentifierType, ObjectType, OutputField};
-use prisma_models::{ast, InternalDataModel};
+use prisma_models::InternalDataModel;
 use psl::{
     datamodel_connector::{Connector, ConnectorCapabilities, ConnectorCapability, RelationMode},
-    PreviewFeature, PreviewFeatures,
+    parser_database as db, PreviewFeature, PreviewFeatures,
 };
 use std::{collections::HashMap, fmt};
 
@@ -176,7 +176,7 @@ impl QuerySchema {
 /// Designates a specific top-level operation on a corresponding model.
 #[derive(Debug, Clone, PartialEq, Hash, Eq)]
 pub struct QueryInfo {
-    pub model: Option<ast::ModelId>,
+    pub model: Option<db::ModelId>,
     pub tag: QueryTag,
 }
 

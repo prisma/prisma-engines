@@ -1,9 +1,8 @@
 use crate::Zipper;
+use psl::{parser_database::EnumId, schema_ast::ast::EnumValueId};
 
-use psl::schema_ast::ast;
-
-pub type InternalEnum = Zipper<ast::EnumId>;
-pub type InternalEnumValue = Zipper<ast::EnumValueId>;
+pub type InternalEnum = Zipper<EnumId>;
+pub type InternalEnumValue = Zipper<EnumValueId>;
 
 impl InternalEnum {
     pub fn name(&self) -> &str {

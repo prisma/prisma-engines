@@ -1,8 +1,6 @@
 #![doc = include_str!("../README.md")]
 #![deny(rust_2018_idioms, unsafe_code, missing_docs)]
 
-use std::collections::HashMap;
-
 pub use builtin_psl_connectors as builtin_connectors;
 pub use psl_core::{
     datamodel_connector,

@@ -15,7 +15,7 @@ pub(crate) use output_types::{mutation_type, query_type};
 
 use self::{enum_types::*, utils::*};
 use crate::*;
-use prisma_models::{ast, Field as ModelField, Model, RelationFieldRef, TypeIdentifier};
+use prisma_models::{Field as ModelField, Model, RelationFieldRef, TypeIdentifier};
 use psl::{datamodel_connector::ConnectorCapability, PreviewFeatures};
 
 pub fn build(schema: Arc<psl::ValidatedSchema>, enable_raw_queries: bool) -> QuerySchema {

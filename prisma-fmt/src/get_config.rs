@@ -8,11 +8,7 @@ use crate::validate::SCHEMA_PARSER_ERROR_CODE;
 #[derive(Deserialize, Debug)]
 #[serde(rename_all = "camelCase")]
 struct GetConfigParams {
-    /// { "./prisma/schema.prisma": "generator { ... }", "./prisma/user.prisma": "model User { ... }" }
-    #[serde(default)]
-    multi_file_prisma_schema: HashMap<String, String>,
-    #[serde(default)]
-    prisma_schema: Option<String>,
+    prisma_schema: String,
     #[serde(default)]
     ignore_env_var_errors: bool,
     #[serde(default)]

@@ -35,7 +35,7 @@ pub struct Runner {
 
 impl Runner {
     pub fn prisma_dml(&self) -> &str {
-        self.query_schema.internal_data_model.schema.db.source()
+        self.query_schema.internal_data_model.schema.db.source_assert_single()
     }
 
     pub async fn load(
