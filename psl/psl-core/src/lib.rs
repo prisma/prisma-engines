@@ -13,8 +13,6 @@ mod configuration;
 mod reformat;
 mod validate;
 
-use std::{collections::HashMap, path::Path, sync::Arc};
-
 pub use crate::{
     common::{PreviewFeature, PreviewFeatures, ALL_PREVIEW_FEATURES},
     configuration::{
@@ -57,7 +55,7 @@ impl ValidatedSchema {
 /// validation information it can, and returns it along with any error and warning diagnostics.
 pub fn validate(file: SourceFile, connectors: ConnectorRegistry) -> ValidatedSchema {
     let mut diagnostics = Diagnostics::new();
-    let db = ParserDatabase::new(file, &mut diagnostics);
+    let db = ParserDatabase::new_single_file(file, &mut diagnostics);
     let configuration = validate_configuration(db.ast(), &mut diagnostics, connectors);
     let datasources = &configuration.datasources;
     let out = validate::validate(db, datasources, configuration.preview_features(), diagnostics);
@@ -69,22 +67,6 @@ pub fn validate(file: SourceFile, connectors: ConnectorRegistry) -> ValidatedSch
         db: out.db,
         relation_mode: out.relation_mode,
     }
-}
-
-/// Loads all configuration blocks from a datamodel using the built-in source definitions.
-pub fn parse_configuration_multi_schema(
-    schema_files: HashMap<String, String>,
-    connectors: ConnectorRegistry,
-) -> Result<Configuration, diagnostics::Diagnostics> {
-    let mut diagnostics = Diagnostics::default();
-    let files: Vec<(String, SourceFile)> = schema_files
-        .into_iter()
-        .map(|(path, contents)| (path, contents.into()))
-        .collect();
-    let db = ParserDatabase::new(files);
-    // let ast = schema_ast::parse_schema(schema, &mut diagnostics);
-    // let out = validate_configuration(&ast, &mut diagnostics, connectors);
-    diagnostics.to_result().map(|_| out)
 }
 
 /// Loads all configuration blocks from a datamodel using the built-in source definitions.

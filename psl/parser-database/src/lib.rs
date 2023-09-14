@@ -83,6 +83,11 @@ pub struct ParserDatabase {
 
 impl ParserDatabase {
     /// See the docs on [ParserDatabase](/struct.ParserDatabase.html).
+    pub fn new_single_file(file: SourceFile, diagnostics: &mut Diagnostics) -> Self {
+        Self::new(vec![("schema.prisma".to_owned(), file)], diagnostics)
+    }
+
+    /// See the docs on [ParserDatabase](/struct.ParserDatabase.html).
     pub fn new(schemas: Vec<(String, schema_ast::SourceFile)>, diagnostics: &mut Diagnostics) -> Self {
         let asts: HashMap<_, _> = schemas
             .iter()
