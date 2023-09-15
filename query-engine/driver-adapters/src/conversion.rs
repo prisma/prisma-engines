@@ -17,8 +17,8 @@ impl From<JsonValue> for JSArg {
 }
 
 // FromNapiValue is the napi equivalent to serde::Deserialize.
-// Note: we can safely leave this unimplemented as we don't need deserialize JSArg back to napi_value
-// (nor we need to). However, removing this altogether would cause a compile error.
+// Note: we can safely leave this unimplemented as we don't need deserialize napi_value back to JSArg.
+// However, removing this altogether would cause a compile error.
 impl FromNapiValue for JSArg {
     unsafe fn from_napi_value(_env: napi::sys::napi_env, _napi_value: napi::sys::napi_value) -> napi::Result<Self> {
         unreachable!()
