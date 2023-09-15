@@ -42,7 +42,7 @@
   "sideEffects": true,
   "dependencies": {
     "@aqrln/prisma-adapter-libsql": "workspace:*",
-    "@libsql/client": "github:libsql/libsql-client-ts",
+    "@libsql/client": "0.3.5-pre.5",
     "@prisma/adapter-neon": "workspace:*",
     "@prisma/adapter-planetscale": "workspace:*",
     "@prisma/adapter-pg": "workspace:*",

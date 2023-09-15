@@ -28,8 +28,8 @@ importers:
         version: link:../driver-adapter-utils
     devDependencies:
       '@libsql/client':
-        specifier: github:libsql/libsql-client-ts
-        version: github.com/libsql/libsql-client-ts/7071e0f87d7f650023efbb918b5add3dd99189e8
+        specifier: 0.3.5-pre.5
+        version: 0.3.5-pre.5
 
   adapter-neon:
     dependencies:
@@ -104,8 +104,8 @@ importers:
         specifier: workspace:*
         version: link:../adapter-libsql
       '@libsql/client':
-        specifier: github:libsql/libsql-client-ts
-        version: github.com/libsql/libsql-client-ts/7071e0f87d7f650023efbb918b5add3dd99189e8
+        specifier: 0.3.5-pre.5
+        version: 0.3.5-pre.5
       '@neondatabase/serverless':
         specifier: ^0.6.0
         version: 0.6.0
@@ -400,6 +400,17 @@ packages:
       '@jridgewell/resolve-uri': 3.1.1
       '@jridgewell/sourcemap-codec': 1.4.15
     dev: true
+
+  /@libsql/client@0.3.5-pre.5:
+    resolution: {integrity: sha512-5SGH3PGXPSZVQznjiXJ3HTN73WtiBQ3moIodKuveVBj5dL0+RUUOe6bVT5BD1mR2OPnnLO8yhEM8MdGXvXHyTA==}
+    dependencies:
+      '@libsql/hrana-client': 0.5.5
+      js-base64: 3.7.5
+      libsql: 0.1.13
+    transitivePeerDependencies:
+      - bufferutil
+      - encoding
+      - utf-8-validate
 
   /@libsql/darwin-arm64@0.1.13:
     resolution: {integrity: sha512-mb89Ss/5rTKGJgjaKlQTHFwwZAb2xeD0qJuOQDGu1B2Mii2uM7qW8QpcptQdO2CssDs38daBtRj7tvV8Yj/EAQ==}
@@ -1487,16 +1498,3 @@ packages:
     resolution: {integrity: sha512-N/lyzTPaJasoDmfV7YTrYCI0G/3ivm/9wdG0aHuheKowWQwGTsK0Eoiw6utmzAnI6pkJa0DUVygvp3spqqEKXg==}
     engines: {node: '>= 14'}
     dev: true
-
-  github.com/libsql/libsql-client-ts/7071e0f87d7f650023efbb918b5add3dd99189e8:
-    resolution: {tarball: https://codeload.github.com/libsql/libsql-client-ts/tar.gz/7071e0f87d7f650023efbb918b5add3dd99189e8}
-    name: '@libsql/client'
-    version: 0.3.5-pre.8
-    dependencies:
-      '@libsql/hrana-client': 0.5.5
-      js-base64: 3.7.5
-      libsql: 0.1.13
-    transitivePeerDependencies:
-      - bufferutil
-      - encoding
-      - utf-8-validate
