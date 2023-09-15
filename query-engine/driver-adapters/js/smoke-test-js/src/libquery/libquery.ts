@@ -385,6 +385,40 @@ export function smokeTestLibquery(adapter: ErrorCapturingDriverAdapter, prismaSc
         throw new Error(`Missing test for flavour ${flavour}`)
       }
     })
+
+    it('bytes are fun', async () => {
+      const resultSet = await doQuery({
+        action: 'createOne',
+        modelName: 'type_test_3',
+        query: {
+          selection: {
+            bytes: true,
+          },
+          arguments:  {
+            data: {
+              bytes: {
+                $type: 'Bytes',
+                value: 'AQID',
+              },
+            },
+          },
+        },
+      })
+      // console.log('[nodejs] createOne resultSet', util)
+      console.dir(resultSet, { depth: Infinity })
+
+      const resultSet2 = await doQuery({
+        action: 'findMany',
+        modelName: 'type_test_3',
+        query: {
+          selection: {
+            bytes: true,
+          },
+        },
+      })
+      // console.log('[nodejs] createOne resultSet', util)
+      console.dir(resultSet2, { depth: Infinity })
+    })
   })
 }
 

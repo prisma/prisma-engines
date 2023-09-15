@@ -116,6 +116,19 @@ export async function smokeTestClient(driverAdapter: DriverAdapter) {
               }),
             )
           })
+
+          it('bytes fun', async () => {
+            const prisma = new PrismaClient({ adapter, log })
+
+            await prisma.type_test_3.create({
+              data: {
+                bytes: Buffer.from([1, 2, 3, 4])
+              }
+            })
+
+            const bytes = await prisma.type_test_3.findMany()
+            console.dir(bytes, { depth: Infinity })
+          })
         })
       }
     })
