@@ -270,8 +270,18 @@ fn js_value_to_quaint(
         },
         ColumnType::Bytes => match json_value {
             serde_json::Value::String(s) => QuaintValue::Bytes(Some(s.into_bytes().into())),
+            serde_json::Value::Array(array) => {
+                let bytes: Option<std::borrow::Cow<[u8]>> = array
+                    .iter()
+                    .map(|value| value.as_i64().and_then(|maybe_byte| maybe_byte.try_into().ok()))
+                    .collect();
+                QuaintValue::Bytes(Some(bytes.expect("elements of the array must be u8")))
+            }
             serde_json::Value::Null => QuaintValue::Bytes(None),
-            mismatch => panic!("Expected a string in column {}, found {}", column_name, mismatch),
+            mismatch => panic!(
+                "Expected a string or an array in column {}, found {}",
+                column_name, mismatch
+            ),
         },
         unimplemented => {
             todo!("support column type {:?} in column {}", unimplemented, column_name)

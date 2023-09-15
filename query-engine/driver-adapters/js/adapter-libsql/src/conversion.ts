@@ -1,5 +1,6 @@
 import { ColumnTypeEnum, ColumnType, Debug } from '@prisma/driver-adapter-utils'
 import { Row, Value } from '@libsql/client'
+import { isArrayBuffer } from 'node:util/types'
 
 const debug = Debug('prisma:driver-adapter:libsql:conversion')
 
@@ -117,7 +118,7 @@ function inferNumericType(value: number): ColumnType {
 }
 
 function inferObjectType(value: {}): ColumnType {
-  if (value instanceof ArrayBuffer || value[Symbol.toStringTag] === 'ArrayBuffer') {
+  if (isArrayBuffer(value)) {
     return ColumnTypeEnum.Bytes
   }
   throw new UnexpectedTypeError(value)
@@ -132,15 +133,27 @@ class UnexpectedTypeError extends Error {
   }
 }
 
-export function mapRow(row: Row): Value[] {
+export function mapRow(row: Row): unknown[] {
   // `Row` doesn't have map, so we copy the array once and modify it in-place
   // to avoid allocating and copying twice if we used `Array.from(row).map(...)`.
-  const result = Array.from(row)
+  const result: unknown[] = Array.from(row)
+
   for (let i = 0; i < result.length; i++) {
     const value = result[i]
+
+    // Convert bigint to string as bigint is currently not supported by napi.rs
     if (typeof value === 'bigint') {
       result[i] = value.toString()
     }
+
+    // Convert array buffers to arrays of bytes.
+    // Base64 would've been more efficient but would collide with the existing
+    // logic that treats string values of type Bytes as raw UTF-8 bytes that was
+    // implemented for other adapters.
+    if (isArrayBuffer(value)) {
+      result[i] = Array.from(new Uint8Array(value))
+    }
   }
+
   return result
 }
