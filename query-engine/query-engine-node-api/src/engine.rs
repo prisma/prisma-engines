@@ -232,7 +232,7 @@ impl QueryEngine {
         if enable_metrics {
             napi_env.execute_tokio_future(
                 async {
-                    query_engine_metrics::describe_metrics();
+                    query_engine_metrics::initialize_metrics();
                     Ok(())
                 }
                 .with_subscriber(logger.dispatcher()),
