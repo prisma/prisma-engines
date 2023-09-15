@@ -183,15 +183,12 @@ impl QueryEngine {
             #[cfg(feature = "driver-adapters")]
             if let Some(driver) = maybe_driver {
                 let js_queryable = driver_adapters::from_napi(driver);
-                let provider_name = schema.connector.provider_name();
 
-                match sql_connector::register_driver_adapter(provider_name, Arc::new(js_queryable)) {
-                    Ok(_) => {
-                        connector_mode = ConnectorMode::Js;
-                        tracing::info!("Registered driver adapter for {provider_name}.")
-                    }
-                    Err(err) => tracing::error!("Failed to register driver adapter for {provider_name}. {err}"),
-                }
+                sql_connector::activate_driver_adapter(Arc::new(js_queryable));
+                connector_mode = ConnectorMode::Js;
+
+                let provider_name = schema.connector.provider_name();
+                tracing::info!("Registered driver adapter for {provider_name}.");
             }
         }
 
@@ -235,7 +232,7 @@ impl QueryEngine {
         if enable_metrics {
             napi_env.execute_tokio_future(
                 async {
-                    query_engine_metrics::describe_metrics();
+                    query_engine_metrics::initialize_metrics();
                     Ok(())
                 }
                 .with_subscriber(logger.dispatcher()),

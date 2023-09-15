@@ -10,7 +10,6 @@ use crate::{
 use bigdecimal::{num_bigint::BigInt, BigDecimal, FromPrimitive, ToPrimitive};
 use bit_vec::BitVec;
 use bytes::BytesMut;
-#[cfg(feature = "chrono")]
 use chrono::{DateTime, NaiveDateTime, Utc};
 #[cfg(feature = "bigdecimal")]
 pub(crate) use decimal::DecimalWrapper;
@@ -52,16 +51,12 @@ pub(crate) fn params_to_types(params: &[Value<'_>]) -> Vec<PostgresType> {
                 Value::Char(_) => PostgresType::CHAR,
                 #[cfg(feature = "bigdecimal")]
                 Value::Numeric(_) => PostgresType::NUMERIC,
-                #[cfg(feature = "json")]
                 Value::Json(_) => PostgresType::JSONB,
                 Value::Xml(_) => PostgresType::XML,
                 #[cfg(feature = "uuid")]
                 Value::Uuid(_) => PostgresType::UUID,
-                #[cfg(feature = "chrono")]
                 Value::DateTime(_) => PostgresType::TIMESTAMPTZ,
-                #[cfg(feature = "chrono")]
                 Value::Date(_) => PostgresType::TIMESTAMP,
-                #[cfg(feature = "chrono")]
                 Value::Time(_) => PostgresType::TIME,
                 Value::Array(ref arr) => {
                     let arr = arr.as_ref().unwrap();
@@ -94,16 +89,12 @@ pub(crate) fn params_to_types(params: &[Value<'_>]) -> Vec<PostgresType> {
                         Value::Char(_) => PostgresType::CHAR_ARRAY,
                         #[cfg(feature = "bigdecimal")]
                         Value::Numeric(_) => PostgresType::NUMERIC_ARRAY,
-                        #[cfg(feature = "json")]
                         Value::Json(_) => PostgresType::JSONB_ARRAY,
                         Value::Xml(_) => PostgresType::XML_ARRAY,
                         #[cfg(feature = "uuid")]
                         Value::Uuid(_) => PostgresType::UUID_ARRAY,
-                        #[cfg(feature = "chrono")]
                         Value::DateTime(_) => PostgresType::TIMESTAMPTZ_ARRAY,
-                        #[cfg(feature = "chrono")]
                         Value::Date(_) => PostgresType::TIMESTAMP_ARRAY,
-                        #[cfg(feature = "chrono")]
                         Value::Time(_) => PostgresType::TIME_ARRAY,
                         // In the case of nested arrays, we let PG infer the type
                         Value::Array(_) => PostgresType::UNKNOWN,
@@ -142,10 +133,8 @@ impl<'a> FromSql<'a> for EnumString {
     }
 }
 
-#[cfg(feature = "chrono")]
 struct TimeTz(chrono::NaiveTime);
 
-#[cfg(feature = "chrono")]
 impl<'a> FromSql<'a> for TimeTz {
     fn from_sql(_ty: &PostgresType, raw: &'a [u8]) -> Result<TimeTz, Box<dyn std::error::Error + Sync + Send>> {
         // We assume UTC.
@@ -248,7 +237,6 @@ impl GetRow for PostgresRow {
                     }
                     None => Value::Numeric(None),
                 },
-                #[cfg(feature = "chrono")]
                 PostgresType::TIMESTAMP => match row.try_get(i)? {
                     Some(val) => {
                         let ts: NaiveDateTime = val;
@@ -257,7 +245,6 @@ impl GetRow for PostgresRow {
                     }
                     None => Value::DateTime(None),
                 },
-                #[cfg(feature = "chrono")]
                 PostgresType::TIMESTAMPTZ => match row.try_get(i)? {
                     Some(val) => {
                         let ts: DateTime<Utc> = val;
@@ -265,17 +252,14 @@ impl GetRow for PostgresRow {
                     }
                     None => Value::DateTime(None),
                 },
-                #[cfg(feature = "chrono")]
                 PostgresType::DATE => match row.try_get(i)? {
                     Some(val) => Value::date(val),
                     None => Value::Date(None),
                 },
-                #[cfg(feature = "chrono")]
                 PostgresType::TIME => match row.try_get(i)? {
                     Some(val) => Value::time(val),
                     None => Value::Time(None),
                 },
-                #[cfg(feature = "chrono")]
                 PostgresType::TIMETZ => match row.try_get(i)? {
                     Some(val) => {
                         let time: TimeTz = val;
@@ -301,7 +285,6 @@ impl GetRow for PostgresRow {
                     }
                     None => Value::Array(None),
                 },
-                #[cfg(feature = "json")]
                 PostgresType::JSON | PostgresType::JSONB => Value::Json(row.try_get(i)?),
                 PostgresType::INT2_ARRAY => match row.try_get(i)? {
                     Some(val) => {
@@ -357,7 +340,6 @@ impl GetRow for PostgresRow {
                     }
                     None => Value::Array(None),
                 },
-                #[cfg(feature = "chrono")]
                 PostgresType::TIMESTAMP_ARRAY => match row.try_get(i)? {
                     Some(val) => {
                         let val: Vec<Option<NaiveDateTime>> = val;
@@ -412,7 +394,6 @@ impl GetRow for PostgresRow {
                     }
                     None => Value::Array(None),
                 },
-                #[cfg(feature = "chrono")]
                 PostgresType::TIMESTAMPTZ_ARRAY => match row.try_get(i)? {
                     Some(val) => {
                         let val: Vec<Option<DateTime<Utc>>> = val;
@@ -422,7 +403,6 @@ impl GetRow for PostgresRow {
                     }
                     None => Value::Array(None),
                 },
-                #[cfg(feature = "chrono")]
                 PostgresType::DATE_ARRAY => match row.try_get(i)? {
                     Some(val) => {
                         let val: Vec<Option<chrono::NaiveDate>> = val;
@@ -432,7 +412,6 @@ impl GetRow for PostgresRow {
                     }
                     None => Value::Array(None),
                 },
-                #[cfg(feature = "chrono")]
                 PostgresType::TIME_ARRAY => match row.try_get(i)? {
                     Some(val) => {
                         let val: Vec<Option<chrono::NaiveTime>> = val;
@@ -442,7 +421,6 @@ impl GetRow for PostgresRow {
                     }
                     None => Value::Array(None),
                 },
-                #[cfg(feature = "chrono")]
                 PostgresType::TIMETZ_ARRAY => match row.try_get(i)? {
                     Some(val) => {
                         let val: Vec<Option<TimeTz>> = val;
@@ -452,7 +430,6 @@ impl GetRow for PostgresRow {
                     }
                     None => Value::Array(None),
                 },
-                #[cfg(feature = "json")]
                 PostgresType::JSON_ARRAY => match row.try_get(i)? {
                     Some(val) => {
                         let val: Vec<Option<serde_json::Value>> = val;
@@ -462,7 +439,6 @@ impl GetRow for PostgresRow {
                     }
                     None => Value::Array(None),
                 },
-                #[cfg(feature = "json")]
                 PostgresType::JSONB_ARRAY => match row.try_get(i)? {
                     Some(val) => {
                         let val: Vec<Option<serde_json::Value>> = val;
@@ -841,7 +817,6 @@ impl<'a> ToSql for Value<'a> {
                     parsed_ip_addr.to_sql(ty, out)
                 })
             }
-            #[cfg(feature = "json")]
             (Value::Text(string), &PostgresType::JSON) | (Value::Text(string), &PostgresType::JSONB) => string
                 .as_ref()
                 .map(|string| serde_json::from_str::<serde_json::Value>(string)?.to_sql(ty, out)),
@@ -880,27 +855,20 @@ impl<'a> ToSql for Value<'a> {
 
                 return Err(Error::builder(kind).build().into());
             }
-            #[cfg(feature = "json")]
             (Value::Json(value), _) => value.as_ref().map(|value| value.to_sql(ty, out)),
             (Value::Xml(value), _) => value.as_ref().map(|value| value.to_sql(ty, out)),
             #[cfg(feature = "uuid")]
             (Value::Uuid(value), _) => value.map(|value| value.to_sql(ty, out)),
-            #[cfg(feature = "chrono")]
             (Value::DateTime(value), &PostgresType::DATE) => value.map(|value| value.date_naive().to_sql(ty, out)),
-            #[cfg(feature = "chrono")]
             (Value::Date(value), _) => value.map(|value| value.to_sql(ty, out)),
-            #[cfg(feature = "chrono")]
             (Value::Time(value), _) => value.map(|value| value.to_sql(ty, out)),
-            #[cfg(feature = "chrono")]
             (Value::DateTime(value), &PostgresType::TIME) => value.map(|value| value.time().to_sql(ty, out)),
-            #[cfg(feature = "chrono")]
             (Value::DateTime(value), &PostgresType::TIMETZ) => value.map(|value| {
                 let result = value.time().to_sql(ty, out)?;
                 // We assume UTC. see https://www.postgresql.org/docs/9.5/datatype-datetime.html
                 out.extend_from_slice(&[0; 4]);
                 Ok(result)
             }),
-            #[cfg(feature = "chrono")]
             (Value::DateTime(value), _) => value.map(|value| value.naive_utc().to_sql(ty, out)),
         };
 

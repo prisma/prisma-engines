@@ -1,5 +1,5 @@
 use super::Visitor;
-#[cfg(all(feature = "json", any(feature = "postgresql", feature = "mysql")))]
+#[cfg(any(feature = "postgresql", feature = "mysql"))]
 use crate::prelude::{JsonExtract, JsonType, JsonUnquote};
 use crate::{
     ast::{
@@ -339,7 +339,7 @@ impl<'a> Visitor<'a> for Mssql<'a> {
 
                 return Err(builder.build());
             }
-            #[cfg(feature = "json")]
+
             Value::Json(j) => j.map(|j| self.write(format!("'{}'", serde_json::to_string(&j).unwrap()))),
             #[cfg(feature = "bigdecimal")]
             Value::Numeric(r) => r.map(|r| self.write(r)),
@@ -348,17 +348,14 @@ impl<'a> Visitor<'a> for Mssql<'a> {
                 let s = format!("CONVERT(uniqueidentifier, N'{}')", uuid.hyphenated());
                 self.write(s)
             }),
-            #[cfg(feature = "chrono")]
             Value::DateTime(dt) => dt.map(|dt| {
                 let s = format!("CONVERT(datetimeoffset, N'{}')", dt.to_rfc3339());
                 self.write(s)
             }),
-            #[cfg(feature = "chrono")]
             Value::Date(date) => date.map(|date| {
                 let s = format!("CONVERT(date, N'{date}')");
                 self.write(s)
             }),
-            #[cfg(feature = "chrono")]
             Value::Time(time) => time.map(|time| {
                 let s = format!("CONVERT(time, N'{time}')");
                 self.write(s)
@@ -636,12 +633,12 @@ impl<'a> Visitor<'a> for Mssql<'a> {
         Ok(())
     }
 
-    #[cfg(all(feature = "json", any(feature = "postgresql", feature = "mysql")))]
+    #[cfg(any(feature = "postgresql", feature = "mysql"))]
     fn visit_json_extract(&mut self, _json_extract: JsonExtract<'a>) -> visitor::Result {
         unimplemented!("JSON filtering is not yet supported on MSSQL")
     }
 
-    #[cfg(all(feature = "json", any(feature = "postgresql", feature = "mysql")))]
+    #[cfg(any(feature = "postgresql", feature = "mysql"))]
     fn visit_json_array_contains(
         &mut self,
         _left: Expression<'a>,
@@ -651,12 +648,12 @@ impl<'a> Visitor<'a> for Mssql<'a> {
         unimplemented!("JSON filtering is not yet supported on MSSQL")
     }
 
-    #[cfg(all(feature = "json", any(feature = "postgresql", feature = "mysql")))]
+    #[cfg(any(feature = "postgresql", feature = "mysql"))]
     fn visit_json_type_equals(&mut self, _left: Expression<'a>, _json_type: JsonType, _not: bool) -> visitor::Result {
         unimplemented!("JSON_TYPE is not yet supported on MSSQL")
     }
 
-    #[cfg(all(feature = "json", any(feature = "postgresql", feature = "mysql")))]
+    #[cfg(any(feature = "postgresql", feature = "mysql"))]
     fn visit_json_unquote(&mut self, _json_unquote: JsonUnquote<'a>) -> visitor::Result {
         unimplemented!("JSON filtering is not yet supported on MSSQL")
     }
@@ -684,7 +681,7 @@ impl<'a> Visitor<'a> for Mssql<'a> {
         unimplemented!("Full-text search is not yet supported on MSSQL")
     }
 
-    #[cfg(all(feature = "json", any(feature = "postgresql", feature = "mysql")))]
+    #[cfg(any(feature = "postgresql", feature = "mysql"))]
     fn visit_json_extract_last_array_item(
         &mut self,
         _extract: crate::prelude::JsonExtractLastArrayElem<'a>,
@@ -692,7 +689,7 @@ impl<'a> Visitor<'a> for Mssql<'a> {
         unimplemented!("JSON filtering is not yet supported on MSSQL")
     }
 
-    #[cfg(all(feature = "json", any(feature = "postgresql", feature = "mysql")))]
+    #[cfg(any(feature = "postgresql", feature = "mysql"))]
     fn visit_json_extract_first_array_item(
         &mut self,
         _extract: crate::prelude::JsonExtractFirstArrayElem<'a>,
@@ -1248,7 +1245,7 @@ mod tests {
     }
 
     #[test]
-    #[cfg(feature = "json")]
+
     fn test_raw_json() {
         let (sql, params) = Mssql::build(Select::default().value(serde_json::json!({ "foo": "bar" }).raw())).unwrap();
         assert_eq!("SELECT '{\"foo\":\"bar\"}'", sql);
@@ -1270,7 +1267,6 @@ mod tests {
     }
 
     #[test]
-    #[cfg(feature = "chrono")]
     fn test_raw_datetime() {
         let dt = chrono::Utc::now();
         let (sql, params) = Mssql::build(Select::default().value(dt.raw())).unwrap();

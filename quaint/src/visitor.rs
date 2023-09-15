@@ -121,22 +121,22 @@ pub trait Visitor<'a> {
     /// Visit a non-parameterized value.
     fn visit_raw_value(&mut self, value: Value<'a>) -> Result;
 
-    #[cfg(all(feature = "json", any(feature = "postgresql", feature = "mysql")))]
+    #[cfg(any(feature = "postgresql", feature = "mysql"))]
     fn visit_json_extract(&mut self, json_extract: JsonExtract<'a>) -> Result;
 
-    #[cfg(all(feature = "json", any(feature = "postgresql", feature = "mysql")))]
+    #[cfg(any(feature = "postgresql", feature = "mysql"))]
     fn visit_json_extract_last_array_item(&mut self, extract: JsonExtractLastArrayElem<'a>) -> Result;
 
-    #[cfg(all(feature = "json", any(feature = "postgresql", feature = "mysql")))]
+    #[cfg(any(feature = "postgresql", feature = "mysql"))]
     fn visit_json_extract_first_array_item(&mut self, extract: JsonExtractFirstArrayElem<'a>) -> Result;
 
-    #[cfg(all(feature = "json", any(feature = "postgresql", feature = "mysql")))]
+    #[cfg(any(feature = "postgresql", feature = "mysql"))]
     fn visit_json_array_contains(&mut self, left: Expression<'a>, right: Expression<'a>, not: bool) -> Result;
 
-    #[cfg(all(feature = "json", any(feature = "postgresql", feature = "mysql")))]
+    #[cfg(any(feature = "postgresql", feature = "mysql"))]
     fn visit_json_type_equals(&mut self, left: Expression<'a>, right: JsonType<'a>, not: bool) -> Result;
 
-    #[cfg(all(feature = "json", any(feature = "postgresql", feature = "mysql")))]
+    #[cfg(any(feature = "postgresql", feature = "mysql"))]
     fn visit_json_unquote(&mut self, json_unquote: JsonUnquote<'a>) -> Result;
 
     #[cfg(any(feature = "postgresql", feature = "mysql"))]
@@ -915,7 +915,7 @@ pub trait Visitor<'a> {
                 self.write(" ")?;
                 self.visit_expression(*right)
             }
-            #[cfg(all(feature = "json", any(feature = "postgresql", feature = "mysql")))]
+            #[cfg(any(feature = "postgresql", feature = "mysql"))]
             Compare::JsonCompare(json_compare) => match json_compare {
                 JsonCompare::ArrayContains(left, right) => self.visit_json_array_contains(*left, *right, false),
                 JsonCompare::ArrayNotContains(left, right) => self.visit_json_array_contains(*left, *right, true),
@@ -997,7 +997,7 @@ pub trait Visitor<'a> {
             FunctionType::AggregateToString(agg) => {
                 self.visit_aggregate_to_string(agg.value.as_ref().clone())?;
             }
-            #[cfg(all(feature = "json", feature = "postgresql"))]
+            #[cfg(feature = "postgresql")]
             FunctionType::RowToJson(row_to_json) => {
                 self.write("ROW_TO_JSON")?;
                 self.surround_with("(", ")", |ref mut s| s.visit_table(row_to_json.expr, false))?
@@ -1029,19 +1029,19 @@ pub trait Visitor<'a> {
                 self.write("COALESCE")?;
                 self.surround_with("(", ")", |s| s.visit_columns(coalesce.exprs))?;
             }
-            #[cfg(all(feature = "json", any(feature = "postgresql", feature = "mysql")))]
+            #[cfg(any(feature = "postgresql", feature = "mysql"))]
             FunctionType::JsonExtract(json_extract) => {
                 self.visit_json_extract(json_extract)?;
             }
-            #[cfg(all(feature = "json", any(feature = "postgresql", feature = "mysql")))]
+            #[cfg(any(feature = "postgresql", feature = "mysql"))]
             FunctionType::JsonExtractFirstArrayElem(extract) => {
                 self.visit_json_extract_first_array_item(extract)?;
             }
-            #[cfg(all(feature = "json", any(feature = "postgresql", feature = "mysql")))]
+            #[cfg(any(feature = "postgresql", feature = "mysql"))]
             FunctionType::JsonExtractLastArrayElem(extract) => {
                 self.visit_json_extract_last_array_item(extract)?;
             }
-            #[cfg(all(feature = "json", any(feature = "postgresql", feature = "mysql")))]
+            #[cfg(any(feature = "postgresql", feature = "mysql"))]
             FunctionType::JsonUnquote(unquote) => {
                 self.visit_json_unquote(unquote)?;
             }
