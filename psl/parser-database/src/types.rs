@@ -1,6 +1,6 @@
 pub(crate) mod index_fields;
 
-use crate::{context::Context, interner::StringId, walkers::IndexFieldWalker, DatamodelError, FileId};
+use crate::{context::Context, interner::StringId, walkers::IndexFieldWalker, DatamodelError};
 use either::Either;
 use enumflags2::bitflags;
 use rustc_hash::FxHashMap as HashMap;
@@ -10,7 +10,7 @@ use std::{collections::BTreeMap, fmt};
 pub(super) fn resolve_types(ctx: &mut Context<'_>) {
     for ((file_id, top_id), top) in ctx.iter_tops() {
         match (top_id, top) {
-            (ast::TopId::Model(model_id), ast::Top::Model(model)) => visit_model(file_id, model_id, model, ctx),
+            (ast::TopId::Model(model_id), ast::Top::Model(model)) => visit_model((file_id, model_id), model, ctx),
             (ast::TopId::Enum(_), ast::Top::Enum(enm)) => visit_enum(enm, ctx),
             (ast::TopId::CompositeType(ct_id), ast::Top::CompositeType(ct)) => {
                 visit_composite_type((file_id, ct_id), ct, ctx)
@@ -631,16 +631,16 @@ pub(super) struct EnumAttributes {
     pub(crate) schema: Option<(StringId, ast::Span)>,
 }
 
-fn visit_model<'db>(file_id: FileId, model_id: ast::ModelId, ast_model: &'db ast::Model, ctx: &mut Context<'db>) {
+fn visit_model<'db>(model_id: crate::ModelId, ast_model: &'db ast::Model, ctx: &mut Context<'db>) {
     for (field_id, ast_field) in ast_model.iter_fields() {
         match field_type(ast_field, ctx) {
             Ok(FieldType::Model(referenced_model)) => {
-                let rf = RelationField::new((file_id, model_id), field_id, referenced_model);
+                let rf = RelationField::new(model_id, field_id, referenced_model);
                 ctx.types.push_relation_field(rf);
             }
             Ok(FieldType::Scalar(scalar_field_type)) => {
                 ctx.types.push_scalar_field(ScalarField {
-                    model_id: (file_id, model_id),
+                    model_id,
                     field_id,
                     r#type: scalar_field_type,
                     is_ignored: false,

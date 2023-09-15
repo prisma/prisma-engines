@@ -6,7 +6,7 @@ use crate::{
 };
 use enumflags2::BitFlags;
 
-#[derive(Debug)]
+#[derive(Debug, Default)]
 pub struct Configuration {
     pub generators: Vec<Generator>,
     pub datasources: Vec<Datasource>,

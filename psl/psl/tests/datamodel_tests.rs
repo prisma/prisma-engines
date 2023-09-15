@@ -7,6 +7,7 @@ mod base;
 mod capabilities;
 mod common;
 mod config;
+mod multi_file;
 mod functions;
 mod parsing;
 mod reformat;

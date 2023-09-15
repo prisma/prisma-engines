@@ -49,3 +49,9 @@ pub fn parse_schema(file: impl Into<SourceFile>) -> Result<ValidatedSchema, Stri
 pub fn validate(file: SourceFile) -> ValidatedSchema {
     psl_core::validate(file, builtin_connectors::BUILTIN_CONNECTORS)
 }
+
+/// The most general API for dealing with Prisma schemas. It accumulates what analysis and
+/// validation information it can, and returns it along with any error and warning diagnostics.
+pub fn validate_multi_file(files: Vec<(String, SourceFile)>) -> ValidatedSchema {
+    psl_core::validate_multi_file(files, builtin_connectors::BUILTIN_CONNECTORS)
+}

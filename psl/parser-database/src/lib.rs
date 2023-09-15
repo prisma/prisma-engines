@@ -52,7 +52,6 @@ pub use types::{
 use self::{context::Context, files::Files, interner::StringId, relations::Relations, types::Types};
 use diagnostics::{DatamodelError, Diagnostics};
 use names::Names;
-use std::collections::HashMap;
 
 /// ParserDatabase is a container for a Schema AST, together with information
 /// gathered during schema validation. Each validation step enriches the
@@ -90,7 +89,7 @@ impl ParserDatabase {
 
     /// See the docs on [ParserDatabase](/struct.ParserDatabase.html).
     pub fn new(schemas: Vec<(String, schema_ast::SourceFile)>, diagnostics: &mut Diagnostics) -> Self {
-        let asts: HashMap<_, _> = schemas
+        let asts = schemas
             .iter()
             .enumerate()
             .map(|(file_idx, (_path, schema))| {
@@ -157,6 +156,8 @@ impl ParserDatabase {
         // Fourth step: relation inference
         relations::infer_relations(&mut ctx);
 
+        dbg!(&asts.0);
+
         ParserDatabase {
             asts,
             schemas,
@@ -169,10 +170,15 @@ impl ParserDatabase {
 
     /// The parsed AST. This methods asserts that there is a single prisma schema file. As
     /// multi-file schemas are implemented, calls to this methods should be replaced with
-    /// `ParserDatabase::ast()` and `ParserDatabase::iter_sources()`.
+    /// `ParserDatabase::ast()` and `ParserDatabase::iter_asts()`.
     pub fn ast_assert_single(&self) -> &ast::SchemaAst {
         assert_eq!(self.asts.0.len(), 1);
-        self.asts.0.iter().next().unwrap().1
+        &self.asts.0.iter().next().unwrap().1
+    }
+
+    /// Iterate all parsed ASTs.
+    pub fn iter_asts(&self) -> impl Iterator<Item = &ast::SchemaAst> {
+        self.asts.0.iter().map(|(_, ast)| ast)
     }
 
     /// A parsed AST.
@@ -201,6 +207,14 @@ impl ParserDatabase {
     /// The source file contents.
     pub(crate) fn source(&self, file_id: FileId) -> &str {
         self.schemas[file_id.0].1.as_str()
+    }
+}
+
+impl std::ops::Index<FileId> for ParserDatabase {
+    type Output = (String, SourceFile);
+
+    fn index(&self, index: FileId) -> &Self::Output {
+        &self.schemas[index.0]
     }
 }
 
