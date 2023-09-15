@@ -105,7 +105,6 @@ fn start_rpc_thread(mut receiver: mpsc::Receiver<ReqImpl>) -> Result<()> {
                 Ok(process) => process,
                 Err(err) => exit_with_message(1, &format!("Failed to spawn the executor process.\nDetails: {err}\n")),
             };
-            // .map_err(|err| GenericError(format!("Failed to spawn node executor process.\nDetails: {err}\n")))?;
 
             let mut stdout = BufReader::new(process.stdout.unwrap()).lines();
             let mut stdin = process.stdin.unwrap();
