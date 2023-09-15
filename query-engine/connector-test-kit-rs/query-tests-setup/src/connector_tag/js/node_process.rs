@@ -115,27 +115,29 @@ fn start_rpc_thread(mut receiver: mpsc::Receiver<ReqImpl>) -> Result<()> {
                 tokio::select! {
                     line = stdout.next_line() => {
                         match line {
+                            // Two error modes in here: the external process can response with 
+                            // something that is not a jsonrpc response (basically any normal logging 
+                            // output), or it can respond with a jsonrpc response that represents a 
+                            // failure.
                             Ok(Some(line)) => // new response
                             {
-                                let response: jsonrpc_core::Output = match serde_json::from_str(&line) {
-                                    Ok(response) => response,
-                                    Err(err) => // log it
-                                    {
-                                        tracing::error!(%err, "Error when decoding response from child node process");
+                                match serde_json::from_str::<jsonrpc_core::Output>(&line) {
+                                    Ok(response) => {
+                                        let sender = pending_requests.remove(response.id()).unwrap();
+                                        match response {
+                                            jsonrpc_core::Output::Success(success) => {
+                                                sender.send(success.result).unwrap();
+                                            }
+                                            jsonrpc_core::Output::Failure(err) => {
+                                                panic!("error response from jsonrpc: {err:?}")
+                                            }
+                                        }
+                                    }
+                                    Err(err) => {
+                                        tracing::error!(%err, "error when decoding response from child node process. Response was: `{}`", &line);
                                         continue
                                     }
                                 };
-
-                                let sender = pending_requests.remove(response.id()).unwrap();
-                                match response {
-                                    jsonrpc_core::Output::Success(success) => {
-                                        sender.send(success.result).unwrap();
-                                    }
-                                    jsonrpc_core::Output::Failure(err) => {
-                                        panic!("error response from jsonrpc: {err:?}")
-                                    }
-                                }
-
                             }
                             Ok(None) => // end of the stream
                             {
