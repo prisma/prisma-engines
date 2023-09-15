@@ -1,10 +1,10 @@
-use crate::{ast, ast::WithDocumentation, types, walkers::Walker, FileId};
+use crate::{ast, ast::WithDocumentation, types, walkers::Walker};
 use schema_ast::ast::{IndentationType, NewlineType};
 
 /// An `enum` declaration in the schema.
-pub type EnumWalker<'db> = Walker<'db, (FileId, ast::EnumId)>;
+pub type EnumWalker<'db> = Walker<'db, crate::EnumId>;
 /// One value in an `enum` declaration in the schema.
-pub type EnumValueWalker<'db> = Walker<'db, (FileId, ast::EnumId, usize)>;
+pub type EnumValueWalker<'db> = Walker<'db, (crate::EnumId, usize)>;
 
 impl<'db> EnumWalker<'db> {
     fn attributes(self) -> &'db types::EnumAttributes {
@@ -44,7 +44,7 @@ impl<'db> EnumWalker<'db> {
 
     /// The values of the enum.
     pub fn values(self) -> impl ExactSizeIterator<Item = EnumValueWalker<'db>> {
-        (0..self.ast_enum().values.len()).map(move |idx| self.walk((self.id.0, self.id.1, idx)))
+        (0..self.ast_enum().values.len()).map(move |idx| self.walk((self.id, idx)))
     }
 
     /// How fields are indented in the enum.
@@ -70,17 +70,17 @@ impl<'db> EnumWalker<'db> {
 
 impl<'db> EnumValueWalker<'db> {
     fn r#enum(self) -> EnumWalker<'db> {
-        self.walk((self.id.0, self.id.1))
+        self.walk(self.id.0)
     }
 
     /// The enum documentation
     pub fn documentation(self) -> Option<&'db str> {
-        self.r#enum().ast_enum().values[self.id.2].documentation()
+        self.r#enum().ast_enum().values[self.id.1].documentation()
     }
 
     /// The name of the value.
     pub fn name(self) -> &'db str {
-        &self.r#enum().ast_enum().values[self.id.2].name.name
+        &self.r#enum().ast_enum().values[self.id.1].name.name
     }
 
     /// The database name of the enum.
@@ -99,9 +99,9 @@ impl<'db> EnumValueWalker<'db> {
     /// }
     /// ```
     pub fn mapped_name(self) -> Option<&'db str> {
-        self.db.types.enum_attributes[&(self.id.0, self.id.1)]
+        self.db.types.enum_attributes[&self.id.0]
             .mapped_values
-            .get(&(self.id.2 as u32))
+            .get(&(self.id.1 as u32))
             .map(|id| &self.db[*id])
     }
 }
