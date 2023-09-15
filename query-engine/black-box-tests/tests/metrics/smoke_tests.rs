@@ -59,6 +59,7 @@ mod smoke_tests {
             // I would have loved to use insta in here and check the snapshot but the order of the metrics is not guaranteed
             // And I opted for the manual checking of invariant data that provided enough confidence instead
 
+            // counters
             assert_eq!(metrics.matches("# HELP prisma_client_queries_total The total number of Prisma Client queries executed").count(), 1);
             assert_eq!(metrics.matches("# TYPE prisma_client_queries_total counter").count(), 1);
 
@@ -71,6 +72,7 @@ mod smoke_tests {
             assert_eq!(metrics.matches("# HELP prisma_pool_connections_opened_total The total number of pool connections opened").count(), 1);
             assert_eq!(metrics.matches("# TYPE prisma_pool_connections_opened_total counter").count(), 1);
 
+            // gauges
             assert_eq!(metrics.matches("# HELP prisma_client_queries_active The number of currently active Prisma Client queries").count(), 1);
             assert_eq!(metrics.matches("# TYPE prisma_client_queries_active gauge").count(), 1);
 
@@ -86,6 +88,7 @@ mod smoke_tests {
             assert_eq!(metrics.matches("# HELP prisma_pool_connections_open The number of pool connections currently open").count(), 1);
             assert_eq!(metrics.matches("# TYPE prisma_pool_connections_open gauge").count(), 1);
 
+            // histograms
             assert_eq!(metrics.matches("# HELP prisma_client_queries_duration_histogram_ms The distribution of the time Prisma Client queries took to run end to end").count(), 1);
             assert_eq!(metrics.matches("# TYPE prisma_client_queries_duration_histogram_ms histogram").count(), 1);
 
