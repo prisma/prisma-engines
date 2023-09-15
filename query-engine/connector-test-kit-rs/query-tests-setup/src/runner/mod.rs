@@ -48,7 +48,22 @@ impl From<TransactionEndResponse> for TxResult {
 }
 
 pub enum RunnerExecutor {
+    // Builtin is a runner that uses the query engine in-process, issuing queries against a
+    // `core::InterpretingExecutor` that uses the particular connector under test in the test suite.
     Builtin(Executor),
+
+    // External is a runner that uses an external process that responds to queries piped to its STDIN
+    // in JsonRPC format. In particular this is used to test the query engine against a node process
+    // running a library engine configured to use a javascript driver adapter to connect to a database.
+    //
+    // In this struct variant, usize represents the index of the schema used for the test suite to
+    // execute queries against. When the suite starts, a message with the schema and the id is sent to
+    // the external process, which will create a new instance of the library engine configured to
+    // access that schema.
+    //
+    // Everytime a query is sent to the external process, it's provided the id of the schema, so the
+    // process knows how to associate the query to the instance of the library engine that will dispatch
+    // it.
     External(usize),
 }
 
