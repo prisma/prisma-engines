@@ -8,6 +8,7 @@ use serde_json::value::Value as JsonValue;
 pub enum JSArg {
     RawString(String),
     Value(serde_json::Value),
+    Buffer(Vec<u8>),
 }
 
 impl From<JsonValue> for JSArg {
@@ -31,6 +32,10 @@ impl ToNapiValue for JSArg {
         match value {
             JSArg::RawString(s) => ToNapiValue::to_napi_value(env, s),
             JSArg::Value(v) => ToNapiValue::to_napi_value(env, v),
+            JSArg::Buffer(bytes) => ToNapiValue::to_napi_value(
+                env,
+                napi::Env::from_raw(env).create_arraybuffer_with_data(bytes)?.into_raw(),
+            ),
         }
     }
 }
@@ -45,6 +50,10 @@ pub fn conv_params(params: &[QuaintValue<'_>]) -> serde_json::Result<Vec<JSArg>>
                     let json_str = serde_json::to_string(s)?;
                     JSArg::RawString(json_str)
                 }
+                None => JsonValue::Null.into(),
+            },
+            QuaintValue::Bytes(bytes) => match bytes {
+                Some(bytes) => JSArg::Buffer(bytes.to_vec()),
                 None => JsonValue::Null.into(),
             },
             quaint_value => {
