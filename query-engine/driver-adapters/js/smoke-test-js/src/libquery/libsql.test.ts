@@ -4,7 +4,7 @@ import { IntMode, createClient } from '@libsql/client'
 import { describe } from 'node:test'
 import { smokeTestLibquery } from './libquery'
 
-describe('libsql', () => {
+describe('libsql', async () => {
   const url = process.env.JS_LIBSQL_DATABASE_URL as string
   const syncUrl = process.env.JS_LIBSQL_SYNC_URL
   const authToken = process.env.JS_LIBSQL_AUTH_TOKEN
@@ -13,6 +13,10 @@ describe('libsql', () => {
   const client = createClient({ url, syncUrl, authToken, intMode })
   const adapter = new PrismaLibsql(client)
   const driverAdapter = bindAdapter(adapter)
+
+  if (syncUrl) {
+    await client.sync()
+  }
 
   smokeTestLibquery(driverAdapter, '../../prisma/sqlite/schema.prisma')
 })

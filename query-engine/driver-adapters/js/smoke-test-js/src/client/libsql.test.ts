@@ -12,5 +12,9 @@ describe('libsql with @prisma/client', async () => {
   const client = createClient({ url, syncUrl, authToken, intMode })
   const adapter = new PrismaLibsql(client)
 
+  if (syncUrl) {
+    await client.sync()
+  }
+
   smokeTestClient(adapter)
 })
