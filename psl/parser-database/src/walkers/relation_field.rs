@@ -84,7 +84,7 @@ impl<'db> RelationFieldWalker<'db> {
     /// The `@relation` attribute in the field AST.
     pub fn relation_attribute(self) -> Option<&'db ast::Attribute> {
         let attrs = self.attributes();
-        attrs.relation_attribute.map(|id| &self.db.asts[attrs.model_id.0][id])
+        attrs.relation_attribute.map(|id| &self.db.asts[(attrs.model_id.0, id)])
     }
 
     /// Does the relation field reference the passed in model?

@@ -104,7 +104,7 @@ impl<'db> CompositeTypeFieldWalker<'db> {
         self.field()
             .default
             .as_ref()
-            .map(|d| &self.db.asts[self.id.0 .0][d.default_attribute.1])
+            .map(|d| &self.db.asts[(self.id.0 .0, d.default_attribute.1)])
     }
 
     /// (attribute scope, native type name, arguments, span)

@@ -55,9 +55,8 @@ where
 impl crate::ParserDatabase {
     fn iter_tops(&self) -> impl Iterator<Item = (FileId, ast::TopId, &ast::Top)> + '_ {
         self.asts
-            .0
             .iter()
-            .flat_map(move |(file_id, ast)| ast.iter_tops().map(|(top_id, top)| (*file_id, top_id, top)))
+            .flat_map(move |(file_id, _, _, ast)| ast.iter_tops().map(move |(top_id, top)| (file_id, top_id, top)))
     }
 
     /// Find an enum by name.

@@ -129,7 +129,7 @@ impl<'db> Context<'db> {
         }
 
         self.attributes
-            .set_attributes(ast_attributes, &self.asts[ast_attributes.0]);
+            .set_attributes(ast_attributes, &self.asts[ast_attributes.0].2);
     }
 
     /// Look for an optional attribute with a name of the form
@@ -333,9 +333,8 @@ impl<'db> Context<'db> {
 
     pub(crate) fn iter_tops(&self) -> impl Iterator<Item = (crate::TopId, &'db ast::Top)> + 'db {
         self.asts
-            .0
             .iter()
-            .flat_map(|(file_id, ast)| ast.iter_tops().map(|(top_id, top)| ((*file_id, top_id), top)))
+            .flat_map(|(file_id, _, _, ast)| ast.iter_tops().map(move |(top_id, top)| ((file_id, top_id), top)))
     }
 
     /// Starts validating the arguments for an attribute, checking for duplicate arguments in the

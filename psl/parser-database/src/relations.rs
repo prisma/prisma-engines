@@ -239,8 +239,8 @@ pub(super) fn relation_evidence<'db>(
     ctx: &'db Context<'db>,
 ) -> RelationEvidence<'db> {
     let rf = &ctx.types[relation_field_id];
-    let referencing_ast = &ctx.asts[rf.model_id.0];
-    let referenced_ast = &ctx.asts[rf.referenced_model.0];
+    let referencing_ast = &ctx.asts[rf.model_id.0].2;
+    let referenced_ast = &ctx.asts[rf.referenced_model.0].2;
     let ast_model = &referencing_ast[relation_field.model_id.1];
     let ast_field = &ast_model[relation_field.field_id];
     let opposite_model = &referenced_ast[relation_field.referenced_model.1];

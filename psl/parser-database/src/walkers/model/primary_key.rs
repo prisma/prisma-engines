@@ -16,7 +16,7 @@ pub struct PrimaryKeyWalker<'db> {
 impl<'db> PrimaryKeyWalker<'db> {
     /// The `@(@)id` AST node.
     pub fn ast_attribute(self) -> &'db ast::Attribute {
-        &self.db.asts[self.model_id.0][self.attribute.source_attribute.1]
+        &self.db.asts[(self.model_id.0, self.attribute.source_attribute.1)]
     }
 
     /// The mapped name of the id.

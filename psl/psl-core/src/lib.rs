@@ -54,7 +54,7 @@ impl ValidatedSchema {
         let mut out = Vec::new();
 
         for error in self.diagnostics.errors() {
-            let (file_name, source) = &self.db[error.span().file_id];
+            let (file_name, source, _) = &self.db[error.span().file_id];
             error.pretty_print(&mut out, file_name, source.as_str()).unwrap();
         }
 

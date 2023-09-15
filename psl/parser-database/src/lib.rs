@@ -73,8 +73,7 @@ use names::Names;
 /// - Global validations are then performed on the mostly validated schema.
 ///   Currently only index name collisions.
 pub struct ParserDatabase {
-    schemas: Vec<(String, schema_ast::SourceFile)>,
-    asts: Files, // todo: combine schemas and ASTs
+    asts: Files,
     interner: interner::StringInterner,
     names: Names,
     types: Types,
@@ -90,11 +89,12 @@ impl ParserDatabase {
     /// See the docs on [ParserDatabase](/struct.ParserDatabase.html).
     pub fn new(schemas: Vec<(String, schema_ast::SourceFile)>, diagnostics: &mut Diagnostics) -> Self {
         let asts = schemas
-            .iter()
+            .into_iter()
             .enumerate()
-            .map(|(file_idx, (_path, schema))| {
+            .map(|(file_idx, (path, source))| {
                 let id = FileId(file_idx as u32);
-                (id, schema_ast::parse_schema(schema.as_str(), diagnostics, id))
+                let ast = schema_ast::parse_schema(source.as_str(), diagnostics, id);
+                (path, source, ast)
             })
             .collect();
         let asts = Files(asts);
@@ -121,7 +121,6 @@ impl ParserDatabase {
 
             return ParserDatabase {
                 asts,
-                schemas,
                 interner,
                 names,
                 types,
@@ -138,7 +137,6 @@ impl ParserDatabase {
 
             return ParserDatabase {
                 asts,
-                schemas,
                 interner,
                 names,
                 types,
@@ -158,7 +156,6 @@ impl ParserDatabase {
 
         ParserDatabase {
             asts,
-            schemas,
             interner,
             names,
             types,
@@ -171,17 +168,17 @@ impl ParserDatabase {
     /// `ParserDatabase::ast()` and `ParserDatabase::iter_asts()`.
     pub fn ast_assert_single(&self) -> &ast::SchemaAst {
         assert_eq!(self.asts.0.len(), 1);
-        &self.asts.0.first().unwrap().1
+        &self.asts.0.first().unwrap().2
     }
 
     /// Iterate all parsed ASTs.
     pub fn iter_asts(&self) -> impl Iterator<Item = &ast::SchemaAst> {
-        self.asts.0.iter().map(|(_, ast)| ast)
+        self.asts.iter().map(|(_, _, _, ast)| ast)
     }
 
     /// A parsed AST.
     pub fn ast(&self, file_id: FileId) -> &ast::SchemaAst {
-        &self.asts[file_id]
+        &self.asts[file_id].2
     }
 
     /// The total number of enums in the schema. This is O(1).
@@ -198,21 +195,21 @@ impl ParserDatabase {
     /// As multi-file schemas are implemented, calls to this methods should be replaced with
     /// `ParserDatabase::source()` and `ParserDatabase::iter_sources()`.
     pub fn source_assert_single(&self) -> &str {
-        assert_eq!(self.schemas.len(), 1);
-        self.schemas[0].1.as_str()
+        assert_eq!(self.asts.0.len(), 1);
+        self.asts.0[0].1.as_str()
     }
 
     /// The source file contents.
     pub(crate) fn source(&self, file_id: FileId) -> &str {
-        self.schemas[file_id.0 as usize].1.as_str()
+        self.asts[file_id].1.as_str()
     }
 }
 
 impl std::ops::Index<FileId> for ParserDatabase {
-    type Output = (String, SourceFile);
+    type Output = (String, SourceFile, ast::SchemaAst);
 
     fn index(&self, index: FileId) -> &Self::Output {
-        &self.schemas[index.0 as usize]
+        &self.asts[index]
     }
 }
 

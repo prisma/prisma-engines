@@ -69,7 +69,7 @@ impl<'db> IndexWalker<'db> {
 
     /// The AST node of the index/unique attribute.
     pub fn ast_attribute(self) -> &'db ast::Attribute {
-        &self.db.asts[self.model_id.0][self.index]
+        &self.db.asts[(self.model_id.0, self.index)]
     }
 
     pub(crate) fn attribute(self) -> &'db IndexAttribute {

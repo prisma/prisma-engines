@@ -2,13 +2,22 @@ use crate::FileId;
 use schema_ast::ast;
 use std::ops::Index;
 
-pub(crate) struct Files(pub(super) Vec<(FileId, ast::SchemaAst)>);
+pub(crate) struct Files(pub(super) Vec<(String, schema_ast::SourceFile, ast::SchemaAst)>);
+
+impl Files {
+    pub(crate) fn iter(&self) -> impl Iterator<Item = (FileId, &String, &schema_ast::SourceFile, &ast::SchemaAst)> {
+        self.0
+            .iter()
+            .enumerate()
+            .map(|(idx, (path, contents, ast))| (FileId(idx as u32), path, contents, ast))
+    }
+}
 
 impl Index<crate::FileId> for Files {
-    type Output = ast::SchemaAst;
+    type Output = (String, schema_ast::SourceFile, ast::SchemaAst);
 
     fn index(&self, index: crate::FileId) -> &Self::Output {
-        &self.0[index.0 as usize].1
+        &self.0[index.0 as usize]
     }
 }
 
@@ -19,6 +28,6 @@ where
     type Output = <ast::SchemaAst as Index<Id>>::Output;
 
     fn index(&self, index: crate::InFile<Id>) -> &Self::Output {
-        &self[index.0][index.1]
+        &self[index.0].2[index.1]
     }
 }
