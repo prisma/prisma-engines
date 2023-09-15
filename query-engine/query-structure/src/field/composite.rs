@@ -1,6 +1,6 @@
 use crate::{parent_container::ParentContainer, CompositeType};
 use psl::{
-    parser_database::ScalarFieldId,
+    parser_database::{self as db, ScalarFieldId},
     schema_ast::ast::{self, FieldArity},
 };
 use std::fmt::{Debug, Display};
@@ -8,7 +8,7 @@ use std::fmt::{Debug, Display};
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum CompositeFieldId {
     InModel(ScalarFieldId),
-    InCompositeType((ast::CompositeTypeId, ast::FieldId)),
+    InCompositeType((db::CompositeTypeId, ast::FieldId)),
 }
 
 pub type CompositeField = crate::Zipper<CompositeFieldId>;

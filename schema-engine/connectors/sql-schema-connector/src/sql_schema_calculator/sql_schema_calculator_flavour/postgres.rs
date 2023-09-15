@@ -69,7 +69,7 @@ impl SqlSchemaCalculatorFlavour for PostgresFlavour {
         }
 
         for model in db.walk_models() {
-            let table_id = context.model_id_to_table_id[&model.model_id()];
+            let table_id = context.model_id_to_table_id[&model.id];
 
             // Add index algorithms and opclasses.
             for index in model.indexes() {
