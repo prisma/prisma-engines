@@ -1,5 +1,5 @@
-use schema_ast::ast;
 use diagnostics::FileId;
+use schema_ast::ast;
 
 /// An AST identifier with the accompanyin file ID.
 pub type InFile<Id> = (FileId, Id);
