@@ -174,7 +174,6 @@ fn resolve_model_attributes(model_id: crate::ModelId, ctx: &mut Context<'_>) {
     // Model-global validations
     id::validate_id_field_arities(model_id, &model_attributes, ctx);
 
-    dbg!(model_id, &model_attributes);
     ctx.types.model_attributes.insert(model_id, model_attributes);
     ctx.validate_visited_attributes();
 }

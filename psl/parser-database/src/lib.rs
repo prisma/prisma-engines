@@ -152,8 +152,6 @@ impl ParserDatabase {
         // Fourth step: relation inference
         relations::infer_relations(&mut ctx);
 
-        dbg!(&asts.0);
-
         ParserDatabase {
             asts,
             interner,
