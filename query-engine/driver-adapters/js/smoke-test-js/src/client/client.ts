@@ -108,10 +108,7 @@ export async function smokeTestClient(driverAdapter: DriverAdapter) {
           })
 
           it('throws on unsupported isolation levels', async () => {
-            const prisma = new PrismaClient({ adapter, log })
-
-            const queries: string[] = []
-            prisma.$on('query', ({ query }) => queries.push(query))
+            const prisma = new PrismaClient({ adapter })
 
             assert.rejects(
               prisma.$transaction([prisma.child.findMany(), prisma.child.count()], {
