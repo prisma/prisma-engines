@@ -5,11 +5,12 @@ import { describe } from 'node:test'
 import { smokeTestLibquery } from './libquery'
 
 describe('libsql', () => {
-  const connectionString = process.env.JS_LIBSQL_DATABASE_URL as string
+  const url = process.env.JS_LIBSQL_DATABASE_URL as string
+  const syncUrl = process.env.JS_LIBSQL_SYNC_URL
   const authToken = process.env.JS_LIBSQL_AUTH_TOKEN
   const intMode = process.env.JS_LIBSQL_INT_MODE as IntMode | undefined
 
-  const client = createClient({ url: connectionString, authToken: authToken, intMode })
+  const client = createClient({ url, syncUrl, authToken, intMode })
   const adapter = new PrismaLibsql(client)
   const driverAdapter = bindAdapter(adapter)
 
