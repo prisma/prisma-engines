@@ -173,7 +173,7 @@ impl ParserDatabase {
     /// `ParserDatabase::ast()` and `ParserDatabase::iter_asts()`.
     pub fn ast_assert_single(&self) -> &ast::SchemaAst {
         assert_eq!(self.asts.0.len(), 1);
-        &self.asts.0.iter().next().unwrap().1
+        &self.asts.0.first().unwrap().1
     }
 
     /// Iterate all parsed ASTs.
