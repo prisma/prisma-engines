@@ -8,7 +8,7 @@ impl Index<crate::FileId> for Files {
     type Output = ast::SchemaAst;
 
     fn index(&self, index: crate::FileId) -> &Self::Output {
-        &self.0[index.0].1
+        &self.0[index.0 as usize].1
     }
 }
 

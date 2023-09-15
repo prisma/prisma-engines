@@ -1,11 +1,11 @@
 /// The stable identifier for a PSL file.
 #[derive(Debug, PartialEq, Clone, Copy, Hash, Eq, PartialOrd, Ord)]
-pub struct FileId(pub usize); // we can't encapsulate because it would be a circular crate
-                              // dependency between diagnostics and parser-database
+pub struct FileId(pub u32); // we can't encapsulate because it would be a circular crate
+                            // dependency between diagnostics and parser-database
 
 impl FileId {
     pub const ZERO: FileId = FileId(0);
-    pub const MAX: FileId = FileId(usize::MAX);
+    pub const MAX: FileId = FileId(u32::MAX);
 }
 
 /// Represents a location in a datamodel's text representation.

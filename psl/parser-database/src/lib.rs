@@ -93,10 +93,8 @@ impl ParserDatabase {
             .iter()
             .enumerate()
             .map(|(file_idx, (_path, schema))| {
-                (
-                    FileId(file_idx),
-                    schema_ast::parse_schema(schema.as_str(), diagnostics, FileId(file_idx)),
-                )
+                let id = FileId(file_idx as u32);
+                (id, schema_ast::parse_schema(schema.as_str(), diagnostics, id))
             })
             .collect();
         let asts = Files(asts);
@@ -206,7 +204,7 @@ impl ParserDatabase {
 
     /// The source file contents.
     pub(crate) fn source(&self, file_id: FileId) -> &str {
-        self.schemas[file_id.0].1.as_str()
+        self.schemas[file_id.0 as usize].1.as_str()
     }
 }
 
@@ -214,7 +212,7 @@ impl std::ops::Index<FileId> for ParserDatabase {
     type Output = (String, SourceFile);
 
     fn index(&self, index: FileId) -> &Self::Output {
-        &self.schemas[index.0]
+        &self.schemas[index.0 as usize]
     }
 }
 
