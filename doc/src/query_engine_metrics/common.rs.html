@@ -120,6 +120,24 @@
 <a href="#120" id="120">120</a>
 <a href="#121" id="121">121</a>
 <a href="#122" id="122">122</a>
+<a href="#123" id="123">123</a>
+<a href="#124" id="124">124</a>
+<a href="#125" id="125">125</a>
+<a href="#126" id="126">126</a>
+<a href="#127" id="127">127</a>
+<a href="#128" id="128">128</a>
+<a href="#129" id="129">129</a>
+<a href="#130" id="130">130</a>
+<a href="#131" id="131">131</a>
+<a href="#132" id="132">132</a>
+<a href="#133" id="133">133</a>
+<a href="#134" id="134">134</a>
+<a href="#135" id="135">135</a>
+<a href="#136" id="136">136</a>
+<a href="#137" id="137">137</a>
+<a href="#138" id="138">138</a>
+<a href="#139" id="139">139</a>
+<a href="#140" id="140">140</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::collections::HashMap;
 
 <span class="kw">use </span>metrics::{Key, Label};
@@ -174,7 +192,30 @@
 }
 
 <span class="kw">impl </span>Metric {
-    <span class="kw">pub fn </span>new(key: Key, description: String, value: MetricValue, global_labels: HashMap&lt;String, String&gt;) -&gt; <span class="self">Self </span>{
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>renamed(
+        key: Key,
+        descriptions: <span class="kw-2">&amp;</span>HashMap&lt;String, String&gt;,
+        value: MetricValue,
+        global_labels: <span class="kw-2">&amp;</span>HashMap&lt;String, String&gt;,
+    ) -&gt; <span class="self">Self </span>{
+        <span class="kw">match </span><span class="kw">crate</span>::METRIC_RENAMES.get(key.name()) {
+            <span class="prelude-val">Some</span>((new_key, new_description)) =&gt; <span class="self">Self</span>::new(
+                Key::from_parts(new_key.to_string(), key.labels()),
+                new_description.to_string(),
+                value,
+                global_labels.clone(),
+            ),
+            <span class="prelude-val">None </span>=&gt; {
+                <span class="kw">let </span>description = descriptions
+                    .get(key.name())
+                    .map(|s| s.to_string())
+                    .unwrap_or(String::new());
+                <span class="self">Self</span>::new(key, description, value, global_labels.clone())
+            }
+        }
+    }
+
+    <span class="kw">fn </span>new(key: Key, description: String, value: MetricValue, global_labels: HashMap&lt;String, String&gt;) -&gt; <span class="self">Self </span>{
         <span class="kw">let </span>(name, labels) = key.into_parts();
 
         <span class="kw">let </span><span class="kw-2">mut </span>labels_map: HashMap&lt;String, String&gt; = labels
@@ -184,13 +225,8 @@
 
         labels_map.extend(global_labels);
 
-        <span class="kw">let </span><span class="kw-2">mut </span>key = name.as_str();
-        <span class="kw">if let </span><span class="prelude-val">Some</span>(rename) = <span class="kw">crate</span>::METRIC_RENAMES.get(key) {
-            key = rename;
-        }
-
         <span class="self">Self </span>{
-            key: key.to_string(),
+            key: name.as_str().to_string(),
             value,
             description,
             labels: labels_map,

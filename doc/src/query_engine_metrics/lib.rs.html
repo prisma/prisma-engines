@@ -579,33 +579,6 @@
 <a href="#579" id="579">579</a>
 <a href="#580" id="580">580</a>
 <a href="#581" id="581">581</a>
-<a href="#582" id="582">582</a>
-<a href="#583" id="583">583</a>
-<a href="#584" id="584">584</a>
-<a href="#585" id="585">585</a>
-<a href="#586" id="586">586</a>
-<a href="#587" id="587">587</a>
-<a href="#588" id="588">588</a>
-<a href="#589" id="589">589</a>
-<a href="#590" id="590">590</a>
-<a href="#591" id="591">591</a>
-<a href="#592" id="592">592</a>
-<a href="#593" id="593">593</a>
-<a href="#594" id="594">594</a>
-<a href="#595" id="595">595</a>
-<a href="#596" id="596">596</a>
-<a href="#597" id="597">597</a>
-<a href="#598" id="598">598</a>
-<a href="#599" id="599">599</a>
-<a href="#600" id="600">600</a>
-<a href="#601" id="601">601</a>
-<a href="#602" id="602">602</a>
-<a href="#603" id="603">603</a>
-<a href="#604" id="604">604</a>
-<a href="#605" id="605">605</a>
-<a href="#606" id="606">606</a>
-<a href="#607" id="607">607</a>
-<a href="#608" id="608">608</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Query Engine Metrics
 //! This crate is responsible for capturing and recording metrics in the Query Engine.
 //! Metrics is broken into two parts, `MetricsRecorder` and `MetricsRegistry`, and uses our tracing framework to communicate.
@@ -642,7 +615,8 @@
 <span class="kw">use </span>recorder::<span class="kw-2">*</span>;
 <span class="kw">pub use </span>registry::MetricRegistry;
 <span class="kw">use </span>serde::Deserialize;
-<span class="kw">use </span>std::{collections::HashMap, sync::Once};
+<span class="kw">use </span>std::collections::HashMap;
+<span class="kw">use </span>std::sync::Once;
 
 <span class="kw">pub extern crate </span>metrics;
 <span class="kw">pub use </span>metrics::{
@@ -650,63 +624,118 @@
     increment_counter, increment_gauge,
 };
 
-<span class="comment">// Dependency metrics names emitted by the connector pool implementation (mobc) that will be renamed
-// using the `METRIC_RENAMES` map.
-</span><span class="kw">pub const </span>MOBC_POOL_CONNECTIONS_OPENED_TOTAL: <span class="kw-2">&amp;</span>str = <span class="string">&quot;mobc_pool_connections_opened_total&quot;</span>;
-<span class="kw">pub const </span>MOBC_POOL_CONNECTIONS_CLOSED_TOTAL: <span class="kw-2">&amp;</span>str = <span class="string">&quot;mobc_pool_connections_closed_total&quot;</span>;
-<span class="kw">pub const </span>MOBC_POOL_CONNECTIONS_OPEN: <span class="kw-2">&amp;</span>str = <span class="string">&quot;mobc_pool_connections_open&quot;</span>;
-<span class="kw">pub const </span>MOBC_POOL_CONNECTIONS_BUSY: <span class="kw-2">&amp;</span>str = <span class="string">&quot;mobc_pool_connections_busy&quot;</span>;
-<span class="kw">pub const </span>MOBC_POOL_CONNECTIONS_IDLE: <span class="kw-2">&amp;</span>str = <span class="string">&quot;mobc_pool_connections_idle&quot;</span>;
-<span class="kw">pub const </span>MOBC_POOL_WAIT_COUNT: <span class="kw-2">&amp;</span>str = <span class="string">&quot;mobc_client_queries_wait&quot;</span>;
-<span class="kw">pub const </span>MOBC_POOL_WAIT_DURATION: <span class="kw-2">&amp;</span>str = <span class="string">&quot;mobc_client_queries_wait_histogram_ms&quot;</span>;
+<span class="comment">// Metrics that we emit from the engines, third party metrics emitted by libraries and that we rename are omitted.
+</span><span class="kw">pub const </span>PRISMA_CLIENT_QUERIES_TOTAL: <span class="kw-2">&amp;</span>str = <span class="string">&quot;prisma_client_queries_total&quot;</span>; <span class="comment">// counter
+</span><span class="kw">pub const </span>PRISMA_DATASOURCE_QUERIES_TOTAL: <span class="kw-2">&amp;</span>str = <span class="string">&quot;prisma_datasource_queries_total&quot;</span>; <span class="comment">// counter
+</span><span class="kw">pub const </span>PRISMA_CLIENT_QUERIES_ACTIVE: <span class="kw-2">&amp;</span>str = <span class="string">&quot;prisma_client_queries_active&quot;</span>; <span class="comment">// gauge
+</span><span class="kw">pub const </span>PRISMA_CLIENT_QUERIES_DURATION_HISTOGRAM_MS: <span class="kw-2">&amp;</span>str = <span class="string">&quot;prisma_client_queries_duration_histogram_ms&quot;</span>; <span class="comment">// histogram
+</span><span class="kw">pub const </span>PRISMA_DATASOURCE_QUERIES_DURATION_HISTOGRAM_MS: <span class="kw-2">&amp;</span>str = <span class="string">&quot;prisma_datasource_queries_duration_histogram_ms&quot;</span>; <span class="comment">// histogram
 
-<span class="comment">// External metrics names that we expose.
-// counters
-</span><span class="kw">pub const </span>PRISMA_CLIENT_QUERIES_TOTAL: <span class="kw-2">&amp;</span>str = <span class="string">&quot;prisma_client_queries_total&quot;</span>;
-<span class="kw">pub const </span>PRISMA_DATASOURCE_QUERIES_TOTAL: <span class="kw-2">&amp;</span>str = <span class="string">&quot;prisma_datasource_queries_total&quot;</span>;
-<span class="kw">pub const </span>PRISMA_POOL_CONNECTIONS_OPENED_TOTAL: <span class="kw-2">&amp;</span>str = <span class="string">&quot;prisma_pool_connections_opened_total&quot;</span>;
-<span class="kw">pub const </span>PRISMA_POOL_CONNECTIONS_CLOSED_TOTAL: <span class="kw-2">&amp;</span>str = <span class="string">&quot;prisma_pool_connections_closed_total&quot;</span>;
-<span class="comment">// gauges
-</span><span class="kw">pub const </span>PRISMA_POOL_CONNECTIONS_OPEN: <span class="kw-2">&amp;</span>str = <span class="string">&quot;prisma_pool_connections_open&quot;</span>;
-<span class="kw">pub const </span>PRISMA_POOL_CONNECTIONS_BUSY: <span class="kw-2">&amp;</span>str = <span class="string">&quot;prisma_pool_connections_busy&quot;</span>;
-<span class="kw">pub const </span>PRISMA_POOL_CONNECTIONS_IDLE: <span class="kw-2">&amp;</span>str = <span class="string">&quot;prisma_pool_connections_idle&quot;</span>;
-<span class="kw">pub const </span>PRISMA_CLIENT_QUERIES_WAIT: <span class="kw-2">&amp;</span>str = <span class="string">&quot;prisma_client_queries_wait&quot;</span>;
-<span class="kw">pub const </span>PRISMA_CLIENT_QUERIES_ACTIVE: <span class="kw-2">&amp;</span>str = <span class="string">&quot;prisma_client_queries_active&quot;</span>;
-<span class="comment">// histograms
-</span><span class="kw">pub const </span>PRISMA_CLIENT_QUERIES_DURATION_HISTOGRAM_MS: <span class="kw-2">&amp;</span>str = <span class="string">&quot;prisma_client_queries_duration_histogram_ms&quot;</span>;
-<span class="kw">pub const </span>PRISMA_CLIENT_QUERIES_WAIT_HISTOGRAM_MS: <span class="kw-2">&amp;</span>str = <span class="string">&quot;prisma_client_queries_wait_histogram_ms&quot;</span>;
-<span class="kw">pub const </span>PRISMA_DATASOURCE_QUERIES_DURATION_HISTOGRAM_MS: <span class="kw-2">&amp;</span>str = <span class="string">&quot;prisma_datasource_queries_duration_histogram_ms&quot;</span>;
+// metrics emitted by the connector pool implementation (mobc) that will be renamed using the `METRIC_RENAMES` map.
+</span><span class="kw">const </span>MOBC_POOL_CONNECTIONS_OPENED_TOTAL: <span class="kw-2">&amp;</span>str = <span class="string">&quot;mobc_pool_connections_opened_total&quot;</span>; <span class="comment">// counter
+</span><span class="kw">const </span>MOBC_POOL_CONNECTIONS_CLOSED_TOTAL: <span class="kw-2">&amp;</span>str = <span class="string">&quot;mobc_pool_connections_closed_total&quot;</span>; <span class="comment">// counter
+</span><span class="kw">const </span>MOBC_POOL_CONNECTIONS_OPEN: <span class="kw-2">&amp;</span>str = <span class="string">&quot;mobc_pool_connections_open&quot;</span>; <span class="comment">// gauge
+</span><span class="kw">const </span>MOBC_POOL_CONNECTIONS_BUSY: <span class="kw-2">&amp;</span>str = <span class="string">&quot;mobc_pool_connections_busy&quot;</span>; <span class="comment">// gauge
+</span><span class="kw">const </span>MOBC_POOL_CONNECTIONS_IDLE: <span class="kw-2">&amp;</span>str = <span class="string">&quot;mobc_pool_connections_idle&quot;</span>; <span class="comment">// gauge
+</span><span class="kw">const </span>MOBC_POOL_WAIT_COUNT: <span class="kw-2">&amp;</span>str = <span class="string">&quot;mobc_client_queries_wait&quot;</span>; <span class="comment">// gauge
+</span><span class="kw">const </span>MOBC_POOL_WAIT_DURATION: <span class="kw-2">&amp;</span>str = <span class="string">&quot;mobc_client_queries_wait_histogram_ms&quot;</span>; <span class="comment">// histogram
 
-<span class="comment">// We need a list of acceptable metrics, we don&#39;t want to accidentally process metrics emitted by a
-// third party library
-</span><span class="kw">const </span>ACCEPT_LIST: <span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span>str] = <span class="kw-2">&amp;</span>[
-    MOBC_POOL_CONNECTIONS_OPENED_TOTAL,
+</span><span class="doccomment">/// Accept list: both first-party (emitted by the query engine) and third-party (emitted) metrics
+</span><span class="kw">pub const </span>ACCEPT_LIST: <span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span>str] = <span class="kw-2">&amp;</span>[
+    <span class="comment">// first-party
+    </span>PRISMA_CLIENT_QUERIES_TOTAL,
+    PRISMA_DATASOURCE_QUERIES_TOTAL,
+    PRISMA_CLIENT_QUERIES_ACTIVE,
+    PRISMA_CLIENT_QUERIES_DURATION_HISTOGRAM_MS,
+    PRISMA_DATASOURCE_QUERIES_DURATION_HISTOGRAM_MS,
+    <span class="comment">// third-party, emitted by mobc
+    </span>MOBC_POOL_CONNECTIONS_OPENED_TOTAL,
     MOBC_POOL_CONNECTIONS_CLOSED_TOTAL,
     MOBC_POOL_CONNECTIONS_OPEN,
     MOBC_POOL_CONNECTIONS_BUSY,
     MOBC_POOL_CONNECTIONS_IDLE,
     MOBC_POOL_WAIT_COUNT,
     MOBC_POOL_WAIT_DURATION,
-    PRISMA_CLIENT_QUERIES_TOTAL,
-    PRISMA_DATASOURCE_QUERIES_TOTAL,
-    PRISMA_CLIENT_QUERIES_ACTIVE,
-    PRISMA_CLIENT_QUERIES_DURATION_HISTOGRAM_MS,
-    PRISMA_DATASOURCE_QUERIES_DURATION_HISTOGRAM_MS,
 ];
 
-<span class="comment">// Some of the metrics we receive have their internal names, and we need to expose them under a different
-// name, this map translates from the internal names used by mobc to the external names we want to expose
-</span><span class="kw">static </span>METRIC_RENAMES: Lazy&lt;HashMap&lt;<span class="kw-2">&amp;</span>str, <span class="kw-2">&amp;</span>str&gt;&gt; = Lazy::new(|| {
+<span class="doccomment">/// Map that for any given accepted metric that is emitted by a third-party, in this case only the
+/// connection pool library mobc, it points to an internal, accepted metrics name and its description
+/// as displayed to users. This is used to rebrand the third-party metrics to accepted, prisma-specific
+/// ones.
+</span><span class="attr">#[rustfmt::skip]
+</span><span class="kw">static </span>METRIC_RENAMES: Lazy&lt;HashMap&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str, (<span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str, <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str)&gt;&gt; = Lazy::new(|| {
     HashMap::from([
-        (MOBC_POOL_CONNECTIONS_OPENED_TOTAL, PRISMA_POOL_CONNECTIONS_OPENED_TOTAL),
-        (MOBC_POOL_CONNECTIONS_CLOSED_TOTAL, PRISMA_POOL_CONNECTIONS_CLOSED_TOTAL),
-        (MOBC_POOL_CONNECTIONS_OPEN, PRISMA_POOL_CONNECTIONS_OPEN),
-        (MOBC_POOL_CONNECTIONS_BUSY, PRISMA_POOL_CONNECTIONS_BUSY),
-        (MOBC_POOL_CONNECTIONS_IDLE, PRISMA_POOL_CONNECTIONS_IDLE),
-        (MOBC_POOL_WAIT_COUNT, PRISMA_CLIENT_QUERIES_WAIT),
-        (MOBC_POOL_WAIT_DURATION, PRISMA_CLIENT_QUERIES_WAIT_HISTOGRAM_MS),
+        (MOBC_POOL_CONNECTIONS_OPENED_TOTAL, (<span class="string">&quot;prisma_pool_connections_opened_total&quot;</span>, <span class="string">&quot;The total number of pool connections opened&quot;</span>)),
+        (MOBC_POOL_CONNECTIONS_CLOSED_TOTAL, (<span class="string">&quot;prisma_pool_connections_closed_total&quot;</span>, <span class="string">&quot;The total number of pool connections closed&quot;</span>)),
+        (MOBC_POOL_CONNECTIONS_OPEN, (<span class="string">&quot;prisma_pool_connections_open&quot;</span>, <span class="string">&quot;The number of pool connections currently open&quot;</span>)),
+        (MOBC_POOL_CONNECTIONS_BUSY, (<span class="string">&quot;prisma_pool_connections_busy&quot;</span>, <span class="string">&quot;The number of pool connections currently executing datasource queries&quot;</span>)),
+        (MOBC_POOL_CONNECTIONS_IDLE, (<span class="string">&quot;prisma_pool_connections_idle&quot;</span>, <span class="string">&quot;The number of pool connections that are not busy running a query&quot;</span>)),
+        (MOBC_POOL_WAIT_COUNT, (<span class="string">&quot;prisma_client_queries_wait&quot;</span>, <span class="string">&quot;The number of datasource queries currently waiting for an free connection&quot;</span>)),
+        (MOBC_POOL_WAIT_DURATION, (<span class="string">&quot;prisma_client_queries_wait_histogram_ms&quot;</span>, <span class="string">&quot;The distribution of the time all datasource queries spent waiting for a free connection&quot;</span>)),
     ])
 });
+
+<span class="kw">pub fn </span>setup() {
+    set_recorder();
+    initialize_metrics();
+}
+
+<span class="kw">static </span>METRIC_RECORDER: Once = Once::new();
+
+<span class="kw">fn </span>set_recorder() {
+    METRIC_RECORDER.call_once(|| {
+        metrics::set_boxed_recorder(Box::new(MetricRecorder)).unwrap();
+    });
+}
+
+<span class="doccomment">/// Initialize metrics descriptions and values
+</span><span class="kw">pub fn </span>initialize_metrics() {
+    initialize_metrics_descriptions();
+    initialize_metrics_values();
+}
+
+<span class="doccomment">/// Describe all first-party metrics that we record in prisma-engines. Metrics recorded by third-parties
+/// --like mobc-- are described by such third parties, but ignored, and replaced by the descriptions in the
+/// METRICS_RENAMES map.
+</span><span class="kw">fn </span>initialize_metrics_descriptions() {
+    <span class="macro">describe_counter!</span>(
+        PRISMA_CLIENT_QUERIES_TOTAL,
+        <span class="string">&quot;The total number of Prisma Client queries executed&quot;
+    </span>);
+    <span class="macro">describe_counter!</span>(
+        PRISMA_DATASOURCE_QUERIES_TOTAL,
+        <span class="string">&quot;The total number of datasource queries executed&quot;
+    </span>);
+    <span class="macro">describe_gauge!</span>(
+        PRISMA_CLIENT_QUERIES_ACTIVE,
+        <span class="string">&quot;The number of currently active Prisma Client queries&quot;
+    </span>);
+    <span class="macro">describe_histogram!</span>(
+        PRISMA_CLIENT_QUERIES_DURATION_HISTOGRAM_MS,
+        <span class="string">&quot;The distribution of the time Prisma Client queries took to run end to end&quot;
+    </span>);
+    <span class="macro">describe_histogram!</span>(
+        PRISMA_DATASOURCE_QUERIES_DURATION_HISTOGRAM_MS,
+        <span class="string">&quot;The distribution of the time datasource queries took to run&quot;
+    </span>);
+}
+
+<span class="doccomment">/// Initialize all metrics values (first and third-party)
+///
+/// FIXME: https://github.com/prisma/prisma/issues/21070
+/// Histograms are excluded, as their initialization will alter the histogram values.
+/// (i.e. histograms don&#39;t have a neutral value, like counters or gauges)
+</span><span class="kw">fn </span>initialize_metrics_values() {
+    <span class="macro">absolute_counter!</span>(PRISMA_CLIENT_QUERIES_TOTAL, <span class="number">0</span>);
+    <span class="macro">absolute_counter!</span>(PRISMA_DATASOURCE_QUERIES_TOTAL, <span class="number">0</span>);
+    <span class="macro">gauge!</span>(PRISMA_CLIENT_QUERIES_ACTIVE, <span class="number">0.0</span>);
+    <span class="macro">absolute_counter!</span>(MOBC_POOL_CONNECTIONS_OPENED_TOTAL, <span class="number">0</span>);
+    <span class="macro">absolute_counter!</span>(MOBC_POOL_CONNECTIONS_CLOSED_TOTAL, <span class="number">0</span>);
+    <span class="macro">gauge!</span>(MOBC_POOL_CONNECTIONS_OPEN, <span class="number">0.0</span>);
+    <span class="macro">gauge!</span>(MOBC_POOL_CONNECTIONS_BUSY, <span class="number">0.0</span>);
+    <span class="macro">gauge!</span>(MOBC_POOL_CONNECTIONS_IDLE, <span class="number">0.0</span>);
+    <span class="macro">gauge!</span>(MOBC_POOL_WAIT_COUNT, <span class="number">0.0</span>);
+}
 
 <span class="comment">// At the moment the histogram is only used for timings. So the bounds are hard coded here
 // The buckets are for ms
@@ -718,89 +747,6 @@
     </span>Json,
     <span class="attr">#[serde(alias = <span class="string">&quot;prometheus&quot;</span>)]
     </span>Prometheus,
-}
-
-<span class="kw">pub fn </span>setup() {
-    set_recorder();
-    describe_metrics();
-}
-
-<span class="comment">// Describe all metric here so that every time for create
-// a new metric registry for a Query Instance the descriptions
-// will be in place
-</span><span class="kw">pub fn </span>describe_metrics() {
-    <span class="comment">// counters
-    </span><span class="macro">describe_counter!</span>(
-        PRISMA_CLIENT_QUERIES_TOTAL,
-        <span class="string">&quot;Total number of Prisma Client queries executed&quot;
-    </span>);
-    <span class="macro">describe_counter!</span>(
-        PRISMA_DATASOURCE_QUERIES_TOTAL,
-        <span class="string">&quot;Total number of Datasource Queries executed&quot;
-    </span>);
-    <span class="macro">describe_counter!</span>(
-        PRISMA_POOL_CONNECTIONS_OPENED_TOTAL,
-        <span class="string">&quot;Total number of Pool Connections opened&quot;
-    </span>);
-    <span class="macro">describe_counter!</span>(
-        PRISMA_POOL_CONNECTIONS_CLOSED_TOTAL,
-        <span class="string">&quot;Total number of Pool Connections closed&quot;
-    </span>);
-
-    <span class="macro">absolute_counter!</span>(PRISMA_CLIENT_QUERIES_TOTAL, <span class="number">0</span>);
-    <span class="macro">absolute_counter!</span>(PRISMA_DATASOURCE_QUERIES_TOTAL, <span class="number">0</span>);
-    <span class="macro">absolute_counter!</span>(MOBC_POOL_CONNECTIONS_OPENED_TOTAL, <span class="number">0</span>);
-    <span class="macro">absolute_counter!</span>(MOBC_POOL_CONNECTIONS_CLOSED_TOTAL, <span class="number">0</span>);
-
-    <span class="comment">// gauges
-    </span><span class="macro">describe_gauge!</span>(
-        PRISMA_POOL_CONNECTIONS_OPEN,
-        <span class="string">&quot;Number of currently open Pool Connections (able to execute a datasource query)&quot;
-    </span>);
-    <span class="macro">describe_gauge!</span>(
-        PRISMA_POOL_CONNECTIONS_BUSY,
-        <span class="string">&quot;Number of currently busy Pool Connections (executing a datasource query)&quot;
-    </span>);
-    <span class="macro">describe_gauge!</span>(
-        PRISMA_POOL_CONNECTIONS_IDLE,
-        <span class="string">&quot;Number of currently unused Pool Connections (waiting for the next datasource query to run)&quot;
-    </span>);
-    <span class="macro">describe_gauge!</span>(
-        PRISMA_CLIENT_QUERIES_WAIT,
-        <span class="string">&quot;Number of Prisma Client queries currently waiting for a connection&quot;
-    </span>);
-    <span class="macro">describe_gauge!</span>(
-        PRISMA_CLIENT_QUERIES_ACTIVE,
-        <span class="string">&quot;Number of currently active Prisma Client queries&quot;
-    </span>);
-
-    <span class="macro">gauge!</span>(MOBC_POOL_CONNECTIONS_OPEN, <span class="number">0.0</span>);
-    <span class="macro">gauge!</span>(MOBC_POOL_CONNECTIONS_BUSY, <span class="number">0.0</span>);
-    <span class="macro">gauge!</span>(MOBC_POOL_CONNECTIONS_IDLE, <span class="number">0.0</span>);
-    <span class="macro">gauge!</span>(PRISMA_CLIENT_QUERIES_WAIT, <span class="number">0.0</span>);
-    <span class="macro">gauge!</span>(PRISMA_CLIENT_QUERIES_ACTIVE, <span class="number">0.0</span>);
-
-    <span class="comment">// histograms
-    </span><span class="macro">describe_histogram!</span>(
-        PRISMA_CLIENT_QUERIES_WAIT_HISTOGRAM_MS,
-        <span class="string">&quot;Histogram of the wait time of all Prisma Client Queries in ms&quot;
-    </span>);
-    <span class="macro">describe_histogram!</span>(
-        PRISMA_DATASOURCE_QUERIES_DURATION_HISTOGRAM_MS,
-        <span class="string">&quot;Histogram of the duration of all executed Datasource Queries in ms&quot;
-    </span>);
-    <span class="macro">describe_histogram!</span>(
-        PRISMA_CLIENT_QUERIES_DURATION_HISTOGRAM_MS,
-        <span class="string">&quot;Histogram of the duration of all executed Prisma Client queries in ms&quot;
-    </span>);
-}
-
-<span class="kw">static </span>METRIC_RECORDER: Once = Once::new();
-
-<span class="kw">fn </span>set_recorder() {
-    METRIC_RECORDER.call_once(|| {
-        metrics::set_boxed_recorder(Box::new(MetricRecorder)).unwrap();
-    });
 }
 
 <span class="attr">#[cfg(test)]
