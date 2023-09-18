@@ -11,7 +11,7 @@ use quaint::connector::ResultSet as QuaintResultSet;
 use quaint::Value as QuaintValue;
 
 // TODO(jkomyno): import these 3rd-party crates from the `quaint-core` crate.
-use bigdecimal::BigDecimal;
+use bigdecimal::{BigDecimal, FromPrimitive};
 use chrono::{DateTime, Utc};
 use chrono::{NaiveDate, NaiveTime};
 
@@ -211,6 +211,11 @@ fn js_value_to_quaint(
                 let decimal = BigDecimal::from_str(&s).expect("invalid numeric value");
                 QuaintValue::numeric(decimal)
             }
+            serde_json::Value::Number(n) => QuaintValue::numeric(
+                n.as_f64()
+                    .and_then(BigDecimal::from_f64)
+                    .expect("number must be an f64"),
+            ),
             serde_json::Value::Null => QuaintValue::Numeric(None),
             mismatch => panic!(
                 "Expected a string-encoded number in column {}, found {}",
