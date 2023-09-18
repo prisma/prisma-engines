@@ -28,8 +28,8 @@ importers:
         version: link:../driver-adapter-utils
     devDependencies:
       '@libsql/client':
-        specifier: 0.3.5-pre.5
-        version: 0.3.5-pre.5
+        specifier: 0.3.5-pre.8
+        version: 0.3.5-pre.8
 
   adapter-neon:
     dependencies:
@@ -104,8 +104,8 @@ importers:
         specifier: workspace:*
         version: link:../adapter-libsql
       '@libsql/client':
-        specifier: 0.3.5-pre.5
-        version: 0.3.5-pre.5
+        specifier: 0.3.5-pre.8
+        version: 0.3.5-pre.8
       '@neondatabase/serverless':
         specifier: ^0.6.0
         version: 0.6.0
@@ -401,8 +401,8 @@ packages:
       '@jridgewell/sourcemap-codec': 1.4.15
     dev: true
 
-  /@libsql/client@0.3.5-pre.5:
-    resolution: {integrity: sha512-5SGH3PGXPSZVQznjiXJ3HTN73WtiBQ3moIodKuveVBj5dL0+RUUOe6bVT5BD1mR2OPnnLO8yhEM8MdGXvXHyTA==}
+  /@libsql/client@0.3.5-pre.8:
+    resolution: {integrity: sha512-qVpdqoYUOaa14VBeGAEyq02RuQtSNEgEXI1+M25kLoUii/Nskcfy3LOa5gKG+N+Z5lfrdLMYEETayHN2Xxjntg==}
     dependencies:
       '@libsql/hrana-client': 0.5.5
       js-base64: 3.7.5
