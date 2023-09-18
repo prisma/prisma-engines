@@ -94,7 +94,7 @@ class LibsqlTransaction extends LibsqlQueryable<TransactionClient> implements Tr
   async rollback(): Promise<Result<void>> {
     debug(`[js::rollback]`)
 
-    this.client.rollback()
+    await this.client.rollback()
     return Promise.resolve({ ok: true, value: undefined })
   }
 }
