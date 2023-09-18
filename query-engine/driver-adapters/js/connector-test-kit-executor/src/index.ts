@@ -75,7 +75,7 @@ async function handleRequest(method: string, params: unknown): Promise<unknown> 
                 if (error.error_code === 'P2036') {
                     const jsError = adapters[castParams.schemaId].errorRegistry.consumeError(error.meta.id)
                     if (!jsError) {
-                        throw new Error(`Something went wrong. Engine reported external error with id ${error.meta.id}, but it was not registered.`)
+                        console.error(`Something went wrong. Engine reported external error with id ${error.meta.id}, but it was not registered.`)
                     } else {
                         console.error("[nodejs] got error response from the engine caused by the driver: ", jsError)
                     }
