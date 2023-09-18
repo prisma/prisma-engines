@@ -51,6 +51,7 @@ pub(crate) fn params_to_types(params: &[Value<'_>]) -> Vec<PostgresType> {
                 Value::Char(_) => PostgresType::CHAR,
                 #[cfg(feature = "bigdecimal")]
                 Value::Numeric(_) => PostgresType::NUMERIC,
+                #[cfg(feature = "json")]
                 Value::Json(_) => PostgresType::JSONB,
                 Value::Xml(_) => PostgresType::XML,
                 #[cfg(feature = "uuid")]
@@ -89,6 +90,7 @@ pub(crate) fn params_to_types(params: &[Value<'_>]) -> Vec<PostgresType> {
                         Value::Char(_) => PostgresType::CHAR_ARRAY,
                         #[cfg(feature = "bigdecimal")]
                         Value::Numeric(_) => PostgresType::NUMERIC_ARRAY,
+                        #[cfg(feature = "json")]
                         Value::Json(_) => PostgresType::JSONB_ARRAY,
                         Value::Xml(_) => PostgresType::XML_ARRAY,
                         #[cfg(feature = "uuid")]
@@ -285,6 +287,7 @@ impl GetRow for PostgresRow {
                     }
                     None => Value::Array(None),
                 },
+                #[cfg(feature = "json")]
                 PostgresType::JSON | PostgresType::JSONB => Value::Json(row.try_get(i)?),
                 PostgresType::INT2_ARRAY => match row.try_get(i)? {
                     Some(val) => {
@@ -430,6 +433,7 @@ impl GetRow for PostgresRow {
                     }
                     None => Value::Array(None),
                 },
+                #[cfg(feature = "json")]
                 PostgresType::JSON_ARRAY => match row.try_get(i)? {
                     Some(val) => {
                         let val: Vec<Option<serde_json::Value>> = val;
@@ -439,6 +443,7 @@ impl GetRow for PostgresRow {
                     }
                     None => Value::Array(None),
                 },
+                #[cfg(feature = "json")]
                 PostgresType::JSONB_ARRAY => match row.try_get(i)? {
                     Some(val) => {
                         let val: Vec<Option<serde_json::Value>> = val;
@@ -817,6 +822,7 @@ impl<'a> ToSql for Value<'a> {
                     parsed_ip_addr.to_sql(ty, out)
                 })
             }
+            #[cfg(feature = "json")]
             (Value::Text(string), &PostgresType::JSON) | (Value::Text(string), &PostgresType::JSONB) => string
                 .as_ref()
                 .map(|string| serde_json::from_str::<serde_json::Value>(string)?.to_sql(ty, out)),
@@ -855,6 +861,7 @@ impl<'a> ToSql for Value<'a> {
 
                 return Err(Error::builder(kind).build().into());
             }
+            #[cfg(feature = "json")]
             (Value::Json(value), _) => value.as_ref().map(|value| value.to_sql(ty, out)),
             (Value::Xml(value), _) => value.as_ref().map(|value| value.to_sql(ty, out)),
             #[cfg(feature = "uuid")]

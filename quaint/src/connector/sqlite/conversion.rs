@@ -268,6 +268,7 @@ impl<'a> ToSql for Value<'a> {
             Value::Numeric(d) => d
                 .as_ref()
                 .map(|d| ToSqlOutput::from(d.to_string().parse::<f64>().expect("BigDecimal is not a f64."))),
+            #[cfg(feature = "json")]
             Value::Json(value) => value.as_ref().map(|value| {
                 let stringified = serde_json::to_string(value)
                     .map_err(|err| RusqlError::ToSqlConversionFailure(Box::new(err)))

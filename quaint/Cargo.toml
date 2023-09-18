@@ -30,6 +30,7 @@ docs = []
 expose-drivers = []
 
 all = [
+  "json",
   "mssql",
   "mysql",
   "pooled",
@@ -57,6 +58,7 @@ postgresql = [
   "byteorder",
 ]
 
+json = ["serde_json", "base64"]
 mssql = ["tiberius", "uuid", "tokio-util", "tokio/time", "tokio/net", "either"]
 mysql = ["mysql_async", "tokio/time", "lru-cache"]
 pooled = ["mobc"]
@@ -79,10 +81,10 @@ url = "2.1"
 hex = "0.4"
 
 either = { version = "1.6", optional = true }
-base64 = { version = "0.12.3" }
+base64 = { version = "0.12.3", optional = true }
 chrono = { version = "0.4", default-features = false, features = ["serde"] }
 lru-cache = { version = "0.1", optional = true }
-serde_json = { version = "1.0.48", features = ["float_roundtrip"] }
+serde_json = { version = "1.0.48", optional = true, features = ["float_roundtrip"] }
 native-tls = { version = "0.2", optional = true }
 bit-vec = { version = "0.6.1", optional = true }
 bytes = { version = "1.0", optional = true }

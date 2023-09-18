@@ -103,7 +103,7 @@ impl<'a> Visitor<'a> for Sqlite<'a> {
 
                 return Err(builder.build());
             }
-
+            #[cfg(feature = "json")]
             Value::Json(j) => match j {
                 Some(ref j) => {
                     let s = serde_json::to_string(j)?;
@@ -276,12 +276,12 @@ impl<'a> Visitor<'a> for Sqlite<'a> {
         })
     }
 
-    #[cfg(any(feature = "postgresql", feature = "mysql"))]
+    #[cfg(all(feature = "json", any(feature = "postgresql", feature = "mysql")))]
     fn visit_json_extract(&mut self, _json_extract: JsonExtract<'a>) -> visitor::Result {
         unimplemented!("JSON filtering is not yet supported on SQLite")
     }
 
-    #[cfg(any(feature = "postgresql", feature = "mysql"))]
+    #[cfg(all(feature = "json", any(feature = "postgresql", feature = "mysql")))]
     fn visit_json_array_contains(
         &mut self,
         _left: Expression<'a>,
@@ -291,7 +291,7 @@ impl<'a> Visitor<'a> for Sqlite<'a> {
         unimplemented!("JSON filtering is not yet supported on SQLite")
     }
 
-    #[cfg(any(feature = "postgresql", feature = "mysql"))]
+    #[cfg(all(feature = "json", any(feature = "postgresql", feature = "mysql")))]
     fn visit_json_type_equals(&mut self, _left: Expression<'a>, _json_type: JsonType, _not: bool) -> visitor::Result {
         unimplemented!("JSON_TYPE is not yet supported on SQLite")
     }
@@ -316,17 +316,17 @@ impl<'a> Visitor<'a> for Sqlite<'a> {
         unimplemented!("Full-text search is not yet supported on SQLite")
     }
 
-    #[cfg(any(feature = "postgresql", feature = "mysql"))]
+    #[cfg(all(feature = "json", any(feature = "postgresql", feature = "mysql")))]
     fn visit_json_extract_last_array_item(&mut self, _extract: JsonExtractLastArrayElem<'a>) -> visitor::Result {
         unimplemented!("JSON filtering is not yet supported on SQLite")
     }
 
-    #[cfg(any(feature = "postgresql", feature = "mysql"))]
+    #[cfg(all(feature = "json", any(feature = "postgresql", feature = "mysql")))]
     fn visit_json_extract_first_array_item(&mut self, _extract: JsonExtractFirstArrayElem<'a>) -> visitor::Result {
         unimplemented!("JSON filtering is not yet supported on SQLite")
     }
 
-    #[cfg(any(feature = "postgresql", feature = "mysql"))]
+    #[cfg(all(feature = "json", any(feature = "postgresql", feature = "mysql")))]
     fn visit_json_unquote(&mut self, _json_unquote: JsonUnquote<'a>) -> visitor::Result {
         unimplemented!("JSON filtering is not yet supported on SQLite")
     }
@@ -913,7 +913,7 @@ mod tests {
     }
 
     #[test]
-
+    #[cfg(feature = "json")]
     fn test_raw_json() {
         let (sql, params) = Sqlite::build(Select::default().value(serde_json::json!({ "foo": "bar" }).raw())).unwrap();
         assert_eq!("SELECT '{\"foo\":\"bar\"}'", sql);

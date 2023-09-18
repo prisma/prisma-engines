@@ -58,6 +58,7 @@ features = [
   "bigdecimal",
   "expose-drivers",
   "fmt-sql",
+  "json",
   "mssql",
   "mysql",
   "pooled",
