@@ -192,20 +192,14 @@ pub(crate) fn chunk_update_with_ids(
 
 pub(crate) fn delete_many(
     model: &Model,
-    ids: &[&SelectionResult],
     filter_condition: ConditionTree<'static>,
     ctx: &Context<'_>,
-) -> Vec<Query<'static>> {
-    let columns: Vec<_> = ModelProjection::from(model.primary_identifier())
-        .as_columns(ctx)
-        .collect();
-
-    super::chunked_conditions(&columns, ids, |conditions| {
-        Delete::from_table(model.as_table(ctx))
-            .so_that(conditions.and(filter_condition.clone()))
-            .append_trace(&Span::current())
-            .add_trace_id(ctx.trace_id)
-    })
+) -> Query<'static> {
+    Delete::from_table(model.as_table(ctx))
+        .so_that(filter_condition)
+        .append_trace(&Span::current())
+        .add_trace_id(ctx.trace_id)
+        .into()
 }
 
 pub(crate) fn create_relation_table_records(

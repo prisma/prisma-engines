@@ -362,23 +362,10 @@ pub(crate) async fn delete_records(
     ctx: &Context<'_>,
 ) -> crate::Result<usize> {
     let filter_condition = FilterBuilder::without_top_level_joins().visit_filter(record_filter.clone().filter, ctx);
-    let ids = conn.filter_selectors(model, record_filter, ctx).await?;
-    let ids: Vec<&SelectionResult> = ids.iter().collect();
-    let count = ids.len();
+    let delete = write::delete_many(model, filter_condition, ctx);
+    let row_count = conn.execute(delete).await?;
 
-    if count == 0 {
-        return Ok(count);
-    }
-
-    let mut row_count = 0;
-    for delete in write::delete_many(model, ids.as_slice(), filter_condition, ctx) {
-        row_count += conn.execute(delete).await?;
-    }
-
-    match usize::try_from(row_count) {
-        Ok(row_count) => Ok(row_count),
-        Err(_) => Ok(count),
-    }
+    Ok(row_count as usize)
 }
 
 /// Connect relations defined in `child_ids` to a parent defined in `parent_id`.
