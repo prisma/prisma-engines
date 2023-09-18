@@ -4,6 +4,7 @@ import * as qe from './qe'
 import * as engines from './engines/Library'
 import * as readline from 'node:readline'
 import * as jsonRpc from './jsonRpc'
+import {bindAdapter, ErrorCapturingDriverAdapter} from "@jkomyno/prisma-driver-adapter-utils";
 
 async function main(): Promise<void> {
     const iface = readline.createInterface({
@@ -34,6 +35,7 @@ async function main(): Promise<void> {
 }
 
 const schemas: Record<number, engines.QueryEngineInstance> = {}
+const adapters: Record<number, ErrorCapturingDriverAdapter> = {}
 const queryLogs: Record<number, string[]> = []
 
 async function handleRequest(method: string, params: unknown): Promise<unknown> {
@@ -47,11 +49,12 @@ async function handleRequest(method: string, params: unknown): Promise<unknown> 
 
             const castParams = params as InitializeSchemaParams;
             const logs = queryLogs[castParams.schemaId] = [] as string[]
-            const engine = await initQe(castParams.url, castParams.schema, (log) => {
+            const [engine, adapter] = await initQe(castParams.url, castParams.schema, (log) => {
                 logs.push(log)
             });
             await engine.connect("")
             schemas[castParams.schemaId] = engine
+            adapters[castParams.schemaId] = adapter
             return null
         }
         case 'query': {
@@ -63,7 +66,22 @@ async function handleRequest(method: string, params: unknown): Promise<unknown> 
 
             console.error("Got `query`", params)
             const castParams = params as QueryPayload;
-            const result = await schemas[castParams.schemaId].query(JSON.stringify(castParams.query), "", castParams.txId)
+            const engine = schemas[castParams.schemaId]
+            const result = await engine.query(JSON.stringify(castParams.query), "", castParams.txId)
+
+            const parsedResult = JSON.parse(result)
+            if (parsedResult.errors) {
+                const error = parsedResult.errors[0]?.user_facing_error
+                if (error.error_code === 'P2036') {
+                    const jsError = adapters[castParams.schemaId].errorRegistry.consumeError(error.meta.id)
+                    if (!jsError) {
+                        throw new Error(`Something went wrong. Engine reported external error with id ${error.meta.id}, but it was not registered.`)
+                    } else {
+                        console.error("[nodejs] got error response from the engine caused by the driver: ", jsError)
+                    }
+                }
+            }
+
             console.error("[nodejs] got response from engine: ", result)
 
             // returning unparsed string: otherwise, some information gots lost during this round-trip. 
@@ -151,10 +169,11 @@ function respondOk(requestId: number, payload: unknown) {
     console.log(JSON.stringify(msg))
 }
 
-async function initQe(url: string, prismaSchema: string, logCallback: qe.QueryLogCallback): Promise<engines.QueryEngineInstance> {
+async function initQe(url: string, prismaSchema: string, logCallback: qe.QueryLogCallback): Promise<[engines.QueryEngineInstance, ErrorCapturingDriverAdapter]> {
     const pool = new pgDriver.Pool({ connectionString: url })
-    const adapter = new pg.PrismaPg(pool)
-    return qe.initQueryEngine(adapter, prismaSchema, logCallback)
+    const adapter = bindAdapter(new pg.PrismaPg(pool))
+    const engineInstance = qe.initQueryEngine(adapter, prismaSchema, logCallback)
+    return [engineInstance, adapter];
 }
 
 main().catch(console.error)

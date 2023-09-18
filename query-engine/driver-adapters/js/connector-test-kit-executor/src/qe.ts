@@ -1,12 +1,12 @@
 import * as pg from '@jkomyno/prisma-adapter-pg'
-import { bindAdapter } from '@jkomyno/prisma-driver-adapter-utils'
+import {bindAdapter, ErrorCapturingDriverAdapter} from '@jkomyno/prisma-driver-adapter-utils'
 import * as lib from './engines/Library'
 import * as os from 'node:os'
 import * as path from 'node:path'
 
 export type QueryLogCallback = (log: string) => void
 
-export function initQueryEngine(driver: pg.PrismaPg, datamodel: string, queryLogCallback: QueryLogCallback): lib.QueryEngineInstance {
+export function initQueryEngine(adapter: ErrorCapturingDriverAdapter, datamodel: string, queryLogCallback: QueryLogCallback): lib.QueryEngineInstance {
     // I assume nobody will run this on Windows ¯\_(ツ)_/¯
     const libExt = os.platform() === 'darwin' ? 'dylib' : 'so'
     const dirname = path.dirname(new URL(import.meta.url).pathname)
@@ -36,7 +36,7 @@ export function initQueryEngine(driver: pg.PrismaPg, datamodel: string, queryLog
         }
         console.error("[nodejs] ", parsed)
     }
-    const engine = new QueryEngine(queryEngineOptions, logCallback, bindAdapter(driver))
+    const engine = new QueryEngine(queryEngineOptions, logCallback, adapter)
 
     return engine
 }
