@@ -46,3 +46,4 @@ dmmf.json
 graph.dot
 
 prisma-schema-wasm/nodejs
+*.sh

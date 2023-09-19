@@ -1,0 +1,97 @@
+name: Query Engine
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    paths-ignore:
+      - '.buildkite/**'
+      - '*.md'
+      - 'LICENSE'
+      - 'CODEOWNERS'
+      - 'renovate.json'
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  rust-query-engine-tests:
+    name: "Test ${{ matrix.database.name }} through`${{ matrix.database.driver_adapter }}` on node v${{ matrix.node_version }}"
+
+    strategy:
+      fail-fast: false
+      matrix:
+        database:
+          - name: "postgres13"
+            connector: "postgres"
+            version: "13"
+            driver_adapter: "pg"
+        node_version: ["18"]
+
+    env:
+      LOG_LEVEL: "info"
+      LOG_QUERIES: "y"
+      RUST_LOG: "info"
+      RUST_LOG_FORMAT: "devel"
+      RUST_BACKTRACE: "1"
+      CLICOLOR_FORCE: "1"
+      CLOSED_TX_CLEANUP: "2"
+      SIMPLE_TEST_MODE: "1"
+      QUERY_BATCH_SIZE: "10"
+      TEST_CONNECTOR: ${{ matrix.database.connector }}
+      TEST_CONNECTOR_VERSION: ${{ matrix.database.version }}
+      TEST_DRIVER_ADAPTER: ${{ matrix.database.driver_adapter }}
+
+    runs-on: buildjet-16vcpu-ubuntu-2004
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: "Setup Node.js"
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.node_version }}
+
+      - name: "Setup pnpm"
+        uses: pnpm/action-setup@v2
+        with:
+          version: 8
+
+      - name: "Get pnpm store directory"
+        shell: bash
+        run: |
+          echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_ENV
+
+      - uses: actions/cache@v3
+        name: "Setup pnpm cache"
+        with:
+          path: ${{ env.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
+
+      - name: "Login to Docker Hub"
+        uses: docker/login-action@v2
+        continue-on-error: true
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: "Start ${{ matrix.database.name }} (${{ matrix.engine_protocol }})"
+        run: make start-${{ matrix.database.name }}
+
+      - uses: dtolnay/rust-toolchain@stable
+
+      - name: "Build query-engine-node-api with driver support"
+        run: cargo build -p query-engine-node-api
+
+      - name: "Install and build driver adapter JS dependencies"
+        run: cd query-engine/driver-adapters/js && pnpm i && pnpm build
+
+      - name: "Run tests"
+        run:  cargo test --package query-engine-tests -- --test-threads=1
+        env:
+          CLICOLOR_FORCE: 1
+          WORKSPACE_ROOT: ${{ github.workspace }}
+          NODE_TEST_EXECUTOR: "${{ github.workspace }}/query-engine/driver-adapters/js/connector-test-kit-executor/script/start_node.sh"
+
