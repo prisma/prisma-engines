@@ -90,7 +90,9 @@ impl ScalarField {
         };
 
         match scalar_field_type {
-            ScalarFieldType::CompositeType(_) => unreachable!(),
+            ScalarFieldType::CompositeType(_) => {
+                unreachable!("Cannot convert a composite type to a type identifier. This error is typically caused by mistakenly using a composite type within a composite index.",)
+            }
             ScalarFieldType::Enum(x) => TypeIdentifier::Enum(x),
             ScalarFieldType::BuiltInScalar(scalar) => scalar.into(),
             ScalarFieldType::Unsupported(_) => TypeIdentifier::Unsupported,
