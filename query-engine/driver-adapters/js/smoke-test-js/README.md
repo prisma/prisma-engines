@@ -23,9 +23,6 @@ In the current directoy:
 Anywhere in the repository:
 - Run `cargo build -p query-engine-node-api` to compile the `libquery` Query Engine
 
-One level up from this file: 
-- Build the driver adapters with `pnpm -r build` (or the needed one in its sub folder with `pnpm build`
-
 ### PlanetScale
 
 If you don't have a connection string yet:
