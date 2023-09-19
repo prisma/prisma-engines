@@ -190,7 +190,7 @@ pub(crate) fn chunk_update_with_ids(
     Ok(query)
 }
 
-pub(crate) fn delete_many(
+pub(crate) fn delete_many_from_filter(
     model: &Model,
     filter_condition: ConditionTree<'static>,
     ctx: &Context<'_>,
@@ -200,6 +200,21 @@ pub(crate) fn delete_many(
         .append_trace(&Span::current())
         .add_trace_id(ctx.trace_id)
         .into()
+}
+
+pub(crate) fn delete_many_from_ids_and_filter(
+    model: &Model,
+    ids: &[&SelectionResult],
+    filter_condition: ConditionTree<'static>,
+    ctx: &Context<'_>,
+) -> Vec<Query<'static>> {
+    let columns: Vec<_> = ModelProjection::from(model.primary_identifier())
+        .as_columns(ctx)
+        .collect();
+
+    super::chunked_conditions(&columns, ids, |conditions| {
+        delete_many_from_filter(model, conditions.and(filter_condition.clone()), ctx)
+    })
 }
 
 pub(crate) fn create_relation_table_records(
