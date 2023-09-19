@@ -386,8 +386,8 @@ export function smokeTestLibquery(adapter: ErrorCapturingDriverAdapter, prismaSc
       }
     })
 
-    it('bytes are fun', async () => {
-      const resultSet = await doQuery({
+    it('write and read back bytes', async () => {
+      const createResultSet = await doQuery({
         action: 'createOne',
         modelName: 'type_test_3',
         query: {
@@ -404,10 +404,10 @@ export function smokeTestLibquery(adapter: ErrorCapturingDriverAdapter, prismaSc
           },
         },
       })
-      // console.log('[nodejs] createOne resultSet', util)
-      console.dir(resultSet, { depth: Infinity })
+      console.log('[nodejs] createOne resultSet:')
+      console.dir(createResultSet, { depth: Infinity })
 
-      const resultSet2 = await doQuery({
+      const findResultSet = await doQuery({
         action: 'findMany',
         modelName: 'type_test_3',
         query: {
@@ -416,8 +416,8 @@ export function smokeTestLibquery(adapter: ErrorCapturingDriverAdapter, prismaSc
           },
         },
       })
-      // console.log('[nodejs] createOne resultSet', util)
-      console.dir(resultSet2, { depth: Infinity })
+      console.log('[nodejs] findMany resultSet:')
+      console.dir(findResultSet, { depth: Infinity })
     })
   })
 }

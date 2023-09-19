@@ -117,7 +117,7 @@ export async function smokeTestClient(driverAdapter: DriverAdapter) {
             )
           })
 
-          it('bytes fun', async () => {
+          it('bytes type support', async () => {
             const prisma = new PrismaClient({ adapter, log })
 
             await prisma.type_test_3.create({
