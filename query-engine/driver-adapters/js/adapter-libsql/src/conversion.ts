@@ -141,7 +141,7 @@ export function mapRow(row: Row): unknown[] {
   for (let i = 0; i < result.length; i++) {
     const value = result[i]
 
-    // Convert bigint to string as bigint is currently not supported by napi.rs
+    // Convert bigint to string as we can only use JSON-encodable types here
     if (typeof value === 'bigint') {
       result[i] = value.toString()
     }
