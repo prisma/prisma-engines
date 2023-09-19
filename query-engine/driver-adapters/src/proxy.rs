@@ -446,6 +446,12 @@ mod proxy_test {
         let json_value = serde_json::Value::Number(serde_json::Number::from(n));
         let quaint_value = js_value_to_quaint(json_value, column_type, "column_name");
         assert_eq!(quaint_value, QuaintValue::Int32(Some(n)));
+
+        // string-encoded
+        let n = i32::MAX;
+        let json_value = serde_json::Value::String(n.to_string());
+        let quaint_value = js_value_to_quaint(json_value, column_type, "column_name");
+        assert_eq!(quaint_value, QuaintValue::Int32(Some(n)));
     }
 
     #[test]
@@ -470,6 +476,12 @@ mod proxy_test {
         // min
         let n: i64 = i64::MIN;
         let json_value = serde_json::Value::String(n.to_string());
+        let quaint_value = js_value_to_quaint(json_value, column_type, "column_name");
+        assert_eq!(quaint_value, QuaintValue::Int64(Some(n)));
+
+        // number-encoded
+        let n: i64 = (1 << 53) - 1; // max JS safe integer
+        let json_value = serde_json::Value::Number(serde_json::Number::from(n));
         let quaint_value = js_value_to_quaint(json_value, column_type, "column_name");
         assert_eq!(quaint_value, QuaintValue::Int64(Some(n)));
     }
