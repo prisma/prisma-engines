@@ -21,7 +21,7 @@ use crate::{
 };
 use async_trait::async_trait;
 use connector::Connector;
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 use tracing::Dispatch;
 
 #[async_trait]
@@ -57,14 +57,14 @@ pub trait QueryExecutor: TransactionManager {
     fn primary_connector(&self) -> &(dyn Connector + Send + Sync);
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Serialize, Deserialize)]
 pub struct TransactionOptions {
     /// Maximum wait time for tx acquisition in milliseconds.
-    #[serde(rename(deserialize = "max_wait"))]
+    #[serde(rename = "max_wait")]
     pub max_acquisition_millis: u64,
 
     /// Time in milliseconds after which the transaction rolls back automatically.
-    #[serde(rename(deserialize = "timeout"))]
+    #[serde(rename = "timeout")]
     pub valid_for_millis: u64,
 
     /// Isolation level to use for the transaction.
@@ -72,7 +72,7 @@ pub struct TransactionOptions {
 
     /// An optional pre-defined transaction id. Some value might be provided in case we want to generate
     /// a new id at the beginning of the transaction
-    #[serde(skip_deserializing)]
+    #[serde(skip)]
     pub new_tx_id: Option<TxId>,
 }
 
