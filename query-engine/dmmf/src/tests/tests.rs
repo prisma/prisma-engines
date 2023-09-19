@@ -87,6 +87,54 @@ fn unsupported_in_composite_type() {
     dmmf_from_schema(schema);
 }
 
+// Regression test for https://github.com/prisma/prisma/issues/20986
+#[test]
+fn unusupported_in_compound_unique_must_not_panic() {
+    let schema = r#"
+        datasource db {
+            provider = "postgresql"
+            url      = env("TEST_DATABASE_URL")
+        }
+
+        generator client {
+            provider = "postgresql"
+        }
+
+        model A {
+            id          Int                      @id
+            field       Int
+            unsupported Unsupported("tstzrange")
+
+            @@unique([field, unsupported])
+        }
+    "#;
+
+    dmmf_from_schema(schema);
+}
+
+#[test]
+fn unusupported_in_compound_id_must_not_panic() {
+    let schema = r#"
+        datasource db {
+            provider = "postgresql"
+            url      = env("TEST_DATABASE_URL")
+        }
+
+        generator client {
+            provider = "postgresql"
+        }
+
+        model A {
+            field       Int                      @unique
+            unsupported Unsupported("tstzrange")
+
+            @@id([field, unsupported])
+        }
+    "#;
+
+    dmmf_from_schema(schema);
+}
+
 const SNAPSHOTS_PATH: &str = concat!(
     env!("CARGO_MANIFEST_DIR"),
     "/src",

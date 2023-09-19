@@ -46,6 +46,7 @@ impl JsBaseQueryable {
         match self.flavour {
             Flavour::Mysql => visitor::Mysql::build(q),
             Flavour::Postgres => visitor::Postgres::build(q),
+            Flavour::Sqlite => visitor::Sqlite::build(q),
             _ => unimplemented!("Unsupported flavour for JS connector {:?}", self.flavour),
         }
     }

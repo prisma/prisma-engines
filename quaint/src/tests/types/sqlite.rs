@@ -1,9 +1,7 @@
 #![allow(clippy::approx_constant)]
 
 use crate::tests::test_api::sqlite_test_api;
-#[cfg(feature = "chrono")]
 use crate::tests::test_api::TestApi;
-#[cfg(feature = "chrono")]
 use crate::{ast::*, connector::Queryable};
 #[cfg(feature = "bigdecimal")]
 use std::str::FromStr;
@@ -78,7 +76,6 @@ test_type!(boolean(
     Value::boolean(false)
 ));
 
-#[cfg(feature = "chrono")]
 test_type!(date(
     sqlite,
     "DATE",
@@ -86,7 +83,6 @@ test_type!(date(
     Value::date(chrono::NaiveDate::from_ymd_opt(1984, 1, 1).unwrap())
 ));
 
-#[cfg(feature = "chrono")]
 test_type!(datetime(
     sqlite,
     "DATETIME",
@@ -94,7 +90,6 @@ test_type!(datetime(
     Value::datetime(chrono::DateTime::from_str("2020-07-29T09:23:44.458Z").unwrap())
 ));
 
-#[cfg(feature = "chrono")]
 #[test_macros::test_each_connector(tags("sqlite"))]
 async fn test_type_text_datetime_rfc3339(api: &mut dyn TestApi) -> crate::Result<()> {
     let table = api.create_type_table("DATETIME").await?;
@@ -115,7 +110,6 @@ async fn test_type_text_datetime_rfc3339(api: &mut dyn TestApi) -> crate::Result
     Ok(())
 }
 
-#[cfg(feature = "chrono")]
 #[test_macros::test_each_connector(tags("sqlite"))]
 async fn test_type_text_datetime_rfc2822(api: &mut dyn TestApi) -> crate::Result<()> {
     let table = api.create_type_table("DATETIME").await?;
@@ -138,7 +132,6 @@ async fn test_type_text_datetime_rfc2822(api: &mut dyn TestApi) -> crate::Result
     Ok(())
 }
 
-#[cfg(feature = "chrono")]
 #[test_macros::test_each_connector(tags("sqlite"))]
 async fn test_type_text_datetime_custom(api: &mut dyn TestApi) -> crate::Result<()> {
     let table = api.create_type_table("DATETIME").await?;

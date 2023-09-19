@@ -11,6 +11,7 @@ qe-setup = { path = "../qe-setup" }
 request-handlers = { path = "../../request-handlers" }
 tokio.workspace = true
 query-core = { path = "../../core" }
+sql-query-connector = { path = "../../connectors/sql-query-connector" }
 query-engine = { path = "../../query-engine"}
 psl.workspace = true
 user-facing-errors = { path = "../../../libs/user-facing-errors" }
@@ -31,6 +32,7 @@ hyper = { version = "0.14", features = ["full"] }
 indexmap = { version = "1.0", features = ["serde-1"] }
 query-engine-metrics = {path = "../../metrics"}
 quaint.workspace = true
+jsonrpc-core = "17"
 
 # Only this version is vetted, upgrade only after going through the code,
 # as this is a small crate with little user base.

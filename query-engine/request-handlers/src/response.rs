@@ -9,26 +9,26 @@ use crate::HandlerError;
 #[derive(Debug, serde::Serialize, Default, PartialEq)]
 pub struct GQLResponse {
     #[serde(skip_serializing_if = "IndexMap::is_empty")]
-    data: Map,
+    pub data: Map,
 
     #[serde(skip_serializing_if = "Vec::is_empty")]
-    errors: Vec<GQLError>,
+    pub errors: Vec<GQLError>,
 
     #[serde(skip_serializing_if = "IndexMap::is_empty")]
-    extensions: Map,
+    pub extensions: Map,
 }
 
 #[derive(Debug, serde::Serialize, Default, PartialEq)]
 #[serde(rename_all = "camelCase")]
 pub struct GQLBatchResponse {
     #[serde(skip_serializing_if = "Vec::is_empty")]
-    batch_result: Vec<GQLResponse>,
+    pub batch_result: Vec<GQLResponse>,
 
     #[serde(skip_serializing_if = "Vec::is_empty")]
-    errors: Vec<GQLError>,
+    pub errors: Vec<GQLError>,
 
     #[serde(skip_serializing_if = "IndexMap::is_empty")]
-    extensions: Map,
+    pub extensions: Map,
 }
 
 #[derive(Debug, serde::Serialize, serde::Deserialize, PartialEq)]

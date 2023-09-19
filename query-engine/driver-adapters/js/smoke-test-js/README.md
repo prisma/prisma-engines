@@ -7,8 +7,11 @@ It contains a subset of `@prisma/client`, plus some handy executable smoke tests
 
 ## How to setup
 
-We assume recent Node.js is installed. If not, run `nvm use` in the current directory.
+We assume a recent Node.js is installed (e.g., `v20.5.x`). If not, run `nvm use` in the current directory.
 It's very important to double-check if you have multiple versions installed, as both PlanetScale and Neon requires either Node.js `v18`+ or a custom `fetch` function.
+
+In the parent directory (`cd ..`):
+- Build the driver adapters via `pnpm i && pnpm build`
 
 In the current directoy:
 - Create a `.envrc` starting from `.envrc.example`, and fill in the missing values following the given template
@@ -17,7 +20,7 @@ In the current directoy:
   pnpm i
   ```
 
-Anywhere in the repository: 
+Anywhere in the repository:
 - Run `cargo build -p query-engine-node-api` to compile the `libquery` Query Engine
 
 One level up from this file: 
@@ -34,7 +37,9 @@ If you don't have a connection string yet:
 In the current directory:
 - Run `pnpm prisma:planetscale` to push the Prisma schema and insert the test data.
 - Run `pnpm planetscale` to run smoke tests using `libquery` against the PlanetScale database.
-- Run `pnpm planetscale:client` to run smoke tests using `@prisma/client` against the PlanetScale database.
+  For more fine-grained control:
+  - Run `pnpm planetscale:libquery` to test using `libquery`
+  - Run `pnpm planetscale:client` to test using `@prisma/client`
 
 ### Neon
 
@@ -45,5 +50,11 @@ If you don't have a connection string yet:
 
 In the current directory:
 - Run `pnpm prisma:neon` to push the Prisma schema and insert the test data.
-- Run `pnpm neon:ws` to run smoke tests using `libquery` against the Neon database.
-- Run `pnpm neon:ws:client` to run smoke tests using `@prisma/client` against the Neon database.
+- Run `pnpm neon:ws` to run smoke tests using `libquery` against the Neon database, using a WebSocket connection.
+  For more fine-grained control:
+  - Run `pnpm neon:ws:libquery` to test using `libquery`
+  - Run `pnpm neon:ws:client` to test using `@prisma/client`
+- Run `pnpm neon:http` to run smoke tests using `libquery` against the Neon database, using an HTTP connection. In this case, transactions won't work, and tests are expected to fail.
+  For more fine-grained control:
+  - Run `pnpm neon:ws:http` to test using `libquery`
+  - Run `pnpm neon:ws:http` to test using `@prisma/client`

@@ -1,4 +1,5 @@
 mod cockroachdb;
+mod js;
 mod mongodb;
 mod mysql;
 mod postgres;
@@ -6,16 +7,18 @@ mod sql_server;
 mod sqlite;
 mod vitess;
 
-pub use mysql::*;
+pub use mysql::MySqlVersion;
 
 pub(crate) use cockroachdb::*;
+pub(crate) use js::*;
 pub(crate) use mongodb::*;
+pub(crate) use mysql::*;
 pub(crate) use postgres::*;
 pub(crate) use sql_server::*;
 pub(crate) use sqlite::*;
 pub(crate) use vitess::*;
 
-use crate::{datamodel_rendering::DatamodelRenderer, BoxFuture, TestError, CONFIG};
+use crate::{datamodel_rendering::DatamodelRenderer, BoxFuture, TestError, CONFIG, EXTERNAL_TEST_EXECUTOR};
 use psl::datamodel_connector::ConnectorCapabilities;
 use std::{convert::TryFrom, fmt};
 
@@ -24,7 +27,7 @@ pub trait ConnectorTagInterface {
 
     /// The name of the datamodel provider for this connector.
     /// Must match valid datamodel provider strings.
-    fn datamodel_provider(&self) -> &'static str;
+    fn datamodel_provider(&self) -> &str;
 
     /// Returns the renderer to be used for templating the datamodel (the models portion).
     fn datamodel_renderer(&self) -> Box<dyn DatamodelRenderer>;
@@ -35,7 +38,7 @@ pub trait ConnectorTagInterface {
     /// Defines where relational constraints are handled:
     ///   - "prisma" is handled in the Query Engine core
     ///   - "foreignKeys" lets the database handle them
-    fn relation_mode(&self) -> &'static str {
+    fn relation_mode(&self) -> &str {
         "foreignKeys"
     }
 }
@@ -299,10 +302,14 @@ pub(crate) fn should_run(
             .any(|only| ConnectorVersion::try_from(*only).unwrap().matches_pattern(&version));
     }
 
-    if exclude
-        .iter()
-        .any(|excl| ConnectorVersion::try_from(*excl).unwrap().matches_pattern(&version))
-    {
+    if EXTERNAL_TEST_EXECUTOR.is_some() && exclude.iter().any(|excl| excl.0.to_uppercase() == "JS") {
+        println!("Excluded test execution for JS driver adapters. Skipping test");
+        return false;
+    };
+
+    if exclude.iter().any(|excl| {
+        ConnectorVersion::try_from(*excl).map_or(false, |connector_version| connector_version.matches_pattern(&version))
+    }) {
         println!("Connector excluded. Skipping test.");
         return false;
     }

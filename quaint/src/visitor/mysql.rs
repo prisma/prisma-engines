@@ -34,7 +34,6 @@ impl<'a> Mysql<'a> {
     }
 
     fn visit_numeric_comparison(&mut self, left: Expression<'a>, right: Expression<'a>, sign: &str) -> visitor::Result {
-        #[cfg(feature = "json")]
         fn json_to_quaint_value<'a>(json: serde_json::Value) -> crate::Result<Value<'a>> {
             match json {
                 serde_json::Value::String(str) => Ok(Value::text(str)),
@@ -61,7 +60,6 @@ impl<'a> Mysql<'a> {
         }
 
         match (left, right) {
-            #[cfg(feature = "json")]
             (left, right) if left.is_json_value() && right.is_fun_retuning_json() => {
                 let quaint_value = json_to_quaint_value(left.into_json_value().unwrap())?;
 
@@ -69,7 +67,7 @@ impl<'a> Mysql<'a> {
                 self.write(format!(" {sign} "))?;
                 self.visit_expression(right)?;
             }
-            #[cfg(feature = "json")]
+
             (left, right) if left.is_fun_retuning_json() && right.is_json_value() => {
                 let quaint_value = json_to_quaint_value(right.into_json_value().unwrap())?;
 
@@ -153,7 +151,7 @@ impl<'a> Visitor<'a> for Mysql<'a> {
             }
             #[cfg(feature = "bigdecimal")]
             Value::Numeric(r) => r.map(|r| self.write(r)),
-            #[cfg(feature = "json")]
+
             Value::Json(j) => match j {
                 Some(ref j) => {
                     let s = serde_json::to_string(&j)?;
@@ -163,11 +161,8 @@ impl<'a> Visitor<'a> for Mysql<'a> {
             },
             #[cfg(feature = "uuid")]
             Value::Uuid(uuid) => uuid.map(|uuid| self.write(format!("'{}'", uuid.hyphenated()))),
-            #[cfg(feature = "chrono")]
             Value::DateTime(dt) => dt.map(|dt| self.write(format!("'{}'", dt.to_rfc3339(),))),
-            #[cfg(feature = "chrono")]
             Value::Date(date) => date.map(|date| self.write(format!("'{date}'"))),
-            #[cfg(feature = "chrono")]
             Value::Time(time) => time.map(|time| self.write(format!("'{time}'"))),
             Value::Xml(cow) => cow.map(|cow| self.write(format!("'{cow}'"))),
         };
@@ -321,7 +316,6 @@ impl<'a> Visitor<'a> for Mysql<'a> {
     }
 
     fn visit_equals(&mut self, left: Expression<'a>, right: Expression<'a>) -> visitor::Result {
-        #[cfg(feature = "json")]
         {
             if right.is_json_expr() || left.is_json_expr() {
                 self.surround_with("(", ")", |ref mut s| {
@@ -345,15 +339,9 @@ impl<'a> Visitor<'a> for Mysql<'a> {
                 self.visit_regular_equality_comparison(left, right)
             }
         }
-
-        #[cfg(not(feature = "json"))]
-        {
-            self.visit_regular_equality_comparison(left, right)
-        }
     }
 
     fn visit_not_equals(&mut self, left: Expression<'a>, right: Expression<'a>) -> visitor::Result {
-        #[cfg(feature = "json")]
         {
             if right.is_json_expr() || left.is_json_expr() {
                 self.surround_with("(", ")", |ref mut s| {
@@ -377,14 +365,9 @@ impl<'a> Visitor<'a> for Mysql<'a> {
                 self.visit_regular_difference_comparison(left, right)
             }
         }
-
-        #[cfg(not(feature = "json"))]
-        {
-            self.visit_regular_difference_comparison(left, right)
-        }
     }
 
-    #[cfg(all(feature = "json", any(feature = "postgresql", feature = "mysql")))]
+    #[cfg(any(feature = "postgresql", feature = "mysql"))]
     fn visit_json_extract(&mut self, json_extract: JsonExtract<'a>) -> visitor::Result {
         if json_extract.extract_as_string {
             self.write("JSON_UNQUOTE(")?;
@@ -409,7 +392,7 @@ impl<'a> Visitor<'a> for Mysql<'a> {
         Ok(())
     }
 
-    #[cfg(all(feature = "json", any(feature = "postgresql", feature = "mysql")))]
+    #[cfg(any(feature = "postgresql", feature = "mysql"))]
     fn visit_json_array_contains(&mut self, left: Expression<'a>, right: Expression<'a>, not: bool) -> visitor::Result {
         self.write("JSON_CONTAINS(")?;
         self.visit_expression(left)?;
@@ -424,7 +407,7 @@ impl<'a> Visitor<'a> for Mysql<'a> {
         Ok(())
     }
 
-    #[cfg(all(feature = "json", any(feature = "postgresql", feature = "mysql")))]
+    #[cfg(any(feature = "postgresql", feature = "mysql"))]
     fn visit_json_type_equals(&mut self, left: Expression<'a>, json_type: JsonType<'a>, not: bool) -> visitor::Result {
         self.write("(")?;
         self.write("JSON_TYPE")?;
@@ -536,7 +519,7 @@ impl<'a> Visitor<'a> for Mysql<'a> {
         Ok(())
     }
 
-    #[cfg(all(feature = "json", any(feature = "postgresql", feature = "mysql")))]
+    #[cfg(any(feature = "postgresql", feature = "mysql"))]
     fn visit_json_extract_last_array_item(&mut self, extract: JsonExtractLastArrayElem<'a>) -> visitor::Result {
         self.write("JSON_EXTRACT(")?;
         self.visit_expression(*extract.expr.clone())?;
@@ -549,7 +532,7 @@ impl<'a> Visitor<'a> for Mysql<'a> {
         Ok(())
     }
 
-    #[cfg(all(feature = "json", any(feature = "postgresql", feature = "mysql")))]
+    #[cfg(any(feature = "postgresql", feature = "mysql"))]
     fn visit_json_extract_first_array_item(&mut self, extract: JsonExtractFirstArrayElem<'a>) -> visitor::Result {
         self.write("JSON_EXTRACT(")?;
         self.visit_expression(*extract.expr)?;
@@ -560,7 +543,7 @@ impl<'a> Visitor<'a> for Mysql<'a> {
         Ok(())
     }
 
-    #[cfg(all(feature = "json", any(feature = "postgresql", feature = "mysql")))]
+    #[cfg(any(feature = "postgresql", feature = "mysql"))]
     fn visit_json_unquote(&mut self, json_unquote: JsonUnquote<'a>) -> visitor::Result {
         self.write("JSON_UNQUOTE(")?;
         self.visit_expression(*json_unquote.expr)?;
@@ -727,7 +710,6 @@ mod tests {
         );
     }
 
-    #[cfg(feature = "json")]
     #[test]
     fn equality_with_a_json_value() {
         let expected = expected_values(
@@ -742,7 +724,6 @@ mod tests {
         assert_eq!(expected.1, params);
     }
 
-    #[cfg(feature = "json")]
     #[test]
     fn difference_with_a_json_value() {
         let expected = expected_values(
@@ -859,7 +840,7 @@ mod tests {
     }
 
     #[test]
-    #[cfg(feature = "json")]
+
     fn test_raw_json() {
         let (sql, params) = Mysql::build(Select::default().value(serde_json::json!({ "foo": "bar" }).raw())).unwrap();
         assert_eq!("SELECT CONVERT('{\"foo\":\"bar\"}', JSON)", sql);
@@ -878,7 +859,6 @@ mod tests {
     }
 
     #[test]
-    #[cfg(feature = "chrono")]
     fn test_raw_datetime() {
         let dt = chrono::Utc::now();
         let (sql, params) = Mysql::build(Select::default().value(dt.raw())).unwrap();
@@ -915,7 +895,7 @@ mod tests {
     }
 
     #[test]
-    #[cfg(feature = "json")]
+
     fn test_json_negation() {
         let conditions = ConditionTree::not("json".equals(Value::Json(Some(serde_json::Value::Null))));
         let (sql, _) = Mysql::build(Select::from_table("test").so_that(conditions)).unwrap();
@@ -927,7 +907,7 @@ mod tests {
     }
 
     #[test]
-    #[cfg(feature = "json")]
+
     fn test_json_not_negation() {
         let conditions = ConditionTree::not("json".not_equals(Value::Json(Some(serde_json::Value::Null))));
         let (sql, _) = Mysql::build(Select::from_table("test").so_that(conditions)).unwrap();

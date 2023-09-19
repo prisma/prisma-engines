@@ -156,6 +156,23 @@ pub(crate) fn upsert_record(
     }
 
     graph.create_edge(&if_node, &create_node, QueryGraphDependency::Else)?;
+
+    // Pass-in the read parent record result to the update node RecordFilter to avoid a redundant read.
+    graph.create_edge(
+        &read_parent_records_node,
+        &update_node,
+        QueryGraphDependency::ProjectedDataDependency(
+            model_id.clone(),
+            Box::new(move |mut update_node, parent_ids| {
+                if let Node::Query(Query::Write(WriteQuery::UpdateRecord(ref mut ur))) = update_node {
+                    ur.set_selectors(parent_ids);
+                }
+
+                Ok(update_node)
+            }),
+        ),
+    )?;
+
     graph.create_edge(
         &update_node,
         &read_node_update,
