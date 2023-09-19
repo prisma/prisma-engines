@@ -154,7 +154,7 @@
 };
 <span class="kw">use </span>async_trait::async_trait;
 <span class="kw">use </span>connector::Connector;
-<span class="kw">use </span>serde::Deserialize;
+<span class="kw">use </span>serde::{Deserialize, Serialize};
 <span class="kw">use </span>tracing::Dispatch;
 
 <span class="attr">#[async_trait]
@@ -190,14 +190,14 @@
     <span class="kw">fn </span>primary_connector(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>(<span class="kw">dyn </span>Connector + Send + Sync);
 }
 
-<span class="attr">#[derive(Debug, Deserialize)]
+<span class="attr">#[derive(Debug, Serialize, Deserialize)]
 </span><span class="kw">pub struct </span>TransactionOptions {
     <span class="doccomment">/// Maximum wait time for tx acquisition in milliseconds.
-    </span><span class="attr">#[serde(rename(deserialize = <span class="string">&quot;max_wait&quot;</span>))]
+    </span><span class="attr">#[serde(rename = <span class="string">&quot;max_wait&quot;</span>)]
     </span><span class="kw">pub </span>max_acquisition_millis: u64,
 
     <span class="doccomment">/// Time in milliseconds after which the transaction rolls back automatically.
-    </span><span class="attr">#[serde(rename(deserialize = <span class="string">&quot;timeout&quot;</span>))]
+    </span><span class="attr">#[serde(rename = <span class="string">&quot;timeout&quot;</span>)]
     </span><span class="kw">pub </span>valid_for_millis: u64,
 
     <span class="doccomment">/// Isolation level to use for the transaction.
@@ -205,7 +205,7 @@
 
     <span class="doccomment">/// An optional pre-defined transaction id. Some value might be provided in case we want to generate
     /// a new id at the beginning of the transaction
-    </span><span class="attr">#[serde(skip_deserializing)]
+    </span><span class="attr">#[serde(skip)]
     </span><span class="kw">pub </span>new_tx_id: <span class="prelude-ty">Option</span>&lt;TxId&gt;,
 }
 

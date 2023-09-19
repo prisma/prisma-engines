@@ -118,8 +118,10 @@
 <a href="#118" id="118">118</a>
 <a href="#119" id="119">119</a>
 <a href="#120" id="120">120</a>
+<a href="#121" id="121">121</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::CoreError;
 <span class="kw">use </span>connector::Transaction;
+<span class="kw">use </span>serde::Deserialize;
 <span class="kw">use </span>std::fmt::Display;
 <span class="kw">use </span>tokio::time::{Duration, Instant};
 
@@ -157,7 +159,7 @@
 /// the TransactionActorManager can reply with a helpful error message which explains that no operation can be performed on a closed transaction
 /// rather than an error message stating that the transaction does not exist.
 
-</span><span class="attr">#[derive(Debug, Clone, Hash, Eq, PartialEq)]
+</span><span class="attr">#[derive(Debug, Clone, Hash, Eq, PartialEq, Deserialize)]
 </span><span class="kw">pub struct </span>TxId(String);
 
 <span class="kw">const </span>MINIMUM_TX_ID_LENGTH: usize = <span class="number">24</span>;

@@ -195,26 +195,26 @@
 <span class="attr">#[derive(Debug, serde::Serialize, Default, PartialEq)]
 </span><span class="kw">pub struct </span>GQLResponse {
     <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;IndexMap::is_empty&quot;</span>)]
-    </span>data: Map,
+    </span><span class="kw">pub </span>data: Map,
 
     <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Vec::is_empty&quot;</span>)]
-    </span>errors: Vec&lt;GQLError&gt;,
+    </span><span class="kw">pub </span>errors: Vec&lt;GQLError&gt;,
 
     <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;IndexMap::is_empty&quot;</span>)]
-    </span>extensions: Map,
+    </span><span class="kw">pub </span>extensions: Map,
 }
 
 <span class="attr">#[derive(Debug, serde::Serialize, Default, PartialEq)]
 #[serde(rename_all = <span class="string">&quot;camelCase&quot;</span>)]
 </span><span class="kw">pub struct </span>GQLBatchResponse {
     <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Vec::is_empty&quot;</span>)]
-    </span>batch_result: Vec&lt;GQLResponse&gt;,
+    </span><span class="kw">pub </span>batch_result: Vec&lt;GQLResponse&gt;,
 
     <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Vec::is_empty&quot;</span>)]
-    </span>errors: Vec&lt;GQLError&gt;,
+    </span><span class="kw">pub </span>errors: Vec&lt;GQLError&gt;,
 
     <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;IndexMap::is_empty&quot;</span>)]
-    </span>extensions: Map,
+    </span><span class="kw">pub </span>extensions: Map,
 }
 
 <span class="attr">#[derive(Debug, serde::Serialize, serde::Deserialize, PartialEq)]

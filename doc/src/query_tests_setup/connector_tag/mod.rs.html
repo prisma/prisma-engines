@@ -329,7 +329,15 @@
 <a href="#329" id="329">329</a>
 <a href="#330" id="330">330</a>
 <a href="#331" id="331">331</a>
+<a href="#332" id="332">332</a>
+<a href="#333" id="333">333</a>
+<a href="#334" id="334">334</a>
+<a href="#335" id="335">335</a>
+<a href="#336" id="336">336</a>
+<a href="#337" id="337">337</a>
+<a href="#338" id="338">338</a>
 </pre></div><pre class="rust"><code><span class="kw">mod </span>cockroachdb;
+<span class="kw">mod </span>js;
 <span class="kw">mod </span>mongodb;
 <span class="kw">mod </span>mysql;
 <span class="kw">mod </span>postgres;
@@ -337,16 +345,18 @@
 <span class="kw">mod </span>sqlite;
 <span class="kw">mod </span>vitess;
 
-<span class="kw">pub use </span>mysql::<span class="kw-2">*</span>;
+<span class="kw">pub use </span>mysql::MySqlVersion;
 
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use </span>cockroachdb::<span class="kw-2">*</span>;
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use </span>js::<span class="kw-2">*</span>;
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use </span>mongodb::<span class="kw-2">*</span>;
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use </span>mysql::<span class="kw-2">*</span>;
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use </span>postgres::<span class="kw-2">*</span>;
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use </span>sql_server::<span class="kw-2">*</span>;
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use </span>sqlite::<span class="kw-2">*</span>;
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use </span>vitess::<span class="kw-2">*</span>;
 
-<span class="kw">use crate</span>::{datamodel_rendering::DatamodelRenderer, BoxFuture, TestError, CONFIG};
+<span class="kw">use crate</span>::{datamodel_rendering::DatamodelRenderer, BoxFuture, TestError, CONFIG, EXTERNAL_TEST_EXECUTOR};
 <span class="kw">use </span>psl::datamodel_connector::ConnectorCapabilities;
 <span class="kw">use </span>std::{convert::TryFrom, fmt};
 
@@ -355,7 +365,7 @@
 
     <span class="doccomment">/// The name of the datamodel provider for this connector.
     /// Must match valid datamodel provider strings.
-    </span><span class="kw">fn </span>datamodel_provider(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str;
+    </span><span class="kw">fn </span>datamodel_provider(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>str;
 
     <span class="doccomment">/// Returns the renderer to be used for templating the datamodel (the models portion).
     </span><span class="kw">fn </span>datamodel_renderer(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Box&lt;<span class="kw">dyn </span>DatamodelRenderer&gt;;
@@ -366,7 +376,7 @@
     <span class="doccomment">/// Defines where relational constraints are handled:
     ///   - &quot;prisma&quot; is handled in the Query Engine core
     ///   - &quot;foreignKeys&quot; lets the database handle them
-    </span><span class="kw">fn </span>relation_mode(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str {
+    </span><span class="kw">fn </span>relation_mode(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>str {
         <span class="string">&quot;foreignKeys&quot;
     </span>}
 }
@@ -630,10 +640,14 @@
             .any(|only| ConnectorVersion::try_from(<span class="kw-2">*</span>only).unwrap().matches_pattern(<span class="kw-2">&amp;</span>version));
     }
 
-    <span class="kw">if </span>exclude
-        .iter()
-        .any(|excl| ConnectorVersion::try_from(<span class="kw-2">*</span>excl).unwrap().matches_pattern(<span class="kw-2">&amp;</span>version))
-    {
+    <span class="kw">if </span>EXTERNAL_TEST_EXECUTOR.is_some() &amp;&amp; exclude.iter().any(|excl| excl.<span class="number">0</span>.to_uppercase() == <span class="string">&quot;JS&quot;</span>) {
+        <span class="macro">println!</span>(<span class="string">&quot;Excluded test execution for JS driver adapters. Skipping test&quot;</span>);
+        <span class="kw">return </span><span class="bool-val">false</span>;
+    };
+
+    <span class="kw">if </span>exclude.iter().any(|excl| {
+        ConnectorVersion::try_from(<span class="kw-2">*</span>excl).map_or(<span class="bool-val">false</span>, |connector_version| connector_version.matches_pattern(<span class="kw-2">&amp;</span>version))
+    }) {
         <span class="macro">println!</span>(<span class="string">&quot;Connector excluded. Skipping test.&quot;</span>);
         <span class="kw">return </span><span class="bool-val">false</span>;
     }

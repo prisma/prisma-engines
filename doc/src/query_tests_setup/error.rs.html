@@ -55,6 +55,12 @@
 <a href="#55" id="55">55</a>
 <a href="#56" id="56">56</a>
 <a href="#57" id="57">57</a>
+<a href="#58" id="58">58</a>
+<a href="#59" id="59">59</a>
+<a href="#60" id="60">60</a>
+<a href="#61" id="61">61</a>
+<a href="#62" id="62">62</a>
+<a href="#63" id="63">63</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::TemplatingError;
 <span class="kw">use </span>quaint::error::Error <span class="kw">as </span>QuaintError;
 <span class="kw">use </span>std::env::VarError;
@@ -63,6 +69,9 @@
 <span class="attr">#[allow(clippy::large_enum_variant)]
 #[derive(Debug, Error)]
 </span><span class="kw">pub enum </span>TestError {
+    <span class="attr">#[error(<span class="string">&quot;Handler Error: {0}&quot;</span>)]
+    </span>RequestHandlerError(request_handlers::HandlerError),
+
     <span class="attr">#[error(<span class="string">&quot;Parse error: {0}&quot;</span>)]
     </span>ParseError(String),
 
@@ -83,6 +92,9 @@
 
     <span class="attr">#[error(<span class="string">&quot;Raw execute error: {0}&quot;</span>)]
     </span>RawExecute(QuaintError),
+
+    <span class="attr">#[error(<span class="string">&quot;External process error: {0}&quot;</span>)]
+    </span>External(<span class="attr">#[from] </span>Box&lt;<span class="kw">dyn </span>std::error::Error + Send + Sync&gt;),
 }
 
 <span class="kw">impl </span>TestError {

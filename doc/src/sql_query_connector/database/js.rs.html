@@ -271,7 +271,7 @@
 // declaration, so finally I couldn&#39;t come up with anything better then wrapping a QuaintQueryable
 // in this object, and implementing TransactionCapable (and quaint::Queryable) explicitly for it.
 </span><span class="attr">#[derive(Clone)]
-</span><span class="kw">struct </span>DriverAdapter {
+</span><span class="kw">pub struct </span>DriverAdapter {
     connector: Arc&lt;<span class="kw">dyn </span>TransactionCapable&gt;,
 }
 

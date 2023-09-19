@@ -308,6 +308,19 @@
 <a href="#308" id="308">308</a>
 <a href="#309" id="309">309</a>
 <a href="#310" id="310">310</a>
+<a href="#311" id="311">311</a>
+<a href="#312" id="312">312</a>
+<a href="#313" id="313">313</a>
+<a href="#314" id="314">314</a>
+<a href="#315" id="315">315</a>
+<a href="#316" id="316">316</a>
+<a href="#317" id="317">317</a>
+<a href="#318" id="318">318</a>
+<a href="#319" id="319">319</a>
+<a href="#320" id="320">320</a>
+<a href="#321" id="321">321</a>
+<a href="#322" id="322">322</a>
+<a href="#323" id="323">323</a>
 </pre></div><pre class="rust"><code><span class="kw">mod </span>config;
 <span class="kw">mod </span>connector_tag;
 <span class="kw">mod </span>datamodel_rendering;
@@ -352,8 +365,16 @@
 </span><span class="kw">pub static </span>ENGINE_PROTOCOL: Lazy&lt;String&gt; =
     Lazy::new(|| std::env::var(<span class="string">&quot;PRISMA_ENGINE_PROTOCOL&quot;</span>).unwrap_or_else(|<span class="kw">_</span>| <span class="string">&quot;graphql&quot;</span>.to_owned()));
 
+<span class="comment">// TODO: rename env var to EXTERNAL_TEST_EXECUTOR
+</span><span class="kw">static </span>EXTERNAL_TEST_EXECUTOR: Lazy&lt;<span class="prelude-ty">Option</span>&lt;String&gt;&gt; = Lazy::new(|| std::env::var(<span class="string">&quot;NODE_TEST_EXECUTOR&quot;</span>).ok());
+
 <span class="doccomment">/// Teardown of a test setup.
-</span><span class="kw">async fn </span>teardown_project(datamodel: <span class="kw-2">&amp;</span>str, db_schemas: <span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span>str]) -&gt; TestResult&lt;()&gt; {
+</span><span class="kw">async fn </span>teardown_project(datamodel: <span class="kw-2">&amp;</span>str, db_schemas: <span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span>str], schema_id: <span class="prelude-ty">Option</span>&lt;usize&gt;) -&gt; TestResult&lt;()&gt; {
+    <span class="kw">if let </span><span class="prelude-val">Some</span>(schema_id) = schema_id {
+        <span class="kw">let </span>params = <span class="macro">serde_json::json!</span>({ <span class="string">&quot;schemaId&quot;</span>: schema_id });
+        <span class="kw">crate</span>::executor_process_request::&lt;serde_json::Value&gt;(<span class="string">&quot;teardown&quot;</span>, params).<span class="kw">await</span><span class="question-mark">?</span>;
+    }
+
     <span class="prelude-val">Ok</span>(qe_setup::teardown(datamodel, db_schemas).<span class="kw">await</span><span class="question-mark">?</span>)
 }
 
@@ -477,7 +498,9 @@
 
                 test_fn(<span class="kw-2">&amp;</span>runner, <span class="kw-2">&amp;</span>dm).<span class="kw">await</span>.unwrap();
 
-                teardown_project(<span class="kw-2">&amp;</span>datamodel, Default::default()).<span class="kw">await</span>.unwrap();
+                teardown_project(<span class="kw-2">&amp;</span>datamodel, Default::default(), runner.schema_id())
+                    .<span class="kw">await
+                    </span>.unwrap();
             }
             .with_subscriber(test_tracing_subscriber(
                 ENV_LOG_LEVEL.to_string(),
@@ -585,10 +608,13 @@
             )
             .<span class="kw">await
             </span>.unwrap();
+            <span class="kw">let </span>schema_id = runner.schema_id();
 
             test_fn(runner).<span class="kw">await</span>.unwrap();
 
-            <span class="kw">crate</span>::teardown_project(<span class="kw-2">&amp;</span>datamodel, db_schemas).<span class="kw">await</span>.unwrap();
+            <span class="kw">crate</span>::teardown_project(<span class="kw-2">&amp;</span>datamodel, db_schemas, schema_id)
+                .<span class="kw">await
+                </span>.unwrap();
         }
         .with_subscriber(test_tracing_subscriber(
             ENV_LOG_LEVEL.to_string(),

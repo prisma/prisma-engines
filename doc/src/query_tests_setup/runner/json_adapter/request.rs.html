@@ -269,7 +269,11 @@
 <a href="#269" id="269">269</a>
 <a href="#270" id="270">270</a>
 <a href="#271" id="271">271</a>
-</pre></div><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::TestResult;
+<a href="#272" id="272">272</a>
+<a href="#273" id="273">273</a>
+<a href="#274" id="274">274</a>
+<a href="#275" id="275">275</a>
+</pre></div><pre class="rust"><code><span class="kw">use crate</span>::{TestError, TestResult};
 <span class="kw">use </span>indexmap::IndexMap;
 <span class="kw">use </span>itertools::Itertools;
 <span class="kw">use </span>prisma_models::PrismaValue;
@@ -289,24 +293,28 @@
 <span class="kw">impl </span>JsonRequest {
     <span class="doccomment">/// Translates a GraphQL query to a JSON query. This is used to keep the same test-suite running on both protocols.
     </span><span class="kw">pub fn </span>from_graphql(gql: <span class="kw-2">&amp;</span>str, query_schema: <span class="kw-2">&amp;</span>QuerySchema) -&gt; TestResult&lt;JsonSingleQuery&gt; {
-        <span class="kw">let </span>operation = GraphQLProtocolAdapter::convert_query_to_operation(gql, <span class="prelude-val">None</span>).unwrap();
-        <span class="kw">let </span>operation_name = operation.name();
-        <span class="kw">let </span>schema_field = query_schema
-            .find_query_field(operation_name)
-            .unwrap_or_else(|| query_schema.find_mutation_field(operation_name).unwrap());
-        <span class="kw">let </span>model_name = schema_field
-            .model()
-            .map(|m| query_schema.internal_data_model.walk(m).name().to_owned());
-        <span class="kw">let </span>query_tag = schema_field.query_tag().unwrap().to_owned();
-        <span class="kw">let </span>selection = operation.into_selection();
+        <span class="kw">match </span>GraphQLProtocolAdapter::convert_query_to_operation(gql, <span class="prelude-val">None</span>) {
+            <span class="prelude-val">Ok</span>(operation) =&gt; {
+                <span class="kw">let </span>operation_name = operation.name();
+                <span class="kw">let </span>schema_field = query_schema
+                    .find_query_field(operation_name)
+                    .unwrap_or_else(|| query_schema.find_mutation_field(operation_name).unwrap());
+                <span class="kw">let </span>model_name = schema_field
+                    .model()
+                    .map(|m| query_schema.internal_data_model.walk(m).name().to_owned());
+                <span class="kw">let </span>query_tag = schema_field.query_tag().unwrap().to_owned();
+                <span class="kw">let </span>selection = operation.into_selection();
 
-        <span class="kw">let </span>output = JsonSingleQuery {
-            model_name,
-            action: Action::new(query_tag),
-            query: graphql_selection_to_json_field_query(selection, <span class="kw-2">&amp;</span>schema_field),
-        };
+                <span class="kw">let </span>output = JsonSingleQuery {
+                    model_name,
+                    action: Action::new(query_tag),
+                    query: graphql_selection_to_json_field_query(selection, <span class="kw-2">&amp;</span>schema_field),
+                };
 
-        <span class="prelude-val">Ok</span>(output)
+                <span class="prelude-val">Ok</span>(output)
+            }
+            <span class="prelude-val">Err</span>(err) =&gt; <span class="prelude-val">Err</span>(TestError::RequestHandlerError(err)),
+        }
     }
 }
 
