@@ -13,12 +13,12 @@ on:
 
 jobs:
   driver-adapter-smoke-tests:
-    name: Smoke
+    name: Smoke tests for adapter ${{ matrix.adapter }}
 
     strategy:
       fail-fast: false
-      #matrix:
-      #  adapter: [neon, neon-http, planetscale, pg]
+      matrix:
+        adapter: [neon:ws, neon:http, planetscale, pg]
   
     runs-on: ubuntu-latest
 
@@ -67,7 +67,7 @@ jobs:
         run: pnpm install
         working-directory: ./query-engine/driver-adapters/js/smoke-test-js
       
-      - run: pnpm prisma:pg
+      - run: pnpm prisma:${{ matrix.adapter }}
         working-directory: ./query-engine/driver-adapters/js/smoke-test-js
-      - run: pnpm pg
+      - run: pnpm ${{ matrix.adapter }}
         working-directory: ./query-engine/driver-adapters/js/smoke-test-js
