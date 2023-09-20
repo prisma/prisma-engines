@@ -1774,6 +1774,7 @@
 <a href="#1774" id="1774">1774</a>
 <a href="#1775" id="1775">1775</a>
 <a href="#1776" id="1776">1776</a>
+<a href="#1777" id="1777">1777</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Postgres schema description.
 
 </span><span class="kw">mod </span>default;
@@ -2662,6 +2663,7 @@
                  FROM pg_class
                  JOIN pg_namespace on pg_namespace.oid = pg_class.relnamespace
                  AND pg_namespace.nspname = ANY ( $1 )
+                 WHERE reltype &gt; 0
                 ) as oid on oid.oid = att.attrelid 
                   AND relname = info.table_name
                   AND namespace = info.table_schema
