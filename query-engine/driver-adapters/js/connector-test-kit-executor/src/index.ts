@@ -13,8 +13,10 @@ import { WebSocket } from 'undici'
 import * as prismaNeon from '@prisma/adapter-neon'
 neonConfig.webSocketConstructor = WebSocket
 
-
 import {bindAdapter, DriverAdapter, ErrorCapturingDriverAdapter} from "@prisma/driver-adapter-utils";
+
+const SUPPORTED_ADAPTERS: Record<string, (_ : string) => Promise<DriverAdapter>>
+    = {'pg': pgAdapter, 'neon:': neonAdapter} as const;
 
 async function main(): Promise<void> {
     const iface = readline.createInterface({
@@ -186,28 +188,25 @@ async function initQe(url: string, prismaSchema: string, logCallback: qe.QueryLo
 }
 
 async function adapterFromEnv(url: string): Promise<DriverAdapter> {
-    const supported_adapters = ['pg', 'neon'];
-
     const adapter = `${process.env.DRIVER_ADAPTER as string}`
 
-    if (adapter === '') {
+    if (adapter == '') {
         throw new Error("DRIVER_ADAPTER is not defined or empty.");
     }
 
-    if (!supported_adapters.includes(adapter)) {
-        throw new Error(`Unknown DRIVER_ADAPTER: ${adapter}`);
+    if (!(adapter in SUPPORTED_ADAPTERS)) {
+        throw new Error(`Unsupported driver adapter: ${adapter}`)
     }
 
-    return await global[`${adapter}Adapter`](url);
+    return await SUPPORTED_ADAPTERS[adapter](url);
 }
 
-async function pgAdapter(url: string) {
+async function pgAdapter(url: string): Promise<DriverAdapter> {
     const pool = new pgDriver.Pool({connectionString: url})
     return new prismaPg.PrismaPg(pool)
 }
 
-
-async function neonAdapter(_: string) {
+async function neonAdapter(_: string): Promise<DriverAdapter> {
     const connectionString = `${process.env.JS_NEON_DATABASE_URL as string}`
     if (connectionString == '') {
         throw new Error("JS_NEON_DATABASE_URL is not defined or empty.");

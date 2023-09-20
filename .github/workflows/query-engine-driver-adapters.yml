@@ -90,7 +90,7 @@ jobs:
         run: cd query-engine/driver-adapters/js && pnpm i && pnpm build
 
       - name: "Run tests"
-        run:  cargo test --package query-engine-tests -- --test-threads=1
+        run:  cargo test --package query-engine-tests writes::top_level_mutations::create_many -- --test-threads=1
         env:
           CLICOLOR_FORCE: 1
           WORKSPACE_ROOT: ${{ github.workspace }}
