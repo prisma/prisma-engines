@@ -1,4 +1,4 @@
-name: Driver Adapter Smoke Tests
+name: Driver Adapters, Smoke Tests
 on:
   push:
     branches:
@@ -44,16 +44,17 @@ jobs:
       - uses: actions/checkout@v4
 
       - uses: dtolnay/rust-toolchain@stable
-      - name: Compile Query Engine
-        run: cargo build -p query-engine-node-api
 
-      - uses: pnpm/action-setup@v2.4.0
+      - uses: pnpm/action-setup@v2
         with:
           version: 8
       - uses: actions/setup-node@v3
         with:
           node-version: 18
-          cache: 'pnpm'
+          #cache: 'pnpm'
+
+      - name: Compile Query Engine
+        run: cargo build -p query-engine-node-api
 
       - name: Install Dependencies (Driver Adapters)
         run: pnpm install
