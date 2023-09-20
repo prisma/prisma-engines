@@ -35,6 +35,7 @@ jobs:
       RUST_LOG: "info"
       RUST_LOG_FORMAT: "devel"
       RUST_BACKTRACE: "1"
+      PRISMA_DISABLE_QUAINT_EXECUTORS: "1"
       CLICOLOR_FORCE: "1"
       CLOSED_TX_CLEANUP: "2"
       SIMPLE_TEST_MODE: "1"
