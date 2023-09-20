@@ -225,6 +225,16 @@ fn js_value_to_quaint(
         ColumnType::Boolean => match json_value {
             serde_json::Value::Bool(b) => QuaintValue::boolean(b),
             serde_json::Value::Null => QuaintValue::Boolean(None),
+            serde_json::Value::Number(n) => QuaintValue::boolean(match n.as_i64() {
+                Some(0) => false,
+                Some(1) => true,
+                _ => panic!("expected number-encoded boolean to be 0 or 1, got {n}"),
+            }),
+            serde_json::Value::String(s) => QuaintValue::boolean(match s.as_str() {
+                "false" | "FALSE" | "0" => false,
+                "true" | "TRUE" | "1" => true,
+                _ => panic!("expected string-encoded boolean, got \"{s}\""),
+            }),
             mismatch => panic!("Expected a boolean in column {}, found {}", column_name, mismatch),
         },
         ColumnType::Char => match json_value {
@@ -568,16 +578,16 @@ mod proxy_test {
         test_null(QuaintValue::Boolean(None), column_type);
 
         // true
-        let bool_val = true;
-        let json_value = serde_json::Value::Bool(bool_val);
-        let quaint_value = js_value_to_quaint(json_value, column_type, "column_name");
-        assert_eq!(quaint_value, QuaintValue::Boolean(Some(bool_val)));
+        for truthy_value in [json!(true), json!(1), json!("true"), json!("TRUE"), json!("1")] {
+            let quaint_value = js_value_to_quaint(truthy_value, column_type, "column_name");
+            assert_eq!(quaint_value, QuaintValue::Boolean(Some(true)));
+        }
 
         // false
-        let bool_val = false;
-        let json_value = serde_json::Value::Bool(bool_val);
-        let quaint_value = js_value_to_quaint(json_value, column_type, "column_name");
-        assert_eq!(quaint_value, QuaintValue::Boolean(Some(bool_val)));
+        for falsy_value in [json!(false), json!(0), json!("false"), json!("FALSE"), json!("0")] {
+            let quaint_value = js_value_to_quaint(falsy_value, column_type, "column_name");
+            assert_eq!(quaint_value, QuaintValue::Boolean(Some(false)));
+        }
     }
 
     #[test]
