@@ -1,9 +1,19 @@
-import pgDriver from 'pg'
-import * as pg from '@prisma/adapter-pg'
 import * as qe from './qe'
 import * as engines from './engines/Library'
 import * as readline from 'node:readline'
 import * as jsonRpc from './jsonRpc'
+
+// pg dependencies
+import pgDriver from 'pg'
+import * as prismaPg from '@prisma/adapter-pg'
+
+// neon dependencies
+import { Pool as NeonPool, neonConfig } from '@neondatabase/serverless'
+import { WebSocket } from 'undici'
+import * as prismaNeon from '@prisma/adapter-neon'
+neonConfig.webSocketConstructor = WebSocket
+
+
 import {bindAdapter, DriverAdapter, ErrorCapturingDriverAdapter} from "@prisma/driver-adapter-utils";
 
 async function main(): Promise<void> {
@@ -176,11 +186,11 @@ async function initQe(url: string, prismaSchema: string, logCallback: qe.QueryLo
 }
 
 async function adapterFromEnv(url: string): Promise<DriverAdapter> {
-    const supported_adapters = ['pg'];
+    const supported_adapters = ['pg', 'neon'];
 
-    const adapter = process.env.DRIVER_ADAPTER;
+    const adapter = `${process.env.DRIVER_ADAPTER as string}`
 
-    if (typeof adapter === 'undefined' || adapter === '') {
+    if (adapter === '') {
         throw new Error("DRIVER_ADAPTER is not defined or empty.");
     }
 
@@ -193,7 +203,18 @@ async function adapterFromEnv(url: string): Promise<DriverAdapter> {
 
 async function pgAdapter(url: string) {
     const pool = new pgDriver.Pool({connectionString: url})
-    return new pg.PrismaPg(pool)
+    return new prismaPg.PrismaPg(pool)
+}
+
+
+async function neonAdapter(_: string) {
+    const connectionString = `${process.env.JS_NEON_DATABASE_URL as string}`
+    if (connectionString == '') {
+        throw new Error("JS_NEON_DATABASE_URL is not defined or empty.");
+    }
+
+    const pool = new NeonPool({ connectionString })
+    return new prismaNeon.PrismaNeon(pool)
 }
 
 main().catch(console.error)
