@@ -12,7 +12,7 @@
     "prisma:db:execute:mysql": "prisma db execute --schema ./prisma/mysql/schema.prisma --file ./prisma/mysql/commands/type_test/insert.sql",
     "prisma:studio:mysql": "prisma studio --schema ./prisma/mysql/schema.prisma",
 
-:    "prisma:neon": "cross-env-shell DATABASE_URL=\"${JS_NEON_DATABASE_URL}\" \"pnpm prisma:db:push:postgres && pnpm prisma:db:execute:postgres\"",
+    "prisma:neon": "cross-env-shell DATABASE_URL=\"${JS_NEON_DATABASE_URL}\" \"pnpm prisma:db:push:postgres && pnpm prisma:db:execute:postgres\"",
     "studio:neon": "cross-env-shell DATABASE_URL=\"${JS_NEON_DATABASE_URL}\" \"pnpm prisma:studio:postgres\"",
     "neon:ws:libquery": "DATABASE_URL=\"${JS_NEON_DATABASE_URL}\" node --test --loader=tsx ./src/libquery/neon.ws.test.ts",
     "neon:http:libquery": "DATABASE_URL=\"${JS_NEON_DATABASE_URL}\" node --test --loader=tsx ./src/libquery/neon.http.test.ts",
