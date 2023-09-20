@@ -147,7 +147,7 @@ impl QueryEngine {
         napi_env: Env,
         options: JsUnknown,
         callback: JsFunction,
-        maybe_driver: Option<JsObject>,
+        maybe_adapter: Option<JsObject>,
     ) -> napi::Result<Self> {
         let mut log_callback = callback.create_threadsafe_function(0usize, |ctx: ThreadSafeCallContext<String>| {
             Ok(vec![ctx.env.create_string(&ctx.value)?])
@@ -181,8 +181,8 @@ impl QueryEngine {
             );
         } else {
             #[cfg(feature = "driver-adapters")]
-            if let Some(driver) = maybe_driver {
-                let js_queryable = driver_adapters::from_napi(driver);
+            if let Some(adapter) = maybe_adapter {
+                let js_queryable = driver_adapters::from_napi(adapter);
 
                 sql_connector::activate_driver_adapter(Arc::new(js_queryable));
                 connector_mode = ConnectorMode::Js;
