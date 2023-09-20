@@ -94,13 +94,11 @@ async function handleRequest(method: string, params: unknown): Promise<unknown> 
                 schemaId: number,
                 options: unknown
             }
+
             console.error("Got `startTx", params)
-            const { schemaId, options } = params as StartTxPayload
+            const {schemaId, options} = params as StartTxPayload
             const result = await schemas[schemaId].startTransaction(JSON.stringify(options), "")
             return JSON.parse(result)
-
-            
-
         }
 
         case 'commitTx': {
@@ -108,8 +106,9 @@ async function handleRequest(method: string, params: unknown): Promise<unknown> 
                 schemaId: number,
                 txId: string,
             }
+
             console.error("Got `commitTx", params)
-            const { schemaId, txId } = params as CommitTxPayload
+            const {schemaId, txId} = params as CommitTxPayload
             const result = await schemas[schemaId].commitTransaction(txId, '{}')
             return JSON.parse(result)
         }
@@ -119,8 +118,9 @@ async function handleRequest(method: string, params: unknown): Promise<unknown> 
                 schemaId: number,
                 txId: string,
             }
+
             console.error("Got `rollbackTx", params)
-            const { schemaId, txId } = params as RollbackTxPayload
+            const {schemaId, txId} = params as RollbackTxPayload
             const result = await schemas[schemaId].rollbackTransaction(txId, '{}')
             return JSON.parse(result)
         }
@@ -134,13 +134,12 @@ async function handleRequest(method: string, params: unknown): Promise<unknown> 
             delete schemas[castParams.schemaId]
             delete queryLogs[castParams.schemaId]
             return {}
-
         }
-
         case 'getLogs': {
             interface GetLogsPayload {
                 schemaId: number
             }
+
             const castParams = params as GetLogsPayload
             return queryLogs[castParams.schemaId] ?? []
         }
@@ -170,7 +169,7 @@ function respondOk(requestId: number, payload: unknown) {
 }
 
 async function initQe(url: string, prismaSchema: string, logCallback: qe.QueryLogCallback): Promise<[engines.QueryEngineInstance, ErrorCapturingDriverAdapter]> {
-    const pool = new pgDriver.Pool({ connectionString: url })
+    const pool = new pgDriver.Pool({connectionString: url})
     const adapter = bindAdapter(new pg.PrismaPg(pool))
     const engineInstance = qe.initQueryEngine(adapter, prismaSchema, logCallback)
     return [engineInstance, adapter];
