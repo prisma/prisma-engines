@@ -81,7 +81,7 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - name: "Start ${{ matrix.database.name }} (${{ matrix.engine_protocol }})"
+      - name: "Start ${{ matrix.database.name }}"
         run: make start-${{ matrix.database.name }}
 
       - uses: dtolnay/rust-toolchain@stable
@@ -93,6 +93,6 @@ jobs:
         run: cd query-engine/driver-adapters/js && pnpm i && pnpm build
 
       - name: "Run tests"
-        run:  cargo test --package query-engine-tests writes::top_level_mutations::create_many -- --test-threads=1
+        run:  cargo test --package query-engine-tests -- --test-threads=1
 
 
