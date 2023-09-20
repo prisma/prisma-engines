@@ -36,8 +36,8 @@ jobs:
           - 5432:5432
 
     env:
-      JS_NEON_DATABASE_URL: postgres://USER:PASSWORD@DATABASE-pooler.eu-central-1.aws.neon.tech/neondb?pgbouncer=true&connect_timeout=10"# ${{ secrets.JS_NEON_DATABASE_URL }}
-      JS_PLANETSCALE_DATABASE_URL: mysql://USER:PASSWORD@aws.connect.psdb.cloud/DATABASE?sslaccept=strict # ${{ secrets.JS_PLANETSCALE_DATABASE_URL }}
+      JS_NEON_DATABASE_URL: ${{ secrets.JS_NEON_DATABASE_URL }}
+      JS_PLANETSCALE_DATABASE_URL: ${{ secrets.JS_PLANETSCALE_DATABASE_URL }}
       JS_PG_DATABASE_URL: postgres://postgres:postgres@localhost:5432/test # ${{ secrets.JS_PG_DATABASE_URL }}
 
     steps:
