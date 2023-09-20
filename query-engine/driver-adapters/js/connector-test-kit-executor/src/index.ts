@@ -207,9 +207,9 @@ async function pgAdapter(url: string): Promise<DriverAdapter> {
 }
 
 async function neonAdapter(_: string): Promise<DriverAdapter> {
-    const connectionString = `${process.env.JS_NEON_DATABASE_URL as string}`
+    const connectionString = `${process.env.DRIVER_ADAPTER_URL_OVERRIDE as string}`
     if (connectionString == '') {
-        throw new Error("JS_NEON_DATABASE_URL is not defined or empty.");
+        throw new Error("DRIVER_ADAPTER_URL_OVERRIDE is not defined or empty, but its required for neon adapter.");
     }
 
     const pool = new NeonPool({ connectionString })

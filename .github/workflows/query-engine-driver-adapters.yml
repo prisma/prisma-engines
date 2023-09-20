@@ -28,7 +28,6 @@ jobs:
             version: "13"
             driver_adapter: "pg"
         node_version: ["18"]
-
     env:
       LOG_LEVEL: "info"
       LOG_QUERIES: "y"
@@ -42,7 +41,11 @@ jobs:
       QUERY_BATCH_SIZE: "10"
       TEST_CONNECTOR: ${{ matrix.database.connector }}
       TEST_CONNECTOR_VERSION: ${{ matrix.database.version }}
-      TEST_DRIVER_ADAPTER: ${{ matrix.database.driver_adapter }}
+      WORKSPACE_ROOT: ${{ github.workspace }}
+      # Driver adapter testing specific env vars
+      NODE_TEST_EXECUTOR: "${{ github.workspace }}/query-engine/driver-adapters/js/connector-test-kit-executor/script/start_node.sh"
+      DRIVER_ADAPTER: ${{ matrix.database.driver_adapter }}
+      DRIVER_ADAPTER_URL_OVERRIDE: ${{ matrix.database.driver_adapter_url }}
 
     runs-on: buildjet-16vcpu-ubuntu-2004
     steps:
@@ -91,8 +94,5 @@ jobs:
 
       - name: "Run tests"
         run:  cargo test --package query-engine-tests writes::top_level_mutations::create_many -- --test-threads=1
-        env:
-          CLICOLOR_FORCE: 1
-          WORKSPACE_ROOT: ${{ github.workspace }}
-          NODE_TEST_EXECUTOR: "${{ github.workspace }}/query-engine/driver-adapters/js/connector-test-kit-executor/script/start_node.sh"
+
 
