@@ -18,7 +18,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        adapter: [neon:ws, neon:http, planetscale, pg]
+        adapter: ["neon:ws", "neon:http", planetscale, pg]
   
     runs-on: ubuntu-latest
 
