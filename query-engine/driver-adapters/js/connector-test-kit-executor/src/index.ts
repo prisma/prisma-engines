@@ -4,7 +4,7 @@ import * as qe from './qe'
 import * as engines from './engines/Library'
 import * as readline from 'node:readline'
 import * as jsonRpc from './jsonRpc'
-import {bindAdapter, ErrorCapturingDriverAdapter} from "@prisma/driver-adapter-utils";
+import {bindAdapter, DriverAdapter, ErrorCapturingDriverAdapter} from "@prisma/driver-adapter-utils";
 
 async function main(): Promise<void> {
     const iface = readline.createInterface({
@@ -169,10 +169,31 @@ function respondOk(requestId: number, payload: unknown) {
 }
 
 async function initQe(url: string, prismaSchema: string, logCallback: qe.QueryLogCallback): Promise<[engines.QueryEngineInstance, ErrorCapturingDriverAdapter]> {
+    const adapter = await adapterFromEnv(url) as DriverAdapter
+    const errorCapturingAdapter = bindAdapter(adapter)
+    const engineInstance = qe.initQueryEngine(errorCapturingAdapter, prismaSchema, logCallback)
+    return [engineInstance, errorCapturingAdapter];
+}
+
+async function adapterFromEnv(url: string): Promise<DriverAdapter> {
+    const supported_adapters = ['pg'];
+
+    const adapter = process.env.DRIVER_ADAPTER;
+
+    if (typeof adapter === 'undefined' || adapter === '') {
+        throw new Error("DRIVER_ADAPTER is not defined or empty.");
+    }
+
+    if (!supported_adapters.includes(adapter)) {
+        throw new Error(`Unknown DRIVER_ADAPTER: ${adapter}`);
+    }
+
+    return await global[`${adapter}Adapter`](url);
+}
+
+async function pgAdapter(url: string) {
     const pool = new pgDriver.Pool({connectionString: url})
-    const adapter = bindAdapter(new pg.PrismaPg(pool))
-    const engineInstance = qe.initQueryEngine(adapter, prismaSchema, logCallback)
-    return [engineInstance, adapter];
+    return new pg.PrismaPg(pool)
 }
 
 main().catch(console.error)
