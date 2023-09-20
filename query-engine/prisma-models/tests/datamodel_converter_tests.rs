@@ -39,6 +39,41 @@ fn converting_enums() {
 }
 
 #[test]
+#[should_panic(
+    expected = "Cannot convert a composite type to a type identifier. This error is typically caused by mistakenly using a composite type within a composite index."
+)]
+fn converting_composite_types() {
+    let datamodel = convert(
+        r#"
+    datasource db {
+      provider = "mongodb"
+      url      = "mongodb://localhost:27017/hello"
+    }
+
+    model MyModel {
+      id        String      @id @default(auto()) @map("_id") @db.ObjectId
+      attribute Attribute
+
+      @@unique([attribute])
+    }
+
+    type Attribute {
+      name  String
+      value String
+      group String
+    }
+    "#,
+    );
+    let model = datamodel.find_model("MyModel").unwrap();
+    let uniq_idx = model.unique_indexes().find(|_| true).unwrap();
+    let attr = ScalarField::from((
+        model.dm.clone().into(),
+        uniq_idx.fields().find(|v| v.name() == "attribute").unwrap(),
+    ));
+    attr.type_identifier();
+}
+
+#[test]
 fn models_with_only_scalar_fields() {
     let datamodel = convert(
         r#"
