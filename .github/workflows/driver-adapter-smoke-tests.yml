@@ -69,5 +69,7 @@ jobs:
       
       - run: pnpm prisma:${{ matrix.adapter }}
         working-directory: ./query-engine/driver-adapters/js/smoke-test-js
-      - run: pnpm ${{ matrix.adapter }}
+      - run: pnpm ${{ matrix.adapter }}:libquery
+        working-directory: ./query-engine/driver-adapters/js/smoke-test-js
+      - run: pnpm ${{ matrix.adapter }}:client
         working-directory: ./query-engine/driver-adapters/js/smoke-test-js
