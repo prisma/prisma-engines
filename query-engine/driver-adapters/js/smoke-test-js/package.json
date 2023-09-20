@@ -42,11 +42,11 @@
   "license": "Apache-2.0",
   "sideEffects": true,
   "dependencies": {
-    "@aqrln/prisma-adapter-libsql": "workspace:*",
     "@libsql/client": "0.3.5-pre.8",
+    "@prisma/adapter-libsql": "workspace:*",
     "@prisma/adapter-neon": "workspace:*",
-    "@prisma/adapter-planetscale": "workspace:*",
     "@prisma/adapter-pg": "workspace:*",
+    "@prisma/adapter-planetscale": "workspace:*",
     "@prisma/driver-adapter-utils": "workspace:*",
     "@neondatabase/serverless": "^0.6.0",
     "@planetscale/database": "^1.11.0",

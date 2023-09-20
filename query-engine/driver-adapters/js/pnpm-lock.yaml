@@ -100,9 +100,6 @@ importers:
 
   smoke-test-js:
     dependencies:
-      '@aqrln/prisma-adapter-libsql':
-        specifier: workspace:*
-        version: link:../adapter-libsql
       '@libsql/client':
         specifier: 0.3.5-pre.8
         version: 0.3.5-pre.8
@@ -112,6 +109,9 @@ importers:
       '@planetscale/database':
         specifier: ^1.11.0
         version: 1.11.0
+      '@prisma/adapter-libsql':
+        specifier: workspace:*
+        version: link:../adapter-libsql
       '@prisma/adapter-neon':
         specifier: workspace:*
         version: link:../adapter-neon

@@ -1,4 +1,4 @@
-import { PrismaLibsql } from '@aqrln/prisma-adapter-libsql'
+import { PrismaLibsql } from '@prisma/adapter-libsql'
 import { IntMode, createClient } from '@libsql/client'
 import { describe } from 'node:test'
 import { smokeTestClient } from './client'
