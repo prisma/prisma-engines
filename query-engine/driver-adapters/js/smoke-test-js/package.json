@@ -42,7 +42,7 @@
   "license": "Apache-2.0",
   "sideEffects": true,
   "dependencies": {
-    "@libsql/client": "0.3.5-pre.8",
+    "@libsql/client": "0.3.5-pre.9",
     "@prisma/adapter-libsql": "workspace:*",
     "@prisma/adapter-neon": "workspace:*",
     "@prisma/adapter-pg": "workspace:*",
