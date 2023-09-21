@@ -14,7 +14,7 @@ const fakeAdapter = bindAdapter({
   },
 
   executeRaw() {
-    throw new Error('Error in queryRaw')
+    throw new Error('Error in executeRaw')
   },
   close() {
     return Promise.resolve({ ok: true, value: undefined })
@@ -53,6 +53,24 @@ describe('errors propagation', () => {
         },
       }),
       /Error in queryRaw/,
+    )
+  })
+
+  test('works for executeRaw', async () => {
+    await assert.rejects(
+      doQuery({
+        action: 'executeRaw',
+        query: {
+          arguments: {
+            query: 'SELECT 1',
+            parameters: '[]',
+          },
+          selection: {
+            $scalars: true,
+          },
+        },
+      }),
+      /Error in executeRaw/,
     )
   })
 
