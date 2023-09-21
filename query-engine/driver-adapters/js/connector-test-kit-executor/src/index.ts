@@ -144,6 +144,7 @@ async function handleRequest(method: string, params: unknown): Promise<unknown> 
             const castParams = params as TeardownPayload;
             await schemas[castParams.schemaId].disconnect("")
             delete schemas[castParams.schemaId]
+            delete adapters[castParams.schemaId]
             delete queryLogs[castParams.schemaId]
             return {}
         }
