@@ -71,6 +71,6 @@ jobs:
         working-directory: ./query-engine/driver-adapters/js/smoke-test-js
       - run: pnpm ${{ matrix.adapter }}:libquery
         working-directory: ./query-engine/driver-adapters/js/smoke-test-js
-      - run: pnpm ${{ matrix.adapter }}:client
+      - run: pnpm ${{ matrix.adapter }}:client (using @prisma/client - including engine! - from Npm)
         if: always()
         working-directory: ./query-engine/driver-adapters/js/smoke-test-js
