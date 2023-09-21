@@ -71,7 +71,7 @@ This means that instead of drivers being implemented in Rust, it's a layer of ad
 
 To run tests through a driver adapters, you should also configure the following environment variables:
 
-* `NODE_TEST_EXECUTOR`: tells the query engine test kit to use an external process to run the queries, this is a node process running
+* `EXTERNAL_TEST_EXECUTOR`: tells the query engine test kit to use an external process to run the queries, this is a node process running
 a program that will read the queries to run from STDIN, and return responses to STDOUT. The connector kit follows a protocol over JSON RPC for this communication. 
 * `DRIVER_ADAPTER`: tells the test executor to use a particular driver adapter. Set to `neon`, `planetscale` or any other supported adapter.
 * `DRIVER_ADAPTER_URL_OVERRIDE`: it overrides the schema URL for the database to use one understood by the driver adapter (ex. neon, planetscale)
@@ -80,7 +80,7 @@ a program that will read the queries to run from STDIN, and return responses to 
 Example:
 
 ```shell
-export NODE_TEST_EXECUTOR="$WORKSPACE_ROOT/query-engine/driver-adapters/js/connector-test-kit-executor/script/start_node.sh"
+export EXTERNAL_TEST_EXECUTOR="$WORKSPACE_ROOT/query-engine/driver-adapters/js/connector-test-kit-executor/script/start_node.sh"
 export DRIVER_ADAPTER=neon
 export DRIVER_ADAPTER_URL_OVERRIDE ="postgres://USER:PASSWORD@DATABASExxxx"
 ````

@@ -69,7 +69,7 @@ impl ExecutorProcess {
     }
 }
 
-pub(super) static NODE_PROCESS: Lazy<ExecutorProcess> =
+pub(super) static EXTERNAL_PROCESS: Lazy<ExecutorProcess> =
     Lazy::new(|| match std::thread::spawn(ExecutorProcess::new).join() {
         Ok(Ok(process)) => process,
         Ok(Err(err)) => exit_with_message(1, &format!("Failed to start node process. Details: {err}")),
@@ -87,7 +87,10 @@ fn start_rpc_thread(mut receiver: mpsc::Receiver<ReqImpl>) -> Result<()> {
 
     let env_var = match crate::EXTERNAL_TEST_EXECUTOR.as_ref() {
         Some(env_var) => env_var,
-        None => exit_with_message(1, "start_rpc_thread() error: NODE_TEST_EXECUTOR env var is not defined"),
+        None => exit_with_message(
+            1,
+            "start_rpc_thread() error: EXTERNAL_TEST_EXECUTOR env var is not defined",
+        ),
     };
 
     tokio::runtime::Builder::new_current_thread()

@@ -43,7 +43,7 @@ jobs:
       TEST_CONNECTOR_VERSION: ${{ matrix.database.version }}
       WORKSPACE_ROOT: ${{ github.workspace }}
       # Driver adapter testing specific env vars
-      NODE_TEST_EXECUTOR: "${{ github.workspace }}/query-engine/driver-adapters/js/connector-test-kit-executor/script/start_node.sh"
+      EXTERNAL_TEST_EXECUTOR: "${{ github.workspace }}/query-engine/driver-adapters/js/connector-test-kit-executor/script/start_node.sh"
       DRIVER_ADAPTER: ${{ matrix.database.driver_adapter }}
       DRIVER_ADAPTER_URL_OVERRIDE: ${{ matrix.database.driver_adapter_url }}
 
