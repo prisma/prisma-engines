@@ -66,9 +66,15 @@ importers:
 
   connector-test-kit-executor:
     dependencies:
+      '@libsql/client':
+        specifier: 0.3.5-pre.9
+        version: 0.3.5-pre.9
       '@neondatabase/serverless':
         specifier: ^0.6.0
         version: 0.6.0
+      '@prisma/adapter-libsql':
+        specifier: workspace:*
+        version: link:../adapter-libsql
       '@prisma/adapter-neon':
         specifier: workspace:*
         version: link:../adapter-neon
