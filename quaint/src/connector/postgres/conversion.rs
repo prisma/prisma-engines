@@ -519,7 +519,7 @@ impl GetRow for PostgresRow {
                     None => Value::Array(None),
                 },
                 ref x => match x.kind() {
-                    Kind::Enum(_) => match row.try_get(i)? {
+                    Kind::Enum => match row.try_get(i)? {
                         Some(val) => {
                             let val: EnumString = val;
 
@@ -528,7 +528,7 @@ impl GetRow for PostgresRow {
                         None => Value::Enum(None),
                     },
                     Kind::Array(inner) => match inner.kind() {
-                        Kind::Enum(_) => match row.try_get(i)? {
+                        Kind::Enum => match row.try_get(i)? {
                             Some(val) => {
                                 let val: Vec<Option<EnumString>> = val;
                                 let variants = val.into_iter().map(|x| Value::Enum(x.map(|x| x.value.into())));
