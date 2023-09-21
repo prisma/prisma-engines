@@ -112,7 +112,7 @@ export class PrismaLibsql extends LibsqlQueryable<StdClient> implements DriverAd
     const tag = '[js::startTransaction]'
     debug(`${tag} options: %O`, options)
 
-    const tx = await this.client.transaction('write')
+    const tx = await this.client.transaction('deferred')
     return { ok: true, value: new LibsqlTransaction(tx, options) }
   }
 
