@@ -74,7 +74,7 @@ To run tests through a driver adapters, you should also configure the following 
 * `EXTERNAL_TEST_EXECUTOR`: tells the query engine test kit to use an external process to run the queries, this is a node process running
 a program that will read the queries to run from STDIN, and return responses to STDOUT. The connector kit follows a protocol over JSON RPC for this communication. 
 * `DRIVER_ADAPTER`: tells the test executor to use a particular driver adapter. Set to `neon`, `planetscale` or any other supported adapter.
-* `DRIVER_ADAPTER_URL_OVERRIDE`: it overrides the schema URL for the database to use one understood by the driver adapter (ex. neon, planetscale)
+* `DRIVER_ADAPTER_CONFIG`: a json string with the configuration for the driver adapter. This is adapter specific, but usually contains the connection string to the database.
  
 
 Example:

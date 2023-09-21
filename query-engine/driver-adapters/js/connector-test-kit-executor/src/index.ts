@@ -11,7 +11,6 @@ import * as prismaPg from '@prisma/adapter-pg'
 import { Pool as NeonPool, neonConfig } from '@neondatabase/serverless'
 import { WebSocket } from 'undici'
 import * as prismaNeon from '@prisma/adapter-neon'
-neonConfig.webSocketConstructor = WebSocket
 
 import {bindAdapter, DriverAdapter, ErrorCapturingDriverAdapter} from "@prisma/driver-adapter-utils";
 
@@ -212,13 +211,18 @@ async function pgAdapter(url: string): Promise<DriverAdapter> {
     return new prismaPg.PrismaPg(pool)
 }
 
-async function neonAdapter(_: string): Promise<DriverAdapter> {
-    const connectionString = process.env.DRIVER_ADAPTER_URL_OVERRIDE ?? ''
-    if (connectionString == '') {
+async function neonAdapter(url: string): Promise<DriverAdapter> {
+    const proxyURL = JSON.parse(process.env.DRIVER_ADAPTER_CONFIG || '{}').proxyUrl ?? ''
+    if (proxyURL == '') {
         throw new Error("DRIVER_ADAPTER_URL_OVERRIDE is not defined or empty, but its required for neon adapter.");
     }
 
-    const pool = new NeonPool({ connectionString })
+    neonConfig.webSocketConstructor = WebSocket
+    neonConfig.useSecureWebSocket = false
+    neonConfig.pipelineConnect = false
+    neonConfig.wsProxy = proxyURL
+
+    const pool = new NeonPool({ connectionString: url })
     return new prismaNeon.PrismaNeon(pool)
 }
 
