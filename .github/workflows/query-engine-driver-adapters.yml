@@ -27,6 +27,12 @@ jobs:
             connector: "postgres"
             version: "13"
             driver_adapter: "pg"
+          - name: "neon-postgres13"
+            connector: "postgres"
+            version: "13"
+            driver_adapter: "neon"
+            driver_adapter_config: |
+              { "proxyUrl": "127.0.0.1:5488/v1" }
         node_version: ["18"]
     env:
       LOG_LEVEL: "info"
