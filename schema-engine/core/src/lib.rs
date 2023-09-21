@@ -89,8 +89,8 @@ fn connector_for_connection_string(
             let connector = MongoDbSchemaConnector::new(params);
             Ok(Box::new(connector))
         }
-        Some(other) => Err(CoreError::url_parse_error(format!(
-            "`{other}` is not a known connection URL scheme. Prisma cannot determine the connector."
+        Some(_other) => Err(CoreError::url_parse_error(format!(
+            "Prisma cannot determine the connector. Expecting postgres/postgresql/file/mysql/sqlserver/mongodb+srv/mongodb"
         ))),
         None => Err(CoreError::user_facing(InvalidConnectionString {
             details: String::new(),
