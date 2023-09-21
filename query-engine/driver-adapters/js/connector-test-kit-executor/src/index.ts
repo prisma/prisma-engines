@@ -16,7 +16,7 @@ neonConfig.webSocketConstructor = WebSocket
 import {bindAdapter, DriverAdapter, ErrorCapturingDriverAdapter} from "@prisma/driver-adapter-utils";
 
 const SUPPORTED_ADAPTERS: Record<string, (_ : string) => Promise<DriverAdapter>>
-    = {'pg': pgAdapter, 'neon:': neonAdapter} as const;
+    = {pg: pgAdapter, neon: neonAdapter};
 
 async function main(): Promise<void> {
     const iface = readline.createInterface({
@@ -188,10 +188,10 @@ async function initQe(url: string, prismaSchema: string, logCallback: qe.QueryLo
 }
 
 async function adapterFromEnv(url: string): Promise<DriverAdapter> {
-    const adapter = `${process.env.DRIVER_ADAPTER as string}`
+    const adapter = process.env.DRIVER_ADAPTER ?? ''
 
     if (adapter == '') {
-        throw new Error("DRIVER_ADAPTER is not defined or empty.");
+        throw new Error("DRIVER_ADAPTER is not defined or empty.")
     }
 
     if (!(adapter in SUPPORTED_ADAPTERS)) {
@@ -207,7 +207,7 @@ async function pgAdapter(url: string): Promise<DriverAdapter> {
 }
 
 async function neonAdapter(_: string): Promise<DriverAdapter> {
-    const connectionString = `${process.env.DRIVER_ADAPTER_URL_OVERRIDE as string}`
+    const connectionString = process.env.DRIVER_ADAPTER_URL_OVERRIDE ?? ''
     if (connectionString == '') {
         throw new Error("DRIVER_ADAPTER_URL_OVERRIDE is not defined or empty, but its required for neon adapter.");
     }

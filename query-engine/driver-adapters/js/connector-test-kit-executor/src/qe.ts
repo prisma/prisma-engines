@@ -35,7 +35,7 @@ export function initQueryEngine(adapter: ErrorCapturingDriverAdapter, datamodel:
             queryLogCallback(parsed.query)
         }
 
-        const level = `${process.env.LOG_LEVEL as string}`
+        const level = process.env.LOG_LEVEL ?? ''
         if (level.toLowerCase() == 'debug') {
             console.error("[nodejs] ", parsed)
         }
