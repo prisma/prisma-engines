@@ -61,11 +61,6 @@ class LibsqlQueryable<ClientT extends StdClient | TransactionClient> implements 
    */
   private async performIO(query: Query) {
     try {
-      // TODO: type assertion: are driver adapter query args always compatible with libsql's InValue?
-      // ```
-      // export type Value = null | string | number | bigint | ArrayBuffer;
-      // export type InValue = Value | boolean | Uint8Array | Date;
-      // ```
       const result = await this.client.execute(query as InStatement)
       return result
     } catch (e) {
