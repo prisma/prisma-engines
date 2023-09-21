@@ -46,9 +46,11 @@ async function main(): Promise<void> {
     });
 }
 
-const schemas: Record<number, engines.QueryEngineInstance> = {}
-const adapters: Record<number, ErrorCapturingDriverAdapter> = {}
-const queryLogs: Record<number, string[]> = []
+const state: Record<number, {
+    engine: engines.QueryEngineInstance,
+    adapter: ErrorCapturingDriverAdapter,
+    queryLogs: string[]
+}> = {}
 
 async function handleRequest(method: string, params: unknown): Promise<unknown> {
     switch (method) {
@@ -60,13 +62,17 @@ async function handleRequest(method: string, params: unknown): Promise<unknown> 
             }
 
             const castParams = params as InitializeSchemaParams;
-            const logs = queryLogs[castParams.schemaId] = [] as string[]
+            const logs = [] as string[]
             const [engine, adapter] = await initQe(castParams.url, castParams.schema, (log) => {
                 logs.push(log)
             });
             await engine.connect("")
-            schemas[castParams.schemaId] = engine
-            adapters[castParams.schemaId] = adapter
+
+            state[castParams.schemaId] = {
+                engine,
+                adapter,
+                logs
+            }
             return null
         }
         case 'query': {
@@ -78,14 +84,14 @@ async function handleRequest(method: string, params: unknown): Promise<unknown> 
 
             console.error("Got `query`", params)
             const castParams = params as QueryPayload;
-            const engine = schemas[castParams.schemaId]
+            const engine = state[castParams.schemaId].engine
             const result = await engine.query(JSON.stringify(castParams.query), "", castParams.txId)
 
             const parsedResult = JSON.parse(result)
             if (parsedResult.errors) {
                 const error = parsedResult.errors[0]?.user_facing_error
                 if (error.error_code === 'P2036') {
-                    const jsError = adapters[castParams.schemaId].errorRegistry.consumeError(error.meta.id)
+                    const jsError = state[castParams.schemaId].adapter.errorRegistry.consumeError(error.meta.id)
                     if (!jsError) {
                         console.error(`Something went wrong. Engine reported external error with id ${error.meta.id}, but it was not registered.`)
                     } else {
@@ -109,7 +115,7 @@ async function handleRequest(method: string, params: unknown): Promise<unknown> 
 
             console.error("Got `startTx", params)
             const {schemaId, options} = params as StartTxPayload
-            const result = await schemas[schemaId].startTransaction(JSON.stringify(options), "")
+            const result = await state[schemaId].engine.startTransaction(JSON.stringify(options), "")
             return JSON.parse(result)
         }
 
@@ -121,7 +127,7 @@ async function handleRequest(method: string, params: unknown): Promise<unknown> 
 
             console.error("Got `commitTx", params)
             const {schemaId, txId} = params as CommitTxPayload
-            const result = await schemas[schemaId].commitTransaction(txId, '{}')
+            const result = await state[schemaId].engine.commitTransaction(txId, '{}')
             return JSON.parse(result)
         }
 
@@ -133,7 +139,7 @@ async function handleRequest(method: string, params: unknown): Promise<unknown> 
 
             console.error("Got `rollbackTx", params)
             const {schemaId, txId} = params as RollbackTxPayload
-            const result = await schemas[schemaId].rollbackTransaction(txId, '{}')
+            const result = await state[schemaId].engine.rollbackTransaction(txId, '{}')
             return JSON.parse(result)
         }
         case 'teardown': {
@@ -142,10 +148,9 @@ async function handleRequest(method: string, params: unknown): Promise<unknown> 
             }
 
             const castParams = params as TeardownPayload;
-            await schemas[castParams.schemaId].disconnect("")
-            delete schemas[castParams.schemaId]
-            delete adapters[castParams.schemaId]
-            delete queryLogs[castParams.schemaId]
+            await state[castParams.schemaId].engine.disconnect("")
+            delete state[castParams.schemaId]
+
             return {}
         }
         case 'getLogs': {
@@ -154,7 +159,7 @@ async function handleRequest(method: string, params: unknown): Promise<unknown> 
             }
 
             const castParams = params as GetLogsPayload
-            return queryLogs[castParams.schemaId] ?? []
+            return state[castParams.schemaId].queryLogs ?? []
         }
         default: {
             throw new Error(`Unknown method: \`${method}\``)
