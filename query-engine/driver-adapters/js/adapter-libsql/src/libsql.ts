@@ -1,4 +1,4 @@
-import { Debug } from '@prisma/driver-adapter-utils'
+import { Debug, ok } from '@prisma/driver-adapter-utils'
 import type {
   DriverAdapter,
   Query,
@@ -38,7 +38,7 @@ class LibSqlQueryable<ClientT extends StdClient | TransactionClient> implements 
       rows: rows.map(mapRow),
     }
 
-    return { ok: true, value: resultSet }
+    return ok(resultSet)
   }
 
   /**
@@ -51,7 +51,7 @@ class LibSqlQueryable<ClientT extends StdClient | TransactionClient> implements 
     debug(`${tag} %O`, query)
 
     const { rowsAffected } = await this.performIO(query)
-    return { ok: true, value: rowsAffected }
+    return ok(rowsAffected ?? 0)
   }
 
   /**
@@ -83,7 +83,7 @@ class LibSqlTransaction extends LibSqlQueryable<TransactionClient> implements Tr
     debug(`[js::commit]`)
 
     await this.client.commit()
-    return Promise.resolve({ ok: true, value: undefined })
+    return ok(undefined)
   }
 
   async rollback(): Promise<Result<void>> {
@@ -95,7 +95,7 @@ class LibSqlTransaction extends LibSqlQueryable<TransactionClient> implements Tr
       debug('error in rollback:', error)
     }
 
-    return Promise.resolve({ ok: true, value: undefined })
+    return ok(undefined)
   }
 }
 
@@ -113,10 +113,10 @@ export class PrismaLibSQL extends LibSqlQueryable<StdClient> implements DriverAd
     debug(`${tag} options: %O`, options)
 
     const tx = await this.client.transaction('deferred')
-    return { ok: true, value: new LibSqlTransaction(tx, options) }
+    return ok(new LibSqlTransaction(tx, options))
   }
 
   async close(): Promise<Result<void>> {
-    return { ok: true, value: undefined }
+    return ok(undefined)
   }
 }
