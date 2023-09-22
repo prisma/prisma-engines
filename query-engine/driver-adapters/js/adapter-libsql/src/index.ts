@@ -1,1 +1,1 @@
-export { PrismaLibsql } from './libsql'
+export { PrismaLibSQL } from './libsql'

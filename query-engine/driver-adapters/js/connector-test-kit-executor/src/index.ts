@@ -14,7 +14,7 @@ import * as prismaNeon from '@prisma/adapter-neon'
 
 // libsql dependencies
 import { createClient } from '@libsql/client'
-import { PrismaLibsql } from '@prisma/adapter-libsql'
+import { PrismaLibSQL } from '@prisma/adapter-libsql'
 
 import {bindAdapter, DriverAdapter, ErrorCapturingDriverAdapter} from "@prisma/driver-adapter-utils";
 
@@ -247,7 +247,7 @@ async function neonWsAdapter(url: string): Promise<DriverAdapter> {
 
 async function libsqlAdapter(url: string): Promise<DriverAdapter> {
     const libsql = createClient({ url, intMode: 'bigint' })
-    return new PrismaLibsql(libsql)
+    return new PrismaLibSQL(libsql)
 }
 
 main().catch(err)

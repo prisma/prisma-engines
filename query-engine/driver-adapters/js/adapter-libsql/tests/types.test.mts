@@ -1,12 +1,12 @@
 import assert from 'node:assert/strict'
 import { describe, it } from 'node:test'
 import { Config, createClient } from '@libsql/client'
-import { PrismaLibsql } from '../dist/index.js'
+import { PrismaLibSQL } from '../dist/index.js'
 import { ColumnTypeEnum } from '@jkomyno/prisma-driver-adapter-utils'
 
-function connect(config?: Partial<Config>): PrismaLibsql {
+function connect(config?: Partial<Config>): PrismaLibSQL {
   const client = createClient({ url: 'file:test.db', ...config })
-  return new PrismaLibsql(client)
+  return new PrismaLibSQL(client)
 }
 
 it('checks declared types', async () => {

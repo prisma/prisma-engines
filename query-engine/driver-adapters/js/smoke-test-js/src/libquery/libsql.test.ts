@@ -1,4 +1,4 @@
-import { PrismaLibsql } from '@prisma/adapter-libsql'
+import { PrismaLibSQL } from '@prisma/adapter-libsql'
 import { bindAdapter } from '@prisma/driver-adapter-utils'
 import { IntMode, createClient } from '@libsql/client'
 import { describe } from 'node:test'
@@ -11,7 +11,7 @@ describe('libsql', async () => {
   const intMode = process.env.JS_LIBSQL_INT_MODE as IntMode | undefined
 
   const client = createClient({ url, syncUrl, authToken, intMode })
-  const adapter = new PrismaLibsql(client)
+  const adapter = new PrismaLibSQL(client)
   const driverAdapter = bindAdapter(adapter)
 
   if (syncUrl) {

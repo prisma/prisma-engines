@@ -8,15 +8,15 @@ import type {
   Transaction,
   TransactionOptions,
 } from '@prisma/driver-adapter-utils'
-import type { InStatement, Client as LibsqlClientRaw, Transaction as LibsqlTransactionRaw } from '@libsql/client'
+import type { InStatement, Client as LibSqlClientRaw, Transaction as LibSqlTransactionRaw } from '@libsql/client'
 import { getColumnTypes, mapRow } from './conversion'
 
 const debug = Debug('prisma:driver-adapter:libsql')
 
-type StdClient = LibsqlClientRaw
-type TransactionClient = LibsqlTransactionRaw
+type StdClient = LibSqlClientRaw
+type TransactionClient = LibSqlTransactionRaw
 
-class LibsqlQueryable<ClientT extends StdClient | TransactionClient> implements Queryable {
+class LibSqlQueryable<ClientT extends StdClient | TransactionClient> implements Queryable {
   readonly flavour = 'sqlite'
 
   constructor(protected readonly client: ClientT) {}
@@ -71,7 +71,7 @@ class LibsqlQueryable<ClientT extends StdClient | TransactionClient> implements 
   }
 }
 
-class LibsqlTransaction extends LibsqlQueryable<TransactionClient> implements Transaction {
+class LibSqlTransaction extends LibSqlQueryable<TransactionClient> implements Transaction {
   constructor(
     client: TransactionClient,
     readonly options: TransactionOptions,
@@ -99,7 +99,7 @@ class LibsqlTransaction extends LibsqlQueryable<TransactionClient> implements Tr
   }
 }
 
-export class PrismaLibsql extends LibsqlQueryable<StdClient> implements DriverAdapter {
+export class PrismaLibSQL extends LibSqlQueryable<StdClient> implements DriverAdapter {
   constructor(client: StdClient) {
     super(client)
   }
@@ -113,7 +113,7 @@ export class PrismaLibsql extends LibsqlQueryable<StdClient> implements DriverAd
     debug(`${tag} options: %O`, options)
 
     const tx = await this.client.transaction('deferred')
-    return { ok: true, value: new LibsqlTransaction(tx, options) }
+    return { ok: true, value: new LibSqlTransaction(tx, options) }
   }
 
   async close(): Promise<Result<void>> {
