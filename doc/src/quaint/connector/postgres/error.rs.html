@@ -354,54 +354,67 @@
 <a href="#354" id="354">354</a>
 <a href="#355" id="355">355</a>
 <a href="#356" id="356">356</a>
-<a href="#357" id="357">357</a>
-<a href="#358" id="358">358</a>
-<a href="#359" id="359">359</a>
-<a href="#360" id="360">360</a>
-<a href="#361" id="361">361</a>
-<a href="#362" id="362">362</a>
-<a href="#363" id="363">363</a>
-<a href="#364" id="364">364</a>
-<a href="#365" id="365">365</a>
-<a href="#366" id="366">366</a>
-<a href="#367" id="367">367</a>
-<a href="#368" id="368">368</a>
-<a href="#369" id="369">369</a>
-<a href="#370" id="370">370</a>
-</pre></div><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::error::{DatabaseConstraint, Error, ErrorKind, Name};
+</pre></div><pre class="rust"><code><span class="kw">use </span>std::fmt::{Display, Formatter};
 
-<span class="kw">impl </span>From&lt;tokio_postgres::error::Error&gt; <span class="kw">for </span>Error {
-    <span class="kw">fn </span>from(e: tokio_postgres::error::Error) -&gt; Error {
-        <span class="kw">use </span>tokio_postgres::error::DbError;
+<span class="kw">use </span>tokio_postgres::error::DbError;
 
-        <span class="kw">if </span>e.is_closed() {
-            <span class="kw">return </span>Error::builder(ErrorKind::ConnectionClosed).build();
+<span class="kw">use </span><span class="kw">crate</span>::error::{DatabaseConstraint, Error, ErrorKind, Name};
+
+<span class="attr">#[derive(Debug)]
+</span><span class="kw">pub struct </span>PostgresError {
+    <span class="kw">pub </span>code: String,
+    <span class="kw">pub </span>message: String,
+    <span class="kw">pub </span>severity: String,
+    <span class="kw">pub </span>detail: <span class="prelude-ty">Option</span>&lt;String&gt;,
+    <span class="kw">pub </span>column: <span class="prelude-ty">Option</span>&lt;String&gt;,
+    <span class="kw">pub </span>hint: <span class="prelude-ty">Option</span>&lt;String&gt;,
+}
+
+<span class="kw">impl </span>std::error::Error <span class="kw">for </span>PostgresError {}
+
+<span class="kw">impl </span>Display <span class="kw">for </span>PostgresError {
+    <span class="comment">// copy of DbError::fmt
+    </span><span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, fmt: <span class="kw-2">&amp;mut </span>Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; std::fmt::Result {
+        <span class="macro">write!</span>(fmt, <span class="string">&quot;{}: {}&quot;</span>, <span class="self">self</span>.severity, <span class="self">self</span>.message)<span class="question-mark">?</span>;
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(detail) = <span class="kw-2">&amp;</span><span class="self">self</span>.detail {
+            <span class="macro">write!</span>(fmt, <span class="string">&quot;\nDETAIL: {}&quot;</span>, detail)<span class="question-mark">?</span>;
         }
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(hint) = <span class="kw-2">&amp;</span><span class="self">self</span>.hint {
+            <span class="macro">write!</span>(fmt, <span class="string">&quot;\nHINT: {}&quot;</span>, hint)<span class="question-mark">?</span>;
+        }
+        <span class="prelude-val">Ok</span>(())
+    }
+}
 
-        <span class="kw">match </span>e.code().map(|c| c.code()) {
-            <span class="prelude-val">Some</span>(code) <span class="kw">if </span>code == <span class="string">&quot;22001&quot; </span>=&gt; {
-                <span class="kw">let </span>code = code.to_string();
+<span class="kw">impl </span>From&lt;<span class="kw-2">&amp;</span>DbError&gt; <span class="kw">for </span>PostgresError {
+    <span class="kw">fn </span>from(value: <span class="kw-2">&amp;</span>DbError) -&gt; <span class="self">Self </span>{
+        PostgresError {
+            code: value.code().code().to_string(),
+            severity: value.severity().to_string(),
+            message: value.message().to_string(),
+            detail: value.detail().map(ToString::to_string),
+            column: value.column().map(ToString::to_string),
+            hint: value.hint().map(ToString::to_string),
+        }
+    }
+}
 
+<span class="kw">impl </span>From&lt;PostgresError&gt; <span class="kw">for </span>Error {
+    <span class="kw">fn </span>from(value: PostgresError) -&gt; <span class="self">Self </span>{
+        <span class="kw">match </span>value.code.as_str() {
+            <span class="string">&quot;22001&quot; </span>=&gt; {
                 <span class="kw">let </span><span class="kw-2">mut </span>builder = Error::builder(ErrorKind::LengthMismatch {
                     column: Name::Unavailable,
                 });
 
-                builder.set_original_code(code);
-
-                <span class="kw">let </span>db_error = e.into_source().and_then(|e| e.downcast::&lt;DbError&gt;().ok());
-                <span class="kw">if let </span><span class="prelude-val">Some</span>(db_error) = db_error {
-                    builder.set_original_message(db_error.to_string());
-                }
+                builder.set_original_code(<span class="kw-2">&amp;</span>value.code);
+                builder.set_original_message(value.to_string());
 
                 builder.build()
             }
-            <span class="prelude-val">Some</span>(code) <span class="kw">if </span>code == <span class="string">&quot;23505&quot; </span>=&gt; {
-                <span class="kw">let </span>code = code.to_string();
-
-                <span class="kw">let </span>db_error = e.into_source().and_then(|e| e.downcast::&lt;DbError&gt;().ok());
-                <span class="kw">let </span>detail = db_error.as_ref().and_then(|e| e.detail()).map(ToString::to_string);
-
-                <span class="kw">let </span>constraint = detail
+            <span class="string">&quot;23505&quot; </span>=&gt; {
+                <span class="kw">let </span>constraint = value
+                    .detail
                     .as_ref()
                     .and_then(|d| d.split(<span class="string">&quot;)=(&quot;</span>).next())
                     .and_then(|d| d.split(<span class="string">&quot; (&quot;</span>).nth(<span class="number">1</span>).map(|s| s.replace(<span class="string">&#39;\&quot;&#39;</span>, <span class="string">&quot;&quot;</span>)))
@@ -411,189 +424,138 @@
                 <span class="kw">let </span>kind = ErrorKind::UniqueConstraintViolation { constraint };
                 <span class="kw">let </span><span class="kw-2">mut </span>builder = Error::builder(kind);
 
-                builder.set_original_code(code);
+                builder.set_original_code(value.code);
 
-                <span class="kw">if let </span><span class="prelude-val">Some</span>(detail) = detail {
+                <span class="kw">if let </span><span class="prelude-val">Some</span>(detail) = value.detail {
                     builder.set_original_message(detail);
                 }
 
                 builder.build()
             }
+
             <span class="comment">// Even lipstick will not save this...
-            </span><span class="prelude-val">Some</span>(code) <span class="kw">if </span>code == <span class="string">&quot;23502&quot; </span>=&gt; {
-                <span class="kw">let </span>code = code.to_string();
-
-                <span class="kw">let </span>db_error = e.into_source().and_then(|e| e.downcast::&lt;DbError&gt;().ok());
-                <span class="kw">let </span>detail = db_error.as_ref().and_then(|e| e.detail()).map(ToString::to_string);
-
-                <span class="kw">let </span>constraint = db_error
-                    .as_ref()
-                    .map(|e| e.column())
-                    .map(DatabaseConstraint::fields)
-                    .unwrap_or(DatabaseConstraint::CannotParse);
+            </span><span class="string">&quot;23502&quot; </span>=&gt; {
+                <span class="kw">let </span>constraint = DatabaseConstraint::fields(value.column);
 
                 <span class="kw">let </span>kind = ErrorKind::NullConstraintViolation { constraint };
                 <span class="kw">let </span><span class="kw-2">mut </span>builder = Error::builder(kind);
 
-                builder.set_original_code(code);
+                builder.set_original_code(value.code);
 
-                <span class="kw">if let </span><span class="prelude-val">Some</span>(detail) = detail {
+                <span class="kw">if let </span><span class="prelude-val">Some</span>(detail) = value.detail {
                     builder.set_original_message(detail);
                 }
 
                 builder.build()
             }
-            <span class="prelude-val">Some</span>(code) <span class="kw">if </span>code == <span class="string">&quot;23503&quot; </span>=&gt; {
-                <span class="kw">let </span>code = code.to_string();
-                <span class="kw">let </span>db_error = e.into_source().and_then(|e| e.downcast::&lt;DbError&gt;().ok());
+            <span class="string">&quot;23503&quot; </span>=&gt; <span class="kw">match </span>value.column {
+                <span class="prelude-val">Some</span>(column) =&gt; {
+                    <span class="kw">let </span><span class="kw-2">mut </span>builder = Error::builder(ErrorKind::ForeignKeyConstraintViolation {
+                        constraint: DatabaseConstraint::fields(<span class="prelude-val">Some</span>(column)),
+                    });
 
-                <span class="kw">match </span>db_error.as_ref().and_then(|e| e.column()) {
-                    <span class="prelude-val">Some</span>(column) =&gt; {
-                        <span class="kw">let </span><span class="kw-2">mut </span>builder = Error::builder(ErrorKind::ForeignKeyConstraintViolation {
-                            constraint: DatabaseConstraint::fields(<span class="prelude-val">Some</span>(column)),
-                        });
+                    builder.set_original_code(value.code);
+                    builder.set_original_message(value.message);
 
-                        builder.set_original_code(code);
-
-                        <span class="kw">if let </span><span class="prelude-val">Some</span>(message) = db_error.as_ref().map(|e| e.message()) {
-                            builder.set_original_message(message);
-                        }
-
-                        builder.build()
-                    }
-                    <span class="prelude-val">None </span>=&gt; {
-                        <span class="kw">let </span>constraint = db_error
-                            .as_ref()
-                            .map(|e| e.message())
-                            .and_then(|e| e.split_whitespace().nth(<span class="number">10</span>))
-                            .and_then(|s| s.split(<span class="string">&#39;&quot;&#39;</span>).nth(<span class="number">1</span>))
-                            .map(ToString::to_string)
-                            .map(DatabaseConstraint::Index)
-                            .unwrap_or(DatabaseConstraint::CannotParse);
-
-                        <span class="kw">let </span>kind = ErrorKind::ForeignKeyConstraintViolation { constraint };
-                        <span class="kw">let </span><span class="kw-2">mut </span>builder = Error::builder(kind);
-
-                        builder.set_original_code(code);
-
-                        <span class="kw">if let </span><span class="prelude-val">Some</span>(message) = db_error.as_ref().map(|e| e.message()) {
-                            builder.set_original_message(message);
-                        }
-
-                        builder.build()
-                    }
+                    builder.build()
                 }
-            }
-            <span class="prelude-val">Some</span>(code) <span class="kw">if </span>code == <span class="string">&quot;3D000&quot; </span>=&gt; {
-                <span class="kw">let </span>code = code.to_string();
-                <span class="kw">let </span>db_error = e.into_source().and_then(|e| e.downcast::&lt;DbError&gt;().ok());
-                <span class="kw">let </span>message = db_error.as_ref().map(|e| e.message());
+                <span class="prelude-val">None </span>=&gt; {
+                    <span class="kw">let </span>constraint = value
+                        .message
+                        .split_whitespace()
+                        .nth(<span class="number">10</span>)
+                        .and_then(|s| s.split(<span class="string">&#39;&quot;&#39;</span>).nth(<span class="number">1</span>))
+                        .map(ToString::to_string)
+                        .map(DatabaseConstraint::Index)
+                        .unwrap_or(DatabaseConstraint::CannotParse);
 
-                <span class="kw">let </span>db_name = message
-                    .as_ref()
-                    .and_then(|s| s.split_whitespace().nth(<span class="number">1</span>))
+                    <span class="kw">let </span>kind = ErrorKind::ForeignKeyConstraintViolation { constraint };
+                    <span class="kw">let </span><span class="kw-2">mut </span>builder = Error::builder(kind);
+
+                    builder.set_original_code(value.code);
+                    builder.set_original_message(value.message);
+
+                    builder.build()
+                }
+            },
+            <span class="string">&quot;3D000&quot; </span>=&gt; {
+                <span class="kw">let </span>db_name = value
+                    .message
+                    .split_whitespace()
+                    .nth(<span class="number">1</span>)
                     .and_then(|s| s.split(<span class="string">&#39;&quot;&#39;</span>).nth(<span class="number">1</span>))
                     .into();
 
                 <span class="kw">let </span>kind = ErrorKind::DatabaseDoesNotExist { db_name };
                 <span class="kw">let </span><span class="kw-2">mut </span>builder = Error::builder(kind);
 
-                builder.set_original_code(code);
-
-                <span class="kw">if let </span><span class="prelude-val">Some</span>(message) = message {
-                    builder.set_original_message(message);
-                }
+                builder.set_original_code(value.code);
+                builder.set_original_message(value.message);
 
                 builder.build()
             }
-            <span class="prelude-val">Some</span>(code) <span class="kw">if </span>code == <span class="string">&quot;28000&quot; </span>=&gt; {
-                <span class="kw">let </span>code = code.to_string();
-                <span class="kw">let </span>db_error = e.into_source().and_then(|e| e.downcast::&lt;DbError&gt;().ok());
-                <span class="kw">let </span>message = db_error.as_ref().map(|e| e.message());
-
-                <span class="kw">let </span>db_name = message
-                    .as_ref()
-                    .and_then(|m| m.split_whitespace().nth(<span class="number">5</span>))
+            <span class="string">&quot;28000&quot; </span>=&gt; {
+                <span class="kw">let </span>db_name = value
+                    .message
+                    .split_whitespace()
+                    .nth(<span class="number">5</span>)
                     .and_then(|s| s.split(<span class="string">&#39;&quot;&#39;</span>).nth(<span class="number">1</span>))
                     .into();
 
                 <span class="kw">let </span>kind = ErrorKind::DatabaseAccessDenied { db_name };
                 <span class="kw">let </span><span class="kw-2">mut </span>builder = Error::builder(kind);
 
-                builder.set_original_code(code);
-
-                <span class="kw">if let </span><span class="prelude-val">Some</span>(message) = message {
-                    builder.set_original_message(message);
-                }
+                builder.set_original_code(value.code);
+                builder.set_original_message(value.message);
 
                 builder.build()
             }
-            <span class="prelude-val">Some</span>(code) <span class="kw">if </span>code == <span class="string">&quot;28P01&quot; </span>=&gt; {
-                <span class="kw">let </span>code = code.to_string();
-                <span class="kw">let </span>db_error = e.into_source().and_then(|e| e.downcast::&lt;DbError&gt;().ok());
-                <span class="kw">let </span>message = db_error.as_ref().map(|e| e.message());
+            <span class="string">&quot;28P01&quot; </span>=&gt; {
+                <span class="kw">let </span>message = value.message;
 
                 <span class="kw">let </span>user = message
-                    .as_ref()
-                    .and_then(|m| m.split_whitespace().last())
+                    .split_whitespace()
+                    .last()
                     .and_then(|s| s.split(<span class="string">&#39;&quot;&#39;</span>).nth(<span class="number">1</span>))
                     .into();
 
                 <span class="kw">let </span>kind = ErrorKind::AuthenticationFailed { user };
                 <span class="kw">let </span><span class="kw-2">mut </span>builder = Error::builder(kind);
 
-                builder.set_original_code(code);
-
-                <span class="kw">if let </span><span class="prelude-val">Some</span>(message) = message {
-                    builder.set_original_message(message);
-                }
+                builder.set_original_code(value.code);
+                builder.set_original_message(message);
 
                 builder.build()
             }
-            <span class="prelude-val">Some</span>(code) <span class="kw">if </span>code == <span class="string">&quot;40001&quot; </span>=&gt; {
-                <span class="kw">let </span>code = code.to_string();
-                <span class="kw">let </span>db_error = e.into_source().and_then(|e| e.downcast::&lt;DbError&gt;().ok());
-                <span class="kw">let </span>message = db_error.as_ref().map(|e| e.message());
-                <span class="kw">let </span><span class="kw-2">mut </span>builder = Error::builder(ErrorKind::TransactionWriteConflict);
+            <span class="string">&quot;40001&quot; </span>=&gt; {
+                <span class="kw">let </span><span class="kw-2">mut </span>builder: <span class="kw">crate</span>::error::ErrorBuilder = Error::builder(ErrorKind::TransactionWriteConflict);
 
-                builder.set_original_code(code);
-
-                <span class="kw">if let </span><span class="prelude-val">Some</span>(message) = message {
-                    builder.set_original_message(message);
-                }
+                builder.set_original_code(value.code);
+                builder.set_original_message(value.message);
 
                 builder.build()
             }
-            <span class="prelude-val">Some</span>(code) <span class="kw">if </span>code == <span class="string">&quot;42P01&quot; </span>=&gt; {
-                <span class="kw">let </span>code = code.to_string();
-                <span class="kw">let </span>db_error = e.into_source().and_then(|e| e.downcast::&lt;DbError&gt;().ok());
-                <span class="kw">let </span>message = db_error.as_ref().map(|e| e.message());
-
-                <span class="kw">let </span>table = message
-                    .as_ref()
-                    .and_then(|m| m.split_whitespace().nth(<span class="number">1</span>))
+            <span class="string">&quot;42P01&quot; </span>=&gt; {
+                <span class="kw">let </span>table = value
+                    .message
+                    .split_whitespace()
+                    .nth(<span class="number">1</span>)
                     .and_then(|s| s.split(<span class="string">&#39;&quot;&#39;</span>).nth(<span class="number">1</span>))
                     .into();
 
                 <span class="kw">let </span>kind = ErrorKind::TableDoesNotExist { table };
                 <span class="kw">let </span><span class="kw-2">mut </span>builder = Error::builder(kind);
 
-                builder.set_original_code(code);
-
-                <span class="kw">if let </span><span class="prelude-val">Some</span>(message) = message {
-                    builder.set_original_message(message);
-                }
+                builder.set_original_code(value.code);
+                builder.set_original_message(value.message);
 
                 builder.build()
             }
-            <span class="prelude-val">Some</span>(code) <span class="kw">if </span>code == <span class="string">&quot;42703&quot; </span>=&gt; {
-                <span class="kw">let </span>code = code.to_string();
-                <span class="kw">let </span>db_error = e.into_source().and_then(|e| e.downcast::&lt;DbError&gt;().ok());
-                <span class="kw">let </span>message = db_error.as_ref().map(|e| e.message());
-
-                <span class="kw">let </span>column = message
-                    .as_ref()
-                    .and_then(|m| m.split_whitespace().nth(<span class="number">1</span>))
+            <span class="string">&quot;42703&quot; </span>=&gt; {
+                <span class="kw">let </span>column = value
+                    .message
+                    .split_whitespace()
+                    .nth(<span class="number">1</span>)
                     .map(|s| s.split(<span class="string">&#39;\&quot;&#39;</span>))
                     .and_then(|<span class="kw-2">mut </span>s| <span class="kw">match </span>(s.next(), s.next()) {
                         (<span class="prelude-val">Some</span>(column), <span class="kw">_</span>) <span class="kw">if </span>!column.is_empty() =&gt; <span class="prelude-val">Some</span>(column),
@@ -605,92 +567,102 @@
                 <span class="kw">let </span>kind = ErrorKind::ColumnNotFound { column };
                 <span class="kw">let </span><span class="kw-2">mut </span>builder = Error::builder(kind);
 
-                builder.set_original_code(code);
-
-                <span class="kw">if let </span><span class="prelude-val">Some</span>(message) = message {
-                    builder.set_original_message(message);
-                }
-
+                builder.set_original_code(value.code);
+                builder.set_original_message(value.message);
                 builder.build()
             }
 
-            <span class="prelude-val">Some</span>(code) <span class="kw">if </span>code == <span class="string">&quot;42P04&quot; </span>=&gt; {
-                <span class="kw">let </span>code = code.to_string();
-                <span class="kw">let </span>db_error = e.into_source().and_then(|e| e.downcast::&lt;DbError&gt;().ok());
-                <span class="kw">let </span>message = db_error.as_ref().map(|e| e.message());
-
-                <span class="kw">let </span>db_name = message
-                    .as_ref()
-                    .and_then(|m| m.split_whitespace().nth(<span class="number">1</span>))
+            <span class="string">&quot;42P04&quot; </span>=&gt; {
+                <span class="kw">let </span>db_name = value
+                    .message
+                    .split_whitespace()
+                    .nth(<span class="number">1</span>)
                     .and_then(|s| s.split(<span class="string">&#39;&quot;&#39;</span>).nth(<span class="number">1</span>))
                     .into();
 
                 <span class="kw">let </span>kind = ErrorKind::DatabaseAlreadyExists { db_name };
                 <span class="kw">let </span><span class="kw-2">mut </span>builder = Error::builder(kind);
 
-                builder.set_original_code(code);
-
-                <span class="kw">if let </span><span class="prelude-val">Some</span>(message) = message {
-                    builder.set_original_message(message);
-                }
+                builder.set_original_code(value.code);
+                builder.set_original_message(value.message);
 
                 builder.build()
             }
-            code =&gt; {
-                <span class="comment">// This is necessary, on top of the other conversions, for the cases where a
-                // native_tls error comes wrapped in a tokio_postgres error.
-                </span><span class="kw">if let </span><span class="prelude-val">Some</span>(tls_error) = try_extracting_tls_error(<span class="kw-2">&amp;</span>e) {
-                    <span class="kw">return </span>tls_error;
-                }
 
-                <span class="comment">// Same for IO errors.
-                </span><span class="kw">if let </span><span class="prelude-val">Some</span>(io_error) = try_extracting_io_error(<span class="kw-2">&amp;</span>e) {
-                    <span class="kw">return </span>io_error;
-                }
+            <span class="kw">_ </span>=&gt; {
+                <span class="kw">let </span>code = value.code.to_owned();
+                <span class="kw">let </span>message = value.to_string();
+                <span class="kw">let </span><span class="kw-2">mut </span>builder = Error::builder(ErrorKind::QueryError(value.into()));
 
-                <span class="attr">#[cfg(feature = <span class="string">&quot;uuid&quot;</span>)]
-                </span><span class="kw">if let </span><span class="prelude-val">Some</span>(uuid_error) = try_extracting_uuid_error(<span class="kw-2">&amp;</span>e) {
-                    <span class="kw">return </span>uuid_error;
-                }
+                builder.set_original_code(code);
+                builder.set_original_message(message);
+                builder.build()
+            }
+        }
+    }
+}
 
-                <span class="kw">let </span>reason = <span class="macro">format!</span>(<span class="string">&quot;{e}&quot;</span>);
+<span class="kw">impl </span>From&lt;tokio_postgres::error::Error&gt; <span class="kw">for </span>Error {
+    <span class="kw">fn </span>from(e: tokio_postgres::error::Error) -&gt; Error {
+        <span class="kw">if </span>e.is_closed() {
+            <span class="kw">return </span>Error::builder(ErrorKind::ConnectionClosed).build();
+        }
 
-                <span class="kw">match </span>reason.as_str() {
-                    <span class="string">&quot;error connecting to server: timed out&quot; </span>=&gt; {
-                        <span class="kw">let </span><span class="kw-2">mut </span>builder = Error::builder(ErrorKind::ConnectTimeout);
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(db_error) = e.as_db_error() {
+            <span class="kw">return </span>PostgresError::from(db_error).into();
+        }
 
-                        <span class="kw">if let </span><span class="prelude-val">Some</span>(code) = code {
-                            builder.set_original_code(code);
-                        };
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(tls_error) = try_extracting_tls_error(<span class="kw-2">&amp;</span>e) {
+            <span class="kw">return </span>tls_error;
+        }
 
-                        builder.set_original_message(reason);
-                        builder.build()
-                    } <span class="comment">// sigh...
-                    // https://github.com/sfackler/rust-postgres/blob/0c84ed9f8201f4e5b4803199a24afa2c9f3723b2/tokio-postgres/src/connect_tls.rs#L37
-                    </span><span class="string">&quot;error performing TLS handshake: server does not support TLS&quot; </span>=&gt; {
-                        <span class="kw">let </span><span class="kw-2">mut </span>builder = Error::builder(ErrorKind::TlsError {
-                            message: reason.clone(),
-                        });
+        <span class="comment">// Same for IO errors.
+        </span><span class="kw">if let </span><span class="prelude-val">Some</span>(io_error) = try_extracting_io_error(<span class="kw-2">&amp;</span>e) {
+            <span class="kw">return </span>io_error;
+        }
 
-                        <span class="kw">if let </span><span class="prelude-val">Some</span>(code) = code {
-                            builder.set_original_code(code);
-                        };
+        <span class="attr">#[cfg(feature = <span class="string">&quot;uuid&quot;</span>)]
+        </span><span class="kw">if let </span><span class="prelude-val">Some</span>(uuid_error) = try_extracting_uuid_error(<span class="kw-2">&amp;</span>e) {
+            <span class="kw">return </span>uuid_error;
+        }
 
-                        builder.set_original_message(reason);
-                        builder.build()
-                    } <span class="comment">// double sigh
-                    </span><span class="kw">_ </span>=&gt; {
-                        <span class="kw">let </span>code = code.map(|c| c.to_string());
-                        <span class="kw">let </span><span class="kw-2">mut </span>builder = Error::builder(ErrorKind::QueryError(e.into()));
+        <span class="kw">let </span>reason = <span class="macro">format!</span>(<span class="string">&quot;{e}&quot;</span>);
+        <span class="kw">let </span>code = e.code().map(|c| c.code());
 
-                        <span class="kw">if let </span><span class="prelude-val">Some</span>(code) = code {
-                            builder.set_original_code(code);
-                        };
+        <span class="kw">match </span>reason.as_str() {
+            <span class="string">&quot;error connecting to server: timed out&quot; </span>=&gt; {
+                <span class="kw">let </span><span class="kw-2">mut </span>builder = Error::builder(ErrorKind::ConnectTimeout);
 
-                        builder.set_original_message(reason);
-                        builder.build()
-                    }
-                }
+                <span class="kw">if let </span><span class="prelude-val">Some</span>(code) = code {
+                    builder.set_original_code(code);
+                };
+
+                builder.set_original_message(reason);
+                <span class="kw">return </span>builder.build();
+            } <span class="comment">// sigh...
+            // https://github.com/sfackler/rust-postgres/blob/0c84ed9f8201f4e5b4803199a24afa2c9f3723b2/tokio-postgres/src/connect_tls.rs#L37
+            </span><span class="string">&quot;error performing TLS handshake: server does not support TLS&quot; </span>=&gt; {
+                <span class="kw">let </span><span class="kw-2">mut </span>builder = Error::builder(ErrorKind::TlsError {
+                    message: reason.clone(),
+                });
+
+                <span class="kw">if let </span><span class="prelude-val">Some</span>(code) = code {
+                    builder.set_original_code(code);
+                };
+
+                builder.set_original_message(reason);
+                <span class="kw">return </span>builder.build();
+            } <span class="comment">// double sigh
+            </span><span class="kw">_ </span>=&gt; {
+                <span class="kw">let </span>code = code.map(|c| c.to_string());
+                <span class="kw">let </span><span class="kw-2">mut </span>builder = Error::builder(ErrorKind::QueryError(e.into()));
+
+                <span class="kw">if let </span><span class="prelude-val">Some</span>(code) = code {
+                    builder.set_original_code(code);
+                };
+
+                builder.set_original_message(reason);
+                <span class="kw">return </span>builder.build();
             }
         }
     }

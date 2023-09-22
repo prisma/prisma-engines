@@ -399,6 +399,8 @@
 <a href="#399" id="399">399</a>
 <a href="#400" id="400">400</a>
 <a href="#401" id="401">401</a>
+<a href="#402" id="402">402</a>
+<a href="#403" id="403">403</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Error module
 </span><span class="kw">use </span><span class="kw">crate</span>::connector::IsolationLevel;
 <span class="kw">use </span>std::{borrow::Cow, fmt, io, num};
@@ -406,6 +408,8 @@
 
 <span class="attr">#[cfg(feature = <span class="string">&quot;pooled&quot;</span>)]
 </span><span class="kw">use </span>std::time::Duration;
+
+<span class="kw">pub use </span><span class="kw">crate</span>::connector::postgres::error::PostgresError;
 
 <span class="attr">#[derive(Debug, PartialEq, Eq)]
 </span><span class="kw">pub enum </span>DatabaseConstraint {

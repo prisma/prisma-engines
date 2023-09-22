@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"enum":["DatabaseConstraint","ErrorKind","Name"],"struct":["Error","ErrorBuilder"]};
+window.SIDEBAR_ITEMS = {"enum":["DatabaseConstraint","ErrorKind","Name"],"struct":["Error","ErrorBuilder","PostgresError"]};
