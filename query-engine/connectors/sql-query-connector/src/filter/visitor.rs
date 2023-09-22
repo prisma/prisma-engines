@@ -69,7 +69,7 @@ impl FilterVisitor {
     }
 
     /// A top-level join can be rendered if we're explicitly allowing it or if we're in a nested visitor.
-    fn should_render_join(&self) -> bool {
+    fn can_render_join(&self) -> bool {
         self.with_top_level_joins || self.is_nested
     }
 
@@ -326,7 +326,8 @@ impl FilterVisitorExt for FilterVisitor {
         let parent_alias = self.parent_alias().map(|a| a.to_string(None));
 
         match &filter.condition {
-            RelationCondition::NoRelatedRecord if self.should_render_join() && !filter.field.is_list() => {
+            // { to_one: { isNot: { ... } } }
+            RelationCondition::NoRelatedRecord if self.can_render_join() && !filter.field.is_list() => {
                 let alias = self.next_alias(AliasMode::Join);
 
                 let linking_fields_null: Vec<_> = ModelProjection::from(filter.field.model().primary_identifier())
@@ -357,7 +358,8 @@ impl FilterVisitorExt for FilterVisitor {
 
                 (conditions.not().or(null_filter), Some(output_joins))
             }
-            RelationCondition::ToOneRelatedRecord if self.should_render_join() && !filter.field.is_list() => {
+            // { to_one: { is: { ... } } }
+            RelationCondition::ToOneRelatedRecord if self.can_render_join() && !filter.field.is_list() => {
                 let alias = self.next_alias(AliasMode::Join);
 
                 let linking_fields_not_null: Vec<_> = ModelProjection::from(filter.field.model().primary_identifier())
@@ -438,7 +440,7 @@ impl FilterVisitorExt for FilterVisitor {
         //    LEFT JOIN "Child" AS "j1" ON ("j1"."parentId" = "Parent"."id")
         //  WHERE "j1"."parentId" IS NULL OFFSET;
         // ```
-        if self.should_render_join() {
+        if self.can_render_join() {
             let alias = self.next_alias(AliasMode::Join);
 
             let conditions: Vec<_> = ModelProjection::from(filter.field.related_field().linking_fields())
