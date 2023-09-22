@@ -75,8 +75,9 @@ fn exit_with_message(msg: &str) -> ! {
     use std::io::{stderr, Write};
     let stderr = stderr();
     let mut sink = stderr.lock();
+    sink.write_all(b"Error in the test configuration:\n").unwrap();
     sink.write_all(msg.as_bytes()).unwrap();
-    sink.write_all(b"\n").unwrap();
+    sink.write_all(b"Aborting test process\n").unwrap();
 
     std::process::exit(1)
 }
@@ -161,20 +162,21 @@ impl TestConfig {
         const DEFAULT_TEST_EXECUTOR: &str =
             "query-engine/driver-adapters/js/connector-test-kit-executor/script/start_node.sh";
 
-        self.external_test_executor = self
+        if self
             .external_test_executor
             .as_ref()
             .filter(|s| s.eq_ignore_ascii_case("default"))
-            .and_then(|_| {
-                Self::workspace_root()
-                    .map(|path| path.join(DEFAULT_TEST_EXECUTOR))
-                    .or_else(|| {
-                        exit_with_message(
-                            "WORKSPACE_ROOT needs to be correctly set to the root of the prisma-engines repository",
-                        )
-                    })
-            })
-            .and_then(|path| path.to_str().map(|s| s.to_owned()));
+            .is_some()
+        {
+            self.external_test_executor = Self::workspace_root()
+                .map(|path| path.join(DEFAULT_TEST_EXECUTOR))
+                .or_else(|| {
+                    exit_with_message(
+                        "WORKSPACE_ROOT needs to be correctly set to the root of the prisma-engines repository",
+                    )
+                })
+                .and_then(|path| path.to_str().map(|s| s.to_owned()));
+        }
     }
 
     fn workspace_root() -> Option<PathBuf> {
@@ -224,7 +226,9 @@ impl TestConfig {
         }
 
         if self.external_test_executor.is_some() && self.driver_adapter.is_none() {
-            exit_with_message("When using an external test executor, the driver adapter must be set.");
+            exit_with_message(
+                "When using an external test executor, the driver adapter (DRIVER_ADAPTER env var) must be set.",
+            );
         }
 
         if self.driver_adapter.is_some() && self.external_test_executor.is_none() {

@@ -35,7 +35,7 @@ jobs:
               { "proxyUrl": "127.0.0.1:5488/v1" }
         node_version: ["18"]
     env:
-      LOG_LEVEL: "info"
+      LOG_LEVEL: "info" # Set to "debug" to trace the query engine and node process running the driver adapter
       LOG_QUERIES: "y"
       RUST_LOG: "info"
       RUST_LOG_FORMAT: "devel"
@@ -93,6 +93,6 @@ jobs:
       - uses: dtolnay/rust-toolchain@stable
 
       - name: "Run tests"
-        run:  cargo test --package query-engine-tests writes::top_level_mutations::create_many::json_create_many::create_many_json_adv -- --test-threads=1
+        run:  cargo test --package query-engine-tests -- --test-threads=1
 
 

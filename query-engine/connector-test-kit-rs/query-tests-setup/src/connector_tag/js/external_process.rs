@@ -94,9 +94,8 @@ fn start_rpc_thread(mut receiver: mpsc::Receiver<ReqImpl>) -> Result<()> {
         .build()
         .unwrap()
         .block_on(async move {
-            eprintln!("Spawning test executor process at `{path}`");
             let process = match Command::new(path)
-                .envs(dbg!(CONFIG.for_external_executor()))
+                .envs(CONFIG.for_external_executor())
                 .stdin(Stdio::piped())
                 .stdout(Stdio::piped())
                 .stderr(Stdio::inherit())
