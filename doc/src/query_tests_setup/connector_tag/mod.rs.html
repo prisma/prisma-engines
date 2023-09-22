@@ -356,7 +356,7 @@
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use </span>sqlite::<span class="kw-2">*</span>;
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use </span>vitess::<span class="kw-2">*</span>;
 
-<span class="kw">use crate</span>::{datamodel_rendering::DatamodelRenderer, BoxFuture, TestError, CONFIG, EXTERNAL_TEST_EXECUTOR};
+<span class="kw">use crate</span>::{datamodel_rendering::DatamodelRenderer, BoxFuture, TestError, CONFIG};
 <span class="kw">use </span>psl::datamodel_connector::ConnectorCapabilities;
 <span class="kw">use </span>std::{convert::TryFrom, fmt};
 
@@ -640,7 +640,7 @@
             .any(|only| ConnectorVersion::try_from(<span class="kw-2">*</span>only).unwrap().matches_pattern(<span class="kw-2">&amp;</span>version));
     }
 
-    <span class="kw">if </span>EXTERNAL_TEST_EXECUTOR.is_some() &amp;&amp; exclude.iter().any(|excl| excl.<span class="number">0</span>.to_uppercase() == <span class="string">&quot;JS&quot;</span>) {
+    <span class="kw">if </span>CONFIG.external_test_executor().is_some() &amp;&amp; exclude.iter().any(|excl| excl.<span class="number">0</span>.to_uppercase() == <span class="string">&quot;JS&quot;</span>) {
         <span class="macro">println!</span>(<span class="string">&quot;Excluded test execution for JS driver adapters. Skipping test&quot;</span>);
         <span class="kw">return </span><span class="bool-val">false</span>;
     };

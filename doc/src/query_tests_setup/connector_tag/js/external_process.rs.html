@@ -168,10 +168,6 @@
 <a href="#168" id="168">168</a>
 <a href="#169" id="169">169</a>
 <a href="#170" id="170">170</a>
-<a href="#171" id="171">171</a>
-<a href="#172" id="172">172</a>
-<a href="#173" id="173">173</a>
-<a href="#174" id="174">174</a>
 </pre></div><pre class="rust"><code><span class="kw">use super</span>::<span class="kw-2">*</span>;
 <span class="kw">use </span>once_cell::sync::Lazy;
 <span class="kw">use </span>serde::de::DeserializeOwned;
@@ -259,28 +255,24 @@
     <span class="kw">use </span>std::process::Stdio;
     <span class="kw">use </span>tokio::process::Command;
 
-    <span class="kw">let </span>env_var = <span class="kw">match </span><span class="kw">crate</span>::EXTERNAL_TEST_EXECUTOR.as_ref() {
-        <span class="prelude-val">Some</span>(env_var) =&gt; env_var,
-        <span class="prelude-val">None </span>=&gt; exit_with_message(
-            <span class="number">1</span>,
-            <span class="string">&quot;start_rpc_thread() error: EXTERNAL_TEST_EXECUTOR env var is not defined&quot;</span>,
-        ),
-    };
+    <span class="kw">let </span>path = <span class="kw">crate</span>::CONFIG
+        .external_test_executor()
+        .unwrap_or_else(|| exit_with_message(<span class="number">1</span>, <span class="string">&quot;start_rpc_thread() error: external test executor is not set&quot;</span>));
 
     tokio::runtime::Builder::new_current_thread()
         .enable_io()
         .build()
         .unwrap()
         .block_on(<span class="kw">async move </span>{
-            <span class="macro">eprintln!</span>(<span class="string">&quot;Spawning test executor process at `{env_var}`&quot;</span>);
-            <span class="kw">let </span>process = <span class="kw">match </span>Command::new(env_var)
+            <span class="kw">let </span>process = <span class="kw">match </span>Command::new(path)
+                .envs(CONFIG.for_external_executor())
                 .stdin(Stdio::piped())
                 .stdout(Stdio::piped())
                 .stderr(Stdio::inherit())
                 .spawn()
             {
                 <span class="prelude-val">Ok</span>(process) =&gt; process,
-                <span class="prelude-val">Err</span>(err) =&gt; exit_with_message(<span class="number">1</span>, <span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;Failed to spawn the executor process: `{env_var}`. Details: {err}\n&quot;</span>)),
+                <span class="prelude-val">Err</span>(err) =&gt; exit_with_message(<span class="number">1</span>, <span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;Failed to spawn the executor process: `{path}`. Details: {err}\n&quot;</span>)),
             };
 
             <span class="kw">let </span><span class="kw-2">mut </span>stdout = BufReader::new(process.stdout.unwrap()).lines();

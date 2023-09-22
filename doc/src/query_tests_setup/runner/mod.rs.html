@@ -605,7 +605,7 @@
         <span class="kw">let </span>data_source = schema.configuration.datasources.first().unwrap();
         <span class="kw">let </span>url = data_source.load_url(|key| env::var(key).ok()).unwrap();
 
-        <span class="kw">let </span>executor = <span class="kw">match </span><span class="kw">crate</span>::EXTERNAL_TEST_EXECUTOR.as_ref() {
+        <span class="kw">let </span>executor = <span class="kw">match </span><span class="kw">crate</span>::CONFIG.external_test_executor() {
             <span class="prelude-val">Some</span>(<span class="kw">_</span>) =&gt; RunnerExecutor::new_external(<span class="kw-2">&amp;</span>url, <span class="kw-2">&amp;</span>datamodel).<span class="kw">await</span><span class="question-mark">?</span>,
             <span class="prelude-val">None </span>=&gt; RunnerExecutor::Builtin(
                 request_handlers::load_executor(
