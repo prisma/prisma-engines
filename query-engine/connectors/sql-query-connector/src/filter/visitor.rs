@@ -329,6 +329,14 @@ impl FilterVisitorExt for FilterVisitor {
             RelationCondition::NoRelatedRecord if self.should_render_join() && !filter.field.is_list() => {
                 let alias = self.next_alias(AliasMode::Join);
 
+                let linking_fields_null: Vec<_> = ModelProjection::from(filter.field.model().primary_identifier())
+                    .as_columns(ctx)
+                    .map(|c| c.aliased_col(Some(alias), ctx))
+                    .map(|c| c.is_null())
+                    .map(Expression::from)
+                    .collect();
+                let null_filter = ConditionTree::And(linking_fields_null);
+
                 let join = compute_one2m_join(
                     &filter.field,
                     alias.to_string(None).as_str(),
@@ -347,7 +355,7 @@ impl FilterVisitorExt for FilterVisitor {
                     output_joins.extend(nested_joins);
                 }
 
-                (conditions.not(), Some(output_joins))
+                (conditions.not().or(null_filter), Some(output_joins))
             }
             RelationCondition::ToOneRelatedRecord if self.should_render_join() && !filter.field.is_list() => {
                 let alias = self.next_alias(AliasMode::Join);
