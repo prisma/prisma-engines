@@ -28,8 +28,8 @@ importers:
         version: link:../driver-adapter-utils
     devDependencies:
       '@libsql/client':
-        specifier: 0.3.5-pre.10
-        version: 0.3.5-pre.10
+        specifier: 0.3.5-pre.11
+        version: 0.3.5-pre.11
 
   adapter-neon:
     dependencies:
@@ -67,8 +67,8 @@ importers:
   connector-test-kit-executor:
     dependencies:
       '@libsql/client':
-        specifier: 0.3.5-pre.10
-        version: 0.3.5-pre.10
+        specifier: 0.3.5-pre.11
+        version: 0.3.5-pre.11
       '@neondatabase/serverless':
         specifier: ^0.6.0
         version: 0.6.0
@@ -107,8 +107,8 @@ importers:
   smoke-test-js:
     dependencies:
       '@libsql/client':
-        specifier: 0.3.5-pre.10
-        version: 0.3.5-pre.10
+        specifier: 0.3.5-pre.11
+        version: 0.3.5-pre.11
       '@neondatabase/serverless':
         specifier: ^0.6.0
         version: 0.6.0
@@ -407,19 +407,19 @@ packages:
       '@jridgewell/sourcemap-codec': 1.4.15
     dev: true
 
-  /@libsql/client@0.3.5-pre.10:
-    resolution: {integrity: sha512-kpw6N9z9gv92VZ+vQljthVkjwREKpMFBFztXOJkccT9aXnr2tmBNqkxQjfoZNUuOjlxiXtBvFpVVFKgvwSaCSQ==}
+  /@libsql/client@0.3.5-pre.11:
+    resolution: {integrity: sha512-nfCuTXeSnUi8giQtxhsjSZx3DMwuVgNQEpLLNAZbStX8hZEHenHHntoNri07DnrCxC7PWkVV5hio8Inr1Xa46g==}
     dependencies:
       '@libsql/hrana-client': 0.5.5
       js-base64: 3.7.5
-      libsql: 0.1.15
+      libsql: 0.1.16
     transitivePeerDependencies:
       - bufferutil
       - encoding
       - utf-8-validate
 
-  /@libsql/darwin-arm64@0.1.15:
-    resolution: {integrity: sha512-8W647/1eKNKHVHqrWQmUw2JwomYBFZI+2KbAJOE5gnNEOCYLpqsr1mMPibBRHnu6AMGAumDwv1/N3pbikWfJhw==}
+  /@libsql/darwin-arm64@0.1.16:
+    resolution: {integrity: sha512-GdRYmcr9ay5S00PU0UJL+7m1Icdl7R3MagKkKKYYfsBp11UfmzKYNwyuijH8s2uTaPRikjc4M1hMtZFbg8qLGw==}
     cpu: [arm64]
     os: [darwin]
     requiresBuild: true
@@ -454,15 +454,15 @@ packages:
       - bufferutil
       - utf-8-validate
 
-  /@libsql/linux-x64-gnu@0.1.15:
-    resolution: {integrity: sha512-/a6UT6EmwtTOr75yFW7UDQfWFzgnLDc2SQkKvxf5cVY+DBY1k02f8Tasy45s9ZmffDLGye+1JhiUi5lwvgzvJg==}
+  /@libsql/linux-x64-gnu@0.1.16:
+    resolution: {integrity: sha512-A5qVAh8l0fo0S5PphUmcXyHLUPPKOg7IYfro2Mj2p1WR0bY9oQaUW49R6OgwfHaSSmzErtQv/64PGmHU2SMr8w==}
     cpu: [x64]
     os: [linux]
     requiresBuild: true
     optional: true
 
-  /@libsql/linux-x64-musl@0.1.15:
-    resolution: {integrity: sha512-2cgNj5LA0owda5aObDLL+NGuFJW8y4wcMqWciRJrYmv2jlfis/lc+1hK83nKv7MCpMF2xVDpy7dhGMuV5j++tg==}
+  /@libsql/linux-x64-musl@0.1.16:
+    resolution: {integrity: sha512-pkdvSYDEejvYflC5BGkA5NM+g4qyLYqqH2padMoKgJNa3etnzLq0SAKJYZU62UO8STFv/0iSRbIzJkNnuwb25g==}
     cpu: [x64]
     os: [linux]
     requiresBuild: true
@@ -935,17 +935,17 @@ packages:
   /js-base64@3.7.5:
     resolution: {integrity: sha512-3MEt5DTINKqfScXKfJFrRbxkrnk2AxPWGBL/ycjz4dK8iqiSJ06UxD8jh8xuh6p10TX4t2+7FsBYVxxQbMg+qA==}
 
-  /libsql@0.1.15:
-    resolution: {integrity: sha512-3Ikt2jQWPuoC/VWSL5dpDMc2x+MtCPBAy3nkvEL4R/mQZJqw72y3AH5l1X5nPUICwba773qohQ62FQUewH4YLA==}
+  /libsql@0.1.16:
+    resolution: {integrity: sha512-znYQ5JSse4FXhmk/lBtctlWJN539QyvxJgYqWS5AU4/Y3TwkVJV5+nYfZGD8zVurkvs5KHxmTphwKGv0UfCv+A==}
     cpu: [x64, arm64]
     os: [darwin, linux]
     dependencies:
       '@neon-rs/load': 0.0.4
       detect-libc: 2.0.2
     optionalDependencies:
-      '@libsql/darwin-arm64': 0.1.15
-      '@libsql/linux-x64-gnu': 0.1.15
-      '@libsql/linux-x64-musl': 0.1.15
+      '@libsql/darwin-arm64': 0.1.16
+      '@libsql/linux-x64-gnu': 0.1.16
+      '@libsql/linux-x64-musl': 0.1.16
 
   /lilconfig@2.1.0:
     resolution: {integrity: sha512-utWOt/GHzuUxnLKxB6dk81RoOeoNeHgbrXiuGk4yyF5qlRz+iIVWu56E2fqGHFrXz0QNUhLB/8nKqvRH66JKGQ==}
