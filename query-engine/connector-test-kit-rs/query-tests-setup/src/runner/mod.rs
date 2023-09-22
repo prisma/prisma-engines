@@ -122,7 +122,7 @@ impl Runner {
         let data_source = schema.configuration.datasources.first().unwrap();
         let url = data_source.load_url(|key| env::var(key).ok()).unwrap();
 
-        let executor = match crate::EXTERNAL_TEST_EXECUTOR.as_ref() {
+        let executor = match crate::CONFIG.external_test_executor() {
             Some(_) => RunnerExecutor::new_external(&url, &datamodel).await?,
             None => RunnerExecutor::Builtin(
                 request_handlers::load_executor(

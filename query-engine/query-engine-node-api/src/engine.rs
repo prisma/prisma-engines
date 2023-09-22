@@ -163,7 +163,17 @@ impl QueryEngine {
             config_dir,
             ignore_env_var_errors,
             engine_protocol,
-        } = napi_env.from_js_value(options)?;
+        } = napi_env.from_js_value(options).expect(
+            r###"
+            Failed to deserialize constructor options. 
+            
+            This usually happens when the javascript object passed to the constructor is missing 
+            properties for the ConstructorOptions fields that must have some value.
+            
+            If you set some of these in javascript trough environment variables, make sure there are
+            values for data_model, log_level, and any field that is not Option<T>
+            "###,
+        );
 
         let env = stringify_env_values(env)?; // we cannot trust anything JS sends us from process.env
         let overrides: Vec<(_, _)> = datasource_overrides.into_iter().collect();

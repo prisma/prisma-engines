@@ -85,28 +85,24 @@ fn start_rpc_thread(mut receiver: mpsc::Receiver<ReqImpl>) -> Result<()> {
     use std::process::Stdio;
     use tokio::process::Command;
 
-    let env_var = match crate::EXTERNAL_TEST_EXECUTOR.as_ref() {
-        Some(env_var) => env_var,
-        None => exit_with_message(
-            1,
-            "start_rpc_thread() error: EXTERNAL_TEST_EXECUTOR env var is not defined",
-        ),
-    };
+    let path = crate::CONFIG
+        .external_test_executor()
+        .unwrap_or_else(|| exit_with_message(1, "start_rpc_thread() error: external test executor is not set"));
 
     tokio::runtime::Builder::new_current_thread()
         .enable_io()
         .build()
         .unwrap()
         .block_on(async move {
-            eprintln!("Spawning test executor process at `{env_var}`");
-            let process = match Command::new(env_var)
+            let process = match Command::new(path)
+                .envs(CONFIG.for_external_executor())
                 .stdin(Stdio::piped())
                 .stdout(Stdio::piped())
                 .stderr(Stdio::inherit())
                 .spawn()
             {
                 Ok(process) => process,
-                Err(err) => exit_with_message(1, &format!("Failed to spawn the executor process: `{env_var}`. Details: {err}\n")),
+                Err(err) => exit_with_message(1, &format!("Failed to spawn the executor process: `{path}`. Details: {err}\n")),
             };
 
             let mut stdout = BufReader::new(process.stdout.unwrap()).lines();

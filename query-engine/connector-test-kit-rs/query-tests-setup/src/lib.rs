@@ -42,13 +42,11 @@ pub static ENV_LOG_LEVEL: Lazy<String> = Lazy::new(|| std::env::var("LOG_LEVEL")
 pub static ENGINE_PROTOCOL: Lazy<String> =
     Lazy::new(|| std::env::var("PRISMA_ENGINE_PROTOCOL").unwrap_or_else(|_| "graphql".to_owned()));
 
-static EXTERNAL_TEST_EXECUTOR: Lazy<Option<String>> = Lazy::new(|| std::env::var("EXTERNAL_TEST_EXECUTOR").ok());
-
 /// Teardown of a test setup.
 async fn teardown_project(datamodel: &str, db_schemas: &[&str], schema_id: Option<usize>) -> TestResult<()> {
     if let Some(schema_id) = schema_id {
         let params = serde_json::json!({ "schemaId": schema_id });
-        crate::executor_process_request::<serde_json::Value>("teardown", params).await?;
+        executor_process_request::<serde_json::Value>("teardown", params).await?;
     }
 
     Ok(qe_setup::teardown(datamodel, db_schemas).await?)

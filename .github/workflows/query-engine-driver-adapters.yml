@@ -17,35 +17,28 @@ concurrency:
 
 jobs:
   rust-query-engine-tests:
-    name: "Test `${{ matrix.database.driver_adapter }}` on node v${{ matrix.node_version }}"
+    name: "Test `${{ matrix.adapter.name }}` on node v${{ matrix.node_version }}"
 
     strategy:
       fail-fast: false
       matrix:
-        database:
-          - name: "postgres13"
-            connector: "postgres"
-            version: "13"
-            driver_adapter: "pg"
+        adapter:
+          - name: "pg"
+            setup_task: "dev-pg-postgres13"
+          - name: "neon:ws"
+            setup_task: "dev-neon-ws-postgres13"
         node_version: ["18"]
     env:
-      LOG_LEVEL: "info"
+      LOG_LEVEL: "info" # Set to "debug" to trace the query engine and node process running the driver adapter
       LOG_QUERIES: "y"
       RUST_LOG: "info"
       RUST_LOG_FORMAT: "devel"
       RUST_BACKTRACE: "1"
-      PRISMA_DISABLE_QUAINT_EXECUTORS: "1"
       CLICOLOR_FORCE: "1"
       CLOSED_TX_CLEANUP: "2"
       SIMPLE_TEST_MODE: "1"
       QUERY_BATCH_SIZE: "10"
-      TEST_CONNECTOR: ${{ matrix.database.connector }}
-      TEST_CONNECTOR_VERSION: ${{ matrix.database.version }}
       WORKSPACE_ROOT: ${{ github.workspace }}
-      # Driver adapter testing specific env vars
-      EXTERNAL_TEST_EXECUTOR: "${{ github.workspace }}/query-engine/driver-adapters/js/connector-test-kit-executor/script/start_node.sh"
-      DRIVER_ADAPTER: ${{ matrix.database.driver_adapter }}
-      DRIVER_ADAPTER_URL_OVERRIDE: ${{ matrix.database.driver_adapter_url }}
 
     runs-on: buildjet-16vcpu-ubuntu-2004
     steps:
@@ -81,16 +74,9 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - name: "Start ${{ matrix.database.name }}"
-        run: make start-${{ matrix.database.name }}
+      - run: make ${{ matrix.adapter.setup_task }}
 
       - uses: dtolnay/rust-toolchain@stable
-
-      - name: "Build query-engine-node-api with driver support"
-        run: cargo build -p query-engine-node-api
-
-      - name: "Install and build driver adapter JS dependencies"
-        run: cd query-engine/driver-adapters/js && pnpm i && pnpm build
 
       - name: "Run tests"
         run:  cargo test --package query-engine-tests -- --test-threads=1
