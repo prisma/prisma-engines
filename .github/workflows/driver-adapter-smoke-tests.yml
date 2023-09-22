@@ -63,10 +63,6 @@ jobs:
         run: pnpm build
         working-directory: ./query-engine/driver-adapters/js
 
-      - name: Install Dependencies (Smoke Tests)
-        run: pnpm install
-        working-directory: ./query-engine/driver-adapters/js/smoke-test-js
-      
       - run: pnpm prisma:${{ matrix.adapter }}
         working-directory: ./query-engine/driver-adapters/js/smoke-test-js
       - run: pnpm ${{ matrix.adapter }}:libquery
