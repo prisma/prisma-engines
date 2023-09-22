@@ -146,7 +146,6 @@ impl TestConfig {
     }
 
     fn try_path(path: PathBuf) -> Option<Self> {
-        dbg!(&path);
         File::open(path).ok().and_then(|mut f| {
             let mut config = String::new();
 
