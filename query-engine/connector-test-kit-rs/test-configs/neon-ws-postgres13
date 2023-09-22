@@ -1,7 +1,7 @@
 {
     "connector": "postgres",
     "version": "13",
-    "driver_adapter": "neon",
+    "driver_adapter": "neon:ws",
     "driver_adapter_config": { "proxyUrl": "127.0.0.1:5488/v1" },
     "external_test_executor": "default"
 }

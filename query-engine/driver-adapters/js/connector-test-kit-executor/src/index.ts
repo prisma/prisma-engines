@@ -15,7 +15,7 @@ import * as prismaNeon from '@prisma/adapter-neon'
 import {bindAdapter, DriverAdapter, ErrorCapturingDriverAdapter} from "@prisma/driver-adapter-utils";
 
 const SUPPORTED_ADAPTERS: Record<string, (_ : string) => Promise<DriverAdapter>>
-    = {pg: pgAdapter, neon: neonAdapter};
+    = {"pg": pgAdapter, "neon:ws" : neonWsAdapter};
 
 async function main(): Promise<void> {
     const iface = readline.createInterface({
@@ -211,7 +211,7 @@ async function pgAdapter(url: string): Promise<DriverAdapter> {
     return new prismaPg.PrismaPg(pool)
 }
 
-async function neonAdapter(url: string): Promise<DriverAdapter> {
+async function neonWsAdapter(url: string): Promise<DriverAdapter> {
     const proxyURL = JSON.parse(process.env.DRIVER_ADAPTER_CONFIG || '{}').proxyUrl ?? ''
     if (proxyURL == '') {
         throw new Error("DRIVER_ADAPTER_URL_OVERRIDE is not defined or empty, but its required for neon adapter.");

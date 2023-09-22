@@ -116,8 +116,8 @@ dev-pg-postgres13: start-pg-postgres13
 start-neon-postgres13: build-qe-napi build-connector-kit-js
 	docker compose -f docker-compose.yml up -d --remove-orphans neon-postgres13
 
-dev-neon-postgres13: start-neon-postgres13
-	cp $(CONFIG_PATH)/neon-postgres13 $(CONFIG_FILE)
+dev-neon-ws-postgres13: start-neon-postgres13
+	cp $(CONFIG_PATH)/neon-ws-postgres13 $(CONFIG_FILE)
 
 start-postgres14:
 	docker compose -f docker-compose.yml up -d --remove-orphans postgres14
