@@ -1465,7 +1465,7 @@
                     <span class="prelude-val">None </span>=&gt; Value::Array(<span class="prelude-val">None</span>),
                 },
                 <span class="kw-2">ref </span>x =&gt; <span class="kw">match </span>x.kind() {
-                    Kind::Enum(<span class="kw">_</span>) =&gt; <span class="kw">match </span>row.try_get(i)<span class="question-mark">? </span>{
+                    Kind::Enum =&gt; <span class="kw">match </span>row.try_get(i)<span class="question-mark">? </span>{
                         <span class="prelude-val">Some</span>(val) =&gt; {
                             <span class="kw">let </span>val: EnumString = val;
 
@@ -1474,7 +1474,7 @@
                         <span class="prelude-val">None </span>=&gt; Value::Enum(<span class="prelude-val">None</span>),
                     },
                     Kind::Array(inner) =&gt; <span class="kw">match </span>inner.kind() {
-                        Kind::Enum(<span class="kw">_</span>) =&gt; <span class="kw">match </span>row.try_get(i)<span class="question-mark">? </span>{
+                        Kind::Enum =&gt; <span class="kw">match </span>row.try_get(i)<span class="question-mark">? </span>{
                             <span class="prelude-val">Some</span>(val) =&gt; {
                                 <span class="kw">let </span>val: Vec&lt;<span class="prelude-ty">Option</span>&lt;EnumString&gt;&gt; = val;
                                 <span class="kw">let </span>variants = val.into_iter().map(|x| Value::Enum(x.map(|x| x.value.into())));
