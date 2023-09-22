@@ -40,18 +40,11 @@ jobs:
       RUST_LOG: "info"
       RUST_LOG_FORMAT: "devel"
       RUST_BACKTRACE: "1"
-      PRISMA_DISABLE_QUAINT_EXECUTORS: "1"
       CLICOLOR_FORCE: "1"
       CLOSED_TX_CLEANUP: "2"
       SIMPLE_TEST_MODE: "1"
       QUERY_BATCH_SIZE: "10"
-      TEST_CONNECTOR: ${{ matrix.database.connector }}
-      TEST_CONNECTOR_VERSION: ${{ matrix.database.version }}
       WORKSPACE_ROOT: ${{ github.workspace }}
-      # Driver adapter testing specific env vars
-      EXTERNAL_TEST_EXECUTOR: "${{ github.workspace }}/query-engine/driver-adapters/js/connector-test-kit-executor/script/start_node.sh"
-      DRIVER_ADAPTER: ${{ matrix.database.driver_adapter }}
-      DRIVER_ADAPTER_CONFIG: ${{ matrix.database.driver_adapter_config }}
 
     runs-on: buildjet-16vcpu-ubuntu-2004
     steps:
@@ -87,8 +80,8 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - name: "Start ${{ matrix.database.name }}"
-        run: make start-${{ matrix.database.name }}
+      - name: "Start ${{ matrix.database.name }} and set .test_config"
+        run: make dev-${{ matrix.database.name }}
 
       - uses: dtolnay/rust-toolchain@stable
 

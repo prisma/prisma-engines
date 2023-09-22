@@ -115,10 +115,6 @@ dev-pg-postgres13: start-pg-postgres13
 start-neon-postgres13: build-qe-napi build-connector-kit-js
 	docker compose -f docker-compose.yml up -d --remove-orphans neon-postgres13
 
-# Alias for consistency with other connectors. It's used from query-engine-driver-adapters.yaml
-# when calling dynamically start-* tasks for particular driver adapter tests
-start-neon-ws-postgres13: start-neon-postgres13
-
 dev-neon-ws-postgres13: start-neon-ws-postgres13
 	cp $(CONFIG_PATH)/neon-ws-postgres13 $(CONFIG_FILE)
 
