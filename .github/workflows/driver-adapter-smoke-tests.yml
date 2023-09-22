@@ -71,3 +71,8 @@ jobs:
         run: pnpm ${{ matrix.adapter }}:client
         if: always()
         working-directory: ./query-engine/driver-adapters/js/smoke-test-js
+
+      - name: pnpm errors
+        run: pnpm errors
+        if: always()
+        working-directory: ./query-engine/driver-adapters/js/smoke-test-js
