@@ -280,13 +280,13 @@ mod many_relation {
         let schema = indoc! {
             r#"
           model Blog {
-              #id(id, Int, @id, @default(autoincrement()))
+              #id(id, Int, @id)
               name  String
               posts Post[]
           }
 
           model Post {
-              #id(id, Int, @id, @default(autoincrement()))
+              #id(id, Int, @id)
 
               blog_id    Int
               blog       Blog      @relation(fields: [blog_id], references: [id])
@@ -295,7 +295,7 @@ mod many_relation {
           }
 
           model Comment {
-            #id(id, Int, @id, @default(autoincrement()))
+            #id(id, Int, @id)
             popularity Int
 
             postId Int @unique
@@ -314,12 +314,13 @@ mod many_relation {
         run_query!(
             &runner,
             r#"mutation { createOneBlog(data: {
+                id: 1,
                 name: "blog1",
                 posts: {
                   create: [
-                    { comment: { create: { popularity: 10 } } },
-                    { comment: { create: { popularity: 50 } } },
-                    { comment: { create: { popularity: 100 } } },
+                    { id: 1, comment: { create: { id: 1, popularity: 10 } } },
+                    { id: 2, comment: { create: { id: 2, popularity: 50 } } },
+                    { id: 3, comment: { create: { id: 3, popularity: 100 } } },
                   ]
                 }
               }) { id } }
@@ -329,11 +330,12 @@ mod many_relation {
         run_query!(
             &runner,
             r#"mutation { createOneBlog(data: {
+              id: 2,
               name: "blog2",
               posts: {
                 create: [
-                  { comment: { create: { popularity: 1000 } } },
-                  { comment: { create: { popularity: 1000 } } },
+                  { id: 4, comment: { create: { id: 4, popularity: 1000 } } },
+                  { id: 5, comment: { create: { id: 5, popularity: 1000 } } },
                 ]
               }
             }) { id } }
@@ -344,11 +346,12 @@ mod many_relation {
         run_query!(
             &runner,
             r#"mutation { createOneBlog(data: {
+            id: 3,
             name: "blog3",
             posts: {
               create: [
-                { },
-                { },
+                { id: 6 },
+                { id: 7 },
               ]
             }
           }) { id } }
@@ -358,7 +361,7 @@ mod many_relation {
         // blog without posts
         run_query!(
             &runner,
-            r#"mutation { createOneBlog(data: { name: "blog4" }) { id } } "#
+            r#"mutation { createOneBlog(data: { id: 4, name: "blog4" }) { id } } "#
         );
 
         // some / is
