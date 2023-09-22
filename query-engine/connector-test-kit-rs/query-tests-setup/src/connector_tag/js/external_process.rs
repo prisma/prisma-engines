@@ -43,7 +43,10 @@ impl ExecutorProcess {
             if let Err(e) = handle.join() {
                 exit_with_message(
                     1,
-                    &format!("rpc thread panicked with: {:?}", e.downcast_ref::<String>()),
+                    &format!(
+                        "rpc thread panicked with: {}",
+                        e.downcast::<String>().unwrap_or_default()
+                    ),
                 );
             }
         });
