@@ -1,5 +1,5 @@
 mod conversion;
-mod error;
+pub mod error;
 
 use crate::{
     ast::{Query, Value},
