@@ -276,6 +276,130 @@ mod many_relation {
         Ok(())
     }
 
+    fn schema_2() -> String {
+        let schema = indoc! {
+            r#"
+          model Blog {
+              #id(id, Int, @id, @default(autoincrement()))
+              name  String
+              posts Post[]
+          }
+
+          model Post {
+              #id(id, Int, @id, @default(autoincrement()))
+
+              blog_id    Int
+              blog       Blog      @relation(fields: [blog_id], references: [id])
+
+              comment Comment?
+          }
+
+          model Comment {
+            #id(id, Int, @id, @default(autoincrement()))
+            popularity Int
+
+            postId Int @unique
+            post Post @relation(fields: [postId], references: [id])
+          }
+          "#
+        };
+
+        schema.to_owned()
+    }
+
+    // 2 levels to-many/to-one relation filter, all combinations.
+    #[connector_test(schema(schema_2))]
+    async fn l2_m_1_rel_all(runner: Runner) -> TestResult<()> {
+        // Seed
+        run_query!(
+            &runner,
+            r#"mutation { createOneBlog(data: {
+                name: "blog1",
+                posts: {
+                  create: [
+                    { comment: { create: { popularity: 10 } } },
+                    { comment: { create: { popularity: 50 } } },
+                    { comment: { create: { popularity: 100 } } },
+                  ]
+                }
+              }) { id } }
+            "#
+        );
+
+        run_query!(
+            &runner,
+            r#"mutation { createOneBlog(data: {
+              name: "blog2",
+              posts: {
+                create: [
+                  { comment: { create: { popularity: 1000 } } },
+                  { comment: { create: { popularity: 1000 } } },
+                ]
+              }
+            }) { id } }
+          "#
+        );
+
+        // posts without comment
+        run_query!(
+            &runner,
+            r#"mutation { createOneBlog(data: {
+            name: "blog3",
+            posts: {
+              create: [
+                { },
+                { },
+              ]
+            }
+          }) { id } }
+        "#
+        );
+
+        // blog without posts
+        run_query!(
+            &runner,
+            r#"mutation { createOneBlog(data: { name: "blog4" }) { id } } "#
+        );
+
+        // some / is
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"query { findManyBlog(where: { posts: { some: { comment: { is: { popularity: { lt: 1000 } } } } } }) { name }}"#),
+          @r###"{"data":{"findManyBlog":[{"name":"blog1"}]}}"###
+        );
+
+        // some / isNot
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"query { findManyBlog(where: { posts: { some: { comment: { isNot: { popularity: { gt: 100 } } } } } }) { name }}"#),
+          @r###"{"data":{"findManyBlog":[{"name":"blog1"},{"name":"blog3"}]}}"###
+        );
+
+        // none / is
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"query { findManyBlog(where: { posts: { none: { comment: { is: { popularity: { lt: 1000 } } } } } }) { name }}"#),
+          @r###"{"data":{"findManyBlog":[{"name":"blog2"},{"name":"blog3"},{"name":"blog4"}]}}"###
+        );
+
+        // none / isNot
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"query { findManyBlog(where: { posts: { none: { comment: { isNot: { popularity: { gt: 100 } } } } } }) { name }}"#),
+          @r###"{"data":{"findManyBlog":[{"name":"blog2"},{"name":"blog4"}]}}"###
+        );
+
+        // every / is
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"query { findManyBlog(where: { posts: { every: { comment: { is: { popularity: { gte: 1000 } } } } } }) { name }}"#),
+          @r###"{"data":{"findManyBlog":[{"name":"blog2"},{"name":"blog4"}]}}"###
+        );
+
+        // every / isNot
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"query { findManyBlog(where: { posts: { every: { comment: { isNot: { popularity: { gte: 1000 } } } } } }) { name }}"#),
+          @r###"{"data":{"findManyBlog":[{"name":"blog1"},{"name":"blog3"},{"name":"blog4"}]}}"###
+        );
+
+        Ok(())
+    }
+
     // Note: Only the original author knows why this is considered crazy.
     #[connector_test]
     async fn crazy_filters(runner: Runner) -> TestResult<()> {
