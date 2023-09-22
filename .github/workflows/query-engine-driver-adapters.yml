@@ -17,22 +17,16 @@ concurrency:
 
 jobs:
   rust-query-engine-tests:
-    name: "Test `${{ matrix.database.driver_adapter }}` on node v${{ matrix.node_version }}"
+    name: "Test `${{ matrix.adapter.name }}` on node v${{ matrix.node_version }}"
 
     strategy:
       fail-fast: false
       matrix:
-        database:
-          - name: "pg-postgres13"
-            connector: "postgres"
-            version: "13"
-            driver_adapter: "pg"
-          - name: "neon-ws-postgres13"
-            connector: "postgres"
-            version: "13"
-            driver_adapter: "neon:ws"
-            driver_adapter_config: |
-              { "proxyUrl": "127.0.0.1:5488/v1" }
+        adapter:
+          - name: "pg"
+            setup_task: "dev-pg-postgres13"
+          - name: "neon:ws"
+            setup_task: "dev-neon-ws-postgres13"
         node_version: ["18"]
     env:
       LOG_LEVEL: "info" # Set to "debug" to trace the query engine and node process running the driver adapter
@@ -80,8 +74,7 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - name: "Start ${{ matrix.database.name }} and set .test_config"
-        run: make dev-${{ matrix.database.name }}
+      - run: make ${{ matrix.adapter.setup_task }}
 
       - uses: dtolnay/rust-toolchain@stable
 
