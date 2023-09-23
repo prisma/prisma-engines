@@ -1,6 +1,14 @@
 import type planetScale from '@planetscale/database'
-import { Debug } from '@jkomyno/prisma-driver-adapter-utils'
-import type { DriverAdapter, ResultSet, Query, Queryable, Transaction, Result, TransactionOptions } from '@jkomyno/prisma-driver-adapter-utils'
+import { Debug, ok } from '@prisma/driver-adapter-utils'
+import type {
+  DriverAdapter,
+  ResultSet,
+  Query,
+  Queryable,
+  Transaction,
+  Result,
+  TransactionOptions,
+} from '@prisma/driver-adapter-utils'
 import { type PlanetScaleColumnType, fieldToColumnType } from './conversion'
 import { createDeferred, Deferred } from './deferred'
 
@@ -17,11 +25,9 @@ class RollbackError extends Error {
   }
 }
 
-
 class PlanetScaleQueryable<ClientT extends planetScale.Connection | planetScale.Transaction> implements Queryable {
   readonly flavour = 'mysql'
-  constructor(protected client: ClientT) {
-  }
+  constructor(protected client: ClientT) {}
 
   /**
    * Execute a query given as SQL, interpolating the given parameters.
@@ -30,17 +36,17 @@ class PlanetScaleQueryable<ClientT extends planetScale.Connection | planetScale.
     const tag = '[js::query_raw]'
     debug(`${tag} %O`, query)
 
-    const { fields, insertId: lastInsertId, rows: results } = await this.performIO(query)
+    const { fields, insertId: lastInsertId, rows } = await this.performIO(query)
 
-    const columns = fields.map(field => field.name)
+    const columns = fields.map((field) => field.name)
     const resultSet: ResultSet = {
       columnNames: columns,
-      columnTypes: fields.map(field => fieldToColumnType(field.type as PlanetScaleColumnType)),
-      rows: results.map(result => columns.map(column => result[column])),
+      columnTypes: fields.map((field) => fieldToColumnType(field.type as PlanetScaleColumnType)),
+      rows: rows as ResultSet['rows'],
       lastInsertId,
     }
 
-    return { ok: true, value: resultSet }
+    return ok(resultSet)
   }
 
   /**
@@ -53,7 +59,7 @@ class PlanetScaleQueryable<ClientT extends planetScale.Connection | planetScale.
     debug(`${tag} %O`, query)
 
     const { rowsAffected } = await this.performIO(query)
-    return { ok: true, value: rowsAffected }
+    return ok(rowsAffected)
   }
 
   /**
@@ -65,7 +71,9 @@ class PlanetScaleQueryable<ClientT extends planetScale.Connection | planetScale.
     const { sql, args: values } = query
 
     try {
-      const result = await this.client.execute(sql, values)
+      const result = await this.client.execute(sql, values, {
+        as: 'array',
+      })
       return result
     } catch (e) {
       const error = e as Error
@@ -89,16 +97,15 @@ class PlanetScaleTransaction extends PlanetScaleQueryable<planetScale.Transactio
     debug(`[js::commit]`)
 
     this.txDeferred.resolve()
-    return Promise.resolve({ ok: true, value: await this.txResultPromise })
+    return Promise.resolve(ok(await this.txResultPromise))
   }
 
   async rollback(): Promise<Result<void>> {
     debug(`[js::rollback]`)
 
     this.txDeferred.reject(new RollbackError())
-    return Promise.resolve({ ok: true, value: await this.txResultPromise })
+    return Promise.resolve(ok(await this.txResultPromise))
   }
-
 }
 
 export class PrismaPlanetScale extends PlanetScaleQueryable<planetScale.Connection> implements DriverAdapter {
@@ -115,25 +122,27 @@ export class PrismaPlanetScale extends PlanetScaleQueryable<planetScale.Connecti
     debug(`${tag} options: %O`, options)
 
     return new Promise<Result<Transaction>>((resolve, reject) => {
-      const txResultPromise = this.client.transaction(async tx => {
-        const [txDeferred, deferredPromise] = createDeferred<void>()
-        const txWrapper = new PlanetScaleTransaction(tx, options, txDeferred, txResultPromise)
+      const txResultPromise = this.client
+        .transaction(async (tx) => {
+          const [txDeferred, deferredPromise] = createDeferred<void>()
+          const txWrapper = new PlanetScaleTransaction(tx, options, txDeferred, txResultPromise)
 
-        resolve({ ok: true, value: txWrapper })
-        return deferredPromise
-      }).catch(error => {
-        // Rollback error is ignored (so that tx.rollback() won't crash)
-        // any other error is legit and is re-thrown
-        if (!(error instanceof RollbackError)) {
-          return reject(error)
-        }
+          resolve(ok(txWrapper))
+          return deferredPromise
+        })
+        .catch((error) => {
+          // Rollback error is ignored (so that tx.rollback() won't crash)
+          // any other error is legit and is re-thrown
+          if (!(error instanceof RollbackError)) {
+            return reject(error)
+          }
 
-        return undefined
-      })
+          return undefined
+        })
     })
   }
 
   async close() {
-    return { ok: true as const, value: undefined }
+    return ok(undefined)
   }
 }

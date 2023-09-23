@@ -330,43 +330,66 @@ impl AliasedSelect for RelationFilter {
         let alias = alias.unwrap_or_default();
         let condition = self.condition;
 
-        let table = self.field.as_table(ctx);
-        let selected_identifier: Vec<Column> = self
-            .field
-            .identifier_columns(ctx)
-            .map(|col| col.aliased_col(Some(alias), ctx))
-            .collect();
+        // Performance can be improved by using fields in related table which skip a join table operation
+        if self.field.related_field().walker().fields().is_some() {
+            let related_table = self.field.related_model().as_table(ctx);
+            let related_columns: Vec<_> = ModelProjection::from(self.field.related_field().linking_fields())
+                .as_columns(ctx)
+                .map(|col| col.aliased_col(Some(alias), ctx))
+                .collect();
 
-        let join_columns: Vec<Column> = self
-            .field
-            .join_columns(ctx)
-            .map(|c| c.aliased_col(Some(alias), ctx))
-            .collect();
+            let nested_conditions = self
+                .nested_filter
+                .aliased_condition_from(Some(alias), false, ctx)
+                .invert_if(condition.invert_of_subselect());
 
-        let related_table = self.field.related_model().as_table(ctx);
-        let related_join_columns: Vec<_> = ModelProjection::from(self.field.related_field().linking_fields())
-            .as_columns(ctx)
-            .map(|col| col.aliased_col(Some(alias.flip(AliasMode::Join)), ctx))
-            .collect();
+            let conditions = related_columns
+                .clone()
+                .into_iter()
+                .fold(nested_conditions, |acc, column| acc.and(column.is_not_null()));
 
-        let nested_conditions = self
-            .nested_filter
-            .aliased_condition_from(Some(alias.flip(AliasMode::Join)), false, ctx)
-            .invert_if(condition.invert_of_subselect());
+            Select::from_table(related_table.alias(alias.to_string(Some(AliasMode::Table))))
+                .columns(related_columns)
+                .so_that(conditions)
+        } else {
+            let table = self.field.as_table(ctx);
+            let selected_identifier: Vec<Column> = self
+                .field
+                .identifier_columns(ctx)
+                .map(|col| col.aliased_col(Some(alias), ctx))
+                .collect();
 
-        let conditions = selected_identifier
-            .clone()
-            .into_iter()
-            .fold(nested_conditions, |acc, column| acc.and(column.is_not_null()));
+            let join_columns: Vec<Column> = self
+                .field
+                .join_columns(ctx)
+                .map(|c| c.aliased_col(Some(alias), ctx))
+                .collect();
 
-        let join = related_table
-            .alias(alias.to_string(Some(AliasMode::Join)))
-            .on(Row::from(related_join_columns).equals(Row::from(join_columns)));
+            let related_table = self.field.related_model().as_table(ctx);
+            let related_join_columns: Vec<_> = ModelProjection::from(self.field.related_field().linking_fields())
+                .as_columns(ctx)
+                .map(|col| col.aliased_col(Some(alias.flip(AliasMode::Join)), ctx))
+                .collect();
 
-        Select::from_table(table.alias(alias.to_string(Some(AliasMode::Table))))
-            .columns(selected_identifier)
-            .inner_join(join)
-            .so_that(conditions)
+            let nested_conditions = self
+                .nested_filter
+                .aliased_condition_from(Some(alias.flip(AliasMode::Join)), false, ctx)
+                .invert_if(condition.invert_of_subselect());
+
+            let conditions = selected_identifier
+                .clone()
+                .into_iter()
+                .fold(nested_conditions, |acc, column| acc.and(column.is_not_null()));
+
+            let join = related_table
+                .alias(alias.to_string(Some(AliasMode::Join)))
+                .on(Row::from(related_join_columns).equals(Row::from(join_columns)));
+
+            Select::from_table(table.alias(alias.to_string(Some(AliasMode::Table))))
+                .columns(selected_identifier)
+                .inner_join(join)
+                .so_that(conditions)
+        }
     }
 }
 

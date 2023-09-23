@@ -37,7 +37,7 @@ pub enum Compare<'a> {
     /// without visitor transformation in between.
     Raw(Box<Expression<'a>>, Cow<'a, str>, Box<Expression<'a>>),
     /// All json related comparators
-    #[cfg(all(feature = "json", any(feature = "postgresql", feature = "mysql")))]
+    #[cfg(any(feature = "postgresql", feature = "mysql"))]
     JsonCompare(JsonCompare<'a>),
     /// All geometry related comparators
     #[cfg(feature = "gis")]
@@ -624,7 +624,7 @@ pub trait Comparable<'a> {
     /// # Ok(())
     /// # }
     /// ```
-    #[cfg(all(feature = "json", any(feature = "postgresql", feature = "mysql")))]
+    #[cfg(any(feature = "postgresql", feature = "mysql"))]
     fn json_array_contains<T>(self, item: T) -> Compare<'a>
     where
         T: Into<Expression<'a>>;
@@ -644,7 +644,7 @@ pub trait Comparable<'a> {
     /// # Ok(())
     /// # }
     /// ```
-    #[cfg(all(feature = "json", any(feature = "postgresql", feature = "mysql")))]
+    #[cfg(any(feature = "postgresql", feature = "mysql"))]
     fn json_array_not_contains<T>(self, item: T) -> Compare<'a>
     where
         T: Into<Expression<'a>>;
@@ -674,7 +674,7 @@ pub trait Comparable<'a> {
     /// # Ok(())
     /// # }
     /// ```
-    #[cfg(all(feature = "json", any(feature = "postgresql", feature = "mysql")))]
+    #[cfg(any(feature = "postgresql", feature = "mysql"))]
     fn json_array_begins_with<T>(self, item: T) -> Compare<'a>
     where
         T: Into<Expression<'a>>;
@@ -704,7 +704,7 @@ pub trait Comparable<'a> {
     /// # Ok(())
     /// # }
     /// ```
-    #[cfg(all(feature = "json", any(feature = "postgresql", feature = "mysql")))]
+    #[cfg(any(feature = "postgresql", feature = "mysql"))]
     fn json_array_not_begins_with<T>(self, item: T) -> Compare<'a>
     where
         T: Into<Expression<'a>>;
@@ -732,7 +732,7 @@ pub trait Comparable<'a> {
     /// # Ok(())
     /// # }
     /// ```
-    #[cfg(all(feature = "json", any(feature = "postgresql", feature = "mysql")))]
+    #[cfg(any(feature = "postgresql", feature = "mysql"))]
     fn json_array_ends_into<T>(self, item: T) -> Compare<'a>
     where
         T: Into<Expression<'a>>;
@@ -760,7 +760,7 @@ pub trait Comparable<'a> {
     /// # Ok(())
     /// # }
     /// ```
-    #[cfg(all(feature = "json", any(feature = "postgresql", feature = "mysql")))]
+    #[cfg(any(feature = "postgresql", feature = "mysql"))]
     fn json_array_not_ends_into<T>(self, item: T) -> Compare<'a>
     where
         T: Into<Expression<'a>>;
@@ -779,7 +779,7 @@ pub trait Comparable<'a> {
     /// # Ok(())
     /// # }
     /// ```
-    #[cfg(all(feature = "json", any(feature = "postgresql", feature = "mysql")))]
+    #[cfg(any(feature = "postgresql", feature = "mysql"))]
     fn json_type_equals<T>(self, json_type: T) -> Compare<'a>
     where
         T: Into<JsonType<'a>>;
@@ -798,7 +798,7 @@ pub trait Comparable<'a> {
     /// # Ok(())
     /// # }
     /// ```
-    #[cfg(all(feature = "json", any(feature = "postgresql", feature = "mysql")))]
+    #[cfg(any(feature = "postgresql", feature = "mysql"))]
     fn json_type_not_equals<T>(self, json_type: T) -> Compare<'a>
     where
         T: Into<JsonType<'a>>;
@@ -1233,7 +1233,7 @@ where
         left.compare_raw(raw_comparator.into(), right)
     }
 
-    #[cfg(all(feature = "json", any(feature = "postgresql", feature = "mysql")))]
+    #[cfg(any(feature = "postgresql", feature = "mysql"))]
     fn json_array_contains<T>(self, item: T) -> Compare<'a>
     where
         T: Into<Expression<'a>>,
@@ -1244,7 +1244,7 @@ where
         val.json_array_contains(item)
     }
 
-    #[cfg(all(feature = "json", any(feature = "postgresql", feature = "mysql")))]
+    #[cfg(any(feature = "postgresql", feature = "mysql"))]
     fn json_array_not_contains<T>(self, item: T) -> Compare<'a>
     where
         T: Into<Expression<'a>>,
@@ -1255,7 +1255,7 @@ where
         val.json_array_not_contains(item)
     }
 
-    #[cfg(all(feature = "json", any(feature = "postgresql", feature = "mysql")))]
+    #[cfg(any(feature = "postgresql", feature = "mysql"))]
     fn json_array_begins_with<T>(self, item: T) -> Compare<'a>
     where
         T: Into<Expression<'a>>,
@@ -1266,7 +1266,7 @@ where
         val.json_array_begins_with(item)
     }
 
-    #[cfg(all(feature = "json", any(feature = "postgresql", feature = "mysql")))]
+    #[cfg(any(feature = "postgresql", feature = "mysql"))]
     fn json_array_not_begins_with<T>(self, item: T) -> Compare<'a>
     where
         T: Into<Expression<'a>>,
@@ -1277,7 +1277,7 @@ where
         val.json_array_not_begins_with(item)
     }
 
-    #[cfg(all(feature = "json", any(feature = "postgresql", feature = "mysql")))]
+    #[cfg(any(feature = "postgresql", feature = "mysql"))]
     fn json_array_ends_into<T>(self, item: T) -> Compare<'a>
     where
         T: Into<Expression<'a>>,
@@ -1288,7 +1288,7 @@ where
         val.json_array_ends_into(item)
     }
 
-    #[cfg(all(feature = "json", any(feature = "postgresql", feature = "mysql")))]
+    #[cfg(any(feature = "postgresql", feature = "mysql"))]
     fn json_array_not_ends_into<T>(self, item: T) -> Compare<'a>
     where
         T: Into<Expression<'a>>,
@@ -1299,7 +1299,7 @@ where
         val.json_array_not_ends_into(item)
     }
 
-    #[cfg(all(feature = "json", any(feature = "postgresql", feature = "mysql")))]
+    #[cfg(any(feature = "postgresql", feature = "mysql"))]
     fn json_type_equals<T>(self, json_type: T) -> Compare<'a>
     where
         T: Into<JsonType<'a>>,
@@ -1310,7 +1310,7 @@ where
         val.json_type_equals(json_type)
     }
 
-    #[cfg(all(feature = "json", any(feature = "postgresql", feature = "mysql")))]
+    #[cfg(any(feature = "postgresql", feature = "mysql"))]
     fn json_type_not_equals<T>(self, json_type: T) -> Compare<'a>
     where
         T: Into<JsonType<'a>>,

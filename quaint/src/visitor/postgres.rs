@@ -105,7 +105,7 @@ impl<'a> Visitor<'a> for Postgres<'a> {
                     Ok(())
                 })
             }),
-            #[cfg(feature = "json")]
+
             Value::Json(j) => j.map(|j| self.write(format!("'{}'", serde_json::to_string(&j).unwrap()))),
             #[cfg(feature = "gis")]
             Value::Geometry(g) => g.map(|g| self.visit_function(geom_from_text(g.wkt.raw(), g.srid.raw(), false))),
@@ -115,11 +115,8 @@ impl<'a> Visitor<'a> for Postgres<'a> {
             Value::Numeric(r) => r.map(|r| self.write(r)),
             #[cfg(feature = "uuid")]
             Value::Uuid(uuid) => uuid.map(|uuid| self.write(format!("'{}'", uuid.hyphenated()))),
-            #[cfg(feature = "chrono")]
             Value::DateTime(dt) => dt.map(|dt| self.write(format!("'{}'", dt.to_rfc3339(),))),
-            #[cfg(feature = "chrono")]
             Value::Date(date) => date.map(|date| self.write(format!("'{date}'"))),
-            #[cfg(feature = "chrono")]
             Value::Time(time) => time.map(|time| self.write(format!("'{time}'"))),
         };
 
@@ -233,14 +230,12 @@ impl<'a> Visitor<'a> for Postgres<'a> {
     fn visit_equals(&mut self, left: Expression<'a>, right: Expression<'a>) -> visitor::Result {
         // LHS must be cast to json/xml-text if the right is a json/xml-text value and vice versa.
         let right_cast = match left {
-            #[cfg(feature = "json")]
             _ if left.is_json_value() => "::jsonb",
             _ if left.is_xml_value() => "::text",
             _ => "",
         };
 
         let left_cast = match right {
-            #[cfg(feature = "json")]
             _ if right.is_json_value() => "::jsonb",
             _ if right.is_xml_value() => "::text",
             _ => "",
@@ -258,14 +253,12 @@ impl<'a> Visitor<'a> for Postgres<'a> {
     fn visit_not_equals(&mut self, left: Expression<'a>, right: Expression<'a>) -> visitor::Result {
         // LHS must be cast to json/xml-text if the right is a json/xml-text value and vice versa.
         let right_cast = match left {
-            #[cfg(feature = "json")]
             _ if left.is_json_value() => "::jsonb",
             _ if left.is_xml_value() => "::text",
             _ => "",
         };
 
         let left_cast = match right {
-            #[cfg(feature = "json")]
             _ if right.is_json_value() => "::jsonb",
             _ if right.is_xml_value() => "::text",
             _ => "",
@@ -287,7 +280,7 @@ impl<'a> Visitor<'a> for Postgres<'a> {
         Ok(())
     }
 
-    #[cfg(all(feature = "json", any(feature = "postgresql", feature = "mysql")))]
+    #[cfg(any(feature = "postgresql", feature = "mysql"))]
     fn visit_json_extract(&mut self, json_extract: JsonExtract<'a>) -> visitor::Result {
         match json_extract.path {
             #[cfg(feature = "mysql")]
@@ -327,7 +320,7 @@ impl<'a> Visitor<'a> for Postgres<'a> {
         Ok(())
     }
 
-    #[cfg(all(feature = "json", any(feature = "postgresql", feature = "mysql")))]
+    #[cfg(any(feature = "postgresql", feature = "mysql"))]
     fn visit_json_unquote(&mut self, json_unquote: JsonUnquote<'a>) -> visitor::Result {
         self.write("(")?;
         self.visit_expression(*json_unquote.expr)?;
@@ -337,7 +330,7 @@ impl<'a> Visitor<'a> for Postgres<'a> {
         Ok(())
     }
 
-    #[cfg(all(feature = "json", any(feature = "postgresql", feature = "mysql")))]
+    #[cfg(any(feature = "postgresql", feature = "mysql"))]
     fn visit_json_array_contains(&mut self, left: Expression<'a>, right: Expression<'a>, not: bool) -> visitor::Result {
         if not {
             self.write("( NOT ")?;
@@ -354,7 +347,7 @@ impl<'a> Visitor<'a> for Postgres<'a> {
         Ok(())
     }
 
-    #[cfg(all(feature = "json", any(feature = "postgresql", feature = "mysql")))]
+    #[cfg(any(feature = "postgresql", feature = "mysql"))]
     fn visit_json_extract_last_array_item(&mut self, extract: JsonExtractLastArrayElem<'a>) -> visitor::Result {
         self.write("(")?;
         self.visit_expression(*extract.expr)?;
@@ -364,7 +357,7 @@ impl<'a> Visitor<'a> for Postgres<'a> {
         Ok(())
     }
 
-    #[cfg(all(feature = "json", any(feature = "postgresql", feature = "mysql")))]
+    #[cfg(any(feature = "postgresql", feature = "mysql"))]
     fn visit_json_extract_first_array_item(&mut self, extract: JsonExtractFirstArrayElem<'a>) -> visitor::Result {
         self.write("(")?;
         self.visit_expression(*extract.expr)?;
@@ -374,7 +367,7 @@ impl<'a> Visitor<'a> for Postgres<'a> {
         Ok(())
     }
 
-    #[cfg(all(feature = "json", any(feature = "postgresql", feature = "mysql")))]
+    #[cfg(any(feature = "postgresql", feature = "mysql"))]
     fn visit_json_type_equals(&mut self, left: Expression<'a>, json_type: JsonType<'a>, not: bool) -> visitor::Result {
         self.write("JSONB_TYPEOF")?;
         self.write("(")?;
@@ -775,7 +768,6 @@ mod tests {
         assert_eq!(expected_sql, sql);
     }
 
-    #[cfg(feature = "json")]
     #[test]
     fn equality_with_a_json_value() {
         let expected = expected_values(
@@ -790,7 +782,6 @@ mod tests {
         assert_eq!(expected.1, params);
     }
 
-    #[cfg(feature = "json")]
     #[test]
     fn equality_with_a_lhs_json_value() {
         // A bit artificial, but checks if the ::jsonb casting is done correctly on the right side as well.
@@ -807,7 +798,6 @@ mod tests {
         assert_eq!(expected.1, params);
     }
 
-    #[cfg(feature = "json")]
     #[test]
     fn difference_with_a_json_value() {
         let expected = expected_values(
@@ -823,7 +813,6 @@ mod tests {
         assert_eq!(expected.1, params);
     }
 
-    #[cfg(feature = "json")]
     #[test]
     fn difference_with_a_lhs_json_value() {
         let expected = expected_values(
@@ -953,7 +942,7 @@ mod tests {
     }
 
     #[test]
-    #[cfg(feature = "json")]
+
     fn test_raw_json() {
         let (sql, params) =
             Postgres::build(Select::default().value(serde_json::json!({ "foo": "bar" }).raw())).unwrap();
@@ -973,7 +962,6 @@ mod tests {
     }
 
     #[test]
-    #[cfg(feature = "chrono")]
     fn test_raw_datetime() {
         let dt = chrono::Utc::now();
         let (sql, params) = Postgres::build(Select::default().value(dt.raw())).unwrap();

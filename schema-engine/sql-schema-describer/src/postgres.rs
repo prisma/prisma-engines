@@ -888,6 +888,7 @@ impl<'a> SqlSchemaDescriber<'a> {
                  FROM pg_class
                  JOIN pg_namespace on pg_namespace.oid = pg_class.relnamespace
                  AND pg_namespace.nspname = ANY ( $1 )
+                 WHERE reltype > 0
                 ) as oid on oid.oid = att.attrelid 
                   AND relname = info.table_name
                   AND namespace = info.table_schema

@@ -24,7 +24,6 @@ impl<'a> IntoSql<'a> for &'a Value<'a> {
             Value::Array(_) => panic!("Arrays are not supported on SQL Server."),
             #[cfg(feature = "bigdecimal")]
             Value::Numeric(val) => (*val).to_sql(),
-            #[cfg(feature = "json")]
             Value::Json(val) => val.as_ref().map(|val| serde_json::to_string(&val).unwrap()).into_sql(),
             #[cfg(feature = "gis")]
             Value::Geometry(_) => panic!("Cannot handle raw Geometry"),
@@ -32,11 +31,8 @@ impl<'a> IntoSql<'a> for &'a Value<'a> {
             Value::Geography(_) => panic!("Cannot handle raw Geography"),
             #[cfg(feature = "uuid")]
             Value::Uuid(val) => val.into_sql(),
-            #[cfg(feature = "chrono")]
             Value::DateTime(val) => val.into_sql(),
-            #[cfg(feature = "chrono")]
             Value::Date(val) => val.into_sql(),
-            #[cfg(feature = "chrono")]
             Value::Time(val) => val.into_sql(),
         }
     }
@@ -64,32 +60,27 @@ impl TryFrom<ColumnData<'static>> for Value<'static> {
                 let kind = ErrorKind::conversion("Please enable `bigdecimal` feature to read numeric values");
                 return Err(Error::builder(kind).build());
             }
-            #[cfg(feature = "chrono")]
             dt @ ColumnData::DateTime(_) => {
                 use tiberius::time::chrono::{DateTime, NaiveDateTime, Utc};
 
                 let dt = NaiveDateTime::from_sql(&dt)?.map(|dt| DateTime::<Utc>::from_utc(dt, Utc));
                 Value::DateTime(dt)
             }
-            #[cfg(feature = "chrono")]
             dt @ ColumnData::SmallDateTime(_) => {
                 use tiberius::time::chrono::{DateTime, NaiveDateTime, Utc};
 
                 let dt = NaiveDateTime::from_sql(&dt)?.map(|dt| DateTime::<Utc>::from_utc(dt, Utc));
                 Value::DateTime(dt)
             }
-            #[cfg(feature = "chrono")]
             dt @ ColumnData::Time(_) => {
                 use tiberius::time::chrono::NaiveTime;
 
                 Value::Time(NaiveTime::from_sql(&dt)?)
             }
-            #[cfg(feature = "chrono")]
             dt @ ColumnData::Date(_) => {
                 use tiberius::time::chrono::NaiveDate;
                 Value::Date(NaiveDate::from_sql(&dt)?)
             }
-            #[cfg(feature = "chrono")]
             dt @ ColumnData::DateTime2(_) => {
                 use tiberius::time::chrono::{DateTime, NaiveDateTime, Utc};
 
@@ -97,7 +88,6 @@ impl TryFrom<ColumnData<'static>> for Value<'static> {
 
                 Value::DateTime(dt)
             }
-            #[cfg(feature = "chrono")]
             dt @ ColumnData::DateTimeOffset(_) => {
                 use tiberius::time::chrono::{DateTime, Utc};
 

@@ -16,7 +16,6 @@ use rusqlite::{
     Column, Error as RusqlError, Row as SqliteRow, Rows as SqliteRows,
 };
 
-#[cfg(feature = "chrono")]
 use chrono::TimeZone;
 
 impl TypeIdentifier for Column<'_> {
@@ -163,9 +162,7 @@ impl<'a> GetRow for SqliteRow<'a> {
                     c if c.is_double() => Value::Double(None),
                     #[cfg(feature = "bigdecimal")]
                     c if c.is_real() => Value::Numeric(None),
-                    #[cfg(feature = "chrono")]
                     c if c.is_datetime() => Value::DateTime(None),
-                    #[cfg(feature = "chrono")]
                     c if c.is_date() => Value::Date(None),
                     c if c.is_bool() => Value::Boolean(None),
                     #[cfg(feature = "gis")]
@@ -190,12 +187,10 @@ impl<'a> GetRow for SqliteRow<'a> {
                                 Value::boolean(true)
                             }
                         }
-                        #[cfg(feature = "chrono")]
                         c if c.is_date() => {
                             let dt = chrono::NaiveDateTime::from_timestamp_opt(i / 1000, 0).unwrap();
                             Value::date(dt.date())
                         }
-                        #[cfg(feature = "chrono")]
                         c if c.is_datetime() => {
                             let dt = chrono::Utc.timestamp_millis_opt(i).unwrap();
                             Value::datetime(dt)
@@ -221,7 +216,6 @@ impl<'a> GetRow for SqliteRow<'a> {
                     Value::numeric(BigDecimal::from_f64(f).unwrap())
                 }
                 ValueRef::Real(f) => Value::double(f),
-                #[cfg(feature = "chrono")]
                 ValueRef::Text(bytes) if column.is_datetime() => {
                     let parse_res = std::str::from_utf8(bytes).map_err(|_| {
                         let builder = Error::builder(ErrorKind::ConversionError(
@@ -302,7 +296,6 @@ impl<'a> ToSql for Value<'a> {
             Value::Numeric(d) => d
                 .as_ref()
                 .map(|d| ToSqlOutput::from(d.to_string().parse::<f64>().expect("BigDecimal is not a f64."))),
-            #[cfg(feature = "json")]
             Value::Json(value) => value.as_ref().map(|value| {
                 let stringified = serde_json::to_string(value)
                     .map_err(|err| RusqlError::ToSqlConversionFailure(Box::new(err)))
@@ -313,13 +306,10 @@ impl<'a> ToSql for Value<'a> {
             Value::Xml(cow) => cow.as_ref().map(|cow| ToSqlOutput::from(cow.as_ref())),
             #[cfg(feature = "uuid")]
             Value::Uuid(value) => value.map(|value| ToSqlOutput::from(value.hyphenated().to_string())),
-            #[cfg(feature = "chrono")]
             Value::DateTime(value) => value.map(|value| ToSqlOutput::from(value.timestamp_millis())),
-            #[cfg(feature = "chrono")]
             Value::Date(date) => date
                 .and_then(|date| date.and_hms_opt(0, 0, 0))
                 .map(|dt| ToSqlOutput::from(dt.timestamp_millis())),
-            #[cfg(feature = "chrono")]
             Value::Time(time) => time
                 .and_then(|time| chrono::NaiveDate::from_ymd_opt(1970, 1, 1).map(|d| (d, time)))
                 .and_then(|(date, time)| {

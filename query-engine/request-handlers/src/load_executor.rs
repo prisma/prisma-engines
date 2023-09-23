@@ -2,6 +2,7 @@ use psl::{builtin_connectors::*, Datasource, PreviewFeatures};
 use query_core::{executor::InterpretingExecutor, Connector, QueryExecutor};
 use sql_query_connector::*;
 use std::collections::HashMap;
+use std::env;
 use tracing::trace;
 use url::Url;
 
@@ -17,24 +18,38 @@ pub async fn load(
     features: PreviewFeatures,
     url: &str,
 ) -> query_core::Result<Box<dyn QueryExecutor + Send + Sync + 'static>> {
-    if connector_mode == ConnectorMode::Js {
-        #[cfg(feature = "driver-adapters")]
-        return driver_adapter(source, url, features).await;
-    }
+    match connector_mode {
+        ConnectorMode::Js => {
+            #[cfg(not(feature = "driver-adapters"))]
+            panic!("Driver adapters are not enabled, but connector mode is set to JS");
 
-    match source.active_provider {
-        p if SQLITE.is_provider(p) => sqlite(source, url, features).await,
-        p if MYSQL.is_provider(p) => mysql(source, url, features).await,
-        p if POSTGRES.is_provider(p) => postgres(source, url, features).await,
-        p if MSSQL.is_provider(p) => mssql(source, url, features).await,
-        p if COCKROACH.is_provider(p) => postgres(source, url, features).await,
+            #[cfg(feature = "driver-adapters")]
+            driver_adapter(source, url, features).await
+        }
 
-        #[cfg(feature = "mongodb")]
-        p if MONGODB.is_provider(p) => mongodb(source, url, features).await,
+        ConnectorMode::Rust => {
+            if let Ok(value) = env::var("PRISMA_DISABLE_QUAINT_EXECUTORS") {
+                let disable = value.to_uppercase();
+                if disable == "TRUE" || disable == "1" {
+                    panic!("Quaint executors are disabled, as per env var PRISMA_DISABLE_QUAINT_EXECUTORS.");
+                }
+            }
 
-        x => Err(query_core::CoreError::ConfigurationError(format!(
-            "Unsupported connector type: {x}"
-        ))),
+            match source.active_provider {
+                p if SQLITE.is_provider(p) => sqlite(source, url, features).await,
+                p if MYSQL.is_provider(p) => mysql(source, url, features).await,
+                p if POSTGRES.is_provider(p) => postgres(source, url, features).await,
+                p if MSSQL.is_provider(p) => mssql(source, url, features).await,
+                p if COCKROACH.is_provider(p) => postgres(source, url, features).await,
+
+                #[cfg(feature = "mongodb")]
+                p if MONGODB.is_provider(p) => mongodb(source, url, features).await,
+
+                x => Err(query_core::CoreError::ConfigurationError(format!(
+                    "Unsupported connector type: {x}"
+                ))),
+            }
+        }
     }
 }
 

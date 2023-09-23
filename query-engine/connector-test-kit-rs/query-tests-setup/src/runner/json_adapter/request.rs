@@ -1,4 +1,4 @@
-use crate::TestResult;
+use crate::{TestError, TestResult};
 use indexmap::IndexMap;
 use itertools::Itertools;
 use prisma_models::PrismaValue;
@@ -18,24 +18,28 @@ pub struct JsonRequest;
 impl JsonRequest {
     /// Translates a GraphQL query to a JSON query. This is used to keep the same test-suite running on both protocols.
     pub fn from_graphql(gql: &str, query_schema: &QuerySchema) -> TestResult<JsonSingleQuery> {
-        let operation = GraphQLProtocolAdapter::convert_query_to_operation(gql, None).unwrap();
-        let operation_name = operation.name();
-        let schema_field = query_schema
-            .find_query_field(operation_name)
-            .unwrap_or_else(|| query_schema.find_mutation_field(operation_name).unwrap());
-        let model_name = schema_field
-            .model()
-            .map(|m| query_schema.internal_data_model.walk(m).name().to_owned());
-        let query_tag = schema_field.query_tag().unwrap().to_owned();
-        let selection = operation.into_selection();
+        match GraphQLProtocolAdapter::convert_query_to_operation(gql, None) {
+            Ok(operation) => {
+                let operation_name = operation.name();
+                let schema_field = query_schema
+                    .find_query_field(operation_name)
+                    .unwrap_or_else(|| query_schema.find_mutation_field(operation_name).unwrap());
+                let model_name = schema_field
+                    .model()
+                    .map(|m| query_schema.internal_data_model.walk(m).name().to_owned());
+                let query_tag = schema_field.query_tag().unwrap().to_owned();
+                let selection = operation.into_selection();
 
-        let output = JsonSingleQuery {
-            model_name,
-            action: Action::new(query_tag),
-            query: graphql_selection_to_json_field_query(selection, &schema_field),
-        };
+                let output = JsonSingleQuery {
+                    model_name,
+                    action: Action::new(query_tag),
+                    query: graphql_selection_to_json_field_query(selection, &schema_field),
+                };
 
-        Ok(output)
+                Ok(output)
+            }
+            Err(err) => Err(TestError::RequestHandlerError(err)),
+        }
     }
 }
 
