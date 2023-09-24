@@ -147,7 +147,7 @@ impl QueryEngine {
         napi_env: Env,
         options: JsUnknown,
         callback: JsFunction,
-        maybe_driver: Option<JsObject>,
+        maybe_adapter: Option<JsObject>,
     ) -> napi::Result<Self> {
         let mut log_callback = callback.create_threadsafe_function(0usize, |ctx: ThreadSafeCallContext<String>| {
             Ok(vec![ctx.env.create_string(&ctx.value)?])
@@ -163,7 +163,17 @@ impl QueryEngine {
             config_dir,
             ignore_env_var_errors,
             engine_protocol,
-        } = napi_env.from_js_value(options)?;
+        } = napi_env.from_js_value(options).expect(
+            r###"
+            Failed to deserialize constructor options. 
+            
+            This usually happens when the javascript object passed to the constructor is missing 
+            properties for the ConstructorOptions fields that must have some value.
+            
+            If you set some of these in javascript trough environment variables, make sure there are
+            values for data_model, log_level, and any field that is not Option<T>
+            "###,
+        );
 
         let env = stringify_env_values(env)?; // we cannot trust anything JS sends us from process.env
         let overrides: Vec<(_, _)> = datasource_overrides.into_iter().collect();
@@ -181,17 +191,14 @@ impl QueryEngine {
             );
         } else {
             #[cfg(feature = "driver-adapters")]
-            if let Some(driver) = maybe_driver {
-                let js_queryable = driver_adapters::from_napi(driver);
-                let provider_name = schema.connector.provider_name();
+            if let Some(adapter) = maybe_adapter {
+                let js_queryable = driver_adapters::from_napi(adapter);
 
-                match sql_connector::register_driver_adapter(provider_name, Arc::new(js_queryable)) {
-                    Ok(_) => {
-                        connector_mode = ConnectorMode::Js;
-                        tracing::info!("Registered driver adapter for {provider_name}.")
-                    }
-                    Err(err) => tracing::error!("Failed to register driver adapter for {provider_name}. {err}"),
-                }
+                sql_connector::activate_driver_adapter(Arc::new(js_queryable));
+                connector_mode = ConnectorMode::Js;
+
+                let provider_name = schema.connector.provider_name();
+                tracing::info!("Registered driver adapter for {provider_name}.");
             }
         }
 
@@ -235,7 +242,7 @@ impl QueryEngine {
         if enable_metrics {
             napi_env.execute_tokio_future(
                 async {
-                    query_engine_metrics::describe_metrics();
+                    query_engine_metrics::initialize_metrics();
                     Ok(())
                 }
                 .with_subscriber(logger.dispatcher()),

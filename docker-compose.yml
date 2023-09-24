@@ -106,6 +106,21 @@ services:
     networks:
       - databases
 
+  neon-postgres13:
+    image: ghcr.io/neondatabase/wsproxy:latest
+    environment:
+      # the port of the postgres13 within the databases network
+      APPEND_PORT: 'postgres13:5432'
+      ALLOW_ADDR_REGEX: '.*'
+      LOG_TRAFFIC: 'true'
+      LOG_CONN_INFO: 'true'
+    ports:
+      - '5488:80'
+    depends_on:
+      - postgres13
+    networks:
+      - databases
+
   postgres14:
     image: postgres:14
     restart: always

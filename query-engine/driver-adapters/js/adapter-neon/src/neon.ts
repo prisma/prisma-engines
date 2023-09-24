@@ -1,14 +1,21 @@
 import type neon from '@neondatabase/serverless'
-import { Debug } from '@jkomyno/prisma-driver-adapter-utils'
-import type { DriverAdapter, ResultSet, Query, Queryable, Transaction, Result, TransactionOptions } from '@jkomyno/prisma-driver-adapter-utils'
+import { Debug, ok, err } from '@prisma/driver-adapter-utils'
+import type {
+  DriverAdapter,
+  ResultSet,
+  Query,
+  Queryable,
+  Transaction,
+  Result,
+  TransactionOptions,
+} from '@prisma/driver-adapter-utils'
 import { fieldToColumnType } from './conversion'
 
 const debug = Debug('prisma:driver-adapter:neon')
 
-type ARRAY_MODE_DISABLED = false
-type FULL_RESULTS_ENABLED = true
+type ARRAY_MODE_ENABLED = true
 
-type PerformIOResult = neon.QueryResult<any> | neon.FullQueryResults<ARRAY_MODE_DISABLED>
+type PerformIOResult = neon.QueryResult<any> | neon.FullQueryResults<ARRAY_MODE_ENABLED>
 
 /**
  * Base class for http client, ws client and ws transaction
@@ -20,29 +27,25 @@ abstract class NeonQueryable implements Queryable {
     const tag = '[js::query_raw]'
     debug(`${tag} %O`, query)
 
-    const { fields, rows: results } = await this.performIO(query)
-
-    const columns = fields.map(field => field.name)
-    const resultSet: ResultSet = {
-      columnNames: columns,
-      columnTypes: fields.map(field => fieldToColumnType(field.dataTypeID)),
-      rows: results.map(result => columns.map(column => result[column])),
-    }
-
-    return { ok: true, value: resultSet }
+    return (await this.performIO(query)).map(({ fields, rows }) => {
+      const columns = fields.map((field) => field.name)
+      return {
+        columnNames: columns,
+        columnTypes: fields.map((field) => fieldToColumnType(field.dataTypeID)),
+        rows,
+      }
+    })
   }
 
   async executeRaw(query: Query): Promise<Result<number>> {
     const tag = '[js::execute_raw]'
     debug(`${tag} %O`, query)
 
-    const { rowCount: rowsAffected } = await this.performIO(query)
-
     // Note: `rowsAffected` can sometimes be null (e.g., when executing `"BEGIN"`)
-    return { ok: true, value: rowsAffected ?? 0 }
+    return (await this.performIO(query)).map((r) => r.rowCount ?? 0)
   }
 
-  abstract performIO(query: Query): Promise<PerformIOResult>
+  abstract performIO(query: Query): Promise<Result<PerformIOResult>>
 }
 
 /**
@@ -53,15 +56,25 @@ class NeonWsQueryable<ClientT extends neon.Pool | neon.PoolClient> extends NeonQ
     super()
   }
 
-  override async performIO(query: Query): Promise<PerformIOResult> {
+  override async performIO(query: Query): Promise<Result<PerformIOResult>> {
     const { sql, args: values } = query
 
     try {
-      return await this.client.query(sql, values)
+      return ok(await this.client.query({ text: sql, values, rowMode: 'array' }))
     } catch (e) {
-      const error = e as Error
-      debug('Error in performIO: %O', error)
-      throw error
+      debug('Error in performIO: %O', e)
+      if (e && e.code) {
+        return err({
+          kind: 'PostgresError',
+          code: e.code,
+          severity: e.severity,
+          message: e.message,
+          detail: e.detail,
+          column: e.column,
+          hint: e.hint,
+        })
+      }
+      throw e
     }
   }
 }
@@ -75,14 +88,14 @@ class NeonTransaction extends NeonWsQueryable<neon.PoolClient> implements Transa
     debug(`[js::commit]`)
 
     this.client.release()
-    return Promise.resolve({ ok: true, value: undefined })
+    return Promise.resolve(ok(undefined))
   }
 
   async rollback(): Promise<Result<void>> {
     debug(`[js::rollback]`)
 
     this.client.release()
-    return Promise.resolve({ ok: true, value: undefined })
+    return Promise.resolve(ok(undefined))
   }
 }
 
@@ -102,7 +115,7 @@ export class PrismaNeon extends NeonWsQueryable<neon.Pool> implements DriverAdap
     debug(`${tag} options: %O`, options)
 
     const connection = await this.client.connect()
-    return { ok: true, value: new NeonTransaction(connection, options) }
+    return ok(new NeonTransaction(connection, options))
   }
 
   async close() {
@@ -110,21 +123,23 @@ export class PrismaNeon extends NeonWsQueryable<neon.Pool> implements DriverAdap
       await this.client.end()
       this.isRunning = false
     }
-    return { ok: true as const, value: undefined }
+    return ok(undefined)
   }
 }
 
 export class PrismaNeonHTTP extends NeonQueryable implements DriverAdapter {
-  constructor(private client: neon.NeonQueryFunction<
-    ARRAY_MODE_DISABLED,
-    FULL_RESULTS_ENABLED
-  >) {
+  constructor(private client: neon.NeonQueryFunction<any, any>) {
     super()
   }
 
-  override async performIO(query: Query): Promise<PerformIOResult> {
+  override async performIO(query: Query): Promise<Result<PerformIOResult>> {
     const { sql, args: values } = query
-    return await this.client(sql, values)
+    return ok(
+      await this.client(sql, values, {
+        arrayMode: true,
+        fullResults: true,
+      }),
+    )
   }
 
   startTransaction(): Promise<Result<Transaction>> {
@@ -132,6 +147,6 @@ export class PrismaNeonHTTP extends NeonQueryable implements DriverAdapter {
   }
 
   async close() {
-    return { ok: true as const, value: undefined }
+    return ok(undefined)
   }
 }

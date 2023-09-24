@@ -11,40 +11,25 @@ use quaint::{
     connector::{IsolationLevel, Transaction},
     prelude::{Queryable as QuaintQueryable, *},
 };
-use std::{
-    collections::{hash_map::Entry, HashMap},
-    sync::{Arc, Mutex},
-};
+use std::sync::{Arc, Mutex};
 
-/// Registry is the type for the global registry of driver adapters.
-type Registry = HashMap<String, DriverAdapter>;
+static ACTIVE_DRIVER_ADAPTER: Lazy<Mutex<Option<DriverAdapter>>> = Lazy::new(|| Mutex::new(None));
 
-/// REGISTRY is the global registry of Driver Adapters.
-static REGISTRY: Lazy<Mutex<Registry>> = Lazy::new(|| Mutex::new(HashMap::new()));
+fn active_driver_adapter(provider: &str) -> connector::Result<DriverAdapter> {
+    let lock = ACTIVE_DRIVER_ADAPTER.lock().unwrap();
 
-fn registered_driver_adapter(provider: &str) -> connector::Result<DriverAdapter> {
-    let lock = REGISTRY.lock().unwrap();
-    lock.get(provider)
+    lock.as_ref()
+        .map(|conn_ref| conn_ref.to_owned())
         .ok_or(ConnectorError::from_kind(ErrorKind::UnsupportedConnector(format!(
             "A driver adapter for {} was not registered",
             provider
         ))))
-        .map(|conn_ref| conn_ref.to_owned())
 }
 
-pub fn register_driver_adapter(provider: &str, connector: Arc<dyn TransactionCapable>) -> Result<(), String> {
-    let mut lock = REGISTRY.lock().unwrap();
-    let entry = lock.entry(provider.to_string());
-    match entry {
-        Entry::Occupied(_) => Err(format!(
-            "A driver adapter for {} was already registered, and cannot be overridden.",
-            provider
-        )),
-        Entry::Vacant(v) => {
-            v.insert(DriverAdapter { connector });
-            Ok(())
-        }
-    }
+pub fn activate_driver_adapter(connector: Arc<dyn TransactionCapable>) {
+    let mut lock = ACTIVE_DRIVER_ADAPTER.lock().unwrap();
+
+    *lock = Some(DriverAdapter { connector });
 }
 
 pub struct Js {
@@ -69,7 +54,7 @@ impl FromSource for Js {
         url: &str,
         features: psl::PreviewFeatures,
     ) -> connector_interface::Result<Js> {
-        let connector = registered_driver_adapter(source.active_provider)?;
+        let connector = active_driver_adapter(source.active_provider)?;
         let connection_info = get_connection_info(url)?;
 
         Ok(Js {
@@ -117,7 +102,7 @@ impl Connector for Js {
 // declaration, so finally I couldn't come up with anything better then wrapping a QuaintQueryable
 // in this object, and implementing TransactionCapable (and quaint::Queryable) explicitly for it.
 #[derive(Clone)]
-struct DriverAdapter {
+pub struct DriverAdapter {
     connector: Arc<dyn TransactionCapable>,
 }
 

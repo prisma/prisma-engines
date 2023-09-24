@@ -1,7 +1,9 @@
 import { describe, it } from 'node:test'
+import path from 'node:path'
 import assert from 'node:assert'
 import { PrismaClient } from '@prisma/client'
-import type { DriverAdapter } from '@jkomyno/prisma-driver-adapter-utils'
+import type { DriverAdapter } from '@prisma/driver-adapter-utils'
+import { getLibQueryEnginePath } from '../libquery/util'
 
 export async function smokeTestClient(driverAdapter: DriverAdapter) {
   const provider = driverAdapter.flavour
@@ -13,13 +15,15 @@ export async function smokeTestClient(driverAdapter: DriverAdapter) {
     } as const,
   ]
 
+  const dirname = path.dirname(new URL(import.meta.url).pathname)
+  process.env.PRISMA_QUERY_ENGINE_LIBRARY = getLibQueryEnginePath(dirname)
+
   for (const adapter of [driverAdapter, undefined]) {
     const isUsingDriverAdapters = adapter !== undefined
     describe(isUsingDriverAdapters ? `using Driver Adapters` : `using Rust drivers`, () => {
       it('batch queries', async () => {
         const prisma = new PrismaClient({
-          // @ts-ignore
-          adapter: driverAdapter,
+          adapter,
           log,
         })
     
@@ -48,15 +52,6 @@ export async function smokeTestClient(driverAdapter: DriverAdapter) {
           '-- Implicit "COMMIT" query via underlying driver',
         ]
 
-        const postgresExpectedQueries = [
-          'BEGIN',
-          'DEALLOCATE ALL',
-          'SELECT 1',
-          'SELECT 2',
-          'SELECT 3',
-          'COMMIT',
-        ]
-
         if (['mysql'].includes(provider)) {
           if (isUsingDriverAdapters) {
             assert.deepEqual(queries, driverAdapterExpectedQueries)
@@ -64,18 +59,18 @@ export async function smokeTestClient(driverAdapter: DriverAdapter) {
             assert.deepEqual(queries, defaultExpectedQueries)
           }
         } else if (['postgres'].includes(provider)) {
-          if (isUsingDriverAdapters) {
-            assert.deepEqual(queries, defaultExpectedQueries)
-          } else {
-            assert.deepEqual(queries, postgresExpectedQueries)
-          }
+          // Note: the "DEALLOCATE ALL" query is only present after "BEGIN" when using Rust Postgres with pgbouncer.
+          assert.deepEqual(queries.at(0), defaultExpectedQueries.at(0))
+          assert.deepEqual(
+            queries.filter((q) => q !== 'DEALLOCATE ALL'),
+            defaultExpectedQueries
+          )
         }
       })
     
       it('applies isolation level when using batch $transaction', async () => {
         const prisma = new PrismaClient({
-          // @ts-ignore
-          adapter: driverAdapter,
+          adapter,
           log,
         })
     
