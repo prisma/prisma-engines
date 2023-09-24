@@ -12,6 +12,7 @@ import type {
 import { fieldToColumnType } from './conversion'
 import { existsSync, createReadStream, promises as fsPromises } from 'fs';
 import { createInterface } from 'readline';
+import path from 'path';
 
 const debug = Debug('prisma:driver-adapter:pg')
 
@@ -100,12 +101,13 @@ class PgQueryable<ClientT extends StdClient | TransactionClient> implements Quer
     const { sql, args: values } = query
 
     try {
-      const recordingFileName = `recordings/${globalThis.names.join("-").replace(/[\/:*?"<>|]/g, '_')}.recording`
       // const recordingFileName = `recordings/${globalThis.testId}-${globalThis.names.join("-")}.recording`;
-
+      const recordingFileName = path.resolve('recordings', `${globalThis.names.join("-").replace(/[\/:*?"<>|]/g, '_')}.recording`);
+      
       let result: any = ""
 
-      let recordings = globalThis.recording
+      let recordings = globalThis.recordings
+      //console.log({ recordings })
 
       if(recordings == "read") {
         let resultString = await this.readExpectedResponse(recordingFileName, sql)
@@ -114,9 +116,7 @@ class PgQueryable<ClientT extends StdClient | TransactionClient> implements Quer
       } else if (recordings == "write") {
         result = await this.client.query({ text: sql, values, rowMode: 'array' })
 
-        await fsPromises.appendFile(recordingFileName, sql + '\n', { flag: 'a' });
-        await fsPromises.appendFile(recordingFileName, JSON.stringify(result) + '\n');
-        await fsPromises.appendFile(recordingFileName, '\n');        
+        await fsPromises.appendFile(recordingFileName, sql + '\n' + JSON.stringify(result) + '\n\n', { flag: 'a' });      
       }
 
       return result

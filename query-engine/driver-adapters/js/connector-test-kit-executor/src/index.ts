@@ -223,6 +223,10 @@ async function adapterFromEnv(url: string): Promise<DriverAdapter> {
 
 async function pgAdapter(url: string): Promise<DriverAdapter> {
     const pool = new pgDriver.Pool({connectionString: url})
+
+    globalThis.names = ['pgAdapter']
+    globalThis.recordings = "write"
+
     return new prismaPg.PrismaPg(pool)
 }
 
