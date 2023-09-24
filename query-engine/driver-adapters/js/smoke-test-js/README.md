@@ -10,7 +10,7 @@ It contains a subset of `@prisma/client`, plus some handy executable smoke tests
 We assume a recent Node.js is installed (e.g., `v20.5.x`). If not, run `nvm use` in the current directory.
 It's very important to double-check if you have multiple versions installed, as both PlanetScale and Neon requires either Node.js `v18`+ or a custom `fetch` function.
 
-In the parent directory (`cd ..`):
+In the parent directory `js` (`cd ..`):
 - Build the driver adapters via `pnpm i && pnpm build`
 
 In the current directoy:
@@ -55,3 +55,14 @@ In the current directory:
   For more fine-grained control:
   - Run `pnpm neon:ws:http` to test using `libquery`
   - Run `pnpm neon:ws:http` to test using `@prisma/client`
+
+### Pg
+
+- Start database for suggested connection string with `docker compose up -d postgres15`
+
+In the current directory:
+- Run `pnpm prisma:pg` to push the Prisma schema and insert the test data.
+- Run `pnpm pg` to run smoke tests using `libquery` against the PostgreSQL database.
+  For more fine-grained control:
+  - Run `pnpm pg:libquery` to test using `libquery`
+  - Run `pnpm pg:client` to test using `@prisma/client`
