@@ -107,6 +107,17 @@ start-postgres13:
 dev-postgres13: start-postgres13
 	cp $(CONFIG_PATH)/postgres13 $(CONFIG_FILE)
 
+start-pg-postgres13: build-qe-napi build-connector-kit-js start-postgres13
+
+dev-pg-postgres13: start-pg-postgres13
+	cp $(CONFIG_PATH)/pg-postgres13 $(CONFIG_FILE)
+
+start-neon-postgres13: build-qe-napi build-connector-kit-js
+	docker compose -f docker-compose.yml up -d --remove-orphans neon-postgres13
+
+dev-neon-ws-postgres13: start-neon-postgres13
+	cp $(CONFIG_PATH)/neon-ws-postgres13 $(CONFIG_FILE)
+
 start-postgres14:
 	docker compose -f docker-compose.yml up -d --remove-orphans postgres14
 
@@ -238,6 +249,12 @@ dev-vitess_8_0: start-vitess_8_0
 ######################
 # Local dev commands #
 ######################
+
+build-qe-napi:
+	cargo build --package query-engine-node-api
+
+build-connector-kit-js:
+	cd query-engine/driver-adapters/js && pnpm i && pnpm build
 
 # Quick schema validation of whatever you have in the dev_datamodel.prisma file.
 validate:

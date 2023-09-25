@@ -43,7 +43,12 @@ pub static ENGINE_PROTOCOL: Lazy<String> =
     Lazy::new(|| std::env::var("PRISMA_ENGINE_PROTOCOL").unwrap_or_else(|_| "graphql".to_owned()));
 
 /// Teardown of a test setup.
-async fn teardown_project(datamodel: &str, db_schemas: &[&str]) -> TestResult<()> {
+async fn teardown_project(datamodel: &str, db_schemas: &[&str], schema_id: Option<usize>) -> TestResult<()> {
+    if let Some(schema_id) = schema_id {
+        let params = serde_json::json!({ "schemaId": schema_id });
+        executor_process_request::<serde_json::Value>("teardown", params).await?;
+    }
+
     Ok(qe_setup::teardown(datamodel, db_schemas).await?)
 }
 
@@ -167,7 +172,9 @@ fn run_relation_link_test_impl(
 
                 test_fn(&runner, &dm).await.unwrap();
 
-                teardown_project(&datamodel, Default::default()).await.unwrap();
+                teardown_project(&datamodel, Default::default(), runner.schema_id())
+                    .await
+                    .unwrap();
             }
             .with_subscriber(test_tracing_subscriber(
                 ENV_LOG_LEVEL.to_string(),
@@ -275,10 +282,13 @@ fn run_connector_test_impl(
             )
             .await
             .unwrap();
+            let schema_id = runner.schema_id();
 
             test_fn(runner).await.unwrap();
 
-            crate::teardown_project(&datamodel, db_schemas).await.unwrap();
+            crate::teardown_project(&datamodel, db_schemas, schema_id)
+                .await
+                .unwrap();
         }
         .with_subscriber(test_tracing_subscriber(
             ENV_LOG_LEVEL.to_string(),

@@ -18,7 +18,10 @@ pub use self::{
     query_document::*,
     telemetry::*,
 };
-pub use connector::{error::ConnectorError, Connector};
+pub use connector::{
+    error::{ConnectorError, ErrorKind as ConnectorErrorKind},
+    Connector,
+};
 
 mod error;
 mod interactive_transactions;
