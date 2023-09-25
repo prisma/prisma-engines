@@ -233,10 +233,10 @@ async function pgAdapter(url: string): Promise<DriverAdapter> {
 async function neonWsAdapter(url: string): Promise<DriverAdapter> {
     const proxyURL = JSON.parse(process.env.DRIVER_ADAPTER_CONFIG || '{}').proxyUrl ?? ''
     if (proxyURL == '') {
-        throw new Error("DRIVER_ADAPTER_URL_OVERRIDE is not defined or empty, but its required for neon adapter.");
+        throw new Error("DRIVER_ADAPTER_CONFIG is not defined or empty, but its required for neon adapter.");
     }
 
-    neonConfig.wsProxy = () => `127.0.0.1:5488/v1`
+    neonConfig.wsProxy = () => proxyURL
     neonConfig.webSocketConstructor = WebSocket
     neonConfig.useSecureWebSocket = false
     neonConfig.pipelineConnect = false
