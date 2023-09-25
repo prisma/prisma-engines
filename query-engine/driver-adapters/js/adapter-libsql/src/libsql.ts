@@ -1,4 +1,4 @@
-import { Debug, ok } from '@prisma/driver-adapter-utils'
+import { Debug, ok, err } from '@prisma/driver-adapter-utils'
 import type {
   DriverAdapter,
   Query,
@@ -8,13 +8,14 @@ import type {
   Transaction,
   TransactionOptions,
 } from '@prisma/driver-adapter-utils'
-import type { InStatement, Client as LibSqlClientRaw, Transaction as LibSqlTransactionRaw } from '@libsql/client'
+import type { InStatement, Client as LibSqlClientRaw, Transaction as LibSqlTransactionRaw, ResultSet as LibsqlResultSet } from '@libsql/client'
 import { getColumnTypes, mapRow } from './conversion'
 
 const debug = Debug('prisma:driver-adapter:libsql')
 
 type StdClient = LibSqlClientRaw
 type TransactionClient = LibSqlTransactionRaw
+
 
 class LibSqlQueryable<ClientT extends StdClient | TransactionClient> implements Queryable {
   readonly flavour = 'sqlite'
@@ -28,17 +29,17 @@ class LibSqlQueryable<ClientT extends StdClient | TransactionClient> implements 
     const tag = '[js::query_raw]'
     debug(`${tag} %O`, query)
 
-    const { columns, rows, columnTypes: declaredColumnTypes } = await this.performIO(query)
+    return (await this.performIO(query)).map( ({ columns, rows, columnTypes: declaredColumnTypes }) => {
+      const columnTypes = getColumnTypes(declaredColumnTypes, rows)
 
-    const columnTypes = getColumnTypes(declaredColumnTypes, rows)
+      const resultSet: ResultSet = {
+        columnNames: columns,
+        columnTypes,
+        rows: rows.map(mapRow),
+      }
 
-    const resultSet: ResultSet = {
-      columnNames: columns,
-      columnTypes,
-      rows: rows.map(mapRow),
-    }
-
-    return ok(resultSet)
+      return resultSet
+    })
   }
 
   /**
@@ -50,8 +51,7 @@ class LibSqlQueryable<ClientT extends StdClient | TransactionClient> implements 
     const tag = '[js::execute_raw]'
     debug(`${tag} %O`, query)
 
-    const { rowsAffected } = await this.performIO(query)
-    return ok(rowsAffected ?? 0)
+    return (await this.performIO(query)).map((r) => r.rowsAffected ?? 0)
   }
 
   /**
@@ -59,14 +59,19 @@ class LibSqlQueryable<ClientT extends StdClient | TransactionClient> implements 
    * Should the query fail due to a connection error, the connection is
    * marked as unhealthy.
    */
-  private async performIO(query: Query) {
+  private async performIO(query: Query): Promise<Result<LibsqlResultSet>> {
     try {
-      const result = await this.client.execute(query as InStatement)
-      return result
+      return ok(await this.client.execute(query as InStatement))
     } catch (e) {
-      const error = e as Error
       debug('Error in performIO: %O', error)
-      throw error
+      if (e && e.code) {
+        return err({
+          kind: 'SqliteError',
+          code: e.code,
+          message: e.message,
+        })
+      }
+      throw e
     }
   }
 }

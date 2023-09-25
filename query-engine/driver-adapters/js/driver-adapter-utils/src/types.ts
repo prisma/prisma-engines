@@ -44,6 +44,10 @@ export type Error = {
   detail: string | undefined
   column: string | undefined
   hint: string | undefined
+} | {
+  kind: 'SqliteError'
+  code: string,
+  message: string
 }
 
 export interface Queryable {
