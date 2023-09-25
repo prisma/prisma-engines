@@ -1,5 +1,6 @@
 mod conversion;
-pub mod error;
+mod error;
+pub use error::PostgresError;
 
 use crate::{
     ast::{Query, Value},

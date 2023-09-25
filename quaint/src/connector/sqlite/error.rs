@@ -1,6 +1,29 @@
 use crate::error::*;
 use rusqlite::ffi;
 use rusqlite::types::FromSqlError;
+use std::fmt::{Display, Formatter};
+
+#[derive(Debug)]
+pub struct SqliteError {
+    pub code: String,
+    pub message: String,
+}
+
+impl std::error::Error for SqliteError {}
+
+impl Display for SqliteError {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", self.message)
+    }
+}
+
+impl From<SqliteError> for Error {
+    fn from(value: SqliteError) -> Self {
+        match value.code.as_str() {
+            code @ _ => todo!("treatment for {} was not implemented yet. Erreor: #{:?}", code, value),
+        }
+    }
+}
 
 impl From<rusqlite::Error> for Error {
     fn from(e: rusqlite::Error) -> Error {

@@ -1,5 +1,5 @@
 use napi::{bindgen_prelude::FromNapiValue, Env, JsUnknown, NapiValue};
-use quaint::error::{Error as QuaintError, PostgresError};
+use quaint::error::{Error as QuaintError, PostgresError, SqliteError};
 use serde::Deserialize;
 
 #[derive(Deserialize)]
@@ -14,6 +14,13 @@ pub struct PostgresErrorDef {
 }
 
 #[derive(Deserialize)]
+#[serde(remote = "SqliteError")]
+pub struct SqliteErrorDef {
+    code: String,
+    message: String,
+}
+
+#[derive(Deserialize)]
 #[serde(tag = "kind")]
 /// Wrapper for JS-side errors
 /// See driver-adapters/js/adapter-utils/src/types.ts file for example
@@ -24,6 +31,8 @@ pub(crate) enum DriverAdapterError {
     },
 
     PostgresError(#[serde(with = "PostgresErrorDef")] PostgresError),
+
+    SqliteError(#[serde(with = "SqliteErrorDef")] SqliteError),
     // in the future, expected errors that map to known user errors with PXXX codes will also go here
 }
 
@@ -39,7 +48,8 @@ impl From<DriverAdapterError> for QuaintError {
     fn from(value: DriverAdapterError) -> Self {
         match value {
             DriverAdapterError::GenericJsError { id } => QuaintError::external_error(id),
-            DriverAdapterError::PostgresError(e) => e.into(),
+            DriverAdapterError::PostgresError(e) => QuaintError::from(e),
+            DriverAdapterError::SqliteError(e) => QuaintError::from(e),
             // in future, more error types would be added and we'll need to convert them to proper QuaintErrors here
         }
     }
