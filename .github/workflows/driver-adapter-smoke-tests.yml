@@ -39,6 +39,10 @@ jobs:
       JS_NEON_DATABASE_URL: ${{ secrets.JS_NEON_DATABASE_URL }}
       JS_PLANETSCALE_DATABASE_URL: ${{ secrets.JS_PLANETSCALE_DATABASE_URL }}
       JS_PG_DATABASE_URL: postgres://postgres:postgres@localhost:5432/test # ${{ secrets.JS_PG_DATABASE_URL }}
+      # TODO: test sqld and embedded replicas
+      JS_LIBSQL_DATABASE_URL: file:/tmp/libsql.db
+      # TODO: test all three of ("number", "bigint", "string") and conditionally skip some tests as appropriate
+      JS_LIBSQL_INT_MODE: bigint
 
     steps:
       - uses: actions/checkout@v4
