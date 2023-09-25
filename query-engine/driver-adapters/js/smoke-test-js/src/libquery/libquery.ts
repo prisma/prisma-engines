@@ -1,4 +1,4 @@
-import { describe, it, before, after } from 'node:test'
+import { describe, it, before, after, beforeEach } from 'node:test'
 import assert from 'node:assert'
 import type { ErrorCapturingDriverAdapter } from '@prisma/driver-adapter-utils'
 import type { QueryEngineInstance } from '../engines/types/Library'
@@ -11,14 +11,29 @@ export function smokeTestLibquery(adapter: ErrorCapturingDriverAdapter, prismaSc
 
   const doQuery = createQueryFn(engine, adapter)
 
+  before(async (outerContext) => {
+    globalThis.testId = new Date().toISOString()
+    globalThis.names = []
+    // store outer describe name
+    globalThis.names[0] = outerContext.name
+  })
+
   describe('using libquery with Driver Adapters', () => {
-    before(async () => {
+    before(async (innerContext) => {
       await engine.connect('trace')
+
+      // store inner describe name
+      globalThis.names[1] = innerContext.name
     })
 
     after(async () => {
       await engine.disconnect('trace')
       await adapter.close()
+    })
+
+    beforeEach((testContext) => {
+      // store test name
+      globalThis.names[2] = testContext.name
     })
 
     it('create JSON values', async () => {

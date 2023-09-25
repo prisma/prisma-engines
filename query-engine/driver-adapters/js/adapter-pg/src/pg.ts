@@ -10,6 +10,9 @@ import type {
   TransactionOptions,
 } from '@prisma/driver-adapter-utils'
 import { fieldToColumnType } from './conversion'
+import { existsSync, createReadStream, promises as fsPromises } from 'fs';
+import { createInterface } from 'readline';
+import path from 'path';
 
 const debug = Debug('prisma:driver-adapter:pg')
 
@@ -56,6 +59,39 @@ class PgQueryable<ClientT extends StdClient | TransactionClient> implements Quer
     return ok(rowsAffected ?? 0)
   }
 
+  // Worst code ever :shrug: Thanks ChatGPT though!
+  private async readExpectedResponse(filePath: string, searchString: string): Promise<string> {
+    return new Promise<string>((resolve, reject) => {
+      if (!existsSync(filePath)) {
+        resolve("");
+        return;
+      }
+
+      const fileStream = createReadStream(filePath);
+      const rl = createInterface({
+        input: fileStream,
+      });
+  
+      let found = false;
+  
+      rl.on('line', (line) => {
+        if (found) {
+          rl.close();
+          resolve(line); // Resolve the promise with the found line
+        } else if (line.includes(searchString)) {
+          found = true;
+        }
+      });
+  
+      rl.on('close', () => {
+        if (!found) {
+          console.log('Search string not found in the file.');
+          reject(new Error(`Search string not found: ${searchString}, (${filePath})`));
+        }
+      });
+    });
+  }
+
   /**
    * Run a query against the database, returning the result set.
    * Should the query fail due to a connection error, the connection is
@@ -65,7 +101,24 @@ class PgQueryable<ClientT extends StdClient | TransactionClient> implements Quer
     const { sql, args: values } = query
 
     try {
-      const result = await this.client.query({ text: sql, values, rowMode: 'array' })
+      // const recordingFileName = `recordings/${globalThis.testId}-${globalThis.names.join("-")}.recording`;
+      const recordingFileName = path.resolve('recordings', `${globalThis.names.join("-").replace(/[\/:*?"<>|]/g, '_')}.recording`);
+      
+      let result: any = ""
+
+      let recordings = globalThis.recordings
+      //console.log({ recordings })
+
+      if(recordings == "read") {
+        let resultString = await this.readExpectedResponse(recordingFileName, sql)
+        // console.log("found this result: ", resultString)
+        result = JSON.parse(resultString)
+      } else if (recordings == "write") {
+        result = await this.client.query({ text: sql, values, rowMode: 'array' })
+
+        await fsPromises.appendFile(recordingFileName, sql + '\n' + JSON.stringify(result) + '\n\n', { flag: 'a' });      
+      }
+
       return result
     } catch (e) {
       const error = e as Error

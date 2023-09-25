@@ -26,12 +26,12 @@
     "pg:libquery": "cross-env-shell DATABASE_URL=\"${JS_PG_DATABASE_URL}\" node --test --test-reporter spec --loader=tsx ./src/libquery/pg.test.ts",
     "pg:client": "DATABASE_URL=\"${JS_PG_DATABASE_URL}\" node --test --test-reporter spec --loader=tsx ./src/client/pg.test.ts",
     "pg": "pnpm pg:libquery && pnpm pg:client",
-    "errors": "DATABASE_URL=\"${JS_PG_DATABASE_URL}\" node --test --test-reporter spec --loader=tsx ./src/libquery/errors.test.ts",
     "prisma:planetscale": "cross-env-shell DATABASE_URL=\"${JS_PLANETSCALE_DATABASE_URL}\" \"pnpm prisma:db:push:mysql && pnpm prisma:db:execute:mysql\"",
     "studio:planetscale": "cross-env-shell DATABASE_URL=\"${JS_PLANETSCALE_DATABASE_URL}\" \"pnpm prisma:studio:mysql\"",
     "planetscale:libquery": "DATABASE_URL=\"${JS_PLANETSCALE_DATABASE_URL}\" node --test --test-reporter spec --loader=tsx ./src/libquery/planetscale.test.ts",
     "planetscale:client": "DATABASE_URL=\"${JS_PLANETSCALE_DATABASE_URL}\" node --test --test-reporter spec --loader=tsx ./src/client/planetscale.test.ts",
-    "planetscale": "pnpm planetscale:libquery && pnpm planetscale:client"
+    "planetscale": "pnpm planetscale:libquery && pnpm planetscale:client",
+    "errors": "DATABASE_URL=\"${JS_PG_DATABASE_URL}\" node --test --test-reporter spec --loader=tsx ./src/libquery/errors.test.ts"
   },
   "keywords": [],
   "author": "Alberto Schiabel <schiabel@prisma.io>",
@@ -43,7 +43,7 @@
     "@prisma/adapter-neon": "workspace:*",
     "@prisma/adapter-pg": "workspace:*",
     "@prisma/adapter-planetscale": "workspace:*",
-    "@prisma/client": "5.4.0-dev.29",
+    "@prisma/client": "5.4.0-dev.31",
     "@prisma/driver-adapter-utils": "workspace:*",
     "pg": "^8.11.3",
     "superjson": "^1.13.1",
@@ -53,7 +53,7 @@
     "@types/node": "^20.5.1",
     "@types/pg": "^8.10.2",
     "cross-env": "^7.0.3",
-    "prisma": "5.4.0-dev.29",
+    "prisma": "5.4.0-dev.31",
     "tsx": "^3.12.7"
   }
 }
