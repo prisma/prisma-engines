@@ -45,7 +45,7 @@ pub(crate) fn params_to_types(params: &[Value<'_>]) -> Vec<PostgresType> {
                 Value::Double(_) => PostgresType::FLOAT8,
                 Value::Text(_) => PostgresType::TEXT,
                 // Enums are special types, we can't statically infer them, so we let PG infer it
-                Value::Enum(_) => PostgresType::UNKNOWN,
+                Value::Enum(_, _) => PostgresType::UNKNOWN,
                 Value::Bytes(_) => PostgresType::BYTEA,
                 Value::Boolean(_) => PostgresType::BOOL,
                 Value::Char(_) => PostgresType::CHAR,
@@ -83,7 +83,7 @@ pub(crate) fn params_to_types(params: &[Value<'_>]) -> Vec<PostgresType> {
                         Value::Double(_) => PostgresType::FLOAT8_ARRAY,
                         Value::Text(_) => PostgresType::TEXT_ARRAY,
                         // Enums are special types, we can't statically infer them, so we let PG infer it
-                        Value::Enum(_) => PostgresType::UNKNOWN,
+                        Value::Enum(_, _) => PostgresType::UNKNOWN,
                         Value::Bytes(_) => PostgresType::BYTEA_ARRAY,
                         Value::Boolean(_) => PostgresType::BOOL_ARRAY,
                         Value::Char(_) => PostgresType::CHAR_ARRAY,
@@ -525,13 +525,13 @@ impl GetRow for PostgresRow {
 
                             Value::enum_variant(val.value)
                         }
-                        None => Value::Enum(None),
+                        None => Value::Enum(None, None),
                     },
                     Kind::Array(inner) => match inner.kind() {
                         Kind::Enum => match row.try_get(i)? {
                             Some(val) => {
                                 let val: Vec<Option<EnumString>> = val;
-                                let variants = val.into_iter().map(|x| Value::Enum(x.map(|x| x.value.into())));
+                                let variants = val.into_iter().map(|x| Value::Enum(x.map(|x| x.value.into()), None));
 
                                 Ok(Value::array(variants))
                             }
@@ -839,7 +839,7 @@ impl<'a> ToSql for Value<'a> {
                 })
             }
             (Value::Bytes(bytes), _) => bytes.as_ref().map(|bytes| bytes.as_ref().to_sql(ty, out)),
-            (Value::Enum(string), _) => string.as_ref().map(|string| {
+            (Value::Enum(string, _), _) => string.as_ref().map(|string| {
                 out.extend_from_slice(string.as_bytes());
                 Ok(IsNull::No)
             }),

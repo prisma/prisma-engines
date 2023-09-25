@@ -26,7 +26,7 @@ pub fn conv_params(params: &[Value<'_>]) -> crate::Result<my::Params> {
                 Value::Double(f) => f.map(my::Value::Double),
                 Value::Text(s) => s.clone().map(|s| my::Value::Bytes((*s).as_bytes().to_vec())),
                 Value::Bytes(bytes) => bytes.clone().map(|bytes| my::Value::Bytes(bytes.into_owned())),
-                Value::Enum(s) => s.clone().map(|s| my::Value::Bytes((*s).as_bytes().to_vec())),
+                Value::Enum(s, _) => s.clone().map(|s| my::Value::Bytes((*s).as_bytes().to_vec())),
                 Value::Boolean(b) => b.map(|b| my::Value::Int(b as i64)),
                 Value::Char(c) => c.map(|c| my::Value::Bytes(vec![c as u8])),
                 Value::Xml(s) => s.as_ref().map(|s| my::Value::Bytes((s).as_bytes().to_vec())),
@@ -304,7 +304,7 @@ impl TakeRow for my::Row {
                 }
                 my::Value::NULL => match column {
                     t if t.is_bool() => Value::Boolean(None),
-                    t if t.is_enum() => Value::Enum(None),
+                    t if t.is_enum() => Value::Enum(None, None),
                     t if t.is_null() => Value::Int32(None),
                     t if t.is_int64() => Value::Int64(None),
                     t if t.is_int32() => Value::Int32(None),

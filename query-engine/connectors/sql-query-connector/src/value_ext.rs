@@ -17,7 +17,7 @@ impl<'a> IntoTypedJsonExtension for quaint::Value<'a> {
             quaint::Value::Float(_) => "float",
             quaint::Value::Double(_) => "double",
             quaint::Value::Text(_) => "string",
-            quaint::Value::Enum(_) => "enum",
+            quaint::Value::Enum(_, _) => "enum",
             quaint::Value::Bytes(_) => "bytes",
             quaint::Value::Boolean(_) => "bool",
             quaint::Value::Char(_) => "char",

@@ -33,7 +33,7 @@ pub fn to_prisma_value(quaint_value: Value<'_>) -> crate::Result<PrismaValue> {
             .map(|s| PrismaValue::String(s.into_owned()))
             .unwrap_or(PrismaValue::Null),
 
-        Value::Enum(s) => s
+        Value::Enum(s, _) => s
             .map(|s| PrismaValue::Enum(s.into_owned()))
             .unwrap_or(PrismaValue::Null),
 

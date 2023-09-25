@@ -136,7 +136,7 @@ impl<'a> Visitor<'a> for Mysql<'a> {
                 v => self.write(format!("{v:?}")),
             }),
             Value::Text(t) => t.map(|t| self.write(format!("'{t}'"))),
-            Value::Enum(e) => e.map(|e| self.write(e)),
+            Value::Enum(e, _) => e.map(|e| self.write(e)),
             Value::Bytes(b) => b.map(|b| self.write(format!("x'{}'", hex::encode(b)))),
             Value::Boolean(b) => b.map(|b| self.write(b)),
             Value::Char(c) => c.map(|c| self.write(format!("'{c}'"))),

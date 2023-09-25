@@ -47,6 +47,51 @@ impl<'a> Visitor<'a> for Postgres<'a> {
         self.write(self.parameters.len())
     }
 
+    fn visit_parameterized_enum(&mut self, val: Value<'a>) -> visitor::Result {
+        let (enum_val, enum_name) = val.into_enum().unwrap();
+
+        self.add_parameter(Value::Text(Some(enum_val)));
+
+        // Since enums are user-defined custom types, tokio-postgres fires an additional query
+        // when parameterizing values of type enum to know which custom type the value refers to.
+        // Casting the enum value to `TEXT` avoid this roundtrip since `TEXT` is a builtin type.
+        if let Some(enum_name) = enum_name {
+            self.surround_with("CAST(", ")", |ref mut s| {
+                s.parameter_substitution()?;
+                s.write("::text")?;
+                s.write(" AS ")?;
+                s.surround_with(Self::C_BACKTICK_OPEN, Self::C_BACKTICK_CLOSE, |ref mut s| {
+                    s.write(enum_name)
+                })
+            })?;
+        }
+
+        Ok(())
+    }
+
+    /// A database column identifier
+    fn visit_column(&mut self, column: Column<'a>) -> visitor::Result {
+        match column.table {
+            Some(table) => {
+                self.visit_table(table, false)?;
+                self.write(".")?;
+                self.delimited_identifiers(&[&*column.name])?;
+            }
+            _ => self.delimited_identifiers(&[&*column.name])?,
+        };
+
+        if column.is_enum && column.should_cast_enum_to_text {
+            self.write("::text")?;
+        }
+
+        if let Some(alias) = column.alias {
+            self.write(" AS ")?;
+            self.delimited_identifiers(&[&*alias])?;
+        }
+
+        Ok(())
+    }
+
     fn visit_limit_and_offset(&mut self, limit: Option<Value<'a>>, offset: Option<Value<'a>>) -> visitor::Result {
         match (limit, offset) {
             (Some(limit), Some(offset)) => {
@@ -73,7 +118,7 @@ impl<'a> Visitor<'a> for Postgres<'a> {
             Value::Int32(i) => i.map(|i| self.write(i)),
             Value::Int64(i) => i.map(|i| self.write(i)),
             Value::Text(t) => t.map(|t| self.write(format!("'{t}'"))),
-            Value::Enum(e) => e.map(|e| self.write(e)),
+            Value::Enum(e, _) => e.map(|e| self.write(e)),
             Value::Bytes(b) => b.map(|b| self.write(format!("E'{}'", hex::encode(b)))),
             Value::Boolean(b) => b.map(|b| self.write(b)),
             Value::Xml(cow) => cow.map(|cow| self.write(format!("'{cow}'"))),

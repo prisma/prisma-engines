@@ -148,10 +148,18 @@ pub trait Visitor<'a> {
     #[cfg(any(feature = "postgresql", feature = "mysql"))]
     fn visit_text_search_relevance(&mut self, text_search_relevance: TextSearchRelevance<'a>) -> Result;
 
+    fn visit_parameterized_enum(&mut self, value: Value<'a>) -> Result {
+        self.visit_parameterized(value)
+    }
+
     /// A visit to a value we parameterize
     fn visit_parameterized(&mut self, value: Value<'a>) -> Result {
-        self.add_parameter(value);
-        self.parameter_substitution()
+        if value.is_enum() {
+            self.visit_parameterized_enum(value)
+        } else {
+            self.add_parameter(value);
+            self.parameter_substitution()
+        }
     }
 
     /// The join statements in the query

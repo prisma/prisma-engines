@@ -50,7 +50,8 @@ pub enum Value<'a> {
     /// String value.
     Text(Option<Cow<'a, str>>),
     /// Database enum value.
-    Enum(Option<Cow<'a, str>>),
+    /// (<enum_value>        , <enum_name>         )
+    Enum(Option<Cow<'a, str>>, Option<Cow<'a, str>>),
     /// Bytes value.
     Bytes(Option<Cow<'a, [u8]>>),
     /// Boolean value.
@@ -106,7 +107,7 @@ impl<'a> fmt::Display for Value<'a> {
             Value::Double(val) => val.map(|v| write!(f, "{v}")),
             Value::Text(val) => val.as_ref().map(|v| write!(f, "\"{v}\"")),
             Value::Bytes(val) => val.as_ref().map(|v| write!(f, "<{} bytes blob>", v.len())),
-            Value::Enum(val) => val.as_ref().map(|v| write!(f, "\"{v}\"")),
+            Value::Enum(val, _) => val.as_ref().map(|v| write!(f, "\"{v}\"")),
             Value::Boolean(val) => val.map(|v| write!(f, "{v}")),
             Value::Char(val) => val.map(|v| write!(f, "'{v}'")),
             Value::Array(vals) => vals.as_ref().map(|vals| {
@@ -155,7 +156,7 @@ impl<'a> From<Value<'a>> for serde_json::Value {
             }),
             Value::Text(cow) => cow.map(|cow| serde_json::Value::String(cow.into_owned())),
             Value::Bytes(bytes) => bytes.map(|bytes| serde_json::Value::String(base64::encode(bytes))),
-            Value::Enum(cow) => cow.map(|cow| serde_json::Value::String(cow.into_owned())),
+            Value::Enum(cow, _) => cow.map(|cow| serde_json::Value::String(cow.into_owned())),
             Value::Boolean(b) => b.map(serde_json::Value::Bool),
             Value::Char(c) => c.map(|c| {
                 let bytes = [c as u8];
@@ -240,7 +241,16 @@ impl<'a> Value<'a> {
     where
         T: Into<Cow<'a, str>>,
     {
-        Value::Enum(Some(value.into()))
+        Value::Enum(Some(value.into()), None)
+    }
+
+    /// Creates a new enum value with the name of the enum attached.
+    pub fn enum_variant_with_name<T, U>(value: T, name: U) -> Self
+    where
+        T: Into<Cow<'a, str>>,
+        U: Into<Cow<'a, str>>,
+    {
+        Value::Enum(Some(value.into()), Some(name.into()))
     }
 
     /// Creates a new bytes value.
@@ -319,7 +329,7 @@ impl<'a> Value<'a> {
             Value::Float(i) => i.is_none(),
             Value::Double(i) => i.is_none(),
             Value::Text(t) => t.is_none(),
-            Value::Enum(e) => e.is_none(),
+            Value::Enum(e, _) => e.is_none(),
             Value::Bytes(b) => b.is_none(),
             Value::Boolean(b) => b.is_none(),
             Value::Char(c) => c.is_none(),
@@ -591,6 +601,14 @@ impl<'a> Value<'a> {
         }
     }
 
+    /// Transforms to a Enum Value if of Enum type, otherwise `None`.
+    pub fn into_enum(self) -> Option<(Cow<'a, str>, Option<Cow<'a, str>>)> {
+        match self {
+            Value::Enum(Some(j), name) => Some((j, name)),
+            _ => None,
+        }
+    }
+
     /// Returns a `Vec<T>` if the value is an array of `T`, otherwise `None`.
     pub fn into_vec<T>(self) -> Option<Vec<T>>
     where
@@ -624,6 +642,11 @@ impl<'a> Value<'a> {
             }
             _ => None,
         }
+    }
+
+    /// Returns `true` if the value is [`Enum`].
+    pub fn is_enum(&self) -> bool {
+        matches!(self, Self::Enum(..))
     }
 }
 

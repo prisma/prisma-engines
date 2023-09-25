@@ -18,6 +18,11 @@ impl ScalarFieldExt for ScalarField {
             (PrismaValue::Float(f), _) => f.into(),
             (PrismaValue::Boolean(b), _) => b.into(),
             (PrismaValue::DateTime(d), _) => d.with_timezone(&Utc).into(),
+            (PrismaValue::Enum(e), TypeIdentifier::Enum(enum_id)) => {
+                let enum_walker = self.dm.clone().zip(enum_id);
+
+                Value::enum_variant_with_name(e, enum_walker.db_name().to_owned())
+            }
             (PrismaValue::Enum(e), _) => e.into(),
             (PrismaValue::Int(i), _) => i.into(),
             (PrismaValue::BigInt(i), _) => i.into(),
@@ -31,7 +36,11 @@ impl ScalarFieldExt for ScalarField {
                 TypeIdentifier::Float => Value::Numeric(None),
                 TypeIdentifier::Decimal => Value::Numeric(None),
                 TypeIdentifier::Boolean => Value::Boolean(None),
-                TypeIdentifier::Enum(_) => Value::Enum(None),
+                TypeIdentifier::Enum(enum_id) => {
+                    let enum_walker = self.dm.clone().zip(enum_id);
+
+                    Value::Enum(None, Some(enum_walker.db_name().to_owned().into()))
+                }
                 TypeIdentifier::Json => Value::Json(None),
                 TypeIdentifier::DateTime => Value::DateTime(None),
                 TypeIdentifier::UUID => Value::Uuid(None),

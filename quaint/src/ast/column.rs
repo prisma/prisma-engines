@@ -32,6 +32,8 @@ pub struct Column<'a> {
     pub(crate) alias: Option<Cow<'a, str>>,
     pub(crate) default: Option<DefaultValue<'a>>,
     pub(crate) type_family: Option<TypeFamily>,
+    pub(crate) is_enum: bool,
+    pub(crate) should_cast_enum_to_text: bool,
 }
 
 /// Defines a default value for a `Column`.
@@ -86,6 +88,22 @@ impl<'a> Column<'a> {
     /// Sets a type family, used mainly for SQL Server `OUTPUT` hack.
     pub fn type_family(mut self, type_family: TypeFamily) -> Self {
         self.type_family = Some(type_family);
+        self
+    }
+
+    /// Sets whether the column points to an enum type.
+    pub fn set_is_enum(mut self, is_enum: bool) -> Self {
+        self.is_enum = is_enum;
+        self
+    }
+
+    /// On Postgres, sets whether the column should be casted to `TEXT` when rendered.
+    ///
+    /// Since enums are user-defined custom types, tokio-postgres fires an additional query
+    /// when selecting columns of type enum to know which custom type the column refers to.
+    /// Casting the enum column to `TEXT` avoid this roundtrip since `TEXT` is a builtin type.
+    pub fn should_cast_enum_to_text(mut self, should: bool) -> Self {
+        self.should_cast_enum_to_text = should;
         self
     }
 

@@ -17,7 +17,7 @@ impl<'a> IntoSql<'a> for &'a Value<'a> {
             Value::Double(val) => val.into_sql(),
             Value::Text(val) => val.as_deref().into_sql(),
             Value::Bytes(val) => val.as_deref().into_sql(),
-            Value::Enum(val) => val.as_deref().into_sql(),
+            Value::Enum(val, _) => val.as_deref().into_sql(),
             Value::Boolean(val) => val.into_sql(),
             Value::Char(val) => val.as_ref().map(|val| format!("{val}")).into_sql(),
             Value::Xml(val) => val.as_deref().into_sql(),

@@ -326,7 +326,7 @@ impl<'a> Visitor<'a> for Mssql<'a> {
                 v => self.write(format!("{v:?}")),
             }),
             Value::Text(t) => t.map(|t| self.write(format!("'{t}'"))),
-            Value::Enum(e) => e.map(|e| self.write(e)),
+            Value::Enum(e, _) => e.map(|e| self.write(e)),
             Value::Bytes(b) => b.map(|b| self.write(format!("0x{}", hex::encode(b)))),
             Value::Boolean(b) => b.map(|b| self.write(if b { 1 } else { 0 })),
             Value::Char(c) => c.map(|c| self.write(format!("'{c}'"))),
