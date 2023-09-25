@@ -32,10 +32,22 @@ impl ExecutorProcess {
     fn new() -> Result<ExecutorProcess> {
         let (sender, receiver) = mpsc::channel::<ReqImpl>(300);
 
-        std::thread::spawn(|| match start_rpc_thread(receiver) {
+        let handle = std::thread::spawn(|| match start_rpc_thread(receiver) {
             Ok(()) => (),
             Err(err) => {
                 exit_with_message(1, &err.to_string());
+            }
+        });
+
+        std::thread::spawn(move || {
+            if let Err(e) = handle.join() {
+                exit_with_message(
+                    1,
+                    &format!(
+                        "rpc thread panicked with: {}",
+                        e.downcast::<String>().unwrap_or_default()
+                    ),
+                );
             }
         });
 
