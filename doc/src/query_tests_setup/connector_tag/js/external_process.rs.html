@@ -168,6 +168,21 @@
 <a href="#168" id="168">168</a>
 <a href="#169" id="169">169</a>
 <a href="#170" id="170">170</a>
+<a href="#171" id="171">171</a>
+<a href="#172" id="172">172</a>
+<a href="#173" id="173">173</a>
+<a href="#174" id="174">174</a>
+<a href="#175" id="175">175</a>
+<a href="#176" id="176">176</a>
+<a href="#177" id="177">177</a>
+<a href="#178" id="178">178</a>
+<a href="#179" id="179">179</a>
+<a href="#180" id="180">180</a>
+<a href="#181" id="181">181</a>
+<a href="#182" id="182">182</a>
+<a href="#183" id="183">183</a>
+<a href="#184" id="184">184</a>
+<a href="#185" id="185">185</a>
 </pre></div><pre class="rust"><code><span class="kw">use super</span>::<span class="kw-2">*</span>;
 <span class="kw">use </span>once_cell::sync::Lazy;
 <span class="kw">use </span>serde::de::DeserializeOwned;
@@ -202,10 +217,22 @@
     <span class="kw">fn </span>new() -&gt; <span class="prelude-ty">Result</span>&lt;ExecutorProcess&gt; {
         <span class="kw">let </span>(sender, receiver) = mpsc::channel::&lt;ReqImpl&gt;(<span class="number">300</span>);
 
-        std::thread::spawn(|| <span class="kw">match </span>start_rpc_thread(receiver) {
+        <span class="kw">let </span>handle = std::thread::spawn(|| <span class="kw">match </span>start_rpc_thread(receiver) {
             <span class="prelude-val">Ok</span>(()) =&gt; (),
             <span class="prelude-val">Err</span>(err) =&gt; {
                 exit_with_message(<span class="number">1</span>, <span class="kw-2">&amp;</span>err.to_string());
+            }
+        });
+
+        std::thread::spawn(<span class="kw">move </span>|| {
+            <span class="kw">if let </span><span class="prelude-val">Err</span>(e) = handle.join() {
+                exit_with_message(
+                    <span class="number">1</span>,
+                    <span class="kw-2">&amp;</span><span class="macro">format!</span>(
+                        <span class="string">&quot;rpc thread panicked with: {}&quot;</span>,
+                        e.downcast::&lt;String&gt;().unwrap_or_default()
+                    ),
+                );
             }
         });
 
@@ -295,7 +322,10 @@
                                         <span class="kw">let </span>sender = pending_requests.remove(response.id()).unwrap();
                                         <span class="kw">match </span>response {
                                             jsonrpc_core::Output::Success(success) =&gt; {
-                                                sender.send(success.result).unwrap();
+                                                <span class="comment">// The other end may be dropped if the whole
+                                                // request future was dropped and not polled to
+                                                // completion, so we ignore send errors here.
+                                                </span><span class="kw">_ </span>= sender.send(success.result);
                                             }
                                             jsonrpc_core::Output::Failure(err) =&gt; {
                                                 <span class="macro">panic!</span>(<span class="string">&quot;error response from jsonrpc: {err:?}&quot;</span>)
