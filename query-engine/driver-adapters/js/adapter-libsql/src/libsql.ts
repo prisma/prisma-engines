@@ -63,13 +63,15 @@ class LibSqlQueryable<ClientT extends StdClient | TransactionClient> implements 
     try {
       return ok(await this.client.execute(query as InStatement))
     } catch (e) {
-      debug('Error in performIO: %O', error)
+      console.error('💥 Error in performIO: %O', e)
       if (e && e.code) {
         return err({
           kind: 'SqliteError',
           code: e.code,
           message: e.message,
         })
+      } else {
+        console.error('❌ Error in performIO: %O. Missing code', e)
       }
       throw e
     }
