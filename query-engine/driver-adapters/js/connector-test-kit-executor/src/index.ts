@@ -126,7 +126,7 @@ async function handleRequest(method: string, params: unknown): Promise<unknown> 
                 options: unknown
             }
 
-            debug("Got `startTx", params)
+            debug("Got `startTx`", params)
             const {schemaId, options} = params as StartTxPayload
             const result = await state[schemaId].engine.startTransaction(JSON.stringify(options), "")
             return JSON.parse(result)
@@ -138,7 +138,7 @@ async function handleRequest(method: string, params: unknown): Promise<unknown> 
                 txId: string,
             }
 
-            debug("Got `commitTx", params)
+            debug("Got `commitTx`", params)
             const {schemaId, txId} = params as CommitTxPayload
             const result = await state[schemaId].engine.commitTransaction(txId, '{}')
             return JSON.parse(result)
@@ -150,7 +150,7 @@ async function handleRequest(method: string, params: unknown): Promise<unknown> 
                 txId: string,
             }
 
-            debug("Got `rollbackTx", params)
+            debug("Got `rollbackTx`", params)
             const {schemaId, txId} = params as RollbackTxPayload
             const result = await state[schemaId].engine.rollbackTransaction(txId, '{}')
             return JSON.parse(result)
@@ -160,7 +160,7 @@ async function handleRequest(method: string, params: unknown): Promise<unknown> 
                 schemaId: number
             }
 
-            debug("Got `teardown", params)
+            debug("Got `teardown`", params)
             const castParams = params as TeardownPayload;
             await state[castParams.schemaId].engine.disconnect("")
             delete state[castParams.schemaId]
