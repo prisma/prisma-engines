@@ -344,6 +344,8 @@ mod occ {
 
         let res = runner.query(delete_many_resource).await.unwrap().to_json_value();
 
+        println!(r#"res: {}"#, &res);
+
         res["data"]["deleteManyResource"]["count"].as_u64().unwrap()
     }
 
