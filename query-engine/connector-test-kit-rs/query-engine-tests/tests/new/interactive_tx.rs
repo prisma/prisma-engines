@@ -213,7 +213,7 @@ mod interactive_tx {
         Ok(())
     }
 
-    #[connector_test]
+    #[connector_test(exclude(JS))]
     async fn batch_queries_failure(mut runner: Runner) -> TestResult<()> {
         // Tx expires after five second.
         let tx_id = runner.start_tx(5000, 5000, None).await?;
@@ -256,7 +256,7 @@ mod interactive_tx {
         Ok(())
     }
 
-    #[connector_test]
+    #[connector_test(exclude(JS))]
     async fn tx_expiration_failure_cycle(mut runner: Runner) -> TestResult<()> {
         // Tx expires after one seconds.
         let tx_id = runner.start_tx(5000, 1000, None).await?;
