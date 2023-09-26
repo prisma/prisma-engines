@@ -117,7 +117,7 @@ where
 {
     let (select, additional_selection_set) = query.into_select(model, aggr_selections, ctx);
     let select = columns
-        .map(|c| c.should_cast_enum_to_text(true))
+        .map(|c| c.set_is_selected(true))
         .fold(select, |acc, col| acc.column(col));
 
     let select = select.append_trace(&Span::current()).add_trace_id(ctx.trace_id);
@@ -212,7 +212,7 @@ pub(crate) fn group_by_aggregate(
     let (base_query, _) = args.into_select(model, &[], ctx);
 
     let select_query = selections.iter().fold(base_query, |select, next_op| match next_op {
-        AggregationSelection::Field(field) => select.column(field.as_column(ctx).should_cast_enum_to_text(true)),
+        AggregationSelection::Field(field) => select.column(field.as_column(ctx).set_is_selected(true)),
 
         AggregationSelection::Count { all, fields } => {
             let select = fields.iter().fold(select, |select, next_field| {

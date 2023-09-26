@@ -32,9 +32,12 @@ pub struct Column<'a> {
     pub(crate) alias: Option<Cow<'a, str>>,
     pub(crate) default: Option<DefaultValue<'a>>,
     pub(crate) type_family: Option<TypeFamily>,
+    /// Whether the column is an enum.
     pub(crate) is_enum: bool,
+    /// Whether the column is a (scalar) list.
     pub(crate) is_list: bool,
-    pub(crate) should_cast_enum_to_text: bool,
+    /// Whether the column is part of a SELECT or RETURNING clause.
+    pub(crate) is_selected: bool,
 }
 
 /// Defines a default value for a `Column`.
@@ -104,13 +107,18 @@ impl<'a> Column<'a> {
         self
     }
 
-    /// On Postgres, sets whether the column should be casted to `TEXT` when rendered.
+    /// Sets whether the column is selected.
     ///
-    /// Since enums are user-defined custom types, tokio-postgres fires an additional query
+    /// On Postgres, this defines whether an enum column should be casted to `TEXT` when rendered.
+    /// 
+    /// Since enums are user-defined custom types, `tokio-postgres` fires an additional query
     /// when selecting columns of type enum to know which custom type the column refers to.
     /// Casting the enum column to `TEXT` avoid this roundtrip since `TEXT` is a builtin type.
-    pub fn should_cast_enum_to_text(mut self, should: bool) -> Self {
-        self.should_cast_enum_to_text = should;
+    ///
+    /// We don't want to cast every single enum columns to text though, as this would prevent indexes from being used,
+    /// so we use this additional field to granularly pick which columns we cast.
+    pub fn set_is_selected(mut self, is_selected: bool) -> Self {
+        self.is_selected = is_selected;
         self
     }
 

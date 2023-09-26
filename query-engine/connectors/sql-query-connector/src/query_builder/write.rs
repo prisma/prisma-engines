@@ -32,11 +32,7 @@ pub(crate) fn create_record(
         });
 
     Insert::from(insert)
-        .returning(
-            selected_fields
-                .as_columns(ctx)
-                .map(|c| c.should_cast_enum_to_text(true)),
-        )
+        .returning(selected_fields.as_columns(ctx).map(|c| c.set_is_selected(true)))
         .append_trace(&Span::current())
         .add_trace_id(ctx.trace_id)
 }
@@ -168,11 +164,7 @@ pub(crate) fn build_update_and_set_query(
     let query = query.append_trace(&Span::current()).add_trace_id(ctx.trace_id);
 
     let query = if let Some(selected_fields) = selected_fields {
-        query.returning(
-            selected_fields
-                .as_columns(ctx)
-                .map(|c| c.should_cast_enum_to_text(true)),
-        )
+        query.returning(selected_fields.as_columns(ctx).map(|c| c.set_is_selected(true)))
     } else {
         query
     };

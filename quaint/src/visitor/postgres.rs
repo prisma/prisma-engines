@@ -121,7 +121,7 @@ impl<'a> Visitor<'a> for Postgres<'a> {
             _ => self.delimited_identifiers(&[&*column.name])?,
         };
 
-        if column.is_enum && column.should_cast_enum_to_text {
+        if column.is_enum && column.is_selected {
             if column.is_list {
                 self.write("::text[]")?;
             } else {

@@ -628,30 +628,6 @@ impl<'a> Value<'a> {
         }
     }
 
-    /// Transforms to a Enum Value if of Enum type, otherwise `None`.
-    pub fn into_enum(self) -> Option<(EnumVariant<'a>, Option<EnumName<'a>>)> {
-        match self {
-            Value::Enum(Some(j), name) => Some((j, name)),
-            _ => None,
-        }
-    }
-
-    /// Transforms to a Enum Value if of Enum type, otherwise `None`.
-    pub fn as_enum(&self) -> Option<(&EnumVariant<'a>, &Option<EnumName<'a>>)> {
-        match self {
-            Value::Enum(Some(j), name) => Some((j, name)),
-            _ => None,
-        }
-    }
-
-    /// Transforms to a Array Value if of Array type, otherwise `None`.
-    pub fn into_array(self) -> Option<Vec<Value<'a>>> {
-        match self {
-            Value::Array(Some(vals)) => Some(vals),
-            _ => None,
-        }
-    }
-
     /// Returns a `Vec<T>` if the value is an array of `T`, otherwise `None`.
     pub fn into_vec<T>(self) -> Option<Vec<T>>
     where
@@ -685,11 +661,6 @@ impl<'a> Value<'a> {
             }
             _ => None,
         }
-    }
-
-    /// Returns `true` if the value is [`Enum`].
-    pub fn is_enum(&self) -> bool {
-        matches!(self, Self::Enum(..))
     }
 }
 
