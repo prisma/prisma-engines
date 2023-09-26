@@ -45,6 +45,8 @@ jobs:
           cache: 'pnpm'
           cache-dependency-path: 'query-engine/driver-adapters/js/pnpm-lock.yaml'
 
+      - uses: dcarbone/install-jq-action
+
       - name: Install dependencies
         run: pnpm i --prefer-offline
         working-directory: query-engine/driver-adapters/js
@@ -65,20 +67,11 @@ jobs:
         run: echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}" > ./.npmrc
         working-directory: query-engine/driver-adapters/js
 
-      - name: Create and publish versions
-        uses: changesets/action@v1
+      - name: Publish new version
+        run: |
+          ./version.sh ${{ github.event.inputs.enginesWrapperVersion }}
+          pnpm publish --dry-run -r --access public --tag ${{ github.event.inputs.npmDistTag }}
         working-directory: query-engine/driver-adapters/js
-        with:
-          version: ${{ github.event.inputs.enginesWrapperVersion }})
-          commit: "chore(driver-adapters): update versions"
-          title: "chore(driver-adapters): update versions"
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Publish
-        if: steps.changesets.outputs.hasChangesets == 'false'
-        working-directory: query-engine/driver-adapters/js
-        run: pnpm publish --dry-run -r --access public --tag ${{ github.event.inputs.npmDistTag }}
 
       #
       # Failure handlers
