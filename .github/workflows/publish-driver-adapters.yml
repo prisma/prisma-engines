@@ -21,7 +21,8 @@ jobs:
     timeout-minutes: 10
     defaults:
       run:
-        working-directory: ./query-engine/driver-adapters/js
+        # Note: the cwd only applies to "run" steps
+        working_directory: $(pwd)/query-engine/driver-adapters/js
     steps:
       - name: Print input
         env:
@@ -39,6 +40,7 @@ jobs:
           run_install: false
 
       - uses: actions/setup-node@v3
+        working_directory: query-engine/driver-adapters/js
         with:
           node-version: "18.x"
           cache: 'pnpm'
@@ -62,12 +64,13 @@ jobs:
         run: echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}" > ./.npmrc
 
       - name: Create and publish versions
+        working_directory: query-engine/driver-adapters/js
         uses: changesets/action@v1
         with:
           version: ${{ github.event.inputs.enginesWrapperVersion }})
           commit: "chore(driver-adapters): update versions"
           title: "chore(driver-adapters): update versions"
-          publish: pnpm publish -r --access public --tag ${{ github.event.inputs.npmDistTag }}
+          publish: pnpm publish --dry-run -r --access public --tag ${{ github.event.inputs.npmDistTag }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -79,10 +82,10 @@ jobs:
         if: ${{ failure() }}
         run: echo "SLACK_FOOTER=<$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID|Click here to go to the job logs>" >> $GITHUB_ENV
 
-      - name: Slack Notification on Failure
-        if: ${{ failure() }}
-        uses: rtCamp/action-slack-notify@v2.2.1
-        env:
-          SLACK_TITLE: "prisma-schema-wasm publishing failed :x:"
-          SLACK_COLOR: "#FF0000"
-          SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK_DRIVER_ADAPTERS_FAILING }}
+      # - name: Slack Notification on Failure
+      #   if: ${{ failure() }}
+      #   uses: rtCamp/action-slack-notify@v2.2.1
+      #   env:
+      #     SLACK_TITLE: "prisma-schema-wasm publishing failed :x:"
+      #     SLACK_COLOR: "#FF0000"
+      #     SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK_DRIVER_ADAPTERS_FAILING }}
