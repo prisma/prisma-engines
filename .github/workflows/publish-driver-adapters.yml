@@ -45,9 +45,6 @@ jobs:
           cache: 'pnpm'
           cache-dependency-path: 'query-engine/driver-adapters/js/pnpm-lock.yaml'
 
-      - name: Instal jq
-        run:  sudo apt-get install jq
-
       - name: Install dependencies
         run: pnpm i --prefer-offline
         working-directory: query-engine/driver-adapters/js
