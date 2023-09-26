@@ -68,7 +68,7 @@ jobs:
       - name: Publish new version
         run: |
           ./version.sh ${{ github.event.inputs.enginesWrapperVersion }}
-          pnpm publish --dry-run -r --access public --tag ${{ github.event.inputs.npmDistTag }}
+          pnpm publish --dry-run -r --no-git-checks --access public --tag ${{ github.event.inputs.npmDistTag }}
         working-directory: query-engine/driver-adapters/js
 
       #
