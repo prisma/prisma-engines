@@ -500,9 +500,10 @@ mod update {
           query_number_operation(&runner, "1", "optFloat", "increment", "4.6").await?,
           @r###"{"data":{"updateOneTestModel":{"optFloat":null}}}"###
         );
-        insta::assert_snapshot!(
-          query_number_operation(&runner, "2", "optFloat", "increment", "4.6").await?,
-          @r###"{"data":{"updateOneTestModel":{"optFloat":10.1}}}"###
+        assert_approximate_float!(
+            query_number_operation(&runner, "2", "optFloat", "increment", "4.6").await?,
+            &["data", "updateOneTestModel", "optFloat"],
+            10.1
         );
 
         // Decrement
@@ -510,9 +511,10 @@ mod update {
           query_number_operation(&runner, "1", "optFloat", "decrement", "4.6").await?,
           @r###"{"data":{"updateOneTestModel":{"optFloat":null}}}"###
         );
-        insta::assert_snapshot!(
-          query_number_operation(&runner, "2", "optFloat", "decrement", "4.6").await?,
-          @r###"{"data":{"updateOneTestModel":{"optFloat":5.5}}}"###
+        assert_approximate_float!(
+            query_number_operation(&runner, "2", "optFloat", "decrement", "4.6").await?,
+            &["data", "updateOneTestModel", "optFloat"],
+            5.5
         );
 
         // Multiply
@@ -520,9 +522,10 @@ mod update {
           query_number_operation(&runner, "1", "optFloat", "multiply", "2").await?,
           @r###"{"data":{"updateOneTestModel":{"optFloat":null}}}"###
         );
-        insta::assert_snapshot!(
-          query_number_operation(&runner, "2", "optFloat", "multiply", "2").await?,
-          @r###"{"data":{"updateOneTestModel":{"optFloat":11.0}}}"###
+        assert_approximate_float!(
+            query_number_operation(&runner, "2", "optFloat", "multiply", "2").await?,
+            &["data", "updateOneTestModel", "optFloat"],
+            11.0
         );
 
         // Divide
@@ -530,19 +533,22 @@ mod update {
           query_number_operation(&runner, "1", "optFloat", "divide", "2").await?,
           @r###"{"data":{"updateOneTestModel":{"optFloat":null}}}"###
         );
-        insta::assert_snapshot!(
-          query_number_operation(&runner, "2", "optFloat", "divide", "2").await?,
-          @r###"{"data":{"updateOneTestModel":{"optFloat":5.5}}}"###
+        assert_approximate_float!(
+            query_number_operation(&runner, "2", "optFloat", "divide", "2").await?,
+            &["data", "updateOneTestModel", "optFloat"],
+            5.5
         );
 
         // Set
-        insta::assert_snapshot!(
-          query_number_operation(&runner, "1", "optFloat", "set", "5.1").await?,
-          @r###"{"data":{"updateOneTestModel":{"optFloat":5.1}}}"###
+        assert_approximate_float!(
+            query_number_operation(&runner, "1", "optFloat", "set", "5.1").await?,
+            &["data", "updateOneTestModel", "optFloat"],
+            5.1
         );
-        insta::assert_snapshot!(
-          query_number_operation(&runner, "2", "optFloat", "set", "5.1").await?,
-          @r###"{"data":{"updateOneTestModel":{"optFloat":5.1}}}"###
+        assert_approximate_float!(
+            query_number_operation(&runner, "2", "optFloat", "set", "5.1").await?,
+            &["data", "updateOneTestModel", "optFloat"],
+            5.1
         );
 
         // Set null

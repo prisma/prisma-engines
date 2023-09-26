@@ -492,7 +492,7 @@ mod typed_output {
             string: "str",
             int: 42,
             bInt: "9223372036854775807",
-            float: 1.5432,
+            float: 10.01,
             bytes: "AQID",
             bool: true,
             dt: "1900-10-10T01:10:10.001Z",
@@ -527,7 +527,7 @@ mod typed_output {
                 },
                 "float": {
                   "prisma__type": "double",
-                  "prisma__value": 1.5432
+                  "prisma__value": 10.01
                 },
                 "bytes": {
                   "prisma__type": "bytes",
