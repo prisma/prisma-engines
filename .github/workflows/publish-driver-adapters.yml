@@ -1,0 +1,88 @@
+name: Build and publish Driver Adapters (@prisma/adapter-* and @prisma/driver-adapter-utils)
+
+concurrency: build-prisma-driver-adapters
+
+on:
+  # usually triggered via GH Actions Workflow in prisma/engines-wrapper repo
+  workflow_dispatch:
+    inputs:
+      enginesWrapperVersion:
+        required: true
+      enginesHash:
+        required: true
+      npmDistTag:
+        required: true
+        default: "latest"
+
+jobs:
+  build:
+    name: Build and publish Driver Adapters (@prisma/adapter-* and @prisma/driver-adapter-utils)
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    defaults:
+      run:
+        working-directory: ./query-engine/driver-adapters/js
+    steps:
+      - name: Print input
+        env:
+          THE_INPUT: "${{ toJson(github.event.inputs) }}"
+        run: |
+          echo $THE_INPUT
+
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.inputs.enginesHash }}
+
+      - uses: pnpm/action-setup@v2
+        with:
+          version: 8
+          run_install: false
+
+      - uses: actions/setup-node@v3
+        with:
+          node-version: "18.x"
+          cache: 'pnpm'
+          cache-dependency-path: './pnpm-lock.yaml'
+
+      - name: Install dependencies
+        run: pnpm i --prefer-offline
+
+      #
+      # Build
+      #
+  
+      - name: Transpile TS to JS
+        run: pnpm build
+
+      #
+      # Publish
+      #
+
+      - name: Set up NPM token
+        run: echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}" > ./.npmrc
+
+      - name: Create and publish versions
+        uses: changesets/action@v1
+        with:
+          version: ${{ github.event.inputs.enginesWrapperVersion }})
+          commit: "chore(driver-adapters): update versions"
+          title: "chore(driver-adapters): update versions"
+          publish: pnpm publish -r --access public --tag ${{ github.event.inputs.npmDistTag }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      #
+      # Failure handlers
+      #
+
+      - name: Set current job url in SLACK_FOOTER env var
+        if: ${{ failure() }}
+        run: echo "SLACK_FOOTER=<$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID|Click here to go to the job logs>" >> $GITHUB_ENV
+
+      - name: Slack Notification on Failure
+        if: ${{ failure() }}
+        uses: rtCamp/action-slack-notify@v2.2.1
+        env:
+          SLACK_TITLE: "prisma-schema-wasm publishing failed :x:"
+          SLACK_COLOR: "#FF0000"
+          SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK_DRIVER_ADAPTERS_FAILING }}
