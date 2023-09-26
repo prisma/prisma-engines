@@ -675,6 +675,52 @@
 <a href="#675" id="675">675</a>
 <a href="#676" id="676">676</a>
 <a href="#677" id="677">677</a>
+<a href="#678" id="678">678</a>
+<a href="#679" id="679">679</a>
+<a href="#680" id="680">680</a>
+<a href="#681" id="681">681</a>
+<a href="#682" id="682">682</a>
+<a href="#683" id="683">683</a>
+<a href="#684" id="684">684</a>
+<a href="#685" id="685">685</a>
+<a href="#686" id="686">686</a>
+<a href="#687" id="687">687</a>
+<a href="#688" id="688">688</a>
+<a href="#689" id="689">689</a>
+<a href="#690" id="690">690</a>
+<a href="#691" id="691">691</a>
+<a href="#692" id="692">692</a>
+<a href="#693" id="693">693</a>
+<a href="#694" id="694">694</a>
+<a href="#695" id="695">695</a>
+<a href="#696" id="696">696</a>
+<a href="#697" id="697">697</a>
+<a href="#698" id="698">698</a>
+<a href="#699" id="699">699</a>
+<a href="#700" id="700">700</a>
+<a href="#701" id="701">701</a>
+<a href="#702" id="702">702</a>
+<a href="#703" id="703">703</a>
+<a href="#704" id="704">704</a>
+<a href="#705" id="705">705</a>
+<a href="#706" id="706">706</a>
+<a href="#707" id="707">707</a>
+<a href="#708" id="708">708</a>
+<a href="#709" id="709">709</a>
+<a href="#710" id="710">710</a>
+<a href="#711" id="711">711</a>
+<a href="#712" id="712">712</a>
+<a href="#713" id="713">713</a>
+<a href="#714" id="714">714</a>
+<a href="#715" id="715">715</a>
+<a href="#716" id="716">716</a>
+<a href="#717" id="717">717</a>
+<a href="#718" id="718">718</a>
+<a href="#719" id="719">719</a>
+<a href="#720" id="720">720</a>
+<a href="#721" id="721">721</a>
+<a href="#722" id="722">722</a>
+<a href="#723" id="723">723</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>core::panic;
 <span class="kw">use </span>std::str::FromStr;
 
@@ -688,7 +734,7 @@
 <span class="kw">use </span>quaint::Value <span class="kw">as </span>QuaintValue;
 
 <span class="comment">// TODO(jkomyno): import these 3rd-party crates from the `quaint-core` crate.
-</span><span class="kw">use </span>bigdecimal::BigDecimal;
+</span><span class="kw">use </span>bigdecimal::{BigDecimal, FromPrimitive};
 <span class="kw">use </span>chrono::{DateTime, Utc};
 <span class="kw">use </span>chrono::{NaiveDate, NaiveTime};
 
@@ -721,7 +767,7 @@
     <span class="doccomment">/// commit transaction
     </span>commit: AsyncJsFunction&lt;(), ()&gt;,
 
-    <span class="doccomment">/// rollback transcation
+    <span class="doccomment">/// rollback transaction
     </span>rollback: AsyncJsFunction&lt;(), ()&gt;,
 }
 
@@ -852,16 +898,24 @@
                 <span class="comment">// n.as_i32() is not implemented, so we need to downcast from i64 instead
                 </span>QuaintValue::int32(n.as_i64().expect(<span class="string">&quot;number must be an i32&quot;</span>) <span class="kw">as </span>i32)
             }
+            serde_json::Value::String(s) =&gt; {
+                <span class="kw">let </span>n = s.parse::&lt;i32&gt;().expect(<span class="string">&quot;string-encoded number must be an i32&quot;</span>);
+                QuaintValue::int32(n)
+            }
             serde_json::Value::Null =&gt; QuaintValue::Int32(<span class="prelude-val">None</span>),
             mismatch =&gt; <span class="macro">panic!</span>(<span class="string">&quot;Expected an i32 number in column {}, found {}&quot;</span>, column_name, mismatch),
         },
         ColumnType::Int64 =&gt; <span class="kw">match </span>json_value {
+            serde_json::Value::Number(n) =&gt; QuaintValue::int64(n.as_i64().expect(<span class="string">&quot;number must be an i64&quot;</span>)),
             serde_json::Value::String(s) =&gt; {
                 <span class="kw">let </span>n = s.parse::&lt;i64&gt;().expect(<span class="string">&quot;string-encoded number must be an i64&quot;</span>);
                 QuaintValue::int64(n)
             }
             serde_json::Value::Null =&gt; QuaintValue::Int64(<span class="prelude-val">None</span>),
-            mismatch =&gt; <span class="macro">panic!</span>(<span class="string">&quot;Expected a string in column {}, found {}&quot;</span>, column_name, mismatch),
+            mismatch =&gt; <span class="macro">panic!</span>(
+                <span class="string">&quot;Expected a string or number in column {}, found {}&quot;</span>,
+                column_name, mismatch
+            ),
         },
         ColumnType::Float =&gt; <span class="kw">match </span>json_value {
             <span class="comment">// n.as_f32() is not implemented, so we need to downcast from f64 instead.
@@ -880,6 +934,11 @@
                 <span class="kw">let </span>decimal = BigDecimal::from_str(<span class="kw-2">&amp;</span>s).expect(<span class="string">&quot;invalid numeric value&quot;</span>);
                 QuaintValue::numeric(decimal)
             }
+            serde_json::Value::Number(n) =&gt; QuaintValue::numeric(
+                n.as_f64()
+                    .and_then(BigDecimal::from_f64)
+                    .expect(<span class="string">&quot;number must be an f64&quot;</span>),
+            ),
             serde_json::Value::Null =&gt; QuaintValue::Numeric(<span class="prelude-val">None</span>),
             mismatch =&gt; <span class="macro">panic!</span>(
                 <span class="string">&quot;Expected a string-encoded number in column {}, found {}&quot;</span>,
@@ -889,6 +948,16 @@
         ColumnType::Boolean =&gt; <span class="kw">match </span>json_value {
             serde_json::Value::Bool(b) =&gt; QuaintValue::boolean(b),
             serde_json::Value::Null =&gt; QuaintValue::Boolean(<span class="prelude-val">None</span>),
+            serde_json::Value::Number(n) =&gt; QuaintValue::boolean(<span class="kw">match </span>n.as_i64() {
+                <span class="prelude-val">Some</span>(<span class="number">0</span>) =&gt; <span class="bool-val">false</span>,
+                <span class="prelude-val">Some</span>(<span class="number">1</span>) =&gt; <span class="bool-val">true</span>,
+                <span class="kw">_ </span>=&gt; <span class="macro">panic!</span>(<span class="string">&quot;expected number-encoded boolean to be 0 or 1, got {n}&quot;</span>),
+            }),
+            serde_json::Value::String(s) =&gt; QuaintValue::boolean(<span class="kw">match </span>s.as_str() {
+                <span class="string">&quot;false&quot; </span>| <span class="string">&quot;FALSE&quot; </span>| <span class="string">&quot;0&quot; </span>=&gt; <span class="bool-val">false</span>,
+                <span class="string">&quot;true&quot; </span>| <span class="string">&quot;TRUE&quot; </span>| <span class="string">&quot;1&quot; </span>=&gt; <span class="bool-val">true</span>,
+                <span class="kw">_ </span>=&gt; <span class="macro">panic!</span>(<span class="string">&quot;expected string-encoded boolean, got \&quot;{s}\&quot;&quot;</span>),
+            }),
             mismatch =&gt; <span class="macro">panic!</span>(<span class="string">&quot;Expected a boolean in column {}, found {}&quot;</span>, column_name, mismatch),
         },
         ColumnType::Char =&gt; <span class="kw">match </span>json_value {
@@ -920,8 +989,9 @@
         ColumnType::DateTime =&gt; <span class="kw">match </span>json_value {
             serde_json::Value::String(s) =&gt; {
                 <span class="kw">let </span>datetime = chrono::NaiveDateTime::parse_from_str(<span class="kw-2">&amp;</span>s, <span class="string">&quot;%Y-%m-%d %H:%M:%S%.f&quot;</span>)
+                    .map(|dt| DateTime::from_utc(dt, Utc))
+                    .or_else(|<span class="kw">_</span>| DateTime::parse_from_rfc3339(<span class="kw-2">&amp;</span>s).map(DateTime::&lt;Utc&gt;::from))
                     .unwrap_or_else(|<span class="kw">_</span>| <span class="macro">panic!</span>(<span class="string">&quot;Expected a datetime string, found {:?}&quot;</span>, <span class="kw-2">&amp;</span>s));
-                <span class="kw">let </span>datetime: DateTime&lt;Utc&gt; = DateTime::from_utc(datetime, Utc);
                 QuaintValue::datetime(datetime)
             }
             serde_json::Value::Null =&gt; QuaintValue::DateTime(<span class="prelude-val">None</span>),
@@ -938,8 +1008,18 @@
         },
         ColumnType::Bytes =&gt; <span class="kw">match </span>json_value {
             serde_json::Value::String(s) =&gt; QuaintValue::Bytes(<span class="prelude-val">Some</span>(s.into_bytes().into())),
+            serde_json::Value::Array(array) =&gt; {
+                <span class="kw">let </span>bytes: <span class="prelude-ty">Option</span>&lt;std::borrow::Cow&lt;[u8]&gt;&gt; = array
+                    .iter()
+                    .map(|value| value.as_i64().and_then(|maybe_byte| maybe_byte.try_into().ok()))
+                    .collect();
+                QuaintValue::Bytes(<span class="prelude-val">Some</span>(bytes.expect(<span class="string">&quot;elements of the array must be u8&quot;</span>)))
+            }
             serde_json::Value::Null =&gt; QuaintValue::Bytes(<span class="prelude-val">None</span>),
-            mismatch =&gt; <span class="macro">panic!</span>(<span class="string">&quot;Expected a string in column {}, found {}&quot;</span>, column_name, mismatch),
+            mismatch =&gt; <span class="macro">panic!</span>(
+                <span class="string">&quot;Expected a string or an array in column {}, found {}&quot;</span>,
+                column_name, mismatch
+            ),
         },
         unimplemented =&gt; {
             <span class="macro">todo!</span>(<span class="string">&quot;support column type {:?} in column {}&quot;</span>, unimplemented, column_name)
@@ -1030,7 +1110,7 @@
     <span class="kw">pub fn </span>new(js_transaction: <span class="kw-2">&amp;</span>JsObject) -&gt; napi::Result&lt;<span class="self">Self</span>&gt; {
         <span class="kw">let </span>commit = js_transaction.get_named_property(<span class="string">&quot;commit&quot;</span>)<span class="question-mark">?</span>;
         <span class="kw">let </span>rollback = js_transaction.get_named_property(<span class="string">&quot;rollback&quot;</span>)<span class="question-mark">?</span>;
-        <span class="kw">let </span>options: TransactionOptions = js_transaction.get_named_property(<span class="string">&quot;options&quot;</span>)<span class="question-mark">?</span>;
+        <span class="kw">let </span>options = js_transaction.get_named_property(<span class="string">&quot;options&quot;</span>)<span class="question-mark">?</span>;
 
         <span class="prelude-val">Ok</span>(<span class="self">Self </span>{
             commit,
@@ -1099,6 +1179,12 @@
         <span class="kw">let </span>json_value = serde_json::Value::Number(serde_json::Number::from(n));
         <span class="kw">let </span>quaint_value = js_value_to_quaint(json_value, column_type, <span class="string">&quot;column_name&quot;</span>);
         <span class="macro">assert_eq!</span>(quaint_value, QuaintValue::Int32(<span class="prelude-val">Some</span>(n)));
+
+        <span class="comment">// string-encoded
+        </span><span class="kw">let </span>n = i32::MAX;
+        <span class="kw">let </span>json_value = serde_json::Value::String(n.to_string());
+        <span class="kw">let </span>quaint_value = js_value_to_quaint(json_value, column_type, <span class="string">&quot;column_name&quot;</span>);
+        <span class="macro">assert_eq!</span>(quaint_value, QuaintValue::Int32(<span class="prelude-val">Some</span>(n)));
     }
 
     <span class="attr">#[test]
@@ -1123,6 +1209,12 @@
         <span class="comment">// min
         </span><span class="kw">let </span>n: i64 = i64::MIN;
         <span class="kw">let </span>json_value = serde_json::Value::String(n.to_string());
+        <span class="kw">let </span>quaint_value = js_value_to_quaint(json_value, column_type, <span class="string">&quot;column_name&quot;</span>);
+        <span class="macro">assert_eq!</span>(quaint_value, QuaintValue::Int64(<span class="prelude-val">Some</span>(n)));
+
+        <span class="comment">// number-encoded
+        </span><span class="kw">let </span>n: i64 = (<span class="number">1 </span>&lt;&lt; <span class="number">53</span>) - <span class="number">1</span>; <span class="comment">// max JS safe integer
+        </span><span class="kw">let </span>json_value = serde_json::Value::Number(serde_json::Number::from(n));
         <span class="kw">let </span>quaint_value = js_value_to_quaint(json_value, column_type, <span class="string">&quot;column_name&quot;</span>);
         <span class="macro">assert_eq!</span>(quaint_value, QuaintValue::Int64(<span class="prelude-val">Some</span>(n)));
     }
@@ -1209,16 +1301,16 @@
         </span>test_null(QuaintValue::Boolean(<span class="prelude-val">None</span>), column_type);
 
         <span class="comment">// true
-        </span><span class="kw">let </span>bool_val = <span class="bool-val">true</span>;
-        <span class="kw">let </span>json_value = serde_json::Value::Bool(bool_val);
-        <span class="kw">let </span>quaint_value = js_value_to_quaint(json_value, column_type, <span class="string">&quot;column_name&quot;</span>);
-        <span class="macro">assert_eq!</span>(quaint_value, QuaintValue::Boolean(<span class="prelude-val">Some</span>(bool_val)));
+        </span><span class="kw">for </span>truthy_value <span class="kw">in </span>[<span class="macro">json!</span>(<span class="bool-val">true</span>), <span class="macro">json!</span>(<span class="number">1</span>), <span class="macro">json!</span>(<span class="string">&quot;true&quot;</span>), <span class="macro">json!</span>(<span class="string">&quot;TRUE&quot;</span>), <span class="macro">json!</span>(<span class="string">&quot;1&quot;</span>)] {
+            <span class="kw">let </span>quaint_value = js_value_to_quaint(truthy_value, column_type, <span class="string">&quot;column_name&quot;</span>);
+            <span class="macro">assert_eq!</span>(quaint_value, QuaintValue::Boolean(<span class="prelude-val">Some</span>(<span class="bool-val">true</span>)));
+        }
 
         <span class="comment">// false
-        </span><span class="kw">let </span>bool_val = <span class="bool-val">false</span>;
-        <span class="kw">let </span>json_value = serde_json::Value::Bool(bool_val);
-        <span class="kw">let </span>quaint_value = js_value_to_quaint(json_value, column_type, <span class="string">&quot;column_name&quot;</span>);
-        <span class="macro">assert_eq!</span>(quaint_value, QuaintValue::Boolean(<span class="prelude-val">Some</span>(bool_val)));
+        </span><span class="kw">for </span>falsy_value <span class="kw">in </span>[<span class="macro">json!</span>(<span class="bool-val">false</span>), <span class="macro">json!</span>(<span class="number">0</span>), <span class="macro">json!</span>(<span class="string">&quot;false&quot;</span>), <span class="macro">json!</span>(<span class="string">&quot;FALSE&quot;</span>), <span class="macro">json!</span>(<span class="string">&quot;0&quot;</span>)] {
+            <span class="kw">let </span>quaint_value = js_value_to_quaint(falsy_value, column_type, <span class="string">&quot;column_name&quot;</span>);
+            <span class="macro">assert_eq!</span>(quaint_value, QuaintValue::Boolean(<span class="prelude-val">Some</span>(<span class="bool-val">false</span>)));
+        }
     }
 
     <span class="attr">#[test]

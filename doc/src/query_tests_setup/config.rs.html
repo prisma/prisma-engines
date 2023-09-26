@@ -303,6 +303,10 @@
 <a href="#303" id="303">303</a>
 <a href="#304" id="304">304</a>
 <a href="#305" id="305">305</a>
+<a href="#306" id="306">306</a>
+<a href="#307" id="307">307</a>
+<a href="#308" id="308">308</a>
+<a href="#309" id="309">309</a>
 </pre></div><pre class="rust"><code><span class="kw">use crate</span>::{
     CockroachDbConnectorTag, ConnectorTag, ConnectorVersion, MongoDbConnectorTag, MySqlConnectorTag,
     PostgresConnectorTag, SqlServerConnectorTag, SqliteConnectorTag, TestResult, VitessConnectorTag,
@@ -536,11 +540,15 @@ Use the Makefile.
         }
 
         <span class="kw">if </span><span class="self">self</span>.driver_adapter.is_some() &amp;&amp; <span class="self">self</span>.external_test_executor.is_none() {
-            exit_with_message(<span class="string">&quot;When using a driver adapter, the external test executor must be set.&quot;</span>);
+            exit_with_message(
+                <span class="string">&quot;When using a driver adapter, the external test executor (EXTERNAL_TEST_EXECUTOR env var) must be set.&quot;</span>,
+            );
         }
 
         <span class="kw">if </span><span class="self">self</span>.driver_adapter.is_none() &amp;&amp; <span class="self">self</span>.driver_adapter_config.is_some() {
-            exit_with_message(<span class="string">&quot;When using a driver adapter config, the driver adapter must be set.&quot;</span>);
+            exit_with_message(
+                <span class="string">&quot;When using a driver adapter config, the driver adapter (DRIVER_ADAPTER env var) must be set.&quot;</span>,
+            );
         }
     }
 

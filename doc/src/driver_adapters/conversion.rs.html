@@ -58,6 +58,15 @@
 <a href="#58" id="58">58</a>
 <a href="#59" id="59">59</a>
 <a href="#60" id="60">60</a>
+<a href="#61" id="61">61</a>
+<a href="#62" id="62">62</a>
+<a href="#63" id="63">63</a>
+<a href="#64" id="64">64</a>
+<a href="#65" id="65">65</a>
+<a href="#66" id="66">66</a>
+<a href="#67" id="67">67</a>
+<a href="#68" id="68">68</a>
+<a href="#69" id="69">69</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>napi::bindgen_prelude::{FromNapiValue, ToNapiValue};
 <span class="kw">use </span>quaint::ast::Value <span class="kw">as </span>QuaintValue;
 <span class="kw">use </span>serde::Serialize;
@@ -68,6 +77,7 @@
 </span><span class="kw">pub enum </span>JSArg {
     RawString(String),
     Value(serde_json::Value),
+    Buffer(Vec&lt;u8&gt;),
 }
 
 <span class="kw">impl </span>From&lt;JsonValue&gt; <span class="kw">for </span>JSArg {
@@ -77,8 +87,8 @@
 }
 
 <span class="comment">// FromNapiValue is the napi equivalent to serde::Deserialize.
-// Note: we can safely leave this unimplemented as we don&#39;t need deserialize JSArg back to napi_value
-// (nor we need to). However, removing this altogether would cause a compile error.
+// Note: we can safely leave this unimplemented as we don&#39;t need deserialize napi_value back to JSArg.
+// However, removing this altogether would cause a compile error.
 </span><span class="kw">impl </span>FromNapiValue <span class="kw">for </span>JSArg {
     <span class="kw">unsafe fn </span>from_napi_value(_env: napi::sys::napi_env, _napi_value: napi::sys::napi_value) -&gt; napi::Result&lt;<span class="self">Self</span>&gt; {
         <span class="macro">unreachable!</span>()
@@ -91,6 +101,10 @@
         <span class="kw">match </span>value {
             JSArg::RawString(s) =&gt; ToNapiValue::to_napi_value(env, s),
             JSArg::Value(v) =&gt; ToNapiValue::to_napi_value(env, v),
+            JSArg::Buffer(bytes) =&gt; ToNapiValue::to_napi_value(
+                env,
+                napi::Env::from_raw(env).create_arraybuffer_with_data(bytes)<span class="question-mark">?</span>.into_raw(),
+            ),
         }
     }
 }
@@ -105,6 +119,10 @@
                     <span class="kw">let </span>json_str = serde_json::to_string(s)<span class="question-mark">?</span>;
                     JSArg::RawString(json_str)
                 }
+                <span class="prelude-val">None </span>=&gt; JsonValue::Null.into(),
+            },
+            QuaintValue::Bytes(bytes) =&gt; <span class="kw">match </span>bytes {
+                <span class="prelude-val">Some</span>(bytes) =&gt; JSArg::Buffer(bytes.to_vec()),
                 <span class="prelude-val">None </span>=&gt; JsonValue::Null.into(),
             },
             quaint_value =&gt; {
