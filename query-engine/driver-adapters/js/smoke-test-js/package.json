@@ -32,6 +32,10 @@
     "planetscale:libquery": "DATABASE_URL=\"${JS_PLANETSCALE_DATABASE_URL}\" node --test --test-reporter spec --loader=tsx ./src/libquery/planetscale.test.ts",
     "planetscale:client": "DATABASE_URL=\"${JS_PLANETSCALE_DATABASE_URL}\" node --test --test-reporter spec --loader=tsx ./src/client/planetscale.test.ts",
     "planetscale": "pnpm planetscale:libquery && pnpm planetscale:client"
+    
+    "prisma:generate:fake": "prisma generate --schema ./prisma/postgres/schema.prisma",
+    "fake": "tsx ./src/libquery/fake.ts",
+    "fake:client": "node --test --loader=tsx ./src/client/fake.test.ts"
   },
   "keywords": [],
   "author": "Alberto Schiabel <schiabel@prisma.io>",
@@ -40,6 +44,7 @@
   "dependencies": {
     "@neondatabase/serverless": "^0.6.0",
     "@planetscale/database": "^1.11.0",
+    "@prisma/adapter-fake": "workspace:*",
     "@prisma/adapter-neon": "workspace:*",
     "@prisma/adapter-pg": "workspace:*",
     "@prisma/adapter-planetscale": "workspace:*",
