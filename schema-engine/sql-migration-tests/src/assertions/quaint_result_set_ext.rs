@@ -88,7 +88,8 @@ impl<'a> RowAssertion<'a> {
     pub fn assert_text_value(self, column_name: &str, expected_value: &str) -> Self {
         let value = self.0.get(column_name).expect("Expected a value, found none");
         let value_text: &str = match value {
-            Value::Text(val) | Value::Enum(val, _) => val.as_deref(),
+            Value::Text(val) => val.as_deref(),
+            Value::Enum(val, _) => val.as_deref(),
             _ => None,
         }
         .expect("Expected a string value");

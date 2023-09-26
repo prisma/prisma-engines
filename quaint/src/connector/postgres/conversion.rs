@@ -44,8 +44,8 @@ pub(crate) fn params_to_types(params: &[Value<'_>]) -> Vec<PostgresType> {
                 Value::Float(_) => PostgresType::FLOAT4,
                 Value::Double(_) => PostgresType::FLOAT8,
                 Value::Text(_) => PostgresType::TEXT,
-                // Enums are special types, we can't statically infer them, so we let PG infer it
-                Value::Enum(_, _) => PostgresType::UNKNOWN,
+                // Enums are user-defined types, we can't statically infer them, so we let PG infer it
+                Value::Enum(_, _) | Value::EnumArray(_, _) => PostgresType::UNKNOWN,
                 Value::Bytes(_) => PostgresType::BYTEA,
                 Value::Boolean(_) => PostgresType::BOOL,
                 Value::Char(_) => PostgresType::CHAR,
@@ -83,7 +83,7 @@ pub(crate) fn params_to_types(params: &[Value<'_>]) -> Vec<PostgresType> {
                         Value::Double(_) => PostgresType::FLOAT8_ARRAY,
                         Value::Text(_) => PostgresType::TEXT_ARRAY,
                         // Enums are special types, we can't statically infer them, so we let PG infer it
-                        Value::Enum(_, _) => PostgresType::UNKNOWN,
+                        Value::Enum(_, _) | Value::EnumArray(_, _) => PostgresType::UNKNOWN,
                         Value::Bytes(_) => PostgresType::BYTEA_ARRAY,
                         Value::Boolean(_) => PostgresType::BOOL_ARRAY,
                         Value::Char(_) => PostgresType::CHAR_ARRAY,
@@ -847,6 +847,16 @@ impl<'a> ToSql for Value<'a> {
             (Value::Char(c), _) => c.map(|c| (c as i8).to_sql(ty, out)),
             (Value::Array(vec), typ) if matches!(typ.kind(), Kind::Array(_)) => {
                 vec.as_ref().map(|vec| vec.to_sql(ty, out))
+            }
+            (Value::EnumArray(variants, _), typ) if matches!(typ.kind(), Kind::Array(_)) => variants
+                .as_ref()
+                .map(|vec| vec.iter().map(|val| val.as_ref()).collect::<Vec<_>>().to_sql(ty, out)),
+            (Value::EnumArray(variants, _), typ) => {
+                let kind = ErrorKind::conversion(format!(
+                    "Couldn't serialize value `{variants:?}` into a `{typ}`. Value is a list but `{typ}` is not."
+                ));
+
+                return Err(Error::builder(kind).build().into());
             }
             (Value::Array(vec), typ) => {
                 let kind = ErrorKind::conversion(format!(

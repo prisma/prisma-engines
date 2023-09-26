@@ -3,7 +3,7 @@
 use std::borrow::Cow;
 
 use crate::{
-    ast::Value,
+    ast::{EnumVariant, Value},
     connector::{ResultRow, ResultSet},
     error::{Error, ErrorKind},
 };
@@ -100,6 +100,14 @@ impl<'de> IntoDeserializer<'de, DeserializeError> for Value<'de> {
     }
 }
 
+impl<'de> IntoDeserializer<'de, DeserializeError> for EnumVariant<'de> {
+    type Deserializer = ValueDeserializer<'de>;
+
+    fn into_deserializer(self) -> Self::Deserializer {
+        ValueDeserializer(self.into_text())
+    }
+}
+
 #[derive(Debug)]
 pub struct ValueDeserializer<'a>(Value<'a>);
 
@@ -114,6 +122,11 @@ impl<'de> Deserializer<'de> for ValueDeserializer<'de> {
             Value::Bytes(None) => visitor.visit_none(),
             Value::Enum(Some(s), _) => visitor.visit_string(s.into_owned()),
             Value::Enum(None, _) => visitor.visit_none(),
+            Value::EnumArray(Some(variants), _) => {
+                let deserializer = serde::de::value::SeqDeserializer::new(variants.into_iter());
+                visitor.visit_seq(deserializer)
+            }
+            Value::EnumArray(None, _) => visitor.visit_none(),
             Value::Int32(Some(i)) => visitor.visit_i32(i),
             Value::Int32(None) => visitor.visit_none(),
             Value::Int64(Some(i)) => visitor.visit_i64(i),

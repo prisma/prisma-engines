@@ -21,7 +21,7 @@ impl<'a> IntoSql<'a> for &'a Value<'a> {
             Value::Boolean(val) => val.into_sql(),
             Value::Char(val) => val.as_ref().map(|val| format!("{val}")).into_sql(),
             Value::Xml(val) => val.as_deref().into_sql(),
-            Value::Array(_) => panic!("Arrays are not supported on SQL Server."),
+            Value::Array(_) | Value::EnumArray(_, _) => panic!("Arrays are not supported on SQL Server."),
             #[cfg(feature = "bigdecimal")]
             Value::Numeric(val) => (*val).to_sql(),
             Value::Json(val) => val.as_ref().map(|val| serde_json::to_string(&val).unwrap()).into_sql(),

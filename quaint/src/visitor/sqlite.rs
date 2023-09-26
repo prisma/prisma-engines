@@ -94,7 +94,7 @@ impl<'a> Visitor<'a> for Sqlite<'a> {
                 f if f == f64::NEG_INFINITY => self.write("'-Infinity"),
                 v => self.write(format!("{v:?}")),
             }),
-            Value::Array(_) => {
+            Value::Array(_) | Value::EnumArray(_, _) => {
                 let msg = "Arrays are not supported in SQLite.";
                 let kind = ErrorKind::conversion(msg);
 

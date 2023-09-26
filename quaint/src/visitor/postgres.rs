@@ -50,15 +50,13 @@ impl<'a> Visitor<'a> for Postgres<'a> {
         self.write(self.parameters.len())
     }
 
-    fn visit_parameterized_enum(&mut self, val: Value<'a>) -> visitor::Result {
-        let (enum_val, enum_name) = val.into_enum().unwrap();
-
-        self.add_parameter(Value::Text(Some(enum_val)));
+    fn visit_parameterized_enum(&mut self, variant: EnumVariant<'a>, name: Option<EnumName<'a>>) -> visitor::Result {
+        self.add_parameter(variant.into_text());
 
         // Since enums are user-defined custom types, tokio-postgres fires an additional query
         // when parameterizing values of type enum to know which custom type the value refers to.
         // Casting the enum value to `TEXT` avoid this roundtrip since `TEXT` is a builtin type.
-        if let Some(enum_name) = enum_name {
+        if let Some(enum_name) = name {
             self.surround_with("CAST(", ")", |ref mut s| {
                 s.parameter_substitution()?;
                 s.write("::text")?;
@@ -72,17 +70,20 @@ impl<'a> Visitor<'a> for Postgres<'a> {
         Ok(())
     }
 
-    fn visit_parameterized_enum_array(&mut self, value: Value<'a>) -> visitor::Result {
-        let vals = value.into_array().unwrap();
-        let len = vals.len();
-        let (_, enum_name) = vals.first().and_then(|val| val.as_enum()).unwrap();
+    fn visit_parameterized_enum_array(
+        &mut self,
+        variants: Vec<EnumVariant<'a>>,
+        name: Option<EnumName<'a>>,
+    ) -> visitor::Result {
+        let len = variants.len();
 
-        if let Some(enum_name) = enum_name.clone() {
+        // Since enums are user-defined custom types, tokio-postgres fires an additional query
+        // when parameterizing values of type enum to know which custom type the value refers to.
+        // Casting the enum value to `TEXT` avoid this roundtrip since `TEXT` is a builtin type.
+        if let Some(enum_name) = name.clone() {
             self.surround_with("ARRAY[", "]", |s| {
-                for (i, enum_val) in vals.into_iter().enumerate() {
-                    let (enum_val, _) = enum_val.into_enum().unwrap();
-
-                    s.add_parameter(Value::Text(Some(enum_val)));
+                for (i, variant) in variants.into_iter().enumerate() {
+                    s.add_parameter(variant.into_text());
                     s.parameter_substitution()?;
                     s.write("::text")?;
 
@@ -98,7 +99,12 @@ impl<'a> Visitor<'a> for Postgres<'a> {
             self.surround_with_backticks(enum_name.deref())?;
             self.write("[]")?;
         } else {
-            self.visit_parameterized(Value::Array(Some(vals)))?;
+            self.visit_parameterized(Value::Array(Some(
+                variants
+                    .into_iter()
+                    .map(|variant| variant.into_enum(name.clone()))
+                    .collect(),
+            )))?;
         }
 
         Ok(())
@@ -189,7 +195,28 @@ impl<'a> Visitor<'a> for Postgres<'a> {
                     Ok(())
                 })
             }),
+            Value::EnumArray(variants, name) => variants.map(|variants| {
+                self.surround_with("ARRAY[", "]", |ref mut s| {
+                    let len = variants.len();
 
+                    for (i, item) in variants.into_iter().enumerate() {
+                        s.surround_with("'", "'", |t| t.write(item))?;
+
+                        if i < len - 1 {
+                            s.write(",")?;
+                        }
+                    }
+
+                    Ok(())
+                })?;
+
+                if let Some(name) = name {
+                    self.write("::")?;
+                    self.surround_with_backticks(name.as_ref())?;
+                }
+
+                Ok(())
+            }),
             Value::Json(j) => j.map(|j| self.write(format!("'{}'", serde_json::to_string(&j).unwrap()))),
             #[cfg(feature = "bigdecimal")]
             Value::Numeric(r) => r.map(|r| self.write(r)),
@@ -1007,6 +1034,18 @@ mod tests {
         let (sql, _) = Postgres::build(Select::from_table("foo").so_that("bar".compare_raw("ILIKE", "baz%"))).unwrap();
 
         assert_eq!(r#"SELECT "foo".* FROM "foo" WHERE "bar" ILIKE $1"#, sql);
+    }
+
+    #[test]
+    fn test_raw_enum_array() {
+        let enum_array = Value::EnumArray(
+            Some(vec![EnumVariant::new("A"), EnumVariant::new("B")]),
+            Some(EnumName::new("Alphabet")),
+        );
+        let (sql, params) = Postgres::build(Select::default().value(enum_array.raw())).unwrap();
+
+        assert_eq!("SELECT ARRAY['A','B']::\"Alphabet\"", sql);
+        assert!(params.is_empty());
     }
 
     #[test]

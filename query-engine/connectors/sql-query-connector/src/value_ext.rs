@@ -28,7 +28,7 @@ impl<'a> IntoTypedJsonExtension for quaint::Value<'a> {
             quaint::Value::DateTime(_) => "datetime",
             quaint::Value::Date(_) => "date",
             quaint::Value::Time(_) => "time",
-            quaint::Value::Array(_) => "array",
+            quaint::Value::Array(_) | quaint::Value::EnumArray(_, _) => "array",
         };
 
         type_name.to_owned()

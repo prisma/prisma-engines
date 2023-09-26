@@ -2,8 +2,8 @@ use chrono::Utc;
 use prisma_models::{ScalarField, TypeIdentifier};
 use prisma_value::PrismaValue;
 use quaint::{
-    ast::Value,
-    prelude::{TypeDataLength, TypeFamily},
+    ast::{EnumName, Value},
+    prelude::{EnumVariant, TypeDataLength, TypeFamily},
 };
 
 pub trait ScalarFieldExt {
@@ -23,6 +23,16 @@ impl ScalarFieldExt for ScalarField {
 
                 Value::enum_variant_with_name(e, enum_walker.db_name().to_owned())
             }
+            (PrismaValue::List(vals), TypeIdentifier::Enum(enum_id)) => {
+                let enum_walker = self.dm.clone().zip(enum_id);
+                let variants: Vec<_> = vals
+                    .into_iter()
+                    .map(|val| val.into_string().unwrap())
+                    .map(EnumVariant::new)
+                    .collect();
+
+                Value::EnumArray(Some(variants), Some(EnumName::new(enum_walker.db_name().to_owned())))
+            }
             (PrismaValue::Enum(e), _) => e.into(),
             (PrismaValue::Int(i), _) => i.into(),
             (PrismaValue::BigInt(i), _) => i.into(),
@@ -39,7 +49,7 @@ impl ScalarFieldExt for ScalarField {
                 TypeIdentifier::Enum(enum_id) => {
                     let enum_walker = self.dm.clone().zip(enum_id);
 
-                    Value::Enum(None, Some(enum_walker.db_name().to_owned().into()))
+                    Value::Enum(None, Some(EnumName::new(enum_walker.db_name().to_owned())))
                 }
                 TypeIdentifier::Json => Value::Json(None),
                 TypeIdentifier::DateTime => Value::DateTime(None),

@@ -51,6 +51,17 @@ pub fn to_prisma_value(quaint_value: Value<'_>) -> crate::Result<PrismaValue> {
 
         Value::Array(None) => PrismaValue::Null,
 
+        Value::EnumArray(Some(v), name) => {
+            let mut res = Vec::with_capacity(v.len());
+
+            for v in v.into_iter() {
+                res.push(to_prisma_value(Value::Enum(Some(v), name.clone()))?);
+            }
+
+            PrismaValue::List(res)
+        }
+        Value::EnumArray(None, _) => PrismaValue::Null,
+
         Value::Json(val) => val
             .map(|val| PrismaValue::Json(val.to_string()))
             .unwrap_or(PrismaValue::Null),

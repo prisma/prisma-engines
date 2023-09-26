@@ -30,7 +30,7 @@ pub fn conv_params(params: &[Value<'_>]) -> crate::Result<my::Params> {
                 Value::Boolean(b) => b.map(|b| my::Value::Int(b as i64)),
                 Value::Char(c) => c.map(|c| my::Value::Bytes(vec![c as u8])),
                 Value::Xml(s) => s.as_ref().map(|s| my::Value::Bytes((s).as_bytes().to_vec())),
-                Value::Array(_) => {
+                Value::Array(_) | Value::EnumArray(_, _) => {
                     let msg = "Arrays are not supported in MySQL.";
                     let kind = ErrorKind::conversion(msg);
 

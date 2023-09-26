@@ -330,7 +330,7 @@ impl<'a> Visitor<'a> for Mssql<'a> {
             Value::Bytes(b) => b.map(|b| self.write(format!("0x{}", hex::encode(b)))),
             Value::Boolean(b) => b.map(|b| self.write(if b { 1 } else { 0 })),
             Value::Char(c) => c.map(|c| self.write(format!("'{c}'"))),
-            Value::Array(_) => {
+            Value::Array(_) | Value::EnumArray(_, _) => {
                 let msg = "Arrays are not supported in T-SQL.";
                 let kind = ErrorKind::conversion(msg);
 
