@@ -1,7 +1,6 @@
 name: Build and publish Driver Adapters (@prisma/adapter-* and @prisma/driver-adapter-utils)
 
 concurrency: build-prisma-driver-adapters
-cancel-in-progress: true
 
 on:
   # usually triggered via GH Actions Workflow in prisma/engines-wrapper repo
@@ -67,13 +66,14 @@ jobs:
         working-directory: query-engine/driver-adapters/js
 
       - name: Create and publish versions
-        working-directory: query-engine/driver-adapters/js
         uses: changesets/action@v1
+        working-directory: query-engine/driver-adapters/js
         with:
           version: ${{ github.event.inputs.enginesWrapperVersion }})
           commit: "chore(driver-adapters): update versions"
           title: "chore(driver-adapters): update versions"
-          publish: pnpm publish --dry-run -r --access public --tag ${{ github.event.inputs.npmDistTag }}
+          publish: |
+            pnpm publish --dry-run -r --access public --tag ${{ github.event.inputs.npmDistTag }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
