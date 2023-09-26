@@ -5,6 +5,7 @@ use crate::async_js_function::AsyncJsFunction;
 use crate::conversion::JSArg;
 use crate::transaction::JsTransaction;
 use napi::bindgen_prelude::{FromNapiValue, ToNapiValue};
+use napi::threadsafe_function::{ErrorStrategy, ThreadsafeFunction};
 use napi::{JsObject, JsString};
 use napi_derive::napi;
 use quaint::connector::ResultSet as QuaintResultSet;
@@ -46,6 +47,9 @@ pub(crate) struct TransactionProxy {
 
     /// rollback transaction
     rollback: AsyncJsFunction<(), ()>,
+
+    /// discard transaction
+    discard: ThreadsafeFunction<(), ErrorStrategy::Fatal>,
 }
 
 /// This result set is more convenient to be manipulated from both Rust and NodeJS.
@@ -387,11 +391,13 @@ impl TransactionProxy {
     pub fn new(js_transaction: &JsObject) -> napi::Result<Self> {
         let commit = js_transaction.get_named_property("commit")?;
         let rollback = js_transaction.get_named_property("rollback")?;
+        let discard = js_transaction.get_named_property("discard")?;
         let options = js_transaction.get_named_property("options")?;
 
         Ok(Self {
             commit,
             rollback,
+            discard,
             options,
         })
     }
@@ -403,8 +409,22 @@ impl TransactionProxy {
     pub async fn commit(&self) -> quaint::Result<()> {
         self.commit.call(()).await
     }
+
     pub async fn rollback(&self) -> quaint::Result<()> {
         self.rollback.call(()).await
+    }
+
+    pub fn discard(&self) -> quaint::Result<()> {
+        match self
+            .discard
+            .call((), napi::threadsafe_function::ThreadsafeFunctionCallMode::NonBlocking)
+        {
+            napi::Status::Ok => Ok(()),
+            err => Err(quaint::error::Error::raw_connector_error(
+                err.to_string(),
+                "error in TransactionProxy::discard".to_owned(),
+            )),
+        }
     }
 }
 

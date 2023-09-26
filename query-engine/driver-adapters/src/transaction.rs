@@ -37,6 +37,12 @@ impl JsTransaction {
     }
 }
 
+impl Drop for JsTransaction {
+    fn drop(&mut self) {
+        _ = self.tx_proxy.discard();
+    }
+}
+
 #[async_trait]
 impl QuaintTransaction for JsTransaction {
     async fn commit(&self) -> quaint::Result<()> {
