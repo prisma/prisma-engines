@@ -152,13 +152,21 @@ pub trait Visitor<'a> {
         self.visit_parameterized(value)
     }
 
+    fn visit_parameterized_enum_array(&mut self, value: Value<'a>) -> Result {
+        self.visit_parameterized(value)
+    }
+
     /// A visit to a value we parameterize
     fn visit_parameterized(&mut self, value: Value<'a>) -> Result {
-        if value.is_enum() {
-            self.visit_parameterized_enum(value)
-        } else {
-            self.add_parameter(value);
-            self.parameter_substitution()
+        match value {
+            Value::Enum(Some(_), _) => self.visit_parameterized_enum(value),
+            Value::Array(Some(ref val)) if !val.is_empty() && val.iter().all(|v| v.is_enum()) => {
+                self.visit_parameterized_enum_array(value)
+            }
+            _ => {
+                self.add_parameter(value);
+                self.parameter_substitution()
+            }
         }
     }
 

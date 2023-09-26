@@ -2,7 +2,10 @@ use crate::{
     ast::*,
     visitor::{self, Visitor},
 };
-use std::fmt::{self, Write};
+use std::{
+    fmt::{self, Write},
+    ops::Deref,
+};
 
 /// A visitor to generate queries for the PostgreSQL database.
 ///
@@ -60,10 +63,42 @@ impl<'a> Visitor<'a> for Postgres<'a> {
                 s.parameter_substitution()?;
                 s.write("::text")?;
                 s.write(" AS ")?;
-                s.surround_with(Self::C_BACKTICK_OPEN, Self::C_BACKTICK_CLOSE, |ref mut s| {
-                    s.write(enum_name)
-                })
+                s.surround_with_backticks(enum_name.deref())
             })?;
+        } else {
+            self.parameter_substitution()?;
+        }
+
+        Ok(())
+    }
+
+    fn visit_parameterized_enum_array(&mut self, value: Value<'a>) -> visitor::Result {
+        let vals = value.into_array().unwrap();
+        let len = vals.len();
+        let (_, enum_name) = vals.first().and_then(|val| val.as_enum()).unwrap();
+
+        if let Some(enum_name) = enum_name.clone() {
+            self.surround_with("ARRAY[", "]", |s| {
+                for (i, enum_val) in vals.into_iter().enumerate() {
+                    let (enum_val, _) = enum_val.into_enum().unwrap();
+
+                    s.add_parameter(Value::Text(Some(enum_val)));
+                    s.parameter_substitution()?;
+                    s.write("::text")?;
+
+                    if i < (len - 1) {
+                        s.write(", ")?;
+                    }
+                }
+
+                Ok(())
+            })?;
+
+            self.write("::")?;
+            self.surround_with_backticks(enum_name.deref())?;
+            self.write("[]")?;
+        } else {
+            self.visit_parameterized(Value::Array(Some(vals)))?;
         }
 
         Ok(())
@@ -81,7 +116,11 @@ impl<'a> Visitor<'a> for Postgres<'a> {
         };
 
         if column.is_enum && column.should_cast_enum_to_text {
-            self.write("::text")?;
+            if column.is_list {
+                self.write("::text[]")?;
+            } else {
+                self.write("::text")?;
+            }
         }
 
         if let Some(alias) = column.alias {

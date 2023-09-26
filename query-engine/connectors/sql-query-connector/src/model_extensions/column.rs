@@ -99,6 +99,7 @@ impl AsColumn for ScalarField {
         Column::from((full_table_name, col))
             .type_family(self.type_family())
             .set_is_enum(self.type_identifier().is_enum())
+            .set_is_list(self.is_list())
             .default(quaint::ast::DefaultValue::Generated)
     }
 }

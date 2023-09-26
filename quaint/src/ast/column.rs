@@ -33,6 +33,7 @@ pub struct Column<'a> {
     pub(crate) default: Option<DefaultValue<'a>>,
     pub(crate) type_family: Option<TypeFamily>,
     pub(crate) is_enum: bool,
+    pub(crate) is_list: bool,
     pub(crate) should_cast_enum_to_text: bool,
 }
 
@@ -94,6 +95,12 @@ impl<'a> Column<'a> {
     /// Sets whether the column points to an enum type.
     pub fn set_is_enum(mut self, is_enum: bool) -> Self {
         self.is_enum = is_enum;
+        self
+    }
+
+    /// Sets whether the column points to an scalar list.
+    pub fn set_is_list(mut self, is_list: bool) -> Self {
+        self.is_list = is_list;
         self
     }
 
