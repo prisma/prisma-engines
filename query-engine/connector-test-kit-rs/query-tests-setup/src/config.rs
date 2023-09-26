@@ -215,11 +215,13 @@ impl TestConfig {
             #[cfg(unix)]
             {
                 use std::os::unix::fs::PermissionsExt;
-                if path.metadata().is_ok_and(|md| md.permissions().mode() & 0o111 == 0) {
-                    exit_with_message(&format!(
-                        "The external test executor file `{}` must be have permissions to execute",
-                        file
-                    ));
+                if let Ok(md) = path.metadata() {
+                    if md.permissions().mode() & 0o111 == 0 {
+                        exit_with_message(&format!(
+                            "The external test executor file `{}` must be have permissions to execute",
+                            file
+                        ));
+                    }
                 }
             }
         }
