@@ -56,10 +56,14 @@ pub fn conv_params(params: &[QuaintValue<'_>]) -> serde_json::Result<Vec<JSArg>>
                 Some(bytes) => JSArg::Buffer(bytes.to_vec()),
                 None => JsonValue::Null.into(),
             },
-            quaint_value => {
-                let json: JsonValue = quaint_value.clone().into();
-                json.into()
-            }
+            quaint_value @ QuaintValue::Numeric(bd) => match bd {
+                Some(bd) => match bd.to_string().parse::<f64>() {
+                    Ok(double) => JSArg::from(JsonValue::from(double)),
+                    Err(_) => JSArg::from(JsonValue::from(quaint_value.clone())),
+                },
+                None => JsonValue::Null.into(),
+            },
+            quaint_value => JSArg::from(JsonValue::from(quaint_value.clone())),
         };
 
         values.push(res);
