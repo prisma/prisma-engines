@@ -77,6 +77,9 @@ start-sqlite:
 dev-sqlite:
 	cp $(CONFIG_PATH)/sqlite $(CONFIG_FILE)
 
+dev-libsql-sqlite: build-qe-napi build-connector-kit-js
+	cp $(CONFIG_PATH)/libsql-sqlite $(CONFIG_FILE)
+
 start-postgres9:
 	docker compose -f docker-compose.yml up -d --remove-orphans postgres9
 
