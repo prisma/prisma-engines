@@ -45,7 +45,8 @@ jobs:
           cache: 'pnpm'
           cache-dependency-path: 'query-engine/driver-adapters/js/pnpm-lock.yaml'
 
-      - uses: dcarbone/install-jq-action
+      - name: Instal jq
+        run:  sudo apt-get install jq
 
       - name: Install dependencies
         run: pnpm i --prefer-offline
