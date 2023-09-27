@@ -45,7 +45,23 @@ export function fieldToColumnType(fieldTypeId: number): ColumnType {
   }
 }
 
+/**
+ * JsonNull are stored in json strings as the string "null", distinguishable from the `null`
+ * value. By default, JSON and JSONB columns use Json.parse to parse a JSON column value and
+ * this will lead to serde_json::Value::Null in rust.
+ *
+ * By converting "null" to the string "null", we can signal JsonNull in rust side and
+ * convert it to QuaintValue::Text("null"), which will be coerced properly in the presentation
+ * of the response document.
+ */
+function convertJson(json: string): any {
+  return (json === 'null') ? json : JSON.parse(json)
+}
+
 // return string instead of JavaScript Date object
 types.setTypeParser(NeonColumnType.DATE, date => date)
 types.setTypeParser(NeonColumnType.TIME, date => date)
 types.setTypeParser(NeonColumnType.TIMESTAMP, date => date)
+
+types.setTypeParser(NeonColumnType.JSONB, convertJson)
+types.setTypeParser(NeonColumnType.JSON, convertJson)

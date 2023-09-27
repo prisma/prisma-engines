@@ -279,10 +279,14 @@ fn js_value_to_quaint(
             serde_json::Value::Null => QuaintValue::DateTime(None),
             mismatch => panic!("Expected a string in column {}, found {}", column_name, mismatch),
         },
-        ColumnType::Json => match json_value {
-            serde_json::Value::Null => QuaintValue::Json(None),
-            json => QuaintValue::json(json),
-        },
+        ColumnType::Json => {
+            match json_value {
+                serde_json::Value::Null => QuaintValue::Json(None),
+                // JsonNull
+                serde_json::Value::String(s) if s == "null" => QuaintValue::Text(Some(s.into())),
+                json => QuaintValue::json(json),
+            }
+        }
         ColumnType::Enum => match json_value {
             serde_json::Value::String(s) => QuaintValue::enum_variant(s),
             serde_json::Value::Null => QuaintValue::Enum(None),
