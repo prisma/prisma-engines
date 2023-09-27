@@ -148,6 +148,8 @@ export class PrismaLibSQL extends LibSqlQueryable<StdClient> implements DriverAd
       const tx = await this.client.transaction('deferred')
       return ok(new LibSqlTransaction(tx, options, release))
     } catch (e) {
+      // note: we only release the lock if creating the transaction fails, it must stay locked otherwise,
+      // hence `catch` and rethrowing the error and not `finally`.
       release()
       throw e
     }
