@@ -36,6 +36,8 @@ export function fieldToColumnType(fieldTypeId: number): ColumnType {
       return ColumnTypeEnum.Text
     case PgColumnType['JSONB']:
       return ColumnTypeEnum.Json
+    case PgColumnType['UUID']:
+      return ColumnTypeEnum.Uuid
     default:
       if (fieldTypeId >= 10000) {
         // Postgres Custom Types

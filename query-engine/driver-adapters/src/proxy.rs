@@ -156,8 +156,13 @@ pub enum ColumnType {
     /// This is currently unhandled, and will panic if encountered.
     Set = 14,
 
-    // Below there are custom types that don't have a 1:1 translation with a quaint::Value.
-    // enum variant.
+    /// UUID from postgres-flavored driver adapters is mapped to this type.
+    Uuid = 15,
+
+    /*
+     * Below there are custom types that don't have a 1:1 translation with a quaint::Value.
+     * enum variant.
+     */
     /// UnknownNumber is used when the type of the column is a number but of unknown particular type
     /// and precision.
     ///
@@ -316,6 +321,14 @@ fn js_value_to_quaint(
                 "Expected a string or an array in column {}, found {}",
                 column_name, mismatch
             ),
+        },
+        ColumnType::Uuid => match json_value {
+            serde_json::Value::String(s) => {
+                let s_as_uuid = uuid::Uuid::parse_str(&s).expect("Expected a UUID string");
+                QuaintValue::uuid(s_as_uuid)
+            }
+            serde_json::Value::Null => QuaintValue::Bytes(None),
+            mismatch => panic!("Expected a UUID string in column {}, found {}", column_name, mismatch),
         },
         ColumnType::UnknownNumber => match json_value {
             serde_json::Value::Number(n) => n
