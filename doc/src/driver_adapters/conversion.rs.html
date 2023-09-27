@@ -67,6 +67,10 @@
 <a href="#67" id="67">67</a>
 <a href="#68" id="68">68</a>
 <a href="#69" id="69">69</a>
+<a href="#70" id="70">70</a>
+<a href="#71" id="71">71</a>
+<a href="#72" id="72">72</a>
+<a href="#73" id="73">73</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>napi::bindgen_prelude::{FromNapiValue, ToNapiValue};
 <span class="kw">use </span>quaint::ast::Value <span class="kw">as </span>QuaintValue;
 <span class="kw">use </span>serde::Serialize;
@@ -125,10 +129,14 @@
                 <span class="prelude-val">Some</span>(bytes) =&gt; JSArg::Buffer(bytes.to_vec()),
                 <span class="prelude-val">None </span>=&gt; JsonValue::Null.into(),
             },
-            quaint_value =&gt; {
-                <span class="kw">let </span>json: JsonValue = quaint_value.clone().into();
-                json.into()
-            }
+            quaint_value @ QuaintValue::Numeric(bd) =&gt; <span class="kw">match </span>bd {
+                <span class="prelude-val">Some</span>(bd) =&gt; <span class="kw">match </span>bd.to_string().parse::&lt;f64&gt;() {
+                    <span class="prelude-val">Ok</span>(double) =&gt; JSArg::from(JsonValue::from(double)),
+                    <span class="prelude-val">Err</span>(<span class="kw">_</span>) =&gt; JSArg::from(JsonValue::from(quaint_value.clone())),
+                },
+                <span class="prelude-val">None </span>=&gt; JsonValue::Null.into(),
+            },
+            quaint_value =&gt; JSArg::from(JsonValue::from(quaint_value.clone())),
         };
 
         values.push(res);
