@@ -742,6 +742,26 @@
 <a href="#742" id="742">742</a>
 <a href="#743" id="743">743</a>
 <a href="#744" id="744">744</a>
+<a href="#745" id="745">745</a>
+<a href="#746" id="746">746</a>
+<a href="#747" id="747">747</a>
+<a href="#748" id="748">748</a>
+<a href="#749" id="749">749</a>
+<a href="#750" id="750">750</a>
+<a href="#751" id="751">751</a>
+<a href="#752" id="752">752</a>
+<a href="#753" id="753">753</a>
+<a href="#754" id="754">754</a>
+<a href="#755" id="755">755</a>
+<a href="#756" id="756">756</a>
+<a href="#757" id="757">757</a>
+<a href="#758" id="758">758</a>
+<a href="#759" id="759">759</a>
+<a href="#760" id="760">760</a>
+<a href="#761" id="761">761</a>
+<a href="#762" id="762">762</a>
+<a href="#763" id="763">763</a>
+<a href="#764" id="764">764</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>core::panic;
 <span class="kw">use </span>std::str::FromStr;
 
@@ -836,69 +856,78 @@
     /// - INT16 (SMALLINT) -&gt; e.g. `32767`
     /// - INT24 (MEDIUMINT) -&gt; e.g. `8388607`
     /// - INT32 (INT) -&gt; e.g. `2147483647`
-    </span>Int32,
+    </span>Int32 = <span class="number">0</span>,
 
     <span class="doccomment">/// The following PlanetScale type IDs are mapped into Int64:
     /// - INT64 (BIGINT) -&gt; e.g. `&quot;9223372036854775807&quot;` (String-encoded)
-    </span>Int64,
+    </span>Int64 = <span class="number">1</span>,
 
     <span class="doccomment">/// The following PlanetScale type IDs are mapped into Float:
     /// - FLOAT32 (FLOAT) -&gt; e.g. `3.402823466`
-    </span>Float,
+    </span>Float = <span class="number">2</span>,
 
     <span class="doccomment">/// The following PlanetScale type IDs are mapped into Double:
     /// - FLOAT64 (DOUBLE) -&gt; e.g. `1.7976931348623157`
-    </span>Double,
+    </span>Double = <span class="number">3</span>,
 
     <span class="doccomment">/// The following PlanetScale type IDs are mapped into Numeric:
     /// - DECIMAL (DECIMAL) -&gt; e.g. `&quot;99999999.99&quot;` (String-encoded)
-    </span>Numeric,
+    </span>Numeric = <span class="number">4</span>,
 
     <span class="doccomment">/// The following PlanetScale type IDs are mapped into Boolean:
     /// - BOOLEAN (BOOLEAN) -&gt; e.g. `1`
-    </span>Boolean,
+    </span>Boolean = <span class="number">5</span>,
 
     <span class="doccomment">/// The following PlanetScale type IDs are mapped into Char:
     /// - CHAR (CHAR) -&gt; e.g. `&quot;c&quot;` (String-encoded)
-    </span>Char,
+    </span>Char = <span class="number">6</span>,
 
     <span class="doccomment">/// The following PlanetScale type IDs are mapped into Text:
     /// - TEXT (TEXT) -&gt; e.g. `&quot;foo&quot;` (String-encoded)
     /// - VARCHAR (VARCHAR) -&gt; e.g. `&quot;foo&quot;` (String-encoded)
-    </span>Text,
+    </span>Text = <span class="number">7</span>,
 
     <span class="doccomment">/// The following PlanetScale type IDs are mapped into Date:
     /// - DATE (DATE) -&gt; e.g. `&quot;2023-01-01&quot;` (String-encoded, yyyy-MM-dd)
-    </span>Date,
+    </span>Date = <span class="number">8</span>,
 
     <span class="doccomment">/// The following PlanetScale type IDs are mapped into Time:
     /// - TIME (TIME) -&gt; e.g. `&quot;23:59:59&quot;` (String-encoded, HH:mm:ss)
-    </span>Time,
+    </span>Time = <span class="number">9</span>,
 
     <span class="doccomment">/// The following PlanetScale type IDs are mapped into DateTime:
     /// - DATETIME (DATETIME) -&gt; e.g. `&quot;2023-01-01 23:59:59&quot;` (String-encoded, yyyy-MM-dd HH:mm:ss)
     /// - TIMESTAMP (TIMESTAMP) -&gt; e.g. `&quot;2023-01-01 23:59:59&quot;` (String-encoded, yyyy-MM-dd HH:mm:ss)
-    </span>DateTime,
+    </span>DateTime = <span class="number">10</span>,
 
     <span class="doccomment">/// The following PlanetScale type IDs are mapped into Json:
     /// - JSON (JSON) -&gt; e.g. `&quot;{\&quot;key\&quot;: \&quot;value\&quot;}&quot;` (String-encoded)
-    </span>Json,
+    </span>Json = <span class="number">11</span>,
 
     <span class="doccomment">/// The following PlanetScale type IDs are mapped into Enum:
     /// - ENUM (ENUM) -&gt; e.g. `&quot;foo&quot;` (String-encoded)
-    </span>Enum,
+    </span>Enum = <span class="number">12</span>,
 
     <span class="doccomment">/// The following PlanetScale type IDs are mapped into Bytes:
     /// - BLOB (BLOB) -&gt; e.g. `&quot;\u0012&quot;` (String-encoded)
     /// - VARBINARY (VARBINARY) -&gt; e.g. `&quot;\u0012&quot;` (String-encoded)
     /// - BINARY (BINARY) -&gt; e.g. `&quot;\u0012&quot;` (String-encoded)
     /// - GEOMETRY (GEOMETRY) -&gt; e.g. `&quot;\u0012&quot;` (String-encoded)
-    </span>Bytes,
+    </span>Bytes = <span class="number">13</span>,
 
     <span class="doccomment">/// The following PlanetScale type IDs are mapped into Set:
     /// - SET (SET) -&gt; e.g. `&quot;foo,bar&quot;` (String-encoded, comma-separated)
     /// This is currently unhandled, and will panic if encountered.
-    </span>Set,
+    </span>Set = <span class="number">14</span>,
+
+    <span class="comment">// Below there are custom types that don&#39;t have a 1:1 translation with a quaint::Value.
+    // enum variant.
+    </span><span class="doccomment">/// UnknownNumber is used when the type of the column is a number but of unknown particular type
+    /// and precision.
+    ///
+    /// It&#39;s used by some driver adapters, like libsql to return aggregation values like AVG, or
+    /// COUNT, and it can be mapped to either Int64, or Double
+    </span>UnknownNumber = <span class="number">128</span>,
 }
 
 <span class="attr">#[napi(object)]
@@ -1049,6 +1078,17 @@
             serde_json::Value::Null =&gt; QuaintValue::Bytes(<span class="prelude-val">None</span>),
             mismatch =&gt; <span class="macro">panic!</span>(
                 <span class="string">&quot;Expected a string or an array in column {}, found {}&quot;</span>,
+                column_name, mismatch
+            ),
+        },
+        ColumnType::UnknownNumber =&gt; <span class="kw">match </span>json_value {
+            serde_json::Value::Number(n) =&gt; n
+                .as_i64()
+                .map(|v| QuaintValue::Int64(<span class="prelude-val">Some</span>(v)))
+                .or(n.as_f64().map(|v| QuaintValue::Double(<span class="prelude-val">Some</span>(v))))
+                .expect(<span class="string">&quot;number must be an i64 or f64&quot;</span>),
+            mismatch =&gt; <span class="macro">panic!</span>(
+                <span class="string">&quot;Expected a either an i64 or a f64 in column {}, found {}&quot;</span>,
                 column_name, mismatch
             ),
         },
