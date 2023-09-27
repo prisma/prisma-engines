@@ -142,11 +142,12 @@ impl OrderByBuilder {
             .expect("An order by relation aggregation has to have at least one hop");
 
         // Unwraps are safe because the SQL connector doesn't yet support any other type of orderBy hop but the relation hop.
-        let mut joins = vec![];
+        let mut joins: Vec<AliasedJoin> = vec![];
+
         for (i, hop) in rest_hops.iter().enumerate() {
             let previous_join = if i > 0 { joins.get(i - 1) } else { None };
-
-            let join = compute_one2m_join(hop.as_relation_hop().unwrap(), &self.join_prefix(), previous_join, ctx);
+            let previous_alias = previous_join.map(|j| j.alias.as_str());
+            let join = compute_one2m_join(hop.as_relation_hop().unwrap(), &self.join_prefix(), previous_alias, ctx);
 
             joins.push(join);
         }
@@ -156,6 +157,8 @@ impl OrderByBuilder {
             _ => unreachable!("Order by relation aggregation other than count are not supported"),
         };
 
+        let previous_alias = joins.last().map(|j| j.alias.as_str());
+
         // We perform the aggregation on the last join
         let last_aggr_join = compute_aggr_join(
             last_hop.as_relation_hop().unwrap(),
@@ -163,7 +166,7 @@ impl OrderByBuilder {
             None,
             ORDER_AGGREGATOR_ALIAS,
             &self.join_prefix(),
-            joins.last(),
+            previous_alias,
             ctx,
         );
 
@@ -181,11 +184,12 @@ impl OrderByBuilder {
         order_by: &OrderByScalar,
         ctx: &Context<'_>,
     ) -> (Vec<AliasedJoin>, Column<'static>) {
-        let mut joins = vec![];
+        let mut joins: Vec<AliasedJoin> = vec![];
 
         for (i, hop) in order_by.path.iter().enumerate() {
             let previous_join = if i > 0 { joins.get(i - 1) } else { None };
-            let join = compute_one2m_join(hop.as_relation_hop().unwrap(), &self.join_prefix(), previous_join, ctx);
+            let previous_alias = previous_join.map(|j| j.alias.as_str());
+            let join = compute_one2m_join(hop.as_relation_hop().unwrap(), &self.join_prefix(), previous_alias, ctx);
 
             joins.push(join);
         }

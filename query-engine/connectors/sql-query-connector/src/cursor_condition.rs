@@ -226,7 +226,7 @@ pub(crate) fn build(
             let order_subquery = order_by_defs
                 .iter()
                 .flat_map(|j| &j.joins)
-                .fold(order_subquery, |acc, join| acc.left_join(join.data.clone()));
+                .fold(order_subquery, |acc, join| acc.join(join.data.clone()));
 
             let len = definitions.len();
             let reverse = query_arguments.needs_reversed_order();
