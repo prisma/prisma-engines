@@ -721,6 +721,22 @@
 <a href="#721" id="721">721</a>
 <a href="#722" id="722">722</a>
 <a href="#723" id="723">723</a>
+<a href="#724" id="724">724</a>
+<a href="#725" id="725">725</a>
+<a href="#726" id="726">726</a>
+<a href="#727" id="727">727</a>
+<a href="#728" id="728">728</a>
+<a href="#729" id="729">729</a>
+<a href="#730" id="730">730</a>
+<a href="#731" id="731">731</a>
+<a href="#732" id="732">732</a>
+<a href="#733" id="733">733</a>
+<a href="#734" id="734">734</a>
+<a href="#735" id="735">735</a>
+<a href="#736" id="736">736</a>
+<a href="#737" id="737">737</a>
+<a href="#738" id="738">738</a>
+<a href="#739" id="739">739</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>core::panic;
 <span class="kw">use </span>std::str::FromStr;
 
@@ -728,6 +744,7 @@
 <span class="kw">use </span><span class="kw">crate</span>::conversion::JSArg;
 <span class="kw">use </span><span class="kw">crate</span>::transaction::JsTransaction;
 <span class="kw">use </span>napi::bindgen_prelude::{FromNapiValue, ToNapiValue};
+<span class="kw">use </span>napi::threadsafe_function::{ErrorStrategy, ThreadsafeFunction};
 <span class="kw">use </span>napi::{JsObject, JsString};
 <span class="kw">use </span>napi_derive::napi;
 <span class="kw">use </span>quaint::connector::ResultSet <span class="kw">as </span>QuaintResultSet;
@@ -769,6 +786,10 @@
 
     <span class="doccomment">/// rollback transaction
     </span>rollback: AsyncJsFunction&lt;(), ()&gt;,
+
+    <span class="doccomment">/// dispose transaction, cleanup logic executed at the end of the transaction lifecycle
+    /// on drop.
+    </span>dispose: ThreadsafeFunction&lt;(), ErrorStrategy::Fatal&gt;,
 }
 
 <span class="doccomment">/// This result set is more convenient to be manipulated from both Rust and NodeJS.
@@ -1110,11 +1131,13 @@
     <span class="kw">pub fn </span>new(js_transaction: <span class="kw-2">&amp;</span>JsObject) -&gt; napi::Result&lt;<span class="self">Self</span>&gt; {
         <span class="kw">let </span>commit = js_transaction.get_named_property(<span class="string">&quot;commit&quot;</span>)<span class="question-mark">?</span>;
         <span class="kw">let </span>rollback = js_transaction.get_named_property(<span class="string">&quot;rollback&quot;</span>)<span class="question-mark">?</span>;
+        <span class="kw">let </span>dispose = js_transaction.get_named_property(<span class="string">&quot;dispose&quot;</span>)<span class="question-mark">?</span>;
         <span class="kw">let </span>options = js_transaction.get_named_property(<span class="string">&quot;options&quot;</span>)<span class="question-mark">?</span>;
 
         <span class="prelude-val">Ok</span>(<span class="self">Self </span>{
             commit,
             rollback,
+            dispose,
             options,
         })
     }
@@ -1126,9 +1149,18 @@
     <span class="kw">pub async fn </span>commit(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; quaint::Result&lt;()&gt; {
         <span class="self">self</span>.commit.call(()).<span class="kw">await
     </span>}
+
     <span class="kw">pub async fn </span>rollback(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; quaint::Result&lt;()&gt; {
         <span class="self">self</span>.rollback.call(()).<span class="kw">await
     </span>}
+}
+
+<span class="kw">impl </span>Drop <span class="kw">for </span>TransactionProxy {
+    <span class="kw">fn </span>drop(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
+        <span class="kw">_ </span>= <span class="self">self
+            </span>.dispose
+            .call((), napi::threadsafe_function::ThreadsafeFunctionCallMode::NonBlocking);
+    }
 }
 
 <span class="doccomment">/// Coerce a `f64` to a `f32`, asserting that the conversion is lossless.
