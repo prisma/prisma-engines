@@ -92,69 +92,78 @@ pub enum ColumnType {
     /// - INT16 (SMALLINT) -> e.g. `32767`
     /// - INT24 (MEDIUMINT) -> e.g. `8388607`
     /// - INT32 (INT) -> e.g. `2147483647`
-    Int32,
+    Int32 = 0,
 
     /// The following PlanetScale type IDs are mapped into Int64:
     /// - INT64 (BIGINT) -> e.g. `"9223372036854775807"` (String-encoded)
-    Int64,
+    Int64 = 1,
 
     /// The following PlanetScale type IDs are mapped into Float:
     /// - FLOAT32 (FLOAT) -> e.g. `3.402823466`
-    Float,
+    Float = 2,
 
     /// The following PlanetScale type IDs are mapped into Double:
     /// - FLOAT64 (DOUBLE) -> e.g. `1.7976931348623157`
-    Double,
+    Double = 3,
 
     /// The following PlanetScale type IDs are mapped into Numeric:
     /// - DECIMAL (DECIMAL) -> e.g. `"99999999.99"` (String-encoded)
-    Numeric,
+    Numeric = 4,
 
     /// The following PlanetScale type IDs are mapped into Boolean:
     /// - BOOLEAN (BOOLEAN) -> e.g. `1`
-    Boolean,
+    Boolean = 5,
 
     /// The following PlanetScale type IDs are mapped into Char:
     /// - CHAR (CHAR) -> e.g. `"c"` (String-encoded)
-    Char,
+    Char = 6,
 
     /// The following PlanetScale type IDs are mapped into Text:
     /// - TEXT (TEXT) -> e.g. `"foo"` (String-encoded)
     /// - VARCHAR (VARCHAR) -> e.g. `"foo"` (String-encoded)
-    Text,
+    Text = 7,
 
     /// The following PlanetScale type IDs are mapped into Date:
     /// - DATE (DATE) -> e.g. `"2023-01-01"` (String-encoded, yyyy-MM-dd)
-    Date,
+    Date = 8,
 
     /// The following PlanetScale type IDs are mapped into Time:
     /// - TIME (TIME) -> e.g. `"23:59:59"` (String-encoded, HH:mm:ss)
-    Time,
+    Time = 9,
 
     /// The following PlanetScale type IDs are mapped into DateTime:
     /// - DATETIME (DATETIME) -> e.g. `"2023-01-01 23:59:59"` (String-encoded, yyyy-MM-dd HH:mm:ss)
     /// - TIMESTAMP (TIMESTAMP) -> e.g. `"2023-01-01 23:59:59"` (String-encoded, yyyy-MM-dd HH:mm:ss)
-    DateTime,
+    DateTime = 10,
 
     /// The following PlanetScale type IDs are mapped into Json:
     /// - JSON (JSON) -> e.g. `"{\"key\": \"value\"}"` (String-encoded)
-    Json,
+    Json = 11,
 
     /// The following PlanetScale type IDs are mapped into Enum:
     /// - ENUM (ENUM) -> e.g. `"foo"` (String-encoded)
-    Enum,
+    Enum = 12,
 
     /// The following PlanetScale type IDs are mapped into Bytes:
     /// - BLOB (BLOB) -> e.g. `"\u0012"` (String-encoded)
     /// - VARBINARY (VARBINARY) -> e.g. `"\u0012"` (String-encoded)
     /// - BINARY (BINARY) -> e.g. `"\u0012"` (String-encoded)
     /// - GEOMETRY (GEOMETRY) -> e.g. `"\u0012"` (String-encoded)
-    Bytes,
+    Bytes = 13,
 
     /// The following PlanetScale type IDs are mapped into Set:
     /// - SET (SET) -> e.g. `"foo,bar"` (String-encoded, comma-separated)
     /// This is currently unhandled, and will panic if encountered.
-    Set,
+    Set = 14,
+
+    // Below there are custom types that don't have a 1:1 translation with a quaint::Value.
+    // enum variant.
+    /// UnknownNumber is used when the type of the column is a number but of unknown particular type
+    /// and precision.
+    ///
+    /// It's used by some driver adapters, like libsql to return aggregation values like AVG, or
+    /// COUNT, and it can be mapped to either Int64, or Double
+    UnknownNumber = 128,
 }
 
 #[napi(object)]
@@ -305,6 +314,17 @@ fn js_value_to_quaint(
             serde_json::Value::Null => QuaintValue::Bytes(None),
             mismatch => panic!(
                 "Expected a string or an array in column {}, found {}",
+                column_name, mismatch
+            ),
+        },
+        ColumnType::UnknownNumber => match json_value {
+            serde_json::Value::Number(n) => n
+                .as_i64()
+                .map(|v| QuaintValue::Int64(Some(v)))
+                .or(n.as_f64().map(|v| QuaintValue::Double(Some(v))))
+                .expect("number must be an i64 or f64"),
+            mismatch => panic!(
+                "Expected a either an i64 or a f64 in column {}, found {}",
                 column_name, mismatch
             ),
         },
