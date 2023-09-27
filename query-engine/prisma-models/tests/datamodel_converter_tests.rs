@@ -39,11 +39,8 @@ fn converting_enums() {
 }
 
 #[test]
-#[should_panic(
-    expected = "Indexes can only contain scalar attributes. Please remove all composite types from the argument list of the indexes."
-)]
 fn converting_composite_types() {
-    let datamodel = convert(
+    let res = psl::parse_schema(
         r#"
     datasource db {
       provider = "mongodb"
@@ -64,13 +61,7 @@ fn converting_composite_types() {
     }
     "#,
     );
-    let model = datamodel.assert_model("MyModel");
-    let uniq_idx = model.unique_indexes().find(|_| true).unwrap();
-    let attr = ScalarField::from((
-        model.dm.clone().into(),
-        uniq_idx.fields().find(|v| v.name() == "attribute").unwrap(),
-    ));
-    attr.type_identifier();
+    assert!(res.unwrap_err().contains("Indexes can only contain scalar attributes. Please remove \"attribute\" from the argument list of the indexes."));
 }
 
 #[test]
