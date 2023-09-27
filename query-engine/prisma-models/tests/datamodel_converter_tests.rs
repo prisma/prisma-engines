@@ -40,7 +40,7 @@ fn converting_enums() {
 
 #[test]
 #[should_panic(
-    expected = "Cannot convert a composite type to a type identifier. This error is typically caused by mistakenly using a composite type within a composite index."
+    expected = "Indexes can only contain scalar attributes. Please remove all composite types from the argument list of the indexes."
 )]
 fn converting_composite_types() {
     let datamodel = convert(
@@ -54,7 +54,7 @@ fn converting_composite_types() {
       id        String      @id @default(auto()) @map("_id") @db.ObjectId
       attribute Attribute
 
-      @@unique([attribute])
+      @@unique([attribute], name: "composite_index")
     }
 
     type Attribute {
@@ -64,7 +64,7 @@ fn converting_composite_types() {
     }
     "#,
     );
-    let model = datamodel.find_model("MyModel").unwrap();
+    let model = datamodel.assert_model("MyModel");
     let uniq_idx = model.unique_indexes().find(|_| true).unwrap();
     let attr = ScalarField::from((
         model.dm.clone().into(),

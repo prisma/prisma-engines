@@ -386,6 +386,20 @@ pub(crate) fn opclasses_are_not_allowed_with_other_than_normal_indices(index: In
     }
 }
 
+pub(crate) fn composite_types_are_not_allowed_in_index(index: IndexWalker<'_>, ctx: &mut Context<'_>) {
+    for field in index.fields() {
+        if field.scalar_field_type().as_composite_type().is_some() {
+            let message = "Indexes can only contain scalar attributes. Please remove all composite types from the argument list of the indexes.";
+            ctx.push_error(DatamodelError::new_attribute_validation_error(
+                message,
+                index.attribute_name(),
+                index.ast_attribute().span,
+            ));
+            return;
+        }
+    }
+}
+
 pub(super) fn unique_client_name_does_not_clash_with_field(index: IndexWalker<'_>, ctx: &mut Context<'_>) {
     if !index.is_unique() {
         return;
