@@ -188,7 +188,11 @@ fn js_value_to_quaint(
             mismatch => panic!("Expected an i32 number in column {}, found {}", column_name, mismatch),
         },
         ColumnType::Int64 => match json_value {
-            serde_json::Value::Number(n) => QuaintValue::int64(n.as_i64().expect("number must be an i64")),
+            serde_json::Value::Number(n) => n
+                .as_i64()
+                .map(|v| QuaintValue::Int64(Some(v)))
+                .or(n.as_f64().map(|v| QuaintValue::Double(Some(v))))
+                .expect("number must be an i64 or f64"),
             serde_json::Value::String(s) => {
                 let n = s.parse::<i64>().expect("string-encoded number must be an i64");
                 QuaintValue::int64(n)
