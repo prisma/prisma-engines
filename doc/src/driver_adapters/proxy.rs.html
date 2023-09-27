@@ -737,6 +737,11 @@
 <a href="#737" id="737">737</a>
 <a href="#738" id="738">738</a>
 <a href="#739" id="739">739</a>
+<a href="#740" id="740">740</a>
+<a href="#741" id="741">741</a>
+<a href="#742" id="742">742</a>
+<a href="#743" id="743">743</a>
+<a href="#744" id="744">744</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>core::panic;
 <span class="kw">use </span>std::str::FromStr;
 
@@ -1018,10 +1023,15 @@
             serde_json::Value::Null =&gt; QuaintValue::DateTime(<span class="prelude-val">None</span>),
             mismatch =&gt; <span class="macro">panic!</span>(<span class="string">&quot;Expected a string in column {}, found {}&quot;</span>, column_name, mismatch),
         },
-        ColumnType::Json =&gt; <span class="kw">match </span>json_value {
-            serde_json::Value::Null =&gt; QuaintValue::Json(<span class="prelude-val">None</span>),
-            json =&gt; QuaintValue::json(json),
-        },
+        ColumnType::Json =&gt; {
+            <span class="kw">match </span>json_value {
+                <span class="comment">// DbNull
+                </span>serde_json::Value::Null =&gt; QuaintValue::Json(<span class="prelude-val">None</span>),
+                <span class="comment">// JsonNull
+                </span>serde_json::Value::String(s) <span class="kw">if </span>s == <span class="string">&quot;$__prisma_null&quot; </span>=&gt; QuaintValue::json(serde_json::Value::Null),
+                json =&gt; QuaintValue::json(json),
+            }
+        }
         ColumnType::Enum =&gt; <span class="kw">match </span>json_value {
             serde_json::Value::String(s) =&gt; QuaintValue::enum_variant(s),
             serde_json::Value::Null =&gt; QuaintValue::Enum(<span class="prelude-val">None</span>),
