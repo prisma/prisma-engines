@@ -48,8 +48,9 @@ pub(crate) struct TransactionProxy {
     /// rollback transaction
     rollback: AsyncJsFunction<(), ()>,
 
-    /// discard transaction
-    discard: ThreadsafeFunction<(), ErrorStrategy::Fatal>,
+    /// dispose transaction, cleanup logic executed at the end of the transaction lifecycle
+    /// on drop.
+    dispose: ThreadsafeFunction<(), ErrorStrategy::Fatal>,
 }
 
 /// This result set is more convenient to be manipulated from both Rust and NodeJS.
@@ -397,7 +398,7 @@ impl TransactionProxy {
         Ok(Self {
             commit,
             rollback,
-            discard,
+            dispose: discard,
             options,
         })
     }
@@ -413,18 +414,13 @@ impl TransactionProxy {
     pub async fn rollback(&self) -> quaint::Result<()> {
         self.rollback.call(()).await
     }
+}
 
-    pub fn discard(&self) -> quaint::Result<()> {
-        match self
-            .discard
-            .call((), napi::threadsafe_function::ThreadsafeFunctionCallMode::NonBlocking)
-        {
-            napi::Status::Ok => Ok(()),
-            err => Err(quaint::error::Error::raw_connector_error(
-                err.to_string(),
-                "error in TransactionProxy::discard".to_owned(),
-            )),
-        }
+impl Drop for TransactionProxy {
+    fn drop(&mut self) {
+        _ = self
+            .dispose
+            .call((), napi::threadsafe_function::ThreadsafeFunctionCallMode::NonBlocking);
     }
 }
 
