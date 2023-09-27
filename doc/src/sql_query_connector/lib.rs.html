@@ -36,7 +36,7 @@
 <span class="kw">mod </span>cursor_condition;
 <span class="kw">mod </span>database;
 <span class="kw">mod </span>error;
-<span class="kw">mod </span>filter_conversion;
+<span class="kw">mod </span>filter;
 <span class="kw">mod </span>join_utils;
 <span class="kw">mod </span>model_extensions;
 <span class="kw">mod </span>nested_aggregations;
@@ -49,7 +49,7 @@
 <span class="kw">mod </span>value;
 <span class="kw">mod </span>value_ext;
 
-<span class="kw">use </span><span class="self">self</span>::{column_metadata::<span class="kw-2">*</span>, context::Context, filter_conversion::<span class="kw-2">*</span>, query_ext::QueryExt, row::<span class="kw-2">*</span>};
+<span class="kw">use </span><span class="self">self</span>::{column_metadata::<span class="kw-2">*</span>, context::Context, query_ext::QueryExt, row::<span class="kw-2">*</span>};
 <span class="kw">use </span>quaint::prelude::Queryable;
 
 <span class="attr">#[cfg(feature = <span class="string">&quot;driver-adapters&quot;</span>)]

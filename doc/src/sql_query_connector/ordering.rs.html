@@ -234,6 +234,10 @@
 <a href="#234" id="234">234</a>
 <a href="#235" id="235">235</a>
 <a href="#236" id="236">236</a>
+<a href="#237" id="237">237</a>
+<a href="#238" id="238">238</a>
+<a href="#239" id="239">239</a>
+<a href="#240" id="240">240</a>
 </pre></div><pre class="rust"><code><span class="kw">use crate</span>::{join_utils::<span class="kw-2">*</span>, model_extensions::<span class="kw-2">*</span>, query_arguments_ext::QueryArgumentsExt, Context};
 <span class="kw">use </span>connector_interface::QueryArguments;
 <span class="kw">use </span>itertools::Itertools;
@@ -378,11 +382,12 @@
             .expect(<span class="string">&quot;An order by relation aggregation has to have at least one hop&quot;</span>);
 
         <span class="comment">// Unwraps are safe because the SQL connector doesn&#39;t yet support any other type of orderBy hop but the relation hop.
-        </span><span class="kw">let </span><span class="kw-2">mut </span>joins = <span class="macro">vec!</span>[];
+        </span><span class="kw">let </span><span class="kw-2">mut </span>joins: Vec&lt;AliasedJoin&gt; = <span class="macro">vec!</span>[];
+
         <span class="kw">for </span>(i, hop) <span class="kw">in </span>rest_hops.iter().enumerate() {
             <span class="kw">let </span>previous_join = <span class="kw">if </span>i &gt; <span class="number">0 </span>{ joins.get(i - <span class="number">1</span>) } <span class="kw">else </span>{ <span class="prelude-val">None </span>};
-
-            <span class="kw">let </span>join = compute_one2m_join(hop.as_relation_hop().unwrap(), <span class="kw-2">&amp;</span><span class="self">self</span>.join_prefix(), previous_join, ctx);
+            <span class="kw">let </span>previous_alias = previous_join.map(|j| j.alias.as_str());
+            <span class="kw">let </span>join = compute_one2m_join(hop.as_relation_hop().unwrap(), <span class="kw-2">&amp;</span><span class="self">self</span>.join_prefix(), previous_alias, ctx);
 
             joins.push(join);
         }
@@ -392,6 +397,8 @@
             <span class="kw">_ </span>=&gt; <span class="macro">unreachable!</span>(<span class="string">&quot;Order by relation aggregation other than count are not supported&quot;</span>),
         };
 
+        <span class="kw">let </span>previous_alias = joins.last().map(|j| j.alias.as_str());
+
         <span class="comment">// We perform the aggregation on the last join
         </span><span class="kw">let </span>last_aggr_join = compute_aggr_join(
             last_hop.as_relation_hop().unwrap(),
@@ -399,7 +406,7 @@
             <span class="prelude-val">None</span>,
             ORDER_AGGREGATOR_ALIAS,
             <span class="kw-2">&amp;</span><span class="self">self</span>.join_prefix(),
-            joins.last(),
+            previous_alias,
             ctx,
         );
 
@@ -417,11 +424,12 @@
         order_by: <span class="kw-2">&amp;</span>OrderByScalar,
         ctx: <span class="kw-2">&amp;</span>Context&lt;<span class="lifetime">&#39;_</span>&gt;,
     ) -&gt; (Vec&lt;AliasedJoin&gt;, Column&lt;<span class="lifetime">&#39;static</span>&gt;) {
-        <span class="kw">let </span><span class="kw-2">mut </span>joins = <span class="macro">vec!</span>[];
+        <span class="kw">let </span><span class="kw-2">mut </span>joins: Vec&lt;AliasedJoin&gt; = <span class="macro">vec!</span>[];
 
         <span class="kw">for </span>(i, hop) <span class="kw">in </span>order_by.path.iter().enumerate() {
             <span class="kw">let </span>previous_join = <span class="kw">if </span>i &gt; <span class="number">0 </span>{ joins.get(i - <span class="number">1</span>) } <span class="kw">else </span>{ <span class="prelude-val">None </span>};
-            <span class="kw">let </span>join = compute_one2m_join(hop.as_relation_hop().unwrap(), <span class="kw-2">&amp;</span><span class="self">self</span>.join_prefix(), previous_join, ctx);
+            <span class="kw">let </span>previous_alias = previous_join.map(|j| j.alias.as_str());
+            <span class="kw">let </span>join = compute_one2m_join(hop.as_relation_hop().unwrap(), <span class="kw-2">&amp;</span><span class="self">self</span>.join_prefix(), previous_alias, ctx);
 
             joins.push(join);
         }

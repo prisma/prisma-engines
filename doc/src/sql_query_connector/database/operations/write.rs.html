@@ -433,7 +433,7 @@
 <a href="#433" id="433">433</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span><span class="kw">super</span>::update::<span class="kw-2">*</span>;
 <span class="kw">use </span><span class="kw">crate</span>::column_metadata;
-<span class="kw">use </span><span class="kw">crate</span>::filter_conversion::AliasedCondition;
+<span class="kw">use </span><span class="kw">crate</span>::filter::FilterBuilder;
 <span class="kw">use </span><span class="kw">crate</span>::row::ToSqlRow;
 <span class="kw">use crate</span>::{
     error::SqlError, model_extensions::<span class="kw-2">*</span>, query_builder::write, sql_trace::SqlTraceComment, Context, QueryExt,
@@ -794,7 +794,7 @@
     record_filter: RecordFilter,
     ctx: <span class="kw-2">&amp;</span>Context&lt;<span class="lifetime">&#39;_</span>&gt;,
 ) -&gt; <span class="kw">crate</span>::Result&lt;usize&gt; {
-    <span class="kw">let </span>filter_condition = record_filter.clone().filter.aliased_condition_from(<span class="prelude-val">None</span>, <span class="bool-val">false</span>, ctx);
+    <span class="kw">let </span>filter_condition = FilterBuilder::without_top_level_joins().visit_filter(record_filter.clone().filter, ctx);
     <span class="kw">let </span>ids = conn.filter_selectors(model, record_filter, ctx).<span class="kw">await</span><span class="question-mark">?</span>;
     <span class="kw">let </span>ids: Vec&lt;<span class="kw-2">&amp;</span>SelectionResult&gt; = ids.iter().collect();
     <span class="kw">let </span>count = ids.len();

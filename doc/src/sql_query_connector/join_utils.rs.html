@@ -258,10 +258,7 @@
 <a href="#258" id="258">258</a>
 <a href="#259" id="259">259</a>
 <a href="#260" id="260">260</a>
-<a href="#261" id="261">261</a>
-<a href="#262" id="262">262</a>
-<a href="#263" id="263">263</a>
-</pre></div><pre class="rust"><code><span class="kw">use crate</span>::{filter_conversion::AliasedCondition, model_extensions::<span class="kw-2">*</span>, Context};
+</pre></div><pre class="rust"><code><span class="kw">use crate</span>::{filter::FilterBuilder, model_extensions::<span class="kw-2">*</span>, Context};
 <span class="kw">use </span>connector_interface::Filter;
 <span class="kw">use </span>prisma_models::<span class="kw-2">*</span>;
 <span class="kw">use </span>quaint::prelude::<span class="kw-2">*</span>;
@@ -269,7 +266,7 @@
 <span class="attr">#[derive(Debug, Clone)]
 </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>AliasedJoin {
     <span class="comment">// Actual join data to be passed to quaint
-    </span><span class="kw">pub</span>(<span class="kw">crate</span>) data: JoinData&lt;<span class="lifetime">&#39;static</span>&gt;,
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) data: Join&lt;<span class="lifetime">&#39;static</span>&gt;,
     <span class="comment">// Alias used for the join. eg: LEFT JOIN ... AS &lt;alias&gt;
     </span><span class="kw">pub</span>(<span class="kw">crate</span>) alias: String,
 }
@@ -285,7 +282,7 @@
     filter: <span class="prelude-ty">Option</span>&lt;Filter&gt;,
     aggregator_alias: <span class="kw-2">&amp;</span>str,
     join_alias: <span class="kw-2">&amp;</span>str,
-    previous_join: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>AliasedJoin&gt;,
+    previous_join: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt;,
     ctx: <span class="kw-2">&amp;</span>Context&lt;<span class="lifetime">&#39;_</span>&gt;,
 ) -&gt; AliasedJoin {
     <span class="kw">let </span>join_alias = <span class="macro">format!</span>(<span class="string">&quot;{}_{}&quot;</span>, join_alias, <span class="kw-2">&amp;</span>rf.related_model().name());
@@ -328,7 +325,7 @@
     filter: <span class="prelude-ty">Option</span>&lt;Filter&gt;,
     aggregator_alias: <span class="kw-2">&amp;</span>str,
     join_alias: <span class="kw-2">&amp;</span>str,
-    previous_join: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>AliasedJoin&gt;,
+    previous_join: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt;,
     ctx: <span class="kw-2">&amp;</span>Context&lt;<span class="lifetime">&#39;_</span>&gt;,
 ) -&gt; AliasedJoin {
     <span class="kw">let </span>(left_fields, right_fields) = <span class="kw">if </span>rf.is_inlined_on_enclosing_model() {
@@ -340,9 +337,9 @@
         )
     };
     <span class="kw">let </span>select_columns = right_fields.iter().map(|f| f.as_column(ctx));
-    <span class="kw">let </span>conditions: ConditionTree = filter
-        .map(|f| f.aliased_condition_from(<span class="prelude-val">None</span>, <span class="bool-val">false</span>, ctx))
-        .unwrap_or(ConditionTree::NoCondition);
+    <span class="kw">let </span>(conditions, joins) = filter
+        .map(|f| FilterBuilder::with_top_level_joins().visit_filter(f, ctx))
+        .unwrap_or((ConditionTree::NoCondition, <span class="prelude-val">None</span>));
 
     <span class="comment">// + SELECT Child.&lt;fk&gt; FROM Child WHERE &lt;FILTER&gt;
     </span><span class="kw">let </span>query = Select::from_table(rf.related_model().as_table(ctx))
@@ -361,11 +358,17 @@
     // + GROUP BY Child.&lt;fk&gt;
     </span><span class="kw">let </span>query = right_fields.iter().fold(query, |acc, f| acc.group_by(f.as_column(ctx)));
 
+    <span class="kw">let </span>query = <span class="kw">if let </span><span class="prelude-val">Some</span>(joins) = joins {
+        joins.into_iter().fold(query, |acc, join| acc.join(join.data))
+    } <span class="kw">else </span>{
+        query
+    };
+
     <span class="kw">let </span>pairs = left_fields.into_iter().zip(right_fields);
     <span class="kw">let </span>on_conditions: Vec&lt;Expression&gt; = pairs
         .map(|(a, b)| {
             <span class="kw">let </span>col_a = <span class="kw">match </span>previous_join {
-                <span class="prelude-val">Some</span>(prev_join) =&gt; Column::from((prev_join.alias.to_owned(), a.db_name().to_owned())),
+                <span class="prelude-val">Some</span>(prev_join) =&gt; Column::from((prev_join.to_owned(), a.db_name().to_owned())),
                 <span class="prelude-val">None </span>=&gt; a.as_column(ctx),
             };
             <span class="kw">let </span>col_b = Column::from((join_alias.to_owned(), b.db_name().to_owned()));
@@ -383,7 +386,7 @@
         .on(ConditionTree::And(on_conditions));
 
     AliasedJoin {
-        data: join,
+        data: Join::Left(join),
         alias: join_alias.to_owned(),
     }
 }
@@ -404,7 +407,7 @@
     filter: <span class="prelude-ty">Option</span>&lt;Filter&gt;,
     aggregator_alias: <span class="kw-2">&amp;</span>str,
     join_alias: <span class="kw-2">&amp;</span>str,
-    previous_join: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>AliasedJoin&gt;,
+    previous_join: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt;,
     ctx: <span class="kw-2">&amp;</span>Context&lt;<span class="lifetime">&#39;_</span>&gt;,
 ) -&gt; AliasedJoin {
     <span class="comment">// m2m join table (_ParentToChild)
@@ -418,14 +421,20 @@
     <span class="comment">// Parent primary identifiers
     </span><span class="kw">let </span>parent_ids: ModelProjection = rf.model().primary_identifier().into();
     <span class="comment">// Rendered filters
-    </span><span class="kw">let </span>conditions: ConditionTree = filter
-        .map(|f| f.aliased_condition_from(<span class="prelude-val">None</span>, <span class="bool-val">false</span>, ctx))
-        .unwrap_or(ConditionTree::NoCondition);
+    </span><span class="kw">let </span>(conditions, joins) = filter
+        .map(|f| FilterBuilder::with_top_level_joins().visit_filter(f, ctx))
+        .unwrap_or((ConditionTree::NoCondition, <span class="prelude-val">None</span>));
 
     <span class="comment">// + SELECT _ParentToChild.ChildId FROM Child WHERE &lt;FILTER&gt;
     </span><span class="kw">let </span>query = Select::from_table(child_model.as_table(ctx))
         .columns(m2m_child_columns.clone())
         .so_that(conditions);
+
+    <span class="kw">let </span>query = <span class="kw">if let </span><span class="prelude-val">Some</span>(joins) = joins {
+        joins.into_iter().fold(query, |acc, join| acc.join(join.data))
+    } <span class="kw">else </span>{
+        query
+    };
 
     <span class="kw">let </span>aggr_expr = <span class="kw">match </span>aggregation {
         AggregationType::Count =&gt; count(m2m_child_columns.clone()),
@@ -459,7 +468,7 @@
     <span class="kw">let </span>on_conditions: Vec&lt;Expression&gt; = pairs
         .map(|(a, b)| {
             <span class="kw">let </span>col_a = <span class="kw">match </span>previous_join {
-                <span class="prelude-val">Some</span>(prev_join) =&gt; Column::from((prev_join.alias.to_owned(), a.db_name().to_owned())),
+                <span class="prelude-val">Some</span>(prev_join) =&gt; Column::from((prev_join.to_owned(), a.db_name().to_owned())),
                 <span class="prelude-val">None </span>=&gt; a.as_column(ctx),
             };
             <span class="kw">let </span>col_b = Column::from((join_alias.to_owned(), b.name.to_string()));
@@ -479,49 +488,34 @@
 
     AliasedJoin {
         alias: join_alias.to_owned(),
-        data: join,
+        data: Join::Left(join),
     }
 }
 
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>compute_one2m_join(
-    rf: <span class="kw-2">&amp;</span>RelationFieldRef,
-    join_prefix: <span class="kw-2">&amp;</span>str,
-    previous_join: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>AliasedJoin&gt;,
+    field: <span class="kw-2">&amp;</span>RelationFieldRef,
+    alias: <span class="kw-2">&amp;</span>str,
+    parent_alias: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt;,
     ctx: <span class="kw-2">&amp;</span>Context&lt;<span class="lifetime">&#39;_</span>&gt;,
 ) -&gt; AliasedJoin {
-    <span class="kw">let </span>(left_fields, right_fields) = <span class="kw">if </span>rf.is_inlined_on_enclosing_model() {
-        (rf.scalar_fields(), rf.referenced_fields())
-    } <span class="kw">else </span>{
-        (
-            rf.related_field().referenced_fields(),
-            rf.related_field().scalar_fields(),
-        )
-    };
+    <span class="kw">let </span>join_columns: Vec&lt;Column&gt; = field
+        .join_columns(ctx)
+        .map(|c| c.opt_table(parent_alias.map(ToOwned::to_owned)))
+        .collect();
 
-    <span class="kw">let </span>right_table_alias = <span class="macro">format!</span>(<span class="string">&quot;{}_{}&quot;</span>, join_prefix, rf.related_model().name());
+    <span class="kw">let </span>related_table = field.related_model().as_table(ctx);
+    <span class="kw">let </span>related_join_columns: Vec&lt;<span class="kw">_</span>&gt; = ModelProjection::from(field.related_field().linking_fields())
+        .as_columns(ctx)
+        .map(|col| col.table(alias.to_owned()))
+        .collect();
 
-    <span class="kw">let </span>related_model = rf.related_model();
-    <span class="kw">let </span>pairs = left_fields.into_iter().zip(right_fields);
-
-    <span class="kw">let </span>on_conditions: Vec&lt;Expression&gt; = pairs
-        .map(|(a, b)| {
-            <span class="kw">let </span>a_col = <span class="kw">match </span>previous_join {
-                <span class="prelude-val">Some</span>(prev_join) =&gt; Column::from((prev_join.alias.to_owned(), a.db_name().to_owned())),
-                <span class="prelude-val">None </span>=&gt; a.as_column(ctx),
-            };
-
-            <span class="kw">let </span>b_col = Column::from((right_table_alias.clone(), b.db_name().to_owned()));
-
-            a_col.equals(b_col).into()
-        })
-        .collect::&lt;Vec&lt;<span class="kw">_</span>&gt;&gt;();
+    <span class="kw">let </span>join = related_table
+        .alias(alias.to_owned())
+        .on(Row::from(related_join_columns).equals(Row::from(join_columns)));
 
     AliasedJoin {
-        alias: right_table_alias.to_owned(),
-        data: related_model
-            .as_table(ctx)
-            .alias(right_table_alias)
-            .on(ConditionTree::And(on_conditions)),
+        alias: alias.to_owned(),
+        data: Join::Left(join),
     }
 }
 </code></pre></div></section></main></body></html>

@@ -693,6 +693,14 @@
 <a href="#693" id="693">693</a>
 <a href="#694" id="694">694</a>
 <a href="#695" id="695">695</a>
+<a href="#696" id="696">696</a>
+<a href="#697" id="697">697</a>
+<a href="#698" id="698">698</a>
+<a href="#699" id="699">699</a>
+<a href="#700" id="700">700</a>
+<a href="#701" id="701">701</a>
+<a href="#702" id="702">702</a>
+<a href="#703" id="703">703</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::ast::<span class="kw-2">*</span>;
 <span class="kw">use </span>std::borrow::Cow;
 
@@ -1145,6 +1153,14 @@
         </span>J: Into&lt;JoinData&lt;<span class="lifetime">&#39;a</span>&gt;&gt;,
     {
         <span class="self">self</span>.joins.push(Join::Full(join.into()));
+        <span class="self">self
+    </span>}
+
+    <span class="kw">pub fn </span>join&lt;J&gt;(<span class="kw-2">mut </span><span class="self">self</span>, join: J) -&gt; <span class="self">Self
+    </span><span class="kw">where
+        </span>J: Into&lt;Join&lt;<span class="lifetime">&#39;a</span>&gt;&gt;,
+    {
+        <span class="self">self</span>.joins.push(join.into());
         <span class="self">self
     </span>}
 

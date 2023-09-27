@@ -277,9 +277,21 @@
 <a href="#277" id="277">277</a>
 <a href="#278" id="278">278</a>
 <a href="#279" id="279">279</a>
+<a href="#280" id="280">280</a>
+<a href="#281" id="281">281</a>
+<a href="#282" id="282">282</a>
+<a href="#283" id="283">283</a>
+<a href="#284" id="284">284</a>
+<a href="#285" id="285">285</a>
+<a href="#286" id="286">286</a>
+<a href="#287" id="287">287</a>
+<a href="#288" id="288">288</a>
+<a href="#289" id="289">289</a>
+<a href="#290" id="290">290</a>
+<a href="#291" id="291">291</a>
 </pre></div><pre class="rust"><code><span class="kw">use crate</span>::{
-    cursor_condition, filter_conversion::AliasedCondition, model_extensions::<span class="kw-2">*</span>, nested_aggregations,
-    ordering::OrderByBuilder, sql_trace::SqlTraceComment, Context,
+    cursor_condition, filter::FilterBuilder, model_extensions::<span class="kw-2">*</span>, nested_aggregations, ordering::OrderByBuilder,
+    sql_trace::SqlTraceComment, Context,
 };
 <span class="kw">use </span>connector_interface::{filter::Filter, AggregationSelection, QueryArguments, RelAggregationSelection};
 <span class="kw">use </span>itertools::Itertools;
@@ -344,10 +356,10 @@
         <span class="kw">let </span>limit = <span class="kw">if </span><span class="self">self</span>.ignore_take { <span class="prelude-val">None </span>} <span class="kw">else </span>{ <span class="self">self</span>.take_abs() };
         <span class="kw">let </span>skip = <span class="kw">if </span><span class="self">self</span>.ignore_skip { <span class="number">0 </span>} <span class="kw">else </span>{ <span class="self">self</span>.skip.unwrap_or(<span class="number">0</span>) };
 
-        <span class="kw">let </span>filter: ConditionTree = <span class="self">self
+        <span class="kw">let </span>(filter, filter_joins) = <span class="self">self
             </span>.filter
-            .map(|f| f.aliased_condition_from(<span class="prelude-val">None</span>, <span class="bool-val">false</span>, ctx))
-            .unwrap_or(ConditionTree::NoCondition);
+            .map(|f| FilterBuilder::with_top_level_joins().visit_filter(f, ctx))
+            .unwrap_or((ConditionTree::NoCondition, <span class="prelude-val">None</span>));
 
         <span class="kw">let </span>conditions = <span class="kw">match </span>(filter, cursor_condition) {
             (ConditionTree::NoCondition, cursor) =&gt; cursor,
@@ -359,13 +371,21 @@
         </span><span class="kw">let </span>joined_table = order_by_definitions
             .iter()
             .flat_map(|j| <span class="kw-2">&amp;</span>j.joins)
-            .fold(model.as_table(ctx), |acc, join| acc.left_join(join.clone().data));
+            .fold(model.as_table(ctx), |acc, join| acc.join(join.clone().data));
 
         <span class="comment">// Add joins necessary to the nested aggregations
         </span><span class="kw">let </span>joined_table = aggregation_joins
             .joins
             .into_iter()
-            .fold(joined_table, |acc, join| acc.left_join(join.data));
+            .fold(joined_table, |acc, join| acc.join(join.data));
+
+        <span class="kw">let </span>joined_table = <span class="kw">if let </span><span class="prelude-val">Some</span>(filter_joins) = filter_joins {
+            filter_joins
+                .into_iter()
+                .fold(joined_table, |acc, join| acc.join(join.data))
+        } <span class="kw">else </span>{
+            joined_table
+        };
 
         <span class="kw">let </span>select_ast = Select::from_table(joined_table)
             .so_that(conditions)
@@ -526,7 +546,11 @@
     );
 
     <span class="kw">match </span>having {
-        <span class="prelude-val">Some</span>(filter) =&gt; grouped.having(filter.aliased_condition_from(<span class="prelude-val">None</span>, <span class="bool-val">false</span>, ctx)),
+        <span class="prelude-val">Some</span>(filter) =&gt; {
+            <span class="kw">let </span>cond = FilterBuilder::without_top_level_joins().visit_filter(filter, ctx);
+
+            grouped.having(cond)
+        }
         <span class="prelude-val">None </span>=&gt; grouped,
     }
 }

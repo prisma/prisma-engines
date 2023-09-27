@@ -167,10 +167,11 @@
 <a href="#167" id="167">167</a>
 <a href="#168" id="168">168</a>
 <a href="#169" id="169">169</a>
+<a href="#170" id="170">170</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span><span class="kw">super</span>::read::get_single_record;
 
 <span class="kw">use </span><span class="kw">crate</span>::column_metadata::{<span class="self">self</span>, ColumnMetadata};
-<span class="kw">use </span><span class="kw">crate</span>::filter_conversion::AliasedCondition;
+<span class="kw">use </span><span class="kw">crate</span>::filter::FilterBuilder;
 <span class="kw">use </span><span class="kw">crate</span>::query_builder::write::{build_update_and_set_query, chunk_update_with_ids};
 <span class="kw">use </span><span class="kw">crate</span>::row::ToSqlRow;
 <span class="kw">use crate</span>::{Context, QueryExt, Queryable};
@@ -200,8 +201,9 @@
         <span class="kw">return </span>get_single_record(conn, model, <span class="kw-2">&amp;</span>filter, <span class="kw-2">&amp;</span>selected_fields, <span class="kw-2">&amp;</span>[], ctx).<span class="kw">await</span>;
     }
 
-    <span class="kw">let </span>update = build_update_and_set_query(model, args, <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span>selected_fields), ctx)
-        .so_that(build_update_one_filter(record_filter).aliased_condition_from(<span class="prelude-val">None</span>, <span class="bool-val">false</span>, ctx));
+    <span class="kw">let </span>cond = FilterBuilder::without_top_level_joins().visit_filter(build_update_one_filter(record_filter), ctx);
+
+    <span class="kw">let </span>update = build_update_and_set_query(model, args, <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span>selected_fields), ctx).so_that(cond);
 
     <span class="kw">let </span>field_names: Vec&lt;<span class="kw">_</span>&gt; = selected_fields.db_names().collect();
     <span class="kw">let </span>idents = selected_fields.type_identifiers_with_arities();
@@ -270,7 +272,7 @@
     ctx: <span class="kw-2">&amp;</span>Context&lt;<span class="lifetime">&#39;_</span>&gt;,
 ) -&gt; <span class="kw">crate</span>::Result&lt;usize&gt; {
     <span class="kw">let </span>update = build_update_and_set_query(model, args, <span class="prelude-val">None</span>, ctx);
-    <span class="kw">let </span>filter_condition = record_filter.filter.aliased_condition_from(<span class="prelude-val">None</span>, <span class="bool-val">false</span>, ctx);
+    <span class="kw">let </span>filter_condition = FilterBuilder::without_top_level_joins().visit_filter(record_filter.filter, ctx);
     <span class="kw">let </span>update = update.so_that(filter_condition);
     <span class="kw">let </span>count = conn.execute(update.into()).<span class="kw">await</span><span class="question-mark">?</span>;
 
@@ -286,7 +288,7 @@
     args: WriteArgs,
     ctx: <span class="kw-2">&amp;</span>Context&lt;<span class="lifetime">&#39;_</span>&gt;,
 ) -&gt; <span class="kw">crate</span>::Result&lt;(usize, Vec&lt;SelectionResult&gt;)&gt; {
-    <span class="kw">let </span>filter_condition = record_filter.filter.aliased_condition_from(<span class="prelude-val">None</span>, <span class="bool-val">false</span>, ctx);
+    <span class="kw">let </span>filter_condition = FilterBuilder::without_top_level_joins().visit_filter(record_filter.filter.clone(), ctx);
     <span class="kw">let </span>ids: Vec&lt;SelectionResult&gt; = conn.filter_selectors(model, record_filter, ctx).<span class="kw">await</span><span class="question-mark">?</span>;
 
     <span class="kw">if </span>ids.is_empty() {
