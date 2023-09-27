@@ -111,7 +111,7 @@ class PlanetScaleTransaction extends PlanetScaleQueryable<planetScale.Transactio
     return Promise.resolve(ok(await this.txResultPromise))
   }
 
-  discard(): Result<void> {
+  dispose(): Result<void> {
     if (!this.finished) {
       this.rollback().catch(console.error)
     }

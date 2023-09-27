@@ -101,7 +101,7 @@ class NeonTransaction extends NeonWsQueryable<neon.PoolClient> implements Transa
     return Promise.resolve(ok(undefined))
   }
 
-  discard(): Result<void> {
+  dispose(): Result<void> {
     this.client.release()
     return ok(undefined)
   }

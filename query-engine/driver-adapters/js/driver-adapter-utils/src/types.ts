@@ -102,7 +102,7 @@ export interface Transaction extends Queryable {
    * asynchronous tasks on the event loop, the driver is responsible for handling the errors
    * appropriately to ensure they don't crash the application.
    */
-  discard(): Result<void>
+  dispose(): Result<void>
 }
 
 export interface ErrorCapturingDriverAdapter extends DriverAdapter {

@@ -94,7 +94,7 @@ class PgTransaction extends PgQueryable<TransactionClient> implements Transactio
     return ok(undefined)
   }
 
-  discard(): Result<void> {
+  dispose(): Result<void> {
     this.client.release()
     return ok(undefined)
   }

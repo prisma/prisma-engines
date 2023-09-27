@@ -392,13 +392,13 @@ impl TransactionProxy {
     pub fn new(js_transaction: &JsObject) -> napi::Result<Self> {
         let commit = js_transaction.get_named_property("commit")?;
         let rollback = js_transaction.get_named_property("rollback")?;
-        let discard = js_transaction.get_named_property("discard")?;
+        let dispose = js_transaction.get_named_property("dispose")?;
         let options = js_transaction.get_named_property("options")?;
 
         Ok(Self {
             commit,
             rollback,
-            dispose: discard,
+            dispose,
             options,
         })
     }

@@ -104,7 +104,7 @@ class LibSqlTransaction extends LibSqlQueryable<TransactionClient> implements Tr
     return ok(undefined)
   }
 
-  discard(): Result<void> {
+  dispose(): Result<void> {
     if (!this.finished) {
       this.finished = true
       this.rollback().catch(console.error)

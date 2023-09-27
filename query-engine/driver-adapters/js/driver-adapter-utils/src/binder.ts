@@ -47,7 +47,7 @@ const bindTransaction = (errorRegistry: ErrorRegistryInternal, transaction: Tran
     executeRaw: wrapAsync(errorRegistry, transaction.executeRaw.bind(transaction)),
     commit: wrapAsync(errorRegistry, transaction.commit.bind(transaction)),
     rollback: wrapAsync(errorRegistry, transaction.rollback.bind(transaction)),
-    discard: wrapSync(errorRegistry, transaction.discard.bind(transaction)),
+    dispose: wrapSync(errorRegistry, transaction.dispose.bind(transaction)),
   }
 }
 
