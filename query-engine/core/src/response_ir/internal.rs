@@ -579,6 +579,9 @@ fn convert_prisma_value_graphql_protocol(
         (ScalarType::Decimal, PrismaValue::Int(i)) => PrismaValue::String(i.to_string()),
         (ScalarType::Decimal, PrismaValue::Float(f)) => PrismaValue::String(f.to_string()),
 
+        // Needed for Prisma Adapters to handle "JsonNull"
+        (ScalarType::Json, PrismaValue::Null) => PrismaValue::Null,
+
         (st, pv) => {
             return Err(crate::FieldConversionError::create(
                 field.name().clone().into_owned(),
@@ -623,6 +626,9 @@ fn convert_prisma_value_json_protocol(
         (ScalarType::Boolean, PrismaValue::Boolean(x)) => PrismaValue::Boolean(x),
         (ScalarType::Int, PrismaValue::Int(x)) => PrismaValue::Int(x),
         (ScalarType::Float, PrismaValue::Float(x)) => PrismaValue::Float(x),
+
+        // Needed for Prisma Adapters to handle "JsonNull"
+        (ScalarType::Json, PrismaValue::Null) => PrismaValue::Null,
 
         (st, pv) => {
             return Err(crate::FieldConversionError::create(
