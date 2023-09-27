@@ -281,9 +281,10 @@ fn js_value_to_quaint(
         },
         ColumnType::Json => {
             match json_value {
+                // DbNull
                 serde_json::Value::Null => QuaintValue::Json(None),
                 // JsonNull
-                serde_json::Value::String(s) if s == "null" => QuaintValue::Text(Some(s.into())),
+                serde_json::Value::String(s) if s == "$__prisma_null" => QuaintValue::json(serde_json::Value::Null),
                 json => QuaintValue::json(json),
             }
         }
