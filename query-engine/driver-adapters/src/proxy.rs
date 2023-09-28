@@ -1,4 +1,3 @@
-use core::panic;
 use std::borrow::Cow;
 use std::str::FromStr;
 
@@ -331,7 +330,9 @@ fn js_value_to_quaint(
                 .map(QuaintValue::datetime)
                 .map_err(|_| conversion_error!("expected a datetime string, found {s}")),
             serde_json::Value::Null => Ok(QuaintValue::DateTime(None)),
-            mismatch => panic!("Expected a string in column {}, found {}", column_name, mismatch),
+            mismatch => Err(conversion_error!(
+                "expected a string in column {column_name}, found {mismatch}"
+            )),
         },
         ColumnType::Json => {
             match json_value {
