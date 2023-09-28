@@ -229,9 +229,9 @@ fn js_value_to_quaint(
                 .map(QuaintValue::int64)
                 .ok_or(conversion_error!("number must be an i64, got {n}")),
             serde_json::Value::String(s) => s
-                .parse::<i32>()
+                .parse::<i64>()
                 .map(QuaintValue::int64)
-                .map_err(|e| conversion_error!("string-encoded number must be an i32, got {s}: {e}")),
+                .map_err(|e| conversion_error!("string-encoded number must be an i64, got {s}: {e}")),
             serde_json::Value::Null => Ok(QuaintValue::Int64(None)),
             mismatch => Err(conversion_error!(
                 "expected a string or number in column {column_name}, found {mismatch}"
