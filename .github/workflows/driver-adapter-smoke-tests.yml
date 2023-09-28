@@ -13,7 +13,7 @@ on:
 
 jobs:
   driver-adapter-smoke-tests:
-    name: Smoke tests for adapter ${{ matrix.adapter }}
+    name: ${{ matrix.adapter }}
 
     strategy:
       fail-fast: false
