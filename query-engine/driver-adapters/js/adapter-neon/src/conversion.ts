@@ -38,6 +38,8 @@ export function fieldToColumnType(fieldTypeId: number): ColumnType {
       return ColumnTypeEnum.Json
     case NeonColumnType['UUID']:
       return ColumnTypeEnum.Uuid
+    case NeonColumnType['OID']:
+      return ColumnTypeEnum.Int64
     default:
       if (fieldTypeId >= 10000) {
         // Postgres Custom Types
