@@ -205,7 +205,6 @@ fn js_value_to_quaint(
         ColumnType::Int32 => match json_value {
             serde_json::Value::Number(n) => {
                 // n.as_i32() is not implemented, so we need to downcast from i64 instead
-                // QuaintValue::int32(n.as_i64().expect("number must be an i32") as i32)
                 n.as_i64()
                     .ok_or(conversion_error!("number must be an integer"))
                     .and_then(|n| -> quaint::Result<i32> {
