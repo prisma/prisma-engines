@@ -150,7 +150,8 @@ impl JsBaseQueryable {
 
         let len = result_set.len();
         let _deserialization_span = info_span!("js:query:result", user_facing = true, "length" = %len).entered();
-        Ok(ResultSet::from(result_set))
+
+        result_set.try_into()
     }
 
     async fn do_execute_raw(&self, sql: &str, params: &[Value<'_>]) -> quaint::Result<u64> {
