@@ -518,7 +518,7 @@ mod proxy_test {
     #[track_caller]
     fn test_null(quaint_none: QuaintValue, column_type: ColumnType) {
         let json_value = serde_json::Value::Null;
-        let quaint_value = js_value_to_quaint(json_value, column_type, "column_name");
+        let quaint_value = js_value_to_quaint(json_value, column_type, "column_name").unwrap();
         assert_eq!(quaint_value, quaint_none);
     }
 
@@ -532,25 +532,25 @@ mod proxy_test {
         // 0
         let n: i32 = 0;
         let json_value = serde_json::Value::Number(serde_json::Number::from(n));
-        let quaint_value = js_value_to_quaint(json_value, column_type, "column_name");
+        let quaint_value = js_value_to_quaint(json_value, column_type, "column_name").unwrap();
         assert_eq!(quaint_value, QuaintValue::Int32(Some(n)));
 
         // max
         let n: i32 = i32::MAX;
         let json_value = serde_json::Value::Number(serde_json::Number::from(n));
-        let quaint_value = js_value_to_quaint(json_value, column_type, "column_name");
+        let quaint_value = js_value_to_quaint(json_value, column_type, "column_name").unwrap();
         assert_eq!(quaint_value, QuaintValue::Int32(Some(n)));
 
         // min
         let n: i32 = i32::MIN;
         let json_value = serde_json::Value::Number(serde_json::Number::from(n));
-        let quaint_value = js_value_to_quaint(json_value, column_type, "column_name");
+        let quaint_value = js_value_to_quaint(json_value, column_type, "column_name").unwrap();
         assert_eq!(quaint_value, QuaintValue::Int32(Some(n)));
 
         // string-encoded
         let n = i32::MAX;
         let json_value = serde_json::Value::String(n.to_string());
-        let quaint_value = js_value_to_quaint(json_value, column_type, "column_name");
+        let quaint_value = js_value_to_quaint(json_value, column_type, "column_name").unwrap();
         assert_eq!(quaint_value, QuaintValue::Int32(Some(n)));
     }
 
@@ -564,25 +564,25 @@ mod proxy_test {
         // 0
         let n: i64 = 0;
         let json_value = serde_json::Value::String(n.to_string());
-        let quaint_value = js_value_to_quaint(json_value, column_type, "column_name");
+        let quaint_value = js_value_to_quaint(json_value, column_type, "column_name").unwrap();
         assert_eq!(quaint_value, QuaintValue::Int64(Some(n)));
 
         // max
         let n: i64 = i64::MAX;
         let json_value = serde_json::Value::String(n.to_string());
-        let quaint_value = js_value_to_quaint(json_value, column_type, "column_name");
+        let quaint_value = js_value_to_quaint(json_value, column_type, "column_name").unwrap();
         assert_eq!(quaint_value, QuaintValue::Int64(Some(n)));
 
         // min
         let n: i64 = i64::MIN;
         let json_value = serde_json::Value::String(n.to_string());
-        let quaint_value = js_value_to_quaint(json_value, column_type, "column_name");
+        let quaint_value = js_value_to_quaint(json_value, column_type, "column_name").unwrap();
         assert_eq!(quaint_value, QuaintValue::Int64(Some(n)));
 
         // number-encoded
         let n: i64 = (1 << 53) - 1; // max JS safe integer
         let json_value = serde_json::Value::Number(serde_json::Number::from(n));
-        let quaint_value = js_value_to_quaint(json_value, column_type, "column_name");
+        let quaint_value = js_value_to_quaint(json_value, column_type, "column_name").unwrap();
         assert_eq!(quaint_value, QuaintValue::Int64(Some(n)));
     }
 
@@ -596,19 +596,19 @@ mod proxy_test {
         // 0
         let n: f32 = 0.0;
         let json_value = serde_json::Value::Number(serde_json::Number::from_f64(n.into()).unwrap());
-        let quaint_value = js_value_to_quaint(json_value, column_type, "column_name");
+        let quaint_value = js_value_to_quaint(json_value, column_type, "column_name").unwrap();
         assert_eq!(quaint_value, QuaintValue::Float(Some(n)));
 
         // max
         let n: f32 = f32::MAX;
         let json_value = serde_json::Value::Number(serde_json::Number::from_f64(n.into()).unwrap());
-        let quaint_value = js_value_to_quaint(json_value, column_type, "column_name");
+        let quaint_value = js_value_to_quaint(json_value, column_type, "column_name").unwrap();
         assert_eq!(quaint_value, QuaintValue::Float(Some(n)));
 
         // min
         let n: f32 = f32::MIN;
         let json_value = serde_json::Value::Number(serde_json::Number::from_f64(n.into()).unwrap());
-        let quaint_value = js_value_to_quaint(json_value, column_type, "column_name");
+        let quaint_value = js_value_to_quaint(json_value, column_type, "column_name").unwrap();
         assert_eq!(quaint_value, QuaintValue::Float(Some(n)));
     }
 
@@ -622,19 +622,19 @@ mod proxy_test {
         // 0
         let n: f64 = 0.0;
         let json_value = serde_json::Value::Number(serde_json::Number::from_f64(n).unwrap());
-        let quaint_value = js_value_to_quaint(json_value, column_type, "column_name");
+        let quaint_value = js_value_to_quaint(json_value, column_type, "column_name").unwrap();
         assert_eq!(quaint_value, QuaintValue::Double(Some(n)));
 
         // max
         let n: f64 = f64::MAX;
         let json_value = serde_json::Value::Number(serde_json::Number::from_f64(n).unwrap());
-        let quaint_value = js_value_to_quaint(json_value, column_type, "column_name");
+        let quaint_value = js_value_to_quaint(json_value, column_type, "column_name").unwrap();
         assert_eq!(quaint_value, QuaintValue::Double(Some(n)));
 
         // min
         let n: f64 = f64::MIN;
         let json_value = serde_json::Value::Number(serde_json::Number::from_f64(n).unwrap());
-        let quaint_value = js_value_to_quaint(json_value, column_type, "column_name");
+        let quaint_value = js_value_to_quaint(json_value, column_type, "column_name").unwrap();
         assert_eq!(quaint_value, QuaintValue::Double(Some(n)));
     }
 
@@ -649,14 +649,14 @@ mod proxy_test {
         let decimal = BigDecimal::new(BigInt::parse_bytes(b"123499", 10).unwrap(), 2);
 
         let json_value = serde_json::Value::String(n_as_string.into());
-        let quaint_value = js_value_to_quaint(json_value, column_type, "column_name");
+        let quaint_value = js_value_to_quaint(json_value, column_type, "column_name").unwrap();
         assert_eq!(quaint_value, QuaintValue::Numeric(Some(decimal)));
 
         let n_as_string = "1234.999999";
         let decimal = BigDecimal::new(BigInt::parse_bytes(b"1234999999", 10).unwrap(), 6);
 
         let json_value = serde_json::Value::String(n_as_string.into());
-        let quaint_value = js_value_to_quaint(json_value, column_type, "column_name");
+        let quaint_value = js_value_to_quaint(json_value, column_type, "column_name").unwrap();
         assert_eq!(quaint_value, QuaintValue::Numeric(Some(decimal)));
     }
 
@@ -669,13 +669,13 @@ mod proxy_test {
 
         // true
         for truthy_value in [json!(true), json!(1), json!("true"), json!("TRUE"), json!("1")] {
-            let quaint_value = js_value_to_quaint(truthy_value, column_type, "column_name");
+            let quaint_value = js_value_to_quaint(truthy_value, column_type, "column_name").unwrap();
             assert_eq!(quaint_value, QuaintValue::Boolean(Some(true)));
         }
 
         // false
         for falsy_value in [json!(false), json!(0), json!("false"), json!("FALSE"), json!("0")] {
-            let quaint_value = js_value_to_quaint(falsy_value, column_type, "column_name");
+            let quaint_value = js_value_to_quaint(falsy_value, column_type, "column_name").unwrap();
             assert_eq!(quaint_value, QuaintValue::Boolean(Some(false)));
         }
     }
@@ -689,7 +689,7 @@ mod proxy_test {
 
         let c = 'c';
         let json_value = serde_json::Value::String(c.to_string());
-        let quaint_value = js_value_to_quaint(json_value, column_type, "column_name");
+        let quaint_value = js_value_to_quaint(json_value, column_type, "column_name").unwrap();
         assert_eq!(quaint_value, QuaintValue::Char(Some(c)));
     }
 
@@ -702,7 +702,7 @@ mod proxy_test {
 
         let s = "some text";
         let json_value = serde_json::Value::String(s.to_string());
-        let quaint_value = js_value_to_quaint(json_value, column_type, "column_name");
+        let quaint_value = js_value_to_quaint(json_value, column_type, "column_name").unwrap();
         assert_eq!(quaint_value, QuaintValue::Text(Some(s.into())));
     }
 
@@ -715,7 +715,7 @@ mod proxy_test {
 
         let s = "2023-01-01";
         let json_value = serde_json::Value::String(s.to_string());
-        let quaint_value = js_value_to_quaint(json_value, column_type, "column_name");
+        let quaint_value = js_value_to_quaint(json_value, column_type, "column_name").unwrap();
 
         let date = NaiveDate::from_ymd_opt(2023, 1, 1).unwrap();
         assert_eq!(quaint_value, QuaintValue::Date(Some(date)));
@@ -730,7 +730,7 @@ mod proxy_test {
 
         let s = "23:59:59";
         let json_value = serde_json::Value::String(s.to_string());
-        let quaint_value = js_value_to_quaint(json_value, column_type, "column_name");
+        let quaint_value = js_value_to_quaint(json_value, column_type, "column_name").unwrap();
 
         let time: NaiveTime = NaiveTime::from_hms_opt(23, 59, 59).unwrap();
         assert_eq!(quaint_value, QuaintValue::Time(Some(time)));
@@ -745,7 +745,7 @@ mod proxy_test {
 
         let s = "2023-01-01 23:59:59.415";
         let json_value = serde_json::Value::String(s.to_string());
-        let quaint_value = js_value_to_quaint(json_value, column_type, "column_name");
+        let quaint_value = js_value_to_quaint(json_value, column_type, "column_name").unwrap();
 
         let datetime = NaiveDate::from_ymd_opt(2023, 1, 1)
             .unwrap()
@@ -756,7 +756,7 @@ mod proxy_test {
 
         let s = "2023-01-01 23:59:59.123456";
         let json_value = serde_json::Value::String(s.to_string());
-        let quaint_value = js_value_to_quaint(json_value, column_type, "column_name");
+        let quaint_value = js_value_to_quaint(json_value, column_type, "column_name").unwrap();
 
         let datetime = NaiveDate::from_ymd_opt(2023, 1, 1)
             .unwrap()
@@ -767,7 +767,7 @@ mod proxy_test {
 
         let s = "2023-01-01 23:59:59";
         let json_value = serde_json::Value::String(s.to_string());
-        let quaint_value = js_value_to_quaint(json_value, column_type, "column_name");
+        let quaint_value = js_value_to_quaint(json_value, column_type, "column_name").unwrap();
 
         let datetime = NaiveDate::from_ymd_opt(2023, 1, 1)
             .unwrap()
@@ -794,7 +794,7 @@ mod proxy_test {
             ]
         });
         let json_value = json.clone();
-        let quaint_value = js_value_to_quaint(json_value, column_type, "column_name");
+        let quaint_value = js_value_to_quaint(json_value, column_type, "column_name").unwrap();
         assert_eq!(quaint_value, QuaintValue::Json(Some(json.clone())));
     }
 
@@ -807,7 +807,7 @@ mod proxy_test {
 
         let s = "some enum variant";
         let json_value = serde_json::Value::String(s.to_string());
-        let quaint_value = js_value_to_quaint(json_value, column_type, "column_name");
+        let quaint_value = js_value_to_quaint(json_value, column_type, "column_name").unwrap();
         assert_eq!(quaint_value, QuaintValue::Enum(Some(s.into())));
     }
 }
