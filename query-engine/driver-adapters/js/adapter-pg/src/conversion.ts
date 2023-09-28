@@ -29,17 +29,20 @@ export function fieldToColumnType(fieldTypeId: number): ColumnType {
       return ColumnTypeEnum.DateTime
     case PgColumnType['NUMERIC']:
       return ColumnTypeEnum.Numeric
-    case PgColumnType['BPCHAR']:
-      return ColumnTypeEnum.Char
-    case PgColumnType['TEXT']:
-    case PgColumnType['VARCHAR']:
-      return ColumnTypeEnum.Text
     case PgColumnType['JSONB']:
       return ColumnTypeEnum.Json
     case PgColumnType['UUID']:
       return ColumnTypeEnum.Uuid
     case PgColumnType['OID']:
       return ColumnTypeEnum.Int64
+    case PgColumnType['BPCHAR']:
+    case PgColumnType['TEXT']:
+    case PgColumnType['VARCHAR']:
+    case PgColumnType['BIT']:
+    case PgColumnType['VARBIT']:
+    case PgColumnType['INET']:
+    case PgColumnType['CIDR']:
+      return ColumnTypeEnum.Text
     default:
       if (fieldTypeId >= 10000) {
         // Postgres Custom Types
@@ -47,6 +50,43 @@ export function fieldToColumnType(fieldTypeId: number): ColumnType {
       }
       throw new Error(`Unsupported column type: ${fieldTypeId}`)
   }
+}
+
+type transformerFunction = (value: any) => any
+type ColumnTypeTransformer = Record<number, transformerFunction | Record<number, transformerFunction>>
+
+/**
+ * Transformers performs data transformation to the format expected by the
+ * sql-query-connector of the query engine. This logic must be equivalent to
+ * that of the rust drivers.
+ *
+ * As an example, see quaint/src/connector/postgres/conversions.rs in the
+ * prisma-engines codebase
+ *
+ * A column type transformer can have different transforming functions either:ç
+ *  - No transforming function at all for a certain ColumnType
+ *  - A single transforming function for a certain ColumnType
+ *  - A transforming function for a certain ColumnType and a certain pgType
+ */
+const transformers: ColumnTypeTransformer = {
+};
+
+
+
+export function transformValue(value: any, pgType: any, columnType: ColumnType): any {
+  const columnTypeTransformer =  transformers[columnType]
+
+  const transformerType = typeof columnTypeTransformer;
+
+  if (transformerType === 'undefined') {
+    return value
+  }
+
+  if (transformerType === 'object') {
+    return columnTypeTransformer[pgType](value)
+  }
+
+  return (columnTypeTransformer as transformerFunction)(value)
 }
 
 /**
@@ -64,9 +104,8 @@ function convertJson(json: string): unknown {
 }
 
 // return string instead of JavaScript Date object
-types.setTypeParser(PgColumnType.DATE, date => date)
 types.setTypeParser(PgColumnType.TIME, date => date)
+types.setTypeParser(PgColumnType.DATE, date => date)
 types.setTypeParser(PgColumnType.TIMESTAMP, date => date)
-
 types.setTypeParser(PgColumnType.JSONB, convertJson)
 types.setTypeParser(PgColumnType.JSON, convertJson)

@@ -9,7 +9,7 @@ import type {
   Transaction,
   TransactionOptions,
 } from '@prisma/driver-adapter-utils'
-import { fieldToColumnType } from './conversion'
+import { fieldToColumnType, transformValue } from './conversion'
 
 const debug = Debug('prisma:driver-adapter:pg')
 
@@ -32,6 +32,15 @@ class PgQueryable<ClientT extends StdClient | TransactionClient> implements Quer
 
     const columns = fields.map((field) => field.name)
     const columnTypes = fields.map((field) => fieldToColumnType(field.dataTypeID))
+
+    for (let i = 0; i < rows.length; i++) {
+      for (let j = 0; j < fields.length; j++) {
+        const pgType = fields[j].dataTypeID
+        const quaintType = columnTypes[j]
+        rows[i][j] = transformValue(rows[i][j], pgType, quaintType)
+      }
+    }
+
     const resultSet: ResultSet = {
       columnNames: columns,
       columnTypes,

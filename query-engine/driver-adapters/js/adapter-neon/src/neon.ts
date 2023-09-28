@@ -9,7 +9,7 @@ import type {
   Result,
   TransactionOptions,
 } from '@prisma/driver-adapter-utils'
-import { fieldToColumnType } from './conversion'
+import {fieldToColumnType, transformValue} from './conversion'
 
 const debug = Debug('prisma:driver-adapter:neon')
 
@@ -29,10 +29,20 @@ abstract class NeonQueryable implements Queryable {
 
     return (await this.performIO(query)).map(({ fields, rows }) => {
       const columns = fields.map((field) => field.name)
+      const columnTypes = fields.map((field) => fieldToColumnType(field.dataTypeID))
+
+      for (let i = 0; i < rows.length; i++) {
+        for (let j = 0; j < fields.length; j++) {
+          const pgType = fields[j].dataTypeID
+          const quaintType = columnTypes[j]
+          rows[i][j] = transformValue(rows[i][j], pgType, quaintType)
+        }
+      }
+
       return {
         columnNames: columns,
-        columnTypes: fields.map((field) => fieldToColumnType(field.dataTypeID)),
-        rows,
+        columnTypes,
+        rows
       }
     })
   }
