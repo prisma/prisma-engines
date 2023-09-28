@@ -289,6 +289,7 @@
 <a href="#289" id="289">289</a>
 <a href="#290" id="290">290</a>
 <a href="#291" id="291">291</a>
+<a href="#292" id="292">292</a>
 </pre></div><pre class="rust"><code><span class="kw">use crate</span>::{
     conversion,
     proxy::{CommonProxy, DriverProxy, Query},
@@ -441,7 +442,8 @@
 
         <span class="kw">let </span>len = result_set.len();
         <span class="kw">let </span>_deserialization_span = <span class="macro">info_span!</span>(<span class="string">&quot;js:query:result&quot;</span>, user_facing = <span class="bool-val">true</span>, <span class="string">&quot;length&quot; </span>= %len).entered();
-        <span class="prelude-val">Ok</span>(ResultSet::from(result_set))
+
+        result_set.try_into()
     }
 
     <span class="kw">async fn </span>do_execute_raw(<span class="kw-2">&amp;</span><span class="self">self</span>, sql: <span class="kw-2">&amp;</span>str, params: <span class="kw-2">&amp;</span>[Value&lt;<span class="lifetime">&#39;_</span>&gt;]) -&gt; quaint::Result&lt;u64&gt; {
