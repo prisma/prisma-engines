@@ -28,6 +28,7 @@ export function fieldToColumnType(fieldTypeId: number): ColumnType {
     case PgColumnType['TIMESTAMP']:
       return ColumnTypeEnum.DateTime
     case PgColumnType['NUMERIC']:
+    case PgColumnType['MONEY']:
       return ColumnTypeEnum.Numeric
     case PgColumnType['JSONB']:
       return ColumnTypeEnum.Json
@@ -53,7 +54,7 @@ export function fieldToColumnType(fieldTypeId: number): ColumnType {
 }
 
 type transformerFunction = (value: any) => any
-type ColumnTypeTransformer = Record<number, transformerFunction | Record<number, transformerFunction>>
+type ColumnTypeTransformer = Record<number, Record<number, transformerFunction>>
 
 /**
  * Transformers performs data transformation to the format expected by the
@@ -63,10 +64,10 @@ type ColumnTypeTransformer = Record<number, transformerFunction | Record<number,
  * As an example, see quaint/src/connector/postgres/conversions.rs in the
  * prisma-engines codebase
  *
- * A column type transformer can have different transforming functions either:ç
- *  - No transforming function at all for a certain ColumnType
- *  - A single transforming function for a certain ColumnType
- *  - A transforming function for a certain ColumnType and a certain pgType
+ * If the transformation is a raw transformation over the raw string coming
+ * from the driver is better to do it by registering a type parser in the
+ * types module of the pg driver. Because those will be called in any case
+ * before passing the value to transformValue.
  */
 const transformers: ColumnTypeTransformer = {
 };
@@ -74,19 +75,13 @@ const transformers: ColumnTypeTransformer = {
 
 
 export function transformValue(value: any, pgType: any, columnType: ColumnType): any {
-  const columnTypeTransformer =  transformers[columnType]
+  const columnTypeTransformer =  transformers[columnType]?.[pgType]
 
-  const transformerType = typeof columnTypeTransformer;
-
-  if (transformerType === 'undefined') {
-    return value
+  if (typeof columnTypeTransformer !== 'undefined') {
+    return columnTypeTransformer(value)
   }
 
-  if (transformerType === 'object') {
-    return columnTypeTransformer[pgType](value)
-  }
-
-  return (columnTypeTransformer as transformerFunction)(value)
+  return value
 }
 
 /**
@@ -109,3 +104,4 @@ types.setTypeParser(PgColumnType.DATE, date => date)
 types.setTypeParser(PgColumnType.TIMESTAMP, date => date)
 types.setTypeParser(PgColumnType.JSONB, convertJson)
 types.setTypeParser(PgColumnType.JSON, convertJson)
+types.setTypeParser(PgColumnType.MONEY, (money: string) => money.slice(1))
