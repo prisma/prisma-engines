@@ -16,6 +16,9 @@ on:
         description: Npm Dist Tag to use for publishing
         required: true
         default: "latest"
+      dryRun:
+        description: 'Check to do a dry run (does not publish packages)'
+        type: boolean
 
 jobs:
   build:
@@ -55,7 +58,7 @@ jobs:
       - run: |
           # find all files package.json, and for each use jq to write the version, then write to temptfile and overwrite original file with result
           find . -name "package.json" -exec bash -c 'jq --arg version "${{ github.event.inputs.prismaVersion }}" ".version = \$version" "{}" > tmpfile && mv tmpfile "{}"' \;
-          pnpm -r publish --no-git-checks --tag ${{ github.event.inputs.npmDistTag }} --dry-run # TODO remove dry-run or make option!
+          pnpm -r publish --no-git-checks --tag ${{ github.event.inputs.npmDistTag }} --dry-run # TODO remove hardcoded dry-run and use input instead!
         working-directory: query-engine/driver-adapters/js
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
