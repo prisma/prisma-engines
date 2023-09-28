@@ -179,11 +179,11 @@ fn js_value_to_quaint(
     json_value: serde_json::Value,
     column_type: ColumnType,
     column_name: &str,
-) -> QuaintValue<'static> {
+) -> quaint::Result<QuaintValue<'static>> {
     //  Note for the future: it may be worth revisiting how much bloat so many panics with different static
     // strings add to the compiled artefact, and in case we should come up with a restricted set of panic
     // messages, or even find a way of removing them altogether.
-    match column_type {
+    Ok(match column_type {
         ColumnType::Int32 => match json_value {
             serde_json::Value::Number(n) => {
                 // n.as_i32() is not implemented, so we need to downcast from i64 instead
@@ -331,11 +331,13 @@ fn js_value_to_quaint(
         unimplemented => {
             todo!("support column type {:?} in column {}", unimplemented, column_name)
         }
-    }
+    })
 }
 
-impl From<JSResultSet> for QuaintResultSet {
-    fn from(js_result_set: JSResultSet) -> Self {
+impl TryFrom<JSResultSet> for QuaintResultSet {
+    type Error = quaint::error::Error;
+
+    fn try_from(js_result_set: JSResultSet) -> Result<Self, Self::Error> {
         let JSResultSet {
             rows,
             column_names,
@@ -352,7 +354,7 @@ impl From<JSResultSet> for QuaintResultSet {
                 let column_type = column_types[i];
                 let column_name = column_names[i].as_str();
 
-                quaint_row.push(js_value_to_quaint(row, column_type, column_name));
+                quaint_row.push(js_value_to_quaint(row, column_type, column_name)?);
             }
 
             quaint_rows.push(quaint_row);
@@ -368,7 +370,7 @@ impl From<JSResultSet> for QuaintResultSet {
             quaint_result_set.set_last_insert_id(last_insert_id);
         }
 
-        quaint_result_set
+        Ok(quaint_result_set)
     }
 }
 
