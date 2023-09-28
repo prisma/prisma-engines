@@ -42,7 +42,7 @@ jobs:
 
       - run: pnpm i
         working-directory: query-engine/driver-adapters/js
-      - run: pnpm run build
+      - run: pnpm -r build
         working-directory: query-engine/driver-adapters/js
 
       #
@@ -55,7 +55,7 @@ jobs:
       - run: |
           # find all files package.json, and for each use jq to write the version, then write to temptfile and overwrite original file with result
           find . -name "package.json" -exec bash -c 'jq --arg version "${{ github.event.inputs.prismaVersion }}" ".version = \$version" "{}" > tmpfile && mv tmpfile "{}"' \;
-          pnpm publish --no-git-checks --tag ${{ github.event.inputs.npmDistTag }} --dry-run # TODO remove dry-run or make option!
+          pnpm -r publish --no-git-checks --tag ${{ github.event.inputs.npmDistTag }} --dry-run # TODO remove dry-run or make option!
         working-directory: query-engine/driver-adapters/js
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
