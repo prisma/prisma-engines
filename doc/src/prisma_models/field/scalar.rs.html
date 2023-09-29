@@ -268,6 +268,8 @@
 <a href="#268" id="268">268</a>
 <a href="#269" id="269">269</a>
 <a href="#270" id="270">270</a>
+<a href="#271" id="271">271</a>
+<a href="#272" id="272">272</a>
 </pre></div><pre class="rust"><code><span class="kw">use crate</span>::{ast, parent_container::ParentContainer, prelude::<span class="kw-2">*</span>, DefaultKind, NativeTypeInstance, ValueGenerator};
 <span class="kw">use </span>psl::{
     parser_database::{walkers, ScalarFieldType, ScalarType},
@@ -360,7 +362,9 @@
         };
 
         <span class="kw">match </span>scalar_field_type {
-            ScalarFieldType::CompositeType(<span class="kw">_</span>) =&gt; <span class="macro">unreachable!</span>(),
+            ScalarFieldType::CompositeType(<span class="kw">_</span>) =&gt; {
+                <span class="macro">unreachable!</span>(<span class="string">&quot;Cannot convert a composite type to a type identifier. This error is typically caused by mistakenly using a composite type within a composite index.&quot;</span>,)
+            }
             ScalarFieldType::Enum(x) =&gt; TypeIdentifier::Enum(x),
             ScalarFieldType::BuiltInScalar(scalar) =&gt; scalar.into(),
             ScalarFieldType::Unsupported(<span class="kw">_</span>) =&gt; TypeIdentifier::Unsupported,
