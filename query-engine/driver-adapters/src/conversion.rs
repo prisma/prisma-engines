@@ -32,10 +32,9 @@ impl ToNapiValue for JSArg {
         match value {
             JSArg::RawString(s) => ToNapiValue::to_napi_value(env, s),
             JSArg::Value(v) => ToNapiValue::to_napi_value(env, v),
-            JSArg::Buffer(bytes) => ToNapiValue::to_napi_value(
-                env,
-                napi::Env::from_raw(env).create_arraybuffer_with_data(bytes)?.into_raw(),
-            ),
+            JSArg::Buffer(bytes) => {
+                ToNapiValue::to_napi_value(env, napi::Env::from_raw(env).create_buffer_with_data(bytes)?.into_raw())
+            }
         }
     }
 }
