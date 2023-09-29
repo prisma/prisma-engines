@@ -1052,11 +1052,11 @@ mod tests {
     fn test_raw_enum_array() {
         let enum_array = Value::EnumArray(
             Some(vec![EnumVariant::new("A"), EnumVariant::new("B")]),
-            Some(EnumName::new("Alphabet")),
+            Some(EnumName::new("Alphabet", Some("foo"))),
         );
         let (sql, params) = Postgres::build(Select::default().value(enum_array.raw())).unwrap();
 
-        assert_eq!("SELECT ARRAY['A','B']::\"Alphabet\"", sql);
+        assert_eq!("SELECT ARRAY['A','B']::\"foo\".\"Alphabet\"", sql);
         assert!(params.is_empty());
     }
 
