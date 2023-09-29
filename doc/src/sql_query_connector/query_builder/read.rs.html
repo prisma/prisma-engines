@@ -289,6 +289,8 @@
 <a href="#289" id="289">289</a>
 <a href="#290" id="290">290</a>
 <a href="#291" id="291">291</a>
+<a href="#292" id="292">292</a>
+<a href="#293" id="293">293</a>
 </pre></div><pre class="rust"><code><span class="kw">use crate</span>::{
     cursor_condition, filter::FilterBuilder, model_extensions::<span class="kw-2">*</span>, nested_aggregations, ordering::OrderByBuilder,
     sql_trace::SqlTraceComment, Context,
@@ -415,7 +417,9 @@
     </span>T: SelectDefinition,
 {
     <span class="kw">let </span>(select, additional_selection_set) = query.into_select(model, aggr_selections, ctx);
-    <span class="kw">let </span>select = columns.fold(select, |acc, col| acc.column(col));
+    <span class="kw">let </span>select = columns
+        .map(|c| c.set_is_selected(<span class="bool-val">true</span>))
+        .fold(select, |acc, col| acc.column(col));
 
     <span class="kw">let </span>select = select.append_trace(<span class="kw-2">&amp;</span>Span::current()).add_trace_id(ctx.trace_id);
 
@@ -509,7 +513,7 @@
     <span class="kw">let </span>(base_query, <span class="kw">_</span>) = args.into_select(model, <span class="kw-2">&amp;</span>[], ctx);
 
     <span class="kw">let </span>select_query = selections.iter().fold(base_query, |select, next_op| <span class="kw">match </span>next_op {
-        AggregationSelection::Field(field) =&gt; select.column(field.as_column(ctx)),
+        AggregationSelection::Field(field) =&gt; select.column(field.as_column(ctx).set_is_selected(<span class="bool-val">true</span>)),
 
         AggregationSelection::Count { all, fields } =&gt; {
             <span class="kw">let </span>select = fields.iter().fold(select, |select, next_field| {

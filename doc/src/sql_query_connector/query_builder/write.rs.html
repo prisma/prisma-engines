@@ -301,7 +301,7 @@
         });
 
     Insert::from(insert)
-        .returning(selected_fields.as_columns(ctx))
+        .returning(selected_fields.as_columns(ctx).map(|c| c.set_is_selected(<span class="bool-val">true</span>)))
         .append_trace(<span class="kw-2">&amp;</span>Span::current())
         .add_trace_id(ctx.trace_id)
 }
@@ -433,7 +433,7 @@
     <span class="kw">let </span>query = query.append_trace(<span class="kw-2">&amp;</span>Span::current()).add_trace_id(ctx.trace_id);
 
     <span class="kw">let </span>query = <span class="kw">if let </span><span class="prelude-val">Some</span>(selected_fields) = selected_fields {
-        query.returning(selected_fields.as_columns(ctx))
+        query.returning(selected_fields.as_columns(ctx).map(|c| c.set_is_selected(<span class="bool-val">true</span>)))
     } <span class="kw">else </span>{
         query
     };

@@ -53,6 +53,8 @@
 <a href="#53" id="53">53</a>
 <a href="#54" id="54">54</a>
 <a href="#55" id="55">55</a>
+<a href="#56" id="56">56</a>
+<a href="#57" id="57">57</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! An abstract syntax tree for SQL queries.
 //!
 //! The ast module handles everything related building abstract SQL queries
@@ -66,6 +68,7 @@
 <span class="kw">mod </span>conjunctive;
 <span class="kw">mod </span>cte;
 <span class="kw">mod </span>delete;
+<span class="kw">mod </span>enums;
 <span class="kw">mod </span>expression;
 <span class="kw">mod </span>function;
 <span class="kw">mod </span>grouping;
@@ -90,6 +93,7 @@
 <span class="kw">pub use </span>conjunctive::Conjunctive;
 <span class="kw">pub use </span>cte::{CommonTableExpression, IntoCommonTableExpression};
 <span class="kw">pub use </span>delete::Delete;
+<span class="kw">pub use </span>enums::{EnumName, EnumVariant};
 <span class="kw">pub use </span>expression::<span class="kw-2">*</span>;
 <span class="kw">pub use </span>function::<span class="kw-2">*</span>;
 <span class="kw">pub use </span>grouping::<span class="kw-2">*</span>;

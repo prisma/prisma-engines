@@ -68,7 +68,7 @@
             quaint::Value::Float(<span class="kw">_</span>) =&gt; <span class="string">&quot;float&quot;</span>,
             quaint::Value::Double(<span class="kw">_</span>) =&gt; <span class="string">&quot;double&quot;</span>,
             quaint::Value::Text(<span class="kw">_</span>) =&gt; <span class="string">&quot;string&quot;</span>,
-            quaint::Value::Enum(<span class="kw">_</span>) =&gt; <span class="string">&quot;enum&quot;</span>,
+            quaint::Value::Enum(<span class="kw">_</span>, <span class="kw">_</span>) =&gt; <span class="string">&quot;enum&quot;</span>,
             quaint::Value::Bytes(<span class="kw">_</span>) =&gt; <span class="string">&quot;bytes&quot;</span>,
             quaint::Value::Boolean(<span class="kw">_</span>) =&gt; <span class="string">&quot;bool&quot;</span>,
             quaint::Value::Char(<span class="kw">_</span>) =&gt; <span class="string">&quot;char&quot;</span>,
@@ -79,7 +79,7 @@
             quaint::Value::DateTime(<span class="kw">_</span>) =&gt; <span class="string">&quot;datetime&quot;</span>,
             quaint::Value::Date(<span class="kw">_</span>) =&gt; <span class="string">&quot;date&quot;</span>,
             quaint::Value::Time(<span class="kw">_</span>) =&gt; <span class="string">&quot;time&quot;</span>,
-            quaint::Value::Array(<span class="kw">_</span>) =&gt; <span class="string">&quot;array&quot;</span>,
+            quaint::Value::Array(<span class="kw">_</span>) | quaint::Value::EnumArray(<span class="kw">_</span>, <span class="kw">_</span>) =&gt; <span class="string">&quot;array&quot;</span>,
         };
 
         type_name.to_owned()

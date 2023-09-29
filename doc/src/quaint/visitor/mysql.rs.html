@@ -1098,11 +1098,11 @@
                 v =&gt; <span class="self">self</span>.write(<span class="macro">format!</span>(<span class="string">&quot;{v:?}&quot;</span>)),
             }),
             Value::Text(t) =&gt; t.map(|t| <span class="self">self</span>.write(<span class="macro">format!</span>(<span class="string">&quot;&#39;{t}&#39;&quot;</span>))),
-            Value::Enum(e) =&gt; e.map(|e| <span class="self">self</span>.write(e)),
+            Value::Enum(e, <span class="kw">_</span>) =&gt; e.map(|e| <span class="self">self</span>.write(e)),
             Value::Bytes(b) =&gt; b.map(|b| <span class="self">self</span>.write(<span class="macro">format!</span>(<span class="string">&quot;x&#39;{}&#39;&quot;</span>, hex::encode(b)))),
             Value::Boolean(b) =&gt; b.map(|b| <span class="self">self</span>.write(b)),
             Value::Char(c) =&gt; c.map(|c| <span class="self">self</span>.write(<span class="macro">format!</span>(<span class="string">&quot;&#39;{c}&#39;&quot;</span>))),
-            Value::Array(<span class="kw">_</span>) =&gt; {
+            Value::Array(<span class="kw">_</span>) | Value::EnumArray(<span class="kw">_</span>, <span class="kw">_</span>) =&gt; {
                 <span class="kw">let </span>msg = <span class="string">&quot;Arrays are not supported in MySQL.&quot;</span>;
                 <span class="kw">let </span>kind = ErrorKind::conversion(msg);
 

@@ -955,6 +955,43 @@
 <a href="#955" id="955">955</a>
 <a href="#956" id="956">956</a>
 <a href="#957" id="957">957</a>
+<a href="#958" id="958">958</a>
+<a href="#959" id="959">959</a>
+<a href="#960" id="960">960</a>
+<a href="#961" id="961">961</a>
+<a href="#962" id="962">962</a>
+<a href="#963" id="963">963</a>
+<a href="#964" id="964">964</a>
+<a href="#965" id="965">965</a>
+<a href="#966" id="966">966</a>
+<a href="#967" id="967">967</a>
+<a href="#968" id="968">968</a>
+<a href="#969" id="969">969</a>
+<a href="#970" id="970">970</a>
+<a href="#971" id="971">971</a>
+<a href="#972" id="972">972</a>
+<a href="#973" id="973">973</a>
+<a href="#974" id="974">974</a>
+<a href="#975" id="975">975</a>
+<a href="#976" id="976">976</a>
+<a href="#977" id="977">977</a>
+<a href="#978" id="978">978</a>
+<a href="#979" id="979">979</a>
+<a href="#980" id="980">980</a>
+<a href="#981" id="981">981</a>
+<a href="#982" id="982">982</a>
+<a href="#983" id="983">983</a>
+<a href="#984" id="984">984</a>
+<a href="#985" id="985">985</a>
+<a href="#986" id="986">986</a>
+<a href="#987" id="987">987</a>
+<a href="#988" id="988">988</a>
+<a href="#989" id="989">989</a>
+<a href="#990" id="990">990</a>
+<a href="#991" id="991">991</a>
+<a href="#992" id="992">992</a>
+<a href="#993" id="993">993</a>
+<a href="#994" id="994">994</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::ast::<span class="kw-2">*</span>;
 <span class="kw">use </span><span class="kw">crate</span>::error::{Error, ErrorKind};
 
@@ -1007,7 +1044,13 @@
     <span class="doccomment">/// String value.
     </span>Text(<span class="prelude-ty">Option</span>&lt;Cow&lt;<span class="lifetime">&#39;a</span>, str&gt;&gt;),
     <span class="doccomment">/// Database enum value.
-    </span>Enum(<span class="prelude-ty">Option</span>&lt;Cow&lt;<span class="lifetime">&#39;a</span>, str&gt;&gt;),
+    /// The optional `EnumName` is only used on PostgreSQL.
+    /// Read more about it here: https://github.com/prisma/prisma-engines/pull/4280
+    </span>Enum(<span class="prelude-ty">Option</span>&lt;EnumVariant&lt;<span class="lifetime">&#39;a</span>&gt;&gt;, <span class="prelude-ty">Option</span>&lt;EnumName&lt;<span class="lifetime">&#39;a</span>&gt;&gt;),
+    <span class="doccomment">/// Database enum array (PostgreSQL specific).
+    /// We use a different variant than `Value::Array` to uplift the `EnumName`
+    /// and have it available even for empty enum arrays.
+    </span>EnumArray(<span class="prelude-ty">Option</span>&lt;Vec&lt;EnumVariant&lt;<span class="lifetime">&#39;a</span>&gt;&gt;&gt;, <span class="prelude-ty">Option</span>&lt;EnumName&lt;<span class="lifetime">&#39;a</span>&gt;&gt;),
     <span class="doccomment">/// Bytes value.
     </span>Bytes(<span class="prelude-ty">Option</span>&lt;Cow&lt;<span class="lifetime">&#39;a</span>, [u8]&gt;&gt;),
     <span class="doccomment">/// Boolean value.
@@ -1063,7 +1106,20 @@
             Value::Double(val) =&gt; val.map(|v| <span class="macro">write!</span>(f, <span class="string">&quot;{v}&quot;</span>)),
             Value::Text(val) =&gt; val.as_ref().map(|v| <span class="macro">write!</span>(f, <span class="string">&quot;\&quot;{v}\&quot;&quot;</span>)),
             Value::Bytes(val) =&gt; val.as_ref().map(|v| <span class="macro">write!</span>(f, <span class="string">&quot;&lt;{} bytes blob&gt;&quot;</span>, v.len())),
-            Value::Enum(val) =&gt; val.as_ref().map(|v| <span class="macro">write!</span>(f, <span class="string">&quot;\&quot;{v}\&quot;&quot;</span>)),
+            Value::Enum(val, <span class="kw">_</span>) =&gt; val.as_ref().map(|v| <span class="macro">write!</span>(f, <span class="string">&quot;\&quot;{v}\&quot;&quot;</span>)),
+            Value::EnumArray(vals, <span class="kw">_</span>) =&gt; vals.as_ref().map(|vals| {
+                <span class="kw">let </span>len = vals.len();
+
+                <span class="macro">write!</span>(f, <span class="string">&quot;[&quot;</span>)<span class="question-mark">?</span>;
+                <span class="kw">for </span>(i, val) <span class="kw">in </span>vals.iter().enumerate() {
+                    <span class="macro">write!</span>(f, <span class="string">&quot;{val}&quot;</span>)<span class="question-mark">?</span>;
+
+                    <span class="kw">if </span>i &lt; (len - <span class="number">1</span>) {
+                        <span class="macro">write!</span>(f, <span class="string">&quot;,&quot;</span>)<span class="question-mark">?</span>;
+                    }
+                }
+                <span class="macro">write!</span>(f, <span class="string">&quot;]&quot;</span>)
+            }),
             Value::Boolean(val) =&gt; val.map(|v| <span class="macro">write!</span>(f, <span class="string">&quot;{v}&quot;</span>)),
             Value::Char(val) =&gt; val.map(|v| <span class="macro">write!</span>(f, <span class="string">&quot;&#39;{v}&#39;&quot;</span>)),
             Value::Array(vals) =&gt; vals.as_ref().map(|vals| {
@@ -1112,7 +1168,15 @@
             }),
             Value::Text(cow) =&gt; cow.map(|cow| serde_json::Value::String(cow.into_owned())),
             Value::Bytes(bytes) =&gt; bytes.map(|bytes| serde_json::Value::String(base64::encode(bytes))),
-            Value::Enum(cow) =&gt; cow.map(|cow| serde_json::Value::String(cow.into_owned())),
+            Value::Enum(cow, <span class="kw">_</span>) =&gt; cow.map(|cow| serde_json::Value::String(cow.into_owned())),
+            Value::EnumArray(values, <span class="kw">_</span>) =&gt; values.map(|values| {
+                serde_json::Value::Array(
+                    values
+                        .into_iter()
+                        .map(|value| serde_json::Value::String(value.into_owned()))
+                        .collect(),
+                )
+            }),
             Value::Boolean(b) =&gt; b.map(serde_json::Value::Bool),
             Value::Char(c) =&gt; c.map(|c| {
                 <span class="kw">let </span>bytes = [c <span class="kw">as </span>u8];
@@ -1197,7 +1261,16 @@
     </span><span class="kw">where
         </span>T: Into&lt;Cow&lt;<span class="lifetime">&#39;a</span>, str&gt;&gt;,
     {
-        Value::Enum(<span class="prelude-val">Some</span>(value.into()))
+        Value::Enum(<span class="prelude-val">Some</span>(EnumVariant::new(value)), <span class="prelude-val">None</span>)
+    }
+
+    <span class="doccomment">/// Creates a new enum value with the name of the enum attached.
+    </span><span class="kw">pub fn </span>enum_variant_with_name&lt;T, U&gt;(value: T, name: U) -&gt; <span class="self">Self
+    </span><span class="kw">where
+        </span>T: Into&lt;Cow&lt;<span class="lifetime">&#39;a</span>, str&gt;&gt;,
+        U: Into&lt;Cow&lt;<span class="lifetime">&#39;a</span>, str&gt;&gt;,
+    {
+        Value::Enum(<span class="prelude-val">Some</span>(EnumVariant::new(value)), <span class="prelude-val">Some</span>(EnumName::new(name)))
     }
 
     <span class="doccomment">/// Creates a new bytes value.
@@ -1276,7 +1349,8 @@
             Value::Float(i) =&gt; i.is_none(),
             Value::Double(i) =&gt; i.is_none(),
             Value::Text(t) =&gt; t.is_none(),
-            Value::Enum(e) =&gt; e.is_none(),
+            Value::Enum(e, <span class="kw">_</span>) =&gt; e.is_none(),
+            Value::EnumArray(e, <span class="kw">_</span>) =&gt; e.is_none(),
             Value::Bytes(b) =&gt; b.is_none(),
             Value::Boolean(b) =&gt; b.is_none(),
             Value::Char(c) =&gt; c.is_none(),

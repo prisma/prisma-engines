@@ -114,11 +114,11 @@
             Value::Double(val) =&gt; val.into_sql(),
             Value::Text(val) =&gt; val.as_deref().into_sql(),
             Value::Bytes(val) =&gt; val.as_deref().into_sql(),
-            Value::Enum(val) =&gt; val.as_deref().into_sql(),
+            Value::Enum(val, <span class="kw">_</span>) =&gt; val.as_deref().into_sql(),
             Value::Boolean(val) =&gt; val.into_sql(),
             Value::Char(val) =&gt; val.as_ref().map(|val| <span class="macro">format!</span>(<span class="string">&quot;{val}&quot;</span>)).into_sql(),
             Value::Xml(val) =&gt; val.as_deref().into_sql(),
-            Value::Array(<span class="kw">_</span>) =&gt; <span class="macro">panic!</span>(<span class="string">&quot;Arrays are not supported on SQL Server.&quot;</span>),
+            Value::Array(<span class="kw">_</span>) | Value::EnumArray(<span class="kw">_</span>, <span class="kw">_</span>) =&gt; <span class="macro">panic!</span>(<span class="string">&quot;Arrays are not supported on SQL Server.&quot;</span>),
             <span class="attr">#[cfg(feature = <span class="string">&quot;bigdecimal&quot;</span>)]
             </span>Value::Numeric(val) =&gt; (<span class="kw-2">*</span>val).to_sql(),
             Value::Json(val) =&gt; val.as_ref().map(|val| serde_json::to_string(<span class="kw-2">&amp;</span>val).unwrap()).into_sql(),

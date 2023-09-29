@@ -944,6 +944,16 @@
 <a href="#944" id="944">944</a>
 <a href="#945" id="945">945</a>
 <a href="#946" id="946">946</a>
+<a href="#947" id="947">947</a>
+<a href="#948" id="948">948</a>
+<a href="#949" id="949">949</a>
+<a href="#950" id="950">950</a>
+<a href="#951" id="951">951</a>
+<a href="#952" id="952">952</a>
+<a href="#953" id="953">953</a>
+<a href="#954" id="954">954</a>
+<a href="#955" id="955">955</a>
+<a href="#956" id="956">956</a>
 </pre></div><pre class="rust"><code><span class="attr">#[cfg(feature = <span class="string">&quot;bigdecimal&quot;</span>)]
 </span><span class="kw">mod </span>decimal;
 
@@ -990,8 +1000,8 @@
                 Value::Float(<span class="kw">_</span>) =&gt; PostgresType::FLOAT4,
                 Value::Double(<span class="kw">_</span>) =&gt; PostgresType::FLOAT8,
                 Value::Text(<span class="kw">_</span>) =&gt; PostgresType::TEXT,
-                <span class="comment">// Enums are special types, we can&#39;t statically infer them, so we let PG infer it
-                </span>Value::Enum(<span class="kw">_</span>) =&gt; PostgresType::UNKNOWN,
+                <span class="comment">// Enums are user-defined types, we can&#39;t statically infer them, so we let PG infer it
+                </span>Value::Enum(<span class="kw">_</span>, <span class="kw">_</span>) | Value::EnumArray(<span class="kw">_</span>, <span class="kw">_</span>) =&gt; PostgresType::UNKNOWN,
                 Value::Bytes(<span class="kw">_</span>) =&gt; PostgresType::BYTEA,
                 Value::Boolean(<span class="kw">_</span>) =&gt; PostgresType::BOOL,
                 Value::Char(<span class="kw">_</span>) =&gt; PostgresType::CHAR,
@@ -1029,7 +1039,7 @@
                         Value::Double(<span class="kw">_</span>) =&gt; PostgresType::FLOAT8_ARRAY,
                         Value::Text(<span class="kw">_</span>) =&gt; PostgresType::TEXT_ARRAY,
                         <span class="comment">// Enums are special types, we can&#39;t statically infer them, so we let PG infer it
-                        </span>Value::Enum(<span class="kw">_</span>) =&gt; PostgresType::UNKNOWN,
+                        </span>Value::Enum(<span class="kw">_</span>, <span class="kw">_</span>) | Value::EnumArray(<span class="kw">_</span>, <span class="kw">_</span>) =&gt; PostgresType::UNKNOWN,
                         Value::Bytes(<span class="kw">_</span>) =&gt; PostgresType::BYTEA_ARRAY,
                         Value::Boolean(<span class="kw">_</span>) =&gt; PostgresType::BOOL_ARRAY,
                         Value::Char(<span class="kw">_</span>) =&gt; PostgresType::CHAR_ARRAY,
@@ -1471,13 +1481,13 @@
 
                             Value::enum_variant(val.value)
                         }
-                        <span class="prelude-val">None </span>=&gt; Value::Enum(<span class="prelude-val">None</span>),
+                        <span class="prelude-val">None </span>=&gt; Value::Enum(<span class="prelude-val">None</span>, <span class="prelude-val">None</span>),
                     },
                     Kind::Array(inner) =&gt; <span class="kw">match </span>inner.kind() {
                         Kind::Enum =&gt; <span class="kw">match </span>row.try_get(i)<span class="question-mark">? </span>{
                             <span class="prelude-val">Some</span>(val) =&gt; {
                                 <span class="kw">let </span>val: Vec&lt;<span class="prelude-ty">Option</span>&lt;EnumString&gt;&gt; = val;
-                                <span class="kw">let </span>variants = val.into_iter().map(|x| Value::Enum(x.map(|x| x.value.into())));
+                                <span class="kw">let </span>variants = val.into_iter().map(|x| Value::Enum(x.map(|x| x.value.into()), <span class="prelude-val">None</span>));
 
                                 <span class="prelude-val">Ok</span>(Value::array(variants))
                             }
@@ -1785,7 +1795,7 @@
                 })
             }
             (Value::Bytes(bytes), <span class="kw">_</span>) =&gt; bytes.as_ref().map(|bytes| bytes.as_ref().to_sql(ty, out)),
-            (Value::Enum(string), <span class="kw">_</span>) =&gt; string.as_ref().map(|string| {
+            (Value::Enum(string, <span class="kw">_</span>), <span class="kw">_</span>) =&gt; string.as_ref().map(|string| {
                 out.extend_from_slice(string.as_bytes());
                 <span class="prelude-val">Ok</span>(IsNull::No)
             }),
@@ -1793,6 +1803,16 @@
             (Value::Char(c), <span class="kw">_</span>) =&gt; c.map(|c| (c <span class="kw">as </span>i8).to_sql(ty, out)),
             (Value::Array(vec), typ) <span class="kw">if </span><span class="macro">matches!</span>(typ.kind(), Kind::Array(<span class="kw">_</span>)) =&gt; {
                 vec.as_ref().map(|vec| vec.to_sql(ty, out))
+            }
+            (Value::EnumArray(variants, <span class="kw">_</span>), typ) <span class="kw">if </span><span class="macro">matches!</span>(typ.kind(), Kind::Array(<span class="kw">_</span>)) =&gt; variants
+                .as_ref()
+                .map(|vec| vec.iter().map(|val| val.as_ref()).collect::&lt;Vec&lt;<span class="kw">_</span>&gt;&gt;().to_sql(ty, out)),
+            (Value::EnumArray(variants, <span class="kw">_</span>), typ) =&gt; {
+                <span class="kw">let </span>kind = ErrorKind::conversion(<span class="macro">format!</span>(
+                    <span class="string">&quot;Couldn&#39;t serialize value `{variants:?}` into a `{typ}`. Value is a list but `{typ}` is not.&quot;
+                </span>));
+
+                <span class="kw">return </span><span class="prelude-val">Err</span>(Error::builder(kind).build().into());
             }
             (Value::Array(vec), typ) =&gt; {
                 <span class="kw">let </span>kind = ErrorKind::conversion(<span class="macro">format!</span>(

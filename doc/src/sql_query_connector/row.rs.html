@@ -554,7 +554,7 @@
         },
         TypeIdentifier::Enum(<span class="kw">_</span>) =&gt; <span class="kw">match </span>p_value {
             value <span class="kw">if </span>value.is_null() =&gt; PrismaValue::Null,
-            Value::Enum(<span class="prelude-val">Some</span>(cow)) =&gt; PrismaValue::Enum(cow.into_owned()),
+            Value::Enum(<span class="prelude-val">Some</span>(cow), <span class="kw">_</span>) =&gt; PrismaValue::Enum(cow.into_owned()),
             Value::Text(<span class="prelude-val">Some</span>(cow)) =&gt; PrismaValue::Enum(cow.into_owned()),
             <span class="kw">_ </span>=&gt; <span class="kw">return </span><span class="prelude-val">Err</span>(create_error(<span class="kw-2">&amp;</span>p_value)),
         },

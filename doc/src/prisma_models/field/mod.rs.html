@@ -246,6 +246,11 @@
 <a href="#246" id="246">246</a>
 <a href="#247" id="247">247</a>
 <a href="#248" id="248">248</a>
+<a href="#249" id="249">249</a>
+<a href="#250" id="250">250</a>
+<a href="#251" id="251">251</a>
+<a href="#252" id="252">252</a>
+<a href="#253" id="253">253</a>
 </pre></div><pre class="rust"><code><span class="kw">mod </span>composite;
 <span class="kw">mod </span>relation;
 <span class="kw">mod </span>scalar;
@@ -425,6 +430,11 @@
             TypeIdentifier::Bytes =&gt; <span class="string">&quot;Bytes&quot;</span>.into(),
             TypeIdentifier::Unsupported =&gt; <span class="string">&quot;Unsupported&quot;</span>.into(),
         }
+    }
+
+    <span class="doccomment">/// Returns `true` if the type identifier is [`Enum`].
+    </span><span class="kw">pub fn </span>is_enum(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="macro">matches!</span>(<span class="self">self</span>, <span class="self">Self</span>::Enum(..))
     }
 }
 

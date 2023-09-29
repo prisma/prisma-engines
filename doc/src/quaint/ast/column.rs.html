@@ -190,6 +190,39 @@
 <a href="#190" id="190">190</a>
 <a href="#191" id="191">191</a>
 <a href="#192" id="192">192</a>
+<a href="#193" id="193">193</a>
+<a href="#194" id="194">194</a>
+<a href="#195" id="195">195</a>
+<a href="#196" id="196">196</a>
+<a href="#197" id="197">197</a>
+<a href="#198" id="198">198</a>
+<a href="#199" id="199">199</a>
+<a href="#200" id="200">200</a>
+<a href="#201" id="201">201</a>
+<a href="#202" id="202">202</a>
+<a href="#203" id="203">203</a>
+<a href="#204" id="204">204</a>
+<a href="#205" id="205">205</a>
+<a href="#206" id="206">206</a>
+<a href="#207" id="207">207</a>
+<a href="#208" id="208">208</a>
+<a href="#209" id="209">209</a>
+<a href="#210" id="210">210</a>
+<a href="#211" id="211">211</a>
+<a href="#212" id="212">212</a>
+<a href="#213" id="213">213</a>
+<a href="#214" id="214">214</a>
+<a href="#215" id="215">215</a>
+<a href="#216" id="216">216</a>
+<a href="#217" id="217">217</a>
+<a href="#218" id="218">218</a>
+<a href="#219" id="219">219</a>
+<a href="#220" id="220">220</a>
+<a href="#221" id="221">221</a>
+<a href="#222" id="222">222</a>
+<a href="#223" id="223">223</a>
+<a href="#224" id="224">224</a>
+<a href="#225" id="225">225</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span><span class="kw">super</span>::Aliasable;
 <span class="kw">use crate</span>::{
     ast::{Expression, ExpressionKind, Table},
@@ -224,6 +257,12 @@
     <span class="kw">pub</span>(<span class="kw">crate</span>) alias: <span class="prelude-ty">Option</span>&lt;Cow&lt;<span class="lifetime">&#39;a</span>, str&gt;&gt;,
     <span class="kw">pub</span>(<span class="kw">crate</span>) default: <span class="prelude-ty">Option</span>&lt;DefaultValue&lt;<span class="lifetime">&#39;a</span>&gt;&gt;,
     <span class="kw">pub</span>(<span class="kw">crate</span>) type_family: <span class="prelude-ty">Option</span>&lt;TypeFamily&gt;,
+    <span class="doccomment">/// Whether the column is an enum.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) is_enum: bool,
+    <span class="doccomment">/// Whether the column is a (scalar) list.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) is_list: bool,
+    <span class="doccomment">/// Whether the column is part of a SELECT or RETURNING clause.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) is_selected: bool,
 }
 
 <span class="doccomment">/// Defines a default value for a `Column`.
@@ -278,6 +317,33 @@
     <span class="doccomment">/// Sets a type family, used mainly for SQL Server `OUTPUT` hack.
     </span><span class="kw">pub fn </span>type_family(<span class="kw-2">mut </span><span class="self">self</span>, type_family: TypeFamily) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.type_family = <span class="prelude-val">Some</span>(type_family);
+        <span class="self">self
+    </span>}
+
+    <span class="doccomment">/// Sets whether the column points to an enum type.
+    </span><span class="kw">pub fn </span>set_is_enum(<span class="kw-2">mut </span><span class="self">self</span>, is_enum: bool) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.is_enum = is_enum;
+        <span class="self">self
+    </span>}
+
+    <span class="doccomment">/// Sets whether the column points to an scalar list.
+    </span><span class="kw">pub fn </span>set_is_list(<span class="kw-2">mut </span><span class="self">self</span>, is_list: bool) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.is_list = is_list;
+        <span class="self">self
+    </span>}
+
+    <span class="doccomment">/// Sets whether the column is selected.
+    ///
+    /// On Postgres, this defines whether an enum column should be casted to `TEXT` when rendered.
+    /// 
+    /// Since enums are user-defined custom types, `tokio-postgres` fires an additional query
+    /// when selecting columns of type enum to know which custom type the column refers to.
+    /// Casting the enum column to `TEXT` avoid this roundtrip since `TEXT` is a builtin type.
+    ///
+    /// We don&#39;t want to cast every single enum columns to text though, as this would prevent indexes from being used,
+    /// so we use this additional field to granularly pick which columns we cast.
+    </span><span class="kw">pub fn </span>set_is_selected(<span class="kw-2">mut </span><span class="self">self</span>, is_selected: bool) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.is_selected = is_selected;
         <span class="self">self
     </span>}
 

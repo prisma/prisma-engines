@@ -367,11 +367,11 @@
                 Value::Double(f) =&gt; f.map(my::Value::Double),
                 Value::Text(s) =&gt; s.clone().map(|s| my::Value::Bytes((<span class="kw-2">*</span>s).as_bytes().to_vec())),
                 Value::Bytes(bytes) =&gt; bytes.clone().map(|bytes| my::Value::Bytes(bytes.into_owned())),
-                Value::Enum(s) =&gt; s.clone().map(|s| my::Value::Bytes((<span class="kw-2">*</span>s).as_bytes().to_vec())),
+                Value::Enum(s, <span class="kw">_</span>) =&gt; s.clone().map(|s| my::Value::Bytes((<span class="kw-2">*</span>s).as_bytes().to_vec())),
                 Value::Boolean(b) =&gt; b.map(|b| my::Value::Int(b <span class="kw">as </span>i64)),
                 Value::Char(c) =&gt; c.map(|c| my::Value::Bytes(<span class="macro">vec!</span>[c <span class="kw">as </span>u8])),
                 Value::Xml(s) =&gt; s.as_ref().map(|s| my::Value::Bytes((s).as_bytes().to_vec())),
-                Value::Array(<span class="kw">_</span>) =&gt; {
+                Value::Array(<span class="kw">_</span>) | Value::EnumArray(<span class="kw">_</span>, <span class="kw">_</span>) =&gt; {
                     <span class="kw">let </span>msg = <span class="string">&quot;Arrays are not supported in MySQL.&quot;</span>;
                     <span class="kw">let </span>kind = ErrorKind::conversion(msg);
 
@@ -645,7 +645,7 @@
                 }
                 my::Value::NULL =&gt; <span class="kw">match </span>column {
                     t <span class="kw">if </span>t.is_bool() =&gt; Value::Boolean(<span class="prelude-val">None</span>),
-                    t <span class="kw">if </span>t.is_enum() =&gt; Value::Enum(<span class="prelude-val">None</span>),
+                    t <span class="kw">if </span>t.is_enum() =&gt; Value::Enum(<span class="prelude-val">None</span>, <span class="prelude-val">None</span>),
                     t <span class="kw">if </span>t.is_null() =&gt; Value::Int32(<span class="prelude-val">None</span>),
                     t <span class="kw">if </span>t.is_int64() =&gt; Value::Int64(<span class="prelude-val">None</span>),
                     t <span class="kw">if </span>t.is_int32() =&gt; Value::Int32(<span class="prelude-val">None</span>),

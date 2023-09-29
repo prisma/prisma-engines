@@ -112,6 +112,7 @@
 <a href="#112" id="112">112</a>
 <a href="#113" id="113">113</a>
 <a href="#114" id="114">114</a>
+<a href="#115" id="115">115</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>quaint::{connector::ResultRowRef, prelude::ResultSet, Value};
 
 <span class="kw">pub trait </span>ResultSetExt: Sized {
@@ -202,7 +203,8 @@
     </span><span class="kw">pub fn </span>assert_text_value(<span class="self">self</span>, column_name: <span class="kw-2">&amp;</span>str, expected_value: <span class="kw-2">&amp;</span>str) -&gt; <span class="self">Self </span>{
         <span class="kw">let </span>value = <span class="self">self</span>.<span class="number">0</span>.get(column_name).expect(<span class="string">&quot;Expected a value, found none&quot;</span>);
         <span class="kw">let </span>value_text: <span class="kw-2">&amp;</span>str = <span class="kw">match </span>value {
-            Value::Text(val) | Value::Enum(val) =&gt; val.as_deref(),
+            Value::Text(val) =&gt; val.as_deref(),
+            Value::Enum(val, <span class="kw">_</span>) =&gt; val.as_deref(),
             <span class="kw">_ </span>=&gt; <span class="prelude-val">None</span>,
         }
         .expect(<span class="string">&quot;Expected a string value&quot;</span>);
