@@ -22,7 +22,10 @@ impl ScalarFieldExt for ScalarField {
             (PrismaValue::Enum(e), TypeIdentifier::Enum(enum_id)) => {
                 let enum_walker = self.dm.clone().zip(enum_id);
                 let enum_name = enum_walker.db_name().to_owned();
-                let schema_name = enum_walker.schema_name().map(ToOwned::to_owned);
+                let schema_name = enum_walker
+                    .schema_name()
+                    .map(ToOwned::to_owned)
+                    .or(Some(ctx.schema_name().to_owned()));
 
                 Value::enum_variant_with_name(e, enum_name, schema_name)
             }
@@ -35,7 +38,10 @@ impl ScalarFieldExt for ScalarField {
                     .collect();
 
                 let enum_name = enum_walker.db_name().to_owned();
-                let schema_name = enum_walker.schema_name().map(ToOwned::to_owned);
+                let schema_name = enum_walker
+                    .schema_name()
+                    .map(ToOwned::to_owned)
+                    .or(Some(ctx.schema_name().to_owned()));
 
                 Value::EnumArray(Some(variants), Some(EnumName::new(enum_name, schema_name)))
             }
@@ -55,7 +61,10 @@ impl ScalarFieldExt for ScalarField {
                 TypeIdentifier::Enum(enum_id) => {
                     let enum_walker = self.dm.clone().zip(enum_id);
                     let enum_name = enum_walker.db_name().to_owned();
-                    let schema_name = enum_walker.schema_name().map(ToOwned::to_owned);
+                    let schema_name = enum_walker
+                        .schema_name()
+                        .map(ToOwned::to_owned)
+                        .or(Some(ctx.schema_name().to_owned()));
 
                     Value::Enum(None, Some(EnumName::new(enum_name, schema_name)))
                 }
