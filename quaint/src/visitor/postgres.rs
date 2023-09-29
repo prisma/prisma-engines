@@ -2,7 +2,10 @@ use crate::{
     ast::*,
     visitor::{self, Visitor},
 };
-use std::fmt::{self, Write};
+use std::{
+    fmt::{self, Write},
+    ops::Deref,
+};
 
 /// A visitor to generate queries for the PostgreSQL database.
 ///
@@ -47,6 +50,93 @@ impl<'a> Visitor<'a> for Postgres<'a> {
         self.write(self.parameters.len())
     }
 
+    fn visit_parameterized_enum(&mut self, variant: EnumVariant<'a>, name: Option<EnumName<'a>>) -> visitor::Result {
+        self.add_parameter(variant.into_text());
+
+        // Since enums are user-defined custom types, tokio-postgres fires an additional query
+        // when parameterizing values of type enum to know which custom type the value refers to.
+        // Casting the enum value to `TEXT` avoid this roundtrip since `TEXT` is a builtin type.
+        if let Some(enum_name) = name {
+            self.surround_with("CAST(", ")", |ref mut s| {
+                s.parameter_substitution()?;
+                s.write("::text")?;
+                s.write(" AS ")?;
+                s.surround_with_backticks(enum_name.deref())
+            })?;
+        } else {
+            self.parameter_substitution()?;
+        }
+
+        Ok(())
+    }
+
+    fn visit_parameterized_enum_array(
+        &mut self,
+        variants: Vec<EnumVariant<'a>>,
+        name: Option<EnumName<'a>>,
+    ) -> visitor::Result {
+        let len = variants.len();
+
+        // Since enums are user-defined custom types, tokio-postgres fires an additional query
+        // when parameterizing values of type enum to know which custom type the value refers to.
+        // Casting the enum value to `TEXT` avoid this roundtrip since `TEXT` is a builtin type.
+        if let Some(enum_name) = name.clone() {
+            self.surround_with("ARRAY[", "]", |s| {
+                for (i, variant) in variants.into_iter().enumerate() {
+                    s.add_parameter(variant.into_text());
+                    s.parameter_substitution()?;
+                    s.write("::text")?;
+
+                    if i < (len - 1) {
+                        s.write(", ")?;
+                    }
+                }
+
+                Ok(())
+            })?;
+
+            self.write("::")?;
+            self.surround_with_backticks(enum_name.deref())?;
+            self.write("[]")?;
+        } else {
+            self.visit_parameterized(Value::Array(Some(
+                variants
+                    .into_iter()
+                    .map(|variant| variant.into_enum(name.clone()))
+                    .collect(),
+            )))?;
+        }
+
+        Ok(())
+    }
+
+    /// A database column identifier
+    fn visit_column(&mut self, column: Column<'a>) -> visitor::Result {
+        match column.table {
+            Some(table) => {
+                self.visit_table(table, false)?;
+                self.write(".")?;
+                self.delimited_identifiers(&[&*column.name])?;
+            }
+            _ => self.delimited_identifiers(&[&*column.name])?,
+        };
+
+        if column.is_enum && column.is_selected {
+            if column.is_list {
+                self.write("::text[]")?;
+            } else {
+                self.write("::text")?;
+            }
+        }
+
+        if let Some(alias) = column.alias {
+            self.write(" AS ")?;
+            self.delimited_identifiers(&[&*alias])?;
+        }
+
+        Ok(())
+    }
+
     fn visit_limit_and_offset(&mut self, limit: Option<Value<'a>>, offset: Option<Value<'a>>) -> visitor::Result {
         match (limit, offset) {
             (Some(limit), Some(offset)) => {
@@ -73,7 +163,7 @@ impl<'a> Visitor<'a> for Postgres<'a> {
             Value::Int32(i) => i.map(|i| self.write(i)),
             Value::Int64(i) => i.map(|i| self.write(i)),
             Value::Text(t) => t.map(|t| self.write(format!("'{t}'"))),
-            Value::Enum(e) => e.map(|e| self.write(e)),
+            Value::Enum(e, _) => e.map(|e| self.write(e)),
             Value::Bytes(b) => b.map(|b| self.write(format!("E'{}'", hex::encode(b)))),
             Value::Boolean(b) => b.map(|b| self.write(b)),
             Value::Xml(cow) => cow.map(|cow| self.write(format!("'{cow}'"))),
@@ -105,7 +195,28 @@ impl<'a> Visitor<'a> for Postgres<'a> {
                     Ok(())
                 })
             }),
+            Value::EnumArray(variants, name) => variants.map(|variants| {
+                self.surround_with("ARRAY[", "]", |ref mut s| {
+                    let len = variants.len();
 
+                    for (i, item) in variants.into_iter().enumerate() {
+                        s.surround_with("'", "'", |t| t.write(item))?;
+
+                        if i < len - 1 {
+                            s.write(",")?;
+                        }
+                    }
+
+                    Ok(())
+                })?;
+
+                if let Some(name) = name {
+                    self.write("::")?;
+                    self.surround_with_backticks(name.as_ref())?;
+                }
+
+                Ok(())
+            }),
             Value::Json(j) => j.map(|j| self.write(format!("'{}'", serde_json::to_string(&j).unwrap()))),
             #[cfg(feature = "bigdecimal")]
             Value::Numeric(r) => r.map(|r| self.write(r)),
@@ -923,6 +1034,18 @@ mod tests {
         let (sql, _) = Postgres::build(Select::from_table("foo").so_that("bar".compare_raw("ILIKE", "baz%"))).unwrap();
 
         assert_eq!(r#"SELECT "foo".* FROM "foo" WHERE "bar" ILIKE $1"#, sql);
+    }
+
+    #[test]
+    fn test_raw_enum_array() {
+        let enum_array = Value::EnumArray(
+            Some(vec![EnumVariant::new("A"), EnumVariant::new("B")]),
+            Some(EnumName::new("Alphabet")),
+        );
+        let (sql, params) = Postgres::build(Select::default().value(enum_array.raw())).unwrap();
+
+        assert_eq!("SELECT ARRAY['A','B']::\"Alphabet\"", sql);
+        assert!(params.is_empty());
     }
 
     #[test]

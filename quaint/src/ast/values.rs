@@ -50,7 +50,13 @@ pub enum Value<'a> {
     /// String value.
     Text(Option<Cow<'a, str>>),
     /// Database enum value.
-    Enum(Option<Cow<'a, str>>),
+    /// The optional `EnumName` is only used on PostgreSQL.
+    /// Read more about it here: https://github.com/prisma/prisma-engines/pull/4280
+    Enum(Option<EnumVariant<'a>>, Option<EnumName<'a>>),
+    /// Database enum array (PostgreSQL specific).
+    /// We use a different variant than `Value::Array` to uplift the `EnumName`
+    /// and have it available even for empty enum arrays.
+    EnumArray(Option<Vec<EnumVariant<'a>>>, Option<EnumName<'a>>),
     /// Bytes value.
     Bytes(Option<Cow<'a, [u8]>>),
     /// Boolean value.
@@ -106,7 +112,20 @@ impl<'a> fmt::Display for Value<'a> {
             Value::Double(val) => val.map(|v| write!(f, "{v}")),
             Value::Text(val) => val.as_ref().map(|v| write!(f, "\"{v}\"")),
             Value::Bytes(val) => val.as_ref().map(|v| write!(f, "<{} bytes blob>", v.len())),
-            Value::Enum(val) => val.as_ref().map(|v| write!(f, "\"{v}\"")),
+            Value::Enum(val, _) => val.as_ref().map(|v| write!(f, "\"{v}\"")),
+            Value::EnumArray(vals, _) => vals.as_ref().map(|vals| {
+                let len = vals.len();
+
+                write!(f, "[")?;
+                for (i, val) in vals.iter().enumerate() {
+                    write!(f, "{val}")?;
+
+                    if i < (len - 1) {
+                        write!(f, ",")?;
+                    }
+                }
+                write!(f, "]")
+            }),
             Value::Boolean(val) => val.map(|v| write!(f, "{v}")),
             Value::Char(val) => val.map(|v| write!(f, "'{v}'")),
             Value::Array(vals) => vals.as_ref().map(|vals| {
@@ -155,7 +174,15 @@ impl<'a> From<Value<'a>> for serde_json::Value {
             }),
             Value::Text(cow) => cow.map(|cow| serde_json::Value::String(cow.into_owned())),
             Value::Bytes(bytes) => bytes.map(|bytes| serde_json::Value::String(base64::encode(bytes))),
-            Value::Enum(cow) => cow.map(|cow| serde_json::Value::String(cow.into_owned())),
+            Value::Enum(cow, _) => cow.map(|cow| serde_json::Value::String(cow.into_owned())),
+            Value::EnumArray(values, _) => values.map(|values| {
+                serde_json::Value::Array(
+                    values
+                        .into_iter()
+                        .map(|value| serde_json::Value::String(value.into_owned()))
+                        .collect(),
+                )
+            }),
             Value::Boolean(b) => b.map(serde_json::Value::Bool),
             Value::Char(c) => c.map(|c| {
                 let bytes = [c as u8];
@@ -240,7 +267,16 @@ impl<'a> Value<'a> {
     where
         T: Into<Cow<'a, str>>,
     {
-        Value::Enum(Some(value.into()))
+        Value::Enum(Some(EnumVariant::new(value)), None)
+    }
+
+    /// Creates a new enum value with the name of the enum attached.
+    pub fn enum_variant_with_name<T, U>(value: T, name: U) -> Self
+    where
+        T: Into<Cow<'a, str>>,
+        U: Into<Cow<'a, str>>,
+    {
+        Value::Enum(Some(EnumVariant::new(value)), Some(EnumName::new(name)))
     }
 
     /// Creates a new bytes value.
@@ -319,7 +355,8 @@ impl<'a> Value<'a> {
             Value::Float(i) => i.is_none(),
             Value::Double(i) => i.is_none(),
             Value::Text(t) => t.is_none(),
-            Value::Enum(e) => e.is_none(),
+            Value::Enum(e, _) => e.is_none(),
+            Value::EnumArray(e, _) => e.is_none(),
             Value::Bytes(b) => b.is_none(),
             Value::Boolean(b) => b.is_none(),
             Value::Char(c) => c.is_none(),

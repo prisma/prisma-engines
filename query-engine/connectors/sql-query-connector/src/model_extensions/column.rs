@@ -96,7 +96,10 @@ impl AsColumn for ScalarField {
         let full_table_name = super::table::db_name_with_schema(&self.container().as_model().unwrap(), ctx);
         let col = self.db_name().to_string();
 
-        let column = Column::from((full_table_name, col)).type_family(self.type_family());
-        column.default(quaint::ast::DefaultValue::Generated)
+        Column::from((full_table_name, col))
+            .type_family(self.type_family())
+            .set_is_enum(self.type_identifier().is_enum())
+            .set_is_list(self.is_list())
+            .default(quaint::ast::DefaultValue::Generated)
     }
 }

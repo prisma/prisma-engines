@@ -345,7 +345,7 @@ fn js_value_to_quaint(
         }
         ColumnType::Enum => match json_value {
             serde_json::Value::String(s) => Ok(QuaintValue::enum_variant(s)),
-            serde_json::Value::Null => Ok(QuaintValue::Enum(None)),
+            serde_json::Value::Null => Ok(QuaintValue::Enum(None, None)),
             mismatch => Err(conversion_error!(
                 "expected a string in column {column_name}, found {mismatch}"
             )),
@@ -803,11 +803,12 @@ mod proxy_test {
         let column_type = ColumnType::Enum;
 
         // null
-        test_null(QuaintValue::Enum(None), column_type);
+        test_null(QuaintValue::Enum(None, None), column_type);
 
         let s = "some enum variant";
         let json_value = serde_json::Value::String(s.to_string());
+
         let quaint_value = js_value_to_quaint(json_value, column_type, "column_name").unwrap();
-        assert_eq!(quaint_value, QuaintValue::Enum(Some(s.into())));
+        assert_eq!(quaint_value, QuaintValue::Enum(Some(s.into()), None));
     }
 }

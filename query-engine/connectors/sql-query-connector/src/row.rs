@@ -151,7 +151,7 @@ fn row_value_to_prisma_value(p_value: Value, meta: ColumnMetadata<'_>) -> Result
         },
         TypeIdentifier::Enum(_) => match p_value {
             value if value.is_null() => PrismaValue::Null,
-            Value::Enum(Some(cow)) => PrismaValue::Enum(cow.into_owned()),
+            Value::Enum(Some(cow), _) => PrismaValue::Enum(cow.into_owned()),
             Value::Text(Some(cow)) => PrismaValue::Enum(cow.into_owned()),
             _ => return Err(create_error(&p_value)),
         },
