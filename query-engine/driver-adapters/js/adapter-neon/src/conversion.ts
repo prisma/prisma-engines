@@ -53,37 +53,6 @@ export function fieldToColumnType(fieldTypeId: number): ColumnType {
   }
 }
 
-type transformerFunction = (value: any) => any
-type ColumnTypeTransformer = Record<number, Record<number, transformerFunction>>
-
-/**
- * Transformers performs data transformation to the format expected by the
- * sql-query-connector of the query engine. This logic must be equivalent to
- * that of the rust drivers.
- *
- * As an example, see quaint/src/connector/postgres/conversions.rs in the
- * prisma-engines codebase
- *
- * If the transformation is a raw transformation over the raw string coming
- * from the driver is better to do it by registering a type parser in the
- * types module of the pg driver. Because those will be called in any case
- * before passing the value to transformValue.
- */
-const transformers: ColumnTypeTransformer = {
-};
-
-
-
-export function transformValue(value: any, pgType: any, columnType: ColumnType): any {
-  const columnTypeTransformer =  transformers[columnType]?.[pgType]
-
-  if (typeof columnTypeTransformer !== 'undefined') {
-    return columnTypeTransformer(value)
-  }
-
-  return value
-}
-
 /**
  * JsonNull are stored in JSON strings as the string "null", distinguishable from
  * the `null` value which is used by the driver to represent the database NULL.

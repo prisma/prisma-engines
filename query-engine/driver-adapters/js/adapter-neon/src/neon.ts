@@ -31,14 +31,6 @@ abstract class NeonQueryable implements Queryable {
       const columns = fields.map((field) => field.name)
       const columnTypes = fields.map((field) => fieldToColumnType(field.dataTypeID))
 
-      for (let i = 0; i < rows.length; i++) {
-        for (let j = 0; j < fields.length; j++) {
-          const pgType = fields[j].dataTypeID
-          const quaintType = columnTypes[j]
-          rows[i][j] = transformValue(rows[i][j], pgType, quaintType)
-        }
-      }
-
       return {
         columnNames: columns,
         columnTypes,
