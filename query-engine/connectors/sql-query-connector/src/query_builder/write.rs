@@ -190,7 +190,19 @@ pub(crate) fn chunk_update_with_ids(
     Ok(query)
 }
 
-pub(crate) fn delete_many(
+pub(crate) fn delete_many_from_filter(
+    model: &Model,
+    filter_condition: ConditionTree<'static>,
+    ctx: &Context<'_>,
+) -> Query<'static> {
+    Delete::from_table(model.as_table(ctx))
+        .so_that(filter_condition)
+        .append_trace(&Span::current())
+        .add_trace_id(ctx.trace_id)
+        .into()
+}
+
+pub(crate) fn delete_many_from_ids_and_filter(
     model: &Model,
     ids: &[&SelectionResult],
     filter_condition: ConditionTree<'static>,
@@ -201,10 +213,7 @@ pub(crate) fn delete_many(
         .collect();
 
     super::chunked_conditions(&columns, ids, |conditions| {
-        Delete::from_table(model.as_table(ctx))
-            .so_that(conditions.and(filter_condition.clone()))
-            .append_trace(&Span::current())
-            .add_trace_id(ctx.trace_id)
+        delete_many_from_filter(model, conditions.and(filter_condition.clone()), ctx)
     })
 }
 
