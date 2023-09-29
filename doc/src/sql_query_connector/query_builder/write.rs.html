@@ -258,6 +258,15 @@
 <a href="#258" id="258">258</a>
 <a href="#259" id="259">259</a>
 <a href="#260" id="260">260</a>
+<a href="#261" id="261">261</a>
+<a href="#262" id="262">262</a>
+<a href="#263" id="263">263</a>
+<a href="#264" id="264">264</a>
+<a href="#265" id="265">265</a>
+<a href="#266" id="266">266</a>
+<a href="#267" id="267">267</a>
+<a href="#268" id="268">268</a>
+<a href="#269" id="269">269</a>
 </pre></div><pre class="rust"><code><span class="kw">use crate</span>::{model_extensions::<span class="kw-2">*</span>, sql_trace::SqlTraceComment, Context};
 <span class="kw">use </span>connector_interface::{DatasourceFieldName, ScalarWriteOperation, WriteArgs};
 <span class="kw">use </span>prisma_models::<span class="kw-2">*</span>;
@@ -450,7 +459,19 @@
     <span class="prelude-val">Ok</span>(query)
 }
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>delete_many(
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>delete_many_from_filter(
+    model: <span class="kw-2">&amp;</span>Model,
+    filter_condition: ConditionTree&lt;<span class="lifetime">&#39;static</span>&gt;,
+    ctx: <span class="kw-2">&amp;</span>Context&lt;<span class="lifetime">&#39;_</span>&gt;,
+) -&gt; Query&lt;<span class="lifetime">&#39;static</span>&gt; {
+    Delete::from_table(model.as_table(ctx))
+        .so_that(filter_condition)
+        .append_trace(<span class="kw-2">&amp;</span>Span::current())
+        .add_trace_id(ctx.trace_id)
+        .into()
+}
+
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>delete_many_from_ids_and_filter(
     model: <span class="kw-2">&amp;</span>Model,
     ids: <span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span>SelectionResult],
     filter_condition: ConditionTree&lt;<span class="lifetime">&#39;static</span>&gt;,
@@ -461,10 +482,7 @@
         .collect();
 
     <span class="kw">super</span>::chunked_conditions(<span class="kw-2">&amp;</span>columns, ids, |conditions| {
-        Delete::from_table(model.as_table(ctx))
-            .so_that(conditions.and(filter_condition.clone()))
-            .append_trace(<span class="kw-2">&amp;</span>Span::current())
-            .add_trace_id(ctx.trace_id)
+        delete_many_from_filter(model, conditions.and(filter_condition.clone()), ctx)
     })
 }
 

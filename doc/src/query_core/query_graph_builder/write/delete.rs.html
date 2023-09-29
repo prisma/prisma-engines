@@ -90,10 +90,25 @@
 <a href="#90" id="90">90</a>
 <a href="#91" id="91">91</a>
 <a href="#92" id="92">92</a>
+<a href="#93" id="93">93</a>
+<a href="#94" id="94">94</a>
+<a href="#95" id="95">95</a>
+<a href="#96" id="96">96</a>
+<a href="#97" id="97">97</a>
+<a href="#98" id="98">98</a>
+<a href="#99" id="99">99</a>
+<a href="#100" id="100">100</a>
+<a href="#101" id="101">101</a>
+<a href="#102" id="102">102</a>
+<a href="#103" id="103">103</a>
+<a href="#104" id="104">104</a>
+<a href="#105" id="105">105</a>
+<a href="#106" id="106">106</a>
+<a href="#107" id="107">107</a>
 </pre></div><pre class="rust"><code><span class="kw">use super</span>::<span class="kw-2">*</span>;
 <span class="kw">use crate</span>::{
     query_ast::<span class="kw-2">*</span>,
-    query_graph::{QueryGraph, QueryGraphDependency},
+    query_graph::{Node, QueryGraph, QueryGraphDependency},
     ArgumentListLookup, FilteredQuery, ParsedField,
 };
 <span class="kw">use </span>connector::filter::Filter;
@@ -144,6 +159,7 @@
     )<span class="question-mark">?</span>;
 
     graph.add_result_node(<span class="kw-2">&amp;</span>read_node);
+
     <span class="prelude-val">Ok</span>(())
 }
 
@@ -154,31 +170,45 @@
     model: Model,
     <span class="kw-2">mut </span>field: ParsedField&lt;<span class="lifetime">&#39;_</span>&gt;,
 ) -&gt; QueryGraphBuilderResult&lt;()&gt; {
-    graph.flag_transactional();
-
     <span class="kw">let </span>filter = <span class="kw">match </span>field.arguments.lookup(args::WHERE) {
         <span class="prelude-val">Some</span>(where_arg) =&gt; extract_filter(where_arg.value.try_into()<span class="question-mark">?</span>, <span class="kw-2">&amp;</span>model)<span class="question-mark">?</span>,
         <span class="prelude-val">None </span>=&gt; Filter::empty(),
     };
 
     <span class="kw">let </span>model_id = model.primary_identifier();
-    <span class="kw">let </span>read_query = utils::read_ids_infallible(model.clone(), model_id, filter.clone());
-    <span class="kw">let </span>record_filter = filter.into();
+    <span class="kw">let </span>record_filter = filter.clone().into();
     <span class="kw">let </span>delete_many = WriteQuery::DeleteManyRecords(DeleteManyRecords {
         model: model.clone(),
         record_filter,
     });
 
-    <span class="kw">let </span>read_query_node = graph.create_node(read_query);
     <span class="kw">let </span>delete_many_node = graph.create_node(Query::Write(delete_many));
 
-    utils::insert_emulated_on_delete(graph, query_schema, <span class="kw-2">&amp;</span>model, <span class="kw-2">&amp;</span>read_query_node, <span class="kw-2">&amp;</span>delete_many_node)<span class="question-mark">?</span>;
+    <span class="kw">if </span>query_schema.relation_mode().is_prisma() {
+        graph.flag_transactional();
 
-    graph.create_edge(
-        <span class="kw-2">&amp;</span>read_query_node,
-        <span class="kw-2">&amp;</span>delete_many_node,
-        QueryGraphDependency::ExecutionOrder,
-    )<span class="question-mark">?</span>;
+        <span class="kw">let </span>read_query = utils::read_ids_infallible(model.clone(), model_id.clone(), filter);
+        <span class="kw">let </span>read_query_node = graph.create_node(read_query);
+
+        utils::insert_emulated_on_delete(graph, query_schema, <span class="kw-2">&amp;</span>model, <span class="kw-2">&amp;</span>read_query_node, <span class="kw-2">&amp;</span>delete_many_node)<span class="question-mark">?</span>;
+
+        graph.create_edge(
+            <span class="kw-2">&amp;</span>read_query_node,
+            <span class="kw-2">&amp;</span>delete_many_node,
+            QueryGraphDependency::ProjectedDataDependency(
+                model_id,
+                Box::new(|<span class="kw-2">mut </span>delete_many_node, ids| {
+                    <span class="kw">if let </span>Node::Query(Query::Write(WriteQuery::DeleteManyRecords(<span class="kw-2">ref mut </span>dmr))) = delete_many_node {
+                        dmr.record_filter = ids.into();
+                    }
+
+                    <span class="prelude-val">Ok</span>(delete_many_node)
+                }),
+            ),
+        )<span class="question-mark">?</span>;
+    }
+
+    graph.add_result_node(<span class="kw-2">&amp;</span>delete_many_node);
 
     <span class="prelude-val">Ok</span>(())
 }
