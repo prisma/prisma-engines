@@ -1,17 +1,21 @@
-use core::panic;
+use std::borrow::Cow;
 use std::str::FromStr;
 
 use crate::async_js_function::AsyncJsFunction;
 use crate::conversion::JSArg;
 use crate::transaction::JsTransaction;
 use napi::bindgen_prelude::{FromNapiValue, ToNapiValue};
+use napi::threadsafe_function::{ErrorStrategy, ThreadsafeFunction};
 use napi::{JsObject, JsString};
 use napi_derive::napi;
 use quaint::connector::ResultSet as QuaintResultSet;
-use quaint::Value as QuaintValue;
+use quaint::{
+    error::{Error as QuaintError, ErrorKind},
+    Value as QuaintValue,
+};
 
 // TODO(jkomyno): import these 3rd-party crates from the `quaint-core` crate.
-use bigdecimal::BigDecimal;
+use bigdecimal::{BigDecimal, FromPrimitive};
 use chrono::{DateTime, Utc};
 use chrono::{NaiveDate, NaiveTime};
 
@@ -44,8 +48,12 @@ pub(crate) struct TransactionProxy {
     /// commit transaction
     commit: AsyncJsFunction<(), ()>,
 
-    /// rollback transcation
+    /// rollback transaction
     rollback: AsyncJsFunction<(), ()>,
+
+    /// dispose transaction, cleanup logic executed at the end of the transaction lifecycle
+    /// on drop.
+    dispose: ThreadsafeFunction<(), ErrorStrategy::Fatal>,
 }
 
 /// This result set is more convenient to be manipulated from both Rust and NodeJS.
@@ -87,69 +95,78 @@ pub enum ColumnType {
     /// - INT16 (SMALLINT) -> e.g. `32767`
     /// - INT24 (MEDIUMINT) -> e.g. `8388607`
     /// - INT32 (INT) -> e.g. `2147483647`
-    Int32,
+    Int32 = 0,
 
     /// The following PlanetScale type IDs are mapped into Int64:
     /// - INT64 (BIGINT) -> e.g. `"9223372036854775807"` (String-encoded)
-    Int64,
+    Int64 = 1,
 
     /// The following PlanetScale type IDs are mapped into Float:
     /// - FLOAT32 (FLOAT) -> e.g. `3.402823466`
-    Float,
+    Float = 2,
 
     /// The following PlanetScale type IDs are mapped into Double:
     /// - FLOAT64 (DOUBLE) -> e.g. `1.7976931348623157`
-    Double,
+    Double = 3,
 
     /// The following PlanetScale type IDs are mapped into Numeric:
     /// - DECIMAL (DECIMAL) -> e.g. `"99999999.99"` (String-encoded)
-    Numeric,
+    Numeric = 4,
 
     /// The following PlanetScale type IDs are mapped into Boolean:
     /// - BOOLEAN (BOOLEAN) -> e.g. `1`
-    Boolean,
+    Boolean = 5,
 
     /// The following PlanetScale type IDs are mapped into Char:
     /// - CHAR (CHAR) -> e.g. `"c"` (String-encoded)
-    Char,
+    Char = 6,
 
     /// The following PlanetScale type IDs are mapped into Text:
     /// - TEXT (TEXT) -> e.g. `"foo"` (String-encoded)
     /// - VARCHAR (VARCHAR) -> e.g. `"foo"` (String-encoded)
-    Text,
+    Text = 7,
 
     /// The following PlanetScale type IDs are mapped into Date:
     /// - DATE (DATE) -> e.g. `"2023-01-01"` (String-encoded, yyyy-MM-dd)
-    Date,
+    Date = 8,
 
     /// The following PlanetScale type IDs are mapped into Time:
     /// - TIME (TIME) -> e.g. `"23:59:59"` (String-encoded, HH:mm:ss)
-    Time,
+    Time = 9,
 
     /// The following PlanetScale type IDs are mapped into DateTime:
     /// - DATETIME (DATETIME) -> e.g. `"2023-01-01 23:59:59"` (String-encoded, yyyy-MM-dd HH:mm:ss)
     /// - TIMESTAMP (TIMESTAMP) -> e.g. `"2023-01-01 23:59:59"` (String-encoded, yyyy-MM-dd HH:mm:ss)
-    DateTime,
+    DateTime = 10,
 
     /// The following PlanetScale type IDs are mapped into Json:
     /// - JSON (JSON) -> e.g. `"{\"key\": \"value\"}"` (String-encoded)
-    Json,
+    Json = 11,
 
     /// The following PlanetScale type IDs are mapped into Enum:
     /// - ENUM (ENUM) -> e.g. `"foo"` (String-encoded)
-    Enum,
+    Enum = 12,
 
     /// The following PlanetScale type IDs are mapped into Bytes:
     /// - BLOB (BLOB) -> e.g. `"\u0012"` (String-encoded)
     /// - VARBINARY (VARBINARY) -> e.g. `"\u0012"` (String-encoded)
     /// - BINARY (BINARY) -> e.g. `"\u0012"` (String-encoded)
     /// - GEOMETRY (GEOMETRY) -> e.g. `"\u0012"` (String-encoded)
-    Bytes,
+    Bytes = 13,
 
     /// The following PlanetScale type IDs are mapped into Set:
     /// - SET (SET) -> e.g. `"foo,bar"` (String-encoded, comma-separated)
     /// This is currently unhandled, and will panic if encountered.
-    Set,
+    Set = 14,
+
+    // Below there are custom types that don't have a 1:1 translation with a quaint::Value.
+    // enum variant.
+    /// UnknownNumber is used when the type of the column is a number but of unknown particular type
+    /// and precision.
+    ///
+    /// It's used by some driver adapters, like libsql to return aggregation values like AVG, or
+    /// COUNT, and it can be mapped to either Int64, or Double
+    UnknownNumber = 128,
 }
 
 #[napi(object)]
@@ -159,13 +176,27 @@ pub struct Query {
     pub args: Vec<JSArg>,
 }
 
+fn conversion_error(args: &std::fmt::Arguments) -> QuaintError {
+    let msg = match args.as_str() {
+        Some(s) => Cow::Borrowed(s),
+        None => Cow::Owned(args.to_string()),
+    };
+    QuaintError::builder(ErrorKind::ConversionError(msg)).build()
+}
+
+macro_rules! conversion_error {
+    ($($arg:tt)*) => {
+        conversion_error(&format_args!($($arg)*))
+    };
+}
+
 /// Handle data-type conversion from a JSON value to a Quaint value.
 /// This is used for most data types, except those that require connector-specific handling, e.g., `ColumnType::Boolean`.
 fn js_value_to_quaint(
     json_value: serde_json::Value,
     column_type: ColumnType,
     column_name: &str,
-) -> QuaintValue<'static> {
+) -> quaint::Result<QuaintValue<'static>> {
     //  Note for the future: it may be worth revisiting how much bloat so many panics with different static
     // strings add to the compiled artefact, and in case we should come up with a restricted set of panic
     // messages, or even find a way of removing them altogether.
@@ -173,96 +204,174 @@ fn js_value_to_quaint(
         ColumnType::Int32 => match json_value {
             serde_json::Value::Number(n) => {
                 // n.as_i32() is not implemented, so we need to downcast from i64 instead
-                QuaintValue::int32(n.as_i64().expect("number must be an i32") as i32)
+                n.as_i64()
+                    .ok_or(conversion_error!("number must be an integer"))
+                    .and_then(|n| -> quaint::Result<i32> {
+                        n.try_into()
+                            .map_err(|e| conversion_error!("cannot convert {n} to i32: {e}"))
+                    })
+                    .map(QuaintValue::int32)
             }
-            serde_json::Value::Null => QuaintValue::Int32(None),
-            mismatch => panic!("Expected an i32 number in column {}, found {}", column_name, mismatch),
+            serde_json::Value::String(s) => s
+                .parse::<i32>()
+                .map(QuaintValue::int32)
+                .map_err(|e| conversion_error!("string-encoded number must be an i32, got {s}: {e}")),
+            serde_json::Value::Null => Ok(QuaintValue::Int32(None)),
+            mismatch => Err(conversion_error!(
+                "expected an i32 number in column {column_name}, found {mismatch}"
+            )),
         },
         ColumnType::Int64 => match json_value {
-            serde_json::Value::String(s) => {
-                let n = s.parse::<i64>().expect("string-encoded number must be an i64");
-                QuaintValue::int64(n)
-            }
-            serde_json::Value::Null => QuaintValue::Int64(None),
-            mismatch => panic!("Expected a string in column {}, found {}", column_name, mismatch),
+            serde_json::Value::Number(n) => n
+                .as_i64()
+                .map(QuaintValue::int64)
+                .ok_or(conversion_error!("number must be an i64, got {n}")),
+            serde_json::Value::String(s) => s
+                .parse::<i64>()
+                .map(QuaintValue::int64)
+                .map_err(|e| conversion_error!("string-encoded number must be an i64, got {s}: {e}")),
+            serde_json::Value::Null => Ok(QuaintValue::Int64(None)),
+            mismatch => Err(conversion_error!(
+                "expected a string or number in column {column_name}, found {mismatch}"
+            )),
         },
         ColumnType::Float => match json_value {
             // n.as_f32() is not implemented, so we need to downcast from f64 instead.
             // We assume that the JSON value is a valid f32 number, but we check for overflows anyway.
-            serde_json::Value::Number(n) => QuaintValue::float(f64_to_f32(n.as_f64().expect("number must be a f64"))),
-            serde_json::Value::Null => QuaintValue::Float(None),
-            mismatch => panic!("Expected a f32 number in column {}, found {}", column_name, mismatch),
+            serde_json::Value::Number(n) => n
+                .as_f64()
+                .ok_or(conversion_error!("number must be a float, got {n}"))
+                .and_then(f64_to_f32)
+                .map(QuaintValue::float),
+            serde_json::Value::Null => Ok(QuaintValue::Float(None)),
+            mismatch => Err(conversion_error!(
+                "expected an f32 number in column {column_name}, found {mismatch}"
+            )),
         },
         ColumnType::Double => match json_value {
-            serde_json::Value::Number(n) => QuaintValue::double(n.as_f64().expect("number must be a f64")),
-            serde_json::Value::Null => QuaintValue::Double(None),
-            mismatch => panic!("Expected a f64 number in column {}, found {}", column_name, mismatch),
+            serde_json::Value::Number(n) => n
+                .as_f64()
+                .map(QuaintValue::double)
+                .ok_or(conversion_error!("number must be a f64, got {n}")),
+            serde_json::Value::Null => Ok(QuaintValue::Double(None)),
+            mismatch => Err(conversion_error!(
+                "expected an f64 number in column {column_name}, found {mismatch}"
+            )),
         },
         ColumnType::Numeric => match json_value {
-            serde_json::Value::String(s) => {
-                let decimal = BigDecimal::from_str(&s).expect("invalid numeric value");
-                QuaintValue::numeric(decimal)
-            }
-            serde_json::Value::Null => QuaintValue::Numeric(None),
-            mismatch => panic!(
-                "Expected a string-encoded number in column {}, found {}",
-                column_name, mismatch
-            ),
+            serde_json::Value::String(s) => BigDecimal::from_str(&s)
+                .map(QuaintValue::numeric)
+                .map_err(|e| conversion_error!("invalid numeric value when parsing {s}: {e}")),
+            serde_json::Value::Number(n) => n
+                .as_f64()
+                .and_then(BigDecimal::from_f64)
+                .ok_or(conversion_error!("number must be an f64, got {n}"))
+                .map(QuaintValue::numeric),
+            serde_json::Value::Null => Ok(QuaintValue::Numeric(None)),
+            mismatch => Err(conversion_error!(
+                "expected a string-encoded number in column {column_name}, found {mismatch}",
+            )),
         },
         ColumnType::Boolean => match json_value {
-            serde_json::Value::Bool(b) => QuaintValue::boolean(b),
-            serde_json::Value::Null => QuaintValue::Boolean(None),
-            mismatch => panic!("Expected a boolean in column {}, found {}", column_name, mismatch),
+            serde_json::Value::Bool(b) => Ok(QuaintValue::boolean(b)),
+            serde_json::Value::Null => Ok(QuaintValue::Boolean(None)),
+            serde_json::Value::Number(n) => match n.as_i64() {
+                Some(0) => Ok(QuaintValue::boolean(false)),
+                Some(1) => Ok(QuaintValue::boolean(true)),
+                _ => Err(conversion_error!(
+                    "expected number-encoded boolean to be 0 or 1, got {n}"
+                )),
+            },
+            serde_json::Value::String(s) => match s.as_str() {
+                "false" | "FALSE" | "0" => Ok(QuaintValue::boolean(false)),
+                "true" | "TRUE" | "1" => Ok(QuaintValue::boolean(true)),
+                _ => Err(conversion_error!("expected string-encoded boolean, got {s}")),
+            },
+            mismatch => Err(conversion_error!(
+                "expected a boolean in column {column_name}, found {mismatch}"
+            )),
         },
         ColumnType::Char => match json_value {
-            serde_json::Value::String(s) => QuaintValue::Char(s.chars().next()),
-            serde_json::Value::Null => QuaintValue::Char(None),
-            mismatch => panic!("Expected a string in column {}, found {}", column_name, mismatch),
+            serde_json::Value::String(s) => Ok(QuaintValue::Char(s.chars().next())),
+            serde_json::Value::Null => Ok(QuaintValue::Char(None)),
+            mismatch => Err(conversion_error!(
+                "expected a string in column {column_name}, found {mismatch}"
+            )),
         },
         ColumnType::Text => match json_value {
-            serde_json::Value::String(s) => QuaintValue::text(s),
-            serde_json::Value::Null => QuaintValue::Text(None),
-            mismatch => panic!("Expected a string in column {}, found {}", column_name, mismatch),
+            serde_json::Value::String(s) => Ok(QuaintValue::text(s)),
+            serde_json::Value::Null => Ok(QuaintValue::Text(None)),
+            mismatch => Err(conversion_error!(
+                "expected a string in column {column_name}, found {mismatch}"
+            )),
         },
         ColumnType::Date => match json_value {
-            serde_json::Value::String(s) => {
-                let date = NaiveDate::parse_from_str(&s, "%Y-%m-%d").expect("Expected a date string");
-                QuaintValue::date(date)
-            }
-            serde_json::Value::Null => QuaintValue::Date(None),
-            mismatch => panic!("Expected a string in column {}, found {}", column_name, mismatch),
+            serde_json::Value::String(s) => NaiveDate::parse_from_str(&s, "%Y-%m-%d")
+                .map(QuaintValue::date)
+                .map_err(|_| conversion_error!("expected a date string, got {s}")),
+            serde_json::Value::Null => Ok(QuaintValue::Date(None)),
+            mismatch => Err(conversion_error!(
+                "expected a string in column {column_name}, found {mismatch}"
+            )),
         },
         ColumnType::Time => match json_value {
-            serde_json::Value::String(s) => {
-                let time = NaiveTime::parse_from_str(&s, "%H:%M:%S").expect("Expected a time string");
-                QuaintValue::time(time)
-            }
-            serde_json::Value::Null => QuaintValue::Time(None),
-            mismatch => panic!("Expected a string in column {}, found {}", column_name, mismatch),
+            serde_json::Value::String(s) => NaiveTime::parse_from_str(&s, "%H:%M:%S")
+                .map(QuaintValue::time)
+                .map_err(|_| conversion_error!("expected a time string, got {s}")),
+            serde_json::Value::Null => Ok(QuaintValue::Time(None)),
+            mismatch => Err(conversion_error!(
+                "expected a string in column {column_name}, found {mismatch}"
+            )),
         },
         ColumnType::DateTime => match json_value {
-            serde_json::Value::String(s) => {
-                let datetime = chrono::NaiveDateTime::parse_from_str(&s, "%Y-%m-%d %H:%M:%S%.f")
-                    .unwrap_or_else(|_| panic!("Expected a datetime string, found {:?}", &s));
-                let datetime: DateTime<Utc> = DateTime::from_utc(datetime, Utc);
-                QuaintValue::datetime(datetime)
+            serde_json::Value::String(s) => chrono::NaiveDateTime::parse_from_str(&s, "%Y-%m-%d %H:%M:%S%.f")
+                .map(|dt| DateTime::from_utc(dt, Utc))
+                .or_else(|_| DateTime::parse_from_rfc3339(&s).map(DateTime::<Utc>::from))
+                .map(QuaintValue::datetime)
+                .map_err(|_| conversion_error!("expected a datetime string, found {s}")),
+            serde_json::Value::Null => Ok(QuaintValue::DateTime(None)),
+            mismatch => Err(conversion_error!(
+                "expected a string in column {column_name}, found {mismatch}"
+            )),
+        },
+        ColumnType::Json => {
+            match json_value {
+                // DbNull
+                serde_json::Value::Null => Ok(QuaintValue::Json(None)),
+                // JsonNull
+                serde_json::Value::String(s) if s == "$__prisma_null" => Ok(QuaintValue::json(serde_json::Value::Null)),
+                json => Ok(QuaintValue::json(json)),
             }
-            serde_json::Value::Null => QuaintValue::DateTime(None),
-            mismatch => panic!("Expected a string in column {}, found {}", column_name, mismatch),
-        },
-        ColumnType::Json => match json_value {
-            serde_json::Value::Null => QuaintValue::Json(None),
-            json => QuaintValue::json(json),
-        },
+        }
         ColumnType::Enum => match json_value {
-            serde_json::Value::String(s) => QuaintValue::enum_variant(s),
-            serde_json::Value::Null => QuaintValue::Enum(None),
-            mismatch => panic!("Expected a string in column {}, found {}", column_name, mismatch),
+            serde_json::Value::String(s) => Ok(QuaintValue::enum_variant(s)),
+            serde_json::Value::Null => Ok(QuaintValue::Enum(None)),
+            mismatch => Err(conversion_error!(
+                "expected a string in column {column_name}, found {mismatch}"
+            )),
         },
         ColumnType::Bytes => match json_value {
-            serde_json::Value::String(s) => QuaintValue::Bytes(Some(s.into_bytes().into())),
-            serde_json::Value::Null => QuaintValue::Bytes(None),
-            mismatch => panic!("Expected a string in column {}, found {}", column_name, mismatch),
+            serde_json::Value::String(s) => Ok(QuaintValue::Bytes(Some(s.into_bytes().into()))),
+            serde_json::Value::Array(array) => array
+                .iter()
+                .map(|value| value.as_i64().and_then(|maybe_byte| maybe_byte.try_into().ok()))
+                .collect::<Option<Cow<[u8]>>>()
+                .map(QuaintValue::bytes)
+                .ok_or(conversion_error!("elements of the array must be u8")),
+            serde_json::Value::Null => Ok(QuaintValue::Bytes(None)),
+            mismatch => Err(conversion_error!(
+                "expected a string or an array in column {column_name}, found {mismatch}",
+            )),
+        },
+        ColumnType::UnknownNumber => match json_value {
+            serde_json::Value::Number(n) => n
+                .as_i64()
+                .map(QuaintValue::int64)
+                .or(n.as_f64().map(QuaintValue::double))
+                .ok_or(conversion_error!("number must be an i64 or f64, got {n}")),
+            mismatch => Err(conversion_error!(
+                "expected a either an i64 or a f64 in column {column_name}, found {mismatch}",
+            )),
         },
         unimplemented => {
             todo!("support column type {:?} in column {}", unimplemented, column_name)
@@ -270,8 +379,10 @@ fn js_value_to_quaint(
     }
 }
 
-impl From<JSResultSet> for QuaintResultSet {
-    fn from(js_result_set: JSResultSet) -> Self {
+impl TryFrom<JSResultSet> for QuaintResultSet {
+    type Error = quaint::error::Error;
+
+    fn try_from(js_result_set: JSResultSet) -> Result<Self, Self::Error> {
         let JSResultSet {
             rows,
             column_names,
@@ -288,7 +399,7 @@ impl From<JSResultSet> for QuaintResultSet {
                 let column_type = column_types[i];
                 let column_name = column_names[i].as_str();
 
-                quaint_row.push(js_value_to_quaint(row, column_type, column_name));
+                quaint_row.push(js_value_to_quaint(row, column_type, column_name)?);
             }
 
             quaint_rows.push(quaint_row);
@@ -304,7 +415,7 @@ impl From<JSResultSet> for QuaintResultSet {
             quaint_result_set.set_last_insert_id(last_insert_id);
         }
 
-        quaint_result_set
+        Ok(quaint_result_set)
     }
 }
 
@@ -353,11 +464,13 @@ impl TransactionProxy {
     pub fn new(js_transaction: &JsObject) -> napi::Result<Self> {
         let commit = js_transaction.get_named_property("commit")?;
         let rollback = js_transaction.get_named_property("rollback")?;
-        let options: TransactionOptions = js_transaction.get_named_property("options")?;
+        let dispose = js_transaction.get_named_property("dispose")?;
+        let options = js_transaction.get_named_property("options")?;
 
         Ok(Self {
             commit,
             rollback,
+            dispose,
             options,
         })
     }
@@ -369,19 +482,30 @@ impl TransactionProxy {
     pub async fn commit(&self) -> quaint::Result<()> {
         self.commit.call(()).await
     }
+
     pub async fn rollback(&self) -> quaint::Result<()> {
         self.rollback.call(()).await
     }
 }
 
+impl Drop for TransactionProxy {
+    fn drop(&mut self) {
+        _ = self
+            .dispose
+            .call((), napi::threadsafe_function::ThreadsafeFunctionCallMode::NonBlocking);
+    }
+}
+
 /// Coerce a `f64` to a `f32`, asserting that the conversion is lossless.
 /// Note that, when overflow occurs during conversion, the result is `infinity`.
-fn f64_to_f32(x: f64) -> f32 {
+fn f64_to_f32(x: f64) -> quaint::Result<f32> {
     let y = x as f32;
 
-    assert_eq!(x.is_finite(), y.is_finite(), "f32 overflow during conversion");
-
-    y
+    if x.is_finite() == y.is_finite() {
+        Ok(y)
+    } else {
+        Err(conversion_error!("f32 overflow during conversion"))
+    }
 }
 
 #[cfg(test)]
@@ -394,7 +518,7 @@ mod proxy_test {
     #[track_caller]
     fn test_null(quaint_none: QuaintValue, column_type: ColumnType) {
         let json_value = serde_json::Value::Null;
-        let quaint_value = js_value_to_quaint(json_value, column_type, "column_name");
+        let quaint_value = js_value_to_quaint(json_value, column_type, "column_name").unwrap();
         assert_eq!(quaint_value, quaint_none);
     }
 
@@ -408,19 +532,25 @@ mod proxy_test {
         // 0
         let n: i32 = 0;
         let json_value = serde_json::Value::Number(serde_json::Number::from(n));
-        let quaint_value = js_value_to_quaint(json_value, column_type, "column_name");
+        let quaint_value = js_value_to_quaint(json_value, column_type, "column_name").unwrap();
         assert_eq!(quaint_value, QuaintValue::Int32(Some(n)));
 
         // max
         let n: i32 = i32::MAX;
         let json_value = serde_json::Value::Number(serde_json::Number::from(n));
-        let quaint_value = js_value_to_quaint(json_value, column_type, "column_name");
+        let quaint_value = js_value_to_quaint(json_value, column_type, "column_name").unwrap();
         assert_eq!(quaint_value, QuaintValue::Int32(Some(n)));
 
         // min
         let n: i32 = i32::MIN;
         let json_value = serde_json::Value::Number(serde_json::Number::from(n));
-        let quaint_value = js_value_to_quaint(json_value, column_type, "column_name");
+        let quaint_value = js_value_to_quaint(json_value, column_type, "column_name").unwrap();
+        assert_eq!(quaint_value, QuaintValue::Int32(Some(n)));
+
+        // string-encoded
+        let n = i32::MAX;
+        let json_value = serde_json::Value::String(n.to_string());
+        let quaint_value = js_value_to_quaint(json_value, column_type, "column_name").unwrap();
         assert_eq!(quaint_value, QuaintValue::Int32(Some(n)));
     }
 
@@ -434,19 +564,25 @@ mod proxy_test {
         // 0
         let n: i64 = 0;
         let json_value = serde_json::Value::String(n.to_string());
-        let quaint_value = js_value_to_quaint(json_value, column_type, "column_name");
+        let quaint_value = js_value_to_quaint(json_value, column_type, "column_name").unwrap();
         assert_eq!(quaint_value, QuaintValue::Int64(Some(n)));
 
         // max
         let n: i64 = i64::MAX;
         let json_value = serde_json::Value::String(n.to_string());
-        let quaint_value = js_value_to_quaint(json_value, column_type, "column_name");
+        let quaint_value = js_value_to_quaint(json_value, column_type, "column_name").unwrap();
         assert_eq!(quaint_value, QuaintValue::Int64(Some(n)));
 
         // min
         let n: i64 = i64::MIN;
         let json_value = serde_json::Value::String(n.to_string());
-        let quaint_value = js_value_to_quaint(json_value, column_type, "column_name");
+        let quaint_value = js_value_to_quaint(json_value, column_type, "column_name").unwrap();
+        assert_eq!(quaint_value, QuaintValue::Int64(Some(n)));
+
+        // number-encoded
+        let n: i64 = (1 << 53) - 1; // max JS safe integer
+        let json_value = serde_json::Value::Number(serde_json::Number::from(n));
+        let quaint_value = js_value_to_quaint(json_value, column_type, "column_name").unwrap();
         assert_eq!(quaint_value, QuaintValue::Int64(Some(n)));
     }
 
@@ -460,19 +596,19 @@ mod proxy_test {
         // 0
         let n: f32 = 0.0;
         let json_value = serde_json::Value::Number(serde_json::Number::from_f64(n.into()).unwrap());
-        let quaint_value = js_value_to_quaint(json_value, column_type, "column_name");
+        let quaint_value = js_value_to_quaint(json_value, column_type, "column_name").unwrap();
         assert_eq!(quaint_value, QuaintValue::Float(Some(n)));
 
         // max
         let n: f32 = f32::MAX;
         let json_value = serde_json::Value::Number(serde_json::Number::from_f64(n.into()).unwrap());
-        let quaint_value = js_value_to_quaint(json_value, column_type, "column_name");
+        let quaint_value = js_value_to_quaint(json_value, column_type, "column_name").unwrap();
         assert_eq!(quaint_value, QuaintValue::Float(Some(n)));
 
         // min
         let n: f32 = f32::MIN;
         let json_value = serde_json::Value::Number(serde_json::Number::from_f64(n.into()).unwrap());
-        let quaint_value = js_value_to_quaint(json_value, column_type, "column_name");
+        let quaint_value = js_value_to_quaint(json_value, column_type, "column_name").unwrap();
         assert_eq!(quaint_value, QuaintValue::Float(Some(n)));
     }
 
@@ -486,19 +622,19 @@ mod proxy_test {
         // 0
         let n: f64 = 0.0;
         let json_value = serde_json::Value::Number(serde_json::Number::from_f64(n).unwrap());
-        let quaint_value = js_value_to_quaint(json_value, column_type, "column_name");
+        let quaint_value = js_value_to_quaint(json_value, column_type, "column_name").unwrap();
         assert_eq!(quaint_value, QuaintValue::Double(Some(n)));
 
         // max
         let n: f64 = f64::MAX;
         let json_value = serde_json::Value::Number(serde_json::Number::from_f64(n).unwrap());
-        let quaint_value = js_value_to_quaint(json_value, column_type, "column_name");
+        let quaint_value = js_value_to_quaint(json_value, column_type, "column_name").unwrap();
         assert_eq!(quaint_value, QuaintValue::Double(Some(n)));
 
         // min
         let n: f64 = f64::MIN;
         let json_value = serde_json::Value::Number(serde_json::Number::from_f64(n).unwrap());
-        let quaint_value = js_value_to_quaint(json_value, column_type, "column_name");
+        let quaint_value = js_value_to_quaint(json_value, column_type, "column_name").unwrap();
         assert_eq!(quaint_value, QuaintValue::Double(Some(n)));
     }
 
@@ -513,14 +649,14 @@ mod proxy_test {
         let decimal = BigDecimal::new(BigInt::parse_bytes(b"123499", 10).unwrap(), 2);
 
         let json_value = serde_json::Value::String(n_as_string.into());
-        let quaint_value = js_value_to_quaint(json_value, column_type, "column_name");
+        let quaint_value = js_value_to_quaint(json_value, column_type, "column_name").unwrap();
         assert_eq!(quaint_value, QuaintValue::Numeric(Some(decimal)));
 
         let n_as_string = "1234.999999";
         let decimal = BigDecimal::new(BigInt::parse_bytes(b"1234999999", 10).unwrap(), 6);
 
         let json_value = serde_json::Value::String(n_as_string.into());
-        let quaint_value = js_value_to_quaint(json_value, column_type, "column_name");
+        let quaint_value = js_value_to_quaint(json_value, column_type, "column_name").unwrap();
         assert_eq!(quaint_value, QuaintValue::Numeric(Some(decimal)));
     }
 
@@ -532,16 +668,16 @@ mod proxy_test {
         test_null(QuaintValue::Boolean(None), column_type);
 
         // true
-        let bool_val = true;
-        let json_value = serde_json::Value::Bool(bool_val);
-        let quaint_value = js_value_to_quaint(json_value, column_type, "column_name");
-        assert_eq!(quaint_value, QuaintValue::Boolean(Some(bool_val)));
+        for truthy_value in [json!(true), json!(1), json!("true"), json!("TRUE"), json!("1")] {
+            let quaint_value = js_value_to_quaint(truthy_value, column_type, "column_name").unwrap();
+            assert_eq!(quaint_value, QuaintValue::Boolean(Some(true)));
+        }
 
         // false
-        let bool_val = false;
-        let json_value = serde_json::Value::Bool(bool_val);
-        let quaint_value = js_value_to_quaint(json_value, column_type, "column_name");
-        assert_eq!(quaint_value, QuaintValue::Boolean(Some(bool_val)));
+        for falsy_value in [json!(false), json!(0), json!("false"), json!("FALSE"), json!("0")] {
+            let quaint_value = js_value_to_quaint(falsy_value, column_type, "column_name").unwrap();
+            assert_eq!(quaint_value, QuaintValue::Boolean(Some(false)));
+        }
     }
 
     #[test]
@@ -553,7 +689,7 @@ mod proxy_test {
 
         let c = 'c';
         let json_value = serde_json::Value::String(c.to_string());
-        let quaint_value = js_value_to_quaint(json_value, column_type, "column_name");
+        let quaint_value = js_value_to_quaint(json_value, column_type, "column_name").unwrap();
         assert_eq!(quaint_value, QuaintValue::Char(Some(c)));
     }
 
@@ -566,7 +702,7 @@ mod proxy_test {
 
         let s = "some text";
         let json_value = serde_json::Value::String(s.to_string());
-        let quaint_value = js_value_to_quaint(json_value, column_type, "column_name");
+        let quaint_value = js_value_to_quaint(json_value, column_type, "column_name").unwrap();
         assert_eq!(quaint_value, QuaintValue::Text(Some(s.into())));
     }
 
@@ -579,7 +715,7 @@ mod proxy_test {
 
         let s = "2023-01-01";
         let json_value = serde_json::Value::String(s.to_string());
-        let quaint_value = js_value_to_quaint(json_value, column_type, "column_name");
+        let quaint_value = js_value_to_quaint(json_value, column_type, "column_name").unwrap();
 
         let date = NaiveDate::from_ymd_opt(2023, 1, 1).unwrap();
         assert_eq!(quaint_value, QuaintValue::Date(Some(date)));
@@ -594,7 +730,7 @@ mod proxy_test {
 
         let s = "23:59:59";
         let json_value = serde_json::Value::String(s.to_string());
-        let quaint_value = js_value_to_quaint(json_value, column_type, "column_name");
+        let quaint_value = js_value_to_quaint(json_value, column_type, "column_name").unwrap();
 
         let time: NaiveTime = NaiveTime::from_hms_opt(23, 59, 59).unwrap();
         assert_eq!(quaint_value, QuaintValue::Time(Some(time)));
@@ -609,7 +745,7 @@ mod proxy_test {
 
         let s = "2023-01-01 23:59:59.415";
         let json_value = serde_json::Value::String(s.to_string());
-        let quaint_value = js_value_to_quaint(json_value, column_type, "column_name");
+        let quaint_value = js_value_to_quaint(json_value, column_type, "column_name").unwrap();
 
         let datetime = NaiveDate::from_ymd_opt(2023, 1, 1)
             .unwrap()
@@ -620,7 +756,7 @@ mod proxy_test {
 
         let s = "2023-01-01 23:59:59.123456";
         let json_value = serde_json::Value::String(s.to_string());
-        let quaint_value = js_value_to_quaint(json_value, column_type, "column_name");
+        let quaint_value = js_value_to_quaint(json_value, column_type, "column_name").unwrap();
 
         let datetime = NaiveDate::from_ymd_opt(2023, 1, 1)
             .unwrap()
@@ -631,7 +767,7 @@ mod proxy_test {
 
         let s = "2023-01-01 23:59:59";
         let json_value = serde_json::Value::String(s.to_string());
-        let quaint_value = js_value_to_quaint(json_value, column_type, "column_name");
+        let quaint_value = js_value_to_quaint(json_value, column_type, "column_name").unwrap();
 
         let datetime = NaiveDate::from_ymd_opt(2023, 1, 1)
             .unwrap()
@@ -658,7 +794,7 @@ mod proxy_test {
             ]
         });
         let json_value = json.clone();
-        let quaint_value = js_value_to_quaint(json_value, column_type, "column_name");
+        let quaint_value = js_value_to_quaint(json_value, column_type, "column_name").unwrap();
         assert_eq!(quaint_value, QuaintValue::Json(Some(json.clone())));
     }
 
@@ -671,7 +807,7 @@ mod proxy_test {
 
         let s = "some enum variant";
         let json_value = serde_json::Value::String(s.to_string());
-        let quaint_value = js_value_to_quaint(json_value, column_type, "column_name");
+        let quaint_value = js_value_to_quaint(json_value, column_type, "column_name").unwrap();
         assert_eq!(quaint_value, QuaintValue::Enum(Some(s.into())));
     }
 }

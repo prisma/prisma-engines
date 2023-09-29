@@ -1,6 +1,6 @@
 use super::update::*;
 use crate::column_metadata;
-use crate::filter_conversion::AliasedCondition;
+use crate::filter::FilterBuilder;
 use crate::row::ToSqlRow;
 use crate::{
     error::SqlError, model_extensions::*, query_builder::write, sql_trace::SqlTraceComment, Context, QueryExt,
@@ -361,7 +361,7 @@ pub(crate) async fn delete_records(
     record_filter: RecordFilter,
     ctx: &Context<'_>,
 ) -> crate::Result<usize> {
-    let filter_condition = record_filter.clone().filter.aliased_condition_from(None, false, ctx);
+    let filter_condition = FilterBuilder::without_top_level_joins().visit_filter(record_filter.clone().filter, ctx);
     let ids = conn.filter_selectors(model, record_filter, ctx).await?;
     let ids: Vec<&SelectionResult> = ids.iter().collect();
     let count = ids.len();
