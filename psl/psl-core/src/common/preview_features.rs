@@ -89,6 +89,7 @@ pub const ALL_PREVIEW_FEATURES: FeatureMap = FeatureMap {
          | PostgresqlExtensions
          | Tracing
          | Views
+         | DriverAdapters
     }),
     deprecated: enumflags2::make_bitflags!(PreviewFeature::{
         AtomicNumberOperations
@@ -123,9 +124,7 @@ pub const ALL_PREVIEW_FEATURES: FeatureMap = FeatureMap {
         | TransactionApi
         | UncheckedScalarInputs
     }),
-    hidden: enumflags2::make_bitflags!(PreviewFeature::{
-        DriverAdapters
-    }),
+    hidden: enumflags2::BitFlags::EMPTY,
 };
 
 #[derive(Debug)]
