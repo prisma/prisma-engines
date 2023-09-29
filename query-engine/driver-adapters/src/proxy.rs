@@ -163,9 +163,59 @@ pub enum ColumnType {
     Uuid = 15,
 
     /*
+     * Scalar arrays
+     */
+
+    /// Int32 array (INT2_ARRAY and INT4_ARRAY in PostgreSQL)
+    Int32Array = 64,
+
+    /// Int64 array (INT8_ARRAY in PostgreSQL)
+    Int64Array = 65,
+
+    /// Float array (FLOAT4_ARRAY in PostgreSQL)
+    FloatArray = 66,
+
+    /// Double array (FLOAT8_ARRAY in PostgreSQL)
+    DoubleArray = 67,
+
+    /// Numeric array (NUMERIC_ARRAY, MONEY_ARRAY etc in PostgreSQL)
+    NumericArray = 68,
+
+    /// Boolean array (BOOL_ARRAY in PostgreSQL)
+    BooleanArray = 69,
+
+    /// Char array (CHAR_ARRAY in PostgreSQL)
+    CharArray = 70,
+
+    /// Text array (TEXT_ARRAY in PostgreSQL)
+    TextArray = 71,
+
+    /// Date array (DATE_ARRAY in PostgreSQL)
+    DateArray = 72,
+
+    /// Time array (TIME_ARRAY in PostgreSQL)
+    TimeArray = 73,
+
+    /// DateTime array (TIMESTAMP_ARRAY in PostgreSQL)
+    DateTimeArray = 74,
+
+    /// Json array (JSON_ARRAY in PostgreSQL)
+    JsonArray = 75,
+
+    /// Enum array
+    EnumArray = 76,
+
+    /// Bytes array (BYTEA_ARRAY in PostgreSQL)
+    BytesArray = 77,
+
+    /// Uuid array (UUID_ARRAY in PostgreSQL)
+    UuidArray = 78,
+
+    /*
      * Below there are custom types that don't have a 1:1 translation with a quaint::Value.
      * enum variant.
      */
+
     /// UnknownNumber is used when the type of the column is a number but of unknown particular type
     /// and precision.
     ///
