@@ -7,6 +7,9 @@ use napi::JsObject;
 use psl::datamodel_connector::Flavour;
 use quaint::{
     connector::{metrics, IsolationLevel, Transaction},
+    conversion::mysql as mysql_conversion,
+    conversion::postgres as postgres_conversion,
+    conversion::sqlite as sqlite_conversion,
     error::{Error, ErrorKind},
     prelude::{Query as QuaintQuery, Queryable as QuaintQueryable, ResultSet, TransactionCapable},
     visitor::{self, Visitor},
@@ -40,10 +43,20 @@ impl JsBaseQueryable {
 
     /// visit a query according to the flavour of the JS connector
     pub fn visit_query<'a>(&self, q: QuaintQuery<'a>) -> quaint::Result<(String, Vec<Value<'a>>)> {
+        eprintln!("?? visit query: {:?}", q);
         match self.flavour {
             Flavour::Mysql => visitor::Mysql::build(q),
             Flavour::Postgres => visitor::Postgres::build(q),
             Flavour::Sqlite => visitor::Sqlite::build(q),
+            _ => unimplemented!("Unsupported flavour for JS connector {:?}", self.flavour),
+        }
+    }
+
+    pub fn convert_params(&self, params: &[Value]) -> serde_json::Result<Vec<conversion::JSArg>> {
+        match self.flavour {
+            Flavour::Mysql => conversion::conv_params(params),
+            Flavour::Postgres => conversion::conv_params(params),
+            Flavour::Sqlite => conversion::conv_params(params),
             _ => unimplemented!("Unsupported flavour for JS connector {:?}", self.flavour),
         }
     }
@@ -134,16 +147,16 @@ impl JsBaseQueryable {
         format!(r#"-- Implicit "{}" query via underlying driver"#, stmt)
     }
 
-    async fn build_query(sql: &str, values: &[quaint::Value<'_>]) -> quaint::Result<Query> {
+    async fn build_query(&self, sql: &str, values: &[quaint::Value<'_>]) -> quaint::Result<Query> {
         let sql: String = sql.to_string();
-        let args = conversion::conv_params(values)?;
+        let args = self.convert_params(values)?;
         Ok(Query { sql, args })
     }
 
     async fn do_query_raw(&self, sql: &str, params: &[Value<'_>]) -> quaint::Result<ResultSet> {
         let len = params.len();
         let serialization_span = info_span!("js:query:args", user_facing = true, "length" = %len);
-        let query = Self::build_query(sql, params).instrument(serialization_span).await?;
+        let query = self.build_query(sql, params).instrument(serialization_span).await?;
 
         let sql_span = info_span!("js:query:sql", user_facing = true, "db.statement" = %sql);
         let result_set = self.proxy.query_raw(query).instrument(sql_span).await?;
@@ -156,7 +169,7 @@ impl JsBaseQueryable {
     async fn do_execute_raw(&self, sql: &str, params: &[Value<'_>]) -> quaint::Result<u64> {
         let len = params.len();
         let serialization_span = info_span!("js:query:args", user_facing = true, "length" = %len);
-        let query = Self::build_query(sql, params).instrument(serialization_span).await?;
+        let query = self.build_query(sql, params).instrument(serialization_span).await?;
 
         let sql_span = info_span!("js:query:sql", user_facing = true, "db.statement" = %sql);
         let affected_rows = self.proxy.execute_raw(query).instrument(sql_span).await?;
