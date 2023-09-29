@@ -207,7 +207,7 @@ pub(crate) fn build(
         None => ConditionTree::NoCondition,
         Some(ref cursor) => {
             let cursor_fields: Vec<_> = cursor.as_scalar_fields().expect("Cursor fields contain non-scalars.");
-            let cursor_values: Vec<_> = cursor.db_values();
+            let cursor_values: Vec<_> = cursor.db_values(ctx);
             let cursor_columns: Vec<_> = cursor_fields.as_slice().as_columns(ctx).collect();
             let cursor_row = Row::from(cursor_columns);
 
