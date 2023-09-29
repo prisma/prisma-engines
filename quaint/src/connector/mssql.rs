@@ -1,4 +1,3 @@
-mod conversion;
 mod error;
 
 use super::{IsolationLevel, Transaction, TransactionOptions};

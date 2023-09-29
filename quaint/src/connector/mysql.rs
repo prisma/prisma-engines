@@ -1,9 +1,9 @@
-mod conversion;
 mod error;
 
 use crate::{
     ast::{Query, Value},
     connector::{metrics, queryable::*, ResultSet},
+    conversion::mysql as conversion,
     error::{Error, ErrorKind},
     visitor::{self, Visitor},
 };
