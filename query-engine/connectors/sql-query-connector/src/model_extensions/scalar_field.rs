@@ -1,3 +1,4 @@
+use crate::context::Context;
 use chrono::Utc;
 use prisma_models::{ScalarField, TypeIdentifier};
 use prisma_value::PrismaValue;
@@ -6,13 +7,13 @@ use quaint::{
     prelude::{EnumVariant, TypeDataLength, TypeFamily},
 };
 
-pub trait ScalarFieldExt {
-    fn value<'a>(&self, pv: PrismaValue) -> Value<'a>;
+pub(crate) trait ScalarFieldExt {
+    fn value<'a>(&self, pv: PrismaValue, ctx: &Context<'_>) -> Value<'a>;
     fn type_family(&self) -> TypeFamily;
 }
 
 impl ScalarFieldExt for ScalarField {
-    fn value<'a>(&self, pv: PrismaValue) -> Value<'a> {
+    fn value<'a>(&self, pv: PrismaValue, ctx: &Context<'_>) -> Value<'a> {
         match (pv, self.type_identifier()) {
             (PrismaValue::String(s), _) => s.into(),
             (PrismaValue::Float(f), _) => f.into(),
@@ -42,7 +43,7 @@ impl ScalarFieldExt for ScalarField {
             (PrismaValue::Int(i), _) => i.into(),
             (PrismaValue::BigInt(i), _) => i.into(),
             (PrismaValue::Uuid(u), _) => u.to_string().into(),
-            (PrismaValue::List(l), _) => Value::Array(Some(l.into_iter().map(|x| self.value(x)).collect())),
+            (PrismaValue::List(l), _) => Value::Array(Some(l.into_iter().map(|x| self.value(x, ctx)).collect())),
             (PrismaValue::Json(s), _) => Value::Json(Some(serde_json::from_str::<serde_json::Value>(&s).unwrap())),
             (PrismaValue::Bytes(b), _) => Value::Bytes(Some(b.into())),
             (PrismaValue::Object(_), _) => unimplemented!(),
