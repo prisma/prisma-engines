@@ -1,4 +1,5 @@
 use napi::bindgen_prelude::{FromNapiValue, ToNapiValue};
+use napi::NapiValue;
 use quaint::ast::Value as QuaintValue;
 use serde::Serialize;
 use serde_json::value::Value as JsonValue;
@@ -9,6 +10,7 @@ pub enum JSArg {
     RawString(String),
     Value(serde_json::Value),
     Buffer(Vec<u8>),
+    Array(Vec<JSArg>),
 }
 
 impl From<JsonValue> for JSArg {
@@ -34,6 +36,23 @@ impl ToNapiValue for JSArg {
             JSArg::Value(v) => ToNapiValue::to_napi_value(env, v),
             JSArg::Buffer(bytes) => {
                 ToNapiValue::to_napi_value(env, napi::Env::from_raw(env).create_buffer_with_data(bytes)?.into_raw())
+            }
+            // While arrays are encodable as JSON generally, their element might not be, or may be
+            // represented in a different way than we need. We use this custom logic for all arrays
+            // to avoid having separate `JsonArray` and `BytesArray` variants in `JSArg` and
+            // avoid complicating the logic in `conv_params`.
+            JSArg::Array(items) => {
+                let env = napi::Env::from_raw(env);
+                let mut array = env.create_array(items.len().try_into().expect("JS array length must fit into u32"))?;
+
+                for (index, item) in items.into_iter().enumerate() {
+                    let js_value = ToNapiValue::to_napi_value(env.raw(), item)?;
+                    // TODO: NapiRaw could be implemented for sys::napi_value directly, there should
+                    // be no need for re-wrapping; submit a patch to napi-rs and simplify here.
+                    array.set(index as u32, napi::JsUnknown::from_raw_unchecked(env.raw(), js_value))?;
+                }
+
+                ToNapiValue::to_napi_value(env.raw(), array)
             }
         }
     }
@@ -62,6 +81,7 @@ pub fn conv_params(params: &[QuaintValue<'_>]) -> serde_json::Result<Vec<JSArg>>
                 },
                 None => JsonValue::Null.into(),
             },
+            QuaintValue::Array(Some(items)) => JSArg::Array(conv_params(items)?),
             quaint_value => JSArg::from(JsonValue::from(quaint_value.clone())),
         };
 

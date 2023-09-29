@@ -163,6 +163,54 @@ pub enum ColumnType {
     Uuid = 15,
 
     /*
+     * Scalar arrays
+     */
+    /// Int32 array (INT2_ARRAY and INT4_ARRAY in PostgreSQL)
+    Int32Array = 64,
+
+    /// Int64 array (INT8_ARRAY in PostgreSQL)
+    Int64Array = 65,
+
+    /// Float array (FLOAT4_ARRAY in PostgreSQL)
+    FloatArray = 66,
+
+    /// Double array (FLOAT8_ARRAY in PostgreSQL)
+    DoubleArray = 67,
+
+    /// Numeric array (NUMERIC_ARRAY, MONEY_ARRAY etc in PostgreSQL)
+    NumericArray = 68,
+
+    /// Boolean array (BOOL_ARRAY in PostgreSQL)
+    BooleanArray = 69,
+
+    /// Char array (CHAR_ARRAY in PostgreSQL)
+    CharArray = 70,
+
+    /// Text array (TEXT_ARRAY in PostgreSQL)
+    TextArray = 71,
+
+    /// Date array (DATE_ARRAY in PostgreSQL)
+    DateArray = 72,
+
+    /// Time array (TIME_ARRAY in PostgreSQL)
+    TimeArray = 73,
+
+    /// DateTime array (TIMESTAMP_ARRAY in PostgreSQL)
+    DateTimeArray = 74,
+
+    /// Json array (JSON_ARRAY in PostgreSQL)
+    JsonArray = 75,
+
+    /// Enum array
+    EnumArray = 76,
+
+    /// Bytes array (BYTEA_ARRAY in PostgreSQL)
+    BytesArray = 77,
+
+    /// Uuid array (UUID_ARRAY in PostgreSQL)
+    UuidArray = 78,
+
+    /*
      * Below there are custom types that don't have a 1:1 translation with a quaint::Value.
      * enum variant.
      */
@@ -387,9 +435,46 @@ fn js_value_to_quaint(
                 "expected a either an i64 or a f64 in column {column_name}, found {mismatch}",
             )),
         },
+
+        ColumnType::Int32Array => js_array_to_quaint(ColumnType::Int32, json_value, column_name),
+        ColumnType::Int64Array => js_array_to_quaint(ColumnType::Int64, json_value, column_name),
+        ColumnType::FloatArray => js_array_to_quaint(ColumnType::Float, json_value, column_name),
+        ColumnType::DoubleArray => js_array_to_quaint(ColumnType::Double, json_value, column_name),
+        ColumnType::NumericArray => js_array_to_quaint(ColumnType::Numeric, json_value, column_name),
+        ColumnType::BooleanArray => js_array_to_quaint(ColumnType::Boolean, json_value, column_name),
+        ColumnType::CharArray => js_array_to_quaint(ColumnType::Char, json_value, column_name),
+        ColumnType::TextArray => js_array_to_quaint(ColumnType::Text, json_value, column_name),
+        ColumnType::DateArray => js_array_to_quaint(ColumnType::Date, json_value, column_name),
+        ColumnType::TimeArray => js_array_to_quaint(ColumnType::Time, json_value, column_name),
+        ColumnType::DateTimeArray => js_array_to_quaint(ColumnType::DateTime, json_value, column_name),
+        ColumnType::JsonArray => js_array_to_quaint(ColumnType::Json, json_value, column_name),
+        ColumnType::EnumArray => js_array_to_quaint(ColumnType::Enum, json_value, column_name),
+        ColumnType::BytesArray => js_array_to_quaint(ColumnType::Bytes, json_value, column_name),
+        ColumnType::UuidArray => js_array_to_quaint(ColumnType::Uuid, json_value, column_name),
+
         unimplemented => {
             todo!("support column type {:?} in column {}", unimplemented, column_name)
         }
+    }
+}
+
+fn js_array_to_quaint(
+    base_type: ColumnType,
+    json_value: serde_json::Value,
+    column_name: &str,
+) -> quaint::Result<QuaintValue<'static>> {
+    match json_value {
+        serde_json::Value::Array(array) => Ok(QuaintValue::Array(Some(
+            array
+                .into_iter()
+                .enumerate()
+                .map(|(index, elem)| js_value_to_quaint(elem, base_type, &format!("{column_name}[{index}]")))
+                .collect::<quaint::Result<Vec<_>>>()?,
+        ))),
+        serde_json::Value::Null => Ok(QuaintValue::Array(None)),
+        mismatch => Err(conversion_error!(
+            "expected an array in column {column_name}, found {mismatch}",
+        )),
     }
 }
 
@@ -824,5 +909,53 @@ mod proxy_test {
 
         let quaint_value = js_value_to_quaint(json_value, column_type, "column_name").unwrap();
         assert_eq!(quaint_value, QuaintValue::Enum(Some(s.into()), None));
+    }
+
+    #[test]
+    fn js_int32_array_to_quaint() {
+        let column_type = ColumnType::Int32Array;
+        test_null(QuaintValue::Array(None), column_type);
+
+        let json_value = json!([1, 2, 3]);
+        let quaint_value = js_value_to_quaint(json_value, column_type, "column_name").unwrap();
+
+        assert_eq!(
+            quaint_value,
+            QuaintValue::Array(Some(vec![
+                QuaintValue::int32(1),
+                QuaintValue::int32(2),
+                QuaintValue::int32(3)
+            ]))
+        );
+
+        let json_value = json!([1, 2, {}]);
+        let quaint_value = js_value_to_quaint(json_value, column_type, "column_name");
+
+        assert_eq!(
+            quaint_value.err().unwrap().to_string(),
+            "Conversion failed: expected an i32 number in column column_name[2], found {}"
+        );
+    }
+
+    #[test]
+    fn js_text_array_to_quaint() {
+        let column_type = ColumnType::TextArray;
+        test_null(QuaintValue::Array(None), column_type);
+
+        let json_value = json!(["hi", "there"]);
+        let quaint_value = js_value_to_quaint(json_value, column_type, "column_name").unwrap();
+
+        assert_eq!(
+            quaint_value,
+            QuaintValue::Array(Some(vec![QuaintValue::text("hi"), QuaintValue::text("there"),]))
+        );
+
+        let json_value = json!([10]);
+        let quaint_value = js_value_to_quaint(json_value, column_type, "column_name");
+
+        assert_eq!(
+            quaint_value.err().unwrap().to_string(),
+            "Conversion failed: expected a string in column column_name[0], found 10"
+        );
     }
 }
