@@ -9,7 +9,7 @@ import type {
   Result,
   TransactionOptions,
 } from '@prisma/driver-adapter-utils'
-import {fieldToColumnType, transformValue} from './conversion'
+import { fieldToColumnType } from './conversion'
 
 const debug = Debug('prisma:driver-adapter:neon')
 
@@ -34,7 +34,7 @@ abstract class NeonQueryable implements Queryable {
       return {
         columnNames: columns,
         columnTypes,
-        rows
+        rows,
       }
     })
   }
