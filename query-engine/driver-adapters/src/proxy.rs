@@ -327,7 +327,7 @@ fn js_value_to_quaint(
                 let s_as_uuid = uuid::Uuid::parse_str(&s).expect("Expected a UUID string");
                 QuaintValue::uuid(s_as_uuid)
             }
-            serde_json::Value::Null => QuaintValue::Bytes(None),
+            serde_json::Value::Null => Ok(QuaintValue::Bytes(None)),
             mismatch => panic!("Expected a UUID string in column {}, found {}", column_name, mismatch),
         },
         ColumnType::UnknownNumber => match json_value {
