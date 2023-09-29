@@ -1882,7 +1882,7 @@
 
         <span class="kw">let </span>condition = <span class="kw">match </span>cond {
             ScalarListCondition::Contains(ConditionValue::Value(val)) =&gt; {
-                comparable.compare_raw(<span class="string">&quot;@&gt;&quot;</span>, convert_list_pv(field, <span class="macro">vec!</span>[val]))
+                comparable.compare_raw(<span class="string">&quot;@&gt;&quot;</span>, convert_list_pv(field, <span class="macro">vec!</span>[val], ctx))
             }
             ScalarListCondition::Contains(ConditionValue::FieldRef(field_ref)) =&gt; {
                 <span class="kw">let </span>field_ref_expr: Expression = field_ref.aliased_col(alias, ctx).into();
@@ -1891,13 +1891,13 @@
                 </span>field_ref_expr.equals(comparable.any())
             }
             ScalarListCondition::ContainsEvery(ConditionListValue::List(vals)) =&gt; {
-                comparable.compare_raw(<span class="string">&quot;@&gt;&quot;</span>, convert_list_pv(field, vals))
+                comparable.compare_raw(<span class="string">&quot;@&gt;&quot;</span>, convert_list_pv(field, vals, ctx))
             }
             ScalarListCondition::ContainsEvery(ConditionListValue::FieldRef(field_ref)) =&gt; {
                 comparable.compare_raw(<span class="string">&quot;@&gt;&quot;</span>, field_ref.aliased_col(alias, ctx))
             }
             ScalarListCondition::ContainsSome(ConditionListValue::List(vals)) =&gt; {
-                comparable.compare_raw(<span class="string">&quot;&amp;&amp;&quot;</span>, convert_list_pv(field, vals))
+                comparable.compare_raw(<span class="string">&quot;&amp;&amp;&quot;</span>, convert_list_pv(field, vals, ctx))
             }
             ScalarListCondition::ContainsSome(ConditionListValue::FieldRef(field_ref)) =&gt; {
                 comparable.compare_raw(<span class="string">&quot;&amp;&amp;&quot;</span>, field_ref.aliased_col(alias, ctx))
@@ -2194,13 +2194,13 @@
                 <span class="kw">let </span><span class="kw-2">mut </span>sql_values = Values::with_capacity(values.len());
 
                 <span class="kw">for </span>pv <span class="kw">in </span>values {
-                    <span class="kw">let </span>list_value = convert_pvs(fields, pv.into_list().unwrap());
+                    <span class="kw">let </span>list_value = convert_pvs(fields, pv.into_list().unwrap(), ctx);
                     sql_values.push(list_value);
                 }
 
                 comparable.in_selection(sql_values)
             }
-            <span class="kw">_ </span>=&gt; comparable.in_selection(convert_pvs(fields, values)),
+            <span class="kw">_ </span>=&gt; comparable.in_selection(convert_pvs(fields, values, ctx)),
         },
         ScalarCondition::In(ConditionListValue::FieldRef(field_ref)) =&gt; {
             <span class="comment">// This code path is only reachable for connectors with `ScalarLists` capability
@@ -2211,13 +2211,13 @@
                 <span class="kw">let </span><span class="kw-2">mut </span>sql_values = Values::with_capacity(values.len());
 
                 <span class="kw">for </span>pv <span class="kw">in </span>values {
-                    <span class="kw">let </span>list_value = convert_pvs(fields, pv.into_list().unwrap());
+                    <span class="kw">let </span>list_value = convert_pvs(fields, pv.into_list().unwrap(), ctx);
                     sql_values.push(list_value);
                 }
 
                 comparable.not_in_selection(sql_values)
             }
-            <span class="kw">_ </span>=&gt; comparable.not_in_selection(convert_pvs(fields, values)),
+            <span class="kw">_ </span>=&gt; comparable.not_in_selection(convert_pvs(fields, values, ctx)),
         },
         ScalarCondition::NotIn(ConditionListValue::FieldRef(field_ref)) =&gt; {
             <span class="comment">// This code path is only reachable for connectors with `ScalarLists` capability
@@ -2346,7 +2346,7 @@
                 <span class="kw">let </span><span class="kw-2">mut </span>sql_values = Values::with_capacity(values.len());
 
                 <span class="kw">for </span>pv <span class="kw">in </span>values {
-                    <span class="kw">let </span>list_value = convert_pvs(fields, pv.into_list().unwrap());
+                    <span class="kw">let </span>list_value = convert_pvs(fields, pv.into_list().unwrap(), ctx);
                     sql_values.push(list_value);
                 }
 
@@ -2377,7 +2377,7 @@
                 <span class="kw">let </span><span class="kw-2">mut </span>sql_values = Values::with_capacity(values.len());
 
                 <span class="kw">for </span>pv <span class="kw">in </span>values {
-                    <span class="kw">let </span>list_value = convert_pvs(fields, pv.into_list().unwrap());
+                    <span class="kw">let </span>list_value = convert_pvs(fields, pv.into_list().unwrap(), ctx);
                     sql_values.push(list_value);
                 }
 
@@ -2443,7 +2443,7 @@
     ctx: <span class="kw-2">&amp;</span>Context&lt;<span class="lifetime">&#39;_</span>&gt;,
 ) -&gt; Expression&lt;<span class="lifetime">&#39;a</span>&gt; {
     <span class="kw">match </span>value.into() {
-        ConditionValue::Value(pv) =&gt; convert_pv(field, pv),
+        ConditionValue::Value(pv) =&gt; convert_pv(field, pv, ctx),
         ConditionValue::FieldRef(field_ref) =&gt; field_ref.aliased_col(alias, ctx).into(),
     }
 }
@@ -2455,29 +2455,29 @@
     ctx: <span class="kw-2">&amp;</span>Context&lt;<span class="lifetime">&#39;_</span>&gt;,
 ) -&gt; Expression&lt;<span class="lifetime">&#39;a</span>&gt; {
     <span class="kw">match </span>value.into() {
-        ConditionValue::Value(pv) =&gt; convert_pv(fields.first().unwrap(), pv),
+        ConditionValue::Value(pv) =&gt; convert_pv(fields.first().unwrap(), pv, ctx),
         ConditionValue::FieldRef(field_ref) =&gt; field_ref.aliased_col(alias, ctx).into(),
     }
 }
 
-<span class="kw">fn </span>convert_pv&lt;<span class="lifetime">&#39;a</span>&gt;(field: <span class="kw-2">&amp;</span>ScalarFieldRef, pv: PrismaValue) -&gt; Expression&lt;<span class="lifetime">&#39;a</span>&gt; {
-    field.value(pv).into()
+<span class="kw">fn </span>convert_pv&lt;<span class="lifetime">&#39;a</span>&gt;(field: <span class="kw-2">&amp;</span>ScalarFieldRef, pv: PrismaValue, ctx: <span class="kw-2">&amp;</span>Context&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; Expression&lt;<span class="lifetime">&#39;a</span>&gt; {
+    field.value(pv, ctx).into()
 }
 
-<span class="kw">fn </span>convert_list_pv&lt;<span class="lifetime">&#39;a</span>&gt;(field: <span class="kw-2">&amp;</span>ScalarFieldRef, values: Vec&lt;PrismaValue&gt;) -&gt; Expression&lt;<span class="lifetime">&#39;a</span>&gt; {
-    Value::Array(<span class="prelude-val">Some</span>(values.into_iter().map(|val| field.value(val)).collect())).into()
+<span class="kw">fn </span>convert_list_pv&lt;<span class="lifetime">&#39;a</span>&gt;(field: <span class="kw-2">&amp;</span>ScalarFieldRef, values: Vec&lt;PrismaValue&gt;, ctx: <span class="kw-2">&amp;</span>Context&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; Expression&lt;<span class="lifetime">&#39;a</span>&gt; {
+    Value::Array(<span class="prelude-val">Some</span>(values.into_iter().map(|val| field.value(val, ctx)).collect())).into()
 }
 
-<span class="kw">fn </span>convert_pvs&lt;<span class="lifetime">&#39;a</span>&gt;(fields: <span class="kw-2">&amp;</span>[ScalarFieldRef], values: Vec&lt;PrismaValue&gt;) -&gt; Vec&lt;Value&lt;<span class="lifetime">&#39;a</span>&gt;&gt; {
+<span class="kw">fn </span>convert_pvs&lt;<span class="lifetime">&#39;a</span>&gt;(fields: <span class="kw-2">&amp;</span>[ScalarFieldRef], values: Vec&lt;PrismaValue&gt;, ctx: <span class="kw-2">&amp;</span>Context&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; Vec&lt;Value&lt;<span class="lifetime">&#39;a</span>&gt;&gt; {
     <span class="kw">if </span>fields.len() == values.len() {
         fields
             .iter()
             .zip(values)
-            .map(|(field, value)| field.value(value))
+            .map(|(field, value)| field.value(value, ctx))
             .collect()
     } <span class="kw">else </span>{
         <span class="kw">let </span>field = fields.first().unwrap();
-        values.into_iter().map(|value| field.value(value)).collect()
+        values.into_iter().map(|value| field.value(value, ctx)).collect()
     }
 }
 
@@ -2538,7 +2538,7 @@
             }
             <span class="comment">// array_contains (value)
             </span>(ConditionValue::Value(value), JsonTargetType::Array) =&gt; {
-                <span class="kw">let </span>contains = expr_json.clone().json_array_contains(convert_pv(field, value));
+                <span class="kw">let </span>contains = expr_json.clone().json_array_contains(convert_pv(field, value, ctx));
 
                 <span class="kw">if </span>reverse {
                     contains.or(expr_json.json_type_not_equals(JsonType::Array)).into()
@@ -2596,7 +2596,7 @@
             }
             <span class="comment">// array_starts_with (value)
             </span>(ConditionValue::Value(value), JsonTargetType::Array) =&gt; {
-                <span class="kw">let </span>starts_with = expr_json.clone().json_array_begins_with(convert_pv(field, value));
+                <span class="kw">let </span>starts_with = expr_json.clone().json_array_begins_with(convert_pv(field, value, ctx));
 
                 <span class="kw">if </span>reverse {
                     starts_with.or(expr_json.json_type_not_equals(JsonType::Array)).into()
@@ -2656,7 +2656,7 @@
             }
             <span class="comment">// array_ends_with (value)
             </span>(ConditionValue::Value(value), JsonTargetType::Array) =&gt; {
-                <span class="kw">let </span>ends_with = expr_json.clone().json_array_ends_into(convert_pv(field, value));
+                <span class="kw">let </span>ends_with = expr_json.clone().json_array_ends_into(convert_pv(field, value, ctx));
 
                 <span class="kw">if </span>reverse {
                     ends_with.or(expr_json.json_type_not_equals(JsonType::Array)).into()

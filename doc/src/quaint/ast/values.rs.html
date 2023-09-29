@@ -992,6 +992,7 @@
 <a href="#992" id="992">992</a>
 <a href="#993" id="993">993</a>
 <a href="#994" id="994">994</a>
+<a href="#995" id="995">995</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::ast::<span class="kw-2">*</span>;
 <span class="kw">use </span><span class="kw">crate</span>::error::{Error, ErrorKind};
 
@@ -1265,12 +1266,13 @@
     }
 
     <span class="doccomment">/// Creates a new enum value with the name of the enum attached.
-    </span><span class="kw">pub fn </span>enum_variant_with_name&lt;T, U&gt;(value: T, name: U) -&gt; <span class="self">Self
+    </span><span class="kw">pub fn </span>enum_variant_with_name&lt;T, U, V&gt;(value: T, name: U, schema_name: <span class="prelude-ty">Option</span>&lt;V&gt;) -&gt; <span class="self">Self
     </span><span class="kw">where
         </span>T: Into&lt;Cow&lt;<span class="lifetime">&#39;a</span>, str&gt;&gt;,
         U: Into&lt;Cow&lt;<span class="lifetime">&#39;a</span>, str&gt;&gt;,
+        V: Into&lt;Cow&lt;<span class="lifetime">&#39;a</span>, str&gt;&gt;,
     {
-        Value::Enum(<span class="prelude-val">Some</span>(EnumVariant::new(value)), <span class="prelude-val">Some</span>(EnumName::new(name)))
+        Value::Enum(<span class="prelude-val">Some</span>(EnumVariant::new(value)), <span class="prelude-val">Some</span>(EnumName::new(name, schema_name)))
     }
 
     <span class="doccomment">/// Creates a new bytes value.

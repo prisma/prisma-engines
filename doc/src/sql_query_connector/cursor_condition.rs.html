@@ -791,7 +791,7 @@
         <span class="prelude-val">None </span>=&gt; ConditionTree::NoCondition,
         <span class="prelude-val">Some</span>(<span class="kw-2">ref </span>cursor) =&gt; {
             <span class="kw">let </span>cursor_fields: Vec&lt;<span class="kw">_</span>&gt; = cursor.as_scalar_fields().expect(<span class="string">&quot;Cursor fields contain non-scalars.&quot;</span>);
-            <span class="kw">let </span>cursor_values: Vec&lt;<span class="kw">_</span>&gt; = cursor.db_values();
+            <span class="kw">let </span>cursor_values: Vec&lt;<span class="kw">_</span>&gt; = cursor.db_values(ctx);
             <span class="kw">let </span>cursor_columns: Vec&lt;<span class="kw">_</span>&gt; = cursor_fields.as_slice().as_columns(ctx).collect();
             <span class="kw">let </span>cursor_row = Row::from(cursor_columns);
 

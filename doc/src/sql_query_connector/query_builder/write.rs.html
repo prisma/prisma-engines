@@ -297,7 +297,7 @@
                 .try_into()
                 .expect(<span class="string">&quot;Create calls can only use PrismaValue write expressions (right now).&quot;</span>);
 
-            insert.value(db_name.to_owned(), field.value(value))
+            insert.value(db_name.to_owned(), field.value(value, ctx))
         });
 
     Insert::from(insert)
@@ -333,7 +333,7 @@
                             .try_into()
                             .expect(<span class="string">&quot;Create calls can only use PrismaValue write expressions (right now).&quot;</span>);
 
-                        row.push(field.value(value).into());
+                        row.push(field.value(value, ctx).into());
                     }
 
                     <span class="prelude-val">None </span>=&gt; row.push(default_value()),
@@ -393,12 +393,12 @@
 
             <span class="kw">let </span>value: Expression = <span class="kw">match </span>val.try_into_scalar().unwrap() {
                 ScalarWriteOperation::Field(<span class="kw">_</span>) =&gt; <span class="macro">unimplemented!</span>(),
-                ScalarWriteOperation::Set(rhs) =&gt; field.value(rhs).into(),
+                ScalarWriteOperation::Set(rhs) =&gt; field.value(rhs, ctx).into(),
                 ScalarWriteOperation::Add(rhs) <span class="kw">if </span>field.is_list() =&gt; {
                     <span class="kw">let </span>e: Expression = Column::from((table.clone(), name.clone())).into();
                     <span class="kw">let </span>vals: Vec&lt;<span class="kw">_</span>&gt; = <span class="kw">match </span>rhs {
-                        PrismaValue::List(vals) =&gt; vals.into_iter().map(|val| field.value(val)).collect(),
-                        <span class="kw">_ </span>=&gt; <span class="macro">vec!</span>[field.value(rhs)],
+                        PrismaValue::List(vals) =&gt; vals.into_iter().map(|val| field.value(val, ctx)).collect(),
+                        <span class="kw">_ </span>=&gt; <span class="macro">vec!</span>[field.value(rhs, ctx)],
                     };
 
                     <span class="comment">// Postgres only
@@ -406,22 +406,22 @@
                 }
                 ScalarWriteOperation::Add(rhs) =&gt; {
                     <span class="kw">let </span>e: Expression&lt;<span class="lifetime">&#39;_</span>&gt; = Column::from((table.clone(), name.clone())).into();
-                    e + field.value(rhs).into()
+                    e + field.value(rhs, ctx).into()
                 }
 
                 ScalarWriteOperation::Substract(rhs) =&gt; {
                     <span class="kw">let </span>e: Expression&lt;<span class="lifetime">&#39;_</span>&gt; = Column::from((table.clone(), name.clone())).into();
-                    e - field.value(rhs).into()
+                    e - field.value(rhs, ctx).into()
                 }
 
                 ScalarWriteOperation::Multiply(rhs) =&gt; {
                     <span class="kw">let </span>e: Expression&lt;<span class="lifetime">&#39;_</span>&gt; = Column::from((table.clone(), name.clone())).into();
-                    e * field.value(rhs).into()
+                    e * field.value(rhs, ctx).into()
                 }
 
                 ScalarWriteOperation::Divide(rhs) =&gt; {
                     <span class="kw">let </span>e: Expression&lt;<span class="lifetime">&#39;_</span>&gt; = Column::from((table.clone(), name.clone())).into();
-                    e / field.value(rhs).into()
+                    e / field.value(rhs, ctx).into()
                 }
 
                 ScalarWriteOperation::Unset(<span class="kw">_</span>) =&gt; <span class="macro">unreachable!</span>(<span class="string">&quot;Unset is not supported on SQL connectors&quot;</span>),
@@ -452,7 +452,7 @@
         .as_columns(ctx)
         .collect();
 
-    <span class="kw">let </span>query = <span class="kw">super</span>::chunked_conditions(<span class="kw-2">&amp;</span>columns, ids, |conditions| {
+    <span class="kw">let </span>query = <span class="kw">super</span>::chunked_conditions(<span class="kw-2">&amp;</span>columns, ids, ctx, |conditions| {
         update.clone().so_that(conditions.and(filter_condition.clone()))
     });
 
@@ -481,7 +481,7 @@
         .as_columns(ctx)
         .collect();
 
-    <span class="kw">super</span>::chunked_conditions(<span class="kw-2">&amp;</span>columns, ids, |conditions| {
+    <span class="kw">super</span>::chunked_conditions(<span class="kw-2">&amp;</span>columns, ids, ctx, |conditions| {
         delete_many_from_filter(model, conditions.and(filter_condition.clone()), ctx)
     })
 }
@@ -501,9 +501,9 @@
     <span class="kw">let </span>insert = Insert::multi_into(relation.as_table(ctx), columns);
 
     <span class="kw">let </span>insert: MultiRowInsert = child_ids.iter().fold(insert, |insert, child_id| {
-        <span class="kw">let </span><span class="kw-2">mut </span>values: Vec&lt;<span class="kw">_</span>&gt; = parent_id.db_values();
+        <span class="kw">let </span><span class="kw-2">mut </span>values: Vec&lt;<span class="kw">_</span>&gt; = parent_id.db_values(ctx);
 
-        values.extend(child_id.db_values());
+        values.extend(child_id.db_values(ctx));
         insert.values(values)
     });
 
@@ -522,14 +522,14 @@
     <span class="kw">let </span><span class="kw-2">mut </span>parent_columns: Vec&lt;<span class="kw">_</span>&gt; = parent_field.related_field().m2m_columns(ctx);
     <span class="kw">let </span>child_columns: Vec&lt;<span class="kw">_</span>&gt; = parent_field.m2m_columns(ctx);
 
-    <span class="kw">let </span>parent_id_values = parent_id.db_values();
+    <span class="kw">let </span>parent_id_values = parent_id.db_values(ctx);
     <span class="kw">let </span>parent_id_criteria = <span class="kw">if </span>parent_columns.len() &gt; <span class="number">1 </span>{
         Row::from(parent_columns).equals(parent_id_values)
     } <span class="kw">else </span>{
         parent_columns.pop().unwrap().equals(parent_id_values)
     };
 
-    <span class="kw">let </span>child_id_criteria = <span class="kw">super</span>::in_conditions(<span class="kw-2">&amp;</span>child_columns, child_ids);
+    <span class="kw">let </span>child_id_criteria = <span class="kw">super</span>::in_conditions(<span class="kw-2">&amp;</span>child_columns, child_ids, ctx);
 
     Delete::from_table(relation.as_table(ctx))
         .so_that(parent_id_criteria.and(child_id_criteria))

@@ -38,9 +38,13 @@
 <a href="#38" id="38">38</a>
 <a href="#39" id="39">39</a>
 <a href="#40" id="40">40</a>
+<a href="#41" id="41">41</a>
+<a href="#42" id="42">42</a>
+<a href="#43" id="43">43</a>
 </pre></div><pre class="rust"><code><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">mod </span>read;
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">mod </span>write;
 
+<span class="kw">use </span><span class="kw">crate</span>::context::Context;
 <span class="kw">use </span><span class="kw">crate</span>::model_extensions::SelectionResultExt;
 <span class="kw">use </span>prisma_models::SelectionResult;
 <span class="kw">use </span>quaint::ast::{Column, Comparable, ConditionTree, Query, Row, Values};
@@ -50,6 +54,7 @@
 <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>chunked_conditions&lt;F, Q&gt;(
     columns: <span class="kw-2">&amp;</span>[Column&lt;<span class="lifetime">&#39;static</span>&gt;],
     records: <span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span>SelectionResult],
+    ctx: <span class="kw-2">&amp;</span>Context&lt;<span class="lifetime">&#39;_</span>&gt;,
     f: F,
 ) -&gt; Vec&lt;Query&lt;<span class="lifetime">&#39;static</span>&gt;&gt;
 <span class="kw">where
@@ -59,7 +64,7 @@
     records
         .chunks(PARAMETER_LIMIT)
         .map(|chunk| {
-            <span class="kw">let </span>tree = in_conditions(columns, chunk.iter().copied());
+            <span class="kw">let </span>tree = in_conditions(columns, chunk.iter().copied(), ctx);
             f(tree).into()
         })
         .collect()
@@ -68,11 +73,12 @@
 <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>in_conditions&lt;<span class="lifetime">&#39;a</span>&gt;(
     columns: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>[Column&lt;<span class="lifetime">&#39;static</span>&gt;],
     results: <span class="kw">impl </span>IntoIterator&lt;Item = <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>SelectionResult&gt;,
+    ctx: <span class="kw-2">&amp;</span>Context&lt;<span class="lifetime">&#39;_</span>&gt;,
 ) -&gt; ConditionTree&lt;<span class="lifetime">&#39;static</span>&gt; {
     <span class="kw">let </span><span class="kw-2">mut </span>values = Values::empty();
 
     <span class="kw">for </span>result <span class="kw">in </span>results.into_iter() {
-        <span class="kw">let </span>vals: Vec&lt;<span class="kw">_</span>&gt; = result.db_values();
+        <span class="kw">let </span>vals: Vec&lt;<span class="kw">_</span>&gt; = result.db_values(ctx);
         values.push(vals)
     }
 

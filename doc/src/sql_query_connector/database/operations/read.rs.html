@@ -446,7 +446,7 @@
 
     <span class="comment">// [DTODO] To verify: We might need chunked fetch here (too many parameters in the query).
     </span><span class="kw">let </span>select = Select::from_table(table)
-        .so_that(query_builder::in_conditions(<span class="kw-2">&amp;</span>from_columns, from_record_ids))
+        .so_that(query_builder::in_conditions(<span class="kw-2">&amp;</span>from_columns, from_record_ids, ctx))
         .columns(from_columns.into_iter().chain(to_columns.into_iter()));
 
     <span class="kw">let </span>parent_model_id = from_field.model().primary_identifier();

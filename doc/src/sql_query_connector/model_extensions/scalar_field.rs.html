@@ -116,7 +116,25 @@
 <a href="#116" id="116">116</a>
 <a href="#117" id="117">117</a>
 <a href="#118" id="118">118</a>
-</pre></div><pre class="rust"><code><span class="kw">use </span>chrono::Utc;
+<a href="#119" id="119">119</a>
+<a href="#120" id="120">120</a>
+<a href="#121" id="121">121</a>
+<a href="#122" id="122">122</a>
+<a href="#123" id="123">123</a>
+<a href="#124" id="124">124</a>
+<a href="#125" id="125">125</a>
+<a href="#126" id="126">126</a>
+<a href="#127" id="127">127</a>
+<a href="#128" id="128">128</a>
+<a href="#129" id="129">129</a>
+<a href="#130" id="130">130</a>
+<a href="#131" id="131">131</a>
+<a href="#132" id="132">132</a>
+<a href="#133" id="133">133</a>
+<a href="#134" id="134">134</a>
+<a href="#135" id="135">135</a>
+</pre></div><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::context::Context;
+<span class="kw">use </span>chrono::Utc;
 <span class="kw">use </span>prisma_models::{ScalarField, TypeIdentifier};
 <span class="kw">use </span>prisma_value::PrismaValue;
 <span class="kw">use </span>quaint::{
@@ -124,13 +142,13 @@
     prelude::{EnumVariant, TypeDataLength, TypeFamily},
 };
 
-<span class="kw">pub trait </span>ScalarFieldExt {
-    <span class="kw">fn </span>value&lt;<span class="lifetime">&#39;a</span>&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, pv: PrismaValue) -&gt; Value&lt;<span class="lifetime">&#39;a</span>&gt;;
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">trait </span>ScalarFieldExt {
+    <span class="kw">fn </span>value&lt;<span class="lifetime">&#39;a</span>&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, pv: PrismaValue, ctx: <span class="kw-2">&amp;</span>Context&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; Value&lt;<span class="lifetime">&#39;a</span>&gt;;
     <span class="kw">fn </span>type_family(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; TypeFamily;
 }
 
 <span class="kw">impl </span>ScalarFieldExt <span class="kw">for </span>ScalarField {
-    <span class="kw">fn </span>value&lt;<span class="lifetime">&#39;a</span>&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, pv: PrismaValue) -&gt; Value&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="kw">fn </span>value&lt;<span class="lifetime">&#39;a</span>&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, pv: PrismaValue, ctx: <span class="kw-2">&amp;</span>Context&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; Value&lt;<span class="lifetime">&#39;a</span>&gt; {
         <span class="kw">match </span>(pv, <span class="self">self</span>.type_identifier()) {
             (PrismaValue::String(s), <span class="kw">_</span>) =&gt; s.into(),
             (PrismaValue::Float(f), <span class="kw">_</span>) =&gt; f.into(),
@@ -138,8 +156,13 @@
             (PrismaValue::DateTime(d), <span class="kw">_</span>) =&gt; d.with_timezone(<span class="kw-2">&amp;</span>Utc).into(),
             (PrismaValue::Enum(e), TypeIdentifier::Enum(enum_id)) =&gt; {
                 <span class="kw">let </span>enum_walker = <span class="self">self</span>.dm.clone().zip(enum_id);
+                <span class="kw">let </span>enum_name = enum_walker.db_name().to_owned();
+                <span class="kw">let </span>schema_name = enum_walker
+                    .schema_name()
+                    .map(ToOwned::to_owned)
+                    .or(<span class="prelude-val">Some</span>(ctx.schema_name().to_owned()));
 
-                Value::enum_variant_with_name(e, enum_walker.db_name().to_owned())
+                Value::enum_variant_with_name(e, enum_name, schema_name)
             }
             (PrismaValue::List(vals), TypeIdentifier::Enum(enum_id)) =&gt; {
                 <span class="kw">let </span>enum_walker = <span class="self">self</span>.dm.clone().zip(enum_id);
@@ -149,13 +172,19 @@
                     .map(EnumVariant::new)
                     .collect();
 
-                Value::EnumArray(<span class="prelude-val">Some</span>(variants), <span class="prelude-val">Some</span>(EnumName::new(enum_walker.db_name().to_owned())))
+                <span class="kw">let </span>enum_name = enum_walker.db_name().to_owned();
+                <span class="kw">let </span>schema_name = enum_walker
+                    .schema_name()
+                    .map(ToOwned::to_owned)
+                    .or(<span class="prelude-val">Some</span>(ctx.schema_name().to_owned()));
+
+                Value::EnumArray(<span class="prelude-val">Some</span>(variants), <span class="prelude-val">Some</span>(EnumName::new(enum_name, schema_name)))
             }
             (PrismaValue::Enum(e), <span class="kw">_</span>) =&gt; e.into(),
             (PrismaValue::Int(i), <span class="kw">_</span>) =&gt; i.into(),
             (PrismaValue::BigInt(i), <span class="kw">_</span>) =&gt; i.into(),
             (PrismaValue::Uuid(u), <span class="kw">_</span>) =&gt; u.to_string().into(),
-            (PrismaValue::List(l), <span class="kw">_</span>) =&gt; Value::Array(<span class="prelude-val">Some</span>(l.into_iter().map(|x| <span class="self">self</span>.value(x)).collect())),
+            (PrismaValue::List(l), <span class="kw">_</span>) =&gt; Value::Array(<span class="prelude-val">Some</span>(l.into_iter().map(|x| <span class="self">self</span>.value(x, ctx)).collect())),
             (PrismaValue::Json(s), <span class="kw">_</span>) =&gt; Value::Json(<span class="prelude-val">Some</span>(serde_json::from_str::&lt;serde_json::Value&gt;(<span class="kw-2">&amp;</span>s).unwrap())),
             (PrismaValue::Bytes(b), <span class="kw">_</span>) =&gt; Value::Bytes(<span class="prelude-val">Some</span>(b.into())),
             (PrismaValue::Object(<span class="kw">_</span>), <span class="kw">_</span>) =&gt; <span class="macro">unimplemented!</span>(),
@@ -166,8 +195,13 @@
                 TypeIdentifier::Boolean =&gt; Value::Boolean(<span class="prelude-val">None</span>),
                 TypeIdentifier::Enum(enum_id) =&gt; {
                     <span class="kw">let </span>enum_walker = <span class="self">self</span>.dm.clone().zip(enum_id);
+                    <span class="kw">let </span>enum_name = enum_walker.db_name().to_owned();
+                    <span class="kw">let </span>schema_name = enum_walker
+                        .schema_name()
+                        .map(ToOwned::to_owned)
+                        .or(<span class="prelude-val">Some</span>(ctx.schema_name().to_owned()));
 
-                    Value::Enum(<span class="prelude-val">None</span>, <span class="prelude-val">Some</span>(EnumName::new(enum_walker.db_name().to_owned())))
+                    Value::Enum(<span class="prelude-val">None</span>, <span class="prelude-val">Some</span>(EnumName::new(enum_name, schema_name)))
                 }
                 TypeIdentifier::Json =&gt; Value::Json(<span class="prelude-val">None</span>),
                 TypeIdentifier::DateTime =&gt; Value::DateTime(<span class="prelude-val">None</span>),

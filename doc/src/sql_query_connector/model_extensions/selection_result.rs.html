@@ -40,13 +40,15 @@
 <a href="#40" id="40">40</a>
 <a href="#41" id="41">41</a>
 <a href="#42" id="42">42</a>
+<a href="#43" id="43">43</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span><span class="kw">super</span>::ScalarFieldExt;
+<span class="kw">use </span><span class="kw">crate</span>::context::Context;
 <span class="kw">use </span>prisma_models::{PrismaValue, SelectedField, SelectionResult};
 <span class="kw">use </span>quaint::Value;
 
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">trait </span>SelectionResultExt {
     <span class="kw">fn </span>misses_autogen_value(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool;
-    <span class="kw">fn </span>db_values&lt;<span class="lifetime">&#39;a</span>&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Vec&lt;Value&lt;<span class="lifetime">&#39;a</span>&gt;&gt;;
+    <span class="kw">fn </span>db_values&lt;<span class="lifetime">&#39;a</span>&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, ctx: <span class="kw-2">&amp;</span>Context&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; Vec&lt;Value&lt;<span class="lifetime">&#39;a</span>&gt;&gt;;
 
     <span class="kw">fn </span>add_autogen_value&lt;V&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, value: V) -&gt; bool
     <span class="kw">where
@@ -72,11 +74,11 @@
         <span class="bool-val">false
     </span>}
 
-    <span class="kw">fn </span>db_values&lt;<span class="lifetime">&#39;a</span>&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Vec&lt;Value&lt;<span class="lifetime">&#39;a</span>&gt;&gt; {
+    <span class="kw">fn </span>db_values&lt;<span class="lifetime">&#39;a</span>&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, ctx: <span class="kw-2">&amp;</span>Context&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; Vec&lt;Value&lt;<span class="lifetime">&#39;a</span>&gt;&gt; {
         <span class="self">self</span>.pairs
             .iter()
             .map(|(selection, v)| <span class="kw">match </span>selection {
-                SelectedField::Scalar(sf) =&gt; sf.value(v.clone()),
+                SelectedField::Scalar(sf) =&gt; sf.value(v.clone(), ctx),
                 SelectedField::Composite(_cf) =&gt; <span class="macro">todo!</span>(), <span class="comment">// [Composites] todo
             </span>})
             .collect()
