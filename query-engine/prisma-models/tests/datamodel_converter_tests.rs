@@ -39,6 +39,32 @@ fn converting_enums() {
 }
 
 #[test]
+fn converting_composite_types() {
+    let res = psl::parse_schema(
+        r#"
+    datasource db {
+      provider = "mongodb"
+      url      = "mongodb://localhost:27017/hello"
+    }
+
+    model MyModel {
+      id        String      @id @default(auto()) @map("_id") @db.ObjectId
+      attribute Attribute
+
+      @@unique([attribute], name: "composite_index")
+    }
+
+    type Attribute {
+      name  String
+      value String
+      group String
+    }
+    "#,
+    );
+    assert!(res.unwrap_err().contains("Indexes can only contain scalar attributes. Please remove \"attribute\" from the argument list of the indexes."));
+}
+
+#[test]
 fn models_with_only_scalar_fields() {
     let datamodel = convert(
         r#"
