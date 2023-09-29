@@ -13,6 +13,10 @@ impl InternalEnum {
     pub fn db_name(&self) -> &str {
         self.dm.walk(self.id).database_name()
     }
+
+    pub fn schema_name(&self) -> Option<&str> {
+        self.dm.walk(self.id).schema().map(|tuple| tuple.0)
+    }
 }
 
 impl std::fmt::Debug for InternalEnum {

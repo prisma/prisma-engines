@@ -59,6 +59,7 @@ class NeonWsQueryable<ClientT extends neon.Pool | neon.PoolClient> extends NeonQ
   }
 
   override async performIO(query: Query): Promise<Result<PerformIOResult>> {
+    console.error("\n💥", JSON.stringify(query));
     const { sql, args: values } = query
 
     try {

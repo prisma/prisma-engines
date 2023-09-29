@@ -61,7 +61,11 @@ impl<'a> Visitor<'a> for Postgres<'a> {
                 s.parameter_substitution()?;
                 s.write("::text")?;
                 s.write(" AS ")?;
-                s.surround_with_backticks(enum_name.deref())
+                if let Some(schema_name) = enum_name.schema_name {
+                    s.write(schema_name.deref())?;
+                    s.write(".")?
+                }
+                s.surround_with_backticks(enum_name.name.deref())
             })?;
         } else {
             self.parameter_substitution()?;
@@ -96,7 +100,11 @@ impl<'a> Visitor<'a> for Postgres<'a> {
             })?;
 
             self.write("::")?;
-            self.surround_with_backticks(enum_name.deref())?;
+            if let Some(schema_name) = enum_name.schema_name {
+                self.write(schema_name.deref())?;
+                self.write(".")?
+            }
+            self.surround_with_backticks(enum_name.name.deref())?;
             self.write("[]")?;
         } else {
             self.visit_parameterized(Value::Array(Some(
@@ -210,9 +218,13 @@ impl<'a> Visitor<'a> for Postgres<'a> {
                     Ok(())
                 })?;
 
-                if let Some(name) = name {
+                if let Some(enum_name) = name {
                     self.write("::")?;
-                    self.surround_with_backticks(name.as_ref())?;
+                    if let Some(schema_name) = enum_name.schema_name {
+                        self.write(schema_name.deref())?;
+                        self.write(".")?
+                    }
+                    self.surround_with_backticks(enum_name.name.deref())?;
                 }
 
                 Ok(())

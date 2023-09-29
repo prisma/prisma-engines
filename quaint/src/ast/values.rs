@@ -271,12 +271,13 @@ impl<'a> Value<'a> {
     }
 
     /// Creates a new enum value with the name of the enum attached.
-    pub fn enum_variant_with_name<T, U>(value: T, name: U) -> Self
+    pub fn enum_variant_with_name<T, U, V>(value: T, name: U, schema_name: Option<V>) -> Self
     where
         T: Into<Cow<'a, str>>,
         U: Into<Cow<'a, str>>,
+        V: Into<Cow<'a, str>>,
     {
-        Value::Enum(Some(EnumVariant::new(value)), Some(EnumName::new(name)))
+        Value::Enum(Some(EnumVariant::new(value)), Some(EnumName::new(name, schema_name)))
     }
 
     /// Creates a new bytes value.

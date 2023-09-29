@@ -61,24 +61,16 @@ impl<'a> From<&'a str> for EnumVariant<'a> {
 }
 
 #[derive(Debug, Clone, PartialEq)]
-pub struct EnumName<'a>(Cow<'a, str>);
+pub struct EnumName<'a> {
+    pub name: Cow<'a, str>,
+    pub schema_name: Option<Cow<'a, str>>,
+}
 
 impl<'a> EnumName<'a> {
-    pub fn new(name: impl Into<Cow<'a, str>>) -> Self {
-        Self(name.into())
-    }
-}
-
-impl<'a> AsRef<str> for EnumName<'a> {
-    fn as_ref(&self) -> &str {
-        self.0.as_ref()
-    }
-}
-
-impl<'a> std::ops::Deref for EnumName<'a> {
-    type Target = str;
-
-    fn deref(&self) -> &Self::Target {
-        &self.0
+    pub fn new(name: impl Into<Cow<'a, str>>, schema_name: Option<impl Into<Cow<'a, str>>>) -> Self {
+        Self {
+            name: name.into(),
+            schema_name: schema_name.map(|s| s.into()),
+        }
     }
 }

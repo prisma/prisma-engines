@@ -20,8 +20,10 @@ impl ScalarFieldExt for ScalarField {
             (PrismaValue::DateTime(d), _) => d.with_timezone(&Utc).into(),
             (PrismaValue::Enum(e), TypeIdentifier::Enum(enum_id)) => {
                 let enum_walker = self.dm.clone().zip(enum_id);
+                let enum_name = enum_walker.db_name().to_owned();
+                let schema_name = enum_walker.schema_name().map(ToOwned::to_owned);
 
-                Value::enum_variant_with_name(e, enum_walker.db_name().to_owned())
+                Value::enum_variant_with_name(e, enum_name, schema_name)
             }
             (PrismaValue::List(vals), TypeIdentifier::Enum(enum_id)) => {
                 let enum_walker = self.dm.clone().zip(enum_id);
@@ -31,7 +33,10 @@ impl ScalarFieldExt for ScalarField {
                     .map(EnumVariant::new)
                     .collect();
 
-                Value::EnumArray(Some(variants), Some(EnumName::new(enum_walker.db_name().to_owned())))
+                let enum_name = enum_walker.db_name().to_owned();
+                let schema_name = enum_walker.schema_name().map(ToOwned::to_owned);
+
+                Value::EnumArray(Some(variants), Some(EnumName::new(enum_name, schema_name)))
             }
             (PrismaValue::Enum(e), _) => e.into(),
             (PrismaValue::Int(i), _) => i.into(),
@@ -48,8 +53,10 @@ impl ScalarFieldExt for ScalarField {
                 TypeIdentifier::Boolean => Value::Boolean(None),
                 TypeIdentifier::Enum(enum_id) => {
                     let enum_walker = self.dm.clone().zip(enum_id);
+                    let enum_name = enum_walker.db_name().to_owned();
+                    let schema_name = enum_walker.schema_name().map(ToOwned::to_owned);
 
-                    Value::Enum(None, Some(EnumName::new(enum_walker.db_name().to_owned())))
+                    Value::Enum(None, Some(EnumName::new(enum_name, schema_name)))
                 }
                 TypeIdentifier::Json => Value::Json(None),
                 TypeIdentifier::DateTime => Value::DateTime(None),
