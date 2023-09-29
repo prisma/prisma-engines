@@ -1,9 +1,9 @@
+mod conversion;
 pub mod error;
 
 use crate::{
     ast::{Query, Value},
     connector::{metrics, queryable::*, ResultSet},
-    conversion::postgres as conversion,
     error::{Error, ErrorKind},
     visitor::{self, Visitor},
 };

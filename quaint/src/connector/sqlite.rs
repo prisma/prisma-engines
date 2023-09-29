@@ -1,3 +1,4 @@
+mod conversion;
 mod error;
 
 pub use rusqlite::{params_from_iter, version as sqlite_version};

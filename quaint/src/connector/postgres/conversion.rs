@@ -1,9 +1,6 @@
 #[cfg(feature = "bigdecimal")]
 mod decimal;
 
-pub(crate) use decimal::DecimalWrapper;
-
-#[cfg(feature = "bigdecimal")]
 use crate::{
     ast::Value,
     connector::queryable::{GetRow, ToColumnNames},
@@ -14,12 +11,15 @@ use bigdecimal::{num_bigint::BigInt, BigDecimal, FromPrimitive, ToPrimitive};
 use bit_vec::BitVec;
 use bytes::BytesMut;
 use chrono::{DateTime, NaiveDateTime, Utc};
+#[cfg(feature = "bigdecimal")]
+pub(crate) use decimal::DecimalWrapper;
 use postgres_types::{FromSql, ToSql, WrongType};
 use std::{convert::TryFrom, error::Error as StdError};
 use tokio_postgres::{
     types::{self, IsNull, Kind, Type as PostgresType},
     Row as PostgresRow, Statement as PostgresStatement,
 };
+
 #[cfg(feature = "uuid")]
 use uuid::Uuid;
 

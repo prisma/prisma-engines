@@ -120,7 +120,6 @@ extern crate bigdecimal_ as bigdecimal;
 
 pub mod ast;
 pub mod connector;
-pub mod conversion;
 pub mod error;
 #[cfg(feature = "pooled")]
 #[cfg_attr(feature = "docs", doc(cfg(pooled)))]

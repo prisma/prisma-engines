@@ -11,7 +11,7 @@
 
 mod connection_info;
 pub mod metrics;
-pub mod queryable;
+mod queryable;
 mod result_set;
 #[cfg(any(feature = "mssql", feature = "postgresql", feature = "mysql"))]
 mod timeout;
