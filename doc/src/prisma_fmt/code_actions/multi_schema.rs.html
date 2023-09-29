@@ -108,8 +108,77 @@
 <a href="#108" id="108">108</a>
 <a href="#109" id="109">109</a>
 <a href="#110" id="110">110</a>
+<a href="#111" id="111">111</a>
+<a href="#112" id="112">112</a>
+<a href="#113" id="113">113</a>
+<a href="#114" id="114">114</a>
+<a href="#115" id="115">115</a>
+<a href="#116" id="116">116</a>
+<a href="#117" id="117">117</a>
+<a href="#118" id="118">118</a>
+<a href="#119" id="119">119</a>
+<a href="#120" id="120">120</a>
+<a href="#121" id="121">121</a>
+<a href="#122" id="122">122</a>
+<a href="#123" id="123">123</a>
+<a href="#124" id="124">124</a>
+<a href="#125" id="125">125</a>
+<a href="#126" id="126">126</a>
+<a href="#127" id="127">127</a>
+<a href="#128" id="128">128</a>
+<a href="#129" id="129">129</a>
+<a href="#130" id="130">130</a>
+<a href="#131" id="131">131</a>
+<a href="#132" id="132">132</a>
+<a href="#133" id="133">133</a>
+<a href="#134" id="134">134</a>
+<a href="#135" id="135">135</a>
+<a href="#136" id="136">136</a>
+<a href="#137" id="137">137</a>
+<a href="#138" id="138">138</a>
+<a href="#139" id="139">139</a>
+<a href="#140" id="140">140</a>
+<a href="#141" id="141">141</a>
+<a href="#142" id="142">142</a>
+<a href="#143" id="143">143</a>
+<a href="#144" id="144">144</a>
+<a href="#145" id="145">145</a>
+<a href="#146" id="146">146</a>
+<a href="#147" id="147">147</a>
+<a href="#148" id="148">148</a>
+<a href="#149" id="149">149</a>
+<a href="#150" id="150">150</a>
+<a href="#151" id="151">151</a>
+<a href="#152" id="152">152</a>
+<a href="#153" id="153">153</a>
+<a href="#154" id="154">154</a>
+<a href="#155" id="155">155</a>
+<a href="#156" id="156">156</a>
+<a href="#157" id="157">157</a>
+<a href="#158" id="158">158</a>
+<a href="#159" id="159">159</a>
+<a href="#160" id="160">160</a>
+<a href="#161" id="161">161</a>
+<a href="#162" id="162">162</a>
+<a href="#163" id="163">163</a>
+<a href="#164" id="164">164</a>
+<a href="#165" id="165">165</a>
+<a href="#166" id="166">166</a>
+<a href="#167" id="167">167</a>
+<a href="#168" id="168">168</a>
+<a href="#169" id="169">169</a>
+<a href="#170" id="170">170</a>
+<a href="#171" id="171">171</a>
+<a href="#172" id="172">172</a>
+<a href="#173" id="173">173</a>
+<a href="#174" id="174">174</a>
+<a href="#175" id="175">175</a>
+<a href="#176" id="176">176</a>
+<a href="#177" id="177">177</a>
+<a href="#178" id="178">178</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>lsp_types::{CodeAction, CodeActionKind, CodeActionOrCommand, CodeActionParams};
 <span class="kw">use </span>psl::{
+    diagnostics::Span,
     parser_database::walkers::{EnumWalker, ModelWalker},
     schema_ast::ast::WithSpan,
     Configuration,
@@ -210,6 +279,73 @@
 
     <span class="kw">let </span>action = CodeAction {
         title: String::from(<span class="string">&quot;Add `@@schema` attribute&quot;</span>),
+        kind: <span class="prelude-val">Some</span>(CodeActionKind::QUICKFIX),
+        edit: <span class="prelude-val">Some</span>(edit),
+        diagnostics: <span class="prelude-val">Some</span>(diagnostics),
+        ..Default::default()
+    };
+
+    actions.push(CodeActionOrCommand::CodeAction(action))
+}
+
+<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>add_schema_to_schemas(
+    actions: <span class="kw-2">&amp;mut </span>Vec&lt;CodeActionOrCommand&gt;,
+    params: <span class="kw-2">&amp;</span>CodeActionParams,
+    schema: <span class="kw-2">&amp;</span>str,
+    config: <span class="kw-2">&amp;</span>Configuration,
+    model: ModelWalker&lt;<span class="lifetime">&#39;_</span>&gt;,
+) {
+    <span class="kw">let </span>datasource = <span class="kw">match </span>config.datasources.first() {
+        <span class="prelude-val">Some</span>(ds) =&gt; ds,
+        <span class="prelude-val">None </span>=&gt; <span class="kw">return</span>,
+    };
+
+    <span class="kw">let </span>span_diagnostics =
+        <span class="kw">match </span><span class="kw">super</span>::diagnostics_for_span(schema, <span class="kw-2">&amp;</span>params.context.diagnostics, model.ast_model().span()) {
+            <span class="prelude-val">Some</span>(sd) =&gt; sd,
+            <span class="prelude-val">None </span>=&gt; <span class="kw">return</span>,
+        };
+
+    <span class="kw">let </span>diagnostics = <span class="kw">match </span><span class="kw">super</span>::filter_diagnostics(span_diagnostics, <span class="string">&quot;This schema is not defined in the datasource.&quot;</span>)
+    {
+        <span class="prelude-val">Some</span>(value) =&gt; value,
+        <span class="prelude-val">None </span>=&gt; <span class="kw">return</span>,
+    };
+
+    <span class="kw">let </span>edit = <span class="kw">match </span>datasource.schemas_span {
+        <span class="prelude-val">Some</span>(span) =&gt; {
+            <span class="kw">let </span>formatted_attribute = <span class="macro">format!</span>(<span class="string">r#&quot;, &quot;{}&quot;&quot;#</span>, model.schema_name().unwrap());
+            <span class="kw">super</span>::create_text_edit(
+                schema,
+                formatted_attribute,
+                <span class="bool-val">true</span>,
+                <span class="comment">// todo: update spans so that we can just append to the end of the _inside_ of the array. Instead of needing to re-append the `]` or taking the span end -1
+                </span>Span::new(span.start, span.end - <span class="number">1</span>),
+                params,
+            )
+        }
+        <span class="prelude-val">None </span>=&gt; {
+            <span class="kw">let </span>has_properties = datasource.provider_defined()
+                || datasource.url_defined()
+                || datasource.direct_url_defined()
+                || datasource.shadow_url_defined()
+                || datasource.relation_mode_defined()
+                || datasource.schemas_defined();
+
+            <span class="kw">let </span>formatted_attribute = <span class="kw">super</span>::format_block_property(
+                <span class="string">&quot;schemas&quot;</span>,
+                model.schema_name().unwrap(),
+                model.indentation(),
+                model.newline(),
+                has_properties,
+            );
+
+            <span class="kw">super</span>::create_text_edit(schema, formatted_attribute, <span class="bool-val">true</span>, datasource.url_span, params)
+        }
+    };
+
+    <span class="kw">let </span>action = CodeAction {
+        title: String::from(<span class="string">&quot;Add schema to schemas&quot;</span>),
         kind: <span class="prelude-val">Some</span>(CodeActionKind::QUICKFIX),
         edit: <span class="prelude-val">Some</span>(edit),
         diagnostics: <span class="prelude-val">Some</span>(diagnostics),
