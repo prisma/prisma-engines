@@ -52,6 +52,10 @@ mod one_relation {
     #[connector_test]
     async fn l1_one_rel(runner: Runner) -> TestResult<()> {
         test_data(&runner).await?;
+        run_query!(
+            &runner,
+            r#"mutation { createOneBlog( data: { name: "blog 4" } ) { name } }"#
+        );
 
         insta::assert_snapshot!(
             run_query!(&runner, r#"query { findManyPost(where: { title: { equals: "post 2" }}) { title }}"#),
@@ -59,12 +63,12 @@ mod one_relation {
         );
 
         insta::assert_snapshot!(
-            run_query!(&runner, r#"{findManyPost(where:{blog:{is:{name:{equals: "blog 1"}}}}) { title }}"#),
+            run_query!(&runner, r#"{findManyPost(where:{blog:{is:{ name:{equals: "blog 1"}}}}) { title }}"#),
             @r###"{"data":{"findManyPost":[{"title":"post 1"}]}}"###
         );
 
         insta::assert_snapshot!(
-            run_query!(&runner, r#"{findManyBlog(where: { post: { is:{popularity: { gte: 100 }}}}){name}}"#),
+            run_query!(&runner, r#"{findManyBlog(where: { post: { is:{ popularity: { gte: 100 }}}}){name}}"#),
             @r###"{"data":{"findManyBlog":[{"name":"blog 2"},{"name":"blog 3"}]}}"###
         );
 
@@ -73,9 +77,11 @@ mod one_relation {
             @r###"{"data":{"findManyBlog":[{"name":"blog 3"}]}}"###
         );
 
-        insta::assert_snapshot!(
-            run_query!(&runner, r#"{findManyBlog(where: { post: { isNot:{popularity: { gte: 500 }}}}){name}}"#),
-            @r###"{"data":{"findManyBlog":[{"name":"blog 1"},{"name":"blog 2"}]}}"###
+        match_connector_result!(
+            &runner,
+            r#"{findManyBlog(where: { post: { isNot:{ popularity: { gte: 500 }}}}){name}}"#,
+            MongoDb(_) => vec![r#"{"data":{"findManyBlog":[{"name":"blog 1"},{"name":"blog 2"}]}}"#],
+            _ => vec![r#"{"data":{"findManyBlog":[{"name":"blog 1"},{"name":"blog 2"},{"name":"blog 4"}]}}"#]
         );
 
         runner

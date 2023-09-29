@@ -1,7 +1,7 @@
 use super::*;
 use crate::{
     query_ast::*,
-    query_graph::{QueryGraph, QueryGraphDependency},
+    query_graph::{Node, QueryGraph, QueryGraphDependency},
     ArgumentListLookup, FilteredQuery, ParsedField,
 };
 use connector::filter::Filter;
@@ -52,6 +52,7 @@ pub(crate) fn delete_record(
     )?;
 
     graph.add_result_node(&read_node);
+
     Ok(())
 }
 
@@ -62,31 +63,45 @@ pub fn delete_many_records(
     model: Model,
     mut field: ParsedField<'_>,
 ) -> QueryGraphBuilderResult<()> {
-    graph.flag_transactional();
-
     let filter = match field.arguments.lookup(args::WHERE) {
         Some(where_arg) => extract_filter(where_arg.value.try_into()?, &model)?,
         None => Filter::empty(),
     };
 
     let model_id = model.primary_identifier();
-    let read_query = utils::read_ids_infallible(model.clone(), model_id, filter.clone());
-    let record_filter = filter.into();
+    let record_filter = filter.clone().into();
     let delete_many = WriteQuery::DeleteManyRecords(DeleteManyRecords {
         model: model.clone(),
         record_filter,
     });
 
-    let read_query_node = graph.create_node(read_query);
     let delete_many_node = graph.create_node(Query::Write(delete_many));
 
-    utils::insert_emulated_on_delete(graph, query_schema, &model, &read_query_node, &delete_many_node)?;
+    if query_schema.relation_mode().is_prisma() {
+        graph.flag_transactional();
 
-    graph.create_edge(
-        &read_query_node,
-        &delete_many_node,
-        QueryGraphDependency::ExecutionOrder,
-    )?;
+        let read_query = utils::read_ids_infallible(model.clone(), model_id.clone(), filter);
+        let read_query_node = graph.create_node(read_query);
+
+        utils::insert_emulated_on_delete(graph, query_schema, &model, &read_query_node, &delete_many_node)?;
+
+        graph.create_edge(
+            &read_query_node,
+            &delete_many_node,
+            QueryGraphDependency::ProjectedDataDependency(
+                model_id,
+                Box::new(|mut delete_many_node, ids| {
+                    if let Node::Query(Query::Write(WriteQuery::DeleteManyRecords(ref mut dmr))) = delete_many_node {
+                        dmr.record_filter = ids.into();
+                    }
+
+                    Ok(delete_many_node)
+                }),
+            ),
+        )?;
+    }
+
+    graph.add_result_node(&delete_many_node);
 
     Ok(())
 }

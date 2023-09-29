@@ -6,10 +6,7 @@ use async_trait::async_trait;
 use napi::JsObject;
 use psl::datamodel_connector::Flavour;
 use quaint::{
-    connector::{
-        metrics::{self},
-        IsolationLevel, Transaction,
-    },
+    connector::{metrics, IsolationLevel, Transaction},
     error::{Error, ErrorKind},
     prelude::{Query as QuaintQuery, Queryable as QuaintQueryable, ResultSet, TransactionCapable},
     visitor::{self, Visitor},
@@ -112,6 +109,13 @@ impl QuaintQueryable for JsBaseQueryable {
             return Err(Error::builder(ErrorKind::invalid_isolation_level(&isolation_level)).build());
         }
 
+        if self.flavour == Flavour::Sqlite {
+            return match isolation_level {
+                IsolationLevel::Serializable => Ok(()),
+                _ => Err(Error::builder(ErrorKind::invalid_isolation_level(&isolation_level)).build()),
+            };
+        }
+
         self.raw_cmd(&format!("SET TRANSACTION ISOLATION LEVEL {isolation_level}"))
             .await
     }
@@ -146,7 +150,8 @@ impl JsBaseQueryable {
 
         let len = result_set.len();
         let _deserialization_span = info_span!("js:query:result", user_facing = true, "length" = %len).entered();
-        Ok(ResultSet::from(result_set))
+
+        result_set.try_into()
     }
 
     async fn do_execute_raw(&self, sql: &str, params: &[Value<'_>]) -> quaint::Result<u64> {

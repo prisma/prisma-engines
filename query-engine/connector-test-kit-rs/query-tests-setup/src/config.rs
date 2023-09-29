@@ -231,11 +231,15 @@ impl TestConfig {
         }
 
         if self.driver_adapter.is_some() && self.external_test_executor.is_none() {
-            exit_with_message("When using a driver adapter, the external test executor must be set.");
+            exit_with_message(
+                "When using a driver adapter, the external test executor (EXTERNAL_TEST_EXECUTOR env var) must be set.",
+            );
         }
 
         if self.driver_adapter.is_none() && self.driver_adapter_config.is_some() {
-            exit_with_message("When using a driver adapter config, the driver adapter must be set.");
+            exit_with_message(
+                "When using a driver adapter config, the driver adapter (DRIVER_ADAPTER env var) must be set.",
+            );
         }
     }
 

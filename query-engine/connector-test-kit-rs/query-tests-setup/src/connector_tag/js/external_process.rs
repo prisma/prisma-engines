@@ -32,10 +32,22 @@ impl ExecutorProcess {
     fn new() -> Result<ExecutorProcess> {
         let (sender, receiver) = mpsc::channel::<ReqImpl>(300);
 
-        std::thread::spawn(|| match start_rpc_thread(receiver) {
+        let handle = std::thread::spawn(|| match start_rpc_thread(receiver) {
             Ok(()) => (),
             Err(err) => {
                 exit_with_message(1, &err.to_string());
+            }
+        });
+
+        std::thread::spawn(move || {
+            if let Err(e) = handle.join() {
+                exit_with_message(
+                    1,
+                    &format!(
+                        "rpc thread panicked with: {}",
+                        e.downcast::<String>().unwrap_or_default()
+                    ),
+                );
             }
         });
 
@@ -125,7 +137,10 @@ fn start_rpc_thread(mut receiver: mpsc::Receiver<ReqImpl>) -> Result<()> {
                                         let sender = pending_requests.remove(response.id()).unwrap();
                                         match response {
                                             jsonrpc_core::Output::Success(success) => {
-                                                sender.send(success.result).unwrap();
+                                                // The other end may be dropped if the whole
+                                                // request future was dropped and not polled to
+                                                // completion, so we ignore send errors here.
+                                                _ = sender.send(success.result);
                                             }
                                             jsonrpc_core::Output::Failure(err) => {
                                                 panic!("error response from jsonrpc: {err:?}")
