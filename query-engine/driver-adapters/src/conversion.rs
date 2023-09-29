@@ -34,7 +34,7 @@ impl ToNapiValue for JSArg {
             JSArg::Value(v) => ToNapiValue::to_napi_value(env, v),
             JSArg::Buffer(bytes) => ToNapiValue::to_napi_value(
                 env,
-                napi::Env::from_raw(env).create_arraybuffer_with_data(bytes)?.into_raw(),
+                napi::Env::from_raw(env).create_buffer_with_data(bytes)?.into_raw(),
             ),
         }
     }
