@@ -32,7 +32,7 @@ pub(crate) fn create_record(
         });
 
     Insert::from(insert)
-        .returning(selected_fields.as_columns(ctx))
+        .returning(selected_fields.as_columns(ctx).map(|c| c.set_is_selected(true)))
         .append_trace(&Span::current())
         .add_trace_id(ctx.trace_id)
 }
@@ -164,7 +164,7 @@ pub(crate) fn build_update_and_set_query(
     let query = query.append_trace(&Span::current()).add_trace_id(ctx.trace_id);
 
     let query = if let Some(selected_fields) = selected_fields {
-        query.returning(selected_fields.as_columns(ctx))
+        query.returning(selected_fields.as_columns(ctx).map(|c| c.set_is_selected(true)))
     } else {
         query
     };
@@ -190,7 +190,19 @@ pub(crate) fn chunk_update_with_ids(
     Ok(query)
 }
 
-pub(crate) fn delete_many(
+pub(crate) fn delete_many_from_filter(
+    model: &Model,
+    filter_condition: ConditionTree<'static>,
+    ctx: &Context<'_>,
+) -> Query<'static> {
+    Delete::from_table(model.as_table(ctx))
+        .so_that(filter_condition)
+        .append_trace(&Span::current())
+        .add_trace_id(ctx.trace_id)
+        .into()
+}
+
+pub(crate) fn delete_many_from_ids_and_filter(
     model: &Model,
     ids: &[&SelectionResult],
     filter_condition: ConditionTree<'static>,
@@ -201,10 +213,7 @@ pub(crate) fn delete_many(
         .collect();
 
     super::chunked_conditions(&columns, ids, |conditions| {
-        Delete::from_table(model.as_table(ctx))
-            .so_that(conditions.and(filter_condition.clone()))
-            .append_trace(&Span::current())
-            .add_trace_id(ctx.trace_id)
+        delete_many_from_filter(model, conditions.and(filter_condition.clone()), ctx)
     })
 }
 

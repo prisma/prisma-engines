@@ -203,7 +203,7 @@ test_type!(blob(mysql, "blob", Value::Bytes(None), Value::bytes(vec![1, 2, 3])))
 test_type!(enum(
     mysql,
     "enum('pollicle_dogs','jellicle_cats')",
-    Value::Enum(None),
+    Value::Enum(None, None),
     Value::enum_variant("jellicle_cats"),
     Value::enum_variant("pollicle_dogs")
 ));

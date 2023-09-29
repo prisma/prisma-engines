@@ -148,10 +148,35 @@ pub trait Visitor<'a> {
     #[cfg(any(feature = "postgresql", feature = "mysql"))]
     fn visit_text_search_relevance(&mut self, text_search_relevance: TextSearchRelevance<'a>) -> Result;
 
+    fn visit_parameterized_enum(&mut self, variant: EnumVariant<'a>, name: Option<EnumName<'a>>) -> Result {
+        self.add_parameter(Value::Enum(Some(variant), name));
+        self.parameter_substitution()?;
+
+        Ok(())
+    }
+
+    fn visit_parameterized_enum_array(&mut self, variants: Vec<EnumVariant<'a>>, name: Option<EnumName<'a>>) -> Result {
+        let enum_variants: Vec<_> = variants
+            .into_iter()
+            .map(|variant| variant.into_enum(name.clone()))
+            .collect();
+
+        self.add_parameter(Value::Array(Some(enum_variants)));
+        self.parameter_substitution()?;
+
+        Ok(())
+    }
+
     /// A visit to a value we parameterize
     fn visit_parameterized(&mut self, value: Value<'a>) -> Result {
-        self.add_parameter(value);
-        self.parameter_substitution()
+        match value {
+            Value::Enum(Some(variant), name) => self.visit_parameterized_enum(variant, name),
+            Value::EnumArray(Some(variants), name) => self.visit_parameterized_enum_array(variants, name),
+            _ => {
+                self.add_parameter(value);
+                self.parameter_substitution()
+            }
+        }
     }
 
     /// The join statements in the query

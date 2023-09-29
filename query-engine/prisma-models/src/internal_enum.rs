@@ -9,6 +9,10 @@ impl InternalEnum {
     pub fn name(&self) -> &str {
         self.dm.walk(self.id).name()
     }
+
+    pub fn db_name(&self) -> &str {
+        self.dm.walk(self.id).database_name()
+    }
 }
 
 impl std::fmt::Debug for InternalEnum {

@@ -159,8 +159,13 @@ pub enum ColumnType {
     /// This is currently unhandled, and will panic if encountered.
     Set = 14,
 
-    // Below there are custom types that don't have a 1:1 translation with a quaint::Value.
-    // enum variant.
+    /// UUID from postgres-flavored driver adapters is mapped to this type.
+    Uuid = 15,
+
+    /*
+     * Below there are custom types that don't have a 1:1 translation with a quaint::Value.
+     * enum variant.
+     */
     /// UnknownNumber is used when the type of the column is a number but of unknown particular type
     /// and precision.
     ///
@@ -345,7 +350,7 @@ fn js_value_to_quaint(
         }
         ColumnType::Enum => match json_value {
             serde_json::Value::String(s) => Ok(QuaintValue::enum_variant(s)),
-            serde_json::Value::Null => Ok(QuaintValue::Enum(None)),
+            serde_json::Value::Null => Ok(QuaintValue::Enum(None, None)),
             mismatch => Err(conversion_error!(
                 "expected a string in column {column_name}, found {mismatch}"
             )),
@@ -361,6 +366,15 @@ fn js_value_to_quaint(
             serde_json::Value::Null => Ok(QuaintValue::Bytes(None)),
             mismatch => Err(conversion_error!(
                 "expected a string or an array in column {column_name}, found {mismatch}",
+            )),
+        },
+        ColumnType::Uuid => match json_value {
+            serde_json::Value::String(s) => uuid::Uuid::parse_str(&s)
+                .map(QuaintValue::uuid)
+                .map_err(|_| conversion_error!("Expected a UUID string")),
+            serde_json::Value::Null => Ok(QuaintValue::Bytes(None)),
+            mismatch => Err(conversion_error!(
+                "Expected a UUID string in column {column_name}, found {mismatch}"
             )),
         },
         ColumnType::UnknownNumber => match json_value {
@@ -803,11 +817,12 @@ mod proxy_test {
         let column_type = ColumnType::Enum;
 
         // null
-        test_null(QuaintValue::Enum(None), column_type);
+        test_null(QuaintValue::Enum(None, None), column_type);
 
         let s = "some enum variant";
         let json_value = serde_json::Value::String(s.to_string());
+
         let quaint_value = js_value_to_quaint(json_value, column_type, "column_name").unwrap();
-        assert_eq!(quaint_value, QuaintValue::Enum(Some(s.into())));
+        assert_eq!(quaint_value, QuaintValue::Enum(Some(s.into()), None));
     }
 }

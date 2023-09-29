@@ -245,7 +245,7 @@ fn enum_defaults_must_work(api: TestApi) {
     assert_eq!(row.get("id").unwrap().to_string().unwrap(), "the-id");
     assert_eq!(
         match row.get("mood").unwrap() {
-            quaint::Value::Enum(Some(enm)) => enm.as_ref(),
+            quaint::Value::Enum(Some(enm), _) => enm.as_ref(),
             quaint::Value::Text(Some(enm)) => enm.as_ref(),
             _ => panic!("mood is not an enum value"),
         },
@@ -253,7 +253,7 @@ fn enum_defaults_must_work(api: TestApi) {
     );
     assert_eq!(
         match row.get("previousMood").unwrap() {
-            quaint::Value::Enum(Some(enm)) => enm.as_ref(),
+            quaint::Value::Enum(Some(enm), _) => enm.as_ref(),
             quaint::Value::Text(Some(enm)) => enm.as_ref(),
             _ => panic!("previousMood is not an enum value"),
         },

@@ -1663,15 +1663,27 @@ async fn enum_values(api: &mut dyn TestApi) -> crate::Result<()> {
         .await?;
 
     api.conn()
-        .insert(Insert::single_into(&table).value("value", "A").into())
+        .insert(
+            Insert::single_into(&table)
+                .value("value", Value::enum_variant_with_name("A", &type_name))
+                .into(),
+        )
         .await?;
 
     api.conn()
-        .insert(Insert::single_into(&table).value("value", "B").into())
+        .insert(
+            Insert::single_into(&table)
+                .value("value", Value::enum_variant_with_name("B", &type_name))
+                .into(),
+        )
         .await?;
 
     api.conn()
-        .insert(Insert::single_into(&table).value("value", Value::Enum(None)).into())
+        .insert(
+            Insert::single_into(&table)
+                .value("value", Value::Enum(None, None))
+                .into(),
+        )
         .await?;
 
     let select = Select::from_table(&table).column("value").order_by("id".ascend());
@@ -1684,7 +1696,7 @@ async fn enum_values(api: &mut dyn TestApi) -> crate::Result<()> {
     assert_eq!(Some(&Value::enum_variant("B")), row.at(0));
 
     let row = res.get(2).unwrap();
-    assert_eq!(Some(&Value::Enum(None)), row.at(0));
+    assert_eq!(Some(&Value::Enum(None, None)), row.at(0));
 
     Ok(())
 }

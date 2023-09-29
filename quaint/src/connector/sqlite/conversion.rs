@@ -251,11 +251,11 @@ impl<'a> ToSql for Value<'a> {
             Value::Float(float) => float.map(|f| f as f64).map(ToSqlOutput::from),
             Value::Double(double) => double.map(ToSqlOutput::from),
             Value::Text(cow) => cow.as_ref().map(|cow| ToSqlOutput::from(cow.as_ref())),
-            Value::Enum(cow) => cow.as_ref().map(|cow| ToSqlOutput::from(cow.as_ref())),
+            Value::Enum(cow, _) => cow.as_ref().map(|cow| ToSqlOutput::from(cow.as_ref())),
             Value::Boolean(boo) => boo.map(ToSqlOutput::from),
             Value::Char(c) => c.map(|c| ToSqlOutput::from(c as u8)),
             Value::Bytes(bytes) => bytes.as_ref().map(|bytes| ToSqlOutput::from(bytes.as_ref())),
-            Value::Array(_) => {
+            Value::Array(_) | Value::EnumArray(_, _) => {
                 let msg = "Arrays are not supported in SQLite.";
                 let kind = ErrorKind::conversion(msg);
 
