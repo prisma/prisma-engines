@@ -62,7 +62,7 @@ impl<'a> Visitor<'a> for Postgres<'a> {
                 s.write("::text")?;
                 s.write(" AS ")?;
                 if let Some(schema_name) = enum_name.schema_name {
-                    s.write(schema_name.deref())?;
+                    s.surround_with_backticks(schema_name.deref())?;
                     s.write(".")?
                 }
                 s.surround_with_backticks(enum_name.name.deref())
@@ -101,7 +101,7 @@ impl<'a> Visitor<'a> for Postgres<'a> {
 
             self.write("::")?;
             if let Some(schema_name) = enum_name.schema_name {
-                self.write(schema_name.deref())?;
+                self.surround_with_backticks(schema_name.deref())?;
                 self.write(".")?
             }
             self.surround_with_backticks(enum_name.name.deref())?;
@@ -221,7 +221,7 @@ impl<'a> Visitor<'a> for Postgres<'a> {
                 if let Some(enum_name) = name {
                     self.write("::")?;
                     if let Some(schema_name) = enum_name.schema_name {
-                        self.write(schema_name.deref())?;
+                        self.surround_with_backticks(schema_name.deref())?;
                         self.write(".")?
                     }
                     self.surround_with_backticks(enum_name.name.deref())?;
