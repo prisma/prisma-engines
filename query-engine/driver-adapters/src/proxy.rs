@@ -373,7 +373,9 @@ fn js_value_to_quaint(
                 .map(QuaintValue::uuid)
                 .map_err(|_| conversion_error!("Expected a UUID string")),
             serde_json::Value::Null => Ok(QuaintValue::Bytes(None)),
-            mismatch => Err(conversion_error!("Expected a UUID string in column {}, found {}", column_name, mismatch)),
+            mismatch => Err(conversion_error!(
+                "Expected a UUID string in column {column_name}, found {mismatch}"
+            )),
         },
         ColumnType::UnknownNumber => match json_value {
             serde_json::Value::Number(n) => n
