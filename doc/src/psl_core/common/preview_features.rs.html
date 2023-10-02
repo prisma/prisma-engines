@@ -166,7 +166,6 @@
 <a href="#166" id="166">166</a>
 <a href="#167" id="167">167</a>
 <a href="#168" id="168">168</a>
-<a href="#169" id="169">169</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>serde::{Serialize, Serializer};
 <span class="kw">use </span>std::fmt;
 
@@ -214,6 +213,7 @@
     DataProxy,
     Deno,
     Distinct,
+    DriverAdapters,
     ExtendedIndexes,
     ExtendedWhereUnique,
     FieldReference,
@@ -233,7 +233,6 @@
     NamedConstraints,
     NApi,
     NativeTypes,
-    DriverAdapters,
     OrderByAggregateGroup,
     OrderByNulls,
     OrderByRelation,
@@ -251,6 +250,7 @@
 </span><span class="kw">pub const </span>ALL_PREVIEW_FEATURES: FeatureMap = FeatureMap {
     active: <span class="macro">enumflags2::make_bitflags!</span>(PreviewFeature::{
         Deno
+         | DriverAdapters
          | FullTextIndex
          | FullTextSearch
          | Metrics
@@ -292,9 +292,7 @@
         | TransactionApi
         | UncheckedScalarInputs
     }),
-    hidden: <span class="macro">enumflags2::make_bitflags!</span>(PreviewFeature::{
-        DriverAdapters
-    }),
+    hidden: enumflags2::BitFlags::EMPTY,
 };
 
 <span class="attr">#[derive(Debug)]
