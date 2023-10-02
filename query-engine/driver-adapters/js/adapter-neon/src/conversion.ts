@@ -43,6 +43,7 @@ export function fieldToColumnType(fieldTypeId: number): ColumnType {
     case NeonColumnType['VARBIT']:
     case NeonColumnType['INET']:
     case NeonColumnType['CIDR']:
+    case NeonColumnType['XML']:
       return ColumnTypeEnum.Text
     default:
       if (fieldTypeId >= 10000) {
