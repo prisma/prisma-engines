@@ -1178,7 +1178,7 @@ mod tests {
             let result_set = client.query_raw("SHOW search_path", &[]).await.unwrap();
             let row = result_set.first().unwrap();
 
-            row[0].to_string()
+            row[0].typed.to_string()
         }
 
         // Safe
@@ -1230,7 +1230,7 @@ mod tests {
             let result_set = client.query_raw("SHOW search_path", &[]).await.unwrap();
             let row = result_set.first().unwrap();
 
-            row[0].to_string()
+            row[0].typed.to_string()
         }
 
         // Safe
@@ -1281,7 +1281,7 @@ mod tests {
             let result_set = client.query_raw("SHOW search_path", &[]).await.unwrap();
             let row = result_set.first().unwrap();
 
-            row[0].to_string()
+            row[0].typed.to_string()
         }
 
         // Safe
@@ -1332,7 +1332,7 @@ mod tests {
             let result_set = client.query_raw("SHOW search_path", &[]).await.unwrap();
             let row = result_set.first().unwrap();
 
-            row[0].to_string()
+            row[0].typed.to_string()
         }
 
         // Safe
@@ -1383,7 +1383,7 @@ mod tests {
             let result_set = client.query_raw("SHOW search_path", &[]).await.unwrap();
             let row = result_set.first().unwrap();
 
-            row[0].to_string()
+            row[0].typed.to_string()
         }
 
         // Safe

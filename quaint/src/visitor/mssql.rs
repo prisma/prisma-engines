@@ -753,7 +753,7 @@ mod tests {
         let (sql, params) = Mssql::build(query).unwrap();
 
         assert_eq!(expected_sql, sql);
-        assert_eq!(vec![ValueType::Int32(None)], params);
+        assert_eq!(vec![ValueType::Int32(None).into_value()], params);
     }
 
     #[test]

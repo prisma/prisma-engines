@@ -6,7 +6,7 @@ use std::str::FromStr;
 test_type!(numeric(
     mssql,
     "numeric(10,2)",
-    ValueInner::Numeric(None),
+    ValueType::Numeric(None).into_value(),
     Value::numeric(BigDecimal::from_str("3.14")?)
 ));
 
@@ -148,21 +148,21 @@ test_type!(numeric_38_6(
 test_type!(money(
     mssql,
     "money",
-    (ValueInner::Numeric(None), ValueInner::Double(None)),
+    (ValueType::Numeric(None).into_value(), ValueType::Double(None).into_value()),
     (Value::numeric(BigDecimal::from_str("3.14")?), Value::double(3.14))
 ));
 
 test_type!(smallmoney(
     mssql,
     "smallmoney",
-    (ValueInner::Numeric(None), ValueInner::Double(None)),
+    (ValueType::Numeric(None).into_value(), ValueType::Double(None).into_value()),
     (Value::numeric(BigDecimal::from_str("3.14")?), Value::double(3.14))
 ));
 
 test_type!(float_24(
     mssql,
     "float(24)",
-    (ValueInner::Numeric(None), ValueInner::Float(None)),
+    (ValueType::Numeric(None).into_value(), ValueType::Float(None).into_value()),
     (
         Value::numeric(BigDecimal::from_str("1.123456")?),
         Value::float(1.123456)
@@ -172,7 +172,7 @@ test_type!(float_24(
 test_type!(real(
     mssql,
     "real",
-    (ValueInner::Numeric(None), ValueInner::Float(None)),
+    (ValueType::Numeric(None).into_value(), ValueType::Float(None).into_value()),
     (
         Value::numeric(BigDecimal::from_str("1.123456")?),
         Value::float(1.123456)
@@ -182,7 +182,7 @@ test_type!(real(
 test_type!(float_53(
     mssql,
     "float(53)",
-    (ValueInner::Numeric(None), ValueInner::Double(None)),
+    (ValueType::Numeric(None).into_value(), ValueType::Double(None).into_value()),
     (
         Value::numeric(BigDecimal::from_str("1.123456789012345")?),
         Value::double(1.123456789012345)

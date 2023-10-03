@@ -9,7 +9,7 @@ use std::str::FromStr;
 test_type!(integer(
     sqlite,
     "INTEGER",
-    ValueInner::Int32(None),
+    ValueType::Int32(None).into_value(),
     Value::int32(i8::MIN),
     Value::int32(i8::MAX),
     Value::int32(i16::MIN),
@@ -21,18 +21,18 @@ test_type!(integer(
 test_type!(big_int(
     sqlite,
     "BIGINT",
-    ValueInner::Int64(None),
+    ValueType::Int64(None).into_value(),
     Value::int64(i64::MIN),
     Value::int64(i64::MAX),
 ));
 
-test_type!(real(sqlite, "REAL", ValueInner::Double(None), Value::double(1.12345)));
+test_type!(real(sqlite, "REAL", ValueType::Double(None).into_value(), Value::double(1.12345)));
 
 #[cfg(feature = "bigdecimal")]
 test_type!(float_decimal(
     sqlite,
     "FLOAT",
-    (ValueInner::Numeric(None), ValueInner::Float(None)),
+    (ValueType::Numeric(None).into_value(), ValueType::Float(None).into_value()),
     (
         Value::numeric(bigdecimal::BigDecimal::from_str("3.14").unwrap()),
         Value::double(3.14)
@@ -43,7 +43,7 @@ test_type!(float_decimal(
 test_type!(double_decimal(
     sqlite,
     "DOUBLE",
-    (ValueInner::Numeric(None), ValueInner::Double(None)),
+    (ValueType::Numeric(None).into_value(), ValueType::Double(None).into_value()),
     (
         Value::numeric(bigdecimal::BigDecimal::from_str("3.14").unwrap()),
         Value::double(3.14)
@@ -53,30 +53,30 @@ test_type!(double_decimal(
 test_type!(text(
     sqlite,
     "TEXT",
-    ValueInner::Text(None),
+    ValueType::Text(None).into_value(),
     Value::text("foobar huhuu")
 ));
 
 test_type!(blob(
     sqlite,
     "BLOB",
-    ValueInner::Bytes(None),
+    ValueType::Bytes(None).into_value(),
     Value::bytes(b"DEADBEEF".to_vec())
 ));
 
-test_type!(float(sqlite, "FLOAT", ValueInner::Float(None), Value::double(1.23)));
+test_type!(float(sqlite, "FLOAT", ValueType::Float(None).into_value(), Value::double(1.23)));
 
 test_type!(double(
     sqlite,
     "DOUBLE",
-    ValueInner::Double(None),
+    ValueType::Double(None).into_value(),
     Value::double(1.2312313213)
 ));
 
 test_type!(boolean(
     sqlite,
     "BOOLEAN",
-    ValueInner::Boolean(None),
+    ValueType::Boolean(None).into_value(),
     Value::boolean(true),
     Value::boolean(false)
 ));
@@ -84,14 +84,14 @@ test_type!(boolean(
 test_type!(date(
     sqlite,
     "DATE",
-    ValueInner::Date(None),
+    ValueType::Date(None).into_value(),
     Value::date(chrono::NaiveDate::from_ymd_opt(1984, 1, 1).unwrap())
 ));
 
 test_type!(datetime(
     sqlite,
     "DATETIME",
-    ValueInner::DateTime(None),
+    ValueType::DateTime(None).into_value(),
     Value::datetime(chrono::DateTime::from_str("2020-07-29T09:23:44.458Z").unwrap())
 ));
 

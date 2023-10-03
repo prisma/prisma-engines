@@ -391,8 +391,8 @@ mod tests {
     use crate::{val, visitor::*};
 
     fn expected_values<'a, T>(sql: &'static str, params: Vec<T>) -> (String, Vec<Value<'a>>)
-    where
-        T: Into<Value<'a>>,
+        where
+            T: Into<Value<'a>>,
     {
         (String::from(sql), params.into_iter().map(|p| p.into()).collect())
     }
@@ -432,11 +432,11 @@ mod tests {
     #[test]
     fn test_aliased_null() {
         let expected_sql = "SELECT ? AS `test`";
-        let query = Select::default().value(val!(ValueType::Text(None)).alias("test"));
+        let query = Select::default().value(val!(ValueType::Text(None).into_value()).alias("test"));
         let (sql, params) = Sqlite::build(query).unwrap();
 
         assert_eq!(expected_sql, sql);
-        assert_eq!(vec![ValueType::Text(None)], params);
+        assert_eq!(vec![ValueType::Text(None).into_value()], params);
     }
 
     #[test]
@@ -460,12 +460,7 @@ mod tests {
 
         assert_eq!(expected_sql, sql);
         assert_eq!(
-            vec![
-                ValueType::int32(1),
-                ValueType::int32(2),
-                ValueType::int32(3),
-                ValueType::int32(4),
-            ],
+            vec![Value::int32(1), Value::int32(2), Value::int32(3), Value::int32(4),],
             params
         );
     }
@@ -482,12 +477,7 @@ mod tests {
 
         assert_eq!(expected_sql, sql);
         assert_eq!(
-            vec![
-                ValueType::int32(1),
-                ValueType::int32(2),
-                ValueType::int32(3),
-                ValueType::int32(4),
-            ],
+            vec![Value::int32(1), Value::int32(2), Value::int32(3), Value::int32(4),],
             params
         );
     }
@@ -515,7 +505,7 @@ mod tests {
         let expected_sql = "SELECT `test`.* FROM `test` WHERE `id1` IN (?,?)";
 
         assert_eq!(expected_sql, sql);
-        assert_eq!(vec![ValueType::int32(1), ValueType::int32(2),], params)
+        assert_eq!(vec![Value::int32(1), Value::int32(2),], params)
     }
 
     #[test]
@@ -625,7 +615,7 @@ mod tests {
     fn test_select_and() {
         let expected_sql = "SELECT `naukio`.* FROM `naukio` WHERE (`word` = ? AND `age` < ? AND `paw` = ?)";
 
-        let expected_params = vec![ValueType::text("meow"), ValueType::int32(10), ValueType::text("warm")];
+        let expected_params = vec![Value::text("meow"), Value::int32(10), Value::text("warm")];
 
         let conditions = "word".equals("meow").and("age".less_than(10)).and("paw".equals("warm"));
 
@@ -641,7 +631,7 @@ mod tests {
     fn test_select_and_different_execution_order() {
         let expected_sql = "SELECT `naukio`.* FROM `naukio` WHERE (`word` = ? AND (`age` < ? AND `paw` = ?))";
 
-        let expected_params = vec![ValueType::text("meow"), ValueType::int32(10), ValueType::text("warm")];
+        let expected_params = vec![Value::text("meow"), Value::int32(10), Value::text("warm")];
 
         let conditions = "word".equals("meow").and("age".less_than(10).and("paw".equals("warm")));
 
@@ -657,7 +647,7 @@ mod tests {
     fn test_select_or() {
         let expected_sql = "SELECT `naukio`.* FROM `naukio` WHERE ((`word` = ? OR `age` < ?) AND `paw` = ?)";
 
-        let expected_params = vec![ValueType::text("meow"), ValueType::int32(10), ValueType::text("warm")];
+        let expected_params = vec![Value::text("meow"), Value::int32(10), Value::text("warm")];
 
         let conditions = "word".equals("meow").or("age".less_than(10)).and("paw".equals("warm"));
 
@@ -673,7 +663,7 @@ mod tests {
     fn test_select_negation() {
         let expected_sql = "SELECT `naukio`.* FROM `naukio` WHERE (NOT ((`word` = ? OR `age` < ?) AND `paw` = ?))";
 
-        let expected_params = vec![ValueType::text("meow"), ValueType::int32(10), ValueType::text("warm")];
+        let expected_params = vec![Value::text("meow"), Value::int32(10), Value::text("warm")];
 
         let conditions = "word"
             .equals("meow")
@@ -693,7 +683,7 @@ mod tests {
     fn test_with_raw_condition_tree() {
         let expected_sql = "SELECT `naukio`.* FROM `naukio` WHERE (NOT ((`word` = ? OR `age` < ?) AND `paw` = ?))";
 
-        let expected_params = vec![ValueType::text("meow"), ValueType::int32(10), ValueType::text("warm")];
+        let expected_params = vec![Value::text("meow"), Value::int32(10), Value::text("warm")];
 
         let conditions = ConditionTree::not("word".equals("meow").or("age".less_than(10)).and("paw".equals("warm")));
         let query = Select::from_table("naukio").so_that(conditions);
@@ -729,7 +719,7 @@ mod tests {
         let (sql, params) = Sqlite::build(query).unwrap();
 
         assert_eq!(expected_sql, sql);
-        assert_eq!(default_params(vec![ValueType::boolean(true),]), params);
+        assert_eq!(default_params(vec![Value::boolean(true),]), params);
     }
 
     #[test]
@@ -757,7 +747,7 @@ mod tests {
         let (sql, params) = Sqlite::build(query).unwrap();
 
         assert_eq!(expected_sql, sql);
-        assert_eq!(default_params(vec![ValueType::boolean(true),]), params);
+        assert_eq!(default_params(vec![Value::boolean(true),]), params);
     }
 
     #[test]
@@ -871,7 +861,7 @@ mod tests {
 
     #[test]
     fn test_raw_null() {
-        let (sql, params) = Sqlite::build(Select::default().value(ValueType::Text(None).raw())).unwrap();
+        let (sql, params) = Sqlite::build(Select::default().value(ValueType::Text(None).into_value().raw())).unwrap();
         assert_eq!("SELECT null", sql);
         assert!(params.is_empty());
     }
@@ -899,7 +889,7 @@ mod tests {
 
     #[test]
     fn test_raw_bytes() {
-        let (sql, params) = Sqlite::build(Select::default().value(ValueType::bytes(vec![1, 2, 3]).raw())).unwrap();
+        let (sql, params) = Sqlite::build(Select::default().value(Value::bytes(vec![1, 2, 3]).raw())).unwrap();
         assert_eq!("SELECT x'010203'", sql);
         assert!(params.is_empty());
     }
@@ -917,7 +907,7 @@ mod tests {
 
     #[test]
     fn test_raw_char() {
-        let (sql, params) = Sqlite::build(Select::default().value(ValueType::character('a').raw())).unwrap();
+        let (sql, params) = Sqlite::build(Select::default().value(Value::character('a').raw())).unwrap();
         assert_eq!("SELECT 'a'", sql);
         assert!(params.is_empty());
     }

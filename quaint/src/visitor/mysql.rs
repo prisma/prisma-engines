@@ -433,27 +433,27 @@ impl<'a> Visitor<'a> for Mysql<'a> {
 
         match json_type {
             JsonType::Array => {
-                self.visit_expression(Value::text("ARRAY").into())?;
+                self.visit_expression(Expression::from(Value::text("ARRAY")))?;
             }
             JsonType::Boolean => {
-                self.visit_expression(Value::text("BOOLEAN").into())?;
+                self.visit_expression(Expression::from(Value::text("BOOLEAN")))?;
             }
             JsonType::Number => {
-                self.visit_expression(Value::text("INTEGER").into())?;
+                self.visit_expression(Expression::from(Value::text("INTEGER")))?;
                 self.write(" OR JSON_TYPE(")?;
                 self.visit_expression(left)?;
                 self.write(")")?;
                 self.write(" = ")?;
-                self.visit_expression(Value::text("DOUBLE").into())?;
+                self.visit_expression(Expression::from(Value::text("DOUBLE")))?;
             }
             JsonType::Object => {
-                self.visit_expression(Value::text("OBJECT").into())?;
+                self.visit_expression(Expression::from(Value::text("OBJECT")))?;
             }
             JsonType::String => {
-                self.visit_expression(Value::text("STRING").into())?;
+                self.visit_expression(Expression::from(Value::text("STRING")))?;
             }
             JsonType::Null => {
-                self.visit_expression(Value::text("NULL").into())?;
+                self.visit_expression(Expression::from(Value::text("NULL")))?;
             }
             JsonType::ColumnRef(column) => {
                 self.write("JSON_TYPE")?;
@@ -909,7 +909,7 @@ mod tests {
     #[test]
 
     fn test_json_negation() {
-        let conditions = ConditionTree::not("json".equals(ValueType::Json(Some(serde_json::ValueInner::Null))));
+        let conditions = ConditionTree::not("json".equals(ValueType::Json(Some(serde_json::Value::Null))));
         let (sql, _) = Mysql::build(Select::from_table("test").so_that(conditions)).unwrap();
 
         assert_eq!(
@@ -921,7 +921,7 @@ mod tests {
     #[test]
 
     fn test_json_not_negation() {
-        let conditions = ConditionTree::not("json".not_equals(ValueType::Json(Some(serde_json::ValueInner::Null))));
+        let conditions = ConditionTree::not("json".not_equals(ValueType::Json(Some(serde_json::Value::Null))));
         let (sql, _) = Mysql::build(Select::from_table("test").so_that(conditions)).unwrap();
 
         assert_eq!(
