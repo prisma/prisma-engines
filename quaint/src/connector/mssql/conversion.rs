@@ -1,4 +1,4 @@
-use crate::ast::Value;
+use crate::ast::{Value, ValueInner};
 #[cfg(not(feature = "bigdecimal"))]
 use crate::error::*;
 #[cfg(feature = "bigdecimal")]
@@ -10,26 +10,26 @@ use tiberius::{ColumnData, FromSql, IntoSql};
 
 impl<'a> IntoSql<'a> for &'a Value<'a> {
     fn into_sql(self) -> ColumnData<'a> {
-        match self {
-            Value::Int32(val) => val.into_sql(),
-            Value::Int64(val) => val.into_sql(),
-            Value::Float(val) => val.into_sql(),
-            Value::Double(val) => val.into_sql(),
-            Value::Text(val) => val.as_deref().into_sql(),
-            Value::Bytes(val) => val.as_deref().into_sql(),
-            Value::Enum(val, _) => val.as_deref().into_sql(),
-            Value::Boolean(val) => val.into_sql(),
-            Value::Char(val) => val.as_ref().map(|val| format!("{val}")).into_sql(),
-            Value::Xml(val) => val.as_deref().into_sql(),
-            Value::Array(_) | Value::EnumArray(_, _) => panic!("Arrays are not supported on SQL Server."),
+        match &self.inner {
+            ValueInner::Int32(val) => val.into_sql(),
+            ValueInner::Int64(val) => val.into_sql(),
+            ValueInner::Float(val) => val.into_sql(),
+            ValueInner::Double(val) => val.into_sql(),
+            ValueInner::Text(val) => val.as_deref().into_sql(),
+            ValueInner::Bytes(val) => val.as_deref().into_sql(),
+            ValueInner::Enum(val, _) => val.as_deref().into_sql(),
+            ValueInner::Boolean(val) => val.into_sql(),
+            ValueInner::Char(val) => val.as_ref().map(|val| format!("{val}")).into_sql(),
+            ValueInner::Xml(val) => val.as_deref().into_sql(),
+            ValueInner::Array(_) | ValueInner::EnumArray(_, _) => panic!("Arrays are not supported on SQL Server."),
             #[cfg(feature = "bigdecimal")]
-            Value::Numeric(val) => (*val).to_sql(),
-            Value::Json(val) => val.as_ref().map(|val| serde_json::to_string(&val).unwrap()).into_sql(),
+            ValueInner::Numeric(val) => (*val).to_sql(),
+            ValueInner::Json(val) => val.as_ref().map(|val| serde_json::to_string(&val).unwrap()).into_sql(),
             #[cfg(feature = "uuid")]
-            Value::Uuid(val) => val.into_sql(),
-            Value::DateTime(val) => val.into_sql(),
-            Value::Date(val) => val.into_sql(),
-            Value::Time(val) => val.into_sql(),
+            ValueInner::Uuid(val) => val.into_sql(),
+            ValueInner::DateTime(val) => val.into_sql(),
+            ValueInner::Date(val) => val.into_sql(),
+            ValueInner::Time(val) => val.into_sql(),
         }
     }
 }
@@ -39,18 +39,18 @@ impl TryFrom<ColumnData<'static>> for Value<'static> {
 
     fn try_from(cd: ColumnData<'static>) -> crate::Result<Self> {
         let res = match cd {
-            ColumnData::U8(num) => Value::Int32(num.map(i32::from)),
-            ColumnData::I16(num) => Value::Int32(num.map(i32::from)),
-            ColumnData::I32(num) => Value::Int32(num.map(i32::from)),
-            ColumnData::I64(num) => Value::Int64(num.map(i64::from)),
-            ColumnData::F32(num) => Value::Float(num),
-            ColumnData::F64(num) => Value::Double(num),
-            ColumnData::Bit(b) => Value::Boolean(b),
-            ColumnData::String(s) => Value::Text(s),
-            ColumnData::Guid(uuid) => Value::Uuid(uuid),
-            ColumnData::Binary(bytes) => Value::Bytes(bytes),
+            ColumnData::U8(num) => ValueInner::Int32(num.map(i32::from)),
+            ColumnData::I16(num) => ValueInner::Int32(num.map(i32::from)),
+            ColumnData::I32(num) => ValueInner::Int32(num.map(i32::from)),
+            ColumnData::I64(num) => ValueInner::Int64(num.map(i64::from)),
+            ColumnData::F32(num) => ValueInner::Float(num),
+            ColumnData::F64(num) => ValueInner::Double(num),
+            ColumnData::Bit(b) => ValueInner::Boolean(b),
+            ColumnData::String(s) => ValueInner::Text(s),
+            ColumnData::Guid(uuid) => ValueInner::Uuid(uuid),
+            ColumnData::Binary(bytes) => ValueInner::Bytes(bytes),
             #[cfg(feature = "bigdecimal")]
-            numeric @ ColumnData::Numeric(_) => Value::Numeric(BigDecimal::from_sql(&numeric)?),
+            numeric @ ColumnData::Numeric(_) => ValueInner::Numeric(BigDecimal::from_sql(&numeric)?),
             #[cfg(not(feature = "bigdecimal"))]
             _numeric @ ColumnData::Numeric(_) => {
                 let kind = ErrorKind::conversion("Please enable `bigdecimal` feature to read numeric values");
@@ -60,38 +60,40 @@ impl TryFrom<ColumnData<'static>> for Value<'static> {
                 use tiberius::time::chrono::{DateTime, NaiveDateTime, Utc};
 
                 let dt = NaiveDateTime::from_sql(&dt)?.map(|dt| DateTime::<Utc>::from_utc(dt, Utc));
-                Value::DateTime(dt)
+                ValueInner::DateTime(dt)
             }
             dt @ ColumnData::SmallDateTime(_) => {
                 use tiberius::time::chrono::{DateTime, NaiveDateTime, Utc};
 
                 let dt = NaiveDateTime::from_sql(&dt)?.map(|dt| DateTime::<Utc>::from_utc(dt, Utc));
-                Value::DateTime(dt)
+                ValueInner::DateTime(dt)
             }
             dt @ ColumnData::Time(_) => {
                 use tiberius::time::chrono::NaiveTime;
 
-                Value::Time(NaiveTime::from_sql(&dt)?)
+                ValueInner::Time(NaiveTime::from_sql(&dt)?)
             }
             dt @ ColumnData::Date(_) => {
                 use tiberius::time::chrono::NaiveDate;
-                Value::Date(NaiveDate::from_sql(&dt)?)
+                ValueInner::Date(NaiveDate::from_sql(&dt)?)
             }
             dt @ ColumnData::DateTime2(_) => {
                 use tiberius::time::chrono::{DateTime, NaiveDateTime, Utc};
 
                 let dt = NaiveDateTime::from_sql(&dt)?.map(|dt| DateTime::<Utc>::from_utc(dt, Utc));
 
-                Value::DateTime(dt)
+                ValueInner::DateTime(dt)
             }
             dt @ ColumnData::DateTimeOffset(_) => {
                 use tiberius::time::chrono::{DateTime, Utc};
 
-                Value::DateTime(DateTime::<Utc>::from_sql(&dt)?)
+                ValueInner::DateTime(DateTime::<Utc>::from_sql(&dt)?)
             }
-            ColumnData::Xml(cow) => Value::Xml(cow.map(|xml_data| Cow::Owned(xml_data.into_owned().into_string()))),
+            ColumnData::Xml(cow) => {
+                ValueInner::Xml(cow.map(|xml_data| Cow::Owned(xml_data.into_owned().into_string())))
+            }
         };
 
-        Ok(res)
+        Ok(Value::from(res))
     }
 }

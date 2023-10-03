@@ -91,7 +91,7 @@ macro_rules! value {
         impl<'a> From<$kind> for crate::ast::Value<'a> {
             fn from(that: $kind) -> Self {
                 let $target = that;
-                crate::ast::Value::$paramkind(Some($that))
+                crate::ast::ValueInner::$paramkind(Some($that)).into()
             }
         }
 
@@ -99,7 +99,7 @@ macro_rules! value {
             fn from(that: Option<$kind>) -> Self {
                 match that {
                     Some(val) => crate::ast::Value::from(val),
-                    None => crate::ast::Value::$paramkind(None),
+                    None => crate::ast::ValueInner::$paramkind(None).into(),
                 }
             }
         }

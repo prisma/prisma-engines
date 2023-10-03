@@ -6,3 +6,4 @@
 docker-compose.override.yml
 db/
 !db/.gitkeep
+target-alternatives/

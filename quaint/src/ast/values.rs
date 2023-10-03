@@ -5,6 +5,7 @@ use crate::error::{Error, ErrorKind};
 use bigdecimal::{BigDecimal, FromPrimitive, ToPrimitive};
 use chrono::{DateTime, NaiveDate, NaiveTime, Utc};
 use serde_json::{Number, Value as JsonValue};
+use std::fmt::Display;
 use std::{
     borrow::{Borrow, Cow},
     convert::TryFrom,
@@ -38,6 +39,12 @@ where
 pub struct Value<'a> {
     pub inner: ValueInner<'a>,
     pub native_column_type: Option<Cow<'a, str>>,
+}
+
+impl<'a> Display for Value<'a> {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        self.inner.fmt(f)
+    }
 }
 
 impl<'a> From<ValueInner<'a>> for Value<'a> {
@@ -100,9 +107,9 @@ pub enum ValueInner<'a> {
     Time(Option<NaiveTime>),
 }
 
-pub(crate) struct Params<'a>(pub(crate) &'a [ValueInner<'a>]);
+pub(crate) struct Params<'a>(pub(crate) &'a [Value<'a>]);
 
-impl<'a> fmt::Display for Params<'a> {
+impl<'a> Display for Params<'a> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         let len = self.0.len();
 
@@ -176,7 +183,13 @@ impl<'a> fmt::Display for ValueInner<'a> {
 
 impl<'a> From<Value<'a>> for serde_json::Value {
     fn from(pv: Value<'a>) -> Self {
-        let res = match pv.inner {
+        pv.inner.into()
+    }
+}
+
+impl<'a> From<ValueInner<'a>> for serde_json::Value {
+    fn from(pv: ValueInner<'a>) -> Self {
+        let res = match pv {
             ValueInner::Int32(i) => i.map(|i| serde_json::Value::Number(Number::from(i))),
             ValueInner::Int64(i) => i.map(|i| serde_json::Value::Number(Number::from(i))),
             ValueInner::Float(f) => f.map(|f| match Number::from_f64(f as f64) {
@@ -368,7 +381,7 @@ impl<'a> Value<'a> {
 
     /// `true` if the `Value` is null.
     pub const fn is_null(&self) -> bool {
-        let inner = match self {
+        match &self.inner {
             ValueInner::Int32(i) => i.is_none(),
             ValueInner::Int64(i) => i.is_none(),
             ValueInner::Float(i) => i.is_none(),
@@ -389,8 +402,7 @@ impl<'a> Value<'a> {
             ValueInner::Date(d) => d.is_none(),
             ValueInner::Time(t) => t.is_none(),
             ValueInner::Json(json) => json.is_none(),
-        };
-        Value::from(inner)
+        }
     }
 
     /// `true` if the `Value` is text.
@@ -400,7 +412,7 @@ impl<'a> Value<'a> {
 
     /// Returns a &str if the value is text, otherwise `None`.
     pub fn as_str(&self) -> Option<&str> {
-        match self.inner {
+        match &self.inner {
             ValueInner::Text(Some(cow)) => Some(cow.borrow()),
             ValueInner::Bytes(Some(cow)) => std::str::from_utf8(cow.as_ref()).ok(),
             _ => None,
@@ -409,7 +421,7 @@ impl<'a> Value<'a> {
 
     /// Returns a char if the value is a char, otherwise `None`.
     pub const fn as_char(&self) -> Option<char> {
-        match self.inner {
+        match &self.inner {
             ValueInner::Char(c) => *c,
             _ => None,
         }
@@ -417,7 +429,7 @@ impl<'a> Value<'a> {
 
     /// Returns a cloned String if the value is text, otherwise `None`.
     pub fn to_string(&self) -> Option<String> {
-        match self.inner {
+        match &self.inner {
             ValueInner::Text(Some(cow)) => Some(cow.to_string()),
             ValueInner::Bytes(Some(cow)) => std::str::from_utf8(cow.as_ref()).map(|s| s.to_owned()).ok(),
             _ => None,
@@ -441,7 +453,7 @@ impl<'a> Value<'a> {
 
     /// Returns a bytes slice if the value is text or a byte slice, otherwise `None`.
     pub fn as_bytes(&self) -> Option<&[u8]> {
-        match self.inner {
+        match &self.inner {
             ValueInner::Text(Some(cow)) => Some(cow.as_ref().as_bytes()),
             ValueInner::Bytes(Some(cow)) => Some(cow.as_ref()),
             _ => None,
@@ -450,7 +462,7 @@ impl<'a> Value<'a> {
 
     /// Returns a cloned `Vec<u8>` if the value is text or a byte slice, otherwise `None`.
     pub fn to_bytes(&self) -> Option<Vec<u8>> {
-        match self.inner {
+        match &self.inner {
             ValueInner::Text(Some(cow)) => Some(cow.to_string().into_bytes()),
             ValueInner::Bytes(Some(cow)) => Some(cow.to_vec()),
             _ => None,
@@ -474,7 +486,7 @@ impl<'a> Value<'a> {
 
     /// Returns an `i64` if the value is a 64-bit signed integer, otherwise `None`.
     pub const fn as_i64(&self) -> Option<i64> {
-        match self.inner {
+        match &self.inner {
             ValueInner::Int64(i) => *i,
             _ => None,
         }
@@ -482,7 +494,7 @@ impl<'a> Value<'a> {
 
     /// Returns an `i32` if the value is a 32-bit signed integer, otherwise `None`.
     pub const fn as_i32(&self) -> Option<i32> {
-        match self.inner {
+        match &self.inner {
             ValueInner::Int32(i) => *i,
             _ => None,
         }
@@ -490,7 +502,7 @@ impl<'a> Value<'a> {
 
     /// Returns an `i64` if the value is a signed integer, otherwise `None`.
     pub fn as_integer(&self) -> Option<i64> {
-        match self.inner {
+        match &self.inner {
             ValueInner::Int32(i) => i.map(|i| i as i64),
             ValueInner::Int64(i) => *i,
             _ => None,
@@ -499,7 +511,7 @@ impl<'a> Value<'a> {
 
     /// Returns a `f64` if the value is a double, otherwise `None`.
     pub const fn as_f64(&self) -> Option<f64> {
-        match self.inner {
+        match &self.inner {
             ValueInner::Double(Some(f)) => Some(*f),
             _ => None,
         }
@@ -507,7 +519,7 @@ impl<'a> Value<'a> {
 
     /// Returns a `f32` if the value is a double, otherwise `None`.
     pub const fn as_f32(&self) -> Option<f32> {
-        match self.inner {
+        match &self.inner {
             ValueInner::Float(Some(f)) => Some(*f),
             _ => None,
         }
@@ -541,7 +553,7 @@ impl<'a> Value<'a> {
     #[cfg(feature = "bigdecimal")]
     #[cfg_attr(feature = "docs", doc(cfg(feature = "bigdecimal")))]
     pub const fn as_numeric(&self) -> Option<&BigDecimal> {
-        match self.inner {
+        match &self.inner {
             ValueInner::Numeric(d) => d.as_ref(),
             _ => None,
         }
@@ -549,7 +561,7 @@ impl<'a> Value<'a> {
 
     /// `true` if the `Value` is a boolean value.
     pub const fn is_bool(&self) -> bool {
-        match self.inner {
+        match &self.inner {
             ValueInner::Boolean(_) => true,
             // For schemas which don't tag booleans
             ValueInner::Int32(Some(i)) if *i == 0 || *i == 1 => true,
@@ -560,7 +572,7 @@ impl<'a> Value<'a> {
 
     /// Returns a bool if the value is a boolean, otherwise `None`.
     pub const fn as_bool(&self) -> Option<bool> {
-        match self.inner {
+        match &self.inner {
             ValueInner::Boolean(b) => *b,
             // For schemas which don't tag booleans
             ValueInner::Int32(Some(i)) if *i == 0 || *i == 1 => Some(*i == 1),
@@ -585,7 +597,7 @@ impl<'a> Value<'a> {
     #[cfg(feature = "uuid")]
     #[cfg_attr(feature = "docs", doc(cfg(feature = "uuid")))]
     pub const fn as_uuid(&self) -> Option<Uuid> {
-        match self.inner {
+        match &self.inner {
             ValueInner::Uuid(u) => *u,
             _ => None,
         }
@@ -598,7 +610,7 @@ impl<'a> Value<'a> {
 
     /// Returns a `DateTime` if the value is a `DateTime`, otherwise `None`.
     pub const fn as_datetime(&self) -> Option<DateTime<Utc>> {
-        match self.inner {
+        match &self.inner {
             ValueInner::DateTime(dt) => *dt,
             _ => None,
         }
@@ -611,7 +623,7 @@ impl<'a> Value<'a> {
 
     /// Returns a `NaiveDate` if the value is a `Date`, otherwise `None`.
     pub const fn as_date(&self) -> Option<NaiveDate> {
-        match self.inner {
+        match &self.inner {
             ValueInner::Date(dt) => *dt,
             _ => None,
         }
@@ -624,7 +636,7 @@ impl<'a> Value<'a> {
 
     /// Returns a `NaiveTime` if the value is a `Time`, otherwise `None`.
     pub const fn as_time(&self) -> Option<NaiveTime> {
-        match self.inner {
+        match &self.inner {
             ValueInner::Time(time) => *time,
             _ => None,
         }
@@ -637,7 +649,7 @@ impl<'a> Value<'a> {
 
     /// Returns a reference to a JSON Value if of Json type, otherwise `None`.
     pub const fn as_json(&self) -> Option<&serde_json::Value> {
-        match self.inner {
+        match &self.inner {
             ValueInner::Json(Some(j)) => Some(j),
             _ => None,
         }
@@ -674,7 +686,7 @@ impl<'a> Value<'a> {
     where
         T: TryFrom<ValueInner<'a>>,
     {
-        match self.inner {
+        match &self.inner {
             ValueInner::Array(Some(vec)) => {
                 let rslt: Result<Vec<_>, _> = vec.clone().into_iter().map(T::try_from).collect();
                 match rslt {
@@ -711,7 +723,6 @@ impl<'a> TryFrom<Value<'a>> for i64 {
 
     fn try_from(value: Value<'a>) -> Result<i64, Self::Error> {
         value
-            .inner
             .as_i64()
             .ok_or_else(|| Error::builder(ErrorKind::conversion("Not an i64")).build())
     }
@@ -722,7 +733,6 @@ impl<'a> TryFrom<Value<'a>> for i32 {
 
     fn try_from(value: Value<'a>) -> Result<i32, Self::Error> {
         value
-            .inner
             .as_i32()
             .ok_or_else(|| Error::builder(ErrorKind::conversion("Not an i32")).build())
     }
@@ -734,7 +744,6 @@ impl<'a> TryFrom<Value<'a>> for BigDecimal {
 
     fn try_from(value: Value<'a>) -> Result<BigDecimal, Self::Error> {
         value
-            .inner
             .into_numeric()
             .ok_or_else(|| Error::builder(ErrorKind::conversion("Not a decimal")).build())
     }
@@ -745,7 +754,6 @@ impl<'a> TryFrom<Value<'a>> for f64 {
 
     fn try_from(value: Value<'a>) -> Result<f64, Self::Error> {
         value
-            .inner
             .as_f64()
             .ok_or_else(|| Error::builder(ErrorKind::conversion("Not a f64")).build())
     }
@@ -756,7 +764,6 @@ impl<'a> TryFrom<Value<'a>> for String {
 
     fn try_from(value: Value<'a>) -> Result<String, Self::Error> {
         value
-            .inner
             .into_string()
             .ok_or_else(|| Error::builder(ErrorKind::conversion("Not a string")).build())
     }
@@ -767,7 +774,6 @@ impl<'a> TryFrom<Value<'a>> for bool {
 
     fn try_from(value: Value<'a>) -> Result<bool, Self::Error> {
         value
-            .inner
             .as_bool()
             .ok_or_else(|| Error::builder(ErrorKind::conversion("Not a bool")).build())
     }
@@ -778,7 +784,6 @@ impl<'a> TryFrom<Value<'a>> for DateTime<Utc> {
 
     fn try_from(value: Value<'a>) -> Result<DateTime<Utc>, Self::Error> {
         value
-            .inner
             .as_datetime()
             .ok_or_else(|| Error::builder(ErrorKind::conversion("Not a datetime")).build())
     }
@@ -788,9 +793,9 @@ impl<'a> TryFrom<&Value<'a>> for Option<std::net::IpAddr> {
     type Error = Error;
 
     fn try_from(value: &Value<'a>) -> Result<Option<std::net::IpAddr>, Self::Error> {
-        match value.inner {
+        match &value.inner {
             val @ ValueInner::Text(Some(_)) => {
-                let text = val.as_str().unwrap();
+                let text = value.as_str().unwrap();
 
                 match std::net::IpAddr::from_str(text) {
                     Ok(ip) => Ok(Some(ip)),
@@ -798,14 +803,14 @@ impl<'a> TryFrom<&Value<'a>> for Option<std::net::IpAddr> {
                 }
             }
             val @ ValueInner::Bytes(Some(_)) => {
-                let text = val.as_str().unwrap();
+                let text = value.as_str().unwrap();
 
                 match std::net::IpAddr::from_str(text) {
                     Ok(ip) => Ok(Some(ip)),
                     Err(e) => Err(e.into()),
                 }
             }
-            v if v.is_null() => Ok(None),
+            _ if value.is_null() => Ok(None),
             v => {
                 let kind =
                     ErrorKind::conversion(format!("Couldn't convert value of type `{v:?}` to std::net::IpAddr."));
@@ -821,10 +826,10 @@ impl<'a> TryFrom<&Value<'a>> for Option<uuid::Uuid> {
     type Error = Error;
 
     fn try_from(value: &Value<'a>) -> Result<Option<uuid::Uuid>, Self::Error> {
-        match value.inner {
+        match &value.inner {
             ValueInner::Uuid(uuid) => Ok(*uuid),
             val @ ValueInner::Text(Some(_)) => {
-                let text = val.as_str().unwrap();
+                let text = value.as_str().unwrap();
 
                 match uuid::Uuid::from_str(text) {
                     Ok(ip) => Ok(Some(ip)),
@@ -832,14 +837,14 @@ impl<'a> TryFrom<&Value<'a>> for Option<uuid::Uuid> {
                 }
             }
             val @ ValueInner::Bytes(Some(_)) => {
-                let text = val.as_str().unwrap();
+                let text = value.as_str().unwrap();
 
                 match uuid::Uuid::from_str(text) {
                     Ok(ip) => Ok(Some(ip)),
                     Err(e) => Err(e.into()),
                 }
             }
-            v if v.is_null() => Ok(None),
+            v if value.is_null() => Ok(None),
             v => {
                 let kind = ErrorKind::conversion(format!("Couldn't convert value of type `{v:?}` to uuid::Uuid."));
 

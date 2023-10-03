@@ -45,7 +45,10 @@ impl<'a> Expression<'a> {
 
     pub(crate) fn is_json_expr(&self) -> bool {
         match &self.kind {
-            ExpressionKind::Parameterized(Value::Json(_)) => true,
+            ExpressionKind::Parameterized(Value {
+                inner: ValueInner::Json(_),
+                ..
+            }) => true,
 
             ExpressionKind::Value(expr) => expr.is_json_value(),
 
@@ -58,7 +61,10 @@ impl<'a> Expression<'a> {
 
     pub(crate) fn is_json_value(&self) -> bool {
         match &self.kind {
-            ExpressionKind::Parameterized(Value::Json(_)) => true,
+            ExpressionKind::Parameterized(Value {
+                inner: ValueInner::Json(_),
+                ..
+            }) => true,
 
             ExpressionKind::Value(expr) => expr.is_json_value(),
             _ => false,
@@ -69,7 +75,10 @@ impl<'a> Expression<'a> {
 
     pub(crate) fn into_json_value(self) -> Option<serde_json::Value> {
         match self.kind {
-            ExpressionKind::Parameterized(Value::Json(json_val)) => json_val,
+            ExpressionKind::Parameterized(Value {
+                inner: ValueInner::Json(json_val),
+                ..
+            }) => json_val,
 
             ExpressionKind::Value(expr) => expr.into_json_value(),
             _ => None,
@@ -217,7 +226,10 @@ pub enum ExpressionKind<'a> {
 impl<'a> ExpressionKind<'a> {
     pub(crate) fn is_xml_value(&self) -> bool {
         match self {
-            Self::Parameterized(Value::Xml(_)) => true,
+            Self::Parameterized(Value {
+                inner: ValueInner::Xml(_),
+                ..
+            }) => true,
             Self::Value(expr) => expr.is_xml_value(),
             _ => false,
         }

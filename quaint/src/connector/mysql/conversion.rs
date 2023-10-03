@@ -1,5 +1,5 @@
 use crate::{
-    ast::Value,
+    ast::{Value, ValueInner},
     connector::{queryable::TakeRow, TypeIdentifier},
     error::{Error, ErrorKind},
 };
@@ -19,18 +19,18 @@ pub fn conv_params(params: &[Value<'_>]) -> crate::Result<my::Params> {
         let mut values = Vec::with_capacity(params.len());
 
         for pv in params {
-            let res = match pv {
-                Value::Int32(i) => i.map(|i| my::Value::Int(i as i64)),
-                Value::Int64(i) => i.map(my::Value::Int),
-                Value::Float(f) => f.map(my::Value::Float),
-                Value::Double(f) => f.map(my::Value::Double),
-                Value::Text(s) => s.clone().map(|s| my::Value::Bytes((*s).as_bytes().to_vec())),
-                Value::Bytes(bytes) => bytes.clone().map(|bytes| my::Value::Bytes(bytes.into_owned())),
-                Value::Enum(s, _) => s.clone().map(|s| my::Value::Bytes((*s).as_bytes().to_vec())),
-                Value::Boolean(b) => b.map(|b| my::Value::Int(b as i64)),
-                Value::Char(c) => c.map(|c| my::Value::Bytes(vec![c as u8])),
-                Value::Xml(s) => s.as_ref().map(|s| my::Value::Bytes((s).as_bytes().to_vec())),
-                Value::Array(_) | Value::EnumArray(_, _) => {
+            let res = match &pv.inner {
+                ValueInner::Int32(i) => i.map(|i| my::Value::Int(i as i64)),
+                ValueInner::Int64(i) => i.map(my::Value::Int),
+                ValueInner::Float(f) => f.map(my::Value::Float),
+                ValueInner::Double(f) => f.map(my::Value::Double),
+                ValueInner::Text(s) => s.clone().map(|s| my::Value::Bytes((*s).as_bytes().to_vec())),
+                ValueInner::Bytes(bytes) => bytes.clone().map(|bytes| my::Value::Bytes(bytes.into_owned())),
+                ValueInner::Enum(s, _) => s.clone().map(|s| my::Value::Bytes((*s).as_bytes().to_vec())),
+                ValueInner::Boolean(b) => b.map(|b| my::Value::Int(b as i64)),
+                ValueInner::Char(c) => c.map(|c| my::Value::Bytes(vec![c as u8])),
+                ValueInner::Xml(s) => s.as_ref().map(|s| my::Value::Bytes((s).as_bytes().to_vec())),
+                ValueInner::Array(_) | ValueInner::EnumArray(_, _) => {
                     let msg = "Arrays are not supported in MySQL.";
                     let kind = ErrorKind::conversion(msg);
 
@@ -40,8 +40,8 @@ pub fn conv_params(params: &[Value<'_>]) -> crate::Result<my::Params> {
                     return Err(builder.build());
                 }
                 #[cfg(feature = "bigdecimal")]
-                Value::Numeric(f) => f.as_ref().map(|f| my::Value::Bytes(f.to_string().as_bytes().to_vec())),
-                Value::Json(s) => match s {
+                ValueInner::Numeric(f) => f.as_ref().map(|f| my::Value::Bytes(f.to_string().as_bytes().to_vec())),
+                ValueInner::Json(s) => match s {
                     Some(ref s) => {
                         let json = serde_json::to_string(s)?;
                         let bytes = json.into_bytes();
@@ -51,14 +51,14 @@ pub fn conv_params(params: &[Value<'_>]) -> crate::Result<my::Params> {
                     None => None,
                 },
                 #[cfg(feature = "uuid")]
-                Value::Uuid(u) => u.map(|u| my::Value::Bytes(u.hyphenated().to_string().into_bytes())),
-                Value::Date(d) => {
+                ValueInner::Uuid(u) => u.map(|u| my::Value::Bytes(u.hyphenated().to_string().into_bytes())),
+                ValueInner::Date(d) => {
                     d.map(|d| my::Value::Date(d.year() as u16, d.month() as u8, d.day() as u8, 0, 0, 0, 0))
                 }
-                Value::Time(t) => {
+                ValueInner::Time(t) => {
                     t.map(|t| my::Value::Time(false, 0, t.hour() as u8, t.minute() as u8, t.second() as u8, 0))
                 }
-                Value::DateTime(dt) => dt.map(|dt| {
+                ValueInner::DateTime(dt) => dt.map(|dt| {
                     my::Value::Date(
                         dt.year() as u16,
                         dt.month() as u8,
@@ -303,21 +303,21 @@ impl TakeRow for my::Row {
                     Value::time(time)
                 }
                 my::Value::NULL => match column {
-                    t if t.is_bool() => Value::Boolean(None),
-                    t if t.is_enum() => Value::Enum(None, None),
-                    t if t.is_null() => Value::Int32(None),
-                    t if t.is_int64() => Value::Int64(None),
-                    t if t.is_int32() => Value::Int32(None),
-                    t if t.is_float() => Value::Float(None),
-                    t if t.is_double() => Value::Double(None),
-                    t if t.is_text() => Value::Text(None),
-                    t if t.is_bytes() => Value::Bytes(None),
+                    t if t.is_bool() => ValueInner::Boolean(None).into(),
+                    t if t.is_enum() => ValueInner::Enum(None, None).into(),
+                    t if t.is_null() => ValueInner::Int32(None).into(),
+                    t if t.is_int64() => ValueInner::Int64(None).into(),
+                    t if t.is_int32() => ValueInner::Int32(None).into(),
+                    t if t.is_float() => ValueInner::Float(None).into(),
+                    t if t.is_double() => ValueInner::Double(None).into(),
+                    t if t.is_text() => ValueInner::Text(None).into(),
+                    t if t.is_bytes() => ValueInner::Bytes(None).into(),
                     #[cfg(feature = "bigdecimal")]
-                    t if t.is_real() => Value::Numeric(None),
-                    t if t.is_datetime() => Value::DateTime(None),
-                    t if t.is_time() => Value::Time(None),
-                    t if t.is_date() => Value::Date(None),
-                    t if t.is_json() => Value::Json(None),
+                    t if t.is_real() => ValueInner::Numeric(None).into(),
+                    t if t.is_datetime() => ValueInner::DateTime(None).into(),
+                    t if t.is_time() => ValueInner::Time(None).into(),
+                    t if t.is_date() => ValueInner::Date(None).into(),
+                    t if t.is_json() => ValueInner::Json(None).into(),
                     typ => {
                         let msg = format!("Value of type {typ:?} is not supported with the current configuration");
 
