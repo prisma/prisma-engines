@@ -749,11 +749,11 @@ mod tests {
     #[test]
     fn test_aliased_null() {
         let expected_sql = "SELECT @P1 AS [test]";
-        let query = Select::default().value(val!(Value::Int32(None)).alias("test"));
+        let query = Select::default().value(val!(ValueInner::Int32(None)).alias("test"));
         let (sql, params) = Mssql::build(query).unwrap();
 
         assert_eq!(expected_sql, sql);
-        assert_eq!(vec![Value::Int32(None)], params);
+        assert_eq!(vec![ValueInner::Int32(None)], params);
     }
 
     #[test]
@@ -1192,7 +1192,7 @@ mod tests {
 
     #[test]
     fn test_raw_null() {
-        let (sql, params) = Mssql::build(Select::default().value(Value::Text(None).raw())).unwrap();
+        let (sql, params) = Mssql::build(Select::default().value(ValueInner::Text(None).raw())).unwrap();
         assert_eq!("SELECT null", sql);
         assert!(params.is_empty());
     }

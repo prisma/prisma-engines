@@ -4,7 +4,7 @@ use crate::bigdecimal::BigDecimal;
 test_type!(decimal(
     postgresql,
     "decimal(10,2)",
-    Value::Numeric(None),
+    ValueInner::Numeric(None),
     Value::numeric(BigDecimal::from_str("3.14")?)
 ));
 
@@ -177,28 +177,28 @@ test_type!(decimal_128_6(
 test_type!(decimal_array(
     postgresql,
     "decimal(10,2)[]",
-    Value::Array(None),
+    ValueInner::Array(None),
     Value::array(vec![BigDecimal::from_str("3.14")?, BigDecimal::from_str("5.12")?])
 ));
 
 test_type!(money(
     postgresql,
     "money",
-    Value::Numeric(None),
+    ValueInner::Numeric(None),
     Value::numeric(BigDecimal::from_str("1.12")?)
 ));
 
 test_type!(money_array(
     postgresql,
     "money[]",
-    Value::Array(None),
+    ValueInner::Array(None),
     Value::array(vec![BigDecimal::from_str("1.12")?, BigDecimal::from_str("1.12")?])
 ));
 
 test_type!(float4(
     postgresql,
     "float4",
-    (Value::Numeric(None), Value::Float(None)),
+    (ValueInner::Numeric(None), ValueInner::Float(None)),
     (
         Value::numeric(BigDecimal::from_str("1.123456")?),
         Value::float(1.123456)
@@ -208,7 +208,7 @@ test_type!(float4(
 test_type!(float8(
     postgresql,
     "float8",
-    (Value::Numeric(None), Value::Double(None)),
+    (ValueInner::Numeric(None), ValueInner::Double(None)),
     (
         Value::numeric(BigDecimal::from_str("1.123456")?),
         Value::double(1.123456)

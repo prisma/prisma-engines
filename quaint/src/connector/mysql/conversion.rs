@@ -20,16 +20,16 @@ pub fn conv_params(params: &[Value<'_>]) -> crate::Result<my::Params> {
 
         for pv in params {
             let res = match &pv.inner {
-                ValueInner::Int32(i) => i.map(|i| my::Value::Int(i as i64)),
-                ValueInner::Int64(i) => i.map(my::Value::Int),
-                ValueInner::Float(f) => f.map(my::Value::Float),
-                ValueInner::Double(f) => f.map(my::Value::Double),
-                ValueInner::Text(s) => s.clone().map(|s| my::Value::Bytes((*s).as_bytes().to_vec())),
-                ValueInner::Bytes(bytes) => bytes.clone().map(|bytes| my::Value::Bytes(bytes.into_owned())),
-                ValueInner::Enum(s, _) => s.clone().map(|s| my::Value::Bytes((*s).as_bytes().to_vec())),
-                ValueInner::Boolean(b) => b.map(|b| my::Value::Int(b as i64)),
-                ValueInner::Char(c) => c.map(|c| my::Value::Bytes(vec![c as u8])),
-                ValueInner::Xml(s) => s.as_ref().map(|s| my::Value::Bytes((s).as_bytes().to_vec())),
+                ValueInner::Int32(i) => i.map(|i| my::ValueInner::Int(i as i64)),
+                ValueInner::Int64(i) => i.map(my::ValueInner::Int),
+                ValueInner::Float(f) => f.map(my::ValueInner::Float),
+                ValueInner::Double(f) => f.map(my::ValueInner::Double),
+                ValueInner::Text(s) => s.clone().map(|s| my::ValueInner::Bytes((*s).as_bytes().to_vec())),
+                ValueInner::Bytes(bytes) => bytes.clone().map(|bytes| my::ValueInner::Bytes(bytes.into_owned())),
+                ValueInner::Enum(s, _) => s.clone().map(|s| my::ValueInner::Bytes((*s).as_bytes().to_vec())),
+                ValueInner::Boolean(b) => b.map(|b| my::ValueInner::Int(b as i64)),
+                ValueInner::Char(c) => c.map(|c| my::ValueInner::Bytes(vec![c as u8])),
+                ValueInner::Xml(s) => s.as_ref().map(|s| my::ValueInner::Bytes((s).as_bytes().to_vec())),
                 ValueInner::Array(_) | ValueInner::EnumArray(_, _) => {
                     let msg = "Arrays are not supported in MySQL.";
                     let kind = ErrorKind::conversion(msg);
@@ -40,26 +40,28 @@ pub fn conv_params(params: &[Value<'_>]) -> crate::Result<my::Params> {
                     return Err(builder.build());
                 }
                 #[cfg(feature = "bigdecimal")]
-                ValueInner::Numeric(f) => f.as_ref().map(|f| my::Value::Bytes(f.to_string().as_bytes().to_vec())),
+                ValueInner::Numeric(f) => f
+                    .as_ref()
+                    .map(|f| my::ValueInner::Bytes(f.to_string().as_bytes().to_vec())),
                 ValueInner::Json(s) => match s {
                     Some(ref s) => {
                         let json = serde_json::to_string(s)?;
                         let bytes = json.into_bytes();
 
-                        Some(my::Value::Bytes(bytes))
+                        Some(my::ValueInner::Bytes(bytes))
                     }
                     None => None,
                 },
                 #[cfg(feature = "uuid")]
-                ValueInner::Uuid(u) => u.map(|u| my::Value::Bytes(u.hyphenated().to_string().into_bytes())),
+                ValueInner::Uuid(u) => u.map(|u| my::ValueInner::Bytes(u.hyphenated().to_string().into_bytes())),
                 ValueInner::Date(d) => {
-                    d.map(|d| my::Value::Date(d.year() as u16, d.month() as u8, d.day() as u8, 0, 0, 0, 0))
+                    d.map(|d| my::ValueInner::Date(d.year() as u16, d.month() as u8, d.day() as u8, 0, 0, 0, 0))
                 }
                 ValueInner::Time(t) => {
-                    t.map(|t| my::Value::Time(false, 0, t.hour() as u8, t.minute() as u8, t.second() as u8, 0))
+                    t.map(|t| my::ValueInner::Time(false, 0, t.hour() as u8, t.minute() as u8, t.second() as u8, 0))
                 }
                 ValueInner::DateTime(dt) => dt.map(|dt| {
-                    my::Value::Date(
+                    my::ValueInner::Date(
                         dt.year() as u16,
                         dt.month() as u8,
                         dt.day() as u8,
@@ -222,7 +224,7 @@ impl TakeRow for my::Row {
 
             let res = match value {
                 // JSON is returned as bytes.
-                my::Value::Bytes(b) if column.is_json() => {
+                my::ValueInner::Bytes(b) if column.is_json() => {
                     serde_json::from_slice(&b).map(Value::json).map_err(|_| {
                         let msg = "Unable to convert bytes to JSON";
                         let kind = ErrorKind::conversion(msg);
@@ -230,13 +232,13 @@ impl TakeRow for my::Row {
                         Error::builder(kind).build()
                     })?
                 }
-                my::Value::Bytes(b) if column.is_enum() => {
+                my::ValueInner::Bytes(b) if column.is_enum() => {
                     let s = String::from_utf8(b)?;
                     Value::enum_variant(s)
                 }
                 // NEWDECIMAL returned as bytes. See https://mariadb.com/kb/en/resultset-row/#decimal-binary-encoding
                 #[cfg(feature = "bigdecimal")]
-                my::Value::Bytes(b) if column.is_real() => {
+                my::ValueInner::Bytes(b) if column.is_real() => {
                     let s = String::from_utf8(b).map_err(|_| {
                         let msg = "Could not convert NEWDECIMAL from bytes to String.";
                         let kind = ErrorKind::conversion(msg);
@@ -253,24 +255,24 @@ impl TakeRow for my::Row {
 
                     Value::numeric(dec)
                 }
-                my::Value::Bytes(b) if column.is_bool() => match b.as_slice() {
+                my::ValueInner::Bytes(b) if column.is_bool() => match b.as_slice() {
                     [0] => Value::boolean(false),
                     _ => Value::boolean(true),
                 },
                 // https://dev.mysql.com/doc/internals/en/character-set.html
-                my::Value::Bytes(b) if column.character_set() == 63 => Value::bytes(b),
-                my::Value::Bytes(s) => Value::text(String::from_utf8(s)?),
-                my::Value::Int(i) if column.is_int64() => Value::int64(i),
-                my::Value::Int(i) => Value::int32(i as i32),
+                my::ValueInner::Bytes(b) if column.character_set() == 63 => Value::bytes(b),
+                my::ValueInner::Bytes(s) => Value::text(String::from_utf8(s)?),
+                my::ValueInner::Int(i) if column.is_int64() => Value::int64(i),
+                my::ValueInner::Int(i) => Value::int32(i as i32),
                 my::Value::UInt(i) => Value::int64(i64::try_from(i).map_err(|_| {
                     let msg = "Unsigned integers larger than 9_223_372_036_854_775_807 are currently not handled.";
                     let kind = ErrorKind::value_out_of_range(msg);
 
                     Error::builder(kind).build()
                 })?),
-                my::Value::Float(f) => Value::from(f),
-                my::Value::Double(f) => Value::from(f),
-                my::Value::Date(year, month, day, hour, min, sec, micro) => {
+                my::ValueInner::Float(f) => Value::from(f),
+                my::ValueInner::Double(f) => Value::from(f),
+                my::ValueInner::Date(year, month, day, hour, min, sec, micro) => {
                     if day == 0 || month == 0 {
                         let msg = format!(
                             "The column `{}` contained an invalid datetime value with either day or month set to zero.",
@@ -287,7 +289,7 @@ impl TakeRow for my::Row {
 
                     Value::datetime(DateTime::<Utc>::from_utc(dt, Utc))
                 }
-                my::Value::Time(is_neg, days, hours, minutes, seconds, micros) => {
+                my::ValueInner::Time(is_neg, days, hours, minutes, seconds, micros) => {
                     if is_neg {
                         let kind = ErrorKind::conversion("Failed to convert a negative time");
                         return Err(Error::builder(kind).build());

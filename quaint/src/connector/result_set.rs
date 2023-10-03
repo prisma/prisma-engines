@@ -122,6 +122,6 @@ impl From<ResultSet> for serde_json::Value {
             result.push(serde_json::Value::Object(object));
         }
 
-        serde_json::Value::Array(result)
+        serde_json::ValueInner::Array(result)
     }
 }

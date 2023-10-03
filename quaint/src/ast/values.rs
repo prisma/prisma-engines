@@ -76,7 +76,7 @@ pub enum ValueInner<'a> {
     /// Read more about it here: https://github.com/prisma/prisma-engines/pull/4280
     Enum(Option<EnumVariant<'a>>, Option<EnumName<'a>>),
     /// Database enum array (PostgreSQL specific).
-    /// We use a different variant than `Value::Array` to uplift the `EnumName`
+    /// We use a different variant than `ValueInner::Array` to uplift the `EnumName`
     /// and have it available even for empty enum arrays.
     EnumArray(Option<Vec<EnumVariant<'a>>>, Option<EnumName<'a>>),
     /// Bytes value.
@@ -204,7 +204,7 @@ impl<'a> From<ValueInner<'a>> for serde_json::Value {
             ValueInner::Bytes(bytes) => bytes.map(|bytes| serde_json::Value::String(base64::encode(bytes))),
             ValueInner::Enum(cow, _) => cow.map(|cow| serde_json::Value::String(cow.into_owned())),
             ValueInner::EnumArray(values, _) => values.map(|values| {
-                serde_json::Value::Array(
+                serde_json::ValueInner::Array(
                     values
                         .into_iter()
                         .map(|value| serde_json::Value::String(value.into_owned()))
@@ -221,7 +221,7 @@ impl<'a> From<ValueInner<'a>> for serde_json::Value {
             }),
             ValueInner::Xml(cow) => cow.map(|cow| serde_json::Value::String(cow.into_owned())),
             ValueInner::Array(v) => {
-                v.map(|v| serde_json::Value::Array(v.into_iter().map(serde_json::Value::from).collect()))
+                v.map(|v| serde_json::ValueInner::Array(v.into_iter().map(serde_json::Value::from).collect()))
             }
             #[cfg(feature = "bigdecimal")]
             ValueInner::Numeric(d) => d.map(|d| serde_json::to_value(d.to_f64().unwrap()).unwrap()),
