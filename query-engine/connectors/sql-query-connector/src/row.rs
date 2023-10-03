@@ -172,7 +172,7 @@ fn row_value_to_prisma_value(p_value: Value, meta: ColumnMetadata<'_>) -> Result
         TypeIdentifier::DateTime => match p_value.inner {
             value if value.is_null() => PrismaValue::Null,
             value if value.is_integer() => {
-                let ts = p_value.as_integer().unwrap();
+                let ts = value.as_integer().unwrap();
                 let nsecs = ((ts % 1000) * 1_000_000) as u32;
                 let secs = ts / 1000;
                 let naive = chrono::NaiveDateTime::from_timestamp_opt(secs, nsecs).unwrap();
@@ -251,7 +251,7 @@ fn row_value_to_prisma_value(p_value: Value, meta: ColumnMetadata<'_>) -> Result
             }
             ValueInner::Numeric(Some(dec)) => PrismaValue::Int(big_decimal_to_i64(dec, "Int")?),
             ValueInner::Boolean(Some(bool)) => PrismaValue::Int(bool as i64),
-            other => to_prisma_value(p_value.clone())?,
+            other => to_prisma_value(other)?,
         },
         TypeIdentifier::BigInt => match p_value.inner {
             value if value.is_null() => PrismaValue::Null,
@@ -273,7 +273,7 @@ fn row_value_to_prisma_value(p_value: Value, meta: ColumnMetadata<'_>) -> Result
             }
             ValueInner::Numeric(Some(dec)) => PrismaValue::BigInt(big_decimal_to_i64(dec, "BigInt")?),
             ValueInner::Boolean(Some(bool)) => PrismaValue::BigInt(bool as i64),
-            other => to_prisma_value(p_value.clone())?,
+            other => to_prisma_value(other)?,
         },
         TypeIdentifier::String => match p_value.inner {
             value if value.is_null() => PrismaValue::Null,
@@ -281,7 +281,7 @@ fn row_value_to_prisma_value(p_value: Value, meta: ColumnMetadata<'_>) -> Result
             ValueInner::Json(Some(ref json_value)) => {
                 PrismaValue::String(serde_json::to_string(json_value).map_err(|_| create_error(&p_value))?)
             }
-            other => to_prisma_value(p_value.clone())?,
+            other => to_prisma_value(other)?,
         },
         TypeIdentifier::Bytes => match p_value.inner {
             value if value.is_null() => PrismaValue::Null,

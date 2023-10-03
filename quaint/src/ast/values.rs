@@ -57,7 +57,7 @@ impl<'a> From<ValueInner<'a>> for Value<'a> {
 }
 
 impl<'a> Into<ValueInner<'a>> for Value<'a> {
-    fn into(self) -> ValueInner {
+    fn into(self) -> ValueInner<'a> {
         return self.inner;
     }
 }
@@ -348,6 +348,47 @@ impl<'a> ValueInner<'a> {
     pub fn is_json(&self) -> bool {
         matches!(self, ValueInner::Json(_))
     }
+
+    /// Returns an `i64` if the value is a 64-bit signed integer, otherwise `None`.
+    pub fn as_i64(&self) -> Option<i64> {
+        match self {
+            ValueInner::Int64(i) => *i,
+            _ => None,
+        }
+    }
+
+    /// Returns an `i32` if the value is a 32-bit signed integer, otherwise `None`.
+    pub fn as_i32(&self) -> Option<i32> {
+        match self {
+            ValueInner::Int32(i) => *i,
+            _ => None,
+        }
+    }
+
+    /// Returns an `i64` if the value is a signed integer, otherwise `None`.
+    pub fn as_integer(&self) -> Option<i64> {
+        match self {
+            ValueInner::Int32(i) => i.map(|i| i as i64),
+            ValueInner::Int64(i) => *i,
+            _ => None,
+        }
+    }
+
+    /// Returns a `f64` if the value is a double, otherwise `None`.
+    pub fn as_f64(&self) -> Option<f64> {
+        match self {
+            ValueInner::Double(Some(f)) => Some(*f),
+            _ => None,
+        }
+    }
+
+    /// Returns a `f32` if the value is a double, otherwise `None`.
+    pub fn as_f32(&self) -> Option<f32> {
+        match self {
+            ValueInner::Float(Some(f)) => Some(*f),
+            _ => None,
+        }
+    }
 }
 
 impl<'a> Value<'a> {
@@ -577,43 +618,27 @@ impl<'a> Value<'a> {
 
     /// Returns an `i64` if the value is a 64-bit signed integer, otherwise `None`.
     pub fn as_i64(&self) -> Option<i64> {
-        match &self.inner {
-            ValueInner::Int64(i) => *i,
-            _ => None,
-        }
+        self.inner.as_i64()
     }
 
     /// Returns an `i32` if the value is a 32-bit signed integer, otherwise `None`.
     pub fn as_i32(&self) -> Option<i32> {
-        match &self.inner {
-            ValueInner::Int32(i) => *i,
-            _ => None,
-        }
+        self.inner.as_i32()
     }
 
     /// Returns an `i64` if the value is a signed integer, otherwise `None`.
     pub fn as_integer(&self) -> Option<i64> {
-        match &self.inner {
-            ValueInner::Int32(i) => i.map(|i| i as i64),
-            ValueInner::Int64(i) => *i,
-            _ => None,
-        }
+        self.inner.as_integer()
     }
 
     /// Returns a `f64` if the value is a double, otherwise `None`.
     pub fn as_f64(&self) -> Option<f64> {
-        match &self.inner {
-            ValueInner::Double(Some(f)) => Some(*f),
-            _ => None,
-        }
+        self.inner.as_f64()
     }
 
     /// Returns a `f32` if the value is a double, otherwise `None`.
     pub fn as_f32(&self) -> Option<f32> {
-        match &self.inner {
-            ValueInner::Float(Some(f)) => Some(*f),
-            _ => None,
-        }
+        self.inner.as_f32()
     }
 
     /// `true` if the `Value` is a numeric value or can be converted to one.

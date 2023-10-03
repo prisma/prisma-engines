@@ -10,7 +10,7 @@ pub fn try_convert(model_projection: &ModelProjection, result_set: ResultSet) ->
         for (i, val) in row.into_iter().enumerate() {
             match model_projection.map_db_name(columns[i].as_str()) {
                 Some(field) => {
-                    record_projection.add((field, to_prisma_value(val)?));
+                    record_projection.add((field, to_prisma_value(val.into())?));
                 }
                 None => {
                     return Err(SqlError::DomainError(DomainError::ScalarFieldNotFound {

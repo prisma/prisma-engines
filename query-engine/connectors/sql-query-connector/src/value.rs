@@ -2,10 +2,10 @@ use crate::row::{sanitize_f32, sanitize_f64};
 use bigdecimal::{BigDecimal, FromPrimitive};
 use chrono::{DateTime, NaiveDate, Utc};
 use prisma_models::PrismaValue;
-use quaint::{Value, ValueInner};
+use quaint::ValueInner;
 
-pub fn to_prisma_value(quaint_value: Value<'_>) -> crate::Result<PrismaValue> {
-    let val = match quaint_value.inner {
+pub fn to_prisma_value(quaint_value_type: ValueInner<'_>) -> crate::Result<PrismaValue> {
+    let val = match quaint_value_type {
         ValueInner::Int32(i) => i.map(|i| PrismaValue::Int(i as i64)).unwrap_or(PrismaValue::Null),
         ValueInner::Int64(i) => i.map(PrismaValue::Int).unwrap_or(PrismaValue::Null),
         ValueInner::Float(Some(f)) => {
@@ -43,7 +43,7 @@ pub fn to_prisma_value(quaint_value: Value<'_>) -> crate::Result<PrismaValue> {
             let mut res = Vec::with_capacity(v.len());
 
             for v in v.into_iter() {
-                res.push(to_prisma_value(v)?);
+                res.push(to_prisma_value(v.into())?);
             }
 
             PrismaValue::List(res)

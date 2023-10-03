@@ -1118,7 +1118,7 @@ fn convert_pv<'a>(field: &ScalarFieldRef, pv: PrismaValue, ctx: &Context<'_>) ->
 }
 
 fn convert_list_pv<'a>(field: &ScalarFieldRef, values: Vec<PrismaValue>, ctx: &Context<'_>) -> Expression<'a> {
-    Value::Array(Some(values.into_iter().map(|val| field.value(val, ctx)).collect())).into()
+    ValueInner::Array(Some(values.into_iter().map(|val| field.value(val, ctx)).collect())).into()
 }
 
 fn convert_pvs<'a>(fields: &[ScalarFieldRef], values: Vec<PrismaValue>, ctx: &Context<'_>) -> Vec<Value<'a>> {
