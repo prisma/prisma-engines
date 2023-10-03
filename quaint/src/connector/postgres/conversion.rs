@@ -38,7 +38,7 @@ pub(crate) fn params_to_types(params: &[Value<'_>]) -> Vec<PostgresType> {
                 return PostgresType::UNKNOWN;
             }
 
-            match &p.inner {
+            match &p.typed {
                 ValueType::Int32(_) => PostgresType::INT4,
                 ValueType::Int64(_) => PostgresType::INT8,
                 ValueType::Float(_) => PostgresType::FLOAT4,
@@ -71,12 +71,12 @@ pub(crate) fn params_to_types(params: &[Value<'_>]) -> Vec<PostgresType> {
                     // If the array does not contain the same types of values, we let PG infer the type
                     if arr
                         .iter()
-                        .any(|val| std::mem::discriminant(&first.inner) != std::mem::discriminant(&val.inner))
+                        .any(|val| std::mem::discriminant(&first.typed) != std::mem::discriminant(&val.typed))
                     {
                         return PostgresType::UNKNOWN;
                     }
 
-                    match first.inner {
+                    match first.typed {
                         ValueType::Int32(_) => PostgresType::INT4_ARRAY,
                         ValueType::Int64(_) => PostgresType::INT8_ARRAY,
                         ValueType::Float(_) => PostgresType::FLOAT4_ARRAY,
@@ -599,7 +599,7 @@ impl<'a> ToSql for Value<'a> {
         ty: &PostgresType,
         out: &mut BytesMut,
     ) -> Result<IsNull, Box<dyn StdError + 'static + Send + Sync>> {
-        let res = match (&self.inner, ty) {
+        let res = match (&self.typed, ty) {
             (ValueType::Int32(integer), &PostgresType::INT2) => match integer {
                 Some(i) => {
                     let integer = i16::try_from(*i).map_err(|_| {
@@ -720,7 +720,7 @@ impl<'a> ToSql for Value<'a> {
                 let mut floats = Vec::with_capacity(values.len());
 
                 for value in values.iter() {
-                    let float = match &value.inner {
+                    let float = match &value.typed {
                         ValueType::Numeric(n) => n.as_ref().and_then(|n| n.to_string().parse::<f32>().ok()),
                         ValueType::Int64(n) => n.map(|n| n as f32),
                         ValueType::Float(f) => *f,
@@ -745,7 +745,7 @@ impl<'a> ToSql for Value<'a> {
                 let mut floats = Vec::with_capacity(values.len());
 
                 for value in values.iter() {
-                    let float = match &value.inner {
+                    let float = match &value.typed {
                         ValueType::Numeric(n) => n.as_ref().and_then(|n| n.to_string().parse::<f64>().ok()),
                         ValueType::Int64(n) => n.map(|n| n as f64),
                         ValueType::Float(f) => f.map(|f| f as f64),
@@ -931,7 +931,7 @@ impl<'a> TryFrom<&Value<'a>> for Option<BitVec> {
     fn try_from(value: &Value<'a>) -> Result<Option<BitVec>, Self::Error> {
         match value {
             val @ Value {
-                inner: ValueType::Text(Some(_)),
+                typed: ValueType::Text(Some(_)),
                 ..
             } => {
                 let text = val.as_str().unwrap();
@@ -939,7 +939,7 @@ impl<'a> TryFrom<&Value<'a>> for Option<BitVec> {
                 string_to_bits(text).map(Option::Some)
             }
             val @ Value {
-                inner: ValueType::Bytes(Some(_)),
+                typed: ValueType::Bytes(Some(_)),
                 ..
             } => {
                 let text = val.as_str().unwrap();

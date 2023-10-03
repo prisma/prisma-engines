@@ -90,13 +90,13 @@ macro_rules! value {
     ($target:ident: $kind:ty,$paramkind:ident,$that:expr) => {
         impl<'a> From<$kind> for crate::ast::Value<'a> {
             fn from(that: $kind) -> Self {
-                ValueInner::from(that).into()
+                ValueType::from(that).into()
             }
         }
 
         impl<'a> From<Option<$kind>> for crate::ast::Value<'a> {
             fn from(that: Option<$kind>) -> Self {
-                ValueInner::from(that).into()
+                ValueType::from(that).into()
             }
         }
 

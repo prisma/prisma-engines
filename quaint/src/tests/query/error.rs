@@ -129,7 +129,7 @@ async fn null_constraint_violation(api: &mut dyn TestApi) -> crate::Result<()> {
     let insert = Insert::single_into(&table).value("id1", 50).value("id2", 55);
     api.conn().insert(insert.into()).await?;
 
-    let update = Update::table(&table).set("id2", ValueInner::Int64(None));
+    let update = Update::table(&table).set("id2", ValueType::Int64(None));
     let res = api.conn().update(update).await;
 
     assert!(res.is_err());

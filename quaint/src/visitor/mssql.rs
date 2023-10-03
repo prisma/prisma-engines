@@ -310,7 +310,7 @@ impl<'a> Visitor<'a> for Mssql<'a> {
     }
 
     fn visit_raw_value(&mut self, value: Value<'a>) -> visitor::Result {
-        let res = match value.inner {
+        let res = match value.typed {
             ValueType::Int32(i) => i.map(|i| self.write(i)),
             ValueType::Int64(i) => i.map(|i| self.write(i)),
             ValueType::Float(d) => d.map(|f| match f {
@@ -391,7 +391,7 @@ impl<'a> Visitor<'a> for Mssql<'a> {
                 self.visit_parameterized(limit)?;
                 self.write(" ROWS ONLY")
             }
-            (None, Some(offset)) if self.order_by_set || offset.as_i64().map(|i| i > 0).unwrap_or(false) => {
+            (None, Some(offset)) if self.order_by_set || offset.typed.as_i64().map(|i| i > 0).unwrap_or(false) => {
                 add_ordering(self)?;
 
                 self.write(" OFFSET ")?;

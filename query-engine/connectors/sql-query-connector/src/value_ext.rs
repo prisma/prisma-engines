@@ -11,7 +11,7 @@ impl<'a> IntoTypedJsonExtension for quaint::Value<'a> {
             return "null".to_owned();
         }
 
-        let type_name = match self.inner {
+        let type_name = match self.typed {
             quaint::ValueType::Int32(_) => "int",
             quaint::ValueType::Int64(_) => "bigint",
             quaint::ValueType::Float(_) => "float",
@@ -37,7 +37,7 @@ impl<'a> IntoTypedJsonExtension for quaint::Value<'a> {
     fn as_typed_json(self) -> serde_json::Value {
         let type_name = self.type_name();
 
-        let json_value = match self.inner {
+        let json_value = match self.typed {
             quaint::ValueType::Array(Some(values)) => {
                 serde_json::Value::Array(values.into_iter().map(|value| value.as_typed_json()).collect())
             }

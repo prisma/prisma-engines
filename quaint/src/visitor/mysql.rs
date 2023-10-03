@@ -120,27 +120,27 @@ impl<'a> Visitor<'a> for Mysql<'a> {
     }
 
     fn visit_raw_value(&mut self, value: Value<'a>) -> visitor::Result {
-        let res = match &value.inner {
-            ValueInner::Int32(i) => i.map(|i| self.write(i)),
-            ValueInner::Int64(i) => i.map(|i| self.write(i)),
-            ValueInner::Float(d) => d.map(|f| match f {
+        let res = match &value.typed {
+            ValueType::Int32(i) => i.map(|i| self.write(i)),
+            ValueType::Int64(i) => i.map(|i| self.write(i)),
+            ValueType::Float(d) => d.map(|f| match f {
                 f if f.is_nan() => self.write("'NaN'"),
                 f if f == f32::INFINITY => self.write("'Infinity'"),
                 f if f == f32::NEG_INFINITY => self.write("'-Infinity"),
                 v => self.write(format!("{v:?}")),
             }),
-            ValueInner::Double(d) => d.map(|f| match f {
+            ValueType::Double(d) => d.map(|f| match f {
                 f if f.is_nan() => self.write("'NaN'"),
                 f if f == f64::INFINITY => self.write("'Infinity'"),
                 f if f == f64::NEG_INFINITY => self.write("'-Infinity"),
                 v => self.write(format!("{v:?}")),
             }),
-            ValueInner::Text(t) => t.as_ref().map(|t| self.write(format!("'{t}'"))),
-            ValueInner::Enum(e, _) => e.as_ref().map(|e| self.write(e)),
-            ValueInner::Bytes(b) => b.as_ref().map(|b| self.write(format!("x'{}'", hex::encode(b)))),
-            ValueInner::Boolean(b) => b.map(|b| self.write(b)),
-            ValueInner::Char(c) => c.map(|c| self.write(format!("'{c}'"))),
-            ValueInner::Array(_) | ValueInner::EnumArray(_, _) => {
+            ValueType::Text(t) => t.as_ref().map(|t| self.write(format!("'{t}'"))),
+            ValueType::Enum(e, _) => e.as_ref().map(|e| self.write(e)),
+            ValueType::Bytes(b) => b.as_ref().map(|b| self.write(format!("x'{}'", hex::encode(b)))),
+            ValueType::Boolean(b) => b.map(|b| self.write(b)),
+            ValueType::Char(c) => c.map(|c| self.write(format!("'{c}'"))),
+            ValueType::Array(_) | ValueType::EnumArray(_, _) => {
                 let msg = "Arrays are not supported in MySQL.";
                 let kind = ErrorKind::conversion(msg);
 
@@ -150,9 +150,9 @@ impl<'a> Visitor<'a> for Mysql<'a> {
                 return Err(builder.build());
             }
             #[cfg(feature = "bigdecimal")]
-            ValueInner::Numeric(r) => r.as_ref().map(|r| self.write(r)),
+            ValueType::Numeric(r) => r.as_ref().map(|r| self.write(r)),
 
-            ValueInner::Json(j) => match j {
+            ValueType::Json(j) => match j {
                 Some(ref j) => {
                     let s = serde_json::to_string(&j)?;
                     Some(self.write(format!("CONVERT('{s}', JSON)")))
@@ -160,11 +160,11 @@ impl<'a> Visitor<'a> for Mysql<'a> {
                 None => None,
             },
             #[cfg(feature = "uuid")]
-            ValueInner::Uuid(uuid) => uuid.map(|uuid| self.write(format!("'{}'", uuid.hyphenated()))),
-            ValueInner::DateTime(dt) => dt.map(|dt| self.write(format!("'{}'", dt.to_rfc3339(),))),
-            ValueInner::Date(date) => date.map(|date| self.write(format!("'{date}'"))),
-            ValueInner::Time(time) => time.map(|time| self.write(format!("'{time}'"))),
-            ValueInner::Xml(cow) => cow.as_ref().map(|cow| self.write(format!("'{cow}'"))),
+            ValueType::Uuid(uuid) => uuid.map(|uuid| self.write(format!("'{}'", uuid.hyphenated()))),
+            ValueType::DateTime(dt) => dt.map(|dt| self.write(format!("'{}'", dt.to_rfc3339(),))),
+            ValueType::Date(date) => date.map(|date| self.write(format!("'{date}'"))),
+            ValueType::Time(time) => time.map(|time| self.write(format!("'{time}'"))),
+            ValueType::Xml(cow) => cow.as_ref().map(|cow| self.write(format!("'{cow}'"))),
         };
 
         match res {
@@ -296,14 +296,14 @@ impl<'a> Visitor<'a> for Mysql<'a> {
             (
                 None,
                 Some(Value {
-                    inner: ValueInner::Int32(Some(offset)),
+                    typed: ValueType::Int32(Some(offset)),
                     ..
                 }),
             ) if offset < 1 => Ok(()),
             (
                 None,
                 Some(Value {
-                    inner: ValueInner::Int64(Some(offset)),
+                    typed: ValueType::Int64(Some(offset)),
                     ..
                 }),
             ) if offset < 1 => Ok(()),
@@ -753,7 +753,7 @@ mod tests {
 
     #[test]
     fn test_raw_null() {
-        let (sql, params) = Mysql::build(Select::default().value(ValueInner::Text(None).raw())).unwrap();
+        let (sql, params) = Mysql::build(Select::default().value(ValueType::Text(None).raw())).unwrap();
         assert_eq!("SELECT null", sql);
         assert!(params.is_empty());
     }
@@ -781,7 +781,7 @@ mod tests {
 
     #[test]
     fn test_raw_bytes() {
-        let (sql, params) = Mysql::build(Select::default().value(ValueInner::bytes(vec![1, 2, 3]).raw())).unwrap();
+        let (sql, params) = Mysql::build(Select::default().value(ValueType::bytes(vec![1, 2, 3]).raw())).unwrap();
         assert_eq!("SELECT x'010203'", sql);
         assert!(params.is_empty());
     }
@@ -799,7 +799,7 @@ mod tests {
 
     #[test]
     fn test_raw_char() {
-        let (sql, params) = Mysql::build(Select::default().value(ValueInner::character('a').raw())).unwrap();
+        let (sql, params) = Mysql::build(Select::default().value(ValueType::character('a').raw())).unwrap();
         assert_eq!("SELECT 'a'", sql);
         assert!(params.is_empty());
     }
@@ -909,7 +909,7 @@ mod tests {
     #[test]
 
     fn test_json_negation() {
-        let conditions = ConditionTree::not("json".equals(ValueInner::Json(Some(serde_json::ValueInner::Null))));
+        let conditions = ConditionTree::not("json".equals(ValueType::Json(Some(serde_json::ValueInner::Null))));
         let (sql, _) = Mysql::build(Select::from_table("test").so_that(conditions)).unwrap();
 
         assert_eq!(
@@ -921,7 +921,7 @@ mod tests {
     #[test]
 
     fn test_json_not_negation() {
-        let conditions = ConditionTree::not("json".not_equals(ValueInner::Json(Some(serde_json::ValueInner::Null))));
+        let conditions = ConditionTree::not("json".not_equals(ValueType::Json(Some(serde_json::ValueInner::Null))));
         let (sql, _) = Mysql::build(Select::from_table("test").so_that(conditions)).unwrap();
 
         assert_eq!(

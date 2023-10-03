@@ -63,7 +63,7 @@ pub fn conv_params(params: &[QuaintValue<'_>]) -> serde_json::Result<Vec<JSArg>>
     let mut values = Vec::with_capacity(params.len());
 
     for qv in params {
-        let res = match &qv.inner {
+        let res = match &qv.typed {
             QuaintValueType::Json(s) => match s {
                 Some(ref s) => {
                     let json_str = serde_json::to_string(s)?;

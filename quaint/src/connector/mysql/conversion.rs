@@ -19,7 +19,7 @@ pub fn conv_params(params: &[Value<'_>]) -> crate::Result<my::Params> {
         let mut values = Vec::with_capacity(params.len());
 
         for pv in params {
-            let res = match &pv.inner {
+            let res = match &pv.typed {
                 ValueType::Int32(i) => i.map(|i| my::Value::Int(i as i64)),
                 ValueType::Int64(i) => i.map(my::Value::Int),
                 ValueType::Float(f) => f.map(my::Value::Float),

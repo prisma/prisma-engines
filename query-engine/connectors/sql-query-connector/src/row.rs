@@ -92,7 +92,7 @@ impl ToSqlRow for ResultRow {
 
         for (i, p_value) in self.into_iter().enumerate().take(row_width) {
             let pv = match (meta[i].identifier(), meta[i].arity()) {
-                (type_identifier, FieldArity::List) => match p_value.inner {
+                (type_identifier, FieldArity::List) => match p_value.typed {
                     value if value.is_null() => Ok(PrismaValue::List(Vec::new())),
                     ValueType::Array(None) => Ok(PrismaValue::List(Vec::new())),
                     // TODO: avoid cloning in here.
@@ -141,7 +141,7 @@ fn row_value_to_prisma_value(p_value: Value, meta: ColumnMetadata<'_>) -> Result
     };
 
     Ok(match meta.identifier() {
-        TypeIdentifier::Boolean => match p_value.inner {
+        TypeIdentifier::Boolean => match p_value.typed {
             value if value.is_null() => PrismaValue::Null,
             ValueType::Int32(Some(i)) => PrismaValue::Boolean(i != 0),
             ValueType::Int64(Some(i)) => PrismaValue::Boolean(i != 0),
@@ -150,26 +150,26 @@ fn row_value_to_prisma_value(p_value: Value, meta: ColumnMetadata<'_>) -> Result
             ValueType::Bytes(Some(bytes)) if bytes.as_ref() == [1u8] => PrismaValue::Boolean(true),
             _ => return Err(create_error(&p_value)),
         },
-        TypeIdentifier::Enum(_) => match p_value.inner {
+        TypeIdentifier::Enum(_) => match p_value.typed {
             value if value.is_null() => PrismaValue::Null,
             ValueType::Enum(Some(cow), _) => PrismaValue::Enum(cow.into_owned()),
             ValueType::Text(Some(cow)) => PrismaValue::Enum(cow.into_owned()),
             _ => return Err(create_error(&p_value)),
         },
 
-        TypeIdentifier::Json => match p_value.inner {
+        TypeIdentifier::Json => match p_value.typed {
             value if value.is_null() => PrismaValue::Null,
             ValueType::Text(Some(json)) => PrismaValue::Json(json.into()),
             ValueType::Json(Some(json)) => PrismaValue::Json(json.to_string()),
             _ => return Err(create_error(&p_value)),
         },
-        TypeIdentifier::UUID => match p_value.inner {
+        TypeIdentifier::UUID => match p_value.typed {
             value if value.is_null() => PrismaValue::Null,
             ValueType::Text(Some(uuid)) => PrismaValue::Uuid(Uuid::parse_str(&uuid)?),
             ValueType::Uuid(Some(uuid)) => PrismaValue::Uuid(uuid),
             _ => return Err(create_error(&p_value)),
         },
-        TypeIdentifier::DateTime => match p_value.inner {
+        TypeIdentifier::DateTime => match p_value.typed {
             value if value.is_null() => PrismaValue::Null,
             value if value.is_integer() => {
                 let ts = value.as_integer().unwrap();
@@ -199,7 +199,7 @@ fn row_value_to_prisma_value(p_value: Value, meta: ColumnMetadata<'_>) -> Result
             }
             _ => return Err(create_error(&p_value)),
         },
-        TypeIdentifier::Float | TypeIdentifier::Decimal => match p_value.inner {
+        TypeIdentifier::Float | TypeIdentifier::Decimal => match p_value.typed {
             value if value.is_null() => PrismaValue::Null,
             ValueType::Numeric(Some(f)) => PrismaValue::Float(f.normalized()),
             ValueType::Double(Some(f)) => match f {
@@ -231,7 +231,7 @@ fn row_value_to_prisma_value(p_value: Value, meta: ColumnMetadata<'_>) -> Result
             }
             _ => return Err(create_error(&p_value)),
         },
-        TypeIdentifier::Int => match p_value.inner {
+        TypeIdentifier::Int => match p_value.typed {
             value if value.is_null() => PrismaValue::Null,
             ValueType::Int32(Some(i)) => PrismaValue::Int(i as i64),
             ValueType::Int64(Some(i)) => PrismaValue::Int(i),
@@ -253,7 +253,7 @@ fn row_value_to_prisma_value(p_value: Value, meta: ColumnMetadata<'_>) -> Result
             ValueType::Boolean(Some(bool)) => PrismaValue::Int(bool as i64),
             other => to_prisma_value(other)?,
         },
-        TypeIdentifier::BigInt => match p_value.inner {
+        TypeIdentifier::BigInt => match p_value.typed {
             value if value.is_null() => PrismaValue::Null,
             ValueType::Int32(Some(i)) => PrismaValue::BigInt(i as i64),
             ValueType::Int64(Some(i)) => PrismaValue::BigInt(i),
@@ -275,7 +275,7 @@ fn row_value_to_prisma_value(p_value: Value, meta: ColumnMetadata<'_>) -> Result
             ValueType::Boolean(Some(bool)) => PrismaValue::BigInt(bool as i64),
             other => to_prisma_value(other)?,
         },
-        TypeIdentifier::String => match p_value.inner {
+        TypeIdentifier::String => match p_value.typed {
             value if value.is_null() => PrismaValue::Null,
             ValueType::Uuid(Some(uuid)) => PrismaValue::String(uuid.to_string()),
             ValueType::Json(Some(ref json_value)) => {
@@ -283,7 +283,7 @@ fn row_value_to_prisma_value(p_value: Value, meta: ColumnMetadata<'_>) -> Result
             }
             other => to_prisma_value(other)?,
         },
-        TypeIdentifier::Bytes => match p_value.inner {
+        TypeIdentifier::Bytes => match p_value.typed {
             value if value.is_null() => PrismaValue::Null,
             ValueType::Bytes(Some(bytes)) => PrismaValue::Bytes(bytes.into()),
             _ => return Err(create_error(&p_value)),

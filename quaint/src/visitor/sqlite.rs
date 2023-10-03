@@ -74,7 +74,7 @@ impl<'a> Visitor<'a> for Sqlite<'a> {
     }
 
     fn visit_raw_value(&mut self, value: Value<'a>) -> visitor::Result {
-        let res = match &value.inner {
+        let res = match &value.typed {
             ValueType::Int32(i) => i.map(|i| self.write(i)),
             ValueType::Int64(i) => i.map(|i| self.write(i)),
             ValueType::Text(t) => t.as_ref().map(|t| self.write(format!("'{t}'"))),

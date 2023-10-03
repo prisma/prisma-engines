@@ -46,7 +46,7 @@ impl<'a> Expression<'a> {
     pub(crate) fn is_json_expr(&self) -> bool {
         match &self.kind {
             ExpressionKind::Parameterized(Value {
-                inner: ValueType::Json(_),
+                typed: ValueType::Json(_),
                 ..
             }) => true,
 
@@ -62,7 +62,7 @@ impl<'a> Expression<'a> {
     pub(crate) fn is_json_value(&self) -> bool {
         match &self.kind {
             ExpressionKind::Parameterized(Value {
-                inner: ValueType::Json(_),
+                typed: ValueType::Json(_),
                 ..
             }) => true,
 
@@ -76,7 +76,7 @@ impl<'a> Expression<'a> {
     pub(crate) fn into_json_value(self) -> Option<serde_json::Value> {
         match self.kind {
             ExpressionKind::Parameterized(Value {
-                inner: ValueType::Json(json_val),
+                typed: ValueType::Json(json_val),
                 ..
             }) => json_val,
 
@@ -227,7 +227,7 @@ impl<'a> ExpressionKind<'a> {
     pub(crate) fn is_xml_value(&self) -> bool {
         match self {
             Self::Parameterized(Value {
-                inner: ValueType::Xml(_),
+                typed: ValueType::Xml(_),
                 ..
             }) => true,
             Self::Value(expr) => expr.is_xml_value(),

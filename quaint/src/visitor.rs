@@ -169,7 +169,7 @@ pub trait Visitor<'a> {
 
     /// A visit to a value we parameterize
     fn visit_parameterized(&mut self, value: Value<'a>) -> Result {
-        match value.inner {
+        match value.typed {
             ValueType::Enum(Some(variant), name) => self.visit_parameterized_enum(variant, name),
             ValueType::EnumArray(Some(variants), name) => self.visit_parameterized_enum_array(variants, name),
             _ => {

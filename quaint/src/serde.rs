@@ -115,7 +115,7 @@ impl<'de> Deserializer<'de> for ValueDeserializer<'de> {
     type Error = DeserializeError;
 
     fn deserialize_any<V: Visitor<'de>>(self, visitor: V) -> Result<V::Value, Self::Error> {
-        match self.0.inner {
+        match self.0.typed {
             ValueType::Text(Some(s)) => visitor.visit_string(s.into_owned()),
             ValueType::Text(None) => visitor.visit_none(),
             ValueType::Bytes(Some(bytes)) => visitor.visit_bytes(bytes.as_ref()),
@@ -193,7 +193,7 @@ impl<'de> Deserializer<'de> for ValueDeserializer<'de> {
     where
         V: Visitor<'de>,
     {
-        if let ValueType::Bytes(Some(bytes)) = self.0.inner {
+        if let ValueType::Bytes(Some(bytes)) = self.0.typed {
             match bytes {
                 Cow::Borrowed(bytes) => visitor.visit_borrowed_bytes(bytes),
                 Cow::Owned(bytes) => visitor.visit_byte_buf(bytes),
