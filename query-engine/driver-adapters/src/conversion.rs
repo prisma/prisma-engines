@@ -1,6 +1,7 @@
 use napi::bindgen_prelude::{FromNapiValue, ToNapiValue};
 use napi::NapiValue;
 use quaint::ast::Value as QuaintValue;
+use quaint::ast::ValueInner as QuaintValueType;
 use serde::Serialize;
 use serde_json::value::Value as JsonValue;
 
@@ -61,20 +62,20 @@ impl ToNapiValue for JSArg {
 pub fn conv_params(params: &[QuaintValue<'_>]) -> serde_json::Result<Vec<JSArg>> {
     let mut values = Vec::with_capacity(params.len());
 
-    for pv in params {
-        let res = match pv {
-            QuaintValue::Json(s) => match s {
+    for qv in params {
+        let res = match &qv.inner {
+            QuaintValueType::Json(s) => match s {
                 Some(ref s) => {
                     let json_str = serde_json::to_string(s)?;
                     JSArg::RawString(json_str)
                 }
                 None => JsonValue::Null.into(),
             },
-            QuaintValue::Bytes(bytes) => match bytes {
+            QuaintValueType::Bytes(bytes) => match bytes {
                 Some(bytes) => JSArg::Buffer(bytes.to_vec()),
                 None => JsonValue::Null.into(),
             },
-            quaint_value @ QuaintValue::Numeric(bd) => match bd {
+            quaint_value @ QuaintValueType::Numeric(bd) => match bd {
                 Some(bd) => match bd.to_string().parse::<f64>() {
                     Ok(double) => JSArg::from(JsonValue::from(double)),
                     Err(_) => JSArg::from(JsonValue::from(quaint_value.clone())),

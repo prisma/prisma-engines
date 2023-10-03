@@ -56,6 +56,12 @@ impl<'a> From<ValueInner<'a>> for Value<'a> {
     }
 }
 
+impl<'a> Into<ValueInner<'a>> for Value<'a> {
+    fn into(self) -> ValueInner {
+        return self.inner;
+    }
+}
+
 /// A value we must parameterize for the prepared statement. Null values should be
 /// defined by their corresponding type variants with a `None` value for best
 /// compatibility.

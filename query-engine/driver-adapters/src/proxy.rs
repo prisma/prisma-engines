@@ -790,6 +790,7 @@ mod proxy_test {
         let json_value = serde_json::Value::String(c.to_string());
         let quaint_value = js_value_to_quaint(json_value, column_type, "column_name").unwrap();
         assert_eq!(quaint_value, QuaintValue::Char(Some(c)));
+        assert_eq!(quaint_value.inner, QuaintValueKind::Char(Some(c)));
     }
 
     #[test]

@@ -555,8 +555,8 @@ impl FilterVisitorExt for FilterVisitor {
             ScalarListCondition::ContainsSome(ConditionListValue::FieldRef(field_ref)) => {
                 comparable.compare_raw("&&", field_ref.aliased_col(alias, ctx))
             }
-            ScalarListCondition::IsEmpty(true) => comparable.compare_raw("=", Value::Array(Some(vec![])).raw()),
-            ScalarListCondition::IsEmpty(false) => comparable.compare_raw("<>", Value::Array(Some(vec![])).raw()),
+            ScalarListCondition::IsEmpty(true) => comparable.compare_raw("=", ValueInner::Array(Some(vec![])).raw()),
+            ScalarListCondition::IsEmpty(false) => comparable.compare_raw("<>", ValueInner::Array(Some(vec![])).raw()),
         };
 
         ConditionTree::single(condition)
