@@ -8,7 +8,7 @@ use crate::{
     },
     error::{Error, ErrorKind},
     prelude::{Aliasable, Average, Query},
-    visitor, Value,
+    visitor, Value, ValueInner,
 };
 use std::{convert::TryFrom, fmt::Write, iter};
 
@@ -310,27 +310,27 @@ impl<'a> Visitor<'a> for Mssql<'a> {
     }
 
     fn visit_raw_value(&mut self, value: Value<'a>) -> visitor::Result {
-        let res = match value {
-            Value::Int32(i) => i.map(|i| self.write(i)),
-            Value::Int64(i) => i.map(|i| self.write(i)),
-            Value::Float(d) => d.map(|f| match f {
+        let res = match value.inner {
+            ValueInner::Int32(i) => i.map(|i| self.write(i)),
+            ValueInner::Int64(i) => i.map(|i| self.write(i)),
+            ValueInner::Float(d) => d.map(|f| match f {
                 f if f.is_nan() => self.write("'NaN'"),
                 f if f == f32::INFINITY => self.write("'Infinity'"),
                 f if f == f32::NEG_INFINITY => self.write("'-Infinity"),
                 v => self.write(format!("{v:?}")),
             }),
-            Value::Double(d) => d.map(|f| match f {
+            ValueInner::Double(d) => d.map(|f| match f {
                 f if f.is_nan() => self.write("'NaN'"),
                 f if f == f64::INFINITY => self.write("'Infinity'"),
                 f if f == f64::NEG_INFINITY => self.write("'-Infinity"),
                 v => self.write(format!("{v:?}")),
             }),
-            Value::Text(t) => t.map(|t| self.write(format!("'{t}'"))),
-            Value::Enum(e, _) => e.map(|e| self.write(e)),
-            Value::Bytes(b) => b.map(|b| self.write(format!("0x{}", hex::encode(b)))),
-            Value::Boolean(b) => b.map(|b| self.write(if b { 1 } else { 0 })),
-            Value::Char(c) => c.map(|c| self.write(format!("'{c}'"))),
-            Value::Array(_) | Value::EnumArray(_, _) => {
+            ValueInner::Text(t) => t.map(|t| self.write(format!("'{t}'"))),
+            ValueInner::Enum(e, _) => e.map(|e| self.write(e)),
+            ValueInner::Bytes(b) => b.map(|b| self.write(format!("0x{}", hex::encode(b)))),
+            ValueInner::Boolean(b) => b.map(|b| self.write(if b { 1 } else { 0 })),
+            ValueInner::Char(c) => c.map(|c| self.write(format!("'{c}'"))),
+            ValueInner::Array(_) | ValueInner::EnumArray(_, _) => {
                 let msg = "Arrays are not supported in T-SQL.";
                 let kind = ErrorKind::conversion(msg);
 
@@ -340,29 +340,29 @@ impl<'a> Visitor<'a> for Mssql<'a> {
                 return Err(builder.build());
             }
 
-            Value::Json(j) => j.map(|j| self.write(format!("'{}'", serde_json::to_string(&j).unwrap()))),
+            ValueInner::Json(j) => j.map(|j| self.write(format!("'{}'", serde_json::to_string(&j).unwrap()))),
             #[cfg(feature = "bigdecimal")]
-            Value::Numeric(r) => r.map(|r| self.write(r)),
+            ValueInner::Numeric(r) => r.map(|r| self.write(r)),
             #[cfg(feature = "uuid")]
-            Value::Uuid(uuid) => uuid.map(|uuid| {
+            ValueInner::Uuid(uuid) => uuid.map(|uuid| {
                 let s = format!("CONVERT(uniqueidentifier, N'{}')", uuid.hyphenated());
                 self.write(s)
             }),
-            Value::DateTime(dt) => dt.map(|dt| {
+            ValueInner::DateTime(dt) => dt.map(|dt| {
                 let s = format!("CONVERT(datetimeoffset, N'{}')", dt.to_rfc3339());
                 self.write(s)
             }),
-            Value::Date(date) => date.map(|date| {
+            ValueInner::Date(date) => date.map(|date| {
                 let s = format!("CONVERT(date, N'{date}')");
                 self.write(s)
             }),
-            Value::Time(time) => time.map(|time| {
+            ValueInner::Time(time) => time.map(|time| {
                 let s = format!("CONVERT(time, N'{time}')");
                 self.write(s)
             }),
             // Style 3 is keep all whitespace + internal DTD processing:
             // https://docs.microsoft.com/en-us/sql/t-sql/functions/cast-and-convert-transact-sql?redirectedfrom=MSDN&view=sql-server-ver15#xml-styles
-            Value::Xml(cow) => cow.map(|cow| self.write(format!("CONVERT(XML, N'{cow}', 3)"))),
+            ValueInner::Xml(cow) => cow.map(|cow| self.write(format!("CONVERT(XML, N'{cow}', 3)"))),
         };
 
         match res {
