@@ -3,7 +3,7 @@
 use std::borrow::Cow;
 
 use crate::{
-    ast::{EnumVariant, Value},
+    ast::{EnumVariant, Value, ValueInner},
     connector::{ResultRow, ResultSet},
     error::{Error, ErrorKind},
 };
@@ -76,7 +76,7 @@ impl<'de> Deserializer<'de> for RowDeserializer {
         let kvs = columns.iter().enumerate().map(move |(v, k)| {
             // The unwrap is safe if `columns` is correct.
             let value = values.get_mut(v).unwrap();
-            let taken_value = std::mem::replace(value, ValueInner::Int64(None));
+            let taken_value = std::mem::replace(value, Value::from(ValueInner::Int64(None)));
             (k.as_str(), taken_value)
         });
 
@@ -115,7 +115,7 @@ impl<'de> Deserializer<'de> for ValueDeserializer<'de> {
     type Error = DeserializeError;
 
     fn deserialize_any<V: Visitor<'de>>(self, visitor: V) -> Result<V::Value, Self::Error> {
-        match self.0 {
+        match self.0.inner {
             ValueInner::Text(Some(s)) => visitor.visit_string(s.into_owned()),
             ValueInner::Text(None) => visitor.visit_none(),
             ValueInner::Bytes(Some(bytes)) => visitor.visit_bytes(bytes.as_ref()),
@@ -193,7 +193,7 @@ impl<'de> Deserializer<'de> for ValueDeserializer<'de> {
     where
         V: Visitor<'de>,
     {
-        if let ValueInner::Bytes(Some(bytes)) = self.0 {
+        if let ValueInner::Bytes(Some(bytes)) = self.0.inner {
             match bytes {
                 Cow::Borrowed(bytes) => visitor.visit_borrowed_bytes(bytes),
                 Cow::Owned(bytes) => visitor.visit_byte_buf(bytes),
@@ -269,7 +269,7 @@ mod tests {
         let first_row = make_row(vec![
             ("id", Value::integer(12)),
             ("name", "Georgina".into()),
-            ("bio", ValueInner::Text(None)),
+            ("bio", Value::from(ValueInner::Text(None))),
         ]);
         let second_row = make_row(vec![
             ("id", 33.into()),

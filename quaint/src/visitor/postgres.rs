@@ -170,11 +170,11 @@ impl<'a> Visitor<'a> for Postgres<'a> {
         let res = match &value.inner {
             ValueInner::Int32(i) => i.map(|i| self.write(i)),
             ValueInner::Int64(i) => i.map(|i| self.write(i)),
-            ValueInner::Text(t) => t.map(|t| self.write(format!("'{t}'"))),
-            ValueInner::Enum(e, _) => e.map(|e| self.write(e)),
-            ValueInner::Bytes(b) => b.map(|b| self.write(format!("E'{}'", hex::encode(b)))),
+            ValueInner::Text(t) => t.as_ref().map(|t| self.write(format!("'{t}'"))),
+            ValueInner::Enum(e, _) => e.as_ref().map(|e| self.write(e)),
+            ValueInner::Bytes(b) => b.as_ref().map(|b| self.write(format!("E'{}'", hex::encode(b)))),
             ValueInner::Boolean(b) => b.map(|b| self.write(b)),
-            ValueInner::Xml(cow) => cow.map(|cow| self.write(format!("'{cow}'"))),
+            ValueInner::Xml(cow) => cow.as_ref().map(|cow| self.write(format!("'{cow}'"))),
             ValueInner::Char(c) => c.map(|c| self.write(format!("'{c}'"))),
             ValueInner::Float(d) => d.map(|f| match f {
                 f if f.is_nan() => self.write("'NaN'"),
@@ -188,7 +188,7 @@ impl<'a> Visitor<'a> for Postgres<'a> {
                 f if f == f64::NEG_INFINITY => self.write("'-Infinity"),
                 v => self.write(format!("{v:?}")),
             }),
-            ValueInner::Array(ary) => ary.map(|ary| {
+            ValueInner::Array(ary) => ary.as_ref().map(|ary| {
                 self.surround_with("'{", "}'", |ref mut s| {
                     let len = ary.len();
 
@@ -203,7 +203,7 @@ impl<'a> Visitor<'a> for Postgres<'a> {
                     Ok(())
                 })
             }),
-            ValueInner::EnumArray(variants, name) => variants.map(|variants| {
+            ValueInner::EnumArray(variants, name) => variants.as_ref().map(|variants| {
                 self.surround_with("ARRAY[", "]", |ref mut s| {
                     let len = variants.len();
 
@@ -229,9 +229,11 @@ impl<'a> Visitor<'a> for Postgres<'a> {
 
                 Ok(())
             }),
-            ValueInner::Json(j) => j.map(|j| self.write(format!("'{}'", serde_json::to_string(&j).unwrap()))),
+            ValueInner::Json(j) => j
+                .as_ref()
+                .map(|j| self.write(format!("'{}'", serde_json::to_string(&j).unwrap()))),
             #[cfg(feature = "bigdecimal")]
-            ValueInner::Numeric(r) => r.map(|r| self.write(r)),
+            ValueInner::Numeric(r) => r.as_ref().map(|r| self.write(r)),
             #[cfg(feature = "uuid")]
             ValueInner::Uuid(uuid) => uuid.map(|uuid| self.write(format!("'{}'", uuid.hyphenated()))),
             ValueInner::DateTime(dt) => dt.map(|dt| self.write(format!("'{}'", dt.to_rfc3339(),))),

@@ -71,7 +71,7 @@ pub(crate) fn params_to_types(params: &[Value<'_>]) -> Vec<PostgresType> {
                     // If the array does not contain the same types of values, we let PG infer the type
                     if arr
                         .iter()
-                        .any(|val| std::mem::discriminant(first) != std::mem::discriminant(val))
+                        .any(|val| std::mem::discriminant(&first.inner) != std::mem::discriminant(&val.inner))
                     {
                         return PostgresType::UNKNOWN;
                     }
@@ -727,7 +727,7 @@ impl<'a> ToSql for Value<'a> {
                         ValueInner::Int64(n) => n.map(|n| n as f32),
                         ValueInner::Float(f) => *f,
                         ValueInner::Double(d) => d.map(|d| d as f32),
-                        v if value.is_null() => None,
+                        _ if value.is_null() => None,
                         v => {
                             let kind = ErrorKind::conversion(format!(
                                 "Couldn't add value of type `{v:?}` into a float array."

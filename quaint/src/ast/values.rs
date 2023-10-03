@@ -870,7 +870,7 @@ impl<'a> TryFrom<&Value<'a>> for Option<std::net::IpAddr> {
 
     fn try_from(value: &Value<'a>) -> Result<Option<std::net::IpAddr>, Self::Error> {
         match &value.inner {
-            val @ ValueInner::Text(Some(_)) => {
+            ValueInner::Text(Some(_)) => {
                 let text = value.as_str().unwrap();
 
                 match std::net::IpAddr::from_str(text) {
@@ -878,7 +878,7 @@ impl<'a> TryFrom<&Value<'a>> for Option<std::net::IpAddr> {
                     Err(e) => Err(e.into()),
                 }
             }
-            val @ ValueInner::Bytes(Some(_)) => {
+            ValueInner::Bytes(Some(_)) => {
                 let text = value.as_str().unwrap();
 
                 match std::net::IpAddr::from_str(text) {
@@ -904,7 +904,7 @@ impl<'a> TryFrom<&Value<'a>> for Option<uuid::Uuid> {
     fn try_from(value: &Value<'a>) -> Result<Option<uuid::Uuid>, Self::Error> {
         match &value.inner {
             ValueInner::Uuid(uuid) => Ok(*uuid),
-            val @ ValueInner::Text(Some(_)) => {
+            ValueInner::Text(Some(_)) => {
                 let text = value.as_str().unwrap();
 
                 match uuid::Uuid::from_str(text) {
@@ -912,7 +912,7 @@ impl<'a> TryFrom<&Value<'a>> for Option<uuid::Uuid> {
                     Err(e) => Err(e.into()),
                 }
             }
-            val @ ValueInner::Bytes(Some(_)) => {
+            ValueInner::Bytes(Some(_)) => {
                 let text = value.as_str().unwrap();
 
                 match uuid::Uuid::from_str(text) {
@@ -920,7 +920,7 @@ impl<'a> TryFrom<&Value<'a>> for Option<uuid::Uuid> {
                     Err(e) => Err(e.into()),
                 }
             }
-            v if value.is_null() => Ok(None),
+            _ if value.is_null() => Ok(None),
             v => {
                 let kind = ErrorKind::conversion(format!("Couldn't convert value of type `{v:?}` to uuid::Uuid."));
 
