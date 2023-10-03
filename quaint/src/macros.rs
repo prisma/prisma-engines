@@ -88,18 +88,6 @@ macro_rules! val {
 
 macro_rules! value {
     ($target:ident: $kind:ty,$paramkind:ident,$that:expr) => {
-        impl<'a> From<$kind> for crate::ast::Value<'a> {
-            fn from(that: $kind) -> Self {
-                crate::ast::Value::from(crate::ast::ValueType::from(that))
-            }
-        }
-
-        impl<'a> From<Option<$kind>> for crate::ast::Value<'a> {
-            fn from(that: Option<$kind>) -> Self {
-                crate::ast::Value::from(crate::ast::ValueType::from(that))
-            }
-        }
-
         impl<'a> From<$kind> for crate::ast::ValueType<'a> {
             fn from(that: $kind) -> Self {
                 let $target = that;
@@ -113,6 +101,18 @@ macro_rules! value {
                     Some(val) => crate::ast::ValueType::from(val),
                     None => crate::ast::ValueType::$paramkind(None),
                 }
+            }
+        }
+
+        impl<'a> From<$kind> for crate::ast::Value<'a> {
+            fn from(that: $kind) -> Self {
+                crate::ast::Value::from(crate::ast::ValueType::from(that))
+            }
+        }
+
+        impl<'a> From<Option<$kind>> for crate::ast::Value<'a> {
+            fn from(that: Option<$kind>) -> Self {
+                crate::ast::Value::from(crate::ast::ValueType::from(that))
             }
         }
     };

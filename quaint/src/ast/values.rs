@@ -44,24 +44,24 @@ pub struct Value<'a> {
 impl<'a> Value<'a> {
     /// Creates a new 32-bit signed integer.
     pub fn int32<I>(value: I) -> Self
-        where
-            I: Into<i32>,
+    where
+        I: Into<i32>,
     {
         ValueType::int32(value).into()
     }
 
     /// Creates a new 64-bit signed integer.
     pub fn int64<I>(value: I) -> Self
-        where
-            I: Into<i64>,
+    where
+        I: Into<i64>,
     {
         ValueType::int64(value).into()
     }
 
     /// Creates a new 32-bit signed integer.
     pub fn integer<I>(value: I) -> Self
-        where
-            I: Into<i32>,
+    where
+        I: Into<i32>,
     {
         ValueType::int32(value).into()
     }
@@ -85,59 +85,59 @@ impl<'a> Value<'a> {
 
     /// Creates a new string value.
     pub fn text<T>(value: T) -> Self
-        where
-            T: Into<Cow<'a, str>>,
+    where
+        T: Into<Cow<'a, str>>,
     {
         ValueType::text(value).into()
     }
 
     /// Creates a new enum value.
     pub fn enum_variant<T>(value: T) -> Self
-        where
-            T: Into<Cow<'a, str>>,
+    where
+        T: Into<Cow<'a, str>>,
     {
         ValueType::enum_variant(value).into()
     }
 
     /// Creates a new enum value with the name of the enum attached.
     pub fn enum_variant_with_name<T, U, V>(value: T, name: U, schema_name: Option<V>) -> Self
-        where
-            T: Into<Cow<'a, str>>,
-            U: Into<Cow<'a, str>>,
-            V: Into<Cow<'a, str>>,
+    where
+        T: Into<Cow<'a, str>>,
+        U: Into<Cow<'a, str>>,
+        V: Into<Cow<'a, str>>,
     {
         ValueType::enum_variant_with_name(value, name, schema_name).into()
     }
 
     /// Creates a new bytes value.
     pub fn bytes<B>(value: B) -> Self
-        where
-            B: Into<Cow<'a, [u8]>>,
+    where
+        B: Into<Cow<'a, [u8]>>,
     {
         ValueType::bytes(value).into()
     }
 
     /// Creates a new boolean value.
     pub fn boolean<B>(value: B) -> Self
-        where
-            B: Into<bool>,
+    where
+        B: Into<bool>,
     {
         ValueType::boolean(value).into()
     }
 
     /// Creates a new character value.
     pub fn character<C>(value: C) -> Self
-        where
-            C: Into<char>,
+    where
+        C: Into<char>,
     {
         ValueType::character(value).into()
     }
 
     /// Creates a new array value.
     pub fn array<I, V>(value: I) -> Self
-        where
-            I: IntoIterator<Item = V>,
-            V: Into<Value<'a>>,
+    where
+        I: IntoIterator<Item = V>,
+        V: Into<Value<'a>>,
     {
         ValueType::array(value).into()
     }
@@ -171,8 +171,8 @@ impl<'a> Value<'a> {
 
     /// Creates a new XML value.
     pub fn xml<T>(value: T) -> Self
-        where
-            T: Into<Cow<'a, str>>,
+    where
+        T: Into<Cow<'a, str>>,
     {
         ValueType::xml(value).into()
     }
@@ -366,16 +366,16 @@ impl<'a> Value<'a> {
 
     /// Returns a `Vec<T>` if the value is an array of `T`, otherwise `None`.
     pub fn into_vec<T>(self) -> Option<Vec<T>>
-        where T: TryFrom<Value<'a>>,
+    where
+        T: TryFrom<Value<'a>>,
     {
         self.typed.into_vec()
-
     }
 
     /// Returns a cloned Vec<T> if the value is an array of T, otherwise `None`.
     pub fn to_vec<T>(&self) -> Option<Vec<T>>
-        where
-            T: TryFrom<Value<'a>>,
+    where
+        T: TryFrom<Value<'a>>,
     {
         self.typed.to_vec()
     }
@@ -587,22 +587,22 @@ impl<'a> From<ValueType<'a>> for serde_json::Value {
 }
 
 impl<'a> ValueType<'a> {
-    pub(crate) fn into_value(self) -> Value<'a> {
+    pub fn into_value(self) -> Value<'a> {
         Value::from(self)
     }
 
     /// Creates a new 32-bit signed integer.
     pub(crate) fn int32<I>(value: I) -> Self
-        where
-            I: Into<i32>,
+    where
+        I: Into<i32>,
     {
         Self::Int32(Some(value.into()))
     }
 
     /// Creates a new 64-bit signed integer.
     pub(crate) fn int64<I>(value: I) -> Self
-        where
-            I: Into<i64>,
+    where
+        I: Into<i64>,
     {
         Self::Int64(Some(value.into()))
     }
@@ -626,59 +626,59 @@ impl<'a> ValueType<'a> {
 
     /// Creates a new string value.
     pub(crate) fn text<T>(value: T) -> Self
-        where
-            T: Into<Cow<'a, str>>,
+    where
+        T: Into<Cow<'a, str>>,
     {
         Self::Text(Some(value.into()))
     }
 
     /// Creates a new enum value.
     pub(crate) fn enum_variant<T>(value: T) -> Self
-        where
-            T: Into<Cow<'a, str>>,
+    where
+        T: Into<Cow<'a, str>>,
     {
         Self::Enum(Some(EnumVariant::new(value)), None)
     }
 
     /// Creates a new enum value with the name of the enum attached.
     pub(crate) fn enum_variant_with_name<T, U, V>(value: T, name: U, schema_name: Option<V>) -> Self
-        where
-            T: Into<Cow<'a, str>>,
-            U: Into<Cow<'a, str>>,
-            V: Into<Cow<'a, str>>,
+    where
+        T: Into<Cow<'a, str>>,
+        U: Into<Cow<'a, str>>,
+        V: Into<Cow<'a, str>>,
     {
         Self::Enum(Some(EnumVariant::new(value)), Some(EnumName::new(name, schema_name)))
     }
 
     /// Creates a new bytes value.
     pub(crate) fn bytes<B>(value: B) -> Self
-        where
-            B: Into<Cow<'a, [u8]>>,
+    where
+        B: Into<Cow<'a, [u8]>>,
     {
         Self::Bytes(Some(value.into()))
     }
 
     /// Creates a new boolean value.
     pub(crate) fn boolean<B>(value: B) -> Self
-        where
-            B: Into<bool>,
+    where
+        B: Into<bool>,
     {
         Self::Boolean(Some(value.into()))
     }
 
     /// Creates a new character value.
     pub(crate) fn character<C>(value: C) -> Self
-        where
-            C: Into<char>,
+    where
+        C: Into<char>,
     {
         Self::Char(Some(value.into()))
     }
 
     /// Creates a new array value.
     pub(crate) fn array<I, V>(value: I) -> Self
-        where
-            I: IntoIterator<Item = V>,
-            V: Into<Value<'a>>,
+    where
+        I: IntoIterator<Item = V>,
+        V: Into<Value<'a>>,
     {
         Self::Array(Some(value.into_iter().map(|v| v.into()).collect()))
     }
@@ -712,8 +712,8 @@ impl<'a> ValueType<'a> {
 
     /// Creates a new XML value.
     pub(crate) fn xml<T>(value: T) -> Self
-        where
-            T: Into<Cow<'a, str>>,
+    where
+        T: Into<Cow<'a, str>>,
     {
         Self::Xml(Some(value.into()))
     }
@@ -1001,9 +1001,9 @@ impl<'a> ValueType<'a> {
 
     /// Returns a `Vec<T>` if the value is an array of `T`, otherwise `None`.
     pub(crate) fn into_vec<T>(self) -> Option<Vec<T>>
-        where
+    where
         // Implement From<Value>
-            T: TryFrom<Value<'a>>,
+        T: TryFrom<Value<'a>>,
     {
         match self {
             Self::Array(Some(vec)) => {
@@ -1019,8 +1019,8 @@ impl<'a> ValueType<'a> {
 
     /// Returns a cloned Vec<T> if the value is an array of T, otherwise `None`.
     pub(crate) fn to_vec<T>(&self) -> Option<Vec<T>>
-        where
-            T: TryFrom<Value<'a>>,
+    where
+        T: TryFrom<Value<'a>>,
     {
         match self {
             Self::Array(Some(vec)) => {
@@ -1039,6 +1039,8 @@ value!(val: i64, Int64, val);
 value!(val: i32, Int32, val);
 value!(val: bool, Boolean, val);
 value!(val: &'a str, Text, val.into());
+value!(val: &'a String, Text, val.into());
+value!(val: &'a &str, Text, (*val).into());
 value!(val: String, Text, val.into());
 value!(val: usize, Int64, i64::try_from(val).unwrap());
 value!(val: &'a [u8], Bytes, val.into());
@@ -1070,7 +1072,6 @@ impl<'a> TryFrom<Value<'a>> for i32 {
 
     fn try_from(value: Value<'a>) -> Result<i32, Self::Error> {
         value
-            .typed
             .as_i32()
             .ok_or_else(|| Error::builder(ErrorKind::conversion("Not an i32")).build())
     }
@@ -1081,7 +1082,7 @@ impl<'a> TryFrom<Value<'a>> for BigDecimal {
     type Error = Error;
 
     fn try_from(value: Value<'a>) -> Result<BigDecimal, Self::Error> {
-        value.typed
+        value
             .into_numeric()
             .ok_or_else(|| Error::builder(ErrorKind::conversion("Not a decimal")).build())
     }
@@ -1092,7 +1093,6 @@ impl<'a> TryFrom<Value<'a>> for f64 {
 
     fn try_from(value: Value<'a>) -> Result<f64, Self::Error> {
         value
-            .typed
             .as_f64()
             .ok_or_else(|| Error::builder(ErrorKind::conversion("Not a f64")).build())
     }
@@ -1102,7 +1102,7 @@ impl<'a> TryFrom<Value<'a>> for String {
     type Error = Error;
 
     fn try_from(value: Value<'a>) -> Result<String, Self::Error> {
-        value.typed
+        value
             .into_string()
             .ok_or_else(|| Error::builder(ErrorKind::conversion("Not a string")).build())
     }
@@ -1112,7 +1112,7 @@ impl<'a> TryFrom<Value<'a>> for bool {
     type Error = Error;
 
     fn try_from(value: Value<'a>) -> Result<bool, Self::Error> {
-        value.typed
+        value
             .as_bool()
             .ok_or_else(|| Error::builder(ErrorKind::conversion("Not a bool")).build())
     }
@@ -1122,7 +1122,7 @@ impl<'a> TryFrom<Value<'a>> for DateTime<Utc> {
     type Error = Error;
 
     fn try_from(value: Value<'a>) -> Result<DateTime<Utc>, Self::Error> {
-        value.typed
+        value
             .as_datetime()
             .ok_or_else(|| Error::builder(ErrorKind::conversion("Not a datetime")).build())
     }
