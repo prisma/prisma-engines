@@ -719,7 +719,7 @@ impl<'a> ValueType<'a> {
     }
 
     /// `true` if the `Value` is null.
-    pub(crate) fn is_null(&self) -> bool {
+    pub fn is_null(&self) -> bool {
         match self {
             Self::Int32(i) => i.is_none(),
             Self::Int64(i) => i.is_none(),
@@ -819,7 +819,7 @@ impl<'a> ValueType<'a> {
     }
 
     /// `true` if the `Value` is a signed integer.
-    pub(crate) fn is_integer(&self) -> bool {
+    pub fn is_integer(&self) -> bool {
         matches!(self, Self::Int32(_) | Self::Int64(_))
     }
 
@@ -840,7 +840,7 @@ impl<'a> ValueType<'a> {
     }
 
     /// Returns an `i64` if the value is a signed integer, otherwise `None`.
-    pub(crate) fn as_integer(&self) -> Option<i64> {
+    pub fn as_integer(&self) -> Option<i64> {
         match self {
             Self::Int32(i) => i.map(|i| i as i64),
             Self::Int64(i) => *i,
