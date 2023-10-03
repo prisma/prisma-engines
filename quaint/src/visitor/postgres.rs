@@ -110,7 +110,7 @@ impl<'a> Visitor<'a> for Postgres<'a> {
             self.visit_parameterized(Value::from(ValueInner::Array(Some(
                 variants
                     .into_iter()
-                    .map(|variant| variant.into_enum(name.clone()))
+                    .map(|variant| Value::from(variant.into_enum(name.clone())))
                     .collect(),
             ))))?;
         }

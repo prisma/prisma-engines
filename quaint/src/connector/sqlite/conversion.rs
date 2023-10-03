@@ -1,7 +1,7 @@
 use std::convert::TryFrom;
 
 use crate::{
-    ast::Value,
+    ast::{Value, ValueInner},
     connector::{
         queryable::{GetRow, ToColumnNames},
         TypeIdentifier,
@@ -138,17 +138,17 @@ impl<'a> GetRow for SqliteRow<'a> {
             let pv = match self.get_ref_unwrap(i) {
                 ValueRef::Null => match column {
                     // NOTE: A value without decl_type would be Int32(None)
-                    c if c.is_int32() | c.is_null() => ValueInner::Int32(None),
-                    c if c.is_int64() => ValueInner::Int64(None),
-                    c if c.is_text() => ValueInner::Text(None),
-                    c if c.is_bytes() => ValueInner::Bytes(None),
-                    c if c.is_float() => ValueInner::Float(None),
-                    c if c.is_double() => ValueInner::Double(None),
+                    c if c.is_int32() | c.is_null() => ValueInner::Int32(None).into(),
+                    c if c.is_int64() => ValueInner::Int64(None).into(),
+                    c if c.is_text() => ValueInner::Text(None).into(),
+                    c if c.is_bytes() => ValueInner::Bytes(None).into(),
+                    c if c.is_float() => ValueInner::Float(None).into(),
+                    c if c.is_double() => ValueInner::Double(None).into(),
                     #[cfg(feature = "bigdecimal")]
-                    c if c.is_real() => ValueInner::Numeric(None),
-                    c if c.is_datetime() => ValueInner::DateTime(None),
-                    c if c.is_date() => ValueInner::Date(None),
-                    c if c.is_bool() => ValueInner::Boolean(None),
+                    c if c.is_real() => ValueInner::Numeric(None).into(),
+                    c if c.is_datetime() => ValueInner::DateTime(None).into(),
+                    c if c.is_date() => ValueInner::Date(None).into(),
+                    c if c.is_bool() => ValueInner::Boolean(None).into(),
                     c => match c.decl_type() {
                         Some(n) => {
                             let msg = format!("Value {n} not supported");
@@ -157,7 +157,7 @@ impl<'a> GetRow for SqliteRow<'a> {
                             return Err(Error::builder(kind).build());
                         }
                         // When we don't know what to do, the default value would be Int32(None)
-                        None => ValueInner::Int32(None),
+                        None => ValueInner::Int32(None).into(),
                     },
                 },
                 ValueRef::Integer(i) => {
@@ -245,7 +245,7 @@ impl<'a> ToColumnNames for SqliteRows<'a> {
 
 impl<'a> ToSql for Value<'a> {
     fn to_sql(&self) -> Result<ToSqlOutput, RusqlError> {
-        let value = match self {
+        let value = match &self.inner {
             ValueInner::Int32(integer) => integer.map(ToSqlOutput::from),
             ValueInner::Int64(integer) => integer.map(ToSqlOutput::from),
             ValueInner::Float(float) => float.map(|f| f as f64).map(ToSqlOutput::from),

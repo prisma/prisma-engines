@@ -90,16 +90,28 @@ macro_rules! value {
     ($target:ident: $kind:ty,$paramkind:ident,$that:expr) => {
         impl<'a> From<$kind> for crate::ast::Value<'a> {
             fn from(that: $kind) -> Self {
-                let $target = that;
-                crate::ast::ValueInner::$paramkind(Some($that)).into()
+                ValueInner::from(that).into()
             }
         }
 
         impl<'a> From<Option<$kind>> for crate::ast::Value<'a> {
             fn from(that: Option<$kind>) -> Self {
+                ValueInner::from(that).into()
+            }
+        }
+
+        impl<'a> From<$kind> for crate::ast::ValueInner<'a> {
+            fn from(that: $kind) -> Self {
+                let $target = that;
+                crate::ast::ValueInner::$paramkind(Some($that))
+            }
+        }
+
+        impl<'a> From<Option<$kind>> for crate::ast::ValueInner<'a> {
+            fn from(that: Option<$kind>) -> Self {
                 match that {
-                    Some(val) => crate::ast::Value::from(val),
-                    None => crate::ast::ValueInner::$paramkind(None).into(),
+                    Some(val) => crate::ast::ValueInner::from(val),
+                    None => crate::ast::ValueInner::$paramkind(None),
                 }
             }
         }
