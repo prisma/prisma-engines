@@ -75,26 +75,26 @@ impl<'a> Visitor<'a> for Sqlite<'a> {
 
     fn visit_raw_value(&mut self, value: Value<'a>) -> visitor::Result {
         let res = match &value.inner {
-            ValueInner::Int32(i) => i.map(|i| self.write(i)),
-            ValueInner::Int64(i) => i.map(|i| self.write(i)),
-            ValueInner::Text(t) => t.as_ref().map(|t| self.write(format!("'{t}'"))),
-            ValueInner::Enum(e, _) => e.as_ref().map(|e| self.write(e)),
-            ValueInner::Bytes(b) => b.as_ref().map(|b| self.write(format!("x'{}'", hex::encode(b)))),
-            ValueInner::Boolean(b) => b.map(|b| self.write(b)),
-            ValueInner::Char(c) => c.map(|c| self.write(format!("'{c}'"))),
-            ValueInner::Float(d) => d.map(|f| match f {
+            ValueType::Int32(i) => i.map(|i| self.write(i)),
+            ValueType::Int64(i) => i.map(|i| self.write(i)),
+            ValueType::Text(t) => t.as_ref().map(|t| self.write(format!("'{t}'"))),
+            ValueType::Enum(e, _) => e.as_ref().map(|e| self.write(e)),
+            ValueType::Bytes(b) => b.as_ref().map(|b| self.write(format!("x'{}'", hex::encode(b)))),
+            ValueType::Boolean(b) => b.map(|b| self.write(b)),
+            ValueType::Char(c) => c.map(|c| self.write(format!("'{c}'"))),
+            ValueType::Float(d) => d.map(|f| match f {
                 f if f.is_nan() => self.write("'NaN'"),
                 f if f == f32::INFINITY => self.write("'Infinity'"),
                 f if f == f32::NEG_INFINITY => self.write("'-Infinity"),
                 v => self.write(format!("{v:?}")),
             }),
-            ValueInner::Double(d) => d.map(|f| match f {
+            ValueType::Double(d) => d.map(|f| match f {
                 f if f.is_nan() => self.write("'NaN'"),
                 f if f == f64::INFINITY => self.write("'Infinity'"),
                 f if f == f64::NEG_INFINITY => self.write("'-Infinity"),
                 v => self.write(format!("{v:?}")),
             }),
-            ValueInner::Array(_) | ValueInner::EnumArray(_, _) => {
+            ValueType::Array(_) | ValueType::EnumArray(_, _) => {
                 let msg = "Arrays are not supported in SQLite.";
                 let kind = ErrorKind::conversion(msg);
 
@@ -104,7 +104,7 @@ impl<'a> Visitor<'a> for Sqlite<'a> {
                 return Err(builder.build());
             }
 
-            ValueInner::Json(j) => match j {
+            ValueType::Json(j) => match j {
                 Some(ref j) => {
                     let s = serde_json::to_string(j)?;
                     Some(self.write(format!("'{s}'")))
@@ -112,13 +112,13 @@ impl<'a> Visitor<'a> for Sqlite<'a> {
                 None => None,
             },
             #[cfg(feature = "bigdecimal")]
-            ValueInner::Numeric(r) => r.as_ref().map(|r| self.write(r)),
+            ValueType::Numeric(r) => r.as_ref().map(|r| self.write(r)),
             #[cfg(feature = "uuid")]
-            ValueInner::Uuid(uuid) => uuid.map(|uuid| self.write(format!("'{}'", uuid.hyphenated()))),
-            ValueInner::DateTime(dt) => dt.map(|dt| self.write(format!("'{}'", dt.to_rfc3339(),))),
-            ValueInner::Date(date) => date.map(|date| self.write(format!("'{date}'"))),
-            ValueInner::Time(time) => time.map(|time| self.write(format!("'{time}'"))),
-            ValueInner::Xml(cow) => cow.as_ref().map(|cow| self.write(format!("'{cow}'"))),
+            ValueType::Uuid(uuid) => uuid.map(|uuid| self.write(format!("'{}'", uuid.hyphenated()))),
+            ValueType::DateTime(dt) => dt.map(|dt| self.write(format!("'{}'", dt.to_rfc3339(),))),
+            ValueType::Date(date) => date.map(|date| self.write(format!("'{date}'"))),
+            ValueType::Time(time) => time.map(|time| self.write(format!("'{time}'"))),
+            ValueType::Xml(cow) => cow.as_ref().map(|cow| self.write(format!("'{cow}'"))),
         };
 
         match res {
@@ -432,11 +432,11 @@ mod tests {
     #[test]
     fn test_aliased_null() {
         let expected_sql = "SELECT ? AS `test`";
-        let query = Select::default().value(val!(ValueInner::Text(None)).alias("test"));
+        let query = Select::default().value(val!(ValueType::Text(None)).alias("test"));
         let (sql, params) = Sqlite::build(query).unwrap();
 
         assert_eq!(expected_sql, sql);
-        assert_eq!(vec![ValueInner::Text(None)], params);
+        assert_eq!(vec![ValueType::Text(None)], params);
     }
 
     #[test]
@@ -461,10 +461,10 @@ mod tests {
         assert_eq!(expected_sql, sql);
         assert_eq!(
             vec![
-                ValueInner::int32(1),
-                ValueInner::int32(2),
-                ValueInner::int32(3),
-                ValueInner::int32(4),
+                ValueType::int32(1),
+                ValueType::int32(2),
+                ValueType::int32(3),
+                ValueType::int32(4),
             ],
             params
         );
@@ -483,10 +483,10 @@ mod tests {
         assert_eq!(expected_sql, sql);
         assert_eq!(
             vec![
-                ValueInner::int32(1),
-                ValueInner::int32(2),
-                ValueInner::int32(3),
-                ValueInner::int32(4),
+                ValueType::int32(1),
+                ValueType::int32(2),
+                ValueType::int32(3),
+                ValueType::int32(4),
             ],
             params
         );
@@ -515,7 +515,7 @@ mod tests {
         let expected_sql = "SELECT `test`.* FROM `test` WHERE `id1` IN (?,?)";
 
         assert_eq!(expected_sql, sql);
-        assert_eq!(vec![ValueInner::int32(1), ValueInner::int32(2),], params)
+        assert_eq!(vec![ValueType::int32(1), ValueType::int32(2),], params)
     }
 
     #[test]
@@ -625,11 +625,7 @@ mod tests {
     fn test_select_and() {
         let expected_sql = "SELECT `naukio`.* FROM `naukio` WHERE (`word` = ? AND `age` < ? AND `paw` = ?)";
 
-        let expected_params = vec![
-            ValueInner::text("meow"),
-            ValueInner::int32(10),
-            ValueInner::text("warm"),
-        ];
+        let expected_params = vec![ValueType::text("meow"), ValueType::int32(10), ValueType::text("warm")];
 
         let conditions = "word".equals("meow").and("age".less_than(10)).and("paw".equals("warm"));
 
@@ -645,11 +641,7 @@ mod tests {
     fn test_select_and_different_execution_order() {
         let expected_sql = "SELECT `naukio`.* FROM `naukio` WHERE (`word` = ? AND (`age` < ? AND `paw` = ?))";
 
-        let expected_params = vec![
-            ValueInner::text("meow"),
-            ValueInner::int32(10),
-            ValueInner::text("warm"),
-        ];
+        let expected_params = vec![ValueType::text("meow"), ValueType::int32(10), ValueType::text("warm")];
 
         let conditions = "word".equals("meow").and("age".less_than(10).and("paw".equals("warm")));
 
@@ -665,11 +657,7 @@ mod tests {
     fn test_select_or() {
         let expected_sql = "SELECT `naukio`.* FROM `naukio` WHERE ((`word` = ? OR `age` < ?) AND `paw` = ?)";
 
-        let expected_params = vec![
-            ValueInner::text("meow"),
-            ValueInner::int32(10),
-            ValueInner::text("warm"),
-        ];
+        let expected_params = vec![ValueType::text("meow"), ValueType::int32(10), ValueType::text("warm")];
 
         let conditions = "word".equals("meow").or("age".less_than(10)).and("paw".equals("warm"));
 
@@ -685,11 +673,7 @@ mod tests {
     fn test_select_negation() {
         let expected_sql = "SELECT `naukio`.* FROM `naukio` WHERE (NOT ((`word` = ? OR `age` < ?) AND `paw` = ?))";
 
-        let expected_params = vec![
-            ValueInner::text("meow"),
-            ValueInner::int32(10),
-            ValueInner::text("warm"),
-        ];
+        let expected_params = vec![ValueType::text("meow"), ValueType::int32(10), ValueType::text("warm")];
 
         let conditions = "word"
             .equals("meow")
@@ -709,11 +693,7 @@ mod tests {
     fn test_with_raw_condition_tree() {
         let expected_sql = "SELECT `naukio`.* FROM `naukio` WHERE (NOT ((`word` = ? OR `age` < ?) AND `paw` = ?))";
 
-        let expected_params = vec![
-            ValueInner::text("meow"),
-            ValueInner::int32(10),
-            ValueInner::text("warm"),
-        ];
+        let expected_params = vec![ValueType::text("meow"), ValueType::int32(10), ValueType::text("warm")];
 
         let conditions = ConditionTree::not("word".equals("meow").or("age".less_than(10)).and("paw".equals("warm")));
         let query = Select::from_table("naukio").so_that(conditions);
@@ -749,7 +729,7 @@ mod tests {
         let (sql, params) = Sqlite::build(query).unwrap();
 
         assert_eq!(expected_sql, sql);
-        assert_eq!(default_params(vec![ValueInner::boolean(true),]), params);
+        assert_eq!(default_params(vec![ValueType::boolean(true),]), params);
     }
 
     #[test]
@@ -777,7 +757,7 @@ mod tests {
         let (sql, params) = Sqlite::build(query).unwrap();
 
         assert_eq!(expected_sql, sql);
-        assert_eq!(default_params(vec![ValueInner::boolean(true),]), params);
+        assert_eq!(default_params(vec![ValueType::boolean(true),]), params);
     }
 
     #[test]
@@ -891,7 +871,7 @@ mod tests {
 
     #[test]
     fn test_raw_null() {
-        let (sql, params) = Sqlite::build(Select::default().value(ValueInner::Text(None).raw())).unwrap();
+        let (sql, params) = Sqlite::build(Select::default().value(ValueType::Text(None).raw())).unwrap();
         assert_eq!("SELECT null", sql);
         assert!(params.is_empty());
     }
@@ -919,7 +899,7 @@ mod tests {
 
     #[test]
     fn test_raw_bytes() {
-        let (sql, params) = Sqlite::build(Select::default().value(ValueInner::bytes(vec![1, 2, 3]).raw())).unwrap();
+        let (sql, params) = Sqlite::build(Select::default().value(ValueType::bytes(vec![1, 2, 3]).raw())).unwrap();
         assert_eq!("SELECT x'010203'", sql);
         assert!(params.is_empty());
     }
@@ -937,7 +917,7 @@ mod tests {
 
     #[test]
     fn test_raw_char() {
-        let (sql, params) = Sqlite::build(Select::default().value(ValueInner::character('a').raw())).unwrap();
+        let (sql, params) = Sqlite::build(Select::default().value(ValueType::character('a').raw())).unwrap();
         assert_eq!("SELECT 'a'", sql);
         assert!(params.is_empty());
     }

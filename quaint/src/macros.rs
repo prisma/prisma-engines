@@ -100,18 +100,18 @@ macro_rules! value {
             }
         }
 
-        impl<'a> From<$kind> for crate::ast::ValueInner<'a> {
+        impl<'a> From<$kind> for crate::ast::ValueType<'a> {
             fn from(that: $kind) -> Self {
                 let $target = that;
-                crate::ast::ValueInner::$paramkind(Some($that))
+                crate::ast::ValueType::$paramkind(Some($that))
             }
         }
 
-        impl<'a> From<Option<$kind>> for crate::ast::ValueInner<'a> {
+        impl<'a> From<Option<$kind>> for crate::ast::ValueType<'a> {
             fn from(that: Option<$kind>) -> Self {
                 match that {
-                    Some(val) => crate::ast::ValueInner::from(val),
-                    None => crate::ast::ValueInner::$paramkind(None),
+                    Some(val) => crate::ast::ValueType::from(val),
+                    None => crate::ast::ValueType::$paramkind(None),
                 }
             }
         }

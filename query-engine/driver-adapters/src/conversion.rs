@@ -1,7 +1,7 @@
 use napi::bindgen_prelude::{FromNapiValue, ToNapiValue};
 use napi::NapiValue;
 use quaint::ast::Value as QuaintValue;
-use quaint::ast::ValueInner as QuaintValueType;
+use quaint::ast::ValueType as QuaintValueType;
 use serde::Serialize;
 use serde_json::value::Value as JsonValue;
 

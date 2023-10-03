@@ -1,4 +1,4 @@
-use crate::{Value, ValueInner};
+use crate::{Value, ValueType};
 use std::{borrow::Cow, fmt};
 
 #[derive(Debug, Clone, PartialEq)]
@@ -14,11 +14,11 @@ impl<'a> EnumVariant<'a> {
     }
 
     pub fn into_text(self) -> Value<'a> {
-        ValueInner::Text(Some(self.0)).into()
+        ValueType::Text(Some(self.0)).into()
     }
 
-    pub fn into_enum(self, name: Option<EnumName<'a>>) -> ValueInner<'a> {
-        ValueInner::Enum(Some(self), name)
+    pub fn into_enum(self, name: Option<EnumName<'a>>) -> ValueType<'a> {
+        ValueType::Enum(Some(self), name)
     }
 }
 

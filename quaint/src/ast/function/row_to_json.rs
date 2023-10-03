@@ -31,7 +31,7 @@ pub struct RowToJson<'a> {
 /// let result = conn.select(select).await?;
 ///
 /// assert_eq!(
-///     ValueInner::Json(Some(serde_json::json!({
+///     ValueType::Json(Some(serde_json::json!({
 ///         "toto": "hello_world"
 ///     }))).into(),
 ///     result.into_single().unwrap()[0]

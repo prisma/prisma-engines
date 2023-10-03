@@ -12,23 +12,23 @@ impl<'a> IntoTypedJsonExtension for quaint::Value<'a> {
         }
 
         let type_name = match self.inner {
-            quaint::ValueInner::Int32(_) => "int",
-            quaint::ValueInner::Int64(_) => "bigint",
-            quaint::ValueInner::Float(_) => "float",
-            quaint::ValueInner::Double(_) => "double",
-            quaint::ValueInner::Text(_) => "string",
-            quaint::ValueInner::Enum(_, _) => "enum",
-            quaint::ValueInner::Bytes(_) => "bytes",
-            quaint::ValueInner::Boolean(_) => "bool",
-            quaint::ValueInner::Char(_) => "char",
-            quaint::ValueInner::Numeric(_) => "decimal",
-            quaint::ValueInner::Json(_) => "json",
-            quaint::ValueInner::Xml(_) => "xml",
-            quaint::ValueInner::Uuid(_) => "uuid",
-            quaint::ValueInner::DateTime(_) => "datetime",
-            quaint::ValueInner::Date(_) => "date",
-            quaint::ValueInner::Time(_) => "time",
-            quaint::ValueInner::Array(_) | quaint::ValueInner::EnumArray(_, _) => "array",
+            quaint::ValueType::Int32(_) => "int",
+            quaint::ValueType::Int64(_) => "bigint",
+            quaint::ValueType::Float(_) => "float",
+            quaint::ValueType::Double(_) => "double",
+            quaint::ValueType::Text(_) => "string",
+            quaint::ValueType::Enum(_, _) => "enum",
+            quaint::ValueType::Bytes(_) => "bytes",
+            quaint::ValueType::Boolean(_) => "bool",
+            quaint::ValueType::Char(_) => "char",
+            quaint::ValueType::Numeric(_) => "decimal",
+            quaint::ValueType::Json(_) => "json",
+            quaint::ValueType::Xml(_) => "xml",
+            quaint::ValueType::Uuid(_) => "uuid",
+            quaint::ValueType::DateTime(_) => "datetime",
+            quaint::ValueType::Date(_) => "date",
+            quaint::ValueType::Time(_) => "time",
+            quaint::ValueType::Array(_) | quaint::ValueType::EnumArray(_, _) => "array",
         };
 
         type_name.to_owned()
@@ -38,11 +38,11 @@ impl<'a> IntoTypedJsonExtension for quaint::Value<'a> {
         let type_name = self.type_name();
 
         let json_value = match self.inner {
-            quaint::ValueInner::Array(Some(values)) => {
+            quaint::ValueType::Array(Some(values)) => {
                 serde_json::Value::Array(values.into_iter().map(|value| value.as_typed_json()).collect())
             }
-            quaint::ValueInner::Int64(Some(value)) => serde_json::Value::String(value.to_string()),
-            quaint::ValueInner::Numeric(Some(decimal)) => serde_json::Value::String(decimal.normalized().to_string()),
+            quaint::ValueType::Int64(Some(value)) => serde_json::Value::String(value.to_string()),
+            quaint::ValueType::Numeric(Some(decimal)) => serde_json::Value::String(decimal.normalized().to_string()),
             x => serde_json::Value::from(x),
         };
 

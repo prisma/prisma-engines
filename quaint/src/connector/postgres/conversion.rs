@@ -2,7 +2,7 @@
 mod decimal;
 
 use crate::{
-    ast::{Value, ValueInner},
+    ast::{Value, ValueType},
     connector::queryable::{GetRow, ToColumnNames},
     error::{Error, ErrorKind},
 };
@@ -39,26 +39,26 @@ pub(crate) fn params_to_types(params: &[Value<'_>]) -> Vec<PostgresType> {
             }
 
             match &p.inner {
-                ValueInner::Int32(_) => PostgresType::INT4,
-                ValueInner::Int64(_) => PostgresType::INT8,
-                ValueInner::Float(_) => PostgresType::FLOAT4,
-                ValueInner::Double(_) => PostgresType::FLOAT8,
-                ValueInner::Text(_) => PostgresType::TEXT,
+                ValueType::Int32(_) => PostgresType::INT4,
+                ValueType::Int64(_) => PostgresType::INT8,
+                ValueType::Float(_) => PostgresType::FLOAT4,
+                ValueType::Double(_) => PostgresType::FLOAT8,
+                ValueType::Text(_) => PostgresType::TEXT,
                 // Enums are user-defined types, we can't statically infer them, so we let PG infer it
-                ValueInner::Enum(_, _) | ValueInner::EnumArray(_, _) => PostgresType::UNKNOWN,
-                ValueInner::Bytes(_) => PostgresType::BYTEA,
-                ValueInner::Boolean(_) => PostgresType::BOOL,
-                ValueInner::Char(_) => PostgresType::CHAR,
+                ValueType::Enum(_, _) | ValueType::EnumArray(_, _) => PostgresType::UNKNOWN,
+                ValueType::Bytes(_) => PostgresType::BYTEA,
+                ValueType::Boolean(_) => PostgresType::BOOL,
+                ValueType::Char(_) => PostgresType::CHAR,
                 #[cfg(feature = "bigdecimal")]
-                ValueInner::Numeric(_) => PostgresType::NUMERIC,
-                ValueInner::Json(_) => PostgresType::JSONB,
-                ValueInner::Xml(_) => PostgresType::XML,
+                ValueType::Numeric(_) => PostgresType::NUMERIC,
+                ValueType::Json(_) => PostgresType::JSONB,
+                ValueType::Xml(_) => PostgresType::XML,
                 #[cfg(feature = "uuid")]
-                ValueInner::Uuid(_) => PostgresType::UUID,
-                ValueInner::DateTime(_) => PostgresType::TIMESTAMPTZ,
-                ValueInner::Date(_) => PostgresType::TIMESTAMP,
-                ValueInner::Time(_) => PostgresType::TIME,
-                ValueInner::Array(ref arr) => {
+                ValueType::Uuid(_) => PostgresType::UUID,
+                ValueType::DateTime(_) => PostgresType::TIMESTAMPTZ,
+                ValueType::Date(_) => PostgresType::TIMESTAMP,
+                ValueType::Time(_) => PostgresType::TIME,
+                ValueType::Array(ref arr) => {
                     let arr = arr.as_ref().unwrap();
 
                     // If the array is empty, we can't infer the type so we let PG infer it
@@ -77,27 +77,27 @@ pub(crate) fn params_to_types(params: &[Value<'_>]) -> Vec<PostgresType> {
                     }
 
                     match first.inner {
-                        ValueInner::Int32(_) => PostgresType::INT4_ARRAY,
-                        ValueInner::Int64(_) => PostgresType::INT8_ARRAY,
-                        ValueInner::Float(_) => PostgresType::FLOAT4_ARRAY,
-                        ValueInner::Double(_) => PostgresType::FLOAT8_ARRAY,
-                        ValueInner::Text(_) => PostgresType::TEXT_ARRAY,
+                        ValueType::Int32(_) => PostgresType::INT4_ARRAY,
+                        ValueType::Int64(_) => PostgresType::INT8_ARRAY,
+                        ValueType::Float(_) => PostgresType::FLOAT4_ARRAY,
+                        ValueType::Double(_) => PostgresType::FLOAT8_ARRAY,
+                        ValueType::Text(_) => PostgresType::TEXT_ARRAY,
                         // Enums are special types, we can't statically infer them, so we let PG infer it
-                        ValueInner::Enum(_, _) | ValueInner::EnumArray(_, _) => PostgresType::UNKNOWN,
-                        ValueInner::Bytes(_) => PostgresType::BYTEA_ARRAY,
-                        ValueInner::Boolean(_) => PostgresType::BOOL_ARRAY,
-                        ValueInner::Char(_) => PostgresType::CHAR_ARRAY,
+                        ValueType::Enum(_, _) | ValueType::EnumArray(_, _) => PostgresType::UNKNOWN,
+                        ValueType::Bytes(_) => PostgresType::BYTEA_ARRAY,
+                        ValueType::Boolean(_) => PostgresType::BOOL_ARRAY,
+                        ValueType::Char(_) => PostgresType::CHAR_ARRAY,
                         #[cfg(feature = "bigdecimal")]
-                        ValueInner::Numeric(_) => PostgresType::NUMERIC_ARRAY,
-                        ValueInner::Json(_) => PostgresType::JSONB_ARRAY,
-                        ValueInner::Xml(_) => PostgresType::XML_ARRAY,
+                        ValueType::Numeric(_) => PostgresType::NUMERIC_ARRAY,
+                        ValueType::Json(_) => PostgresType::JSONB_ARRAY,
+                        ValueType::Xml(_) => PostgresType::XML_ARRAY,
                         #[cfg(feature = "uuid")]
-                        ValueInner::Uuid(_) => PostgresType::UUID_ARRAY,
-                        ValueInner::DateTime(_) => PostgresType::TIMESTAMPTZ_ARRAY,
-                        ValueInner::Date(_) => PostgresType::TIMESTAMP_ARRAY,
-                        ValueInner::Time(_) => PostgresType::TIME_ARRAY,
+                        ValueType::Uuid(_) => PostgresType::UUID_ARRAY,
+                        ValueType::DateTime(_) => PostgresType::TIMESTAMPTZ_ARRAY,
+                        ValueType::Date(_) => PostgresType::TIMESTAMP_ARRAY,
+                        ValueType::Time(_) => PostgresType::TIME_ARRAY,
                         // In the case of nested arrays, we let PG infer the type
-                        ValueInner::Array(_) => PostgresType::UNKNOWN,
+                        ValueType::Array(_) => PostgresType::UNKNOWN,
                     }
                 }
             }
@@ -171,56 +171,56 @@ impl GetRow for PostgresRow {
     fn get_result_row(&self) -> crate::Result<Vec<Value<'static>>> {
         fn convert(row: &PostgresRow, i: usize) -> crate::Result<Value<'static>> {
             let result = match *row.columns()[i].type_() {
-                PostgresType::BOOL => ValueInner::Boolean(row.try_get(i)?).into(),
+                PostgresType::BOOL => ValueType::Boolean(row.try_get(i)?).into(),
                 PostgresType::INT2 | PostgresType::INT4 => match row.try_get(i)? {
                     Some(val) => {
                         let val: i32 = val;
                         Value::int32(val)
                     }
-                    None => ValueInner::Int32(None).into(),
+                    None => ValueType::Int32(None).into(),
                 },
                 PostgresType::INT8 => match row.try_get(i)? {
                     Some(val) => {
                         let val: i64 = val;
                         Value::int64(val)
                     }
-                    None => ValueInner::Int64(None).into(),
+                    None => ValueType::Int64(None).into(),
                 },
                 PostgresType::FLOAT4 => match row.try_get(i)? {
                     Some(val) => {
                         let val: f32 = val;
                         Value::float(val)
                     }
-                    None => ValueInner::Float(None).into(),
+                    None => ValueType::Float(None).into(),
                 },
                 PostgresType::FLOAT8 => match row.try_get(i)? {
                     Some(val) => {
                         let val: f64 = val;
                         Value::double(val)
                     }
-                    None => ValueInner::Double(None).into(),
+                    None => ValueType::Double(None).into(),
                 },
                 PostgresType::BYTEA => match row.try_get(i)? {
                     Some(val) => {
                         let val: &[u8] = val;
                         Value::bytes(val.to_owned())
                     }
-                    None => ValueInner::Bytes(None).into(),
+                    None => ValueType::Bytes(None).into(),
                 },
                 PostgresType::BYTEA_ARRAY => match row.try_get(i)? {
                     Some(val) => {
                         let val: Vec<Option<Vec<u8>>> = val;
-                        let byteas = val.into_iter().map(|b| ValueInner::Bytes(b.map(Into::into)));
+                        let byteas = val.into_iter().map(|b| ValueType::Bytes(b.map(Into::into)));
 
                         Value::array(byteas)
                     }
-                    None => ValueInner::Array(None).into(),
+                    None => ValueType::Array(None).into(),
                 },
                 #[cfg(feature = "bigdecimal")]
                 PostgresType::NUMERIC => {
                     let dw: Option<DecimalWrapper> = row.try_get(i)?;
 
-                    ValueInner::Numeric(dw.map(|dw| dw.0)).into()
+                    ValueType::Numeric(dw.map(|dw| dw.0)).into()
                 }
                 #[cfg(feature = "bigdecimal")]
                 PostgresType::MONEY => match row.try_get(i)? {
@@ -228,7 +228,7 @@ impl GetRow for PostgresRow {
                         let val: NaiveMoney = val;
                         Value::numeric(val.0)
                     }
-                    None => ValueInner::Numeric(None).into(),
+                    None => ValueType::Numeric(None).into(),
                 },
                 PostgresType::TIMESTAMP => match row.try_get(i)? {
                     Some(val) => {
@@ -236,29 +236,29 @@ impl GetRow for PostgresRow {
                         let dt = DateTime::<Utc>::from_utc(ts, Utc);
                         Value::datetime(dt)
                     }
-                    None => ValueInner::DateTime(None).into(),
+                    None => ValueType::DateTime(None).into(),
                 },
                 PostgresType::TIMESTAMPTZ => match row.try_get(i)? {
                     Some(val) => {
                         let ts: DateTime<Utc> = val;
                         Value::datetime(ts)
                     }
-                    None => ValueInner::DateTime(None).into(),
+                    None => ValueType::DateTime(None).into(),
                 },
                 PostgresType::DATE => match row.try_get(i)? {
                     Some(val) => Value::date(val),
-                    None => ValueInner::Date(None).into(),
+                    None => ValueType::Date(None).into(),
                 },
                 PostgresType::TIME => match row.try_get(i)? {
                     Some(val) => Value::time(val),
-                    None => ValueInner::Time(None).into(),
+                    None => ValueType::Time(None).into(),
                 },
                 PostgresType::TIMETZ => match row.try_get(i)? {
                     Some(val) => {
                         let time: TimeTz = val;
                         Value::time(time.0)
                     }
-                    None => ValueInner::Time(None).into(),
+                    None => ValueType::Time(None).into(),
                 },
                 #[cfg(feature = "uuid")]
                 PostgresType::UUID => match row.try_get(i)? {
@@ -266,72 +266,72 @@ impl GetRow for PostgresRow {
                         let val: Uuid = val;
                         Value::uuid(val)
                     }
-                    None => ValueInner::Uuid(None).into(),
+                    None => ValueType::Uuid(None).into(),
                 },
                 #[cfg(feature = "uuid")]
                 PostgresType::UUID_ARRAY => match row.try_get(i)? {
                     Some(val) => {
                         let val: Vec<Option<Uuid>> = val;
-                        let val = val.into_iter().map(ValueInner::Uuid);
+                        let val = val.into_iter().map(ValueType::Uuid);
 
                         Value::array(val)
                     }
-                    None => ValueInner::Array(None).into(),
+                    None => ValueType::Array(None).into(),
                 },
-                PostgresType::JSON | PostgresType::JSONB => ValueInner::Json(row.try_get(i)?).into(),
+                PostgresType::JSON | PostgresType::JSONB => ValueType::Json(row.try_get(i)?).into(),
                 PostgresType::INT2_ARRAY => match row.try_get(i)? {
                     Some(val) => {
                         let val: Vec<Option<i16>> = val;
-                        let ints = val.into_iter().map(|i| ValueInner::Int32(i.map(|i| i as i32)));
+                        let ints = val.into_iter().map(|i| ValueType::Int32(i.map(|i| i as i32)));
 
                         Value::array(ints)
                     }
-                    None => ValueInner::Array(None).into(),
+                    None => ValueType::Array(None).into(),
                 },
                 PostgresType::INT4_ARRAY => match row.try_get(i)? {
                     Some(val) => {
                         let val: Vec<Option<i32>> = val;
-                        let ints = val.into_iter().map(ValueInner::Int32);
+                        let ints = val.into_iter().map(ValueType::Int32);
 
                         Value::array(ints)
                     }
-                    None => ValueInner::Array(None).into(),
+                    None => ValueType::Array(None).into(),
                 },
                 PostgresType::INT8_ARRAY => match row.try_get(i)? {
                     Some(val) => {
                         let val: Vec<Option<i64>> = val;
-                        let ints = val.into_iter().map(ValueInner::Int64);
+                        let ints = val.into_iter().map(ValueType::Int64);
 
                         Value::array(ints)
                     }
-                    None => ValueInner::Array(None).into(),
+                    None => ValueType::Array(None).into(),
                 },
                 PostgresType::FLOAT4_ARRAY => match row.try_get(i)? {
                     Some(val) => {
                         let val: Vec<Option<f32>> = val;
-                        let floats = val.into_iter().map(ValueInner::Float);
+                        let floats = val.into_iter().map(ValueType::Float);
 
                         Value::array(floats)
                     }
-                    None => ValueInner::Array(None).into(),
+                    None => ValueType::Array(None).into(),
                 },
                 PostgresType::FLOAT8_ARRAY => match row.try_get(i)? {
                     Some(val) => {
                         let val: Vec<Option<f64>> = val;
-                        let floats = val.into_iter().map(ValueInner::Double);
+                        let floats = val.into_iter().map(ValueType::Double);
 
                         Value::array(floats)
                     }
-                    None => ValueInner::Array(None).into(),
+                    None => ValueType::Array(None).into(),
                 },
                 PostgresType::BOOL_ARRAY => match row.try_get(i)? {
                     Some(val) => {
                         let val: Vec<Option<bool>> = val;
-                        let bools = val.into_iter().map(ValueInner::Boolean);
+                        let bools = val.into_iter().map(ValueType::Boolean);
 
                         Value::array(bools)
                     }
-                    None => ValueInner::Array(None).into(),
+                    None => ValueType::Array(None).into(),
                 },
                 PostgresType::TIMESTAMP_ARRAY => match row.try_get(i)? {
                     Some(val) => {
@@ -339,11 +339,11 @@ impl GetRow for PostgresRow {
 
                         let dates = val
                             .into_iter()
-                            .map(|dt| ValueInner::DateTime(dt.map(|dt| DateTime::<Utc>::from_utc(dt, Utc))));
+                            .map(|dt| ValueType::DateTime(dt.map(|dt| DateTime::<Utc>::from_utc(dt, Utc))));
 
                         Value::array(dates)
                     }
-                    None => ValueInner::Array(None).into(),
+                    None => ValueType::Array(None).into(),
                 },
                 #[cfg(feature = "bigdecimal")]
                 PostgresType::NUMERIC_ARRAY => match row.try_get(i)? {
@@ -352,11 +352,11 @@ impl GetRow for PostgresRow {
 
                         let decimals = val
                             .into_iter()
-                            .map(|dec| ValueInner::Numeric(dec.map(|dec| dec.0.to_string().parse().unwrap())));
+                            .map(|dec| ValueType::Numeric(dec.map(|dec| dec.0.to_string().parse().unwrap())));
 
                         Value::array(decimals)
                     }
-                    None => ValueInner::Array(None).into(),
+                    None => ValueType::Array(None).into(),
                 },
                 PostgresType::TEXT_ARRAY | PostgresType::NAME_ARRAY | PostgresType::VARCHAR_ARRAY => {
                     match row.try_get(i)? {
@@ -365,140 +365,140 @@ impl GetRow for PostgresRow {
 
                             Value::array(strings.into_iter().map(|s| s.map(|s| s.to_string())))
                         }
-                        None => ValueInner::Array(None).into(),
+                        None => ValueType::Array(None).into(),
                     }
                 }
                 #[cfg(feature = "bigdecimal")]
                 PostgresType::MONEY_ARRAY => match row.try_get(i)? {
                     Some(val) => {
                         let val: Vec<Option<NaiveMoney>> = val;
-                        let nums = val.into_iter().map(|num| ValueInner::Numeric(num.map(|num| num.0)));
+                        let nums = val.into_iter().map(|num| ValueType::Numeric(num.map(|num| num.0)));
 
                         Value::array(nums)
                     }
-                    None => ValueInner::Array(None).into(),
+                    None => ValueType::Array(None).into(),
                 },
                 PostgresType::OID_ARRAY => match row.try_get(i)? {
                     Some(val) => {
                         let val: Vec<Option<u32>> = val;
-                        let nums = val.into_iter().map(|oid| ValueInner::Int64(oid.map(|oid| oid as i64)));
+                        let nums = val.into_iter().map(|oid| ValueType::Int64(oid.map(|oid| oid as i64)));
 
                         Value::array(nums)
                     }
-                    None => ValueInner::Array(None).into(),
+                    None => ValueType::Array(None).into(),
                 },
                 PostgresType::TIMESTAMPTZ_ARRAY => match row.try_get(i)? {
                     Some(val) => {
                         let val: Vec<Option<DateTime<Utc>>> = val;
-                        let dates = val.into_iter().map(ValueInner::DateTime);
+                        let dates = val.into_iter().map(ValueType::DateTime);
 
                         Value::array(dates)
                     }
-                    None => ValueInner::Array(None).into(),
+                    None => ValueType::Array(None).into(),
                 },
                 PostgresType::DATE_ARRAY => match row.try_get(i)? {
                     Some(val) => {
                         let val: Vec<Option<chrono::NaiveDate>> = val;
-                        let dates = val.into_iter().map(ValueInner::Date);
+                        let dates = val.into_iter().map(ValueType::Date);
 
                         Value::array(dates)
                     }
-                    None => ValueInner::Array(None).into(),
+                    None => ValueType::Array(None).into(),
                 },
                 PostgresType::TIME_ARRAY => match row.try_get(i)? {
                     Some(val) => {
                         let val: Vec<Option<chrono::NaiveTime>> = val;
-                        let times = val.into_iter().map(ValueInner::Time);
+                        let times = val.into_iter().map(ValueType::Time);
 
                         Value::array(times)
                     }
-                    None => ValueInner::Array(None).into(),
+                    None => ValueType::Array(None).into(),
                 },
                 PostgresType::TIMETZ_ARRAY => match row.try_get(i)? {
                     Some(val) => {
                         let val: Vec<Option<TimeTz>> = val;
-                        let timetzs = val.into_iter().map(|time| ValueInner::Time(time.map(|time| time.0)));
+                        let timetzs = val.into_iter().map(|time| ValueType::Time(time.map(|time| time.0)));
 
                         Value::array(timetzs)
                     }
-                    None => ValueInner::Array(None).into(),
+                    None => ValueType::Array(None).into(),
                 },
                 PostgresType::JSON_ARRAY => match row.try_get(i)? {
                     Some(val) => {
                         let val: Vec<Option<serde_json::Value>> = val;
-                        let jsons = val.into_iter().map(ValueInner::Json);
+                        let jsons = val.into_iter().map(ValueType::Json);
 
                         Value::array(jsons)
                     }
-                    None => ValueInner::Array(None).into(),
+                    None => ValueType::Array(None).into(),
                 },
                 PostgresType::JSONB_ARRAY => match row.try_get(i)? {
                     Some(val) => {
                         let val: Vec<Option<serde_json::Value>> = val;
-                        let jsons = val.into_iter().map(ValueInner::Json);
+                        let jsons = val.into_iter().map(ValueType::Json);
 
                         Value::array(jsons)
                     }
-                    None => ValueInner::Array(None).into(),
+                    None => ValueType::Array(None).into(),
                 },
                 PostgresType::OID => match row.try_get(i)? {
                     Some(val) => {
                         let val: u32 = val;
                         Value::int64(val)
                     }
-                    None => ValueInner::Int64(None).into(),
+                    None => ValueType::Int64(None).into(),
                 },
                 PostgresType::CHAR => match row.try_get(i)? {
                     Some(val) => {
                         let val: i8 = val;
                         Value::character((val as u8) as char)
                     }
-                    None => ValueInner::Char(None).into(),
+                    None => ValueType::Char(None).into(),
                 },
                 PostgresType::INET | PostgresType::CIDR => match row.try_get(i)? {
                     Some(val) => {
                         let val: std::net::IpAddr = val;
                         Value::text(val.to_string())
                     }
-                    None => ValueInner::Text(None).into(),
+                    None => ValueType::Text(None).into(),
                 },
                 PostgresType::INET_ARRAY | PostgresType::CIDR_ARRAY => match row.try_get(i)? {
                     Some(val) => {
                         let val: Vec<Option<std::net::IpAddr>> = val;
                         let addrs = val
                             .into_iter()
-                            .map(|ip| ValueInner::Text(ip.map(|ip| ip.to_string().into())));
+                            .map(|ip| ValueType::Text(ip.map(|ip| ip.to_string().into())));
 
                         Value::array(addrs)
                     }
-                    None => ValueInner::Array(None).into(),
+                    None => ValueType::Array(None).into(),
                 },
                 PostgresType::BIT | PostgresType::VARBIT => match row.try_get(i)? {
                     Some(val) => {
                         let val: BitVec = val;
                         Value::text(bits_to_string(&val)?)
                     }
-                    None => ValueInner::Text(None).into(),
+                    None => ValueType::Text(None).into(),
                 },
                 PostgresType::BIT_ARRAY | PostgresType::VARBIT_ARRAY => match row.try_get(i)? {
                     Some(val) => {
                         let val: Vec<Option<BitVec>> = val;
                         val.into_iter()
                             .map(|bits| match bits {
-                                Some(bits) => bits_to_string(&bits).map(|s| ValueInner::Text(Some(s.into()))),
-                                None => Ok(ValueInner::Text(None)),
+                                Some(bits) => bits_to_string(&bits).map(|s| ValueType::Text(Some(s.into()))),
+                                None => Ok(ValueType::Text(None)),
                             })
                             .collect::<crate::Result<Vec<_>>>()
                             .map(Value::array)?
                     }
-                    None => ValueInner::Array(None).into(),
+                    None => ValueType::Array(None).into(),
                 },
                 PostgresType::XML => match row.try_get(i)? {
                     Some(val) => {
                         let val: XmlString = val;
                         Value::xml(val.0)
                     }
-                    None => ValueInner::Xml(None).into(),
+                    None => ValueType::Xml(None).into(),
                 },
                 PostgresType::XML_ARRAY => match row.try_get(i)? {
                     Some(val) => {
@@ -507,7 +507,7 @@ impl GetRow for PostgresRow {
 
                         Value::array(xmls)
                     }
-                    None => ValueInner::Array(None).into(),
+                    None => ValueType::Array(None).into(),
                 },
                 ref x => match x.kind() {
                     Kind::Enum => match row.try_get(i)? {
@@ -516,7 +516,7 @@ impl GetRow for PostgresRow {
 
                             Value::enum_variant(val.value)
                         }
-                        None => ValueInner::Enum(None, None).into(),
+                        None => ValueType::Enum(None, None).into(),
                     },
                     Kind::Array(inner) => match inner.kind() {
                         Kind::Enum => match row.try_get(i)? {
@@ -524,20 +524,20 @@ impl GetRow for PostgresRow {
                                 let val: Vec<Option<EnumString>> = val;
                                 let variants = val
                                     .into_iter()
-                                    .map(|x| ValueInner::Enum(x.map(|x| x.value.into()), None));
+                                    .map(|x| ValueType::Enum(x.map(|x| x.value.into()), None));
 
                                 Ok(Value::array(variants))
                             }
-                            None => Ok(ValueInner::Array(None).into()),
+                            None => Ok(ValueType::Array(None).into()),
                         },
                         _ => match row.try_get(i) {
                             Ok(Some(val)) => {
                                 let val: Vec<Option<String>> = val;
-                                let strings = val.into_iter().map(|str| ValueInner::Text(str.map(Into::into)));
+                                let strings = val.into_iter().map(|str| ValueType::Text(str.map(Into::into)));
 
                                 Ok(Value::array(strings))
                             }
-                            Ok(None) => Ok(ValueInner::Array(None).into()),
+                            Ok(None) => Ok(ValueType::Array(None).into()),
                             Err(err) => {
                                 if err.source().map(|err| err.is::<WrongType>()).unwrap_or(false) {
                                     let kind = ErrorKind::UnsupportedColumnType {
@@ -557,7 +557,7 @@ impl GetRow for PostgresRow {
 
                             Ok(Value::text(val))
                         }
-                        Ok(None) => Ok(Value::from(ValueInner::Text(None))),
+                        Ok(None) => Ok(Value::from(ValueType::Text(None))),
                         Err(err) => {
                             if err.source().map(|err| err.is::<WrongType>()).unwrap_or(false) {
                                 let kind = ErrorKind::UnsupportedColumnType {
@@ -600,7 +600,7 @@ impl<'a> ToSql for Value<'a> {
         out: &mut BytesMut,
     ) -> Result<IsNull, Box<dyn StdError + 'static + Send + Sync>> {
         let res = match (&self.inner, ty) {
-            (ValueInner::Int32(integer), &PostgresType::INT2) => match integer {
+            (ValueType::Int32(integer), &PostgresType::INT2) => match integer {
                 Some(i) => {
                     let integer = i16::try_from(*i).map_err(|_| {
                         let kind = ErrorKind::conversion(format!(
@@ -614,11 +614,9 @@ impl<'a> ToSql for Value<'a> {
                 }
                 _ => None,
             },
-            (ValueInner::Int32(integer), &PostgresType::INT4) => integer.map(|integer| integer.to_sql(ty, out)),
-            (ValueInner::Int32(integer), &PostgresType::INT8) => {
-                integer.map(|integer| (integer as i64).to_sql(ty, out))
-            }
-            (ValueInner::Int64(integer), &PostgresType::INT2) => match integer {
+            (ValueType::Int32(integer), &PostgresType::INT4) => integer.map(|integer| integer.to_sql(ty, out)),
+            (ValueType::Int32(integer), &PostgresType::INT8) => integer.map(|integer| (integer as i64).to_sql(ty, out)),
+            (ValueType::Int64(integer), &PostgresType::INT2) => match integer {
                 Some(i) => {
                     let integer = i16::try_from(*i).map_err(|_| {
                         let kind = ErrorKind::conversion(format!(
@@ -632,7 +630,7 @@ impl<'a> ToSql for Value<'a> {
                 }
                 _ => None,
             },
-            (ValueInner::Int64(integer), &PostgresType::INT4) => match integer {
+            (ValueType::Int64(integer), &PostgresType::INT4) => match integer {
                 Some(i) => {
                     let integer = i32::try_from(*i).map_err(|_| {
                         let kind = ErrorKind::conversion(format!(
@@ -646,24 +644,24 @@ impl<'a> ToSql for Value<'a> {
                 }
                 _ => None,
             },
-            (ValueInner::Int64(integer), &PostgresType::INT8) => integer.map(|integer| integer.to_sql(ty, out)),
+            (ValueType::Int64(integer), &PostgresType::INT8) => integer.map(|integer| integer.to_sql(ty, out)),
             #[cfg(feature = "bigdecimal")]
-            (ValueInner::Int32(integer), &PostgresType::NUMERIC) => integer
+            (ValueType::Int32(integer), &PostgresType::NUMERIC) => integer
                 .map(|integer| BigDecimal::from_i32(integer).unwrap())
                 .map(DecimalWrapper)
                 .map(|dw| dw.to_sql(ty, out)),
             #[cfg(feature = "bigdecimal")]
-            (ValueInner::Int64(integer), &PostgresType::NUMERIC) => integer
+            (ValueType::Int64(integer), &PostgresType::NUMERIC) => integer
                 .map(|integer| BigDecimal::from_i64(integer).unwrap())
                 .map(DecimalWrapper)
                 .map(|dw| dw.to_sql(ty, out)),
-            (ValueInner::Int32(integer), &PostgresType::TEXT) => {
+            (ValueType::Int32(integer), &PostgresType::TEXT) => {
                 integer.map(|integer| format!("{integer}").to_sql(ty, out))
             }
-            (ValueInner::Int64(integer), &PostgresType::TEXT) => {
+            (ValueType::Int64(integer), &PostgresType::TEXT) => {
                 integer.map(|integer| format!("{integer}").to_sql(ty, out))
             }
-            (ValueInner::Int32(integer), &PostgresType::OID) => match integer {
+            (ValueType::Int32(integer), &PostgresType::OID) => match integer {
                 Some(i) => {
                     let integer = u32::try_from(*i).map_err(|_| {
                         let kind = ErrorKind::conversion(format!(
@@ -677,7 +675,7 @@ impl<'a> ToSql for Value<'a> {
                 }
                 _ => None,
             },
-            (ValueInner::Int64(integer), &PostgresType::OID) => match integer {
+            (ValueType::Int64(integer), &PostgresType::OID) => match integer {
                 Some(i) => {
                     let integer = u32::try_from(*i).map_err(|_| {
                         let kind = ErrorKind::conversion(format!(
@@ -691,42 +689,42 @@ impl<'a> ToSql for Value<'a> {
                 }
                 _ => None,
             },
-            (ValueInner::Int32(integer), _) => integer.map(|integer| integer.to_sql(ty, out)),
-            (ValueInner::Int64(integer), _) => integer.map(|integer| integer.to_sql(ty, out)),
-            (ValueInner::Float(float), &PostgresType::FLOAT8) => float.map(|float| (float as f64).to_sql(ty, out)),
+            (ValueType::Int32(integer), _) => integer.map(|integer| integer.to_sql(ty, out)),
+            (ValueType::Int64(integer), _) => integer.map(|integer| integer.to_sql(ty, out)),
+            (ValueType::Float(float), &PostgresType::FLOAT8) => float.map(|float| (float as f64).to_sql(ty, out)),
             #[cfg(feature = "bigdecimal")]
-            (ValueInner::Float(float), &PostgresType::NUMERIC) => float
+            (ValueType::Float(float), &PostgresType::NUMERIC) => float
                 .map(|float| BigDecimal::from_f32(float).unwrap())
                 .map(DecimalWrapper)
                 .map(|dw| dw.to_sql(ty, out)),
-            (ValueInner::Float(float), _) => float.map(|float| float.to_sql(ty, out)),
-            (ValueInner::Double(double), &PostgresType::FLOAT4) => double.map(|double| (double as f32).to_sql(ty, out)),
+            (ValueType::Float(float), _) => float.map(|float| float.to_sql(ty, out)),
+            (ValueType::Double(double), &PostgresType::FLOAT4) => double.map(|double| (double as f32).to_sql(ty, out)),
             #[cfg(feature = "bigdecimal")]
-            (ValueInner::Double(double), &PostgresType::NUMERIC) => double
+            (ValueType::Double(double), &PostgresType::NUMERIC) => double
                 .map(|double| BigDecimal::from_f64(double).unwrap())
                 .map(DecimalWrapper)
                 .map(|dw| dw.to_sql(ty, out)),
-            (ValueInner::Double(double), _) => double.map(|double| double.to_sql(ty, out)),
+            (ValueType::Double(double), _) => double.map(|double| double.to_sql(ty, out)),
             #[cfg(feature = "bigdecimal")]
-            (ValueInner::Numeric(decimal), &PostgresType::FLOAT4) => decimal.as_ref().map(|decimal| {
+            (ValueType::Numeric(decimal), &PostgresType::FLOAT4) => decimal.as_ref().map(|decimal| {
                 let f = decimal.to_string().parse::<f32>().expect("decimal to f32 conversion");
                 f.to_sql(ty, out)
             }),
             #[cfg(feature = "bigdecimal")]
-            (ValueInner::Numeric(decimal), &PostgresType::FLOAT8) => decimal.as_ref().map(|decimal| {
+            (ValueType::Numeric(decimal), &PostgresType::FLOAT8) => decimal.as_ref().map(|decimal| {
                 let f = decimal.to_string().parse::<f64>().expect("decimal to f64 conversion");
                 f.to_sql(ty, out)
             }),
             #[cfg(feature = "bigdecimal")]
-            (ValueInner::Array(values), &PostgresType::FLOAT4_ARRAY) => values.as_ref().map(|values| {
+            (ValueType::Array(values), &PostgresType::FLOAT4_ARRAY) => values.as_ref().map(|values| {
                 let mut floats = Vec::with_capacity(values.len());
 
                 for value in values.iter() {
                     let float = match &value.inner {
-                        ValueInner::Numeric(n) => n.as_ref().and_then(|n| n.to_string().parse::<f32>().ok()),
-                        ValueInner::Int64(n) => n.map(|n| n as f32),
-                        ValueInner::Float(f) => *f,
-                        ValueInner::Double(d) => d.map(|d| d as f32),
+                        ValueType::Numeric(n) => n.as_ref().and_then(|n| n.to_string().parse::<f32>().ok()),
+                        ValueType::Int64(n) => n.map(|n| n as f32),
+                        ValueType::Float(f) => *f,
+                        ValueType::Double(d) => d.map(|d| d as f32),
                         _ if value.is_null() => None,
                         v => {
                             let kind = ErrorKind::conversion(format!(
@@ -743,15 +741,15 @@ impl<'a> ToSql for Value<'a> {
                 floats.to_sql(ty, out)
             }),
             #[cfg(feature = "bigdecimal")]
-            (ValueInner::Array(values), &PostgresType::FLOAT8_ARRAY) => values.as_ref().map(|values| {
+            (ValueType::Array(values), &PostgresType::FLOAT8_ARRAY) => values.as_ref().map(|values| {
                 let mut floats = Vec::with_capacity(values.len());
 
                 for value in values.iter() {
                     let float = match &value.inner {
-                        ValueInner::Numeric(n) => n.as_ref().and_then(|n| n.to_string().parse::<f64>().ok()),
-                        ValueInner::Int64(n) => n.map(|n| n as f64),
-                        ValueInner::Float(f) => f.map(|f| f as f64),
-                        ValueInner::Double(d) => *d,
+                        ValueType::Numeric(n) => n.as_ref().and_then(|n| n.to_string().parse::<f64>().ok()),
+                        ValueType::Int64(n) => n.map(|n| n as f64),
+                        ValueType::Float(f) => f.map(|f| f as f64),
+                        ValueType::Double(d) => *d,
                         v if v.is_null() => None,
                         v => {
                             let kind = ErrorKind::conversion(format!(
@@ -768,7 +766,7 @@ impl<'a> ToSql for Value<'a> {
                 floats.to_sql(ty, out)
             }),
             #[cfg(feature = "bigdecimal")]
-            (ValueInner::Numeric(decimal), &PostgresType::MONEY) => decimal.as_ref().map(|decimal| {
+            (ValueType::Numeric(decimal), &PostgresType::MONEY) => decimal.as_ref().map(|decimal| {
                 let decimal = (decimal * BigInt::from_i32(100).unwrap()).round(0);
 
                 let i = decimal.to_i64().ok_or_else(|| {
@@ -779,20 +777,20 @@ impl<'a> ToSql for Value<'a> {
                 i.to_sql(ty, out)
             }),
             #[cfg(feature = "bigdecimal")]
-            (ValueInner::Numeric(decimal), &PostgresType::NUMERIC) => decimal
+            (ValueType::Numeric(decimal), &PostgresType::NUMERIC) => decimal
                 .as_ref()
                 .map(|decimal| DecimalWrapper(decimal.clone()).to_sql(ty, out)),
             #[cfg(feature = "bigdecimal")]
-            (ValueInner::Numeric(float), _) => float
+            (ValueType::Numeric(float), _) => float
                 .as_ref()
                 .map(|float| DecimalWrapper(float.clone()).to_sql(ty, out)),
             #[cfg(feature = "uuid")]
-            (ValueInner::Text(string), &PostgresType::UUID) => string.as_ref().map(|string| {
+            (ValueType::Text(string), &PostgresType::UUID) => string.as_ref().map(|string| {
                 let parsed_uuid: Uuid = string.parse()?;
                 parsed_uuid.to_sql(ty, out)
             }),
             #[cfg(feature = "uuid")]
-            (ValueInner::Array(values), &PostgresType::UUID_ARRAY) => values.as_ref().map(|values| {
+            (ValueType::Array(values), &PostgresType::UUID_ARRAY) => values.as_ref().map(|values| {
                 let parsed_uuid: Vec<Option<Uuid>> = values
                     .iter()
                     .map(<Option<Uuid>>::try_from)
@@ -800,14 +798,14 @@ impl<'a> ToSql for Value<'a> {
 
                 parsed_uuid.to_sql(ty, out)
             }),
-            (ValueInner::Text(string), &PostgresType::INET) | (ValueInner::Text(string), &PostgresType::CIDR) => {
+            (ValueType::Text(string), &PostgresType::INET) | (ValueType::Text(string), &PostgresType::CIDR) => {
                 string.as_ref().map(|string| {
                     let parsed_ip_addr: std::net::IpAddr = string.parse()?;
                     parsed_ip_addr.to_sql(ty, out)
                 })
             }
-            (ValueInner::Array(values), &PostgresType::INET_ARRAY)
-            | (ValueInner::Array(values), &PostgresType::CIDR_ARRAY) => values.as_ref().map(|values| {
+            (ValueType::Array(values), &PostgresType::INET_ARRAY)
+            | (ValueType::Array(values), &PostgresType::CIDR_ARRAY) => values.as_ref().map(|values| {
                 let parsed_ip_addr: Vec<Option<std::net::IpAddr>> = values
                     .iter()
                     .map(<Option<std::net::IpAddr>>::try_from)
@@ -815,21 +813,19 @@ impl<'a> ToSql for Value<'a> {
 
                 parsed_ip_addr.to_sql(ty, out)
             }),
-            (ValueInner::Text(string), &PostgresType::JSON) | (ValueInner::Text(string), &PostgresType::JSONB) => {
-                string
-                    .as_ref()
-                    .map(|string| serde_json::from_str::<serde_json::Value>(string)?.to_sql(ty, out))
-            }
-            (ValueInner::Text(string), &PostgresType::BIT) | (ValueInner::Text(string), &PostgresType::VARBIT) => {
+            (ValueType::Text(string), &PostgresType::JSON) | (ValueType::Text(string), &PostgresType::JSONB) => string
+                .as_ref()
+                .map(|string| serde_json::from_str::<serde_json::Value>(string)?.to_sql(ty, out)),
+            (ValueType::Text(string), &PostgresType::BIT) | (ValueType::Text(string), &PostgresType::VARBIT) => {
                 string.as_ref().map(|string| {
                     let bits: BitVec = string_to_bits(string)?;
 
                     bits.to_sql(ty, out)
                 })
             }
-            (ValueInner::Text(string), _) => string.as_ref().map(|ref string| string.to_sql(ty, out)),
-            (ValueInner::Array(values), &PostgresType::BIT_ARRAY)
-            | (ValueInner::Array(values), &PostgresType::VARBIT_ARRAY) => values.as_ref().map(|values| {
+            (ValueType::Text(string), _) => string.as_ref().map(|ref string| string.to_sql(ty, out)),
+            (ValueType::Array(values), &PostgresType::BIT_ARRAY)
+            | (ValueType::Array(values), &PostgresType::VARBIT_ARRAY) => values.as_ref().map(|values| {
                 let bitvecs: Vec<Option<BitVec>> = values
                     .iter()
                     .map(|value| value.try_into())
@@ -837,48 +833,48 @@ impl<'a> ToSql for Value<'a> {
 
                 bitvecs.to_sql(ty, out)
             }),
-            (ValueInner::Bytes(bytes), _) => bytes.as_ref().map(|bytes| bytes.as_ref().to_sql(ty, out)),
-            (ValueInner::Enum(string, _), _) => string.as_ref().map(|string| {
+            (ValueType::Bytes(bytes), _) => bytes.as_ref().map(|bytes| bytes.as_ref().to_sql(ty, out)),
+            (ValueType::Enum(string, _), _) => string.as_ref().map(|string| {
                 out.extend_from_slice(string.as_bytes());
                 Ok(IsNull::No)
             }),
-            (ValueInner::Boolean(boo), _) => boo.map(|boo| boo.to_sql(ty, out)),
-            (ValueInner::Char(c), _) => c.map(|c| (c as i8).to_sql(ty, out)),
-            (ValueInner::Array(vec), typ) if matches!(typ.kind(), Kind::Array(_)) => {
+            (ValueType::Boolean(boo), _) => boo.map(|boo| boo.to_sql(ty, out)),
+            (ValueType::Char(c), _) => c.map(|c| (c as i8).to_sql(ty, out)),
+            (ValueType::Array(vec), typ) if matches!(typ.kind(), Kind::Array(_)) => {
                 vec.as_ref().map(|vec| vec.to_sql(ty, out))
             }
-            (ValueInner::EnumArray(variants, _), typ) if matches!(typ.kind(), Kind::Array(_)) => variants
+            (ValueType::EnumArray(variants, _), typ) if matches!(typ.kind(), Kind::Array(_)) => variants
                 .as_ref()
                 .map(|vec| vec.iter().map(|val| val.as_ref()).collect::<Vec<_>>().to_sql(ty, out)),
-            (ValueInner::EnumArray(variants, _), typ) => {
+            (ValueType::EnumArray(variants, _), typ) => {
                 let kind = ErrorKind::conversion(format!(
                     "Couldn't serialize value `{variants:?}` into a `{typ}`. Value is a list but `{typ}` is not."
                 ));
 
                 return Err(Error::builder(kind).build().into());
             }
-            (ValueInner::Array(vec), typ) => {
+            (ValueType::Array(vec), typ) => {
                 let kind = ErrorKind::conversion(format!(
                     "Couldn't serialize value `{vec:?}` into a `{typ}`. Value is a list but `{typ}` is not."
                 ));
 
                 return Err(Error::builder(kind).build().into());
             }
-            (ValueInner::Json(value), _) => value.as_ref().map(|value| value.to_sql(ty, out)),
-            (ValueInner::Xml(value), _) => value.as_ref().map(|value| value.to_sql(ty, out)),
+            (ValueType::Json(value), _) => value.as_ref().map(|value| value.to_sql(ty, out)),
+            (ValueType::Xml(value), _) => value.as_ref().map(|value| value.to_sql(ty, out)),
             #[cfg(feature = "uuid")]
-            (ValueInner::Uuid(value), _) => value.map(|value| value.to_sql(ty, out)),
-            (ValueInner::DateTime(value), &PostgresType::DATE) => value.map(|value| value.date_naive().to_sql(ty, out)),
-            (ValueInner::Date(value), _) => value.map(|value| value.to_sql(ty, out)),
-            (ValueInner::Time(value), _) => value.map(|value| value.to_sql(ty, out)),
-            (ValueInner::DateTime(value), &PostgresType::TIME) => value.map(|value| value.time().to_sql(ty, out)),
-            (ValueInner::DateTime(value), &PostgresType::TIMETZ) => value.map(|value| {
+            (ValueType::Uuid(value), _) => value.map(|value| value.to_sql(ty, out)),
+            (ValueType::DateTime(value), &PostgresType::DATE) => value.map(|value| value.date_naive().to_sql(ty, out)),
+            (ValueType::Date(value), _) => value.map(|value| value.to_sql(ty, out)),
+            (ValueType::Time(value), _) => value.map(|value| value.to_sql(ty, out)),
+            (ValueType::DateTime(value), &PostgresType::TIME) => value.map(|value| value.time().to_sql(ty, out)),
+            (ValueType::DateTime(value), &PostgresType::TIMETZ) => value.map(|value| {
                 let result = value.time().to_sql(ty, out)?;
                 // We assume UTC. see https://www.postgresql.org/docs/9.5/datatype-datetime.html
                 out.extend_from_slice(&[0; 4]);
                 Ok(result)
             }),
-            (ValueInner::DateTime(value), _) => value.map(|value| value.naive_utc().to_sql(ty, out)),
+            (ValueType::DateTime(value), _) => value.map(|value| value.naive_utc().to_sql(ty, out)),
         };
 
         match res {
@@ -935,7 +931,7 @@ impl<'a> TryFrom<&Value<'a>> for Option<BitVec> {
     fn try_from(value: &Value<'a>) -> Result<Option<BitVec>, Self::Error> {
         match value {
             val @ Value {
-                inner: ValueInner::Text(Some(_)),
+                inner: ValueType::Text(Some(_)),
                 ..
             } => {
                 let text = val.as_str().unwrap();
@@ -943,7 +939,7 @@ impl<'a> TryFrom<&Value<'a>> for Option<BitVec> {
                 string_to_bits(text).map(Option::Some)
             }
             val @ Value {
-                inner: ValueInner::Bytes(Some(_)),
+                inner: ValueType::Bytes(Some(_)),
                 ..
             } => {
                 let text = val.as_str().unwrap();

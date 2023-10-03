@@ -107,7 +107,7 @@ impl<'a> Visitor<'a> for Postgres<'a> {
             self.surround_with_backticks(enum_name.name.deref())?;
             self.write("[]")?;
         } else {
-            self.visit_parameterized(Value::from(ValueInner::Array(Some(
+            self.visit_parameterized(Value::from(ValueType::Array(Some(
                 variants
                     .into_iter()
                     .map(|variant| Value::from(variant.into_enum(name.clone())))
@@ -168,27 +168,27 @@ impl<'a> Visitor<'a> for Postgres<'a> {
 
     fn visit_raw_value(&mut self, value: Value<'a>) -> visitor::Result {
         let res = match &value.inner {
-            ValueInner::Int32(i) => i.map(|i| self.write(i)),
-            ValueInner::Int64(i) => i.map(|i| self.write(i)),
-            ValueInner::Text(t) => t.as_ref().map(|t| self.write(format!("'{t}'"))),
-            ValueInner::Enum(e, _) => e.as_ref().map(|e| self.write(e)),
-            ValueInner::Bytes(b) => b.as_ref().map(|b| self.write(format!("E'{}'", hex::encode(b)))),
-            ValueInner::Boolean(b) => b.map(|b| self.write(b)),
-            ValueInner::Xml(cow) => cow.as_ref().map(|cow| self.write(format!("'{cow}'"))),
-            ValueInner::Char(c) => c.map(|c| self.write(format!("'{c}'"))),
-            ValueInner::Float(d) => d.map(|f| match f {
+            ValueType::Int32(i) => i.map(|i| self.write(i)),
+            ValueType::Int64(i) => i.map(|i| self.write(i)),
+            ValueType::Text(t) => t.as_ref().map(|t| self.write(format!("'{t}'"))),
+            ValueType::Enum(e, _) => e.as_ref().map(|e| self.write(e)),
+            ValueType::Bytes(b) => b.as_ref().map(|b| self.write(format!("E'{}'", hex::encode(b)))),
+            ValueType::Boolean(b) => b.map(|b| self.write(b)),
+            ValueType::Xml(cow) => cow.as_ref().map(|cow| self.write(format!("'{cow}'"))),
+            ValueType::Char(c) => c.map(|c| self.write(format!("'{c}'"))),
+            ValueType::Float(d) => d.map(|f| match f {
                 f if f.is_nan() => self.write("'NaN'"),
                 f if f == f32::INFINITY => self.write("'Infinity'"),
                 f if f == f32::NEG_INFINITY => self.write("'-Infinity"),
                 v => self.write(format!("{v:?}")),
             }),
-            ValueInner::Double(d) => d.map(|f| match f {
+            ValueType::Double(d) => d.map(|f| match f {
                 f if f.is_nan() => self.write("'NaN'"),
                 f if f == f64::INFINITY => self.write("'Infinity'"),
                 f if f == f64::NEG_INFINITY => self.write("'-Infinity"),
                 v => self.write(format!("{v:?}")),
             }),
-            ValueInner::Array(ary) => ary.as_ref().map(|ary| {
+            ValueType::Array(ary) => ary.as_ref().map(|ary| {
                 self.surround_with("'{", "}'", |ref mut s| {
                     let len = ary.len();
 
@@ -203,7 +203,7 @@ impl<'a> Visitor<'a> for Postgres<'a> {
                     Ok(())
                 })
             }),
-            ValueInner::EnumArray(variants, name) => variants.as_ref().map(|variants| {
+            ValueType::EnumArray(variants, name) => variants.as_ref().map(|variants| {
                 self.surround_with("ARRAY[", "]", |ref mut s| {
                     let len = variants.len();
 
@@ -229,16 +229,16 @@ impl<'a> Visitor<'a> for Postgres<'a> {
 
                 Ok(())
             }),
-            ValueInner::Json(j) => j
+            ValueType::Json(j) => j
                 .as_ref()
                 .map(|j| self.write(format!("'{}'", serde_json::to_string(&j).unwrap()))),
             #[cfg(feature = "bigdecimal")]
-            ValueInner::Numeric(r) => r.as_ref().map(|r| self.write(r)),
+            ValueType::Numeric(r) => r.as_ref().map(|r| self.write(r)),
             #[cfg(feature = "uuid")]
-            ValueInner::Uuid(uuid) => uuid.map(|uuid| self.write(format!("'{}'", uuid.hyphenated()))),
-            ValueInner::DateTime(dt) => dt.map(|dt| self.write(format!("'{}'", dt.to_rfc3339(),))),
-            ValueInner::Date(date) => date.map(|date| self.write(format!("'{date}'"))),
-            ValueInner::Time(time) => time.map(|time| self.write(format!("'{time}'"))),
+            ValueType::Uuid(uuid) => uuid.map(|uuid| self.write(format!("'{}'", uuid.hyphenated()))),
+            ValueType::DateTime(dt) => dt.map(|dt| self.write(format!("'{}'", dt.to_rfc3339(),))),
+            ValueType::Date(date) => date.map(|date| self.write(format!("'{date}'"))),
+            ValueType::Time(time) => time.map(|time| self.write(format!("'{time}'"))),
         };
 
         match res {
@@ -863,7 +863,7 @@ mod tests {
             vec![serde_json::json!({"a": "b"})],
         );
 
-        let value_expr: Expression = ValueInner::json(serde_json::json!({"a":"b"})).into();
+        let value_expr: Expression = ValueType::json(serde_json::json!({"a":"b"})).into();
         let query = Select::from_table("users").so_that(value_expr.equals(Column::from("jsonField")));
         let (sql, params) = Postgres::build(query).unwrap();
 
@@ -893,7 +893,7 @@ mod tests {
             vec![serde_json::json!({"a": "b"})],
         );
 
-        let value_expr: Expression = ValueInner::json(serde_json::json!({"a":"b"})).into();
+        let value_expr: Expression = ValueType::json(serde_json::json!({"a":"b"})).into();
         let query = Select::from_table("users").so_that(value_expr.not_equals(Column::from("jsonField")));
         let (sql, params) = Postgres::build(query).unwrap();
 
@@ -905,11 +905,11 @@ mod tests {
     fn equality_with_a_xml_value() {
         let expected = expected_values(
             r#"SELECT "users".* FROM "users" WHERE "xmlField"::text = $1"#,
-            vec![ValueInner::xml("<salad>wurst</salad>")],
+            vec![ValueType::xml("<salad>wurst</salad>")],
         );
 
         let query = Select::from_table("users")
-            .so_that(Column::from("xmlField").equals(ValueInner::xml("<salad>wurst</salad>")));
+            .so_that(Column::from("xmlField").equals(ValueType::xml("<salad>wurst</salad>")));
         let (sql, params) = Postgres::build(query).unwrap();
 
         assert_eq!(expected.0, sql);
@@ -920,10 +920,10 @@ mod tests {
     fn equality_with_a_lhs_xml_value() {
         let expected = expected_values(
             r#"SELECT "users".* FROM "users" WHERE $1 = "xmlField"::text"#,
-            vec![ValueInner::xml("<salad>wurst</salad>")],
+            vec![ValueType::xml("<salad>wurst</salad>")],
         );
 
-        let value_expr: Expression = ValueInner::xml("<salad>wurst</salad>").into();
+        let value_expr: Expression = ValueType::xml("<salad>wurst</salad>").into();
         let query = Select::from_table("users").so_that(value_expr.equals(Column::from("xmlField")));
         let (sql, params) = Postgres::build(query).unwrap();
 
@@ -935,11 +935,11 @@ mod tests {
     fn difference_with_a_xml_value() {
         let expected = expected_values(
             r#"SELECT "users".* FROM "users" WHERE "xmlField"::text <> $1"#,
-            vec![ValueInner::xml("<salad>wurst</salad>")],
+            vec![ValueType::xml("<salad>wurst</salad>")],
         );
 
         let query = Select::from_table("users")
-            .so_that(Column::from("xmlField").not_equals(ValueInner::xml("<salad>wurst</salad>")));
+            .so_that(Column::from("xmlField").not_equals(ValueType::xml("<salad>wurst</salad>")));
         let (sql, params) = Postgres::build(query).unwrap();
 
         assert_eq!(expected.0, sql);
@@ -950,10 +950,10 @@ mod tests {
     fn difference_with_a_lhs_xml_value() {
         let expected = expected_values(
             r#"SELECT "users".* FROM "users" WHERE $1 <> "xmlField"::text"#,
-            vec![ValueInner::xml("<salad>wurst</salad>")],
+            vec![ValueType::xml("<salad>wurst</salad>")],
         );
 
-        let value_expr: Expression = ValueInner::xml("<salad>wurst</salad>").into();
+        let value_expr: Expression = ValueType::xml("<salad>wurst</salad>").into();
         let query = Select::from_table("users").so_that(value_expr.not_equals(Column::from("xmlField")));
         let (sql, params) = Postgres::build(query).unwrap();
 
@@ -963,7 +963,7 @@ mod tests {
 
     #[test]
     fn test_raw_null() {
-        let (sql, params) = Postgres::build(Select::default().value(ValueInner::Text(None).raw())).unwrap();
+        let (sql, params) = Postgres::build(Select::default().value(ValueType::Text(None).raw())).unwrap();
         assert_eq!("SELECT null", sql);
         assert!(params.is_empty());
     }
@@ -991,7 +991,7 @@ mod tests {
 
     #[test]
     fn test_raw_bytes() {
-        let (sql, params) = Postgres::build(Select::default().value(ValueInner::bytes(vec![1, 2, 3]).raw())).unwrap();
+        let (sql, params) = Postgres::build(Select::default().value(ValueType::bytes(vec![1, 2, 3]).raw())).unwrap();
         assert_eq!("SELECT E'010203'", sql);
         assert!(params.is_empty());
     }
@@ -1009,7 +1009,7 @@ mod tests {
 
     #[test]
     fn test_raw_char() {
-        let (sql, params) = Postgres::build(Select::default().value(ValueInner::character('a').raw())).unwrap();
+        let (sql, params) = Postgres::build(Select::default().value(ValueType::character('a').raw())).unwrap();
         assert_eq!("SELECT 'a'", sql);
         assert!(params.is_empty());
     }
@@ -1052,7 +1052,7 @@ mod tests {
 
     #[test]
     fn test_raw_enum_array() {
-        let enum_array = ValueInner::EnumArray(
+        let enum_array = ValueType::EnumArray(
             Some(vec![EnumVariant::new("A"), EnumVariant::new("B")]),
             Some(EnumName::new("Alphabet", Some("foo"))),
         );

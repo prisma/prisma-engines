@@ -11,7 +11,7 @@ use napi_derive::napi;
 use quaint::connector::ResultSet as QuaintResultSet;
 use quaint::{
     error::{Error as QuaintError, ErrorKind},
-    Value as QuaintValue, ValueInner as QuaintValueType,
+    Value as QuaintValue, ValueType as QuaintValueType,
 };
 
 // TODO(jkomyno): import these 3rd-party crates from the `quaint-core` crate.
