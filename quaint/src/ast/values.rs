@@ -432,7 +432,7 @@ impl<'a> Value<'a> {
         ValueType::Boolean(None).into()
     }
 
-    pub fn null_char() -> Self {
+    pub fn null_character() -> Self {
         ValueType::Char(None).into()
     }
 

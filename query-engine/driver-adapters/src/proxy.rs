@@ -11,7 +11,7 @@ use napi_derive::napi;
 use quaint::connector::ResultSet as QuaintResultSet;
 use quaint::{
     error::{Error as QuaintError, ErrorKind},
-    Value as QuaintValue, ValueType as QuaintValueType,
+    Value as QuaintValue,
 };
 
 // TODO(jkomyno): import these 3rd-party crates from the `quaint-core` crate.
@@ -345,8 +345,11 @@ fn js_value_to_quaint(
             )),
         },
         ColumnType::Char => match json_value {
-            serde_json::Value::String(s) => Ok(QuaintValueType::Char(s.chars().next()).into_value()),
-            serde_json::Value::Null => Ok(QuaintValue::null_char()),
+            serde_json::Value::String(s) => match s.chars().next() {
+                Some(c) => Ok(QuaintValue::character(c)),
+                None => Ok(QuaintValue::null_character()),
+            },
+            serde_json::Value::Null => Ok(QuaintValue::null_character()),
             mismatch => Err(conversion_error!(
                 "expected a string in column {column_name}, found {mismatch}"
             )),
@@ -404,7 +407,7 @@ fn js_value_to_quaint(
             )),
         },
         ColumnType::Bytes => match json_value {
-            serde_json::Value::String(s) => Ok(QuaintValueType::Bytes(Some(s.into_bytes().into())).into_value()),
+            serde_json::Value::String(s) => Ok(QuaintValue::bytes(s.into_bytes())),
             serde_json::Value::Array(array) => array
                 .iter()
                 .map(|value| value.as_i64().and_then(|maybe_byte| maybe_byte.try_into().ok()))
@@ -625,31 +628,31 @@ mod proxy_test {
         let column_type = ColumnType::Int32;
 
         // null
-        test_null(QuaintValueType::Int32(None), column_type);
+        test_null(QuaintValue::null_int32(), column_type);
 
         // 0
         let n: i32 = 0;
         let json_value = serde_json::Value::Number(serde_json::Number::from(n));
         let quaint_value = js_value_to_quaint(json_value, column_type, "column_name").unwrap();
-        assert_eq!(quaint_value.typed, QuaintValueType::Int32(Some(n)));
+        assert_eq!(quaint_value, QuaintValue::int32(n));
 
         // max
         let n: i32 = i32::MAX;
         let json_value = serde_json::Value::Number(serde_json::Number::from(n));
         let quaint_value = js_value_to_quaint(json_value, column_type, "column_name").unwrap();
-        assert_eq!(quaint_value.typed, QuaintValueType::Int32(Some(n)));
+        assert_eq!(quaint_value, QuaintValue::int32(n));
 
         // min
         let n: i32 = i32::MIN;
         let json_value = serde_json::Value::Number(serde_json::Number::from(n));
         let quaint_value = js_value_to_quaint(json_value, column_type, "column_name").unwrap();
-        assert_eq!(quaint_value.typed, QuaintValueType::Int32(Some(n)));
+        assert_eq!(quaint_value, QuaintValue::int32(n));
 
         // string-encoded
         let n = i32::MAX;
         let json_value = serde_json::Value::String(n.to_string());
         let quaint_value = js_value_to_quaint(json_value, column_type, "column_name").unwrap();
-        assert_eq!(quaint_value.typed, QuaintValueType::Int32(Some(n)));
+        assert_eq!(quaint_value, QuaintValue::int32(n));
     }
 
     #[test]
@@ -657,31 +660,31 @@ mod proxy_test {
         let column_type = ColumnType::Int64;
 
         // null
-        test_null(QuaintValueType::Int64(None), column_type);
+        test_null(QuaintValue::null_int64(), column_type);
 
         // 0
         let n: i64 = 0;
         let json_value = serde_json::Value::String(n.to_string());
         let quaint_value = js_value_to_quaint(json_value, column_type, "column_name").unwrap();
-        assert_eq!(quaint_value.typed, QuaintValueType::Int64(Some(n)));
+        assert_eq!(quaint_value, QuaintValue::int64(n));
 
         // max
         let n: i64 = i64::MAX;
         let json_value = serde_json::Value::String(n.to_string());
         let quaint_value = js_value_to_quaint(json_value, column_type, "column_name").unwrap();
-        assert_eq!(quaint_value.typed, QuaintValueType::Int64(Some(n)));
+        assert_eq!(quaint_value, QuaintValue::int64(n));
 
         // min
         let n: i64 = i64::MIN;
         let json_value = serde_json::Value::String(n.to_string());
         let quaint_value = js_value_to_quaint(json_value, column_type, "column_name").unwrap();
-        assert_eq!(quaint_value.typed, QuaintValueType::Int64(Some(n)));
+        assert_eq!(quaint_value, QuaintValue::int64(n));
 
         // number-encoded
         let n: i64 = (1 << 53) - 1; // max JS safe integer
         let json_value = serde_json::Value::Number(serde_json::Number::from(n));
         let quaint_value = js_value_to_quaint(json_value, column_type, "column_name").unwrap();
-        assert_eq!(quaint_value.typed, QuaintValueType::Int64(Some(n)));
+        assert_eq!(quaint_value, QuaintValue::int64(n));
     }
 
     #[test]
@@ -689,25 +692,25 @@ mod proxy_test {
         let column_type = ColumnType::Float;
 
         // null
-        test_null(QuaintValueType::Float(None), column_type);
+        test_null(QuaintValue::null_float(), column_type);
 
         // 0
         let n: f32 = 0.0;
         let json_value = serde_json::Value::Number(serde_json::Number::from_f64(n.into()).unwrap());
         let quaint_value = js_value_to_quaint(json_value, column_type, "column_name").unwrap();
-        assert_eq!(quaint_value.typed, QuaintValueType::Float(Some(n)));
+        assert_eq!(quaint_value, QuaintValue::float(n));
 
         // max
         let n: f32 = f32::MAX;
         let json_value = serde_json::Value::Number(serde_json::Number::from_f64(n.into()).unwrap());
         let quaint_value = js_value_to_quaint(json_value, column_type, "column_name").unwrap();
-        assert_eq!(quaint_value.typed, QuaintValueType::Float(Some(n)));
+        assert_eq!(quaint_value, QuaintValue::float(n));
 
         // min
         let n: f32 = f32::MIN;
         let json_value = serde_json::Value::Number(serde_json::Number::from_f64(n.into()).unwrap());
         let quaint_value = js_value_to_quaint(json_value, column_type, "column_name").unwrap();
-        assert_eq!(quaint_value.typed, QuaintValueType::Float(Some(n)));
+        assert_eq!(quaint_value, QuaintValue::float(n));
     }
 
     #[test]
@@ -715,25 +718,25 @@ mod proxy_test {
         let column_type = ColumnType::Double;
 
         // null
-        test_null(QuaintValueType::Double(None), column_type);
+        test_null(QuaintValue::null_double(), column_type);
 
         // 0
         let n: f64 = 0.0;
         let json_value = serde_json::Value::Number(serde_json::Number::from_f64(n).unwrap());
         let quaint_value = js_value_to_quaint(json_value, column_type, "column_name").unwrap();
-        assert_eq!(quaint_value.typed, QuaintValueType::Double(Some(n)));
+        assert_eq!(quaint_value, QuaintValue::double(n));
 
         // max
         let n: f64 = f64::MAX;
         let json_value = serde_json::Value::Number(serde_json::Number::from_f64(n).unwrap());
         let quaint_value = js_value_to_quaint(json_value, column_type, "column_name").unwrap();
-        assert_eq!(quaint_value.typed, QuaintValueType::Double(Some(n)));
+        assert_eq!(quaint_value, QuaintValue::double(n));
 
         // min
         let n: f64 = f64::MIN;
         let json_value = serde_json::Value::Number(serde_json::Number::from_f64(n).unwrap());
         let quaint_value = js_value_to_quaint(json_value, column_type, "column_name").unwrap();
-        assert_eq!(quaint_value.typed, QuaintValueType::Double(Some(n)));
+        assert_eq!(quaint_value, QuaintValue::double(n));
     }
 
     #[test]
@@ -741,21 +744,21 @@ mod proxy_test {
         let column_type = ColumnType::Numeric;
 
         // null
-        test_null(QuaintValueType::Numeric(None), column_type);
+        test_null(QuaintValue::null_numeric(), column_type);
 
         let n_as_string = "1234.99";
         let decimal = BigDecimal::new(BigInt::parse_bytes(b"123499", 10).unwrap(), 2);
 
         let json_value = serde_json::Value::String(n_as_string.into());
         let quaint_value = js_value_to_quaint(json_value, column_type, "column_name").unwrap();
-        assert_eq!(quaint_value.typed, QuaintValueType::Numeric(Some(decimal)));
+        assert_eq!(quaint_value, QuaintValue::numeric(decimal));
 
         let n_as_string = "1234.999999";
         let decimal = BigDecimal::new(BigInt::parse_bytes(b"1234999999", 10).unwrap(), 6);
 
         let json_value = serde_json::Value::String(n_as_string.into());
         let quaint_value = js_value_to_quaint(json_value, column_type, "column_name").unwrap();
-        assert_eq!(quaint_value.typed, QuaintValueType::Numeric(Some(decimal)));
+        assert_eq!(quaint_value, QuaintValue::numeric(decimal));
     }
 
     #[test]
@@ -763,18 +766,18 @@ mod proxy_test {
         let column_type = ColumnType::Boolean;
 
         // null
-        test_null(QuaintValueType::Boolean(None), column_type);
+        test_null(QuaintValue::null_boolean(), column_type);
 
         // true
         for truthy_value in [json!(true), json!(1), json!("true"), json!("TRUE"), json!("1")] {
             let quaint_value = js_value_to_quaint(truthy_value, column_type, "column_name").unwrap();
-            assert_eq!(quaint_value.typed, QuaintValueType::Boolean(Some(true)));
+            assert_eq!(quaint_value, QuaintValue::boolean(true));
         }
 
         // false
         for falsy_value in [json!(false), json!(0), json!("false"), json!("FALSE"), json!("0")] {
             let quaint_value = js_value_to_quaint(falsy_value, column_type, "column_name").unwrap();
-            assert_eq!(quaint_value.typed, QuaintValueType::Boolean(Some(false)));
+            assert_eq!(quaint_value, QuaintValue::boolean(false));
         }
     }
 
@@ -783,12 +786,12 @@ mod proxy_test {
         let column_type = ColumnType::Char;
 
         // null
-        test_null(QuaintValueType::Char(None), column_type);
+        test_null(QuaintValue::null_character(), column_type);
 
         let c = 'c';
         let json_value = serde_json::Value::String(c.to_string());
         let quaint_value = js_value_to_quaint(json_value, column_type, "column_name").unwrap();
-        assert_eq!(quaint_value.typed, QuaintValueType::Char(Some(c)));
+        assert_eq!(quaint_value, QuaintValue::character(c));
     }
 
     #[test]
@@ -796,12 +799,12 @@ mod proxy_test {
         let column_type = ColumnType::Text;
 
         // null
-        test_null(QuaintValueType::Text(None), column_type);
+        test_null(QuaintValue::null_text(), column_type);
 
         let s = "some text";
         let json_value = serde_json::Value::String(s.to_string());
         let quaint_value = js_value_to_quaint(json_value, column_type, "column_name").unwrap();
-        assert_eq!(quaint_value.typed, QuaintValueType::Text(Some(s.into())));
+        assert_eq!(quaint_value, QuaintValue::text(s));
     }
 
     #[test]
@@ -809,14 +812,14 @@ mod proxy_test {
         let column_type = ColumnType::Date;
 
         // null
-        test_null(QuaintValueType::Date(None), column_type);
+        test_null(QuaintValue::null_date(), column_type);
 
         let s = "2023-01-01";
         let json_value = serde_json::Value::String(s.to_string());
         let quaint_value = js_value_to_quaint(json_value, column_type, "column_name").unwrap();
 
         let date = NaiveDate::from_ymd_opt(2023, 1, 1).unwrap();
-        assert_eq!(quaint_value.typed, QuaintValueType::Date(Some(date)));
+        assert_eq!(quaint_value, QuaintValue::date(date));
     }
 
     #[test]
@@ -824,14 +827,14 @@ mod proxy_test {
         let column_type = ColumnType::Time;
 
         // null
-        test_null(QuaintValueType::Time(None), column_type);
+        test_null(QuaintValue::null_time(), column_type);
 
         let s = "23:59:59";
         let json_value = serde_json::Value::String(s.to_string());
         let quaint_value = js_value_to_quaint(json_value, column_type, "column_name").unwrap();
 
         let time: NaiveTime = NaiveTime::from_hms_opt(23, 59, 59).unwrap();
-        assert_eq!(quaint_value.typed, QuaintValueType::Time(Some(time)));
+        assert_eq!(quaint_value, QuaintValue::time(time));
     }
 
     #[test]
@@ -839,7 +842,7 @@ mod proxy_test {
         let column_type = ColumnType::DateTime;
 
         // null
-        test_null(QuaintValueType::DateTime(None), column_type);
+        test_null(QuaintValue::null_datetime(), column_type);
 
         let s = "2023-01-01 23:59:59.415";
         let json_value = serde_json::Value::String(s.to_string());
@@ -850,7 +853,7 @@ mod proxy_test {
             .and_hms_milli_opt(23, 59, 59, 415)
             .unwrap();
         let datetime = DateTime::from_utc(datetime, Utc);
-        assert_eq!(quaint_value.typed, QuaintValueType::DateTime(Some(datetime)));
+        assert_eq!(quaint_value, QuaintValue::datetime(datetime));
 
         let s = "2023-01-01 23:59:59.123456";
         let json_value = serde_json::Value::String(s.to_string());
@@ -861,7 +864,7 @@ mod proxy_test {
             .and_hms_micro_opt(23, 59, 59, 123_456)
             .unwrap();
         let datetime = DateTime::from_utc(datetime, Utc);
-        assert_eq!(quaint_value.typed, QuaintValueType::DateTime(Some(datetime)));
+        assert_eq!(quaint_value, QuaintValue::datetime(datetime));
 
         let s = "2023-01-01 23:59:59";
         let json_value = serde_json::Value::String(s.to_string());
@@ -872,7 +875,7 @@ mod proxy_test {
             .and_hms_milli_opt(23, 59, 59, 0)
             .unwrap();
         let datetime = DateTime::from_utc(datetime, Utc);
-        assert_eq!(quaint_value.typed, QuaintValueType::DateTime(Some(datetime)));
+        assert_eq!(quaint_value, QuaintValue::datetime(datetime));
     }
 
     #[test]
@@ -880,7 +883,7 @@ mod proxy_test {
         let column_type = ColumnType::Json;
 
         // null
-        test_null(QuaintValueType::Json(None), column_type);
+        test_null(QuaintValue::null_json(), column_type);
 
         let json = json!({
             "key": "value",
@@ -893,7 +896,7 @@ mod proxy_test {
         });
         let json_value = json.clone();
         let quaint_value = js_value_to_quaint(json_value, column_type, "column_name").unwrap();
-        assert_eq!(quaint_value.typed, QuaintValueType::Json(Some(json.clone())));
+        assert_eq!(quaint_value, QuaintValue::json(json.clone()));
     }
 
     #[test]
@@ -901,13 +904,13 @@ mod proxy_test {
         let column_type = ColumnType::Enum;
 
         // null
-        test_null(QuaintValueType::Enum(None, None), column_type);
+        test_null(QuaintValue::null_enum(), column_type);
 
         let s = "some enum variant";
         let json_value = serde_json::Value::String(s.to_string());
 
         let quaint_value = js_value_to_quaint(json_value, column_type, "column_name").unwrap();
-        assert_eq!(quaint_value.typed, QuaintValueType::Enum(Some(s.into()), None));
+        assert_eq!(quaint_value, QuaintValue::enum_variant(s));
     }
 
     #[test]

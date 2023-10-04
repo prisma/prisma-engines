@@ -460,7 +460,7 @@ impl GetRow for PostgresRow {
                         let val: i8 = val;
                         Value::character((val as u8) as char)
                     }
-                    None => Value::null_char(),
+                    None => Value::null_character(),
                 },
                 PostgresType::INET | PostgresType::CIDR => match row.try_get(i)? {
                     Some(val) => {

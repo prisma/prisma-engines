@@ -43,19 +43,15 @@ impl ScalarFieldExt for ScalarField {
                     .map(ToOwned::to_owned)
                     .or(Some(ctx.schema_name().to_owned()));
 
-                ValueType::EnumArray(Some(variants), Some(EnumName::new(enum_name, schema_name))).into_value()
+                Value::enum_array_with_name(variants, EnumName::new(enum_name, schema_name))
             }
             (PrismaValue::Enum(e), _) => e.into(),
             (PrismaValue::Int(i), _) => i.into(),
             (PrismaValue::BigInt(i), _) => i.into(),
             (PrismaValue::Uuid(u), _) => u.to_string().into(),
-            (PrismaValue::List(l), _) => {
-                ValueType::Array(Some(l.into_iter().map(|x| self.value(x, ctx)).collect())).into_value()
-            }
-            (PrismaValue::Json(s), _) => {
-                ValueType::Json(Some(serde_json::from_str::<serde_json::Value>(&s).unwrap())).into_value()
-            }
-            (PrismaValue::Bytes(b), _) => ValueType::Bytes(Some(b.into())).into_value(),
+            (PrismaValue::List(l), _) => Value::array(l.into_iter().map(|x| self.value(x, ctx))),
+            (PrismaValue::Json(s), _) => Value::json(serde_json::from_str::<serde_json::Value>(&s).unwrap()),
+            (PrismaValue::Bytes(b), _) => Value::bytes(b),
             (PrismaValue::Object(_), _) => unimplemented!(),
             (PrismaValue::Null, ident) => match ident {
                 TypeIdentifier::String => Value::null_text(),
@@ -74,7 +70,7 @@ impl ScalarFieldExt for ScalarField {
                 }
                 TypeIdentifier::Json => Value::null_json(),
                 TypeIdentifier::DateTime => Value::null_datetime(),
-                TypeIdentifier::UUID => ValueType::Uuid(None).into_value(),
+                TypeIdentifier::UUID => Value::null_uuid(),
                 TypeIdentifier::Int => Value::null_int32(),
                 TypeIdentifier::BigInt => Value::null_int64(),
                 TypeIdentifier::Bytes => Value::null_bytes(),
@@ -121,9 +117,9 @@ pub fn convert_lossy<'a>(pv: PrismaValue) -> Value<'a> {
         PrismaValue::Int(i) => i.into(),
         PrismaValue::BigInt(i) => i.into(),
         PrismaValue::Uuid(u) => u.to_string().into(),
-        PrismaValue::List(l) => ValueType::Array(Some(l.into_iter().map(convert_lossy).collect())).into_value(),
-        PrismaValue::Json(s) => ValueType::Json(serde_json::from_str(&s).unwrap()).into_value(),
-        PrismaValue::Bytes(b) => ValueType::Bytes(Some(b.into())).into_value(),
+        PrismaValue::List(l) => Value::array(l.into_iter().map(convert_lossy)),
+        PrismaValue::Json(s) => Value::json(serde_json::from_str(&s).unwrap()),
+        PrismaValue::Bytes(b) => Value::bytes(b),
         PrismaValue::Null => Value::null_int32(), // Can't tell which type the null is supposed to be.
         PrismaValue::Object(_) => unimplemented!(),
     }
