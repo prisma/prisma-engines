@@ -172,7 +172,14 @@ impl GetRow for PostgresRow {
         fn convert(row: &PostgresRow, i: usize) -> crate::Result<Value<'static>> {
             let result = match *row.columns()[i].type_() {
                 PostgresType::BOOL => ValueType::Boolean(row.try_get(i)?).into_value(),
-                PostgresType::INT2 | PostgresType::INT4 => match row.try_get(i)? {
+                PostgresType::INT2 => match row.try_get(i)? {
+                    Some(val) => {
+                        let val: i16 = val;
+                        Value::int32(val)
+                    }
+                    None => Value::null_int32(),
+                },
+                PostgresType::INT4 => match row.try_get(i)? {
                     Some(val) => {
                         let val: i32 = val;
                         Value::int32(val)

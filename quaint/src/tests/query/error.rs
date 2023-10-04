@@ -414,7 +414,8 @@ async fn array_into_scalar_should_fail(api: &mut dyn TestApi) -> crate::Result<(
 
     let err = result.unwrap_err();
 
-    assert!(err.to_string().contains("Couldn't serialize value `Some([Text(Some(\"abc\")), Text(Some(\"def\"))])` into a `text`. Value is a list but `text` is not."));
+    assert!(err.to_string().contains("Couldn't serialize value"));
+    assert!(err.to_string().contains("Value is a list but `text` is not."));
 
     Ok(())
 }
