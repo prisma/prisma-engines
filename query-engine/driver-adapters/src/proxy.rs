@@ -467,14 +467,14 @@ fn js_array_to_quaint(
     column_name: &str,
 ) -> quaint::Result<QuaintValue<'static>> {
     match json_value {
-        serde_json::Value::Array(array) => Ok(QuaintValue::Array(Some(
+        serde_json::Value::Array(array) => Ok(QuaintValue::array(
             array
                 .into_iter()
                 .enumerate()
                 .map(|(index, elem)| js_value_to_quaint(elem, base_type, &format!("{column_name}[{index}]")))
                 .collect::<quaint::Result<Vec<_>>>()?,
-        ))),
-        serde_json::Value::Null => Ok(QuaintValue::Array(None)),
+        )),
+        serde_json::Value::Null => Ok(QuaintValue::null_array()),
         mismatch => Err(conversion_error!(
             "expected an array in column {column_name}, found {mismatch}",
         )),

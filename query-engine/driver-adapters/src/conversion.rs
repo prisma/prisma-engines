@@ -82,7 +82,7 @@ pub fn conv_params(params: &[QuaintValue<'_>]) -> serde_json::Result<Vec<JSArg>>
                 },
                 None => JsonValue::Null.into(),
             },
-            QuaintValue::Array(Some(items)) => JSArg::Array(conv_params(items)?),
+            QuaintValueType::Array(Some(items)) => JSArg::Array(conv_params(items)?),
             quaint_value => JSArg::from(JsonValue::from(quaint_value.clone())),
         };
 
