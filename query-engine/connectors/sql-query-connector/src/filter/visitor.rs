@@ -330,12 +330,13 @@ impl FilterVisitorExt for FilterVisitor {
             RelationCondition::NoRelatedRecord if self.can_render_join() && !filter.field.is_list() => {
                 let alias = self.next_alias(AliasMode::Join);
 
-                let linking_fields_null: Vec<_> = ModelProjection::from(filter.field.model().primary_identifier())
-                    .as_columns(ctx)
-                    .map(|c| c.aliased_col(Some(alias), ctx))
-                    .map(|c| c.is_null())
-                    .map(Expression::from)
-                    .collect();
+                let linking_fields_null: Vec<_> =
+                    ModelProjection::from(filter.field.related_model().primary_identifier())
+                        .as_columns(ctx)
+                        .map(|c| c.aliased_col(Some(alias), ctx))
+                        .map(|c| c.is_null())
+                        .map(Expression::from)
+                        .collect();
                 let null_filter = ConditionTree::And(linking_fields_null);
 
                 let join = compute_one2m_join(
@@ -362,12 +363,13 @@ impl FilterVisitorExt for FilterVisitor {
             RelationCondition::ToOneRelatedRecord if self.can_render_join() && !filter.field.is_list() => {
                 let alias = self.next_alias(AliasMode::Join);
 
-                let linking_fields_not_null: Vec<_> = ModelProjection::from(filter.field.model().primary_identifier())
-                    .as_columns(ctx)
-                    .map(|c| c.aliased_col(Some(alias), ctx))
-                    .map(|c| c.is_not_null())
-                    .map(Expression::from)
-                    .collect();
+                let linking_fields_not_null: Vec<_> =
+                    ModelProjection::from(filter.field.related_model().primary_identifier())
+                        .as_columns(ctx)
+                        .map(|c| c.aliased_col(Some(alias), ctx))
+                        .map(|c| c.is_not_null())
+                        .map(Expression::from)
+                        .collect();
                 let not_null_filter = ConditionTree::And(linking_fields_not_null);
 
                 let join = compute_one2m_join(
