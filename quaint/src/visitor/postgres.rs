@@ -107,12 +107,9 @@ impl<'a> Visitor<'a> for Postgres<'a> {
             self.surround_with_backticks(enum_name.name.deref())?;
             self.write("[]")?;
         } else {
-            self.visit_parameterized(Value::from(ValueType::Array(Some(
-                variants
-                    .into_iter()
-                    .map(|variant| variant.into_enum(name.clone()))
-                    .collect(),
-            ))))?;
+            self.visit_parameterized(Value::array(
+                variants.into_iter().map(|variant| variant.into_enum(name.clone())),
+            ))?;
         }
 
         Ok(())
@@ -863,7 +860,7 @@ mod tests {
             vec![serde_json::json!({"a": "b"})],
         );
 
-        let value_expr: Expression = ValueType::json(serde_json::json!({"a":"b"})).into_value();
+        let value_expr: Expression = Value::json(serde_json::json!({"a":"b"})).into();
         let query = Select::from_table("users").so_that(value_expr.equals(Column::from("jsonField")));
         let (sql, params) = Postgres::build(query).unwrap();
 
@@ -893,7 +890,7 @@ mod tests {
             vec![serde_json::json!({"a": "b"})],
         );
 
-        let value_expr: Expression = ValueType::json(serde_json::json!({"a":"b"})).into_value();
+        let value_expr: Expression = Value::json(serde_json::json!({"a":"b"})).into();
         let query = Select::from_table("users").so_that(value_expr.not_equals(Column::from("jsonField")));
         let (sql, params) = Postgres::build(query).unwrap();
 
@@ -905,11 +902,11 @@ mod tests {
     fn equality_with_a_xml_value() {
         let expected = expected_values(
             r#"SELECT "users".* FROM "users" WHERE "xmlField"::text = $1"#,
-            vec![ValueType::xml("<salad>wurst</salad>")],
+            vec![Value::xml("<salad>wurst</salad>")],
         );
 
-        let query = Select::from_table("users")
-            .so_that(Column::from("xmlField").equals(ValueType::xml("<salad>wurst</salad>")));
+        let query =
+            Select::from_table("users").so_that(Column::from("xmlField").equals(Value::xml("<salad>wurst</salad>")));
         let (sql, params) = Postgres::build(query).unwrap();
 
         assert_eq!(expected.0, sql);
@@ -920,10 +917,10 @@ mod tests {
     fn equality_with_a_lhs_xml_value() {
         let expected = expected_values(
             r#"SELECT "users".* FROM "users" WHERE $1 = "xmlField"::text"#,
-            vec![ValueType::xml("<salad>wurst</salad>")],
+            vec![Value::xml("<salad>wurst</salad>")],
         );
 
-        let value_expr: Expression = ValueType::xml("<salad>wurst</salad>").into_value();
+        let value_expr: Expression = Value::xml("<salad>wurst</salad>").into();
         let query = Select::from_table("users").so_that(value_expr.equals(Column::from("xmlField")));
         let (sql, params) = Postgres::build(query).unwrap();
 
@@ -935,11 +932,11 @@ mod tests {
     fn difference_with_a_xml_value() {
         let expected = expected_values(
             r#"SELECT "users".* FROM "users" WHERE "xmlField"::text <> $1"#,
-            vec![ValueType::xml("<salad>wurst</salad>")],
+            vec![Value::xml("<salad>wurst</salad>")],
         );
 
         let query = Select::from_table("users")
-            .so_that(Column::from("xmlField").not_equals(ValueType::xml("<salad>wurst</salad>")));
+            .so_that(Column::from("xmlField").not_equals(Value::xml("<salad>wurst</salad>")));
         let (sql, params) = Postgres::build(query).unwrap();
 
         assert_eq!(expected.0, sql);
@@ -950,10 +947,10 @@ mod tests {
     fn difference_with_a_lhs_xml_value() {
         let expected = expected_values(
             r#"SELECT "users".* FROM "users" WHERE $1 <> "xmlField"::text"#,
-            vec![ValueType::xml("<salad>wurst</salad>")],
+            vec![Value::xml("<salad>wurst</salad>")],
         );
 
-        let value_expr: Expression = ValueType::xml("<salad>wurst</salad>").into_value();
+        let value_expr: Expression = Value::xml("<salad>wurst</salad>").into();
         let query = Select::from_table("users").so_that(value_expr.not_equals(Column::from("xmlField")));
         let (sql, params) = Postgres::build(query).unwrap();
 
@@ -963,7 +960,7 @@ mod tests {
 
     #[test]
     fn test_raw_null() {
-        let (sql, params) = Postgres::build(Select::default().value(ValueType::Text(None).raw())).unwrap();
+        let (sql, params) = Postgres::build(Select::default().value(Value::null_text().raw())).unwrap();
         assert_eq!("SELECT null", sql);
         assert!(params.is_empty());
     }
@@ -991,7 +988,7 @@ mod tests {
 
     #[test]
     fn test_raw_bytes() {
-        let (sql, params) = Postgres::build(Select::default().value(ValueType::bytes(vec![1, 2, 3]).raw())).unwrap();
+        let (sql, params) = Postgres::build(Select::default().value(Value::bytes(vec![1, 2, 3]).raw())).unwrap();
         assert_eq!("SELECT E'010203'", sql);
         assert!(params.is_empty());
     }
@@ -1009,7 +1006,7 @@ mod tests {
 
     #[test]
     fn test_raw_char() {
-        let (sql, params) = Postgres::build(Select::default().value(ValueType::character('a').raw())).unwrap();
+        let (sql, params) = Postgres::build(Select::default().value(Value::character('a').raw())).unwrap();
         assert_eq!("SELECT 'a'", sql);
         assert!(params.is_empty());
     }
@@ -1052,9 +1049,9 @@ mod tests {
 
     #[test]
     fn test_raw_enum_array() {
-        let enum_array = ValueType::EnumArray(
-            Some(vec![EnumVariant::new("A"), EnumVariant::new("B")]),
-            Some(EnumName::new("Alphabet", Some("foo"))),
+        let enum_array = Value::enum_array_with_name(
+            vec![EnumVariant::new("A"), EnumVariant::new("B")],
+            EnumName::new("Alphabet", Some("foo")),
         );
         let (sql, params) = Postgres::build(Select::default().value(enum_array.raw())).unwrap();
 

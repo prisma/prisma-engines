@@ -109,6 +109,23 @@ impl<'a> Value<'a> {
         ValueType::enum_variant_with_name(value, name, schema_name).into_value()
     }
 
+    /// Creates a new enum array value
+    pub fn enum_array<T>(value: T) -> Self
+    where
+        T: IntoIterator<Item = EnumVariant<'a>>,
+    {
+        ValueType::enum_array(value).into_value()
+    }
+
+    /// Creates a new enum array value with the name of the enum attached.
+    pub fn enum_array_with_name<T, U>(value: T, name: U) -> Self
+    where
+        T: IntoIterator<Item = EnumVariant<'a>>,
+        U: Into<EnumName<'a>>,
+    {
+        ValueType::enum_array_with_name(value, name).into_value()
+    }
+
     /// Creates a new bytes value.
     pub fn bytes<B>(value: B) -> Self
     where
@@ -722,6 +739,23 @@ impl<'a> ValueType<'a> {
         V: Into<Cow<'a, str>>,
     {
         Self::Enum(Some(EnumVariant::new(value)), Some(EnumName::new(name, schema_name)))
+    }
+
+    /// Creates a new enum array value
+    pub fn enum_array<T>(value: T) -> Self
+    where
+        T: IntoIterator<Item = EnumVariant<'a>>,
+    {
+        Self::EnumArray(Some(value.into_iter().collect()), None)
+    }
+
+    /// Creates a new enum array value with the name of the enum attached.
+    pub fn enum_array_with_name<T, U>(value: T, name: U) -> Self
+    where
+        T: IntoIterator<Item = EnumVariant<'a>>,
+        U: Into<EnumName<'a>>,
+    {
+        Self::EnumArray(Some(value.into_iter().collect()), Some(name.into()))
     }
 
     /// Creates a new bytes value.
