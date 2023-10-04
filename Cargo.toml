@@ -30,26 +30,31 @@ members = [
   "prisma-fmt",
   "prisma-schema-wasm",
   "psl/*",
-]
-
-# All path dependencies residing in the workspace directory automatically become members.
-# The following shouldn't be considered members but embedded dependencies.
-exclude = [
   "quaint",
-  "quaint/test-macros",
-  "quaint/test-setup"
 ]
 
 [workspace.dependencies]
 psl = { path = "./psl/psl" }
 serde_json = { version = "1", features = ["float_roundtrip", "preserve_order"] }
 serde = { version = "1", features = ["derive"] }
-tokio = { version = "1.25", features = ["rt-multi-thread", "macros", "sync", "io-std", "io-util", "parking_lot", "time"] }
+tokio = { version = "1.25", features = [
+  "rt-multi-thread",
+  "macros",
+  "sync",
+  "io-std",
+  "io-util",
+  "parking_lot",
+  "time",
+] }
 user-facing-errors = { path = "./libs/user-facing-errors" }
 uuid = { version = "1", features = ["serde"] }
 indoc = "2.0.1"
 connection-string = "0.2"
-napi = { version = "2.12.4", default-features = false, features = ["napi8", "tokio_rt", "serde-json"] }
+napi = { version = "2.12.4", default-features = false, features = [
+  "napi8",
+  "tokio_rt",
+  "serde-json",
+] }
 napi-derive = "2.12.4"
 
 [workspace.dependencies.quaint]
@@ -78,7 +83,7 @@ strip = "symbols"
 [profile.release]
 lto = "fat"
 codegen-units = 1
-opt-level = 's' # Optimize for size.
+opt-level = 's'   # Optimize for size.
 
 [profile.profiling]
 inherits = "release"
