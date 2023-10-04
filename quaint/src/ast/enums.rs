@@ -14,11 +14,11 @@ impl<'a> EnumVariant<'a> {
     }
 
     pub fn into_text(self) -> Value<'a> {
-        ValueType::Text(Some(self.0)).into()
+        Value::text(self.0)
     }
 
-    pub fn into_enum(self, name: Option<EnumName<'a>>) -> ValueType<'a> {
-        ValueType::Enum(Some(self), name)
+    pub fn into_enum(self, name: Option<EnumName<'a>>) -> Value<'a> {
+        ValueType::Enum(Some(self), name).into()
     }
 }
 

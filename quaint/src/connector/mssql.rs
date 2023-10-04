@@ -430,7 +430,7 @@ impl Queryable for Mssql {
 
         let version_string = rows
             .get(0)
-            .and_then(|row| row.get("version").and_then(|version| version.typed.to_string()));
+            .and_then(|row| row.get("version").and_then(|version| version.to_string()));
 
         Ok(version_string)
     }

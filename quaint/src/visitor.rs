@@ -158,7 +158,7 @@ pub trait Visitor<'a> {
     fn visit_parameterized_enum_array(&mut self, variants: Vec<EnumVariant<'a>>, name: Option<EnumName<'a>>) -> Result {
         let enum_variants: Vec<_> = variants
             .into_iter()
-            .map(|variant| Value::from(variant.into_enum(name.clone())))
+            .map(|variant| variant.into_enum(name.clone()))
             .collect();
 
         self.add_parameter(ValueType::Array(Some(enum_variants)).into());
