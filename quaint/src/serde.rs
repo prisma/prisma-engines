@@ -269,7 +269,7 @@ mod tests {
         let first_row = make_row(vec![
             ("id", Value::integer(12)),
             ("name", "Georgina".into()),
-            ("bio", Value::from(Value::null_text())),
+            ("bio", Value::null_text()),
         ]);
         let second_row = make_row(vec![
             ("id", 33.into()),

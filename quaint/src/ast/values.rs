@@ -1391,35 +1391,35 @@ mod tests {
 
     #[test]
     fn a_parameterized_value_of_ints32_can_be_converted_into_a_vec() {
-        let pv = Value::from(ValueType::array(vec![1]));
+        let pv = Value::array(vec![1]);
         let values: Vec<i32> = pv.typed.into_vec().expect("convert into Vec<i32>");
         assert_eq!(values, vec![1]);
     }
 
     #[test]
     fn a_parameterized_value_of_ints64_can_be_converted_into_a_vec() {
-        let pv = Value::from(ValueType::array(vec![1_i64]));
+        let pv = Value::array(vec![1_i64]);
         let values: Vec<i64> = pv.typed.into_vec().expect("convert into Vec<i64>");
         assert_eq!(values, vec![1]);
     }
 
     #[test]
     fn a_parameterized_value_of_reals_can_be_converted_into_a_vec() {
-        let pv = Value::from(ValueType::array(vec![1.0]));
+        let pv = Value::array(vec![1.0]);
         let values: Vec<f64> = pv.typed.into_vec().expect("convert into Vec<f64>");
         assert_eq!(values, vec![1.0]);
     }
 
     #[test]
     fn a_parameterized_value_of_texts_can_be_converted_into_a_vec() {
-        let pv = Value::from(ValueType::array(vec!["test"]));
+        let pv = Value::array(vec!["test"]);
         let values: Vec<String> = pv.typed.into_vec().expect("convert into Vec<String>");
         assert_eq!(values, vec!["test"]);
     }
 
     #[test]
     fn a_parameterized_value_of_booleans_can_be_converted_into_a_vec() {
-        let pv = Value::from(ValueType::array(vec![true]));
+        let pv = Value::array(vec![true]);
         let values: Vec<bool> = pv.typed.into_vec().expect("convert into Vec<bool>");
         assert_eq!(values, vec![true]);
     }
@@ -1427,14 +1427,14 @@ mod tests {
     #[test]
     fn a_parameterized_value_of_datetimes_can_be_converted_into_a_vec() {
         let datetime = DateTime::from_str("2019-07-27T05:30:30Z").expect("parsing date/time");
-        let pv = Value::from(ValueType::array(vec![datetime]));
+        let pv = Value::array(vec![datetime]);
         let values: Vec<DateTime<Utc>> = pv.typed.into_vec().expect("convert into Vec<DateTime>");
         assert_eq!(values, vec![datetime]);
     }
 
     #[test]
     fn a_parameterized_value_of_an_array_cant_be_converted_into_a_vec_of_the_wrong_type() {
-        let pv = Value::from(ValueType::array(vec![1]));
+        let pv = Value::array(vec![1]);
         let rslt: Option<Vec<f64>> = pv.typed.into_vec();
         assert!(rslt.is_none());
     }
@@ -1442,7 +1442,7 @@ mod tests {
     #[test]
     fn display_format_for_datetime() {
         let dt: DateTime<Utc> = DateTime::from_str("2019-07-27T05:30:30Z").expect("failed while parsing date");
-        let pv = Value::from(ValueType::datetime(dt));
+        let pv = Value::datetime(dt);
 
         assert_eq!(format!("{pv}"), "\"2019-07-27 05:30:30 UTC\"");
     }
@@ -1450,7 +1450,7 @@ mod tests {
     #[test]
     fn display_format_for_date() {
         let date = NaiveDate::from_ymd_opt(2022, 8, 11).unwrap();
-        let pv = Value::from(ValueType::date(date));
+        let pv = Value::date(date);
 
         assert_eq!(format!("{pv}"), "\"2022-08-11\"");
     }
@@ -1458,7 +1458,7 @@ mod tests {
     #[test]
     fn display_format_for_time() {
         let time = NaiveTime::from_hms_opt(16, 17, 00).unwrap();
-        let pv = Value::from(ValueType::time(time));
+        let pv = Value::time(time);
 
         assert_eq!(format!("{pv}"), "\"16:17:00\"");
     }
@@ -1467,7 +1467,7 @@ mod tests {
     #[cfg(feature = "uuid")]
     fn display_format_for_uuid() {
         let id = Uuid::from_str("67e5504410b1426f9247bb680e5fe0c8").unwrap();
-        let pv = Value::from(ValueType::uuid(id));
+        let pv = Value::uuid(id);
 
         assert_eq!(format!("{pv}"), "\"67e55044-10b1-426f-9247-bb680e5fe0c8\"");
     }
