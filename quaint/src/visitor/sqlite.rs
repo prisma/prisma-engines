@@ -391,8 +391,8 @@ mod tests {
     use crate::{val, visitor::*};
 
     fn expected_values<'a, T>(sql: &'static str, params: Vec<T>) -> (String, Vec<Value<'a>>)
-        where
-            T: Into<Value<'a>>,
+    where
+        T: Into<Value<'a>>,
     {
         (String::from(sql), params.into_iter().map(|p| p.into()).collect())
     }
@@ -432,11 +432,11 @@ mod tests {
     #[test]
     fn test_aliased_null() {
         let expected_sql = "SELECT ? AS `test`";
-        let query = Select::default().value(val!(ValueType::Text(None).into_value()).alias("test"));
+        let query = Select::default().value(val!(Value::null_text()).alias("test"));
         let (sql, params) = Sqlite::build(query).unwrap();
 
         assert_eq!(expected_sql, sql);
-        assert_eq!(vec![ValueType::Text(None).into_value()], params);
+        assert_eq!(vec![Value::null_text()], params);
     }
 
     #[test]
@@ -861,7 +861,7 @@ mod tests {
 
     #[test]
     fn test_raw_null() {
-        let (sql, params) = Sqlite::build(Select::default().value(ValueType::Text(None).into_value().raw())).unwrap();
+        let (sql, params) = Sqlite::build(Select::default().value(Value::null_text().raw())).unwrap();
         assert_eq!("SELECT null", sql);
         assert!(params.is_empty());
     }

@@ -138,17 +138,17 @@ impl<'a> GetRow for SqliteRow<'a> {
             let pv = match self.get_ref_unwrap(i) {
                 ValueRef::Null => match column {
                     // NOTE: A value without decl_type would be Int32(None)
-                    c if c.is_int32() | c.is_null() => ValueType::Int32(None).into_value(),
-                    c if c.is_int64() => ValueType::Int64(None).into_value(),
-                    c if c.is_text() => ValueType::Text(None).into_value(),
-                    c if c.is_bytes() => ValueType::Bytes(None).into_value(),
-                    c if c.is_float() => ValueType::Float(None).into_value(),
-                    c if c.is_double() => ValueType::Double(None).into_value(),
+                    c if c.is_int32() | c.is_null() => Value::null_int32(),
+                    c if c.is_int64() => Value::null_int64(),
+                    c if c.is_text() => Value::null_text(),
+                    c if c.is_bytes() => Value::null_bytes(),
+                    c if c.is_float() => Value::null_float(),
+                    c if c.is_double() => Value::null_double(),
                     #[cfg(feature = "bigdecimal")]
-                    c if c.is_real() => ValueType::Numeric(None).into_value(),
-                    c if c.is_datetime() => ValueType::DateTime(None).into_value(),
-                    c if c.is_date() => ValueType::Date(None).into_value(),
-                    c if c.is_bool() => ValueType::Boolean(None).into_value(),
+                    c if c.is_real() => Value::null_numeric(),
+                    c if c.is_datetime() => Value::null_datetime(),
+                    c if c.is_date() => Value::null_date(),
+                    c if c.is_bool() => Value::null_boolean(),
                     c => match c.decl_type() {
                         Some(n) => {
                             let msg = format!("Value {n} not supported");
@@ -157,7 +157,7 @@ impl<'a> GetRow for SqliteRow<'a> {
                             return Err(Error::builder(kind).build());
                         }
                         // When we don't know what to do, the default value would be Int32(None)
-                        None => ValueType::Int32(None).into_value(),
+                        None => Value::null_int32(),
                     },
                 },
                 ValueRef::Integer(i) => {

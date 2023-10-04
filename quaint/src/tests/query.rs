@@ -33,7 +33,7 @@ async fn aliased_value(api: &mut dyn TestApi) -> crate::Result<()> {
 
 #[test_each_connector]
 async fn aliased_null(api: &mut dyn TestApi) -> crate::Result<()> {
-    let query = Select::default().value(val!(ValueType::Int64(None).into_value()).alias("test"));
+    let query = Select::default().value(val!(Value::null_int64()).alias("test"));
 
     let res = api.conn().select(query).await?;
     let row = res.get(0).unwrap();
@@ -1702,7 +1702,7 @@ async fn enum_values(api: &mut dyn TestApi) -> crate::Result<()> {
     assert_eq!(Some(&Value::enum_variant("B")), row.at(0));
 
     let row = res.get(2).unwrap();
-    assert_eq!(Some(&ValueType::Enum(None, None).into_value()), row.at(0));
+    assert_eq!(Some(&Value::null_enum()), row.at(0));
 
     Ok(())
 }
@@ -2077,7 +2077,7 @@ async fn bigdecimal_read_write_to_floating(api: &mut dyn TestApi) -> crate::Resu
 
 #[test_each_connector]
 async fn coalesce_fun(api: &mut dyn TestApi) -> crate::Result<()> {
-    let exprs: Vec<Expression> = vec![ValueType::Text(None).into_value(), Value::text("Individual")];
+    let exprs: Vec<Expression> = vec![Value::null_text(), Value::text("Individual")];
     let select = Select::default().value(coalesce(exprs).alias("val"));
     let row = api.conn().select(select).await?.into_single()?;
 
@@ -3178,25 +3178,25 @@ async fn order_by_nulls_first_last(api: &mut dyn TestApi) -> crate::Result<()> {
 
     let insert = Insert::single_into(&table)
         .value("name", "b")
-        .value("age", ValueType::Int32(None).into_value());
+        .value("age", Value::null_int32());
     api.conn().insert(insert.into()).await?;
 
     let insert = Insert::single_into(&table)
-        .value("name", ValueType::Text(None).into_value())
+        .value("name", Value::null_text())
         .value("age", 2);
     api.conn().insert(insert.into()).await?;
 
     let insert = Insert::single_into(&table)
-        .value("name", ValueType::Text(None).into_value())
-        .value("age", ValueType::Text(None).into_value());
+        .value("name", Value::null_text())
+        .value("age", Value::null_text());
     api.conn().insert(insert.into()).await?;
 
     // name ASC NULLS FIRST
     let select = Select::from_table(table.clone()).order_by("name".ascend_nulls_first());
     let res = api.conn().select(select).await?;
 
-    assert_eq!(res.get(0).unwrap()["name"], ValueType::Text(None).into_value());
-    assert_eq!(res.get(1).unwrap()["name"], ValueType::Text(None).into_value());
+    assert_eq!(res.get(0).unwrap()["name"], Value::null_text());
+    assert_eq!(res.get(1).unwrap()["name"], Value::null_text());
     assert_eq!(res.get(2).unwrap()["name"], Value::text("a"));
     assert_eq!(res.get(3).unwrap()["name"], Value::text("b"));
 
@@ -3206,15 +3206,15 @@ async fn order_by_nulls_first_last(api: &mut dyn TestApi) -> crate::Result<()> {
 
     assert_eq!(res.get(0).unwrap()["name"], Value::text("a"));
     assert_eq!(res.get(1).unwrap()["name"], Value::text("b"));
-    assert_eq!(res.get(2).unwrap()["name"], ValueType::Text(None).into_value());
-    assert_eq!(res.get(3).unwrap()["name"], ValueType::Text(None).into_value());
+    assert_eq!(res.get(2).unwrap()["name"], Value::null_text());
+    assert_eq!(res.get(3).unwrap()["name"], Value::null_text());
 
     // name DESC NULLS FIRST
     let select = Select::from_table(table.clone()).order_by("name".descend_nulls_first());
     let res = api.conn().select(select).await?;
 
-    assert_eq!(res.get(0).unwrap()["name"], ValueType::Text(None).into_value());
-    assert_eq!(res.get(1).unwrap()["name"], ValueType::Text(None).into_value());
+    assert_eq!(res.get(0).unwrap()["name"], Value::null_text());
+    assert_eq!(res.get(1).unwrap()["name"], Value::null_text());
     assert_eq!(res.get(2).unwrap()["name"], Value::text("b"));
     assert_eq!(res.get(3).unwrap()["name"], Value::text("a"));
 
@@ -3224,8 +3224,8 @@ async fn order_by_nulls_first_last(api: &mut dyn TestApi) -> crate::Result<()> {
 
     assert_eq!(res.get(0).unwrap()["name"], Value::text("b"));
     assert_eq!(res.get(1).unwrap()["name"], Value::text("a"));
-    assert_eq!(res.get(2).unwrap()["name"], ValueType::Text(None).into_value());
-    assert_eq!(res.get(3).unwrap()["name"], ValueType::Text(None).into_value());
+    assert_eq!(res.get(2).unwrap()["name"], Value::null_text());
+    assert_eq!(res.get(3).unwrap()["name"], Value::null_text());
 
     // name ASC NULLS FIRST, age ASC NULLS FIRST
     let select = Select::from_table(table.clone())
@@ -3233,17 +3233,17 @@ async fn order_by_nulls_first_last(api: &mut dyn TestApi) -> crate::Result<()> {
         .order_by("age".ascend_nulls_first());
     let res = api.conn().select(select).await?;
 
-    assert_eq!(res.get(0).unwrap()["name"], ValueType::Text(None).into_value());
-    assert_eq!(res.get(0).unwrap()["age"], ValueType::Int32(None).into_value());
+    assert_eq!(res.get(0).unwrap()["name"], Value::null_text());
+    assert_eq!(res.get(0).unwrap()["age"], Value::null_int32());
 
-    assert_eq!(res.get(1).unwrap()["name"], ValueType::Text(None).into_value());
+    assert_eq!(res.get(1).unwrap()["name"], Value::null_text());
     assert_eq!(res.get(1).unwrap()["age"], Value::int32(2));
 
     assert_eq!(res.get(2).unwrap()["name"], Value::text("a"));
     assert_eq!(res.get(2).unwrap()["age"], Value::int32(1));
 
     assert_eq!(res.get(3).unwrap()["name"], Value::text("b"));
-    assert_eq!(res.get(3).unwrap()["age"], ValueType::Int32(None).into_value());
+    assert_eq!(res.get(3).unwrap()["age"], Value::null_int32());
 
     // name ASC NULLS LAST, age ASC NULLS LAST
     let select = Select::from_table(table.clone())
@@ -3255,13 +3255,13 @@ async fn order_by_nulls_first_last(api: &mut dyn TestApi) -> crate::Result<()> {
     assert_eq!(res.get(0).unwrap()["age"], Value::int32(1));
 
     assert_eq!(res.get(1).unwrap()["name"], Value::text("b"));
-    assert_eq!(res.get(1).unwrap()["age"], ValueType::Int32(None).into_value());
+    assert_eq!(res.get(1).unwrap()["age"], Value::null_int32());
 
-    assert_eq!(res.get(2).unwrap()["name"], ValueType::Text(None).into_value());
+    assert_eq!(res.get(2).unwrap()["name"], Value::null_text());
     assert_eq!(res.get(2).unwrap()["age"], Value::int32(2));
 
-    assert_eq!(res.get(3).unwrap()["name"], ValueType::Text(None).into_value());
-    assert_eq!(res.get(3).unwrap()["age"], ValueType::Int32(None).into_value());
+    assert_eq!(res.get(3).unwrap()["name"], Value::null_text());
+    assert_eq!(res.get(3).unwrap()["age"], Value::null_int32());
 
     // name DESC NULLS FIRST, age DESC NULLS FIRST
     let select = Select::from_table(table.clone())
@@ -3269,14 +3269,14 @@ async fn order_by_nulls_first_last(api: &mut dyn TestApi) -> crate::Result<()> {
         .order_by("age".descend_nulls_first());
     let res = api.conn().select(select).await?;
 
-    assert_eq!(res.get(0).unwrap()["name"], ValueType::Text(None).into_value());
-    assert_eq!(res.get(0).unwrap()["age"], ValueType::Int32(None).into_value());
+    assert_eq!(res.get(0).unwrap()["name"], Value::null_text());
+    assert_eq!(res.get(0).unwrap()["age"], Value::null_int32());
 
-    assert_eq!(res.get(1).unwrap()["name"], ValueType::Text(None).into_value());
+    assert_eq!(res.get(1).unwrap()["name"], Value::null_text());
     assert_eq!(res.get(1).unwrap()["age"], Value::int32(2));
 
     assert_eq!(res.get(2).unwrap()["name"], Value::text("b"));
-    assert_eq!(res.get(2).unwrap()["age"], ValueType::Int32(None).into_value());
+    assert_eq!(res.get(2).unwrap()["age"], Value::null_int32());
 
     assert_eq!(res.get(3).unwrap()["name"], Value::text("a"));
     assert_eq!(res.get(3).unwrap()["age"], Value::int32(1));
@@ -3288,16 +3288,16 @@ async fn order_by_nulls_first_last(api: &mut dyn TestApi) -> crate::Result<()> {
     let res = api.conn().select(select).await?;
 
     assert_eq!(res.get(0).unwrap()["name"], Value::text("b"));
-    assert_eq!(res.get(0).unwrap()["age"], ValueType::Int32(None).into_value());
+    assert_eq!(res.get(0).unwrap()["age"], Value::null_int32());
 
     assert_eq!(res.get(1).unwrap()["name"], Value::text("a"));
     assert_eq!(res.get(1).unwrap()["age"], Value::int32(1));
 
-    assert_eq!(res.get(2).unwrap()["name"], ValueType::Text(None).into_value());
+    assert_eq!(res.get(2).unwrap()["name"], Value::null_text());
     assert_eq!(res.get(2).unwrap()["age"], Value::int32(2));
 
-    assert_eq!(res.get(3).unwrap()["name"], ValueType::Text(None).into_value());
-    assert_eq!(res.get(3).unwrap()["age"], ValueType::Int32(None).into_value());
+    assert_eq!(res.get(3).unwrap()["name"], Value::null_text());
+    assert_eq!(res.get(3).unwrap()["age"], Value::null_int32());
 
     // name ASC NULLS LAST, age DESC NULLS FIRST
     let select = Select::from_table(table.clone())
@@ -3309,12 +3309,12 @@ async fn order_by_nulls_first_last(api: &mut dyn TestApi) -> crate::Result<()> {
     assert_eq!(res.get(0).unwrap()["age"], Value::int32(1));
 
     assert_eq!(res.get(1).unwrap()["name"], Value::text("b"));
-    assert_eq!(res.get(1).unwrap()["age"], ValueType::Int32(None).into_value());
+    assert_eq!(res.get(1).unwrap()["age"], Value::null_int32());
 
-    assert_eq!(res.get(2).unwrap()["name"], ValueType::Text(None).into_value());
-    assert_eq!(res.get(2).unwrap()["age"], ValueType::Int32(None).into_value());
+    assert_eq!(res.get(2).unwrap()["name"], Value::null_text());
+    assert_eq!(res.get(2).unwrap()["age"], Value::null_int32());
 
-    assert_eq!(res.get(3).unwrap()["name"], ValueType::Text(None).into_value());
+    assert_eq!(res.get(3).unwrap()["name"], Value::null_text());
     assert_eq!(res.get(3).unwrap()["age"], Value::int32(2));
 
     // name DESC NULLS FIRST, age ASC NULLS LAST
@@ -3323,14 +3323,14 @@ async fn order_by_nulls_first_last(api: &mut dyn TestApi) -> crate::Result<()> {
         .order_by("age".ascend_nulls_last());
     let res = api.conn().select(select).await?;
 
-    assert_eq!(res.get(0).unwrap()["name"], ValueType::Text(None).into_value());
+    assert_eq!(res.get(0).unwrap()["name"], Value::null_text());
     assert_eq!(res.get(0).unwrap()["age"], Value::int32(2));
 
-    assert_eq!(res.get(1).unwrap()["name"], ValueType::Text(None).into_value());
-    assert_eq!(res.get(1).unwrap()["age"], ValueType::Int32(None).into_value());
+    assert_eq!(res.get(1).unwrap()["name"], Value::null_text());
+    assert_eq!(res.get(1).unwrap()["age"], Value::null_int32());
 
     assert_eq!(res.get(2).unwrap()["name"], Value::text("b"));
-    assert_eq!(res.get(2).unwrap()["age"], ValueType::Int32(None).into_value());
+    assert_eq!(res.get(2).unwrap()["age"], Value::null_int32());
 
     assert_eq!(res.get(3).unwrap()["name"], Value::text("a"));
     assert_eq!(res.get(3).unwrap()["age"], Value::int32(1));

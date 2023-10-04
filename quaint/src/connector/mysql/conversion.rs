@@ -303,21 +303,21 @@ impl TakeRow for my::Row {
                     Value::time(time)
                 }
                 my::Value::NULL => match column {
-                    t if t.is_bool() => ValueType::Boolean(None).into_value(),
-                    t if t.is_enum() => ValueType::Enum(None, None).into_value(),
-                    t if t.is_null() => ValueType::Int32(None).into_value(),
-                    t if t.is_int64() => ValueType::Int64(None).into_value(),
-                    t if t.is_int32() => ValueType::Int32(None).into_value(),
-                    t if t.is_float() => ValueType::Float(None).into_value(),
-                    t if t.is_double() => ValueType::Double(None).into_value(),
-                    t if t.is_text() => ValueType::Text(None).into_value(),
-                    t if t.is_bytes() => ValueType::Bytes(None).into_value(),
+                    t if t.is_bool() => Value::null_boolean(),
+                    t if t.is_enum() => Value::null_enum(),
+                    t if t.is_null() => Value::null_int32(),
+                    t if t.is_int64() => Value::null_int64(),
+                    t if t.is_int32() => Value::null_int32(),
+                    t if t.is_float() => Value::null_float(),
+                    t if t.is_double() => Value::null_double(),
+                    t if t.is_text() => Value::null_text(),
+                    t if t.is_bytes() => Value::null_bytes(),
                     #[cfg(feature = "bigdecimal")]
-                    t if t.is_real() => ValueType::Numeric(None).into_value(),
-                    t if t.is_datetime() => ValueType::DateTime(None).into_value(),
-                    t if t.is_time() => ValueType::Time(None).into_value(),
-                    t if t.is_date() => ValueType::Date(None).into_value(),
-                    t if t.is_json() => ValueType::Json(None).into_value(),
+                    t if t.is_real() => Value::null_numeric(),
+                    t if t.is_datetime() => Value::null_datetime(),
+                    t if t.is_time() => Value::null_time(),
+                    t if t.is_date() => Value::null_date(),
+                    t if t.is_json() => Value::null_json(),
                     typ => {
                         let msg = format!("Value of type {typ:?} is not supported with the current configuration");
 

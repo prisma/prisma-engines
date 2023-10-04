@@ -379,6 +379,80 @@ impl<'a> Value<'a> {
     {
         self.typed.to_vec()
     }
+
+    pub fn null_int32() -> Self {
+        ValueType::Int32(None).into()
+    }
+
+    pub fn null_int64() -> Self {
+        ValueType::Int64(None).into()
+    }
+
+    pub fn null_float() -> Self {
+        ValueType::Float(None).into()
+    }
+
+    pub fn null_double() -> Self {
+        ValueType::Double(None).into()
+    }
+
+    pub fn null_text() -> Self {
+        ValueType::Text(None).into()
+    }
+
+    pub fn null_enum() -> Self {
+        ValueType::Enum(None, None).into()
+    }
+
+    pub fn null_enum_array() -> Self {
+        ValueType::EnumArray(None, None).into()
+    }
+
+    pub fn null_bytes() -> Self {
+        ValueType::Bytes(None).into()
+    }
+
+    pub fn null_boolean() -> Self {
+        ValueType::Boolean(None).into()
+    }
+
+    pub fn null_char() -> Self {
+        ValueType::Char(None).into()
+    }
+
+    pub fn null_array() -> Self {
+        ValueType::Array(None).into()
+    }
+
+    #[cfg(feature = "bigdecimal")]
+    pub fn null_numeric() -> Self {
+        ValueType::Numeric(None).into()
+    }
+
+    pub fn null_json() -> Self {
+        ValueType::Json(None).into()
+    }
+
+    pub fn null_xml() -> Self {
+        ValueType::Xml(None).into()
+    }
+
+    #[cfg(feature = "uuid")]
+    pub fn null_uuid() -> Self {
+        ValueType::Uuid(None).into()
+    }
+
+    pub fn null_datetime() -> Self {
+        ValueType::DateTime(None).into()
+    }
+
+    pub fn null_date() -> Self {
+        ValueType::Date(None).into()
+    }
+
+    pub fn null_time() -> Self {
+        ValueType::Time(None).into()
+    }
 }
 
 impl<'a> Display for Value<'a> {
