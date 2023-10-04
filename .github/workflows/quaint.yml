@@ -23,8 +23,7 @@ jobs:
           - "--lib --no-default-features --features=mysql"
           - "--lib --no-default-features --features=mysql --features=uuid --features=pooled --features=bigdecimal"
           - "--lib --no-default-features --features=mssql"
-          - "--lib --no-default-features --features=mssql --features=uuid --features=pooled --features=bigdecimal"
-          - "--doc --features=all"
+          - "--lib --no-default-features --features=mssql --features=uuid --features=pooled --features=bigdecimal"          
     env:
       TEST_MYSQL: "mysql://root:prisma@localhost:3306/prisma"
       TEST_MYSQL8: "mysql://root:prisma@localhost:3307/prisma"

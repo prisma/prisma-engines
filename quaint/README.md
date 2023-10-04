@@ -13,11 +13,6 @@ Quaint is an abstraction over certain SQL databases. It provides:
 - Pooling with [mobc](https://crates.io/crates/mobc)
 - Async/await and Futures 0.3
 
-### Documentation
-
-- [Released](https://docs.rs/quaint)
-- [Main](https://prisma.github.io/quaint/quaint/index.html)
-
 ### Feature flags
 
 - `mysql`: Support for MySQL databases.
@@ -76,7 +71,7 @@ The `FMT_SQL` environment variable can be used to log _formatted_ SQL queries. B
 This requires the rust nightly channel:
 
 ```sh
-> cargo +nightly rustdoc --all-features
+> cargo rustdoc --all-features
 ```
 
 Documentation index would be created at `$CARGO_TARGET_DIR/doc/quaint/index.html`

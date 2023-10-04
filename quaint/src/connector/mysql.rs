@@ -33,7 +33,6 @@ use super::IsolationLevel;
 
 /// A connector interface for the MySQL database.
 #[derive(Debug)]
-#[cfg_attr(feature = "docs", doc(cfg(feature = "mysql")))]
 pub struct Mysql {
     pub(crate) conn: Mutex<my::Conn>,
     pub(crate) url: MysqlUrl,
@@ -44,7 +43,6 @@ pub struct Mysql {
 
 /// Wraps a connection url and exposes the parsing logic used by quaint, including default values.
 #[derive(Debug, Clone)]
-#[cfg_attr(feature = "docs", doc(cfg(feature = "mysql")))]
 pub struct MysqlUrl {
     url: Url,
     query_params: MysqlUrlQueryParams,

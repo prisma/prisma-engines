@@ -60,7 +60,6 @@ impl<'a> Value<'a> {
 
     /// Creates a new decimal value.
     #[cfg(feature = "bigdecimal")]
-    #[cfg_attr(feature = "docs", doc(cfg(feature = "bigdecimal")))]
     pub fn numeric(value: BigDecimal) -> Self {
         ValueType::numeric(value).into_value()
     }
@@ -152,7 +151,6 @@ impl<'a> Value<'a> {
 
     /// Creates a new uuid value.
     #[cfg(feature = "uuid")]
-    #[cfg_attr(feature = "docs", doc(cfg(feature = "uuid")))]
     pub fn uuid(value: Uuid) -> Self {
         ValueType::uuid(value).into_value()
     }
@@ -273,7 +271,6 @@ impl<'a> Value<'a> {
 
     /// `true` if the `Value` is a numeric value or can be converted to one.
     #[cfg(feature = "bigdecimal")]
-    #[cfg_attr(feature = "docs", doc(cfg(feature = "bigdecimal")))]
     pub fn is_numeric(&self) -> bool {
         self.typed.is_numeric()
     }
@@ -281,7 +278,6 @@ impl<'a> Value<'a> {
     /// Returns a bigdecimal, if the value is a numeric, float or double value,
     /// otherwise `None`.
     #[cfg(feature = "bigdecimal")]
-    #[cfg_attr(feature = "docs", doc(cfg(feature = "bigdecimal")))]
     pub fn into_numeric(self) -> Option<BigDecimal> {
         self.typed.into_numeric()
     }
@@ -289,7 +285,6 @@ impl<'a> Value<'a> {
     /// Returns a reference to a bigdecimal, if the value is a numeric.
     /// Otherwise `None`.
     #[cfg(feature = "bigdecimal")]
-    #[cfg_attr(feature = "docs", doc(cfg(feature = "bigdecimal")))]
     pub fn as_numeric(&self) -> Option<&BigDecimal> {
         self.typed.as_numeric()
     }
@@ -311,14 +306,12 @@ impl<'a> Value<'a> {
 
     /// `true` if the `Value` is of UUID type.
     #[cfg(feature = "uuid")]
-    #[cfg_attr(feature = "docs", doc(cfg(feature = "uuid")))]
     pub fn is_uuid(&self) -> bool {
         self.typed.is_uuid()
     }
 
     /// Returns an UUID if the value is of UUID type, otherwise `None`.
     #[cfg(feature = "uuid")]
-    #[cfg_attr(feature = "docs", doc(cfg(feature = "uuid")))]
     pub fn as_uuid(&self) -> Option<Uuid> {
         self.typed.as_uuid()
     }
@@ -513,14 +506,12 @@ pub enum ValueType<'a> {
     Array(Option<Vec<Value<'a>>>),
     /// A numeric value.
     #[cfg(feature = "bigdecimal")]
-    #[cfg_attr(feature = "docs", doc(cfg(feature = "bigdecimal")))]
     Numeric(Option<BigDecimal>),
     /// A JSON value.
     Json(Option<serde_json::Value>),
     /// A XML value.
     Xml(Option<Cow<'a, str>>),
     #[cfg(feature = "uuid")]
-    #[cfg_attr(feature = "docs", doc(cfg(feature = "uuid")))]
     /// An UUID value.
     Uuid(Option<Uuid>),
     /// A datetime value.
@@ -687,7 +678,6 @@ impl<'a> ValueType<'a> {
 
     /// Creates a new decimal value.
     #[cfg(feature = "bigdecimal")]
-    #[cfg_attr(feature = "docs", doc(cfg(feature = "bigdecimal")))]
     pub(crate) fn numeric(value: BigDecimal) -> Self {
         Self::Numeric(Some(value))
     }
@@ -779,7 +769,6 @@ impl<'a> ValueType<'a> {
 
     /// Creates a new uuid value.
     #[cfg(feature = "uuid")]
-    #[cfg_attr(feature = "docs", doc(cfg(feature = "uuid")))]
     pub(crate) fn uuid(value: Uuid) -> Self {
         Self::Uuid(Some(value))
     }
@@ -960,7 +949,6 @@ impl<'a> ValueType<'a> {
 
     /// `true` if the `Value` is a numeric value or can be converted to one.
     #[cfg(feature = "bigdecimal")]
-    #[cfg_attr(feature = "docs", doc(cfg(feature = "bigdecimal")))]
     pub(crate) fn is_numeric(&self) -> bool {
         matches!(self, Self::Numeric(_) | Self::Float(_) | Self::Double(_))
     }
@@ -968,7 +956,6 @@ impl<'a> ValueType<'a> {
     /// Returns a bigdecimal, if the value is a numeric, float or double value,
     /// otherwise `None`.
     #[cfg(feature = "bigdecimal")]
-    #[cfg_attr(feature = "docs", doc(cfg(feature = "bigdecimal")))]
     pub(crate) fn into_numeric(self) -> Option<BigDecimal> {
         match self {
             Self::Numeric(d) => d,
@@ -981,7 +968,6 @@ impl<'a> ValueType<'a> {
     /// Returns a reference to a bigdecimal, if the value is a numeric.
     /// Otherwise `None`.
     #[cfg(feature = "bigdecimal")]
-    #[cfg_attr(feature = "docs", doc(cfg(feature = "bigdecimal")))]
     pub(crate) fn as_numeric(&self) -> Option<&BigDecimal> {
         match self {
             Self::Numeric(d) => d.as_ref(),
@@ -1018,14 +1004,12 @@ impl<'a> ValueType<'a> {
 
     /// `true` if the `Value` is of UUID type.
     #[cfg(feature = "uuid")]
-    #[cfg_attr(feature = "docs", doc(cfg(feature = "uuid")))]
     pub(crate) fn is_uuid(&self) -> bool {
         matches!(self, Self::Uuid(_))
     }
 
     /// Returns an UUID if the value is of UUID type, otherwise `None`.
     #[cfg(feature = "uuid")]
-    #[cfg_attr(feature = "docs", doc(cfg(feature = "uuid")))]
     pub(crate) fn as_uuid(&self) -> Option<Uuid> {
         match self {
             Self::Uuid(u) => *u,

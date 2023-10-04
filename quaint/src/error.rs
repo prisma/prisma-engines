@@ -315,7 +315,6 @@ impl From<Error> for ErrorKind {
 }
 
 #[cfg(feature = "bigdecimal")]
-#[cfg_attr(feature = "docs", doc(cfg(feature = "bigdecimal")))]
 impl From<bigdecimal::ParseBigDecimalError> for Error {
     fn from(e: bigdecimal::ParseBigDecimalError) -> Self {
         let kind = ErrorKind::conversion(format!("{e}"));
