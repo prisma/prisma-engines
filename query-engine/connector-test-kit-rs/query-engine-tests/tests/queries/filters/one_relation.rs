@@ -9,26 +9,26 @@ mod one_relation {
         let schema = indoc! {
             r#"
             model Blog {
-                #id(id, String, @id, @default(cuid()))
+                #id(blogId, String, @id, @default(cuid()))
                 name String
                 post Post?
             }
 
             model Post {
-                #id(id, String, @id, @default(cuid()))
+                #id(postId, String, @id, @default(cuid()))
                 title      String
                 popularity Int
                 blogId     String? @unique
-                blog       Blog?    @relation(fields: [blogId], references: [id])
+                blog       Blog?    @relation(fields: [blogId], references: [blogId])
                 comment    Comment?
             }
 
             model Comment {
-                #id(id, String, @id, @default(cuid()))
+                #id(commentId, String, @id, @default(cuid()))
                 text   String
                 likes  Int
                 postId String? @unique
-                post   Post?   @relation(fields: [postId], references: [id])
+                post   Post?   @relation(fields: [postId], references: [postId])
             }
             "#
         };
