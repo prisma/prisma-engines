@@ -916,18 +916,18 @@ mod proxy_test {
     #[test]
     fn js_int32_array_to_quaint() {
         let column_type = ColumnType::Int32Array;
-        test_null(QuaintValue::Array(None), column_type);
+        test_null(QuaintValue::null_array(), column_type);
 
         let json_value = json!([1, 2, 3]);
         let quaint_value = js_value_to_quaint(json_value, column_type, "column_name").unwrap();
 
         assert_eq!(
             quaint_value,
-            QuaintValue::Array(Some(vec![
+            QuaintValue::array(vec![
                 QuaintValue::int32(1),
                 QuaintValue::int32(2),
                 QuaintValue::int32(3)
-            ]))
+            ])
         );
 
         let json_value = json!([1, 2, {}]);
@@ -942,14 +942,14 @@ mod proxy_test {
     #[test]
     fn js_text_array_to_quaint() {
         let column_type = ColumnType::TextArray;
-        test_null(QuaintValue::Array(None), column_type);
+        test_null(QuaintValue::null_array(), column_type);
 
         let json_value = json!(["hi", "there"]);
         let quaint_value = js_value_to_quaint(json_value, column_type, "column_name").unwrap();
 
         assert_eq!(
             quaint_value,
-            QuaintValue::Array(Some(vec![QuaintValue::text("hi"), QuaintValue::text("there"),]))
+            QuaintValue::array(vec![QuaintValue::text("hi"), QuaintValue::text("there"),])
         );
 
         let json_value = json!([10]);
