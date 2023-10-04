@@ -1345,6 +1345,8 @@
 <a href="#1345" id="1345">1345</a>
 <a href="#1346" id="1346">1346</a>
 <a href="#1347" id="1347">1347</a>
+<a href="#1348" id="1348">1348</a>
+<a href="#1349" id="1349">1349</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span><span class="kw">super</span>::alias::<span class="kw-2">*</span>;
 <span class="kw">use </span><span class="kw">crate</span>::join_utils::{compute_one2m_join, AliasedJoin};
 <span class="kw">use crate</span>::{model_extensions::<span class="kw-2">*</span>, Context};
@@ -1677,12 +1679,13 @@
             </span>RelationCondition::NoRelatedRecord <span class="kw">if </span><span class="self">self</span>.can_render_join() &amp;&amp; !filter.field.is_list() =&gt; {
                 <span class="kw">let </span>alias = <span class="self">self</span>.next_alias(AliasMode::Join);
 
-                <span class="kw">let </span>linking_fields_null: Vec&lt;<span class="kw">_</span>&gt; = ModelProjection::from(filter.field.model().primary_identifier())
-                    .as_columns(ctx)
-                    .map(|c| c.aliased_col(<span class="prelude-val">Some</span>(alias), ctx))
-                    .map(|c| c.is_null())
-                    .map(Expression::from)
-                    .collect();
+                <span class="kw">let </span>linking_fields_null: Vec&lt;<span class="kw">_</span>&gt; =
+                    ModelProjection::from(filter.field.related_model().primary_identifier())
+                        .as_columns(ctx)
+                        .map(|c| c.aliased_col(<span class="prelude-val">Some</span>(alias), ctx))
+                        .map(|c| c.is_null())
+                        .map(Expression::from)
+                        .collect();
                 <span class="kw">let </span>null_filter = ConditionTree::And(linking_fields_null);
 
                 <span class="kw">let </span>join = compute_one2m_join(
@@ -1709,12 +1712,13 @@
             </span>RelationCondition::ToOneRelatedRecord <span class="kw">if </span><span class="self">self</span>.can_render_join() &amp;&amp; !filter.field.is_list() =&gt; {
                 <span class="kw">let </span>alias = <span class="self">self</span>.next_alias(AliasMode::Join);
 
-                <span class="kw">let </span>linking_fields_not_null: Vec&lt;<span class="kw">_</span>&gt; = ModelProjection::from(filter.field.model().primary_identifier())
-                    .as_columns(ctx)
-                    .map(|c| c.aliased_col(<span class="prelude-val">Some</span>(alias), ctx))
-                    .map(|c| c.is_not_null())
-                    .map(Expression::from)
-                    .collect();
+                <span class="kw">let </span>linking_fields_not_null: Vec&lt;<span class="kw">_</span>&gt; =
+                    ModelProjection::from(filter.field.related_model().primary_identifier())
+                        .as_columns(ctx)
+                        .map(|c| c.aliased_col(<span class="prelude-val">Some</span>(alias), ctx))
+                        .map(|c| c.is_not_null())
+                        .map(Expression::from)
+                        .collect();
                 <span class="kw">let </span>not_null_filter = ConditionTree::And(linking_fields_not_null);
 
                 <span class="kw">let </span>join = compute_one2m_join(
