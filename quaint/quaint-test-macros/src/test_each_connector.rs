@@ -2,6 +2,7 @@ use darling::FromMeta;
 use once_cell::sync::Lazy;
 use proc_macro::TokenStream;
 use proc_macro2::Span;
+
 use quaint_test_setup::{ConnectorDefinition, Tags, CONNECTORS};
 use quote::quote;
 use std::str::FromStr;
@@ -77,7 +78,6 @@ impl darling::FromMeta for TagsWrapper {
     }
 }
 
-#[allow(clippy::needless_borrow)]
 pub fn test_each_connector_impl(attr: TokenStream, input: TokenStream) -> TokenStream {
     let attributes_meta: syn::AttributeArgs = parse_macro_input!(attr as AttributeArgs);
     let args = TestEachConnectorArgs::from_list(&attributes_meta);
@@ -99,7 +99,6 @@ pub fn test_each_connector_impl(attr: TokenStream, input: TokenStream) -> TokenS
     output.into()
 }
 
-#[allow(clippy::needless_borrow)]
 fn test_each_connector_async_wrapper_functions(
     args: &TestEachConnectorArgs,
     test_function: &ItemFn,

@@ -8,8 +8,8 @@ use crate::{
     error::ErrorKind,
     prelude::*,
 };
-use test_macros::test_each_connector;
-use test_setup::Tags;
+use quaint_test_macros::test_each_connector;
+use quaint_test_setup::Tags;
 
 #[test_each_connector]
 async fn single_value(api: &mut dyn TestApi) -> crate::Result<()> {
