@@ -19,7 +19,10 @@ fn views_ignore() {
 }
 
 fn assert_comment(actual: Option<&String>, expected: &str) {
-    assert!(actual.is_some_and(|c| c.as_str() == expected))
+    match actual {
+        Some(actual) => assert_eq!(actual.as_str(), expected),
+        None => panic!("Expected comment: {}", expected),
+    }
 }
 
 #[test]

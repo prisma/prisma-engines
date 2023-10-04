@@ -1,4 +1,4 @@
-use quaint::Value;
+use quaint::{Value, ValueType};
 use sql_migration_tests::test_api::*;
 use sql_schema_describer::DefaultValue;
 
@@ -151,7 +151,11 @@ fn making_an_optional_field_required_with_data_with_a_default_is_unexecutable(ap
             .map(|row| row.into_iter().collect::<Vec<Value>>())
             .collect::<Vec<_>>(),
         &[
-            &[Value::text("abc"), Value::text("george"), Value::Int32(None)],
+            &[
+                Value::text("abc"),
+                Value::text("george"),
+                ValueType::Int32(None).into_value()
+            ],
             &[Value::text("def"), Value::text("X Æ A-12"), Value::int32(7)],
         ]
     );
