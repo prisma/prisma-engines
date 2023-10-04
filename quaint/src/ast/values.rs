@@ -47,7 +47,7 @@ impl<'a> Value<'a> {
     where
         I: Into<i32>,
     {
-        ValueType::int32(value).into()
+        ValueType::int32(value).into_value()
     }
 
     /// Creates a new 64-bit signed integer.
@@ -55,7 +55,7 @@ impl<'a> Value<'a> {
     where
         I: Into<i64>,
     {
-        ValueType::int64(value).into()
+        ValueType::int64(value).into_value()
     }
 
     /// Creates a new 32-bit signed integer.
@@ -63,24 +63,24 @@ impl<'a> Value<'a> {
     where
         I: Into<i32>,
     {
-        ValueType::int32(value).into()
+        ValueType::int32(value).into_value()
     }
 
     /// Creates a new decimal value.
     #[cfg(feature = "bigdecimal")]
     #[cfg_attr(feature = "docs", doc(cfg(feature = "bigdecimal")))]
     pub fn numeric(value: BigDecimal) -> Self {
-        ValueType::numeric(value).into()
+        ValueType::numeric(value).into_value()
     }
 
     /// Creates a new float value.
     pub fn float(value: f32) -> Self {
-        ValueType::float(value).into()
+        ValueType::float(value).into_value()
     }
 
     /// Creates a new double value.
     pub fn double(value: f64) -> Self {
-        ValueType::double(value).into()
+        ValueType::double(value).into_value()
     }
 
     /// Creates a new string value.
@@ -88,7 +88,7 @@ impl<'a> Value<'a> {
     where
         T: Into<Cow<'a, str>>,
     {
-        ValueType::text(value).into()
+        ValueType::text(value).into_value()
     }
 
     /// Creates a new enum value.
@@ -96,7 +96,7 @@ impl<'a> Value<'a> {
     where
         T: Into<Cow<'a, str>>,
     {
-        ValueType::enum_variant(value).into()
+        ValueType::enum_variant(value).into_value()
     }
 
     /// Creates a new enum value with the name of the enum attached.
@@ -106,7 +106,7 @@ impl<'a> Value<'a> {
         U: Into<Cow<'a, str>>,
         V: Into<Cow<'a, str>>,
     {
-        ValueType::enum_variant_with_name(value, name, schema_name).into()
+        ValueType::enum_variant_with_name(value, name, schema_name).into_value()
     }
 
     /// Creates a new bytes value.
@@ -114,7 +114,7 @@ impl<'a> Value<'a> {
     where
         B: Into<Cow<'a, [u8]>>,
     {
-        ValueType::bytes(value).into()
+        ValueType::bytes(value).into_value()
     }
 
     /// Creates a new boolean value.
@@ -122,7 +122,7 @@ impl<'a> Value<'a> {
     where
         B: Into<bool>,
     {
-        ValueType::boolean(value).into()
+        ValueType::boolean(value).into_value()
     }
 
     /// Creates a new character value.
@@ -130,7 +130,7 @@ impl<'a> Value<'a> {
     where
         C: Into<char>,
     {
-        ValueType::character(value).into()
+        ValueType::character(value).into_value()
     }
 
     /// Creates a new array value.
@@ -139,34 +139,34 @@ impl<'a> Value<'a> {
         I: IntoIterator<Item = V>,
         V: Into<Value<'a>>,
     {
-        ValueType::array(value).into()
+        ValueType::array(value).into_value()
     }
 
     /// Creates a new uuid value.
     #[cfg(feature = "uuid")]
     #[cfg_attr(feature = "docs", doc(cfg(feature = "uuid")))]
     pub fn uuid(value: Uuid) -> Self {
-        ValueType::uuid(value).into()
+        ValueType::uuid(value).into_value()
     }
 
     /// Creates a new datetime value.
     pub fn datetime(value: DateTime<Utc>) -> Self {
-        ValueType::datetime(value).into()
+        ValueType::datetime(value).into_value()
     }
 
     /// Creates a new date value.
     pub fn date(value: NaiveDate) -> Self {
-        ValueType::date(value).into()
+        ValueType::date(value).into_value()
     }
 
     /// Creates a new time value.
     pub fn time(value: NaiveTime) -> Self {
-        ValueType::time(value).into()
+        ValueType::time(value).into_value()
     }
 
     /// Creates a new JSON value.
     pub fn json(value: serde_json::Value) -> Self {
-        ValueType::json(value).into()
+        ValueType::json(value).into_value()
     }
 
     /// Creates a new XML value.
@@ -174,7 +174,7 @@ impl<'a> Value<'a> {
     where
         T: Into<Cow<'a, str>>,
     {
-        ValueType::xml(value).into()
+        ValueType::xml(value).into_value()
     }
 
     /// `true` if the `Value` is null.
@@ -391,7 +391,7 @@ impl<'a> From<ValueType<'a>> for Value<'a> {
     fn from(inner: ValueType<'a>) -> Self {
         Self {
             typed: inner,
-            native_column_type: None,
+            native_column_type: Default::default(),
         }
     }
 }
@@ -588,7 +588,7 @@ impl<'a> From<ValueType<'a>> for serde_json::Value {
 
 impl<'a> ValueType<'a> {
     pub fn into_value(self) -> Value<'a> {
-        Value::from(self)
+        self.into()
     }
 
     /// Creates a new 32-bit signed integer.

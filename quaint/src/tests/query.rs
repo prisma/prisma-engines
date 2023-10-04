@@ -1719,7 +1719,8 @@ async fn row_to_json_normal(api: &mut dyn TestApi) -> crate::Result<()> {
     assert_eq!(
         ValueType::Json(Some(serde_json::json!({
             "toto": "hello_world"
-        }))).into_value(),
+        })))
+        .into_value(),
         result.into_single().unwrap()[0]
     );
 
@@ -1738,7 +1739,8 @@ async fn row_to_json_pretty(api: &mut dyn TestApi) -> crate::Result<()> {
     assert_eq!(
         ValueType::Json(Some(serde_json::json!({
             "toto": "hello_world"
-        }))).into_value(),
+        })))
+        .into_value(),
         result.into_single().unwrap()[0]
     );
 
@@ -2075,7 +2077,7 @@ async fn bigdecimal_read_write_to_floating(api: &mut dyn TestApi) -> crate::Resu
 
 #[test_each_connector]
 async fn coalesce_fun(api: &mut dyn TestApi) -> crate::Result<()> {
-    let exprs: Vec<Expression> = vec![ValueType::Text(None).into_value().into(), Value::text("Individual").into()];
+    let exprs: Vec<Expression> = vec![ValueType::Text(None).into_value(), Value::text("Individual")];
     let select = Select::default().value(coalesce(exprs).alias("val"));
     let row = api.conn().select(select).await?.into_single()?;
 
@@ -2726,7 +2728,7 @@ async fn json_gt_gte_lt_lte(api: &mut dyn TestApi, json_type: &str) -> crate::Re
     assert_eq!(None, res.get(2));
 
     // Assert JSON greater_than (CAST on left side)
-    let json_value: Expression = ValueType::json(serde_json::json!(50)).into();
+    let json_value: Expression = ValueType::json(serde_json::json!(50)).into_value();
     let select = Select::from_table(&table).so_that(json_value.greater_than(path.clone()));
     let res = api.conn().select(select).await?;
     assert_eq!(

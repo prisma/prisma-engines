@@ -138,17 +138,17 @@ impl<'a> GetRow for SqliteRow<'a> {
             let pv = match self.get_ref_unwrap(i) {
                 ValueRef::Null => match column {
                     // NOTE: A value without decl_type would be Int32(None)
-                    c if c.is_int32() | c.is_null() => ValueType::Int32(None).into(),
-                    c if c.is_int64() => ValueType::Int64(None).into(),
-                    c if c.is_text() => ValueType::Text(None).into(),
-                    c if c.is_bytes() => ValueType::Bytes(None).into(),
-                    c if c.is_float() => ValueType::Float(None).into(),
-                    c if c.is_double() => ValueType::Double(None).into(),
+                    c if c.is_int32() | c.is_null() => ValueType::Int32(None).into_value(),
+                    c if c.is_int64() => ValueType::Int64(None).into_value(),
+                    c if c.is_text() => ValueType::Text(None).into_value(),
+                    c if c.is_bytes() => ValueType::Bytes(None).into_value(),
+                    c if c.is_float() => ValueType::Float(None).into_value(),
+                    c if c.is_double() => ValueType::Double(None).into_value(),
                     #[cfg(feature = "bigdecimal")]
-                    c if c.is_real() => ValueType::Numeric(None).into(),
-                    c if c.is_datetime() => ValueType::DateTime(None).into(),
-                    c if c.is_date() => ValueType::Date(None).into(),
-                    c if c.is_bool() => ValueType::Boolean(None).into(),
+                    c if c.is_real() => ValueType::Numeric(None).into_value(),
+                    c if c.is_datetime() => ValueType::DateTime(None).into_value(),
+                    c if c.is_date() => ValueType::Date(None).into_value(),
+                    c if c.is_bool() => ValueType::Boolean(None).into_value(),
                     c => match c.decl_type() {
                         Some(n) => {
                             let msg = format!("Value {n} not supported");
@@ -157,7 +157,7 @@ impl<'a> GetRow for SqliteRow<'a> {
                             return Err(Error::builder(kind).build());
                         }
                         // When we don't know what to do, the default value would be Int32(None)
-                        None => ValueType::Int32(None).into(),
+                        None => ValueType::Int32(None).into_value(),
                     },
                 },
                 ValueRef::Integer(i) => {

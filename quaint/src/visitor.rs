@@ -149,7 +149,7 @@ pub trait Visitor<'a> {
     fn visit_text_search_relevance(&mut self, text_search_relevance: TextSearchRelevance<'a>) -> Result;
 
     fn visit_parameterized_enum(&mut self, variant: EnumVariant<'a>, name: Option<EnumName<'a>>) -> Result {
-        self.add_parameter(ValueType::Enum(Some(variant), name).into());
+        self.add_parameter(ValueType::Enum(Some(variant), name).into_value());
         self.parameter_substitution()?;
 
         Ok(())
@@ -161,7 +161,7 @@ pub trait Visitor<'a> {
             .map(|variant| variant.into_enum(name.clone()))
             .collect();
 
-        self.add_parameter(ValueType::Array(Some(enum_variants)).into());
+        self.add_parameter(ValueType::Array(Some(enum_variants)).into_value());
         self.parameter_substitution()?;
 
         Ok(())

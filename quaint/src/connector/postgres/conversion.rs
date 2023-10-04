@@ -171,41 +171,41 @@ impl GetRow for PostgresRow {
     fn get_result_row(&self) -> crate::Result<Vec<Value<'static>>> {
         fn convert(row: &PostgresRow, i: usize) -> crate::Result<Value<'static>> {
             let result = match *row.columns()[i].type_() {
-                PostgresType::BOOL => ValueType::Boolean(row.try_get(i)?).into(),
+                PostgresType::BOOL => ValueType::Boolean(row.try_get(i)?).into_value(),
                 PostgresType::INT2 | PostgresType::INT4 => match row.try_get(i)? {
                     Some(val) => {
                         let val: i32 = val;
                         Value::int32(val)
                     }
-                    None => ValueType::Int32(None).into(),
+                    None => ValueType::Int32(None).into_value(),
                 },
                 PostgresType::INT8 => match row.try_get(i)? {
                     Some(val) => {
                         let val: i64 = val;
                         Value::int64(val)
                     }
-                    None => ValueType::Int64(None).into(),
+                    None => ValueType::Int64(None).into_value(),
                 },
                 PostgresType::FLOAT4 => match row.try_get(i)? {
                     Some(val) => {
                         let val: f32 = val;
                         Value::float(val)
                     }
-                    None => ValueType::Float(None).into(),
+                    None => ValueType::Float(None).into_value(),
                 },
                 PostgresType::FLOAT8 => match row.try_get(i)? {
                     Some(val) => {
                         let val: f64 = val;
                         Value::double(val)
                     }
-                    None => ValueType::Double(None).into(),
+                    None => ValueType::Double(None).into_value(),
                 },
                 PostgresType::BYTEA => match row.try_get(i)? {
                     Some(val) => {
                         let val: &[u8] = val;
                         Value::bytes(val.to_owned())
                     }
-                    None => ValueType::Bytes(None).into(),
+                    None => ValueType::Bytes(None).into_value(),
                 },
                 PostgresType::BYTEA_ARRAY => match row.try_get(i)? {
                     Some(val) => {
@@ -214,13 +214,13 @@ impl GetRow for PostgresRow {
 
                         Value::array(byteas)
                     }
-                    None => ValueType::Array(None).into(),
+                    None => ValueType::Array(None).into_value(),
                 },
                 #[cfg(feature = "bigdecimal")]
                 PostgresType::NUMERIC => {
                     let dw: Option<DecimalWrapper> = row.try_get(i)?;
 
-                    ValueType::Numeric(dw.map(|dw| dw.0)).into()
+                    ValueType::Numeric(dw.map(|dw| dw.0)).into_value()
                 }
                 #[cfg(feature = "bigdecimal")]
                 PostgresType::MONEY => match row.try_get(i)? {
@@ -228,7 +228,7 @@ impl GetRow for PostgresRow {
                         let val: NaiveMoney = val;
                         Value::numeric(val.0)
                     }
-                    None => ValueType::Numeric(None).into(),
+                    None => ValueType::Numeric(None).into_value(),
                 },
                 PostgresType::TIMESTAMP => match row.try_get(i)? {
                     Some(val) => {
@@ -236,29 +236,29 @@ impl GetRow for PostgresRow {
                         let dt = DateTime::<Utc>::from_utc(ts, Utc);
                         Value::datetime(dt)
                     }
-                    None => ValueType::DateTime(None).into(),
+                    None => ValueType::DateTime(None).into_value(),
                 },
                 PostgresType::TIMESTAMPTZ => match row.try_get(i)? {
                     Some(val) => {
                         let ts: DateTime<Utc> = val;
                         Value::datetime(ts)
                     }
-                    None => ValueType::DateTime(None).into(),
+                    None => ValueType::DateTime(None).into_value(),
                 },
                 PostgresType::DATE => match row.try_get(i)? {
                     Some(val) => Value::date(val),
-                    None => ValueType::Date(None).into(),
+                    None => ValueType::Date(None).into_value(),
                 },
                 PostgresType::TIME => match row.try_get(i)? {
                     Some(val) => Value::time(val),
-                    None => ValueType::Time(None).into(),
+                    None => ValueType::Time(None).into_value(),
                 },
                 PostgresType::TIMETZ => match row.try_get(i)? {
                     Some(val) => {
                         let time: TimeTz = val;
                         Value::time(time.0)
                     }
-                    None => ValueType::Time(None).into(),
+                    None => ValueType::Time(None).into_value(),
                 },
                 #[cfg(feature = "uuid")]
                 PostgresType::UUID => match row.try_get(i)? {
@@ -266,7 +266,7 @@ impl GetRow for PostgresRow {
                         let val: Uuid = val;
                         Value::uuid(val)
                     }
-                    None => ValueType::Uuid(None).into(),
+                    None => ValueType::Uuid(None).into_value(),
                 },
                 #[cfg(feature = "uuid")]
                 PostgresType::UUID_ARRAY => match row.try_get(i)? {
@@ -276,9 +276,9 @@ impl GetRow for PostgresRow {
 
                         Value::array(val)
                     }
-                    None => ValueType::Array(None).into(),
+                    None => ValueType::Array(None).into_value(),
                 },
-                PostgresType::JSON | PostgresType::JSONB => ValueType::Json(row.try_get(i)?).into(),
+                PostgresType::JSON | PostgresType::JSONB => ValueType::Json(row.try_get(i)?).into_value(),
                 PostgresType::INT2_ARRAY => match row.try_get(i)? {
                     Some(val) => {
                         let val: Vec<Option<i16>> = val;
@@ -286,7 +286,7 @@ impl GetRow for PostgresRow {
 
                         Value::array(ints)
                     }
-                    None => ValueType::Array(None).into(),
+                    None => ValueType::Array(None).into_value(),
                 },
                 PostgresType::INT4_ARRAY => match row.try_get(i)? {
                     Some(val) => {
@@ -295,7 +295,7 @@ impl GetRow for PostgresRow {
 
                         Value::array(ints)
                     }
-                    None => ValueType::Array(None).into(),
+                    None => ValueType::Array(None).into_value(),
                 },
                 PostgresType::INT8_ARRAY => match row.try_get(i)? {
                     Some(val) => {
@@ -304,7 +304,7 @@ impl GetRow for PostgresRow {
 
                         Value::array(ints)
                     }
-                    None => ValueType::Array(None).into(),
+                    None => ValueType::Array(None).into_value(),
                 },
                 PostgresType::FLOAT4_ARRAY => match row.try_get(i)? {
                     Some(val) => {
@@ -313,7 +313,7 @@ impl GetRow for PostgresRow {
 
                         Value::array(floats)
                     }
-                    None => ValueType::Array(None).into(),
+                    None => ValueType::Array(None).into_value(),
                 },
                 PostgresType::FLOAT8_ARRAY => match row.try_get(i)? {
                     Some(val) => {
@@ -322,7 +322,7 @@ impl GetRow for PostgresRow {
 
                         Value::array(floats)
                     }
-                    None => ValueType::Array(None).into(),
+                    None => ValueType::Array(None).into_value(),
                 },
                 PostgresType::BOOL_ARRAY => match row.try_get(i)? {
                     Some(val) => {
@@ -331,7 +331,7 @@ impl GetRow for PostgresRow {
 
                         Value::array(bools)
                     }
-                    None => ValueType::Array(None).into(),
+                    None => ValueType::Array(None).into_value(),
                 },
                 PostgresType::TIMESTAMP_ARRAY => match row.try_get(i)? {
                     Some(val) => {
@@ -343,7 +343,7 @@ impl GetRow for PostgresRow {
 
                         Value::array(dates)
                     }
-                    None => ValueType::Array(None).into(),
+                    None => ValueType::Array(None).into_value(),
                 },
                 #[cfg(feature = "bigdecimal")]
                 PostgresType::NUMERIC_ARRAY => match row.try_get(i)? {
@@ -356,7 +356,7 @@ impl GetRow for PostgresRow {
 
                         Value::array(decimals)
                     }
-                    None => ValueType::Array(None).into(),
+                    None => ValueType::Array(None).into_value(),
                 },
                 PostgresType::TEXT_ARRAY | PostgresType::NAME_ARRAY | PostgresType::VARCHAR_ARRAY => {
                     match row.try_get(i)? {
@@ -365,7 +365,7 @@ impl GetRow for PostgresRow {
 
                             Value::array(strings.into_iter().map(|s| s.map(|s| s.to_string())))
                         }
-                        None => ValueType::Array(None).into(),
+                        None => ValueType::Array(None).into_value(),
                     }
                 }
                 #[cfg(feature = "bigdecimal")]
@@ -376,7 +376,7 @@ impl GetRow for PostgresRow {
 
                         Value::array(nums)
                     }
-                    None => ValueType::Array(None).into(),
+                    None => ValueType::Array(None).into_value(),
                 },
                 PostgresType::OID_ARRAY => match row.try_get(i)? {
                     Some(val) => {
@@ -385,7 +385,7 @@ impl GetRow for PostgresRow {
 
                         Value::array(nums)
                     }
-                    None => ValueType::Array(None).into(),
+                    None => ValueType::Array(None).into_value(),
                 },
                 PostgresType::TIMESTAMPTZ_ARRAY => match row.try_get(i)? {
                     Some(val) => {
@@ -394,7 +394,7 @@ impl GetRow for PostgresRow {
 
                         Value::array(dates)
                     }
-                    None => ValueType::Array(None).into(),
+                    None => ValueType::Array(None).into_value(),
                 },
                 PostgresType::DATE_ARRAY => match row.try_get(i)? {
                     Some(val) => {
@@ -403,7 +403,7 @@ impl GetRow for PostgresRow {
 
                         Value::array(dates)
                     }
-                    None => ValueType::Array(None).into(),
+                    None => ValueType::Array(None).into_value(),
                 },
                 PostgresType::TIME_ARRAY => match row.try_get(i)? {
                     Some(val) => {
@@ -412,7 +412,7 @@ impl GetRow for PostgresRow {
 
                         Value::array(times)
                     }
-                    None => ValueType::Array(None).into(),
+                    None => ValueType::Array(None).into_value(),
                 },
                 PostgresType::TIMETZ_ARRAY => match row.try_get(i)? {
                     Some(val) => {
@@ -421,7 +421,7 @@ impl GetRow for PostgresRow {
 
                         Value::array(timetzs)
                     }
-                    None => ValueType::Array(None).into(),
+                    None => ValueType::Array(None).into_value(),
                 },
                 PostgresType::JSON_ARRAY => match row.try_get(i)? {
                     Some(val) => {
@@ -430,7 +430,7 @@ impl GetRow for PostgresRow {
 
                         Value::array(jsons)
                     }
-                    None => ValueType::Array(None).into(),
+                    None => ValueType::Array(None).into_value(),
                 },
                 PostgresType::JSONB_ARRAY => match row.try_get(i)? {
                     Some(val) => {
@@ -439,28 +439,28 @@ impl GetRow for PostgresRow {
 
                         Value::array(jsons)
                     }
-                    None => ValueType::Array(None).into(),
+                    None => ValueType::Array(None).into_value(),
                 },
                 PostgresType::OID => match row.try_get(i)? {
                     Some(val) => {
                         let val: u32 = val;
                         Value::int64(val)
                     }
-                    None => ValueType::Int64(None).into(),
+                    None => ValueType::Int64(None).into_value(),
                 },
                 PostgresType::CHAR => match row.try_get(i)? {
                     Some(val) => {
                         let val: i8 = val;
                         Value::character((val as u8) as char)
                     }
-                    None => ValueType::Char(None).into(),
+                    None => ValueType::Char(None).into_value(),
                 },
                 PostgresType::INET | PostgresType::CIDR => match row.try_get(i)? {
                     Some(val) => {
                         let val: std::net::IpAddr = val;
                         Value::text(val.to_string())
                     }
-                    None => ValueType::Text(None).into(),
+                    None => ValueType::Text(None).into_value(),
                 },
                 PostgresType::INET_ARRAY | PostgresType::CIDR_ARRAY => match row.try_get(i)? {
                     Some(val) => {
@@ -471,14 +471,14 @@ impl GetRow for PostgresRow {
 
                         Value::array(addrs)
                     }
-                    None => ValueType::Array(None).into(),
+                    None => ValueType::Array(None).into_value(),
                 },
                 PostgresType::BIT | PostgresType::VARBIT => match row.try_get(i)? {
                     Some(val) => {
                         let val: BitVec = val;
                         Value::text(bits_to_string(&val)?)
                     }
-                    None => ValueType::Text(None).into(),
+                    None => ValueType::Text(None).into_value(),
                 },
                 PostgresType::BIT_ARRAY | PostgresType::VARBIT_ARRAY => match row.try_get(i)? {
                     Some(val) => {
@@ -491,14 +491,14 @@ impl GetRow for PostgresRow {
                             .collect::<crate::Result<Vec<_>>>()
                             .map(Value::array)?
                     }
-                    None => ValueType::Array(None).into(),
+                    None => ValueType::Array(None).into_value(),
                 },
                 PostgresType::XML => match row.try_get(i)? {
                     Some(val) => {
                         let val: XmlString = val;
                         Value::xml(val.0)
                     }
-                    None => ValueType::Xml(None).into(),
+                    None => ValueType::Xml(None).into_value(),
                 },
                 PostgresType::XML_ARRAY => match row.try_get(i)? {
                     Some(val) => {
@@ -507,7 +507,7 @@ impl GetRow for PostgresRow {
 
                         Value::array(xmls)
                     }
-                    None => ValueType::Array(None).into(),
+                    None => ValueType::Array(None).into_value(),
                 },
                 ref x => match x.kind() {
                     Kind::Enum => match row.try_get(i)? {
@@ -516,7 +516,7 @@ impl GetRow for PostgresRow {
 
                             Value::enum_variant(val.value)
                         }
-                        None => ValueType::Enum(None, None).into(),
+                        None => ValueType::Enum(None, None).into_value(),
                     },
                     Kind::Array(inner) => match inner.kind() {
                         Kind::Enum => match row.try_get(i)? {
@@ -528,7 +528,7 @@ impl GetRow for PostgresRow {
 
                                 Ok(Value::array(variants))
                             }
-                            None => Ok(ValueType::Array(None).into()),
+                            None => Ok(ValueType::Array(None).into_value()),
                         },
                         _ => match row.try_get(i) {
                             Ok(Some(val)) => {
@@ -537,7 +537,7 @@ impl GetRow for PostgresRow {
 
                                 Ok(Value::array(strings))
                             }
-                            Ok(None) => Ok(ValueType::Array(None).into()),
+                            Ok(None) => Ok(ValueType::Array(None).into_value()),
                             Err(err) => {
                                 if err.source().map(|err| err.is::<WrongType>()).unwrap_or(false) {
                                     let kind = ErrorKind::UnsupportedColumnType {

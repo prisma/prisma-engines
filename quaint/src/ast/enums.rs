@@ -18,7 +18,7 @@ impl<'a> EnumVariant<'a> {
     }
 
     pub fn into_enum(self, name: Option<EnumName<'a>>) -> Value<'a> {
-        ValueType::Enum(Some(self), name).into()
+        ValueType::Enum(Some(self), name).into_value()
     }
 }
 

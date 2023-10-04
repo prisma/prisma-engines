@@ -43,25 +43,25 @@ impl ScalarFieldExt for ScalarField {
                     .map(ToOwned::to_owned)
                     .or(Some(ctx.schema_name().to_owned()));
 
-                ValueType::EnumArray(Some(variants), Some(EnumName::new(enum_name, schema_name))).into()
+                ValueType::EnumArray(Some(variants), Some(EnumName::new(enum_name, schema_name))).into_value()
             }
             (PrismaValue::Enum(e), _) => e.into(),
             (PrismaValue::Int(i), _) => i.into(),
             (PrismaValue::BigInt(i), _) => i.into(),
             (PrismaValue::Uuid(u), _) => u.to_string().into(),
             (PrismaValue::List(l), _) => {
-                ValueType::Array(Some(l.into_iter().map(|x| self.value(x, ctx)).collect())).into()
+                ValueType::Array(Some(l.into_iter().map(|x| self.value(x, ctx)).collect())).into_value()
             }
             (PrismaValue::Json(s), _) => {
-                ValueType::Json(Some(serde_json::from_str::<serde_json::Value>(&s).unwrap())).into()
+                ValueType::Json(Some(serde_json::from_str::<serde_json::Value>(&s).unwrap())).into_value()
             }
-            (PrismaValue::Bytes(b), _) => ValueType::Bytes(Some(b.into())).into(),
+            (PrismaValue::Bytes(b), _) => ValueType::Bytes(Some(b.into())).into_value(),
             (PrismaValue::Object(_), _) => unimplemented!(),
             (PrismaValue::Null, ident) => match ident {
-                TypeIdentifier::String => ValueType::Text(None).into(),
-                TypeIdentifier::Float => ValueType::Numeric(None).into(),
-                TypeIdentifier::Decimal => ValueType::Numeric(None).into(),
-                TypeIdentifier::Boolean => ValueType::Boolean(None).into(),
+                TypeIdentifier::String => ValueType::Text(None).into_value(),
+                TypeIdentifier::Float => ValueType::Numeric(None).into_value(),
+                TypeIdentifier::Decimal => ValueType::Numeric(None).into_value(),
+                TypeIdentifier::Boolean => ValueType::Boolean(None).into_value(),
                 TypeIdentifier::Enum(enum_id) => {
                     let enum_walker = self.dm.clone().zip(enum_id);
                     let enum_name = enum_walker.db_name().to_owned();
@@ -70,14 +70,14 @@ impl ScalarFieldExt for ScalarField {
                         .map(ToOwned::to_owned)
                         .or(Some(ctx.schema_name().to_owned()));
 
-                    ValueType::Enum(None, Some(EnumName::new(enum_name, schema_name))).into()
+                    ValueType::Enum(None, Some(EnumName::new(enum_name, schema_name))).into_value()
                 }
-                TypeIdentifier::Json => ValueType::Json(None).into(),
-                TypeIdentifier::DateTime => ValueType::DateTime(None).into(),
-                TypeIdentifier::UUID => ValueType::Uuid(None).into(),
-                TypeIdentifier::Int => ValueType::Int32(None).into(),
-                TypeIdentifier::BigInt => ValueType::Int64(None).into(),
-                TypeIdentifier::Bytes => ValueType::Bytes(None).into(),
+                TypeIdentifier::Json => ValueType::Json(None).into_value(),
+                TypeIdentifier::DateTime => ValueType::DateTime(None).into_value(),
+                TypeIdentifier::UUID => ValueType::Uuid(None).into_value(),
+                TypeIdentifier::Int => ValueType::Int32(None).into_value(),
+                TypeIdentifier::BigInt => ValueType::Int64(None).into_value(),
+                TypeIdentifier::Bytes => ValueType::Bytes(None).into_value(),
                 TypeIdentifier::Unsupported => unreachable!("No unsupported field should reach that path"),
             },
         }
@@ -121,10 +121,10 @@ pub fn convert_lossy<'a>(pv: PrismaValue) -> Value<'a> {
         PrismaValue::Int(i) => i.into(),
         PrismaValue::BigInt(i) => i.into(),
         PrismaValue::Uuid(u) => u.to_string().into(),
-        PrismaValue::List(l) => ValueType::Array(Some(l.into_iter().map(convert_lossy).collect())).into(),
-        PrismaValue::Json(s) => ValueType::Json(serde_json::from_str(&s).unwrap()).into(),
-        PrismaValue::Bytes(b) => ValueType::Bytes(Some(b.into())).into(),
-        PrismaValue::Null => ValueType::Int32(None).into(), // Can't tell which type the null is supposed to be.
+        PrismaValue::List(l) => ValueType::Array(Some(l.into_iter().map(convert_lossy).collect())).into_value(),
+        PrismaValue::Json(s) => ValueType::Json(serde_json::from_str(&s).unwrap()).into_value(),
+        PrismaValue::Bytes(b) => ValueType::Bytes(Some(b.into())).into_value(),
+        PrismaValue::Null => ValueType::Int32(None).into_value(), // Can't tell which type the null is supposed to be.
         PrismaValue::Object(_) => unimplemented!(),
     }
 }

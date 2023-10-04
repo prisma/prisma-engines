@@ -4,8 +4,8 @@ use chrono::{DateTime, NaiveDate, Utc};
 use prisma_models::PrismaValue;
 use quaint::ValueType;
 
-pub fn to_prisma_value(quaint_value_type: ValueType<'_>) -> crate::Result<PrismaValue> {
-    let val = match quaint_value_type {
+pub fn to_prisma_value<'a, T: Into<ValueType<'a>>>(qv: T) -> crate::Result<PrismaValue> {
+    let val = match qv.into() {
         ValueType::Int32(i) => i.map(|i| PrismaValue::Int(i as i64)).unwrap_or(PrismaValue::Null),
         ValueType::Int64(i) => i.map(PrismaValue::Int).unwrap_or(PrismaValue::Null),
         ValueType::Float(Some(f)) => {
@@ -43,7 +43,7 @@ pub fn to_prisma_value(quaint_value_type: ValueType<'_>) -> crate::Result<Prisma
             let mut res = Vec::with_capacity(v.len());
 
             for v in v.into_iter() {
-                res.push(to_prisma_value(v.into())?);
+                res.push(to_prisma_value(v)?);
             }
 
             PrismaValue::List(res)
@@ -55,7 +55,7 @@ pub fn to_prisma_value(quaint_value_type: ValueType<'_>) -> crate::Result<Prisma
             let mut res = Vec::with_capacity(v.len());
 
             for v in v.into_iter() {
-                res.push(to_prisma_value(ValueType::Enum(Some(v), name.clone()).into())?);
+                res.push(to_prisma_value(ValueType::Enum(Some(v), name.clone()))?);
             }
 
             PrismaValue::List(res)

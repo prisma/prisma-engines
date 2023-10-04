@@ -217,7 +217,7 @@ impl TestConfig {
                 use std::os::unix::fs::PermissionsExt;
                 let is_executable = match path.metadata() {
                     Err(_) => false,
-                    Ok(md) => md.permissions().mode() & 0o111 == 0,
+                    Ok(md) => md.permissions().mode() & 0o111 != 0,
                 };
                 if !is_executable {
                     exit_with_message(&format!(

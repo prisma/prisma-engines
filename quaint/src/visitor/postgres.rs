@@ -863,7 +863,7 @@ mod tests {
             vec![serde_json::json!({"a": "b"})],
         );
 
-        let value_expr: Expression = ValueType::json(serde_json::json!({"a":"b"})).into();
+        let value_expr: Expression = ValueType::json(serde_json::json!({"a":"b"})).into_value();
         let query = Select::from_table("users").so_that(value_expr.equals(Column::from("jsonField")));
         let (sql, params) = Postgres::build(query).unwrap();
 
@@ -893,7 +893,7 @@ mod tests {
             vec![serde_json::json!({"a": "b"})],
         );
 
-        let value_expr: Expression = ValueType::json(serde_json::json!({"a":"b"})).into();
+        let value_expr: Expression = ValueType::json(serde_json::json!({"a":"b"})).into_value();
         let query = Select::from_table("users").so_that(value_expr.not_equals(Column::from("jsonField")));
         let (sql, params) = Postgres::build(query).unwrap();
 
@@ -923,7 +923,7 @@ mod tests {
             vec![ValueType::xml("<salad>wurst</salad>")],
         );
 
-        let value_expr: Expression = ValueType::xml("<salad>wurst</salad>").into();
+        let value_expr: Expression = ValueType::xml("<salad>wurst</salad>").into_value();
         let query = Select::from_table("users").so_that(value_expr.equals(Column::from("xmlField")));
         let (sql, params) = Postgres::build(query).unwrap();
 
@@ -953,7 +953,7 @@ mod tests {
             vec![ValueType::xml("<salad>wurst</salad>")],
         );
 
-        let value_expr: Expression = ValueType::xml("<salad>wurst</salad>").into();
+        let value_expr: Expression = ValueType::xml("<salad>wurst</salad>").into_value();
         let query = Select::from_table("users").so_that(value_expr.not_equals(Column::from("xmlField")));
         let (sql, params) = Postgres::build(query).unwrap();
 
