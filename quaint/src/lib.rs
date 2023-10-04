@@ -125,9 +125,6 @@ pub mod error;
 #[cfg_attr(feature = "docs", doc(cfg(pooled)))]
 pub mod pooled;
 pub mod prelude;
-#[cfg(feature = "serde-support")]
-#[cfg_attr(feature = "docs", doc(cfg(feature = "serde-support")))]
-pub mod serde;
 pub mod single;
 #[cfg(test)]
 mod tests;

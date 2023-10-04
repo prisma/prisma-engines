@@ -29,16 +29,7 @@ docs = []
 # way to access database-specific methods when you need extra control.
 expose-drivers = []
 
-all = [
-  "mssql",
-  "mysql",
-  "pooled",
-  "postgresql",
-  "serde-support",
-  "sqlite",
-  "uuid",
-  "bigdecimal",
-]
+all = ["mssql", "mysql", "pooled", "postgresql", "sqlite", "uuid", "bigdecimal"]
 
 vendored-openssl = [
   "postgres-native-tls/vendored-openssl",
@@ -60,7 +51,6 @@ postgresql = [
 mssql = ["tiberius", "uuid", "tokio-util", "tokio/time", "tokio/net", "either"]
 mysql = ["mysql_async", "tokio/time", "lru-cache"]
 pooled = ["mobc"]
-serde-support = ["serde"]
 sqlite = ["rusqlite", "tokio/sync"]
 bigdecimal = ["bigdecimal_"]
 fmt-sql = ["sqlformat"]
