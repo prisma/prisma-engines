@@ -333,7 +333,7 @@ test_type!(xml_array(
 test_type!(uuid(
     postgresql,
     "uuid",
-    ValueType::Uuid(None).into_value(),
+    Value::null_uuid(),
     Value::uuid(uuid::Uuid::from_str("936DA01F-9ABD-4D9D-80C7-02AF85C822A8").unwrap())
 ));
 
@@ -344,7 +344,7 @@ test_type!(uuid_array(
     Value::null_array(),
     Value::array(vec![
         Value::uuid(uuid::Uuid::from_str("936DA01F-9ABD-4D9D-80C7-02AF85C822A8").unwrap()),
-        ValueType::Uuid(None).into_value()
+        Value::null_uuid(),
     ])
 ));
 

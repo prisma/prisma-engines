@@ -17,7 +17,7 @@ use uuid::Uuid;
 
 /// A value written to the query as-is without parameterization.
 #[derive(Debug, Clone, PartialEq)]
-pub struct Raw<'a>(pub(crate) ValueType<'a>);
+pub struct Raw<'a>(pub(crate) Value<'a>);
 
 /// Converts the value into a state to skip parameterization.
 ///
@@ -28,7 +28,7 @@ pub trait IntoRaw<'a> {
 
 impl<'a, T> IntoRaw<'a> for T
 where
-    T: Into<ValueType<'a>>,
+    T: Into<Value<'a>>,
 {
     fn raw(self) -> Raw<'a> {
         Raw(self.into())
@@ -94,19 +94,18 @@ impl<'a> Value<'a> {
     /// Creates a new enum value.
     pub fn enum_variant<T>(value: T) -> Self
     where
-        T: Into<Cow<'a, str>>,
+        T: Into<EnumVariant<'a>>,
     {
         ValueType::enum_variant(value).into_value()
     }
 
     /// Creates a new enum value with the name of the enum attached.
-    pub fn enum_variant_with_name<T, U, V>(value: T, name: U, schema_name: Option<V>) -> Self
+    pub fn enum_variant_with_name<T, U>(value: T, name: U) -> Self
     where
-        T: Into<Cow<'a, str>>,
-        U: Into<Cow<'a, str>>,
-        V: Into<Cow<'a, str>>,
+        T: Into<EnumVariant<'a>>,
+        U: Into<EnumName<'a>>,
     {
-        ValueType::enum_variant_with_name(value, name, schema_name).into_value()
+        ValueType::enum_variant_with_name(value, name).into_value()
     }
 
     /// Creates a new enum array value
@@ -726,19 +725,18 @@ impl<'a> ValueType<'a> {
     /// Creates a new enum value.
     pub(crate) fn enum_variant<T>(value: T) -> Self
     where
-        T: Into<Cow<'a, str>>,
+        T: Into<EnumVariant<'a>>,
     {
-        Self::Enum(Some(EnumVariant::new(value)), None)
+        Self::Enum(Some(value.into()), None)
     }
 
     /// Creates a new enum value with the name of the enum attached.
-    pub(crate) fn enum_variant_with_name<T, U, V>(value: T, name: U, schema_name: Option<V>) -> Self
+    pub(crate) fn enum_variant_with_name<T, U>(value: T, enum_name: U) -> Self
     where
-        T: Into<Cow<'a, str>>,
-        U: Into<Cow<'a, str>>,
-        V: Into<Cow<'a, str>>,
+        T: Into<EnumVariant<'a>>,
+        U: Into<EnumName<'a>>,
     {
-        Self::Enum(Some(EnumVariant::new(value)), Some(EnumName::new(name, schema_name)))
+        Self::Enum(Some(value.into()), Some(enum_name.into()))
     }
 
     /// Creates a new enum array value

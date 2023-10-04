@@ -1664,7 +1664,7 @@ async fn enum_values(api: &mut dyn TestApi) -> crate::Result<()> {
             Insert::single_into(&table)
                 .value(
                     "value",
-                    Value::enum_variant_with_name("A", &type_name, Option::<&str>::None),
+                    Value::enum_variant_with_name("A", EnumName::new(&type_name, Option::<String>::None)),
                 )
                 .into(),
         )
@@ -1675,7 +1675,7 @@ async fn enum_values(api: &mut dyn TestApi) -> crate::Result<()> {
             Insert::single_into(&table)
                 .value(
                     "value",
-                    Value::enum_variant_with_name("B", &type_name, Option::<&str>::None),
+                    Value::enum_variant_with_name("B", EnumName::new(&type_name, Option::<String>::None)),
                 )
                 .into(),
         )

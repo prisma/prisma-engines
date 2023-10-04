@@ -149,7 +149,10 @@ pub trait Visitor<'a> {
     fn visit_text_search_relevance(&mut self, text_search_relevance: TextSearchRelevance<'a>) -> Result;
 
     fn visit_parameterized_enum(&mut self, variant: EnumVariant<'a>, name: Option<EnumName<'a>>) -> Result {
-        self.add_parameter(ValueType::Enum(Some(variant), name).into_value());
+        match name {
+            Some(name) => self.add_parameter(Value::enum_variant_with_name(variant, name)),
+            None => self.add_parameter(Value::enum_variant(variant)),
+        }
         self.parameter_substitution()?;
 
         Ok(())
@@ -161,7 +164,7 @@ pub trait Visitor<'a> {
             .map(|variant| variant.into_enum(name.clone()))
             .collect();
 
-        self.add_parameter(ValueType::Array(Some(enum_variants)).into_value());
+        self.add_parameter(Value::array(enum_variants));
         self.parameter_substitution()?;
 
         Ok(())
@@ -565,7 +568,7 @@ pub trait Visitor<'a> {
             ExpressionKind::ConditionTree(tree) => self.visit_conditions(tree)?,
             ExpressionKind::Compare(compare) => self.visit_compare(compare)?,
             ExpressionKind::Parameterized(val) => self.visit_parameterized(val)?,
-            ExpressionKind::RawValue(val) => self.visit_raw_value(val.0.into())?,
+            ExpressionKind::RawValue(val) => self.visit_raw_value(val.0)?,
             ExpressionKind::Column(column) => self.visit_column(*column)?,
             ExpressionKind::Row(row) => self.visit_row(row)?,
             ExpressionKind::Selection(selection) => {

@@ -1,4 +1,4 @@
-use crate::{Value, ValueType};
+use crate::Value;
 use std::{borrow::Cow, fmt};
 
 #[derive(Debug, Clone, PartialEq)]
@@ -18,7 +18,10 @@ impl<'a> EnumVariant<'a> {
     }
 
     pub fn into_enum(self, name: Option<EnumName<'a>>) -> Value<'a> {
-        ValueType::Enum(Some(self), name).into_value()
+        match name {
+            Some(name) => Value::enum_variant_with_name(self.0, name),
+            None => Value::enum_variant(self.0),
+        }
     }
 }
 
