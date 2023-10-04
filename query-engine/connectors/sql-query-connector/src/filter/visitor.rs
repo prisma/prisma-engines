@@ -364,7 +364,6 @@ impl FilterVisitorExt for FilterVisitor {
                 let alias = self.next_alias(AliasMode::Join);
 
                 let linking_fields_not_null: Vec<_> =
-                    // ModelProjection::from(filter.field.model().primary_identifier())
                     ModelProjection::from(filter.field.related_model().primary_identifier())
                         .as_columns(ctx)
                         .map(|c| c.aliased_col(Some(alias), ctx))
