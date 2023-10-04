@@ -345,7 +345,10 @@ async fn push_columns(
         let default = match row.get("dflt_value") {
             None => None,
             Some(val) if val.is_null() => None,
-            Some(Value { typed: ValueType::Text(Some(cow_string)), .. }) => {
+            Some(Value {
+                typed: ValueType::Text(Some(cow_string)),
+                ..
+            }) => {
                 let default_string = cow_string.to_string();
 
                 if default_string.to_lowercase() == "null" {
