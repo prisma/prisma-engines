@@ -480,4 +480,8 @@ impl Runner {
     pub fn protocol(&self) -> EngineProtocol {
         self.protocol
     }
+
+    pub fn is_external_executor(&self) -> bool {
+        matches!(self.executor, RunnerExecutor::External(_))
+    }
 }

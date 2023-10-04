@@ -330,12 +330,13 @@ impl FilterVisitorExt for FilterVisitor {
             RelationCondition::NoRelatedRecord if self.can_render_join() && !filter.field.is_list() => {
                 let alias = self.next_alias(AliasMode::Join);
 
-                let linking_fields_null: Vec<_> = ModelProjection::from(filter.field.model().primary_identifier())
-                    .as_columns(ctx)
-                    .map(|c| c.aliased_col(Some(alias), ctx))
-                    .map(|c| c.is_null())
-                    .map(Expression::from)
-                    .collect();
+                let linking_fields_null: Vec<_> =
+                    ModelProjection::from(filter.field.related_model().primary_identifier())
+                        .as_columns(ctx)
+                        .map(|c| c.aliased_col(Some(alias), ctx))
+                        .map(|c| c.is_null())
+                        .map(Expression::from)
+                        .collect();
                 let null_filter = ConditionTree::And(linking_fields_null);
 
                 let join = compute_one2m_join(
@@ -362,12 +363,13 @@ impl FilterVisitorExt for FilterVisitor {
             RelationCondition::ToOneRelatedRecord if self.can_render_join() && !filter.field.is_list() => {
                 let alias = self.next_alias(AliasMode::Join);
 
-                let linking_fields_not_null: Vec<_> = ModelProjection::from(filter.field.model().primary_identifier())
-                    .as_columns(ctx)
-                    .map(|c| c.aliased_col(Some(alias), ctx))
-                    .map(|c| c.is_not_null())
-                    .map(Expression::from)
-                    .collect();
+                let linking_fields_not_null: Vec<_> =
+                    ModelProjection::from(filter.field.related_model().primary_identifier())
+                        .as_columns(ctx)
+                        .map(|c| c.aliased_col(Some(alias), ctx))
+                        .map(|c| c.is_not_null())
+                        .map(Expression::from)
+                        .collect();
                 let not_null_filter = ConditionTree::And(linking_fields_not_null);
 
                 let join = compute_one2m_join(
@@ -535,7 +537,7 @@ impl FilterVisitorExt for FilterVisitor {
 
         let condition = match cond {
             ScalarListCondition::Contains(ConditionValue::Value(val)) => {
-                comparable.compare_raw("@>", convert_list_pv(field, vec![val]))
+                comparable.compare_raw("@>", convert_list_pv(field, vec![val], ctx))
             }
             ScalarListCondition::Contains(ConditionValue::FieldRef(field_ref)) => {
                 let field_ref_expr: Expression = field_ref.aliased_col(alias, ctx).into();
@@ -544,13 +546,13 @@ impl FilterVisitorExt for FilterVisitor {
                 field_ref_expr.equals(comparable.any())
             }
             ScalarListCondition::ContainsEvery(ConditionListValue::List(vals)) => {
-                comparable.compare_raw("@>", convert_list_pv(field, vals))
+                comparable.compare_raw("@>", convert_list_pv(field, vals, ctx))
             }
             ScalarListCondition::ContainsEvery(ConditionListValue::FieldRef(field_ref)) => {
                 comparable.compare_raw("@>", field_ref.aliased_col(alias, ctx))
             }
             ScalarListCondition::ContainsSome(ConditionListValue::List(vals)) => {
-                comparable.compare_raw("&&", convert_list_pv(field, vals))
+                comparable.compare_raw("&&", convert_list_pv(field, vals, ctx))
             }
             ScalarListCondition::ContainsSome(ConditionListValue::FieldRef(field_ref)) => {
                 comparable.compare_raw("&&", field_ref.aliased_col(alias, ctx))
@@ -847,13 +849,13 @@ fn default_scalar_filter(
                 let mut sql_values = Values::with_capacity(values.len());
 
                 for pv in values {
-                    let list_value = convert_pvs(fields, pv.into_list().unwrap());
+                    let list_value = convert_pvs(fields, pv.into_list().unwrap(), ctx);
                     sql_values.push(list_value);
                 }
 
                 comparable.in_selection(sql_values)
             }
-            _ => comparable.in_selection(convert_pvs(fields, values)),
+            _ => comparable.in_selection(convert_pvs(fields, values, ctx)),
         },
         ScalarCondition::In(ConditionListValue::FieldRef(field_ref)) => {
             // This code path is only reachable for connectors with `ScalarLists` capability
@@ -864,13 +866,13 @@ fn default_scalar_filter(
                 let mut sql_values = Values::with_capacity(values.len());
 
                 for pv in values {
-                    let list_value = convert_pvs(fields, pv.into_list().unwrap());
+                    let list_value = convert_pvs(fields, pv.into_list().unwrap(), ctx);
                     sql_values.push(list_value);
                 }
 
                 comparable.not_in_selection(sql_values)
             }
-            _ => comparable.not_in_selection(convert_pvs(fields, values)),
+            _ => comparable.not_in_selection(convert_pvs(fields, values, ctx)),
         },
         ScalarCondition::NotIn(ConditionListValue::FieldRef(field_ref)) => {
             // This code path is only reachable for connectors with `ScalarLists` capability
@@ -999,7 +1001,7 @@ fn insensitive_scalar_filter(
                 let mut sql_values = Values::with_capacity(values.len());
 
                 for pv in values {
-                    let list_value = convert_pvs(fields, pv.into_list().unwrap());
+                    let list_value = convert_pvs(fields, pv.into_list().unwrap(), ctx);
                     sql_values.push(list_value);
                 }
 
@@ -1030,7 +1032,7 @@ fn insensitive_scalar_filter(
                 let mut sql_values = Values::with_capacity(values.len());
 
                 for pv in values {
-                    let list_value = convert_pvs(fields, pv.into_list().unwrap());
+                    let list_value = convert_pvs(fields, pv.into_list().unwrap(), ctx);
                     sql_values.push(list_value);
                 }
 
@@ -1096,7 +1098,7 @@ fn convert_value<'a>(
     ctx: &Context<'_>,
 ) -> Expression<'a> {
     match value.into() {
-        ConditionValue::Value(pv) => convert_pv(field, pv),
+        ConditionValue::Value(pv) => convert_pv(field, pv, ctx),
         ConditionValue::FieldRef(field_ref) => field_ref.aliased_col(alias, ctx).into(),
     }
 }
@@ -1108,29 +1110,29 @@ fn convert_first_value<'a>(
     ctx: &Context<'_>,
 ) -> Expression<'a> {
     match value.into() {
-        ConditionValue::Value(pv) => convert_pv(fields.first().unwrap(), pv),
+        ConditionValue::Value(pv) => convert_pv(fields.first().unwrap(), pv, ctx),
         ConditionValue::FieldRef(field_ref) => field_ref.aliased_col(alias, ctx).into(),
     }
 }
 
-fn convert_pv<'a>(field: &ScalarFieldRef, pv: PrismaValue) -> Expression<'a> {
-    field.value(pv).into()
+fn convert_pv<'a>(field: &ScalarFieldRef, pv: PrismaValue, ctx: &Context<'_>) -> Expression<'a> {
+    field.value(pv, ctx).into()
 }
 
-fn convert_list_pv<'a>(field: &ScalarFieldRef, values: Vec<PrismaValue>) -> Expression<'a> {
-    Value::Array(Some(values.into_iter().map(|val| field.value(val)).collect())).into()
+fn convert_list_pv<'a>(field: &ScalarFieldRef, values: Vec<PrismaValue>, ctx: &Context<'_>) -> Expression<'a> {
+    Value::Array(Some(values.into_iter().map(|val| field.value(val, ctx)).collect())).into()
 }
 
-fn convert_pvs<'a>(fields: &[ScalarFieldRef], values: Vec<PrismaValue>) -> Vec<Value<'a>> {
+fn convert_pvs<'a>(fields: &[ScalarFieldRef], values: Vec<PrismaValue>, ctx: &Context<'_>) -> Vec<Value<'a>> {
     if fields.len() == values.len() {
         fields
             .iter()
             .zip(values)
-            .map(|(field, value)| field.value(value))
+            .map(|(field, value)| field.value(value, ctx))
             .collect()
     } else {
         let field = fields.first().unwrap();
-        values.into_iter().map(|value| field.value(value)).collect()
+        values.into_iter().map(|value| field.value(value, ctx)).collect()
     }
 }
 
@@ -1191,7 +1193,7 @@ impl JsonFilterExt for (Expression<'static>, Expression<'static>) {
             }
             // array_contains (value)
             (ConditionValue::Value(value), JsonTargetType::Array) => {
-                let contains = expr_json.clone().json_array_contains(convert_pv(field, value));
+                let contains = expr_json.clone().json_array_contains(convert_pv(field, value, ctx));
 
                 if reverse {
                     contains.or(expr_json.json_type_not_equals(JsonType::Array)).into()
@@ -1249,7 +1251,7 @@ impl JsonFilterExt for (Expression<'static>, Expression<'static>) {
             }
             // array_starts_with (value)
             (ConditionValue::Value(value), JsonTargetType::Array) => {
-                let starts_with = expr_json.clone().json_array_begins_with(convert_pv(field, value));
+                let starts_with = expr_json.clone().json_array_begins_with(convert_pv(field, value, ctx));
 
                 if reverse {
                     starts_with.or(expr_json.json_type_not_equals(JsonType::Array)).into()
@@ -1309,7 +1311,7 @@ impl JsonFilterExt for (Expression<'static>, Expression<'static>) {
             }
             // array_ends_with (value)
             (ConditionValue::Value(value), JsonTargetType::Array) => {
-                let ends_with = expr_json.clone().json_array_ends_into(convert_pv(field, value));
+                let ends_with = expr_json.clone().json_array_ends_into(convert_pv(field, value, ctx));
 
                 if reverse {
                     ends_with.or(expr_json.json_type_not_equals(JsonType::Array)).into()

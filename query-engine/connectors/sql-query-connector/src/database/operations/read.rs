@@ -166,7 +166,7 @@ pub(crate) async fn get_related_m2m_record_ids(
 
     // [DTODO] To verify: We might need chunked fetch here (too many parameters in the query).
     let select = Select::from_table(table)
-        .so_that(query_builder::in_conditions(&from_columns, from_record_ids))
+        .so_that(query_builder::in_conditions(&from_columns, from_record_ids, ctx))
         .columns(from_columns.into_iter().chain(to_columns.into_iter()));
 
     let parent_model_id = from_field.model().primary_identifier();

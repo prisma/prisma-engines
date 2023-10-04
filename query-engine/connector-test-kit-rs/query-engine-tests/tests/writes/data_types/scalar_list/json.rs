@@ -70,8 +70,9 @@ mod json {
         // TODO: This specific query currently cannot be sent from the JS client.
         // The client _always_ sends an array as plain json and never as an array of json.
         // We're temporarily ignoring it for the JSON protocol because we can't differentiate a list of json values from a json array.
+        // Similarly, this does not currently work with driver adapters.
         // https://github.com/prisma/prisma/issues/18019
-        if runner.protocol().is_graphql() {
+        if runner.protocol().is_graphql() && !runner.is_external_executor() {
             match_connector_result!(
               &runner,
               r#"mutation {
@@ -161,8 +162,9 @@ mod json {
         // TODO: This specific query currently cannot be sent from the JS client.
         // The client _always_ sends an array as plain json and never as an array of json.
         // We're temporarily ignoring it for the JSON protocol because we can't differentiate a list of json values from a json array.
+        // Similarly, this does not currently work with driver adapters.
         // https://github.com/prisma/prisma/issues/18019
-        if runner.protocol().is_graphql() {
+        if runner.protocol().is_graphql() && !runner.is_external_executor() {
             match_connector_result!(
               &runner,
               r#"mutation {
