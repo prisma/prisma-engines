@@ -740,7 +740,7 @@ impl<'a> ValueType<'a> {
     }
 
     /// Creates a new enum array value
-    pub fn enum_array<T>(value: T) -> Self
+    pub(crate) fn enum_array<T>(value: T) -> Self
     where
         T: IntoIterator<Item = EnumVariant<'a>>,
     {
@@ -748,7 +748,7 @@ impl<'a> ValueType<'a> {
     }
 
     /// Creates a new enum array value with the name of the enum attached.
-    pub fn enum_array_with_name<T, U>(value: T, name: U) -> Self
+    pub(crate) fn enum_array_with_name<T, U>(value: T, name: U) -> Self
     where
         T: IntoIterator<Item = EnumVariant<'a>>,
         U: Into<EnumName<'a>>,
