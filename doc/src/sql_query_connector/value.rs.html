@@ -106,44 +106,44 @@
 <span class="kw">use </span>bigdecimal::{BigDecimal, FromPrimitive};
 <span class="kw">use </span>chrono::{DateTime, NaiveDate, Utc};
 <span class="kw">use </span>prisma_models::PrismaValue;
-<span class="kw">use </span>quaint::Value;
+<span class="kw">use </span>quaint::ValueType;
 
-<span class="kw">pub fn </span>to_prisma_value(quaint_value: Value&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; <span class="kw">crate</span>::Result&lt;PrismaValue&gt; {
-    <span class="kw">let </span>val = <span class="kw">match </span>quaint_value {
-        Value::Int32(i) =&gt; i.map(|i| PrismaValue::Int(i <span class="kw">as </span>i64)).unwrap_or(PrismaValue::Null),
-        Value::Int64(i) =&gt; i.map(PrismaValue::Int).unwrap_or(PrismaValue::Null),
-        Value::Float(<span class="prelude-val">Some</span>(f)) =&gt; {
+<span class="kw">pub fn </span>to_prisma_value&lt;<span class="lifetime">&#39;a</span>, T: Into&lt;ValueType&lt;<span class="lifetime">&#39;a</span>&gt;&gt;&gt;(qv: T) -&gt; <span class="kw">crate</span>::Result&lt;PrismaValue&gt; {
+    <span class="kw">let </span>val = <span class="kw">match </span>qv.into() {
+        ValueType::Int32(i) =&gt; i.map(|i| PrismaValue::Int(i <span class="kw">as </span>i64)).unwrap_or(PrismaValue::Null),
+        ValueType::Int64(i) =&gt; i.map(PrismaValue::Int).unwrap_or(PrismaValue::Null),
+        ValueType::Float(<span class="prelude-val">Some</span>(f)) =&gt; {
             sanitize_f32(f, <span class="string">&quot;BigDecimal&quot;</span>)<span class="question-mark">?</span>;
 
             PrismaValue::Float(BigDecimal::from_f32(f).unwrap().normalized())
         }
 
-        Value::Float(<span class="prelude-val">None</span>) =&gt; PrismaValue::Null,
+        ValueType::Float(<span class="prelude-val">None</span>) =&gt; PrismaValue::Null,
 
-        Value::Double(<span class="prelude-val">Some</span>(f)) =&gt; {
+        ValueType::Double(<span class="prelude-val">Some</span>(f)) =&gt; {
             sanitize_f64(f, <span class="string">&quot;BigDecimal&quot;</span>)<span class="question-mark">?</span>;
 
             PrismaValue::Float(BigDecimal::from_f64(f).unwrap().normalized())
         }
 
-        Value::Double(<span class="prelude-val">None</span>) =&gt; PrismaValue::Null,
+        ValueType::Double(<span class="prelude-val">None</span>) =&gt; PrismaValue::Null,
 
-        Value::Numeric(d) =&gt; d
+        ValueType::Numeric(d) =&gt; d
             <span class="comment">// chop the trailing zeroes off so javascript doesn&#39;t start rounding things wrong
             </span>.map(|d| PrismaValue::Float(d.normalized()))
             .unwrap_or(PrismaValue::Null),
 
-        Value::Text(s) =&gt; s
+        ValueType::Text(s) =&gt; s
             .map(|s| PrismaValue::String(s.into_owned()))
             .unwrap_or(PrismaValue::Null),
 
-        Value::Enum(s, <span class="kw">_</span>) =&gt; s
+        ValueType::Enum(s, <span class="kw">_</span>) =&gt; s
             .map(|s| PrismaValue::Enum(s.into_owned()))
             .unwrap_or(PrismaValue::Null),
 
-        Value::Boolean(b) =&gt; b.map(PrismaValue::Boolean).unwrap_or(PrismaValue::Null),
+        ValueType::Boolean(b) =&gt; b.map(PrismaValue::Boolean).unwrap_or(PrismaValue::Null),
 
-        Value::Array(<span class="prelude-val">Some</span>(v)) =&gt; {
+        ValueType::Array(<span class="prelude-val">Some</span>(v)) =&gt; {
             <span class="kw">let </span><span class="kw-2">mut </span>res = Vec::with_capacity(v.len());
 
             <span class="kw">for </span>v <span class="kw">in </span>v.into_iter() {
@@ -153,33 +153,33 @@
             PrismaValue::List(res)
         }
 
-        Value::Array(<span class="prelude-val">None</span>) =&gt; PrismaValue::Null,
+        ValueType::Array(<span class="prelude-val">None</span>) =&gt; PrismaValue::Null,
 
-        Value::EnumArray(<span class="prelude-val">Some</span>(v), name) =&gt; {
+        ValueType::EnumArray(<span class="prelude-val">Some</span>(v), name) =&gt; {
             <span class="kw">let </span><span class="kw-2">mut </span>res = Vec::with_capacity(v.len());
 
             <span class="kw">for </span>v <span class="kw">in </span>v.into_iter() {
-                res.push(to_prisma_value(Value::Enum(<span class="prelude-val">Some</span>(v), name.clone()))<span class="question-mark">?</span>);
+                res.push(to_prisma_value(ValueType::Enum(<span class="prelude-val">Some</span>(v), name.clone()))<span class="question-mark">?</span>);
             }
 
             PrismaValue::List(res)
         }
-        Value::EnumArray(<span class="prelude-val">None</span>, <span class="kw">_</span>) =&gt; PrismaValue::Null,
+        ValueType::EnumArray(<span class="prelude-val">None</span>, <span class="kw">_</span>) =&gt; PrismaValue::Null,
 
-        Value::Json(val) =&gt; val
+        ValueType::Json(val) =&gt; val
             .map(|val| PrismaValue::Json(val.to_string()))
             .unwrap_or(PrismaValue::Null),
 
-        Value::Uuid(uuid) =&gt; uuid.map(PrismaValue::Uuid).unwrap_or(PrismaValue::Null),
+        ValueType::Uuid(uuid) =&gt; uuid.map(PrismaValue::Uuid).unwrap_or(PrismaValue::Null),
 
-        Value::Date(d) =&gt; d
+        ValueType::Date(d) =&gt; d
             .map(|d| {
                 <span class="kw">let </span>dt = DateTime::&lt;Utc&gt;::from_utc(d.and_hms_opt(<span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>).unwrap(), Utc);
                 PrismaValue::DateTime(dt.into())
             })
             .unwrap_or(PrismaValue::Null),
 
-        Value::Time(t) =&gt; t
+        ValueType::Time(t) =&gt; t
             .map(|t| {
                 <span class="kw">let </span>d = NaiveDate::from_ymd_opt(<span class="number">1970</span>, <span class="number">1</span>, <span class="number">1</span>).unwrap();
                 <span class="kw">let </span>dt = DateTime::&lt;Utc&gt;::from_utc(d.and_time(t), Utc);
@@ -187,19 +187,19 @@
             })
             .unwrap_or(PrismaValue::Null),
 
-        Value::DateTime(dt) =&gt; dt
+        ValueType::DateTime(dt) =&gt; dt
             .map(|dt| PrismaValue::DateTime(dt.into()))
             .unwrap_or(PrismaValue::Null),
 
-        Value::Char(c) =&gt; c
+        ValueType::Char(c) =&gt; c
             .map(|c| PrismaValue::String(c.to_string()))
             .unwrap_or(PrismaValue::Null),
 
-        Value::Bytes(bytes) =&gt; bytes
+        ValueType::Bytes(bytes) =&gt; bytes
             .map(|b| PrismaValue::Bytes(b.into_owned()))
             .unwrap_or(PrismaValue::Null),
 
-        Value::Xml(s) =&gt; s
+        ValueType::Xml(s) =&gt; s
             .map(|s| PrismaValue::String(s.into_owned()))
             .unwrap_or(PrismaValue::Null),
     };

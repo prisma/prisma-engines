@@ -13,9 +13,9 @@
 <span class="kw">let </span>result = conn.select(select).<span class="kw">await</span><span class="question-mark">?</span>;
 
 <span class="macro">assert_eq!</span>(
-    Value::Json(<span class="prelude-val">Some</span>(<span class="macro">serde_json::json!</span>({
+    Value::json(<span class="macro">serde_json::json!</span>({
         <span class="string">&quot;toto&quot;</span>: <span class="string">&quot;hello_world&quot;
-    </span>}))),
+    </span>})),
     result.into_single().unwrap()[<span class="number">0</span>]
 );</code></pre></div>
 </div></details></section></div></main></body></html>

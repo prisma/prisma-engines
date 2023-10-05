@@ -1906,8 +1906,8 @@
             ScalarListCondition::ContainsSome(ConditionListValue::FieldRef(field_ref)) =&gt; {
                 comparable.compare_raw(<span class="string">&quot;&amp;&amp;&quot;</span>, field_ref.aliased_col(alias, ctx))
             }
-            ScalarListCondition::IsEmpty(<span class="bool-val">true</span>) =&gt; comparable.compare_raw(<span class="string">&quot;=&quot;</span>, Value::Array(<span class="prelude-val">Some</span>(<span class="macro">vec!</span>[])).raw()),
-            ScalarListCondition::IsEmpty(<span class="bool-val">false</span>) =&gt; comparable.compare_raw(<span class="string">&quot;&lt;&gt;&quot;</span>, Value::Array(<span class="prelude-val">Some</span>(<span class="macro">vec!</span>[])).raw()),
+            ScalarListCondition::IsEmpty(<span class="bool-val">true</span>) =&gt; comparable.compare_raw(<span class="string">&quot;=&quot;</span>, ValueType::Array(<span class="prelude-val">Some</span>(<span class="macro">vec!</span>[])).raw()),
+            ScalarListCondition::IsEmpty(<span class="bool-val">false</span>) =&gt; comparable.compare_raw(<span class="string">&quot;&lt;&gt;&quot;</span>, ValueType::Array(<span class="prelude-val">Some</span>(<span class="macro">vec!</span>[])).raw()),
         };
 
         ConditionTree::single(condition)
@@ -2469,7 +2469,7 @@
 }
 
 <span class="kw">fn </span>convert_list_pv&lt;<span class="lifetime">&#39;a</span>&gt;(field: <span class="kw-2">&amp;</span>ScalarFieldRef, values: Vec&lt;PrismaValue&gt;, ctx: <span class="kw-2">&amp;</span>Context&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; Expression&lt;<span class="lifetime">&#39;a</span>&gt; {
-    Value::Array(<span class="prelude-val">Some</span>(values.into_iter().map(|val| field.value(val, ctx)).collect())).into()
+    Expression::from(Value::array(values.into_iter().map(|val| field.value(val, ctx))))
 }
 
 <span class="kw">fn </span>convert_pvs&lt;<span class="lifetime">&#39;a</span>&gt;(fields: <span class="kw-2">&amp;</span>[ScalarFieldRef], values: Vec&lt;PrismaValue&gt;, ctx: <span class="kw-2">&amp;</span>Context&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; Vec&lt;Value&lt;<span class="lifetime">&#39;a</span>&gt;&gt; {

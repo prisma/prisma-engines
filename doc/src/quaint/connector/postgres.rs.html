@@ -1593,8 +1593,6 @@
 <a href="#1593" id="1593">1593</a>
 <a href="#1594" id="1594">1594</a>
 <a href="#1595" id="1595">1595</a>
-<a href="#1596" id="1596">1596</a>
-<a href="#1597" id="1597">1597</a>
 </pre></div><pre class="rust"><code><span class="kw">mod </span>conversion;
 <span class="kw">pub mod </span>error;
 
@@ -2775,7 +2773,7 @@
             <span class="kw">let </span>result_set = client.query_raw(<span class="string">&quot;SHOW search_path&quot;</span>, <span class="kw-2">&amp;</span>[]).<span class="kw">await</span>.unwrap();
             <span class="kw">let </span>row = result_set.first().unwrap();
 
-            row[<span class="number">0</span>].to_string()
+            row[<span class="number">0</span>].typed.to_string()
         }
 
         <span class="comment">// Safe
@@ -2827,7 +2825,7 @@
             <span class="kw">let </span>result_set = client.query_raw(<span class="string">&quot;SHOW search_path&quot;</span>, <span class="kw-2">&amp;</span>[]).<span class="kw">await</span>.unwrap();
             <span class="kw">let </span>row = result_set.first().unwrap();
 
-            row[<span class="number">0</span>].to_string()
+            row[<span class="number">0</span>].typed.to_string()
         }
 
         <span class="comment">// Safe
@@ -2878,7 +2876,7 @@
             <span class="kw">let </span>result_set = client.query_raw(<span class="string">&quot;SHOW search_path&quot;</span>, <span class="kw-2">&amp;</span>[]).<span class="kw">await</span>.unwrap();
             <span class="kw">let </span>row = result_set.first().unwrap();
 
-            row[<span class="number">0</span>].to_string()
+            row[<span class="number">0</span>].typed.to_string()
         }
 
         <span class="comment">// Safe
@@ -2929,7 +2927,7 @@
             <span class="kw">let </span>result_set = client.query_raw(<span class="string">&quot;SHOW search_path&quot;</span>, <span class="kw-2">&amp;</span>[]).<span class="kw">await</span>.unwrap();
             <span class="kw">let </span>row = result_set.first().unwrap();
 
-            row[<span class="number">0</span>].to_string()
+            row[<span class="number">0</span>].typed.to_string()
         }
 
         <span class="comment">// Safe
@@ -2980,7 +2978,7 @@
             <span class="kw">let </span>result_set = client.query_raw(<span class="string">&quot;SHOW search_path&quot;</span>, <span class="kw-2">&amp;</span>[]).<span class="kw">await</span>.unwrap();
             <span class="kw">let </span>row = result_set.first().unwrap();
 
-            row[<span class="number">0</span>].to_string()
+            row[<span class="number">0</span>].typed.to_string()
         }
 
         <span class="comment">// Safe
@@ -3077,9 +3075,7 @@
         <span class="kw">let </span>url = Url::parse(<span class="kw-2">&amp;</span>CONN_STR).unwrap();
         <span class="kw">let </span>conn = Quaint::new(url.as_str()).<span class="kw">await</span>.unwrap();
 
-        <span class="kw">let </span>res = conn
-            .query_raw(<span class="string">&quot;SELECT $1&quot;</span>, <span class="kw-2">&amp;</span>[Value::integer(<span class="number">1</span>), Value::integer(<span class="number">2</span>)])
-            .<span class="kw">await</span>;
+        <span class="kw">let </span>res = conn.query_raw(<span class="string">&quot;SELECT $1&quot;</span>, <span class="kw-2">&amp;</span>[Value::int32(<span class="number">1</span>), Value::int32(<span class="number">2</span>)]).<span class="kw">await</span>;
 
         <span class="macro">assert!</span>(res.is_err());
 

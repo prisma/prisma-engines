@@ -307,6 +307,10 @@
 <a href="#307" id="307">307</a>
 <a href="#308" id="308">308</a>
 <a href="#309" id="309">309</a>
+<a href="#310" id="310">310</a>
+<a href="#311" id="311">311</a>
+<a href="#312" id="312">312</a>
+<a href="#313" id="313">313</a>
 </pre></div><pre class="rust"><code><span class="kw">use crate</span>::{
     CockroachDbConnectorTag, ConnectorTag, ConnectorVersion, MongoDbConnectorTag, MySqlConnectorTag,
     PostgresConnectorTag, SqlServerConnectorTag, SqliteConnectorTag, TestResult, VitessConnectorTag,
@@ -524,7 +528,11 @@ Use the Makefile.
             <span class="attr">#[cfg(unix)]
             </span>{
                 <span class="kw">use </span>std::os::unix::fs::PermissionsExt;
-                <span class="kw">if </span>path.metadata().is_ok_and(|md| md.permissions().mode() &amp; <span class="number">0o111 </span>== <span class="number">0</span>) {
+                <span class="kw">let </span>is_executable = <span class="kw">match </span>path.metadata() {
+                    <span class="prelude-val">Err</span>(<span class="kw">_</span>) =&gt; <span class="bool-val">false</span>,
+                    <span class="prelude-val">Ok</span>(md) =&gt; md.permissions().mode() &amp; <span class="number">0o111 </span>!= <span class="number">0</span>,
+                };
+                <span class="kw">if </span>!is_executable {
                     exit_with_message(<span class="kw-2">&amp;</span><span class="macro">format!</span>(
                         <span class="string">&quot;The external test executor file `{}` must be have permissions to execute&quot;</span>,
                         file

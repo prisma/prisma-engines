@@ -521,6 +521,18 @@
 <a href="#521" id="521">521</a>
 <a href="#522" id="522">522</a>
 <a href="#523" id="523">523</a>
+<a href="#524" id="524">524</a>
+<a href="#525" id="525">525</a>
+<a href="#526" id="526">526</a>
+<a href="#527" id="527">527</a>
+<a href="#528" id="528">528</a>
+<a href="#529" id="529">529</a>
+<a href="#530" id="530">530</a>
+<a href="#531" id="531">531</a>
+<a href="#532" id="532">532</a>
+<a href="#533" id="533">533</a>
+<a href="#534" id="534">534</a>
+<a href="#535" id="535">535</a>
 </pre></div><pre class="rust"><code><span class="attr">#[cfg(any(feature = <span class="string">&quot;postgresql&quot;</span>, feature = <span class="string">&quot;mysql&quot;</span>))]
 </span><span class="kw">use </span><span class="kw">super</span>::compare::{JsonCompare, JsonType};
 <span class="kw">use </span><span class="kw">crate</span>::ast::<span class="kw-2">*</span>;
@@ -568,7 +580,10 @@
 
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>is_json_expr(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
         <span class="kw">match </span><span class="kw-2">&amp;</span><span class="self">self</span>.kind {
-            ExpressionKind::Parameterized(Value::Json(<span class="kw">_</span>)) =&gt; <span class="bool-val">true</span>,
+            ExpressionKind::Parameterized(Value {
+                typed: ValueType::Json(<span class="kw">_</span>),
+                ..
+            }) =&gt; <span class="bool-val">true</span>,
 
             ExpressionKind::Value(expr) =&gt; expr.is_json_value(),
 
@@ -581,7 +596,10 @@
 
     </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>is_json_value(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
         <span class="kw">match </span><span class="kw-2">&amp;</span><span class="self">self</span>.kind {
-            ExpressionKind::Parameterized(Value::Json(<span class="kw">_</span>)) =&gt; <span class="bool-val">true</span>,
+            ExpressionKind::Parameterized(Value {
+                typed: ValueType::Json(<span class="kw">_</span>),
+                ..
+            }) =&gt; <span class="bool-val">true</span>,
 
             ExpressionKind::Value(expr) =&gt; expr.is_json_value(),
             <span class="kw">_ </span>=&gt; <span class="bool-val">false</span>,
@@ -592,7 +610,10 @@
 
     </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>into_json_value(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;serde_json::Value&gt; {
         <span class="kw">match </span><span class="self">self</span>.kind {
-            ExpressionKind::Parameterized(Value::Json(json_val)) =&gt; json_val,
+            ExpressionKind::Parameterized(Value {
+                typed: ValueType::Json(json_val),
+                ..
+            }) =&gt; json_val,
 
             ExpressionKind::Value(expr) =&gt; expr.into_json_value(),
             <span class="kw">_ </span>=&gt; <span class="prelude-val">None</span>,
@@ -740,7 +761,10 @@
 <span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; ExpressionKind&lt;<span class="lifetime">&#39;a</span>&gt; {
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>is_xml_value(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
         <span class="kw">match </span><span class="self">self </span>{
-            <span class="self">Self</span>::Parameterized(Value::Xml(<span class="kw">_</span>)) =&gt; <span class="bool-val">true</span>,
+            <span class="self">Self</span>::Parameterized(Value {
+                typed: ValueType::Xml(<span class="kw">_</span>),
+                ..
+            }) =&gt; <span class="bool-val">true</span>,
             <span class="self">Self</span>::Value(expr) =&gt; expr.is_xml_value(),
             <span class="kw">_ </span>=&gt; <span class="bool-val">false</span>,
         }

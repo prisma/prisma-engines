@@ -269,7 +269,7 @@
 
 <span class="kw">impl </span>GroupByBuilder {
     <span class="kw">pub fn </span>new() -&gt; <span class="self">Self </span>{
-        <span class="self">Self </span>{ ..Default::default() }
+        Default::default()
     }
 
     <span class="kw">pub fn </span>render(<span class="kw-2">&amp;</span><span class="self">self</span>, by_fields: Vec&lt;ScalarFieldRef&gt;) -&gt; (Document, <span class="prelude-ty">Option</span>&lt;Document&gt;) {

@@ -638,7 +638,7 @@
                 };
 
                 builder.set_original_message(reason);
-                <span class="kw">return </span>builder.build();
+                builder.build()
             } <span class="comment">// sigh...
             // https://github.com/sfackler/rust-postgres/blob/0c84ed9f8201f4e5b4803199a24afa2c9f3723b2/tokio-postgres/src/connect_tls.rs#L37
             </span><span class="string">&quot;error performing TLS handshake: server does not support TLS&quot; </span>=&gt; {
@@ -651,7 +651,7 @@
                 };
 
                 builder.set_original_message(reason);
-                <span class="kw">return </span>builder.build();
+                builder.build()
             } <span class="comment">// double sigh
             </span><span class="kw">_ </span>=&gt; {
                 <span class="kw">let </span>code = code.map(|c| c.to_string());
@@ -662,7 +662,7 @@
                 };
 
                 builder.set_original_message(reason);
-                <span class="kw">return </span>builder.build();
+                builder.build()
             }
         }
     }

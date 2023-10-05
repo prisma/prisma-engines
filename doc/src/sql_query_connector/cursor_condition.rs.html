@@ -1053,7 +1053,7 @@
     order_by: <span class="kw-2">&amp;</span>OrderByScalarAggregation,
     order_by_def: <span class="kw-2">&amp;</span>OrderByDefinition,
 ) -&gt; CursorOrderDefinition {
-    <span class="kw">let </span>coalesce_exprs: Vec&lt;Expression&gt; = <span class="macro">vec!</span>[order_by_def.order_column.clone(), Value::integer(<span class="number">0</span>).into()];
+    <span class="kw">let </span>coalesce_exprs: Vec&lt;Expression&gt; = <span class="macro">vec!</span>[order_by_def.order_column.clone(), Value::int32(<span class="number">0</span>).into()];
 
     <span class="comment">// We coalesce the order column to 0 when it&#39;s compared to the cmp table since the aggregations joins
     // might return NULL on relations that have no connected records
@@ -1077,7 +1077,7 @@
     // cf: part #2 of the SQL query above, when a field is nullable.
     </span><span class="kw">let </span>fks = foreign_keys_from_order_path(<span class="kw-2">&amp;</span>order_by.path, <span class="kw-2">&amp;</span>order_by_def.joins);
 
-    <span class="kw">let </span>coalesce_exprs: Vec&lt;Expression&gt; = <span class="macro">vec!</span>[order_by_def.order_column.clone(), Value::integer(<span class="number">0</span>).into()];
+    <span class="kw">let </span>coalesce_exprs: Vec&lt;Expression&gt; = <span class="macro">vec!</span>[order_by_def.order_column.clone(), Value::int32(<span class="number">0</span>).into()];
     <span class="comment">// We coalesce the order column to 0 when it&#39;s compared to the cmp table since the aggregations joins
     // might return NULL on relations that have no connected records
     </span><span class="kw">let </span>order_column: Expression = coalesce(coalesce_exprs).into();

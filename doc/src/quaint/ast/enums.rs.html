@@ -74,6 +74,9 @@
 <a href="#74" id="74">74</a>
 <a href="#75" id="75">75</a>
 <a href="#76" id="76">76</a>
+<a href="#77" id="77">77</a>
+<a href="#78" id="78">78</a>
+<a href="#79" id="79">79</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::Value;
 <span class="kw">use </span>std::{borrow::Cow, fmt};
 
@@ -90,11 +93,14 @@
     }
 
     <span class="kw">pub fn </span>into_text(<span class="self">self</span>) -&gt; Value&lt;<span class="lifetime">&#39;a</span>&gt; {
-        Value::Text(<span class="prelude-val">Some</span>(<span class="self">self</span>.<span class="number">0</span>))
+        Value::text(<span class="self">self</span>.<span class="number">0</span>)
     }
 
     <span class="kw">pub fn </span>into_enum(<span class="self">self</span>, name: <span class="prelude-ty">Option</span>&lt;EnumName&lt;<span class="lifetime">&#39;a</span>&gt;&gt;) -&gt; Value&lt;<span class="lifetime">&#39;a</span>&gt; {
-        Value::Enum(<span class="prelude-val">Some</span>(<span class="self">self</span>), name)
+        <span class="kw">match </span>name {
+            <span class="prelude-val">Some</span>(name) =&gt; Value::enum_variant_with_name(<span class="self">self</span>.<span class="number">0</span>, name),
+            <span class="prelude-val">None </span>=&gt; Value::enum_variant(<span class="self">self</span>.<span class="number">0</span>),
+        }
     }
 }
 

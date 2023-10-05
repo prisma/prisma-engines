@@ -1170,6 +1170,9 @@
 <a href="#1170" id="1170">1170</a>
 <a href="#1171" id="1171">1171</a>
 <a href="#1172" id="1172">1172</a>
+<a href="#1173" id="1173">1173</a>
+<a href="#1174" id="1174">1174</a>
+<a href="#1175" id="1175">1175</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Visitors for reading an abstract SQL syntax tree, generating the query and
 //! gathering parameters in the right order.
 //!
@@ -1321,7 +1324,10 @@
     </span><span class="kw">fn </span>visit_text_search_relevance(<span class="kw-2">&amp;mut </span><span class="self">self</span>, text_search_relevance: TextSearchRelevance&lt;<span class="lifetime">&#39;a</span>&gt;) -&gt; <span class="prelude-ty">Result</span>;
 
     <span class="kw">fn </span>visit_parameterized_enum(<span class="kw-2">&amp;mut </span><span class="self">self</span>, variant: EnumVariant&lt;<span class="lifetime">&#39;a</span>&gt;, name: <span class="prelude-ty">Option</span>&lt;EnumName&lt;<span class="lifetime">&#39;a</span>&gt;&gt;) -&gt; <span class="prelude-ty">Result </span>{
-        <span class="self">self</span>.add_parameter(Value::Enum(<span class="prelude-val">Some</span>(variant), name));
+        <span class="kw">match </span>name {
+            <span class="prelude-val">Some</span>(name) =&gt; <span class="self">self</span>.add_parameter(Value::enum_variant_with_name(variant, name)),
+            <span class="prelude-val">None </span>=&gt; <span class="self">self</span>.add_parameter(Value::enum_variant(variant)),
+        }
         <span class="self">self</span>.parameter_substitution()<span class="question-mark">?</span>;
 
         <span class="prelude-val">Ok</span>(())
@@ -1333,7 +1339,7 @@
             .map(|variant| variant.into_enum(name.clone()))
             .collect();
 
-        <span class="self">self</span>.add_parameter(Value::Array(<span class="prelude-val">Some</span>(enum_variants)));
+        <span class="self">self</span>.add_parameter(Value::array(enum_variants));
         <span class="self">self</span>.parameter_substitution()<span class="question-mark">?</span>;
 
         <span class="prelude-val">Ok</span>(())
@@ -1341,9 +1347,9 @@
 
     <span class="doccomment">/// A visit to a value we parameterize
     </span><span class="kw">fn </span>visit_parameterized(<span class="kw-2">&amp;mut </span><span class="self">self</span>, value: Value&lt;<span class="lifetime">&#39;a</span>&gt;) -&gt; <span class="prelude-ty">Result </span>{
-        <span class="kw">match </span>value {
-            Value::Enum(<span class="prelude-val">Some</span>(variant), name) =&gt; <span class="self">self</span>.visit_parameterized_enum(variant, name),
-            Value::EnumArray(<span class="prelude-val">Some</span>(variants), name) =&gt; <span class="self">self</span>.visit_parameterized_enum_array(variants, name),
+        <span class="kw">match </span>value.typed {
+            ValueType::Enum(<span class="prelude-val">Some</span>(variant), name) =&gt; <span class="self">self</span>.visit_parameterized_enum(variant, name),
+            ValueType::EnumArray(<span class="prelude-val">Some</span>(variants), name) =&gt; <span class="self">self</span>.visit_parameterized_enum_array(variants, name),
             <span class="kw">_ </span>=&gt; {
                 <span class="self">self</span>.add_parameter(value);
                 <span class="self">self</span>.parameter_substitution()

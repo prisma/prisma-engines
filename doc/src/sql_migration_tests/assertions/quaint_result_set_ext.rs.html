@@ -113,7 +113,7 @@
 <a href="#113" id="113">113</a>
 <a href="#114" id="114">114</a>
 <a href="#115" id="115">115</a>
-</pre></div><pre class="rust"><code><span class="kw">use </span>quaint::{connector::ResultRowRef, prelude::ResultSet, Value};
+</pre></div><pre class="rust"><code><span class="kw">use </span>quaint::{connector::ResultRowRef, prelude::ResultSet, Value, ValueType};
 
 <span class="kw">pub trait </span>ResultSetExt: Sized {
     <span class="kw">fn </span>assert_row_count(<span class="self">self</span>, expected_count: usize) -&gt; <span class="self">Self</span>;
@@ -149,8 +149,8 @@
 
 <span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; RowAssertion&lt;<span class="lifetime">&#39;a</span>&gt; {
     <span class="kw">pub fn </span>assert_array_value(<span class="self">self</span>, column_name: <span class="kw-2">&amp;</span>str, expected_value: <span class="kw-2">&amp;</span>[Value&lt;<span class="lifetime">&#39;_</span>&gt;]) -&gt; <span class="self">Self </span>{
-        <span class="kw">let </span>actual_value = <span class="self">self</span>.<span class="number">0</span>.get(column_name).and_then(|col: <span class="kw-2">&amp;</span>Value&lt;<span class="lifetime">&#39;_</span>&gt;| <span class="kw">match </span>col {
-            Value::Array(x) =&gt; x.as_ref(),
+        <span class="kw">let </span>actual_value = <span class="self">self</span>.<span class="number">0</span>.get(column_name).and_then(|col: <span class="kw-2">&amp;</span>Value&lt;<span class="lifetime">&#39;_</span>&gt;| <span class="kw">match </span><span class="kw-2">&amp;</span>col.typed {
+            ValueType::Array(x) =&gt; x.as_ref(),
             <span class="kw">_ </span>=&gt; <span class="macro">panic!</span>(<span class="string">&quot;as_array&quot;</span>),
         });
 
@@ -202,9 +202,9 @@
     <span class="attr">#[track_caller]
     </span><span class="kw">pub fn </span>assert_text_value(<span class="self">self</span>, column_name: <span class="kw-2">&amp;</span>str, expected_value: <span class="kw-2">&amp;</span>str) -&gt; <span class="self">Self </span>{
         <span class="kw">let </span>value = <span class="self">self</span>.<span class="number">0</span>.get(column_name).expect(<span class="string">&quot;Expected a value, found none&quot;</span>);
-        <span class="kw">let </span>value_text: <span class="kw-2">&amp;</span>str = <span class="kw">match </span>value {
-            Value::Text(val) =&gt; val.as_deref(),
-            Value::Enum(val, <span class="kw">_</span>) =&gt; val.as_deref(),
+        <span class="kw">let </span>value_text: <span class="kw-2">&amp;</span>str = <span class="kw">match </span><span class="kw-2">&amp;</span>value.typed {
+            ValueType::Text(val) =&gt; val.as_deref(),
+            ValueType::Enum(val, <span class="kw">_</span>) =&gt; val.as_deref(),
             <span class="kw">_ </span>=&gt; <span class="prelude-val">None</span>,
         }
         .expect(<span class="string">&quot;Expected a string value&quot;</span>);

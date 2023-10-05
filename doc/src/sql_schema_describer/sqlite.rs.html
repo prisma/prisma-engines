@@ -615,6 +615,9 @@
 <a href="#615" id="615">615</a>
 <a href="#616" id="616">616</a>
 <a href="#617" id="617">617</a>
+<a href="#618" id="618">618</a>
+<a href="#619" id="619">619</a>
+<a href="#620" id="620">620</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! SQLite description.
 
 </span><span class="kw">use crate</span>::{
@@ -625,7 +628,7 @@
 <span class="kw">use </span>either::Either;
 <span class="kw">use </span>indexmap::IndexMap;
 <span class="kw">use </span>quaint::{
-    ast::Value,
+    ast::{Value, ValueType},
     connector::{GetRow, ToColumnNames},
     prelude::ResultRow,
 };
@@ -962,7 +965,10 @@
         <span class="kw">let </span>default = <span class="kw">match </span>row.get(<span class="string">&quot;dflt_value&quot;</span>) {
             <span class="prelude-val">None </span>=&gt; <span class="prelude-val">None</span>,
             <span class="prelude-val">Some</span>(val) <span class="kw">if </span>val.is_null() =&gt; <span class="prelude-val">None</span>,
-            <span class="prelude-val">Some</span>(Value::Text(<span class="prelude-val">Some</span>(cow_string))) =&gt; {
+            <span class="prelude-val">Some</span>(Value {
+                typed: ValueType::Text(<span class="prelude-val">Some</span>(cow_string)),
+                ..
+            }) =&gt; {
                 <span class="kw">let </span>default_string = cow_string.to_string();
 
                 <span class="kw">if </span>default_string.to_lowercase() == <span class="string">&quot;null&quot; </span>{

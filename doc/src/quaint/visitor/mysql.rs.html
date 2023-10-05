@@ -960,6 +960,18 @@
 <a href="#960" id="960">960</a>
 <a href="#961" id="961">961</a>
 <a href="#962" id="962">962</a>
+<a href="#963" id="963">963</a>
+<a href="#964" id="964">964</a>
+<a href="#965" id="965">965</a>
+<a href="#966" id="966">966</a>
+<a href="#967" id="967">967</a>
+<a href="#968" id="968">968</a>
+<a href="#969" id="969">969</a>
+<a href="#970" id="970">970</a>
+<a href="#971" id="971">971</a>
+<a href="#972" id="972">972</a>
+<a href="#973" id="973">973</a>
+<a href="#974" id="974">974</a>
 </pre></div><pre class="rust"><code><span class="kw">use crate</span>::{
     ast::<span class="kw-2">*</span>,
     error::{Error, ErrorKind},
@@ -1082,27 +1094,27 @@
     }
 
     <span class="kw">fn </span>visit_raw_value(<span class="kw-2">&amp;mut </span><span class="self">self</span>, value: Value&lt;<span class="lifetime">&#39;a</span>&gt;) -&gt; visitor::Result {
-        <span class="kw">let </span>res = <span class="kw">match </span>value {
-            Value::Int32(i) =&gt; i.map(|i| <span class="self">self</span>.write(i)),
-            Value::Int64(i) =&gt; i.map(|i| <span class="self">self</span>.write(i)),
-            Value::Float(d) =&gt; d.map(|f| <span class="kw">match </span>f {
+        <span class="kw">let </span>res = <span class="kw">match </span><span class="kw-2">&amp;</span>value.typed {
+            ValueType::Int32(i) =&gt; i.map(|i| <span class="self">self</span>.write(i)),
+            ValueType::Int64(i) =&gt; i.map(|i| <span class="self">self</span>.write(i)),
+            ValueType::Float(d) =&gt; d.map(|f| <span class="kw">match </span>f {
                 f <span class="kw">if </span>f.is_nan() =&gt; <span class="self">self</span>.write(<span class="string">&quot;&#39;NaN&#39;&quot;</span>),
                 f <span class="kw">if </span>f == f32::INFINITY =&gt; <span class="self">self</span>.write(<span class="string">&quot;&#39;Infinity&#39;&quot;</span>),
                 f <span class="kw">if </span>f == f32::NEG_INFINITY =&gt; <span class="self">self</span>.write(<span class="string">&quot;&#39;-Infinity&quot;</span>),
                 v =&gt; <span class="self">self</span>.write(<span class="macro">format!</span>(<span class="string">&quot;{v:?}&quot;</span>)),
             }),
-            Value::Double(d) =&gt; d.map(|f| <span class="kw">match </span>f {
+            ValueType::Double(d) =&gt; d.map(|f| <span class="kw">match </span>f {
                 f <span class="kw">if </span>f.is_nan() =&gt; <span class="self">self</span>.write(<span class="string">&quot;&#39;NaN&#39;&quot;</span>),
                 f <span class="kw">if </span>f == f64::INFINITY =&gt; <span class="self">self</span>.write(<span class="string">&quot;&#39;Infinity&#39;&quot;</span>),
                 f <span class="kw">if </span>f == f64::NEG_INFINITY =&gt; <span class="self">self</span>.write(<span class="string">&quot;&#39;-Infinity&quot;</span>),
                 v =&gt; <span class="self">self</span>.write(<span class="macro">format!</span>(<span class="string">&quot;{v:?}&quot;</span>)),
             }),
-            Value::Text(t) =&gt; t.map(|t| <span class="self">self</span>.write(<span class="macro">format!</span>(<span class="string">&quot;&#39;{t}&#39;&quot;</span>))),
-            Value::Enum(e, <span class="kw">_</span>) =&gt; e.map(|e| <span class="self">self</span>.write(e)),
-            Value::Bytes(b) =&gt; b.map(|b| <span class="self">self</span>.write(<span class="macro">format!</span>(<span class="string">&quot;x&#39;{}&#39;&quot;</span>, hex::encode(b)))),
-            Value::Boolean(b) =&gt; b.map(|b| <span class="self">self</span>.write(b)),
-            Value::Char(c) =&gt; c.map(|c| <span class="self">self</span>.write(<span class="macro">format!</span>(<span class="string">&quot;&#39;{c}&#39;&quot;</span>))),
-            Value::Array(<span class="kw">_</span>) | Value::EnumArray(<span class="kw">_</span>, <span class="kw">_</span>) =&gt; {
+            ValueType::Text(t) =&gt; t.as_ref().map(|t| <span class="self">self</span>.write(<span class="macro">format!</span>(<span class="string">&quot;&#39;{t}&#39;&quot;</span>))),
+            ValueType::Enum(e, <span class="kw">_</span>) =&gt; e.as_ref().map(|e| <span class="self">self</span>.write(e)),
+            ValueType::Bytes(b) =&gt; b.as_ref().map(|b| <span class="self">self</span>.write(<span class="macro">format!</span>(<span class="string">&quot;x&#39;{}&#39;&quot;</span>, hex::encode(b)))),
+            ValueType::Boolean(b) =&gt; b.map(|b| <span class="self">self</span>.write(b)),
+            ValueType::Char(c) =&gt; c.map(|c| <span class="self">self</span>.write(<span class="macro">format!</span>(<span class="string">&quot;&#39;{c}&#39;&quot;</span>))),
+            ValueType::Array(<span class="kw">_</span>) | ValueType::EnumArray(<span class="kw">_</span>, <span class="kw">_</span>) =&gt; {
                 <span class="kw">let </span>msg = <span class="string">&quot;Arrays are not supported in MySQL.&quot;</span>;
                 <span class="kw">let </span>kind = ErrorKind::conversion(msg);
 
@@ -1112,9 +1124,9 @@
                 <span class="kw">return </span><span class="prelude-val">Err</span>(builder.build());
             }
             <span class="attr">#[cfg(feature = <span class="string">&quot;bigdecimal&quot;</span>)]
-            </span>Value::Numeric(r) =&gt; r.map(|r| <span class="self">self</span>.write(r)),
+            </span>ValueType::Numeric(r) =&gt; r.as_ref().map(|r| <span class="self">self</span>.write(r)),
 
-            Value::Json(j) =&gt; <span class="kw">match </span>j {
+            ValueType::Json(j) =&gt; <span class="kw">match </span>j {
                 <span class="prelude-val">Some</span>(<span class="kw-2">ref </span>j) =&gt; {
                     <span class="kw">let </span>s = serde_json::to_string(<span class="kw-2">&amp;</span>j)<span class="question-mark">?</span>;
                     <span class="prelude-val">Some</span>(<span class="self">self</span>.write(<span class="macro">format!</span>(<span class="string">&quot;CONVERT(&#39;{s}&#39;, JSON)&quot;</span>)))
@@ -1122,11 +1134,11 @@
                 <span class="prelude-val">None </span>=&gt; <span class="prelude-val">None</span>,
             },
             <span class="attr">#[cfg(feature = <span class="string">&quot;uuid&quot;</span>)]
-            </span>Value::Uuid(uuid) =&gt; uuid.map(|uuid| <span class="self">self</span>.write(<span class="macro">format!</span>(<span class="string">&quot;&#39;{}&#39;&quot;</span>, uuid.hyphenated()))),
-            Value::DateTime(dt) =&gt; dt.map(|dt| <span class="self">self</span>.write(<span class="macro">format!</span>(<span class="string">&quot;&#39;{}&#39;&quot;</span>, dt.to_rfc3339(),))),
-            Value::Date(date) =&gt; date.map(|date| <span class="self">self</span>.write(<span class="macro">format!</span>(<span class="string">&quot;&#39;{date}&#39;&quot;</span>))),
-            Value::Time(time) =&gt; time.map(|time| <span class="self">self</span>.write(<span class="macro">format!</span>(<span class="string">&quot;&#39;{time}&#39;&quot;</span>))),
-            Value::Xml(cow) =&gt; cow.map(|cow| <span class="self">self</span>.write(<span class="macro">format!</span>(<span class="string">&quot;&#39;{cow}&#39;&quot;</span>))),
+            </span>ValueType::Uuid(uuid) =&gt; uuid.map(|uuid| <span class="self">self</span>.write(<span class="macro">format!</span>(<span class="string">&quot;&#39;{}&#39;&quot;</span>, uuid.hyphenated()))),
+            ValueType::DateTime(dt) =&gt; dt.map(|dt| <span class="self">self</span>.write(<span class="macro">format!</span>(<span class="string">&quot;&#39;{}&#39;&quot;</span>, dt.to_rfc3339(),))),
+            ValueType::Date(date) =&gt; date.map(|date| <span class="self">self</span>.write(<span class="macro">format!</span>(<span class="string">&quot;&#39;{date}&#39;&quot;</span>))),
+            ValueType::Time(time) =&gt; time.map(|time| <span class="self">self</span>.write(<span class="macro">format!</span>(<span class="string">&quot;&#39;{time}&#39;&quot;</span>))),
+            ValueType::Xml(cow) =&gt; cow.as_ref().map(|cow| <span class="self">self</span>.write(<span class="macro">format!</span>(<span class="string">&quot;&#39;{cow}&#39;&quot;</span>))),
         };
 
         <span class="kw">match </span>res {
@@ -1255,8 +1267,20 @@
                 <span class="self">self</span>.write(<span class="string">&quot; OFFSET &quot;</span>)<span class="question-mark">?</span>;
                 <span class="self">self</span>.visit_parameterized(offset)
             }
-            (<span class="prelude-val">None</span>, <span class="prelude-val">Some</span>(Value::Int32(<span class="prelude-val">Some</span>(offset)))) <span class="kw">if </span>offset &lt; <span class="number">1 </span>=&gt; <span class="prelude-val">Ok</span>(()),
-            (<span class="prelude-val">None</span>, <span class="prelude-val">Some</span>(Value::Int64(<span class="prelude-val">Some</span>(offset)))) <span class="kw">if </span>offset &lt; <span class="number">1 </span>=&gt; <span class="prelude-val">Ok</span>(()),
+            (
+                <span class="prelude-val">None</span>,
+                <span class="prelude-val">Some</span>(Value {
+                    typed: ValueType::Int32(<span class="prelude-val">Some</span>(offset)),
+                    ..
+                }),
+            ) <span class="kw">if </span>offset &lt; <span class="number">1 </span>=&gt; <span class="prelude-val">Ok</span>(()),
+            (
+                <span class="prelude-val">None</span>,
+                <span class="prelude-val">Some</span>(Value {
+                    typed: ValueType::Int64(<span class="prelude-val">Some</span>(offset)),
+                    ..
+                }),
+            ) <span class="kw">if </span>offset &lt; <span class="number">1 </span>=&gt; <span class="prelude-val">Ok</span>(()),
             (<span class="prelude-val">None</span>, <span class="prelude-val">Some</span>(offset)) =&gt; {
                 <span class="self">self</span>.write(<span class="string">&quot; LIMIT &quot;</span>)<span class="question-mark">?</span>;
                 <span class="self">self</span>.visit_parameterized(Value::from(<span class="number">9_223_372_036_854_775_807i64</span>))<span class="question-mark">?</span>;
@@ -1383,27 +1407,27 @@
 
         <span class="kw">match </span>json_type {
             JsonType::Array =&gt; {
-                <span class="self">self</span>.visit_expression(Value::text(<span class="string">&quot;ARRAY&quot;</span>).into())<span class="question-mark">?</span>;
+                <span class="self">self</span>.visit_expression(Expression::from(Value::text(<span class="string">&quot;ARRAY&quot;</span>)))<span class="question-mark">?</span>;
             }
             JsonType::Boolean =&gt; {
-                <span class="self">self</span>.visit_expression(Value::text(<span class="string">&quot;BOOLEAN&quot;</span>).into())<span class="question-mark">?</span>;
+                <span class="self">self</span>.visit_expression(Expression::from(Value::text(<span class="string">&quot;BOOLEAN&quot;</span>)))<span class="question-mark">?</span>;
             }
             JsonType::Number =&gt; {
-                <span class="self">self</span>.visit_expression(Value::text(<span class="string">&quot;INTEGER&quot;</span>).into())<span class="question-mark">?</span>;
+                <span class="self">self</span>.visit_expression(Expression::from(Value::text(<span class="string">&quot;INTEGER&quot;</span>)))<span class="question-mark">?</span>;
                 <span class="self">self</span>.write(<span class="string">&quot; OR JSON_TYPE(&quot;</span>)<span class="question-mark">?</span>;
                 <span class="self">self</span>.visit_expression(left)<span class="question-mark">?</span>;
                 <span class="self">self</span>.write(<span class="string">&quot;)&quot;</span>)<span class="question-mark">?</span>;
                 <span class="self">self</span>.write(<span class="string">&quot; = &quot;</span>)<span class="question-mark">?</span>;
-                <span class="self">self</span>.visit_expression(Value::text(<span class="string">&quot;DOUBLE&quot;</span>).into())<span class="question-mark">?</span>;
+                <span class="self">self</span>.visit_expression(Expression::from(Value::text(<span class="string">&quot;DOUBLE&quot;</span>)))<span class="question-mark">?</span>;
             }
             JsonType::Object =&gt; {
-                <span class="self">self</span>.visit_expression(Value::text(<span class="string">&quot;OBJECT&quot;</span>).into())<span class="question-mark">?</span>;
+                <span class="self">self</span>.visit_expression(Expression::from(Value::text(<span class="string">&quot;OBJECT&quot;</span>)))<span class="question-mark">?</span>;
             }
             JsonType::String =&gt; {
-                <span class="self">self</span>.visit_expression(Value::text(<span class="string">&quot;STRING&quot;</span>).into())<span class="question-mark">?</span>;
+                <span class="self">self</span>.visit_expression(Expression::from(Value::text(<span class="string">&quot;STRING&quot;</span>)))<span class="question-mark">?</span>;
             }
             JsonType::Null =&gt; {
-                <span class="self">self</span>.visit_expression(Value::text(<span class="string">&quot;NULL&quot;</span>).into())<span class="question-mark">?</span>;
+                <span class="self">self</span>.visit_expression(Expression::from(Value::text(<span class="string">&quot;NULL&quot;</span>)))<span class="question-mark">?</span>;
             }
             JsonType::ColumnRef(column) =&gt; {
                 <span class="self">self</span>.write(<span class="string">&quot;JSON_TYPE&quot;</span>)<span class="question-mark">?</span>;
@@ -1703,7 +1727,7 @@
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>test_raw_null() {
-        <span class="kw">let </span>(sql, params) = Mysql::build(Select::default().value(Value::Text(<span class="prelude-val">None</span>).raw())).unwrap();
+        <span class="kw">let </span>(sql, params) = Mysql::build(Select::default().value(ValueType::Text(<span class="prelude-val">None</span>).raw())).unwrap();
         <span class="macro">assert_eq!</span>(<span class="string">&quot;SELECT null&quot;</span>, sql);
         <span class="macro">assert!</span>(params.is_empty());
     }
@@ -1731,7 +1755,7 @@
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>test_raw_bytes() {
-        <span class="kw">let </span>(sql, params) = Mysql::build(Select::default().value(Value::bytes(<span class="macro">vec!</span>[<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>]).raw())).unwrap();
+        <span class="kw">let </span>(sql, params) = Mysql::build(Select::default().value(ValueType::bytes(<span class="macro">vec!</span>[<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>]).raw())).unwrap();
         <span class="macro">assert_eq!</span>(<span class="string">&quot;SELECT x&#39;010203&#39;&quot;</span>, sql);
         <span class="macro">assert!</span>(params.is_empty());
     }
@@ -1749,7 +1773,7 @@
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>test_raw_char() {
-        <span class="kw">let </span>(sql, params) = Mysql::build(Select::default().value(Value::character(<span class="string">&#39;a&#39;</span>).raw())).unwrap();
+        <span class="kw">let </span>(sql, params) = Mysql::build(Select::default().value(ValueType::character(<span class="string">&#39;a&#39;</span>).raw())).unwrap();
         <span class="macro">assert_eq!</span>(<span class="string">&quot;SELECT &#39;a&#39;&quot;</span>, sql);
         <span class="macro">assert!</span>(params.is_empty());
     }
@@ -1859,7 +1883,7 @@
     <span class="attr">#[test]
 
     </span><span class="kw">fn </span>test_json_negation() {
-        <span class="kw">let </span>conditions = ConditionTree::not(<span class="string">&quot;json&quot;</span>.equals(Value::Json(<span class="prelude-val">Some</span>(serde_json::Value::Null))));
+        <span class="kw">let </span>conditions = ConditionTree::not(<span class="string">&quot;json&quot;</span>.equals(ValueType::Json(<span class="prelude-val">Some</span>(serde_json::Value::Null))));
         <span class="kw">let </span>(sql, <span class="kw">_</span>) = Mysql::build(Select::from_table(<span class="string">&quot;test&quot;</span>).so_that(conditions)).unwrap();
 
         <span class="macro">assert_eq!</span>(
@@ -1871,7 +1895,7 @@
     <span class="attr">#[test]
 
     </span><span class="kw">fn </span>test_json_not_negation() {
-        <span class="kw">let </span>conditions = ConditionTree::not(<span class="string">&quot;json&quot;</span>.not_equals(Value::Json(<span class="prelude-val">Some</span>(serde_json::Value::Null))));
+        <span class="kw">let </span>conditions = ConditionTree::not(<span class="string">&quot;json&quot;</span>.not_equals(ValueType::Json(<span class="prelude-val">Some</span>(serde_json::Value::Null))));
         <span class="kw">let </span>(sql, <span class="kw">_</span>) = Mysql::build(Select::from_table(<span class="string">&quot;test&quot;</span>).so_that(conditions)).unwrap();
 
         <span class="macro">assert_eq!</span>(

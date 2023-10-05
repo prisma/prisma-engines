@@ -95,7 +95,7 @@
 <a href="#95" id="95">95</a>
 <a href="#96" id="96">96</a>
 <a href="#97" id="97">97</a>
-</pre></div><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::ast::Value;
+</pre></div><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::ast::{Value, ValueType};
 <span class="attr">#[cfg(not(feature = <span class="string">&quot;bigdecimal&quot;</span>))]
 </span><span class="kw">use </span><span class="kw">crate</span>::error::<span class="kw-2">*</span>;
 <span class="attr">#[cfg(feature = <span class="string">&quot;bigdecimal&quot;</span>)]
@@ -107,26 +107,26 @@
 
 <span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; IntoSql&lt;<span class="lifetime">&#39;a</span>&gt; <span class="kw">for </span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>Value&lt;<span class="lifetime">&#39;a</span>&gt; {
     <span class="kw">fn </span>into_sql(<span class="self">self</span>) -&gt; ColumnData&lt;<span class="lifetime">&#39;a</span>&gt; {
-        <span class="kw">match </span><span class="self">self </span>{
-            Value::Int32(val) =&gt; val.into_sql(),
-            Value::Int64(val) =&gt; val.into_sql(),
-            Value::Float(val) =&gt; val.into_sql(),
-            Value::Double(val) =&gt; val.into_sql(),
-            Value::Text(val) =&gt; val.as_deref().into_sql(),
-            Value::Bytes(val) =&gt; val.as_deref().into_sql(),
-            Value::Enum(val, <span class="kw">_</span>) =&gt; val.as_deref().into_sql(),
-            Value::Boolean(val) =&gt; val.into_sql(),
-            Value::Char(val) =&gt; val.as_ref().map(|val| <span class="macro">format!</span>(<span class="string">&quot;{val}&quot;</span>)).into_sql(),
-            Value::Xml(val) =&gt; val.as_deref().into_sql(),
-            Value::Array(<span class="kw">_</span>) | Value::EnumArray(<span class="kw">_</span>, <span class="kw">_</span>) =&gt; <span class="macro">panic!</span>(<span class="string">&quot;Arrays are not supported on SQL Server.&quot;</span>),
+        <span class="kw">match </span><span class="kw-2">&amp;</span><span class="self">self</span>.typed {
+            ValueType::Int32(val) =&gt; val.into_sql(),
+            ValueType::Int64(val) =&gt; val.into_sql(),
+            ValueType::Float(val) =&gt; val.into_sql(),
+            ValueType::Double(val) =&gt; val.into_sql(),
+            ValueType::Text(val) =&gt; val.as_deref().into_sql(),
+            ValueType::Bytes(val) =&gt; val.as_deref().into_sql(),
+            ValueType::Enum(val, <span class="kw">_</span>) =&gt; val.as_deref().into_sql(),
+            ValueType::Boolean(val) =&gt; val.into_sql(),
+            ValueType::Char(val) =&gt; val.as_ref().map(|val| <span class="macro">format!</span>(<span class="string">&quot;{val}&quot;</span>)).into_sql(),
+            ValueType::Xml(val) =&gt; val.as_deref().into_sql(),
+            ValueType::Array(<span class="kw">_</span>) | ValueType::EnumArray(<span class="kw">_</span>, <span class="kw">_</span>) =&gt; <span class="macro">panic!</span>(<span class="string">&quot;Arrays are not supported on SQL Server.&quot;</span>),
             <span class="attr">#[cfg(feature = <span class="string">&quot;bigdecimal&quot;</span>)]
-            </span>Value::Numeric(val) =&gt; (<span class="kw-2">*</span>val).to_sql(),
-            Value::Json(val) =&gt; val.as_ref().map(|val| serde_json::to_string(<span class="kw-2">&amp;</span>val).unwrap()).into_sql(),
+            </span>ValueType::Numeric(val) =&gt; (<span class="kw-2">*</span>val).to_sql(),
+            ValueType::Json(val) =&gt; val.as_ref().map(|val| serde_json::to_string(<span class="kw-2">&amp;</span>val).unwrap()).into_sql(),
             <span class="attr">#[cfg(feature = <span class="string">&quot;uuid&quot;</span>)]
-            </span>Value::Uuid(val) =&gt; val.into_sql(),
-            Value::DateTime(val) =&gt; val.into_sql(),
-            Value::Date(val) =&gt; val.into_sql(),
-            Value::Time(val) =&gt; val.into_sql(),
+            </span>ValueType::Uuid(val) =&gt; val.into_sql(),
+            ValueType::DateTime(val) =&gt; val.into_sql(),
+            ValueType::Date(val) =&gt; val.into_sql(),
+            ValueType::Time(val) =&gt; val.into_sql(),
         }
     }
 }
@@ -136,18 +136,18 @@
 
     <span class="kw">fn </span>try_from(cd: ColumnData&lt;<span class="lifetime">&#39;static</span>&gt;) -&gt; <span class="kw">crate</span>::Result&lt;<span class="self">Self</span>&gt; {
         <span class="kw">let </span>res = <span class="kw">match </span>cd {
-            ColumnData::U8(num) =&gt; Value::Int32(num.map(i32::from)),
-            ColumnData::I16(num) =&gt; Value::Int32(num.map(i32::from)),
-            ColumnData::I32(num) =&gt; Value::Int32(num.map(i32::from)),
-            ColumnData::I64(num) =&gt; Value::Int64(num.map(i64::from)),
-            ColumnData::F32(num) =&gt; Value::Float(num),
-            ColumnData::F64(num) =&gt; Value::Double(num),
-            ColumnData::Bit(b) =&gt; Value::Boolean(b),
-            ColumnData::String(s) =&gt; Value::Text(s),
-            ColumnData::Guid(uuid) =&gt; Value::Uuid(uuid),
-            ColumnData::Binary(bytes) =&gt; Value::Bytes(bytes),
+            ColumnData::U8(num) =&gt; ValueType::Int32(num.map(i32::from)),
+            ColumnData::I16(num) =&gt; ValueType::Int32(num.map(i32::from)),
+            ColumnData::I32(num) =&gt; ValueType::Int32(num.map(i32::from)),
+            ColumnData::I64(num) =&gt; ValueType::Int64(num.map(i64::from)),
+            ColumnData::F32(num) =&gt; ValueType::Float(num),
+            ColumnData::F64(num) =&gt; ValueType::Double(num),
+            ColumnData::Bit(b) =&gt; ValueType::Boolean(b),
+            ColumnData::String(s) =&gt; ValueType::Text(s),
+            ColumnData::Guid(uuid) =&gt; ValueType::Uuid(uuid),
+            ColumnData::Binary(bytes) =&gt; ValueType::Bytes(bytes),
             <span class="attr">#[cfg(feature = <span class="string">&quot;bigdecimal&quot;</span>)]
-            </span>numeric @ ColumnData::Numeric(<span class="kw">_</span>) =&gt; Value::Numeric(BigDecimal::from_sql(<span class="kw-2">&amp;</span>numeric)<span class="question-mark">?</span>),
+            </span>numeric @ ColumnData::Numeric(<span class="kw">_</span>) =&gt; ValueType::Numeric(BigDecimal::from_sql(<span class="kw-2">&amp;</span>numeric)<span class="question-mark">?</span>),
             <span class="attr">#[cfg(not(feature = <span class="string">&quot;bigdecimal&quot;</span>))]
             </span>_numeric @ ColumnData::Numeric(<span class="kw">_</span>) =&gt; {
                 <span class="kw">let </span>kind = ErrorKind::conversion(<span class="string">&quot;Please enable `bigdecimal` feature to read numeric values&quot;</span>);
@@ -157,39 +157,39 @@
                 <span class="kw">use </span>tiberius::time::chrono::{DateTime, NaiveDateTime, Utc};
 
                 <span class="kw">let </span>dt = NaiveDateTime::from_sql(<span class="kw-2">&amp;</span>dt)<span class="question-mark">?</span>.map(|dt| DateTime::&lt;Utc&gt;::from_utc(dt, Utc));
-                Value::DateTime(dt)
+                ValueType::DateTime(dt)
             }
             dt @ ColumnData::SmallDateTime(<span class="kw">_</span>) =&gt; {
                 <span class="kw">use </span>tiberius::time::chrono::{DateTime, NaiveDateTime, Utc};
 
                 <span class="kw">let </span>dt = NaiveDateTime::from_sql(<span class="kw-2">&amp;</span>dt)<span class="question-mark">?</span>.map(|dt| DateTime::&lt;Utc&gt;::from_utc(dt, Utc));
-                Value::DateTime(dt)
+                ValueType::DateTime(dt)
             }
             dt @ ColumnData::Time(<span class="kw">_</span>) =&gt; {
                 <span class="kw">use </span>tiberius::time::chrono::NaiveTime;
 
-                Value::Time(NaiveTime::from_sql(<span class="kw-2">&amp;</span>dt)<span class="question-mark">?</span>)
+                ValueType::Time(NaiveTime::from_sql(<span class="kw-2">&amp;</span>dt)<span class="question-mark">?</span>)
             }
             dt @ ColumnData::Date(<span class="kw">_</span>) =&gt; {
                 <span class="kw">use </span>tiberius::time::chrono::NaiveDate;
-                Value::Date(NaiveDate::from_sql(<span class="kw-2">&amp;</span>dt)<span class="question-mark">?</span>)
+                ValueType::Date(NaiveDate::from_sql(<span class="kw-2">&amp;</span>dt)<span class="question-mark">?</span>)
             }
             dt @ ColumnData::DateTime2(<span class="kw">_</span>) =&gt; {
                 <span class="kw">use </span>tiberius::time::chrono::{DateTime, NaiveDateTime, Utc};
 
                 <span class="kw">let </span>dt = NaiveDateTime::from_sql(<span class="kw-2">&amp;</span>dt)<span class="question-mark">?</span>.map(|dt| DateTime::&lt;Utc&gt;::from_utc(dt, Utc));
 
-                Value::DateTime(dt)
+                ValueType::DateTime(dt)
             }
             dt @ ColumnData::DateTimeOffset(<span class="kw">_</span>) =&gt; {
                 <span class="kw">use </span>tiberius::time::chrono::{DateTime, Utc};
 
-                Value::DateTime(DateTime::&lt;Utc&gt;::from_sql(<span class="kw-2">&amp;</span>dt)<span class="question-mark">?</span>)
+                ValueType::DateTime(DateTime::&lt;Utc&gt;::from_sql(<span class="kw-2">&amp;</span>dt)<span class="question-mark">?</span>)
             }
-            ColumnData::Xml(cow) =&gt; Value::Xml(cow.map(|xml_data| Cow::Owned(xml_data.into_owned().into_string()))),
+            ColumnData::Xml(cow) =&gt; ValueType::Xml(cow.map(|xml_data| Cow::Owned(xml_data.into_owned().into_string()))),
         };
 
-        <span class="prelude-val">Ok</span>(res)
+        <span class="prelude-val">Ok</span>(Value::from(res))
     }
 }
 </code></pre></div></section></main></body></html>

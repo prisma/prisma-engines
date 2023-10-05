@@ -62,24 +62,24 @@
             <span class="kw">return </span><span class="string">&quot;null&quot;</span>.to_owned();
         }
 
-        <span class="kw">let </span>type_name = <span class="kw">match </span><span class="self">self </span>{
-            quaint::Value::Int32(<span class="kw">_</span>) =&gt; <span class="string">&quot;int&quot;</span>,
-            quaint::Value::Int64(<span class="kw">_</span>) =&gt; <span class="string">&quot;bigint&quot;</span>,
-            quaint::Value::Float(<span class="kw">_</span>) =&gt; <span class="string">&quot;float&quot;</span>,
-            quaint::Value::Double(<span class="kw">_</span>) =&gt; <span class="string">&quot;double&quot;</span>,
-            quaint::Value::Text(<span class="kw">_</span>) =&gt; <span class="string">&quot;string&quot;</span>,
-            quaint::Value::Enum(<span class="kw">_</span>, <span class="kw">_</span>) =&gt; <span class="string">&quot;enum&quot;</span>,
-            quaint::Value::Bytes(<span class="kw">_</span>) =&gt; <span class="string">&quot;bytes&quot;</span>,
-            quaint::Value::Boolean(<span class="kw">_</span>) =&gt; <span class="string">&quot;bool&quot;</span>,
-            quaint::Value::Char(<span class="kw">_</span>) =&gt; <span class="string">&quot;char&quot;</span>,
-            quaint::Value::Numeric(<span class="kw">_</span>) =&gt; <span class="string">&quot;decimal&quot;</span>,
-            quaint::Value::Json(<span class="kw">_</span>) =&gt; <span class="string">&quot;json&quot;</span>,
-            quaint::Value::Xml(<span class="kw">_</span>) =&gt; <span class="string">&quot;xml&quot;</span>,
-            quaint::Value::Uuid(<span class="kw">_</span>) =&gt; <span class="string">&quot;uuid&quot;</span>,
-            quaint::Value::DateTime(<span class="kw">_</span>) =&gt; <span class="string">&quot;datetime&quot;</span>,
-            quaint::Value::Date(<span class="kw">_</span>) =&gt; <span class="string">&quot;date&quot;</span>,
-            quaint::Value::Time(<span class="kw">_</span>) =&gt; <span class="string">&quot;time&quot;</span>,
-            quaint::Value::Array(<span class="kw">_</span>) | quaint::Value::EnumArray(<span class="kw">_</span>, <span class="kw">_</span>) =&gt; <span class="string">&quot;array&quot;</span>,
+        <span class="kw">let </span>type_name = <span class="kw">match </span><span class="self">self</span>.typed {
+            quaint::ValueType::Int32(<span class="kw">_</span>) =&gt; <span class="string">&quot;int&quot;</span>,
+            quaint::ValueType::Int64(<span class="kw">_</span>) =&gt; <span class="string">&quot;bigint&quot;</span>,
+            quaint::ValueType::Float(<span class="kw">_</span>) =&gt; <span class="string">&quot;float&quot;</span>,
+            quaint::ValueType::Double(<span class="kw">_</span>) =&gt; <span class="string">&quot;double&quot;</span>,
+            quaint::ValueType::Text(<span class="kw">_</span>) =&gt; <span class="string">&quot;string&quot;</span>,
+            quaint::ValueType::Enum(<span class="kw">_</span>, <span class="kw">_</span>) =&gt; <span class="string">&quot;enum&quot;</span>,
+            quaint::ValueType::Bytes(<span class="kw">_</span>) =&gt; <span class="string">&quot;bytes&quot;</span>,
+            quaint::ValueType::Boolean(<span class="kw">_</span>) =&gt; <span class="string">&quot;bool&quot;</span>,
+            quaint::ValueType::Char(<span class="kw">_</span>) =&gt; <span class="string">&quot;char&quot;</span>,
+            quaint::ValueType::Numeric(<span class="kw">_</span>) =&gt; <span class="string">&quot;decimal&quot;</span>,
+            quaint::ValueType::Json(<span class="kw">_</span>) =&gt; <span class="string">&quot;json&quot;</span>,
+            quaint::ValueType::Xml(<span class="kw">_</span>) =&gt; <span class="string">&quot;xml&quot;</span>,
+            quaint::ValueType::Uuid(<span class="kw">_</span>) =&gt; <span class="string">&quot;uuid&quot;</span>,
+            quaint::ValueType::DateTime(<span class="kw">_</span>) =&gt; <span class="string">&quot;datetime&quot;</span>,
+            quaint::ValueType::Date(<span class="kw">_</span>) =&gt; <span class="string">&quot;date&quot;</span>,
+            quaint::ValueType::Time(<span class="kw">_</span>) =&gt; <span class="string">&quot;time&quot;</span>,
+            quaint::ValueType::Array(<span class="kw">_</span>) | quaint::ValueType::EnumArray(<span class="kw">_</span>, <span class="kw">_</span>) =&gt; <span class="string">&quot;array&quot;</span>,
         };
 
         type_name.to_owned()
@@ -88,12 +88,12 @@
     <span class="kw">fn </span>as_typed_json(<span class="self">self</span>) -&gt; serde_json::Value {
         <span class="kw">let </span>type_name = <span class="self">self</span>.type_name();
 
-        <span class="kw">let </span>json_value = <span class="kw">match </span><span class="self">self </span>{
-            quaint::Value::Array(<span class="prelude-val">Some</span>(values)) =&gt; {
+        <span class="kw">let </span>json_value = <span class="kw">match </span><span class="self">self</span>.typed {
+            quaint::ValueType::Array(<span class="prelude-val">Some</span>(values)) =&gt; {
                 serde_json::Value::Array(values.into_iter().map(|value| value.as_typed_json()).collect())
             }
-            quaint::Value::Int64(<span class="prelude-val">Some</span>(value)) =&gt; serde_json::Value::String(value.to_string()),
-            quaint::Value::Numeric(<span class="prelude-val">Some</span>(decimal)) =&gt; serde_json::Value::String(decimal.normalized().to_string()),
+            quaint::ValueType::Int64(<span class="prelude-val">Some</span>(value)) =&gt; serde_json::Value::String(value.to_string()),
+            quaint::ValueType::Numeric(<span class="prelude-val">Some</span>(decimal)) =&gt; serde_json::Value::String(decimal.normalized().to_string()),
             x =&gt; serde_json::Value::from(x),
         };
 

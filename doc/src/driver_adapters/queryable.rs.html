@@ -326,7 +326,7 @@
 
 <span class="kw">impl </span>JsBaseQueryable {
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>new(proxy: CommonProxy) -&gt; <span class="self">Self </span>{
-        <span class="kw">let </span>flavour: Flavour = proxy.flavour.to_owned().parse().unwrap();
+        <span class="kw">let </span>flavour: Flavour = proxy.flavour.parse().unwrap();
         <span class="self">Self </span>{ proxy, flavour }
     }
 

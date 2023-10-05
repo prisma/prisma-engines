@@ -1167,7 +1167,6 @@
 <a href="#1167" id="1167">1167</a>
 <a href="#1168" id="1168">1168</a>
 <a href="#1169" id="1169">1169</a>
-<a href="#1170" id="1170">1170</a>
 </pre></div><pre class="rust"><code><span class="kw">use crate</span>::{
     ast::<span class="kw-2">*</span>,
     visitor::{<span class="self">self</span>, Visitor},
@@ -1277,12 +1276,9 @@
             <span class="self">self</span>.surround_with_backticks(enum_name.name.deref())<span class="question-mark">?</span>;
             <span class="self">self</span>.write(<span class="string">&quot;[]&quot;</span>)<span class="question-mark">?</span>;
         } <span class="kw">else </span>{
-            <span class="self">self</span>.visit_parameterized(Value::Array(<span class="prelude-val">Some</span>(
-                variants
-                    .into_iter()
-                    .map(|variant| variant.into_enum(name.clone()))
-                    .collect(),
-            )))<span class="question-mark">?</span>;
+            <span class="self">self</span>.visit_parameterized(Value::array(
+                variants.into_iter().map(|variant| variant.into_enum(name.clone())),
+            ))<span class="question-mark">?</span>;
         }
 
         <span class="prelude-val">Ok</span>(())
@@ -1337,32 +1333,32 @@
     }
 
     <span class="kw">fn </span>visit_raw_value(<span class="kw-2">&amp;mut </span><span class="self">self</span>, value: Value&lt;<span class="lifetime">&#39;a</span>&gt;) -&gt; visitor::Result {
-        <span class="kw">let </span>res = <span class="kw">match </span>value {
-            Value::Int32(i) =&gt; i.map(|i| <span class="self">self</span>.write(i)),
-            Value::Int64(i) =&gt; i.map(|i| <span class="self">self</span>.write(i)),
-            Value::Text(t) =&gt; t.map(|t| <span class="self">self</span>.write(<span class="macro">format!</span>(<span class="string">&quot;&#39;{t}&#39;&quot;</span>))),
-            Value::Enum(e, <span class="kw">_</span>) =&gt; e.map(|e| <span class="self">self</span>.write(e)),
-            Value::Bytes(b) =&gt; b.map(|b| <span class="self">self</span>.write(<span class="macro">format!</span>(<span class="string">&quot;E&#39;{}&#39;&quot;</span>, hex::encode(b)))),
-            Value::Boolean(b) =&gt; b.map(|b| <span class="self">self</span>.write(b)),
-            Value::Xml(cow) =&gt; cow.map(|cow| <span class="self">self</span>.write(<span class="macro">format!</span>(<span class="string">&quot;&#39;{cow}&#39;&quot;</span>))),
-            Value::Char(c) =&gt; c.map(|c| <span class="self">self</span>.write(<span class="macro">format!</span>(<span class="string">&quot;&#39;{c}&#39;&quot;</span>))),
-            Value::Float(d) =&gt; d.map(|f| <span class="kw">match </span>f {
+        <span class="kw">let </span>res = <span class="kw">match </span><span class="kw-2">&amp;</span>value.typed {
+            ValueType::Int32(i) =&gt; i.map(|i| <span class="self">self</span>.write(i)),
+            ValueType::Int64(i) =&gt; i.map(|i| <span class="self">self</span>.write(i)),
+            ValueType::Text(t) =&gt; t.as_ref().map(|t| <span class="self">self</span>.write(<span class="macro">format!</span>(<span class="string">&quot;&#39;{t}&#39;&quot;</span>))),
+            ValueType::Enum(e, <span class="kw">_</span>) =&gt; e.as_ref().map(|e| <span class="self">self</span>.write(e)),
+            ValueType::Bytes(b) =&gt; b.as_ref().map(|b| <span class="self">self</span>.write(<span class="macro">format!</span>(<span class="string">&quot;E&#39;{}&#39;&quot;</span>, hex::encode(b)))),
+            ValueType::Boolean(b) =&gt; b.map(|b| <span class="self">self</span>.write(b)),
+            ValueType::Xml(cow) =&gt; cow.as_ref().map(|cow| <span class="self">self</span>.write(<span class="macro">format!</span>(<span class="string">&quot;&#39;{cow}&#39;&quot;</span>))),
+            ValueType::Char(c) =&gt; c.map(|c| <span class="self">self</span>.write(<span class="macro">format!</span>(<span class="string">&quot;&#39;{c}&#39;&quot;</span>))),
+            ValueType::Float(d) =&gt; d.map(|f| <span class="kw">match </span>f {
                 f <span class="kw">if </span>f.is_nan() =&gt; <span class="self">self</span>.write(<span class="string">&quot;&#39;NaN&#39;&quot;</span>),
                 f <span class="kw">if </span>f == f32::INFINITY =&gt; <span class="self">self</span>.write(<span class="string">&quot;&#39;Infinity&#39;&quot;</span>),
                 f <span class="kw">if </span>f == f32::NEG_INFINITY =&gt; <span class="self">self</span>.write(<span class="string">&quot;&#39;-Infinity&quot;</span>),
                 v =&gt; <span class="self">self</span>.write(<span class="macro">format!</span>(<span class="string">&quot;{v:?}&quot;</span>)),
             }),
-            Value::Double(d) =&gt; d.map(|f| <span class="kw">match </span>f {
+            ValueType::Double(d) =&gt; d.map(|f| <span class="kw">match </span>f {
                 f <span class="kw">if </span>f.is_nan() =&gt; <span class="self">self</span>.write(<span class="string">&quot;&#39;NaN&#39;&quot;</span>),
                 f <span class="kw">if </span>f == f64::INFINITY =&gt; <span class="self">self</span>.write(<span class="string">&quot;&#39;Infinity&#39;&quot;</span>),
                 f <span class="kw">if </span>f == f64::NEG_INFINITY =&gt; <span class="self">self</span>.write(<span class="string">&quot;&#39;-Infinity&quot;</span>),
                 v =&gt; <span class="self">self</span>.write(<span class="macro">format!</span>(<span class="string">&quot;{v:?}&quot;</span>)),
             }),
-            Value::Array(ary) =&gt; ary.map(|ary| {
+            ValueType::Array(ary) =&gt; ary.as_ref().map(|ary| {
                 <span class="self">self</span>.surround_with(<span class="string">&quot;&#39;{&quot;</span>, <span class="string">&quot;}&#39;&quot;</span>, |<span class="kw-2">ref mut </span>s| {
                     <span class="kw">let </span>len = ary.len();
 
-                    <span class="kw">for </span>(i, item) <span class="kw">in </span>ary.into_iter().enumerate() {
+                    <span class="kw">for </span>(i, item) <span class="kw">in </span>ary.iter().enumerate() {
                         s.write(item)<span class="question-mark">?</span>;
 
                         <span class="kw">if </span>i &lt; len - <span class="number">1 </span>{
@@ -1373,11 +1369,11 @@
                     <span class="prelude-val">Ok</span>(())
                 })
             }),
-            Value::EnumArray(variants, name) =&gt; variants.map(|variants| {
+            ValueType::EnumArray(variants, name) =&gt; variants.as_ref().map(|variants| {
                 <span class="self">self</span>.surround_with(<span class="string">&quot;ARRAY[&quot;</span>, <span class="string">&quot;]&quot;</span>, |<span class="kw-2">ref mut </span>s| {
                     <span class="kw">let </span>len = variants.len();
 
-                    <span class="kw">for </span>(i, item) <span class="kw">in </span>variants.into_iter().enumerate() {
+                    <span class="kw">for </span>(i, item) <span class="kw">in </span>variants.iter().enumerate() {
                         s.surround_with(<span class="string">&quot;&#39;&quot;</span>, <span class="string">&quot;&#39;&quot;</span>, |t| t.write(item))<span class="question-mark">?</span>;
 
                         <span class="kw">if </span>i &lt; len - <span class="number">1 </span>{
@@ -1390,7 +1386,7 @@
 
                 <span class="kw">if let </span><span class="prelude-val">Some</span>(enum_name) = name {
                     <span class="self">self</span>.write(<span class="string">&quot;::&quot;</span>)<span class="question-mark">?</span>;
-                    <span class="kw">if let </span><span class="prelude-val">Some</span>(schema_name) = enum_name.schema_name {
+                    <span class="kw">if let </span><span class="prelude-val">Some</span>(schema_name) = <span class="kw-2">&amp;</span>enum_name.schema_name {
                         <span class="self">self</span>.surround_with_backticks(schema_name.deref())<span class="question-mark">?</span>;
                         <span class="self">self</span>.write(<span class="string">&quot;.&quot;</span>)<span class="question-mark">?
                     </span>}
@@ -1399,14 +1395,16 @@
 
                 <span class="prelude-val">Ok</span>(())
             }),
-            Value::Json(j) =&gt; j.map(|j| <span class="self">self</span>.write(<span class="macro">format!</span>(<span class="string">&quot;&#39;{}&#39;&quot;</span>, serde_json::to_string(<span class="kw-2">&amp;</span>j).unwrap()))),
+            ValueType::Json(j) =&gt; j
+                .as_ref()
+                .map(|j| <span class="self">self</span>.write(<span class="macro">format!</span>(<span class="string">&quot;&#39;{}&#39;&quot;</span>, serde_json::to_string(<span class="kw-2">&amp;</span>j).unwrap()))),
             <span class="attr">#[cfg(feature = <span class="string">&quot;bigdecimal&quot;</span>)]
-            </span>Value::Numeric(r) =&gt; r.map(|r| <span class="self">self</span>.write(r)),
+            </span>ValueType::Numeric(r) =&gt; r.as_ref().map(|r| <span class="self">self</span>.write(r)),
             <span class="attr">#[cfg(feature = <span class="string">&quot;uuid&quot;</span>)]
-            </span>Value::Uuid(uuid) =&gt; uuid.map(|uuid| <span class="self">self</span>.write(<span class="macro">format!</span>(<span class="string">&quot;&#39;{}&#39;&quot;</span>, uuid.hyphenated()))),
-            Value::DateTime(dt) =&gt; dt.map(|dt| <span class="self">self</span>.write(<span class="macro">format!</span>(<span class="string">&quot;&#39;{}&#39;&quot;</span>, dt.to_rfc3339(),))),
-            Value::Date(date) =&gt; date.map(|date| <span class="self">self</span>.write(<span class="macro">format!</span>(<span class="string">&quot;&#39;{date}&#39;&quot;</span>))),
-            Value::Time(time) =&gt; time.map(|time| <span class="self">self</span>.write(<span class="macro">format!</span>(<span class="string">&quot;&#39;{time}&#39;&quot;</span>))),
+            </span>ValueType::Uuid(uuid) =&gt; uuid.map(|uuid| <span class="self">self</span>.write(<span class="macro">format!</span>(<span class="string">&quot;&#39;{}&#39;&quot;</span>, uuid.hyphenated()))),
+            ValueType::DateTime(dt) =&gt; dt.map(|dt| <span class="self">self</span>.write(<span class="macro">format!</span>(<span class="string">&quot;&#39;{}&#39;&quot;</span>, dt.to_rfc3339(),))),
+            ValueType::Date(date) =&gt; date.map(|date| <span class="self">self</span>.write(<span class="macro">format!</span>(<span class="string">&quot;&#39;{date}&#39;&quot;</span>))),
+            ValueType::Time(time) =&gt; time.map(|time| <span class="self">self</span>.write(<span class="macro">format!</span>(<span class="string">&quot;&#39;{time}&#39;&quot;</span>))),
         };
 
         <span class="kw">match </span>res {
@@ -2131,7 +2129,7 @@
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>test_raw_null() {
-        <span class="kw">let </span>(sql, params) = Postgres::build(Select::default().value(Value::Text(<span class="prelude-val">None</span>).raw())).unwrap();
+        <span class="kw">let </span>(sql, params) = Postgres::build(Select::default().value(Value::null_text().raw())).unwrap();
         <span class="macro">assert_eq!</span>(<span class="string">&quot;SELECT null&quot;</span>, sql);
         <span class="macro">assert!</span>(params.is_empty());
     }
@@ -2220,9 +2218,9 @@
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>test_raw_enum_array() {
-        <span class="kw">let </span>enum_array = Value::EnumArray(
-            <span class="prelude-val">Some</span>(<span class="macro">vec!</span>[EnumVariant::new(<span class="string">&quot;A&quot;</span>), EnumVariant::new(<span class="string">&quot;B&quot;</span>)]),
-            <span class="prelude-val">Some</span>(EnumName::new(<span class="string">&quot;Alphabet&quot;</span>, <span class="prelude-val">Some</span>(<span class="string">&quot;foo&quot;</span>))),
+        <span class="kw">let </span>enum_array = Value::enum_array_with_name(
+            <span class="macro">vec!</span>[EnumVariant::new(<span class="string">&quot;A&quot;</span>), EnumVariant::new(<span class="string">&quot;B&quot;</span>)],
+            EnumName::new(<span class="string">&quot;Alphabet&quot;</span>, <span class="prelude-val">Some</span>(<span class="string">&quot;foo&quot;</span>)),
         );
         <span class="kw">let </span>(sql, params) = Postgres::build(Select::default().value(enum_array.raw())).unwrap();
 

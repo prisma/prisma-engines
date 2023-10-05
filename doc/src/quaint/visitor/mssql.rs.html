@@ -1814,7 +1814,7 @@
     },
     error::{Error, ErrorKind},
     prelude::{Aliasable, Average, Query},
-    visitor, Value,
+    visitor, Value, ValueType,
 };
 <span class="kw">use </span>std::{convert::TryFrom, fmt::Write, iter};
 
@@ -2116,27 +2116,27 @@
     }
 
     <span class="kw">fn </span>visit_raw_value(<span class="kw-2">&amp;mut </span><span class="self">self</span>, value: Value&lt;<span class="lifetime">&#39;a</span>&gt;) -&gt; visitor::Result {
-        <span class="kw">let </span>res = <span class="kw">match </span>value {
-            Value::Int32(i) =&gt; i.map(|i| <span class="self">self</span>.write(i)),
-            Value::Int64(i) =&gt; i.map(|i| <span class="self">self</span>.write(i)),
-            Value::Float(d) =&gt; d.map(|f| <span class="kw">match </span>f {
+        <span class="kw">let </span>res = <span class="kw">match </span>value.typed {
+            ValueType::Int32(i) =&gt; i.map(|i| <span class="self">self</span>.write(i)),
+            ValueType::Int64(i) =&gt; i.map(|i| <span class="self">self</span>.write(i)),
+            ValueType::Float(d) =&gt; d.map(|f| <span class="kw">match </span>f {
                 f <span class="kw">if </span>f.is_nan() =&gt; <span class="self">self</span>.write(<span class="string">&quot;&#39;NaN&#39;&quot;</span>),
                 f <span class="kw">if </span>f == f32::INFINITY =&gt; <span class="self">self</span>.write(<span class="string">&quot;&#39;Infinity&#39;&quot;</span>),
                 f <span class="kw">if </span>f == f32::NEG_INFINITY =&gt; <span class="self">self</span>.write(<span class="string">&quot;&#39;-Infinity&quot;</span>),
                 v =&gt; <span class="self">self</span>.write(<span class="macro">format!</span>(<span class="string">&quot;{v:?}&quot;</span>)),
             }),
-            Value::Double(d) =&gt; d.map(|f| <span class="kw">match </span>f {
+            ValueType::Double(d) =&gt; d.map(|f| <span class="kw">match </span>f {
                 f <span class="kw">if </span>f.is_nan() =&gt; <span class="self">self</span>.write(<span class="string">&quot;&#39;NaN&#39;&quot;</span>),
                 f <span class="kw">if </span>f == f64::INFINITY =&gt; <span class="self">self</span>.write(<span class="string">&quot;&#39;Infinity&#39;&quot;</span>),
                 f <span class="kw">if </span>f == f64::NEG_INFINITY =&gt; <span class="self">self</span>.write(<span class="string">&quot;&#39;-Infinity&quot;</span>),
                 v =&gt; <span class="self">self</span>.write(<span class="macro">format!</span>(<span class="string">&quot;{v:?}&quot;</span>)),
             }),
-            Value::Text(t) =&gt; t.map(|t| <span class="self">self</span>.write(<span class="macro">format!</span>(<span class="string">&quot;&#39;{t}&#39;&quot;</span>))),
-            Value::Enum(e, <span class="kw">_</span>) =&gt; e.map(|e| <span class="self">self</span>.write(e)),
-            Value::Bytes(b) =&gt; b.map(|b| <span class="self">self</span>.write(<span class="macro">format!</span>(<span class="string">&quot;0x{}&quot;</span>, hex::encode(b)))),
-            Value::Boolean(b) =&gt; b.map(|b| <span class="self">self</span>.write(<span class="kw">if </span>b { <span class="number">1 </span>} <span class="kw">else </span>{ <span class="number">0 </span>})),
-            Value::Char(c) =&gt; c.map(|c| <span class="self">self</span>.write(<span class="macro">format!</span>(<span class="string">&quot;&#39;{c}&#39;&quot;</span>))),
-            Value::Array(<span class="kw">_</span>) | Value::EnumArray(<span class="kw">_</span>, <span class="kw">_</span>) =&gt; {
+            ValueType::Text(t) =&gt; t.map(|t| <span class="self">self</span>.write(<span class="macro">format!</span>(<span class="string">&quot;&#39;{t}&#39;&quot;</span>))),
+            ValueType::Enum(e, <span class="kw">_</span>) =&gt; e.map(|e| <span class="self">self</span>.write(e)),
+            ValueType::Bytes(b) =&gt; b.map(|b| <span class="self">self</span>.write(<span class="macro">format!</span>(<span class="string">&quot;0x{}&quot;</span>, hex::encode(b)))),
+            ValueType::Boolean(b) =&gt; b.map(|b| <span class="self">self</span>.write(<span class="kw">if </span>b { <span class="number">1 </span>} <span class="kw">else </span>{ <span class="number">0 </span>})),
+            ValueType::Char(c) =&gt; c.map(|c| <span class="self">self</span>.write(<span class="macro">format!</span>(<span class="string">&quot;&#39;{c}&#39;&quot;</span>))),
+            ValueType::Array(<span class="kw">_</span>) | ValueType::EnumArray(<span class="kw">_</span>, <span class="kw">_</span>) =&gt; {
                 <span class="kw">let </span>msg = <span class="string">&quot;Arrays are not supported in T-SQL.&quot;</span>;
                 <span class="kw">let </span>kind = ErrorKind::conversion(msg);
 
@@ -2146,29 +2146,29 @@
                 <span class="kw">return </span><span class="prelude-val">Err</span>(builder.build());
             }
 
-            Value::Json(j) =&gt; j.map(|j| <span class="self">self</span>.write(<span class="macro">format!</span>(<span class="string">&quot;&#39;{}&#39;&quot;</span>, serde_json::to_string(<span class="kw-2">&amp;</span>j).unwrap()))),
+            ValueType::Json(j) =&gt; j.map(|j| <span class="self">self</span>.write(<span class="macro">format!</span>(<span class="string">&quot;&#39;{}&#39;&quot;</span>, serde_json::to_string(<span class="kw-2">&amp;</span>j).unwrap()))),
             <span class="attr">#[cfg(feature = <span class="string">&quot;bigdecimal&quot;</span>)]
-            </span>Value::Numeric(r) =&gt; r.map(|r| <span class="self">self</span>.write(r)),
+            </span>ValueType::Numeric(r) =&gt; r.map(|r| <span class="self">self</span>.write(r)),
             <span class="attr">#[cfg(feature = <span class="string">&quot;uuid&quot;</span>)]
-            </span>Value::Uuid(uuid) =&gt; uuid.map(|uuid| {
+            </span>ValueType::Uuid(uuid) =&gt; uuid.map(|uuid| {
                 <span class="kw">let </span>s = <span class="macro">format!</span>(<span class="string">&quot;CONVERT(uniqueidentifier, N&#39;{}&#39;)&quot;</span>, uuid.hyphenated());
                 <span class="self">self</span>.write(s)
             }),
-            Value::DateTime(dt) =&gt; dt.map(|dt| {
+            ValueType::DateTime(dt) =&gt; dt.map(|dt| {
                 <span class="kw">let </span>s = <span class="macro">format!</span>(<span class="string">&quot;CONVERT(datetimeoffset, N&#39;{}&#39;)&quot;</span>, dt.to_rfc3339());
                 <span class="self">self</span>.write(s)
             }),
-            Value::Date(date) =&gt; date.map(|date| {
+            ValueType::Date(date) =&gt; date.map(|date| {
                 <span class="kw">let </span>s = <span class="macro">format!</span>(<span class="string">&quot;CONVERT(date, N&#39;{date}&#39;)&quot;</span>);
                 <span class="self">self</span>.write(s)
             }),
-            Value::Time(time) =&gt; time.map(|time| {
+            ValueType::Time(time) =&gt; time.map(|time| {
                 <span class="kw">let </span>s = <span class="macro">format!</span>(<span class="string">&quot;CONVERT(time, N&#39;{time}&#39;)&quot;</span>);
                 <span class="self">self</span>.write(s)
             }),
             <span class="comment">// Style 3 is keep all whitespace + internal DTD processing:
             // https://docs.microsoft.com/en-us/sql/t-sql/functions/cast-and-convert-transact-sql?redirectedfrom=MSDN&amp;view=sql-server-ver15#xml-styles
-            </span>Value::Xml(cow) =&gt; cow.map(|cow| <span class="self">self</span>.write(<span class="macro">format!</span>(<span class="string">&quot;CONVERT(XML, N&#39;{cow}&#39;, 3)&quot;</span>))),
+            </span>ValueType::Xml(cow) =&gt; cow.map(|cow| <span class="self">self</span>.write(<span class="macro">format!</span>(<span class="string">&quot;CONVERT(XML, N&#39;{cow}&#39;, 3)&quot;</span>))),
         };
 
         <span class="kw">match </span>res {
@@ -2197,7 +2197,7 @@
                 <span class="self">self</span>.visit_parameterized(limit)<span class="question-mark">?</span>;
                 <span class="self">self</span>.write(<span class="string">&quot; ROWS ONLY&quot;</span>)
             }
-            (<span class="prelude-val">None</span>, <span class="prelude-val">Some</span>(offset)) <span class="kw">if </span><span class="self">self</span>.order_by_set || offset.as_i64().map(|i| i &gt; <span class="number">0</span>).unwrap_or(<span class="bool-val">false</span>) =&gt; {
+            (<span class="prelude-val">None</span>, <span class="prelude-val">Some</span>(offset)) <span class="kw">if </span><span class="self">self</span>.order_by_set || offset.typed.as_i64().map(|i| i &gt; <span class="number">0</span>).unwrap_or(<span class="bool-val">false</span>) =&gt; {
                 add_ordering(<span class="self">self</span>)<span class="question-mark">?</span>;
 
                 <span class="self">self</span>.write(<span class="string">&quot; OFFSET &quot;</span>)<span class="question-mark">?</span>;
@@ -2555,11 +2555,11 @@
     <span class="attr">#[test]
     </span><span class="kw">fn </span>test_aliased_null() {
         <span class="kw">let </span>expected_sql = <span class="string">&quot;SELECT @P1 AS [test]&quot;</span>;
-        <span class="kw">let </span>query = Select::default().value(<span class="macro">val!</span>(Value::Int32(<span class="prelude-val">None</span>)).alias(<span class="string">&quot;test&quot;</span>));
+        <span class="kw">let </span>query = Select::default().value(<span class="macro">val!</span>(ValueType::Int32(<span class="prelude-val">None</span>)).alias(<span class="string">&quot;test&quot;</span>));
         <span class="kw">let </span>(sql, params) = Mssql::build(query).unwrap();
 
         <span class="macro">assert_eq!</span>(expected_sql, sql);
-        <span class="macro">assert_eq!</span>(<span class="macro">vec!</span>[Value::Int32(<span class="prelude-val">None</span>)], params);
+        <span class="macro">assert_eq!</span>(<span class="macro">vec!</span>[Value::null_int32()], params);
     }
 
     <span class="attr">#[test]
@@ -2998,7 +2998,7 @@
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>test_raw_null() {
-        <span class="kw">let </span>(sql, params) = Mssql::build(Select::default().value(Value::Text(<span class="prelude-val">None</span>).raw())).unwrap();
+        <span class="kw">let </span>(sql, params) = Mssql::build(Select::default().value(ValueType::Text(<span class="prelude-val">None</span>).raw())).unwrap();
         <span class="macro">assert_eq!</span>(<span class="string">&quot;SELECT null&quot;</span>, sql);
         <span class="macro">assert!</span>(params.is_empty());
     }

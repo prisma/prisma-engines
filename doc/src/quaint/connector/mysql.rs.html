@@ -1229,7 +1229,7 @@
 
         <span class="kw">let </span>version_string = rows
             .get(<span class="number">0</span>)
-            .and_then(|row| row.get(<span class="string">&quot;version&quot;</span>).and_then(|version| version.to_string()));
+            .and_then(|row| row.get(<span class="string">&quot;version&quot;</span>).and_then(|version| version.typed.to_string()));
 
         <span class="prelude-val">Ok</span>(version_string)
     }

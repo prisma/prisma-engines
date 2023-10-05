@@ -406,7 +406,7 @@
 <span class="kw">use </span>chrono::{DateTime, NaiveDate, Utc};
 <span class="kw">use </span>connector_interface::{coerce_null_to_zero_value, AggregationResult, AggregationSelection};
 <span class="kw">use </span>prisma_models::{ConversionFailure, FieldArity, PrismaValue, Record, TypeIdentifier};
-<span class="kw">use </span>quaint::{ast::Value, connector::ResultRow};
+<span class="kw">use </span>quaint::{connector::ResultRow, Value, ValueType};
 <span class="kw">use </span>std::{io, str::FromStr};
 <span class="kw">use </span>uuid::Uuid;
 
@@ -495,12 +495,12 @@
 
         <span class="kw">for </span>(i, p_value) <span class="kw">in </span><span class="self">self</span>.into_iter().enumerate().take(row_width) {
             <span class="kw">let </span>pv = <span class="kw">match </span>(meta[i].identifier(), meta[i].arity()) {
-                (type_identifier, FieldArity::List) =&gt; <span class="kw">match </span>p_value {
+                (type_identifier, FieldArity::List) =&gt; <span class="kw">match </span>p_value.typed {
                     value <span class="kw">if </span>value.is_null() =&gt; <span class="prelude-val">Ok</span>(PrismaValue::List(Vec::new())),
-                    Value::Array(<span class="prelude-val">None</span>) =&gt; <span class="prelude-val">Ok</span>(PrismaValue::List(Vec::new())),
-                    Value::Array(<span class="prelude-val">Some</span>(l)) =&gt; l
+                    ValueType::Array(<span class="prelude-val">None</span>) =&gt; <span class="prelude-val">Ok</span>(PrismaValue::List(Vec::new())),
+                    ValueType::Array(<span class="prelude-val">Some</span>(l)) =&gt; l
                         .into_iter()
-                        .map(|p_value| row_value_to_prisma_value(p_value, meta[i]))
+                        .map(|val| row_value_to_prisma_value(val, meta[i]))
                         .collect::&lt;<span class="kw">crate</span>::Result&lt;Vec&lt;<span class="kw">_</span>&gt;&gt;&gt;()
                         .map(PrismaValue::List),
                     <span class="kw">_ </span>=&gt; {
@@ -543,35 +543,35 @@
     };
 
     <span class="prelude-val">Ok</span>(<span class="kw">match </span>meta.identifier() {
-        TypeIdentifier::Boolean =&gt; <span class="kw">match </span>p_value {
+        TypeIdentifier::Boolean =&gt; <span class="kw">match </span>p_value.typed {
             value <span class="kw">if </span>value.is_null() =&gt; PrismaValue::Null,
-            Value::Int32(<span class="prelude-val">Some</span>(i)) =&gt; PrismaValue::Boolean(i != <span class="number">0</span>),
-            Value::Int64(<span class="prelude-val">Some</span>(i)) =&gt; PrismaValue::Boolean(i != <span class="number">0</span>),
-            Value::Boolean(<span class="prelude-val">Some</span>(b)) =&gt; PrismaValue::Boolean(b),
-            Value::Bytes(<span class="prelude-val">Some</span>(bytes)) <span class="kw">if </span>bytes.as_ref() == [<span class="number">0u8</span>] =&gt; PrismaValue::Boolean(<span class="bool-val">false</span>),
-            Value::Bytes(<span class="prelude-val">Some</span>(bytes)) <span class="kw">if </span>bytes.as_ref() == [<span class="number">1u8</span>] =&gt; PrismaValue::Boolean(<span class="bool-val">true</span>),
+            ValueType::Int32(<span class="prelude-val">Some</span>(i)) =&gt; PrismaValue::Boolean(i != <span class="number">0</span>),
+            ValueType::Int64(<span class="prelude-val">Some</span>(i)) =&gt; PrismaValue::Boolean(i != <span class="number">0</span>),
+            ValueType::Boolean(<span class="prelude-val">Some</span>(b)) =&gt; PrismaValue::Boolean(b),
+            ValueType::Bytes(<span class="prelude-val">Some</span>(bytes)) <span class="kw">if </span>bytes.as_ref() == [<span class="number">0u8</span>] =&gt; PrismaValue::Boolean(<span class="bool-val">false</span>),
+            ValueType::Bytes(<span class="prelude-val">Some</span>(bytes)) <span class="kw">if </span>bytes.as_ref() == [<span class="number">1u8</span>] =&gt; PrismaValue::Boolean(<span class="bool-val">true</span>),
             <span class="kw">_ </span>=&gt; <span class="kw">return </span><span class="prelude-val">Err</span>(create_error(<span class="kw-2">&amp;</span>p_value)),
         },
-        TypeIdentifier::Enum(<span class="kw">_</span>) =&gt; <span class="kw">match </span>p_value {
+        TypeIdentifier::Enum(<span class="kw">_</span>) =&gt; <span class="kw">match </span>p_value.typed {
             value <span class="kw">if </span>value.is_null() =&gt; PrismaValue::Null,
-            Value::Enum(<span class="prelude-val">Some</span>(cow), <span class="kw">_</span>) =&gt; PrismaValue::Enum(cow.into_owned()),
-            Value::Text(<span class="prelude-val">Some</span>(cow)) =&gt; PrismaValue::Enum(cow.into_owned()),
+            ValueType::Enum(<span class="prelude-val">Some</span>(cow), <span class="kw">_</span>) =&gt; PrismaValue::Enum(cow.into_owned()),
+            ValueType::Text(<span class="prelude-val">Some</span>(cow)) =&gt; PrismaValue::Enum(cow.into_owned()),
             <span class="kw">_ </span>=&gt; <span class="kw">return </span><span class="prelude-val">Err</span>(create_error(<span class="kw-2">&amp;</span>p_value)),
         },
 
-        TypeIdentifier::Json =&gt; <span class="kw">match </span>p_value {
+        TypeIdentifier::Json =&gt; <span class="kw">match </span>p_value.typed {
             value <span class="kw">if </span>value.is_null() =&gt; PrismaValue::Null,
-            Value::Text(<span class="prelude-val">Some</span>(json)) =&gt; PrismaValue::Json(json.into()),
-            Value::Json(<span class="prelude-val">Some</span>(json)) =&gt; PrismaValue::Json(json.to_string()),
+            ValueType::Text(<span class="prelude-val">Some</span>(json)) =&gt; PrismaValue::Json(json.into()),
+            ValueType::Json(<span class="prelude-val">Some</span>(json)) =&gt; PrismaValue::Json(json.to_string()),
             <span class="kw">_ </span>=&gt; <span class="kw">return </span><span class="prelude-val">Err</span>(create_error(<span class="kw-2">&amp;</span>p_value)),
         },
-        TypeIdentifier::UUID =&gt; <span class="kw">match </span>p_value {
+        TypeIdentifier::UUID =&gt; <span class="kw">match </span>p_value.typed {
             value <span class="kw">if </span>value.is_null() =&gt; PrismaValue::Null,
-            Value::Text(<span class="prelude-val">Some</span>(uuid)) =&gt; PrismaValue::Uuid(Uuid::parse_str(<span class="kw-2">&amp;</span>uuid)<span class="question-mark">?</span>),
-            Value::Uuid(<span class="prelude-val">Some</span>(uuid)) =&gt; PrismaValue::Uuid(uuid),
+            ValueType::Text(<span class="prelude-val">Some</span>(uuid)) =&gt; PrismaValue::Uuid(Uuid::parse_str(<span class="kw-2">&amp;</span>uuid)<span class="question-mark">?</span>),
+            ValueType::Uuid(<span class="prelude-val">Some</span>(uuid)) =&gt; PrismaValue::Uuid(uuid),
             <span class="kw">_ </span>=&gt; <span class="kw">return </span><span class="prelude-val">Err</span>(create_error(<span class="kw-2">&amp;</span>p_value)),
         },
-        TypeIdentifier::DateTime =&gt; <span class="kw">match </span>p_value {
+        TypeIdentifier::DateTime =&gt; <span class="kw">match </span>p_value.typed {
             value <span class="kw">if </span>value.is_null() =&gt; PrismaValue::Null,
             value <span class="kw">if </span>value.is_integer() =&gt; {
                 <span class="kw">let </span>ts = value.as_integer().unwrap();
@@ -582,47 +582,47 @@
 
                 PrismaValue::DateTime(datetime.into())
             }
-            Value::DateTime(<span class="prelude-val">Some</span>(dt)) =&gt; PrismaValue::DateTime(dt.into()),
-            Value::Text(<span class="prelude-val">Some</span>(<span class="kw-2">ref </span>dt_string)) =&gt; {
+            ValueType::DateTime(<span class="prelude-val">Some</span>(dt)) =&gt; PrismaValue::DateTime(dt.into()),
+            ValueType::Text(<span class="prelude-val">Some</span>(<span class="kw-2">ref </span>dt_string)) =&gt; {
                 <span class="kw">let </span>dt = DateTime::parse_from_rfc3339(dt_string)
                     .or_else(|<span class="kw">_</span>| DateTime::parse_from_rfc2822(dt_string))
                     .map_err(|<span class="kw">_</span>| create_error(<span class="kw-2">&amp;</span>p_value))<span class="question-mark">?</span>;
 
                 PrismaValue::DateTime(dt.with_timezone(<span class="kw-2">&amp;</span>Utc).into())
             }
-            Value::Date(<span class="prelude-val">Some</span>(d)) =&gt; {
+            ValueType::Date(<span class="prelude-val">Some</span>(d)) =&gt; {
                 <span class="kw">let </span>dt = DateTime::&lt;Utc&gt;::from_utc(d.and_hms_opt(<span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>).unwrap(), Utc);
                 PrismaValue::DateTime(dt.into())
             }
-            Value::Time(<span class="prelude-val">Some</span>(t)) =&gt; {
+            ValueType::Time(<span class="prelude-val">Some</span>(t)) =&gt; {
                 <span class="kw">let </span>d = NaiveDate::from_ymd_opt(<span class="number">1970</span>, <span class="number">1</span>, <span class="number">1</span>).unwrap();
                 <span class="kw">let </span>dt = DateTime::&lt;Utc&gt;::from_utc(d.and_time(t), Utc);
                 PrismaValue::DateTime(dt.into())
             }
             <span class="kw">_ </span>=&gt; <span class="kw">return </span><span class="prelude-val">Err</span>(create_error(<span class="kw-2">&amp;</span>p_value)),
         },
-        TypeIdentifier::Float | TypeIdentifier::Decimal =&gt; <span class="kw">match </span>p_value {
+        TypeIdentifier::Float | TypeIdentifier::Decimal =&gt; <span class="kw">match </span>p_value.typed {
             value <span class="kw">if </span>value.is_null() =&gt; PrismaValue::Null,
-            Value::Numeric(<span class="prelude-val">Some</span>(f)) =&gt; PrismaValue::Float(f.normalized()),
-            Value::Double(<span class="prelude-val">Some</span>(f)) =&gt; <span class="kw">match </span>f {
+            ValueType::Numeric(<span class="prelude-val">Some</span>(f)) =&gt; PrismaValue::Float(f.normalized()),
+            ValueType::Double(<span class="prelude-val">Some</span>(f)) =&gt; <span class="kw">match </span>f {
                 f <span class="kw">if </span>f.is_nan() =&gt; <span class="kw">return </span><span class="prelude-val">Err</span>(create_error(<span class="kw-2">&amp;</span>p_value)),
                 f <span class="kw">if </span>f.is_infinite() =&gt; <span class="kw">return </span><span class="prelude-val">Err</span>(create_error(<span class="kw-2">&amp;</span>p_value)),
                 <span class="kw">_ </span>=&gt; PrismaValue::Float(BigDecimal::from_f64(f).unwrap().normalized()),
             },
-            Value::Float(<span class="prelude-val">Some</span>(f)) =&gt; <span class="kw">match </span>f {
+            ValueType::Float(<span class="prelude-val">Some</span>(f)) =&gt; <span class="kw">match </span>f {
                 f <span class="kw">if </span>f.is_nan() =&gt; <span class="kw">return </span><span class="prelude-val">Err</span>(create_error(<span class="kw-2">&amp;</span>p_value)),
                 f <span class="kw">if </span>f.is_infinite() =&gt; <span class="kw">return </span><span class="prelude-val">Err</span>(create_error(<span class="kw-2">&amp;</span>p_value)),
                 <span class="kw">_ </span>=&gt; PrismaValue::Float(BigDecimal::from_f32(f).unwrap().normalized()),
             },
-            Value::Int32(<span class="prelude-val">Some</span>(i)) =&gt; <span class="kw">match </span>BigDecimal::from_i32(i) {
+            ValueType::Int32(<span class="prelude-val">Some</span>(i)) =&gt; <span class="kw">match </span>BigDecimal::from_i32(i) {
                 <span class="prelude-val">Some</span>(dec) =&gt; PrismaValue::Float(dec),
                 <span class="prelude-val">None </span>=&gt; <span class="kw">return </span><span class="prelude-val">Err</span>(create_error(<span class="kw-2">&amp;</span>p_value)),
             },
-            Value::Int64(<span class="prelude-val">Some</span>(i)) =&gt; <span class="kw">match </span>BigDecimal::from_i64(i) {
+            ValueType::Int64(<span class="prelude-val">Some</span>(i)) =&gt; <span class="kw">match </span>BigDecimal::from_i64(i) {
                 <span class="prelude-val">Some</span>(dec) =&gt; PrismaValue::Float(dec),
                 <span class="prelude-val">None </span>=&gt; <span class="kw">return </span><span class="prelude-val">Err</span>(create_error(<span class="kw-2">&amp;</span>p_value)),
             },
-            Value::Text(<span class="kw">_</span>) | Value::Bytes(<span class="kw">_</span>) =&gt; {
+            ValueType::Text(<span class="kw">_</span>) | ValueType::Bytes(<span class="kw">_</span>) =&gt; {
                 <span class="kw">let </span>dec: BigDecimal = p_value
                     .as_str()
                     .expect(<span class="string">&quot;text/bytes as str&quot;</span>)
@@ -633,61 +633,61 @@
             }
             <span class="kw">_ </span>=&gt; <span class="kw">return </span><span class="prelude-val">Err</span>(create_error(<span class="kw-2">&amp;</span>p_value)),
         },
-        TypeIdentifier::Int =&gt; <span class="kw">match </span>p_value {
+        TypeIdentifier::Int =&gt; <span class="kw">match </span>p_value.typed {
             value <span class="kw">if </span>value.is_null() =&gt; PrismaValue::Null,
-            Value::Int32(<span class="prelude-val">Some</span>(i)) =&gt; PrismaValue::Int(i <span class="kw">as </span>i64),
-            Value::Int64(<span class="prelude-val">Some</span>(i)) =&gt; PrismaValue::Int(i),
-            Value::Bytes(<span class="prelude-val">Some</span>(bytes)) =&gt; PrismaValue::Int(interpret_bytes_as_i64(<span class="kw-2">&amp;</span>bytes)),
-            Value::Text(<span class="prelude-val">Some</span>(<span class="kw-2">ref </span>txt)) =&gt; {
+            ValueType::Int32(<span class="prelude-val">Some</span>(i)) =&gt; PrismaValue::Int(i <span class="kw">as </span>i64),
+            ValueType::Int64(<span class="prelude-val">Some</span>(i)) =&gt; PrismaValue::Int(i),
+            ValueType::Bytes(<span class="prelude-val">Some</span>(bytes)) =&gt; PrismaValue::Int(interpret_bytes_as_i64(<span class="kw-2">&amp;</span>bytes)),
+            ValueType::Text(<span class="prelude-val">Some</span>(<span class="kw-2">ref </span>txt)) =&gt; {
                 PrismaValue::Int(i64::from_str(txt.trim_start_matches(<span class="string">&#39;\0&#39;</span>)).map_err(|<span class="kw">_</span>| create_error(<span class="kw-2">&amp;</span>p_value))<span class="question-mark">?</span>)
             }
-            Value::Float(<span class="prelude-val">Some</span>(f)) =&gt; {
+            ValueType::Float(<span class="prelude-val">Some</span>(f)) =&gt; {
                 sanitize_f32(f, <span class="string">&quot;Int&quot;</span>)<span class="question-mark">?</span>;
 
                 PrismaValue::Int(big_decimal_to_i64(BigDecimal::from_f32(f).unwrap(), <span class="string">&quot;Int&quot;</span>)<span class="question-mark">?</span>)
             }
-            Value::Double(<span class="prelude-val">Some</span>(f)) =&gt; {
+            ValueType::Double(<span class="prelude-val">Some</span>(f)) =&gt; {
                 sanitize_f64(f, <span class="string">&quot;Int&quot;</span>)<span class="question-mark">?</span>;
 
                 PrismaValue::Int(big_decimal_to_i64(BigDecimal::from_f64(f).unwrap(), <span class="string">&quot;Int&quot;</span>)<span class="question-mark">?</span>)
             }
-            Value::Numeric(<span class="prelude-val">Some</span>(dec)) =&gt; PrismaValue::Int(big_decimal_to_i64(dec, <span class="string">&quot;Int&quot;</span>)<span class="question-mark">?</span>),
-            Value::Boolean(<span class="prelude-val">Some</span>(bool)) =&gt; PrismaValue::Int(bool <span class="kw">as </span>i64),
+            ValueType::Numeric(<span class="prelude-val">Some</span>(dec)) =&gt; PrismaValue::Int(big_decimal_to_i64(dec, <span class="string">&quot;Int&quot;</span>)<span class="question-mark">?</span>),
+            ValueType::Boolean(<span class="prelude-val">Some</span>(bool)) =&gt; PrismaValue::Int(bool <span class="kw">as </span>i64),
             other =&gt; to_prisma_value(other)<span class="question-mark">?</span>,
         },
-        TypeIdentifier::BigInt =&gt; <span class="kw">match </span>p_value {
+        TypeIdentifier::BigInt =&gt; <span class="kw">match </span>p_value.typed {
             value <span class="kw">if </span>value.is_null() =&gt; PrismaValue::Null,
-            Value::Int32(<span class="prelude-val">Some</span>(i)) =&gt; PrismaValue::BigInt(i <span class="kw">as </span>i64),
-            Value::Int64(<span class="prelude-val">Some</span>(i)) =&gt; PrismaValue::BigInt(i),
-            Value::Bytes(<span class="prelude-val">Some</span>(bytes)) =&gt; PrismaValue::BigInt(interpret_bytes_as_i64(<span class="kw-2">&amp;</span>bytes)),
-            Value::Text(<span class="prelude-val">Some</span>(<span class="kw-2">ref </span>txt)) =&gt; {
+            ValueType::Int32(<span class="prelude-val">Some</span>(i)) =&gt; PrismaValue::BigInt(i <span class="kw">as </span>i64),
+            ValueType::Int64(<span class="prelude-val">Some</span>(i)) =&gt; PrismaValue::BigInt(i),
+            ValueType::Bytes(<span class="prelude-val">Some</span>(bytes)) =&gt; PrismaValue::BigInt(interpret_bytes_as_i64(<span class="kw-2">&amp;</span>bytes)),
+            ValueType::Text(<span class="prelude-val">Some</span>(<span class="kw-2">ref </span>txt)) =&gt; {
                 PrismaValue::BigInt(i64::from_str(txt.trim_start_matches(<span class="string">&#39;\0&#39;</span>)).map_err(|<span class="kw">_</span>| create_error(<span class="kw-2">&amp;</span>p_value))<span class="question-mark">?</span>)
             }
-            Value::Float(<span class="prelude-val">Some</span>(f)) =&gt; {
+            ValueType::Float(<span class="prelude-val">Some</span>(f)) =&gt; {
                 sanitize_f32(f, <span class="string">&quot;BigInt&quot;</span>)<span class="question-mark">?</span>;
 
                 PrismaValue::BigInt(big_decimal_to_i64(BigDecimal::from_f32(f).unwrap(), <span class="string">&quot;BigInt&quot;</span>)<span class="question-mark">?</span>)
             }
-            Value::Double(<span class="prelude-val">Some</span>(f)) =&gt; {
+            ValueType::Double(<span class="prelude-val">Some</span>(f)) =&gt; {
                 sanitize_f64(f, <span class="string">&quot;BigInt&quot;</span>)<span class="question-mark">?</span>;
 
                 PrismaValue::BigInt(big_decimal_to_i64(BigDecimal::from_f64(f).unwrap(), <span class="string">&quot;BigInt&quot;</span>)<span class="question-mark">?</span>)
             }
-            Value::Numeric(<span class="prelude-val">Some</span>(dec)) =&gt; PrismaValue::BigInt(big_decimal_to_i64(dec, <span class="string">&quot;BigInt&quot;</span>)<span class="question-mark">?</span>),
-            Value::Boolean(<span class="prelude-val">Some</span>(bool)) =&gt; PrismaValue::BigInt(bool <span class="kw">as </span>i64),
+            ValueType::Numeric(<span class="prelude-val">Some</span>(dec)) =&gt; PrismaValue::BigInt(big_decimal_to_i64(dec, <span class="string">&quot;BigInt&quot;</span>)<span class="question-mark">?</span>),
+            ValueType::Boolean(<span class="prelude-val">Some</span>(bool)) =&gt; PrismaValue::BigInt(bool <span class="kw">as </span>i64),
             other =&gt; to_prisma_value(other)<span class="question-mark">?</span>,
         },
-        TypeIdentifier::String =&gt; <span class="kw">match </span>p_value {
+        TypeIdentifier::String =&gt; <span class="kw">match </span>p_value.typed {
             value <span class="kw">if </span>value.is_null() =&gt; PrismaValue::Null,
-            Value::Uuid(<span class="prelude-val">Some</span>(uuid)) =&gt; PrismaValue::String(uuid.to_string()),
-            Value::Json(<span class="prelude-val">Some</span>(<span class="kw-2">ref </span>json_value)) =&gt; {
+            ValueType::Uuid(<span class="prelude-val">Some</span>(uuid)) =&gt; PrismaValue::String(uuid.to_string()),
+            ValueType::Json(<span class="prelude-val">Some</span>(<span class="kw-2">ref </span>json_value)) =&gt; {
                 PrismaValue::String(serde_json::to_string(json_value).map_err(|<span class="kw">_</span>| create_error(<span class="kw-2">&amp;</span>p_value))<span class="question-mark">?</span>)
             }
             other =&gt; to_prisma_value(other)<span class="question-mark">?</span>,
         },
-        TypeIdentifier::Bytes =&gt; <span class="kw">match </span>p_value {
+        TypeIdentifier::Bytes =&gt; <span class="kw">match </span>p_value.typed {
             value <span class="kw">if </span>value.is_null() =&gt; PrismaValue::Null,
-            Value::Bytes(<span class="prelude-val">Some</span>(bytes)) =&gt; PrismaValue::Bytes(bytes.into()),
+            ValueType::Bytes(<span class="prelude-val">Some</span>(bytes)) =&gt; PrismaValue::Bytes(bytes.into()),
             <span class="kw">_ </span>=&gt; <span class="kw">return </span><span class="prelude-val">Err</span>(create_error(<span class="kw-2">&amp;</span>p_value)),
         },
         TypeIdentifier::Unsupported =&gt; <span class="macro">unreachable!</span>(<span class="string">&quot;No unsupported field should reach that path&quot;</span>),

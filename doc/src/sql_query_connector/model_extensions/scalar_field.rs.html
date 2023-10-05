@@ -138,7 +138,7 @@
 <span class="kw">use </span>prisma_models::{ScalarField, TypeIdentifier};
 <span class="kw">use </span>prisma_value::PrismaValue;
 <span class="kw">use </span>quaint::{
-    ast::{EnumName, Value},
+    ast::{EnumName, Value, ValueType},
     prelude::{EnumVariant, TypeDataLength, TypeFamily},
 };
 
@@ -162,7 +162,7 @@
                     .map(ToOwned::to_owned)
                     .or(<span class="prelude-val">Some</span>(ctx.schema_name().to_owned()));
 
-                Value::enum_variant_with_name(e, enum_name, schema_name)
+                Value::enum_variant_with_name(e, EnumName::new(enum_name, schema_name))
             }
             (PrismaValue::List(vals), TypeIdentifier::Enum(enum_id)) =&gt; {
                 <span class="kw">let </span>enum_walker = <span class="self">self</span>.dm.clone().zip(enum_id);
@@ -178,21 +178,21 @@
                     .map(ToOwned::to_owned)
                     .or(<span class="prelude-val">Some</span>(ctx.schema_name().to_owned()));
 
-                Value::EnumArray(<span class="prelude-val">Some</span>(variants), <span class="prelude-val">Some</span>(EnumName::new(enum_name, schema_name)))
+                Value::enum_array_with_name(variants, EnumName::new(enum_name, schema_name))
             }
             (PrismaValue::Enum(e), <span class="kw">_</span>) =&gt; e.into(),
             (PrismaValue::Int(i), <span class="kw">_</span>) =&gt; i.into(),
             (PrismaValue::BigInt(i), <span class="kw">_</span>) =&gt; i.into(),
             (PrismaValue::Uuid(u), <span class="kw">_</span>) =&gt; u.to_string().into(),
-            (PrismaValue::List(l), <span class="kw">_</span>) =&gt; Value::Array(<span class="prelude-val">Some</span>(l.into_iter().map(|x| <span class="self">self</span>.value(x, ctx)).collect())),
-            (PrismaValue::Json(s), <span class="kw">_</span>) =&gt; Value::Json(<span class="prelude-val">Some</span>(serde_json::from_str::&lt;serde_json::Value&gt;(<span class="kw-2">&amp;</span>s).unwrap())),
-            (PrismaValue::Bytes(b), <span class="kw">_</span>) =&gt; Value::Bytes(<span class="prelude-val">Some</span>(b.into())),
+            (PrismaValue::List(l), <span class="kw">_</span>) =&gt; Value::array(l.into_iter().map(|x| <span class="self">self</span>.value(x, ctx))),
+            (PrismaValue::Json(s), <span class="kw">_</span>) =&gt; Value::json(serde_json::from_str::&lt;serde_json::Value&gt;(<span class="kw-2">&amp;</span>s).unwrap()),
+            (PrismaValue::Bytes(b), <span class="kw">_</span>) =&gt; Value::bytes(b),
             (PrismaValue::Object(<span class="kw">_</span>), <span class="kw">_</span>) =&gt; <span class="macro">unimplemented!</span>(),
             (PrismaValue::Null, ident) =&gt; <span class="kw">match </span>ident {
-                TypeIdentifier::String =&gt; Value::Text(<span class="prelude-val">None</span>),
-                TypeIdentifier::Float =&gt; Value::Numeric(<span class="prelude-val">None</span>),
-                TypeIdentifier::Decimal =&gt; Value::Numeric(<span class="prelude-val">None</span>),
-                TypeIdentifier::Boolean =&gt; Value::Boolean(<span class="prelude-val">None</span>),
+                TypeIdentifier::String =&gt; Value::null_text(),
+                TypeIdentifier::Float =&gt; Value::null_numeric(),
+                TypeIdentifier::Decimal =&gt; Value::null_numeric(),
+                TypeIdentifier::Boolean =&gt; Value::null_boolean(),
                 TypeIdentifier::Enum(enum_id) =&gt; {
                     <span class="kw">let </span>enum_walker = <span class="self">self</span>.dm.clone().zip(enum_id);
                     <span class="kw">let </span>enum_name = enum_walker.db_name().to_owned();
@@ -201,14 +201,14 @@
                         .map(ToOwned::to_owned)
                         .or(<span class="prelude-val">Some</span>(ctx.schema_name().to_owned()));
 
-                    Value::Enum(<span class="prelude-val">None</span>, <span class="prelude-val">Some</span>(EnumName::new(enum_name, schema_name)))
+                    ValueType::Enum(<span class="prelude-val">None</span>, <span class="prelude-val">Some</span>(EnumName::new(enum_name, schema_name))).into_value()
                 }
-                TypeIdentifier::Json =&gt; Value::Json(<span class="prelude-val">None</span>),
-                TypeIdentifier::DateTime =&gt; Value::DateTime(<span class="prelude-val">None</span>),
-                TypeIdentifier::UUID =&gt; Value::Uuid(<span class="prelude-val">None</span>),
-                TypeIdentifier::Int =&gt; Value::Int32(<span class="prelude-val">None</span>),
-                TypeIdentifier::BigInt =&gt; Value::Int64(<span class="prelude-val">None</span>),
-                TypeIdentifier::Bytes =&gt; Value::Bytes(<span class="prelude-val">None</span>),
+                TypeIdentifier::Json =&gt; Value::null_json(),
+                TypeIdentifier::DateTime =&gt; Value::null_datetime(),
+                TypeIdentifier::UUID =&gt; Value::null_uuid(),
+                TypeIdentifier::Int =&gt; Value::null_int32(),
+                TypeIdentifier::BigInt =&gt; Value::null_int64(),
+                TypeIdentifier::Bytes =&gt; Value::null_bytes(),
                 TypeIdentifier::Unsupported =&gt; <span class="macro">unreachable!</span>(<span class="string">&quot;No unsupported field should reach that path&quot;</span>),
             },
         }
@@ -252,10 +252,10 @@
         PrismaValue::Int(i) =&gt; i.into(),
         PrismaValue::BigInt(i) =&gt; i.into(),
         PrismaValue::Uuid(u) =&gt; u.to_string().into(),
-        PrismaValue::List(l) =&gt; Value::Array(<span class="prelude-val">Some</span>(l.into_iter().map(convert_lossy).collect())),
-        PrismaValue::Json(s) =&gt; Value::Json(serde_json::from_str(<span class="kw-2">&amp;</span>s).unwrap()),
-        PrismaValue::Bytes(b) =&gt; Value::Bytes(<span class="prelude-val">Some</span>(b.into())),
-        PrismaValue::Null =&gt; Value::Int32(<span class="prelude-val">None</span>), <span class="comment">// Can&#39;t tell which type the null is supposed to be.
+        PrismaValue::List(l) =&gt; Value::array(l.into_iter().map(convert_lossy)),
+        PrismaValue::Json(s) =&gt; Value::json(serde_json::from_str(<span class="kw-2">&amp;</span>s).unwrap()),
+        PrismaValue::Bytes(b) =&gt; Value::bytes(b),
+        PrismaValue::Null =&gt; Value::null_int32(), <span class="comment">// Can&#39;t tell which type the null is supposed to be.
         </span>PrismaValue::Object(<span class="kw">_</span>) =&gt; <span class="macro">unimplemented!</span>(),
     }
 }

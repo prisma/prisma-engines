@@ -954,11 +954,19 @@
 <a href="#954" id="954">954</a>
 <a href="#955" id="955">955</a>
 <a href="#956" id="956">956</a>
+<a href="#957" id="957">957</a>
+<a href="#958" id="958">958</a>
+<a href="#959" id="959">959</a>
+<a href="#960" id="960">960</a>
+<a href="#961" id="961">961</a>
+<a href="#962" id="962">962</a>
+<a href="#963" id="963">963</a>
+<a href="#964" id="964">964</a>
 </pre></div><pre class="rust"><code><span class="attr">#[cfg(feature = <span class="string">&quot;bigdecimal&quot;</span>)]
 </span><span class="kw">mod </span>decimal;
 
 <span class="kw">use crate</span>::{
-    ast::Value,
+    ast::{Value, ValueType},
     connector::queryable::{GetRow, ToColumnNames},
     error::{Error, ErrorKind},
 };
@@ -994,27 +1002,27 @@
                 <span class="kw">return </span>PostgresType::UNKNOWN;
             }
 
-            <span class="kw">match </span>p {
-                Value::Int32(<span class="kw">_</span>) =&gt; PostgresType::INT4,
-                Value::Int64(<span class="kw">_</span>) =&gt; PostgresType::INT8,
-                Value::Float(<span class="kw">_</span>) =&gt; PostgresType::FLOAT4,
-                Value::Double(<span class="kw">_</span>) =&gt; PostgresType::FLOAT8,
-                Value::Text(<span class="kw">_</span>) =&gt; PostgresType::TEXT,
+            <span class="kw">match </span><span class="kw-2">&amp;</span>p.typed {
+                ValueType::Int32(<span class="kw">_</span>) =&gt; PostgresType::INT4,
+                ValueType::Int64(<span class="kw">_</span>) =&gt; PostgresType::INT8,
+                ValueType::Float(<span class="kw">_</span>) =&gt; PostgresType::FLOAT4,
+                ValueType::Double(<span class="kw">_</span>) =&gt; PostgresType::FLOAT8,
+                ValueType::Text(<span class="kw">_</span>) =&gt; PostgresType::TEXT,
                 <span class="comment">// Enums are user-defined types, we can&#39;t statically infer them, so we let PG infer it
-                </span>Value::Enum(<span class="kw">_</span>, <span class="kw">_</span>) | Value::EnumArray(<span class="kw">_</span>, <span class="kw">_</span>) =&gt; PostgresType::UNKNOWN,
-                Value::Bytes(<span class="kw">_</span>) =&gt; PostgresType::BYTEA,
-                Value::Boolean(<span class="kw">_</span>) =&gt; PostgresType::BOOL,
-                Value::Char(<span class="kw">_</span>) =&gt; PostgresType::CHAR,
+                </span>ValueType::Enum(<span class="kw">_</span>, <span class="kw">_</span>) | ValueType::EnumArray(<span class="kw">_</span>, <span class="kw">_</span>) =&gt; PostgresType::UNKNOWN,
+                ValueType::Bytes(<span class="kw">_</span>) =&gt; PostgresType::BYTEA,
+                ValueType::Boolean(<span class="kw">_</span>) =&gt; PostgresType::BOOL,
+                ValueType::Char(<span class="kw">_</span>) =&gt; PostgresType::CHAR,
                 <span class="attr">#[cfg(feature = <span class="string">&quot;bigdecimal&quot;</span>)]
-                </span>Value::Numeric(<span class="kw">_</span>) =&gt; PostgresType::NUMERIC,
-                Value::Json(<span class="kw">_</span>) =&gt; PostgresType::JSONB,
-                Value::Xml(<span class="kw">_</span>) =&gt; PostgresType::XML,
+                </span>ValueType::Numeric(<span class="kw">_</span>) =&gt; PostgresType::NUMERIC,
+                ValueType::Json(<span class="kw">_</span>) =&gt; PostgresType::JSONB,
+                ValueType::Xml(<span class="kw">_</span>) =&gt; PostgresType::XML,
                 <span class="attr">#[cfg(feature = <span class="string">&quot;uuid&quot;</span>)]
-                </span>Value::Uuid(<span class="kw">_</span>) =&gt; PostgresType::UUID,
-                Value::DateTime(<span class="kw">_</span>) =&gt; PostgresType::TIMESTAMPTZ,
-                Value::Date(<span class="kw">_</span>) =&gt; PostgresType::TIMESTAMP,
-                Value::Time(<span class="kw">_</span>) =&gt; PostgresType::TIME,
-                Value::Array(<span class="kw-2">ref </span>arr) =&gt; {
+                </span>ValueType::Uuid(<span class="kw">_</span>) =&gt; PostgresType::UUID,
+                ValueType::DateTime(<span class="kw">_</span>) =&gt; PostgresType::TIMESTAMPTZ,
+                ValueType::Date(<span class="kw">_</span>) =&gt; PostgresType::TIMESTAMP,
+                ValueType::Time(<span class="kw">_</span>) =&gt; PostgresType::TIME,
+                ValueType::Array(<span class="kw-2">ref </span>arr) =&gt; {
                     <span class="kw">let </span>arr = arr.as_ref().unwrap();
 
                     <span class="comment">// If the array is empty, we can&#39;t infer the type so we let PG infer it
@@ -1027,33 +1035,33 @@
                     <span class="comment">// If the array does not contain the same types of values, we let PG infer the type
                     </span><span class="kw">if </span>arr
                         .iter()
-                        .any(|val| std::mem::discriminant(first) != std::mem::discriminant(val))
+                        .any(|val| std::mem::discriminant(<span class="kw-2">&amp;</span>first.typed) != std::mem::discriminant(<span class="kw-2">&amp;</span>val.typed))
                     {
                         <span class="kw">return </span>PostgresType::UNKNOWN;
                     }
 
-                    <span class="kw">match </span>first {
-                        Value::Int32(<span class="kw">_</span>) =&gt; PostgresType::INT4_ARRAY,
-                        Value::Int64(<span class="kw">_</span>) =&gt; PostgresType::INT8_ARRAY,
-                        Value::Float(<span class="kw">_</span>) =&gt; PostgresType::FLOAT4_ARRAY,
-                        Value::Double(<span class="kw">_</span>) =&gt; PostgresType::FLOAT8_ARRAY,
-                        Value::Text(<span class="kw">_</span>) =&gt; PostgresType::TEXT_ARRAY,
+                    <span class="kw">match </span>first.typed {
+                        ValueType::Int32(<span class="kw">_</span>) =&gt; PostgresType::INT4_ARRAY,
+                        ValueType::Int64(<span class="kw">_</span>) =&gt; PostgresType::INT8_ARRAY,
+                        ValueType::Float(<span class="kw">_</span>) =&gt; PostgresType::FLOAT4_ARRAY,
+                        ValueType::Double(<span class="kw">_</span>) =&gt; PostgresType::FLOAT8_ARRAY,
+                        ValueType::Text(<span class="kw">_</span>) =&gt; PostgresType::TEXT_ARRAY,
                         <span class="comment">// Enums are special types, we can&#39;t statically infer them, so we let PG infer it
-                        </span>Value::Enum(<span class="kw">_</span>, <span class="kw">_</span>) | Value::EnumArray(<span class="kw">_</span>, <span class="kw">_</span>) =&gt; PostgresType::UNKNOWN,
-                        Value::Bytes(<span class="kw">_</span>) =&gt; PostgresType::BYTEA_ARRAY,
-                        Value::Boolean(<span class="kw">_</span>) =&gt; PostgresType::BOOL_ARRAY,
-                        Value::Char(<span class="kw">_</span>) =&gt; PostgresType::CHAR_ARRAY,
+                        </span>ValueType::Enum(<span class="kw">_</span>, <span class="kw">_</span>) | ValueType::EnumArray(<span class="kw">_</span>, <span class="kw">_</span>) =&gt; PostgresType::UNKNOWN,
+                        ValueType::Bytes(<span class="kw">_</span>) =&gt; PostgresType::BYTEA_ARRAY,
+                        ValueType::Boolean(<span class="kw">_</span>) =&gt; PostgresType::BOOL_ARRAY,
+                        ValueType::Char(<span class="kw">_</span>) =&gt; PostgresType::CHAR_ARRAY,
                         <span class="attr">#[cfg(feature = <span class="string">&quot;bigdecimal&quot;</span>)]
-                        </span>Value::Numeric(<span class="kw">_</span>) =&gt; PostgresType::NUMERIC_ARRAY,
-                        Value::Json(<span class="kw">_</span>) =&gt; PostgresType::JSONB_ARRAY,
-                        Value::Xml(<span class="kw">_</span>) =&gt; PostgresType::XML_ARRAY,
+                        </span>ValueType::Numeric(<span class="kw">_</span>) =&gt; PostgresType::NUMERIC_ARRAY,
+                        ValueType::Json(<span class="kw">_</span>) =&gt; PostgresType::JSONB_ARRAY,
+                        ValueType::Xml(<span class="kw">_</span>) =&gt; PostgresType::XML_ARRAY,
                         <span class="attr">#[cfg(feature = <span class="string">&quot;uuid&quot;</span>)]
-                        </span>Value::Uuid(<span class="kw">_</span>) =&gt; PostgresType::UUID_ARRAY,
-                        Value::DateTime(<span class="kw">_</span>) =&gt; PostgresType::TIMESTAMPTZ_ARRAY,
-                        Value::Date(<span class="kw">_</span>) =&gt; PostgresType::TIMESTAMP_ARRAY,
-                        Value::Time(<span class="kw">_</span>) =&gt; PostgresType::TIME_ARRAY,
+                        </span>ValueType::Uuid(<span class="kw">_</span>) =&gt; PostgresType::UUID_ARRAY,
+                        ValueType::DateTime(<span class="kw">_</span>) =&gt; PostgresType::TIMESTAMPTZ_ARRAY,
+                        ValueType::Date(<span class="kw">_</span>) =&gt; PostgresType::TIMESTAMP_ARRAY,
+                        ValueType::Time(<span class="kw">_</span>) =&gt; PostgresType::TIME_ARRAY,
                         <span class="comment">// In the case of nested arrays, we let PG infer the type
-                        </span>Value::Array(<span class="kw">_</span>) =&gt; PostgresType::UNKNOWN,
+                        </span>ValueType::Array(<span class="kw">_</span>) =&gt; PostgresType::UNKNOWN,
                     }
                 }
             }
@@ -1127,63 +1135,63 @@
     <span class="kw">fn </span>get_result_row(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw">crate</span>::Result&lt;Vec&lt;Value&lt;<span class="lifetime">&#39;static</span>&gt;&gt;&gt; {
         <span class="kw">fn </span>convert(row: <span class="kw-2">&amp;</span>PostgresRow, i: usize) -&gt; <span class="kw">crate</span>::Result&lt;Value&lt;<span class="lifetime">&#39;static</span>&gt;&gt; {
             <span class="kw">let </span>result = <span class="kw">match </span><span class="kw-2">*</span>row.columns()[i].type_() {
-                PostgresType::BOOL =&gt; Value::Boolean(row.try_get(i)<span class="question-mark">?</span>),
+                PostgresType::BOOL =&gt; ValueType::Boolean(row.try_get(i)<span class="question-mark">?</span>).into_value(),
                 PostgresType::INT2 =&gt; <span class="kw">match </span>row.try_get(i)<span class="question-mark">? </span>{
                     <span class="prelude-val">Some</span>(val) =&gt; {
                         <span class="kw">let </span>val: i16 = val;
                         Value::int32(val)
                     }
-                    <span class="prelude-val">None </span>=&gt; Value::Int32(<span class="prelude-val">None</span>),
+                    <span class="prelude-val">None </span>=&gt; Value::null_int32(),
                 },
                 PostgresType::INT4 =&gt; <span class="kw">match </span>row.try_get(i)<span class="question-mark">? </span>{
                     <span class="prelude-val">Some</span>(val) =&gt; {
                         <span class="kw">let </span>val: i32 = val;
                         Value::int32(val)
                     }
-                    <span class="prelude-val">None </span>=&gt; Value::Int32(<span class="prelude-val">None</span>),
+                    <span class="prelude-val">None </span>=&gt; Value::null_int32(),
                 },
                 PostgresType::INT8 =&gt; <span class="kw">match </span>row.try_get(i)<span class="question-mark">? </span>{
                     <span class="prelude-val">Some</span>(val) =&gt; {
                         <span class="kw">let </span>val: i64 = val;
                         Value::int64(val)
                     }
-                    <span class="prelude-val">None </span>=&gt; Value::Int64(<span class="prelude-val">None</span>),
+                    <span class="prelude-val">None </span>=&gt; Value::null_int64(),
                 },
                 PostgresType::FLOAT4 =&gt; <span class="kw">match </span>row.try_get(i)<span class="question-mark">? </span>{
                     <span class="prelude-val">Some</span>(val) =&gt; {
                         <span class="kw">let </span>val: f32 = val;
                         Value::float(val)
                     }
-                    <span class="prelude-val">None </span>=&gt; Value::Float(<span class="prelude-val">None</span>),
+                    <span class="prelude-val">None </span>=&gt; Value::null_float(),
                 },
                 PostgresType::FLOAT8 =&gt; <span class="kw">match </span>row.try_get(i)<span class="question-mark">? </span>{
                     <span class="prelude-val">Some</span>(val) =&gt; {
                         <span class="kw">let </span>val: f64 = val;
                         Value::double(val)
                     }
-                    <span class="prelude-val">None </span>=&gt; Value::Double(<span class="prelude-val">None</span>),
+                    <span class="prelude-val">None </span>=&gt; Value::null_double(),
                 },
                 PostgresType::BYTEA =&gt; <span class="kw">match </span>row.try_get(i)<span class="question-mark">? </span>{
                     <span class="prelude-val">Some</span>(val) =&gt; {
                         <span class="kw">let </span>val: <span class="kw-2">&amp;</span>[u8] = val;
                         Value::bytes(val.to_owned())
                     }
-                    <span class="prelude-val">None </span>=&gt; Value::Bytes(<span class="prelude-val">None</span>),
+                    <span class="prelude-val">None </span>=&gt; Value::null_bytes(),
                 },
                 PostgresType::BYTEA_ARRAY =&gt; <span class="kw">match </span>row.try_get(i)<span class="question-mark">? </span>{
                     <span class="prelude-val">Some</span>(val) =&gt; {
                         <span class="kw">let </span>val: Vec&lt;<span class="prelude-ty">Option</span>&lt;Vec&lt;u8&gt;&gt;&gt; = val;
-                        <span class="kw">let </span>byteas = val.into_iter().map(|b| Value::Bytes(b.map(Into::into)));
+                        <span class="kw">let </span>byteas = val.into_iter().map(|b| ValueType::Bytes(b.map(Into::into)));
 
                         Value::array(byteas)
                     }
-                    <span class="prelude-val">None </span>=&gt; Value::Array(<span class="prelude-val">None</span>),
+                    <span class="prelude-val">None </span>=&gt; Value::null_array(),
                 },
                 <span class="attr">#[cfg(feature = <span class="string">&quot;bigdecimal&quot;</span>)]
                 </span>PostgresType::NUMERIC =&gt; {
                     <span class="kw">let </span>dw: <span class="prelude-ty">Option</span>&lt;DecimalWrapper&gt; = row.try_get(i)<span class="question-mark">?</span>;
 
-                    Value::Numeric(dw.map(|dw| dw.<span class="number">0</span>))
+                    ValueType::Numeric(dw.map(|dw| dw.<span class="number">0</span>)).into_value()
                 }
                 <span class="attr">#[cfg(feature = <span class="string">&quot;bigdecimal&quot;</span>)]
                 </span>PostgresType::MONEY =&gt; <span class="kw">match </span>row.try_get(i)<span class="question-mark">? </span>{
@@ -1191,7 +1199,7 @@
                         <span class="kw">let </span>val: NaiveMoney = val;
                         Value::numeric(val.<span class="number">0</span>)
                     }
-                    <span class="prelude-val">None </span>=&gt; Value::Numeric(<span class="prelude-val">None</span>),
+                    <span class="prelude-val">None </span>=&gt; Value::null_numeric(),
                 },
                 PostgresType::TIMESTAMP =&gt; <span class="kw">match </span>row.try_get(i)<span class="question-mark">? </span>{
                     <span class="prelude-val">Some</span>(val) =&gt; {
@@ -1199,29 +1207,29 @@
                         <span class="kw">let </span>dt = DateTime::&lt;Utc&gt;::from_utc(ts, Utc);
                         Value::datetime(dt)
                     }
-                    <span class="prelude-val">None </span>=&gt; Value::DateTime(<span class="prelude-val">None</span>),
+                    <span class="prelude-val">None </span>=&gt; Value::null_datetime(),
                 },
                 PostgresType::TIMESTAMPTZ =&gt; <span class="kw">match </span>row.try_get(i)<span class="question-mark">? </span>{
                     <span class="prelude-val">Some</span>(val) =&gt; {
                         <span class="kw">let </span>ts: DateTime&lt;Utc&gt; = val;
                         Value::datetime(ts)
                     }
-                    <span class="prelude-val">None </span>=&gt; Value::DateTime(<span class="prelude-val">None</span>),
+                    <span class="prelude-val">None </span>=&gt; Value::null_datetime(),
                 },
                 PostgresType::DATE =&gt; <span class="kw">match </span>row.try_get(i)<span class="question-mark">? </span>{
                     <span class="prelude-val">Some</span>(val) =&gt; Value::date(val),
-                    <span class="prelude-val">None </span>=&gt; Value::Date(<span class="prelude-val">None</span>),
+                    <span class="prelude-val">None </span>=&gt; Value::null_date(),
                 },
                 PostgresType::TIME =&gt; <span class="kw">match </span>row.try_get(i)<span class="question-mark">? </span>{
                     <span class="prelude-val">Some</span>(val) =&gt; Value::time(val),
-                    <span class="prelude-val">None </span>=&gt; Value::Time(<span class="prelude-val">None</span>),
+                    <span class="prelude-val">None </span>=&gt; Value::null_time(),
                 },
                 PostgresType::TIMETZ =&gt; <span class="kw">match </span>row.try_get(i)<span class="question-mark">? </span>{
                     <span class="prelude-val">Some</span>(val) =&gt; {
                         <span class="kw">let </span>time: TimeTz = val;
                         Value::time(time.<span class="number">0</span>)
                     }
-                    <span class="prelude-val">None </span>=&gt; Value::Time(<span class="prelude-val">None</span>),
+                    <span class="prelude-val">None </span>=&gt; Value::null_time(),
                 },
                 <span class="attr">#[cfg(feature = <span class="string">&quot;uuid&quot;</span>)]
                 </span>PostgresType::UUID =&gt; <span class="kw">match </span>row.try_get(i)<span class="question-mark">? </span>{
@@ -1229,72 +1237,72 @@
                         <span class="kw">let </span>val: Uuid = val;
                         Value::uuid(val)
                     }
-                    <span class="prelude-val">None </span>=&gt; Value::Uuid(<span class="prelude-val">None</span>),
+                    <span class="prelude-val">None </span>=&gt; ValueType::Uuid(<span class="prelude-val">None</span>).into_value(),
                 },
                 <span class="attr">#[cfg(feature = <span class="string">&quot;uuid&quot;</span>)]
                 </span>PostgresType::UUID_ARRAY =&gt; <span class="kw">match </span>row.try_get(i)<span class="question-mark">? </span>{
                     <span class="prelude-val">Some</span>(val) =&gt; {
                         <span class="kw">let </span>val: Vec&lt;<span class="prelude-ty">Option</span>&lt;Uuid&gt;&gt; = val;
-                        <span class="kw">let </span>val = val.into_iter().map(Value::Uuid);
+                        <span class="kw">let </span>val = val.into_iter().map(ValueType::Uuid);
 
                         Value::array(val)
                     }
-                    <span class="prelude-val">None </span>=&gt; Value::Array(<span class="prelude-val">None</span>),
+                    <span class="prelude-val">None </span>=&gt; Value::null_array(),
                 },
-                PostgresType::JSON | PostgresType::JSONB =&gt; Value::Json(row.try_get(i)<span class="question-mark">?</span>),
+                PostgresType::JSON | PostgresType::JSONB =&gt; ValueType::Json(row.try_get(i)<span class="question-mark">?</span>).into_value(),
                 PostgresType::INT2_ARRAY =&gt; <span class="kw">match </span>row.try_get(i)<span class="question-mark">? </span>{
                     <span class="prelude-val">Some</span>(val) =&gt; {
                         <span class="kw">let </span>val: Vec&lt;<span class="prelude-ty">Option</span>&lt;i16&gt;&gt; = val;
-                        <span class="kw">let </span>ints = val.into_iter().map(|i| Value::Int32(i.map(|i| i <span class="kw">as </span>i32)));
+                        <span class="kw">let </span>ints = val.into_iter().map(|i| ValueType::Int32(i.map(|i| i <span class="kw">as </span>i32)));
 
                         Value::array(ints)
                     }
-                    <span class="prelude-val">None </span>=&gt; Value::Array(<span class="prelude-val">None</span>),
+                    <span class="prelude-val">None </span>=&gt; Value::null_array(),
                 },
                 PostgresType::INT4_ARRAY =&gt; <span class="kw">match </span>row.try_get(i)<span class="question-mark">? </span>{
                     <span class="prelude-val">Some</span>(val) =&gt; {
                         <span class="kw">let </span>val: Vec&lt;<span class="prelude-ty">Option</span>&lt;i32&gt;&gt; = val;
-                        <span class="kw">let </span>ints = val.into_iter().map(Value::Int32);
+                        <span class="kw">let </span>ints = val.into_iter().map(ValueType::Int32);
 
                         Value::array(ints)
                     }
-                    <span class="prelude-val">None </span>=&gt; Value::Array(<span class="prelude-val">None</span>),
+                    <span class="prelude-val">None </span>=&gt; Value::null_array(),
                 },
                 PostgresType::INT8_ARRAY =&gt; <span class="kw">match </span>row.try_get(i)<span class="question-mark">? </span>{
                     <span class="prelude-val">Some</span>(val) =&gt; {
                         <span class="kw">let </span>val: Vec&lt;<span class="prelude-ty">Option</span>&lt;i64&gt;&gt; = val;
-                        <span class="kw">let </span>ints = val.into_iter().map(Value::Int64);
+                        <span class="kw">let </span>ints = val.into_iter().map(ValueType::Int64);
 
                         Value::array(ints)
                     }
-                    <span class="prelude-val">None </span>=&gt; Value::Array(<span class="prelude-val">None</span>),
+                    <span class="prelude-val">None </span>=&gt; Value::null_array(),
                 },
                 PostgresType::FLOAT4_ARRAY =&gt; <span class="kw">match </span>row.try_get(i)<span class="question-mark">? </span>{
                     <span class="prelude-val">Some</span>(val) =&gt; {
                         <span class="kw">let </span>val: Vec&lt;<span class="prelude-ty">Option</span>&lt;f32&gt;&gt; = val;
-                        <span class="kw">let </span>floats = val.into_iter().map(Value::Float);
+                        <span class="kw">let </span>floats = val.into_iter().map(ValueType::Float);
 
                         Value::array(floats)
                     }
-                    <span class="prelude-val">None </span>=&gt; Value::Array(<span class="prelude-val">None</span>),
+                    <span class="prelude-val">None </span>=&gt; Value::null_array(),
                 },
                 PostgresType::FLOAT8_ARRAY =&gt; <span class="kw">match </span>row.try_get(i)<span class="question-mark">? </span>{
                     <span class="prelude-val">Some</span>(val) =&gt; {
                         <span class="kw">let </span>val: Vec&lt;<span class="prelude-ty">Option</span>&lt;f64&gt;&gt; = val;
-                        <span class="kw">let </span>floats = val.into_iter().map(Value::Double);
+                        <span class="kw">let </span>floats = val.into_iter().map(ValueType::Double);
 
                         Value::array(floats)
                     }
-                    <span class="prelude-val">None </span>=&gt; Value::Array(<span class="prelude-val">None</span>),
+                    <span class="prelude-val">None </span>=&gt; Value::null_array(),
                 },
                 PostgresType::BOOL_ARRAY =&gt; <span class="kw">match </span>row.try_get(i)<span class="question-mark">? </span>{
                     <span class="prelude-val">Some</span>(val) =&gt; {
                         <span class="kw">let </span>val: Vec&lt;<span class="prelude-ty">Option</span>&lt;bool&gt;&gt; = val;
-                        <span class="kw">let </span>bools = val.into_iter().map(Value::Boolean);
+                        <span class="kw">let </span>bools = val.into_iter().map(ValueType::Boolean);
 
                         Value::array(bools)
                     }
-                    <span class="prelude-val">None </span>=&gt; Value::Array(<span class="prelude-val">None</span>),
+                    <span class="prelude-val">None </span>=&gt; Value::null_array(),
                 },
                 PostgresType::TIMESTAMP_ARRAY =&gt; <span class="kw">match </span>row.try_get(i)<span class="question-mark">? </span>{
                     <span class="prelude-val">Some</span>(val) =&gt; {
@@ -1302,11 +1310,11 @@
 
                         <span class="kw">let </span>dates = val
                             .into_iter()
-                            .map(|dt| Value::DateTime(dt.map(|dt| DateTime::&lt;Utc&gt;::from_utc(dt, Utc))));
+                            .map(|dt| ValueType::DateTime(dt.map(|dt| DateTime::&lt;Utc&gt;::from_utc(dt, Utc))));
 
                         Value::array(dates)
                     }
-                    <span class="prelude-val">None </span>=&gt; Value::Array(<span class="prelude-val">None</span>),
+                    <span class="prelude-val">None </span>=&gt; Value::null_array(),
                 },
                 <span class="attr">#[cfg(feature = <span class="string">&quot;bigdecimal&quot;</span>)]
                 </span>PostgresType::NUMERIC_ARRAY =&gt; <span class="kw">match </span>row.try_get(i)<span class="question-mark">? </span>{
@@ -1315,11 +1323,11 @@
 
                         <span class="kw">let </span>decimals = val
                             .into_iter()
-                            .map(|dec| Value::Numeric(dec.map(|dec| dec.<span class="number">0</span>.to_string().parse().unwrap())));
+                            .map(|dec| ValueType::Numeric(dec.map(|dec| dec.<span class="number">0</span>.to_string().parse().unwrap())));
 
                         Value::array(decimals)
                     }
-                    <span class="prelude-val">None </span>=&gt; Value::Array(<span class="prelude-val">None</span>),
+                    <span class="prelude-val">None </span>=&gt; Value::null_array(),
                 },
                 PostgresType::TEXT_ARRAY | PostgresType::NAME_ARRAY | PostgresType::VARCHAR_ARRAY =&gt; {
                     <span class="kw">match </span>row.try_get(i)<span class="question-mark">? </span>{
@@ -1328,142 +1336,140 @@
 
                             Value::array(strings.into_iter().map(|s| s.map(|s| s.to_string())))
                         }
-                        <span class="prelude-val">None </span>=&gt; Value::Array(<span class="prelude-val">None</span>),
+                        <span class="prelude-val">None </span>=&gt; Value::null_array(),
                     }
                 }
                 <span class="attr">#[cfg(feature = <span class="string">&quot;bigdecimal&quot;</span>)]
                 </span>PostgresType::MONEY_ARRAY =&gt; <span class="kw">match </span>row.try_get(i)<span class="question-mark">? </span>{
                     <span class="prelude-val">Some</span>(val) =&gt; {
                         <span class="kw">let </span>val: Vec&lt;<span class="prelude-ty">Option</span>&lt;NaiveMoney&gt;&gt; = val;
-                        <span class="kw">let </span>nums = val.into_iter().map(|num| Value::Numeric(num.map(|num| num.<span class="number">0</span>)));
+                        <span class="kw">let </span>nums = val.into_iter().map(|num| ValueType::Numeric(num.map(|num| num.<span class="number">0</span>)));
 
                         Value::array(nums)
                     }
-                    <span class="prelude-val">None </span>=&gt; Value::Array(<span class="prelude-val">None</span>),
+                    <span class="prelude-val">None </span>=&gt; Value::null_array(),
                 },
                 PostgresType::OID_ARRAY =&gt; <span class="kw">match </span>row.try_get(i)<span class="question-mark">? </span>{
                     <span class="prelude-val">Some</span>(val) =&gt; {
                         <span class="kw">let </span>val: Vec&lt;<span class="prelude-ty">Option</span>&lt;u32&gt;&gt; = val;
-                        <span class="kw">let </span>nums = val.into_iter().map(|oid| Value::Int64(oid.map(|oid| oid <span class="kw">as </span>i64)));
+                        <span class="kw">let </span>nums = val.into_iter().map(|oid| ValueType::Int64(oid.map(|oid| oid <span class="kw">as </span>i64)));
 
                         Value::array(nums)
                     }
-                    <span class="prelude-val">None </span>=&gt; Value::Array(<span class="prelude-val">None</span>),
+                    <span class="prelude-val">None </span>=&gt; Value::null_array(),
                 },
                 PostgresType::TIMESTAMPTZ_ARRAY =&gt; <span class="kw">match </span>row.try_get(i)<span class="question-mark">? </span>{
                     <span class="prelude-val">Some</span>(val) =&gt; {
                         <span class="kw">let </span>val: Vec&lt;<span class="prelude-ty">Option</span>&lt;DateTime&lt;Utc&gt;&gt;&gt; = val;
-                        <span class="kw">let </span>dates = val.into_iter().map(Value::DateTime);
+                        <span class="kw">let </span>dates = val.into_iter().map(ValueType::DateTime);
 
                         Value::array(dates)
                     }
-                    <span class="prelude-val">None </span>=&gt; Value::Array(<span class="prelude-val">None</span>),
+                    <span class="prelude-val">None </span>=&gt; Value::null_array(),
                 },
                 PostgresType::DATE_ARRAY =&gt; <span class="kw">match </span>row.try_get(i)<span class="question-mark">? </span>{
                     <span class="prelude-val">Some</span>(val) =&gt; {
                         <span class="kw">let </span>val: Vec&lt;<span class="prelude-ty">Option</span>&lt;chrono::NaiveDate&gt;&gt; = val;
-                        <span class="kw">let </span>dates = val.into_iter().map(Value::Date);
+                        <span class="kw">let </span>dates = val.into_iter().map(ValueType::Date);
 
                         Value::array(dates)
                     }
-                    <span class="prelude-val">None </span>=&gt; Value::Array(<span class="prelude-val">None</span>),
+                    <span class="prelude-val">None </span>=&gt; Value::null_array(),
                 },
                 PostgresType::TIME_ARRAY =&gt; <span class="kw">match </span>row.try_get(i)<span class="question-mark">? </span>{
                     <span class="prelude-val">Some</span>(val) =&gt; {
                         <span class="kw">let </span>val: Vec&lt;<span class="prelude-ty">Option</span>&lt;chrono::NaiveTime&gt;&gt; = val;
-                        <span class="kw">let </span>times = val.into_iter().map(Value::Time);
+                        <span class="kw">let </span>times = val.into_iter().map(ValueType::Time);
 
                         Value::array(times)
                     }
-                    <span class="prelude-val">None </span>=&gt; Value::Array(<span class="prelude-val">None</span>),
+                    <span class="prelude-val">None </span>=&gt; Value::null_array(),
                 },
                 PostgresType::TIMETZ_ARRAY =&gt; <span class="kw">match </span>row.try_get(i)<span class="question-mark">? </span>{
                     <span class="prelude-val">Some</span>(val) =&gt; {
                         <span class="kw">let </span>val: Vec&lt;<span class="prelude-ty">Option</span>&lt;TimeTz&gt;&gt; = val;
-                        <span class="kw">let </span>timetzs = val.into_iter().map(|time| Value::Time(time.map(|time| time.<span class="number">0</span>)));
+                        <span class="kw">let </span>timetzs = val.into_iter().map(|time| ValueType::Time(time.map(|time| time.<span class="number">0</span>)));
 
                         Value::array(timetzs)
                     }
-                    <span class="prelude-val">None </span>=&gt; Value::Array(<span class="prelude-val">None</span>),
+                    <span class="prelude-val">None </span>=&gt; Value::null_array(),
                 },
                 PostgresType::JSON_ARRAY =&gt; <span class="kw">match </span>row.try_get(i)<span class="question-mark">? </span>{
                     <span class="prelude-val">Some</span>(val) =&gt; {
                         <span class="kw">let </span>val: Vec&lt;<span class="prelude-ty">Option</span>&lt;serde_json::Value&gt;&gt; = val;
-                        <span class="kw">let </span>jsons = val.into_iter().map(Value::Json);
+                        <span class="kw">let </span>jsons = val.into_iter().map(ValueType::Json);
 
                         Value::array(jsons)
                     }
-                    <span class="prelude-val">None </span>=&gt; Value::Array(<span class="prelude-val">None</span>),
+                    <span class="prelude-val">None </span>=&gt; Value::null_array(),
                 },
                 PostgresType::JSONB_ARRAY =&gt; <span class="kw">match </span>row.try_get(i)<span class="question-mark">? </span>{
                     <span class="prelude-val">Some</span>(val) =&gt; {
                         <span class="kw">let </span>val: Vec&lt;<span class="prelude-ty">Option</span>&lt;serde_json::Value&gt;&gt; = val;
-                        <span class="kw">let </span>jsons = val.into_iter().map(Value::Json);
+                        <span class="kw">let </span>jsons = val.into_iter().map(ValueType::Json);
 
                         Value::array(jsons)
                     }
-                    <span class="prelude-val">None </span>=&gt; Value::Array(<span class="prelude-val">None</span>),
+                    <span class="prelude-val">None </span>=&gt; Value::null_array(),
                 },
                 PostgresType::OID =&gt; <span class="kw">match </span>row.try_get(i)<span class="question-mark">? </span>{
                     <span class="prelude-val">Some</span>(val) =&gt; {
                         <span class="kw">let </span>val: u32 = val;
                         Value::int64(val)
                     }
-                    <span class="prelude-val">None </span>=&gt; Value::Int64(<span class="prelude-val">None</span>),
+                    <span class="prelude-val">None </span>=&gt; Value::null_int64(),
                 },
                 PostgresType::CHAR =&gt; <span class="kw">match </span>row.try_get(i)<span class="question-mark">? </span>{
                     <span class="prelude-val">Some</span>(val) =&gt; {
                         <span class="kw">let </span>val: i8 = val;
                         Value::character((val <span class="kw">as </span>u8) <span class="kw">as </span>char)
                     }
-                    <span class="prelude-val">None </span>=&gt; Value::Char(<span class="prelude-val">None</span>),
+                    <span class="prelude-val">None </span>=&gt; Value::null_character(),
                 },
                 PostgresType::INET | PostgresType::CIDR =&gt; <span class="kw">match </span>row.try_get(i)<span class="question-mark">? </span>{
                     <span class="prelude-val">Some</span>(val) =&gt; {
                         <span class="kw">let </span>val: std::net::IpAddr = val;
                         Value::text(val.to_string())
                     }
-                    <span class="prelude-val">None </span>=&gt; Value::Text(<span class="prelude-val">None</span>),
+                    <span class="prelude-val">None </span>=&gt; Value::null_text(),
                 },
                 PostgresType::INET_ARRAY | PostgresType::CIDR_ARRAY =&gt; <span class="kw">match </span>row.try_get(i)<span class="question-mark">? </span>{
                     <span class="prelude-val">Some</span>(val) =&gt; {
                         <span class="kw">let </span>val: Vec&lt;<span class="prelude-ty">Option</span>&lt;std::net::IpAddr&gt;&gt; = val;
                         <span class="kw">let </span>addrs = val
                             .into_iter()
-                            .map(|ip| Value::Text(ip.map(|ip| ip.to_string().into())));
+                            .map(|ip| ValueType::Text(ip.map(|ip| ip.to_string().into())));
 
                         Value::array(addrs)
                     }
-                    <span class="prelude-val">None </span>=&gt; Value::Array(<span class="prelude-val">None</span>),
+                    <span class="prelude-val">None </span>=&gt; Value::null_array(),
                 },
                 PostgresType::BIT | PostgresType::VARBIT =&gt; <span class="kw">match </span>row.try_get(i)<span class="question-mark">? </span>{
                     <span class="prelude-val">Some</span>(val) =&gt; {
                         <span class="kw">let </span>val: BitVec = val;
                         Value::text(bits_to_string(<span class="kw-2">&amp;</span>val)<span class="question-mark">?</span>)
                     }
-                    <span class="prelude-val">None </span>=&gt; Value::Text(<span class="prelude-val">None</span>),
+                    <span class="prelude-val">None </span>=&gt; Value::null_text(),
                 },
                 PostgresType::BIT_ARRAY | PostgresType::VARBIT_ARRAY =&gt; <span class="kw">match </span>row.try_get(i)<span class="question-mark">? </span>{
                     <span class="prelude-val">Some</span>(val) =&gt; {
                         <span class="kw">let </span>val: Vec&lt;<span class="prelude-ty">Option</span>&lt;BitVec&gt;&gt; = val;
-                        <span class="kw">let </span>stringified = val
-                            .into_iter()
+                        val.into_iter()
                             .map(|bits| <span class="kw">match </span>bits {
-                                <span class="prelude-val">Some</span>(bits) =&gt; bits_to_string(<span class="kw-2">&amp;</span>bits).map(Value::text),
-                                <span class="prelude-val">None </span>=&gt; <span class="prelude-val">Ok</span>(Value::Text(<span class="prelude-val">None</span>)),
+                                <span class="prelude-val">Some</span>(bits) =&gt; bits_to_string(<span class="kw-2">&amp;</span>bits).map(|s| ValueType::Text(<span class="prelude-val">Some</span>(s.into()))),
+                                <span class="prelude-val">None </span>=&gt; <span class="prelude-val">Ok</span>(ValueType::Text(<span class="prelude-val">None</span>)),
                             })
-                            .collect::&lt;<span class="kw">crate</span>::Result&lt;Vec&lt;<span class="kw">_</span>&gt;&gt;&gt;()<span class="question-mark">?</span>;
-
-                        Value::array(stringified)
-                    }
-                    <span class="prelude-val">None </span>=&gt; Value::Array(<span class="prelude-val">None</span>),
+                            .collect::&lt;<span class="kw">crate</span>::Result&lt;Vec&lt;<span class="kw">_</span>&gt;&gt;&gt;()
+                            .map(Value::array)<span class="question-mark">?
+                    </span>}
+                    <span class="prelude-val">None </span>=&gt; Value::null_array(),
                 },
                 PostgresType::XML =&gt; <span class="kw">match </span>row.try_get(i)<span class="question-mark">? </span>{
                     <span class="prelude-val">Some</span>(val) =&gt; {
                         <span class="kw">let </span>val: XmlString = val;
                         Value::xml(val.<span class="number">0</span>)
                     }
-                    <span class="prelude-val">None </span>=&gt; Value::Xml(<span class="prelude-val">None</span>),
+                    <span class="prelude-val">None </span>=&gt; Value::null_xml(),
                 },
                 PostgresType::XML_ARRAY =&gt; <span class="kw">match </span>row.try_get(i)<span class="question-mark">? </span>{
                     <span class="prelude-val">Some</span>(val) =&gt; {
@@ -1472,7 +1478,7 @@
 
                         Value::array(xmls)
                     }
-                    <span class="prelude-val">None </span>=&gt; Value::Array(<span class="prelude-val">None</span>),
+                    <span class="prelude-val">None </span>=&gt; Value::null_array(),
                 },
                 <span class="kw-2">ref </span>x =&gt; <span class="kw">match </span>x.kind() {
                     Kind::Enum =&gt; <span class="kw">match </span>row.try_get(i)<span class="question-mark">? </span>{
@@ -1481,26 +1487,28 @@
 
                             Value::enum_variant(val.value)
                         }
-                        <span class="prelude-val">None </span>=&gt; Value::Enum(<span class="prelude-val">None</span>, <span class="prelude-val">None</span>),
+                        <span class="prelude-val">None </span>=&gt; Value::null_enum(),
                     },
                     Kind::Array(inner) =&gt; <span class="kw">match </span>inner.kind() {
                         Kind::Enum =&gt; <span class="kw">match </span>row.try_get(i)<span class="question-mark">? </span>{
                             <span class="prelude-val">Some</span>(val) =&gt; {
                                 <span class="kw">let </span>val: Vec&lt;<span class="prelude-ty">Option</span>&lt;EnumString&gt;&gt; = val;
-                                <span class="kw">let </span>variants = val.into_iter().map(|x| Value::Enum(x.map(|x| x.value.into()), <span class="prelude-val">None</span>));
+                                <span class="kw">let </span>variants = val
+                                    .into_iter()
+                                    .map(|x| ValueType::Enum(x.map(|x| x.value.into()), <span class="prelude-val">None</span>));
 
                                 <span class="prelude-val">Ok</span>(Value::array(variants))
                             }
-                            <span class="prelude-val">None </span>=&gt; <span class="prelude-val">Ok</span>(Value::Array(<span class="prelude-val">None</span>)),
+                            <span class="prelude-val">None </span>=&gt; <span class="prelude-val">Ok</span>(Value::null_array()),
                         },
                         <span class="kw">_ </span>=&gt; <span class="kw">match </span>row.try_get(i) {
                             <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(val)) =&gt; {
                                 <span class="kw">let </span>val: Vec&lt;<span class="prelude-ty">Option</span>&lt;String&gt;&gt; = val;
-                                <span class="kw">let </span>strings = val.into_iter().map(|str| Value::Text(str.map(Into::into)));
+                                <span class="kw">let </span>strings = val.into_iter().map(|str| ValueType::Text(str.map(Into::into)));
 
                                 <span class="prelude-val">Ok</span>(Value::array(strings))
                             }
-                            <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>) =&gt; <span class="prelude-val">Ok</span>(Value::Array(<span class="prelude-val">None</span>)),
+                            <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>) =&gt; <span class="prelude-val">Ok</span>(Value::null_array()),
                             <span class="prelude-val">Err</span>(err) =&gt; {
                                 <span class="kw">if </span>err.source().map(|err| err.is::&lt;WrongType&gt;()).unwrap_or(<span class="bool-val">false</span>) {
                                     <span class="kw">let </span>kind = ErrorKind::UnsupportedColumnType {
@@ -1520,7 +1528,7 @@
 
                             <span class="prelude-val">Ok</span>(Value::text(val))
                         }
-                        <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>) =&gt; <span class="prelude-val">Ok</span>(Value::Text(<span class="prelude-val">None</span>)),
+                        <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>) =&gt; <span class="prelude-val">Ok</span>(Value::from(ValueType::Text(<span class="prelude-val">None</span>))),
                         <span class="prelude-val">Err</span>(err) =&gt; {
                             <span class="kw">if </span>err.source().map(|err| err.is::&lt;WrongType&gt;()).unwrap_or(<span class="bool-val">false</span>) {
                                 <span class="kw">let </span>kind = ErrorKind::UnsupportedColumnType {
@@ -1562,8 +1570,8 @@
         ty: <span class="kw-2">&amp;</span>PostgresType,
         out: <span class="kw-2">&amp;mut </span>BytesMut,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;IsNull, Box&lt;<span class="kw">dyn </span>StdError + <span class="lifetime">&#39;static </span>+ Send + Sync&gt;&gt; {
-        <span class="kw">let </span>res = <span class="kw">match </span>(<span class="self">self</span>, ty) {
-            (Value::Int32(integer), <span class="kw-2">&amp;</span>PostgresType::INT2) =&gt; <span class="kw">match </span>integer {
+        <span class="kw">let </span>res = <span class="kw">match </span>(<span class="kw-2">&amp;</span><span class="self">self</span>.typed, ty) {
+            (ValueType::Int32(integer), <span class="kw-2">&amp;</span>PostgresType::INT2) =&gt; <span class="kw">match </span>integer {
                 <span class="prelude-val">Some</span>(i) =&gt; {
                     <span class="kw">let </span>integer = i16::try_from(<span class="kw-2">*</span>i).map_err(|<span class="kw">_</span>| {
                         <span class="kw">let </span>kind = ErrorKind::conversion(<span class="macro">format!</span>(
@@ -1577,9 +1585,9 @@
                 }
                 <span class="kw">_ </span>=&gt; <span class="prelude-val">None</span>,
             },
-            (Value::Int32(integer), <span class="kw-2">&amp;</span>PostgresType::INT4) =&gt; integer.map(|integer| integer.to_sql(ty, out)),
-            (Value::Int32(integer), <span class="kw-2">&amp;</span>PostgresType::INT8) =&gt; integer.map(|integer| (integer <span class="kw">as </span>i64).to_sql(ty, out)),
-            (Value::Int64(integer), <span class="kw-2">&amp;</span>PostgresType::INT2) =&gt; <span class="kw">match </span>integer {
+            (ValueType::Int32(integer), <span class="kw-2">&amp;</span>PostgresType::INT4) =&gt; integer.map(|integer| integer.to_sql(ty, out)),
+            (ValueType::Int32(integer), <span class="kw-2">&amp;</span>PostgresType::INT8) =&gt; integer.map(|integer| (integer <span class="kw">as </span>i64).to_sql(ty, out)),
+            (ValueType::Int64(integer), <span class="kw-2">&amp;</span>PostgresType::INT2) =&gt; <span class="kw">match </span>integer {
                 <span class="prelude-val">Some</span>(i) =&gt; {
                     <span class="kw">let </span>integer = i16::try_from(<span class="kw-2">*</span>i).map_err(|<span class="kw">_</span>| {
                         <span class="kw">let </span>kind = ErrorKind::conversion(<span class="macro">format!</span>(
@@ -1593,7 +1601,7 @@
                 }
                 <span class="kw">_ </span>=&gt; <span class="prelude-val">None</span>,
             },
-            (Value::Int64(integer), <span class="kw-2">&amp;</span>PostgresType::INT4) =&gt; <span class="kw">match </span>integer {
+            (ValueType::Int64(integer), <span class="kw-2">&amp;</span>PostgresType::INT4) =&gt; <span class="kw">match </span>integer {
                 <span class="prelude-val">Some</span>(i) =&gt; {
                     <span class="kw">let </span>integer = i32::try_from(<span class="kw-2">*</span>i).map_err(|<span class="kw">_</span>| {
                         <span class="kw">let </span>kind = ErrorKind::conversion(<span class="macro">format!</span>(
@@ -1607,20 +1615,24 @@
                 }
                 <span class="kw">_ </span>=&gt; <span class="prelude-val">None</span>,
             },
-            (Value::Int64(integer), <span class="kw-2">&amp;</span>PostgresType::INT8) =&gt; integer.map(|integer| integer.to_sql(ty, out)),
+            (ValueType::Int64(integer), <span class="kw-2">&amp;</span>PostgresType::INT8) =&gt; integer.map(|integer| integer.to_sql(ty, out)),
             <span class="attr">#[cfg(feature = <span class="string">&quot;bigdecimal&quot;</span>)]
-            </span>(Value::Int32(integer), <span class="kw-2">&amp;</span>PostgresType::NUMERIC) =&gt; integer
+            </span>(ValueType::Int32(integer), <span class="kw-2">&amp;</span>PostgresType::NUMERIC) =&gt; integer
                 .map(|integer| BigDecimal::from_i32(integer).unwrap())
                 .map(DecimalWrapper)
                 .map(|dw| dw.to_sql(ty, out)),
             <span class="attr">#[cfg(feature = <span class="string">&quot;bigdecimal&quot;</span>)]
-            </span>(Value::Int64(integer), <span class="kw-2">&amp;</span>PostgresType::NUMERIC) =&gt; integer
+            </span>(ValueType::Int64(integer), <span class="kw-2">&amp;</span>PostgresType::NUMERIC) =&gt; integer
                 .map(|integer| BigDecimal::from_i64(integer).unwrap())
                 .map(DecimalWrapper)
                 .map(|dw| dw.to_sql(ty, out)),
-            (Value::Int32(integer), <span class="kw-2">&amp;</span>PostgresType::TEXT) =&gt; integer.map(|integer| <span class="macro">format!</span>(<span class="string">&quot;{integer}&quot;</span>).to_sql(ty, out)),
-            (Value::Int64(integer), <span class="kw-2">&amp;</span>PostgresType::TEXT) =&gt; integer.map(|integer| <span class="macro">format!</span>(<span class="string">&quot;{integer}&quot;</span>).to_sql(ty, out)),
-            (Value::Int32(integer), <span class="kw-2">&amp;</span>PostgresType::OID) =&gt; <span class="kw">match </span>integer {
+            (ValueType::Int32(integer), <span class="kw-2">&amp;</span>PostgresType::TEXT) =&gt; {
+                integer.map(|integer| <span class="macro">format!</span>(<span class="string">&quot;{integer}&quot;</span>).to_sql(ty, out))
+            }
+            (ValueType::Int64(integer), <span class="kw-2">&amp;</span>PostgresType::TEXT) =&gt; {
+                integer.map(|integer| <span class="macro">format!</span>(<span class="string">&quot;{integer}&quot;</span>).to_sql(ty, out))
+            }
+            (ValueType::Int32(integer), <span class="kw-2">&amp;</span>PostgresType::OID) =&gt; <span class="kw">match </span>integer {
                 <span class="prelude-val">Some</span>(i) =&gt; {
                     <span class="kw">let </span>integer = u32::try_from(<span class="kw-2">*</span>i).map_err(|<span class="kw">_</span>| {
                         <span class="kw">let </span>kind = ErrorKind::conversion(<span class="macro">format!</span>(
@@ -1634,7 +1646,7 @@
                 }
                 <span class="kw">_ </span>=&gt; <span class="prelude-val">None</span>,
             },
-            (Value::Int64(integer), <span class="kw-2">&amp;</span>PostgresType::OID) =&gt; <span class="kw">match </span>integer {
+            (ValueType::Int64(integer), <span class="kw-2">&amp;</span>PostgresType::OID) =&gt; <span class="kw">match </span>integer {
                 <span class="prelude-val">Some</span>(i) =&gt; {
                     <span class="kw">let </span>integer = u32::try_from(<span class="kw-2">*</span>i).map_err(|<span class="kw">_</span>| {
                         <span class="kw">let </span>kind = ErrorKind::conversion(<span class="macro">format!</span>(
@@ -1648,43 +1660,43 @@
                 }
                 <span class="kw">_ </span>=&gt; <span class="prelude-val">None</span>,
             },
-            (Value::Int32(integer), <span class="kw">_</span>) =&gt; integer.map(|integer| integer.to_sql(ty, out)),
-            (Value::Int64(integer), <span class="kw">_</span>) =&gt; integer.map(|integer| integer.to_sql(ty, out)),
-            (Value::Float(float), <span class="kw-2">&amp;</span>PostgresType::FLOAT8) =&gt; float.map(|float| (float <span class="kw">as </span>f64).to_sql(ty, out)),
+            (ValueType::Int32(integer), <span class="kw">_</span>) =&gt; integer.map(|integer| integer.to_sql(ty, out)),
+            (ValueType::Int64(integer), <span class="kw">_</span>) =&gt; integer.map(|integer| integer.to_sql(ty, out)),
+            (ValueType::Float(float), <span class="kw-2">&amp;</span>PostgresType::FLOAT8) =&gt; float.map(|float| (float <span class="kw">as </span>f64).to_sql(ty, out)),
             <span class="attr">#[cfg(feature = <span class="string">&quot;bigdecimal&quot;</span>)]
-            </span>(Value::Float(float), <span class="kw-2">&amp;</span>PostgresType::NUMERIC) =&gt; float
+            </span>(ValueType::Float(float), <span class="kw-2">&amp;</span>PostgresType::NUMERIC) =&gt; float
                 .map(|float| BigDecimal::from_f32(float).unwrap())
                 .map(DecimalWrapper)
                 .map(|dw| dw.to_sql(ty, out)),
-            (Value::Float(float), <span class="kw">_</span>) =&gt; float.map(|float| float.to_sql(ty, out)),
-            (Value::Double(double), <span class="kw-2">&amp;</span>PostgresType::FLOAT4) =&gt; double.map(|double| (double <span class="kw">as </span>f32).to_sql(ty, out)),
+            (ValueType::Float(float), <span class="kw">_</span>) =&gt; float.map(|float| float.to_sql(ty, out)),
+            (ValueType::Double(double), <span class="kw-2">&amp;</span>PostgresType::FLOAT4) =&gt; double.map(|double| (double <span class="kw">as </span>f32).to_sql(ty, out)),
             <span class="attr">#[cfg(feature = <span class="string">&quot;bigdecimal&quot;</span>)]
-            </span>(Value::Double(double), <span class="kw-2">&amp;</span>PostgresType::NUMERIC) =&gt; double
+            </span>(ValueType::Double(double), <span class="kw-2">&amp;</span>PostgresType::NUMERIC) =&gt; double
                 .map(|double| BigDecimal::from_f64(double).unwrap())
                 .map(DecimalWrapper)
                 .map(|dw| dw.to_sql(ty, out)),
-            (Value::Double(double), <span class="kw">_</span>) =&gt; double.map(|double| double.to_sql(ty, out)),
+            (ValueType::Double(double), <span class="kw">_</span>) =&gt; double.map(|double| double.to_sql(ty, out)),
             <span class="attr">#[cfg(feature = <span class="string">&quot;bigdecimal&quot;</span>)]
-            </span>(Value::Numeric(decimal), <span class="kw-2">&amp;</span>PostgresType::FLOAT4) =&gt; decimal.as_ref().map(|decimal| {
+            </span>(ValueType::Numeric(decimal), <span class="kw-2">&amp;</span>PostgresType::FLOAT4) =&gt; decimal.as_ref().map(|decimal| {
                 <span class="kw">let </span>f = decimal.to_string().parse::&lt;f32&gt;().expect(<span class="string">&quot;decimal to f32 conversion&quot;</span>);
                 f.to_sql(ty, out)
             }),
             <span class="attr">#[cfg(feature = <span class="string">&quot;bigdecimal&quot;</span>)]
-            </span>(Value::Numeric(decimal), <span class="kw-2">&amp;</span>PostgresType::FLOAT8) =&gt; decimal.as_ref().map(|decimal| {
+            </span>(ValueType::Numeric(decimal), <span class="kw-2">&amp;</span>PostgresType::FLOAT8) =&gt; decimal.as_ref().map(|decimal| {
                 <span class="kw">let </span>f = decimal.to_string().parse::&lt;f64&gt;().expect(<span class="string">&quot;decimal to f64 conversion&quot;</span>);
                 f.to_sql(ty, out)
             }),
             <span class="attr">#[cfg(feature = <span class="string">&quot;bigdecimal&quot;</span>)]
-            </span>(Value::Array(values), <span class="kw-2">&amp;</span>PostgresType::FLOAT4_ARRAY) =&gt; values.as_ref().map(|values| {
+            </span>(ValueType::Array(values), <span class="kw-2">&amp;</span>PostgresType::FLOAT4_ARRAY) =&gt; values.as_ref().map(|values| {
                 <span class="kw">let </span><span class="kw-2">mut </span>floats = Vec::with_capacity(values.len());
 
                 <span class="kw">for </span>value <span class="kw">in </span>values.iter() {
-                    <span class="kw">let </span>float = <span class="kw">match </span>value {
-                        Value::Numeric(n) =&gt; n.as_ref().and_then(|n| n.to_string().parse::&lt;f32&gt;().ok()),
-                        Value::Int64(n) =&gt; n.map(|n| n <span class="kw">as </span>f32),
-                        Value::Float(f) =&gt; <span class="kw-2">*</span>f,
-                        Value::Double(d) =&gt; d.map(|d| d <span class="kw">as </span>f32),
-                        v <span class="kw">if </span>v.is_null() =&gt; <span class="prelude-val">None</span>,
+                    <span class="kw">let </span>float = <span class="kw">match </span><span class="kw-2">&amp;</span>value.typed {
+                        ValueType::Numeric(n) =&gt; n.as_ref().and_then(|n| n.to_string().parse::&lt;f32&gt;().ok()),
+                        ValueType::Int64(n) =&gt; n.map(|n| n <span class="kw">as </span>f32),
+                        ValueType::Float(f) =&gt; <span class="kw-2">*</span>f,
+                        ValueType::Double(d) =&gt; d.map(|d| d <span class="kw">as </span>f32),
+                        <span class="kw">_ if </span>value.is_null() =&gt; <span class="prelude-val">None</span>,
                         v =&gt; {
                             <span class="kw">let </span>kind = ErrorKind::conversion(<span class="macro">format!</span>(
                                 <span class="string">&quot;Couldn&#39;t add value of type `{v:?}` into a float array.&quot;
@@ -1700,15 +1712,15 @@
                 floats.to_sql(ty, out)
             }),
             <span class="attr">#[cfg(feature = <span class="string">&quot;bigdecimal&quot;</span>)]
-            </span>(Value::Array(values), <span class="kw-2">&amp;</span>PostgresType::FLOAT8_ARRAY) =&gt; values.as_ref().map(|values| {
+            </span>(ValueType::Array(values), <span class="kw-2">&amp;</span>PostgresType::FLOAT8_ARRAY) =&gt; values.as_ref().map(|values| {
                 <span class="kw">let </span><span class="kw-2">mut </span>floats = Vec::with_capacity(values.len());
 
                 <span class="kw">for </span>value <span class="kw">in </span>values.iter() {
-                    <span class="kw">let </span>float = <span class="kw">match </span>value {
-                        Value::Numeric(n) =&gt; n.as_ref().and_then(|n| n.to_string().parse::&lt;f64&gt;().ok()),
-                        Value::Int64(n) =&gt; n.map(|n| n <span class="kw">as </span>f64),
-                        Value::Float(f) =&gt; f.map(|f| f <span class="kw">as </span>f64),
-                        Value::Double(d) =&gt; <span class="kw-2">*</span>d,
+                    <span class="kw">let </span>float = <span class="kw">match </span><span class="kw-2">&amp;</span>value.typed {
+                        ValueType::Numeric(n) =&gt; n.as_ref().and_then(|n| n.to_string().parse::&lt;f64&gt;().ok()),
+                        ValueType::Int64(n) =&gt; n.map(|n| n <span class="kw">as </span>f64),
+                        ValueType::Float(f) =&gt; f.map(|f| f <span class="kw">as </span>f64),
+                        ValueType::Double(d) =&gt; <span class="kw-2">*</span>d,
                         v <span class="kw">if </span>v.is_null() =&gt; <span class="prelude-val">None</span>,
                         v =&gt; {
                             <span class="kw">let </span>kind = ErrorKind::conversion(<span class="macro">format!</span>(
@@ -1725,7 +1737,7 @@
                 floats.to_sql(ty, out)
             }),
             <span class="attr">#[cfg(feature = <span class="string">&quot;bigdecimal&quot;</span>)]
-            </span>(Value::Numeric(decimal), <span class="kw-2">&amp;</span>PostgresType::MONEY) =&gt; decimal.as_ref().map(|decimal| {
+            </span>(ValueType::Numeric(decimal), <span class="kw-2">&amp;</span>PostgresType::MONEY) =&gt; decimal.as_ref().map(|decimal| {
                 <span class="kw">let </span>decimal = (decimal * BigInt::from_i32(<span class="number">100</span>).unwrap()).round(<span class="number">0</span>);
 
                 <span class="kw">let </span>i = decimal.to_i64().ok_or_else(|| {
@@ -1736,20 +1748,20 @@
                 i.to_sql(ty, out)
             }),
             <span class="attr">#[cfg(feature = <span class="string">&quot;bigdecimal&quot;</span>)]
-            </span>(Value::Numeric(decimal), <span class="kw-2">&amp;</span>PostgresType::NUMERIC) =&gt; decimal
+            </span>(ValueType::Numeric(decimal), <span class="kw-2">&amp;</span>PostgresType::NUMERIC) =&gt; decimal
                 .as_ref()
                 .map(|decimal| DecimalWrapper(decimal.clone()).to_sql(ty, out)),
             <span class="attr">#[cfg(feature = <span class="string">&quot;bigdecimal&quot;</span>)]
-            </span>(Value::Numeric(float), <span class="kw">_</span>) =&gt; float
+            </span>(ValueType::Numeric(float), <span class="kw">_</span>) =&gt; float
                 .as_ref()
                 .map(|float| DecimalWrapper(float.clone()).to_sql(ty, out)),
             <span class="attr">#[cfg(feature = <span class="string">&quot;uuid&quot;</span>)]
-            </span>(Value::Text(string), <span class="kw-2">&amp;</span>PostgresType::UUID) =&gt; string.as_ref().map(|string| {
+            </span>(ValueType::Text(string), <span class="kw-2">&amp;</span>PostgresType::UUID) =&gt; string.as_ref().map(|string| {
                 <span class="kw">let </span>parsed_uuid: Uuid = string.parse()<span class="question-mark">?</span>;
                 parsed_uuid.to_sql(ty, out)
             }),
             <span class="attr">#[cfg(feature = <span class="string">&quot;uuid&quot;</span>)]
-            </span>(Value::Array(values), <span class="kw-2">&amp;</span>PostgresType::UUID_ARRAY) =&gt; values.as_ref().map(|values| {
+            </span>(ValueType::Array(values), <span class="kw-2">&amp;</span>PostgresType::UUID_ARRAY) =&gt; values.as_ref().map(|values| {
                 <span class="kw">let </span>parsed_uuid: Vec&lt;<span class="prelude-ty">Option</span>&lt;Uuid&gt;&gt; = values
                     .iter()
                     .map(&lt;<span class="prelude-ty">Option</span>&lt;Uuid&gt;&gt;::try_from)
@@ -1757,85 +1769,83 @@
 
                 parsed_uuid.to_sql(ty, out)
             }),
-            (Value::Text(string), <span class="kw-2">&amp;</span>PostgresType::INET) | (Value::Text(string), <span class="kw-2">&amp;</span>PostgresType::CIDR) =&gt; {
+            (ValueType::Text(string), <span class="kw-2">&amp;</span>PostgresType::INET) | (ValueType::Text(string), <span class="kw-2">&amp;</span>PostgresType::CIDR) =&gt; {
                 string.as_ref().map(|string| {
                     <span class="kw">let </span>parsed_ip_addr: std::net::IpAddr = string.parse()<span class="question-mark">?</span>;
                     parsed_ip_addr.to_sql(ty, out)
                 })
             }
-            (Value::Array(values), <span class="kw-2">&amp;</span>PostgresType::INET_ARRAY) | (Value::Array(values), <span class="kw-2">&amp;</span>PostgresType::CIDR_ARRAY) =&gt; {
-                values.as_ref().map(|values| {
-                    <span class="kw">let </span>parsed_ip_addr: Vec&lt;<span class="prelude-ty">Option</span>&lt;std::net::IpAddr&gt;&gt; = values
-                        .iter()
-                        .map(&lt;<span class="prelude-ty">Option</span>&lt;std::net::IpAddr&gt;&gt;::try_from)
-                        .collect::&lt;<span class="kw">crate</span>::Result&lt;<span class="kw">_</span>&gt;&gt;()<span class="question-mark">?</span>;
+            (ValueType::Array(values), <span class="kw-2">&amp;</span>PostgresType::INET_ARRAY)
+            | (ValueType::Array(values), <span class="kw-2">&amp;</span>PostgresType::CIDR_ARRAY) =&gt; values.as_ref().map(|values| {
+                <span class="kw">let </span>parsed_ip_addr: Vec&lt;<span class="prelude-ty">Option</span>&lt;std::net::IpAddr&gt;&gt; = values
+                    .iter()
+                    .map(&lt;<span class="prelude-ty">Option</span>&lt;std::net::IpAddr&gt;&gt;::try_from)
+                    .collect::&lt;<span class="kw">crate</span>::Result&lt;<span class="kw">_</span>&gt;&gt;()<span class="question-mark">?</span>;
 
-                    parsed_ip_addr.to_sql(ty, out)
-                })
-            }
-            (Value::Text(string), <span class="kw-2">&amp;</span>PostgresType::JSON) | (Value::Text(string), <span class="kw-2">&amp;</span>PostgresType::JSONB) =&gt; string
+                parsed_ip_addr.to_sql(ty, out)
+            }),
+            (ValueType::Text(string), <span class="kw-2">&amp;</span>PostgresType::JSON) | (ValueType::Text(string), <span class="kw-2">&amp;</span>PostgresType::JSONB) =&gt; string
                 .as_ref()
                 .map(|string| serde_json::from_str::&lt;serde_json::Value&gt;(string)<span class="question-mark">?</span>.to_sql(ty, out)),
-            (Value::Text(string), <span class="kw-2">&amp;</span>PostgresType::BIT) | (Value::Text(string), <span class="kw-2">&amp;</span>PostgresType::VARBIT) =&gt; {
+            (ValueType::Text(string), <span class="kw-2">&amp;</span>PostgresType::BIT) | (ValueType::Text(string), <span class="kw-2">&amp;</span>PostgresType::VARBIT) =&gt; {
                 string.as_ref().map(|string| {
                     <span class="kw">let </span>bits: BitVec = string_to_bits(string)<span class="question-mark">?</span>;
 
                     bits.to_sql(ty, out)
                 })
             }
-            (Value::Text(string), <span class="kw">_</span>) =&gt; string.as_ref().map(|<span class="kw-2">ref </span>string| string.to_sql(ty, out)),
-            (Value::Array(values), <span class="kw-2">&amp;</span>PostgresType::BIT_ARRAY) | (Value::Array(values), <span class="kw-2">&amp;</span>PostgresType::VARBIT_ARRAY) =&gt; {
-                values.as_ref().map(|values| {
-                    <span class="kw">let </span>bitvecs: Vec&lt;<span class="prelude-ty">Option</span>&lt;BitVec&gt;&gt; = values
-                        .iter()
-                        .map(&lt;<span class="prelude-ty">Option</span>&lt;BitVec&gt;&gt;::try_from)
-                        .collect::&lt;<span class="kw">crate</span>::Result&lt;Vec&lt;<span class="kw">_</span>&gt;&gt;&gt;()<span class="question-mark">?</span>;
+            (ValueType::Text(string), <span class="kw">_</span>) =&gt; string.as_ref().map(|<span class="kw-2">ref </span>string| string.to_sql(ty, out)),
+            (ValueType::Array(values), <span class="kw-2">&amp;</span>PostgresType::BIT_ARRAY)
+            | (ValueType::Array(values), <span class="kw-2">&amp;</span>PostgresType::VARBIT_ARRAY) =&gt; values.as_ref().map(|values| {
+                <span class="kw">let </span>bitvecs: Vec&lt;<span class="prelude-ty">Option</span>&lt;BitVec&gt;&gt; = values
+                    .iter()
+                    .map(|value| value.try_into())
+                    .collect::&lt;<span class="kw">crate</span>::Result&lt;Vec&lt;<span class="kw">_</span>&gt;&gt;&gt;()<span class="question-mark">?</span>;
 
-                    bitvecs.to_sql(ty, out)
-                })
-            }
-            (Value::Bytes(bytes), <span class="kw">_</span>) =&gt; bytes.as_ref().map(|bytes| bytes.as_ref().to_sql(ty, out)),
-            (Value::Enum(string, <span class="kw">_</span>), <span class="kw">_</span>) =&gt; string.as_ref().map(|string| {
+                bitvecs.to_sql(ty, out)
+            }),
+            (ValueType::Bytes(bytes), <span class="kw">_</span>) =&gt; bytes.as_ref().map(|bytes| bytes.as_ref().to_sql(ty, out)),
+            (ValueType::Enum(string, <span class="kw">_</span>), <span class="kw">_</span>) =&gt; string.as_ref().map(|string| {
                 out.extend_from_slice(string.as_bytes());
                 <span class="prelude-val">Ok</span>(IsNull::No)
             }),
-            (Value::Boolean(boo), <span class="kw">_</span>) =&gt; boo.map(|boo| boo.to_sql(ty, out)),
-            (Value::Char(c), <span class="kw">_</span>) =&gt; c.map(|c| (c <span class="kw">as </span>i8).to_sql(ty, out)),
-            (Value::Array(vec), typ) <span class="kw">if </span><span class="macro">matches!</span>(typ.kind(), Kind::Array(<span class="kw">_</span>)) =&gt; {
+            (ValueType::Boolean(boo), <span class="kw">_</span>) =&gt; boo.map(|boo| boo.to_sql(ty, out)),
+            (ValueType::Char(c), <span class="kw">_</span>) =&gt; c.map(|c| (c <span class="kw">as </span>i8).to_sql(ty, out)),
+            (ValueType::Array(vec), typ) <span class="kw">if </span><span class="macro">matches!</span>(typ.kind(), Kind::Array(<span class="kw">_</span>)) =&gt; {
                 vec.as_ref().map(|vec| vec.to_sql(ty, out))
             }
-            (Value::EnumArray(variants, <span class="kw">_</span>), typ) <span class="kw">if </span><span class="macro">matches!</span>(typ.kind(), Kind::Array(<span class="kw">_</span>)) =&gt; variants
+            (ValueType::EnumArray(variants, <span class="kw">_</span>), typ) <span class="kw">if </span><span class="macro">matches!</span>(typ.kind(), Kind::Array(<span class="kw">_</span>)) =&gt; variants
                 .as_ref()
                 .map(|vec| vec.iter().map(|val| val.as_ref()).collect::&lt;Vec&lt;<span class="kw">_</span>&gt;&gt;().to_sql(ty, out)),
-            (Value::EnumArray(variants, <span class="kw">_</span>), typ) =&gt; {
+            (ValueType::EnumArray(variants, <span class="kw">_</span>), typ) =&gt; {
                 <span class="kw">let </span>kind = ErrorKind::conversion(<span class="macro">format!</span>(
                     <span class="string">&quot;Couldn&#39;t serialize value `{variants:?}` into a `{typ}`. Value is a list but `{typ}` is not.&quot;
                 </span>));
 
                 <span class="kw">return </span><span class="prelude-val">Err</span>(Error::builder(kind).build().into());
             }
-            (Value::Array(vec), typ) =&gt; {
+            (ValueType::Array(vec), typ) =&gt; {
                 <span class="kw">let </span>kind = ErrorKind::conversion(<span class="macro">format!</span>(
                     <span class="string">&quot;Couldn&#39;t serialize value `{vec:?}` into a `{typ}`. Value is a list but `{typ}` is not.&quot;
                 </span>));
 
                 <span class="kw">return </span><span class="prelude-val">Err</span>(Error::builder(kind).build().into());
             }
-            (Value::Json(value), <span class="kw">_</span>) =&gt; value.as_ref().map(|value| value.to_sql(ty, out)),
-            (Value::Xml(value), <span class="kw">_</span>) =&gt; value.as_ref().map(|value| value.to_sql(ty, out)),
+            (ValueType::Json(value), <span class="kw">_</span>) =&gt; value.as_ref().map(|value| value.to_sql(ty, out)),
+            (ValueType::Xml(value), <span class="kw">_</span>) =&gt; value.as_ref().map(|value| value.to_sql(ty, out)),
             <span class="attr">#[cfg(feature = <span class="string">&quot;uuid&quot;</span>)]
-            </span>(Value::Uuid(value), <span class="kw">_</span>) =&gt; value.map(|value| value.to_sql(ty, out)),
-            (Value::DateTime(value), <span class="kw-2">&amp;</span>PostgresType::DATE) =&gt; value.map(|value| value.date_naive().to_sql(ty, out)),
-            (Value::Date(value), <span class="kw">_</span>) =&gt; value.map(|value| value.to_sql(ty, out)),
-            (Value::Time(value), <span class="kw">_</span>) =&gt; value.map(|value| value.to_sql(ty, out)),
-            (Value::DateTime(value), <span class="kw-2">&amp;</span>PostgresType::TIME) =&gt; value.map(|value| value.time().to_sql(ty, out)),
-            (Value::DateTime(value), <span class="kw-2">&amp;</span>PostgresType::TIMETZ) =&gt; value.map(|value| {
+            </span>(ValueType::Uuid(value), <span class="kw">_</span>) =&gt; value.map(|value| value.to_sql(ty, out)),
+            (ValueType::DateTime(value), <span class="kw-2">&amp;</span>PostgresType::DATE) =&gt; value.map(|value| value.date_naive().to_sql(ty, out)),
+            (ValueType::Date(value), <span class="kw">_</span>) =&gt; value.map(|value| value.to_sql(ty, out)),
+            (ValueType::Time(value), <span class="kw">_</span>) =&gt; value.map(|value| value.to_sql(ty, out)),
+            (ValueType::DateTime(value), <span class="kw-2">&amp;</span>PostgresType::TIME) =&gt; value.map(|value| value.time().to_sql(ty, out)),
+            (ValueType::DateTime(value), <span class="kw-2">&amp;</span>PostgresType::TIMETZ) =&gt; value.map(|value| {
                 <span class="kw">let </span>result = value.time().to_sql(ty, out)<span class="question-mark">?</span>;
                 <span class="comment">// We assume UTC. see https://www.postgresql.org/docs/9.5/datatype-datetime.html
                 </span>out.extend_from_slice(<span class="kw-2">&amp;</span>[<span class="number">0</span>; <span class="number">4</span>]);
                 <span class="prelude-val">Ok</span>(result)
             }),
-            (Value::DateTime(value), <span class="kw">_</span>) =&gt; value.map(|value| value.naive_utc().to_sql(ty, out)),
+            (ValueType::DateTime(value), <span class="kw">_</span>) =&gt; value.map(|value| value.naive_utc().to_sql(ty, out)),
         };
 
         <span class="kw">match </span>res {
@@ -1891,12 +1901,18 @@
 
     <span class="kw">fn </span>try_from(value: <span class="kw-2">&amp;</span>Value&lt;<span class="lifetime">&#39;a</span>&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="prelude-ty">Option</span>&lt;BitVec&gt;, <span class="self">Self</span>::Error&gt; {
         <span class="kw">match </span>value {
-            val @ Value::Text(<span class="prelude-val">Some</span>(<span class="kw">_</span>)) =&gt; {
+            val @ Value {
+                typed: ValueType::Text(<span class="prelude-val">Some</span>(<span class="kw">_</span>)),
+                ..
+            } =&gt; {
                 <span class="kw">let </span>text = val.as_str().unwrap();
 
                 string_to_bits(text).map(Option::Some)
             }
-            val @ Value::Bytes(<span class="prelude-val">Some</span>(<span class="kw">_</span>)) =&gt; {
+            val @ Value {
+                typed: ValueType::Bytes(<span class="prelude-val">Some</span>(<span class="kw">_</span>)),
+                ..
+            } =&gt; {
                 <span class="kw">let </span>text = val.as_str().unwrap();
 
                 string_to_bits(text).map(Option::Some)

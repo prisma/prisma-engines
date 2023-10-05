@@ -340,7 +340,7 @@
 <a href="#340" id="340">340</a>
 <a href="#341" id="341">341</a>
 </pre></div><pre class="rust"><code><span class="kw">use crate</span>::{
-    ast::Value,
+    ast::{Value, ValueType},
     connector::{queryable::TakeRow, TypeIdentifier},
     error::{Error, ErrorKind},
 };
@@ -360,18 +360,18 @@
         <span class="kw">let </span><span class="kw-2">mut </span>values = Vec::with_capacity(params.len());
 
         <span class="kw">for </span>pv <span class="kw">in </span>params {
-            <span class="kw">let </span>res = <span class="kw">match </span>pv {
-                Value::Int32(i) =&gt; i.map(|i| my::Value::Int(i <span class="kw">as </span>i64)),
-                Value::Int64(i) =&gt; i.map(my::Value::Int),
-                Value::Float(f) =&gt; f.map(my::Value::Float),
-                Value::Double(f) =&gt; f.map(my::Value::Double),
-                Value::Text(s) =&gt; s.clone().map(|s| my::Value::Bytes((<span class="kw-2">*</span>s).as_bytes().to_vec())),
-                Value::Bytes(bytes) =&gt; bytes.clone().map(|bytes| my::Value::Bytes(bytes.into_owned())),
-                Value::Enum(s, <span class="kw">_</span>) =&gt; s.clone().map(|s| my::Value::Bytes((<span class="kw-2">*</span>s).as_bytes().to_vec())),
-                Value::Boolean(b) =&gt; b.map(|b| my::Value::Int(b <span class="kw">as </span>i64)),
-                Value::Char(c) =&gt; c.map(|c| my::Value::Bytes(<span class="macro">vec!</span>[c <span class="kw">as </span>u8])),
-                Value::Xml(s) =&gt; s.as_ref().map(|s| my::Value::Bytes((s).as_bytes().to_vec())),
-                Value::Array(<span class="kw">_</span>) | Value::EnumArray(<span class="kw">_</span>, <span class="kw">_</span>) =&gt; {
+            <span class="kw">let </span>res = <span class="kw">match </span><span class="kw-2">&amp;</span>pv.typed {
+                ValueType::Int32(i) =&gt; i.map(|i| my::Value::Int(i <span class="kw">as </span>i64)),
+                ValueType::Int64(i) =&gt; i.map(my::Value::Int),
+                ValueType::Float(f) =&gt; f.map(my::Value::Float),
+                ValueType::Double(f) =&gt; f.map(my::Value::Double),
+                ValueType::Text(s) =&gt; s.clone().map(|s| my::Value::Bytes((<span class="kw-2">*</span>s).as_bytes().to_vec())),
+                ValueType::Bytes(bytes) =&gt; bytes.clone().map(|bytes| my::Value::Bytes(bytes.into_owned())),
+                ValueType::Enum(s, <span class="kw">_</span>) =&gt; s.clone().map(|s| my::Value::Bytes((<span class="kw-2">*</span>s).as_bytes().to_vec())),
+                ValueType::Boolean(b) =&gt; b.map(|b| my::Value::Int(b <span class="kw">as </span>i64)),
+                ValueType::Char(c) =&gt; c.map(|c| my::Value::Bytes(<span class="macro">vec!</span>[c <span class="kw">as </span>u8])),
+                ValueType::Xml(s) =&gt; s.as_ref().map(|s| my::Value::Bytes((s).as_bytes().to_vec())),
+                ValueType::Array(<span class="kw">_</span>) | ValueType::EnumArray(<span class="kw">_</span>, <span class="kw">_</span>) =&gt; {
                     <span class="kw">let </span>msg = <span class="string">&quot;Arrays are not supported in MySQL.&quot;</span>;
                     <span class="kw">let </span>kind = ErrorKind::conversion(msg);
 
@@ -381,8 +381,8 @@
                     <span class="kw">return </span><span class="prelude-val">Err</span>(builder.build());
                 }
                 <span class="attr">#[cfg(feature = <span class="string">&quot;bigdecimal&quot;</span>)]
-                </span>Value::Numeric(f) =&gt; f.as_ref().map(|f| my::Value::Bytes(f.to_string().as_bytes().to_vec())),
-                Value::Json(s) =&gt; <span class="kw">match </span>s {
+                </span>ValueType::Numeric(f) =&gt; f.as_ref().map(|f| my::Value::Bytes(f.to_string().as_bytes().to_vec())),
+                ValueType::Json(s) =&gt; <span class="kw">match </span>s {
                     <span class="prelude-val">Some</span>(<span class="kw-2">ref </span>s) =&gt; {
                         <span class="kw">let </span>json = serde_json::to_string(s)<span class="question-mark">?</span>;
                         <span class="kw">let </span>bytes = json.into_bytes();
@@ -392,14 +392,14 @@
                     <span class="prelude-val">None </span>=&gt; <span class="prelude-val">None</span>,
                 },
                 <span class="attr">#[cfg(feature = <span class="string">&quot;uuid&quot;</span>)]
-                </span>Value::Uuid(u) =&gt; u.map(|u| my::Value::Bytes(u.hyphenated().to_string().into_bytes())),
-                Value::Date(d) =&gt; {
+                </span>ValueType::Uuid(u) =&gt; u.map(|u| my::Value::Bytes(u.hyphenated().to_string().into_bytes())),
+                ValueType::Date(d) =&gt; {
                     d.map(|d| my::Value::Date(d.year() <span class="kw">as </span>u16, d.month() <span class="kw">as </span>u8, d.day() <span class="kw">as </span>u8, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>))
                 }
-                Value::Time(t) =&gt; {
+                ValueType::Time(t) =&gt; {
                     t.map(|t| my::Value::Time(<span class="bool-val">false</span>, <span class="number">0</span>, t.hour() <span class="kw">as </span>u8, t.minute() <span class="kw">as </span>u8, t.second() <span class="kw">as </span>u8, <span class="number">0</span>))
                 }
-                Value::DateTime(dt) =&gt; dt.map(|dt| {
+                ValueType::DateTime(dt) =&gt; dt.map(|dt| {
                     my::Value::Date(
                         dt.year() <span class="kw">as </span>u16,
                         dt.month() <span class="kw">as </span>u8,
@@ -644,21 +644,21 @@
                     Value::time(time)
                 }
                 my::Value::NULL =&gt; <span class="kw">match </span>column {
-                    t <span class="kw">if </span>t.is_bool() =&gt; Value::Boolean(<span class="prelude-val">None</span>),
-                    t <span class="kw">if </span>t.is_enum() =&gt; Value::Enum(<span class="prelude-val">None</span>, <span class="prelude-val">None</span>),
-                    t <span class="kw">if </span>t.is_null() =&gt; Value::Int32(<span class="prelude-val">None</span>),
-                    t <span class="kw">if </span>t.is_int64() =&gt; Value::Int64(<span class="prelude-val">None</span>),
-                    t <span class="kw">if </span>t.is_int32() =&gt; Value::Int32(<span class="prelude-val">None</span>),
-                    t <span class="kw">if </span>t.is_float() =&gt; Value::Float(<span class="prelude-val">None</span>),
-                    t <span class="kw">if </span>t.is_double() =&gt; Value::Double(<span class="prelude-val">None</span>),
-                    t <span class="kw">if </span>t.is_text() =&gt; Value::Text(<span class="prelude-val">None</span>),
-                    t <span class="kw">if </span>t.is_bytes() =&gt; Value::Bytes(<span class="prelude-val">None</span>),
+                    t <span class="kw">if </span>t.is_bool() =&gt; Value::null_boolean(),
+                    t <span class="kw">if </span>t.is_enum() =&gt; Value::null_enum(),
+                    t <span class="kw">if </span>t.is_null() =&gt; Value::null_int32(),
+                    t <span class="kw">if </span>t.is_int64() =&gt; Value::null_int64(),
+                    t <span class="kw">if </span>t.is_int32() =&gt; Value::null_int32(),
+                    t <span class="kw">if </span>t.is_float() =&gt; Value::null_float(),
+                    t <span class="kw">if </span>t.is_double() =&gt; Value::null_double(),
+                    t <span class="kw">if </span>t.is_text() =&gt; Value::null_text(),
+                    t <span class="kw">if </span>t.is_bytes() =&gt; Value::null_bytes(),
                     <span class="attr">#[cfg(feature = <span class="string">&quot;bigdecimal&quot;</span>)]
-                    </span>t <span class="kw">if </span>t.is_real() =&gt; Value::Numeric(<span class="prelude-val">None</span>),
-                    t <span class="kw">if </span>t.is_datetime() =&gt; Value::DateTime(<span class="prelude-val">None</span>),
-                    t <span class="kw">if </span>t.is_time() =&gt; Value::Time(<span class="prelude-val">None</span>),
-                    t <span class="kw">if </span>t.is_date() =&gt; Value::Date(<span class="prelude-val">None</span>),
-                    t <span class="kw">if </span>t.is_json() =&gt; Value::Json(<span class="prelude-val">None</span>),
+                    </span>t <span class="kw">if </span>t.is_real() =&gt; Value::null_numeric(),
+                    t <span class="kw">if </span>t.is_datetime() =&gt; Value::null_datetime(),
+                    t <span class="kw">if </span>t.is_time() =&gt; Value::null_time(),
+                    t <span class="kw">if </span>t.is_date() =&gt; Value::null_date(),
+                    t <span class="kw">if </span>t.is_json() =&gt; Value::null_json(),
                     typ =&gt; {
                         <span class="kw">let </span>msg = <span class="macro">format!</span>(<span class="string">&quot;Value of type {typ:?} is not supported with the current configuration&quot;</span>);
 

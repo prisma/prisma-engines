@@ -90,9 +90,11 @@
 <a href="#90" id="90">90</a>
 <a href="#91" id="91">91</a>
 <a href="#92" id="92">92</a>
+<a href="#93" id="93">93</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>napi::bindgen_prelude::{FromNapiValue, ToNapiValue};
 <span class="kw">use </span>napi::NapiValue;
 <span class="kw">use </span>quaint::ast::Value <span class="kw">as </span>QuaintValue;
+<span class="kw">use </span>quaint::ast::ValueType <span class="kw">as </span>QuaintValueType;
 <span class="kw">use </span>serde::Serialize;
 <span class="kw">use </span>serde_json::value::Value <span class="kw">as </span>JsonValue;
 
@@ -153,27 +155,27 @@
 <span class="kw">pub fn </span>conv_params(params: <span class="kw-2">&amp;</span>[QuaintValue&lt;<span class="lifetime">&#39;_</span>&gt;]) -&gt; serde_json::Result&lt;Vec&lt;JSArg&gt;&gt; {
     <span class="kw">let </span><span class="kw-2">mut </span>values = Vec::with_capacity(params.len());
 
-    <span class="kw">for </span>pv <span class="kw">in </span>params {
-        <span class="kw">let </span>res = <span class="kw">match </span>pv {
-            QuaintValue::Json(s) =&gt; <span class="kw">match </span>s {
+    <span class="kw">for </span>qv <span class="kw">in </span>params {
+        <span class="kw">let </span>res = <span class="kw">match </span><span class="kw-2">&amp;</span>qv.typed {
+            QuaintValueType::Json(s) =&gt; <span class="kw">match </span>s {
                 <span class="prelude-val">Some</span>(<span class="kw-2">ref </span>s) =&gt; {
                     <span class="kw">let </span>json_str = serde_json::to_string(s)<span class="question-mark">?</span>;
                     JSArg::RawString(json_str)
                 }
                 <span class="prelude-val">None </span>=&gt; JsonValue::Null.into(),
             },
-            QuaintValue::Bytes(bytes) =&gt; <span class="kw">match </span>bytes {
+            QuaintValueType::Bytes(bytes) =&gt; <span class="kw">match </span>bytes {
                 <span class="prelude-val">Some</span>(bytes) =&gt; JSArg::Buffer(bytes.to_vec()),
                 <span class="prelude-val">None </span>=&gt; JsonValue::Null.into(),
             },
-            quaint_value @ QuaintValue::Numeric(bd) =&gt; <span class="kw">match </span>bd {
+            quaint_value @ QuaintValueType::Numeric(bd) =&gt; <span class="kw">match </span>bd {
                 <span class="prelude-val">Some</span>(bd) =&gt; <span class="kw">match </span>bd.to_string().parse::&lt;f64&gt;() {
                     <span class="prelude-val">Ok</span>(double) =&gt; JSArg::from(JsonValue::from(double)),
                     <span class="prelude-val">Err</span>(<span class="kw">_</span>) =&gt; JSArg::from(JsonValue::from(quaint_value.clone())),
                 },
                 <span class="prelude-val">None </span>=&gt; JsonValue::Null.into(),
             },
-            QuaintValue::Array(<span class="prelude-val">Some</span>(items)) =&gt; JSArg::Array(conv_params(items)<span class="question-mark">?</span>),
+            QuaintValueType::Array(<span class="prelude-val">Some</span>(items)) =&gt; JSArg::Array(conv_params(items)<span class="question-mark">?</span>),
             quaint_value =&gt; JSArg::from(JsonValue::from(quaint_value.clone())),
         };
 
