@@ -95,10 +95,9 @@ impl ToSqlRow for ResultRow {
                 (type_identifier, FieldArity::List) => match p_value.typed {
                     value if value.is_null() => Ok(PrismaValue::List(Vec::new())),
                     ValueType::Array(None) => Ok(PrismaValue::List(Vec::new())),
-                    // TODO: avoid cloning in here.
                     ValueType::Array(Some(l)) => l
                         .into_iter()
-                        .map(|val| row_value_to_prisma_value(val.clone(), meta[i]))
+                        .map(|val| row_value_to_prisma_value(val, meta[i]))
                         .collect::<crate::Result<Vec<_>>>()
                         .map(PrismaValue::List),
                     _ => {
