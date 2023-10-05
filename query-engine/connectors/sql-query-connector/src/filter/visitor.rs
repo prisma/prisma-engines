@@ -114,10 +114,8 @@ impl FilterVisitor {
         let alias = self.next_alias(AliasMode::Table);
         let condition = filter.condition;
 
-        // Perf: We can skip a join if the relation is inlined on the related model.
-        // In this case, we can select the related table's foreign key instead of joining.
-        // This is not possible in the case of M2M implicit relations.
-        if filter.field.related_field().is_inlined_on_enclosing_model() {
+        // Perf: We can skip a join if the relation is not a m2m table
+        if !filter.field.relation().is_many_to_many() {
             let related_table = filter.field.related_model().as_table(ctx);
             let related_columns: Vec<_> = filter
                 .field

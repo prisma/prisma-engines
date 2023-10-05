@@ -350,7 +350,6 @@ mod one_relation {
         schema.to_owned()
     }
 
-    //
     #[connector_test(schema(schema_21356))]
     async fn repro_21356(runner: Runner) -> TestResult<()> {
         run_query!(
@@ -360,7 +359,48 @@ mod one_relation {
 
         insta::assert_snapshot!(
           run_query!(&runner, r#"{ findManyUser(where: { posts: { some: { author: { name: "Bob" } } } }) { id } }"#),
-          @r###"{"data":{"findManyUser":[{"id":1}]}"###
+          @r###"{"data":{"findManyUser":[{"id":1}]}}"###
+        );
+
+        Ok(())
+    }
+
+    // https://github.com/prisma/prisma/issues/21366
+    fn schema_21366() -> String {
+        let schema = indoc! {
+            r#"model device {
+                #id(id, Int, @id)
+
+                device_id String @unique   
+                current_state device_state? @relation(fields: [device_id], references: [device_id], onDelete: NoAction)
+              }
+              
+              model device_state {
+                #id(id, Int, @id)
+
+                device_id String   @unique
+                device    device[]
+              }"#
+        };
+
+        schema.to_owned()
+    }
+
+    #[connector_test(schema(schema_21366))]
+    async fn repro_21366(runner: Runner) -> TestResult<()> {
+        run_query!(
+            &runner,
+            r#"mutation {
+                createOnedevice(data: { id: 1, current_state: { create: { id: 1, device_id: "1" } } }) {
+                  id
+                }
+              }
+            "#
+        );
+
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"{ findManydevice_state(where: { device: { some: { device_id: "1" } } }) { id } }"#),
+          @r###"{"data":{"findManydevice_state":[{"id":1}]}}"###
         );
 
         Ok(())
