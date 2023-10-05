@@ -54,7 +54,7 @@ jobs:
       #
 
       - run: |
-          # find all files package.json, and for each use jq to write the version, then write to temptfile and overwrite original file with result
+          # find all files package.json, and for each use jq to write the version, then write to temp file and overwrite original file with result
           find . -name "package.json" -exec bash -c 'jq --arg version "${{ github.event.inputs.prismaVersion }}" ".version = \$version" "{}" > tmpfile && mv tmpfile "{}"' \;
           pnpm -r publish --no-git-checks --tag ${{ github.event.inputs.npmDistTag }} --dry-run # TODO remove hardcoded dry-run and use input instead!
         working-directory: query-engine/driver-adapters/js
