@@ -3,7 +3,7 @@
 use std::borrow::Cow;
 
 use crate::{
-    ast::{EnumVariant, Value},
+    ast::{EnumVariant, Value, ValueType},
     connector::{ResultRow, ResultSet},
     error::{Error, ErrorKind},
 };
@@ -76,7 +76,7 @@ impl<'de> Deserializer<'de> for RowDeserializer {
         let kvs = columns.iter().enumerate().map(move |(v, k)| {
             // The unwrap is safe if `columns` is correct.
             let value = values.get_mut(v).unwrap();
-            let taken_value = std::mem::replace(value, Value::Int64(None));
+            let taken_value = std::mem::replace(value, Value::from(ValueType::Int64(None)));
             (k.as_str(), taken_value)
         });
 
@@ -115,69 +115,69 @@ impl<'de> Deserializer<'de> for ValueDeserializer<'de> {
     type Error = DeserializeError;
 
     fn deserialize_any<V: Visitor<'de>>(self, visitor: V) -> Result<V::Value, Self::Error> {
-        match self.0 {
-            Value::Text(Some(s)) => visitor.visit_string(s.into_owned()),
-            Value::Text(None) => visitor.visit_none(),
-            Value::Bytes(Some(bytes)) => visitor.visit_bytes(bytes.as_ref()),
-            Value::Bytes(None) => visitor.visit_none(),
-            Value::Enum(Some(s), _) => visitor.visit_string(s.into_owned()),
-            Value::Enum(None, _) => visitor.visit_none(),
-            Value::EnumArray(Some(variants), _) => {
+        match self.0.typed {
+            ValueType::Text(Some(s)) => visitor.visit_string(s.into_owned()),
+            ValueType::Text(None) => visitor.visit_none(),
+            ValueType::Bytes(Some(bytes)) => visitor.visit_bytes(bytes.as_ref()),
+            ValueType::Bytes(None) => visitor.visit_none(),
+            ValueType::Enum(Some(s), _) => visitor.visit_string(s.into_owned()),
+            ValueType::Enum(None, _) => visitor.visit_none(),
+            ValueType::EnumArray(Some(variants), _) => {
                 let deserializer = serde::de::value::SeqDeserializer::new(variants.into_iter());
                 visitor.visit_seq(deserializer)
             }
-            Value::EnumArray(None, _) => visitor.visit_none(),
-            Value::Int32(Some(i)) => visitor.visit_i32(i),
-            Value::Int32(None) => visitor.visit_none(),
-            Value::Int64(Some(i)) => visitor.visit_i64(i),
-            Value::Int64(None) => visitor.visit_none(),
-            Value::Boolean(Some(b)) => visitor.visit_bool(b),
-            Value::Boolean(None) => visitor.visit_none(),
-            Value::Char(Some(c)) => visitor.visit_char(c),
-            Value::Char(None) => visitor.visit_none(),
-            Value::Float(Some(num)) => visitor.visit_f64(num as f64),
-            Value::Float(None) => visitor.visit_none(),
-            Value::Double(Some(num)) => visitor.visit_f64(num),
-            Value::Double(None) => visitor.visit_none(),
+            ValueType::EnumArray(None, _) => visitor.visit_none(),
+            ValueType::Int32(Some(i)) => visitor.visit_i32(i),
+            ValueType::Int32(None) => visitor.visit_none(),
+            ValueType::Int64(Some(i)) => visitor.visit_i64(i),
+            ValueType::Int64(None) => visitor.visit_none(),
+            ValueType::Boolean(Some(b)) => visitor.visit_bool(b),
+            ValueType::Boolean(None) => visitor.visit_none(),
+            ValueType::Char(Some(c)) => visitor.visit_char(c),
+            ValueType::Char(None) => visitor.visit_none(),
+            ValueType::Float(Some(num)) => visitor.visit_f64(num as f64),
+            ValueType::Float(None) => visitor.visit_none(),
+            ValueType::Double(Some(num)) => visitor.visit_f64(num),
+            ValueType::Double(None) => visitor.visit_none(),
 
             #[cfg(feature = "bigdecimal")]
-            Value::Numeric(Some(num)) => {
+            ValueType::Numeric(Some(num)) => {
                 use crate::bigdecimal::ToPrimitive;
                 visitor.visit_f64(num.to_f64().unwrap())
             }
             #[cfg(feature = "bigdecimal")]
-            Value::Numeric(None) => visitor.visit_none(),
+            ValueType::Numeric(None) => visitor.visit_none(),
 
             #[cfg(feature = "uuid")]
-            Value::Uuid(Some(uuid)) => visitor.visit_string(uuid.to_string()),
+            ValueType::Uuid(Some(uuid)) => visitor.visit_string(uuid.to_string()),
             #[cfg(feature = "uuid")]
-            Value::Uuid(None) => visitor.visit_none(),
+            ValueType::Uuid(None) => visitor.visit_none(),
 
-            Value::Json(Some(value)) => {
+            ValueType::Json(Some(value)) => {
                 let de = value.into_deserializer();
 
                 de.deserialize_any(visitor)
                     .map_err(|err| serde::de::value::Error::custom(format!("Error deserializing JSON value: {err}")))
             }
-            Value::Json(None) => visitor.visit_none(),
+            ValueType::Json(None) => visitor.visit_none(),
 
-            Value::Xml(Some(s)) => visitor.visit_string(s.into_owned()),
-            Value::Xml(None) => visitor.visit_none(),
+            ValueType::Xml(Some(s)) => visitor.visit_string(s.into_owned()),
+            ValueType::Xml(None) => visitor.visit_none(),
 
-            Value::DateTime(Some(dt)) => visitor.visit_string(dt.to_rfc3339()),
-            Value::DateTime(None) => visitor.visit_none(),
+            ValueType::DateTime(Some(dt)) => visitor.visit_string(dt.to_rfc3339()),
+            ValueType::DateTime(None) => visitor.visit_none(),
 
-            Value::Date(Some(d)) => visitor.visit_string(format!("{d}")),
-            Value::Date(None) => visitor.visit_none(),
+            ValueType::Date(Some(d)) => visitor.visit_string(format!("{d}")),
+            ValueType::Date(None) => visitor.visit_none(),
 
-            Value::Time(Some(t)) => visitor.visit_string(format!("{t}")),
-            Value::Time(None) => visitor.visit_none(),
+            ValueType::Time(Some(t)) => visitor.visit_string(format!("{t}")),
+            ValueType::Time(None) => visitor.visit_none(),
 
-            Value::Array(Some(values)) => {
+            ValueType::Array(Some(values)) => {
                 let deserializer = serde::de::value::SeqDeserializer::new(values.into_iter());
                 visitor.visit_seq(deserializer)
             }
-            Value::Array(None) => visitor.visit_none(),
+            ValueType::Array(None) => visitor.visit_none(),
         }
     }
 
@@ -193,7 +193,7 @@ impl<'de> Deserializer<'de> for ValueDeserializer<'de> {
     where
         V: Visitor<'de>,
     {
-        if let Value::Bytes(Some(bytes)) = self.0 {
+        if let ValueType::Bytes(Some(bytes)) = self.0.typed {
             match bytes {
                 Cow::Borrowed(bytes) => visitor.visit_borrowed_bytes(bytes),
                 Cow::Owned(bytes) => visitor.visit_byte_buf(bytes),
@@ -251,7 +251,7 @@ mod tests {
 
     #[test]
     fn deserialize_user() {
-        let row = make_row(vec![("id", Value::integer(12)), ("name", "Georgina".into())]);
+        let row = make_row(vec![("id", Value::int32(12)), ("name", "Georgina".into())]);
         let user: User = from_row(row).unwrap();
 
         assert_eq!(
@@ -267,9 +267,9 @@ mod tests {
     #[test]
     fn from_rows_works() {
         let first_row = make_row(vec![
-            ("id", Value::integer(12)),
+            ("id", Value::int32(12)),
             ("name", "Georgina".into()),
-            ("bio", Value::Text(None)),
+            ("bio", Value::null_text()),
         ]);
         let second_row = make_row(vec![
             ("id", 33.into()),

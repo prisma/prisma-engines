@@ -110,7 +110,7 @@ impl<'a> Column<'a> {
     /// Sets whether the column is selected.
     ///
     /// On Postgres, this defines whether an enum column should be casted to `TEXT` when rendered.
-    /// 
+    ///
     /// Since enums are user-defined custom types, `tokio-postgres` fires an additional query
     /// when selecting columns of type enum to know which custom type the column refers to.
     /// Casting the enum column to `TEXT` avoid this roundtrip since `TEXT` is a builtin type.

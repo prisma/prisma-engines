@@ -133,6 +133,6 @@ pub mod single;
 mod tests;
 pub mod visitor;
 
-pub use ast::Value;
+pub use ast::{Value, ValueType};
 
 pub type Result<T> = std::result::Result<T, error::Error>;

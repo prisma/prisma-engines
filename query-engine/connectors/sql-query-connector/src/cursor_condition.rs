@@ -469,7 +469,7 @@ fn cursor_order_def_aggregation_scalar(
     order_by: &OrderByScalarAggregation,
     order_by_def: &OrderByDefinition,
 ) -> CursorOrderDefinition {
-    let coalesce_exprs: Vec<Expression> = vec![order_by_def.order_column.clone(), Value::integer(0).into()];
+    let coalesce_exprs: Vec<Expression> = vec![order_by_def.order_column.clone(), Value::int32(0).into()];
 
     // We coalesce the order column to 0 when it's compared to the cmp table since the aggregations joins
     // might return NULL on relations that have no connected records
@@ -493,7 +493,7 @@ fn cursor_order_def_aggregation_rel(
     // cf: part #2 of the SQL query above, when a field is nullable.
     let fks = foreign_keys_from_order_path(&order_by.path, &order_by_def.joins);
 
-    let coalesce_exprs: Vec<Expression> = vec![order_by_def.order_column.clone(), Value::integer(0).into()];
+    let coalesce_exprs: Vec<Expression> = vec![order_by_def.order_column.clone(), Value::int32(0).into()];
     // We coalesce the order column to 0 when it's compared to the cmp table since the aggregations joins
     // might return NULL on relations that have no connected records
     let order_column: Expression = coalesce(coalesce_exprs).into();

@@ -149,7 +149,10 @@ pub trait Visitor<'a> {
     fn visit_text_search_relevance(&mut self, text_search_relevance: TextSearchRelevance<'a>) -> Result;
 
     fn visit_parameterized_enum(&mut self, variant: EnumVariant<'a>, name: Option<EnumName<'a>>) -> Result {
-        self.add_parameter(Value::Enum(Some(variant), name));
+        match name {
+            Some(name) => self.add_parameter(Value::enum_variant_with_name(variant, name)),
+            None => self.add_parameter(Value::enum_variant(variant)),
+        }
         self.parameter_substitution()?;
 
         Ok(())
@@ -161,7 +164,7 @@ pub trait Visitor<'a> {
             .map(|variant| variant.into_enum(name.clone()))
             .collect();
 
-        self.add_parameter(Value::Array(Some(enum_variants)));
+        self.add_parameter(Value::array(enum_variants));
         self.parameter_substitution()?;
 
         Ok(())
@@ -169,9 +172,9 @@ pub trait Visitor<'a> {
 
     /// A visit to a value we parameterize
     fn visit_parameterized(&mut self, value: Value<'a>) -> Result {
-        match value {
-            Value::Enum(Some(variant), name) => self.visit_parameterized_enum(variant, name),
-            Value::EnumArray(Some(variants), name) => self.visit_parameterized_enum_array(variants, name),
+        match value.typed {
+            ValueType::Enum(Some(variant), name) => self.visit_parameterized_enum(variant, name),
+            ValueType::EnumArray(Some(variants), name) => self.visit_parameterized_enum_array(variants, name),
             _ => {
                 self.add_parameter(value);
                 self.parameter_substitution()

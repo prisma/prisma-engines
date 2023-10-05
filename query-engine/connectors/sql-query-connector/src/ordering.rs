@@ -115,7 +115,7 @@ impl OrderByBuilder {
         let (joins, order_column) = self.compute_joins_aggregation(order_by, ctx);
         let order_definition: OrderDefinition = match order_by.sort_aggregation {
             SortAggregation::Count => {
-                let exprs: Vec<Expression> = vec![order_column.clone().into(), Value::integer(0).into()];
+                let exprs: Vec<Expression> = vec![order_column.clone().into(), Value::int32(0).into()];
 
                 // We coalesce the order by expr to 0 so that if there's no relation,
                 // `COALESCE(NULL, 0)` will return `0`, thus preserving the order

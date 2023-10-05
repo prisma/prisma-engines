@@ -1,7 +1,7 @@
 use std::convert::TryFrom;
 
 use crate::{
-    ast::Value,
+    ast::{Value, ValueType},
     connector::{
         queryable::{GetRow, ToColumnNames},
         TypeIdentifier,
@@ -138,17 +138,17 @@ impl<'a> GetRow for SqliteRow<'a> {
             let pv = match self.get_ref_unwrap(i) {
                 ValueRef::Null => match column {
                     // NOTE: A value without decl_type would be Int32(None)
-                    c if c.is_int32() | c.is_null() => Value::Int32(None),
-                    c if c.is_int64() => Value::Int64(None),
-                    c if c.is_text() => Value::Text(None),
-                    c if c.is_bytes() => Value::Bytes(None),
-                    c if c.is_float() => Value::Float(None),
-                    c if c.is_double() => Value::Double(None),
+                    c if c.is_int32() | c.is_null() => Value::null_int32(),
+                    c if c.is_int64() => Value::null_int64(),
+                    c if c.is_text() => Value::null_text(),
+                    c if c.is_bytes() => Value::null_bytes(),
+                    c if c.is_float() => Value::null_float(),
+                    c if c.is_double() => Value::null_double(),
                     #[cfg(feature = "bigdecimal")]
-                    c if c.is_real() => Value::Numeric(None),
-                    c if c.is_datetime() => Value::DateTime(None),
-                    c if c.is_date() => Value::Date(None),
-                    c if c.is_bool() => Value::Boolean(None),
+                    c if c.is_real() => Value::null_numeric(),
+                    c if c.is_datetime() => Value::null_datetime(),
+                    c if c.is_date() => Value::null_date(),
+                    c if c.is_bool() => Value::null_boolean(),
                     c => match c.decl_type() {
                         Some(n) => {
                             let msg = format!("Value {n} not supported");
@@ -157,7 +157,7 @@ impl<'a> GetRow for SqliteRow<'a> {
                             return Err(Error::builder(kind).build());
                         }
                         // When we don't know what to do, the default value would be Int32(None)
-                        None => Value::Int32(None),
+                        None => Value::null_int32(),
                     },
                 },
                 ValueRef::Integer(i) => {
@@ -245,17 +245,17 @@ impl<'a> ToColumnNames for SqliteRows<'a> {
 
 impl<'a> ToSql for Value<'a> {
     fn to_sql(&self) -> Result<ToSqlOutput, RusqlError> {
-        let value = match self {
-            Value::Int32(integer) => integer.map(ToSqlOutput::from),
-            Value::Int64(integer) => integer.map(ToSqlOutput::from),
-            Value::Float(float) => float.map(|f| f as f64).map(ToSqlOutput::from),
-            Value::Double(double) => double.map(ToSqlOutput::from),
-            Value::Text(cow) => cow.as_ref().map(|cow| ToSqlOutput::from(cow.as_ref())),
-            Value::Enum(cow, _) => cow.as_ref().map(|cow| ToSqlOutput::from(cow.as_ref())),
-            Value::Boolean(boo) => boo.map(ToSqlOutput::from),
-            Value::Char(c) => c.map(|c| ToSqlOutput::from(c as u8)),
-            Value::Bytes(bytes) => bytes.as_ref().map(|bytes| ToSqlOutput::from(bytes.as_ref())),
-            Value::Array(_) | Value::EnumArray(_, _) => {
+        let value = match &self.typed {
+            ValueType::Int32(integer) => integer.map(ToSqlOutput::from),
+            ValueType::Int64(integer) => integer.map(ToSqlOutput::from),
+            ValueType::Float(float) => float.map(|f| f as f64).map(ToSqlOutput::from),
+            ValueType::Double(double) => double.map(ToSqlOutput::from),
+            ValueType::Text(cow) => cow.as_ref().map(|cow| ToSqlOutput::from(cow.as_ref())),
+            ValueType::Enum(cow, _) => cow.as_ref().map(|cow| ToSqlOutput::from(cow.as_ref())),
+            ValueType::Boolean(boo) => boo.map(ToSqlOutput::from),
+            ValueType::Char(c) => c.map(|c| ToSqlOutput::from(c as u8)),
+            ValueType::Bytes(bytes) => bytes.as_ref().map(|bytes| ToSqlOutput::from(bytes.as_ref())),
+            ValueType::Array(_) | ValueType::EnumArray(_, _) => {
                 let msg = "Arrays are not supported in SQLite.";
                 let kind = ErrorKind::conversion(msg);
 
@@ -265,24 +265,24 @@ impl<'a> ToSql for Value<'a> {
                 return Err(RusqlError::ToSqlConversionFailure(Box::new(builder.build())));
             }
             #[cfg(feature = "bigdecimal")]
-            Value::Numeric(d) => d
+            ValueType::Numeric(d) => d
                 .as_ref()
                 .map(|d| ToSqlOutput::from(d.to_string().parse::<f64>().expect("BigDecimal is not a f64."))),
-            Value::Json(value) => value.as_ref().map(|value| {
+            ValueType::Json(value) => value.as_ref().map(|value| {
                 let stringified = serde_json::to_string(value)
                     .map_err(|err| RusqlError::ToSqlConversionFailure(Box::new(err)))
                     .unwrap();
 
                 ToSqlOutput::from(stringified)
             }),
-            Value::Xml(cow) => cow.as_ref().map(|cow| ToSqlOutput::from(cow.as_ref())),
+            ValueType::Xml(cow) => cow.as_ref().map(|cow| ToSqlOutput::from(cow.as_ref())),
             #[cfg(feature = "uuid")]
-            Value::Uuid(value) => value.map(|value| ToSqlOutput::from(value.hyphenated().to_string())),
-            Value::DateTime(value) => value.map(|value| ToSqlOutput::from(value.timestamp_millis())),
-            Value::Date(date) => date
+            ValueType::Uuid(value) => value.map(|value| ToSqlOutput::from(value.hyphenated().to_string())),
+            ValueType::DateTime(value) => value.map(|value| ToSqlOutput::from(value.timestamp_millis())),
+            ValueType::Date(date) => date
                 .and_then(|date| date.and_hms_opt(0, 0, 0))
                 .map(|dt| ToSqlOutput::from(dt.timestamp_millis())),
-            Value::Time(time) => time
+            ValueType::Time(time) => time
                 .and_then(|time| chrono::NaiveDate::from_ymd_opt(1970, 1, 1).map(|d| (d, time)))
                 .and_then(|(date, time)| {
                     use chrono::Timelike;

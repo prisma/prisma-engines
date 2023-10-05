@@ -1178,7 +1178,7 @@ mod tests {
             let result_set = client.query_raw("SHOW search_path", &[]).await.unwrap();
             let row = result_set.first().unwrap();
 
-            row[0].to_string()
+            row[0].typed.to_string()
         }
 
         // Safe
@@ -1230,7 +1230,7 @@ mod tests {
             let result_set = client.query_raw("SHOW search_path", &[]).await.unwrap();
             let row = result_set.first().unwrap();
 
-            row[0].to_string()
+            row[0].typed.to_string()
         }
 
         // Safe
@@ -1281,7 +1281,7 @@ mod tests {
             let result_set = client.query_raw("SHOW search_path", &[]).await.unwrap();
             let row = result_set.first().unwrap();
 
-            row[0].to_string()
+            row[0].typed.to_string()
         }
 
         // Safe
@@ -1332,7 +1332,7 @@ mod tests {
             let result_set = client.query_raw("SHOW search_path", &[]).await.unwrap();
             let row = result_set.first().unwrap();
 
-            row[0].to_string()
+            row[0].typed.to_string()
         }
 
         // Safe
@@ -1383,7 +1383,7 @@ mod tests {
             let result_set = client.query_raw("SHOW search_path", &[]).await.unwrap();
             let row = result_set.first().unwrap();
 
-            row[0].to_string()
+            row[0].typed.to_string()
         }
 
         // Safe
@@ -1480,9 +1480,7 @@ mod tests {
         let url = Url::parse(&CONN_STR).unwrap();
         let conn = Quaint::new(url.as_str()).await.unwrap();
 
-        let res = conn
-            .query_raw("SELECT $1", &[Value::integer(1), Value::integer(2)])
-            .await;
+        let res = conn.query_raw("SELECT $1", &[Value::int32(1), Value::int32(2)]).await;
 
         assert!(res.is_err());
 

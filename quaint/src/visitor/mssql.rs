@@ -8,7 +8,7 @@ use crate::{
     },
     error::{Error, ErrorKind},
     prelude::{Aliasable, Average, Query},
-    visitor, Value,
+    visitor, Value, ValueType,
 };
 use std::{convert::TryFrom, fmt::Write, iter};
 
@@ -310,27 +310,27 @@ impl<'a> Visitor<'a> for Mssql<'a> {
     }
 
     fn visit_raw_value(&mut self, value: Value<'a>) -> visitor::Result {
-        let res = match value {
-            Value::Int32(i) => i.map(|i| self.write(i)),
-            Value::Int64(i) => i.map(|i| self.write(i)),
-            Value::Float(d) => d.map(|f| match f {
+        let res = match value.typed {
+            ValueType::Int32(i) => i.map(|i| self.write(i)),
+            ValueType::Int64(i) => i.map(|i| self.write(i)),
+            ValueType::Float(d) => d.map(|f| match f {
                 f if f.is_nan() => self.write("'NaN'"),
                 f if f == f32::INFINITY => self.write("'Infinity'"),
                 f if f == f32::NEG_INFINITY => self.write("'-Infinity"),
                 v => self.write(format!("{v:?}")),
             }),
-            Value::Double(d) => d.map(|f| match f {
+            ValueType::Double(d) => d.map(|f| match f {
                 f if f.is_nan() => self.write("'NaN'"),
                 f if f == f64::INFINITY => self.write("'Infinity'"),
                 f if f == f64::NEG_INFINITY => self.write("'-Infinity"),
                 v => self.write(format!("{v:?}")),
             }),
-            Value::Text(t) => t.map(|t| self.write(format!("'{t}'"))),
-            Value::Enum(e, _) => e.map(|e| self.write(e)),
-            Value::Bytes(b) => b.map(|b| self.write(format!("0x{}", hex::encode(b)))),
-            Value::Boolean(b) => b.map(|b| self.write(if b { 1 } else { 0 })),
-            Value::Char(c) => c.map(|c| self.write(format!("'{c}'"))),
-            Value::Array(_) | Value::EnumArray(_, _) => {
+            ValueType::Text(t) => t.map(|t| self.write(format!("'{t}'"))),
+            ValueType::Enum(e, _) => e.map(|e| self.write(e)),
+            ValueType::Bytes(b) => b.map(|b| self.write(format!("0x{}", hex::encode(b)))),
+            ValueType::Boolean(b) => b.map(|b| self.write(if b { 1 } else { 0 })),
+            ValueType::Char(c) => c.map(|c| self.write(format!("'{c}'"))),
+            ValueType::Array(_) | ValueType::EnumArray(_, _) => {
                 let msg = "Arrays are not supported in T-SQL.";
                 let kind = ErrorKind::conversion(msg);
 
@@ -340,29 +340,29 @@ impl<'a> Visitor<'a> for Mssql<'a> {
                 return Err(builder.build());
             }
 
-            Value::Json(j) => j.map(|j| self.write(format!("'{}'", serde_json::to_string(&j).unwrap()))),
+            ValueType::Json(j) => j.map(|j| self.write(format!("'{}'", serde_json::to_string(&j).unwrap()))),
             #[cfg(feature = "bigdecimal")]
-            Value::Numeric(r) => r.map(|r| self.write(r)),
+            ValueType::Numeric(r) => r.map(|r| self.write(r)),
             #[cfg(feature = "uuid")]
-            Value::Uuid(uuid) => uuid.map(|uuid| {
+            ValueType::Uuid(uuid) => uuid.map(|uuid| {
                 let s = format!("CONVERT(uniqueidentifier, N'{}')", uuid.hyphenated());
                 self.write(s)
             }),
-            Value::DateTime(dt) => dt.map(|dt| {
+            ValueType::DateTime(dt) => dt.map(|dt| {
                 let s = format!("CONVERT(datetimeoffset, N'{}')", dt.to_rfc3339());
                 self.write(s)
             }),
-            Value::Date(date) => date.map(|date| {
+            ValueType::Date(date) => date.map(|date| {
                 let s = format!("CONVERT(date, N'{date}')");
                 self.write(s)
             }),
-            Value::Time(time) => time.map(|time| {
+            ValueType::Time(time) => time.map(|time| {
                 let s = format!("CONVERT(time, N'{time}')");
                 self.write(s)
             }),
             // Style 3 is keep all whitespace + internal DTD processing:
             // https://docs.microsoft.com/en-us/sql/t-sql/functions/cast-and-convert-transact-sql?redirectedfrom=MSDN&view=sql-server-ver15#xml-styles
-            Value::Xml(cow) => cow.map(|cow| self.write(format!("CONVERT(XML, N'{cow}', 3)"))),
+            ValueType::Xml(cow) => cow.map(|cow| self.write(format!("CONVERT(XML, N'{cow}', 3)"))),
         };
 
         match res {
@@ -391,7 +391,7 @@ impl<'a> Visitor<'a> for Mssql<'a> {
                 self.visit_parameterized(limit)?;
                 self.write(" ROWS ONLY")
             }
-            (None, Some(offset)) if self.order_by_set || offset.as_i64().map(|i| i > 0).unwrap_or(false) => {
+            (None, Some(offset)) if self.order_by_set || offset.typed.as_i64().map(|i| i > 0).unwrap_or(false) => {
                 add_ordering(self)?;
 
                 self.write(" OFFSET ")?;
@@ -749,11 +749,11 @@ mod tests {
     #[test]
     fn test_aliased_null() {
         let expected_sql = "SELECT @P1 AS [test]";
-        let query = Select::default().value(val!(Value::Int32(None)).alias("test"));
+        let query = Select::default().value(val!(ValueType::Int32(None)).alias("test"));
         let (sql, params) = Mssql::build(query).unwrap();
 
         assert_eq!(expected_sql, sql);
-        assert_eq!(vec![Value::Int32(None)], params);
+        assert_eq!(vec![Value::null_int32()], params);
     }
 
     #[test]
@@ -1192,7 +1192,7 @@ mod tests {
 
     #[test]
     fn test_raw_null() {
-        let (sql, params) = Mssql::build(Select::default().value(Value::Text(None).raw())).unwrap();
+        let (sql, params) = Mssql::build(Select::default().value(ValueType::Text(None).raw())).unwrap();
         assert_eq!("SELECT null", sql);
         assert!(params.is_empty());
     }

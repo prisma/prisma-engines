@@ -14,11 +14,14 @@ impl<'a> EnumVariant<'a> {
     }
 
     pub fn into_text(self) -> Value<'a> {
-        Value::Text(Some(self.0))
+        Value::text(self.0)
     }
 
     pub fn into_enum(self, name: Option<EnumName<'a>>) -> Value<'a> {
-        Value::Enum(Some(self), name)
+        match name {
+            Some(name) => Value::enum_variant_with_name(self.0, name),
+            None => Value::enum_variant(self.0),
+        }
     }
 }
 

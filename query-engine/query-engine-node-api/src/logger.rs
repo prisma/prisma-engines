@@ -58,7 +58,7 @@ impl Logger {
             None
         };
 
-        let layer = CallbackLayer::new(log_callback.clone()).with_filter(filters);
+        let layer = CallbackLayer::new(log_callback).with_filter(filters);
 
         let metrics = if enable_metrics {
             query_engine_metrics::setup();

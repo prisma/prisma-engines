@@ -74,27 +74,27 @@ impl<'a> Visitor<'a> for Sqlite<'a> {
     }
 
     fn visit_raw_value(&mut self, value: Value<'a>) -> visitor::Result {
-        let res = match value {
-            Value::Int32(i) => i.map(|i| self.write(i)),
-            Value::Int64(i) => i.map(|i| self.write(i)),
-            Value::Text(t) => t.map(|t| self.write(format!("'{t}'"))),
-            Value::Enum(e, _) => e.map(|e| self.write(e)),
-            Value::Bytes(b) => b.map(|b| self.write(format!("x'{}'", hex::encode(b)))),
-            Value::Boolean(b) => b.map(|b| self.write(b)),
-            Value::Char(c) => c.map(|c| self.write(format!("'{c}'"))),
-            Value::Float(d) => d.map(|f| match f {
+        let res = match &value.typed {
+            ValueType::Int32(i) => i.map(|i| self.write(i)),
+            ValueType::Int64(i) => i.map(|i| self.write(i)),
+            ValueType::Text(t) => t.as_ref().map(|t| self.write(format!("'{t}'"))),
+            ValueType::Enum(e, _) => e.as_ref().map(|e| self.write(e)),
+            ValueType::Bytes(b) => b.as_ref().map(|b| self.write(format!("x'{}'", hex::encode(b)))),
+            ValueType::Boolean(b) => b.map(|b| self.write(b)),
+            ValueType::Char(c) => c.map(|c| self.write(format!("'{c}'"))),
+            ValueType::Float(d) => d.map(|f| match f {
                 f if f.is_nan() => self.write("'NaN'"),
                 f if f == f32::INFINITY => self.write("'Infinity'"),
                 f if f == f32::NEG_INFINITY => self.write("'-Infinity"),
                 v => self.write(format!("{v:?}")),
             }),
-            Value::Double(d) => d.map(|f| match f {
+            ValueType::Double(d) => d.map(|f| match f {
                 f if f.is_nan() => self.write("'NaN'"),
                 f if f == f64::INFINITY => self.write("'Infinity'"),
                 f if f == f64::NEG_INFINITY => self.write("'-Infinity"),
                 v => self.write(format!("{v:?}")),
             }),
-            Value::Array(_) | Value::EnumArray(_, _) => {
+            ValueType::Array(_) | ValueType::EnumArray(_, _) => {
                 let msg = "Arrays are not supported in SQLite.";
                 let kind = ErrorKind::conversion(msg);
 
@@ -104,7 +104,7 @@ impl<'a> Visitor<'a> for Sqlite<'a> {
                 return Err(builder.build());
             }
 
-            Value::Json(j) => match j {
+            ValueType::Json(j) => match j {
                 Some(ref j) => {
                     let s = serde_json::to_string(j)?;
                     Some(self.write(format!("'{s}'")))
@@ -112,13 +112,13 @@ impl<'a> Visitor<'a> for Sqlite<'a> {
                 None => None,
             },
             #[cfg(feature = "bigdecimal")]
-            Value::Numeric(r) => r.map(|r| self.write(r)),
+            ValueType::Numeric(r) => r.as_ref().map(|r| self.write(r)),
             #[cfg(feature = "uuid")]
-            Value::Uuid(uuid) => uuid.map(|uuid| self.write(format!("'{}'", uuid.hyphenated()))),
-            Value::DateTime(dt) => dt.map(|dt| self.write(format!("'{}'", dt.to_rfc3339(),))),
-            Value::Date(date) => date.map(|date| self.write(format!("'{date}'"))),
-            Value::Time(time) => time.map(|time| self.write(format!("'{time}'"))),
-            Value::Xml(cow) => cow.map(|cow| self.write(format!("'{cow}'"))),
+            ValueType::Uuid(uuid) => uuid.map(|uuid| self.write(format!("'{}'", uuid.hyphenated()))),
+            ValueType::DateTime(dt) => dt.map(|dt| self.write(format!("'{}'", dt.to_rfc3339(),))),
+            ValueType::Date(date) => date.map(|date| self.write(format!("'{date}'"))),
+            ValueType::Time(time) => time.map(|time| self.write(format!("'{time}'"))),
+            ValueType::Xml(cow) => cow.as_ref().map(|cow| self.write(format!("'{cow}'"))),
         };
 
         match res {
@@ -432,11 +432,11 @@ mod tests {
     #[test]
     fn test_aliased_null() {
         let expected_sql = "SELECT ? AS `test`";
-        let query = Select::default().value(val!(Value::Text(None)).alias("test"));
+        let query = Select::default().value(val!(Value::null_text()).alias("test"));
         let (sql, params) = Sqlite::build(query).unwrap();
 
         assert_eq!(expected_sql, sql);
-        assert_eq!(vec![Value::Text(None)], params);
+        assert_eq!(vec![Value::null_text()], params);
     }
 
     #[test]
@@ -861,7 +861,7 @@ mod tests {
 
     #[test]
     fn test_raw_null() {
-        let (sql, params) = Sqlite::build(Select::default().value(Value::Text(None).raw())).unwrap();
+        let (sql, params) = Sqlite::build(Select::default().value(Value::null_text().raw())).unwrap();
         assert_eq!("SELECT null", sql);
         assert!(params.is_empty());
     }

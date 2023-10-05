@@ -39,7 +39,7 @@ impl std::fmt::Display for AggregationType {
 
 impl GroupByBuilder {
     pub fn new() -> Self {
-        Self { ..Default::default() }
+        Default::default()
     }
 
     pub fn render(&self, by_fields: Vec<ScalarFieldRef>) -> (Document, Option<Document>) {

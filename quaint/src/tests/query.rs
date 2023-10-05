@@ -33,7 +33,7 @@ async fn aliased_value(api: &mut dyn TestApi) -> crate::Result<()> {
 
 #[test_each_connector]
 async fn aliased_null(api: &mut dyn TestApi) -> crate::Result<()> {
-    let query = Select::default().value(val!(Value::Int64(None)).alias("test"));
+    let query = Select::default().value(val!(Value::null_int64()).alias("test"));
 
     let res = api.conn().select(query).await?;
     let row = res.get(0).unwrap();
@@ -307,8 +307,8 @@ async fn where_equals(api: &mut dyn TestApi) -> crate::Result<()> {
     let table = api.create_temp_table("id int, name varchar(255)").await?;
 
     let insert = Insert::multi_into(&table, vec!["id", "name"])
-        .values(vec![Value::integer(1), Value::text("Musti")])
-        .values(vec![Value::integer(2), Value::text("Naukio")]);
+        .values(vec![Value::int32(1), Value::text("Musti")])
+        .values(vec![Value::int32(2), Value::text("Naukio")]);
 
     api.conn().insert(insert.into()).await?;
 
@@ -328,8 +328,8 @@ async fn where_like(api: &mut dyn TestApi) -> crate::Result<()> {
     let table = api.create_temp_table("id int, name varchar(255)").await?;
 
     let insert = Insert::multi_into(&table, vec!["id", "name"])
-        .values(vec![Value::integer(1), Value::text("Musti")])
-        .values(vec![Value::integer(2), Value::text("Naukio")]);
+        .values(vec![Value::int32(1), Value::text("Musti")])
+        .values(vec![Value::int32(2), Value::text("Naukio")]);
 
     api.conn().insert(insert.into()).await?;
 
@@ -349,8 +349,8 @@ async fn where_not_like(api: &mut dyn TestApi) -> crate::Result<()> {
     let table = api.create_temp_table("id int, name varchar(255)").await?;
 
     let insert = Insert::multi_into(&table, vec!["id", "name"])
-        .values(vec![Value::integer(1), Value::text("Musti")])
-        .values(vec![Value::integer(2), Value::text("Naukio")]);
+        .values(vec![Value::int32(1), Value::text("Musti")])
+        .values(vec![Value::int32(2), Value::text("Naukio")]);
 
     api.conn().insert(insert.into()).await?;
 
@@ -371,14 +371,14 @@ async fn inner_join(api: &mut dyn TestApi) -> crate::Result<()> {
     let table2 = api.create_temp_table("t1_id int, is_cat int").await?;
 
     let insert = Insert::multi_into(&table1, vec!["id", "name"])
-        .values(vec![Value::integer(1), Value::text("Musti")])
-        .values(vec![Value::integer(2), Value::text("Belka")]);
+        .values(vec![Value::int32(1), Value::text("Musti")])
+        .values(vec![Value::int32(2), Value::text("Belka")]);
 
     api.conn().insert(insert.into()).await?;
 
     let insert = Insert::multi_into(&table2, vec!["t1_id", "is_cat"])
-        .values(vec![Value::integer(1), Value::integer(1)])
-        .values(vec![Value::integer(2), Value::integer(0)]);
+        .values(vec![Value::int32(1), Value::int32(1)])
+        .values(vec![Value::int32(2), Value::int32(0)]);
 
     api.conn().insert(insert.into()).await?;
 
@@ -414,18 +414,18 @@ async fn table_inner_join(api: &mut dyn TestApi) -> crate::Result<()> {
     let table3 = api.create_temp_table("id int, foo int").await?;
 
     let insert = Insert::multi_into(&table1, vec!["id", "name"])
-        .values(vec![Value::integer(1), Value::text("Musti")])
-        .values(vec![Value::integer(2), Value::text("Belka")]);
+        .values(vec![Value::int32(1), Value::text("Musti")])
+        .values(vec![Value::int32(2), Value::text("Belka")]);
 
     api.conn().insert(insert.into()).await?;
 
     let insert = Insert::multi_into(&table2, vec!["t1_id", "is_cat"])
-        .values(vec![Value::integer(1), Value::integer(1)])
-        .values(vec![Value::integer(2), Value::integer(0)]);
+        .values(vec![Value::int32(1), Value::int32(1)])
+        .values(vec![Value::int32(2), Value::int32(0)]);
 
     api.conn().insert(insert.into()).await?;
 
-    let insert = Insert::multi_into(&table3, vec!["id", "foo"]).values(vec![Value::integer(1), Value::integer(1)]);
+    let insert = Insert::multi_into(&table3, vec!["id", "foo"]).values(vec![Value::int32(1), Value::int32(1)]);
 
     api.conn().insert(insert.into()).await?;
 
@@ -466,13 +466,12 @@ async fn left_join(api: &mut dyn TestApi) -> crate::Result<()> {
     let table2 = api.create_temp_table("t1_id int, is_cat int").await?;
 
     let insert = Insert::multi_into(&table1, vec!["id", "name"])
-        .values(vec![Value::integer(1), Value::text("Musti")])
-        .values(vec![Value::integer(2), Value::text("Belka")]);
+        .values(vec![Value::int32(1), Value::text("Musti")])
+        .values(vec![Value::int32(2), Value::text("Belka")]);
 
     api.conn().insert(insert.into()).await?;
 
-    let insert =
-        Insert::multi_into(&table2, vec!["t1_id", "is_cat"]).values(vec![Value::integer(1), Value::integer(1)]);
+    let insert = Insert::multi_into(&table2, vec!["t1_id", "is_cat"]).values(vec![Value::int32(1), Value::int32(1)]);
 
     api.conn().insert(insert.into()).await?;
 
@@ -508,17 +507,16 @@ async fn table_left_join(api: &mut dyn TestApi) -> crate::Result<()> {
     let table3 = api.create_temp_table("id int, foo int").await?;
 
     let insert = Insert::multi_into(&table1, vec!["id", "name"])
-        .values(vec![Value::integer(1), Value::text("Musti")])
-        .values(vec![Value::integer(2), Value::text("Belka")]);
+        .values(vec![Value::int32(1), Value::text("Musti")])
+        .values(vec![Value::int32(2), Value::text("Belka")]);
 
     api.conn().insert(insert.into()).await?;
 
-    let insert =
-        Insert::multi_into(&table2, vec!["t1_id", "is_cat"]).values(vec![Value::integer(1), Value::integer(1)]);
+    let insert = Insert::multi_into(&table2, vec!["t1_id", "is_cat"]).values(vec![Value::int32(1), Value::int32(1)]);
 
     api.conn().insert(insert.into()).await?;
 
-    let insert = Insert::multi_into(&table3, vec!["id", "foo"]).values(vec![Value::integer(1), Value::integer(1)]);
+    let insert = Insert::multi_into(&table3, vec!["id", "foo"]).values(vec![Value::int32(1), Value::int32(1)]);
 
     api.conn().insert(insert.into()).await?;
 
@@ -558,8 +556,8 @@ async fn limit_no_offset(api: &mut dyn TestApi) -> crate::Result<()> {
     let table = api.create_temp_table("id int, name varchar(255)").await?;
 
     let insert = Insert::multi_into(&table, vec!["id", "name"])
-        .values(vec![Value::integer(1), Value::text("Musti")])
-        .values(vec![Value::integer(2), Value::text("Naukio")]);
+        .values(vec![Value::int32(1), Value::text("Musti")])
+        .values(vec![Value::int32(2), Value::text("Naukio")]);
 
     api.conn().insert(insert.into()).await?;
 
@@ -580,8 +578,8 @@ async fn offset_no_limit(api: &mut dyn TestApi) -> crate::Result<()> {
     let table = api.create_temp_table("id int, name varchar(255)").await?;
 
     let insert = Insert::multi_into(&table, vec!["id", "name"])
-        .values(vec![Value::integer(1), Value::text("Musti")])
-        .values(vec![Value::integer(2), Value::text("Naukio")]);
+        .values(vec![Value::int32(1), Value::text("Musti")])
+        .values(vec![Value::int32(2), Value::text("Naukio")]);
 
     api.conn().insert(insert.into()).await?;
 
@@ -602,9 +600,9 @@ async fn limit_with_offset(api: &mut dyn TestApi) -> crate::Result<()> {
     let table = api.create_temp_table("id int, name varchar(255)").await?;
 
     let insert = Insert::multi_into(&table, vec!["id", "name"])
-        .values(vec![Value::integer(1), Value::text("Musti")])
-        .values(vec![Value::integer(2), Value::text("Naukio")])
-        .values(vec![Value::integer(3), Value::text("Belka")]);
+        .values(vec![Value::int32(1), Value::text("Musti")])
+        .values(vec![Value::int32(2), Value::text("Naukio")])
+        .values(vec![Value::int32(3), Value::text("Belka")]);
 
     api.conn().insert(insert.into()).await?;
 
@@ -625,9 +623,9 @@ async fn limit_with_offset_no_given_order(api: &mut dyn TestApi) -> crate::Resul
     let table = api.create_temp_table("id int, name varchar(255)").await?;
 
     let insert = Insert::multi_into(&table, vec!["id", "name"])
-        .values(vec![Value::integer(1), Value::text("Musti")])
-        .values(vec![Value::integer(2), Value::text("Naukio")])
-        .values(vec![Value::integer(3), Value::text("Belka")]);
+        .values(vec![Value::int32(1), Value::text("Musti")])
+        .values(vec![Value::int32(2), Value::text("Naukio")])
+        .values(vec![Value::int32(3), Value::text("Belka")]);
 
     api.conn().insert(insert.into()).await?;
 
@@ -1376,13 +1374,10 @@ async fn float_columns_cast_to_f32(api: &mut dyn TestApi) -> crate::Result<()> {
 #[test_each_connector(tags("mysql"), ignore("mysql8"))]
 #[cfg(feature = "bigdecimal")]
 async fn newdecimal_conversion_is_handled_correctly(api: &mut dyn TestApi) -> crate::Result<()> {
-    let select = Select::default().value(sum(Value::integer(1)).alias("theone"));
+    let select = Select::default().value(sum(Value::int32(1)).alias("theone"));
     let result = api.conn().select(select).await?;
 
-    assert_eq!(
-        Value::Numeric(Some("1.0".parse().unwrap())),
-        result.into_single().unwrap()[0]
-    );
+    assert_eq!(Value::numeric("1.0".parse().unwrap()), result.into_single().unwrap()[0]);
 
     Ok(())
 }
@@ -1667,7 +1662,7 @@ async fn enum_values(api: &mut dyn TestApi) -> crate::Result<()> {
             Insert::single_into(&table)
                 .value(
                     "value",
-                    Value::enum_variant_with_name("A", &type_name, Option::<&str>::None),
+                    Value::enum_variant_with_name("A", EnumName::new(&type_name, Option::<String>::None)),
                 )
                 .into(),
         )
@@ -1678,18 +1673,14 @@ async fn enum_values(api: &mut dyn TestApi) -> crate::Result<()> {
             Insert::single_into(&table)
                 .value(
                     "value",
-                    Value::enum_variant_with_name("B", &type_name, Option::<&str>::None),
+                    Value::enum_variant_with_name("B", EnumName::new(&type_name, Option::<String>::None)),
                 )
                 .into(),
         )
         .await?;
 
     api.conn()
-        .insert(
-            Insert::single_into(&table)
-                .value("value", Value::Enum(None, None))
-                .into(),
-        )
+        .insert(Insert::single_into(&table).value("value", Value::null_enum()).into())
         .await?;
 
     let select = Select::from_table(&table).column("value").order_by("id".ascend());
@@ -1702,7 +1693,7 @@ async fn enum_values(api: &mut dyn TestApi) -> crate::Result<()> {
     assert_eq!(Some(&Value::enum_variant("B")), row.at(0));
 
     let row = res.get(2).unwrap();
-    assert_eq!(Some(&Value::Enum(None, None)), row.at(0));
+    assert_eq!(Some(&Value::null_enum()), row.at(0));
 
     Ok(())
 }
@@ -1717,9 +1708,9 @@ async fn row_to_json_normal(api: &mut dyn TestApi) -> crate::Result<()> {
     let result = api.conn().select(select).await?;
 
     assert_eq!(
-        Value::Json(Some(serde_json::json!({
+        Value::json(serde_json::json!({
             "toto": "hello_world"
-        }))),
+        })),
         result.into_single().unwrap()[0]
     );
 
@@ -1736,9 +1727,9 @@ async fn row_to_json_pretty(api: &mut dyn TestApi) -> crate::Result<()> {
     let result = api.conn().select(select).await?;
 
     assert_eq!(
-        Value::Json(Some(serde_json::json!({
+        Value::json(serde_json::json!({
             "toto": "hello_world"
-        }))),
+        })),
         result.into_single().unwrap()[0]
     );
 
@@ -2027,9 +2018,9 @@ async fn ints_read_write_to_numeric(api: &mut dyn TestApi) -> crate::Result<()> 
     let table = api.create_temp_table("id int, value numeric(12,2)").await?;
 
     let insert = Insert::multi_into(&table, ["id", "value"])
-        .values(vec![Value::integer(1), Value::double(1234.5)])
-        .values(vec![Value::integer(2), Value::integer(1234)])
-        .values(vec![Value::integer(3), Value::integer(12345)]);
+        .values(vec![Value::int32(1), Value::double(1234.5)])
+        .values(vec![Value::int32(2), Value::int32(1234)])
+        .values(vec![Value::int32(3), Value::int32(12345)]);
 
     api.conn().execute(insert.into()).await?;
 
@@ -2057,7 +2048,7 @@ async fn bigdecimal_read_write_to_floating(api: &mut dyn TestApi) -> crate::Resu
     let val = BigDecimal::from_str("0.1").unwrap();
 
     let insert = Insert::multi_into(&table, ["id", "a", "b"]).values(vec![
-        Value::integer(1),
+        Value::int32(1),
         Value::numeric(val.clone()),
         Value::numeric(val.clone()),
     ]);
@@ -2075,7 +2066,7 @@ async fn bigdecimal_read_write_to_floating(api: &mut dyn TestApi) -> crate::Resu
 
 #[test_each_connector]
 async fn coalesce_fun(api: &mut dyn TestApi) -> crate::Result<()> {
-    let exprs: Vec<Expression> = vec![Value::Text(None).into(), Value::text("Individual").into()];
+    let exprs: Vec<Expression> = vec![Value::null_text().into(), Value::text("Individual").into()];
     let select = Select::default().value(coalesce(exprs).alias("val"));
     let row = api.conn().select(select).await?.into_single()?;
 
@@ -2085,15 +2076,15 @@ async fn coalesce_fun(api: &mut dyn TestApi) -> crate::Result<()> {
 }
 
 fn value_into_json(value: &Value) -> Option<serde_json::Value> {
-    match value.clone() {
+    match value.typed.clone() {
         // MariaDB returns JSON as text
-        Value::Text(Some(text)) => {
+        ValueType::Text(Some(text)) => {
             let json: serde_json::Value = serde_json::from_str(&text)
                 .unwrap_or_else(|_| panic!("expected parsable text to json, found {}", text));
 
             Some(json)
         }
-        Value::Json(Some(json)) => Some(json),
+        ValueType::Json(Some(json)) => Some(json),
         _ => None,
     }
 }
@@ -3007,7 +2998,7 @@ async fn generate_binary_uuid(api: &mut dyn TestApi) -> crate::Result<()> {
     let val = res.into_single()?;
 
     // If it is a byte type and has a value, it's a generated UUID.
-    assert!(matches!(val, Value::Bytes(x) if x.is_some()));
+    assert!(matches!(val.typed, ValueType::Bytes(x) if x.is_some()));
 
     Ok(())
 }
@@ -3020,7 +3011,7 @@ async fn generate_swapped_binary_uuid(api: &mut dyn TestApi) -> crate::Result<()
     let val = res.into_single()?;
 
     // If it is a byte type and has a value, it's a generated UUID.
-    assert!(matches!(val, Value::Bytes(x) if x.is_some()));
+    assert!(matches!(val.typed, ValueType::Bytes(x) if x.is_some()));
 
     Ok(())
 }
@@ -3033,7 +3024,7 @@ async fn generate_native_uuid(api: &mut dyn TestApi) -> crate::Result<()> {
     let val = res.into_single()?;
 
     // If it is a text type and has a value, it's a generated string UUID.
-    assert!(matches!(val, Value::Text(x) if x.is_some()));
+    assert!(matches!(val.typed, ValueType::Text(x) if x.is_some()));
 
     Ok(())
 }
@@ -3176,25 +3167,25 @@ async fn order_by_nulls_first_last(api: &mut dyn TestApi) -> crate::Result<()> {
 
     let insert = Insert::single_into(&table)
         .value("name", "b")
-        .value("age", Value::Int32(None));
+        .value("age", Value::null_int32());
     api.conn().insert(insert.into()).await?;
 
     let insert = Insert::single_into(&table)
-        .value("name", Value::Text(None))
+        .value("name", Value::null_text())
         .value("age", 2);
     api.conn().insert(insert.into()).await?;
 
     let insert = Insert::single_into(&table)
-        .value("name", Value::Text(None))
-        .value("age", Value::Text(None));
+        .value("name", Value::null_text())
+        .value("age", Value::null_text());
     api.conn().insert(insert.into()).await?;
 
     // name ASC NULLS FIRST
     let select = Select::from_table(table.clone()).order_by("name".ascend_nulls_first());
     let res = api.conn().select(select).await?;
 
-    assert_eq!(res.get(0).unwrap()["name"], Value::Text(None));
-    assert_eq!(res.get(1).unwrap()["name"], Value::Text(None));
+    assert_eq!(res.get(0).unwrap()["name"], Value::null_text());
+    assert_eq!(res.get(1).unwrap()["name"], Value::null_text());
     assert_eq!(res.get(2).unwrap()["name"], Value::text("a"));
     assert_eq!(res.get(3).unwrap()["name"], Value::text("b"));
 
@@ -3204,15 +3195,15 @@ async fn order_by_nulls_first_last(api: &mut dyn TestApi) -> crate::Result<()> {
 
     assert_eq!(res.get(0).unwrap()["name"], Value::text("a"));
     assert_eq!(res.get(1).unwrap()["name"], Value::text("b"));
-    assert_eq!(res.get(2).unwrap()["name"], Value::Text(None));
-    assert_eq!(res.get(3).unwrap()["name"], Value::Text(None));
+    assert_eq!(res.get(2).unwrap()["name"], Value::null_text());
+    assert_eq!(res.get(3).unwrap()["name"], Value::null_text());
 
     // name DESC NULLS FIRST
     let select = Select::from_table(table.clone()).order_by("name".descend_nulls_first());
     let res = api.conn().select(select).await?;
 
-    assert_eq!(res.get(0).unwrap()["name"], Value::Text(None));
-    assert_eq!(res.get(1).unwrap()["name"], Value::Text(None));
+    assert_eq!(res.get(0).unwrap()["name"], Value::null_text());
+    assert_eq!(res.get(1).unwrap()["name"], Value::null_text());
     assert_eq!(res.get(2).unwrap()["name"], Value::text("b"));
     assert_eq!(res.get(3).unwrap()["name"], Value::text("a"));
 
@@ -3222,8 +3213,8 @@ async fn order_by_nulls_first_last(api: &mut dyn TestApi) -> crate::Result<()> {
 
     assert_eq!(res.get(0).unwrap()["name"], Value::text("b"));
     assert_eq!(res.get(1).unwrap()["name"], Value::text("a"));
-    assert_eq!(res.get(2).unwrap()["name"], Value::Text(None));
-    assert_eq!(res.get(3).unwrap()["name"], Value::Text(None));
+    assert_eq!(res.get(2).unwrap()["name"], Value::null_text());
+    assert_eq!(res.get(3).unwrap()["name"], Value::null_text());
 
     // name ASC NULLS FIRST, age ASC NULLS FIRST
     let select = Select::from_table(table.clone())
@@ -3231,17 +3222,17 @@ async fn order_by_nulls_first_last(api: &mut dyn TestApi) -> crate::Result<()> {
         .order_by("age".ascend_nulls_first());
     let res = api.conn().select(select).await?;
 
-    assert_eq!(res.get(0).unwrap()["name"], Value::Text(None));
-    assert_eq!(res.get(0).unwrap()["age"], Value::Int32(None));
+    assert_eq!(res.get(0).unwrap()["name"], Value::null_text());
+    assert_eq!(res.get(0).unwrap()["age"], Value::null_int32());
 
-    assert_eq!(res.get(1).unwrap()["name"], Value::Text(None));
+    assert_eq!(res.get(1).unwrap()["name"], Value::null_text());
     assert_eq!(res.get(1).unwrap()["age"], Value::int32(2));
 
     assert_eq!(res.get(2).unwrap()["name"], Value::text("a"));
     assert_eq!(res.get(2).unwrap()["age"], Value::int32(1));
 
     assert_eq!(res.get(3).unwrap()["name"], Value::text("b"));
-    assert_eq!(res.get(3).unwrap()["age"], Value::Int32(None));
+    assert_eq!(res.get(3).unwrap()["age"], Value::null_int32());
 
     // name ASC NULLS LAST, age ASC NULLS LAST
     let select = Select::from_table(table.clone())
@@ -3253,13 +3244,13 @@ async fn order_by_nulls_first_last(api: &mut dyn TestApi) -> crate::Result<()> {
     assert_eq!(res.get(0).unwrap()["age"], Value::int32(1));
 
     assert_eq!(res.get(1).unwrap()["name"], Value::text("b"));
-    assert_eq!(res.get(1).unwrap()["age"], Value::Int32(None));
+    assert_eq!(res.get(1).unwrap()["age"], Value::null_int32());
 
-    assert_eq!(res.get(2).unwrap()["name"], Value::Text(None));
+    assert_eq!(res.get(2).unwrap()["name"], Value::null_text());
     assert_eq!(res.get(2).unwrap()["age"], Value::int32(2));
 
-    assert_eq!(res.get(3).unwrap()["name"], Value::Text(None));
-    assert_eq!(res.get(3).unwrap()["age"], Value::Int32(None));
+    assert_eq!(res.get(3).unwrap()["name"], Value::null_text());
+    assert_eq!(res.get(3).unwrap()["age"], Value::null_int32());
 
     // name DESC NULLS FIRST, age DESC NULLS FIRST
     let select = Select::from_table(table.clone())
@@ -3267,14 +3258,14 @@ async fn order_by_nulls_first_last(api: &mut dyn TestApi) -> crate::Result<()> {
         .order_by("age".descend_nulls_first());
     let res = api.conn().select(select).await?;
 
-    assert_eq!(res.get(0).unwrap()["name"], Value::Text(None));
-    assert_eq!(res.get(0).unwrap()["age"], Value::Int32(None));
+    assert_eq!(res.get(0).unwrap()["name"], Value::null_text());
+    assert_eq!(res.get(0).unwrap()["age"], Value::null_int32());
 
-    assert_eq!(res.get(1).unwrap()["name"], Value::Text(None));
+    assert_eq!(res.get(1).unwrap()["name"], Value::null_text());
     assert_eq!(res.get(1).unwrap()["age"], Value::int32(2));
 
     assert_eq!(res.get(2).unwrap()["name"], Value::text("b"));
-    assert_eq!(res.get(2).unwrap()["age"], Value::Int32(None));
+    assert_eq!(res.get(2).unwrap()["age"], Value::null_int32());
 
     assert_eq!(res.get(3).unwrap()["name"], Value::text("a"));
     assert_eq!(res.get(3).unwrap()["age"], Value::int32(1));
@@ -3286,16 +3277,16 @@ async fn order_by_nulls_first_last(api: &mut dyn TestApi) -> crate::Result<()> {
     let res = api.conn().select(select).await?;
 
     assert_eq!(res.get(0).unwrap()["name"], Value::text("b"));
-    assert_eq!(res.get(0).unwrap()["age"], Value::Int32(None));
+    assert_eq!(res.get(0).unwrap()["age"], Value::null_int32());
 
     assert_eq!(res.get(1).unwrap()["name"], Value::text("a"));
     assert_eq!(res.get(1).unwrap()["age"], Value::int32(1));
 
-    assert_eq!(res.get(2).unwrap()["name"], Value::Text(None));
+    assert_eq!(res.get(2).unwrap()["name"], Value::null_text());
     assert_eq!(res.get(2).unwrap()["age"], Value::int32(2));
 
-    assert_eq!(res.get(3).unwrap()["name"], Value::Text(None));
-    assert_eq!(res.get(3).unwrap()["age"], Value::Int32(None));
+    assert_eq!(res.get(3).unwrap()["name"], Value::null_text());
+    assert_eq!(res.get(3).unwrap()["age"], Value::null_int32());
 
     // name ASC NULLS LAST, age DESC NULLS FIRST
     let select = Select::from_table(table.clone())
@@ -3307,12 +3298,12 @@ async fn order_by_nulls_first_last(api: &mut dyn TestApi) -> crate::Result<()> {
     assert_eq!(res.get(0).unwrap()["age"], Value::int32(1));
 
     assert_eq!(res.get(1).unwrap()["name"], Value::text("b"));
-    assert_eq!(res.get(1).unwrap()["age"], Value::Int32(None));
+    assert_eq!(res.get(1).unwrap()["age"], Value::null_int32());
 
-    assert_eq!(res.get(2).unwrap()["name"], Value::Text(None));
-    assert_eq!(res.get(2).unwrap()["age"], Value::Int32(None));
+    assert_eq!(res.get(2).unwrap()["name"], Value::null_text());
+    assert_eq!(res.get(2).unwrap()["age"], Value::null_int32());
 
-    assert_eq!(res.get(3).unwrap()["name"], Value::Text(None));
+    assert_eq!(res.get(3).unwrap()["name"], Value::null_text());
     assert_eq!(res.get(3).unwrap()["age"], Value::int32(2));
 
     // name DESC NULLS FIRST, age ASC NULLS LAST
@@ -3321,14 +3312,14 @@ async fn order_by_nulls_first_last(api: &mut dyn TestApi) -> crate::Result<()> {
         .order_by("age".ascend_nulls_last());
     let res = api.conn().select(select).await?;
 
-    assert_eq!(res.get(0).unwrap()["name"], Value::Text(None));
+    assert_eq!(res.get(0).unwrap()["name"], Value::null_text());
     assert_eq!(res.get(0).unwrap()["age"], Value::int32(2));
 
-    assert_eq!(res.get(1).unwrap()["name"], Value::Text(None));
-    assert_eq!(res.get(1).unwrap()["age"], Value::Int32(None));
+    assert_eq!(res.get(1).unwrap()["name"], Value::null_text());
+    assert_eq!(res.get(1).unwrap()["age"], Value::null_int32());
 
     assert_eq!(res.get(2).unwrap()["name"], Value::text("b"));
-    assert_eq!(res.get(2).unwrap()["age"], Value::Int32(None));
+    assert_eq!(res.get(2).unwrap()["age"], Value::null_int32());
 
     assert_eq!(res.get(3).unwrap()["name"], Value::text("a"));
     assert_eq!(res.get(3).unwrap()["age"], Value::int32(1));

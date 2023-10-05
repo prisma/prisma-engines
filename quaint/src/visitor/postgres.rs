@@ -107,12 +107,9 @@ impl<'a> Visitor<'a> for Postgres<'a> {
             self.surround_with_backticks(enum_name.name.deref())?;
             self.write("[]")?;
         } else {
-            self.visit_parameterized(Value::Array(Some(
-                variants
-                    .into_iter()
-                    .map(|variant| variant.into_enum(name.clone()))
-                    .collect(),
-            )))?;
+            self.visit_parameterized(Value::array(
+                variants.into_iter().map(|variant| variant.into_enum(name.clone())),
+            ))?;
         }
 
         Ok(())
@@ -167,32 +164,32 @@ impl<'a> Visitor<'a> for Postgres<'a> {
     }
 
     fn visit_raw_value(&mut self, value: Value<'a>) -> visitor::Result {
-        let res = match value {
-            Value::Int32(i) => i.map(|i| self.write(i)),
-            Value::Int64(i) => i.map(|i| self.write(i)),
-            Value::Text(t) => t.map(|t| self.write(format!("'{t}'"))),
-            Value::Enum(e, _) => e.map(|e| self.write(e)),
-            Value::Bytes(b) => b.map(|b| self.write(format!("E'{}'", hex::encode(b)))),
-            Value::Boolean(b) => b.map(|b| self.write(b)),
-            Value::Xml(cow) => cow.map(|cow| self.write(format!("'{cow}'"))),
-            Value::Char(c) => c.map(|c| self.write(format!("'{c}'"))),
-            Value::Float(d) => d.map(|f| match f {
+        let res = match &value.typed {
+            ValueType::Int32(i) => i.map(|i| self.write(i)),
+            ValueType::Int64(i) => i.map(|i| self.write(i)),
+            ValueType::Text(t) => t.as_ref().map(|t| self.write(format!("'{t}'"))),
+            ValueType::Enum(e, _) => e.as_ref().map(|e| self.write(e)),
+            ValueType::Bytes(b) => b.as_ref().map(|b| self.write(format!("E'{}'", hex::encode(b)))),
+            ValueType::Boolean(b) => b.map(|b| self.write(b)),
+            ValueType::Xml(cow) => cow.as_ref().map(|cow| self.write(format!("'{cow}'"))),
+            ValueType::Char(c) => c.map(|c| self.write(format!("'{c}'"))),
+            ValueType::Float(d) => d.map(|f| match f {
                 f if f.is_nan() => self.write("'NaN'"),
                 f if f == f32::INFINITY => self.write("'Infinity'"),
                 f if f == f32::NEG_INFINITY => self.write("'-Infinity"),
                 v => self.write(format!("{v:?}")),
             }),
-            Value::Double(d) => d.map(|f| match f {
+            ValueType::Double(d) => d.map(|f| match f {
                 f if f.is_nan() => self.write("'NaN'"),
                 f if f == f64::INFINITY => self.write("'Infinity'"),
                 f if f == f64::NEG_INFINITY => self.write("'-Infinity"),
                 v => self.write(format!("{v:?}")),
             }),
-            Value::Array(ary) => ary.map(|ary| {
+            ValueType::Array(ary) => ary.as_ref().map(|ary| {
                 self.surround_with("'{", "}'", |ref mut s| {
                     let len = ary.len();
 
-                    for (i, item) in ary.into_iter().enumerate() {
+                    for (i, item) in ary.iter().enumerate() {
                         s.write(item)?;
 
                         if i < len - 1 {
@@ -203,11 +200,11 @@ impl<'a> Visitor<'a> for Postgres<'a> {
                     Ok(())
                 })
             }),
-            Value::EnumArray(variants, name) => variants.map(|variants| {
+            ValueType::EnumArray(variants, name) => variants.as_ref().map(|variants| {
                 self.surround_with("ARRAY[", "]", |ref mut s| {
                     let len = variants.len();
 
-                    for (i, item) in variants.into_iter().enumerate() {
+                    for (i, item) in variants.iter().enumerate() {
                         s.surround_with("'", "'", |t| t.write(item))?;
 
                         if i < len - 1 {
@@ -220,7 +217,7 @@ impl<'a> Visitor<'a> for Postgres<'a> {
 
                 if let Some(enum_name) = name {
                     self.write("::")?;
-                    if let Some(schema_name) = enum_name.schema_name {
+                    if let Some(schema_name) = &enum_name.schema_name {
                         self.surround_with_backticks(schema_name.deref())?;
                         self.write(".")?
                     }
@@ -229,14 +226,16 @@ impl<'a> Visitor<'a> for Postgres<'a> {
 
                 Ok(())
             }),
-            Value::Json(j) => j.map(|j| self.write(format!("'{}'", serde_json::to_string(&j).unwrap()))),
+            ValueType::Json(j) => j
+                .as_ref()
+                .map(|j| self.write(format!("'{}'", serde_json::to_string(&j).unwrap()))),
             #[cfg(feature = "bigdecimal")]
-            Value::Numeric(r) => r.map(|r| self.write(r)),
+            ValueType::Numeric(r) => r.as_ref().map(|r| self.write(r)),
             #[cfg(feature = "uuid")]
-            Value::Uuid(uuid) => uuid.map(|uuid| self.write(format!("'{}'", uuid.hyphenated()))),
-            Value::DateTime(dt) => dt.map(|dt| self.write(format!("'{}'", dt.to_rfc3339(),))),
-            Value::Date(date) => date.map(|date| self.write(format!("'{date}'"))),
-            Value::Time(time) => time.map(|time| self.write(format!("'{time}'"))),
+            ValueType::Uuid(uuid) => uuid.map(|uuid| self.write(format!("'{}'", uuid.hyphenated()))),
+            ValueType::DateTime(dt) => dt.map(|dt| self.write(format!("'{}'", dt.to_rfc3339(),))),
+            ValueType::Date(date) => date.map(|date| self.write(format!("'{date}'"))),
+            ValueType::Time(time) => time.map(|time| self.write(format!("'{time}'"))),
         };
 
         match res {
@@ -961,7 +960,7 @@ mod tests {
 
     #[test]
     fn test_raw_null() {
-        let (sql, params) = Postgres::build(Select::default().value(Value::Text(None).raw())).unwrap();
+        let (sql, params) = Postgres::build(Select::default().value(Value::null_text().raw())).unwrap();
         assert_eq!("SELECT null", sql);
         assert!(params.is_empty());
     }
@@ -1050,9 +1049,9 @@ mod tests {
 
     #[test]
     fn test_raw_enum_array() {
-        let enum_array = Value::EnumArray(
-            Some(vec![EnumVariant::new("A"), EnumVariant::new("B")]),
-            Some(EnumName::new("Alphabet", Some("foo"))),
+        let enum_array = Value::enum_array_with_name(
+            vec![EnumVariant::new("A"), EnumVariant::new("B")],
+            EnumName::new("Alphabet", Some("foo")),
         );
         let (sql, params) = Postgres::build(Select::default().value(enum_array.raw())).unwrap();
 

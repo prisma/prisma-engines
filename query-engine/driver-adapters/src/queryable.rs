@@ -34,7 +34,7 @@ pub(crate) struct JsBaseQueryable {
 
 impl JsBaseQueryable {
     pub(crate) fn new(proxy: CommonProxy) -> Self {
-        let flavour: Flavour = proxy.flavour.to_owned().parse().unwrap();
+        let flavour: Flavour = proxy.flavour.parse().unwrap();
         Self { proxy, flavour }
     }
 
