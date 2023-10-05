@@ -130,7 +130,7 @@ fn test_each_connector_async_wrapper_functions(
                     #test_fn_name(&mut api).await#optional_unwrap
                 };
 
-                test_setup::run_with_tokio(fut)
+                quaint_test_setup::run_with_tokio(fut)
             }
         };
 
