@@ -119,8 +119,10 @@ impl FilterVisitor {
         // This is not possible in the case of M2M implicit relations.
         if filter.field.related_field().is_inlined_on_enclosing_model() {
             let related_table = filter.field.related_model().as_table(ctx);
-            let related_columns: Vec<_> = ModelProjection::from(filter.field.related_field().linking_fields())
-                .as_columns(ctx)
+            let related_columns: Vec<_> = filter
+                .field
+                .related_field()
+                .join_columns(ctx)
                 .map(|col| col.aliased_col(Some(alias), ctx))
                 .collect();
 
@@ -146,7 +148,8 @@ impl FilterVisitor {
             let table = filter.field.as_table(ctx);
             let selected_identifier: Vec<Column> = filter
                 .field
-                .identifier_columns(ctx)
+                .related_field()
+                .join_columns(ctx)
                 .map(|col| col.aliased_col(Some(alias), ctx))
                 .collect();
 
@@ -392,7 +395,7 @@ impl FilterVisitorExt for FilterVisitor {
             }
 
             _ => {
-                let ids = ModelProjection::from(filter.field.model().primary_identifier()).as_columns(ctx);
+                let ids = ModelProjection::from(filter.field.linking_fields()).as_columns(ctx);
                 let columns: Vec<Column<'static>> = ids.map(|col| col.aliased_col(self.parent_alias(), ctx)).collect();
 
                 let condition = filter.condition;
