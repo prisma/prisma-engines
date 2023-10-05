@@ -78,6 +78,7 @@ impl darling::FromMeta for TagsWrapper {
     }
 }
 
+#[allow(clippy::needless_borrow)]
 pub fn test_each_connector_impl(attr: TokenStream, input: TokenStream) -> TokenStream {
     let attributes_meta: syn::AttributeArgs = parse_macro_input!(attr as AttributeArgs);
     let args = TestEachConnectorArgs::from_list(&attributes_meta);
@@ -99,6 +100,7 @@ pub fn test_each_connector_impl(attr: TokenStream, input: TokenStream) -> TokenS
     output.into()
 }
 
+#[allow(clippy::needless_borrow)]
 fn test_each_connector_async_wrapper_functions(
     args: &TestEachConnectorArgs,
     test_function: &ItemFn,
@@ -128,7 +130,7 @@ fn test_each_connector_async_wrapper_functions(
                     #test_fn_name(&mut api).await#optional_unwrap
                 };
 
-                quaint_test_setup::run_with_tokio(fut)
+                test_setup::run_with_tokio(fut)
             }
         };
 
