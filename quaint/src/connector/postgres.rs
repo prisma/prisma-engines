@@ -1480,9 +1480,7 @@ mod tests {
         let url = Url::parse(&CONN_STR).unwrap();
         let conn = Quaint::new(url.as_str()).await.unwrap();
 
-        let res = conn
-            .query_raw("SELECT $1", &[Value::integer(1), Value::integer(2)])
-            .await;
+        let res = conn.query_raw("SELECT $1", &[Value::int32(1), Value::int32(2)]).await;
 
         assert!(res.is_err());
 

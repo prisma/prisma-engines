@@ -251,7 +251,7 @@ mod tests {
 
     #[test]
     fn deserialize_user() {
-        let row = make_row(vec![("id", Value::integer(12)), ("name", "Georgina".into())]);
+        let row = make_row(vec![("id", Value::int32(12)), ("name", "Georgina".into())]);
         let user: User = from_row(row).unwrap();
 
         assert_eq!(
@@ -267,7 +267,7 @@ mod tests {
     #[test]
     fn from_rows_works() {
         let first_row = make_row(vec![
-            ("id", Value::integer(12)),
+            ("id", Value::int32(12)),
             ("name", "Georgina".into()),
             ("bio", Value::null_text()),
         ]);

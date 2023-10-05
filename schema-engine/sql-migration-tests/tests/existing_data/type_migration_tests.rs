@@ -138,10 +138,7 @@ fn changing_an_int_array_column_to_scalar_is_not_possible(api: TestApi) {
 
     api.insert("Film")
         .value("id", "film1")
-        .value(
-            "mainProtagonist",
-            Value::array(vec![Value::integer(7), Value::integer(11)]),
-        )
+        .value("mainProtagonist", Value::array(vec![Value::int32(7), Value::int32(11)]))
         .result_raw();
 
     let dm2 = r#"

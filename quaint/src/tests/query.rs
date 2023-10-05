@@ -307,8 +307,8 @@ async fn where_equals(api: &mut dyn TestApi) -> crate::Result<()> {
     let table = api.create_temp_table("id int, name varchar(255)").await?;
 
     let insert = Insert::multi_into(&table, vec!["id", "name"])
-        .values(vec![Value::integer(1), Value::text("Musti")])
-        .values(vec![Value::integer(2), Value::text("Naukio")]);
+        .values(vec![Value::int32(1), Value::text("Musti")])
+        .values(vec![Value::int32(2), Value::text("Naukio")]);
 
     api.conn().insert(insert.into()).await?;
 
@@ -328,8 +328,8 @@ async fn where_like(api: &mut dyn TestApi) -> crate::Result<()> {
     let table = api.create_temp_table("id int, name varchar(255)").await?;
 
     let insert = Insert::multi_into(&table, vec!["id", "name"])
-        .values(vec![Value::integer(1), Value::text("Musti")])
-        .values(vec![Value::integer(2), Value::text("Naukio")]);
+        .values(vec![Value::int32(1), Value::text("Musti")])
+        .values(vec![Value::int32(2), Value::text("Naukio")]);
 
     api.conn().insert(insert.into()).await?;
 
@@ -349,8 +349,8 @@ async fn where_not_like(api: &mut dyn TestApi) -> crate::Result<()> {
     let table = api.create_temp_table("id int, name varchar(255)").await?;
 
     let insert = Insert::multi_into(&table, vec!["id", "name"])
-        .values(vec![Value::integer(1), Value::text("Musti")])
-        .values(vec![Value::integer(2), Value::text("Naukio")]);
+        .values(vec![Value::int32(1), Value::text("Musti")])
+        .values(vec![Value::int32(2), Value::text("Naukio")]);
 
     api.conn().insert(insert.into()).await?;
 
@@ -371,14 +371,14 @@ async fn inner_join(api: &mut dyn TestApi) -> crate::Result<()> {
     let table2 = api.create_temp_table("t1_id int, is_cat int").await?;
 
     let insert = Insert::multi_into(&table1, vec!["id", "name"])
-        .values(vec![Value::integer(1), Value::text("Musti")])
-        .values(vec![Value::integer(2), Value::text("Belka")]);
+        .values(vec![Value::int32(1), Value::text("Musti")])
+        .values(vec![Value::int32(2), Value::text("Belka")]);
 
     api.conn().insert(insert.into()).await?;
 
     let insert = Insert::multi_into(&table2, vec!["t1_id", "is_cat"])
-        .values(vec![Value::integer(1), Value::integer(1)])
-        .values(vec![Value::integer(2), Value::integer(0)]);
+        .values(vec![Value::int32(1), Value::int32(1)])
+        .values(vec![Value::int32(2), Value::int32(0)]);
 
     api.conn().insert(insert.into()).await?;
 
@@ -414,18 +414,18 @@ async fn table_inner_join(api: &mut dyn TestApi) -> crate::Result<()> {
     let table3 = api.create_temp_table("id int, foo int").await?;
 
     let insert = Insert::multi_into(&table1, vec!["id", "name"])
-        .values(vec![Value::integer(1), Value::text("Musti")])
-        .values(vec![Value::integer(2), Value::text("Belka")]);
+        .values(vec![Value::int32(1), Value::text("Musti")])
+        .values(vec![Value::int32(2), Value::text("Belka")]);
 
     api.conn().insert(insert.into()).await?;
 
     let insert = Insert::multi_into(&table2, vec!["t1_id", "is_cat"])
-        .values(vec![Value::integer(1), Value::integer(1)])
-        .values(vec![Value::integer(2), Value::integer(0)]);
+        .values(vec![Value::int32(1), Value::int32(1)])
+        .values(vec![Value::int32(2), Value::int32(0)]);
 
     api.conn().insert(insert.into()).await?;
 
-    let insert = Insert::multi_into(&table3, vec!["id", "foo"]).values(vec![Value::integer(1), Value::integer(1)]);
+    let insert = Insert::multi_into(&table3, vec!["id", "foo"]).values(vec![Value::int32(1), Value::int32(1)]);
 
     api.conn().insert(insert.into()).await?;
 
@@ -466,13 +466,12 @@ async fn left_join(api: &mut dyn TestApi) -> crate::Result<()> {
     let table2 = api.create_temp_table("t1_id int, is_cat int").await?;
 
     let insert = Insert::multi_into(&table1, vec!["id", "name"])
-        .values(vec![Value::integer(1), Value::text("Musti")])
-        .values(vec![Value::integer(2), Value::text("Belka")]);
+        .values(vec![Value::int32(1), Value::text("Musti")])
+        .values(vec![Value::int32(2), Value::text("Belka")]);
 
     api.conn().insert(insert.into()).await?;
 
-    let insert =
-        Insert::multi_into(&table2, vec!["t1_id", "is_cat"]).values(vec![Value::integer(1), Value::integer(1)]);
+    let insert = Insert::multi_into(&table2, vec!["t1_id", "is_cat"]).values(vec![Value::int32(1), Value::int32(1)]);
 
     api.conn().insert(insert.into()).await?;
 
@@ -508,17 +507,16 @@ async fn table_left_join(api: &mut dyn TestApi) -> crate::Result<()> {
     let table3 = api.create_temp_table("id int, foo int").await?;
 
     let insert = Insert::multi_into(&table1, vec!["id", "name"])
-        .values(vec![Value::integer(1), Value::text("Musti")])
-        .values(vec![Value::integer(2), Value::text("Belka")]);
+        .values(vec![Value::int32(1), Value::text("Musti")])
+        .values(vec![Value::int32(2), Value::text("Belka")]);
 
     api.conn().insert(insert.into()).await?;
 
-    let insert =
-        Insert::multi_into(&table2, vec!["t1_id", "is_cat"]).values(vec![Value::integer(1), Value::integer(1)]);
+    let insert = Insert::multi_into(&table2, vec!["t1_id", "is_cat"]).values(vec![Value::int32(1), Value::int32(1)]);
 
     api.conn().insert(insert.into()).await?;
 
-    let insert = Insert::multi_into(&table3, vec!["id", "foo"]).values(vec![Value::integer(1), Value::integer(1)]);
+    let insert = Insert::multi_into(&table3, vec!["id", "foo"]).values(vec![Value::int32(1), Value::int32(1)]);
 
     api.conn().insert(insert.into()).await?;
 
@@ -558,8 +556,8 @@ async fn limit_no_offset(api: &mut dyn TestApi) -> crate::Result<()> {
     let table = api.create_temp_table("id int, name varchar(255)").await?;
 
     let insert = Insert::multi_into(&table, vec!["id", "name"])
-        .values(vec![Value::integer(1), Value::text("Musti")])
-        .values(vec![Value::integer(2), Value::text("Naukio")]);
+        .values(vec![Value::int32(1), Value::text("Musti")])
+        .values(vec![Value::int32(2), Value::text("Naukio")]);
 
     api.conn().insert(insert.into()).await?;
 
@@ -580,8 +578,8 @@ async fn offset_no_limit(api: &mut dyn TestApi) -> crate::Result<()> {
     let table = api.create_temp_table("id int, name varchar(255)").await?;
 
     let insert = Insert::multi_into(&table, vec!["id", "name"])
-        .values(vec![Value::integer(1), Value::text("Musti")])
-        .values(vec![Value::integer(2), Value::text("Naukio")]);
+        .values(vec![Value::int32(1), Value::text("Musti")])
+        .values(vec![Value::int32(2), Value::text("Naukio")]);
 
     api.conn().insert(insert.into()).await?;
 
@@ -602,9 +600,9 @@ async fn limit_with_offset(api: &mut dyn TestApi) -> crate::Result<()> {
     let table = api.create_temp_table("id int, name varchar(255)").await?;
 
     let insert = Insert::multi_into(&table, vec!["id", "name"])
-        .values(vec![Value::integer(1), Value::text("Musti")])
-        .values(vec![Value::integer(2), Value::text("Naukio")])
-        .values(vec![Value::integer(3), Value::text("Belka")]);
+        .values(vec![Value::int32(1), Value::text("Musti")])
+        .values(vec![Value::int32(2), Value::text("Naukio")])
+        .values(vec![Value::int32(3), Value::text("Belka")]);
 
     api.conn().insert(insert.into()).await?;
 
@@ -625,9 +623,9 @@ async fn limit_with_offset_no_given_order(api: &mut dyn TestApi) -> crate::Resul
     let table = api.create_temp_table("id int, name varchar(255)").await?;
 
     let insert = Insert::multi_into(&table, vec!["id", "name"])
-        .values(vec![Value::integer(1), Value::text("Musti")])
-        .values(vec![Value::integer(2), Value::text("Naukio")])
-        .values(vec![Value::integer(3), Value::text("Belka")]);
+        .values(vec![Value::int32(1), Value::text("Musti")])
+        .values(vec![Value::int32(2), Value::text("Naukio")])
+        .values(vec![Value::int32(3), Value::text("Belka")]);
 
     api.conn().insert(insert.into()).await?;
 
@@ -1376,7 +1374,7 @@ async fn float_columns_cast_to_f32(api: &mut dyn TestApi) -> crate::Result<()> {
 #[test_each_connector(tags("mysql"), ignore("mysql8"))]
 #[cfg(feature = "bigdecimal")]
 async fn newdecimal_conversion_is_handled_correctly(api: &mut dyn TestApi) -> crate::Result<()> {
-    let select = Select::default().value(sum(Value::integer(1)).alias("theone"));
+    let select = Select::default().value(sum(Value::int32(1)).alias("theone"));
     let result = api.conn().select(select).await?;
 
     assert_eq!(Value::numeric("1.0".parse().unwrap()), result.into_single().unwrap()[0]);
@@ -2020,9 +2018,9 @@ async fn ints_read_write_to_numeric(api: &mut dyn TestApi) -> crate::Result<()> 
     let table = api.create_temp_table("id int, value numeric(12,2)").await?;
 
     let insert = Insert::multi_into(&table, ["id", "value"])
-        .values(vec![Value::integer(1), Value::double(1234.5)])
-        .values(vec![Value::integer(2), Value::integer(1234)])
-        .values(vec![Value::integer(3), Value::integer(12345)]);
+        .values(vec![Value::int32(1), Value::double(1234.5)])
+        .values(vec![Value::int32(2), Value::int32(1234)])
+        .values(vec![Value::int32(3), Value::int32(12345)]);
 
     api.conn().execute(insert.into()).await?;
 
@@ -2050,7 +2048,7 @@ async fn bigdecimal_read_write_to_floating(api: &mut dyn TestApi) -> crate::Resu
     let val = BigDecimal::from_str("0.1").unwrap();
 
     let insert = Insert::multi_into(&table, ["id", "a", "b"]).values(vec![
-        Value::integer(1),
+        Value::int32(1),
         Value::numeric(val.clone()),
         Value::numeric(val.clone()),
     ]);

@@ -58,14 +58,6 @@ impl<'a> Value<'a> {
         ValueType::int64(value).into_value()
     }
 
-    /// Creates a new 32-bit signed integer.
-    pub fn integer<I>(value: I) -> Self
-    where
-        I: Into<i32>,
-    {
-        ValueType::int32(value).into_value()
-    }
-
     /// Creates a new decimal value.
     #[cfg(feature = "bigdecimal")]
     #[cfg_attr(feature = "docs", doc(cfg(feature = "bigdecimal")))]
@@ -508,7 +500,7 @@ pub enum ValueType<'a> {
     /// Read more about it here: https://github.com/prisma/prisma-engines/pull/4280
     Enum(Option<EnumVariant<'a>>, Option<EnumName<'a>>),
     /// Database enum array (PostgreSQL specific).
-    /// We use a different variant than `ValueInner::Array` to uplift the `EnumName`
+    /// We use a different variant than `ValueType::Array` to uplift the `EnumName`
     /// and have it available even for empty enum arrays.
     EnumArray(Option<Vec<EnumVariant<'a>>>, Option<EnumName<'a>>),
     /// Bytes value.

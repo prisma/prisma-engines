@@ -149,8 +149,8 @@ test_type!(bit1(
     mysql,
     "bit(1)",
     (Value::null_bytes(), Value::null_boolean()),
-    (Value::integer(0), Value::boolean(false)),
-    (Value::integer(1), Value::boolean(true)),
+    (Value::int32(0), Value::boolean(false)),
+    (Value::int32(1), Value::boolean(true)),
 ));
 
 test_type!(bit64(
