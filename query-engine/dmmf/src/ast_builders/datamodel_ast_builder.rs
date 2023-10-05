@@ -133,17 +133,15 @@ fn model_to_dmmf(model: walkers::ModelWalker<'_>) -> Model {
         primary_key,
         unique_fields: model
             .indexes()
-            .filter_map(|i| {
-                (i.is_unique() && !i.is_defined_on_field()).then(|| i.fields().map(|f| f.name().to_owned()).collect())
-            })
+            .filter(|&i| i.is_unique() && !i.is_defined_on_field())
+            .map(|i| i.fields().map(|f| f.name().to_owned()).collect())
             .collect(),
         unique_indexes: model
             .indexes()
-            .filter_map(|i| {
-                (i.is_unique() && !i.is_defined_on_field()).then(|| UniqueIndex {
-                    name: i.name().map(ToOwned::to_owned),
-                    fields: i.fields().map(|f| f.name().to_owned()).collect(),
-                })
+            .filter(|&i| i.is_unique() && !i.is_defined_on_field())
+            .map(|i| UniqueIndex {
+                name: i.name().map(ToOwned::to_owned),
+                fields: i.fields().map(|f| f.name().to_owned()).collect(),
             })
             .collect(),
     }

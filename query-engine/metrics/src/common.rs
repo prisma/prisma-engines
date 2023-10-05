@@ -66,10 +66,7 @@ impl Metric {
                 global_labels.clone(),
             ),
             None => {
-                let description = descriptions
-                    .get(key.name())
-                    .map(|s| s.to_string())
-                    .unwrap_or(String::new());
+                let description = descriptions.get(key.name()).map(|s| s.to_string()).unwrap_or_default();
                 Self::new(key, description, value, global_labels.clone())
             }
         }

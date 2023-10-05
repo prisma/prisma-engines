@@ -254,7 +254,7 @@ mod tests {
 
     #[test]
     fn test_deserializing_error_batch_response() {
-        let response = r###"
+        let response = r#"
 {
    "batchResult":[
       {
@@ -280,7 +280,7 @@ mod tests {
          ]
       }
    ]
-}"###;
+}"#;
         let result: QueryResult = serde_json::from_str(response).unwrap();
 
         let expected = QueryResult {
