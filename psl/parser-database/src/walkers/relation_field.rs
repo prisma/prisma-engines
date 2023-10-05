@@ -187,12 +187,7 @@ impl<'db> Eq for RelationName<'db> {}
 
 impl<'db> PartialOrd for RelationName<'db> {
     fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
-        match (self, other) {
-            (Self::Explicit(l0), Self::Explicit(r0)) => l0.partial_cmp(r0),
-            (Self::Generated(l0), Self::Generated(r0)) => l0.partial_cmp(r0),
-            (Self::Explicit(l0), Self::Generated(r0)) => l0.partial_cmp(&r0.as_str()),
-            (Self::Generated(l0), Self::Explicit(r0)) => l0.as_str().partial_cmp(*r0),
-        }
+        Some(self.cmp(other))
     }
 }
 

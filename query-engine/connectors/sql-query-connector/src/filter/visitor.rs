@@ -199,8 +199,8 @@ impl FilterVisitorExt for FilterVisitor {
     ) -> (ConditionTree<'static>, Option<Vec<AliasedJoin>>) {
         match filter {
             Filter::And(mut filters) => match filters.len() {
-                n if n == 0 => (ConditionTree::NoCondition, None),
-                n if n == 1 => self.visit_filter(filters.pop().unwrap(), ctx),
+                0 => (ConditionTree::NoCondition, None),
+                1 => self.visit_filter(filters.pop().unwrap(), ctx),
                 _ => {
                     let mut exprs = Vec::with_capacity(filters.len());
                     let mut top_level_joins = vec![];
@@ -219,8 +219,8 @@ impl FilterVisitorExt for FilterVisitor {
                 }
             },
             Filter::Or(mut filters) => match filters.len() {
-                n if n == 0 => (ConditionTree::NegativeCondition, None),
-                n if n == 1 => self.visit_filter(filters.pop().unwrap(), ctx),
+                0 => (ConditionTree::NegativeCondition, None),
+                1 => self.visit_filter(filters.pop().unwrap(), ctx),
                 _ => {
                     let mut exprs = Vec::with_capacity(filters.len());
                     let mut top_level_joins = vec![];
@@ -239,8 +239,8 @@ impl FilterVisitorExt for FilterVisitor {
                 }
             },
             Filter::Not(mut filters) => match filters.len() {
-                n if n == 0 => (ConditionTree::NoCondition, None),
-                n if n == 1 => {
+                0 => (ConditionTree::NoCondition, None),
+                1 => {
                     let (cond, joins) = self.invert_reverse(|this| this.visit_filter(filters.pop().unwrap(), ctx));
 
                     (cond.not(), joins)

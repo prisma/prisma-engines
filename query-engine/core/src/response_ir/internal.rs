@@ -211,7 +211,7 @@ fn find_nested_aggregate_output_field<'a, 'b>(
 
 fn coerce_non_numeric(value: PrismaValue, output: &OutputType<'_>) -> PrismaValue {
     match (value, &output.inner) {
-        (PrismaValue::Int(x), InnerOutputType::Scalar(ScalarType::String)) if x == 0 => PrismaValue::Null,
+        (PrismaValue::Int(0), InnerOutputType::Scalar(ScalarType::String)) => PrismaValue::Null,
         (x, _) => x,
     }
 }
