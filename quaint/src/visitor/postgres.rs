@@ -189,7 +189,7 @@ impl<'a> Visitor<'a> for Postgres<'a> {
                 self.surround_with("'{", "}'", |ref mut s| {
                     let len = ary.len();
 
-                    for (i, item) in ary.into_iter().enumerate() {
+                    for (i, item) in ary.iter().enumerate() {
                         s.write(item)?;
 
                         if i < len - 1 {
@@ -204,7 +204,7 @@ impl<'a> Visitor<'a> for Postgres<'a> {
                 self.surround_with("ARRAY[", "]", |ref mut s| {
                     let len = variants.len();
 
-                    for (i, item) in variants.into_iter().enumerate() {
+                    for (i, item) in variants.iter().enumerate() {
                         s.surround_with("'", "'", |t| t.write(item))?;
 
                         if i < len - 1 {

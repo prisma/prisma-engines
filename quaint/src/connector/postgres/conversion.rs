@@ -580,7 +580,7 @@ impl GetRow for PostgresRow {
                 },
             };
 
-            Ok(Value::from(result))
+            Ok(result)
         }
 
         let num_columns = self.columns().len();

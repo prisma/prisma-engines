@@ -203,10 +203,6 @@ impl<'a> Value<'a> {
         self.typed.as_str()
     }
 
-    pub fn into_value(self) -> Value<'a> {
-        Value::from(self)
-    }
-
     /// `true` if the `Value` is text.
     pub fn is_text(&self) -> bool {
         self.typed.is_text()
@@ -486,9 +482,9 @@ impl<'a> From<ValueType<'a>> for Value<'a> {
     }
 }
 
-impl<'a> Into<ValueType<'a>> for Value<'a> {
-    fn into(self) -> ValueType<'a> {
-        return self.typed;
+impl<'a> From<Value<'a>> for ValueType<'a> {
+    fn from(val: Value<'a>) -> Self {
+        val.typed
     }
 }
 
