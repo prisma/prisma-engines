@@ -314,7 +314,7 @@
 
     <span class="kw">let </span>edit = <span class="kw">match </span>datasource.schemas_span {
         <span class="prelude-val">Some</span>(span) =&gt; {
-            <span class="kw">let </span>formatted_attribute = <span class="macro">format!</span>(<span class="string">r#&quot;, &quot;{}&quot;&quot;#</span>, model.schema_name().unwrap());
+            <span class="kw">let </span>formatted_attribute = <span class="macro">format!</span>(<span class="string">r#&quot;&quot;, &quot;{}&quot;&quot;#</span>, model.schema_name().unwrap());
             <span class="kw">super</span>::create_text_edit(
                 schema,
                 formatted_attribute,
