@@ -15,7 +15,7 @@ on:
       npmDistTag:
         description: npm dist-tag to use for publishing
         required: true
-        default: "latest"
+        default: 'latest'
       dryRun:
         description: 'Check to do a dry run (does not publish packages)'
         type: boolean
@@ -27,7 +27,7 @@ jobs:
     steps:
       - name: Print input
         env:
-          THE_INPUT: "${{ toJson(github.event.inputs) }}"
+          THE_INPUT: '${{ toJson(github.event.inputs) }}'
         run: |
           echo $THE_INPUT
 
@@ -35,31 +35,32 @@ jobs:
         with:
           ref: ${{ github.event.inputs.enginesHash }}
 
-      #
-      # Build
-      #
-
       - uses: actions/setup-node@v3
         with:
-          node-version: "20.x"
+          node-version: '20.x'
           registry-url: 'https://registry.npmjs.org/'
 
-      - run: pnpm i
-        working-directory: query-engine/driver-adapters/js
-      - run: pnpm -r build
+      - name: Install dependencies
+        run: pnpm i
         working-directory: query-engine/driver-adapters/js
 
-      #
-      # Publish
-      #
+      - name: Build
+        run: pnpm -r build
+        working-directory: query-engine/driver-adapters/js
 
-      - run: |
+      - name: Update version in package.json
+        run: |
           # find all files package.json, and for each use jq to write the version, then write to temp file and overwrite original file with result
           find . -name "package.json" -exec bash -c 'jq --arg version "${{ github.event.inputs.prismaVersion }}" ".version = \$version" "{}" > tmpfile && mv tmpfile "{}"' \;
-          pnpm -r publish --no-git-checks --tag ${{ github.event.inputs.npmDistTag }} --dry-run # TODO remove hardcoded dry-run and use input instead!
+        working-directory: query-engine/driver-adapters/js
+
+      - name: Publish Prisma Driver Adapters packages
+        run: |
+          pnpm -r publish --no-git-checks --tag ${{ github.event.inputs.npmDistTag }} ${{ env.DRY_RUN }}
         working-directory: query-engine/driver-adapters/js
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+          DRY_RUN: ${{ github.event.inputs.dryRun && '--dry-run' || '' }}
 
       #
       # Failure handlers
@@ -68,11 +69,10 @@ jobs:
       - name: Set current job url in SLACK_FOOTER env var
         if: ${{ failure() }}
         run: echo "SLACK_FOOTER=<$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID|Click here to go to the job logs>" >> $GITHUB_ENV
-
       - name: Slack Notification on Failure
         if: ${{ failure() }}
         uses: rtCamp/action-slack-notify@v2.2.1
         env:
-          SLACK_TITLE: "prisma driver adapters publishing failed :x:"
-          SLACK_COLOR: "#FF0000"
+          SLACK_TITLE: 'prisma driver adapters publishing failed :x:'
+          SLACK_COLOR: '#FF0000'
           SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK_DRIVER_ADPATERS_FAILING }}
