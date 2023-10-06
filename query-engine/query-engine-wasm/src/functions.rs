@@ -13,11 +13,10 @@ pub struct Version {
 
 #[wasm_bindgen]
 pub fn version() -> Version {
-    let version = Version {
-        commit: env!("GIT_HASH").into(),
-        version: env!("CARGO_PKG_VERSION").into(),
-    };
-    version
+    Version {
+        commit: env!("GIT_HASH"),
+        version: env!("CARGO_PKG_VERSION"),
+    }
 }
 
 #[wasm_bindgen]
