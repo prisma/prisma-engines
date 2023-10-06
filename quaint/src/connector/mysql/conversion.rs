@@ -39,7 +39,7 @@ pub fn conv_params(params: &[Value<'_>]) -> crate::Result<my::Params> {
 
                     return Err(builder.build());
                 }
-                #[cfg(feature = "bigdecimal")]
+
                 ValueType::Numeric(f) => f.as_ref().map(|f| my::Value::Bytes(f.to_string().as_bytes().to_vec())),
                 ValueType::Json(s) => match s {
                     Some(ref s) => {
@@ -235,7 +235,6 @@ impl TakeRow for my::Row {
                     Value::enum_variant(s)
                 }
                 // NEWDECIMAL returned as bytes. See https://mariadb.com/kb/en/resultset-row/#decimal-binary-encoding
-                #[cfg(feature = "bigdecimal")]
                 my::Value::Bytes(b) if column.is_real() => {
                     let s = String::from_utf8(b).map_err(|_| {
                         let msg = "Could not convert NEWDECIMAL from bytes to String.";
@@ -312,7 +311,7 @@ impl TakeRow for my::Row {
                     t if t.is_double() => Value::null_double(),
                     t if t.is_text() => Value::null_text(),
                     t if t.is_bytes() => Value::null_bytes(),
-                    #[cfg(feature = "bigdecimal")]
+
                     t if t.is_real() => Value::null_numeric(),
                     t if t.is_datetime() => Value::null_datetime(),
                     t if t.is_time() => Value::null_time(),

@@ -1,8 +1,7 @@
-#[cfg(feature = "bigdecimal")]
 mod bigdecimal;
 
 use crate::tests::test_api::*;
-#[cfg(any(feature = "bigdecimal", feature = "uuid"))]
+#[cfg(feature = "uuid")]
 use std::str::FromStr;
 
 test_type!(boolean(

@@ -148,7 +148,7 @@ impl<'a> Visitor<'a> for Mysql<'a> {
 
                 return Err(builder.build());
             }
-            #[cfg(feature = "bigdecimal")]
+
             ValueType::Numeric(r) => r.as_ref().map(|r| self.write(r)),
 
             ValueType::Json(j) => match j {

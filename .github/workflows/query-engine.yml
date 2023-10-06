@@ -5,6 +5,8 @@ on:
       - main
   pull_request:
     paths-ignore:
+      - '.github/**'
+      - '!.github/workflows/query-engine.yml'
       - '.buildkite/**'
       - '*.md'
       - 'LICENSE'
@@ -31,11 +33,12 @@ jobs:
             single_threaded: true
             connector: 'vitess'
             version: '8.0'
-          # Why are we testing v15 and not older?
-          - name: 'postgres15'
+          # Arbitrary PostgreSQL version
+          # we opted for the most recent one, there is no need to have a matrix
+          - name: 'postgres16'
             single_threaded: true
             connector: 'postgres'
-            version: '15'
+            version: '16'
           - name: 'mssql_2022'
             single_threaded: false
             connector: 'sqlserver'
@@ -77,7 +80,7 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Login to Docker Hub
-        uses: docker/login-action@v2
+        uses: docker/login-action@v3
         continue-on-error: true
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
