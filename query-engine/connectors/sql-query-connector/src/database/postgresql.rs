@@ -5,7 +5,7 @@ use connector_interface::{
     error::{ConnectorError, ErrorKind},
     Connection, Connector,
 };
-use psl::builtin_connectors::COCKROACH;
+use psl::{builtin_connectors::COCKROACH, datamodel_connector::ConnectorCapabilities};
 use quaint::{connector::PostgresFlavour, pooled::Quaint, prelude::ConnectionInfo};
 use std::time::Duration;
 
@@ -13,6 +13,7 @@ pub struct PostgreSql {
     pool: Quaint,
     connection_info: ConnectionInfo,
     features: psl::PreviewFeatures,
+    capabilities: ConnectorCapabilities,
 }
 
 impl PostgreSql {
@@ -28,6 +29,7 @@ impl FromSource for PostgreSql {
         source: &psl::Datasource,
         url: &str,
         features: psl::PreviewFeatures,
+        capabilities: ConnectorCapabilities,
     ) -> connector_interface::Result<Self> {
         let database_str = url;
 
@@ -56,10 +58,12 @@ impl FromSource for PostgreSql {
 
         let pool = builder.build();
         let connection_info = pool.connection_info().to_owned();
+
         Ok(PostgreSql {
             pool,
             connection_info,
             features,
+            capabilities,
         })
     }
 }
@@ -69,7 +73,7 @@ impl Connector for PostgreSql {
     async fn get_connection<'a>(&'a self) -> connector_interface::Result<Box<dyn Connection + Send + Sync + 'static>> {
         super::catch(self.connection_info.clone(), async move {
             let conn = self.pool.check_out().await.map_err(SqlError::from)?;
-            let conn = SqlConnection::new(conn, &self.connection_info, self.features);
+            let conn = SqlConnection::new(conn, &self.connection_info, self.features, self.capabilities);
             Ok(Box::new(conn) as Box<dyn Connection + Send + Sync + 'static>)
         })
         .await

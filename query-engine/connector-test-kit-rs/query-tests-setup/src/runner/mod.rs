@@ -129,6 +129,7 @@ impl Runner {
                     ConnectorMode::Rust,
                     data_source,
                     schema.configuration.preview_features(),
+                    schema.connector.capabilities(),
                     &url,
                 )
                 .await?,

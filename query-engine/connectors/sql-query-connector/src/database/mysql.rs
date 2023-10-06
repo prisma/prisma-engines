@@ -6,6 +6,7 @@ use connector_interface::{
     error::{ConnectorError, ErrorKind},
     Connection, Connector,
 };
+use psl::datamodel_connector::ConnectorCapabilities;
 use quaint::{pooled::Quaint, prelude::ConnectionInfo};
 use std::time::Duration;
 
@@ -13,6 +14,7 @@ pub struct Mysql {
     pool: Quaint,
     connection_info: ConnectionInfo,
     features: psl::PreviewFeatures,
+    capabilities: ConnectorCapabilities,
 }
 
 impl Mysql {
@@ -41,6 +43,7 @@ impl FromSource for Mysql {
         _: &psl::Datasource,
         url: &str,
         features: psl::PreviewFeatures,
+        capabilities: ConnectorCapabilities,
     ) -> connector_interface::Result<Mysql> {
         let connection_info = get_connection_info(url)?;
 
@@ -58,6 +61,7 @@ impl FromSource for Mysql {
             pool,
             connection_info,
             features: features.to_owned(),
+            capabilities,
         })
     }
 }
@@ -69,7 +73,7 @@ impl Connector for Mysql {
             let runtime_conn = self.pool.check_out().await?;
 
             // Note: `runtime_conn` must be `Sized`, as that's required by `TransactionCapable`
-            let sql_conn = SqlConnection::new(runtime_conn, &self.connection_info, self.features);
+            let sql_conn = SqlConnection::new(runtime_conn, &self.connection_info, self.features, self.capabilities);
 
             Ok(Box::new(sql_conn) as Box<dyn Connection + Send + Sync + 'static>)
         })

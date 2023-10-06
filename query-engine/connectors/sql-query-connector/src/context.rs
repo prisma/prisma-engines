@@ -1,3 +1,4 @@
+use psl::datamodel_connector::ConnectorCapabilities;
 use quaint::prelude::ConnectionInfo;
 
 pub(super) struct Context<'a> {
@@ -9,10 +10,19 @@ pub(super) struct Context<'a> {
     /// Maximum number of bind parameters allowed for a single query.
     /// None is unlimited.
     pub(crate) max_bind_values: Option<usize>,
+    /// Capabilities supported by the loaded connector.
+    /// 
+    /// To be used WITH CAUTION and _ONLY_ if you can't render different SQL expressions by transforming Quaint's AST when visiting it.
+    /// We DO NOT want to end up with forests of ifs in the SQL connector to act differently based on each connector's capabilities.
+    pub(crate) capabilities: ConnectorCapabilities,
 }
 
 impl<'a> Context<'a> {
-    pub(crate) fn new(connection_info: &'a ConnectionInfo, trace_id: Option<&'a str>) -> Self {
+    pub(crate) fn new(
+        connection_info: &'a ConnectionInfo,
+        capabilities: ConnectorCapabilities,
+        trace_id: Option<&'a str>,
+    ) -> Self {
         let (max_rows, default_batch_size) = match connection_info {
             ConnectionInfo::Postgres(_) => (None, 32766),
             // See https://stackoverflow.com/a/11131824/788562
@@ -25,6 +35,7 @@ impl<'a> Context<'a> {
             trace_id,
             max_rows,
             max_bind_values: get_batch_size(default_batch_size),
+            capabilities,
         }
     }
 

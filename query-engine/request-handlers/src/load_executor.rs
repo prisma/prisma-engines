@@ -1,3 +1,4 @@
+use psl::datamodel_connector::ConnectorCapabilities;
 use psl::{builtin_connectors::*, Datasource, PreviewFeatures};
 use query_core::{executor::InterpretingExecutor, Connector, QueryExecutor};
 use sql_query_connector::*;
@@ -16,6 +17,7 @@ pub async fn load(
     connector_mode: ConnectorMode,
     source: &Datasource,
     features: PreviewFeatures,
+    capabilities: ConnectorCapabilities,
     url: &str,
 ) -> query_core::Result<Box<dyn QueryExecutor + Send + Sync + 'static>> {
     match connector_mode {
@@ -24,7 +26,7 @@ pub async fn load(
             panic!("Driver adapters are not enabled, but connector mode is set to JS");
 
             #[cfg(feature = "driver-adapters")]
-            driver_adapter(source, url, features).await
+            driver_adapter(source, url, features, capabilities).await
         }
 
         ConnectorMode::Rust => {
@@ -36,11 +38,11 @@ pub async fn load(
             }
 
             match source.active_provider {
-                p if SQLITE.is_provider(p) => sqlite(source, url, features).await,
-                p if MYSQL.is_provider(p) => mysql(source, url, features).await,
-                p if POSTGRES.is_provider(p) => postgres(source, url, features).await,
-                p if MSSQL.is_provider(p) => mssql(source, url, features).await,
-                p if COCKROACH.is_provider(p) => postgres(source, url, features).await,
+                p if SQLITE.is_provider(p) => sqlite(source, url, features, capabilities).await,
+                p if MYSQL.is_provider(p) => mysql(source, url, features, capabilities).await,
+                p if POSTGRES.is_provider(p) => postgres(source, url, features, capabilities).await,
+                p if MSSQL.is_provider(p) => mssql(source, url, features, capabilities).await,
+                p if COCKROACH.is_provider(p) => postgres(source, url, features, capabilities).await,
 
                 #[cfg(feature = "mongodb")]
                 p if MONGODB.is_provider(p) => mongodb(source, url, features).await,
@@ -57,9 +59,10 @@ async fn sqlite(
     source: &Datasource,
     url: &str,
     features: PreviewFeatures,
+    capabilities: ConnectorCapabilities,
 ) -> query_core::Result<Box<dyn QueryExecutor + Send + Sync>> {
     trace!("Loading SQLite query connector...");
-    let sqlite = Sqlite::from_source(source, url, features).await?;
+    let sqlite = Sqlite::from_source(source, url, features, capabilities).await?;
     trace!("Loaded SQLite query connector.");
     Ok(executor_for(sqlite, false))
 }
@@ -68,10 +71,11 @@ async fn postgres(
     source: &Datasource,
     url: &str,
     features: PreviewFeatures,
+    capabilities: ConnectorCapabilities,
 ) -> query_core::Result<Box<dyn QueryExecutor + Send + Sync>> {
     trace!("Loading Postgres query connector...");
     let database_str = url;
-    let psql = PostgreSql::from_source(source, url, features).await?;
+    let psql = PostgreSql::from_source(source, url, features, capabilities).await?;
 
     let url = Url::parse(database_str)
         .map_err(|err| query_core::CoreError::ConfigurationError(format!("Error parsing connection string: {err}")))?;
@@ -89,8 +93,9 @@ async fn mysql(
     source: &Datasource,
     url: &str,
     features: PreviewFeatures,
+    capabilities: ConnectorCapabilities,
 ) -> query_core::Result<Box<dyn QueryExecutor + Send + Sync>> {
-    let mysql = Mysql::from_source(source, url, features).await?;
+    let mysql = Mysql::from_source(source, url, features, capabilities).await?;
     trace!("Loaded MySQL query connector.");
     Ok(executor_for(mysql, false))
 }
@@ -99,9 +104,10 @@ async fn mssql(
     source: &Datasource,
     url: &str,
     features: PreviewFeatures,
+    capabilities: ConnectorCapabilities,
 ) -> query_core::Result<Box<dyn QueryExecutor + Send + Sync>> {
     trace!("Loading SQL Server query connector...");
-    let mssql = Mssql::from_source(source, url, features).await?;
+    let mssql = Mssql::from_source(source, url, features, capabilities).await?;
     trace!("Loaded SQL Server query connector.");
     Ok(executor_for(mssql, false))
 }
@@ -130,9 +136,10 @@ async fn driver_adapter(
     source: &Datasource,
     url: &str,
     features: PreviewFeatures,
+    capabilities: ConnectorCapabilities,
 ) -> Result<Box<dyn QueryExecutor + Send + Sync>, query_core::CoreError> {
     trace!("Loading driver adapter...");
-    let js = Js::from_source(source, url, features).await?;
+    let js = Js::from_source(source, url, features, capabilities).await?;
     trace!("Loaded driver adapter...");
     Ok(executor_for(js, false))
 }

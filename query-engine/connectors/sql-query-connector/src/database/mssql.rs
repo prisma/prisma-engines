@@ -6,7 +6,7 @@ use connector_interface::{
     error::{ConnectorError, ErrorKind},
     Connection, Connector,
 };
-use psl::{Datasource, PreviewFeatures};
+use psl::{datamodel_connector::ConnectorCapabilities, Datasource, PreviewFeatures};
 use quaint::{pooled::Quaint, prelude::ConnectionInfo};
 use std::time::Duration;
 
@@ -14,6 +14,7 @@ pub struct Mssql {
     pool: Quaint,
     connection_info: ConnectionInfo,
     features: PreviewFeatures,
+    capabilities: ConnectorCapabilities,
 }
 
 impl Mssql {
@@ -29,6 +30,7 @@ impl FromSource for Mssql {
         _source: &Datasource,
         url: &str,
         features: PreviewFeatures,
+        capabilities: ConnectorCapabilities,
     ) -> connector_interface::Result<Self> {
         let database_str = url;
 
@@ -53,6 +55,7 @@ impl FromSource for Mssql {
             pool,
             connection_info,
             features: features.to_owned(),
+            capabilities,
         })
     }
 }
@@ -62,7 +65,7 @@ impl Connector for Mssql {
     async fn get_connection<'a>(&'a self) -> connector::Result<Box<dyn Connection + Send + Sync + 'static>> {
         super::catch(self.connection_info.clone(), async move {
             let conn = self.pool.check_out().await.map_err(SqlError::from)?;
-            let conn = SqlConnection::new(conn, &self.connection_info, self.features);
+            let conn = SqlConnection::new(conn, &self.connection_info, self.features, self.capabilities);
 
             Ok(Box::new(conn) as Box<dyn Connection + Send + Sync + 'static>)
         })

@@ -6,6 +6,7 @@ use connector_interface::{
     error::{ConnectorError, ErrorKind},
     Connection, Connector,
 };
+use psl::datamodel_connector::ConnectorCapabilities;
 use quaint::{connector::SqliteParams, error::ErrorKind as QuaintKind, pooled::Quaint, prelude::ConnectionInfo};
 use std::{convert::TryFrom, time::Duration};
 
@@ -13,6 +14,7 @@ pub struct Sqlite {
     pool: Quaint,
     file_path: String,
     features: psl::PreviewFeatures,
+    capabilities: ConnectorCapabilities,
 }
 
 impl Sqlite {
@@ -36,6 +38,7 @@ impl FromSource for Sqlite {
         _source: &psl::Datasource,
         url: &str,
         features: psl::PreviewFeatures,
+        capabilities: ConnectorCapabilities,
     ) -> connector_interface::Result<Sqlite> {
         let database_str = url;
 
@@ -66,6 +69,7 @@ impl FromSource for Sqlite {
             pool,
             file_path,
             features: features.to_owned(),
+            capabilities,
         })
     }
 }
@@ -82,7 +86,7 @@ impl Connector for Sqlite {
     async fn get_connection<'a>(&'a self) -> connector::Result<Box<dyn Connection + Send + Sync + 'static>> {
         super::catch(self.connection_info().clone(), async move {
             let conn = self.pool.check_out().await.map_err(SqlError::from)?;
-            let conn = SqlConnection::new(conn, self.connection_info(), self.features);
+            let conn = SqlConnection::new(conn, self.connection_info(), self.features, self.capabilities);
 
             Ok(Box::new(conn) as Box<dyn Connection + Send + Sync + 'static>)
         })

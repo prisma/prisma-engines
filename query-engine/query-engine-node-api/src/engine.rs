@@ -292,9 +292,11 @@ impl QueryEngine {
                     .ok_or_else(|| ApiError::configuration("No valid data source found"))?;
 
                 let preview_features = arced_schema.configuration.preview_features();
+                let capabilities = arced_schema.connector.capabilities();
 
                 let executor_fut = async {
-                    let executor = load_executor(self.connector_mode, data_source, preview_features, &url).await?;
+                    let executor =
+                        load_executor(self.connector_mode, data_source, preview_features, capabilities, &url).await?;
                     let connector = executor.primary_connector();
 
                     let conn_span = tracing::info_span!(
