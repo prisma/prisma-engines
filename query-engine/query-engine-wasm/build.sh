@@ -5,7 +5,7 @@
 OUT_VERSION="$1"
 OUT_JSON="pkg/package.json"
 OUT_TARGET="bundler" # Note(jkomyno): I wasn't able to make it work with `web` target
-OUT_NPM_NAME="@jkomyno/query-engine-wasm"
+OUT_NPM_NAME="@prisma/query-engine-wasm"
 
 wasm-pack build --release --target $OUT_TARGET
 
