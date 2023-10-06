@@ -60,7 +60,6 @@ napi-derive = "2.12.4"
 [workspace.dependencies.quaint]
 path = "quaint"
 features = [
-  "bigdecimal",
   "expose-drivers",
   "fmt-sql",
   "mssql",

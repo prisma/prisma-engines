@@ -110,7 +110,7 @@ impl<'a> Visitor<'a> for Sqlite<'a> {
                 }
                 None => None,
             },
-            #[cfg(feature = "bigdecimal")]
+
             ValueType::Numeric(r) => r.as_ref().map(|r| self.write(r)),
             #[cfg(feature = "uuid")]
             ValueType::Uuid(uuid) => uuid.map(|uuid| self.write(format!("'{}'", uuid.hyphenated()))),
