@@ -11,7 +11,7 @@ pub(super) struct Context<'a> {
     /// None is unlimited.
     pub(crate) max_bind_values: Option<usize>,
     /// Capabilities supported by the loaded connector.
-    /// 
+    ///
     /// To be used WITH CAUTION and _ONLY_ if you can't render different SQL expressions by transforming Quaint's AST when visiting it.
     /// We DO NOT want to end up with forests of ifs in the SQL connector to act differently based on each connector's capabilities.
     pub(crate) capabilities: ConnectorCapabilities,
