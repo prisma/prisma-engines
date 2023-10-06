@@ -377,34 +377,33 @@ impl QueryEngine {
     /// If connected, sends a query to the core and returns the response.
     #[napi]
     pub async fn query(&self, body: String, trace: String, tx_id: Option<String>) -> napi::Result<String> {
+        let dispatcher = self.logger.dispatcher();
+
         async_panic_to_js_error(async {
             let inner = self.inner.read().await;
             let engine = inner.as_engine()?;
 
             let query = RequestBody::try_from_str(&body, engine.engine_protocol())?;
 
-            let dispatcher = self.logger.dispatcher();
+            let span = if tx_id.is_none() {
+                tracing::info_span!("prisma:engine", user_facing = true)
+            } else {
+                Span::none()
+            };
+
+            let trace_id = telemetry::helpers::set_parent_context_from_json_str(&span, &trace);
 
             async move {
-                let span = if tx_id.is_none() {
-                    tracing::info_span!("prisma:engine", user_facing = true)
-                } else {
-                    Span::none()
-                };
-
-                let trace_id = telemetry::helpers::set_parent_context_from_json_str(&span, &trace);
-
                 let handler = RequestHandler::new(engine.executor(), engine.query_schema(), engine.engine_protocol());
-                let response = handler
-                    .handle(query, tx_id.map(TxId::from), trace_id)
-                    .instrument(span)
-                    .await;
+                let response = handler.handle(query, tx_id.map(TxId::from), trace_id).await;
 
-                Ok(serde_json::to_string(&response)?)
+                let serde_span = tracing::info_span!("prisma:engine:response_json_serialization", user_facing = true);
+                Ok(serde_span.in_scope(|| serde_json::to_string(&response))?)
             }
-            .with_subscriber(dispatcher)
+            .instrument(span)
             .await
         })
+        .with_subscriber(dispatcher)
         .await
     }
 

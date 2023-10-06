@@ -1,4 +1,5 @@
 name: Build and publish Prisma Driver Adapters
+run-name: npm - release Driver Adapters ${{ github.event.inputs.prismaVersion }} from ${{ github.event.inputs.enginesHash }} on ${{ github.event.inputs.npmDistTag }}
 
 concurrency: publish-prisma-driver-adapters
 
@@ -35,6 +36,10 @@ jobs:
         with:
           ref: ${{ github.event.inputs.enginesHash }}
 
+      - uses: pnpm/action-setup@v2.4.0
+        with:
+          version: 8
+
       - uses: actions/setup-node@v3
         with:
           node-version: '20.x'
@@ -60,7 +65,7 @@ jobs:
         working-directory: query-engine/driver-adapters/js
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-          DRY_RUN: ${{ github.event.inputs.dryRun && '--dry-run' || '' }}
+          DRY_RUN: ${{ github.event.inputs.dryRun == 'true' && '--dry-run' || '' }}
 
       #
       # Failure handlers
