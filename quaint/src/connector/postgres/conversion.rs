@@ -19,7 +19,6 @@ use tokio_postgres::{
     Row as PostgresRow, Statement as PostgresStatement,
 };
 
-#[cfg(feature = "uuid")]
 use uuid::Uuid;
 
 pub(crate) fn conv_params<'a>(params: &'a [Value<'a>]) -> Vec<&'a (dyn types::ToSql + Sync)> {
@@ -51,7 +50,6 @@ pub(crate) fn params_to_types(params: &[Value<'_>]) -> Vec<PostgresType> {
                 ValueType::Numeric(_) => PostgresType::NUMERIC,
                 ValueType::Json(_) => PostgresType::JSONB,
                 ValueType::Xml(_) => PostgresType::XML,
-                #[cfg(feature = "uuid")]
                 ValueType::Uuid(_) => PostgresType::UUID,
                 ValueType::DateTime(_) => PostgresType::TIMESTAMPTZ,
                 ValueType::Date(_) => PostgresType::TIMESTAMP,
@@ -88,7 +86,6 @@ pub(crate) fn params_to_types(params: &[Value<'_>]) -> Vec<PostgresType> {
                         ValueType::Numeric(_) => PostgresType::NUMERIC_ARRAY,
                         ValueType::Json(_) => PostgresType::JSONB_ARRAY,
                         ValueType::Xml(_) => PostgresType::XML_ARRAY,
-                        #[cfg(feature = "uuid")]
                         ValueType::Uuid(_) => PostgresType::UUID_ARRAY,
                         ValueType::DateTime(_) => PostgresType::TIMESTAMPTZ_ARRAY,
                         ValueType::Date(_) => PostgresType::TIMESTAMP_ARRAY,
@@ -260,7 +257,6 @@ impl GetRow for PostgresRow {
                     }
                     None => Value::null_time(),
                 },
-                #[cfg(feature = "uuid")]
                 PostgresType::UUID => match row.try_get(i)? {
                     Some(val) => {
                         let val: Uuid = val;
@@ -268,7 +264,6 @@ impl GetRow for PostgresRow {
                     }
                     None => ValueType::Uuid(None).into_value(),
                 },
-                #[cfg(feature = "uuid")]
                 PostgresType::UUID_ARRAY => match row.try_get(i)? {
                     Some(val) => {
                         let val: Vec<Option<Uuid>> = val;
@@ -771,12 +766,10 @@ impl<'a> ToSql for Value<'a> {
             (ValueType::Numeric(float), _) => float
                 .as_ref()
                 .map(|float| DecimalWrapper(float.clone()).to_sql(ty, out)),
-            #[cfg(feature = "uuid")]
             (ValueType::Text(string), &PostgresType::UUID) => string.as_ref().map(|string| {
                 let parsed_uuid: Uuid = string.parse()?;
                 parsed_uuid.to_sql(ty, out)
             }),
-            #[cfg(feature = "uuid")]
             (ValueType::Array(values), &PostgresType::UUID_ARRAY) => values.as_ref().map(|values| {
                 let parsed_uuid: Vec<Option<Uuid>> = values
                     .iter()
@@ -849,7 +842,6 @@ impl<'a> ToSql for Value<'a> {
             }
             (ValueType::Json(value), _) => value.as_ref().map(|value| value.to_sql(ty, out)),
             (ValueType::Xml(value), _) => value.as_ref().map(|value| value.to_sql(ty, out)),
-            #[cfg(feature = "uuid")]
             (ValueType::Uuid(value), _) => value.map(|value| value.to_sql(ty, out)),
             (ValueType::DateTime(value), &PostgresType::DATE) => value.map(|value| value.date_naive().to_sql(ty, out)),
             (ValueType::Date(value), _) => value.map(|value| value.to_sql(ty, out)),

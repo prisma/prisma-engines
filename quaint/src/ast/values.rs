@@ -11,7 +11,6 @@ use std::{
     fmt,
     str::FromStr,
 };
-#[cfg(feature = "uuid")]
 use uuid::Uuid;
 
 /// A value written to the query as-is without parameterization.
@@ -148,7 +147,6 @@ impl<'a> Value<'a> {
     }
 
     /// Creates a new uuid value.
-    #[cfg(feature = "uuid")]
     pub fn uuid(value: Uuid) -> Self {
         ValueType::uuid(value).into_value()
     }
@@ -303,13 +301,11 @@ impl<'a> Value<'a> {
     }
 
     /// `true` if the `Value` is of UUID type.
-    #[cfg(feature = "uuid")]
     pub fn is_uuid(&self) -> bool {
         self.typed.is_uuid()
     }
 
     /// Returns an UUID if the value is of UUID type, otherwise `None`.
-    #[cfg(feature = "uuid")]
     pub fn as_uuid(&self) -> Option<Uuid> {
         self.typed.as_uuid()
     }
@@ -431,7 +427,6 @@ impl<'a> Value<'a> {
         ValueType::Xml(None).into()
     }
 
-    #[cfg(feature = "uuid")]
     pub fn null_uuid() -> Self {
         ValueType::Uuid(None).into()
     }
@@ -507,7 +502,6 @@ pub enum ValueType<'a> {
     Json(Option<serde_json::Value>),
     /// A XML value.
     Xml(Option<Cow<'a, str>>),
-    #[cfg(feature = "uuid")]
     /// An UUID value.
     Uuid(Option<Uuid>),
     /// A datetime value.
@@ -578,7 +572,6 @@ impl<'a> fmt::Display for ValueType<'a> {
 
             ValueType::Numeric(val) => val.as_ref().map(|v| write!(f, "{v}")),
             ValueType::Json(val) => val.as_ref().map(|v| write!(f, "{v}")),
-            #[cfg(feature = "uuid")]
             ValueType::Uuid(val) => val.map(|v| write!(f, "\"{v}\"")),
             ValueType::DateTime(val) => val.map(|v| write!(f, "\"{v}\"")),
             ValueType::Date(val) => val.map(|v| write!(f, "\"{v}\"")),
@@ -637,7 +630,6 @@ impl<'a> From<ValueType<'a>> for serde_json::Value {
 
             ValueType::Numeric(d) => d.map(|d| serde_json::to_value(d.to_f64().unwrap()).unwrap()),
             ValueType::Json(v) => v,
-            #[cfg(feature = "uuid")]
             ValueType::Uuid(u) => u.map(|u| serde_json::Value::String(u.hyphenated().to_string())),
             ValueType::DateTime(dt) => dt.map(|dt| serde_json::Value::String(dt.to_rfc3339())),
             ValueType::Date(date) => date.map(|date| serde_json::Value::String(format!("{date}"))),
@@ -764,7 +756,6 @@ impl<'a> ValueType<'a> {
     }
 
     /// Creates a new uuid value.
-    #[cfg(feature = "uuid")]
     pub(crate) fn uuid(value: Uuid) -> Self {
         Self::Uuid(Some(value))
     }
@@ -812,9 +803,7 @@ impl<'a> ValueType<'a> {
             Self::Char(c) => c.is_none(),
             Self::Array(v) => v.is_none(),
             Self::Xml(s) => s.is_none(),
-
             Self::Numeric(r) => r.is_none(),
-            #[cfg(feature = "uuid")]
             Self::Uuid(u) => u.is_none(),
             Self::DateTime(dt) => dt.is_none(),
             Self::Date(d) => d.is_none(),
@@ -999,13 +988,11 @@ impl<'a> ValueType<'a> {
     }
 
     /// `true` if the `Value` is of UUID type.
-    #[cfg(feature = "uuid")]
     pub(crate) fn is_uuid(&self) -> bool {
         matches!(self, Self::Uuid(_))
     }
 
     /// Returns an UUID if the value is of UUID type, otherwise `None`.
-    #[cfg(feature = "uuid")]
     pub(crate) fn as_uuid(&self) -> Option<Uuid> {
         match self {
             Self::Uuid(u) => *u,
@@ -1120,14 +1107,11 @@ value!(val: usize, Int64, i64::try_from(val).unwrap());
 value!(val: &'a [u8], Bytes, val.into());
 value!(val: f64, Double, val);
 value!(val: f32, Float, val);
-
 value!(val: DateTime<Utc>, DateTime, val);
 value!(val: chrono::NaiveTime, Time, val);
 value!(val: chrono::NaiveDate, Date, val);
-
 value!(val: BigDecimal, Numeric, val);
 value!(val: JsonValue, Json, val);
-#[cfg(feature = "uuid")]
 value!(val: Uuid, Uuid, val);
 
 impl<'a> TryFrom<Value<'a>> for i64 {
@@ -1233,7 +1217,6 @@ impl<'a> TryFrom<&Value<'a>> for Option<std::net::IpAddr> {
     }
 }
 
-#[cfg(feature = "uuid")]
 impl<'a> TryFrom<&Value<'a>> for Option<uuid::Uuid> {
     type Error = Error;
 
@@ -1431,7 +1414,6 @@ mod tests {
     }
 
     #[test]
-    #[cfg(feature = "uuid")]
     fn display_format_for_uuid() {
         let id = Uuid::from_str("67e5504410b1426f9247bb680e5fe0c8").unwrap();
         let pv = Value::uuid(id);

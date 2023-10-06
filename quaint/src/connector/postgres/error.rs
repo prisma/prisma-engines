@@ -265,7 +265,6 @@ impl From<tokio_postgres::error::Error> for Error {
             return io_error;
         }
 
-        #[cfg(feature = "uuid")]
         if let Some(uuid_error) = try_extracting_uuid_error(&e) {
             return uuid_error;
         }
@@ -312,7 +311,6 @@ impl From<tokio_postgres::error::Error> for Error {
     }
 }
 
-#[cfg(feature = "uuid")]
 fn try_extracting_uuid_error(err: &tokio_postgres::error::Error) -> Option<Error> {
     use std::error::Error as _;
 

@@ -22,7 +22,6 @@ impl<'a> IntoSql<'a> for &'a Value<'a> {
             ValueType::Array(_) | ValueType::EnumArray(_, _) => panic!("Arrays are not supported on SQL Server."),
             ValueType::Numeric(val) => (*val).to_sql(),
             ValueType::Json(val) => val.as_ref().map(|val| serde_json::to_string(&val).unwrap()).into_sql(),
-            #[cfg(feature = "uuid")]
             ValueType::Uuid(val) => val.into_sql(),
             ValueType::DateTime(val) => val.into_sql(),
             ValueType::Date(val) => val.into_sql(),
