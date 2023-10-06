@@ -1,4 +1,4 @@
-# @prisma/prisma-schema-wasm
+# @prisma/query-engine-wasm
 
 This is a Wasm-compatible version of the Query Engine library (libquery).
 Currently, it just contains a skeleton of the public API, as some internal crates are still not Wasm-compatible.
@@ -20,13 +20,15 @@ cargo install wasm-pack
 
 From the current folder:
 
-- `./build.sh`
+- `./build.sh $OUT_NPM_VERSION`
+
+where e.g. `OUT_NPM_VERSION="0.0.1"` is the version you want to publish this package on npm with.
 
 ## How to Publish
 
 From the current folder:
 
-- `wasm-pack publish --tag alpha --access public`
+- `wasm-pack publish --access public`
 
 ## How to Test
 
