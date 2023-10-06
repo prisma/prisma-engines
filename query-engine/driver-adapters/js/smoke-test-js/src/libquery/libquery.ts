@@ -289,10 +289,22 @@ export function smokeTestLibquery(adapter: ErrorCapturingDriverAdapter, prismaSc
           async () => {
             const result = await doQuery({
               modelName: 'Unique',
-              action: 'createMany',
+              action: 'createOne',
               query: {
                 arguments: {
-                  data: [{ email: 'duplicate@example.com' }, { email: 'duplicate@example.com' }],
+                  data: { email: 'duplicate@example.com' },
+                },
+                selection: {
+                  $scalars: true,
+                },
+              },
+            })
+            const result2 = await doQuery({
+              modelName: 'Unique',
+              action: 'createOne',
+              query: {
+                arguments: {
+                  data: { email: 'duplicate@example.com' }
                 },
                 selection: {
                   $scalars: true,
