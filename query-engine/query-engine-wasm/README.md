@@ -1,5 +1,7 @@
 # @prisma/query-engine-wasm
 
+**INTERNAL PACKAGE, DO NOT USE**
+
 This is a Wasm-compatible version of the Query Engine library (libquery).
 Currently, it just contains a skeleton of the public API, as some internal crates are still not Wasm-compatible.
 
