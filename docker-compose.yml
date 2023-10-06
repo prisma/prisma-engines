@@ -1,11 +1,11 @@
-version: "3"
+version: '3'
 services:
   cockroach_23_1:
     image: prismagraphql/cockroachdb-custom:23.1
     command: |
       start-single-node --insecure
     ports:
-      - "26260:26257"
+      - '26260:26257'
     networks:
       - databases
 
@@ -14,7 +14,7 @@ services:
     restart: always
     command: start-single-node --insecure
     ports:
-      - "26259:26257"
+      - '26259:26257'
     networks:
       - databases
 
@@ -23,7 +23,7 @@ services:
     restart: always
     command: start-single-node --insecure
     ports:
-      - "26257:26257"
+      - '26257:26257'
     networks:
       - databases
 
@@ -32,7 +32,7 @@ services:
     restart: always
     command: start-single-node --insecure
     ports:
-      - "26258:26257"
+      - '26258:26257'
     networks:
       - databases
 
@@ -40,25 +40,25 @@ services:
     image: brainsam/pgbouncer:latest
     restart: always
     environment:
-      DB_HOST: "postgres11"
-      DB_PORT: "5432"
-      DB_USER: "postgres"
-      DB_PASSWORD: "prisma"
-      POOL_MODE: "transaction"
-      MAX_CLIENT_CONN: "1000"
+      DB_HOST: 'postgres11'
+      DB_PORT: '5432'
+      DB_USER: 'postgres'
+      DB_PASSWORD: 'prisma'
+      POOL_MODE: 'transaction'
+      MAX_CLIENT_CONN: '1000'
     networks:
       - databases
     ports:
-      - "6432:6432"
+      - '6432:6432'
 
   postgres9:
     image: postgres:9.6
     restart: always
     command: postgres -c 'max_connections=1000'
     environment:
-      POSTGRES_PASSWORD: "prisma"
+      POSTGRES_PASSWORD: 'prisma'
     ports:
-      - "5431:5432"
+      - '5431:5432'
     networks:
       - databases
 
@@ -67,9 +67,9 @@ services:
     restart: always
     command: postgres -c 'max_connections=1000'
     environment:
-      POSTGRES_PASSWORD: "prisma"
+      POSTGRES_PASSWORD: 'prisma'
     ports:
-      - "5432:5432"
+      - '5432:5432'
     networks:
       - databases
 
@@ -78,9 +78,9 @@ services:
     restart: always
     command: postgres -c 'max_connections=1000'
     environment:
-      POSTGRES_PASSWORD: "prisma"
+      POSTGRES_PASSWORD: 'prisma'
     ports:
-      - "5433:5432"
+      - '5433:5432'
     networks:
       - databases
 
@@ -89,9 +89,9 @@ services:
     restart: always
     command: postgres -c 'max_connections=1000'
     environment:
-      POSTGRES_PASSWORD: "prisma"
+      POSTGRES_PASSWORD: 'prisma'
     ports:
-      - "5434:5432"
+      - '5434:5432'
     networks:
       - databases
 
@@ -100,9 +100,9 @@ services:
     restart: always
     command: postgres -c 'max_connections=1000'
     environment:
-      POSTGRES_PASSWORD: "prisma"
+      POSTGRES_PASSWORD: 'prisma'
     ports:
-      - "5435:5432"
+      - '5435:5432'
     networks:
       - databases
 
@@ -126,11 +126,11 @@ services:
     restart: always
     command: postgres -c 'max_connections=1000'
     environment:
-      POSTGRES_PASSWORD: "prisma"
-      POSTGRES_HOST_AUTH_METHOD: "md5"
-      POSTGRES_INITDB_ARGS: "--auth-host=md5"
+      POSTGRES_PASSWORD: 'prisma'
+      POSTGRES_HOST_AUTH_METHOD: 'md5'
+      POSTGRES_INITDB_ARGS: '--auth-host=md5'
     ports:
-      - "5437:5432"
+      - '5437:5432'
     networks:
       - databases
 
@@ -139,11 +139,24 @@ services:
     restart: always
     command: postgres -c 'max_connections=1000'
     environment:
-      POSTGRES_PASSWORD: "prisma"
-      POSTGRES_HOST_AUTH_METHOD: "md5"
-      POSTGRES_INITDB_ARGS: "--auth-host=md5"
+      POSTGRES_PASSWORD: 'prisma'
+      POSTGRES_HOST_AUTH_METHOD: 'md5'
+      POSTGRES_INITDB_ARGS: '--auth-host=md5'
     ports:
-      - "5438:5432"
+      - '5438:5432'
+    networks:
+      - databases
+
+  postgres16:
+    image: postgres:16
+    restart: always
+    command: postgres -c 'max_connections=1000'
+    environment:
+      POSTGRES_PASSWORD: 'prisma'
+      POSTGRES_HOST_AUTH_METHOD: 'md5'
+      POSTGRES_INITDB_ARGS: '--auth-host=md5'
+    ports:
+      - '5439:5432'
     networks:
       - databases
 
@@ -157,7 +170,7 @@ services:
       MYSQL_ROOT_PASSWORD: prisma
       MYSQL_DATABASE: prisma
     ports:
-      - "3309:3306"
+      - '3309:3306'
     networks:
       - databases
     tmpfs: /var/lib/mysql
@@ -172,7 +185,7 @@ services:
       MYSQL_ROOT_PASSWORD: prisma
       MYSQL_DATABASE: prisma
     ports:
-      - "3306:3306"
+      - '3306:3306'
     networks:
       - databases
     tmpfs: /var/lib/mysql
@@ -186,7 +199,7 @@ services:
       MYSQL_ROOT_PASSWORD: prisma
       MYSQL_DATABASE: prisma
     ports:
-      - "3307:3306"
+      - '3307:3306'
     networks:
       - databases
     tmpfs: /var/lib/mysql8
@@ -199,7 +212,7 @@ services:
       MYSQL_ROOT_PASSWORD: prisma
       MYSQL_DATABASE: prisma
     ports:
-      - "3308:3306"
+      - '3308:3306'
     networks:
       - databases
     tmpfs: /var/lib/mariadb
@@ -211,10 +224,10 @@ services:
       - 33577:33577
     environment:
       PORT: 33574
-      KEYSPACES: "test"
-      NUM_SHARDS: "1"
-      MYSQL_BIND_HOST: "0.0.0.0"
-      FOREIGN_KEY_MODE: "disallow"
+      KEYSPACES: 'test'
+      NUM_SHARDS: '1'
+      MYSQL_BIND_HOST: '0.0.0.0'
+      FOREIGN_KEY_MODE: 'disallow'
       ENABLE_ONLINE_DDL: false
 
   vitess-test-8_0:
@@ -224,11 +237,11 @@ services:
       - 33807:33807
     environment:
       PORT: 33804
-      KEYSPACES: "test"
-      NUM_SHARDS: "1"
-      MYSQL_BIND_HOST: "0.0.0.0"
-      FOREIGN_KEY_MODE: "disallow"
-      TABLET_REFRESH_INTERVAL: "500ms"
+      KEYSPACES: 'test'
+      NUM_SHARDS: '1'
+      MYSQL_BIND_HOST: '0.0.0.0'
+      FOREIGN_KEY_MODE: 'disallow'
+      TABLET_REFRESH_INTERVAL: '500ms'
       ENABLE_ONLINE_DDL: false
 
   vitess-shadow-5_7:
@@ -238,10 +251,10 @@ services:
       - 33578:33577
     environment:
       PORT: 33574
-      KEYSPACES: "shadow"
-      NUM_SHARDS: "1"
-      MYSQL_BIND_HOST: "0.0.0.0"
-      FOREIGN_KEY_MODE: "disallow"
+      KEYSPACES: 'shadow'
+      NUM_SHARDS: '1'
+      MYSQL_BIND_HOST: '0.0.0.0'
+      FOREIGN_KEY_MODE: 'disallow'
       ENABLE_ONLINE_DDL: false
 
   vitess-shadow-8_0:
@@ -251,32 +264,32 @@ services:
       - 33808:33807
     environment:
       PORT: 33804
-      KEYSPACES: "shadow"
-      NUM_SHARDS: "1"
-      MYSQL_BIND_HOST: "0.0.0.0"
-      FOREIGN_KEY_MODE: "disallow"
-      TABLET_REFRESH_INTERVAL: "500ms"
+      KEYSPACES: 'shadow'
+      NUM_SHARDS: '1'
+      MYSQL_BIND_HOST: '0.0.0.0'
+      FOREIGN_KEY_MODE: 'disallow'
+      TABLET_REFRESH_INTERVAL: '500ms'
       ENABLE_ONLINE_DDL: false
 
   mssql-2017:
     image: mcr.microsoft.com/mssql/server:2017-latest
     restart: always
     environment:
-      ACCEPT_EULA: "Y"
-      SA_PASSWORD: "<YourStrong@Passw0rd>"
+      ACCEPT_EULA: 'Y'
+      SA_PASSWORD: '<YourStrong@Passw0rd>'
     ports:
-      - "1434:1433"
+      - '1434:1433'
     networks:
       - databases
-      
+
   mssql-2019:
     image: mcr.microsoft.com/mssql/server:2019-latest
     restart: always
     environment:
-      ACCEPT_EULA: "Y"
-      SA_PASSWORD: "<YourStrong@Passw0rd>"
+      ACCEPT_EULA: 'Y'
+      SA_PASSWORD: '<YourStrong@Passw0rd>'
     ports:
-      - "1433:1433"
+      - '1433:1433'
     networks:
       - databases
 
@@ -284,10 +297,10 @@ services:
     image: mcr.microsoft.com/mssql/server:2022-latest
     restart: always
     environment:
-      ACCEPT_EULA: "Y"
-      SA_PASSWORD: "<YourStrong@Passw0rd>"
+      ACCEPT_EULA: 'Y'
+      SA_PASSWORD: '<YourStrong@Passw0rd>'
     ports:
-      - "1435:1433"
+      - '1435:1433'
     networks:
       - databases
 
@@ -295,10 +308,10 @@ services:
     image: mcr.microsoft.com/azure-sql-edge
     restart: always
     environment:
-      ACCEPT_EULA: "Y"
-      MSSQL_SA_PASSWORD: "<YourStrong@Passw0rd>"
+      ACCEPT_EULA: 'Y'
+      MSSQL_SA_PASSWORD: '<YourStrong@Passw0rd>'
     ports:
-      - "1433:1433"
+      - '1433:1433'
     networks:
       - databases
 
@@ -306,24 +319,24 @@ services:
     image: prismagraphql/mongo-single-replica:4.2.17-bionic
     restart: always
     environment:
-      MONGO_INITDB_ROOT_USERNAME: "prisma"
-      MONGO_INITDB_ROOT_PASSWORD: "prisma"
+      MONGO_INITDB_ROOT_USERNAME: 'prisma'
+      MONGO_INITDB_ROOT_PASSWORD: 'prisma'
       MONGO_PORT: 27016
       INIT_WAIT_SEC: $INIT_WAIT_SEC
     networks:
       - databases
     ports:
-      - "27016:27016"
+      - '27016:27016'
 
   mongo44:
     image: prismagraphql/mongo-single-replica:4.4.3-bionic
     restart: always
     environment:
-      MONGO_INITDB_ROOT_USERNAME: "prisma"
-      MONGO_INITDB_ROOT_PASSWORD: "prisma"
+      MONGO_INITDB_ROOT_USERNAME: 'prisma'
+      MONGO_INITDB_ROOT_PASSWORD: 'prisma'
       INIT_WAIT_SEC: $INIT_WAIT_SEC
     ports:
-      - "27017:27017"
+      - '27017:27017'
     networks:
       - databases
 
@@ -331,11 +344,11 @@ services:
     image: mongo:4.2
     restart: always
     environment:
-      MONGO_INITDB_ROOT_USERNAME: "prisma"
-      MONGO_INITDB_ROOT_PASSWORD: "prisma"
+      MONGO_INITDB_ROOT_USERNAME: 'prisma'
+      MONGO_INITDB_ROOT_PASSWORD: 'prisma'
       INIT_WAIT_SEC: $INIT_WAIT_SEC
     ports:
-      - "27016:27017"
+      - '27016:27017'
     networks:
       - databases
 
@@ -343,11 +356,11 @@ services:
     image: mongo:4.4
     restart: always
     environment:
-      MONGO_INITDB_ROOT_USERNAME: "prisma"
-      MONGO_INITDB_ROOT_PASSWORD: "prisma"
+      MONGO_INITDB_ROOT_USERNAME: 'prisma'
+      MONGO_INITDB_ROOT_PASSWORD: 'prisma'
       INIT_WAIT_SEC: $INIT_WAIT_SEC
     ports:
-      - "27017:27017"
+      - '27017:27017'
     networks:
       - databases
 
@@ -355,12 +368,12 @@ services:
     image: prismagraphql/mongo-single-replica:5.0.3
     restart: always
     environment:
-      MONGO_INITDB_ROOT_USERNAME: "prisma"
-      MONGO_INITDB_ROOT_PASSWORD: "prisma"
+      MONGO_INITDB_ROOT_USERNAME: 'prisma'
+      MONGO_INITDB_ROOT_PASSWORD: 'prisma'
       MONGO_PORT: 27018
       INIT_WAIT_SEC: $INIT_WAIT_SEC
     ports:
-      - "27018:27018"
+      - '27018:27018'
     networks:
       - databases
 
@@ -368,11 +381,11 @@ services:
     image: mongo:5
     restart: always
     environment:
-      MONGO_INITDB_ROOT_USERNAME: "prisma"
-      MONGO_INITDB_ROOT_PASSWORD: "prisma"
+      MONGO_INITDB_ROOT_USERNAME: 'prisma'
+      MONGO_INITDB_ROOT_PASSWORD: 'prisma'
       INIT_WAIT_SEC: $INIT_WAIT_SEC
     ports:
-      - "27018:27017"
+      - '27018:27017'
     networks:
       - databases
 
@@ -382,8 +395,8 @@ services:
     ports:
       - 8081:8081
     environment:
-      ME_CONFIG_MONGODB_ADMINUSERNAME: "prisma"
-      ME_CONFIG_MONGODB_ADMINPASSWORD: "prisma"
+      ME_CONFIG_MONGODB_ADMINUSERNAME: 'prisma'
+      ME_CONFIG_MONGODB_ADMINPASSWORD: 'prisma'
       ME_CONFIG_MONGODB_URL: mongodb://prisma:prisma@mongo4-single:27017/
     networks:
       - databases
@@ -391,8 +404,8 @@ services:
   otel:
     image: jaegertracing/all-in-one:1.35
     environment:
-      COLLECTOR_OTLP_ENABLED: "true"
-      COLLECTOR_ZIPKIN_HOST_PORT: ":9411"
+      COLLECTOR_OTLP_ENABLED: 'true'
+      COLLECTOR_ZIPKIN_HOST_PORT: ':9411'
     ports:
       - 6831:6831/udp
       - 6832:6832/udp
