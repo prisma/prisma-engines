@@ -971,7 +971,6 @@
 <a href="#971" id="971">971</a>
 <a href="#972" id="972">972</a>
 <a href="#973" id="973">973</a>
-<a href="#974" id="974">974</a>
 </pre></div><pre class="rust"><code><span class="kw">use crate</span>::{
     ast::<span class="kw-2">*</span>,
     error::{Error, ErrorKind},
@@ -982,7 +981,6 @@
 <span class="doccomment">/// A visitor to generate queries for the MySQL database.
 ///
 /// The returned parameter values can be used directly with the mysql crate.
-</span><span class="attr">#[cfg_attr(feature = <span class="string">&quot;docs&quot;</span>, doc(cfg(feature = <span class="string">&quot;mysql&quot;</span>)))]
 </span><span class="kw">pub struct </span>Mysql&lt;<span class="lifetime">&#39;a</span>&gt; {
     query: String,
     parameters: Vec&lt;Value&lt;<span class="lifetime">&#39;a</span>&gt;&gt;,
@@ -1910,7 +1908,7 @@
         <span class="kw">let </span>table_2 = <span class="string">&quot;table2&quot;</span>;
 
         <span class="kw">let </span>join = table_2.alias(<span class="string">&quot;j&quot;</span>).on((<span class="string">&quot;j&quot;</span>, <span class="string">&quot;id&quot;</span>).equals(Column::from((<span class="string">&quot;t1&quot;</span>, <span class="string">&quot;id2&quot;</span>))));
-        <span class="kw">let </span>a = table_1.clone().alias(<span class="string">&quot;t1&quot;</span>);
+        <span class="kw">let </span>a = table_1.alias(<span class="string">&quot;t1&quot;</span>);
         <span class="kw">let </span>selection = Select::from_table(a).column((<span class="string">&quot;t1&quot;</span>, <span class="string">&quot;id&quot;</span>)).inner_join(join);
 
         <span class="kw">let </span>id1 = Column::from((table_1, <span class="string">&quot;id&quot;</span>));
@@ -1931,7 +1929,7 @@
         <span class="kw">let </span>table_2 = <span class="string">&quot;table2&quot;</span>;
 
         <span class="kw">let </span>join = table_2.alias(<span class="string">&quot;j&quot;</span>).on((<span class="string">&quot;j&quot;</span>, <span class="string">&quot;id&quot;</span>).equals(Column::from((<span class="string">&quot;t1&quot;</span>, <span class="string">&quot;id2&quot;</span>))));
-        <span class="kw">let </span>a = table_1.clone().alias(<span class="string">&quot;t1&quot;</span>);
+        <span class="kw">let </span>a = table_1.alias(<span class="string">&quot;t1&quot;</span>);
         <span class="kw">let </span>selection = Select::from_table(a).column((<span class="string">&quot;t1&quot;</span>, <span class="string">&quot;id&quot;</span>)).inner_join(join);
 
         <span class="kw">let </span>id1 = Column::from((table_1, <span class="string">&quot;id&quot;</span>));

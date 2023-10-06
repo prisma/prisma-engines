@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"struct":["Accumulator","Error","IntoIter"],"type":["Result"]};

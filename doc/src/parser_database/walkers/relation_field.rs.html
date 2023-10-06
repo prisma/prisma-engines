@@ -241,17 +241,6 @@
 <a href="#241" id="241">241</a>
 <a href="#242" id="242">242</a>
 <a href="#243" id="243">243</a>
-<a href="#244" id="244">244</a>
-<a href="#245" id="245">245</a>
-<a href="#246" id="246">246</a>
-<a href="#247" id="247">247</a>
-<a href="#248" id="248">248</a>
-<a href="#249" id="249">249</a>
-<a href="#250" id="250">250</a>
-<a href="#251" id="251">251</a>
-<a href="#252" id="252">252</a>
-<a href="#253" id="253">253</a>
-<a href="#254" id="254">254</a>
 </pre></div><pre class="rust"><code><span class="kw">use crate</span>::{
     ast::{<span class="self">self</span>, FieldArity},
     types::{RelationField, RelationFieldId},
@@ -418,7 +407,7 @@
 }
 
 <span class="doccomment">/// The relation name.
-</span><span class="attr">#[derive(Debug, Clone)]
+</span><span class="attr">#[derive(Debug, Clone, PartialOrd)]
 </span><span class="kw">pub enum </span>RelationName&lt;<span class="lifetime">&#39;db</span>&gt; {
     <span class="doccomment">/// A relation name specified in the AST.
     </span>Explicit(<span class="kw-2">&amp;</span><span class="lifetime">&#39;db </span>str),
@@ -438,17 +427,6 @@
 }
 
 <span class="kw">impl</span>&lt;<span class="lifetime">&#39;db</span>&gt; Eq <span class="kw">for </span>RelationName&lt;<span class="lifetime">&#39;db</span>&gt; {}
-
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;db</span>&gt; PartialOrd <span class="kw">for </span>RelationName&lt;<span class="lifetime">&#39;db</span>&gt; {
-    <span class="kw">fn </span>partial_cmp(<span class="kw-2">&amp;</span><span class="self">self</span>, other: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;std::cmp::Ordering&gt; {
-        <span class="kw">match </span>(<span class="self">self</span>, other) {
-            (<span class="self">Self</span>::Explicit(l0), <span class="self">Self</span>::Explicit(r0)) =&gt; l0.partial_cmp(r0),
-            (<span class="self">Self</span>::Generated(l0), <span class="self">Self</span>::Generated(r0)) =&gt; l0.partial_cmp(r0),
-            (<span class="self">Self</span>::Explicit(l0), <span class="self">Self</span>::Generated(r0)) =&gt; l0.partial_cmp(<span class="kw-2">&amp;</span>r0.as_str()),
-            (<span class="self">Self</span>::Generated(l0), <span class="self">Self</span>::Explicit(r0)) =&gt; l0.as_str().partial_cmp(<span class="kw-2">*</span>r0),
-        }
-    }
-}
 
 <span class="kw">impl</span>&lt;<span class="lifetime">&#39;db</span>&gt; Ord <span class="kw">for </span>RelationName&lt;<span class="lifetime">&#39;db</span>&gt; {
     <span class="kw">fn </span>cmp(<span class="kw-2">&amp;</span><span class="self">self</span>, other: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; std::cmp::Ordering {

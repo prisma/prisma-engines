@@ -1589,10 +1589,6 @@
 <a href="#1589" id="1589">1589</a>
 <a href="#1590" id="1590">1590</a>
 <a href="#1591" id="1591">1591</a>
-<a href="#1592" id="1592">1592</a>
-<a href="#1593" id="1593">1593</a>
-<a href="#1594" id="1594">1594</a>
-<a href="#1595" id="1595">1595</a>
 </pre></div><pre class="rust"><code><span class="kw">mod </span>conversion;
 <span class="kw">pub mod </span>error;
 
@@ -1650,7 +1646,6 @@
 
 <span class="doccomment">/// A connector interface for the PostgreSQL database.
 </span><span class="attr">#[derive(Debug)]
-#[cfg_attr(feature = <span class="string">&quot;docs&quot;</span>, doc(cfg(feature = <span class="string">&quot;postgresql&quot;</span>)))]
 </span><span class="kw">pub struct </span>PostgreSql {
     client: PostgresClient,
     pg_bouncer: bool,
@@ -1660,14 +1655,12 @@
 }
 
 <span class="attr">#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-#[cfg_attr(feature = <span class="string">&quot;docs&quot;</span>, doc(cfg(feature = <span class="string">&quot;postgresql&quot;</span>)))]
 </span><span class="kw">pub enum </span>SslAcceptMode {
     Strict,
     AcceptInvalidCerts,
 }
 
 <span class="attr">#[derive(Debug, Clone)]
-#[cfg_attr(feature = <span class="string">&quot;docs&quot;</span>, doc(cfg(feature = <span class="string">&quot;postgresql&quot;</span>)))]
 </span><span class="kw">pub struct </span>SslParams {
     certificate_file: <span class="prelude-ty">Option</span>&lt;String&gt;,
     identity_file: <span class="prelude-ty">Option</span>&lt;String&gt;,
@@ -1775,7 +1768,6 @@
 <span class="doccomment">/// Wraps a connection url and exposes the parsing logic used by Quaint,
 /// including default values.
 </span><span class="attr">#[derive(Debug, Clone)]
-#[cfg_attr(feature = <span class="string">&quot;docs&quot;</span>, doc(cfg(feature = <span class="string">&quot;postgresql&quot;</span>)))]
 </span><span class="kw">pub struct </span>PostgresUrl {
     url: Url,
     query_params: PostgresUrlQueryParams,

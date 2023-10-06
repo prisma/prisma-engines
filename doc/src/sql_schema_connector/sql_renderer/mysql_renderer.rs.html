@@ -886,7 +886,7 @@
         .map(|default| render_default(next_column, default))
         .filter(|expr| !expr.is_empty())
         .map(|expression| <span class="macro">format!</span>(<span class="string">&quot; DEFAULT {expression}&quot;</span>))
-        .unwrap_or_else(String::new);
+        .unwrap_or_default();
 
     <span class="macro">format!</span>(
         <span class="string">&quot;MODIFY {column_name} {column_type}{nullability}{default}{sequence}&quot;</span>,

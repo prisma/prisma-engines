@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"enum":["Purpose"],"struct":["Options"],"trait":["CollectLifetimes","CollectTypeParams","GenericsExt","UsesLifetimes","UsesTypeParams"],"type":["IdentRefSet","IdentSet","LifetimeRefSet","LifetimeSet"]};

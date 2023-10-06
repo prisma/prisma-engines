@@ -1166,7 +1166,6 @@
 <a href="#1166" id="1166">1166</a>
 <a href="#1167" id="1167">1167</a>
 <a href="#1168" id="1168">1168</a>
-<a href="#1169" id="1169">1169</a>
 </pre></div><pre class="rust"><code><span class="kw">use crate</span>::{
     ast::<span class="kw-2">*</span>,
     visitor::{<span class="self">self</span>, Visitor},
@@ -1180,7 +1179,6 @@
 ///
 /// The returned parameter values implement the `ToSql` trait from postgres and
 /// can be used directly with the database.
-</span><span class="attr">#[cfg_attr(feature = <span class="string">&quot;docs&quot;</span>, doc(cfg(feature = <span class="string">&quot;postgresql&quot;</span>)))]
 </span><span class="kw">pub struct </span>Postgres&lt;<span class="lifetime">&#39;a</span>&gt; {
     query: String,
     parameters: Vec&lt;Value&lt;<span class="lifetime">&#39;a</span>&gt;&gt;,

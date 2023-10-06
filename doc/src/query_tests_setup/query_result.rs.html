@@ -564,7 +564,7 @@
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>test_deserializing_error_batch_response() {
-        <span class="kw">let </span>response = <span class="string">r###&quot;
+        <span class="kw">let </span>response = <span class="string">r#&quot;
 {
    &quot;batchResult&quot;:[
       {
@@ -590,7 +590,7 @@
          ]
       }
    ]
-}&quot;###</span>;
+}&quot;#</span>;
         <span class="kw">let </span>result: QueryResult = serde_json::from_str(response).unwrap();
 
         <span class="kw">let </span>expected = QueryResult {

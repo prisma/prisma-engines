@@ -1803,7 +1803,6 @@
 <a href="#1803" id="1803">1803</a>
 <a href="#1804" id="1804">1804</a>
 <a href="#1805" id="1805">1805</a>
-<a href="#1806" id="1806">1806</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span><span class="kw">super</span>::Visitor;
 <span class="attr">#[cfg(any(feature = <span class="string">&quot;postgresql&quot;</span>, feature = <span class="string">&quot;mysql&quot;</span>))]
 </span><span class="kw">use </span><span class="kw">crate</span>::prelude::{JsonExtract, JsonType, JsonUnquote};
@@ -1823,7 +1822,6 @@
 <span class="doccomment">/// A visitor to generate queries for the SQL Server database.
 ///
 /// The returned parameter values can be used directly with the tiberius crate.
-</span><span class="attr">#[cfg_attr(feature = <span class="string">&quot;docs&quot;</span>, doc(cfg(feature = <span class="string">&quot;mssql&quot;</span>)))]
 </span><span class="kw">pub struct </span>Mssql&lt;<span class="lifetime">&#39;a</span>&gt; {
     query: String,
     parameters: Vec&lt;Value&lt;<span class="lifetime">&#39;a</span>&gt;&gt;,

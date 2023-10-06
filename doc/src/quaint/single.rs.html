@@ -240,7 +240,6 @@
 <a href="#240" id="240">240</a>
 <a href="#241" id="241">241</a>
 <a href="#242" id="242">242</a>
-<a href="#243" id="243">243</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! A single connection abstraction to a SQL database.
 
 </span><span class="attr">#[cfg(feature = <span class="string">&quot;sqlite&quot;</span>)]
@@ -410,7 +409,6 @@
     }
 
     <span class="attr">#[cfg(feature = <span class="string">&quot;sqlite&quot;</span>)]
-    #[cfg_attr(feature = <span class="string">&quot;docs&quot;</span>, doc(cfg(sqlite)))]
     </span><span class="doccomment">/// Open a new SQLite database in memory.
     </span><span class="kw">pub fn </span>new_in_memory() -&gt; <span class="kw">crate</span>::Result&lt;Quaint&gt; {
         <span class="prelude-val">Ok</span>(Quaint {

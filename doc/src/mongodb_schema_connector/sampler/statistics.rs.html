@@ -1190,7 +1190,7 @@
                         sampler.types.insert(FieldType::Document(type_name.clone()), <span class="number">1</span>);
 
                         <span class="kw">let </span>key = Name::CompositeType(type_name);
-                        <span class="self">self</span>.models.entry(key).or_insert_with(Default::default);
+                        <span class="self">self</span>.models.entry(key).or_default();
 
                         sampler
                     } <span class="kw">else </span>{

@@ -395,12 +395,6 @@
 <a href="#395" id="395">395</a>
 <a href="#396" id="396">396</a>
 <a href="#397" id="397">397</a>
-<a href="#398" id="398">398</a>
-<a href="#399" id="399">399</a>
-<a href="#400" id="400">400</a>
-<a href="#401" id="401">401</a>
-<a href="#402" id="402">402</a>
-<a href="#403" id="403">403</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Error module
 </span><span class="kw">use </span><span class="kw">crate</span>::connector::IsolationLevel;
 <span class="kw">use </span>std::{borrow::Cow, fmt, io, num};
@@ -650,11 +644,6 @@
     <span class="attr">#[error(<span class="string">&quot;Value out of range error. {}&quot;</span>, message)]
     </span>ValueOutOfRange { message: String },
 
-    <span class="attr">#[cfg(feature = <span class="string">&quot;serde-support&quot;</span>)]
-    #[cfg_attr(feature = <span class="string">&quot;docs&quot;</span>, doc(cfg(feature = <span class="string">&quot;serde-support&quot;</span>)))]
-    #[error(<span class="string">&quot;Deserializing a ResultRow {:?}&quot;</span>, _0)]
-    </span>FromRowError(serde::de::value::Error),
-
     <span class="attr">#[error(
         <span class="string">&quot;Incorrect number of parameters given to a statement. Expected {}: got: {}.&quot;</span>,
         expected,
@@ -723,7 +712,6 @@
 }
 
 <span class="attr">#[cfg(feature = <span class="string">&quot;bigdecimal&quot;</span>)]
-#[cfg_attr(feature = <span class="string">&quot;docs&quot;</span>, doc(cfg(feature = <span class="string">&quot;bigdecimal&quot;</span>)))]
 </span><span class="kw">impl </span>From&lt;bigdecimal::ParseBigDecimalError&gt; <span class="kw">for </span>Error {
     <span class="kw">fn </span>from(e: bigdecimal::ParseBigDecimalError) -&gt; <span class="self">Self </span>{
         <span class="kw">let </span>kind = ErrorKind::conversion(<span class="macro">format!</span>(<span class="string">&quot;{e}&quot;</span>));

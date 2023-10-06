@@ -130,12 +130,6 @@
 <a href="#130" id="130">130</a>
 <a href="#131" id="131">131</a>
 <a href="#132" id="132">132</a>
-<a href="#133" id="133">133</a>
-<a href="#134" id="134">134</a>
-<a href="#135" id="135">135</a>
-<a href="#136" id="136">136</a>
-<a href="#137" id="137">137</a>
-<a href="#138" id="138">138</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! # quaint
 //!
 //! A database client abstraction for reading and writing to an SQL database in a
@@ -242,9 +236,7 @@
 //! # }
 //! ```
 
-</span><span class="attr">#![cfg_attr(feature = <span class="string">&quot;docs&quot;</span>, feature(doc_cfg))]
-
-#[cfg(not(any(feature = <span class="string">&quot;sqlite&quot;</span>, feature = <span class="string">&quot;postgresql&quot;</span>, feature = <span class="string">&quot;mysql&quot;</span>, feature = <span class="string">&quot;mssql&quot;</span>)))]
+</span><span class="attr">#[cfg(not(any(feature = <span class="string">&quot;sqlite&quot;</span>, feature = <span class="string">&quot;postgresql&quot;</span>, feature = <span class="string">&quot;mysql&quot;</span>, feature = <span class="string">&quot;mssql&quot;</span>)))]
 </span><span class="macro">compile_error!</span>(<span class="string">&quot;one of &#39;sqlite&#39;, &#39;postgresql&#39;, &#39;mysql&#39; or &#39;mssql&#39; features must be enabled&quot;</span>);
 
 <span class="attr">#[macro_use]
@@ -260,12 +252,8 @@
 <span class="kw">pub mod </span>connector;
 <span class="kw">pub mod </span>error;
 <span class="attr">#[cfg(feature = <span class="string">&quot;pooled&quot;</span>)]
-#[cfg_attr(feature = <span class="string">&quot;docs&quot;</span>, doc(cfg(pooled)))]
 </span><span class="kw">pub mod </span>pooled;
 <span class="kw">pub mod </span>prelude;
-<span class="attr">#[cfg(feature = <span class="string">&quot;serde-support&quot;</span>)]
-#[cfg_attr(feature = <span class="string">&quot;docs&quot;</span>, doc(cfg(feature = <span class="string">&quot;serde-support&quot;</span>)))]
-</span><span class="kw">pub mod </span>serde;
 <span class="kw">pub mod </span>single;
 <span class="attr">#[cfg(test)]
 </span><span class="kw">mod </span>tests;

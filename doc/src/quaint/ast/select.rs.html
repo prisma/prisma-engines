@@ -1362,7 +1362,7 @@
 
                 ctes.into_iter().collect()
             })
-            .unwrap_or_else(Vec::new);
+            .unwrap_or_default();
 
         <span class="kw">if </span>top_level {
             <span class="kw">let </span>clashing_names = <span class="self">self

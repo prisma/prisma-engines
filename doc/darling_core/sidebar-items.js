@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"macro":["uses_lifetimes","uses_type_params"],"mod":["ast","derive","error","usage","util"],"trait":["FromAttributes","FromDeriveInput","FromField","FromGenericParam","FromGenerics","FromMeta","FromTypeParam","FromVariant"]};

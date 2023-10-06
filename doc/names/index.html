@@ -1,0 +1,45 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="This crate provides a generate that constructs random name strings suitable for use in container instances, project names, application instances, etc."><title>names - Rust</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../static.files/rustdoc-9bb858ba049f1f21.css" id="mainThemeStyle"><meta name="rustdoc-vars" data-root-path="../" data-static-root-path="../static.files/" data-current-crate="names" data-themes="" data-resource-suffix="" data-rustdoc-version="1.72.0 (5680fa18f 2023-08-23) (built from a source tarball)" data-channel="1.72.0" data-search-js="search-f6292fe389d70017.js" data-settings-js="settings-de11bff964e9d4e5.js" data-settings-css="settings-8c76f75bfb6bd192.css" data-theme-light-css="light-0f8c037637f9eb3e.css" data-theme-dark-css="dark-1097f8e92a01e3cf.css" data-theme-ayu-css="ayu-614652228113ac93.css" ><script src="../static.files/storage-59fd9b8ccb335783.js"></script><script defer src="../crates.js"></script><script defer src="../static.files/main-0795b7d26be81095.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../static.files/light-0f8c037637f9eb3e.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../static.files/dark-1097f8e92a01e3cf.css"><link rel="stylesheet" href="../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc mod crate"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="logo-container" href="../names/index.html"><img class="rust-logo" src="../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><h2></h2></nav><nav class="sidebar"><a class="logo-container" href="../names/index.html"><img class="rust-logo" src="../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><h2 class="location"><a href="#">Crate names</a></h2><div class="sidebar-elems"><ul class="block"><li class="version">Version 0.11.0</li><li><a id="all-types" href="all.html">All Items</a></li></ul><section><ul class="block"><li><a href="#structs">Structs</a></li><li><a href="#enums">Enums</a></li><li><a href="#constants">Constants</a></li></ul></section></div></nav><main><div class="width-limiter"><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="main-heading"><h1>Crate <a class="mod" href="#">names</a><button id="copy-path" title="Copy item path to clipboard"><img src="../static.files/clipboard-7571035ce49a181d.svg" width="19" height="18" alt="Copy item path"></button></h1><span class="out-of-band"><a class="srclink" href="../src/names/lib.rs.html#1-168">source</a> · <button id="toggle-all-docs" title="collapse all docs">[<span>&#x2212;</span>]</button></span></div><details class="toggle top-doc" open><summary class="hideme"><span>Expand description</span></summary><div class="docblock"><p>This crate provides a generate that constructs random name strings suitable
+for use in container instances, project names, application instances, etc.</p>
+<p>The name <code>Generator</code> implements the <code>Iterator</code> trait so it can be used with
+adapters, consumers, and in loops.</p>
+<h2 id="usage"><a href="#usage">Usage</a></h2>
+<p>This crate is <a href="https://crates.io/crates/names">on crates.io</a> and can be
+used by adding <code>names</code> to your dependencies in your project’s <code>Cargo.toml</code>
+file:</p>
+<div class="example-wrap"><pre class="language-toml"><code>[dependencies]
+names = &quot;0.9.0&quot;
+</code></pre></div>
+<p>and this to your crate root:</p>
+
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">extern crate </span>names;</code></pre></div>
+<h2 id="example-painless-defaults"><a href="#example-painless-defaults">Example: painless defaults</a></h2>
+<p>The easiest way to get started is to use the default <code>Generator</code> to return
+a name:</p>
+
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use </span>names::Generator;
+
+<span class="kw">let </span><span class="kw-2">mut </span>generator = Generator::default();
+<span class="macro">println!</span>(<span class="string">&quot;Your project is: {}&quot;</span>, generator.next().unwrap());
+<span class="comment">// #=&gt; &quot;Your project is: rusty-nail&quot;</span></code></pre></div>
+<p>If more randomness is required, you can generate a name with a trailing
+4-digit number:</p>
+
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use </span>names::{Generator, Name};
+
+<span class="kw">let </span><span class="kw-2">mut </span>generator = Generator::with_naming(Name::Numbered);
+<span class="macro">println!</span>(<span class="string">&quot;Your project is: {}&quot;</span>, generator.next().unwrap());
+<span class="comment">// #=&gt; &quot;Your project is: pushy-pencil-5602&quot;</span></code></pre></div>
+<h2 id="example-with-custom-dictionaries"><a href="#example-with-custom-dictionaries">Example: with custom dictionaries</a></h2>
+<p>If you would rather supply your own custom adjective and noun word lists,
+you can provide your own by supplying 2 string slices. For example,
+this returns only one result:</p>
+
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use </span>names::{Generator, Name};
+
+<span class="kw">let </span>adjectives = <span class="kw-2">&amp;</span>[<span class="string">&quot;imaginary&quot;</span>];
+<span class="kw">let </span>nouns = <span class="kw-2">&amp;</span>[<span class="string">&quot;roll&quot;</span>];
+<span class="kw">let </span><span class="kw-2">mut </span>generator = Generator::new(adjectives, nouns, Name::default());
+
+<span class="macro">assert_eq!</span>(<span class="string">&quot;imaginary-roll&quot;</span>, generator.next().unwrap());</code></pre></div>
+</div></details><h2 id="structs" class="small-section-header"><a href="#structs">Structs</a></h2><ul class="item-table"><li><div class="item-name"><a class="struct" href="struct.Generator.html" title="struct names::Generator">Generator</a></div><div class="desc docblock-short">A random name generator which combines an adjective, a noun, and an
+optional number</div></li></ul><h2 id="enums" class="small-section-header"><a href="#enums">Enums</a></h2><ul class="item-table"><li><div class="item-name"><a class="enum" href="enum.Name.html" title="enum names::Name">Name</a></div><div class="desc docblock-short">A naming strategy for the <code>Generator</code></div></li></ul><h2 id="constants" class="small-section-header"><a href="#constants">Constants</a></h2><ul class="item-table"><li><div class="item-name"><a class="constant" href="constant.ADJECTIVES.html" title="constant names::ADJECTIVES">ADJECTIVES</a></div></li><li><div class="item-name"><a class="constant" href="constant.NOUNS.html" title="constant names::NOUNS">NOUNS</a></div></li></ul></section></div></main></body></html>

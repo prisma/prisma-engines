@@ -999,7 +999,6 @@
 <a href="#999" id="999">999</a>
 <a href="#1000" id="1000">1000</a>
 <a href="#1001" id="1001">1001</a>
-<a href="#1002" id="1002">1002</a>
 </pre></div><pre class="rust"><code><span class="kw">use crate</span>::{
     ast::<span class="kw-2">*</span>,
     error::{Error, ErrorKind},
@@ -1012,7 +1011,6 @@
 ///
 /// The returned parameter values implement the `ToSql` trait from rusqlite and
 /// can be used directly with the database.
-</span><span class="attr">#[cfg_attr(feature = <span class="string">&quot;docs&quot;</span>, doc(cfg(feature = <span class="string">&quot;sqlite&quot;</span>)))]
 </span><span class="kw">pub struct </span>Sqlite&lt;<span class="lifetime">&#39;a</span>&gt; {
     query: String,
     parameters: Vec&lt;Value&lt;<span class="lifetime">&#39;a</span>&gt;&gt;,

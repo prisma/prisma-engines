@@ -1444,22 +1444,6 @@
 <a href="#1444" id="1444">1444</a>
 <a href="#1445" id="1445">1445</a>
 <a href="#1446" id="1446">1446</a>
-<a href="#1447" id="1447">1447</a>
-<a href="#1448" id="1448">1448</a>
-<a href="#1449" id="1449">1449</a>
-<a href="#1450" id="1450">1450</a>
-<a href="#1451" id="1451">1451</a>
-<a href="#1452" id="1452">1452</a>
-<a href="#1453" id="1453">1453</a>
-<a href="#1454" id="1454">1454</a>
-<a href="#1455" id="1455">1455</a>
-<a href="#1456" id="1456">1456</a>
-<a href="#1457" id="1457">1457</a>
-<a href="#1458" id="1458">1458</a>
-<a href="#1459" id="1459">1459</a>
-<a href="#1460" id="1460">1460</a>
-<a href="#1461" id="1461">1461</a>
-<a href="#1462" id="1462">1462</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::ast::<span class="kw-2">*</span>;
 <span class="kw">use </span><span class="kw">crate</span>::error::{Error, ErrorKind};
 
@@ -1522,7 +1506,6 @@
 
     <span class="doccomment">/// Creates a new decimal value.
     </span><span class="attr">#[cfg(feature = <span class="string">&quot;bigdecimal&quot;</span>)]
-    #[cfg_attr(feature = <span class="string">&quot;docs&quot;</span>, doc(cfg(feature = <span class="string">&quot;bigdecimal&quot;</span>)))]
     </span><span class="kw">pub fn </span>numeric(value: BigDecimal) -&gt; <span class="self">Self </span>{
         ValueType::numeric(value).into_value()
     }
@@ -1614,7 +1597,6 @@
 
     <span class="doccomment">/// Creates a new uuid value.
     </span><span class="attr">#[cfg(feature = <span class="string">&quot;uuid&quot;</span>)]
-    #[cfg_attr(feature = <span class="string">&quot;docs&quot;</span>, doc(cfg(feature = <span class="string">&quot;uuid&quot;</span>)))]
     </span><span class="kw">pub fn </span>uuid(value: Uuid) -&gt; <span class="self">Self </span>{
         ValueType::uuid(value).into_value()
     }
@@ -1735,7 +1717,6 @@
 
     <span class="doccomment">/// `true` if the `Value` is a numeric value or can be converted to one.
     </span><span class="attr">#[cfg(feature = <span class="string">&quot;bigdecimal&quot;</span>)]
-    #[cfg_attr(feature = <span class="string">&quot;docs&quot;</span>, doc(cfg(feature = <span class="string">&quot;bigdecimal&quot;</span>)))]
     </span><span class="kw">pub fn </span>is_numeric(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
         <span class="self">self</span>.typed.is_numeric()
     }
@@ -1743,7 +1724,6 @@
     <span class="doccomment">/// Returns a bigdecimal, if the value is a numeric, float or double value,
     /// otherwise `None`.
     </span><span class="attr">#[cfg(feature = <span class="string">&quot;bigdecimal&quot;</span>)]
-    #[cfg_attr(feature = <span class="string">&quot;docs&quot;</span>, doc(cfg(feature = <span class="string">&quot;bigdecimal&quot;</span>)))]
     </span><span class="kw">pub fn </span>into_numeric(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;BigDecimal&gt; {
         <span class="self">self</span>.typed.into_numeric()
     }
@@ -1751,7 +1731,6 @@
     <span class="doccomment">/// Returns a reference to a bigdecimal, if the value is a numeric.
     /// Otherwise `None`.
     </span><span class="attr">#[cfg(feature = <span class="string">&quot;bigdecimal&quot;</span>)]
-    #[cfg_attr(feature = <span class="string">&quot;docs&quot;</span>, doc(cfg(feature = <span class="string">&quot;bigdecimal&quot;</span>)))]
     </span><span class="kw">pub fn </span>as_numeric(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>BigDecimal&gt; {
         <span class="self">self</span>.typed.as_numeric()
     }
@@ -1773,14 +1752,12 @@
 
     <span class="doccomment">/// `true` if the `Value` is of UUID type.
     </span><span class="attr">#[cfg(feature = <span class="string">&quot;uuid&quot;</span>)]
-    #[cfg_attr(feature = <span class="string">&quot;docs&quot;</span>, doc(cfg(feature = <span class="string">&quot;uuid&quot;</span>)))]
     </span><span class="kw">pub fn </span>is_uuid(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
         <span class="self">self</span>.typed.is_uuid()
     }
 
     <span class="doccomment">/// Returns an UUID if the value is of UUID type, otherwise `None`.
     </span><span class="attr">#[cfg(feature = <span class="string">&quot;uuid&quot;</span>)]
-    #[cfg_attr(feature = <span class="string">&quot;docs&quot;</span>, doc(cfg(feature = <span class="string">&quot;uuid&quot;</span>)))]
     </span><span class="kw">pub fn </span>as_uuid(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;Uuid&gt; {
         <span class="self">self</span>.typed.as_uuid()
     }
@@ -1975,14 +1952,12 @@
     </span>Array(<span class="prelude-ty">Option</span>&lt;Vec&lt;Value&lt;<span class="lifetime">&#39;a</span>&gt;&gt;&gt;),
     <span class="doccomment">/// A numeric value.
     </span><span class="attr">#[cfg(feature = <span class="string">&quot;bigdecimal&quot;</span>)]
-    #[cfg_attr(feature = <span class="string">&quot;docs&quot;</span>, doc(cfg(feature = <span class="string">&quot;bigdecimal&quot;</span>)))]
     </span>Numeric(<span class="prelude-ty">Option</span>&lt;BigDecimal&gt;),
     <span class="doccomment">/// A JSON value.
     </span>Json(<span class="prelude-ty">Option</span>&lt;serde_json::Value&gt;),
     <span class="doccomment">/// A XML value.
     </span>Xml(<span class="prelude-ty">Option</span>&lt;Cow&lt;<span class="lifetime">&#39;a</span>, str&gt;&gt;),
     <span class="attr">#[cfg(feature = <span class="string">&quot;uuid&quot;</span>)]
-    #[cfg_attr(feature = <span class="string">&quot;docs&quot;</span>, doc(cfg(feature = <span class="string">&quot;uuid&quot;</span>)))]
     </span><span class="doccomment">/// An UUID value.
     </span>Uuid(<span class="prelude-ty">Option</span>&lt;Uuid&gt;),
     <span class="doccomment">/// A datetime value.
@@ -2149,7 +2124,6 @@
 
     <span class="doccomment">/// Creates a new decimal value.
     </span><span class="attr">#[cfg(feature = <span class="string">&quot;bigdecimal&quot;</span>)]
-    #[cfg_attr(feature = <span class="string">&quot;docs&quot;</span>, doc(cfg(feature = <span class="string">&quot;bigdecimal&quot;</span>)))]
     </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>numeric(value: BigDecimal) -&gt; <span class="self">Self </span>{
         <span class="self">Self</span>::Numeric(<span class="prelude-val">Some</span>(value))
     }
@@ -2241,7 +2215,6 @@
 
     <span class="doccomment">/// Creates a new uuid value.
     </span><span class="attr">#[cfg(feature = <span class="string">&quot;uuid&quot;</span>)]
-    #[cfg_attr(feature = <span class="string">&quot;docs&quot;</span>, doc(cfg(feature = <span class="string">&quot;uuid&quot;</span>)))]
     </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>uuid(value: Uuid) -&gt; <span class="self">Self </span>{
         <span class="self">Self</span>::Uuid(<span class="prelude-val">Some</span>(value))
     }
@@ -2422,7 +2395,6 @@
 
     <span class="doccomment">/// `true` if the `Value` is a numeric value or can be converted to one.
     </span><span class="attr">#[cfg(feature = <span class="string">&quot;bigdecimal&quot;</span>)]
-    #[cfg_attr(feature = <span class="string">&quot;docs&quot;</span>, doc(cfg(feature = <span class="string">&quot;bigdecimal&quot;</span>)))]
     </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>is_numeric(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
         <span class="macro">matches!</span>(<span class="self">self</span>, <span class="self">Self</span>::Numeric(<span class="kw">_</span>) | <span class="self">Self</span>::Float(<span class="kw">_</span>) | <span class="self">Self</span>::Double(<span class="kw">_</span>))
     }
@@ -2430,7 +2402,6 @@
     <span class="doccomment">/// Returns a bigdecimal, if the value is a numeric, float or double value,
     /// otherwise `None`.
     </span><span class="attr">#[cfg(feature = <span class="string">&quot;bigdecimal&quot;</span>)]
-    #[cfg_attr(feature = <span class="string">&quot;docs&quot;</span>, doc(cfg(feature = <span class="string">&quot;bigdecimal&quot;</span>)))]
     </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>into_numeric(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;BigDecimal&gt; {
         <span class="kw">match </span><span class="self">self </span>{
             <span class="self">Self</span>::Numeric(d) =&gt; d,
@@ -2443,7 +2414,6 @@
     <span class="doccomment">/// Returns a reference to a bigdecimal, if the value is a numeric.
     /// Otherwise `None`.
     </span><span class="attr">#[cfg(feature = <span class="string">&quot;bigdecimal&quot;</span>)]
-    #[cfg_attr(feature = <span class="string">&quot;docs&quot;</span>, doc(cfg(feature = <span class="string">&quot;bigdecimal&quot;</span>)))]
     </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>as_numeric(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>BigDecimal&gt; {
         <span class="kw">match </span><span class="self">self </span>{
             <span class="self">Self</span>::Numeric(d) =&gt; d.as_ref(),
@@ -2480,14 +2450,12 @@
 
     <span class="doccomment">/// `true` if the `Value` is of UUID type.
     </span><span class="attr">#[cfg(feature = <span class="string">&quot;uuid&quot;</span>)]
-    #[cfg_attr(feature = <span class="string">&quot;docs&quot;</span>, doc(cfg(feature = <span class="string">&quot;uuid&quot;</span>)))]
     </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>is_uuid(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
         <span class="macro">matches!</span>(<span class="self">self</span>, <span class="self">Self</span>::Uuid(<span class="kw">_</span>))
     }
 
     <span class="doccomment">/// Returns an UUID if the value is of UUID type, otherwise `None`.
     </span><span class="attr">#[cfg(feature = <span class="string">&quot;uuid&quot;</span>)]
-    #[cfg_attr(feature = <span class="string">&quot;docs&quot;</span>, doc(cfg(feature = <span class="string">&quot;uuid&quot;</span>)))]
     </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>as_uuid(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;Uuid&gt; {
         <span class="kw">match </span><span class="self">self </span>{
             <span class="self">Self</span>::Uuid(u) =&gt; <span class="kw-2">*</span>u,

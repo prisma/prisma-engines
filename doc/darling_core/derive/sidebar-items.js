@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"fn":["from_attributes","from_derive_input","from_field","from_meta","from_type_param","from_variant"]};

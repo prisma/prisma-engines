@@ -50,13 +50,10 @@
 <a href="#50" id="50">50</a>
 <a href="#51" id="51">51</a>
 <a href="#52" id="52">52</a>
-<a href="#53" id="53">53</a>
-<a href="#54" id="54">54</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span><span class="kw">super</span>::Function;
 <span class="kw">use </span><span class="kw">crate</span>::ast::Table;
 
 <span class="attr">#[derive(Debug, Clone, PartialEq)]
-#[cfg_attr(feature = <span class="string">&quot;docs&quot;</span>, doc(cfg(feature = <span class="string">&quot;postgresql&quot;</span>)))]
 #[cfg(feature = <span class="string">&quot;postgresql&quot;</span>)]
 </span><span class="doccomment">/// A representation of the `ROW_TO_JSON` function in the database.
 /// Only for `Postgresql`
@@ -93,8 +90,7 @@
 /// # Ok(())
 /// # }
 /// ```
-</span><span class="attr">#[cfg_attr(feature = <span class="string">&quot;docs&quot;</span>, doc(cfg(feature = <span class="string">&quot;postgresql&quot;</span>)))]
-#[cfg(feature = <span class="string">&quot;postgresql&quot;</span>)]
+</span><span class="attr">#[cfg(feature = <span class="string">&quot;postgresql&quot;</span>)]
 </span><span class="kw">pub fn </span>row_to_json&lt;<span class="lifetime">&#39;a</span>, T&gt;(expr: T, pretty_print: bool) -&gt; Function&lt;<span class="lifetime">&#39;a</span>&gt;
 <span class="kw">where
     </span>T: Into&lt;Table&lt;<span class="lifetime">&#39;a</span>&gt;&gt;,

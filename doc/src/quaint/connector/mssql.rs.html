@@ -612,9 +612,6 @@
 <a href="#612" id="612">612</a>
 <a href="#613" id="613">613</a>
 <a href="#614" id="614">614</a>
-<a href="#615" id="615">615</a>
-<a href="#616" id="616">616</a>
-<a href="#617" id="617">617</a>
 </pre></div><pre class="rust"><code><span class="kw">mod </span>conversion;
 <span class="kw">mod </span>error;
 
@@ -647,7 +644,6 @@
 <span class="doccomment">/// Wraps a connection url and exposes the parsing logic used by Quaint,
 /// including default values.
 </span><span class="attr">#[derive(Debug, Clone)]
-#[cfg_attr(feature = <span class="string">&quot;docs&quot;</span>, doc(cfg(feature = <span class="string">&quot;mssql&quot;</span>)))]
 </span><span class="kw">pub struct </span>MssqlUrl {
     connection_string: String,
     query_params: MssqlQueryParams,
@@ -655,7 +651,6 @@
 
 <span class="doccomment">/// TLS mode when connecting to SQL Server.
 </span><span class="attr">#[derive(Debug, Clone, Copy)]
-#[cfg_attr(feature = <span class="string">&quot;docs&quot;</span>, doc(cfg(feature = <span class="string">&quot;mssql&quot;</span>)))]
 </span><span class="kw">pub enum </span>EncryptMode {
     <span class="doccomment">/// All traffic is encrypted.
     </span>On,
@@ -887,7 +882,6 @@
 
 <span class="doccomment">/// A connector interface for the SQL Server database.
 </span><span class="attr">#[derive(Debug)]
-#[cfg_attr(feature = <span class="string">&quot;docs&quot;</span>, doc(cfg(feature = <span class="string">&quot;mssql&quot;</span>)))]
 </span><span class="kw">pub struct </span>Mssql {
     client: Mutex&lt;Client&lt;Compat&lt;TcpStream&gt;&gt;&gt;,
     url: MssqlUrl,

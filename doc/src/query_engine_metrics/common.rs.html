@@ -135,9 +135,6 @@
 <a href="#135" id="135">135</a>
 <a href="#136" id="136">136</a>
 <a href="#137" id="137">137</a>
-<a href="#138" id="138">138</a>
-<a href="#139" id="139">139</a>
-<a href="#140" id="140">140</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::collections::HashMap;
 
 <span class="kw">use </span>metrics::{Key, Label};
@@ -206,10 +203,7 @@
                 global_labels.clone(),
             ),
             <span class="prelude-val">None </span>=&gt; {
-                <span class="kw">let </span>description = descriptions
-                    .get(key.name())
-                    .map(|s| s.to_string())
-                    .unwrap_or(String::new());
+                <span class="kw">let </span>description = descriptions.get(key.name()).map(|s| s.to_string()).unwrap_or_default();
                 <span class="self">Self</span>::new(key, description, value, global_labels.clone())
             }
         }
