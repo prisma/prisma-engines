@@ -284,7 +284,7 @@ export function smokeTestLibquery(adapter: ErrorCapturingDriverAdapter, prismaSc
 
     it('expected error', async () => {
 
-      assert.throws(function () {
+      assert.throws( async () => {
         const result = await doQuery({
           modelName: 'Unique',
           action: 'createMany',
