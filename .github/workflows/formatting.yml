@@ -5,6 +5,8 @@ on:
       - main
   pull_request:
     paths-ignore:
+      - '.github/**'
+      - '!.github/workflows/formatting.yml'
       - '.buildkite/**'
       - '*.md'
       - 'LICENSE'
@@ -19,7 +21,7 @@ jobs:
   clippy:
     runs-on: ubuntu-latest
     env:
-      RUSTFLAGS: "-Dwarnings"
+      RUSTFLAGS: '-Dwarnings'
     steps:
       - uses: actions/checkout@v4
       - uses: dtolnay/rust-toolchain@stable
