@@ -65,7 +65,7 @@ jobs:
         working-directory: query-engine/driver-adapters/js
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-          DRY_RUN: ${{ github.event.inputs.dryRun && '--dry-run' || '' }}
+          DRY_RUN: ${{ github.event.inputs.dryRun == 'true' && '--dry-run' || '' }}
 
       #
       # Failure handlers
