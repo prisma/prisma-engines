@@ -55,3 +55,14 @@ In the current directory:
   For more fine-grained control:
   - Run `pnpm neon:ws:http` to test using `libquery`
   - Run `pnpm neon:ws:http` to test using `@prisma/client`
+
+### Pg
+
+Start `docker compose up postgrest15` in `/docker`.
+
+In the current directory:
+- Run `pnpm prisma:pg` to push the Prisma schema and insert the test data.
+- Run `pnpm pg` to run smoke tests using `libquery` against the PostgreSQL database, using `pg`
+  For more fine-grained control:
+  - Run `pnpm pg:libquery` to test using `libquery`
+  - Run `pnpm pg:client` to test using `@prisma/client`
