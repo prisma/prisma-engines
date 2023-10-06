@@ -228,7 +228,7 @@ impl<'a> Visitor<'a> for Postgres<'a> {
             ValueType::Json(j) => j
                 .as_ref()
                 .map(|j| self.write(format!("'{}'", serde_json::to_string(&j).unwrap()))),
-            #[cfg(feature = "bigdecimal")]
+
             ValueType::Numeric(r) => r.as_ref().map(|r| self.write(r)),
             #[cfg(feature = "uuid")]
             ValueType::Uuid(uuid) => uuid.map(|uuid| self.write(format!("'{}'", uuid.hyphenated()))),

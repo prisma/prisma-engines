@@ -1,7 +1,6 @@
 use crate::ast::*;
 use crate::error::{Error, ErrorKind};
 
-#[cfg(feature = "bigdecimal")]
 use bigdecimal::{BigDecimal, FromPrimitive, ToPrimitive};
 use chrono::{DateTime, NaiveDate, NaiveTime, Utc};
 use serde_json::{Number, Value as JsonValue};
@@ -59,7 +58,6 @@ impl<'a> Value<'a> {
     }
 
     /// Creates a new decimal value.
-    #[cfg(feature = "bigdecimal")]
     pub fn numeric(value: BigDecimal) -> Self {
         ValueType::numeric(value).into_value()
     }
@@ -270,21 +268,21 @@ impl<'a> Value<'a> {
     }
 
     /// `true` if the `Value` is a numeric value or can be converted to one.
-    #[cfg(feature = "bigdecimal")]
+
     pub fn is_numeric(&self) -> bool {
         self.typed.is_numeric()
     }
 
     /// Returns a bigdecimal, if the value is a numeric, float or double value,
     /// otherwise `None`.
-    #[cfg(feature = "bigdecimal")]
+
     pub fn into_numeric(self) -> Option<BigDecimal> {
         self.typed.into_numeric()
     }
 
     /// Returns a reference to a bigdecimal, if the value is a numeric.
     /// Otherwise `None`.
-    #[cfg(feature = "bigdecimal")]
+
     pub fn as_numeric(&self) -> Option<&BigDecimal> {
         self.typed.as_numeric()
     }
@@ -421,7 +419,6 @@ impl<'a> Value<'a> {
         ValueType::Array(None).into()
     }
 
-    #[cfg(feature = "bigdecimal")]
     pub fn null_numeric() -> Self {
         ValueType::Numeric(None).into()
     }
@@ -505,7 +502,6 @@ pub enum ValueType<'a> {
     /// An array value (PostgreSQL).
     Array(Option<Vec<Value<'a>>>),
     /// A numeric value.
-    #[cfg(feature = "bigdecimal")]
     Numeric(Option<BigDecimal>),
     /// A JSON value.
     Json(Option<serde_json::Value>),
@@ -579,7 +575,7 @@ impl<'a> fmt::Display for ValueType<'a> {
                 write!(f, "]")
             }),
             ValueType::Xml(val) => val.as_ref().map(|v| write!(f, "{v}")),
-            #[cfg(feature = "bigdecimal")]
+
             ValueType::Numeric(val) => val.as_ref().map(|v| write!(f, "{v}")),
             ValueType::Json(val) => val.as_ref().map(|v| write!(f, "{v}")),
             #[cfg(feature = "uuid")]
@@ -638,7 +634,7 @@ impl<'a> From<ValueType<'a>> for serde_json::Value {
             ValueType::Array(v) => {
                 v.map(|v| serde_json::Value::Array(v.into_iter().map(serde_json::Value::from).collect()))
             }
-            #[cfg(feature = "bigdecimal")]
+
             ValueType::Numeric(d) => d.map(|d| serde_json::to_value(d.to_f64().unwrap()).unwrap()),
             ValueType::Json(v) => v,
             #[cfg(feature = "uuid")]
@@ -677,7 +673,7 @@ impl<'a> ValueType<'a> {
     }
 
     /// Creates a new decimal value.
-    #[cfg(feature = "bigdecimal")]
+
     pub(crate) fn numeric(value: BigDecimal) -> Self {
         Self::Numeric(Some(value))
     }
@@ -816,7 +812,7 @@ impl<'a> ValueType<'a> {
             Self::Char(c) => c.is_none(),
             Self::Array(v) => v.is_none(),
             Self::Xml(s) => s.is_none(),
-            #[cfg(feature = "bigdecimal")]
+
             Self::Numeric(r) => r.is_none(),
             #[cfg(feature = "uuid")]
             Self::Uuid(u) => u.is_none(),
@@ -948,14 +944,14 @@ impl<'a> ValueType<'a> {
     }
 
     /// `true` if the `Value` is a numeric value or can be converted to one.
-    #[cfg(feature = "bigdecimal")]
+
     pub(crate) fn is_numeric(&self) -> bool {
         matches!(self, Self::Numeric(_) | Self::Float(_) | Self::Double(_))
     }
 
     /// Returns a bigdecimal, if the value is a numeric, float or double value,
     /// otherwise `None`.
-    #[cfg(feature = "bigdecimal")]
+
     pub(crate) fn into_numeric(self) -> Option<BigDecimal> {
         match self {
             Self::Numeric(d) => d,
@@ -967,7 +963,7 @@ impl<'a> ValueType<'a> {
 
     /// Returns a reference to a bigdecimal, if the value is a numeric.
     /// Otherwise `None`.
-    #[cfg(feature = "bigdecimal")]
+
     pub(crate) fn as_numeric(&self) -> Option<&BigDecimal> {
         match self {
             Self::Numeric(d) => d.as_ref(),
@@ -1128,7 +1124,7 @@ value!(val: f32, Float, val);
 value!(val: DateTime<Utc>, DateTime, val);
 value!(val: chrono::NaiveTime, Time, val);
 value!(val: chrono::NaiveDate, Date, val);
-#[cfg(feature = "bigdecimal")]
+
 value!(val: BigDecimal, Numeric, val);
 value!(val: JsonValue, Json, val);
 #[cfg(feature = "uuid")]
@@ -1155,7 +1151,6 @@ impl<'a> TryFrom<Value<'a>> for i32 {
     }
 }
 
-#[cfg(feature = "bigdecimal")]
 impl<'a> TryFrom<Value<'a>> for BigDecimal {
     type Error = Error;
 

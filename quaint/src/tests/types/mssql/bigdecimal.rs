@@ -2,7 +2,6 @@ use super::*;
 use crate::bigdecimal::BigDecimal;
 use std::str::FromStr;
 
-#[cfg(feature = "bigdecimal")]
 test_type!(numeric(
     mssql,
     "numeric(10,2)",

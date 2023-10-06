@@ -3,7 +3,7 @@
 use crate::tests::test_api::sqlite_test_api;
 use crate::tests::test_api::TestApi;
 use crate::{ast::*, connector::Queryable};
-#[cfg(feature = "bigdecimal")]
+
 use std::str::FromStr;
 
 test_type!(integer(
@@ -28,7 +28,6 @@ test_type!(big_int(
 
 test_type!(real(sqlite, "REAL", Value::null_double(), Value::double(1.12345)));
 
-#[cfg(feature = "bigdecimal")]
 test_type!(float_decimal(
     sqlite,
     "FLOAT",
@@ -39,7 +38,6 @@ test_type!(float_decimal(
     )
 ));
 
-#[cfg(feature = "bigdecimal")]
 test_type!(double_decimal(
     sqlite,
     "DOUBLE",

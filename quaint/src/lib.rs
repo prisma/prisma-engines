@@ -113,8 +113,7 @@ mod macros;
 #[macro_use]
 extern crate metrics;
 
-#[cfg(feature = "bigdecimal")]
-extern crate bigdecimal_ as bigdecimal;
+extern crate bigdecimal;
 
 pub mod ast;
 pub mod connector;

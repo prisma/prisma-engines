@@ -340,7 +340,7 @@ impl<'a> Visitor<'a> for Mssql<'a> {
             }
 
             ValueType::Json(j) => j.map(|j| self.write(format!("'{}'", serde_json::to_string(&j).unwrap()))),
-            #[cfg(feature = "bigdecimal")]
+
             ValueType::Numeric(r) => r.map(|r| self.write(r)),
             #[cfg(feature = "uuid")]
             ValueType::Uuid(uuid) => uuid.map(|uuid| {
