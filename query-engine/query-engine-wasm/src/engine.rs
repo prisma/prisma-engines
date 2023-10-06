@@ -1,6 +1,7 @@
 #![allow(dead_code)]
 #![allow(unused_variables)]
 
+use crate::proxy;
 use crate::{
     error::ApiError,
     logger::{LogCallback, Logger},
@@ -14,8 +15,8 @@ use std::{
 };
 use tokio::sync::RwLock;
 use tracing_subscriber::filter::LevelFilter;
+use tsify::Tsify;
 use wasm_bindgen::prelude::wasm_bindgen;
-use wasm_bindgen::JsValue;
 
 /// The main query engine used by JS
 #[wasm_bindgen]
@@ -57,9 +58,10 @@ struct ServerInfo {
 }
 
 /// Parameters defining the construction of an engine.
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Tsify)]
+#[tsify(from_wasm_abi)]
 #[serde(rename_all = "camelCase")]
-struct ConstructorOptions {
+pub struct ConstructorOptions {
     datamodel: String,
     log_level: String,
     #[serde(default)]
@@ -71,6 +73,8 @@ struct ConstructorOptions {
     config_dir: PathBuf,
     #[serde(default)]
     ignore_env_var_errors: bool,
+    #[serde(default)]
+    engine_protocol: Option<String>,
 }
 
 impl Inner {
@@ -96,7 +100,7 @@ impl QueryEngine {
     /// Parse a validated datamodel and configuration to allow connecting later on.
     #[wasm_bindgen(constructor)]
     pub fn new(
-        options: JsValue,
+        options: ConstructorOptions,
         callback: JsFunction,
         maybe_adapter: Option<JsObject>,
     ) -> Result<QueryEngine, wasm_bindgen::JsError> {
@@ -113,24 +117,22 @@ impl QueryEngine {
             env,
             config_dir,
             ignore_env_var_errors,
-        } = serde_wasm_bindgen::from_value(options).expect(
-            r###"
-            Failed to deserialize constructor options. 
-            
-            This usually happens when the javascript object passed to the constructor is missing 
-            properties for the ConstructorOptions fields that must have some value.
-            
-            If you set some of these in javascript trough environment variables, make sure there are
-            values for data_model, log_level, and any field that is not Option<T>
-            "###,
-        );
-        log::info!("Parsed `ConstructorOptions`");
+            engine_protocol,
+        } = options;
 
         let env = stringify_env_values(env)?; // we cannot trust anything JS sends us from process.env
         let overrides: Vec<(_, _)> = datasource_overrides.into_iter().collect();
 
         let mut schema = psl::validate(datamodel.into());
         let config = &mut schema.configuration;
+
+        if let Some(adapter) = maybe_adapter {
+            let js_queryable =
+                proxy::from_wasm(adapter).map_err(|e| ApiError::configuration(e.as_string().unwrap_or_default()))?;
+
+            let provider_name = schema.connector.provider_name();
+            log::info!("Received driver adapter for {provider_name}.");
+        }
 
         schema
             .diagnostics

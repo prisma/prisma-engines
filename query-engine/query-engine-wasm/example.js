@@ -3,14 +3,23 @@
  * on Node.js 18+.
  */
 
-import { init, QueryEngine, version } from './pkg/query_engine.js'
+import { Pool } from '@neondatabase/serverless'
+import { PrismaNeon } from '@prisma/adapter-neon'
+import { bindAdapter } from '@prisma/driver-adapter-utils'
+import { init, QueryEngine, getBuildTimeInfo } from './pkg/query_engine.js'
 
 async function main() {
   // Always initialize the Wasm library before using it.
   // This sets up the logging and panic hooks.
   init()
 
-  console.log('version', version())
+  const connectionString = undefined
+
+  const pool = new Pool({ connectionString })
+  const adapter = new PrismaNeon(pool)
+  const driverAdapter = bindAdapter(adapter)
+
+  console.log('buildTimeInfo', getBuildTimeInfo())
 
   const options = {
     datamodel: /* prisma */`
@@ -35,12 +44,11 @@ async function main() {
     ignoreEnvVarErrors: true,
   }
   const callback = () => { console.log('log-callback') }
-  const driverAdapter = undefined
 
   const queryEngine = new QueryEngine(options, callback, driverAdapter)
   
-  queryEngine.connect('trace')
-  queryEngine.disconnect('trace')
+  await queryEngine.connect('trace')
+  await queryEngine.disconnect('trace')
 }
 
 main()

@@ -11,7 +11,7 @@ pub struct Version {
     pub version: &'static str,
 }
 
-#[wasm_bindgen]
+#[wasm_bindgen(js_name = "getBuildTimeInfo")]
 pub fn version() -> Version {
     Version {
         commit: env!("GIT_HASH"),
