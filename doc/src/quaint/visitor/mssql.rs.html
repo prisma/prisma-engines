@@ -2145,8 +2145,8 @@
             }
 
             ValueType::Json(j) =&gt; j.map(|j| <span class="self">self</span>.write(<span class="macro">format!</span>(<span class="string">&quot;&#39;{}&#39;&quot;</span>, serde_json::to_string(<span class="kw-2">&amp;</span>j).unwrap()))),
-            <span class="attr">#[cfg(feature = <span class="string">&quot;bigdecimal&quot;</span>)]
-            </span>ValueType::Numeric(r) =&gt; r.map(|r| <span class="self">self</span>.write(r)),
+
+            ValueType::Numeric(r) =&gt; r.map(|r| <span class="self">self</span>.write(r)),
             <span class="attr">#[cfg(feature = <span class="string">&quot;uuid&quot;</span>)]
             </span>ValueType::Uuid(uuid) =&gt; uuid.map(|uuid| {
                 <span class="kw">let </span>s = <span class="macro">format!</span>(<span class="string">&quot;CONVERT(uniqueidentifier, N&#39;{}&#39;)&quot;</span>, uuid.hyphenated());

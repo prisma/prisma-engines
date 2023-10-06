@@ -942,41 +942,20 @@
 <a href="#942" id="942">942</a>
 <a href="#943" id="943">943</a>
 <a href="#944" id="944">944</a>
-<a href="#945" id="945">945</a>
-<a href="#946" id="946">946</a>
-<a href="#947" id="947">947</a>
-<a href="#948" id="948">948</a>
-<a href="#949" id="949">949</a>
-<a href="#950" id="950">950</a>
-<a href="#951" id="951">951</a>
-<a href="#952" id="952">952</a>
-<a href="#953" id="953">953</a>
-<a href="#954" id="954">954</a>
-<a href="#955" id="955">955</a>
-<a href="#956" id="956">956</a>
-<a href="#957" id="957">957</a>
-<a href="#958" id="958">958</a>
-<a href="#959" id="959">959</a>
-<a href="#960" id="960">960</a>
-<a href="#961" id="961">961</a>
-<a href="#962" id="962">962</a>
-<a href="#963" id="963">963</a>
-<a href="#964" id="964">964</a>
-</pre></div><pre class="rust"><code><span class="attr">#[cfg(feature = <span class="string">&quot;bigdecimal&quot;</span>)]
-</span><span class="kw">mod </span>decimal;
+</pre></div><pre class="rust"><code><span class="kw">mod </span>decimal;
 
 <span class="kw">use crate</span>::{
     ast::{Value, ValueType},
     connector::queryable::{GetRow, ToColumnNames},
     error::{Error, ErrorKind},
 };
-<span class="attr">#[cfg(feature = <span class="string">&quot;bigdecimal&quot;</span>)]
-</span><span class="kw">use </span>bigdecimal::{num_bigint::BigInt, BigDecimal, FromPrimitive, ToPrimitive};
+
+<span class="kw">use </span>bigdecimal::{num_bigint::BigInt, BigDecimal, FromPrimitive, ToPrimitive};
 <span class="kw">use </span>bit_vec::BitVec;
 <span class="kw">use </span>bytes::BytesMut;
 <span class="kw">use </span>chrono::{DateTime, NaiveDateTime, Utc};
-<span class="attr">#[cfg(feature = <span class="string">&quot;bigdecimal&quot;</span>)]
-</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use </span>decimal::DecimalWrapper;
+
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use </span>decimal::DecimalWrapper;
 <span class="kw">use </span>postgres_types::{FromSql, ToSql, WrongType};
 <span class="kw">use </span>std::{convert::TryFrom, error::Error <span class="kw">as </span>StdError};
 <span class="kw">use </span>tokio_postgres::{
@@ -1013,8 +992,7 @@
                 ValueType::Bytes(<span class="kw">_</span>) =&gt; PostgresType::BYTEA,
                 ValueType::Boolean(<span class="kw">_</span>) =&gt; PostgresType::BOOL,
                 ValueType::Char(<span class="kw">_</span>) =&gt; PostgresType::CHAR,
-                <span class="attr">#[cfg(feature = <span class="string">&quot;bigdecimal&quot;</span>)]
-                </span>ValueType::Numeric(<span class="kw">_</span>) =&gt; PostgresType::NUMERIC,
+                ValueType::Numeric(<span class="kw">_</span>) =&gt; PostgresType::NUMERIC,
                 ValueType::Json(<span class="kw">_</span>) =&gt; PostgresType::JSONB,
                 ValueType::Xml(<span class="kw">_</span>) =&gt; PostgresType::XML,
                 <span class="attr">#[cfg(feature = <span class="string">&quot;uuid&quot;</span>)]
@@ -1051,8 +1029,7 @@
                         ValueType::Bytes(<span class="kw">_</span>) =&gt; PostgresType::BYTEA_ARRAY,
                         ValueType::Boolean(<span class="kw">_</span>) =&gt; PostgresType::BOOL_ARRAY,
                         ValueType::Char(<span class="kw">_</span>) =&gt; PostgresType::CHAR_ARRAY,
-                        <span class="attr">#[cfg(feature = <span class="string">&quot;bigdecimal&quot;</span>)]
-                        </span>ValueType::Numeric(<span class="kw">_</span>) =&gt; PostgresType::NUMERIC_ARRAY,
+                        ValueType::Numeric(<span class="kw">_</span>) =&gt; PostgresType::NUMERIC_ARRAY,
                         ValueType::Json(<span class="kw">_</span>) =&gt; PostgresType::JSONB_ARRAY,
                         ValueType::Xml(<span class="kw">_</span>) =&gt; PostgresType::XML_ARRAY,
                         <span class="attr">#[cfg(feature = <span class="string">&quot;uuid&quot;</span>)]
@@ -1115,11 +1092,9 @@
 /// of 2 decimals.
 ///
 /// Postgres docs: https://www.postgresql.org/docs/current/datatype-money.html
-</span><span class="attr">#[cfg(feature = <span class="string">&quot;bigdecimal&quot;</span>)]
 </span><span class="kw">struct </span>NaiveMoney(BigDecimal);
 
-<span class="attr">#[cfg(feature = <span class="string">&quot;bigdecimal&quot;</span>)]
-</span><span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; FromSql&lt;<span class="lifetime">&#39;a</span>&gt; <span class="kw">for </span>NaiveMoney {
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; FromSql&lt;<span class="lifetime">&#39;a</span>&gt; <span class="kw">for </span>NaiveMoney {
     <span class="kw">fn </span>from_sql(_ty: <span class="kw-2">&amp;</span>PostgresType, raw: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>[u8]) -&gt; <span class="prelude-ty">Result</span>&lt;NaiveMoney, Box&lt;<span class="kw">dyn </span>std::error::Error + Sync + Send&gt;&gt; {
         <span class="kw">let </span>cents = i64::from_sql(<span class="kw-2">&amp;</span>PostgresType::INT8, raw)<span class="question-mark">?</span>;
 
@@ -1187,14 +1162,12 @@
                     }
                     <span class="prelude-val">None </span>=&gt; Value::null_array(),
                 },
-                <span class="attr">#[cfg(feature = <span class="string">&quot;bigdecimal&quot;</span>)]
-                </span>PostgresType::NUMERIC =&gt; {
+                PostgresType::NUMERIC =&gt; {
                     <span class="kw">let </span>dw: <span class="prelude-ty">Option</span>&lt;DecimalWrapper&gt; = row.try_get(i)<span class="question-mark">?</span>;
 
                     ValueType::Numeric(dw.map(|dw| dw.<span class="number">0</span>)).into_value()
                 }
-                <span class="attr">#[cfg(feature = <span class="string">&quot;bigdecimal&quot;</span>)]
-                </span>PostgresType::MONEY =&gt; <span class="kw">match </span>row.try_get(i)<span class="question-mark">? </span>{
+                PostgresType::MONEY =&gt; <span class="kw">match </span>row.try_get(i)<span class="question-mark">? </span>{
                     <span class="prelude-val">Some</span>(val) =&gt; {
                         <span class="kw">let </span>val: NaiveMoney = val;
                         Value::numeric(val.<span class="number">0</span>)
@@ -1316,8 +1289,7 @@
                     }
                     <span class="prelude-val">None </span>=&gt; Value::null_array(),
                 },
-                <span class="attr">#[cfg(feature = <span class="string">&quot;bigdecimal&quot;</span>)]
-                </span>PostgresType::NUMERIC_ARRAY =&gt; <span class="kw">match </span>row.try_get(i)<span class="question-mark">? </span>{
+                PostgresType::NUMERIC_ARRAY =&gt; <span class="kw">match </span>row.try_get(i)<span class="question-mark">? </span>{
                     <span class="prelude-val">Some</span>(val) =&gt; {
                         <span class="kw">let </span>val: Vec&lt;<span class="prelude-ty">Option</span>&lt;DecimalWrapper&gt;&gt; = val;
 
@@ -1339,8 +1311,7 @@
                         <span class="prelude-val">None </span>=&gt; Value::null_array(),
                     }
                 }
-                <span class="attr">#[cfg(feature = <span class="string">&quot;bigdecimal&quot;</span>)]
-                </span>PostgresType::MONEY_ARRAY =&gt; <span class="kw">match </span>row.try_get(i)<span class="question-mark">? </span>{
+                PostgresType::MONEY_ARRAY =&gt; <span class="kw">match </span>row.try_get(i)<span class="question-mark">? </span>{
                     <span class="prelude-val">Some</span>(val) =&gt; {
                         <span class="kw">let </span>val: Vec&lt;<span class="prelude-ty">Option</span>&lt;NaiveMoney&gt;&gt; = val;
                         <span class="kw">let </span>nums = val.into_iter().map(|num| ValueType::Numeric(num.map(|num| num.<span class="number">0</span>)));
@@ -1616,13 +1587,11 @@
                 <span class="kw">_ </span>=&gt; <span class="prelude-val">None</span>,
             },
             (ValueType::Int64(integer), <span class="kw-2">&amp;</span>PostgresType::INT8) =&gt; integer.map(|integer| integer.to_sql(ty, out)),
-            <span class="attr">#[cfg(feature = <span class="string">&quot;bigdecimal&quot;</span>)]
-            </span>(ValueType::Int32(integer), <span class="kw-2">&amp;</span>PostgresType::NUMERIC) =&gt; integer
+            (ValueType::Int32(integer), <span class="kw-2">&amp;</span>PostgresType::NUMERIC) =&gt; integer
                 .map(|integer| BigDecimal::from_i32(integer).unwrap())
                 .map(DecimalWrapper)
                 .map(|dw| dw.to_sql(ty, out)),
-            <span class="attr">#[cfg(feature = <span class="string">&quot;bigdecimal&quot;</span>)]
-            </span>(ValueType::Int64(integer), <span class="kw-2">&amp;</span>PostgresType::NUMERIC) =&gt; integer
+            (ValueType::Int64(integer), <span class="kw-2">&amp;</span>PostgresType::NUMERIC) =&gt; integer
                 .map(|integer| BigDecimal::from_i64(integer).unwrap())
                 .map(DecimalWrapper)
                 .map(|dw| dw.to_sql(ty, out)),
@@ -1663,31 +1632,26 @@
             (ValueType::Int32(integer), <span class="kw">_</span>) =&gt; integer.map(|integer| integer.to_sql(ty, out)),
             (ValueType::Int64(integer), <span class="kw">_</span>) =&gt; integer.map(|integer| integer.to_sql(ty, out)),
             (ValueType::Float(float), <span class="kw-2">&amp;</span>PostgresType::FLOAT8) =&gt; float.map(|float| (float <span class="kw">as </span>f64).to_sql(ty, out)),
-            <span class="attr">#[cfg(feature = <span class="string">&quot;bigdecimal&quot;</span>)]
-            </span>(ValueType::Float(float), <span class="kw-2">&amp;</span>PostgresType::NUMERIC) =&gt; float
+            (ValueType::Float(float), <span class="kw-2">&amp;</span>PostgresType::NUMERIC) =&gt; float
                 .map(|float| BigDecimal::from_f32(float).unwrap())
                 .map(DecimalWrapper)
                 .map(|dw| dw.to_sql(ty, out)),
             (ValueType::Float(float), <span class="kw">_</span>) =&gt; float.map(|float| float.to_sql(ty, out)),
             (ValueType::Double(double), <span class="kw-2">&amp;</span>PostgresType::FLOAT4) =&gt; double.map(|double| (double <span class="kw">as </span>f32).to_sql(ty, out)),
-            <span class="attr">#[cfg(feature = <span class="string">&quot;bigdecimal&quot;</span>)]
-            </span>(ValueType::Double(double), <span class="kw-2">&amp;</span>PostgresType::NUMERIC) =&gt; double
+            (ValueType::Double(double), <span class="kw-2">&amp;</span>PostgresType::NUMERIC) =&gt; double
                 .map(|double| BigDecimal::from_f64(double).unwrap())
                 .map(DecimalWrapper)
                 .map(|dw| dw.to_sql(ty, out)),
             (ValueType::Double(double), <span class="kw">_</span>) =&gt; double.map(|double| double.to_sql(ty, out)),
-            <span class="attr">#[cfg(feature = <span class="string">&quot;bigdecimal&quot;</span>)]
-            </span>(ValueType::Numeric(decimal), <span class="kw-2">&amp;</span>PostgresType::FLOAT4) =&gt; decimal.as_ref().map(|decimal| {
+            (ValueType::Numeric(decimal), <span class="kw-2">&amp;</span>PostgresType::FLOAT4) =&gt; decimal.as_ref().map(|decimal| {
                 <span class="kw">let </span>f = decimal.to_string().parse::&lt;f32&gt;().expect(<span class="string">&quot;decimal to f32 conversion&quot;</span>);
                 f.to_sql(ty, out)
             }),
-            <span class="attr">#[cfg(feature = <span class="string">&quot;bigdecimal&quot;</span>)]
-            </span>(ValueType::Numeric(decimal), <span class="kw-2">&amp;</span>PostgresType::FLOAT8) =&gt; decimal.as_ref().map(|decimal| {
+            (ValueType::Numeric(decimal), <span class="kw-2">&amp;</span>PostgresType::FLOAT8) =&gt; decimal.as_ref().map(|decimal| {
                 <span class="kw">let </span>f = decimal.to_string().parse::&lt;f64&gt;().expect(<span class="string">&quot;decimal to f64 conversion&quot;</span>);
                 f.to_sql(ty, out)
             }),
-            <span class="attr">#[cfg(feature = <span class="string">&quot;bigdecimal&quot;</span>)]
-            </span>(ValueType::Array(values), <span class="kw-2">&amp;</span>PostgresType::FLOAT4_ARRAY) =&gt; values.as_ref().map(|values| {
+            (ValueType::Array(values), <span class="kw-2">&amp;</span>PostgresType::FLOAT4_ARRAY) =&gt; values.as_ref().map(|values| {
                 <span class="kw">let </span><span class="kw-2">mut </span>floats = Vec::with_capacity(values.len());
 
                 <span class="kw">for </span>value <span class="kw">in </span>values.iter() {
@@ -1711,8 +1675,7 @@
 
                 floats.to_sql(ty, out)
             }),
-            <span class="attr">#[cfg(feature = <span class="string">&quot;bigdecimal&quot;</span>)]
-            </span>(ValueType::Array(values), <span class="kw-2">&amp;</span>PostgresType::FLOAT8_ARRAY) =&gt; values.as_ref().map(|values| {
+            (ValueType::Array(values), <span class="kw-2">&amp;</span>PostgresType::FLOAT8_ARRAY) =&gt; values.as_ref().map(|values| {
                 <span class="kw">let </span><span class="kw-2">mut </span>floats = Vec::with_capacity(values.len());
 
                 <span class="kw">for </span>value <span class="kw">in </span>values.iter() {
@@ -1736,8 +1699,7 @@
 
                 floats.to_sql(ty, out)
             }),
-            <span class="attr">#[cfg(feature = <span class="string">&quot;bigdecimal&quot;</span>)]
-            </span>(ValueType::Numeric(decimal), <span class="kw-2">&amp;</span>PostgresType::MONEY) =&gt; decimal.as_ref().map(|decimal| {
+            (ValueType::Numeric(decimal), <span class="kw-2">&amp;</span>PostgresType::MONEY) =&gt; decimal.as_ref().map(|decimal| {
                 <span class="kw">let </span>decimal = (decimal * BigInt::from_i32(<span class="number">100</span>).unwrap()).round(<span class="number">0</span>);
 
                 <span class="kw">let </span>i = decimal.to_i64().ok_or_else(|| {
@@ -1747,12 +1709,10 @@
 
                 i.to_sql(ty, out)
             }),
-            <span class="attr">#[cfg(feature = <span class="string">&quot;bigdecimal&quot;</span>)]
-            </span>(ValueType::Numeric(decimal), <span class="kw-2">&amp;</span>PostgresType::NUMERIC) =&gt; decimal
+            (ValueType::Numeric(decimal), <span class="kw-2">&amp;</span>PostgresType::NUMERIC) =&gt; decimal
                 .as_ref()
                 .map(|decimal| DecimalWrapper(decimal.clone()).to_sql(ty, out)),
-            <span class="attr">#[cfg(feature = <span class="string">&quot;bigdecimal&quot;</span>)]
-            </span>(ValueType::Numeric(float), <span class="kw">_</span>) =&gt; float
+            (ValueType::Numeric(float), <span class="kw">_</span>) =&gt; float
                 .as_ref()
                 .map(|float| DecimalWrapper(float.clone()).to_sql(ty, out)),
             <span class="attr">#[cfg(feature = <span class="string">&quot;uuid&quot;</span>)]

@@ -338,7 +338,6 @@
 <a href="#338" id="338">338</a>
 <a href="#339" id="339">339</a>
 <a href="#340" id="340">340</a>
-<a href="#341" id="341">341</a>
 </pre></div><pre class="rust"><code><span class="kw">use crate</span>::{
     ast::{Value, ValueType},
     connector::{queryable::TakeRow, TypeIdentifier},
@@ -380,8 +379,8 @@
 
                     <span class="kw">return </span><span class="prelude-val">Err</span>(builder.build());
                 }
-                <span class="attr">#[cfg(feature = <span class="string">&quot;bigdecimal&quot;</span>)]
-                </span>ValueType::Numeric(f) =&gt; f.as_ref().map(|f| my::Value::Bytes(f.to_string().as_bytes().to_vec())),
+
+                ValueType::Numeric(f) =&gt; f.as_ref().map(|f| my::Value::Bytes(f.to_string().as_bytes().to_vec())),
                 ValueType::Json(s) =&gt; <span class="kw">match </span>s {
                     <span class="prelude-val">Some</span>(<span class="kw-2">ref </span>s) =&gt; {
                         <span class="kw">let </span>json = serde_json::to_string(s)<span class="question-mark">?</span>;
@@ -576,7 +575,6 @@
                     Value::enum_variant(s)
                 }
                 <span class="comment">// NEWDECIMAL returned as bytes. See https://mariadb.com/kb/en/resultset-row/#decimal-binary-encoding
-                </span><span class="attr">#[cfg(feature = <span class="string">&quot;bigdecimal&quot;</span>)]
                 </span>my::Value::Bytes(b) <span class="kw">if </span>column.is_real() =&gt; {
                     <span class="kw">let </span>s = String::from_utf8(b).map_err(|<span class="kw">_</span>| {
                         <span class="kw">let </span>msg = <span class="string">&quot;Could not convert NEWDECIMAL from bytes to String.&quot;</span>;
@@ -653,8 +651,8 @@
                     t <span class="kw">if </span>t.is_double() =&gt; Value::null_double(),
                     t <span class="kw">if </span>t.is_text() =&gt; Value::null_text(),
                     t <span class="kw">if </span>t.is_bytes() =&gt; Value::null_bytes(),
-                    <span class="attr">#[cfg(feature = <span class="string">&quot;bigdecimal&quot;</span>)]
-                    </span>t <span class="kw">if </span>t.is_real() =&gt; Value::null_numeric(),
+
+                    t <span class="kw">if </span>t.is_real() =&gt; Value::null_numeric(),
                     t <span class="kw">if </span>t.is_datetime() =&gt; Value::null_datetime(),
                     t <span class="kw">if </span>t.is_time() =&gt; Value::null_time(),
                     t <span class="kw">if </span>t.is_date() =&gt; Value::null_date(),

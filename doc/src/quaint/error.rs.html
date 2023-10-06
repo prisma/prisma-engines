@@ -394,7 +394,6 @@
 <a href="#394" id="394">394</a>
 <a href="#395" id="395">395</a>
 <a href="#396" id="396">396</a>
-<a href="#397" id="397">397</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Error module
 </span><span class="kw">use </span><span class="kw">crate</span>::connector::IsolationLevel;
 <span class="kw">use </span>std::{borrow::Cow, fmt, io, num};
@@ -711,8 +710,7 @@
     }
 }
 
-<span class="attr">#[cfg(feature = <span class="string">&quot;bigdecimal&quot;</span>)]
-</span><span class="kw">impl </span>From&lt;bigdecimal::ParseBigDecimalError&gt; <span class="kw">for </span>Error {
+<span class="kw">impl </span>From&lt;bigdecimal::ParseBigDecimalError&gt; <span class="kw">for </span>Error {
     <span class="kw">fn </span>from(e: bigdecimal::ParseBigDecimalError) -&gt; <span class="self">Self </span>{
         <span class="kw">let </span>kind = ErrorKind::conversion(<span class="macro">format!</span>(<span class="string">&quot;{e}&quot;</span>));
         <span class="self">Self</span>::builder(kind).build()

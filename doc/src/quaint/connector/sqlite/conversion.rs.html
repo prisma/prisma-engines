@@ -294,9 +294,6 @@
 <a href="#294" id="294">294</a>
 <a href="#295" id="295">295</a>
 <a href="#296" id="296">296</a>
-<a href="#297" id="297">297</a>
-<a href="#298" id="298">298</a>
-<a href="#299" id="299">299</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::convert::TryFrom;
 
 <span class="kw">use crate</span>::{
@@ -443,8 +440,7 @@
                     c <span class="kw">if </span>c.is_bytes() =&gt; Value::null_bytes(),
                     c <span class="kw">if </span>c.is_float() =&gt; Value::null_float(),
                     c <span class="kw">if </span>c.is_double() =&gt; Value::null_double(),
-                    <span class="attr">#[cfg(feature = <span class="string">&quot;bigdecimal&quot;</span>)]
-                    </span>c <span class="kw">if </span>c.is_real() =&gt; Value::null_numeric(),
+                    c <span class="kw">if </span>c.is_real() =&gt; Value::null_numeric(),
                     c <span class="kw">if </span>c.is_datetime() =&gt; Value::null_datetime(),
                     c <span class="kw">if </span>c.is_date() =&gt; Value::null_date(),
                     c <span class="kw">if </span>c.is_bool() =&gt; Value::null_boolean(),
@@ -490,8 +486,7 @@
                         </span><span class="kw">_ </span>=&gt; Value::int64(i),
                     }
                 }
-                <span class="attr">#[cfg(feature = <span class="string">&quot;bigdecimal&quot;</span>)]
-                </span>ValueRef::Real(f) <span class="kw">if </span>column.is_real() =&gt; {
+                ValueRef::Real(f) <span class="kw">if </span>column.is_real() =&gt; {
                     <span class="kw">use </span>bigdecimal::{BigDecimal, FromPrimitive};
 
                     Value::numeric(BigDecimal::from_f64(f).unwrap())
@@ -563,8 +558,7 @@
 
                 <span class="kw">return </span><span class="prelude-val">Err</span>(RusqlError::ToSqlConversionFailure(Box::new(builder.build())));
             }
-            <span class="attr">#[cfg(feature = <span class="string">&quot;bigdecimal&quot;</span>)]
-            </span>ValueType::Numeric(d) =&gt; d
+            ValueType::Numeric(d) =&gt; d
                 .as_ref()
                 .map(|d| ToSqlOutput::from(d.to_string().parse::&lt;f64&gt;().expect(<span class="string">&quot;BigDecimal is not a f64.&quot;</span>))),
             ValueType::Json(value) =&gt; value.as_ref().map(|value| {

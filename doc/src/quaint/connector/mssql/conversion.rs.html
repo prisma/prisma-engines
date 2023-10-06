@@ -86,23 +86,12 @@
 <a href="#86" id="86">86</a>
 <a href="#87" id="87">87</a>
 <a href="#88" id="88">88</a>
-<a href="#89" id="89">89</a>
-<a href="#90" id="90">90</a>
-<a href="#91" id="91">91</a>
-<a href="#92" id="92">92</a>
-<a href="#93" id="93">93</a>
-<a href="#94" id="94">94</a>
-<a href="#95" id="95">95</a>
-<a href="#96" id="96">96</a>
-<a href="#97" id="97">97</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::ast::{Value, ValueType};
-<span class="attr">#[cfg(not(feature = <span class="string">&quot;bigdecimal&quot;</span>))]
-</span><span class="kw">use </span><span class="kw">crate</span>::error::<span class="kw-2">*</span>;
-<span class="attr">#[cfg(feature = <span class="string">&quot;bigdecimal&quot;</span>)]
-</span><span class="kw">use </span>bigdecimal::BigDecimal;
+
+<span class="kw">use </span>bigdecimal::BigDecimal;
 <span class="kw">use </span>std::{borrow::Cow, convert::TryFrom};
-<span class="attr">#[cfg(feature = <span class="string">&quot;bigdecimal&quot;</span>)]
-</span><span class="kw">use </span>tiberius::ToSql;
+
+<span class="kw">use </span>tiberius::ToSql;
 <span class="kw">use </span>tiberius::{ColumnData, FromSql, IntoSql};
 
 <span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; IntoSql&lt;<span class="lifetime">&#39;a</span>&gt; <span class="kw">for </span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>Value&lt;<span class="lifetime">&#39;a</span>&gt; {
@@ -119,8 +108,7 @@
             ValueType::Char(val) =&gt; val.as_ref().map(|val| <span class="macro">format!</span>(<span class="string">&quot;{val}&quot;</span>)).into_sql(),
             ValueType::Xml(val) =&gt; val.as_deref().into_sql(),
             ValueType::Array(<span class="kw">_</span>) | ValueType::EnumArray(<span class="kw">_</span>, <span class="kw">_</span>) =&gt; <span class="macro">panic!</span>(<span class="string">&quot;Arrays are not supported on SQL Server.&quot;</span>),
-            <span class="attr">#[cfg(feature = <span class="string">&quot;bigdecimal&quot;</span>)]
-            </span>ValueType::Numeric(val) =&gt; (<span class="kw-2">*</span>val).to_sql(),
+            ValueType::Numeric(val) =&gt; (<span class="kw-2">*</span>val).to_sql(),
             ValueType::Json(val) =&gt; val.as_ref().map(|val| serde_json::to_string(<span class="kw-2">&amp;</span>val).unwrap()).into_sql(),
             <span class="attr">#[cfg(feature = <span class="string">&quot;uuid&quot;</span>)]
             </span>ValueType::Uuid(val) =&gt; val.into_sql(),
@@ -146,13 +134,7 @@
             ColumnData::String(s) =&gt; ValueType::Text(s),
             ColumnData::Guid(uuid) =&gt; ValueType::Uuid(uuid),
             ColumnData::Binary(bytes) =&gt; ValueType::Bytes(bytes),
-            <span class="attr">#[cfg(feature = <span class="string">&quot;bigdecimal&quot;</span>)]
-            </span>numeric @ ColumnData::Numeric(<span class="kw">_</span>) =&gt; ValueType::Numeric(BigDecimal::from_sql(<span class="kw-2">&amp;</span>numeric)<span class="question-mark">?</span>),
-            <span class="attr">#[cfg(not(feature = <span class="string">&quot;bigdecimal&quot;</span>))]
-            </span>_numeric @ ColumnData::Numeric(<span class="kw">_</span>) =&gt; {
-                <span class="kw">let </span>kind = ErrorKind::conversion(<span class="string">&quot;Please enable `bigdecimal` feature to read numeric values&quot;</span>);
-                <span class="kw">return </span><span class="prelude-val">Err</span>(Error::builder(kind).build());
-            }
+            numeric @ ColumnData::Numeric(<span class="kw">_</span>) =&gt; ValueType::Numeric(BigDecimal::from_sql(<span class="kw-2">&amp;</span>numeric)<span class="question-mark">?</span>),
             dt @ ColumnData::DateTime(<span class="kw">_</span>) =&gt; {
                 <span class="kw">use </span>tiberius::time::chrono::{DateTime, NaiveDateTime, Utc};
 
