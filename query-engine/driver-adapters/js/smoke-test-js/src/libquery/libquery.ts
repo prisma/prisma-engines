@@ -284,25 +284,28 @@ export function smokeTestLibquery(adapter: ErrorCapturingDriverAdapter, prismaSc
 
     it('expected error', async () => {
 
-      assert.throws( async () => {
-          const result = await doQuery({
-            modelName: 'Unique',
-            action: 'createMany',
-            query: {
-              arguments: {
-                data: [{ email: 'duplicate@example.com' }, { email: 'duplicate@example.com' }],
-              },
-              selection: {
-                $scalars: true,
-              },
-            },
-          })
-    
-          console.log('[nodejs] error result', JSON.stringify(result, null, 2))
-        },
-        /unique/i,
-      );
 
+        await assert.rejects(
+          async () => {
+            const result = await doQuery({
+              modelName: 'Unique',
+              action: 'createMany',
+              query: {
+                arguments: {
+                  data: [{ email: 'duplicate@example.com' }, { email: 'duplicate@example.com' }],
+                },
+                selection: {
+                  $scalars: true,
+                },
+              },
+            })
+            console.log('[nodejs] error result', JSON.stringify(result, null, 2))
+          },
+          (err) => {
+            assert.match(err.message, /unique/i);
+            return true;
+          },
+        );
       
     })
 
