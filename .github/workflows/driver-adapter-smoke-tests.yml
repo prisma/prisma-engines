@@ -5,6 +5,8 @@ on:
       - main
   pull_request:
     paths-ignore:
+      - '.github/**'
+      - '!.github/workflows/driver-adapter-smoke-tests.yml'
       - '.buildkite/**'
       - '*.md'
       - 'LICENSE'
@@ -18,8 +20,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        adapter: ["neon:ws", "neon:http", planetscale, pg, libsql]
-  
+        adapter: ['neon:ws', 'neon:http', planetscale, pg, libsql]
+
     runs-on: ubuntu-latest
 
     services:
