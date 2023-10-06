@@ -659,7 +659,7 @@ impl<'a> Select<'a> {
 
                 ctes.into_iter().collect()
             })
-            .unwrap_or_else(Vec::new);
+            .unwrap_or_default();
 
         if top_level {
             let clashing_names = self

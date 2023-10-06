@@ -116,7 +116,7 @@ impl From<isize> for CompositeTypeDepth {
     fn from(size: isize) -> Self {
         match size {
             size if size < 0 => Self::Infinite,
-            size if size == 0 => Self::None,
+            0 => Self::None,
             _ => Self::Level(size as usize),
         }
     }

@@ -936,7 +936,7 @@ mod tests {
         let table_2 = "table2";
 
         let join = table_2.alias("j").on(("j", "id").equals(Column::from(("t1", "id2"))));
-        let a = table_1.clone().alias("t1");
+        let a = table_1.alias("t1");
         let selection = Select::from_table(a).column(("t1", "id")).inner_join(join);
 
         let id1 = Column::from((table_1, "id"));
@@ -957,7 +957,7 @@ mod tests {
         let table_2 = "table2";
 
         let join = table_2.alias("j").on(("j", "id").equals(Column::from(("t1", "id2"))));
-        let a = table_1.clone().alias("t1");
+        let a = table_1.alias("t1");
         let selection = Select::from_table(a).column(("t1", "id")).inner_join(join);
 
         let id1 = Column::from((table_1, "id"));

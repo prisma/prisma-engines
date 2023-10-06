@@ -1373,9 +1373,7 @@ impl<'a> SqlSchemaDescriber<'a> {
             let description = row.get_string("description");
             let namespace_id = sql_schema.get_namespace_id(&namespace).unwrap();
 
-            let values = enum_values
-                .entry((namespace_id, name, description))
-                .or_insert_with(Vec::new);
+            let values = enum_values.entry((namespace_id, name, description)).or_default();
 
             values.push(value);
         }
