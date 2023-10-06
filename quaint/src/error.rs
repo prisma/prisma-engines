@@ -247,11 +247,6 @@ pub enum ErrorKind {
     #[error("Value out of range error. {}", message)]
     ValueOutOfRange { message: String },
 
-    #[cfg(feature = "serde-support")]
-    #[cfg_attr(feature = "docs", doc(cfg(feature = "serde-support")))]
-    #[error("Deserializing a ResultRow {:?}", _0)]
-    FromRowError(serde::de::value::Error),
-
     #[error(
         "Incorrect number of parameters given to a statement. Expected {}: got: {}.",
         expected,
@@ -320,7 +315,6 @@ impl From<Error> for ErrorKind {
 }
 
 #[cfg(feature = "bigdecimal")]
-#[cfg_attr(feature = "docs", doc(cfg(feature = "bigdecimal")))]
 impl From<bigdecimal::ParseBigDecimalError> for Error {
     fn from(e: bigdecimal::ParseBigDecimalError) -> Self {
         let kind = ErrorKind::conversion(format!("{e}"));

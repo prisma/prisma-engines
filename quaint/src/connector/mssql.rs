@@ -30,7 +30,6 @@ pub use tiberius;
 /// Wraps a connection url and exposes the parsing logic used by Quaint,
 /// including default values.
 #[derive(Debug, Clone)]
-#[cfg_attr(feature = "docs", doc(cfg(feature = "mssql")))]
 pub struct MssqlUrl {
     connection_string: String,
     query_params: MssqlQueryParams,
@@ -38,7 +37,6 @@ pub struct MssqlUrl {
 
 /// TLS mode when connecting to SQL Server.
 #[derive(Debug, Clone, Copy)]
-#[cfg_attr(feature = "docs", doc(cfg(feature = "mssql")))]
 pub enum EncryptMode {
     /// All traffic is encrypted.
     On,
@@ -270,7 +268,6 @@ impl MssqlQueryParams {
 
 /// A connector interface for the SQL Server database.
 #[derive(Debug)]
-#[cfg_attr(feature = "docs", doc(cfg(feature = "mssql")))]
 pub struct Mssql {
     client: Mutex<Client<Compat<TcpStream>>>,
     url: MssqlUrl,

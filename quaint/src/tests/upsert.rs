@@ -1,6 +1,6 @@
 use super::test_api::*;
 use crate::{connector::Queryable, prelude::*};
-use test_macros::test_each_connector;
+use quaint_test_macros::test_each_connector;
 
 #[test_each_connector(tags("postgresql", "sqlite"))]
 async fn upsert_on_primary_key(api: &mut dyn TestApi) -> crate::Result<()> {

@@ -21,7 +21,6 @@ pub(crate) const DEFAULT_SQLITE_SCHEMA_NAME: &str = "main";
 pub use rusqlite;
 
 /// A connector interface for the SQLite database
-#[cfg_attr(feature = "docs", doc(cfg(feature = "sqlite")))]
 pub struct Sqlite {
     pub(crate) client: Mutex<rusqlite::Connection>,
 }
@@ -29,7 +28,6 @@ pub struct Sqlite {
 /// Wraps a connection url and exposes the parsing logic used by Quaint,
 /// including default values.
 #[derive(Debug)]
-#[cfg_attr(feature = "docs", doc(cfg(feature = "sqlite")))]
 pub struct SqliteParams {
     pub connection_limit: Option<usize>,
     /// This is not a `PathBuf` because we need to `ATTACH` the database to the path, and this can

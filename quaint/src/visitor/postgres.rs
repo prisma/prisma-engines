@@ -11,7 +11,6 @@ use std::{
 ///
 /// The returned parameter values implement the `ToSql` trait from postgres and
 /// can be used directly with the database.
-#[cfg_attr(feature = "docs", doc(cfg(feature = "postgresql")))]
 pub struct Postgres<'a> {
     query: String,
     parameters: Vec<Value<'a>>,

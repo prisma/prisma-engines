@@ -2,6 +2,7 @@ use darling::FromMeta;
 use once_cell::sync::Lazy;
 use proc_macro::TokenStream;
 use proc_macro2::Span;
+
 use quaint_test_setup::{ConnectorDefinition, Tags, CONNECTORS};
 use quote::quote;
 use std::str::FromStr;

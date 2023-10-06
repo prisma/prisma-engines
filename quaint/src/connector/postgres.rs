@@ -55,7 +55,6 @@ impl Debug for PostgresClient {
 
 /// A connector interface for the PostgreSQL database.
 #[derive(Debug)]
-#[cfg_attr(feature = "docs", doc(cfg(feature = "postgresql")))]
 pub struct PostgreSql {
     client: PostgresClient,
     pg_bouncer: bool,
@@ -65,14 +64,12 @@ pub struct PostgreSql {
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-#[cfg_attr(feature = "docs", doc(cfg(feature = "postgresql")))]
 pub enum SslAcceptMode {
     Strict,
     AcceptInvalidCerts,
 }
 
 #[derive(Debug, Clone)]
-#[cfg_attr(feature = "docs", doc(cfg(feature = "postgresql")))]
 pub struct SslParams {
     certificate_file: Option<String>,
     identity_file: Option<String>,
@@ -180,7 +177,6 @@ impl PostgresFlavour {
 /// Wraps a connection url and exposes the parsing logic used by Quaint,
 /// including default values.
 #[derive(Debug, Clone)]
-#[cfg_attr(feature = "docs", doc(cfg(feature = "postgresql")))]
 pub struct PostgresUrl {
     url: Url,
     query_params: PostgresUrlQueryParams,

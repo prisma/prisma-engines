@@ -90,7 +90,7 @@ test_type!(datetime(
     Value::datetime(chrono::DateTime::from_str("2020-07-29T09:23:44.458Z").unwrap())
 ));
 
-#[test_macros::test_each_connector(tags("sqlite"))]
+#[quaint_test_macros::test_each_connector(tags("sqlite"))]
 async fn test_type_text_datetime_rfc3339(api: &mut dyn TestApi) -> crate::Result<()> {
     let table = api.create_type_table("DATETIME").await?;
     let dt = chrono::Utc::now();
@@ -110,7 +110,7 @@ async fn test_type_text_datetime_rfc3339(api: &mut dyn TestApi) -> crate::Result
     Ok(())
 }
 
-#[test_macros::test_each_connector(tags("sqlite"))]
+#[quaint_test_macros::test_each_connector(tags("sqlite"))]
 async fn test_type_text_datetime_rfc2822(api: &mut dyn TestApi) -> crate::Result<()> {
     let table = api.create_type_table("DATETIME").await?;
     let dt = chrono::DateTime::parse_from_rfc2822("Tue, 1 Jul 2003 10:52:37 +0200")
@@ -132,7 +132,7 @@ async fn test_type_text_datetime_rfc2822(api: &mut dyn TestApi) -> crate::Result
     Ok(())
 }
 
-#[test_macros::test_each_connector(tags("sqlite"))]
+#[quaint_test_macros::test_each_connector(tags("sqlite"))]
 async fn test_type_text_datetime_custom(api: &mut dyn TestApi) -> crate::Result<()> {
     let table = api.create_type_table("DATETIME").await?;
 
@@ -154,7 +154,7 @@ async fn test_type_text_datetime_custom(api: &mut dyn TestApi) -> crate::Result<
     Ok(())
 }
 
-#[test_macros::test_each_connector(tags("sqlite"))]
+#[quaint_test_macros::test_each_connector(tags("sqlite"))]
 async fn test_get_int64_from_int32_field_fails(api: &mut dyn TestApi) -> crate::Result<()> {
     let table = api.create_type_table("INT").await?;
 

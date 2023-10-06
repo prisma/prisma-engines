@@ -3,7 +3,7 @@ use crate::{
     connector::Queryable,
     error::{DatabaseConstraint, ErrorKind, Name},
 };
-use test_macros::test_each_connector;
+use quaint_test_macros::test_each_connector;
 
 #[test_each_connector]
 async fn table_does_not_exist(api: &mut dyn TestApi) -> crate::Result<()> {
