@@ -58,7 +58,7 @@ In the current directory:
 
 ### Pg
 
-Start `docker compose up postgrest15` in `/docker`.
+Start database via `docker compose up postgres15` in `/docker`.
 
 In the current directory:
 - Run `pnpm prisma:pg` to push the Prisma schema and insert the test data.
