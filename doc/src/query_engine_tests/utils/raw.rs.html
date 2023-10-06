@@ -111,7 +111,7 @@
 <span class="kw">use </span>prisma_value::encode_bytes;
 <span class="kw">use </span>query_tests_setup::{TestError, TestResult};
 
-<span class="kw">pub fn </span>fmt_query_raw(query: <span class="kw-2">&amp;</span>str, params: Vec&lt;RawParam&gt;) -&gt; String {
+<span class="kw">pub fn </span>fmt_query_raw(query: <span class="kw-2">&amp;</span>str, params: <span class="kw">impl </span>IntoIterator&lt;Item = RawParam&gt;) -&gt; String {
     <span class="kw">let </span>params = params_to_json(params);
     <span class="kw">let </span>params = serde_json::to_string(<span class="kw-2">&amp;</span>params).unwrap();
 
@@ -122,7 +122,7 @@
     )
 }
 
-<span class="kw">pub fn </span>fmt_execute_raw(query: <span class="kw-2">&amp;</span>str, params: Vec&lt;RawParam&gt;) -&gt; String {
+<span class="kw">pub fn </span>fmt_execute_raw(query: <span class="kw-2">&amp;</span>str, params: <span class="kw">impl </span>IntoIterator&lt;Item = RawParam&gt;) -&gt; String {
     <span class="kw">let </span>params = params_to_json(params);
     <span class="kw">let </span>params = serde_json::to_string(<span class="kw-2">&amp;</span>params).unwrap();
 
@@ -175,7 +175,7 @@
     }
 }
 
-<span class="kw">fn </span>params_to_json(params: Vec&lt;RawParam&gt;) -&gt; Vec&lt;serde_json::Value&gt; {
+<span class="kw">fn </span>params_to_json(params: <span class="kw">impl </span>IntoIterator&lt;Item = RawParam&gt;) -&gt; Vec&lt;serde_json::Value&gt; {
     params.into_iter().map(serde_json::Value::from).collect::&lt;Vec&lt;<span class="kw">_</span>&gt;&gt;()
 }
 
