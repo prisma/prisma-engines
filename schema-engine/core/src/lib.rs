@@ -90,7 +90,7 @@ fn connector_for_connection_string(
             Ok(Box::new(connector))
         }
         Some(_other) => Err(CoreError::url_parse_error(format!(
-            "Prisma cannot determine the connector. Expecting postgres/postgresql/file/mysql/sqlserver/mongodb+srv/mongodb"
+            "Expecting schemes postgres/postgresql/file/mysql/sqlserver/mongodb+srv/mongodb"
         ))),
         None => Err(CoreError::user_facing(InvalidConnectionString {
             details: String::new(),

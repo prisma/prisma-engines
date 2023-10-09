@@ -192,7 +192,7 @@ fn test_sqlite_url(api: TestApi) {
     assert!(!output.status.success());
     let message = String::from_utf8(output.stderr).unwrap();
     assert!(message.contains(
-        "Prisma cannot determine the connector. Expecting postgres/postgresql/file/mysql/sqlserver/mongodb+srv/mongodb"
+        "The provided database string is invalid. Expecting schemes postgres/postgresql/file/mysql/sqlserver/mongodb+srv/mongodb in database URL."
     ));
 }
 
