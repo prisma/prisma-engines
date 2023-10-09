@@ -33,13 +33,37 @@ where
     }
 }
 
+/// A native-column type, i.e. the connector-specific type of the column.
+#[derive(Debug, Clone, PartialEq)]
+pub struct NativeColumnType<'a>(Cow<'a, str>);
+
+impl<'a> std::ops::Deref for NativeColumnType<'a> {
+    type Target = str;
+
+    fn deref(&self) -> &Self::Target {
+        &self.0
+    }
+}
+
+impl<'a> From<&'a str> for NativeColumnType<'a> {
+    fn from(s: &'a str) -> Self {
+        Self(s.into())
+    }
+}
+
 #[derive(Debug, Clone, PartialEq)]
 pub struct Value<'a> {
     pub typed: ValueType<'a>,
-    pub native_column_type: Option<Cow<'a, str>>,
+    pub native_column_type: Option<NativeColumnType<'a>>,
 }
 
 impl<'a> Value<'a> {
+    /// Changes the value to include information about the native column type
+    pub fn with_native_column_type<T: Into<NativeColumnType<'a>>>(mut self, column_type: Option<T>) -> Self {
+        self.native_column_type = column_type.map(|ct| ct.into());
+        self
+    }
+
     /// Creates a new 32-bit signed integer.
     pub fn int32<I>(value: I) -> Self
     where

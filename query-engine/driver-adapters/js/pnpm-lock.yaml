@@ -43,6 +43,9 @@ importers:
       '@neondatabase/serverless':
         specifier: ^0.6.0
         version: 0.6.0
+      postgres-array:
+        specifier: ^3.0.2
+        version: 3.0.2
 
   adapter-pg:
     dependencies:

@@ -258,34 +258,31 @@ fn js_value_to_quaint(
             serde_json::Value::Number(n) => {
                 // n.as_i32() is not implemented, so we need to downcast from i64 instead
                 n.as_i64()
-                    .ok_or(conversion_error!("number must be an integer"))
+                    .ok_or(conversion_error!("number must be an integer in column '{column_name}'"))
                     .and_then(|n| -> quaint::Result<i32> {
                         n.try_into()
-                            .map_err(|e| conversion_error!("cannot convert {n} to i32: {e}"))
+                            .map_err(|e| conversion_error!("cannot convert {n} to i32 in column '{column_name}': {e}"))
                     })
                     .map(QuaintValue::int32)
             }
-            serde_json::Value::String(s) => s
-                .parse::<i32>()
-                .map(QuaintValue::int32)
-                .map_err(|e| conversion_error!("string-encoded number must be an i32, got {s}: {e}")),
+            serde_json::Value::String(s) => s.parse::<i32>().map(QuaintValue::int32).map_err(|e| {
+                conversion_error!("string-encoded number must be an i32 in column '{column_name}', got {s}: {e}")
+            }),
             serde_json::Value::Null => Ok(QuaintValue::null_int32()),
             mismatch => Err(conversion_error!(
-                "expected an i32 number in column {column_name}, found {mismatch}"
+                "expected an i32 number in column '{column_name}', found {mismatch}"
             )),
         },
         ColumnType::Int64 => match json_value {
-            serde_json::Value::Number(n) => n
-                .as_i64()
-                .map(QuaintValue::int64)
-                .ok_or(conversion_error!("number must be an i64, got {n}")),
-            serde_json::Value::String(s) => s
-                .parse::<i64>()
-                .map(QuaintValue::int64)
-                .map_err(|e| conversion_error!("string-encoded number must be an i64, got {s}: {e}")),
+            serde_json::Value::Number(n) => n.as_i64().map(QuaintValue::int64).ok_or(conversion_error!(
+                "number must be an i64 in column '{column_name}', got {n}"
+            )),
+            serde_json::Value::String(s) => s.parse::<i64>().map(QuaintValue::int64).map_err(|e| {
+                conversion_error!("string-encoded number must be an i64 in column '{column_name}', got {s}: {e}")
+            }),
             serde_json::Value::Null => Ok(QuaintValue::null_int64()),
             mismatch => Err(conversion_error!(
-                "expected a string or number in column {column_name}, found {mismatch}"
+                "expected a string or number in column '{column_name}', found {mismatch}"
             )),
         },
         ColumnType::Float => match json_value {
@@ -293,36 +290,39 @@ fn js_value_to_quaint(
             // We assume that the JSON value is a valid f32 number, but we check for overflows anyway.
             serde_json::Value::Number(n) => n
                 .as_f64()
-                .ok_or(conversion_error!("number must be a float, got {n}"))
+                .ok_or(conversion_error!(
+                    "number must be a float in column '{column_name}', got {n}"
+                ))
                 .and_then(f64_to_f32)
                 .map(QuaintValue::float),
             serde_json::Value::Null => Ok(QuaintValue::null_float()),
             mismatch => Err(conversion_error!(
-                "expected an f32 number in column {column_name}, found {mismatch}"
+                "expected an f32 number in column '{column_name}', found {mismatch}"
             )),
         },
         ColumnType::Double => match json_value {
-            serde_json::Value::Number(n) => n
-                .as_f64()
-                .map(QuaintValue::double)
-                .ok_or(conversion_error!("number must be a f64, got {n}")),
+            serde_json::Value::Number(n) => n.as_f64().map(QuaintValue::double).ok_or(conversion_error!(
+                "number must be a f64 in column '{column_name}', got {n}"
+            )),
             serde_json::Value::Null => Ok(QuaintValue::null_double()),
             mismatch => Err(conversion_error!(
-                "expected an f64 number in column {column_name}, found {mismatch}"
+                "expected an f64 number in column '{column_name}', found {mismatch}"
             )),
         },
         ColumnType::Numeric => match json_value {
-            serde_json::Value::String(s) => BigDecimal::from_str(&s)
-                .map(QuaintValue::numeric)
-                .map_err(|e| conversion_error!("invalid numeric value when parsing {s}: {e}")),
+            serde_json::Value::String(s) => BigDecimal::from_str(&s).map(QuaintValue::numeric).map_err(|e| {
+                conversion_error!("invalid numeric value when parsing {s} in column '{column_name}': {e}")
+            }),
             serde_json::Value::Number(n) => n
                 .as_f64()
                 .and_then(BigDecimal::from_f64)
-                .ok_or(conversion_error!("number must be an f64, got {n}"))
+                .ok_or(conversion_error!(
+                    "number must be an f64 in column '{column_name}', got {n}"
+                ))
                 .map(QuaintValue::numeric),
             serde_json::Value::Null => Ok(QuaintValue::null_numeric()),
             mismatch => Err(conversion_error!(
-                "expected a string-encoded number in column {column_name}, found {mismatch}",
+                "expected a string-encoded number in column '{column_name}', found {mismatch}",
             )),
         },
         ColumnType::Boolean => match json_value {
@@ -332,16 +332,18 @@ fn js_value_to_quaint(
                 Some(0) => Ok(QuaintValue::boolean(false)),
                 Some(1) => Ok(QuaintValue::boolean(true)),
                 _ => Err(conversion_error!(
-                    "expected number-encoded boolean to be 0 or 1, got {n}"
+                    "expected number-encoded boolean to be 0 or 1 in column '{column_name}', got {n}"
                 )),
             },
             serde_json::Value::String(s) => match s.as_str() {
                 "false" | "FALSE" | "0" => Ok(QuaintValue::boolean(false)),
                 "true" | "TRUE" | "1" => Ok(QuaintValue::boolean(true)),
-                _ => Err(conversion_error!("expected string-encoded boolean, got {s}")),
+                _ => Err(conversion_error!(
+                    "expected string-encoded boolean in column '{column_name}', got {s}"
+                )),
             },
             mismatch => Err(conversion_error!(
-                "expected a boolean in column {column_name}, found {mismatch}"
+                "expected a boolean in column '{column_name}', found {mismatch}"
             )),
         },
         ColumnType::Char => match json_value {
@@ -351,43 +353,44 @@ fn js_value_to_quaint(
             },
             serde_json::Value::Null => Ok(QuaintValue::null_character()),
             mismatch => Err(conversion_error!(
-                "expected a string in column {column_name}, found {mismatch}"
+                "expected a string in column '{column_name}', found {mismatch}"
             )),
         },
         ColumnType::Text => match json_value {
             serde_json::Value::String(s) => Ok(QuaintValue::text(s)),
             serde_json::Value::Null => Ok(QuaintValue::null_text()),
             mismatch => Err(conversion_error!(
-                "expected a string in column {column_name}, found {mismatch}"
+                "expected a string in column '{column_name}', found {mismatch}"
             )),
         },
         ColumnType::Date => match json_value {
             serde_json::Value::String(s) => NaiveDate::parse_from_str(&s, "%Y-%m-%d")
                 .map(QuaintValue::date)
-                .map_err(|_| conversion_error!("expected a date string, got {s}")),
+                .map_err(|_| conversion_error!("expected a date string in column '{column_name}', got {s}")),
             serde_json::Value::Null => Ok(QuaintValue::null_date()),
             mismatch => Err(conversion_error!(
-                "expected a string in column {column_name}, found {mismatch}"
+                "expected a string in column '{column_name}', found {mismatch}"
             )),
         },
         ColumnType::Time => match json_value {
-            serde_json::Value::String(s) => NaiveTime::parse_from_str(&s, "%H:%M:%S")
+            serde_json::Value::String(s) => NaiveTime::parse_from_str(&s, "%H:%M:%S%.f")
                 .map(QuaintValue::time)
-                .map_err(|_| conversion_error!("expected a time string, got {s}")),
+                .map_err(|_| conversion_error!("expected a time string in column '{column_name}', got {s}")),
             serde_json::Value::Null => Ok(QuaintValue::null_time()),
             mismatch => Err(conversion_error!(
-                "expected a string in column {column_name}, found {mismatch}"
+                "expected a string in column '{column_name}', found {mismatch}"
             )),
         },
         ColumnType::DateTime => match json_value {
+            // TODO: change parsing order to prefer RFC3339
             serde_json::Value::String(s) => chrono::NaiveDateTime::parse_from_str(&s, "%Y-%m-%d %H:%M:%S%.f")
                 .map(|dt| DateTime::from_utc(dt, Utc))
                 .or_else(|_| DateTime::parse_from_rfc3339(&s).map(DateTime::<Utc>::from))
                 .map(QuaintValue::datetime)
-                .map_err(|_| conversion_error!("expected a datetime string, found {s}")),
+                .map_err(|_| conversion_error!("expected a datetime string in column '{column_name}', found {s}")),
             serde_json::Value::Null => Ok(QuaintValue::null_datetime()),
             mismatch => Err(conversion_error!(
-                "expected a string in column {column_name}, found {mismatch}"
+                "expected a string in column '{column_name}', found {mismatch}"
             )),
         },
         ColumnType::Json => {
@@ -403,7 +406,7 @@ fn js_value_to_quaint(
             serde_json::Value::String(s) => Ok(QuaintValue::enum_variant(s)),
             serde_json::Value::Null => Ok(QuaintValue::null_enum()),
             mismatch => Err(conversion_error!(
-                "expected a string in column {column_name}, found {mismatch}"
+                "expected a string in column '{column_name}', found {mismatch}"
             )),
         },
         ColumnType::Bytes => match json_value {
@@ -413,19 +416,21 @@ fn js_value_to_quaint(
                 .map(|value| value.as_i64().and_then(|maybe_byte| maybe_byte.try_into().ok()))
                 .collect::<Option<Cow<[u8]>>>()
                 .map(QuaintValue::bytes)
-                .ok_or(conversion_error!("elements of the array must be u8")),
+                .ok_or(conversion_error!(
+                    "elements of the array in column '{column_name}' must be u8"
+                )),
             serde_json::Value::Null => Ok(QuaintValue::null_bytes()),
             mismatch => Err(conversion_error!(
-                "expected a string or an array in column {column_name}, found {mismatch}",
+                "expected a string or an array in column '{column_name}', found {mismatch}",
             )),
         },
         ColumnType::Uuid => match json_value {
             serde_json::Value::String(s) => uuid::Uuid::parse_str(&s)
                 .map(QuaintValue::uuid)
-                .map_err(|_| conversion_error!("Expected a UUID string")),
+                .map_err(|_| conversion_error!("Expected a UUID string in column '{column_name}'")),
             serde_json::Value::Null => Ok(QuaintValue::null_bytes()),
             mismatch => Err(conversion_error!(
-                "Expected a UUID string in column {column_name}, found {mismatch}"
+                "Expected a UUID string in column '{column_name}', found {mismatch}"
             )),
         },
         ColumnType::UnknownNumber => match json_value {
@@ -433,9 +438,11 @@ fn js_value_to_quaint(
                 .as_i64()
                 .map(QuaintValue::int64)
                 .or(n.as_f64().map(QuaintValue::double))
-                .ok_or(conversion_error!("number must be an i64 or f64, got {n}")),
+                .ok_or(conversion_error!(
+                    "number must be an i64 or f64 in column '{column_name}', got {n}"
+                )),
             mismatch => Err(conversion_error!(
-                "expected a either an i64 or a f64 in column {column_name}, found {mismatch}",
+                "expected a either an i64 or a f64 in column '{column_name}', found {mismatch}",
             )),
         },
 
@@ -476,7 +483,7 @@ fn js_array_to_quaint(
         )),
         serde_json::Value::Null => Ok(QuaintValue::null_array()),
         mismatch => Err(conversion_error!(
-            "expected an array in column {column_name}, found {mismatch}",
+            "expected an array in column '{column_name}', found {mismatch}",
         )),
     }
 }
@@ -832,8 +839,13 @@ mod proxy_test {
         let s = "23:59:59";
         let json_value = serde_json::Value::String(s.to_string());
         let quaint_value = js_value_to_quaint(json_value, column_type, "column_name").unwrap();
-
         let time: NaiveTime = NaiveTime::from_hms_opt(23, 59, 59).unwrap();
+        assert_eq!(quaint_value, QuaintValue::time(time));
+
+        let s = "13:02:20.321";
+        let json_value = serde_json::Value::String(s.to_string());
+        let quaint_value = js_value_to_quaint(json_value, column_type, "column_name").unwrap();
+        let time: NaiveTime = NaiveTime::from_hms_milli_opt(13, 02, 20, 321).unwrap();
         assert_eq!(quaint_value, QuaintValue::time(time));
     }
 
