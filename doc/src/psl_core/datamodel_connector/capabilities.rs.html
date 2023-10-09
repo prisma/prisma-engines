@@ -107,6 +107,7 @@
 <a href="#107" id="107">107</a>
 <a href="#108" id="108">108</a>
 <a href="#109" id="109">109</a>
+<a href="#110" id="110">110</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::{fmt, str::FromStr};
 
 <span class="doccomment">/// Not all Databases are created equal. Hence connectors for our datasources support different capabilities.
@@ -212,7 +213,8 @@
     NativeUpsert,
     InsertReturning,
     UpdateReturning,
-);
+    RowIn, <span class="comment">// Connector supports (a, b) IN (c, d) expression.
+</span>);
 
 <span class="doccomment">/// Contains all capabilities that the connector is able to serve.
 </span><span class="kw">pub type </span>ConnectorCapabilities = enumflags2::BitFlags&lt;ConnectorCapability&gt;;

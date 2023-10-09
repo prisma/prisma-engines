@@ -1347,12 +1347,80 @@
 <a href="#1347" id="1347">1347</a>
 <a href="#1348" id="1348">1348</a>
 <a href="#1349" id="1349">1349</a>
+<a href="#1350" id="1350">1350</a>
+<a href="#1351" id="1351">1351</a>
+<a href="#1352" id="1352">1352</a>
+<a href="#1353" id="1353">1353</a>
+<a href="#1354" id="1354">1354</a>
+<a href="#1355" id="1355">1355</a>
+<a href="#1356" id="1356">1356</a>
+<a href="#1357" id="1357">1357</a>
+<a href="#1358" id="1358">1358</a>
+<a href="#1359" id="1359">1359</a>
+<a href="#1360" id="1360">1360</a>
+<a href="#1361" id="1361">1361</a>
+<a href="#1362" id="1362">1362</a>
+<a href="#1363" id="1363">1363</a>
+<a href="#1364" id="1364">1364</a>
+<a href="#1365" id="1365">1365</a>
+<a href="#1366" id="1366">1366</a>
+<a href="#1367" id="1367">1367</a>
+<a href="#1368" id="1368">1368</a>
+<a href="#1369" id="1369">1369</a>
+<a href="#1370" id="1370">1370</a>
+<a href="#1371" id="1371">1371</a>
+<a href="#1372" id="1372">1372</a>
+<a href="#1373" id="1373">1373</a>
+<a href="#1374" id="1374">1374</a>
+<a href="#1375" id="1375">1375</a>
+<a href="#1376" id="1376">1376</a>
+<a href="#1377" id="1377">1377</a>
+<a href="#1378" id="1378">1378</a>
+<a href="#1379" id="1379">1379</a>
+<a href="#1380" id="1380">1380</a>
+<a href="#1381" id="1381">1381</a>
+<a href="#1382" id="1382">1382</a>
+<a href="#1383" id="1383">1383</a>
+<a href="#1384" id="1384">1384</a>
+<a href="#1385" id="1385">1385</a>
+<a href="#1386" id="1386">1386</a>
+<a href="#1387" id="1387">1387</a>
+<a href="#1388" id="1388">1388</a>
+<a href="#1389" id="1389">1389</a>
+<a href="#1390" id="1390">1390</a>
+<a href="#1391" id="1391">1391</a>
+<a href="#1392" id="1392">1392</a>
+<a href="#1393" id="1393">1393</a>
+<a href="#1394" id="1394">1394</a>
+<a href="#1395" id="1395">1395</a>
+<a href="#1396" id="1396">1396</a>
+<a href="#1397" id="1397">1397</a>
+<a href="#1398" id="1398">1398</a>
+<a href="#1399" id="1399">1399</a>
+<a href="#1400" id="1400">1400</a>
+<a href="#1401" id="1401">1401</a>
+<a href="#1402" id="1402">1402</a>
+<a href="#1403" id="1403">1403</a>
+<a href="#1404" id="1404">1404</a>
+<a href="#1405" id="1405">1405</a>
+<a href="#1406" id="1406">1406</a>
+<a href="#1407" id="1407">1407</a>
+<a href="#1408" id="1408">1408</a>
+<a href="#1409" id="1409">1409</a>
+<a href="#1410" id="1410">1410</a>
+<a href="#1411" id="1411">1411</a>
+<a href="#1412" id="1412">1412</a>
+<a href="#1413" id="1413">1413</a>
+<a href="#1414" id="1414">1414</a>
+<a href="#1415" id="1415">1415</a>
+<a href="#1416" id="1416">1416</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span><span class="kw">super</span>::alias::<span class="kw-2">*</span>;
 <span class="kw">use </span><span class="kw">crate</span>::join_utils::{compute_one2m_join, AliasedJoin};
 <span class="kw">use crate</span>::{model_extensions::<span class="kw-2">*</span>, Context};
 
 <span class="kw">use </span>connector_interface::filter::<span class="kw-2">*</span>;
 <span class="kw">use </span>prisma_models::prelude::<span class="kw-2">*</span>;
+<span class="kw">use </span>psl::datamodel_connector::ConnectorCapability;
 <span class="kw">use </span>quaint::ast::concat;
 <span class="kw">use </span>quaint::ast::<span class="kw-2">*</span>;
 <span class="kw">use </span>std::convert::TryInto;
@@ -1459,84 +1527,149 @@
         res
     }
 
-    <span class="kw">fn </span>visit_relation_filter_select(<span class="kw-2">&amp;mut </span><span class="self">self</span>, filter: RelationFilter, ctx: <span class="kw-2">&amp;</span>Context&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; Select&lt;<span class="lifetime">&#39;static</span>&gt; {
+    <span class="kw">fn </span>visit_relation_filter_select(
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>,
+        filter: RelationFilter,
+        ctx: <span class="kw-2">&amp;</span>Context&lt;<span class="lifetime">&#39;_</span>&gt;,
+    ) -&gt; (ModelProjection, Select&lt;<span class="lifetime">&#39;static</span>&gt;) {
+        <span class="kw">let </span>is_many_to_many = filter.field.relation().is_many_to_many();
+        <span class="comment">// HACK: This is temporary. A fix should be done in Quaint instead of branching out here.
+        // See https://www.notion.so/prismaio/Spec-Faulty-Tuple-Join-on-SQL-Server-55b8232fb44f4a6cb4d3f36428f17bac
+        // for more info
+        </span><span class="kw">let </span>support_row_in = filter
+            .field
+            .dm
+            .schema
+            .connector
+            .capabilities()
+            .contains(ConnectorCapability::RowIn);
+        <span class="kw">let </span>has_compound_fields = filter.field.linking_fields().into_inner().len() &gt; <span class="number">1</span>;
+
+        <span class="comment">// If the relation is an M2M relation we don&#39;t have a choice but to join
+        // If the connector does not support (a, b) IN (SELECT c, d) and there are several linking fields, then we must use a join.
+        // Hint: SQL Server does not support `ROW() IN ()`.
+        </span><span class="kw">if </span>is_many_to_many || (!support_row_in &amp;&amp; has_compound_fields) {
+            <span class="self">self</span>.visit_relation_filter_select_no_row(filter, ctx)
+        } <span class="kw">else </span>{
+            <span class="self">self</span>.visit_relation_filter_select_with_row(filter, ctx)
+        }
+    }
+
+    <span class="doccomment">/// Traverses a relation filter using this rough SQL structure:
+    ///
+    /// ```sql
+    /// (parent.id) IN (
+    ///   SELECT id FROM parent
+    ///   INNER JOIN child ON (child.parent_id = parent.id)
+    ///   WHERE &lt;filter&gt;
+    /// )
+    /// ```
+    /// We need this in two cases:
+    /// - For M2M relations, as we need to traverse the join table so the join is not superfluous
+    /// - SQL Server because it does not support (a, b) IN (subselect)
+    </span><span class="kw">fn </span>visit_relation_filter_select_no_row(
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>,
+        filter: RelationFilter,
+        ctx: <span class="kw-2">&amp;</span>Context&lt;<span class="lifetime">&#39;_</span>&gt;,
+    ) -&gt; (ModelProjection, Select&lt;<span class="lifetime">&#39;static</span>&gt;) {
         <span class="kw">let </span>alias = <span class="self">self</span>.next_alias(AliasMode::Table);
         <span class="kw">let </span>condition = filter.condition;
+        <span class="kw">let </span>table = filter.field.as_table(ctx);
+        <span class="kw">let </span>ids = ModelProjection::from(filter.field.model().primary_identifier());
 
-        <span class="comment">// Perf: We can skip a join if the relation is inlined on the related model.
-        // In this case, we can select the related table&#39;s foreign key instead of joining.
-        // This is not possible in the case of M2M implicit relations.
-        </span><span class="kw">if </span>filter.field.related_field().is_inlined_on_enclosing_model() {
-            <span class="kw">let </span>related_table = filter.field.related_model().as_table(ctx);
-            <span class="kw">let </span>related_columns: Vec&lt;<span class="kw">_</span>&gt; = ModelProjection::from(filter.field.related_field().linking_fields())
-                .as_columns(ctx)
-                .map(|col| col.aliased_col(<span class="prelude-val">Some</span>(alias), ctx))
-                .collect();
+        <span class="kw">let </span>selected_identifier: Vec&lt;Column&gt; = filter
+            .field
+            .identifier_columns(ctx)
+            .map(|col| col.aliased_col(<span class="prelude-val">Some</span>(alias), ctx))
+            .collect();
 
-            <span class="kw">let </span>(nested_conditions, nested_joins) =
-                <span class="self">self</span>.visit_nested_filter(alias, |this| this.visit_filter(<span class="kw-2">*</span>filter.nested_filter, ctx));
-            <span class="kw">let </span>nested_conditions = nested_conditions.invert_if(condition.invert_of_subselect());
+        <span class="kw">let </span>join_columns: Vec&lt;Column&gt; = filter
+            .field
+            .join_columns(ctx)
+            .map(|c| c.aliased_col(<span class="prelude-val">Some</span>(alias), ctx))
+            .collect();
 
-            <span class="kw">let </span>conditions = related_columns
-                .clone()
-                .into_iter()
-                .fold(nested_conditions, |acc, column| acc.and(column.is_not_null()));
+        <span class="kw">let </span>related_table = filter.field.related_model().as_table(ctx);
+        <span class="kw">let </span>related_join_columns: Vec&lt;<span class="kw">_</span>&gt; = ModelProjection::from(filter.field.related_field().linking_fields())
+            .as_columns(ctx)
+            .map(|col| col.aliased_col(<span class="prelude-val">Some</span>(alias.flip(AliasMode::Join)), ctx))
+            .collect();
 
-            <span class="kw">let </span>select = Select::from_table(related_table.alias(alias.to_string(<span class="prelude-val">Some</span>(AliasMode::Table))))
-                .columns(related_columns)
-                .so_that(conditions);
+        <span class="kw">let </span>(nested_conditions, nested_joins) = <span class="self">self
+            </span>.visit_nested_filter(alias.flip(AliasMode::Join), |nested_visitor| {
+                nested_visitor.visit_filter(<span class="kw-2">*</span>filter.nested_filter, ctx)
+            });
 
-            <span class="kw">if let </span><span class="prelude-val">Some</span>(nested_joins) = nested_joins {
-                nested_joins.into_iter().fold(select, |acc, join| acc.join(join.data))
-            } <span class="kw">else </span>{
-                select
-            }
+        <span class="kw">let </span>nested_conditions = nested_conditions.invert_if(condition.invert_of_subselect());
+        <span class="kw">let </span>nested_conditons = selected_identifier
+            .clone()
+            .into_iter()
+            .fold(nested_conditions, |acc, column| acc.and(column.is_not_null()));
+
+        <span class="kw">let </span>join = related_table
+            .alias(alias.to_string(<span class="prelude-val">Some</span>(AliasMode::Join)))
+            .on(Row::from(related_join_columns).equals(Row::from(join_columns)));
+
+        <span class="kw">let </span>select = Select::from_table(table.alias(alias.to_string(<span class="prelude-val">Some</span>(AliasMode::Table))))
+            .columns(selected_identifier)
+            .inner_join(join)
+            .so_that(nested_conditons);
+
+        <span class="kw">let </span>select = <span class="kw">if let </span><span class="prelude-val">Some</span>(nested_joins) = nested_joins {
+            nested_joins.into_iter().fold(select, |acc, join| acc.join(join.data))
         } <span class="kw">else </span>{
-            <span class="kw">let </span>table = filter.field.as_table(ctx);
-            <span class="kw">let </span>selected_identifier: Vec&lt;Column&gt; = filter
-                .field
-                .identifier_columns(ctx)
-                .map(|col| col.aliased_col(<span class="prelude-val">Some</span>(alias), ctx))
-                .collect();
+            select
+        };
 
-            <span class="kw">let </span>join_columns: Vec&lt;Column&gt; = filter
-                .field
-                .join_columns(ctx)
-                .map(|c| c.aliased_col(<span class="prelude-val">Some</span>(alias), ctx))
-                .collect();
+        (ids, select)
+    }
 
-            <span class="kw">let </span>related_table = filter.field.related_model().as_table(ctx);
-            <span class="kw">let </span>related_join_columns: Vec&lt;<span class="kw">_</span>&gt; = ModelProjection::from(filter.field.related_field().linking_fields())
-                .as_columns(ctx)
-                .map(|col| col.aliased_col(<span class="prelude-val">Some</span>(alias.flip(AliasMode::Join)), ctx))
-                .collect();
+    <span class="doccomment">/// Traverses a relation filter using this rough SQL structure:
+    ///
+    /// ```sql
+    /// (parent.id1, parent.id2) IN (
+    ///   SELECT id1, id2 FROM child
+    ///   WHERE &lt;filter&gt;
+    /// )
+    /// ```
+    </span><span class="kw">fn </span>visit_relation_filter_select_with_row(
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>,
+        filter: RelationFilter,
+        ctx: <span class="kw-2">&amp;</span>Context&lt;<span class="lifetime">&#39;_</span>&gt;,
+    ) -&gt; (ModelProjection, Select&lt;<span class="lifetime">&#39;static</span>&gt;) {
+        <span class="kw">let </span>alias = <span class="self">self</span>.next_alias(AliasMode::Table);
+        <span class="kw">let </span>condition = filter.condition;
+        <span class="kw">let </span>linking_fields = ModelProjection::from(filter.field.linking_fields());
 
-            <span class="kw">let </span>(nested_conditions, nested_joins) = <span class="self">self
-                </span>.visit_nested_filter(alias.flip(AliasMode::Join), |nested_visitor| {
-                    nested_visitor.visit_filter(<span class="kw-2">*</span>filter.nested_filter, ctx)
-                });
+        <span class="kw">let </span>related_table = filter.field.related_model().as_table(ctx);
+        <span class="comment">// Select linking fields to match the linking fields of the parent record
+        </span><span class="kw">let </span>related_columns: Vec&lt;<span class="kw">_</span>&gt; = filter
+            .field
+            .related_field()
+            .join_columns(ctx)
+            .map(|col| col.aliased_col(<span class="prelude-val">Some</span>(alias), ctx))
+            .collect();
 
-            <span class="kw">let </span>nested_conditions = nested_conditions.invert_if(condition.invert_of_subselect());
-            <span class="kw">let </span>nested_conditons = selected_identifier
-                .clone()
-                .into_iter()
-                .fold(nested_conditions, |acc, column| acc.and(column.is_not_null()));
+        <span class="kw">let </span>(nested_conditions, nested_joins) =
+            <span class="self">self</span>.visit_nested_filter(alias, |this| this.visit_filter(<span class="kw-2">*</span>filter.nested_filter, ctx));
+        <span class="kw">let </span>nested_conditions = nested_conditions.invert_if(condition.invert_of_subselect());
 
-            <span class="kw">let </span>join = related_table
-                .alias(alias.to_string(<span class="prelude-val">Some</span>(AliasMode::Join)))
-                .on(Row::from(related_join_columns).equals(Row::from(join_columns)));
+        <span class="kw">let </span>conditions = related_columns
+            .clone()
+            .into_iter()
+            .fold(nested_conditions, |acc, column| acc.and(column.is_not_null()));
 
-            <span class="kw">let </span>select = Select::from_table(table.alias(alias.to_string(<span class="prelude-val">Some</span>(AliasMode::Table))))
-                .columns(selected_identifier)
-                .inner_join(join)
-                .so_that(nested_conditons);
+        <span class="kw">let </span>select = Select::from_table(related_table.alias(alias.to_string(<span class="prelude-val">Some</span>(AliasMode::Table))))
+            .columns(related_columns)
+            .so_that(conditions);
 
-            <span class="kw">if let </span><span class="prelude-val">Some</span>(nested_joins) = nested_joins {
-                nested_joins.into_iter().fold(select, |acc, join| acc.join(join.data))
-            } <span class="kw">else </span>{
-                select
-            }
-        }
+        <span class="kw">let </span>select = <span class="kw">if let </span><span class="prelude-val">Some</span>(nested_joins) = nested_joins {
+            nested_joins.into_iter().fold(select, |acc, join| acc.join(join.data))
+        } <span class="kw">else </span>{
+            select
+        };
+
+        (linking_fields, select)
     }
 }
 
@@ -1741,11 +1874,12 @@
             }
 
             <span class="kw">_ </span>=&gt; {
-                <span class="kw">let </span>ids = ModelProjection::from(filter.field.model().primary_identifier()).as_columns(ctx);
-                <span class="kw">let </span>columns: Vec&lt;Column&lt;<span class="lifetime">&#39;static</span>&gt;&gt; = ids.map(|col| col.aliased_col(<span class="self">self</span>.parent_alias(), ctx)).collect();
-
                 <span class="kw">let </span>condition = filter.condition;
-                <span class="kw">let </span>sub_select = <span class="self">self</span>.visit_relation_filter_select(filter, ctx);
+                <span class="kw">let </span>(ids, sub_select) = <span class="self">self</span>.visit_relation_filter_select(filter, ctx);
+                <span class="kw">let </span>columns: Vec&lt;Column&lt;<span class="lifetime">&#39;static</span>&gt;&gt; = ids
+                    .as_columns(ctx)
+                    .map(|col| col.aliased_col(<span class="self">self</span>.parent_alias(), ctx))
+                    .collect();
 
                 <span class="kw">let </span>comparison = <span class="kw">match </span>condition {
                     RelationCondition::AtLeastOneRelatedRecord =&gt; Row::from(columns).in_selection(sub_select),
