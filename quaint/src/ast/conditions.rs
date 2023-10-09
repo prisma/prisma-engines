@@ -19,50 +19,6 @@ pub enum ConditionTree<'a> {
 }
 
 impl<'a> ConditionTree<'a> {
-    // Finds all possible comparisons between a tuple and a select. If returning
-    // a vector of CTEs, they should be handled by the calling party.
-    #[cfg(feature = "mssql")]
-    pub(crate) fn convert_tuple_selects_to_ctes(self, level: &mut usize) -> (Self, Vec<CommonTableExpression<'a>>) {
-        fn convert_many<'a>(
-            exprs: Vec<Expression<'a>>,
-            level: &mut usize,
-        ) -> (Vec<Expression<'a>>, Vec<CommonTableExpression<'a>>) {
-            let mut converted = Vec::with_capacity(exprs.len());
-            let mut result_ctes = Vec::new();
-
-            for expr in exprs.into_iter() {
-                let (expr, ctes) = expr.convert_tuple_selects_to_ctes(level);
-
-                converted.push(expr);
-                result_ctes.extend(ctes);
-            }
-
-            (converted, result_ctes)
-        }
-
-        match self {
-            Self::Single(expr) => {
-                let (expr, ctes) = expr.convert_tuple_selects_to_ctes(level);
-
-                (Self::single(expr), ctes)
-            }
-            Self::Not(expr) => {
-                let (expr, ctes) = expr.convert_tuple_selects_to_ctes(level);
-
-                (expr.not(), ctes)
-            }
-            Self::And(exprs) => {
-                let (converted, ctes) = convert_many(exprs, level);
-                (Self::And(converted), ctes)
-            }
-            Self::Or(exprs) => {
-                let (converted, ctes) = convert_many(exprs, level);
-                (Self::Or(converted), ctes)
-            }
-            tree => (tree, Vec::new()),
-        }
-    }
-
     /// An `AND` statement, is true when both sides are true.
     pub fn and<E>(mut self, other: E) -> ConditionTree<'a>
     where

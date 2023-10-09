@@ -39,7 +39,6 @@ impl<'a> Row<'a> {
         self.values.len()
     }
 
-    #[cfg(feature = "mssql")]
     pub(crate) fn is_only_columns(&self) -> bool {
         self.values.iter().all(|v| v.is_column())
     }

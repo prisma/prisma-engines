@@ -299,34 +299,34 @@ pub trait Visitor<'a> {
 
                 self.visit_table(table, true)?;
             }
-
-            if !select.joins.is_empty() {
-                self.visit_joins(select.joins)?;
-            }
-
-            if let Some(conditions) = select.conditions {
-                self.write(" WHERE ")?;
-                self.visit_conditions(conditions)?;
-            }
-            if !select.grouping.is_empty() {
-                self.write(" GROUP BY ")?;
-                self.visit_grouping(select.grouping)?;
-            }
-            if let Some(conditions) = select.having {
-                self.write(" HAVING ")?;
-                self.visit_conditions(conditions)?;
-            }
-            if !select.ordering.is_empty() {
-                self.write(" ORDER BY ")?;
-                self.visit_ordering(select.ordering)?;
-            }
-
-            self.visit_limit_and_offset(select.limit, select.offset)?;
         } else if select.columns.is_empty() {
             self.write(" *")?;
         } else {
             self.visit_columns(select.columns)?;
         }
+
+        if !select.joins.is_empty() {
+            self.visit_joins(select.joins)?;
+        }
+
+        if let Some(conditions) = select.conditions {
+            self.write(" WHERE ")?;
+            self.visit_conditions(conditions)?;
+        }
+        if !select.grouping.is_empty() {
+            self.write(" GROUP BY ")?;
+            self.visit_grouping(select.grouping)?;
+        }
+        if let Some(conditions) = select.having {
+            self.write(" HAVING ")?;
+            self.visit_conditions(conditions)?;
+        }
+        if !select.ordering.is_empty() {
+            self.write(" ORDER BY ")?;
+            self.visit_ordering(select.ordering)?;
+        }
+
+        self.visit_limit_and_offset(select.limit, select.offset)?;
 
         if let Some(comment) = select.comment {
             self.write(" ")?;
@@ -759,6 +759,20 @@ pub trait Visitor<'a> {
         Ok(())
     }
 
+    fn visit_tuple_in_select(&mut self, left: Row<'a>, right: Select<'a>, not: bool) -> Result {
+        self.visit_row(left)?;
+
+        if not {
+            self.write(" NOT IN ")?;
+        } else {
+            self.write(" IN ")?;
+        }
+
+        self.visit_select(right)?;
+
+        Ok(())
+    }
+
     /// A comparison expression
     fn visit_compare(&mut self, compare: Compare<'a>) -> Result {
         match compare {
@@ -769,6 +783,18 @@ pub trait Visitor<'a> {
             Compare::GreaterThan(left, right) => self.visit_greater_than(*left, *right),
             Compare::GreaterThanOrEquals(left, right) => self.visit_greater_than_or_equals(*left, *right),
             Compare::In(left, right) => match (*left, *right) {
+                (
+                    Expression {
+                        kind: ExpressionKind::Row(left),
+                        ..
+                    },
+                    Expression {
+                        kind: ExpressionKind::Selection(SelectQuery::Select(right)),
+                        ..
+                    },
+                ) if left.is_only_columns() && left.len() > 1 && left.len() == right.columns.len() => {
+                    self.visit_tuple_in_select(left, *right, false)
+                }
                 // To prevent `x IN ()` from happening.
                 (
                     _,
@@ -841,6 +867,18 @@ pub trait Visitor<'a> {
                 }
             },
             Compare::NotIn(left, right) => match (*left, *right) {
+                (
+                    Expression {
+                        kind: ExpressionKind::Row(left),
+                        ..
+                    },
+                    Expression {
+                        kind: ExpressionKind::Selection(SelectQuery::Select(right)),
+                        ..
+                    },
+                ) if left.is_only_columns() && left.len() > 1 && left.len() == right.columns.len() => {
+                    self.visit_tuple_in_select(left, *right, true)
+                }
                 // To prevent `x NOT IN ()` from happening.
                 (
                     _,

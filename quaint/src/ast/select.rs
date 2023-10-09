@@ -616,66 +616,6 @@ impl<'a> Select<'a> {
         self
     }
 
-    /// Traverse the condition tree, looking for a comparison where the left
-    /// side is a tuple and the right side a nested `SELECT` in an `IN` or `NOT
-    /// IN` operation; converting it to a common table expression.
-    ///
-    /// So the following query:
-    ///
-    /// ```sql
-    /// SELECT * FROM A WHERE (x, y) IN (SELECT a, b FROM B)
-    /// ```
-    ///
-    /// turns into:
-    ///
-    /// ```sql
-    /// WITH cte_0 AS (SELECT a, b FROM B)
-    /// SELECT * FROM A
-    /// WHERE x IN (SELECT a FROM cte_0 WHERE b = y)
-    /// ```
-    ///
-    /// This makes possible certain tuple comparisons in databases which do not
-    /// support them, allowing the same query AST to be used throughout
-    /// different systems.
-    ///
-    /// The function traverses the whole tree, converting all matching cases.
-    /// Does nothing if any of the following rules fail:
-    ///
-    /// - Not comparing a tuple (e.g. `x IN (SELECT ...)`)
-    /// - Not using a `IN` or `NOT IN` operation
-    /// - Imbalanced number of variables (e.g. `(x, y, z) IN (SELECT a, b ...)`)
-    #[cfg(feature = "mssql")]
-    pub(crate) fn convert_tuple_selects_to_ctes(
-        mut self,
-        top_level: bool,
-        level: &mut usize,
-    ) -> either::Either<Self, (Self, Vec<CommonTableExpression<'a>>)> {
-        let ctes: Vec<CommonTableExpression<'_>> = self
-            .conditions
-            .take()
-            .map(|tree| {
-                let (tree, ctes) = tree.convert_tuple_selects_to_ctes(level);
-                self.conditions = Some(tree);
-
-                ctes.into_iter().collect()
-            })
-            .unwrap_or_default();
-
-        if top_level {
-            let clashing_names = self
-                .ctes
-                .iter()
-                .any(|c| ctes.iter().any(|c2| c.identifier == c2.identifier));
-
-            assert!(!clashing_names);
-            self.ctes.extend(ctes);
-
-            either::Either::Left(self)
-        } else {
-            either::Either::Right((self, ctes))
-        }
-    }
-
     /// A list of item names in the query, skipping the anonymous values or
     /// columns.
     pub(crate) fn named_selection(&self) -> Vec<String> {

@@ -4,7 +4,6 @@ use crate::{model_extensions::*, Context};
 
 use connector_interface::filter::*;
 use prisma_models::prelude::*;
-use psl::datamodel_connector::ConnectorCapability;
 use quaint::ast::concat;
 use quaint::ast::*;
 use std::convert::TryInto;
@@ -116,23 +115,7 @@ impl FilterVisitor {
         filter: RelationFilter,
         ctx: &Context<'_>,
     ) -> (ModelProjection, Select<'static>) {
-        let is_many_to_many = filter.field.relation().is_many_to_many();
-        // HACK: This is temporary. A fix should be done in Quaint instead of branching out here.
-        // See https://www.notion.so/prismaio/Spec-Faulty-Tuple-Join-on-SQL-Server-55b8232fb44f4a6cb4d3f36428f17bac
-        // for more info
-        let support_row_in = filter
-            .field
-            .dm
-            .schema
-            .connector
-            .capabilities()
-            .contains(ConnectorCapability::RowIn);
-        let has_compound_fields = filter.field.linking_fields().into_inner().len() > 1;
-
-        // If the relation is an M2M relation we don't have a choice but to join
-        // If the connector does not support (a, b) IN (SELECT c, d) and there are several linking fields, then we must use a join.
-        // Hint: SQL Server does not support `ROW() IN ()`.
-        if is_many_to_many || (!support_row_in && has_compound_fields) {
+        if filter.field.relation().is_many_to_many() {
             self.visit_relation_filter_select_no_row(filter, ctx)
         } else {
             self.visit_relation_filter_select_with_row(filter, ctx)

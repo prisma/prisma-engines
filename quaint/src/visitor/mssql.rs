@@ -7,7 +7,7 @@ use crate::{
         Order, Ordering, Row, Table, TypeDataLength, TypeFamily, Values,
     },
     error::{Error, ErrorKind},
-    prelude::{Aliasable, Average, Query},
+    prelude::{Aliasable, Average, ConditionTree, Query, Select},
     visitor, Value, ValueType,
 };
 use std::{convert::TryFrom, fmt::Write, iter};
@@ -211,12 +211,6 @@ impl<'a> Visitor<'a> for Mssql<'a> {
     /// SQL Server.
     fn compatibility_modifications(&self, query: Query<'a>) -> Query<'a> {
         match query {
-            // Finding possible `(a, b) (NOT) IN (SELECT x, y ...)` comparisons,
-            // and replacing them with common table expressions.
-            Query::Select(select) => select
-                .convert_tuple_selects_to_ctes(true, &mut 0)
-                .expect_left("Top-level query was right")
-                .into(),
             // Replacing the `ON CONFLICT DO NOTHING` clause with a `MERGE` statement.
             Query::Insert(insert) => match insert.on_conflict {
                 Some(OnConflict::DoNothing) => Merge::try_from(*insert).unwrap().into(),
@@ -224,6 +218,42 @@ impl<'a> Visitor<'a> for Mssql<'a> {
             },
             _ => query,
         }
+    }
+
+    /// Transform `(parent.a, parent.b) IN (SELECT child.c, child.d FROM child)`
+    /// into `EXISTS (SELECT 1 FROM child WHERE parent.a = child.c AND parent.b = child.d)`.
+    /// This is needed because SQL Server doesn't support (tuple) IN.
+    fn visit_tuple_in_select(&mut self, left: Row<'a>, right: Select<'a>, not: bool) -> visitor::Result {
+        if not {
+            self.write("NOT ")?;
+        }
+
+        self.write("EXISTS (")?;
+
+        let mut new_select = right.clone();
+
+        let conditions = left
+            .into_columns()
+            .into_iter()
+            .zip(right.columns)
+            .map(|(left, mut right)| {
+                // Removes the expression aliases so that we don't end up with `parent.a = child.b AS "alias"`
+                right.alias = None;
+                (left, right)
+            })
+            .fold(right.conditions, |acc, (left, right)| match acc {
+                Some(cond) => Some(cond.and(left.equals(right))),
+                None => Some(ConditionTree::single(left.equals(right))),
+            });
+
+        new_select.conditions = conditions;
+        new_select.columns = vec![1.raw().into()];
+
+        self.visit_select(new_select)?;
+
+        self.write(")")?;
+
+        Ok(())
     }
 
     fn visit_equals(&mut self, left: Expression<'a>, right: Expression<'a>) -> visitor::Result {
@@ -1650,12 +1680,9 @@ mod tests {
 
     #[test]
     fn test_cte_conversion_top_level_in() {
-        let expected_sql = indoc!(
-            r#"WITH [cte_0] AS (SELECT @P1 AS [a], @P2 AS [b])
-            SELECT [A].* FROM [A]
-            WHERE [A].[x] IN (SELECT [a] FROM [cte_0] WHERE [b] = [A].[y])"#
-        )
-        .replace('\n', " ");
+        let expected_sql =
+            indoc!(r#"SELECT [A].* FROM [A] WHERE EXISTS (SELECT 1 WHERE (1=1 AND [A].[x] = @P1 AND [A].[y] = @P2))"#)
+                .replace('\n', " ");
 
         let inner = Select::default().value(val!(1).alias("a")).value(val!(2).alias("b"));
         let row = Row::from(vec![col!(("A", "x")), col!(("A", "y"))]);
@@ -1670,9 +1697,8 @@ mod tests {
     #[test]
     fn test_cte_conversion_top_level_not_in() {
         let expected_sql = indoc!(
-            r#"WITH [cte_0] AS (SELECT @P1 AS [a], @P2 AS [b])
-            SELECT [A].* FROM [A]
-            WHERE [A].[x] NOT IN (SELECT [a] FROM [cte_0] WHERE [b] = [A].[y])"#
+            r#"SELECT [A].* FROM [A]
+            WHERE NOT EXISTS (SELECT 1 WHERE (1=1 AND [A].[x] = @P1 AND [A].[y] = @P2))"#
         )
         .replace('\n', " ");
 
@@ -1689,11 +1715,9 @@ mod tests {
     #[test]
     fn test_cte_conversion_in_a_tree_top_level() {
         let expected_sql = indoc!(
-            r#"WITH [cte_0] AS (SELECT @P1 AS [a], @P2 AS [b])
-            SELECT [A].* FROM [A]
-            WHERE ([A].[y] = @P3
-            AND [A].[z] = @P4
-            AND [A].[x] IN (SELECT [a] FROM [cte_0] WHERE [b] = [A].[y]))"#
+            r#"SELECT [A].* FROM [A]
+            WHERE ([A].[y] = @P1 AND [A].[z] = @P2 AND
+            EXISTS (SELECT 1 WHERE (1=1 AND [A].[x] = @P3 AND [A].[y] = @P4)))"#
         )
         .replace('\n', " ");
 
@@ -1710,7 +1734,7 @@ mod tests {
         assert_eq!(expected_sql, sql);
 
         assert_eq!(
-            vec![Value::int32(1), Value::int32(2), Value::text("bar"), Value::text("foo")],
+            vec![Value::text("bar"), Value::text("foo"), Value::int32(1), Value::int32(2),],
             params
         );
     }
@@ -1718,10 +1742,9 @@ mod tests {
     #[test]
     fn test_cte_conversion_in_a_tree_nested() {
         let expected_sql = indoc!(
-            r#"WITH [cte_0] AS (SELECT @P1 AS [a], @P2 AS [b])
-            SELECT [A].* FROM [A]
-            WHERE ([A].[y] = @P3 OR ([A].[z] = @P4 AND [A].[x] IN
-            (SELECT [a] FROM [cte_0] WHERE [b] = [A].[y])))"#
+            r#"SELECT [A].* FROM [A]
+            WHERE ([A].[y] = @P1 OR ([A].[z] = @P2 AND
+            EXISTS (SELECT 1 WHERE (1=1 AND [A].[x] = @P3 AND [A].[y] = @P4))))"#
         )
         .replace('\n', " ");
 
@@ -1738,7 +1761,7 @@ mod tests {
         assert_eq!(expected_sql, sql);
 
         assert_eq!(
-            vec![Value::int32(1), Value::int32(2), Value::text("bar"), Value::text("foo")],
+            vec![Value::text("bar"), Value::text("foo"), Value::int32(1), Value::int32(2)],
             params
         );
     }
@@ -1746,12 +1769,10 @@ mod tests {
     #[test]
     fn test_multiple_cte_conversions_in_the_ast() {
         let expected_sql = indoc!(
-            r#"WITH
-            [cte_0] AS (SELECT @P1 AS [a], @P2 AS [b]),
-            [cte_1] AS (SELECT @P3 AS [c], @P4 AS [d])
-            SELECT [A].* FROM [A]
-            WHERE ([A].[x] IN (SELECT [a] FROM [cte_0] WHERE [b] = [A].[y])
-            AND [A].[u] NOT IN (SELECT [c] FROM [cte_1] WHERE [d] = [A].[z]))"#
+            r#"SELECT [A].* FROM [A]
+            WHERE
+            (EXISTS (SELECT 1 WHERE (1=1 AND [A].[x] = @P1 AND [A].[y] = @P2)) AND
+            NOT EXISTS (SELECT 1 WHERE (1=1 AND [A].[u] = @P3 AND [A].[z] = @P4)))"#
         )
         .replace('\n', " ");
 
