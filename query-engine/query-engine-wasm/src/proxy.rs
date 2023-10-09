@@ -24,9 +24,9 @@ pub struct CommonProxy {
 
 impl CommonProxy {
     pub(crate) fn new(driver: &JsObject) -> Result<Self> {
-        let query_raw = JsReflect::get(&driver, &"queryRaw".into())?.dyn_into::<JsFunction>()?;
-        let execute_raw = JsReflect::get(&driver, &"executeRaw".into())?.dyn_into::<JsFunction>()?;
-        let flavour: String = JsReflect::get(&driver, &"flavour".into())?
+        let query_raw = JsReflect::get(driver, &"queryRaw".into())?.dyn_into::<JsFunction>()?;
+        let execute_raw = JsReflect::get(driver, &"executeRaw".into())?.dyn_into::<JsFunction>()?;
+        let flavour: String = JsReflect::get(driver, &"flavour".into())?
             .dyn_into::<JsString>()?
             .into();
 
@@ -45,7 +45,7 @@ pub struct DriverProxy {
 
 impl DriverProxy {
     pub(crate) fn new(driver: &JsObject) -> Result<Self> {
-        let start_transaction = JsReflect::get(&driver, &"startTransaction".into())?.dyn_into::<JsFunction>()?;
+        let start_transaction = JsReflect::get(driver, &"startTransaction".into())?.dyn_into::<JsFunction>()?;
 
         let driver_proxy = Self { start_transaction };
         Ok(driver_proxy)

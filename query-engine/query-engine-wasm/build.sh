@@ -16,10 +16,10 @@ sleep 1
 printf '%s\n' "$(jq '. + {"type": "module"} + {"main": "./query_engine.js"} + {"private": false}' $OUT_JSON)" > $OUT_JSON
 
 # Add the version
-printf '%s\n' "$(jq --arg version $OUT_VERSION '. + {"version": $version}' $OUT_JSON)" > $OUT_JSON
+printf '%s\n' "$(jq --arg version "$OUT_VERSION" '. + {"version": $version}' $OUT_JSON)" > $OUT_JSON
 
 # Add the package name
-printf '%s\n' "$(jq --arg name $OUT_NPM_NAME '. + {"name": $name}' $OUT_JSON)" > $OUT_JSON
+printf '%s\n' "$(jq --arg name "$OUT_NPM_NAME" '. + {"name": $name}' $OUT_JSON)" > $OUT_JSON
 
 enable_cf_in_bindings() {
     # Enable Cloudflare Workers in the generated JS bindings.
