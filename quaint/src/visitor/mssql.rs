@@ -1681,7 +1681,7 @@ mod tests {
     #[test]
     fn test_cte_conversion_top_level_in() {
         let expected_sql =
-            indoc!(r#"SELECT [A].* FROM [A] WHERE EXISTS (SELECT 1 WHERE (1=1 AND [A].[x] = @P1 AND [A].[y] = @P2))"#)
+            indoc!(r#"SELECT [A].* FROM [A] WHERE EXISTS (SELECT 1 WHERE ([A].[x] = @P1 AND [A].[y] = @P2))"#)
                 .replace('\n', " ");
 
         let inner = Select::default().value(val!(1).alias("a")).value(val!(2).alias("b"));
@@ -1698,7 +1698,7 @@ mod tests {
     fn test_cte_conversion_top_level_not_in() {
         let expected_sql = indoc!(
             r#"SELECT [A].* FROM [A]
-            WHERE NOT EXISTS (SELECT 1 WHERE (1=1 AND [A].[x] = @P1 AND [A].[y] = @P2))"#
+            WHERE NOT EXISTS (SELECT 1 WHERE ([A].[x] = @P1 AND [A].[y] = @P2))"#
         )
         .replace('\n', " ");
 
@@ -1717,7 +1717,7 @@ mod tests {
         let expected_sql = indoc!(
             r#"SELECT [A].* FROM [A]
             WHERE ([A].[y] = @P1 AND [A].[z] = @P2 AND
-            EXISTS (SELECT 1 WHERE (1=1 AND [A].[x] = @P3 AND [A].[y] = @P4)))"#
+            EXISTS (SELECT 1 WHERE ([A].[x] = @P3 AND [A].[y] = @P4)))"#
         )
         .replace('\n', " ");
 
@@ -1744,7 +1744,7 @@ mod tests {
         let expected_sql = indoc!(
             r#"SELECT [A].* FROM [A]
             WHERE ([A].[y] = @P1 OR ([A].[z] = @P2 AND
-            EXISTS (SELECT 1 WHERE (1=1 AND [A].[x] = @P3 AND [A].[y] = @P4))))"#
+            EXISTS (SELECT 1 WHERE ([A].[x] = @P3 AND [A].[y] = @P4))))"#
         )
         .replace('\n', " ");
 
@@ -1771,8 +1771,8 @@ mod tests {
         let expected_sql = indoc!(
             r#"SELECT [A].* FROM [A]
             WHERE
-            (EXISTS (SELECT 1 WHERE (1=1 AND [A].[x] = @P1 AND [A].[y] = @P2)) AND
-            NOT EXISTS (SELECT 1 WHERE (1=1 AND [A].[u] = @P3 AND [A].[z] = @P4)))"#
+            (EXISTS (SELECT 1 WHERE ([A].[x] = @P1 AND [A].[y] = @P2)) AND
+            NOT EXISTS (SELECT 1 WHERE ([A].[u] = @P3 AND [A].[z] = @P4)))"#
         )
         .replace('\n', " ");
 
