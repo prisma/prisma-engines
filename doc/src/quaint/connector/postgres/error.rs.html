@@ -352,8 +352,6 @@
 <a href="#352" id="352">352</a>
 <a href="#353" id="353">353</a>
 <a href="#354" id="354">354</a>
-<a href="#355" id="355">355</a>
-<a href="#356" id="356">356</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::fmt::{Display, Formatter};
 
 <span class="kw">use </span>tokio_postgres::error::DbError;
@@ -621,8 +619,7 @@
             <span class="kw">return </span>io_error;
         }
 
-        <span class="attr">#[cfg(feature = <span class="string">&quot;uuid&quot;</span>)]
-        </span><span class="kw">if let </span><span class="prelude-val">Some</span>(uuid_error) = try_extracting_uuid_error(<span class="kw-2">&amp;</span>e) {
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(uuid_error) = try_extracting_uuid_error(<span class="kw-2">&amp;</span>e) {
             <span class="kw">return </span>uuid_error;
         }
 
@@ -668,8 +665,7 @@
     }
 }
 
-<span class="attr">#[cfg(feature = <span class="string">&quot;uuid&quot;</span>)]
-</span><span class="kw">fn </span>try_extracting_uuid_error(err: <span class="kw-2">&amp;</span>tokio_postgres::error::Error) -&gt; <span class="prelude-ty">Option</span>&lt;Error&gt; {
+<span class="kw">fn </span>try_extracting_uuid_error(err: <span class="kw-2">&amp;</span>tokio_postgres::error::Error) -&gt; <span class="prelude-ty">Option</span>&lt;Error&gt; {
     <span class="kw">use </span>std::error::Error <span class="kw">as _</span>;
 
     err.source()

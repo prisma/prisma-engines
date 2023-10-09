@@ -293,7 +293,6 @@
 <a href="#293" id="293">293</a>
 <a href="#294" id="294">294</a>
 <a href="#295" id="295">295</a>
-<a href="#296" id="296">296</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::convert::TryFrom;
 
 <span class="kw">use crate</span>::{
@@ -569,8 +568,7 @@
                 ToSqlOutput::from(stringified)
             }),
             ValueType::Xml(cow) =&gt; cow.as_ref().map(|cow| ToSqlOutput::from(cow.as_ref())),
-            <span class="attr">#[cfg(feature = <span class="string">&quot;uuid&quot;</span>)]
-            </span>ValueType::Uuid(value) =&gt; value.map(|value| ToSqlOutput::from(value.hyphenated().to_string())),
+            ValueType::Uuid(value) =&gt; value.map(|value| ToSqlOutput::from(value.hyphenated().to_string())),
             ValueType::DateTime(value) =&gt; value.map(|value| ToSqlOutput::from(value.timestamp_millis())),
             ValueType::Date(date) =&gt; date
                 .and_then(|date| date.and_hms_opt(<span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>))

@@ -1164,8 +1164,6 @@
 <a href="#1164" id="1164">1164</a>
 <a href="#1165" id="1165">1165</a>
 <a href="#1166" id="1166">1166</a>
-<a href="#1167" id="1167">1167</a>
-<a href="#1168" id="1168">1168</a>
 </pre></div><pre class="rust"><code><span class="kw">use crate</span>::{
     ast::<span class="kw-2">*</span>,
     visitor::{<span class="self">self</span>, Visitor},
@@ -1398,8 +1396,7 @@
                 .map(|j| <span class="self">self</span>.write(<span class="macro">format!</span>(<span class="string">&quot;&#39;{}&#39;&quot;</span>, serde_json::to_string(<span class="kw-2">&amp;</span>j).unwrap()))),
 
             ValueType::Numeric(r) =&gt; r.as_ref().map(|r| <span class="self">self</span>.write(r)),
-            <span class="attr">#[cfg(feature = <span class="string">&quot;uuid&quot;</span>)]
-            </span>ValueType::Uuid(uuid) =&gt; uuid.map(|uuid| <span class="self">self</span>.write(<span class="macro">format!</span>(<span class="string">&quot;&#39;{}&#39;&quot;</span>, uuid.hyphenated()))),
+            ValueType::Uuid(uuid) =&gt; uuid.map(|uuid| <span class="self">self</span>.write(<span class="macro">format!</span>(<span class="string">&quot;&#39;{}&#39;&quot;</span>, uuid.hyphenated()))),
             ValueType::DateTime(dt) =&gt; dt.map(|dt| <span class="self">self</span>.write(<span class="macro">format!</span>(<span class="string">&quot;&#39;{}&#39;&quot;</span>, dt.to_rfc3339(),))),
             ValueType::Date(date) =&gt; date.map(|date| <span class="self">self</span>.write(<span class="macro">format!</span>(<span class="string">&quot;&#39;{date}&#39;&quot;</span>))),
             ValueType::Time(time) =&gt; time.map(|time| <span class="self">self</span>.write(<span class="macro">format!</span>(<span class="string">&quot;&#39;{time}&#39;&quot;</span>))),
@@ -2188,7 +2185,6 @@
     }
 
     <span class="attr">#[test]
-    #[cfg(feature = <span class="string">&quot;uuid&quot;</span>)]
     </span><span class="kw">fn </span>test_raw_uuid() {
         <span class="kw">let </span>uuid = uuid::Uuid::new_v4();
         <span class="kw">let </span>(sql, params) = Postgres::build(Select::default().value(uuid.raw())).unwrap();

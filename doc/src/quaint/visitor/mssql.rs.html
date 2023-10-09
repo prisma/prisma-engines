@@ -1801,8 +1801,6 @@
 <a href="#1801" id="1801">1801</a>
 <a href="#1802" id="1802">1802</a>
 <a href="#1803" id="1803">1803</a>
-<a href="#1804" id="1804">1804</a>
-<a href="#1805" id="1805">1805</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span><span class="kw">super</span>::Visitor;
 <span class="attr">#[cfg(any(feature = <span class="string">&quot;postgresql&quot;</span>, feature = <span class="string">&quot;mysql&quot;</span>))]
 </span><span class="kw">use </span><span class="kw">crate</span>::prelude::{JsonExtract, JsonType, JsonUnquote};
@@ -2147,8 +2145,7 @@
             ValueType::Json(j) =&gt; j.map(|j| <span class="self">self</span>.write(<span class="macro">format!</span>(<span class="string">&quot;&#39;{}&#39;&quot;</span>, serde_json::to_string(<span class="kw-2">&amp;</span>j).unwrap()))),
 
             ValueType::Numeric(r) =&gt; r.map(|r| <span class="self">self</span>.write(r)),
-            <span class="attr">#[cfg(feature = <span class="string">&quot;uuid&quot;</span>)]
-            </span>ValueType::Uuid(uuid) =&gt; uuid.map(|uuid| {
+            ValueType::Uuid(uuid) =&gt; uuid.map(|uuid| {
                 <span class="kw">let </span>s = <span class="macro">format!</span>(<span class="string">&quot;CONVERT(uniqueidentifier, N&#39;{}&#39;)&quot;</span>, uuid.hyphenated());
                 <span class="self">self</span>.write(s)
             }),
@@ -3057,7 +3054,6 @@
     }
 
     <span class="attr">#[test]
-    #[cfg(feature = <span class="string">&quot;uuid&quot;</span>)]
     </span><span class="kw">fn </span>test_raw_uuid() {
         <span class="kw">let </span>uuid = uuid::Uuid::new_v4();
         <span class="kw">let </span>(sql, params) = Mssql::build(Select::default().value(uuid.raw())).unwrap();

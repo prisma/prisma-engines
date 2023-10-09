@@ -85,7 +85,6 @@
 <a href="#85" id="85">85</a>
 <a href="#86" id="86">86</a>
 <a href="#87" id="87">87</a>
-<a href="#88" id="88">88</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::ast::{Value, ValueType};
 
 <span class="kw">use </span>bigdecimal::BigDecimal;
@@ -110,8 +109,7 @@
             ValueType::Array(<span class="kw">_</span>) | ValueType::EnumArray(<span class="kw">_</span>, <span class="kw">_</span>) =&gt; <span class="macro">panic!</span>(<span class="string">&quot;Arrays are not supported on SQL Server.&quot;</span>),
             ValueType::Numeric(val) =&gt; (<span class="kw-2">*</span>val).to_sql(),
             ValueType::Json(val) =&gt; val.as_ref().map(|val| serde_json::to_string(<span class="kw-2">&amp;</span>val).unwrap()).into_sql(),
-            <span class="attr">#[cfg(feature = <span class="string">&quot;uuid&quot;</span>)]
-            </span>ValueType::Uuid(val) =&gt; val.into_sql(),
+            ValueType::Uuid(val) =&gt; val.into_sql(),
             ValueType::DateTime(val) =&gt; val.into_sql(),
             ValueType::Date(val) =&gt; val.into_sql(),
             ValueType::Time(val) =&gt; val.into_sql(),

@@ -934,14 +934,6 @@
 <a href="#934" id="934">934</a>
 <a href="#935" id="935">935</a>
 <a href="#936" id="936">936</a>
-<a href="#937" id="937">937</a>
-<a href="#938" id="938">938</a>
-<a href="#939" id="939">939</a>
-<a href="#940" id="940">940</a>
-<a href="#941" id="941">941</a>
-<a href="#942" id="942">942</a>
-<a href="#943" id="943">943</a>
-<a href="#944" id="944">944</a>
 </pre></div><pre class="rust"><code><span class="kw">mod </span>decimal;
 
 <span class="kw">use crate</span>::{
@@ -963,8 +955,7 @@
     Row <span class="kw">as </span>PostgresRow, Statement <span class="kw">as </span>PostgresStatement,
 };
 
-<span class="attr">#[cfg(feature = <span class="string">&quot;uuid&quot;</span>)]
-</span><span class="kw">use </span>uuid::Uuid;
+<span class="kw">use </span>uuid::Uuid;
 
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>conv_params&lt;<span class="lifetime">&#39;a</span>&gt;(params: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>[Value&lt;<span class="lifetime">&#39;a</span>&gt;]) -&gt; Vec&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>(<span class="kw">dyn </span>types::ToSql + Sync)&gt; {
     params.iter().map(|x| x <span class="kw">as </span><span class="kw-2">&amp;</span>(<span class="kw">dyn </span>ToSql + Sync)).collect::&lt;Vec&lt;<span class="kw">_</span>&gt;&gt;()
@@ -995,8 +986,7 @@
                 ValueType::Numeric(<span class="kw">_</span>) =&gt; PostgresType::NUMERIC,
                 ValueType::Json(<span class="kw">_</span>) =&gt; PostgresType::JSONB,
                 ValueType::Xml(<span class="kw">_</span>) =&gt; PostgresType::XML,
-                <span class="attr">#[cfg(feature = <span class="string">&quot;uuid&quot;</span>)]
-                </span>ValueType::Uuid(<span class="kw">_</span>) =&gt; PostgresType::UUID,
+                ValueType::Uuid(<span class="kw">_</span>) =&gt; PostgresType::UUID,
                 ValueType::DateTime(<span class="kw">_</span>) =&gt; PostgresType::TIMESTAMPTZ,
                 ValueType::Date(<span class="kw">_</span>) =&gt; PostgresType::TIMESTAMP,
                 ValueType::Time(<span class="kw">_</span>) =&gt; PostgresType::TIME,
@@ -1032,8 +1022,7 @@
                         ValueType::Numeric(<span class="kw">_</span>) =&gt; PostgresType::NUMERIC_ARRAY,
                         ValueType::Json(<span class="kw">_</span>) =&gt; PostgresType::JSONB_ARRAY,
                         ValueType::Xml(<span class="kw">_</span>) =&gt; PostgresType::XML_ARRAY,
-                        <span class="attr">#[cfg(feature = <span class="string">&quot;uuid&quot;</span>)]
-                        </span>ValueType::Uuid(<span class="kw">_</span>) =&gt; PostgresType::UUID_ARRAY,
+                        ValueType::Uuid(<span class="kw">_</span>) =&gt; PostgresType::UUID_ARRAY,
                         ValueType::DateTime(<span class="kw">_</span>) =&gt; PostgresType::TIMESTAMPTZ_ARRAY,
                         ValueType::Date(<span class="kw">_</span>) =&gt; PostgresType::TIMESTAMP_ARRAY,
                         ValueType::Time(<span class="kw">_</span>) =&gt; PostgresType::TIME_ARRAY,
@@ -1204,16 +1193,14 @@
                     }
                     <span class="prelude-val">None </span>=&gt; Value::null_time(),
                 },
-                <span class="attr">#[cfg(feature = <span class="string">&quot;uuid&quot;</span>)]
-                </span>PostgresType::UUID =&gt; <span class="kw">match </span>row.try_get(i)<span class="question-mark">? </span>{
+                PostgresType::UUID =&gt; <span class="kw">match </span>row.try_get(i)<span class="question-mark">? </span>{
                     <span class="prelude-val">Some</span>(val) =&gt; {
                         <span class="kw">let </span>val: Uuid = val;
                         Value::uuid(val)
                     }
                     <span class="prelude-val">None </span>=&gt; ValueType::Uuid(<span class="prelude-val">None</span>).into_value(),
                 },
-                <span class="attr">#[cfg(feature = <span class="string">&quot;uuid&quot;</span>)]
-                </span>PostgresType::UUID_ARRAY =&gt; <span class="kw">match </span>row.try_get(i)<span class="question-mark">? </span>{
+                PostgresType::UUID_ARRAY =&gt; <span class="kw">match </span>row.try_get(i)<span class="question-mark">? </span>{
                     <span class="prelude-val">Some</span>(val) =&gt; {
                         <span class="kw">let </span>val: Vec&lt;<span class="prelude-ty">Option</span>&lt;Uuid&gt;&gt; = val;
                         <span class="kw">let </span>val = val.into_iter().map(ValueType::Uuid);
@@ -1715,13 +1702,11 @@
             (ValueType::Numeric(float), <span class="kw">_</span>) =&gt; float
                 .as_ref()
                 .map(|float| DecimalWrapper(float.clone()).to_sql(ty, out)),
-            <span class="attr">#[cfg(feature = <span class="string">&quot;uuid&quot;</span>)]
-            </span>(ValueType::Text(string), <span class="kw-2">&amp;</span>PostgresType::UUID) =&gt; string.as_ref().map(|string| {
+            (ValueType::Text(string), <span class="kw-2">&amp;</span>PostgresType::UUID) =&gt; string.as_ref().map(|string| {
                 <span class="kw">let </span>parsed_uuid: Uuid = string.parse()<span class="question-mark">?</span>;
                 parsed_uuid.to_sql(ty, out)
             }),
-            <span class="attr">#[cfg(feature = <span class="string">&quot;uuid&quot;</span>)]
-            </span>(ValueType::Array(values), <span class="kw-2">&amp;</span>PostgresType::UUID_ARRAY) =&gt; values.as_ref().map(|values| {
+            (ValueType::Array(values), <span class="kw-2">&amp;</span>PostgresType::UUID_ARRAY) =&gt; values.as_ref().map(|values| {
                 <span class="kw">let </span>parsed_uuid: Vec&lt;<span class="prelude-ty">Option</span>&lt;Uuid&gt;&gt; = values
                     .iter()
                     .map(&lt;<span class="prelude-ty">Option</span>&lt;Uuid&gt;&gt;::try_from)
@@ -1793,8 +1778,7 @@
             }
             (ValueType::Json(value), <span class="kw">_</span>) =&gt; value.as_ref().map(|value| value.to_sql(ty, out)),
             (ValueType::Xml(value), <span class="kw">_</span>) =&gt; value.as_ref().map(|value| value.to_sql(ty, out)),
-            <span class="attr">#[cfg(feature = <span class="string">&quot;uuid&quot;</span>)]
-            </span>(ValueType::Uuid(value), <span class="kw">_</span>) =&gt; value.map(|value| value.to_sql(ty, out)),
+            (ValueType::Uuid(value), <span class="kw">_</span>) =&gt; value.map(|value| value.to_sql(ty, out)),
             (ValueType::DateTime(value), <span class="kw-2">&amp;</span>PostgresType::DATE) =&gt; value.map(|value| value.date_naive().to_sql(ty, out)),
             (ValueType::Date(value), <span class="kw">_</span>) =&gt; value.map(|value| value.to_sql(ty, out)),
             (ValueType::Time(value), <span class="kw">_</span>) =&gt; value.map(|value| value.to_sql(ty, out)),

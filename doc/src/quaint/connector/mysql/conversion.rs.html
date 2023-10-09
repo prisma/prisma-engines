@@ -337,7 +337,6 @@
 <a href="#337" id="337">337</a>
 <a href="#338" id="338">338</a>
 <a href="#339" id="339">339</a>
-<a href="#340" id="340">340</a>
 </pre></div><pre class="rust"><code><span class="kw">use crate</span>::{
     ast::{Value, ValueType},
     connector::{queryable::TakeRow, TypeIdentifier},
@@ -390,8 +389,7 @@
                     }
                     <span class="prelude-val">None </span>=&gt; <span class="prelude-val">None</span>,
                 },
-                <span class="attr">#[cfg(feature = <span class="string">&quot;uuid&quot;</span>)]
-                </span>ValueType::Uuid(u) =&gt; u.map(|u| my::Value::Bytes(u.hyphenated().to_string().into_bytes())),
+                ValueType::Uuid(u) =&gt; u.map(|u| my::Value::Bytes(u.hyphenated().to_string().into_bytes())),
                 ValueType::Date(d) =&gt; {
                     d.map(|d| my::Value::Date(d.year() <span class="kw">as </span>u16, d.month() <span class="kw">as </span>u8, d.day() <span class="kw">as </span>u8, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>))
                 }
