@@ -117,7 +117,16 @@ impl FilterVisitor {
         ctx: &Context<'_>,
     ) -> (ModelProjection, Select<'static>) {
         let is_many_to_many = filter.field.relation().is_many_to_many();
-        let support_row_in = ctx.capabilities.contains(ConnectorCapability::RowIn);
+        // HACK: This is temporary. A fix should be done in Quaint instead of branching out here.
+        // See https://www.notion.so/prismaio/Spec-Faulty-Tuple-Join-on-SQL-Server-55b8232fb44f4a6cb4d3f36428f17bac
+        // for more info
+        let support_row_in = filter
+            .field
+            .dm
+            .schema
+            .connector
+            .capabilities()
+            .contains(ConnectorCapability::RowIn);
         let has_compound_fields = filter.field.linking_fields().into_inner().len() > 1;
 
         // If the relation is an M2M relation we don't have a choice but to join

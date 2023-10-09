@@ -54,7 +54,6 @@ impl PrismaContext {
         let executor_fut = tokio::spawn(async move {
             let config = &arced_schema_2.configuration;
             let preview_features = config.preview_features();
-            let capabilities = arced_schema_2.connector.capabilities();
 
             // We only support one data source at the moment, so take the first one (default not exposed yet).
             let data_source = config
@@ -65,7 +64,7 @@ impl PrismaContext {
             let url = data_source.load_url(|key| env::var(key).ok())?;
             // Load executor
             let connector_mode = ConnectorMode::Rust;
-            let executor = load_executor(connector_mode, data_source, preview_features, capabilities, &url).await?;
+            let executor = load_executor(connector_mode, data_source, preview_features, &url).await?;
             executor.primary_connector().get_connection().await?;
             PrismaResult::<_>::Ok(executor)
         });

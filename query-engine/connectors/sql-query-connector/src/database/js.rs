@@ -7,7 +7,6 @@ use connector_interface::{
     Connection, Connector,
 };
 use once_cell::sync::Lazy;
-use psl::datamodel_connector::ConnectorCapabilities;
 use quaint::{
     connector::{IsolationLevel, Transaction},
     prelude::{Queryable as QuaintQueryable, *},
@@ -37,7 +36,6 @@ pub struct Js {
     connector: DriverAdapter,
     connection_info: ConnectionInfo,
     features: psl::PreviewFeatures,
-    capabilities: ConnectorCapabilities,
 }
 
 fn get_connection_info(url: &str) -> connector::Result<ConnectionInfo> {
@@ -55,7 +53,6 @@ impl FromSource for Js {
         source: &psl::Datasource,
         url: &str,
         features: psl::PreviewFeatures,
-        capabilities: ConnectorCapabilities,
     ) -> connector_interface::Result<Js> {
         let connector = active_driver_adapter(source.active_provider)?;
         let connection_info = get_connection_info(url)?;
@@ -64,7 +61,6 @@ impl FromSource for Js {
             connector,
             connection_info,
             features,
-            capabilities,
         })
     }
 }
@@ -73,12 +69,7 @@ impl FromSource for Js {
 impl Connector for Js {
     async fn get_connection<'a>(&'a self) -> connector::Result<Box<dyn Connection + Send + Sync + 'static>> {
         super::catch(self.connection_info.clone(), async move {
-            let sql_conn = SqlConnection::new(
-                self.connector.clone(),
-                &self.connection_info,
-                self.features,
-                self.capabilities,
-            );
+            let sql_conn = SqlConnection::new(self.connector.clone(), &self.connection_info, self.features);
             Ok(Box::new(sql_conn) as Box<dyn Connection + Send + Sync + 'static>)
         })
         .await

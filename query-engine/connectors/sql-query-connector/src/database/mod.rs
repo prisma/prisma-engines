@@ -11,7 +11,6 @@ pub(crate) mod operations;
 
 use async_trait::async_trait;
 use connector_interface::{error::ConnectorError, Connector};
-use psl::datamodel_connector::ConnectorCapabilities;
 
 #[cfg(feature = "driver-adapters")]
 pub use js::*;
@@ -36,7 +35,6 @@ pub trait FromSource {
         source: &psl::Datasource,
         url: &str,
         features: psl::PreviewFeatures,
-        capabilities: ConnectorCapabilities,
     ) -> connector_interface::Result<Self>
     where
         Self: Connector + Sized;
