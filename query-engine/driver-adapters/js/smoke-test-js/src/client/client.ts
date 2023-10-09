@@ -120,6 +120,8 @@ export async function smokeTestClient(driverAdapter: DriverAdapter) {
               isolationLevel: 'Serializable',
             })
 
+            console.log("queries", queries)
+
             if (isUsingDriverAdapters) {
               assert.equal(queries.at(0), '-- Implicit "BEGIN" query via underlying driver')
               assert.equal(queries.at(-1), '-- Implicit "COMMIT" query via underlying driver')
