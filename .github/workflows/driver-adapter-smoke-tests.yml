@@ -37,6 +37,7 @@ jobs:
         ports:
           - 5432:5432
 
+    # via package.json rewritten into DATABASE_URL before scripts are run
     env:
       JS_NEON_DATABASE_URL: ${{ secrets.JS_NEON_DATABASE_URL }}
       JS_PLANETSCALE_DATABASE_URL: ${{ secrets.JS_PLANETSCALE_DATABASE_URL }}
@@ -77,6 +78,52 @@ jobs:
         run: pnpm ${{ matrix.adapter }}:client
         if: always()
         working-directory: ./query-engine/driver-adapters/js/smoke-test-js
+
+
+  driver-adapter-smoke-tests-errors:
+    name: Errors
+
+    runs-on: ubuntu-latest
+
+    # services:
+    #   postgres:
+    #     image: postgres
+    #     env:
+    #       POSTGRES_PASSWORD: postgres
+    #     options: >-
+    #       --health-cmd pg_isready
+    #       --health-interval 10s
+    #       --health-timeout 5s
+    #       --health-retries 5
+    #     ports:
+    #       - 5432:5432
+
+    env:
+      # via package.json rewritten into DATABASE_URL before scripts are run
+      JS_PG_DATABASE_URL: postgres://postgres:postgres@localhost:5432/test
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: dtolnay/rust-toolchain@stable
+
+      - uses: pnpm/action-setup@v2
+        with:
+          version: 8
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 18
+          #cache: 'pnpm'
+
+      - name: Compile Query Engine
+        run: cargo build -p query-engine-node-api
+
+      - name: Install Dependencies (Driver Adapters)
+        run: pnpm install
+        working-directory: ./query-engine/driver-adapters/js
+      - name: Build Driver Adapters
+        run: pnpm build
+        working-directory: ./query-engine/driver-adapters/js
 
       - name: pnpm errors
         run: pnpm errors
