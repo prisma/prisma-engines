@@ -323,6 +323,89 @@ mod one_relation {
         Ok(())
     }
 
+    // https://github.com/prisma/prisma/issues/21356
+    fn schema_21356() -> String {
+        let schema = indoc! {
+            r#"model User {
+                #id(id, Int, @id)
+                name String?
+            
+                posts Post[]
+            
+                userId  Int
+                userId2 Int
+                @@unique([userId, userId2])
+            }
+            
+            model Post {
+                #id(id, Int, @id)
+                title String?
+            
+                userId   Int?
+                userId_2 Int?
+                author User? @relation(fields: [userId, userId_2], references: [userId, userId2])
+            }"#
+        };
+
+        schema.to_owned()
+    }
+
+    #[connector_test(schema(schema_21356))]
+    async fn repro_21356(runner: Runner) -> TestResult<()> {
+        run_query!(
+            &runner,
+            r#"mutation { createOneUser(data: { id: 1, userId: 1, userId2: 1, name: "Bob", posts: { create: { id: 1, title: "Hello" } } }) { id } }"#
+        );
+
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"{ findManyUser(where: { posts: { some: { author: { name: "Bob" } } } }) { id } }"#),
+          @r###"{"data":{"findManyUser":[{"id":1}]}}"###
+        );
+
+        Ok(())
+    }
+
+    // https://github.com/prisma/prisma/issues/21366
+    fn schema_21366() -> String {
+        let schema = indoc! {
+            r#"model device {
+                #id(id, Int, @id)
+
+                device_id String @unique   
+                current_state device_state? @relation(fields: [device_id], references: [device_id], onDelete: NoAction)
+              }
+              
+              model device_state {
+                #id(id, Int, @id)
+
+                device_id String   @unique
+                device    device[]
+              }"#
+        };
+
+        schema.to_owned()
+    }
+
+    #[connector_test(schema(schema_21366))]
+    async fn repro_21366(runner: Runner) -> TestResult<()> {
+        run_query!(
+            &runner,
+            r#"mutation {
+                createOnedevice(data: { id: 1, current_state: { create: { id: 1, device_id: "1" } } }) {
+                  id
+                }
+              }
+            "#
+        );
+
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"{ findManydevice_state(where: { device: { some: { device_id: "1" } } }) { id } }"#),
+          @r###"{"data":{"findManydevice_state":[{"id":1}]}}"###
+        );
+
+        Ok(())
+    }
+
     async fn test_data(runner: &Runner) -> TestResult<()> {
         runner
             .query(indoc! { r#"
