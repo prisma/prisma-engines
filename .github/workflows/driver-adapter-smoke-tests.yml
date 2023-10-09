@@ -37,6 +37,7 @@ jobs:
         ports:
           - 5432:5432
 
+    # via package.json rewritten into DATABASE_URL before scripts are run
     env:
       JS_NEON_DATABASE_URL: ${{ secrets.JS_NEON_DATABASE_URL }}
       JS_PLANETSCALE_DATABASE_URL: ${{ secrets.JS_PLANETSCALE_DATABASE_URL }}
@@ -98,7 +99,8 @@ jobs:
     #       - 5432:5432
 
     env:
-      DATABASE_URL: postgres://postgres:postgres@localhost:5432/test
+      # via package.json rewritten into DATABASE_URL before scripts are run
+      JS_PG_DATABASE_URL: postgres://postgres:postgres@localhost:5432/test
 
     steps:
       - uses: actions/checkout@v4
