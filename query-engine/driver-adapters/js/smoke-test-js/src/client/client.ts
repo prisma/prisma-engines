@@ -23,7 +23,7 @@ export async function smokeTestClient(driverAdapter: DriverAdapter) {
     const isUsingDriverAdapters = adapter !== null
     describe(isUsingDriverAdapters ? `using Driver Adapters` : `using Rust drivers`, () => {
       
-      it('expected error on duplicate insert', async () => {
+      it('expected error (on duplicate insert) as exception thrown / promise rejected', async () => {
         const prisma = new PrismaClient({ adapter, log })
 
         await assert.rejects(
@@ -137,19 +137,22 @@ export async function smokeTestClient(driverAdapter: DriverAdapter) {
             )
           })
 
-          it('bytes type support', async () => {
-            const prisma = new PrismaClient({ adapter, log })
-
-            const result = await prisma.type_test_3.create({
-              data: {
-                bytes: Buffer.from([1, 2, 3, 4]),
-              },
-            })
-
-            assert.deepEqual(result.bytes, Buffer.from([1, 2, 3, 4]))
-          })
         })
+
       }
+
+      it('bytes type support', async () => {
+        const prisma = new PrismaClient({ adapter, log })
+
+        const result = await prisma.type_test_3.create({
+          data: {
+            bytes: Buffer.from([1, 2, 3, 4]),
+          },
+        })
+
+        assert.deepEqual(result.bytes, Buffer.from([1, 2, 3, 4]))
+      })
+
     })
   }
 }

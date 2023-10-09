@@ -282,7 +282,7 @@ export function smokeTestLibquery(adapter: ErrorCapturingDriverAdapter, prismaSc
       console.log('[nodejs] commited', commitResponse)
     })
 
-    it('expected error', async () => {
+    it('expected error (on duplicate insert) as json result (not throwing error)', async () => {
       const result = await doQuery({
         modelName: 'Unique',
         action: 'createOne',
