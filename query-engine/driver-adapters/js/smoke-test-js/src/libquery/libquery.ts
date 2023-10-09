@@ -283,6 +283,17 @@ export function smokeTestLibquery(adapter: ErrorCapturingDriverAdapter, prismaSc
     })
 
     it('expected error (on duplicate insert) as json result (not throwing error)', async () => {
+      // clean up first
+      await doQuery({
+        modelName: 'Unique',
+        action: 'deleteMany',
+        query: {
+          selection: {
+            count: true,
+          },
+        },
+      })
+
       const result = await doQuery({
         modelName: 'Unique',
         action: 'createOne',
@@ -295,6 +306,8 @@ export function smokeTestLibquery(adapter: ErrorCapturingDriverAdapter, prismaSc
           },
         },
       })
+      console.log('[nodejs] error result1', JSON.stringify(result, null, 2))
+
       const result2 = await doQuery({
         modelName: 'Unique',
         action: 'createOne',
@@ -307,8 +320,8 @@ export function smokeTestLibquery(adapter: ErrorCapturingDriverAdapter, prismaSc
           },
         },
       })
-      console.log('[nodejs] error result', JSON.stringify(result, null, 2),  JSON.stringify(result2, null, 2))
-      
+      console.log('[nodejs] error result2', JSON.stringify(result2, null, 2))
+    
       // TODO assert that result2 includes `errors.error` (which should currently only pass on neon:ws)
       
     })
