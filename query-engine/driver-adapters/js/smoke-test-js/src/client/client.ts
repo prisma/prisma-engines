@@ -97,7 +97,11 @@ export async function smokeTestClient(driverAdapter: DriverAdapter) {
           })
 
           if (['mysql'].includes(provider)) {
-            assert.deepEqual(queries.slice(0, 2), ['SET TRANSACTION ISOLATION LEVEL READ COMMITTED', 'BEGIN'])
+            if (isUsingDriverAdapters) {
+              assert.deepEqual(queries.slice(0, 2), ['SET TRANSACTION ISOLATION LEVEL READ COMMITTED', '-- Implicit "BEGIN" query via underlying driver'])
+            } else {
+              assert.deepEqual(queries.slice(0, 2), ['SET TRANSACTION ISOLATION LEVEL READ COMMITTED', 'BEGIN'])
+            }
           } else if (['postgres'].includes(provider)) {
             assert.deepEqual(queries.slice(0, 2), ['BEGIN', 'SET TRANSACTION ISOLATION LEVEL READ COMMITTED'])
           }
