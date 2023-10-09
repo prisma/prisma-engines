@@ -1,0 +1,1 @@
+export { PrismaTiDBCloud } from './tidbcloud'
