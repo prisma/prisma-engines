@@ -20,6 +20,8 @@ In the current directoy:
   pnpm i
   ```
 
+(or run `sh ./setup.sh`)
+
 Anywhere in the repository:
 - Run `cargo build -p query-engine-node-api` to compile the `libquery` Query Engine
 
