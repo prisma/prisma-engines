@@ -273,7 +273,6 @@ impl<'a> ToSql for Value<'a> {
                 ToSqlOutput::from(stringified)
             }),
             ValueType::Xml(cow) => cow.as_ref().map(|cow| ToSqlOutput::from(cow.as_ref())),
-            #[cfg(feature = "uuid")]
             ValueType::Uuid(value) => value.map(|value| ToSqlOutput::from(value.hyphenated().to_string())),
             ValueType::DateTime(value) => value.map(|value| ToSqlOutput::from(value.timestamp_millis())),
             ValueType::Date(date) => date
