@@ -22,11 +22,25 @@ export async function smokeTestClient(driverAdapter: DriverAdapter) {
   for (const adapter of [driverAdapter, null]) {
     const isUsingDriverAdapters = adapter !== null
     describe(isUsingDriverAdapters ? `using Driver Adapters` : `using Rust drivers`, () => {
+      
+      it('expected error on duplicate insert', async () => {
+        const prisma = new PrismaClient({ adapter, log })
+
+        await assert.rejects(
+          async () => {
+            const result = await prisma.unique.create({ data: { email: 'duplicate@example.com' } })
+            const result2 = await prisma.unique.create({ data: { email: 'duplicate@example.com' } })
+          },
+          (err) => {
+            assert.match(err.message, /unique/i);
+            return true;
+          },
+        );
+      
+      })
+
       it('batch queries', async () => {
-        const prisma = new PrismaClient({
-          adapter,
-          log,
-        })
+        const prisma = new PrismaClient({ adapter, log })
 
         const queries: string[] = []
         prisma.$on('query', ({ query }) => queries.push(query))
