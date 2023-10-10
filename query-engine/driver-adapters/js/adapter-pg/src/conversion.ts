@@ -1,7 +1,7 @@
 import { ColumnTypeEnum, type ColumnType, JsonNullMarker } from '@prisma/driver-adapter-utils'
 import { types } from 'pg'
 
-const PgColumnType = types.builtins
+const ScalarColumnType = types.builtins
 
 /**
  * PostgreSQL array column types (not defined in PgColumnType).
@@ -35,43 +35,43 @@ const ArrayColumnType = {
  */
 export function fieldToColumnType(fieldTypeId: number): ColumnType {
   switch (fieldTypeId) {
-    case PgColumnType['INT2']:
-    case PgColumnType['INT4']:
+    case ScalarColumnType['INT2']:
+    case ScalarColumnType['INT4']:
       return ColumnTypeEnum.Int32
-    case PgColumnType['INT8']:
+    case ScalarColumnType['INT8']:
       return ColumnTypeEnum.Int64
-    case PgColumnType['FLOAT4']:
+    case ScalarColumnType['FLOAT4']:
       return ColumnTypeEnum.Float
-    case PgColumnType['FLOAT8']:
+    case ScalarColumnType['FLOAT8']:
       return ColumnTypeEnum.Double
-    case PgColumnType['BOOL']:
+    case ScalarColumnType['BOOL']:
       return ColumnTypeEnum.Boolean
-    case PgColumnType['DATE']:
+    case ScalarColumnType['DATE']:
       return ColumnTypeEnum.Date
-    case PgColumnType['TIME']:
+    case ScalarColumnType['TIME']:
       return ColumnTypeEnum.Time
-    case PgColumnType['TIMESTAMP']:
+    case ScalarColumnType['TIMESTAMP']:
       return ColumnTypeEnum.DateTime
-    case PgColumnType['NUMERIC']:
-    case PgColumnType['MONEY']:
+    case ScalarColumnType['NUMERIC']:
+    case ScalarColumnType['MONEY']:
       return ColumnTypeEnum.Numeric
-    case PgColumnType['JSON']:
-    case PgColumnType['JSONB']:
+    case ScalarColumnType['JSON']:
+    case ScalarColumnType['JSONB']:
       return ColumnTypeEnum.Json
-    case PgColumnType['UUID']:
+    case ScalarColumnType['UUID']:
       return ColumnTypeEnum.Uuid
-    case PgColumnType['OID']:
+    case ScalarColumnType['OID']:
       return ColumnTypeEnum.Int64
-    case PgColumnType['BPCHAR']:
-    case PgColumnType['TEXT']:
-    case PgColumnType['VARCHAR']:
-    case PgColumnType['BIT']:
-    case PgColumnType['VARBIT']:
-    case PgColumnType['INET']:
-    case PgColumnType['CIDR']:
-    case PgColumnType['XML']:
+    case ScalarColumnType['BPCHAR']:
+    case ScalarColumnType['TEXT']:
+    case ScalarColumnType['VARCHAR']:
+    case ScalarColumnType['BIT']:
+    case ScalarColumnType['VARBIT']:
+    case ScalarColumnType['INET']:
+    case ScalarColumnType['CIDR']:
+    case ScalarColumnType['XML']:
       return ColumnTypeEnum.Text
-    case PgColumnType['BYTEA']:
+    case ScalarColumnType['BYTEA']:
       return ColumnTypeEnum.Bytes
 
     case ArrayColumnType.INT2_ARRAY:
@@ -131,7 +131,7 @@ function convertJson(json: string): unknown {
 }
 
 // Original BYTEA parser
-const parsePgBytes = types.getTypeParser(PgColumnType.BYTEA) as (_: string) => Buffer
+const parsePgBytes = types.getTypeParser(ScalarColumnType.BYTEA) as (_: string) => Buffer
 
 /**
  * Convert bytes to a JSON-encodable representation since we can't
@@ -155,13 +155,13 @@ function encodeBuffer(buffer: Buffer) {
 }
 
 // return string instead of JavaScript Date object
-types.setTypeParser(PgColumnType.TIME, date => date)
-types.setTypeParser(PgColumnType.DATE, date => date)
-types.setTypeParser(PgColumnType.TIMESTAMP, date => date)
-types.setTypeParser(PgColumnType.JSONB, convertJson)
-types.setTypeParser(PgColumnType.JSON, convertJson)
-types.setTypeParser(PgColumnType.MONEY, money => money.slice(1))
-types.setTypeParser(PgColumnType.BYTEA, convertBytes)
+types.setTypeParser(ScalarColumnType.TIME, date => date)
+types.setTypeParser(ScalarColumnType.DATE, date => date)
+types.setTypeParser(ScalarColumnType.TIMESTAMP, date => date)
+types.setTypeParser(ScalarColumnType.JSONB, convertJson)
+types.setTypeParser(ScalarColumnType.JSON, convertJson)
+types.setTypeParser(ScalarColumnType.MONEY, money => money.slice(1))
+types.setTypeParser(ScalarColumnType.BYTEA, convertBytes)
 
 const parseBytesArray = types.getTypeParser(ArrayColumnType.BYTEA_ARRAY) as (_: string) => Buffer[]
 

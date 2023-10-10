@@ -2,7 +2,7 @@ import { ColumnTypeEnum, type ColumnType, JsonNullMarker } from '@prisma/driver-
 import { types } from '@neondatabase/serverless'
 import { parse as parseArray } from 'postgres-array'
 
-const NeonColumnType = types.builtins
+const ScalarColumnType = types.builtins
 
 /**
  * PostgreSQL array column types (not defined in NeonColumnType).
@@ -36,45 +36,45 @@ const ArrayColumnType = {
  */
 export function fieldToColumnType(fieldTypeId: number): ColumnType {
   switch (fieldTypeId) {
-    case NeonColumnType['INT2']:
-    case NeonColumnType['INT4']:
+    case ScalarColumnType['INT2']:
+    case ScalarColumnType['INT4']:
       return ColumnTypeEnum.Int32
-    case NeonColumnType['INT8']:
+    case ScalarColumnType['INT8']:
       return ColumnTypeEnum.Int64
-    case NeonColumnType['FLOAT4']:
+    case ScalarColumnType['FLOAT4']:
       return ColumnTypeEnum.Float
-    case NeonColumnType['FLOAT8']:
+    case ScalarColumnType['FLOAT8']:
       return ColumnTypeEnum.Double
-    case NeonColumnType['BOOL']:
+    case ScalarColumnType['BOOL']:
       return ColumnTypeEnum.Boolean
-    case NeonColumnType['DATE']:
+    case ScalarColumnType['DATE']:
       return ColumnTypeEnum.Date
-    case NeonColumnType['TIME']:
-    case NeonColumnType['TIMETZ']:
+    case ScalarColumnType['TIME']:
+    case ScalarColumnType['TIMETZ']:
       return ColumnTypeEnum.Time
-    case NeonColumnType['TIMESTAMP']:
-    case NeonColumnType['TIMESTAMPTZ']:
+    case ScalarColumnType['TIMESTAMP']:
+    case ScalarColumnType['TIMESTAMPTZ']:
       return ColumnTypeEnum.DateTime
-    case NeonColumnType['NUMERIC']:
-    case NeonColumnType['MONEY']:
+    case ScalarColumnType['NUMERIC']:
+    case ScalarColumnType['MONEY']:
       return ColumnTypeEnum.Numeric
-    case NeonColumnType['JSON']:
-    case NeonColumnType['JSONB']:
+    case ScalarColumnType['JSON']:
+    case ScalarColumnType['JSONB']:
       return ColumnTypeEnum.Json
-    case NeonColumnType['UUID']:
+    case ScalarColumnType['UUID']:
       return ColumnTypeEnum.Uuid
-    case NeonColumnType['OID']:
+    case ScalarColumnType['OID']:
       return ColumnTypeEnum.Int64
-    case NeonColumnType['BPCHAR']:
-    case NeonColumnType['TEXT']:
-    case NeonColumnType['VARCHAR']:
-    case NeonColumnType['BIT']:
-    case NeonColumnType['VARBIT']:
-    case NeonColumnType['INET']:
-    case NeonColumnType['CIDR']:
-    case NeonColumnType['XML']:
+    case ScalarColumnType['BPCHAR']:
+    case ScalarColumnType['TEXT']:
+    case ScalarColumnType['VARCHAR']:
+    case ScalarColumnType['BIT']:
+    case ScalarColumnType['VARBIT']:
+    case ScalarColumnType['INET']:
+    case ScalarColumnType['CIDR']:
+    case ScalarColumnType['XML']:
       return ColumnTypeEnum.Text
-    case NeonColumnType['BYTEA']:
+    case ScalarColumnType['BYTEA']:
       return ColumnTypeEnum.Bytes
     case ArrayColumnType.INT2_ARRAY:
     case ArrayColumnType.INT4_ARRAY:
@@ -155,15 +155,15 @@ function normalize_timez(time: string): string {
   return time.split("+")[0]
 }
 
-types.setTypeParser(NeonColumnType.TIME, normalize_time)
+types.setTypeParser(ScalarColumnType.TIME, normalize_time)
 types.setTypeParser(ArrayColumnType.TIME_ARRAY, normalize_array(normalize_time))
-types.setTypeParser(NeonColumnType.TIMETZ, normalize_timez)
+types.setTypeParser(ScalarColumnType.TIMETZ, normalize_timez)
 
 /*
  * DATE, DATE_ARRAY - converts value (or value elements) to a string in the format YYYY-MM-DD
  */
 
-types.setTypeParser(NeonColumnType.DATE, normalize_date)
+types.setTypeParser(ScalarColumnType.DATE, normalize_date)
 types.setTypeParser(ArrayColumnType.DATE_ARRAY, normalize_array(normalize_date))
 
 
@@ -171,9 +171,9 @@ types.setTypeParser(ArrayColumnType.DATE_ARRAY, normalize_array(normalize_date))
  * TIMESTAMP, TIMESTAMP_ARRAY - converts value (or value elements) to a string in the rfc3339 format
  * ex: 1996-12-19T16:39:57-08:00
  */
-types.setTypeParser(NeonColumnType.TIMESTAMP, normalize_timestamp)
+types.setTypeParser(ScalarColumnType.TIMESTAMP, normalize_timestamp)
 types.setTypeParser(ArrayColumnType.TIMESTAMP_ARRAY, normalize_array(normalize_timestamp))
-types.setTypeParser(NeonColumnType.TIMESTAMPTZ, normalize_timestampz)
+types.setTypeParser(ScalarColumnType.TIMESTAMPTZ, normalize_timestampz)
 
 /******************/
 /* Money handling */
@@ -183,7 +183,7 @@ function normalize_money(money: string): string {
   return money.slice(1)
 }
 
-types.setTypeParser(NeonColumnType.MONEY, normalize_money)
+types.setTypeParser(ScalarColumnType.MONEY, normalize_money)
 types.setTypeParser(ArrayColumnType.MONEY_ARRAY, normalize_array(normalize_money))
 
 
@@ -206,8 +206,8 @@ function toJson(json: string): unknown {
 }
 
 
-types.setTypeParser(NeonColumnType.JSONB, toJson)
-types.setTypeParser(NeonColumnType.JSON, toJson)
+types.setTypeParser(ScalarColumnType.JSONB, toJson)
+types.setTypeParser(ScalarColumnType.JSON, toJson)
 
 /************************/
 /* Binary data handling */
@@ -228,7 +228,7 @@ function encodeBuffer(buffer: Buffer) {
  * BYTEA - arbitrary raw binary strings
  */
 
-const parsePgBytes = types.getTypeParser(NeonColumnType.BYTEA) as (_: string) => Buffer
+const parsePgBytes = types.getTypeParser(ScalarColumnType.BYTEA) as (_: string) => Buffer
 /**
  * Convert bytes to a JSON-encodable representation since we can't
  * currently send a parsed Buffer or ArrayBuffer across JS to Rust
@@ -239,7 +239,7 @@ function convertBytes(serializedBytes: string): number[] {
   return encodeBuffer(buffer)
 }
 
-types.setTypeParser(NeonColumnType.BYTEA, convertBytes)
+types.setTypeParser(ScalarColumnType.BYTEA, convertBytes)
 
 /*
  * BYTEA_ARRAYS - arrays of arbitrary raw binary strings
