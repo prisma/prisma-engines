@@ -204,7 +204,6 @@ function respondOk(requestId: number, payload: unknown) {
     console.log(JSON.stringify(msg))
 }
 
-
 async function initQe(url: string, prismaSchema: string, logCallback: qe.QueryLogCallback): Promise<[engines.QueryEngineInstance, ErrorCapturingDriverAdapter]> {
     const adapter = await adapterFromEnv(url) as DriverAdapter
     const errorCapturingAdapter = bindAdapter(adapter)
@@ -227,12 +226,7 @@ async function adapterFromEnv(url: string): Promise<DriverAdapter> {
 }
 
 async function pgAdapter(url: string): Promise<DriverAdapter> {
-    let args: any = { connectionString: url}
-    const schemaName = new URL(url).searchParams.get('schema')
-    if (schemaName != null) {
-       args.options = `--search_path="${schemaName}"`
-    }
-    const pool = new pgDriver.Pool(args)
+    const pool = new pgDriver.Pool(postgres_options(url))
     return new prismaPg.PrismaPg(pool)
 }
 
@@ -247,13 +241,7 @@ async function neonWsAdapter(url: string): Promise<DriverAdapter> {
     neonConfig.useSecureWebSocket = false
     neonConfig.pipelineConnect = false
 
-
-    let args: any = { connectionString: url}
-    const schemaName = new URL(url).searchParams.get('schema')
-    if (schemaName != null) {
-        args.options = `--search_path="${schemaName}"`
-    }
-    const pool = new NeonPool(args)
+    const pool = new NeonPool(postgres_options(url))
     return new prismaNeon.PrismaNeon(pool)
 }
 
@@ -261,5 +249,15 @@ async function libsqlAdapter(url: string): Promise<DriverAdapter> {
     const libsql = createClient({ url, intMode: 'bigint' })
     return new PrismaLibSQL(libsql)
 }
+
+function postgres_options(url: string): any {
+    let args: any = {connectionString: url}
+    const schemaName = new URL(url).searchParams.get('schema')
+    if (schemaName != null) {
+        args.options = `--search_path="${schemaName}"`
+    }
+    return args;
+}
+
 
 main().catch(err)
