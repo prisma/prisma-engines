@@ -5,7 +5,7 @@ import { parse as parseArray } from 'postgres-array'
 const ScalarColumnType = types.builtins
 
 /**
- * PostgreSQL array column types (not defined in NeonColumnType).
+ * PostgreSQL array column types (not defined in ScalarColumnType).
  */
 const ArrayColumnType = {
   BOOL_ARRAY: 1000,
