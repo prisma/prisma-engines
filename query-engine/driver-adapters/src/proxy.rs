@@ -947,7 +947,7 @@ mod proxy_test {
 
         assert_eq!(
             quaint_value.err().unwrap().to_string(),
-            "Conversion failed: expected an i32 number in column column_name[2], found {}"
+            "Conversion failed: expected an i32 number in column 'column_name[2]', found {}"
         );
     }
 
@@ -969,7 +969,7 @@ mod proxy_test {
 
         assert_eq!(
             quaint_value.err().unwrap().to_string(),
-            "Conversion failed: expected a string in column column_name[0], found 10"
+            "Conversion failed: expected a string in column 'column_name[0]', found 10"
         );
     }
 }

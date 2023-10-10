@@ -3,7 +3,7 @@ use chrono::format::StrftimeItems;
 use once_cell::sync::Lazy;
 use serde_json::value::Value as JsonValue;
 
-const TIME_FMT: Lazy<StrftimeItems> = Lazy::new(|| StrftimeItems::new("%H:%M:%S%.f"));
+static TIME_FMT: Lazy<StrftimeItems> = Lazy::new(|| StrftimeItems::new("%H:%M:%S%.f"));
 
 pub fn values_to_js_args(values: &[quaint::Value<'_>]) -> serde_json::Result<Vec<JSArg>> {
     let mut args = Vec::with_capacity(values.len());
