@@ -153,6 +153,10 @@ export class PrismaPlanetScale extends PlanetScaleQueryable<planetScale.Connecti
     })
   }
 
+  async setDefaultSchema(schema: string): Promise<Result<void>> {
+    return ok(undefined)
+  }
+
   async close() {
     return ok(undefined)
   }

@@ -155,6 +155,10 @@ export class PrismaLibSQL extends LibSqlQueryable<StdClient> implements DriverAd
     }
   }
 
+  async setDefaultSchema(schema: string): Promise<Result<void>> {
+    return ok(undefined)
+  }
+
   async close(): Promise<Result<void>> {
     await this[LOCK_TAG].acquire()
     this.client.close()

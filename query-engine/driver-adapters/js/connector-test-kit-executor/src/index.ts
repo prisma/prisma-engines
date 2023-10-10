@@ -81,10 +81,9 @@ async function handleRequest(method: string, params: unknown): Promise<unknown> 
 
             const castParams = params as InitializeSchemaParams;
             const logs = [] as string[]
-            const [engine, adapter] = await initQe(castParams.url, castParams.schema, (log) => {
+            const [engine, adapter] = await initQe(castParams.url, castParams.schema, castParams.url, (log) => {
                 logs.push(log)
             });
-            await engine.connect("")
 
             state[castParams.schemaId] = {
                 engine,
@@ -204,10 +203,30 @@ function respondOk(requestId: number, payload: unknown) {
     console.log(JSON.stringify(msg))
 }
 
-async function initQe(url: string, prismaSchema: string, logCallback: qe.QueryLogCallback): Promise<[engines.QueryEngineInstance, ErrorCapturingDriverAdapter]> {
+/**
+ * Extract the schema from the url params
+ * @param url the prisma connection URL
+ */
+function extractSchema(url: string): string | null {
+    const schemaRegex = /[?&]schema=([^&]+)/;
+    const match = url.match(schemaRegex);
+    if (match && match[1]) {
+        return match[1];
+    } else {
+        return null;
+    }
+}
+
+async function initQe(url: string, prismaSchema: string, schemaURL: string, logCallback: qe.QueryLogCallback): Promise<[engines.QueryEngineInstance, ErrorCapturingDriverAdapter]> {
     const adapter = await adapterFromEnv(url) as DriverAdapter
     const errorCapturingAdapter = bindAdapter(adapter)
     const engineInstance = qe.initQueryEngine(errorCapturingAdapter, prismaSchema, logCallback, debug)
+    const schemaName = extractSchema(schemaURL)
+    engineInstance.connect("")
+    if (schemaName) {
+        await errorCapturingAdapter.setDefaultSchema(schemaName)
+    }
+
     return [engineInstance, errorCapturingAdapter];
 }
 

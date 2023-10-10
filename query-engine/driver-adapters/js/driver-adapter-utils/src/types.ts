@@ -74,6 +74,11 @@ export interface DriverAdapter extends Queryable {
   startTransaction(): Promise<Result<Transaction>>
 
   /**
+   * Sets the default schema for the connection.
+   */
+  setDefaultSchema(schema: string): Promise<Result<void>>
+
+  /**
    * Closes the connection to the database, if any.
    */
   close: () => Promise<Result<void>>

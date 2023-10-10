@@ -62,7 +62,7 @@ class PgQueryable<ClientT extends StdClient | TransactionClient> implements Quer
    * Should the query fail due to a connection error, the connection is
    * marked as unhealthy.
    */
-  private async performIO(query: Query) {
+  protected async performIO(query: Query) {
     const { sql, args: values } = query
 
     try {
@@ -122,6 +122,12 @@ export class PrismaPg extends PgQueryable<StdClient> implements DriverAdapter {
 
     const connection = await this.client.connect()
     return ok(new PgTransaction(connection, options))
+  }
+
+  async setDefaultSchema(schema: string): Promise<Result<void>> {
+    const query = { sql: `SET search_path TO ${schema},public`, args: [] }
+    await this.performIO(query)
+    return ok(undefined)
   }
 
   async close() {
