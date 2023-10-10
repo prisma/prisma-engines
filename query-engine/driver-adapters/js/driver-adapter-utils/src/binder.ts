@@ -33,7 +33,6 @@ export const bindAdapter = (adapter: DriverAdapter): ErrorCapturingDriverAdapter
       const result = await startTransaction(...args)
       return result.map((tx) => bindTransaction(errorRegistry, tx))
     },
-    setDefaultSchema: wrapAsync(errorRegistry, adapter.setDefaultSchema.bind(adapter)),
     close: wrapAsync(errorRegistry, adapter.close.bind(adapter)),
   }
 }

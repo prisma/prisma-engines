@@ -134,11 +134,6 @@ export class PrismaNeon extends NeonWsQueryable<neon.Pool> implements DriverAdap
     return ok(new NeonTransaction(connection, options))
   }
 
-  async setDefaultSchema(schema: string): Promise<Result<void>> {
-    const query = { sql: `SET search_path TO ${schema},public`, args: [] }
-    return (await this.performIO(query)).map((_) => undefined)
-  }
-
   async close() {
     if (this.isRunning) {
       await this.client.end()
@@ -165,11 +160,6 @@ export class PrismaNeonHTTP extends NeonQueryable implements DriverAdapter {
 
   startTransaction(): Promise<Result<Transaction>> {
     return Promise.reject(new Error('Transactions are not supported in HTTP mode'))
-  }
-
-  async setDefaultSchema(schema: string): Promise<Result<void>> {
-    const query = { sql: `SET search_path TO ${schema},public`, args: [] }
-    return (await this.performIO(query)).map((_) => undefined)
   }
 
   async close() {
