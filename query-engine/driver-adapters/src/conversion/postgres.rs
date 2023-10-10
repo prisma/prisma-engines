@@ -9,16 +9,16 @@ pub fn values_to_js_args(values: &[quaint::Value<'_>]) -> serde_json::Result<Vec
     let mut args = Vec::with_capacity(values.len());
 
     for qv in values {
-        let res = match (&qv.typed, qv.native_column_type.as_deref()) {
-            (quaint::ValueType::DateTime(value), Some("Date")) => match value {
+        let res = match (&qv.typed, qv.native_column_type_name()) {
+            (quaint::ValueType::DateTime(value), Some("DATE")) => match value {
                 Some(value) => JSArg::RawString(value.date_naive().to_string()),
                 None => JsonValue::Null.into(),
             },
-            (quaint::ValueType::DateTime(value), Some("Time")) => match value {
+            (quaint::ValueType::DateTime(value), Some("TIME")) => match value {
                 Some(value) => JSArg::RawString(value.time().to_string()),
                 None => JsonValue::Null.into(),
             },
-            (quaint::ValueType::DateTime(value), Some("Timetz")) => match value {
+            (quaint::ValueType::DateTime(value), Some("TIMETZ")) => match value {
                 Some(value) => JSArg::RawString(value.time().format_with_items(TIME_FMT.clone()).to_string()),
                 None => JsonValue::Null.into(),
             },

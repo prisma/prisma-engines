@@ -47,7 +47,7 @@ impl<'a> std::ops::Deref for NativeColumnType<'a> {
 
 impl<'a> From<&'a str> for NativeColumnType<'a> {
     fn from(s: &'a str) -> Self {
-        Self(s.into())
+        Self(Cow::Owned(s.to_uppercase()))
     }
 }
 
@@ -58,6 +58,12 @@ pub struct Value<'a> {
 }
 
 impl<'a> Value<'a> {
+    /// Returns the native column type of the value, if any, in the form
+    /// of an UPCASE string. ex: "VARCHAR, BYTEA, DATE, TIMEZ"  
+    pub fn native_column_type_name(&'a self) -> Option<&'a str> {
+        self.native_column_type.as_deref()
+    }
+
     /// Changes the value to include information about the native column type
     pub fn with_native_column_type<T: Into<NativeColumnType<'a>>>(mut self, column_type: Option<T>) -> Self {
         self.native_column_type = column_type.map(|ct| ct.into());
