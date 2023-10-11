@@ -118,6 +118,21 @@ export function fieldToColumnType(fieldTypeId: number): ColumnType {
   }
 }
 
+function normalize_array(element_normalizer: (string) => string): (string) => string[] {
+  return (str) => parseArray(str, element_normalizer)
+}
+
+/****************************/
+/* Time-related data-types  */
+/****************************/
+
+function normalize_numeric(numeric: string): string {
+  return numeric
+}
+
+types.setTypeParser(ScalarColumnType.NUMERIC, normalize_numeric)
+types.setTypeParser(ArrayColumnType.NUMERIC_ARRAY, normalize_array(normalize_numeric))
+
 /****************************/
 /* Time-related data-types  */
 /****************************/
@@ -133,10 +148,6 @@ function normalize_timestamp(time: string): string {
 
 function normalize_timestampz(time: string): string {
   return time.split("+")[0]
-}
-
-function normalize_array(element_normalizer: (string) => string): (string) => string[] {
-  return (str) => parseArray(str, element_normalizer)
 }
 
 /*
@@ -249,6 +260,3 @@ types.setTypeParser(ArrayColumnType.BYTEA_ARRAY, (serializedBytesArray) => {
   const buffers = parseBytesArray(serializedBytesArray)
   return buffers.map(encodeBuffer)
 })
-
-
-
