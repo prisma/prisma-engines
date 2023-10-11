@@ -1,5 +1,27 @@
 #!/usr/bin/env bash
 
+set -ex
+
+node -v
+npm -v
+
+git clone https://github.com/timsuchanek/last-git-changes.git
+cd last-git-changes
+npm install
+npm run build
+cd ..
+node last-git-changes/bin.js --exclude='docs,examples,scripts,README.md,LICENSE,CONTRIBUTING.md,.github,.prettierrc.yml' 
+export CHANGED_COUNT=$(node last-git-changes/bin.js --exclude='docs,examples,scripts,README.md,LICENSE,CONTRIBUTING.md,.github,.prettierrc.yml' | wc -l)
+
+echo $CHANGED_COUNT
+
+if [ $CHANGED_COUNT -gt 0 ]; then
+  echo "Something changed, TODO"
+else
+  echo "Nothing changed, this run will be skipped now."
+fi
+
+
 if [[ "$OSTYPE" == "linux-gnu" ]]; then
     OS=linux-amzn
 elif [[ "$OSTYPE" == "darwin"* ]]; then
