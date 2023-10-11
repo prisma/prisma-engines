@@ -175,8 +175,8 @@ const parseTextArray = types.getTypeParser(ArrayColumnType.TEXT_ARRAY) as (_: st
 types.setTypeParser(ArrayColumnType.TIME_ARRAY, parseTextArray)
 types.setTypeParser(ArrayColumnType.DATE_ARRAY, parseTextArray)
 types.setTypeParser(ArrayColumnType.TIMESTAMP_ARRAY, parseTextArray)
-types.setTypeParser(ArrayColumnType.NUMERIC_ARRAY, parseTextArray)
 
+types.setTypeParser(ArrayColumnType.NUMERIC_ARRAY, parseTextArray)
 types.setTypeParser(ArrayColumnType.MONEY_ARRAY, (moneyArray) =>
   parseTextArray(moneyArray).map((money) => money.slice(1)),
 )
