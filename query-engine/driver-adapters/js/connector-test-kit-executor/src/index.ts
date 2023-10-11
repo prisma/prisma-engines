@@ -263,7 +263,7 @@ async function libsqlAdapter(url: string): Promise<DriverAdapter> {
 async function planetscaleAdapter(url: string): Promise<DriverAdapter> {
     const proxyURL = JSON.parse(process.env.DRIVER_ADAPTER_CONFIG || '{}').proxyUrl ?? ''
     if (proxyURL == '') {
-        throw new Error("DRIVER_ADAPTER_CONFIG is not defined or empty, but its required for neon adapter.");
+        throw new Error("DRIVER_ADAPTER_CONFIG is not defined or empty, but its required for planetscale adapter.");
     }
 
     const connection = planetscaleConnect({
