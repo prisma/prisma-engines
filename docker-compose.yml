@@ -121,6 +121,23 @@ services:
     networks:
       - databases
 
+  planetscale-vitess8:
+    build: ./docker/planetscale_proxy
+    environment:
+      MYSQL_HOST: 'vitess-test-8_0'
+      MYSQL_PORT: 33807
+      MYSQL_DATABASE: 'test-0000-00000000'
+    ports:
+      - '8085:8085'
+    depends_on:
+      - vitess-test-8_0
+    restart: always
+    healthcheck:
+      test: [ 'CMD', 'nc', '-z', '127.0.0.1', '8085' ]
+      interval: 5s
+      timeout: 2s
+      retries: 20
+
   postgres14:
     image: postgres:14
     restart: always
@@ -230,6 +247,11 @@ services:
       FOREIGN_KEY_MODE: "disallow"
       TABLET_REFRESH_INTERVAL: "500ms"
       ENABLE_ONLINE_DDL: false
+    healthcheck:
+      test: [ 'CMD', 'mysqladmin', 'ping', '-h127.0.0.1', '-P33807' ]
+      interval: 5s
+      timeout: 2s
+      retries: 20
 
   vitess-shadow-5_7:
     image: vitess/vttestserver:mysql57@sha256:23863a518b34330109c502ac61a396008f5f023e96263bcb2bb1b0f7f7d5dc7f
