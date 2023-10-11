@@ -249,6 +249,12 @@ start-vitess_8_0:
 dev-vitess_8_0: start-vitess_8_0
 	cp $(CONFIG_PATH)/vitess_8_0 $(CONFIG_FILE)
 
+start-planetscale-vitess8: build-qe-napi build-connector-kit-js
+	docker compose -f docker-compose.yml up -d --remove-orphans planetscale-vitess8
+
+dev-planetscale-vitess8: start-planetscale-vitess8
+	cp $(CONFIG_PATH)/planetscale-vitess8 $(CONFIG_FILE)
+
 ######################
 # Local dev commands #
 ######################
