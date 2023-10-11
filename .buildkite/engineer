@@ -26,7 +26,7 @@ if [[ "$2" == "test" ]]; then
         exit 0
     else
         # Note that printf works better for displaying line returns in CI
-        printf "Changes found for the previous commit in paths that are not ignored: \n\n${GIT_DIFF}\n\nThis run will continue...\n"
+        printf "Changes found for the previous commit in paths that are not ignored: \n\n%s\n\nThis run will continue...\n" "${GIT_DIFF}"
     fi
 fi
 
