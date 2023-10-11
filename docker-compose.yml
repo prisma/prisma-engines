@@ -228,11 +228,18 @@ services:
       - 33577:33577
     environment:
       PORT: 33574
-      KEYSPACES: "test"
-      NUM_SHARDS: "1"
-      MYSQL_BIND_HOST: "0.0.0.0"
-      FOREIGN_KEY_MODE: "disallow"
+      KEYSPACES: 'test'
+      NUM_SHARDS: '1'
+      MYSQL_BIND_HOST: '0.0.0.0'
+      FOREIGN_KEY_MODE: 'disallow'
       ENABLE_ONLINE_DDL: false
+      MYSQL_MAX_CONNECTIONS: 100000
+      TABLET_REFRESH_INTERVAL: '500ms'
+    healthcheck:
+      test: ['CMD', 'mysqladmin', 'ping', '-h127.0.0.1', '-P33577']
+      interval: 5s
+      timeout: 2s
+      retries: 20
 
   vitess-test-8_0:
     image: vitess/vttestserver:mysql80@sha256:8bec2644d83cb322eb2cdd596d33c0f858243ba6ade9164c95dfcc519643094e
@@ -241,14 +248,15 @@ services:
       - 33807:33807
     environment:
       PORT: 33804
-      KEYSPACES: "test"
-      NUM_SHARDS: "1"
-      MYSQL_BIND_HOST: "0.0.0.0"
-      FOREIGN_KEY_MODE: "disallow"
-      TABLET_REFRESH_INTERVAL: "500ms"
+      KEYSPACES: 'test'
+      NUM_SHARDS: '1'
+      MYSQL_BIND_HOST: '0.0.0.0'
+      FOREIGN_KEY_MODE: 'disallow'
       ENABLE_ONLINE_DDL: false
+      MYSQL_MAX_CONNECTIONS: 100000
+      TABLET_REFRESH_INTERVAL: '500ms'
     healthcheck:
-      test: [ 'CMD', 'mysqladmin', 'ping', '-h127.0.0.1', '-P33807' ]
+      test: ['CMD', 'mysqladmin', 'ping', '-h127.0.0.1', '-P33807']
       interval: 5s
       timeout: 2s
       retries: 20
@@ -260,11 +268,18 @@ services:
       - 33578:33577
     environment:
       PORT: 33574
-      KEYSPACES: "shadow"
-      NUM_SHARDS: "1"
-      MYSQL_BIND_HOST: "0.0.0.0"
-      FOREIGN_KEY_MODE: "disallow"
+      KEYSPACES: 'shadow'
+      NUM_SHARDS: '1'
+      MYSQL_BIND_HOST: '0.0.0.0'
+      FOREIGN_KEY_MODE: 'disallow'
       ENABLE_ONLINE_DDL: false
+      MYSQL_MAX_CONNECTIONS: 100000
+      TABLET_REFRESH_INTERVAL: '500ms'
+    healthcheck:
+      test: ['CMD', 'mysqladmin', 'ping', '-h127.0.0.1', '-P33577']
+      interval: 5s
+      timeout: 2s
+      retries: 20
 
   vitess-shadow-8_0:
     image: vitess/vttestserver:mysql80@sha256:8bec2644d83cb322eb2cdd596d33c0f858243ba6ade9164c95dfcc519643094e
@@ -273,12 +288,18 @@ services:
       - 33808:33807
     environment:
       PORT: 33804
-      KEYSPACES: "shadow"
-      NUM_SHARDS: "1"
-      MYSQL_BIND_HOST: "0.0.0.0"
-      FOREIGN_KEY_MODE: "disallow"
-      TABLET_REFRESH_INTERVAL: "500ms"
+      KEYSPACES: 'shadow'
+      NUM_SHARDS: '1'
+      MYSQL_BIND_HOST: '0.0.0.0'
+      FOREIGN_KEY_MODE: 'disallow'
       ENABLE_ONLINE_DDL: false
+      MYSQL_MAX_CONNECTIONS: 100000
+      TABLET_REFRESH_INTERVAL: '500ms'
+    healthcheck:
+      test: ['CMD', 'mysqladmin', 'ping', '-h127.0.0.1', '-P33807']
+      interval: 5s
+      timeout: 2s
+      retries: 20
 
   mssql-2017:
     image: mcr.microsoft.com/mssql/server:2017-latest
