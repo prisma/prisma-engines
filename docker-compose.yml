@@ -121,16 +121,16 @@ services:
     networks:
       - databases
 
-  planetscale-vitess5_7:
+  planetscale-vitess8:
     build: ./docker/planetscale_proxy
     environment:
-      MYSQL_HOST: 'vitess-test-5_7'
-      MYSQL_PORT: 33577
+      MYSQL_HOST: 'vitess-test-8_0'
+      MYSQL_PORT: 33807
       MYSQL_DATABASE: 'test-0000-00000000'
     ports:
       - '8085:8085'
     depends_on:
-      - vitess-test-5_7
+      - vitess-test-8_0
     restart: always
     healthcheck:
       test: [ 'CMD', 'nc', '-z', '127.0.0.1', '8085' ]

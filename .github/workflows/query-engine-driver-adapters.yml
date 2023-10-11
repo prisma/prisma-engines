@@ -32,7 +32,7 @@ jobs:
           - name: 'libsql'
             setup_task: 'dev-libsql-sqlite'
           - name: 'planetscale'
-            setup_task: 'dev-planetscale-vitess5_7'
+            setup_task: 'dev-planetscale-vitess8'
         node_version: ['18']
     env:
       LOG_LEVEL: 'info' # Set to "debug" to trace the query engine and node process running the driver adapter
