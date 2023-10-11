@@ -19,7 +19,8 @@ if [[ "$2" == "test" ]]; then
         echo "No changes found for the previous commit in paths that are not ignored, this run will now be skipped."
         exit 0
     else
-        echo "Changes found for the previous commit in paths that are not ignored: \n\n${GIT_DIFF}\n\nThis run will continue..."
+        # Note that printf works better for displaying line returns in CI
+        printf "Changes found for the previous commit in paths that are not ignored: \n\n${GIT_DIFF}\n\nThis run will continue...\n"
     fi
 else
     echo "We are in the build pipeline."
