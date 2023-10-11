@@ -136,9 +136,7 @@ function normalize_timestampz(time: string): string {
 }
 
 function normalize_array(element_normalizer: (string) => string): (string) => string[] {
-  return function(str: string): string[] {
-    return parseArray(str, element_normalizer)
-  }
+  return (str) => parseArray(str, element_normalizer)
 }
 
 /*
