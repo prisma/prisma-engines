@@ -2,6 +2,13 @@
 
 set -e
 
+if [[ -z "$2"  ]]; then
+    printf "Error: the name of the pipeline must be provided.\nExample: './engineer pipeline test'" 1>&2
+    exit 1
+else
+    echo "We are in the $2 pipeline."
+fi
+
 # Checks what's the diff with the previous commit, 
 # excluding some paths that do not need a run, 
 # because they do not affect tests running in Buildkite.
@@ -11,7 +18,6 @@ GIT_DIFF=$(git diff --name-only HEAD HEAD~1 -- . ':!.github' ':!query-engine/dri
 # Example: ./.buildkite/engineer pipeline test
 # We only want to check for changes and skip in the test pipeline.
 if [[ "$2" == "test" ]]; then
-    echo "We are in the test pipeline."
     # Checking if GIT_DIFF is empty
     # If it's empty then it's most likely that there are changes but they are in ignored paths.
     # So we do not start Buildkite
@@ -22,8 +28,6 @@ if [[ "$2" == "test" ]]; then
         # Note that printf works better for displaying line returns in CI
         printf "Changes found for the previous commit in paths that are not ignored: \n\n${GIT_DIFF}\n\nThis run will continue...\n"
     fi
-else
-    echo "We are in the build pipeline."
 fi
 
 # Check OS
