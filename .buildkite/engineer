@@ -5,7 +5,7 @@ set -e
 # Checks what's the diff with the previous commit, 
 # excluding some paths that do not need a run, 
 # because they do not affect tests running in Buildkite.
-GIT_DIFF=$(git diff --name-only -- . ':!.github' ':!query-engine/driver-adapters/js' ':!renovate.json' ':!*.md' ':!LICENSE' ':!CODEOWNERS';)
+GIT_DIFF=$(git diff --name-only HEAD HEAD~1 -- . ':!.github' ':!query-engine/driver-adapters/js' ':!renovate.json' ':!*.md' ':!LICENSE' ':!CODEOWNERS';)
 
 # $2 is either "test" or "build", depending on the pipeline
 # Example: ./.buildkite/engineer pipeline test
