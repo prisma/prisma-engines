@@ -290,6 +290,8 @@
 <a href="#290" id="290">290</a>
 <a href="#291" id="291">291</a>
 <a href="#292" id="292">292</a>
+<a href="#293" id="293">293</a>
+<a href="#294" id="294">294</a>
 </pre></div><pre class="rust"><code><span class="kw">use crate</span>::{
     conversion,
     proxy::{CommonProxy, DriverProxy, Query},
@@ -302,7 +304,6 @@
     error::{Error, ErrorKind},
     prelude::{Query <span class="kw">as </span>QuaintQuery, Queryable <span class="kw">as </span>QuaintQueryable, ResultSet, TransactionCapable},
     visitor::{<span class="self">self</span>, Visitor},
-    Value,
 };
 <span class="kw">use </span>tracing::{info_span, Instrument};
 
@@ -330,8 +331,8 @@
         <span class="self">Self </span>{ proxy, flavour }
     }
 
-    <span class="doccomment">/// visit a query according to the flavour of the JS connector
-    </span><span class="kw">pub fn </span>visit_query&lt;<span class="lifetime">&#39;a</span>&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, q: QuaintQuery&lt;<span class="lifetime">&#39;a</span>&gt;) -&gt; quaint::Result&lt;(String, Vec&lt;Value&lt;<span class="lifetime">&#39;a</span>&gt;&gt;)&gt; {
+    <span class="doccomment">/// visit a quaint query AST according to the flavour of the JS connector
+    </span><span class="kw">fn </span>visit_quaint_query&lt;<span class="lifetime">&#39;a</span>&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, q: QuaintQuery&lt;<span class="lifetime">&#39;a</span>&gt;) -&gt; quaint::Result&lt;(String, Vec&lt;quaint::Value&lt;<span class="lifetime">&#39;a</span>&gt;&gt;)&gt; {
         <span class="kw">match </span><span class="self">self</span>.flavour {
             Flavour::Mysql =&gt; visitor::Mysql::build(q),
             Flavour::Postgres =&gt; visitor::Postgres::build(q),
@@ -339,39 +340,48 @@
             <span class="kw">_ </span>=&gt; <span class="macro">unimplemented!</span>(<span class="string">&quot;Unsupported flavour for JS connector {:?}&quot;</span>, <span class="self">self</span>.flavour),
         }
     }
+
+    <span class="kw">async fn </span>build_query(<span class="kw-2">&amp;</span><span class="self">self</span>, sql: <span class="kw-2">&amp;</span>str, values: <span class="kw-2">&amp;</span>[quaint::Value&lt;<span class="lifetime">&#39;_</span>&gt;]) -&gt; quaint::Result&lt;Query&gt; {
+        <span class="kw">let </span>sql: String = sql.to_string();
+        <span class="kw">let </span>args = <span class="kw">match </span><span class="self">self</span>.flavour {
+            Flavour::Postgres =&gt; conversion::postgres::values_to_js_args(values),
+            <span class="kw">_ </span>=&gt; conversion::values_to_js_args(values),
+        }<span class="question-mark">?</span>;
+        <span class="prelude-val">Ok</span>(Query { sql, args })
+    }
 }
 
 <span class="attr">#[async_trait]
 </span><span class="kw">impl </span>QuaintQueryable <span class="kw">for </span>JsBaseQueryable {
     <span class="kw">async fn </span>query(<span class="kw-2">&amp;</span><span class="self">self</span>, q: QuaintQuery&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; quaint::Result&lt;ResultSet&gt; {
-        <span class="kw">let </span>(sql, params) = <span class="self">self</span>.visit_query(q)<span class="question-mark">?</span>;
+        <span class="kw">let </span>(sql, params) = <span class="self">self</span>.visit_quaint_query(q)<span class="question-mark">?</span>;
         <span class="self">self</span>.query_raw(<span class="kw-2">&amp;</span>sql, <span class="kw-2">&amp;</span>params).<span class="kw">await
     </span>}
 
-    <span class="kw">async fn </span>query_raw(<span class="kw-2">&amp;</span><span class="self">self</span>, sql: <span class="kw-2">&amp;</span>str, params: <span class="kw-2">&amp;</span>[Value&lt;<span class="lifetime">&#39;_</span>&gt;]) -&gt; quaint::Result&lt;ResultSet&gt; {
+    <span class="kw">async fn </span>query_raw(<span class="kw-2">&amp;</span><span class="self">self</span>, sql: <span class="kw-2">&amp;</span>str, params: <span class="kw-2">&amp;</span>[quaint::Value&lt;<span class="lifetime">&#39;_</span>&gt;]) -&gt; quaint::Result&lt;ResultSet&gt; {
         metrics::query(<span class="string">&quot;js.query_raw&quot;</span>, sql, params, <span class="kw">move </span>|| <span class="kw">async move </span>{
             <span class="self">self</span>.do_query_raw(sql, params).<span class="kw">await
         </span>})
         .<span class="kw">await
     </span>}
 
-    <span class="kw">async fn </span>query_raw_typed(<span class="kw-2">&amp;</span><span class="self">self</span>, sql: <span class="kw-2">&amp;</span>str, params: <span class="kw-2">&amp;</span>[Value&lt;<span class="lifetime">&#39;_</span>&gt;]) -&gt; quaint::Result&lt;ResultSet&gt; {
+    <span class="kw">async fn </span>query_raw_typed(<span class="kw-2">&amp;</span><span class="self">self</span>, sql: <span class="kw-2">&amp;</span>str, params: <span class="kw-2">&amp;</span>[quaint::Value&lt;<span class="lifetime">&#39;_</span>&gt;]) -&gt; quaint::Result&lt;ResultSet&gt; {
         <span class="self">self</span>.query_raw(sql, params).<span class="kw">await
     </span>}
 
     <span class="kw">async fn </span>execute(<span class="kw-2">&amp;</span><span class="self">self</span>, q: QuaintQuery&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; quaint::Result&lt;u64&gt; {
-        <span class="kw">let </span>(sql, params) = <span class="self">self</span>.visit_query(q)<span class="question-mark">?</span>;
+        <span class="kw">let </span>(sql, params) = <span class="self">self</span>.visit_quaint_query(q)<span class="question-mark">?</span>;
         <span class="self">self</span>.execute_raw(<span class="kw-2">&amp;</span>sql, <span class="kw-2">&amp;</span>params).<span class="kw">await
     </span>}
 
-    <span class="kw">async fn </span>execute_raw(<span class="kw-2">&amp;</span><span class="self">self</span>, sql: <span class="kw-2">&amp;</span>str, params: <span class="kw-2">&amp;</span>[Value&lt;<span class="lifetime">&#39;_</span>&gt;]) -&gt; quaint::Result&lt;u64&gt; {
+    <span class="kw">async fn </span>execute_raw(<span class="kw-2">&amp;</span><span class="self">self</span>, sql: <span class="kw-2">&amp;</span>str, params: <span class="kw-2">&amp;</span>[quaint::Value&lt;<span class="lifetime">&#39;_</span>&gt;]) -&gt; quaint::Result&lt;u64&gt; {
         metrics::query(<span class="string">&quot;js.execute_raw&quot;</span>, sql, params, <span class="kw">move </span>|| <span class="kw">async move </span>{
             <span class="self">self</span>.do_execute_raw(sql, params).<span class="kw">await
         </span>})
         .<span class="kw">await
     </span>}
 
-    <span class="kw">async fn </span>execute_raw_typed(<span class="kw-2">&amp;</span><span class="self">self</span>, sql: <span class="kw-2">&amp;</span>str, params: <span class="kw-2">&amp;</span>[Value&lt;<span class="lifetime">&#39;_</span>&gt;]) -&gt; quaint::Result&lt;u64&gt; {
+    <span class="kw">async fn </span>execute_raw_typed(<span class="kw-2">&amp;</span><span class="self">self</span>, sql: <span class="kw-2">&amp;</span>str, params: <span class="kw-2">&amp;</span>[quaint::Value&lt;<span class="lifetime">&#39;_</span>&gt;]) -&gt; quaint::Result&lt;u64&gt; {
         <span class="self">self</span>.execute_raw(sql, params).<span class="kw">await
     </span>}
 
@@ -426,16 +436,10 @@
         <span class="macro">format!</span>(<span class="string">r#&quot;-- Implicit &quot;{}&quot; query via underlying driver&quot;#</span>, stmt)
     }
 
-    <span class="kw">async fn </span>build_query(sql: <span class="kw-2">&amp;</span>str, values: <span class="kw-2">&amp;</span>[quaint::Value&lt;<span class="lifetime">&#39;_</span>&gt;]) -&gt; quaint::Result&lt;Query&gt; {
-        <span class="kw">let </span>sql: String = sql.to_string();
-        <span class="kw">let </span>args = conversion::conv_params(values)<span class="question-mark">?</span>;
-        <span class="prelude-val">Ok</span>(Query { sql, args })
-    }
-
-    <span class="kw">async fn </span>do_query_raw(<span class="kw-2">&amp;</span><span class="self">self</span>, sql: <span class="kw-2">&amp;</span>str, params: <span class="kw-2">&amp;</span>[Value&lt;<span class="lifetime">&#39;_</span>&gt;]) -&gt; quaint::Result&lt;ResultSet&gt; {
+    <span class="kw">async fn </span>do_query_raw(<span class="kw-2">&amp;</span><span class="self">self</span>, sql: <span class="kw-2">&amp;</span>str, params: <span class="kw-2">&amp;</span>[quaint::Value&lt;<span class="lifetime">&#39;_</span>&gt;]) -&gt; quaint::Result&lt;ResultSet&gt; {
         <span class="kw">let </span>len = params.len();
         <span class="kw">let </span>serialization_span = <span class="macro">info_span!</span>(<span class="string">&quot;js:query:args&quot;</span>, user_facing = <span class="bool-val">true</span>, <span class="string">&quot;length&quot; </span>= %len);
-        <span class="kw">let </span>query = <span class="self">Self</span>::build_query(sql, params).instrument(serialization_span).<span class="kw">await</span><span class="question-mark">?</span>;
+        <span class="kw">let </span>query = <span class="self">self</span>.build_query(sql, params).instrument(serialization_span).<span class="kw">await</span><span class="question-mark">?</span>;
 
         <span class="kw">let </span>sql_span = <span class="macro">info_span!</span>(<span class="string">&quot;js:query:sql&quot;</span>, user_facing = <span class="bool-val">true</span>, <span class="string">&quot;db.statement&quot; </span>= %sql);
         <span class="kw">let </span>result_set = <span class="self">self</span>.proxy.query_raw(query).instrument(sql_span).<span class="kw">await</span><span class="question-mark">?</span>;
@@ -446,10 +450,10 @@
         result_set.try_into()
     }
 
-    <span class="kw">async fn </span>do_execute_raw(<span class="kw-2">&amp;</span><span class="self">self</span>, sql: <span class="kw-2">&amp;</span>str, params: <span class="kw-2">&amp;</span>[Value&lt;<span class="lifetime">&#39;_</span>&gt;]) -&gt; quaint::Result&lt;u64&gt; {
+    <span class="kw">async fn </span>do_execute_raw(<span class="kw-2">&amp;</span><span class="self">self</span>, sql: <span class="kw-2">&amp;</span>str, params: <span class="kw-2">&amp;</span>[quaint::Value&lt;<span class="lifetime">&#39;_</span>&gt;]) -&gt; quaint::Result&lt;u64&gt; {
         <span class="kw">let </span>len = params.len();
         <span class="kw">let </span>serialization_span = <span class="macro">info_span!</span>(<span class="string">&quot;js:query:args&quot;</span>, user_facing = <span class="bool-val">true</span>, <span class="string">&quot;length&quot; </span>= %len);
-        <span class="kw">let </span>query = <span class="self">Self</span>::build_query(sql, params).instrument(serialization_span).<span class="kw">await</span><span class="question-mark">?</span>;
+        <span class="kw">let </span>query = <span class="self">self</span>.build_query(sql, params).instrument(serialization_span).<span class="kw">await</span><span class="question-mark">?</span>;
 
         <span class="kw">let </span>sql_span = <span class="macro">info_span!</span>(<span class="string">&quot;js:query:sql&quot;</span>, user_facing = <span class="bool-val">true</span>, <span class="string">&quot;db.statement&quot; </span>= %sql);
         <span class="kw">let </span>affected_rows = <span class="self">self</span>.proxy.execute_raw(query).instrument(sql_span).<span class="kw">await</span><span class="question-mark">?</span>;
@@ -494,11 +498,11 @@
         <span class="self">self</span>.inner.query(q).<span class="kw">await
     </span>}
 
-    <span class="kw">async fn </span>query_raw(<span class="kw-2">&amp;</span><span class="self">self</span>, sql: <span class="kw-2">&amp;</span>str, params: <span class="kw-2">&amp;</span>[Value&lt;<span class="lifetime">&#39;_</span>&gt;]) -&gt; quaint::Result&lt;ResultSet&gt; {
+    <span class="kw">async fn </span>query_raw(<span class="kw-2">&amp;</span><span class="self">self</span>, sql: <span class="kw-2">&amp;</span>str, params: <span class="kw-2">&amp;</span>[quaint::Value&lt;<span class="lifetime">&#39;_</span>&gt;]) -&gt; quaint::Result&lt;ResultSet&gt; {
         <span class="self">self</span>.inner.query_raw(sql, params).<span class="kw">await
     </span>}
 
-    <span class="kw">async fn </span>query_raw_typed(<span class="kw-2">&amp;</span><span class="self">self</span>, sql: <span class="kw-2">&amp;</span>str, params: <span class="kw-2">&amp;</span>[Value&lt;<span class="lifetime">&#39;_</span>&gt;]) -&gt; quaint::Result&lt;ResultSet&gt; {
+    <span class="kw">async fn </span>query_raw_typed(<span class="kw-2">&amp;</span><span class="self">self</span>, sql: <span class="kw-2">&amp;</span>str, params: <span class="kw-2">&amp;</span>[quaint::Value&lt;<span class="lifetime">&#39;_</span>&gt;]) -&gt; quaint::Result&lt;ResultSet&gt; {
         <span class="self">self</span>.inner.query_raw_typed(sql, params).<span class="kw">await
     </span>}
 
@@ -506,11 +510,11 @@
         <span class="self">self</span>.inner.execute(q).<span class="kw">await
     </span>}
 
-    <span class="kw">async fn </span>execute_raw(<span class="kw-2">&amp;</span><span class="self">self</span>, sql: <span class="kw-2">&amp;</span>str, params: <span class="kw-2">&amp;</span>[Value&lt;<span class="lifetime">&#39;_</span>&gt;]) -&gt; quaint::Result&lt;u64&gt; {
+    <span class="kw">async fn </span>execute_raw(<span class="kw-2">&amp;</span><span class="self">self</span>, sql: <span class="kw-2">&amp;</span>str, params: <span class="kw-2">&amp;</span>[quaint::Value&lt;<span class="lifetime">&#39;_</span>&gt;]) -&gt; quaint::Result&lt;u64&gt; {
         <span class="self">self</span>.inner.execute_raw(sql, params).<span class="kw">await
     </span>}
 
-    <span class="kw">async fn </span>execute_raw_typed(<span class="kw-2">&amp;</span><span class="self">self</span>, sql: <span class="kw-2">&amp;</span>str, params: <span class="kw-2">&amp;</span>[Value&lt;<span class="lifetime">&#39;_</span>&gt;]) -&gt; quaint::Result&lt;u64&gt; {
+    <span class="kw">async fn </span>execute_raw_typed(<span class="kw-2">&amp;</span><span class="self">self</span>, sql: <span class="kw-2">&amp;</span>str, params: <span class="kw-2">&amp;</span>[quaint::Value&lt;<span class="lifetime">&#39;_</span>&gt;]) -&gt; quaint::Result&lt;u64&gt; {
         <span class="self">self</span>.inner.execute_raw_typed(sql, params).<span class="kw">await
     </span>}
 

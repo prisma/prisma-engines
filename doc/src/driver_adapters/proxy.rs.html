@@ -961,6 +961,18 @@
 <a href="#961" id="961">961</a>
 <a href="#962" id="962">962</a>
 <a href="#963" id="963">963</a>
+<a href="#964" id="964">964</a>
+<a href="#965" id="965">965</a>
+<a href="#966" id="966">966</a>
+<a href="#967" id="967">967</a>
+<a href="#968" id="968">968</a>
+<a href="#969" id="969">969</a>
+<a href="#970" id="970">970</a>
+<a href="#971" id="971">971</a>
+<a href="#972" id="972">972</a>
+<a href="#973" id="973">973</a>
+<a href="#974" id="974">974</a>
+<a href="#975" id="975">975</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::borrow::Cow;
 <span class="kw">use </span>std::str::FromStr;
 
@@ -1221,34 +1233,31 @@
             serde_json::Value::Number(n) =&gt; {
                 <span class="comment">// n.as_i32() is not implemented, so we need to downcast from i64 instead
                 </span>n.as_i64()
-                    .ok_or(<span class="macro">conversion_error!</span>(<span class="string">&quot;number must be an integer&quot;</span>))
+                    .ok_or(<span class="macro">conversion_error!</span>(<span class="string">&quot;number must be an integer in column &#39;{column_name}&#39;&quot;</span>))
                     .and_then(|n| -&gt; quaint::Result&lt;i32&gt; {
                         n.try_into()
-                            .map_err(|e| <span class="macro">conversion_error!</span>(<span class="string">&quot;cannot convert {n} to i32: {e}&quot;</span>))
+                            .map_err(|e| <span class="macro">conversion_error!</span>(<span class="string">&quot;cannot convert {n} to i32 in column &#39;{column_name}&#39;: {e}&quot;</span>))
                     })
                     .map(QuaintValue::int32)
             }
-            serde_json::Value::String(s) =&gt; s
-                .parse::&lt;i32&gt;()
-                .map(QuaintValue::int32)
-                .map_err(|e| <span class="macro">conversion_error!</span>(<span class="string">&quot;string-encoded number must be an i32, got {s}: {e}&quot;</span>)),
+            serde_json::Value::String(s) =&gt; s.parse::&lt;i32&gt;().map(QuaintValue::int32).map_err(|e| {
+                <span class="macro">conversion_error!</span>(<span class="string">&quot;string-encoded number must be an i32 in column &#39;{column_name}&#39;, got {s}: {e}&quot;</span>)
+            }),
             serde_json::Value::Null =&gt; <span class="prelude-val">Ok</span>(QuaintValue::null_int32()),
             mismatch =&gt; <span class="prelude-val">Err</span>(<span class="macro">conversion_error!</span>(
-                <span class="string">&quot;expected an i32 number in column {column_name}, found {mismatch}&quot;
+                <span class="string">&quot;expected an i32 number in column &#39;{column_name}&#39;, found {mismatch}&quot;
             </span>)),
         },
         ColumnType::Int64 =&gt; <span class="kw">match </span>json_value {
-            serde_json::Value::Number(n) =&gt; n
-                .as_i64()
-                .map(QuaintValue::int64)
-                .ok_or(<span class="macro">conversion_error!</span>(<span class="string">&quot;number must be an i64, got {n}&quot;</span>)),
-            serde_json::Value::String(s) =&gt; s
-                .parse::&lt;i64&gt;()
-                .map(QuaintValue::int64)
-                .map_err(|e| <span class="macro">conversion_error!</span>(<span class="string">&quot;string-encoded number must be an i64, got {s}: {e}&quot;</span>)),
+            serde_json::Value::Number(n) =&gt; n.as_i64().map(QuaintValue::int64).ok_or(<span class="macro">conversion_error!</span>(
+                <span class="string">&quot;number must be an i64 in column &#39;{column_name}&#39;, got {n}&quot;
+            </span>)),
+            serde_json::Value::String(s) =&gt; s.parse::&lt;i64&gt;().map(QuaintValue::int64).map_err(|e| {
+                <span class="macro">conversion_error!</span>(<span class="string">&quot;string-encoded number must be an i64 in column &#39;{column_name}&#39;, got {s}: {e}&quot;</span>)
+            }),
             serde_json::Value::Null =&gt; <span class="prelude-val">Ok</span>(QuaintValue::null_int64()),
             mismatch =&gt; <span class="prelude-val">Err</span>(<span class="macro">conversion_error!</span>(
-                <span class="string">&quot;expected a string or number in column {column_name}, found {mismatch}&quot;
+                <span class="string">&quot;expected a string or number in column &#39;{column_name}&#39;, found {mismatch}&quot;
             </span>)),
         },
         ColumnType::Float =&gt; <span class="kw">match </span>json_value {
@@ -1256,36 +1265,39 @@
             // We assume that the JSON value is a valid f32 number, but we check for overflows anyway.
             </span>serde_json::Value::Number(n) =&gt; n
                 .as_f64()
-                .ok_or(<span class="macro">conversion_error!</span>(<span class="string">&quot;number must be a float, got {n}&quot;</span>))
+                .ok_or(<span class="macro">conversion_error!</span>(
+                    <span class="string">&quot;number must be a float in column &#39;{column_name}&#39;, got {n}&quot;
+                </span>))
                 .and_then(f64_to_f32)
                 .map(QuaintValue::float),
             serde_json::Value::Null =&gt; <span class="prelude-val">Ok</span>(QuaintValue::null_float()),
             mismatch =&gt; <span class="prelude-val">Err</span>(<span class="macro">conversion_error!</span>(
-                <span class="string">&quot;expected an f32 number in column {column_name}, found {mismatch}&quot;
+                <span class="string">&quot;expected an f32 number in column &#39;{column_name}&#39;, found {mismatch}&quot;
             </span>)),
         },
         ColumnType::Double =&gt; <span class="kw">match </span>json_value {
-            serde_json::Value::Number(n) =&gt; n
-                .as_f64()
-                .map(QuaintValue::double)
-                .ok_or(<span class="macro">conversion_error!</span>(<span class="string">&quot;number must be a f64, got {n}&quot;</span>)),
+            serde_json::Value::Number(n) =&gt; n.as_f64().map(QuaintValue::double).ok_or(<span class="macro">conversion_error!</span>(
+                <span class="string">&quot;number must be a f64 in column &#39;{column_name}&#39;, got {n}&quot;
+            </span>)),
             serde_json::Value::Null =&gt; <span class="prelude-val">Ok</span>(QuaintValue::null_double()),
             mismatch =&gt; <span class="prelude-val">Err</span>(<span class="macro">conversion_error!</span>(
-                <span class="string">&quot;expected an f64 number in column {column_name}, found {mismatch}&quot;
+                <span class="string">&quot;expected an f64 number in column &#39;{column_name}&#39;, found {mismatch}&quot;
             </span>)),
         },
         ColumnType::Numeric =&gt; <span class="kw">match </span>json_value {
-            serde_json::Value::String(s) =&gt; BigDecimal::from_str(<span class="kw-2">&amp;</span>s)
-                .map(QuaintValue::numeric)
-                .map_err(|e| <span class="macro">conversion_error!</span>(<span class="string">&quot;invalid numeric value when parsing {s}: {e}&quot;</span>)),
+            serde_json::Value::String(s) =&gt; BigDecimal::from_str(<span class="kw-2">&amp;</span>s).map(QuaintValue::numeric).map_err(|e| {
+                <span class="macro">conversion_error!</span>(<span class="string">&quot;invalid numeric value when parsing {s} in column &#39;{column_name}&#39;: {e}&quot;</span>)
+            }),
             serde_json::Value::Number(n) =&gt; n
                 .as_f64()
                 .and_then(BigDecimal::from_f64)
-                .ok_or(<span class="macro">conversion_error!</span>(<span class="string">&quot;number must be an f64, got {n}&quot;</span>))
+                .ok_or(<span class="macro">conversion_error!</span>(
+                    <span class="string">&quot;number must be an f64 in column &#39;{column_name}&#39;, got {n}&quot;
+                </span>))
                 .map(QuaintValue::numeric),
             serde_json::Value::Null =&gt; <span class="prelude-val">Ok</span>(QuaintValue::null_numeric()),
             mismatch =&gt; <span class="prelude-val">Err</span>(<span class="macro">conversion_error!</span>(
-                <span class="string">&quot;expected a string-encoded number in column {column_name}, found {mismatch}&quot;</span>,
+                <span class="string">&quot;expected a string-encoded number in column &#39;{column_name}&#39;, found {mismatch}&quot;</span>,
             )),
         },
         ColumnType::Boolean =&gt; <span class="kw">match </span>json_value {
@@ -1295,16 +1307,18 @@
                 <span class="prelude-val">Some</span>(<span class="number">0</span>) =&gt; <span class="prelude-val">Ok</span>(QuaintValue::boolean(<span class="bool-val">false</span>)),
                 <span class="prelude-val">Some</span>(<span class="number">1</span>) =&gt; <span class="prelude-val">Ok</span>(QuaintValue::boolean(<span class="bool-val">true</span>)),
                 <span class="kw">_ </span>=&gt; <span class="prelude-val">Err</span>(<span class="macro">conversion_error!</span>(
-                    <span class="string">&quot;expected number-encoded boolean to be 0 or 1, got {n}&quot;
+                    <span class="string">&quot;expected number-encoded boolean to be 0 or 1 in column &#39;{column_name}&#39;, got {n}&quot;
                 </span>)),
             },
             serde_json::Value::String(s) =&gt; <span class="kw">match </span>s.as_str() {
                 <span class="string">&quot;false&quot; </span>| <span class="string">&quot;FALSE&quot; </span>| <span class="string">&quot;0&quot; </span>=&gt; <span class="prelude-val">Ok</span>(QuaintValue::boolean(<span class="bool-val">false</span>)),
                 <span class="string">&quot;true&quot; </span>| <span class="string">&quot;TRUE&quot; </span>| <span class="string">&quot;1&quot; </span>=&gt; <span class="prelude-val">Ok</span>(QuaintValue::boolean(<span class="bool-val">true</span>)),
-                <span class="kw">_ </span>=&gt; <span class="prelude-val">Err</span>(<span class="macro">conversion_error!</span>(<span class="string">&quot;expected string-encoded boolean, got {s}&quot;</span>)),
+                <span class="kw">_ </span>=&gt; <span class="prelude-val">Err</span>(<span class="macro">conversion_error!</span>(
+                    <span class="string">&quot;expected string-encoded boolean in column &#39;{column_name}&#39;, got {s}&quot;
+                </span>)),
             },
             mismatch =&gt; <span class="prelude-val">Err</span>(<span class="macro">conversion_error!</span>(
-                <span class="string">&quot;expected a boolean in column {column_name}, found {mismatch}&quot;
+                <span class="string">&quot;expected a boolean in column &#39;{column_name}&#39;, found {mismatch}&quot;
             </span>)),
         },
         ColumnType::Char =&gt; <span class="kw">match </span>json_value {
@@ -1314,43 +1328,44 @@
             },
             serde_json::Value::Null =&gt; <span class="prelude-val">Ok</span>(QuaintValue::null_character()),
             mismatch =&gt; <span class="prelude-val">Err</span>(<span class="macro">conversion_error!</span>(
-                <span class="string">&quot;expected a string in column {column_name}, found {mismatch}&quot;
+                <span class="string">&quot;expected a string in column &#39;{column_name}&#39;, found {mismatch}&quot;
             </span>)),
         },
         ColumnType::Text =&gt; <span class="kw">match </span>json_value {
             serde_json::Value::String(s) =&gt; <span class="prelude-val">Ok</span>(QuaintValue::text(s)),
             serde_json::Value::Null =&gt; <span class="prelude-val">Ok</span>(QuaintValue::null_text()),
             mismatch =&gt; <span class="prelude-val">Err</span>(<span class="macro">conversion_error!</span>(
-                <span class="string">&quot;expected a string in column {column_name}, found {mismatch}&quot;
+                <span class="string">&quot;expected a string in column &#39;{column_name}&#39;, found {mismatch}&quot;
             </span>)),
         },
         ColumnType::Date =&gt; <span class="kw">match </span>json_value {
             serde_json::Value::String(s) =&gt; NaiveDate::parse_from_str(<span class="kw-2">&amp;</span>s, <span class="string">&quot;%Y-%m-%d&quot;</span>)
                 .map(QuaintValue::date)
-                .map_err(|<span class="kw">_</span>| <span class="macro">conversion_error!</span>(<span class="string">&quot;expected a date string, got {s}&quot;</span>)),
+                .map_err(|<span class="kw">_</span>| <span class="macro">conversion_error!</span>(<span class="string">&quot;expected a date string in column &#39;{column_name}&#39;, got {s}&quot;</span>)),
             serde_json::Value::Null =&gt; <span class="prelude-val">Ok</span>(QuaintValue::null_date()),
             mismatch =&gt; <span class="prelude-val">Err</span>(<span class="macro">conversion_error!</span>(
-                <span class="string">&quot;expected a string in column {column_name}, found {mismatch}&quot;
+                <span class="string">&quot;expected a string in column &#39;{column_name}&#39;, found {mismatch}&quot;
             </span>)),
         },
         ColumnType::Time =&gt; <span class="kw">match </span>json_value {
-            serde_json::Value::String(s) =&gt; NaiveTime::parse_from_str(<span class="kw-2">&amp;</span>s, <span class="string">&quot;%H:%M:%S&quot;</span>)
+            serde_json::Value::String(s) =&gt; NaiveTime::parse_from_str(<span class="kw-2">&amp;</span>s, <span class="string">&quot;%H:%M:%S%.f&quot;</span>)
                 .map(QuaintValue::time)
-                .map_err(|<span class="kw">_</span>| <span class="macro">conversion_error!</span>(<span class="string">&quot;expected a time string, got {s}&quot;</span>)),
+                .map_err(|<span class="kw">_</span>| <span class="macro">conversion_error!</span>(<span class="string">&quot;expected a time string in column &#39;{column_name}&#39;, got {s}&quot;</span>)),
             serde_json::Value::Null =&gt; <span class="prelude-val">Ok</span>(QuaintValue::null_time()),
             mismatch =&gt; <span class="prelude-val">Err</span>(<span class="macro">conversion_error!</span>(
-                <span class="string">&quot;expected a string in column {column_name}, found {mismatch}&quot;
+                <span class="string">&quot;expected a string in column &#39;{column_name}&#39;, found {mismatch}&quot;
             </span>)),
         },
         ColumnType::DateTime =&gt; <span class="kw">match </span>json_value {
-            serde_json::Value::String(s) =&gt; chrono::NaiveDateTime::parse_from_str(<span class="kw-2">&amp;</span>s, <span class="string">&quot;%Y-%m-%d %H:%M:%S%.f&quot;</span>)
+            <span class="comment">// TODO: change parsing order to prefer RFC3339
+            </span>serde_json::Value::String(s) =&gt; chrono::NaiveDateTime::parse_from_str(<span class="kw-2">&amp;</span>s, <span class="string">&quot;%Y-%m-%d %H:%M:%S%.f&quot;</span>)
                 .map(|dt| DateTime::from_utc(dt, Utc))
                 .or_else(|<span class="kw">_</span>| DateTime::parse_from_rfc3339(<span class="kw-2">&amp;</span>s).map(DateTime::&lt;Utc&gt;::from))
                 .map(QuaintValue::datetime)
-                .map_err(|<span class="kw">_</span>| <span class="macro">conversion_error!</span>(<span class="string">&quot;expected a datetime string, found {s}&quot;</span>)),
+                .map_err(|<span class="kw">_</span>| <span class="macro">conversion_error!</span>(<span class="string">&quot;expected a datetime string in column &#39;{column_name}&#39;, found {s}&quot;</span>)),
             serde_json::Value::Null =&gt; <span class="prelude-val">Ok</span>(QuaintValue::null_datetime()),
             mismatch =&gt; <span class="prelude-val">Err</span>(<span class="macro">conversion_error!</span>(
-                <span class="string">&quot;expected a string in column {column_name}, found {mismatch}&quot;
+                <span class="string">&quot;expected a string in column &#39;{column_name}&#39;, found {mismatch}&quot;
             </span>)),
         },
         ColumnType::Json =&gt; {
@@ -1366,7 +1381,7 @@
             serde_json::Value::String(s) =&gt; <span class="prelude-val">Ok</span>(QuaintValue::enum_variant(s)),
             serde_json::Value::Null =&gt; <span class="prelude-val">Ok</span>(QuaintValue::null_enum()),
             mismatch =&gt; <span class="prelude-val">Err</span>(<span class="macro">conversion_error!</span>(
-                <span class="string">&quot;expected a string in column {column_name}, found {mismatch}&quot;
+                <span class="string">&quot;expected a string in column &#39;{column_name}&#39;, found {mismatch}&quot;
             </span>)),
         },
         ColumnType::Bytes =&gt; <span class="kw">match </span>json_value {
@@ -1376,19 +1391,21 @@
                 .map(|value| value.as_i64().and_then(|maybe_byte| maybe_byte.try_into().ok()))
                 .collect::&lt;<span class="prelude-ty">Option</span>&lt;Cow&lt;[u8]&gt;&gt;&gt;()
                 .map(QuaintValue::bytes)
-                .ok_or(<span class="macro">conversion_error!</span>(<span class="string">&quot;elements of the array must be u8&quot;</span>)),
+                .ok_or(<span class="macro">conversion_error!</span>(
+                    <span class="string">&quot;elements of the array in column &#39;{column_name}&#39; must be u8&quot;
+                </span>)),
             serde_json::Value::Null =&gt; <span class="prelude-val">Ok</span>(QuaintValue::null_bytes()),
             mismatch =&gt; <span class="prelude-val">Err</span>(<span class="macro">conversion_error!</span>(
-                <span class="string">&quot;expected a string or an array in column {column_name}, found {mismatch}&quot;</span>,
+                <span class="string">&quot;expected a string or an array in column &#39;{column_name}&#39;, found {mismatch}&quot;</span>,
             )),
         },
         ColumnType::Uuid =&gt; <span class="kw">match </span>json_value {
             serde_json::Value::String(s) =&gt; uuid::Uuid::parse_str(<span class="kw-2">&amp;</span>s)
                 .map(QuaintValue::uuid)
-                .map_err(|<span class="kw">_</span>| <span class="macro">conversion_error!</span>(<span class="string">&quot;Expected a UUID string&quot;</span>)),
+                .map_err(|<span class="kw">_</span>| <span class="macro">conversion_error!</span>(<span class="string">&quot;Expected a UUID string in column &#39;{column_name}&#39;&quot;</span>)),
             serde_json::Value::Null =&gt; <span class="prelude-val">Ok</span>(QuaintValue::null_bytes()),
             mismatch =&gt; <span class="prelude-val">Err</span>(<span class="macro">conversion_error!</span>(
-                <span class="string">&quot;Expected a UUID string in column {column_name}, found {mismatch}&quot;
+                <span class="string">&quot;Expected a UUID string in column &#39;{column_name}&#39;, found {mismatch}&quot;
             </span>)),
         },
         ColumnType::UnknownNumber =&gt; <span class="kw">match </span>json_value {
@@ -1396,9 +1413,11 @@
                 .as_i64()
                 .map(QuaintValue::int64)
                 .or(n.as_f64().map(QuaintValue::double))
-                .ok_or(<span class="macro">conversion_error!</span>(<span class="string">&quot;number must be an i64 or f64, got {n}&quot;</span>)),
+                .ok_or(<span class="macro">conversion_error!</span>(
+                    <span class="string">&quot;number must be an i64 or f64 in column &#39;{column_name}&#39;, got {n}&quot;
+                </span>)),
             mismatch =&gt; <span class="prelude-val">Err</span>(<span class="macro">conversion_error!</span>(
-                <span class="string">&quot;expected a either an i64 or a f64 in column {column_name}, found {mismatch}&quot;</span>,
+                <span class="string">&quot;expected a either an i64 or a f64 in column &#39;{column_name}&#39;, found {mismatch}&quot;</span>,
             )),
         },
 
@@ -1439,7 +1458,7 @@
         )),
         serde_json::Value::Null =&gt; <span class="prelude-val">Ok</span>(QuaintValue::null_array()),
         mismatch =&gt; <span class="prelude-val">Err</span>(<span class="macro">conversion_error!</span>(
-            <span class="string">&quot;expected an array in column {column_name}, found {mismatch}&quot;</span>,
+            <span class="string">&quot;expected an array in column &#39;{column_name}&#39;, found {mismatch}&quot;</span>,
         )),
     }
 }
@@ -1795,8 +1814,13 @@
         <span class="kw">let </span>s = <span class="string">&quot;23:59:59&quot;</span>;
         <span class="kw">let </span>json_value = serde_json::Value::String(s.to_string());
         <span class="kw">let </span>quaint_value = js_value_to_quaint(json_value, column_type, <span class="string">&quot;column_name&quot;</span>).unwrap();
-
         <span class="kw">let </span>time: NaiveTime = NaiveTime::from_hms_opt(<span class="number">23</span>, <span class="number">59</span>, <span class="number">59</span>).unwrap();
+        <span class="macro">assert_eq!</span>(quaint_value, QuaintValue::time(time));
+
+        <span class="kw">let </span>s = <span class="string">&quot;13:02:20.321&quot;</span>;
+        <span class="kw">let </span>json_value = serde_json::Value::String(s.to_string());
+        <span class="kw">let </span>quaint_value = js_value_to_quaint(json_value, column_type, <span class="string">&quot;column_name&quot;</span>).unwrap();
+        <span class="kw">let </span>time: NaiveTime = NaiveTime::from_hms_milli_opt(<span class="number">13</span>, <span class="number">02</span>, <span class="number">20</span>, <span class="number">321</span>).unwrap();
         <span class="macro">assert_eq!</span>(quaint_value, QuaintValue::time(time));
     }
 
@@ -1898,7 +1922,7 @@
 
         <span class="macro">assert_eq!</span>(
             quaint_value.err().unwrap().to_string(),
-            <span class="string">&quot;Conversion failed: expected an i32 number in column column_name[2], found {}&quot;
+            <span class="string">&quot;Conversion failed: expected an i32 number in column &#39;column_name[2]&#39;, found {}&quot;
         </span>);
     }
 
@@ -1920,7 +1944,7 @@
 
         <span class="macro">assert_eq!</span>(
             quaint_value.err().unwrap().to_string(),
-            <span class="string">&quot;Conversion failed: expected a string in column column_name[0], found 10&quot;
+            <span class="string">&quot;Conversion failed: expected a string in column &#39;column_name[0]&#39;, found 10&quot;
         </span>);
     }
 }

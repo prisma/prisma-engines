@@ -133,6 +133,8 @@
 <a href="#133" id="133">133</a>
 <a href="#134" id="134">134</a>
 <a href="#135" id="135">135</a>
+<a href="#136" id="136">136</a>
+<a href="#137" id="137">137</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::context::Context;
 <span class="kw">use </span>chrono::Utc;
 <span class="kw">use </span>prisma_models::{ScalarField, TypeIdentifier};
@@ -149,7 +151,7 @@
 
 <span class="kw">impl </span>ScalarFieldExt <span class="kw">for </span>ScalarField {
     <span class="kw">fn </span>value&lt;<span class="lifetime">&#39;a</span>&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, pv: PrismaValue, ctx: <span class="kw-2">&amp;</span>Context&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; Value&lt;<span class="lifetime">&#39;a</span>&gt; {
-        <span class="kw">match </span>(pv, <span class="self">self</span>.type_identifier()) {
+        <span class="kw">let </span>value = <span class="kw">match </span>(pv, <span class="self">self</span>.type_identifier()) {
             (PrismaValue::String(s), <span class="kw">_</span>) =&gt; s.into(),
             (PrismaValue::Float(f), <span class="kw">_</span>) =&gt; f.into(),
             (PrismaValue::Boolean(b), <span class="kw">_</span>) =&gt; b.into(),
@@ -211,7 +213,9 @@
                 TypeIdentifier::Bytes =&gt; Value::null_bytes(),
                 TypeIdentifier::Unsupported =&gt; <span class="macro">unreachable!</span>(<span class="string">&quot;No unsupported field should reach that path&quot;</span>),
             },
-        }
+        };
+
+        value.with_native_column_type(<span class="self">self</span>.native_type().map(|nt| nt.name()))
     }
 
     <span class="kw">fn </span>type_family(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; TypeFamily {
