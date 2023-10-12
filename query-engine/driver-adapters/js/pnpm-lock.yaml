@@ -140,12 +140,18 @@ importers:
       '@prisma/adapter-planetscale':
         specifier: workspace:*
         version: link:../adapter-planetscale
+      '@prisma/adapter-tidbcloud':
+        specifier: workspace:*
+        version: link:../adapter-tidbcloud
       '@prisma/client':
         specifier: 5.4.1
         version: 5.4.1(prisma@5.4.1)
       '@prisma/driver-adapter-utils':
         specifier: workspace:*
         version: link:../driver-adapter-utils
+      '@tidbcloud/serverless':
+        specifier: ^0.0.6
+        version: 0.0.6
       pg:
         specifier: ^8.11.3
         version: 8.11.3
@@ -556,7 +562,6 @@ packages:
   /@tidbcloud/serverless@0.0.6:
     resolution: {integrity: sha512-7fsWRy5xWS2/8GdSswXskJ84KEBmV1XybUCNHxCaMfNexCwoFceppO7iAsiPXMXgkEkgjuH/GOn2eqFNapKWnA==}
     engines: {node: '>=16'}
-    dev: true
 
   /@types/debug@4.1.8:
     resolution: {integrity: sha512-/vPO1EPOs306Cvhwv7KfVfYvOJqA/S/AXjaHQiJboCZzcNDb+TIJFN9/2C9DZ//ijSKWioNyUxD792QmDJ+HKQ==}

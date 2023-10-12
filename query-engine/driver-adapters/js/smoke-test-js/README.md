@@ -55,3 +55,12 @@ In the current directory:
   For more fine-grained control:
   - Run `pnpm neon:ws:http` to test using `libquery`
   - Run `pnpm neon:ws:http` to test using `@prisma/client`
+
+### TiDB Cloud
+
+In the current directory:
+- Run `pnpm prisma:tidbcloud` to push the Prisma schema and insert the test data.
+- Run `pnpm tidbcloud` to run smoke tests using `libquery` against the PlanetScale database.
+  For more fine-grained control:
+  - Run `pnpm tidbcloud:libquery` to test using `libquery`
+  - Run `pnpm tidbcloud:client` to test using `@prisma/client`

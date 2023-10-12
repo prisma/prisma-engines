@@ -20,7 +20,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        adapter: ['neon:ws', 'neon:http', planetscale, pg, libsql]
+        adapter: ['neon:ws', 'neon:http', planetscale, pg, libsql, tidbcloud]
 
     runs-on: ubuntu-latest
 
