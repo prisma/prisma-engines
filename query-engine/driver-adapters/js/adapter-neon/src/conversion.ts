@@ -270,7 +270,7 @@ const parseBytesArray = types.getTypeParser(ArrayColumnType.BYTEA_ARRAY) as (_: 
 
 types.setTypeParser(ArrayColumnType.BYTEA_ARRAY, (serializedBytesArray) => {
   const buffers = parseBytesArray(serializedBytesArray)
-  return buffers.map(encodeBuffer)
+  return buffers.map((buf) => buf ? encodeBuffer(buf) : null)
 })
 
 /* BIT_ARRAY, VARBIT_ARRAY */
