@@ -4,8 +4,9 @@ import type { ErrorCapturingDriverAdapter } from '@prisma/driver-adapter-utils'
 import type { QueryEngineInstance } from '../engines/types/Library'
 import { createQueryFn, initQueryEngine } from './util'
 import { JsonQuery } from '../engines/types/JsonProtocol'
+import { PrismaNeonHTTP } from '@prisma/adapter-neon'
 
-export function smokeTestLibquery(adapter: ErrorCapturingDriverAdapter, prismaSchemaRelativePath: string) {
+export function smokeTestLibquery(adapter: ErrorCapturingDriverAdapter, prismaSchemaRelativePath: string, supportsTransactions = true) {
   const engine = initQueryEngine(adapter, prismaSchemaRelativePath)
   const flavour = adapter.flavour
 
@@ -262,11 +263,14 @@ export function smokeTestLibquery(adapter: ErrorCapturingDriverAdapter, prismaSc
     })
 
     it('create explicit transaction', async () => {
+      if(!supportsTransactions) return
+
       const args = { isolation_level: 'Serializable', max_wait: 5000, timeout: 15000 }
       const startResponse = await engine.startTransaction(JSON.stringify(args), 'trace')
       const tx_id = JSON.parse(startResponse).id
-
       console.log('[nodejs] transaction id', tx_id)
+      assert.notStrictEqual(tx_id, undefined)
+
       await doQuery(
         {
           action: 'findMany',
@@ -282,21 +286,48 @@ export function smokeTestLibquery(adapter: ErrorCapturingDriverAdapter, prismaSc
       console.log('[nodejs] commited', commitResponse)
     })
 
-    it('expected error', async () => {
+    it('expected error (on duplicate insert) as json result (not throwing error)', async () => {
+      // clean up first
+      await doQuery({
+        modelName: 'Unique',
+        action: 'deleteMany',
+        query: {
+          selection: {
+            count: true,
+          },
+        },
+      })
+
       const result = await doQuery({
         modelName: 'Unique',
-        action: 'createMany',
+        action: 'createOne',
         query: {
           arguments: {
-            data: [{ email: 'duplicate@example.com' }, { email: 'duplicate@example.com' }],
+            data: { email: 'duplicate@example.com' },
           },
           selection: {
             $scalars: true,
           },
         },
       })
+      console.log('[nodejs] error result1', JSON.stringify(result, null, 2))
 
-      console.log('[nodejs] error result', JSON.stringify(result, null, 2))
+      const result2 = await doQuery({
+        modelName: 'Unique',
+        action: 'createOne',
+        query: {
+          arguments: {
+            data: { email: 'duplicate@example.com' }
+          },
+          selection: {
+            $scalars: true,
+          },
+        },
+      })
+      console.log('[nodejs] error result2', JSON.stringify(result2, null, 2))
+    
+      // TODO assert that result2 includes `errors.error` (which should currently only pass on neon:ws)
+      
     })
 
     describe('read scalar and non scalar types', () => {
@@ -396,7 +427,7 @@ export function smokeTestLibquery(adapter: ErrorCapturingDriverAdapter, prismaSc
           selection: {
             bytes: true,
           },
-          arguments:  {
+          arguments: {
             data: {
               bytes: {
                 $type: 'Bytes',

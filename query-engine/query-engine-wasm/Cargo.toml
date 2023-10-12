@@ -1,0 +1,36 @@
+[package]
+name = "query-engine-wasm"
+version = "0.1.0"
+edition = "2021"
+
+[lib]
+doc = false
+crate-type = ["cdylib"]
+name = "query_engine"
+
+[dependencies]
+anyhow = "1"
+async-trait = "0.1"
+user-facing-errors = { path = "../../libs/user-facing-errors" }
+psl.workspace = true
+prisma-models = { path = "../prisma-models" }
+
+thiserror = "1"
+connection-string.workspace = true 
+url = "2"
+serde_json.workspace = true
+serde.workspace = true
+tokio = { version = "1.25", features = ["macros", "sync", "io-util", "time"] }
+futures = "0.3"
+wasm-bindgen = "=0.2.87"
+wasm-bindgen-futures = "0.4"
+serde-wasm-bindgen = "0.5"
+js-sys = "0.3"
+log = "0.4.6"
+wasm-logger = "0.2.0"
+
+tracing = "0.1"
+tracing-subscriber = { version = "0.3" }
+tracing-futures = "0.2"
+tsify = "0.4.5"
+console_error_panic_hook = "0.1.7"

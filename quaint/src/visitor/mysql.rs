@@ -158,7 +158,6 @@ impl<'a> Visitor<'a> for Mysql<'a> {
                 }
                 None => None,
             },
-            #[cfg(feature = "uuid")]
             ValueType::Uuid(uuid) => uuid.map(|uuid| self.write(format!("'{}'", uuid.hyphenated()))),
             ValueType::DateTime(dt) => dt.map(|dt| self.write(format!("'{}'", dt.to_rfc3339(),))),
             ValueType::Date(date) => date.map(|date| self.write(format!("'{date}'"))),
@@ -859,7 +858,6 @@ mod tests {
     }
 
     #[test]
-    #[cfg(feature = "uuid")]
     fn test_raw_uuid() {
         let uuid = uuid::Uuid::new_v4();
         let (sql, params) = Mysql::build(Select::default().value(uuid.raw())).unwrap();

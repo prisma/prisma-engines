@@ -388,7 +388,6 @@ impl From<std::net::AddrParseError> for Error {
     }
 }
 
-#[cfg(feature = "uuid")]
 impl From<uuid::Error> for Error {
     fn from(e: uuid::Error) -> Self {
         Error::builder(ErrorKind::UUIDError(format!("{e}"))).build()

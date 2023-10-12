@@ -35,9 +35,9 @@
     "planetscale:client": "DATABASE_URL=\"${JS_PLANETSCALE_DATABASE_URL}\" node --test --test-reporter spec --loader=tsx ./src/client/planetscale.test.ts",
     "planetscale": "pnpm planetscale:libquery && pnpm planetscale:client",
     "prisma:libsql": "cross-env-shell DATABASE_URL=\"${JS_LIBSQL_DATABASE_URL}\" \"pnpm prisma:db:push:sqlite && pnpm prisma:db:execute:sqlite\"",
-    "libsql:libquery": "cross-env-shell DATABASE_URL=\"${JS_LIBSQL_DATABASE_URL}\" node --test --loader=tsx ./src/libquery/libsql.test.ts",
-    "libsql:client": "cross-env-shell DATABASE_URL=\"${JS_LIBSQL_DATABASE_URL}\" node --test --loader=tsx ./src/client/libsql.test.ts",
-    "libsql": "pnpm libsql:libquery && pnpm libsql:client",
+    "libsql:libquery": "cross-env-shell DATABASE_URL=\"${JS_LIBSQL_DATABASE_URL}\" node --test --test-reporter spec --loader=tsx ./src/libquery/libsql.test.ts",
+    "libsql:client": "cross-env-shell DATABASE_URL=\"${JS_LIBSQL_DATABASE_URL}\" node --test --test-reporter spec --loader=tsx ./src/client/libsql.test.ts",
+    "libsql": "pnpm libsql:libquery && pnpm libsql:client"
     "prisma:tidbcloud": "cross-env-shell DATABASE_URL=\"${JS_TIDBCLOUD_DATABASE_URL}\" \"pnpm prisma:db:push:mysql && pnpm prisma:db:execute:mysql\"",
     "tidbcloud:libquery": "DATABASE_URL=\"${JS_TIDBCLOUD_DATABASE_URL}\" node --test --test-reporter spec --loader=tsx ./src/libquery/tidbcloud.test.ts",
     "tidbcloud:client": "DATABASE_URL=\"${JS_TIDBCLOUD_DATABASE_URL}\" node --test --test-reporter spec --loader=tsx ./src/client/tidbcloud.test.ts",
@@ -55,7 +55,7 @@
     "@prisma/adapter-neon": "workspace:*",
     "@prisma/adapter-pg": "workspace:*",
     "@prisma/adapter-planetscale": "workspace:*",
-    "@prisma/client": "5.4.1",
+    "@prisma/client": "5.4.2",
     "@prisma/driver-adapter-utils": "workspace:*",
     "@tidbcloud/serverless": "^0.0.6",
     "@prisma/adapter-tidbcloud": "workspace:*",
@@ -67,7 +67,7 @@
     "@types/node": "^20.5.1",
     "@types/pg": "^8.10.2",
     "cross-env": "^7.0.3",
-    "prisma": "5.4.1",
+    "prisma": "5.4.2",
     "tsx": "^3.12.7"
   }
 }
