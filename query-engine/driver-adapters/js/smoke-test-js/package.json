@@ -37,7 +37,7 @@
     "prisma:libsql": "cross-env-shell DATABASE_URL=\"${JS_LIBSQL_DATABASE_URL}\" \"pnpm prisma:db:push:sqlite && pnpm prisma:db:execute:sqlite\"",
     "libsql:libquery": "cross-env-shell DATABASE_URL=\"${JS_LIBSQL_DATABASE_URL}\" node --test --test-reporter spec --loader=tsx ./src/libquery/libsql.test.ts",
     "libsql:client": "cross-env-shell DATABASE_URL=\"${JS_LIBSQL_DATABASE_URL}\" node --test --test-reporter spec --loader=tsx ./src/client/libsql.test.ts",
-    "libsql": "pnpm libsql:libquery && pnpm libsql:client"
+    "libsql": "pnpm libsql:libquery && pnpm libsql:client",
     "prisma:tidbcloud": "cross-env-shell DATABASE_URL=\"${JS_TIDBCLOUD_DATABASE_URL}\" \"pnpm prisma:db:push:mysql && pnpm prisma:db:execute:mysql\"",
     "tidbcloud:libquery": "DATABASE_URL=\"${JS_TIDBCLOUD_DATABASE_URL}\" node --test --test-reporter spec --loader=tsx ./src/libquery/tidbcloud.test.ts",
     "tidbcloud:client": "DATABASE_URL=\"${JS_TIDBCLOUD_DATABASE_URL}\" node --test --test-reporter spec --loader=tsx ./src/client/tidbcloud.test.ts",
