@@ -20,6 +20,7 @@ const ArrayColumnType = {
   INET_ARRAY: 1041,
   INT2_ARRAY: 1005,
   INT4_ARRAY: 1007,
+  INT8_ARRAY: 1016,
   JSONB_ARRAY: 3807,
   JSON_ARRAY: 199,
   MONEY_ARRAY: 791,
@@ -117,6 +118,7 @@ export function fieldToColumnType(fieldTypeId: number): ColumnType {
       return ColumnTypeEnum.BytesArray
     case ArrayColumnType.UUID_ARRAY:
       return ColumnTypeEnum.UuidArray
+    case ArrayColumnType.INT8_ARRAY:
     case ArrayColumnType.OID_ARRAY:
       return ColumnTypeEnum.Int64Array
     default:
