@@ -8,7 +8,7 @@ use std::fmt::Display;
 
 #[allow(clippy::enum_variant_names)]
 #[derive(Debug, Clone)]
-pub(crate) enum ReadQuery {
+pub enum ReadQuery {
     RecordQuery(RecordQuery),
     ManyRecordsQuery(ManyRecordsQuery),
     RelatedRecordsQuery(RelatedRecordsQuery),
@@ -53,6 +53,14 @@ impl ReadQuery {
             ReadQuery::ManyRecordsQuery(x) => x.model.clone(),
             ReadQuery::RelatedRecordsQuery(x) => x.parent_field.related_field().model(),
             ReadQuery::AggregateRecordsQuery(x) => x.model.clone(),
+        }
+    }
+
+    pub(crate) fn into_related_records_query(self) -> Option<RelatedRecordsQuery> {
+        if let Self::RelatedRecordsQuery(v) = self {
+            Some(v)
+        } else {
+            None
         }
     }
 }
@@ -194,7 +202,7 @@ pub struct RelatedRecordsQuery {
     pub parent_field: RelationFieldRef,
     pub args: QueryArguments,
     pub selected_fields: FieldSelection,
-    pub(crate) nested: Vec<ReadQuery>,
+    pub nested: Vec<ReadQuery>,
     pub selection_order: Vec<String>,
     pub aggregation_selections: Vec<RelAggregationSelection>,
 

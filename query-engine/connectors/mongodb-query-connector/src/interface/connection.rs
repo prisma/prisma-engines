@@ -6,8 +6,8 @@ use crate::{
 };
 use async_trait::async_trait;
 use connector_interface::{
-    Connection, ConnectionLike, ReadOperations, RelAggregationSelection, Transaction, UpdateType, WriteArgs,
-    WriteOperations,
+    Connection, ConnectionLike, ReadOperations, RelAggregationSelection, RelatedQuery, Transaction, UpdateType,
+    WriteArgs, WriteOperations,
 };
 use mongodb::{ClientSession, Database};
 use query_structure::{prelude::*, SelectionResult};
@@ -211,6 +211,7 @@ impl ReadOperations for MongoDbConnection {
         model: &Model,
         query_arguments: query_structure::QueryArguments,
         selected_fields: &FieldSelection,
+        _nested: Vec<RelatedQuery>,
         aggregation_selections: &[RelAggregationSelection],
         _trace_id: Option<String>,
     ) -> connector_interface::Result<ManyRecords> {

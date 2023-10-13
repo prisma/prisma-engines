@@ -3,6 +3,8 @@ mod average;
 mod coalesce;
 mod concat;
 mod count;
+mod json_array_agg;
+mod json_build_obj;
 #[cfg(any(feature = "postgresql", feature = "mysql"))]
 mod json_extract;
 #[cfg(any(feature = "postgresql", feature = "mysql"))]
@@ -28,6 +30,8 @@ pub use average::*;
 pub use coalesce::*;
 pub use concat::*;
 pub use count::*;
+pub use json_array_agg::*;
+pub use json_build_obj::*;
 #[cfg(any(feature = "postgresql", feature = "mysql"))]
 pub use json_extract::*;
 #[cfg(any(feature = "postgresql", feature = "mysql"))]
@@ -37,6 +41,7 @@ pub use json_unquote::*;
 pub use lower::*;
 pub use maximum::*;
 pub use minimum::*;
+use postgres_types::Json;
 pub use row_number::*;
 #[cfg(feature = "postgresql")]
 pub use row_to_json::*;
@@ -98,6 +103,8 @@ pub(crate) enum FunctionType<'a> {
     JsonExtractFirstArrayElem(JsonExtractFirstArrayElem<'a>),
     #[cfg(any(feature = "postgresql", feature = "mysql"))]
     JsonUnquote(JsonUnquote<'a>),
+    JsonArrayAgg(JsonArrayAgg<'a>),
+    JsonBuildObject(JsonBuildObject<'a>),
     #[cfg(any(feature = "postgresql", feature = "mysql"))]
     TextSearch(TextSearch<'a>),
     #[cfg(any(feature = "postgresql", feature = "mysql"))]
@@ -154,5 +161,7 @@ function!(
     Minimum,
     Maximum,
     Coalesce,
-    Concat
+    Concat,
+    JsonArrayAgg,
+    JsonBuildObject
 );

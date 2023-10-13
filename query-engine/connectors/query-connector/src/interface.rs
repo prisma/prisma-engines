@@ -217,6 +217,18 @@ impl RelAggregationSelection {
     }
 }
 
+#[derive(Debug, Clone)]
+pub struct RelatedQuery {
+    pub name: String,
+    pub alias: Option<String>,
+    pub parent_field: RelationFieldRef,
+    pub args: QueryArguments,
+    pub selected_fields: FieldSelection,
+    pub nested: Option<Vec<RelatedQuery>>,
+    pub selection_order: Vec<String>,
+    pub aggregation_selections: Vec<RelAggregationSelection>,
+}
+
 #[async_trait]
 pub trait ReadOperations {
     /// Gets a single record or `None` back from the database.
@@ -245,6 +257,7 @@ pub trait ReadOperations {
         model: &Model,
         query_arguments: QueryArguments,
         selected_fields: &FieldSelection,
+        nested: Vec<RelatedQuery>,
         aggregation_selections: &[RelAggregationSelection],
         trace_id: Option<String>,
     ) -> crate::Result<ManyRecords>;
