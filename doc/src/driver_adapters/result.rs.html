@@ -113,11 +113,11 @@
 /// See driver-adapters/js/adapter-utils/src/types.ts file for example
 </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">enum </span>DriverAdapterError {
     <span class="doccomment">/// Unexpected JS exception
-    </span>GenericJsError {
+    </span>GenericJs {
         id: i32,
     },
 
-    PostgresError(<span class="attr">#[serde(with = <span class="string">&quot;PostgresErrorDef&quot;</span>)] </span>PostgresError),
+    Postgres(<span class="attr">#[serde(with = <span class="string">&quot;PostgresErrorDef&quot;</span>)] </span>PostgresError),
     <span class="comment">// in the future, expected errors that map to known user errors with PXXX codes will also go here
 </span>}
 
@@ -132,8 +132,8 @@
 <span class="kw">impl </span>From&lt;DriverAdapterError&gt; <span class="kw">for </span>QuaintError {
     <span class="kw">fn </span>from(value: DriverAdapterError) -&gt; <span class="self">Self </span>{
         <span class="kw">match </span>value {
-            DriverAdapterError::GenericJsError { id } =&gt; QuaintError::external_error(id),
-            DriverAdapterError::PostgresError(e) =&gt; e.into(),
+            DriverAdapterError::GenericJs { id } =&gt; QuaintError::external_error(id),
+            DriverAdapterError::Postgres(e) =&gt; e.into(),
             <span class="comment">// in future, more error types would be added and we&#39;ll need to convert them to proper QuaintErrors here
         </span>}
     }

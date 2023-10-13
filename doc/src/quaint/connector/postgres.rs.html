@@ -1589,8 +1589,10 @@
 <a href="#1589" id="1589">1589</a>
 <a href="#1590" id="1590">1590</a>
 <a href="#1591" id="1591">1591</a>
+<a href="#1592" id="1592">1592</a>
+<a href="#1593" id="1593">1593</a>
 </pre></div><pre class="rust"><code><span class="kw">mod </span>conversion;
-<span class="kw">pub mod </span>error;
+<span class="kw">mod </span>error;
 
 <span class="kw">use crate</span>::{
     ast::{Query, Value},
@@ -1617,6 +1619,8 @@
     Client, Config, Statement,
 };
 <span class="kw">use </span>url::{Host, Url};
+
+<span class="kw">pub use </span>error::PostgresError;
 
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">const </span>DEFAULT_SCHEMA: <span class="kw-2">&amp;</span>str = <span class="string">&quot;public&quot;</span>;
 
