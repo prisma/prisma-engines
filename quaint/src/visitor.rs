@@ -1106,6 +1106,27 @@ pub trait Visitor<'a> {
             FunctionType::Concat(concat) => {
                 self.visit_concat(concat)?;
             }
+            FunctionType::JsonArrayAgg(array_agg) => {
+                self.write("JSON_AGG")?;
+                self.surround_with("(", ")", |s| s.visit_expression(*array_agg.expr))?;
+            }
+            FunctionType::JsonBuildObject(build_obj) => {
+                let len = build_obj.exprs.len();
+
+                self.write("JSON_BUILD_OBJECT")?;
+                self.surround_with("(", ")", |s| {
+                    for (i, (name, expr)) in build_obj.exprs.into_iter().enumerate() {
+                        s.visit_raw_value(Value::text(name))?;
+                        s.write(", ")?;
+                        s.visit_expression(expr)?;
+                        if i < (len - 1) {
+                            s.write(", ")?;
+                        }
+                    }
+
+                    Ok(())
+                })?;
+            }
         };
 
         if let Some(alias) = fun.alias {

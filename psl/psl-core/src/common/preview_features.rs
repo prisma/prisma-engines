@@ -76,6 +76,7 @@ features!(
     TransactionApi,
     UncheckedScalarInputs,
     Views,
+    RelationJoins
 );
 
 /// Generator preview features
@@ -90,6 +91,7 @@ pub const ALL_PREVIEW_FEATURES: FeatureMap = FeatureMap {
          | PostgresqlExtensions
          | Tracing
          | Views
+         | RelationJoins
     }),
     deprecated: enumflags2::make_bitflags!(PreviewFeature::{
         AtomicNumberOperations

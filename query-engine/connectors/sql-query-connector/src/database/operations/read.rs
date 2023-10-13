@@ -58,6 +58,7 @@ pub(crate) async fn get_many_records(
     model: &Model,
     mut query_arguments: QueryArguments,
     selected_fields: &ModelProjection,
+    nested: Vec<RelatedQuery>,
     aggr_selections: &[RelAggregationSelection],
     ctx: &Context<'_>,
 ) -> crate::Result<ManyRecords> {
@@ -132,11 +133,14 @@ pub(crate) async fn get_many_records(
             }
         }
         _ => {
+            query_builder::select::build(query_arguments.clone(), nested.clone(), selected_fields, &[], ctx);
+
             let query = read::get_records(
                 model,
                 selected_fields.as_columns(ctx).mark_all_selected(),
                 aggr_selections,
                 query_arguments,
+                nested,
                 ctx,
             );
 

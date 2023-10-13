@@ -1,6 +1,8 @@
 use super::*;
 use crate::{interpreter::InterpretationResult, query_ast::*, result_ast::*};
-use connector::{self, error::ConnectorError, ConnectionLike, RelAggregationRow, RelAggregationSelection};
+use connector::{
+    self, error::ConnectorError, ConnectionLike, RelAggregationRow, RelAggregationSelection, RelatedQuery,
+};
 use futures::future::{BoxFuture, FutureExt};
 use inmemory_record_processor::InMemoryRecordProcessor;
 use query_structure::ManyRecords;
@@ -86,6 +88,20 @@ fn read_one(
 /// -> Unstable cursors can't reliably be fetched by the underlying datasource, so we need to process part of it in-memory.
 fn read_many(
     tx: &mut dyn ConnectionLike,
+    query: ManyRecordsQuery,
+    trace_id: Option<String>,
+) -> BoxFuture<'_, InterpretationResult<QueryResult>> {
+    let use_joins = true;
+
+    if use_joins {
+        read_many_by_joins(tx, query, trace_id)
+    } else {
+        read_many_by_queries(tx, query, trace_id)
+    }
+}
+
+fn read_many_by_queries(
+    tx: &mut dyn ConnectionLike,
     mut query: ManyRecordsQuery,
     trace_id: Option<String>,
 ) -> BoxFuture<'_, InterpretationResult<QueryResult>> {
@@ -101,6 +117,7 @@ fn read_many(
                 &query.model,
                 query.args.clone(),
                 &query.selected_fields,
+                Vec::new(),
                 &query.aggregation_selections,
                 trace_id,
             )
@@ -131,6 +148,86 @@ fn read_many(
     };
 
     fut.boxed()
+}
+
+fn read_many_by_joins(
+    tx: &mut dyn ConnectionLike,
+    mut query: ManyRecordsQuery,
+    trace_id: Option<String>,
+) -> BoxFuture<'_, InterpretationResult<QueryResult>> {
+    let processor = if query.args.requires_inmemory_processing() {
+        Some(InMemoryRecordProcessor::new_from_query_args(&mut query.args))
+    } else {
+        None
+    };
+
+    let nested = build_related_reads(&query);
+
+    let fut = async move {
+        let scalars = tx
+            .get_many_records(
+                &query.model,
+                query.args.clone(),
+                &query.selected_fields,
+                nested,
+                &query.aggregation_selections,
+                trace_id,
+            )
+            .await?;
+
+        let scalars = if let Some(p) = processor {
+            p.apply(scalars)
+        } else {
+            scalars
+        };
+
+        let (scalars, aggregation_rows) = extract_aggregation_rows_from_scalars(scalars, query.aggregation_selections);
+
+        if scalars.records.is_empty() && query.options.contains(QueryOption::ThrowOnEmpty) {
+            record_not_found()
+        } else {
+            Ok(RecordSelection {
+                name: query.name,
+                fields: query.selection_order,
+                scalars,
+                nested: Vec::new(),
+                model: query.model,
+                aggregation_rows,
+            }
+            .into())
+        }
+    };
+
+    fut.boxed()
+}
+
+fn build_related_reads(query: &ManyRecordsQuery) -> Vec<RelatedQuery> {
+    query
+        .nested
+        .clone()
+        .into_iter()
+        .filter_map(|n| n.into_related_records_query())
+        .map(to_related_query)
+        .collect()
+}
+
+fn to_related_query(n: RelatedRecordsQuery) -> RelatedQuery {
+    RelatedQuery {
+        name: n.name,
+        alias: n.alias,
+        parent_field: n.parent_field,
+        args: n.args,
+        selected_fields: n.selected_fields,
+        nested: Some(
+            n.nested
+                .into_iter()
+                .filter_map(|n| n.into_related_records_query())
+                .map(|n| to_related_query(n))
+                .collect(),
+        ),
+        selection_order: n.selection_order,
+        aggregation_selections: n.aggregation_selections,
+    }
 }
 
 /// Queries related records for a set of parent IDs.
