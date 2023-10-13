@@ -6,7 +6,7 @@ use thiserror::Error;
 #[cfg(feature = "pooled")]
 use std::time::Duration;
 
-pub use crate::connector::postgres::error::PostgresError;
+pub use crate::connector::postgres::PostgresError;
 
 #[derive(Debug, PartialEq, Eq)]
 pub enum DatabaseConstraint {
