@@ -1,5 +1,5 @@
 mod conversion;
-pub mod error;
+mod error;
 
 use crate::{
     ast::{Query, Value},
@@ -8,6 +8,7 @@ use crate::{
     visitor::{self, Visitor},
 };
 use async_trait::async_trait;
+pub use error::PostgresError;
 use futures::{future::FutureExt, lock::Mutex};
 use lru_cache::LruCache;
 use native_tls::{Certificate, Identity, TlsConnector};
