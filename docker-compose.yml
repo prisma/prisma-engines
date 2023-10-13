@@ -126,7 +126,7 @@ services:
     environment:
       MYSQL_HOST: 'vitess-test-8_0'
       MYSQL_PORT: 33807
-      MYSQL_DATABASE: 'test-0000-00000000'
+      MYSQL_DATABASE: 'test'
     ports:
       - '8085:8085'
     depends_on:
