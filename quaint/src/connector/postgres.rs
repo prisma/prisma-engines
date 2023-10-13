@@ -8,7 +8,6 @@ use crate::{
     visitor::{self, Visitor},
 };
 use async_trait::async_trait;
-pub use error::PostgresError;
 use futures::{future::FutureExt, lock::Mutex};
 use lru_cache::LruCache;
 use native_tls::{Certificate, Identity, TlsConnector};
@@ -27,6 +26,8 @@ use tokio_postgres::{
     Client, Config, Statement,
 };
 use url::{Host, Url};
+
+pub use error::PostgresError;
 
 pub(crate) const DEFAULT_SCHEMA: &str = "public";
 
