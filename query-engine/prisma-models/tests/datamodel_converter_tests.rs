@@ -42,26 +42,79 @@ fn converting_enums() {
 fn converting_composite_types() {
     let res = psl::parse_schema(
         r#"
-    datasource db {
-      provider = "mongodb"
-      url      = "mongodb://localhost:27017/hello"
-    }
+        datasource db {
+            provider = "mongodb"
+            url      = "mongodb://localhost:27017/hello"
+        }
 
-    model MyModel {
-      id        String      @id @default(auto()) @map("_id") @db.ObjectId
-      attribute Attribute
+        model Post {
+            id         String      @id @default(auto()) @map("_id") @db.ObjectId
+            author     User        @relation(fields: [authorId], references: [id])
+            authorId   String      @db.ObjectId
+            attributes Attribute[]
+      
+            @@unique([authorId, attributes])
+            //       ^^^^^^^^^^^^^^^^^^^^^^
+            // Indexes only support composite types when not used in
+            // conjunction with other fields
+        }
 
-      @@unique([attribute], name: "composite_index")
-    }
-
-    type Attribute {
-      name  String
-      value String
-      group String
-    }
+        type Attribute {
+            name  String
+            value String
+            group String
+        }
+      
+        model User {
+            id   String @id @default(auto()) @map("_id") @db.ObjectId
+            Post Post[]
+        }
     "#,
     );
-    assert!(res.unwrap_err().contains("Indexes can only contain scalar attributes. Please remove \"attribute\" from the argument list of the indexes."));
+
+    assert!(res
+        .unwrap_err()
+        .contains("Prisma currently does not composite types in indexes when used in conjunction with other fields."));
+}
+
+#[test]
+fn converting_composite_types_2() {
+    let res = psl::parse_schema(
+        r#"
+        datasource db { 
+            provider = "mongodb"
+            url      = "mongodb://localhost:27017/hello"
+          }
+          
+          type TheatersLocation {
+            address TheatersLocationAddress
+            geo     TheatersLocationGeo
+          }
+          
+          type TheatersLocationAddress {
+            city    String
+            state   String
+            street1 String
+            street2 String?
+            zipcode String
+          }
+          
+          type TheatersLocationGeo {
+            coordinates Float[]
+            type        String
+          }
+          
+          model theaters {
+            id        String           @id @default(auto()) @map("_id") @db.ObjectId
+            location  TheatersLocation
+            theaterId Int
+          
+            @@index([location.geo], map: "geo index")
+          }
+        "#,
+    );
+
+    assert!(res.is_ok());
 }
 
 #[test]
