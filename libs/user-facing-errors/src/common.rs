@@ -251,7 +251,7 @@ mod tests {
             database_file_name: "dev.db".into(),
         };
 
-        assert_eq!(sqlite_err.message(), "Database `dev.db` does not exist at `/tmp/dev.db`");
+        assert_eq!(sqlite_err.message(), "Database `dev.db` does not exist at `/tmp/dev.db`.");
 
         let mysql_err = DatabaseDoesNotExist::Mysql {
             database_name: "root".into(),
