@@ -113,7 +113,7 @@ fn unreachable_database_must_return_a_proper_error_on_mysql(api: TestApi) {
     let json_error = serde_json::to_value(&error.to_user_facing()).unwrap();
     let expected = json!({
         "is_panic": false,
-        "message": format!("Can't reach database server at `{host}`:`{port}`\n\nPlease make sure your database server is running at `{host}`:`{port}`."),
+        "message": format!("Can't reach database server at `{host}:{port}`\n\nPlease make sure your database server is running at `{host}:{port}`."),
         "meta": {
             "database_host": host,
             "database_port": port,
@@ -147,7 +147,7 @@ fn unreachable_database_must_return_a_proper_error_on_postgres(api: TestApi) {
     let json_error = serde_json::to_value(&error.to_user_facing()).unwrap();
     let expected = json!({
         "is_panic": false,
-        "message": format!("Can't reach database server at `{host}`:`{port}`\n\nPlease make sure your database server is running at `{host}`:`{port}`."),
+        "message": format!("Can't reach database server at `{host}:{port}`\n\nPlease make sure your database server is running at `{host}:{port}`."),
         "meta": {
             "database_host": host,
             "database_port": port,
