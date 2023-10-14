@@ -252,7 +252,7 @@ mod tests {
         };
 
         assert_eq!(
-            sqlite_err.message(), 
+            sqlite_err.message(),
             "Database `dev.db` does not exist at `/tmp/dev.db`."
         );
 
