@@ -1,4 +1,4 @@
-use std::future::Future;
+use std::{borrow::Cow, future::Future};
 
 use async_trait::async_trait;
 use prisma_metrics::gauge;
@@ -86,11 +86,16 @@ impl Queryable for JsTransactionContext {
 pub(crate) struct JsTransaction {
     tx_proxy: TransactionProxy,
     inner: JsBaseQueryable,
+    pub depth: u32,
 }
 
 impl JsTransaction {
     pub(crate) fn new(inner: JsBaseQueryable, tx_proxy: TransactionProxy) -> Self {
-        Self { inner, tx_proxy }
+        Self {
+            inner,
+            tx_proxy,
+            depth: 0,
+        }
     }
 
     pub fn options(&self) -> &TransactionOptions {
@@ -112,36 +117,60 @@ impl JsTransaction {
 
 #[async_trait]
 impl QuaintTransaction for JsTransaction {
-    async fn commit(&self) -> quaint::Result<()> {
+    async fn begin(&mut self) -> quaint::Result<()> {
         // increment of this gauge is done in DriverProxy::startTransaction
         gauge!("prisma_client_queries_active").decrement(1.0);
 
-        let commit_stmt = "COMMIT";
+        self.depth += 1;
+
+        let begin_stmt = self.begin_statement(self.depth);
 
         if self.options().use_phantom_query {
-            let commit_stmt = JsBaseQueryable::phantom_query_message(commit_stmt);
+            let commit_stmt = JsBaseQueryable::phantom_query_message(&begin_stmt);
             self.raw_phantom_cmd(commit_stmt.as_str()).await?;
         } else {
-            self.inner.raw_cmd(commit_stmt).await?;
+            self.inner.raw_cmd(&begin_stmt).await?;
         }
 
-        UnsafeFuture(self.tx_proxy.commit()).await
+        UnsafeFuture(self.tx_proxy.begin()).await
     }
-
-    async fn rollback(&self) -> quaint::Result<()> {
+    async fn commit(&mut self) -> quaint::Result<u32> {
         // increment of this gauge is done in DriverProxy::startTransaction
         gauge!("prisma_client_queries_active").decrement(1.0);
 
-        let rollback_stmt = "ROLLBACK";
+        let commit_stmt = self.commit_statement(self.depth);
 
         if self.options().use_phantom_query {
-            let rollback_stmt = JsBaseQueryable::phantom_query_message(rollback_stmt);
-            self.raw_phantom_cmd(rollback_stmt.as_str()).await?;
+            let commit_stmt = JsBaseQueryable::phantom_query_message(&commit_stmt);
+            self.raw_phantom_cmd(commit_stmt.as_str()).await?;
         } else {
-            self.inner.raw_cmd(rollback_stmt).await?;
+            self.inner.raw_cmd(&commit_stmt).await?;
         }
 
-        UnsafeFuture(self.tx_proxy.rollback()).await
+        let _ = UnsafeFuture(self.tx_proxy.commit()).await;
+
+        // Modify the depth value
+        self.depth -= 1;
+
+        Ok(self.depth)
+    }
+
+    async fn rollback(&mut self) -> quaint::Result<u32> {
+        let rollback_stmt = self.rollback_statement(self.depth);
+
+        if self.options().use_phantom_query {
+            let rollback_stmt = JsBaseQueryable::phantom_query_message(&rollback_stmt);
+            self.raw_phantom_cmd(rollback_stmt.as_str()).await?;
+        } else {
+            self.inner.raw_cmd(&rollback_stmt).await?;
+        }
+
+        let _ = UnsafeFuture(self.tx_proxy.rollback()).await;
+
+        // Modify the depth value
+        self.depth -= 1;
+
+        Ok(self.depth)
     }
 
     fn as_queryable(&self) -> &dyn Queryable {
@@ -197,6 +226,18 @@ impl Queryable for JsTransaction {
 
     fn requires_isolation_first(&self) -> bool {
         self.inner.requires_isolation_first()
+    }
+
+    fn begin_statement(&self, depth: u32) -> Cow<'static, str> {
+        self.inner.begin_statement(depth)
+    }
+
+    fn commit_statement(&self, depth: u32) -> Cow<'static, str> {
+        self.inner.commit_statement(depth)
+    }
+
+    fn rollback_statement(&self, depth: u32) -> Cow<'static, str> {
+        self.inner.rollback_statement(depth)
     }
 }
 

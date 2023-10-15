@@ -44,17 +44,21 @@ impl<'conn> MongoDbTransaction<'conn> {
 
 #[async_trait]
 impl Transaction for MongoDbTransaction<'_> {
-    async fn commit(&mut self) -> connector_interface::Result<()> {
+    async fn begin(&mut self) -> connector_interface::Result<()> {
+        Ok(())
+    }
+
+    async fn commit(&mut self) -> connector_interface::Result<u32> {
         self.gauge.decrement();
 
         utils::commit_with_retry(&mut self.connection.session)
             .await
             .map_err(|err| MongoError::from(err).into_connector_error())?;
 
-        Ok(())
+        Ok(0)
     }
 
-    async fn rollback(&mut self) -> connector_interface::Result<()> {
+    async fn rollback(&mut self) -> connector_interface::Result<u32> {
         self.gauge.decrement();
 
         self.connection
@@ -63,7 +67,7 @@ impl Transaction for MongoDbTransaction<'_> {
             .await
             .map_err(|err| MongoError::from(err).into_connector_error())?;
 
-        Ok(())
+        Ok(0)
     }
 
     async fn version(&self) -> Option<String> {

@@ -370,16 +370,18 @@ impl JsQueryable {
         }
 
         // 3. Spawn a transaction from the context.
-        let tx = tx_ctx.start_transaction().await?;
+        let mut tx = tx_ctx.start_transaction().await?;
 
-        let begin_stmt = tx.begin_statement();
+        tx.depth += 1;
+
+        let begin_stmt = tx.begin_statement(tx.depth);
         let tx_opts = tx.options();
 
         if tx_opts.use_phantom_query {
-            let begin_stmt = JsBaseQueryable::phantom_query_message(begin_stmt);
+            let begin_stmt = JsBaseQueryable::phantom_query_message(&begin_stmt);
             tx.raw_phantom_cmd(begin_stmt.as_str()).await?;
         } else {
-            tx.raw_cmd(begin_stmt).await?;
+            tx.raw_cmd(&begin_stmt).await?;
         }
 
         // 4. Set the isolation level (if specified) if we didn't do it before.
