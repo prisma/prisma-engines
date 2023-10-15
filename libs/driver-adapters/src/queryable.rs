@@ -369,6 +369,7 @@ impl JsQueryable {
         isolation: Option<IsolationLevel>,
     ) -> quaint::Result<Box<dyn Transaction + 'a>> {
         let tx = self.driver_proxy.start_transaction(isolation).await?;
+        tx.depth += 1;
         self.server_reset_query(tx.as_ref()).await?;
         Ok(tx)
     }

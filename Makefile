@@ -466,8 +466,8 @@ ensure-prisma-present:
 		  echo "⚠️ ../prisma diverges from prisma/prisma main branch. Test results might diverge from those in CI ⚠️ "; \
 		fi \
 	else \
-		echo "git clone --depth=1 https://github.com/prisma/prisma.git --branch=$(PRISMA_BRANCH) ../prisma"; \
-		git clone --depth=1 https://github.com/prisma/prisma.git --branch=$(PRISMA_BRANCH) "../prisma" && echo "Prisma repository has been cloned to ../prisma"; \
+		echo "git clone --depth=1 https://github.com/prisma/prisma.git --branch=lucianbuzzo/nested-rollbacks ../prisma"; \
+		git clone --depth=1 https://github.com/prisma/prisma.git --branch=lucianbuzzo/nested-rollbacks "../prisma" && echo "Prisma repository has been cloned to ../prisma"; \
 	fi;
 
 ## OpenTelemetry

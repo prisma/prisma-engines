@@ -35,6 +35,7 @@ use native_tls::{Certificate, Identity, TlsConnector};
 use postgres_native_tls::MakeTlsConnector;
 use postgres_types::{Kind as PostgresKind, Type as PostgresType};
 use query::PreparedQuery;
+use std::borrow::Cow;
 use std::{
     fmt::{Debug, Display},
     fs,
@@ -546,9 +547,7 @@ impl<Cache: QueryCache> TransactionCapable for PostgreSql<Cache> {
     ) -> crate::Result<Box<dyn Transaction + 'a>> {
         let opts = TransactionOptions::new(isolation, self.requires_isolation_first());
 
-        Ok(Box::new(
-            DefaultTransaction::new(self, self.begin_statement(), opts).await?,
-        ))
+        Ok(Box::new(DefaultTransaction::new(self, opts).await?))
     }
 }
 
@@ -745,6 +744,33 @@ impl<Cache: QueryCache> Queryable for PostgreSql<Cache> {
 
     fn requires_isolation_first(&self) -> bool {
         false
+    }
+
+    /// Statement to begin a transaction
+    fn begin_statement(&self, depth: u32) -> Cow<'static, str> {
+        if depth > 1 {
+            Cow::Owned(format!("SAVEPOINT savepoint{depth}"))
+        } else {
+            Cow::Borrowed("BEGIN")
+        }
+    }
+
+    /// Statement to commit a transaction
+    fn commit_statement(&self, depth: u32) -> Cow<'static, str> {
+        if depth > 1 {
+            Cow::Owned(format!("RELEASE SAVEPOINT savepoint{depth}"))
+        } else {
+            Cow::Borrowed("COMMIT")
+        }
+    }
+
+    /// Statement to rollback a transaction
+    fn rollback_statement(&self, depth: u32) -> Cow<'static, str> {
+        if depth > 1 {
+            Cow::Owned(format!("ROLLBACK TO SAVEPOINT savepoint{depth}"))
+        } else {
+            Cow::Borrowed("ROLLBACK")
+        }
     }
 }
 

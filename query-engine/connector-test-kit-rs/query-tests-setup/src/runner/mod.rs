@@ -379,8 +379,10 @@ impl Runner {
         max_acquisition_millis: u64,
         valid_for_millis: u64,
         isolation_level: Option<String>,
+        new_tx_id: Option<TxId>,
     ) -> TestResult<TxId> {
-        let tx_opts = TransactionOptions::new(max_acquisition_millis, valid_for_millis, isolation_level);
+        let mut tx_opts = TransactionOptions::new(max_acquisition_millis, valid_for_millis, isolation_level);
+        tx_opts.new_tx_id = new_tx_id;
         let response: StartTransactionResponse = self.executor.start_tx(tx_opts).await?;
 
         match response {

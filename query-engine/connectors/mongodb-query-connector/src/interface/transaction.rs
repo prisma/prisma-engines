@@ -39,22 +39,28 @@ impl<'conn> MongoDbTransaction<'conn> {
 
 #[async_trait]
 impl Transaction for MongoDbTransaction<'_> {
-    async fn commit(&mut self) -> connector_interface::Result<()> {
+    async fn begin(&mut self) -> connector_interface::Result<()> {
+        // MongoDB transactions are started in `MongoDbTransaction::new()`. Nested transactions are
+        // not supported, so this is a no-op.
+        Ok(())
+    }
+
+    async fn commit(&mut self) -> connector_interface::Result<u32> {
         utils::commit_with_retry(&mut self.connection.session)
             .await
             .map_err(|err| MongoError::from(err).into_connector_error())?;
 
-        Ok(())
+        Ok(0)
     }
 
-    async fn rollback(&mut self) -> connector_interface::Result<()> {
+    async fn rollback(&mut self) -> connector_interface::Result<u32> {
         self.connection
             .session
             .abort_transaction()
             .await
             .map_err(|err| MongoError::from(err).into_connector_error())?;
 
-        Ok(())
+        Ok(0)
     }
 
     async fn version(&self) -> Option<String> {
