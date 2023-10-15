@@ -6,6 +6,7 @@ use tokio::sync::oneshot;
 pub enum TxOpRequestMsg {
     Commit,
     Rollback,
+    Begin,
     Single(Operation, Option<String>),
     Batch(Vec<Operation>, Option<String>),
 }
@@ -18,6 +19,7 @@ pub struct TxOpRequest {
 impl Display for TxOpRequest {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self.msg {
+            TxOpRequestMsg::Begin => write!(f, "Begin"),
             TxOpRequestMsg::Commit => write!(f, "Commit"),
             TxOpRequestMsg::Rollback => write!(f, "Rollback"),
             TxOpRequestMsg::Single(..) => write!(f, "Single"),
@@ -28,8 +30,9 @@ impl Display for TxOpRequest {
 
 #[derive(Debug)]
 pub enum TxOpResponse {
-    Committed(crate::Result<()>),
-    RolledBack(crate::Result<()>),
+    Begin(crate::Result<()>),
+    Committed(crate::Result<i32>),
+    RolledBack(crate::Result<i32>),
     Single(crate::Result<ResponseData>),
     Batch(crate::Result<Vec<crate::Result<ResponseData>>>),
 }
@@ -37,6 +40,7 @@ pub enum TxOpResponse {
 impl Display for TxOpResponse {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
+            Self::Begin(..) => write!(f, "Begin"),
             Self::Committed(..) => write!(f, "Committed"),
             Self::RolledBack(..) => write!(f, "RolledBack"),
             Self::Single(..) => write!(f, "Single"),
