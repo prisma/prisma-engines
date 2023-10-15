@@ -13,6 +13,7 @@ use crate::{
 use async_trait::async_trait;
 use std::{convert::TryFrom, path::Path, time::Duration};
 use tokio::sync::Mutex;
+use std::sync::Arc;
 
 pub(crate) const DEFAULT_SQLITE_SCHEMA_NAME: &str = "main";
 
@@ -23,6 +24,7 @@ pub use rusqlite;
 /// A connector interface for the SQLite database
 pub struct Sqlite {
     pub(crate) client: Mutex<rusqlite::Connection>,
+    transaction_depth: Arc<futures::lock::Mutex<i32>>,
 }
 
 /// Wraps a connection url and exposes the parsing logic used by Quaint,
@@ -139,7 +141,10 @@ impl TryFrom<&str> for Sqlite {
 
         let client = Mutex::new(conn);
 
-        Ok(Sqlite { client })
+        Ok(Sqlite { 
+            client,
+            transaction_depth: Arc::new(futures::lock::Mutex::new(0)),
+        })
     }
 }
 
@@ -154,6 +159,7 @@ impl Sqlite {
 
         Ok(Sqlite {
             client: Mutex::new(client),
+            transaction_depth: Arc::new(futures::lock::Mutex::new(0)),
         })
     }
 
@@ -249,6 +255,42 @@ impl Queryable for Sqlite {
 
     fn requires_isolation_first(&self) -> bool {
         false
+    }
+
+    /// Statement to begin a transaction
+    async fn begin_statement(&self, depth: i32) -> String {
+        let savepoint_stmt = format!("SAVEPOINT savepoint{}", depth);
+        let ret = if depth > 1 {
+            savepoint_stmt
+        } else {
+            "BEGIN".to_string()
+        };
+
+        return ret
+    }
+
+    /// Statement to commit a transaction
+    async fn commit_statement(&self, depth: i32) -> String {
+        let savepoint_stmt = format!("RELEASE SAVEPOINT savepoint{}", depth);
+        let ret = if depth > 1 {
+            savepoint_stmt
+        } else {
+            "COMMIT".to_string()
+        };
+
+        return ret
+    }
+
+    /// Statement to rollback a transaction
+    async fn rollback_statement(&self, depth: i32) -> String {
+        let savepoint_stmt = format!("ROLLBACK TO savepoint{}", depth);
+        let ret = if depth > 1 {
+            savepoint_stmt
+        } else {
+            "ROLLBACK".to_string()
+        };
+
+        return ret
     }
 }
 

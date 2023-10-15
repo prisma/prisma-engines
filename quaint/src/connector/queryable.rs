@@ -87,8 +87,18 @@ pub trait Queryable: Send + Sync {
     }
 
     /// Statement to begin a transaction
-    fn begin_statement(&self) -> &'static str {
-        "BEGIN"
+    async fn begin_statement(&self, _depth: i32) -> String {
+        "BEGIN".to_string()
+    }
+
+    /// Statement to commit a transaction
+    async fn commit_statement(&self, _depth: i32) -> String {
+        "COMMIT".to_string()
+    }
+
+    /// Statement to rollback a transaction
+    async fn rollback_statement(&self, _depth: i32) -> String {
+        "ROLLBACK".to_string()
     }
 
     /// Sets the transaction isolation level to given value.
@@ -117,10 +127,28 @@ macro_rules! impl_default_TransactionCapable {
                 &'a self,
                 isolation: Option<IsolationLevel>,
             ) -> crate::Result<Box<dyn crate::connector::Transaction + 'a>> {
-                let opts = crate::connector::TransactionOptions::new(isolation, self.requires_isolation_first());
+                let depth = self.transaction_depth.clone();
+                let mut depth_guard = self.transaction_depth.lock().await;
+                *depth_guard += 1;
+
+                let st_depth = *depth_guard;
+
+                let begin_statement = self.begin_statement(st_depth).await;
+                let commit_stmt = self.commit_statement(st_depth).await;
+                let rollback_stmt = self.rollback_statement(st_depth).await;
+
+
+
+                let opts = crate::connector::TransactionOptions::new(
+                    isolation, 
+                    self.requires_isolation_first(),
+                    depth,
+                    commit_stmt,
+                    rollback_stmt,
+                );
 
                 Ok(Box::new(
-                    crate::connector::DefaultTransaction::new(self, self.begin_statement(), opts).await?,
+                    crate::connector::DefaultTransaction::new(self, &begin_statement, opts).await?,
                 ))
             }
         }

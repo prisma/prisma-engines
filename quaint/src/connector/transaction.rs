@@ -6,16 +6,18 @@ use crate::{
 use async_trait::async_trait;
 use metrics::{decrement_gauge, increment_gauge};
 use std::{fmt, str::FromStr};
+use futures::lock::Mutex;
+use std::sync::Arc;
 
 extern crate metrics as metrics;
 
 #[async_trait]
 pub trait Transaction: Queryable {
     /// Commit the changes to the database and consume the transaction.
-    async fn commit(&self) -> crate::Result<()>;
+    async fn commit(&mut self) -> crate::Result<()>;
 
     /// Rolls back the changes to the database.
-    async fn rollback(&self) -> crate::Result<()>;
+    async fn rollback(&mut self) -> crate::Result<()>;
 
     /// workaround for lack of upcasting between traits https://github.com/rust-lang/rust/issues/65991
     fn as_queryable(&self) -> &dyn Queryable;
@@ -27,6 +29,15 @@ pub(crate) struct TransactionOptions {
 
     /// Whether or not to put the isolation level `SET` before or after the `BEGIN`.
     pub(crate) isolation_first: bool,
+
+    /// The depth of the transaction, used to determine the nested transaction statements.
+    pub depth: Arc<Mutex<i32>>,
+
+    /// The statement to use to commit the transaction.
+    pub commit_stmt: String,
+
+    /// The statement to use to rollback the transaction.
+    pub rollback_stmt: String,
 }
 
 /// A default representation of an SQL database transaction. If not commited, a
@@ -36,6 +47,9 @@ pub(crate) struct TransactionOptions {
 /// transaction object will panic.
 pub struct DefaultTransaction<'a> {
     pub inner: &'a dyn Queryable,
+    pub depth: Arc<Mutex<i32>>,
+    pub commit_stmt: String,
+    pub rollback_stmt: String,
 }
 
 impl<'a> DefaultTransaction<'a> {
@@ -44,7 +58,12 @@ impl<'a> DefaultTransaction<'a> {
         begin_stmt: &str,
         tx_opts: TransactionOptions,
     ) -> crate::Result<DefaultTransaction<'a>> {
-        let this = Self { inner };
+        let this = Self { 
+            inner, 
+            depth: tx_opts.depth,
+            commit_stmt: tx_opts.commit_stmt,
+            rollback_stmt: tx_opts.rollback_stmt,
+        };
 
         if tx_opts.isolation_first {
             if let Some(isolation) = tx_opts.isolation_level {
@@ -70,17 +89,29 @@ impl<'a> DefaultTransaction<'a> {
 #[async_trait]
 impl<'a> Transaction for DefaultTransaction<'a> {
     /// Commit the changes to the database and consume the transaction.
-    async fn commit(&self) -> crate::Result<()> {
+    async fn commit(&mut self) -> crate::Result<()> {
         decrement_gauge!("prisma_client_queries_active", 1.0);
-        self.inner.raw_cmd("COMMIT").await?;
+
+        let mut depth_guard = self.depth.lock().await;
+
+        self.inner.raw_cmd(&self.commit_stmt).await?;
+
+        // Modify the depth value through the MutexGuard
+        *depth_guard -= 1;
 
         Ok(())
     }
 
     /// Rolls back the changes to the database.
-    async fn rollback(&self) -> crate::Result<()> {
+    async fn rollback(&mut self) -> crate::Result<()> {
         decrement_gauge!("prisma_client_queries_active", 1.0);
-        self.inner.raw_cmd("ROLLBACK").await?;
+
+        let mut depth_guard = self.depth.lock().await;
+
+        self.inner.raw_cmd(&self.rollback_stmt).await?;
+
+        // Modify the depth value through the MutexGuard
+        *depth_guard -= 1;
 
         Ok(())
     }
@@ -190,10 +221,19 @@ impl FromStr for IsolationLevel {
     }
 }
 impl TransactionOptions {
-    pub fn new(isolation_level: Option<IsolationLevel>, isolation_first: bool) -> Self {
+    pub fn new(
+        isolation_level: Option<IsolationLevel>, 
+        isolation_first: bool,
+        depth: Arc<Mutex<i32>>,
+        commit_stmt: String,
+        rollback_stmt: String,
+    ) -> Self {
         Self {
             isolation_level,
             isolation_first,
+            depth,
+            commit_stmt,
+            rollback_stmt,
         }
     }
 }

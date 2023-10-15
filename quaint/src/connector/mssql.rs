@@ -22,6 +22,7 @@ use std::{
 use tiberius::*;
 use tokio::net::TcpStream;
 use tokio_util::compat::{Compat, TokioAsyncWriteCompatExt};
+use std::sync::Arc;
 
 /// The underlying SQL Server driver. Only available with the `expose-drivers` Cargo feature.
 #[cfg(feature = "expose-drivers")]
@@ -106,10 +107,25 @@ impl TransactionCapable for Mssql {
             .or(self.url.query_params.transaction_isolation_level)
             .or(Some(SQL_SERVER_DEFAULT_ISOLATION));
 
-        let opts = TransactionOptions::new(isolation, self.requires_isolation_first());
+        let mut transaction_depth = self.transaction_depth.lock().await;
+        *transaction_depth += 1;
+        let st_depth = *transaction_depth + 0;
+
+        let begin_statement = self.begin_statement(st_depth).await;
+        let commit_stmt = self.commit_statement(st_depth).await;
+        let rollback_stmt = self.rollback_statement(st_depth).await;
+
+        let opts = TransactionOptions::new(
+            isolation, 
+            self.requires_isolation_first(),
+            self.transaction_depth.clone(),
+            commit_stmt,
+            rollback_stmt,
+        );
+
 
         Ok(Box::new(
-            DefaultTransaction::new(self, self.begin_statement(), opts).await?,
+            DefaultTransaction::new(self, &begin_statement, opts).await?,
         ))
     }
 }
@@ -273,6 +289,7 @@ pub struct Mssql {
     url: MssqlUrl,
     socket_timeout: Option<Duration>,
     is_healthy: AtomicBool,
+    transaction_depth: Arc<Mutex<i32>>,
 }
 
 impl Mssql {
@@ -304,6 +321,7 @@ impl Mssql {
             url,
             socket_timeout,
             is_healthy: AtomicBool::new(true),
+            transaction_depth: Arc::new(Mutex::new(0)),
         };
 
         if let Some(isolation) = this.url.transaction_isolation_level() {
@@ -443,8 +461,41 @@ impl Queryable for Mssql {
         Ok(())
     }
 
-    fn begin_statement(&self) -> &'static str {
-        "BEGIN TRAN"
+    /// Statement to begin a transaction
+    async fn begin_statement(&self, depth: i32) -> String {
+        let savepoint_stmt = format!("SAVE TRANSACTION savepoint{}", depth);
+        let ret = if depth > 1 {
+            savepoint_stmt
+        } else {
+            "BEGIN TRAN".to_string()
+        };
+
+        return ret
+    }
+
+    /// Statement to commit a transaction
+    async fn commit_statement(&self, depth: i32) -> String {
+        // MSSQL doesn't have a "RELEASE SAVEPOINT" equivalent, so in a nested 
+        // transaction we just continue onwards
+        let ret = if depth > 1 {
+            " ".to_string()
+        } else {
+            "COMMIT".to_string()
+        };
+
+        return ret
+    }
+
+    /// Statement to rollback a transaction
+    async fn rollback_statement(&self, depth: i32) -> String {
+        let savepoint_stmt = format!("ROLLBACK TRANSACTION savepoint{}", depth);
+        let ret = if depth > 1 {
+            savepoint_stmt
+        } else {
+            "ROLLBACK".to_string()
+        };
+
+        return ret
     }
 
     fn requires_isolation_first(&self) -> bool {
