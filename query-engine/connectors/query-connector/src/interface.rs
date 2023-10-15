@@ -30,8 +30,9 @@ pub trait Connection: ConnectionLike {
 
 #[async_trait]
 pub trait Transaction: ConnectionLike {
-    async fn commit(&mut self) -> crate::Result<()>;
-    async fn rollback(&mut self) -> crate::Result<()>;
+    async fn begin(&mut self) -> crate::Result<()>;
+    async fn commit(&mut self) -> crate::Result<i32>;
+    async fn rollback(&mut self) -> crate::Result<i32>;
 
     /// Explicit upcast of self reference. Rusts current vtable layout doesn't allow for an upcast if
     /// `trait A`, `trait B: A`, so that `Box<dyn B> as Box<dyn A>` works. This is a simple, explicit workaround.

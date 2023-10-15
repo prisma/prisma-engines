@@ -16,7 +16,7 @@ use crate::{
     visitor::{self, Visitor},
 };
 use async_trait::async_trait;
-use std::convert::TryFrom;
+use std::{convert::TryFrom, sync::Arc};
 use tokio::sync::Mutex;
 
 /// The underlying sqlite driver. Only available with the `expose-drivers` Cargo feature.
@@ -26,6 +26,7 @@ pub use rusqlite;
 /// A connector interface for the SQLite database
 pub struct Sqlite {
     pub(crate) client: Mutex<rusqlite::Connection>,
+    transaction_depth: Arc<futures::lock::Mutex<i32>>,
 }
 
 impl TryFrom<&str> for Sqlite {
@@ -43,7 +44,10 @@ impl TryFrom<&str> for Sqlite {
 
         let client = Mutex::new(conn);
 
-        Ok(Sqlite { client })
+        Ok(Sqlite {
+            client,
+            transaction_depth: Arc::new(futures::lock::Mutex::new(0)),
+        })
     }
 }
 
@@ -58,6 +62,7 @@ impl Sqlite {
 
         Ok(Sqlite {
             client: Mutex::new(client),
+            transaction_depth: Arc::new(futures::lock::Mutex::new(0)),
         })
     }
 
@@ -153,6 +158,38 @@ impl Queryable for Sqlite {
 
     fn requires_isolation_first(&self) -> bool {
         false
+    }
+
+    /// Statement to begin a transaction
+    async fn begin_statement(&self, depth: i32) -> String {
+        let savepoint_stmt = format!("SAVEPOINT savepoint{}", depth);
+        let ret = if depth > 1 { savepoint_stmt } else { "BEGIN".to_string() };
+
+        return ret;
+    }
+
+    /// Statement to commit a transaction
+    async fn commit_statement(&self, depth: i32) -> String {
+        let savepoint_stmt = format!("RELEASE SAVEPOINT savepoint{}", depth);
+        let ret = if depth > 1 {
+            savepoint_stmt
+        } else {
+            "COMMIT".to_string()
+        };
+
+        return ret;
+    }
+
+    /// Statement to rollback a transaction
+    async fn rollback_statement(&self, depth: i32) -> String {
+        let savepoint_stmt = format!("ROLLBACK TO savepoint{}", depth);
+        let ret = if depth > 1 {
+            savepoint_stmt
+        } else {
+            "ROLLBACK".to_string()
+        };
+
+        return ret;
     }
 }
 

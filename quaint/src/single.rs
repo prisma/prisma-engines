@@ -5,6 +5,7 @@ use crate::{
     connector::{self, impl_default_TransactionCapable, ConnectionInfo, IsolationLevel, Queryable, TransactionCapable},
 };
 use async_trait::async_trait;
+use futures::lock::Mutex;
 use std::{fmt, sync::Arc};
 
 #[cfg(feature = "sqlite-native")]
@@ -15,6 +16,7 @@ use std::convert::TryFrom;
 pub struct Quaint {
     inner: Arc<dyn Queryable>,
     connection_info: Arc<ConnectionInfo>,
+    transaction_depth: Arc<Mutex<i32>>,
 }
 
 impl fmt::Debug for Quaint {
@@ -162,7 +164,11 @@ impl Quaint {
         let connection_info = Arc::new(ConnectionInfo::from_url(url_str)?);
         Self::log_start(&connection_info);
 
-        Ok(Self { inner, connection_info })
+        Ok(Self {
+            inner,
+            connection_info,
+            transaction_depth: Arc::new(Mutex::new(0)),
+        })
     }
 
     #[cfg(feature = "sqlite-native")]
@@ -175,6 +181,7 @@ impl Quaint {
             connection_info: Arc::new(ConnectionInfo::InMemorySqlite {
                 db_name: DEFAULT_SQLITE_SCHEMA_NAME.to_owned(),
             }),
+            transaction_depth: Arc::new(Mutex::new(0)),
         })
     }
 
@@ -229,8 +236,16 @@ impl Queryable for Quaint {
         self.inner.is_healthy()
     }
 
-    fn begin_statement(&self) -> &'static str {
-        self.inner.begin_statement()
+    async fn begin_statement(&self, depth: i32) -> String {
+        self.inner.begin_statement(depth).await
+    }
+
+    async fn commit_statement(&self, depth: i32) -> String {
+        self.inner.commit_statement(depth).await
+    }
+
+    async fn rollback_statement(&self, depth: i32) -> String {
+        self.inner.rollback_statement(depth).await
     }
 
     async fn set_tx_isolation_level(&self, isolation_level: IsolationLevel) -> crate::Result<()> {

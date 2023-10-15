@@ -73,19 +73,27 @@ impl TransactionActorManager {
         timeout: Duration,
         engine_protocol: EngineProtocol,
     ) -> crate::Result<()> {
-        let client = spawn_itx_actor(
-            query_schema.clone(),
-            tx_id.clone(),
-            conn,
-            isolation_level,
-            timeout,
-            CHANNEL_SIZE,
-            self.send_done.clone(),
-            engine_protocol,
-        )
-        .await?;
+        // Only create a client if there is no client for this transaction yet.
+        // otherwise, begin a new transaction/savepoint for the existing client.
+        if !self.clients.read().await.contains_key(&tx_id) {
+            let client = spawn_itx_actor(
+                query_schema.clone(),
+                tx_id.clone(),
+                conn,
+                isolation_level,
+                timeout,
+                CHANNEL_SIZE,
+                self.send_done.clone(),
+                engine_protocol,
+            )
+            .await?;
 
-        self.clients.write().await.insert(tx_id, client);
+            self.clients.write().await.insert(tx_id, client);
+        } else {
+            let client = self.get_client(&tx_id, "begin").await?;
+            client.begin().await?;
+        }
+
         Ok(())
     }
 

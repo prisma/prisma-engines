@@ -282,7 +282,11 @@ async fn transaction_start_handler(cx: Arc<PrismaContext>, req: Request<Body>) -
     let body_start = req.into_body();
     let full_body = hyper::body::to_bytes(body_start).await?;
     let mut tx_opts: TransactionOptions = serde_json::from_slice(full_body.as_ref()).unwrap();
-    let tx_id = tx_opts.with_new_transaction_id();
+    let tx_id = if tx_opts.new_tx_id.is_none() {
+        tx_opts.with_new_transaction_id()
+    } else {
+        tx_opts.new_tx_id.clone().unwrap()
+    };
 
     // This is the span we use to instrument the execution of a transaction. This span will be open
     // during the tx execution, and held in the ITXServer for that transaction (see ITXServer])

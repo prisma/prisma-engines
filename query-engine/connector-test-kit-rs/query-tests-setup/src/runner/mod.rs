@@ -365,8 +365,9 @@ impl Runner {
         max_acquisition_millis: u64,
         valid_for_millis: u64,
         isolation_level: Option<String>,
+        new_tx_id: Option<TxId>,
     ) -> TestResult<TxId> {
-        let tx_opts = TransactionOptions::new(max_acquisition_millis, valid_for_millis, isolation_level);
+        let tx_opts = TransactionOptions::new(max_acquisition_millis, valid_for_millis, isolation_level, new_tx_id);
         match &self.executor {
             RunnerExecutor::Builtin(executor) => {
                 let id = executor

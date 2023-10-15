@@ -82,7 +82,7 @@ impl Actor {
                         response_sender.send(Response::Query(result)).await.unwrap();
                     }
                     Message::BeginTransaction => {
-                        let response = with_logs(runner.start_tx(10000, 10000, None), log_tx.clone()).await;
+                        let response = with_logs(runner.start_tx(10000, 10000, None, None), log_tx.clone()).await;
                         response_sender.send(Response::Tx(response)).await.unwrap();
                     }
                     Message::RollbackTransaction(tx_id) => {

@@ -10,12 +10,15 @@ use crate::{
     error::Error,
 };
 use async_trait::async_trait;
+use futures::lock::Mutex;
 use mobc::{Connection as MobcPooled, Manager};
+use std::sync::Arc;
 
 /// A connection from the pool. Implements
 /// [Queryable](connector/trait.Queryable.html).
 pub struct PooledConnection {
     pub(crate) inner: MobcPooled<QuaintManager>,
+    pub transaction_depth: Arc<Mutex<i32>>,
 }
 
 impl_default_TransactionCapable!(PooledConnection);
@@ -62,8 +65,16 @@ impl Queryable for PooledConnection {
         self.inner.server_reset_query(tx).await
     }
 
-    fn begin_statement(&self) -> &'static str {
-        self.inner.begin_statement()
+    async fn begin_statement(&self, depth: i32) -> String {
+        self.inner.begin_statement(depth).await
+    }
+
+    async fn commit_statement(&self, depth: i32) -> String {
+        self.inner.commit_statement(depth).await
+    }
+
+    async fn rollback_statement(&self, depth: i32) -> String {
+        self.inner.rollback_statement(depth).await
     }
 
     async fn set_tx_isolation_level(&self, isolation_level: IsolationLevel) -> crate::Result<()> {

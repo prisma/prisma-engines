@@ -87,8 +87,35 @@ pub trait Queryable: Send + Sync {
     }
 
     /// Statement to begin a transaction
-    fn begin_statement(&self) -> &'static str {
-        "BEGIN"
+    async fn begin_statement(&self, depth: i32) -> String {
+        let savepoint_stmt = format!("SAVEPOINT savepoint{}", depth);
+        let ret = if depth > 1 { savepoint_stmt } else { "BEGIN".to_string() };
+
+        return ret;
+    }
+
+    /// Statement to commit a transaction
+    async fn commit_statement(&self, depth: i32) -> String {
+        let savepoint_stmt = format!("RELEASE SAVEPOINT savepoint{}", depth);
+        let ret = if depth > 1 {
+            savepoint_stmt
+        } else {
+            "COMMIT".to_string()
+        };
+
+        return ret;
+    }
+
+    /// Statement to rollback a transaction
+    async fn rollback_statement(&self, depth: i32) -> String {
+        let savepoint_stmt = format!("ROLLBACK TO SAVEPOINT savepoint{}", depth);
+        let ret = if depth > 1 {
+            savepoint_stmt
+        } else {
+            "ROLLBACK".to_string()
+        };
+
+        return ret;
     }
 
     /// Sets the transaction isolation level to given value.
@@ -117,10 +144,14 @@ macro_rules! impl_default_TransactionCapable {
                 &'a self,
                 isolation: Option<IsolationLevel>,
             ) -> crate::Result<Box<dyn crate::connector::Transaction + 'a>> {
-                let opts = crate::connector::TransactionOptions::new(isolation, self.requires_isolation_first());
+                let opts = crate::connector::TransactionOptions::new(
+                    isolation,
+                    self.requires_isolation_first(),
+                    self.transaction_depth.clone(),
+                );
 
                 Ok(Box::new(
-                    crate::connector::DefaultTransaction::new(self, self.begin_statement(), opts).await?,
+                    crate::connector::DefaultTransaction::new(self, opts).await?,
                 ))
             }
         }
