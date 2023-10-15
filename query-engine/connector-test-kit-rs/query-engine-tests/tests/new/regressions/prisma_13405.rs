@@ -90,7 +90,7 @@ mod mongodb {
     }
 
     async fn start_itx(runner: &mut Runner) -> TestResult<TxId> {
-        let tx_id = runner.start_tx(5000, 5000, None).await?;
+        let tx_id = runner.start_tx(5000, 5000, None, None).await?;
         runner.set_active_tx(tx_id.clone());
 
         Ok(tx_id)

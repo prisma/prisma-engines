@@ -1,7 +1,7 @@
 use crate::CoreError;
 use connector::Transaction;
 use crosstarget_utils::time::ElapsedTimeCounter;
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 use std::fmt::Display;
 use tokio::time::Duration;
 
@@ -39,7 +39,7 @@ pub(crate) use messages::*;
 /// the TransactionActorManager can reply with a helpful error message which explains that no operation can be performed on a closed transaction
 /// rather than an error message stating that the transaction does not exist.
 
-#[derive(Debug, Clone, Hash, Eq, PartialEq, Deserialize)]
+#[derive(Debug, Clone, Hash, Eq, PartialEq, Deserialize, Serialize)]
 pub struct TxId(String);
 
 const MINIMUM_TX_ID_LENGTH: usize = 24;

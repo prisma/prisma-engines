@@ -5,7 +5,7 @@ use crate::JsObject;
 use super::conversion;
 use crate::send_future::UnsafeFuture;
 use async_trait::async_trait;
-use futures::Future;
+use futures::{lock::Mutex, Future};
 use quaint::connector::{ExternalConnectionInfo, ExternalConnector};
 use quaint::{
     connector::{metrics, IsolationLevel, Transaction},
@@ -13,6 +13,7 @@ use quaint::{
     prelude::{Query as QuaintQuery, Queryable as QuaintQueryable, ResultSet, TransactionCapable},
     visitor::{self, Visitor},
 };
+use std::sync::Arc;
 use tracing::{info_span, Instrument};
 
 /// A JsQueryable adapts a Proxy to implement quaint's Queryable interface. It has the
@@ -218,6 +219,7 @@ impl JsBaseQueryable {
 pub struct JsQueryable {
     inner: JsBaseQueryable,
     driver_proxy: DriverProxy,
+    pub transaction_depth: Arc<Mutex<i32>>,
 }
 
 impl std::fmt::Display for JsQueryable {
@@ -303,14 +305,19 @@ impl TransactionCapable for JsQueryable {
             }
         }
 
-        let begin_stmt = tx.begin_statement();
+        let mut depth_guard = self.transaction_depth.lock().await;
+        *depth_guard += 1;
+
+        let st_depth = *depth_guard;
+
+        let begin_stmt = tx.begin_statement(st_depth).await;
 
         let tx_opts = tx.options();
         if tx_opts.use_phantom_query {
-            let begin_stmt = JsBaseQueryable::phantom_query_message(begin_stmt);
+            let begin_stmt = JsBaseQueryable::phantom_query_message(&begin_stmt);
             tx.raw_phantom_cmd(begin_stmt.as_str()).await?;
         } else {
-            tx.raw_cmd(begin_stmt).await?;
+            tx.raw_cmd(&begin_stmt).await?;
         }
 
         if !isolation_first {
@@ -332,5 +339,6 @@ pub fn from_js(driver: JsObject) -> JsQueryable {
     JsQueryable {
         inner: JsBaseQueryable::new(common),
         driver_proxy,
+        transaction_depth: Arc::new(futures::lock::Mutex::new(0)),
     }
 }
