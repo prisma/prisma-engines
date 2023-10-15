@@ -15,6 +15,7 @@ use crate::{
 };
 use async_trait::async_trait;
 use futures::lock::Mutex;
+use std::borrow::Cow;
 use std::{
     convert::TryFrom,
     future::Future,
@@ -48,9 +49,7 @@ impl TransactionCapable for Mssql {
 
         let opts = TransactionOptions::new(isolation, self.requires_isolation_first());
 
-        Ok(Box::new(
-            DefaultTransaction::new(self, self.begin_statement(), opts).await?,
-        ))
+        Ok(Box::new(DefaultTransaction::new(self, opts).await?))
     }
 }
 
@@ -244,8 +243,33 @@ impl Queryable for Mssql {
         Ok(())
     }
 
-    fn begin_statement(&self) -> &'static str {
-        "BEGIN TRAN"
+    /// Statement to begin a transaction
+    fn begin_statement(&self, depth: u32) -> Cow<'static, str> {
+        if depth > 1 {
+            Cow::Owned(format!("SAVE TRANSACTION savepoint{depth}"))
+        } else {
+            Cow::Borrowed("BEGIN TRAN")
+        }
+    }
+
+    /// Statement to commit a transaction
+    fn commit_statement(&self, depth: u32) -> Cow<'static, str> {
+        // MSSQL doesn't have a "RELEASE SAVEPOINT" equivalent, so in a nested
+        // transaction we just continue onwards
+        if depth > 1 {
+            Cow::Owned("".to_string())
+        } else {
+            Cow::Borrowed("COMMIT")
+        }
+    }
+
+    /// Statement to rollback a transaction
+    fn rollback_statement(&self, depth: u32) -> Cow<'static, str> {
+        if depth > 1 {
+            Cow::Owned(format!("ROLLBACK TRANSACTION savepoint{depth}"))
+        } else {
+            Cow::Borrowed("ROLLBACK")
+        }
     }
 
     fn requires_isolation_first(&self) -> bool {
