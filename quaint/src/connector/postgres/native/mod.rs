@@ -33,7 +33,10 @@ use std::{
     fmt::{Debug, Display},
     fs,
     future::Future,
-    sync::atomic::{AtomicBool, Ordering},
+    sync::{
+        atomic::{AtomicBool, Ordering},
+        Arc,
+    },
     time::Duration,
 };
 use tokio_postgres::{config::ChannelBinding, Client, Config, Statement};
@@ -61,6 +64,7 @@ pub struct PostgreSql {
     is_healthy: AtomicBool,
     is_cockroachdb: bool,
     is_materialize: bool,
+    transaction_depth: Arc<Mutex<i32>>,
 }
 
 /// Key uniquely representing an SQL statement in the prepared statements cache.
@@ -289,6 +293,7 @@ impl PostgreSql {
             is_healthy: AtomicBool::new(true),
             is_cockroachdb,
             is_materialize,
+            transaction_depth: Arc::new(Mutex::new(0)),
         })
     }
 
@@ -762,6 +767,38 @@ impl Queryable for PostgreSql {
 
     fn requires_isolation_first(&self) -> bool {
         false
+    }
+
+    /// Statement to begin a transaction
+    async fn begin_statement(&self, depth: i32) -> String {
+        let savepoint_stmt = format!("SAVEPOINT savepoint{}", depth);
+        let ret = if depth > 1 { savepoint_stmt } else { "BEGIN".to_string() };
+
+        return ret;
+    }
+
+    /// Statement to commit a transaction
+    async fn commit_statement(&self, depth: i32) -> String {
+        let savepoint_stmt = format!("RELEASE SAVEPOINT savepoint{}", depth);
+        let ret = if depth > 1 {
+            savepoint_stmt
+        } else {
+            "COMMIT".to_string()
+        };
+
+        return ret;
+    }
+
+    /// Statement to rollback a transaction
+    async fn rollback_statement(&self, depth: i32) -> String {
+        let savepoint_stmt = format!("ROLLBACK TO SAVEPOINT savepoint{}", depth);
+        let ret = if depth > 1 {
+            savepoint_stmt
+        } else {
+            "ROLLBACK".to_string()
+        };
+
+        return ret;
     }
 }
 

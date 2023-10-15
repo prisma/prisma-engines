@@ -23,7 +23,10 @@ use mysql_async::{
 };
 use std::{
     future::Future,
-    sync::atomic::{AtomicBool, Ordering},
+    sync::{
+        atomic::{AtomicBool, Ordering},
+        Arc,
+    },
     time::Duration,
 };
 use tokio::sync::Mutex;
@@ -76,6 +79,7 @@ pub struct Mysql {
     socket_timeout: Option<Duration>,
     is_healthy: AtomicBool,
     statement_cache: Mutex<LruCache<String, my::Statement>>,
+    transaction_depth: Arc<futures::lock::Mutex<i32>>,
 }
 
 impl Mysql {
@@ -89,6 +93,7 @@ impl Mysql {
             statement_cache: Mutex::new(url.cache()),
             url,
             is_healthy: AtomicBool::new(true),
+            transaction_depth: Arc::new(futures::lock::Mutex::new(0)),
         })
     }
 
@@ -344,5 +349,37 @@ impl Queryable for Mysql {
 
     fn requires_isolation_first(&self) -> bool {
         true
+    }
+
+    /// Statement to begin a transaction
+    async fn begin_statement(&self, depth: i32) -> String {
+        let savepoint_stmt = format!("SAVEPOINT savepoint{}", depth);
+        let ret = if depth > 1 { savepoint_stmt } else { "BEGIN".to_string() };
+
+        return ret;
+    }
+
+    /// Statement to commit a transaction
+    async fn commit_statement(&self, depth: i32) -> String {
+        let savepoint_stmt = format!("RELEASE SAVEPOINT savepoint{}", depth);
+        let ret = if depth > 1 {
+            savepoint_stmt
+        } else {
+            "COMMIT".to_string()
+        };
+
+        return ret;
+    }
+
+    /// Statement to rollback a transaction
+    async fn rollback_statement(&self, depth: i32) -> String {
+        let savepoint_stmt = format!("ROLLBACK TO savepoint{}", depth);
+        let ret = if depth > 1 {
+            savepoint_stmt
+        } else {
+            "ROLLBACK".to_string()
+        };
+
+        return ret;
     }
 }
