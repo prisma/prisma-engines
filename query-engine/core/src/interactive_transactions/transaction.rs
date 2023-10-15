@@ -197,28 +197,50 @@ impl InteractiveTransaction {
         })
     }
 
+    pub async fn begin(&mut self) -> crate::Result<()> {
+        tx_timeout!(self, "begin", async {
+            let name = self.name();
+            let conn = self.state.as_open("begin")?;
+            let span = info_span!("prisma:engine:itx_begin", user_facing = true);
+
+            if let Err(err) = conn.begin().instrument(span).await {
+                error!(?err, ?name, "transaction failed to begin");
+                let _ = self.rollback(false).await;
+                Err(err.into())
+            } else {
+                debug!(?name, "transaction started");
+                Ok(())
+            }
+        })
+    }
+
     pub async fn commit(&mut self) -> crate::Result<()> {
         tx_timeout!(self, "commit", async {
             let name = self.name();
             let conn = self.state.as_open("commit")?;
             let span = info_span!("prisma:engine:itx_commit");
 
-            if let Err(err) = conn.commit().instrument(span).await {
-                error!(?err, ?name, "transaction failed to commit");
-                // We don't know if the transaction was committed or not. Because of that, we cannot
-                // leave it in "open" state. We attempt to rollback to get the transaction into a
-                // known state.
-                let _ = self.rollback(false).await;
-                Err(err.into())
-            } else {
-                debug!(?name, "transaction committed");
-                self.state = TransactionState::Committed;
-                Ok(())
+            match conn.commit().instrument(span).await {
+                Ok(depth) => {
+                    debug!(?depth, ?name, "transaction committed");
+                    if depth == 0 {
+                        self.state = TransactionState::Committed;
+                    }
+                    Ok(())
+                }
+                Err(err) => {
+                    error!(?err, ?name, "transaction failed to commit");
+                    // We don't know if the transaction was committed or not. Because of that, we cannot
+                    // leave it in "open" state. We attempt to rollback to get the transaction into a
+                    // known state.
+                    let _ = self.rollback(false).await;
+                    Err(err.into())
+                }
             }
         })
     }
 
-    pub async fn rollback(&mut self, was_timeout: bool) -> crate::Result<()> {
+    pub async fn rollback(&mut self, was_timeout: bool) -> crate::Result<u32> {
         let name = self.name();
         let conn = self.state.as_open("rollback")?;
         let span = info_span!("prisma:engine:itx_rollback");

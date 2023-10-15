@@ -189,7 +189,7 @@ where
         self.itx_manager.commit_tx(&tx_id).await
     }
 
-    async fn rollback_tx(&self, tx_id: TxId) -> crate::Result<()> {
+    async fn rollback_tx(&self, tx_id: TxId) -> crate::Result<u32> {
         self.itx_manager.rollback_tx(&tx_id).await
     }
 }
