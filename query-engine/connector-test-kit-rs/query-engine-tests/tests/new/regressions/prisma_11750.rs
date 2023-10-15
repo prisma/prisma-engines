@@ -96,7 +96,7 @@ mod prisma_11750 {
     }
 
     async fn update_user(runner: Arc<Runner>, new_email: &str) -> TestResult<()> {
-        let tx_id = runner.start_tx(2000, 25, None).await?;
+        let tx_id = runner.start_tx(2000, 25, None, None).await?;
 
         let result = runner
             .query_in_tx(
