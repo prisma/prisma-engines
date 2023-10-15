@@ -36,8 +36,9 @@ pub trait Connection: ConnectionLike {
 
 #[async_trait]
 pub trait Transaction: ConnectionLike {
-    async fn commit(&mut self) -> crate::Result<()>;
-    async fn rollback(&mut self) -> crate::Result<()>;
+    async fn begin(&mut self) -> crate::Result<()>;
+    async fn commit(&mut self) -> crate::Result<u32>;
+    async fn rollback(&mut self) -> crate::Result<u32>;
 
     async fn version(&self) -> Option<String>;
 
