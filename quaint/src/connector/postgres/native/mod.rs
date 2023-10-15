@@ -29,6 +29,7 @@ use native_tls::{Certificate, Identity, TlsConnector};
 use postgres_native_tls::MakeTlsConnector;
 use postgres_types::{Kind as PostgresKind, Type as PostgresType};
 use prisma_metrics::WithMetricsInstrumentation;
+use std::borrow::Cow;
 use std::hash::{DefaultHasher, Hash, Hasher};
 use std::{
     fmt::{Debug, Display},
@@ -805,6 +806,33 @@ impl Queryable for PostgreSql {
 
     fn requires_isolation_first(&self) -> bool {
         false
+    }
+
+    /// Statement to begin a transaction
+    fn begin_statement(&self, depth: u32) -> Cow<'static, str> {
+        if depth > 1 {
+            Cow::Owned(format!("SAVEPOINT savepoint{depth}"))
+        } else {
+            Cow::Borrowed("BEGIN")
+        }
+    }
+
+    /// Statement to commit a transaction
+    fn commit_statement(&self, depth: u32) -> Cow<'static, str> {
+        if depth > 1 {
+            Cow::Owned(format!("RELEASE SAVEPOINT savepoint{depth}"))
+        } else {
+            Cow::Borrowed("COMMIT")
+        }
+    }
+
+    /// Statement to rollback a transaction
+    fn rollback_statement(&self, depth: u32) -> Cow<'static, str> {
+        if depth > 1 {
+            Cow::Owned(format!("ROLLBACK TO SAVEPOINT savepoint{depth}"))
+        } else {
+            Cow::Borrowed("ROLLBACK")
+        }
     }
 }
 

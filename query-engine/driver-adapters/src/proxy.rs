@@ -49,6 +49,9 @@ pub(crate) struct TransactionProxy {
     /// transaction options
     options: TransactionOptions,
 
+    /// begin transaction
+    pub begin: AdapterMethod<(), ()>,
+
     /// commit transaction
     commit: AdapterMethod<(), ()>,
 
@@ -133,11 +136,13 @@ impl TransactionContextProxy {
 impl TransactionProxy {
     pub fn new(js_transaction: &JsObject) -> JsResult<Self> {
         let commit = get_named_property(js_transaction, "commit")?;
+        let begin = get_named_property(js_transaction, "begin")?;
         let rollback = get_named_property(js_transaction, "rollback")?;
         let options = get_named_property(js_transaction, "options")?;
         let options = from_js_value::<TransactionOptions>(options);
 
         Ok(Self {
+            begin,
             commit,
             rollback,
             options,
@@ -147,6 +152,10 @@ impl TransactionProxy {
 
     pub fn options(&self) -> &TransactionOptions {
         &self.options
+    }
+
+    pub fn begin(&self) -> UnsafeFuture<impl Future<Output = quaint::Result<()>> + '_> {
+        UnsafeFuture(self.begin.call_as_async(()))
     }
 
     /// Commits the transaction via the driver adapter.

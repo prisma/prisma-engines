@@ -1,5 +1,3 @@
-use std::{fmt, str::FromStr};
-
 use async_trait::async_trait;
 use prisma_metrics::guards::GaugeGuard;
 
@@ -8,14 +6,22 @@ use crate::{
     ast::*,
     error::{Error, ErrorKind},
 };
+use std::{
+    fmt,
+    str::FromStr,
+    sync::{Arc, Mutex},
+};
 
 #[async_trait]
 pub trait Transaction: Queryable {
+    /// Start a new transaction or nested transaction via savepoint.
+    async fn begin(&mut self) -> crate::Result<()>;
+
     /// Commit the changes to the database and consume the transaction.
-    async fn commit(&self) -> crate::Result<()>;
+    async fn commit(&mut self) -> crate::Result<u32>;
 
     /// Rolls back the changes to the database.
-    async fn rollback(&self) -> crate::Result<()>;
+    async fn rollback(&mut self) -> crate::Result<u32>;
 
     /// workaround for lack of upcasting between traits https://github.com/rust-lang/rust/issues/65991
     fn as_queryable(&self) -> &dyn Queryable;
@@ -57,6 +63,7 @@ impl TransactionOptions {
 /// transaction object will panic.
 pub struct DefaultTransaction<'a> {
     pub inner: &'a dyn Queryable,
+    pub depth: Arc<Mutex<u32>>,
     gauge: GaugeGuard,
 }
 
@@ -78,12 +85,12 @@ impl<'a> DefaultTransaction<'a> {
     ))]
     pub(crate) async fn new(
         inner: &'a dyn Queryable,
-        begin_stmt: &str,
         tx_opts: TransactionOptions,
     ) -> crate::Result<DefaultTransaction<'a>> {
-        let this = Self {
+        let mut this = Self {
             inner,
             gauge: GaugeGuard::increment("prisma_client_queries_active"),
+            depth: Arc::new(Mutex::new(0)),
         };
 
         if tx_opts.isolation_first {
@@ -92,7 +99,7 @@ impl<'a> DefaultTransaction<'a> {
             }
         }
 
-        inner.raw_cmd(begin_stmt).await?;
+        this.begin().await?;
 
         if !tx_opts.isolation_first {
             if let Some(isolation) = tx_opts.isolation_level {
@@ -108,20 +115,71 @@ impl<'a> DefaultTransaction<'a> {
 
 #[async_trait]
 impl Transaction for DefaultTransaction<'_> {
-    /// Commit the changes to the database and consume the transaction.
-    async fn commit(&self) -> crate::Result<()> {
-        self.gauge.decrement();
-        self.inner.raw_cmd("COMMIT").await?;
+    async fn begin(&mut self) -> crate::Result<()> {
+        let current_depth = {
+            let mut depth = self.depth.lock().unwrap();
+            *depth += 1;
+            *depth
+        };
+
+        let begin_statement = self.inner.begin_statement(current_depth);
+
+        self.inner.raw_cmd(&begin_statement).await?;
 
         Ok(())
     }
 
-    /// Rolls back the changes to the database.
-    async fn rollback(&self) -> crate::Result<()> {
-        self.gauge.decrement();
-        self.inner.raw_cmd("ROLLBACK").await?;
+    /// Commit the changes to the database and consume the transaction.
+    async fn commit(&mut self) -> crate::Result<u32> {
+        // Lock the mutex and get the depth value
+        let depth_val = {
+            let depth = self.depth.lock().unwrap();
+            *depth
+        };
 
-        Ok(())
+        // Perform the asynchronous operation without holding the lock
+        let commit_statement = self.inner.commit_statement(depth_val);
+        self.inner.raw_cmd(&commit_statement).await?;
+
+        // Lock the mutex again to modify the depth
+        let new_depth = {
+            let mut depth = self.depth.lock().unwrap();
+            *depth -= 1;
+            *depth
+        };
+
+        if new_depth == 0 {
+            self.gauge.decrement();
+        }
+
+        Ok(new_depth)
+    }
+
+    /// Rolls back the changes to the database.
+    async fn rollback(&mut self) -> crate::Result<u32> {
+        // Lock the mutex and get the depth value
+        let depth_val = {
+            let depth = self.depth.lock().unwrap();
+            *depth
+        };
+
+        // Perform the asynchronous operation without holding the lock
+        let rollback_statement = self.inner.rollback_statement(depth_val);
+
+        self.inner.raw_cmd(&rollback_statement).await?;
+
+        // Lock the mutex again to modify the depth
+        let new_depth = {
+            let mut depth = self.depth.lock().unwrap();
+            *depth -= 1;
+            *depth
+        };
+
+        if new_depth == 0 {
+            self.gauge.decrement();
+        }
+
+        Ok(new_depth)
     }
 
     fn as_queryable(&self) -> &dyn Queryable {

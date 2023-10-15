@@ -109,24 +109,30 @@ impl ItxManager {
         isolation_level: Option<String>,
         timeout: Duration,
     ) -> crate::Result<()> {
-        // This task notifies the task spawned in `new()` method that the timeout for this
-        // transaction has expired.
-        crosstarget_utils::task::spawn({
-            let timeout_sender = self.timeout_sender.clone();
-            let tx_id = tx_id.clone();
-            async move {
-                crosstarget_utils::time::sleep(timeout).await;
-                timeout_sender.send(tx_id).expect("receiver must exist");
-            }
-        });
+        // Only create a client if there is no client for this transaction yet.
+        // otherwise, begin a new transaction/savepoint for the existing client.
+        if self.transactions.read().await.contains_key(&tx_id) {
+            let _ = self.get_transaction(&tx_id, "begin").await?.lock().await.begin().await;
+        } else {
+            // This task notifies the task spawned in `new()` method that the timeout for this
+            // transaction has expired.
+            crosstarget_utils::task::spawn({
+                let timeout_sender = self.timeout_sender.clone();
+                let tx_id = tx_id.clone();
+                async move {
+                    crosstarget_utils::time::sleep(timeout).await;
+                    timeout_sender.send(tx_id).expect("receiver must exist");
+                }
+            });
 
-        let transaction =
-            InteractiveTransaction::new(tx_id.clone(), conn, timeout, query_schema, isolation_level).await?;
+            let transaction =
+                InteractiveTransaction::new(tx_id.clone(), conn, timeout, query_schema, isolation_level).await?;
 
-        self.transactions
-            .write()
-            .await
-            .insert(tx_id, Arc::new(Mutex::new(transaction)));
+            self.transactions
+                .write()
+                .await
+                .insert(tx_id, Arc::new(Mutex::new(transaction)));
+        }
         Ok(())
     }
 
@@ -181,7 +187,7 @@ impl ItxManager {
         self.get_transaction(tx_id, "commit").await?.lock().await.commit().await
     }
 
-    pub async fn rollback_tx(&self, tx_id: &TxId) -> crate::Result<()> {
+    pub async fn rollback_tx(&self, tx_id: &TxId) -> crate::Result<u32> {
         self.get_transaction(tx_id, "rollback")
             .await?
             .lock()

@@ -38,19 +38,26 @@ impl ConnectionLike for SqlConnectorTransaction<'_> {}
 
 #[async_trait]
 impl Transaction for SqlConnectorTransaction<'_> {
-    async fn commit(&mut self) -> connector::Result<()> {
+    async fn begin(&mut self) -> connector::Result<()> {
+        catch(&self.connection_info, async {
+            self.inner.begin().await.map_err(SqlError::from)
+        })
+        .await
+    }
+
+    async fn commit(&mut self) -> connector::Result<u32> {
         catch(&self.connection_info, async {
             self.inner.commit().await.map_err(SqlError::from)
         })
         .await
     }
 
-    async fn rollback(&mut self) -> connector::Result<()> {
+    async fn rollback(&mut self) -> connector::Result<u32> {
         catch(&self.connection_info, async {
             let res = self.inner.rollback().await.map_err(SqlError::from);
 
             match res {
-                Err(SqlError::TransactionAlreadyClosed(_)) | Err(SqlError::RollbackWithoutBegin) => Ok(()),
+                Err(SqlError::TransactionAlreadyClosed(_)) | Err(SqlError::RollbackWithoutBegin) => Ok(0),
                 _ => res,
             }
         })
