@@ -39,17 +39,21 @@ impl<'conn> MongoDbTransaction<'conn> {
 
 #[async_trait]
 impl<'conn> Transaction for MongoDbTransaction<'conn> {
-    async fn commit(&mut self) -> connector_interface::Result<()> {
+    async fn begin(&mut self) -> connector_interface::Result<()> {
+        Ok(())
+    }
+
+    async fn commit(&mut self) -> connector_interface::Result<i32> {
         decrement_gauge!(PRISMA_CLIENT_QUERIES_ACTIVE, 1.0);
 
         utils::commit_with_retry(&mut self.connection.session)
             .await
             .map_err(|err| MongoError::from(err).into_connector_error())?;
 
-        Ok(())
+        Ok(0)
     }
 
-    async fn rollback(&mut self) -> connector_interface::Result<()> {
+    async fn rollback(&mut self) -> connector_interface::Result<i32> {
         decrement_gauge!(PRISMA_CLIENT_QUERIES_ACTIVE, 1.0);
 
         self.connection
@@ -58,7 +62,7 @@ impl<'conn> Transaction for MongoDbTransaction<'conn> {
             .await
             .map_err(|err| MongoError::from(err).into_connector_error())?;
 
-        Ok(())
+        Ok(0)
     }
 
     async fn version(&self) -> Option<String> {

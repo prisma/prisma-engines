@@ -507,7 +507,10 @@ impl Quaint {
             }
         };
 
-        Ok(PooledConnection { inner })
+        Ok(PooledConnection {
+            inner,
+            transaction_depth: Arc::new(futures::lock::Mutex::new(0)),
+        })
     }
 
     /// Info about the connection and underlying database.

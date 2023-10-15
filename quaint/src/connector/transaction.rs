@@ -4,18 +4,22 @@ use crate::{
     error::{Error, ErrorKind},
 };
 use async_trait::async_trait;
+use futures::lock::Mutex;
 use metrics::{decrement_gauge, increment_gauge};
-use std::{fmt, str::FromStr};
+use std::{fmt, str::FromStr, sync::Arc};
 
 extern crate metrics as metrics;
 
 #[async_trait]
 pub trait Transaction: Queryable {
     /// Commit the changes to the database and consume the transaction.
-    async fn commit(&self) -> crate::Result<()>;
+    async fn begin(&mut self) -> crate::Result<()>;
+
+    /// Commit the changes to the database and consume the transaction.
+    async fn commit(&mut self) -> crate::Result<i32>;
 
     /// Rolls back the changes to the database.
-    async fn rollback(&self) -> crate::Result<()>;
+    async fn rollback(&mut self) -> crate::Result<i32>;
 
     /// workaround for lack of upcasting between traits https://github.com/rust-lang/rust/issues/65991
     fn as_queryable(&self) -> &dyn Queryable;
@@ -27,6 +31,9 @@ pub(crate) struct TransactionOptions {
 
     /// Whether or not to put the isolation level `SET` before or after the `BEGIN`.
     pub(crate) isolation_first: bool,
+
+    /// The depth of the transaction, used to determine the nested transaction statements.
+    pub depth: Arc<Mutex<i32>>,
 }
 
 /// A default representation of an SQL database transaction. If not commited, a
@@ -36,15 +43,18 @@ pub(crate) struct TransactionOptions {
 /// transaction object will panic.
 pub struct DefaultTransaction<'a> {
     pub inner: &'a dyn Queryable,
+    pub depth: Arc<Mutex<i32>>,
 }
 
 impl<'a> DefaultTransaction<'a> {
     pub(crate) async fn new(
         inner: &'a dyn Queryable,
-        begin_stmt: &str,
         tx_opts: TransactionOptions,
     ) -> crate::Result<DefaultTransaction<'a>> {
-        let this = Self { inner };
+        let mut this = Self {
+            inner,
+            depth: tx_opts.depth,
+        };
 
         if tx_opts.isolation_first {
             if let Some(isolation) = tx_opts.isolation_level {
@@ -52,7 +62,7 @@ impl<'a> DefaultTransaction<'a> {
             }
         }
 
-        inner.raw_cmd(begin_stmt).await?;
+        this.begin().await?;
 
         if !tx_opts.isolation_first {
             if let Some(isolation) = tx_opts.isolation_level {
@@ -62,27 +72,63 @@ impl<'a> DefaultTransaction<'a> {
 
         inner.server_reset_query(&this).await?;
 
-        increment_gauge!("prisma_client_queries_active", 1.0);
         Ok(this)
     }
 }
 
 #[async_trait]
 impl<'a> Transaction for DefaultTransaction<'a> {
-    /// Commit the changes to the database and consume the transaction.
-    async fn commit(&self) -> crate::Result<()> {
-        decrement_gauge!("prisma_client_queries_active", 1.0);
-        self.inner.raw_cmd("COMMIT").await?;
+    async fn begin(&mut self) -> crate::Result<()> {
+        increment_gauge!("prisma_client_queries_active", 1.0);
+
+        let mut depth_guard = self.depth.lock().await;
+
+        // Modify the depth value through the MutexGuard
+        *depth_guard += 1;
+
+        let st_depth = *depth_guard;
+
+        let begin_statement = self.inner.begin_statement(st_depth).await;
+
+        self.inner.raw_cmd(&begin_statement).await?;
 
         Ok(())
     }
 
-    /// Rolls back the changes to the database.
-    async fn rollback(&self) -> crate::Result<()> {
+    /// Commit the changes to the database and consume the transaction.
+    async fn commit(&mut self) -> crate::Result<i32> {
         decrement_gauge!("prisma_client_queries_active", 1.0);
-        self.inner.raw_cmd("ROLLBACK").await?;
 
-        Ok(())
+        let mut depth_guard = self.depth.lock().await;
+
+        let st_depth = *depth_guard;
+
+        let commit_statement = self.inner.commit_statement(st_depth).await;
+
+        self.inner.raw_cmd(&commit_statement).await?;
+
+        // Modify the depth value through the MutexGuard
+        *depth_guard -= 1;
+
+        Ok(*depth_guard)
+    }
+
+    /// Rolls back the changes to the database.
+    async fn rollback(&mut self) -> crate::Result<i32> {
+        decrement_gauge!("prisma_client_queries_active", 1.0);
+
+        let mut depth_guard = self.depth.lock().await;
+
+        let st_depth = *depth_guard;
+
+        let rollback_statement = self.inner.rollback_statement(st_depth).await;
+
+        self.inner.raw_cmd(&rollback_statement).await?;
+
+        // Modify the depth value through the MutexGuard
+        *depth_guard -= 1;
+
+        Ok(*depth_guard)
     }
 
     fn as_queryable(&self) -> &dyn Queryable {
@@ -194,10 +240,11 @@ impl FromStr for IsolationLevel {
     }
 }
 impl TransactionOptions {
-    pub fn new(isolation_level: Option<IsolationLevel>, isolation_first: bool) -> Self {
+    pub fn new(isolation_level: Option<IsolationLevel>, isolation_first: bool, depth: Arc<Mutex<i32>>) -> Self {
         Self {
             isolation_level,
             isolation_first,
+            depth,
         }
     }
 }

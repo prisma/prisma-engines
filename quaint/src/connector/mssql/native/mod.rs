@@ -18,7 +18,10 @@ use futures::lock::Mutex;
 use std::{
     convert::TryFrom,
     future::Future,
-    sync::atomic::{AtomicBool, Ordering},
+    sync::{
+        atomic::{AtomicBool, Ordering},
+        Arc,
+    },
     time::Duration,
 };
 use tiberius::*;
@@ -45,11 +48,13 @@ impl TransactionCapable for Mssql {
             .or(self.url.query_params.transaction_isolation_level)
             .or(Some(SQL_SERVER_DEFAULT_ISOLATION));
 
-        let opts = TransactionOptions::new(isolation, self.requires_isolation_first());
+        let opts = TransactionOptions::new(
+            isolation,
+            self.requires_isolation_first(),
+            self.transaction_depth.clone(),
+        );
 
-        Ok(Box::new(
-            DefaultTransaction::new(self, self.begin_statement(), opts).await?,
-        ))
+        Ok(Box::new(DefaultTransaction::new(self, opts).await?))
     }
 }
 
@@ -60,6 +65,7 @@ pub struct Mssql {
     url: MssqlUrl,
     socket_timeout: Option<Duration>,
     is_healthy: AtomicBool,
+    transaction_depth: Arc<Mutex<i32>>,
 }
 
 impl Mssql {
@@ -91,6 +97,7 @@ impl Mssql {
             url,
             socket_timeout,
             is_healthy: AtomicBool::new(true),
+            transaction_depth: Arc::new(Mutex::new(0)),
         };
 
         if let Some(isolation) = this.url.transaction_isolation_level() {
@@ -243,8 +250,41 @@ impl Queryable for Mssql {
         Ok(())
     }
 
-    fn begin_statement(&self) -> &'static str {
-        "BEGIN TRAN"
+    /// Statement to begin a transaction
+    async fn begin_statement(&self, depth: i32) -> String {
+        let savepoint_stmt = format!("SAVE TRANSACTION savepoint{}", depth);
+        let ret = if depth > 1 {
+            savepoint_stmt
+        } else {
+            "BEGIN TRAN".to_string()
+        };
+
+        return ret;
+    }
+
+    /// Statement to commit a transaction
+    async fn commit_statement(&self, depth: i32) -> String {
+        // MSSQL doesn't have a "RELEASE SAVEPOINT" equivalent, so in a nested
+        // transaction we just continue onwards
+        let ret = if depth > 1 {
+            " ".to_string()
+        } else {
+            "COMMIT".to_string()
+        };
+
+        return ret;
+    }
+
+    /// Statement to rollback a transaction
+    async fn rollback_statement(&self, depth: i32) -> String {
+        let savepoint_stmt = format!("ROLLBACK TRANSACTION savepoint{}", depth);
+        let ret = if depth > 1 {
+            savepoint_stmt
+        } else {
+            "ROLLBACK".to_string()
+        };
+
+        return ret;
     }
 
     fn requires_isolation_first(&self) -> bool {

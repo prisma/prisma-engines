@@ -1,12 +1,14 @@
 use std::future::Future;
 
 use async_trait::async_trait;
+use futures::lock::Mutex;
 use metrics::decrement_gauge;
 use quaint::{
     connector::{DescribedQuery, IsolationLevel, Transaction as QuaintTransaction},
     prelude::{Query as QuaintQuery, Queryable, ResultSet},
     Value,
 };
+use std::sync::Arc;
 
 use crate::proxy::{TransactionContextProxy, TransactionOptions, TransactionProxy};
 use crate::{proxy::CommonProxy, queryable::JsBaseQueryable, send_future::UnsafeFuture};
@@ -86,11 +88,16 @@ impl Queryable for JsTransactionContext {
 pub(crate) struct JsTransaction {
     tx_proxy: TransactionProxy,
     inner: JsBaseQueryable,
+    pub depth: Arc<Mutex<i32>>,
 }
 
 impl JsTransaction {
     pub(crate) fn new(inner: JsBaseQueryable, tx_proxy: TransactionProxy) -> Self {
-        Self { inner, tx_proxy }
+        Self {
+            inner,
+            tx_proxy,
+            depth: Arc::new(futures::lock::Mutex::new(0)),
+        }
     }
 
     pub fn options(&self) -> &TransactionOptions {
@@ -105,36 +112,69 @@ impl JsTransaction {
 
 #[async_trait]
 impl QuaintTransaction for JsTransaction {
-    async fn commit(&self) -> quaint::Result<()> {
+    async fn begin(&mut self) -> quaint::Result<()> {
         // increment of this gauge is done in DriverProxy::startTransaction
         decrement_gauge!("prisma_client_queries_active", 1.0);
 
-        let commit_stmt = "COMMIT";
+        let mut depth_guard = self.depth.lock().await;
+        // Modify the depth value through the MutexGuard
+        *depth_guard += 1;
+
+        let begin_stmt = self.begin_statement(*depth_guard).await;
 
         if self.options().use_phantom_query {
-            let commit_stmt = JsBaseQueryable::phantom_query_message(commit_stmt);
+            let commit_stmt = JsBaseQueryable::phantom_query_message(&begin_stmt);
             self.raw_phantom_cmd(commit_stmt.as_str()).await?;
         } else {
-            self.inner.raw_cmd(commit_stmt).await?;
+            self.inner.raw_cmd(&begin_stmt).await?;
         }
 
-        UnsafeFuture(self.tx_proxy.commit()).await
-    }
+        println!("JsTransaction begin: incrementing depth_guard to: {}", *depth_guard);
 
-    async fn rollback(&self) -> quaint::Result<()> {
+        UnsafeFuture(self.tx_proxy.begin()).await
+    }
+    async fn commit(&mut self) -> quaint::Result<i32> {
         // increment of this gauge is done in DriverProxy::startTransaction
         decrement_gauge!("prisma_client_queries_active", 1.0);
 
-        let rollback_stmt = "ROLLBACK";
+        let mut depth_guard = self.depth.lock().await;
+        let commit_stmt = self.commit_statement(*depth_guard).await;
 
         if self.options().use_phantom_query {
-            let rollback_stmt = JsBaseQueryable::phantom_query_message(rollback_stmt);
-            self.raw_phantom_cmd(rollback_stmt.as_str()).await?;
+            let commit_stmt = JsBaseQueryable::phantom_query_message(&commit_stmt);
+            self.raw_phantom_cmd(commit_stmt.as_str()).await?;
         } else {
-            self.inner.raw_cmd(rollback_stmt).await?;
+            self.inner.raw_cmd(&commit_stmt).await?;
         }
 
-        UnsafeFuture(self.tx_proxy.rollback()).await
+        // Modify the depth value through the MutexGuard
+        *depth_guard -= 1;
+
+        let _ = UnsafeFuture(self.tx_proxy.commit()).await;
+
+        Ok(*depth_guard)
+    }
+
+    async fn rollback(&mut self) -> quaint::Result<i32> {
+        // increment of this gauge is done in DriverProxy::startTransaction
+        decrement_gauge!("prisma_client_queries_active", 1.0);
+
+        let mut depth_guard = self.depth.lock().await;
+        let rollback_stmt = self.rollback_statement(*depth_guard).await;
+
+        if self.options().use_phantom_query {
+            let rollback_stmt = JsBaseQueryable::phantom_query_message(&rollback_stmt);
+            self.raw_phantom_cmd(rollback_stmt.as_str()).await?;
+        } else {
+            self.inner.raw_cmd(&rollback_stmt).await?;
+        }
+
+        // Modify the depth value through the MutexGuard
+        *depth_guard -= 1;
+
+        let _ = UnsafeFuture(self.tx_proxy.rollback()).await;
+
+        Ok(*depth_guard)
     }
 
     fn as_queryable(&self) -> &dyn Queryable {
@@ -190,6 +230,18 @@ impl Queryable for JsTransaction {
 
     fn requires_isolation_first(&self) -> bool {
         self.inner.requires_isolation_first()
+    }
+
+    async fn begin_statement(&self, depth: i32) -> String {
+        self.inner.begin_statement(depth).await
+    }
+
+    async fn commit_statement(&self, depth: i32) -> String {
+        self.inner.commit_statement(depth).await
+    }
+
+    async fn rollback_statement(&self, depth: i32) -> String {
+        self.inner.rollback_statement(depth).await
     }
 }
 
