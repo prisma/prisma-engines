@@ -46,6 +46,7 @@ jobs:
       JS_LIBSQL_DATABASE_URL: file:/tmp/libsql.db
       # TODO: test all three of ("number", "bigint", "string") and conditionally skip some tests as appropriate
       JS_LIBSQL_INT_MODE: bigint
+      JS_TIDBCLOUD_DATABASE_URL: ${{ secrets.JS_TIDBCLOUD_DATABASE_URL }}
 
     steps:
       - uses: actions/checkout@v4
