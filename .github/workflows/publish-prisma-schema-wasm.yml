@@ -1,6 +1,6 @@
 name: Build and publish @prisma/prisma-schema-wasm
 
-concurrency: publish-prisma-schema-wasm
+concurrency: build-prisma-schema-wasm
 
 on:
   # usually triggered via GH Actions Workflow in prisma/engines-wrapper repo
@@ -30,19 +30,26 @@ jobs:
           ref: ${{ github.event.inputs.enginesHash }}
       - uses: cachix/install-nix-action@v23
 
-      - name: Build
-        run: nix build .#prisma-schema-wasm
+      #
+      # Build
+      #
+
+      - run: nix build .#prisma-schema-wasm
+
+      #
+      # Publish
+      #
 
       - uses: actions/setup-node@v3
         with:
-          node-version: '20.x'
-          registry-url: 'https://registry.npmjs.org/'
+          node-version: '14.x'
 
-      - name: Update version in package.json
-        run: PACKAGE_DIR=$( nix run .#renderPrismaSchemaWasmPackage ${{ github.event.inputs.enginesWrapperVersion }})
+      - name: Set up NPM token
+        run: echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}" > ~/.npmrc
 
-      - name: Publish Prisma Driver Adapters packages
-        run: npm publish "$PACKAGE_DIR" --access public --tag ${{ github.event.inputs.npmDistTag }}
+      - run: |
+          PACKAGE_DIR=$( nix run .#renderPrismaSchemaWasmPackage ${{ github.event.inputs.enginesWrapperVersion }})
+          npm publish "$PACKAGE_DIR" --access public --tag ${{ github.event.inputs.npmDistTag }}
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
@@ -53,6 +60,7 @@ jobs:
       - name: Set current job url in SLACK_FOOTER env var
         if: ${{ failure() }}
         run: echo "SLACK_FOOTER=<$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID|Click here to go to the job logs>" >> $GITHUB_ENV
+
       - name: Slack Notification on Failure
         if: ${{ failure() }}
         uses: rtCamp/action-slack-notify@v2.2.1
