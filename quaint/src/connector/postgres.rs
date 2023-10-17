@@ -1,5 +1,5 @@
 mod conversion;
-pub mod error;
+mod error;
 
 use crate::{
     ast::{Query, Value},
@@ -26,6 +26,8 @@ use tokio_postgres::{
     Client, Config, Statement,
 };
 use url::{Host, Url};
+
+pub use error::PostgresError;
 
 pub(crate) const DEFAULT_SCHEMA: &str = "public";
 

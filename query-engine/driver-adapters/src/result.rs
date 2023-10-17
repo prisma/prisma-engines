@@ -19,11 +19,11 @@ pub struct PostgresErrorDef {
 /// See driver-adapters/js/adapter-utils/src/types.ts file for example
 pub(crate) enum DriverAdapterError {
     /// Unexpected JS exception
-    GenericJsError {
+    GenericJs {
         id: i32,
     },
 
-    PostgresError(#[serde(with = "PostgresErrorDef")] PostgresError),
+    Postgres(#[serde(with = "PostgresErrorDef")] PostgresError),
     // in the future, expected errors that map to known user errors with PXXX codes will also go here
 }
 
@@ -38,8 +38,8 @@ impl FromNapiValue for DriverAdapterError {
 impl From<DriverAdapterError> for QuaintError {
     fn from(value: DriverAdapterError) -> Self {
         match value {
-            DriverAdapterError::GenericJsError { id } => QuaintError::external_error(id),
-            DriverAdapterError::PostgresError(e) => e.into(),
+            DriverAdapterError::GenericJs { id } => QuaintError::external_error(id),
+            DriverAdapterError::Postgres(e) => e.into(),
             // in future, more error types would be added and we'll need to convert them to proper QuaintErrors here
         }
     }
