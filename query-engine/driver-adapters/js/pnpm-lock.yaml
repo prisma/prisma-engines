@@ -152,8 +152,8 @@ importers:
         specifier: ^8.11.3
         version: 8.11.3
       superjson:
-        specifier: ^1.13.1
-        version: 1.13.1
+        specifier: ^2.0.0
+        version: 2.0.0
       undici:
         specifier: ^5.26.2
         version: 5.26.2
@@ -1378,9 +1378,9 @@ packages:
       ts-interface-checker: 0.1.13
     dev: true
 
-  /superjson@1.13.1:
-    resolution: {integrity: sha512-AVH2eknm9DEd3qvxM4Sq+LTCkSXE2ssfh1t11MHMXyYXFQyQ1HLgVvV+guLTsaQnJU3gnaVo34TohHPulY/wLg==}
-    engines: {node: '>=10'}
+  /superjson@2.0.0:
+    resolution: {integrity: sha512-W3n+NJ7TFjaLle8ihIIvsr/bbuKpnxeatsyjmhy7iSkom+/cshaHziCQAWXrHGWJVQSQFDOuES6C3nSEvcbrQg==}
+    engines: {node: '>=16'}
     dependencies:
       copy-anything: 3.0.5
     dev: false
