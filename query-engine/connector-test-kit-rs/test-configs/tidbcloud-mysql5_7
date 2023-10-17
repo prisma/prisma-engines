@@ -1,0 +1,7 @@
+{
+  "connector": "mysql",
+  "version": "5.7",
+  "driver_adapter": "tidbcloud",
+  "driver_adapter_config": { "proxyUrl": "mysql://user:password@host/test" },
+  "external_test_executor": "default"
+}

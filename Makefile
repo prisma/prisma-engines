@@ -255,6 +255,9 @@ start-planetscale-vitess8: build-qe-napi build-connector-kit-js
 dev-planetscale-vitess8: start-planetscale-vitess8
 	cp $(CONFIG_PATH)/planetscale-vitess8 $(CONFIG_FILE)
 
+dev-tidbcloud-mysql5_7: build-qe-napi build-connector-kit-js
+	cp $(CONFIG_PATH)/tidbcloud-mysql5_7 $(CONFIG_FILE)
+
 ######################
 # Local dev commands #
 ######################

@@ -20,6 +20,10 @@ import { PrismaLibSQL } from '@prisma/adapter-libsql'
 import { connect as planetscaleConnect } from '@planetscale/database'
 import { PrismaPlanetScale } from '@prisma/adapter-planetscale'
 
+// tidbcloud dependencies
+import { connect as tidbcloudConnect } from '@tidbcloud/serverless'
+import { PrismaTiDBCloud } from '@prisma/adapter-tidbcloud'
+
 
 import {bindAdapter, DriverAdapter, ErrorCapturingDriverAdapter} from "@prisma/driver-adapter-utils";
 
@@ -30,6 +34,7 @@ const SUPPORTED_ADAPTERS: Record<string, (_ : string) => Promise<DriverAdapter>>
         "neon:ws" : neonWsAdapter,
         "libsql": libsqlAdapter,
         "planetscale": planetscaleAdapter,
+        "tidbcloud": tidbcloudAdapter,
     };
 
 // conditional debug logging based on LOG_LEVEL env var
@@ -129,7 +134,7 @@ async function handleRequest(method: string, params: unknown): Promise<unknown> 
             }
 
             debug("got response from engine: ", result)
-            // returning unparsed string: otherwise, some information gots lost during this round-trip. 
+            // returning unparsed string: otherwise, some information gots lost during this round-trip.
             // In particular, floating point without decimal part turn into integers
             return result
         }
@@ -281,6 +286,20 @@ async function planetscaleAdapter(url: string): Promise<DriverAdapter> {
     })
 
     return new PrismaPlanetScale(connection)
+}
+
+async function tidbcloudAdapter(url: string): Promise<DriverAdapter> {
+    const proxyURL = JSON.parse(process.env.DRIVER_ADAPTER_CONFIG || '{}').proxyUrl ?? ''
+    if (proxyURL == '') {
+        throw new Error("DRIVER_ADAPTER_CONFIG is not defined or empty, but its required for tidbcloud adapter.");
+    }
+
+    const connection = tidbcloudConnect({
+        url: proxyURL,
+        fetch,
+    })
+
+    return new PrismaTiDBCloud(connection)
 }
 
 main().catch(err)

@@ -106,9 +106,15 @@ importers:
       '@prisma/adapter-planetscale':
         specifier: workspace:*
         version: link:../adapter-planetscale
+      '@prisma/adapter-tidbcloud':
+        specifier: workspace:*
+        version: link:../adapter-tidbcloud
       '@prisma/driver-adapter-utils':
         specifier: workspace:*
         version: link:../driver-adapter-utils
+      '@tidbcloud/serverless':
+        specifier: 0.0.6
+        version: 0.0.6
       '@types/pg':
         specifier: ^8.10.2
         version: 8.10.2
