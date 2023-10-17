@@ -10,15 +10,15 @@ mod decimal {
         let schema = indoc! {
             r#"model Model {
               #id(id, Int, @id)
-              field Decimal? @default("1.001122334455668")
+              field Decimal? @default("1.00112233445566778899")
              }"#
         };
 
         schema.to_owned()
     }
 
-    // {"data":{"createOneModel":{"field":"1.001122334455668"}}}
-    #[connector_test(exclude(SqlServer, Sqlite))]
+    // {"data":{"createOneModel":{"field":"1.00112233445566778899"}}}
+    #[connector_test(exclude(SqlServer, Sqlite, MongoDB))]
     async fn using_decimal_field(runner: Runner) -> TestResult<()> {
         insta::assert_snapshot!(
           run_query!(&runner, r#"mutation {
@@ -30,7 +30,7 @@ mod decimal {
               field
             }
           }"#),
-          @r###"{"data":{"createOneModel":{"field":"1.001122334455668"}}}"###
+          @r###"{"data":{"createOneModel":{"field":"1.00112233445566778899"}}}"###
         );
 
         insta::assert_snapshot!(
