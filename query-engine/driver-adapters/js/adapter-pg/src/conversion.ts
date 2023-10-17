@@ -6,6 +6,9 @@ const ScalarColumnType = types.builtins
 
 /**
  * PostgreSQL array column types (not defined in ScalarColumnType).
+ *
+ * See the semantics of each of this code in:
+ *   https://github.com/postgres/postgres/blob/master/src/include/catalog/pg_type.dat
  */
 const ArrayColumnType = {
   BIT_ARRAY: 1561,
@@ -279,5 +282,5 @@ function normalizeBit(bit: string): string {
   return bit
 }
 
-types.setTypeParser(ArrayColumnType.BIT_ARRAY,normalize_array(normalizeBit))
-types.setTypeParser(ArrayColumnType.VARBIT_ARRAY,normalize_array(normalizeBit))
+types.setTypeParser(ArrayColumnType.BIT_ARRAY, normalize_array(normalizeBit))
+types.setTypeParser(ArrayColumnType.VARBIT_ARRAY, normalize_array(normalizeBit))
