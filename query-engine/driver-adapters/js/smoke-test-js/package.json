@@ -61,7 +61,7 @@
     "@prisma/adapter-tidbcloud": "workspace:*",
     "pg": "^8.11.3",
     "superjson": "^1.13.1",
-    "undici": "^5.23.0"
+    "undici": "^5.26.2"
   },
   "devDependencies": {
     "@types/node": "^20.5.1",

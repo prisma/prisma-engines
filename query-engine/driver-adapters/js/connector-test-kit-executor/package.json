@@ -25,6 +25,6 @@
     "@prisma/adapter-tidbcloud": "workspace:*",
     "@types/pg": "^8.10.2",
     "pg": "^8.11.3",
-    "undici": "^5.23.0"
+    "undici": "^5.26.2"
   }
 }
