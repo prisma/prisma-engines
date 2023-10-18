@@ -28,7 +28,7 @@
             Some(MySqlVersion::V5_7) => format!("mysql://user:password@host:4000/{database}?sslaccept=strict"),
     ```
 
-2. `export WORKSPACE_ROOT=/Users/shiyuhang/github/prisma-engines`
+2. `export WORKSPACE_ROOT=${where is your project}`
 3. `make dev-tidbcloud-mysql5_7`
 4. Input the TiDB Cloud connection information in the `.test_config` file
 5. Run test by `cargo test --package query-engine-tests -- --test-threads=1`
