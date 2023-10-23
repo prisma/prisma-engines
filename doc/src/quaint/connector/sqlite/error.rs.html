@@ -204,40 +204,160 @@
 <a href="#204" id="204">204</a>
 <a href="#205" id="205">205</a>
 <a href="#206" id="206">206</a>
-<a href="#207" id="207">207</a>
-<a href="#208" id="208">208</a>
-<a href="#209" id="209">209</a>
-<a href="#210" id="210">210</a>
-<a href="#211" id="211">211</a>
-<a href="#212" id="212">212</a>
-<a href="#213" id="213">213</a>
-<a href="#214" id="214">214</a>
-<a href="#215" id="215">215</a>
-<a href="#216" id="216">216</a>
-<a href="#217" id="217">217</a>
-<a href="#218" id="218">218</a>
-<a href="#219" id="219">219</a>
-<a href="#220" id="220">220</a>
-<a href="#221" id="221">221</a>
-<a href="#222" id="222">222</a>
-<a href="#223" id="223">223</a>
-<a href="#224" id="224">224</a>
-<a href="#225" id="225">225</a>
-<a href="#226" id="226">226</a>
-<a href="#227" id="227">227</a>
-<a href="#228" id="228">228</a>
-<a href="#229" id="229">229</a>
-<a href="#230" id="230">230</a>
-<a href="#231" id="231">231</a>
-<a href="#232" id="232">232</a>
-<a href="#233" id="233">233</a>
-<a href="#234" id="234">234</a>
-<a href="#235" id="235">235</a>
-<a href="#236" id="236">236</a>
-<a href="#237" id="237">237</a>
-</pre></div><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::error::<span class="kw-2">*</span>;
+</pre></div><pre class="rust"><code><span class="kw">use </span>std::fmt;
+
+<span class="kw">use </span><span class="kw">crate</span>::error::<span class="kw-2">*</span>;
 <span class="kw">use </span>rusqlite::ffi;
 <span class="kw">use </span>rusqlite::types::FromSqlError;
+
+<span class="attr">#[derive(Debug)]
+</span><span class="kw">pub struct </span>SqliteError {
+    <span class="kw">pub </span>extended_code: i32,
+    <span class="kw">pub </span>message: <span class="prelude-ty">Option</span>&lt;String&gt;,
+}
+
+<span class="kw">impl </span>fmt::Display <span class="kw">for </span>SqliteError {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
+        <span class="macro">write!</span>(
+            f,
+            <span class="string">&quot;Error code {}: {}&quot;</span>,
+            <span class="self">self</span>.extended_code,
+            ffi::code_to_str(<span class="self">self</span>.extended_code)
+        )
+    }
+}
+
+<span class="kw">impl </span>std::error::Error <span class="kw">for </span>SqliteError {}
+
+<span class="kw">impl </span>SqliteError {
+    <span class="kw">pub fn </span>new(extended_code: i32, message: <span class="prelude-ty">Option</span>&lt;String&gt;) -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{ extended_code, message }
+    }
+
+    <span class="kw">pub fn </span>primary_code(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; i32 {
+        <span class="self">self</span>.extended_code &amp; <span class="number">0xFF
+    </span>}
+}
+
+<span class="kw">impl </span>From&lt;SqliteError&gt; <span class="kw">for </span>Error {
+    <span class="kw">fn </span>from(error: SqliteError) -&gt; <span class="self">Self </span>{
+        <span class="kw">match </span>error {
+            SqliteError {
+                extended_code: ffi::SQLITE_CONSTRAINT_UNIQUE | ffi::SQLITE_CONSTRAINT_PRIMARYKEY,
+                message: <span class="prelude-val">Some</span>(description),
+            } =&gt; {
+                <span class="kw">let </span>constraint = description
+                    .split(<span class="string">&quot;: &quot;</span>)
+                    .nth(<span class="number">1</span>)
+                    .map(|s| s.split(<span class="string">&quot;, &quot;</span>))
+                    .map(|i| i.flat_map(|s| s.split(<span class="string">&#39;.&#39;</span>).last()))
+                    .map(DatabaseConstraint::fields)
+                    .unwrap_or(DatabaseConstraint::CannotParse);
+
+                <span class="kw">let </span>kind = ErrorKind::UniqueConstraintViolation { constraint };
+                <span class="kw">let </span><span class="kw-2">mut </span>builder = Error::builder(kind);
+
+                builder.set_original_code(error.extended_code.to_string());
+                builder.set_original_message(description);
+
+                builder.build()
+            }
+
+            SqliteError {
+                extended_code: ffi::SQLITE_CONSTRAINT_NOTNULL,
+                message: <span class="prelude-val">Some</span>(description),
+            } =&gt; {
+                <span class="kw">let </span>constraint = description
+                    .split(<span class="string">&quot;: &quot;</span>)
+                    .nth(<span class="number">1</span>)
+                    .map(|s| s.split(<span class="string">&quot;, &quot;</span>))
+                    .map(|i| i.flat_map(|s| s.split(<span class="string">&#39;.&#39;</span>).last()))
+                    .map(DatabaseConstraint::fields)
+                    .unwrap_or(DatabaseConstraint::CannotParse);
+
+                <span class="kw">let </span>kind = ErrorKind::NullConstraintViolation { constraint };
+                <span class="kw">let </span><span class="kw-2">mut </span>builder = Error::builder(kind);
+
+                builder.set_original_code(error.extended_code.to_string());
+                builder.set_original_message(description);
+
+                builder.build()
+            }
+
+            SqliteError {
+                extended_code: ffi::SQLITE_CONSTRAINT_FOREIGNKEY | ffi::SQLITE_CONSTRAINT_TRIGGER,
+                message: <span class="prelude-val">Some</span>(description),
+            } =&gt; {
+                <span class="kw">let </span><span class="kw-2">mut </span>builder = Error::builder(ErrorKind::ForeignKeyConstraintViolation {
+                    constraint: DatabaseConstraint::ForeignKey,
+                });
+
+                builder.set_original_code(error.extended_code.to_string());
+                builder.set_original_message(description);
+
+                builder.build()
+            }
+
+            SqliteError { extended_code, message } <span class="kw">if </span>error.primary_code() == ffi::SQLITE_BUSY =&gt; {
+                <span class="kw">let </span><span class="kw-2">mut </span>builder = Error::builder(ErrorKind::SocketTimeout);
+                builder.set_original_code(<span class="macro">format!</span>(<span class="string">&quot;{extended_code}&quot;</span>));
+
+                <span class="kw">if let </span><span class="prelude-val">Some</span>(description) = message {
+                    builder.set_original_message(description);
+                }
+
+                builder.build()
+            }
+
+            SqliteError {
+                extended_code,
+                <span class="kw-2">ref </span>message,
+            } =&gt; <span class="kw">match </span>message {
+                <span class="prelude-val">Some</span>(d) <span class="kw">if </span>d.starts_with(<span class="string">&quot;no such table&quot;</span>) =&gt; {
+                    <span class="kw">let </span>table = d.split(<span class="string">&quot;: &quot;</span>).last().into();
+                    <span class="kw">let </span>kind = ErrorKind::TableDoesNotExist { table };
+
+                    <span class="kw">let </span><span class="kw-2">mut </span>builder = Error::builder(kind);
+                    builder.set_original_code(<span class="macro">format!</span>(<span class="string">&quot;{extended_code}&quot;</span>));
+                    builder.set_original_message(d);
+
+                    builder.build()
+                }
+                <span class="prelude-val">Some</span>(d) <span class="kw">if </span>d.contains(<span class="string">&quot;has no column named&quot;</span>) =&gt; {
+                    <span class="kw">let </span>column = d.split(<span class="string">&quot; has no column named &quot;</span>).last().into();
+                    <span class="kw">let </span>kind = ErrorKind::ColumnNotFound { column };
+
+                    <span class="kw">let </span><span class="kw-2">mut </span>builder = Error::builder(kind);
+                    builder.set_original_code(<span class="macro">format!</span>(<span class="string">&quot;{extended_code}&quot;</span>));
+                    builder.set_original_message(d);
+
+                    builder.build()
+                }
+                <span class="prelude-val">Some</span>(d) <span class="kw">if </span>d.starts_with(<span class="string">&quot;no such column: &quot;</span>) =&gt; {
+                    <span class="kw">let </span>column = d.split(<span class="string">&quot;no such column: &quot;</span>).last().into();
+                    <span class="kw">let </span>kind = ErrorKind::ColumnNotFound { column };
+
+                    <span class="kw">let </span><span class="kw-2">mut </span>builder = Error::builder(kind);
+                    builder.set_original_code(<span class="macro">format!</span>(<span class="string">&quot;{extended_code}&quot;</span>));
+                    builder.set_original_message(d);
+
+                    builder.build()
+                }
+                <span class="kw">_ </span>=&gt; {
+                    <span class="kw">let </span>description = message.as_ref().map(|d| d.to_string());
+                    <span class="kw">let </span><span class="kw-2">mut </span>builder = Error::builder(ErrorKind::QueryError(error.into()));
+                    builder.set_original_code(<span class="macro">format!</span>(<span class="string">&quot;{extended_code}&quot;</span>));
+
+                    <span class="kw">if let </span><span class="prelude-val">Some</span>(description) = description {
+                        builder.set_original_message(description);
+                    }
+
+                    builder.build()
+                }
+            },
+        }
+    }
+}
 
 <span class="kw">impl </span>From&lt;rusqlite::Error&gt; <span class="kw">for </span>Error {
     <span class="kw">fn </span>from(e: rusqlite::Error) -&gt; Error {
@@ -270,197 +390,15 @@
 
             rusqlite::Error::QueryReturnedNoRows =&gt; Error::builder(ErrorKind::NotFound).build(),
 
-            rusqlite::Error::SqliteFailure(
-                ffi::Error {
-                    code: ffi::ErrorCode::ConstraintViolation,
-                    extended_code: <span class="number">2067</span>,
-                },
-                <span class="prelude-val">Some</span>(description),
-            ) =&gt; {
-                <span class="kw">let </span>constraint = description
-                    .split(<span class="string">&quot;: &quot;</span>)
-                    .nth(<span class="number">1</span>)
-                    .map(|s| s.split(<span class="string">&quot;, &quot;</span>))
-                    .map(|i| i.flat_map(|s| s.split(<span class="string">&#39;.&#39;</span>).last()))
-                    .map(DatabaseConstraint::fields)
-                    .unwrap_or(DatabaseConstraint::CannotParse);
-
-                <span class="kw">let </span>kind = ErrorKind::UniqueConstraintViolation { constraint };
-                <span class="kw">let </span><span class="kw-2">mut </span>builder = Error::builder(kind);
-
-                builder.set_original_code(<span class="string">&quot;2067&quot;</span>);
-                builder.set_original_message(description);
-
-                builder.build()
+            rusqlite::Error::SqliteFailure(ffi::Error { code: <span class="kw">_</span>, extended_code }, message) =&gt; {
+                SqliteError::new(extended_code, message).into()
             }
-
-            rusqlite::Error::SqliteFailure(
-                ffi::Error {
-                    code: ffi::ErrorCode::ConstraintViolation,
-                    extended_code: <span class="number">1555</span>,
-                },
-                <span class="prelude-val">Some</span>(description),
-            ) =&gt; {
-                <span class="kw">let </span>constraint = description
-                    .split(<span class="string">&quot;: &quot;</span>)
-                    .nth(<span class="number">1</span>)
-                    .map(|s| s.split(<span class="string">&quot;, &quot;</span>))
-                    .map(|i| i.flat_map(|s| s.split(<span class="string">&#39;.&#39;</span>).last()))
-                    .map(DatabaseConstraint::fields)
-                    .unwrap_or(DatabaseConstraint::CannotParse);
-
-                <span class="kw">let </span>kind = ErrorKind::UniqueConstraintViolation { constraint };
-                <span class="kw">let </span><span class="kw-2">mut </span>builder = Error::builder(kind);
-
-                builder.set_original_code(<span class="string">&quot;1555&quot;</span>);
-                builder.set_original_message(description);
-
-                builder.build()
-            }
-
-            rusqlite::Error::SqliteFailure(
-                ffi::Error {
-                    code: ffi::ErrorCode::ConstraintViolation,
-                    extended_code: <span class="number">1299</span>,
-                },
-                <span class="prelude-val">Some</span>(description),
-            ) =&gt; {
-                <span class="kw">let </span>constraint = description
-                    .split(<span class="string">&quot;: &quot;</span>)
-                    .nth(<span class="number">1</span>)
-                    .map(|s| s.split(<span class="string">&quot;, &quot;</span>))
-                    .map(|i| i.flat_map(|s| s.split(<span class="string">&#39;.&#39;</span>).last()))
-                    .map(DatabaseConstraint::fields)
-                    .unwrap_or(DatabaseConstraint::CannotParse);
-
-                <span class="kw">let </span>kind = ErrorKind::NullConstraintViolation { constraint };
-                <span class="kw">let </span><span class="kw-2">mut </span>builder = Error::builder(kind);
-
-                builder.set_original_code(<span class="string">&quot;1299&quot;</span>);
-                builder.set_original_message(description);
-
-                builder.build()
-            }
-
-            rusqlite::Error::SqliteFailure(
-                ffi::Error {
-                    code: ffi::ErrorCode::ConstraintViolation,
-                    extended_code: <span class="number">787</span>,
-                },
-                <span class="prelude-val">Some</span>(description),
-            ) =&gt; {
-                <span class="kw">let </span><span class="kw-2">mut </span>builder = Error::builder(ErrorKind::ForeignKeyConstraintViolation {
-                    constraint: DatabaseConstraint::ForeignKey,
-                });
-
-                builder.set_original_code(<span class="string">&quot;787&quot;</span>);
-                builder.set_original_message(description);
-
-                builder.build()
-            }
-
-            rusqlite::Error::SqliteFailure(
-                ffi::Error {
-                    code: ffi::ErrorCode::ConstraintViolation,
-                    extended_code: <span class="number">1811</span>,
-                },
-                <span class="prelude-val">Some</span>(description),
-            ) =&gt; {
-                <span class="kw">let </span><span class="kw-2">mut </span>builder = Error::builder(ErrorKind::ForeignKeyConstraintViolation {
-                    constraint: DatabaseConstraint::ForeignKey,
-                });
-
-                builder.set_original_code(<span class="string">&quot;1811&quot;</span>);
-                builder.set_original_message(description);
-
-                builder.build()
-            }
-
-            rusqlite::Error::SqliteFailure(
-                ffi::Error {
-                    code: ffi::ErrorCode::DatabaseBusy,
-                    extended_code,
-                },
-                description,
-            ) =&gt; {
-                <span class="kw">let </span><span class="kw-2">mut </span>builder = Error::builder(ErrorKind::SocketTimeout);
-                builder.set_original_code(<span class="macro">format!</span>(<span class="string">&quot;{extended_code}&quot;</span>));
-
-                <span class="kw">if let </span><span class="prelude-val">Some</span>(description) = description {
-                    builder.set_original_message(description);
-                }
-
-                builder.build()
-            }
-
-            rusqlite::Error::SqliteFailure(ffi::Error { extended_code, .. }, <span class="kw-2">ref </span>description) =&gt; <span class="kw">match </span>description {
-                <span class="prelude-val">Some</span>(d) <span class="kw">if </span>d.starts_with(<span class="string">&quot;no such table&quot;</span>) =&gt; {
-                    <span class="kw">let </span>table = d.split(<span class="string">&quot;: &quot;</span>).last().into();
-                    <span class="kw">let </span>kind = ErrorKind::TableDoesNotExist { table };
-
-                    <span class="kw">let </span><span class="kw-2">mut </span>builder = Error::builder(kind);
-                    builder.set_original_code(<span class="macro">format!</span>(<span class="string">&quot;{extended_code}&quot;</span>));
-                    builder.set_original_message(d);
-
-                    builder.build()
-                }
-                <span class="prelude-val">Some</span>(d) <span class="kw">if </span>d.contains(<span class="string">&quot;has no column named&quot;</span>) =&gt; {
-                    <span class="kw">let </span>column = d.split(<span class="string">&quot; has no column named &quot;</span>).last().into();
-                    <span class="kw">let </span>kind = ErrorKind::ColumnNotFound { column };
-
-                    <span class="kw">let </span><span class="kw-2">mut </span>builder = Error::builder(kind);
-                    builder.set_original_code(<span class="macro">format!</span>(<span class="string">&quot;{extended_code}&quot;</span>));
-                    builder.set_original_message(d);
-
-                    builder.build()
-                }
-                <span class="prelude-val">Some</span>(d) <span class="kw">if </span>d.starts_with(<span class="string">&quot;no such column: &quot;</span>) =&gt; {
-                    <span class="kw">let </span>column = d.split(<span class="string">&quot;no such column: &quot;</span>).last().into();
-                    <span class="kw">let </span>kind = ErrorKind::ColumnNotFound { column };
-
-                    <span class="kw">let </span><span class="kw-2">mut </span>builder = Error::builder(kind);
-                    builder.set_original_code(<span class="macro">format!</span>(<span class="string">&quot;{extended_code}&quot;</span>));
-                    builder.set_original_message(d);
-
-                    builder.build()
-                }
-                <span class="kw">_ </span>=&gt; {
-                    <span class="kw">let </span>description = description.as_ref().map(|d| d.to_string());
-                    <span class="kw">let </span><span class="kw-2">mut </span>builder = Error::builder(ErrorKind::QueryError(e.into()));
-                    builder.set_original_code(<span class="macro">format!</span>(<span class="string">&quot;{extended_code}&quot;</span>));
-
-                    <span class="kw">if let </span><span class="prelude-val">Some</span>(description) = description {
-                        builder.set_original_message(description);
-                    }
-
-                    builder.build()
-                }
-            },
 
             rusqlite::Error::SqlInputError {
                 error: ffi::Error { extended_code, .. },
-                <span class="kw-2">ref </span>msg,
+                msg,
                 ..
-            } =&gt; <span class="kw">match </span>msg {
-                d <span class="kw">if </span>d.starts_with(<span class="string">&quot;no such column: &quot;</span>) =&gt; {
-                    <span class="kw">let </span>column = d.split(<span class="string">&quot;no such column: &quot;</span>).last().into();
-                    <span class="kw">let </span>kind = ErrorKind::ColumnNotFound { column };
-
-                    <span class="kw">let </span><span class="kw-2">mut </span>builder = Error::builder(kind);
-                    builder.set_original_code(extended_code.to_string());
-                    builder.set_original_message(d);
-
-                    builder.build()
-                }
-                <span class="kw">_ </span>=&gt; {
-                    <span class="kw">let </span>description = msg.clone();
-                    <span class="kw">let </span><span class="kw-2">mut </span>builder = Error::builder(ErrorKind::QueryError(e.into()));
-                    builder.set_original_code(extended_code.to_string());
-                    builder.set_original_message(description);
-
-                    builder.build()
-                }
-            },
+            } =&gt; SqliteError::new(extended_code, <span class="prelude-val">Some</span>(msg)).into(),
 
             e =&gt; Error::builder(ErrorKind::QueryError(e.into())).build(),
         }

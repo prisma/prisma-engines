@@ -102,8 +102,16 @@
 <a href="#102" id="102">102</a>
 <a href="#103" id="103">103</a>
 <a href="#104" id="104">104</a>
+<a href="#105" id="105">105</a>
+<a href="#106" id="106">106</a>
+<a href="#107" id="107">107</a>
+<a href="#108" id="108">108</a>
+<a href="#109" id="109">109</a>
+<a href="#110" id="110">110</a>
+<a href="#111" id="111">111</a>
+<a href="#112" id="112">112</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>napi::{bindgen_prelude::FromNapiValue, Env, JsUnknown, NapiValue};
-<span class="kw">use </span>quaint::error::{Error <span class="kw">as </span>QuaintError, MysqlError, PostgresError};
+<span class="kw">use </span>quaint::error::{Error <span class="kw">as </span>QuaintError, MysqlError, PostgresError, SqliteError};
 <span class="kw">use </span>serde::Deserialize;
 
 <span class="attr">#[derive(Deserialize)]
@@ -126,6 +134,13 @@
 }
 
 <span class="attr">#[derive(Deserialize)]
+#[serde(remote = <span class="string">&quot;SqliteError&quot;</span>, rename_all = <span class="string">&quot;camelCase&quot;</span>)]
+</span><span class="kw">pub struct </span>SqliteErrorDef {
+    <span class="kw">pub </span>extended_code: i32,
+    <span class="kw">pub </span>message: <span class="prelude-ty">Option</span>&lt;String&gt;,
+}
+
+<span class="attr">#[derive(Deserialize)]
 #[serde(tag = <span class="string">&quot;kind&quot;</span>)]
 </span><span class="doccomment">/// Wrapper for JS-side errors
 /// See driver-adapters/js/adapter-utils/src/types.ts file for example
@@ -137,8 +152,8 @@
 
     Postgres(<span class="attr">#[serde(with = <span class="string">&quot;PostgresErrorDef&quot;</span>)] </span>PostgresError),
     Mysql(<span class="attr">#[serde(with = <span class="string">&quot;MysqlErrorDef&quot;</span>)] </span>MysqlError),
-    <span class="comment">// in the future, expected errors that map to known user errors with PXXX codes will also go here
-</span>}
+    Sqlite(<span class="attr">#[serde(with = <span class="string">&quot;SqliteErrorDef&quot;</span>)] </span>SqliteError),
+}
 
 <span class="kw">impl </span>FromNapiValue <span class="kw">for </span>DriverAdapterError {
     <span class="kw">unsafe fn </span>from_napi_value(napi_env: napi::sys::napi_env, napi_val: napi::sys::napi_value) -&gt; napi::Result&lt;<span class="self">Self</span>&gt; {
@@ -154,6 +169,7 @@
             DriverAdapterError::GenericJs { id } =&gt; QuaintError::external_error(id),
             DriverAdapterError::Postgres(e) =&gt; e.into(),
             DriverAdapterError::Mysql(e) =&gt; e.into(),
+            DriverAdapterError::Sqlite(e) =&gt; e.into(),
             <span class="comment">// in future, more error types would be added and we&#39;ll need to convert them to proper QuaintErrors here
         </span>}
     }

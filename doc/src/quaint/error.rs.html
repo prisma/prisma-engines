@@ -394,6 +394,7 @@
 <a href="#394" id="394">394</a>
 <a href="#395" id="395">395</a>
 <a href="#396" id="396">396</a>
+<a href="#397" id="397">397</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Error module
 </span><span class="kw">use </span><span class="kw">crate</span>::connector::IsolationLevel;
 <span class="kw">use </span>std::{borrow::Cow, fmt, io, num};
@@ -404,6 +405,7 @@
 
 <span class="kw">pub use </span><span class="kw">crate</span>::connector::mysql::MysqlError;
 <span class="kw">pub use </span><span class="kw">crate</span>::connector::postgres::PostgresError;
+<span class="kw">pub use </span><span class="kw">crate</span>::connector::sqlite::SqliteError;
 
 <span class="attr">#[derive(Debug, PartialEq, Eq)]
 </span><span class="kw">pub enum </span>DatabaseConstraint {
