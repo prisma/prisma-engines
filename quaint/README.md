@@ -20,10 +20,6 @@ Quaint is an abstraction over certain SQL databases. It provides:
 - `sqlite`: Support for SQLite databases.
 - `mssql`: Support for Microsoft SQL Server databases.
 - `pooled`: A connection pool in `pooled::Quaint`.
-- `json`: JSON type support with `serde_json` crate.
-- `uuid`: UUID type support with `uuid` crate.
-- `chrono`: DateTime type support with `chrono` crate.
-- `bigdecimal`: Numeric values can be read as `BigDecimal`.
 - `vendored-openssl`: Statically links against a vendored OpenSSL library on
   non-Windows or non-Apple platforms.
 - `fmt-sql`: Enables logging SQL queries _formatted_. The `FMT_SQL` env var must be present for the formatting to be enabled.

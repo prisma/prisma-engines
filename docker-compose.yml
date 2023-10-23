@@ -121,6 +121,23 @@ services:
     networks:
       - databases
 
+  planetscale-vitess8:
+    build: ./docker/planetscale_proxy
+    environment:
+      MYSQL_HOST: 'vitess-test-8_0'
+      MYSQL_PORT: 33807
+      MYSQL_DATABASE: 'test'
+    ports:
+      - '8085:8085'
+    depends_on:
+      - vitess-test-8_0
+    restart: always
+    healthcheck:
+      test: [ 'CMD', 'nc', '-z', '127.0.0.1', '8085' ]
+      interval: 5s
+      timeout: 2s
+      retries: 20
+
   postgres14:
     image: postgres:14
     restart: always
@@ -211,11 +228,18 @@ services:
       - 33577:33577
     environment:
       PORT: 33574
-      KEYSPACES: "test"
-      NUM_SHARDS: "1"
-      MYSQL_BIND_HOST: "0.0.0.0"
-      FOREIGN_KEY_MODE: "disallow"
+      KEYSPACES: 'test'
+      NUM_SHARDS: '1'
+      MYSQL_BIND_HOST: '0.0.0.0'
+      FOREIGN_KEY_MODE: 'disallow'
       ENABLE_ONLINE_DDL: false
+      MYSQL_MAX_CONNECTIONS: 100000
+      TABLET_REFRESH_INTERVAL: '500ms'
+    healthcheck:
+      test: ['CMD', 'mysqladmin', 'ping', '-h127.0.0.1', '-P33577']
+      interval: 5s
+      timeout: 2s
+      retries: 20
 
   vitess-test-8_0:
     image: vitess/vttestserver:mysql80@sha256:8bec2644d83cb322eb2cdd596d33c0f858243ba6ade9164c95dfcc519643094e
@@ -224,12 +248,18 @@ services:
       - 33807:33807
     environment:
       PORT: 33804
-      KEYSPACES: "test"
-      NUM_SHARDS: "1"
-      MYSQL_BIND_HOST: "0.0.0.0"
-      FOREIGN_KEY_MODE: "disallow"
-      TABLET_REFRESH_INTERVAL: "500ms"
+      KEYSPACES: 'test'
+      NUM_SHARDS: '1'
+      MYSQL_BIND_HOST: '0.0.0.0'
+      FOREIGN_KEY_MODE: 'disallow'
       ENABLE_ONLINE_DDL: false
+      MYSQL_MAX_CONNECTIONS: 100000
+      TABLET_REFRESH_INTERVAL: '500ms'
+    healthcheck:
+      test: ['CMD', 'mysqladmin', 'ping', '-h127.0.0.1', '-P33807']
+      interval: 5s
+      timeout: 2s
+      retries: 20
 
   vitess-shadow-5_7:
     image: vitess/vttestserver:mysql57@sha256:23863a518b34330109c502ac61a396008f5f023e96263bcb2bb1b0f7f7d5dc7f
@@ -238,11 +268,18 @@ services:
       - 33578:33577
     environment:
       PORT: 33574
-      KEYSPACES: "shadow"
-      NUM_SHARDS: "1"
-      MYSQL_BIND_HOST: "0.0.0.0"
-      FOREIGN_KEY_MODE: "disallow"
+      KEYSPACES: 'shadow'
+      NUM_SHARDS: '1'
+      MYSQL_BIND_HOST: '0.0.0.0'
+      FOREIGN_KEY_MODE: 'disallow'
       ENABLE_ONLINE_DDL: false
+      MYSQL_MAX_CONNECTIONS: 100000
+      TABLET_REFRESH_INTERVAL: '500ms'
+    healthcheck:
+      test: ['CMD', 'mysqladmin', 'ping', '-h127.0.0.1', '-P33577']
+      interval: 5s
+      timeout: 2s
+      retries: 20
 
   vitess-shadow-8_0:
     image: vitess/vttestserver:mysql80@sha256:8bec2644d83cb322eb2cdd596d33c0f858243ba6ade9164c95dfcc519643094e
@@ -251,12 +288,18 @@ services:
       - 33808:33807
     environment:
       PORT: 33804
-      KEYSPACES: "shadow"
-      NUM_SHARDS: "1"
-      MYSQL_BIND_HOST: "0.0.0.0"
-      FOREIGN_KEY_MODE: "disallow"
-      TABLET_REFRESH_INTERVAL: "500ms"
+      KEYSPACES: 'shadow'
+      NUM_SHARDS: '1'
+      MYSQL_BIND_HOST: '0.0.0.0'
+      FOREIGN_KEY_MODE: 'disallow'
       ENABLE_ONLINE_DDL: false
+      MYSQL_MAX_CONNECTIONS: 100000
+      TABLET_REFRESH_INTERVAL: '500ms'
+    healthcheck:
+      test: ['CMD', 'mysqladmin', 'ping', '-h127.0.0.1', '-P33807']
+      interval: 5s
+      timeout: 2s
+      retries: 20
 
   mssql-2017:
     image: mcr.microsoft.com/mssql/server:2017-latest

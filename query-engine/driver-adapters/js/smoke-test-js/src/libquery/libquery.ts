@@ -5,7 +5,11 @@ import type { QueryEngineInstance } from '../engines/types/Library'
 import { createQueryFn, initQueryEngine } from './util'
 import { JsonQuery } from '../engines/types/JsonProtocol'
 
-export function smokeTestLibquery(adapter: ErrorCapturingDriverAdapter, prismaSchemaRelativePath: string) {
+export function smokeTestLibquery(
+  adapter: ErrorCapturingDriverAdapter,
+  prismaSchemaRelativePath: string,
+  supportsTransactions = true,
+) {
   const engine = initQueryEngine(adapter, prismaSchemaRelativePath)
   const flavour = adapter.flavour
 
@@ -262,11 +266,14 @@ export function smokeTestLibquery(adapter: ErrorCapturingDriverAdapter, prismaSc
     })
 
     it('create explicit transaction', async () => {
+      if (!supportsTransactions) return
+
       const args = { isolation_level: 'Serializable', max_wait: 5000, timeout: 15000 }
       const startResponse = await engine.startTransaction(JSON.stringify(args), 'trace')
       const tx_id = JSON.parse(startResponse).id
-
       console.log('[nodejs] transaction id', tx_id)
+      assert.notStrictEqual(tx_id, undefined)
+
       await doQuery(
         {
           action: 'findMany',
@@ -282,13 +289,24 @@ export function smokeTestLibquery(adapter: ErrorCapturingDriverAdapter, prismaSc
       console.log('[nodejs] commited', commitResponse)
     })
 
-    it('expected error', async () => {
-      const result = await doQuery({
+    it('expected error (on duplicate insert) as json result (not throwing error)', async () => {
+      // clean up first
+      await doQuery({
         modelName: 'Unique',
-        action: 'createMany',
+        action: 'deleteMany',
+        query: {
+          selection: {
+            count: true,
+          },
+        },
+      })
+
+      await doQuery({
+        modelName: 'Unique',
+        action: 'createOne',
         query: {
           arguments: {
-            data: [{ email: 'duplicate@example.com' }, { email: 'duplicate@example.com' }],
+            data: { email: 'duplicate@example.com' },
           },
           selection: {
             $scalars: true,
@@ -296,7 +314,30 @@ export function smokeTestLibquery(adapter: ErrorCapturingDriverAdapter, prismaSc
         },
       })
 
-      console.log('[nodejs] error result', JSON.stringify(result, null, 2))
+      const promise = doQuery({
+        modelName: 'Unique',
+        action: 'createOne',
+        query: {
+          arguments: {
+            data: { email: 'duplicate@example.com' },
+          },
+          selection: {
+            $scalars: true,
+          },
+        },
+      })
+
+      if (flavour === 'postgres') {
+        const result = await promise
+        console.log('[nodejs] error result', JSON.stringify(result, null, 2))
+        assert.equal(result?.errors?.[0]?.['user_facing_error']?.['error_code'], 'P2002')
+      } else {
+        await assert.rejects(promise, (err) => {
+          assert(typeof err === 'object' && err !== null)
+          assert.match(err['message'], /unique/i)
+          return true
+        })
+      }
     })
 
     describe('read scalar and non scalar types', () => {
@@ -364,24 +405,22 @@ export function smokeTestLibquery(adapter: ErrorCapturingDriverAdapter, prismaSc
         })
       } else if (['sqlite'].includes(flavour)) {
         it('sqlite', async () => {
-          const resultSet = await doQuery(
-            {
-              "action": "findMany",
-              "modelName": "type_test",
-              "query": {
-                "selection": {
-                  "int_column": true,
-                  "bigint_column": true,
-                  "double_column": true,
-                  "decimal_column": true,
-                  "boolean_column": true,
-                  "text_column": true,
-                  "datetime_column": true,
-                }
-              }
-            }
-          )
-          console.log('[nodejs] findMany resultSet', JSON.stringify((resultSet), null, 2))
+          const resultSet = await doQuery({
+            action: 'findMany',
+            modelName: 'type_test',
+            query: {
+              selection: {
+                int_column: true,
+                bigint_column: true,
+                double_column: true,
+                decimal_column: true,
+                boolean_column: true,
+                text_column: true,
+                datetime_column: true,
+              },
+            },
+          })
+          console.log('[nodejs] findMany resultSet', JSON.stringify(resultSet, null, 2))
         })
       } else {
         throw new Error(`Missing test for flavour ${flavour}`)
@@ -396,7 +435,7 @@ export function smokeTestLibquery(adapter: ErrorCapturingDriverAdapter, prismaSc
           selection: {
             bytes: true,
           },
-          arguments:  {
+          arguments: {
             data: {
               bytes: {
                 $type: 'Bytes',
