@@ -23,7 +23,7 @@ Make sure your [Neon database connection string](https://neon.tech/docs/connect/
 DATABASE_URL="postgres://..."
 ```
 
-You can now reference this environment variable in your `schema.prisma` datasource. Make sure you also include the `driverAdapters` Preview feature.
+Make sure you also include the `driverAdapters` Preview feature in your `schema.prisma`.
 
 ```prisma
 // schema.prisma
