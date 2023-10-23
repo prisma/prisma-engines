@@ -6,6 +6,7 @@ use thiserror::Error;
 #[cfg(feature = "pooled")]
 use std::time::Duration;
 
+pub use crate::connector::mysql::MysqlError;
 pub use crate::connector::postgres::PostgresError;
 
 #[derive(Debug, PartialEq, Eq)]
