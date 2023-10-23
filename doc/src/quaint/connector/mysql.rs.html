@@ -665,6 +665,8 @@
 <a href="#665" id="665">665</a>
 <a href="#666" id="666">666</a>
 <a href="#667" id="667">667</a>
+<a href="#668" id="668">668</a>
+<a href="#669" id="669">669</a>
 </pre></div><pre class="rust"><code><span class="kw">mod </span>conversion;
 <span class="kw">mod </span>error;
 
@@ -690,6 +692,8 @@
 };
 <span class="kw">use </span>tokio::sync::Mutex;
 <span class="kw">use </span>url::{Host, Url};
+
+<span class="kw">pub use </span>error::MysqlError;
 
 <span class="doccomment">/// The underlying MySQL driver. Only available with the `expose-drivers`
 /// Cargo feature.

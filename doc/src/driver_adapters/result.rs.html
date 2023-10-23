@@ -92,8 +92,18 @@
 <a href="#92" id="92">92</a>
 <a href="#93" id="93">93</a>
 <a href="#94" id="94">94</a>
+<a href="#95" id="95">95</a>
+<a href="#96" id="96">96</a>
+<a href="#97" id="97">97</a>
+<a href="#98" id="98">98</a>
+<a href="#99" id="99">99</a>
+<a href="#100" id="100">100</a>
+<a href="#101" id="101">101</a>
+<a href="#102" id="102">102</a>
+<a href="#103" id="103">103</a>
+<a href="#104" id="104">104</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>napi::{bindgen_prelude::FromNapiValue, Env, JsUnknown, NapiValue};
-<span class="kw">use </span>quaint::error::{Error <span class="kw">as </span>QuaintError, PostgresError};
+<span class="kw">use </span>quaint::error::{Error <span class="kw">as </span>QuaintError, MysqlError, PostgresError};
 <span class="kw">use </span>serde::Deserialize;
 
 <span class="attr">#[derive(Deserialize)]
@@ -108,6 +118,14 @@
 }
 
 <span class="attr">#[derive(Deserialize)]
+#[serde(remote = <span class="string">&quot;MysqlError&quot;</span>)]
+</span><span class="kw">pub struct </span>MysqlErrorDef {
+    <span class="kw">pub </span>code: u16,
+    <span class="kw">pub </span>message: String,
+    <span class="kw">pub </span>state: String,
+}
+
+<span class="attr">#[derive(Deserialize)]
 #[serde(tag = <span class="string">&quot;kind&quot;</span>)]
 </span><span class="doccomment">/// Wrapper for JS-side errors
 /// See driver-adapters/js/adapter-utils/src/types.ts file for example
@@ -118,6 +136,7 @@
     },
 
     Postgres(<span class="attr">#[serde(with = <span class="string">&quot;PostgresErrorDef&quot;</span>)] </span>PostgresError),
+    Mysql(<span class="attr">#[serde(with = <span class="string">&quot;MysqlErrorDef&quot;</span>)] </span>MysqlError),
     <span class="comment">// in the future, expected errors that map to known user errors with PXXX codes will also go here
 </span>}
 
@@ -134,6 +153,7 @@
         <span class="kw">match </span>value {
             DriverAdapterError::GenericJs { id } =&gt; QuaintError::external_error(id),
             DriverAdapterError::Postgres(e) =&gt; e.into(),
+            DriverAdapterError::Mysql(e) =&gt; e.into(),
             <span class="comment">// in future, more error types would be added and we&#39;ll need to convert them to proper QuaintErrors here
         </span>}
     }
