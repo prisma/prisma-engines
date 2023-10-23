@@ -46,7 +46,7 @@ jobs:
       QUERY_BATCH_SIZE: '10'
       WORKSPACE_ROOT: ${{ github.workspace }}
 
-    runs-on: buildjet-16vcpu-ubuntu-2004
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
 
