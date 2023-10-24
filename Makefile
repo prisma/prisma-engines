@@ -262,8 +262,32 @@ dev-planetscale-vitess8: start-planetscale-vitess8
 build-qe-napi:
 	cargo build --package query-engine-node-api
 
-build-connector-kit-js:
-	cd query-engine/driver-adapters/js && pnpm i && pnpm build
+build-connector-kit-js: symlink-driver-adapters
+	cd query-engine/driver-adapters && pnpm i && pnpm build
+
+symlink-driver-adapters: ensure-prisma-present
+	@echo "Creating symbolic links for driver adapters..."
+	@for dir in $(wildcard $(realpath ../prisma)/packages/*adapter*); do \
+        if [ -d "$$dir" ]; then \
+            dir_name=$$(basename "$$dir"); \
+            ln -sfh "$$dir" "$(realpath .)/query-engine/driver-adapters/$$dir_name"; \
+            echo "Created symbolic link for $$dir_name"; \
+        fi; \
+	done;
+	@ln -sf "../prisma/tsconfig.build.adapter.json" "./tsconfig.build.adapter.json"; \
+	echo "Symbolic links creation completed.";
+
+.PHONY: ensure-prisma-present
+ensure-prisma-present:
+	@if [ -d ../prisma ]; then \
+		cd "$(realpath ../prisma)" && git fetch origin main; \
+		LOCAL_CHANGES=$$(git diff --name-only HEAD origin/main -- 'packages/*adapter*'); \
+		if [ -n "$$LOCAL_CHANGES" ]; then \
+		  echo "⚠️ ../prisma diverges from prisma/prisma main branch. Test results might diverge from those in CI ⚠️ "; \
+		fi \
+	else \
+		git clone https://github.com/prisma/prisma.git "../prisma" && echo "Prisma repository has been cloned to ../prisma"; \
+	fi;
 
 # Quick schema validation of whatever you have in the dev_datamodel.prisma file.
 validate:
