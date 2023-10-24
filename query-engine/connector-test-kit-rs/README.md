@@ -66,8 +66,9 @@ If you choose to set up the databases yourself, please note that the connection 
 
 #### Running tests through driver adapters
 
-The query engine is able to delegate query execution to javascript through [driver adapters](query-engine/driver-adapters/js/README.md).
-This means that instead of drivers being implemented in Rust, it's a layer of adapters over NodeJs drivers the code that actually communicates with the databases. 
+The query engine is able to delegate query execution to javascript through driver adapters.
+This means that instead of drivers being implemented in Rust, it's a layer of adapters over NodeJs
+drivers the code that actually communicates with the databases. See [`adapter-*` packages in prisma/prisma](https://github.com/prisma/prisma/tree/main/packages)
 
 To run tests through a driver adapters, you should also configure the following environment variables:
 
@@ -78,7 +79,7 @@ To run tests through a driver adapters, you should also configure the following 
 Example:
 
 ```shell
-export EXTERNAL_TEST_EXECUTOR="$WORKSPACE_ROOT/query-engine/driver-adapters/js/connector-test-kit-executor/script/start_node.sh"
+export EXTERNAL_TEST_EXECUTOR="$WORKSPACE_ROOT/query-engine/driver-adapters/connector-test-kit-executor/script/start_node.sh"
 export DRIVER_ADAPTER=neon
 export DRIVER_ADAPTER_CONFIG ='{ "proxyUrl": "127.0.0.1:5488/v1" }'
 ````

@@ -159,7 +159,7 @@ impl TestConfig {
     /// and the workspace_root is set, then use the default external test executor.
     fn fill_defaults(&mut self) {
         const DEFAULT_TEST_EXECUTOR: &str =
-            "query-engine/driver-adapters/js/connector-test-kit-executor/script/start_node.sh";
+            "query-engine/driver-adapters/connector-test-kit-executor/script/start_node.sh";
 
         if self
             .external_test_executor
