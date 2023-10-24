@@ -46,3 +46,6 @@ dmmf.json
 graph.dot
 
 prisma-schema-wasm/nodejs
+
+# This symlink looks orphan here, but it comes from prisma/prisma where driver adapters reference a file in their parent directory
+tsconfig.build.adapter.json
