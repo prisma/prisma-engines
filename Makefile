@@ -286,7 +286,7 @@ ensure-prisma-present:
 		  echo "⚠️ ../prisma diverges from prisma/prisma main branch. Test results might diverge from those in CI ⚠️ "; \
 		fi \
 	else \
-		git clone https://github.com/prisma/prisma.git "../prisma" && echo "Prisma repository has been cloned to ../prisma"; \
+		git clone --depth=1 https://github.com/prisma/prisma.git "../prisma" && echo "Prisma repository has been cloned to ../prisma"; \
 	fi;
 
 # Quick schema validation of whatever you have in the dev_datamodel.prisma file.
