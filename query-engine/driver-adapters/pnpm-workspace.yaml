@@ -1,0 +1,4 @@
+packages:
+  - "./connector-test-kit-executor"
+  - "./driver-adapter-utils"
+  - "./adapter-*"
