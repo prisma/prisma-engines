@@ -42,7 +42,7 @@ jobs:
       - name: Update version in package.json
         run: PACKAGE_DIR=$( nix run .#renderPrismaSchemaWasmPackage ${{ github.event.inputs.enginesWrapperVersion }})
 
-      - name: Publish Prisma Driver Adapters packages
+      - name: Publish @prisma/prisma-schema-wasm
         run: npm publish "$PACKAGE_DIR" --access public --tag ${{ github.event.inputs.npmDistTag }}
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
