@@ -74,7 +74,7 @@ jobs:
 
       - name: Extract Branch Name
         id: extract-branch
-        run: echo "::set-output name=branch::$(git show -s --format=%s | grep -o "DRIVER_ADAPTERS_BRANCH=[^ ]*" | cut -f2 -d=)"
+        run: echo branch="$(git show -s --format=%s | grep -o "DRIVER_ADAPTERS_BRANCH=[^ ]*" | cut -f2 -d=)" >> $GITHUB_OUTPUT
 
       - name: Set Environment Variable
         if: steps.extract-branch.outputs.branch != ''
