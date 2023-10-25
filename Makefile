@@ -116,11 +116,15 @@ start-pg-postgres13: build-qe-napi build-connector-kit-js start-postgres13
 dev-pg-postgres13: start-pg-postgres13
 	cp $(CONFIG_PATH)/pg-postgres13 $(CONFIG_FILE)
 
+test-pg-postgres13: dev-pg-postgres13 test-qe-st
+
 start-neon-postgres13: build-qe-napi build-connector-kit-js
 	docker compose -f docker-compose.yml up --wait -d --remove-orphans neon-postgres13
 
 dev-neon-ws-postgres13: start-neon-postgres13
 	cp $(CONFIG_PATH)/neon-ws-postgres13 $(CONFIG_FILE)
+
+test-neon-ws-postgres13: dev-neon-ws-postgres13 test-qe-st
 
 start-postgres14:
 	docker compose -f docker-compose.yml up --wait -d --remove-orphans postgres14
@@ -255,6 +259,8 @@ start-planetscale-vitess8: build-qe-napi build-connector-kit-js
 
 dev-planetscale-vitess8: start-planetscale-vitess8
 	cp $(CONFIG_PATH)/planetscale-vitess8 $(CONFIG_FILE)
+
+test-planetscale-vitess8: dev-planetscale-vitess8 test-qe-st
 
 ######################
 # Local dev commands #

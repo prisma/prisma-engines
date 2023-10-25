@@ -10,7 +10,7 @@ export function initQueryEngine(adapter: ErrorCapturingDriverAdapter, datamodel:
     const libExt = os.platform() === 'darwin' ? 'dylib' : 'so'
     const dirname = path.dirname(new URL(import.meta.url).pathname)
 
-    const libQueryEnginePath = path.join(dirname, `../../../../../target/debug/libquery_engine.${libExt}`)
+    const libQueryEnginePath = path.join(dirname, `../../../../target/debug/libquery_engine.${libExt}`)
 
     const libqueryEngine = { exports: {} as unknown as lib.Library }
     // @ts-ignore
