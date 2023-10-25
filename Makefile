@@ -45,7 +45,13 @@ release:
 #################
 
 test-qe:
+ifndef DRIVER_ADAPTER
 	cargo test --package query-engine-tests
+else
+	@echo "Executing query engine tests with $(DRIVER_ADAPTER) driver adapter"; \
+	# Add your actual command for the "test-driver-adapter" task here
+	$(MAKE) test-driver-adapter-$(DRIVER_ADAPTER);
+endif
 
 test-qe-verbose:
 	cargo test --package query-engine-tests -- --nocapture
@@ -80,6 +86,10 @@ dev-sqlite:
 
 dev-libsql-sqlite: build-qe-napi build-connector-kit-js
 	cp $(CONFIG_PATH)/libsql-sqlite $(CONFIG_FILE)
+
+test-libsql-sqlite: dev-libsql-sqlite test-qe-st
+
+test-driver-adapter-libsql: test-libsql-sqlite
 
 start-postgres9:
 	docker compose -f docker-compose.yml up --wait -d --remove-orphans postgres9
@@ -118,6 +128,8 @@ dev-pg-postgres13: start-pg-postgres13
 
 test-pg-postgres13: dev-pg-postgres13 test-qe-st
 
+test-driver-adapter-pg: test-pg-postgres13
+
 start-neon-postgres13: build-qe-napi build-connector-kit-js
 	docker compose -f docker-compose.yml up --wait -d --remove-orphans neon-postgres13
 
@@ -125,6 +137,8 @@ dev-neon-ws-postgres13: start-neon-postgres13
 	cp $(CONFIG_PATH)/neon-ws-postgres13 $(CONFIG_FILE)
 
 test-neon-ws-postgres13: dev-neon-ws-postgres13 test-qe-st
+
+test-driver-adapter-neon: test-neon-ws-postgres13
 
 start-postgres14:
 	docker compose -f docker-compose.yml up --wait -d --remove-orphans postgres14
@@ -261,6 +275,8 @@ dev-planetscale-vitess8: start-planetscale-vitess8
 	cp $(CONFIG_PATH)/planetscale-vitess8 $(CONFIG_FILE)
 
 test-planetscale-vitess8: dev-planetscale-vitess8 test-qe-st
+
+test-driver-adapter-planetscale: test-planetscale-vitess8
 
 ######################
 # Local dev commands #

@@ -203,6 +203,7 @@ integration tests.
   - Alternatively: Load the defined environment in `./.envrc` manually in your shell.
 
 **Setup:**
+
 There are helper `make` commands to set up a test environment for a specific
 database connector you want to test. The commands set up a container (if needed)
 and write the `.test_config` file, which is picked up by the integration
@@ -233,6 +234,21 @@ Other variables may or may not be useful.
 **Run:**
 
 Run `cargo test` in the repository root.
+
+#### Testing driver adapters
+
+Driver adapters are a feature to run queries through javascript drivers from rust. An adapter for a certain driver is 
+provided by the prisma client and then use by rust code. If you want to run query engine tests through driver adapters:
+
+- `DRIVER_ADAPTER=$adapter make qe-test`
+
+Where `$adapter` is one of `pg`, `neon`, or `planetscale` or `libsql` (the driver adapters currently supported)
+
+This make task hides the underlying complexity of spawning the right docker containers, pulling driver adapters code 
+from prisma/prisma, building them, and build a test runner to use them. 
+
+When pulling the driver adapters code, make will ensure you have a clone of prisma/prisma in the same directory as 
+prisma-engines. If you don't, it will clone it for you.
 
 ## Parallel rust-analyzer builds
 
