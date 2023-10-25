@@ -263,22 +263,26 @@ dev-planetscale-vitess8: start-planetscale-vitess8
 build-qe-napi:
 	cargo build --package query-engine-node-api
 
-build-connector-kit-js: symlink-driver-adapters
+build-connector-kit-js: build-driver-adapters symlink-driver-adapters
 	cd query-engine/driver-adapters && pnpm i && pnpm build
+
+build-driver-adapters: ensure-prisma-present
+	@echo "Building driver adapters..."
+	@cd ../prisma && pnpm --filter "*adapter*" i && pnpm --filter "*adapter*" build
+	@echo "Driver adapters build completed.";
 
 symlink-driver-adapters: ensure-prisma-present
 	@echo "Creating symbolic links for driver adapters..."
 	@for dir in $(wildcard $(realpath ../prisma)/packages/*adapter*); do \
         if [ -d "$$dir" ]; then \
             dir_name=$$(basename "$$dir"); \
-            ln -sfh "$$dir" "$(realpath .)/query-engine/driver-adapters/$$dir_name"; \
+            ln -sfn "$$dir" "$(realpath .)/query-engine/driver-adapters/$$dir_name"; \
             echo "Created symbolic link for $$dir_name"; \
         fi; \
 	done;
-	@ln -sf "../prisma/tsconfig.build.adapter.json" "./tsconfig.build.adapter.json"; \
+	@ln -sfn "../prisma/tsconfig.build.adapter.json" "./tsconfig.build.adapter.json"; \
 	echo "Symbolic links creation completed.";
 
-.PHONY: ensure-prisma-present
 ensure-prisma-present:
 	@if [ -d ../prisma ]; then \
 		cd "$(realpath ../prisma)" && git fetch origin main; \
