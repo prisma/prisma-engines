@@ -72,6 +72,14 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
+      - name: Extract Branch Name
+        id: extract-branch
+        run: echo "::set-output name=branch::$(git show -s --format=%s | grep -o "DRIVER_ADAPTERS_BRANCH=[^ ]*" | cut -f2 -d=)"
+
+      - name: Set Environment Variable
+        if: steps.extract-branch.outputs.branch != ''
+        run: echo "DRIVER_ADAPTERS_BRANCH=${{ steps.extract-branch.outputs.branch }}" >> $GITHUB_ENV
+
       - run: make ${{ matrix.adapter.setup_task }}
 
       - uses: dtolnay/rust-toolchain@stable
