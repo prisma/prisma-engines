@@ -237,18 +237,7 @@ Run `cargo test` in the repository root.
 
 #### Testing driver adapters
 
-Driver adapters are a feature to run queries through javascript drivers from rust. An adapter for a certain driver is 
-provided by the prisma client and then use by rust code. If you want to run query engine tests through driver adapters:
-
-- `DRIVER_ADAPTER=$adapter make qe-test`
-
-Where `$adapter` is one of `pg`, `neon`, or `planetscale` or `libsql` (the driver adapters currently supported)
-
-This make task hides the underlying complexity of spawning the right docker containers, pulling driver adapters code 
-from prisma/prisma, building them, and build a test runner to use them. 
-
-When pulling the driver adapters code, make will ensure you have a clone of prisma/prisma in the same directory as 
-prisma-engines. If you don't, it will clone it for you.
+Please refer to the [Testing driver adapters](./query-engine/connector-test-kit-rs/README.md#testing-driver-adapters) section in the connector-test-kit-rs README.
 
 ## Parallel rust-analyzer builds
 
