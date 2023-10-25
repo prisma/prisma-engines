@@ -17,7 +17,7 @@ use sql_schema_describer::{
     ColumnTypeFamily, DefaultKind, DefaultValue, ForeignKeyAction, SQLSortOrder, SqlSchema,
 };
 use std::borrow::Cow;
-use datamodel::ScalarType::String;
+use String;
 
 impl MysqlFlavour {
     fn render_column<'a>(&self, col: &ColumnWalker<'a>) -> ddl::Column<'a> {

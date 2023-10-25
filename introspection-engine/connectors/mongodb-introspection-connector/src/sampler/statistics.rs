@@ -234,6 +234,7 @@ fn add_missing_ids_to_models(models: &mut BTreeMap<String, Model>) {
             is_updated_at: false,
             is_commented_out: false,
             is_ignored: false,
+            comment_value: None,
         };
 
         model.fields.insert(0, Field::ScalarField(field));
@@ -462,6 +463,7 @@ fn populate_fields(
                     is_updated_at: false,
                     is_commented_out,
                     is_ignored: false,
+                    comment_value: None,
                 };
 
                 match &field.database_name {
@@ -609,6 +611,7 @@ fn add_indices_to_models(
                     is_updated_at: false,
                     is_commented_out: false,
                     is_ignored: false,
+                    comment_value: None,
                 };
 
                 model.fields.push(Field::ScalarField(sf));

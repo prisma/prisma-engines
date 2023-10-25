@@ -206,6 +206,7 @@ pub(crate) fn calculate_scalar_field(table: &Table, column: &Column, ctx: &Intro
         is_updated_at: false,
         is_commented_out: false,
         is_ignored: false,
+        comment_value: None,
     }
 }
 
