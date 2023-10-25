@@ -1,6 +1,10 @@
 {
+  "engines": {
+    "node": ">=16.13",
+    "pnpm": ">=8.6.6 <9"
+  },
   "name": "connector-test-kit-executor",
-  "version": "5.4.0",
+  "version": "0.0.1",
   "description": "",
   "main": "dist/index.js",
   "private": true,
@@ -24,5 +28,11 @@
     "@types/pg": "^8.10.2",
     "pg": "^8.11.3",
     "undici": "^5.26.2"
+  },
+  "devDependencies": {
+    "@types/node": "^20.5.1",
+    "tsup": "^7.2.0",
+    "tsx": "^3.12.7",
+    "typescript": "^5.1.6"
   }
 }

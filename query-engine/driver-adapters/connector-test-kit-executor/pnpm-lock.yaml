@@ -4,58 +4,54 @@ settings:
   autoInstallPeers: true
   excludeLinksFromLockfile: false
 
-importers:
+dependencies:
+  '@libsql/client':
+    specifier: 0.3.5
+    version: 0.3.5
+  '@neondatabase/serverless':
+    specifier: ^0.6.0
+    version: 0.6.0
+  '@planetscale/database':
+    specifier: 1.11.0
+    version: 1.11.0
+  '@prisma/adapter-libsql':
+    specifier: ../adapter-libsql
+    version: link:../adapter-libsql
+  '@prisma/adapter-neon':
+    specifier: ../adapter-neon
+    version: link:../adapter-neon
+  '@prisma/adapter-pg':
+    specifier: ../adapter-pg
+    version: link:../adapter-pg
+  '@prisma/adapter-planetscale':
+    specifier: ../adapter-planetscale
+    version: link:../adapter-planetscale
+  '@prisma/driver-adapter-utils':
+    specifier: ../driver-adapter-utils
+    version: link:../driver-adapter-utils
+  '@types/pg':
+    specifier: ^8.10.2
+    version: 8.10.2
+  pg:
+    specifier: ^8.11.3
+    version: 8.11.3
+  undici:
+    specifier: ^5.26.2
+    version: 5.26.2
 
-  .:
-    devDependencies:
-      '@types/node':
-        specifier: ^20.5.1
-        version: 20.5.1
-      tsup:
-        specifier: ^7.2.0
-        version: 7.2.0(typescript@5.1.6)
-      tsx:
-        specifier: ^3.12.7
-        version: 3.12.7
-      typescript:
-        specifier: ^5.1.6
-        version: 5.1.6
-
-  connector-test-kit-executor:
-    dependencies:
-      '@libsql/client':
-        specifier: 0.3.5
-        version: 0.3.5
-      '@neondatabase/serverless':
-        specifier: ^0.6.0
-        version: 0.6.0
-      '@planetscale/database':
-        specifier: 1.11.0
-        version: 1.11.0
-      '@prisma/adapter-libsql':
-        specifier: ../adapter-libsql
-        version: link:../adapter-libsql
-      '@prisma/adapter-neon':
-        specifier: ../adapter-neon
-        version: link:../adapter-neon
-      '@prisma/adapter-pg':
-        specifier: ../adapter-pg
-        version: link:../adapter-pg
-      '@prisma/adapter-planetscale':
-        specifier: ../adapter-planetscale
-        version: link:../adapter-planetscale
-      '@prisma/driver-adapter-utils':
-        specifier: ../driver-adapter-utils
-        version: link:../driver-adapter-utils
-      '@types/pg':
-        specifier: ^8.10.2
-        version: 8.10.2
-      pg:
-        specifier: ^8.11.3
-        version: 8.11.3
-      undici:
-        specifier: ^5.26.2
-        version: 5.26.2
+devDependencies:
+  '@types/node':
+    specifier: ^20.5.1
+    version: 20.5.1
+  tsup:
+    specifier: ^7.2.0
+    version: 7.2.0(typescript@5.1.6)
+  tsx:
+    specifier: ^3.12.7
+    version: 3.12.7
+  typescript:
+    specifier: ^5.1.6
+    version: 5.1.6
 
 packages:
 
