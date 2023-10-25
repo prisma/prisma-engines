@@ -25,8 +25,14 @@ jobs:
       fail-fast: false
       matrix:
         adapter:
+          - name: 'pg'
+            setup_task: 'dev-pg-postgres13'
           - name: 'neon:ws'
             setup_task: 'dev-neon-ws-postgres13'
+          - name: 'libsql'
+            setup_task: 'dev-libsql-sqlite'
+          - name: 'planetscale'
+            setup_task: 'dev-planetscale-vitess8'
         node_version: ['18']
     env:
       LOG_LEVEL: 'info' # Set to "debug" to trace the query engine and node process running the driver adapter
