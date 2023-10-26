@@ -9,24 +9,35 @@ else
     echo "We are in the $2 pipeline."
 fi
 
+# Checks what's the diff with the previous commit
+# This is used to detect if the previous commit was empty
+GIT_DIFF=$(git diff --name-only HEAD HEAD~1 -- .)
+
 # Checks what's the diff with the previous commit, 
 # excluding some paths that do not need a run, 
 # because they do not affect tests running in Buildkite.
-GIT_DIFF=$(git diff --name-only HEAD HEAD~1 -- . ':!.github' ':!query-engine/driver-adapters/js' ':!renovate.json' ':!*.md' ':!LICENSE' ':!CODEOWNERS';)
+GIT_DIFF_WITH_IGNORED_PATHS=$(git diff --name-only HEAD HEAD~1 -- . ':!.github' ':!query-engine/driver-adapters/js' ':!query-engine/query-engine-wasm' ':!renovate.json' ':!*.md' ':!LICENSE' ':!CODEOWNERS';)
 
 # $2 is either "test" or "build", depending on the pipeline
 # Example: ./.buildkite/engineer pipeline test
 # We only want to check for changes and skip in the test pipeline.
 if [[ "$2" == "test" ]]; then
-    # Checking if GIT_DIFF is empty
-    # If it's empty then it's most likely that there are changes but they are in ignored paths.
-    # So we do not start Buildkite
+    # If GIT_DIFF is empty then the previous commit was empty
+    # We assume it's intended and we continue with the run
+    # Example use: to get a new engine hash built with identical code 
     if [ -z "${GIT_DIFF}" ]; then
-        echo "No changes found for the previous commit in paths that are not ignored, this run will now be skipped."
-        exit 0
+        echo "The previous commit is empty, this run will continue..."
     else
-        # Note that printf works better for displaying line returns in CI
-        printf "Changes found for the previous commit in paths that are not ignored: \n\n%s\n\nThis run will continue...\n" "${GIT_DIFF}"
+        # Checking if GIT_DIFF_WITH_IGNORED_PATHS is empty
+        # If it's empty then it's most likely that there are changes but they are in ignored paths.
+        # So we do not start Buildkite
+        if [ -z "${GIT_DIFF_WITH_IGNORED_PATHS}" ]; then
+            echo "No changes found for the previous commit in paths that are not ignored, this run will now be skipped."
+            exit 0
+        else
+            # Note that printf works better for displaying line returns in CI
+            printf "Changes found for the previous commit in paths that are not ignored: \n\n%s\n\nThis run will continue...\n" "${GIT_DIFF_WITH_IGNORED_PATHS}"
+        fi
     fi
 fi
 
