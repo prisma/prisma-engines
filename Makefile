@@ -302,7 +302,6 @@ symlink-driver-adapters: ensure-prisma-present
             echo "Created symbolic link for $$dir_name"; \
         fi; \
 	done;
-	@ln -sfn "../prisma/tsconfig.build.adapter.json" "./tsconfig.build.adapter.json"; \
 	echo "Symbolic links creation completed.";
 
 ensure-prisma-present:
