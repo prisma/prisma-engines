@@ -45,6 +45,7 @@ features!(
     DataProxy,
     Deno,
     Distinct,
+    DriverAdapters,
     ExtendedIndexes,
     ExtendedWhereUnique,
     FieldReference,
@@ -64,7 +65,6 @@ features!(
     NamedConstraints,
     NApi,
     NativeTypes,
-    DriverAdapters,
     OrderByAggregateGroup,
     OrderByNulls,
     OrderByRelation,
@@ -82,6 +82,7 @@ features!(
 pub const ALL_PREVIEW_FEATURES: FeatureMap = FeatureMap {
     active: enumflags2::make_bitflags!(PreviewFeature::{
         Deno
+         | DriverAdapters
          | FullTextIndex
          | FullTextSearch
          | Metrics
@@ -123,9 +124,7 @@ pub const ALL_PREVIEW_FEATURES: FeatureMap = FeatureMap {
         | TransactionApi
         | UncheckedScalarInputs
     }),
-    hidden: enumflags2::make_bitflags!(PreviewFeature::{
-        DriverAdapters
-    }),
+    hidden: enumflags2::BitFlags::EMPTY,
 };
 
 #[derive(Debug)]

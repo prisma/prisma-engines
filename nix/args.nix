@@ -4,10 +4,10 @@
     let
       overlays = [
         flakeInputs.rust-overlay.overlays.default
-        (self: super:
-          let toolchain = super.rust-bin.stable.latest; in
-          { cargo = toolchain.minimal; rustc = toolchain.minimal; rustToolchain = toolchain; })
       ];
-    in
-    { pkgs = import flakeInputs.nixpkgs { inherit system overlays; }; };
+    in rec
+    {
+      pkgs = import flakeInputs.nixpkgs { inherit system overlays; };
+      rustToolchain = pkgs.rust-bin.stable.latest;
+    };
 }

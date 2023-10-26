@@ -18,19 +18,15 @@ use std::convert::TryFrom;
 pub enum ConnectionInfo {
     /// A PostgreSQL connection URL.
     #[cfg(feature = "postgresql")]
-    #[cfg_attr(feature = "docs", doc(cfg(feature = "postgresql")))]
     Postgres(PostgresUrl),
     /// A MySQL connection URL.
     #[cfg(feature = "mysql")]
-    #[cfg_attr(feature = "docs", doc(cfg(feature = "mysql")))]
     Mysql(MysqlUrl),
     /// A SQL Server connection URL.
     #[cfg(feature = "mssql")]
-    #[cfg_attr(feature = "docs", doc(cfg(feature = "mssql")))]
     Mssql(MssqlUrl),
     /// A SQLite connection URL.
     #[cfg(feature = "sqlite")]
-    #[cfg_attr(feature = "docs", doc(cfg(feature = "sqlite")))]
     Sqlite {
         /// The filesystem path of the SQLite database.
         file_path: String,
@@ -38,7 +34,6 @@ pub enum ConnectionInfo {
         db_name: String,
     },
     #[cfg(feature = "sqlite")]
-    #[cfg_attr(feature = "docs", doc(cfg(feature = "sqlite")))]
     InMemorySqlite { db_name: String },
 }
 
@@ -236,16 +231,12 @@ impl ConnectionInfo {
 #[derive(Debug, PartialEq, Eq, Clone, Copy)]
 pub enum SqlFamily {
     #[cfg(feature = "postgresql")]
-    #[cfg_attr(feature = "docs", doc(cfg(feature = "postgresql")))]
     Postgres,
     #[cfg(feature = "mysql")]
-    #[cfg_attr(feature = "docs", doc(cfg(feature = "mysql")))]
     Mysql,
     #[cfg(feature = "sqlite")]
-    #[cfg_attr(feature = "docs", doc(cfg(feature = "sqlite")))]
     Sqlite,
     #[cfg(feature = "mssql")]
-    #[cfg_attr(feature = "docs", doc(cfg(feature = "mssql")))]
     Mssql,
 }
 

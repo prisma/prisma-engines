@@ -207,7 +207,7 @@ pub(crate) fn build(
         None => ConditionTree::NoCondition,
         Some(ref cursor) => {
             let cursor_fields: Vec<_> = cursor.as_scalar_fields().expect("Cursor fields contain non-scalars.");
-            let cursor_values: Vec<_> = cursor.db_values();
+            let cursor_values: Vec<_> = cursor.db_values(ctx);
             let cursor_columns: Vec<_> = cursor_fields.as_slice().as_columns(ctx).collect();
             let cursor_row = Row::from(cursor_columns);
 
@@ -226,7 +226,7 @@ pub(crate) fn build(
             let order_subquery = order_by_defs
                 .iter()
                 .flat_map(|j| &j.joins)
-                .fold(order_subquery, |acc, join| acc.left_join(join.data.clone()));
+                .fold(order_subquery, |acc, join| acc.join(join.data.clone()));
 
             let len = definitions.len();
             let reverse = query_arguments.needs_reversed_order();
@@ -469,7 +469,7 @@ fn cursor_order_def_aggregation_scalar(
     order_by: &OrderByScalarAggregation,
     order_by_def: &OrderByDefinition,
 ) -> CursorOrderDefinition {
-    let coalesce_exprs: Vec<Expression> = vec![order_by_def.order_column.clone(), Value::integer(0).into()];
+    let coalesce_exprs: Vec<Expression> = vec![order_by_def.order_column.clone(), Value::int32(0).into()];
 
     // We coalesce the order column to 0 when it's compared to the cmp table since the aggregations joins
     // might return NULL on relations that have no connected records
@@ -493,7 +493,7 @@ fn cursor_order_def_aggregation_rel(
     // cf: part #2 of the SQL query above, when a field is nullable.
     let fks = foreign_keys_from_order_path(&order_by.path, &order_by_def.joins);
 
-    let coalesce_exprs: Vec<Expression> = vec![order_by_def.order_column.clone(), Value::integer(0).into()];
+    let coalesce_exprs: Vec<Expression> = vec![order_by_def.order_column.clone(), Value::int32(0).into()];
     // We coalesce the order column to 0 when it's compared to the cmp table since the aggregations joins
     // might return NULL on relations that have no connected records
     let order_column: Expression = coalesce(coalesce_exprs).into();

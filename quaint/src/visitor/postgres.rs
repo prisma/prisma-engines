@@ -2,13 +2,15 @@ use crate::{
     ast::*,
     visitor::{self, Visitor},
 };
-use std::fmt::{self, Write};
+use std::{
+    fmt::{self, Write},
+    ops::Deref,
+};
 
 /// A visitor to generate queries for the PostgreSQL database.
 ///
 /// The returned parameter values implement the `ToSql` trait from postgres and
 /// can be used directly with the database.
-#[cfg_attr(feature = "docs", doc(cfg(feature = "postgresql")))]
 pub struct Postgres<'a> {
     query: String,
     parameters: Vec<Value<'a>>,
@@ -47,6 +49,98 @@ impl<'a> Visitor<'a> for Postgres<'a> {
         self.write(self.parameters.len())
     }
 
+    fn visit_parameterized_enum(&mut self, variant: EnumVariant<'a>, name: Option<EnumName<'a>>) -> visitor::Result {
+        self.add_parameter(variant.into_text());
+
+        // Since enums are user-defined custom types, tokio-postgres fires an additional query
+        // when parameterizing values of type enum to know which custom type the value refers to.
+        // Casting the enum value to `TEXT` avoid this roundtrip since `TEXT` is a builtin type.
+        if let Some(enum_name) = name {
+            self.surround_with("CAST(", ")", |ref mut s| {
+                s.parameter_substitution()?;
+                s.write("::text")?;
+                s.write(" AS ")?;
+                if let Some(schema_name) = enum_name.schema_name {
+                    s.surround_with_backticks(schema_name.deref())?;
+                    s.write(".")?
+                }
+                s.surround_with_backticks(enum_name.name.deref())
+            })?;
+        } else {
+            self.parameter_substitution()?;
+        }
+
+        Ok(())
+    }
+
+    fn visit_parameterized_enum_array(
+        &mut self,
+        variants: Vec<EnumVariant<'a>>,
+        name: Option<EnumName<'a>>,
+    ) -> visitor::Result {
+        let len = variants.len();
+
+        // Since enums are user-defined custom types, tokio-postgres fires an additional query
+        // when parameterizing values of type enum to know which custom type the value refers to.
+        // Casting the enum value to `TEXT` avoid this roundtrip since `TEXT` is a builtin type.
+        if let Some(enum_name) = name.clone() {
+            self.surround_with("ARRAY[", "]", |s| {
+                for (i, variant) in variants.into_iter().enumerate() {
+                    s.add_parameter(variant.into_text());
+                    s.parameter_substitution()?;
+                    s.write("::text")?;
+
+                    if i < (len - 1) {
+                        s.write(", ")?;
+                    }
+                }
+
+                Ok(())
+            })?;
+
+            self.write("::")?;
+            if let Some(schema_name) = enum_name.schema_name {
+                self.surround_with_backticks(schema_name.deref())?;
+                self.write(".")?
+            }
+            self.surround_with_backticks(enum_name.name.deref())?;
+            self.write("[]")?;
+        } else {
+            self.visit_parameterized(Value::array(
+                variants.into_iter().map(|variant| variant.into_enum(name.clone())),
+            ))?;
+        }
+
+        Ok(())
+    }
+
+    /// A database column identifier
+    fn visit_column(&mut self, column: Column<'a>) -> visitor::Result {
+        match column.table {
+            Some(table) => {
+                self.visit_table(table, false)?;
+                self.write(".")?;
+                self.delimited_identifiers(&[&*column.name])?;
+            }
+            _ => self.delimited_identifiers(&[&*column.name])?,
+        };
+
+        if column.is_enum && column.is_selected {
+            if column.is_list {
+                self.write("::text[]")?;
+            } else {
+                self.write("::text")?;
+            }
+        }
+
+        if let Some(alias) = column.alias {
+            self.write(" AS ")?;
+            self.delimited_identifiers(&[&*alias])?;
+        }
+
+        Ok(())
+    }
+
     fn visit_limit_and_offset(&mut self, limit: Option<Value<'a>>, offset: Option<Value<'a>>) -> visitor::Result {
         match (limit, offset) {
             (Some(limit), Some(offset)) => {
@@ -69,32 +163,32 @@ impl<'a> Visitor<'a> for Postgres<'a> {
     }
 
     fn visit_raw_value(&mut self, value: Value<'a>) -> visitor::Result {
-        let res = match value {
-            Value::Int32(i) => i.map(|i| self.write(i)),
-            Value::Int64(i) => i.map(|i| self.write(i)),
-            Value::Text(t) => t.map(|t| self.write(format!("'{t}'"))),
-            Value::Enum(e) => e.map(|e| self.write(e)),
-            Value::Bytes(b) => b.map(|b| self.write(format!("E'{}'", hex::encode(b)))),
-            Value::Boolean(b) => b.map(|b| self.write(b)),
-            Value::Xml(cow) => cow.map(|cow| self.write(format!("'{cow}'"))),
-            Value::Char(c) => c.map(|c| self.write(format!("'{c}'"))),
-            Value::Float(d) => d.map(|f| match f {
+        let res = match &value.typed {
+            ValueType::Int32(i) => i.map(|i| self.write(i)),
+            ValueType::Int64(i) => i.map(|i| self.write(i)),
+            ValueType::Text(t) => t.as_ref().map(|t| self.write(format!("'{t}'"))),
+            ValueType::Enum(e, _) => e.as_ref().map(|e| self.write(e)),
+            ValueType::Bytes(b) => b.as_ref().map(|b| self.write(format!("E'{}'", hex::encode(b)))),
+            ValueType::Boolean(b) => b.map(|b| self.write(b)),
+            ValueType::Xml(cow) => cow.as_ref().map(|cow| self.write(format!("'{cow}'"))),
+            ValueType::Char(c) => c.map(|c| self.write(format!("'{c}'"))),
+            ValueType::Float(d) => d.map(|f| match f {
                 f if f.is_nan() => self.write("'NaN'"),
                 f if f == f32::INFINITY => self.write("'Infinity'"),
                 f if f == f32::NEG_INFINITY => self.write("'-Infinity"),
                 v => self.write(format!("{v:?}")),
             }),
-            Value::Double(d) => d.map(|f| match f {
+            ValueType::Double(d) => d.map(|f| match f {
                 f if f.is_nan() => self.write("'NaN'"),
                 f if f == f64::INFINITY => self.write("'Infinity'"),
                 f if f == f64::NEG_INFINITY => self.write("'-Infinity"),
                 v => self.write(format!("{v:?}")),
             }),
-            Value::Array(ary) => ary.map(|ary| {
+            ValueType::Array(ary) => ary.as_ref().map(|ary| {
                 self.surround_with("'{", "}'", |ref mut s| {
                     let len = ary.len();
 
-                    for (i, item) in ary.into_iter().enumerate() {
+                    for (i, item) in ary.iter().enumerate() {
                         s.write(item)?;
 
                         if i < len - 1 {
@@ -105,18 +199,41 @@ impl<'a> Visitor<'a> for Postgres<'a> {
                     Ok(())
                 })
             }),
-            #[cfg(feature = "json")]
-            Value::Json(j) => j.map(|j| self.write(format!("'{}'", serde_json::to_string(&j).unwrap()))),
-            #[cfg(feature = "bigdecimal")]
-            Value::Numeric(r) => r.map(|r| self.write(r)),
-            #[cfg(feature = "uuid")]
-            Value::Uuid(uuid) => uuid.map(|uuid| self.write(format!("'{}'", uuid.hyphenated()))),
-            #[cfg(feature = "chrono")]
-            Value::DateTime(dt) => dt.map(|dt| self.write(format!("'{}'", dt.to_rfc3339(),))),
-            #[cfg(feature = "chrono")]
-            Value::Date(date) => date.map(|date| self.write(format!("'{date}'"))),
-            #[cfg(feature = "chrono")]
-            Value::Time(time) => time.map(|time| self.write(format!("'{time}'"))),
+            ValueType::EnumArray(variants, name) => variants.as_ref().map(|variants| {
+                self.surround_with("ARRAY[", "]", |ref mut s| {
+                    let len = variants.len();
+
+                    for (i, item) in variants.iter().enumerate() {
+                        s.surround_with("'", "'", |t| t.write(item))?;
+
+                        if i < len - 1 {
+                            s.write(",")?;
+                        }
+                    }
+
+                    Ok(())
+                })?;
+
+                if let Some(enum_name) = name {
+                    self.write("::")?;
+                    if let Some(schema_name) = &enum_name.schema_name {
+                        self.surround_with_backticks(schema_name.deref())?;
+                        self.write(".")?
+                    }
+                    self.surround_with_backticks(enum_name.name.deref())?;
+                }
+
+                Ok(())
+            }),
+            ValueType::Json(j) => j
+                .as_ref()
+                .map(|j| self.write(format!("'{}'", serde_json::to_string(&j).unwrap()))),
+
+            ValueType::Numeric(r) => r.as_ref().map(|r| self.write(r)),
+            ValueType::Uuid(uuid) => uuid.map(|uuid| self.write(format!("'{}'", uuid.hyphenated()))),
+            ValueType::DateTime(dt) => dt.map(|dt| self.write(format!("'{}'", dt.to_rfc3339(),))),
+            ValueType::Date(date) => date.map(|date| self.write(format!("'{date}'"))),
+            ValueType::Time(time) => time.map(|time| self.write(format!("'{time}'"))),
         };
 
         match res {
@@ -229,14 +346,12 @@ impl<'a> Visitor<'a> for Postgres<'a> {
     fn visit_equals(&mut self, left: Expression<'a>, right: Expression<'a>) -> visitor::Result {
         // LHS must be cast to json/xml-text if the right is a json/xml-text value and vice versa.
         let right_cast = match left {
-            #[cfg(feature = "json")]
             _ if left.is_json_value() => "::jsonb",
             _ if left.is_xml_value() => "::text",
             _ => "",
         };
 
         let left_cast = match right {
-            #[cfg(feature = "json")]
             _ if right.is_json_value() => "::jsonb",
             _ if right.is_xml_value() => "::text",
             _ => "",
@@ -254,14 +369,12 @@ impl<'a> Visitor<'a> for Postgres<'a> {
     fn visit_not_equals(&mut self, left: Expression<'a>, right: Expression<'a>) -> visitor::Result {
         // LHS must be cast to json/xml-text if the right is a json/xml-text value and vice versa.
         let right_cast = match left {
-            #[cfg(feature = "json")]
             _ if left.is_json_value() => "::jsonb",
             _ if left.is_xml_value() => "::text",
             _ => "",
         };
 
         let left_cast = match right {
-            #[cfg(feature = "json")]
             _ if right.is_json_value() => "::jsonb",
             _ if right.is_xml_value() => "::text",
             _ => "",
@@ -276,7 +389,7 @@ impl<'a> Visitor<'a> for Postgres<'a> {
         Ok(())
     }
 
-    #[cfg(all(feature = "json", any(feature = "postgresql", feature = "mysql")))]
+    #[cfg(any(feature = "postgresql", feature = "mysql"))]
     fn visit_json_extract(&mut self, json_extract: JsonExtract<'a>) -> visitor::Result {
         match json_extract.path {
             #[cfg(feature = "mysql")]
@@ -316,7 +429,7 @@ impl<'a> Visitor<'a> for Postgres<'a> {
         Ok(())
     }
 
-    #[cfg(all(feature = "json", any(feature = "postgresql", feature = "mysql")))]
+    #[cfg(any(feature = "postgresql", feature = "mysql"))]
     fn visit_json_unquote(&mut self, json_unquote: JsonUnquote<'a>) -> visitor::Result {
         self.write("(")?;
         self.visit_expression(*json_unquote.expr)?;
@@ -326,7 +439,7 @@ impl<'a> Visitor<'a> for Postgres<'a> {
         Ok(())
     }
 
-    #[cfg(all(feature = "json", any(feature = "postgresql", feature = "mysql")))]
+    #[cfg(any(feature = "postgresql", feature = "mysql"))]
     fn visit_json_array_contains(&mut self, left: Expression<'a>, right: Expression<'a>, not: bool) -> visitor::Result {
         if not {
             self.write("( NOT ")?;
@@ -343,7 +456,7 @@ impl<'a> Visitor<'a> for Postgres<'a> {
         Ok(())
     }
 
-    #[cfg(all(feature = "json", any(feature = "postgresql", feature = "mysql")))]
+    #[cfg(any(feature = "postgresql", feature = "mysql"))]
     fn visit_json_extract_last_array_item(&mut self, extract: JsonExtractLastArrayElem<'a>) -> visitor::Result {
         self.write("(")?;
         self.visit_expression(*extract.expr)?;
@@ -353,7 +466,7 @@ impl<'a> Visitor<'a> for Postgres<'a> {
         Ok(())
     }
 
-    #[cfg(all(feature = "json", any(feature = "postgresql", feature = "mysql")))]
+    #[cfg(any(feature = "postgresql", feature = "mysql"))]
     fn visit_json_extract_first_array_item(&mut self, extract: JsonExtractFirstArrayElem<'a>) -> visitor::Result {
         self.write("(")?;
         self.visit_expression(*extract.expr)?;
@@ -363,7 +476,7 @@ impl<'a> Visitor<'a> for Postgres<'a> {
         Ok(())
     }
 
-    #[cfg(all(feature = "json", any(feature = "postgresql", feature = "mysql")))]
+    #[cfg(any(feature = "postgresql", feature = "mysql"))]
     fn visit_json_type_equals(&mut self, left: Expression<'a>, json_type: JsonType<'a>, not: bool) -> visitor::Result {
         self.write("JSONB_TYPEOF")?;
         self.write("(")?;
@@ -723,7 +836,6 @@ mod tests {
         assert_eq!(expected_sql, sql);
     }
 
-    #[cfg(feature = "json")]
     #[test]
     fn equality_with_a_json_value() {
         let expected = expected_values(
@@ -738,7 +850,6 @@ mod tests {
         assert_eq!(expected.1, params);
     }
 
-    #[cfg(feature = "json")]
     #[test]
     fn equality_with_a_lhs_json_value() {
         // A bit artificial, but checks if the ::jsonb casting is done correctly on the right side as well.
@@ -755,7 +866,6 @@ mod tests {
         assert_eq!(expected.1, params);
     }
 
-    #[cfg(feature = "json")]
     #[test]
     fn difference_with_a_json_value() {
         let expected = expected_values(
@@ -771,7 +881,6 @@ mod tests {
         assert_eq!(expected.1, params);
     }
 
-    #[cfg(feature = "json")]
     #[test]
     fn difference_with_a_lhs_json_value() {
         let expected = expected_values(
@@ -849,7 +958,7 @@ mod tests {
 
     #[test]
     fn test_raw_null() {
-        let (sql, params) = Postgres::build(Select::default().value(Value::Text(None).raw())).unwrap();
+        let (sql, params) = Postgres::build(Select::default().value(Value::null_text().raw())).unwrap();
         assert_eq!("SELECT null", sql);
         assert!(params.is_empty());
     }
@@ -901,7 +1010,7 @@ mod tests {
     }
 
     #[test]
-    #[cfg(feature = "json")]
+
     fn test_raw_json() {
         let (sql, params) =
             Postgres::build(Select::default().value(serde_json::json!({ "foo": "bar" }).raw())).unwrap();
@@ -910,7 +1019,6 @@ mod tests {
     }
 
     #[test]
-    #[cfg(feature = "uuid")]
     fn test_raw_uuid() {
         let uuid = uuid::Uuid::new_v4();
         let (sql, params) = Postgres::build(Select::default().value(uuid.raw())).unwrap();
@@ -921,7 +1029,6 @@ mod tests {
     }
 
     #[test]
-    #[cfg(feature = "chrono")]
     fn test_raw_datetime() {
         let dt = chrono::Utc::now();
         let (sql, params) = Postgres::build(Select::default().value(dt.raw())).unwrap();
@@ -935,6 +1042,18 @@ mod tests {
         let (sql, _) = Postgres::build(Select::from_table("foo").so_that("bar".compare_raw("ILIKE", "baz%"))).unwrap();
 
         assert_eq!(r#"SELECT "foo".* FROM "foo" WHERE "bar" ILIKE $1"#, sql);
+    }
+
+    #[test]
+    fn test_raw_enum_array() {
+        let enum_array = Value::enum_array_with_name(
+            vec![EnumVariant::new("A"), EnumVariant::new("B")],
+            EnumName::new("Alphabet", Some("foo")),
+        );
+        let (sql, params) = Postgres::build(Select::default().value(enum_array.raw())).unwrap();
+
+        assert_eq!("SELECT ARRAY['A','B']::\"foo\".\"Alphabet\"", sql);
+        assert!(params.is_empty());
     }
 
     #[test]

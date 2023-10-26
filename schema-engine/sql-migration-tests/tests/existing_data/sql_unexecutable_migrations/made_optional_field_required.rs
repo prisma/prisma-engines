@@ -92,8 +92,8 @@ fn making_an_optional_field_required_with_data_with_a_default_works(api: TestApi
             .map(|row| row.into_iter().collect::<Vec<Value>>())
             .collect::<Vec<_>>(),
         &[
-            &[Value::text("abc"), Value::text("george"), Value::integer(84)],
-            &[Value::text("def"), Value::text("X Æ A-12"), Value::integer(7)],
+            &[Value::text("abc"), Value::text("george"), Value::int32(84)],
+            &[Value::text("def"), Value::text("X Æ A-12"), Value::int32(7)],
         ]
     );
 }
@@ -151,7 +151,7 @@ fn making_an_optional_field_required_with_data_with_a_default_is_unexecutable(ap
             .map(|row| row.into_iter().collect::<Vec<Value>>())
             .collect::<Vec<_>>(),
         &[
-            &[Value::text("abc"), Value::text("george"), Value::Int32(None)],
+            &[Value::text("abc"), Value::text("george"), Value::null_int32()],
             &[Value::text("def"), Value::text("X Æ A-12"), Value::int32(7)],
         ]
     );

@@ -1,6 +1,7 @@
 import { ColumnTypeEnum } from './const'
+import { Result } from './result'
 
-export type ColumnType = typeof ColumnTypeEnum[keyof typeof ColumnTypeEnum]
+export type ColumnType = (typeof ColumnTypeEnum)[keyof typeof ColumnTypeEnum]
 
 export interface ResultSet {
   /**
@@ -32,26 +33,42 @@ export type Query = {
   args: Array<unknown>
 }
 
-export type Error = {
-  kind: 'GenericJsError',
-  id: number
-}
+export type Error =
+  | {
+      kind: 'GenericJs'
+      id: number
+    }
+  | {
+      kind: 'Postgres'
+      code: string
+      severity: string
+      message: string
+      detail: string | undefined
+      column: string | undefined
+      hint: string | undefined
+    }
+  | {
+      kind: 'Mysql'
+      code: number
+      message: string
+      state: string
+    }
+  | {
+      kind: 'Sqlite'
+      /**
+       * Sqlite extended error code: https://www.sqlite.org/rescode.html
+       */
+      extendedCode: number
+      message: string
+    }
 
-export type Result<T> = {
-  ok: true,
-  value: T
-} | {
-  ok: false,
-  error: Error
-}
-
-export interface Queryable  {
-  readonly flavour: 'mysql' | 'postgres'
+export interface Queryable {
+  readonly flavour: 'mysql' | 'postgres' | 'sqlite'
 
   /**
    * Execute a query given as SQL, interpolating the given parameters,
    * and returning the type-aware result set of the query.
-   * 
+   *
    * This is the preferred way of executing `SELECT` queries.
    */
   queryRaw(params: Query): Promise<Result<ResultSet>>
@@ -59,7 +76,7 @@ export interface Queryable  {
   /**
    * Execute a query given as SQL, interpolating the given parameters,
    * and returning the number of affected rows.
-   * 
+   *
    * This is the preferred way of executing `INSERT`, `UPDATE`, `DELETE` queries,
    * as well as transactional queries.
    */
@@ -95,6 +112,13 @@ export interface Transaction extends Queryable {
    * Rolls back the transaction.
    */
   rollback(): Promise<Result<void>>
+  /**
+   * Discards and closes the transaction which may or may not have been committed or rolled back.
+   * This operation must be synchronous. If the implementation requires calling creating new
+   * asynchronous tasks on the event loop, the driver is responsible for handling the errors
+   * appropriately to ensure they don't crash the application.
+   */
+  dispose(): Result<void>
 }
 
 export interface ErrorCapturingDriverAdapter extends DriverAdapter {

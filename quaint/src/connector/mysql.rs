@@ -24,6 +24,8 @@ use std::{
 use tokio::sync::Mutex;
 use url::{Host, Url};
 
+pub use error::MysqlError;
+
 /// The underlying MySQL driver. Only available with the `expose-drivers`
 /// Cargo feature.
 #[cfg(feature = "expose-drivers")]
@@ -33,7 +35,6 @@ use super::IsolationLevel;
 
 /// A connector interface for the MySQL database.
 #[derive(Debug)]
-#[cfg_attr(feature = "docs", doc(cfg(feature = "mysql")))]
 pub struct Mysql {
     pub(crate) conn: Mutex<my::Conn>,
     pub(crate) url: MysqlUrl,
@@ -44,7 +45,6 @@ pub struct Mysql {
 
 /// Wraps a connection url and exposes the parsing logic used by quaint, including default values.
 #[derive(Debug, Clone)]
-#[cfg_attr(feature = "docs", doc(cfg(feature = "mysql")))]
 pub struct MysqlUrl {
     url: Url,
     query_params: MysqlUrlQueryParams,
@@ -560,7 +560,7 @@ impl Queryable for Mysql {
 
         let version_string = rows
             .get(0)
-            .and_then(|row| row.get("version").and_then(|version| version.to_string()));
+            .and_then(|row| row.get("version").and_then(|version| version.typed.to_string()));
 
         Ok(version_string)
     }

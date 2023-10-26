@@ -103,6 +103,7 @@ capabilities!(
     NativeUpsert,
     InsertReturning,
     UpdateReturning,
+    RowIn, // Connector supports (a, b) IN (c, d) expression.
 );
 
 /// Contains all capabilities that the connector is able to serve.

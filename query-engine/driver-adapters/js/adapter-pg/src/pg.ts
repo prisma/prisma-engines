@@ -1,6 +1,14 @@
 import type pg from 'pg'
-import { Debug } from '@jkomyno/prisma-driver-adapter-utils'
-import type { DriverAdapter, Query, Queryable, Result, ResultSet, Transaction, TransactionOptions } from '@jkomyno/prisma-driver-adapter-utils'
+import { Debug, err, ok } from '@prisma/driver-adapter-utils'
+import type {
+  DriverAdapter,
+  Query,
+  Queryable,
+  Result,
+  ResultSet,
+  Transaction,
+  TransactionOptions,
+} from '@prisma/driver-adapter-utils'
 import { fieldToColumnType } from './conversion'
 
 const debug = Debug('prisma:driver-adapter:pg')
@@ -8,12 +16,10 @@ const debug = Debug('prisma:driver-adapter:pg')
 type StdClient = pg.Pool
 type TransactionClient = pg.PoolClient
 
-class PgQueryable<ClientT extends StdClient | TransactionClient>
-  implements Queryable {
+class PgQueryable<ClientT extends StdClient | TransactionClient> implements Queryable {
   readonly flavour = 'postgres'
 
-  constructor(protected readonly client: ClientT) {
-  }
+  constructor(protected readonly client: ClientT) {}
 
   /**
    * Execute a query given as SQL, interpolating the given parameters.
@@ -22,16 +28,17 @@ class PgQueryable<ClientT extends StdClient | TransactionClient>
     const tag = '[js::query_raw]'
     debug(`${tag} %O`, query)
 
-    const { fields, rows: results } = await this.performIO(query)
+    const ioResult = await this.performIO(query)
+    return ioResult.map(({ fields, rows }) => {
+      const columns = fields.map((field) => field.name)
+      const columnTypes = fields.map((field) => fieldToColumnType(field.dataTypeID))
 
-    const columns = fields.map((field) => field.name)
-    const resultSet: ResultSet = {
-      columnNames: columns,
-      columnTypes: fields.map((field) => fieldToColumnType(field.dataTypeID)),
-      rows: results.map((result) => columns.map((column) => result[column])),
-    }
-
-    return { ok: true, value: resultSet }
+      return {
+        columnNames: columns,
+        columnTypes,
+        rows,
+      }
+    })
   }
 
   /**
@@ -43,10 +50,8 @@ class PgQueryable<ClientT extends StdClient | TransactionClient>
     const tag = '[js::execute_raw]'
     debug(`${tag} %O`, query)
 
-    const { rowCount: rowsAffected } = await this.performIO(query)
-    
     // Note: `rowsAffected` can sometimes be null (e.g., when executing `"BEGIN"`)
-    return { ok: true, value: rowsAffected ?? 0 }
+    return (await this.performIO(query)).map(({ rowCount: rowsAffected }) => rowsAffected ?? 0)
   }
 
   /**
@@ -54,22 +59,34 @@ class PgQueryable<ClientT extends StdClient | TransactionClient>
    * Should the query fail due to a connection error, the connection is
    * marked as unhealthy.
    */
-  private async performIO(query: Query) {
+  private async performIO(query: Query): Promise<Result<pg.QueryArrayResult<any>>> {
     const { sql, args: values } = query
 
     try {
-      const result = await this.client.query(sql, values)
-      return result
+      const result = await this.client.query({ text: sql, values, rowMode: 'array' })
+      return ok(result)
     } catch (e) {
       const error = e as Error
       debug('Error in performIO: %O', error)
+      if (e && e.code) {
+        return err({
+          kind: 'Postgres',
+          code: e.code,
+          severity: e.severity,
+          message: e.message,
+          detail: e.detail,
+          column: e.column,
+          hint: e.hint,
+        })
+      }
       throw error
     }
   }
 }
 
-class PgTransaction extends PgQueryable<TransactionClient>
-  implements Transaction {
+class PgTransaction extends PgQueryable<TransactionClient> implements Transaction {
+  finished = false
+
   constructor(client: pg.PoolClient, readonly options: TransactionOptions) {
     super(client)
   }
@@ -77,15 +94,24 @@ class PgTransaction extends PgQueryable<TransactionClient>
   async commit(): Promise<Result<void>> {
     debug(`[js::commit]`)
 
+    this.finished = true
     this.client.release()
-    return Promise.resolve({ ok: true, value: undefined })
+    return ok(undefined)
   }
 
   async rollback(): Promise<Result<void>> {
     debug(`[js::rollback]`)
 
+    this.finished = true
     this.client.release()
-    return Promise.resolve({ ok: true, value: undefined })
+    return ok(undefined)
+  }
+
+  dispose(): Result<void> {
+    if (!this.finished) {
+      this.client.release()
+    }
+    return ok(undefined)
   }
 }
 
@@ -103,10 +129,10 @@ export class PrismaPg extends PgQueryable<StdClient> implements DriverAdapter {
     debug(`${tag} options: %O`, options)
 
     const connection = await this.client.connect()
-    return { ok: true, value: new PgTransaction(connection, options) }
+    return ok(new PgTransaction(connection, options))
   }
 
   async close() {
-    return { ok: true as const, value: undefined }
+    return ok(undefined)
   }
 }

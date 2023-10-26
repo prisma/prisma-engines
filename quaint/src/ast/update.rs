@@ -150,7 +150,6 @@ impl<'a> Update<'a> {
     /// # }
     /// ```
     #[cfg(any(feature = "postgresql", feature = "sqlite"))]
-    #[cfg_attr(feature = "docs", doc(cfg(any(feature = "postgresql", feature = "sqlite"))))]
     pub fn returning<K, I>(mut self, columns: I) -> Self
     where
         K: Into<Column<'a>>,

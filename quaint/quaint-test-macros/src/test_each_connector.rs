@@ -2,10 +2,11 @@ use darling::FromMeta;
 use once_cell::sync::Lazy;
 use proc_macro::TokenStream;
 use proc_macro2::Span;
+
+use quaint_test_setup::{ConnectorDefinition, Tags, CONNECTORS};
 use quote::quote;
 use std::str::FromStr;
 use syn::{parse_macro_input, spanned::Spanned, AttributeArgs, Ident, ItemFn};
-use test_setup::{ConnectorDefinition, Tags, CONNECTORS};
 
 static TAGS_FILTER: Lazy<Tags> = Lazy::new(|| {
     let tags_str = std::env::var("TEST_EACH_CONNECTOR_TAGS").ok();
@@ -77,6 +78,7 @@ impl darling::FromMeta for TagsWrapper {
     }
 }
 
+#[allow(clippy::needless_borrow)]
 pub fn test_each_connector_impl(attr: TokenStream, input: TokenStream) -> TokenStream {
     let attributes_meta: syn::AttributeArgs = parse_macro_input!(attr as AttributeArgs);
     let args = TestEachConnectorArgs::from_list(&attributes_meta);
@@ -98,6 +100,7 @@ pub fn test_each_connector_impl(attr: TokenStream, input: TokenStream) -> TokenS
     output.into()
 }
 
+#[allow(clippy::needless_borrow)]
 fn test_each_connector_async_wrapper_functions(
     args: &TestEachConnectorArgs,
     test_function: &ItemFn,
@@ -127,7 +130,7 @@ fn test_each_connector_async_wrapper_functions(
                     #test_fn_name(&mut api).await#optional_unwrap
                 };
 
-                test_setup::run_with_tokio(fut)
+                quaint_test_setup::run_with_tokio(fut)
             }
         };
 

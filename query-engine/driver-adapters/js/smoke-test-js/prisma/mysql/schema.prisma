@@ -67,6 +67,11 @@ model type_test_2 {
   datetime_column_null DateTime? @db.DateTime(3)
 }
 
+model type_test_3 {
+  id    Int   @id @default(autoincrement())
+  bytes Bytes
+}
+
 enum type_test_enum_column {
   value1
   value2
@@ -113,4 +118,8 @@ model Product {
   id              String @id @default(cuid())
   properties      Json
   properties_null Json?
+}
+
+model Unique {
+  email String @id
 }

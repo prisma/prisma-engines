@@ -102,7 +102,7 @@ impl Connector for Js {
 // declaration, so finally I couldn't come up with anything better then wrapping a QuaintQueryable
 // in this object, and implementing TransactionCapable (and quaint::Queryable) explicitly for it.
 #[derive(Clone)]
-struct DriverAdapter {
+pub struct DriverAdapter {
     connector: Arc<dyn TransactionCapable>,
 }
 

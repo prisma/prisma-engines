@@ -27,6 +27,8 @@ use tokio_postgres::{
 };
 use url::{Host, Url};
 
+pub use error::PostgresError;
+
 pub(crate) const DEFAULT_SCHEMA: &str = "public";
 
 /// The underlying postgres driver. Only available with the `expose-drivers`
@@ -55,7 +57,6 @@ impl Debug for PostgresClient {
 
 /// A connector interface for the PostgreSQL database.
 #[derive(Debug)]
-#[cfg_attr(feature = "docs", doc(cfg(feature = "postgresql")))]
 pub struct PostgreSql {
     client: PostgresClient,
     pg_bouncer: bool,
@@ -65,14 +66,12 @@ pub struct PostgreSql {
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-#[cfg_attr(feature = "docs", doc(cfg(feature = "postgresql")))]
 pub enum SslAcceptMode {
     Strict,
     AcceptInvalidCerts,
 }
 
 #[derive(Debug, Clone)]
-#[cfg_attr(feature = "docs", doc(cfg(feature = "postgresql")))]
 pub struct SslParams {
     certificate_file: Option<String>,
     identity_file: Option<String>,
@@ -180,7 +179,6 @@ impl PostgresFlavour {
 /// Wraps a connection url and exposes the parsing logic used by Quaint,
 /// including default values.
 #[derive(Debug, Clone)]
-#[cfg_attr(feature = "docs", doc(cfg(feature = "postgresql")))]
 pub struct PostgresUrl {
     url: Url,
     query_params: PostgresUrlQueryParams,
@@ -1178,7 +1176,7 @@ mod tests {
             let result_set = client.query_raw("SHOW search_path", &[]).await.unwrap();
             let row = result_set.first().unwrap();
 
-            row[0].to_string()
+            row[0].typed.to_string()
         }
 
         // Safe
@@ -1230,7 +1228,7 @@ mod tests {
             let result_set = client.query_raw("SHOW search_path", &[]).await.unwrap();
             let row = result_set.first().unwrap();
 
-            row[0].to_string()
+            row[0].typed.to_string()
         }
 
         // Safe
@@ -1281,7 +1279,7 @@ mod tests {
             let result_set = client.query_raw("SHOW search_path", &[]).await.unwrap();
             let row = result_set.first().unwrap();
 
-            row[0].to_string()
+            row[0].typed.to_string()
         }
 
         // Safe
@@ -1332,7 +1330,7 @@ mod tests {
             let result_set = client.query_raw("SHOW search_path", &[]).await.unwrap();
             let row = result_set.first().unwrap();
 
-            row[0].to_string()
+            row[0].typed.to_string()
         }
 
         // Safe
@@ -1383,7 +1381,7 @@ mod tests {
             let result_set = client.query_raw("SHOW search_path", &[]).await.unwrap();
             let row = result_set.first().unwrap();
 
-            row[0].to_string()
+            row[0].typed.to_string()
         }
 
         // Safe
@@ -1480,9 +1478,7 @@ mod tests {
         let url = Url::parse(&CONN_STR).unwrap();
         let conn = Quaint::new(url.as_str()).await.unwrap();
 
-        let res = conn
-            .query_raw("SELECT $1", &[Value::integer(1), Value::integer(2)])
-            .await;
+        let res = conn.query_raw("SELECT $1", &[Value::int32(1), Value::int32(2)]).await;
 
         assert!(res.is_err());
 

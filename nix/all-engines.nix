@@ -1,4 +1,4 @@
-{ pkgs, flakeInputs, lib, self', ... }:
+{ pkgs, flakeInputs, lib, self', rustToolchain, ... }:
 
 let
   stdenv = pkgs.clangStdenv;
@@ -15,7 +15,7 @@ let
     src = srcPath;
     name = "prisma-engines-source";
   };
-  craneLib = flakeInputs.crane.mkLib pkgs;
+  craneLib = (flakeInputs.crane.mkLib pkgs).overrideToolchain rustToolchain.default;
   deps = craneLib.vendorCargoDeps { inherit src; };
   libSuffix = stdenv.hostPlatform.extensions.sharedLibrary;
 in
@@ -34,6 +34,7 @@ in
     ] ++ lib.optionals stdenv.isDarwin [
       perl # required to build openssl
       darwin.apple_sdk.frameworks.Security
+      iconv
     ];
 
     configurePhase = ''
@@ -53,13 +54,15 @@ in
       cp target/release/prisma-fmt $out/bin/
       cp target/release/libquery_engine${libSuffix} $out/lib/libquery_engine.node
     '';
+
+    dontStrip = true;
   };
 
   packages.test-cli = lib.makeOverridable
     ({ profile }: stdenv.mkDerivation {
       name = "test-cli";
       inherit src;
-      inherit (self'.packages.prisma-engines) buildInputs nativeBuildInputs configurePhase;
+      inherit (self'.packages.prisma-engines) buildInputs nativeBuildInputs configurePhase dontStrip;
 
       buildPhase = "cargo build --profile=${profile} --bin=test-cli";
 
@@ -76,7 +79,7 @@ in
     ({ profile }: stdenv.mkDerivation {
       name = "query-engine-bin";
       inherit src;
-      inherit (self'.packages.prisma-engines) buildInputs nativeBuildInputs configurePhase;
+      inherit (self'.packages.prisma-engines) buildInputs nativeBuildInputs configurePhase dontStrip;
 
       buildPhase = "cargo build --profile=${profile} --bin=query-engine";
 
@@ -96,7 +99,7 @@ in
     ({ profile }: stdenv.mkDerivation {
       name = "query-engine-bin-and-lib";
       inherit src;
-      inherit (self'.packages.prisma-engines) buildInputs nativeBuildInputs configurePhase;
+      inherit (self'.packages.prisma-engines) buildInputs nativeBuildInputs configurePhase dontStrip;
 
       buildPhase = ''
         cargo build --profile=${profile} --bin=query-engine
