@@ -39,11 +39,10 @@ jobs:
           node-version: '20.x'
           registry-url: 'https://registry.npmjs.org/'
 
-      - name: Update version in package.json
-        run: PACKAGE_DIR=$( nix run .#renderPrismaSchemaWasmPackage ${{ github.event.inputs.enginesWrapperVersion }})
-
-      - name: Publish @prisma/prisma-schema-wasm
-        run: npm publish "$PACKAGE_DIR" --access public --tag ${{ github.event.inputs.npmDistTag }}
+      - name: Update version in package.json & Publish @prisma/prisma-schema-wasm
+        run: 
+          PACKAGE_DIR=$( nix run .#renderPrismaSchemaWasmPackage ${{ github.event.inputs.enginesWrapperVersion }})
+          npm publish "$PACKAGE_DIR" --access public --tag ${{ github.event.inputs.npmDistTag }}
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
