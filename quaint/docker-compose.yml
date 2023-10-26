@@ -1,14 +1,14 @@
-version: "3"
+version: '3'
 services:
   postgres13:
     image: postgres:13
-    restart: always
+    restart: unless-stopped
     command: postgres -c 'max_connections=1000'
     environment:
-      POSTGRES_PASSWORD: "prisma"
-      PGDATA: "/pgtmpfs13"
+      POSTGRES_PASSWORD: 'prisma'
+      PGDATA: '/pgtmpfs13'
     ports:
-      - "5432:5432"
+      - '5432:5432'
     networks:
       - databases
     tmpfs: /pgtmpfs12
@@ -16,13 +16,13 @@ services:
   mysql57:
     image: mysql:5.7
     command: mysqld
-    restart: always
+    restart: unless-stopped
     platform: linux/x86_64
     environment:
       MYSQL_ROOT_PASSWORD: prisma
       MYSQL_DATABASE: prisma
     ports:
-      - "3306:3306"
+      - '3306:3306'
     networks:
       - databases
     tmpfs: /var/lib/mysql5.7
@@ -30,48 +30,48 @@ services:
   mysql8:
     image: mysql:8.0.22
     command: mysqld
-    restart: always
+    restart: unless-stopped
     platform: linux/x86_64
     environment:
       MYSQL_USER: root
       MYSQL_ROOT_PASSWORD: prisma
       MYSQL_DATABASE: prisma
     ports:
-      - "3307:3306"
+      - '3307:3306'
     networks:
       - databases
     tmpfs: /var/lib/mysql8
 
   mariadb:
     image: mariadb:10
-    restart: always
+    restart: unless-stopped
     environment:
       MYSQL_USER: root
       MYSQL_ROOT_PASSWORD: prisma
       MYSQL_DATABASE: prisma
     ports:
-      - "3308:3306"
+      - '3308:3306'
     networks:
       - databases
     tmpfs: /var/lib/mariadb
 
   mssql:
     image: mcr.microsoft.com/mssql/server:2022-latest
-    restart: always
+    restart: unless-stopped
     environment:
-      ACCEPT_EULA: "Y"
-      SA_PASSWORD: "<YourStrong@Passw0rd>"
+      ACCEPT_EULA: 'Y'
+      SA_PASSWORD: '<YourStrong@Passw0rd>'
     ports:
-      - "1433:1433"
+      - '1433:1433'
     networks:
       - databases
 
   cockroach_22_2:
     image: prismagraphql/cockroachdb-custom:22.2
-    restart: always
+    restart: unless-stopped
     command: start-single-node --insecure
     ports:
-      - "26259:26257"
+      - '26259:26257'
     networks:
       - databases
 
