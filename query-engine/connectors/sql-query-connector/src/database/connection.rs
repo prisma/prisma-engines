@@ -9,6 +9,7 @@ use connector_interface::{
     WriteArgs, WriteOperations,
 };
 use prisma_value::PrismaValue;
+use psl::PreviewFeature;
 use quaint::{
     connector::{IsolationLevel, TransactionCapable},
     prelude::{ConnectionInfo, Queryable},
@@ -116,16 +117,30 @@ where
     ) -> connector::Result<ManyRecords> {
         catch(self.connection_info.clone(), async move {
             let ctx = Context::new(&self.connection_info, trace_id.as_deref());
-            read::get_many_records(
-                &self.inner,
-                model,
-                query_arguments,
-                &selected_fields.into(),
-                nested,
-                aggr_selections,
-                &ctx,
-            )
-            .await
+
+            if self.features.contains(PreviewFeature::RelationJoins) {
+                read::get_many_records_joins(
+                    &self.inner,
+                    model,
+                    query_arguments,
+                    &selected_fields.into(),
+                    nested,
+                    aggr_selections,
+                    &ctx,
+                )
+                .await
+            } else {
+                read::get_many_records(
+                    &self.inner,
+                    model,
+                    query_arguments,
+                    &selected_fields.into(),
+                    nested,
+                    aggr_selections,
+                    &ctx,
+                )
+                .await
+            }
         })
         .await
     }

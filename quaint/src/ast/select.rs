@@ -391,6 +391,15 @@ impl<'a> Select<'a> {
         self
     }
 
+    pub fn left_join_lateral<J>(self, join: J) -> Self
+    where
+        J: Into<JoinData<'a>>,
+    {
+        let join_data: JoinData = join.into();
+
+        self.left_join(join_data.as_lateral())
+    }
+
     /// Adds `RIGHT JOIN` clause to the query.
     ///
     /// ```rust

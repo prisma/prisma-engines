@@ -188,18 +188,38 @@ pub trait Visitor<'a> {
             match j {
                 Join::Inner(data) => {
                     self.write(" INNER JOIN ")?;
+
+                    if data.lateral {
+                        self.write("LATERAL ")?;
+                    }
+
                     self.visit_join_data(data)?;
                 }
                 Join::Left(data) => {
                     self.write(" LEFT JOIN ")?;
+
+                    if data.lateral {
+                        self.write("LATERAL ")?;
+                    }
+
                     self.visit_join_data(data)?;
                 }
                 Join::Right(data) => {
                     self.write(" RIGHT JOIN ")?;
+
+                    if data.lateral {
+                        self.write("LATERAL ")?;
+                    }
+
                     self.visit_join_data(data)?;
                 }
                 Join::Full(data) => {
                     self.write(" FULL JOIN ")?;
+
+                    if data.lateral {
+                        self.write("LATERAL ")?;
+                    }
+
                     self.visit_join_data(data)?;
                 }
             }
