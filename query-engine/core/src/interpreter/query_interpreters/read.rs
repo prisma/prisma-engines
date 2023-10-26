@@ -152,53 +152,55 @@ fn read_many_by_queries(
 
 fn read_many_by_joins(
     tx: &mut dyn ConnectionLike,
-    mut query: ManyRecordsQuery,
+    query: ManyRecordsQuery,
     trace_id: Option<String>,
 ) -> BoxFuture<'_, InterpretationResult<QueryResult>> {
-    let processor = if query.args.requires_inmemory_processing() {
-        Some(InMemoryRecordProcessor::new_from_query_args(&mut query.args))
-    } else {
-        None
-    };
-
+    // TODO: Hack, ideally, relations should be part of the selection set
     let nested = build_related_reads(&query);
 
     let fut = async move {
-        let scalars = tx
+        let records = tx
             .get_many_records(
                 &query.model,
                 query.args.clone(),
                 &query.selected_fields,
-                nested,
+                nested.clone(),
                 &query.aggregation_selections,
                 trace_id,
             )
             .await?;
 
-        let scalars = if let Some(p) = processor {
-            p.apply(scalars)
-        } else {
-            scalars
-        };
-
-        let (scalars, aggregation_rows) = extract_aggregation_rows_from_scalars(scalars, query.aggregation_selections);
-
-        if scalars.records.is_empty() && query.options.contains(QueryOption::ThrowOnEmpty) {
+        if records.records.is_empty() && query.options.contains(QueryOption::ThrowOnEmpty) {
             record_not_found()
         } else {
-            Ok(RecordSelection {
+            Ok(RecordSelectionWithRelations {
                 name: query.name,
                 fields: query.selection_order,
-                scalars,
-                nested: Vec::new(),
+                records,
+                nested: build_relation_record_selection(nested),
                 model: query.model,
-                aggregation_rows,
             }
             .into())
         }
     };
 
     fut.boxed()
+}
+
+fn build_relation_record_selection(related_queries: Vec<RelatedQuery>) -> Vec<RelationRecordSelection> {
+    related_queries
+        .into_iter()
+        .map(|rq| RelationRecordSelection {
+            name: rq.name,
+            fields: rq.selection_order,
+            model: rq.parent_field.related_model(),
+            nested: if let Some(nested) = rq.nested {
+                build_relation_record_selection(nested)
+            } else {
+                Vec::new()
+            },
+        })
+        .collect()
 }
 
 fn build_related_reads(query: &ManyRecordsQuery) -> Vec<RelatedQuery> {

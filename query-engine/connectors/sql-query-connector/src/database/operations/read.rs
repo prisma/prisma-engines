@@ -1,3 +1,4 @@
+use super::coerce::coerce_record_with_join;
 use crate::{
     column_metadata,
     model_extensions::*,
@@ -5,6 +6,7 @@ use crate::{
     query_builder::{self, read},
     Context, QueryExt, Queryable, SqlError,
 };
+
 use connector_interface::*;
 use futures::stream::{FuturesUnordered, StreamExt};
 use quaint::ast::*;
@@ -51,6 +53,56 @@ pub(crate) async fn get_single_record(
     .map(|record| SingleRecord { record, field_names });
 
     Ok(record)
+}
+
+pub(crate) async fn get_many_records_joins(
+    conn: &dyn Queryable,
+    _model: &Model,
+    query_arguments: QueryArguments,
+    selected_fields: &ModelProjection,
+    nested: Vec<RelatedQuery>,
+    _aggr_selections: &[RelAggregationSelection],
+    ctx: &Context<'_>,
+) -> crate::Result<ManyRecords> {
+    let mut field_names: Vec<_> = selected_fields.db_names().collect();
+    field_names.extend(nested.iter().map(|n| n.parent_field.name().to_owned()));
+
+    let mut idents = selected_fields.type_identifiers_with_arities();
+    idents.extend(nested.iter().map(|_| (TypeIdentifier::Json, FieldArity::Required)));
+
+    let meta = column_metadata::create(field_names.as_slice(), idents.as_slice());
+    let rq_indexes = related_queries_indexes(&nested, field_names.as_slice());
+
+    let mut records = ManyRecords::new(field_names.clone());
+
+    let query = query_builder::select::build(query_arguments.clone(), nested.clone(), selected_fields, &[], ctx);
+
+    for item in conn.filter(query.into(), meta.as_slice(), ctx).await?.into_iter() {
+        let mut record = Record::from(item);
+
+        // Coerces json values to prisma values
+        coerce_record_with_join(&mut record, rq_indexes.clone());
+
+        records.push(record)
+    }
+
+    Ok(records)
+}
+
+// TODO: find better name
+fn related_queries_indexes<'a>(
+    related_queries: &'a [RelatedQuery],
+    field_names: &[String],
+) -> Vec<(usize, &'a RelatedQuery)> {
+    let mut output: Vec<(usize, &RelatedQuery)> = Vec::new();
+
+    for (idx, field_name) in field_names.iter().enumerate() {
+        if let Some(rq) = related_queries.iter().find(|rq| rq.name == *field_name) {
+            output.push((idx, rq));
+        }
+    }
+
+    output
 }
 
 pub(crate) async fn get_many_records(
@@ -133,8 +185,6 @@ pub(crate) async fn get_many_records(
             }
         }
         _ => {
-            query_builder::select::build(query_arguments.clone(), nested.clone(), selected_fields, &[], ctx);
-
             let query = read::get_records(
                 model,
                 selected_fields.as_columns(ctx).mark_all_selected(),
