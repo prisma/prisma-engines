@@ -6,10 +6,11 @@
   "name": "connector-test-kit-executor",
   "version": "0.0.1",
   "description": "",
-  "main": "dist/index.js",
+  "main": "dist/index.mjs",
+  "module": "dist/index.mjs",
   "private": true,
   "scripts": {
-    "build": "tsup ./src/index.ts --format cjs,esm --dts",
+    "build": "tsup ./src/index.ts --format esm --dts",
     "lint": "tsc -p ./tsconfig.build.json"
   },
   "keywords": [],
