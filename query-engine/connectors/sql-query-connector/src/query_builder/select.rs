@@ -33,7 +33,7 @@ pub(crate) fn build(
         acc.value(Column::from((join_alias_name(&read.parent_field), JSON_AGG_IDENT)).alias(read.name.to_owned()))
     });
 
-    let select = with_nested_joins(select, nested, ctx);
+    let select = with_related_queries(select, nested, ctx);
     let select = with_pagination_and_filters(select, args, ctx);
 
     let (sql, _) = Postgres::build(select.clone()).unwrap();
@@ -76,7 +76,67 @@ fn with_pagination_and_filters<'a>(select: Select<'a>, args: QueryArguments, ctx
     select
 }
 
-pub(crate) fn build_nested(related_query: RelatedQuery, ctx: &Context<'_>) -> Select<'static> {
+fn with_related_queries<'a>(input: Select<'a>, related_queries: Vec<RelatedQuery>, ctx: &Context<'_>) -> Select<'a> {
+    related_queries.into_iter().fold(input, |acc, rq| {
+        let alias = join_alias_name(&rq.parent_field);
+        let is_m2m = rq.parent_field.relation().is_many_to_many();
+
+        let join_columns = rq
+            .parent_field
+            .join_columns(ctx)
+            .map(|c| c.opt_table(is_m2m.then(|| m2m_join_alias_name(&rq.parent_field))));
+        let related_alias = join_alias_name(&rq.parent_field.related_field());
+        let related_join_columns = ModelProjection::from(rq.parent_field.related_field().linking_fields())
+            .as_columns(ctx)
+            .map(|c| c.table(related_alias.clone()));
+        // WHERE Parent.id = Child.id
+        let join_cond = join_columns
+            .zip(related_join_columns)
+            .fold(None::<ConditionTree>, |acc, (a, b)| match acc {
+                Some(acc) => Some(acc.and(a.equals(b))),
+                None => Some(a.equals(b).into()),
+            })
+            .unwrap();
+
+        let m2m_join = build_m2m_join(&rq, ctx);
+
+        // LEFT JOIN LATERAL () AS <relation name> ON TRUE
+        let join_select = Table::from(build_related_query_select(rq, ctx).and_where(join_cond))
+            .alias(alias)
+            .on(ConditionTree::single(true.raw()));
+
+        if is_m2m {
+            // m2m relations need to left join on the relation table first
+            acc.join(m2m_join).left_join_lateral(join_select)
+        } else {
+            acc.left_join_lateral(join_select)
+        }
+    })
+}
+
+fn build_m2m_join(rq: &RelatedQuery, ctx: &Context<'_>) -> Join<'static> {
+    let m2m_table = rq
+        .parent_field
+        .as_table(ctx)
+        .alias(m2m_join_alias_name(&rq.parent_field));
+
+    let left_columns = rq.parent_field.identifier_columns(ctx);
+    let right_columns = ModelProjection::from(rq.parent_field.model().primary_identifier()).as_columns(ctx);
+
+    let conditions = left_columns
+        .zip(right_columns)
+        .fold(None::<ConditionTree>, |acc, (a, b)| match acc {
+            Some(acc) => Some(acc.and(a.equals(b))),
+            None => Some(a.equals(b).into()),
+        })
+        .unwrap();
+
+    let m2m_join = m2m_table.on(conditions);
+
+    Join::Left(m2m_join)
+}
+
+pub(crate) fn build_related_query_select(related_query: RelatedQuery, ctx: &Context<'_>) -> Select<'static> {
     let mut build_obj_params = ModelProjection::from(related_query.selected_fields)
         .fields()
         .map(|f| match f {
@@ -113,45 +173,28 @@ pub(crate) fn build_nested(related_query: RelatedQuery, ctx: &Context<'_>) -> Se
     let inner = with_pagination_and_filters(inner, related_query.args, ctx);
 
     let inner = if let Some(nested) = related_query.nested {
-        with_nested_joins(inner, nested, ctx)
+        with_related_queries(inner, nested, ctx)
     } else {
         inner
     };
 
     let inner = Table::from(inner).alias(inner_alias);
 
-    let select = Select::from_table(inner).value(json_array_agg(Column::from(JSON_AGG_IDENT)).alias(JSON_AGG_IDENT));
+    let select = Select::from_table(inner).value(
+        coalesce(vec![
+            json_array_agg(Column::from(JSON_AGG_IDENT)).into(),
+            Expression::from("[]".raw()),
+        ])
+        .alias(JSON_AGG_IDENT),
+    );
 
     select
 }
 
-fn with_nested_joins<'a>(input: Select<'a>, nested: Vec<RelatedQuery>, ctx: &Context<'_>) -> Select<'a> {
-    nested.into_iter().fold(input, |acc, nested| {
-        let alias = join_alias_name(&nested.parent_field);
-
-        let join_columns = nested.parent_field.join_columns(ctx);
-        let related_alias = join_alias_name(&nested.parent_field.related_field());
-        let related_join_columns = ModelProjection::from(nested.parent_field.related_field().linking_fields())
-            .as_columns(ctx)
-            .map(|c| c.table(related_alias.clone()));
-        // WHERE Parent.id = Child.id
-        let join_cond = join_columns
-            .zip(related_join_columns)
-            .fold(None::<ConditionTree>, |acc, (a, b)| match acc {
-                Some(acc) => Some(acc.and(a.equals(b))),
-                None => Some(a.equals(b).into()),
-            })
-            .unwrap();
-
-        // LEFT JOIN LATERAL () AS <relation name> ON TRUE
-        let join_select = Table::from(build_nested(nested, ctx).and_where(join_cond))
-            .alias(alias)
-            .on(ConditionTree::single(true.raw()));
-
-        acc.left_join_lateral(join_select)
-    })
-}
-
 fn join_alias_name(rf: &RelationField) -> String {
     format!("{}_{}", rf.model().name(), rf.name())
+}
+
+fn m2m_join_alias_name(rf: &RelationField) -> String {
+    format!("{}_{}_m2m", rf.model().name(), rf.name())
 }
