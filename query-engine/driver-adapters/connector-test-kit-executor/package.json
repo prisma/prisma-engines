@@ -27,7 +27,8 @@
     "@prisma/driver-adapter-utils": "../driver-adapter-utils",
     "@types/pg": "^8.10.2",
     "pg": "^8.11.3",
-    "undici": "^5.26.2"
+    "undici": "^5.26.5",
+    "ws": "^8.14.2"
   },
   "devDependencies": {
     "@types/node": "^20.5.1",

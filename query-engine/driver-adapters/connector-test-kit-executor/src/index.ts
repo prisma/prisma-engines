@@ -9,7 +9,8 @@ import * as prismaPg from '@prisma/adapter-pg'
 
 // neon dependencies
 import { Pool as NeonPool, neonConfig } from '@neondatabase/serverless'
-import { fetch, WebSocket } from 'undici'
+import { fetch } from 'undici'
+import { WebSocket } from 'ws'
 import * as prismaNeon from '@prisma/adapter-neon'
 
 // libsql dependencies

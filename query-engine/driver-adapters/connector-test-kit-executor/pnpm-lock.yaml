@@ -36,8 +36,11 @@ dependencies:
     specifier: ^8.11.3
     version: 8.11.3
   undici:
-    specifier: ^5.26.2
-    version: 5.26.2
+    specifier: ^5.26.5
+    version: 5.26.5
+  ws:
+    specifier: ^8.14.2
+    version: 8.14.2
 
 devDependencies:
   '@types/node':
@@ -1350,8 +1353,8 @@ packages:
     hasBin: true
     dev: true
 
-  /undici@5.26.2:
-    resolution: {integrity: sha512-a4PDLQgLTPHVzOK+x3F79/M4GtyYPl+aX9AAK7aQxpwxDwCqkeZCScy7Gk5kWT3JtdFq1uhO3uZJdLtHI4dK9A==}
+  /undici@5.26.5:
+    resolution: {integrity: sha512-cSb4bPFd5qgR7qr2jYAi0hlX9n5YKK2ONKkLFkxl+v/9BvC0sOpZjBHDBSXc5lWAf5ty9oZdRXytBIHzgUcerw==}
     engines: {node: '>=14.0'}
     dependencies:
       '@fastify/busboy': 2.0.0
