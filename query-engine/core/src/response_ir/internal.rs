@@ -338,7 +338,7 @@ fn serialize_objects_with_relation(
     let mut object_mapping = UncheckedItemsWithParents::with_capacity(result.records.records.len());
 
     let model = result.model;
-    let db_field_names = result.fields;
+    let db_field_names = result.records.field_names;
     let nested = result.nested;
 
     let fields: Vec<_> = db_field_names
