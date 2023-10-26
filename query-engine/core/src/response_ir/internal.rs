@@ -13,7 +13,7 @@ use schema::{
     constants::{aggregations::*, output_fields::*},
     *,
 };
-use std::collections::HashMap;
+use std::collections::{HashMap, HashSet};
 
 /// A grouping of items to their parent record.
 /// The item implicitly holds the information of the type of item contained.
@@ -240,7 +240,9 @@ fn serialize_record_selection_with_relations(
             query_schema,
         ),
         InnerOutputType::Object(obj) => {
+            dbg!(&record_selection);
             let result = serialize_objects_with_relation(record_selection, obj, query_schema)?;
+            dbg!(&result);
 
             process_object(field, is_list, result, name)
         }
@@ -346,6 +348,10 @@ fn serialize_objects_with_relation(
         .filter_map(|f| model.fields().all().find(|field| field.db_name() == f))
         .collect();
 
+    // Hack: we convert it to a hashset to support contains with &str as input
+    // because Vec<String>::contains(&str) doesn't work and we don't want to allocate a string record value
+    let selected_db_field_names: HashSet<String> = result.fields.into_iter().collect();
+
     for record in result.records.records.into_iter() {
         if !object_mapping.contains_key(&record.parent_id) {
             object_mapping.insert(record.parent_id.clone(), Vec::new());
@@ -355,6 +361,11 @@ fn serialize_objects_with_relation(
         let mut object = IndexMap::with_capacity(values.len());
 
         for (val, field) in values.into_iter().zip(fields.iter()) {
+            // Skip fields that aren't part of the selection set
+            if !selected_db_field_names.contains(field.name()) {
+                continue;
+            }
+
             let out_field = typ.find_field(field.name()).unwrap();
 
             match field {
@@ -409,12 +420,12 @@ fn serialize_relation_selection(
     let db_field_names = &rrs.fields;
     let fields: Vec<_> = db_field_names
         .iter()
-        .filter_map(|f| rrs.model.fields().all().find(|field| field.db_name() == f))
+        .filter_map(|f| rrs.model.fields().all().find(|field| field.name() == f))
         .collect();
 
     for field in fields {
         let out_field = typ.find_field(field.name()).unwrap();
-        let value = value_obj.remove(field.name()).unwrap();
+        let value = value_obj.remove(field.db_name()).unwrap();
 
         match field {
             Field::Scalar(_) if !out_field.field_type().is_object() => {
