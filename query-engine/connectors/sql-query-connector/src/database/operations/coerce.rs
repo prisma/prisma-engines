@@ -15,12 +15,29 @@ pub(crate) fn coerce_record_with_join(record: &mut Record, rq_indexes: Vec<(usiz
 // TODO: find better name
 pub(crate) fn coerce_json_relation_to_pv(value: serde_json::Value, q: &RelatedQuery) -> PrismaValue {
     match value {
-        serde_json::Value::Array(values) => PrismaValue::List(
+        // to-many
+        serde_json::Value::Array(values) if q.parent_field.is_list() => PrismaValue::List(
             values
                 .into_iter()
                 .map(|value| coerce_json_relation_to_pv(value, q))
                 .collect(),
         ),
+        // to-one
+        serde_json::Value::Array(values) => {
+            let coerced = values
+                .into_iter()
+                .next()
+                .map(|value| coerce_json_relation_to_pv(value, q));
+
+            // TODO(HACK): We probably want to update the sql builder instead to not aggregate to-one relations as array
+            // If the arary is empty, it means there's no relations
+            if let Some(val) = coerced {
+                val
+            // else the relation's null
+            } else {
+                PrismaValue::Null
+            }
+        }
         serde_json::Value::Object(obj) => {
             let mut map: Vec<(String, PrismaValue)> = Vec::with_capacity(obj.len());
             let related_model = q.parent_field.related_model();
