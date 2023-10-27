@@ -31,6 +31,7 @@ pub struct SqliteErrorDef {
 #[derive(Deserialize)]
 #[serde(tag = "kind")]
 /// Wrapper for JS-side errors
+/// See driver-adapters/js/adapter-utils/src/types.ts file for example
 pub(crate) enum DriverAdapterError {
     /// Unexpected JS exception
     GenericJs {
@@ -63,6 +64,7 @@ impl From<DriverAdapterError> for QuaintError {
 }
 
 /// Wrapper for JS-side result type
+/// See driver-adapters/js/adapter-utils/src/types.ts file for example
 pub(crate) enum JsResult<T>
 where
     T: FromNapiValue,

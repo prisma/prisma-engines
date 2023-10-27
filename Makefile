@@ -2,7 +2,6 @@ CONFIG_PATH = ./query-engine/connector-test-kit-rs/test-configs
 CONFIG_FILE = .test_config
 SCHEMA_EXAMPLES_PATH = ./query-engine/example_schemas
 DEV_SCHEMA_FILE = dev_datamodel.prisma
-DRIVER_ADAPTERS_BRANCH ?= main
 
 LIBRARY_EXT := $(shell                            \
     case "$$(uname -s)" in                        \
@@ -45,13 +44,7 @@ release:
 #################
 
 test-qe:
-ifndef DRIVER_ADAPTER
 	cargo test --package query-engine-tests
-else
-	@echo "Executing query engine tests with $(DRIVER_ADAPTER) driver adapter"; \
-	# Add your actual command for the "test-driver-adapter" task here
-	$(MAKE) test-driver-adapter-$(DRIVER_ADAPTER);
-endif
 
 test-qe-verbose:
 	cargo test --package query-engine-tests -- --nocapture
@@ -86,10 +79,6 @@ dev-sqlite:
 
 dev-libsql-sqlite: build-qe-napi build-connector-kit-js
 	cp $(CONFIG_PATH)/libsql-sqlite $(CONFIG_FILE)
-
-test-libsql-sqlite: dev-libsql-sqlite test-qe-st
-
-test-driver-adapter-libsql: test-libsql-sqlite
 
 start-postgres9:
 	docker compose -f docker-compose.yml up --wait -d --remove-orphans postgres9
@@ -126,19 +115,11 @@ start-pg-postgres13: build-qe-napi build-connector-kit-js start-postgres13
 dev-pg-postgres13: start-pg-postgres13
 	cp $(CONFIG_PATH)/pg-postgres13 $(CONFIG_FILE)
 
-test-pg-postgres13: dev-pg-postgres13 test-qe-st
-
-test-driver-adapter-pg: test-pg-postgres13
-
 start-neon-postgres13: build-qe-napi build-connector-kit-js
 	docker compose -f docker-compose.yml up --wait -d --remove-orphans neon-postgres13
 
 dev-neon-ws-postgres13: start-neon-postgres13
 	cp $(CONFIG_PATH)/neon-ws-postgres13 $(CONFIG_FILE)
-
-test-neon-ws-postgres13: dev-neon-ws-postgres13 test-qe-st
-
-test-driver-adapter-neon: test-neon-ws-postgres13
 
 start-postgres14:
 	docker compose -f docker-compose.yml up --wait -d --remove-orphans postgres14
@@ -274,10 +255,6 @@ start-planetscale-vitess8: build-qe-napi build-connector-kit-js
 dev-planetscale-vitess8: start-planetscale-vitess8
 	cp $(CONFIG_PATH)/planetscale-vitess8 $(CONFIG_FILE)
 
-test-planetscale-vitess8: dev-planetscale-vitess8 test-qe-st
-
-test-driver-adapter-planetscale: test-planetscale-vitess8
-
 ######################
 # Local dev commands #
 ######################
@@ -285,36 +262,8 @@ test-driver-adapter-planetscale: test-planetscale-vitess8
 build-qe-napi:
 	cargo build --package query-engine-node-api
 
-build-connector-kit-js: build-driver-adapters symlink-driver-adapters
-	cd query-engine/driver-adapters/connector-test-kit-executor && pnpm i && pnpm build
-
-build-driver-adapters: ensure-prisma-present
-	@echo "Building driver adapters..."
-	@cd ../prisma && pnpm --filter "*adapter*" i && pnpm --filter "*adapter*" build
-	@echo "Driver adapters build completed.";
-
-symlink-driver-adapters: ensure-prisma-present
-	@echo "Creating symbolic links for driver adapters..."
-	@for dir in $(wildcard $(realpath ../prisma)/packages/*adapter*); do \
-        if [ -d "$$dir" ]; then \
-            dir_name=$$(basename "$$dir"); \
-            ln -sfn "$$dir" "$(realpath .)/query-engine/driver-adapters/$$dir_name"; \
-            echo "Created symbolic link for $$dir_name"; \
-        fi; \
-	done;
-	echo "Symbolic links creation completed.";
-
-ensure-prisma-present:
-	@if [ -d ../prisma ]; then \
-		cd "$(realpath ../prisma)" && git fetch origin main; \
-		LOCAL_CHANGES=$$(git diff --name-only HEAD origin/main -- 'packages/*adapter*'); \
-		if [ -n "$$LOCAL_CHANGES" ]; then \
-		  echo "⚠️ ../prisma diverges from prisma/prisma main branch. Test results might diverge from those in CI ⚠️ "; \
-		fi \
-	else \
-		echo "git clone --depth=1 https://github.com/prisma/prisma.git --branch=$(DRIVER_ADAPTERS_BRANCH) ../prisma"; \
-		git clone --depth=1 https://github.com/prisma/prisma.git --branch=$(DRIVER_ADAPTERS_BRANCH) "../prisma" && echo "Prisma repository has been cloned to ../prisma"; \
-	fi;
+build-connector-kit-js:
+	cd query-engine/driver-adapters/js && pnpm i && pnpm build
 
 # Quick schema validation of whatever you have in the dev_datamodel.prisma file.
 validate:

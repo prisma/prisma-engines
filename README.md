@@ -203,7 +203,6 @@ integration tests.
   - Alternatively: Load the defined environment in `./.envrc` manually in your shell.
 
 **Setup:**
-
 There are helper `make` commands to set up a test environment for a specific
 database connector you want to test. The commands set up a container (if needed)
 and write the `.test_config` file, which is picked up by the integration
@@ -234,31 +233,6 @@ Other variables may or may not be useful.
 **Run:**
 
 Run `cargo test` in the repository root.
-
-### Testing driver adapters
-
-Please refer to the [Testing driver adapters](./query-engine/connector-test-kit-rs/README.md#testing-driver-adapters) section in the connector-test-kit-rs README.
-
-**ℹ️ Important note on developing features that require changes to the both the query engine, and driver adapters code**
-
-As explained in [Testing driver adapters](./query-engine/connector-test-kit-rs/README.md#testing-driver-adapters), running `DRIVER_ADAPTER=$adapter make qe-test`
-will ensure you have prisma checked out in your filesystem in the same directory as prisma-engines. This is needed because the driver adapters code is symlinked in prisma-engines.
-
-When working on a feature or bugfix spanning adapters code and query-engine code, you will need to open sibling PRs in `prisma/prisma` and `prisma/prisma-engines` respectively.
-Locally, each time you run `DRIVER_ADAPTER=$adapter make qe-test` tests will run using the driver adapters built from the source code in the working copy of prisma/prisma. All good.
-
-In CI, tho', we need to denote which branch of prisma/prisma we want to use for tests. In CI, there's no working copy of prisma/prisma before tests run.
-The CI jobs clones prisma/prisma `main` branch by default, which doesn't include your local changes. To test in integration, we can tell CI to use the branch of prisma/prisma containing
-the changes in adapters. To do it, you can use a simple convention in commit messages. Like this:
-
-```
-git commit -m "DRIVER_ADAPTERS_BRANCH=prisma-branch-with-changes-in-adapters [...]"
-```
-
-GitHub actions will then pick up the branch name and use it to clone that branch's code of prisma/prisma, and build the driver adapters code from there.
-
-When it's time to merge the sibling PRs, you'll need to merge the prisma/prisma PR first, so when merging the engines PR you have the code of the adapters ready in prisma/prisma `main` branch.
-
 
 ## Parallel rust-analyzer builds
 
