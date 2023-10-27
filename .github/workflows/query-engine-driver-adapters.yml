@@ -49,6 +49,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
 
       - name: 'Setup Node.js'
         uses: actions/setup-node@v3
@@ -75,6 +77,15 @@ jobs:
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Extract Branch Name
+        id: extract-branch
+        run: |
+          branch="$(git show -s --format=%s | grep -o "DRIVER_ADAPTERS_BRANCH=[^ ]*" | cut -f2 -d=)"
+          if [ -n "$branch" ]; then
+            echo "Using $branch branch of driver adapters"
+            echo "DRIVER_ADAPTERS_BRANCH=$branch" >> "$GITHUB_ENV"
+          fi
 
       - run: make ${{ matrix.adapter.setup_task }}
 
