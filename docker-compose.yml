@@ -197,7 +197,7 @@ services:
     tmpfs: /var/lib/mysql
 
   mysql-8-0:
-    image: mysql:8.0.28
+    image: mysql:8.0.35
     command: mysqld
     restart: unless-stopped
     platform: linux/x86_64
