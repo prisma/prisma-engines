@@ -36,16 +36,16 @@ jobs:
 
       - uses: actions/setup-node@v3
         with:
-          node-version: '20.x'
-      
+          node-version: '14.x'
+
       # This is needed to be done manually because of `PACKAGE_DIR` used later
       - name: Set up NPM token for publishing later
         run: echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}" > ~/.npmrc
 
       - name: Update version in package.json & Publish @prisma/prisma-schema-wasm
-        run: 
+        run:
           # Update version in package.json and return directory for later usage
-          PACKAGE_DIR=$( nix run .#renderPrismaSchemaWasmPackage ${{ github.event.inputs.enginesWrapperVersion }}) 
+          PACKAGE_DIR=$( nix run .#renderPrismaSchemaWasmPackage ${{ github.event.inputs.enginesWrapperVersion }})
           npm publish "$PACKAGE_DIR" --access public --tag ${{ github.event.inputs.npmDistTag }}
         env:
           # Required for publishing
