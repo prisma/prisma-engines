@@ -63,7 +63,7 @@ pub(crate) async fn routes(cx: Arc<PrismaContext>, req: Request<Body>) -> Result
     let mut res = match (req.method(), req.uri().path()) {
         (&Method::POST, "/") => request_handler(cx, req).await?,
         (&Method::GET, "/") if cx.enabled_features.contains(Feature::Playground) => playground_handler(),
-        (&Method::GET, "/status") => build_json_response(StatusCode::OK, r#"{"status":"ok"}"#),
+        (&Method::GET, "/status") => build_json_response(StatusCode::OK, &json!({"status": "ok"})),
 
         (&Method::GET, "/sdl") => {
             let schema = render_graphql_schema(cx.query_schema());
