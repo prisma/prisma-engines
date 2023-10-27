@@ -89,7 +89,7 @@ static METRIC_RENAMES: Lazy<HashMap<&'static str, (&'static str, &'static str)>>
         (MOBC_POOL_CONNECTIONS_OPEN, ("prisma_pool_connections_open", "The number of pool connections currently open")),
         (MOBC_POOL_CONNECTIONS_BUSY, ("prisma_pool_connections_busy", "The number of pool connections currently executing datasource queries")),
         (MOBC_POOL_CONNECTIONS_IDLE, ("prisma_pool_connections_idle", "The number of pool connections that are not busy running a query")),
-        (MOBC_POOL_WAIT_COUNT, ("prisma_client_queries_wait", "The number of datasource queries currently waiting for an free connection")),
+        (MOBC_POOL_WAIT_COUNT, ("prisma_client_queries_wait", "The number of datasource queries currently waiting for a free connection")),
         (MOBC_POOL_WAIT_DURATION, ("prisma_client_queries_wait_histogram_ms", "The distribution of the time all datasource queries spent waiting for a free connection")),
     ])
 });
