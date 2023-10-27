@@ -24,6 +24,8 @@ use std::{
 use tokio::sync::Mutex;
 use url::{Host, Url};
 
+pub use error::MysqlError;
+
 /// The underlying MySQL driver. Only available with the `expose-drivers`
 /// Cargo feature.
 #[cfg(feature = "expose-drivers")]
