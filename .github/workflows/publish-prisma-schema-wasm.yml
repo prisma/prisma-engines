@@ -47,7 +47,9 @@ jobs:
           # Update version in package.json and return directory for later usage
           PACKAGE_DIR=$( nix run .#renderPrismaSchemaWasmPackage ${{ github.event.inputs.enginesWrapperVersion }}) 
           npm publish "$PACKAGE_DIR" --access public --tag ${{ github.event.inputs.npmDistTag }}
-
+        env:
+          # Required for publishing
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
       #
       # Failure handlers
       #
