@@ -1,0 +1,40 @@
+{
+  "engines": {
+    "node": ">=16.13",
+    "pnpm": ">=8.6.6 <9"
+  },
+  "name": "connector-test-kit-executor",
+  "version": "0.0.1",
+  "description": "",
+  "main": "dist/index.mjs",
+  "module": "dist/index.mjs",
+  "private": true,
+  "scripts": {
+    "build": "tsup ./src/index.ts --format esm --dts",
+    "lint": "tsc -p ./tsconfig.build.json"
+  },
+  "keywords": [],
+  "author": "",
+  "sideEffects": false,
+  "license": "Apache-2.0",
+  "dependencies": {
+    "@libsql/client": "0.3.5",
+    "@neondatabase/serverless": "^0.6.0",
+    "@planetscale/database": "1.11.0",
+    "@prisma/adapter-libsql": "../adapter-libsql",
+    "@prisma/adapter-neon": "../adapter-neon",
+    "@prisma/adapter-pg": "../adapter-pg",
+    "@prisma/adapter-planetscale": "../adapter-planetscale",
+    "@prisma/driver-adapter-utils": "../driver-adapter-utils",
+    "@types/pg": "^8.10.2",
+    "pg": "^8.11.3",
+    "undici": "^5.26.5",
+    "ws": "^8.14.2"
+  },
+  "devDependencies": {
+    "@types/node": "^20.5.1",
+    "tsup": "^7.2.0",
+    "tsx": "^3.12.7",
+    "typescript": "^5.1.6"
+  }
+}
