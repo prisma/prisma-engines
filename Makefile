@@ -285,13 +285,8 @@ test-driver-adapter-planetscale: test-planetscale-vitess8
 build-qe-napi:
 	cargo build --package query-engine-node-api
 
-build-connector-kit-js: build-driver-adapters symlink-driver-adapters
-	cd query-engine/driver-adapters/connector-test-kit-executor && pnpm i && pnpm build
-
-build-driver-adapters: ensure-prisma-present
-	@echo "Building driver adapters..."
-	@cd ../prisma && pnpm --filter "*adapter*" i && pnpm --filter "*adapter*" build
-	@echo "Driver adapters build completed.";
+build-connector-kit-js: symlink-driver-adapters
+	cd query-engine/driver-adapters && pnpm i && pnpm build
 
 symlink-driver-adapters: ensure-prisma-present
 	@echo "Creating symbolic links for driver adapters..."
