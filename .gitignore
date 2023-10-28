@@ -47,5 +47,5 @@ graph.dot
 
 prisma-schema-wasm/nodejs
 
-# This symlink looks orphan here, but it comes from prisma/prisma where driver adapters reference a file in their parent directory
-tsconfig.build.adapter.json
+# Ignore pnpm-lock.yaml
+query-engine/driver-adapters/pnpm-lock.yaml

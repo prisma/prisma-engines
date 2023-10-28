@@ -1,0 +1,7 @@
+packages:
+  - './adapter-libsql'
+  - './adapter-neon'
+  - './adapter-pg'
+  - './adapter-planetscale'
+  - './connector-test-kit-executor'
+  - './driver-adapter-utils'
