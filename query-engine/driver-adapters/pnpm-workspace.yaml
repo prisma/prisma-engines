@@ -1,7 +1,7 @@
 packages:
-  - './adapter-libsql'
-  - './adapter-neon'
-  - './adapter-pg'
-  - './adapter-planetscale'
+  - '../../../prisma/packages/adapter-libsql'
+  - '../../../prisma/packages/adapter-neon'
+  - '../../../prisma/packages/adapter-pg'
+  - '../../../prisma/packages/adapter-planetscale'
+  - '../../../prisma/packages/driver-adapter-utils'
   - './connector-test-kit-executor'
-  - './driver-adapter-utils'
