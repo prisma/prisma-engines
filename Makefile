@@ -285,8 +285,13 @@ test-driver-adapter-planetscale: test-planetscale-vitess8
 build-qe-napi:
 	cargo build --package query-engine-node-api
 
-build-connector-kit-js: ensure-prisma-present
+build-connector-kit-js: build-driver-adapters
 	cd query-engine/driver-adapters && pnpm i && pnpm build
+
+build-driver-adapters: ensure-prisma-present
+	@echo "Building driver adapters..."
+	@cd ../prisma && pnpm --filter "*adapter*" i
+	@echo "Driver adapters build completed.";
 
 ensure-prisma-present:
 	@if [ -d ../prisma ]; then \
