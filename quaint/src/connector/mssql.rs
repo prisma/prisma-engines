@@ -109,7 +109,7 @@ impl TransactionCapable for Mssql {
 
         let mut transaction_depth = self.transaction_depth.lock().await;
         *transaction_depth += 1;
-        let st_depth = *transaction_depth + 0;
+        let st_depth = *transaction_depth;
 
         let begin_statement = self.begin_statement(st_depth).await;
         let commit_stmt = self.commit_statement(st_depth).await;
