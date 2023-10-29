@@ -13,6 +13,7 @@ use lru_cache::LruCache;
 use native_tls::{Certificate, Identity, TlsConnector};
 use percent_encoding::percent_decode;
 use postgres_native_tls::MakeTlsConnector;
+use std::sync::Arc;
 use std::{
     borrow::{Borrow, Cow},
     fmt::{Debug, Display},
@@ -26,7 +27,6 @@ use tokio_postgres::{
     Client, Config, Statement,
 };
 use url::{Host, Url};
-use std::sync::Arc;
 
 pub(crate) const DEFAULT_SCHEMA: &str = "public";
 
@@ -937,13 +937,9 @@ impl Queryable for PostgreSql {
     /// Statement to begin a transaction
     async fn begin_statement(&self, depth: i32) -> String {
         let savepoint_stmt = format!("SAVEPOINT savepoint{}", depth);
-        let ret = if depth > 1 {
-            savepoint_stmt
-        } else {
-            "BEGIN".to_string()
-        };
+        let ret = if depth > 1 { savepoint_stmt } else { "BEGIN".to_string() };
 
-        return ret
+        return ret;
     }
 
     /// Statement to commit a transaction
@@ -955,7 +951,7 @@ impl Queryable for PostgreSql {
             "COMMIT".to_string()
         };
 
-        return ret
+        return ret;
     }
 
     /// Statement to rollback a transaction
@@ -967,7 +963,7 @@ impl Queryable for PostgreSql {
             "ROLLBACK".to_string()
         };
 
-        return ret
+        return ret;
     }
 }
 

@@ -11,9 +11,9 @@ use crate::{
     visitor::{self, Visitor},
 };
 use async_trait::async_trait;
+use std::sync::Arc;
 use std::{convert::TryFrom, path::Path, time::Duration};
 use tokio::sync::Mutex;
-use std::sync::Arc;
 
 pub(crate) const DEFAULT_SQLITE_SCHEMA_NAME: &str = "main";
 
@@ -141,7 +141,7 @@ impl TryFrom<&str> for Sqlite {
 
         let client = Mutex::new(conn);
 
-        Ok(Sqlite { 
+        Ok(Sqlite {
             client,
             transaction_depth: Arc::new(futures::lock::Mutex::new(0)),
         })
@@ -260,13 +260,9 @@ impl Queryable for Sqlite {
     /// Statement to begin a transaction
     async fn begin_statement(&self, depth: i32) -> String {
         let savepoint_stmt = format!("SAVEPOINT savepoint{}", depth);
-        let ret = if depth > 1 {
-            savepoint_stmt
-        } else {
-            "BEGIN".to_string()
-        };
+        let ret = if depth > 1 { savepoint_stmt } else { "BEGIN".to_string() };
 
-        return ret
+        return ret;
     }
 
     /// Statement to commit a transaction
@@ -278,7 +274,7 @@ impl Queryable for Sqlite {
             "COMMIT".to_string()
         };
 
-        return ret
+        return ret;
     }
 
     /// Statement to rollback a transaction
@@ -290,7 +286,7 @@ impl Queryable for Sqlite {
             "ROLLBACK".to_string()
         };
 
-        return ret
+        return ret;
     }
 }
 

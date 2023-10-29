@@ -4,10 +4,10 @@ use crate::{
     error::{Error, ErrorKind},
 };
 use async_trait::async_trait;
-use metrics::{decrement_gauge, increment_gauge};
-use std::{fmt, str::FromStr};
 use futures::lock::Mutex;
+use metrics::{decrement_gauge, increment_gauge};
 use std::sync::Arc;
+use std::{fmt, str::FromStr};
 
 extern crate metrics as metrics;
 
@@ -58,8 +58,8 @@ impl<'a> DefaultTransaction<'a> {
         begin_stmt: &str,
         tx_opts: TransactionOptions,
     ) -> crate::Result<DefaultTransaction<'a>> {
-        let this = Self { 
-            inner, 
+        let this = Self {
+            inner,
             depth: tx_opts.depth,
             commit_stmt: tx_opts.commit_stmt,
             rollback_stmt: tx_opts.rollback_stmt,
@@ -222,7 +222,7 @@ impl FromStr for IsolationLevel {
 }
 impl TransactionOptions {
     pub fn new(
-        isolation_level: Option<IsolationLevel>, 
+        isolation_level: Option<IsolationLevel>,
         isolation_first: bool,
         depth: Arc<Mutex<i32>>,
         commit_stmt: String,

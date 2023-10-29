@@ -500,9 +500,9 @@ impl Quaint {
             }
         };
 
-        Ok(PooledConnection { 
-            inner, 
-            transaction_depth: Arc::new(futures::lock::Mutex::new(0))
+        Ok(PooledConnection {
+            inner,
+            transaction_depth: Arc::new(futures::lock::Mutex::new(0)),
         })
     }
 

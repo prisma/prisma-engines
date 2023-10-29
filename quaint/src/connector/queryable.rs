@@ -137,10 +137,8 @@ macro_rules! impl_default_TransactionCapable {
                 let commit_stmt = self.commit_statement(st_depth).await;
                 let rollback_stmt = self.rollback_statement(st_depth).await;
 
-
-
                 let opts = crate::connector::TransactionOptions::new(
-                    isolation, 
+                    isolation,
                     self.requires_isolation_first(),
                     depth,
                     commit_stmt,
