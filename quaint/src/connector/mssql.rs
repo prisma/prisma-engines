@@ -11,6 +11,7 @@ use crate::{
 use async_trait::async_trait;
 use connection_string::JdbcString;
 use futures::lock::Mutex;
+use std::sync::Arc;
 use std::{
     convert::TryFrom,
     fmt,
@@ -22,7 +23,6 @@ use std::{
 use tiberius::*;
 use tokio::net::TcpStream;
 use tokio_util::compat::{Compat, TokioAsyncWriteCompatExt};
-use std::sync::Arc;
 
 /// The underlying SQL Server driver. Only available with the `expose-drivers` Cargo feature.
 #[cfg(feature = "expose-drivers")]
@@ -116,17 +116,14 @@ impl TransactionCapable for Mssql {
         let rollback_stmt = self.rollback_statement(st_depth).await;
 
         let opts = TransactionOptions::new(
-            isolation, 
+            isolation,
             self.requires_isolation_first(),
             self.transaction_depth.clone(),
             commit_stmt,
             rollback_stmt,
         );
 
-
-        Ok(Box::new(
-            DefaultTransaction::new(self, &begin_statement, opts).await?,
-        ))
+        Ok(Box::new(DefaultTransaction::new(self, &begin_statement, opts).await?))
     }
 }
 
@@ -470,12 +467,12 @@ impl Queryable for Mssql {
             "BEGIN TRAN".to_string()
         };
 
-        return ret
+        return ret;
     }
 
     /// Statement to commit a transaction
     async fn commit_statement(&self, depth: i32) -> String {
-        // MSSQL doesn't have a "RELEASE SAVEPOINT" equivalent, so in a nested 
+        // MSSQL doesn't have a "RELEASE SAVEPOINT" equivalent, so in a nested
         // transaction we just continue onwards
         let ret = if depth > 1 {
             " ".to_string()
@@ -483,7 +480,7 @@ impl Queryable for Mssql {
             "COMMIT".to_string()
         };
 
-        return ret
+        return ret;
     }
 
     /// Statement to rollback a transaction
@@ -495,7 +492,7 @@ impl Queryable for Mssql {
             "ROLLBACK".to_string()
         };
 
-        return ret
+        return ret;
     }
 
     fn requires_isolation_first(&self) -> bool {

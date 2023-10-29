@@ -10,8 +10,8 @@ use crate::{
     error::Error,
 };
 use async_trait::async_trait;
-use mobc::{Connection as MobcPooled, Manager};
 use futures::lock::Mutex;
+use mobc::{Connection as MobcPooled, Manager};
 use std::sync::Arc;
 
 /// A connection from the pool. Implements

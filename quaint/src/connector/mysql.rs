@@ -14,6 +14,7 @@ use mysql_async::{
     prelude::{Query as _, Queryable as _},
 };
 use percent_encoding::percent_decode;
+use std::sync::Arc;
 use std::{
     borrow::Cow,
     future::Future,
@@ -23,7 +24,6 @@ use std::{
 };
 use tokio::sync::Mutex;
 use url::{Host, Url};
-use std::sync::Arc;
 
 pub use error::MysqlError;
 
@@ -590,13 +590,9 @@ impl Queryable for Mysql {
     /// Statement to begin a transaction
     async fn begin_statement(&self, depth: i32) -> String {
         let savepoint_stmt = format!("SAVEPOINT savepoint{}", depth);
-        let ret = if depth > 1 {
-            savepoint_stmt
-        } else {
-            "BEGIN".to_string()
-        };
+        let ret = if depth > 1 { savepoint_stmt } else { "BEGIN".to_string() };
 
-        return ret
+        return ret;
     }
 
     /// Statement to commit a transaction
@@ -608,7 +604,7 @@ impl Queryable for Mysql {
             "COMMIT".to_string()
         };
 
-        return ret
+        return ret;
     }
 
     /// Statement to rollback a transaction
@@ -620,7 +616,7 @@ impl Queryable for Mysql {
             "ROLLBACK".to_string()
         };
 
-        return ret
+        return ret;
     }
 }
 
