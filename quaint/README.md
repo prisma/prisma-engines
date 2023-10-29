@@ -41,7 +41,7 @@ choice.
 
 ```sh
  > cargo build --features all
- ```
+```
 
 ### Testing
 
@@ -70,7 +70,7 @@ This requires the rust nightly channel:
 > cargo rustdoc --all-features
 ```
 
-Documentation index would be created at `$CARGO_TARGET_DIR/doc/quaint/index.html`
+Documentation index would be created at `$CARGO_TARGET_DIR/doc/quaint/index.html`.
 
 ## Security
 

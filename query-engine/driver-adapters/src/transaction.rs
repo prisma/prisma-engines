@@ -1,4 +1,5 @@
 use async_trait::async_trait;
+use futures::lock::Mutex;
 use metrics::{decrement_gauge, increment_gauge};
 use napi::{bindgen_prelude::FromNapiValue, JsObject};
 use quaint::{
@@ -6,6 +7,7 @@ use quaint::{
     prelude::{Query as QuaintQuery, Queryable, ResultSet},
     Value,
 };
+use std::sync::Arc;
 
 use crate::{
     proxy::{CommonProxy, TransactionOptions, TransactionProxy},
@@ -18,13 +20,22 @@ use crate::{
 pub(crate) struct JsTransaction {
     tx_proxy: TransactionProxy,
     inner: JsBaseQueryable,
+    pub depth: Arc<Mutex<i32>>,
+    pub commit_stmt: String,
+    pub rollback_stmt: String,
 }
 
 impl JsTransaction {
     pub(crate) fn new(inner: JsBaseQueryable, tx_proxy: TransactionProxy) -> Self {
         increment_gauge!("prisma_client_queries_active", 1.0);
 
-        Self { inner, tx_proxy }
+        Self {
+            inner,
+            tx_proxy,
+            commit_stmt: "COMMIT".to_string(),
+            rollback_stmt: "ROLLBACK".to_string(),
+            depth: Arc::new(futures::lock::Mutex::new(0)),
+        }
     }
 
     pub fn options(&self) -> &TransactionOptions {
@@ -39,10 +50,11 @@ impl JsTransaction {
 
 #[async_trait]
 impl QuaintTransaction for JsTransaction {
-    async fn commit(&self) -> quaint::Result<()> {
+    async fn commit(&mut self) -> quaint::Result<()> {
         decrement_gauge!("prisma_client_queries_active", 1.0);
 
-        let commit_stmt = "COMMIT";
+        let mut depth_guard = self.depth.lock().await;
+        let commit_stmt = &self.commit_stmt;
 
         if self.options().use_phantom_query {
             let commit_stmt = JsBaseQueryable::phantom_query_message(commit_stmt);
@@ -51,13 +63,17 @@ impl QuaintTransaction for JsTransaction {
             self.inner.raw_cmd(commit_stmt).await?;
         }
 
+        // Modify the depth value through the MutexGuard
+        *depth_guard -= 1;
+
         self.tx_proxy.commit().await
     }
 
-    async fn rollback(&self) -> quaint::Result<()> {
+    async fn rollback(&mut self) -> quaint::Result<()> {
         decrement_gauge!("prisma_client_queries_active", 1.0);
 
-        let rollback_stmt = "ROLLBACK";
+        let mut depth_guard = self.depth.lock().await;
+        let rollback_stmt = &self.rollback_stmt;
 
         if self.options().use_phantom_query {
             let rollback_stmt = JsBaseQueryable::phantom_query_message(rollback_stmt);
@@ -65,6 +81,9 @@ impl QuaintTransaction for JsTransaction {
         } else {
             self.inner.raw_cmd(rollback_stmt).await?;
         }
+
+        // Modify the depth value through the MutexGuard
+        *depth_guard -= 1;
 
         self.tx_proxy.rollback().await
     }
