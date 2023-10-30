@@ -90,7 +90,7 @@ fn connector_for_connection_string(
             Ok(Box::new(connector))
         }
         Some(_other) => Err(CoreError::url_parse_error(
-            "Expecting schemes postgres/postgresql/file/mysql/sqlserver/mongodb+srv/mongodb",
+            "The scheme is not recognized",
         )),
         None => Err(CoreError::user_facing(InvalidConnectionString {
             details: String::new(),
