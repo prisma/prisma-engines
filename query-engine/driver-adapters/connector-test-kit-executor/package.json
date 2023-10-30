@@ -10,8 +10,7 @@
   "module": "dist/index.mjs",
   "private": true,
   "scripts": {
-    "build": "tsup ./src/index.ts --format esm --dts",
-    "lint": "tsc -p ./tsconfig.build.json"
+    "build": "tsup ./src/index.ts --format esm --dts"
   },
   "keywords": [],
   "author": "",
@@ -21,11 +20,11 @@
     "@libsql/client": "0.3.5",
     "@neondatabase/serverless": "^0.6.0",
     "@planetscale/database": "1.11.0",
-    "@prisma/adapter-libsql": "../adapter-libsql",
-    "@prisma/adapter-neon": "../adapter-neon",
-    "@prisma/adapter-pg": "../adapter-pg",
-    "@prisma/adapter-planetscale": "../adapter-planetscale",
-    "@prisma/driver-adapter-utils": "../driver-adapter-utils",
+    "@prisma/adapter-libsql": "workspace:*",
+    "@prisma/adapter-neon": "workspace:*",
+    "@prisma/adapter-pg": "workspace:*",
+    "@prisma/adapter-planetscale": "workspace:*",
+    "@prisma/driver-adapter-utils": "workspace:*",
     "@types/pg": "^8.10.2",
     "pg": "^8.11.3",
     "undici": "^5.26.5",
@@ -34,7 +33,6 @@
   "devDependencies": {
     "@types/node": "^20.5.1",
     "tsup": "^7.2.0",
-    "tsx": "^3.12.7",
-    "typescript": "^5.1.6"
+    "typescript": "5.2.2"
   }
 }
