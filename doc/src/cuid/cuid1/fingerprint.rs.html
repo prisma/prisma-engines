@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/nix/store/2vh5qdx8lp2p3gfx5gfr58jjqcmwwzhj-vendor-cargo-deps/c19b7c6f923b580ac259164a89f2577984ad5ab09ee9d583b888f934adbbe8d0/cuid-1.3.2/src/cuid1/fingerprint.rs`."><title>fingerprint.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-9bb858ba049f1f21.css" id="mainThemeStyle"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="cuid" data-themes="" data-resource-suffix="" data-rustdoc-version="1.72.0 (5680fa18f 2023-08-23) (built from a source tarball)" data-channel="1.72.0" data-search-js="search-f6292fe389d70017.js" data-settings-js="settings-de11bff964e9d4e5.js" data-settings-css="settings-8c76f75bfb6bd192.css" data-theme-light-css="light-0f8c037637f9eb3e.css" data-theme-dark-css="dark-1097f8e92a01e3cf.css" data-theme-ayu-css="ayu-614652228113ac93.css" ><script src="../../../static.files/storage-59fd9b8ccb335783.js"></script><script defer src="../../../static.files/source-script-106908c7a7964ba4.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../static.files/main-0795b7d26be81095.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../../../static.files/light-0f8c037637f9eb3e.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../../../static.files/dark-1097f8e92a01e3cf.css"><link rel="stylesheet" href="../../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../../cuid/index.html"><img class="rust-logo" src="../../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/nix/store/xp3hpbjh91w01f7ay5mrpqwnnyn0ljd3-vendor-cargo-deps/e3f901bd92842106e4cc5233f8ce1d3b79149fea6cb156ba4c47e651f8192699/cuid-1.3.2/src/cuid1/fingerprint.rs`."><title>fingerprint.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-9bb858ba049f1f21.css" id="mainThemeStyle"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="cuid" data-themes="" data-resource-suffix="" data-rustdoc-version="1.72.0 (5680fa18f 2023-08-23) (built from a source tarball)" data-channel="1.72.0" data-search-js="search-f6292fe389d70017.js" data-settings-js="settings-de11bff964e9d4e5.js" data-settings-css="settings-8c76f75bfb6bd192.css" data-theme-light-css="light-0f8c037637f9eb3e.css" data-theme-dark-css="dark-1097f8e92a01e3cf.css" data-theme-ayu-css="ayu-614652228113ac93.css" ><script src="../../../static.files/storage-59fd9b8ccb335783.js"></script><script defer src="../../../static.files/source-script-106908c7a7964ba4.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../static.files/main-0795b7d26be81095.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../../../static.files/light-0f8c037637f9eb3e.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../../../static.files/dark-1097f8e92a01e3cf.css"><link rel="stylesheet" href="../../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../../cuid/index.html"><img class="rust-logo" src="../../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -114,85 +114,128 @@
 <a href="#114" id="114">114</a>
 <a href="#115" id="115">115</a>
 <a href="#116" id="116">116</a>
-</pre></div><pre class="rust"><code><span class="kw">use </span>std::process;
+<a href="#117" id="117">117</a>
+<a href="#118" id="118">118</a>
+<a href="#119" id="119">119</a>
+<a href="#120" id="120">120</a>
+<a href="#121" id="121">121</a>
+<a href="#122" id="122">122</a>
+<a href="#123" id="123">123</a>
+<a href="#124" id="124">124</a>
+<a href="#125" id="125">125</a>
+<a href="#126" id="126">126</a>
+<a href="#127" id="127">127</a>
+</pre></div><pre class="rust"><code><span class="kw">use </span>num::bigint;
+<span class="kw">use </span>rand::{thread_rng, Rng};
+<span class="kw">use </span>sha3::{Digest, Sha3_512};
+<span class="kw">use </span>std::{
+    collections::hash_map::DefaultHasher,
+    hash::{Hash, Hasher},
+};
 
-<span class="kw">use </span><span class="kw">crate</span>::error::CuidError;
-<span class="kw">use </span><span class="kw">crate</span>::text::{pad, to_base_string};
-<span class="kw">use </span><span class="kw">crate</span>::BASE;
+<span class="kw">use crate</span>::{error::CuidError, BASE};
 
-<span class="kw">static </span>FINGERPRINT_PADDING: usize = <span class="number">2</span>;
+<span class="kw">const </span>BIG_LENGTH: u8 = <span class="number">4</span>;
 
-<span class="kw">fn </span>pid() -&gt; <span class="prelude-ty">Result</span>&lt;String, CuidError&gt; {
-    to_base_string(process::id())
-        .map(|s| pad(FINGERPRINT_PADDING, s))
-        .map_err(|<span class="kw">_</span>| CuidError::FingerprintError(<span class="string">&quot;Could not encode pid&quot;</span>))
+<span class="comment">// =============================================================================
+// THREAD LOCALS
+// =============================================================================
+// Each thread generating CUIDs gets its own:
+// - 64-bit counter, randomly initialized to some value between 0 and 2056, inclusive
+// - fingerprint, a hash with added entropy, derived from a random number between
+//   2063 and 4125, inclusive, the process ID, and the thread ID
+
+</span><span class="macro">thread_local! </span>{
+    <span class="doccomment">/// Fingerprint! The original implementation is a hash of:
+    /// - stringified keys of the global object
+    /// - added entropy
+    ///
+    /// For us, we&#39;ll use
+    /// - A few random numbers
+    /// - the process ID
+    /// - the thread ID (which also ensures our CUIDs will be different per thread)
+    ///
+    /// This is pretty non-language, non-system dependent, so it allows us to
+    /// compile to wasm and so on.
+    </span><span class="kw">static </span>FINGERPRINT: String = hash(
+        [
+            thread_rng().gen::&lt;u128&gt;().to_be_bytes(),
+            thread_rng().gen::&lt;u128&gt;().to_be_bytes(),
+            u128::from(std::process::id()).to_be_bytes(),
+            u128::from(get_thread_id()).to_be_bytes(),
+        ],
+        BIG_LENGTH.into(),
+    );
 }
 
-<span class="doccomment">/// Convert the hostname to a padded String in the appropriate base.
-///
-/// First converts the hostname to a number comprising the length of the
-/// hostname, added to the base radix for CUID strings, added to the sum of
-/// the integer value of each character in the hostname, then converts that
-/// number to base radix.
-</span><span class="kw">fn </span>convert_hostname(hn: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Result</span>&lt;String, CuidError&gt; {
-    to_base_string(
-        hn.chars()
-            .fold(hn.len() + BASE <span class="kw">as </span>usize, |acc, c| acc + c <span class="kw">as </span>usize) <span class="kw">as </span>u64,
-    )
-    .map(|base_str| pad(FINGERPRINT_PADDING, base_str))
+<span class="doccomment">/// Retrieves the current thread&#39;s ID.
+</span><span class="kw">fn </span>get_thread_id() -&gt; u64 {
+    <span class="comment">// ThreadId doesn&#39;t implement debug or display, but it does implement Hash,
+    // so we can get the hash value to use in our fingerprint.
+    </span><span class="kw">let </span><span class="kw-2">mut </span>hasher = DefaultHasher::new();
+    std::thread::current().id().hash(<span class="kw-2">&amp;mut </span>hasher);
+    hasher.finish()
 }
 
-<span class="kw">fn </span>host_id() -&gt; <span class="prelude-ty">Result</span>&lt;String, CuidError&gt; {
-    <span class="kw">let </span>hn = hostname::get()<span class="question-mark">?</span>;
-    convert_hostname(<span class="kw-2">&amp;</span>hn.to_string_lossy())
+<span class="doccomment">/// Retrieves the thread-local fingerprint.
+</span><span class="kw">fn </span>get_fingerprint() -&gt; String {
+    FINGERPRINT.with(|x| x.clone())
+}
+
+<span class="comment">// Hashing
+// =======
+
+</span><span class="doccomment">/// Hash a value, including an additional salt of randomly generated data.
+</span><span class="comment">//
+// Updated 2023-08-08 to match the updated JS implementation, which is:
+//
+// ```js
+// const hash = (input = &quot;&quot;) =&gt; {
+//   // Drop the first character because it will bias the histogram
+//   // to the left.
+//   return bufToBigInt(sha3(input)).toString(36).slice(1);
+// };
+// ```
+//
+// We don&#39;t drop the first character, because it doesn&#39;t actually affect the
+// histogram (the comment in the reference implementation is incorrect).
+</span><span class="kw">fn </span>hash&lt;S: AsRef&lt;[u8]&gt;, T: IntoIterator&lt;Item = S&gt;&gt;(input: T, length: u16) -&gt; String {
+    <span class="kw">let </span><span class="kw-2">mut </span>hasher = Sha3_512::new();
+
+    <span class="kw">for </span>block <span class="kw">in </span>input {
+        hasher.update(block.as_ref());
+    }
+
+    <span class="comment">// 512 bits (64 bytes) of data ([u8; 64])
+    </span><span class="kw">let </span>hash = hasher.finalize();
+
+    <span class="comment">// We&#39;ll convert the bytes directly to a big, unsigned int and then use
+    // its builtin radix conversion.
+    //
+    // We don&#39;t use bigint for the rest of our base conversions, because it&#39;s
+    // significantly slower, but we use it here since we need to deal with the
+    // 512-bit integer from the hash function.
+    </span><span class="kw">let </span><span class="kw-2">mut </span>res = bigint::BigUint::from_bytes_be(<span class="kw-2">&amp;</span>hash).to_str_radix(BASE.into());
+
+    <span class="comment">// Note that truncate panics if the length does not fall on a char boundary,
+    // but we don&#39;t need to worry about that since all the chars will be ASCII.
+    </span>res.truncate(length.into());
+
+    res
 }
 
 <span class="kw">pub fn </span>fingerprint() -&gt; <span class="prelude-ty">Result</span>&lt;String, CuidError&gt; {
-    <span class="kw">let </span><span class="kw-2">mut </span>hid = host_id()<span class="question-mark">?</span>;
-    <span class="kw">let </span>procid = pid()<span class="question-mark">?</span>;
-    hid.push_str(<span class="kw-2">&amp;</span>procid);
-    <span class="prelude-val">Ok</span>(hid)
+    <span class="kw">let </span>fingerprint = get_fingerprint();
+    <span class="prelude-val">Ok</span>(fingerprint)
 }
 
 <span class="attr">#[cfg(test)]
-</span><span class="kw">mod </span>fingerprint_tests {
-
+</span><span class="kw">mod </span>tests {
     <span class="kw">use super</span>::<span class="kw-2">*</span>;
 
     <span class="attr">#[test]
-    </span><span class="kw">fn </span>test_pid_length() {
-        <span class="macro">assert_eq!</span>(pid().unwrap().len(), FINGERPRINT_PADDING)
-    }
-
-    <span class="comment">// The below expected host_ids were all generated directly using
-    // the original javascript implementation.
-
-    </span><span class="attr">#[test]
-    </span><span class="kw">fn </span>test_convert_hostname_1() {
-        <span class="macro">assert_eq!</span>(<span class="string">&quot;a3&quot;</span>, <span class="kw-2">&amp;*</span>convert_hostname(<span class="string">&quot;foo&quot;</span>).unwrap())
-    }
-
-    <span class="attr">#[test]
-    </span><span class="kw">fn </span>test_convert_hostname_2() {
-        <span class="macro">assert_eq!</span>(<span class="string">&quot;9o&quot;</span>, <span class="kw-2">&amp;*</span>convert_hostname(<span class="string">&quot;bar&quot;</span>).unwrap())
-    }
-
-    <span class="attr">#[test]
-    </span><span class="kw">fn </span>test_convert_hostname_3() {
-        <span class="macro">assert_eq!</span>(<span class="string">&quot;nf&quot;</span>, <span class="kw-2">&amp;*</span>convert_hostname(<span class="string">&quot;mr-magoo&quot;</span>).unwrap())
-    }
-
-    <span class="attr">#[test]
-    </span><span class="kw">fn </span>test_convert_hostname_4() {
-        <span class="macro">assert_eq!</span>(
-            <span class="string">&quot;j9&quot;</span>,
-            <span class="kw-2">&amp;*</span>convert_hostname(<span class="string">&quot;wow-what-a-long-hostname-you-have&quot;</span>).unwrap()
-        )
-    }
-
-    <span class="attr">#[test]
-    </span><span class="kw">fn </span>fingerprint_len() {
-        <span class="macro">assert_eq!</span>(<span class="number">4</span>, fingerprint().unwrap().len())
+    </span><span class="kw">fn </span>test_fingerprint_length() {
+        <span class="macro">assert_eq!</span>(fingerprint().unwrap().len(), BIG_LENGTH <span class="kw">as </span>usize)
     }
 }
 
@@ -201,27 +244,6 @@
 </span><span class="kw">mod </span>benchmarks {
     <span class="kw">use super</span>::<span class="kw-2">*</span>;
     <span class="kw">use </span>test::Bencher;
-
-    <span class="attr">#[bench]
-    </span><span class="kw">fn </span>bench_pid(b: <span class="kw-2">&amp;mut </span>Bencher) {
-        b.iter(|| {
-            pid().unwrap();
-        })
-    }
-
-    <span class="attr">#[bench]
-    </span><span class="kw">fn </span>bench_convert_hostname_real(b: <span class="kw-2">&amp;mut </span>Bencher) {
-        b.iter(|| {
-            convert_hostname(get_hostname).unwrap();
-        })
-    }
-
-    <span class="attr">#[bench]
-    </span><span class="kw">fn </span>bench_convert_hostname_mock(b: <span class="kw-2">&amp;mut </span>Bencher) {
-        b.iter(|| {
-            convert_hostname(|| <span class="prelude-val">Some</span>(String::from(<span class="string">&quot;hostname&quot;</span>))).unwrap();
-        })
-    }
 
     <span class="attr">#[bench]
     </span><span class="kw">fn </span>bench_fingerprint(b: <span class="kw-2">&amp;mut </span>Bencher) {
