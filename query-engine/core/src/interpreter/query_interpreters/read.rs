@@ -91,7 +91,8 @@ fn read_many(
     query: ManyRecordsQuery,
     trace_id: Option<String>,
 ) -> BoxFuture<'_, InterpretationResult<QueryResult>> {
-    let use_joins = true;
+    // use joins if we're not using cursors
+    let use_joins = query.args.cursor.is_none() && !query.nested.iter().any(|q| q.has_cursor());
 
     if use_joins {
         read_many_by_joins(tx, query, trace_id)
@@ -169,6 +170,8 @@ fn read_many_by_joins(
                 trace_id,
             )
             .await?;
+
+        // dbg!(&records);
 
         if records.records.is_empty() && query.options.contains(QueryOption::ThrowOnEmpty) {
             record_not_found()

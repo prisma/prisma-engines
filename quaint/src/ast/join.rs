@@ -18,7 +18,7 @@ impl<'a> JoinData<'a> {
         }
     }
 
-    pub fn as_lateral(mut self) -> Self {
+    pub fn lateral(mut self) -> Self {
         self.lateral = true;
         self
     }

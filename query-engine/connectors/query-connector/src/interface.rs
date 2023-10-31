@@ -217,6 +217,7 @@ impl RelAggregationSelection {
     }
 }
 
+// TODO: rename this
 #[derive(Debug, Clone)]
 pub struct RelatedQuery {
     pub name: String,
