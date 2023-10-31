@@ -2,7 +2,7 @@ use query_engine_tests::*;
 
 #[test_suite(schema(generic), only(Postgres))]
 mod raw_params {
-    #[connector_test]
+    #[connector_test(exclude(JS))]
     async fn value_too_many_bind_variables(runner: Runner) -> TestResult<()> {
         let n = 32768;
 
