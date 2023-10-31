@@ -397,7 +397,7 @@ impl<'a> Select<'a> {
     {
         let join_data: JoinData = join.into();
 
-        self.left_join(join_data.as_lateral())
+        self.left_join(join_data.lateral())
     }
 
     /// Adds `RIGHT JOIN` clause to the query.

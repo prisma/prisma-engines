@@ -15,7 +15,7 @@ pub(crate) fn coerce_record_with_join(record: &mut Record, rq_indexes: Vec<(usiz
 // TODO: find better name
 pub(crate) fn coerce_json_relation_to_pv(value: serde_json::Value, q: &RelatedQuery) -> PrismaValue {
     match value {
-        // to-many
+        // one-to-many
         serde_json::Value::Array(values) if q.parent_field.is_list() => PrismaValue::List(
             values
                 .into_iter()

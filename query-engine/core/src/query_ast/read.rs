@@ -63,6 +63,15 @@ impl ReadQuery {
             None
         }
     }
+
+    pub(crate) fn has_cursor(&self) -> bool {
+        match self {
+            ReadQuery::RecordQuery(_) => false,
+            ReadQuery::ManyRecordsQuery(q) => q.args.cursor.is_some() || q.nested.iter().any(|q| q.has_cursor()),
+            ReadQuery::RelatedRecordsQuery(q) => q.args.cursor.is_some() || q.nested.iter().any(|q| q.has_cursor()),
+            ReadQuery::AggregateRecordsQuery(_) => false,
+        }
+    }
 }
 
 impl FilteredQuery for ReadQuery {

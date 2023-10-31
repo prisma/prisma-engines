@@ -18,8 +18,16 @@ pub(crate) struct OrderByDefinition {
 
 #[derive(Debug, Default)]
 pub(crate) struct OrderByBuilder {
+    parent_alias: Option<String>,
     // Used to generate unique join alias
     join_counter: usize,
+}
+
+impl OrderByBuilder {
+    pub(crate) fn with_parent_alias(mut self, alias: Option<String>) -> Self {
+        self.parent_alias = alias;
+        self
+    }
 }
 
 impl OrderByBuilder {
@@ -27,7 +35,6 @@ impl OrderByBuilder {
     pub(crate) fn build(&mut self, query_arguments: &QueryArguments, ctx: &Context<'_>) -> Vec<OrderByDefinition> {
         let needs_reversed_order = query_arguments.needs_reversed_order();
 
-        // The index is used to differentiate potentially separate relations to the same model.
         query_arguments
             .order_by
             .iter()
@@ -201,7 +208,7 @@ impl OrderByBuilder {
         let order_by_column = if let Some(last_join) = joins.last() {
             Column::from((last_join.alias.to_owned(), order_by.field.db_name().to_owned()))
         } else {
-            order_by.field.as_column(ctx)
+            order_by.field.as_column(ctx).opt_table(self.parent_alias.clone())
         };
 
         (joins, order_by_column)

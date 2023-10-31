@@ -240,9 +240,9 @@ fn serialize_record_selection_with_relations(
             query_schema,
         ),
         InnerOutputType::Object(obj) => {
-            dbg!(&record_selection);
+            // dbg!(&record_selection);
             let result = serialize_objects_with_relation(record_selection, obj, query_schema)?;
-            dbg!(&result);
+            // dbg!(&result);
 
             process_object(field, is_list, result, name)
         }
