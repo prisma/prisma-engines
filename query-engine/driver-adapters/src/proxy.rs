@@ -182,7 +182,7 @@ pub enum ColumnType {
     BooleanArray = 69,
 
     /// Char array (CHAR_ARRAY in PostgreSQL)
-    CharArray = 70,
+    CharacterArray = 70,
 
     /// Text array (TEXT_ARRAY in PostgreSQL)
     TextArray = 71,
@@ -450,7 +450,7 @@ fn js_value_to_quaint(
         ColumnType::DoubleArray => js_array_to_quaint(ColumnType::Double, json_value, column_name),
         ColumnType::NumericArray => js_array_to_quaint(ColumnType::Numeric, json_value, column_name),
         ColumnType::BooleanArray => js_array_to_quaint(ColumnType::Boolean, json_value, column_name),
-        ColumnType::CharArray => js_array_to_quaint(ColumnType::Character, json_value, column_name),
+        ColumnType::CharacterArray => js_array_to_quaint(ColumnType::Character, json_value, column_name),
         ColumnType::TextArray => js_array_to_quaint(ColumnType::Text, json_value, column_name),
         ColumnType::DateArray => js_array_to_quaint(ColumnType::Date, json_value, column_name),
         ColumnType::TimeArray => js_array_to_quaint(ColumnType::Time, json_value, column_name),
