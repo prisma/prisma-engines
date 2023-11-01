@@ -10,7 +10,7 @@ serde.workspace = true
 serde_json.workspace = true
 schema = { path = "../schema" }
 indexmap = { version = "1.7", features = ["serde-1"] }
-prisma-models = { path = "../prisma-models" }
+prisma-models = { path = "../prisma-models", features = ["default_generators"] }
 
 [dev-dependencies]
 expect-test = "1.2.2"
