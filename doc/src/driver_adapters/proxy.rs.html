@@ -971,8 +971,6 @@
 <a href="#971" id="971">971</a>
 <a href="#972" id="972">972</a>
 <a href="#973" id="973">973</a>
-<a href="#974" id="974">974</a>
-<a href="#975" id="975">975</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::borrow::Cow;
 <span class="kw">use </span>std::str::FromStr;
 
@@ -1092,9 +1090,7 @@
     /// - BOOLEAN (BOOLEAN) -&gt; e.g. `1`
     </span>Boolean = <span class="number">5</span>,
 
-    <span class="doccomment">/// The following PlanetScale type IDs are mapped into Char:
-    /// - CHAR (CHAR) -&gt; e.g. `&quot;c&quot;` (String-encoded)
-    </span>Char = <span class="number">6</span>,
+    Character = <span class="number">6</span>,
 
     <span class="doccomment">/// The following PlanetScale type IDs are mapped into Text:
     /// - TEXT (TEXT) -&gt; e.g. `&quot;foo&quot;` (String-encoded)
@@ -1159,7 +1155,7 @@
     </span>BooleanArray = <span class="number">69</span>,
 
     <span class="doccomment">/// Char array (CHAR_ARRAY in PostgreSQL)
-    </span>CharArray = <span class="number">70</span>,
+    </span>CharacterArray = <span class="number">70</span>,
 
     <span class="doccomment">/// Text array (TEXT_ARRAY in PostgreSQL)
     </span>TextArray = <span class="number">71</span>,
@@ -1321,7 +1317,7 @@
                 <span class="string">&quot;expected a boolean in column &#39;{column_name}&#39;, found {mismatch}&quot;
             </span>)),
         },
-        ColumnType::Char =&gt; <span class="kw">match </span>json_value {
+        ColumnType::Character =&gt; <span class="kw">match </span>json_value {
             serde_json::Value::String(s) =&gt; <span class="kw">match </span>s.chars().next() {
                 <span class="prelude-val">Some</span>(c) =&gt; <span class="prelude-val">Ok</span>(QuaintValue::character(c)),
                 <span class="prelude-val">None </span>=&gt; <span class="prelude-val">Ok</span>(QuaintValue::null_character()),
@@ -1427,7 +1423,7 @@
         ColumnType::DoubleArray =&gt; js_array_to_quaint(ColumnType::Double, json_value, column_name),
         ColumnType::NumericArray =&gt; js_array_to_quaint(ColumnType::Numeric, json_value, column_name),
         ColumnType::BooleanArray =&gt; js_array_to_quaint(ColumnType::Boolean, json_value, column_name),
-        ColumnType::CharArray =&gt; js_array_to_quaint(ColumnType::Char, json_value, column_name),
+        ColumnType::CharacterArray =&gt; js_array_to_quaint(ColumnType::Character, json_value, column_name),
         ColumnType::TextArray =&gt; js_array_to_quaint(ColumnType::Text, json_value, column_name),
         ColumnType::DateArray =&gt; js_array_to_quaint(ColumnType::Date, json_value, column_name),
         ColumnType::TimeArray =&gt; js_array_to_quaint(ColumnType::Time, json_value, column_name),
@@ -1765,7 +1761,7 @@
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>js_value_char_to_quaint() {
-        <span class="kw">let </span>column_type = ColumnType::Char;
+        <span class="kw">let </span>column_type = ColumnType::Character;
 
         <span class="comment">// null
         </span>test_null(QuaintValue::null_character(), column_type);
