@@ -27,6 +27,7 @@
     systems.url = "github:nix-systems/default";
   };
 
+
   outputs = inputs@{ self, nixpkgs, rust-overlay, flake-parts, crane, systems, ... }:
     flake-parts.lib.mkFlake { inherit inputs; } {
       systems = import systems;
