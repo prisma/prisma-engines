@@ -392,7 +392,6 @@ pub(crate) fn composite_type_in_compound_index(index: IndexWalker<'_>, ctx: &mut
         .find(|f| f.scalar_field_type().as_composite_type().is_some());
 
     if index.fields().len() > 1 && composite_type.is_some() {
-        
         let message = format!(
             "Prisma does not currently support composite types in compound indices. Please remove {:?} from the index.",
             composite_type.unwrap().name()
@@ -402,7 +401,6 @@ pub(crate) fn composite_type_in_compound_index(index: IndexWalker<'_>, ctx: &mut
             index.attribute_name(),
             index.ast_attribute().span,
         ));
-        return;
     }
 }
 
