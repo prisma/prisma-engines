@@ -191,9 +191,7 @@ fn test_sqlite_url(api: TestApi) {
     let output = api.run(&["--datasource", &url, "can-connect-to-database"]);
     assert!(!output.status.success());
     let message = String::from_utf8(output.stderr).unwrap();
-    assert!(message.contains(
-        "The provided database string is invalid. The scheme is not recognized in database URL."
-    ));
+    assert!(message.contains("The provided database string is invalid. The scheme is not recognized in database URL."));
 }
 
 #[test_connector(tags(Sqlite))]
