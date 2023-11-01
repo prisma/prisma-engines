@@ -17,13 +17,13 @@ jobs:
         features:
           - "--lib --features=all"
           - "--lib --no-default-features --features=sqlite"
-          - "--lib --no-default-features --features=sqlite --features=uuid --features=pooled"
+          - "--lib --no-default-features --features=sqlite --features=pooled"
           - "--lib --no-default-features --features=postgresql"
-          - "--lib --no-default-features --features=postgresql --features=uuid --features=pooled"
+          - "--lib --no-default-features --features=postgresql --features=pooled"
           - "--lib --no-default-features --features=mysql"
-          - "--lib --no-default-features --features=mysql --features=uuid --features=pooled"
+          - "--lib --no-default-features --features=mysql --features=pooled"
           - "--lib --no-default-features --features=mssql"
-          - "--lib --no-default-features --features=mssql --features=uuid --features=pooled"          
+          - "--lib --no-default-features --features=mssql --features=pooled"          
     env:
       TEST_MYSQL: "mysql://root:prisma@localhost:3306/prisma"
       TEST_MYSQL8: "mysql://root:prisma@localhost:3307/prisma"

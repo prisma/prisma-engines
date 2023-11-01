@@ -25,6 +25,7 @@ uuid.workspace = true
 opentelemetry = { version = "0.17", features = ["tokio"] }
 tracing-opentelemetry = "0.17.3"
 quaint.workspace = true
+cuid = { git = "https://github.com/prisma/cuid-rust", branch = "wasm32-support" }
 
 [dependencies.connector-interface]
 package = "query-connector"
@@ -43,9 +44,6 @@ version = "0.4"
 [dependencies.serde]
 features = ["derive"]
 version = "1.0"
-
-[dependencies.cuid]
-version = "1.2"
 
 [dependencies.user-facing-errors]
 features = ["sql"]
