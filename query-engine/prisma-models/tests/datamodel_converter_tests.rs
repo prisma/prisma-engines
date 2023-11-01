@@ -38,8 +38,9 @@ fn converting_enums() {
     }
 }
 
+// region: composite
 #[test]
-fn converting_composite_types() {
+fn converting_composite_types_compound() {
     let res = psl::parse_schema(
         r#"
         datasource db {
@@ -55,8 +56,7 @@ fn converting_composite_types() {
       
             @@unique([authorId, attributes])
             //       ^^^^^^^^^^^^^^^^^^^^^^
-            // Indexes only support composite types when not used in
-            // conjunction with other fields
+            // Prisma does not currently support composite types in compound indices
         }
 
         type Attribute {
@@ -74,11 +74,11 @@ fn converting_composite_types() {
 
     assert!(res
         .unwrap_err()
-        .contains("Prisma currently does not composite types in indexes when used in conjunction with other fields."));
+        .contains(r#"Prisma does not currently support composite types in compound indices. Please remove "attributes" from the index."#));
 }
 
 #[test]
-fn converting_composite_types_2() {
+fn converting_composite_types_nested() {
     let res = psl::parse_schema(
         r#"
         datasource db { 
@@ -116,6 +116,47 @@ fn converting_composite_types_2() {
 
     assert!(res.is_ok());
 }
+
+#[test]
+fn converting_composite_types_nested_scalar() {
+    let res = psl::parse_schema(
+        r#"
+        datasource db { 
+            provider = "mongodb"
+            url      = "mongodb://localhost:27017/hello"
+          }
+          
+          type TheatersLocation {
+            address TheatersLocationAddress
+            geo     TheatersLocationGeo
+          }
+          
+          type TheatersLocationAddress {
+            city    String
+            state   String
+            street1 String
+            street2 String?
+            zipcode String
+          }
+          
+          type TheatersLocationGeo {
+            coordinates Float[]
+            type        String
+          }
+          
+          model theaters {
+            id        String           @id @default(auto()) @map("_id") @db.ObjectId
+            location  TheatersLocation
+            theaterId Int
+          
+            @@index([location.geo.type], map: "geo index")
+          }
+        "#,
+    );
+
+    assert!(res.is_ok());
+}
+// endregion
 
 #[test]
 fn models_with_only_scalar_fields() {

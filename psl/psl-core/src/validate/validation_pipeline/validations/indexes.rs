@@ -386,14 +386,16 @@ pub(crate) fn opclasses_are_not_allowed_with_other_than_normal_indices(index: In
     }
 }
 
-pub(crate) fn composite_types_non_conjunctive_in_indexes(index: IndexWalker<'_>, ctx: &mut Context<'_>) {
+pub(crate) fn composite_type_in_compound_index(index: IndexWalker<'_>, ctx: &mut Context<'_>) {
     let composite_type = index
         .fields()
         .find(|f| f.scalar_field_type().as_composite_type().is_some());
 
     if index.fields().len() > 1 && composite_type.is_some() {
+        
         let message = format!(
-            "Prisma currently does not composite types in indexes when used in conjunction with other fields.",
+            "Prisma does not currently support composite types in compound indices. Please remove {:?} from the index.",
+            composite_type.unwrap().name()
         );
         ctx.push_error(DatamodelError::new_attribute_validation_error(
             &message,

@@ -90,6 +90,8 @@ impl ScalarField {
         };
 
         match scalar_field_type {
+            // TODO: Fix message -- composite types do work?
+            // ? Is this message not validated anywhere ?
             ScalarFieldType::CompositeType(_) => {
                 unreachable!("Cannot convert a composite type to a type identifier. This error is typically caused by mistakenly using a composite type within a composite index.",)
             }
