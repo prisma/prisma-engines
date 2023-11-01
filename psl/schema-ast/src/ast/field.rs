@@ -65,6 +65,11 @@ impl Field {
     pub fn name(&self) -> &str {
         &self.name.name
     }
+
+    /// column comment
+    pub fn comment(&self) -> Option<&str> {
+        self.documentation.as_ref().map(|doc| doc.text.as_str())
+    }
 }
 
 impl WithIdentifier for Field {

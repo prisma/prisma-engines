@@ -114,4 +114,9 @@ impl<'a> TableColumnWalker<'a> {
     pub fn table(self) -> TableWalker<'a> {
         self.walk(self.get().0)
     }
+
+    /// return column comment
+    pub fn description(self) -> Option<&'a str> {
+        self.coarsen().description()
+    }
 }

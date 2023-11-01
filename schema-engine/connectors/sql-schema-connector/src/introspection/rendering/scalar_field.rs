@@ -60,6 +60,10 @@ pub(crate) fn render(field: ScalarFieldPair<'_>) -> renderer::Field<'_> {
         rendered.commented_out();
     }
 
+    if let Some(desc) = field.description() {
+        rendered.documentation(desc);
+    }
+
     rendered
 }
 

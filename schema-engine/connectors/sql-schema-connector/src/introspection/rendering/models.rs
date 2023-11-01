@@ -98,9 +98,12 @@ fn render_model(model: ModelPair<'_>, sql_family: SqlFamily) -> renderer::Model<
         rendered.documentation(docs);
     }
 
-    if model.adds_a_description() {
-        let docs = "This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments";
-        rendered.documentation(docs);
+    // if model.adds_a_description() {
+    //     let docs = "This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments";
+    //     rendered.documentation(docs);
+    // }
+    if model.description().is_some() {
+        rendered.documentation(model.description().unwrap());
     }
 
     if model.adds_a_row_level_ttl() {

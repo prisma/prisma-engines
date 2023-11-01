@@ -57,10 +57,11 @@ fn push_model_tables(ctx: &mut Context<'_>) {
             .and_then(|(name, _)| ctx.schemas.get(name))
             .copied()
             .unwrap_or_default();
-        let table_id = ctx
-            .schema
-            .describer_schema
-            .push_table(model.database_name().to_owned(), namespace_id, None);
+        let table_id = ctx.schema.describer_schema.push_table(
+            model.database_name().to_owned(),
+            namespace_id,
+            model.ast_model().comment(),
+        );
         ctx.model_id_to_table_id.insert(model.model_id(), table_id);
 
         for field in model.scalar_fields() {
@@ -524,7 +525,7 @@ fn push_column_for_builtin_scalar_type(
             native_type: Some(native_type),
         },
         auto_increment: field.is_autoincrement() || ctx.flavour.field_is_implicit_autoincrement_primary_key(field),
-        description: None,
+        description: field.ast_field().comment().map(|s| s.to_string()),
     };
 
     let column_id = ctx.schema.describer_schema.push_table_column(table_id, column);

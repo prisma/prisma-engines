@@ -32,12 +32,15 @@ impl MysqlFlavour {
             })
             .map(|default| render_default(col, default.inner()));
 
+        let comment = col.description().map(Cow::Borrowed);
+
         ddl::Column {
             column_name: col.name().into(),
             not_null: col.arity().is_required(),
             column_type: render_column_type(col),
             default,
             auto_increment: col.is_autoincrement(),
+            comment,
             ..Default::default()
         }
     }
@@ -222,6 +225,8 @@ impl SqlRenderer for MysqlFlavour {
     }
 
     fn render_create_table_as(&self, table: TableWalker<'_>, table_name: QuotedWithPrefix<&str>) -> String {
+        let comment = table.description().map(Cow::Borrowed);
+
         ddl::CreateTable {
             table_name: &table_name,
             columns: table.columns().map(|col| self.render_column(col)).collect(),
@@ -266,6 +271,7 @@ impl SqlRenderer for MysqlFlavour {
                 .collect(),
             default_character_set: Some("utf8mb4".into()),
             collate: Some("utf8mb4_unicode_ci".into()),
+            comment,
         }
         .to_string()
     }

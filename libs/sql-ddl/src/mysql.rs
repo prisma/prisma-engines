@@ -143,6 +143,8 @@ pub struct Column<'a> {
     pub auto_increment: bool,
     pub primary_key: bool,
     pub references: Option<ForeignKey<'a>>,
+    // 评论
+    pub comment: Option<Cow<'a, str>>,
 }
 
 impl Display for Column<'_> {
@@ -173,6 +175,12 @@ impl Display for Column<'_> {
         if let Some(references) = &self.references {
             f.write_str(" ")?;
             Display::fmt(references, f)?;
+        }
+
+        if let Some(comment) = &self.comment {
+            f.write_str(" COMMENT '")?;
+            Display::fmt(comment, f)?;
+            f.write_str("'")?;
         }
 
         Ok(())
@@ -232,6 +240,7 @@ pub struct CreateTable<'a> {
     pub primary_key: Vec<IndexColumn<'a>>,
     pub default_character_set: Option<Cow<'a, str>>,
     pub collate: Option<Cow<'a, str>>,
+    pub comment: Option<Cow<'a, str>>,
 }
 
 impl Display for CreateTable<'_> {
@@ -285,6 +294,12 @@ impl Display for CreateTable<'_> {
         if let Some(collate) = &self.collate {
             f.write_str(" COLLATE ")?;
             f.write_str(collate.as_ref())?;
+        }
+
+        if let Some(comment) = &self.comment {
+            f.write_str(" COMMENT='")?;
+            f.write_str(comment.as_ref())?;
+            f.write_str("'")?;
         }
 
         Ok(())
@@ -409,6 +424,7 @@ mod tests {
                     auto_increment: true,
                     primary_key: true,
                     references: None,
+                    comment: Some(Cow::from("this is comment")),
                 },
                 Column {
                     column_type: "BINARY(16)".into(),
@@ -418,20 +434,22 @@ mod tests {
                     auto_increment: false,
                     primary_key: false,
                     references: None,
+                    comment: Some(Cow::from("this is comment")),
                 },
             ],
             indexes: vec![],
             default_character_set: Some("utf8mb4".into()),
             collate: Some("utf8mb4_unicode_ci".into()),
             primary_key: Vec::new(),
+            comment: Some(Cow::from("this is comment")),
         };
 
         let expected = indoc!(
             r#"
             CREATE TABLE `Cat` (
-                `id` INTEGER NULL AUTO_INCREMENT PRIMARY KEY,
-                `test` BINARY(16) NOT NULL DEFAULT (uuid_to_bin(uuid()))
-            ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci
+                `id` INTEGER NULL AUTO_INCREMENT PRIMARY KEY COMMENT 'this is comment',
+                `test` BINARY(16) NOT NULL DEFAULT (uuid_to_bin(uuid())) COMMENT 'this is comment'
+            ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci COMMENT='this is comment'
             "#,
         )
         .trim_end();

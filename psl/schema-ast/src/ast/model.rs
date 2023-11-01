@@ -89,6 +89,11 @@ impl Model {
     pub fn is_view(&self) -> bool {
         self.is_view
     }
+
+    /// use documentation as table commnet
+    pub fn comment(&self) -> Option<String> {
+        self.documentation.as_ref().map(|doc| doc.text.to_string())
+    }
 }
 
 impl WithIdentifier for Model {

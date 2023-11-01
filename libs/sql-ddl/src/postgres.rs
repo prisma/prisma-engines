@@ -72,6 +72,8 @@ pub struct Column<'a> {
     pub name: Cow<'a, str>,
     pub r#type: Cow<'a, str>,
     pub default: Option<Cow<'a, str>>,
+    // 评论
+    pub comment: Option<Cow<'a, str>>,
 }
 
 impl Display for Column<'_> {
@@ -84,6 +86,8 @@ impl Display for Column<'_> {
             f.write_str(" DEFAULT ")?;
             f.write_str(default)?;
         }
+
+        // TODO pg 如何增加 comment
 
         Ok(())
     }
