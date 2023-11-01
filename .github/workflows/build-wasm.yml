@@ -5,15 +5,17 @@ on:
       - main
   pull_request:
     paths-ignore:
-      - ".buildkite/**"
-      - "*.md"
-      - "LICENSE"
-      - "CODEOWNERS"
-      - "renovate.json"
+      - '.github/**'
+      - '!.github/workflows/build-wasm.yml'
+      - '.buildkite/**'
+      - '*.md'
+      - 'LICENSE'
+      - 'CODEOWNERS'
+      - 'renovate.json'
 
 jobs:
   build:
-    name: "prisma-schema-wasm build ${{ github.event.ref }} for commit ${{ github.event.inputs.commit }}"
+    name: 'prisma-schema-wasm build ${{ github.event.ref }} for commit ${{ github.event.inputs.commit }}'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4

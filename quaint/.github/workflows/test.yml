@@ -46,13 +46,13 @@ jobs:
         features:
           - "--lib --features=all"
           - "--lib --no-default-features --features=sqlite"
-          - "--lib --no-default-features --features=sqlite --features=chrono --features=json --features=uuid --features=pooled --features=serde-support --features=bigdecimal"
+          - "--lib --no-default-features --features=sqlite --features=pooled"
           - "--lib --no-default-features --features=postgresql"
-          - "--lib --no-default-features --features=postgresql --features=chrono --features=json --features=uuid --features=pooled --features=serde-support --features=bigdecimal"
+          - "--lib --no-default-features --features=postgresql --features=pooled"
           - "--lib --no-default-features --features=mysql"
-          - "--lib --no-default-features --features=mysql --features=chrono --features=json --features=uuid --features=pooled --features=serde-support --features=bigdecimal"
+          - "--lib --no-default-features --features=mysql --features=pooled"
           - "--lib --no-default-features --features=mssql"
-          - "--lib --no-default-features --features=mssql --features=chrono --features=json --features=uuid --features=pooled --features=serde-support --features=bigdecimal"
+          - "--lib --no-default-features --features=mssql --features=pooled"
           - "--doc --features=all"
     env:
       TEST_MYSQL: "mysql://root:prisma@localhost:3306/prisma"

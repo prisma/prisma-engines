@@ -1,9 +1,8 @@
 use crate::{
-    ast::Value,
+    ast::{Value, ValueType},
     connector::{queryable::TakeRow, TypeIdentifier},
     error::{Error, ErrorKind},
 };
-#[cfg(feature = "chrono")]
 use chrono::{DateTime, Datelike, NaiveDate, NaiveDateTime, NaiveTime, Timelike, Utc};
 use mysql_async::{
     self as my,
@@ -20,18 +19,18 @@ pub fn conv_params(params: &[Value<'_>]) -> crate::Result<my::Params> {
         let mut values = Vec::with_capacity(params.len());
 
         for pv in params {
-            let res = match pv {
-                Value::Int32(i) => i.map(|i| my::Value::Int(i as i64)),
-                Value::Int64(i) => i.map(my::Value::Int),
-                Value::Float(f) => f.map(my::Value::Float),
-                Value::Double(f) => f.map(my::Value::Double),
-                Value::Text(s) => s.clone().map(|s| my::Value::Bytes((*s).as_bytes().to_vec())),
-                Value::Bytes(bytes) => bytes.clone().map(|bytes| my::Value::Bytes(bytes.into_owned())),
-                Value::Enum(s) => s.clone().map(|s| my::Value::Bytes((*s).as_bytes().to_vec())),
-                Value::Boolean(b) => b.map(|b| my::Value::Int(b as i64)),
-                Value::Char(c) => c.map(|c| my::Value::Bytes(vec![c as u8])),
-                Value::Xml(s) => s.as_ref().map(|s| my::Value::Bytes((s).as_bytes().to_vec())),
-                Value::Array(_) => {
+            let res = match &pv.typed {
+                ValueType::Int32(i) => i.map(|i| my::Value::Int(i as i64)),
+                ValueType::Int64(i) => i.map(my::Value::Int),
+                ValueType::Float(f) => f.map(my::Value::Float),
+                ValueType::Double(f) => f.map(my::Value::Double),
+                ValueType::Text(s) => s.clone().map(|s| my::Value::Bytes((*s).as_bytes().to_vec())),
+                ValueType::Bytes(bytes) => bytes.clone().map(|bytes| my::Value::Bytes(bytes.into_owned())),
+                ValueType::Enum(s, _) => s.clone().map(|s| my::Value::Bytes((*s).as_bytes().to_vec())),
+                ValueType::Boolean(b) => b.map(|b| my::Value::Int(b as i64)),
+                ValueType::Char(c) => c.map(|c| my::Value::Bytes(vec![c as u8])),
+                ValueType::Xml(s) => s.as_ref().map(|s| my::Value::Bytes((s).as_bytes().to_vec())),
+                ValueType::Array(_) | ValueType::EnumArray(_, _) => {
                     let msg = "Arrays are not supported in MySQL.";
                     let kind = ErrorKind::conversion(msg);
 
@@ -40,10 +39,9 @@ pub fn conv_params(params: &[Value<'_>]) -> crate::Result<my::Params> {
 
                     return Err(builder.build());
                 }
-                #[cfg(feature = "bigdecimal")]
-                Value::Numeric(f) => f.as_ref().map(|f| my::Value::Bytes(f.to_string().as_bytes().to_vec())),
-                #[cfg(feature = "json")]
-                Value::Json(s) => match s {
+
+                ValueType::Numeric(f) => f.as_ref().map(|f| my::Value::Bytes(f.to_string().as_bytes().to_vec())),
+                ValueType::Json(s) => match s {
                     Some(ref s) => {
                         let json = serde_json::to_string(s)?;
                         let bytes = json.into_bytes();
@@ -52,18 +50,14 @@ pub fn conv_params(params: &[Value<'_>]) -> crate::Result<my::Params> {
                     }
                     None => None,
                 },
-                #[cfg(feature = "uuid")]
-                Value::Uuid(u) => u.map(|u| my::Value::Bytes(u.hyphenated().to_string().into_bytes())),
-                #[cfg(feature = "chrono")]
-                Value::Date(d) => {
+                ValueType::Uuid(u) => u.map(|u| my::Value::Bytes(u.hyphenated().to_string().into_bytes())),
+                ValueType::Date(d) => {
                     d.map(|d| my::Value::Date(d.year() as u16, d.month() as u8, d.day() as u8, 0, 0, 0, 0))
                 }
-                #[cfg(feature = "chrono")]
-                Value::Time(t) => {
+                ValueType::Time(t) => {
                     t.map(|t| my::Value::Time(false, 0, t.hour() as u8, t.minute() as u8, t.second() as u8, 0))
                 }
-                #[cfg(feature = "chrono")]
-                Value::DateTime(dt) => dt.map(|dt| {
+                ValueType::DateTime(dt) => dt.map(|dt| {
                     my::Value::Date(
                         dt.year() as u16,
                         dt.month() as u8,
@@ -227,7 +221,6 @@ impl TakeRow for my::Row {
 
             let res = match value {
                 // JSON is returned as bytes.
-                #[cfg(feature = "json")]
                 my::Value::Bytes(b) if column.is_json() => {
                     serde_json::from_slice(&b).map(Value::json).map_err(|_| {
                         let msg = "Unable to convert bytes to JSON";
@@ -241,7 +234,6 @@ impl TakeRow for my::Row {
                     Value::enum_variant(s)
                 }
                 // NEWDECIMAL returned as bytes. See https://mariadb.com/kb/en/resultset-row/#decimal-binary-encoding
-                #[cfg(feature = "bigdecimal")]
                 my::Value::Bytes(b) if column.is_real() => {
                     let s = String::from_utf8(b).map_err(|_| {
                         let msg = "Could not convert NEWDECIMAL from bytes to String.";
@@ -276,7 +268,6 @@ impl TakeRow for my::Row {
                 })?),
                 my::Value::Float(f) => Value::from(f),
                 my::Value::Double(f) => Value::from(f),
-                #[cfg(feature = "chrono")]
                 my::Value::Date(year, month, day, hour, min, sec, micro) => {
                     if day == 0 || month == 0 {
                         let msg = format!(
@@ -294,7 +285,6 @@ impl TakeRow for my::Row {
 
                     Value::datetime(DateTime::<Utc>::from_utc(dt, Utc))
                 }
-                #[cfg(feature = "chrono")]
                 my::Value::Time(is_neg, days, hours, minutes, seconds, micros) => {
                     if is_neg {
                         let kind = ErrorKind::conversion("Failed to convert a negative time");
@@ -311,25 +301,21 @@ impl TakeRow for my::Row {
                     Value::time(time)
                 }
                 my::Value::NULL => match column {
-                    t if t.is_bool() => Value::Boolean(None),
-                    t if t.is_enum() => Value::Enum(None),
-                    t if t.is_null() => Value::Int32(None),
-                    t if t.is_int64() => Value::Int64(None),
-                    t if t.is_int32() => Value::Int32(None),
-                    t if t.is_float() => Value::Float(None),
-                    t if t.is_double() => Value::Double(None),
-                    t if t.is_text() => Value::Text(None),
-                    t if t.is_bytes() => Value::Bytes(None),
-                    #[cfg(feature = "bigdecimal")]
-                    t if t.is_real() => Value::Numeric(None),
-                    #[cfg(feature = "chrono")]
-                    t if t.is_datetime() => Value::DateTime(None),
-                    #[cfg(feature = "chrono")]
-                    t if t.is_time() => Value::Time(None),
-                    #[cfg(feature = "chrono")]
-                    t if t.is_date() => Value::Date(None),
-                    #[cfg(feature = "json")]
-                    t if t.is_json() => Value::Json(None),
+                    t if t.is_bool() => Value::null_boolean(),
+                    t if t.is_enum() => Value::null_enum(),
+                    t if t.is_null() => Value::null_int32(),
+                    t if t.is_int64() => Value::null_int64(),
+                    t if t.is_int32() => Value::null_int32(),
+                    t if t.is_float() => Value::null_float(),
+                    t if t.is_double() => Value::null_double(),
+                    t if t.is_text() => Value::null_text(),
+                    t if t.is_bytes() => Value::null_bytes(),
+
+                    t if t.is_real() => Value::null_numeric(),
+                    t if t.is_datetime() => Value::null_datetime(),
+                    t if t.is_time() => Value::null_time(),
+                    t if t.is_date() => Value::null_date(),
+                    t if t.is_json() => Value::null_json(),
                     typ => {
                         let msg = format!("Value of type {typ:?} is not supported with the current configuration");
 
@@ -337,16 +323,6 @@ impl TakeRow for my::Row {
                         return Err(Error::builder(kind).build());
                     }
                 },
-                #[cfg(not(feature = "chrono"))]
-                typ => {
-                    let msg = format!(
-                        "Value of type {:?} is not supported with the current configuration",
-                        typ
-                    );
-
-                    let kind = ErrorKind::conversion(msg);
-                    Err(Error::builder(kind).build())?
-                }
             };
 
             Ok(res)

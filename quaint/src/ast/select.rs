@@ -453,6 +453,14 @@ impl<'a> Select<'a> {
         self
     }
 
+    pub fn join<J>(mut self, join: J) -> Self
+    where
+        J: Into<Join<'a>>,
+    {
+        self.joins.push(join.into());
+        self
+    }
+
     /// Adds an ordering to the `ORDER BY` section.
     ///
     /// ```rust
@@ -651,7 +659,7 @@ impl<'a> Select<'a> {
 
                 ctes.into_iter().collect()
             })
-            .unwrap_or_else(Vec::new);
+            .unwrap_or_default();
 
         if top_level {
             let clashing_names = self

@@ -1,15 +1,45 @@
 use napi::{bindgen_prelude::FromNapiValue, Env, JsUnknown, NapiValue};
-use quaint::error::Error as QuaintError;
+use quaint::error::{Error as QuaintError, MysqlError, PostgresError, SqliteError};
 use serde::Deserialize;
 
-#[derive(Deserialize, Debug)]
+#[derive(Deserialize)]
+#[serde(remote = "PostgresError")]
+pub struct PostgresErrorDef {
+    code: String,
+    message: String,
+    severity: String,
+    detail: Option<String>,
+    column: Option<String>,
+    hint: Option<String>,
+}
+
+#[derive(Deserialize)]
+#[serde(remote = "MysqlError")]
+pub struct MysqlErrorDef {
+    pub code: u16,
+    pub message: String,
+    pub state: String,
+}
+
+#[derive(Deserialize)]
+#[serde(remote = "SqliteError", rename_all = "camelCase")]
+pub struct SqliteErrorDef {
+    pub extended_code: i32,
+    pub message: Option<String>,
+}
+
+#[derive(Deserialize)]
 #[serde(tag = "kind")]
 /// Wrapper for JS-side errors
-/// See driver-adapters/js/adapter-utils/src/types.ts file for example
 pub(crate) enum DriverAdapterError {
     /// Unexpected JS exception
-    GenericJsError { id: i32 },
-    // in the future, expected errors that map to known user errors with PXXX codes will also go here
+    GenericJs {
+        id: i32,
+    },
+
+    Postgres(#[serde(with = "PostgresErrorDef")] PostgresError),
+    Mysql(#[serde(with = "MysqlErrorDef")] MysqlError),
+    Sqlite(#[serde(with = "SqliteErrorDef")] SqliteError),
 }
 
 impl FromNapiValue for DriverAdapterError {
@@ -23,14 +53,16 @@ impl FromNapiValue for DriverAdapterError {
 impl From<DriverAdapterError> for QuaintError {
     fn from(value: DriverAdapterError) -> Self {
         match value {
-            DriverAdapterError::GenericJsError { id } => QuaintError::external_error(id),
+            DriverAdapterError::GenericJs { id } => QuaintError::external_error(id),
+            DriverAdapterError::Postgres(e) => e.into(),
+            DriverAdapterError::Mysql(e) => e.into(),
+            DriverAdapterError::Sqlite(e) => e.into(),
             // in future, more error types would be added and we'll need to convert them to proper QuaintErrors here
         }
     }
 }
 
 /// Wrapper for JS-side result type
-/// See driver-adapters/js/adapter-utils/src/types.ts file for example
 pub(crate) enum JsResult<T>
 where
     T: FromNapiValue,

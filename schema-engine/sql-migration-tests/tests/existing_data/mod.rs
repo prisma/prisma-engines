@@ -334,7 +334,7 @@ fn changing_a_column_from_optional_to_required_is_unexecutable(api: TestApi) {
     let insert = Insert::multi_into(api.render_table_name("Test"), ["id", "age"])
         .values(("a", 12))
         .values(("b", 22))
-        .values(("c", Value::Int32(None)));
+        .values(("c", ValueType::Int32(None)));
 
     api.query(insert.into());
 
@@ -756,10 +756,9 @@ fn set_default_current_timestamp_on_existing_column_works(api: TestApi) {
 
     api.schema_push_w_datasource(dm1).send().assert_green();
 
-    let insert = Insert::single_into(api.render_table_name("User")).value("id", 5).value(
-        "created_at",
-        Value::DateTime(Some("2020-06-15T14:50:00Z".parse().unwrap())),
-    );
+    let insert = Insert::single_into(api.render_table_name("User"))
+        .value("id", 5)
+        .value("created_at", Value::datetime("2020-06-15T14:50:00Z".parse().unwrap()));
     api.query(insert.into());
 
     let dm2 = r#"

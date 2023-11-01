@@ -101,7 +101,7 @@ fn changing_a_string_array_column_to_scalar_is_fine(api: TestApi) {
         .value("id", "film1")
         .value(
             "mainProtagonist",
-            Value::Array(Some(vec!["giant shark".into(), "jason statham".into()])),
+            Value::array(vec![Value::text("giant shark"), Value::text("jason statham")]),
         )
         .result_raw();
 
@@ -138,7 +138,7 @@ fn changing_an_int_array_column_to_scalar_is_not_possible(api: TestApi) {
 
     api.insert("Film")
         .value("id", "film1")
-        .value("mainProtagonist", Value::Array(Some(vec![7.into(), 11.into()])))
+        .value("mainProtagonist", Value::array(vec![Value::int32(7), Value::int32(11)]))
         .result_raw();
 
     let dm2 = r#"

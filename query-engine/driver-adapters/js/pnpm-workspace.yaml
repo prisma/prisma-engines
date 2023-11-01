@@ -1,6 +1,0 @@
-packages:
-  - './adapter-neon'
-  - './adapter-planetscale'
-  - './adapter-pg'
-  - './driver-adapter-utils'
-  - './smoke-test-js'

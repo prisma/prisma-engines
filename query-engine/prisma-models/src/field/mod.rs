@@ -178,6 +178,11 @@ impl TypeIdentifier {
             TypeIdentifier::Unsupported => "Unsupported".into(),
         }
     }
+
+    /// Returns `true` if the type identifier is [`Enum`].
+    pub fn is_enum(&self) -> bool {
+        matches!(self, Self::Enum(..))
+    }
 }
 
 #[derive(Clone, Debug, PartialEq, Eq, Hash)]

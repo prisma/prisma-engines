@@ -2,6 +2,7 @@ use crate::{
     walkers::{ModelWalker, RelationFieldId, RelationFieldWalker, ScalarFieldWalker},
     ParserDatabase, ReferentialAction,
 };
+use diagnostics::Span;
 use schema_ast::ast;
 
 /// Represents a relation that has fields and references defined in one of the
@@ -63,6 +64,10 @@ impl<'db> CompleteInlineRelationWalker<'db> {
             .on_update
             .map(|(action, _)| action)
             .unwrap_or(Cascade)
+    }
+
+    pub fn on_update_span(self) -> Option<Span> {
+        self.referencing_field().attributes().on_update.map(|(_, span)| span)
     }
 
     /// Prisma allows setting the relation field as optional, even if one of the

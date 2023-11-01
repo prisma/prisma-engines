@@ -48,7 +48,9 @@ pub(crate) fn available_actions(schema: String, params: CodeActionParams) -> Vec
                 validated_schema.db.source(),
                 config,
                 model,
-            )
+            );
+
+            multi_schema::add_schema_to_schemas(&mut actions, &params, validated_schema.db.source(), config, model);
         }
 
         if matches!(datasource, Some(ds) if ds.active_provider == "mongodb") {
@@ -98,6 +100,16 @@ pub(crate) fn available_actions(schema: String, params: CodeActionParams) -> Vec
                     validated_schema.db.source(),
                     complete_relation.referencing_field(),
                 );
+            }
+
+            if validated_schema.relation_mode().uses_foreign_keys() {
+                relation_mode::replace_set_default_mysql(
+                    &mut actions,
+                    &params,
+                    validated_schema.db.source(),
+                    complete_relation,
+                    config,
+                )
             }
         }
     }
@@ -193,6 +205,25 @@ fn span_to_range(schema: &str, span: Span) -> Range {
 fn format_field_attribute(attribute: &str) -> String {
     // ? (soph) rust doesn't recognise \s
     format!(" {attribute}\n")
+}
+
+fn format_block_property(
+    property: &str,
+    value: &str,
+    indentation: IndentationType,
+    newline: NewlineType,
+    has_properties: bool,
+) -> String {
+    let separator = if has_properties { newline.as_ref() } else { "" };
+
+    // * (soph) I don't super like needing to prefix this with ')' but
+    // * it would require further updating how we parse spans
+    // todo: update so that we have a concepts for:
+    // todo: - The entire url span
+    // todo: - The url arg span :: currently, url_span only represents this.
+    let formatted_attribute = format!(r#"){separator}{indentation}{property} = ["{value}"]"#);
+
+    formatted_attribute
 }
 
 fn format_block_attribute(

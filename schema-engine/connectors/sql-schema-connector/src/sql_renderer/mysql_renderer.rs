@@ -366,7 +366,7 @@ fn render_mysql_modify(
         .map(|default| render_default(next_column, default))
         .filter(|expr| !expr.is_empty())
         .map(|expression| format!(" DEFAULT {expression}"))
-        .unwrap_or_else(String::new);
+        .unwrap_or_default();
 
     format!(
         "MODIFY {column_name} {column_type}{nullability}{default}{sequence}",
