@@ -261,11 +261,11 @@ When it's time to merge the sibling PRs, you'll need to merge the prisma/prisma 
 
 ### Testing engines in `prisma/prisma`
 
-You can trigger releases from this repository to npm that can be used for testing the engines in `prisma/prisma` both automatically, or manually:
+You can trigger releases from this repository to npm that can be used for testing the engines in `prisma/prisma` either automatically or manually:
 
 #### Automated integration releases from this repository to npm
 
-(Since July 2022). Any branch name starting with `integration/` will, first, run the full test suite in Buildkite `[Test] Prisma Engines` and, second, if passing, run the publish pipeline (build and upload engines to S3)
+(Since July 2022). Any branch name starting with `integration/` will, first, run the full test suite in Buildkite `[Test] Prisma Engines` and, second, if passing, run the publish pipeline (build and upload engines to S3 & R2)
 
 The journey through the pipeline is the same as a commit on the `main` branch.
 - It will trigger [`prisma/engines-wrapper`](https://github.com/prisma/engines-wrapper) and publish a new [`@prisma/engines-version`](https://www.npmjs.com/package/@prisma/engines-version) npm package but on the `integration` tag.
@@ -293,7 +293,7 @@ rust-analyzer. To avoid this. Open VSCode settings and search for `Check on Save
 ```
 
 
-## Create local branches for fork branches from PRs
+## Community PRs: create a local branch for a branch coming from a fork
 
 To trigger an [Automated integration releases from this repository to npm](#automated-integration-releases-from-this-repository-to-npm) or [Manual integration releases from this repository to npm](#manual-integration-releases-from-this-repository-to-npm) branches of forks need to be pulled into this repository so the Buildkite job is triggered. You can use these GitHub and git CLI commands to achieve that easily:
 
@@ -301,7 +301,7 @@ To trigger an [Automated integration releases from this repository to npm](#auto
 gh pr checkout 4375
 git branch integration/sql-nested-transactions
 git checkout integration/sql-nested-transactions
-git push (something)
+git push --set-upstream origin integration/sql-nested-transactions
 ```
 
 ## Security
