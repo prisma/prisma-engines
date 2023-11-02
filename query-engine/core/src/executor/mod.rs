@@ -72,7 +72,6 @@ pub struct TransactionOptions {
 
     /// An optional pre-defined transaction id. Some value might be provided in case we want to generate
     /// a new id at the beginning of the transaction
-    #[serde(skip)]
     pub new_tx_id: Option<TxId>,
 }
 
