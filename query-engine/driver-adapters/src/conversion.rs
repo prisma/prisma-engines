@@ -76,6 +76,7 @@ pub fn values_to_js_args(values: &[quaint::Value<'_>]) -> serde_json::Result<Vec
                 None => JsonValue::Null.into(),
             },
             quaint::ValueType::Numeric(bd) => match bd {
+                // converting decimal to string to preserve the precision
                 Some(bd) => JSArg::RawString(bd.to_string()),
                 None => JsonValue::Null.into(),
             },
