@@ -74,7 +74,7 @@ fn converting_composite_types_compound() {
 
     assert!(res
         .unwrap_err()
-        .contains(r#"Prisma does not currently support composite types in compound indices. Please remove "attributes" from the index."#));
+        .contains(r#"Prisma does not currently support composite types in compound indices, please remove "attributes" from the index. See https://pris.ly/d/mongodb-composite-compound-indices for more details"#));
 }
 
 #[test]

@@ -393,7 +393,7 @@ pub(crate) fn composite_type_in_compound_index(index: IndexWalker<'_>, ctx: &mut
 
     if index.fields().len() > 1 && composite_type.is_some() {
         let message = format!(
-            "Prisma does not currently support composite types in compound indices. Please remove {:?} from the index.",
+            "Prisma does not currently support composite types in compound indices, please remove {:?} from the index. See https://pris.ly/d/mongodb-composite-compound-indices for more details",
             composite_type.unwrap().name()
         );
         ctx.push_error(DatamodelError::new_attribute_validation_error(
