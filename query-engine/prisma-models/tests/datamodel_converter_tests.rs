@@ -84,33 +84,33 @@ fn converting_composite_types_nested() {
         datasource db { 
             provider = "mongodb"
             url      = "mongodb://localhost:27017/hello"
-          }
+        }
           
-          type TheatersLocation {
+        type TheatersLocation {
             address TheatersLocationAddress
             geo     TheatersLocationGeo
-          }
+        }
           
-          type TheatersLocationAddress {
+        type TheatersLocationAddress {
             city    String
             state   String
             street1 String
             street2 String?
             zipcode String
-          }
+        }
           
-          type TheatersLocationGeo {
+        type TheatersLocationGeo {
             coordinates Float[]
             type        String
-          }
+        }
           
-          model theaters {
+        model theaters {
             id        String           @id @default(auto()) @map("_id") @db.ObjectId
             location  TheatersLocation
             theaterId Int
           
             @@index([location.geo], map: "geo index")
-          }
+        }
         "#,
     );
 
@@ -124,33 +124,33 @@ fn converting_composite_types_nested_scalar() {
         datasource db { 
             provider = "mongodb"
             url      = "mongodb://localhost:27017/hello"
-          }
+        }
           
-          type TheatersLocation {
+        type TheatersLocation {
             address TheatersLocationAddress
             geo     TheatersLocationGeo
-          }
+        }
           
-          type TheatersLocationAddress {
+        type TheatersLocationAddress {
             city    String
             state   String
             street1 String
             street2 String?
             zipcode String
-          }
+        }
           
-          type TheatersLocationGeo {
+        type TheatersLocationGeo {
             coordinates Float[]
             type        String
-          }
+        }
           
-          model theaters {
+        model theaters {
             id        String           @id @default(auto()) @map("_id") @db.ObjectId
             location  TheatersLocation
             theaterId Int
           
             @@index([location.geo.type], map: "geo index")
-          }
+        }
         "#,
     );
 
