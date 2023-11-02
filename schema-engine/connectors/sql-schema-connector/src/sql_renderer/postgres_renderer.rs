@@ -36,6 +36,16 @@ impl PostgresFlavour {
 
         format!("{SQL_INDENTATION}{column_name} {tpe_str}{nullability_str}{default_str}{identity_str}",)
     }
+
+    fn render_column_comment(&self, table_name: String, column: TableColumnWalker<'_>) -> String {
+        let column_name = Quoted::postgres_ident(column.name());
+        let comment: String = if let Some(comment) = column.description() {
+            format!("COMMENT ON COLUMN {table_name}.{column_name} IS '{comment}' ;")
+        } else {
+            String::new()
+        };
+        comment
+    }
 }
 
 impl SqlRenderer for PostgresFlavour {
@@ -408,7 +418,18 @@ impl SqlRenderer for PostgresFlavour {
             String::new()
         };
 
-        format!("CREATE TABLE {table_name} (\n{columns}{pk}\n)")
+        let table_comment = if let Some(table_comment) = table.description() {
+            format!("comment on table {} is '{}' ", table_name, table_comment)
+        } else {
+            String::new()
+        };
+
+        let column_comment: String = table
+            .columns()
+            .map(|column| self.render_column_comment(format!("{table_name}"), column))
+            .join("\n");
+
+        format!("CREATE TABLE {table_name} (\n{columns}{pk}\n); {table_comment}; {column_comment}")
     }
 
     fn render_drop_enum(&self, dropped_enum: EnumWalker<'_>) -> Vec<String> {
