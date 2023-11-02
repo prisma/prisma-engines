@@ -1,4 +1,5 @@
 pub(crate) mod postgres;
+pub(crate) mod sqlite;
 
 use napi::bindgen_prelude::{FromNapiValue, ToNapiValue};
 use napi::NapiValue;
@@ -59,33 +60,31 @@ impl ToNapiValue for JSArg {
     }
 }
 
+pub fn value_to_js_arg(value: &quaint::Value) -> serde_json::Result<JSArg> {
+    let res = match &value.typed {
+        quaint::ValueType::Json(s) => match s {
+            Some(ref s) => {
+                let json_str = serde_json::to_string(s)?;
+                JSArg::RawString(json_str)
+            }
+            None => JsonValue::Null.into(),
+        },
+        quaint::ValueType::Bytes(bytes) => match bytes {
+            Some(bytes) => JSArg::Buffer(bytes.to_vec()),
+            None => JsonValue::Null.into(),
+        },
+        quaint::ValueType::Numeric(bd) => match bd {
+            // converting decimal to string to preserve the precision
+            Some(bd) => JSArg::RawString(bd.to_string()),
+            None => JsonValue::Null.into(),
+        },
+        quaint::ValueType::Array(Some(ref items)) => JSArg::Array(values_to_js_args(items)?),
+        quaint_value => JSArg::from(JsonValue::from(quaint_value.clone())),
+    };
+
+    Ok(res)
+}
+
 pub fn values_to_js_args(values: &[quaint::Value<'_>]) -> serde_json::Result<Vec<JSArg>> {
-    let mut args = Vec::with_capacity(values.len());
-
-    for qv in values {
-        let res = match &qv.typed {
-            quaint::ValueType::Json(s) => match s {
-                Some(ref s) => {
-                    let json_str = serde_json::to_string(s)?;
-                    JSArg::RawString(json_str)
-                }
-                None => JsonValue::Null.into(),
-            },
-            quaint::ValueType::Bytes(bytes) => match bytes {
-                Some(bytes) => JSArg::Buffer(bytes.to_vec()),
-                None => JsonValue::Null.into(),
-            },
-            quaint::ValueType::Numeric(bd) => match bd {
-                // converting decimal to string to preserve the precision
-                Some(bd) => JSArg::RawString(bd.to_string()),
-                None => JsonValue::Null.into(),
-            },
-            quaint::ValueType::Array(Some(items)) => JSArg::Array(values_to_js_args(items)?),
-            quaint_value => JSArg::from(JsonValue::from(quaint_value.clone())),
-        };
-
-        args.push(res);
-    }
-
-    Ok(args)
+    values.iter().map(value_to_js_arg).collect()
 }
