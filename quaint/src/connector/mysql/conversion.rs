@@ -203,8 +203,8 @@ impl TypeIdentifier for my::Column {
 }
 
 impl TakeRow for my::Row {
-    fn take_result_row(&mut self) -> crate::Result<Vec<Value<'static>>> {
-        fn convert(row: &mut my::Row, i: usize) -> crate::Result<Value<'static>> {
+    fn take_result_row(&mut self, mysql_zero_date_as_null: bool) -> crate::Result<Vec<Value<'static>>> {
+        let convert = |row: &mut my::Row, i: usize| -> crate::Result<Value<'static>> {
             let value = row.take(i).ok_or_else(|| {
                 let msg = "Index out of bounds";
                 let kind = ErrorKind::conversion(msg);
@@ -270,6 +270,9 @@ impl TakeRow for my::Row {
                 my::Value::Double(f) => Value::from(f),
                 my::Value::Date(year, month, day, hour, min, sec, micro) => {
                     if day == 0 || month == 0 {
+                        if mysql_zero_date_as_null {
+                            return Ok(Value::null_datetime());
+                        }
                         let msg = format!(
                             "The column `{}` contained an invalid datetime value with either day or month set to zero.",
                             column.name_str()
@@ -326,7 +329,7 @@ impl TakeRow for my::Row {
             };
 
             Ok(res)
-        }
+        };
 
         let mut row = Vec::with_capacity(self.len());
 

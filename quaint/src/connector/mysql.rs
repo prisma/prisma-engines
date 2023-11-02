@@ -41,6 +41,7 @@ pub struct Mysql {
     socket_timeout: Option<Duration>,
     is_healthy: AtomicBool,
     statement_cache: Mutex<LruCache<String, my::Statement>>,
+    mysql_zero_date_as_null: bool
 }
 
 /// Wraps a connection url and exposes the parsing logic used by quaint, including default values.
@@ -152,6 +153,11 @@ impl MysqlUrl {
         self.query_params.max_idle_connection_lifetime
     }
 
+    /// Prefer zero date as null
+    pub fn mysql_zero_date_as_null(&self) -> bool {
+        self.query_params.mysql_zero_date_as_null
+    }
+
     fn statement_cache_size(&self) -> usize {
         self.query_params.statement_cache_size
     }
@@ -175,6 +181,7 @@ impl MysqlUrl {
         let mut prefer_socket = None;
         let mut statement_cache_size = 100;
         let mut identity: Option<(Option<PathBuf>, Option<String>)> = None;
+        let mut mysql_zero_date_as_null = false;
 
         for (k, v) in url.query_pairs() {
             match k.as_ref() {
@@ -282,6 +289,12 @@ impl MysqlUrl {
                         max_idle_connection_lifetime = Some(Duration::from_secs(as_int));
                     }
                 }
+                "mysql_zero_date_as_null" => {
+                    let as_bool = v
+                        .parse::<bool>()
+                        .map_err(|_| Error::builder(ErrorKind::InvalidConnectionArguments).build())?;
+                    mysql_zero_date_as_null = as_bool
+                }
                 _ => {
                     tracing::trace!(message = "Discarding connection string param", param = &*k);
                 }
@@ -312,6 +325,7 @@ impl MysqlUrl {
             max_idle_connection_lifetime,
             prefer_socket,
             statement_cache_size,
+            mysql_zero_date_as_null
         })
     }
 
@@ -363,6 +377,7 @@ pub(crate) struct MysqlUrlQueryParams {
     max_idle_connection_lifetime: Option<Duration>,
     prefer_socket: Option<bool>,
     statement_cache_size: usize,
+    mysql_zero_date_as_null: bool
 }
 
 impl Mysql {
@@ -374,6 +389,7 @@ impl Mysql {
             socket_timeout: url.query_params.socket_timeout,
             conn: Mutex::new(conn),
             statement_cache: Mutex::new(url.cache()),
+            mysql_zero_date_as_null: url.query_params.mysql_zero_date_as_null,
             url,
             is_healthy: AtomicBool::new(true),
         })
@@ -492,7 +508,7 @@ impl Queryable for Mysql {
                 let mut result_set = ResultSet::new(columns, Vec::new());
 
                 for mut row in rows {
-                    result_set.rows.push(row.take_result_row()?);
+                    result_set.rows.push(row.take_result_row(self.mysql_zero_date_as_null)?);
                 }
 
                 if let Some(id) = last_id {

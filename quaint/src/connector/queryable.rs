@@ -7,7 +7,7 @@ pub trait GetRow {
 }
 
 pub trait TakeRow {
-    fn take_result_row(&mut self) -> crate::Result<Vec<Value<'static>>>;
+    fn take_result_row(&mut self, mysql_zero_date_as_null: bool) -> crate::Result<Vec<Value<'static>>>;
 }
 
 pub trait ToColumnNames {
