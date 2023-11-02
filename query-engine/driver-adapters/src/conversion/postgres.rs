@@ -37,6 +37,10 @@ pub fn values_to_js_args(values: &[quaint::Value<'_>]) -> serde_json::Result<Vec
                 Some(bytes) => JSArg::Buffer(bytes.to_vec()),
                 None => JsonValue::Null.into(),
             },
+            (quaint::ValueType::Numeric(bd), _) => match bd {
+                Some(bd) => JSArg::RawString(bd.to_string()),
+                None => JsonValue::Null.into(),
+            },
             (quaint::ValueType::Array(Some(items)), _) => JSArg::Array(values_to_js_args(items)?),
             (quaint_value, _) => JSArg::from(JsonValue::from(quaint_value.clone())),
         };
