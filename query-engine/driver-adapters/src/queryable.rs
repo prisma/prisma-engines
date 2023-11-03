@@ -51,6 +51,7 @@ impl JsBaseQueryable {
         let sql: String = sql.to_string();
         let args = match self.flavour {
             Flavour::Postgres => conversion::postgres::values_to_js_args(values),
+            Flavour::Sqlite => conversion::sqlite::values_to_js_args(values),
             _ => conversion::values_to_js_args(values),
         }?;
         Ok(Query { sql, args })
