@@ -200,8 +200,6 @@
 <a href="#200" id="200">200</a>
 <a href="#201" id="201">201</a>
 <a href="#202" id="202">202</a>
-<a href="#203" id="203">203</a>
-<a href="#204" id="204">204</a>
 </pre></div><pre class="rust"><code><span class="attr">#![deny(rust_2018_idioms, unsafe_code, missing_docs)]
 #![allow(clippy::needless_collect)] </span><span class="comment">// the implementation of that rule is way too eager, it rejects necessary collects
 </span><span class="attr">#![allow(clippy::derive_partial_eq_without_eq)]
@@ -293,9 +291,7 @@
             <span class="kw">let </span>connector = MongoDbSchemaConnector::new(params);
             <span class="prelude-val">Ok</span>(Box::new(connector))
         }
-        <span class="prelude-val">Some</span>(other) =&gt; <span class="prelude-val">Err</span>(CoreError::url_parse_error(<span class="macro">format!</span>(
-            <span class="string">&quot;`{other}` is not a known connection URL scheme. Prisma cannot determine the connector.&quot;
-        </span>))),
+        <span class="prelude-val">Some</span>(_other) =&gt; <span class="prelude-val">Err</span>(CoreError::url_parse_error(<span class="string">&quot;The scheme is not recognized&quot;</span>)),
         <span class="prelude-val">None </span>=&gt; <span class="prelude-val">Err</span>(CoreError::user_facing(InvalidConnectionString {
             details: String::new(),
         })),
