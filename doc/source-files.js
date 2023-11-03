@@ -61,7 +61,7 @@ var sourcesIndex = JSON.parse('{\
 "digest":["",[["core_api",[],["ct_variable.rs","rt_variable.rs","wrapper.rs","xof_reader.rs"]]],["core_api.rs","digest.rs","lib.rs","mac.rs"]],\
 "dissimilar":["",[],["find.rs","lib.rs","range.rs"]],\
 "dmmf":["",[["ast_builders",[["schema_ast_builder",[],["enum_renderer.rs","field_renderer.rs","mod.rs","object_renderer.rs","schema_renderer.rs","type_renderer.rs"]]],["datamodel_ast_builder.rs","mod.rs"]],["serialization_ast",[],["datamodel_ast.rs","mappings_ast.rs","mod.rs","schema_ast.rs"]]],["lib.rs"]],\
-"driver_adapters":["",[["conversion",[],["postgres.rs"]]],["async_js_function.rs","conversion.rs","error.rs","lib.rs","proxy.rs","queryable.rs","result.rs","transaction.rs"]],\
+"driver_adapters":["",[["conversion",[],["postgres.rs","sqlite.rs"]]],["async_js_function.rs","conversion.rs","error.rs","lib.rs","proxy.rs","queryable.rs","result.rs","transaction.rs"]],\
 "either":["",[],["lib.rs"]],\
 "encoding":["",[["codec",[],["ascii.rs","error.rs","japanese.rs","korean.rs","simpchinese.rs","singlebyte.rs","tradchinese.rs","utf_16.rs","utf_8.rs","whatwg.rs"]]],["all.rs","label.rs","lib.rs","types.rs","util.rs"]],\
 "encoding_index_japanese":["",[],["jis0208.rs","jis0212.rs","lib.rs"]],\
