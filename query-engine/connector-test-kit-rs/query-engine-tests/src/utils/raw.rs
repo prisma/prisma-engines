@@ -2,7 +2,7 @@ use chrono::{DateTime, FixedOffset};
 use prisma_value::encode_bytes;
 use query_tests_setup::{TestError, TestResult};
 
-pub fn fmt_query_raw(query: &str, params: Vec<RawParam>) -> String {
+pub fn fmt_query_raw(query: &str, params: impl IntoIterator<Item = RawParam>) -> String {
     let params = params_to_json(params);
     let params = serde_json::to_string(&params).unwrap();
 
@@ -13,7 +13,7 @@ pub fn fmt_query_raw(query: &str, params: Vec<RawParam>) -> String {
     )
 }
 
-pub fn fmt_execute_raw(query: &str, params: Vec<RawParam>) -> String {
+pub fn fmt_execute_raw(query: &str, params: impl IntoIterator<Item = RawParam>) -> String {
     let params = params_to_json(params);
     let params = serde_json::to_string(&params).unwrap();
 
@@ -66,7 +66,7 @@ impl RawParam {
     }
 }
 
-fn params_to_json(params: Vec<RawParam>) -> Vec<serde_json::Value> {
+fn params_to_json(params: impl IntoIterator<Item = RawParam>) -> Vec<serde_json::Value> {
     params.into_iter().map(serde_json::Value::from).collect::<Vec<_>>()
 }
 

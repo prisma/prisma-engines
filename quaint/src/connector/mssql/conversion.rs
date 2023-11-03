@@ -1,10 +1,8 @@
 use crate::ast::{Value, ValueType};
-#[cfg(not(feature = "bigdecimal"))]
-use crate::error::*;
-#[cfg(feature = "bigdecimal")]
+
 use bigdecimal::BigDecimal;
 use std::{borrow::Cow, convert::TryFrom};
-#[cfg(feature = "bigdecimal")]
+
 use tiberius::ToSql;
 use tiberius::{ColumnData, FromSql, IntoSql};
 
@@ -22,10 +20,8 @@ impl<'a> IntoSql<'a> for &'a Value<'a> {
             ValueType::Char(val) => val.as_ref().map(|val| format!("{val}")).into_sql(),
             ValueType::Xml(val) => val.as_deref().into_sql(),
             ValueType::Array(_) | ValueType::EnumArray(_, _) => panic!("Arrays are not supported on SQL Server."),
-            #[cfg(feature = "bigdecimal")]
             ValueType::Numeric(val) => (*val).to_sql(),
             ValueType::Json(val) => val.as_ref().map(|val| serde_json::to_string(&val).unwrap()).into_sql(),
-            #[cfg(feature = "uuid")]
             ValueType::Uuid(val) => val.into_sql(),
             ValueType::DateTime(val) => val.into_sql(),
             ValueType::Date(val) => val.into_sql(),
@@ -49,13 +45,7 @@ impl TryFrom<ColumnData<'static>> for Value<'static> {
             ColumnData::String(s) => ValueType::Text(s),
             ColumnData::Guid(uuid) => ValueType::Uuid(uuid),
             ColumnData::Binary(bytes) => ValueType::Bytes(bytes),
-            #[cfg(feature = "bigdecimal")]
             numeric @ ColumnData::Numeric(_) => ValueType::Numeric(BigDecimal::from_sql(&numeric)?),
-            #[cfg(not(feature = "bigdecimal"))]
-            _numeric @ ColumnData::Numeric(_) => {
-                let kind = ErrorKind::conversion("Please enable `bigdecimal` feature to read numeric values");
-                return Err(Error::builder(kind).build());
-            }
             dt @ ColumnData::DateTime(_) => {
                 use tiberius::time::chrono::{DateTime, NaiveDateTime, Utc};
 

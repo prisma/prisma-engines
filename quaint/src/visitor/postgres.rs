@@ -228,9 +228,8 @@ impl<'a> Visitor<'a> for Postgres<'a> {
             ValueType::Json(j) => j
                 .as_ref()
                 .map(|j| self.write(format!("'{}'", serde_json::to_string(&j).unwrap()))),
-            #[cfg(feature = "bigdecimal")]
+
             ValueType::Numeric(r) => r.as_ref().map(|r| self.write(r)),
-            #[cfg(feature = "uuid")]
             ValueType::Uuid(uuid) => uuid.map(|uuid| self.write(format!("'{}'", uuid.hyphenated()))),
             ValueType::DateTime(dt) => dt.map(|dt| self.write(format!("'{}'", dt.to_rfc3339(),))),
             ValueType::Date(date) => date.map(|date| self.write(format!("'{date}'"))),
@@ -1020,7 +1019,6 @@ mod tests {
     }
 
     #[test]
-    #[cfg(feature = "uuid")]
     fn test_raw_uuid() {
         let uuid = uuid::Uuid::new_v4();
         let (sql, params) = Postgres::build(Select::default().value(uuid.raw())).unwrap();

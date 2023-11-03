@@ -20,10 +20,6 @@ Quaint is an abstraction over certain SQL databases. It provides:
 - `sqlite`: Support for SQLite databases.
 - `mssql`: Support for Microsoft SQL Server databases.
 - `pooled`: A connection pool in `pooled::Quaint`.
-- `json`: JSON type support with `serde_json` crate.
-- `uuid`: UUID type support with `uuid` crate.
-- `chrono`: DateTime type support with `chrono` crate.
-- `bigdecimal`: Numeric values can be read as `BigDecimal`.
 - `vendored-openssl`: Statically links against a vendored OpenSSL library on
   non-Windows or non-Apple platforms.
 - `fmt-sql`: Enables logging SQL queries _formatted_. The `FMT_SQL` env var must be present for the formatting to be enabled.
@@ -45,7 +41,7 @@ choice.
 
 ```sh
  > cargo build --features all
- ```
+```
 
 ### Testing
 
@@ -74,8 +70,8 @@ This requires the rust nightly channel:
 > cargo rustdoc --all-features
 ```
 
-Documentation index would be created at `$CARGO_TARGET_DIR/doc/quaint/index.html`
+Documentation index would be created at `$CARGO_TARGET_DIR/doc/quaint/index.html`.
 
 ## Security
 
-If you have a security issue to report, please contact us at [security@prisma.io](mailto:security@prisma.io?subject=[GitHub]%20Prisma%202%20Security%20Report%20Quaint)
+If you have a security issue to report, please contact us at [security@prisma.io](mailto:security@prisma.io?subject=[GitHub]%20Prisma%202%20Security%20Report%20Quaint).

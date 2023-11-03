@@ -1,6 +1,5 @@
 #![allow(clippy::approx_constant)]
 
-#[cfg(feature = "bigdecimal")]
 mod bigdecimal;
 
 use crate::tests::test_api::*;

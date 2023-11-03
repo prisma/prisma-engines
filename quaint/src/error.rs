@@ -6,7 +6,9 @@ use thiserror::Error;
 #[cfg(feature = "pooled")]
 use std::time::Duration;
 
-pub use crate::connector::postgres::error::PostgresError;
+pub use crate::connector::mysql::MysqlError;
+pub use crate::connector::postgres::PostgresError;
+pub use crate::connector::sqlite::SqliteError;
 
 #[derive(Debug, PartialEq, Eq)]
 pub enum DatabaseConstraint {
@@ -314,7 +316,6 @@ impl From<Error> for ErrorKind {
     }
 }
 
-#[cfg(feature = "bigdecimal")]
 impl From<bigdecimal::ParseBigDecimalError> for Error {
     fn from(e: bigdecimal::ParseBigDecimalError) -> Self {
         let kind = ErrorKind::conversion(format!("{e}"));
@@ -389,7 +390,6 @@ impl From<std::net::AddrParseError> for Error {
     }
 }
 
-#[cfg(feature = "uuid")]
 impl From<uuid::Error> for Error {
     fn from(e: uuid::Error) -> Self {
         Error::builder(ErrorKind::UUIDError(format!("{e}"))).build()

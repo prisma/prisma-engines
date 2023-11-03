@@ -1,7 +1,6 @@
 use crate::ast::*;
 use crate::error::{Error, ErrorKind};
 
-#[cfg(feature = "bigdecimal")]
 use bigdecimal::{BigDecimal, FromPrimitive, ToPrimitive};
 use chrono::{DateTime, NaiveDate, NaiveTime, Utc};
 use serde_json::{Number, Value as JsonValue};
@@ -12,7 +11,6 @@ use std::{
     fmt,
     str::FromStr,
 };
-#[cfg(feature = "uuid")]
 use uuid::Uuid;
 
 /// A value written to the query as-is without parameterization.
@@ -35,13 +33,43 @@ where
     }
 }
 
+/// A native-column type, i.e. the connector-specific type of the column.
+#[derive(Debug, Clone, PartialEq)]
+pub struct NativeColumnType<'a>(Cow<'a, str>);
+
+impl<'a> std::ops::Deref for NativeColumnType<'a> {
+    type Target = str;
+
+    fn deref(&self) -> &Self::Target {
+        &self.0
+    }
+}
+
+impl<'a> From<&'a str> for NativeColumnType<'a> {
+    fn from(s: &'a str) -> Self {
+        Self(Cow::Owned(s.to_uppercase()))
+    }
+}
+
 #[derive(Debug, Clone, PartialEq)]
 pub struct Value<'a> {
     pub typed: ValueType<'a>,
-    pub native_column_type: Option<Cow<'a, str>>,
+    pub native_column_type: Option<NativeColumnType<'a>>,
 }
 
 impl<'a> Value<'a> {
+    /// Returns the native column type of the value, if any, in the form
+    /// of an UPCASE string. ex: "VARCHAR, BYTEA, DATE, TIMEZ"  
+    pub fn native_column_type_name(&'a self) -> Option<&'a str> {
+        self.native_column_type.as_deref()
+    }
+
+    /// Changes the value to include information about the native column type
+    pub fn with_native_column_type<T: Into<NativeColumnType<'a>>>(mut self, column_type: Option<T>) -> Self {
+        self.native_column_type = column_type.map(|ct| ct.into());
+        self
+    }
+
     /// Creates a new 32-bit signed integer.
     pub fn int32<I>(value: I) -> Self
     where
@@ -59,7 +87,6 @@ impl<'a> Value<'a> {
     }
 
     /// Creates a new decimal value.
-    #[cfg(feature = "bigdecimal")]
     pub fn numeric(value: BigDecimal) -> Self {
         ValueType::numeric(value).into_value()
     }
@@ -150,7 +177,6 @@ impl<'a> Value<'a> {
     }
 
     /// Creates a new uuid value.
-    #[cfg(feature = "uuid")]
     pub fn uuid(value: Uuid) -> Self {
         ValueType::uuid(value).into_value()
     }
@@ -270,21 +296,21 @@ impl<'a> Value<'a> {
     }
 
     /// `true` if the `Value` is a numeric value or can be converted to one.
-    #[cfg(feature = "bigdecimal")]
+
     pub fn is_numeric(&self) -> bool {
         self.typed.is_numeric()
     }
 
     /// Returns a bigdecimal, if the value is a numeric, float or double value,
     /// otherwise `None`.
-    #[cfg(feature = "bigdecimal")]
+
     pub fn into_numeric(self) -> Option<BigDecimal> {
         self.typed.into_numeric()
     }
 
     /// Returns a reference to a bigdecimal, if the value is a numeric.
     /// Otherwise `None`.
-    #[cfg(feature = "bigdecimal")]
+
     pub fn as_numeric(&self) -> Option<&BigDecimal> {
         self.typed.as_numeric()
     }
@@ -305,13 +331,11 @@ impl<'a> Value<'a> {
     }
 
     /// `true` if the `Value` is of UUID type.
-    #[cfg(feature = "uuid")]
     pub fn is_uuid(&self) -> bool {
         self.typed.is_uuid()
     }
 
     /// Returns an UUID if the value is of UUID type, otherwise `None`.
-    #[cfg(feature = "uuid")]
     pub fn as_uuid(&self) -> Option<Uuid> {
         self.typed.as_uuid()
     }
@@ -421,7 +445,6 @@ impl<'a> Value<'a> {
         ValueType::Array(None).into()
     }
 
-    #[cfg(feature = "bigdecimal")]
     pub fn null_numeric() -> Self {
         ValueType::Numeric(None).into()
     }
@@ -434,7 +457,6 @@ impl<'a> Value<'a> {
         ValueType::Xml(None).into()
     }
 
-    #[cfg(feature = "uuid")]
     pub fn null_uuid() -> Self {
         ValueType::Uuid(None).into()
     }
@@ -505,13 +527,11 @@ pub enum ValueType<'a> {
     /// An array value (PostgreSQL).
     Array(Option<Vec<Value<'a>>>),
     /// A numeric value.
-    #[cfg(feature = "bigdecimal")]
     Numeric(Option<BigDecimal>),
     /// A JSON value.
     Json(Option<serde_json::Value>),
     /// A XML value.
     Xml(Option<Cow<'a, str>>),
-    #[cfg(feature = "uuid")]
     /// An UUID value.
     Uuid(Option<Uuid>),
     /// A datetime value.
@@ -579,10 +599,9 @@ impl<'a> fmt::Display for ValueType<'a> {
                 write!(f, "]")
             }),
             ValueType::Xml(val) => val.as_ref().map(|v| write!(f, "{v}")),
-            #[cfg(feature = "bigdecimal")]
+
             ValueType::Numeric(val) => val.as_ref().map(|v| write!(f, "{v}")),
             ValueType::Json(val) => val.as_ref().map(|v| write!(f, "{v}")),
-            #[cfg(feature = "uuid")]
             ValueType::Uuid(val) => val.map(|v| write!(f, "\"{v}\"")),
             ValueType::DateTime(val) => val.map(|v| write!(f, "\"{v}\"")),
             ValueType::Date(val) => val.map(|v| write!(f, "\"{v}\"")),
@@ -638,10 +657,9 @@ impl<'a> From<ValueType<'a>> for serde_json::Value {
             ValueType::Array(v) => {
                 v.map(|v| serde_json::Value::Array(v.into_iter().map(serde_json::Value::from).collect()))
             }
-            #[cfg(feature = "bigdecimal")]
+
             ValueType::Numeric(d) => d.map(|d| serde_json::to_value(d.to_f64().unwrap()).unwrap()),
             ValueType::Json(v) => v,
-            #[cfg(feature = "uuid")]
             ValueType::Uuid(u) => u.map(|u| serde_json::Value::String(u.hyphenated().to_string())),
             ValueType::DateTime(dt) => dt.map(|dt| serde_json::Value::String(dt.to_rfc3339())),
             ValueType::Date(date) => date.map(|date| serde_json::Value::String(format!("{date}"))),
@@ -677,7 +695,7 @@ impl<'a> ValueType<'a> {
     }
 
     /// Creates a new decimal value.
-    #[cfg(feature = "bigdecimal")]
+
     pub(crate) fn numeric(value: BigDecimal) -> Self {
         Self::Numeric(Some(value))
     }
@@ -768,7 +786,6 @@ impl<'a> ValueType<'a> {
     }
 
     /// Creates a new uuid value.
-    #[cfg(feature = "uuid")]
     pub(crate) fn uuid(value: Uuid) -> Self {
         Self::Uuid(Some(value))
     }
@@ -816,9 +833,7 @@ impl<'a> ValueType<'a> {
             Self::Char(c) => c.is_none(),
             Self::Array(v) => v.is_none(),
             Self::Xml(s) => s.is_none(),
-            #[cfg(feature = "bigdecimal")]
             Self::Numeric(r) => r.is_none(),
-            #[cfg(feature = "uuid")]
             Self::Uuid(u) => u.is_none(),
             Self::DateTime(dt) => dt.is_none(),
             Self::Date(d) => d.is_none(),
@@ -948,14 +963,14 @@ impl<'a> ValueType<'a> {
     }
 
     /// `true` if the `Value` is a numeric value or can be converted to one.
-    #[cfg(feature = "bigdecimal")]
+
     pub(crate) fn is_numeric(&self) -> bool {
         matches!(self, Self::Numeric(_) | Self::Float(_) | Self::Double(_))
     }
 
     /// Returns a bigdecimal, if the value is a numeric, float or double value,
     /// otherwise `None`.
-    #[cfg(feature = "bigdecimal")]
+
     pub(crate) fn into_numeric(self) -> Option<BigDecimal> {
         match self {
             Self::Numeric(d) => d,
@@ -967,7 +982,7 @@ impl<'a> ValueType<'a> {
 
     /// Returns a reference to a bigdecimal, if the value is a numeric.
     /// Otherwise `None`.
-    #[cfg(feature = "bigdecimal")]
+
     pub(crate) fn as_numeric(&self) -> Option<&BigDecimal> {
         match self {
             Self::Numeric(d) => d.as_ref(),
@@ -1003,13 +1018,11 @@ impl<'a> ValueType<'a> {
     }
 
     /// `true` if the `Value` is of UUID type.
-    #[cfg(feature = "uuid")]
     pub(crate) fn is_uuid(&self) -> bool {
         matches!(self, Self::Uuid(_))
     }
 
     /// Returns an UUID if the value is of UUID type, otherwise `None`.
-    #[cfg(feature = "uuid")]
     pub(crate) fn as_uuid(&self) -> Option<Uuid> {
         match self {
             Self::Uuid(u) => *u,
@@ -1124,14 +1137,11 @@ value!(val: usize, Int64, i64::try_from(val).unwrap());
 value!(val: &'a [u8], Bytes, val.into());
 value!(val: f64, Double, val);
 value!(val: f32, Float, val);
-
 value!(val: DateTime<Utc>, DateTime, val);
 value!(val: chrono::NaiveTime, Time, val);
 value!(val: chrono::NaiveDate, Date, val);
-#[cfg(feature = "bigdecimal")]
 value!(val: BigDecimal, Numeric, val);
 value!(val: JsonValue, Json, val);
-#[cfg(feature = "uuid")]
 value!(val: Uuid, Uuid, val);
 
 impl<'a> TryFrom<Value<'a>> for i64 {
@@ -1155,7 +1165,6 @@ impl<'a> TryFrom<Value<'a>> for i32 {
     }
 }
 
-#[cfg(feature = "bigdecimal")]
 impl<'a> TryFrom<Value<'a>> for BigDecimal {
     type Error = Error;
 
@@ -1238,7 +1247,6 @@ impl<'a> TryFrom<&Value<'a>> for Option<std::net::IpAddr> {
     }
 }
 
-#[cfg(feature = "uuid")]
 impl<'a> TryFrom<&Value<'a>> for Option<uuid::Uuid> {
     type Error = Error;
 
@@ -1436,7 +1444,6 @@ mod tests {
     }
 
     #[test]
-    #[cfg(feature = "uuid")]
     fn display_format_for_uuid() {
         let id = Uuid::from_str("67e5504410b1426f9247bb680e5fe0c8").unwrap();
         let pv = Value::uuid(id);

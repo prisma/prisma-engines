@@ -1,4 +1,3 @@
-#[cfg(feature = "bigdecimal")]
 mod decimal;
 
 use crate::{
@@ -6,12 +5,12 @@ use crate::{
     connector::queryable::{GetRow, ToColumnNames},
     error::{Error, ErrorKind},
 };
-#[cfg(feature = "bigdecimal")]
+
 use bigdecimal::{num_bigint::BigInt, BigDecimal, FromPrimitive, ToPrimitive};
 use bit_vec::BitVec;
 use bytes::BytesMut;
 use chrono::{DateTime, NaiveDateTime, Utc};
-#[cfg(feature = "bigdecimal")]
+
 pub(crate) use decimal::DecimalWrapper;
 use postgres_types::{FromSql, ToSql, WrongType};
 use std::{convert::TryFrom, error::Error as StdError};
@@ -20,7 +19,6 @@ use tokio_postgres::{
     Row as PostgresRow, Statement as PostgresStatement,
 };
 
-#[cfg(feature = "uuid")]
 use uuid::Uuid;
 
 pub(crate) fn conv_params<'a>(params: &'a [Value<'a>]) -> Vec<&'a (dyn types::ToSql + Sync)> {
@@ -49,11 +47,9 @@ pub(crate) fn params_to_types(params: &[Value<'_>]) -> Vec<PostgresType> {
                 ValueType::Bytes(_) => PostgresType::BYTEA,
                 ValueType::Boolean(_) => PostgresType::BOOL,
                 ValueType::Char(_) => PostgresType::CHAR,
-                #[cfg(feature = "bigdecimal")]
                 ValueType::Numeric(_) => PostgresType::NUMERIC,
                 ValueType::Json(_) => PostgresType::JSONB,
                 ValueType::Xml(_) => PostgresType::XML,
-                #[cfg(feature = "uuid")]
                 ValueType::Uuid(_) => PostgresType::UUID,
                 ValueType::DateTime(_) => PostgresType::TIMESTAMPTZ,
                 ValueType::Date(_) => PostgresType::TIMESTAMP,
@@ -87,11 +83,9 @@ pub(crate) fn params_to_types(params: &[Value<'_>]) -> Vec<PostgresType> {
                         ValueType::Bytes(_) => PostgresType::BYTEA_ARRAY,
                         ValueType::Boolean(_) => PostgresType::BOOL_ARRAY,
                         ValueType::Char(_) => PostgresType::CHAR_ARRAY,
-                        #[cfg(feature = "bigdecimal")]
                         ValueType::Numeric(_) => PostgresType::NUMERIC_ARRAY,
                         ValueType::Json(_) => PostgresType::JSONB_ARRAY,
                         ValueType::Xml(_) => PostgresType::XML_ARRAY,
-                        #[cfg(feature = "uuid")]
                         ValueType::Uuid(_) => PostgresType::UUID_ARRAY,
                         ValueType::DateTime(_) => PostgresType::TIMESTAMPTZ_ARRAY,
                         ValueType::Date(_) => PostgresType::TIMESTAMP_ARRAY,
@@ -151,10 +145,8 @@ impl<'a> FromSql<'a> for TimeTz {
 /// of 2 decimals.
 ///
 /// Postgres docs: https://www.postgresql.org/docs/current/datatype-money.html
-#[cfg(feature = "bigdecimal")]
 struct NaiveMoney(BigDecimal);
 
-#[cfg(feature = "bigdecimal")]
 impl<'a> FromSql<'a> for NaiveMoney {
     fn from_sql(_ty: &PostgresType, raw: &'a [u8]) -> Result<NaiveMoney, Box<dyn std::error::Error + Sync + Send>> {
         let cents = i64::from_sql(&PostgresType::INT8, raw)?;
@@ -223,13 +215,11 @@ impl GetRow for PostgresRow {
                     }
                     None => Value::null_array(),
                 },
-                #[cfg(feature = "bigdecimal")]
                 PostgresType::NUMERIC => {
                     let dw: Option<DecimalWrapper> = row.try_get(i)?;
 
                     ValueType::Numeric(dw.map(|dw| dw.0)).into_value()
                 }
-                #[cfg(feature = "bigdecimal")]
                 PostgresType::MONEY => match row.try_get(i)? {
                     Some(val) => {
                         let val: NaiveMoney = val;
@@ -267,7 +257,6 @@ impl GetRow for PostgresRow {
                     }
                     None => Value::null_time(),
                 },
-                #[cfg(feature = "uuid")]
                 PostgresType::UUID => match row.try_get(i)? {
                     Some(val) => {
                         let val: Uuid = val;
@@ -275,7 +264,6 @@ impl GetRow for PostgresRow {
                     }
                     None => ValueType::Uuid(None).into_value(),
                 },
-                #[cfg(feature = "uuid")]
                 PostgresType::UUID_ARRAY => match row.try_get(i)? {
                     Some(val) => {
                         let val: Vec<Option<Uuid>> = val;
@@ -352,7 +340,6 @@ impl GetRow for PostgresRow {
                     }
                     None => Value::null_array(),
                 },
-                #[cfg(feature = "bigdecimal")]
                 PostgresType::NUMERIC_ARRAY => match row.try_get(i)? {
                     Some(val) => {
                         let val: Vec<Option<DecimalWrapper>> = val;
@@ -375,7 +362,6 @@ impl GetRow for PostgresRow {
                         None => Value::null_array(),
                     }
                 }
-                #[cfg(feature = "bigdecimal")]
                 PostgresType::MONEY_ARRAY => match row.try_get(i)? {
                     Some(val) => {
                         let val: Vec<Option<NaiveMoney>> = val;
@@ -652,12 +638,10 @@ impl<'a> ToSql for Value<'a> {
                 _ => None,
             },
             (ValueType::Int64(integer), &PostgresType::INT8) => integer.map(|integer| integer.to_sql(ty, out)),
-            #[cfg(feature = "bigdecimal")]
             (ValueType::Int32(integer), &PostgresType::NUMERIC) => integer
                 .map(|integer| BigDecimal::from_i32(integer).unwrap())
                 .map(DecimalWrapper)
                 .map(|dw| dw.to_sql(ty, out)),
-            #[cfg(feature = "bigdecimal")]
             (ValueType::Int64(integer), &PostgresType::NUMERIC) => integer
                 .map(|integer| BigDecimal::from_i64(integer).unwrap())
                 .map(DecimalWrapper)
@@ -699,30 +683,25 @@ impl<'a> ToSql for Value<'a> {
             (ValueType::Int32(integer), _) => integer.map(|integer| integer.to_sql(ty, out)),
             (ValueType::Int64(integer), _) => integer.map(|integer| integer.to_sql(ty, out)),
             (ValueType::Float(float), &PostgresType::FLOAT8) => float.map(|float| (float as f64).to_sql(ty, out)),
-            #[cfg(feature = "bigdecimal")]
             (ValueType::Float(float), &PostgresType::NUMERIC) => float
                 .map(|float| BigDecimal::from_f32(float).unwrap())
                 .map(DecimalWrapper)
                 .map(|dw| dw.to_sql(ty, out)),
             (ValueType::Float(float), _) => float.map(|float| float.to_sql(ty, out)),
             (ValueType::Double(double), &PostgresType::FLOAT4) => double.map(|double| (double as f32).to_sql(ty, out)),
-            #[cfg(feature = "bigdecimal")]
             (ValueType::Double(double), &PostgresType::NUMERIC) => double
                 .map(|double| BigDecimal::from_f64(double).unwrap())
                 .map(DecimalWrapper)
                 .map(|dw| dw.to_sql(ty, out)),
             (ValueType::Double(double), _) => double.map(|double| double.to_sql(ty, out)),
-            #[cfg(feature = "bigdecimal")]
             (ValueType::Numeric(decimal), &PostgresType::FLOAT4) => decimal.as_ref().map(|decimal| {
                 let f = decimal.to_string().parse::<f32>().expect("decimal to f32 conversion");
                 f.to_sql(ty, out)
             }),
-            #[cfg(feature = "bigdecimal")]
             (ValueType::Numeric(decimal), &PostgresType::FLOAT8) => decimal.as_ref().map(|decimal| {
                 let f = decimal.to_string().parse::<f64>().expect("decimal to f64 conversion");
                 f.to_sql(ty, out)
             }),
-            #[cfg(feature = "bigdecimal")]
             (ValueType::Array(values), &PostgresType::FLOAT4_ARRAY) => values.as_ref().map(|values| {
                 let mut floats = Vec::with_capacity(values.len());
 
@@ -747,7 +726,6 @@ impl<'a> ToSql for Value<'a> {
 
                 floats.to_sql(ty, out)
             }),
-            #[cfg(feature = "bigdecimal")]
             (ValueType::Array(values), &PostgresType::FLOAT8_ARRAY) => values.as_ref().map(|values| {
                 let mut floats = Vec::with_capacity(values.len());
 
@@ -772,7 +750,6 @@ impl<'a> ToSql for Value<'a> {
 
                 floats.to_sql(ty, out)
             }),
-            #[cfg(feature = "bigdecimal")]
             (ValueType::Numeric(decimal), &PostgresType::MONEY) => decimal.as_ref().map(|decimal| {
                 let decimal = (decimal * BigInt::from_i32(100).unwrap()).round(0);
 
@@ -783,20 +760,16 @@ impl<'a> ToSql for Value<'a> {
 
                 i.to_sql(ty, out)
             }),
-            #[cfg(feature = "bigdecimal")]
             (ValueType::Numeric(decimal), &PostgresType::NUMERIC) => decimal
                 .as_ref()
                 .map(|decimal| DecimalWrapper(decimal.clone()).to_sql(ty, out)),
-            #[cfg(feature = "bigdecimal")]
             (ValueType::Numeric(float), _) => float
                 .as_ref()
                 .map(|float| DecimalWrapper(float.clone()).to_sql(ty, out)),
-            #[cfg(feature = "uuid")]
             (ValueType::Text(string), &PostgresType::UUID) => string.as_ref().map(|string| {
                 let parsed_uuid: Uuid = string.parse()?;
                 parsed_uuid.to_sql(ty, out)
             }),
-            #[cfg(feature = "uuid")]
             (ValueType::Array(values), &PostgresType::UUID_ARRAY) => values.as_ref().map(|values| {
                 let parsed_uuid: Vec<Option<Uuid>> = values
                     .iter()
@@ -869,7 +842,6 @@ impl<'a> ToSql for Value<'a> {
             }
             (ValueType::Json(value), _) => value.as_ref().map(|value| value.to_sql(ty, out)),
             (ValueType::Xml(value), _) => value.as_ref().map(|value| value.to_sql(ty, out)),
-            #[cfg(feature = "uuid")]
             (ValueType::Uuid(value), _) => value.map(|value| value.to_sql(ty, out)),
             (ValueType::DateTime(value), &PostgresType::DATE) => value.map(|value| value.date_naive().to_sql(ty, out)),
             (ValueType::Date(value), _) => value.map(|value| value.to_sql(ty, out)),

@@ -1372,7 +1372,7 @@ async fn float_columns_cast_to_f32(api: &mut dyn TestApi) -> crate::Result<()> {
 // left: `Numeric(Some(BigDecimal("1.0")))`,
 // right: `Double(Some(1.0))`'
 #[test_each_connector(tags("mysql"), ignore("mysql8"))]
-#[cfg(feature = "bigdecimal")]
+
 async fn newdecimal_conversion_is_handled_correctly(api: &mut dyn TestApi) -> crate::Result<()> {
     let select = Select::default().value(sum(Value::int32(1)).alias("theone"));
     let result = api.conn().select(select).await?;
@@ -2009,7 +2009,6 @@ async fn insert_default_keyword(api: &mut dyn TestApi) -> crate::Result<()> {
     Ok(())
 }
 
-#[cfg(feature = "bigdecimal")]
 #[test_each_connector(tags("postgresql"))]
 async fn ints_read_write_to_numeric(api: &mut dyn TestApi) -> crate::Result<()> {
     use bigdecimal::BigDecimal;
@@ -2038,7 +2037,6 @@ async fn ints_read_write_to_numeric(api: &mut dyn TestApi) -> crate::Result<()> 
     Ok(())
 }
 
-#[cfg(feature = "bigdecimal")]
 #[test_each_connector(tags("postgresql"))]
 async fn bigdecimal_read_write_to_floating(api: &mut dyn TestApi) -> crate::Result<()> {
     use bigdecimal::BigDecimal;

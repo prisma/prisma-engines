@@ -2,10 +2,8 @@
 
 use crate::tests::test_api::*;
 
-#[cfg(feature = "bigdecimal")]
 use std::str::FromStr;
 
-#[cfg(feature = "bigdecimal")]
 use crate::bigdecimal::BigDecimal;
 
 test_type!(tinyint(
@@ -105,7 +103,6 @@ test_type!(bigint(
     Value::int64(i64::MAX)
 ));
 
-#[cfg(feature = "bigdecimal")]
 test_type!(decimal(
     mysql,
     "decimal(10,2)",
@@ -114,7 +111,6 @@ test_type!(decimal(
 ));
 
 // Highest mantissa on MySQL
-#[cfg(feature = "bigdecimal")]
 test_type!(decimal_65_6(
     mysql,
     "decimal(65, 6)",
@@ -123,7 +119,6 @@ test_type!(decimal_65_6(
     )?),
 ));
 
-#[cfg(feature = "bigdecimal")]
 test_type!(float_decimal(
     mysql,
     "float",
@@ -134,7 +129,6 @@ test_type!(float_decimal(
     )
 ));
 
-#[cfg(feature = "bigdecimal")]
 test_type!(double_decimal(
     mysql,
     "double",

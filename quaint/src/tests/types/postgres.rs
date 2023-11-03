@@ -1,8 +1,6 @@
-#[cfg(feature = "bigdecimal")]
 mod bigdecimal;
 
 use crate::tests::test_api::*;
-#[cfg(any(feature = "bigdecimal", feature = "uuid"))]
 use std::str::FromStr;
 
 test_type!(boolean(
@@ -329,7 +327,6 @@ test_type!(xml_array(
     ])
 ));
 
-#[cfg(feature = "uuid")]
 test_type!(uuid(
     postgresql,
     "uuid",
@@ -337,7 +334,6 @@ test_type!(uuid(
     Value::uuid(uuid::Uuid::from_str("936DA01F-9ABD-4D9D-80C7-02AF85C822A8").unwrap())
 ));
 
-#[cfg(feature = "uuid")]
 test_type!(uuid_array(
     postgresql,
     "uuid[]",

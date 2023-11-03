@@ -76,7 +76,7 @@ mod smoke_tests {
             assert_eq!(metrics.matches("# HELP prisma_client_queries_active The number of currently active Prisma Client queries").count(), 1);
             assert_eq!(metrics.matches("# TYPE prisma_client_queries_active gauge").count(), 1);
 
-            assert_eq!(metrics.matches("# HELP prisma_client_queries_wait The number of datasource queries currently waiting for an free connection").count(), 1);
+            assert_eq!(metrics.matches("# HELP prisma_client_queries_wait The number of datasource queries currently waiting for a free connection").count(), 1);
             assert_eq!(metrics.matches("# TYPE prisma_client_queries_wait gauge").count(), 1);
 
             assert_eq!(metrics.matches("# HELP prisma_pool_connections_busy The number of pool connections currently executing datasource queries").count(), 1);

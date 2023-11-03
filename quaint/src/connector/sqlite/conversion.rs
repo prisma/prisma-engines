@@ -144,7 +144,6 @@ impl<'a> GetRow for SqliteRow<'a> {
                     c if c.is_bytes() => Value::null_bytes(),
                     c if c.is_float() => Value::null_float(),
                     c if c.is_double() => Value::null_double(),
-                    #[cfg(feature = "bigdecimal")]
                     c if c.is_real() => Value::null_numeric(),
                     c if c.is_datetime() => Value::null_datetime(),
                     c if c.is_date() => Value::null_date(),
@@ -191,7 +190,6 @@ impl<'a> GetRow for SqliteRow<'a> {
                         _ => Value::int64(i),
                     }
                 }
-                #[cfg(feature = "bigdecimal")]
                 ValueRef::Real(f) if column.is_real() => {
                     use bigdecimal::{BigDecimal, FromPrimitive};
 
@@ -264,7 +262,6 @@ impl<'a> ToSql for Value<'a> {
 
                 return Err(RusqlError::ToSqlConversionFailure(Box::new(builder.build())));
             }
-            #[cfg(feature = "bigdecimal")]
             ValueType::Numeric(d) => d
                 .as_ref()
                 .map(|d| ToSqlOutput::from(d.to_string().parse::<f64>().expect("BigDecimal is not a f64."))),
@@ -276,7 +273,6 @@ impl<'a> ToSql for Value<'a> {
                 ToSqlOutput::from(stringified)
             }),
             ValueType::Xml(cow) => cow.as_ref().map(|cow| ToSqlOutput::from(cow.as_ref())),
-            #[cfg(feature = "uuid")]
             ValueType::Uuid(value) => value.map(|value| ToSqlOutput::from(value.hyphenated().to_string())),
             ValueType::DateTime(value) => value.map(|value| ToSqlOutput::from(value.timestamp_millis())),
             ValueType::Date(date) => date

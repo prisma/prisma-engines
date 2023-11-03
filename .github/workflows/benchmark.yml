@@ -5,6 +5,8 @@ on:
       - main
   pull_request:
     paths-ignore:
+      - '.github/**'
+      - '!.github/workflows/benchmark.yml'
       - '.buildkite/**'
       - '*.md'
       - 'LICENSE'
@@ -17,7 +19,7 @@ concurrency:
 
 jobs:
   benchmark:
-    name: "Run benchmarks on Linux"
+    name: 'Run benchmarks on Linux'
 
     runs-on: ubuntu-latest
     steps:

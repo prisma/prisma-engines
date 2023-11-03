@@ -1,7 +1,7 @@
+pub(crate) mod postgres;
+
 use napi::bindgen_prelude::{FromNapiValue, ToNapiValue};
 use napi::NapiValue;
-use quaint::ast::Value as QuaintValue;
-use quaint::ast::ValueType as QuaintValueType;
 use serde::Serialize;
 use serde_json::value::Value as JsonValue;
 
@@ -59,35 +59,35 @@ impl ToNapiValue for JSArg {
     }
 }
 
-pub fn conv_params(params: &[QuaintValue<'_>]) -> serde_json::Result<Vec<JSArg>> {
-    let mut values = Vec::with_capacity(params.len());
+pub fn values_to_js_args(values: &[quaint::Value<'_>]) -> serde_json::Result<Vec<JSArg>> {
+    let mut args = Vec::with_capacity(values.len());
 
-    for qv in params {
+    for qv in values {
         let res = match &qv.typed {
-            QuaintValueType::Json(s) => match s {
+            quaint::ValueType::Json(s) => match s {
                 Some(ref s) => {
                     let json_str = serde_json::to_string(s)?;
                     JSArg::RawString(json_str)
                 }
                 None => JsonValue::Null.into(),
             },
-            QuaintValueType::Bytes(bytes) => match bytes {
+            quaint::ValueType::Bytes(bytes) => match bytes {
                 Some(bytes) => JSArg::Buffer(bytes.to_vec()),
                 None => JsonValue::Null.into(),
             },
-            quaint_value @ QuaintValueType::Numeric(bd) => match bd {
+            quaint_value @ quaint::ValueType::Numeric(bd) => match bd {
                 Some(bd) => match bd.to_string().parse::<f64>() {
                     Ok(double) => JSArg::from(JsonValue::from(double)),
                     Err(_) => JSArg::from(JsonValue::from(quaint_value.clone())),
                 },
                 None => JsonValue::Null.into(),
             },
-            QuaintValueType::Array(Some(items)) => JSArg::Array(conv_params(items)?),
+            quaint::ValueType::Array(Some(items)) => JSArg::Array(values_to_js_args(items)?),
             quaint_value => JSArg::from(JsonValue::from(quaint_value.clone())),
         };
 
-        values.push(res);
+        args.push(res);
     }
 
-    Ok(values)
+    Ok(args)
 }
