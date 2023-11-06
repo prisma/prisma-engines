@@ -1,5 +1,5 @@
 use async_trait::async_trait;
-use metrics::{decrement_gauge, increment_gauge};
+use metrics::decrement_gauge;
 use napi::{bindgen_prelude::FromNapiValue, JsObject};
 use quaint::{
     connector::{IsolationLevel, Transaction as QuaintTransaction},
