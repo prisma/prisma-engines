@@ -22,8 +22,6 @@ pub(crate) struct JsTransaction {
 
 impl JsTransaction {
     pub(crate) fn new(inner: JsBaseQueryable, tx_proxy: TransactionProxy) -> Self {
-        increment_gauge!("prisma_client_queries_active", 1.0);
-
         Self { inner, tx_proxy }
     }
 
@@ -40,6 +38,7 @@ impl JsTransaction {
 #[async_trait]
 impl QuaintTransaction for JsTransaction {
     async fn commit(&self) -> quaint::Result<()> {
+        // increment of this gauge is done in DriverProxy::startTransaction
         decrement_gauge!("prisma_client_queries_active", 1.0);
 
         let commit_stmt = "COMMIT";
@@ -55,6 +54,7 @@ impl QuaintTransaction for JsTransaction {
     }
 
     async fn rollback(&self) -> quaint::Result<()> {
+        // increment of this gauge is done in DriverProxy::startTransaction
         decrement_gauge!("prisma_client_queries_active", 1.0);
 
         let rollback_stmt = "ROLLBACK";
