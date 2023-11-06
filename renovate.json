@@ -13,6 +13,7 @@
     "before 5am every weekday",
     "every weekend"
   ],
+  "rangeStrategy": "pin",
   "separateMinorPatch": true,
   "packageRules": [
     {
@@ -24,6 +25,12 @@
       "groupName": "Weekly vitess docker image version update",
       "packageNames": ["vitess/vttestserver"],
       "schedule": ["before 7am on Wednesday"]
+    },
+    {
+      "groupName": ["Prisma Driver Adapters"],
+      "matchPackageNames": ["@prisma/driver-adapter-utils"],
+      "matchPackagePrefixes": ["@prisma/adapter"],
+      "schedule": ["at any time"]
     }
   ]
 }
