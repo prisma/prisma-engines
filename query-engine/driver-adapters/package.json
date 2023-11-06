@@ -16,8 +16,8 @@
   "keywords": [],
   "author": "",
   "devDependencies": {
-    "@types/node": "^20.5.1",
-    "tsup": "^7.2.0",
+    "@types/node": "20.8.10",
+    "tsup": "7.2.0",
     "typescript": "5.2.2",
     "esbuild": "0.19.5",
     "esbuild-register": "3.5.0"
