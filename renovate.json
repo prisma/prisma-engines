@@ -13,6 +13,7 @@
     "before 5am every weekday",
     "every weekend"
   ],
+  "rangeStrategy": "pin",
   "separateMinorPatch": true,
   "packageRules": [
     {
