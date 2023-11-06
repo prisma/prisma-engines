@@ -50,12 +50,12 @@ pub(super) fn generate_warnings(model: ModelPair<'_>, warnings: &mut Warnings) {
         });
     }
 
-    if model.description().is_some() {
-        warnings.objects_with_comments.push(generators::Object {
-            r#type: "model",
-            name: model.name().to_string(),
-        })
-    }
+    // if model.description().is_some() {
+    //     warnings.objects_with_comments.push(generators::Object {
+    //         r#type: "model",
+    //         name: model.name().to_string(),
+    //     })
+    // }
 
     for constraint in model.check_constraints() {
         warnings.check_constraints.push(generators::ModelAndConstraint {
@@ -100,12 +100,12 @@ pub(super) fn generate_warnings(model: ModelPair<'_>, warnings: &mut Warnings) {
             warnings.fields_with_empty_names_in_model.push(mf);
         }
 
-        if field.description().is_some() {
-            warnings.objects_with_comments.push(generators::Object {
-                r#type: "field",
-                name: format!("{}.{}", model.name(), field.name()),
-            })
-        }
+        // if field.description().is_some() {
+        //     warnings.objects_with_comments.push(generators::Object {
+        //         r#type: "field",
+        //         name: format!("{}.{}", model.name(), field.name()),
+        //     })
+        // }
     }
 
     for field in model.relation_fields() {
