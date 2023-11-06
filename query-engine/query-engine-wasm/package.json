@@ -3,7 +3,7 @@
   "main": "./example.js",
   "dependencies": {
     "@neondatabase/serverless": "0.6.0",
-    "@prisma/adapter-neon": "5.4.1",
-    "@prisma/driver-adapter-utils": "5.4.1"
+    "@prisma/adapter-neon": "5.5.2",
+    "@prisma/driver-adapter-utils": "5.5.2"
   }
 }
