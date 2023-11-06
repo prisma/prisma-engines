@@ -31,6 +31,10 @@
       "matchPackageNames": ["@prisma/driver-adapter-utils"],
       "matchPackagePrefixes": ["@prisma/adapter"],
       "schedule": ["at any time"]
+    },
+    {
+  	  "packageNames": ["node"],
+      "enabled": false
     }
   ]
 }
