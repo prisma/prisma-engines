@@ -135,7 +135,7 @@
 <a href="#135" id="135">135</a>
 <a href="#136" id="136">136</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>async_trait::async_trait;
-<span class="kw">use </span>metrics::{decrement_gauge, increment_gauge};
+<span class="kw">use </span>metrics::decrement_gauge;
 <span class="kw">use </span>napi::{bindgen_prelude::FromNapiValue, JsObject};
 <span class="kw">use </span>quaint::{
     connector::{IsolationLevel, Transaction <span class="kw">as </span>QuaintTransaction},
@@ -158,8 +158,6 @@
 
 <span class="kw">impl </span>JsTransaction {
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>new(inner: JsBaseQueryable, tx_proxy: TransactionProxy) -&gt; <span class="self">Self </span>{
-        <span class="macro">increment_gauge!</span>(<span class="string">&quot;prisma_client_queries_active&quot;</span>, <span class="number">1.0</span>);
-
         <span class="self">Self </span>{ inner, tx_proxy }
     }
 
@@ -176,7 +174,8 @@
 <span class="attr">#[async_trait]
 </span><span class="kw">impl </span>QuaintTransaction <span class="kw">for </span>JsTransaction {
     <span class="kw">async fn </span>commit(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; quaint::Result&lt;()&gt; {
-        <span class="macro">decrement_gauge!</span>(<span class="string">&quot;prisma_client_queries_active&quot;</span>, <span class="number">1.0</span>);
+        <span class="comment">// increment of this gauge is done in DriverProxy::startTransaction
+        </span><span class="macro">decrement_gauge!</span>(<span class="string">&quot;prisma_client_queries_active&quot;</span>, <span class="number">1.0</span>);
 
         <span class="kw">let </span>commit_stmt = <span class="string">&quot;COMMIT&quot;</span>;
 
@@ -191,7 +190,8 @@
     </span>}
 
     <span class="kw">async fn </span>rollback(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; quaint::Result&lt;()&gt; {
-        <span class="macro">decrement_gauge!</span>(<span class="string">&quot;prisma_client_queries_active&quot;</span>, <span class="number">1.0</span>);
+        <span class="comment">// increment of this gauge is done in DriverProxy::startTransaction
+        </span><span class="macro">decrement_gauge!</span>(<span class="string">&quot;prisma_client_queries_active&quot;</span>, <span class="number">1.0</span>);
 
         <span class="kw">let </span>rollback_stmt = <span class="string">&quot;ROLLBACK&quot;</span>;
 
