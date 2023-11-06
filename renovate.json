@@ -33,7 +33,7 @@
       "schedule": ["at any time"]
     },
     {
-  	  "packageNames": ["node"],
+      "packageNames": ["node"],
       "enabled": false
     }
   ]
