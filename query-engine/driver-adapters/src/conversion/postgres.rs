@@ -12,7 +12,7 @@ pub fn value_to_js_arg(value: &quaint::Value) -> serde_json::Result<JSArg> {
         (quaint::ValueType::DateTime(Some(dt)), Some("TIME")) =>  JSArg::Value(JsonValue::String(dt.time().to_string())),
         (quaint::ValueType::DateTime(Some(dt)), Some("TIMETZ")) => JSArg::Value(JsonValue::String(dt.time().format_with_items(TIME_FMT.clone()).to_string())),
         (quaint::ValueType::DateTime(Some(dt)), _) => JSArg::Value(JsonValue::String(dt.naive_utc().to_string())),
-        (quaint::ValueType::Json(Some(s)), _) => JSArg::Value(s.to_owned()),
+        (quaint::ValueType::Json(Some(s)), _) => JSArg::Value(JsonValue::String(serde_json::to_string(s)?)),
         (quaint::ValueType::Bytes(Some(bytes)), _) => JSArg::Buffer(bytes.to_vec()),
         (quaint::ValueType::Numeric(Some(bd)), _) =>  JSArg::Value(JsonValue::String(bd.to_string())),
         (quaint::ValueType::Array(Some(items)), _) => JSArg::Array(
@@ -33,7 +33,6 @@ mod test {
     use bigdecimal::BigDecimal;
     use chrono::*;
     use quaint::ValueType;
-    use serde_json::Value;
     use std::str::FromStr;
 
     #[test]
@@ -50,23 +49,23 @@ mod test {
             ),
             (
                 ValueType::Numeric(None).into_value(),
-                JSArg::Value(Value::Null)
+                JSArg::Value(JsonValue::Null)
             ),
             (
                 ValueType::Json(Some(serde_json::json!({"a": 1}))).into_value(),
-                JSArg::Value(serde_json::json!({"a": 1}))
+                JSArg::Value(JsonValue::String("{\"a\":1}".to_string()))
             ),
             (
                 ValueType::Json(None).into_value(),
-                JSArg::Value(Value::Null)
+                JSArg::Value(JsonValue::Null)
             ),
             (
                 ValueType::Date(Some(NaiveDate::from_ymd_opt(2020, 2, 29).unwrap())).into_value(),
-                JSArg::Value(Value::String("2020-02-29".to_string()))
+                JSArg::Value(JsonValue::String("2020-02-29".to_string()))
             ),
             (
                 ValueType::Date(None).into_value(),
-                JSArg::Value(Value::Null)
+                JSArg::Value(JsonValue::Null)
             ),
             (
                 ValueType::DateTime(Some(Utc.with_ymd_and_hms(2020, 1, 1, 23, 13, 1).unwrap())).into_value().with_native_column_type(Some("DATE")),
@@ -82,15 +81,15 @@ mod test {
             ),
             (
                 ValueType::DateTime(None).into_value(),
-                JSArg::Value(Value::Null)
+                JSArg::Value(JsonValue::Null)
             ),
             (
                 ValueType::Time(Some(NaiveTime::from_hms_opt(23, 13, 1).unwrap())).into_value(),
-                JSArg::Value(Value::String("23:13:01".to_string()))
+                JSArg::Value(JsonValue::String("23:13:01".to_string()))
             ),
             (
                 ValueType::Time(None).into_value(),
-                JSArg::Value(Value::Null)
+                JSArg::Value(JsonValue::Null)
             ),
             (
                 ValueType::Array(Some(vec!(
@@ -101,9 +100,9 @@ mod test {
                 ))).into_value(),
                 JSArg::Array(vec!(
                     JSArg::Value(JsonValue::String("1".to_string())),
-                    JSArg::Value(Value::Null),
-                    JSArg::Value(Value::String("23:13:01".to_string())),
-                    JSArg::Value(Value::Null),
+                    JSArg::Value(JsonValue::Null),
+                    JSArg::Value(JsonValue::String("23:13:01".to_string())),
+                    JSArg::Value(JsonValue::Null),
                 ))
             ),
         ];

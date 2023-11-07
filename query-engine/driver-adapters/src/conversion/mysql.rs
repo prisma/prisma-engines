@@ -9,7 +9,7 @@ const TIME_FORMAT: &str = "%H:%M:%S";
 pub fn value_to_js_arg(value: &quaint::Value) -> serde_json::Result<JSArg> {
     let res = match &value.typed {
         quaint::ValueType::Numeric(Some(bd)) => JSArg::Value(JsonValue::String(bd.to_string())),
-        quaint::ValueType::Json(Some(s)) => JSArg::Value(s.to_owned()),
+        quaint::ValueType::Json(Some(s)) => JSArg::Value(JsonValue::String(serde_json::to_string(s)?)),
         quaint::ValueType::Bytes(Some(bytes)) => JSArg::Buffer(bytes.to_vec()),
         quaint::ValueType::Date(Some(d)) => JSArg::Value(JsonValue::String(d.format(DATE_FORMAT).to_string())),
         quaint::ValueType::DateTime(Some(dt)) => JSArg::Value(JsonValue::String(dt.format(DATETIME_FORMAT).to_string())),
@@ -47,15 +47,15 @@ mod test {
             ),
             (
                 ValueType::Numeric(None),
-                JSArg::Value(serde_json::Value::Null)
+                JSArg::Value(JsonValue::Null)
             ),
             (
                 ValueType::Json(Some(serde_json::json!({"a": 1}))),
-                JSArg::Value(serde_json::json!({"a": 1}))
+                JSArg::Value(JsonValue::String("{\"a\":1}".to_string()))
             ),
             (
                 ValueType::Json(None),
-                JSArg::Value(serde_json::Value::Null)
+                JSArg::Value(JsonValue::Null)
             ),
             (
                 ValueType::Date(Some(NaiveDate::from_ymd_opt(2020, 2, 29).unwrap())),
@@ -63,7 +63,7 @@ mod test {
             ),
             (
                 ValueType::Date(None),
-                JSArg::Value(serde_json::Value::Null)
+                JSArg::Value(JsonValue::Null)
             ),
             (
                 ValueType::DateTime(Some(Utc.with_ymd_and_hms(2020, 1, 1, 23, 13, 1).unwrap())),
@@ -71,7 +71,7 @@ mod test {
             ),
             (
                 ValueType::DateTime(None),
-                JSArg::Value(serde_json::Value::Null)
+                JSArg::Value(JsonValue::Null)
             ),
             (
                 ValueType::Time(Some(NaiveTime::from_hms_opt(23, 13, 1).unwrap())),
@@ -79,7 +79,7 @@ mod test {
             ),
             (
                 ValueType::Time(None),
-                JSArg::Value(serde_json::Value::Null)
+                JSArg::Value(JsonValue::Null)
             ),
             (
                 ValueType::Array(Some(vec!(
@@ -89,7 +89,7 @@ mod test {
                 ))),
                 JSArg::Array(vec!(
                     JSArg::Value(JsonValue::String("1".to_string())),
-                    JSArg::Value(serde_json::Value::Null),
+                    JSArg::Value(JsonValue::Null),
                     JSArg::Value(JsonValue::String("23:13:01".to_string()))
                 ))
             ),
