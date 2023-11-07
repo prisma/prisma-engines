@@ -7,7 +7,7 @@ use napi::NapiValue;
 use serde::Serialize;
 use serde_json::value::Value as JsonValue;
 
-#[derive(Debug, Serialize)]
+#[derive(Debug, PartialEq, Serialize)]
 #[serde(untagged)]
 pub enum JSArg {
     RawString(String),
