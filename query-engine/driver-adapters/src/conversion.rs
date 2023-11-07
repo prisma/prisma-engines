@@ -10,7 +10,6 @@ use serde_json::value::Value as JsonValue;
 #[derive(Debug, PartialEq, Serialize)]
 #[serde(untagged)]
 pub enum JSArg {
-    RawString(String),
     Value(serde_json::Value),
     Buffer(Vec<u8>),
     Array(Vec<JSArg>),
@@ -35,7 +34,6 @@ impl FromNapiValue for JSArg {
 impl ToNapiValue for JSArg {
     unsafe fn to_napi_value(env: napi::sys::napi_env, value: Self) -> napi::Result<napi::sys::napi_value> {
         match value {
-            JSArg::RawString(s) => ToNapiValue::to_napi_value(env, s),
             JSArg::Value(v) => ToNapiValue::to_napi_value(env, v),
             JSArg::Buffer(bytes) => {
                 ToNapiValue::to_napi_value(env, napi::Env::from_raw(env).create_buffer_with_data(bytes)?.into_raw())

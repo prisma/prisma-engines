@@ -7,10 +7,7 @@ pub fn value_to_js_arg(value: &quaint::Value) -> serde_json::Result<JSArg> {
             Ok(double) => JSArg::from(JsonValue::from(double)),
             Err(_) => JSArg::from(JsonValue::from(value.clone())),
         },
-        quaint::ValueType::Json(Some(ref s)) => {
-            let json_str = serde_json::to_string(s)?;
-            JSArg::RawString(json_str)
-        }
+        quaint::ValueType::Json(Some(s)) => JSArg::Value(s.to_owned()),
         quaint::ValueType::Bytes(Some(bytes)) => JSArg::Buffer(bytes.to_vec()),
         quaint::ValueType::Array(Some(ref items)) => JSArg::Array(
             items
@@ -39,6 +36,7 @@ mod test {
     fn test_value_to_js_arg() {
         let test_cases = vec![
            (
+                // This is different than how mysql or postgres processes integral BigInt values.
                 ValueType::Numeric(Some(1.into())),
                 JSArg::Value(Value::Number("1.0".parse().unwrap()))
             ),
@@ -52,7 +50,7 @@ mod test {
             ),
             (
                 ValueType::Json(Some(serde_json::json!({"a": 1}))),
-                JSArg::RawString(r#"{"a":1}"#.to_string()),
+                JSArg::Value(serde_json::json!({"a": 1})),
             ),
             (
                 ValueType::Json(None),
