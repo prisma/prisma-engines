@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `query-engine/driver-adapters/src/conversion/sqlite.rs`."><title>sqlite.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-9bb858ba049f1f21.css" id="mainThemeStyle"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="driver_adapters" data-themes="" data-resource-suffix="" data-rustdoc-version="1.72.0 (5680fa18f 2023-08-23) (built from a source tarball)" data-channel="1.72.0" data-search-js="search-f6292fe389d70017.js" data-settings-js="settings-de11bff964e9d4e5.js" data-settings-css="settings-8c76f75bfb6bd192.css" data-theme-light-css="light-0f8c037637f9eb3e.css" data-theme-dark-css="dark-1097f8e92a01e3cf.css" data-theme-ayu-css="ayu-614652228113ac93.css" ><script src="../../../static.files/storage-59fd9b8ccb335783.js"></script><script defer src="../../../static.files/source-script-106908c7a7964ba4.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../static.files/main-0795b7d26be81095.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../../../static.files/light-0f8c037637f9eb3e.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../../../static.files/dark-1097f8e92a01e3cf.css"><link rel="stylesheet" href="../../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../../driver_adapters/index.html"><img class="rust-logo" src="../../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `query-engine/driver-adapters/src/conversion/mysql.rs`."><title>mysql.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-9bb858ba049f1f21.css" id="mainThemeStyle"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="driver_adapters" data-themes="" data-resource-suffix="" data-rustdoc-version="1.72.0 (5680fa18f 2023-08-23) (built from a source tarball)" data-channel="1.72.0" data-search-js="search-f6292fe389d70017.js" data-settings-js="settings-de11bff964e9d4e5.js" data-settings-css="settings-8c76f75bfb6bd192.css" data-theme-light-css="light-0f8c037637f9eb3e.css" data-theme-dark-css="dark-1097f8e92a01e3cf.css" data-theme-ayu-css="ayu-614652228113ac93.css" ><script src="../../../static.files/storage-59fd9b8ccb335783.js"></script><script defer src="../../../static.files/source-script-106908c7a7964ba4.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../static.files/main-0795b7d26be81095.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../../../static.files/light-0f8c037637f9eb3e.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../../../static.files/dark-1097f8e92a01e3cf.css"><link rel="stylesheet" href="../../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../../driver_adapters/index.html"><img class="rust-logo" src="../../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -105,18 +105,22 @@
 <a href="#105" id="105">105</a>
 <a href="#106" id="106">106</a>
 <a href="#107" id="107">107</a>
-<a href="#108" id="108">108</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::conversion::JSArg;
 <span class="kw">use </span>serde_json::value::Value <span class="kw">as </span>JsonValue;
 
-<span class="kw">pub fn </span>value_to_js_arg(value: <span class="kw-2">&amp;</span>quaint::Value) -&gt; serde_json::Result&lt;JSArg&gt; {
+<span class="kw">const </span>DATETIME_FORMAT: <span class="kw-2">&amp;</span>str = <span class="string">&quot;%Y-%m-%d %H:%M:%S&quot;</span>;
+<span class="kw">const </span>DATE_FORMAT: <span class="kw-2">&amp;</span>str = <span class="string">&quot;%Y-%m-%d&quot;</span>;
+<span class="kw">const </span>TIME_FORMAT: <span class="kw-2">&amp;</span>str = <span class="string">&quot;%H:%M:%S&quot;</span>;
+
+<span class="attr">#[rustfmt::skip]
+</span><span class="kw">pub fn </span>value_to_js_arg(value: <span class="kw-2">&amp;</span>quaint::Value) -&gt; serde_json::Result&lt;JSArg&gt; {
     <span class="kw">let </span>res = <span class="kw">match </span><span class="kw-2">&amp;</span>value.typed {
-        quaint::ValueType::Numeric(<span class="prelude-val">Some</span>(bd)) =&gt; <span class="kw">match </span>bd.to_string().parse::&lt;f64&gt;() {
-            <span class="prelude-val">Ok</span>(double) =&gt; JSArg::from(JsonValue::from(double)),
-            <span class="prelude-val">Err</span>(<span class="kw">_</span>) =&gt; JSArg::from(JsonValue::from(value.clone())),
-        },
-        quaint::ValueType::Json(<span class="prelude-val">Some</span>(s)) =&gt; JSArg::Value(s.to_owned()),
+        quaint::ValueType::Numeric(<span class="prelude-val">Some</span>(bd)) =&gt; JSArg::Value(JsonValue::String(bd.to_string())),
+        quaint::ValueType::Json(<span class="prelude-val">Some</span>(s)) =&gt; JSArg::Value(JsonValue::String(serde_json::to_string(s)<span class="question-mark">?</span>)),
         quaint::ValueType::Bytes(<span class="prelude-val">Some</span>(bytes)) =&gt; JSArg::Buffer(bytes.to_vec()),
+        quaint::ValueType::Date(<span class="prelude-val">Some</span>(d)) =&gt; JSArg::Value(JsonValue::String(d.format(DATE_FORMAT).to_string())),
+        quaint::ValueType::DateTime(<span class="prelude-val">Some</span>(dt)) =&gt; JSArg::Value(JsonValue::String(dt.format(DATETIME_FORMAT).to_string())),
+        quaint::ValueType::Time(<span class="prelude-val">Some</span>(t)) =&gt; JSArg::Value(JsonValue::String(t.format(TIME_FORMAT).to_string())),
         quaint::ValueType::Array(<span class="prelude-val">Some</span>(<span class="kw-2">ref </span>items)) =&gt; JSArg::Array(
             items
                 .iter()
@@ -125,81 +129,75 @@
         ),
         quaint_value =&gt; JSArg::from(JsonValue::from(quaint_value.clone())),
     };
-
     <span class="prelude-val">Ok</span>(res)
 }
 
-<span class="comment">// unit tests for value_to_js_arg
-</span><span class="attr">#[cfg(test)]
+<span class="attr">#[cfg(test)]
 </span><span class="kw">mod </span>test {
     <span class="kw">use super</span>::<span class="kw-2">*</span>;
     <span class="kw">use </span>bigdecimal::BigDecimal;
     <span class="kw">use </span>chrono::<span class="kw-2">*</span>;
     <span class="kw">use </span>quaint::ValueType;
-    <span class="kw">use </span>serde_json::Value;
     <span class="kw">use </span>std::str::FromStr;
 
     <span class="attr">#[test]
     #[rustfmt::skip]
     </span><span class="kw">fn </span>test_value_to_js_arg() {
-        <span class="kw">let </span>test_cases = <span class="macro">vec!</span>[
-           (
-                <span class="comment">// This is different than how mysql or postgres processes integral BigInt values.
-                </span>ValueType::Numeric(<span class="prelude-val">Some</span>(<span class="number">1</span>.into())),
-                JSArg::Value(Value::Number(<span class="string">&quot;1.0&quot;</span>.parse().unwrap()))
+            <span class="kw">let </span>test_cases = <span class="macro">vec!</span>[
+            (
+                ValueType::Numeric(<span class="prelude-val">Some</span>(<span class="number">1</span>.into())), 
+                JSArg::Value(JsonValue::String(<span class="string">&quot;1&quot;</span>.to_string()))
             ),
             (
                 ValueType::Numeric(<span class="prelude-val">Some</span>(BigDecimal::from_str(<span class="string">&quot;-1.1&quot;</span>).unwrap())),
-                JSArg::Value(Value::Number(<span class="string">&quot;-1.1&quot;</span>.parse().unwrap())),
+                JSArg::Value(JsonValue::String(<span class="string">&quot;-1.1&quot;</span>.to_string()))
             ),
             (
                 ValueType::Numeric(<span class="prelude-val">None</span>),
-                JSArg::Value(Value::Null)
+                JSArg::Value(JsonValue::Null)
             ),
             (
                 ValueType::Json(<span class="prelude-val">Some</span>(<span class="macro">serde_json::json!</span>({<span class="string">&quot;a&quot;</span>: <span class="number">1</span>}))),
-                JSArg::Value(<span class="macro">serde_json::json!</span>({<span class="string">&quot;a&quot;</span>: <span class="number">1</span>})),
+                JSArg::Value(JsonValue::String(<span class="string">&quot;{\&quot;a\&quot;:1}&quot;</span>.to_string()))
             ),
             (
                 ValueType::Json(<span class="prelude-val">None</span>),
-                JSArg::Value(Value::Null)
+                JSArg::Value(JsonValue::Null)
             ),
             (
                 ValueType::Date(<span class="prelude-val">Some</span>(NaiveDate::from_ymd_opt(<span class="number">2020</span>, <span class="number">2</span>, <span class="number">29</span>).unwrap())),
-                JSArg::Value(Value::String(<span class="string">&quot;2020-02-29&quot;</span>.to_string())),
+                JSArg::Value(JsonValue::String(<span class="string">&quot;2020-02-29&quot;</span>.to_string()))
             ),
             (
                 ValueType::Date(<span class="prelude-val">None</span>),
-                JSArg::Value(Value::Null)
+                JSArg::Value(JsonValue::Null)
             ),
             (
                 ValueType::DateTime(<span class="prelude-val">Some</span>(Utc.with_ymd_and_hms(<span class="number">2020</span>, <span class="number">1</span>, <span class="number">1</span>, <span class="number">23</span>, <span class="number">13</span>, <span class="number">1</span>).unwrap())),
-                JSArg::Value(Value::String(<span class="string">&quot;2020-01-01T23:13:01+00:00&quot;</span>.to_string())),
+                JSArg::Value(JsonValue::String(<span class="string">&quot;2020-01-01 23:13:01&quot;</span>.to_string()))
             ),
             (
                 ValueType::DateTime(<span class="prelude-val">None</span>),
-                JSArg::Value(Value::Null)
+                JSArg::Value(JsonValue::Null)
             ),
             (
                 ValueType::Time(<span class="prelude-val">Some</span>(NaiveTime::from_hms_opt(<span class="number">23</span>, <span class="number">13</span>, <span class="number">1</span>).unwrap())),
-                JSArg::Value(Value::String(<span class="string">&quot;23:13:01&quot;</span>.to_string())),
+                JSArg::Value(JsonValue::String(<span class="string">&quot;23:13:01&quot;</span>.to_string()))
             ),
             (
                 ValueType::Time(<span class="prelude-val">None</span>),
-                JSArg::Value(Value::Null)
+                JSArg::Value(JsonValue::Null)
             ),
             (
                 ValueType::Array(<span class="prelude-val">Some</span>(<span class="macro">vec!</span>(
                     ValueType::Numeric(<span class="prelude-val">Some</span>(<span class="number">1</span>.into())).into_value(),
                     ValueType::Numeric(<span class="prelude-val">None</span>).into_value(),
                     ValueType::Time(<span class="prelude-val">Some</span>(NaiveTime::from_hms_opt(<span class="number">23</span>, <span class="number">13</span>, <span class="number">1</span>).unwrap())).into_value(),
-                    ValueType::Time(<span class="prelude-val">None</span>).into_value(),
                 ))),
                 JSArg::Array(<span class="macro">vec!</span>(
-                    JSArg::Value(Value::Number(<span class="string">&quot;1.0&quot;</span>.parse().unwrap())),
-                    JSArg::Value(Value::Null),
-                    JSArg::Value(Value::String(<span class="string">&quot;23:13:01&quot;</span>.to_string())),
-                    JSArg::Value(Value::Null),
+                    JSArg::Value(JsonValue::String(<span class="string">&quot;1&quot;</span>.to_string())),
+                    JSArg::Value(JsonValue::Null),
+                    JSArg::Value(JsonValue::String(<span class="string">&quot;23:13:01&quot;</span>.to_string()))
                 ))
             ),
         ];
