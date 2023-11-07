@@ -202,3 +202,163 @@ fn parse_configuration(datamodel: &str) -> CoreResult<(Datasource, String, BitFl
 
     Ok((source, url, preview_features, shadow_database_url))
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::{commands, json_rpc::types::*, CoreResult};
+    use tracing_subscriber;
+    // provider = "postgres"
+    // url      = "postgres://postgres:123456,zjl@localhost:5432/zjl"
+    #[tokio::test]
+    async fn introspect() {
+        let schema = String::from(
+            r##"
+datasource db {
+  provider = "mysql"
+  url      = "mysql://root:123456,zjl@localhost:3306/zjl"
+}"##,
+        );
+        let api = match schema_api(Some(schema.clone()), None) {
+            Ok(api) => api,
+            Err(e) => {
+                panic!("schema_api meet err {}", e)
+            }
+        };
+
+        let params = IntrospectParams {
+            schema,
+            force: false,
+            composite_type_depth: 0,
+            schemas: None,
+        };
+
+        let introspected = match api.introspect(params).await {
+            Ok(introspected) => introspected,
+            Err(e) => {
+                panic!("schema_api meet err {:?}", e)
+            }
+        };
+
+        println!(
+            "{}, {:?}, {:?}",
+            &introspected.datamodel, introspected.warnings, introspected.views
+        );
+    }
+
+    #[tokio::test]
+    async fn test_push() {
+        let s = String::from(
+            r##"
+datasource db {
+  provider = "mysql"
+  url      = "mysql://root:123456,zjl@localhost:3306/zjl"
+}
+
+model User {
+  /// id comment
+  id    Int     @id @default(autoincrement())
+  // email comment
+  email Int  @unique
+  // name comment
+   name  String?
+  // posts comment
+  posts Post[]
+}
+
+// table comment
+model Post {
+    // id comment
+  id        Int     @id @default(autoincrement())
+  title     String // id comment
+  content   String?
+  published Boolean @default(false)
+  author    User    @relation(fields: [authorID], references: [id])
+  authorID  Int
+}
+        "##,
+        );
+        tracing_subscriber::fmt().with_max_level(tracing::Level::DEBUG).init();
+        let schema = String::from(s);
+        let api = match schema_api(Some(schema.clone()), None) {
+            Ok(api) => api,
+            Err(e) => {
+                panic!("schema_api meet err {}", e)
+            }
+        };
+
+        let params = SchemaPushInput { schema, force: false };
+
+        let res = match api.schema_push(params).await.map_err(|err| panic!("{}", err)) {
+            Ok(introspected) => introspected,
+            Err(e) => {
+                panic!("schema_api meet err {:?}", e)
+            }
+        };
+
+        println!("{:?}", res);
+    }
+
+    #[tokio::test]
+    async fn test_migration() {
+        let s = String::from(
+            r##"
+datasource db {
+  provider = "mysql"
+  url      = "mysql://root:123456,zjl@localhost:3306/zjl"
+}
+
+/// table comment
+model User {
+  /// id comment
+  id    Int     @id @default(autoincrement())
+  /// email comment
+  email String  @unique
+  /// posts comment
+  posts Post[]
+  /// author id
+  authorID  Int
+}
+
+model Post {
+    /// id comment
+  id        Int     @id @default(autoincrement())
+  /// id comment
+  title     String
+  /// id comment
+  content   String?
+  /// id comment
+  published Boolean @default(false)
+  /// id comment
+  author    User    @relation(fields: [authorID], references: [id])
+  authorID  Int
+}
+        "##,
+        );
+        tracing_subscriber::fmt().with_max_level(tracing::Level::DEBUG).init();
+        let schema = String::from(s);
+        let api = match schema_api(Some(schema.clone()), None) {
+            Ok(api) => api,
+            Err(e) => {
+                panic!("schema_api meet err {}", e)
+            }
+        };
+
+        let params = CreateMigrationInput {
+            draft: false,
+            migration_name: "test".to_string(),
+            migrations_directory_path: "/Users/bytedance/RustroverProjects/prisma-engines/schema-engine/core/src"
+                .to_string(),
+            prisma_schema: schema,
+        };
+
+        let res = match api.create_migration(params).await.map_err(|err| panic!("{err:?}")) {
+            Ok(introspected) => introspected,
+            Err(e) => {
+                panic!("schema_api meet err {:?}", e)
+            }
+        };
+
+        println!("{:?}", res);
+    }
+}
