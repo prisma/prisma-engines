@@ -49,11 +49,19 @@ impl JsBaseQueryable {
 
     async fn build_query(&self, sql: &str, values: &[quaint::Value<'_>]) -> quaint::Result<Query> {
         let sql: String = sql.to_string();
-        let args = match self.flavour {
-            Flavour::Postgres => conversion::postgres::values_to_js_args(values),
-            Flavour::Sqlite => conversion::sqlite::values_to_js_args(values),
-            _ => conversion::values_to_js_args(values),
-        }?;
+
+        let converter = match self.flavour {
+            Flavour::Postgres => conversion::postgres::value_to_js_arg,
+            Flavour::Sqlite => conversion::sqlite::value_to_js_arg,
+            Flavour::Mysql => conversion::mysql::value_to_js_arg,
+            _ => unreachable!("Unsupported flavour for JS connector {:?}", self.flavour),
+        };
+
+        let args = values
+            .iter()
+            .map(converter)
+            .collect::<serde_json::Result<Vec<conversion::JSArg>>>()?;
+
         Ok(Query { sql, args })
     }
 }

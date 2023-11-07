@@ -1,3 +1,4 @@
+pub(crate) mod mysql;
 pub(crate) mod postgres;
 pub(crate) mod sqlite;
 
@@ -6,10 +7,9 @@ use napi::NapiValue;
 use serde::Serialize;
 use serde_json::value::Value as JsonValue;
 
-#[derive(Debug, Serialize)]
+#[derive(Debug, PartialEq, Serialize)]
 #[serde(untagged)]
 pub enum JSArg {
-    RawString(String),
     Value(serde_json::Value),
     Buffer(Vec<u8>),
     Array(Vec<JSArg>),
@@ -34,7 +34,6 @@ impl FromNapiValue for JSArg {
 impl ToNapiValue for JSArg {
     unsafe fn to_napi_value(env: napi::sys::napi_env, value: Self) -> napi::Result<napi::sys::napi_value> {
         match value {
-            JSArg::RawString(s) => ToNapiValue::to_napi_value(env, s),
             JSArg::Value(v) => ToNapiValue::to_napi_value(env, v),
             JSArg::Buffer(bytes) => {
                 ToNapiValue::to_napi_value(env, napi::Env::from_raw(env).create_buffer_with_data(bytes)?.into_raw())
@@ -58,33 +57,4 @@ impl ToNapiValue for JSArg {
             }
         }
     }
-}
-
-pub fn value_to_js_arg(value: &quaint::Value) -> serde_json::Result<JSArg> {
-    let res = match &value.typed {
-        quaint::ValueType::Json(s) => match s {
-            Some(ref s) => {
-                let json_str = serde_json::to_string(s)?;
-                JSArg::RawString(json_str)
-            }
-            None => JsonValue::Null.into(),
-        },
-        quaint::ValueType::Bytes(bytes) => match bytes {
-            Some(bytes) => JSArg::Buffer(bytes.to_vec()),
-            None => JsonValue::Null.into(),
-        },
-        quaint::ValueType::Numeric(bd) => match bd {
-            // converting decimal to string to preserve the precision
-            Some(bd) => JSArg::RawString(bd.to_string()),
-            None => JsonValue::Null.into(),
-        },
-        quaint::ValueType::Array(Some(ref items)) => JSArg::Array(values_to_js_args(items)?),
-        quaint_value => JSArg::from(JsonValue::from(quaint_value.clone())),
-    };
-
-    Ok(res)
-}
-
-pub fn values_to_js_args(values: &[quaint::Value<'_>]) -> serde_json::Result<Vec<JSArg>> {
-    values.iter().map(value_to_js_arg).collect()
 }
