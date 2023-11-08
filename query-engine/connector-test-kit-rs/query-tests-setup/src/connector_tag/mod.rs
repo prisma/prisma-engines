@@ -296,16 +296,16 @@ pub(crate) fn should_run(
         return false;
     }
 
+    if CONFIG.external_test_executor().is_some() && exclude.iter().any(|excl| excl.0.to_uppercase() == "JS") {
+        println!("Excluded test execution for JS driver adapters. Skipping test");
+        return false;
+    };
+
     if !only.is_empty() {
         return only
             .iter()
             .any(|only| ConnectorVersion::try_from(*only).unwrap().matches_pattern(&version));
     }
-
-    if CONFIG.external_test_executor().is_some() && exclude.iter().any(|excl| excl.0.to_uppercase() == "JS") {
-        println!("Excluded test execution for JS driver adapters. Skipping test");
-        return false;
-    };
 
     if exclude.iter().any(|excl| {
         ConnectorVersion::try_from(*excl).map_or(false, |connector_version| connector_version.matches_pattern(&version))
