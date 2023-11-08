@@ -91,7 +91,7 @@ impl ScalarField {
 
         match scalar_field_type {
             ScalarFieldType::CompositeType(_) => {
-                unreachable!("This shouldn't be reached; composite types are not supported in unique indices.",)
+                unreachable!("This shouldn't be reached; composite types are not supported in compound unique indices.",)
             }
             ScalarFieldType::Enum(x) => TypeIdentifier::Enum(x),
             ScalarFieldType::BuiltInScalar(scalar) => scalar.into(),
