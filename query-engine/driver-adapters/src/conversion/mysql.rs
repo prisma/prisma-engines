@@ -1,9 +1,9 @@
 use crate::conversion::JSArg;
 use serde_json::value::Value as JsonValue;
 
-const DATETIME_FORMAT: &str = "%Y-%m-%d %H:%M:%S";
+const DATETIME_FORMAT: &str = "%Y-%m-%d %H:%M:%S%.f";
 const DATE_FORMAT: &str = "%Y-%m-%d";
-const TIME_FORMAT: &str = "%H:%M:%S";
+const TIME_FORMAT: &str = "%H:%M:%S%.f";
 
 #[rustfmt::skip]
 pub fn value_to_js_arg(value: &quaint::Value) -> serde_json::Result<JSArg> {
@@ -66,16 +66,16 @@ mod test {
                 JSArg::Value(JsonValue::Null)
             ),
             (
-                ValueType::DateTime(Some(Utc.with_ymd_and_hms(2020, 1, 1, 23, 13, 1).unwrap())),
-                JSArg::Value(JsonValue::String("2020-01-01 23:13:01".to_string()))
+                ValueType::DateTime(Some(Utc.with_ymd_and_hms(2020, 1, 1, 23, 13, 1).unwrap().with_nanosecond(100).unwrap())),
+                JSArg::Value(JsonValue::String("2020-01-01 23:13:01.000000100".to_string()))
             ),
             (
                 ValueType::DateTime(None),
                 JSArg::Value(JsonValue::Null)
             ),
             (
-                ValueType::Time(Some(NaiveTime::from_hms_opt(23, 13, 1).unwrap())),
-                JSArg::Value(JsonValue::String("23:13:01".to_string()))
+                ValueType::Time(Some(NaiveTime::from_hms_opt(23, 13, 1).unwrap().with_nanosecond(1200).unwrap())),
+                JSArg::Value(JsonValue::String("23:13:01.000001200".to_string()))
             ),
             (
                 ValueType::Time(None),
