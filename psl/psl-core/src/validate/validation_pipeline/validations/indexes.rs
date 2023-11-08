@@ -386,14 +386,18 @@ pub(crate) fn opclasses_are_not_allowed_with_other_than_normal_indices(index: In
     }
 }
 
-pub(crate) fn composite_type_in_compound_index(index: IndexWalker<'_>, ctx: &mut Context<'_>) {
+pub(crate) fn composite_type_in_compound_unique_index(index: IndexWalker<'_>, ctx: &mut Context<'_>) {
+    if !index.is_unique() {
+        return;
+    }
+
     let composite_type = index
         .fields()
         .find(|f| f.scalar_field_type().as_composite_type().is_some());
 
     if index.fields().len() > 1 && composite_type.is_some() {
         let message = format!(
-            "Prisma does not currently support composite types in compound indices, please remove {:?} from the index. See https://pris.ly/d/mongodb-composite-compound-indices for more details",
+            "Prisma does not currently support composite types in compound unique indices, please remove {:?} from the index. See https://pris.ly/d/mongodb-composite-compound-indices for more details",
             composite_type.unwrap().name()
         );
         ctx.push_error(DatamodelError::new_attribute_validation_error(
