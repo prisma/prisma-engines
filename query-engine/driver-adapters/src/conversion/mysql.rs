@@ -1,7 +1,7 @@
 use crate::conversion::JSArg;
 use serde_json::value::Value as JsonValue;
 
-const DATETIME_FORMAT: &str = "%Y-%m-%d %H:%M:%S";
+const DATETIME_FORMAT: &str = "%Y-%m-%d %H:%M:%S.%f";
 const DATE_FORMAT: &str = "%Y-%m-%d";
 const TIME_FORMAT: &str = "%H:%M:%S";
 
