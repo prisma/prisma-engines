@@ -68,7 +68,7 @@ jobs:
           - name: 'mysql_8'
             single_threaded: false
             connector: 'mysql'
-            version: '8.0'
+            version: '8'
           - name: 'mysql_mariadb'
             single_threaded: false
             connector: 'mysql'
@@ -76,7 +76,7 @@ jobs:
           - name: 'sqlite'
             single_threaded: false
             connector: 'sqlite'
-            version: '??'
+            version: 'n/a'
         engine_protocol: [graphql, json]
 
     env:
