@@ -54,9 +54,43 @@ fn converting_composite_types_compound() {
             authorId   String      @db.ObjectId
             attributes Attribute[]
       
+            @@index([authorId, attributes])
+        }
+
+        type Attribute {
+            name  String
+            value String
+            group String
+        }
+      
+        model User {
+            id   String @id @default(auto()) @map("_id") @db.ObjectId
+            Post Post[]
+        }
+    "#,
+    );
+
+    assert!(res.is_ok());
+}
+
+#[test]
+fn converting_composite_types_compound_unique() {
+    let res = psl::parse_schema(
+        r#"
+        datasource db {
+            provider = "mongodb"
+            url      = "mongodb://localhost:27017/hello"
+        }
+
+        model Post {
+            id         String      @id @default(auto()) @map("_id") @db.ObjectId
+            author     User        @relation(fields: [authorId], references: [id])
+            authorId   String      @db.ObjectId
+            attributes Attribute[]
+      
             @@unique([authorId, attributes])
             //       ^^^^^^^^^^^^^^^^^^^^^^
-            // Prisma does not currently support composite types in compound indices
+            // Prisma does not currently support composite types in compound unique indices...
         }
 
         type Attribute {
@@ -74,7 +108,7 @@ fn converting_composite_types_compound() {
 
     assert!(res
         .unwrap_err()
-        .contains(r#"Prisma does not currently support composite types in compound indices, please remove "attributes" from the index. See https://pris.ly/d/mongodb-composite-compound-indices for more details"#));
+        .contains(r#"Prisma does not currently support composite types in compound unique indices, please remove "attributes" from the index. See https://pris.ly/d/mongodb-composite-compound-indices for more details"#));
 }
 
 #[test]
