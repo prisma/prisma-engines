@@ -108,9 +108,9 @@
 </pre></div><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::conversion::JSArg;
 <span class="kw">use </span>serde_json::value::Value <span class="kw">as </span>JsonValue;
 
-<span class="kw">const </span>DATETIME_FORMAT: <span class="kw-2">&amp;</span>str = <span class="string">&quot;%Y-%m-%d %H:%M:%S&quot;</span>;
+<span class="kw">const </span>DATETIME_FORMAT: <span class="kw-2">&amp;</span>str = <span class="string">&quot;%Y-%m-%d %H:%M:%S%.f&quot;</span>;
 <span class="kw">const </span>DATE_FORMAT: <span class="kw-2">&amp;</span>str = <span class="string">&quot;%Y-%m-%d&quot;</span>;
-<span class="kw">const </span>TIME_FORMAT: <span class="kw-2">&amp;</span>str = <span class="string">&quot;%H:%M:%S&quot;</span>;
+<span class="kw">const </span>TIME_FORMAT: <span class="kw-2">&amp;</span>str = <span class="string">&quot;%H:%M:%S%.f&quot;</span>;
 
 <span class="attr">#[rustfmt::skip]
 </span><span class="kw">pub fn </span>value_to_js_arg(value: <span class="kw-2">&amp;</span>quaint::Value) -&gt; serde_json::Result&lt;JSArg&gt; {
@@ -173,16 +173,16 @@
                 JSArg::Value(JsonValue::Null)
             ),
             (
-                ValueType::DateTime(<span class="prelude-val">Some</span>(Utc.with_ymd_and_hms(<span class="number">2020</span>, <span class="number">1</span>, <span class="number">1</span>, <span class="number">23</span>, <span class="number">13</span>, <span class="number">1</span>).unwrap())),
-                JSArg::Value(JsonValue::String(<span class="string">&quot;2020-01-01 23:13:01&quot;</span>.to_string()))
+                ValueType::DateTime(<span class="prelude-val">Some</span>(Utc.with_ymd_and_hms(<span class="number">2020</span>, <span class="number">1</span>, <span class="number">1</span>, <span class="number">23</span>, <span class="number">13</span>, <span class="number">1</span>).unwrap().with_nanosecond(<span class="number">100</span>).unwrap())),
+                JSArg::Value(JsonValue::String(<span class="string">&quot;2020-01-01 23:13:01.000000100&quot;</span>.to_string()))
             ),
             (
                 ValueType::DateTime(<span class="prelude-val">None</span>),
                 JSArg::Value(JsonValue::Null)
             ),
             (
-                ValueType::Time(<span class="prelude-val">Some</span>(NaiveTime::from_hms_opt(<span class="number">23</span>, <span class="number">13</span>, <span class="number">1</span>).unwrap())),
-                JSArg::Value(JsonValue::String(<span class="string">&quot;23:13:01&quot;</span>.to_string()))
+                ValueType::Time(<span class="prelude-val">Some</span>(NaiveTime::from_hms_opt(<span class="number">23</span>, <span class="number">13</span>, <span class="number">1</span>).unwrap().with_nanosecond(<span class="number">1200</span>).unwrap())),
+                JSArg::Value(JsonValue::String(<span class="string">&quot;23:13:01.000001200&quot;</span>.to_string()))
             ),
             (
                 ValueType::Time(<span class="prelude-val">None</span>),
