@@ -187,8 +187,8 @@ mod max_integer {
         schema.to_owned()
     }
 
-    #[connector_test(schema(overflow_pg), only(Postgres))]
-    async fn unfitted_int_should_fail_pg(runner: Runner) -> TestResult<()> {
+    #[connector_test(schema(overflow_pg), only(Postgres), exclude(JS))]
+    async fn unfitted_int_should_fail_pg_quaint(runner: Runner) -> TestResult<()> {
         // int
         assert_error!(
             runner,
@@ -229,6 +229,55 @@ mod max_integer {
             format!("mutation {{ createOneTest(data: {{ oid: {OVERFLOW_MIN} }}) {{ id }} }}"),
             None,
             "Unable to fit integer value '-1' into an OID (32-bit unsigned integer)."
+        );
+
+        Ok(())
+    }
+
+    // The driver adapter for neon provides different error messages on overflow
+    #[connector_test(schema(overflow_pg), only(JS, Postgres))]
+    async fn unfitted_int_should_fail_pg_js(runner: Runner) -> TestResult<()> {
+        // int
+        assert_error!(
+            runner,
+            format!("mutation {{ createOneTest(data: {{ int: {I32_OVERFLOW_MAX} }}) {{ id }} }}"),
+            None,
+            "value \\\"2147483648\\\" is out of range for type integer"
+        );
+        assert_error!(
+            runner,
+            format!("mutation {{ createOneTest(data: {{ int: {I32_OVERFLOW_MIN} }}) {{ id }} }}"),
+            None,
+            "value \\\"-2147483649\\\" is out of range for type integer"
+        );
+
+        // smallint
+        assert_error!(
+            runner,
+            format!("mutation {{ createOneTest(data: {{ smallint: {I16_OVERFLOW_MAX} }}) {{ id }} }}"),
+            None,
+            "value \\\"32768\\\" is out of range for type smallint"
+        );
+        assert_error!(
+            runner,
+            format!("mutation {{ createOneTest(data: {{ smallint: {I16_OVERFLOW_MIN} }}) {{ id }} }}"),
+            None,
+            "value \\\"-32769\\\" is out of range for type smallint"
+        );
+
+        //oid
+        assert_error!(
+            runner,
+            format!("mutation {{ createOneTest(data: {{ oid: {U32_OVERFLOW_MAX} }}) {{ id }} }}"),
+            None,
+            "value \\\"4294967296\\\" is out of range for type oid"
+        );
+
+        // The underlying driver swallows a negative id by interpreting it as unsigned.
+        // {"data":{"createOneTest":{"id":1,"oid":4294967295}}}
+        run_query!(
+            runner,
+            format!("mutation {{ createOneTest(data: {{ oid: {OVERFLOW_MIN} }}) {{ id, oid }} }}")
         );
 
         Ok(())
