@@ -4,6 +4,7 @@ use std::str::FromStr;
 use crate::async_js_function::AsyncJsFunction;
 use crate::conversion::JSArg;
 use crate::transaction::JsTransaction;
+use metrics::increment_gauge;
 use napi::bindgen_prelude::{FromNapiValue, ToNapiValue};
 use napi::threadsafe_function::{ErrorStrategy, ThreadsafeFunction};
 use napi::{JsObject, JsString};
@@ -555,6 +556,12 @@ impl DriverProxy {
 
     pub async fn start_transaction(&self) -> quaint::Result<Box<JsTransaction>> {
         let tx = self.start_transaction.call(()).await?;
+
+        // Decrement for this gauge is done in JsTransaction::commit/JsTransaction::rollback
+        // Previously, it was done in JsTransaction::new, similar to the native Transaction.
+        // However, correct Dispatcher is lost there and increment does not register, so we moved
+        // it here instead.
+        increment_gauge!("prisma_client_queries_active", 1.0);
         Ok(Box::new(tx))
     }
 }
