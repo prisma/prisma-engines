@@ -257,7 +257,9 @@ fn js_value_to_quaint(
             serde_json::Value::Number(n) => {
                 // n.as_i32() is not implemented, so we need to downcast from i64 instead
                 n.as_i64()
-                    .ok_or(conversion_error!("number must be an integer in column '{column_name}'"))
+                    .ok_or(conversion_error!(
+                        "number must be an integer in column '{column_name}', got '{n}'"
+                    ))
                     .and_then(|n| -> quaint::Result<i32> {
                         n.try_into()
                             .map_err(|e| conversion_error!("cannot convert {n} to i32 in column '{column_name}': {e}"))
@@ -273,9 +275,12 @@ fn js_value_to_quaint(
             )),
         },
         ColumnType::Int64 => match json_value {
-            serde_json::Value::Number(n) => n.as_i64().map(QuaintValue::int64).ok_or(conversion_error!(
-                "number must be an i64 in column '{column_name}', got {n}"
-            )),
+            serde_json::Value::Number(n) => n
+                .as_i64()
+                .ok_or(conversion_error!(
+                    "number must be an integer in column '{column_name}', got '{n}'"
+                ))
+                .map(QuaintValue::int64),
             serde_json::Value::String(s) => s.parse::<i64>().map(QuaintValue::int64).map_err(|e| {
                 conversion_error!("string-encoded number must be an i64 in column '{column_name}', got {s}: {e}")
             }),
