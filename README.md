@@ -299,8 +299,7 @@ To trigger an [Automated integration releases from this repository to npm](#auto
 
 ```
 gh pr checkout 4375
-git branch integration/sql-nested-transactions
-git checkout integration/sql-nested-transactions
+git checkout -b integration/sql-nested-transactions
 git push --set-upstream origin integration/sql-nested-transactions
 ```
 
