@@ -432,6 +432,11 @@
 <a href="#432" id="432">432</a>
 <a href="#433" id="433">433</a>
 <a href="#434" id="434">434</a>
+<a href="#435" id="435">435</a>
+<a href="#436" id="436">436</a>
+<a href="#437" id="437">437</a>
+<a href="#438" id="438">438</a>
+<a href="#439" id="439">439</a>
 </pre></div><pre class="rust"><code><span class="kw">use super</span>::{constraint_namespace::ConstraintName, database_name::validate_db_name};
 <span class="kw">use crate</span>::{
     datamodel_connector::{walker_ext_traits::<span class="kw-2">*</span>, ConnectorCapability},
@@ -820,20 +825,25 @@
     }
 }
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>composite_types_are_not_allowed_in_index(index: IndexWalker&lt;<span class="lifetime">&#39;_</span>&gt;, ctx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;) {
-    <span class="kw">for </span>field <span class="kw">in </span>index.fields() {
-        <span class="kw">if </span>field.scalar_field_type().as_composite_type().is_some() {
-            <span class="kw">let </span>message = <span class="macro">format!</span>(
-                <span class="string">&quot;Indexes can only contain scalar attributes. Please remove {:?} from the argument list of the indexes.&quot;</span>,
-                field.name()
-            );
-            ctx.push_error(DatamodelError::new_attribute_validation_error(
-                <span class="kw-2">&amp;</span>message,
-                index.attribute_name(),
-                index.ast_attribute().span,
-            ));
-            <span class="kw">return</span>;
-        }
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>composite_type_in_compound_unique_index(index: IndexWalker&lt;<span class="lifetime">&#39;_</span>&gt;, ctx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;) {
+    <span class="kw">if </span>!index.is_unique() {
+        <span class="kw">return</span>;
+    }
+
+    <span class="kw">let </span>composite_type = index
+        .fields()
+        .find(|f| f.scalar_field_type().as_composite_type().is_some());
+
+    <span class="kw">if </span>index.fields().len() &gt; <span class="number">1 </span>&amp;&amp; composite_type.is_some() {
+        <span class="kw">let </span>message = <span class="macro">format!</span>(
+            <span class="string">&quot;Prisma does not currently support composite types in compound unique indices, please remove {:?} from the index. See https://pris.ly/d/mongodb-composite-compound-indices for more details&quot;</span>,
+            composite_type.unwrap().name()
+        );
+        ctx.push_error(DatamodelError::new_attribute_validation_error(
+            <span class="kw-2">&amp;</span>message,
+            index.attribute_name(),
+            index.ast_attribute().span,
+        ));
     }
 }
 
