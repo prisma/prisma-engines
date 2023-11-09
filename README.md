@@ -277,7 +277,7 @@ This end to end will take minimum ~1h20 to complete, but is completely automated
 
 Notes:
 - in `prisma/prisma` repository, we do not run tests for `integration/` branches, it is much faster and also means that there is no risk of tests failing (e.g. flaky tests, snapshots) that would stop the publishing process.
-- in `prisma/prisma-engines` tests must first pass, before publishing starts. So better keep an eye on them and restart them as needed.
+- in `prisma/prisma-engines` the Buildkite test pipeline must first pass, then the engines will be built and uploaded to our storage via the Buildkite release pipeline. These 2 pipelines can fail for different reasons, it's recommended to keep an eye on them (check notifications in Slack) and restart jobs as needed. Finally, it will trigger [`prisma/engines-wrapper`](https://github.com/prisma/engines-wrapper). 
 
 #### Manual integration releases from this repository to npm
 
@@ -301,6 +301,15 @@ To trigger an [Automated integration releases from this repository to npm](#auto
 gh pr checkout 4375
 git checkout -b integration/sql-nested-transactions
 git push --set-upstream origin integration/sql-nested-transactions
+```
+
+If there is a need to re-create this branch because it has been updated, deleting it and re-creating will make sure the content is identical and avoid any conflicts.
+
+```
+git branch --delete integration/sql-nested-transactions
+gh pr checkout 4375
+git checkout -b integration/sql-nested-transactions
+git push --set-upstream origin integration/sql-nested-transactions --force
 ```
 
 ## Security
