@@ -187,7 +187,6 @@ services:
     restart: unless-stopped
     platform: linux/x86_64
     environment:
-      MYSQL_USER: root
       MYSQL_ROOT_PASSWORD: prisma
       MYSQL_DATABASE: prisma
     ports:
