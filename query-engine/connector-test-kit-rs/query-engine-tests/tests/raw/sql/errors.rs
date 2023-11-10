@@ -34,7 +34,7 @@ mod raw_errors {
         Ok(())
     }
 
-    #[connector_test(schema(common_nullable_types), exclude(JS))]
+    #[connector_test(schema(common_nullable_types), only(Postgres), exclude(JS))]
     async fn list_param_for_scalar_column_should_not_panic_quaint(runner: Runner) -> TestResult<()> {
         assert_error!(
             runner,

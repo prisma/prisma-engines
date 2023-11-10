@@ -49,7 +49,7 @@ impl ToNapiValue for JSArg {
                 for (index, item) in items.into_iter().enumerate() {
                     let js_value = ToNapiValue::to_napi_value(env.raw(), item)?;
                     // TODO: NapiRaw could be implemented for sys::napi_value directly, there should
-                    // be no need for re-wrapping; submit a patch to napi-rs and simplify here.
+                    //  be no need for re-wrapping; submit a patch to napi-rs and simplify here.
                     array.set(index as u32, napi::JsUnknown::from_raw_unchecked(env.raw(), js_value))?;
                 }
 

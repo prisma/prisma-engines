@@ -36,7 +36,6 @@ pub(crate) enum DriverAdapterError {
     GenericJs {
         id: i32,
     },
-
     Postgres(#[serde(with = "PostgresErrorDef")] PostgresError),
     Mysql(#[serde(with = "MysqlErrorDef")] MysqlError),
     Sqlite(#[serde(with = "SqliteErrorDef")] SqliteError),
