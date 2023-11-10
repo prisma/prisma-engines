@@ -1,5 +1,15 @@
 use crate::error::{DatabaseConstraint, Error, ErrorKind};
+use thiserror::Error;
 
+#[derive(Debug, Error)]
+enum MysqlAsyncError {
+    #[error("Server error: `{}'", _0)]
+    Server(#[source] MysqlError),
+}
+
+/// This type represents MySql server error.
+#[derive(Debug, Error, Clone, Eq, PartialEq)]
+#[error("ERROR {} ({}): {}", state, code, message)]
 pub struct MysqlError {
     pub code: u16,
     pub message: String,
@@ -219,23 +229,22 @@ impl From<MysqlError> for Error {
                 builder.set_original_message(error.message);
                 builder.build()
             }
-            _ => unimplemented!(),
-            // _ => {
-            //     let kind = ErrorKind::QueryError(
-            //         my::Error::Server(my::ServerError {
-            //             message: error.message.clone(),
-            //             code,
-            //             state: error.state.clone(),
-            //         })
-            //         .into(),
-            //     );
+            _ => {
+                let kind = ErrorKind::QueryError(
+                    MysqlAsyncError::Server(MysqlError {
+                        message: error.message.clone(),
+                        code,
+                        state: error.state.clone(),
+                    })
+                    .into(),
+                );
 
-            //     let mut builder = Error::builder(kind);
-            //     builder.set_original_code(format!("{code}"));
-            //     builder.set_original_message(error.message);
+                let mut builder = Error::builder(kind);
+                builder.set_original_code(format!("{code}"));
+                builder.set_original_message(error.message);
 
-            //     builder.build()
-            // }
+                builder.build()
+            }
         }
     }
 }
