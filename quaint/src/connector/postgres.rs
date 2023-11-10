@@ -1,6 +1,9 @@
 mod conversion;
 mod error;
 
+use super::postgres_wasm::{Hidden, SslAcceptMode, SslParams};
+pub(crate) use super::postgres_wasm::{PostgresFlavour, PostgresUrl};
+
 use crate::{
     ast::{Query, Value},
     connector::{metrics, queryable::*, ResultSet},
@@ -11,25 +14,18 @@ use async_trait::async_trait;
 use futures::{future::FutureExt, lock::Mutex};
 use lru_cache::LruCache;
 use native_tls::{Certificate, Identity, TlsConnector};
-use percent_encoding::percent_decode;
 use postgres_native_tls::MakeTlsConnector;
 use std::{
-    borrow::{Borrow, Cow},
+    borrow::Borrow,
     fmt::{Debug, Display},
     fs,
     future::Future,
     sync::atomic::{AtomicBool, Ordering},
     time::Duration,
 };
-use tokio_postgres::{
-    config::{ChannelBinding, SslMode},
-    Client, Config, Statement,
-};
-use url::{Host, Url};
+use tokio_postgres::{config::ChannelBinding, Client, Config, Statement};
 
 pub use error::PostgresError;
-
-pub(crate) const DEFAULT_SCHEMA: &str = "public";
 
 /// The underlying postgres driver. Only available with the `expose-drivers`
 /// Cargo feature.
@@ -37,15 +33,6 @@ pub(crate) const DEFAULT_SCHEMA: &str = "public";
 pub use tokio_postgres;
 
 use super::{IsolationLevel, Transaction};
-
-#[derive(Clone)]
-struct Hidden<T>(T);
-
-impl<T> Debug for Hidden<T> {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        f.write_str("<HIDDEN>")
-    }
-}
 
 struct PostgresClient(Client);
 
@@ -63,20 +50,6 @@ pub struct PostgreSql {
     socket_timeout: Option<Duration>,
     statement_cache: Mutex<LruCache<String, Statement>>,
     is_healthy: AtomicBool,
-}
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum SslAcceptMode {
-    Strict,
-    AcceptInvalidCerts,
-}
-
-#[derive(Debug, Clone)]
-pub struct SslParams {
-    certificate_file: Option<String>,
-    identity_file: Option<String>,
-    identity_password: Hidden<Option<String>>,
-    ssl_accept_mode: SslAcceptMode,
 }
 
 #[derive(Debug)]
@@ -146,166 +119,7 @@ impl SslParams {
     }
 }
 
-#[derive(Debug, Clone, Copy)]
-pub enum PostgresFlavour {
-    Postgres,
-    Cockroach,
-    Unknown,
-}
-
-impl PostgresFlavour {
-    /// Returns `true` if the postgres flavour is [`Postgres`].
-    ///
-    /// [`Postgres`]: PostgresFlavour::Postgres
-    fn is_postgres(&self) -> bool {
-        matches!(self, Self::Postgres)
-    }
-
-    /// Returns `true` if the postgres flavour is [`Cockroach`].
-    ///
-    /// [`Cockroach`]: PostgresFlavour::Cockroach
-    fn is_cockroach(&self) -> bool {
-        matches!(self, Self::Cockroach)
-    }
-
-    /// Returns `true` if the postgres flavour is [`Unknown`].
-    ///
-    /// [`Unknown`]: PostgresFlavour::Unknown
-    fn is_unknown(&self) -> bool {
-        matches!(self, Self::Unknown)
-    }
-}
-
-/// Wraps a connection url and exposes the parsing logic used by Quaint,
-/// including default values.
-#[derive(Debug, Clone)]
-pub struct PostgresUrl {
-    url: Url,
-    query_params: PostgresUrlQueryParams,
-    flavour: PostgresFlavour,
-}
-
 impl PostgresUrl {
-    /// Parse `Url` to `PostgresUrl`. Returns error for mistyped connection
-    /// parameters.
-    pub fn new(url: Url) -> Result<Self, Error> {
-        let query_params = Self::parse_query_params(&url)?;
-
-        Ok(Self {
-            url,
-            query_params,
-            flavour: PostgresFlavour::Unknown,
-        })
-    }
-
-    /// The bare `Url` to the database.
-    pub fn url(&self) -> &Url {
-        &self.url
-    }
-
-    /// The percent-decoded database username.
-    pub fn username(&self) -> Cow<str> {
-        match percent_decode(self.url.username().as_bytes()).decode_utf8() {
-            Ok(username) => username,
-            Err(_) => {
-                tracing::warn!("Couldn't decode username to UTF-8, using the non-decoded version.");
-
-                self.url.username().into()
-            }
-        }
-    }
-
-    /// The database host. Taken first from the `host` query parameter, then
-    /// from the `host` part of the URL. For socket connections, the query
-    /// parameter must be used.
-    ///
-    /// If none of them are set, defaults to `localhost`.
-    pub fn host(&self) -> &str {
-        match (self.query_params.host.as_ref(), self.url.host_str(), self.url.host()) {
-            (Some(host), _, _) => host.as_str(),
-            (None, Some(""), _) => "localhost",
-            (None, None, _) => "localhost",
-            (None, Some(host), Some(Host::Ipv6(_))) => {
-                // The `url` crate may return an IPv6 address in brackets, which must be stripped.
-                if host.starts_with('[') && host.ends_with(']') {
-                    &host[1..host.len() - 1]
-                } else {
-                    host
-                }
-            }
-            (None, Some(host), _) => host,
-        }
-    }
-
-    /// Name of the database connected. Defaults to `postgres`.
-    pub fn dbname(&self) -> &str {
-        match self.url.path_segments() {
-            Some(mut segments) => segments.next().unwrap_or("postgres"),
-            None => "postgres",
-        }
-    }
-
-    /// The percent-decoded database password.
-    pub fn password(&self) -> Cow<str> {
-        match self
-            .url
-            .password()
-            .and_then(|pw| percent_decode(pw.as_bytes()).decode_utf8().ok())
-        {
-            Some(password) => password,
-            None => self.url.password().unwrap_or("").into(),
-        }
-    }
-
-    /// The database port, defaults to `5432`.
-    pub fn port(&self) -> u16 {
-        self.url.port().unwrap_or(5432)
-    }
-
-    /// The database schema, defaults to `public`.
-    pub fn schema(&self) -> &str {
-        self.query_params.schema.as_deref().unwrap_or(DEFAULT_SCHEMA)
-    }
-
-    /// Whether the pgbouncer mode is enabled.
-    pub fn pg_bouncer(&self) -> bool {
-        self.query_params.pg_bouncer
-    }
-
-    /// The connection timeout.
-    pub fn connect_timeout(&self) -> Option<Duration> {
-        self.query_params.connect_timeout
-    }
-
-    /// Pool check_out timeout
-    pub fn pool_timeout(&self) -> Option<Duration> {
-        self.query_params.pool_timeout
-    }
-
-    /// The socket timeout
-    pub fn socket_timeout(&self) -> Option<Duration> {
-        self.query_params.socket_timeout
-    }
-
-    /// The maximum connection lifetime
-    pub fn max_connection_lifetime(&self) -> Option<Duration> {
-        self.query_params.max_connection_lifetime
-    }
-
-    /// The maximum idle connection lifetime
-    pub fn max_idle_connection_lifetime(&self) -> Option<Duration> {
-        self.query_params.max_idle_connection_lifetime
-    }
-
-    /// The custom application name
-    pub fn application_name(&self) -> Option<&str> {
-        self.query_params.application_name.as_deref()
-    }
-
-    pub fn channel_binding(&self) -> ChannelBinding {
-        self.query_params.channel_binding
-    }
-
     pub(crate) fn cache(&self) -> LruCache<String, Statement> {
         if self.query_params.pg_bouncer {
             LruCache::new(0)
@@ -314,208 +128,8 @@ impl PostgresUrl {
         }
     }
 
-    pub(crate) fn options(&self) -> Option<&str> {
-        self.query_params.options.as_deref()
-    }
-
-    /// Sets whether the URL points to a Postgres, Cockroach or Unknown database.
-    /// This is used to avoid a network roundtrip at connection to set the search path.
-    ///
-    /// The different behaviours are:
-    /// - Postgres: Always avoid a network roundtrip by setting the search path through client connection parameters.
-    /// - Cockroach: Avoid a network roundtrip if the schema name is deemed "safe" (i.e. no escape quoting required). Otherwise, set the search path through a database query.
-    /// - Unknown: Always add a network roundtrip by setting the search path through a database query.
-    pub fn set_flavour(&mut self, flavour: PostgresFlavour) {
-        self.flavour = flavour;
-    }
-
-    fn parse_query_params(url: &Url) -> Result<PostgresUrlQueryParams, Error> {
-        let mut connection_limit = None;
-        let mut schema = None;
-        let mut certificate_file = None;
-        let mut identity_file = None;
-        let mut identity_password = None;
-        let mut ssl_accept_mode = SslAcceptMode::AcceptInvalidCerts;
-        let mut ssl_mode = SslMode::Prefer;
-        let mut host = None;
-        let mut application_name = None;
-        let mut channel_binding = ChannelBinding::Prefer;
-        let mut socket_timeout = None;
-        let mut connect_timeout = Some(Duration::from_secs(5));
-        let mut pool_timeout = Some(Duration::from_secs(10));
-        let mut pg_bouncer = false;
-        let mut statement_cache_size = 100;
-        let mut max_connection_lifetime = None;
-        let mut max_idle_connection_lifetime = Some(Duration::from_secs(300));
-        let mut options = None;
-
-        for (k, v) in url.query_pairs() {
-            match k.as_ref() {
-                "pgbouncer" => {
-                    pg_bouncer = v
-                        .parse()
-                        .map_err(|_| Error::builder(ErrorKind::InvalidConnectionArguments).build())?;
-                }
-                "sslmode" => {
-                    match v.as_ref() {
-                        "disable" => ssl_mode = SslMode::Disable,
-                        "prefer" => ssl_mode = SslMode::Prefer,
-                        "require" => ssl_mode = SslMode::Require,
-                        _ => {
-                            tracing::debug!(message = "Unsupported SSL mode, defaulting to `prefer`", mode = &*v);
-                        }
-                    };
-                }
-                "sslcert" => {
-                    certificate_file = Some(v.to_string());
-                }
-                "sslidentity" => {
-                    identity_file = Some(v.to_string());
-                }
-                "sslpassword" => {
-                    identity_password = Some(v.to_string());
-                }
-                "statement_cache_size" => {
-                    statement_cache_size = v
-                        .parse()
-                        .map_err(|_| Error::builder(ErrorKind::InvalidConnectionArguments).build())?;
-                }
-                "sslaccept" => {
-                    match v.as_ref() {
-                        "strict" => {
-                            ssl_accept_mode = SslAcceptMode::Strict;
-                        }
-                        "accept_invalid_certs" => {
-                            ssl_accept_mode = SslAcceptMode::AcceptInvalidCerts;
-                        }
-                        _ => {
-                            tracing::debug!(
-                                message = "Unsupported SSL accept mode, defaulting to `strict`",
-                                mode = &*v
-                            );
-
-                            ssl_accept_mode = SslAcceptMode::Strict;
-                        }
-                    };
-                }
-                "schema" => {
-                    schema = Some(v.to_string());
-                }
-                "connection_limit" => {
-                    let as_int: usize = v
-                        .parse()
-                        .map_err(|_| Error::builder(ErrorKind::InvalidConnectionArguments).build())?;
-                    connection_limit = Some(as_int);
-                }
-                "host" => {
-                    host = Some(v.to_string());
-                }
-                "socket_timeout" => {
-                    let as_int = v
-                        .parse()
-                        .map_err(|_| Error::builder(ErrorKind::InvalidConnectionArguments).build())?;
-                    socket_timeout = Some(Duration::from_secs(as_int));
-                }
-                "connect_timeout" => {
-                    let as_int = v
-                        .parse()
-                        .map_err(|_| Error::builder(ErrorKind::InvalidConnectionArguments).build())?;
-
-                    if as_int == 0 {
-                        connect_timeout = None;
-                    } else {
-                        connect_timeout = Some(Duration::from_secs(as_int));
-                    }
-                }
-                "pool_timeout" => {
-                    let as_int = v
-                        .parse()
-                        .map_err(|_| Error::builder(ErrorKind::InvalidConnectionArguments).build())?;
-
-                    if as_int == 0 {
-                        pool_timeout = None;
-                    } else {
-                        pool_timeout = Some(Duration::from_secs(as_int));
-                    }
-                }
-                "max_connection_lifetime" => {
-                    let as_int = v
-                        .parse()
-                        .map_err(|_| Error::builder(ErrorKind::InvalidConnectionArguments).build())?;
-
-                    if as_int == 0 {
-                        max_connection_lifetime = None;
-                    } else {
-                        max_connection_lifetime = Some(Duration::from_secs(as_int));
-                    }
-                }
-                "max_idle_connection_lifetime" => {
-                    let as_int = v
-                        .parse()
-                        .map_err(|_| Error::builder(ErrorKind::InvalidConnectionArguments).build())?;
-
-                    if as_int == 0 {
-                        max_idle_connection_lifetime = None;
-                    } else {
-                        max_idle_connection_lifetime = Some(Duration::from_secs(as_int));
-                    }
-                }
-                "application_name" => {
-                    application_name = Some(v.to_string());
-                }
-                "channel_binding" => {
-                    match v.as_ref() {
-                        "disable" => channel_binding = ChannelBinding::Disable,
-                        "prefer" => channel_binding = ChannelBinding::Prefer,
-                        "require" => channel_binding = ChannelBinding::Require,
-                        _ => {
-                            tracing::debug!(
-                                message = "Unsupported Channel Binding {channel_binding}, defaulting to `prefer`",
-                                channel_binding = &*v
-                            );
-                        }
-                    };
-                }
-                "options" => {
-                    options = Some(v.to_string());
-                }
-                _ => {
-                    tracing::trace!(message = "Discarding connection string param", param = &*k);
-                }
-            };
-        }
-
-        Ok(PostgresUrlQueryParams {
-            ssl_params: SslParams {
-                certificate_file,
-                identity_file,
-                ssl_accept_mode,
-                identity_password: Hidden(identity_password),
-            },
-            connection_limit,
-            schema,
-            ssl_mode,
-            host,
-            connect_timeout,
-            pool_timeout,
-            socket_timeout,
-            pg_bouncer,
-            statement_cache_size,
-            max_connection_lifetime,
-            max_idle_connection_lifetime,
-            application_name,
-            channel_binding,
-            options,
-        })
-    }
-
-    pub(crate) fn ssl_params(&self) -> &SslParams {
-        &self.query_params.ssl_params
-    }
-
-    #[cfg(feature = "pooled")]
-    pub(crate) fn connection_limit(&self) -> Option<usize> {
-        self.query_params.connection_limit
+    pub fn channel_binding(&self) -> ChannelBinding {
+        self.query_params.channel_binding
     }
 
     /// On Postgres, we set the SEARCH_PATH and client-encoding through client connection parameters to save a network roundtrip on connection.
@@ -569,29 +183,6 @@ impl PostgresUrl {
 
         config
     }
-
-    pub fn flavour(&self) -> PostgresFlavour {
-        self.flavour
-    }
-}
-
-#[derive(Debug, Clone)]
-pub(crate) struct PostgresUrlQueryParams {
-    ssl_params: SslParams,
-    connection_limit: Option<usize>,
-    schema: Option<String>,
-    ssl_mode: SslMode,
-    pg_bouncer: bool,
-    host: Option<String>,
-    socket_timeout: Option<Duration>,
-    connect_timeout: Option<Duration>,
-    pool_timeout: Option<Duration>,
-    statement_cache_size: usize,
-    max_connection_lifetime: Option<Duration>,
-    max_idle_connection_lifetime: Option<Duration>,
-    application_name: Option<String>,
-    channel_binding: ChannelBinding,
-    options: Option<String>,
 }
 
 impl PostgreSql {

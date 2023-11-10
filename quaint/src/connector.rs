@@ -10,36 +10,62 @@
 //! querying interface.
 
 mod connection_info;
+
 pub mod metrics;
 mod queryable;
 mod result_set;
-#[cfg(any(feature = "mssql", feature = "postgresql", feature = "mysql"))]
+#[cfg(any(
+    feature = "mssql-connector",
+    feature = "postgresql-connector",
+    feature = "mysql-connector"
+))]
 mod timeout;
 mod transaction;
 mod type_identifier;
 
-#[cfg(feature = "mssql")]
+#[cfg(feature = "mssql-connector")]
 pub(crate) mod mssql;
-#[cfg(feature = "mysql")]
+#[cfg(feature = "mssql")]
+pub(crate) mod mssql_wasm;
+#[cfg(feature = "mysql-connector")]
 pub(crate) mod mysql;
-#[cfg(feature = "postgresql")]
-pub(crate) mod postgres;
-#[cfg(feature = "sqlite")]
-pub(crate) mod sqlite;
-
 #[cfg(feature = "mysql")]
-pub use self::mysql::*;
+pub(crate) mod mysql_wasm;
+#[cfg(feature = "postgresql-connector")]
+pub(crate) mod postgres;
 #[cfg(feature = "postgresql")]
+pub(crate) mod postgres_wasm;
+#[cfg(feature = "sqlite-connector")]
+pub(crate) mod sqlite;
+#[cfg(feature = "sqlite")]
+pub(crate) mod sqlite_wasm;
+
+#[cfg(feature = "mysql-connector")]
+pub use self::mysql::*;
+#[cfg(feature = "mysql")]
+pub use self::mysql_wasm::*;
+#[cfg(feature = "postgresql-connector")]
 pub use self::postgres::*;
+#[cfg(feature = "postgresql")]
+pub use self::postgres_wasm::*;
+#[cfg(feature = "mssql-connector")]
+pub use mssql::*;
+#[cfg(feature = "mssql")]
+pub use mssql_wasm::*;
+#[cfg(feature = "sqlite-connector")]
+pub use sqlite::*;
+#[cfg(feature = "sqlite")]
+pub use sqlite_wasm::*;
+
 pub use self::result_set::*;
 pub use connection_info::*;
-#[cfg(feature = "mssql")]
-pub use mssql::*;
 pub use queryable::*;
-#[cfg(feature = "sqlite")]
-pub use sqlite::*;
 pub use transaction::*;
-#[cfg(any(feature = "sqlite", feature = "mysql", feature = "postgresql"))]
+#[cfg(any(
+    feature = "mssql-connector",
+    feature = "postgresql-connector",
+    feature = "mysql-connector"
+))]
 #[allow(unused_imports)]
 pub(crate) use type_identifier::*;
 

@@ -1,8 +1,8 @@
-#[cfg(feature = "mssql")]
+#[cfg(feature = "mssql-connector")]
 use crate::connector::MssqlUrl;
-#[cfg(feature = "mysql")]
+#[cfg(feature = "mysql-connector")]
 use crate::connector::MysqlUrl;
-#[cfg(feature = "postgresql")]
+#[cfg(feature = "postgresql-connector")]
 use crate::connector::PostgresUrl;
 use crate::{
     ast,
@@ -97,7 +97,7 @@ impl Manager for QuaintManager {
 
     async fn connect(&self) -> crate::Result<Self::Connection> {
         let conn = match self {
-            #[cfg(feature = "sqlite")]
+            #[cfg(feature = "sqlite-connector")]
             QuaintManager::Sqlite { url, .. } => {
                 use crate::connector::Sqlite;
 
@@ -106,19 +106,19 @@ impl Manager for QuaintManager {
                 Ok(Box::new(conn) as Self::Connection)
             }
 
-            #[cfg(feature = "mysql")]
+            #[cfg(feature = "mysql-connector")]
             QuaintManager::Mysql { url } => {
                 use crate::connector::Mysql;
                 Ok(Box::new(Mysql::new(url.clone()).await?) as Self::Connection)
             }
 
-            #[cfg(feature = "postgresql")]
+            #[cfg(feature = "postgresql-connector")]
             QuaintManager::Postgres { url } => {
                 use crate::connector::PostgreSql;
                 Ok(Box::new(PostgreSql::new(url.clone()).await?) as Self::Connection)
             }
 
-            #[cfg(feature = "mssql")]
+            #[cfg(feature = "mssql-connector")]
             QuaintManager::Mssql { url } => {
                 use crate::connector::Mssql;
                 Ok(Box::new(Mssql::new(url.clone()).await?) as Self::Connection)
@@ -146,7 +146,7 @@ mod tests {
     use crate::pooled::Quaint;
 
     #[tokio::test]
-    #[cfg(feature = "mysql")]
+    #[cfg(feature = "mysql-connector")]
     async fn mysql_default_connection_limit() {
         let conn_string = std::env::var("TEST_MYSQL").expect("TEST_MYSQL connection string not set.");
 
@@ -156,7 +156,7 @@ mod tests {
     }
 
     #[tokio::test]
-    #[cfg(feature = "mysql")]
+    #[cfg(feature = "mysql-connector")]
     async fn mysql_custom_connection_limit() {
         let conn_string = format!(
             "{}?connection_limit=10",
@@ -169,7 +169,7 @@ mod tests {
     }
 
     #[tokio::test]
-    #[cfg(feature = "postgresql")]
+    #[cfg(feature = "postgresql-connector")]
     async fn psql_default_connection_limit() {
         let conn_string = std::env::var("TEST_PSQL").expect("TEST_PSQL connection string not set.");
 
@@ -179,7 +179,7 @@ mod tests {
     }
 
     #[tokio::test]
-    #[cfg(feature = "postgresql")]
+    #[cfg(feature = "postgresql-connector")]
     async fn psql_custom_connection_limit() {
         let conn_string = format!(
             "{}?connection_limit=10",
@@ -192,7 +192,7 @@ mod tests {
     }
 
     #[tokio::test]
-    #[cfg(feature = "mssql")]
+    #[cfg(feature = "mssql-connector")]
     async fn mssql_default_connection_limit() {
         let conn_string = std::env::var("TEST_MSSQL").expect("TEST_MSSQL connection string not set.");
 
@@ -202,7 +202,7 @@ mod tests {
     }
 
     #[tokio::test]
-    #[cfg(feature = "mssql")]
+    #[cfg(feature = "mssql-connector")]
     async fn mssql_custom_connection_limit() {
         let conn_string = format!(
             "{};connectionLimit=10",
@@ -215,7 +215,7 @@ mod tests {
     }
 
     #[tokio::test]
-    #[cfg(feature = "sqlite")]
+    #[cfg(feature = "sqlite-connector")]
     async fn test_default_connection_limit() {
         let conn_string = "file:db/test.db".to_string();
         let pool = Quaint::builder(&conn_string).unwrap().build();
@@ -224,7 +224,7 @@ mod tests {
     }
 
     #[tokio::test]
-    #[cfg(feature = "sqlite")]
+    #[cfg(feature = "sqlite-connector")]
     async fn test_custom_connection_limit() {
         let conn_string = "file:db/test.db?connection_limit=10".to_string();
         let pool = Quaint::builder(&conn_string).unwrap().build();
