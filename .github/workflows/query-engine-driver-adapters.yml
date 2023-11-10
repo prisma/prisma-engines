@@ -31,8 +31,6 @@ jobs:
             setup_task: 'dev-neon-ws-postgres13'
           - name: 'libsql'
             setup_task: 'dev-libsql-sqlite'
-          - name: 'planetscale'
-            setup_task: 'dev-planetscale-vitess8'
         node_version: ['18']
     env:
       LOG_LEVEL: 'info' # Set to "debug" to trace the query engine and node process running the driver adapter
@@ -46,7 +44,7 @@ jobs:
       QUERY_BATCH_SIZE: '10'
       WORKSPACE_ROOT: ${{ github.workspace }}
 
-    runs-on: buildjet-8vcpu-ubuntu-2004
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
         with:
