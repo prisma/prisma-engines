@@ -1,20 +1,9 @@
 use crate::error::{DatabaseConstraint, Error, ErrorKind};
-use mysql_async as my;
 
 pub struct MysqlError {
     pub code: u16,
     pub message: String,
     pub state: String,
-}
-
-impl From<&my::ServerError> for MysqlError {
-    fn from(value: &my::ServerError) -> Self {
-        MysqlError {
-            code: value.code,
-            message: value.message.to_owned(),
-            state: value.state.to_owned(),
-        }
-    }
 }
 
 impl From<MysqlError> for Error {
@@ -230,43 +219,23 @@ impl From<MysqlError> for Error {
                 builder.set_original_message(error.message);
                 builder.build()
             }
-            _ => {
-                let kind = ErrorKind::QueryError(
-                    my::Error::Server(my::ServerError {
-                        message: error.message.clone(),
-                        code,
-                        state: error.state.clone(),
-                    })
-                    .into(),
-                );
+            _ => unimplemented!(),
+            // _ => {
+            //     let kind = ErrorKind::QueryError(
+            //         my::Error::Server(my::ServerError {
+            //             message: error.message.clone(),
+            //             code,
+            //             state: error.state.clone(),
+            //         })
+            //         .into(),
+            //     );
 
-                let mut builder = Error::builder(kind);
-                builder.set_original_code(format!("{code}"));
-                builder.set_original_message(error.message);
+            //     let mut builder = Error::builder(kind);
+            //     builder.set_original_code(format!("{code}"));
+            //     builder.set_original_message(error.message);
 
-                builder.build()
-            }
-        }
-    }
-}
-
-impl From<my::Error> for Error {
-    fn from(e: my::Error) -> Error {
-        match e {
-            my::Error::Io(my::IoError::Tls(err)) => Error::builder(ErrorKind::TlsError {
-                message: err.to_string(),
-            })
-            .build(),
-            my::Error::Io(my::IoError::Io(err)) if err.kind() == std::io::ErrorKind::UnexpectedEof => {
-                Error::builder(ErrorKind::ConnectionClosed).build()
-            }
-            my::Error::Io(io_error) => Error::builder(ErrorKind::ConnectionError(io_error.into())).build(),
-            my::Error::Driver(e) => Error::builder(ErrorKind::QueryError(e.into())).build(),
-            my::Error::Server(ref server_error) => {
-                let mysql_error: MysqlError = server_error.into();
-                mysql_error.into()
-            }
-            e => Error::builder(ErrorKind::QueryError(e.into())).build(),
+            //     builder.build()
+            // }
         }
     }
 }

@@ -1,3 +1,4 @@
+pub use wasm::common::PostgresUrl;
 pub use wasm::error::PostgresError;
 
 #[cfg(feature = "postgresql")]

@@ -27,10 +27,10 @@ mod type_identifier;
 pub(crate) mod mssql;
 #[cfg(feature = "mssql")]
 pub(crate) mod mssql_wasm;
-#[cfg(feature = "mysql-connector")]
-pub(crate) mod mysql;
-#[cfg(feature = "mysql")]
-pub(crate) mod mysql_wasm;
+// #[cfg(feature = "mysql-connector")]
+// pub(crate) mod mysql;
+// #[cfg(feature = "mysql")]
+// pub(crate) mod mysql_wasm;
 // #[cfg(feature = "postgresql-connector")]
 // pub(crate) mod postgres;
 // #[cfg(feature = "postgresql")]
@@ -40,10 +40,10 @@ pub(crate) mod sqlite;
 #[cfg(feature = "sqlite")]
 pub(crate) mod sqlite_wasm;
 
-#[cfg(feature = "mysql-connector")]
-pub use self::mysql::*;
-#[cfg(feature = "mysql")]
-pub use self::mysql_wasm::*;
+// #[cfg(feature = "mysql-connector")]
+// pub use self::mysql::*;
+// #[cfg(feature = "mysql")]
+// pub use self::mysql_wasm::*;
 // #[cfg(feature = "postgresql-connector")]
 // pub use self::postgres::*;
 // #[cfg(feature = "postgresql")]
@@ -76,4 +76,11 @@ pub(crate) mod postgres;
 #[cfg(feature = "postgresql-connector")]
 pub use postgres::native::*;
 #[cfg(feature = "postgresql")]
-pub use postgres::wasm::*;
+pub use postgres::wasm::common::*;
+
+#[cfg(feature = "mysql")]
+pub(crate) mod mysql;
+#[cfg(feature = "mysql-connector")]
+pub use mysql::native::*;
+#[cfg(feature = "mysql")]
+pub use mysql::wasm::common::*;
