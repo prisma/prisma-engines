@@ -18,7 +18,7 @@ import { createClient } from '@libsql/client'
 import { PrismaLibSQL } from '@prisma/adapter-libsql'
 
 // planetscale dependencies
-import { connect as planetscaleConnect } from '@planetscale/database'
+import { Client as PlanetscaleClient } from '@planetscale/database'
 import { PrismaPlanetScale } from '@prisma/adapter-planetscale'
 
 
@@ -276,12 +276,12 @@ async function planetscaleAdapter(url: string): Promise<DriverAdapter> {
         throw new Error("DRIVER_ADAPTER_CONFIG is not defined or empty, but its required for planetscale adapter.");
     }
 
-    const connection = planetscaleConnect({
+    const client = new PlanetscaleClient({
         url: proxyURL,
         fetch,
     })
 
-    return new PrismaPlanetScale(connection)
+    return new PrismaPlanetScale(client)
 }
 
 main().catch(err)
