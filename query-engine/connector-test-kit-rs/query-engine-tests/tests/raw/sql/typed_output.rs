@@ -49,7 +49,7 @@ mod typed_output {
         create_row(&runner, r#"{ id: 2 }"#).await?;
 
         insta::assert_snapshot!(
-          run_query_pretty!(&runner, fmt_query_raw(r#"SELECT * FROM "TestModel";"#, vec![])),
+          run_query_pretty!(&runner, fmt_query_raw(r#"SELECT * FROM "typed_output_all_scalars_pg"."TestModel";"#, vec![])),
           @r###"
         {
           "data": {

@@ -533,9 +533,9 @@ impl PostgresUrl {
                 config.search_path(CockroachSearchPath(schema).to_string());
             }
 
-            if self.flavour().is_postgres() {
-                config.search_path(PostgresSearchPath(schema).to_string());
-            }
+            // if self.flavour().is_postgres() {
+            //     config.search_path(PostgresSearchPath(schema).to_string());
+            // }
         }
     }
 
