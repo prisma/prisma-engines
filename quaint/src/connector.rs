@@ -23,10 +23,10 @@ mod timeout;
 mod transaction;
 mod type_identifier;
 
-#[cfg(feature = "mssql-connector")]
-pub(crate) mod mssql;
-#[cfg(feature = "mssql")]
-pub(crate) mod mssql_wasm;
+// #[cfg(feature = "mssql-connector")]
+// pub(crate) mod mssql;
+// #[cfg(feature = "mssql")]
+// pub(crate) mod mssql_wasm;
 // #[cfg(feature = "mysql-connector")]
 // pub(crate) mod mysql;
 // #[cfg(feature = "mysql")]
@@ -48,10 +48,10 @@ pub(crate) mod sqlite_wasm;
 // pub use self::postgres::*;
 // #[cfg(feature = "postgresql")]
 // pub use self::postgres_wasm::*;
-#[cfg(feature = "mssql-connector")]
-pub use mssql::*;
-#[cfg(feature = "mssql")]
-pub use mssql_wasm::*;
+// #[cfg(feature = "mssql-connector")]
+// pub use mssql::*;
+// #[cfg(feature = "mssql")]
+// pub use mssql_wasm::*;
 #[cfg(feature = "sqlite-connector")]
 pub use sqlite::*;
 #[cfg(feature = "sqlite")]
@@ -84,3 +84,10 @@ pub(crate) mod mysql;
 pub use mysql::native::*;
 #[cfg(feature = "mysql")]
 pub use mysql::wasm::common::*;
+
+#[cfg(feature = "mssql")]
+pub(crate) mod mssql;
+#[cfg(feature = "mssql-connector")]
+pub use mssql::native::*;
+#[cfg(feature = "mssql")]
+pub use mssql::wasm::common::*;

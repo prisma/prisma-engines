@@ -1,8 +1,7 @@
-#![cfg_attr(target_arch = "wasm32", allow(dead_code))]
-
-use super::IsolationLevel;
-
-use crate::error::{Error, ErrorKind};
+use crate::{
+    connector::IsolationLevel,
+    error::{Error, ErrorKind},
+};
 use connection_string::JdbcString;
 use std::{fmt, str::FromStr, time::Duration};
 
@@ -10,8 +9,8 @@ use std::{fmt, str::FromStr, time::Duration};
 /// including default values.
 #[derive(Debug, Clone)]
 pub struct MssqlUrl {
-    pub(super) connection_string: String,
-    pub(super) query_params: MssqlQueryParams,
+    pub(crate) connection_string: String,
+    pub(crate) query_params: MssqlQueryParams,
 }
 
 /// TLS mode when connecting to SQL Server.
@@ -51,22 +50,22 @@ impl FromStr for EncryptMode {
 
 #[derive(Debug, Clone)]
 pub(crate) struct MssqlQueryParams {
-    pub(super) encrypt: EncryptMode,
-    pub(super) port: Option<u16>,
-    pub(super) host: Option<String>,
-    pub(super) user: Option<String>,
-    pub(super) password: Option<String>,
-    pub(super) database: String,
-    pub(super) schema: String,
-    pub(super) trust_server_certificate: bool,
-    pub(super) trust_server_certificate_ca: Option<String>,
-    pub(super) connection_limit: Option<usize>,
-    pub(super) socket_timeout: Option<Duration>,
-    pub(super) connect_timeout: Option<Duration>,
-    pub(super) pool_timeout: Option<Duration>,
-    pub(super) transaction_isolation_level: Option<IsolationLevel>,
-    pub(super) max_connection_lifetime: Option<Duration>,
-    pub(super) max_idle_connection_lifetime: Option<Duration>,
+    pub(crate) encrypt: EncryptMode,
+    pub(crate) port: Option<u16>,
+    pub(crate) host: Option<String>,
+    pub(crate) user: Option<String>,
+    pub(crate) password: Option<String>,
+    pub(crate) database: String,
+    pub(crate) schema: String,
+    pub(crate) trust_server_certificate: bool,
+    pub(crate) trust_server_certificate_ca: Option<String>,
+    pub(crate) connection_limit: Option<usize>,
+    pub(crate) socket_timeout: Option<Duration>,
+    pub(crate) connect_timeout: Option<Duration>,
+    pub(crate) pool_timeout: Option<Duration>,
+    pub(crate) transaction_isolation_level: Option<IsolationLevel>,
+    pub(crate) max_connection_lifetime: Option<Duration>,
+    pub(crate) max_idle_connection_lifetime: Option<Duration>,
 }
 
 impl MssqlUrl {
