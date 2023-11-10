@@ -285,24 +285,13 @@ test-driver-adapter-planetscale: test-planetscale-vitess8
 build-qe-napi:
 	cargo build --package query-engine-node-api
 
-build-connector-kit-js: build-driver-adapters symlink-driver-adapters
-	cd query-engine/driver-adapters/connector-test-kit-executor && pnpm i && pnpm build
+build-connector-kit-js: build-driver-adapters
+	cd query-engine/driver-adapters && pnpm i && pnpm build
 
 build-driver-adapters: ensure-prisma-present
 	@echo "Building driver adapters..."
-	@cd ../prisma && pnpm --filter "*adapter*" i && pnpm --filter "*adapter*" build
+	@cd ../prisma && pnpm --filter "*adapter*" i
 	@echo "Driver adapters build completed.";
-
-symlink-driver-adapters: ensure-prisma-present
-	@echo "Creating symbolic links for driver adapters..."
-	@for dir in $(wildcard $(realpath ../prisma)/packages/*adapter*); do \
-        if [ -d "$$dir" ]; then \
-            dir_name=$$(basename "$$dir"); \
-            ln -sfn "$$dir" "$(realpath .)/query-engine/driver-adapters/$$dir_name"; \
-            echo "Created symbolic link for $$dir_name"; \
-        fi; \
-	done;
-	echo "Symbolic links creation completed.";
 
 ensure-prisma-present:
 	@if [ -d ../prisma ]; then \

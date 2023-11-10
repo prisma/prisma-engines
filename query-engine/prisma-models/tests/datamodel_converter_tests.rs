@@ -38,31 +38,159 @@ fn converting_enums() {
     }
 }
 
+// region: composite
 #[test]
-fn converting_composite_types() {
+fn converting_composite_types_compound() {
     let res = psl::parse_schema(
         r#"
-    datasource db {
-      provider = "mongodb"
-      url      = "mongodb://localhost:27017/hello"
-    }
+        datasource db {
+            provider = "mongodb"
+            url      = "mongodb://localhost:27017/hello"
+        }
 
-    model MyModel {
-      id        String      @id @default(auto()) @map("_id") @db.ObjectId
-      attribute Attribute
+        model Post {
+            id         String      @id @default(auto()) @map("_id") @db.ObjectId
+            author     User        @relation(fields: [authorId], references: [id])
+            authorId   String      @db.ObjectId
+            attributes Attribute[]
+      
+            @@index([authorId, attributes])
+        }
 
-      @@unique([attribute], name: "composite_index")
-    }
-
-    type Attribute {
-      name  String
-      value String
-      group String
-    }
+        type Attribute {
+            name  String
+            value String
+            group String
+        }
+      
+        model User {
+            id   String @id @default(auto()) @map("_id") @db.ObjectId
+            Post Post[]
+        }
     "#,
     );
-    assert!(res.unwrap_err().contains("Indexes can only contain scalar attributes. Please remove \"attribute\" from the argument list of the indexes."));
+
+    assert!(res.is_ok());
 }
+
+#[test]
+fn converting_composite_types_compound_unique() {
+    let res = psl::parse_schema(
+        r#"
+        datasource db {
+            provider = "mongodb"
+            url      = "mongodb://localhost:27017/hello"
+        }
+
+        model Post {
+            id         String      @id @default(auto()) @map("_id") @db.ObjectId
+            author     User        @relation(fields: [authorId], references: [id])
+            authorId   String      @db.ObjectId
+            attributes Attribute[]
+      
+            @@unique([authorId, attributes])
+            //       ^^^^^^^^^^^^^^^^^^^^^^
+            // Prisma does not currently support composite types in compound unique indices...
+        }
+
+        type Attribute {
+            name  String
+            value String
+            group String
+        }
+      
+        model User {
+            id   String @id @default(auto()) @map("_id") @db.ObjectId
+            Post Post[]
+        }
+    "#,
+    );
+
+    assert!(res
+        .unwrap_err()
+        .contains(r#"Prisma does not currently support composite types in compound unique indices, please remove "attributes" from the index. See https://pris.ly/d/mongodb-composite-compound-indices for more details"#));
+}
+
+#[test]
+fn converting_composite_types_nested() {
+    let res = psl::parse_schema(
+        r#"
+        datasource db { 
+            provider = "mongodb"
+            url      = "mongodb://localhost:27017/hello"
+        }
+          
+        type TheatersLocation {
+            address TheatersLocationAddress
+            geo     TheatersLocationGeo
+        }
+          
+        type TheatersLocationAddress {
+            city    String
+            state   String
+            street1 String
+            street2 String?
+            zipcode String
+        }
+          
+        type TheatersLocationGeo {
+            coordinates Float[]
+            type        String
+        }
+          
+        model theaters {
+            id        String           @id @default(auto()) @map("_id") @db.ObjectId
+            location  TheatersLocation
+            theaterId Int
+          
+            @@index([location.geo], map: "geo index")
+        }
+        "#,
+    );
+
+    assert!(res.is_ok());
+}
+
+#[test]
+fn converting_composite_types_nested_scalar() {
+    let res = psl::parse_schema(
+        r#"
+        datasource db { 
+            provider = "mongodb"
+            url      = "mongodb://localhost:27017/hello"
+        }
+          
+        type TheatersLocation {
+            address TheatersLocationAddress
+            geo     TheatersLocationGeo
+        }
+          
+        type TheatersLocationAddress {
+            city    String
+            state   String
+            street1 String
+            street2 String?
+            zipcode String
+        }
+          
+        type TheatersLocationGeo {
+            coordinates Float[]
+            type        String
+        }
+          
+        model theaters {
+            id        String           @id @default(auto()) @map("_id") @db.ObjectId
+            location  TheatersLocation
+            theaterId Int
+          
+            @@index([location.geo.type], map: "geo index")
+        }
+        "#,
+    );
+
+    assert!(res.is_ok());
+}
+// endregion
 
 #[test]
 fn models_with_only_scalar_fields() {
