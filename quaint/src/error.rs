@@ -7,7 +7,7 @@ use thiserror::Error;
 use std::time::Duration;
 
 // pub use crate::connector::mysql::MysqlError;
-// pub use crate::connector::postgres::PostgresError;
+pub use crate::connector::postgres::PostgresError;
 // pub use crate::connector::sqlite::SqliteError;
 
 #[derive(Debug, PartialEq, Eq)]
