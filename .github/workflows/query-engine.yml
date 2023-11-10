@@ -72,7 +72,7 @@ jobs:
           - name: 'mysql_mariadb'
             single_threaded: true
             connector: 'mysql'
-            version: 'maria'
+            version: 'mariadb'
           - name: 'sqlite'
             single_threaded: false
             connector: 'sqlite'
