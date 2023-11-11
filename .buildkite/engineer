@@ -7,7 +7,6 @@ if [[ -z "$2"  ]]; then
 else
     echo "We are in the $2 pipeline."
 fi
-
 # Checks what's the diff with the previous commit
 # This is used to detect if the previous commit was empty
 GIT_DIFF=$(git diff --name-only HEAD HEAD~1 -- .)
