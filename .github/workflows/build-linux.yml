@@ -9,7 +9,7 @@ on:
 
 jobs:
   build:
-    name: "`${{ matrix.target.name }}` (on branch ${{ github.event.ref }} for commit ${{ github.event.inputs.commit }})"
+    name: "${{ matrix.target.name }} (on branch ${{ github.event.ref }} for commit ${{ github.event.inputs.commit }})"
     # env:
     #   # default build config
     #   SQLITE_MAX_VARIABLE_NUMBER: 250000
