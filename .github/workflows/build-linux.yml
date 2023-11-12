@@ -5,6 +5,7 @@ on:
       commit:
         description: "Commit on the given branch to build"
         required: false
+  pull_request:
 
 jobs:
   build:
