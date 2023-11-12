@@ -1,4 +1,4 @@
-name: Driver Adapters
+name: Test Driver Adapters
 on:
   push:
     branches:
@@ -19,19 +19,19 @@ concurrency:
 
 jobs:
   rust-query-engine-tests:
-    name: 'Test `${{ matrix.adapter.name }}` on node v${{ matrix.node_version }}'
+    name: '`${{ matrix.adapter.name }}` on node v${{ matrix.node_version }}'
 
     strategy:
       fail-fast: false
       matrix:
         adapter:
-          - name: 'pg'
+          - name: '@prisma/adapter-pg'
             setup_task: 'dev-pg-postgres13'
-          - name: 'neon:ws'
+          - name: '@prisma/adapter-neon (ws)'
             setup_task: 'dev-neon-ws-postgres13'
-          - name: 'libsql'
+          - name: '@prisma/adapter-libsql (Turso)'
             setup_task: 'dev-libsql-sqlite'
-          - name: 'planetscale'
+          - name: '@prisma/adapter-planetscale'
             setup_task: 'dev-planetscale-vitess8'
         node_version: ['18']
     env:

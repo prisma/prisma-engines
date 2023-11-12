@@ -1,3 +1,4 @@
+name: Build Apple Silicon
 on:
   workflow_dispatch:
     inputs:
