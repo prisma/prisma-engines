@@ -97,15 +97,15 @@ jobs:
             target
           key: ${{ runner.os }}-intel-cargo-${{ hashFiles('**/Cargo.lock') }}
 
-      - run: |
-          # TODO check if .finished already exists
-
-          docker run \
+      - name: Construct Build Command
+        id: construct_build_command
+        run: |
+          echo "::set-output name=command::docker run \
             -e SQLITE_MAX_VARIABLE_NUMBER=250000 \
             -e SQLITE_MAX_EXPR_DEPTH=10000 \
             -e LIBZ_SYS_STATIC=1 \
             -w /root/build \
-            -v "$(pwd)":/root/build \
+            -v \"$(pwd)\":/root/build \
             ${{ matrix.target.image }} \
             bash -c \
               " \
@@ -113,8 +113,16 @@ jobs:
               && cargo build --release -p query-engine          --manifest-path query-engine/query-engine/Cargo.toml          ${{ matrix.target.target_string }} ${{ matrix.target.features_string }} \
               && cargo build --release -p query-engine-node-api --manifest-path query-engine/query-engine-node-api/Cargo.toml ${{ matrix.target.target_string }} ${{ matrix.target.features_string }} \
               && cargo build --release -p schema-engine-cli     --manifest-path schema-engine/cli/Cargo.toml                  ${{ matrix.target.target_string }} ${{ matrix.target.features_string }} \
-              && cargo build --release -p prisma-fmt            --manifest-path prisma-fmt/Cargo.toml                         ${{ matrix.target.target_string }} ${{ matrix.target.features_string }} \ 
+              && cargo build --release -p prisma-fmt            --manifest-path prisma-fmt/Cargo.toml                         ${{ matrix.target.target_string }} ${{ matrix.target.features_string }} \
               "
+      - name: Show Build Command
+        run: echo "Build Command: ${{ steps.construct_build_command.outputs.command }}"
+
+      - run: |
+          # TODO check if .finished already exists
+
+          ${{ steps.construct_build_command.outputs.command }}
+          
           # TODO Compressing binary files
           # TODO do things with prismagraphql/build:release image
           #   upload artifacts
