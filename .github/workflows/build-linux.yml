@@ -118,7 +118,7 @@ jobs:
               && cargo build --release -p query-engine-node-api --manifest-path query-engine/query-engine-node-api/Cargo.toml $TARGET_STRING $FEATURES_STRING \
               && cargo build --release -p schema-engine-cli     --manifest-path schema-engine/cli/Cargo.toml                  $TARGET_STRING $FEATURES_STRING \
               && cargo build --release -p prisma-fmt            --manifest-path prisma-fmt/Cargo.toml                         $TARGET_STRING $FEATURES_STRING \
-              \" \
+               \
             " >> "$GITHUB_OUTPUT"
       - name: Show Build Command
         env:
