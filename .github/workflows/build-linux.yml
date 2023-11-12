@@ -46,7 +46,7 @@ jobs:
             # Linux Static
             - name: "Linux Static x86_64"
               image: 'prismagraphql/build:linux-static-x64'
-              target_string: '--target aarch64-unknown-linux-musl'
+              target_string: '--target x86_64-unknown-linux-musl'
               features_string: '--features vendored-openssl'
             # Linux Arm64 Glibc
             - name: "Linux ARM64 [1.0.x]"
