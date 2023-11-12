@@ -19,7 +19,7 @@ concurrency:
 
 jobs:
   rust-query-engine-tests:
-    name: '`${{ matrix.adapter.name }}` on node v${{ matrix.node_version }}'
+    name: '${{ matrix.adapter.name }} on node v${{ matrix.node_version }}'
 
     strategy:
       fail-fast: false
