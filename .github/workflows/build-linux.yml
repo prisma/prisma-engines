@@ -25,55 +25,67 @@ jobs:
             - name: "Linux Glibc [1.0.x]"
               image: 'prismagraphql/build:rhel-libssl1.0.x'
               target_string: ''
+              target_path: ''
               features_string: '--features vendored-openssl'
             - name: "Linux Glibc [1.1.x]"
               image: 'prismagraphql/build:rhel-libssl1.1.x'
               target_string: ''
+              target_path: ''
               features_string: ''
             - name: "Linux Glibc [3.0.x]"
               image: 'prismagraphql/build:rhel-libssl3.0.x'
               target_string: ''
+              target_path: ''
               features_string: ''
             # Linux Musl
             - name: "Linux Musl [1.1.x]"
               image: 'prismagraphql/build:alpine-libssl1.1.x'
               target_string: ''
+              target_path: ''
               features_string: ''
             - name: "Linux Musl [3.0.x]"
               image: 'prismagraphql/build:alpine-libssl3.0.x'
               target_string: ''
+              target_path: ''
               features_string: ''
             # Linux Static
             - name: "Linux Static x86_64"
               image: 'prismagraphql/build:linux-static-x64'
               target_string: '--target x86_64-unknown-linux-musl'
+              target_path: ''
               features_string: '--features vendored-openssl'
             # Linux Arm64 Glibc
             - name: "Linux ARM64 [1.0.x]"
               image: 'prismagraphql/build:cross-linux-arm-ssl-1.0.x'
               target_string: '--target aarch64-unknown-linux-gnu'
+              target_path: ''
               features_string: '--features vendored-openssl'
             - name: "Linux ARM64 [1.1.x]"
               image: 'prismagraphql/build:cross-linux-arm-ssl-1.1.x'
               target_string: '--target aarch64-unknown-linux-gnu'
+              target_path: 'aarch64-unknown-linux-gnu'
               features_string: ''
             - name: "Linux ARM64 [3.0.x]"
               image: 'prismagraphql/build:cross-linux-arm-ssl-3.0.x'
               target_string: '--target aarch64-unknown-linux-gnu'
+              target_path: 'aarch64-unknown-linux-gnu'
               features_string: ''
             # Linux Arm64 Musl
             - name: "Linux Musl ARM64 [1.1.x]"
               image: 'prismagraphql/build:cross-linux-musl-arm-ssl-1.1.x'
               target_string: '--target aarch64-unknown-linux-musl'
+              target_path: 'aarch64-unknown-linux-musl'
               features_string: ''
             - name: "Linux Musl ARM64 [3.0.x]"
               image: 'prismagraphql/build:cross-linux-musl-arm-ssl-3.0.x'
               target_string: '--target aarch64-unknown-linux-musl'
+              target_path: 'aarch64-unknown-linux-musl'
               features_string: ''
             # Linux Arm64 Static
             - name: "Linux Static ARM64"
               image: 'prismagraphql/build:linux-static-arm64'
               target_string: '--target aarch64-unknown-linux-musl'
+              target_path: 'aarch64-unknown-linux-musl'
               features_string: '--features vendored-openssl'
 
     steps:
@@ -146,6 +158,7 @@ jobs:
         run: echo "foo"
       
       - uses: actions/upload-artifact@v3
+        if: ${{ matrix.target.target_path == '' }} 
         with:
           name: Engine files ${{ matrix.target.name }}
           path: |
@@ -153,3 +166,13 @@ jobs:
             ${{ github.workspace }}/target/release/schema-engine
             ${{ github.workspace }}/target/release/query-engine
             ${{ github.workspace }}/target/release/prisma-fmt
+
+      - uses: actions/upload-artifact@v3
+        if: ${{ matrix.target.target_path != '' }} 
+        with:
+          name: Engine files ${{ matrix.target.name }}
+          path: |
+            ${{ github.workspace }}/target/${{ matrix.target.target_path }}/release/libquery_engine.dylib
+            ${{ github.workspace }}/target/${{ matrix.target.target_path }}/release/schema-engine
+            ${{ github.workspace }}/target/${{ matrix.target.target_path }}/release/query-engine
+            ${{ github.workspace }}/target/${{ matrix.target.target_path }}/release/prisma-fmt
