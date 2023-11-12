@@ -97,6 +97,9 @@ jobs:
             target
           key: ${{ runner.os }}-intel-cargo-${{ hashFiles('**/Cargo.lock') }}
 
+      - name: 'TODO: Check if artifacts were already built and published before via .finished file'
+        run: echo "foo"
+
       - name: Construct Build Command
         id: construct_build_command
         env:
@@ -134,23 +137,19 @@ jobs:
         env:
           COMMAND: ${{ steps.construct_build_command.outputs.COMMAND }}"
         run: echo "Build command is $COMMAND"
+      - name: Execute Build command
+        run:  ${{ steps.construct_build_command.outputs.command }}
 
-      - name: Execute Build command (TODO other commands before and after that)
-        run: |
-          # TODO check if .finished already exists
-
-          ${{ steps.construct_build_command.outputs.command }}
-          
-          # TODO Compressing binary files
-          # TODO do things with prismagraphql/build:release image
-          #   upload artifacts
-          #   verify uploaded artifacts
-
+      - name: 'TODO: Compressing binary files'
+        run: echo "foo"
+      - name: 'TODO: do things with prismagraphql/build:release image (upload artifacts, verify uploaded artifacts)'
+        run: echo "foo"
+      
       - uses: actions/upload-artifact@v3
         with:
-          name: binaries
+          name: Engine files ${{ matrix.target.name }}
           path: |
-            ${{ github.workspace }}/target/release/schema-engine
-            ${{ github.workspace }}/target/release/prisma-fmt
-            ${{ github.workspace }}/target/release/query-engine
             ${{ github.workspace }}/target/release/libquery_engine.dylib
+            ${{ github.workspace }}/target/release/schema-engine
+            ${{ github.workspace }}/target/release/query-engine
+            ${{ github.workspace }}/target/release/prisma-fmt
