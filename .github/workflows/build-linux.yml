@@ -58,7 +58,7 @@ jobs:
             - name: "Linux ARM64 [1.0.x]"
               image: 'prismagraphql/build:cross-linux-arm-ssl-1.0.x'
               target_string: '--target aarch64-unknown-linux-gnu'
-              target_path: ''
+              target_path: 'aarch64-unknown-linux-gnu'
               features_string: '--features vendored-openssl'
             - name: "Linux ARM64 [1.1.x]"
               image: 'prismagraphql/build:cross-linux-arm-ssl-1.1.x'
@@ -138,7 +138,7 @@ jobs:
               \" \
             "
           # remove query-engine-node-api for "static" targets
-          if [[ "$TARGET_NAME" == *static* ]]; then
+          if [[ "$TARGET_NAME" == *Static* ]]; then
             substring_to_replace="&& cargo build --release -p query-engine-node-api --manifest-path query-engine/query-engine-node-api/Cargo.toml $TARGET_STRING $FEATURES_STRING"
             replacement_string=""
             command=$(echo "$command" | sed "s|$substring_to_replace|$replacement_string|")
