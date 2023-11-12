@@ -603,7 +603,7 @@ mod mysql {
     }
 
     // "MySQL native spatial types" should "work"
-    #[connector_test(schema(schema_geojson_srid_geometry_types))]
+    #[connector_test(only(MySQL(8)), schema(schema_geojson_srid_geometry_types))]
     async fn native_geojson_srid_geometry_types(runner: Runner) -> TestResult<()> {
         insta::assert_snapshot!(
           run_query!(&runner, r#"mutation {
