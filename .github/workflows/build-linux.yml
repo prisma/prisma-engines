@@ -114,7 +114,7 @@ jobs:
               && cargo build --release -p query-engine-node-api --manifest-path query-engine/query-engine-node-api/Cargo.toml ${{ matrix.target.target_string }} ${{ matrix.target.features_string }} \
               && cargo build --release -p schema-engine-cli     --manifest-path schema-engine/cli/Cargo.toml                  ${{ matrix.target.target_string }} ${{ matrix.target.features_string }} \
               && cargo build --release -p prisma-fmt            --manifest-path prisma-fmt/Cargo.toml                         ${{ matrix.target.target_string }} ${{ matrix.target.features_string }} \
-              \"
+              \" \
             " >> $GITHUB_OUTPUT
       - name: Show Build Command
         env:
