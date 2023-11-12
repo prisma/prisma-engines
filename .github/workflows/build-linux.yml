@@ -99,6 +99,10 @@ jobs:
 
       - name: Construct Build Command
         id: construct_build_command
+        env:
+          IMAGE: ${{ matrix.target.image }}
+          TARGET_STRING: ${{ matrix.target.target_string }} 
+          FEATURES_STRING: ${{ matrix.target.features_string }}
         run: |
           echo "COMMAND=docker run \
             -e SQLITE_MAX_VARIABLE_NUMBER=250000 \
@@ -106,15 +110,16 @@ jobs:
             -e LIBZ_SYS_STATIC=1 \
             -w /root/build \
             -v \"$(pwd)\":/root/build \
-            ${{ matrix.target.image }} \
+            $IMAGE \
             bash -c \
               \" \
               cargo clean \
-              && cargo build --release -p query-engine          --manifest-path query-engine/query-engine/Cargo.toml          ${{ matrix.target.target_string }} ${{ matrix.target.features_string }} \
-              && cargo build --release -p query-engine-node-api --manifest-path query-engine/query-engine-node-api/Cargo.toml ${{ matrix.target.target_string }} ${{ matrix.target.features_string }} \
-              && cargo build --release -p schema-engine-cli     --manifest-path schema-engine/cli/Cargo.toml                  ${{ matrix.target.target_string }} ${{ matrix.target.features_string }} \
-              && cargo build --release -p prisma-fmt            --manifest-path prisma-fmt/Cargo.toml                         ${{ matrix.target.target_string }} ${{ matrix.target.features_string }} \
-              \" >> "$GITHUB_OUTPUT"
+              && cargo build --release -p query-engine          --manifest-path query-engine/query-engine/Cargo.toml          $TARGET_STRING $FEATURES_STRING \
+              && cargo build --release -p query-engine-node-api --manifest-path query-engine/query-engine-node-api/Cargo.toml $TARGET_STRING $FEATURES_STRING \
+              && cargo build --release -p schema-engine-cli     --manifest-path schema-engine/cli/Cargo.toml                  $TARGET_STRING $FEATURES_STRING \
+              && cargo build --release -p prisma-fmt            --manifest-path prisma-fmt/Cargo.toml                         $TARGET_STRING $FEATURES_STRING \
+              \" \
+            " >> "$GITHUB_OUTPUT"
       - name: Show Build Command
         env:
           COMMAND: ${{ steps.construct_build_command.outputs.COMMAND }}"
