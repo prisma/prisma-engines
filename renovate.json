@@ -1,6 +1,7 @@
 {
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "extends": [
-    "config:base"
+    "config:recommended"
   ],
   "cargo": {
     "enabled": false
@@ -13,17 +14,47 @@
     "before 5am every weekday",
     "every weekend"
   ],
+  "rangeStrategy": "pin",
   "separateMinorPatch": true,
+  "configMigration": true,
   "packageRules": [
     {
-      "matchFiles": ["docker-compose.yml"],
-      "matchUpdateTypes": ["minor", "major"],
+      "matchFileNames": [
+        "docker-compose.yml"
+      ],
+      "matchUpdateTypes": [
+        "minor",
+        "major"
+      ],
       "enabled": false
     },
     {
       "groupName": "Weekly vitess docker image version update",
-      "packageNames": ["vitess/vttestserver"],
-      "schedule": ["before 7am on Wednesday"]
+      "matchPackageNames": [
+        "vitess/vttestserver"
+      ],
+      "schedule": [
+        "before 7am on Wednesday"
+      ]
+    },
+    {
+      "groupName": "Prisma Driver Adapters",
+      "matchPackageNames": [
+        "@prisma/driver-adapter-utils"
+      ],
+      "matchPackagePrefixes": [
+        "@prisma/adapter"
+      ],
+      "schedule": [
+        "at any time"
+      ]
+    },
+    {
+      "matchPackageNames": [
+        "node",
+        "pnpm"
+      ],
+      "enabled": false
     }
   ]
 }

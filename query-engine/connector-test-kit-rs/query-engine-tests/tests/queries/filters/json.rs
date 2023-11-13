@@ -207,7 +207,9 @@ mod json {
         Ok(())
     }
 
-    #[connector_test(schema(json_opt))]
+    // The external runner for driver adapters, in spite of the protocol being used in the test matrix
+    // uses the JSON representation of queries, so this test should not apply to driver adapters (exclude(JS))
+    #[connector_test(schema(json_opt), exclude(JS, MySQL(5.6)))]
     async fn nested_not_shorthand(runner: Runner) -> TestResult<()> {
         // Those tests pass with the JSON protocol because the entire object is parsed as JSON.
         // They remain useful to ensure we don't ever allow a full JSON filter input object type at the schema level.
