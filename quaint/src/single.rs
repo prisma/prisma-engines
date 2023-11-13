@@ -7,6 +7,7 @@ use crate::{
 use async_trait::async_trait;
 use std::{fmt, sync::Arc};
 
+#[cfg(feature = "sqlite-connector")]
 use std::convert::TryFrom;
 
 /// The main entry point and an abstraction over a database connection.
@@ -124,6 +125,7 @@ impl Quaint {
     /// - `isolationLevel` the transaction isolation level. Possible values:
     ///   `READ UNCOMMITTED`, `READ COMMITTED`, `REPEATABLE READ`, `SNAPSHOT`,
     ///   `SERIALIZABLE`.
+    #[cfg_attr(target_arch = "wasm32", allow(unused_variables))]
     #[allow(unreachable_code)]
     pub async fn new(url_str: &str) -> crate::Result<Self> {
         let inner = match url_str {

@@ -1,3 +1,5 @@
+#![cfg_attr(target_arch = "wasm32", allow(dead_code))]
+
 use crate::error::{Error, ErrorKind};
 use std::{convert::TryFrom, path::Path, time::Duration};
 
