@@ -16,9 +16,13 @@ Quaint is an abstraction over certain SQL databases. It provides:
 ### Feature flags
 
 - `mysql`: Support for MySQL databases.
+  - On non-WebAssembly targets, choose `mysql-connector` instead.
 - `postgresql`: Support for PostgreSQL databases.
+  - On non-WebAssembly targets, choose `postgresql-connector` instead.
 - `sqlite`: Support for SQLite databases.
+  - On non-WebAssembly targets, choose `sqlite-connector` instead.
 - `mssql`: Support for Microsoft SQL Server databases.
+  - On non-WebAssembly targets, choose `mssql-connector` instead.
 - `pooled`: A connection pool in `pooled::Quaint`.
 - `vendored-openssl`: Statically links against a vendored OpenSSL library on
   non-Windows or non-Apple platforms.
