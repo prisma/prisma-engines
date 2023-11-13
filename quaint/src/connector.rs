@@ -35,10 +35,10 @@ mod type_identifier;
 // pub(crate) mod postgres;
 // #[cfg(feature = "postgresql")]
 // pub(crate) mod postgres_wasm;
-#[cfg(feature = "sqlite-connector")]
-pub(crate) mod sqlite;
-#[cfg(feature = "sqlite")]
-pub(crate) mod sqlite_wasm;
+// #[cfg(feature = "sqlite-connector")]
+// pub(crate) mod sqlite;
+// #[cfg(feature = "sqlite")]
+// pub(crate) mod sqlite_wasm;
 
 // #[cfg(feature = "mysql-connector")]
 // pub use self::mysql::*;
@@ -52,10 +52,10 @@ pub(crate) mod sqlite_wasm;
 // pub use mssql::*;
 // #[cfg(feature = "mssql")]
 // pub use mssql_wasm::*;
-#[cfg(feature = "sqlite-connector")]
-pub use sqlite::*;
-#[cfg(feature = "sqlite")]
-pub use sqlite_wasm::*;
+// #[cfg(feature = "sqlite-connector")]
+// pub use sqlite::*;
+// #[cfg(feature = "sqlite")]
+// pub use sqlite_wasm::*;
 
 pub use self::result_set::*;
 pub use connection_info::*;
@@ -84,6 +84,13 @@ pub(crate) mod mysql;
 pub use mysql::native::*;
 #[cfg(feature = "mysql")]
 pub use mysql::wasm::common::*;
+
+#[cfg(feature = "sqlite")]
+pub(crate) mod sqlite;
+#[cfg(feature = "sqlite-connector")]
+pub use sqlite::native::*;
+#[cfg(feature = "sqlite")]
+pub use sqlite::wasm::common::*;
 
 #[cfg(feature = "mssql")]
 pub(crate) mod mssql;
