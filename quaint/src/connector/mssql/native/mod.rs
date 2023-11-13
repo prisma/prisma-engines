@@ -1,3 +1,6 @@
+//! Definitions for the MSSQL connector.
+//! This module is not compatible with wasm32-* targets.
+//! This module is only available with the `mssql-connector` feature.
 mod conversion;
 mod error;
 

@@ -1,3 +1,6 @@
+//! Definitions for the MySQL connector.
+//! This module is not compatible with wasm32-* targets.
+//! This module is only available with the `mysql-connector` feature.
 mod conversion;
 mod error;
 
@@ -61,21 +64,6 @@ impl MysqlUrl {
 
         config
     }
-}
-
-#[derive(Debug, Clone)]
-pub(crate) struct MysqlUrlQueryParams {
-    ssl_opts: my::SslOpts,
-    connection_limit: Option<usize>,
-    use_ssl: bool,
-    socket: Option<String>,
-    socket_timeout: Option<Duration>,
-    connect_timeout: Option<Duration>,
-    pool_timeout: Option<Duration>,
-    max_connection_lifetime: Option<Duration>,
-    max_idle_connection_lifetime: Option<Duration>,
-    prefer_socket: Option<bool>,
-    statement_cache_size: usize,
 }
 
 /// A connector interface for the MySQL database.

@@ -1,7 +1,5 @@
 //! A single connection abstraction to a SQL database.
 
-#[cfg(feature = "sqlite")]
-use crate::connector::DEFAULT_SQLITE_SCHEMA_NAME;
 use crate::{
     ast,
     connector::{self, impl_default_TransactionCapable, ConnectionInfo, IsolationLevel, Queryable, TransactionCapable},
@@ -9,7 +7,6 @@ use crate::{
 use async_trait::async_trait;
 use std::{fmt, sync::Arc};
 
-#[cfg(feature = "sqlite")]
 use std::convert::TryFrom;
 
 /// The main entry point and an abstraction over a database connection.
@@ -169,6 +166,8 @@ impl Quaint {
     #[cfg(feature = "sqlite-connector")]
     /// Open a new SQLite database in memory.
     pub fn new_in_memory() -> crate::Result<Quaint> {
+        use crate::connector::DEFAULT_SQLITE_SCHEMA_NAME;
+
         Ok(Quaint {
             inner: Arc::new(connector::Sqlite::new_in_memory()?),
             connection_info: Arc::new(ConnectionInfo::InMemorySqlite {

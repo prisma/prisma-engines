@@ -1,11 +1,11 @@
-///! Definitions for the Postgres connector.
-/// This module is not compatible with wasm32-* targets.
-/// This module is only available with the `postgresql-connector` feature.
+//! Definitions for the Postgres connector.
+//! This module is not compatible with wasm32-* targets.
+//! This module is only available with the `postgresql-connector` feature.
 mod conversion;
 mod error;
 
+pub(crate) use crate::connector::postgres::wasm::common::PostgresUrl;
 use crate::connector::postgres::wasm::common::{Hidden, SslAcceptMode, SslParams};
-pub(crate) use crate::connector::postgres::wasm::common::{PostgresFlavour, PostgresUrl};
 use crate::connector::{timeout, IsolationLevel, Transaction};
 
 use crate::{
@@ -670,6 +670,7 @@ fn is_safe_identifier(ident: &str) -> bool {
 #[cfg(test)]
 mod tests {
     use super::*;
+    pub(crate) use crate::connector::postgres::wasm::common::PostgresFlavour;
     use crate::tests::test_api::postgres::CONN_STR;
     use crate::tests::test_api::CRDB_CONN_STR;
     use crate::{connector::Queryable, error::*, single::Quaint};
