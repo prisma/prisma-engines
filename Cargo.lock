@@ -326,6 +326,7 @@ dependencies = [
  "query-engine-metrics",
  "query-engine-tests",
  "query-tests-setup",
+ "regex",
  "reqwest",
  "serde_json",
  "tokio",
