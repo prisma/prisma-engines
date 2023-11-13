@@ -88,13 +88,13 @@ mod geometry_filter_spec {
 
         // geoIntersects
         insta::assert_snapshot!(
-          run_query!(&runner, r#"query { findManyTestModel(where: { geom: { geoIntersects: "{\"type\":\"Point\",\"coordinates\":[0, 0]}" }}) { id }}"#),
+          run_query!(&runner, r#"query { findManyTestModel(where: { geom: { geoIntersects: "{\"type\":\"Polygon\",\"coordinates\":[[[-1,-1],[-1,1],[1,1],[1,-1],[-1,-1]]]}" }}) { id }}"#),
           @r###"{"data":{"findManyTestModel":[{"id":1}]}}"###
         );
 
         // Not geoIntersects
         insta::assert_snapshot!(
-          run_query!(&runner, r#"query { findManyTestModel(where: { geom: { not: { geoIntersects: "{\"type\":\"Point\",\"coordinates\":[0, 0]}" }}}) { id }}"#),
+          run_query!(&runner, r#"query { findManyTestModel(where: { geom: { not: { geoIntersects: "{\"type\":\"Polygon\",\"coordinates\":[[[-1,-1],[-1,1],[1,1],[1,-1],[-1,-1]]]}" }}}) { id }}"#),
           @r###"{"data":{"findManyTestModel":[{"id":2}]}}"###
         );
 
