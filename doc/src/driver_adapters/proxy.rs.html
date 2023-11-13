@@ -978,6 +978,9 @@
 <a href="#978" id="978">978</a>
 <a href="#979" id="979">979</a>
 <a href="#980" id="980">980</a>
+<a href="#981" id="981">981</a>
+<a href="#982" id="982">982</a>
+<a href="#983" id="983">983</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::borrow::Cow;
 <span class="kw">use </span>std::str::FromStr;
 
@@ -1229,6 +1232,12 @@
     column_type: ColumnType,
     column_name: <span class="kw-2">&amp;</span>str,
 ) -&gt; quaint::Result&lt;QuaintValue&lt;<span class="lifetime">&#39;static</span>&gt;&gt; {
+    <span class="kw">let </span>parse_number_as_i64 = |n: <span class="kw-2">&amp;</span>serde_json::Number| {
+        n.as_i64().ok_or(<span class="macro">conversion_error!</span>(
+            <span class="string">&quot;number must be an integer in column &#39;{column_name}&#39;, got &#39;{n}&#39;&quot;
+        </span>))
+    };
+
     <span class="comment">//  Note for the future: it may be worth revisiting how much bloat so many panics with different static
     // strings add to the compiled artefact, and in case we should come up with a restricted set of panic
     // messages, or even find a way of removing them altogether.
@@ -1236,8 +1245,7 @@
         ColumnType::Int32 =&gt; <span class="kw">match </span>json_value {
             serde_json::Value::Number(n) =&gt; {
                 <span class="comment">// n.as_i32() is not implemented, so we need to downcast from i64 instead
-                </span>n.as_i64()
-                    .ok_or(<span class="macro">conversion_error!</span>(<span class="string">&quot;number must be an integer in column &#39;{column_name}&#39;&quot;</span>))
+                </span>parse_number_as_i64(<span class="kw-2">&amp;</span>n)
                     .and_then(|n| -&gt; quaint::Result&lt;i32&gt; {
                         n.try_into()
                             .map_err(|e| <span class="macro">conversion_error!</span>(<span class="string">&quot;cannot convert {n} to i32 in column &#39;{column_name}&#39;: {e}&quot;</span>))
@@ -1253,9 +1261,7 @@
             </span>)),
         },
         ColumnType::Int64 =&gt; <span class="kw">match </span>json_value {
-            serde_json::Value::Number(n) =&gt; n.as_i64().map(QuaintValue::int64).ok_or(<span class="macro">conversion_error!</span>(
-                <span class="string">&quot;number must be an i64 in column &#39;{column_name}&#39;, got {n}&quot;
-            </span>)),
+            serde_json::Value::Number(n) =&gt; parse_number_as_i64(<span class="kw-2">&amp;</span>n).map(QuaintValue::int64),
             serde_json::Value::String(s) =&gt; s.parse::&lt;i64&gt;().map(QuaintValue::int64).map_err(|e| {
                 <span class="macro">conversion_error!</span>(<span class="string">&quot;string-encoded number must be an i64 in column &#39;{column_name}&#39;, got {s}: {e}&quot;</span>)
             }),
