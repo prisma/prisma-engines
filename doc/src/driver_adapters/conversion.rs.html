@@ -109,7 +109,7 @@
                 <span class="kw">for </span>(index, item) <span class="kw">in </span>items.into_iter().enumerate() {
                     <span class="kw">let </span>js_value = ToNapiValue::to_napi_value(env.raw(), item)<span class="question-mark">?</span>;
                     <span class="comment">// TODO: NapiRaw could be implemented for sys::napi_value directly, there should
-                    // be no need for re-wrapping; submit a patch to napi-rs and simplify here.
+                    //  be no need for re-wrapping; submit a patch to napi-rs and simplify here.
                     </span>array.set(index <span class="kw">as </span>u32, napi::JsUnknown::from_raw_unchecked(env.raw(), js_value))<span class="question-mark">?</span>;
                 }
 

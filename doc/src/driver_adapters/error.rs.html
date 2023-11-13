@@ -47,7 +47,7 @@
     QuaintError::raw_connector_error(status, reason)
 }
 
-<span class="doccomment">/// catches a panic thrown during the executuin of an asynchronous closure and transforms it into
+<span class="doccomment">/// catches a panic thrown during the execution of an asynchronous closure and transforms it into
 /// the Error variant of a napi::Result.
 </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async fn </span>async_unwinding_panic&lt;F, R&gt;(fut: F) -&gt; napi::Result&lt;R&gt;
 <span class="kw">where
