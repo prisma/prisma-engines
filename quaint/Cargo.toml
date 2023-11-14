@@ -71,7 +71,7 @@ mysql = ["chrono/std"]
 
 pooled = ["mobc"]
 sqlite-native = ["sqlite", "rusqlite/bundled", "tokio/sync"]
-sqlite = ["rusqlite"]
+sqlite = []
 
 fmt-sql = ["sqlformat"]
 

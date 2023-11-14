@@ -2,6 +2,17 @@ use crate::connector::sqlite::wasm::error::SqliteError;
 
 use crate::error::*;
 
+impl std::fmt::Display for SqliteError {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "Error code {}: {}",
+            self.extended_code,
+            rusqlite::ffi::code_to_str(self.extended_code)
+        )
+    }
+}
+
 impl From<rusqlite::Error> for Error {
     fn from(e: rusqlite::Error) -> Error {
         match e {
@@ -45,5 +56,11 @@ impl From<rusqlite::Error> for Error {
 
             e => Error::builder(ErrorKind::QueryError(e.into())).build(),
         }
+    }
+}
+
+impl From<rusqlite::types::FromSqlError> for Error {
+    fn from(e: rusqlite::types::FromSqlError) -> Error {
+        Error::builder(ErrorKind::ColumnReadFailure(e.into())).build()
     }
 }
