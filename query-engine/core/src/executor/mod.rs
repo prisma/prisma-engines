@@ -12,6 +12,7 @@ mod pipeline;
 mod request_context;
 
 pub use self::{execute_operation::*, interpreting_executor::InterpretingExecutor};
+use futures::Future;
 
 pub(crate) use request_context::*;
 
@@ -130,4 +131,54 @@ pub trait TransactionManager {
 
 pub fn get_current_dispatcher() -> Dispatch {
     tracing::dispatcher::get_default(|current| current.clone())
+}
+
+#[cfg(not(target_arch = "wasm32"))]
+pub(crate) mod task {
+    use super::*;
+
+    pub type JoinHandle<T> = tokio::task::JoinHandle<T>;
+
+    pub fn spawn<T>(future: T) -> JoinHandle<T::Output>
+    where
+        T: Future + Send + 'static,
+        T::Output: Send + 'static,
+    {
+        tokio::spawn(future)
+    }
+}
+
+#[cfg(target_arch = "wasm32")]
+pub(crate) mod task {
+    use super::*;
+
+    #[pin_project::pin_project]
+    pub struct JoinHandle<T>(#[pin] tokio::sync::oneshot::Receiver<T>);
+
+    impl<T> Future for JoinHandle<T> {
+        type Output = Result<T, tokio::sync::oneshot::error::RecvError>;
+        fn poll(self: std::pin::Pin<&mut Self>, cx: &mut std::task::Context<'_>) -> std::task::Poll<Self::Output> {
+            let this = self.project();
+            this.0.poll(cx)
+        }
+    }
+
+    impl<T> JoinHandle<T> {
+        pub fn abort(&mut self) {
+            // abort is noop for WASM builds
+        }
+    }
+
+    pub fn spawn<T>(future: T) -> JoinHandle<T::Output>
+    where
+        T: Future + Send + 'static,
+        T::Output: Send + 'static,
+    {
+        let (tx, rx) = tokio::sync::oneshot::channel();
+        wasm_bindgen_futures::spawn_local(async move {
+            let result = future.await;
+            tx.send(result).ok();
+        });
+        JoinHandle(rx)
+    }
 }

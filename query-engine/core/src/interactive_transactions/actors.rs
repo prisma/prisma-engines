@@ -1,7 +1,8 @@
 use super::{CachedTx, TransactionError, TxOpRequest, TxOpRequestMsg, TxOpResponse};
+use crate::executor::task::{spawn, JoinHandle};
 use crate::{
-    execute_many_operations, execute_single_operation, protocol::EngineProtocol,
-    telemetry::helpers::set_span_link_from_traceparent, ClosedTx, Operation, ResponseData, TxId,
+    execute_many_operations, execute_single_operation, protocol::EngineProtocol, ClosedTx, Operation, ResponseData,
+    TxId,
 };
 use connector::Connection;
 use schema::QuerySchemaRef;
@@ -11,12 +12,14 @@ use tokio::{
         mpsc::{channel, Receiver, Sender},
         oneshot, RwLock,
     },
-    task::JoinHandle,
     time::{self, Duration, Instant},
 };
 use tracing::Span;
 use tracing_futures::Instrument;
 use tracing_futures::WithSubscriber;
+
+#[cfg(feature = "metrics")]
+use crate::telemetry::helpers::set_span_link_from_traceparent;
 
 #[derive(PartialEq)]
 enum RunState {
@@ -81,6 +84,8 @@ impl<'a> ITXServer<'a> {
         traceparent: Option<String>,
     ) -> crate::Result<ResponseData> {
         let span = info_span!("prisma:engine:itx_query_builder", user_facing = true);
+
+        #[cfg(feature = "metrics")]
         set_span_link_from_traceparent(&span, traceparent.clone());
 
         let conn = self.cached_tx.as_open()?;
@@ -267,7 +272,7 @@ pub(crate) async fn spawn_itx_actor(
     };
     let (open_transaction_send, open_transaction_rcv) = oneshot::channel();
 
-    tokio::task::spawn(
+    spawn(
         crate::executor::with_request_context(engine_protocol, async move {
             // We match on the result in order to send the error to the parent task and abort this
             // task, on error. This is a separate task (actor), not a function where we can just bubble up the
@@ -380,7 +385,7 @@ pub(crate) fn spawn_client_list_clear_actor(
     closed_txs: Arc<RwLock<lru::LruCache<TxId, Option<ClosedTx>>>>,
     mut rx: Receiver<(TxId, Option<ClosedTx>)>,
 ) -> JoinHandle<()> {
-    tokio::task::spawn(async move {
+    spawn(async move {
         loop {
             if let Some((id, closed_tx)) = rx.recv().await {
                 trace!("removing {} from client list", id);

@@ -10,7 +10,7 @@ once_cell = "1"
 qe-setup = { path = "../qe-setup" }
 request-handlers = { path = "../../request-handlers" }
 tokio.workspace = true
-query-core = { path = "../../core" }
+query-core = { path = "../../core", features = ["metrics"] }
 sql-query-connector = { path = "../../connectors/sql-query-connector" }
 query-engine = { path = "../../query-engine"}
 psl.workspace = true

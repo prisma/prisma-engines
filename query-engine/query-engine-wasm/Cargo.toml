@@ -17,6 +17,7 @@ prisma-models = { path = "../prisma-models" }
 quaint = { path = "../../quaint" }
 connector = { path = "../connectors/query-connector", package = "query-connector" }
 sql-query-connector = { path = "../connectors/sql-query-connector" }
+query-core = { path = "../core" }
 
 thiserror = "1"
 connection-string.workspace = true 
