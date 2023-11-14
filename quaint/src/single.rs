@@ -7,7 +7,7 @@ use crate::{
 use async_trait::async_trait;
 use std::{fmt, sync::Arc};
 
-#[cfg(feature = "sqlite-connector")]
+#[cfg(feature = "sqlite-native")]
 use std::convert::TryFrom;
 
 /// The main entry point and an abstraction over a database connection.
@@ -129,27 +129,27 @@ impl Quaint {
     #[allow(unreachable_code)]
     pub async fn new(url_str: &str) -> crate::Result<Self> {
         let inner = match url_str {
-            #[cfg(feature = "sqlite-connector")]
+            #[cfg(feature = "sqlite-native")]
             s if s.starts_with("file") => {
                 let params = connector::SqliteParams::try_from(s)?;
                 let sqlite = connector::Sqlite::new(&params.file_path)?;
 
                 Arc::new(sqlite) as Arc<dyn Queryable>
             }
-            #[cfg(feature = "mysql-connector")]
+            #[cfg(feature = "mysql-native")]
             s if s.starts_with("mysql") => {
                 let url = connector::MysqlUrl::new(url::Url::parse(s)?)?;
                 let mysql = connector::Mysql::new(url).await?;
 
                 Arc::new(mysql) as Arc<dyn Queryable>
             }
-            #[cfg(feature = "postgresql-connector")]
+            #[cfg(feature = "postgresql-native")]
             s if s.starts_with("postgres") || s.starts_with("postgresql") => {
                 let url = connector::PostgresUrl::new(url::Url::parse(s)?)?;
                 let psql = connector::PostgreSql::new(url).await?;
                 Arc::new(psql) as Arc<dyn Queryable>
             }
-            #[cfg(feature = "mssql-connector")]
+            #[cfg(feature = "mssql-native")]
             s if s.starts_with("jdbc:sqlserver") | s.starts_with("sqlserver") => {
                 let url = connector::MssqlUrl::new(s)?;
                 let psql = connector::Mssql::new(url).await?;
@@ -165,7 +165,7 @@ impl Quaint {
         Ok(Self { inner, connection_info })
     }
 
-    #[cfg(feature = "sqlite-connector")]
+    #[cfg(feature = "sqlite-native")]
     /// Open a new SQLite database in memory.
     pub fn new_in_memory() -> crate::Result<Quaint> {
         use crate::connector::DEFAULT_SQLITE_SCHEMA_NAME;

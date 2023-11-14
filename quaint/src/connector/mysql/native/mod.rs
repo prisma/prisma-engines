@@ -1,6 +1,6 @@
 //! Definitions for the MySQL connector.
 //! This module is not compatible with wasm32-* targets.
-//! This module is only available with the `mysql-connector` feature.
+//! This module is only available with the `mysql-native` feature.
 mod conversion;
 mod error;
 

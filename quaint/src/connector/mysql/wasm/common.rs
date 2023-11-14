@@ -123,7 +123,7 @@ impl MysqlUrl {
     }
 
     fn parse_query_params(url: &Url) -> Result<MysqlUrlQueryParams, Error> {
-        #[cfg(feature = "mysql-connector")]
+        #[cfg(feature = "mysql-native")]
         let mut ssl_opts = {
             let mut ssl_opts = mysql_async::SslOpts::default();
             ssl_opts = ssl_opts.with_danger_accept_invalid_certs(true);
@@ -159,7 +159,7 @@ impl MysqlUrl {
                 "sslcert" => {
                     use_ssl = true;
 
-                    #[cfg(feature = "mysql-connector")]
+                    #[cfg(feature = "mysql-native")]
                     {
                         ssl_opts = ssl_opts.with_root_cert_path(Some(Path::new(&*v).to_path_buf()));
                     }
@@ -219,7 +219,7 @@ impl MysqlUrl {
                     use_ssl = true;
                     match v.as_ref() {
                         "strict" => {
-                            #[cfg(feature = "mysql-connector")]
+                            #[cfg(feature = "mysql-native")]
                             {
                                 ssl_opts = ssl_opts.with_danger_accept_invalid_certs(false);
                             }
@@ -263,7 +263,7 @@ impl MysqlUrl {
 
         // Wrapping this in a block, as attributes on expressions are still experimental
         // See: https://github.com/rust-lang/rust/issues/15701
-        #[cfg(feature = "mysql-connector")]
+        #[cfg(feature = "mysql-native")]
         {
             ssl_opts = match identity {
                 Some((Some(path), Some(pw))) => {
@@ -279,7 +279,7 @@ impl MysqlUrl {
         }
 
         Ok(MysqlUrlQueryParams {
-            #[cfg(feature = "mysql-connector")]
+            #[cfg(feature = "mysql-native")]
             ssl_opts,
             connection_limit,
             use_ssl,
@@ -313,6 +313,6 @@ pub(crate) struct MysqlUrlQueryParams {
     pub(crate) prefer_socket: Option<bool>,
     pub(crate) statement_cache_size: usize,
 
-    #[cfg(feature = "mysql-connector")]
+    #[cfg(feature = "mysql-native")]
     pub(crate) ssl_opts: mysql_async::SslOpts,
 }

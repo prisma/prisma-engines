@@ -4,5 +4,5 @@ pub use wasm::error::PostgresError;
 #[cfg(feature = "postgresql")]
 pub(crate) mod wasm;
 
-#[cfg(feature = "postgresql-connector")]
+#[cfg(feature = "postgresql-native")]
 pub(crate) mod native;

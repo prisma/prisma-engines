@@ -11,7 +11,7 @@ use url::{Host, Url};
 
 use crate::error::{Error, ErrorKind};
 
-#[cfg(feature = "postgresql-connector")]
+#[cfg(feature = "postgresql-native")]
 use tokio_postgres::config::{ChannelBinding, SslMode};
 
 #[derive(Clone)]
@@ -211,9 +211,9 @@ impl PostgresUrl {
     }
 
     fn parse_query_params(url: &Url) -> Result<PostgresUrlQueryParams, Error> {
-        #[cfg(feature = "postgresql-connector")]
+        #[cfg(feature = "postgresql-native")]
         let mut ssl_mode = SslMode::Prefer;
-        #[cfg(feature = "postgresql-connector")]
+        #[cfg(feature = "postgresql-native")]
         let mut channel_binding = ChannelBinding::Prefer;
 
         let mut connection_limit = None;
@@ -240,7 +240,7 @@ impl PostgresUrl {
                         .parse()
                         .map_err(|_| Error::builder(ErrorKind::InvalidConnectionArguments).build())?;
                 }
-                #[cfg(feature = "postgresql-connector")]
+                #[cfg(feature = "postgresql-native")]
                 "sslmode" => {
                     match v.as_ref() {
                         "disable" => ssl_mode = SslMode::Disable,
@@ -348,7 +348,7 @@ impl PostgresUrl {
                 "application_name" => {
                     application_name = Some(v.to_string());
                 }
-                #[cfg(feature = "postgresql-connector")]
+                #[cfg(feature = "postgresql-native")]
                 "channel_binding" => {
                     match v.as_ref() {
                         "disable" => channel_binding = ChannelBinding::Disable,
@@ -390,9 +390,9 @@ impl PostgresUrl {
             max_idle_connection_lifetime,
             application_name,
             options,
-            #[cfg(feature = "postgresql-connector")]
+            #[cfg(feature = "postgresql-native")]
             channel_binding,
-            #[cfg(feature = "postgresql-connector")]
+            #[cfg(feature = "postgresql-native")]
             ssl_mode,
         })
     }
@@ -427,10 +427,10 @@ pub(crate) struct PostgresUrlQueryParams {
     pub(crate) application_name: Option<String>,
     pub(crate) options: Option<String>,
 
-    #[cfg(feature = "postgresql-connector")]
+    #[cfg(feature = "postgresql-native")]
     pub(crate) channel_binding: ChannelBinding,
 
-    #[cfg(feature = "postgresql-connector")]
+    #[cfg(feature = "postgresql-native")]
     pub(crate) ssl_mode: SslMode,
 }
 

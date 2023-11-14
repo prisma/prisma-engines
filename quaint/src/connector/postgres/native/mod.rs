@@ -1,6 +1,6 @@
 //! Definitions for the Postgres connector.
 //! This module is not compatible with wasm32-* targets.
-//! This module is only available with the `postgresql-connector` feature.
+//! This module is only available with the `postgresql-native` feature.
 mod conversion;
 mod error;
 

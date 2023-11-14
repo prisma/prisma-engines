@@ -29,21 +29,21 @@ docs = []
 # way to access database-specific methods when you need extra control.
 expose-drivers = []
 
-connectors = [
-  "postgresql-connector",
-  "mysql-connector",
-  "mssql-connector",
-  "sqlite-connector",
+native = [
+  "postgresql-native",
+  "mysql-native",
+  "mssql-native",
+  "sqlite-native",
 ]
 
-all = ["connectors", "pooled"]
+all = ["native", "pooled"]
 
 vendored-openssl = [
   "postgres-native-tls/vendored-openssl",
   "mysql_async/vendored-openssl",
 ]
 
-postgresql-connector = [
+postgresql-native = [
   "postgresql",
   "native-tls",
   "tokio-postgres",
@@ -57,7 +57,7 @@ postgresql-connector = [
 ]
 postgresql = []
 
-mssql-connector = [
+mssql-native = [
   "mssql",
   "tiberius",
   "tokio-util",
@@ -66,11 +66,11 @@ mssql-connector = [
 ]
 mssql = []
 
-mysql-connector = ["mysql", "mysql_async", "tokio/time", "lru-cache"]
+mysql-native = ["mysql", "mysql_async", "tokio/time", "lru-cache"]
 mysql = ["chrono/std"]
 
 pooled = ["mobc"]
-sqlite-connector = ["sqlite", "rusqlite/bundled", "tokio/sync"]
+sqlite-native = ["sqlite", "rusqlite/bundled", "tokio/sync"]
 sqlite = ["rusqlite"]
 
 fmt-sql = ["sqlformat"]
