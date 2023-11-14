@@ -22,11 +22,6 @@ pub use js::*;
 #[cfg(not(target_arch = "wasm32"))]
 pub use native::{mssql::*, mysql::*, postgresql::*, sqlite::*};
 
-// pub use mssql::*;
-// pub use mysql::*;
-// pub use postgresql::*;
-// pub use sqlite::*;
-
 #[async_trait]
 pub trait FromSource {
     /// Instantiate a query connector from a Datasource.
