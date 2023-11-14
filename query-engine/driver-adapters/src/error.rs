@@ -12,7 +12,7 @@ pub(crate) fn into_quaint_error(napi_err: NapiError) -> QuaintError {
     QuaintError::raw_connector_error(status, reason)
 }
 
-/// catches a panic thrown during the executuin of an asynchronous closure and transforms it into
+/// catches a panic thrown during the execution of an asynchronous closure and transforms it into
 /// the Error variant of a napi::Result.
 pub(crate) async fn async_unwinding_panic<F, R>(fut: F) -> napi::Result<R>
 where

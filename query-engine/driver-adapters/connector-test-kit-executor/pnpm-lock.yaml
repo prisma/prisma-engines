@@ -38,9 +38,6 @@ dependencies:
   undici:
     specifier: ^5.26.5
     version: 5.26.5
-  ws:
-    specifier: ^8.14.2
-    version: 8.14.2
 
 devDependencies:
   '@types/node':

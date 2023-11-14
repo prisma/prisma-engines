@@ -4,6 +4,7 @@ use std::str::FromStr;
 use crate::async_js_function::AsyncJsFunction;
 use crate::conversion::JSArg;
 use crate::transaction::JsTransaction;
+use metrics::increment_gauge;
 use napi::bindgen_prelude::{FromNapiValue, ToNapiValue};
 use napi::threadsafe_function::{ErrorStrategy, ThreadsafeFunction};
 use napi::{JsObject, JsString};
@@ -117,9 +118,7 @@ pub enum ColumnType {
     /// - BOOLEAN (BOOLEAN) -> e.g. `1`
     Boolean = 5,
 
-    /// The following PlanetScale type IDs are mapped into Char:
-    /// - CHAR (CHAR) -> e.g. `"c"` (String-encoded)
-    Char = 6,
+    Character = 6,
 
     /// The following PlanetScale type IDs are mapped into Text:
     /// - TEXT (TEXT) -> e.g. `"foo"` (String-encoded)
@@ -184,7 +183,7 @@ pub enum ColumnType {
     BooleanArray = 69,
 
     /// Char array (CHAR_ARRAY in PostgreSQL)
-    CharArray = 70,
+    CharacterArray = 70,
 
     /// Text array (TEXT_ARRAY in PostgreSQL)
     TextArray = 71,
@@ -250,6 +249,12 @@ fn js_value_to_quaint(
     column_type: ColumnType,
     column_name: &str,
 ) -> quaint::Result<QuaintValue<'static>> {
+    let parse_number_as_i64 = |n: &serde_json::Number| {
+        n.as_i64().ok_or(conversion_error!(
+            "number must be an integer in column '{column_name}', got '{n}'"
+        ))
+    };
+
     //  Note for the future: it may be worth revisiting how much bloat so many panics with different static
     // strings add to the compiled artefact, and in case we should come up with a restricted set of panic
     // messages, or even find a way of removing them altogether.
@@ -257,8 +262,7 @@ fn js_value_to_quaint(
         ColumnType::Int32 => match json_value {
             serde_json::Value::Number(n) => {
                 // n.as_i32() is not implemented, so we need to downcast from i64 instead
-                n.as_i64()
-                    .ok_or(conversion_error!("number must be an integer in column '{column_name}'"))
+                parse_number_as_i64(&n)
                     .and_then(|n| -> quaint::Result<i32> {
                         n.try_into()
                             .map_err(|e| conversion_error!("cannot convert {n} to i32 in column '{column_name}': {e}"))
@@ -274,9 +278,7 @@ fn js_value_to_quaint(
             )),
         },
         ColumnType::Int64 => match json_value {
-            serde_json::Value::Number(n) => n.as_i64().map(QuaintValue::int64).ok_or(conversion_error!(
-                "number must be an i64 in column '{column_name}', got {n}"
-            )),
+            serde_json::Value::Number(n) => parse_number_as_i64(&n).map(QuaintValue::int64),
             serde_json::Value::String(s) => s.parse::<i64>().map(QuaintValue::int64).map_err(|e| {
                 conversion_error!("string-encoded number must be an i64 in column '{column_name}', got {s}: {e}")
             }),
@@ -346,7 +348,7 @@ fn js_value_to_quaint(
                 "expected a boolean in column '{column_name}', found {mismatch}"
             )),
         },
-        ColumnType::Char => match json_value {
+        ColumnType::Character => match json_value {
             serde_json::Value::String(s) => match s.chars().next() {
                 Some(c) => Ok(QuaintValue::character(c)),
                 None => Ok(QuaintValue::null_character()),
@@ -452,7 +454,7 @@ fn js_value_to_quaint(
         ColumnType::DoubleArray => js_array_to_quaint(ColumnType::Double, json_value, column_name),
         ColumnType::NumericArray => js_array_to_quaint(ColumnType::Numeric, json_value, column_name),
         ColumnType::BooleanArray => js_array_to_quaint(ColumnType::Boolean, json_value, column_name),
-        ColumnType::CharArray => js_array_to_quaint(ColumnType::Char, json_value, column_name),
+        ColumnType::CharacterArray => js_array_to_quaint(ColumnType::Character, json_value, column_name),
         ColumnType::TextArray => js_array_to_quaint(ColumnType::Text, json_value, column_name),
         ColumnType::DateArray => js_array_to_quaint(ColumnType::Date, json_value, column_name),
         ColumnType::TimeArray => js_array_to_quaint(ColumnType::Time, json_value, column_name),
@@ -557,6 +559,12 @@ impl DriverProxy {
 
     pub async fn start_transaction(&self) -> quaint::Result<Box<JsTransaction>> {
         let tx = self.start_transaction.call(()).await?;
+
+        // Decrement for this gauge is done in JsTransaction::commit/JsTransaction::rollback
+        // Previously, it was done in JsTransaction::new, similar to the native Transaction.
+        // However, correct Dispatcher is lost there and increment does not register, so we moved
+        // it here instead.
+        increment_gauge!("prisma_client_queries_active", 1.0);
         Ok(Box::new(tx))
     }
 }
@@ -790,7 +798,7 @@ mod proxy_test {
 
     #[test]
     fn js_value_char_to_quaint() {
-        let column_type = ColumnType::Char;
+        let column_type = ColumnType::Character;
 
         // null
         test_null(QuaintValue::null_character(), column_type);

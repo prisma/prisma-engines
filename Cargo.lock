@@ -326,6 +326,7 @@ dependencies = [
  "query-engine-metrics",
  "query-engine-tests",
  "query-tests-setup",
+ "regex",
  "reqwest",
  "serde_json",
  "tokio",
@@ -2396,9 +2397,9 @@ dependencies = [
 
 [[package]]
 name = "mobc"
-version = "0.8.2"
+version = "0.8.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "0bdeff49b387edef305eccfe166af3e1483bb57902dbf369dddc42dc824df23b"
+checksum = "90eb49dc5d193287ff80e72a86f34cfb27aae562299d22fea215e06ea1059dd3"
 dependencies = [
  "async-trait",
  "futures-channel",

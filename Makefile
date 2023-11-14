@@ -130,10 +130,10 @@ test-pg-postgres13: dev-pg-postgres13 test-qe-st
 
 test-driver-adapter-pg: test-pg-postgres13
 
-start-neon-postgres13: build-qe-napi build-connector-kit-js
+start-neon-postgres13:
 	docker compose -f docker-compose.yml up --wait -d --remove-orphans neon-postgres13
 
-dev-neon-ws-postgres13: start-neon-postgres13
+dev-neon-ws-postgres13: start-neon-postgres13 build-qe-napi build-connector-kit-js
 	cp $(CONFIG_PATH)/neon-ws-postgres13 $(CONFIG_FILE)
 
 test-neon-ws-postgres13: dev-neon-ws-postgres13 test-qe-st
@@ -268,10 +268,10 @@ start-vitess_8_0:
 dev-vitess_8_0: start-vitess_8_0
 	cp $(CONFIG_PATH)/vitess_8_0 $(CONFIG_FILE)
 
-start-planetscale-vitess8: build-qe-napi build-connector-kit-js
+start-planetscale-vitess8:
 	docker compose -f docker-compose.yml up -d --remove-orphans planetscale-vitess8
 
-dev-planetscale-vitess8: start-planetscale-vitess8
+dev-planetscale-vitess8: start-planetscale-vitess8 build-qe-napi build-connector-kit-js
 	cp $(CONFIG_PATH)/planetscale-vitess8 $(CONFIG_FILE)
 
 test-planetscale-vitess8: dev-planetscale-vitess8 test-qe-st
@@ -285,24 +285,13 @@ test-driver-adapter-planetscale: test-planetscale-vitess8
 build-qe-napi:
 	cargo build --package query-engine-node-api
 
-build-connector-kit-js: build-driver-adapters symlink-driver-adapters
-	cd query-engine/driver-adapters/connector-test-kit-executor && pnpm i && pnpm build
+build-connector-kit-js: build-driver-adapters
+	cd query-engine/driver-adapters && pnpm i && pnpm build
 
 build-driver-adapters: ensure-prisma-present
 	@echo "Building driver adapters..."
-	@cd ../prisma && pnpm --filter "*adapter*" i && pnpm --filter "*adapter*" build
+	@cd ../prisma && pnpm --filter "*adapter*" i
 	@echo "Driver adapters build completed.";
-
-symlink-driver-adapters: ensure-prisma-present
-	@echo "Creating symbolic links for driver adapters..."
-	@for dir in $(wildcard $(realpath ../prisma)/packages/*adapter*); do \
-        if [ -d "$$dir" ]; then \
-            dir_name=$$(basename "$$dir"); \
-            ln -sfn "$$dir" "$(realpath .)/query-engine/driver-adapters/$$dir_name"; \
-            echo "Created symbolic link for $$dir_name"; \
-        fi; \
-	done;
-	echo "Symbolic links creation completed.";
 
 ensure-prisma-present:
 	@if [ -d ../prisma ]; then \
