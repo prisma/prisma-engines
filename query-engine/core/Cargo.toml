@@ -4,7 +4,6 @@ name = "query-core"
 version = "0.1.0"
 
 [features]
-# default = ["metrics"]
 metrics = ["query-engine-metrics"]
 
 [dependencies]
