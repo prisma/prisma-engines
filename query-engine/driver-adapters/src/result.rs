@@ -1,5 +1,5 @@
 use napi::{bindgen_prelude::FromNapiValue, Env, JsUnknown, NapiValue};
-use quaint::error::{Error as QuaintError, MysqlError, PostgresError, SqliteError};
+use quaint::error::{Error as QuaintError, ErrorKind, MysqlError, PostgresError, SqliteError};
 use serde::Deserialize;
 
 #[derive(Deserialize)]
@@ -36,7 +36,10 @@ pub(crate) enum DriverAdapterError {
     GenericJs {
         id: i32,
     },
-
+    UnsupportedNativeDataType {
+        #[serde(rename = "type")]
+        native_type: String,
+    },
     Postgres(#[serde(with = "PostgresErrorDef")] PostgresError),
     Mysql(#[serde(with = "MysqlErrorDef")] MysqlError),
     Sqlite(#[serde(with = "SqliteErrorDef")] SqliteError),
@@ -53,6 +56,12 @@ impl FromNapiValue for DriverAdapterError {
 impl From<DriverAdapterError> for QuaintError {
     fn from(value: DriverAdapterError) -> Self {
         match value {
+            DriverAdapterError::UnsupportedNativeDataType { native_type } => {
+                QuaintError::builder(ErrorKind::UnsupportedColumnType {
+                    column_type: native_type,
+                })
+                .build()
+            }
             DriverAdapterError::GenericJs { id } => QuaintError::external_error(id),
             DriverAdapterError::Postgres(e) => e.into(),
             DriverAdapterError::Mysql(e) => e.into(),
