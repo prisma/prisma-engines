@@ -34,7 +34,7 @@ pub(crate) mod postgres;
 #[cfg(feature = "postgresql-native")]
 pub use postgres::native::*;
 #[cfg(feature = "postgresql")]
-pub use postgres::wasm::common::*;
+pub use postgres::*;
 
 #[cfg(feature = "mysql")]
 pub(crate) mod mysql;
