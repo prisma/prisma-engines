@@ -1,14 +1,13 @@
 use indoc::indoc;
 use query_engine_tests::*;
 
-#[test_suite(schema(schema))]
+#[test_suite(schema(schema), capabilities(Enums))]
 mod prisma_21901 {
     fn schema() -> String {
         let schema = indoc! {
             r#"model Test {
               #id(id, Int, @id)
               colors Color[]
-              color Color?
             }
             
             enum Color {
