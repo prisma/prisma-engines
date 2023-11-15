@@ -1,6 +1,8 @@
 use crate::error::{DatabaseConstraint, Error, ErrorKind};
 use thiserror::Error;
 
+// This is a partial copy of the `mysql_async::Error` using only the enum variant used by Prisma.
+// This avoids pulling in `mysql_async`, which would break Wasm compilation.
 #[derive(Debug, Error)]
 enum MysqlAsyncError {
     #[error("Server error: `{}'", _0)]
