@@ -1,7 +1,7 @@
 use indoc::indoc;
 use query_engine_tests::*;
 
-#[test_suite(schema(schema), capabilities(Enums), exclude(MongoDb))]
+#[test_suite(schema(schema), capabilities(Enums, ScalarLists), exclude(MongoDb))]
 mod prisma_21901 {
     fn schema() -> String {
         let schema = indoc! {
