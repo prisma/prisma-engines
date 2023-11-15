@@ -48,7 +48,7 @@ pub(crate) mod sqlite;
 #[cfg(feature = "sqlite-native")]
 pub use sqlite::native::*;
 #[cfg(feature = "sqlite")]
-pub use sqlite::wasm::common::*;
+pub use sqlite::*;
 
 #[cfg(feature = "mssql")]
 pub(crate) mod mssql;

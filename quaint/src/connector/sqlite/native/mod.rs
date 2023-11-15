@@ -4,7 +4,7 @@
 mod conversion;
 mod error;
 
-use crate::connector::sqlite::wasm::common::SqliteParams;
+use crate::connector::sqlite::params::SqliteParams;
 use crate::connector::IsolationLevel;
 
 pub use rusqlite::{params_from_iter, version as sqlite_version};
