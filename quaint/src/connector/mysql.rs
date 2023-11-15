@@ -8,4 +8,3 @@ pub use url::MysqlUrl;
 
 #[cfg(feature = "mysql-native")]
 pub(crate) mod native;
-

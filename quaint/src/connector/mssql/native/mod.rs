@@ -4,7 +4,7 @@
 mod conversion;
 mod error;
 
-pub(crate) use crate::connector::mssql::wasm::common::MssqlUrl;
+pub(crate) use crate::connector::mssql::MssqlUrl;
 use crate::connector::{timeout, IsolationLevel, Transaction, TransactionOptions};
 
 use crate::{
