@@ -4,7 +4,7 @@
 mod conversion;
 mod error;
 
-pub(crate) use crate::connector::mssql::wasm::common::MssqlUrl;
+pub(crate) use crate::connector::mssql::MssqlUrl;
 use crate::connector::{timeout, IsolationLevel, Transaction, TransactionOptions};
 
 use crate::{
@@ -235,22 +235,5 @@ impl Queryable for Mssql {
 
     fn requires_isolation_first(&self) -> bool {
         true
-    }
-}
-
-#[cfg(test)]
-mod tests {
-    use crate::tests::test_api::mssql::CONN_STR;
-    use crate::{error::*, single::Quaint};
-
-    #[tokio::test]
-    async fn should_map_wrong_credentials_error() {
-        let url = CONN_STR.replace("user=SA", "user=WRONG");
-
-        let res = Quaint::new(url.as_str()).await;
-        assert!(res.is_err());
-
-        let err = res.unwrap_err();
-        assert!(matches!(err.kind(), ErrorKind::AuthenticationFailed { user } if user == &Name::available("WRONG")));
     }
 }
