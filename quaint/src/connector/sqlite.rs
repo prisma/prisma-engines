@@ -1,7 +1,11 @@
-pub use wasm::error::SqliteError;
+//! Wasm-compatible definitions for the SQLite connector.
+//! This module is only available with the `sqlite` feature.
+pub(crate) mod error;
+mod ffi;
+pub(crate) mod params;
 
-#[cfg(feature = "sqlite")]
-pub(crate) mod wasm;
+pub use error::SqliteError;
+pub use params::*;
 
 #[cfg(feature = "sqlite-native")]
 pub(crate) mod native;

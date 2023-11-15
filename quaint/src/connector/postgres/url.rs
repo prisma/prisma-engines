@@ -470,3 +470,226 @@ impl Display for SetSearchPath<'_> {
         Ok(())
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::ast::Value;
+    pub(crate) use crate::connector::postgres::url::PostgresFlavour;
+    use crate::tests::test_api::postgres::CONN_STR;
+    use crate::{connector::Queryable, error::*, single::Quaint};
+    use url::Url;
+
+    #[test]
+    fn should_parse_socket_url() {
+        let url = PostgresUrl::new(Url::parse("postgresql:///dbname?host=/var/run/psql.sock").unwrap()).unwrap();
+        assert_eq!("dbname", url.dbname());
+        assert_eq!("/var/run/psql.sock", url.host());
+    }
+
+    #[test]
+    fn should_parse_escaped_url() {
+        let url = PostgresUrl::new(Url::parse("postgresql:///dbname?host=%2Fvar%2Frun%2Fpostgresql").unwrap()).unwrap();
+        assert_eq!("dbname", url.dbname());
+        assert_eq!("/var/run/postgresql", url.host());
+    }
+
+    #[test]
+    fn should_allow_changing_of_cache_size() {
+        let url =
+            PostgresUrl::new(Url::parse("postgresql:///localhost:5432/foo?statement_cache_size=420").unwrap()).unwrap();
+        assert_eq!(420, url.cache().capacity());
+    }
+
+    #[test]
+    fn should_have_default_cache_size() {
+        let url = PostgresUrl::new(Url::parse("postgresql:///localhost:5432/foo").unwrap()).unwrap();
+        assert_eq!(100, url.cache().capacity());
+    }
+
+    #[test]
+    fn should_have_application_name() {
+        let url =
+            PostgresUrl::new(Url::parse("postgresql:///localhost:5432/foo?application_name=test").unwrap()).unwrap();
+        assert_eq!(Some("test"), url.application_name());
+    }
+
+    #[test]
+    fn should_have_channel_binding() {
+        let url =
+            PostgresUrl::new(Url::parse("postgresql:///localhost:5432/foo?channel_binding=require").unwrap()).unwrap();
+        assert_eq!(ChannelBinding::Require, url.channel_binding());
+    }
+
+    #[test]
+    fn should_have_default_channel_binding() {
+        let url =
+            PostgresUrl::new(Url::parse("postgresql:///localhost:5432/foo?channel_binding=invalid").unwrap()).unwrap();
+        assert_eq!(ChannelBinding::Prefer, url.channel_binding());
+
+        let url = PostgresUrl::new(Url::parse("postgresql:///localhost:5432/foo").unwrap()).unwrap();
+        assert_eq!(ChannelBinding::Prefer, url.channel_binding());
+    }
+
+    #[test]
+    fn should_not_enable_caching_with_pgbouncer() {
+        let url = PostgresUrl::new(Url::parse("postgresql:///localhost:5432/foo?pgbouncer=true").unwrap()).unwrap();
+        assert_eq!(0, url.cache().capacity());
+    }
+
+    #[test]
+    fn should_parse_default_host() {
+        let url = PostgresUrl::new(Url::parse("postgresql:///dbname").unwrap()).unwrap();
+        assert_eq!("dbname", url.dbname());
+        assert_eq!("localhost", url.host());
+    }
+
+    #[test]
+    fn should_parse_ipv6_host() {
+        let url = PostgresUrl::new(Url::parse("postgresql://[2001:db8:1234::ffff]:5432/dbname").unwrap()).unwrap();
+        assert_eq!("2001:db8:1234::ffff", url.host());
+    }
+
+    #[test]
+    fn should_handle_options_field() {
+        let url = PostgresUrl::new(Url::parse("postgresql:///localhost:5432?options=--cluster%3Dmy_cluster").unwrap())
+            .unwrap();
+
+        assert_eq!("--cluster=my_cluster", url.options().unwrap());
+    }
+
+    #[tokio::test]
+    async fn should_map_nonexisting_database_error() {
+        let mut url = Url::parse(&CONN_STR).unwrap();
+        url.set_path("/this_does_not_exist");
+
+        let res = Quaint::new(url.as_str()).await;
+
+        assert!(res.is_err());
+
+        match res {
+            Ok(_) => unreachable!(),
+            Err(e) => match e.kind() {
+                ErrorKind::DatabaseDoesNotExist { db_name } => {
+                    assert_eq!(Some("3D000"), e.original_code());
+                    assert_eq!(
+                        Some("database \"this_does_not_exist\" does not exist"),
+                        e.original_message()
+                    );
+                    assert_eq!(&Name::available("this_does_not_exist"), db_name)
+                }
+                kind => panic!("Expected `DatabaseDoesNotExist`, got {:?}", kind),
+            },
+        }
+    }
+
+    #[tokio::test]
+    async fn should_map_wrong_credentials_error() {
+        let mut url = Url::parse(&CONN_STR).unwrap();
+        url.set_username("WRONG").unwrap();
+
+        let res = Quaint::new(url.as_str()).await;
+        assert!(res.is_err());
+
+        let err = res.unwrap_err();
+        assert!(matches!(err.kind(), ErrorKind::AuthenticationFailed { user } if user == &Name::available("WRONG")));
+    }
+
+    #[tokio::test]
+    async fn should_map_tls_errors() {
+        let mut url = Url::parse(&CONN_STR).expect("parsing url");
+        url.set_query(Some("sslmode=require&sslaccept=strict"));
+
+        let res = Quaint::new(url.as_str()).await;
+
+        assert!(res.is_err());
+
+        match res {
+            Ok(_) => unreachable!(),
+            Err(e) => match e.kind() {
+                ErrorKind::TlsError { .. } => (),
+                other => panic!("{:#?}", other),
+            },
+        }
+    }
+
+    #[tokio::test]
+    async fn should_map_incorrect_parameters_error() {
+        let url = Url::parse(&CONN_STR).unwrap();
+        let conn = Quaint::new(url.as_str()).await.unwrap();
+
+        let res = conn.query_raw("SELECT $1", &[Value::int32(1), Value::int32(2)]).await;
+
+        assert!(res.is_err());
+
+        match res {
+            Ok(_) => unreachable!(),
+            Err(e) => match e.kind() {
+                ErrorKind::IncorrectNumberOfParameters { expected, actual } => {
+                    assert_eq!(1, *expected);
+                    assert_eq!(2, *actual);
+                }
+                other => panic!("{:#?}", other),
+            },
+        }
+    }
+
+    #[test]
+    fn search_path_pgbouncer_should_be_set_with_query() {
+        let mut url = Url::parse(&CONN_STR).unwrap();
+        url.query_pairs_mut().append_pair("schema", "hello");
+        url.query_pairs_mut().append_pair("pgbouncer", "true");
+
+        let mut pg_url = PostgresUrl::new(url).unwrap();
+        pg_url.set_flavour(PostgresFlavour::Postgres);
+
+        let config = pg_url.to_config();
+
+        // PGBouncer does not support the `search_path` connection parameter.
+        // When `pgbouncer=true`, config.search_path should be None,
+        // And the `search_path` should be set via a db query after connection.
+        assert_eq!(config.get_search_path(), None);
+    }
+
+    #[test]
+    fn search_path_pg_should_be_set_with_param() {
+        let mut url = Url::parse(&CONN_STR).unwrap();
+        url.query_pairs_mut().append_pair("schema", "hello");
+
+        let mut pg_url = PostgresUrl::new(url).unwrap();
+        pg_url.set_flavour(PostgresFlavour::Postgres);
+
+        let config = pg_url.to_config();
+
+        // Postgres supports setting the search_path via a connection parameter.
+        assert_eq!(config.get_search_path(), Some(&"\"hello\"".to_owned()));
+    }
+
+    #[test]
+    fn search_path_crdb_safe_ident_should_be_set_with_param() {
+        let mut url = Url::parse(&CONN_STR).unwrap();
+        url.query_pairs_mut().append_pair("schema", "hello");
+
+        let mut pg_url = PostgresUrl::new(url).unwrap();
+        pg_url.set_flavour(PostgresFlavour::Cockroach);
+
+        let config = pg_url.to_config();
+
+        // CRDB supports setting the search_path via a connection parameter if the identifier is safe.
+        assert_eq!(config.get_search_path(), Some(&"hello".to_owned()));
+    }
+
+    #[test]
+    fn search_path_crdb_unsafe_ident_should_be_set_with_query() {
+        let mut url = Url::parse(&CONN_STR).unwrap();
+        url.query_pairs_mut().append_pair("schema", "HeLLo");
+
+        let mut pg_url = PostgresUrl::new(url).unwrap();
+        pg_url.set_flavour(PostgresFlavour::Cockroach);
+
+        let config = pg_url.to_config();
+
+        // CRDB does NOT support setting the search_path via a connection parameter if the identifier is unsafe.
+        assert_eq!(config.get_search_path(), None);
+    }
+}

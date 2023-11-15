@@ -1,7 +1,7 @@
 use tokio_postgres::error::DbError;
 
 use crate::{
-    connector::postgres::wasm::error::PostgresError,
+    connector::postgres::error::PostgresError,
     error::{Error, ErrorKind},
 };
 
