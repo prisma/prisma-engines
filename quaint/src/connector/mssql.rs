@@ -2,7 +2,7 @@
 //! This module is only available with the `mssql` feature.
 pub(crate) mod url;
 
-pub use url::MssqlUrl;
+pub use url::*;
 
 #[cfg(feature = "mssql-native")]
 pub(crate) mod native;

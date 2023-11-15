@@ -4,7 +4,7 @@ pub(crate) mod error;
 pub(crate) mod url;
 
 pub use error::PostgresError;
-pub use url::{PostgresFlavour, PostgresUrl};
+pub use url::*;
 
 #[cfg(feature = "postgresql-native")]
 pub(crate) mod native;

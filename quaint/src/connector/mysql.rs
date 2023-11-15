@@ -4,7 +4,7 @@ pub(crate) mod error;
 pub(crate) mod url;
 
 pub use error::MysqlError;
-pub use url::MysqlUrl;
+pub use url::*;
 
 #[cfg(feature = "mysql-native")]
 pub(crate) mod native;
