@@ -7,6 +7,15 @@ pub struct ColumnIterator {
     inner: Box<dyn Iterator<Item = Column<'static>> + 'static>,
 }
 
+impl ColumnIterator {
+    /// Sets all columns as selected. This is a hack that we use to help the Postgres SQL visitor cast enum columns to text to avoid some driver roundtrips otherwise needed to resolve enum types.
+    pub fn mark_all_selected(self) -> Self {
+        ColumnIterator {
+            inner: Box::new(self.inner.map(|c| c.set_is_selected(true))),
+        }
+    }
+}
+
 impl Iterator for ColumnIterator {
     type Item = Column<'static>;
 

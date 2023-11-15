@@ -633,6 +633,34 @@ impl<'a> Visitor<'a> for Postgres<'a> {
 
         Ok(())
     }
+
+    fn visit_min(&mut self, min: Minimum<'a>) -> visitor::Result {
+        // If the inner column is a selected enum, then we cast the result of MIN(enum)::text instead of casting the inner enum column, which changes the behavior of MIN.
+        let should_cast = min.column.is_enum && min.column.is_selected;
+
+        self.write("MIN")?;
+        self.surround_with("(", ")", |ref mut s| s.visit_column(min.column.set_is_selected(false)))?;
+
+        if should_cast {
+            self.write("::text")?;
+        }
+
+        Ok(())
+    }
+
+    fn visit_max(&mut self, max: Maximum<'a>) -> visitor::Result {
+        // If the inner column is a selected enum, then we cast the result of MAX(enum)::text instead of casting the inner enum column, which changes the behavior of MAX.
+        let should_cast = max.column.is_enum && max.column.is_selected;
+
+        self.write("MAX")?;
+        self.surround_with("(", ")", |ref mut s| s.visit_column(max.column.set_is_selected(false)))?;
+
+        if should_cast {
+            self.write("::text")?;
+        }
+
+        Ok(())
+    }
 }
 
 #[cfg(test)]

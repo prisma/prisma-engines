@@ -1004,6 +1004,20 @@ pub trait Visitor<'a> {
         Ok(())
     }
 
+    fn visit_min(&mut self, min: Minimum<'a>) -> Result {
+        self.write("MIN")?;
+        self.surround_with("(", ")", |ref mut s| s.visit_column(min.column))?;
+
+        Ok(())
+    }
+
+    fn visit_max(&mut self, max: Maximum<'a>) -> Result {
+        self.write("MAX")?;
+        self.surround_with("(", ")", |ref mut s| s.visit_column(max.column))?;
+
+        Ok(())
+    }
+
     fn visit_function(&mut self, fun: Function<'a>) -> Result {
         match fun.typ_ {
             FunctionType::RowNumber(fun_rownum) => {
@@ -1046,12 +1060,10 @@ pub trait Visitor<'a> {
                 self.surround_with("(", ")", |ref mut s| s.visit_expression(*upper.expression))?;
             }
             FunctionType::Minimum(min) => {
-                self.write("MIN")?;
-                self.surround_with("(", ")", |ref mut s| s.visit_column(min.column))?;
+                self.visit_min(min)?;
             }
             FunctionType::Maximum(max) => {
-                self.write("MAX")?;
-                self.surround_with("(", ")", |ref mut s| s.visit_column(max.column))?;
+                self.visit_max(max)?;
             }
             FunctionType::Coalesce(coalesce) => {
                 self.write("COALESCE")?;

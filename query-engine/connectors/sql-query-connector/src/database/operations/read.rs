@@ -18,7 +18,13 @@ pub(crate) async fn get_single_record(
     aggr_selections: &[RelAggregationSelection],
     ctx: &Context<'_>,
 ) -> crate::Result<Option<SingleRecord>> {
-    let query = read::get_records(model, selected_fields.as_columns(ctx), aggr_selections, filter, ctx);
+    let query = read::get_records(
+        model,
+        selected_fields.as_columns(ctx).mark_all_selected(),
+        aggr_selections,
+        filter,
+        ctx,
+    );
 
     let mut field_names: Vec<_> = selected_fields.db_names().collect();
     let mut aggr_field_names: Vec<_> = aggr_selections.iter().map(|aggr_sel| aggr_sel.db_alias()).collect();
@@ -104,7 +110,13 @@ pub(crate) async fn get_many_records(
             let mut futures = FuturesUnordered::new();
 
             for args in batches.into_iter() {
-                let query = read::get_records(model, selected_fields.as_columns(ctx), aggr_selections, args, ctx);
+                let query = read::get_records(
+                    model,
+                    selected_fields.as_columns(ctx).mark_all_selected(),
+                    aggr_selections,
+                    args,
+                    ctx,
+                );
 
                 futures.push(conn.filter(query.into(), meta.as_slice(), ctx));
             }
@@ -122,7 +134,7 @@ pub(crate) async fn get_many_records(
         _ => {
             let query = read::get_records(
                 model,
-                selected_fields.as_columns(ctx),
+                selected_fields.as_columns(ctx).mark_all_selected(),
                 aggr_selections,
                 query_arguments,
                 ctx,
