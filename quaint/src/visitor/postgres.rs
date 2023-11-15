@@ -99,7 +99,6 @@ impl<'a> Visitor<'a> for Postgres<'a> {
 
                 Ok(())
             })?;
-
         } else {
             self.visit_parameterized(Value::array(
                 variants.into_iter().map(|variant| variant.into_enum(name.clone())),

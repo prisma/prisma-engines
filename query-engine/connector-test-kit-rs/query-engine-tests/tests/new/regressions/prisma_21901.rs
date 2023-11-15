@@ -29,7 +29,7 @@ mod prisma_21901 {
           run_query!(
             runner,
             r#"mutation { createOneTest(data: { id: 1, colors: ["red"] }) { colors } }"#
-          ), 
+          ),
           @r###"{"data":{"createOneTest":{"colors":["red"]}}}"###
         );
 
