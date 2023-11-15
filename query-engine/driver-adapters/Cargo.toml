@@ -8,7 +8,6 @@ async-trait = "0.1"
 once_cell = "1.15"
 serde.workspace = true
 serde_json.workspace = true
-quaint.workspace = true
 psl.workspace = true
 tracing = "0.1"
 tracing-core = "0.1"
@@ -22,9 +21,16 @@ bigdecimal = "0.3.0"
 chrono = "0.4.20"
 futures = "0.3"
 
-napi.workspace = true
-napi-derive.workspace = true
-
 [dev-dependencies]
 expect-test = "1"
 tokio.workspace = true
+
+[target.'cfg(not(target_arch = "wasm32"))'.dependencies]
+napi.workspace = true
+napi-derive.workspace = true
+quaint.workspace = true
+
+[target.'cfg(target_arch = "wasm32")'.dependencies]
+wasm-bindgen.workspace = true
+js-sys.workspace = true
+quaint = { path = "../../quaint" }

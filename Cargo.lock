@@ -1099,6 +1099,7 @@ dependencies = [
  "chrono",
  "expect-test",
  "futures",
+ "js-sys",
  "metrics 0.18.1",
  "napi",
  "napi-derive",
@@ -1112,6 +1113,7 @@ dependencies = [
  "tracing",
  "tracing-core",
  "uuid",
+ "wasm-bindgen",
 ]
 
 [[package]]
