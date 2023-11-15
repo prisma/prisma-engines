@@ -1,5 +1,5 @@
 use crate::{
-    connector::mysql::wasm::error::MysqlError,
+    connector::mysql::error::MysqlError,
     error::{Error, ErrorKind},
 };
 use mysql_async as my;
