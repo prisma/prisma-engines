@@ -4,7 +4,7 @@
 mod conversion;
 mod error;
 
-pub(crate) use crate::connector::mysql::wasm::common::MysqlUrl;
+pub(crate) use crate::connector::mysql::MysqlUrl;
 use crate::connector::{timeout, IsolationLevel};
 
 use crate::{
@@ -293,88 +293,5 @@ impl Queryable for Mysql {
 
     fn requires_isolation_first(&self) -> bool {
         true
-    }
-}
-
-#[cfg(test)]
-mod tests {
-    use super::MysqlUrl;
-    use crate::tests::test_api::mysql::CONN_STR;
-    use crate::{error::*, single::Quaint};
-    use url::Url;
-
-    #[test]
-    fn should_parse_socket_url() {
-        let url = MysqlUrl::new(Url::parse("mysql://root@localhost/dbname?socket=(/tmp/mysql.sock)").unwrap()).unwrap();
-        assert_eq!("dbname", url.dbname());
-        assert_eq!(&Some(String::from("/tmp/mysql.sock")), url.socket());
-    }
-
-    #[test]
-    fn should_parse_prefer_socket() {
-        let url =
-            MysqlUrl::new(Url::parse("mysql://root:root@localhost:3307/testdb?prefer_socket=false").unwrap()).unwrap();
-        assert!(!url.prefer_socket().unwrap());
-    }
-
-    #[test]
-    fn should_parse_sslaccept() {
-        let url =
-            MysqlUrl::new(Url::parse("mysql://root:root@localhost:3307/testdb?sslaccept=strict").unwrap()).unwrap();
-        assert!(url.query_params.use_ssl);
-        assert!(!url.query_params.ssl_opts.skip_domain_validation());
-        assert!(!url.query_params.ssl_opts.accept_invalid_certs());
-    }
-
-    #[test]
-    fn should_parse_ipv6_host() {
-        let url = MysqlUrl::new(Url::parse("mysql://[2001:db8:1234::ffff]:5432/testdb").unwrap()).unwrap();
-        assert_eq!("2001:db8:1234::ffff", url.host());
-    }
-
-    #[test]
-    fn should_allow_changing_of_cache_size() {
-        let url = MysqlUrl::new(Url::parse("mysql:///root:root@localhost:3307/foo?statement_cache_size=420").unwrap())
-            .unwrap();
-        assert_eq!(420, url.cache().capacity());
-    }
-
-    #[test]
-    fn should_have_default_cache_size() {
-        let url = MysqlUrl::new(Url::parse("mysql:///root:root@localhost:3307/foo").unwrap()).unwrap();
-        assert_eq!(100, url.cache().capacity());
-    }
-
-    #[tokio::test]
-    async fn should_map_nonexisting_database_error() {
-        let mut url = Url::parse(&CONN_STR).unwrap();
-        url.set_username("root").unwrap();
-        url.set_path("/this_does_not_exist");
-
-        let url = url.as_str().to_string();
-        let res = Quaint::new(&url).await;
-
-        let err = res.unwrap_err();
-
-        match err.kind() {
-            ErrorKind::DatabaseDoesNotExist { db_name } => {
-                assert_eq!(Some("1049"), err.original_code());
-                assert_eq!(Some("Unknown database \'this_does_not_exist\'"), err.original_message());
-                assert_eq!(&Name::available("this_does_not_exist"), db_name)
-            }
-            e => panic!("Expected `DatabaseDoesNotExist`, got {:?}", e),
-        }
-    }
-
-    #[tokio::test]
-    async fn should_map_wrong_credentials_error() {
-        let mut url = Url::parse(&CONN_STR).unwrap();
-        url.set_username("WRONG").unwrap();
-
-        let res = Quaint::new(url.as_str()).await;
-        assert!(res.is_err());
-
-        let err = res.unwrap_err();
-        assert!(matches!(err.kind(), ErrorKind::AuthenticationFailed { user } if user == &Name::available("WRONG")));
     }
 }
