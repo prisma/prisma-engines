@@ -24,10 +24,6 @@ use tiberius::*;
 use tokio::net::TcpStream;
 use tokio_util::compat::{Compat, TokioAsyncWriteCompatExt};
 
-/// The underlying SQL Server driver. Only available with the `expose-drivers` Cargo feature.
-#[cfg(feature = "expose-drivers")]
-pub use tiberius;
-
 static SQL_SERVER_DEFAULT_ISOLATION: IsolationLevel = IsolationLevel::ReadCommitted;
 
 #[async_trait]
@@ -98,13 +94,6 @@ impl Mssql {
         };
 
         Ok(this)
-    }
-
-    /// The underlying Tiberius client. Only available with the `expose-drivers` Cargo feature.
-    /// This is a lower level API when you need to get into database specific features.
-    #[cfg(feature = "expose-drivers")]
-    pub fn client(&self) -> &Mutex<Client<Compat<TcpStream>>> {
-        &self.client
     }
 
     async fn perform_io<F, T>(&self, fut: F) -> crate::Result<T>

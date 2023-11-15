@@ -19,10 +19,6 @@ use async_trait::async_trait;
 use std::convert::TryFrom;
 use tokio::sync::Mutex;
 
-/// The underlying sqlite driver. Only available with the `expose-drivers` Cargo feature.
-#[cfg(feature = "expose-drivers")]
-pub use rusqlite;
-
 /// A connector interface for the SQLite database
 pub struct Sqlite {
     pub(crate) client: Mutex<rusqlite::Connection>,
@@ -59,13 +55,6 @@ impl Sqlite {
         Ok(Sqlite {
             client: Mutex::new(client),
         })
-    }
-
-    /// The underlying rusqlite::Connection. Only available with the `expose-drivers` Cargo
-    /// feature. This is a lower level API when you need to get into database specific features.
-    #[cfg(feature = "expose-drivers")]
-    pub fn connection(&self) -> &Mutex<rusqlite::Connection> {
-        &self.client
     }
 }
 

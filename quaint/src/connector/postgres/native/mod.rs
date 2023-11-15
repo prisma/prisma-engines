@@ -29,11 +29,6 @@ use std::{
 };
 use tokio_postgres::{config::ChannelBinding, Client, Config, Statement};
 
-/// The underlying postgres driver. Only available with the `expose-drivers`
-/// Cargo feature.
-#[cfg(feature = "expose-drivers")]
-pub use tokio_postgres;
-
 struct PostgresClient(Client);
 
 impl Debug for PostgresClient {
@@ -244,14 +239,6 @@ impl PostgreSql {
             statement_cache: Mutex::new(url.cache()),
             is_healthy: AtomicBool::new(true),
         })
-    }
-
-    /// The underlying tokio_postgres::Client. Only available with the
-    /// `expose-drivers` Cargo feature. This is a lower level API when you need
-    /// to get into database specific features.
-    #[cfg(feature = "expose-drivers")]
-    pub fn client(&self) -> &tokio_postgres::Client {
-        &self.client.0
     }
 
     async fn fetch_cached(&self, sql: &str, params: &[Value<'_>]) -> crate::Result<Statement> {
