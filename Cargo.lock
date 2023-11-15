@@ -3827,6 +3827,7 @@ dependencies = [
  "quaint",
  "query-connector",
  "query-core",
+ "request-handlers",
  "serde",
  "serde-wasm-bindgen",
  "serde_json",
