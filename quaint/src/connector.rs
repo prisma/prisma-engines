@@ -34,25 +34,25 @@ pub(crate) mod postgres;
 #[cfg(feature = "postgresql-native")]
 pub use postgres::native::*;
 #[cfg(feature = "postgresql")]
-pub use postgres::wasm::common::*;
+pub use postgres::*;
 
 #[cfg(feature = "mysql")]
 pub(crate) mod mysql;
 #[cfg(feature = "mysql-native")]
 pub use mysql::native::*;
 #[cfg(feature = "mysql")]
-pub use mysql::wasm::common::*;
+pub use mysql::*;
 
 #[cfg(feature = "sqlite")]
 pub(crate) mod sqlite;
 #[cfg(feature = "sqlite-native")]
 pub use sqlite::native::*;
 #[cfg(feature = "sqlite")]
-pub use sqlite::wasm::common::*;
+pub use sqlite::*;
 
 #[cfg(feature = "mssql")]
 pub(crate) mod mssql;
 #[cfg(feature = "mssql-native")]
 pub use mssql::native::*;
 #[cfg(feature = "mssql")]
-pub use mssql::wasm::common::*;
+pub use mssql::*;

@@ -4,7 +4,7 @@
 mod conversion;
 mod error;
 
-use crate::connector::sqlite::wasm::common::SqliteParams;
+use crate::connector::sqlite::params::SqliteParams;
 use crate::connector::IsolationLevel;
 
 pub use rusqlite::{params_from_iter, version as sqlite_version};
@@ -164,27 +164,6 @@ mod tests {
         connector::Queryable,
         error::{ErrorKind, Name},
     };
-
-    #[test]
-    fn sqlite_params_from_str_should_resolve_path_correctly_with_file_scheme() {
-        let path = "file:dev.db";
-        let params = SqliteParams::try_from(path).unwrap();
-        assert_eq!(params.file_path, "dev.db");
-    }
-
-    #[test]
-    fn sqlite_params_from_str_should_resolve_path_correctly_with_sqlite_scheme() {
-        let path = "sqlite:dev.db";
-        let params = SqliteParams::try_from(path).unwrap();
-        assert_eq!(params.file_path, "dev.db");
-    }
-
-    #[test]
-    fn sqlite_params_from_str_should_resolve_path_correctly_with_no_scheme() {
-        let path = "dev.db";
-        let params = SqliteParams::try_from(path).unwrap();
-        assert_eq!(params.file_path, "dev.db");
-    }
 
     #[tokio::test]
     async fn unknown_table_should_give_a_good_error() {

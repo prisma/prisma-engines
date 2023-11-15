@@ -1,7 +1,8 @@
-pub use wasm::common::MssqlUrl;
+//! Wasm-compatible definitions for the MSSQL connector.
+//! This module is only available with the `mssql` feature.
+pub(crate) mod url;
 
-#[cfg(feature = "mssql")]
-pub(crate) mod wasm;
+pub use url::*;
 
 #[cfg(feature = "mssql-native")]
 pub(crate) mod native;

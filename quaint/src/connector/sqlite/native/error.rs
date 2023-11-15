@@ -1,4 +1,4 @@
-use crate::connector::sqlite::wasm::error::SqliteError;
+use crate::connector::sqlite::error::SqliteError;
 
 use crate::error::*;
 
