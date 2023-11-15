@@ -38,10 +38,10 @@ pub use postgres::wasm::common::*;
 
 #[cfg(feature = "mysql")]
 pub(crate) mod mysql;
+#[cfg(feature = "mysql")]
+pub use mysql::*;
 #[cfg(feature = "mysql-native")]
 pub use mysql::native::*;
-#[cfg(feature = "mysql")]
-pub use mysql::wasm::common::*;
 
 #[cfg(feature = "sqlite")]
 pub(crate) mod sqlite;

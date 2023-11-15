@@ -4,7 +4,7 @@
 mod conversion;
 mod error;
 
-pub(crate) use crate::connector::mysql::wasm::common::MysqlUrl;
+pub(crate) use crate::connector::mysql::MysqlUrl;
 use crate::connector::{timeout, IsolationLevel};
 
 use crate::{
