@@ -1191,4 +1191,15 @@ mod tests {
 
         assert_eq!("SELECT \"User\".*, \"Toto\".* FROM \"User\" LEFT JOIN \"Post\" AS \"p\" ON \"p\".\"userId\" = \"User\".\"id\", \"Toto\"", sql);
     }
+
+    #[test]
+    fn enum_cast_text_in_min_max_should_be_outside() {
+        let enum_col = Column::from("enum").set_is_enum(true).set_is_selected(true);
+        let q = Select::from_table("User")
+            .value(min(enum_col.clone()))
+            .value(max(enum_col));
+        let (sql, _) = Postgres::build(q).unwrap();
+
+        assert_eq!("SELECT MIN(\"enum\")::text, MAX(\"enum\")::text FROM \"User\"", sql);
+    }
 }
