@@ -31,6 +31,8 @@ napi-derive.workspace = true
 quaint.workspace = true
 
 [target.'cfg(target_arch = "wasm32")'.dependencies]
-wasm-bindgen.workspace = true
 js-sys.workspace = true
 quaint = { path = "../../quaint" }
+serde-wasm-bindgen.workspace = true
+wasm-bindgen.workspace = true
+wasm-bindgen-futures.workspace = true
