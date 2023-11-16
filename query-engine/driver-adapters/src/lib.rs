@@ -8,6 +8,7 @@
 //!
 
 pub(crate) mod conversion;
+pub(crate) mod error;
 
 #[cfg(not(target_arch = "wasm32"))]
 pub mod napi;
