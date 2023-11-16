@@ -2,7 +2,7 @@ CONFIG_PATH = ./query-engine/connector-test-kit-rs/test-configs
 CONFIG_FILE = .test_config
 SCHEMA_EXAMPLES_PATH = ./query-engine/example_schemas
 DEV_SCHEMA_FILE = dev_datamodel.prisma
-DRIVER_ADAPTERS_BRANCH ?= revert-esm
+DRIVER_ADAPTERS_BRANCH ?= main
 
 LIBRARY_EXT := $(shell                            \
     case "$$(uname -s)" in                        \
