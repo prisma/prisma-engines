@@ -1,7 +1,7 @@
 use super::*;
 use fmt::Debug;
 use once_cell::sync::Lazy;
-use prisma_models::ast::ModelId;
+use query_structure::ast::ModelId;
 use std::{borrow::Cow, fmt};
 
 #[derive(Debug, Clone)]

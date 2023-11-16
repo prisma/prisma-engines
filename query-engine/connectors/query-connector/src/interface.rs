@@ -1,7 +1,7 @@
-use crate::{coerce_null_to_zero_value, Filter, NativeUpsert, QueryArguments, WriteArgs};
+use crate::{coerce_null_to_zero_value, NativeUpsert, WriteArgs};
 use async_trait::async_trait;
-use prisma_models::{ast::FieldArity, *};
 use prisma_value::PrismaValue;
+use query_structure::{ast::FieldArity, *};
 use std::collections::HashMap;
 
 #[async_trait]

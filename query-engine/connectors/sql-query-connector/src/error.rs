@@ -1,6 +1,6 @@
-use connector_interface::{error::*, Filter};
-use prisma_models::prelude::DomainError;
+use connector_interface::error::*;
 use quaint::error::ErrorKind as QuaintKind;
+use query_structure::{prelude::DomainError, Filter};
 use std::{any::Any, string::FromUtf8Error};
 use thiserror::Error;
 use user_facing_errors::query_engine::DatabaseConstraint;
@@ -267,8 +267,8 @@ impl SqlError {
     }
 }
 
-impl From<prisma_models::ConversionFailure> for SqlError {
-    fn from(e: prisma_models::ConversionFailure) -> Self {
+impl From<query_structure::ConversionFailure> for SqlError {
+    fn from(e: query_structure::ConversionFailure) -> Self {
         Self::ConversionError(e.into())
     }
 }

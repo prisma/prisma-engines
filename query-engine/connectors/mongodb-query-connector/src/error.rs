@@ -4,7 +4,7 @@ use mongodb::{
     bson::{self, extjson},
     error::{CommandError, Error as DriverError, TRANSIENT_TRANSACTION_ERROR},
 };
-use prisma_models::{CompositeFieldRef, Field, ScalarFieldRef, SelectedField};
+use query_structure::{CompositeFieldRef, Field, ScalarFieldRef, SelectedField};
 use regex::Regex;
 use thiserror::Error;
 use user_facing_errors::query_engine::DatabaseConstraint;

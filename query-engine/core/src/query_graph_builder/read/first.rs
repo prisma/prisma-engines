@@ -1,4 +1,4 @@
-use prisma_models::Model;
+use query_structure::Model;
 
 use super::*;
 use crate::ParsedField;

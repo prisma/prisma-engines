@@ -1,7 +1,7 @@
 use super::ScalarFieldExt;
 use crate::context::Context;
-use prisma_models::{PrismaValue, SelectedField, SelectionResult};
 use quaint::Value;
+use query_structure::{PrismaValue, SelectedField, SelectionResult};
 
 pub(crate) trait SelectionResultExt {
     fn misses_autogen_value(&self) -> bool;

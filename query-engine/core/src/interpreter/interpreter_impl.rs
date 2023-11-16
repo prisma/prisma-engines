@@ -6,7 +6,7 @@ use super::{
 use crate::{Query, QueryResult};
 use connector::ConnectionLike;
 use futures::future::BoxFuture;
-use prisma_models::prelude::*;
+use query_structure::prelude::*;
 use std::{collections::HashMap, fmt};
 use tracing::Instrument;
 

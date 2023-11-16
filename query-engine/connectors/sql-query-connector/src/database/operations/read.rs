@@ -7,8 +7,8 @@ use crate::{
 };
 use connector_interface::*;
 use futures::stream::{FuturesUnordered, StreamExt};
-use prisma_models::*;
 use quaint::ast::*;
+use query_structure::*;
 
 pub(crate) async fn get_single_record(
     conn: &dyn Queryable,

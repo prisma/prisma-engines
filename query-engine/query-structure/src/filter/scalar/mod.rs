@@ -6,7 +6,7 @@ pub use compare::*;
 pub use condition::*;
 pub use projection::*;
 
-use prisma_models::*;
+use crate::*;
 
 use std::collections::BTreeSet;
 

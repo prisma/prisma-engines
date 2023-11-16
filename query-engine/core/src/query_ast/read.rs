@@ -1,9 +1,9 @@
 //! Prisma read query AST
 use super::FilteredQuery;
 use crate::ToGraphviz;
-use connector::{filter::Filter, AggregationSelection, QueryArguments, RelAggregationSelection};
+use connector::{AggregationSelection, RelAggregationSelection};
 use enumflags2::BitFlags;
-use prisma_models::prelude::*;
+use query_structure::{prelude::*, Filter, QueryArguments};
 use std::fmt::Display;
 
 #[allow(clippy::enum_variant_names)]

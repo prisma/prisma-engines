@@ -1,7 +1,7 @@
 use super::*;
 
 use crate::filter::Filter;
-use prisma_models::PrismaValue;
+use prisma_value::PrismaValue;
 
 /// Comparing methods for scalar fields.
 pub trait ScalarCompare {

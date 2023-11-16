@@ -1,8 +1,8 @@
 mod alias;
 mod visitor;
 
-use connector_interface::Filter;
 use quaint::prelude::*;
+use query_structure::Filter;
 use visitor::*;
 
 use crate::{context::Context, join_utils::AliasedJoin};

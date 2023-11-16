@@ -10,7 +10,6 @@ use crate::{
     interpreter::ExpressionResult, FilteredQuery, ManyRecordsQuery, Query, QueryGraphBuilderResult, QueryOptions,
     ReadQuery,
 };
-use connector::{IntoFilter, QueryArguments};
 use guard::*;
 use itertools::Itertools;
 use petgraph::{
@@ -18,7 +17,7 @@ use petgraph::{
     visit::{EdgeRef as PEdgeRef, NodeIndexable},
     *,
 };
-use prisma_models::{FieldSelection, SelectionResult};
+use query_structure::{FieldSelection, IntoFilter, QueryArguments, SelectionResult};
 use std::{collections::HashSet, fmt};
 
 pub type QueryGraphResult<T> = std::result::Result<T, QueryGraphError>;

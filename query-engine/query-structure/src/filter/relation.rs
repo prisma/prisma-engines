@@ -1,6 +1,4 @@
-use crate::compare::RelationCompare;
-use crate::filter::Filter;
-use prisma_models::RelationField;
+use crate::{filter::Filter, RelationCompare, RelationField};
 
 #[derive(Clone, PartialEq, Eq, Hash)]
 pub struct RelationFilter {

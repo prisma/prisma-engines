@@ -1,8 +1,7 @@
 use crate::{join_utils::*, model_extensions::*, query_arguments_ext::QueryArgumentsExt, Context};
-use connector_interface::QueryArguments;
 use itertools::Itertools;
-use prisma_models::*;
 use quaint::ast::*;
+use query_structure::*;
 
 static ORDER_JOIN_PREFIX: &str = "orderby_";
 static ORDER_AGGREGATOR_ALIAS: &str = "orderby_aggregator";

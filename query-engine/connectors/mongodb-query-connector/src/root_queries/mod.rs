@@ -13,11 +13,11 @@ use crate::{
 use futures::Future;
 use mongodb::bson::Bson;
 use mongodb::bson::Document;
-use prisma_models::*;
 use query_engine_metrics::{
     histogram, increment_counter, metrics, PRISMA_DATASOURCE_QUERIES_DURATION_HISTOGRAM_MS,
     PRISMA_DATASOURCE_QUERIES_TOTAL,
 };
+use query_structure::*;
 use std::time::Instant;
 use tracing::debug;
 
