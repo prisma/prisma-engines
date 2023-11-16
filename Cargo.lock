@@ -1097,6 +1097,7 @@ dependencies = [
  "async-trait",
  "bigdecimal",
  "chrono",
+ "ducktor",
  "expect-test",
  "futures",
  "js-sys",
@@ -1105,6 +1106,7 @@ dependencies = [
  "napi-derive",
  "num-bigint",
  "once_cell",
+ "pin-project",
  "psl",
  "quaint",
  "serde",
@@ -1117,6 +1119,17 @@ dependencies = [
  "uuid",
  "wasm-bindgen",
  "wasm-bindgen-futures",
+]
+
+[[package]]
+name = "ducktor"
+version = "0.1.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "c421abf6328bda65f53e6a76ee9837fd197b23bdfdbcebc4d7917dfaa1cf88ae"
+dependencies = [
+ "proc-macro2",
+ "quote",
+ "syn 2.0.28",
 ]
 
 [[package]]
@@ -3523,6 +3536,7 @@ dependencies = [
  "serde",
  "serde_json",
  "url",
+ "wasm-bindgen",
 ]
 
 [[package]]

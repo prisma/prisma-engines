@@ -26,7 +26,7 @@ use serde::{Deserialize, Serialize};
 #[cfg_attr(not(target_arch = "wasm32"), napi_derive::napi(object))]
 #[cfg_attr(target_arch = "wasm32", derive(Serialize, Deserialize, Tsify))]
 #[cfg_attr(target_arch = "wasm32", tsify(into_wasm_abi, from_wasm_abi))]
-#[derive(Debug)]
+#[derive(Debug, Default)]
 pub struct JSResultSet {
     pub column_types: Vec<ColumnType>,
     pub column_names: Vec<String>,
@@ -180,7 +180,7 @@ pub enum ColumnType {
 #[cfg_attr(not(target_arch = "wasm32"), napi_derive::napi(object))]
 #[cfg_attr(target_arch = "wasm32", derive(Serialize, Tsify))]
 #[cfg_attr(target_arch = "wasm32", tsify(into_wasm_abi))]
-#[derive(Debug)]
+#[derive(Debug, Default)]
 pub struct Query {
     pub sql: String,
     pub args: Vec<JSArg>,
@@ -189,7 +189,7 @@ pub struct Query {
 #[cfg_attr(not(target_arch = "wasm32"), napi_derive::napi(object))]
 #[cfg_attr(target_arch = "wasm32", derive(Serialize, Deserialize, Tsify))]
 #[cfg_attr(target_arch = "wasm32", tsify(into_wasm_abi, from_wasm_abi))]
-#[derive(Debug)]
+#[derive(Debug, Default)]
 pub struct TransactionOptions {
     /// Whether or not to run a phantom query (i.e., a query that only influences Prisma event logs, but not the database itself)
     /// before opening a transaction, committing, or rollbacking.

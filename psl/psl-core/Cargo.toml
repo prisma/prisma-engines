@@ -22,3 +22,6 @@ indoc.workspace = true
 # For the connector API.
 lsp-types = "0.91.1"
 url = "2.2.1"
+
+[target.'cfg(target_arch = "wasm32")'.dependencies]
+wasm-bindgen.workspace = true
