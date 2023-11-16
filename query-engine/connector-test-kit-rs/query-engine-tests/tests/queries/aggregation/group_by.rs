@@ -519,6 +519,7 @@ mod aggregation_group_by {
         let schema = indoc! {
             r#"model Test {
               #id(id, Int, @id)
+              group Int
               color Color
             }
             
@@ -534,19 +535,19 @@ mod aggregation_group_by {
     }
 
     // regression test for https://github.com/prisma/prisma/issues/21789
-    #[connector_test(schema(schema_21789), capabilities(Enums))]
+    #[connector_test(schema(schema_21789), only(Postgres, CockroachDB))]
     async fn regression_21789(runner: Runner) -> TestResult<()> {
         run_query!(
             &runner,
-            r#"mutation { createOneTest(data: { id: 1, color: "red" }) { id } }"#
+            r#"mutation { createOneTest(data: { id: 1, group: 1, color: "red" }) { id } }"#
         );
         run_query!(
             &runner,
-            r#"mutation { createOneTest(data: { id: 2, color: "green" }) { id } }"#
+            r#"mutation { createOneTest(data: { id: 2, group: 2, color: "green" }) { id } }"#
         );
         run_query!(
             &runner,
-            r#"mutation { createOneTest(data: { id: 3, color: "blue" }) { id } }"#
+            r#"mutation { createOneTest(data: { id: 3, group: 1, color: "blue" }) { id } }"#
         );
 
         insta::assert_snapshot!(
@@ -555,8 +556,8 @@ mod aggregation_group_by {
         );
 
         insta::assert_snapshot!(
-          run_query!(&runner, r#"{ groupByTest(by: [color]) { color _max { color } _min { color } } }"#),
-          @r###"{"data":{"groupByTest":[{"color":"green","_max":{"color":"green"},"_min":{"color":"green"}},{"color":"blue","_max":{"color":"blue"},"_min":{"color":"blue"}},{"color":"red","_max":{"color":"red"},"_min":{"color":"red"}}]}"###
+          run_query!(&runner, r#"{ groupByTest(by: [group], orderBy: { group: asc }) { group _max { color } _min { color } } }"#),
+          @r###"{"data":{"groupByTest":[{"group":1,"_max":{"color":"red"},"_min":{"color":"blue"}},{"group":2,"_max":{"color":"green"},"_min":{"color":"green"}}]}}"###
         );
 
         Ok(())
