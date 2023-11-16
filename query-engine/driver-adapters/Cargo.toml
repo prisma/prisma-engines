@@ -36,3 +36,4 @@ quaint = { path = "../../quaint" }
 serde-wasm-bindgen.workspace = true
 wasm-bindgen.workspace = true
 wasm-bindgen-futures.workspace = true
+tsify.workspace = true

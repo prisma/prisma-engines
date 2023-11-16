@@ -1113,6 +1113,7 @@ dependencies = [
  "tokio",
  "tracing",
  "tracing-core",
+ "tsify",
  "uuid",
  "wasm-bindgen",
  "wasm-bindgen-futures",

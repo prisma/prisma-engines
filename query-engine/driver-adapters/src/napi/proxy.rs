@@ -1,14 +1,13 @@
 use std::borrow::Cow;
 use std::str::FromStr;
 
+pub use crate::types::{ColumnType, JSResultSet, Query, TransactionOptions};
+
 use super::async_js_function::AsyncJsFunction;
-use super::conversion::JSArg;
 use super::transaction::JsTransaction;
 use metrics::increment_gauge;
-use napi::bindgen_prelude::{FromNapiValue, ToNapiValue};
 use napi::threadsafe_function::{ErrorStrategy, ThreadsafeFunction};
 use napi::{JsObject, JsString};
-use napi_derive::napi;
 use quaint::connector::ResultSet as QuaintResultSet;
 use quaint::{
     error::{Error as QuaintError, ErrorKind},
@@ -55,177 +54,6 @@ pub(crate) struct TransactionProxy {
     /// dispose transaction, cleanup logic executed at the end of the transaction lifecycle
     /// on drop.
     dispose: ThreadsafeFunction<(), ErrorStrategy::Fatal>,
-}
-
-/// This result set is more convenient to be manipulated from both Rust and NodeJS.
-/// Quaint's version of ResultSet is:
-///
-/// pub struct ResultSet {
-///     pub(crate) columns: Arc<Vec<String>>,
-///     pub(crate) rows: Vec<Vec<Value<'static>>>,
-///     pub(crate) last_insert_id: Option<u64>,
-/// }
-///
-/// If we used this ResultSet would we would have worse ergonomics as quaint::Value is a structured
-/// enum and cannot be used directly with the #[napi(Object)] macro. Thus requiring us to implement
-/// the FromNapiValue and ToNapiValue traits for quaint::Value, and use a different custom type
-/// representing the Value in javascript.
-///
-#[napi(object)]
-#[derive(Debug)]
-pub struct JSResultSet {
-    pub column_types: Vec<ColumnType>,
-    pub column_names: Vec<String>,
-    // Note this might be encoded differently for performance reasons
-    pub rows: Vec<Vec<serde_json::Value>>,
-    pub last_insert_id: Option<String>,
-}
-
-impl JSResultSet {
-    pub fn len(&self) -> usize {
-        self.rows.len()
-    }
-}
-
-#[napi]
-#[derive(Debug)]
-pub enum ColumnType {
-    // [PLANETSCALE_TYPE] (MYSQL_TYPE) -> [TypeScript example]
-    /// The following PlanetScale type IDs are mapped into Int32:
-    /// - INT8 (TINYINT) -> e.g. `127`
-    /// - INT16 (SMALLINT) -> e.g. `32767`
-    /// - INT24 (MEDIUMINT) -> e.g. `8388607`
-    /// - INT32 (INT) -> e.g. `2147483647`
-    Int32 = 0,
-
-    /// The following PlanetScale type IDs are mapped into Int64:
-    /// - INT64 (BIGINT) -> e.g. `"9223372036854775807"` (String-encoded)
-    Int64 = 1,
-
-    /// The following PlanetScale type IDs are mapped into Float:
-    /// - FLOAT32 (FLOAT) -> e.g. `3.402823466`
-    Float = 2,
-
-    /// The following PlanetScale type IDs are mapped into Double:
-    /// - FLOAT64 (DOUBLE) -> e.g. `1.7976931348623157`
-    Double = 3,
-
-    /// The following PlanetScale type IDs are mapped into Numeric:
-    /// - DECIMAL (DECIMAL) -> e.g. `"99999999.99"` (String-encoded)
-    Numeric = 4,
-
-    /// The following PlanetScale type IDs are mapped into Boolean:
-    /// - BOOLEAN (BOOLEAN) -> e.g. `1`
-    Boolean = 5,
-
-    Character = 6,
-
-    /// The following PlanetScale type IDs are mapped into Text:
-    /// - TEXT (TEXT) -> e.g. `"foo"` (String-encoded)
-    /// - VARCHAR (VARCHAR) -> e.g. `"foo"` (String-encoded)
-    Text = 7,
-
-    /// The following PlanetScale type IDs are mapped into Date:
-    /// - DATE (DATE) -> e.g. `"2023-01-01"` (String-encoded, yyyy-MM-dd)
-    Date = 8,
-
-    /// The following PlanetScale type IDs are mapped into Time:
-    /// - TIME (TIME) -> e.g. `"23:59:59"` (String-encoded, HH:mm:ss)
-    Time = 9,
-
-    /// The following PlanetScale type IDs are mapped into DateTime:
-    /// - DATETIME (DATETIME) -> e.g. `"2023-01-01 23:59:59"` (String-encoded, yyyy-MM-dd HH:mm:ss)
-    /// - TIMESTAMP (TIMESTAMP) -> e.g. `"2023-01-01 23:59:59"` (String-encoded, yyyy-MM-dd HH:mm:ss)
-    DateTime = 10,
-
-    /// The following PlanetScale type IDs are mapped into Json:
-    /// - JSON (JSON) -> e.g. `"{\"key\": \"value\"}"` (String-encoded)
-    Json = 11,
-
-    /// The following PlanetScale type IDs are mapped into Enum:
-    /// - ENUM (ENUM) -> e.g. `"foo"` (String-encoded)
-    Enum = 12,
-
-    /// The following PlanetScale type IDs are mapped into Bytes:
-    /// - BLOB (BLOB) -> e.g. `"\u0012"` (String-encoded)
-    /// - VARBINARY (VARBINARY) -> e.g. `"\u0012"` (String-encoded)
-    /// - BINARY (BINARY) -> e.g. `"\u0012"` (String-encoded)
-    /// - GEOMETRY (GEOMETRY) -> e.g. `"\u0012"` (String-encoded)
-    Bytes = 13,
-
-    /// The following PlanetScale type IDs are mapped into Set:
-    /// - SET (SET) -> e.g. `"foo,bar"` (String-encoded, comma-separated)
-    /// This is currently unhandled, and will panic if encountered.
-    Set = 14,
-
-    /// UUID from postgres-flavored driver adapters is mapped to this type.
-    Uuid = 15,
-
-    /*
-     * Scalar arrays
-     */
-    /// Int32 array (INT2_ARRAY and INT4_ARRAY in PostgreSQL)
-    Int32Array = 64,
-
-    /// Int64 array (INT8_ARRAY in PostgreSQL)
-    Int64Array = 65,
-
-    /// Float array (FLOAT4_ARRAY in PostgreSQL)
-    FloatArray = 66,
-
-    /// Double array (FLOAT8_ARRAY in PostgreSQL)
-    DoubleArray = 67,
-
-    /// Numeric array (NUMERIC_ARRAY, MONEY_ARRAY etc in PostgreSQL)
-    NumericArray = 68,
-
-    /// Boolean array (BOOL_ARRAY in PostgreSQL)
-    BooleanArray = 69,
-
-    /// Char array (CHAR_ARRAY in PostgreSQL)
-    CharacterArray = 70,
-
-    /// Text array (TEXT_ARRAY in PostgreSQL)
-    TextArray = 71,
-
-    /// Date array (DATE_ARRAY in PostgreSQL)
-    DateArray = 72,
-
-    /// Time array (TIME_ARRAY in PostgreSQL)
-    TimeArray = 73,
-
-    /// DateTime array (TIMESTAMP_ARRAY in PostgreSQL)
-    DateTimeArray = 74,
-
-    /// Json array (JSON_ARRAY in PostgreSQL)
-    JsonArray = 75,
-
-    /// Enum array
-    EnumArray = 76,
-
-    /// Bytes array (BYTEA_ARRAY in PostgreSQL)
-    BytesArray = 77,
-
-    /// Uuid array (UUID_ARRAY in PostgreSQL)
-    UuidArray = 78,
-
-    /*
-     * Below there are custom types that don't have a 1:1 translation with a quaint::Value.
-     * enum variant.
-     */
-    /// UnknownNumber is used when the type of the column is a number but of unknown particular type
-    /// and precision.
-    ///
-    /// It's used by some driver adapters, like libsql to return aggregation values like AVG, or
-    /// COUNT, and it can be mapped to either Int64, or Double
-    UnknownNumber = 128,
-}
-
-#[napi(object)]
-#[derive(Debug)]
-pub struct Query {
-    pub sql: String,
-    pub args: Vec<JSArg>,
 }
 
 fn conversion_error(args: &std::fmt::Arguments) -> QuaintError {
@@ -567,14 +395,6 @@ impl DriverProxy {
         increment_gauge!("prisma_client_queries_active", 1.0);
         Ok(Box::new(tx))
     }
-}
-
-#[derive(Debug)]
-#[napi(object)]
-pub struct TransactionOptions {
-    /// Whether or not to run a phantom query (i.e., a query that only influences Prisma event logs, but not the database itself)
-    /// before opening a transaction, committing, or rollbacking.
-    pub use_phantom_query: bool,
 }
 
 impl TransactionProxy {
