@@ -42,7 +42,7 @@ impl JSResultSet {
 }
 
 #[cfg_attr(not(target_arch = "wasm32"), napi_derive::napi(object))]
-#[cfg_attr(target_arch = "wasm32", derive(Serialize, Deserialize, Tsify))]
+#[cfg_attr(target_arch = "wasm32", derive(Clone, Copy, Serialize, Deserialize, Tsify))]
 #[cfg_attr(target_arch = "wasm32", tsify(into_wasm_abi, from_wasm_abi))]
 #[derive(Debug)]
 pub enum ColumnType {
