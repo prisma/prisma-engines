@@ -1108,12 +1108,14 @@ dependencies = [
  "psl",
  "quaint",
  "serde",
+ "serde-wasm-bindgen",
  "serde_json",
  "tokio",
  "tracing",
  "tracing-core",
  "uuid",
  "wasm-bindgen",
+ "wasm-bindgen-futures",
 ]
 
 [[package]]
@@ -3821,6 +3823,7 @@ dependencies = [
  "async-trait",
  "connection-string",
  "console_error_panic_hook",
+ "driver-adapters",
  "futures",
  "js-sys",
  "log",
