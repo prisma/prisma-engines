@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/nix/store/8ic7fnjngqnr0krj4f0dqym3fgisdqmk-vendor-cargo-deps/c19b7c6f923b580ac259164a89f2577984ad5ab09ee9d583b888f934adbbe8d0/wasm-bindgen-0.2.87/src/closure.rs`."><title>closure.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-9bb858ba049f1f21.css" id="mainThemeStyle"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="wasm_bindgen" data-themes="" data-resource-suffix="" data-rustdoc-version="1.72.0 (5680fa18f 2023-08-23) (built from a source tarball)" data-channel="1.72.0" data-search-js="search-f6292fe389d70017.js" data-settings-js="settings-de11bff964e9d4e5.js" data-settings-css="settings-8c76f75bfb6bd192.css" data-theme-light-css="light-0f8c037637f9eb3e.css" data-theme-dark-css="dark-1097f8e92a01e3cf.css" data-theme-ayu-css="ayu-614652228113ac93.css" ><script src="../../static.files/storage-59fd9b8ccb335783.js"></script><script defer src="../../static.files/source-script-106908c7a7964ba4.js"></script><script defer src="../../source-files.js"></script><script defer src="../../static.files/main-0795b7d26be81095.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../../static.files/light-0f8c037637f9eb3e.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../../static.files/dark-1097f8e92a01e3cf.css"><link rel="stylesheet" href="../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../wasm_bindgen/index.html"><img class="rust-logo" src="../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/nix/store/vdd2sws6sz9g1xs3lr5m2dis64m6cxjj-vendor-cargo-deps/c19b7c6f923b580ac259164a89f2577984ad5ab09ee9d583b888f934adbbe8d0/wasm-bindgen-0.2.88/src/closure.rs`."><title>closure.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-9bb858ba049f1f21.css" id="mainThemeStyle"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="wasm_bindgen" data-themes="" data-resource-suffix="" data-rustdoc-version="1.72.1 (d5c2e9c34 2023-09-13) (built from a source tarball)" data-channel="1.72.1" data-search-js="search-f6292fe389d70017.js" data-settings-js="settings-de11bff964e9d4e5.js" data-settings-css="settings-8c76f75bfb6bd192.css" data-theme-light-css="light-0f8c037637f9eb3e.css" data-theme-dark-css="dark-1097f8e92a01e3cf.css" data-theme-ayu-css="ayu-614652228113ac93.css" ><script src="../../static.files/storage-59fd9b8ccb335783.js"></script><script defer src="../../static.files/source-script-106908c7a7964ba4.js"></script><script defer src="../../source-files.js"></script><script defer src="../../static.files/main-0795b7d26be81095.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../../static.files/light-0f8c037637f9eb3e.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../../static.files/dark-1097f8e92a01e3cf.css"><link rel="stylesheet" href="../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../wasm_bindgen/index.html"><img class="rust-logo" src="../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -885,6 +885,22 @@
 <a href="#885" id="885">885</a>
 <a href="#886" id="886">886</a>
 <a href="#887" id="887">887</a>
+<a href="#888" id="888">888</a>
+<a href="#889" id="889">889</a>
+<a href="#890" id="890">890</a>
+<a href="#891" id="891">891</a>
+<a href="#892" id="892">892</a>
+<a href="#893" id="893">893</a>
+<a href="#894" id="894">894</a>
+<a href="#895" id="895">895</a>
+<a href="#896" id="896">896</a>
+<a href="#897" id="897">897</a>
+<a href="#898" id="898">898</a>
+<a href="#899" id="899">899</a>
+<a href="#900" id="900">900</a>
+<a href="#901" id="901">901</a>
+<a href="#902" id="902">902</a>
+<a href="#903" id="903">903</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Support for long-lived closures in `wasm-bindgen`
 //!
 //! This module defines the `Closure` type which is used to pass &quot;owned
@@ -1446,7 +1462,7 @@
 
 </span><span class="macro">macro_rules! </span>doit {
     ($(
-        ($(<span class="macro-nonterminal">$var</span>:ident)<span class="kw-2">*</span>)
+        ($(<span class="macro-nonterminal">$var</span>:ident <span class="macro-nonterminal">$arg1</span>:ident <span class="macro-nonterminal">$arg2</span>:ident <span class="macro-nonterminal">$arg3</span>:ident <span class="macro-nonterminal">$arg4</span>:ident)<span class="kw-2">*</span>)
     )<span class="kw-2">*</span>) =&gt; ($(
         <span class="kw">unsafe impl</span>&lt;$(<span class="macro-nonterminal">$var</span>,)* R&gt; WasmClosure <span class="kw">for dyn </span>Fn($(<span class="macro-nonterminal">$var</span>),<span class="kw-2">*</span>) -&gt; R + <span class="lifetime">&#39;static
             </span><span class="kw">where </span>$(<span class="macro-nonterminal">$var</span>: FromWasmAbi + <span class="lifetime">&#39;static</span>,)*
@@ -1457,8 +1473,13 @@
                 </span><span class="kw">unsafe extern </span><span class="string">&quot;C&quot; </span><span class="kw">fn </span>invoke&lt;$(<span class="macro-nonterminal">$var</span>: FromWasmAbi,)* R: ReturnWasmAbi&gt;(
                     a: usize,
                     b: usize,
-                    $(<span class="macro-nonterminal">$var</span>: &lt;<span class="macro-nonterminal">$var </span><span class="kw">as </span>FromWasmAbi&gt;::Abi),*
-                ) -&gt; &lt;R <span class="kw">as </span>ReturnWasmAbi&gt;::Abi {
+                    $(
+                    <span class="macro-nonterminal">$arg1</span>: &lt;<span class="macro-nonterminal">$var::Abi </span><span class="kw">as </span>WasmAbi&gt;::Prim1,
+                    <span class="macro-nonterminal">$arg2</span>: &lt;<span class="macro-nonterminal">$var::Abi </span><span class="kw">as </span>WasmAbi&gt;::Prim2,
+                    <span class="macro-nonterminal">$arg3</span>: &lt;<span class="macro-nonterminal">$var::Abi </span><span class="kw">as </span>WasmAbi&gt;::Prim3,
+                    <span class="macro-nonterminal">$arg4</span>: &lt;<span class="macro-nonterminal">$var::Abi </span><span class="kw">as </span>WasmAbi&gt;::Prim4,
+                    )*
+                ) -&gt; WasmRet&lt;R::Abi&gt; {
                     <span class="kw">if </span>a == <span class="number">0 </span>{
                         throw_str(<span class="string">&quot;closure invoked after being dropped&quot;</span>);
                     }
@@ -1469,11 +1490,11 @@
                         <span class="kw">let </span>f: <span class="kw-2">*const </span><span class="kw">dyn </span>Fn($(<span class="macro-nonterminal">$var</span>),<span class="kw-2">*</span>) -&gt; R =
                             FatPtr { fields: (a, b) }.ptr;
                         $(
-                            <span class="kw">let </span><span class="macro-nonterminal">$var </span>= &lt;<span class="macro-nonterminal">$var </span><span class="kw">as </span>FromWasmAbi&gt;::from_abi(<span class="macro-nonterminal">$var</span>);
+                            <span class="kw">let </span><span class="macro-nonterminal">$var </span>= &lt;<span class="macro-nonterminal">$var </span><span class="kw">as </span>FromWasmAbi&gt;::from_abi(<span class="macro-nonterminal">$var::Abi::join</span>(<span class="macro-nonterminal">$arg1</span>, <span class="macro-nonterminal">$arg2</span>, <span class="macro-nonterminal">$arg3</span>, <span class="macro-nonterminal">$arg4</span>));
                         )*
                         (<span class="kw-2">*</span>f)($(<span class="macro-nonterminal">$var</span>),<span class="kw-2">*</span>)
                     };
-                    ret.return_abi()
+                    ret.return_abi().into()
                 }
 
                 inform(invoke::&lt;$(<span class="macro-nonterminal">$var</span>,)* R&gt; <span class="kw">as </span>u32);
@@ -1509,8 +1530,13 @@
                 </span><span class="kw">unsafe extern </span><span class="string">&quot;C&quot; </span><span class="kw">fn </span>invoke&lt;$(<span class="macro-nonterminal">$var</span>: FromWasmAbi,)* R: ReturnWasmAbi&gt;(
                     a: usize,
                     b: usize,
-                    $(<span class="macro-nonterminal">$var</span>: &lt;<span class="macro-nonterminal">$var </span><span class="kw">as </span>FromWasmAbi&gt;::Abi),*
-                ) -&gt; &lt;R <span class="kw">as </span>ReturnWasmAbi&gt;::Abi {
+                    $(
+                    <span class="macro-nonterminal">$arg1</span>: &lt;<span class="macro-nonterminal">$var::Abi </span><span class="kw">as </span>WasmAbi&gt;::Prim1,
+                    <span class="macro-nonterminal">$arg2</span>: &lt;<span class="macro-nonterminal">$var::Abi </span><span class="kw">as </span>WasmAbi&gt;::Prim2,
+                    <span class="macro-nonterminal">$arg3</span>: &lt;<span class="macro-nonterminal">$var::Abi </span><span class="kw">as </span>WasmAbi&gt;::Prim3,
+                    <span class="macro-nonterminal">$arg4</span>: &lt;<span class="macro-nonterminal">$var::Abi </span><span class="kw">as </span>WasmAbi&gt;::Prim4,
+                    )*
+                ) -&gt; WasmRet&lt;R::Abi&gt; {
                     <span class="kw">if </span>a == <span class="number">0 </span>{
                         throw_str(<span class="string">&quot;closure invoked recursively or after being dropped&quot;</span>);
                     }
@@ -1522,11 +1548,11 @@
                             FatPtr { fields: (a, b) }.ptr;
                         <span class="kw">let </span>f = f <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">dyn </span>FnMut($(<span class="macro-nonterminal">$var</span>),<span class="kw-2">*</span>) -&gt; R;
                         $(
-                            <span class="kw">let </span><span class="macro-nonterminal">$var </span>= &lt;<span class="macro-nonterminal">$var </span><span class="kw">as </span>FromWasmAbi&gt;::from_abi(<span class="macro-nonterminal">$var</span>);
+                            <span class="kw">let </span><span class="macro-nonterminal">$var </span>= &lt;<span class="macro-nonterminal">$var </span><span class="kw">as </span>FromWasmAbi&gt;::from_abi(<span class="macro-nonterminal">$var::Abi::join</span>(<span class="macro-nonterminal">$arg1</span>, <span class="macro-nonterminal">$arg2</span>, <span class="macro-nonterminal">$arg3</span>, <span class="macro-nonterminal">$arg4</span>));
                         )*
                         (<span class="kw-2">*</span>f)($(<span class="macro-nonterminal">$var</span>),<span class="kw-2">*</span>)
                     };
-                    ret.return_abi()
+                    ret.return_abi().into()
                 }
 
                 inform(invoke::&lt;$(<span class="macro-nonterminal">$var</span>,)* R&gt; <span class="kw">as </span>u32);
@@ -1619,14 +1645,14 @@
 
 <span class="macro">doit! </span>{
     ()
-    (A)
-    (A B)
-    (A B C)
-    (A B C D)
-    (A B C D E)
-    (A B C D E F)
-    (A B C D E F G)
-    (A B C D E F G H)
+    (A a1 a2 a3 a4)
+    (A a1 a2 a3 a4 B b1 b2 b3 b4)
+    (A a1 a2 a3 a4 B b1 b2 b3 b4 C c1 c2 c3 c4)
+    (A a1 a2 a3 a4 B b1 b2 b3 b4 C c1 c2 c3 c4 D d1 d2 d3 d4)
+    (A a1 a2 a3 a4 B b1 b2 b3 b4 C c1 c2 c3 c4 D d1 d2 d3 d4 E e1 e2 e3 e4)
+    (A a1 a2 a3 a4 B b1 b2 b3 b4 C c1 c2 c3 c4 D d1 d2 d3 d4 E e1 e2 e3 e4 F f1 f2 f3 f4)
+    (A a1 a2 a3 a4 B b1 b2 b3 b4 C c1 c2 c3 c4 D d1 d2 d3 d4 E e1 e2 e3 e4 F f1 f2 f3 f4 G g1 g2 g3 g4)
+    (A a1 a2 a3 a4 B b1 b2 b3 b4 C c1 c2 c3 c4 D d1 d2 d3 d4 E e1 e2 e3 e4 F f1 f2 f3 f4 G g1 g2 g3 g4 H h1 h2 h3 h4)
 }
 
 <span class="comment">// Copy the above impls down here for where there&#39;s only one argument and it&#39;s a
@@ -1645,8 +1671,11 @@
         </span><span class="kw">unsafe extern </span><span class="string">&quot;C&quot; </span><span class="kw">fn </span>invoke&lt;A: RefFromWasmAbi, R: ReturnWasmAbi&gt;(
             a: usize,
             b: usize,
-            arg: &lt;A <span class="kw">as </span>RefFromWasmAbi&gt;::Abi,
-        ) -&gt; &lt;R <span class="kw">as </span>ReturnWasmAbi&gt;::Abi {
+            arg1: &lt;A::Abi <span class="kw">as </span>WasmAbi&gt;::Prim1,
+            arg2: &lt;A::Abi <span class="kw">as </span>WasmAbi&gt;::Prim2,
+            arg3: &lt;A::Abi <span class="kw">as </span>WasmAbi&gt;::Prim3,
+            arg4: &lt;A::Abi <span class="kw">as </span>WasmAbi&gt;::Prim4,
+        ) -&gt; WasmRet&lt;R::Abi&gt; {
             <span class="kw">if </span>a == <span class="number">0 </span>{
                 throw_str(<span class="string">&quot;closure invoked after being dropped&quot;</span>);
             }
@@ -1655,10 +1684,10 @@
             // example)
             </span><span class="kw">let </span>ret = {
                 <span class="kw">let </span>f: <span class="kw-2">*const </span><span class="kw">dyn </span>Fn(<span class="kw-2">&amp;</span>A) -&gt; R = FatPtr { fields: (a, b) }.ptr;
-                <span class="kw">let </span>arg = &lt;A <span class="kw">as </span>RefFromWasmAbi&gt;::ref_from_abi(arg);
+                <span class="kw">let </span>arg = &lt;A <span class="kw">as </span>RefFromWasmAbi&gt;::ref_from_abi(A::Abi::join(arg1, arg2, arg3, arg4));
                 (<span class="kw-2">*</span>f)(<span class="kw-2">&amp;*</span>arg)
             };
-            ret.return_abi()
+            ret.return_abi().into()
         }
 
         inform(invoke::&lt;A, R&gt; <span class="kw">as </span>u32);
@@ -1688,8 +1717,11 @@
         </span><span class="kw">unsafe extern </span><span class="string">&quot;C&quot; </span><span class="kw">fn </span>invoke&lt;A: RefFromWasmAbi, R: ReturnWasmAbi&gt;(
             a: usize,
             b: usize,
-            arg: &lt;A <span class="kw">as </span>RefFromWasmAbi&gt;::Abi,
-        ) -&gt; &lt;R <span class="kw">as </span>ReturnWasmAbi&gt;::Abi {
+            arg1: &lt;A::Abi <span class="kw">as </span>WasmAbi&gt;::Prim1,
+            arg2: &lt;A::Abi <span class="kw">as </span>WasmAbi&gt;::Prim2,
+            arg3: &lt;A::Abi <span class="kw">as </span>WasmAbi&gt;::Prim3,
+            arg4: &lt;A::Abi <span class="kw">as </span>WasmAbi&gt;::Prim4,
+        ) -&gt; WasmRet&lt;R::Abi&gt; {
             <span class="kw">if </span>a == <span class="number">0 </span>{
                 throw_str(<span class="string">&quot;closure invoked recursively or after being dropped&quot;</span>);
             }
@@ -1699,10 +1731,10 @@
             </span><span class="kw">let </span>ret = {
                 <span class="kw">let </span>f: <span class="kw-2">*const </span><span class="kw">dyn </span>FnMut(<span class="kw-2">&amp;</span>A) -&gt; R = FatPtr { fields: (a, b) }.ptr;
                 <span class="kw">let </span>f = f <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">dyn </span>FnMut(<span class="kw-2">&amp;</span>A) -&gt; R;
-                <span class="kw">let </span>arg = &lt;A <span class="kw">as </span>RefFromWasmAbi&gt;::ref_from_abi(arg);
+                <span class="kw">let </span>arg = &lt;A <span class="kw">as </span>RefFromWasmAbi&gt;::ref_from_abi(A::Abi::join(arg1, arg2, arg3, arg4));
                 (<span class="kw-2">*</span>f)(<span class="kw-2">&amp;*</span>arg)
             };
-            ret.return_abi()
+            ret.return_abi().into()
         }
 
         inform(invoke::&lt;A, R&gt; <span class="kw">as </span>u32);
