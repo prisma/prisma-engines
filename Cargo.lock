@@ -3571,6 +3571,7 @@ dependencies = [
  "connection-string",
  "either",
  "futures",
+ "getrandom 0.2.10",
  "hex",
  "indoc 0.3.6",
  "lru-cache",

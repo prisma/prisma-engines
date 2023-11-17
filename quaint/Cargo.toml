@@ -23,20 +23,28 @@ resolver = "2"
 features = ["docs", "all"]
 
 [features]
-default = []
+default = ["mysql", "postgresql", "mssql", "sqlite"]
 docs = []
 # Expose the underlying database drivers when a connector is enabled. This is a
 # way to access database-specific methods when you need extra control.
 expose-drivers = []
 
-all = ["mssql", "mysql", "pooled", "postgresql", "sqlite"]
+native = [
+  "postgresql-native",
+  "mysql-native",
+  "mssql-native",
+  "sqlite-native",
+]
+
+all = ["native", "pooled"]
 
 vendored-openssl = [
   "postgres-native-tls/vendored-openssl",
   "mysql_async/vendored-openssl",
 ]
 
-postgresql = [
+postgresql-native = [
+  "postgresql",
   "native-tls",
   "tokio-postgres",
   "postgres-types",
@@ -47,11 +55,24 @@ postgresql = [
   "lru-cache",
   "byteorder",
 ]
+postgresql = []
 
-mssql = ["tiberius", "tokio-util", "tokio/time", "tokio/net", "either"]
-mysql = ["mysql_async", "tokio/time", "lru-cache"]
+mssql-native = [
+  "mssql",
+  "tiberius",
+  "tokio-util",
+  "tokio/time",
+  "tokio/net",
+]
+mssql = []
+
+mysql-native = ["mysql", "mysql_async", "tokio/time", "lru-cache"]
+mysql = ["chrono/std"]
+
 pooled = ["mobc"]
-sqlite = ["rusqlite", "tokio/sync"]
+sqlite-native = ["sqlite", "rusqlite/bundled", "tokio/sync"]
+sqlite = []
+
 fmt-sql = ["sqlformat"]
 
 [dependencies]
@@ -67,7 +88,7 @@ futures = "0.3"
 url = "2.1"
 hex = "0.4"
 
-either = { version = "1.6", optional = true }
+either = { version = "1.6" }
 base64 = { version = "0.12.3" }
 chrono = { version = "0.4", default-features = false, features = ["serde"] }
 lru-cache = { version = "0.1", optional = true }
@@ -88,7 +109,11 @@ paste = "1.0"
 serde = { version = "1.0", features = ["derive"] }
 quaint-test-macros = { path = "quaint-test-macros" }
 quaint-test-setup = { path = "quaint-test-setup" }
-tokio = { version = "1.0", features = ["rt-multi-thread", "macros", "time"] }
+tokio = { version = "1.0", features = ["macros", "time"] }
+
+[target.'cfg(target_arch = "wasm32")'.dependencies.getrandom]
+version = "0.2"
+features = ["js"]
 
 [dependencies.byteorder]
 default-features = false
@@ -102,7 +127,7 @@ branch = "vendored-openssl"
 
 [dependencies.rusqlite]
 version = "0.29"
-features = ["chrono", "bundled", "column_decltype"]
+features = ["chrono", "column_decltype"]
 optional = true
 
 [target.'cfg(not(any(target_os = "macos", target_os = "ios")))'.dependencies.tiberius]
