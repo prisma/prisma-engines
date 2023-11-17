@@ -259,6 +259,29 @@ GitHub actions will then pick up the branch name and use it to clone that branch
 
 When it's time to merge the sibling PRs, you'll need to merge the prisma/prisma PR first, so when merging the engines PR you have the code of the adapters ready in prisma/prisma `main` branch.
 
+### Testing engines in `prisma/prisma`
+
+You can trigger releases from this repository to npm that can be used for testing the engines in `prisma/prisma` either automatically or manually:
+
+#### Automated integration releases from this repository to npm
+
+(Since July 2022). Any branch name starting with `integration/` will, first, run the full test suite in Buildkite `[Test] Prisma Engines` and, second, if passing, run the publish pipeline (build and upload engines to S3 & R2)
+
+The journey through the pipeline is the same as a commit on the `main` branch.
+- It will trigger [`prisma/engines-wrapper`](https://github.com/prisma/engines-wrapper) and publish a new [`@prisma/engines-version`](https://www.npmjs.com/package/@prisma/engines-version) npm package but on the `integration` tag.
+- Which triggers [`prisma/prisma`](https://github.com/prisma/prisma) to create a `chore(Automated Integration PR): [...]` PR with a branch name also starting with `integration/`
+- Since in `prisma/prisma` we also trigger the publish pipeline when a branch name starts with `integration/`, this will publish all `prisma/prisma` monorepo packages to npm on the `integration` tag.
+- Our [ecosystem-tests](https://github.com/prisma/ecosystem-tests/) tests will automatically pick up this new version and run tests, results will show in [GitHub Actions](https://github.com/prisma/ecosystem-tests/actions?query=branch%3Aintegration)
+
+This end to end will take minimum ~1h20 to complete, but is completely automated :robot:
+
+Notes:
+- in `prisma/prisma` repository, we do not run tests for `integration/` branches, it is much faster and also means that there is no risk of tests failing (e.g. flaky tests, snapshots) that would stop the publishing process.
+- in `prisma/prisma-engines` the Buildkite test pipeline must first pass, then the engines will be built and uploaded to our storage via the Buildkite release pipeline. These 2 pipelines can fail for different reasons, it's recommended to keep an eye on them (check notifications in Slack) and restart jobs as needed. Finally, it will trigger [`prisma/engines-wrapper`](https://github.com/prisma/engines-wrapper). 
+
+#### Manual integration releases from this repository to npm
+
+Additionally to the automated integration release for `integration/` branches, you can also trigger a publish **manually** in the Buildkite `[Test] Prisma Engines` job if that succeeds for _any_ branch name. Click "🚀 Publish binaries" at the bottom of the test list to unlock the publishing step. When all the jobs in `[Release] Prisma Engines` succeed, you also have to unlock the next step by clicking "🚀 Publish client". This will then trigger the same journey as described above.
 
 ## Parallel rust-analyzer builds
 
@@ -269,22 +292,25 @@ rust-analyzer. To avoid this. Open VSCode settings and search for `Check on Save
 --target-dir:/tmp/rust-analyzer-check
 ```
 
-### Automated integration releases from this repository to npm
 
-(Since July 2022). Any branch name starting with `integration/` will, first, run the full test suite and, second, if passing, run the publish pipeline (build and upload engines to S3)
+## Community PRs: create a local branch for a branch coming from a fork
 
-The journey through the pipeline is the same as a commit on the `main` branch.
-- It will trigger [prisma/engines-wrapper](https://github.com/prisma/engines-wrapper) and publish a new [`@prisma/engines-version`](https://www.npmjs.com/package/@prisma/engines-version) npm package but on the `integration` tag.
-- Which triggers [prisma/prisma](https://github.com/prisma/prisma) to create a `chore(Automated Integration PR): [...]` PR with a branch name also starting with `integration/`
-- Since in prisma/prisma we also trigger the publish pipeline when a branch name starts with `integration/`, this will publish all prisma/prisma monorepo packages to npm on the `integration` tag.
-- Our [ecosystem-tests](https://github.com/prisma/ecosystem-tests/) tests will automatically pick up this new version and run tests, results will show in [GitHub Actions](https://github.com/prisma/ecosystem-tests/actions?query=branch%3Aintegration)
+To trigger an [Automated integration releases from this repository to npm](#automated-integration-releases-from-this-repository-to-npm) or [Manual integration releases from this repository to npm](#manual-integration-releases-from-this-repository-to-npm) branches of forks need to be pulled into this repository so the Buildkite job is triggered. You can use these GitHub and git CLI commands to achieve that easily:
 
-This end to end will take minimum ~1h20 to complete, but is completely automated :robot:
+```
+gh pr checkout 4375
+git checkout -b integration/sql-nested-transactions
+git push --set-upstream origin integration/sql-nested-transactions
+```
 
-Notes:
-- in prisma/prisma repository, we do not run tests for `integration/` branches, it is much faster and also means that there is no risk of test failing (e.g. flaky tests, snapshots) that would stop the publishing process.
-- in prisma/prisma-engines tests must first pass, before publishing starts. So better keep an eye on them and restart them as needed.
+If there is a need to re-create this branch because it has been updated, deleting it and re-creating will make sure the content is identical and avoid any conflicts.
 
+```
+git branch --delete integration/sql-nested-transactions
+gh pr checkout 4375
+git checkout -b integration/sql-nested-transactions
+git push --set-upstream origin integration/sql-nested-transactions --force
+```
 
 ## Security
 

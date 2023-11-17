@@ -4,6 +4,7 @@ use query_engine_tests::*;
 /// Asserts common basics for composite type writes.
 #[test_suite(schema(schema))]
 mod smoke_tests {
+    use regex::Regex;
     fn schema() -> String {
         let schema = indoc! {
             r#"model Person {
@@ -12,6 +13,24 @@ mod smoke_tests {
         };
 
         schema.to_owned()
+    }
+
+    fn assert_value_in_range(metrics: &str, metric: &str, low: f64, high: f64) {
+        let regex = Regex::new(format!(r"{metric}\s+([+-]?\d+(\.\d+)?)").as_str()).unwrap();
+        match regex.captures(metrics) {
+            Some(capture) => {
+                let value = capture.get(1).unwrap().as_str().parse::<f64>().unwrap();
+                assert!(
+                    value >= low && value <= high,
+                    "expected {} value of {} to be between {} and {}",
+                    metric,
+                    value,
+                    low,
+                    high
+                );
+            }
+            None => panic!("Metric {} not found in metrics text", metric),
+        }
     }
 
     #[connector_test]
@@ -62,6 +81,8 @@ mod smoke_tests {
             // counters
             assert_eq!(metrics.matches("# HELP prisma_client_queries_total The total number of Prisma Client queries executed").count(), 1);
             assert_eq!(metrics.matches("# TYPE prisma_client_queries_total counter").count(), 1);
+            assert_eq!(metrics.matches("prisma_client_queries_total 1").count(), 1);
+            
 
             assert_eq!(metrics.matches("# HELP prisma_datasource_queries_total The total number of datasource queries executed").count(), 1);
             assert_eq!(metrics.matches("# TYPE prisma_datasource_queries_total counter").count(), 1);
@@ -81,13 +102,15 @@ mod smoke_tests {
 
             assert_eq!(metrics.matches("# HELP prisma_pool_connections_busy The number of pool connections currently executing datasource queries").count(), 1);
             assert_eq!(metrics.matches("# TYPE prisma_pool_connections_busy gauge").count(), 1);
+            assert_value_in_range(&metrics, "prisma_pool_connections_busy", 0f64, 1f64);
 
             assert_eq!(metrics.matches("# HELP prisma_pool_connections_idle The number of pool connections that are not busy running a query").count(), 1);
             assert_eq!(metrics.matches("# TYPE prisma_pool_connections_idle gauge").count(), 1);
 
             assert_eq!(metrics.matches("# HELP prisma_pool_connections_open The number of pool connections currently open").count(), 1);
             assert_eq!(metrics.matches("# TYPE prisma_pool_connections_open gauge").count(), 1);
-
+            assert_value_in_range(&metrics, "prisma_pool_connections_open", 0f64, 1f64);
+            
             // histograms
             assert_eq!(metrics.matches("# HELP prisma_client_queries_duration_histogram_ms The distribution of the time Prisma Client queries took to run end to end").count(), 1);
             assert_eq!(metrics.matches("# TYPE prisma_client_queries_duration_histogram_ms histogram").count(), 1);

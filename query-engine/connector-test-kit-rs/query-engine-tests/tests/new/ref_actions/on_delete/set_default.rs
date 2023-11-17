@@ -66,7 +66,7 @@ mod one2one_req {
     }
 
     /// Deleting the parent reconnects the child to the default and fails (the default doesn't exist).
-    #[connector_test(schema(required_with_default), exclude(MongoDb, MySQL, JS))]
+    #[connector_test(schema(required_with_default), exclude(MongoDb, MySQL))]
     async fn delete_parent_no_exist_fail(runner: Runner) -> TestResult<()> {
         insta::assert_snapshot!(
           run_query!(&runner, r#"mutation { createOneParent(data: { id: 1, child: { create: { id: 1 }}}) { id }}"#),
@@ -167,7 +167,7 @@ mod one2one_opt {
     }
 
     /// Deleting the parent reconnects the child to the default and fails (the default doesn't exist).
-    #[connector_test(schema(optional_with_default), exclude(MongoDb, MySQL, JS))]
+    #[connector_test(schema(optional_with_default), exclude(MongoDb, MySQL))]
     async fn delete_parent_no_exist_fail(runner: Runner) -> TestResult<()> {
         insta::assert_snapshot!(
           run_query!(&runner, r#"mutation { createOneParent(data: { id: 1, child: { create: { id: 1 }}}) { id }}"#),
@@ -270,7 +270,7 @@ mod one2many_req {
     }
 
     /// Deleting the parent reconnects the child to the default and fails (the default doesn't exist).
-    #[connector_test(schema(required_with_default), exclude(MongoDb, MySQL, JS))]
+    #[connector_test(schema(required_with_default), exclude(MongoDb, MySQL))]
     async fn delete_parent_no_exist_fail(runner: Runner) -> TestResult<()> {
         insta::assert_snapshot!(
           run_query!(&runner, r#"mutation { createOneParent(data: { id: 1, children: { create: { id: 1 }}}) { id }}"#),
@@ -371,7 +371,7 @@ mod one2many_opt {
     }
 
     /// Deleting the parent reconnects the child to the default and fails (the default doesn't exist).
-    #[connector_test(schema(optional_with_default), exclude(MongoDb, MySQL, JS))]
+    #[connector_test(schema(optional_with_default), exclude(MongoDb, MySQL))]
     async fn delete_parent_no_exist_fail(runner: Runner) -> TestResult<()> {
         insta::assert_snapshot!(
           run_query!(&runner, r#"mutation { createOneParent(data: { id: 1, children: { create: { id: 1 }}}) { id }}"#),

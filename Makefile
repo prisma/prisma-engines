@@ -130,10 +130,10 @@ test-pg-postgres13: dev-pg-postgres13 test-qe-st
 
 test-driver-adapter-pg: test-pg-postgres13
 
-start-neon-postgres13: build-qe-napi build-connector-kit-js
+start-neon-postgres13:
 	docker compose -f docker-compose.yml up --wait -d --remove-orphans neon-postgres13
 
-dev-neon-ws-postgres13: start-neon-postgres13
+dev-neon-ws-postgres13: start-neon-postgres13 build-qe-napi build-connector-kit-js
 	cp $(CONFIG_PATH)/neon-ws-postgres13 $(CONFIG_FILE)
 
 test-neon-ws-postgres13: dev-neon-ws-postgres13 test-qe-st
@@ -262,22 +262,16 @@ dev-mongodb_5: start-mongodb_5
 dev-mongodb_4_2: start-mongodb_4_2
 	cp $(CONFIG_PATH)/mongodb42 $(CONFIG_FILE)
 
-start-vitess_5_7:
-	docker compose -f docker-compose.yml up --wait -d --remove-orphans vitess-test-5_7 vitess-shadow-5_7
-
-dev-vitess_5_7: start-vitess_5_7
-	cp $(CONFIG_PATH)/vitess_5_7 $(CONFIG_FILE)
-
 start-vitess_8_0:
 	docker compose -f docker-compose.yml up --wait -d --remove-orphans vitess-test-8_0 vitess-shadow-8_0
 
 dev-vitess_8_0: start-vitess_8_0
 	cp $(CONFIG_PATH)/vitess_8_0 $(CONFIG_FILE)
 
-start-planetscale-vitess8: build-qe-napi build-connector-kit-js
+start-planetscale-vitess8:
 	docker compose -f docker-compose.yml up -d --remove-orphans planetscale-vitess8
 
-dev-planetscale-vitess8: start-planetscale-vitess8
+dev-planetscale-vitess8: start-planetscale-vitess8 build-qe-napi build-connector-kit-js
 	cp $(CONFIG_PATH)/planetscale-vitess8 $(CONFIG_FILE)
 
 test-planetscale-vitess8: dev-planetscale-vitess8 test-qe-st

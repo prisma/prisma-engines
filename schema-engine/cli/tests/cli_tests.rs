@@ -184,6 +184,17 @@ fn test_create_database_mssql(api: TestApi) {
 }
 
 #[test_connector(tags(Sqlite))]
+fn test_sqlite_url(api: TestApi) {
+    let base_dir = tempfile::tempdir().unwrap();
+    let sqlite_path = base_dir.path().join("test.db");
+    let url = format!("{}", sqlite_path.to_string_lossy());
+    let output = api.run(&["--datasource", &url, "can-connect-to-database"]);
+    assert!(!output.status.success());
+    let message = String::from_utf8(output.stderr).unwrap();
+    assert!(message.contains("The provided database string is invalid. The scheme is not recognized in database URL."));
+}
+
+#[test_connector(tags(Sqlite))]
 fn test_create_sqlite_database(api: TestApi) {
     let base_dir = tempfile::tempdir().unwrap();
 

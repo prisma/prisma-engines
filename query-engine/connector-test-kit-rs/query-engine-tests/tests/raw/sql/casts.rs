@@ -5,7 +5,20 @@ use query_engine_tests::*;
 mod casts {
     use query_engine_tests::{fmt_query_raw, run_query, RawParam};
 
-    #[connector_test]
+    // The following tests are excluded for driver adapters. The underlying
+    // driver rejects queries where the values of the positional arguments do
+    // not match the expected types. As an example, the following query to the
+    // driver
+    //
+    // ```json
+    // {
+    // sql: 'SELECT $1::int4 AS decimal_to_i4;                         ',
+    // args: [ 42.51 ]
+    // }
+    //
+    // Bails with: ERROR: invalid input syntax for type integer: "42.51"
+    //
+    #[connector_test(only(Postgres), exclude(JS))]
     async fn query_numeric_casts(runner: Runner) -> TestResult<()> {
         insta::assert_snapshot!(
           run_query_pretty!(&runner, fmt_query_raw(r#"

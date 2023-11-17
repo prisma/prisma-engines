@@ -196,7 +196,6 @@ pub(crate) fn connection_string(
                 None => unreachable!("A versioned connector must have a concrete version to run."),
             }
         }
-        ConnectorVersion::Vitess(Some(VitessVersion::V5_7)) => "mysql://root@localhost:33577/test".into(),
         ConnectorVersion::Vitess(Some(VitessVersion::V8_0)) => "mysql://root@localhost:33807/test".into(),
         ConnectorVersion::Vitess(None) => unreachable!("A versioned connector must have a concrete version to run."),
     }
@@ -296,19 +295,33 @@ pub(crate) fn should_run(
         return false;
     }
 
-    if !only.is_empty() {
-        return only
-            .iter()
-            .any(|only| ConnectorVersion::try_from(*only).unwrap().matches_pattern(&version));
-    }
-
+    // We skip tests that exclude JS driver adapters when an external test executor is configured.
+    // A test that you only want to run with rust drivers can be annotated with exclude(JS)
     if CONFIG.external_test_executor().is_some() && exclude.iter().any(|excl| excl.0.to_uppercase() == "JS") {
         println!("Excluded test execution for JS driver adapters. Skipping test");
         return false;
     };
+    // we consume the JS token to prevent it from being used in the following checks
+    let exclude: Vec<_> = exclude.iter().filter(|excl| excl.0.to_uppercase() != "JS").collect();
+
+    // We only run tests that include JS driver adapters when an external test executor is configured.
+    // A test that you only want to run with js driver adapters can be annotated with only(JS)
+    if CONFIG.external_test_executor().is_none() && only.iter().any(|incl| incl.0.to_uppercase() == "JS") {
+        println!("Excluded test execution for rust driver adapters. Skipping test");
+        return false;
+    }
+    // we consume the JS token to prevent it from being used in the following checks
+    let only: Vec<_> = only.iter().filter(|incl| incl.0.to_uppercase() != "JS").collect();
+
+    if !only.is_empty() {
+        return only
+            .iter()
+            .any(|incl| ConnectorVersion::try_from(**incl).unwrap().matches_pattern(&version));
+    }
 
     if exclude.iter().any(|excl| {
-        ConnectorVersion::try_from(*excl).map_or(false, |connector_version| connector_version.matches_pattern(&version))
+        ConnectorVersion::try_from(**excl)
+            .map_or(false, |connector_version| connector_version.matches_pattern(&version))
     }) {
         println!("Connector excluded. Skipping test.");
         return false;

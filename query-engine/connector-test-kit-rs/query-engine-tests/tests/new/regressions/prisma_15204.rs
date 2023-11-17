@@ -24,8 +24,8 @@ mod conversion_error {
         schema.to_owned()
     }
 
-    #[connector_test(schema(schema_int))]
-    async fn convert_to_int(runner: Runner) -> TestResult<()> {
+    #[connector_test(schema(schema_int), only(Sqlite), exclude(JS))]
+    async fn convert_to_int_sqlite_quaint(runner: Runner) -> TestResult<()> {
         create_test_data(&runner).await?;
 
         assert_error!(
@@ -38,8 +38,22 @@ mod conversion_error {
         Ok(())
     }
 
-    #[connector_test(schema(schema_bigint))]
-    async fn convert_to_bigint(runner: Runner) -> TestResult<()> {
+    #[connector_test(schema(schema_int), only(Sqlite, JS))]
+    async fn convert_to_int_sqlite_js(runner: Runner) -> TestResult<()> {
+        create_test_data(&runner).await?;
+
+        assert_error!(
+            runner,
+            r#"query { findManyTestModel { field } }"#,
+            2023,
+            "Inconsistent column data: Conversion failed: number must be an integer in column 'field', got '1.84467440724388e19'"
+        );
+
+        Ok(())
+    }
+
+    #[connector_test(schema(schema_bigint), only(Sqlite), exclude(JS))]
+    async fn convert_to_bigint_sqlite_quaint(runner: Runner) -> TestResult<()> {
         create_test_data(&runner).await?;
 
         assert_error!(
@@ -47,6 +61,20 @@ mod conversion_error {
             r#"query { findManyTestModel { field } }"#,
             2023,
             "Inconsistent column data: Could not convert from `BigDecimal(18446744072438800000)` to `BigInt`"
+        );
+
+        Ok(())
+    }
+
+    #[connector_test(schema(schema_bigint), only(Sqlite, JS))]
+    async fn convert_to_bigint_sqlite_js(runner: Runner) -> TestResult<()> {
+        create_test_data(&runner).await?;
+
+        assert_error!(
+            runner,
+            r#"query { findManyTestModel { field } }"#,
+            2023,
+            "Inconsistent column data: Conversion failed: number must be an integer in column 'field', got '1.84467440724388e19'"
         );
 
         Ok(())

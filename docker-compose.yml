@@ -200,7 +200,6 @@ services:
     restart: unless-stopped
     platform: linux/x86_64
     environment:
-      MYSQL_USER: root
       MYSQL_ROOT_PASSWORD: prisma
       MYSQL_DATABASE: prisma
     ports:
@@ -236,26 +235,6 @@ services:
       - databases
     tmpfs: /var/lib/mariadb
 
-  vitess-test-5_7:
-    image: vitess/vttestserver:mysql57@sha256:23863a518b34330109c502ac61a396008f5f023e96263bcb2bb1b0f7f7d5dc7f
-    restart: unless-stopped
-    ports:
-      - 33577:33577
-    environment:
-      PORT: 33574
-      KEYSPACES: 'test'
-      NUM_SHARDS: '1'
-      MYSQL_BIND_HOST: '0.0.0.0'
-      FOREIGN_KEY_MODE: 'disallow'
-      ENABLE_ONLINE_DDL: false
-      MYSQL_MAX_CONNECTIONS: 100000
-      TABLET_REFRESH_INTERVAL: '500ms'
-    healthcheck:
-      test: ['CMD', 'mysqladmin', 'ping', '-h127.0.0.1', '-P33577']
-      interval: 5s
-      timeout: 2s
-      retries: 20
-
   vitess-test-8_0:
     image: vitess/vttestserver:mysql80@sha256:8bec2644d83cb322eb2cdd596d33c0f858243ba6ade9164c95dfcc519643094e
     restart: unless-stopped
@@ -272,26 +251,6 @@ services:
       TABLET_REFRESH_INTERVAL: '500ms'
     healthcheck:
       test: ['CMD', 'mysqladmin', 'ping', '-h127.0.0.1', '-P33807']
-      interval: 5s
-      timeout: 2s
-      retries: 20
-
-  vitess-shadow-5_7:
-    image: vitess/vttestserver:mysql57@sha256:23863a518b34330109c502ac61a396008f5f023e96263bcb2bb1b0f7f7d5dc7f
-    restart: unless-stopped
-    ports:
-      - 33578:33577
-    environment:
-      PORT: 33574
-      KEYSPACES: 'shadow'
-      NUM_SHARDS: '1'
-      MYSQL_BIND_HOST: '0.0.0.0'
-      FOREIGN_KEY_MODE: 'disallow'
-      ENABLE_ONLINE_DDL: false
-      MYSQL_MAX_CONNECTIONS: 100000
-      TABLET_REFRESH_INTERVAL: '500ms'
-    healthcheck:
-      test: ['CMD', 'mysqladmin', 'ping', '-h127.0.0.1', '-P33577']
       interval: 5s
       timeout: 2s
       retries: 20
