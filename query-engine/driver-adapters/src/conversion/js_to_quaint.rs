@@ -557,7 +557,7 @@ mod proxy_test {
         let s = "13:02:20.321";
         let json_value = serde_json::Value::String(s.to_string());
         let quaint_value = js_value_to_quaint(json_value, column_type, "column_name").unwrap();
-        let time: NaiveTime = NaiveTime::from_hms_milli_opt(13, 02, 20, 321).unwrap();
+        let time: NaiveTime = NaiveTime::from_hms_milli_opt(13, 2, 20, 321).unwrap();
         assert_eq!(quaint_value, QuaintValue::time(time));
     }
 
