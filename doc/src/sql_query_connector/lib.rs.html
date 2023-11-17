@@ -28,6 +28,9 @@
 <a href="#28" id="28">28</a>
 <a href="#29" id="29">29</a>
 <a href="#30" id="30">30</a>
+<a href="#31" id="31">31</a>
+<a href="#32" id="32">32</a>
+<a href="#33" id="33">33</a>
 </pre></div><pre class="rust"><code><span class="attr">#![allow(clippy::wrong_self_convention)]
 #![deny(unsafe_code)]
 
@@ -52,10 +55,13 @@
 <span class="kw">use </span><span class="self">self</span>::{column_metadata::<span class="kw-2">*</span>, context::Context, query_ext::QueryExt, row::<span class="kw-2">*</span>};
 <span class="kw">use </span>quaint::prelude::Queryable;
 
+<span class="kw">pub use </span>database::FromSource;
 <span class="attr">#[cfg(feature = <span class="string">&quot;driver-adapters&quot;</span>)]
 </span><span class="kw">pub use </span>database::{activate_driver_adapter, Js};
-<span class="kw">pub use </span>database::{FromSource, Mssql, Mysql, PostgreSql, Sqlite};
 <span class="kw">pub use </span>error::SqlError;
+
+<span class="attr">#[cfg(not(target_arch = <span class="string">&quot;wasm32&quot;</span>))]
+</span><span class="kw">pub use </span>database::{Mssql, Mysql, PostgreSql, Sqlite};
 
 <span class="kw">type </span><span class="prelude-ty">Result</span>&lt;T&gt; = std::result::Result&lt;T, error::SqlError&gt;;
 </code></pre></div></section></main></body></html>

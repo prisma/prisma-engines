@@ -299,7 +299,11 @@
 <a href="#299" id="299">299</a>
 <a href="#300" id="300">300</a>
 <a href="#301" id="301">301</a>
-</pre></div><pre class="rust"><code><span class="kw">use super</span>::{catch, transaction::SqlConnectorTransaction};
+<a href="#302" id="302">302</a>
+<a href="#303" id="303">303</a>
+</pre></div><pre class="rust"><code><span class="attr">#![cfg_attr(target_arch = <span class="string">&quot;wasm32&quot;</span>, allow(dead_code))]
+
+</span><span class="kw">use super</span>::{catch, transaction::SqlConnectorTransaction};
 <span class="kw">use crate</span>::{database::operations::<span class="kw-2">*</span>, Context, SqlError};
 <span class="kw">use </span>async_trait::async_trait;
 <span class="kw">use </span>connector::{ConnectionLike, RelAggregationSelection};

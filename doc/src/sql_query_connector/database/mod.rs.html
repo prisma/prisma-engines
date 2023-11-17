@@ -49,14 +49,21 @@
 <a href="#49" id="49">49</a>
 <a href="#50" id="50">50</a>
 <a href="#51" id="51">51</a>
+<a href="#52" id="52">52</a>
+<a href="#53" id="53">53</a>
+<a href="#54" id="54">54</a>
 </pre></div><pre class="rust"><code><span class="kw">mod </span>connection;
 <span class="attr">#[cfg(feature = <span class="string">&quot;driver-adapters&quot;</span>)]
 </span><span class="kw">mod </span>js;
-<span class="kw">mod </span>mssql;
-<span class="kw">mod </span>mysql;
-<span class="kw">mod </span>postgresql;
-<span class="kw">mod </span>sqlite;
 <span class="kw">mod </span>transaction;
+
+<span class="attr">#[cfg(not(target_arch = <span class="string">&quot;wasm32&quot;</span>))]
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">mod </span>native {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">mod </span>mssql;
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">mod </span>mysql;
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">mod </span>postgresql;
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">mod </span>sqlite;
+}
 
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">mod </span>operations;
 
@@ -65,10 +72,9 @@
 
 <span class="attr">#[cfg(feature = <span class="string">&quot;driver-adapters&quot;</span>)]
 </span><span class="kw">pub use </span>js::<span class="kw-2">*</span>;
-<span class="kw">pub use </span>mssql::<span class="kw-2">*</span>;
-<span class="kw">pub use </span>mysql::<span class="kw-2">*</span>;
-<span class="kw">pub use </span>postgresql::<span class="kw-2">*</span>;
-<span class="kw">pub use </span>sqlite::<span class="kw-2">*</span>;
+
+<span class="attr">#[cfg(not(target_arch = <span class="string">&quot;wasm32&quot;</span>))]
+</span><span class="kw">pub use </span>native::{mssql::<span class="kw-2">*</span>, mysql::<span class="kw-2">*</span>, postgresql::<span class="kw-2">*</span>, sqlite::<span class="kw-2">*</span>};
 
 <span class="attr">#[async_trait]
 </span><span class="kw">pub trait </span>FromSource {
