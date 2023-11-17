@@ -25,10 +25,6 @@ jobs:
       fail-fast: false
       matrix:
         database:
-          - name: 'vitess_5_7'
-            single_threaded: true
-            connector: 'vitess'
-            version: '5.7'
           - name: 'vitess_8_0'
             single_threaded: true
             connector: 'vitess'
