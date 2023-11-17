@@ -679,7 +679,7 @@
 }
 
 <span class="kw">impl </span>ErrorKind {
-    <span class="attr">#[cfg(feature = <span class="string">&quot;mysql&quot;</span>)]
+    <span class="attr">#[cfg(feature = <span class="string">&quot;mysql-native&quot;</span>)]
     </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>value_out_of_range(msg: <span class="kw">impl </span>Into&lt;String&gt;) -&gt; <span class="self">Self </span>{
         <span class="self">Self</span>::ValueOutOfRange { message: msg.into() }
     }

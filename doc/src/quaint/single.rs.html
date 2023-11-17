@@ -240,18 +240,17 @@
 <a href="#240" id="240">240</a>
 <a href="#241" id="241">241</a>
 <a href="#242" id="242">242</a>
+<a href="#243" id="243">243</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! A single connection abstraction to a SQL database.
 
-</span><span class="attr">#[cfg(feature = <span class="string">&quot;sqlite&quot;</span>)]
-</span><span class="kw">use </span><span class="kw">crate</span>::connector::DEFAULT_SQLITE_SCHEMA_NAME;
-<span class="kw">use crate</span>::{
+</span><span class="kw">use crate</span>::{
     ast,
     connector::{<span class="self">self</span>, impl_default_TransactionCapable, ConnectionInfo, IsolationLevel, Queryable, TransactionCapable},
 };
 <span class="kw">use </span>async_trait::async_trait;
 <span class="kw">use </span>std::{fmt, sync::Arc};
 
-<span class="attr">#[cfg(feature = <span class="string">&quot;sqlite&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">&quot;sqlite-native&quot;</span>)]
 </span><span class="kw">use </span>std::convert::TryFrom;
 
 <span class="doccomment">/// The main entry point and an abstraction over a database connection.
@@ -369,30 +368,31 @@
     /// - `isolationLevel` the transaction isolation level. Possible values:
     ///   `READ UNCOMMITTED`, `READ COMMITTED`, `REPEATABLE READ`, `SNAPSHOT`,
     ///   `SERIALIZABLE`.
-    </span><span class="attr">#[allow(unreachable_code)]
+    </span><span class="attr">#[cfg_attr(target_arch = <span class="string">&quot;wasm32&quot;</span>, allow(unused_variables))]
+    #[allow(unreachable_code)]
     </span><span class="kw">pub async fn </span>new(url_str: <span class="kw-2">&amp;</span>str) -&gt; <span class="kw">crate</span>::Result&lt;<span class="self">Self</span>&gt; {
         <span class="kw">let </span>inner = <span class="kw">match </span>url_str {
-            <span class="attr">#[cfg(feature = <span class="string">&quot;sqlite&quot;</span>)]
+            <span class="attr">#[cfg(feature = <span class="string">&quot;sqlite-native&quot;</span>)]
             </span>s <span class="kw">if </span>s.starts_with(<span class="string">&quot;file&quot;</span>) =&gt; {
                 <span class="kw">let </span>params = connector::SqliteParams::try_from(s)<span class="question-mark">?</span>;
                 <span class="kw">let </span>sqlite = connector::Sqlite::new(<span class="kw-2">&amp;</span>params.file_path)<span class="question-mark">?</span>;
 
                 Arc::new(sqlite) <span class="kw">as </span>Arc&lt;<span class="kw">dyn </span>Queryable&gt;
             }
-            <span class="attr">#[cfg(feature = <span class="string">&quot;mysql&quot;</span>)]
+            <span class="attr">#[cfg(feature = <span class="string">&quot;mysql-native&quot;</span>)]
             </span>s <span class="kw">if </span>s.starts_with(<span class="string">&quot;mysql&quot;</span>) =&gt; {
                 <span class="kw">let </span>url = connector::MysqlUrl::new(url::Url::parse(s)<span class="question-mark">?</span>)<span class="question-mark">?</span>;
                 <span class="kw">let </span>mysql = connector::Mysql::new(url).<span class="kw">await</span><span class="question-mark">?</span>;
 
                 Arc::new(mysql) <span class="kw">as </span>Arc&lt;<span class="kw">dyn </span>Queryable&gt;
             }
-            <span class="attr">#[cfg(feature = <span class="string">&quot;postgresql&quot;</span>)]
+            <span class="attr">#[cfg(feature = <span class="string">&quot;postgresql-native&quot;</span>)]
             </span>s <span class="kw">if </span>s.starts_with(<span class="string">&quot;postgres&quot;</span>) || s.starts_with(<span class="string">&quot;postgresql&quot;</span>) =&gt; {
                 <span class="kw">let </span>url = connector::PostgresUrl::new(url::Url::parse(s)<span class="question-mark">?</span>)<span class="question-mark">?</span>;
                 <span class="kw">let </span>psql = connector::PostgreSql::new(url).<span class="kw">await</span><span class="question-mark">?</span>;
                 Arc::new(psql) <span class="kw">as </span>Arc&lt;<span class="kw">dyn </span>Queryable&gt;
             }
-            <span class="attr">#[cfg(feature = <span class="string">&quot;mssql&quot;</span>)]
+            <span class="attr">#[cfg(feature = <span class="string">&quot;mssql-native&quot;</span>)]
             </span>s <span class="kw">if </span>s.starts_with(<span class="string">&quot;jdbc:sqlserver&quot;</span>) | s.starts_with(<span class="string">&quot;sqlserver&quot;</span>) =&gt; {
                 <span class="kw">let </span>url = connector::MssqlUrl::new(s)<span class="question-mark">?</span>;
                 <span class="kw">let </span>psql = connector::Mssql::new(url).<span class="kw">await</span><span class="question-mark">?</span>;
@@ -408,9 +408,11 @@
         <span class="prelude-val">Ok</span>(<span class="self">Self </span>{ inner, connection_info })
     }
 
-    <span class="attr">#[cfg(feature = <span class="string">&quot;sqlite&quot;</span>)]
+    <span class="attr">#[cfg(feature = <span class="string">&quot;sqlite-native&quot;</span>)]
     </span><span class="doccomment">/// Open a new SQLite database in memory.
     </span><span class="kw">pub fn </span>new_in_memory() -&gt; <span class="kw">crate</span>::Result&lt;Quaint&gt; {
+        <span class="kw">use </span><span class="kw">crate</span>::connector::DEFAULT_SQLITE_SCHEMA_NAME;
+
         <span class="prelude-val">Ok</span>(Quaint {
             inner: Arc::new(connector::Sqlite::new_in_memory()<span class="question-mark">?</span>),
             connection_info: Arc::new(ConnectionInfo::InMemorySqlite {

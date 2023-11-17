@@ -232,11 +232,11 @@
 <a href="#232" id="232">232</a>
 <a href="#233" id="233">233</a>
 <a href="#234" id="234">234</a>
-</pre></div><pre class="rust"><code><span class="attr">#[cfg(feature = <span class="string">&quot;mssql&quot;</span>)]
+</pre></div><pre class="rust"><code><span class="attr">#[cfg(feature = <span class="string">&quot;mssql-native&quot;</span>)]
 </span><span class="kw">use </span><span class="kw">crate</span>::connector::MssqlUrl;
-<span class="attr">#[cfg(feature = <span class="string">&quot;mysql&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">&quot;mysql-native&quot;</span>)]
 </span><span class="kw">use </span><span class="kw">crate</span>::connector::MysqlUrl;
-<span class="attr">#[cfg(feature = <span class="string">&quot;postgresql&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">&quot;postgresql-native&quot;</span>)]
 </span><span class="kw">use </span><span class="kw">crate</span>::connector::PostgresUrl;
 <span class="kw">use crate</span>::{
     ast,
@@ -331,7 +331,7 @@
 
     <span class="kw">async fn </span>connect(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw">crate</span>::Result&lt;<span class="self">Self</span>::Connection&gt; {
         <span class="kw">let </span>conn = <span class="kw">match </span><span class="self">self </span>{
-            <span class="attr">#[cfg(feature = <span class="string">&quot;sqlite&quot;</span>)]
+            <span class="attr">#[cfg(feature = <span class="string">&quot;sqlite-native&quot;</span>)]
             </span>QuaintManager::Sqlite { url, .. } =&gt; {
                 <span class="kw">use </span><span class="kw">crate</span>::connector::Sqlite;
 
@@ -340,19 +340,19 @@
                 <span class="prelude-val">Ok</span>(Box::new(conn) <span class="kw">as </span><span class="self">Self</span>::Connection)
             }
 
-            <span class="attr">#[cfg(feature = <span class="string">&quot;mysql&quot;</span>)]
+            <span class="attr">#[cfg(feature = <span class="string">&quot;mysql-native&quot;</span>)]
             </span>QuaintManager::Mysql { url } =&gt; {
                 <span class="kw">use </span><span class="kw">crate</span>::connector::Mysql;
                 <span class="prelude-val">Ok</span>(Box::new(Mysql::new(url.clone()).<span class="kw">await</span><span class="question-mark">?</span>) <span class="kw">as </span><span class="self">Self</span>::Connection)
             }
 
-            <span class="attr">#[cfg(feature = <span class="string">&quot;postgresql&quot;</span>)]
+            <span class="attr">#[cfg(feature = <span class="string">&quot;postgresql-native&quot;</span>)]
             </span>QuaintManager::Postgres { url } =&gt; {
                 <span class="kw">use </span><span class="kw">crate</span>::connector::PostgreSql;
                 <span class="prelude-val">Ok</span>(Box::new(PostgreSql::new(url.clone()).<span class="kw">await</span><span class="question-mark">?</span>) <span class="kw">as </span><span class="self">Self</span>::Connection)
             }
 
-            <span class="attr">#[cfg(feature = <span class="string">&quot;mssql&quot;</span>)]
+            <span class="attr">#[cfg(feature = <span class="string">&quot;mssql-native&quot;</span>)]
             </span>QuaintManager::Mssql { url } =&gt; {
                 <span class="kw">use </span><span class="kw">crate</span>::connector::Mssql;
                 <span class="prelude-val">Ok</span>(Box::new(Mssql::new(url.clone()).<span class="kw">await</span><span class="question-mark">?</span>) <span class="kw">as </span><span class="self">Self</span>::Connection)
@@ -380,7 +380,7 @@
     <span class="kw">use </span><span class="kw">crate</span>::pooled::Quaint;
 
     <span class="attr">#[tokio::test]
-    #[cfg(feature = <span class="string">&quot;mysql&quot;</span>)]
+    #[cfg(feature = <span class="string">&quot;mysql-native&quot;</span>)]
     </span><span class="kw">async fn </span>mysql_default_connection_limit() {
         <span class="kw">let </span>conn_string = std::env::var(<span class="string">&quot;TEST_MYSQL&quot;</span>).expect(<span class="string">&quot;TEST_MYSQL connection string not set.&quot;</span>);
 
@@ -390,7 +390,7 @@
     }
 
     <span class="attr">#[tokio::test]
-    #[cfg(feature = <span class="string">&quot;mysql&quot;</span>)]
+    #[cfg(feature = <span class="string">&quot;mysql-native&quot;</span>)]
     </span><span class="kw">async fn </span>mysql_custom_connection_limit() {
         <span class="kw">let </span>conn_string = <span class="macro">format!</span>(
             <span class="string">&quot;{}?connection_limit=10&quot;</span>,
@@ -403,7 +403,7 @@
     }
 
     <span class="attr">#[tokio::test]
-    #[cfg(feature = <span class="string">&quot;postgresql&quot;</span>)]
+    #[cfg(feature = <span class="string">&quot;postgresql-native&quot;</span>)]
     </span><span class="kw">async fn </span>psql_default_connection_limit() {
         <span class="kw">let </span>conn_string = std::env::var(<span class="string">&quot;TEST_PSQL&quot;</span>).expect(<span class="string">&quot;TEST_PSQL connection string not set.&quot;</span>);
 
@@ -413,7 +413,7 @@
     }
 
     <span class="attr">#[tokio::test]
-    #[cfg(feature = <span class="string">&quot;postgresql&quot;</span>)]
+    #[cfg(feature = <span class="string">&quot;postgresql-native&quot;</span>)]
     </span><span class="kw">async fn </span>psql_custom_connection_limit() {
         <span class="kw">let </span>conn_string = <span class="macro">format!</span>(
             <span class="string">&quot;{}?connection_limit=10&quot;</span>,
@@ -426,7 +426,7 @@
     }
 
     <span class="attr">#[tokio::test]
-    #[cfg(feature = <span class="string">&quot;mssql&quot;</span>)]
+    #[cfg(feature = <span class="string">&quot;mssql-native&quot;</span>)]
     </span><span class="kw">async fn </span>mssql_default_connection_limit() {
         <span class="kw">let </span>conn_string = std::env::var(<span class="string">&quot;TEST_MSSQL&quot;</span>).expect(<span class="string">&quot;TEST_MSSQL connection string not set.&quot;</span>);
 
@@ -436,7 +436,7 @@
     }
 
     <span class="attr">#[tokio::test]
-    #[cfg(feature = <span class="string">&quot;mssql&quot;</span>)]
+    #[cfg(feature = <span class="string">&quot;mssql-native&quot;</span>)]
     </span><span class="kw">async fn </span>mssql_custom_connection_limit() {
         <span class="kw">let </span>conn_string = <span class="macro">format!</span>(
             <span class="string">&quot;{};connectionLimit=10&quot;</span>,
@@ -449,7 +449,7 @@
     }
 
     <span class="attr">#[tokio::test]
-    #[cfg(feature = <span class="string">&quot;sqlite&quot;</span>)]
+    #[cfg(feature = <span class="string">&quot;sqlite-native&quot;</span>)]
     </span><span class="kw">async fn </span>test_default_connection_limit() {
         <span class="kw">let </span>conn_string = <span class="string">&quot;file:db/test.db&quot;</span>.to_string();
         <span class="kw">let </span>pool = Quaint::builder(<span class="kw-2">&amp;</span>conn_string).unwrap().build();
@@ -458,7 +458,7 @@
     }
 
     <span class="attr">#[tokio::test]
-    #[cfg(feature = <span class="string">&quot;sqlite&quot;</span>)]
+    #[cfg(feature = <span class="string">&quot;sqlite-native&quot;</span>)]
     </span><span class="kw">async fn </span>test_custom_connection_limit() {
         <span class="kw">let </span>conn_string = <span class="string">&quot;file:db/test.db?connection_limit=10&quot;</span>.to_string();
         <span class="kw">let </span>pool = Quaint::builder(<span class="kw-2">&amp;</span>conn_string).unwrap().build();
