@@ -10,6 +10,7 @@ mod execute_operation;
 mod interpreting_executor;
 mod pipeline;
 mod request_context;
+pub(crate) mod task;
 
 pub use self::{execute_operation::*, interpreting_executor::InterpretingExecutor};
 
@@ -130,67 +131,4 @@ pub trait TransactionManager {
 
 pub fn get_current_dispatcher() -> Dispatch {
     tracing::dispatcher::get_default(|current| current.clone())
-}
-
-// The `task` module provides a unified interface for spawning asynchronous tasks, regardless of the target platform.
-pub(crate) mod task {
-    pub use arch::{spawn, JoinHandle};
-    use futures::Future;
-
-    // On native targets, `tokio::spawn` spawns a new asynchronous task.
-    #[cfg(not(target_arch = "wasm32"))]
-    mod arch {
-        use super::*;
-
-        pub type JoinHandle<T> = tokio::task::JoinHandle<T>;
-
-        pub fn spawn<T>(future: T) -> JoinHandle<T::Output>
-        where
-            T: Future + Send + 'static,
-            T::Output: Send + 'static,
-        {
-            tokio::spawn(future)
-        }
-    }
-
-    // On Wasm targets, `wasm_bindgen_futures::spawn_local` spawns a new asynchronous task.
-    #[cfg(target_arch = "wasm32")]
-    mod arch {
-        use super::*;
-        use tokio::sync::oneshot::{self};
-
-        // Wasm-compatible alternative to `tokio::task::JoinHandle<T>`.
-        // `pin_project` enables pin-projection and a `Pin`-compatible implementation of the `Future` trait.
-        #[pin_project::pin_project]
-        pub struct JoinHandle<T>(#[pin] oneshot::Receiver<T>);
-
-        impl<T> Future for JoinHandle<T> {
-            type Output = Result<T, oneshot::error::RecvError>;
-
-            fn poll(self: std::pin::Pin<&mut Self>, cx: &mut std::task::Context<'_>) -> std::task::Poll<Self::Output> {
-                // the `self.project()` method is provided by the `pin_project` macro
-                let receiver: std::pin::Pin<&mut oneshot::Receiver<T>> = self.project().0;
-                receiver.poll(cx)
-            }
-        }
-
-        impl<T> JoinHandle<T> {
-            pub fn abort(&mut self) {
-                // abort is noop on Wasm targets
-            }
-        }
-
-        pub fn spawn<T>(future: T) -> JoinHandle<T::Output>
-        where
-            T: Future + Send + 'static,
-            T::Output: Send + 'static,
-        {
-            let (sender, receiver) = oneshot::channel();
-            wasm_bindgen_futures::spawn_local(async move {
-                let result = future.await;
-                sender.send(result).ok();
-            });
-            JoinHandle(receiver)
-        }
-    }
 }
