@@ -1,12 +1,12 @@
 #![allow(dead_code)]
 #![allow(unused_variables)]
 
-use crate::proxy;
 use crate::{
     error::ApiError,
     logger::{LogCallback, Logger},
 };
 use js_sys::{Function as JsFunction, Object as JsObject};
+use request_handlers::ConnectorMode;
 use serde::{Deserialize, Serialize};
 use std::{
     collections::{BTreeMap, HashMap},
@@ -21,6 +21,7 @@ use wasm_bindgen::prelude::wasm_bindgen;
 /// The main query engine used by JS
 #[wasm_bindgen]
 pub struct QueryEngine {
+    connector_mode: ConnectorMode,
     inner: RwLock<Inner>,
     logger: Logger,
 }
@@ -125,10 +126,12 @@ impl QueryEngine {
 
         let mut schema = psl::validate(datamodel.into());
         let config = &mut schema.configuration;
+        let preview_features = config.preview_features();
 
         if let Some(adapter) = maybe_adapter {
-            let js_queryable =
-                proxy::from_wasm(adapter).map_err(|e| ApiError::configuration(e.as_string().unwrap_or_default()))?;
+            let js_queryable = driver_adapters::from_wasm(adapter);
+
+            sql_connector::activate_driver_adapter(Arc::new(js_queryable));
 
             let provider_name = schema.connector.provider_name();
             log::info!("Received driver adapter for {provider_name}.");
@@ -160,9 +163,12 @@ impl QueryEngine {
         let log_level = log_level.parse::<LevelFilter>().unwrap();
         let logger = Logger::new(log_queries, log_level, log_callback);
 
+        let connector_mode = ConnectorMode::Js;
+
         Ok(Self {
             inner: RwLock::new(Inner::Builder(builder)),
             logger,
+            connector_mode,
         })
     }
 
