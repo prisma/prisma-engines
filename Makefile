@@ -256,12 +256,6 @@ dev-mongodb_5: start-mongodb_5
 dev-mongodb_4_2: start-mongodb_4_2
 	cp $(CONFIG_PATH)/mongodb42 $(CONFIG_FILE)
 
-start-vitess_5_7:
-	docker compose -f docker-compose.yml up --wait -d --remove-orphans vitess-test-5_7 vitess-shadow-5_7
-
-dev-vitess_5_7: start-vitess_5_7
-	cp $(CONFIG_PATH)/vitess_5_7 $(CONFIG_FILE)
-
 start-vitess_8_0:
 	docker compose -f docker-compose.yml up --wait -d --remove-orphans vitess-test-8_0 vitess-shadow-8_0
 
