@@ -57,6 +57,10 @@ jobs:
             single_threaded: false
             connector: 'cockroachdb'
             version: '22.1'
+          - name: 'sqlite'
+            single_threaded: false
+            connector: 'sqlite'
+            version: 'n/a'
         engine_protocol: [graphql, json]
 
     env:
