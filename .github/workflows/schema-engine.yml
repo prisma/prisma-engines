@@ -94,11 +94,6 @@ jobs:
             url: 'postgresql://prisma@localhost:26257'
           - name: sqlite
             url: sqlite
-          - name: vitess_5_7
-            url: 'mysql://root:prisma@localhost:33577/test'
-            shadow_database_url: 'mysql://root:prisma@localhost:33578/shadow'
-            is_vitess: true
-            single_threaded: true
           - name: vitess_8_0
             url: 'mysql://root:prisma@localhost:33807/test'
             shadow_database_url: 'mysql://root:prisma@localhost:33808/shadow'
