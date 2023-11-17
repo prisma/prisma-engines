@@ -196,7 +196,6 @@ pub(crate) fn connection_string(
                 None => unreachable!("A versioned connector must have a concrete version to run."),
             }
         }
-        ConnectorVersion::Vitess(Some(VitessVersion::V5_7)) => "mysql://root@localhost:33577/test".into(),
         ConnectorVersion::Vitess(Some(VitessVersion::V8_0)) => "mysql://root@localhost:33807/test".into(),
         ConnectorVersion::Vitess(None) => unreachable!("A versioned connector must have a concrete version to run."),
     }
