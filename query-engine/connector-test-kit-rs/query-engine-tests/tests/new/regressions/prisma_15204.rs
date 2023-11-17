@@ -46,7 +46,7 @@ mod conversion_error {
             runner,
             r#"query { findManyTestModel { field } }"#,
             2023,
-            "Inconsistent column data: Conversion failed: number must be an integer in column 'field'"
+            "Inconsistent column data: Conversion failed: number must be an integer in column 'field', got '1.84467440724388e19'"
         );
 
         Ok(())
@@ -74,7 +74,7 @@ mod conversion_error {
             runner,
             r#"query { findManyTestModel { field } }"#,
             2023,
-            "Inconsistent column data: Conversion failed: number must be an i64 in column 'field'"
+            "Inconsistent column data: Conversion failed: number must be an integer in column 'field', got '1.84467440724388e19'"
         );
 
         Ok(())
