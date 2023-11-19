@@ -82,7 +82,7 @@ mod geometry_filter_spec {
 
         // Not geoWithin
         insta::assert_snapshot!(
-          run_query!(&runner, r#"query { findManyTestModel(where: { geom: { not: { geoWithin: "{\"type\":\"Polygon\",\"coordinates\":[[[1,1],[1,4],[4,4],[4,1],[1,1]]]}" }}}) { id }}"#),
+          run_query!(&runner, r#"query { findManyTestModel(where: { AND: [{ geom: { not: { geoWithin: "{\"type\":\"Polygon\",\"coordinates\":[[[1,1],[1,4],[4,4],[4,1],[1,1]]]}" }}}, { geom: { not: null }}]}) { id }}"#),
           @r###"{"data":{"findManyTestModel":[{"id":1}]}}"###
         );
 
@@ -94,7 +94,7 @@ mod geometry_filter_spec {
 
         // Not geoIntersects
         insta::assert_snapshot!(
-          run_query!(&runner, r#"query { findManyTestModel(where: { geom: { not: { geoIntersects: "{\"type\":\"Polygon\",\"coordinates\":[[[-1,-1],[-1,1],[1,1],[1,-1],[-1,-1]]]}" }}}) { id }}"#),
+          run_query!(&runner, r#"query { findManyTestModel(where: { AND: [{ geom: { not: { geoIntersects: "{\"type\":\"Polygon\",\"coordinates\":[[[-1,-1],[-1,1],[1,1],[1,-1],[-1,-1]]]}" }}}, { geom: { not: null }}]}) { id }}"#),
           @r###"{"data":{"findManyTestModel":[{"id":2}]}}"###
         );
 

@@ -281,6 +281,26 @@ impl<'a> Visitor<'a> for Sqlite<'a> {
         })
     }
 
+    fn visit_geometry_within(&mut self, left: Expression<'a>, right: Expression<'a>, not: bool) -> visitor::Result {
+        self.surround_with("ST_Within(", ")", |s| {
+            s.visit_expression(left)?;
+            s.write(",")?;
+            s.visit_expression(right)
+        })?;
+        self.write(if not { " != 1" } else { " = 1" })?;
+        Ok(())
+    }
+
+    fn visit_geometry_intersects(&mut self, left: Expression<'a>, right: Expression<'a>, not: bool) -> visitor::Result {
+        self.surround_with("ST_Intersects(", ")", |s| {
+            s.visit_expression(left)?;
+            s.write(",")?;
+            s.visit_expression(right)
+        })?;
+        self.write(if not { " != 1" } else { " = 1" })?;
+        Ok(())
+    }
+
     fn visit_geometry_type_equals(
         &mut self,
         left: Expression<'a>,
