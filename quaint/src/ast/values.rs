@@ -56,8 +56,7 @@ impl FromStr for GeometryValue {
     type Err = String;
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
-        static EWKT_REGEX: Lazy<Regex> =
-            Lazy::new(|| Regex::new(r"^(SRID=(?P<srid>\d+);)?(?P<geometry>.+)$").unwrap());
+        static EWKT_REGEX: Lazy<Regex> = Lazy::new(|| Regex::new(r"^(SRID=(?P<srid>\d+);)?(?P<geometry>.+)$").unwrap());
         EWKT_REGEX
             .captures(s)
             .map(|capture| {

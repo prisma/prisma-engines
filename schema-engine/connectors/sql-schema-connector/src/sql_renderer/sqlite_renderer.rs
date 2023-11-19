@@ -10,7 +10,7 @@ use psl::builtin_connectors::SQLiteType;
 use regex::Regex;
 use sql_ddl::sqlite as ddl;
 use sql_schema_describer::{walkers::*, *};
-use std::{fmt::Write, borrow::Cow};
+use std::{borrow::Cow, fmt::Write};
 
 impl SqlRenderer for SqliteFlavour {
     fn quote<'a>(&self, name: &'a str) -> Quoted<&'a str> {

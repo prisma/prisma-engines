@@ -79,10 +79,7 @@ impl<'a> Function<'a> {
         }
     }
     pub fn returns_geometry(&self) -> bool {
-        match self.typ_ {
-            FunctionType::GeomFromText(_) => true,
-            _ => false,
-        }
+        matches!(self.typ_, FunctionType::GeomFromText(_))
     }
 }
 
