@@ -3846,8 +3846,11 @@ dependencies = [
  "psl",
  "quaint",
  "query-connector",
+<<<<<<< HEAD
  "query-core",
  "request-handlers",
+=======
+>>>>>>> main
  "serde",
  "serde-wasm-bindgen",
  "serde_json",
