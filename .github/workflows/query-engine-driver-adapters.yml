@@ -25,12 +25,18 @@ jobs:
       fail-fast: false
       matrix:
         adapter:
-          - name: 'pg'
+          - name: 'pg (napi)'
             setup_task: 'dev-pg-postgres13'
-          - name: 'neon:ws'
+          - name: 'neon:ws (napi)'
             setup_task: 'dev-neon-ws-postgres13'
-          - name: 'libsql'
+          - name: 'libsql (napi)'
             setup_task: 'dev-libsql-sqlite'
+          - name: 'pg (wasm)'
+            setup_task: 'dev-pg-postgres13-wasm'
+          - name: 'neon:ws (wasm)'
+            setup_task: 'dev-neon-ws-postgres13-wasm'
+          - name: 'libsql (wasm)'
+            setup_task: 'dev-libsql-sqlite-wasm'
         node_version: ['18']
     env:
       LOG_LEVEL: 'info' # Set to "debug" to trace the query engine and node process running the driver adapter
