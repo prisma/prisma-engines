@@ -13,8 +13,8 @@
 </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">mod </span>error;
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">mod </span>url;
 
+<span class="kw">pub use </span><span class="self">self</span>::url::<span class="kw-2">*</span>;
 <span class="kw">pub use </span>error::MysqlError;
-<span class="kw">pub use </span>url::<span class="kw-2">*</span>;
 
 <span class="attr">#[cfg(feature = <span class="string">&quot;mysql-native&quot;</span>)]
 </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">mod </span>native;
