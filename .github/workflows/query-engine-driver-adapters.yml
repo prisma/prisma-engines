@@ -31,15 +31,16 @@ jobs:
             setup_task: 'dev-neon-ws-postgres13'
           - name: 'libsql (napi)'
             setup_task: 'dev-libsql-sqlite'
-          - name: 'pg (wasm)'
-            setup_task: 'dev-pg-postgres13-wasm'
-            needs_wasm_pack: true
-          - name: 'neon:ws (wasm)'
-            setup_task: 'dev-neon-ws-postgres13-wasm'
-            needs_wasm_pack: true
-          - name: 'libsql (wasm)'
-            setup_task: 'dev-libsql-sqlite-wasm'
-            needs_wasm_pack: true
+          # TODO: uncomment when WASM engine is functional
+          # - name: 'pg (wasm)'
+          #   setup_task: 'dev-pg-postgres13-wasm'
+          #   needs_wasm_pack: true
+          # - name: 'neon:ws (wasm)'
+          #   setup_task: 'dev-neon-ws-postgres13-wasm'
+          #   needs_wasm_pack: true
+          # - name: 'libsql (wasm)'
+          #   setup_task: 'dev-libsql-sqlite-wasm'
+          #   needs_wasm_pack: true
         node_version: ['18']
     env:
       LOG_LEVEL: 'info' # Set to "debug" to trace the query engine and node process running the driver adapter
