@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"fn":["compile","compile_streaming","instantiate_buffer","instantiate_module","instantiate_streaming","validate"],"struct":["CompileError","Global","Instance","LinkError","Memory","Module","RuntimeError","Table"]};

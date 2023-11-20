@@ -394,10 +394,16 @@
 <a href="#394" id="394">394</a>
 <a href="#395" id="395">395</a>
 <a href="#396" id="396">396</a>
+<a href="#397" id="397">397</a>
+<a href="#398" id="398">398</a>
+<a href="#399" id="399">399</a>
+<a href="#400" id="400">400</a>
+<a href="#401" id="401">401</a>
 </pre></div><pre class="rust"><code><span class="kw">use super</span>::{CachedTx, TransactionError, TxOpRequest, TxOpRequestMsg, TxOpResponse};
+<span class="kw">use </span><span class="kw">crate</span>::executor::task::{spawn, JoinHandle};
 <span class="kw">use crate</span>::{
-    execute_many_operations, execute_single_operation, protocol::EngineProtocol,
-    telemetry::helpers::set_span_link_from_traceparent, ClosedTx, Operation, ResponseData, TxId,
+    execute_many_operations, execute_single_operation, protocol::EngineProtocol, ClosedTx, Operation, ResponseData,
+    TxId,
 };
 <span class="kw">use </span>connector::Connection;
 <span class="kw">use </span>schema::QuerySchemaRef;
@@ -407,12 +413,14 @@
         mpsc::{channel, Receiver, Sender},
         oneshot, RwLock,
     },
-    task::JoinHandle,
     time::{<span class="self">self</span>, Duration, Instant},
 };
 <span class="kw">use </span>tracing::Span;
 <span class="kw">use </span>tracing_futures::Instrument;
 <span class="kw">use </span>tracing_futures::WithSubscriber;
+
+<span class="attr">#[cfg(feature = <span class="string">&quot;metrics&quot;</span>)]
+</span><span class="kw">use </span><span class="kw">crate</span>::telemetry::helpers::set_span_link_from_traceparent;
 
 <span class="attr">#[derive(PartialEq)]
 </span><span class="kw">enum </span>RunState {
@@ -477,7 +485,9 @@
         traceparent: <span class="prelude-ty">Option</span>&lt;String&gt;,
     ) -&gt; <span class="kw">crate</span>::Result&lt;ResponseData&gt; {
         <span class="kw">let </span>span = <span class="macro">info_span!</span>(<span class="string">&quot;prisma:engine:itx_query_builder&quot;</span>, user_facing = <span class="bool-val">true</span>);
-        set_span_link_from_traceparent(<span class="kw-2">&amp;</span>span, traceparent.clone());
+
+        <span class="attr">#[cfg(feature = <span class="string">&quot;metrics&quot;</span>)]
+        </span>set_span_link_from_traceparent(<span class="kw-2">&amp;</span>span, traceparent.clone());
 
         <span class="kw">let </span>conn = <span class="self">self</span>.cached_tx.as_open()<span class="question-mark">?</span>;
         execute_single_operation(
@@ -663,7 +673,7 @@
     };
     <span class="kw">let </span>(open_transaction_send, open_transaction_rcv) = oneshot::channel();
 
-    tokio::task::spawn(
+    spawn(
         <span class="kw">crate</span>::executor::with_request_context(engine_protocol, <span class="kw">async move </span>{
             <span class="comment">// We match on the result in order to send the error to the parent task and abort this
             // task, on error. This is a separate task (actor), not a function where we can just bubble up the
@@ -776,7 +786,7 @@
     closed_txs: Arc&lt;RwLock&lt;lru::LruCache&lt;TxId, <span class="prelude-ty">Option</span>&lt;ClosedTx&gt;&gt;&gt;&gt;,
     <span class="kw-2">mut </span>rx: Receiver&lt;(TxId, <span class="prelude-ty">Option</span>&lt;ClosedTx&gt;)&gt;,
 ) -&gt; JoinHandle&lt;()&gt; {
-    tokio::task::spawn(<span class="kw">async move </span>{
+    spawn(<span class="kw">async move </span>{
         <span class="kw">loop </span>{
             <span class="kw">if let </span><span class="prelude-val">Some</span>((id, closed_tx)) = rx.recv().<span class="kw">await </span>{
                 <span class="macro">trace!</span>(<span class="string">&quot;removing {} from client list&quot;</span>, id);

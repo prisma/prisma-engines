@@ -279,16 +279,32 @@
 <a href="#279" id="279">279</a>
 <a href="#280" id="280">280</a>
 <a href="#281" id="281">281</a>
-</pre></div><pre class="rust"><code><span class="kw">use </span><span class="kw">super</span>::pipeline::QueryPipeline;
+<a href="#282" id="282">282</a>
+<a href="#283" id="283">283</a>
+<a href="#284" id="284">284</a>
+<a href="#285" id="285">285</a>
+<a href="#286" id="286">286</a>
+<a href="#287" id="287">287</a>
+<a href="#288" id="288">288</a>
+<a href="#289" id="289">289</a>
+<a href="#290" id="290">290</a>
+<a href="#291" id="291">291</a>
+<a href="#292" id="292">292</a>
+</pre></div><pre class="rust"><code><span class="attr">#![cfg_attr(target_arch = <span class="string">&quot;wasm32&quot;</span>, allow(unused_variables))]
+
+</span><span class="kw">use </span><span class="kw">super</span>::pipeline::QueryPipeline;
 <span class="kw">use crate</span>::{
     executor::request_context, protocol::EngineProtocol, CoreError, IrSerializer, Operation, QueryGraph,
     QueryGraphBuilder, QueryInterpreter, ResponseData,
 };
 <span class="kw">use </span>connector::{Connection, ConnectionLike, Connector};
 <span class="kw">use </span>futures::future;
-<span class="kw">use </span>query_engine_metrics::{
+
+<span class="attr">#[cfg(feature = <span class="string">&quot;metrics&quot;</span>)]
+</span><span class="kw">use </span>query_engine_metrics::{
     histogram, increment_counter, metrics, PRISMA_CLIENT_QUERIES_DURATION_HISTOGRAM_MS, PRISMA_CLIENT_QUERIES_TOTAL,
 };
+
 <span class="kw">use </span>schema::{QuerySchema, QuerySchemaRef};
 <span class="kw">use </span>std::time::{Duration, Instant};
 <span class="kw">use </span>tracing::Instrument;
@@ -305,7 +321,8 @@
     <span class="kw">let </span>(graph, serializer) = build_graph(<span class="kw-2">&amp;</span>query_schema, operation.clone())<span class="question-mark">?</span>;
     <span class="kw">let </span>result = execute_on(conn, graph, serializer, query_schema.as_ref(), trace_id).<span class="kw">await</span>;
 
-    <span class="macro">histogram!</span>(PRISMA_CLIENT_QUERIES_DURATION_HISTOGRAM_MS, operation_timer.elapsed());
+    <span class="attr">#[cfg(feature = <span class="string">&quot;metrics&quot;</span>)]
+    </span><span class="macro">histogram!</span>(PRISMA_CLIENT_QUERIES_DURATION_HISTOGRAM_MS, operation_timer.elapsed());
 
     result
 }
@@ -326,7 +343,9 @@
     <span class="kw">for </span>(i, (graph, serializer)) <span class="kw">in </span>queries.into_iter().enumerate() {
         <span class="kw">let </span>operation_timer = Instant::now();
         <span class="kw">let </span>result = execute_on(conn, graph, serializer, query_schema.as_ref(), trace_id.clone()).<span class="kw">await</span>;
-        <span class="macro">histogram!</span>(PRISMA_CLIENT_QUERIES_DURATION_HISTOGRAM_MS, operation_timer.elapsed());
+
+        <span class="attr">#[cfg(feature = <span class="string">&quot;metrics&quot;</span>)]
+        </span><span class="macro">histogram!</span>(PRISMA_CLIENT_QUERIES_DURATION_HISTOGRAM_MS, operation_timer.elapsed());
 
         <span class="kw">match </span>result {
             <span class="prelude-val">Ok</span>(result) =&gt; results.push(<span class="prelude-val">Ok</span>(result)),
@@ -379,7 +398,8 @@
 
     <span class="kw">let </span>dispatcher = <span class="kw">crate</span>::get_current_dispatcher();
     <span class="kw">for </span>op <span class="kw">in </span>operations {
-        <span class="macro">increment_counter!</span>(PRISMA_CLIENT_QUERIES_TOTAL);
+        <span class="attr">#[cfg(feature = <span class="string">&quot;metrics&quot;</span>)]
+        </span><span class="macro">increment_counter!</span>(PRISMA_CLIENT_QUERIES_TOTAL);
 
         <span class="kw">let </span>conn_span = <span class="macro">info_span!</span>(
             <span class="string">&quot;prisma:engine:connection&quot;</span>,
@@ -439,7 +459,8 @@
         execute_self_contained_without_retry(conn, graph, serializer, force_transactions, <span class="kw-2">&amp;</span>query_schema, trace_id).<span class="kw">await
     </span>};
 
-    <span class="macro">histogram!</span>(PRISMA_CLIENT_QUERIES_DURATION_HISTOGRAM_MS, operation_timer.elapsed());
+    <span class="attr">#[cfg(feature = <span class="string">&quot;metrics&quot;</span>)]
+    </span><span class="macro">histogram!</span>(PRISMA_CLIENT_QUERIES_DURATION_HISTOGRAM_MS, operation_timer.elapsed());
 
     result
 }
@@ -540,7 +561,8 @@
     query_schema: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>QuerySchema,
     trace_id: <span class="prelude-ty">Option</span>&lt;String&gt;,
 ) -&gt; <span class="kw">crate</span>::Result&lt;ResponseData&gt; {
-    <span class="macro">increment_counter!</span>(PRISMA_CLIENT_QUERIES_TOTAL);
+    <span class="attr">#[cfg(feature = <span class="string">&quot;metrics&quot;</span>)]
+    </span><span class="macro">increment_counter!</span>(PRISMA_CLIENT_QUERIES_TOTAL);
 
     <span class="kw">let </span>interpreter = QueryInterpreter::new(conn);
     QueryPipeline::new(graph, interpreter, serializer)
