@@ -91,7 +91,7 @@ test-libsql-sqlite: dev-libsql-sqlite test-qe-st
 
 test-driver-adapter-libsql: test-libsql-sqlite
 
-dev-libsql-sqlite-wasm: build-qe-napi build-connector-kit-js
+dev-libsql-sqlite-wasm: build-qe-wasm build-connector-kit-js
 	cp $(CONFIG_PATH)/libsql-sqlite-wasm $(CONFIG_FILE)
 
 test-libsql-sqlite-wasm: dev-libsql-sqlite-wasm test-qe-st
@@ -126,14 +126,14 @@ start-postgres13:
 dev-postgres13: start-postgres13
 	cp $(CONFIG_PATH)/postgres13 $(CONFIG_FILE)
 
-start-pg-postgres13: build-qe-napi build-connector-kit-js start-postgres13
+start-pg-postgres13: start-postgres13
 
-dev-pg-postgres13: start-pg-postgres13
+dev-pg-postgres13: start-pg-postgres13 build-qe-napi build-connector-kit-js
 	cp $(CONFIG_PATH)/pg-postgres13 $(CONFIG_FILE)
 
 test-pg-postgres13: dev-pg-postgres13 test-qe-st
 
-dev-pg-postgres13-wasm: start-pg-postgres13
+dev-pg-postgres13-wasm: start-pg-postgres13 build-qe-wasm build-connector-kit-js
 	cp $(CONFIG_PATH)/pg-postgres13-wasm $(CONFIG_FILE)
 
 test-pg-postgres13-wasm: dev-pg-postgres13-wasm test-qe-st
@@ -148,7 +148,7 @@ dev-neon-ws-postgres13: start-neon-postgres13 build-qe-napi build-connector-kit-
 
 test-neon-ws-postgres13: dev-neon-ws-postgres13 test-qe-st
 
-dev-neon-ws-postgres13-wasm: start-neon-postgres13 build-qe-napi build-connector-kit-js
+dev-neon-ws-postgres13-wasm: start-neon-postgres13 build-qe-wasm build-connector-kit-js
 	cp $(CONFIG_PATH)/neon-ws-postgres13-wasm $(CONFIG_FILE)
 
 test-neon-ws-postgres13-wasm: dev-neon-ws-postgres13-wasm test-qe-st
@@ -285,7 +285,7 @@ dev-planetscale-vitess8: start-planetscale-vitess8 build-qe-napi build-connector
 
 test-planetscale-vitess8: dev-planetscale-vitess8 test-qe-st
 
-dev-planetscale-vitess8-wasm: start-planetscale-vitess8 build-qe-napi build-connector-kit-js
+dev-planetscale-vitess8-wasm: start-planetscale-vitess8 build-qe-wasm build-connector-kit-js
 	cp $(CONFIG_PATH)/planetscale-vitess8-wasm $(CONFIG_FILE)
 
 test-planetscale-vitess8-wasm: dev-planetscale-vitess8-wasm test-qe-st
@@ -298,6 +298,9 @@ test-driver-adapter-planetscale: test-planetscale-vitess8
 
 build-qe-napi:
 	cargo build --package query-engine-node-api
+
+build-qe-wasm:
+	cd query-engine/query-engine-wasm && ./build.sh
 
 build-connector-kit-js: build-driver-adapters
 	cd query-engine/driver-adapters && pnpm i && pnpm build

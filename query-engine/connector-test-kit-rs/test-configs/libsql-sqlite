@@ -2,5 +2,5 @@
     "connector": "sqlite",
     "driver_adapter": "libsql",
     "external_test_executor": "default",
-    "external_test_executor_engine": "NAPI"
+    "external_test_executor_engine": "Napi"
 }

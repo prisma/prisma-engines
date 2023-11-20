@@ -1,5 +1,4 @@
 import type { ErrorCapturingDriverAdapter } from '@prisma/driver-adapter-utils'
-import { WasmQueryEngine } from './wasm'
 import * as napi from './engines/Library'
 import * as os from 'node:os'
 import * as path from 'node:path'
@@ -19,7 +18,7 @@ export interface QueryEngine {
 export type QueryLogCallback = (log: string) => void
 
 
-export function initQueryEngine(adapter: ErrorCapturingDriverAdapter, datamodel: string, queryLogCallback: QueryLogCallback, debug: (...args: any[]) => void): QueryEngine {
+export async function initQueryEngine(adapter: ErrorCapturingDriverAdapter, datamodel: string, queryLogCallback: QueryLogCallback, debug: (...args: any[]) => void): QueryEngine {
 
     const queryEngineOptions = {
         datamodel,
@@ -40,14 +39,15 @@ export function initQueryEngine(adapter: ErrorCapturingDriverAdapter, datamodel:
         debug(parsed)
     }
 
-    const engineFromEnv = process.env.EXTERNAL_TEST_EXECUTOR_ENGINE ?? 'napi'
-    if (engineFromEnv === 'WASM') {
+    const engineFromEnv = process.env.EXTERNAL_TEST_EXECUTOR_ENGINE ?? 'Napi'
+    if (engineFromEnv === 'Wasm') {
+        const { WasmQueryEngine } = await import('./wasm')
         return  new WasmQueryEngine(queryEngineOptions, logCallback, adapter)
-    } else if (engineFromEnv === 'NAPI') {
+    } else if (engineFromEnv === 'Napi') {
         const { QueryEngine } = loadNapiEngine()
         return new QueryEngine(queryEngineOptions, logCallback, adapter)
     } else {
-        throw new TypeError(`Invalid EXTERNAL_TEST_EXECUTOR_ENGINE value: ${engineFromEnv}. Expected NAPI or WASM`)
+        throw new TypeError(`Invalid EXTERNAL_TEST_EXECUTOR_ENGINE value: ${engineFromEnv}. Expected Napi or Wasm`)
     }
 
 

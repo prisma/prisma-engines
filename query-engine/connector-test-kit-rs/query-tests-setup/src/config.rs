@@ -8,17 +8,17 @@ use std::{convert::TryFrom, env, fmt::Display, fs::File, io::Read, path::PathBuf
 static TEST_CONFIG_FILE_NAME: &str = ".test_config";
 
 #[derive(Debug, Default, Deserialize, Clone)]
-enum TestExecutorEngine {
+pub enum TestExecutorEngine {
     #[default]
-    NAPI,
-    WASM,
+    Napi,
+    Wasm,
 }
 
 impl Display for TestExecutorEngine {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            TestExecutorEngine::NAPI => f.write_str("NAPI"),
-            TestExecutorEngine::WASM => f.write_str("WASM"),
+            TestExecutorEngine::Napi => f.write_str("Napi"),
+            TestExecutorEngine::Wasm => f.write_str("Wasm"),
         }
     }
 }
@@ -130,7 +130,7 @@ impl TestConfig {
         println!("* CI? {}", self.is_ci);
         if self.external_test_executor.as_ref().is_some() {
             println!("* External test executor: {}", self.external_test_executor().unwrap_or_default());
-            println!("* External test executor engine: {:?}", self.external_test_executor().unwrap_or_default());
+            println!("* External test executor engine: {:?}", self.external_test_executor_engine().unwrap_or_default());
             println!("* Driver adapter: {}", self.driver_adapter().unwrap_or_default());
             println!("* Driver adapter url override: {}", self.json_stringify_driver_adapter_config());
         }
@@ -294,6 +294,10 @@ impl TestConfig {
 
     pub fn external_test_executor(&self) -> Option<&str> {
         self.external_test_executor.as_deref()
+    }
+
+    pub fn external_test_executor_engine(&self) -> Option<TestExecutorEngine> {
+        self.external_test_executor_engine.clone()
     }
 
     pub fn driver_adapter(&self) -> Option<&str> {

@@ -217,7 +217,7 @@ function respondOk(requestId: number, payload: unknown) {
 async function initQe(url: string, prismaSchema: string, logCallback: qe.QueryLogCallback): Promise<[qe.QueryEngine, ErrorCapturingDriverAdapter]> {
     const adapter = await adapterFromEnv(url) as DriverAdapter
     const errorCapturingAdapter = bindAdapter(adapter)
-    const engineInstance = qe.initQueryEngine(errorCapturingAdapter, prismaSchema, logCallback, debug)
+    const engineInstance = await qe.initQueryEngine(errorCapturingAdapter, prismaSchema, logCallback, debug)
     return [engineInstance, errorCapturingAdapter];
 }
 
