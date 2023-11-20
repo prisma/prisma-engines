@@ -3,9 +3,25 @@ use crate::{
     PostgresConnectorTag, SqlServerConnectorTag, SqliteConnectorTag, TestResult, VitessConnectorTag,
 };
 use serde::Deserialize;
-use std::{convert::TryFrom, env, fs::File, io::Read, path::PathBuf};
+use std::{convert::TryFrom, env, fmt::Display, fs::File, io::Read, path::PathBuf};
 
 static TEST_CONFIG_FILE_NAME: &str = ".test_config";
+
+#[derive(Debug, Default, Deserialize, Clone)]
+enum TestExecutorEngine {
+    #[default]
+    NAPI,
+    WASM,
+}
+
+impl Display for TestExecutorEngine {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            TestExecutorEngine::NAPI => f.write_str("NAPI"),
+            TestExecutorEngine::WASM => f.write_str("WASM"),
+        }
+    }
+}
 
 /// The central test configuration.
 #[derive(Debug, Default, Deserialize)]
@@ -26,6 +42,11 @@ pub struct TestConfig {
     /// driver adapter.
     /// Env key: `EXTERNAL_TEST_EXECUTOR`
     external_test_executor: Option<String>,
+
+    /// Specifies which engine to use within external test executor.
+    /// If omitted, NAPI engine will be used.
+    /// Env key: `EXTERNAL_TEST_EXECUTOR_ENGINE`
+    external_test_executor_engine: Option<TestExecutorEngine>,
 
     /// The driver adapter to use when running tests, will be forwarded to the external test
     /// executor by setting the `DRIVER_ADAPTER` env var when spawning the executor process
@@ -109,6 +130,7 @@ impl TestConfig {
         println!("* CI? {}", self.is_ci);
         if self.external_test_executor.as_ref().is_some() {
             println!("* External test executor: {}", self.external_test_executor().unwrap_or_default());
+            println!("* External test executor engine: {:?}", self.external_test_executor().unwrap_or_default());
             println!("* Driver adapter: {}", self.driver_adapter().unwrap_or_default());
             println!("* Driver adapter url override: {}", self.json_stringify_driver_adapter_config());
         }
@@ -119,6 +141,10 @@ impl TestConfig {
         let connector = std::env::var("TEST_CONNECTOR").ok();
         let connector_version = std::env::var("TEST_CONNECTOR_VERSION").ok();
         let external_test_executor = std::env::var("EXTERNAL_TEST_EXECUTOR").ok();
+        let external_test_executor_engine = std::env::var("EXTERNAL_TEST_EXECUTOR_ENGINE")
+            .map(|value| serde_json::from_str::<TestExecutorEngine>(&value).ok())
+            .unwrap_or_default();
+
         let driver_adapter = std::env::var("DRIVER_ADAPTER").ok();
         let driver_adapter_config = std::env::var("DRIVER_ADAPTER_CONFIG")
             .map(|config| serde_json::from_str::<serde_json::Value>(config.as_str()).ok())
@@ -134,6 +160,7 @@ impl TestConfig {
             external_test_executor,
             driver_adapter,
             driver_adapter_config,
+            external_test_executor_engine,
         })
     }
 
@@ -234,6 +261,12 @@ impl TestConfig {
             );
         }
 
+        if self.external_test_executor_engine.is_some() && self.external_test_executor.is_none() {
+            exit_with_message(
+                "External test executor engine can be used only if EXTERNAL_TEST_EXECUTOR env var is set.",
+            );
+        }
+
         if self.driver_adapter.is_some() && self.external_test_executor.is_none() {
             exit_with_message(
                 "When using a driver adapter, the external test executor (EXTERNAL_TEST_EXECUTOR env var) must be set.",
@@ -294,10 +327,15 @@ impl TestConfig {
         vec!(
             (
                 "DRIVER_ADAPTER".to_string(), 
-                self.driver_adapter.clone().unwrap_or_default()),
+                self.driver_adapter.clone().unwrap_or_default()
+            ),
             (
                 "DRIVER_ADAPTER_CONFIG".to_string(),
                 self.json_stringify_driver_adapter_config()
+            ),
+            (
+                "EXTERNAL_TEST_EXECUTOR_ENGINE".to_string(),
+                self.external_test_executor_engine.clone().unwrap_or_default().to_string(),
             ),
             (
                 "PRISMA_DISABLE_QUAINT_EXECUTORS".to_string(),
