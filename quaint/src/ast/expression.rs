@@ -141,55 +141,6 @@ impl<'a> Expression<'a> {
     pub(crate) fn is_column(&self) -> bool {
         matches!(self.kind, ExpressionKind::Column(_))
     }
-
-    /// Finds all comparisons between a tuple and a selection. If returning some
-    /// CTEs, they should be handled in the calling layer.
-    #[cfg(feature = "mssql")]
-    pub(crate) fn convert_tuple_selects_to_ctes(self, level: &mut usize) -> (Self, Vec<CommonTableExpression<'a>>) {
-        match self.kind {
-            ExpressionKind::Selection(s) => {
-                let (selection, ctes) = s.convert_tuple_selects_to_ctes(level);
-
-                let expr = Expression {
-                    kind: ExpressionKind::Selection(selection),
-                    alias: self.alias,
-                };
-
-                (expr, ctes)
-            }
-            ExpressionKind::Compare(compare) => match compare.convert_tuple_select_to_cte(level) {
-                // No conversion
-                either::Either::Left(compare) => {
-                    let expr = Expression {
-                        kind: ExpressionKind::Compare(compare),
-                        alias: self.alias,
-                    };
-
-                    (expr, Vec::new())
-                }
-                // Conversion happened
-                either::Either::Right((comp, ctes)) => {
-                    let expr = Expression {
-                        kind: ExpressionKind::Compare(comp),
-                        alias: self.alias,
-                    };
-
-                    (expr, ctes)
-                }
-            },
-            ExpressionKind::ConditionTree(tree) => {
-                let (tree, ctes) = tree.convert_tuple_selects_to_ctes(level);
-
-                let expr = Expression {
-                    kind: ExpressionKind::ConditionTree(tree),
-                    alias: self.alias,
-                };
-
-                (expr, ctes)
-            }
-            _ => (self, Vec::new()),
-        }
-    }
 }
 
 /// An expression we can compare and use in database queries.

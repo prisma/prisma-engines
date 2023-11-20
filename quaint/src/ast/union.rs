@@ -113,37 +113,6 @@ impl<'a> Union<'a> {
             .into_iter()
             .collect()
     }
-
-    /// Finds all comparisons between tuples and selects in the queries and
-    /// converts them to common table expressions for making the query
-    /// compatible with databases not supporting tuples.
-    #[cfg(feature = "mssql")]
-    pub(crate) fn convert_tuple_selects_into_ctes(
-        mut self,
-        top_level: bool,
-        level: &mut usize,
-    ) -> either::Either<Self, (Self, Vec<CommonTableExpression<'a>>)> {
-        let mut queries = Vec::with_capacity(self.selects.len());
-        let mut combined_ctes = Vec::new();
-
-        for select in self.selects.drain(0..) {
-            let (select, ctes) = select
-                .convert_tuple_selects_to_ctes(false, level)
-                .expect_right("Nested select should always be right.");
-
-            queries.push(select);
-            combined_ctes.extend(ctes);
-        }
-
-        self.selects = queries;
-
-        if top_level {
-            self.ctes = combined_ctes;
-            either::Either::Left(self)
-        } else {
-            either::Either::Right((self, combined_ctes))
-        }
-    }
 }
 
 impl<'a> IntoCommonTableExpression<'a> for Union<'a> {}
