@@ -1,11 +1,15 @@
 mod connection;
 #[cfg(feature = "driver-adapters")]
 mod js;
-mod mssql;
-mod mysql;
-mod postgresql;
-mod sqlite;
 mod transaction;
+
+#[cfg(not(target_arch = "wasm32"))]
+pub(crate) mod native {
+    pub(crate) mod mssql;
+    pub(crate) mod mysql;
+    pub(crate) mod postgresql;
+    pub(crate) mod sqlite;
+}
 
 pub(crate) mod operations;
 
@@ -14,10 +18,9 @@ use connector_interface::{error::ConnectorError, Connector};
 
 #[cfg(feature = "driver-adapters")]
 pub use js::*;
-pub use mssql::*;
-pub use mysql::*;
-pub use postgresql::*;
-pub use sqlite::*;
+
+#[cfg(not(target_arch = "wasm32"))]
+pub use native::{mssql::*, mysql::*, postgresql::*, sqlite::*};
 
 #[async_trait]
 pub trait FromSource {

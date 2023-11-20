@@ -23,7 +23,7 @@ impl SqlSchemaCalculatorFlavour for MssqlFlavour {
         }
     }
 
-    fn push_connector_data(&self, context: &mut super::super::Context<'_>) {
+    fn push_connector_data(&self, context: &mut crate::sql_schema_calculator::Context<'_>) {
         let mut data = MssqlSchemaExt::default();
 
         for model in context.datamodel.db.walk_models() {

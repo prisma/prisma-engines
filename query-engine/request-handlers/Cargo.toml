@@ -5,7 +5,7 @@ edition = "2021"
 
 [dependencies]
 prisma-models = { path = "../prisma-models" }
-query-core = { path = "../core" }
+query-core = { path = "../core", features = ["metrics"] }
 user-facing-errors = { path = "../../libs/user-facing-errors" }
 psl.workspace = true
 dmmf_crate = { path = "../dmmf", package = "dmmf" }

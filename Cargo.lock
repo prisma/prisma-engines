@@ -3680,6 +3680,7 @@ dependencies = [
  "once_cell",
  "opentelemetry",
  "petgraph 0.4.13",
+ "pin-project",
  "prisma-models",
  "psl",
  "query-connector",
@@ -3695,6 +3696,7 @@ dependencies = [
  "tracing-subscriber",
  "user-facing-errors",
  "uuid",
+ "wasm-bindgen-futures",
 ]
 
 [[package]]
@@ -3822,9 +3824,13 @@ dependencies = [
  "log",
  "prisma-models",
  "psl",
+ "quaint",
+ "query-connector",
+ "query-core",
  "serde",
  "serde-wasm-bindgen",
  "serde_json",
+ "sql-query-connector",
  "thiserror",
  "tokio",
  "tracing",

@@ -16,7 +16,7 @@ driver-adapters = ["request-handlers/driver-adapters", "sql-connector/driver-ada
 [dependencies]
 anyhow = "1"
 async-trait = "0.1"
-query-core = { path = "../core" }
+query-core = { path = "../core", features = ["metrics"] }
 request-handlers = { path = "../request-handlers" }
 query-connector = { path = "../connectors/query-connector" }
 user-facing-errors = { path = "../../libs/user-facing-errors" }

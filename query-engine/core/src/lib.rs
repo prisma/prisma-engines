@@ -9,6 +9,8 @@ pub mod protocol;
 pub mod query_document;
 pub mod query_graph_builder;
 pub mod response_ir;
+
+#[cfg(feature = "metrics")]
 pub mod telemetry;
 
 pub use self::{
@@ -16,8 +18,11 @@ pub use self::{
     executor::{QueryExecutor, TransactionOptions},
     interactive_transactions::{ExtendedTransactionUserFacingError, TransactionError, TxId},
     query_document::*,
-    telemetry::*,
 };
+
+#[cfg(feature = "metrics")]
+pub use self::telemetry::*;
+
 pub use connector::{
     error::{ConnectorError, ErrorKind as ConnectorErrorKind},
     Connector,

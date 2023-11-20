@@ -1,3 +1,5 @@
+#![cfg_attr(target_arch = "wasm32", allow(dead_code))]
+
 use super::{catch, transaction::SqlConnectorTransaction};
 use crate::{database::operations::*, Context, SqlError};
 use async_trait::async_trait;
