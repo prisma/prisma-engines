@@ -93,18 +93,26 @@ mod create {
     }
 
     // A Create Mutation should create and return item with explicit null attributes
-    // TODO: Flaky test on Cockroach, re-enable once figured out
-    #[connector_test(exclude(CockroachDb))]
+    #[connector_test]
     async fn return_item_explicit_null_attrs(runner: Runner) -> TestResult<()> {
+        let res = retry!(
+            {
+                runner.query(
+                    r#"mutation {
+                      createOneScalarModel(data: {
+                        id: "1",
+                        optString: null, optInt: null, optBoolean: null, optEnum: null, optFloat: null
+                      }){
+                        optString, optInt, optFloat, optBoolean, optEnum
+                      }
+                    }"#,
+                )
+            },
+            5
+        );
+
         insta::assert_snapshot!(
-          run_query!(&runner, r#"mutation {
-            createOneScalarModel(data: {
-              id: "1",
-              optString: null, optInt: null, optBoolean: null, optEnum: null, optFloat: null
-            }){
-              optString, optInt, optFloat, optBoolean, optEnum
-            }
-          }"#),
+          res.to_string(),
           @r###"{"data":{"createOneScalarModel":{"optString":null,"optInt":null,"optFloat":null,"optBoolean":null,"optEnum":null}}}"###
         );
 
@@ -128,7 +136,7 @@ mod create {
     }
 
     // A Create Mutation should create and return item with explicit null values after previous mutation with explicit non-null values
-    #[connector_test(exclude(CockroachDb))]
+    #[connector_test]
     async fn return_item_non_null_attrs_then_explicit_null_attrs(runner: Runner) -> TestResult<()> {
         insta::assert_snapshot!(
           run_query!(&runner, r#"mutation {
@@ -221,11 +229,15 @@ mod create {
     }
 
     // "A Create Mutation" should "create and return an item with enums passed as strings"
-    // TODO: Flaky test on Cockroach, re-enable once figured out
-    #[connector_test(exclude(CockroachDb))]
+    #[connector_test]
     async fn return_enums_passed_as_strings(runner: Runner) -> TestResult<()> {
+        let res = retry!(
+            { runner.query(r#"mutation {createOneScalarModel(data: {id: "1", optEnum: "A"}){ optEnum }}"#) },
+            5
+        );
+
         insta::assert_snapshot!(
-          run_query!(&runner, r#"mutation {createOneScalarModel(data: {id: "1", optEnum: "A"}){ optEnum }}"#),
+          res.to_string(),
           @r###"{"data":{"createOneScalarModel":{"optEnum":"A"}}}"###
         );
 

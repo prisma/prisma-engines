@@ -86,8 +86,7 @@ mod combinations {
         Ok(())
     }
 
-    // Mongo precision issue.
-    #[connector_test(exclude(MongoDB))]
+    #[connector_test]
     async fn with_query_args(runner: Runner) -> TestResult<()> {
         create_row(&runner, r#"{ id: "1", float: 5.5, int: 5 }"#).await?;
         create_row(&runner, r#"{ id: "2", float: 4.5, int: 10 }"#).await?;
@@ -368,8 +367,7 @@ mod decimal_combinations {
         Ok(())
     }
 
-    // Mongo precision issue.
-    #[connector_test(exclude(MongoDB))]
+    #[connector_test]
     async fn with_query_args(runner: Runner) -> TestResult<()> {
         create_row(&runner, r#"{ id: "1", dec: "5.5" }"#).await?;
         create_row(&runner, r#"{ id: "2", dec: "4.5" }"#).await?;
