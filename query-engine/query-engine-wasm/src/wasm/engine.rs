@@ -210,15 +210,109 @@ impl QueryEngine {
     /// Connect to the database, allow queries to be run.
     #[wasm_bindgen]
     pub async fn connect(&self, trace: String) -> Result<(), wasm_bindgen::JsError> {
-        log::info!("Called `QueryEngine::connect()`");
+        async_panic_to_js_error(async {
+            let span = tracing::info_span!("prisma:engine:connect");
+
+            let mut inner = self.inner.write().await;
+            let builder = inner.as_builder()?;
+            let arced_schema = Arc::clone(&builder.schema);
+            let arced_schema_2 = Arc::clone(&builder.schema);
+
+            let url = {
+                let data_source = builder
+                    .schema
+                    .configuration
+                    .datasources
+                    .first()
+                    .ok_or_else(|| ApiError::configuration("No valid data source found"))?;
+                data_source
+                    .load_url_with_config_dir(&builder.config_dir, |key| builder.env.get(key).map(ToString::to_string))
+                    .map_err(|err| crate::error::ApiError::Conversion(err, builder.schema.db.source().to_owned()))?
+            };
+
+            let engine = async move {
+                // We only support one data source & generator at the moment, so take the first one (default not exposed yet).
+                let data_source = arced_schema
+                    .configuration
+                    .datasources
+                    .first()
+                    .ok_or_else(|| ApiError::configuration("No valid data source found"))?;
+
+                let preview_features = arced_schema.configuration.preview_features();
+
+                let executor_fut = async {
+                    let executor = load_executor(self.connector_mode, data_source, preview_features, &url).await?;
+                    let connector = executor.primary_connector();
+
+                    let conn_span = tracing::info_span!(
+                        "prisma:engine:connection",
+                        user_facing = true,
+                        "db.type" = connector.name(),
+                    );
+
+                    connector.get_connection().instrument(conn_span).await?;
+
+                    crate::Result::<_>::Ok(executor)
+                };
+
+                let query_schema_span = tracing::info_span!("prisma:engine:schema");
+                let query_schema_fut = tokio::runtime::Handle::current()
+                    .spawn_blocking(move || {
+                        let enable_raw_queries = true;
+                        schema::build(arced_schema_2, enable_raw_queries)
+                    })
+                    .instrument(query_schema_span);
+
+                let (query_schema, executor) = tokio::join!(query_schema_fut, executor_fut);
+
+                Ok(ConnectedEngine {
+                    schema: builder.schema.clone(),
+                    query_schema: Arc::new(query_schema.unwrap()),
+                    executor: executor?,
+                    config_dir: builder.config_dir.clone(),
+                    env: builder.env.clone(),
+                    engine_protocol: builder.engine_protocol,
+                }) as crate::Result<ConnectedEngine>
+            }
+            .instrument(span)
+            .await?;
+
+            *inner = Inner::Connected(engine);
+
+            Ok(())
+        })
+        .await?;
+
         Ok(())
     }
 
     /// Disconnect and drop the core. Can be reconnected later with `#connect`.
     #[wasm_bindgen]
     pub async fn disconnect(&self, trace: String) -> Result<(), wasm_bindgen::JsError> {
-        log::info!("Called `QueryEngine::disconnect()`");
-        Ok(())
+        async_panic_to_js_error(async {
+            let span = tracing::info_span!("prisma:engine:disconnect");
+
+            // TODO: when using Node Drivers, we need to call Driver::close() here.
+
+            async {
+                let mut inner = self.inner.write().await;
+                let engine = inner.as_engine()?;
+
+                let builder = EngineBuilder {
+                    schema: engine.schema.clone(),
+                    config_dir: engine.config_dir.clone(),
+                    env: engine.env.clone(),
+                    engine_protocol: engine.engine_protocol(),
+                };
+
+                *inner = Inner::Builder(builder);
+
+                Ok(())
+            }
+            .instrument(span)
+            .await
+        })
+        .await
     }
 
     /// If connected, sends a query to the core and returns the response.
