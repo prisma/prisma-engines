@@ -5,17 +5,29 @@ use crate::{
     error::ApiError,
     logger::{LogCallback, Logger},
 };
+use futures::FutureExt;
 use js_sys::{Function as JsFunction, Object as JsObject};
+use query_core::{
+    protocol::EngineProtocol,
+    schema::{self, QuerySchema},
+    QueryExecutor, TransactionOptions, TxId,
+};
 use request_handlers::ConnectorMode;
+use request_handlers::{dmmf, load_executor, render_graphql_schema, RequestBody, RequestHandler};
 use serde::{Deserialize, Serialize};
+use serde_json::json;
 use std::{
     collections::{BTreeMap, HashMap},
+    future::Future,
+    panic::AssertUnwindSafe,
     path::PathBuf,
     sync::Arc,
 };
 use tokio::sync::RwLock;
+use tracing::{field, Instrument, Span};
 use tracing_subscriber::filter::LevelFilter;
 use tsify::Tsify;
+use user_facing_errors::Error;
 use wasm_bindgen::prelude::wasm_bindgen;
 
 /// The main query engine used by JS
@@ -40,13 +52,17 @@ struct EngineBuilder {
     schema: Arc<psl::ValidatedSchema>,
     config_dir: PathBuf,
     env: HashMap<String, String>,
+    engine_protocol: EngineProtocol,
 }
 
 /// Internal structure for querying and reconnecting with the engine.
 struct ConnectedEngine {
     schema: Arc<psl::ValidatedSchema>,
+    query_schema: Arc<QuerySchema>,
+    executor: crate::Executor,
     config_dir: PathBuf,
     env: HashMap<String, String>,
+    engine_protocol: EngineProtocol,
 }
 
 /// Returned from the `serverInfo` method in javascript.
@@ -56,6 +72,22 @@ struct ServerInfo {
     commit: String,
     version: String,
     primary_connector: Option<String>,
+}
+
+impl ConnectedEngine {
+    /// The schema AST for Query Engine core.
+    pub fn query_schema(&self) -> &Arc<QuerySchema> {
+        &self.query_schema
+    }
+
+    /// The query executor.
+    pub fn executor(&self) -> &(dyn QueryExecutor + Send + Sync) {
+        self.executor.as_ref()
+    }
+
+    pub fn engine_protocol(&self) -> EngineProtocol {
+        self.engine_protocol
+    }
 }
 
 /// Parameters defining the construction of an engine.
@@ -75,7 +107,7 @@ pub struct ConstructorOptions {
     #[serde(default)]
     ignore_env_var_errors: bool,
     #[serde(default)]
-    engine_protocol: Option<String>,
+    engine_protocol: Option<EngineProtocol>,
 }
 
 impl Inner {
@@ -154,9 +186,12 @@ impl QueryEngine {
             .validate_that_one_datasource_is_provided()
             .map_err(|errors| ApiError::conversion(errors, schema.db.source()))?;
 
+        let engine_protocol = engine_protocol.unwrap_or(EngineProtocol::Json);
+
         let builder = EngineBuilder {
             schema: Arc::new(schema),
             config_dir,
+            engine_protocol,
             env,
         };
 
@@ -194,42 +229,122 @@ impl QueryEngine {
         trace: String,
         tx_id: Option<String>,
     ) -> Result<String, wasm_bindgen::JsError> {
-        log::info!("Called `QueryEngine::query()`");
-        Err(ApiError::configuration("Can't use `query` until `request_handlers` is Wasm-compatible.").into())
+        async_panic_to_js_error(async {
+            let inner = self.inner.read().await;
+            let engine = inner.as_engine()?;
+
+            let query = RequestBody::try_from_str(&body, engine.engine_protocol())?;
+
+            async move {
+                let span = if tx_id.is_none() {
+                    tracing::info_span!("prisma:engine", user_facing = true)
+                } else {
+                    Span::none()
+                };
+
+                let handler = RequestHandler::new(engine.executor(), engine.query_schema(), engine.engine_protocol());
+                let response = handler
+                    .handle(query, tx_id.map(TxId::from), None)
+                    .instrument(span)
+                    .await;
+
+                Ok(serde_json::to_string(&response)?)
+            }
+            .await
+        })
+        .await
     }
 
     /// If connected, attempts to start a transaction in the core and returns its ID.
     #[wasm_bindgen(js_name = startTransaction)]
     pub async fn start_transaction(&self, input: String, trace: String) -> Result<String, wasm_bindgen::JsError> {
-        log::info!("Called `QueryEngine::start_transaction()`");
-        Err(ApiError::configuration("Can't use `start_transaction` until `query_core` is Wasm-compatible.").into())
+        async_panic_to_js_error(async {
+            let inner = self.inner.read().await;
+            let engine = inner.as_engine()?;
+
+            async move {
+                let span = tracing::info_span!("prisma:engine:itx_runner", user_facing = true, itx_id = field::Empty);
+
+                let tx_opts: TransactionOptions = serde_json::from_str(&input)?;
+                match engine
+                    .executor()
+                    .start_tx(engine.query_schema().clone(), engine.engine_protocol(), tx_opts)
+                    .instrument(span)
+                    .await
+                {
+                    Ok(tx_id) => Ok(json!({ "id": tx_id.to_string() }).to_string()),
+                    Err(err) => Ok(map_known_error(err)?),
+                }
+            }
+            .await
+        })
+        .await
     }
 
     /// If connected, attempts to commit a transaction with id `tx_id` in the core.
     #[wasm_bindgen(js_name = commitTransaction)]
     pub async fn commit_transaction(&self, tx_id: String, trace: String) -> Result<String, wasm_bindgen::JsError> {
-        log::info!("Called `QueryEngine::commit_transaction()`");
-        Err(ApiError::configuration("Can't use `commit_transaction` until `query_core` is Wasm-compatible.").into())
+        async_panic_to_js_error(async {
+            let inner = self.inner.read().await;
+            let engine = inner.as_engine()?;
+
+            async move {
+                match engine.executor().commit_tx(TxId::from(tx_id)).await {
+                    Ok(_) => Ok("{}".to_string()),
+                    Err(err) => Ok(map_known_error(err)?),
+                }
+            }
+            .await
+        })
+        .await
     }
 
     #[wasm_bindgen]
     pub async fn dmmf(&self, trace: String) -> Result<String, wasm_bindgen::JsError> {
-        log::info!("Called `QueryEngine::dmmf()`");
-        Err(ApiError::configuration("Can't use `dmmf` until `request_handlers` is Wasm-compatible.").into())
+        async_panic_to_js_error(async {
+            let inner = self.inner.read().await;
+            let engine = inner.as_engine()?;
+
+            let dmmf = dmmf::render_dmmf(&engine.query_schema);
+
+            let json = {
+                let _span = tracing::info_span!("prisma:engine:dmmf_to_json").entered();
+                serde_json::to_string(&dmmf)?
+            };
+
+            Ok(json)
+        })
+        .await
     }
 
     /// If connected, attempts to roll back a transaction with id `tx_id` in the core.
     #[wasm_bindgen(js_name = rollbackTransaction)]
     pub async fn rollback_transaction(&self, tx_id: String, trace: String) -> Result<String, wasm_bindgen::JsError> {
-        log::info!("Called `QueryEngine::rollback_transaction()`");
-        Ok("{}".to_owned())
+        async_panic_to_js_error(async {
+            let inner = self.inner.read().await;
+            let engine = inner.as_engine()?;
+
+            async move {
+                match engine.executor().rollback_tx(TxId::from(tx_id)).await {
+                    Ok(_) => Ok("{}".to_string()),
+                    Err(err) => Ok(map_known_error(err)?),
+                }
+            }
+            .await
+        })
+        .await
     }
 
     /// Loads the query schema. Only available when connected.
     #[wasm_bindgen(js_name = sdlSchema)]
     pub async fn sdl_schema(&self) -> Result<String, wasm_bindgen::JsError> {
-        log::info!("Called `QueryEngine::sdl_schema()`");
-        Ok("{}".to_owned())
+        async_panic_to_js_error(async move {
+            let inner = self.inner.read().await;
+            let engine = inner.as_engine()?;
+
+            Ok(render_graphql_schema(engine.query_schema()))
+        })
+        .await
     }
 
     #[wasm_bindgen]
@@ -237,6 +352,13 @@ impl QueryEngine {
         log::info!("Called `QueryEngine::metrics()`");
         Err(ApiError::configuration("Metrics is not enabled in Wasm.").into())
     }
+}
+
+fn map_known_error(err: query_core::CoreError) -> crate::Result<String> {
+    let user_error: user_facing_errors::Error = err.into();
+    let value = serde_json::to_string(&user_error)?;
+
+    Ok(value)
 }
 
 fn stringify_env_values(origin: serde_json::Value) -> crate::Result<HashMap<String, String>> {
@@ -268,4 +390,17 @@ fn stringify_env_values(origin: serde_json::Value) -> crate::Result<HashMap<Stri
     };
 
     Err(ApiError::JsonDecode(msg.to_string()))
+}
+
+async fn async_panic_to_js_error<F, R>(fut: F) -> Result<R, wasm_bindgen::JsError>
+where
+    F: Future<Output = Result<R, wasm_bindgen::JsError>>,
+{
+    match AssertUnwindSafe(fut).catch_unwind().await {
+        Ok(result) => result,
+        Err(err) => match Error::extract_panic_message(err) {
+            Some(message) => Err(wasm_bindgen::JsError::new(&format!("PANIC: {message}"))),
+            None => Err(wasm_bindgen::JsError::new("PANIC: unknown panic")),
+        },
+    }
 }

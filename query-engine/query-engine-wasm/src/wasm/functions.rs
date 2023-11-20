@@ -1,5 +1,7 @@
 use crate::error::ApiError;
+use request_handlers::dmmf;
 use serde::Serialize;
+use std::sync::Arc;
 use tsify::Tsify;
 use wasm_bindgen::prelude::wasm_bindgen;
 
@@ -28,12 +30,10 @@ pub fn dmmf(datamodel_string: String) -> Result<String, wasm_bindgen::JsError> {
         .to_result()
         .map_err(|errors| ApiError::conversion(errors, schema.db.source()))?;
 
-    Ok("{}".to_string())
+    let query_schema = query_core::schema::build(Arc::new(schema), true);
+    let dmmf = dmmf::render_dmmf(&query_schema);
 
-    // let query_schema = query_core::schema::build(Arc::new(schema), true);
-    // let dmmf = dmmf::render_dmmf(&query_schema);
-
-    // Ok(serde_json::to_string(&dmmf)?)
+    Ok(serde_json::to_string(&dmmf)?)
 }
 
 #[wasm_bindgen]
