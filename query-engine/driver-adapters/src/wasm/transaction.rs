@@ -1,5 +1,4 @@
 use async_trait::async_trait;
-use ducktor::FromJsValue as DuckType;
 use metrics::decrement_gauge;
 use quaint::{
     connector::{IsolationLevel, Transaction as QuaintTransaction},

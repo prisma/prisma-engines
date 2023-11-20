@@ -1,6 +1,6 @@
 use ducktor::FromJsValue as DuckType;
 use futures::Future;
-use js_sys::{Function as JsFunction, Object as JsObject, Promise as JsPromise};
+use js_sys::{Function as JsFunction, Object as JsObject};
 
 use super::{async_js_function::AsyncJsFunction, send_future::SendFuture, transaction::JsTransaction};
 pub use crate::types::{ColumnType, JSResultSet, Query, TransactionOptions};

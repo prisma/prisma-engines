@@ -1,9 +1,9 @@
-use js_sys::{Function as JsFunction, Object as JsObject, Promise as JsPromise};
+use js_sys::{Function as JsFunction, Promise as JsPromise};
 use serde::{de::DeserializeOwned, Serialize};
 use std::marker::PhantomData;
-use wasm_bindgen::convert::{FromWasmAbi, WasmAbi};
+use wasm_bindgen::convert::FromWasmAbi;
 use wasm_bindgen::describe::WasmDescribe;
-use wasm_bindgen::{prelude::wasm_bindgen, JsError, JsValue};
+use wasm_bindgen::{JsError, JsValue};
 use wasm_bindgen_futures::JsFuture;
 
 use super::error::into_quaint_error;
