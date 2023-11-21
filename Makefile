@@ -49,8 +49,11 @@ ifndef DRIVER_ADAPTER
 	cargo test --package query-engine-tests
 else
 	@echo "Executing query engine tests with $(DRIVER_ADAPTER) driver adapter"; \
-	# Add your actual command for the "test-driver-adapter" task here
-	$(MAKE) test-driver-adapter-$(DRIVER_ADAPTER);
+	if [ "$(ENGINE)" = "wasm" ]; then \
+		$(MAKE) test-driver-adapter-$(DRIVER_ADAPTER)-wasm; \
+	else \
+		$(MAKE) test-driver-adapter-$(DRIVER_ADAPTER); \
+	fi
 endif
 
 test-qe-verbose:
@@ -95,6 +98,7 @@ dev-libsql-sqlite-wasm: build-qe-wasm build-connector-kit-js
 	cp $(CONFIG_PATH)/libsql-sqlite-wasm $(CONFIG_FILE)
 
 test-libsql-sqlite-wasm: dev-libsql-sqlite-wasm test-qe-st
+test-driver-adapter-libsql-sqlite-wasm: test-libsql-sqlite-wasm
 
 start-postgres9:
 	docker compose -f docker-compose.yml up --wait -d --remove-orphans postgres9
@@ -139,6 +143,7 @@ dev-pg-postgres13-wasm: start-pg-postgres13 build-qe-wasm build-connector-kit-js
 test-pg-postgres13-wasm: dev-pg-postgres13-wasm test-qe-st
 
 test-driver-adapter-pg: test-pg-postgres13
+test-driver-adapter-pg-wasm: test-pg-postgres13-wasm
 
 start-neon-postgres13:
 	docker compose -f docker-compose.yml up --wait -d --remove-orphans neon-postgres13
@@ -154,6 +159,7 @@ dev-neon-ws-postgres13-wasm: start-neon-postgres13 build-qe-wasm build-connector
 test-neon-ws-postgres13-wasm: dev-neon-ws-postgres13-wasm test-qe-st
 
 test-driver-adapter-neon: test-neon-ws-postgres13
+test-driver-adapter-neon-wasm: test-neon-ws-postgres13-wasm
 
 start-postgres14:
 	docker compose -f docker-compose.yml up --wait -d --remove-orphans postgres14
@@ -291,6 +297,7 @@ dev-planetscale-vitess8-wasm: start-planetscale-vitess8 build-qe-wasm build-conn
 test-planetscale-vitess8-wasm: dev-planetscale-vitess8-wasm test-qe-st
 
 test-driver-adapter-planetscale: test-planetscale-vitess8
+test-driver-adapter-planetscale-wasm: test-planetscale-vitess8-wasm
 
 ######################
 # Local dev commands #
