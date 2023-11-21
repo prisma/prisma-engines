@@ -6,9 +6,11 @@
 <a href="#6" id="6">6</a>
 <a href="#7" id="7">7</a>
 <a href="#8" id="8">8</a>
+<a href="#9" id="9">9</a>
 </pre></div><pre class="rust"><code><span class="attr">#[derive(Copy, Clone, PartialEq, Eq)]
 </span><span class="kw">pub enum </span>ConnectorMode {
     <span class="doccomment">/// Indicates that Rust drivers are used in Query Engine.
+    </span><span class="attr">#[cfg(feature = <span class="string">&quot;native&quot;</span>)]
     </span>Rust,
 
     <span class="doccomment">/// Indicates that JS drivers are used in Query Engine.

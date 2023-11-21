@@ -136,16 +136,20 @@
 <a href="#136" id="136">136</a>
 <a href="#137" id="137">137</a>
 <a href="#138" id="138">138</a>
-</pre></div><pre class="rust"><code><span class="kw">use </span>psl::{builtin_connectors::<span class="kw-2">*</span>, Datasource, PreviewFeatures};
+<a href="#139" id="139">139</a>
+<a href="#140" id="140">140</a>
+<a href="#141" id="141">141</a>
+<a href="#142" id="142">142</a>
+<a href="#143" id="143">143</a>
+<a href="#144" id="144">144</a>
+</pre></div><pre class="rust"><code><span class="attr">#![allow(unused_imports)]
+
+</span><span class="kw">use </span>psl::{builtin_connectors::<span class="kw-2">*</span>, Datasource, PreviewFeatures};
 <span class="kw">use </span>query_core::{executor::InterpretingExecutor, Connector, QueryExecutor};
 <span class="kw">use </span>sql_query_connector::<span class="kw-2">*</span>;
 <span class="kw">use </span>std::collections::HashMap;
 <span class="kw">use </span>std::env;
-<span class="kw">use </span>tracing::trace;
 <span class="kw">use </span>url::Url;
-
-<span class="attr">#[cfg(feature = <span class="string">&quot;mongodb&quot;</span>)]
-</span><span class="kw">use </span>mongodb_query_connector::MongoDb;
 
 <span class="kw">use </span><span class="kw">super</span>::ConnectorMode;
 
@@ -165,7 +169,8 @@
             </span>driver_adapter(source, url, features).<span class="kw">await
         </span>}
 
-        ConnectorMode::Rust =&gt; {
+        <span class="attr">#[cfg(feature = <span class="string">&quot;native&quot;</span>)]
+        </span>ConnectorMode::Rust =&gt; {
             <span class="kw">if let </span><span class="prelude-val">Ok</span>(value) = env::var(<span class="string">&quot;PRISMA_DISABLE_QUAINT_EXECUTORS&quot;</span>) {
                 <span class="kw">let </span>disable = value.to_uppercase();
                 <span class="kw">if </span>disable == <span class="string">&quot;TRUE&quot; </span>|| disable == <span class="string">&quot;1&quot; </span>{
@@ -174,14 +179,14 @@
             }
 
             <span class="kw">match </span>source.active_provider {
-                p <span class="kw">if </span>SQLITE.is_provider(p) =&gt; sqlite(source, url, features).<span class="kw">await</span>,
-                p <span class="kw">if </span>MYSQL.is_provider(p) =&gt; mysql(source, url, features).<span class="kw">await</span>,
-                p <span class="kw">if </span>POSTGRES.is_provider(p) =&gt; postgres(source, url, features).<span class="kw">await</span>,
-                p <span class="kw">if </span>MSSQL.is_provider(p) =&gt; mssql(source, url, features).<span class="kw">await</span>,
-                p <span class="kw">if </span>COCKROACH.is_provider(p) =&gt; postgres(source, url, features).<span class="kw">await</span>,
+                p <span class="kw">if </span>SQLITE.is_provider(p) =&gt; native::sqlite(source, url, features).<span class="kw">await</span>,
+                p <span class="kw">if </span>MYSQL.is_provider(p) =&gt; native::mysql(source, url, features).<span class="kw">await</span>,
+                p <span class="kw">if </span>POSTGRES.is_provider(p) =&gt; native::postgres(source, url, features).<span class="kw">await</span>,
+                p <span class="kw">if </span>MSSQL.is_provider(p) =&gt; native::mssql(source, url, features).<span class="kw">await</span>,
+                p <span class="kw">if </span>COCKROACH.is_provider(p) =&gt; native::postgres(source, url, features).<span class="kw">await</span>,
 
                 <span class="attr">#[cfg(feature = <span class="string">&quot;mongodb&quot;</span>)]
-                </span>p <span class="kw">if </span>MONGODB.is_provider(p) =&gt; mongodb(source, url, features).<span class="kw">await</span>,
+                </span>p <span class="kw">if </span>MONGODB.is_provider(p) =&gt; native::mongodb(source, url, features).<span class="kw">await</span>,
 
                 x =&gt; <span class="prelude-val">Err</span>(query_core::CoreError::ConfigurationError(<span class="macro">format!</span>(
                     <span class="string">&quot;Unsupported connector type: {x}&quot;
@@ -191,57 +196,88 @@
     }
 }
 
-<span class="kw">async fn </span>sqlite(
+<span class="attr">#[cfg(feature = <span class="string">&quot;driver-adapters&quot;</span>)]
+</span><span class="kw">async fn </span>driver_adapter(
     source: <span class="kw-2">&amp;</span>Datasource,
     url: <span class="kw-2">&amp;</span>str,
     features: PreviewFeatures,
-) -&gt; query_core::Result&lt;Box&lt;<span class="kw">dyn </span>QueryExecutor + Send + Sync&gt;&gt; {
-    <span class="macro">trace!</span>(<span class="string">&quot;Loading SQLite query connector...&quot;</span>);
-    <span class="kw">let </span>sqlite = Sqlite::from_source(source, url, features).<span class="kw">await</span><span class="question-mark">?</span>;
-    <span class="macro">trace!</span>(<span class="string">&quot;Loaded SQLite query connector.&quot;</span>);
-    <span class="prelude-val">Ok</span>(executor_for(sqlite, <span class="bool-val">false</span>))
+) -&gt; <span class="prelude-ty">Result</span>&lt;Box&lt;<span class="kw">dyn </span>QueryExecutor + Send + Sync&gt;, query_core::CoreError&gt; {
+    <span class="kw">let </span>js = Js::from_source(source, url, features).<span class="kw">await</span><span class="question-mark">?</span>;
+    <span class="prelude-val">Ok</span>(executor_for(js, <span class="bool-val">false</span>))
 }
 
-<span class="kw">async fn </span>postgres(
-    source: <span class="kw-2">&amp;</span>Datasource,
-    url: <span class="kw-2">&amp;</span>str,
-    features: PreviewFeatures,
-) -&gt; query_core::Result&lt;Box&lt;<span class="kw">dyn </span>QueryExecutor + Send + Sync&gt;&gt; {
-    <span class="macro">trace!</span>(<span class="string">&quot;Loading Postgres query connector...&quot;</span>);
-    <span class="kw">let </span>database_str = url;
-    <span class="kw">let </span>psql = PostgreSql::from_source(source, url, features).<span class="kw">await</span><span class="question-mark">?</span>;
+<span class="attr">#[cfg(feature = <span class="string">&quot;native&quot;</span>)]
+</span><span class="kw">mod </span>native {
+    <span class="kw">use super</span>::<span class="kw-2">*</span>;
+    <span class="kw">use </span>tracing::trace;
 
-    <span class="kw">let </span>url = Url::parse(database_str)
-        .map_err(|err| query_core::CoreError::ConfigurationError(<span class="macro">format!</span>(<span class="string">&quot;Error parsing connection string: {err}&quot;</span>)))<span class="question-mark">?</span>;
-    <span class="kw">let </span>params: HashMap&lt;String, String&gt; = url.query_pairs().into_owned().collect();
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async fn </span>sqlite(
+        source: <span class="kw-2">&amp;</span>Datasource,
+        url: <span class="kw-2">&amp;</span>str,
+        features: PreviewFeatures,
+    ) -&gt; query_core::Result&lt;Box&lt;<span class="kw">dyn </span>QueryExecutor + Send + Sync&gt;&gt; {
+        <span class="macro">trace!</span>(<span class="string">&quot;Loading SQLite query connector...&quot;</span>);
+        <span class="kw">let </span>sqlite = Sqlite::from_source(source, url, features).<span class="kw">await</span><span class="question-mark">?</span>;
+        <span class="macro">trace!</span>(<span class="string">&quot;Loaded SQLite query connector.&quot;</span>);
+        <span class="prelude-val">Ok</span>(executor_for(sqlite, <span class="bool-val">false</span>))
+    }
 
-    <span class="kw">let </span>force_transactions = params
-        .get(<span class="string">&quot;pgbouncer&quot;</span>)
-        .and_then(|flag| flag.parse().ok())
-        .unwrap_or(<span class="bool-val">false</span>);
-    <span class="macro">trace!</span>(<span class="string">&quot;Loaded Postgres query connector.&quot;</span>);
-    <span class="prelude-val">Ok</span>(executor_for(psql, force_transactions))
-}
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async fn </span>postgres(
+        source: <span class="kw-2">&amp;</span>Datasource,
+        url: <span class="kw-2">&amp;</span>str,
+        features: PreviewFeatures,
+    ) -&gt; query_core::Result&lt;Box&lt;<span class="kw">dyn </span>QueryExecutor + Send + Sync&gt;&gt; {
+        <span class="macro">trace!</span>(<span class="string">&quot;Loading Postgres query connector...&quot;</span>);
+        <span class="kw">let </span>database_str = url;
+        <span class="kw">let </span>psql = PostgreSql::from_source(source, url, features).<span class="kw">await</span><span class="question-mark">?</span>;
 
-<span class="kw">async fn </span>mysql(
-    source: <span class="kw-2">&amp;</span>Datasource,
-    url: <span class="kw-2">&amp;</span>str,
-    features: PreviewFeatures,
-) -&gt; query_core::Result&lt;Box&lt;<span class="kw">dyn </span>QueryExecutor + Send + Sync&gt;&gt; {
-    <span class="kw">let </span>mysql = Mysql::from_source(source, url, features).<span class="kw">await</span><span class="question-mark">?</span>;
-    <span class="macro">trace!</span>(<span class="string">&quot;Loaded MySQL query connector.&quot;</span>);
-    <span class="prelude-val">Ok</span>(executor_for(mysql, <span class="bool-val">false</span>))
-}
+        <span class="kw">let </span>url = Url::parse(database_str).map_err(|err| {
+            query_core::CoreError::ConfigurationError(<span class="macro">format!</span>(<span class="string">&quot;Error parsing connection string: {err}&quot;</span>))
+        })<span class="question-mark">?</span>;
+        <span class="kw">let </span>params: HashMap&lt;String, String&gt; = url.query_pairs().into_owned().collect();
 
-<span class="kw">async fn </span>mssql(
-    source: <span class="kw-2">&amp;</span>Datasource,
-    url: <span class="kw-2">&amp;</span>str,
-    features: PreviewFeatures,
-) -&gt; query_core::Result&lt;Box&lt;<span class="kw">dyn </span>QueryExecutor + Send + Sync&gt;&gt; {
-    <span class="macro">trace!</span>(<span class="string">&quot;Loading SQL Server query connector...&quot;</span>);
-    <span class="kw">let </span>mssql = Mssql::from_source(source, url, features).<span class="kw">await</span><span class="question-mark">?</span>;
-    <span class="macro">trace!</span>(<span class="string">&quot;Loaded SQL Server query connector.&quot;</span>);
-    <span class="prelude-val">Ok</span>(executor_for(mssql, <span class="bool-val">false</span>))
+        <span class="kw">let </span>force_transactions = params
+            .get(<span class="string">&quot;pgbouncer&quot;</span>)
+            .and_then(|flag| flag.parse().ok())
+            .unwrap_or(<span class="bool-val">false</span>);
+        <span class="macro">trace!</span>(<span class="string">&quot;Loaded Postgres query connector.&quot;</span>);
+        <span class="prelude-val">Ok</span>(executor_for(psql, force_transactions))
+    }
+
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async fn </span>mysql(
+        source: <span class="kw-2">&amp;</span>Datasource,
+        url: <span class="kw-2">&amp;</span>str,
+        features: PreviewFeatures,
+    ) -&gt; query_core::Result&lt;Box&lt;<span class="kw">dyn </span>QueryExecutor + Send + Sync&gt;&gt; {
+        <span class="kw">let </span>mysql = Mysql::from_source(source, url, features).<span class="kw">await</span><span class="question-mark">?</span>;
+        <span class="macro">trace!</span>(<span class="string">&quot;Loaded MySQL query connector.&quot;</span>);
+        <span class="prelude-val">Ok</span>(executor_for(mysql, <span class="bool-val">false</span>))
+    }
+
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async fn </span>mssql(
+        source: <span class="kw-2">&amp;</span>Datasource,
+        url: <span class="kw-2">&amp;</span>str,
+        features: PreviewFeatures,
+    ) -&gt; query_core::Result&lt;Box&lt;<span class="kw">dyn </span>QueryExecutor + Send + Sync&gt;&gt; {
+        <span class="macro">trace!</span>(<span class="string">&quot;Loading SQL Server query connector...&quot;</span>);
+        <span class="kw">let </span>mssql = Mssql::from_source(source, url, features).<span class="kw">await</span><span class="question-mark">?</span>;
+        <span class="macro">trace!</span>(<span class="string">&quot;Loaded SQL Server query connector.&quot;</span>);
+        <span class="prelude-val">Ok</span>(executor_for(mssql, <span class="bool-val">false</span>))
+    }
+
+    <span class="attr">#[cfg(feature = <span class="string">&quot;mongodb&quot;</span>)]
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async fn </span>mongodb(
+        source: <span class="kw-2">&amp;</span>Datasource,
+        url: <span class="kw-2">&amp;</span>str,
+        _features: PreviewFeatures,
+    ) -&gt; query_core::Result&lt;Box&lt;<span class="kw">dyn </span>QueryExecutor + Send + Sync&gt;&gt; {
+        <span class="kw">use </span>mongodb_query_connector::MongoDb;
+
+        <span class="macro">trace!</span>(<span class="string">&quot;Loading MongoDB query connector...&quot;</span>);
+        <span class="kw">let </span>mongo = MongoDb::new(source, url).<span class="kw">await</span><span class="question-mark">?</span>;
+        <span class="macro">trace!</span>(<span class="string">&quot;Loaded MongoDB query connector.&quot;</span>);
+        <span class="prelude-val">Ok</span>(executor_for(mongo, <span class="bool-val">false</span>))
+    }
 }
 
 <span class="kw">fn </span>executor_for&lt;T&gt;(connector: T, force_transactions: bool) -&gt; Box&lt;<span class="kw">dyn </span>QueryExecutor + Send + Sync&gt;
@@ -249,29 +285,5 @@
     </span>T: Connector + Send + Sync + <span class="lifetime">&#39;static</span>,
 {
     Box::new(InterpretingExecutor::new(connector, force_transactions))
-}
-
-<span class="attr">#[cfg(feature = <span class="string">&quot;mongodb&quot;</span>)]
-</span><span class="kw">async fn </span>mongodb(
-    source: <span class="kw-2">&amp;</span>Datasource,
-    url: <span class="kw-2">&amp;</span>str,
-    _features: PreviewFeatures,
-) -&gt; query_core::Result&lt;Box&lt;<span class="kw">dyn </span>QueryExecutor + Send + Sync&gt;&gt; {
-    <span class="macro">trace!</span>(<span class="string">&quot;Loading MongoDB query connector...&quot;</span>);
-    <span class="kw">let </span>mongo = MongoDb::new(source, url).<span class="kw">await</span><span class="question-mark">?</span>;
-    <span class="macro">trace!</span>(<span class="string">&quot;Loaded MongoDB query connector.&quot;</span>);
-    <span class="prelude-val">Ok</span>(executor_for(mongo, <span class="bool-val">false</span>))
-}
-
-<span class="attr">#[cfg(feature = <span class="string">&quot;driver-adapters&quot;</span>)]
-</span><span class="kw">async fn </span>driver_adapter(
-    source: <span class="kw-2">&amp;</span>Datasource,
-    url: <span class="kw-2">&amp;</span>str,
-    features: PreviewFeatures,
-) -&gt; <span class="prelude-ty">Result</span>&lt;Box&lt;<span class="kw">dyn </span>QueryExecutor + Send + Sync&gt;, query_core::CoreError&gt; {
-    <span class="macro">trace!</span>(<span class="string">&quot;Loading driver adapter...&quot;</span>);
-    <span class="kw">let </span>js = Js::from_source(source, url, features).<span class="kw">await</span><span class="question-mark">?</span>;
-    <span class="macro">trace!</span>(<span class="string">&quot;Loaded driver adapter...&quot;</span>);
-    <span class="prelude-val">Ok</span>(executor_for(js, <span class="bool-val">false</span>))
 }
 </code></pre></div></section></main></body></html>
