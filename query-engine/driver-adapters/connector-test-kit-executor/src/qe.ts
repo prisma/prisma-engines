@@ -39,7 +39,7 @@ export async function initQueryEngine(adapter: ErrorCapturingDriverAdapter, data
         debug(parsed)
     }
 
-    const engineFromEnv = process.env.EXTERNAL_TEST_EXECUTOR_ENGINE ?? 'Napi'
+    const engineFromEnv = process.env.EXTERNAL_TEST_EXECUTOR ?? 'Napi'
     if (engineFromEnv === 'Wasm') {
         const { WasmQueryEngine } = await import('./wasm')
         return  new WasmQueryEngine(queryEngineOptions, logCallback, adapter)
@@ -47,7 +47,7 @@ export async function initQueryEngine(adapter: ErrorCapturingDriverAdapter, data
         const { QueryEngine } = loadNapiEngine()
         return new QueryEngine(queryEngineOptions, logCallback, adapter)
     } else {
-        throw new TypeError(`Invalid EXTERNAL_TEST_EXECUTOR_ENGINE value: ${engineFromEnv}. Expected Napi or Wasm`)
+        throw new TypeError(`Invalid EXTERNAL_TEST_EXECUTOR value: ${engineFromEnv}. Expected Napi or Wasm`)
     }
 
 

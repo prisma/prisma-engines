@@ -2,6 +2,5 @@
     "connector": "postgres",
     "version": "13",
     "driver_adapter": "pg",
-    "external_test_executor": "default",
-    "external_test_executor_engine": "Wasm"
+    "external_test_executor": "Wasm"
 }

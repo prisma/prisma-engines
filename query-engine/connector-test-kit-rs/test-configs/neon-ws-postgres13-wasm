@@ -3,6 +3,5 @@
     "version": "13",
     "driver_adapter": "neon:ws",
     "driver_adapter_config": { "proxyUrl": "127.0.0.1:5488/v1" },
-    "external_test_executor": "default",
-    "external_test_executor_engine": "Wasm"
+    "external_test_executor": "Wasm"
 }

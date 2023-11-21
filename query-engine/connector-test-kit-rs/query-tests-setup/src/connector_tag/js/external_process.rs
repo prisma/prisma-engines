@@ -101,7 +101,7 @@ fn start_rpc_thread(mut receiver: mpsc::Receiver<ReqImpl>) -> Result<()> {
     use tokio::process::Command;
 
     let path = crate::CONFIG
-        .external_test_executor()
+        .external_test_executor_path()
         .unwrap_or_else(|| exit_with_message(1, "start_rpc_thread() error: external test executor is not set"));
 
     tokio::runtime::Builder::new_current_thread()
@@ -109,7 +109,7 @@ fn start_rpc_thread(mut receiver: mpsc::Receiver<ReqImpl>) -> Result<()> {
         .build()
         .unwrap()
         .block_on(async move {
-            let process = match Command::new(path)
+            let process = match Command::new(&path)
                 .envs(CONFIG.for_external_executor())
                 .stdin(Stdio::piped())
                 .stdout(Stdio::piped())
