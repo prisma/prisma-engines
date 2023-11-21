@@ -182,13 +182,14 @@ impl TestConfig {
             "query-engine/driver-adapters/connector-test-kit-executor/script/start_node.sh";
         self.external_test_executor
             .as_ref()
-            .and_then(|_| Self::workspace_root())
-            .map(|path| path.join(DEFAULT_TEST_EXECUTOR))
-            .or_else(|| {
-                exit_with_message(
-                    "WORKSPACE_ROOT needs to be correctly set to the root of the prisma-engines repository",
-                )
+            .and_then(|_| {
+                Self::workspace_root().or_else(|| {
+                    exit_with_message(
+                        "WORKSPACE_ROOT needs to be correctly set to the root of the prisma-engines repository",
+                    )
+                })
             })
+            .map(|path| path.join(DEFAULT_TEST_EXECUTOR))
             .and_then(|path| path.to_str().map(|s| s.to_owned()))
     }
 
