@@ -6,7 +6,7 @@ on:
   pull_request:
     paths-ignore:
       - '.github/**'
-      - '!.github/workflows/build-wasm.yml'
+      - '!.github/workflows/qe-wasm-check.yml'
       - '.buildkite/**'
       - '*.md'
       - 'LICENSE'
