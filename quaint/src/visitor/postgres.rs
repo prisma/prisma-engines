@@ -78,33 +78,27 @@ impl<'a> Visitor<'a> for Postgres<'a> {
         variants: Vec<EnumVariant<'a>>,
         name: Option<EnumName<'a>>,
     ) -> visitor::Result {
-        let len = variants.len();
-
         // Since enums are user-defined custom types, tokio-postgres fires an additional query
         // when parameterizing values of type enum to know which custom type the value refers to.
         // Casting the enum value to `TEXT` avoid this roundtrip since `TEXT` is a builtin type.
         if let Some(enum_name) = name.clone() {
-            self.surround_with("ARRAY[", "]", |s| {
-                for (i, variant) in variants.into_iter().enumerate() {
-                    s.add_parameter(variant.into_text());
-                    s.parameter_substitution()?;
-                    s.write("::text")?;
+            self.add_parameter(Value::array(variants.into_iter().map(|v| v.into_text())));
 
-                    if i < (len - 1) {
-                        s.write(", ")?;
-                    }
+            self.surround_with("CAST(", ")", |s| {
+                s.parameter_substitution()?;
+                s.write("::text[]")?;
+                s.write(" AS ")?;
+
+                if let Some(schema_name) = enum_name.schema_name {
+                    s.surround_with_backticks(schema_name.deref())?;
+                    s.write(".")?
                 }
+
+                s.surround_with_backticks(enum_name.name.deref())?;
+                s.write("[]")?;
 
                 Ok(())
             })?;
-
-            self.write("::")?;
-            if let Some(schema_name) = enum_name.schema_name {
-                self.surround_with_backticks(schema_name.deref())?;
-                self.write(".")?
-            }
-            self.surround_with_backticks(enum_name.name.deref())?;
-            self.write("[]")?;
         } else {
             self.visit_parameterized(Value::array(
                 variants.into_iter().map(|variant| variant.into_enum(name.clone())),

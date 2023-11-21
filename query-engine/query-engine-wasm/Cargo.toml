@@ -16,9 +16,8 @@ psl.workspace = true
 quaint = { path = "../../quaint" }
 query-connector = { path = "../connectors/query-connector" }
 sql-connector = { path = "../connectors/sql-query-connector", package = "sql-query-connector" }
-
-query-core = { path = "../core" }
 request-handlers = { path = "../request-handlers", default-features = false, features = ["sql", "driver-adapters"] }
+query-core = { path = "../core" }
 driver-adapters = { path = "../driver-adapters" }
 
 connection-string.workspace = true 

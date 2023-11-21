@@ -3,8 +3,8 @@
 pub(crate) mod error;
 pub(crate) mod url;
 
+pub use self::url::*;
 pub use error::PostgresError;
-pub use url::*;
 
 #[cfg(feature = "postgresql-native")]
 pub(crate) mod native;
