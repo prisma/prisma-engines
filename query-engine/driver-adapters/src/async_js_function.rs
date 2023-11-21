@@ -55,6 +55,10 @@ where
         .map_err(into_quaint_error)?;
         js_result.into()
     }
+
+    pub(crate) fn as_raw(&self) -> &ThreadsafeFunction<ArgType, ErrorStrategy::Fatal> {
+        &self.threadsafe_fn
+    }
 }
 
 impl<ArgType, ReturnType> FromNapiValue for AsyncJsFunction<ArgType, ReturnType>
