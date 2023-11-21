@@ -600,7 +600,7 @@ impl TransactionProxy {
     /// so the destructor will ensure the transaction is closed even if the future is dropped.
     pub async fn commit(&self) -> quaint::Result<()> {
         let result = self.commit.call(()).await;
-        self.closed.swap(true, Ordering::Release);
+        self.closed.store(true, Ordering::Release);
         result
     }
 
@@ -610,7 +610,7 @@ impl TransactionProxy {
     /// so the destructor will ensure the transaction is closed even if the future is dropped.
     pub async fn rollback(&self) -> quaint::Result<()> {
         let result = self.rollback.call(()).await;
-        self.closed.swap(true, Ordering::Release);
+        self.closed.store(true, Ordering::Release);
         result
     }
 }
