@@ -22,5 +22,6 @@ jobs:
       - uses: dtolnay/rust-toolchain@stable
       - name: Install wasm-pack
         run: cargo install wasm-pack
-      - run: ./build.sh
+      - name: Build wasm query engine
+        run: ./build.sh
         working-directory: ./query-engine/query-engine-wasm
