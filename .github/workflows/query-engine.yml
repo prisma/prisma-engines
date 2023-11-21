@@ -37,6 +37,10 @@ jobs:
             single_threaded: false
             connector: 'sqlserver'
             version: '2022'
+          - name: 'sqlite'
+            single_threaded: false
+            connector: 'sqlite'
+            version: '3'
           - name: 'mongodb_4_2'
             single_threaded: true
             connector: 'mongodb'
