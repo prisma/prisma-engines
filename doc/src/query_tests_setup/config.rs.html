@@ -311,14 +311,45 @@
 <a href="#311" id="311">311</a>
 <a href="#312" id="312">312</a>
 <a href="#313" id="313">313</a>
+<a href="#314" id="314">314</a>
+<a href="#315" id="315">315</a>
+<a href="#316" id="316">316</a>
+<a href="#317" id="317">317</a>
+<a href="#318" id="318">318</a>
+<a href="#319" id="319">319</a>
+<a href="#320" id="320">320</a>
+<a href="#321" id="321">321</a>
+<a href="#322" id="322">322</a>
+<a href="#323" id="323">323</a>
+<a href="#324" id="324">324</a>
+<a href="#325" id="325">325</a>
+<a href="#326" id="326">326</a>
+<a href="#327" id="327">327</a>
+<a href="#328" id="328">328</a>
+<a href="#329" id="329">329</a>
 </pre></div><pre class="rust"><code><span class="kw">use crate</span>::{
     CockroachDbConnectorTag, ConnectorTag, ConnectorVersion, MongoDbConnectorTag, MySqlConnectorTag,
     PostgresConnectorTag, SqlServerConnectorTag, SqliteConnectorTag, TestResult, VitessConnectorTag,
 };
 <span class="kw">use </span>serde::Deserialize;
-<span class="kw">use </span>std::{convert::TryFrom, env, fs::File, io::Read, path::PathBuf};
+<span class="kw">use </span>std::{convert::TryFrom, env, fmt::Display, fs::File, io::Read, path::PathBuf};
 
 <span class="kw">static </span>TEST_CONFIG_FILE_NAME: <span class="kw-2">&amp;</span>str = <span class="string">&quot;.test_config&quot;</span>;
+
+<span class="attr">#[derive(Debug, Deserialize, Clone)]
+</span><span class="kw">pub enum </span>TestExecutor {
+    Napi,
+    Wasm,
+}
+
+<span class="kw">impl </span>Display <span class="kw">for </span>TestExecutor {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>std::fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; std::fmt::Result {
+        <span class="kw">match </span><span class="self">self </span>{
+            TestExecutor::Napi =&gt; f.write_str(<span class="string">&quot;Napi&quot;</span>),
+            TestExecutor::Wasm =&gt; f.write_str(<span class="string">&quot;Wasm&quot;</span>),
+        }
+    }
+}
 
 <span class="doccomment">/// The central test configuration.
 </span><span class="attr">#[derive(Debug, Default, Deserialize)]
@@ -337,8 +368,9 @@
     /// Used when testing driver adapters, this process is expected to be a javascript process
     /// loading the library engine (as a library, or WASM modules) and providing it with a
     /// driver adapter.
+    /// Possible values: Napi, Wasm
     /// Env key: `EXTERNAL_TEST_EXECUTOR`
-    </span>external_test_executor: <span class="prelude-ty">Option</span>&lt;String&gt;,
+    </span>external_test_executor: <span class="prelude-ty">Option</span>&lt;TestExecutor&gt;,
 
     <span class="doccomment">/// The driver adapter to use when running tests, will be forwarded to the external test
     /// executor by setting the `DRIVER_ADAPTER` env var when spawning the executor process
@@ -398,12 +430,11 @@ Use the Makefile.
 <span class="kw">impl </span>TestConfig {
     <span class="doccomment">/// Loads a configuration. File-based config has precedence over env config.
     </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>load() -&gt; <span class="self">Self </span>{
-        <span class="kw">let </span><span class="kw-2">mut </span>config = <span class="kw">match </span><span class="self">Self</span>::from_file().or_else(<span class="self">Self</span>::from_env) {
+        <span class="kw">let </span>config = <span class="kw">match </span><span class="self">Self</span>::from_file().or_else(<span class="self">Self</span>::from_env) {
             <span class="prelude-val">Some</span>(config) =&gt; config,
             <span class="prelude-val">None </span>=&gt; exit_with_message(CONFIG_LOAD_FAILED),
         };
 
-        config.fill_defaults();
         config.validate();
         config.log_info();
 
@@ -420,8 +451,8 @@ Use the Makefile.
             <span class="self">self</span>.connector_version().unwrap_or_default()
         );
         <span class="macro">println!</span>(<span class="string">&quot;* CI? {}&quot;</span>, <span class="self">self</span>.is_ci);
-        <span class="kw">if </span><span class="self">self</span>.external_test_executor.as_ref().is_some() {
-            <span class="macro">println!</span>(<span class="string">&quot;* External test executor: {}&quot;</span>, <span class="self">self</span>.external_test_executor().unwrap_or_default());
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(external_test_executor) = <span class="self">self</span>.external_test_executor.as_ref() {
+            <span class="macro">println!</span>(<span class="string">&quot;* External test executor: {}&quot;</span>, external_test_executor);
             <span class="macro">println!</span>(<span class="string">&quot;* Driver adapter: {}&quot;</span>, <span class="self">self</span>.driver_adapter().unwrap_or_default());
             <span class="macro">println!</span>(<span class="string">&quot;* Driver adapter url override: {}&quot;</span>, <span class="self">self</span>.json_stringify_driver_adapter_config());
         }
@@ -431,7 +462,10 @@ Use the Makefile.
     <span class="kw">fn </span>from_env() -&gt; <span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>&gt; {
         <span class="kw">let </span>connector = std::env::var(<span class="string">&quot;TEST_CONNECTOR&quot;</span>).ok();
         <span class="kw">let </span>connector_version = std::env::var(<span class="string">&quot;TEST_CONNECTOR_VERSION&quot;</span>).ok();
-        <span class="kw">let </span>external_test_executor = std::env::var(<span class="string">&quot;EXTERNAL_TEST_EXECUTOR&quot;</span>).ok();
+        <span class="kw">let </span>external_test_executor = std::env::var(<span class="string">&quot;EXTERNAL_TEST_EXECUTOR&quot;</span>)
+            .map(|value| serde_json::from_str::&lt;TestExecutor&gt;(<span class="kw-2">&amp;</span>value).ok())
+            .unwrap_or_default();
+
         <span class="kw">let </span>driver_adapter = std::env::var(<span class="string">&quot;DRIVER_ADAPTER&quot;</span>).ok();
         <span class="kw">let </span>driver_adapter_config = std::env::var(<span class="string">&quot;DRIVER_ADAPTER_CONFIG&quot;</span>)
             .map(|config| serde_json::from_str::&lt;serde_json::Value&gt;(config.as_str()).ok())
@@ -468,31 +502,24 @@ Use the Makefile.
         })
     }
 
-    <span class="doccomment">/// if the loaded value for external_test_executor is &quot;default&quot; (case insensitive),
-    /// and the workspace_root is set, then use the default external test executor.
-    </span><span class="kw">fn </span>fill_defaults(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
+    <span class="kw">fn </span>workspace_root() -&gt; <span class="prelude-ty">Option</span>&lt;PathBuf&gt; {
+        env::var(<span class="string">&quot;WORKSPACE_ROOT&quot;</span>).ok().map(PathBuf::from)
+    }
+
+    <span class="kw">pub fn </span>external_test_executor_path(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;String&gt; {
         <span class="kw">const </span>DEFAULT_TEST_EXECUTOR: <span class="kw-2">&amp;</span>str =
             <span class="string">&quot;query-engine/driver-adapters/connector-test-kit-executor/script/start_node.sh&quot;</span>;
-
-        <span class="kw">if </span><span class="self">self
-            </span>.external_test_executor
+        <span class="self">self</span>.external_test_executor
             .as_ref()
-            .filter(|s| s.eq_ignore_ascii_case(<span class="string">&quot;default&quot;</span>))
-            .is_some()
-        {
-            <span class="self">self</span>.external_test_executor = <span class="self">Self</span>::workspace_root()
-                .map(|path| path.join(DEFAULT_TEST_EXECUTOR))
-                .or_else(|| {
+            .and_then(|<span class="kw">_</span>| {
+                <span class="self">Self</span>::workspace_root().or_else(|| {
                     exit_with_message(
                         <span class="string">&quot;WORKSPACE_ROOT needs to be correctly set to the root of the prisma-engines repository&quot;</span>,
                     )
                 })
-                .and_then(|path| path.to_str().map(|s| s.to_owned()));
-        }
-    }
-
-    <span class="kw">fn </span>workspace_root() -&gt; <span class="prelude-ty">Option</span>&lt;PathBuf&gt; {
-        env::var(<span class="string">&quot;WORKSPACE_ROOT&quot;</span>).ok().map(PathBuf::from)
+            })
+            .map(|path| path.join(DEFAULT_TEST_EXECUTOR))
+            .and_then(|path| path.to_str().map(|s| s.to_owned()))
     }
 
     <span class="kw">fn </span>validate(<span class="kw-2">&amp;</span><span class="self">self</span>) {
@@ -519,7 +546,7 @@ Use the Makefile.
             <span class="prelude-val">Err</span>(err) =&gt; exit_with_message(<span class="kw-2">&amp;</span>err.to_string()),
         }
 
-        <span class="kw">if let </span><span class="prelude-val">Some</span>(file) = <span class="self">self</span>.external_test_executor.as_ref() {
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(file) = <span class="self">self</span>.external_test_executor_path().as_ref() {
             <span class="kw">let </span>path = PathBuf::from(file);
             <span class="kw">let </span>md = path.metadata();
             <span class="kw">if </span>!path.exists() || md.is_err() || !md.unwrap().is_file() {
@@ -572,8 +599,8 @@ Use the Makefile.
         <span class="self">self</span>.is_ci
     }
 
-    <span class="kw">pub fn </span>external_test_executor(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt; {
-        <span class="self">self</span>.external_test_executor.as_deref()
+    <span class="kw">pub fn </span>external_test_executor(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;TestExecutor&gt; {
+        <span class="self">self</span>.external_test_executor.clone()
     }
 
     <span class="kw">pub fn </span>driver_adapter(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt; {
@@ -607,10 +634,15 @@ Use the Makefile.
         <span class="macro">vec!</span>(
             (
                 <span class="string">&quot;DRIVER_ADAPTER&quot;</span>.to_string(), 
-                <span class="self">self</span>.driver_adapter.clone().unwrap_or_default()),
+                <span class="self">self</span>.driver_adapter.clone().unwrap_or_default()
+            ),
             (
                 <span class="string">&quot;DRIVER_ADAPTER_CONFIG&quot;</span>.to_string(),
                 <span class="self">self</span>.json_stringify_driver_adapter_config()
+            ),
+            (
+                <span class="string">&quot;EXTERNAL_TEST_EXECUTOR&quot;</span>.to_string(),
+                <span class="self">self</span>.external_test_executor.clone().unwrap_or(TestExecutor::Napi).to_string(),
             ),
             (
                 <span class="string">&quot;PRISMA_DISABLE_QUAINT_EXECUTORS&quot;</span>.to_string(),
