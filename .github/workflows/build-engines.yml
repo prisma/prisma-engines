@@ -1,0 +1,178 @@
+name: Build Engines
+on:
+  workflow_dispatch:
+    inputs:
+      commit:
+        description: "Commit on the given branch to build"
+        required: false
+  pull_request:
+
+jobs:
+  build-linux:
+    name: "${{ matrix.target.name }} (on branch ${{ github.event.ref }} for commit ${{ github.event.inputs.commit }})"
+    # env:
+    #   # default build config
+    #   SQLITE_MAX_VARIABLE_NUMBER: 250000
+    #   SQLITE_MAX_EXPR_DEPTH: 10000
+
+    runs-on: ubuntu-latest
+
+    strategy:
+        fail-fast: false
+        matrix:
+          target:
+            # Linux Glibc
+            - name: "Linux Glibc [1.0.x]"
+              image: 'prismagraphql/build:rhel-libssl1.0.x'
+              target_string: ''
+              target_path: ''
+              features_string: '--features vendored-openssl'
+            - name: "Linux Glibc [1.1.x]"
+              image: 'prismagraphql/build:rhel-libssl1.1.x'
+              target_string: ''
+              target_path: ''
+              features_string: ''
+            - name: "Linux Glibc [3.0.x]"
+              image: 'prismagraphql/build:rhel-libssl3.0.x'
+              target_string: ''
+              target_path: ''
+              features_string: ''
+            # Linux Musl
+            - name: "Linux Musl [1.1.x]"
+              image: 'prismagraphql/build:alpine-libssl1.1.x'
+              target_string: ''
+              target_path: ''
+              features_string: ''
+            - name: "Linux Musl [3.0.x]"
+              image: 'prismagraphql/build:alpine-libssl3.0.x'
+              target_string: ''
+              target_path: ''
+              features_string: ''
+            # Linux Static
+            - name: "Linux Static x86_64"
+              image: 'prismagraphql/build:linux-static-x64'
+              target_string: '--target x86_64-unknown-linux-musl'
+              target_path: ''
+              features_string: '--features vendored-openssl'
+            # Linux Arm64 Glibc
+            - name: "Linux ARM64 [1.0.x]"
+              image: 'prismagraphql/build:cross-linux-arm-ssl-1.0.x'
+              target_string: '--target aarch64-unknown-linux-gnu'
+              target_path: 'aarch64-unknown-linux-gnu'
+              features_string: '--features vendored-openssl'
+            - name: "Linux ARM64 [1.1.x]"
+              image: 'prismagraphql/build:cross-linux-arm-ssl-1.1.x'
+              target_string: '--target aarch64-unknown-linux-gnu'
+              target_path: 'aarch64-unknown-linux-gnu'
+              features_string: ''
+            - name: "Linux ARM64 [3.0.x]"
+              image: 'prismagraphql/build:cross-linux-arm-ssl-3.0.x'
+              target_string: '--target aarch64-unknown-linux-gnu'
+              target_path: 'aarch64-unknown-linux-gnu'
+              features_string: ''
+            # Linux Arm64 Musl
+            - name: "Linux Musl ARM64 [1.1.x]"
+              image: 'prismagraphql/build:cross-linux-musl-arm-ssl-1.1.x'
+              target_string: '--target aarch64-unknown-linux-musl'
+              target_path: 'aarch64-unknown-linux-musl'
+              features_string: ''
+            - name: "Linux Musl ARM64 [3.0.x]"
+              image: 'prismagraphql/build:cross-linux-musl-arm-ssl-3.0.x'
+              target_string: '--target aarch64-unknown-linux-musl'
+              target_path: 'aarch64-unknown-linux-musl'
+              features_string: ''
+            # Linux Arm64 Static
+            - name: "Linux Static ARM64"
+              image: 'prismagraphql/build:linux-static-arm64'
+              target_string: '--target aarch64-unknown-linux-musl'
+              target_path: 'aarch64-unknown-linux-musl'
+              features_string: '--features vendored-openssl'
+
+    steps:
+      - name: Output link to real commit
+        if: ${{ github.event.inputs.commit }}
+        run: echo https://github.com/prisma/prisma-engines/commit/${{ github.event.inputs.commit }}
+
+      - name: Checkout ${{ github.event.inputs.commit }}
+        uses: actions/checkout@v4
+        with:
+          repository: prisma/prisma-engines
+          ref: ${{ github.event.inputs.commit }}
+
+      - uses: dtolnay/rust-toolchain@stable
+
+      # TODO proper way to do cache?
+      - uses: actions/cache@v3
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            target
+          key: ${{ runner.os }}-${{ matrix.target.name }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+
+      - name: 'TODO: Check if artifacts were already built and published before via .finished file'
+        run: echo "foo"
+
+      - name: Construct Build Command
+        id: construct_build_command
+        env:
+          TARGET_NAME: ${{ matrix.target.name }}
+          IMAGE: ${{ matrix.target.image }}
+          TARGET_STRING: ${{ matrix.target.target_string }} 
+          FEATURES_STRING: ${{ matrix.target.features_string }}
+        run: |
+          # full command
+          command="docker run \
+            -e SQLITE_MAX_VARIABLE_NUMBER=250000 \
+            -e SQLITE_MAX_EXPR_DEPTH=10000 \
+            -e LIBZ_SYS_STATIC=1 \
+            -w /root/build \
+            -v \"$(pwd)\":/root/build \
+            $IMAGE \
+            bash -c \
+              \" \
+              cargo clean \
+              && cargo build --release -p query-engine          --manifest-path query-engine/query-engine/Cargo.toml          $TARGET_STRING $FEATURES_STRING \
+              && cargo build --release -p query-engine-node-api --manifest-path query-engine/query-engine-node-api/Cargo.toml $TARGET_STRING $FEATURES_STRING \
+              && cargo build --release -p schema-engine-cli     --manifest-path schema-engine/cli/Cargo.toml                  $TARGET_STRING $FEATURES_STRING \
+              && cargo build --release -p prisma-fmt            --manifest-path prisma-fmt/Cargo.toml                         $TARGET_STRING $FEATURES_STRING \
+              \" \
+            "
+          # remove query-engine-node-api for "static" targets
+          if [[ "$TARGET_NAME" == *Static* ]]; then
+            substring_to_replace="&& cargo build --release -p query-engine-node-api --manifest-path query-engine/query-engine-node-api/Cargo.toml $TARGET_STRING $FEATURES_STRING"
+            replacement_string=""
+            command=$(echo "$command" | sed "s|$substring_to_replace|$replacement_string|")
+          fi
+          # store command in github output
+          echo "COMMAND=$command" >> "$GITHUB_OUTPUT"
+      - name: Show Build Command
+        env:
+          COMMAND: ${{ steps.construct_build_command.outputs.COMMAND }}"
+        run: echo "Build command is $COMMAND"
+      - name: Execute Build command
+        run:  ${{ steps.construct_build_command.outputs.command }}
+
+      - name: 'TODO: Compressing binary files'
+        run: echo "foo"
+      - name: 'TODO: do things with prismagraphql/build:release image (upload artifacts, verify uploaded artifacts)'
+        run: echo "foo"
+      
+      - uses: actions/upload-artifact@v3
+        if: ${{ matrix.target.target_path == '' }} 
+        with:
+          name: Engine files ${{ matrix.target.name }}
+          path: |
+            ${{ github.workspace }}/target/release/libquery_engine.dylib
+            ${{ github.workspace }}/target/release/schema-engine
+            ${{ github.workspace }}/target/release/query-engine
+            ${{ github.workspace }}/target/release/prisma-fmt
+      - uses: actions/upload-artifact@v3
+        if: ${{ matrix.target.target_path != '' }} 
+        with:
+          name: Engine files ${{ matrix.target.name }}
+          path: |
+            ${{ github.workspace }}/target/${{ matrix.target.target_path }}/release/libquery_engine.dylib
+            ${{ github.workspace }}/target/${{ matrix.target.target_path }}/release/schema-engine
+            ${{ github.workspace }}/target/${{ matrix.target.target_path }}/release/query-engine
+            ${{ github.workspace }}/target/${{ matrix.target.target_path }}/release/prisma-fmt
