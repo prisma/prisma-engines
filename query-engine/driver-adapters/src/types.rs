@@ -26,6 +26,7 @@ use serde::{Deserialize, Serialize};
 #[cfg_attr(not(target_arch = "wasm32"), napi_derive::napi(object))]
 #[cfg_attr(target_arch = "wasm32", derive(Serialize, Deserialize, Tsify))]
 #[cfg_attr(target_arch = "wasm32", tsify(into_wasm_abi, from_wasm_abi))]
+#[cfg_attr(target_arch = "wasm32", serde(rename_all = "camelCase"))]
 #[derive(Debug, Default)]
 pub struct JSResultSet {
     pub column_types: Vec<ColumnType>,
