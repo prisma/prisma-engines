@@ -51,7 +51,7 @@ jobs:
         run: echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}" > ~/.npmrc
 
       - name: Publish @prisma/query-engine-wasm
-        run: npm publish ./pkg --access public --tag ${{ github.event.inputs.npmDistTag }}
+        run: npm publish ./pkg --provenance --access public --tag ${{ github.event.inputs.npmDistTag }}
         working-directory: ./query-engine/query-engine-wasm
 
       #
