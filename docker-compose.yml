@@ -1,7 +1,7 @@
 version: '3'
 services:
   cockroach_23_1:
-    image: prismagraphql/cockroachdb-custom:23.1
+    image: prismagraphql/cockroachdb-custom:23.1@sha256:b6cbbf910d964792cb72498bba7b7821ad44473f13ab686d05b63d091e4d137f
     restart: unless-stopped
     command: |
       start-single-node --insecure
@@ -11,7 +11,7 @@ services:
       - databases
 
   cockroach_22_2:
-    image: prismagraphql/cockroachdb-custom:22.2
+    image: prismagraphql/cockroachdb-custom:22.2@sha256:0e9d30bd998d6db3e8e0233c05ca677edf4ea2184194eae4a2af3b6c4cff292c
     restart: unless-stopped
     command: start-single-node --insecure
     ports:
@@ -20,7 +20,7 @@ services:
       - databases
 
   cockroach_22_1_0:
-    image: prismagraphql/cockroachdb-custom:22.1.0
+    image: prismagraphql/cockroachdb-custom:22.1.0@sha256:dec39389027003402ce43c82c965e779027560888e1a5b2a78f765116d0801c8
     restart: unless-stopped
     command: start-single-node --insecure
     ports:
@@ -29,7 +29,7 @@ services:
       - databases
 
   cockroach_21_2_0_patched:
-    image: prismagraphql/cockroachdb-custom:21.2.0-patched
+    image: prismagraphql/cockroachdb-custom:21.2.0-patched@sha256:dd377b177c5350c4eb09a16a1f3ac5759b4ff4896ab634c44692a81fa5479fe7
     restart: unless-stopped
     command: start-single-node --insecure
     ports:
@@ -307,7 +307,7 @@ services:
       - databases
 
   mongo42:
-    image: prismagraphql/mongo-single-replica:4.2.17-bionic
+    image: prismagraphql/mongo-single-replica:4.2.17-bionic@sha256:8337a9ee48f169c879b56a850eda597d6ea2a0234faaf85ab5a6d6abf7d0c58b
     restart: unless-stopped
     environment:
       MONGO_INITDB_ROOT_USERNAME: 'prisma'
@@ -320,7 +320,7 @@ services:
       - '27016:27016'
 
   mongo44:
-    image: prismagraphql/mongo-single-replica:4.4.3-bionic
+    image: prismagraphql/mongo-single-replica:4.4.3-bionic@sha256:9175c5ab84ee76706efa53be85b5afb6f739598c34c6aadb5177eff04620dd00
     restart: unless-stopped
     environment:
       MONGO_INITDB_ROOT_USERNAME: 'prisma'
@@ -356,7 +356,7 @@ services:
       - databases
 
   mongo5:
-    image: prismagraphql/mongo-single-replica:5.0.3
+    image: prismagraphql/mongo-single-replica:5.0.3@sha256:cd45c5413dce1704fe935774f035604458dec7b5ce15230821ea0bc0d016b358
     restart: unless-stopped
     environment:
       MONGO_INITDB_ROOT_USERNAME: 'prisma'
