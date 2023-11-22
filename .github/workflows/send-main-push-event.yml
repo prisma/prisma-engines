@@ -17,5 +17,5 @@ jobs:
         with:
           workflow: .github/workflows/build-engines.yml
           repo: prisma/prisma-engines-builds
-          token: ${{ secrets.BOT_TOKEN }}
+          token: ${{ secrets.BOT_TOKEN_PRISMA_ENGINES_BUILD }}
           inputs: '{ "commit": "${{ github.sha }}" }'
