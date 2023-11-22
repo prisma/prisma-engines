@@ -56,7 +56,7 @@ pub(crate) struct TransactionProxy {
 
 impl CommonProxy {
     pub fn new(object: &JsObjectExtern) -> JsResult<Self> {
-        let flavour: String = JsString::from(object.get("value".into())?).into();
+        let flavour: String = JsString::from(object.get("flavour".into())?).into();
 
         Ok(Self {
             query_raw: JsFunction::from(object.get("queryRaw".into())?).into(),
