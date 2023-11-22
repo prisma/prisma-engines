@@ -37,4 +37,4 @@ From the current folder:
 To try importing the , you can run:
 
 - `nvm use`
-- `node --experimental-wasm-modules ./example.js`
+- `node --experimental-wasm-modules example/example.js`

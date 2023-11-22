@@ -2,43 +2,29 @@
  * Run with: `node --experimental-wasm-modules ./example.js`
  * on Node.js 18+.
  */
-
-import { Pool, neonConfig } from '@neondatabase/serverless'
-import { PrismaNeon } from '@prisma/adapter-neon'
+import { readFile } from 'fs/promises'
+import { PrismaLibSQL } from '@prisma/adapter-libsql'
+import { createClient } from '@libsql/client'
 import { bindAdapter } from '@prisma/driver-adapter-utils'
-import { init, QueryEngine, getBuildTimeInfo } from './pkg/query_engine.js'
-import { WebSocket  } from 'undici'
+import { init, QueryEngine, getBuildTimeInfo } from '../pkg/query_engine.js'
 
-neonConfig.webSocketConstructor = WebSocket
 
 async function main() {
   // Always initialize the Wasm library before using it.
   // This sets up the logging and panic hooks.
   init()
 
-  const connectionString = process.env.DATABASE_URL
 
-  const pool = new Pool({ connectionString })
-  const adapter = new PrismaNeon(pool)
+  const client = createClient({ url: "file:./prisma/dev.db"})
+  const adapter = new PrismaLibSQL(client)
   const driverAdapter = bindAdapter(adapter)
 
   console.log('buildTimeInfo', getBuildTimeInfo())
 
+  const datamodel = await readFile('prisma/schema.prisma', 'utf8')
+
   const options = {
-    datamodel: /* prisma */`
-      datasource db {
-        provider = "postgres"
-        url      = env("DATABASE_URL")
-      }
-
-      generator client {
-        provider = "prisma-client-js"
-      }
-
-      model User {
-        id    Int    @id @default(autoincrement())
-      }
-    `,
+    datamodel,
     logLevel: 'info',
     logQueries: true,
     datasourceOverrides: {},
