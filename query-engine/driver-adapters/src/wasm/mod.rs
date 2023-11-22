@@ -1,7 +1,6 @@
 //! Query Engine Driver Adapters: `wasm`-specific implementation.
 
 mod async_js_function;
-mod conversion;
 mod error;
 mod js_object_extern;
 pub(crate) mod proxy;
