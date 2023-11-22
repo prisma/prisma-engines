@@ -126,7 +126,7 @@ mod json_filter {
         Ok(())
     }
 
-    #[connector_test(schema(schema), exclude(Vitess("planetscale.js")))]
+    #[connector_test(schema(schema), exclude(MySQL(5.6), Vitess("planetscale.js")))]
     async fn string_comparison_filters(runner: Runner) -> TestResult<()> {
         test_string_data(&runner).await?;
 
@@ -169,7 +169,7 @@ mod json_filter {
         Ok(())
     }
 
-    #[connector_test(schema(schema), exclude(Vitess("planetscale.js")))]
+    #[connector_test(schema(schema), exclude(MySQL(5.6), Vitess("planetscale.js")))]
     async fn array_comparison_filters(runner: Runner) -> TestResult<()> {
         test_array_data(&runner).await?;
 
