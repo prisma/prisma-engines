@@ -3,17 +3,20 @@
  * on Node.js 18+.
  */
 
-import { Pool } from '@neondatabase/serverless'
+import { Pool, neonConfig } from '@neondatabase/serverless'
 import { PrismaNeon } from '@prisma/adapter-neon'
 import { bindAdapter } from '@prisma/driver-adapter-utils'
 import { init, QueryEngine, getBuildTimeInfo } from './pkg/query_engine.js'
+import { WebSocket  } from 'undici'
+
+neonConfig.webSocketConstructor = WebSocket
 
 async function main() {
   // Always initialize the Wasm library before using it.
   // This sets up the logging and panic hooks.
   init()
 
-  const connectionString = undefined
+  const connectionString = process.env.DATABASE_URL
 
   const pool = new Pool({ connectionString })
   const adapter = new PrismaNeon(pool)
@@ -60,6 +63,12 @@ async function main() {
   }), 'trace')
   const parsed = JSON.parse(res);
   console.log('query result = ', parsed)
+
+  const error = parsed.errors?.[0]?.user_facing_error
+  if (error?.error_code === 'P2036') {
+    console.log('js error:', driverAdapter.errorRegistry.consumeError(error.meta.id))
+  }
+  // if (res.error.user_facing_error.code =)
   await queryEngine.disconnect('trace')
   console.log('after disconnect')
   queryEngine.free()

@@ -7,8 +7,7 @@ use wasm_bindgen::{JsError, JsValue};
 use wasm_bindgen_futures::JsFuture;
 
 use super::error::into_quaint_error;
-
-type JsResult<T> = core::result::Result<T, JsValue>;
+use super::result::JsResult;
 
 #[derive(Clone, Default)]
 pub(crate) struct AsyncJsFunction<ArgType, ReturnType>
@@ -42,18 +41,22 @@ where
     R: DeserializeOwned,
 {
     pub async fn call(&self, arg1: T) -> quaint::Result<R> {
-        let call_internal = async {
-            let arg1 = serde_wasm_bindgen::to_value(&arg1).map_err(|err| JsError::from(&err))?;
-            let promise = self.threadsafe_fn.call1(&JsValue::null(), &arg1)?;
-            let future = JsFuture::from(JsPromise::from(promise));
-            let value = future.await?;
-            serde_wasm_bindgen::from_value(value).map_err(|err| JsValue::from(err))
-        };
+        let result = self.call_internal(arg1).await;
 
-        match call_internal.await {
-            Ok(result) => Ok(result),
+        match result {
+            Ok(js_result) => js_result.into(),
             Err(err) => Err(into_quaint_error(err)),
         }
+    }
+
+    async fn call_internal(&self, arg1: T) -> Result<JsResult<R>, JsValue> {
+        let arg1 = serde_wasm_bindgen::to_value(&arg1).map_err(|err| JsValue::from(JsError::from(&err)))?;
+        let promise = self.threadsafe_fn.call1(&JsValue::null(), &arg1)?;
+        let future = JsFuture::from(JsPromise::from(promise));
+        let value = future.await?;
+        let js_result: JsResult<R> = value.try_into()?;
+
+        Ok(js_result)
     }
 }
 

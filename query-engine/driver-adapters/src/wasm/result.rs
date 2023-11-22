@@ -1,5 +1,6 @@
 use js_sys::Boolean as JsBoolean;
 use quaint::error::{Error as QuaintError, ErrorKind};
+use serde::de::DeserializeOwned;
 use wasm_bindgen::{JsCast, JsValue};
 
 use crate::{error::DriverAdapterError, JsObjectExtern};
@@ -25,7 +26,7 @@ impl From<DriverAdapterError> for QuaintError {
 /// Wrapper for JS-side result type
 pub(crate) enum JsResult<T>
 where
-    T: From<JsValue>,
+    T: DeserializeOwned,
 {
     Ok(T),
     Err(DriverAdapterError),
@@ -33,7 +34,7 @@ where
 
 impl<T> TryFrom<JsValue> for JsResult<T>
 where
-    T: From<JsValue>,
+    T: DeserializeOwned,
 {
     type Error = JsValue;
 
@@ -44,7 +45,7 @@ where
 
 impl<T> JsResult<T>
 where
-    T: From<JsValue>,
+    T: DeserializeOwned,
 {
     fn from_js_unknown(unknown: JsValue) -> Result<Self, JsValue> {
         let object = unknown.unchecked_into::<JsObjectExtern>();
@@ -53,8 +54,9 @@ where
         let ok = ok.value_of();
 
         if ok {
-            let value: JsValue = object.get("value".into())?;
-            return Ok(Self::Ok(T::from(value)));
+            let js_value: JsValue = object.get("value".into())?;
+            let deserialized = serde_wasm_bindgen::from_value::<T>(js_value)?;
+            return Ok(Self::Ok(deserialized));
         }
 
         let error = object.get("error".into())?;
@@ -65,7 +67,7 @@ where
 
 impl<T> From<JsResult<T>> for quaint::Result<T>
 where
-    T: From<JsValue>,
+    T: DeserializeOwned,
 {
     fn from(value: JsResult<T>) -> Self {
         match value {
