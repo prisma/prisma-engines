@@ -9,6 +9,8 @@
 
 pub(crate) mod conversion;
 pub(crate) mod error;
+pub(crate) mod queryable;
+pub(crate) mod send_future;
 pub(crate) mod types;
 
 #[cfg(not(target_arch = "wasm32"))]

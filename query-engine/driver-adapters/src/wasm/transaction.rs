@@ -6,13 +6,9 @@ use quaint::{
     Value,
 };
 use serde::Deserialize;
-use wasm_bindgen::prelude::wasm_bindgen;
 
-use super::{
-    proxy::{CommonProxy, TransactionOptions, TransactionProxy},
-    queryable::JsBaseQueryable,
-    send_future::SendFuture,
-};
+use super::proxy::{TransactionOptions, TransactionProxy};
+use crate::{queryable::JsBaseQueryable, send_future::SendFuture};
 
 // Wrapper around JS transaction objects that implements Queryable
 // and quaint::Transaction. Can be used in place of quaint transaction,

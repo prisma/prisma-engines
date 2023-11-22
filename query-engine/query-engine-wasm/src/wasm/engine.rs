@@ -5,8 +5,9 @@ use crate::{
     error::ApiError,
     logger::{LogCallback, Logger},
 };
+use driver_adapters::JsObjectExtern;
 use futures::FutureExt;
-use js_sys::{Function as JsFunction, Object as JsObject};
+use js_sys::Function as JsFunction;
 use query_core::{
     protocol::EngineProtocol,
     schema::{self, QuerySchema},
@@ -135,7 +136,7 @@ impl QueryEngine {
     pub fn new(
         options: ConstructorOptions,
         callback: JsFunction,
-        maybe_adapter: Option<JsObject>,
+        maybe_adapter: Option<JsObjectExtern>,
     ) -> Result<QueryEngine, wasm_bindgen::JsError> {
         log::info!("Called `QueryEngine::new()`");
 
