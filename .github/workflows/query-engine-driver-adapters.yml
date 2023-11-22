@@ -25,12 +25,22 @@ jobs:
       fail-fast: false
       matrix:
         adapter:
-          - name: 'pg'
+          - name: 'pg (napi)'
             setup_task: 'dev-pg-postgres13'
-          - name: 'neon:ws'
+          - name: 'neon:ws (napi)'
             setup_task: 'dev-neon-ws-postgres13'
-          - name: 'libsql'
+          - name: 'libsql (napi)'
             setup_task: 'dev-libsql-sqlite'
+          # TODO: uncomment when WASM engine is functional
+          # - name: 'pg (wasm)'
+          #   setup_task: 'dev-pg-postgres13-wasm'
+          #   needs_wasm_pack: true
+          # - name: 'neon:ws (wasm)'
+          #   setup_task: 'dev-neon-ws-postgres13-wasm'
+          #   needs_wasm_pack: true
+          # - name: 'libsql (wasm)'
+          #   setup_task: 'dev-libsql-sqlite-wasm'
+          #   needs_wasm_pack: true
         node_version: ['18']
     env:
       LOG_LEVEL: 'info' # Set to "debug" to trace the query engine and node process running the driver adapter
@@ -85,9 +95,13 @@ jobs:
             echo "DRIVER_ADAPTERS_BRANCH=$branch" >> "$GITHUB_ENV"
           fi
 
-      - run: make ${{ matrix.adapter.setup_task }}
-
       - uses: dtolnay/rust-toolchain@stable
+
+      - name: 'Install wasm-pack'
+        if: ${{ matrix.adapter.needs_wasm_pack }}
+        run: cargo install wasm-pack
+
+      - run: make ${{ matrix.adapter.setup_task }}
 
       - name: 'Run tests'
         run: cargo test --package query-engine-tests -- --test-threads=1

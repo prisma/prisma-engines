@@ -1,5 +1,4 @@
 import * as qe from './qe'
-import * as engines from './engines/Library'
 import * as readline from 'node:readline'
 import * as jsonRpc from './jsonRpc'
 
@@ -76,7 +75,7 @@ async function main(): Promise<void> {
 }
 
 const state: Record<number, {
-    engine: engines.QueryEngineInstance,
+    engine: qe.QueryEngine,
     adapter: ErrorCapturingDriverAdapter,
     logs: string[]
 }> = {}
@@ -215,10 +214,10 @@ function respondOk(requestId: number, payload: unknown) {
     console.log(JSON.stringify(msg))
 }
 
-async function initQe(url: string, prismaSchema: string, logCallback: qe.QueryLogCallback): Promise<[engines.QueryEngineInstance, ErrorCapturingDriverAdapter]> {
+async function initQe(url: string, prismaSchema: string, logCallback: qe.QueryLogCallback): Promise<[qe.QueryEngine, ErrorCapturingDriverAdapter]> {
     const adapter = await adapterFromEnv(url) as DriverAdapter
     const errorCapturingAdapter = bindAdapter(adapter)
-    const engineInstance = qe.initQueryEngine(errorCapturingAdapter, prismaSchema, logCallback, debug)
+    const engineInstance = await qe.initQueryEngine(errorCapturingAdapter, prismaSchema, logCallback, debug)
     return [engineInstance, errorCapturingAdapter];
 }
 
