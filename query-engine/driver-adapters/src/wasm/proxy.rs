@@ -1,11 +1,12 @@
-use ducktor::FromJsValue as DuckType;
 use futures::Future;
-use js_sys::{Function as JsFunction, Object as JsObject};
+use js_sys::{Function as JsFunction, JsString, Object as JsObject};
+use tsify::Tsify;
 
 use super::{async_js_function::AsyncJsFunction, send_future::SendFuture, transaction::JsTransaction};
 pub use crate::types::{ColumnType, JSResultSet, Query, TransactionOptions};
+use crate::JsObjectExtern;
 use metrics::increment_gauge;
-use wasm_bindgen::{prelude::wasm_bindgen, JsValue};
+use wasm_bindgen::{prelude::wasm_bindgen, JsCast, JsValue};
 
 type JsResult<T> = core::result::Result<T, JsValue>;
 
@@ -13,7 +14,7 @@ type JsResult<T> = core::result::Result<T, JsValue>;
 /// querying and executing SQL (i.e. a client connector). The Proxy uses Wasm's JsFunction to
 /// invoke the code within the node runtime that implements the client connector.
 #[wasm_bindgen(getter_with_clone)]
-#[derive(DuckType, Default)]
+#[derive(Default)]
 pub(crate) struct CommonProxy {
     /// Execute a query given as SQL, interpolating the given parameters.
     query_raw: AsyncJsFunction<Query, JSResultSet>,
@@ -29,7 +30,6 @@ pub(crate) struct CommonProxy {
 /// This is a JS proxy for accessing the methods specific to top level
 /// JS driver objects
 #[wasm_bindgen(getter_with_clone)]
-#[derive(DuckType)]
 pub(crate) struct DriverProxy {
     start_transaction: AsyncJsFunction<(), JsTransaction>,
 }
@@ -37,7 +37,7 @@ pub(crate) struct DriverProxy {
 /// This a JS proxy for accessing the methods, specific
 /// to JS transaction objects
 #[wasm_bindgen(getter_with_clone)]
-#[derive(DuckType, Default)]
+#[derive(Default)]
 pub(crate) struct TransactionProxy {
     /// transaction options
     options: TransactionOptions,
@@ -54,8 +54,14 @@ pub(crate) struct TransactionProxy {
 }
 
 impl CommonProxy {
-    pub fn new(object: &JsObject) -> Self {
-        CommonProxy::from(&object.into())
+    pub fn new(object: &JsObjectExtern) -> JsResult<Self> {
+        let flavour: String = JsString::from(object.get("value".into())?).into();
+
+        Ok(Self {
+            query_raw: JsFunction::from(object.get("queryRaw".into())?).into(),
+            execute_raw: JsFunction::from(object.get("executeRaw".into())?).into(),
+            flavour,
+        })
     }
 
     pub async fn query_raw(&self, params: Query) -> quaint::Result<JSResultSet> {
@@ -68,8 +74,10 @@ impl CommonProxy {
 }
 
 impl DriverProxy {
-    pub fn new(object: &JsObject) -> Self {
-        Self::from(&object.into())
+    pub fn new(object: &JsObjectExtern) -> JsResult<Self> {
+        Ok(Self {
+            start_transaction: JsFunction::from(object.get("startTransaction".into())?).into(),
+        })
     }
 
     async fn start_transaction_inner(&self) -> quaint::Result<Box<JsTransaction>> {
@@ -91,8 +99,15 @@ impl DriverProxy {
 }
 
 impl TransactionProxy {
-    pub fn new(object: &JsObject) -> Self {
-        Self::from(&object.into())
+    pub fn new(object: &JsObjectExtern) -> JsResult<Self> {
+        let options = object.get("options".into())?;
+
+        Ok(Self {
+            options: TransactionOptions::from_js(options).unwrap(),
+            commit: JsFunction::from(object.get("commit".into())?).into(),
+            rollback: JsFunction::from(object.get("dispose".into())?).into(),
+            dispose: object.get("dispose".into())?.into(),
+        })
     }
 
     pub fn options(&self) -> &TransactionOptions {

@@ -22,6 +22,20 @@ where
     _phantom_return: PhantomData<ReturnType>,
 }
 
+impl<T, R> From<JsFunction> for AsyncJsFunction<T, R>
+where
+    T: Serialize,
+    R: DeserializeOwned,
+{
+    fn from(js_fn: JsFunction) -> Self {
+        Self {
+            threadsafe_fn: js_fn,
+            _phantom_arg: PhantomData::<T> {},
+            _phantom_return: PhantomData::<R> {},
+        }
+    }
+}
+
 impl<T, R> AsyncJsFunction<T, R>
 where
     T: Serialize,

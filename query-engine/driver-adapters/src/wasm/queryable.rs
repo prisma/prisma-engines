@@ -1,10 +1,11 @@
+use crate::JsObjectExtern;
+
 use super::{
     conversion,
     proxy::{CommonProxy, DriverProxy, Query},
     send_future::SendFuture,
 };
 use async_trait::async_trait;
-use ducktor::FromJsValue as DuckType;
 use futures::Future;
 use js_sys::Object as JsObject;
 use psl::datamodel_connector::Flavour;
@@ -30,7 +31,7 @@ use wasm_bindgen::prelude::wasm_bindgen;
 /// into a `quaint::connector::result_set::ResultSet`. A quaint `ResultSet` is basically a vector
 /// of `quaint::Value` but said type is a tagged enum, with non-unit variants that cannot be converted to javascript as is.
 #[wasm_bindgen(getter_with_clone)]
-#[derive(DuckType, Default)]
+#[derive(Default)]
 pub(crate) struct JsBaseQueryable {
     pub(crate) proxy: CommonProxy,
     pub flavour: Flavour,
@@ -313,9 +314,9 @@ impl TransactionCapable for JsQueryable {
     }
 }
 
-pub fn from_wasm(driver: JsObject) -> JsQueryable {
-    let common = CommonProxy::new(&driver);
-    let driver_proxy = DriverProxy::new(&driver);
+pub fn from_wasm(driver: JsObjectExtern) -> JsQueryable {
+    let common = CommonProxy::new(&driver).unwrap();
+    let driver_proxy = DriverProxy::new(&driver).unwrap();
 
     JsQueryable {
         inner: JsBaseQueryable::new(common),
