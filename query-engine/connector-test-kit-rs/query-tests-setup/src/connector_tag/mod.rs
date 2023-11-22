@@ -332,7 +332,7 @@ pub(crate) fn should_run(
     for exclusion in exclusions.iter() {
         for inclusion in inclusions.iter() {
             if exclusion.is_broader(inclusion) {
-                panic!("Error in connector test execution rules. `{exclusion}` in `excluded()` subsumes `{inclusion}` in `only()`");
+                panic!("Error in connector test execution rules. Version `{exclusion}` in `excluded()` is broader than `{inclusion}` in `only()`");
             }
         }
     }
