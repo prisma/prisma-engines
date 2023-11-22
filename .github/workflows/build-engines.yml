@@ -1,4 +1,5 @@
 name: Build Engines
+run-name: Build Engines for ${{ github.event.inputs.commit }}
 on:
   workflow_dispatch:
     inputs:
