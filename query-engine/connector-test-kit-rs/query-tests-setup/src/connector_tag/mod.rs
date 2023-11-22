@@ -18,7 +18,7 @@ pub(crate) use sql_server::*;
 pub(crate) use sqlite::*;
 pub(crate) use vitess::*;
 
-use crate::{datamodel_rendering::DatamodelRenderer, BoxFuture, TestError, CONFIG};
+use crate::{datamodel_rendering::DatamodelRenderer, BoxFuture, TestConfig, TestError, CONFIG};
 use psl::datamodel_connector::ConnectorCapabilities;
 use std::{convert::TryFrom, fmt};
 
@@ -49,12 +49,13 @@ pub trait ConnectorTagInterface {
 /// - `is_ci` signals whether or not the test run is done on CI or not. May be important if local
 ///   test run connection strings and CI connection strings differ because of networking.
 pub(crate) fn connection_string(
+    test_config: &TestConfig,
     version: &ConnectorVersion,
     database: &str,
-    is_ci: bool,
     is_multi_schema: bool,
     isolation_level: Option<&'static str>,
 ) -> String {
+    let is_ci = test_config.is_ci;
     match version {
         ConnectorVersion::SqlServer(v) => {
             let database = if is_multi_schema {
@@ -98,7 +99,7 @@ pub(crate) fn connection_string(
                 Some(PostgresVersion::V12) if is_ci => {
                     format!("postgresql://postgres:prisma@test-db-postgres-12:5432/{database}")
                 }
-                Some(PostgresVersion::V13) if is_ci => {
+                Some(PostgresVersion::V13) | Some(PostgresVersion::NeonJs) | Some(PostgresVersion::PgJs) if is_ci => {
                     format!("postgresql://postgres:prisma@test-db-postgres-13:5432/{database}")
                 }
                 Some(PostgresVersion::V14) if is_ci => {
@@ -115,7 +116,9 @@ pub(crate) fn connection_string(
                 Some(PostgresVersion::V10) => format!("postgresql://postgres:prisma@127.0.0.1:5432/{database}"),
                 Some(PostgresVersion::V11) => format!("postgresql://postgres:prisma@127.0.0.1:5433/{database}"),
                 Some(PostgresVersion::V12) => format!("postgresql://postgres:prisma@127.0.0.1:5434/{database}"),
-                Some(PostgresVersion::V13) => format!("postgresql://postgres:prisma@127.0.0.1:5435/{database}"),
+                Some(PostgresVersion::V13) | Some(PostgresVersion::NeonJs) | Some(PostgresVersion::PgJs) => {
+                    format!("postgresql://postgres:prisma@127.0.0.1:5435/{database}")
+                }
                 Some(PostgresVersion::V14) => format!("postgresql://postgres:prisma@127.0.0.1:5437/{database}"),
                 Some(PostgresVersion::V15) => format!("postgresql://postgres:prisma@127.0.0.1:5438/{database}"),
                 Some(PostgresVersion::PgBouncer) => {
@@ -162,7 +165,7 @@ pub(crate) fn connection_string(
             }
             None => unreachable!("A versioned connector must have a concrete version to run."),
         },
-        ConnectorVersion::Sqlite => {
+        ConnectorVersion::Sqlite(_) => {
             let workspace_root = std::env::var("WORKSPACE_ROOT")
                 .unwrap_or_else(|_| ".".to_owned())
                 .trim_end_matches('/')
@@ -196,7 +199,12 @@ pub(crate) fn connection_string(
                 None => unreachable!("A versioned connector must have a concrete version to run."),
             }
         }
+
         ConnectorVersion::Vitess(Some(VitessVersion::V8_0)) => "mysql://root@localhost:33807/test".into(),
+        ConnectorVersion::Vitess(Some(VitessVersion::PlanetscaleJs)) => {
+            format!("mysql://root@127.0.0.1:3310/{database}")
+        }
+
         ConnectorVersion::Vitess(None) => unreachable!("A versioned connector must have a concrete version to run."),
     }
 }
@@ -209,12 +217,25 @@ pub enum ConnectorVersion {
     Postgres(Option<PostgresVersion>),
     MySql(Option<MySqlVersion>),
     MongoDb(Option<MongoDbVersion>),
-    Sqlite,
+    Sqlite(Option<SqliteVersion>),
     CockroachDb(Option<CockroachDbVersion>),
     Vitess(Option<VitessVersion>),
 }
 
 impl ConnectorVersion {
+    fn is_broader(&self, other: &ConnectorVersion) -> bool {
+        matches!(
+            (self, other),
+            (Self::SqlServer(None), Self::SqlServer(_))
+                | (Self::Postgres(None), Self::Postgres(_))
+                | (Self::MySql(None), Self::MySql(_))
+                | (Self::MongoDb(None), Self::MongoDb(_))
+                | (Self::Sqlite(None), Self::Sqlite(_))
+                | (Self::CockroachDb(None), Self::CockroachDb(_))
+                | (Self::Vitess(None), Self::Vitess(_))
+        )
+    }
+
     fn matches_pattern(&self, pat: &ConnectorVersion) -> bool {
         use ConnectorVersion::*;
 
@@ -232,14 +253,14 @@ impl ConnectorVersion {
             (MongoDb(a), MongoDb(b)) => versions_match(a, b),
             (CockroachDb(a), CockroachDb(b)) => versions_match(a, b),
             (Vitess(a), Vitess(b)) => versions_match(a, b),
-            (Sqlite, Sqlite) => true,
+            (Sqlite(a), Sqlite(b)) => versions_match(a, b),
 
             (MongoDb(..), _)
             | (_, MongoDb(..))
             | (SqlServer(..), _)
             | (_, SqlServer(..))
-            | (Sqlite, _)
-            | (_, Sqlite)
+            | (Sqlite(..), _)
+            | (_, Sqlite(..))
             | (CockroachDb(..), _)
             | (_, CockroachDb(..))
             | (Vitess(..), _)
@@ -269,7 +290,10 @@ impl fmt::Display for ConnectorVersion {
                 Some(v) => format!("MongoDB ({})", v.to_string()),
                 None => "MongoDB (unknown)".to_string(),
             },
-            Self::Sqlite => "SQLite".to_string(),
+            Self::Sqlite(v) => match v {
+                Some(v) => format!("SQLite ({})", v.to_string()),
+                None => "SQLite (unknown)".to_string(),
+            },
             Self::Vitess(v) => match v {
                 Some(v) => format!("Vitess ({v})"),
                 None => "Vitess (unknown)".to_string(),
@@ -284,47 +308,42 @@ impl fmt::Display for ConnectorVersion {
 /// Determines whether or not a test should run for the given enabled connectors and capabilities
 /// a connector is required to have.
 pub(crate) fn should_run(
+    connector: &ConnectorTag,
+    version: &ConnectorVersion,
     only: &[(&str, Option<&str>)],
     exclude: &[(&str, Option<&str>)],
     capabilities: ConnectorCapabilities,
 ) -> bool {
-    let (connector, version) = CONFIG.test_connector().unwrap();
-
     if !capabilities.is_empty() && !connector.capabilities().contains(capabilities) {
         println!("Connector excluded. Missing required capability.");
         return false;
     }
 
-    // We skip tests that exclude JS driver adapters when an external test executor is configured.
-    // A test that you only want to run with rust drivers can be annotated with exclude(JS)
-    if CONFIG.external_test_executor().is_some() && exclude.iter().any(|excl| excl.0.to_uppercase() == "JS") {
-        println!("Excluded test execution for JS driver adapters. Skipping test");
-        return false;
-    };
-    // we consume the JS token to prevent it from being used in the following checks
-    let exclude: Vec<_> = exclude.iter().filter(|excl| excl.0.to_uppercase() != "JS").collect();
+    let exclusions = exclude
+        .iter()
+        .filter_map(|c| ConnectorVersion::try_from(*c).ok())
+        .collect::<Vec<_>>();
 
-    // We only run tests that include JS driver adapters when an external test executor is configured.
-    // A test that you only want to run with js driver adapters can be annotated with only(JS)
-    if CONFIG.external_test_executor().is_none() && only.iter().any(|incl| incl.0.to_uppercase() == "JS") {
-        println!("Excluded test execution for rust driver adapters. Skipping test");
-        return false;
-    }
-    // we consume the JS token to prevent it from being used in the following checks
-    let only: Vec<_> = only.iter().filter(|incl| incl.0.to_uppercase() != "JS").collect();
+    let inclusions = only
+        .iter()
+        .filter_map(|c| ConnectorVersion::try_from(*c).ok())
+        .collect::<Vec<_>>();
 
-    if !only.is_empty() {
-        return only
-            .iter()
-            .any(|incl| ConnectorVersion::try_from(**incl).unwrap().matches_pattern(&version));
+    for exclusion in exclusions.iter() {
+        for inclusion in inclusions.iter() {
+            if exclusion.is_broader(inclusion) {
+                panic!("Error in connector test execution rules. `{exclusion}` in `excluded()` subsumes `{inclusion}` in `only()`");
+            }
+        }
     }
 
-    if exclude.iter().any(|excl| {
-        ConnectorVersion::try_from(**excl)
-            .map_or(false, |connector_version| connector_version.matches_pattern(&version))
-    }) {
+    if exclusions.iter().any(|excl| excl.matches_pattern(version)) {
         println!("Connector excluded. Skipping test.");
         return false;
+    }
+
+    if !inclusions.is_empty() {
+        return inclusions.iter().any(|incl| incl.matches_pattern(version));
     }
 
     // FIXME: This skips vitess unless explicitly opted in. Replace with `true` when fixing
@@ -338,7 +357,7 @@ impl TryFrom<(&str, Option<&str>)> for ConnectorVersion {
     #[track_caller]
     fn try_from((connector, version): (&str, Option<&str>)) -> Result<Self, Self::Error> {
         Ok(match connector.to_lowercase().as_str() {
-            "sqlite" => ConnectorVersion::Sqlite,
+            "sqlite" => ConnectorVersion::Sqlite(version.map(SqliteVersion::try_from).transpose()?),
             "sqlserver" => ConnectorVersion::SqlServer(version.map(SqlServerVersion::try_from).transpose()?),
             "cockroachdb" => ConnectorVersion::CockroachDb(version.map(CockroachDbVersion::try_from).transpose()?),
             "postgres" => ConnectorVersion::Postgres(version.map(PostgresVersion::try_from).transpose()?),
@@ -347,5 +366,46 @@ impl TryFrom<(&str, Option<&str>)> for ConnectorVersion {
             "vitess" => ConnectorVersion::Vitess(version.map(|v| v.parse()).transpose()?),
             _ => return Err(TestError::parse_error(format!("Unknown connector tag `{connector}`"))),
         })
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use crate::connector_tag::{PostgresConnectorTag, PostgresVersion};
+    use crate::{ConnectorTag, ConnectorVersion};
+
+    #[test]
+    #[rustfmt::skip]
+    fn test_should_run() {
+        let only = vec![("postgres", None)];
+        let exclude = vec![("postgres", Some("neon.js"))];
+        let postgres = &PostgresConnectorTag as ConnectorTag;
+        let neon = ConnectorVersion::Postgres(Some(PostgresVersion::NeonJs));
+        let pg = ConnectorVersion::Postgres(Some(PostgresVersion::PgJs));
+
+        assert!(!super::should_run(&postgres, &neon, &only, &exclude, Default::default()));
+        assert!(super::should_run(&postgres, &pg, &only, &exclude, Default::default()));
+    }
+
+    #[test]
+    #[should_panic]
+    fn test_should_run_wrong_definition_versionless() {
+        let only = vec![("postgres", None)];
+        let exclude = vec![("postgres", None)];
+        let postgres = &PostgresConnectorTag as ConnectorTag;
+        let neon = ConnectorVersion::Postgres(Some(PostgresVersion::NeonJs));
+
+        super::should_run(&postgres, &neon, &only, &exclude, Default::default());
+    }
+
+    #[test]
+    #[should_panic]
+    fn test_should_run_wrong_definition_wider_exclusion() {
+        let only = vec![("postgres", Some("neon.js"))];
+        let exclude = vec![("postgres", None)];
+        let postgres = &PostgresConnectorTag as ConnectorTag;
+        let neon = ConnectorVersion::Postgres(Some(PostgresVersion::NeonJs));
+
+        super::should_run(&postgres, &neon, &only, &exclude, Default::default());
     }
 }

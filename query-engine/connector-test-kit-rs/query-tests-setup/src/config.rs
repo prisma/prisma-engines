@@ -219,7 +219,7 @@ impl TestConfig {
             | Ok(ConnectorVersion::MongoDb(Some(_)))
             | Ok(ConnectorVersion::CockroachDb(Some(_)))
             | Ok(ConnectorVersion::Postgres(Some(_)))
-            | Ok(ConnectorVersion::Sqlite) => (),
+            | Ok(ConnectorVersion::Sqlite(Some(_))) => (),
             Err(err) => exit_with_message(&err.to_string()),
         }
 
@@ -295,7 +295,7 @@ impl TestConfig {
             ConnectorVersion::Postgres(_) => &PostgresConnectorTag,
             ConnectorVersion::MySql(_) => &MySqlConnectorTag,
             ConnectorVersion::MongoDb(_) => &MongoDbConnectorTag,
-            ConnectorVersion::Sqlite => &SqliteConnectorTag,
+            ConnectorVersion::Sqlite(_) => &SqliteConnectorTag,
             ConnectorVersion::CockroachDb(_) => &CockroachDbConnectorTag,
             ConnectorVersion::Vitess(_) => &VitessConnectorTag,
         };

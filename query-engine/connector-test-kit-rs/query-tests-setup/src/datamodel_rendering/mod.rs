@@ -62,13 +62,7 @@ pub fn render_test_datamodel(
             }}
         "#},
         tag.datamodel_provider(),
-        connection_string(
-            &version,
-            test_database,
-            CONFIG.is_ci(),
-            is_multi_schema,
-            isolation_level
-        ),
+        connection_string(&CONFIG, &version, test_database, is_multi_schema, isolation_level),
         relation_mode_override.unwrap_or_else(|| tag.relation_mode().to_string()),
         schema_def,
         preview_features
