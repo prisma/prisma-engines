@@ -18,4 +18,4 @@ jobs:
           workflow: .github/workflows/build-engines.yml
           repo: prisma/prisma-engines-builds
           token: ${{ secrets.BOT_TOKEN }}
-          inputs: '{ "commit": "${{ github.event.client_payload.commit }}" }'
+          inputs: '{ "commit": "${{ github.sha }}" }'
