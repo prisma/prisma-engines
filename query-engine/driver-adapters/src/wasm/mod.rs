@@ -5,6 +5,7 @@ mod conversion;
 mod error;
 mod js_object_extern;
 pub(crate) mod proxy;
+mod result;
 mod transaction;
 
 pub use crate::queryable::{from_wasm, JsQueryable};
