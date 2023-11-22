@@ -18,8 +18,27 @@ use std::{
     ops::Deref,
     usize,
 };
-use tracing::log::trace;
 use user_facing_errors::query_engine::DatabaseConstraint;
+
+#[cfg(target_arch = "wasm32")]
+macro_rules! trace {
+    (target: $target:expr, $($arg:tt)+) => {{
+        // No-op in WebAssembly
+    }};
+    ($($arg:tt)+) => {{
+        // No-op in WebAssembly
+    }};
+}
+
+#[cfg(not(target_arch = "wasm32"))]
+macro_rules! trace {
+    (target: $target:expr, $($arg:tt)+) => {
+        tracing::log::trace!(target: $target, $($arg)+);
+    };
+    ($($arg:tt)+) => {
+        tracing::log::trace!($($arg)+);
+    };
+}
 
 async fn generate_id(
     conn: &dyn Queryable,

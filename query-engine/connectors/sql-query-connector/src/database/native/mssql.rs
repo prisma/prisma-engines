@@ -1,4 +1,4 @@
-use super::connection::SqlConnection;
+use crate::database::{catch, connection::SqlConnection};
 use crate::{FromSource, SqlError};
 use async_trait::async_trait;
 use connector_interface::{
@@ -60,7 +60,7 @@ impl FromSource for Mssql {
 #[async_trait]
 impl Connector for Mssql {
     async fn get_connection<'a>(&'a self) -> connector::Result<Box<dyn Connection + Send + Sync + 'static>> {
-        super::catch(self.connection_info.clone(), async move {
+        catch(self.connection_info.clone(), async move {
             let conn = self.pool.check_out().await.map_err(SqlError::from)?;
             let conn = SqlConnection::new(conn, &self.connection_info, self.features);
 

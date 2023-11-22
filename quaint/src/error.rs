@@ -282,7 +282,7 @@ pub enum ErrorKind {
 }
 
 impl ErrorKind {
-    #[cfg(feature = "mysql")]
+    #[cfg(feature = "mysql-native")]
     pub(crate) fn value_out_of_range(msg: impl Into<String>) -> Self {
         Self::ValueOutOfRange { message: msg.into() }
     }

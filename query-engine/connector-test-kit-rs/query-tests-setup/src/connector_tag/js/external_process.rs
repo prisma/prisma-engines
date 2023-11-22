@@ -74,7 +74,7 @@ impl ExecutorProcess {
         };
 
         self.task_handle.send((method_call, sender)).await?;
-        let raw_response = receiver.await?;
+        let raw_response = receiver.await??;
         tracing::debug!(%raw_response);
         let response = serde_json::from_value(raw_response)?;
         Ok(response)
@@ -91,14 +91,17 @@ pub(super) static EXTERNAL_PROCESS: Lazy<ExecutorProcess> =
         }
     });
 
-type ReqImpl = (jsonrpc_core::MethodCall, oneshot::Sender<serde_json::value::Value>);
+type ReqImpl = (
+    jsonrpc_core::MethodCall,
+    oneshot::Sender<Result<serde_json::value::Value>>,
+);
 
 fn start_rpc_thread(mut receiver: mpsc::Receiver<ReqImpl>) -> Result<()> {
     use std::process::Stdio;
     use tokio::process::Command;
 
     let path = crate::CONFIG
-        .external_test_executor()
+        .external_test_executor_path()
         .unwrap_or_else(|| exit_with_message(1, "start_rpc_thread() error: external test executor is not set"));
 
     tokio::runtime::Builder::new_current_thread()
@@ -106,7 +109,7 @@ fn start_rpc_thread(mut receiver: mpsc::Receiver<ReqImpl>) -> Result<()> {
         .build()
         .unwrap()
         .block_on(async move {
-            let process = match Command::new(path)
+            let process = match Command::new(&path)
                 .envs(CONFIG.for_external_executor())
                 .stdin(Stdio::piped())
                 .stdout(Stdio::piped())
@@ -119,7 +122,7 @@ fn start_rpc_thread(mut receiver: mpsc::Receiver<ReqImpl>) -> Result<()> {
 
             let mut stdout = BufReader::new(process.stdout.unwrap()).lines();
             let mut stdin = process.stdin.unwrap();
-            let mut pending_requests: HashMap<jsonrpc_core::Id, oneshot::Sender<serde_json::value::Value>> =
+            let mut pending_requests: HashMap<jsonrpc_core::Id, oneshot::Sender<Result<serde_json::value::Value>>> =
                 HashMap::new();
 
             loop {
@@ -140,10 +143,11 @@ fn start_rpc_thread(mut receiver: mpsc::Receiver<ReqImpl>) -> Result<()> {
                                                 // The other end may be dropped if the whole
                                                 // request future was dropped and not polled to
                                                 // completion, so we ignore send errors here.
-                                                _ = sender.send(success.result);
+                                                _ = sender.send(Ok(success.result));
                                             }
                                             jsonrpc_core::Output::Failure(err) => {
-                                                panic!("error response from jsonrpc: {err:?}")
+                                                tracing::error!("error response from jsonrpc: {err:?}");
+                                                _ = sender.send(Err(Box::new(err.error)));
                                             }
                                         }
                                     }

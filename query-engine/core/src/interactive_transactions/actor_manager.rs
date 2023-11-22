@@ -1,3 +1,4 @@
+use crate::executor::task::JoinHandle;
 use crate::{protocol::EngineProtocol, ClosedTx, Operation, ResponseData};
 use connector::Connection;
 use lru::LruCache;
@@ -9,7 +10,6 @@ use tokio::{
         mpsc::{channel, Sender},
         RwLock,
     },
-    task::JoinHandle,
     time::Duration,
 };
 

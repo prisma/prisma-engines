@@ -17,7 +17,7 @@ mod smoke_tests {
 
     fn assert_value_in_range(metrics: &str, metric: &str, low: f64, high: f64) {
         let regex = Regex::new(format!(r"{metric}\s+([+-]?\d+(\.\d+)?)").as_str()).unwrap();
-        match regex.captures(&metrics) {
+        match regex.captures(metrics) {
             Some(capture) => {
                 let value = capture.get(1).unwrap().as_str().parse::<f64>().unwrap();
                 assert!(

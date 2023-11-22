@@ -12,6 +12,11 @@
   "scripts": {
     "build": "tsup ./src/index.ts --format esm --dts"
   },
+  "tsup": {
+    "external": [
+      "../../../query-engine-wasm/pkg/query_engine_bg.js"
+    ]
+  },
   "keywords": [],
   "author": "",
   "sideEffects": false,
