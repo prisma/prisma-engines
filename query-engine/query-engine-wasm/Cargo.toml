@@ -15,7 +15,10 @@ user-facing-errors = { path = "../../libs/user-facing-errors" }
 psl.workspace = true
 prisma-models = { path = "../prisma-models" }
 quaint = { path = "../../quaint" }
-# request-handlers = { path = "../request-handlers", default-features = false, features = ["sql", "driver-adapters"] }
+request-handlers = { path = "../request-handlers", default-features = false, features = [
+    "sql",
+    "driver-adapters",
+] }
 connector = { path = "../connectors/query-connector", package = "query-connector" }
 sql-query-connector = { path = "../connectors/sql-query-connector" }
 query-core = { path = "../core" }
