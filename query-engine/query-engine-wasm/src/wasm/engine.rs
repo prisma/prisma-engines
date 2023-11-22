@@ -240,7 +240,7 @@ impl QueryEngine {
 
                 let preview_features = arced_schema.configuration.preview_features();
 
-                let executor_fut = async {
+                let executor = async {
                     let executor = load_executor(self.connector_mode, data_source, preview_features, &url).await?;
                     let connector = executor.primary_connector();
 
@@ -253,21 +253,17 @@ impl QueryEngine {
                     connector.get_connection().instrument(conn_span).await?;
 
                     crate::Result::<_>::Ok(executor)
+                }
+                .await;
+
+                let query_schema = {
+                    let enable_raw_queries = true;
+                    schema::build(arced_schema_2, enable_raw_queries)
                 };
-
-                let query_schema_span = tracing::info_span!("prisma:engine:schema");
-                let query_schema_fut = tokio::runtime::Handle::current()
-                    .spawn_blocking(move || {
-                        let enable_raw_queries = true;
-                        schema::build(arced_schema_2, enable_raw_queries)
-                    })
-                    .instrument(query_schema_span);
-
-                let (query_schema, executor) = tokio::join!(query_schema_fut, executor_fut);
 
                 Ok(ConnectedEngine {
                     schema: builder.schema.clone(),
-                    query_schema: Arc::new(query_schema.unwrap()),
+                    query_schema: Arc::new(query_schema),
                     executor: executor?,
                     config_dir: builder.config_dir.clone(),
                     env: builder.env.clone(),
