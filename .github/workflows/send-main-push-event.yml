@@ -1,4 +1,6 @@
 name: Trigger prisma-engines-builds run
+run-name: Trigger prisma-engines-builds run for ${{ github.sha }}
+
 
 on:
   push:
