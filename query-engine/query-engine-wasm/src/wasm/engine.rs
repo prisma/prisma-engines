@@ -241,31 +241,24 @@ impl QueryEngine {
 
                 let preview_features = arced_schema.configuration.preview_features();
 
-                let executor = async {
-                    let executor = load_executor(self.connector_mode, data_source, preview_features, &url).await?;
-                    let connector = executor.primary_connector();
+                let executor = load_executor(self.connector_mode, data_source, preview_features, &url).await?;
+                let connector = executor.primary_connector();
 
-                    let conn_span = tracing::info_span!(
-                        "prisma:engine:connection",
-                        user_facing = true,
-                        "db.type" = connector.name(),
-                    );
+                let conn_span = tracing::info_span!(
+                    "prisma:engine:connection",
+                    user_facing = true,
+                    "db.type" = connector.name(),
+                );
 
-                    connector.get_connection().instrument(conn_span).await?;
+                connector.get_connection().instrument(conn_span).await?;
 
-                    crate::Result::<_>::Ok(executor)
-                }
-                .await;
-
-                let query_schema = {
-                    let enable_raw_queries = true;
-                    schema::build(arced_schema_2, enable_raw_queries)
-                };
+                let query_schema_span = tracing::info_span!("prisma:engine:schema");
+                let query_schema = query_schema_span.in_scope(|| schema::build(arced_schema_2, true));
 
                 Ok(ConnectedEngine {
                     schema: builder.schema.clone(),
                     query_schema: Arc::new(query_schema),
-                    executor: executor?,
+                    executor,
                     config_dir: builder.config_dir.clone(),
                     env: builder.env.clone(),
                     engine_protocol: builder.engine_protocol,
@@ -286,30 +279,32 @@ impl QueryEngine {
     /// Disconnect and drop the core. Can be reconnected later with `#connect`.
     #[wasm_bindgen]
     pub async fn disconnect(&self, trace: String) -> Result<(), wasm_bindgen::JsError> {
-        async_panic_to_js_error(async {
-            let span = tracing::info_span!("prisma:engine:disconnect");
+        // async_panic_to_js_error(async {
+        // let span = tracing::info_span!("prisma:engine:disconnect");
 
-            // TODO: when using Node Drivers, we need to call Driver::close() here.
+        // TODO: when using Node Drivers, we need to call Driver::close() here.
 
-            async {
-                let mut inner = self.inner.write().await;
-                let engine = inner.as_engine()?;
+        // async {
+        let mut inner = self.inner.write().await;
+        let engine = inner.as_engine()?;
 
-                let builder = EngineBuilder {
-                    schema: engine.schema.clone(),
-                    config_dir: engine.config_dir.clone(),
-                    env: engine.env.clone(),
-                    engine_protocol: engine.engine_protocol(),
-                };
+        let builder = EngineBuilder {
+            schema: engine.schema.clone(),
+            config_dir: engine.config_dir.clone(),
+            env: engine.env.clone(),
+            engine_protocol: engine.engine_protocol(),
+        };
 
-                *inner = Inner::Builder(builder);
+        log::info!("Recreated builder");
+        *inner = Inner::Builder(builder);
+        log::info!("Recreated inner builder");
 
-                Ok(())
-            }
-            .instrument(span)
-            .await
-        })
-        .await
+        Ok(())
+        // }
+        // .instrument(span)
+        // .await
+        // })
+        // .await
     }
 
     /// If connected, sends a query to the core and returns the response.

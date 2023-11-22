@@ -6,7 +6,7 @@
 import { Pool } from '@neondatabase/serverless'
 import { PrismaNeon } from '@prisma/adapter-neon'
 import { bindAdapter } from '@prisma/driver-adapter-utils'
-import { init, QueryEngine, getBuildTimeInfo } from './pkg/query_engine_wasm.js'
+import { init, QueryEngine, getBuildTimeInfo } from './pkg/query_engine.js'
 
 async function main() {
   // Always initialize the Wasm library before using it.
@@ -48,7 +48,22 @@ async function main() {
   const queryEngine = new QueryEngine(options, callback, driverAdapter)
   
   await queryEngine.connect('trace')
+  const res = await queryEngine.query(JSON.stringify({
+    modelName: 'User',
+    action: 'findMany',
+    query: {
+      arguments: {},
+      selection: {
+        $scalars: true
+      }
+    }
+  }), 'trace')
+  const parsed = JSON.parse(res);
+  console.log('query result = ', parsed)
   await queryEngine.disconnect('trace')
+  console.log('after disconnect')
+  queryEngine.free()
+  await driverAdapter.close()
 }
 
 main()

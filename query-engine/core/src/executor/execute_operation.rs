@@ -6,6 +6,7 @@ use crate::{
     QueryGraphBuilder, QueryInterpreter, ResponseData,
 };
 use connector::{Connection, ConnectionLike, Connector};
+use elapsed::ElapsedTimeCounter;
 use futures::future;
 
 #[cfg(feature = "metrics")]
@@ -14,7 +15,7 @@ use query_engine_metrics::{
 };
 
 use schema::{QuerySchema, QuerySchemaRef};
-use std::time::{Duration, Instant};
+use std::time::Duration;
 use tracing::Instrument;
 use tracing_futures::WithSubscriber;
 
@@ -24,13 +25,16 @@ pub async fn execute_single_operation(
     operation: &Operation,
     trace_id: Option<String>,
 ) -> crate::Result<ResponseData> {
-    let operation_timer = Instant::now();
+    let operation_timer = ElapsedTimeCounter::start();
 
     let (graph, serializer) = build_graph(&query_schema, operation.clone())?;
     let result = execute_on(conn, graph, serializer, query_schema.as_ref(), trace_id).await;
 
     #[cfg(feature = "metrics")]
-    histogram!(PRISMA_CLIENT_QUERIES_DURATION_HISTOGRAM_MS, operation_timer.elapsed());
+    histogram!(
+        PRISMA_CLIENT_QUERIES_DURATION_HISTOGRAM_MS,
+        operation_timer.elapsed_time()
+    );
 
     result
 }
@@ -49,11 +53,14 @@ pub async fn execute_many_operations(
     let mut results = Vec::with_capacity(queries.len());
 
     for (i, (graph, serializer)) in queries.into_iter().enumerate() {
-        let operation_timer = Instant::now();
+        let operation_timer = ElapsedTimeCounter::start();
         let result = execute_on(conn, graph, serializer, query_schema.as_ref(), trace_id.clone()).await;
 
         #[cfg(feature = "metrics")]
-        histogram!(PRISMA_CLIENT_QUERIES_DURATION_HISTOGRAM_MS, operation_timer.elapsed());
+        histogram!(
+            PRISMA_CLIENT_QUERIES_DURATION_HISTOGRAM_MS,
+            operation_timer.elapsed_time()
+        );
 
         match result {
             Ok(result) => results.push(Ok(result)),
@@ -150,14 +157,14 @@ async fn execute_self_contained(
     retry_on_transient_error: bool,
     trace_id: Option<String>,
 ) -> crate::Result<ResponseData> {
-    let operation_timer = Instant::now();
+    let operation_timer = ElapsedTimeCounter::start();
     let result = if retry_on_transient_error {
         execute_self_contained_with_retry(
             &mut conn,
             query_schema,
             operation,
             force_transactions,
-            Instant::now(),
+            ElapsedTimeCounter::start(),
             trace_id,
         )
         .await
@@ -168,7 +175,10 @@ async fn execute_self_contained(
     };
 
     #[cfg(feature = "metrics")]
-    histogram!(PRISMA_CLIENT_QUERIES_DURATION_HISTOGRAM_MS, operation_timer.elapsed());
+    histogram!(
+        PRISMA_CLIENT_QUERIES_DURATION_HISTOGRAM_MS,
+        operation_timer.elapsed_time()
+    );
 
     result
 }
@@ -200,7 +210,7 @@ async fn execute_self_contained_with_retry(
     query_schema: QuerySchemaRef,
     operation: Operation,
     force_transactions: bool,
-    retry_timeout: Instant,
+    retry_timeout: ElapsedTimeCounter,
     trace_id: Option<String>,
 ) -> crate::Result<ResponseData> {
     let (graph, serializer) = build_graph(&query_schema, operation.clone())?;
@@ -216,7 +226,7 @@ async fn execute_self_contained_with_retry(
             let (graph, serializer) = build_graph(&query_schema, operation.clone())?;
             let res = execute_in_tx(conn, graph, serializer, query_schema.as_ref(), trace_id.clone()).await;
 
-            if is_transient_error(&res) && retry_timeout.elapsed() < MAX_TX_TIMEOUT_RETRY_LIMIT {
+            if is_transient_error(&res) && retry_timeout.elapsed_time() < MAX_TX_TIMEOUT_RETRY_LIMIT {
                 tokio::time::sleep(TX_RETRY_BACKOFF).await;
                 continue;
             } else {
