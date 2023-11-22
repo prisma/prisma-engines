@@ -1,12 +1,13 @@
 use futures::Future;
-use js_sys::{Function as JsFunction, JsString, Object as JsObject};
+use js_sys::{Function as JsFunction, JsString};
 use tsify::Tsify;
 
-use super::{async_js_function::AsyncJsFunction, send_future::SendFuture, transaction::JsTransaction};
+use super::{async_js_function::AsyncJsFunction, transaction::JsTransaction};
+use crate::send_future::SendFuture;
 pub use crate::types::{ColumnType, JSResultSet, Query, TransactionOptions};
 use crate::JsObjectExtern;
 use metrics::increment_gauge;
-use wasm_bindgen::{prelude::wasm_bindgen, JsCast, JsValue};
+use wasm_bindgen::{prelude::wasm_bindgen, JsValue};
 
 type JsResult<T> = core::result::Result<T, JsValue>;
 

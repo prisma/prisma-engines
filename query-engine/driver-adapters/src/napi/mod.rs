@@ -3,8 +3,8 @@
 mod async_js_function;
 mod conversion;
 mod error;
-mod proxy;
-mod queryable;
+pub(crate) mod proxy;
 mod result;
 mod transaction;
-pub use queryable::{from_napi, JsQueryable};
+
+pub use crate::queryable::{from_napi, JsQueryable};

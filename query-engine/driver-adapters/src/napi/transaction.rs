@@ -7,10 +7,8 @@ use quaint::{
     Value,
 };
 
-use super::{
-    proxy::{CommonProxy, TransactionOptions, TransactionProxy},
-    queryable::JsBaseQueryable,
-};
+use super::proxy::{CommonProxy, TransactionOptions, TransactionProxy};
+use crate::queryable::JsBaseQueryable;
 
 // Wrapper around JS transaction objects that implements Queryable
 // and quaint::Transaction. Can be used in place of quaint transaction,

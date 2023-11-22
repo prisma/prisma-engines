@@ -4,10 +4,8 @@ mod async_js_function;
 mod conversion;
 mod error;
 mod js_object_extern;
-mod proxy;
-mod queryable;
-mod send_future;
+pub(crate) mod proxy;
 mod transaction;
 
+pub use crate::queryable::{from_wasm, JsQueryable};
 pub use js_object_extern::JsObjectExtern;
-pub use queryable::{from_wasm, JsQueryable};
