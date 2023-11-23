@@ -1,5 +1,7 @@
 #![allow(unused_imports)]
 
+use std::str::FromStr;
+
 #[cfg(not(target_arch = "wasm32"))]
 use napi::bindgen_prelude::{FromNapiValue, ToNapiValue};
 
@@ -8,6 +10,28 @@ use tsify::Tsify;
 
 use crate::conversion::JSArg;
 use serde::{Deserialize, Serialize};
+
+#[cfg_attr(target_arch = "wasm32", derive(Serialize, Deserialize, Tsify))]
+#[cfg_attr(target_arch = "wasm32", tsify(into_wasm_abi, from_wasm_abi))]
+#[derive(Debug, Eq, PartialEq, Clone)]
+pub enum AdapterFlavour {
+    Mysql,
+    Postgres,
+    Sqlite,
+}
+
+impl FromStr for AdapterFlavour {
+    type Err = String;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        match s {
+            "postgres" => Ok(Self::Postgres),
+            "mysql" => Ok(Self::Mysql),
+            "sqlite" => Ok(Self::Sqlite),
+            _ => Err(format!("Unsupported adapter flavour: {:?}", s)),
+        }
+    }
+}
 
 /// This result set is more convenient to be manipulated from both Rust and NodeJS.
 /// Quaint's version of ResultSet is:
@@ -27,7 +51,7 @@ use serde::{Deserialize, Serialize};
 #[cfg_attr(target_arch = "wasm32", derive(Serialize, Deserialize, Tsify))]
 #[cfg_attr(target_arch = "wasm32", tsify(into_wasm_abi, from_wasm_abi))]
 #[cfg_attr(target_arch = "wasm32", serde(rename_all = "camelCase"))]
-#[derive(Debug, Default)]
+#[derive(Debug)]
 pub struct JSResultSet {
     pub column_types: Vec<ColumnType>,
     pub column_names: Vec<String>,
@@ -190,6 +214,7 @@ pub struct Query {
 #[cfg_attr(not(target_arch = "wasm32"), napi_derive::napi(object))]
 #[cfg_attr(target_arch = "wasm32", derive(Serialize, Deserialize, Tsify))]
 #[cfg_attr(target_arch = "wasm32", tsify(into_wasm_abi, from_wasm_abi))]
+#[cfg_attr(target_arch = "wasm32", serde(rename_all = "camelCase"))]
 #[derive(Debug, Default)]
 pub struct TransactionOptions {
     /// Whether or not to run a phantom query (i.e., a query that only influences Prisma event logs, but not the database itself)

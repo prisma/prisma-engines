@@ -1106,7 +1106,6 @@ dependencies = [
  "num-bigint",
  "once_cell",
  "pin-project",
- "psl",
  "quaint",
  "serde",
  "serde-wasm-bindgen",
@@ -1118,6 +1117,7 @@ dependencies = [
  "uuid",
  "wasm-bindgen",
  "wasm-bindgen-futures",
+ "web-sys",
 ]
 
 [[package]]

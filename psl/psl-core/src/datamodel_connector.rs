@@ -361,10 +361,7 @@ pub trait Connector: Send + Sync {
     }
 }
 
-#[cfg_attr(target_arch = "wasm32", wasm_bindgen::prelude::wasm_bindgen)]
-#[derive(Copy, Clone, Debug, PartialEq, Default, serde::Deserialize)]
 pub enum Flavour {
-    #[default]
     Cockroach,
     Mongo,
     Sqlserver,

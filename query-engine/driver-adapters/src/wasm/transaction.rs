@@ -1,23 +1,25 @@
 use async_trait::async_trait;
+use js_sys::{JsString, Object as JsObject};
 use metrics::decrement_gauge;
 use quaint::{
     connector::{IsolationLevel, Transaction as QuaintTransaction},
     prelude::{Query as QuaintQuery, Queryable, ResultSet},
     Value,
 };
-use serde::Deserialize;
+use std::str::FromStr;
+use wasm_bindgen::JsCast;
 
-use super::proxy::{TransactionOptions, TransactionProxy};
-use crate::{queryable::JsBaseQueryable, send_future::SendFuture};
+use super::{
+    from_js::FromJsValue,
+    proxy::{TransactionOptions, TransactionProxy},
+};
+use crate::{proxy::CommonProxy, queryable::JsBaseQueryable, send_future::SendFuture, JsObjectExtern};
 
 // Wrapper around JS transaction objects that implements Queryable
 // and quaint::Transaction. Can be used in place of quaint transaction,
 // but delegates most operations to JS
-#[derive(Deserialize, Default)]
 pub(crate) struct JsTransaction {
-    #[serde(skip)]
     tx_proxy: TransactionProxy,
-    #[serde(skip)]
     inner: JsBaseQueryable,
 }
 
@@ -33,6 +35,21 @@ impl JsTransaction {
     pub async fn raw_phantom_cmd(&self, cmd: &str) -> quaint::Result<()> {
         let params = &[];
         quaint::connector::metrics::query("js.raw_phantom_cmd", cmd, params, move || async move { Ok(()) }).await
+    }
+}
+
+impl FromJsValue for JsTransaction {
+    fn from_js_value(value: wasm_bindgen::prelude::JsValue) -> Result<Self, wasm_bindgen::prelude::JsValue> {
+        let object: JsObjectExtern = value.dyn_into::<JsObject>()?.unchecked_into();
+        web_sys::console::log_1(&JsString::from_str("OBJECT").unwrap().into());
+        let common_proxy = CommonProxy::new(&object)?;
+        web_sys::console::log_1(&JsString::from_str("PROXY").unwrap().into());
+        let base = JsBaseQueryable::new(common_proxy);
+        web_sys::console::log_1(&JsString::from_str("BASE").unwrap().into());
+        let tx_proxy = TransactionProxy::new(&object)?;
+        web_sys::console::log_1(&JsString::from_str("TX_PROXY").unwrap().into());
+
+        Ok(Self::new(base, tx_proxy))
     }
 }
 

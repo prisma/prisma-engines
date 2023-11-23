@@ -1,8 +1,10 @@
-use js_sys::Boolean as JsBoolean;
+use std::str::FromStr;
+
+use js_sys::{Boolean as JsBoolean, JsString};
 use quaint::error::{Error as QuaintError, ErrorKind};
-use serde::de::DeserializeOwned;
 use wasm_bindgen::{JsCast, JsValue};
 
+use super::from_js::FromJsValue;
 use crate::{error::DriverAdapterError, JsObjectExtern};
 
 impl From<DriverAdapterError> for QuaintError {
@@ -26,28 +28,17 @@ impl From<DriverAdapterError> for QuaintError {
 /// Wrapper for JS-side result type
 pub(crate) enum JsResult<T>
 where
-    T: DeserializeOwned,
+    T: FromJsValue,
 {
     Ok(T),
     Err(DriverAdapterError),
 }
 
-impl<T> TryFrom<JsValue> for JsResult<T>
+impl<T> FromJsValue for JsResult<T>
 where
-    T: DeserializeOwned,
+    T: FromJsValue,
 {
-    type Error = JsValue;
-
-    fn try_from(value: JsValue) -> Result<Self, Self::Error> {
-        Self::from_js_unknown(value)
-    }
-}
-
-impl<T> JsResult<T>
-where
-    T: DeserializeOwned,
-{
-    fn from_js_unknown(unknown: JsValue) -> Result<Self, JsValue> {
+    fn from_js_value(unknown: JsValue) -> Result<Self, JsValue> {
         let object = unknown.unchecked_into::<JsObjectExtern>();
 
         let ok: JsBoolean = object.get("ok".into())?.unchecked_into();
@@ -55,7 +46,9 @@ where
 
         if ok {
             let js_value: JsValue = object.get("value".into())?;
-            let deserialized = serde_wasm_bindgen::from_value::<T>(js_value)?;
+            web_sys::console::log_1(&JsString::from_str("BEFORE DESERIALIZE").unwrap().into());
+            let deserialized = T::from_js_value(js_value)?;
+            web_sys::console::log_1(&JsString::from_str(" DESERIALIZE").unwrap().into());
             return Ok(Self::Ok(deserialized));
         }
 
@@ -67,7 +60,7 @@ where
 
 impl<T> From<JsResult<T>> for quaint::Result<T>
 where
-    T: DeserializeOwned,
+    T: FromJsValue,
 {
     fn from(value: JsResult<T>) -> Self {
         match value {

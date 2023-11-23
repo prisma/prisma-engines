@@ -15,7 +15,6 @@ type JsResult<T> = core::result::Result<T, JsValue>;
 /// querying and executing SQL (i.e. a client connector). The Proxy uses Wasm's JsFunction to
 /// invoke the code within the node runtime that implements the client connector.
 #[wasm_bindgen(getter_with_clone)]
-#[derive(Default)]
 pub(crate) struct CommonProxy {
     /// Execute a query given as SQL, interpolating the given parameters.
     query_raw: AsyncJsFunction<Query, JSResultSet>,
@@ -38,7 +37,6 @@ pub(crate) struct DriverProxy {
 /// This a JS proxy for accessing the methods, specific
 /// to JS transaction objects
 #[wasm_bindgen(getter_with_clone)]
-#[derive(Default)]
 pub(crate) struct TransactionProxy {
     /// transaction options
     options: TransactionOptions,

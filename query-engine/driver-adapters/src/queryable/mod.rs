@@ -19,11 +19,11 @@ pub(crate) use wasm::JsBaseQueryable;
 use super::{
     conversion,
     proxy::{CommonProxy, DriverProxy, Query},
+    types::AdapterFlavour,
 };
 use crate::send_future::SendFuture;
 use async_trait::async_trait;
 use futures::Future;
-use psl::datamodel_connector::Flavour;
 use quaint::{
     connector::{metrics, IsolationLevel, Transaction},
     error::{Error, ErrorKind},
@@ -34,17 +34,16 @@ use tracing::{info_span, Instrument};
 
 impl JsBaseQueryable {
     pub(crate) fn new(proxy: CommonProxy) -> Self {
-        let flavour: Flavour = proxy.flavour.parse().unwrap();
+        let flavour: AdapterFlavour = proxy.flavour.parse().unwrap();
         Self { proxy, flavour }
     }
 
     /// visit a quaint query AST according to the flavour of the JS connector
     fn visit_quaint_query<'a>(&self, q: QuaintQuery<'a>) -> quaint::Result<(String, Vec<quaint::Value<'a>>)> {
         match self.flavour {
-            Flavour::Mysql => visitor::Mysql::build(q),
-            Flavour::Postgres => visitor::Postgres::build(q),
-            Flavour::Sqlite => visitor::Sqlite::build(q),
-            _ => unimplemented!("Unsupported flavour for JS connector {:?}", self.flavour),
+            AdapterFlavour::Mysql => visitor::Mysql::build(q),
+            AdapterFlavour::Postgres => visitor::Postgres::build(q),
+            AdapterFlavour::Sqlite => visitor::Sqlite::build(q),
         }
     }
 
@@ -52,10 +51,9 @@ impl JsBaseQueryable {
         let sql: String = sql.to_string();
 
         let converter = match self.flavour {
-            Flavour::Postgres => conversion::postgres::value_to_js_arg,
-            Flavour::Sqlite => conversion::sqlite::value_to_js_arg,
-            Flavour::Mysql => conversion::mysql::value_to_js_arg,
-            _ => unreachable!("Unsupported flavour for JS connector {:?}", self.flavour),
+            AdapterFlavour::Postgres => conversion::postgres::value_to_js_arg,
+            AdapterFlavour::Sqlite => conversion::sqlite::value_to_js_arg,
+            AdapterFlavour::Mysql => conversion::mysql::value_to_js_arg,
         };
 
         let args = values
@@ -127,7 +125,7 @@ impl QuaintQueryable for JsBaseQueryable {
             return Err(Error::builder(ErrorKind::invalid_isolation_level(&isolation_level)).build());
         }
 
-        if self.flavour == Flavour::Sqlite {
+        if self.flavour == AdapterFlavour::Sqlite {
             return match isolation_level {
                 IsolationLevel::Serializable => Ok(()),
                 _ => Err(Error::builder(ErrorKind::invalid_isolation_level(&isolation_level)).build()),
@@ -140,9 +138,8 @@ impl QuaintQueryable for JsBaseQueryable {
 
     fn requires_isolation_first(&self) -> bool {
         match self.flavour {
-            Flavour::Mysql => true,
-            Flavour::Postgres | Flavour::Sqlite => false,
-            _ => unreachable!(),
+            AdapterFlavour::Mysql => true,
+            AdapterFlavour::Postgres | AdapterFlavour::Sqlite => false,
         }
     }
 }
