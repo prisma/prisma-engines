@@ -1,14 +1,13 @@
 name: Trigger prisma-engines-builds run
 run-name: Trigger prisma-engines-builds run for ${{ github.sha }}
 
-
 on:
   push:
     branches:
       - main
 
 jobs:
-  send-tag-event:
+  send-commit-hash:
     runs-on: ubuntu-22.04
     steps:
       - run: echo "Sending event for commit $GITHUB_SHA"
