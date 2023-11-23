@@ -294,7 +294,7 @@ services:
       FOREIGN_KEY_MODE: 'disallow'
       ENABLE_ONLINE_DDL: false
       MYSQL_MAX_CONNECTIONS: 100000
-      TABLET_REFRESH_INTERVAL: '500ms'
+      TABLET_REFRESH_INTERVAL: '100ms'
     healthcheck:
       test: ['CMD', 'mysqladmin', 'ping', '-h127.0.0.1', '-P33807']
       interval: 5s
