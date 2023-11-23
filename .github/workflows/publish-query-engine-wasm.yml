@@ -24,7 +24,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Print input
-        run: echo ${{ toJson(github.event.inputs) }}
+        run: echo "${{ toJson(github.event.inputs) }}"
 
       - uses: actions/checkout@v4
         with:
@@ -51,8 +51,8 @@ jobs:
         run: echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}" > ~/.npmrc
 
       - name: Publish @prisma/query-engine-wasm
-        run: npm publish ./pkg --provenance --access public --tag ${{ github.event.inputs.npmDistTag }}
-        working-directory: ./query-engine/query-engine-wasm
+        run: npm publish --access public --tag ${{ github.event.inputs.npmDistTag }}
+        working-directory: ./query-engine/query-engine-wasm/pkg
 
       #
       # Failure handlers
