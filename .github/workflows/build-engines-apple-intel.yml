@@ -1,4 +1,4 @@
-name: Build Apple Intel
+name: Build Engines for Apple Intel
 on:
   workflow_dispatch:
     inputs:
