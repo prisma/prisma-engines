@@ -318,6 +318,9 @@
 <a href="#318" id="318">318</a>
 <a href="#319" id="319">319</a>
 <a href="#320" id="320">320</a>
+<a href="#321" id="321">321</a>
+<a href="#322" id="322">322</a>
+<a href="#323" id="323">323</a>
 </pre></div><pre class="rust"><code><span class="kw">mod </span>config;
 <span class="kw">mod </span>connector_tag;
 <span class="kw">mod </span>datamodel_rendering;
@@ -472,8 +475,9 @@
         <span class="kw">let </span>required_capabilities_for_test = required_capabilities | caps;
         <span class="kw">let </span>test_db_name = <span class="macro">format!</span>(<span class="string">&quot;{suite_name}_{test_name}_{i}&quot;</span>);
         <span class="kw">let </span>template = dm.datamodel().to_owned();
+        <span class="kw">let </span>(connector, version) = CONFIG.test_connector().unwrap();
 
-        <span class="kw">if </span>!should_run(only, exclude, required_capabilities_for_test) {
+        <span class="kw">if </span>!should_run(<span class="kw-2">&amp;</span>connector, <span class="kw-2">&amp;</span>version, only, exclude, required_capabilities_for_test) {
             <span class="kw">continue</span>;
         }
 
@@ -570,7 +574,9 @@
     referential_override: <span class="prelude-ty">Option</span>&lt;String&gt;,
     test_fn: <span class="kw-2">&amp;</span><span class="kw">dyn </span>Fn(Runner) -&gt; BoxFuture&lt;<span class="lifetime">&#39;static</span>, TestResult&lt;()&gt;&gt;,
 ) {
-    <span class="kw">if </span>!should_run(only, exclude, capabilities) {
+    <span class="kw">let </span>(connector, version) = CONFIG.test_connector().unwrap();
+
+    <span class="kw">if </span>!should_run(<span class="kw-2">&amp;</span>connector, <span class="kw-2">&amp;</span>version, only, exclude, capabilities) {
         <span class="kw">return</span>;
     }
 

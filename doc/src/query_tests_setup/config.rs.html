@@ -327,11 +327,14 @@
 <a href="#327" id="327">327</a>
 <a href="#328" id="328">328</a>
 <a href="#329" id="329">329</a>
+<a href="#330" id="330">330</a>
+<a href="#331" id="331">331</a>
+<a href="#332" id="332">332</a>
 </pre></div><pre class="rust"><code><span class="kw">use crate</span>::{
     CockroachDbConnectorTag, ConnectorTag, ConnectorVersion, MongoDbConnectorTag, MySqlConnectorTag,
     PostgresConnectorTag, SqlServerConnectorTag, SqliteConnectorTag, TestResult, VitessConnectorTag,
 };
-<span class="kw">use </span>serde::Deserialize;
+<span class="kw">use </span>serde::{Deserialize, Serialize};
 <span class="kw">use </span>std::{convert::TryFrom, env, fmt::Display, fs::File, io::Read, path::PathBuf};
 
 <span class="kw">static </span>TEST_CONFIG_FILE_NAME: <span class="kw-2">&amp;</span>str = <span class="string">&quot;.test_config&quot;</span>;
@@ -356,13 +359,13 @@
 </span><span class="kw">pub struct </span>TestConfig {
     <span class="doccomment">/// The connector that tests should run for.
     /// Env key: `TEST_CONNECTOR`
-    </span>connector: String,
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) connector: String,
 
     <span class="doccomment">/// The connector version tests should run for.
     /// If the test connector is versioned, this option is required.
     /// Env key: `TEST_CONNECTOR_VERSION`
     </span><span class="attr">#[serde(rename = <span class="string">&quot;version&quot;</span>)]
-    </span>connector_version: <span class="prelude-ty">Option</span>&lt;String&gt;,
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) connector_version: <span class="prelude-ty">Option</span>&lt;String&gt;,
 
     <span class="doccomment">/// An external process to execute the test queries and produced responses for assertion
     /// Used when testing driver adapters, this process is expected to be a javascript process
@@ -370,20 +373,25 @@
     /// driver adapter.
     /// Possible values: Napi, Wasm
     /// Env key: `EXTERNAL_TEST_EXECUTOR`
-    </span>external_test_executor: <span class="prelude-ty">Option</span>&lt;TestExecutor&gt;,
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) external_test_executor: <span class="prelude-ty">Option</span>&lt;TestExecutor&gt;,
 
     <span class="doccomment">/// The driver adapter to use when running tests, will be forwarded to the external test
     /// executor by setting the `DRIVER_ADAPTER` env var when spawning the executor process
-    </span>driver_adapter: <span class="prelude-ty">Option</span>&lt;String&gt;,
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) driver_adapter: <span class="prelude-ty">Option</span>&lt;String&gt;,
 
     <span class="doccomment">/// The driver adapter configuration to forward as a stringified JSON object to the external
     /// test executor by setting the `DRIVER_ADAPTER_CONFIG` env var when spawning the executor
-    </span>driver_adapter_config: <span class="prelude-ty">Option</span>&lt;serde_json::Value&gt;,
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) driver_adapter_config: <span class="prelude-ty">Option</span>&lt;DriverAdapterConfig&gt;,
 
     <span class="doccomment">/// Indicates whether or not the tests are running in CI context.
     /// Env key: `BUILDKITE`
     </span><span class="attr">#[serde(default)]
-    </span>is_ci: bool,
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) is_ci: bool,
+}
+
+<span class="attr">#[derive(Debug, Default, Serialize, Deserialize)]
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>DriverAdapterConfig {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) proxy_url: <span class="prelude-ty">Option</span>&lt;String&gt;,
 }
 
 <span class="kw">const </span>CONFIG_LOAD_FAILED: <span class="kw-2">&amp;</span>str = <span class="string">r####&quot;
@@ -454,7 +462,7 @@ Use the Makefile.
         <span class="kw">if let </span><span class="prelude-val">Some</span>(external_test_executor) = <span class="self">self</span>.external_test_executor.as_ref() {
             <span class="macro">println!</span>(<span class="string">&quot;* External test executor: {}&quot;</span>, external_test_executor);
             <span class="macro">println!</span>(<span class="string">&quot;* Driver adapter: {}&quot;</span>, <span class="self">self</span>.driver_adapter().unwrap_or_default());
-            <span class="macro">println!</span>(<span class="string">&quot;* Driver adapter url override: {}&quot;</span>, <span class="self">self</span>.json_stringify_driver_adapter_config());
+            <span class="macro">println!</span>(<span class="string">&quot;* Driver adapter config: {}&quot;</span>, <span class="self">self</span>.json_stringify_driver_adapter_config());
         }
         <span class="macro">println!</span>(<span class="string">&quot;******************************&quot;</span>);
     }
@@ -468,7 +476,7 @@ Use the Makefile.
 
         <span class="kw">let </span>driver_adapter = std::env::var(<span class="string">&quot;DRIVER_ADAPTER&quot;</span>).ok();
         <span class="kw">let </span>driver_adapter_config = std::env::var(<span class="string">&quot;DRIVER_ADAPTER_CONFIG&quot;</span>)
-            .map(|config| serde_json::from_str::&lt;serde_json::Value&gt;(config.as_str()).ok())
+            .map(|config| serde_json::from_str::&lt;DriverAdapterConfig&gt;(config.as_str()).ok())
             .unwrap_or_default();
 
         <span class="comment">// Just care for a set value for now.
@@ -533,7 +541,8 @@ Use the Makefile.
             | <span class="prelude-val">Ok</span>(ConnectorVersion::SqlServer(<span class="prelude-val">None</span>))
             | <span class="prelude-val">Ok</span>(ConnectorVersion::MongoDb(<span class="prelude-val">None</span>))
             | <span class="prelude-val">Ok</span>(ConnectorVersion::CockroachDb(<span class="prelude-val">None</span>))
-            | <span class="prelude-val">Ok</span>(ConnectorVersion::Postgres(<span class="prelude-val">None</span>)) =&gt; {
+            | <span class="prelude-val">Ok</span>(ConnectorVersion::Postgres(<span class="prelude-val">None</span>))
+            | <span class="prelude-val">Ok</span>(ConnectorVersion::Sqlite(<span class="prelude-val">None</span>)) =&gt; {
                 exit_with_message(<span class="string">&quot;The current test connector requires a version to be set to run.&quot;</span>);
             }
             <span class="prelude-val">Ok</span>(ConnectorVersion::Vitess(<span class="prelude-val">Some</span>(<span class="kw">_</span>)))
@@ -542,7 +551,7 @@ Use the Makefile.
             | <span class="prelude-val">Ok</span>(ConnectorVersion::MongoDb(<span class="prelude-val">Some</span>(<span class="kw">_</span>)))
             | <span class="prelude-val">Ok</span>(ConnectorVersion::CockroachDb(<span class="prelude-val">Some</span>(<span class="kw">_</span>)))
             | <span class="prelude-val">Ok</span>(ConnectorVersion::Postgres(<span class="prelude-val">Some</span>(<span class="kw">_</span>)))
-            | <span class="prelude-val">Ok</span>(ConnectorVersion::Sqlite) =&gt; (),
+            | <span class="prelude-val">Ok</span>(ConnectorVersion::Sqlite(<span class="prelude-val">Some</span>(<span class="kw">_</span>))) =&gt; (),
             <span class="prelude-val">Err</span>(err) =&gt; exit_with_message(<span class="kw-2">&amp;</span>err.to_string()),
         }
 
@@ -607,11 +616,8 @@ Use the Makefile.
         <span class="self">self</span>.driver_adapter.as_deref()
     }
 
-    <span class="kw">pub fn </span>json_stringify_driver_adapter_config(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; String {
-        <span class="self">self</span>.driver_adapter_config
-            .as_ref()
-            .map(|value| value.to_string())
-            .unwrap_or(<span class="string">&quot;{}&quot;</span>.to_string())
+    <span class="kw">fn </span>json_stringify_driver_adapter_config(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; String {
+        serde_json::to_string(<span class="kw-2">&amp;</span><span class="self">self</span>.driver_adapter_config).unwrap_or_default()
     }
 
     <span class="kw">pub fn </span>test_connector(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; TestResult&lt;(ConnectorTag, ConnectorVersion)&gt; {
@@ -621,7 +627,7 @@ Use the Makefile.
             ConnectorVersion::Postgres(<span class="kw">_</span>) =&gt; <span class="kw-2">&amp;</span>PostgresConnectorTag,
             ConnectorVersion::MySql(<span class="kw">_</span>) =&gt; <span class="kw-2">&amp;</span>MySqlConnectorTag,
             ConnectorVersion::MongoDb(<span class="kw">_</span>) =&gt; <span class="kw-2">&amp;</span>MongoDbConnectorTag,
-            ConnectorVersion::Sqlite =&gt; <span class="kw-2">&amp;</span>SqliteConnectorTag,
+            ConnectorVersion::Sqlite(<span class="kw">_</span>) =&gt; <span class="kw-2">&amp;</span>SqliteConnectorTag,
             ConnectorVersion::CockroachDb(<span class="kw">_</span>) =&gt; <span class="kw-2">&amp;</span>CockroachDbConnectorTag,
             ConnectorVersion::Vitess(<span class="kw">_</span>) =&gt; <span class="kw-2">&amp;</span>VitessConnectorTag,
         };

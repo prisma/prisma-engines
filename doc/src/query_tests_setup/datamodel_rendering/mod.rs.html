@@ -100,12 +100,6 @@
 <a href="#100" id="100">100</a>
 <a href="#101" id="101">101</a>
 <a href="#102" id="102">102</a>
-<a href="#103" id="103">103</a>
-<a href="#104" id="104">104</a>
-<a href="#105" id="105">105</a>
-<a href="#106" id="106">106</a>
-<a href="#107" id="107">107</a>
-<a href="#108" id="108">108</a>
 </pre></div><pre class="rust"><code><span class="kw">mod </span>mongodb_renderer;
 <span class="kw">mod </span>sql_renderer;
 
@@ -170,13 +164,7 @@
             }}
         &quot;#</span>},
         tag.datamodel_provider(),
-        connection_string(
-            <span class="kw-2">&amp;</span>version,
-            test_database,
-            CONFIG.is_ci(),
-            is_multi_schema,
-            isolation_level
-        ),
+        connection_string(<span class="kw-2">&amp;</span>CONFIG, <span class="kw-2">&amp;</span>version, test_database, is_multi_schema, isolation_level),
         relation_mode_override.unwrap_or_else(|| tag.relation_mode().to_string()),
         schema_def,
         preview_features

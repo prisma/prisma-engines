@@ -25,6 +25,34 @@
 <a href="#25" id="25">25</a>
 <a href="#26" id="26">26</a>
 <a href="#27" id="27">27</a>
+<a href="#28" id="28">28</a>
+<a href="#29" id="29">29</a>
+<a href="#30" id="30">30</a>
+<a href="#31" id="31">31</a>
+<a href="#32" id="32">32</a>
+<a href="#33" id="33">33</a>
+<a href="#34" id="34">34</a>
+<a href="#35" id="35">35</a>
+<a href="#36" id="36">36</a>
+<a href="#37" id="37">37</a>
+<a href="#38" id="38">38</a>
+<a href="#39" id="39">39</a>
+<a href="#40" id="40">40</a>
+<a href="#41" id="41">41</a>
+<a href="#42" id="42">42</a>
+<a href="#43" id="43">43</a>
+<a href="#44" id="44">44</a>
+<a href="#45" id="45">45</a>
+<a href="#46" id="46">46</a>
+<a href="#47" id="47">47</a>
+<a href="#48" id="48">48</a>
+<a href="#49" id="49">49</a>
+<a href="#50" id="50">50</a>
+<a href="#51" id="51">51</a>
+<a href="#52" id="52">52</a>
+<a href="#53" id="53">53</a>
+<a href="#54" id="54">54</a>
+<a href="#55" id="55">55</a>
 </pre></div><pre class="rust"><code><span class="kw">use super</span>::<span class="kw-2">*</span>;
 <span class="kw">use crate</span>::{BoxFuture, SqlDatamodelRenderer};
 <span class="kw">use </span>quaint::{prelude::Queryable, single::Quaint};
@@ -50,6 +78,34 @@
 
     <span class="kw">fn </span>capabilities(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; ConnectorCapabilities {
         psl::builtin_connectors::SQLITE.capabilities()
+    }
+}
+
+<span class="attr">#[derive(Clone, Debug, PartialEq, Eq)]
+</span><span class="kw">pub enum </span>SqliteVersion {
+    V3,
+    LibsqlJS,
+}
+
+<span class="kw">impl </span>ToString <span class="kw">for </span>SqliteVersion {
+    <span class="kw">fn </span>to_string(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; String {
+        <span class="kw">match </span><span class="self">self </span>{
+            SqliteVersion::V3 =&gt; <span class="string">&quot;3&quot;</span>.to_string(),
+            SqliteVersion::LibsqlJS =&gt; <span class="string">&quot;libsql.js&quot;</span>.to_string(),
+        }
+    }
+}
+
+<span class="kw">impl </span>TryFrom&lt;<span class="kw-2">&amp;</span>str&gt; <span class="kw">for </span>SqliteVersion {
+    <span class="kw">type </span>Error = TestError;
+
+    <span class="kw">fn </span>try_from(s: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, <span class="self">Self</span>::Error&gt; {
+        <span class="kw">let </span>version = <span class="kw">match </span>s {
+            <span class="string">&quot;3&quot; </span>=&gt; <span class="self">Self</span>::V3,
+            <span class="string">&quot;libsql.js&quot; </span>=&gt; <span class="self">Self</span>::LibsqlJS,
+            <span class="kw">_ </span>=&gt; <span class="kw">return </span><span class="prelude-val">Err</span>(TestError::parse_error(<span class="macro">format!</span>(<span class="string">&quot;Unknown SQLite version `{s}`&quot;</span>))),
+        };
+        <span class="prelude-val">Ok</span>(version)
     }
 }
 </code></pre></div></section></main></body></html>

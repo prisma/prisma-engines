@@ -349,6 +349,66 @@
 <a href="#349" id="349">349</a>
 <a href="#350" id="350">350</a>
 <a href="#351" id="351">351</a>
+<a href="#352" id="352">352</a>
+<a href="#353" id="353">353</a>
+<a href="#354" id="354">354</a>
+<a href="#355" id="355">355</a>
+<a href="#356" id="356">356</a>
+<a href="#357" id="357">357</a>
+<a href="#358" id="358">358</a>
+<a href="#359" id="359">359</a>
+<a href="#360" id="360">360</a>
+<a href="#361" id="361">361</a>
+<a href="#362" id="362">362</a>
+<a href="#363" id="363">363</a>
+<a href="#364" id="364">364</a>
+<a href="#365" id="365">365</a>
+<a href="#366" id="366">366</a>
+<a href="#367" id="367">367</a>
+<a href="#368" id="368">368</a>
+<a href="#369" id="369">369</a>
+<a href="#370" id="370">370</a>
+<a href="#371" id="371">371</a>
+<a href="#372" id="372">372</a>
+<a href="#373" id="373">373</a>
+<a href="#374" id="374">374</a>
+<a href="#375" id="375">375</a>
+<a href="#376" id="376">376</a>
+<a href="#377" id="377">377</a>
+<a href="#378" id="378">378</a>
+<a href="#379" id="379">379</a>
+<a href="#380" id="380">380</a>
+<a href="#381" id="381">381</a>
+<a href="#382" id="382">382</a>
+<a href="#383" id="383">383</a>
+<a href="#384" id="384">384</a>
+<a href="#385" id="385">385</a>
+<a href="#386" id="386">386</a>
+<a href="#387" id="387">387</a>
+<a href="#388" id="388">388</a>
+<a href="#389" id="389">389</a>
+<a href="#390" id="390">390</a>
+<a href="#391" id="391">391</a>
+<a href="#392" id="392">392</a>
+<a href="#393" id="393">393</a>
+<a href="#394" id="394">394</a>
+<a href="#395" id="395">395</a>
+<a href="#396" id="396">396</a>
+<a href="#397" id="397">397</a>
+<a href="#398" id="398">398</a>
+<a href="#399" id="399">399</a>
+<a href="#400" id="400">400</a>
+<a href="#401" id="401">401</a>
+<a href="#402" id="402">402</a>
+<a href="#403" id="403">403</a>
+<a href="#404" id="404">404</a>
+<a href="#405" id="405">405</a>
+<a href="#406" id="406">406</a>
+<a href="#407" id="407">407</a>
+<a href="#408" id="408">408</a>
+<a href="#409" id="409">409</a>
+<a href="#410" id="410">410</a>
+<a href="#411" id="411">411</a>
 </pre></div><pre class="rust"><code><span class="kw">mod </span>cockroachdb;
 <span class="kw">mod </span>js;
 <span class="kw">mod </span>mongodb;
@@ -369,7 +429,7 @@
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use </span>sqlite::<span class="kw-2">*</span>;
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use </span>vitess::<span class="kw-2">*</span>;
 
-<span class="kw">use crate</span>::{datamodel_rendering::DatamodelRenderer, BoxFuture, TestError, CONFIG};
+<span class="kw">use crate</span>::{datamodel_rendering::DatamodelRenderer, BoxFuture, TestConfig, TestError, CONFIG};
 <span class="kw">use </span>psl::datamodel_connector::ConnectorCapabilities;
 <span class="kw">use </span>std::{convert::TryFrom, fmt};
 
@@ -400,12 +460,13 @@
 /// - `is_ci` signals whether or not the test run is done on CI or not. May be important if local
 ///   test run connection strings and CI connection strings differ because of networking.
 </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>connection_string(
+    test_config: <span class="kw-2">&amp;</span>TestConfig,
     version: <span class="kw-2">&amp;</span>ConnectorVersion,
     database: <span class="kw-2">&amp;</span>str,
-    is_ci: bool,
     is_multi_schema: bool,
     isolation_level: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str&gt;,
 ) -&gt; String {
+    <span class="kw">let </span>is_ci = test_config.is_ci;
     <span class="kw">match </span>version {
         ConnectorVersion::SqlServer(v) =&gt; {
             <span class="kw">let </span>database = <span class="kw">if </span>is_multi_schema {
@@ -449,7 +510,7 @@
                 <span class="prelude-val">Some</span>(PostgresVersion::V12) <span class="kw">if </span>is_ci =&gt; {
                     <span class="macro">format!</span>(<span class="string">&quot;postgresql://postgres:prisma@test-db-postgres-12:5432/{database}&quot;</span>)
                 }
-                <span class="prelude-val">Some</span>(PostgresVersion::V13) <span class="kw">if </span>is_ci =&gt; {
+                <span class="prelude-val">Some</span>(PostgresVersion::V13) | <span class="prelude-val">Some</span>(PostgresVersion::NeonJs) | <span class="prelude-val">Some</span>(PostgresVersion::PgJs) <span class="kw">if </span>is_ci =&gt; {
                     <span class="macro">format!</span>(<span class="string">&quot;postgresql://postgres:prisma@test-db-postgres-13:5432/{database}&quot;</span>)
                 }
                 <span class="prelude-val">Some</span>(PostgresVersion::V14) <span class="kw">if </span>is_ci =&gt; {
@@ -466,7 +527,9 @@
                 <span class="prelude-val">Some</span>(PostgresVersion::V10) =&gt; <span class="macro">format!</span>(<span class="string">&quot;postgresql://postgres:prisma@127.0.0.1:5432/{database}&quot;</span>),
                 <span class="prelude-val">Some</span>(PostgresVersion::V11) =&gt; <span class="macro">format!</span>(<span class="string">&quot;postgresql://postgres:prisma@127.0.0.1:5433/{database}&quot;</span>),
                 <span class="prelude-val">Some</span>(PostgresVersion::V12) =&gt; <span class="macro">format!</span>(<span class="string">&quot;postgresql://postgres:prisma@127.0.0.1:5434/{database}&quot;</span>),
-                <span class="prelude-val">Some</span>(PostgresVersion::V13) =&gt; <span class="macro">format!</span>(<span class="string">&quot;postgresql://postgres:prisma@127.0.0.1:5435/{database}&quot;</span>),
+                <span class="prelude-val">Some</span>(PostgresVersion::V13) | <span class="prelude-val">Some</span>(PostgresVersion::NeonJs) | <span class="prelude-val">Some</span>(PostgresVersion::PgJs) =&gt; {
+                    <span class="macro">format!</span>(<span class="string">&quot;postgresql://postgres:prisma@127.0.0.1:5435/{database}&quot;</span>)
+                }
                 <span class="prelude-val">Some</span>(PostgresVersion::V14) =&gt; <span class="macro">format!</span>(<span class="string">&quot;postgresql://postgres:prisma@127.0.0.1:5437/{database}&quot;</span>),
                 <span class="prelude-val">Some</span>(PostgresVersion::V15) =&gt; <span class="macro">format!</span>(<span class="string">&quot;postgresql://postgres:prisma@127.0.0.1:5438/{database}&quot;</span>),
                 <span class="prelude-val">Some</span>(PostgresVersion::PgBouncer) =&gt; {
@@ -513,7 +576,7 @@
             }
             <span class="prelude-val">None </span>=&gt; <span class="macro">unreachable!</span>(<span class="string">&quot;A versioned connector must have a concrete version to run.&quot;</span>),
         },
-        ConnectorVersion::Sqlite =&gt; {
+        ConnectorVersion::Sqlite(<span class="kw">_</span>) =&gt; {
             <span class="kw">let </span>workspace_root = std::env::var(<span class="string">&quot;WORKSPACE_ROOT&quot;</span>)
                 .unwrap_or_else(|<span class="kw">_</span>| <span class="string">&quot;.&quot;</span>.to_owned())
                 .trim_end_matches(<span class="string">&#39;/&#39;</span>)
@@ -547,7 +610,12 @@
                 <span class="prelude-val">None </span>=&gt; <span class="macro">unreachable!</span>(<span class="string">&quot;A versioned connector must have a concrete version to run.&quot;</span>),
             }
         }
+
         ConnectorVersion::Vitess(<span class="prelude-val">Some</span>(VitessVersion::V8_0)) =&gt; <span class="string">&quot;mysql://root@localhost:33807/test&quot;</span>.into(),
+        ConnectorVersion::Vitess(<span class="prelude-val">Some</span>(VitessVersion::PlanetscaleJs)) =&gt; {
+            <span class="macro">format!</span>(<span class="string">&quot;mysql://root@127.0.0.1:3310/{database}&quot;</span>)
+        }
+
         ConnectorVersion::Vitess(<span class="prelude-val">None</span>) =&gt; <span class="macro">unreachable!</span>(<span class="string">&quot;A versioned connector must have a concrete version to run.&quot;</span>),
     }
 }
@@ -560,12 +628,25 @@
     Postgres(<span class="prelude-ty">Option</span>&lt;PostgresVersion&gt;),
     MySql(<span class="prelude-ty">Option</span>&lt;MySqlVersion&gt;),
     MongoDb(<span class="prelude-ty">Option</span>&lt;MongoDbVersion&gt;),
-    Sqlite,
+    Sqlite(<span class="prelude-ty">Option</span>&lt;SqliteVersion&gt;),
     CockroachDb(<span class="prelude-ty">Option</span>&lt;CockroachDbVersion&gt;),
     Vitess(<span class="prelude-ty">Option</span>&lt;VitessVersion&gt;),
 }
 
 <span class="kw">impl </span>ConnectorVersion {
+    <span class="kw">fn </span>is_broader(<span class="kw-2">&amp;</span><span class="self">self</span>, other: <span class="kw-2">&amp;</span>ConnectorVersion) -&gt; bool {
+        <span class="macro">matches!</span>(
+            (<span class="self">self</span>, other),
+            (<span class="self">Self</span>::SqlServer(<span class="prelude-val">None</span>), <span class="self">Self</span>::SqlServer(<span class="kw">_</span>))
+                | (<span class="self">Self</span>::Postgres(<span class="prelude-val">None</span>), <span class="self">Self</span>::Postgres(<span class="kw">_</span>))
+                | (<span class="self">Self</span>::MySql(<span class="prelude-val">None</span>), <span class="self">Self</span>::MySql(<span class="kw">_</span>))
+                | (<span class="self">Self</span>::MongoDb(<span class="prelude-val">None</span>), <span class="self">Self</span>::MongoDb(<span class="kw">_</span>))
+                | (<span class="self">Self</span>::Sqlite(<span class="prelude-val">None</span>), <span class="self">Self</span>::Sqlite(<span class="kw">_</span>))
+                | (<span class="self">Self</span>::CockroachDb(<span class="prelude-val">None</span>), <span class="self">Self</span>::CockroachDb(<span class="kw">_</span>))
+                | (<span class="self">Self</span>::Vitess(<span class="prelude-val">None</span>), <span class="self">Self</span>::Vitess(<span class="kw">_</span>))
+        )
+    }
+
     <span class="kw">fn </span>matches_pattern(<span class="kw-2">&amp;</span><span class="self">self</span>, pat: <span class="kw-2">&amp;</span>ConnectorVersion) -&gt; bool {
         <span class="kw">use </span>ConnectorVersion::<span class="kw-2">*</span>;
 
@@ -583,14 +664,14 @@
             (MongoDb(a), MongoDb(b)) =&gt; versions_match(a, b),
             (CockroachDb(a), CockroachDb(b)) =&gt; versions_match(a, b),
             (Vitess(a), Vitess(b)) =&gt; versions_match(a, b),
-            (Sqlite, Sqlite) =&gt; <span class="bool-val">true</span>,
+            (Sqlite(a), Sqlite(b)) =&gt; versions_match(a, b),
 
             (MongoDb(..), <span class="kw">_</span>)
             | (<span class="kw">_</span>, MongoDb(..))
             | (SqlServer(..), <span class="kw">_</span>)
             | (<span class="kw">_</span>, SqlServer(..))
-            | (Sqlite, <span class="kw">_</span>)
-            | (<span class="kw">_</span>, Sqlite)
+            | (Sqlite(..), <span class="kw">_</span>)
+            | (<span class="kw">_</span>, Sqlite(..))
             | (CockroachDb(..), <span class="kw">_</span>)
             | (<span class="kw">_</span>, CockroachDb(..))
             | (Vitess(..), <span class="kw">_</span>)
@@ -620,7 +701,10 @@
                 <span class="prelude-val">Some</span>(v) =&gt; <span class="macro">format!</span>(<span class="string">&quot;MongoDB ({})&quot;</span>, v.to_string()),
                 <span class="prelude-val">None </span>=&gt; <span class="string">&quot;MongoDB (unknown)&quot;</span>.to_string(),
             },
-            <span class="self">Self</span>::Sqlite =&gt; <span class="string">&quot;SQLite&quot;</span>.to_string(),
+            <span class="self">Self</span>::Sqlite(v) =&gt; <span class="kw">match </span>v {
+                <span class="prelude-val">Some</span>(v) =&gt; <span class="macro">format!</span>(<span class="string">&quot;SQLite ({})&quot;</span>, v.to_string()),
+                <span class="prelude-val">None </span>=&gt; <span class="string">&quot;SQLite (unknown)&quot;</span>.to_string(),
+            },
             <span class="self">Self</span>::Vitess(v) =&gt; <span class="kw">match </span>v {
                 <span class="prelude-val">Some</span>(v) =&gt; <span class="macro">format!</span>(<span class="string">&quot;Vitess ({v})&quot;</span>),
                 <span class="prelude-val">None </span>=&gt; <span class="string">&quot;Vitess (unknown)&quot;</span>.to_string(),
@@ -635,52 +719,47 @@
 <span class="doccomment">/// Determines whether or not a test should run for the given enabled connectors and capabilities
 /// a connector is required to have.
 </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>should_run(
+    connector: <span class="kw-2">&amp;</span>ConnectorTag,
+    version: <span class="kw-2">&amp;</span>ConnectorVersion,
     only: <span class="kw-2">&amp;</span>[(<span class="kw-2">&amp;</span>str, <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt;)],
     exclude: <span class="kw-2">&amp;</span>[(<span class="kw-2">&amp;</span>str, <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt;)],
     capabilities: ConnectorCapabilities,
 ) -&gt; bool {
-    <span class="kw">let </span>(connector, version) = CONFIG.test_connector().unwrap();
-
     <span class="kw">if </span>!capabilities.is_empty() &amp;&amp; !connector.capabilities().contains(capabilities) {
         <span class="macro">println!</span>(<span class="string">&quot;Connector excluded. Missing required capability.&quot;</span>);
         <span class="kw">return </span><span class="bool-val">false</span>;
     }
 
-    <span class="comment">// We skip tests that exclude JS driver adapters when an external test executor is configured.
-    // A test that you only want to run with rust drivers can be annotated with exclude(JS)
-    </span><span class="kw">if </span>CONFIG.external_test_executor().is_some() &amp;&amp; exclude.iter().any(|excl| excl.<span class="number">0</span>.to_uppercase() == <span class="string">&quot;JS&quot;</span>) {
-        <span class="macro">println!</span>(<span class="string">&quot;Excluded test execution for JS driver adapters. Skipping test&quot;</span>);
-        <span class="kw">return </span><span class="bool-val">false</span>;
-    };
-    <span class="comment">// we consume the JS token to prevent it from being used in the following checks
-    </span><span class="kw">let </span>exclude: Vec&lt;<span class="kw">_</span>&gt; = exclude.iter().filter(|excl| excl.<span class="number">0</span>.to_uppercase() != <span class="string">&quot;JS&quot;</span>).collect();
+    <span class="kw">let </span>exclusions = exclude
+        .iter()
+        .filter_map(|c| ConnectorVersion::try_from(<span class="kw-2">*</span>c).ok())
+        .collect::&lt;Vec&lt;<span class="kw">_</span>&gt;&gt;();
 
-    <span class="comment">// We only run tests that include JS driver adapters when an external test executor is configured.
-    // A test that you only want to run with js driver adapters can be annotated with only(JS)
-    </span><span class="kw">if </span>CONFIG.external_test_executor().is_none() &amp;&amp; only.iter().any(|incl| incl.<span class="number">0</span>.to_uppercase() == <span class="string">&quot;JS&quot;</span>) {
-        <span class="macro">println!</span>(<span class="string">&quot;Excluded test execution for rust driver adapters. Skipping test&quot;</span>);
-        <span class="kw">return </span><span class="bool-val">false</span>;
-    }
-    <span class="comment">// we consume the JS token to prevent it from being used in the following checks
-    </span><span class="kw">let </span>only: Vec&lt;<span class="kw">_</span>&gt; = only.iter().filter(|incl| incl.<span class="number">0</span>.to_uppercase() != <span class="string">&quot;JS&quot;</span>).collect();
+    <span class="kw">let </span>inclusions = only
+        .iter()
+        .filter_map(|c| ConnectorVersion::try_from(<span class="kw-2">*</span>c).ok())
+        .collect::&lt;Vec&lt;<span class="kw">_</span>&gt;&gt;();
 
-    <span class="kw">if </span>!only.is_empty() {
-        <span class="kw">return </span>only
-            .iter()
-            .any(|incl| ConnectorVersion::try_from(<span class="kw-2">**</span>incl).unwrap().matches_pattern(<span class="kw-2">&amp;</span>version));
+    <span class="kw">for </span>exclusion <span class="kw">in </span>exclusions.iter() {
+        <span class="kw">for </span>inclusion <span class="kw">in </span>inclusions.iter() {
+            <span class="kw">if </span>exclusion.is_broader(inclusion) {
+                <span class="macro">panic!</span>(<span class="string">&quot;Error in connector test execution rules. Version `{exclusion}` in `excluded()` is broader than `{inclusion}` in `only()`&quot;</span>);
+            }
+        }
     }
 
-    <span class="kw">if </span>exclude.iter().any(|excl| {
-        ConnectorVersion::try_from(<span class="kw-2">**</span>excl)
-            .map_or(<span class="bool-val">false</span>, |connector_version| connector_version.matches_pattern(<span class="kw-2">&amp;</span>version))
-    }) {
+    <span class="kw">if </span>exclusions.iter().any(|excl| excl.matches_pattern(version)) {
         <span class="macro">println!</span>(<span class="string">&quot;Connector excluded. Skipping test.&quot;</span>);
         <span class="kw">return </span><span class="bool-val">false</span>;
     }
 
+    <span class="kw">if </span>!inclusions.is_empty() {
+        <span class="kw">return </span>inclusions.iter().any(|incl| incl.matches_pattern(version));
+    }
+
     <span class="comment">// FIXME: This skips vitess unless explicitly opted in. Replace with `true` when fixing
     // https://github.com/prisma/client-planning/issues/332
-    </span>!<span class="macro">matches!</span>(version, ConnectorVersion::Vitess(<span class="kw">_</span>))
+    </span>CONFIG.external_test_executor().is_some() || !<span class="macro">matches!</span>(version, ConnectorVersion::Vitess(<span class="kw">_</span>))
 }
 
 <span class="kw">impl </span>TryFrom&lt;(<span class="kw-2">&amp;</span>str, <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt;)&gt; <span class="kw">for </span>ConnectorVersion {
@@ -689,7 +768,7 @@
     <span class="attr">#[track_caller]
     </span><span class="kw">fn </span>try_from((connector, version): (<span class="kw-2">&amp;</span>str, <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt;)) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, <span class="self">Self</span>::Error&gt; {
         <span class="prelude-val">Ok</span>(<span class="kw">match </span>connector.to_lowercase().as_str() {
-            <span class="string">&quot;sqlite&quot; </span>=&gt; ConnectorVersion::Sqlite,
+            <span class="string">&quot;sqlite&quot; </span>=&gt; ConnectorVersion::Sqlite(version.map(SqliteVersion::try_from).transpose()<span class="question-mark">?</span>),
             <span class="string">&quot;sqlserver&quot; </span>=&gt; ConnectorVersion::SqlServer(version.map(SqlServerVersion::try_from).transpose()<span class="question-mark">?</span>),
             <span class="string">&quot;cockroachdb&quot; </span>=&gt; ConnectorVersion::CockroachDb(version.map(CockroachDbVersion::try_from).transpose()<span class="question-mark">?</span>),
             <span class="string">&quot;postgres&quot; </span>=&gt; ConnectorVersion::Postgres(version.map(PostgresVersion::try_from).transpose()<span class="question-mark">?</span>),
@@ -698,6 +777,47 @@
             <span class="string">&quot;vitess&quot; </span>=&gt; ConnectorVersion::Vitess(version.map(|v| v.parse()).transpose()<span class="question-mark">?</span>),
             <span class="kw">_ </span>=&gt; <span class="kw">return </span><span class="prelude-val">Err</span>(TestError::parse_error(<span class="macro">format!</span>(<span class="string">&quot;Unknown connector tag `{connector}`&quot;</span>))),
         })
+    }
+}
+
+<span class="attr">#[cfg(test)]
+</span><span class="kw">mod </span>tests {
+    <span class="kw">use </span><span class="kw">crate</span>::connector_tag::{PostgresConnectorTag, PostgresVersion};
+    <span class="kw">use crate</span>::{ConnectorTag, ConnectorVersion};
+
+    <span class="attr">#[test]
+    #[rustfmt::skip]
+    </span><span class="kw">fn </span>test_should_run() {
+        <span class="kw">let </span>only = <span class="macro">vec!</span>[(<span class="string">&quot;postgres&quot;</span>, <span class="prelude-val">None</span>)];
+        <span class="kw">let </span>exclude = <span class="macro">vec!</span>[(<span class="string">&quot;postgres&quot;</span>, <span class="prelude-val">Some</span>(<span class="string">&quot;neon.js&quot;</span>))];
+        <span class="kw">let </span>postgres = <span class="kw-2">&amp;</span>PostgresConnectorTag <span class="kw">as </span>ConnectorTag;
+        <span class="kw">let </span>neon = ConnectorVersion::Postgres(<span class="prelude-val">Some</span>(PostgresVersion::NeonJs));
+        <span class="kw">let </span>pg = ConnectorVersion::Postgres(<span class="prelude-val">Some</span>(PostgresVersion::PgJs));
+
+        <span class="macro">assert!</span>(!<span class="kw">super</span>::should_run(<span class="kw-2">&amp;</span>postgres, <span class="kw-2">&amp;</span>neon, <span class="kw-2">&amp;</span>only, <span class="kw-2">&amp;</span>exclude, Default::default()));
+        <span class="macro">assert!</span>(<span class="kw">super</span>::should_run(<span class="kw-2">&amp;</span>postgres, <span class="kw-2">&amp;</span>pg, <span class="kw-2">&amp;</span>only, <span class="kw-2">&amp;</span>exclude, Default::default()));
+    }
+
+    <span class="attr">#[test]
+    #[should_panic]
+    </span><span class="kw">fn </span>test_should_run_wrong_definition_versionless() {
+        <span class="kw">let </span>only = <span class="macro">vec!</span>[(<span class="string">&quot;postgres&quot;</span>, <span class="prelude-val">None</span>)];
+        <span class="kw">let </span>exclude = <span class="macro">vec!</span>[(<span class="string">&quot;postgres&quot;</span>, <span class="prelude-val">None</span>)];
+        <span class="kw">let </span>postgres = <span class="kw-2">&amp;</span>PostgresConnectorTag <span class="kw">as </span>ConnectorTag;
+        <span class="kw">let </span>neon = ConnectorVersion::Postgres(<span class="prelude-val">Some</span>(PostgresVersion::NeonJs));
+
+        <span class="kw">super</span>::should_run(<span class="kw-2">&amp;</span>postgres, <span class="kw-2">&amp;</span>neon, <span class="kw-2">&amp;</span>only, <span class="kw-2">&amp;</span>exclude, Default::default());
+    }
+
+    <span class="attr">#[test]
+    #[should_panic]
+    </span><span class="kw">fn </span>test_should_run_wrong_definition_wider_exclusion() {
+        <span class="kw">let </span>only = <span class="macro">vec!</span>[(<span class="string">&quot;postgres&quot;</span>, <span class="prelude-val">Some</span>(<span class="string">&quot;neon.js&quot;</span>))];
+        <span class="kw">let </span>exclude = <span class="macro">vec!</span>[(<span class="string">&quot;postgres&quot;</span>, <span class="prelude-val">None</span>)];
+        <span class="kw">let </span>postgres = <span class="kw-2">&amp;</span>PostgresConnectorTag <span class="kw">as </span>ConnectorTag;
+        <span class="kw">let </span>neon = ConnectorVersion::Postgres(<span class="prelude-val">Some</span>(PostgresVersion::NeonJs));
+
+        <span class="kw">super</span>::should_run(<span class="kw-2">&amp;</span>postgres, <span class="kw-2">&amp;</span>neon, <span class="kw-2">&amp;</span>only, <span class="kw-2">&amp;</span>exclude, Default::default());
     }
 }
 </code></pre></div></section></main></body></html>
