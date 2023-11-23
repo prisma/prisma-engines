@@ -1106,7 +1106,6 @@ dependencies = [
  "num-bigint",
  "once_cell",
  "pin-project",
- "psl",
  "quaint",
  "serde",
  "serde-wasm-bindgen",

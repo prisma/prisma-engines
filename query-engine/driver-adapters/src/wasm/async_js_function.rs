@@ -1,5 +1,5 @@
 use js_sys::{Function as JsFunction, Promise as JsPromise};
-use serde::{de::DeserializeOwned, Serialize};
+use serde::Serialize;
 use std::marker::PhantomData;
 use wasm_bindgen::convert::FromWasmAbi;
 use wasm_bindgen::describe::WasmDescribe;
@@ -7,13 +7,14 @@ use wasm_bindgen::{JsError, JsValue};
 use wasm_bindgen_futures::JsFuture;
 
 use super::error::into_quaint_error;
+use super::from_js::FromJsValue;
 use super::result::JsResult;
 
-#[derive(Clone, Default)]
+#[derive(Clone)]
 pub(crate) struct AsyncJsFunction<ArgType, ReturnType>
 where
     ArgType: Serialize,
-    ReturnType: DeserializeOwned,
+    ReturnType: FromJsValue,
 {
     pub threadsafe_fn: JsFunction,
 
@@ -24,7 +25,7 @@ where
 impl<T, R> From<JsFunction> for AsyncJsFunction<T, R>
 where
     T: Serialize,
-    R: DeserializeOwned,
+    R: FromJsValue,
 {
     fn from(js_fn: JsFunction) -> Self {
         Self {
@@ -38,7 +39,7 @@ where
 impl<T, R> AsyncJsFunction<T, R>
 where
     T: Serialize,
-    R: DeserializeOwned,
+    R: FromJsValue,
 {
     pub async fn call(&self, arg1: T) -> quaint::Result<R> {
         let result = self.call_internal(arg1).await;
@@ -54,7 +55,7 @@ where
         let promise = self.threadsafe_fn.call1(&JsValue::null(), &arg1)?;
         let future = JsFuture::from(JsPromise::from(promise));
         let value = future.await?;
-        let js_result: JsResult<R> = value.try_into()?;
+        let js_result = JsResult::<R>::from_js_value(value)?;
 
         Ok(js_result)
     }
@@ -63,7 +64,7 @@ where
 impl<ArgType, ReturnType> WasmDescribe for AsyncJsFunction<ArgType, ReturnType>
 where
     ArgType: Serialize,
-    ReturnType: DeserializeOwned,
+    ReturnType: FromJsValue,
 {
     fn describe() {
         JsFunction::describe();
@@ -73,7 +74,7 @@ where
 impl<ArgType, ReturnType> FromWasmAbi for AsyncJsFunction<ArgType, ReturnType>
 where
     ArgType: Serialize,
-    ReturnType: DeserializeOwned,
+    ReturnType: FromJsValue,
 {
     type Abi = <JsFunction as FromWasmAbi>::Abi;
 

@@ -8,7 +8,6 @@ async-trait = "0.1"
 once_cell = "1.15"
 serde.workspace = true
 serde_json.workspace = true
-psl.workspace = true
 tracing = "0.1"
 tracing-core = "0.1"
 metrics = "0.18"

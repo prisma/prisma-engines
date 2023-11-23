@@ -1,6 +1,6 @@
+use crate::types::AdapterFlavour;
 use crate::wasm::proxy::{CommonProxy, DriverProxy};
 use crate::{JsObjectExtern, JsQueryable};
-use psl::datamodel_connector::Flavour;
 use wasm_bindgen::prelude::wasm_bindgen;
 
 /// A JsQueryable adapts a Proxy to implement quaint's Queryable interface. It has the
@@ -16,10 +16,9 @@ use wasm_bindgen::prelude::wasm_bindgen;
 /// into a `quaint::connector::result_set::ResultSet`. A quaint `ResultSet` is basically a vector
 /// of `quaint::Value` but said type is a tagged enum, with non-unit variants that cannot be converted to javascript as is.
 #[wasm_bindgen(getter_with_clone)]
-#[derive(Default)]
 pub(crate) struct JsBaseQueryable {
     pub(crate) proxy: CommonProxy,
-    pub flavour: Flavour,
+    pub flavour: AdapterFlavour,
 }
 
 pub fn from_wasm(driver: JsObjectExtern) -> JsQueryable {
