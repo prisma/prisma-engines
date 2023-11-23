@@ -1,4 +1,4 @@
-name: Driver Adapters
+name: Test Driver Adapters
 on:
   push:
     branches:
@@ -19,28 +19,31 @@ concurrency:
 
 jobs:
   rust-query-engine-tests:
-    name: 'Test `${{ matrix.adapter.name }}` on node v${{ matrix.node_version }}'
+    name: '${{ matrix.adapter.name }} on node v${{ matrix.node_version }}'
 
     strategy:
       fail-fast: false
       matrix:
         adapter:
-          - name: 'planetscale'
+          - name: '@prisma/adapter-planetscale'
             setup_task: 'dev-planetscale-js'
-          - name: 'pg (napi)'
+          - name: '@prisma/adapter-pg (napi)'
             setup_task: 'dev-pg-js'
-          - name: 'neon:ws (napi)'
+          - name: '@prisma/adapter-neon (ws) (napi)'
             setup_task: 'dev-neon-js'
-          - name: 'libsql (napi)'
+          - name: '@prisma/adapter-libsql (Turso) (napi)'
             setup_task: 'dev-libsql-js'
           # TODO: uncomment when WASM engine is functional
-          # - name: 'pg (wasm)'
+          # - name: '@prisma/adapter-planetscale'
+          #   setup_task: 'dev-planetscale-wasm'
+          #   needs_wasm_pack: true
+          # - name: '@prisma/adapter-pg (wasm)'
           #   setup_task: 'dev-pg-wasm'
           #   needs_wasm_pack: true
-          # - name: 'neon:ws (wasm)'
+          # - name: '@prisma/adapter-neon (ws) (wasm)'
           #   setup_task: 'dev-neon-wasm'
           #   needs_wasm_pack: true
-          # - name: 'libsql (wasm)'
+          # - name: '@prisma/adapter-libsql (Turso) (wasm)'
           #   setup_task: 'dev-libsql-wasm'
           #   needs_wasm_pack: true
         node_version: ['18']

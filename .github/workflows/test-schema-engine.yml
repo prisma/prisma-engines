@@ -1,4 +1,4 @@
-name: Schema Engine
+name: Test Schema Engine
 on:
   push:
     branches:
@@ -22,7 +22,7 @@ concurrency:
 
 jobs:
   test-mongodb-schema-connector:
-    name: 'Test ${{ matrix.database.name }} on Linux'
+    name: '${{ matrix.database.name }} on Linux'
     strategy:
       fail-fast: false
       matrix:
@@ -54,7 +54,7 @@ jobs:
           TEST_DATABASE_URL: ${{ matrix.database.url }}
 
   test-linux:
-    name: 'Test ${{ matrix.database.name }} on Linux'
+    name: '${{ matrix.database.name }} on Linux'
 
     strategy:
       fail-fast: false
@@ -207,7 +207,7 @@ jobs:
 
     runs-on: ${{ matrix.os }}
 
-    name: 'Test ${{ matrix.db.name }} on Windows'
+    name: '${{ matrix.db.name }} on Windows'
 
     steps:
       - uses: actions/checkout@v4

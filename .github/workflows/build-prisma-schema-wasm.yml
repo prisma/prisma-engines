@@ -1,4 +1,4 @@
-name: WASM build
+name: Build prisma-schema-wasm
 on:
   push:
     branches:
