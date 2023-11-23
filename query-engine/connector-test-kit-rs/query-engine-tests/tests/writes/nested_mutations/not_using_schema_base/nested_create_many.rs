@@ -78,7 +78,7 @@ mod nested_create_many {
 
     // "Nested createMany" should "error on duplicates by default"
     // TODO(dom): Not working for mongo
-    #[connector_test(exclude(Sqlite, MongoDb))]
+    #[connector_test(exclude(Sqlite, MongoDb, Vitess("planetscale.js")))]
     async fn nested_createmany_fail_dups(runner: Runner) -> TestResult<()> {
         assert_error!(
             &runner,

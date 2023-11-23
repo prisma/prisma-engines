@@ -2,7 +2,7 @@ use crate::{
     CockroachDbConnectorTag, ConnectorTag, ConnectorVersion, MongoDbConnectorTag, MySqlConnectorTag,
     PostgresConnectorTag, SqlServerConnectorTag, SqliteConnectorTag, TestResult, VitessConnectorTag,
 };
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 use std::{convert::TryFrom, env, fmt::Display, fs::File, io::Read, path::PathBuf};
 
 static TEST_CONFIG_FILE_NAME: &str = ".test_config";
@@ -27,13 +27,13 @@ impl Display for TestExecutor {
 pub struct TestConfig {
     /// The connector that tests should run for.
     /// Env key: `TEST_CONNECTOR`
-    connector: String,
+    pub(crate) connector: String,
 
     /// The connector version tests should run for.
     /// If the test connector is versioned, this option is required.
     /// Env key: `TEST_CONNECTOR_VERSION`
     #[serde(rename = "version")]
-    connector_version: Option<String>,
+    pub(crate) connector_version: Option<String>,
 
     /// An external process to execute the test queries and produced responses for assertion
     /// Used when testing driver adapters, this process is expected to be a javascript process
@@ -41,20 +41,25 @@ pub struct TestConfig {
     /// driver adapter.
     /// Possible values: Napi, Wasm
     /// Env key: `EXTERNAL_TEST_EXECUTOR`
-    external_test_executor: Option<TestExecutor>,
+    pub(crate) external_test_executor: Option<TestExecutor>,
 
     /// The driver adapter to use when running tests, will be forwarded to the external test
     /// executor by setting the `DRIVER_ADAPTER` env var when spawning the executor process
-    driver_adapter: Option<String>,
+    pub(crate) driver_adapter: Option<String>,
 
     /// The driver adapter configuration to forward as a stringified JSON object to the external
     /// test executor by setting the `DRIVER_ADAPTER_CONFIG` env var when spawning the executor
-    driver_adapter_config: Option<serde_json::Value>,
+    pub(crate) driver_adapter_config: Option<DriverAdapterConfig>,
 
     /// Indicates whether or not the tests are running in CI context.
     /// Env key: `BUILDKITE`
     #[serde(default)]
-    is_ci: bool,
+    pub(crate) is_ci: bool,
+}
+
+#[derive(Debug, Default, Serialize, Deserialize)]
+pub(crate) struct DriverAdapterConfig {
+    pub(crate) proxy_url: Option<String>,
 }
 
 const CONFIG_LOAD_FAILED: &str = r####"
@@ -125,7 +130,7 @@ impl TestConfig {
         if let Some(external_test_executor) = self.external_test_executor.as_ref() {
             println!("* External test executor: {}", external_test_executor);
             println!("* Driver adapter: {}", self.driver_adapter().unwrap_or_default());
-            println!("* Driver adapter url override: {}", self.json_stringify_driver_adapter_config());
+            println!("* Driver adapter config: {}", self.json_stringify_driver_adapter_config());
         }
         println!("******************************");
     }
@@ -139,7 +144,7 @@ impl TestConfig {
 
         let driver_adapter = std::env::var("DRIVER_ADAPTER").ok();
         let driver_adapter_config = std::env::var("DRIVER_ADAPTER_CONFIG")
-            .map(|config| serde_json::from_str::<serde_json::Value>(config.as_str()).ok())
+            .map(|config| serde_json::from_str::<DriverAdapterConfig>(config.as_str()).ok())
             .unwrap_or_default();
 
         // Just care for a set value for now.
@@ -204,7 +209,8 @@ impl TestConfig {
             | Ok(ConnectorVersion::SqlServer(None))
             | Ok(ConnectorVersion::MongoDb(None))
             | Ok(ConnectorVersion::CockroachDb(None))
-            | Ok(ConnectorVersion::Postgres(None)) => {
+            | Ok(ConnectorVersion::Postgres(None))
+            | Ok(ConnectorVersion::Sqlite(None)) => {
                 exit_with_message("The current test connector requires a version to be set to run.");
             }
             Ok(ConnectorVersion::Vitess(Some(_)))
@@ -213,7 +219,7 @@ impl TestConfig {
             | Ok(ConnectorVersion::MongoDb(Some(_)))
             | Ok(ConnectorVersion::CockroachDb(Some(_)))
             | Ok(ConnectorVersion::Postgres(Some(_)))
-            | Ok(ConnectorVersion::Sqlite) => (),
+            | Ok(ConnectorVersion::Sqlite(Some(_))) => (),
             Err(err) => exit_with_message(&err.to_string()),
         }
 
@@ -278,11 +284,8 @@ impl TestConfig {
         self.driver_adapter.as_deref()
     }
 
-    pub fn json_stringify_driver_adapter_config(&self) -> String {
-        self.driver_adapter_config
-            .as_ref()
-            .map(|value| value.to_string())
-            .unwrap_or("{}".to_string())
+    fn json_stringify_driver_adapter_config(&self) -> String {
+        serde_json::to_string(&self.driver_adapter_config).unwrap_or_default()
     }
 
     pub fn test_connector(&self) -> TestResult<(ConnectorTag, ConnectorVersion)> {
@@ -292,7 +295,7 @@ impl TestConfig {
             ConnectorVersion::Postgres(_) => &PostgresConnectorTag,
             ConnectorVersion::MySql(_) => &MySqlConnectorTag,
             ConnectorVersion::MongoDb(_) => &MongoDbConnectorTag,
-            ConnectorVersion::Sqlite => &SqliteConnectorTag,
+            ConnectorVersion::Sqlite(_) => &SqliteConnectorTag,
             ConnectorVersion::CockroachDb(_) => &CockroachDbConnectorTag,
             ConnectorVersion::Vitess(_) => &VitessConnectorTag,
         };
