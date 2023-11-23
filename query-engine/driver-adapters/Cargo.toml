@@ -14,6 +14,7 @@ tracing-core = "0.1"
 metrics = "0.18"
 uuid = { version = "1", features = ["v4"] }
 pin-project = "1"
+wasm-rs-dbg = "0.1.2"
 
 # Note: these deps are temporarily specified here to avoid importing them from tiberius (the SQL server driver).
 # They will be imported from quaint-core instead in a future PR.
@@ -24,7 +25,8 @@ futures = "0.3"
 
 [dev-dependencies]
 expect-test = "1"
-tokio.workspace = true
+tokio = { version = "1.0", features = ["macros", "time", "sync"] }
+wasm-rs-dbg.dev-workspace = true
 
 [target.'cfg(not(target_arch = "wasm32"))'.dependencies]
 napi.workspace = true
@@ -35,6 +37,7 @@ quaint.workspace = true
 quaint = { path = "../../quaint" }
 js-sys.workspace = true
 serde-wasm-bindgen.workspace = true
+serde_repr.workspace = true
 wasm-bindgen.workspace = true
 wasm-bindgen-futures.workspace = true
 tsify.workspace = true

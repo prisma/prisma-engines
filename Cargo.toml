@@ -58,10 +58,12 @@ napi = { version = "2.12.4", default-features = false, features = [
 ] }
 napi-derive = "2.12.4"
 js-sys = { version = "0.3" }
+serde_repr = { version = "0.1.17" }
 serde-wasm-bindgen = { version = "0.5" }
 tsify = { version = "0.4.5" }
 wasm-bindgen = { version = "0.2.88" }
 wasm-bindgen-futures = { version = "0.4" }
+wasm-rs-dbg = { version = "0.1.2" }
 
 [workspace.dependencies.quaint]
 path = "quaint"

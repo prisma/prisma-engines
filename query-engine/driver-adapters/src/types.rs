@@ -8,6 +8,7 @@ use tsify::Tsify;
 
 use crate::conversion::JSArg;
 use serde::{Deserialize, Serialize};
+use serde_repr::{Deserialize_repr, Serialize_repr};
 
 /// This result set is more convenient to be manipulated from both Rust and NodeJS.
 /// Quaint's version of ResultSet is:
@@ -43,8 +44,9 @@ impl JSResultSet {
 }
 
 #[cfg_attr(not(target_arch = "wasm32"), napi_derive::napi(object))]
-#[cfg_attr(target_arch = "wasm32", derive(Clone, Copy, Serialize, Deserialize, Tsify))]
+#[cfg_attr(target_arch = "wasm32", derive(Clone, Copy, Serialize_repr, Deserialize_repr, Tsify))]
 #[cfg_attr(target_arch = "wasm32", tsify(into_wasm_abi, from_wasm_abi))]
+#[repr(u8)]
 #[derive(Debug)]
 pub enum ColumnType {
     // [PLANETSCALE_TYPE] (MYSQL_TYPE) -> [TypeScript example]
