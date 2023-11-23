@@ -20,7 +20,6 @@ num-bigint = "0.4.3"
 bigdecimal = "0.3.0"
 chrono = "0.4.20"
 futures = "0.3"
-web-sys = "0.3.65"
 
 [dev-dependencies]
 expect-test = "1"

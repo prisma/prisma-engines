@@ -1,6 +1,4 @@
-use std::str::FromStr;
-
-use js_sys::{Boolean as JsBoolean, JsString};
+use js_sys::Boolean as JsBoolean;
 use quaint::error::{Error as QuaintError, ErrorKind};
 use wasm_bindgen::{JsCast, JsValue};
 
@@ -46,9 +44,7 @@ where
 
         if ok {
             let js_value: JsValue = object.get("value".into())?;
-            web_sys::console::log_1(&JsString::from_str("BEFORE DESERIALIZE").unwrap().into());
             let deserialized = T::from_js_value(js_value)?;
-            web_sys::console::log_1(&JsString::from_str(" DESERIALIZE").unwrap().into());
             return Ok(Self::Ok(deserialized));
         }
 

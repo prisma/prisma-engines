@@ -1,7 +1,6 @@
-use js_sys::{Function as JsFunction, JsString, Promise as JsPromise};
+use js_sys::{Function as JsFunction, Promise as JsPromise};
 use serde::Serialize;
 use std::marker::PhantomData;
-use std::str::FromStr;
 use wasm_bindgen::convert::FromWasmAbi;
 use wasm_bindgen::describe::WasmDescribe;
 use wasm_bindgen::{JsError, JsValue};
@@ -46,14 +45,8 @@ where
         let result = self.call_internal(arg1).await;
 
         match result {
-            Ok(js_result) => {
-                web_sys::console::log_1(&JsString::from_str("OK JS").unwrap().into());
-                js_result.into()
-            }
-            Err(err) => {
-                web_sys::console::log_1(&JsString::from_str("CALL ERR").unwrap().into());
-                Err(into_quaint_error(err))
-            }
+            Ok(js_result) => js_result.into(),
+            Err(err) => Err(into_quaint_error(err)),
         }
     }
 
