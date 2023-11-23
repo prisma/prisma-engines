@@ -596,22 +596,42 @@ impl TransactionProxy {
 
     /// Commits the transaction via the driver adapter.
     ///
-    /// Cancelation safety: [`TransactionProxy::closed`] is only set after the call to JS finishes,
-    /// so the destructor will ensure the transaction is closed even if the future is dropped.
+    /// ## Cancellation safety
+    ///
+    /// The future is cancellation-safe as long as the underlying Node-API call
+    /// is cancellation-safe and no new await points are introduced between storing true in
+    /// [`TransactionProxy::closed`] and calling the underlying JS function.
+    ///
+    /// - If `commit` is called but never polled or awaited, it's a no-op, the transaction won't be
+    ///   committed and [`TransactionProxy::closed`] will not be changed.
+    ///
+    /// - If it is polled at least once, `true` will be stored in [`TransactionProxy::closed`] and
+    ///   the underlying FFI call will be delivered to JavaScript side in lockstep, so the destructor
+    ///   will not attempt rolling the transaction back even if the `commit` future was dropped while
+    ///   waiting on the JavaScript call.
     pub async fn commit(&self) -> quaint::Result<()> {
-        let result = self.commit.call(()).await;
         self.closed.store(true, Ordering::Release);
-        result
+        self.commit.call(()).await
     }
 
     /// Rolls back the transaction via the driver adapter.
     ///
-    /// Cancelation safety: [`TransactionProxy::closed`] is only set after the call to JS finishes,
-    /// so the destructor will ensure the transaction is closed even if the future is dropped.
+    /// ## Cancellation safety
+    ///
+    /// The future is cancellation-safe as long as the underlying Node-API call
+    /// is cancellation-safe and no new await points are introduced between storing true in
+    /// [`TransactionProxy::closed`] and calling the underlying JS function.
+    ///
+    /// - If `rollback` is called but never polled or awaited, it's a no-op, the transaction won't be
+    ///   rolled back yet and [`TransactionProxy::closed`] will not be changed.
+    ///
+    /// - If it is polled at least once, `true` will be stored in [`TransactionProxy::closed`] and
+    ///   the underlying FFI call will be delivered to JavaScript side in lockstep, so the destructor
+    ///   will not attempt rolling back again even if the `rollback` future was dropped while waiting
+    ///   on the JavaScript call.
     pub async fn rollback(&self) -> quaint::Result<()> {
-        let result = self.rollback.call(()).await;
         self.closed.store(true, Ordering::Release);
-        result
+        self.rollback.call(()).await
     }
 }
 
