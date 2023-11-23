@@ -13,7 +13,7 @@ use enumflags2::BitFlags;
 use indexmap::IndexMap;
 use indoc::indoc;
 use psl::{
-    builtin_connectors::{CockroachType, PostgresType},
+    builtin_connectors::{CockroachType, GeometryParams, GeometryType, PostgresType},
     datamodel_connector::NativeTypeInstance,
 };
 use quaint::{connector::ResultRow, prelude::Queryable, Value};
@@ -23,6 +23,7 @@ use std::{
     collections::{BTreeMap, HashMap},
     convert::TryInto,
     iter::Peekable,
+    str::FromStr,
 };
 use tracing::trace;
 
@@ -109,6 +110,7 @@ pub enum Circumstances {
     Cockroach,
     CockroachWithPostgresNativeTypes, // TODO: this is a temporary workaround
     CanPartitionTables,
+    HasPostGIS,
 }
 
 pub struct SqlSchemaDescriber<'a> {
@@ -904,9 +906,9 @@ impl<'a> SqlSchemaDescriber<'a> {
                     .circumstances
                     .contains(Circumstances::CockroachWithPostgresNativeTypes)
             {
-                get_column_type_cockroachdb(&col, sql_schema)
+                get_column_type_cockroachdb(&col, sql_schema, &self.circumstances)
             } else {
-                get_column_type_postgresql(&col, sql_schema)
+                get_column_type_postgresql(&col, sql_schema, &self.circumstances)
             };
 
             let default = col
@@ -974,9 +976,29 @@ impl<'a> SqlSchemaDescriber<'a> {
         Ok(())
     }
 
+    fn get_geometry_info(col: &str) -> Option<GeometryParams> {
+        static GEOM_REGEX: Lazy<Regex> =
+            Lazy::new(|| Regex::new(r"^(?P<class>geometry|geography)(\((?P<type>.+?)(,(?P<srid>\d+))?\))?$").unwrap());
+        GEOM_REGEX.captures(col).and_then(|capture| {
+            let is_geography = capture.name("class").map(|c| c.as_str() == "geography").unwrap();
+            let geom_type = capture
+                .name("type")
+                .map(|t| GeometryType::from_str(t.as_str()))
+                .unwrap_or(Ok(GeometryType::default()));
+            let srid = capture
+                .name("srid")
+                .map(|v| v.as_str().parse::<i32>())
+                .unwrap_or(Ok(if is_geography { 4326 } else { 0 }));
+            match (geom_type, srid) {
+                (Ok(ty), Ok(srid)) => Some(GeometryParams { ty, srid }),
+                _ => None,
+            }
+        })
+    }
+
     fn get_precision(col: &ResultRow) -> Precision {
-        let (character_maximum_length, numeric_precision, numeric_scale, time_precision) =
-            if matches!(col.get_expect_string("data_type").as_str(), "ARRAY") {
+        match col.get_expect_string("data_type").as_str() {
+            "ARRAY" => {
                 fn get_single(formatted_type: &str) -> Option<u32> {
                     static SINGLE_REGEX: Lazy<Regex> = Lazy::new(|| Regex::new(r".*\(([0-9]*)\).*\[\]$").unwrap());
 
@@ -1003,34 +1025,32 @@ impl<'a> SqlSchemaDescriber<'a> {
 
                 let formatted_type = col.get_expect_string("formatted_type");
                 let fdt = col.get_expect_string("full_data_type");
-                let char_max_length = match fdt.as_str() {
+                let character_maximum_length = match fdt.as_str() {
                     "_bpchar" | "_varchar" | "_bit" | "_varbit" => get_single(&formatted_type),
                     _ => None,
                 };
-                let (num_precision, num_scale) = match fdt.as_str() {
+                let (numeric_precision, numeric_scale) = match fdt.as_str() {
                     "_numeric" => get_dual(&formatted_type),
                     _ => (None, None),
                 };
-                let time = match fdt.as_str() {
+                let time_precision = match fdt.as_str() {
                     "_timestamptz" | "_timestamp" | "_timetz" | "_time" | "_interval" => get_single(&formatted_type),
                     _ => None,
                 };
 
-                (char_max_length, num_precision, num_scale, time)
-            } else {
-                (
-                    col.get_u32("character_maximum_length"),
-                    col.get_u32("numeric_precision"),
-                    col.get_u32("numeric_scale"),
-                    col.get_u32("datetime_precision"),
-                )
-            };
-
-        Precision {
-            character_maximum_length,
-            numeric_precision,
-            numeric_scale,
-            time_precision,
+                Precision {
+                    character_maximum_length,
+                    numeric_precision,
+                    numeric_scale,
+                    time_precision,
+                }
+            }
+            _ => Precision {
+                character_maximum_length: col.get_u32("character_maximum_length"),
+                numeric_precision: col.get_u32("numeric_precision"),
+                numeric_scale: col.get_u32("numeric_scale"),
+                time_precision: col.get_u32("datetime_precision"),
+            },
         }
     }
 
@@ -1535,10 +1555,15 @@ fn index_from_row(
     }
 }
 
-fn get_column_type_postgresql(row: &ResultRow, schema: &SqlSchema) -> ColumnType {
+fn get_column_type_postgresql(
+    row: &ResultRow,
+    schema: &SqlSchema,
+    circumstances: &BitFlags<Circumstances>,
+) -> ColumnType {
     use ColumnTypeFamily::*;
     let data_type = row.get_expect_string("data_type");
     let full_data_type = row.get_expect_string("full_data_type");
+    let formatted_type = row.get_expect_string("formatted_type");
     let is_required = match row.get_expect_string("is_nullable").to_lowercase().as_ref() {
         "no" => true,
         "yes" => false,
@@ -1551,6 +1576,10 @@ fn get_column_type_postgresql(row: &ResultRow, schema: &SqlSchema) -> ColumnType
         false => ColumnArity::Nullable,
     };
 
+    let geometry = match circumstances.contains(Circumstances::HasPostGIS) {
+        true => SqlSchemaDescriber::get_geometry_info(&formatted_type),
+        false => None,
+    };
     let precision = SqlSchemaDescriber::get_precision(row);
     let unsupported_type = || (Unsupported(full_data_type.clone()), None);
     let enum_id: Option<_> = match data_type.as_str() {
@@ -1610,6 +1639,13 @@ fn get_column_type_postgresql(row: &ResultRow, schema: &SqlSchema) -> ColumnType
         "tsvector" | "_tsvector" => unsupported_type(),
         "txid_snapshot" | "_txid_snapshot" => unsupported_type(),
         "inet" | "_inet" => (String, Some(PostgresType::Inet)),
+        //postgis
+        "geometry" => geometry
+            .map(|_| (Geometry, Some(PostgresType::Geometry(geometry))))
+            .unwrap_or_else(unsupported_type),
+        "geography" => geometry
+            .map(|_| (Geometry, Some(PostgresType::Geography(geometry))))
+            .unwrap_or_else(unsupported_type),
         //geometric
         "box" | "_box" => unsupported_type(),
         "circle" | "_circle" => unsupported_type(),
@@ -1629,7 +1665,11 @@ fn get_column_type_postgresql(row: &ResultRow, schema: &SqlSchema) -> ColumnType
 }
 
 // Separate from get_column_type_postgresql because of native types.
-fn get_column_type_cockroachdb(row: &ResultRow, schema: &SqlSchema) -> ColumnType {
+fn get_column_type_cockroachdb(
+    row: &ResultRow,
+    schema: &SqlSchema,
+    circumstances: &BitFlags<Circumstances>,
+) -> ColumnType {
     use ColumnTypeFamily::*;
     let data_type = row.get_expect_string("data_type");
     let full_data_type = row.get_expect_string("full_data_type");
@@ -1645,6 +1685,10 @@ fn get_column_type_cockroachdb(row: &ResultRow, schema: &SqlSchema) -> ColumnTyp
         false => ColumnArity::Nullable,
     };
 
+    let geometry_type = match circumstances.contains(Circumstances::HasPostGIS) {
+        true => SqlSchemaDescriber::get_geometry_info(&data_type),
+        false => None,
+    };
     let precision = SqlSchemaDescriber::get_precision(row);
     let unsupported_type = || (Unsupported(full_data_type.clone()), None);
     let enum_id: Option<_> = match data_type.as_str() {
@@ -1699,6 +1743,13 @@ fn get_column_type_cockroachdb(row: &ResultRow, schema: &SqlSchema) -> ColumnTyp
         "tsvector" | "_tsvector" => unsupported_type(),
         "txid_snapshot" | "_txid_snapshot" => unsupported_type(),
         "inet" | "_inet" => (String, Some(CockroachType::Inet)),
+        //postgis
+        "geometry" => geometry_type
+            .map(|_| (Geometry, Some(CockroachType::Geometry(geometry_type))))
+            .unwrap_or_else(unsupported_type),
+        "geography" => geometry_type
+            .map(|_| (Geometry, Some(CockroachType::Geography(geometry_type))))
+            .unwrap_or_else(unsupported_type),
         //geometric
         "box" | "_box" => unsupported_type(),
         "circle" | "_circle" => unsupported_type(),

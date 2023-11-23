@@ -174,6 +174,24 @@ impl<'a> ScalarFilterParser<'a> {
             filters::HAS_SOME => Ok(vec![field.contains_some_element(self.as_condition_list_value(input)?)]),
             filters::IS_EMPTY => Ok(vec![field.is_empty_list(input.try_into()?)]),
 
+            // Geometry-specific filters
+            filters::GEO_WITHIN => {
+                if self.reverse() {
+                    Ok(vec![field.geometry_not_within(self.as_condition_value(input, false)?)])
+                } else {
+                    Ok(vec![field.geometry_within(self.as_condition_value(input, false)?)])
+                }
+            }
+            filters::GEO_INTERSECTS => {
+                if self.reverse() {
+                    Ok(vec![
+                        field.geometry_not_intersects(self.as_condition_value(input, false)?)
+                    ])
+                } else {
+                    Ok(vec![field.geometry_intersects(self.as_condition_value(input, false)?)])
+                }
+            }
+
             // Aggregation filters
             aggregations::UNDERSCORE_COUNT => self.aggregation_filter(input, Filter::count, true),
             aggregations::UNDERSCORE_AVG => self.aggregation_filter(input, Filter::average, false),

@@ -1,6 +1,6 @@
 use super::ExpressionKind;
 use crate::ast::{Column, ConditionTree, Expression};
-use std::borrow::Cow;
+use std::{borrow::Cow, fmt};
 
 /// For modeling comparison expressions.
 #[derive(Debug, Clone, PartialEq)]
@@ -39,6 +39,8 @@ pub enum Compare<'a> {
     /// All json related comparators
     #[cfg(any(feature = "postgresql", feature = "mysql"))]
     JsonCompare(JsonCompare<'a>),
+    /// All geometry related comparators
+    GeometryCompare(GeometryCompare<'a>),
     /// `left` @@ to_tsquery(`value`)
     #[cfg(feature = "postgresql")]
     Matches(Box<Expression<'a>>, Cow<'a, str>),
@@ -51,6 +53,69 @@ pub enum Compare<'a> {
     /// ALL (`left`)
     #[cfg(feature = "postgresql")]
     All(Box<Expression<'a>>),
+}
+
+#[derive(Debug, Clone, PartialEq)]
+pub enum GeometryCompare<'a> {
+    Empty(Box<Expression<'a>>),
+    NotEmpty(Box<Expression<'a>>),
+    Valid(Box<Expression<'a>>),
+    NotValid(Box<Expression<'a>>),
+    Within(Box<Expression<'a>>, Box<Expression<'a>>),
+    NotWithin(Box<Expression<'a>>, Box<Expression<'a>>),
+    Intersects(Box<Expression<'a>>, Box<Expression<'a>>),
+    NotIntersects(Box<Expression<'a>>, Box<Expression<'a>>),
+    TypeEquals(Box<Expression<'a>>, GeometryType<'a>),
+    TypeNotEquals(Box<Expression<'a>>, GeometryType<'a>),
+}
+
+#[derive(Debug, Clone, PartialEq)]
+pub enum GeometryType<'a> {
+    Point,
+    LineString,
+    CircularString,
+    CompoundCurve,
+    Polygon,
+    CurvePolygon,
+    Triangle,
+    Tin,
+    MultiPoint,
+    MultiLineString,
+    MultiCurve,
+    MultiPolygon,
+    MultiSurface,
+    PolyhedralSurface,
+    GeometryCollection,
+    ColumnRef(Box<Column<'a>>),
+}
+
+impl<'a> From<Column<'a>> for GeometryType<'a> {
+    fn from(col: Column<'a>) -> Self {
+        GeometryType::ColumnRef(Box::new(col))
+    }
+}
+
+impl fmt::Display for GeometryType<'_> {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            Self::Point => f.write_str("Point"),
+            Self::LineString => f.write_str("LineString"),
+            Self::CircularString => f.write_str("CircularString"),
+            Self::CompoundCurve => f.write_str("CompoundCurve"),
+            Self::Polygon => f.write_str("Polygon"),
+            Self::CurvePolygon => f.write_str("CurvePolygon"),
+            Self::Triangle => f.write_str("Triangle"),
+            Self::Tin => f.write_str("Tin"),
+            Self::MultiPoint => f.write_str("MultiPoint"),
+            Self::MultiLineString => f.write_str("MultiLineString"),
+            Self::MultiCurve => f.write_str("MultiCurve"),
+            Self::MultiPolygon => f.write_str("MultiPolygon"),
+            Self::MultiSurface => f.write_str("MultiSurface"),
+            Self::PolyhedralSurface => f.write_str("PolyhedralSurface"),
+            Self::GeometryCollection => f.write_str("GeometryCollection"),
+            Self::ColumnRef(_) => f.write_str(""),
+        }
+    }
 }
 
 #[derive(Debug, Clone, PartialEq)]
@@ -737,6 +802,186 @@ pub trait Comparable<'a> {
     where
         T: Into<JsonType<'a>>;
 
+    /// Tests if the geometry value is empty.
+    ///
+    /// ```rust
+    /// # use quaint::{ast::*, visitor::{Visitor, Sqlite}};
+    /// # fn main() -> Result<(), quaint::error::Error> {
+    /// let query = Select::from_table("users").so_that("geom".geometry_is_empty());
+    /// let (sql, _) = Sqlite::build(query)?;
+    ///
+    /// assert_eq!("SELECT `users`.* FROM `users` WHERE ST_IsEmpty(`geom`)", sql);
+    /// # Ok(())
+    /// # }
+    /// ```
+    fn geometry_is_empty(self) -> Compare<'a>;
+
+    /// Tests if the geometry value is not empty.
+    ///
+    /// ```rust
+    /// # use quaint::{ast::*, visitor::{Visitor, Sqlite}};
+    /// # fn main() -> Result<(), quaint::error::Error> {
+    /// let query = Select::from_table("users").so_that("geom".geometry_is_not_empty());
+    /// let (sql, _) = Sqlite::build(query)?;
+    ///
+    /// assert_eq!("SELECT `users`.* FROM `users` WHERE NOT ST_IsEmpty(`geom`)", sql);
+    /// # Ok(())
+    /// # }
+    /// ```
+    fn geometry_is_not_empty(self) -> Compare<'a>;
+
+    /// Tests if the geometry value is valid.
+    ///
+    /// ```rust
+    /// # use quaint::{ast::*, visitor::{Visitor, Sqlite}};
+    /// # fn main() -> Result<(), quaint::error::Error> {
+    /// let query = Select::from_table("users").so_that("geom".geometry_is_valid());
+    /// let (sql, _) = Sqlite::build(query)?;
+    ///
+    /// assert_eq!("SELECT `users`.* FROM `users` WHERE ST_IsValid(`geom`)", sql);
+    /// # Ok(())
+    /// # }
+    /// ```
+    fn geometry_is_valid(self) -> Compare<'a>;
+
+    /// Tests if the geometry value is not valid.
+    ///
+    /// ```rust
+    /// # use quaint::{ast::*, visitor::{Visitor, Sqlite}};
+    /// # fn main() -> Result<(), quaint::error::Error> {
+    /// let query = Select::from_table("users").so_that("geom".geometry_is_not_valid());
+    /// let (sql, _) = Sqlite::build(query)?;
+    ///
+    /// assert_eq!("SELECT `users`.* FROM `users` WHERE NOT ST_IsValid(`geom`)", sql);
+    /// # Ok(())
+    /// # }
+    /// ```
+    fn geometry_is_not_valid(self) -> Compare<'a>;
+
+    /// Tests if the left side geometry contains the right side geometry.
+    ///
+    /// ```rust
+    /// # use quaint::{ast::*, visitor::{Visitor, Sqlite}};
+    /// # fn main() -> Result<(), quaint::error::Error> {
+    /// let query = Select::from_table("users").so_that("geom".geometry_within(geom_from_text("POINT(0 0)", 4326, false)));
+    /// let (sql, params) = Sqlite::build(query)?;
+    ///
+    /// assert_eq!("SELECT `users`.* FROM `users` WHERE ST_Within(`geom`,ST_GeomFromText(?,?))", sql);
+    ///
+    /// assert_eq!(vec![
+    ///    Value::from("POINT(0 0)"),
+    ///    Value::from(4326)
+    ///  ], params);
+    ///
+    /// # Ok(())
+    /// # }
+    /// ```
+    fn geometry_within<T>(self, geom: T) -> Compare<'a>
+    where
+        T: Into<Expression<'a>>;
+
+    /// Tests if the left side geometry doesn't contain the right side geometry.
+    ///
+    /// ```rust
+    /// # use quaint::{ast::*, visitor::{Visitor, Sqlite}};
+    /// # fn main() -> Result<(), quaint::error::Error> {
+    /// let query = Select::from_table("users").so_that("geom".geometry_not_within(geom_from_text("POINT(0 0)", 4326, false)));
+    /// let (sql, params) = Sqlite::build(query)?;
+    ///
+    /// assert_eq!("SELECT `users`.* FROM `users` WHERE NOT ST_Within(`geom`,ST_GeomFromText(?,?))", sql);
+    ///
+    /// assert_eq!(vec![
+    ///    Value::from("POINT(0 0)"),
+    ///    Value::from(4326)
+    ///  ], params);
+    ///
+    /// # Ok(())
+    /// # }
+    /// ```
+    fn geometry_not_within<T>(self, geom: T) -> Compare<'a>
+    where
+        T: Into<Expression<'a>>;
+
+    /// Tests if the left side geometry intersects the right side geometry.
+    ///
+    /// ```rust
+    /// # use quaint::{ast::*, visitor::{Visitor, Sqlite}};
+    /// # fn main() -> Result<(), quaint::error::Error> {
+    /// let query = Select::from_table("users").so_that("geom".geometry_intersects(geom_from_text("POINT(0 0)", 4326, false)));
+    /// let (sql, params) = Sqlite::build(query)?;
+    ///
+    /// assert_eq!("SELECT `users`.* FROM `users` WHERE ST_Intersects(`geom`,ST_GeomFromText(?,?))", sql);
+    ///
+    /// assert_eq!(vec![
+    ///    Value::from("POINT(0 0)"),
+    ///    Value::from(4326)
+    ///  ], params);
+    ///
+    /// # Ok(())
+    /// # }
+    /// ```
+    fn geometry_intersects<T>(self, geom: T) -> Compare<'a>
+    where
+        T: Into<Expression<'a>>;
+
+    /// Tests if the left side geometry doesn't intersect the right side geometry.
+    ///
+    /// ```rust
+    /// # use quaint::{ast::*, visitor::{Visitor, Sqlite}};
+    /// # fn main() -> Result<(), quaint::error::Error> {
+    /// let query = Select::from_table("users").so_that("geom".geometry_not_intersects(geom_from_text("POINT(0 0)", 4326, false)));
+    /// let (sql, params) = Sqlite::build(query)?;
+    ///
+    /// assert_eq!("SELECT `users`.* FROM `users` WHERE NOT ST_Intersects(`geom`,ST_GeomFromText(?,?))", sql);
+    ///
+    /// assert_eq!(vec![
+    ///    Value::from("POINT(0 0)"),
+    ///    Value::from(4326)
+    ///  ], params);
+    ///
+    /// # Ok(())
+    /// # }
+    /// ```
+    fn geometry_not_intersects<T>(self, geom: T) -> Compare<'a>
+    where
+        T: Into<Expression<'a>>;
+
+    /// Tests if the geometry value is of a certain type.
+    ///
+    /// ```rust
+    /// # use quaint::{ast::*, visitor::{Visitor, Sqlite}};
+    /// # fn main() -> Result<(), quaint::error::Error> {
+    /// let query = Select::from_table("users").so_that("geom".geometry_type_equals(GeometryType::Point));
+    /// let (sql, params) = Sqlite::build(query)?;
+    ///
+    /// assert_eq!("SELECT `users`.* FROM `users` WHERE ST_GeometryType(`geom`) = ?", sql);
+    ///
+    /// assert_eq!(vec![Value::from("POINT")], params);
+    /// # Ok(())
+    /// # }
+    /// ```
+    fn geometry_type_equals<T>(self, geom_type: T) -> Compare<'a>
+    where
+        T: Into<GeometryType<'a>>;
+
+    /// Tests if the geometry value is not of a certain type.
+    ///
+    /// ```rust
+    /// # use quaint::{ast::*, visitor::{Visitor, Sqlite}};
+    /// # fn main() -> Result<(), quaint::error::Error> {
+    /// let query = Select::from_table("users").so_that("geom".geometry_type_not_equals(GeometryType::Point));
+    /// let (sql, params) = Sqlite::build(query)?;
+    ///
+    /// assert_eq!("SELECT `users`.* FROM `users` WHERE ST_GeometryType(`geom`) != ?", sql);
+    ///
+    /// assert_eq!(vec![Value::from("POINT")], params);
+    /// # Ok(())
+    /// # }
+    /// ```
+    fn geometry_type_not_equals<T>(self, geom_type: T) -> Compare<'a>
+    where
+        T: Into<GeometryType<'a>>;
+
     /// Tests if a full-text search matches a certain query. Use it in combination with the `text_search()` function
     ///
     /// ```rust
@@ -1063,6 +1308,88 @@ where
         let val: Expression<'a> = col.into();
 
         val.json_type_not_equals(json_type)
+    }
+
+    #[allow(clippy::wrong_self_convention)]
+    fn geometry_is_empty(self) -> Compare<'a> {
+        let col: Column<'a> = self.into();
+        let val: Expression<'a> = col.into();
+        val.geometry_is_empty()
+    }
+
+    #[allow(clippy::wrong_self_convention)]
+    fn geometry_is_not_empty(self) -> Compare<'a> {
+        let col: Column<'a> = self.into();
+        let val: Expression<'a> = col.into();
+        val.geometry_is_not_empty()
+    }
+
+    #[allow(clippy::wrong_self_convention)]
+    fn geometry_is_valid(self) -> Compare<'a> {
+        let col: Column<'a> = self.into();
+        let val: Expression<'a> = col.into();
+        val.geometry_is_valid()
+    }
+
+    #[allow(clippy::wrong_self_convention)]
+    fn geometry_is_not_valid(self) -> Compare<'a> {
+        let col: Column<'a> = self.into();
+        let val: Expression<'a> = col.into();
+        val.geometry_is_not_valid()
+    }
+
+    fn geometry_within<T>(self, geom: T) -> Compare<'a>
+    where
+        T: Into<Expression<'a>>,
+    {
+        let col: Column<'a> = self.into();
+        let val: Expression<'a> = col.into();
+        val.geometry_within(geom)
+    }
+
+    fn geometry_not_within<T>(self, geom: T) -> Compare<'a>
+    where
+        T: Into<Expression<'a>>,
+    {
+        let col: Column<'a> = self.into();
+        let val: Expression<'a> = col.into();
+        val.geometry_not_within(geom)
+    }
+
+    fn geometry_intersects<T>(self, geom: T) -> Compare<'a>
+    where
+        T: Into<Expression<'a>>,
+    {
+        let col: Column<'a> = self.into();
+        let val: Expression<'a> = col.into();
+        val.geometry_intersects(geom)
+    }
+
+    fn geometry_not_intersects<T>(self, geom: T) -> Compare<'a>
+    where
+        T: Into<Expression<'a>>,
+    {
+        let col: Column<'a> = self.into();
+        let val: Expression<'a> = col.into();
+        val.geometry_not_intersects(geom)
+    }
+
+    fn geometry_type_equals<T>(self, geom_type: T) -> Compare<'a>
+    where
+        T: Into<GeometryType<'a>>,
+    {
+        let col: Column<'a> = self.into();
+        let val: Expression<'a> = col.into();
+        val.geometry_type_equals(geom_type)
+    }
+
+    fn geometry_type_not_equals<T>(self, geom_type: T) -> Compare<'a>
+    where
+        T: Into<GeometryType<'a>>,
+    {
+        let col: Column<'a> = self.into();
+        let val: Expression<'a> = col.into();
+        val.geometry_type_not_equals(geom_type)
     }
 
     #[cfg(feature = "postgresql")]

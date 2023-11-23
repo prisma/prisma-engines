@@ -139,6 +139,48 @@ pub trait Visitor<'a> {
     #[cfg(any(feature = "postgresql", feature = "mysql"))]
     fn visit_json_unquote(&mut self, json_unquote: JsonUnquote<'a>) -> Result;
 
+    fn visit_geom_as_text(&mut self, geom: GeomAsText<'a>) -> Result;
+
+    fn visit_geom_from_text(&mut self, geom: GeomFromText<'a>) -> Result;
+
+    fn visit_geometry_type_equals(&mut self, left: Expression<'a>, right: GeometryType<'a>, not: bool) -> Result;
+
+    fn visit_geometry_empty(&mut self, left: Expression<'a>, not: bool) -> Result {
+        if not {
+            self.write("NOT ")?;
+        }
+        self.surround_with("ST_IsEmpty(", ")", |s| s.visit_expression(left))
+    }
+
+    fn visit_geometry_valid(&mut self, left: Expression<'a>, not: bool) -> Result {
+        if not {
+            self.write("NOT ")?;
+        }
+        self.surround_with("ST_IsValid(", ")", |s| s.visit_expression(left))
+    }
+
+    fn visit_geometry_within(&mut self, left: Expression<'a>, right: Expression<'a>, not: bool) -> Result {
+        if not {
+            self.write("NOT ")?;
+        }
+        self.surround_with("ST_Within(", ")", |s| {
+            s.visit_expression(left)?;
+            s.write(",")?;
+            s.visit_expression(right)
+        })
+    }
+
+    fn visit_geometry_intersects(&mut self, left: Expression<'a>, right: Expression<'a>, not: bool) -> Result {
+        if not {
+            self.write("NOT ")?;
+        }
+        self.surround_with("ST_Intersects(", ")", |s| {
+            s.visit_expression(left)?;
+            s.write(",")?;
+            s.visit_expression(right)
+        })
+    }
+
     #[cfg(any(feature = "postgresql", feature = "mysql"))]
     fn visit_text_search(&mut self, text_search: TextSearch<'a>) -> Result;
 
@@ -175,6 +217,9 @@ pub trait Visitor<'a> {
         match value.typed {
             ValueType::Enum(Some(variant), name) => self.visit_parameterized_enum(variant, name),
             ValueType::EnumArray(Some(variants), name) => self.visit_parameterized_enum_array(variants, name),
+            ValueType::Geometry(Some(geom)) => self.visit_function(geom_from_text(geom.wkt, geom.srid, false)),
+            ValueType::Geography(Some(geom)) => self.visit_function(geom_from_text(geom.wkt, geom.srid, true)),
+            ValueType::Geometry(None) | ValueType::Geography(None) => self.write("NULL"),
             _ => {
                 self.add_parameter(value);
                 self.parameter_substitution()
@@ -950,6 +995,22 @@ pub trait Visitor<'a> {
                 JsonCompare::TypeEquals(left, json_type) => self.visit_json_type_equals(*left, json_type, false),
                 JsonCompare::TypeNotEquals(left, json_type) => self.visit_json_type_equals(*left, json_type, true),
             },
+            Compare::GeometryCompare(geom_compare) => match geom_compare {
+                GeometryCompare::Empty(left) => self.visit_geometry_empty(*left, false),
+                GeometryCompare::NotEmpty(left) => self.visit_geometry_empty(*left, true),
+                GeometryCompare::Valid(left) => self.visit_geometry_valid(*left, false),
+                GeometryCompare::NotValid(left) => self.visit_geometry_valid(*left, true),
+                GeometryCompare::Within(left, right) => self.visit_geometry_within(*left, *right, false),
+                GeometryCompare::NotWithin(left, right) => self.visit_geometry_within(*left, *right, true),
+                GeometryCompare::Intersects(left, right) => self.visit_geometry_intersects(*left, *right, false),
+                GeometryCompare::NotIntersects(left, right) => self.visit_geometry_intersects(*left, *right, true),
+                GeometryCompare::TypeEquals(left, geom_type) => {
+                    self.visit_geometry_type_equals(*left, geom_type, false)
+                }
+                GeometryCompare::TypeNotEquals(left, geom_type) => {
+                    self.visit_geometry_type_equals(*left, geom_type, true)
+                }
+            },
             #[cfg(feature = "postgresql")]
             Compare::Matches(left, right) => self.visit_matches(*left, right, false),
             #[cfg(feature = "postgresql")]
@@ -1105,6 +1166,12 @@ pub trait Visitor<'a> {
             FunctionType::Uuid => self.write("uuid()")?,
             FunctionType::Concat(concat) => {
                 self.visit_concat(concat)?;
+            }
+            FunctionType::GeomAsText(geom) => {
+                self.visit_geom_as_text(geom)?;
+            }
+            FunctionType::GeomFromText(geom) => {
+                self.visit_geom_from_text(geom)?;
             }
         };
 

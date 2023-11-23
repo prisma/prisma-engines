@@ -158,6 +158,15 @@ fn native_type_change(types: MigrationPair<&MySqlType>) -> Option<ColumnTypeChan
             | MySqlType::DateTime(_)
             | MySqlType::Timestamp(_)
             | MySqlType::Json => not_castable(),
+
+            MySqlType::Geometry(_)
+            | MySqlType::Point(_)
+            | MySqlType::LineString(_)
+            | MySqlType::Polygon(_)
+            | MySqlType::MultiPoint(_)
+            | MySqlType::MultiLineString(_)
+            | MySqlType::MultiPolygon(_)
+            | MySqlType::GeometryCollection(_) => not_castable(),
         },
         MySqlType::Binary(size) => match next {
             MySqlType::Binary(n) if n == size => return None,
@@ -196,6 +205,15 @@ fn native_type_change(types: MigrationPair<&MySqlType>) -> Option<ColumnTypeChan
             | MySqlType::Year => risky(),
 
             MySqlType::Date | MySqlType::DateTime(_) | MySqlType::Json | MySqlType::Timestamp(_) => not_castable(),
+
+            MySqlType::Geometry(_)
+            | MySqlType::Point(_)
+            | MySqlType::LineString(_)
+            | MySqlType::Polygon(_)
+            | MySqlType::MultiPoint(_)
+            | MySqlType::MultiLineString(_)
+            | MySqlType::MultiPolygon(_)
+            | MySqlType::GeometryCollection(_) => not_castable(),
         },
         MySqlType::Bit(n) => match next {
             MySqlType::Bit(m) if n == m => return None,
@@ -236,6 +254,15 @@ fn native_type_change(types: MigrationPair<&MySqlType>) -> Option<ColumnTypeChan
             | MySqlType::Time(_)
             | MySqlType::Timestamp(_)
             | MySqlType::Json => not_castable(),
+
+            MySqlType::Geometry(_)
+            | MySqlType::Point(_)
+            | MySqlType::LineString(_)
+            | MySqlType::Polygon(_)
+            | MySqlType::MultiPoint(_)
+            | MySqlType::MultiLineString(_)
+            | MySqlType::MultiPolygon(_)
+            | MySqlType::GeometryCollection(_) => not_castable(),
         },
         MySqlType::Blob => match next {
             MySqlType::Blob => return None,
@@ -271,6 +298,15 @@ fn native_type_change(types: MigrationPair<&MySqlType>) -> Option<ColumnTypeChan
             | MySqlType::UnsignedTinyInt
             | MySqlType::UnsignedBigInt
             | MySqlType::Year => not_castable(),
+
+            MySqlType::Geometry(_)
+            | MySqlType::Point(_)
+            | MySqlType::LineString(_)
+            | MySqlType::Polygon(_)
+            | MySqlType::MultiPoint(_)
+            | MySqlType::MultiLineString(_)
+            | MySqlType::MultiPolygon(_)
+            | MySqlType::GeometryCollection(_) => not_castable(),
         },
         MySqlType::Char(n) => match next {
             MySqlType::Char(m) if m == n => return None,
@@ -312,6 +348,15 @@ fn native_type_change(types: MigrationPair<&MySqlType>) -> Option<ColumnTypeChan
             | MySqlType::Timestamp(_)
             | MySqlType::Time(_)
             | MySqlType::Year => risky(),
+
+            MySqlType::Geometry(_)
+            | MySqlType::Point(_)
+            | MySqlType::LineString(_)
+            | MySqlType::Polygon(_)
+            | MySqlType::MultiPoint(_)
+            | MySqlType::MultiLineString(_)
+            | MySqlType::MultiPolygon(_)
+            | MySqlType::GeometryCollection(_) => not_castable(),
         },
         MySqlType::Date => match next {
             MySqlType::Date => return None,
@@ -334,6 +379,15 @@ fn native_type_change(types: MigrationPair<&MySqlType>) -> Option<ColumnTypeChan
             | MySqlType::Json
             | MySqlType::UnsignedMediumInt
             | MySqlType::UnsignedSmallInt => not_castable(),
+
+            MySqlType::Geometry(_)
+            | MySqlType::Point(_)
+            | MySqlType::LineString(_)
+            | MySqlType::Polygon(_)
+            | MySqlType::MultiPoint(_)
+            | MySqlType::MultiLineString(_)
+            | MySqlType::MultiPolygon(_)
+            | MySqlType::GeometryCollection(_) => not_castable(),
 
             // To string
             MySqlType::Binary(_)
@@ -386,6 +440,15 @@ fn native_type_change(types: MigrationPair<&MySqlType>) -> Option<ColumnTypeChan
             | MySqlType::UnsignedMediumInt
             | MySqlType::Year => not_castable(),
 
+            MySqlType::Geometry(_)
+            | MySqlType::Point(_)
+            | MySqlType::LineString(_)
+            | MySqlType::Polygon(_)
+            | MySqlType::MultiPoint(_)
+            | MySqlType::MultiLineString(_)
+            | MySqlType::MultiPolygon(_)
+            | MySqlType::GeometryCollection(_) => not_castable(),
+
             MySqlType::Timestamp(_) | MySqlType::Time(_) | MySqlType::Date => safe(),
         },
         MySqlType::Decimal(n) => match next {
@@ -425,6 +488,15 @@ fn native_type_change(types: MigrationPair<&MySqlType>) -> Option<ColumnTypeChan
             | MySqlType::Json => risky(),
 
             MySqlType::DateTime(_) | MySqlType::Timestamp(_) | MySqlType::Date => not_castable(),
+
+            MySqlType::Geometry(_)
+            | MySqlType::Point(_)
+            | MySqlType::LineString(_)
+            | MySqlType::Polygon(_)
+            | MySqlType::MultiPoint(_)
+            | MySqlType::MultiLineString(_)
+            | MySqlType::MultiPolygon(_)
+            | MySqlType::GeometryCollection(_) => not_castable(),
         },
         MySqlType::Double => match next {
             MySqlType::Double => return None,
@@ -469,6 +541,15 @@ fn native_type_change(types: MigrationPair<&MySqlType>) -> Option<ColumnTypeChan
             MySqlType::Time(_) => safe(),
 
             MySqlType::Timestamp(_) | MySqlType::DateTime(_) | MySqlType::Date => not_castable(),
+
+            MySqlType::Geometry(_)
+            | MySqlType::Point(_)
+            | MySqlType::LineString(_)
+            | MySqlType::Polygon(_)
+            | MySqlType::MultiPoint(_)
+            | MySqlType::MultiLineString(_)
+            | MySqlType::MultiPolygon(_)
+            | MySqlType::GeometryCollection(_) => not_castable(),
         },
         MySqlType::Float => match next {
             MySqlType::Float => return None,
@@ -514,6 +595,15 @@ fn native_type_change(types: MigrationPair<&MySqlType>) -> Option<ColumnTypeChan
             MySqlType::Time(_) => safe(),
 
             MySqlType::Timestamp(_) | MySqlType::DateTime(_) | MySqlType::Date => not_castable(),
+
+            MySqlType::Geometry(_)
+            | MySqlType::Point(_)
+            | MySqlType::LineString(_)
+            | MySqlType::Polygon(_)
+            | MySqlType::MultiPoint(_)
+            | MySqlType::MultiLineString(_)
+            | MySqlType::MultiPolygon(_)
+            | MySqlType::GeometryCollection(_) => not_castable(),
         },
         MySqlType::Int => match next {
             MySqlType::Int => return None,
@@ -555,6 +645,15 @@ fn native_type_change(types: MigrationPair<&MySqlType>) -> Option<ColumnTypeChan
             | MySqlType::Timestamp(_)
             | MySqlType::Time(_)
             | MySqlType::Json => not_castable(),
+
+            MySqlType::Geometry(_)
+            | MySqlType::Point(_)
+            | MySqlType::LineString(_)
+            | MySqlType::Polygon(_)
+            | MySqlType::MultiPoint(_)
+            | MySqlType::MultiLineString(_)
+            | MySqlType::MultiPolygon(_)
+            | MySqlType::GeometryCollection(_) => not_castable(),
         },
         MySqlType::Json => match next {
             MySqlType::Json => return None,
@@ -594,6 +693,15 @@ fn native_type_change(types: MigrationPair<&MySqlType>) -> Option<ColumnTypeChan
             | MySqlType::UnsignedTinyInt
             | MySqlType::Float
             | MySqlType::Double => not_castable(),
+
+            MySqlType::Geometry(_)
+            | MySqlType::Point(_)
+            | MySqlType::LineString(_)
+            | MySqlType::Polygon(_)
+            | MySqlType::MultiPoint(_)
+            | MySqlType::MultiLineString(_)
+            | MySqlType::MultiPolygon(_)
+            | MySqlType::GeometryCollection(_) => not_castable(),
         },
         MySqlType::LongBlob => match next {
             MySqlType::LongBlob => return None,
@@ -629,6 +737,15 @@ fn native_type_change(types: MigrationPair<&MySqlType>) -> Option<ColumnTypeChan
             | MySqlType::UnsignedTinyInt
             | MySqlType::UnsignedBigInt
             | MySqlType::Year => not_castable(),
+
+            MySqlType::Geometry(_)
+            | MySqlType::Point(_)
+            | MySqlType::LineString(_)
+            | MySqlType::Polygon(_)
+            | MySqlType::MultiPoint(_)
+            | MySqlType::MultiLineString(_)
+            | MySqlType::MultiPolygon(_)
+            | MySqlType::GeometryCollection(_) => not_castable(),
         },
         MySqlType::LongText => match next {
             MySqlType::LongText => return None,
@@ -668,6 +785,15 @@ fn native_type_change(types: MigrationPair<&MySqlType>) -> Option<ColumnTypeChan
             | MySqlType::Json
             | MySqlType::Time(_)
             | MySqlType::Year => risky(),
+
+            MySqlType::Geometry(_)
+            | MySqlType::Point(_)
+            | MySqlType::LineString(_)
+            | MySqlType::Polygon(_)
+            | MySqlType::MultiPoint(_)
+            | MySqlType::MultiLineString(_)
+            | MySqlType::MultiPolygon(_)
+            | MySqlType::GeometryCollection(_) => not_castable(),
         },
         MySqlType::MediumBlob => match next {
             MySqlType::MediumBlob => return None,
@@ -703,6 +829,15 @@ fn native_type_change(types: MigrationPair<&MySqlType>) -> Option<ColumnTypeChan
             | MySqlType::UnsignedTinyInt
             | MySqlType::UnsignedBigInt
             | MySqlType::Year => not_castable(),
+
+            MySqlType::Geometry(_)
+            | MySqlType::Point(_)
+            | MySqlType::LineString(_)
+            | MySqlType::Polygon(_)
+            | MySqlType::MultiPoint(_)
+            | MySqlType::MultiLineString(_)
+            | MySqlType::MultiPolygon(_)
+            | MySqlType::GeometryCollection(_) => not_castable(),
         },
         MySqlType::MediumInt => match next {
             MySqlType::MediumInt => return None,
@@ -744,6 +879,15 @@ fn native_type_change(types: MigrationPair<&MySqlType>) -> Option<ColumnTypeChan
             | MySqlType::Timestamp(_)
             | MySqlType::Time(_)
             | MySqlType::Json => not_castable(),
+
+            MySqlType::Geometry(_)
+            | MySqlType::Point(_)
+            | MySqlType::LineString(_)
+            | MySqlType::Polygon(_)
+            | MySqlType::MultiPoint(_)
+            | MySqlType::MultiLineString(_)
+            | MySqlType::MultiPolygon(_)
+            | MySqlType::GeometryCollection(_) => not_castable(),
         },
         MySqlType::MediumText => match next {
             MySqlType::MediumText => return None,
@@ -783,6 +927,15 @@ fn native_type_change(types: MigrationPair<&MySqlType>) -> Option<ColumnTypeChan
             | MySqlType::Json
             | MySqlType::Time(_)
             | MySqlType::Year => risky(),
+
+            MySqlType::Geometry(_)
+            | MySqlType::Point(_)
+            | MySqlType::LineString(_)
+            | MySqlType::Polygon(_)
+            | MySqlType::MultiPoint(_)
+            | MySqlType::MultiLineString(_)
+            | MySqlType::MultiPolygon(_)
+            | MySqlType::GeometryCollection(_) => not_castable(),
         },
 
         MySqlType::SmallInt => match next {
@@ -820,6 +973,15 @@ fn native_type_change(types: MigrationPair<&MySqlType>) -> Option<ColumnTypeChan
             | MySqlType::DateTime(_)
             | MySqlType::Timestamp(_)
             | MySqlType::Json => not_castable(),
+
+            MySqlType::Geometry(_)
+            | MySqlType::Point(_)
+            | MySqlType::LineString(_)
+            | MySqlType::Polygon(_)
+            | MySqlType::MultiPoint(_)
+            | MySqlType::MultiLineString(_)
+            | MySqlType::MultiPolygon(_)
+            | MySqlType::GeometryCollection(_) => not_castable(),
         },
 
         MySqlType::Text => match next {
@@ -860,6 +1022,15 @@ fn native_type_change(types: MigrationPair<&MySqlType>) -> Option<ColumnTypeChan
             | MySqlType::Json
             | MySqlType::Time(_)
             | MySqlType::Year => risky(),
+
+            MySqlType::Geometry(_)
+            | MySqlType::Point(_)
+            | MySqlType::LineString(_)
+            | MySqlType::Polygon(_)
+            | MySqlType::MultiPoint(_)
+            | MySqlType::MultiLineString(_)
+            | MySqlType::MultiPolygon(_)
+            | MySqlType::GeometryCollection(_) => not_castable(),
         },
 
         MySqlType::Time(n) => match next {
@@ -885,6 +1056,15 @@ fn native_type_change(types: MigrationPair<&MySqlType>) -> Option<ColumnTypeChan
             MySqlType::Date | MySqlType::DateTime(_) | MySqlType::Timestamp(_) => risky(),
 
             MySqlType::Json | MySqlType::Year => not_castable(),
+
+            MySqlType::Geometry(_)
+            | MySqlType::Point(_)
+            | MySqlType::LineString(_)
+            | MySqlType::Polygon(_)
+            | MySqlType::MultiPoint(_)
+            | MySqlType::MultiLineString(_)
+            | MySqlType::MultiPolygon(_)
+            | MySqlType::GeometryCollection(_) => not_castable(),
 
             // To numeric
             MySqlType::BigInt
@@ -937,6 +1117,15 @@ fn native_type_change(types: MigrationPair<&MySqlType>) -> Option<ColumnTypeChan
             | MySqlType::UnsignedMediumInt
             | MySqlType::Year => not_castable(),
 
+            MySqlType::Geometry(_)
+            | MySqlType::Point(_)
+            | MySqlType::LineString(_)
+            | MySqlType::Polygon(_)
+            | MySqlType::MultiPoint(_)
+            | MySqlType::MultiLineString(_)
+            | MySqlType::MultiPolygon(_)
+            | MySqlType::GeometryCollection(_) => not_castable(),
+
             MySqlType::DateTime(_) | MySqlType::Time(_) | MySqlType::Date => safe(),
         },
 
@@ -974,6 +1163,15 @@ fn native_type_change(types: MigrationPair<&MySqlType>) -> Option<ColumnTypeChan
             | MySqlType::UnsignedTinyInt
             | MySqlType::UnsignedBigInt
             | MySqlType::Year => not_castable(),
+
+            MySqlType::Geometry(_)
+            | MySqlType::Point(_)
+            | MySqlType::LineString(_)
+            | MySqlType::Polygon(_)
+            | MySqlType::MultiPoint(_)
+            | MySqlType::MultiLineString(_)
+            | MySqlType::MultiPolygon(_)
+            | MySqlType::GeometryCollection(_) => not_castable(),
         },
 
         MySqlType::TinyInt => match next {
@@ -1013,6 +1211,15 @@ fn native_type_change(types: MigrationPair<&MySqlType>) -> Option<ColumnTypeChan
             | MySqlType::DateTime(_)
             | MySqlType::Timestamp(_)
             | MySqlType::Json => not_castable(),
+
+            MySqlType::Geometry(_)
+            | MySqlType::Point(_)
+            | MySqlType::LineString(_)
+            | MySqlType::Polygon(_)
+            | MySqlType::MultiPoint(_)
+            | MySqlType::MultiLineString(_)
+            | MySqlType::MultiPolygon(_)
+            | MySqlType::GeometryCollection(_) => not_castable(),
         },
 
         MySqlType::TinyText => match next {
@@ -1054,6 +1261,15 @@ fn native_type_change(types: MigrationPair<&MySqlType>) -> Option<ColumnTypeChan
             | MySqlType::Json
             | MySqlType::Time(_)
             | MySqlType::Year => risky(),
+
+            MySqlType::Geometry(_)
+            | MySqlType::Point(_)
+            | MySqlType::LineString(_)
+            | MySqlType::Polygon(_)
+            | MySqlType::MultiPoint(_)
+            | MySqlType::MultiLineString(_)
+            | MySqlType::MultiPolygon(_)
+            | MySqlType::GeometryCollection(_) => not_castable(),
         },
 
         MySqlType::UnsignedBigInt => match next {
@@ -1094,6 +1310,15 @@ fn native_type_change(types: MigrationPair<&MySqlType>) -> Option<ColumnTypeChan
             | MySqlType::DateTime(_)
             | MySqlType::Timestamp(_)
             | MySqlType::Json => not_castable(),
+
+            MySqlType::Geometry(_)
+            | MySqlType::Point(_)
+            | MySqlType::LineString(_)
+            | MySqlType::Polygon(_)
+            | MySqlType::MultiPoint(_)
+            | MySqlType::MultiLineString(_)
+            | MySqlType::MultiPolygon(_)
+            | MySqlType::GeometryCollection(_) => not_castable(),
         },
 
         MySqlType::UnsignedInt => match next {
@@ -1134,6 +1359,15 @@ fn native_type_change(types: MigrationPair<&MySqlType>) -> Option<ColumnTypeChan
             | MySqlType::DateTime(_)
             | MySqlType::Timestamp(_)
             | MySqlType::Json => not_castable(),
+
+            MySqlType::Geometry(_)
+            | MySqlType::Point(_)
+            | MySqlType::LineString(_)
+            | MySqlType::Polygon(_)
+            | MySqlType::MultiPoint(_)
+            | MySqlType::MultiLineString(_)
+            | MySqlType::MultiPolygon(_)
+            | MySqlType::GeometryCollection(_) => not_castable(),
         },
         MySqlType::UnsignedMediumInt => match next {
             MySqlType::UnsignedMediumInt => return None,
@@ -1173,6 +1407,15 @@ fn native_type_change(types: MigrationPair<&MySqlType>) -> Option<ColumnTypeChan
             | MySqlType::DateTime(_)
             | MySqlType::Timestamp(_)
             | MySqlType::Json => not_castable(),
+
+            MySqlType::Geometry(_)
+            | MySqlType::Point(_)
+            | MySqlType::LineString(_)
+            | MySqlType::Polygon(_)
+            | MySqlType::MultiPoint(_)
+            | MySqlType::MultiLineString(_)
+            | MySqlType::MultiPolygon(_)
+            | MySqlType::GeometryCollection(_) => not_castable(),
         },
         MySqlType::UnsignedSmallInt => match next {
             MySqlType::UnsignedSmallInt => return None,
@@ -1211,6 +1454,15 @@ fn native_type_change(types: MigrationPair<&MySqlType>) -> Option<ColumnTypeChan
             | MySqlType::DateTime(_)
             | MySqlType::Timestamp(_)
             | MySqlType::Json => not_castable(),
+
+            MySqlType::Geometry(_)
+            | MySqlType::Point(_)
+            | MySqlType::LineString(_)
+            | MySqlType::Polygon(_)
+            | MySqlType::MultiPoint(_)
+            | MySqlType::MultiLineString(_)
+            | MySqlType::MultiPolygon(_)
+            | MySqlType::GeometryCollection(_) => not_castable(),
         },
         MySqlType::UnsignedTinyInt => match next {
             MySqlType::UnsignedTinyInt => return None,
@@ -1251,6 +1503,15 @@ fn native_type_change(types: MigrationPair<&MySqlType>) -> Option<ColumnTypeChan
             | MySqlType::DateTime(_)
             | MySqlType::Timestamp(_)
             | MySqlType::Json => not_castable(),
+
+            MySqlType::Geometry(_)
+            | MySqlType::Point(_)
+            | MySqlType::LineString(_)
+            | MySqlType::Polygon(_)
+            | MySqlType::MultiPoint(_)
+            | MySqlType::MultiLineString(_)
+            | MySqlType::MultiPolygon(_)
+            | MySqlType::GeometryCollection(_) => not_castable(),
         },
         MySqlType::VarBinary(n) => match next {
             MySqlType::VarBinary(m) if n > m => risky(),
@@ -1289,6 +1550,15 @@ fn native_type_change(types: MigrationPair<&MySqlType>) -> Option<ColumnTypeChan
             | MySqlType::UnsignedTinyInt
             | MySqlType::UnsignedBigInt
             | MySqlType::Year => not_castable(),
+
+            MySqlType::Geometry(_)
+            | MySqlType::Point(_)
+            | MySqlType::LineString(_)
+            | MySqlType::Polygon(_)
+            | MySqlType::MultiPoint(_)
+            | MySqlType::MultiLineString(_)
+            | MySqlType::MultiPolygon(_)
+            | MySqlType::GeometryCollection(_) => not_castable(),
         },
         MySqlType::VarChar(n) => match next {
             MySqlType::VarChar(m) if m == n => return None,
@@ -1329,6 +1599,15 @@ fn native_type_change(types: MigrationPair<&MySqlType>) -> Option<ColumnTypeChan
             | MySqlType::UnsignedTinyInt
             | MySqlType::Year
             | MySqlType::Json => risky(),
+
+            MySqlType::Geometry(_)
+            | MySqlType::Point(_)
+            | MySqlType::LineString(_)
+            | MySqlType::Polygon(_)
+            | MySqlType::MultiPoint(_)
+            | MySqlType::MultiLineString(_)
+            | MySqlType::MultiPolygon(_)
+            | MySqlType::GeometryCollection(_) => not_castable(),
         },
         MySqlType::Year => match next {
             MySqlType::Year => return None,
@@ -1362,12 +1641,94 @@ fn native_type_change(types: MigrationPair<&MySqlType>) -> Option<ColumnTypeChan
 
             MySqlType::Decimal(_) | MySqlType::Json => risky(),
 
+            MySqlType::Geometry(_)
+            | MySqlType::Point(_)
+            | MySqlType::LineString(_)
+            | MySqlType::Polygon(_)
+            | MySqlType::MultiPoint(_)
+            | MySqlType::MultiLineString(_)
+            | MySqlType::MultiPolygon(_)
+            | MySqlType::GeometryCollection(_) => not_castable(),
+
             MySqlType::Date
             | MySqlType::DateTime(_)
             | MySqlType::Time(_)
             | MySqlType::TinyInt
             | MySqlType::Timestamp(_)
             | MySqlType::UnsignedTinyInt => not_castable(), // out of range
+        },
+        // TODO@geometry: MySQL 8+ can actually cast between spatial types (https://dev.mysql.com/doc/refman/8.0/en/cast-functions.html#cast-spatial-types)
+        MySqlType::Geometry(_) => match next {
+            MySqlType::TinyBlob
+            | MySqlType::Blob
+            | MySqlType::MediumBlob
+            | MySqlType::LongBlob
+            | MySqlType::Binary(_)
+            | MySqlType::VarBinary(_) => risky(),
+            _ => not_castable(),
+        },
+        MySqlType::Point(_) => match next {
+            MySqlType::TinyBlob
+            | MySqlType::Blob
+            | MySqlType::MediumBlob
+            | MySqlType::LongBlob
+            | MySqlType::Binary(_)
+            | MySqlType::VarBinary(_) => risky(),
+            _ => not_castable(),
+        },
+        MySqlType::LineString(_) => match next {
+            MySqlType::TinyBlob
+            | MySqlType::Blob
+            | MySqlType::MediumBlob
+            | MySqlType::LongBlob
+            | MySqlType::Binary(_)
+            | MySqlType::VarBinary(_) => risky(),
+            _ => not_castable(),
+        },
+        MySqlType::Polygon(_) => match next {
+            MySqlType::TinyBlob
+            | MySqlType::Blob
+            | MySqlType::MediumBlob
+            | MySqlType::LongBlob
+            | MySqlType::Binary(_)
+            | MySqlType::VarBinary(_) => risky(),
+            _ => not_castable(),
+        },
+        MySqlType::MultiPoint(_) => match next {
+            MySqlType::TinyBlob
+            | MySqlType::Blob
+            | MySqlType::MediumBlob
+            | MySqlType::LongBlob
+            | MySqlType::Binary(_)
+            | MySqlType::VarBinary(_) => risky(),
+            _ => not_castable(),
+        },
+        MySqlType::MultiLineString(_) => match next {
+            MySqlType::TinyBlob
+            | MySqlType::Blob
+            | MySqlType::MediumBlob
+            | MySqlType::LongBlob
+            | MySqlType::Binary(_)
+            | MySqlType::VarBinary(_) => risky(),
+            _ => not_castable(),
+        },
+        MySqlType::MultiPolygon(_) => match next {
+            MySqlType::TinyBlob
+            | MySqlType::Blob
+            | MySqlType::MediumBlob
+            | MySqlType::LongBlob
+            | MySqlType::Binary(_)
+            | MySqlType::VarBinary(_) => risky(),
+            _ => not_castable(),
+        },
+        MySqlType::GeometryCollection(_) => match next {
+            MySqlType::TinyBlob
+            | MySqlType::Blob
+            | MySqlType::MediumBlob
+            | MySqlType::LongBlob
+            | MySqlType::Binary(_)
+            | MySqlType::VarBinary(_) => risky(),
+            _ => not_castable(),
         },
     })
 }

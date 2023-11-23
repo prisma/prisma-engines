@@ -51,7 +51,7 @@ fn views_can_be_described(api: TestApi) {
 fn sqlite_column_types_must_work(api: TestApi) {
     let sql = r#"
         CREATE TABLE "User" (
-            int_col int not null,
+            int_col int NOT NULL,
             int4_col INTEGER NOT NULL,
             text_col TEXT NOT NULL,
             real_col REAL NOT NULL,
@@ -195,6 +195,697 @@ fn sqlite_column_types_must_work(api: TestApi) {
                     ),
                     column_id: TableColumnId(
                         4,
+                    ),
+                    sort_order: None,
+                    length: None,
+                },
+            ],
+            check_constraints: [],
+            views: [],
+            view_columns: [],
+            procedures: [],
+            user_defined_types: [],
+            connector_data: <ConnectorData>,
+        }
+    "#]];
+    api.expect_schema(expectation);
+}
+
+#[test_connector(tags(Spatialite))]
+fn spatialite_column_types_must_work(api: TestApi) {
+    let sql = r#"
+        SELECT InitSpatialMetaData();
+        
+        CREATE TABLE "User" (
+            primary_col INTEGER PRIMARY KEY
+        );
+
+        SELECT
+            AddGeometryColumn('User', 'geometry_xy', 3857, 'GEOMETRY', 'XY', 0),
+            AddGeometryColumn('User', 'geometry_xyz', 3857, 'GEOMETRY', 'XYZ', 0),
+            AddGeometryColumn('User', 'geometry_xym', 3857, 'GEOMETRY', 'XYM', 0),
+            AddGeometryColumn('User', 'geometry_xyzm', 3857, 'GEOMETRY', 'XYZM', 0),
+            AddGeometryColumn('User', 'point_xy', 3857, 'POINT', 'XY', 0),
+            AddGeometryColumn('User', 'point_xyz', 3857, 'POINT', 'XYZ', 0),
+            AddGeometryColumn('User', 'point_xym', 3857, 'POINT', 'XYM', 0),
+            AddGeometryColumn('User', 'point_xyzm', 3857, 'POINT', 'XYZM', 0),
+            AddGeometryColumn('User', 'linestring_xy', 3857, 'LINESTRING', 'XY', 0),
+            AddGeometryColumn('User', 'linestring_xyz', 3857, 'LINESTRING', 'XYZ', 0),
+            AddGeometryColumn('User', 'linestring_xym', 3857, 'LINESTRING', 'XYM', 0),
+            AddGeometryColumn('User', 'linestring_xyzm', 3857, 'LINESTRING', 'XYZM', 0),
+            AddGeometryColumn('User', 'polygon_xy', 3857, 'POLYGON', 'XY', 0),
+            AddGeometryColumn('User', 'polygon_xyz', 3857, 'POLYGON', 'XYZ', 0),
+            AddGeometryColumn('User', 'polygon_xym', 3857, 'POLYGON', 'XYM', 0),
+            AddGeometryColumn('User', 'polygon_xyzm', 3857, 'POLYGON', 'XYZM', 0),
+            AddGeometryColumn('User', 'multipoint_xy', 3857, 'MULTIPOINT', 'XY', 0),
+            AddGeometryColumn('User', 'multipoint_xyz', 3857, 'MULTIPOINT', 'XYZ', 0),
+            AddGeometryColumn('User', 'multipoint_xym', 3857, 'MULTIPOINT', 'XYM', 0),
+            AddGeometryColumn('User', 'multipoint_xyzm', 3857, 'MULTIPOINT', 'XYZM', 0),
+            AddGeometryColumn('User', 'multilinestring_xy', 3857, 'MULTILINESTRING', 'XY', 0),
+            AddGeometryColumn('User', 'multilinestring_xyz', 3857, 'MULTILINESTRING', 'XYZ', 0),
+            AddGeometryColumn('User', 'multilinestring_xym', 3857, 'MULTILINESTRING', 'XYM', 0),
+            AddGeometryColumn('User', 'multilinestring_xyzm', 3857, 'MULTILINESTRING', 'XYZM', 0),
+            AddGeometryColumn('User', 'multipolygon_xy', 3857, 'MULTIPOLYGON', 'XY', 0),
+            AddGeometryColumn('User', 'multipolygon_xyz', 3857, 'MULTIPOLYGON', 'XYZ', 0),
+            AddGeometryColumn('User', 'multipolygon_xym', 3857, 'MULTIPOLYGON', 'XYM', 0),
+            AddGeometryColumn('User', 'multipolygon_xyzm', 3857, 'MULTIPOLYGON', 'XYZM', 0),
+            AddGeometryColumn('User', 'geometrycollection_xy', 3857, 'GEOMETRYCOLLECTION', 'XY', 0),
+            AddGeometryColumn('User', 'geometrycollection_xyz', 3857, 'GEOMETRYCOLLECTION', 'XYZ', 0),
+            AddGeometryColumn('User', 'geometrycollection_xym', 3857, 'GEOMETRYCOLLECTION', 'XYM', 0),
+            AddGeometryColumn('User', 'geometrycollection_xyzm', 3857, 'GEOMETRYCOLLECTION', 'XYZM', 0);
+    "#;
+    api.raw_cmd(sql);
+    let expectation = expect![[r#"
+        SqlSchema {
+            namespaces: [],
+            tables: [
+                Table {
+                    namespace_id: NamespaceId(
+                        0,
+                    ),
+                    name: "User",
+                    properties: BitFlags<TableProperties> {
+                        bits: 0b0,
+                    },
+                    description: None,
+                },
+            ],
+            enums: [],
+            enum_variants: [],
+            table_columns: [
+                (
+                    TableId(
+                        0,
+                    ),
+                    Column {
+                        name: "primary_col",
+                        tpe: ColumnType {
+                            full_data_type: "integer",
+                            family: Int,
+                            arity: Required,
+                            native_type: None,
+                        },
+                        auto_increment: true,
+                        description: None,
+                    },
+                ),
+                (
+                    TableId(
+                        0,
+                    ),
+                    Column {
+                        name: "geometry_xy",
+                        tpe: ColumnType {
+                            full_data_type: "GEOMETRY",
+                            family: Geometry,
+                            arity: Nullable,
+                            native_type: Some(
+                                NativeTypeInstance(..),
+                            ),
+                        },
+                        auto_increment: false,
+                        description: None,
+                    },
+                ),
+                (
+                    TableId(
+                        0,
+                    ),
+                    Column {
+                        name: "geometry_xyz",
+                        tpe: ColumnType {
+                            full_data_type: "GEOMETRY",
+                            family: Geometry,
+                            arity: Nullable,
+                            native_type: Some(
+                                NativeTypeInstance(..),
+                            ),
+                        },
+                        auto_increment: false,
+                        description: None,
+                    },
+                ),
+                (
+                    TableId(
+                        0,
+                    ),
+                    Column {
+                        name: "geometry_xym",
+                        tpe: ColumnType {
+                            full_data_type: "GEOMETRY",
+                            family: Geometry,
+                            arity: Nullable,
+                            native_type: Some(
+                                NativeTypeInstance(..),
+                            ),
+                        },
+                        auto_increment: false,
+                        description: None,
+                    },
+                ),
+                (
+                    TableId(
+                        0,
+                    ),
+                    Column {
+                        name: "geometry_xyzm",
+                        tpe: ColumnType {
+                            full_data_type: "GEOMETRY",
+                            family: Geometry,
+                            arity: Nullable,
+                            native_type: Some(
+                                NativeTypeInstance(..),
+                            ),
+                        },
+                        auto_increment: false,
+                        description: None,
+                    },
+                ),
+                (
+                    TableId(
+                        0,
+                    ),
+                    Column {
+                        name: "point_xy",
+                        tpe: ColumnType {
+                            full_data_type: "POINT",
+                            family: Geometry,
+                            arity: Nullable,
+                            native_type: Some(
+                                NativeTypeInstance(..),
+                            ),
+                        },
+                        auto_increment: false,
+                        description: None,
+                    },
+                ),
+                (
+                    TableId(
+                        0,
+                    ),
+                    Column {
+                        name: "point_xyz",
+                        tpe: ColumnType {
+                            full_data_type: "POINT",
+                            family: Geometry,
+                            arity: Nullable,
+                            native_type: Some(
+                                NativeTypeInstance(..),
+                            ),
+                        },
+                        auto_increment: false,
+                        description: None,
+                    },
+                ),
+                (
+                    TableId(
+                        0,
+                    ),
+                    Column {
+                        name: "point_xym",
+                        tpe: ColumnType {
+                            full_data_type: "POINT",
+                            family: Geometry,
+                            arity: Nullable,
+                            native_type: Some(
+                                NativeTypeInstance(..),
+                            ),
+                        },
+                        auto_increment: false,
+                        description: None,
+                    },
+                ),
+                (
+                    TableId(
+                        0,
+                    ),
+                    Column {
+                        name: "point_xyzm",
+                        tpe: ColumnType {
+                            full_data_type: "POINT",
+                            family: Geometry,
+                            arity: Nullable,
+                            native_type: Some(
+                                NativeTypeInstance(..),
+                            ),
+                        },
+                        auto_increment: false,
+                        description: None,
+                    },
+                ),
+                (
+                    TableId(
+                        0,
+                    ),
+                    Column {
+                        name: "linestring_xy",
+                        tpe: ColumnType {
+                            full_data_type: "LINESTRING",
+                            family: Geometry,
+                            arity: Nullable,
+                            native_type: Some(
+                                NativeTypeInstance(..),
+                            ),
+                        },
+                        auto_increment: false,
+                        description: None,
+                    },
+                ),
+                (
+                    TableId(
+                        0,
+                    ),
+                    Column {
+                        name: "linestring_xyz",
+                        tpe: ColumnType {
+                            full_data_type: "LINESTRING",
+                            family: Geometry,
+                            arity: Nullable,
+                            native_type: Some(
+                                NativeTypeInstance(..),
+                            ),
+                        },
+                        auto_increment: false,
+                        description: None,
+                    },
+                ),
+                (
+                    TableId(
+                        0,
+                    ),
+                    Column {
+                        name: "linestring_xym",
+                        tpe: ColumnType {
+                            full_data_type: "LINESTRING",
+                            family: Geometry,
+                            arity: Nullable,
+                            native_type: Some(
+                                NativeTypeInstance(..),
+                            ),
+                        },
+                        auto_increment: false,
+                        description: None,
+                    },
+                ),
+                (
+                    TableId(
+                        0,
+                    ),
+                    Column {
+                        name: "linestring_xyzm",
+                        tpe: ColumnType {
+                            full_data_type: "LINESTRING",
+                            family: Geometry,
+                            arity: Nullable,
+                            native_type: Some(
+                                NativeTypeInstance(..),
+                            ),
+                        },
+                        auto_increment: false,
+                        description: None,
+                    },
+                ),
+                (
+                    TableId(
+                        0,
+                    ),
+                    Column {
+                        name: "polygon_xy",
+                        tpe: ColumnType {
+                            full_data_type: "POLYGON",
+                            family: Geometry,
+                            arity: Nullable,
+                            native_type: Some(
+                                NativeTypeInstance(..),
+                            ),
+                        },
+                        auto_increment: false,
+                        description: None,
+                    },
+                ),
+                (
+                    TableId(
+                        0,
+                    ),
+                    Column {
+                        name: "polygon_xyz",
+                        tpe: ColumnType {
+                            full_data_type: "POLYGON",
+                            family: Geometry,
+                            arity: Nullable,
+                            native_type: Some(
+                                NativeTypeInstance(..),
+                            ),
+                        },
+                        auto_increment: false,
+                        description: None,
+                    },
+                ),
+                (
+                    TableId(
+                        0,
+                    ),
+                    Column {
+                        name: "polygon_xym",
+                        tpe: ColumnType {
+                            full_data_type: "POLYGON",
+                            family: Geometry,
+                            arity: Nullable,
+                            native_type: Some(
+                                NativeTypeInstance(..),
+                            ),
+                        },
+                        auto_increment: false,
+                        description: None,
+                    },
+                ),
+                (
+                    TableId(
+                        0,
+                    ),
+                    Column {
+                        name: "polygon_xyzm",
+                        tpe: ColumnType {
+                            full_data_type: "POLYGON",
+                            family: Geometry,
+                            arity: Nullable,
+                            native_type: Some(
+                                NativeTypeInstance(..),
+                            ),
+                        },
+                        auto_increment: false,
+                        description: None,
+                    },
+                ),
+                (
+                    TableId(
+                        0,
+                    ),
+                    Column {
+                        name: "multipoint_xy",
+                        tpe: ColumnType {
+                            full_data_type: "MULTIPOINT",
+                            family: Geometry,
+                            arity: Nullable,
+                            native_type: Some(
+                                NativeTypeInstance(..),
+                            ),
+                        },
+                        auto_increment: false,
+                        description: None,
+                    },
+                ),
+                (
+                    TableId(
+                        0,
+                    ),
+                    Column {
+                        name: "multipoint_xyz",
+                        tpe: ColumnType {
+                            full_data_type: "MULTIPOINT",
+                            family: Geometry,
+                            arity: Nullable,
+                            native_type: Some(
+                                NativeTypeInstance(..),
+                            ),
+                        },
+                        auto_increment: false,
+                        description: None,
+                    },
+                ),
+                (
+                    TableId(
+                        0,
+                    ),
+                    Column {
+                        name: "multipoint_xym",
+                        tpe: ColumnType {
+                            full_data_type: "MULTIPOINT",
+                            family: Geometry,
+                            arity: Nullable,
+                            native_type: Some(
+                                NativeTypeInstance(..),
+                            ),
+                        },
+                        auto_increment: false,
+                        description: None,
+                    },
+                ),
+                (
+                    TableId(
+                        0,
+                    ),
+                    Column {
+                        name: "multipoint_xyzm",
+                        tpe: ColumnType {
+                            full_data_type: "MULTIPOINT",
+                            family: Geometry,
+                            arity: Nullable,
+                            native_type: Some(
+                                NativeTypeInstance(..),
+                            ),
+                        },
+                        auto_increment: false,
+                        description: None,
+                    },
+                ),
+                (
+                    TableId(
+                        0,
+                    ),
+                    Column {
+                        name: "multilinestring_xy",
+                        tpe: ColumnType {
+                            full_data_type: "MULTILINESTRING",
+                            family: Geometry,
+                            arity: Nullable,
+                            native_type: Some(
+                                NativeTypeInstance(..),
+                            ),
+                        },
+                        auto_increment: false,
+                        description: None,
+                    },
+                ),
+                (
+                    TableId(
+                        0,
+                    ),
+                    Column {
+                        name: "multilinestring_xyz",
+                        tpe: ColumnType {
+                            full_data_type: "MULTILINESTRING",
+                            family: Geometry,
+                            arity: Nullable,
+                            native_type: Some(
+                                NativeTypeInstance(..),
+                            ),
+                        },
+                        auto_increment: false,
+                        description: None,
+                    },
+                ),
+                (
+                    TableId(
+                        0,
+                    ),
+                    Column {
+                        name: "multilinestring_xym",
+                        tpe: ColumnType {
+                            full_data_type: "MULTILINESTRING",
+                            family: Geometry,
+                            arity: Nullable,
+                            native_type: Some(
+                                NativeTypeInstance(..),
+                            ),
+                        },
+                        auto_increment: false,
+                        description: None,
+                    },
+                ),
+                (
+                    TableId(
+                        0,
+                    ),
+                    Column {
+                        name: "multilinestring_xyzm",
+                        tpe: ColumnType {
+                            full_data_type: "MULTILINESTRING",
+                            family: Geometry,
+                            arity: Nullable,
+                            native_type: Some(
+                                NativeTypeInstance(..),
+                            ),
+                        },
+                        auto_increment: false,
+                        description: None,
+                    },
+                ),
+                (
+                    TableId(
+                        0,
+                    ),
+                    Column {
+                        name: "multipolygon_xy",
+                        tpe: ColumnType {
+                            full_data_type: "MULTIPOLYGON",
+                            family: Geometry,
+                            arity: Nullable,
+                            native_type: Some(
+                                NativeTypeInstance(..),
+                            ),
+                        },
+                        auto_increment: false,
+                        description: None,
+                    },
+                ),
+                (
+                    TableId(
+                        0,
+                    ),
+                    Column {
+                        name: "multipolygon_xyz",
+                        tpe: ColumnType {
+                            full_data_type: "MULTIPOLYGON",
+                            family: Geometry,
+                            arity: Nullable,
+                            native_type: Some(
+                                NativeTypeInstance(..),
+                            ),
+                        },
+                        auto_increment: false,
+                        description: None,
+                    },
+                ),
+                (
+                    TableId(
+                        0,
+                    ),
+                    Column {
+                        name: "multipolygon_xym",
+                        tpe: ColumnType {
+                            full_data_type: "MULTIPOLYGON",
+                            family: Geometry,
+                            arity: Nullable,
+                            native_type: Some(
+                                NativeTypeInstance(..),
+                            ),
+                        },
+                        auto_increment: false,
+                        description: None,
+                    },
+                ),
+                (
+                    TableId(
+                        0,
+                    ),
+                    Column {
+                        name: "multipolygon_xyzm",
+                        tpe: ColumnType {
+                            full_data_type: "MULTIPOLYGON",
+                            family: Geometry,
+                            arity: Nullable,
+                            native_type: Some(
+                                NativeTypeInstance(..),
+                            ),
+                        },
+                        auto_increment: false,
+                        description: None,
+                    },
+                ),
+                (
+                    TableId(
+                        0,
+                    ),
+                    Column {
+                        name: "geometrycollection_xy",
+                        tpe: ColumnType {
+                            full_data_type: "GEOMETRYCOLLECTION",
+                            family: Geometry,
+                            arity: Nullable,
+                            native_type: Some(
+                                NativeTypeInstance(..),
+                            ),
+                        },
+                        auto_increment: false,
+                        description: None,
+                    },
+                ),
+                (
+                    TableId(
+                        0,
+                    ),
+                    Column {
+                        name: "geometrycollection_xyz",
+                        tpe: ColumnType {
+                            full_data_type: "GEOMETRYCOLLECTION",
+                            family: Geometry,
+                            arity: Nullable,
+                            native_type: Some(
+                                NativeTypeInstance(..),
+                            ),
+                        },
+                        auto_increment: false,
+                        description: None,
+                    },
+                ),
+                (
+                    TableId(
+                        0,
+                    ),
+                    Column {
+                        name: "geometrycollection_xym",
+                        tpe: ColumnType {
+                            full_data_type: "GEOMETRYCOLLECTION",
+                            family: Geometry,
+                            arity: Nullable,
+                            native_type: Some(
+                                NativeTypeInstance(..),
+                            ),
+                        },
+                        auto_increment: false,
+                        description: None,
+                    },
+                ),
+                (
+                    TableId(
+                        0,
+                    ),
+                    Column {
+                        name: "geometrycollection_xyzm",
+                        tpe: ColumnType {
+                            full_data_type: "GEOMETRYCOLLECTION",
+                            family: Geometry,
+                            arity: Nullable,
+                            native_type: Some(
+                                NativeTypeInstance(..),
+                            ),
+                        },
+                        auto_increment: false,
+                        description: None,
+                    },
+                ),
+            ],
+            foreign_keys: [],
+            table_default_values: [],
+            view_default_values: [],
+            foreign_key_columns: [],
+            indexes: [
+                Index {
+                    table_id: TableId(
+                        0,
+                    ),
+                    index_name: "",
+                    tpe: PrimaryKey,
+                },
+            ],
+            index_columns: [
+                IndexColumn {
+                    index_id: IndexId(
+                        0,
+                    ),
+                    column_id: TableColumnId(
+                        0,
                     ),
                     sort_order: None,
                     length: None,

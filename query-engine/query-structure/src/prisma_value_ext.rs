@@ -1,5 +1,5 @@
 use super::{PrismaValue, TypeIdentifier};
-use crate::DomainError;
+use crate::{DomainError, GeometryFormat};
 use bigdecimal::ToPrimitive;
 
 pub(crate) trait PrismaValueExtensions {
@@ -23,6 +23,8 @@ impl PrismaValueExtensions for PrismaValue {
             (val @ PrismaValue::BigInt(_), TypeIdentifier::BigInt) => val,
             (val @ PrismaValue::Bytes(_), TypeIdentifier::Bytes) => val,
             (val @ PrismaValue::Json(_), TypeIdentifier::Json) => val,
+            (val @ PrismaValue::Geometry(_), TypeIdentifier::Geometry(GeometryFormat::EWKT)) => val,
+            (val @ PrismaValue::GeoJson(_), TypeIdentifier::Geometry(GeometryFormat::GeoJSON)) => val,
 
             // Valid String coercions
             (PrismaValue::Int(i), TypeIdentifier::String) => PrismaValue::String(format!("{i}")),

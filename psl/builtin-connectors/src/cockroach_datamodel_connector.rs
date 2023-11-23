@@ -1,6 +1,7 @@
 mod native_types;
 mod validations;
 
+pub use crate::geometry::GeometryParams;
 pub use native_types::CockroachType;
 
 use enumflags2::BitFlags;
@@ -22,7 +23,7 @@ use psl_core::{
 };
 use std::borrow::Cow;
 
-use crate::completions;
+use crate::{completions, geometry::GeometryType};
 
 const CONSTRAINT_SCOPES: &[ConstraintScope] = &[ConstraintScope::ModelPrimaryKeyKeyIndexForeignKey];
 
@@ -42,6 +43,12 @@ const CAPABILITIES: ConnectorCapabilities = enumflags2::make_bitflags!(Connector
     Json |
     JsonFiltering |
     JsonFilteringArrayPath |
+    EwktGeometry |
+    GeoJsonGeometry |
+    GeometryRawRead |
+    GeometryFiltering |
+    GeometryExtraDims |
+    GeometryExtraTypes |
     NamedPrimaryKeys |
     NamedForeignKeys |
     SqlQueryRaw |
@@ -71,6 +78,20 @@ const SCALAR_TYPE_DEFAULTS: &[(ScalarType, CockroachType)] = &[
     (ScalarType::DateTime, CockroachType::Timestamp(Some(3))),
     (ScalarType::Bytes, CockroachType::Bytes),
     (ScalarType::Json, CockroachType::JsonB),
+    (
+        ScalarType::Geometry,
+        CockroachType::Geometry(Some(GeometryParams {
+            ty: GeometryType::Geometry,
+            srid: 0,
+        })),
+    ),
+    (
+        ScalarType::GeoJson,
+        CockroachType::Geometry(Some(GeometryParams {
+            ty: GeometryType::Geometry,
+            srid: 4326,
+        })),
+    ),
 ];
 
 pub(crate) struct CockroachDatamodelConnector;
@@ -136,6 +157,9 @@ impl Connector for CockroachDatamodelConnector {
             CockroachType::JsonB => ScalarType::Json,
             // Bytes
             CockroachType::Bytes => ScalarType::Bytes,
+            // Geometry
+            CockroachType::Geometry(_) => ScalarType::Geometry,
+            CockroachType::Geography(_) => ScalarType::Geometry,
         }
     }
 
@@ -169,7 +193,7 @@ impl Connector for CockroachDatamodelConnector {
     fn validate_native_type_arguments(
         &self,
         native_type_instance: &NativeTypeInstance,
-        _scalar_type: &ScalarType,
+        scalar_type: &ScalarType,
         span: ast::Span,
         errors: &mut Diagnostics,
     ) {
@@ -189,6 +213,19 @@ impl Connector for CockroachDatamodelConnector {
             CockroachType::Bit(Some(0)) | CockroachType::VarBit(Some(0)) => {
                 errors.push_error(error.new_argument_m_out_of_range_error("M must be a positive integer.", span))
             }
+            CockroachType::Geometry(Some(g)) | CockroachType::Geography(Some(g))
+                if *scalar_type == ScalarType::GeoJson && g.srid != 4326 =>
+            {
+                errors.push_error(error.new_argument_m_out_of_range_error("GeoJson SRID must be 4326.", span))
+            }
+            CockroachType::Geometry(Some(g)) | CockroachType::Geography(Some(g)) if g.srid < 0 || g.srid > 999000 => {
+                errors.push_error(error.new_argument_m_out_of_range_error("SRID must be between 0 and 999000.", span))
+            }
+            CockroachType::Geometry(Some(g)) | CockroachType::Geography(Some(g)) if g.ty.is_extra() => errors
+                .push_error(error.new_argument_m_out_of_range_error(
+                    &format!("{} isn't supported for the current connector.", g.ty),
+                    span,
+                )),
             CockroachType::Timestamp(Some(p))
             | CockroachType::Timestamptz(Some(p))
             | CockroachType::Time(Some(p))

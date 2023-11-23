@@ -28,6 +28,8 @@ impl<'a> IntoTypedJsonExtension for quaint::Value<'a> {
             quaint::ValueType::DateTime(_) => "datetime",
             quaint::ValueType::Date(_) => "date",
             quaint::ValueType::Time(_) => "time",
+            quaint::ValueType::Geometry(_) => "geometry",
+            quaint::ValueType::Geography(_) => "geography",
             quaint::ValueType::Array(_) | quaint::ValueType::EnumArray(_, _) => "array",
         };
 

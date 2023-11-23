@@ -35,13 +35,13 @@ mod metrics {
         let total_operations = get_counter(&json, PRISMA_CLIENT_QUERIES_TOTAL);
 
         match runner.connector_version() {
-            Sqlite(_) => assert_eq!(total_queries, 9),
+            Sqlite(_) => assert_eq!(total_queries, 10),
             SqlServer(_) => assert_eq!(total_queries, 17),
             MongoDb(_) => assert_eq!(total_queries, 5),
             CockroachDb(_) => (), // not deterministic
             MySql(_) => assert_eq!(total_queries, 12),
             Vitess(_) => assert_eq!(total_queries, 11),
-            Postgres(_) => assert_eq!(total_queries, 7),
+            Postgres(_) => assert_eq!(total_queries, 9),
         }
 
         assert_eq!(total_operations, 2);

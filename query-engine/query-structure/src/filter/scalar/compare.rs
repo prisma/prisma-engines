@@ -199,6 +199,50 @@ impl ScalarCompare for ScalarFieldRef {
             mode: QueryMode::Default,
         })
     }
+
+    fn geometry_within<T>(&self, val: T) -> Filter
+    where
+        T: Into<ConditionValue>,
+    {
+        Filter::from(ScalarFilter {
+            projection: ScalarProjection::Single(self.clone()),
+            condition: ScalarCondition::GeometryWithin(val.into()),
+            mode: QueryMode::Default,
+        })
+    }
+
+    fn geometry_not_within<T>(&self, val: T) -> Filter
+    where
+        T: Into<ConditionValue>,
+    {
+        Filter::from(ScalarFilter {
+            projection: ScalarProjection::Single(self.clone()),
+            condition: ScalarCondition::GeometryNotWithin(val.into()),
+            mode: QueryMode::Default,
+        })
+    }
+
+    fn geometry_intersects<T>(&self, val: T) -> Filter
+    where
+        T: Into<ConditionValue>,
+    {
+        Filter::from(ScalarFilter {
+            projection: ScalarProjection::Single(self.clone()),
+            condition: ScalarCondition::GeometryIntersects(val.into()),
+            mode: QueryMode::Default,
+        })
+    }
+
+    fn geometry_not_intersects<T>(&self, val: T) -> Filter
+    where
+        T: Into<ConditionValue>,
+    {
+        Filter::from(ScalarFilter {
+            projection: ScalarProjection::Single(self.clone()),
+            condition: ScalarCondition::GeometryNotIntersects(val.into()),
+            mode: QueryMode::Default,
+        })
+    }
 }
 
 impl ScalarCompare for ModelProjection {
@@ -399,6 +443,50 @@ impl ScalarCompare for ModelProjection {
             mode: QueryMode::Default,
         })
     }
+
+    fn geometry_within<T>(&self, val: T) -> Filter
+    where
+        T: Into<ConditionValue>,
+    {
+        Filter::from(ScalarFilter {
+            projection: ScalarProjection::Compound(self.scalar_fields().collect()),
+            condition: ScalarCondition::GeometryWithin(val.into()),
+            mode: QueryMode::Default,
+        })
+    }
+
+    fn geometry_not_within<T>(&self, val: T) -> Filter
+    where
+        T: Into<ConditionValue>,
+    {
+        Filter::from(ScalarFilter {
+            projection: ScalarProjection::Compound(self.scalar_fields().collect()),
+            condition: ScalarCondition::GeometryNotWithin(val.into()),
+            mode: QueryMode::Default,
+        })
+    }
+
+    fn geometry_intersects<T>(&self, val: T) -> Filter
+    where
+        T: Into<ConditionValue>,
+    {
+        Filter::from(ScalarFilter {
+            projection: ScalarProjection::Compound(self.scalar_fields().collect()),
+            condition: ScalarCondition::GeometryIntersects(val.into()),
+            mode: QueryMode::Default,
+        })
+    }
+
+    fn geometry_not_intersects<T>(&self, val: T) -> Filter
+    where
+        T: Into<ConditionValue>,
+    {
+        Filter::from(ScalarFilter {
+            projection: ScalarProjection::Compound(self.scalar_fields().collect()),
+            condition: ScalarCondition::GeometryNotIntersects(val.into()),
+            mode: QueryMode::Default,
+        })
+    }
 }
 
 impl ScalarCompare for FieldSelection {
@@ -596,6 +684,50 @@ impl ScalarCompare for FieldSelection {
         Filter::from(ScalarFilter {
             projection: ScalarProjection::Compound(self.as_scalar_fields().expect("Todo composites in filters.")),
             condition: ScalarCondition::IsSet(val),
+            mode: QueryMode::Default,
+        })
+    }
+
+    fn geometry_within<T>(&self, val: T) -> Filter
+    where
+        T: Into<ConditionValue>,
+    {
+        Filter::from(ScalarFilter {
+            projection: ScalarProjection::Compound(self.as_scalar_fields().expect("Todo composites in filters.")),
+            condition: ScalarCondition::GeometryWithin(val.into()),
+            mode: QueryMode::Default,
+        })
+    }
+
+    fn geometry_not_within<T>(&self, val: T) -> Filter
+    where
+        T: Into<ConditionValue>,
+    {
+        Filter::from(ScalarFilter {
+            projection: ScalarProjection::Compound(self.as_scalar_fields().expect("Todo composites in filters.")),
+            condition: ScalarCondition::GeometryNotWithin(val.into()),
+            mode: QueryMode::Default,
+        })
+    }
+
+    fn geometry_intersects<T>(&self, val: T) -> Filter
+    where
+        T: Into<ConditionValue>,
+    {
+        Filter::from(ScalarFilter {
+            projection: ScalarProjection::Compound(self.as_scalar_fields().expect("Todo composites in filters.")),
+            condition: ScalarCondition::GeometryIntersects(val.into()),
+            mode: QueryMode::Default,
+        })
+    }
+
+    fn geometry_not_intersects<T>(&self, val: T) -> Filter
+    where
+        T: Into<ConditionValue>,
+    {
+        Filter::from(ScalarFilter {
+            projection: ScalarProjection::Compound(self.as_scalar_fields().expect("Todo composites in filters.")),
+            condition: ScalarCondition::GeometryNotIntersects(val.into()),
             mode: QueryMode::Default,
         })
     }

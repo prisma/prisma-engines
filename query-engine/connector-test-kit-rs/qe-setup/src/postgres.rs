@@ -38,6 +38,9 @@ pub(crate) async fn postgres_setup(url: String, prisma_schema: &str, db_schemas:
             .map_err(|e| ConnectorError::from_source(e, ""))?;
     }
 
+    let conn = Quaint::new(parsed_url.as_ref()).await.unwrap();
+    conn.raw_cmd("CREATE EXTENSION IF NOT EXISTS postgis").await.ok();
+
     let mut connector = sql_schema_connector::SqlSchemaConnector::new_postgres();
     crate::diff_and_apply(prisma_schema, url, &mut connector).await
 }

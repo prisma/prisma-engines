@@ -7,10 +7,11 @@ mod mongodb;
 mod mssql;
 mod mysql;
 mod postgres;
+mod sqlite;
 
 pub use schema_core::schema_connector::ConnectorError;
 
-use self::{cockroachdb::*, mongodb::*, mssql::*, mysql::*, postgres::*};
+use self::{cockroachdb::*, mongodb::*, mssql::*, mysql::*, postgres::*, sqlite::*};
 use enumflags2::BitFlags;
 use psl::{builtin_connectors::*, Datasource};
 use schema_core::schema_connector::{ConnectorResult, DiffTarget, SchemaConnector};
@@ -50,12 +51,7 @@ pub async fn setup(prisma_schema: &str, db_schemas: &[&str]) -> ConnectorResult<
             let mut connector = sql_schema_connector::SqlSchemaConnector::new_mysql();
             diff_and_apply(prisma_schema, url, &mut connector).await
         }
-        provider if SQLITE.is_provider(provider) => {
-            std::fs::remove_file(source.url.as_literal().unwrap().trim_start_matches("file:")).ok();
-            let mut connector = sql_schema_connector::SqlSchemaConnector::new_sqlite();
-            diff_and_apply(prisma_schema, url, &mut connector).await
-        }
-
+        provider if SQLITE.is_provider(provider) => sqlite_setup(url, source, prisma_schema).await,
         provider if MONGODB.is_provider(provider) => mongo_setup(prisma_schema, &url).await,
 
         x => unimplemented!("Connector {} is not supported yet", x),

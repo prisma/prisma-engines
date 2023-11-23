@@ -2,10 +2,7 @@ use super::Visitor;
 #[cfg(any(feature = "postgresql", feature = "mysql"))]
 use crate::prelude::{JsonExtract, JsonType, JsonUnquote};
 use crate::{
-    ast::{
-        Column, Comparable, Expression, ExpressionKind, Insert, IntoRaw, Join, JoinData, Joinable, Merge, OnConflict,
-        Order, Ordering, Row, Table, TypeDataLength, TypeFamily, Values,
-    },
+    ast::*,
     error::{Error, ErrorKind},
     prelude::{Aliasable, Average, Query},
     visitor, Value, ValueType,
@@ -74,6 +71,8 @@ impl<'a> Mssql<'a> {
             TypeFamily::Boolean => self.write("BIT"),
             TypeFamily::Uuid => self.write("UNIQUEIDENTIFIER"),
             TypeFamily::DateTime => self.write("DATETIMEOFFSET"),
+            TypeFamily::Geometry(_) => self.write("GEOMETRY"),
+            TypeFamily::Geography(_) => self.write("GEOGRAPHY"),
             TypeFamily::Bytes(len) => {
                 self.write("VARBINARY(")?;
                 match len {
@@ -176,6 +175,12 @@ impl<'a> Mssql<'a> {
 
         Ok(())
     }
+
+    fn visit_geometry_equals(&mut self, left: Expression<'a>, right: Expression<'a>, not: bool) -> visitor::Result {
+        self.surround_with("(", ")", |s| s.visit_expression(left))?;
+        self.surround_with(".STEquals(", ")", |s| s.visit_expression(right))?;
+        self.write(if not { " = 0" } else { " = 1" })
+    }
 }
 
 impl<'a> Visitor<'a> for Mssql<'a> {
@@ -201,10 +206,6 @@ impl<'a> Visitor<'a> for Mssql<'a> {
     fn write<D: std::fmt::Display>(&mut self, s: D) -> visitor::Result {
         write!(&mut self.query, "{s}")?;
         Ok(())
-    }
-
-    fn add_parameter(&mut self, value: Value<'a>) {
-        self.parameters.push(value)
     }
 
     /// A point to modify an incoming query to make it compatible with the
@@ -235,6 +236,7 @@ impl<'a> Visitor<'a> for Mssql<'a> {
             (left_kind, right_kind) => {
                 let (l_alias, r_alias) = (left.alias, right.alias);
                 let (left_xml, right_xml) = (left_kind.is_xml_value(), right_kind.is_xml_value());
+                let (left_geom, right_geom) = (left_kind.is_geometry_expr(), right_kind.is_geometry_expr());
 
                 let mut left = Expression::from(left_kind);
 
@@ -246,6 +248,12 @@ impl<'a> Visitor<'a> for Mssql<'a> {
 
                 if let Some(alias) = r_alias {
                     right = right.alias(alias);
+                }
+
+                if left_geom {
+                    return self.visit_geometry_equals(left, right, false);
+                } else if right_geom {
+                    return self.visit_geometry_equals(right, left, false);
                 }
 
                 if right_xml {
@@ -276,6 +284,7 @@ impl<'a> Visitor<'a> for Mssql<'a> {
             (left_kind, right_kind) => {
                 let (l_alias, r_alias) = (left.alias, right.alias);
                 let (left_xml, right_xml) = (left_kind.is_xml_value(), right_kind.is_xml_value());
+                let (left_geom, right_geom) = (left_kind.is_geometry_expr(), right_kind.is_geometry_expr());
 
                 let mut left = Expression::from(left_kind);
 
@@ -287,6 +296,12 @@ impl<'a> Visitor<'a> for Mssql<'a> {
 
                 if let Some(alias) = r_alias {
                     right = right.alias(alias);
+                }
+
+                if left_geom {
+                    return self.visit_geometry_equals(left, right, true);
+                } else if right_geom {
+                    return self.visit_geometry_equals(right, left, true);
                 }
 
                 if right_xml {
@@ -361,6 +376,13 @@ impl<'a> Visitor<'a> for Mssql<'a> {
             // Style 3 is keep all whitespace + internal DTD processing:
             // https://docs.microsoft.com/en-us/sql/t-sql/functions/cast-and-convert-transact-sql?redirectedfrom=MSDN&view=sql-server-ver15#xml-styles
             ValueType::Xml(cow) => cow.map(|cow| self.write(format!("CONVERT(XML, N'{cow}', 3)"))),
+            // TODO@geometry: find a way to avoid cloning
+            ValueType::Geometry(g) => g
+                .as_ref()
+                .map(|g| self.visit_function(geom_from_text(g.wkt.clone().raw(), g.srid.raw(), false))),
+            ValueType::Geography(g) => g
+                .as_ref()
+                .map(|g| self.visit_function(geom_from_text(g.wkt.clone().raw(), g.srid.raw(), true))),
         };
 
         match res {
@@ -526,6 +548,10 @@ impl<'a> Visitor<'a> for Mssql<'a> {
         unimplemented!("Upsert not supported for the underlying database.")
     }
 
+    fn add_parameter(&mut self, value: Value<'a>) {
+        self.parameters.push(value)
+    }
+
     fn parameter_substitution(&mut self) -> visitor::Result {
         self.write("@P")?;
         self.write(self.parameters.len())
@@ -631,6 +657,50 @@ impl<'a> Visitor<'a> for Mssql<'a> {
         Ok(())
     }
 
+    fn visit_geometry_type_equals(
+        &mut self,
+        left: Expression<'a>,
+        geom_type: GeometryType<'a>,
+        not: bool,
+    ) -> visitor::Result {
+        self.surround_with("(", ").STGeometryType()", |s| s.visit_expression(left))?;
+
+        if not {
+            self.write(" != ")?;
+        } else {
+            self.write(" = ")?;
+        }
+
+        match geom_type {
+            GeometryType::ColumnRef(column) => {
+                self.surround_with("(", ").STGeometryType()", |s| s.visit_column(*column))
+            }
+            _ => self.visit_expression(Value::text(geom_type.to_string()).into()),
+        }
+    }
+
+    fn visit_geometry_empty(&mut self, left: Expression<'a>, not: bool) -> visitor::Result {
+        self.surround_with("(", ").STIsEmpty()", |s| s.visit_expression(left))?;
+        self.write(if not { " = 0" } else { " = 1" })
+    }
+
+    fn visit_geometry_valid(&mut self, left: Expression<'a>, not: bool) -> visitor::Result {
+        self.surround_with("(", ").STIsValid()", |s| s.visit_expression(left))?;
+        self.write(if not { " = 0" } else { " = 1" })
+    }
+
+    fn visit_geometry_within(&mut self, left: Expression<'a>, right: Expression<'a>, not: bool) -> visitor::Result {
+        self.surround_with("(", ")", |s| s.visit_expression(left))?;
+        self.surround_with(".STWithin(", ")", |s| s.visit_expression(right))?;
+        self.write(if not { " = 0" } else { " = 1" })
+    }
+
+    fn visit_geometry_intersects(&mut self, left: Expression<'a>, right: Expression<'a>, not: bool) -> visitor::Result {
+        self.surround_with("(", ")", |s| s.visit_expression(left))?;
+        self.surround_with(".STIntersects(", ")", |s| s.visit_expression(right))?;
+        self.write(if not { " = 0" } else { " = 1" })
+    }
+
     #[cfg(any(feature = "postgresql", feature = "mysql"))]
     fn visit_json_extract(&mut self, _json_extract: JsonExtract<'a>) -> visitor::Result {
         unimplemented!("JSON filtering is not yet supported on MSSQL")
@@ -694,6 +764,35 @@ impl<'a> Visitor<'a> for Mssql<'a> {
     ) -> visitor::Result {
         unimplemented!("JSON filtering is not yet supported on MSSQL")
     }
+
+    fn visit_geom_as_text(&mut self, geom: GeomAsText<'a>) -> visitor::Result {
+        self.write("CASE WHEN ")?;
+        self.visit_expression(*geom.expression.clone())?;
+        self.write("IS NULL THEN NULL ELSE ")?;
+        self.surround_with("CONCAT(", ")", |ref mut s| {
+            s.write("'SRID=',")?;
+            s.surround_with("(", ").STSrid", |ref mut s| {
+                s.visit_expression(*geom.expression.clone())
+            })?;
+            s.write(",';',")?;
+            s.surround_with("CAST(", " AS VARCHAR(MAX))", |ref mut s| {
+                s.visit_expression(*geom.expression)
+            })?;
+            Ok(())
+        })?;
+        self.write("END")?;
+        Ok(())
+    }
+
+    fn visit_geom_from_text(&mut self, geom: GeomFromText<'a>) -> visitor::Result {
+        self.write(if geom.geography { "geography" } else { "geometry" })?;
+        self.surround_with("::STGeomFromText(", ")", |ref mut s| {
+            s.visit_expression(*geom.wkt_expression)?;
+            s.write(",")?;
+            s.visit_expression(*geom.srid_expression)?;
+            Ok(())
+        })
+    }
 }
 
 #[cfg(test)]
@@ -704,6 +803,7 @@ mod tests {
         visitor::{Mssql, Visitor},
     };
     use indoc::indoc;
+    use std::str::FromStr;
 
     fn expected_values<'a, T>(sql: &'static str, params: Vec<T>) -> (String, Vec<Value<'a>>)
     where
@@ -1269,6 +1369,22 @@ mod tests {
         let (sql, params) = Mssql::build(Select::default().value(dt.raw())).unwrap();
 
         assert_eq!(format!("SELECT CONVERT(datetimeoffset, N'{}')", dt.to_rfc3339(),), sql);
+        assert!(params.is_empty());
+    }
+
+    #[test]
+    fn test_raw_geometry() {
+        let geom = GeometryValue::from_str("SRID=4326;POINT(0 0)").unwrap();
+        let (sql, params) = Mssql::build(Select::default().value(Value::geometry(geom).raw())).unwrap();
+        assert_eq!("SELECT geometry::STGeomFromText('POINT(0 0)',4326)", sql);
+        assert!(params.is_empty());
+    }
+
+    #[test]
+    fn test_raw_geography() {
+        let geom = GeometryValue::from_str("SRID=4326;POINT(0 0)").unwrap();
+        let (sql, params) = Mssql::build(Select::default().value(Value::geography(geom).raw())).unwrap();
+        assert_eq!("SELECT geography::STGeomFromText('POINT(0 0)',4326)", sql);
         assert!(params.is_empty());
     }
 

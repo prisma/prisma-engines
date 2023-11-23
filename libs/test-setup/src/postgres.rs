@@ -7,9 +7,14 @@ pub(crate) fn get_postgres_tags(database_url: &str) -> Result<BitFlags<Tags>, St
     let fut = async {
         let quaint = Quaint::new(database_url).await.map_err(|err| err.to_string())?;
         let mut tags = Tags::Postgres.into();
-        let version = quaint.version().await.map_err(|err| err.to_string())?;
 
-        match version {
+        if let Ok(_postgis_version) = quaint.query_raw("SELECT PostGIS_version()", &[]).await {
+            tags |= Tags::PostGIS;
+        }
+
+        let postgres_version = quaint.version().await.map_err(|err| err.to_string())?;
+
+        match postgres_version {
             None => Ok(tags),
             Some(version) => {
                 eprintln!("version: {version:?}");

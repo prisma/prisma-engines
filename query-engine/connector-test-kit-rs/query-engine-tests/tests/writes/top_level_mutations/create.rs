@@ -424,3 +424,36 @@ mod mapped_create {
         Ok(())
     }
 }
+
+#[test_suite(
+    schema(geometry_opt),
+    capabilities(GeoJsonGeometry),
+    exclude(Postgres(9, 10, 11, 12, 13, 14, 15, "pgbouncer"))
+)]
+mod geometry_create {
+    use query_engine_tests::run_query;
+
+    #[connector_test]
+    async fn create_geometry(runner: Runner) -> TestResult<()> {
+        // TODO@geometry: ideally, make geojson generation consistent with SQL connectors
+        match_connector_result!(
+          &runner,
+          r#"mutation { createOneTestModel(data: { id: 1, geometry: "{\"type\": \"Point\", \"coordinates\": [1,2]}" }) { geometry }}"#,
+          // MongoDB excludes undefined fields
+          MongoDb(_) => vec![r#"{"data":{"createOneTestModel":{"geometry":"{\"type\":\"Point\",\"coordinates\":[1,2]}"}}}"#],
+          _ => vec![r#"{"data":{"createOneTestModel":{"geometry":"{\"type\": \"Point\", \"coordinates\": [1,2]}"}}}"#]
+        );
+
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"mutation { createOneTestModel(data: { id: 2, geometry: null }) { geometry }}"#),
+          @r###"{"data":{"createOneTestModel":{"geometry":null}}}"###
+        );
+
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"mutation { createOneTestModel(data: { id: 3 }) { geometry }}"#),
+          @r###"{"data":{"createOneTestModel":{"geometry":null}}}"###
+        );
+
+        Ok(())
+    }
+}

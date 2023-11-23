@@ -4,7 +4,7 @@ use crate::error::{Error, ErrorKind};
 use bigdecimal::{BigDecimal, FromPrimitive, ToPrimitive};
 use chrono::{DateTime, NaiveDate, NaiveTime, Utc};
 use serde_json::{Number, Value as JsonValue};
-use std::fmt::Display;
+use std::fmt::{Display, Formatter};
 use std::{
     borrow::{Borrow, Cow},
     convert::TryFrom,
@@ -12,6 +12,9 @@ use std::{
     str::FromStr,
 };
 use uuid::Uuid;
+
+use once_cell::sync::Lazy;
+use regex::Regex;
 
 /// A value written to the query as-is without parameterization.
 #[derive(Debug, Clone, PartialEq)]
@@ -30,6 +33,43 @@ where
 {
     fn raw(self) -> Raw<'a> {
         Raw(self.into())
+    }
+}
+
+#[derive(Debug, Clone, Eq, PartialEq, Hash, PartialOrd, Ord)]
+pub struct GeometryValue {
+    pub wkt: String,
+    pub srid: i32,
+}
+
+impl Display for GeometryValue {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        match self.srid {
+            0 => (),
+            srid => write!(f, "SRID={};", srid)?,
+        }
+        f.write_str(&self.wkt)
+    }
+}
+
+impl FromStr for GeometryValue {
+    type Err = String;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        static EWKT_REGEX: Lazy<Regex> =
+            Lazy::new(|| Regex::new(r"^(SRID=(?P<srid>\d+);)?(?P<geometry>.+)$").unwrap());
+        EWKT_REGEX
+            .captures(s)
+            .map(|capture| {
+                let srid = match capture.name("srid").map(|v| v.as_str().parse::<i32>()) {
+                    None => Ok(0),
+                    Some(Ok(srid)) => Ok(srid),
+                    Some(Err(_)) => Err("Invalid SRID"),
+                }?;
+                let wkt = capture.name("geometry").map(|v| v.as_str()).unwrap().to_string();
+                Ok(GeometryValue { srid, wkt })
+            })
+            .ok_or("Invalid EWKT".to_string())?
     }
 }
 
@@ -207,6 +247,22 @@ impl<'a> Value<'a> {
         T: Into<Cow<'a, str>>,
     {
         ValueType::xml(value).into_value()
+    }
+
+    /// Creates a new geometry value.
+    pub fn geometry<T>(value: T) -> Self
+    where
+        T: Into<GeometryValue>,
+    {
+        ValueType::geometry(value).into_value()
+    }
+
+    /// Creates a new geography value.
+    pub fn geography<T>(value: T) -> Self
+    where
+        T: Into<GeometryValue>,
+    {
+        ValueType::geography(value).into_value()
     }
 
     /// `true` if the `Value` is null.
@@ -472,6 +528,10 @@ impl<'a> Value<'a> {
     pub fn null_time() -> Self {
         ValueType::Time(None).into()
     }
+
+    pub fn null_geometry() -> Self {
+        ValueType::Time(None).into()
+    }
 }
 
 impl<'a> Display for Value<'a> {
@@ -530,6 +590,10 @@ pub enum ValueType<'a> {
     Numeric(Option<BigDecimal>),
     /// A JSON value.
     Json(Option<serde_json::Value>),
+    /// A Geometry value.
+    Geometry(Option<GeometryValue>),
+    /// A Geography value.
+    Geography(Option<GeometryValue>),
     /// A XML value.
     Xml(Option<Cow<'a, str>>),
     /// An UUID value.
@@ -606,6 +670,8 @@ impl<'a> fmt::Display for ValueType<'a> {
             ValueType::DateTime(val) => val.map(|v| write!(f, "\"{v}\"")),
             ValueType::Date(val) => val.map(|v| write!(f, "\"{v}\"")),
             ValueType::Time(val) => val.map(|v| write!(f, "\"{v}\"")),
+            ValueType::Geometry(val) => val.as_ref().map(|v| write!(f, "\"{v}\"")),
+            ValueType::Geography(val) => val.as_ref().map(|v| write!(f, "\"{v}\"")),
         };
 
         match res {
@@ -664,6 +730,8 @@ impl<'a> From<ValueType<'a>> for serde_json::Value {
             ValueType::DateTime(dt) => dt.map(|dt| serde_json::Value::String(dt.to_rfc3339())),
             ValueType::Date(date) => date.map(|date| serde_json::Value::String(format!("{date}"))),
             ValueType::Time(time) => time.map(|time| serde_json::Value::String(format!("{time}"))),
+            ValueType::Geometry(g) => g.map(|g| serde_json::Value::String(g.to_string())),
+            ValueType::Geography(g) => g.map(|g| serde_json::Value::String(g.to_string())),
         };
 
         match res {
@@ -810,6 +878,22 @@ impl<'a> ValueType<'a> {
         Self::Json(Some(value))
     }
 
+    /// Creates a new geometry value.
+    pub fn geometry<T>(value: T) -> Self
+    where
+        T: Into<GeometryValue>,
+    {
+        Self::Geometry(Some(value.into()))
+    }
+
+    /// Creates a new geometry value.
+    pub fn geography<T>(value: T) -> Self
+    where
+        T: Into<GeometryValue>,
+    {
+        Self::Geography(Some(value.into()))
+    }
+
     /// Creates a new XML value.
     pub(crate) fn xml<T>(value: T) -> Self
     where
@@ -839,6 +923,8 @@ impl<'a> ValueType<'a> {
             Self::Date(d) => d.is_none(),
             Self::Time(t) => t.is_none(),
             Self::Json(json) => json.is_none(),
+            Self::Geometry(geom) => geom.is_none(),
+            Self::Geography(geom) => geom.is_none(),
         }
     }
 

@@ -173,6 +173,12 @@ start-postgres15:
 dev-postgres15: start-postgres15
 	cp $(CONFIG_PATH)/postgres15 $(CONFIG_FILE)
 
+start-postgis15:
+	docker compose -f docker-compose.yml up -d --remove-orphans postgis15
+
+dev-postgis15: start-postgis15
+	cp $(CONFIG_PATH)/postgis15 $(CONFIG_FILE)
+
 start-cockroach_23_1:
 	docker compose -f docker-compose.yml up --wait -d --remove-orphans cockroach_23_1
 

@@ -4,11 +4,12 @@ use crate::{
     error::{Error, ErrorKind},
 };
 use chrono::{DateTime, Datelike, NaiveDate, NaiveDateTime, NaiveTime, Timelike, Utc};
+use geozero::{wkb::MySQLWkb, wkt::WktStr, ToWkb, ToWkt};
 use mysql_async::{
     self as my,
     consts::{ColumnFlags, ColumnType},
 };
-use std::convert::TryFrom;
+use std::{convert::TryFrom, vec};
 
 pub fn conv_params(params: &[Value<'_>]) -> crate::Result<my::Params> {
     if params.is_empty() {
@@ -67,6 +68,13 @@ pub fn conv_params(params: &[Value<'_>]) -> crate::Result<my::Params> {
                         dt.second() as u8,
                         dt.timestamp_subsec_micros(),
                     )
+                }),
+                ValueType::Geometry(g) | ValueType::Geography(g) => g.as_ref().map(|g| {
+                    // TODO@geometry: Improve WKB serialization error handling
+                    WktStr(&g.wkt)
+                        .to_mysql_wkb(Some(g.srid))
+                        .map(my::Value::Bytes)
+                        .unwrap_or_else(|_| panic!("Couldn't convert value `{g}` into EWKB."))
                 }),
             };
 
@@ -193,6 +201,10 @@ impl TypeIdentifier for my::Column {
         self.column_type() == ColumnType::MYSQL_TYPE_JSON
     }
 
+    fn is_geometry(&self) -> bool {
+        self.column_type() == ColumnType::MYSQL_TYPE_GEOMETRY
+    }
+
     fn is_enum(&self) -> bool {
         self.flags() == ColumnFlags::ENUM_FLAG || self.column_type() == ColumnType::MYSQL_TYPE_ENUM
     }
@@ -255,6 +267,14 @@ impl TakeRow for my::Row {
                     [0] => Value::boolean(false),
                     _ => Value::boolean(true),
                 },
+                my::Value::Bytes(b) if column.is_geometry() => {
+                    MySQLWkb(b).to_ewkt(None).map(Value::text).map_err(|_| {
+                        let msg = "Could not convert geometry blob to Ewkt";
+                        let kind = ErrorKind::conversion(msg);
+
+                        Error::builder(kind).build()
+                    })?
+                }
                 // https://dev.mysql.com/doc/internals/en/character-set.html
                 my::Value::Bytes(b) if column.character_set() == 63 => Value::bytes(b),
                 my::Value::Bytes(s) => Value::text(String::from_utf8(s)?),
@@ -316,6 +336,7 @@ impl TakeRow for my::Row {
                     t if t.is_time() => Value::null_time(),
                     t if t.is_date() => Value::null_date(),
                     t if t.is_json() => Value::null_json(),
+                    t if t.is_geometry() => Value::null_geometry(),
                     typ => {
                         let msg = format!("Value of type {typ:?} is not supported with the current configuration");
 

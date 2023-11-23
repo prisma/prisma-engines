@@ -377,6 +377,7 @@ impl<'a> SqlSchemaDescriber<'a> {
                             },
                             ColumnTypeFamily::Binary => DefaultValue::db_generated(default_string),
                             ColumnTypeFamily::Json => DefaultValue::db_generated(default_string),
+                            ColumnTypeFamily::Geometry => DefaultValue::db_generated(default_string),
                             ColumnTypeFamily::Uuid => DefaultValue::db_generated(default_string),
                             ColumnTypeFamily::Unsupported(_) => DefaultValue::db_generated(default_string),
                             ColumnTypeFamily::Enum(_) => unreachable!("No enums in MSSQL"),
@@ -865,6 +866,8 @@ impl<'a> SqlSchemaDescriber<'a> {
             "varbinary" => (Binary, Some(MsSqlType::VarBinary(type_parameter))),
             "image" => (Binary, Some(MsSqlType::Image)),
             "xml" => (String, Some(MsSqlType::Xml)),
+            "geometry" => (Geometry, Some(MsSqlType::Geometry)),
+            "geography" => (Geometry, Some(MsSqlType::Geography)),
             "uniqueidentifier" => (Uuid, Some(MsSqlType::UniqueIdentifier)),
             _ => unsupported_type(),
         };
