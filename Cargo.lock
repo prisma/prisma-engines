@@ -3534,7 +3534,6 @@ dependencies = [
  "serde_json",
  "url",
  "wasm-bindgen",
- "wasm-rs-dbg",
 ]
 
 [[package]]
@@ -3851,7 +3850,6 @@ dependencies = [
  "serde",
  "serde-wasm-bindgen",
  "serde_json",
- "serde_repr",
  "sql-query-connector",
  "thiserror",
  "tokio",
