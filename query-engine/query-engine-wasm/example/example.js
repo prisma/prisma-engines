@@ -37,6 +37,22 @@ async function main() {
   const queryEngine = new QueryEngine(options, callback, driverAdapter)
   
   await queryEngine.connect('trace')
+
+  const created = await queryEngine.query(JSON.stringify({
+    modelName: 'User',
+    action: 'createOne',
+    query: {
+      arguments: {
+        data: {
+          id: 1234,
+        },
+      },
+      selection: {
+        $scalars: true
+      }
+    }
+  }), 'trace')
+
   const res = await queryEngine.query(JSON.stringify({
     modelName: 'User',
     action: 'findMany',
