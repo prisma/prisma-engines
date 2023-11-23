@@ -10,13 +10,19 @@ on:
       packageVersion:
         required: true
         description: 'New @prisma/query-engine-wasm package version'
+        default: '0.6.2-integration-test-workflow.1' # TODO: delete me
       enginesHash:
         required: true
         description: 'prisma-engines commit to build'
+        default: '8ddef72bc25a5133915fd788494b660ef2565e8f' # TODO: delete me
       npmDistTag:
         required: true
-        default: 'latest'
+        # default: 'latest' # TODO: uncomment me
         description: 'npm dist-tag (e.g. latest or integration)'
+        default: 'integration' # TODO: delete me
+  push: # TODO: delete me
+    branches: # TODO: delete me
+      - ci-add-gh-actions-workflow-for-query-engine-wasm-publishing # TODO: delete me
 
 jobs:
   build:
