@@ -25,6 +25,9 @@ Example usage:
 source .test_database_urls/mysql_5_6
 "#;
 
+/// How long to wait for a schema change to propagate in Vitess.
+const VITESS_MAX_REFRESH_DELAY_MS: u64 = 1000;
+
 static DB_UNDER_TEST: Lazy<Result<DbUnderTest, String>> = Lazy::new(|| {
     let database_url = std::env::var("TEST_DATABASE_URL").map_err(|_| MISSING_TEST_DATABASE_URL_MSG.to_owned())?;
     let shadow_database_url = std::env::var("TEST_SHADOW_DATABASE_URL").ok();
@@ -57,7 +60,7 @@ static DB_UNDER_TEST: Lazy<Result<DbUnderTest, String>> = Lazy::new(|| {
                 //
                 // For schema changes that do not alter the table column names, the schema is not
                 // required to be reloaded.
-                max_refresh_delay = Some(Duration::from_millis(500));
+                max_refresh_delay = Some(Duration::from_millis(VITESS_MAX_REFRESH_DELAY_MS));
             }
 
             Ok(DbUnderTest {
