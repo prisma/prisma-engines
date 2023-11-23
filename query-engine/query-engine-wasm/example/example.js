@@ -53,6 +53,8 @@ async function main() {
     }
   }), 'trace')
 
+  console.log({ created })
+
   const res = await queryEngine.query(JSON.stringify({
     modelName: 'User',
     action: 'findMany',

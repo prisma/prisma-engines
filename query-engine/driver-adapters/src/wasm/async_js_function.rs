@@ -3,7 +3,7 @@ use serde::Serialize;
 use std::marker::PhantomData;
 use wasm_bindgen::convert::FromWasmAbi;
 use wasm_bindgen::describe::WasmDescribe;
-use wasm_bindgen::{JsError, JsValue};
+use wasm_bindgen::{JsCast, JsError, JsValue};
 use wasm_bindgen_futures::JsFuture;
 
 use super::error::into_quaint_error;
@@ -52,9 +52,14 @@ where
 
     async fn call_internal(&self, arg1: T) -> Result<JsResult<R>, JsValue> {
         let arg1 = serde_wasm_bindgen::to_value(&arg1).map_err(|err| JsValue::from(JsError::from(&err)))?;
-        let promise = self.threadsafe_fn.call1(&JsValue::null(), &arg1)?;
-        let future = JsFuture::from(JsPromise::from(promise));
-        let value = future.await?;
+        let return_value = self.threadsafe_fn.call1(&JsValue::null(), &arg1)?;
+
+        let value = if let Some(promise) = return_value.dyn_ref::<JsPromise>() {
+            JsFuture::from(promise.to_owned()).await?
+        } else {
+            return_value
+        };
+
         let js_result = JsResult::<R>::from_js_value(value)?;
 
         Ok(js_result)
