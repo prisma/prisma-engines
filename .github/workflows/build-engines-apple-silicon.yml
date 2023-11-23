@@ -1,4 +1,4 @@
-name: Build Apple Silicon
+name: Build Engines for Apple Silicon
 on:
   workflow_dispatch:
     inputs:
