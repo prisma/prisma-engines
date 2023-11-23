@@ -1,4 +1,4 @@
-name: Build Windows
+name: Build Engines for Windows
 on:
   workflow_dispatch:
     inputs:
