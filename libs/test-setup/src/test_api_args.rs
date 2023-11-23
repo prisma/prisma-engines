@@ -207,7 +207,7 @@ impl TestApiArgs {
     }
 
     pub fn max_ddl_refresh_delay(&self) -> Option<Duration> {
-        self.db.max_ddl_refresh_delay.clone()
+        self.db.max_ddl_refresh_delay
     }
 }
 
