@@ -610,7 +610,7 @@ impl TransactionProxy {
     ///   will not attempt rolling the transaction back even if the `commit` future was dropped while
     ///   waiting on the JavaScript call to complete and deliver response.
     pub async fn commit(&self) -> quaint::Result<()> {
-        self.closed.store(true, Ordering::Release);
+        self.closed.store(true, Ordering::Relaxed);
         self.commit.call(()).await
     }
 
@@ -630,14 +630,14 @@ impl TransactionProxy {
     ///   will not attempt rolling back again even if the `rollback` future was dropped while waiting
     ///   on the JavaScript call to complete and deliver response.
     pub async fn rollback(&self) -> quaint::Result<()> {
-        self.closed.store(true, Ordering::Release);
+        self.closed.store(true, Ordering::Relaxed);
         self.rollback.call(()).await
     }
 }
 
 impl Drop for TransactionProxy {
     fn drop(&mut self) {
-        if self.closed.swap(true, Ordering::Acquire) {
+        if self.closed.swap(true, Ordering::Relaxed) {
             return;
         }
 
