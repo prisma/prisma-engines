@@ -14,7 +14,7 @@ pub(crate) trait ScalarFieldExt {
 
 impl ScalarFieldExt for ScalarField {
     fn value<'a>(&self, pv: PrismaValue, ctx: &Context<'_>) -> Value<'a> {
-        match (pv, self.type_identifier()) {
+        let value = match (pv, self.type_identifier()) {
             (PrismaValue::String(s), _) => s.into(),
             (PrismaValue::Float(f), _) => f.into(),
             (PrismaValue::Boolean(b), _) => b.into(),
@@ -76,7 +76,9 @@ impl ScalarFieldExt for ScalarField {
                 TypeIdentifier::Bytes => Value::null_bytes(),
                 TypeIdentifier::Unsupported => unreachable!("No unsupported field should reach that path"),
             },
-        }
+        };
+
+        value.with_native_column_type(self.native_type().map(|nt| nt.name()))
     }
 
     fn type_family(&self) -> TypeFamily {

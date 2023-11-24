@@ -152,8 +152,9 @@ fn run_relation_link_test_impl(
         let required_capabilities_for_test = required_capabilities | caps;
         let test_db_name = format!("{suite_name}_{test_name}_{i}");
         let template = dm.datamodel().to_owned();
+        let (connector, version) = CONFIG.test_connector().unwrap();
 
-        if !should_run(only, exclude, required_capabilities_for_test) {
+        if !should_run(&connector, &version, only, exclude, required_capabilities_for_test) {
             continue;
         }
 
@@ -250,7 +251,9 @@ fn run_connector_test_impl(
     referential_override: Option<String>,
     test_fn: &dyn Fn(Runner) -> BoxFuture<'static, TestResult<()>>,
 ) {
-    if !should_run(only, exclude, capabilities) {
+    let (connector, version) = CONFIG.test_connector().unwrap();
+
+    if !should_run(&connector, &version, only, exclude, capabilities) {
         return;
     }
 

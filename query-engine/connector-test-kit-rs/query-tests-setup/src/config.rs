@@ -2,43 +2,64 @@ use crate::{
     CockroachDbConnectorTag, ConnectorTag, ConnectorVersion, MongoDbConnectorTag, MySqlConnectorTag,
     PostgresConnectorTag, SqlServerConnectorTag, SqliteConnectorTag, TestResult, VitessConnectorTag,
 };
-use serde::Deserialize;
-use std::{convert::TryFrom, env, fs::File, io::Read, path::PathBuf};
+use serde::{Deserialize, Serialize};
+use std::{convert::TryFrom, env, fmt::Display, fs::File, io::Read, path::PathBuf};
 
 static TEST_CONFIG_FILE_NAME: &str = ".test_config";
+
+#[derive(Debug, Deserialize, Clone)]
+pub enum TestExecutor {
+    Napi,
+    Wasm,
+}
+
+impl Display for TestExecutor {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            TestExecutor::Napi => f.write_str("Napi"),
+            TestExecutor::Wasm => f.write_str("Wasm"),
+        }
+    }
+}
 
 /// The central test configuration.
 #[derive(Debug, Default, Deserialize)]
 pub struct TestConfig {
     /// The connector that tests should run for.
     /// Env key: `TEST_CONNECTOR`
-    connector: String,
+    pub(crate) connector: String,
 
     /// The connector version tests should run for.
     /// If the test connector is versioned, this option is required.
     /// Env key: `TEST_CONNECTOR_VERSION`
     #[serde(rename = "version")]
-    connector_version: Option<String>,
+    pub(crate) connector_version: Option<String>,
 
     /// An external process to execute the test queries and produced responses for assertion
     /// Used when testing driver adapters, this process is expected to be a javascript process
     /// loading the library engine (as a library, or WASM modules) and providing it with a
     /// driver adapter.
+    /// Possible values: Napi, Wasm
     /// Env key: `EXTERNAL_TEST_EXECUTOR`
-    external_test_executor: Option<String>,
+    pub(crate) external_test_executor: Option<TestExecutor>,
 
     /// The driver adapter to use when running tests, will be forwarded to the external test
     /// executor by setting the `DRIVER_ADAPTER` env var when spawning the executor process
-    driver_adapter: Option<String>,
+    pub(crate) driver_adapter: Option<String>,
 
     /// The driver adapter configuration to forward as a stringified JSON object to the external
     /// test executor by setting the `DRIVER_ADAPTER_CONFIG` env var when spawning the executor
-    driver_adapter_config: Option<serde_json::Value>,
+    pub(crate) driver_adapter_config: Option<DriverAdapterConfig>,
 
     /// Indicates whether or not the tests are running in CI context.
     /// Env key: `BUILDKITE`
     #[serde(default)]
-    is_ci: bool,
+    pub(crate) is_ci: bool,
+}
+
+#[derive(Debug, Default, Serialize, Deserialize)]
+pub(crate) struct DriverAdapterConfig {
+    pub(crate) proxy_url: Option<String>,
 }
 
 const CONFIG_LOAD_FAILED: &str = r####"
@@ -85,12 +106,11 @@ fn exit_with_message(msg: &str) -> ! {
 impl TestConfig {
     /// Loads a configuration. File-based config has precedence over env config.
     pub(crate) fn load() -> Self {
-        let mut config = match Self::from_file().or_else(Self::from_env) {
+        let config = match Self::from_file().or_else(Self::from_env) {
             Some(config) => config,
             None => exit_with_message(CONFIG_LOAD_FAILED),
         };
 
-        config.fill_defaults();
         config.validate();
         config.log_info();
 
@@ -107,10 +127,10 @@ impl TestConfig {
             self.connector_version().unwrap_or_default()
         );
         println!("* CI? {}", self.is_ci);
-        if self.external_test_executor.as_ref().is_some() {
-            println!("* External test executor: {}", self.external_test_executor().unwrap_or_default());
+        if let Some(external_test_executor) = self.external_test_executor.as_ref() {
+            println!("* External test executor: {}", external_test_executor);
             println!("* Driver adapter: {}", self.driver_adapter().unwrap_or_default());
-            println!("* Driver adapter url override: {}", self.json_stringify_driver_adapter_config());
+            println!("* Driver adapter config: {}", self.json_stringify_driver_adapter_config());
         }
         println!("******************************");
     }
@@ -118,10 +138,13 @@ impl TestConfig {
     fn from_env() -> Option<Self> {
         let connector = std::env::var("TEST_CONNECTOR").ok();
         let connector_version = std::env::var("TEST_CONNECTOR_VERSION").ok();
-        let external_test_executor = std::env::var("EXTERNAL_TEST_EXECUTOR").ok();
+        let external_test_executor = std::env::var("EXTERNAL_TEST_EXECUTOR")
+            .map(|value| serde_json::from_str::<TestExecutor>(&value).ok())
+            .unwrap_or_default();
+
         let driver_adapter = std::env::var("DRIVER_ADAPTER").ok();
         let driver_adapter_config = std::env::var("DRIVER_ADAPTER_CONFIG")
-            .map(|config| serde_json::from_str::<serde_json::Value>(config.as_str()).ok())
+            .map(|config| serde_json::from_str::<DriverAdapterConfig>(config.as_str()).ok())
             .unwrap_or_default();
 
         // Just care for a set value for now.
@@ -155,31 +178,24 @@ impl TestConfig {
         })
     }
 
-    /// if the loaded value for external_test_executor is "default" (case insensitive),
-    /// and the workspace_root is set, then use the default external test executor.
-    fn fill_defaults(&mut self) {
-        const DEFAULT_TEST_EXECUTOR: &str =
-            "query-engine/driver-adapters/js/connector-test-kit-executor/script/start_node.sh";
+    fn workspace_root() -> Option<PathBuf> {
+        env::var("WORKSPACE_ROOT").ok().map(PathBuf::from)
+    }
 
-        if self
-            .external_test_executor
+    pub fn external_test_executor_path(&self) -> Option<String> {
+        const DEFAULT_TEST_EXECUTOR: &str =
+            "query-engine/driver-adapters/connector-test-kit-executor/script/start_node.sh";
+        self.external_test_executor
             .as_ref()
-            .filter(|s| s.eq_ignore_ascii_case("default"))
-            .is_some()
-        {
-            self.external_test_executor = Self::workspace_root()
-                .map(|path| path.join(DEFAULT_TEST_EXECUTOR))
-                .or_else(|| {
+            .and_then(|_| {
+                Self::workspace_root().or_else(|| {
                     exit_with_message(
                         "WORKSPACE_ROOT needs to be correctly set to the root of the prisma-engines repository",
                     )
                 })
-                .and_then(|path| path.to_str().map(|s| s.to_owned()));
-        }
-    }
-
-    fn workspace_root() -> Option<PathBuf> {
-        env::var("WORKSPACE_ROOT").ok().map(PathBuf::from)
+            })
+            .map(|path| path.join(DEFAULT_TEST_EXECUTOR))
+            .and_then(|path| path.to_str().map(|s| s.to_owned()))
     }
 
     fn validate(&self) {
@@ -193,7 +209,8 @@ impl TestConfig {
             | Ok(ConnectorVersion::SqlServer(None))
             | Ok(ConnectorVersion::MongoDb(None))
             | Ok(ConnectorVersion::CockroachDb(None))
-            | Ok(ConnectorVersion::Postgres(None)) => {
+            | Ok(ConnectorVersion::Postgres(None))
+            | Ok(ConnectorVersion::Sqlite(None)) => {
                 exit_with_message("The current test connector requires a version to be set to run.");
             }
             Ok(ConnectorVersion::Vitess(Some(_)))
@@ -202,11 +219,11 @@ impl TestConfig {
             | Ok(ConnectorVersion::MongoDb(Some(_)))
             | Ok(ConnectorVersion::CockroachDb(Some(_)))
             | Ok(ConnectorVersion::Postgres(Some(_)))
-            | Ok(ConnectorVersion::Sqlite) => (),
+            | Ok(ConnectorVersion::Sqlite(Some(_))) => (),
             Err(err) => exit_with_message(&err.to_string()),
         }
 
-        if let Some(file) = self.external_test_executor.as_ref() {
+        if let Some(file) = self.external_test_executor_path().as_ref() {
             let path = PathBuf::from(file);
             let md = path.metadata();
             if !path.exists() || md.is_err() || !md.unwrap().is_file() {
@@ -259,19 +276,16 @@ impl TestConfig {
         self.is_ci
     }
 
-    pub fn external_test_executor(&self) -> Option<&str> {
-        self.external_test_executor.as_deref()
+    pub fn external_test_executor(&self) -> Option<TestExecutor> {
+        self.external_test_executor.clone()
     }
 
     pub fn driver_adapter(&self) -> Option<&str> {
         self.driver_adapter.as_deref()
     }
 
-    pub fn json_stringify_driver_adapter_config(&self) -> String {
-        self.driver_adapter_config
-            .as_ref()
-            .map(|value| value.to_string())
-            .unwrap_or("{}".to_string())
+    fn json_stringify_driver_adapter_config(&self) -> String {
+        serde_json::to_string(&self.driver_adapter_config).unwrap_or_default()
     }
 
     pub fn test_connector(&self) -> TestResult<(ConnectorTag, ConnectorVersion)> {
@@ -281,7 +295,7 @@ impl TestConfig {
             ConnectorVersion::Postgres(_) => &PostgresConnectorTag,
             ConnectorVersion::MySql(_) => &MySqlConnectorTag,
             ConnectorVersion::MongoDb(_) => &MongoDbConnectorTag,
-            ConnectorVersion::Sqlite => &SqliteConnectorTag,
+            ConnectorVersion::Sqlite(_) => &SqliteConnectorTag,
             ConnectorVersion::CockroachDb(_) => &CockroachDbConnectorTag,
             ConnectorVersion::Vitess(_) => &VitessConnectorTag,
         };
@@ -294,10 +308,15 @@ impl TestConfig {
         vec!(
             (
                 "DRIVER_ADAPTER".to_string(), 
-                self.driver_adapter.clone().unwrap_or_default()),
+                self.driver_adapter.clone().unwrap_or_default()
+            ),
             (
                 "DRIVER_ADAPTER_CONFIG".to_string(),
                 self.json_stringify_driver_adapter_config()
+            ),
+            (
+                "EXTERNAL_TEST_EXECUTOR".to_string(),
+                self.external_test_executor.clone().unwrap_or(TestExecutor::Napi).to_string(),
             ),
             (
                 "PRISMA_DISABLE_QUAINT_EXECUTORS".to_string(),

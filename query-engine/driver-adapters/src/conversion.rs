@@ -1,14 +1,15 @@
+pub(crate) mod mysql;
+pub(crate) mod postgres;
+pub(crate) mod sqlite;
+
 use napi::bindgen_prelude::{FromNapiValue, ToNapiValue};
 use napi::NapiValue;
-use quaint::ast::Value as QuaintValue;
-use quaint::ast::ValueType as QuaintValueType;
 use serde::Serialize;
 use serde_json::value::Value as JsonValue;
 
-#[derive(Debug, Serialize)]
+#[derive(Debug, PartialEq, Serialize)]
 #[serde(untagged)]
 pub enum JSArg {
-    RawString(String),
     Value(serde_json::Value),
     Buffer(Vec<u8>),
     Array(Vec<JSArg>),
@@ -33,7 +34,6 @@ impl FromNapiValue for JSArg {
 impl ToNapiValue for JSArg {
     unsafe fn to_napi_value(env: napi::sys::napi_env, value: Self) -> napi::Result<napi::sys::napi_value> {
         match value {
-            JSArg::RawString(s) => ToNapiValue::to_napi_value(env, s),
             JSArg::Value(v) => ToNapiValue::to_napi_value(env, v),
             JSArg::Buffer(bytes) => {
                 ToNapiValue::to_napi_value(env, napi::Env::from_raw(env).create_buffer_with_data(bytes)?.into_raw())
@@ -49,7 +49,7 @@ impl ToNapiValue for JSArg {
                 for (index, item) in items.into_iter().enumerate() {
                     let js_value = ToNapiValue::to_napi_value(env.raw(), item)?;
                     // TODO: NapiRaw could be implemented for sys::napi_value directly, there should
-                    // be no need for re-wrapping; submit a patch to napi-rs and simplify here.
+                    //  be no need for re-wrapping; submit a patch to napi-rs and simplify here.
                     array.set(index as u32, napi::JsUnknown::from_raw_unchecked(env.raw(), js_value))?;
                 }
 
@@ -57,37 +57,4 @@ impl ToNapiValue for JSArg {
             }
         }
     }
-}
-
-pub fn conv_params(params: &[QuaintValue<'_>]) -> serde_json::Result<Vec<JSArg>> {
-    let mut values = Vec::with_capacity(params.len());
-
-    for qv in params {
-        let res = match &qv.typed {
-            QuaintValueType::Json(s) => match s {
-                Some(ref s) => {
-                    let json_str = serde_json::to_string(s)?;
-                    JSArg::RawString(json_str)
-                }
-                None => JsonValue::Null.into(),
-            },
-            QuaintValueType::Bytes(bytes) => match bytes {
-                Some(bytes) => JSArg::Buffer(bytes.to_vec()),
-                None => JsonValue::Null.into(),
-            },
-            quaint_value @ QuaintValueType::Numeric(bd) => match bd {
-                Some(bd) => match bd.to_string().parse::<f64>() {
-                    Ok(double) => JSArg::from(JsonValue::from(double)),
-                    Err(_) => JSArg::from(JsonValue::from(quaint_value.clone())),
-                },
-                None => JsonValue::Null.into(),
-            },
-            QuaintValueType::Array(Some(items)) => JSArg::Array(conv_params(items)?),
-            quaint_value => JSArg::from(JsonValue::from(quaint_value.clone())),
-        };
-
-        values.push(res);
-    }
-
-    Ok(values)
 }

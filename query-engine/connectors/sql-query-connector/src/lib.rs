@@ -22,9 +22,12 @@ mod value_ext;
 use self::{column_metadata::*, context::Context, query_ext::QueryExt, row::*};
 use quaint::prelude::Queryable;
 
+pub use database::FromSource;
 #[cfg(feature = "driver-adapters")]
 pub use database::{activate_driver_adapter, Js};
-pub use database::{FromSource, Mssql, Mysql, PostgreSql, Sqlite};
 pub use error::SqlError;
+
+#[cfg(not(target_arch = "wasm32"))]
+pub use database::{Mssql, Mysql, PostgreSql, Sqlite};
 
 type Result<T> = std::result::Result<T, error::SqlError>;

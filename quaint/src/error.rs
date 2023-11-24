@@ -6,7 +6,9 @@ use thiserror::Error;
 #[cfg(feature = "pooled")]
 use std::time::Duration;
 
-pub use crate::connector::postgres::error::PostgresError;
+pub use crate::connector::mysql::MysqlError;
+pub use crate::connector::postgres::PostgresError;
+pub use crate::connector::sqlite::SqliteError;
 
 #[derive(Debug, PartialEq, Eq)]
 pub enum DatabaseConstraint {
@@ -280,7 +282,7 @@ pub enum ErrorKind {
 }
 
 impl ErrorKind {
-    #[cfg(feature = "mysql")]
+    #[cfg(feature = "mysql-native")]
     pub(crate) fn value_out_of_range(msg: impl Into<String>) -> Self {
         Self::ValueOutOfRange { message: msg.into() }
     }

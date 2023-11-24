@@ -33,8 +33,8 @@ impl ConnectorTagInterface for VitessConnectorTag {
 
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub enum VitessVersion {
-    V5_7,
     V8_0,
+    PlanetscaleJs,
 }
 
 impl FromStr for VitessVersion {
@@ -42,8 +42,8 @@ impl FromStr for VitessVersion {
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         let version = match s {
-            "5.7" => Self::V5_7,
             "8.0" => Self::V8_0,
+            "planetscale.js" => Self::PlanetscaleJs,
             _ => return Err(TestError::parse_error(format!("Unknown Vitess version `{s}`"))),
         };
 
@@ -54,8 +54,8 @@ impl FromStr for VitessVersion {
 impl Display for VitessVersion {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            Self::V5_7 => write!(f, "5.7"),
             Self::V8_0 => write!(f, "8.0"),
+            Self::PlanetscaleJs => write!(f, "planetscale.js"),
         }
     }
 }

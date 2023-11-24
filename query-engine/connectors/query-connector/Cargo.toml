@@ -14,6 +14,6 @@ prisma-value = {path = "../../../libs/prisma-value"}
 serde.workspace = true
 serde_json.workspace = true
 thiserror = "1.0"
-user-facing-errors = {path = "../../../libs/user-facing-errors"}
+user-facing-errors = {path = "../../../libs/user-facing-errors", features = ["sql"]}
 uuid = "1"
 indexmap = "1.7"

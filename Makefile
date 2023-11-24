@@ -2,6 +2,7 @@ CONFIG_PATH = ./query-engine/connector-test-kit-rs/test-configs
 CONFIG_FILE = .test_config
 SCHEMA_EXAMPLES_PATH = ./query-engine/example_schemas
 DEV_SCHEMA_FILE = dev_datamodel.prisma
+DRIVER_ADAPTERS_BRANCH ?= main
 
 LIBRARY_EXT := $(shell                            \
     case "$$(uname -s)" in                        \
@@ -44,7 +45,16 @@ release:
 #################
 
 test-qe:
+ifndef DRIVER_ADAPTER
 	cargo test --package query-engine-tests
+else
+	@echo "Executing query engine tests with $(DRIVER_ADAPTER) driver adapter"; \
+	if [ "$(ENGINE)" = "wasm" ]; then \
+		$(MAKE) test-driver-adapter-$(DRIVER_ADAPTER)-wasm; \
+	else \
+		$(MAKE) test-driver-adapter-$(DRIVER_ADAPTER); \
+	fi
+endif
 
 test-qe-verbose:
 	cargo test --package query-engine-tests -- --nocapture
@@ -67,7 +77,7 @@ test-qe-black-box: build-qe
 ###########################
 
 all-dbs-up:
-	docker compose -f docker-compose.yml up -d --remove-orphans
+	docker compose -f docker-compose.yml up --wait -d --remove-orphans
 
 all-dbs-down:
 	docker compose -f docker-compose.yml down -v --remove-orphans
@@ -77,159 +87,189 @@ start-sqlite:
 dev-sqlite:
 	cp $(CONFIG_PATH)/sqlite $(CONFIG_FILE)
 
-dev-libsql-sqlite: build-qe-napi build-connector-kit-js
-	cp $(CONFIG_PATH)/libsql-sqlite $(CONFIG_FILE)
+dev-libsql-js: build-qe-napi build-connector-kit-js
+	cp $(CONFIG_PATH)/libsql-js $(CONFIG_FILE)
+
+test-libsql-js: dev-libsql-js test-qe-st
+
+test-driver-adapter-libsql: test-libsql-js
+
+dev-libsql-wasm: build-qe-wasm build-connector-kit-js
+	cp $(CONFIG_PATH)/libsql-wasm $(CONFIG_FILE)
+
+test-libsql-wasm: dev-libsql-wasm test-qe-st
+test-driver-adapter-libsql-wasm: test-libsql-wasm
 
 start-postgres9:
-	docker compose -f docker-compose.yml up -d --remove-orphans postgres9
+	docker compose -f docker-compose.yml up --wait -d --remove-orphans postgres9
 
 dev-postgres9: start-postgres9
 	cp $(CONFIG_PATH)/postgres9 $(CONFIG_FILE)
 
 start-postgres10:
-	docker compose -f docker-compose.yml up -d --remove-orphans postgres10
+	docker compose -f docker-compose.yml up --wait -d --remove-orphans postgres10
 
 dev-postgres10: start-postgres10
 	cp $(CONFIG_PATH)/postgres10 $(CONFIG_FILE)
 
 start-postgres11:
-	docker compose -f docker-compose.yml up -d --remove-orphans postgres11
+	docker compose -f docker-compose.yml up --wait -d --remove-orphans postgres11
 
 dev-postgres11: start-postgres11
 	cp $(CONFIG_PATH)/postgres11 $(CONFIG_FILE)
 
 start-postgres12:
-	docker compose -f docker-compose.yml up -d --remove-orphans postgres12
+	docker compose -f docker-compose.yml up --wait -d --remove-orphans postgres12
 
 dev-postgres12: start-postgres12
 	cp $(CONFIG_PATH)/postgres12 $(CONFIG_FILE)
 
 start-postgres13:
-	docker compose -f docker-compose.yml up -d --remove-orphans postgres13
+	docker compose -f docker-compose.yml up --wait -d --remove-orphans postgres13
 
 dev-postgres13: start-postgres13
 	cp $(CONFIG_PATH)/postgres13 $(CONFIG_FILE)
 
-start-pg-postgres13: build-qe-napi build-connector-kit-js start-postgres13
+start-pg-js: start-postgres13
 
-dev-pg-postgres13: start-pg-postgres13
-	cp $(CONFIG_PATH)/pg-postgres13 $(CONFIG_FILE)
+dev-pg-js: start-pg-js build-qe-napi build-connector-kit-js
+	cp $(CONFIG_PATH)/pg-js $(CONFIG_FILE)
 
-start-neon-postgres13: build-qe-napi build-connector-kit-js
-	docker compose -f docker-compose.yml up -d --remove-orphans neon-postgres13
+test-pg-js: dev-pg-js test-qe-st
 
-dev-neon-ws-postgres13: start-neon-postgres13
-	cp $(CONFIG_PATH)/neon-ws-postgres13 $(CONFIG_FILE)
+dev-pg-wasm: start-pg-js build-qe-wasm build-connector-kit-js
+	cp $(CONFIG_PATH)/pg-wasm $(CONFIG_FILE)
+
+test-pg-wasm: dev-pg-wasm test-qe-st
+
+test-driver-adapter-pg: test-pg-js
+test-driver-adapter-pg-wasm: test-pg-wasm
+
+start-neon-js:
+	docker compose -f docker-compose.yml up --wait -d --remove-orphans neon-proxy
+
+dev-neon-js: start-neon-js build-qe-napi build-connector-kit-js
+	cp $(CONFIG_PATH)/neon-js $(CONFIG_FILE)
+
+test-neon-js: dev-neon-js test-qe-st
+
+dev-neon-wasm: start-neon-js build-qe-wasm build-connector-kit-js
+	cp $(CONFIG_PATH)/neon-wasm $(CONFIG_FILE)
+
+test-neon-wasm: dev-neon-wasm test-qe-st
+
+test-driver-adapter-neon: test-neon-js
+test-driver-adapter-neon-wasm: test-neon-wasm
 
 start-postgres14:
-	docker compose -f docker-compose.yml up -d --remove-orphans postgres14
+	docker compose -f docker-compose.yml up --wait -d --remove-orphans postgres14
 
 dev-postgres14: start-postgres14
 	cp $(CONFIG_PATH)/postgres14 $(CONFIG_FILE)
 
 start-postgres15:
-	docker compose -f docker-compose.yml up -d --remove-orphans postgres15
+	docker compose -f docker-compose.yml up --wait -d --remove-orphans postgres15
 
 dev-postgres15: start-postgres15
 	cp $(CONFIG_PATH)/postgres15 $(CONFIG_FILE)
 
 start-cockroach_23_1:
-	docker compose -f docker-compose.yml up -d --remove-orphans cockroach_23_1
+	docker compose -f docker-compose.yml up --wait -d --remove-orphans cockroach_23_1
 
 dev-cockroach_23_1: start-cockroach_23_1
 	cp $(CONFIG_PATH)/cockroach_23_1 $(CONFIG_FILE)
 
 start-cockroach_22_2:
-	docker compose -f docker-compose.yml up -d --remove-orphans cockroach_22_2
+	docker compose -f docker-compose.yml up --wait -d --remove-orphans cockroach_22_2
 
 dev-cockroach_22_2: start-cockroach_22_2
 	cp $(CONFIG_PATH)/cockroach_22_2 $(CONFIG_FILE)
 
 start-cockroach_22_1_0:
-	docker compose -f docker-compose.yml up -d --remove-orphans cockroach_22_1_0
+	docker compose -f docker-compose.yml up --wait -d --remove-orphans cockroach_22_1_0
 
 dev-cockroach_22_1_0: start-cockroach_22_1_0
 	cp $(CONFIG_PATH)/cockroach_22_1 $(CONFIG_FILE)
 
 start-cockroach_21_2_0_patched:
-	docker compose -f docker-compose.yml up -d --remove-orphans cockroach_21_2_0_patched
+	docker compose -f docker-compose.yml up --wait -d --remove-orphans cockroach_21_2_0_patched
 
 dev-cockroach_21_2_0_patched: start-cockroach_21_2_0_patched
 	cp $(CONFIG_PATH)/cockroach_21_2_0_patched $(CONFIG_FILE)
 
 dev-pgbouncer:
-	docker compose -f docker-compose.yml up -d --remove-orphans pgbouncer postgres11
+	docker compose -f docker-compose.yml up --wait -d --remove-orphans pgbouncer postgres11
 
 start-mysql_5_7:
-	docker compose -f docker-compose.yml up -d --remove-orphans mysql-5-7
+	docker compose -f docker-compose.yml up --wait -d --remove-orphans mysql-5-7
 
 dev-mysql: start-mysql_5_7
 	cp $(CONFIG_PATH)/mysql57 $(CONFIG_FILE)
 
 start-mysql_5_6:
-	docker compose -f docker-compose.yml up -d --remove-orphans mysql-5-6
+	docker compose -f docker-compose.yml up --wait -d --remove-orphans mysql-5-6
 
 dev-mysql_5_6: start-mysql_5_6
 	cp $(CONFIG_PATH)/mysql56 $(CONFIG_FILE)
 
 start-mysql_8:
-	docker compose -f docker-compose.yml up -d --remove-orphans mysql-8-0
+	docker compose -f docker-compose.yml up --wait -d --remove-orphans mysql-8-0
 
 dev-mysql8: start-mysql_8
 	cp $(CONFIG_PATH)/mysql8 $(CONFIG_FILE)
 
 start-mysql_mariadb:
-	docker compose -f docker-compose.yml up -d --remove-orphans mariadb-10-0
+	docker compose -f docker-compose.yml up --wait -d --remove-orphans mariadb-10-0
 
 dev-mariadb: start-mysql_mariadb
 	cp $(CONFIG_PATH)/mariadb $(CONFIG_FILE)
 
 start-mssql_2019:
-	docker compose -f docker-compose.yml up -d --remove-orphans mssql-2019
+	docker compose -f docker-compose.yml up --wait -d --remove-orphans mssql-2019
 
 dev-mssql2019: start-mssql_2019
 	cp $(CONFIG_PATH)/sqlserver2019 $(CONFIG_FILE)
 
 start-mssql_2022:
-	docker compose -f docker-compose.yml up -d --remove-orphans mssql-2022
+	docker compose -f docker-compose.yml up --wait -d --remove-orphans mssql-2022
 
 dev-mssql2022: start-mssql_2022
 	cp $(CONFIG_PATH)/sqlserver2022 $(CONFIG_FILE)
 
 start-mssql_edge:
-	docker compose -f docker-compose.yml up -d --remove-orphans azure-edge
+	docker compose -f docker-compose.yml up --wait -d --remove-orphans azure-edge
 
 dev-mssql_edge: start-mssql_edge
 	cp $(CONFIG_PATH)/sqlserver2019 $(CONFIG_FILE)
 
 start-mssql_2017:
-	docker compose -f docker-compose.yml up -d --remove-orphans mssql-2017
+	docker compose -f docker-compose.yml up --wait -d --remove-orphans mssql-2017
 
 dev-mssql2017: start-mssql_2017
 	cp $(CONFIG_PATH)/sqlserver2017 $(CONFIG_FILE)
 
 start-mongodb42-single:
-	docker compose -f docker-compose.yml up -d --remove-orphans mongo42-single
+	docker compose -f docker-compose.yml up --wait -d --remove-orphans mongo42-single
 
 start-mongodb44-single:
-	docker compose -f docker-compose.yml up -d --remove-orphans mongo44-single
+	docker compose -f docker-compose.yml up --wait -d --remove-orphans mongo44-single
 
 start-mongodb4-single: start-mongodb44-single
 
 start-mongodb5-single:
-	docker compose -f docker-compose.yml up -d --remove-orphans mongo5-single
+	docker compose -f docker-compose.yml up --wait -d --remove-orphans mongo5-single
 
 start-mongodb_4_2:
-	docker compose -f docker-compose.yml up -d --remove-orphans mongo42
+	docker compose -f docker-compose.yml up --wait -d --remove-orphans mongo42
 
 start-mongodb_4_4:
-	docker compose -f docker-compose.yml up -d --remove-orphans mongo44
+	docker compose -f docker-compose.yml up --wait -d --remove-orphans mongo44
 
 dev-mongodb_4_4: start-mongodb_4_4
 	cp $(CONFIG_PATH)/mongodb44 $(CONFIG_FILE)
 
 start-mongodb_5:
-	docker compose -f docker-compose.yml up -d --remove-orphans mongo5
+	docker compose -f docker-compose.yml up --wait -d --remove-orphans mongo5
 
 dev-mongodb_5: start-mongodb_5
 	cp $(CONFIG_PATH)/mongodb5 $(CONFIG_FILE)
@@ -237,17 +277,27 @@ dev-mongodb_5: start-mongodb_5
 dev-mongodb_4_2: start-mongodb_4_2
 	cp $(CONFIG_PATH)/mongodb42 $(CONFIG_FILE)
 
-start-vitess_5_7:
-	docker compose -f docker-compose.yml up -d --remove-orphans vitess-test-5_7 vitess-shadow-5_7
-
-dev-vitess_5_7: start-vitess_5_7
-	cp $(CONFIG_PATH)/vitess_5_7 $(CONFIG_FILE)
-
 start-vitess_8_0:
-	docker compose -f docker-compose.yml up -d --remove-orphans vitess-test-8_0 vitess-shadow-8_0
+	docker compose -f docker-compose.yml up --wait -d --remove-orphans vitess-test-8_0 vitess-shadow-8_0
 
 dev-vitess_8_0: start-vitess_8_0
 	cp $(CONFIG_PATH)/vitess_8_0 $(CONFIG_FILE)
+
+start-planetscale-js:
+	docker compose -f docker-compose.yml up -d --remove-orphans planetscale-proxy
+
+dev-planetscale-js: start-planetscale-js build-qe-napi build-connector-kit-js
+	cp $(CONFIG_PATH)/planetscale-js $(CONFIG_FILE)
+
+test-planetscale-js: dev-planetscale-js test-qe-st
+
+dev-planetscale-wasm: start-planetscale-js build-qe-wasm build-connector-kit-js
+	cp $(CONFIG_PATH)/planetscale-wasm $(CONFIG_FILE)
+
+test-planetscale-wasm: dev-planetscale-wasm test-qe-st
+
+test-driver-adapter-planetscale: test-planetscale-js
+test-driver-adapter-planetscale-wasm: test-planetscale-wasm
 
 ######################
 # Local dev commands #
@@ -256,8 +306,28 @@ dev-vitess_8_0: start-vitess_8_0
 build-qe-napi:
 	cargo build --package query-engine-node-api
 
-build-connector-kit-js:
-	cd query-engine/driver-adapters/js && pnpm i && pnpm build
+build-qe-wasm:
+	cd query-engine/query-engine-wasm && ./build.sh
+
+build-connector-kit-js: build-driver-adapters
+	cd query-engine/driver-adapters && pnpm i && pnpm build
+
+build-driver-adapters: ensure-prisma-present
+	@echo "Building driver adapters..."
+	@cd ../prisma && pnpm --filter "*adapter*" i
+	@echo "Driver adapters build completed.";
+
+ensure-prisma-present:
+	@if [ -d ../prisma ]; then \
+		cd "$(realpath ../prisma)" && git fetch origin main; \
+		LOCAL_CHANGES=$$(git diff --name-only HEAD origin/main -- 'packages/*adapter*'); \
+		if [ -n "$$LOCAL_CHANGES" ]; then \
+		  echo "⚠️ ../prisma diverges from prisma/prisma main branch. Test results might diverge from those in CI ⚠️ "; \
+		fi \
+	else \
+		echo "git clone --depth=1 https://github.com/prisma/prisma.git --branch=$(DRIVER_ADAPTERS_BRANCH) ../prisma"; \
+		git clone --depth=1 https://github.com/prisma/prisma.git --branch=$(DRIVER_ADAPTERS_BRANCH) "../prisma" && echo "Prisma repository has been cloned to ../prisma"; \
+	fi;
 
 # Quick schema validation of whatever you have in the dev_datamodel.prisma file.
 validate:
@@ -293,7 +363,7 @@ use-local-query-engine:
 	cp target/release/query-engine $(PRISMA2_BINARY_PATH)/query-engine-darwin
 
 show-metrics:
-	docker compose -f docker-compose.yml up -d --remove-orphans grafana prometheus
+	docker compose -f docker-compose.yml up --wait -d --remove-orphans grafana prometheus
 
 ## OpenTelemetry
 otel:

@@ -1,0 +1,5 @@
+{
+    "connector": "sqlite",
+    "driver_adapter": "libsql",
+    "external_test_executor": "Wasm"
+}
