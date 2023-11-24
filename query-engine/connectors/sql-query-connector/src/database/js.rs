@@ -13,6 +13,8 @@ use quaint::{
 };
 use std::sync::{Arc, Mutex};
 
+// TODO: evaluate turning this into `Lazy<Mutex<Option<Arc<DriverAdapter>>>>` to avoid
+// a clone+drop on the adapter passed via `Js::from_source`.
 static ACTIVE_DRIVER_ADAPTER: Lazy<Mutex<Option<DriverAdapter>>> = Lazy::new(|| Mutex::new(None));
 
 fn active_driver_adapter(provider: &str) -> connector::Result<DriverAdapter> {
