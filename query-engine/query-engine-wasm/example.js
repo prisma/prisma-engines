@@ -6,7 +6,7 @@
 import { Pool } from '@neondatabase/serverless'
 import { PrismaNeon } from '@prisma/adapter-neon'
 import { bindAdapter } from '@prisma/driver-adapter-utils'
-import { init, QueryEngine, getBuildTimeInfo } from './pkg/query_engine.js'
+import { init, QueryEngine, getBuildTimeInfo } from './pkg/query_engine_wasm.js'
 
 async function main() {
   // Always initialize the Wasm library before using it.
