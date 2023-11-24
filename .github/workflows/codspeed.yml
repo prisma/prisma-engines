@@ -1,4 +1,4 @@
-name: Benchmark
+name: Codspeed Benchmark
 on:
   push:
     branches:

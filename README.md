@@ -1,7 +1,7 @@
 # Prisma Engines
 
-[![Query Engine](https://github.com/prisma/prisma-engines/actions/workflows/query-engine.yml/badge.svg)](https://github.com/prisma/prisma-engines/actions/workflows/query-engine.yml)
-[![Schema Engine + sql_schema_describer](https://github.com/prisma/prisma-engines/actions/workflows/schema-engine.yml/badge.svg)](https://github.com/prisma/prisma-engines/actions/workflows/schema-engine.yml)
+[![Query Engine](https://github.com/prisma/prisma-engines/actions/workflows/test-query-engine.yml/badge.svg)](https://github.com/prisma/prisma-engines/actions/workflows/test-query-engine.yml)
+[![Schema Engine + sql_schema_describer](https://github.com/prisma/prisma-engines/actions/workflows/test-schema-engine.yml/badge.svg)](https://github.com/prisma/prisma-engines/actions/workflows/test-schema-engine.yml)
 [![Cargo docs](https://github.com/prisma/prisma-engines/actions/workflows/on-push-to-main.yml/badge.svg)](https://github.com/prisma/prisma-engines/actions/workflows/on-push-to-main.yml)
 
 This repository contains a collection of engines that power the core stack for
