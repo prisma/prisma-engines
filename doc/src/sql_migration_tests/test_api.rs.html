@@ -445,6 +445,14 @@
 <a href="#445" id="445">445</a>
 <a href="#446" id="446">446</a>
 <a href="#447" id="447">447</a>
+<a href="#448" id="448">448</a>
+<a href="#449" id="449">449</a>
+<a href="#450" id="450">450</a>
+<a href="#451" id="451">451</a>
+<a href="#452" id="452">452</a>
+<a href="#453" id="453">453</a>
+<a href="#454" id="454">454</a>
+<a href="#455" id="455">455</a>
 </pre></div><pre class="rust"><code><span class="kw">pub use </span><span class="kw">crate</span>::assertions::{MigrationsAssertions, ResultSetExt, SchemaAssertion};
 <span class="kw">pub use </span>expect_test::expect;
 <span class="kw">pub use </span>schema_core::{
@@ -468,6 +476,7 @@
 };
 <span class="kw">use </span>sql_schema_connector::SqlSchemaConnector;
 <span class="kw">use </span>sql_schema_describer::SqlSchema;
+<span class="kw">use </span>std::time::Duration;
 <span class="kw">use </span>std::{
     borrow::Cow,
     fmt::{Display, Write},
@@ -636,6 +645,12 @@
         <span class="self">self</span>.root.is_vitess()
     }
 
+    <span class="doccomment">/// Returns a duration that is guaranteed to be larger than the maximum refresh rate after a
+    /// DDL statement
+    </span><span class="kw">pub fn </span>max_ddl_refresh_delay(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;Duration&gt; {
+        <span class="self">self</span>.root.max_ddl_refresh_delay()
+    }
+
     <span class="doccomment">/// Insert test values
     </span><span class="kw">pub fn </span>insert&lt;<span class="lifetime">&#39;a</span>&gt;(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span><span class="self">self</span>, table_name: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str) -&gt; SingleRowInsert&lt;<span class="lifetime">&#39;a</span>&gt; {
         SingleRowInsert {
@@ -763,12 +778,13 @@
     <span class="doccomment">/// Plan a `schemaPush` command adding the datasource
     </span><span class="kw">pub fn </span>schema_push_w_datasource(<span class="kw-2">&amp;mut </span><span class="self">self</span>, dm: <span class="kw">impl </span>Into&lt;String&gt;) -&gt; SchemaPush&lt;<span class="lifetime">&#39;_</span>&gt; {
         <span class="kw">let </span>schema = <span class="self">self</span>.datamodel_with_provider(<span class="kw-2">&amp;</span>dm.into());
-        SchemaPush::new(<span class="kw-2">&amp;mut </span><span class="self">self</span>.connector, schema)
+        <span class="self">self</span>.schema_push(schema)
     }
 
     <span class="doccomment">/// Plan a `schemaPush` command
     </span><span class="kw">pub fn </span>schema_push(<span class="kw-2">&amp;mut </span><span class="self">self</span>, dm: <span class="kw">impl </span>Into&lt;String&gt;) -&gt; SchemaPush&lt;<span class="lifetime">&#39;_</span>&gt; {
-        SchemaPush::new(<span class="kw-2">&amp;mut </span><span class="self">self</span>.connector, dm.into())
+        <span class="kw">let </span>max_ddl_refresh_delay = <span class="self">self</span>.max_ddl_refresh_delay();
+        SchemaPush::new(<span class="kw-2">&amp;mut </span><span class="self">self</span>.connector, dm.into(), max_ddl_refresh_delay)
     }
 
     <span class="kw">pub fn </span>tags(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; BitFlags&lt;Tags&gt; {

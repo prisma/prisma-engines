@@ -245,10 +245,32 @@
 <a href="#245" id="245">245</a>
 <a href="#246" id="246">246</a>
 <a href="#247" id="247">247</a>
+<a href="#248" id="248">248</a>
+<a href="#249" id="249">249</a>
+<a href="#250" id="250">250</a>
+<a href="#251" id="251">251</a>
+<a href="#252" id="252">252</a>
+<a href="#253" id="253">253</a>
+<a href="#254" id="254">254</a>
+<a href="#255" id="255">255</a>
+<a href="#256" id="256">256</a>
+<a href="#257" id="257">257</a>
+<a href="#258" id="258">258</a>
+<a href="#259" id="259">259</a>
+<a href="#260" id="260">260</a>
+<a href="#261" id="261">261</a>
+<a href="#262" id="262">262</a>
+<a href="#263" id="263">263</a>
+<a href="#264" id="264">264</a>
+<a href="#265" id="265">265</a>
+<a href="#266" id="266">266</a>
+<a href="#267" id="267">267</a>
+<a href="#268" id="268">268</a>
 </pre></div><pre class="rust"><code><span class="kw">use crate</span>::{logging, mssql, mysql, postgres, Capabilities, Tags};
 <span class="kw">use </span>enumflags2::BitFlags;
 <span class="kw">use </span>once_cell::sync::Lazy;
 <span class="kw">use </span>quaint::single::Quaint;
+<span class="kw">use </span>std::time::Duration;
 <span class="kw">use </span>std::{fmt::Display, io::Write <span class="kw">as _</span>};
 
 <span class="attr">#[derive(Debug)]
@@ -258,6 +280,7 @@
     shadow_database_url: <span class="prelude-ty">Option</span>&lt;String&gt;,
     provider: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str,
     <span class="kw">pub</span>(<span class="kw">crate</span>) tags: BitFlags&lt;Tags&gt;,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) max_ddl_refresh_delay: <span class="prelude-ty">Option</span>&lt;std::time::Duration&gt;,
 }
 
 <span class="kw">const </span>MISSING_TEST_DATABASE_URL_MSG: <span class="kw-2">&amp;</span>str = <span class="string">r#&quot;
@@ -269,6 +292,9 @@ Example usage:
 
 source .test_database_urls/mysql_5_6
 &quot;#</span>;
+
+<span class="doccomment">/// How long to wait for a schema change to propagate in Vitess.
+</span><span class="kw">const </span>VITESS_MAX_REFRESH_DELAY_MS: u64 = <span class="number">1000</span>;
 
 <span class="kw">static </span>DB_UNDER_TEST: Lazy&lt;<span class="prelude-ty">Result</span>&lt;DbUnderTest, String&gt;&gt; = Lazy::new(|| {
     <span class="kw">let </span>database_url = std::env::var(<span class="string">&quot;TEST_DATABASE_URL&quot;</span>).map_err(|<span class="kw">_</span>| MISSING_TEST_DATABASE_URL_MSG.to_owned())<span class="question-mark">?</span>;
@@ -287,13 +313,22 @@ source .test_database_urls/mysql_5_6
             capabilities: Capabilities::CreateDatabase.into(),
             provider: <span class="string">&quot;sqlite&quot;</span>,
             shadow_database_url,
+            max_ddl_refresh_delay: <span class="prelude-val">None</span>,
         }),
         <span class="string">&quot;mysql&quot; </span>=&gt; {
             <span class="kw">let </span>tags = mysql::get_mysql_tags(<span class="kw-2">&amp;</span>database_url)<span class="question-mark">?</span>;
             <span class="kw">let </span><span class="kw-2">mut </span>capabilities = Capabilities::Enums | Capabilities::Json;
+            <span class="kw">let </span><span class="kw-2">mut </span>max_refresh_delay = <span class="prelude-val">None</span>;
 
             <span class="kw">if </span>tags.contains(Tags::Vitess) {
                 capabilities |= Capabilities::CreateDatabase;
+                <span class="comment">// Vitess is an eventually consistent system that propagates schema changes
+                // from vttablet to vtgate asynchronously. We might need to wait for a while before
+                // start querying the database after a schema change is made.
+                //
+                // For schema changes that do not alter the table column names, the schema is not
+                // required to be reloaded.
+                </span>max_refresh_delay = <span class="prelude-val">Some</span>(Duration::from_millis(VITESS_MAX_REFRESH_DELAY_MS));
             }
 
             <span class="prelude-val">Ok</span>(DbUnderTest {
@@ -302,6 +337,7 @@ source .test_database_urls/mysql_5_6
                 capabilities,
                 provider: <span class="string">&quot;mysql&quot;</span>,
                 shadow_database_url,
+                max_ddl_refresh_delay: max_refresh_delay,
             })
         }
         <span class="string">&quot;postgresql&quot; </span>| <span class="string">&quot;postgres&quot; </span>=&gt; <span class="prelude-val">Ok</span>({
@@ -322,6 +358,7 @@ source .test_database_urls/mysql_5_6
                     | Capabilities::CreateDatabase,
                 provider,
                 shadow_database_url,
+                max_ddl_refresh_delay: <span class="prelude-val">None</span>,
             }
         }),
         <span class="string">&quot;sqlserver&quot; </span>=&gt; <span class="prelude-val">Ok</span>(DbUnderTest {
@@ -330,6 +367,7 @@ source .test_database_urls/mysql_5_6
             capabilities: Capabilities::CreateDatabase.into(),
             provider: <span class="string">&quot;sqlserver&quot;</span>,
             shadow_database_url,
+            max_ddl_refresh_delay: <span class="prelude-val">None</span>,
         }),
         <span class="kw">_ </span>=&gt; <span class="prelude-val">Err</span>(<span class="string">&quot;Unknown database URL&quot;</span>.into()),
     }
@@ -437,6 +475,10 @@ source .test_database_urls/mysql_5_6
 
     <span class="kw">pub fn </span>tags(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; BitFlags&lt;Tags&gt; {
         <span class="self">self</span>.db.tags
+    }
+
+    <span class="kw">pub fn </span>max_ddl_refresh_delay(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;Duration&gt; {
+        <span class="self">self</span>.db.max_ddl_refresh_delay
     }
 }
 

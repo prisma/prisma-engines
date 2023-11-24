@@ -272,10 +272,19 @@
 <a href="#272" id="272">272</a>
 <a href="#273" id="273">273</a>
 <a href="#274" id="274">274</a>
+<a href="#275" id="275">275</a>
+<a href="#276" id="276">276</a>
+<a href="#277" id="277">277</a>
+<a href="#278" id="278">278</a>
+<a href="#279" id="279">279</a>
+<a href="#280" id="280">280</a>
+<a href="#281" id="281">281</a>
+<a href="#282" id="282">282</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>colored::Colorize;
 <span class="kw">use </span>schema_core::{
     commands::schema_push, json_rpc::types::<span class="kw-2">*</span>, schema_connector::SchemaConnector, CoreError, CoreResult,
 };
+<span class="kw">use </span>std::time::Duration;
 <span class="kw">use </span>std::{borrow::Cow, fmt::Debug};
 <span class="kw">use </span>tracing_futures::Instrument;
 
@@ -285,15 +294,18 @@
     force: bool,
     <span class="doccomment">/// Purely for logging diagnostics.
     </span>migration_id: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str&gt;,
+    <span class="comment">// In eventually-consistent systems, we might need to wait for a while before the system refreshes
+    </span>max_ddl_refresh_delay: <span class="prelude-ty">Option</span>&lt;Duration&gt;,
 }
 
 <span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; SchemaPush&lt;<span class="lifetime">&#39;a</span>&gt; {
-    <span class="kw">pub fn </span>new(api: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span><span class="kw">dyn </span>SchemaConnector, schema: String) -&gt; <span class="self">Self </span>{
+    <span class="kw">pub fn </span>new(api: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span><span class="kw">dyn </span>SchemaConnector, schema: String, max_refresh_delay: <span class="prelude-ty">Option</span>&lt;Duration&gt;) -&gt; <span class="self">Self </span>{
         SchemaPush {
             api,
             schema,
             force: <span class="bool-val">false</span>,
             migration_id: <span class="prelude-val">None</span>,
+            max_ddl_refresh_delay: max_refresh_delay,
         }
     }
 
@@ -317,6 +329,10 @@
             .instrument(<span class="macro">tracing::info_span!</span>(<span class="string">&quot;SchemaPush&quot;</span>, migration_id = <span class="question-mark">?</span><span class="self">self</span>.migration_id));
 
         <span class="kw">let </span>output = test_setup::runtime::run_with_thread_local_runtime(fut)<span class="question-mark">?</span>;
+
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(delay) = <span class="self">self</span>.max_ddl_refresh_delay {
+            std::thread::sleep(delay);
+        }
 
         <span class="prelude-val">Ok</span>(SchemaPushAssertion {
             result: output,

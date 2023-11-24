@@ -334,12 +334,22 @@
 <a href="#334" id="334">334</a>
 <a href="#335" id="335">335</a>
 <a href="#336" id="336">336</a>
+<a href="#337" id="337">337</a>
+<a href="#338" id="338">338</a>
+<a href="#339" id="339">339</a>
+<a href="#340" id="340">340</a>
+<a href="#341" id="341">341</a>
+<a href="#342" id="342">342</a>
+<a href="#343" id="343">343</a>
+<a href="#344" id="344">344</a>
+<a href="#345" id="345">345</a>
 </pre></div><pre class="rust"><code><span class="attr">#![deny(missing_docs)]
 
 </span><span class="doccomment">//! A TestApi that is initialized without IO or async code and can instantiate
 //! multiple schema engines.
 
-</span><span class="kw">pub use </span>test_macros::test_connector;
+</span><span class="kw">use </span>std::time::Duration;
+<span class="kw">pub use </span>test_macros::test_connector;
 <span class="kw">pub use </span>test_setup::sqlite_test_url;
 <span class="kw">pub use </span>test_setup::{runtime::run_with_thread_local_runtime <span class="kw">as </span>tok, BitFlags, Capabilities, Tags};
 
@@ -494,6 +504,12 @@
         <span class="self">self</span>.tags().contains(Tags::Vitess)
     }
 
+    <span class="doccomment">/// Returns a duration that is guaranteed to be larger than the maximum refresh rate after a
+    /// DDL statement
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>max_ddl_refresh_delay(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;Duration&gt; {
+        <span class="self">self</span>.args.max_ddl_refresh_delay()
+    }
+
     <span class="doccomment">/// Returns whether the database automatically lower-cases table names.
     </span><span class="kw">pub fn </span>lower_cases_table_names(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
         <span class="self">self</span>.tags().contains(Tags::LowerCasesTableNames)
@@ -539,6 +555,7 @@
             connection_info,
             tags: <span class="self">self</span>.args.tags(),
             namespaces: <span class="self">self</span>.args.namespaces(),
+            max_ddl_refresh_delay: <span class="self">self</span>.args.max_ddl_refresh_delay(),
         }
     }
 
@@ -612,6 +629,7 @@
     connection_info: ConnectionInfo,
     tags: BitFlags&lt;Tags&gt;,
     namespaces: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>[<span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str],
+    max_ddl_refresh_delay: <span class="prelude-ty">Option</span>&lt;Duration&gt;,
 }
 
 <span class="kw">impl </span>EngineTestApi {
@@ -656,7 +674,7 @@
 
     <span class="doccomment">/// Plan a `schemaPush` command
     </span><span class="kw">pub fn </span>schema_push(<span class="kw-2">&amp;mut </span><span class="self">self</span>, dm: <span class="kw">impl </span>Into&lt;String&gt;) -&gt; SchemaPush&lt;<span class="lifetime">&#39;_</span>&gt; {
-        SchemaPush::new(<span class="kw-2">&amp;mut </span><span class="self">self</span>.connector, dm.into())
+        SchemaPush::new(<span class="kw-2">&amp;mut </span><span class="self">self</span>.connector, dm.into(), <span class="self">self</span>.max_ddl_refresh_delay)
     }
 
     <span class="doccomment">/// The schema name of the current connected database.
