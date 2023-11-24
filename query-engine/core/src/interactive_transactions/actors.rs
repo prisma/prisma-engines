@@ -1,5 +1,5 @@
 use super::{CachedTx, TransactionError, TxOpRequest, TxOpRequestMsg, TxOpResponse};
-use crate::executor::task::{spawn, JoinHandle};
+use crate::executor::task::{spawn, spawn_controlled, JoinHandle};
 use crate::{
     execute_many_operations, execute_single_operation, protocol::EngineProtocol, ClosedTx, Operation, ResponseData,
     TxId,
@@ -17,6 +17,7 @@ use tokio::{
 use tracing::Span;
 use tracing_futures::Instrument;
 use tracing_futures::WithSubscriber;
+use wasm_rs_dbg::dbg;
 
 #[cfg(feature = "metrics")]
 use crate::telemetry::helpers::set_span_link_from_traceparent;
@@ -385,17 +386,35 @@ pub(crate) fn spawn_client_list_clear_actor(
     closed_txs: Arc<RwLock<lru::LruCache<TxId, Option<ClosedTx>>>>,
     mut rx: Receiver<(TxId, Option<ClosedTx>)>,
 ) -> JoinHandle<()> {
-    spawn(async move {
-        loop {
-            if let Some((id, closed_tx)) = rx.recv().await {
-                trace!("removing {} from client list", id);
+    spawn_controlled(Box::new(
+        |mut rx_exit: tokio::sync::broadcast::Receiver<()>| async move {
+            loop {
+                tokio::select! {
+                    result = rx.recv() => {
+                        dbg!("spawn_controlled - AFTER rx.recv(): {:?}", result.is_some());
+                        match result {
+                            Some((id, closed_tx)) => {
+                                trace!("removing {} from client list", id);
 
-                let mut clients_guard = clients.write().await;
-                clients_guard.remove(&id);
-                drop(clients_guard);
+                                let mut clients_guard = clients.write().await;
 
-                closed_txs.write().await.put(id, closed_tx);
+                                clients_guard.remove(&id);
+                                drop(clients_guard);
+
+                                closed_txs.write().await.put(id, closed_tx);
+                            }
+                            None => {
+                                // the `rx` channel is closed.
+                                break;
+                            }
+                        }
+                    },
+                    _ = rx_exit.recv() => {
+                        dbg!("spawn_controlled - AFTER rx_exit.recv()");
+                        break;
+                    },
+                }
             }
-        }
-    })
+        },
+    ))
 }

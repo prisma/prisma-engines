@@ -37,7 +37,6 @@ pub struct TransactionActorManager {
 
 impl Drop for TransactionActorManager {
     fn drop(&mut self) {
-        debug!("DROPPING TPM");
         self.bg_reader_clear.abort();
     }
 }

@@ -1,21 +1,56 @@
 //! This module provides a unified interface for spawning asynchronous tasks, regardless of the target platform.
 
-pub use arch::{spawn, JoinHandle};
+pub use arch::{spawn, spawn_controlled, JoinHandle};
 use futures::Future;
 
 // On native targets, `tokio::spawn` spawns a new asynchronous task.
 #[cfg(not(target_arch = "wasm32"))]
 mod arch {
     use super::*;
+    use tokio::sync::broadcast::{self};
 
-    pub type JoinHandle<T> = tokio::task::JoinHandle<T>;
+    pub struct JoinHandle<T> {
+        handle: tokio::task::JoinHandle<T>,
+
+        sx_exit: Option<broadcast::Sender<()>>,
+    }
+
+    impl<T> JoinHandle<T> {
+        pub fn abort(&mut self) {
+            if let Some(sx_exit) = self.sx_exit.as_ref() {
+                sx_exit.send(()).ok();
+            }
+
+            self.handle.abort();
+        }
+    }
 
     pub fn spawn<T>(future: T) -> JoinHandle<T::Output>
     where
         T: Future + Send + 'static,
         T::Output: Send + 'static,
     {
-        tokio::spawn(future)
+        spawn_with_sx_exit::<T>(future, None)
+    }
+
+    pub fn spawn_controlled<T>(future_fn: Box<dyn FnOnce(broadcast::Receiver<()>) -> T>) -> JoinHandle<T::Output>
+    where
+        T: Future + Send + 'static,
+        T::Output: Send + 'static,
+    {
+        let (sx_exit, rx_exit) = tokio::sync::broadcast::channel::<()>(1);
+        let future = future_fn(rx_exit);
+
+        spawn_with_sx_exit::<T>(future, Some(sx_exit))
+    }
+
+    fn spawn_with_sx_exit<T>(future: T, sx_exit: Option<broadcast::Sender<()>>) -> JoinHandle<T::Output>
+    where
+        T: Future + Send + 'static,
+        T::Output: Send + 'static,
+    {
+        let handle = tokio::spawn(future);
+        JoinHandle { handle, sx_exit }
     }
 }
 
@@ -23,28 +58,63 @@ mod arch {
 #[cfg(target_arch = "wasm32")]
 mod arch {
     use super::*;
-    use tokio::sync::oneshot::{self};
+    use tokio::sync::{
+        broadcast::{self},
+        oneshot::{self},
+    };
+    use wasm_rs_dbg::dbg;
 
     // Wasm-compatible alternative to `tokio::task::JoinHandle<T>`.
     // `pin_project` enables pin-projection and a `Pin`-compatible implementation of the `Future` trait.
-    pub struct JoinHandle<T>(oneshot::Receiver<T>);
+    #[pin_project::pin_project]
+    pub struct JoinHandle<T> {
+        #[pin]
+        receiver: oneshot::Receiver<T>,
+
+        sx_exit: Option<broadcast::Sender<()>>,
+    }
 
     impl<T> Future for JoinHandle<T> {
         type Output = Result<T, oneshot::error::RecvError>;
 
         fn poll(mut self: std::pin::Pin<&mut Self>, cx: &mut std::task::Context<'_>) -> std::task::Poll<Self::Output> {
+            dbg!("JoinHandle::poll");
+
             // the `self.project()` method is provided by the `pin_project` macro
-            core::pin::Pin::new(&mut self.0).poll(cx)
+            core::pin::Pin::new(&mut self.receiver).poll(cx)
         }
     }
 
     impl<T> JoinHandle<T> {
         pub fn abort(&mut self) {
-            // abort is noop on Wasm targets
+            dbg!("JoinHandle::abort");
+
+            if let Some(sx_exit) = self.sx_exit.as_ref() {
+                dbg!("JoinHandle::abort - Send sx_exit");
+                sx_exit.send(()).ok();
+            }
         }
     }
 
     pub fn spawn<T>(future: T) -> JoinHandle<T::Output>
+    where
+        T: Future + Send + 'static,
+        T::Output: Send + 'static,
+    {
+        spawn_with_sx_exit::<T>(future, None)
+    }
+
+    pub fn spawn_controlled<T>(future_fn: Box<dyn FnOnce(broadcast::Receiver<()>) -> T>) -> JoinHandle<T::Output>
+    where
+        T: Future + Send + 'static,
+        T::Output: Send + 'static,
+    {
+        let (sx_exit, rx_exit) = tokio::sync::broadcast::channel::<()>(1);
+        let future = future_fn(rx_exit);
+        spawn_with_sx_exit::<T>(future, Some(sx_exit))
+    }
+
+    fn spawn_with_sx_exit<T>(future: T, sx_exit: Option<broadcast::Sender<()>>) -> JoinHandle<T::Output>
     where
         T: Future + Send + 'static,
         T::Output: Send + 'static,
@@ -54,6 +124,7 @@ mod arch {
             let result = future.await;
             sender.send(result).ok();
         });
-        JoinHandle(receiver)
+
+        JoinHandle { receiver, sx_exit }
     }
 }
