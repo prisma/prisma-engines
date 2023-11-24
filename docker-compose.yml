@@ -1,7 +1,7 @@
 version: '3'
 services:
   cockroach_23_1:
-    image: prismagraphql/cockroachdb-custom:23.1
+    image: prismagraphql/cockroachdb-custom:23.1@sha256:c5a97355d56a7692ed34d835dfd8e3663d642219ea90736658a24840ea26862d
     restart: unless-stopped
     command: |
       start-single-node --insecure
@@ -107,7 +107,7 @@ services:
     networks:
       - databases
 
-  neon-postgres13:
+  neon-proxy:
     image: ghcr.io/neondatabase/wsproxy:latest
     restart: unless-stopped
     environment:
@@ -123,22 +123,69 @@ services:
     networks:
       - databases
 
-  planetscale-vitess8:
+  # Tests using a vitess backend were not running properly for query-engine tests, and In
+  # https://github.com/prisma/prisma-engines/pull/4423 work was done to have coverage of the correctness of planetscale
+  # driver adapters.
+  #
+  # Given these tests run against the planetscale proxy, and given a different test suite will exist for vitess with
+  # rust drivers, we opted for the path of least friction when running the driver adapter tests, which is putting a
+  # single mysql box behind the planetscale proxy instead of full vttest cluster.
+  #
+  # The tradeoffs are:
+  #
+  # - we don't exercise vitess but mysql. This is a close approximation, but there might be small differences in
+  # behavior. (ex. vttest can be returning different error messages than mysql)
+  #
+  # - however, we 1) do exercise the planetscale proxy, 2) we use relationMode=prisma and this resembles what actually
+  # happens within the query engine, where vitess does not exist as a provider, and as such there isn't any particular
+  # capability or conditional code making the engine behave differently then when using Mysql.
+  # In the end Vitess is just an abstraction existing in the test kit to a) use the mysql provider, b) run the suite
+  # with relationMode=prisma; c) being able to run or exclude specific tests for that configuration. But the existence
+  # of this testing connector is misleading, and it should probably be just a version of the MySQL testing connector
+  # instead.
+  planetscale-proxy:
     build: ./docker/planetscale_proxy
     environment:
-      MYSQL_HOST: 'vitess-test-8_0'
-      MYSQL_PORT: 33807
-      MYSQL_DATABASE: 'test'
+      MYSQL_HOST: 'mysql-planetscale'
+      MYSQL_PORT: 3306
+      MYSQL_DATABASE: prisma
     ports:
       - '8085:8085'
     depends_on:
-      - vitess-test-8_0
+      mysql-planetscale:
+        condition: service_healthy
     restart: unless-stopped
     healthcheck:
       test: ['CMD', 'nc', '-z', '127.0.0.1', '8085']
       interval: 5s
       timeout: 2s
       retries: 20
+    networks:
+      - databases
+
+  mysql-planetscale:
+    image: mysql:8.0.28
+    command: mysqld
+    restart: unless-stopped
+    platform: linux/x86_64
+    environment:
+      MYSQL_ALLOW_EMPTY_PASSWORD: yes
+      MYSQL_DATABASE: prisma
+    ports:
+      - '3310:3306'
+    networks:
+      - databases
+    tmpfs: /var/lib/planetscale-mysql
+    volumes:
+      - "./docker/planetscale-mysql/my.cnf:/etc/mysql/my.cnf"
+    ulimits:
+      nofile:
+        soft: 20000
+        hard: 40000
+    healthcheck:
+      test: [ "CMD", "mysqladmin" ,"ping", "-h", "localhost" ]
+      timeout: 20s
+      retries: 10
 
   postgres14:
     image: postgres:14
@@ -180,6 +227,10 @@ services:
     networks:
       - databases
     tmpfs: /var/lib/mysql
+    healthcheck:
+      test: [ "CMD", "mysqladmin" ,"ping", "-h", "localhost" ]
+      timeout: 20s
+      retries: 10
 
   mysql-5-7:
     image: mysql:5.7.44
@@ -194,6 +245,10 @@ services:
     networks:
       - databases
     tmpfs: /var/lib/mysql
+    healthcheck:
+      test: [ "CMD", "mysqladmin" ,"ping", "-h", "localhost" ]
+      timeout: 20s
+      retries: 10
 
   mysql-8-0:
     image: mysql:8.0.28
@@ -208,6 +263,10 @@ services:
     networks:
       - databases
     tmpfs: /var/lib/mysql8
+    healthcheck:
+      test: [ "CMD", "mysqladmin" ,"ping", "-h", "localhost" ]
+      timeout: 20s
+      retries: 10
 
   mariadb-10-0:
     image: mariadb:10

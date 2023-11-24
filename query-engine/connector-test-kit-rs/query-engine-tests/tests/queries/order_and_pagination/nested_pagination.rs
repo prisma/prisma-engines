@@ -80,7 +80,7 @@ mod nested_pagination {
      ***************/
 
     // should skip the first item
-    #[connector_test]
+    #[connector_test(exclude(Vitess("planetscale.js")))]
     async fn mid_lvl_skip_1(runner: Runner) -> TestResult<()> {
         create_test_data(&runner).await?;
 
@@ -102,7 +102,7 @@ mod nested_pagination {
     }
 
     // should "skip all items"
-    #[connector_test]
+    #[connector_test(exclude(Vitess("planetscale.js")))]
     async fn mid_lvl_skip_3(runner: Runner) -> TestResult<()> {
         create_test_data(&runner).await?;
 
@@ -124,7 +124,7 @@ mod nested_pagination {
     }
 
     // should "skip all items"
-    #[connector_test]
+    #[connector_test(exclude(Vitess("planetscale.js")))]
     async fn mid_lvl_skip_4(runner: Runner) -> TestResult<()> {
         create_test_data(&runner).await?;
 

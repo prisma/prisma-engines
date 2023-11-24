@@ -1,4 +1,4 @@
-name: 'Release binary compilation test'
+name: Test release binary compilation
 on:
   pull_request:
     paths-ignore:

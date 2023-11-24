@@ -1,4 +1,4 @@
-name: Send Tag Event
+name: Send Tag Event to PDP
 
 on:
   push:

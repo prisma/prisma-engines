@@ -1,4 +1,4 @@
-name: Query Engine Black Box
+name: Test Query Engine (Black Box)
 on:
   push:
     branches:
@@ -19,7 +19,7 @@ concurrency:
 
 jobs:
   rust-tests:
-    name: 'Test query-engine as a black-box'
+    name: 'query-engine as a black-box'
 
     strategy:
       fail-fast: false

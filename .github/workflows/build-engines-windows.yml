@@ -1,21 +1,20 @@
+name: Build Engines for Windows
 on:
   workflow_dispatch:
     inputs:
       commit:
         description: "Commit on the given branch to build"
-        required: false
+        required: true
 
 jobs:
   build:
     # Do not change `name`, prisma-engines Buildkite build job depends on this name ending with the commit
-    name: "MacOS Intel engines build on branch ${{ github.event.ref }} for commit ${{ github.event.inputs.commit }}"
+    name: "Windows engines build on branch ${{ github.event.ref }} for commit ${{ github.event.inputs.commit }}"
     env:
       SQLITE_MAX_VARIABLE_NUMBER: 250000
       SQLITE_MAX_EXPR_DEPTH: 10000
-
-      # minimum supported version of macOS
-      MACOSX_DEPLOYMENT_TARGET: 10.15
-    runs-on: macos-13
+      RUSTFLAGS: "-C target-feature=+crt-static"
+    runs-on: windows-latest
 
     steps:
       - name: Output link to real commit
@@ -34,16 +33,13 @@ jobs:
             ~/.cargo/registry
             ~/.cargo/git
             target
-          key: ${{ runner.os }}-intel-cargo-${{ hashFiles('**/Cargo.lock') }}
+          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
 
-      - run: |
-          cargo build --release -p query-engine -p query-engine-node-api -p schema-engine-cli -p prisma-fmt
+      - run: cargo build --release
 
       - uses: actions/upload-artifact@v3
         with:
           name: binaries
           path: |
-            ${{ github.workspace }}/target/release/schema-engine
-            ${{ github.workspace }}/target/release/prisma-fmt
-            ${{ github.workspace }}/target/release/query-engine
-            ${{ github.workspace }}/target/release/libquery_engine.dylib
+            ${{ github.workspace }}/target/release/*.exe
+            ${{ github.workspace }}/target/release/*.dll
