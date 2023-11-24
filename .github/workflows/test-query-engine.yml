@@ -45,6 +45,10 @@ jobs:
             single_threaded: false
             connector: 'sqlite'
             version: '3'
+          - name: 'spatialite'
+            single_threaded: false
+            connector: 'sqlite'
+            version: '3-spatialite'
           - name: 'mongodb_4_2'
             single_threaded: true
             connector: 'mongodb'
@@ -113,12 +117,18 @@ jobs:
 
       - uses: dtolnay/rust-toolchain@stable
 
+      - name: Install Spatialite
+        if: ${{ matrix.database.name == 'spatialite' }}
+        run: apt install -y libsqlite3-mod-spatialite
+
       - run: export WORKSPACE_ROOT=$(pwd) && cargo test --package query-engine-tests -- --test-threads=1
         if: ${{ matrix.database.single_threaded }}
         env:
           CLICOLOR_FORCE: 1
+          SPATIALITE_PATH: ${{ matrix.database.name == 'spatialite' && 'mod_spatialite' || null }}
 
       - run: export WORKSPACE_ROOT=$(pwd) && cargo test --package query-engine-tests -- --test-threads=8
         if: ${{ !matrix.database.single_threaded }}
         env:
           CLICOLOR_FORCE: 1
+          SPATIALITE_PATH: ${{ matrix.database.name == 'spatialite' && 'mod_spatialite' || null }}

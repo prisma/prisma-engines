@@ -96,6 +96,8 @@ jobs:
             url: 'postgresql://prisma@localhost:26257'
           - name: sqlite
             url: sqlite
+          - name: spatialite
+            url: sqlite
           - name: vitess_8_0
             url: 'mysql://root:prisma@localhost:33807/test'
             shadow_database_url: 'mysql://root:prisma@localhost:33808/shadow'
@@ -118,6 +120,10 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
+      - name: Install Spatialite
+        if: ${{ matrix.database.name == 'spatialite' }}
+        run: sudo apt install -y libsqlite3-mod-spatialite
+  
       - name: 'Start ${{ matrix.database.name }}'
         run: make start-${{ matrix.database.name }}
 
@@ -126,18 +132,21 @@ jobs:
         env:
           CLICOLOR_FORCE: 1
           TEST_DATABASE_URL: ${{ matrix.database.url }}
+          SPATIALITE_PATH: ${{ matrix.database.name == 'spatialite' && 'mod_spatialite' || null }}
 
       - run: cargo test -p sql-schema-describer
         if: ${{ !matrix.database.single_threaded }}
         env:
           CLICOLOR_FORCE: 1
           TEST_DATABASE_URL: ${{ matrix.database.url }}
+          SPATIALITE_PATH: ${{ matrix.database.name == 'spatialite' && 'mod_spatialite' || null }}
 
       - run: cargo test -p sql-migration-tests
         if: ${{ !matrix.database.single_threaded }}
         env:
           CLICOLOR_FORCE: 1
           TEST_DATABASE_URL: ${{ matrix.database.url }}
+          SPATIALITE_PATH: ${{ matrix.database.name == 'spatialite' && 'mod_spatialite' || null }}
           RUST_LOG: debug
 
       - run: cargo test -p schema-engine-cli
@@ -145,6 +154,7 @@ jobs:
         env:
           CLICOLOR_FORCE: 1
           TEST_DATABASE_URL: ${{ matrix.database.url }}
+          SPATIALITE_PATH: ${{ matrix.database.name == 'spatialite' && 'mod_spatialite' || null }}
 
       - run: cargo test -p sql-introspection-tests -- --test-threads=1
         if: ${{ matrix.database.is_vitess }}
