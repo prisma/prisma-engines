@@ -107,7 +107,7 @@ impl TransactionActorManager {
                              of the transaction. Consider increasing the interactive transaction timeout \
                              or doing less work in the transaction",
                             timeout.as_millis(),
-                            start_time.elapsed().as_millis(),
+                            start_time.elapsed_time().as_millis(),
                         )
                     }
                     None => {
