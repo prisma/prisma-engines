@@ -1,4 +1,4 @@
-name: Query Engine
+name: Test Query Engine
 on:
   push:
     branches:
@@ -19,7 +19,7 @@ concurrency:
 
 jobs:
   rust-query-engine-tests:
-    name: 'Test ${{ matrix.database.name }} (${{ matrix.engine_protocol }}) on Linux'
+    name: '${{ matrix.database.name }} (${{ matrix.engine_protocol }}) on Linux'
 
     strategy:
       fail-fast: false
@@ -37,6 +37,10 @@ jobs:
             single_threaded: false
             connector: 'sqlserver'
             version: '2022'
+          - name: 'sqlite'
+            single_threaded: false
+            connector: 'sqlite'
+            version: '3'
           - name: 'mongodb_4_2'
             single_threaded: true
             connector: 'mongodb'

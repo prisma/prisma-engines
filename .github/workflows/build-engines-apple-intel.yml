@@ -1,3 +1,4 @@
+name: Build Engines for Apple Intel
 on:
   workflow_dispatch:
     inputs:
@@ -8,10 +9,13 @@ on:
 jobs:
   build:
     # Do not change `name`, prisma-engines Buildkite build job depends on this name ending with the commit
-    name: "MacOS ARM64 (Apple Silicon) engines build on branch ${{ github.event.ref }} for commit ${{ github.event.inputs.commit }}"
+    name: "MacOS Intel engines build on branch ${{ github.event.ref }} for commit ${{ github.event.inputs.commit }}"
     env:
       SQLITE_MAX_VARIABLE_NUMBER: 250000
       SQLITE_MAX_EXPR_DEPTH: 10000
+
+      # minimum supported version of macOS
+      MACOSX_DEPLOYMENT_TARGET: 10.15
     runs-on: macos-13
 
     steps:
@@ -25,27 +29,22 @@ jobs:
 
       - uses: dtolnay/rust-toolchain@stable
 
-      - name: Install aarch64 toolchain
-        run: rustup target add aarch64-apple-darwin
-
       - uses: actions/cache@v3
         with:
           path: |
             ~/.cargo/registry
             ~/.cargo/git
             target
-          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
-
-      - run: xcodebuild -showsdks
+          key: ${{ runner.os }}-intel-cargo-${{ hashFiles('**/Cargo.lock') }}
 
       - run: |
-          cargo build --target=aarch64-apple-darwin --release -p query-engine -p query-engine-node-api -p schema-engine-cli -p prisma-fmt
+          cargo build --release -p query-engine -p query-engine-node-api -p schema-engine-cli -p prisma-fmt
 
       - uses: actions/upload-artifact@v3
         with:
           name: binaries
           path: |
-            ${{ github.workspace }}/target/aarch64-apple-darwin/release/schema-engine
-            ${{ github.workspace }}/target/aarch64-apple-darwin/release/prisma-fmt
-            ${{ github.workspace }}/target/aarch64-apple-darwin/release/query-engine
-            ${{ github.workspace }}/target/aarch64-apple-darwin/release/libquery_engine.dylib
+            ${{ github.workspace }}/target/release/schema-engine
+            ${{ github.workspace }}/target/release/prisma-fmt
+            ${{ github.workspace }}/target/release/query-engine
+            ${{ github.workspace }}/target/release/libquery_engine.dylib
