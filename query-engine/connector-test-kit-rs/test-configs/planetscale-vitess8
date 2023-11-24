@@ -1,7 +1,0 @@
-{
-    "connector": "vitess",
-    "version": "8.0",
-    "driver_adapter": "planetscale",
-    "driver_adapter_config": { "proxyUrl": "http://root:root@127.0.0.1:8085" },
-    "external_test_executor": "Napi"
-}

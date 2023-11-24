@@ -250,7 +250,7 @@ async function pgAdapter(url: string): Promise<DriverAdapter> {
 }
 
 async function neonWsAdapter(url: string): Promise<DriverAdapter> {
-    const proxyURL = JSON.parse(process.env.DRIVER_ADAPTER_CONFIG || '{}').proxyUrl ?? ''
+    const proxyURL = JSON.parse(process.env.DRIVER_ADAPTER_CONFIG || '{}').proxy_url ?? ''
     if (proxyURL == '') {
         throw new Error("DRIVER_ADAPTER_CONFIG is not defined or empty, but its required for neon adapter.");
     }
@@ -270,7 +270,7 @@ async function libsqlAdapter(url: string): Promise<DriverAdapter> {
 }
 
 async function planetscaleAdapter(url: string): Promise<DriverAdapter> {
-    const proxyURL = JSON.parse(process.env.DRIVER_ADAPTER_CONFIG || '{}').proxyUrl ?? ''
+    const proxyURL = JSON.parse(process.env.DRIVER_ADAPTER_CONFIG || '{}').proxy_url ?? ''
     if (proxyURL == '') {
         throw new Error("DRIVER_ADAPTER_CONFIG is not defined or empty, but its required for planetscale adapter.");
     }
