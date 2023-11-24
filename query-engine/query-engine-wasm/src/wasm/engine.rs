@@ -30,7 +30,6 @@ use tracing_subscriber::filter::LevelFilter;
 use tsify::Tsify;
 use user_facing_errors::Error;
 use wasm_bindgen::prelude::wasm_bindgen;
-
 /// The main query engine used by JS
 #[wasm_bindgen]
 pub struct QueryEngine {
@@ -279,32 +278,28 @@ impl QueryEngine {
     /// Disconnect and drop the core. Can be reconnected later with `#connect`.
     #[wasm_bindgen]
     pub async fn disconnect(&self, trace: String) -> Result<(), wasm_bindgen::JsError> {
-        // async_panic_to_js_error(async {
-        // let span = tracing::info_span!("prisma:engine:disconnect");
+        async_panic_to_js_error(async {
+            let span = tracing::info_span!("prisma:engine:disconnect");
 
-        // TODO: when using Node Drivers, we need to call Driver::close() here.
+            async {
+                let mut inner = self.inner.write().await;
+                let engine = inner.as_engine()?;
 
-        // async {
-        let mut inner = self.inner.write().await;
-        let engine = inner.as_engine()?;
+                let builder = EngineBuilder {
+                    schema: engine.schema.clone(),
+                    config_dir: engine.config_dir.clone(),
+                    env: engine.env.clone(),
+                    engine_protocol: engine.engine_protocol(),
+                };
 
-        let builder = EngineBuilder {
-            schema: engine.schema.clone(),
-            config_dir: engine.config_dir.clone(),
-            env: engine.env.clone(),
-            engine_protocol: engine.engine_protocol(),
-        };
+                *inner = Inner::Builder(builder);
 
-        log::info!("Recreated builder");
-        *inner = Inner::Builder(builder);
-        log::info!("Recreated inner builder");
-
-        Ok(())
-        // }
-        // .instrument(span)
-        // .await
-        // })
-        // .await
+                Ok(())
+            }
+            .instrument(span)
+            .await
+        })
+        .await
     }
 
     /// If connected, sends a query to the core and returns the response.
