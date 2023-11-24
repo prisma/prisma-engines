@@ -3715,6 +3715,7 @@ dependencies = [
  "user-facing-errors",
  "uuid",
  "wasm-bindgen-futures",
+ "wasm-rs-dbg",
 ]
 
 [[package]]
@@ -3862,6 +3863,7 @@ dependencies = [
  "wasm-bindgen",
  "wasm-bindgen-futures",
  "wasm-logger",
+ "wasm-rs-dbg",
 ]
 
 [[package]]

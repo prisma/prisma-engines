@@ -1,7 +1,7 @@
 use crate::napi::proxy::{CommonProxy, DriverProxy};
 use crate::JsQueryable;
 use napi::JsObject;
-use psl::datamodel_connector::Flavour;
+use crate::types::AdapterFlavour;
 
 /// A JsQueryable adapts a Proxy to implement quaint's Queryable interface. It has the
 /// responsibility of transforming inputs and outputs of `query` and `execute` methods from quaint
@@ -18,7 +18,7 @@ use psl::datamodel_connector::Flavour;
 ///
 pub(crate) struct JsBaseQueryable {
     pub(crate) proxy: CommonProxy,
-    pub flavour: Flavour,
+    pub flavour: AdapterFlavour,
 }
 
 pub fn from_napi(driver: JsObject) -> JsQueryable {
