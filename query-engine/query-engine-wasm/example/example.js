@@ -44,7 +44,7 @@ async function main() {
     query: {
       arguments: {
         data: {
-          id: 1234,
+          id: 1235,
         },
       },
       selection: {
@@ -66,17 +66,25 @@ async function main() {
     }
   }), 'trace')
   const parsed = JSON.parse(res);
-  console.log('query result = ', parsed)
+  console.log('query result = ')
+  console.dir(parsed, { depth: null })
 
   const error = parsed.errors?.[0]?.user_facing_error
   if (error?.error_code === 'P2036') {
     console.log('js error:', driverAdapter.errorRegistry.consumeError(error.meta.id))
   }
-  // if (res.error.user_facing_error.code =)
+
+  // console.log('before disconnect')
   await queryEngine.disconnect('trace')
-  console.log('after disconnect')
-  queryEngine.free()
+  // console.log('after disconnect')
+
+  // console.log('before close')
   await driverAdapter.close()
+  // console.log('after close')
+
+  // console.log('before free')
+  queryEngine.free()
+  // console.log('after free')
 }
 
 main()
