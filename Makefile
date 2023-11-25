@@ -87,6 +87,11 @@ start-sqlite:
 dev-sqlite:
 	cp $(CONFIG_PATH)/sqlite $(CONFIG_FILE)
 
+start-spatialite:
+
+dev-spatialite:
+	cp $(CONFIG_PATH)/spatialite $(CONFIG_FILE)
+
 dev-libsql-js: build-qe-napi build-connector-kit-js
 	cp $(CONFIG_PATH)/libsql-js $(CONFIG_FILE)
 

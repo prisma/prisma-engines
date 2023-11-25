@@ -169,12 +169,20 @@ pub(crate) fn connection_string(
             }
             None => unreachable!("A versioned connector must have a concrete version to run."),
         },
-        ConnectorVersion::Sqlite(_) => {
+        ConnectorVersion::Sqlite(version) => {
             let workspace_root = std::env::var("WORKSPACE_ROOT")
                 .unwrap_or_else(|_| ".".to_owned())
                 .trim_end_matches('/')
                 .to_owned();
 
+            let spatialite_path = std::env::var("SPATIALITE_PATH");
+            match (version, spatialite_path) {
+                (Some(SqliteVersion::V3Spatialite), Err(_)) => {
+                    panic!("SPATIALITE_PATH env var should be set for version 3-spatialite")
+                }
+                (None, _) => unreachable!("A versioned connector must have a concrete version to run."),
+                (_, _) => (),
+            };
             format!("file://{workspace_root}/db/{database}.db")
         }
         ConnectorVersion::CockroachDb(v) => {

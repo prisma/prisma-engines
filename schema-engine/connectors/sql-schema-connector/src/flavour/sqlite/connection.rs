@@ -13,9 +13,11 @@ pub(super) struct Connection(Mutex<rusqlite::Connection>);
 fn load_spatialite(conn: &rusqlite::Connection) {
     // TODO@geometry: raise an appropriate error when spatialite cannot be loaded instead
     if let Ok(spatialite_path) = std::env::var("SPATIALITE_PATH") {
-        unsafe {
-            let _guard = LoadExtensionGuard::new(conn).unwrap();
-            conn.load_extension(spatialite_path, None).unwrap();
+        if !spatialite_path.is_empty() {
+            unsafe {
+                let _guard = LoadExtensionGuard::new(conn).unwrap();
+                conn.load_extension(spatialite_path, None).unwrap();
+            }
         }
     }
 }

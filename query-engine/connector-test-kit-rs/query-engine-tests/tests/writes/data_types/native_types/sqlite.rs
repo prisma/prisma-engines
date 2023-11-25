@@ -1,6 +1,6 @@
 use query_engine_tests::*;
 
-#[test_suite(only(Sqlite))]
+#[test_suite(only(Sqlite("3-spatialite")))]
 mod sqlite {
     use indoc::indoc;
     use query_engine_tests::run_query;

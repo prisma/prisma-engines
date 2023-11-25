@@ -32,9 +32,11 @@ fn load_spatialite(conn: &rusqlite::Connection) -> crate::Result<()> {
     // Loading Spatialite here isn't ideal, but needed because it has to be
     // done for every new pooled connection..?
     if let Ok(spatialite_path) = std::env::var("SPATIALITE_PATH") {
-        unsafe {
-            let _guard = LoadExtensionGuard::new(conn)?;
-            conn.load_extension(spatialite_path, None)?;
+        if !spatialite_path.is_empty() {
+            unsafe {
+                let _guard = LoadExtensionGuard::new(conn)?;
+                conn.load_extension(spatialite_path, None)?;
+            }
         }
     }
     Ok(())

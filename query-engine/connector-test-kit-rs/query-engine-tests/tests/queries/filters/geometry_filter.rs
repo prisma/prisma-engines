@@ -101,17 +101,21 @@ mod geometry_filter_spec {
         Ok(())
     }
 
-    #[connector_test(schema(schema), exclude(Postgres))]
+    #[connector_test(schema(schema), exclude(Postgres, Sqlite(3, "libsql.js")))]
     async fn basic_where(runner: Runner) -> TestResult<()> {
         basic_where_test(runner).await
     }
 
-    #[connector_test(schema(schema), exclude(Postgres))]
+    #[connector_test(schema(schema), exclude(Postgres, Sqlite(3, "libsql.js")))]
     async fn where_shorthands(runner: Runner) -> TestResult<()> {
         where_shorthands_test(runner).await
     }
 
-    #[connector_test(schema(schema), exclude(Postgres), capabilities(GeometryFiltering))]
+    #[connector_test(
+        schema(schema),
+        exclude(Postgres, Sqlite(3, "libsql.js")),
+        capabilities(GeometryFiltering)
+    )]
     async fn geometric_comparison_filters(runner: Runner) -> TestResult<()> {
         geometric_comparison_filters_test(runner).await
     }

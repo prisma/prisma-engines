@@ -142,11 +142,15 @@ impl SqlRenderer for SqliteFlavour {
                 .map(|c| c.map(|c| c.name().into()).collect());
         }
 
-        let create_geometries = &self.render_create_geometry_columns(table, table_name);
+        let create_geometries = if self.has_spatialite() {
+            self.render_create_geometry_columns(table, table_name)
+        } else {
+            "".to_string()
+        };
         if create_geometries.is_empty() {
             create_table.to_string()
         } else {
-            create_table.to_string() + "\n;" + create_geometries
+            create_table.to_string() + "\n;" + &create_geometries
         }
     }
 
@@ -233,19 +237,10 @@ impl SqlRenderer for SqliteFlavour {
 
             if self.has_spatialite() {
                 result.push(format!("SELECT DropTable(NULL, '{}')", tables.previous.name()));
-                result.push(format!(
-                    "SELECT RenameTable('{old_name}', '{new_name}')",
-                    old_name = temporary_table_name,
-                    new_name = tables.next.name(),
-                ));
             } else {
                 result.push(format!(r#"DROP TABLE "{}""#, tables.previous.name()));
-                result.push(format!(
-                    r#"ALTER TABLE "{old_name}" RENAME TO "{new_name}""#,
-                    old_name = temporary_table_name,
-                    new_name = tables.next.name(),
-                ));
             }
+            result.push(self.render_rename_table(None, &temporary_table_name, tables.next.name()));
 
             for index in tables.next.indexes().filter(|idx| !idx.is_primary_key()) {
                 result.push(self.render_create_index(index));
