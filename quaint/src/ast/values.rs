@@ -529,7 +529,7 @@ impl<'a> Value<'a> {
     }
 
     pub fn null_geometry() -> Self {
-        ValueType::Time(None).into()
+        ValueType::Geometry(None).into()
     }
 }
 
