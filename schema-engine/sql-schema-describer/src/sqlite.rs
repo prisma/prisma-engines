@@ -705,6 +705,7 @@ static SPATIALITE_SYSTEM_TABLES: Lazy<RegexSet> = Lazy::new(|| {
         "(?i)^iso_metadata$",
         "(?i)^iso_metadata_reference$",
         "(?i)^iso_metadata_view$",
+        "(?i)^knn$",
         "(?i)^knn2$",
         "(?i)^networks$",
         "(?i)^raster_coverages$",
