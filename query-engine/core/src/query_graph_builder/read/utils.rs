@@ -252,11 +252,11 @@ pub(crate) fn get_relation_load_strategy(
         && query_schema.has_capability(ConnectorCapability::LateralJoin)
         && args.cursor.is_none()
         && args.distinct.is_none()
+        && aggregation_selections.is_empty()
         && !nested_queries.iter().any(|q| match q {
-            ReadQuery::RelatedRecordsQuery(q) => q.has_cursor() || q.has_distinct(),
+            ReadQuery::RelatedRecordsQuery(q) => q.has_cursor() || q.has_distinct() || q.has_aggregation_selections(),
             _ => false,
         })
-        && aggregation_selections.is_empty()
     {
         RelationLoadStrategy::Join
     } else {
