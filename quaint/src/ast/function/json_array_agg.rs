@@ -5,7 +5,7 @@ pub struct JsonArrayAgg<'a> {
     pub(crate) expr: Box<Expression<'a>>,
 }
 
-/// This is an internal function used to help construct the JsonArrayBeginsWith Comparable
+/// Builds a JSON array out of a list of values.
 pub fn json_array_agg<'a, E>(expr: E) -> Function<'a>
 where
     E: Into<Expression<'a>>,

@@ -240,9 +240,7 @@ fn serialize_record_selection_with_relations(
             query_schema,
         ),
         InnerOutputType::Object(obj) => {
-            // dbg!(&record_selection);
-            let result = serialize_objects_with_relation(record_selection, obj, query_schema)?;
-            // dbg!(&result);
+            let result = serialize_objects_with_relation(record_selection, obj)?;
 
             process_object(field, is_list, result, name)
         }
@@ -335,7 +333,6 @@ fn process_object(
 fn serialize_objects_with_relation(
     result: RecordSelectionWithRelations,
     typ: &ObjectType<'_>,
-    query_schema: &QuerySchema,
 ) -> crate::Result<UncheckedItemsWithParents> {
     let mut object_mapping = UncheckedItemsWithParents::with_capacity(result.records.records.len());
 
@@ -380,7 +377,7 @@ fn serialize_objects_with_relation(
                         .into_list()
                         .unwrap()
                         .into_iter()
-                        .map(|value| serialize_relation_selection(rrs, value, inner_typ, query_schema))
+                        .map(|value| serialize_relation_selection(rrs, value, inner_typ))
                         .collect::<crate::Result<Vec<_>>>()?;
 
                     object.insert(field.name().to_owned(), Item::list(items));
@@ -391,7 +388,7 @@ fn serialize_objects_with_relation(
 
                     object.insert(
                         field.name().to_owned(),
-                        serialize_relation_selection(rrs, val, inner_typ, query_schema)?,
+                        serialize_relation_selection(rrs, val, inner_typ)?,
                     );
                 }
                 _ => panic!("unexpected field"),
@@ -411,7 +408,6 @@ fn serialize_relation_selection(
     value: PrismaValue,
     // parent_id: Option<SelectionResult>,
     typ: &ObjectType<'_>,
-    query_schema: &QuerySchema,
 ) -> crate::Result<Item> {
     if value.is_null() {
         return Ok(Item::Value(PrismaValue::Null));
@@ -420,7 +416,7 @@ fn serialize_relation_selection(
     let mut map = Map::new();
 
     // TODO: handle errors
-    let mut value_obj: HashMap<String, PrismaValue> = HashMap::from_iter(value.into_object().unwrap().into_iter());
+    let mut value_obj: HashMap<String, PrismaValue> = HashMap::from_iter(value.into_object().unwrap());
     let db_field_names = &rrs.fields;
     let fields: Vec<_> = db_field_names
         .iter()
@@ -443,7 +439,7 @@ fn serialize_relation_selection(
                     .into_list()
                     .unwrap()
                     .into_iter()
-                    .map(|value| serialize_relation_selection(inner_rrs, value, inner_typ, query_schema))
+                    .map(|value| serialize_relation_selection(inner_rrs, value, inner_typ))
                     .collect::<crate::Result<Vec<_>>>()?;
 
                 map.insert(field.name().to_owned(), Item::list(items));
@@ -454,7 +450,7 @@ fn serialize_relation_selection(
 
                 map.insert(
                     field.name().to_owned(),
-                    serialize_relation_selection(inner_rrs, value, inner_typ, query_schema)?,
+                    serialize_relation_selection(inner_rrs, value, inner_typ)?,
                 );
             }
             _ => (),

@@ -58,9 +58,8 @@ impl SelectBuilder {
         let select = self.with_ordering(select, &args, Some(table_alias.to_table_string()), ctx);
         let select = self.with_pagination(select, args.take_abs(), args.skip);
         let select = self.with_filters(select, args.filter, Some(table_alias), ctx);
-        let select = select.append_trace(&Span::current()).add_trace_id(ctx.trace_id);
 
-        select
+        select.append_trace(&Span::current()).add_trace_id(ctx.trace_id)
     }
 
     fn with_related_queries<'a, 'b>(
@@ -160,11 +159,9 @@ impl SelectBuilder {
 
             // SELECT <foreign_keys>
             // SELECT <orderby columns> ONLY if it's a m2m table as we need to order by outside of the inner select
-            let inner = ModelProjection::from(selection)
+            ModelProjection::from(selection)
                 .as_columns(ctx)
-                .fold(inner, |acc, c| acc.column(c.table(table_alias.to_table_string())));
-
-            inner
+                .fold(inner, |acc, c| acc.column(c.table(table_alias.to_table_string())))
         } else {
             // SELECT <foreign_keys>
             let inner = ModelProjection::from(linking_fields)
@@ -310,12 +307,10 @@ impl SelectBuilder {
             let (filter, joins) = visitor.visit_filter(filter, ctx);
             let select = select.and_where(filter);
 
-            let select = match joins {
+            match joins {
                 Some(joins) => joins.into_iter().fold(select, |acc, join| acc.join(join.data)),
                 None => select,
-            };
-
-            select
+            }
         } else {
             select
         }

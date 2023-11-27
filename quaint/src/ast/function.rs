@@ -41,7 +41,6 @@ pub use json_unquote::*;
 pub use lower::*;
 pub use maximum::*;
 pub use minimum::*;
-use postgres_types::Json;
 pub use row_number::*;
 #[cfg(feature = "postgresql")]
 pub use row_to_json::*;
