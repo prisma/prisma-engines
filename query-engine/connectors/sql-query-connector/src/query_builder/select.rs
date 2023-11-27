@@ -5,11 +5,13 @@ use crate::{
     filter::alias::{Alias, AliasMode},
     model_extensions::{AsColumn, AsColumns, AsTable, RelationFieldExt},
     ordering::OrderByBuilder,
+    sql_trace::SqlTraceComment,
 };
 
 use itertools::Itertools;
 use quaint::prelude::*;
 use query_structure::*;
+use tracing::Span;
 
 pub const JSON_AGG_IDENT: &str = "data";
 
@@ -56,6 +58,7 @@ impl SelectBuilder {
         let select = self.with_ordering(select, &args, Some(table_alias.to_table_string()), ctx);
         let select = self.with_pagination(select, args.take_abs(), args.skip);
         let select = self.with_filters(select, args.filter, Some(table_alias), ctx);
+        let select = select.append_trace(&Span::current()).add_trace_id(ctx.trace_id);
 
         select
     }
@@ -100,8 +103,6 @@ impl SelectBuilder {
         ctx: &Context<'_>,
     ) -> Select<'static> {
         let table_alias = self.next_alias();
-
-        dbg!(&rs);
 
         let build_obj_params = rs
             .selections
