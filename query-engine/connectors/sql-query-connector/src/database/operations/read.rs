@@ -55,62 +55,89 @@ pub(crate) async fn get_single_record(
     Ok(record)
 }
 
+pub(crate) async fn get_many_records(
+    conn: &dyn Queryable,
+    model: &Model,
+    query_arguments: QueryArguments,
+    selected_fields: &FieldSelection,
+    aggr_selections: &[RelAggregationSelection],
+    relation_load_strategy: RelationLoadStrategy,
+    ctx: &Context<'_>,
+) -> crate::Result<ManyRecords> {
+    match relation_load_strategy {
+        RelationLoadStrategy::Join => {
+            get_many_records_joins(conn, model, query_arguments, selected_fields, aggr_selections, ctx).await
+        }
+        RelationLoadStrategy::Query => {
+            get_many_records_wo_joins(
+                conn,
+                model,
+                query_arguments,
+                &ModelProjection::from(selected_fields),
+                aggr_selections,
+                ctx,
+            )
+            .await
+        }
+    }
+}
+
 pub(crate) async fn get_many_records_joins(
     conn: &dyn Queryable,
     _model: &Model,
     query_arguments: QueryArguments,
-    selected_fields: &ModelProjection,
-    nested: Vec<RelatedQuery>,
+    selected_fields: &FieldSelection,
     _aggr_selections: &[RelAggregationSelection],
     ctx: &Context<'_>,
 ) -> crate::Result<ManyRecords> {
-    let mut field_names: Vec<_> = selected_fields.db_names().collect();
-    field_names.extend(nested.iter().map(|n| n.parent_field.name().to_owned()));
-
-    let mut idents = selected_fields.type_identifiers_with_arities();
-    idents.extend(nested.iter().map(|_| (TypeIdentifier::Json, FieldArity::Required)));
-
+    let field_names: Vec<_> = selected_fields.db_names().collect();
+    let idents = selected_fields.type_identifiers_with_arities();
     let meta = column_metadata::create(field_names.as_slice(), idents.as_slice());
-    let rq_indexes = related_queries_indexes(&nested, field_names.as_slice());
 
+    let rs_indexes = relation_selection_indexes(selected_fields.relations().collect(), &field_names);
+    // dbg!(&rs_indexes);
     let mut records = ManyRecords::new(field_names.clone());
 
-    let query = query_builder::select::build(query_arguments.clone(), nested.clone(), selected_fields, &[], ctx);
+    let query = query_builder::select::SelectBuilder::default().build(query_arguments.clone(), selected_fields, ctx);
 
     for item in conn.filter(query.into(), meta.as_slice(), ctx).await?.into_iter() {
         let mut record = Record::from(item);
 
         // Coerces json values to prisma values
-        coerce_record_with_join(&mut record, rq_indexes.clone());
+        coerce_record_with_join(&mut record, rs_indexes.clone());
 
         records.push(record)
+    }
+
+    // Reverses order when using negative take
+    if query_arguments.needs_reversed_order() {
+        records.reverse();
     }
 
     Ok(records)
 }
 
 // TODO: find better name
-fn related_queries_indexes<'a>(
-    related_queries: &'a [RelatedQuery],
+fn relation_selection_indexes<'a>(
+    selections: Vec<&'a RelationSelection>,
     field_names: &[String],
-) -> Vec<(usize, &'a RelatedQuery)> {
-    let mut output: Vec<(usize, &RelatedQuery)> = Vec::new();
+) -> Vec<(usize, &'a RelationSelection)> {
+    let mut output: Vec<(usize, &RelationSelection)> = Vec::new();
 
     for (idx, field_name) in field_names.iter().enumerate() {
-        if let Some(rq) = related_queries.iter().find(|rq| rq.name == *field_name) {
-            output.push((idx, rq));
+        if let Some(rs) = selections.iter().find(|rq| rq.field.name() == *field_name) {
+            output.push((idx, rs));
         }
     }
 
     output
 }
 
-pub(crate) async fn get_many_records(
+pub(crate) async fn get_many_records_wo_joins(
     conn: &dyn Queryable,
     model: &Model,
     mut query_arguments: QueryArguments,
     selected_fields: &ModelProjection,
-    nested: Vec<RelatedQuery>,
     aggr_selections: &[RelAggregationSelection],
     ctx: &Context<'_>,
 ) -> crate::Result<ManyRecords> {
@@ -190,7 +217,6 @@ pub(crate) async fn get_many_records(
                 selected_fields.as_columns(ctx).mark_all_selected(),
                 aggr_selections,
                 query_arguments,
-                nested,
                 ctx,
             );
 
