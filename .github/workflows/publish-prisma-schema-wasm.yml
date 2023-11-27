@@ -17,7 +17,6 @@ on:
         required: true
         default: 'latest'
         description: 'npm dist-tag (e.g. latest or integration)'
-  pull_request:
   
 jobs:
   build:
@@ -30,30 +29,27 @@ jobs:
         run: |
           echo $THE_INPUT
 
-      - name: exit
-        run: exit 1
-        
-      # - uses: actions/checkout@v4
-      #   with:
-      #     ref: ${{ github.event.inputs.enginesHash }}
-      # - uses: cachix/install-nix-action@v23
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.inputs.enginesHash }}
+      - uses: cachix/install-nix-action@v23
 
-      # - name: Build
-      #   run: nix build .#prisma-schema-wasm
+      - name: Build
+        run: nix build .#prisma-schema-wasm
 
-      # - uses: actions/setup-node@v4
-      #   with:
-      #     node-version: '20.x'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20.x'
 
-      # # This is needed to be done manually because of `PACKAGE_DIR` used later
-      # - name: Set up NPM token for publishing later
-      #   run: echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}" > ~/.npmrc
+      # This is needed to be done manually because of `PACKAGE_DIR` used later
+      - name: Set up NPM token for publishing later
+        run: echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}" > ~/.npmrc
 
-      # - name: Update version in package.json & Publish @prisma/prisma-schema-wasm
-      #   run: |
-      #     # Update version in package.json and return directory for later usage
-      #     PACKAGE_DIR=$( nix run .#renderPrismaSchemaWasmPackage ${{ github.event.inputs.enginesWrapperVersion }})
-      #     npm publish "$PACKAGE_DIR" --access public --tag ${{ github.event.inputs.npmDistTag }}
+      - name: Update version in package.json & Publish @prisma/prisma-schema-wasm
+        run: |
+          # Update version in package.json and return directory for later usage
+          PACKAGE_DIR=$( nix run .#renderPrismaSchemaWasmPackage ${{ github.event.inputs.enginesWrapperVersion }})
+          npm publish "$PACKAGE_DIR" --access public --tag ${{ github.event.inputs.npmDistTag }}
           
       #
       # Failure handlers
