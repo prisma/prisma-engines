@@ -1,9 +1,10 @@
 use crate::{
     parent_container::ParentContainer, prisma_value_ext::PrismaValueExtensions, CompositeFieldRef, DomainError, Field,
-    ScalarFieldRef, SelectionResult,
+    QueryArguments, RelationField, ScalarField, ScalarFieldRef, SelectionResult, TypeIdentifier,
 };
 use itertools::Itertools;
 use prisma_value::PrismaValue;
+use psl::schema_ast::ast::FieldArity;
 use std::fmt::Display;
 
 /// A selection of fields from a model.
@@ -31,6 +32,7 @@ impl FieldSelection {
                 .and_then(|selection| selection.as_composite())
                 .map(|cs| cs.is_superset_of(other_cs))
                 .unwrap_or(false),
+            SelectedField::Relation(_) => todo!(),
         })
     }
 
@@ -64,6 +66,7 @@ impl FieldSelection {
             .map(|selection| match selection {
                 SelectedField::Scalar(sf) => sf.clone().into(),
                 SelectedField::Composite(cf) => cf.field.clone().into(),
+                SelectedField::Relation(rs) => rs.field.clone().into(),
             })
             .collect()
     }
@@ -76,6 +79,7 @@ impl FieldSelection {
             .filter_map(|selection| match selection {
                 SelectedField::Scalar(sf) => Some(sf.clone()),
                 SelectedField::Composite(_) => None,
+                SelectedField::Relation(_) => None,
             })
             .collect::<Vec<_>>();
 
@@ -139,6 +143,24 @@ impl FieldSelection {
 
         FieldSelection { selections }
     }
+
+    pub fn type_identifiers_with_arities(&self) -> Vec<(TypeIdentifier, FieldArity)> {
+        self.selections()
+            .filter_map(|selection| match selection {
+                SelectedField::Scalar(sf) => Some(sf.type_identifier_with_arity()),
+                SelectedField::Relation(rf) if rf.field.is_list() => Some((TypeIdentifier::Json, FieldArity::Required)),
+                SelectedField::Relation(rf) => Some((TypeIdentifier::Json, rf.field.arity())),
+                SelectedField::Composite(_) => None,
+            })
+            .collect()
+    }
+
+    pub fn relations(&self) -> impl Iterator<Item = &RelationSelection> {
+        self.selections().filter_map(|selection| match selection {
+            SelectedField::Relation(rs) => Some(rs),
+            _ => None,
+        })
+    }
 }
 
 /// A selected field. Can be contained on a model or composite type.
@@ -147,6 +169,30 @@ impl FieldSelection {
 pub enum SelectedField {
     Scalar(ScalarFieldRef),
     Composite(CompositeSelection),
+    Relation(RelationSelection),
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct RelationSelection {
+    pub field: RelationField,
+    pub args: QueryArguments,
+    pub selections: Vec<SelectedField>,
+}
+
+impl RelationSelection {
+    pub fn scalars(&self) -> impl Iterator<Item = &ScalarField> {
+        self.selections.iter().filter_map(|selection| match selection {
+            SelectedField::Scalar(sf) => Some(sf),
+            _ => None,
+        })
+    }
+
+    pub fn relations(&self) -> impl Iterator<Item = &RelationSelection> {
+        self.selections.iter().filter_map(|selection| match selection {
+            SelectedField::Relation(rs) => Some(rs),
+            _ => None,
+        })
+    }
 }
 
 impl SelectedField {
@@ -154,6 +200,7 @@ impl SelectedField {
         match self {
             SelectedField::Scalar(sf) => sf.name(),
             SelectedField::Composite(cf) => cf.field.name(),
+            SelectedField::Relation(rs) => rs.field.name(),
         }
     }
 
@@ -161,6 +208,7 @@ impl SelectedField {
         match self {
             SelectedField::Scalar(sf) => sf.db_name(),
             SelectedField::Composite(cs) => cs.field.db_name(),
+            SelectedField::Relation(rs) => rs.field.name(),
         }
     }
 
@@ -175,6 +223,7 @@ impl SelectedField {
         match self {
             SelectedField::Scalar(sf) => sf.container(),
             SelectedField::Composite(cs) => cs.field.container(),
+            SelectedField::Relation(rs) => ParentContainer::from(rs.field.model()),
         }
     }
 
@@ -183,7 +232,13 @@ impl SelectedField {
         match self {
             SelectedField::Scalar(sf) => value.coerce(&sf.type_identifier()),
             SelectedField::Composite(cs) => cs.coerce_value(value),
+            SelectedField::Relation(_) => todo!(),
         }
+    }
+
+    /// Returns `true` if the selected field is [`Scalar`].
+    pub fn is_scalar(&self) -> bool {
+        matches!(self, Self::Scalar(..))
     }
 }
 
@@ -203,6 +258,7 @@ impl CompositeSelection {
                     .and_then(|selection| selection.as_composite())
                     .map(|cs| cs.is_superset_of(other_cs))
                     .unwrap_or(false),
+                SelectedField::Relation(_) => unreachable!(),
             })
     }
 
@@ -277,6 +333,12 @@ impl Display for SelectedField {
                 "{} {{ {} }}",
                 cs.field,
                 cs.selections.iter().map(|selection| format!("{selection}")).join(", ")
+            ),
+            SelectedField::Relation(rs) => write!(
+                f,
+                "{} {{ {} }}",
+                rs.field,
+                rs.selections.iter().map(|selection| format!("{selection}")).join(", ")
             ),
         }
     }

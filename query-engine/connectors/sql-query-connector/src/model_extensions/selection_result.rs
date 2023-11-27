@@ -36,7 +36,8 @@ impl SelectionResultExt for SelectionResult {
             .iter()
             .map(|(selection, v)| match selection {
                 SelectedField::Scalar(sf) => sf.value(v.clone(), ctx),
-                SelectedField::Composite(_cf) => todo!(), // [Composites] todo
+                SelectedField::Composite(_cf) => todo!(),
+                SelectedField::Relation(_) => todo!(), // [Composites] todo
             })
             .collect()
     }

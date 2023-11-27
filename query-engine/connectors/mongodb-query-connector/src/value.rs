@@ -23,6 +23,7 @@ impl IntoBson for (&SelectedField, PrismaValue) {
         match selection {
             SelectedField::Scalar(sf) => (sf, value).into_bson(),
             SelectedField::Composite(_) => todo!(), // [Composites] todo
+            SelectedField::Relation(_) => unreachable!(),
         }
     }
 }

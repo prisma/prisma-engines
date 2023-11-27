@@ -30,6 +30,7 @@ impl From<&FieldSelection> for ModelProjection {
                 .filter_map(|selected| match selected {
                     SelectedField::Scalar(sf) => Some(sf.clone().into()),
                     SelectedField::Composite(_cf) => None,
+                    SelectedField::Relation(_) => None,
                 })
                 .collect(),
         }
@@ -112,6 +113,7 @@ impl From<&SelectionResult> for ModelProjection {
             .map(|(field_selection, _)| match field_selection {
                 SelectedField::Scalar(sf) => sf.clone().into(),
                 SelectedField::Composite(cf) => cf.field.clone().into(),
+                SelectedField::Relation(_) => todo!(),
             })
             .collect::<Vec<_>>();
 
