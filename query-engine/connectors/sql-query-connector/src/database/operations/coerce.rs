@@ -7,7 +7,8 @@ use crate::query_arguments_ext::QueryArgumentsExt;
 pub(crate) fn coerce_record_with_join(record: &mut Record, rq_indexes: Vec<(usize, &RelationSelection)>) {
     for (val_idx, rs) in rq_indexes {
         let val = record.values.get_mut(val_idx).unwrap();
-        let json_val: serde_json::Value = serde_json::from_str(&val.as_json().unwrap()).unwrap();
+        // TODO(perf): Find ways to avoid serializing and deserializing multiple times.
+        let json_val: serde_json::Value = serde_json::from_str(val.as_json().unwrap()).unwrap();
 
         *val = coerce_json_relation_to_pv(json_val, rs);
     }

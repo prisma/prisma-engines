@@ -159,9 +159,7 @@ impl OrderByBuilder {
         for (i, hop) in rest_hops.iter().enumerate() {
             let previous_join = if i > 0 { joins.get(i - 1) } else { None };
 
-            let previous_alias = previous_join
-                .map(|j| j.alias.as_str())
-                .or_else(|| parent_alias.as_deref());
+            let previous_alias = previous_join.map(|j| j.alias.as_str()).or(parent_alias.as_deref());
             let join = compute_one2m_join(hop.as_relation_hop().unwrap(), &self.join_prefix(), previous_alias, ctx);
 
             joins.push(join);
@@ -172,10 +170,7 @@ impl OrderByBuilder {
             _ => unreachable!("Order by relation aggregation other than count are not supported"),
         };
 
-        let previous_alias = joins
-            .last()
-            .map(|j| j.alias.as_str())
-            .or_else(|| parent_alias.as_deref());
+        let previous_alias = joins.last().map(|j| j.alias.as_str()).or(parent_alias.as_deref());
 
         // We perform the aggregation on the last join
         let last_aggr_join = compute_aggr_join(

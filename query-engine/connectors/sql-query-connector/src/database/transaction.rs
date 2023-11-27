@@ -101,7 +101,7 @@ impl<'tx> ReadOperations for SqlConnectorTransaction<'tx> {
                 self.inner.as_queryable(),
                 model,
                 query_arguments,
-                &selected_fields,
+                selected_fields,
                 aggr_selections,
                 relation_load_strategy,
                 &ctx,
