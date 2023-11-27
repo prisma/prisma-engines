@@ -172,7 +172,10 @@ impl OrderByBuilder {
             _ => unreachable!("Order by relation aggregation other than count are not supported"),
         };
 
-        let previous_alias = joins.last().map(|j| j.alias.as_str());
+        let previous_alias = joins
+            .last()
+            .map(|j| j.alias.as_str())
+            .or_else(|| parent_alias.as_deref());
 
         // We perform the aggregation on the last join
         let last_aggr_join = compute_aggr_join(
