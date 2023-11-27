@@ -58,6 +58,6 @@ jobs:
         if: ${{ failure() }}
         uses: rtCamp/action-slack-notify@v2.2.1
         env:
-          SLACK_TITLE: 'Build and publish prisma-schema-wasm failed :x:'
+          SLACK_TITLE: 'Building and publishing prisma-schema-wasm failed :x:'
           SLACK_COLOR: '#FF0000'
           SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK_WASM_FAILING }}
