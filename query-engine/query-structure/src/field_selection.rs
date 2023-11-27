@@ -176,6 +176,9 @@ pub enum SelectedField {
 pub struct RelationSelection {
     pub field: RelationField,
     pub args: QueryArguments,
+    /// Field names that will eventually be serialized
+    pub result_fields: Vec<String>,
+    // Fields that will be queried by the connectors
     pub selections: Vec<SelectedField>,
 }
 

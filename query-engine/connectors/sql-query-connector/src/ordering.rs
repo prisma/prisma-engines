@@ -76,7 +76,11 @@ impl OrderByBuilder {
         needs_reversed_order: bool,
         ctx: &Context<'_>,
     ) -> OrderByDefinition {
-        let columns: Vec<Expression> = order_by.fields.iter().map(|sf| sf.as_column(ctx).into()).collect();
+        let columns: Vec<Expression> = order_by
+            .fields
+            .iter()
+            .map(|sf| sf.as_column(ctx).opt_table(self.parent_alias.clone()).into())
+            .collect();
         let order_column: Expression = text_search_relevance(&columns, order_by.search.clone()).into();
         let order: Option<Order> = Some(into_order(&order_by.sort_order, None, needs_reversed_order));
         let order_definition: OrderDefinition = (order_column.clone(), order);
