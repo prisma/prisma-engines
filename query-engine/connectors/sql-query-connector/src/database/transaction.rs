@@ -1,14 +1,14 @@
 use super::catch;
 use crate::{database::operations::*, Context, SqlError};
 use async_trait::async_trait;
-use connector::{ConnectionLike, RelAggregationSelection, RelatedQuery};
+use connector::{ConnectionLike, RelAggregationSelection};
 use connector_interface::{
     self as connector, AggregationRow, AggregationSelection, ReadOperations, RecordFilter, Transaction, WriteArgs,
     WriteOperations,
 };
 use prisma_value::PrismaValue;
 use quaint::prelude::ConnectionInfo;
-use query_structure::{prelude::*, Filter, QueryArguments, SelectionResult};
+use query_structure::{prelude::*, Filter, QueryArguments, RelationLoadStrategy, SelectionResult};
 use std::collections::HashMap;
 
 pub struct SqlConnectorTransaction<'tx> {
@@ -91,8 +91,8 @@ impl<'tx> ReadOperations for SqlConnectorTransaction<'tx> {
         model: &Model,
         query_arguments: QueryArguments,
         selected_fields: &FieldSelection,
-        nested: Vec<RelatedQuery>,
         aggr_selections: &[RelAggregationSelection],
+        relation_load_strategy: RelationLoadStrategy,
         trace_id: Option<String>,
     ) -> connector::Result<ManyRecords> {
         catch(self.connection_info.clone(), async move {
@@ -101,9 +101,9 @@ impl<'tx> ReadOperations for SqlConnectorTransaction<'tx> {
                 self.inner.as_queryable(),
                 model,
                 query_arguments,
-                &selected_fields.into(),
-                nested,
+                &selected_fields,
                 aggr_selections,
+                relation_load_strategy,
                 &ctx,
             )
             .await

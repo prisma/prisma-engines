@@ -12,7 +12,7 @@ use crate::*;
 /// A query argument struct is always valid over a single model only, meaning that all
 /// data referenced in a single query argument instance is always refering to data of
 /// a single model (e.g. the cursor projection, distinct projection, orderby, ...).
-#[derive(Clone)]
+#[derive(Clone, PartialEq, Eq, Hash)]
 pub struct QueryArguments {
     pub model: Model,
     pub cursor: Option<SelectionResult>,
@@ -23,6 +23,12 @@ pub struct QueryArguments {
     pub distinct: Option<FieldSelection>,
     pub ignore_skip: bool,
     pub ignore_take: bool,
+}
+
+#[derive(Debug, Copy, Clone, PartialEq, Eq, Hash)]
+pub enum RelationLoadStrategy {
+    Join,
+    Query,
 }
 
 impl std::fmt::Debug for QueryArguments {

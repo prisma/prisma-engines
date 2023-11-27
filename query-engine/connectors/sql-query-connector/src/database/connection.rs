@@ -3,18 +3,17 @@
 use super::{catch, transaction::SqlConnectorTransaction};
 use crate::{database::operations::*, Context, SqlError};
 use async_trait::async_trait;
-use connector::{ConnectionLike, RelAggregationSelection, RelatedQuery};
+use connector::{ConnectionLike, RelAggregationSelection};
 use connector_interface::{
     self as connector, AggregationRow, AggregationSelection, Connection, ReadOperations, RecordFilter, Transaction,
     WriteArgs, WriteOperations,
 };
 use prisma_value::PrismaValue;
-use psl::PreviewFeature;
 use quaint::{
     connector::{IsolationLevel, TransactionCapable},
     prelude::{ConnectionInfo, Queryable},
 };
-use query_structure::{prelude::*, Filter, QueryArguments, SelectionResult};
+use query_structure::{prelude::*, Filter, QueryArguments, RelationLoadStrategy, SelectionResult};
 use std::{collections::HashMap, str::FromStr};
 
 pub(crate) struct SqlConnection<C> {
@@ -111,36 +110,23 @@ where
         model: &Model,
         query_arguments: QueryArguments,
         selected_fields: &FieldSelection,
-        nested: Vec<RelatedQuery>,
         aggr_selections: &[RelAggregationSelection],
+        relation_load_strategy: RelationLoadStrategy,
         trace_id: Option<String>,
     ) -> connector::Result<ManyRecords> {
         catch(self.connection_info.clone(), async move {
             let ctx = Context::new(&self.connection_info, trace_id.as_deref());
 
-            if self.features.contains(PreviewFeature::RelationJoins) {
-                read::get_many_records_joins(
-                    &self.inner,
-                    model,
-                    query_arguments,
-                    &selected_fields.into(),
-                    nested,
-                    aggr_selections,
-                    &ctx,
-                )
-                .await
-            } else {
-                read::get_many_records(
-                    &self.inner,
-                    model,
-                    query_arguments,
-                    &selected_fields.into(),
-                    nested,
-                    aggr_selections,
-                    &ctx,
-                )
-                .await
-            }
+            read::get_many_records(
+                &self.inner,
+                model,
+                query_arguments,
+                selected_fields,
+                aggr_selections,
+                relation_load_strategy,
+                &ctx,
+            )
+            .await
         })
         .await
     }

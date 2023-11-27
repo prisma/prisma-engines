@@ -3,7 +3,7 @@ use super::FilteredQuery;
 use crate::ToGraphviz;
 use connector::{AggregationSelection, RelAggregationSelection};
 use enumflags2::BitFlags;
-use query_structure::{prelude::*, Filter, QueryArguments};
+use query_structure::{prelude::*, Filter, QueryArguments, RelationLoadStrategy};
 use std::fmt::Display;
 
 #[allow(clippy::enum_variant_names)]
@@ -56,19 +56,20 @@ impl ReadQuery {
         }
     }
 
-    pub(crate) fn into_related_records_query(self) -> Option<RelatedRecordsQuery> {
-        if let Self::RelatedRecordsQuery(v) = self {
-            Some(v)
-        } else {
-            None
-        }
-    }
-
     pub(crate) fn has_cursor(&self) -> bool {
         match self {
             ReadQuery::RecordQuery(_) => false,
             ReadQuery::ManyRecordsQuery(q) => q.args.cursor.is_some() || q.nested.iter().any(|q| q.has_cursor()),
             ReadQuery::RelatedRecordsQuery(q) => q.args.cursor.is_some() || q.nested.iter().any(|q| q.has_cursor()),
+            ReadQuery::AggregateRecordsQuery(_) => false,
+        }
+    }
+
+    pub(crate) fn has_distinct(&self) -> bool {
+        match self {
+            ReadQuery::RecordQuery(_) => false,
+            ReadQuery::ManyRecordsQuery(q) => q.args.distinct.is_some() || q.nested.iter().any(|q| q.has_cursor()),
+            ReadQuery::RelatedRecordsQuery(q) => q.args.distinct.is_some() || q.nested.iter().any(|q| q.has_cursor()),
             ReadQuery::AggregateRecordsQuery(_) => false,
         }
     }
@@ -202,6 +203,7 @@ pub struct ManyRecordsQuery {
     pub selection_order: Vec<String>,
     pub aggregation_selections: Vec<RelAggregationSelection>,
     pub options: QueryOptions,
+    pub relation_load_strategy: RelationLoadStrategy,
 }
 
 #[derive(Debug, Clone)]
@@ -218,6 +220,16 @@ pub struct RelatedRecordsQuery {
     /// Fields and values of the parent to satisfy the relation query without
     /// relying on the parent result passed by the interpreter.
     pub parent_results: Option<Vec<SelectionResult>>,
+}
+
+impl RelatedRecordsQuery {
+    pub fn has_cursor(&self) -> bool {
+        self.args.cursor.is_some() || self.nested.iter().any(|q| q.has_cursor())
+    }
+
+    pub fn has_distinct(&self) -> bool {
+        self.args.distinct.is_some() || self.nested.iter().any(|q| q.has_distinct())
+    }
 }
 
 #[derive(Debug, Clone)]

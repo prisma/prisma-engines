@@ -4,11 +4,11 @@ use crate::{
     root_queries::{aggregate, read, write},
 };
 use connector_interface::{
-    ConnectionLike, ReadOperations, RelAggregationSelection, RelatedQuery, Transaction, UpdateType, WriteOperations,
+    ConnectionLike, ReadOperations, RelAggregationSelection, Transaction, UpdateType, WriteOperations,
 };
 use mongodb::options::{Acknowledgment, ReadConcern, TransactionOptions, WriteConcern};
 use query_engine_metrics::{decrement_gauge, increment_gauge, metrics, PRISMA_CLIENT_QUERIES_ACTIVE};
-use query_structure::SelectionResult;
+use query_structure::{RelationLoadStrategy, SelectionResult};
 use std::collections::HashMap;
 
 pub struct MongoDbTransaction<'conn> {
@@ -276,8 +276,8 @@ impl<'conn> ReadOperations for MongoDbTransaction<'conn> {
         model: &Model,
         query_arguments: query_structure::QueryArguments,
         selected_fields: &FieldSelection,
-        _nested: Vec<RelatedQuery>,
         aggregation_selections: &[RelAggregationSelection],
+        _relation_load_strategy: RelationLoadStrategy,
         _trace_id: Option<String>,
     ) -> connector_interface::Result<ManyRecords> {
         catch(async move {
