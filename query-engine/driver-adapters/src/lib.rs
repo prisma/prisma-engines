@@ -27,14 +27,42 @@ pub use wasm::*;
 
 #[cfg(target_arch = "wasm32")]
 mod arch {
+    use crate::JsObjectExtern as JsObject;
+    pub(crate) use js_sys::JsString;
     use wasm_bindgen::JsValue;
+
+    pub(crate) fn get_named_property<T>(object: &JsObject, name: &str) -> JsResult<T>
+    where
+        T: From<JsValue>,
+    {
+        // object.get("queryRaw".into())?
+        Ok(object.get(name.into())?.into())
+    }
+
+    pub(crate) fn to_rust_str(value: JsString) -> JsResult<String> {
+        Ok(value.into())
+    }
 
     pub(crate) type JsResult<T> = core::result::Result<T, JsValue>;
 }
 
 #[cfg(not(target_arch = "wasm32"))]
 mod arch {
+    use napi::bindgen_prelude::FromNapiValue;
+    pub(crate) use napi::{JsObject, JsString};
+
+    pub(crate) fn get_named_property<T>(object: &JsObject, name: &str) -> JsResult<T>
+    where
+        T: FromNapiValue,
+    {
+        object.get_named_property(name).into()
+    }
+
+    pub(crate) fn to_rust_str(value: JsString) -> JsResult<String> {
+        Ok(value.into_utf8()?.as_str()?.to_string())
+    }
+
     pub(crate) type JsResult<T> = napi::Result<T>;
 }
 
-pub(crate) use arch::JsResult;
+pub(crate) use arch::*;

@@ -1,10 +1,9 @@
 pub use crate::types::{ColumnType, JSResultSet, Query, TransactionOptions};
-use crate::JsResult;
+use crate::{get_named_property, to_rust_str, JsObject, JsResult, JsString};
 
 use super::async_js_function::AsyncJsFunction;
 use super::transaction::JsTransaction;
 use metrics::increment_gauge;
-use napi::{JsObject, JsString};
 use std::sync::atomic::{AtomicBool, Ordering};
 
 /// Proxy is a struct wrapping a javascript object that exhibits basic primitives for
@@ -45,12 +44,12 @@ pub(crate) struct TransactionProxy {
 
 impl CommonProxy {
     pub fn new(object: &JsObject) -> JsResult<Self> {
-        let flavour: JsString = object.get_named_property("flavour")?;
+        let flavour: JsString = get_named_property(object, "flavour")?;
 
         Ok(Self {
-            query_raw: object.get_named_property("queryRaw")?,
-            execute_raw: object.get_named_property("executeRaw")?,
-            flavour: flavour.into_utf8()?.as_str()?.to_owned(),
+            query_raw: get_named_property(object, "queryRaw")?,
+            execute_raw: get_named_property(object, "executeRaw")?,
+            flavour: to_rust_str(flavour)?,
         })
     }
 
@@ -66,7 +65,7 @@ impl CommonProxy {
 impl DriverProxy {
     pub fn new(driver_adapter: &JsObject) -> JsResult<Self> {
         Ok(Self {
-            start_transaction: driver_adapter.get_named_property("startTransaction")?,
+            start_transaction: get_named_property(driver_adapter, "startTransaction")?,
         })
     }
 
@@ -84,9 +83,9 @@ impl DriverProxy {
 
 impl TransactionProxy {
     pub fn new(js_transaction: &JsObject) -> JsResult<Self> {
-        let commit = js_transaction.get_named_property("commit")?;
-        let rollback = js_transaction.get_named_property("rollback")?;
-        let options = js_transaction.get_named_property("options")?;
+        let commit = get_named_property(js_transaction, "commit")?;
+        let rollback = get_named_property(js_transaction, "rollback")?;
+        let options = get_named_property(js_transaction, "options")?;
         let closed = AtomicBool::new(false);
 
         Ok(Self {

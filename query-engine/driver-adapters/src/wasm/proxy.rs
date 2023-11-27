@@ -1,7 +1,7 @@
 use crate::send_future::SendFuture;
 pub use crate::types::{ColumnType, JSResultSet, Query, TransactionOptions};
 use crate::JsObjectExtern;
-use crate::JsResult;
+use crate::{get_named_property, to_rust_str, JsResult};
 
 use super::{async_js_function::AsyncJsFunction, transaction::JsTransaction};
 use futures::Future;
@@ -53,12 +53,13 @@ pub(crate) struct TransactionProxy {
 
 impl CommonProxy {
     pub fn new(object: &JsObjectExtern) -> JsResult<Self> {
-        let flavour: String = JsString::from(object.get("flavour".into())?).into();
+        let flavour: JsString = get_named_property(object, "flavour")?;
 
         Ok(Self {
+            // TODO: remove the need for `JsFunction::from` (?)
             query_raw: JsFunction::from(object.get("queryRaw".into())?).into(),
             execute_raw: JsFunction::from(object.get("executeRaw".into())?).into(),
-            flavour,
+            flavour: to_rust_str(flavour)?,
         })
     }
 
