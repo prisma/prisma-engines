@@ -22,6 +22,16 @@ where
     _phantom_return: PhantomData<ReturnType>,
 }
 
+impl<T, R> From<JsValue> for AsyncJsFunction<T, R>
+where
+    T: Serialize,
+    R: FromJsValue,
+{
+    fn from(js_value: JsValue) -> Self {
+        JsFunction::from(js_value).into()
+    }
+}
+
 impl<T, R> From<JsFunction> for AsyncJsFunction<T, R>
 where
     T: Serialize,

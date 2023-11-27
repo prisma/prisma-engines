@@ -27,8 +27,9 @@ pub use wasm::*;
 
 #[cfg(target_arch = "wasm32")]
 mod arch {
-    use crate::JsObjectExtern as JsObject;
+    pub(crate) use crate::JsObjectExtern as JsObject;
     pub(crate) use js_sys::JsString;
+    use tsify::Tsify;
     use wasm_bindgen::JsValue;
 
     pub(crate) fn get_named_property<T>(object: &JsObject, name: &str) -> JsResult<T>
@@ -41,6 +42,13 @@ mod arch {
 
     pub(crate) fn to_rust_str(value: JsString) -> JsResult<String> {
         Ok(value.into())
+    }
+
+    pub(crate) fn from_js<C>(value: JsValue) -> C
+    where
+        C: Tsify + serde::de::DeserializeOwned,
+    {
+        C::from_js(value).unwrap()
     }
 
     pub(crate) type JsResult<T> = core::result::Result<T, JsValue>;
@@ -60,6 +68,10 @@ mod arch {
 
     pub(crate) fn to_rust_str(value: JsString) -> JsResult<String> {
         Ok(value.into_utf8()?.as_str()?.to_string())
+    }
+
+    pub(crate) fn from_js<C>(value: C) -> C {
+        value
     }
 
     pub(crate) type JsResult<T> = napi::Result<T>;

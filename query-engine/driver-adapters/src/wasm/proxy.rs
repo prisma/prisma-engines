@@ -1,14 +1,11 @@
 use crate::send_future::SendFuture;
 pub use crate::types::{ColumnType, JSResultSet, Query, TransactionOptions};
-use crate::JsObjectExtern;
-use crate::{get_named_property, to_rust_str, JsResult};
+use crate::{from_js, get_named_property, to_rust_str, JsObject, JsResult, JsString};
 
 use super::{async_js_function::AsyncJsFunction, transaction::JsTransaction};
 use futures::Future;
-use js_sys::{Function as JsFunction, JsString};
 use metrics::increment_gauge;
 use std::sync::atomic::{AtomicBool, Ordering};
-use tsify::Tsify;
 use wasm_bindgen::prelude::wasm_bindgen;
 
 /// Proxy is a struct wrapping a javascript object that exhibits basic primitives for
@@ -52,13 +49,12 @@ pub(crate) struct TransactionProxy {
 }
 
 impl CommonProxy {
-    pub fn new(object: &JsObjectExtern) -> JsResult<Self> {
+    pub fn new(object: &JsObject) -> JsResult<Self> {
         let flavour: JsString = get_named_property(object, "flavour")?;
 
         Ok(Self {
-            // TODO: remove the need for `JsFunction::from` (?)
-            query_raw: JsFunction::from(object.get("queryRaw".into())?).into(),
-            execute_raw: JsFunction::from(object.get("executeRaw".into())?).into(),
+            query_raw: get_named_property(object, "queryRaw")?,
+            execute_raw: get_named_property(object, "executeRaw")?,
             flavour: to_rust_str(flavour)?,
         })
     }
@@ -73,9 +69,9 @@ impl CommonProxy {
 }
 
 impl DriverProxy {
-    pub fn new(object: &JsObjectExtern) -> JsResult<Self> {
+    pub fn new(object: &JsObject) -> JsResult<Self> {
         Ok(Self {
-            start_transaction: JsFunction::from(object.get("startTransaction".into())?).into(),
+            start_transaction: get_named_property(object, "startTransaction")?,
         })
     }
 
@@ -98,15 +94,17 @@ impl DriverProxy {
 }
 
 impl TransactionProxy {
-    pub fn new(object: &JsObjectExtern) -> JsResult<Self> {
-        let options = object.get("options".into())?;
-        let closed = AtomicBool::new(false);
+    pub fn new(js_transaction: &JsObject) -> JsResult<Self> {
+        let commit = get_named_property(js_transaction, "commit")?;
+        let rollback = get_named_property(js_transaction, "rollback")?;
+        let options = get_named_property(js_transaction, "options")?;
+        let options = from_js::<TransactionOptions>(options);
 
         Ok(Self {
-            options: TransactionOptions::from_js(options).unwrap(),
-            commit: JsFunction::from(object.get("commit".into())?).into(),
-            rollback: JsFunction::from(object.get("rollback".into())?).into(),
-            closed,
+            commit,
+            rollback,
+            options,
+            closed: AtomicBool::new(false),
         })
     }
 

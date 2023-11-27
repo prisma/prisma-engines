@@ -1,5 +1,5 @@
 pub use crate::types::{ColumnType, JSResultSet, Query, TransactionOptions};
-use crate::{get_named_property, to_rust_str, JsObject, JsResult, JsString};
+use crate::{from_js, get_named_property, to_rust_str, JsObject, JsResult, JsString};
 
 use super::async_js_function::AsyncJsFunction;
 use super::transaction::JsTransaction;
@@ -86,13 +86,13 @@ impl TransactionProxy {
         let commit = get_named_property(js_transaction, "commit")?;
         let rollback = get_named_property(js_transaction, "rollback")?;
         let options = get_named_property(js_transaction, "options")?;
-        let closed = AtomicBool::new(false);
+        let options = from_js::<TransactionOptions>(options);
 
         Ok(Self {
             commit,
             rollback,
             options,
-            closed,
+            closed: AtomicBool::new(false),
         })
     }
 

@@ -13,7 +13,16 @@ OUT_NPM_NAME="@prisma/query-engine-wasm"
 # This little `sed -i` trick below is a hack to publish "@prisma/query-engine-wasm"
 # with the same binding filenames currently expected by the Prisma Client.
 sed -i '' 's/name = "query_engine_wasm"/name = "query_engine"/g' Cargo.toml
-wasm-pack build --dev --target $OUT_TARGET
+
+# use `wasm-pack build --release` on CI only
+if [[ -z "$BUILDKITE" ]] || [[ -z "$GITHUB_ACTIONS" ]]; then
+    BUILD_PROFILE="--release"
+else
+    BUILD_PROFILE="--dev"
+fi
+
+wasm-pack build $BUILD_PROFILE --target $OUT_TARGET
+
 sed -i '' 's/name = "query_engine"/name = "query_engine_wasm"/g' Cargo.toml
 
 sleep 1
