@@ -127,7 +127,6 @@
 <a href="#127" id="127">127</a>
 <a href="#128" id="128">128</a>
 <a href="#129" id="129">129</a>
-<a href="#130" id="130">130</a>
 </pre></div><pre class="rust"><code><span class="kw">mod </span>read;
 <span class="kw">mod </span>write;
 
@@ -135,8 +134,7 @@
 <span class="kw">pub use </span>write::<span class="kw-2">*</span>;
 
 <span class="kw">use </span><span class="kw">crate</span>::ToGraphviz;
-<span class="kw">use </span>connector::filter::Filter;
-<span class="kw">use </span>prisma_models::{FieldSelection, Model, SelectionResult};
+<span class="kw">use </span>query_structure::{FieldSelection, Filter, Model, SelectionResult};
 
 <span class="attr">#[derive(Debug, Clone)]
 #[allow(clippy::large_enum_variant)]

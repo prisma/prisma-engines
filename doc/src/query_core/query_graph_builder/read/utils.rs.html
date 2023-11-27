@@ -192,7 +192,7 @@
 </pre></div><pre class="rust"><code><span class="kw">use super</span>::<span class="kw-2">*</span>;
 <span class="kw">use crate</span>::{ArgumentListLookup, FieldPair, ParsedField, ReadQuery};
 <span class="kw">use </span>connector::RelAggregationSelection;
-<span class="kw">use </span>prisma_models::prelude::<span class="kw-2">*</span>;
+<span class="kw">use </span>query_structure::prelude::<span class="kw-2">*</span>;
 <span class="kw">use </span>schema::constants::{aggregations::<span class="kw-2">*</span>, args};
 
 <span class="kw">pub fn </span>collect_selection_order(from: <span class="kw-2">&amp;</span>[FieldPair&lt;<span class="lifetime">&#39;_</span>&gt;]) -&gt; Vec&lt;String&gt; {

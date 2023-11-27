@@ -432,8 +432,8 @@
 </pre></div><pre class="rust"><code><span class="doccomment">//! Write query AST
 </span><span class="kw">use super</span>::{FilteredNestedMutation, FilteredQuery};
 <span class="kw">use crate</span>::{RecordQuery, ToGraphviz};
-<span class="kw">use </span>connector::{filter::Filter, DatasourceFieldName, NativeUpsert, RecordFilter, WriteArgs};
-<span class="kw">use </span>prisma_models::prelude::<span class="kw-2">*</span>;
+<span class="kw">use </span>connector::{DatasourceFieldName, NativeUpsert, RecordFilter, WriteArgs};
+<span class="kw">use </span>query_structure::{prelude::<span class="kw-2">*</span>, Filter};
 <span class="kw">use </span>std::collections::HashMap;
 
 <span class="attr">#[derive(Debug, Clone)]

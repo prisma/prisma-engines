@@ -1112,23 +1112,9 @@
 <a href="#1112" id="1112">1112</a>
 <a href="#1113" id="1113">1113</a>
 <a href="#1114" id="1114">1114</a>
-<a href="#1115" id="1115">1115</a>
-<a href="#1116" id="1116">1116</a>
-<a href="#1117" id="1117">1117</a>
-<a href="#1118" id="1118">1118</a>
-<a href="#1119" id="1119">1119</a>
-<a href="#1120" id="1120">1120</a>
-<a href="#1121" id="1121">1121</a>
-<a href="#1122" id="1122">1122</a>
-<a href="#1123" id="1123">1123</a>
 </pre></div><pre class="rust"><code><span class="kw">use crate</span>::{constants::group_by, error::MongoError, join::JoinStage, query_builder::AggregationType, IntoBson};
-<span class="kw">use </span>connector_interface::{
-    AggregationFilter, CompositeCondition, CompositeFilter, ConditionListValue, ConditionValue, Filter,
-    OneRelationIsNullFilter, QueryMode, RelationFilter, ScalarCompare, ScalarCondition, ScalarFilter, ScalarListFilter,
-    ScalarProjection,
-};
 <span class="kw">use </span>mongodb::bson::{doc, Bson, Document};
-<span class="kw">use </span>prisma_models::{CompositeFieldRef, PrismaValue, ScalarFieldRef, TypeIdentifier};
+<span class="kw">use </span>query_structure::<span class="kw-2">*</span>;
 
 <span class="attr">#[derive(Debug, Clone)]
 </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">enum </span>MongoFilter {
@@ -1255,9 +1241,9 @@
 
     <span class="kw">fn </span>visit_scalar_filter(<span class="kw-2">&amp;</span><span class="self">self</span>, filter: ScalarFilter) -&gt; <span class="kw">crate</span>::Result&lt;MongoFilter&gt; {
         <span class="kw">let </span>field = <span class="kw">match </span>filter.projection {
-            connector_interface::ScalarProjection::Single(sf) =&gt; sf,
-            connector_interface::ScalarProjection::Compound(<span class="kw-2">mut </span>c) <span class="kw">if </span>c.len() == <span class="number">1 </span>=&gt; c.pop().unwrap(),
-            connector_interface::ScalarProjection::Compound(<span class="kw">_</span>) =&gt; {
+            ScalarProjection::Single(sf) =&gt; sf,
+            ScalarProjection::Compound(<span class="kw-2">mut </span>c) <span class="kw">if </span>c.len() == <span class="number">1 </span>=&gt; c.pop().unwrap(),
+            ScalarProjection::Compound(<span class="kw">_</span>) =&gt; {
                 <span class="macro">unreachable!</span>(
                     <span class="string">&quot;Multi-field compound filter case hit when it should have been folded into normal filters previously.&quot;
                 </span>)
@@ -1540,7 +1526,7 @@
         <span class="kw">let </span>field_ref = filter.as_field_ref().cloned();
 
         <span class="kw">let </span>filter_doc = <span class="kw">match </span>filter.condition {
-            connector_interface::ScalarListCondition::Contains(val) =&gt; {
+            ScalarListCondition::Contains(val) =&gt; {
                 <span class="kw">let </span>bson = <span class="kw">match </span>val {
                     ConditionValue::Value(value) =&gt; (field, value).into_bson()<span class="question-mark">?</span>,
                     ConditionValue::FieldRef(field_ref) =&gt; <span class="self">self</span>.prefixed_field_ref(<span class="kw-2">&amp;</span>field_ref)<span class="question-mark">?</span>,
@@ -1549,11 +1535,11 @@
                 <span class="macro">doc! </span>{ <span class="string">&quot;$in&quot;</span>: [bson, coerce_as_array(<span class="kw-2">&amp;</span>field_name)] }
             }
 
-            connector_interface::ScalarListCondition::ContainsEvery(vals) <span class="kw">if </span>vals.is_empty() =&gt; {
+            ScalarListCondition::ContainsEvery(vals) <span class="kw">if </span>vals.is_empty() =&gt; {
                 <span class="comment">// Empty hasEvery: Return all records.
                 </span>render_stub_condition(<span class="bool-val">true</span>)
             }
-            connector_interface::ScalarListCondition::ContainsEvery(ConditionListValue::List(vals)) =&gt; {
+            ScalarListCondition::ContainsEvery(ConditionListValue::List(vals)) =&gt; {
                 <span class="kw">let </span>ins = vals
                     .into_iter()
                     .map(|val| {
@@ -1565,20 +1551,18 @@
 
                 <span class="macro">doc! </span>{ <span class="string">&quot;$and&quot;</span>: ins }
             }
-            connector_interface::ScalarListCondition::ContainsEvery(ConditionListValue::FieldRef(field_ref)) =&gt; {
-                render_every(
-                    <span class="kw-2">&amp;</span>field_name,
-                    <span class="string">&quot;elem&quot;</span>,
-                    <span class="macro">doc! </span>{ <span class="string">&quot;$in&quot;</span>: [<span class="string">&quot;$$elem&quot;</span>, coerce_as_array((<span class="self">self</span>.prefix(), <span class="kw-2">&amp;</span>field_ref).into_bson()<span class="question-mark">?</span>)] },
-                    <span class="bool-val">true</span>,
-                )
-            }
+            ScalarListCondition::ContainsEvery(ConditionListValue::FieldRef(field_ref)) =&gt; render_every(
+                <span class="kw-2">&amp;</span>field_name,
+                <span class="string">&quot;elem&quot;</span>,
+                <span class="macro">doc! </span>{ <span class="string">&quot;$in&quot;</span>: [<span class="string">&quot;$$elem&quot;</span>, coerce_as_array((<span class="self">self</span>.prefix(), <span class="kw-2">&amp;</span>field_ref).into_bson()<span class="question-mark">?</span>)] },
+                <span class="bool-val">true</span>,
+            ),
 
-            connector_interface::ScalarListCondition::ContainsSome(vals) <span class="kw">if </span>vals.is_empty() =&gt; {
+            ScalarListCondition::ContainsSome(vals) <span class="kw">if </span>vals.is_empty() =&gt; {
                 <span class="comment">// Empty hasSome: Return no records.
                 </span>render_stub_condition(<span class="bool-val">false</span>)
             }
-            connector_interface::ScalarListCondition::ContainsSome(ConditionListValue::List(vals)) =&gt; {
+            ScalarListCondition::ContainsSome(ConditionListValue::List(vals)) =&gt; {
                 <span class="kw">let </span>ins = vals
                     .into_iter()
                     .map(|val| {
@@ -1590,19 +1574,17 @@
 
                 <span class="macro">doc! </span>{ <span class="string">&quot;$or&quot;</span>: ins }
             }
-            connector_interface::ScalarListCondition::ContainsSome(ConditionListValue::FieldRef(field_ref)) =&gt; {
-                render_some(
-                    <span class="kw-2">&amp;</span>field_name,
-                    <span class="string">&quot;elem&quot;</span>,
-                    <span class="macro">doc! </span>{ <span class="string">&quot;$in&quot;</span>: [<span class="string">&quot;$$elem&quot;</span>, coerce_as_array((<span class="self">self</span>.prefix(), <span class="kw-2">&amp;</span>field_ref).into_bson()<span class="question-mark">?</span>)] },
-                    <span class="bool-val">true</span>,
-                )
-            }
+            ScalarListCondition::ContainsSome(ConditionListValue::FieldRef(field_ref)) =&gt; render_some(
+                <span class="kw-2">&amp;</span>field_name,
+                <span class="string">&quot;elem&quot;</span>,
+                <span class="macro">doc! </span>{ <span class="string">&quot;$in&quot;</span>: [<span class="string">&quot;$$elem&quot;</span>, coerce_as_array((<span class="self">self</span>.prefix(), <span class="kw-2">&amp;</span>field_ref).into_bson()<span class="question-mark">?</span>)] },
+                <span class="bool-val">true</span>,
+            ),
 
-            connector_interface::ScalarListCondition::IsEmpty(<span class="bool-val">true</span>) =&gt; {
+            ScalarListCondition::IsEmpty(<span class="bool-val">true</span>) =&gt; {
                 <span class="macro">doc! </span>{ <span class="string">&quot;$eq&quot;</span>: [render_size(<span class="kw-2">&amp;</span>field_name, <span class="bool-val">true</span>), <span class="number">0</span>] }
             }
-            connector_interface::ScalarListCondition::IsEmpty(<span class="bool-val">false</span>) =&gt; {
+            ScalarListCondition::IsEmpty(<span class="bool-val">false</span>) =&gt; {
                 <span class="macro">doc! </span>{ <span class="string">&quot;$gt&quot;</span>: [render_size(<span class="kw-2">&amp;</span>field_name, <span class="bool-val">true</span>), <span class="number">0</span>] }
             }
         };
@@ -1776,21 +1758,21 @@
         <span class="kw">let </span><span class="kw-2">mut </span>join_stage = JoinStage::new(from_field);
 
         <span class="kw">let </span>filter_doc = <span class="kw">match </span>filter.condition {
-            connector_interface::RelationCondition::EveryRelatedRecord =&gt; {
+            RelationCondition::EveryRelatedRecord =&gt; {
                 <span class="kw">let </span>(every, nested_joins) = render_every_from_filter(<span class="kw-2">&amp;</span>field_name, nested_filter, <span class="bool-val">false</span>, <span class="bool-val">false</span>)<span class="question-mark">?</span>;
 
                 join_stage.extend_nested(nested_joins);
 
                 every
             }
-            connector_interface::RelationCondition::AtLeastOneRelatedRecord =&gt; {
+            RelationCondition::AtLeastOneRelatedRecord =&gt; {
                 <span class="kw">let </span>(some, nested_joins) = render_some_from_filter(<span class="kw-2">&amp;</span>field_name, nested_filter, <span class="bool-val">false</span>, <span class="bool-val">false</span>)<span class="question-mark">?</span>;
 
                 join_stage.extend_nested(nested_joins);
 
                 some
             }
-            connector_interface::RelationCondition::NoRelatedRecord <span class="kw">if </span>is_to_one =&gt; {
+            RelationCondition::NoRelatedRecord <span class="kw">if </span>is_to_one =&gt; {
                 <span class="kw">if </span>is_empty_filter {
                     <span class="comment">// Doesn&#39;t need coercing the array since joins always return arrays
                     </span><span class="macro">doc! </span>{ <span class="string">&quot;$eq&quot;</span>: [render_size(<span class="kw-2">&amp;</span>field_name, <span class="bool-val">false</span>), <span class="number">0</span>] }
@@ -1811,7 +1793,7 @@
                     }
                 }
             }
-            connector_interface::RelationCondition::NoRelatedRecord =&gt; {
+            RelationCondition::NoRelatedRecord =&gt; {
                 <span class="kw">if </span>is_empty_filter {
                     <span class="comment">// Doesn&#39;t need coercing the array since joins always return arrays
                     </span><span class="macro">doc! </span>{ <span class="string">&quot;$eq&quot;</span>: [render_size(<span class="kw-2">&amp;</span>field_name, <span class="bool-val">false</span>), <span class="number">0</span>] }
@@ -1823,7 +1805,7 @@
                     none
                 }
             }
-            connector_interface::RelationCondition::ToOneRelatedRecord =&gt; {
+            RelationCondition::ToOneRelatedRecord =&gt; {
                 <span class="comment">// To-ones are coerced to single-element arrays via the join.
                 // We render an &quot;every&quot; expression on that array to ensure that the predicate is matched.
                 </span><span class="kw">let </span>(every, nested_joins) = render_every_from_filter(<span class="kw-2">&amp;</span>field_name, nested_filter, <span class="bool-val">false</span>, <span class="bool-val">false</span>)<span class="question-mark">?</span>;

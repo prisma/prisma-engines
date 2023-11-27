@@ -43,8 +43,8 @@
 <a href="#43" id="43">43</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span><span class="kw">super</span>::ScalarFieldExt;
 <span class="kw">use </span><span class="kw">crate</span>::context::Context;
-<span class="kw">use </span>prisma_models::{PrismaValue, SelectedField, SelectionResult};
 <span class="kw">use </span>quaint::Value;
+<span class="kw">use </span>query_structure::{PrismaValue, SelectedField, SelectionResult};
 
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">trait </span>SelectionResultExt {
     <span class="kw">fn </span>misses_autogen_value(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool;

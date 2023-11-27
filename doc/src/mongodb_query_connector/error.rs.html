@@ -299,7 +299,7 @@
     bson::{<span class="self">self</span>, extjson},
     error::{CommandError, Error <span class="kw">as </span>DriverError, TRANSIENT_TRANSACTION_ERROR},
 };
-<span class="kw">use </span>prisma_models::{CompositeFieldRef, Field, ScalarFieldRef, SelectedField};
+<span class="kw">use </span>query_structure::{CompositeFieldRef, Field, ScalarFieldRef, SelectedField};
 <span class="kw">use </span>regex::Regex;
 <span class="kw">use </span>thiserror::Error;
 <span class="kw">use </span>user_facing_errors::query_engine::DatabaseConstraint;

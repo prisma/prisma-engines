@@ -97,11 +97,11 @@
 <span class="kw">use </span>futures::Future;
 <span class="kw">use </span>mongodb::bson::Bson;
 <span class="kw">use </span>mongodb::bson::Document;
-<span class="kw">use </span>prisma_models::<span class="kw-2">*</span>;
 <span class="kw">use </span>query_engine_metrics::{
     histogram, increment_counter, metrics, PRISMA_DATASOURCE_QUERIES_DURATION_HISTOGRAM_MS,
     PRISMA_DATASOURCE_QUERIES_TOTAL,
 };
+<span class="kw">use </span>query_structure::<span class="kw-2">*</span>;
 <span class="kw">use </span>std::time::Instant;
 <span class="kw">use </span>tracing::debug;
 

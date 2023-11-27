@@ -644,16 +644,14 @@
 <a href="#644" id="644">644</a>
 <a href="#645" id="645">645</a>
 <a href="#646" id="646">646</a>
-<a href="#647" id="647">647</a>
 </pre></div><pre class="rust"><code><span class="kw">use super</span>::<span class="kw-2">*</span>;
 <span class="kw">use crate</span>::{
     query_ast::<span class="kw-2">*</span>,
     query_graph::{Node, NodeRef, QueryGraph, QueryGraphDependency},
     ParsedInputMap, ParsedInputValue, QueryResult,
 };
-<span class="kw">use </span>connector::{Filter, IntoFilter};
 <span class="kw">use </span>itertools::Itertools;
-<span class="kw">use </span>prisma_models::{Model, RelationFieldRef};
+<span class="kw">use </span>query_structure::{Filter, IntoFilter, Model, RelationFieldRef};
 <span class="kw">use </span>std::convert::TryInto;
 
 <span class="doccomment">/// Handles nested connect cases.

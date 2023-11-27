@@ -301,12 +301,12 @@
 <span class="kw">use </span>async_trait::async_trait;
 <span class="kw">use </span>connector::{ConnectionLike, RelAggregationSelection};
 <span class="kw">use </span>connector_interface::{
-    <span class="self">self </span><span class="kw">as </span>connector, filter::Filter, AggregationRow, AggregationSelection, QueryArguments, ReadOperations,
-    RecordFilter, Transaction, WriteArgs, WriteOperations,
+    <span class="self">self </span><span class="kw">as </span>connector, AggregationRow, AggregationSelection, ReadOperations, RecordFilter, Transaction, WriteArgs,
+    WriteOperations,
 };
-<span class="kw">use </span>prisma_models::{prelude::<span class="kw-2">*</span>, SelectionResult};
 <span class="kw">use </span>prisma_value::PrismaValue;
 <span class="kw">use </span>quaint::prelude::ConnectionInfo;
+<span class="kw">use </span>query_structure::{prelude::<span class="kw-2">*</span>, Filter, QueryArguments, SelectionResult};
 <span class="kw">use </span>std::collections::HashMap;
 
 <span class="kw">pub struct </span>SqlConnectorTransaction&lt;<span class="lifetime">&#39;tx</span>&gt; {

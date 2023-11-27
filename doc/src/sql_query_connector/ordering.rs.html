@@ -237,12 +237,10 @@
 <a href="#237" id="237">237</a>
 <a href="#238" id="238">238</a>
 <a href="#239" id="239">239</a>
-<a href="#240" id="240">240</a>
 </pre></div><pre class="rust"><code><span class="kw">use crate</span>::{join_utils::<span class="kw-2">*</span>, model_extensions::<span class="kw-2">*</span>, query_arguments_ext::QueryArgumentsExt, Context};
-<span class="kw">use </span>connector_interface::QueryArguments;
 <span class="kw">use </span>itertools::Itertools;
-<span class="kw">use </span>prisma_models::<span class="kw-2">*</span>;
 <span class="kw">use </span>quaint::ast::<span class="kw-2">*</span>;
+<span class="kw">use </span>query_structure::<span class="kw-2">*</span>;
 
 <span class="kw">static </span>ORDER_JOIN_PREFIX: <span class="kw-2">&amp;</span>str = <span class="string">&quot;orderby_&quot;</span>;
 <span class="kw">static </span>ORDER_AGGREGATOR_ALIAS: <span class="kw-2">&amp;</span>str = <span class="string">&quot;orderby_aggregator&quot;</span>;

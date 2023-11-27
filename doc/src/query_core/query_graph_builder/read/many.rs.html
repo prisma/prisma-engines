@@ -44,7 +44,7 @@
 <a href="#44" id="44">44</a>
 </pre></div><pre class="rust"><code><span class="kw">use super</span>::<span class="kw-2">*</span>;
 <span class="kw">use crate</span>::{query_document::ParsedField, ManyRecordsQuery, QueryOption, QueryOptions, ReadQuery};
-<span class="kw">use </span>prisma_models::Model;
+<span class="kw">use </span>query_structure::Model;
 
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>find_many(field: ParsedField&lt;<span class="lifetime">&#39;_</span>&gt;, model: Model) -&gt; QueryGraphBuilderResult&lt;ReadQuery&gt; {
     find_many_with_options(field, model, QueryOptions::none())

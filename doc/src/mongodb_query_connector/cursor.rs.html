@@ -211,7 +211,7 @@
 <a href="#211" id="211">211</a>
 </pre></div><pre class="rust"><code><span class="kw">use crate</span>::{orderby::OrderByData, IntoBson};
 <span class="kw">use </span>mongodb::bson::{doc, Document};
-<span class="kw">use </span>prisma_models::{OrderBy, SelectionResult, SortOrder};
+<span class="kw">use </span>query_structure::{OrderBy, SelectionResult, SortOrder};
 
 <span class="attr">#[derive(Debug, Clone)]
 </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>CursorData {

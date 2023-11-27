@@ -949,13 +949,15 @@
 <a href="#949" id="949">949</a>
 <a href="#950" id="950">950</a>
 <a href="#951" id="951">951</a>
+<a href="#952" id="952">952</a>
+<a href="#953" id="953">953</a>
 </pre></div><pre class="rust"><code><span class="kw">use super</span>::<span class="kw-2">*</span>;
 <span class="kw">use crate</span>::{executor::get_engine_protocol, schema::<span class="kw-2">*</span>};
 <span class="kw">use </span>bigdecimal::{BigDecimal, ToPrimitive};
 <span class="kw">use </span>chrono::prelude::<span class="kw-2">*</span>;
 <span class="kw">use </span>core::fmt;
 <span class="kw">use </span>indexmap::{IndexMap, IndexSet};
-<span class="kw">use </span>prisma_models::{DefaultKind, PrismaValue, ValueGeneratorFn};
+<span class="kw">use </span>query_structure::{DefaultKind, PrismaValue, ValueGeneratorFn};
 <span class="kw">use </span>std::{borrow::Cow, convert::TryFrom, rc::Rc, str::FromStr};
 <span class="kw">use </span>user_facing_errors::query_engine::validation::ValidationError;
 <span class="kw">use </span>uuid::Uuid;
@@ -1365,7 +1367,7 @@
         argument_path: <span class="kw-2">&amp;</span>Path,
         s: <span class="kw-2">&amp;</span>str,
     ) -&gt; QueryParserResult&lt;DateTime&lt;FixedOffset&gt;&gt; {
-        prisma_models::parse_datetime(s).map_err(|err| {
+        query_structure::parse_datetime(s).map_err(|err| {
             ValidationError::invalid_argument_value(
                 selection_path.segments(),
                 argument_path.segments(),
@@ -1377,15 +1379,17 @@
     }
 
     <span class="kw">fn </span>parse_bytes(<span class="kw-2">&amp;</span><span class="self">self</span>, selection_path: <span class="kw-2">&amp;</span>Path, argument_path: <span class="kw-2">&amp;</span>Path, s: String) -&gt; QueryParserResult&lt;PrismaValue&gt; {
-        prisma_models::decode_bytes(<span class="kw-2">&amp;</span>s).map(PrismaValue::Bytes).map_err(|err| {
-            ValidationError::invalid_argument_value(
-                selection_path.segments(),
-                argument_path.segments(),
-                s.to_string(),
-                <span class="string">&quot;base64 String&quot;</span>,
-                <span class="prelude-val">Some</span>(Box::new(err)),
-            )
-        })
+        query_structure::decode_bytes(<span class="kw-2">&amp;</span>s)
+            .map(PrismaValue::Bytes)
+            .map_err(|err| {
+                ValidationError::invalid_argument_value(
+                    selection_path.segments(),
+                    argument_path.segments(),
+                    s.to_string(),
+                    <span class="string">&quot;base64 String&quot;</span>,
+                    <span class="prelude-val">Some</span>(Box::new(err)),
+                )
+            })
     }
 
     <span class="kw">fn </span>parse_decimal(
@@ -1733,7 +1737,7 @@
         schema::{InputType, OutputType},
         ArgumentValue,
     };
-    <span class="kw">use </span>prisma_models::PrismaValue;
+    <span class="kw">use </span>query_structure::PrismaValue;
     <span class="kw">use </span>schema::InnerOutputType;
     <span class="kw">use </span>user_facing_errors::query_engine::validation::{<span class="self">self</span>, InputTypeDescription};
 

@@ -35,7 +35,7 @@
 <a href="#35" id="35">35</a>
 </pre></div><pre class="rust"><code><span class="kw">use super</span>::<span class="kw-2">*</span>;
 <span class="kw">use crate</span>::{query_document::ParsedField, ReadQuery, RelatedRecordsQuery};
-<span class="kw">use </span>prisma_models::{Model, RelationFieldRef};
+<span class="kw">use </span>query_structure::{Model, RelationFieldRef};
 
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>find_related(
     field: ParsedField&lt;<span class="lifetime">&#39;_</span>&gt;,

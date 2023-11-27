@@ -92,8 +92,8 @@
     model_extensions::{AsColumns, AsTable, ColumnIterator},
     Context,
 };
-<span class="kw">use </span>prisma_models::{walkers, ModelProjection, Relation, RelationField};
 <span class="kw">use </span>quaint::{ast::Table, prelude::Column};
+<span class="kw">use </span>query_structure::{walkers, ModelProjection, Relation, RelationField};
 
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">trait </span>RelationFieldExt {
     <span class="kw">fn </span>m2m_columns(<span class="kw-2">&amp;</span><span class="self">self</span>, ctx: <span class="kw-2">&amp;</span>Context&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; Vec&lt;Column&lt;<span class="lifetime">&#39;static</span>&gt;&gt;;

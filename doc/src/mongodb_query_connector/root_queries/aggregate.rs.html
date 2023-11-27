@@ -162,7 +162,7 @@
 
 <span class="kw">use </span>connector_interface::<span class="kw-2">*</span>;
 <span class="kw">use </span>mongodb::{bson::Document, ClientSession, Database};
-<span class="kw">use </span>prisma_models::prelude::<span class="kw-2">*</span>;
+<span class="kw">use </span>query_structure::{prelude::<span class="kw-2">*</span>, Filter, QueryArguments};
 
 <span class="kw">pub async fn </span>aggregate&lt;<span class="lifetime">&#39;conn</span>&gt;(
     database: <span class="kw-2">&amp;</span>Database,

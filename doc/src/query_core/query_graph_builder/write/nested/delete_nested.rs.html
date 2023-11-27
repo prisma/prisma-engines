@@ -198,8 +198,8 @@
     query_graph::{Node, NodeRef, QueryGraph, QueryGraphDependency},
     ParsedInputMap, ParsedInputValue,
 };
-<span class="kw">use </span>connector::{Filter, RecordFilter};
-<span class="kw">use </span>prisma_models::{Model, PrismaValue, RelationFieldRef};
+<span class="kw">use </span>connector::RecordFilter;
+<span class="kw">use </span>query_structure::{Filter, Model, PrismaValue, RelationFieldRef};
 <span class="kw">use </span>std::convert::TryInto;
 
 <span class="doccomment">/// Adds a delete (single) record node to the graph and connects it to the parent.

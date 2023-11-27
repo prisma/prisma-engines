@@ -7,7 +7,7 @@
 <a href="#7" id="7">7</a>
 <a href="#8" id="8">8</a>
 <a href="#9" id="9">9</a>
-</pre></div><pre class="rust"><code><span class="kw">use </span>prisma_models::PrismaValue;
+</pre></div><pre class="rust"><code><span class="kw">use </span>query_structure::PrismaValue;
 
 <span class="kw">pub fn </span>coerce_null_to_zero_value(value: PrismaValue) -&gt; PrismaValue {
     <span class="kw">if let </span>PrismaValue::Null = value {

@@ -1874,12 +1874,12 @@
 </pre></div><pre class="rust"><code><span class="kw">use crate</span>::{FieldQuery, HandlerError, JsonSingleQuery, SelectionSet};
 <span class="kw">use </span>bigdecimal::{BigDecimal, FromPrimitive};
 <span class="kw">use </span>indexmap::IndexMap;
-<span class="kw">use </span>prisma_models::{decode_bytes, parse_datetime, prelude::ParentContainer, Field};
 <span class="kw">use </span>query_core::{
     constants::custom_types,
     schema::{ObjectType, OutputField, QuerySchema},
     ArgumentValue, Operation, Selection,
 };
+<span class="kw">use </span>query_structure::{decode_bytes, parse_datetime, prelude::ParentContainer, Field};
 <span class="kw">use </span>serde_json::Value <span class="kw">as </span>JsonValue;
 <span class="kw">use </span>std::str::FromStr;
 

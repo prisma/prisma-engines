@@ -352,9 +352,9 @@
 <a href="#352" id="352">352</a>
 <a href="#353" id="353">353</a>
 <a href="#354" id="354">354</a>
-</pre></div><pre class="rust"><code><span class="kw">use </span>connector_interface::{error::<span class="kw-2">*</span>, Filter};
-<span class="kw">use </span>prisma_models::prelude::DomainError;
+</pre></div><pre class="rust"><code><span class="kw">use </span>connector_interface::error::<span class="kw-2">*</span>;
 <span class="kw">use </span>quaint::error::ErrorKind <span class="kw">as </span>QuaintKind;
+<span class="kw">use </span>query_structure::{prelude::DomainError, Filter};
 <span class="kw">use </span>std::{any::Any, string::FromUtf8Error};
 <span class="kw">use </span>thiserror::Error;
 <span class="kw">use </span>user_facing_errors::query_engine::DatabaseConstraint;
@@ -621,8 +621,8 @@
     }
 }
 
-<span class="kw">impl </span>From&lt;prisma_models::ConversionFailure&gt; <span class="kw">for </span>SqlError {
-    <span class="kw">fn </span>from(e: prisma_models::ConversionFailure) -&gt; <span class="self">Self </span>{
+<span class="kw">impl </span>From&lt;query_structure::ConversionFailure&gt; <span class="kw">for </span>SqlError {
+    <span class="kw">fn </span>from(e: query_structure::ConversionFailure) -&gt; <span class="self">Self </span>{
         <span class="self">Self</span>::ConversionError(e.into())
     }
 }

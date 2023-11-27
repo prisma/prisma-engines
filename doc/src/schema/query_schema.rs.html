@@ -336,11 +336,11 @@
 <a href="#336" id="336">336</a>
 <a href="#337" id="337">337</a>
 </pre></div><pre class="rust"><code><span class="kw">use crate</span>::{IdentifierType, ObjectType, OutputField};
-<span class="kw">use </span>prisma_models::{ast, InternalDataModel};
 <span class="kw">use </span>psl::{
     datamodel_connector::{Connector, ConnectorCapabilities, ConnectorCapability, RelationMode},
     PreviewFeature, PreviewFeatures,
 };
+<span class="kw">use </span>query_structure::{ast, InternalDataModel};
 <span class="kw">use </span>std::{collections::HashMap, fmt};
 
 <span class="attr">#[derive(Clone, Debug, Hash, Eq, PartialEq)]

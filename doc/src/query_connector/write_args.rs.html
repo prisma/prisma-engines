@@ -488,15 +488,11 @@
 <a href="#488" id="488">488</a>
 <a href="#489" id="489">489</a>
 <a href="#490" id="490">490</a>
-<a href="#491" id="491">491</a>
-<a href="#492" id="492">492</a>
-</pre></div><pre class="rust"><code><span class="kw">use crate</span>::{
-    error::{ConnectorError, ErrorKind},
-    Filter,
-};
+</pre></div><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::error::{ConnectorError, ErrorKind};
 <span class="kw">use </span>indexmap::{map::Keys, IndexMap};
-<span class="kw">use </span>prisma_models::{
-    CompositeFieldRef, Field, Model, ModelProjection, PrismaValue, ScalarFieldRef, SelectedField, SelectionResult,
+<span class="kw">use </span>query_structure::{
+    CompositeFieldRef, Field, Filter, Model, ModelProjection, PrismaValue, ScalarFieldRef, SelectedField,
+    SelectionResult,
 };
 <span class="kw">use </span>std::{borrow::Borrow, convert::TryInto, ops::Deref};
 

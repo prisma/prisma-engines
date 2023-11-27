@@ -24,7 +24,7 @@
 <a href="#24" id="24">24</a>
 <a href="#25" id="25">25</a>
 <a href="#26" id="26">26</a>
-</pre></div><pre class="rust"><code><span class="kw">use </span>prisma_models::{Model, ScalarFieldRef};
+</pre></div><pre class="rust"><code><span class="kw">use </span>query_structure::{Model, ScalarFieldRef};
 
 <span class="doccomment">/// Attempts to resolve a field name to a compound field.
 </span><span class="kw">pub fn </span>resolve_compound_field(name: <span class="kw-2">&amp;</span>str, model: <span class="kw-2">&amp;</span>Model) -&gt; <span class="prelude-ty">Option</span>&lt;Vec&lt;ScalarFieldRef&gt;&gt; {

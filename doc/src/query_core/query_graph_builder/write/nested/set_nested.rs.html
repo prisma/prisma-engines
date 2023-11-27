@@ -364,12 +364,10 @@
 <a href="#364" id="364">364</a>
 <a href="#365" id="365">365</a>
 <a href="#366" id="366">366</a>
-<a href="#367" id="367">367</a>
 </pre></div><pre class="rust"><code><span class="kw">use super</span>::<span class="kw-2">*</span>;
 <span class="kw">use crate</span>::{query_ast::<span class="kw-2">*</span>, query_graph::<span class="kw-2">*</span>, ParsedInputValue};
-<span class="kw">use </span>connector::Filter;
 <span class="kw">use </span>itertools::Itertools;
-<span class="kw">use </span>prisma_models::{Model, RelationFieldRef, SelectionResult};
+<span class="kw">use </span>query_structure::{Filter, Model, RelationFieldRef, SelectionResult};
 <span class="kw">use </span>std::convert::TryInto;
 
 <span class="doccomment">/// Only for x-to-many relations.

@@ -276,7 +276,7 @@
     WriteOperations,
 };
 <span class="kw">use </span>mongodb::{ClientSession, Database};
-<span class="kw">use </span>prisma_models::{prelude::<span class="kw-2">*</span>, SelectionResult};
+<span class="kw">use </span>query_structure::{prelude::<span class="kw-2">*</span>, SelectionResult};
 <span class="kw">use </span>std::collections::HashMap;
 
 <span class="kw">pub struct </span>MongoDbConnection {
@@ -453,7 +453,7 @@
     <span class="kw">async fn </span>get_single_record(
         <span class="kw-2">&amp;mut </span><span class="self">self</span>,
         model: <span class="kw-2">&amp;</span>Model,
-        filter: <span class="kw-2">&amp;</span>connector_interface::Filter,
+        filter: <span class="kw-2">&amp;</span>query_structure::Filter,
         selected_fields: <span class="kw-2">&amp;</span>FieldSelection,
         aggr_selections: <span class="kw-2">&amp;</span>[RelAggregationSelection],
         _trace_id: <span class="prelude-ty">Option</span>&lt;String&gt;,
@@ -475,7 +475,7 @@
     <span class="kw">async fn </span>get_many_records(
         <span class="kw-2">&amp;mut </span><span class="self">self</span>,
         model: <span class="kw-2">&amp;</span>Model,
-        query_arguments: connector_interface::QueryArguments,
+        query_arguments: query_structure::QueryArguments,
         selected_fields: <span class="kw-2">&amp;</span>FieldSelection,
         aggregation_selections: <span class="kw-2">&amp;</span>[RelAggregationSelection],
         _trace_id: <span class="prelude-ty">Option</span>&lt;String&gt;,
@@ -509,10 +509,10 @@
     <span class="kw">async fn </span>aggregate_records(
         <span class="kw-2">&amp;mut </span><span class="self">self</span>,
         model: <span class="kw-2">&amp;</span>Model,
-        query_arguments: connector_interface::QueryArguments,
+        query_arguments: query_structure::QueryArguments,
         selections: Vec&lt;connector_interface::AggregationSelection&gt;,
         group_by: Vec&lt;ScalarFieldRef&gt;,
-        having: <span class="prelude-ty">Option</span>&lt;connector_interface::Filter&gt;,
+        having: <span class="prelude-ty">Option</span>&lt;query_structure::Filter&gt;,
         _trace_id: <span class="prelude-ty">Option</span>&lt;String&gt;,
     ) -&gt; connector_interface::Result&lt;Vec&lt;connector_interface::AggregationRow&gt;&gt; {
         catch(<span class="kw">async move </span>{

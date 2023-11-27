@@ -179,9 +179,11 @@
 <a href="#179" id="179">179</a>
 <a href="#180" id="180">180</a>
 <a href="#181" id="181">181</a>
+<a href="#182" id="182">182</a>
 </pre></div><pre class="rust"><code><span class="kw">use super</span>::{expression, into_expression::IntoUpdateExpression};
-<span class="kw">use </span>connector_interface::{FieldPath, Filter};
+<span class="kw">use </span>connector_interface::FieldPath;
 <span class="kw">use </span>mongodb::bson::{doc, Document};
+<span class="kw">use </span>query_structure::Filter;
 
 <span class="doccomment">/// `UpdateOperation` is an intermediary AST used to perform preliminary transformations from a `WriteOperation`.
 /// It is meant to be transformed into an `UpdateExpression`.

@@ -45,7 +45,7 @@
 <a href="#45" id="45">45</a>
 </pre></div><pre class="rust"><code><span class="kw">use super</span>::<span class="kw-2">*</span>;
 <span class="kw">use crate</span>::{query_ast::<span class="kw-2">*</span>, query_graph::QueryGraph, ParsedField};
-<span class="kw">use </span>prisma_models::{Model, PrismaValue};
+<span class="kw">use </span>query_structure::{Model, PrismaValue};
 <span class="kw">use </span>std::{collections::HashMap, convert::TryInto};
 
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>execute_raw(graph: <span class="kw-2">&amp;mut </span>QueryGraph, field: ParsedField&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; QueryGraphBuilderResult&lt;()&gt; {

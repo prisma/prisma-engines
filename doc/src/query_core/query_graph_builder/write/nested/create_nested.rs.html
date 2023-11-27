@@ -485,7 +485,6 @@
 <a href="#485" id="485">485</a>
 <a href="#486" id="486">486</a>
 <a href="#487" id="487">487</a>
-<a href="#488" id="488">488</a>
 </pre></div><pre class="rust"><code><span class="kw">use super</span>::<span class="kw-2">*</span>;
 <span class="kw">use crate</span>::{
     query_ast::<span class="kw-2">*</span>,
@@ -493,8 +492,7 @@
     write::write_args_parser::WriteArgsParser,
     ParsedInputList, ParsedInputValue,
 };
-<span class="kw">use </span>connector::{Filter, IntoFilter};
-<span class="kw">use </span>prisma_models::{Model, RelationFieldRef};
+<span class="kw">use </span>query_structure::{Filter, IntoFilter, Model, RelationFieldRef};
 <span class="kw">use </span>schema::constants::args;
 <span class="kw">use </span>std::convert::TryInto;
 

@@ -540,7 +540,7 @@
     options::InsertManyOptions,
     ClientSession, Collection, Database,
 };
-<span class="kw">use </span>prisma_models::{Model, PrismaValue, SelectionResult};
+<span class="kw">use </span>query_structure::{Model, PrismaValue, SelectionResult};
 <span class="kw">use </span>std::{collections::HashMap, convert::TryInto};
 <span class="kw">use </span>tracing::{info_span, Instrument};
 <span class="kw">use </span>update::IntoUpdateDocumentExtension;

@@ -348,14 +348,12 @@
 <a href="#348" id="348">348</a>
 <a href="#349" id="349">349</a>
 <a href="#350" id="350">350</a>
-<a href="#351" id="351">351</a>
 </pre></div><pre class="rust"><code><span class="kw">use super</span>::<span class="kw-2">*</span>;
 <span class="kw">use crate</span>::{
     query_document::{ParsedArgument, ParsedInputMap},
     QueryGraphBuilderError, QueryGraphBuilderResult,
 };
-<span class="kw">use </span>connector::QueryArguments;
-<span class="kw">use </span>prisma_models::prelude::<span class="kw-2">*</span>;
+<span class="kw">use </span>query_structure::{prelude::<span class="kw-2">*</span>, QueryArguments};
 <span class="kw">use </span>schema::constants::{aggregations, args, ordering};
 <span class="kw">use </span>std::convert::TryInto;
 

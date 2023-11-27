@@ -297,15 +297,13 @@
 <a href="#297" id="297">297</a>
 <a href="#298" id="298">298</a>
 <a href="#299" id="299">299</a>
-<a href="#300" id="300">300</a>
 </pre></div><pre class="rust"><code><span class="kw">use super</span>::{write_args_parser::WriteArgsParser, <span class="kw-2">*</span>};
 <span class="kw">use crate</span>::{
     query_ast::<span class="kw-2">*</span>,
     query_graph::{Flow, Node, QueryGraph, QueryGraphDependency},
     ParsedField, ParsedInputMap, ParsedInputValue, ParsedObject,
 };
-<span class="kw">use </span>connector::IntoFilter;
-<span class="kw">use </span>prisma_models::Model;
+<span class="kw">use </span>query_structure::{IntoFilter, Model};
 <span class="kw">use </span>schema::QuerySchema;
 
 <span class="doccomment">/// Handles a top-level upsert

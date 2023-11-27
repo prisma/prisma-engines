@@ -220,15 +220,13 @@
 <a href="#220" id="220">220</a>
 <a href="#221" id="221">221</a>
 <a href="#222" id="222">222</a>
-<a href="#223" id="223">223</a>
 </pre></div><pre class="rust"><code><span class="kw">use super</span>::<span class="kw-2">*</span>;
 <span class="kw">use crate</span>::{
     query_graph::{Node, NodeRef, QueryGraph, QueryGraphDependency},
     ParsedInputMap, ParsedInputValue, Query, WriteQuery,
 };
-<span class="kw">use </span>connector::{Filter, RelationCompare};
 <span class="kw">use </span>itertools::Itertools;
-<span class="kw">use </span>prisma_models::{Model, PrismaValue, RelationFieldRef, SelectionResult};
+<span class="kw">use </span>query_structure::{Filter, Model, PrismaValue, RelationCompare, RelationFieldRef, SelectionResult};
 <span class="kw">use </span>std::convert::TryInto;
 
 <span class="doccomment">/// Handles nested disconnect cases.

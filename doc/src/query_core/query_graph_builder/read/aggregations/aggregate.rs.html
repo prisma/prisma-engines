@@ -38,7 +38,7 @@
 <a href="#38" id="38">38</a>
 </pre></div><pre class="rust"><code><span class="kw">use super</span>::<span class="kw-2">*</span>;
 <span class="kw">use crate</span>::{query_document::ParsedField, AggregateRecordsQuery};
-<span class="kw">use </span>prisma_models::Model;
+<span class="kw">use </span>query_structure::Model;
 
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>aggregate(field: ParsedField&lt;<span class="lifetime">&#39;_</span>&gt;, model: Model) -&gt; QueryGraphBuilderResult&lt;ReadQuery&gt; {
     <span class="kw">let </span>name = field.name;

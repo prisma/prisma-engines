@@ -46,8 +46,8 @@
     Context, Queryable,
 };
 <span class="kw">use </span>connector_interface::NativeUpsert;
-<span class="kw">use </span>prisma_models::{ModelProjection, Record, SingleRecord};
 <span class="kw">use </span>quaint::prelude::{OnConflict, Query};
+<span class="kw">use </span>query_structure::{ModelProjection, Record, SingleRecord};
 
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async fn </span>native_upsert(
     conn: <span class="kw-2">&amp;</span><span class="kw">dyn </span>Queryable,

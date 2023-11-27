@@ -581,7 +581,6 @@
 <a href="#581" id="581">581</a>
 <a href="#582" id="582">582</a>
 <a href="#583" id="583">583</a>
-<a href="#584" id="584">584</a>
 </pre></div><pre class="rust"><code><span class="kw">use crate</span>::{
     join_utils::AliasedJoin,
     model_extensions::{AsColumn, AsColumns, AsTable, SelectionResultExt},
@@ -589,10 +588,9 @@
     query_arguments_ext::QueryArgumentsExt,
     Context,
 };
-<span class="kw">use </span>connector_interface::QueryArguments;
 <span class="kw">use </span>itertools::Itertools;
-<span class="kw">use </span>prisma_models::<span class="kw-2">*</span>;
 <span class="kw">use </span>quaint::ast::<span class="kw-2">*</span>;
+<span class="kw">use </span>query_structure::<span class="kw-2">*</span>;
 
 <span class="attr">#[derive(Debug)]
 </span><span class="kw">struct </span>CursorOrderDefinition {

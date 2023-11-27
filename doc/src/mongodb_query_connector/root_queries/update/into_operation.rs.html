@@ -174,7 +174,7 @@
 
 <span class="kw">use </span>connector_interface::{CompositeWriteOperation, FieldPath, ScalarWriteOperation, WriteOperation};
 <span class="kw">use </span>mongodb::bson::doc;
-<span class="kw">use </span>prisma_models::{Field, PrismaValue};
+<span class="kw">use </span>query_structure::{Field, PrismaValue};
 
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">trait </span>IntoUpdateOperation {
     <span class="kw">fn </span>into_update_operations(<span class="self">self</span>, field: <span class="kw-2">&amp;</span>Field, path: FieldPath) -&gt; <span class="kw">crate</span>::Result&lt;Vec&lt;UpdateOperation&gt;&gt;;

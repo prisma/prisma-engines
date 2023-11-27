@@ -1005,15 +1005,13 @@
 <a href="#1005" id="1005">1005</a>
 <a href="#1006" id="1006">1006</a>
 <a href="#1007" id="1007">1007</a>
-<a href="#1008" id="1008">1008</a>
 </pre></div><pre class="rust"><code><span class="kw">use super</span>::<span class="kw-2">*</span>;
 <span class="kw">use crate</span>::{
     query_ast::<span class="kw-2">*</span>,
     query_graph::{Flow, Node, NodeRef, QueryGraph, QueryGraphDependency},
     Computation, ParsedInputMap, ParsedInputValue,
 };
-<span class="kw">use </span>connector::{Filter, IntoFilter};
-<span class="kw">use </span>prisma_models::{Model, RelationFieldRef, SelectionResult};
+<span class="kw">use </span>query_structure::{Filter, IntoFilter, Model, RelationFieldRef, SelectionResult};
 <span class="kw">use </span>schema::constants::args;
 <span class="kw">use </span>std::convert::TryInto;
 

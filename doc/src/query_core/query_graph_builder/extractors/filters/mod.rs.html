@@ -348,11 +348,6 @@
 <a href="#348" id="348">348</a>
 <a href="#349" id="349">349</a>
 <a href="#350" id="350">350</a>
-<a href="#351" id="351">351</a>
-<a href="#352" id="352">352</a>
-<a href="#353" id="353">353</a>
-<a href="#354" id="354">354</a>
-<a href="#355" id="355">355</a>
 </pre></div><pre class="rust"><code><span class="kw">mod </span>composite;
 <span class="kw">mod </span>filter_fold;
 <span class="kw">mod </span>filter_grouping;
@@ -364,15 +359,10 @@
     query_document::{ParsedInputMap, ParsedInputValue},
     QueryGraphBuilderError, QueryGraphBuilderResult,
 };
-<span class="kw">use </span>connector::{
-    filter::Filter, CompositeCompare, QueryMode, RelationCompare, ScalarCompare, ScalarCondition, ScalarProjection,
-};
 <span class="kw">use </span>filter_fold::<span class="kw-2">*</span>;
 <span class="kw">use </span>filter_grouping::<span class="kw-2">*</span>;
 <span class="kw">use </span>indexmap::IndexMap;
-<span class="kw">use </span>prisma_models::{
-    prelude::ParentContainer, CompositeFieldRef, Field, Model, PrismaValue, RelationFieldRef, ScalarFieldRef,
-};
+<span class="kw">use </span>query_structure::{prelude::ParentContainer, <span class="kw-2">*</span>};
 <span class="kw">use </span>schema::constants::filters;
 <span class="kw">use </span>std::{borrow::Cow, collections::HashMap, convert::TryInto, str::FromStr};
 

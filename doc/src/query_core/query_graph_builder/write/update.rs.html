@@ -307,7 +307,6 @@
 <a href="#307" id="307">307</a>
 <a href="#308" id="308">308</a>
 <a href="#309" id="309">309</a>
-<a href="#310" id="310">310</a>
 </pre></div><pre class="rust"><code><span class="kw">use super</span>::<span class="kw-2">*</span>;
 <span class="kw">use </span><span class="kw">crate</span>::query_graph_builder::write::write_args_parser::<span class="kw-2">*</span>;
 <span class="kw">use crate</span>::{
@@ -315,9 +314,8 @@
     query_graph::{Node, NodeRef, QueryGraph, QueryGraphDependency},
     ArgumentListLookup, ParsedField, ParsedInputMap,
 };
-<span class="kw">use </span>connector::{Filter, IntoFilter};
-<span class="kw">use </span>prisma_models::Model;
 <span class="kw">use </span>psl::datamodel_connector::ConnectorCapability;
+<span class="kw">use </span>query_structure::{Filter, IntoFilter, Model};
 <span class="kw">use </span>schema::{constants::args, QuerySchema};
 <span class="kw">use </span>std::convert::TryInto;
 

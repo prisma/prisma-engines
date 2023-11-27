@@ -1167,10 +1167,10 @@
     query_graph::{Flow, Node, NodeRef, QueryGraph, QueryGraphDependency},
     Computation, ParsedInputValue, QueryGraphBuilderError, QueryGraphBuilderResult,
 };
-<span class="kw">use </span>connector::{DatasourceFieldName, Filter, RecordFilter, WriteArgs, WriteOperation};
+<span class="kw">use </span>connector::{DatasourceFieldName, RecordFilter, WriteArgs, WriteOperation};
 <span class="kw">use </span>indexmap::IndexMap;
-<span class="kw">use </span>prisma_models::{FieldSelection, Model, PrismaValue, RelationFieldRef, SelectionResult};
 <span class="kw">use </span>psl::parser_database::ReferentialAction;
+<span class="kw">use </span>query_structure::{FieldSelection, Filter, Model, PrismaValue, RelationFieldRef, SelectionResult};
 <span class="kw">use </span>schema::QuerySchema;
 
 <span class="doccomment">/// Coerces single values (`ParsedInputValue::Single` and `ParsedInputValue::Map`) into a vector.

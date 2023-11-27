@@ -276,7 +276,6 @@
 </pre></div><pre class="rust"><code><span class="kw">use crate</span>::{TestError, TestResult};
 <span class="kw">use </span>indexmap::IndexMap;
 <span class="kw">use </span>itertools::Itertools;
-<span class="kw">use </span>prisma_models::PrismaValue;
 <span class="kw">use </span>query_core::{
     constants::custom_types,
     schema::{
@@ -285,6 +284,7 @@
     },
     ArgumentValue, ArgumentValueObject, Selection,
 };
+<span class="kw">use </span>query_structure::PrismaValue;
 <span class="kw">use </span>request_handlers::{Action, FieldQuery, GraphQLProtocolAdapter, JsonSingleQuery, SelectionSet, SelectionSetValue};
 <span class="kw">use </span>serde_json::{json, Value <span class="kw">as </span>JsonValue};
 

@@ -44,11 +44,9 @@
 <a href="#44" id="44">44</a>
 <a href="#45" id="45">45</a>
 <a href="#46" id="46">46</a>
-<a href="#47" id="47">47</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span><span class="kw">super</span>::extract_filter;
 <span class="kw">use crate</span>::{ParsedInputMap, ParsedInputValue, QueryGraphBuilderError, QueryGraphBuilderResult};
-<span class="kw">use </span>connector::{CompositeCompare, Filter};
-<span class="kw">use </span>prisma_models::{CompositeFieldRef, PrismaValue};
+<span class="kw">use </span>query_structure::{CompositeCompare, CompositeFieldRef, Filter, PrismaValue};
 <span class="kw">use </span>schema::{constants::filters, ObjectTag};
 <span class="kw">use </span>std::convert::TryInto;
 

@@ -168,9 +168,9 @@
     error::DecorateErrorWithFieldInformationExtension, output_meta, query_builder::MongoReadQueryBuilder,
     vacuum_cursor, IntoBson,
 };
-<span class="kw">use </span>connector_interface::{Filter, QueryArguments, RelAggregationSelection};
+<span class="kw">use </span>connector_interface::RelAggregationSelection;
 <span class="kw">use </span>mongodb::{bson::doc, options::FindOptions, ClientSession, Database};
-<span class="kw">use </span>prisma_models::<span class="kw-2">*</span>;
+<span class="kw">use </span>query_structure::<span class="kw-2">*</span>;
 <span class="kw">use </span>tracing::{info_span, Instrument};
 
 <span class="doccomment">/// Finds a single record. Joins are not required at the moment because the selector is always a unique one.

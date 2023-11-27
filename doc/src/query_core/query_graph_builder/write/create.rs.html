@@ -197,16 +197,14 @@
 <a href="#197" id="197">197</a>
 <a href="#198" id="198">198</a>
 <a href="#199" id="199">199</a>
-<a href="#200" id="200">200</a>
 </pre></div><pre class="rust"><code><span class="kw">use super</span>::<span class="kw-2">*</span>;
 <span class="kw">use crate</span>::{
     query_ast::<span class="kw-2">*</span>,
     query_graph::{Node, NodeRef, QueryGraph, QueryGraphDependency},
     ArgumentListLookup, ParsedField, ParsedInputList, ParsedInputMap,
 };
-<span class="kw">use </span>connector::IntoFilter;
-<span class="kw">use </span>prisma_models::Model;
 <span class="kw">use </span>psl::datamodel_connector::ConnectorCapability;
+<span class="kw">use </span>query_structure::{IntoFilter, Model};
 <span class="kw">use </span>schema::{constants::args, QuerySchema};
 <span class="kw">use </span>std::convert::TryInto;
 <span class="kw">use </span>write_args_parser::<span class="kw-2">*</span>;

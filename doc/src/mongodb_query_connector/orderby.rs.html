@@ -341,7 +341,7 @@
 </pre></div><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::join::JoinStage;
 <span class="kw">use </span>itertools::Itertools;
 <span class="kw">use </span>mongodb::bson::{doc, Document};
-<span class="kw">use </span>prisma_models::{OrderBy, OrderByHop, OrderByToManyAggregation, SortOrder};
+<span class="kw">use </span>query_structure::{OrderBy, OrderByHop, OrderByToManyAggregation, SortOrder};
 <span class="kw">use </span>std::iter;
 
 <span class="attr">#[derive(Debug)]
@@ -570,11 +570,11 @@
                 <span class="comment">// Can only be scalar aggregations for groupBy, ToMany aggregations are not supported yet.
                 </span><span class="kw">if let </span>OrderBy::ScalarAggregation(order_by_aggr) = <span class="kw-2">&amp;</span>data.order_by {
                     <span class="kw">let </span>prefix = <span class="kw">match </span>order_by_aggr.sort_aggregation {
-                        prisma_models::SortAggregation::Count =&gt; <span class="string">&quot;count&quot;</span>,
-                        prisma_models::SortAggregation::Avg =&gt; <span class="string">&quot;avg&quot;</span>,
-                        prisma_models::SortAggregation::Sum =&gt; <span class="string">&quot;sum&quot;</span>,
-                        prisma_models::SortAggregation::Min =&gt; <span class="string">&quot;min&quot;</span>,
-                        prisma_models::SortAggregation::Max =&gt; <span class="string">&quot;max&quot;</span>,
+                        query_structure::SortAggregation::Count =&gt; <span class="string">&quot;count&quot;</span>,
+                        query_structure::SortAggregation::Avg =&gt; <span class="string">&quot;avg&quot;</span>,
+                        query_structure::SortAggregation::Sum =&gt; <span class="string">&quot;sum&quot;</span>,
+                        query_structure::SortAggregation::Min =&gt; <span class="string">&quot;min&quot;</span>,
+                        query_structure::SortAggregation::Max =&gt; <span class="string">&quot;max&quot;</span>,
                     };
 
                     <span class="macro">format!</span>(<span class="string">&quot;{}_{}&quot;</span>, prefix, data.scalar_field_name())
@@ -598,7 +598,7 @@
             </span><span class="kw">if let </span>OrderBy::ToManyAggregation(order_by_aggregate) = <span class="kw-2">&amp;</span>data.order_by {
                 <span class="kw">if </span>!order_by_aggregate.path.is_empty() {
                     <span class="kw">match </span>order_by_aggregate.sort_aggregation {
-                        prisma_models::SortAggregation::Count =&gt; {
+                        query_structure::SortAggregation::Count =&gt; {
                             <span class="kw">if let </span><span class="prelude-val">Some</span>(clone_to) = data.prefix.as_ref().and_then(|x| x.clone_to.clone()) {
                                 order_aggregate_proj_doc.push(<span class="macro">doc! </span>{ <span class="string">&quot;$addFields&quot;</span>: { clone_to.clone(): { <span class="string">&quot;$size&quot;</span>: { <span class="string">&quot;$ifNull&quot;</span>: [<span class="macro">format!</span>(<span class="string">&quot;${}&quot;</span>, data.full_reference_path(<span class="bool-val">false</span>)), []] } } } });
                                 field_name = clone_to; <span class="comment">// Todo: Just a hack right now, this whole function needs love.

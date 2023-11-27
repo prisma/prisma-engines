@@ -373,10 +373,10 @@
 <a href="#373" id="373">373</a>
 <a href="#374" id="374">374</a>
 <a href="#375" id="375">375</a>
-</pre></div><pre class="rust"><code><span class="kw">use crate</span>::{coerce_null_to_zero_value, Filter, NativeUpsert, QueryArguments, WriteArgs};
+</pre></div><pre class="rust"><code><span class="kw">use crate</span>::{coerce_null_to_zero_value, NativeUpsert, WriteArgs};
 <span class="kw">use </span>async_trait::async_trait;
-<span class="kw">use </span>prisma_models::{ast::FieldArity, <span class="kw-2">*</span>};
 <span class="kw">use </span>prisma_value::PrismaValue;
+<span class="kw">use </span>query_structure::{ast::FieldArity, <span class="kw-2">*</span>};
 <span class="kw">use </span>std::collections::HashMap;
 
 <span class="attr">#[async_trait]

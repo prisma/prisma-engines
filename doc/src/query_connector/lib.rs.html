@@ -23,29 +23,17 @@
 <a href="#23" id="23">23</a>
 <a href="#24" id="24">24</a>
 <a href="#25" id="25">25</a>
-<a href="#26" id="26">26</a>
-<a href="#27" id="27">27</a>
-<a href="#28" id="28">28</a>
-<a href="#29" id="29">29</a>
-<a href="#30" id="30">30</a>
-<a href="#31" id="31">31</a>
 </pre></div><pre class="rust"><code><span class="attr">#![allow(clippy::derive_partial_eq_without_eq)]
 
 </span><span class="kw">pub mod </span>error;
-<span class="kw">pub mod </span>filter;
 
 <span class="kw">mod </span>coerce;
-<span class="kw">mod </span>compare;
 <span class="kw">mod </span>interface;
-<span class="kw">mod </span>query_arguments;
 <span class="kw">mod </span>upsert;
 <span class="kw">mod </span>write_args;
 
 <span class="kw">pub use </span>coerce::<span class="kw-2">*</span>;
-<span class="kw">pub use </span>compare::<span class="kw-2">*</span>;
-<span class="kw">pub use </span>filter::<span class="kw-2">*</span>;
 <span class="kw">pub use </span>interface::<span class="kw-2">*</span>;
-<span class="kw">pub use </span>query_arguments::<span class="kw-2">*</span>;
 <span class="kw">pub use </span>upsert::<span class="kw-2">*</span>;
 <span class="kw">pub use </span>write_args::<span class="kw-2">*</span>;
 

@@ -997,7 +997,6 @@
 <a href="#997" id="997">997</a>
 <a href="#998" id="998">998</a>
 <a href="#999" id="999">999</a>
-<a href="#1000" id="1000">1000</a>
 </pre></div><pre class="rust"><code><span class="kw">mod </span>error;
 <span class="kw">mod </span>formatters;
 <span class="kw">mod </span>guard;
@@ -1010,7 +1009,6 @@
     interpreter::ExpressionResult, FilteredQuery, ManyRecordsQuery, Query, QueryGraphBuilderResult, QueryOptions,
     ReadQuery,
 };
-<span class="kw">use </span>connector::{IntoFilter, QueryArguments};
 <span class="kw">use </span>guard::<span class="kw-2">*</span>;
 <span class="kw">use </span>itertools::Itertools;
 <span class="kw">use </span>petgraph::{
@@ -1018,7 +1016,7 @@
     visit::{EdgeRef <span class="kw">as </span>PEdgeRef, NodeIndexable},
     <span class="kw-2">*</span>,
 };
-<span class="kw">use </span>prisma_models::{FieldSelection, SelectionResult};
+<span class="kw">use </span>query_structure::{FieldSelection, IntoFilter, QueryArguments, SelectionResult};
 <span class="kw">use </span>std::{collections::HashSet, fmt};
 
 <span class="kw">pub type </span>QueryGraphResult&lt;T&gt; = std::result::Result&lt;T, QueryGraphError&gt;;

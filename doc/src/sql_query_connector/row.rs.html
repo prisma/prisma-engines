@@ -405,8 +405,8 @@
 <span class="kw">use </span>bigdecimal::{BigDecimal, FromPrimitive, ToPrimitive};
 <span class="kw">use </span>chrono::{DateTime, NaiveDate, Utc};
 <span class="kw">use </span>connector_interface::{coerce_null_to_zero_value, AggregationResult, AggregationSelection};
-<span class="kw">use </span>prisma_models::{ConversionFailure, FieldArity, PrismaValue, Record, TypeIdentifier};
 <span class="kw">use </span>quaint::{connector::ResultRow, Value, ValueType};
+<span class="kw">use </span>query_structure::{ConversionFailure, FieldArity, PrismaValue, Record, TypeIdentifier};
 <span class="kw">use </span>std::{io, str::FromStr};
 <span class="kw">use </span>uuid::Uuid;
 

@@ -493,10 +493,10 @@
 <span class="kw">use </span>chrono::{TimeZone, Utc};
 <span class="kw">use </span>itertools::Itertools;
 <span class="kw">use </span>mongodb::bson::{oid::ObjectId, spec::BinarySubtype, Binary, Bson, Document, Timestamp};
-<span class="kw">use </span>prisma_models::{
+<span class="kw">use </span>psl::builtin_connectors::MongoDbType;
+<span class="kw">use </span>query_structure::{
     CompositeFieldRef, Field, PrismaValue, RelationFieldRef, ScalarFieldRef, SelectedField, TypeIdentifier,
 };
-<span class="kw">use </span>psl::builtin_connectors::MongoDbType;
 <span class="kw">use </span>serde_json::Value;
 <span class="kw">use </span>std::{convert::TryFrom, fmt::Display};
 

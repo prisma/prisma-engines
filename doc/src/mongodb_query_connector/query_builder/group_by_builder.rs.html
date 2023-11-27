@@ -230,9 +230,9 @@
 <a href="#230" id="230">230</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::constants::<span class="kw-2">*</span>;
 
-<span class="kw">use </span>connector_interface::{AggregationSelection, Filter};
+<span class="kw">use </span>connector_interface::AggregationSelection;
 <span class="kw">use </span>mongodb::bson::{doc, Bson, Document};
-<span class="kw">use </span>prisma_models::ScalarFieldRef;
+<span class="kw">use </span>query_structure::{AggregationFilter, Filter, ScalarFieldRef};
 <span class="kw">use </span>std::collections::HashSet;
 
 <span class="doccomment">/// Represents a `$group` aggregation stage.
@@ -391,19 +391,19 @@
                 unfold_filters(filters);
             }
             Filter::Aggregation(aggregation) =&gt; <span class="kw">match </span>aggregation {
-                connector_interface::AggregationFilter::Count(filter) =&gt; {
+                AggregationFilter::Count(filter) =&gt; {
                     <span class="self">self</span>.insert_from_filter(filter.as_ref(), AggregationType::Count);
                 }
-                connector_interface::AggregationFilter::Average(filter) =&gt; {
+                AggregationFilter::Average(filter) =&gt; {
                     <span class="self">self</span>.insert_from_filter(filter.as_ref(), AggregationType::Average);
                 }
-                connector_interface::AggregationFilter::Sum(filter) =&gt; {
+                AggregationFilter::Sum(filter) =&gt; {
                     <span class="self">self</span>.insert_from_filter(filter.as_ref(), AggregationType::Sum);
                 }
-                connector_interface::AggregationFilter::Min(filter) =&gt; {
+                AggregationFilter::Min(filter) =&gt; {
                     <span class="self">self</span>.insert_from_filter(filter.as_ref(), AggregationType::Min);
                 }
-                connector_interface::AggregationFilter::Max(filter) =&gt; {
+                AggregationFilter::Max(filter) =&gt; {
                     <span class="self">self</span>.insert_from_filter(filter.as_ref(), AggregationType::Max);
                 }
             },

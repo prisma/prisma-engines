@@ -40,8 +40,8 @@
 <a href="#40" id="40">40</a>
 <a href="#41" id="41">41</a>
 </pre></div><pre class="rust"><code><span class="kw">use crate</span>::{model_extensions::AsColumns, Context};
-<span class="kw">use </span>prisma_models::Model;
 <span class="kw">use </span>quaint::ast::{Column, Table};
+<span class="kw">use </span>query_structure::Model;
 
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>db_name_with_schema(model: <span class="kw-2">&amp;</span>Model, ctx: <span class="kw-2">&amp;</span>Context&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; Table&lt;<span class="lifetime">&#39;static</span>&gt; {
     <span class="kw">let </span>schema_prefix = model
@@ -73,7 +73,7 @@
         <span class="self">self</span>.unique_indexes().fold(table, |table, index| {
             <span class="kw">let </span>fields: Vec&lt;<span class="kw">_</span>&gt; = index
                 .fields()
-                .map(|f| prisma_models::ScalarFieldRef::from((<span class="self">self</span>.dm.clone(), f)))
+                .map(|f| query_structure::ScalarFieldRef::from((<span class="self">self</span>.dm.clone(), f)))
                 .collect();
             <span class="kw">let </span>index: Vec&lt;Column&lt;<span class="lifetime">&#39;static</span>&gt;&gt; = fields.as_columns(ctx).collect();
             table.add_unique_index(index)

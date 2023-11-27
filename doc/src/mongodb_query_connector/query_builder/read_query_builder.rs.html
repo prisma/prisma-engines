@@ -476,14 +476,14 @@
     root_queries::observing,
     vacuum_cursor, BsonTransform, IntoBson,
 };
-<span class="kw">use </span>connector_interface::{AggregationSelection, Filter, QueryArguments, RelAggregationSelection};
+<span class="kw">use </span>connector_interface::{AggregationSelection, RelAggregationSelection};
 <span class="kw">use </span>itertools::Itertools;
 <span class="kw">use </span>mongodb::{
     bson::{doc, Document},
     options::AggregateOptions,
     ClientSession, Collection,
 };
-<span class="kw">use </span>prisma_models::{FieldSelection, Model, ScalarFieldRef};
+<span class="kw">use </span>query_structure::{FieldSelection, Filter, Model, QueryArguments, ScalarFieldRef};
 <span class="kw">use </span>std::convert::TryFrom;
 
 <span class="comment">// Mongo Driver broke usage of the simple API, can&#39;t be used by us anymore.

@@ -301,10 +301,10 @@
     cursor_condition, filter::FilterBuilder, model_extensions::<span class="kw-2">*</span>, nested_aggregations, ordering::OrderByBuilder,
     sql_trace::SqlTraceComment, Context,
 };
-<span class="kw">use </span>connector_interface::{filter::Filter, AggregationSelection, QueryArguments, RelAggregationSelection};
+<span class="kw">use </span>connector_interface::{AggregationSelection, RelAggregationSelection};
 <span class="kw">use </span>itertools::Itertools;
-<span class="kw">use </span>prisma_models::<span class="kw-2">*</span>;
 <span class="kw">use </span>quaint::ast::<span class="kw-2">*</span>;
+<span class="kw">use </span>query_structure::<span class="kw-2">*</span>;
 <span class="kw">use </span>tracing::Span;
 
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">trait </span>SelectDefinition {

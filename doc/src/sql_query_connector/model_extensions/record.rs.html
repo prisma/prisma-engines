@@ -33,8 +33,8 @@
 <a href="#33" id="33">33</a>
 <a href="#34" id="34">34</a>
 </pre></div><pre class="rust"><code><span class="kw">use crate</span>::{value::to_prisma_value, SqlError};
-<span class="kw">use </span>prisma_models::{DomainError, ModelProjection, SelectionResult};
 <span class="kw">use </span>quaint::connector::ResultSet;
+<span class="kw">use </span>query_structure::{DomainError, ModelProjection, SelectionResult};
 
 <span class="kw">pub fn </span>try_convert(model_projection: <span class="kw-2">&amp;</span>ModelProjection, result_set: ResultSet) -&gt; <span class="kw">crate</span>::Result&lt;SelectionResult&gt; {
     <span class="kw">let </span>columns: Vec&lt;String&gt; = result_set.columns().iter().map(|c| c.to_string()).collect();

@@ -105,8 +105,8 @@
 </pre></div><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::row::{sanitize_f32, sanitize_f64};
 <span class="kw">use </span>bigdecimal::{BigDecimal, FromPrimitive};
 <span class="kw">use </span>chrono::{DateTime, NaiveDate, Utc};
-<span class="kw">use </span>prisma_models::PrismaValue;
 <span class="kw">use </span>quaint::ValueType;
+<span class="kw">use </span>query_structure::PrismaValue;
 
 <span class="kw">pub fn </span>to_prisma_value&lt;<span class="lifetime">&#39;a</span>, T: Into&lt;ValueType&lt;<span class="lifetime">&#39;a</span>&gt;&gt;&gt;(qv: T) -&gt; <span class="kw">crate</span>::Result&lt;PrismaValue&gt; {
     <span class="kw">let </span>val = <span class="kw">match </span>qv.into() {

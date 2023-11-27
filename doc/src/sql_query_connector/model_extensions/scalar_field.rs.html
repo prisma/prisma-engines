@@ -137,12 +137,12 @@
 <a href="#137" id="137">137</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::context::Context;
 <span class="kw">use </span>chrono::Utc;
-<span class="kw">use </span>prisma_models::{ScalarField, TypeIdentifier};
 <span class="kw">use </span>prisma_value::PrismaValue;
 <span class="kw">use </span>quaint::{
     ast::{EnumName, Value, ValueType},
     prelude::{EnumVariant, TypeDataLength, TypeFamily},
 };
+<span class="kw">use </span>query_structure::{ScalarField, TypeIdentifier};
 
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">trait </span>ScalarFieldExt {
     <span class="kw">fn </span>value&lt;<span class="lifetime">&#39;a</span>&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, pv: PrismaValue, ctx: <span class="kw-2">&amp;</span>Context&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; Value&lt;<span class="lifetime">&#39;a</span>&gt;;
