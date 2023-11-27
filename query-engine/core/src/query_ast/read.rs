@@ -73,6 +73,19 @@ impl ReadQuery {
             ReadQuery::AggregateRecordsQuery(_) => false,
         }
     }
+
+    pub(crate) fn has_aggregation_selections(&self) -> bool {
+        fn has_aggregations(selections: &[RelAggregationSelection], nested: &[ReadQuery]) -> bool {
+            !selections.is_empty() || nested.iter().any(|q| q.has_aggregation_selections())
+        }
+
+        match self {
+            ReadQuery::RecordQuery(q) => has_aggregations(&q.aggregation_selections, &q.nested),
+            ReadQuery::ManyRecordsQuery(q) => has_aggregations(&q.aggregation_selections, &q.nested),
+            ReadQuery::RelatedRecordsQuery(q) => has_aggregations(&q.aggregation_selections, &q.nested),
+            ReadQuery::AggregateRecordsQuery(_) => false,
+        }
+    }
 }
 
 impl FilteredQuery for ReadQuery {
@@ -229,6 +242,10 @@ impl RelatedRecordsQuery {
 
     pub fn has_distinct(&self) -> bool {
         self.args.distinct.is_some() || self.nested.iter().any(|q| q.has_distinct())
+    }
+
+    pub fn has_aggregation_selections(&self) -> bool {
+        !self.aggregation_selections.is_empty() || self.nested.iter().any(|q| q.has_aggregation_selections())
     }
 }
 
