@@ -62,5 +62,5 @@ jobs:
         env:
           SLACK_TITLE: 'Building and publishing @prisma/prisma-schema-wasm failed :x:'
           SLACK_COLOR: '#FF0000'
-          SLACK_CHANNEL: feed-prisma-fmt-wasm-publish-failures
+          SLACK_CHANNEL: feed-prisma-schema-wasm-publish-failures
           SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK_WASM_FAILING }}
