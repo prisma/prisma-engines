@@ -185,7 +185,7 @@ fn build_relation_record_selection<'a>(
     selections
         .map(|rq| RelationRecordSelection {
             name: rq.field.name().to_owned(),
-            fields: rq.selections.iter().map(|sf| sf.prisma_name().to_owned()).collect(),
+            fields: rq.result_fields.clone(),
             model: rq.field.related_model(),
             nested: build_relation_record_selection(rq.relations()),
         })
