@@ -24,3 +24,17 @@ pub mod wasm;
 
 #[cfg(target_arch = "wasm32")]
 pub use wasm::*;
+
+#[cfg(target_arch = "wasm32")]
+mod arch {
+    use wasm_bindgen::JsValue;
+
+    pub(crate) type JsResult<T> = core::result::Result<T, JsValue>;
+}
+
+#[cfg(not(target_arch = "wasm32"))]
+mod arch {
+    pub(crate) type JsResult<T> = napi::Result<T>;
+}
+
+pub(crate) use arch::JsResult;

@@ -1,4 +1,5 @@
 pub use crate::types::{ColumnType, JSResultSet, Query, TransactionOptions};
+use crate::JsResult;
 
 use super::async_js_function::AsyncJsFunction;
 use super::transaction::JsTransaction;
@@ -43,7 +44,7 @@ pub(crate) struct TransactionProxy {
 }
 
 impl CommonProxy {
-    pub fn new(object: &JsObject) -> napi::Result<Self> {
+    pub fn new(object: &JsObject) -> JsResult<Self> {
         let flavour: JsString = object.get_named_property("flavour")?;
 
         Ok(Self {
@@ -63,7 +64,7 @@ impl CommonProxy {
 }
 
 impl DriverProxy {
-    pub fn new(driver_adapter: &JsObject) -> napi::Result<Self> {
+    pub fn new(driver_adapter: &JsObject) -> JsResult<Self> {
         Ok(Self {
             start_transaction: driver_adapter.get_named_property("startTransaction")?,
         })
@@ -82,7 +83,7 @@ impl DriverProxy {
 }
 
 impl TransactionProxy {
-    pub fn new(js_transaction: &JsObject) -> napi::Result<Self> {
+    pub fn new(js_transaction: &JsObject) -> JsResult<Self> {
         let commit = js_transaction.get_named_property("commit")?;
         let rollback = js_transaction.get_named_property("rollback")?;
         let options = js_transaction.get_named_property("options")?;

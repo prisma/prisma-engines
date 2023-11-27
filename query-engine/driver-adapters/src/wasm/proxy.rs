@@ -1,16 +1,15 @@
-use futures::Future;
-use js_sys::{Function as JsFunction, JsString};
-use tsify::Tsify;
-
-use super::{async_js_function::AsyncJsFunction, transaction::JsTransaction};
 use crate::send_future::SendFuture;
 pub use crate::types::{ColumnType, JSResultSet, Query, TransactionOptions};
 use crate::JsObjectExtern;
+use crate::JsResult;
+
+use super::{async_js_function::AsyncJsFunction, transaction::JsTransaction};
+use futures::Future;
+use js_sys::{Function as JsFunction, JsString};
 use metrics::increment_gauge;
 use std::sync::atomic::{AtomicBool, Ordering};
-use wasm_bindgen::{prelude::wasm_bindgen, JsValue};
-
-type JsResult<T> = core::result::Result<T, JsValue>;
+use tsify::Tsify;
+use wasm_bindgen::prelude::wasm_bindgen;
 
 /// Proxy is a struct wrapping a javascript object that exhibits basic primitives for
 /// querying and executing SQL (i.e. a client connector). The Proxy uses Wasm's JsFunction to
