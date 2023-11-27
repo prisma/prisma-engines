@@ -1,8 +1,8 @@
 use std::borrow::Cow;
 use std::str::FromStr;
+use std::sync::atomic::{AtomicBool, Ordering};
 
 pub use crate::types::{ColumnType, JSResultSet, Query, TransactionOptions};
-
 use quaint::{
     connector::ResultSet as QuaintResultSet,
     error::{Error as QuaintError, ErrorKind},

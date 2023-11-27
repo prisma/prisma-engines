@@ -5,6 +5,7 @@ use super::transaction::JsTransaction;
 use metrics::increment_gauge;
 use napi::threadsafe_function::{ErrorStrategy, ThreadsafeFunction};
 use napi::{JsObject, JsString};
+use std::sync::atomic::{AtomicBool, Ordering};
 
 /// Proxy is a struct wrapping a javascript object that exhibits basic primitives for
 /// querying and executing SQL (i.e. a client connector). The Proxy uses NAPI ThreadSafeFunction to
@@ -38,9 +39,8 @@ pub(crate) struct TransactionProxy {
     /// rollback transaction
     rollback: AsyncJsFunction<(), ()>,
 
-    /// dispose transaction, cleanup logic executed at the end of the transaction lifecycle
-    /// on drop.
-    dispose: ThreadsafeFunction<(), ErrorStrategy::Fatal>,
+    /// whether the transaction has already been committed or rolled back
+    closed: AtomicBool,
 }
 
 impl CommonProxy {
@@ -86,14 +86,14 @@ impl TransactionProxy {
     pub fn new(js_transaction: &JsObject) -> napi::Result<Self> {
         let commit = js_transaction.get_named_property("commit")?;
         let rollback = js_transaction.get_named_property("rollback")?;
-        let dispose = js_transaction.get_named_property("dispose")?;
         let options = js_transaction.get_named_property("options")?;
+        let closed = AtomicBool::new(false);
 
         Ok(Self {
             commit,
             rollback,
-            dispose,
             options,
+            closed,
         })
     }
 
@@ -101,19 +101,56 @@ impl TransactionProxy {
         &self.options
     }
 
+    /// Commits the transaction via the driver adapter.
+    ///
+    /// ## Cancellation safety
+    ///
+    /// The future is cancellation-safe as long as the underlying Node-API call
+    /// is cancellation-safe and no new await points are introduced between storing true in
+    /// [`TransactionProxy::closed`] and calling the underlying JS function.
+    ///
+    /// - If `commit` is called but never polled or awaited, it's a no-op, the transaction won't be
+    ///   committed and [`TransactionProxy::closed`] will not be changed.
+    ///
+    /// - If it is polled at least once, `true` will be stored in [`TransactionProxy::closed`] and
+    ///   the underlying FFI call will be delivered to JavaScript side in lockstep, so the destructor
+    ///   will not attempt rolling the transaction back even if the `commit` future was dropped while
+    ///   waiting on the JavaScript call to complete and deliver response.
     pub async fn commit(&self) -> quaint::Result<()> {
+        self.closed.store(true, Ordering::Relaxed);
         self.commit.call(()).await
     }
 
+    /// Rolls back the transaction via the driver adapter.
+    ///
+    /// ## Cancellation safety
+    ///
+    /// The future is cancellation-safe as long as the underlying Node-API call
+    /// is cancellation-safe and no new await points are introduced between storing true in
+    /// [`TransactionProxy::closed`] and calling the underlying JS function.
+    ///
+    /// - If `rollback` is called but never polled or awaited, it's a no-op, the transaction won't be
+    ///   rolled back yet and [`TransactionProxy::closed`] will not be changed.
+    ///
+    /// - If it is polled at least once, `true` will be stored in [`TransactionProxy::closed`] and
+    ///   the underlying FFI call will be delivered to JavaScript side in lockstep, so the destructor
+    ///   will not attempt rolling back again even if the `rollback` future was dropped while waiting
+    ///   on the JavaScript call to complete and deliver response.
     pub async fn rollback(&self) -> quaint::Result<()> {
+        self.closed.store(true, Ordering::Relaxed);
         self.rollback.call(()).await
     }
 }
 
 impl Drop for TransactionProxy {
     fn drop(&mut self) {
+        if self.closed.swap(true, Ordering::Relaxed) {
+            return;
+        }
+
         _ = self
-            .dispose
+            .rollback
+            .as_raw()
             .call((), napi::threadsafe_function::ThreadsafeFunctionCallMode::NonBlocking);
     }
 }

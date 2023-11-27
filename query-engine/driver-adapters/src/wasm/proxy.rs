@@ -7,6 +7,7 @@ use crate::send_future::SendFuture;
 pub use crate::types::{ColumnType, JSResultSet, Query, TransactionOptions};
 use crate::JsObjectExtern;
 use metrics::increment_gauge;
+use std::sync::atomic::{AtomicBool, Ordering};
 use wasm_bindgen::{prelude::wasm_bindgen, JsValue};
 
 type JsResult<T> = core::result::Result<T, JsValue>;
@@ -47,9 +48,8 @@ pub(crate) struct TransactionProxy {
     /// rollback transaction
     rollback: AsyncJsFunction<(), ()>,
 
-    /// dispose transaction, cleanup logic executed at the end of the transaction lifecycle
-    /// on drop.
-    dispose: JsFunction,
+    /// whether the transaction has already been committed or rolled back
+    closed: AtomicBool,
 }
 
 impl CommonProxy {
@@ -100,12 +100,13 @@ impl DriverProxy {
 impl TransactionProxy {
     pub fn new(object: &JsObjectExtern) -> JsResult<Self> {
         let options = object.get("options".into())?;
+        let closed = AtomicBool::new(false);
 
         Ok(Self {
             options: TransactionOptions::from_js(options).unwrap(),
             commit: JsFunction::from(object.get("commit".into())?).into(),
-            rollback: JsFunction::from(object.get("dispose".into())?).into(),
-            dispose: object.get("dispose".into())?.into(),
+            rollback: JsFunction::from(object.get("rollback".into())?).into(),
+            closed,
         })
     }
 
@@ -114,17 +115,23 @@ impl TransactionProxy {
     }
 
     pub fn commit<'a>(&'a self) -> SendFuture<impl Future<Output = quaint::Result<()>> + 'a> {
+        self.closed.store(true, Ordering::Relaxed);
         SendFuture(self.commit.call(()))
     }
 
     pub fn rollback<'a>(&'a self) -> SendFuture<impl Future<Output = quaint::Result<()>> + 'a> {
+        self.closed.store(true, Ordering::Relaxed);
         SendFuture(self.rollback.call(()))
     }
 }
 
 impl Drop for TransactionProxy {
     fn drop(&mut self) {
-        _ = self.dispose.call0(&JsValue::null());
+        if self.closed.swap(true, Ordering::Relaxed) {
+            return;
+        }
+
+        _ = self.rollback.as_raw().call0(&JsValue::null());
     }
 }
 

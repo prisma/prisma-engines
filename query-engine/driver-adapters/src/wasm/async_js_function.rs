@@ -64,6 +64,10 @@ where
 
         Ok(js_result)
     }
+
+    pub(crate) fn as_raw(&self) -> &JsFunction {
+        &self.threadsafe_fn
+    }
 }
 
 impl<ArgType, ReturnType> WasmDescribe for AsyncJsFunction<ArgType, ReturnType>
