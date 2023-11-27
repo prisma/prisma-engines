@@ -150,9 +150,14 @@ impl OrderByBuilder {
         // Unwraps are safe because the SQL connector doesn't yet support any other type of orderBy hop but the relation hop.
         let mut joins: Vec<AliasedJoin> = vec![];
 
+        let parent_alias = self.parent_alias.clone();
+
         for (i, hop) in rest_hops.iter().enumerate() {
             let previous_join = if i > 0 { joins.get(i - 1) } else { None };
-            let previous_alias = previous_join.map(|j| j.alias.as_str());
+
+            let previous_alias = previous_join
+                .map(|j| j.alias.as_str())
+                .or_else(|| parent_alias.as_deref());
             let join = compute_one2m_join(hop.as_relation_hop().unwrap(), &self.join_prefix(), previous_alias, ctx);
 
             joins.push(join);
@@ -192,9 +197,14 @@ impl OrderByBuilder {
     ) -> (Vec<AliasedJoin>, Column<'static>) {
         let mut joins: Vec<AliasedJoin> = vec![];
 
+        let parent_alias = self.parent_alias.clone();
+
         for (i, hop) in order_by.path.iter().enumerate() {
             let previous_join = if i > 0 { joins.get(i - 1) } else { None };
-            let previous_alias = previous_join.map(|j| j.alias.as_str());
+            let previous_alias = previous_join
+                .map(|j| &j.alias)
+                .or(parent_alias.as_ref())
+                .map(|alias| alias.as_str());
             let join = compute_one2m_join(hop.as_relation_hop().unwrap(), &self.join_prefix(), previous_alias, ctx);
 
             joins.push(join);

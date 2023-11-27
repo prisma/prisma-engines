@@ -394,7 +394,7 @@ fn serialize_objects_with_relation(
                         serialize_relation_selection(rrs, val, inner_typ, query_schema)?,
                     );
                 }
-                _ => (),
+                _ => panic!("unexpected field"),
             }
         }
 
@@ -413,6 +413,10 @@ fn serialize_relation_selection(
     typ: &ObjectType<'_>,
     query_schema: &QuerySchema,
 ) -> crate::Result<Item> {
+    if value.is_null() {
+        return Ok(Item::Value(PrismaValue::Null));
+    }
+
     let mut map = Map::new();
 
     // TODO: handle errors

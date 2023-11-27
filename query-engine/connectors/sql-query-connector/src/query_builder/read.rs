@@ -2,19 +2,16 @@ use crate::{
     cursor_condition, filter::FilterBuilder, model_extensions::*, nested_aggregations, ordering::OrderByBuilder,
     sql_trace::SqlTraceComment, Context,
 };
-use connector_interface::{AggregationSelection, RelAggregationSelection, RelatedQuery};
+use connector_interface::{AggregationSelection, RelAggregationSelection};
 use itertools::Itertools;
 use quaint::ast::*;
 use query_structure::*;
 use tracing::Span;
 
-use super::select;
-
 pub(crate) trait SelectDefinition {
     fn into_select(
         self,
         _: &Model,
-        nested: Vec<RelatedQuery>,
         aggr_selections: &[RelAggregationSelection],
         ctx: &Context<'_>,
     ) -> (Select<'static>, Vec<Expression<'static>>);
@@ -24,12 +21,11 @@ impl SelectDefinition for Filter {
     fn into_select(
         self,
         model: &Model,
-        nested: Vec<RelatedQuery>,
         aggr_selections: &[RelAggregationSelection],
         ctx: &Context<'_>,
     ) -> (Select<'static>, Vec<Expression<'static>>) {
         let args = QueryArguments::from((model.clone(), self));
-        args.into_select(model, nested, aggr_selections, ctx)
+        args.into_select(model, aggr_selections, ctx)
     }
 }
 
@@ -37,11 +33,10 @@ impl SelectDefinition for &Filter {
     fn into_select(
         self,
         model: &Model,
-        nested: Vec<RelatedQuery>,
         aggr_selections: &[RelAggregationSelection],
         ctx: &Context<'_>,
     ) -> (Select<'static>, Vec<Expression<'static>>) {
-        self.clone().into_select(model, nested, aggr_selections, ctx)
+        self.clone().into_select(model, aggr_selections, ctx)
     }
 }
 
@@ -49,7 +44,6 @@ impl SelectDefinition for Select<'static> {
     fn into_select(
         self,
         _: &Model,
-        _: Vec<RelatedQuery>,
         _: &[RelAggregationSelection],
         _ctx: &Context<'_>,
     ) -> (Select<'static>, Vec<Expression<'static>>) {
@@ -61,7 +55,6 @@ impl SelectDefinition for QueryArguments {
     fn into_select(
         self,
         model: &Model,
-        nested: Vec<RelatedQuery>,
         aggr_selections: &[RelAggregationSelection],
         ctx: &Context<'_>,
     ) -> (Select<'static>, Vec<Expression<'static>>) {
@@ -125,13 +118,12 @@ pub(crate) fn get_records<T>(
     columns: impl Iterator<Item = Column<'static>>,
     aggr_selections: &[RelAggregationSelection],
     query: T,
-    nested: Vec<RelatedQuery>,
     ctx: &Context<'_>,
 ) -> Select<'static>
 where
     T: SelectDefinition,
 {
-    let (select, additional_selection_set) = query.into_select(model, nested, aggr_selections, ctx);
+    let (select, additional_selection_set) = query.into_select(model, aggr_selections, ctx);
     let select = columns.fold(select, |acc, col| acc.column(col));
 
     let select = select.append_trace(&Span::current()).add_trace_id(ctx.trace_id);
@@ -174,7 +166,7 @@ pub(crate) fn aggregate(
     ctx: &Context<'_>,
 ) -> Select<'static> {
     let columns = extract_columns(model, selections, ctx);
-    let sub_query = get_records(model, columns.into_iter(), &[], args, Vec::new(), ctx);
+    let sub_query = get_records(model, columns.into_iter(), &[], args, ctx);
     let sub_table = Table::from(sub_query).alias("sub");
 
     selections.iter().fold(
@@ -231,7 +223,7 @@ pub(crate) fn group_by_aggregate(
     having: Option<Filter>,
     ctx: &Context<'_>,
 ) -> Select<'static> {
-    let (base_query, _) = args.into_select(model, Vec::new(), &[], ctx);
+    let (base_query, _) = args.into_select(model, &[], ctx);
 
     let select_query = selections.iter().fold(base_query, |select, next_op| match next_op {
         AggregationSelection::Field(field) => select.column(field.as_column(ctx).set_is_selected(true)),
