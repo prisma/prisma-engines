@@ -17,7 +17,7 @@ on:
         required: true
         default: 'latest'
         description: 'npm dist-tag (e.g. latest or integration)'
-  
+
 jobs:
   build:
     name: Build and publish @prisma/query-engine-wasm
@@ -25,7 +25,7 @@ jobs:
     steps:
       - name: Print input
         run: echo "${{ toJson(github.event.inputs) }}"
-        
+
       - uses: actions/checkout@v4
         with:
           ref: ${{ github.event.inputs.enginesHash }}
@@ -46,10 +46,10 @@ jobs:
       - name: Build @prisma/query-engine-wasm
         run: ./build.sh ${{ github.event.inputs.packageVersion }}
         working-directory: ./query-engine/query-engine-wasm
-        
+
       - name: Set up NPM token for publishing
         run: echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}" > ~/.npmrc
-        
+
       - name: Publish @prisma/query-engine-wasm
         run: npm publish --access public --tag ${{ github.event.inputs.npmDistTag }}
         working-directory: ./query-engine/query-engine-wasm/pkg
