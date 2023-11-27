@@ -17,7 +17,8 @@ on:
         required: true
         default: 'latest'
         description: 'npm dist-tag (e.g. latest or integration)'
-
+  pull_request:
+  
 jobs:
   build:
     name: Build and publish @prisma/query-engine-wasm
@@ -26,33 +27,36 @@ jobs:
       - name: Print input
         run: echo "${{ toJson(github.event.inputs) }}"
 
-      - uses: actions/checkout@v4
-        with:
-          ref: ${{ github.event.inputs.enginesHash }}
-
-      - name: Install Rust toolchain
-        uses: dtolnay/rust-toolchain@stable
-        with:
-          targets: wasm32-unknown-unknown
-
-      - name: Install Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20.x'
-
-      - name: Install wasm-pack
-        run: cargo install wasm-pack
-
-      - name: Build @prisma/query-engine-wasm
-        run: ./build.sh ${{ github.event.inputs.packageVersion }}
-        working-directory: ./query-engine/query-engine-wasm
-
       - name: Set up NPM token for publishing
-        run: echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}" > ~/.npmrc
+        run: exit 1
+        
+      # - uses: actions/checkout@v4
+      #   with:
+      #     ref: ${{ github.event.inputs.enginesHash }}
 
-      - name: Publish @prisma/query-engine-wasm
-        run: npm publish --access public --tag ${{ github.event.inputs.npmDistTag }}
-        working-directory: ./query-engine/query-engine-wasm/pkg
+      # - name: Install Rust toolchain
+      #   uses: dtolnay/rust-toolchain@stable
+      #   with:
+      #     targets: wasm32-unknown-unknown
+
+      # - name: Install Node.js
+      #   uses: actions/setup-node@v4
+      #   with:
+      #     node-version: '20.x'
+
+      # - name: Install wasm-pack
+      #   run: cargo install wasm-pack
+
+      # - name: Build @prisma/query-engine-wasm
+      #   run: ./build.sh ${{ github.event.inputs.packageVersion }}
+      #   working-directory: ./query-engine/query-engine-wasm
+        
+      # - name: Set up NPM token for publishing
+      #   run: echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}" > ~/.npmrc
+        
+      # - name: Publish @prisma/query-engine-wasm
+      #   run: npm publish --access public --tag ${{ github.event.inputs.npmDistTag }}
+      #   working-directory: ./query-engine/query-engine-wasm/pkg
 
       #
       # Failure handlers
@@ -66,4 +70,5 @@ jobs:
         env:
           SLACK_TITLE: 'Building and publishing @prisma/query-engine-wasm failed :x:'
           SLACK_COLOR: '#FF0000'
+          SLACK_CHANNEL: feed-prisma-fmt-wasm-publish-failures
           SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK_WASM_FAILING }}
