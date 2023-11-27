@@ -60,7 +60,7 @@ pub(crate) fn coerce_json_relation_to_pv(value: serde_json::Value, rs: &Relation
                             map.push((key, coerce_json_relation_to_pv(value, nested_selection)));
                         }
                     }
-                    Field::Composite(_) => unreachable!(),
+                    _ => (),
                 }
             }
 
