@@ -1,5 +1,5 @@
 name: Build and publish @prisma/query-engine-wasm
-run-name: npm - release @prisma/query-engine-wasm@${{ github.event.inputs.enginesWrapperVersion }} from ${{ github.event.inputs.enginesHash }} on ${{ github.event.inputs.npmDistTag }}
+run-name: npm - release @prisma/query-engine-wasm@${{ github.event.inputs.packageVersion }} from ${{ github.event.inputs.enginesHash }} on ${{ github.event.inputs.npmDistTag }}
 
 concurrency: publish-query-engine-wasm
 
