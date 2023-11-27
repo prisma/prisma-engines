@@ -16,7 +16,7 @@ where
     ArgType: Serialize,
     ReturnType: FromJsValue,
 {
-    pub threadsafe_fn: JsFunction,
+    threadsafe_fn: JsFunction,
 
     _phantom_arg: PhantomData<ArgType>,
     _phantom_return: PhantomData<ReturnType>,
@@ -41,7 +41,7 @@ where
     T: Serialize,
     R: FromJsValue,
 {
-    pub async fn call(&self, arg1: T) -> quaint::Result<R> {
+    pub(crate) async fn call(&self, arg1: T) -> quaint::Result<R> {
         let result = self.call_internal(arg1).await;
 
         match result {
@@ -65,8 +65,10 @@ where
         Ok(js_result)
     }
 
-    pub(crate) fn as_raw(&self) -> &JsFunction {
-        &self.threadsafe_fn
+    pub(crate) fn call_non_blocking(&self, arg: T) {
+        if let Ok(arg) = serde_wasm_bindgen::to_value(&arg) {
+            _ = self.threadsafe_fn.call1(&JsValue::null(), &arg);
+        }
     }
 }
 
@@ -88,10 +90,6 @@ where
     type Abi = <JsFunction as FromWasmAbi>::Abi;
 
     unsafe fn from_abi(js: Self::Abi) -> Self {
-        Self {
-            threadsafe_fn: JsFunction::from_abi(js),
-            _phantom_arg: PhantomData::<ArgType> {},
-            _phantom_return: PhantomData::<ReturnType> {},
-        }
+        JsFunction::from_abi(js).into()
     }
 }

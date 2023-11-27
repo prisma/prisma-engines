@@ -2,7 +2,7 @@ use std::marker::PhantomData;
 
 use napi::{
     bindgen_prelude::*,
-    threadsafe_function::{ErrorStrategy, ThreadsafeFunction},
+    threadsafe_function::{ErrorStrategy, ThreadsafeFunction, ThreadsafeFunctionCallMode},
 };
 
 use super::{
@@ -56,8 +56,8 @@ where
         js_result.into()
     }
 
-    pub(crate) fn as_raw(&self) -> &ThreadsafeFunction<ArgType, ErrorStrategy::Fatal> {
-        &self.threadsafe_fn
+    pub(crate) fn call_non_blocking(&self, arg: ArgType) {
+        _ = self.threadsafe_fn.call(arg, ThreadsafeFunctionCallMode::NonBlocking);
     }
 }
 

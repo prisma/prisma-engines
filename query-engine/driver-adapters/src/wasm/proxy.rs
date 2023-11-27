@@ -131,7 +131,7 @@ impl Drop for TransactionProxy {
             return;
         }
 
-        _ = self.rollback.as_raw().call0(&JsValue::null());
+        _ = self.rollback.call_non_blocking(());
     }
 }
 

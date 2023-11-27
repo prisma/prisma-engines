@@ -3,7 +3,6 @@ pub use crate::types::{ColumnType, JSResultSet, Query, TransactionOptions};
 use super::async_js_function::AsyncJsFunction;
 use super::transaction::JsTransaction;
 use metrics::increment_gauge;
-use napi::threadsafe_function::{ErrorStrategy, ThreadsafeFunction};
 use napi::{JsObject, JsString};
 use std::sync::atomic::{AtomicBool, Ordering};
 
@@ -148,9 +147,6 @@ impl Drop for TransactionProxy {
             return;
         }
 
-        _ = self
-            .rollback
-            .as_raw()
-            .call((), napi::threadsafe_function::ThreadsafeFunctionCallMode::NonBlocking);
+        _ = self.rollback.call_non_blocking(());
     }
 }
