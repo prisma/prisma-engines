@@ -981,15 +981,50 @@
 <a href="#981" id="981">981</a>
 <a href="#982" id="982">982</a>
 <a href="#983" id="983">983</a>
+<a href="#984" id="984">984</a>
+<a href="#985" id="985">985</a>
+<a href="#986" id="986">986</a>
+<a href="#987" id="987">987</a>
+<a href="#988" id="988">988</a>
+<a href="#989" id="989">989</a>
+<a href="#990" id="990">990</a>
+<a href="#991" id="991">991</a>
+<a href="#992" id="992">992</a>
+<a href="#993" id="993">993</a>
+<a href="#994" id="994">994</a>
+<a href="#995" id="995">995</a>
+<a href="#996" id="996">996</a>
+<a href="#997" id="997">997</a>
+<a href="#998" id="998">998</a>
+<a href="#999" id="999">999</a>
+<a href="#1000" id="1000">1000</a>
+<a href="#1001" id="1001">1001</a>
+<a href="#1002" id="1002">1002</a>
+<a href="#1003" id="1003">1003</a>
+<a href="#1004" id="1004">1004</a>
+<a href="#1005" id="1005">1005</a>
+<a href="#1006" id="1006">1006</a>
+<a href="#1007" id="1007">1007</a>
+<a href="#1008" id="1008">1008</a>
+<a href="#1009" id="1009">1009</a>
+<a href="#1010" id="1010">1010</a>
+<a href="#1011" id="1011">1011</a>
+<a href="#1012" id="1012">1012</a>
+<a href="#1013" id="1013">1013</a>
+<a href="#1014" id="1014">1014</a>
+<a href="#1015" id="1015">1015</a>
+<a href="#1016" id="1016">1016</a>
+<a href="#1017" id="1017">1017</a>
+<a href="#1018" id="1018">1018</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::borrow::Cow;
 <span class="kw">use </span>std::str::FromStr;
+<span class="kw">use </span>std::sync::atomic::{AtomicBool, Ordering};
 
 <span class="kw">use </span><span class="kw">crate</span>::async_js_function::AsyncJsFunction;
 <span class="kw">use </span><span class="kw">crate</span>::conversion::JSArg;
 <span class="kw">use </span><span class="kw">crate</span>::transaction::JsTransaction;
 <span class="kw">use </span>metrics::increment_gauge;
 <span class="kw">use </span>napi::bindgen_prelude::{FromNapiValue, ToNapiValue};
-<span class="kw">use </span>napi::threadsafe_function::{ErrorStrategy, ThreadsafeFunction};
 <span class="kw">use </span>napi::{JsObject, JsString};
 <span class="kw">use </span>napi_derive::napi;
 <span class="kw">use </span>quaint::connector::ResultSet <span class="kw">as </span>QuaintResultSet;
@@ -1035,9 +1070,8 @@
     <span class="doccomment">/// rollback transaction
     </span>rollback: AsyncJsFunction&lt;(), ()&gt;,
 
-    <span class="doccomment">/// dispose transaction, cleanup logic executed at the end of the transaction lifecycle
-    /// on drop.
-    </span>dispose: ThreadsafeFunction&lt;(), ErrorStrategy::Fatal&gt;,
+    <span class="doccomment">/// whether the transaction has already been committed or rolled back
+    </span>closed: AtomicBool,
 }
 
 <span class="doccomment">/// This result set is more convenient to be manipulated from both Rust and NodeJS.
@@ -1564,14 +1598,13 @@
     <span class="kw">pub fn </span>new(js_transaction: <span class="kw-2">&amp;</span>JsObject) -&gt; napi::Result&lt;<span class="self">Self</span>&gt; {
         <span class="kw">let </span>commit = js_transaction.get_named_property(<span class="string">&quot;commit&quot;</span>)<span class="question-mark">?</span>;
         <span class="kw">let </span>rollback = js_transaction.get_named_property(<span class="string">&quot;rollback&quot;</span>)<span class="question-mark">?</span>;
-        <span class="kw">let </span>dispose = js_transaction.get_named_property(<span class="string">&quot;dispose&quot;</span>)<span class="question-mark">?</span>;
         <span class="kw">let </span>options = js_transaction.get_named_property(<span class="string">&quot;options&quot;</span>)<span class="question-mark">?</span>;
 
         <span class="prelude-val">Ok</span>(<span class="self">Self </span>{
             commit,
             rollback,
-            dispose,
             options,
+            closed: AtomicBool::new(<span class="bool-val">false</span>),
         })
     }
 
@@ -1579,19 +1612,56 @@
         <span class="kw-2">&amp;</span><span class="self">self</span>.options
     }
 
-    <span class="kw">pub async fn </span>commit(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; quaint::Result&lt;()&gt; {
+    <span class="doccomment">/// Commits the transaction via the driver adapter.
+    ///
+    /// ## Cancellation safety
+    ///
+    /// The future is cancellation-safe as long as the underlying Node-API call
+    /// is cancellation-safe and no new await points are introduced between storing true in
+    /// [`TransactionProxy::closed`] and calling the underlying JS function.
+    ///
+    /// - If `commit` is called but never polled or awaited, it&#39;s a no-op, the transaction won&#39;t be
+    ///   committed and [`TransactionProxy::closed`] will not be changed.
+    ///
+    /// - If it is polled at least once, `true` will be stored in [`TransactionProxy::closed`] and
+    ///   the underlying FFI call will be delivered to JavaScript side in lockstep, so the destructor
+    ///   will not attempt rolling the transaction back even if the `commit` future was dropped while
+    ///   waiting on the JavaScript call to complete and deliver response.
+    </span><span class="kw">pub async fn </span>commit(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; quaint::Result&lt;()&gt; {
+        <span class="self">self</span>.closed.store(<span class="bool-val">true</span>, Ordering::Relaxed);
         <span class="self">self</span>.commit.call(()).<span class="kw">await
     </span>}
 
-    <span class="kw">pub async fn </span>rollback(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; quaint::Result&lt;()&gt; {
+    <span class="doccomment">/// Rolls back the transaction via the driver adapter.
+    ///
+    /// ## Cancellation safety
+    ///
+    /// The future is cancellation-safe as long as the underlying Node-API call
+    /// is cancellation-safe and no new await points are introduced between storing true in
+    /// [`TransactionProxy::closed`] and calling the underlying JS function.
+    ///
+    /// - If `rollback` is called but never polled or awaited, it&#39;s a no-op, the transaction won&#39;t be
+    ///   rolled back yet and [`TransactionProxy::closed`] will not be changed.
+    ///
+    /// - If it is polled at least once, `true` will be stored in [`TransactionProxy::closed`] and
+    ///   the underlying FFI call will be delivered to JavaScript side in lockstep, so the destructor
+    ///   will not attempt rolling back again even if the `rollback` future was dropped while waiting
+    ///   on the JavaScript call to complete and deliver response.
+    </span><span class="kw">pub async fn </span>rollback(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; quaint::Result&lt;()&gt; {
+        <span class="self">self</span>.closed.store(<span class="bool-val">true</span>, Ordering::Relaxed);
         <span class="self">self</span>.rollback.call(()).<span class="kw">await
     </span>}
 }
 
 <span class="kw">impl </span>Drop <span class="kw">for </span>TransactionProxy {
     <span class="kw">fn </span>drop(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
+        <span class="kw">if </span><span class="self">self</span>.closed.swap(<span class="bool-val">true</span>, Ordering::Relaxed) {
+            <span class="kw">return</span>;
+        }
+
         <span class="kw">_ </span>= <span class="self">self
-            </span>.dispose
+            </span>.rollback
+            .as_raw()
             .call((), napi::threadsafe_function::ThreadsafeFunctionCallMode::NonBlocking);
     }
 }
