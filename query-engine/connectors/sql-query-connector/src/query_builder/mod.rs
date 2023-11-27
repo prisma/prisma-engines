@@ -3,8 +3,8 @@ pub(crate) mod write;
 
 use crate::context::Context;
 use crate::model_extensions::SelectionResultExt;
-use prisma_models::SelectionResult;
 use quaint::ast::{Column, Comparable, ConditionTree, Query, Row, Values};
+use query_structure::SelectionResult;
 
 const PARAMETER_LIMIT: usize = 2000;
 

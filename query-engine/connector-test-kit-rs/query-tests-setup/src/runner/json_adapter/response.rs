@@ -1,8 +1,8 @@
-use prisma_models::PrismaValue;
 use query_core::{
     constants::custom_types,
     response_ir::{Item, ItemRef, Map},
 };
+use query_structure::PrismaValue;
 use request_handlers::{GQLBatchResponse, GQLResponse, PrismaResponse};
 
 pub struct JsonResponse;

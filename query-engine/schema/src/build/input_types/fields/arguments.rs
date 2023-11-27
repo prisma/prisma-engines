@@ -3,7 +3,7 @@ use constants::args;
 use input_types::objects::order_by_objects::OrderByOptions;
 use mutations::create_one;
 use objects::*;
-use prisma_models::{prelude::ParentContainer, CompositeFieldRef};
+use query_structure::{prelude::ParentContainer, CompositeFieldRef};
 
 /// Builds "where" argument.
 pub(crate) fn where_argument<'a>(ctx: &'a QuerySchema, model: &Model) -> InputField<'a> {

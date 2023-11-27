@@ -1,4 +1,4 @@
-use prisma_models::ScalarFieldRef;
+use crate::field::ScalarFieldRef;
 
 #[derive(Clone, PartialEq, Eq, Hash)]
 pub enum ScalarProjection {

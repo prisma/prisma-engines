@@ -5,15 +5,15 @@ use crate::{database::operations::*, Context, SqlError};
 use async_trait::async_trait;
 use connector::{ConnectionLike, RelAggregationSelection};
 use connector_interface::{
-    self as connector, filter::Filter, AggregationRow, AggregationSelection, Connection, QueryArguments,
-    ReadOperations, RecordFilter, Transaction, WriteArgs, WriteOperations,
+    self as connector, AggregationRow, AggregationSelection, Connection, ReadOperations, RecordFilter, Transaction,
+    WriteArgs, WriteOperations,
 };
-use prisma_models::{prelude::*, SelectionResult};
 use prisma_value::PrismaValue;
 use quaint::{
     connector::{IsolationLevel, TransactionCapable},
     prelude::{ConnectionInfo, Queryable},
 };
+use query_structure::{prelude::*, Filter, QueryArguments, SelectionResult};
 use std::{collections::HashMap, str::FromStr};
 
 pub(crate) struct SqlConnection<C> {

@@ -8,11 +8,11 @@ use crate::{
 };
 use connector_interface::*;
 use itertools::Itertools;
-use prisma_models::*;
 use quaint::{
     error::ErrorKind,
     prelude::{native_uuid, uuid_to_bin, uuid_to_bin_swapped, Aliasable, Select, SqlFamily},
 };
+use query_structure::*;
 use std::{
     collections::{HashMap, HashSet},
     ops::Deref,

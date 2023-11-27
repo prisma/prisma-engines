@@ -3,7 +3,7 @@ use std::borrow::Cow;
 use super::*;
 use constants::{aggregations, ordering};
 use output_types::aggregation;
-use prisma_models::prelude::ParentContainer;
+use query_structure::prelude::ParentContainer;
 
 #[derive(Debug, Default, Clone, Copy)]
 pub(crate) struct OrderByOptions {

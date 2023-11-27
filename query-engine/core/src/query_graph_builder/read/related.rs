@@ -1,6 +1,6 @@
 use super::*;
 use crate::{query_document::ParsedField, ReadQuery, RelatedRecordsQuery};
-use prisma_models::{Model, RelationFieldRef};
+use query_structure::{Model, RelationFieldRef};
 
 pub(crate) fn find_related(
     field: ParsedField<'_>,

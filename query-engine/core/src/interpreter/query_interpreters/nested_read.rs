@@ -1,10 +1,7 @@
 use super::{inmemory_record_processor::InMemoryRecordProcessor, read};
 use crate::{interpreter::InterpretationResult, query_ast::*};
-use connector::{
-    self, filter::Filter, ConditionListValue, ConnectionLike, QueryArguments, RelAggregationRow,
-    RelAggregationSelection, ScalarCompare,
-};
-use prisma_models::{FieldSelection, ManyRecords, PrismaValue, Record, RelationFieldRef, SelectionResult};
+use connector::{self, ConnectionLike, RelAggregationRow, RelAggregationSelection};
+use query_structure::*;
 use std::collections::HashMap;
 
 pub(crate) async fn m2m(

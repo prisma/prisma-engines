@@ -3,9 +3,8 @@ use crate::{
     query_graph::{Node, NodeRef, QueryGraph, QueryGraphDependency},
     ParsedInputMap, ParsedInputValue, Query, WriteQuery,
 };
-use connector::{Filter, RelationCompare};
 use itertools::Itertools;
-use prisma_models::{Model, PrismaValue, RelationFieldRef, SelectionResult};
+use query_structure::{Filter, Model, PrismaValue, RelationCompare, RelationFieldRef, SelectionResult};
 use std::convert::TryInto;
 
 /// Handles nested disconnect cases.

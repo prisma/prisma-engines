@@ -2,10 +2,10 @@ use crate::{
     cursor_condition, filter::FilterBuilder, model_extensions::*, nested_aggregations, ordering::OrderByBuilder,
     sql_trace::SqlTraceComment, Context,
 };
-use connector_interface::{filter::Filter, AggregationSelection, QueryArguments, RelAggregationSelection};
+use connector_interface::{AggregationSelection, RelAggregationSelection};
 use itertools::Itertools;
-use prisma_models::*;
 use quaint::ast::*;
+use query_structure::*;
 use tracing::Span;
 
 pub(crate) trait SelectDefinition {

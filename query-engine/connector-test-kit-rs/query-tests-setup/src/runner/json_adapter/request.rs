@@ -1,7 +1,6 @@
 use crate::{TestError, TestResult};
 use indexmap::IndexMap;
 use itertools::Itertools;
-use prisma_models::PrismaValue;
 use query_core::{
     constants::custom_types,
     schema::{
@@ -10,6 +9,7 @@ use query_core::{
     },
     ArgumentValue, ArgumentValueObject, Selection,
 };
+use query_structure::PrismaValue;
 use request_handlers::{Action, FieldQuery, GraphQLProtocolAdapter, JsonSingleQuery, SelectionSet, SelectionSetValue};
 use serde_json::{json, Value as JsonValue};
 

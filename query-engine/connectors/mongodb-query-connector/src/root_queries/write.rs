@@ -15,7 +15,7 @@ use mongodb::{
     options::InsertManyOptions,
     ClientSession, Collection, Database,
 };
-use prisma_models::{Model, PrismaValue, SelectionResult};
+use query_structure::{Model, PrismaValue, SelectionResult};
 use std::{collections::HashMap, convert::TryInto};
 use tracing::{info_span, Instrument};
 use update::IntoUpdateDocumentExtension;

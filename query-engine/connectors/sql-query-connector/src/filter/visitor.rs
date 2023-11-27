@@ -2,11 +2,10 @@ use super::alias::*;
 use crate::join_utils::{compute_one2m_join, AliasedJoin};
 use crate::{model_extensions::*, Context};
 
-use connector_interface::filter::*;
-use prisma_models::prelude::*;
 use psl::datamodel_connector::ConnectorCapability;
 use quaint::ast::concat;
 use quaint::ast::*;
+use query_structure::{filter::*, prelude::*};
 use std::convert::TryInto;
 
 pub(crate) trait FilterVisitorExt {

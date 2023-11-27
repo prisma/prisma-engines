@@ -5,8 +5,7 @@ use crate::{
     write::write_args_parser::WriteArgsParser,
     ParsedInputList, ParsedInputValue,
 };
-use connector::{Filter, IntoFilter};
-use prisma_models::{Model, RelationFieldRef};
+use query_structure::{Filter, IntoFilter, Model, RelationFieldRef};
 use schema::constants::args;
 use std::convert::TryInto;
 

@@ -4,9 +4,8 @@ use crate::{
     query_graph::{Node, NodeRef, QueryGraph, QueryGraphDependency},
     ParsedInputMap, ParsedInputValue, QueryResult,
 };
-use connector::{Filter, IntoFilter};
 use itertools::Itertools;
-use prisma_models::{Model, RelationFieldRef};
+use query_structure::{Filter, IntoFilter, Model, RelationFieldRef};
 use std::convert::TryInto;
 
 /// Handles nested connect cases.

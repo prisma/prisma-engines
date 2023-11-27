@@ -5,6 +5,7 @@
 //! [RelationCompare](/query-connector/trait.RelationCompare.html).
 //! [CompositeCompare](/query-connector/trait.RelationCompare.html).
 
+mod compare;
 mod composite;
 mod into_filter;
 mod json;
@@ -12,13 +13,15 @@ mod list;
 mod relation;
 mod scalar;
 
+pub use compare::*;
 pub use composite::*;
 pub use into_filter::*;
 pub use json::*;
 pub use list::*;
-use prisma_models::ScalarFieldRef;
 pub use relation::*;
 pub use scalar::*;
+
+use crate::ScalarFieldRef;
 
 #[derive(Debug, Clone, Eq, Hash, PartialEq)]
 pub enum Filter {

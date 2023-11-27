@@ -1,7 +1,7 @@
 use crate::{model_extensions::ScalarFieldExt, Context};
 use itertools::Itertools;
-use prisma_models::{Field, ModelProjection, RelationField, ScalarField};
 use quaint::ast::{Column, Row};
+use query_structure::{Field, ModelProjection, RelationField, ScalarField};
 
 pub struct ColumnIterator {
     inner: Box<dyn Iterator<Item = Column<'static>> + 'static>,

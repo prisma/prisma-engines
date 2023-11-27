@@ -4,8 +4,7 @@ use crate::{
     query_graph::{Flow, Node, QueryGraph, QueryGraphDependency},
     ParsedField, ParsedInputMap, ParsedInputValue, ParsedObject,
 };
-use connector::IntoFilter;
-use prisma_models::Model;
+use query_structure::{IntoFilter, Model};
 use schema::QuerySchema;
 
 /// Handles a top-level upsert

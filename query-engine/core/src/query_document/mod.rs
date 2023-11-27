@@ -32,7 +32,7 @@ use crate::{
     query_ast::{QueryOption, QueryOptions},
     query_graph_builder::resolve_compound_field,
 };
-use prisma_models::Model;
+use query_structure::Model;
 use schema::{constants::*, QuerySchema};
 use std::collections::HashMap;
 use user_facing_errors::query_engine::validation::ValidationError;

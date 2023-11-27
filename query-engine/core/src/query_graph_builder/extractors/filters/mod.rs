@@ -9,15 +9,10 @@ use crate::{
     query_document::{ParsedInputMap, ParsedInputValue},
     QueryGraphBuilderError, QueryGraphBuilderResult,
 };
-use connector::{
-    filter::Filter, CompositeCompare, QueryMode, RelationCompare, ScalarCompare, ScalarCondition, ScalarProjection,
-};
 use filter_fold::*;
 use filter_grouping::*;
 use indexmap::IndexMap;
-use prisma_models::{
-    prelude::ParentContainer, CompositeFieldRef, Field, Model, PrismaValue, RelationFieldRef, ScalarFieldRef,
-};
+use query_structure::{prelude::ParentContainer, *};
 use schema::constants::filters;
 use std::{borrow::Cow, collections::HashMap, convert::TryInto, str::FromStr};
 

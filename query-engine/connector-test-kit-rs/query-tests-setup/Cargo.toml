@@ -5,7 +5,7 @@ edition = "2021"
 
 [dependencies]
 serde_json.workspace = true
-prisma-models = { path = "../../prisma-models" }
+query-structure = { path = "../../query-structure" }
 once_cell = "1"
 qe-setup = { path = "../qe-setup" }
 request-handlers = { path = "../../request-handlers" }

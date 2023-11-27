@@ -1,6 +1,7 @@
 use super::*;
+
 use crate::ScalarCompare;
-use prisma_models::{SelectedField, SelectionResult};
+use crate::{SelectedField, SelectionResult};
 
 pub trait IntoFilter {
     fn filter(self) -> Filter;
