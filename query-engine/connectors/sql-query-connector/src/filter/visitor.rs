@@ -27,7 +27,7 @@ pub(crate) trait FilterVisitorExt {
 }
 
 #[derive(Debug, Clone, Default)]
-pub(crate) struct FilterVisitor {
+pub struct FilterVisitor {
     /// The last alias that's been rendered.
     last_alias: Option<Alias>,
     /// The parent alias, used when rendering nested filters so that a child filter can refer to its join.
@@ -66,6 +66,11 @@ impl FilterVisitor {
     /// Returns the parent alias, if there's one set, so that nested filters can refer to the parent join/table.
     fn parent_alias(&self) -> Option<Alias> {
         self.parent_alias
+    }
+
+    pub fn set_parent_alias_opt(mut self, alias: Option<Alias>) -> Self {
+        self.parent_alias = alias;
+        self
     }
 
     /// A top-level join can be rendered if we're explicitly allowing it or if we're in a nested visitor.
