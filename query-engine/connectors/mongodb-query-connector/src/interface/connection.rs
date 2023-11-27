@@ -6,11 +6,11 @@ use crate::{
 };
 use async_trait::async_trait;
 use connector_interface::{
-    Connection, ConnectionLike, ReadOperations, RelAggregationSelection, RelatedQuery, Transaction, UpdateType,
-    WriteArgs, WriteOperations,
+    Connection, ConnectionLike, ReadOperations, RelAggregationSelection, Transaction, UpdateType, WriteArgs,
+    WriteOperations,
 };
 use mongodb::{ClientSession, Database};
-use query_structure::{prelude::*, SelectionResult};
+use query_structure::{prelude::*, RelationLoadStrategy, SelectionResult};
 use std::collections::HashMap;
 
 pub struct MongoDbConnection {
@@ -211,8 +211,8 @@ impl ReadOperations for MongoDbConnection {
         model: &Model,
         query_arguments: query_structure::QueryArguments,
         selected_fields: &FieldSelection,
-        _nested: Vec<RelatedQuery>,
         aggregation_selections: &[RelAggregationSelection],
+        _relation_load_strategy: RelationLoadStrategy,
         _trace_id: Option<String>,
     ) -> connector_interface::Result<ManyRecords> {
         catch(async move {

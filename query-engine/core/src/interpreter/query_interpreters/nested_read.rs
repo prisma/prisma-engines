@@ -67,8 +67,8 @@ pub(crate) async fn m2m(
                 &query.parent_field.related_model(),
                 args,
                 &query.selected_fields,
-                Vec::new(),
                 &query.aggregation_selections,
+                RelationLoadStrategy::Query,
                 trace_id.clone(),
             )
             .await?
@@ -209,8 +209,8 @@ pub async fn one2m(
             &parent_field.related_model(),
             args,
             selected_fields,
-            Vec::new(),
             &aggr_selections,
+            RelationLoadStrategy::Query,
             trace_id,
         )
         .await?

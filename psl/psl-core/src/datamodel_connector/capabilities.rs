@@ -104,6 +104,7 @@ capabilities!(
     InsertReturning,
     UpdateReturning,
     RowIn, // Connector supports (a, b) IN (c, d) expression.
+    LateralJoin,
 );
 
 /// Contains all capabilities that the connector is able to serve.

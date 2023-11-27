@@ -88,7 +88,7 @@ pub(crate) fn update_record(
     } else {
         graph.flag_transactional();
 
-        let read_query = read::find_unique(field, model.clone())?;
+        let read_query = read::find_unique(field, model.clone(), query_schema)?;
         let read_node = graph.create_node(Query::Read(read_query));
 
         graph.add_result_node(&read_node);

@@ -21,7 +21,7 @@ pub(crate) fn delete_record(
     let filter = extract_unique_filter(where_arg.value.try_into()?, &model)?;
 
     // Prefetch read query for the delete
-    let mut read_query = read::find_unique(field, model.clone())?;
+    let mut read_query = read::find_unique(field, model.clone(), query_schema)?;
     read_query.add_filter(filter.clone());
 
     let read_node = graph.create_node(Query::Read(read_query));

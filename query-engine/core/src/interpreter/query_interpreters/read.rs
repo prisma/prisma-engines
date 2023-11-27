@@ -1,11 +1,9 @@
 use super::*;
 use crate::{interpreter::InterpretationResult, query_ast::*, result_ast::*};
-use connector::{
-    self, error::ConnectorError, ConnectionLike, RelAggregationRow, RelAggregationSelection, RelatedQuery,
-};
+use connector::{self, error::ConnectorError, ConnectionLike, RelAggregationRow, RelAggregationSelection};
 use futures::future::{BoxFuture, FutureExt};
 use inmemory_record_processor::InMemoryRecordProcessor;
-use query_structure::ManyRecords;
+use query_structure::{ManyRecords, RelationLoadStrategy, RelationSelection};
 use std::collections::HashMap;
 use user_facing_errors::KnownError;
 
@@ -91,13 +89,9 @@ fn read_many(
     query: ManyRecordsQuery,
     trace_id: Option<String>,
 ) -> BoxFuture<'_, InterpretationResult<QueryResult>> {
-    // use joins if we're not using cursors
-    let use_joins = query.args.cursor.is_none() && !query.nested.iter().any(|q| q.has_cursor());
-
-    if use_joins {
-        read_many_by_joins(tx, query, trace_id)
-    } else {
-        read_many_by_queries(tx, query, trace_id)
+    match query.relation_load_strategy {
+        RelationLoadStrategy::Join => read_many_by_joins(tx, query, trace_id),
+        RelationLoadStrategy::Query => read_many_by_queries(tx, query, trace_id),
     }
 }
 
@@ -118,8 +112,8 @@ fn read_many_by_queries(
                 &query.model,
                 query.args.clone(),
                 &query.selected_fields,
-                Vec::new(),
                 &query.aggregation_selections,
+                query.relation_load_strategy,
                 trace_id,
             )
             .await?;
@@ -156,31 +150,26 @@ fn read_many_by_joins(
     query: ManyRecordsQuery,
     trace_id: Option<String>,
 ) -> BoxFuture<'_, InterpretationResult<QueryResult>> {
-    // TODO: Hack, ideally, relations should be part of the selection set
-    let nested = build_related_reads(&query);
-
     let fut = async move {
-        let records = tx
+        let result = tx
             .get_many_records(
                 &query.model,
                 query.args.clone(),
                 &query.selected_fields,
-                nested.clone(),
                 &query.aggregation_selections,
+                query.relation_load_strategy,
                 trace_id,
             )
             .await?;
 
-        // dbg!(&records);
-
-        if records.records.is_empty() && query.options.contains(QueryOption::ThrowOnEmpty) {
+        if result.records.is_empty() && query.options.contains(QueryOption::ThrowOnEmpty) {
             record_not_found()
         } else {
             Ok(RecordSelectionWithRelations {
                 name: query.name,
                 fields: query.selection_order,
-                records,
-                nested: build_relation_record_selection(nested),
+                records: result,
+                nested: build_relation_record_selection(query.selected_fields.relations()),
                 model: query.model,
             }
             .into())
@@ -190,49 +179,17 @@ fn read_many_by_joins(
     fut.boxed()
 }
 
-fn build_relation_record_selection(related_queries: Vec<RelatedQuery>) -> Vec<RelationRecordSelection> {
-    related_queries
-        .into_iter()
+fn build_relation_record_selection<'a>(
+    selections: impl Iterator<Item = &'a RelationSelection>,
+) -> Vec<RelationRecordSelection> {
+    selections
         .map(|rq| RelationRecordSelection {
-            name: rq.name,
-            fields: rq.selection_order,
-            model: rq.parent_field.related_model(),
-            nested: if let Some(nested) = rq.nested {
-                build_relation_record_selection(nested)
-            } else {
-                Vec::new()
-            },
+            name: rq.field.name().to_owned(),
+            fields: rq.selections.iter().map(|sf| sf.prisma_name().to_owned()).collect(),
+            model: rq.field.related_model(),
+            nested: build_relation_record_selection(rq.relations()),
         })
         .collect()
-}
-
-fn build_related_reads(query: &ManyRecordsQuery) -> Vec<RelatedQuery> {
-    query
-        .nested
-        .clone()
-        .into_iter()
-        .filter_map(|n| n.into_related_records_query())
-        .map(to_related_query)
-        .collect()
-}
-
-fn to_related_query(n: RelatedRecordsQuery) -> RelatedQuery {
-    RelatedQuery {
-        name: n.name,
-        alias: n.alias,
-        parent_field: n.parent_field,
-        args: n.args,
-        selected_fields: n.selected_fields,
-        nested: Some(
-            n.nested
-                .into_iter()
-                .filter_map(|n| n.into_related_records_query())
-                .map(|n| to_related_query(n))
-                .collect(),
-        ),
-        selection_order: n.selection_order,
-        aggregation_selections: n.aggregation_selections,
-    }
 }
 
 /// Queries related records for a set of parent IDs.

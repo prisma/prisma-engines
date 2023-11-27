@@ -96,7 +96,7 @@ impl QuerySchema {
                 || self.has_capability(ConnectorCapability::FullTextSearchWithIndex))
     }
 
-    pub(crate) fn has_feature(&self, feature: PreviewFeature) -> bool {
+    pub fn has_feature(&self, feature: PreviewFeature) -> bool {
         self.preview_features.contains(feature)
     }
 
