@@ -9,11 +9,14 @@ on:
     inputs:
       enginesWrapperVersion:
         required: true
+        description: 'New @prisma/prisma-schema-wasm package version'
       enginesHash:
         required: true
+        description: 'prisma-engines commit to build'
       npmDistTag:
         required: true
         default: 'latest'
+        description: 'npm dist-tag (e.g. latest or integration)'
 
 jobs:
   build:
