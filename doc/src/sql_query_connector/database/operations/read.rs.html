@@ -278,6 +278,18 @@
 <a href="#278" id="278">278</a>
 <a href="#279" id="279">279</a>
 <a href="#280" id="280">280</a>
+<a href="#281" id="281">281</a>
+<a href="#282" id="282">282</a>
+<a href="#283" id="283">283</a>
+<a href="#284" id="284">284</a>
+<a href="#285" id="285">285</a>
+<a href="#286" id="286">286</a>
+<a href="#287" id="287">287</a>
+<a href="#288" id="288">288</a>
+<a href="#289" id="289">289</a>
+<a href="#290" id="290">290</a>
+<a href="#291" id="291">291</a>
+<a href="#292" id="292">292</a>
 </pre></div><pre class="rust"><code><span class="kw">use crate</span>::{
     column_metadata,
     model_extensions::<span class="kw-2">*</span>,
@@ -298,7 +310,13 @@
     aggr_selections: <span class="kw-2">&amp;</span>[RelAggregationSelection],
     ctx: <span class="kw-2">&amp;</span>Context&lt;<span class="lifetime">&#39;_</span>&gt;,
 ) -&gt; <span class="kw">crate</span>::Result&lt;<span class="prelude-ty">Option</span>&lt;SingleRecord&gt;&gt; {
-    <span class="kw">let </span>query = read::get_records(model, selected_fields.as_columns(ctx), aggr_selections, filter, ctx);
+    <span class="kw">let </span>query = read::get_records(
+        model,
+        selected_fields.as_columns(ctx).mark_all_selected(),
+        aggr_selections,
+        filter,
+        ctx,
+    );
 
     <span class="kw">let </span><span class="kw-2">mut </span>field_names: Vec&lt;<span class="kw">_</span>&gt; = selected_fields.db_names().collect();
     <span class="kw">let </span><span class="kw-2">mut </span>aggr_field_names: Vec&lt;<span class="kw">_</span>&gt; = aggr_selections.iter().map(|aggr_sel| aggr_sel.db_alias()).collect();
@@ -384,7 +402,13 @@
             <span class="kw">let </span><span class="kw-2">mut </span>futures = FuturesUnordered::new();
 
             <span class="kw">for </span>args <span class="kw">in </span>batches.into_iter() {
-                <span class="kw">let </span>query = read::get_records(model, selected_fields.as_columns(ctx), aggr_selections, args, ctx);
+                <span class="kw">let </span>query = read::get_records(
+                    model,
+                    selected_fields.as_columns(ctx).mark_all_selected(),
+                    aggr_selections,
+                    args,
+                    ctx,
+                );
 
                 futures.push(conn.filter(query.into(), meta.as_slice(), ctx));
             }
@@ -402,7 +426,7 @@
         <span class="kw">_ </span>=&gt; {
             <span class="kw">let </span>query = read::get_records(
                 model,
-                selected_fields.as_columns(ctx),
+                selected_fields.as_columns(ctx).mark_all_selected(),
                 aggr_selections,
                 query_arguments,
                 ctx,

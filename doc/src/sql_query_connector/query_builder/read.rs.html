@@ -291,6 +291,12 @@
 <a href="#291" id="291">291</a>
 <a href="#292" id="292">292</a>
 <a href="#293" id="293">293</a>
+<a href="#294" id="294">294</a>
+<a href="#295" id="295">295</a>
+<a href="#296" id="296">296</a>
+<a href="#297" id="297">297</a>
+<a href="#298" id="298">298</a>
+<a href="#299" id="299">299</a>
 </pre></div><pre class="rust"><code><span class="kw">use crate</span>::{
     cursor_condition, filter::FilterBuilder, model_extensions::<span class="kw-2">*</span>, nested_aggregations, ordering::OrderByBuilder,
     sql_trace::SqlTraceComment, Context,
@@ -417,9 +423,7 @@
     </span>T: SelectDefinition,
 {
     <span class="kw">let </span>(select, additional_selection_set) = query.into_select(model, aggr_selections, ctx);
-    <span class="kw">let </span>select = columns
-        .map(|c| c.set_is_selected(<span class="bool-val">true</span>))
-        .fold(select, |acc, col| acc.column(col));
+    <span class="kw">let </span>select = columns.fold(select, |acc, col| acc.column(col));
 
     <span class="kw">let </span>select = select.append_trace(<span class="kw-2">&amp;</span>Span::current()).add_trace_id(ctx.trace_id);
 
@@ -469,7 +473,11 @@
             .append_trace(<span class="kw-2">&amp;</span>Span::current())
             .add_trace_id(ctx.trace_id),
         |select, next_op| <span class="kw">match </span>next_op {
-            AggregationSelection::Field(field) =&gt; select.column(Column::from(field.db_name().to_owned())),
+            AggregationSelection::Field(field) =&gt; select.column(
+                Column::from(field.db_name().to_owned())
+                    .set_is_enum(field.type_identifier().is_enum())
+                    .set_is_selected(<span class="bool-val">true</span>),
+            ),
 
             AggregationSelection::Count { all, fields } =&gt; {
                 <span class="kw">let </span>select = fields.iter().fold(select, |select, next_field| {
@@ -492,11 +500,15 @@
             }),
 
             AggregationSelection::Min(fields) =&gt; fields.iter().fold(select, |select, next_field| {
-                select.value(min(Column::from(next_field.db_name().to_owned())))
+                select.value(min(Column::from(next_field.db_name().to_owned())
+                    .set_is_enum(next_field.type_identifier().is_enum())
+                    .set_is_selected(<span class="bool-val">true</span>)))
             }),
 
             AggregationSelection::Max(fields) =&gt; fields.iter().fold(select, |select, next_field| {
-                select.value(max(Column::from(next_field.db_name().to_owned())))
+                select.value(max(Column::from(next_field.db_name().to_owned())
+                    .set_is_enum(next_field.type_identifier().is_enum())
+                    .set_is_selected(<span class="bool-val">true</span>)))
             }),
         },
     )
@@ -536,11 +548,11 @@
         }),
 
         AggregationSelection::Min(fields) =&gt; fields.iter().fold(select, |select, next_field| {
-            select.value(min(next_field.as_column(ctx)))
+            select.value(min(next_field.as_column(ctx).set_is_selected(<span class="bool-val">true</span>)))
         }),
 
         AggregationSelection::Max(fields) =&gt; fields.iter().fold(select, |select, next_field| {
-            select.value(max(next_field.as_column(ctx)))
+            select.value(max(next_field.as_column(ctx).set_is_selected(<span class="bool-val">true</span>)))
         }),
     });
 

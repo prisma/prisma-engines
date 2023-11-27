@@ -103,6 +103,15 @@
 <a href="#103" id="103">103</a>
 <a href="#104" id="104">104</a>
 <a href="#105" id="105">105</a>
+<a href="#106" id="106">106</a>
+<a href="#107" id="107">107</a>
+<a href="#108" id="108">108</a>
+<a href="#109" id="109">109</a>
+<a href="#110" id="110">110</a>
+<a href="#111" id="111">111</a>
+<a href="#112" id="112">112</a>
+<a href="#113" id="113">113</a>
+<a href="#114" id="114">114</a>
 </pre></div><pre class="rust"><code><span class="kw">use crate</span>::{model_extensions::ScalarFieldExt, Context};
 <span class="kw">use </span>itertools::Itertools;
 <span class="kw">use </span>prisma_models::{Field, ModelProjection, RelationField, ScalarField};
@@ -110,6 +119,15 @@
 
 <span class="kw">pub struct </span>ColumnIterator {
     inner: Box&lt;<span class="kw">dyn </span>Iterator&lt;Item = Column&lt;<span class="lifetime">&#39;static</span>&gt;&gt; + <span class="lifetime">&#39;static</span>&gt;,
+}
+
+<span class="kw">impl </span>ColumnIterator {
+    <span class="doccomment">/// Sets all columns as selected. This is a hack that we use to help the Postgres SQL visitor cast enum columns to text to avoid some driver roundtrips otherwise needed to resolve enum types.
+    </span><span class="kw">pub fn </span>mark_all_selected(<span class="self">self</span>) -&gt; <span class="self">Self </span>{
+        ColumnIterator {
+            inner: Box::new(<span class="self">self</span>.inner.map(|c| c.set_is_selected(<span class="bool-val">true</span>))),
+        }
+    }
 }
 
 <span class="kw">impl </span>Iterator <span class="kw">for </span>ColumnIterator {

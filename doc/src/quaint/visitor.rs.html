@@ -1173,6 +1173,18 @@
 <a href="#1173" id="1173">1173</a>
 <a href="#1174" id="1174">1174</a>
 <a href="#1175" id="1175">1175</a>
+<a href="#1176" id="1176">1176</a>
+<a href="#1177" id="1177">1177</a>
+<a href="#1178" id="1178">1178</a>
+<a href="#1179" id="1179">1179</a>
+<a href="#1180" id="1180">1180</a>
+<a href="#1181" id="1181">1181</a>
+<a href="#1182" id="1182">1182</a>
+<a href="#1183" id="1183">1183</a>
+<a href="#1184" id="1184">1184</a>
+<a href="#1185" id="1185">1185</a>
+<a href="#1186" id="1186">1186</a>
+<a href="#1187" id="1187">1187</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Visitors for reading an abstract SQL syntax tree, generating the query and
 //! gathering parameters in the right order.
 //!
@@ -2179,6 +2191,20 @@
         <span class="prelude-val">Ok</span>(())
     }
 
+    <span class="kw">fn </span>visit_min(<span class="kw-2">&amp;mut </span><span class="self">self</span>, min: Minimum&lt;<span class="lifetime">&#39;a</span>&gt;) -&gt; <span class="prelude-ty">Result </span>{
+        <span class="self">self</span>.write(<span class="string">&quot;MIN&quot;</span>)<span class="question-mark">?</span>;
+        <span class="self">self</span>.surround_with(<span class="string">&quot;(&quot;</span>, <span class="string">&quot;)&quot;</span>, |<span class="kw-2">ref mut </span>s| s.visit_column(min.column))<span class="question-mark">?</span>;
+
+        <span class="prelude-val">Ok</span>(())
+    }
+
+    <span class="kw">fn </span>visit_max(<span class="kw-2">&amp;mut </span><span class="self">self</span>, max: Maximum&lt;<span class="lifetime">&#39;a</span>&gt;) -&gt; <span class="prelude-ty">Result </span>{
+        <span class="self">self</span>.write(<span class="string">&quot;MAX&quot;</span>)<span class="question-mark">?</span>;
+        <span class="self">self</span>.surround_with(<span class="string">&quot;(&quot;</span>, <span class="string">&quot;)&quot;</span>, |<span class="kw-2">ref mut </span>s| s.visit_column(max.column))<span class="question-mark">?</span>;
+
+        <span class="prelude-val">Ok</span>(())
+    }
+
     <span class="kw">fn </span>visit_function(<span class="kw-2">&amp;mut </span><span class="self">self</span>, fun: Function&lt;<span class="lifetime">&#39;a</span>&gt;) -&gt; <span class="prelude-ty">Result </span>{
         <span class="kw">match </span>fun.typ_ {
             FunctionType::RowNumber(fun_rownum) =&gt; {
@@ -2221,12 +2247,10 @@
                 <span class="self">self</span>.surround_with(<span class="string">&quot;(&quot;</span>, <span class="string">&quot;)&quot;</span>, |<span class="kw-2">ref mut </span>s| s.visit_expression(<span class="kw-2">*</span>upper.expression))<span class="question-mark">?</span>;
             }
             FunctionType::Minimum(min) =&gt; {
-                <span class="self">self</span>.write(<span class="string">&quot;MIN&quot;</span>)<span class="question-mark">?</span>;
-                <span class="self">self</span>.surround_with(<span class="string">&quot;(&quot;</span>, <span class="string">&quot;)&quot;</span>, |<span class="kw-2">ref mut </span>s| s.visit_column(min.column))<span class="question-mark">?</span>;
+                <span class="self">self</span>.visit_min(min)<span class="question-mark">?</span>;
             }
             FunctionType::Maximum(max) =&gt; {
-                <span class="self">self</span>.write(<span class="string">&quot;MAX&quot;</span>)<span class="question-mark">?</span>;
-                <span class="self">self</span>.surround_with(<span class="string">&quot;(&quot;</span>, <span class="string">&quot;)&quot;</span>, |<span class="kw-2">ref mut </span>s| s.visit_column(max.column))<span class="question-mark">?</span>;
+                <span class="self">self</span>.visit_max(max)<span class="question-mark">?</span>;
             }
             FunctionType::Coalesce(coalesce) =&gt; {
                 <span class="self">self</span>.write(<span class="string">&quot;COALESCE&quot;</span>)<span class="question-mark">?</span>;
