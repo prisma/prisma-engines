@@ -1,46 +1,53 @@
-use connector_interface::RelatedQuery;
-use prisma_models::*;
-use prisma_value::PrismaValue;
+use itertools::{Either, Itertools};
+use query_structure::*;
+
+use crate::query_arguments_ext::QueryArgumentsExt;
 
 // TODO: find better name
-pub(crate) fn coerce_record_with_join(record: &mut Record, rq_indexes: Vec<(usize, &RelatedQuery)>) {
-    for (val_idx, rq) in rq_indexes {
+pub(crate) fn coerce_record_with_join(record: &mut Record, rq_indexes: Vec<(usize, &RelationSelection)>) {
+    for (val_idx, rs) in rq_indexes {
         let val = record.values.get_mut(val_idx).unwrap();
         let json_val: serde_json::Value = serde_json::from_str(&val.as_json().unwrap()).unwrap();
 
-        *val = coerce_json_relation_to_pv(json_val, rq);
+        *val = coerce_json_relation_to_pv(json_val, rs);
     }
 }
 
 // TODO: find better name
-pub(crate) fn coerce_json_relation_to_pv(value: serde_json::Value, q: &RelatedQuery) -> PrismaValue {
+pub(crate) fn coerce_json_relation_to_pv(value: serde_json::Value, rs: &RelationSelection) -> PrismaValue {
+    let relations = rs.relations().collect_vec();
+
     match value {
         // one-to-many
-        serde_json::Value::Array(values) if q.parent_field.is_list() => PrismaValue::List(
-            values
-                .into_iter()
-                .map(|value| coerce_json_relation_to_pv(value, q))
-                .collect(),
-        ),
+        serde_json::Value::Array(values) if rs.field.is_list() => {
+            let iter = values.into_iter().map(|value| coerce_json_relation_to_pv(value, rs));
+
+            // Reverses order when using negative take.
+            let iter = match rs.args.needs_reversed_order() {
+                true => Either::Left(iter.rev()),
+                false => Either::Right(iter),
+            };
+
+            PrismaValue::List(iter.collect())
+        }
         // to-one
         serde_json::Value::Array(values) => {
             let coerced = values
                 .into_iter()
                 .next()
-                .map(|value| coerce_json_relation_to_pv(value, q));
+                .map(|value| coerce_json_relation_to_pv(value, rs));
 
             // TODO(HACK): We probably want to update the sql builder instead to not aggregate to-one relations as array
-            // If the arary is empty, it means there's no relations
+            // If the arary is empty, it means there's no relations, so we coerce it to
             if let Some(val) = coerced {
                 val
-            // else the relation's null
             } else {
                 PrismaValue::Null
             }
         }
         serde_json::Value::Object(obj) => {
             let mut map: Vec<(String, PrismaValue)> = Vec::with_capacity(obj.len());
-            let related_model = q.parent_field.related_model();
+            let related_model = rs.field.related_model();
 
             for (key, value) in obj {
                 match related_model.fields().all().find(|f| f.db_name() == key).unwrap() {
@@ -49,17 +56,11 @@ pub(crate) fn coerce_json_relation_to_pv(value: serde_json::Value, q: &RelatedQu
                     }
                     Field::Relation(rf) => {
                         // TODO: optimize this
-                        if let Some(rq) = q
-                            .nested
-                            .as_ref()
-                            .unwrap()
-                            .iter()
-                            .find(|rq| rq.parent_field.name() == rf.name())
-                        {
-                            map.push((key, coerce_json_relation_to_pv(value, rq)));
+                        if let Some(nested_selection) = relations.iter().find(|rs| rs.field == rf) {
+                            map.push((key, coerce_json_relation_to_pv(value, nested_selection)));
                         }
                     }
-                    _ => unreachable!(),
+                    Field::Composite(_) => unreachable!(),
                 }
             }
 
