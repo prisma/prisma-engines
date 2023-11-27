@@ -94,9 +94,22 @@ pub(crate) async fn get_many_records_joins(
     let idents = selected_fields.type_identifiers_with_arities();
     let meta = column_metadata::create(field_names.as_slice(), idents.as_slice());
 
-    let rs_indexes = relation_selection_indexes(selected_fields.relations().collect(), &field_names);
-    // dbg!(&rs_indexes);
+    let rs_indexes = get_relation_selection_indexes(selected_fields.relations().collect(), &field_names);
     let mut records = ManyRecords::new(field_names.clone());
+
+    if let Some(0) = query_arguments.take {
+        return Ok(records);
+    };
+
+    match ctx.max_bind_values {
+        Some(chunk_size) if query_arguments.should_batch(chunk_size) => {
+            return Err(SqlError::QueryParameterLimitExceeded(
+                "Join queries cannot be split into multiple queries just yet. If you encounter that issue, please open an issue."
+                    .to_string(),
+            ));
+        }
+        _ => (),
+    };
 
     let query = query_builder::select::SelectBuilder::default().build(query_arguments.clone(), selected_fields, ctx);
 
@@ -115,22 +128,6 @@ pub(crate) async fn get_many_records_joins(
     }
 
     Ok(records)
-}
-
-// TODO: find better name
-fn relation_selection_indexes<'a>(
-    selections: Vec<&'a RelationSelection>,
-    field_names: &[String],
-) -> Vec<(usize, &'a RelationSelection)> {
-    let mut output: Vec<(usize, &RelationSelection)> = Vec::new();
-
-    for (idx, field_name) in field_names.iter().enumerate() {
-        if let Some(rs) = selections.iter().find(|rq| rq.field.name() == *field_name) {
-            output.push((idx, rs));
-        }
-    }
-
-    output
 }
 
 pub(crate) async fn get_many_records_wo_joins(
@@ -369,4 +366,20 @@ async fn group_by_aggregate(
         .into_iter()
         .map(|row| row.into_aggregation_results(&selections))
         .collect())
+}
+
+/// Find the indexes of the relation records to traverse a set of records faster when coercing JSON values
+fn get_relation_selection_indexes<'a>(
+    selections: Vec<&'a RelationSelection>,
+    field_names: &[String],
+) -> Vec<(usize, &'a RelationSelection)> {
+    let mut output: Vec<(usize, &RelationSelection)> = Vec::new();
+
+    for (idx, field_name) in field_names.iter().enumerate() {
+        if let Some(rs) = selections.iter().find(|rq| rq.field.name() == *field_name) {
+            output.push((idx, rs));
+        }
+    }
+
+    output
 }

@@ -91,8 +91,7 @@ mod isb {
             r#"query {
               findManyA(where: {id: { in: [5,4,3,2,1,1,1,2,3,4,5,6,7,6,5,4,3,2,1,2,3,4,5,6] }}, orderBy: { b: { as: { _count: asc } } }) { id }
             }"#,
-            2029,
-            "Your query cannot be split into multiple queries because of the order by aggregation or relevance."
+            2029 // QueryParameterLimitExceeded
         );
 
         Ok(())
@@ -107,8 +106,7 @@ mod isb {
             r#"query {
               findManyA(where: {id: { in: [5,4,3,2,1,1,1,2,3,4,5,6,7,6,5,4,3,2,1,2,3,4,5,6] }}, orderBy: { _relevance: { fields: text, search: "something", sort: asc } }) { id }
             }"#,
-            2029,
-            "Your query cannot be split into multiple queries because of the order by aggregation or relevance."
+            2029 // QueryParameterLimitExceeded
         );
 
         Ok(())
