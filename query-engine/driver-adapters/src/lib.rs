@@ -74,7 +74,7 @@ mod arch {
     where
         T: FromNapiValue,
     {
-        object.get_named_property(name).into()
+        object.get_named_property(name)
     }
 
     pub(crate) fn to_rust_str(value: JsString) -> JsResult<String> {
