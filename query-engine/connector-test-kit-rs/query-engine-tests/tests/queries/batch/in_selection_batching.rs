@@ -35,7 +35,9 @@ mod isb {
     }
 
     // "batching of IN queries" should "work when having more than the specified amount of items"
-    #[connector_test]
+    // TODO(joins): Excluded because we have no support for batched queries with joins. In practice, it should happen under much less circumstances
+    // TODO(joins): than with the query-based strategy, because we don't issue `WHERE IN (parent_ids)` queries anymore to resolve relations.
+    #[connector_test(exclude_features("joins"))]
     async fn in_more_items(runner: Runner) -> TestResult<()> {
         create_test_data(&runner).await?;
 
@@ -51,7 +53,9 @@ mod isb {
     }
 
     // "ascending ordering of batched IN queries" should "work when having more than the specified amount of items"
-    #[connector_test]
+    // TODO(joins): Excluded because we have no support for batched queries with joins. In practice, it should happen under much less circumstances
+    // TODO(joins): than with the query-based strategy, because we don't issue `WHERE IN (parent_ids)` queries anymore to resolve relations.
+    #[connector_test(exclude_features("joins"))]
     async fn asc_in_ordering(runner: Runner) -> TestResult<()> {
         create_test_data(&runner).await?;
 
@@ -67,7 +71,9 @@ mod isb {
     }
 
     // "ascending ordering of batched IN queries" should "work when having more than the specified amount of items"
-    #[connector_test]
+    // TODO(joins): Excluded because we have no support for batched queries with joins. In practice, it should happen under much less circumstances
+    // TODO(joins): than with the query-based strategy, because we don't issue `WHERE IN (parent_ids)` queries anymore to resolve relations.
+    #[connector_test(exclude_features("joins"))]
     async fn desc_in_ordering(runner: Runner) -> TestResult<()> {
         create_test_data(&runner).await?;
 
