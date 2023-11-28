@@ -315,6 +315,8 @@ pub(crate) async fn spawn_itx_actor(
                             if run_state == RunState::Finished {
                                 break
                             }
+                        } else {
+                            break;
                         }
                     }
                 }
