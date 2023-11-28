@@ -9,25 +9,34 @@
 
 pub(crate) mod conversion;
 pub(crate) mod error;
+pub(crate) mod proxy;
 pub(crate) mod queryable;
 pub(crate) mod send_future;
 pub(crate) mod types;
+
+pub use queryable::from_js;
+
+#[cfg(target_arch = "wasm32")]
+pub use wasm::JsObjectExtern as JsObject;
+
+#[cfg(not(target_arch = "wasm32"))]
+pub use ::napi::JsObject;
 
 #[cfg(not(target_arch = "wasm32"))]
 pub mod napi;
 
 #[cfg(not(target_arch = "wasm32"))]
-pub use napi::*;
+pub(crate) use napi::*;
 
 #[cfg(target_arch = "wasm32")]
 pub mod wasm;
 
 #[cfg(target_arch = "wasm32")]
-pub use wasm::*;
+pub(crate) use wasm::*;
 
 #[cfg(target_arch = "wasm32")]
 mod arch {
-    pub(crate) use crate::JsObjectExtern as JsObject;
+    pub(crate) use super::JsObject;
     pub(crate) use js_sys::JsString;
     use tsify::Tsify;
     use wasm_bindgen::JsValue;
@@ -36,7 +45,6 @@ mod arch {
     where
         T: From<JsValue>,
     {
-        // object.get("queryRaw".into())?
         Ok(object.get(name.into())?.into())
     }
 
@@ -44,7 +52,7 @@ mod arch {
         Ok(value.into())
     }
 
-    pub(crate) fn from_js<C>(value: JsValue) -> C
+    pub(crate) fn from_js_value<C>(value: JsValue) -> C
     where
         C: Tsify + serde::de::DeserializeOwned,
     {
@@ -56,8 +64,9 @@ mod arch {
 
 #[cfg(not(target_arch = "wasm32"))]
 mod arch {
+    pub(crate) use super::JsObject;
     use napi::bindgen_prelude::FromNapiValue;
-    pub(crate) use napi::{JsObject, JsString};
+    pub(crate) use napi::JsString;
 
     pub(crate) fn get_named_property<T>(object: &JsObject, name: &str) -> JsResult<T>
     where
@@ -70,7 +79,7 @@ mod arch {
         Ok(value.into_utf8()?.as_str()?.to_string())
     }
 
-    pub(crate) fn from_js<C>(value: C) -> C {
+    pub(crate) fn from_js_value<C>(value: C) -> C {
         value
     }
 

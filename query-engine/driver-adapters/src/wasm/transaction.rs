@@ -8,10 +8,8 @@ use quaint::{
 };
 use wasm_bindgen::JsCast;
 
-use super::{
-    from_js::FromJsValue,
-    proxy::{TransactionOptions, TransactionProxy},
-};
+use super::from_js::FromJsValue;
+use crate::proxy::{TransactionOptions, TransactionProxy};
 use crate::{proxy::CommonProxy, queryable::JsBaseQueryable, send_future::SendFuture, JsObjectExtern};
 
 // Wrapper around JS transaction objects that implements Queryable

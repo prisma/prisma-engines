@@ -7,7 +7,7 @@ use quaint::{
     Value,
 };
 
-use super::proxy::{CommonProxy, TransactionOptions, TransactionProxy};
+use crate::proxy::{CommonProxy, TransactionOptions, TransactionProxy};
 use crate::queryable::JsBaseQueryable;
 
 // Wrapper around JS transaction objects that implements Queryable

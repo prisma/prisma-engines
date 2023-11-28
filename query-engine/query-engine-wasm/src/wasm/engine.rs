@@ -5,7 +5,7 @@ use crate::{
     error::ApiError,
     logger::{LogCallback, Logger},
 };
-use driver_adapters::JsObjectExtern;
+use driver_adapters::JsObject;
 use futures::FutureExt;
 use js_sys::Function as JsFunction;
 use query_core::{
@@ -135,7 +135,7 @@ impl QueryEngine {
     pub fn new(
         options: ConstructorOptions,
         callback: JsFunction,
-        maybe_adapter: Option<JsObjectExtern>,
+        maybe_adapter: Option<JsObject>,
     ) -> Result<QueryEngine, wasm_bindgen::JsError> {
         log::info!("Called `QueryEngine::new()`");
 
@@ -161,7 +161,7 @@ impl QueryEngine {
         let preview_features = config.preview_features();
 
         if let Some(adapter) = maybe_adapter {
-            let js_queryable = driver_adapters::from_wasm(adapter);
+            let js_queryable = driver_adapters::from_js(adapter);
 
             sql_connector::activate_driver_adapter(Arc::new(js_queryable));
 

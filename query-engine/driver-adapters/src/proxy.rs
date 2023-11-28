@@ -1,14 +1,19 @@
+use crate::send_future::SendFuture;
 pub use crate::types::{ColumnType, JSResultSet, Query, TransactionOptions};
-use crate::{from_js, get_named_property, to_rust_str, JsObject, JsResult, JsString};
+use crate::{from_js_value, get_named_property, to_rust_str, JsObject, JsResult, JsString};
 
-use super::async_js_function::AsyncJsFunction;
-use super::transaction::JsTransaction;
+use crate::{AsyncJsFunction, JsTransaction};
+use futures::Future;
 use metrics::increment_gauge;
 use std::sync::atomic::{AtomicBool, Ordering};
 
+#[cfg(target_arch = "wasm32")]
+use wasm_bindgen::prelude::wasm_bindgen;
+
 /// Proxy is a struct wrapping a javascript object that exhibits basic primitives for
-/// querying and executing SQL (i.e. a client connector). The Proxy uses NAPI ThreadSafeFunction to
-/// invoke the code within the node runtime that implements the client connector.
+/// querying and executing SQL (i.e. a client connector). The Proxy uses Napi/Wasm's JsFunction
+/// to invoke the code within the node runtime that implements the client connector.
+#[cfg_attr(target_arch = "wasm32", wasm_bindgen(getter_with_clone))]
 pub(crate) struct CommonProxy {
     /// Execute a query given as SQL, interpolating the given parameters.
     query_raw: AsyncJsFunction<Query, JSResultSet>,
@@ -23,11 +28,14 @@ pub(crate) struct CommonProxy {
 
 /// This is a JS proxy for accessing the methods specific to top level
 /// JS driver objects
+#[cfg_attr(target_arch = "wasm32", wasm_bindgen(getter_with_clone))]
 pub(crate) struct DriverProxy {
     start_transaction: AsyncJsFunction<(), JsTransaction>,
 }
+
 /// This a JS proxy for accessing the methods, specific
 /// to JS transaction objects
+#[cfg_attr(target_arch = "wasm32", wasm_bindgen(getter_with_clone))]
 pub(crate) struct TransactionProxy {
     /// transaction options
     options: TransactionOptions,
@@ -63,13 +71,13 @@ impl CommonProxy {
 }
 
 impl DriverProxy {
-    pub fn new(driver_adapter: &JsObject) -> JsResult<Self> {
+    pub fn new(object: &JsObject) -> JsResult<Self> {
         Ok(Self {
-            start_transaction: get_named_property(driver_adapter, "startTransaction")?,
+            start_transaction: get_named_property(object, "startTransaction")?,
         })
     }
 
-    pub async fn start_transaction(&self) -> quaint::Result<Box<JsTransaction>> {
+    async fn start_transaction_inner(&self) -> quaint::Result<Box<JsTransaction>> {
         let tx = self.start_transaction.call(()).await?;
 
         // Decrement for this gauge is done in JsTransaction::commit/JsTransaction::rollback
@@ -79,6 +87,12 @@ impl DriverProxy {
         increment_gauge!("prisma_client_queries_active", 1.0);
         Ok(Box::new(tx))
     }
+
+    pub fn start_transaction<'a>(
+        &'a self,
+    ) -> SendFuture<impl Future<Output = quaint::Result<Box<JsTransaction>>> + 'a> {
+        SendFuture(self.start_transaction_inner())
+    }
 }
 
 impl TransactionProxy {
@@ -86,7 +100,7 @@ impl TransactionProxy {
         let commit = get_named_property(js_transaction, "commit")?;
         let rollback = get_named_property(js_transaction, "rollback")?;
         let options = get_named_property(js_transaction, "options")?;
-        let options = from_js::<TransactionOptions>(options);
+        let options = from_js_value::<TransactionOptions>(options);
 
         Ok(Self {
             commit,
@@ -115,9 +129,9 @@ impl TransactionProxy {
     ///   the underlying FFI call will be delivered to JavaScript side in lockstep, so the destructor
     ///   will not attempt rolling the transaction back even if the `commit` future was dropped while
     ///   waiting on the JavaScript call to complete and deliver response.
-    pub async fn commit(&self) -> quaint::Result<()> {
+    pub fn commit<'a>(&'a self) -> SendFuture<impl Future<Output = quaint::Result<()>> + 'a> {
         self.closed.store(true, Ordering::Relaxed);
-        self.commit.call(()).await
+        SendFuture(self.commit.call(()))
     }
 
     /// Rolls back the transaction via the driver adapter.
@@ -135,9 +149,9 @@ impl TransactionProxy {
     ///   the underlying FFI call will be delivered to JavaScript side in lockstep, so the destructor
     ///   will not attempt rolling back again even if the `rollback` future was dropped while waiting
     ///   on the JavaScript call to complete and deliver response.
-    pub async fn rollback(&self) -> quaint::Result<()> {
+    pub fn rollback<'a>(&'a self) -> SendFuture<impl Future<Output = quaint::Result<()>> + 'a> {
         self.closed.store(true, Ordering::Relaxed);
-        self.rollback.call(()).await
+        SendFuture(self.rollback.call(()))
     }
 }
 
@@ -150,3 +164,17 @@ impl Drop for TransactionProxy {
         _ = self.rollback.call_non_blocking(());
     }
 }
+
+macro_rules! impl_send_sync_on_wasm {
+    ($struct:ident) => {
+        #[cfg(target_arch = "wasm32")]
+        unsafe impl Send for $struct {}
+        #[cfg(target_arch = "wasm32")]
+        unsafe impl Sync for $struct {}
+    };
+}
+
+// Assume the proxy object will not be sent to service workers, we can unsafe impl Send + Sync.
+impl_send_sync_on_wasm!(TransactionProxy);
+impl_send_sync_on_wasm!(DriverProxy);
+impl_send_sync_on_wasm!(CommonProxy);
