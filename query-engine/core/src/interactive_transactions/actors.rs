@@ -18,7 +18,6 @@ use tokio::{
 use tracing::Span;
 use tracing_futures::Instrument;
 use tracing_futures::WithSubscriber;
-use wasm_rs_dbg::dbg;
 
 #[cfg(feature = "metrics")]
 use crate::telemetry::helpers::set_span_link_from_traceparent;
