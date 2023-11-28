@@ -4,8 +4,6 @@ use sql_introspection_tests::test_api::*;
 #[test_connector(tags(Spatialite))]
 async fn native_spatial_type_columns_feature_on(api: &mut TestApi) -> TestResult {
     let setup = indoc! {r#"
-        SELECT InitSpatialMetaData();
-        
         CREATE TABLE "User" (
             id INTEGER PRIMARY KEY
         );

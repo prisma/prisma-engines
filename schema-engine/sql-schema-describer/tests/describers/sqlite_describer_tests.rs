@@ -214,8 +214,6 @@ fn sqlite_column_types_must_work(api: TestApi) {
 #[test_connector(tags(Spatialite))]
 fn spatialite_column_types_must_work(api: TestApi) {
     let sql = r#"
-        SELECT InitSpatialMetaData();
-        
         CREATE TABLE "User" (
             primary_col INTEGER PRIMARY KEY
         );
