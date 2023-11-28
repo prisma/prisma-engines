@@ -52,8 +52,7 @@ const CAPABILITIES: ConnectorCapabilities = enumflags2::make_bitflags!(Connector
     SupportsTxIsolationReadCommitted |
     SupportsTxIsolationRepeatableRead |
     SupportsTxIsolationSerializable |
-    SupportsTxIsolationSnapshot |
-    LateralJoin
+    SupportsTxIsolationSnapshot
 });
 
 pub(crate) struct MsSqlDatamodelConnector;
