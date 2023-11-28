@@ -5,7 +5,7 @@ use crate::{
     TxId,
 };
 use connector::Connection;
-use elapsed::ElapsedTimeCounter;
+use crosstarget_utils::time::ElapsedTimeCounter;
 use schema::QuerySchemaRef;
 use std::{collections::HashMap, sync::Arc};
 use tokio::{
@@ -13,7 +13,7 @@ use tokio::{
         mpsc::{channel, Receiver, Sender},
         oneshot, RwLock,
     },
-    time::{self, Duration},
+    time::Duration,
 };
 use tracing::Span;
 use tracing_futures::Instrument;
@@ -299,7 +299,7 @@ pub(crate) async fn spawn_itx_actor(
             );
 
             let start_time = ElapsedTimeCounter::start();
-            let sleep = time::sleep(timeout);
+            let sleep = crosstarget_utils::time::sleep(timeout);
             tokio::pin!(sleep);
 
             loop {

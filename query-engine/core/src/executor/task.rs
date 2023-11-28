@@ -92,7 +92,7 @@ mod arch {
 
     pub fn spawn<T>(future: T) -> JoinHandle<T::Output>
     where
-        T: Future + Send + 'static,
+        T: Future + 'static,
         T::Output: Send + 'static,
     {
         spawn_with_sx_exit::<T>(future, None)
@@ -100,7 +100,7 @@ mod arch {
 
     pub fn spawn_controlled<T>(future_fn: Box<dyn FnOnce(broadcast::Receiver<()>) -> T>) -> JoinHandle<T::Output>
     where
-        T: Future + Send + 'static,
+        T: Future + 'static,
         T::Output: Send + 'static,
     {
         let (sx_exit, rx_exit) = tokio::sync::broadcast::channel::<()>(1);
@@ -110,7 +110,7 @@ mod arch {
 
     fn spawn_with_sx_exit<T>(future: T, sx_exit: Option<broadcast::Sender<()>>) -> JoinHandle<T::Output>
     where
-        T: Future + Send + 'static,
+        T: Future + 'static,
         T::Output: Send + 'static,
     {
         let (sender, receiver) = oneshot::channel();

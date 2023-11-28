@@ -1,7 +1,7 @@
 use tracing::{info_span, Instrument};
 
 use crate::ast::{Params, Value};
-use elapsed::ElapsedTimeCounter;
+use crosstarget_utils::time::ElapsedTimeCounter;
 use std::future::Future;
 
 pub async fn query<'a, F, T, U>(tag: &'static str, query: &'a str, params: &'a [Value<'_>], f: F) -> crate::Result<T>
