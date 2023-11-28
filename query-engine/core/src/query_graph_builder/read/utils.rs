@@ -74,7 +74,7 @@ where
     T: Into<ParentContainer>,
 {
     let should_collect_relation_selection = query_schema.has_capability(ConnectorCapability::LateralJoin)
-        && query_schema.has_feature(PreviewFeature::RelationJoins);
+        && query_schema.has_feature(PreviewFeature::Joins);
 
     let parent = parent.into();
 
@@ -248,7 +248,7 @@ pub(crate) fn get_relation_load_strategy(
     aggregation_selections: &[RelAggregationSelection],
     query_schema: &QuerySchema,
 ) -> RelationLoadStrategy {
-    if query_schema.has_feature(PreviewFeature::RelationJoins)
+    if query_schema.has_feature(PreviewFeature::Joins)
         && query_schema.has_capability(ConnectorCapability::LateralJoin)
         && args.cursor.is_none()
         && args.distinct.is_none()
