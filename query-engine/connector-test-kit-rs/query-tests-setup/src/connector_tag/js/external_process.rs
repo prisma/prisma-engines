@@ -97,6 +97,10 @@ impl ExecutorProcess {
     }
 }
 
+/// Wraps an ExecutorProcess allowing for restarting it.
+///
+/// A node process can die for a number of reasons, being one that any `panic!` occurring in Rust
+/// asynchronous code are translated to an abort trap by wasm-bindgen, which kills the node process.
 #[derive(Clone)]
 pub(crate) struct RestartableExecutorProcess {
     p: Arc<Mutex<ExecutorProcess>>,

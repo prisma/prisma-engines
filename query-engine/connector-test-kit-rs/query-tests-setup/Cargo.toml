@@ -33,7 +33,7 @@ indexmap = { version = "1.0", features = ["serde-1"] }
 query-engine-metrics = {path = "../../metrics"}
 quaint.workspace = true
 jsonrpc-core = "17"
-futures = "0.3" 
+futures = "0.3"
 
 # Only this version is vetted, upgrade only after going through the code,
 # as this is a small crate with little user base.
