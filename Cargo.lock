@@ -3701,7 +3701,6 @@ dependencies = [
  "user-facing-errors",
  "uuid",
  "wasm-bindgen-futures",
- "wasm-rs-dbg",
 ]
 
 [[package]]

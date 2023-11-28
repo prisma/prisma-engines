@@ -62,7 +62,6 @@ mod arch {
         broadcast::{self},
         oneshot::{self},
     };
-    use wasm_rs_dbg::dbg;
 
     // Wasm-compatible alternative to `tokio::task::JoinHandle<T>`.
     // `pin_project` enables pin-projection and a `Pin`-compatible implementation of the `Future` trait.
@@ -78,8 +77,6 @@ mod arch {
         type Output = Result<T, oneshot::error::RecvError>;
 
         fn poll(mut self: std::pin::Pin<&mut Self>, cx: &mut std::task::Context<'_>) -> std::task::Poll<Self::Output> {
-            dbg!("JoinHandle::poll");
-
             // the `self.project()` method is provided by the `pin_project` macro
             core::pin::Pin::new(&mut self.receiver).poll(cx)
         }
@@ -87,10 +84,7 @@ mod arch {
 
     impl<T> JoinHandle<T> {
         pub fn abort(&mut self) {
-            dbg!("JoinHandle::abort");
-
             if let Some(sx_exit) = self.sx_exit.as_ref() {
-                dbg!("JoinHandle::abort - Send sx_exit");
                 sx_exit.send(()).ok();
             }
         }

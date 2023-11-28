@@ -392,7 +392,6 @@ pub(crate) fn spawn_client_list_clear_actor(
             loop {
                 tokio::select! {
                     result = rx.recv() => {
-                        dbg!("spawn_controlled - AFTER rx.recv(): {:?}", result.is_some());
                         match result {
                             Some((id, closed_tx)) => {
                                 trace!("removing {} from client list", id);
@@ -411,7 +410,6 @@ pub(crate) fn spawn_client_list_clear_actor(
                         }
                     },
                     _ = rx_exit.recv() => {
-                        dbg!("spawn_controlled - AFTER rx_exit.recv()");
                         break;
                     },
                 }
