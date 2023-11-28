@@ -119,7 +119,7 @@ jobs:
 
       - name: Install Spatialite
         if: ${{ matrix.database.name == 'spatialite' }}
-        run: apt install -y libsqlite3-mod-spatialite
+        run: sudo apt install -y libsqlite3-mod-spatialite
 
       - run: export WORKSPACE_ROOT=$(pwd) && cargo test --package query-engine-tests -- --test-threads=1
         if: ${{ matrix.database.single_threaded }}
