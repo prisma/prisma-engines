@@ -1,5 +1,5 @@
 use connector::{AggregationRow, RelAggregationRow};
-use prisma_models::{ManyRecords, Model, SelectionResult};
+use query_structure::{ManyRecords, Model, SelectionResult};
 
 #[derive(Debug, Clone)]
 pub(crate) enum QueryResult {

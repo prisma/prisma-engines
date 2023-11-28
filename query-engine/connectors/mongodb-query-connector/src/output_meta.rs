@@ -1,6 +1,6 @@
 use connector_interface::{AggregationSelection, RelAggregationSelection};
 use indexmap::IndexMap;
-use prisma_models::{
+use query_structure::{
     ast::FieldArity, DefaultKind, FieldSelection, PrismaValue, ScalarFieldRef, SelectedField, TypeIdentifier,
 };
 

@@ -4,7 +4,7 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-prisma-models = { path = "../prisma-models" }
+query-structure = { path = "../query-structure" }
 query-core = { path = "../core" }
 user-facing-errors = { path = "../../libs/user-facing-errors" }
 quaint = { path = "../../quaint" }

@@ -24,8 +24,8 @@ indexmap = "1.7"
 query-engine-metrics = {path = "../../metrics"}
 cuid = { git = "https://github.com/prisma/cuid-rust", branch = "wasm32-support" }
 
-[dependencies.prisma-models]
-path = "../../prisma-models"
+[dependencies.query-structure]
+path = "../../query-structure"
 
 [dependencies.mongodb-client]
 path = "../../../libs/mongodb-client"

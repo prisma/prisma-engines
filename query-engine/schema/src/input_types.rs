@@ -1,7 +1,7 @@
 use super::*;
 use fmt::Debug;
 use once_cell::sync::Lazy;
-use prisma_models::{prelude::ParentContainer, DefaultKind};
+use query_structure::{prelude::ParentContainer, DefaultKind};
 use std::{borrow::Cow, boxed::Box, fmt};
 
 type InputObjectFields<'a> =

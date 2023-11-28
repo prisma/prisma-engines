@@ -22,7 +22,7 @@ query-connector = { path = "../connectors/query-connector" }
 user-facing-errors = { path = "../../libs/user-facing-errors" }
 psl.workspace = true
 sql-connector = { path = "../connectors/sql-query-connector", package = "sql-query-connector" }
-prisma-models = { path = "../prisma-models" }
+query-structure = { path = "../query-structure" }
 driver-adapters = { path = "../driver-adapters" }
 napi.workspace = true
 napi-derive.workspace = true

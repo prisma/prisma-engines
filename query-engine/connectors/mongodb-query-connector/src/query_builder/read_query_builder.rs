@@ -10,14 +10,14 @@ use crate::{
     root_queries::observing,
     vacuum_cursor, BsonTransform, IntoBson,
 };
-use connector_interface::{AggregationSelection, Filter, QueryArguments, RelAggregationSelection};
+use connector_interface::{AggregationSelection, RelAggregationSelection};
 use itertools::Itertools;
 use mongodb::{
     bson::{doc, Document},
     options::AggregateOptions,
     ClientSession, Collection,
 };
-use prisma_models::{FieldSelection, Model, ScalarFieldRef};
+use query_structure::{FieldSelection, Filter, Model, QueryArguments, ScalarFieldRef};
 use std::convert::TryFrom;
 
 // Mongo Driver broke usage of the simple API, can't be used by us anymore.

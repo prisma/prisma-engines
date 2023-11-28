@@ -2,7 +2,7 @@
 //! Structures represent parsed and validated parts of the query document, used by the query builders.
 use crate::QueryParserResult;
 use indexmap::IndexMap;
-use prisma_models::{OrderBy, PrismaValue, ScalarFieldRef};
+use query_structure::{OrderBy, PrismaValue, ScalarFieldRef};
 use schema::ObjectTag;
 use std::{
     borrow::Cow,

@@ -38,8 +38,8 @@ quaint = { path = "../../../quaint" }
 package = "query-connector"
 path = "../query-connector"
 
-[dependencies.prisma-models]
-path = "../../prisma-models"
+[dependencies.query-structure]
+path = "../../query-structure"
 
 [dependencies.prisma-value]
 path = "../../../libs/prisma-value"

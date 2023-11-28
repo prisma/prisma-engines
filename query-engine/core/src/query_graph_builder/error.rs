@@ -1,5 +1,5 @@
 use crate::QueryGraphError;
-use prisma_models::{DomainError, RelationFieldRef};
+use query_structure::{DomainError, RelationFieldRef};
 use user_facing_errors::query_engine::validation::ValidationError;
 
 #[derive(Debug)]

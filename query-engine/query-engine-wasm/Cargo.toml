@@ -16,6 +16,7 @@ anyhow = "1"
 async-trait = "0.1"
 user-facing-errors = { path = "../../libs/user-facing-errors" }
 psl.workspace = true
+query-structure = { path = "../query-structure" }
 quaint = { path = "../../quaint" }
 sql-connector = { path = "../connectors/sql-query-connector", package = "sql-query-connector" }
 request-handlers = { path = "../request-handlers", default-features = false, features = [
@@ -33,8 +34,6 @@ tsify.workspace = true
 wasm-bindgen.workspace = true
 wasm-bindgen-futures.workspace = true
 wasm-rs-dbg.workspace = true
-
-prisma-models = { path = "../prisma-models" }
 
 thiserror = "1"
 url = "2"

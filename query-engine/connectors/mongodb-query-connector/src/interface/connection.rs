@@ -10,7 +10,7 @@ use connector_interface::{
     WriteOperations,
 };
 use mongodb::{ClientSession, Database};
-use prisma_models::{prelude::*, SelectionResult};
+use query_structure::{prelude::*, SelectionResult};
 use std::collections::HashMap;
 
 pub struct MongoDbConnection {
@@ -187,7 +187,7 @@ impl ReadOperations for MongoDbConnection {
     async fn get_single_record(
         &mut self,
         model: &Model,
-        filter: &connector_interface::Filter,
+        filter: &query_structure::Filter,
         selected_fields: &FieldSelection,
         aggr_selections: &[RelAggregationSelection],
         _trace_id: Option<String>,
@@ -209,7 +209,7 @@ impl ReadOperations for MongoDbConnection {
     async fn get_many_records(
         &mut self,
         model: &Model,
-        query_arguments: connector_interface::QueryArguments,
+        query_arguments: query_structure::QueryArguments,
         selected_fields: &FieldSelection,
         aggregation_selections: &[RelAggregationSelection],
         _trace_id: Option<String>,
@@ -243,10 +243,10 @@ impl ReadOperations for MongoDbConnection {
     async fn aggregate_records(
         &mut self,
         model: &Model,
-        query_arguments: connector_interface::QueryArguments,
+        query_arguments: query_structure::QueryArguments,
         selections: Vec<connector_interface::AggregationSelection>,
         group_by: Vec<ScalarFieldRef>,
-        having: Option<connector_interface::Filter>,
+        having: Option<query_structure::Filter>,
         _trace_id: Option<String>,
     ) -> connector_interface::Result<Vec<connector_interface::AggregationRow>> {
         catch(async move {

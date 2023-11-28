@@ -1,6 +1,6 @@
 use super::{internal::serialize_internal, response::*, *};
 use crate::{CoreError, ExpressionResult, QueryResult};
-use prisma_models::PrismaValue;
+use query_structure::PrismaValue;
 use schema::{OutputField, QuerySchema};
 
 #[derive(Debug)]

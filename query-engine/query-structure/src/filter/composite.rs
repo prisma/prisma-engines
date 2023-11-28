@@ -1,7 +1,5 @@
-use crate::compare::CompositeCompare;
-use crate::filter::Filter;
-use prisma_models::{CompositeFieldRef, PrismaValue};
-// use std::sync::Arc;
+use crate::{filter::Filter, CompositeCompare, CompositeFieldRef};
+use prisma_value::PrismaValue;
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct CompositeFilter {

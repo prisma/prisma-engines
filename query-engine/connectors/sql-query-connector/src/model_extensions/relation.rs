@@ -2,8 +2,8 @@ use crate::{
     model_extensions::{AsColumns, AsTable, ColumnIterator},
     Context,
 };
-use prisma_models::{walkers, ModelProjection, Relation, RelationField};
 use quaint::{ast::Table, prelude::Column};
+use query_structure::{walkers, ModelProjection, Relation, RelationField};
 
 pub(crate) trait RelationFieldExt {
     fn m2m_columns(&self, ctx: &Context<'_>) -> Vec<Column<'static>>;

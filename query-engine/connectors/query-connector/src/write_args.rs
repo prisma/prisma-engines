@@ -1,10 +1,8 @@
-use crate::{
-    error::{ConnectorError, ErrorKind},
-    Filter,
-};
+use crate::error::{ConnectorError, ErrorKind};
 use indexmap::{map::Keys, IndexMap};
-use prisma_models::{
-    CompositeFieldRef, Field, Model, ModelProjection, PrismaValue, ScalarFieldRef, SelectedField, SelectionResult,
+use query_structure::{
+    CompositeFieldRef, Field, Filter, Model, ModelProjection, PrismaValue, ScalarFieldRef, SelectedField,
+    SelectionResult,
 };
 use std::{borrow::Borrow, convert::TryInto, ops::Deref};
 

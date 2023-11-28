@@ -7,7 +7,7 @@
 use super::*;
 use bigdecimal::ToPrimitive;
 use chrono::prelude::*;
-use prisma_models::{OrderBy, PrismaValue, ScalarFieldRef};
+use query_structure::{OrderBy, PrismaValue, ScalarFieldRef};
 use std::convert::TryInto;
 use user_facing_errors::query_engine::validation::ValidationError;
 

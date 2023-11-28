@@ -8,7 +8,7 @@ use crate::{Context, QueryExt, Queryable};
 
 use connector_interface::*;
 use itertools::Itertools;
-use prisma_models::*;
+use query_structure::*;
 use std::usize;
 
 /// Performs an update with an explicit selection set.

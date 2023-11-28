@@ -1084,8 +1084,8 @@ dependencies = [
  "indoc 2.0.3",
  "itertools",
  "pretty_assertions",
- "prisma-models",
  "psl",
+ "query-structure",
  "schema",
  "serde",
  "serde_json",
@@ -2503,11 +2503,11 @@ dependencies = [
  "itertools",
  "mongodb",
  "mongodb-client",
- "prisma-models",
  "prisma-value",
  "psl",
  "query-connector",
  "query-engine-metrics",
+ "query-structure",
  "rand 0.7.3",
  "regex",
  "serde",
@@ -3364,22 +3364,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "prisma-models"
-version = "0.0.0"
-dependencies = [
- "bigdecimal",
- "chrono",
- "cuid",
- "getrandom 0.2.11",
- "itertools",
- "nanoid",
- "prisma-value",
- "psl",
- "thiserror",
- "uuid",
-]
-
-[[package]]
 name = "prisma-schema-build"
 version = "0.1.0"
 dependencies = [
@@ -3672,8 +3656,8 @@ dependencies = [
  "futures",
  "indexmap 1.9.3",
  "itertools",
- "prisma-models",
  "prisma-value",
+ "query-structure",
  "serde",
  "serde_json",
  "thiserror",
@@ -3701,10 +3685,10 @@ dependencies = [
  "opentelemetry",
  "petgraph 0.4.13",
  "pin-project",
- "prisma-models",
  "psl",
  "query-connector",
  "query-engine-metrics",
+ "query-structure",
  "schema",
  "serde",
  "serde_json",
@@ -3786,12 +3770,12 @@ dependencies = [
  "napi-build",
  "napi-derive",
  "opentelemetry",
- "prisma-models",
  "psl",
  "quaint",
  "query-connector",
  "query-core",
  "query-engine-metrics",
+ "query-structure",
  "request-handlers",
  "serde",
  "serde_json",
@@ -3844,11 +3828,11 @@ dependencies = [
  "futures",
  "js-sys",
  "log",
- "prisma-models",
  "psl",
  "quaint",
  "query-connector",
  "query-core",
+ "query-structure",
  "request-handlers",
  "serde",
  "serde-wasm-bindgen",
@@ -3866,6 +3850,22 @@ dependencies = [
  "wasm-bindgen-futures",
  "wasm-logger",
  "wasm-rs-dbg",
+]
+
+[[package]]
+name = "query-structure"
+version = "0.0.0"
+dependencies = [
+ "bigdecimal",
+ "chrono",
+ "cuid",
+ "getrandom 0.2.11",
+ "itertools",
+ "nanoid",
+ "prisma-value",
+ "psl",
+ "thiserror",
+ "uuid",
 ]
 
 [[package]]
@@ -3893,13 +3893,13 @@ dependencies = [
  "nom",
  "once_cell",
  "parse-hyperlinks",
- "prisma-models",
  "psl",
  "qe-setup",
  "quaint",
  "query-core",
  "query-engine",
  "query-engine-metrics",
+ "query-structure",
  "regex",
  "request-handlers",
  "serde",
@@ -4181,10 +4181,10 @@ dependencies = [
  "itertools",
  "mongodb-query-connector",
  "once_cell",
- "prisma-models",
  "psl",
  "quaint",
  "query-core",
+ "query-structure",
  "schema",
  "serde",
  "serde_json",
@@ -4452,8 +4452,8 @@ version = "0.1.0"
 dependencies = [
  "codspeed-criterion-compat",
  "once_cell",
- "prisma-models",
  "psl",
+ "query-structure",
  "rustc-hash",
 ]
 
@@ -4971,11 +4971,11 @@ dependencies = [
  "itertools",
  "once_cell",
  "opentelemetry",
- "prisma-models",
  "prisma-value",
  "psl",
  "quaint",
  "query-connector",
+ "query-structure",
  "rand 0.7.3",
  "serde",
  "serde_json",

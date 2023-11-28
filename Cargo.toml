@@ -21,7 +21,7 @@ members = [
   "query-engine/dmmf",
   "query-engine/driver-adapters",
   "query-engine/metrics",
-  "query-engine/prisma-models",
+  "query-engine/query-structure",
   "query-engine/query-engine",
   "query-engine/query-engine-node-api",
   "query-engine/query-engine-wasm",

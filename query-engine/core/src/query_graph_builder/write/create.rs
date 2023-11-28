@@ -4,9 +4,8 @@ use crate::{
     query_graph::{Node, NodeRef, QueryGraph, QueryGraphDependency},
     ArgumentListLookup, ParsedField, ParsedInputList, ParsedInputMap,
 };
-use connector::IntoFilter;
-use prisma_models::Model;
 use psl::datamodel_connector::ConnectorCapability;
+use query_structure::{IntoFilter, Model};
 use schema::{constants::args, QuerySchema};
 use std::convert::TryInto;
 use write_args_parser::*;
