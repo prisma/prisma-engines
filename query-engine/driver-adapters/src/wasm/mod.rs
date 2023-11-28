@@ -5,8 +5,7 @@ mod error;
 mod from_js;
 mod js_object_extern;
 mod result;
-mod transaction;
 
 pub(crate) use async_js_function::AsyncJsFunction;
+pub(crate) use from_js::FromJsValue;
 pub use js_object_extern::JsObjectExtern;
-pub(crate) use transaction::JsTransaction;

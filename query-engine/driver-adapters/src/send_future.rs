@@ -11,8 +11,6 @@ use futures::Future;
 #[pin_project::pin_project]
 pub struct SendFuture<F: Future>(#[pin] pub F);
 
-unsafe impl<F: Future> Send for SendFuture<F> {}
-
 impl<F: Future> Future for SendFuture<F> {
     type Output = F::Output;
 
@@ -22,3 +20,8 @@ impl<F: Future> Future for SendFuture<F> {
         future.poll(cx)
     }
 }
+
+// Note: on Napi.rs, we require the underlying future to be `Send`.
+// On Wasm, that's currently not possible.
+#[cfg(target_arch = "wasm32")]
+unsafe impl<F: Future> Send for SendFuture<F> {}

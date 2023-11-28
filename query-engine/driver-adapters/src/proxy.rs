@@ -178,3 +178,4 @@ macro_rules! impl_send_sync_on_wasm {
 impl_send_sync_on_wasm!(TransactionProxy);
 impl_send_sync_on_wasm!(DriverProxy);
 impl_send_sync_on_wasm!(CommonProxy);
+impl_send_sync_on_wasm!(JsTransaction);

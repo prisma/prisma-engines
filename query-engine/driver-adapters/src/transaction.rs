@@ -1,16 +1,14 @@
 use async_trait::async_trait;
-use js_sys::Object as JsObject;
 use metrics::decrement_gauge;
 use quaint::{
     connector::{IsolationLevel, Transaction as QuaintTransaction},
     prelude::{Query as QuaintQuery, Queryable, ResultSet},
     Value,
 };
-use wasm_bindgen::JsCast;
 
-use super::from_js::FromJsValue;
 use crate::proxy::{TransactionOptions, TransactionProxy};
-use crate::{proxy::CommonProxy, queryable::JsBaseQueryable, send_future::SendFuture, JsObjectExtern};
+use crate::{proxy::CommonProxy, queryable::JsBaseQueryable, send_future::SendFuture};
+use crate::{JsObject, JsResult};
 
 // Wrapper around JS transaction objects that implements Queryable
 // and quaint::Transaction. Can be used in place of quaint transaction,
@@ -32,17 +30,6 @@ impl JsTransaction {
     pub async fn raw_phantom_cmd(&self, cmd: &str) -> quaint::Result<()> {
         let params = &[];
         quaint::connector::metrics::query("js.raw_phantom_cmd", cmd, params, move || async move { Ok(()) }).await
-    }
-}
-
-impl FromJsValue for JsTransaction {
-    fn from_js_value(value: wasm_bindgen::prelude::JsValue) -> Result<Self, wasm_bindgen::prelude::JsValue> {
-        let object: JsObjectExtern = value.dyn_into::<JsObject>()?.unchecked_into();
-        let common_proxy = CommonProxy::new(&object)?;
-        let base = JsBaseQueryable::new(common_proxy);
-        let tx_proxy = TransactionProxy::new(&object)?;
-
-        Ok(Self::new(base, tx_proxy))
     }
 }
 
@@ -132,6 +119,29 @@ impl Queryable for JsTransaction {
     }
 }
 
-// Assume the proxy object will not be sent to service workers, we can unsafe impl Send + Sync.
-unsafe impl Send for JsTransaction {}
-unsafe impl Sync for JsTransaction {}
+#[cfg(target_arch = "wasm32")]
+impl super::wasm::FromJsValue for JsTransaction {
+    fn from_js_value(value: wasm_bindgen::prelude::JsValue) -> JsResult<Self> {
+        use wasm_bindgen::JsCast;
+
+        let object = value.dyn_into::<JsObject>()?;
+        let common_proxy = CommonProxy::new(&object)?;
+        let base = JsBaseQueryable::new(common_proxy);
+        let tx_proxy = TransactionProxy::new(&object)?;
+
+        Ok(Self::new(base, tx_proxy))
+    }
+}
+
+/// Implementing unsafe `from_napi_value` allows retrieving a threadsafe `JsTransaction` in `DriverProxy`
+/// while keeping derived futures `Send`.
+#[cfg(not(target_arch = "wasm32"))]
+impl ::napi::bindgen_prelude::FromNapiValue for JsTransaction {
+    unsafe fn from_napi_value(env: napi::sys::napi_env, napi_val: napi::sys::napi_value) -> JsResult<Self> {
+        let object = JsObject::from_napi_value(env, napi_val)?;
+        let common_proxy = CommonProxy::new(&object)?;
+        let tx_proxy = TransactionProxy::new(&object)?;
+
+        Ok(Self::new(JsBaseQueryable::new(common_proxy), tx_proxy))
+    }
+}

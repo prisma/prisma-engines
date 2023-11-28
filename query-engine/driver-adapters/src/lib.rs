@@ -12,9 +12,11 @@ pub(crate) mod error;
 pub(crate) mod proxy;
 pub(crate) mod queryable;
 pub(crate) mod send_future;
+pub(crate) mod transaction;
 pub(crate) mod types;
 
 pub use queryable::from_js;
+pub(crate) use transaction::JsTransaction;
 
 #[cfg(target_arch = "wasm32")]
 pub use wasm::JsObjectExtern as JsObject;
