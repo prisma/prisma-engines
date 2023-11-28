@@ -50,7 +50,7 @@ pub(crate) fn serialize_internal(
             serialize_record_selection(*rs, field, field.field_type(), is_list, query_schema)
         }
         QueryResult::RecordSelectionWithRelations(rs) => {
-            serialize_record_selection_with_relations(*rs, field, field.field_type(), is_list, query_schema)
+            serialize_record_selection_with_relations(*rs, field, field.field_type(), is_list)
         }
         QueryResult::RecordAggregations(ras) => serialize_aggregations(field, ras),
         QueryResult::Count(c) => {
@@ -227,7 +227,6 @@ fn serialize_record_selection_with_relations(
     field: &OutputField<'_>,
     typ: &OutputType<'_>, // We additionally pass the type to allow recursing into nested type definitions of a field.
     is_list: bool,
-    query_schema: &QuerySchema,
 ) -> crate::Result<CheckedItemsWithParents> {
     let name = record_selection.name.clone();
 
@@ -237,7 +236,6 @@ fn serialize_record_selection_with_relations(
             field,
             &OutputType::non_list(inner.clone()),
             true,
-            query_schema,
         ),
         InnerOutputType::Object(obj) => {
             let result = serialize_objects_with_relation(record_selection, obj)?;
