@@ -257,7 +257,7 @@ fn from_schema_datasource_relative(mut api: TestApi) {
     };
 
     api.diff(params).unwrap();
-    
+
     let expected_printed_messages = if api.tags().contains(test_setup::Tags::Spatialite) {
         expect![[r#"
             [

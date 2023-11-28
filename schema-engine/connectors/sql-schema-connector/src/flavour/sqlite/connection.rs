@@ -2,7 +2,7 @@
 
 pub(crate) use quaint::connector::rusqlite;
 
-use quaint::connector::{GetRow, ToColumnNames, load_spatialite};
+use quaint::connector::{load_spatialite, GetRow, ToColumnNames};
 use schema_connector::{ConnectorError, ConnectorResult};
 use sql_schema_describer::{sqlite as describer, DescriberErrorKind, SqlSchema};
 use std::sync::Mutex;
