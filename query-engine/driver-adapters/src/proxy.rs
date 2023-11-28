@@ -88,9 +88,7 @@ impl DriverProxy {
         Ok(Box::new(tx))
     }
 
-    pub fn start_transaction<'a>(
-        &'a self,
-    ) -> SendFuture<impl Future<Output = quaint::Result<Box<JsTransaction>>> + 'a> {
+    pub fn start_transaction(&self) -> SendFuture<impl Future<Output = quaint::Result<Box<JsTransaction>>> + '_> {
         SendFuture(self.start_transaction_inner())
     }
 }
@@ -129,7 +127,7 @@ impl TransactionProxy {
     ///   the underlying FFI call will be delivered to JavaScript side in lockstep, so the destructor
     ///   will not attempt rolling the transaction back even if the `commit` future was dropped while
     ///   waiting on the JavaScript call to complete and deliver response.
-    pub fn commit<'a>(&'a self) -> SendFuture<impl Future<Output = quaint::Result<()>> + 'a> {
+    pub fn commit(&self) -> SendFuture<impl Future<Output = quaint::Result<()>> + '_> {
         self.closed.store(true, Ordering::Relaxed);
         SendFuture(self.commit.call(()))
     }
@@ -149,7 +147,7 @@ impl TransactionProxy {
     ///   the underlying FFI call will be delivered to JavaScript side in lockstep, so the destructor
     ///   will not attempt rolling back again even if the `rollback` future was dropped while waiting
     ///   on the JavaScript call to complete and deliver response.
-    pub fn rollback<'a>(&'a self) -> SendFuture<impl Future<Output = quaint::Result<()>> + 'a> {
+    pub fn rollback(&self) -> SendFuture<impl Future<Output = quaint::Result<()>> + '_> {
         self.closed.store(true, Ordering::Relaxed);
         SendFuture(self.rollback.call(()))
     }
@@ -161,7 +159,7 @@ impl Drop for TransactionProxy {
             return;
         }
 
-        _ = self.rollback.call_non_blocking(());
+        self.rollback.call_non_blocking(());
     }
 }
 
