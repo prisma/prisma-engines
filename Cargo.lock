@@ -3887,6 +3887,7 @@ dependencies = [
  "async-trait",
  "colored",
  "enumflags2",
+ "futures",
  "hyper",
  "indexmap 1.9.3",
  "indoc 2.0.3",
