@@ -1,6 +1,6 @@
 use std::fmt::Display;
 
-#[derive(Debug)]
+#[derive(Debug, Default)]
 pub struct SpawnError {}
 
 impl SpawnError {
@@ -17,7 +17,7 @@ impl Display for SpawnError {
 
 impl std::error::Error for SpawnError {}
 
-#[derive(Debug)]
+#[derive(Debug, Default)]
 pub struct TimeoutError {}
 
 impl TimeoutError {

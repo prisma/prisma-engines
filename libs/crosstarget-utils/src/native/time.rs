@@ -21,7 +21,7 @@ impl ElapsedTimeCounter {
     }
 }
 
-pub async fn sleep(duration: Duration) -> () {
+pub async fn sleep(duration: Duration) {
     tokio::time::sleep(duration).await
 }
 
