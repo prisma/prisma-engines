@@ -2,6 +2,7 @@ use super::*;
 use once_cell::sync::Lazy;
 use serde::de::DeserializeOwned;
 use std::{
+    error::Error as StdError,
     fmt::Display,
     io::Write as _,
     sync::{atomic::Ordering, Arc},
@@ -123,6 +124,22 @@ impl RestartableExecutorProcess {
     }
 }
 
+struct ExecutorProcessDiedError;
+
+impl fmt::Debug for ExecutorProcessDiedError {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "The external test executor process died")
+    }
+}
+
+impl Display for ExecutorProcessDiedError {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        fmt::Debug::fmt(self, f)
+    }
+}
+
+impl StdError for ExecutorProcessDiedError {}
+
 pub(super) static EXTERNAL_PROCESS: Lazy<RestartableExecutorProcess> = Lazy::new(|| RestartableExecutorProcess::new());
 
 type ReqImpl = (
@@ -198,7 +215,7 @@ fn start_rpc_thread(mut receiver: mpsc::Receiver<ReqImpl>) -> Result<()> {
                             {
                                 tracing::error!("Error when reading from child node process. Process might have exited. Restarting...");
                                 if let Some((_, sender)) = last_pending_request.take() {
-                                    let _ = sender.send(Err(Box::new(jsonrpc_core::types::Error::new(jsonrpc_core::ErrorCode::ServerError(500))))).unwrap();
+                                    let _ = sender.send(Err(Box::new(ExecutorProcessDiedError))).unwrap();
                                 }
                                 EXTERNAL_PROCESS.restart().await;
                                 break;
