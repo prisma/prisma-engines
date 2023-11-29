@@ -6,7 +6,6 @@ use crate::{
     logger::{LogCallback, Logger},
 };
 use driver_adapters::JsObject;
-use futures::FutureExt;
 use js_sys::Function as JsFunction;
 use psl::PreviewFeature;
 use query_core::{
@@ -20,8 +19,6 @@ use serde::{Deserialize, Serialize};
 use serde_json::json;
 use std::{
     collections::{BTreeMap, HashMap},
-    future::Future,
-    panic::AssertUnwindSafe,
     path::PathBuf,
     sync::Arc,
 };
@@ -29,7 +26,6 @@ use tokio::sync::RwLock;
 use tracing::{field, instrument::WithSubscriber, Instrument, Span};
 use tracing_subscriber::filter::LevelFilter;
 use tsify::Tsify;
-use user_facing_errors::Error;
 use wasm_bindgen::prelude::wasm_bindgen;
 /// The main query engine used by JS
 #[wasm_bindgen]
@@ -211,7 +207,7 @@ impl QueryEngine {
     pub async fn connect(&self, trace: String) -> Result<(), wasm_bindgen::JsError> {
         let dispatcher = self.logger.dispatcher();
 
-        async_panic_to_js_error(async {
+        async {
             let span = tracing::info_span!("prisma:engine:connect");
             let _ = telemetry::helpers::set_parent_context_from_json_str(&span, &trace);
 
@@ -271,11 +267,9 @@ impl QueryEngine {
             *inner = Inner::Connected(engine);
 
             Ok(())
-        })
+        }
         .with_subscriber(dispatcher)
-        .await?;
-
-        Ok(())
+        .await
     }
 
     /// Disconnect and drop the core. Can be reconnected later with `#connect`.
@@ -283,7 +277,7 @@ impl QueryEngine {
     pub async fn disconnect(&self, trace: String) -> Result<(), wasm_bindgen::JsError> {
         let dispatcher = self.logger.dispatcher();
 
-        async_panic_to_js_error(async {
+        async {
             let span = tracing::info_span!("prisma:engine:disconnect");
             let _ = telemetry::helpers::set_parent_context_from_json_str(&span, &trace);
 
@@ -304,7 +298,7 @@ impl QueryEngine {
             }
             .instrument(span)
             .await
-        })
+        }
         .with_subscriber(dispatcher)
         .await
     }
@@ -319,7 +313,7 @@ impl QueryEngine {
     ) -> Result<String, wasm_bindgen::JsError> {
         let dispatcher = self.logger.dispatcher();
 
-        async_panic_to_js_error(async {
+        async {
             let inner = self.inner.read().await;
             let engine = inner.as_engine()?;
 
@@ -343,7 +337,7 @@ impl QueryEngine {
                 Ok(serde_json::to_string(&response)?)
             }
             .await
-        })
+        }
         .with_subscriber(dispatcher)
         .await
     }
@@ -351,109 +345,93 @@ impl QueryEngine {
     /// If connected, attempts to start a transaction in the core and returns its ID.
     #[wasm_bindgen(js_name = startTransaction)]
     pub async fn start_transaction(&self, input: String, trace: String) -> Result<String, wasm_bindgen::JsError> {
-        async_panic_to_js_error(async {
-            let inner = self.inner.read().await;
-            let engine = inner.as_engine()?;
+        let inner = self.inner.read().await;
+        let engine = inner.as_engine()?;
+        let dispatcher = self.logger.dispatcher();
 
-            let dispatcher = self.logger.dispatcher();
+        async move {
+            let span = tracing::info_span!("prisma:engine:itx_runner", user_facing = true, itx_id = field::Empty);
 
-            async move {
-                let span = tracing::info_span!("prisma:engine:itx_runner", user_facing = true, itx_id = field::Empty);
-
-                let tx_opts: TransactionOptions = serde_json::from_str(&input)?;
-                match engine
-                    .executor()
-                    .start_tx(engine.query_schema().clone(), engine.engine_protocol(), tx_opts)
-                    .instrument(span)
-                    .await
-                {
-                    Ok(tx_id) => Ok(json!({ "id": tx_id.to_string() }).to_string()),
-                    Err(err) => Ok(map_known_error(err)?),
-                }
+            let tx_opts: TransactionOptions = serde_json::from_str(&input)?;
+            match engine
+                .executor()
+                .start_tx(engine.query_schema().clone(), engine.engine_protocol(), tx_opts)
+                .instrument(span)
+                .await
+            {
+                Ok(tx_id) => Ok(json!({ "id": tx_id.to_string() }).to_string()),
+                Err(err) => Ok(map_known_error(err)?),
             }
-            .with_subscriber(dispatcher)
-            .await
-        })
+        }
+        .with_subscriber(dispatcher)
         .await
     }
 
     /// If connected, attempts to commit a transaction with id `tx_id` in the core.
     #[wasm_bindgen(js_name = commitTransaction)]
     pub async fn commit_transaction(&self, tx_id: String, trace: String) -> Result<String, wasm_bindgen::JsError> {
-        async_panic_to_js_error(async {
-            let inner = self.inner.read().await;
-            let engine = inner.as_engine()?;
+        let inner = self.inner.read().await;
+        let engine = inner.as_engine()?;
 
-            let dispatcher = self.logger.dispatcher();
+        let dispatcher = self.logger.dispatcher();
 
-            async move {
-                match engine.executor().commit_tx(TxId::from(tx_id)).await {
-                    Ok(_) => Ok("{}".to_string()),
-                    Err(err) => Ok(map_known_error(err)?),
-                }
+        async move {
+            match engine.executor().commit_tx(TxId::from(tx_id)).await {
+                Ok(_) => Ok("{}".to_string()),
+                Err(err) => Ok(map_known_error(err)?),
             }
-            .with_subscriber(dispatcher)
-            .await
-        })
+        }
+        .with_subscriber(dispatcher)
         .await
     }
 
     #[wasm_bindgen]
     pub async fn dmmf(&self, trace: String) -> Result<String, wasm_bindgen::JsError> {
-        async_panic_to_js_error(async {
-            let inner = self.inner.read().await;
-            let engine = inner.as_engine()?;
+        let inner = self.inner.read().await;
+        let engine = inner.as_engine()?;
 
-            let dispatcher = self.logger.dispatcher();
+        let dispatcher = self.logger.dispatcher();
 
-            tracing::dispatcher::with_default(&dispatcher, || {
-                let span = tracing::info_span!("prisma:engine:dmmf");
-                let _ = telemetry::helpers::set_parent_context_from_json_str(&span, &trace);
-                let _guard = span.enter();
-                let dmmf = dmmf::render_dmmf(&engine.query_schema);
+        tracing::dispatcher::with_default(&dispatcher, || {
+            let span = tracing::info_span!("prisma:engine:dmmf");
+            let _ = telemetry::helpers::set_parent_context_from_json_str(&span, &trace);
+            let _guard = span.enter();
+            let dmmf = dmmf::render_dmmf(&engine.query_schema);
 
-                let json = {
-                    let _span = tracing::info_span!("prisma:engine:dmmf_to_json").entered();
-                    serde_json::to_string(&dmmf)?
-                };
+            let json = {
+                let _span = tracing::info_span!("prisma:engine:dmmf_to_json").entered();
+                serde_json::to_string(&dmmf)?
+            };
 
-                Ok(json)
-            })
+            Ok(json)
         })
-        .await
     }
 
     /// If connected, attempts to roll back a transaction with id `tx_id` in the core.
     #[wasm_bindgen(js_name = rollbackTransaction)]
     pub async fn rollback_transaction(&self, tx_id: String, trace: String) -> Result<String, wasm_bindgen::JsError> {
-        async_panic_to_js_error(async {
-            let inner = self.inner.read().await;
-            let engine = inner.as_engine()?;
+        let inner = self.inner.read().await;
+        let engine = inner.as_engine()?;
 
-            let dispatcher = self.logger.dispatcher();
+        let dispatcher = self.logger.dispatcher();
 
-            async move {
-                match engine.executor().rollback_tx(TxId::from(tx_id)).await {
-                    Ok(_) => Ok("{}".to_string()),
-                    Err(err) => Ok(map_known_error(err)?),
-                }
+        async move {
+            match engine.executor().rollback_tx(TxId::from(tx_id)).await {
+                Ok(_) => Ok("{}".to_string()),
+                Err(err) => Ok(map_known_error(err)?),
             }
-            .with_subscriber(dispatcher)
-            .await
-        })
+        }
+        .with_subscriber(dispatcher)
         .await
     }
 
     /// Loads the query schema. Only available when connected.
     #[wasm_bindgen(js_name = sdlSchema)]
     pub async fn sdl_schema(&self) -> Result<String, wasm_bindgen::JsError> {
-        async_panic_to_js_error(async move {
-            let inner = self.inner.read().await;
-            let engine = inner.as_engine()?;
+        let inner = self.inner.read().await;
+        let engine = inner.as_engine()?;
 
-            Ok(render_graphql_schema(engine.query_schema()))
-        })
-        .await
+        Ok(render_graphql_schema(engine.query_schema()))
     }
 
     #[wasm_bindgen]
@@ -499,17 +477,4 @@ fn stringify_env_values(origin: serde_json::Value) -> crate::Result<HashMap<Stri
     };
 
     Err(ApiError::JsonDecode(msg.to_string()))
-}
-
-async fn async_panic_to_js_error<F, R>(fut: F) -> Result<R, wasm_bindgen::JsError>
-where
-    F: Future<Output = Result<R, wasm_bindgen::JsError>>,
-{
-    match AssertUnwindSafe(fut).catch_unwind().await {
-        Ok(result) => result,
-        Err(err) => match Error::extract_panic_message(err) {
-            Some(message) => Err(wasm_bindgen::JsError::new(&format!("PANIC: {message}"))),
-            None => Err(wasm_bindgen::JsError::new("PANIC: unknown panic")),
-        },
-    }
 }

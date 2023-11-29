@@ -289,7 +289,9 @@ fn run_connector_test_impl(
             .unwrap();
             let schema_id = runner.schema_id();
 
-            test_fn(runner).await.unwrap();
+            if let Err(err) = test_fn(runner).await {
+                panic!("💥 Test failed due to an error: {err:?}");
+            }
 
             crate::teardown_project(&datamodel, db_schemas, schema_id)
                 .await

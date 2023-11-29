@@ -1,13 +1,7 @@
 use std::fmt::Display;
 
-#[derive(Debug, Default)]
-pub struct SpawnError {}
-
-impl SpawnError {
-    pub fn new() -> Self {
-        SpawnError {}
-    }
-}
+#[derive(Debug)]
+pub struct SpawnError;
 
 impl Display for SpawnError {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
@@ -17,14 +11,8 @@ impl Display for SpawnError {
 
 impl std::error::Error for SpawnError {}
 
-#[derive(Debug, Default)]
-pub struct TimeoutError {}
-
-impl TimeoutError {
-    pub fn new() -> Self {
-        TimeoutError {}
-    }
-}
+#[derive(Debug)]
+pub struct TimeoutError;
 
 impl Display for TimeoutError {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
