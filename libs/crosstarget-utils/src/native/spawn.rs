@@ -7,5 +7,5 @@ where
     F: Future + 'static + Send,
     F::Output: Send + 'static,
 {
-    tokio::spawn(future).await.map_err(|_| SpawnError::new())
+    tokio::spawn(future).await.map_err(|_| SpawnError)
 }

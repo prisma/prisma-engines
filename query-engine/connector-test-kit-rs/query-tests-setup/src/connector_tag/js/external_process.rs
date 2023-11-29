@@ -140,7 +140,7 @@ impl Display for ExecutorProcessDiedError {
 
 impl StdError for ExecutorProcessDiedError {}
 
-pub(super) static EXTERNAL_PROCESS: Lazy<RestartableExecutorProcess> = Lazy::new(|| RestartableExecutorProcess::new());
+pub(super) static EXTERNAL_PROCESS: Lazy<RestartableExecutorProcess> = Lazy::new(RestartableExecutorProcess::new);
 
 type ReqImpl = (
     jsonrpc_core::MethodCall,
@@ -215,7 +215,7 @@ fn start_rpc_thread(mut receiver: mpsc::Receiver<ReqImpl>) -> Result<()> {
                             {
                                 tracing::error!("Error when reading from child node process. Process might have exited. Restarting...");
                                 if let Some((_, sender)) = last_pending_request.take() {
-                                    let _ = sender.send(Err(Box::new(ExecutorProcessDiedError))).unwrap();
+                                    sender.send(Err(Box::new(ExecutorProcessDiedError))).unwrap();
                                 }
                                 EXTERNAL_PROCESS.restart().await;
                                 break;
