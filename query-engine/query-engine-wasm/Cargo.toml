@@ -6,7 +6,7 @@ edition = "2021"
 [lib]
 doc = false
 crate-type = ["cdylib"]
-name = "query_engine_wasm"
+name = "query_engine"
 
 [dependencies]
 
