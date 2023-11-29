@@ -18,10 +18,7 @@ pub(crate) async fn m2m(
     );
 
     let inm_builder = if query.args.requires_inmemory_distinct() {
-        let inm_builder = inm_builder.distinct(query.args.distinct.clone());
-        query.args.distinct = None;
-
-        inm_builder
+        inm_builder.distinct(&mut query.args.distinct.clone())
     } else {
         inm_builder
     };
@@ -220,10 +217,7 @@ pub async fn one2m(
         );
 
         let inm_builder = if req_inmem_distinct {
-            let inm_builder = inm_builder.distinct(query_args.distinct);
-            query_args.distinct = None;
-
-            inm_builder
+            inm_builder.distinct(&mut query_args.distinct)
         } else {
             inm_builder
         };
