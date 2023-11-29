@@ -67,7 +67,7 @@
     <span class="kw">let </span>span_id = context.span_id();
 
     <span class="comment">// see https://www.w3.org/TR/trace-context/#traceparent-header-field-values
-    </span><span class="macro">format!</span>(<span class="string">&quot;traceparent=00-{trace_id:032x}-{span_id:032x}-01&quot;</span>)
+    </span><span class="macro">format!</span>(<span class="string">&quot;traceparent=&#39;00-{trace_id:032x}-{span_id:032x}-01&#39;&quot;</span>)
 }
 
 <span class="kw">pub trait </span>SqlTraceComment: Sized {
@@ -93,7 +93,7 @@
             </span><span class="kw">fn </span>add_trace_id(<span class="self">self</span>, trace_id: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt;) -&gt; <span class="self">Self </span>{
                 <span class="kw">if let </span><span class="prelude-val">Some</span>(traceparent) = trace_id {
                     <span class="kw">if </span>should_sample(<span class="kw-2">&amp;</span>traceparent) {
-                        <span class="self">self</span>.comment(<span class="macro">format!</span>(<span class="string">&quot;traceparent={}&quot;</span>, traceparent))
+                        <span class="self">self</span>.comment(<span class="macro">format!</span>(<span class="string">&quot;traceparent=&#39;{}&#39;&quot;</span>, traceparent))
                     } <span class="kw">else </span>{
                         <span class="self">self
                     </span>}
