@@ -38,18 +38,16 @@ pub fn load_spatialite(conn: &rusqlite::Connection) -> crate::Result<()> {
                 conn.load_extension(spatialite_path, None)?;
             }
             return match conn.query_row("SELECT CheckSpatialMetaData()", [], |r| r.get(0))? {
-                0 => {
-                    match conn.query_row("SELECT InitSpatialMetaData(1, 'WGS84_ONLY')", [], |r| r.get(0))? {
-                        1 => Ok(()),
-                        _ => Err(Error::builder(ErrorKind::QueryError("Failed to load Spatialite".into())).build()),
-                    }
+                0 => match conn.query_row("SELECT InitSpatialMetaData(1, 'WGS84_ONLY')", [], |r| r.get(0))? {
+                    1 => Ok(()),
+                    _ => Err(Error::builder(ErrorKind::QueryError("Failed to load Spatialite".into())).build()),
                 },
                 3 => Ok(()),
-                _ => Err(Error::builder(ErrorKind::ConnectionError("Invalid Spatialite State".into())).build())
-            }
+                _ => Err(Error::builder(ErrorKind::ConnectionError("Invalid Spatialite State".into())).build()),
+            };
         }
     }
-    return Ok(())
+    Ok(())
 }
 
 impl TryFrom<&str> for Sqlite {
