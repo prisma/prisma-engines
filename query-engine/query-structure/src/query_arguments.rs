@@ -72,17 +72,27 @@ impl QueryArguments {
     /// retrieved by the connector or if it requires the query engine to fetch a raw set
     /// of records and perform certain operations itself, in-memory.
     pub fn requires_inmemory_processing(&self) -> bool {
-        self.contains_unstable_cursor() || self.contains_null_cursor()
+        self.contains_unstable_cursor() || self.contains_null_cursor() || self.requires_inmemory_distinct()
     }
 
     pub fn requires_inmemory_distinct(&self) -> bool {
+        self.has_distinct() && (!self.has_distinct_capability() || self.has_orderby())
+    }
+
+    fn has_distinct_capability(&self) -> bool {
+        self.model()
+            .dm
+            .schema
+            .connector
+            .has_capability(ConnectorCapability::Distinct)
+    }
+
+    fn has_distinct(&self) -> bool {
         self.distinct.is_some()
-            && !self
-                .model()
-                .dm
-                .schema
-                .connector
-                .has_capability(ConnectorCapability::Distinct)
+    }
+
+    fn has_orderby(&self) -> bool {
+        !self.order_by.is_empty()
     }
 
     /// An unstable cursor is a cursor that is used in conjunction with an unstable (non-unique) combination of orderBys.

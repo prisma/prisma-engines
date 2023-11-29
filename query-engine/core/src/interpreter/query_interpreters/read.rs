@@ -85,7 +85,7 @@ fn read_one(
 /// -> Unstable cursors can't reliably be fetched by the underlying datasource, so we need to process part of it in-memory.
 fn read_many(
     tx: &mut dyn ConnectionLike,
-    query: ManyRecordsQuery,
+    mut query: ManyRecordsQuery,
     trace_id: Option<String>,
 ) -> BoxFuture<'_, InterpretationResult<QueryResult>> {
     let req_inmem_distinct = query.args.requires_inmemory_distinct();
@@ -98,15 +98,15 @@ fn read_many(
             query.args.ignore_take,
         );
 
-        let inm_builder = match query.args.distinct {
-            Some(ref fs) => {
-                if req_inmem_distinct {
-                    inm_builder.distinct(fs.clone())
-                } else {
-                    inm_builder
-                }
-            }
-            None => inm_builder,
+        dbg!(req_inmem_distinct);
+        let inm_builder = if req_inmem_distinct {
+            let inm_builder = inm_builder.distinct(query.args.distinct);
+            query.args.distinct = None;
+            dbg!(&query.args.distinct);
+
+            inm_builder
+        } else {
+            inm_builder
         };
 
         Some(inm_builder.build())

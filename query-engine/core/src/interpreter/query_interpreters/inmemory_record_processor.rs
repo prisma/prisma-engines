@@ -229,8 +229,8 @@ impl InMemoryRecordProcessorBuilder {
         self
     }
 
-    pub fn distinct(mut self, distinct: FieldSelection) -> Self {
-        self.args.distinct = Some(distinct);
+    pub fn distinct(mut self, distinct: Option<FieldSelection>) -> Self {
+        self.args.distinct = distinct.clone();
         self
     }
 

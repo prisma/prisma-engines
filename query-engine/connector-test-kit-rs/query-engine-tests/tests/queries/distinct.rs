@@ -85,7 +85,7 @@ mod distinct {
     }
 
     #[connector_test]
-    async fn with_skip(runner: Runner) -> TestResult<()> {
+    async fn with_skip_basic(runner: Runner) -> TestResult<()> {
         test_user(&runner, r#"{ id: 1, first_name: "Joe", last_name: "Doe", email: "1" }"#).await?;
         test_user(
             &runner,
@@ -104,7 +104,7 @@ mod distinct {
             ),
             // r#"{"data":{"findManyUser":[{"id":2,"first_name":"Hans","last_name":"Wurst"}]}}"#
             // ! SELECT DISTINCT ON expressions must match initial ORDER BY expressions
-            @r###""###
+            @r###"{"data":{"findManyUser":[{"id":2,"first_name":"Hans","last_name":"Wurst"},{"id":3,"first_name":"Joe","last_name":"Doe"}]}}"###
         );
 
         Ok(())
@@ -158,14 +158,14 @@ mod distinct {
             ),
             // r#"{"data":{"findManyUser":[{"id":3,"first_name":"Joe","last_name":"Doe"},{"id":2,"first_name":"Hans","last_name":"Wurst"}]}}"#
             // ! SELECT DISTINCT ON expressions must match initial ORDER BY expressions
-            @r###""###
+            @r###"{"data":{"findManyUser":[{"id":3,"first_name":"Joe","last_name":"Doe"},{"id":2,"first_name":"Hans","last_name":"Wurst"}]}}"###
         );
 
         Ok(())
     }
 
     /// Mut return only distinct records for top record, and only for those the distinct relation records.
-    // #[connector_test]
+    #[connector_test]
     async fn nested_distinct(runner: Runner) -> TestResult<()> {
         nested_dataset(&runner).await?;
 
@@ -187,7 +187,7 @@ mod distinct {
             ),
             // {"data":{"findManyUser":[{"id":1,"posts":[{"title":"3"},{"title":"1"},{"title":"2"}]},{"id":3,"posts":[]},{"id":4,"posts":[{"title":"1"}]},{"id":5,"posts":[{"title":"2"},{"title":"3"}]}]}}
             // ! SELECT DISTINCT ON expressions must match initial ORDER BY expressions
-            @r###""###
+            @r###"{"data":{"findManyUser":[{"id":1,"posts":[{"title":"3"},{"title":"1"},{"title":"2"}]},{"id":4,"posts":[{"title":"1"}]},{"id":3,"posts":[]},{"id":5,"posts":[{"title":"2"},{"title":"3"}]}]}}"###
         );
 
         Ok(())
@@ -218,7 +218,7 @@ mod distinct {
             ),
             // {"data":{"findManyUser":[{"id":5,"posts":[{"title":"2"},{"title":"3"}]},{"id":4,"posts":[{"title":"1"}]},{"id":3,"posts":[]},{"id":2,"posts":[{"title":"2"},{"title":"1"}]}]}}
             // ! SELECT DISTINCT ON expressions must match initial ORDER BY expressions
-            @r###""###
+            @r###"{"data":{"findManyUser":[{"id":5,"posts":[{"title":"2"},{"title":"3"}]},{"id":4,"posts":[{"title":"1"}]},{"id":3,"posts":[]},{"id":2,"posts":[{"title":"2"},{"title":"1"}]}]}}"###
         );
 
         Ok(())

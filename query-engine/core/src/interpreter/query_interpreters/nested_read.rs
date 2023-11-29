@@ -17,17 +17,16 @@ pub(crate) async fn m2m(
         query.args.ignore_take,
     );
 
-    let processor = match query.args.distinct {
-        Some(ref fs) => {
-            if query.args.requires_inmemory_distinct() {
-                inm_builder.distinct(fs.clone())
-            } else {
-                inm_builder
-            }
-        }
-        None => inm_builder,
-    }
-    .build();
+    let inm_builder = if query.args.requires_inmemory_distinct() {
+        let inm_builder = inm_builder.distinct(query.args.distinct.clone());
+        query.args.distinct = None;
+
+        inm_builder
+    } else {
+        inm_builder
+    };
+
+    let processor = inm_builder.build();
 
     let parent_field = &query.parent_field;
     let child_link_id = parent_field.related_field().linking_fields();
@@ -153,7 +152,7 @@ pub async fn one2m(
     parent_field: &RelationFieldRef,
     parent_selections: Option<Vec<SelectionResult>>,
     parent_result: Option<&ManyRecords>,
-    query_args: QueryArguments,
+    mut query_args: QueryArguments,
     selected_fields: &FieldSelection,
     aggr_selections: Vec<RelAggregationSelection>,
     trace_id: Option<String>,
@@ -220,15 +219,13 @@ pub async fn one2m(
             query_args.ignore_take,
         );
 
-        let inm_builder = match query_args.distinct {
-            Some(ref fs) => {
-                if req_inmem_distinct {
-                    inm_builder.distinct(fs.clone())
-                } else {
-                    inm_builder
-                }
-            }
-            None => inm_builder,
+        let inm_builder = if req_inmem_distinct {
+            let inm_builder = inm_builder.distinct(query_args.distinct);
+            query_args.distinct = None;
+
+            inm_builder
+        } else {
+            inm_builder
         };
 
         Some(inm_builder.build())
