@@ -103,23 +103,23 @@ impl ExecutorProcess {
 /// asynchronous code are translated to an abort trap by wasm-bindgen, which kills the node process.
 #[derive(Clone)]
 pub(crate) struct RestartableExecutorProcess {
-    p: Arc<Mutex<ExecutorProcess>>,
+    process: Arc<Mutex<ExecutorProcess>>,
 }
 
 impl RestartableExecutorProcess {
     fn new() -> Self {
         Self {
-            p: Arc::new(Mutex::new(ExecutorProcess::spawn())),
+            process: Arc::new(Mutex::new(ExecutorProcess::spawn())),
         }
     }
 
     async fn restart(&self) {
-        let mut p = self.p.lock().await;
-        _ = std::mem::replace(&mut *p, ExecutorProcess::spawn());
+        let mut process = self.process.lock().await;
+        _ = std::mem::replace(&mut *process, ExecutorProcess::spawn());
     }
 
     pub(crate) async fn request<T: DeserializeOwned>(&self, method: &str, params: serde_json::Value) -> Result<T> {
-        let p = self.p.lock().await;
+        let p = self.process.lock().await;
         p.request(method, params).await
     }
 }
