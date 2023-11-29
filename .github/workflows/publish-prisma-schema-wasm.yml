@@ -9,11 +9,14 @@ on:
     inputs:
       enginesWrapperVersion:
         required: true
+        description: 'New @prisma/prisma-schema-wasm package version'
       enginesHash:
         required: true
+        description: 'prisma-engines commit to build'
       npmDistTag:
         required: true
         default: 'latest'
+        description: 'npm dist-tag (e.g. latest or integration)'
 
 jobs:
   build:
@@ -50,7 +53,6 @@ jobs:
       #
       # Failure handlers
       #
-
       - name: Set current job url in SLACK_FOOTER env var
         if: ${{ failure() }}
         run: echo "SLACK_FOOTER=<$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID|Click here to go to the job logs>" >> $GITHUB_ENV
@@ -58,6 +60,7 @@ jobs:
         if: ${{ failure() }}
         uses: rtCamp/action-slack-notify@v2.2.1
         env:
-          SLACK_TITLE: 'prisma-schema-wasm publishing failed :x:'
+          SLACK_TITLE: 'Building and publishing @prisma/prisma-schema-wasm failed :x:'
           SLACK_COLOR: '#FF0000'
+          SLACK_CHANNEL: feed-prisma-schema-wasm-publish-failures
           SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK_WASM_FAILING }}

@@ -7,8 +7,8 @@ use crate::{
     Context, Queryable,
 };
 use connector_interface::NativeUpsert;
-use prisma_models::{ModelProjection, Record, SingleRecord};
 use quaint::prelude::{OnConflict, Query};
+use query_structure::{ModelProjection, Record, SingleRecord};
 
 pub(crate) async fn native_upsert(
     conn: &dyn Queryable,

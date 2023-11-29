@@ -1,6 +1,5 @@
 use super::scalar::*;
-use crate::{Filter, JsonCompare, ScalarFilter};
-use prisma_models::ScalarFieldRef;
+use crate::{Filter, JsonCompare, ScalarFieldRef, ScalarFilter};
 
 #[derive(Debug, Clone, Eq, Hash, PartialEq)]
 pub enum JsonTargetType {

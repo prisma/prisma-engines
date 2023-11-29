@@ -1,5 +1,4 @@
-use crate::filter::Filter;
-use prisma_models::*;
+use crate::*;
 
 /// `QueryArguments` define various constraints queried data should fulfill:
 /// - `cursor`, `take`, `skip` page through the data.

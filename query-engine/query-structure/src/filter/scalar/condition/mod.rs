@@ -4,7 +4,6 @@ pub use value::{ConditionListValue, ConditionValue};
 
 use super::*;
 use crate::*;
-use prisma_models::*;
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum ScalarCondition {

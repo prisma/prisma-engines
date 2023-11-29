@@ -1,6 +1,6 @@
 #![allow(non_snake_case)]
 
-use prisma_models::*;
+use query_structure::*;
 use std::sync::Arc;
 
 #[test]
@@ -420,7 +420,7 @@ fn duplicate_relation_name() {
 
 fn convert(datamodel: &str) -> InternalDataModel {
     let schema = psl::parse_schema(datamodel).unwrap();
-    prisma_models::convert(Arc::new(schema))
+    query_structure::convert(Arc::new(schema))
 }
 
 trait DatamodelAssertions {

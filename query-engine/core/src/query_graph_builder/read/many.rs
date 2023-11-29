@@ -1,6 +1,6 @@
 use super::*;
 use crate::{query_document::ParsedField, ManyRecordsQuery, QueryOption, QueryOptions, ReadQuery};
-use prisma_models::Model;
+use query_structure::Model;
 
 pub(crate) fn find_many(field: ParsedField<'_>, model: Model) -> QueryGraphBuilderResult<ReadQuery> {
     find_many_with_options(field, model, QueryOptions::none())

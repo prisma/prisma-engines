@@ -1,6 +1,5 @@
-use connector::QueryArguments;
 use itertools::Itertools;
-use prisma_models::{FieldSelection, ManyRecords, Record, SelectionResult};
+use query_structure::*;
 use std::ops::Deref;
 
 #[derive(Debug)]

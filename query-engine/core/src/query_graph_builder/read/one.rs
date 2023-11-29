@@ -1,6 +1,6 @@
 use super::*;
 use crate::{query_document::*, QueryOption, QueryOptions, ReadQuery, RecordQuery};
-use prisma_models::Model;
+use query_structure::Model;
 use schema::constants::args;
 use std::convert::TryInto;
 

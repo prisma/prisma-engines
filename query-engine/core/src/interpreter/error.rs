@@ -1,6 +1,6 @@
 use crate::{QueryGraphBuilderError, QueryGraphError};
 use connector::error::ConnectorError;
-use prisma_models::DomainError;
+use query_structure::DomainError;
 use std::fmt;
 
 #[derive(Debug)]

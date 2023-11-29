@@ -3,12 +3,12 @@ use crate::{database::operations::*, Context, SqlError};
 use async_trait::async_trait;
 use connector::{ConnectionLike, RelAggregationSelection};
 use connector_interface::{
-    self as connector, filter::Filter, AggregationRow, AggregationSelection, QueryArguments, ReadOperations,
-    RecordFilter, Transaction, WriteArgs, WriteOperations,
+    self as connector, AggregationRow, AggregationSelection, ReadOperations, RecordFilter, Transaction, WriteArgs,
+    WriteOperations,
 };
-use prisma_models::{prelude::*, SelectionResult};
 use prisma_value::PrismaValue;
 use quaint::prelude::ConnectionInfo;
+use query_structure::{prelude::*, Filter, QueryArguments, SelectionResult};
 use std::collections::HashMap;
 
 pub struct SqlConnectorTransaction<'tx> {

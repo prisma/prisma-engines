@@ -1,7 +1,7 @@
 #![allow(clippy::unnecessary_to_owned)]
 
 use super::*;
-use prisma_models::CompositeType;
+use query_structure::CompositeType;
 
 pub(crate) fn composite_object_type(ctx: &'_ QuerySchema, composite: CompositeType) -> ObjectType<'_> {
     ObjectType::new(Identifier::new_model(composite.name().to_owned()), move || {

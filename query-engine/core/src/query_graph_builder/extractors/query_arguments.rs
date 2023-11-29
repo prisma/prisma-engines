@@ -3,8 +3,7 @@ use crate::{
     query_document::{ParsedArgument, ParsedInputMap},
     QueryGraphBuilderError, QueryGraphBuilderResult,
 };
-use connector::QueryArguments;
-use prisma_models::prelude::*;
+use query_structure::{prelude::*, QueryArguments};
 use schema::constants::{aggregations, args, ordering};
 use std::convert::TryInto;
 

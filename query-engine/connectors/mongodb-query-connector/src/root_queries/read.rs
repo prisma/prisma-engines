@@ -3,9 +3,9 @@ use crate::{
     error::DecorateErrorWithFieldInformationExtension, output_meta, query_builder::MongoReadQueryBuilder,
     vacuum_cursor, IntoBson,
 };
-use connector_interface::{Filter, QueryArguments, RelAggregationSelection};
+use connector_interface::RelAggregationSelection;
 use mongodb::{bson::doc, options::FindOptions, ClientSession, Database};
-use prisma_models::*;
+use query_structure::*;
 use tracing::{info_span, Instrument};
 
 /// Finds a single record. Joins are not required at the moment because the selector is always a unique one.

@@ -1,8 +1,8 @@
 //! Write query AST
 use super::{FilteredNestedMutation, FilteredQuery};
 use crate::{RecordQuery, ToGraphviz};
-use connector::{filter::Filter, DatasourceFieldName, NativeUpsert, RecordFilter, WriteArgs};
-use prisma_models::prelude::*;
+use connector::{DatasourceFieldName, NativeUpsert, RecordFilter, WriteArgs};
+use query_structure::{prelude::*, Filter};
 use std::collections::HashMap;
 
 #[derive(Debug, Clone)]

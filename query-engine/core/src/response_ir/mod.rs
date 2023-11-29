@@ -18,7 +18,7 @@ pub(crate) use ir_serializer::*;
 
 use crate::ArgumentValue;
 use indexmap::IndexMap;
-use prisma_models::PrismaValue;
+use query_structure::PrismaValue;
 use serde::ser::{Serialize, SerializeMap, SerializeSeq, Serializer};
 use std::{collections::HashMap, fmt, sync::Arc};
 

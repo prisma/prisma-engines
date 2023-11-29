@@ -1,4 +1,5 @@
-use prisma_models::{PrismaListValue, PrismaValue, ScalarFieldRef};
+use crate::field::*;
+use prisma_value::{PrismaListValue, PrismaValue};
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum ConditionValue {

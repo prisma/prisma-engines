@@ -1,5 +1,5 @@
 use crate::protocol::EngineProtocol;
-use prisma_models::PrismaValue;
+use query_structure::PrismaValue;
 
 #[derive(Debug)]
 struct RequestContext {

@@ -2,7 +2,6 @@ use super::GQLResponse;
 use crate::{GQLError, PrismaResponse, RequestBody};
 use futures::FutureExt;
 use indexmap::IndexMap;
-use prisma_models::{parse_datetime, stringify_datetime, PrismaValue};
 use query_core::{
     constants::custom_types,
     protocol::EngineProtocol,
@@ -11,6 +10,7 @@ use query_core::{
     ArgumentValue, ArgumentValueObject, BatchDocument, BatchDocumentTransaction, CompactedDocument, Operation,
     QueryDocument, QueryExecutor, TxId,
 };
+use query_structure::{parse_datetime, stringify_datetime, PrismaValue};
 use std::{collections::HashMap, fmt, panic::AssertUnwindSafe};
 
 type ArgsToResult = (HashMap<String, ArgumentValue>, IndexMap<String, Item>);

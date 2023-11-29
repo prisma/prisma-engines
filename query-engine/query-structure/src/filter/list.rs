@@ -1,6 +1,5 @@
 use super::*;
-use crate::compare::ScalarListCompare;
-use prisma_models::{ScalarField, ScalarFieldRef};
+use crate::{ScalarField, ScalarFieldRef, ScalarListCompare};
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct ScalarListFilter {
