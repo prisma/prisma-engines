@@ -849,6 +849,16 @@ dependencies = [
 ]
 
 [[package]]
+name = "crosstarget-utils"
+version = "0.1.0"
+dependencies = [
+ "js-sys",
+ "tokio",
+ "wasm-bindgen",
+ "wasm-bindgen-futures",
+]
+
+[[package]]
 name = "crypto-common"
 version = "0.1.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1129,13 +1139,6 @@ name = "either"
 version = "1.9.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "a26ae43d7bcc3b814de94796a5e736d4029efb0ee900c12e2d54c993ad1a1e07"
-
-[[package]]
-name = "elapsed"
-version = "0.1.0"
-dependencies = [
- "js-sys",
-]
 
 [[package]]
 name = "encode_unicode"
@@ -3571,8 +3574,8 @@ dependencies = [
  "bytes",
  "chrono",
  "connection-string",
+ "crosstarget-utils",
  "either",
- "elapsed",
  "futures",
  "getrandom 0.2.11",
  "hex",
@@ -3674,8 +3677,8 @@ dependencies = [
  "chrono",
  "connection-string",
  "crossbeam-channel",
+ "crosstarget-utils",
  "cuid",
- "elapsed",
  "enumflags2",
  "futures",
  "indexmap 1.9.3",
@@ -3889,6 +3892,7 @@ dependencies = [
  "hyper",
  "indexmap 1.9.3",
  "indoc 2.0.3",
+ "insta",
  "itertools",
  "jsonrpc-core",
  "nom",

@@ -1,6 +1,6 @@
 use crate::CoreError;
 use connector::Transaction;
-use elapsed::ElapsedTimeCounter;
+use crosstarget_utils::time::ElapsedTimeCounter;
 use serde::Deserialize;
 use std::fmt::Display;
 use tokio::time::Duration;

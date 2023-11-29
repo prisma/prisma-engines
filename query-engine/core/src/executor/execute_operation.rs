@@ -6,7 +6,7 @@ use crate::{
     QueryGraphBuilder, QueryInterpreter, ResponseData,
 };
 use connector::{Connection, ConnectionLike, Connector};
-use elapsed::ElapsedTimeCounter;
+use crosstarget_utils::time::ElapsedTimeCounter;
 use futures::future;
 
 #[cfg(feature = "metrics")]
@@ -123,7 +123,7 @@ pub async fn execute_many_self_contained<C: Connector + Send + Sync>(
         );
         let conn = connector.get_connection().instrument(conn_span).await?;
 
-        futures.push(tokio::spawn(
+        futures.push(crosstarget_utils::spawn::spawn_if_possible(
             request_context::with_request_context(
                 engine_protocol,
                 execute_self_contained(
@@ -227,7 +227,7 @@ async fn execute_self_contained_with_retry(
             let res = execute_in_tx(conn, graph, serializer, query_schema.as_ref(), trace_id.clone()).await;
 
             if is_transient_error(&res) && retry_timeout.elapsed_time() < MAX_TX_TIMEOUT_RETRY_LIMIT {
-                tokio::time::sleep(TX_RETRY_BACKOFF).await;
+                crosstarget_utils::time::sleep(TX_RETRY_BACKOFF).await;
                 continue;
             } else {
                 return res;
