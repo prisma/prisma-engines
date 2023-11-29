@@ -144,45 +144,47 @@ fn run_relation_link_test_impl(
 
     let (dms, capabilities) = schema_with_relation(on_parent, on_child, id_only);
 
-    for (i, (dm, caps)) in dms.into_iter().zip(capabilities.into_iter()).enumerate() {
-        if RELATION_TEST_IDX.map(|idx| idx != i).unwrap_or(false) {
-            continue;
-        }
-
-        let required_capabilities_for_test = required_capabilities | caps;
-        let test_db_name = format!("{suite_name}_{test_name}_{i}");
-        let template = dm.datamodel().to_owned();
-        let (connector, version) = CONFIG.test_connector().unwrap();
-
-        if !should_run(&connector, &version, only, exclude, required_capabilities_for_test) {
-            continue;
-        }
-
-        let datamodel = render_test_datamodel(&test_db_name, template, &[], None, Default::default(), None);
-        let (connector_tag, version) = CONFIG.test_connector().unwrap();
-        let metrics = setup_metrics();
-        let metrics_for_subscriber = metrics.clone();
-        let (log_capture, log_tx) = TestLogCapture::new();
-
-        run_with_tokio(
-            async move {
-                println!("Used datamodel:\n {}", datamodel.yellow());
-                let runner = Runner::load(datamodel.clone(), &[], version, connector_tag, metrics, log_capture)
-                    .await
-                    .unwrap();
-
-                test_fn(&runner, &dm).await.unwrap();
-
-                teardown_project(&datamodel, Default::default(), runner.schema_id())
-                    .await
-                    .unwrap();
+    insta::allow_duplicates! {
+        for (i, (dm, caps)) in dms.into_iter().zip(capabilities.into_iter()).enumerate() {
+            if RELATION_TEST_IDX.map(|idx| idx != i).unwrap_or(false) {
+                continue;
             }
-            .with_subscriber(test_tracing_subscriber(
-                ENV_LOG_LEVEL.to_string(),
-                metrics_for_subscriber,
-                log_tx,
-            )),
-        );
+
+            let required_capabilities_for_test = required_capabilities | caps;
+            let test_db_name = format!("{suite_name}_{test_name}_{i}");
+            let template = dm.datamodel().to_owned();
+            let (connector, version) = CONFIG.test_connector().unwrap();
+
+            if !should_run(&connector, &version, only, exclude, required_capabilities_for_test) {
+                continue;
+            }
+
+            let datamodel = render_test_datamodel(&test_db_name, template, &[], None, Default::default(), None);
+            let (connector_tag, version) = CONFIG.test_connector().unwrap();
+            let metrics = setup_metrics();
+            let metrics_for_subscriber = metrics.clone();
+            let (log_capture, log_tx) = TestLogCapture::new();
+
+            run_with_tokio(
+                async move {
+                    println!("Used datamodel:\n {}", datamodel.yellow());
+                    let runner = Runner::load(datamodel.clone(), &[], version, connector_tag, metrics, log_capture)
+                        .await
+                        .unwrap();
+
+                    test_fn(&runner, &dm).await.unwrap();
+
+                    teardown_project(&datamodel, Default::default(), runner.schema_id())
+                        .await
+                        .unwrap();
+                }
+                .with_subscriber(test_tracing_subscriber(
+                    ENV_LOG_LEVEL.to_string(),
+                    metrics_for_subscriber,
+                    log_tx,
+                )),
+            );
+        }
     }
 }
 
