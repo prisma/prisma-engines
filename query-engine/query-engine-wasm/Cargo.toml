@@ -46,4 +46,6 @@ wasm-logger = "0.2.0"
 tracing = "0.1"
 tracing-subscriber = { version = "0.3" }
 tracing-futures = "0.2"
+tracing-opentelemetry = "0.17.3"
+opentelemetry = { version = "0.17"}
 console_error_panic_hook = "0.1.7"

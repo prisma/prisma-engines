@@ -2,6 +2,7 @@
 
 use core::fmt;
 use js_sys::Function as JsFunction;
+use query_core::telemetry;
 use serde_json::Value;
 use std::collections::BTreeMap;
 use tracing::{
@@ -16,7 +17,17 @@ use tracing_subscriber::{
 };
 use wasm_bindgen::JsValue;
 
-pub(crate) struct LogCallback(pub JsFunction);
+#[derive(Clone)]
+pub struct LogCallback(pub JsFunction);
+
+impl LogCallback {
+    pub fn call<T: Into<JsValue>>(&self, arg1: T) -> Result<(), String> {
+        self.0
+            .call1(&JsValue::NULL, &arg1.into())
+            .map(|_| ())
+            .map_err(|err| err.as_string().unwrap_or_default())
+    }
+}
 
 unsafe impl Send for LogCallback {}
 unsafe impl Sync for LogCallback {}
@@ -27,7 +38,7 @@ pub(crate) struct Logger {
 
 impl Logger {
     /// Creates a new logger using a call layer
-    pub fn new(log_queries: bool, log_level: LevelFilter, log_callback: LogCallback) -> Self {
+    pub fn new(log_queries: bool, log_level: LevelFilter, log_callback: LogCallback, enable_tracing: bool) -> Self {
         let is_sql_query = filter_fn(|meta| {
             meta.target() == "quaint::connector::metrics" && meta.fields().iter().any(|f| f.name() == "query")
         });
@@ -44,10 +55,21 @@ impl Logger {
             FilterExt::boxed(log_level)
         };
 
+        let is_user_trace = filter_fn(telemetry::helpers::user_facing_span_only_filter);
+        let tracer = super::tracer::new_pipeline().install_simple(log_callback.clone());
+        let telemetry = if enable_tracing {
+            let telemetry = tracing_opentelemetry::layer()
+                .with_tracer(tracer)
+                .with_filter(is_user_trace);
+            Some(telemetry)
+        } else {
+            None
+        };
+
         let layer = CallbackLayer::new(log_callback).with_filter(filters);
 
         Self {
-            dispatcher: Dispatch::new(Registry::default().with(layer)),
+            dispatcher: Dispatch::new(Registry::default().with(telemetry).with(layer)),
         }
     }
 
@@ -124,9 +146,6 @@ impl<S: Subscriber> Layer<S> for CallbackLayer {
         let mut visitor = JsonVisitor::new(event.metadata().level(), event.metadata().target());
         event.record(&mut visitor);
 
-        let _ = self
-            .callback
-            .0
-            .call1(&JsValue::NULL, &JsValue::from_str(&visitor.to_string()));
+        let _ = self.callback.call(&visitor.to_string());
     }
 }

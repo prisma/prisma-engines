@@ -8,10 +8,11 @@ use crate::{
 use driver_adapters::JsObject;
 use futures::FutureExt;
 use js_sys::Function as JsFunction;
+use psl::PreviewFeature;
 use query_core::{
     protocol::EngineProtocol,
     schema::{self, QuerySchema},
-    QueryExecutor, TransactionOptions, TxId,
+    telemetry, QueryExecutor, TransactionOptions, TxId,
 };
 use request_handlers::ConnectorMode;
 use request_handlers::{dmmf, load_executor, render_graphql_schema, RequestBody, RequestHandler};
@@ -25,7 +26,7 @@ use std::{
     sync::Arc,
 };
 use tokio::sync::RwLock;
-use tracing::{field, Instrument, Span};
+use tracing::{field, instrument::WithSubscriber, Instrument, Span};
 use tracing_subscriber::filter::LevelFilter;
 use tsify::Tsify;
 use user_facing_errors::Error;
@@ -137,10 +138,7 @@ impl QueryEngine {
         callback: JsFunction,
         maybe_adapter: Option<JsObject>,
     ) -> Result<QueryEngine, wasm_bindgen::JsError> {
-        log::info!("Called `QueryEngine::new()`");
-
         let log_callback = LogCallback(callback);
-        log::info!("Parsed `log_callback`");
 
         let ConstructorOptions {
             datamodel,
@@ -166,7 +164,7 @@ impl QueryEngine {
             sql_connector::activate_driver_adapter(Arc::new(js_queryable));
 
             let provider_name = schema.connector.provider_name();
-            log::info!("Received driver adapter for {provider_name}.");
+            tracing::info!("Received driver adapter for {provider_name}.");
         }
 
         schema
@@ -186,6 +184,7 @@ impl QueryEngine {
             .validate_that_one_datasource_is_provided()
             .map_err(|errors| ApiError::conversion(errors, schema.db.source()))?;
 
+        let enable_tracing = config.preview_features().contains(PreviewFeature::Tracing);
         let engine_protocol = engine_protocol.unwrap_or(EngineProtocol::Json);
 
         let builder = EngineBuilder {
@@ -196,7 +195,7 @@ impl QueryEngine {
         };
 
         let log_level = log_level.parse::<LevelFilter>().unwrap();
-        let logger = Logger::new(log_queries, log_level, log_callback);
+        let logger = Logger::new(log_queries, log_level, log_callback, enable_tracing);
 
         let connector_mode = ConnectorMode::Js;
 
@@ -210,8 +209,11 @@ impl QueryEngine {
     /// Connect to the database, allow queries to be run.
     #[wasm_bindgen]
     pub async fn connect(&self, trace: String) -> Result<(), wasm_bindgen::JsError> {
+        let dispatcher = self.logger.dispatcher();
+
         async_panic_to_js_error(async {
             let span = tracing::info_span!("prisma:engine:connect");
+            let _ = telemetry::helpers::set_parent_context_from_json_str(&span, &trace);
 
             let mut inner = self.inner.write().await;
             let builder = inner.as_builder()?;
@@ -270,6 +272,7 @@ impl QueryEngine {
 
             Ok(())
         })
+        .with_subscriber(dispatcher)
         .await?;
 
         Ok(())
@@ -278,8 +281,11 @@ impl QueryEngine {
     /// Disconnect and drop the core. Can be reconnected later with `#connect`.
     #[wasm_bindgen]
     pub async fn disconnect(&self, trace: String) -> Result<(), wasm_bindgen::JsError> {
+        let dispatcher = self.logger.dispatcher();
+
         async_panic_to_js_error(async {
             let span = tracing::info_span!("prisma:engine:disconnect");
+            let _ = telemetry::helpers::set_parent_context_from_json_str(&span, &trace);
 
             async {
                 let mut inner = self.inner.write().await;
@@ -299,6 +305,7 @@ impl QueryEngine {
             .instrument(span)
             .await
         })
+        .with_subscriber(dispatcher)
         .await
     }
 
@@ -310,6 +317,8 @@ impl QueryEngine {
         trace: String,
         tx_id: Option<String>,
     ) -> Result<String, wasm_bindgen::JsError> {
+        let dispatcher = self.logger.dispatcher();
+
         async_panic_to_js_error(async {
             let inner = self.inner.read().await;
             let engine = inner.as_engine()?;
@@ -323,9 +332,11 @@ impl QueryEngine {
                     Span::none()
                 };
 
+                let trace_id = telemetry::helpers::set_parent_context_from_json_str(&span, &trace);
+
                 let handler = RequestHandler::new(engine.executor(), engine.query_schema(), engine.engine_protocol());
                 let response = handler
-                    .handle(query, tx_id.map(TxId::from), None)
+                    .handle(query, tx_id.map(TxId::from), trace_id)
                     .instrument(span)
                     .await;
 
@@ -333,6 +344,7 @@ impl QueryEngine {
             }
             .await
         })
+        .with_subscriber(dispatcher)
         .await
     }
 
@@ -342,6 +354,8 @@ impl QueryEngine {
         async_panic_to_js_error(async {
             let inner = self.inner.read().await;
             let engine = inner.as_engine()?;
+
+            let dispatcher = self.logger.dispatcher();
 
             async move {
                 let span = tracing::info_span!("prisma:engine:itx_runner", user_facing = true, itx_id = field::Empty);
@@ -357,6 +371,7 @@ impl QueryEngine {
                     Err(err) => Ok(map_known_error(err)?),
                 }
             }
+            .with_subscriber(dispatcher)
             .await
         })
         .await
@@ -369,12 +384,15 @@ impl QueryEngine {
             let inner = self.inner.read().await;
             let engine = inner.as_engine()?;
 
+            let dispatcher = self.logger.dispatcher();
+
             async move {
                 match engine.executor().commit_tx(TxId::from(tx_id)).await {
                     Ok(_) => Ok("{}".to_string()),
                     Err(err) => Ok(map_known_error(err)?),
                 }
             }
+            .with_subscriber(dispatcher)
             .await
         })
         .await
@@ -386,14 +404,21 @@ impl QueryEngine {
             let inner = self.inner.read().await;
             let engine = inner.as_engine()?;
 
-            let dmmf = dmmf::render_dmmf(&engine.query_schema);
+            let dispatcher = self.logger.dispatcher();
 
-            let json = {
-                let _span = tracing::info_span!("prisma:engine:dmmf_to_json").entered();
-                serde_json::to_string(&dmmf)?
-            };
+            tracing::dispatcher::with_default(&dispatcher, || {
+                let span = tracing::info_span!("prisma:engine:dmmf");
+                let _ = telemetry::helpers::set_parent_context_from_json_str(&span, &trace);
+                let _guard = span.enter();
+                let dmmf = dmmf::render_dmmf(&engine.query_schema);
 
-            Ok(json)
+                let json = {
+                    let _span = tracing::info_span!("prisma:engine:dmmf_to_json").entered();
+                    serde_json::to_string(&dmmf)?
+                };
+
+                Ok(json)
+            })
         })
         .await
     }
@@ -405,12 +430,15 @@ impl QueryEngine {
             let inner = self.inner.read().await;
             let engine = inner.as_engine()?;
 
+            let dispatcher = self.logger.dispatcher();
+
             async move {
                 match engine.executor().rollback_tx(TxId::from(tx_id)).await {
                     Ok(_) => Ok("{}".to_string()),
                     Err(err) => Ok(map_known_error(err)?),
                 }
             }
+            .with_subscriber(dispatcher)
             .await
         })
         .await
