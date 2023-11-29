@@ -21,6 +21,13 @@ else
     BUILD_PROFILE="--dev"
 fi
 
+# Check if wasm-pack is installed
+if ! command -v wasm-pack &> /dev/null
+then
+    echo "wasm-pack could not be found, installing now..."
+    # Install wasm-pack
+    curl https://rustwasm.github.io/wasm-pack/installer/init.sh -sSf | sh
+fi
 wasm-pack build $BUILD_PROFILE --target $OUT_TARGET
 
 sed -i '' 's/name = "query_engine"/name = "query_engine_wasm"/g' Cargo.toml

@@ -1,6 +1,6 @@
+#![cfg(target_os = "wasm32")]
 use wasm_bindgen_test::*;
 
-// use driver_adapters::types::ColumnType;
 use serde::{Deserialize, Serialize};
 use serde_repr::{Deserialize_repr, Serialize_repr};
 use tsify::Tsify;

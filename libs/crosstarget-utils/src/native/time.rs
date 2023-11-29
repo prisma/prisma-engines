@@ -21,7 +21,7 @@ impl ElapsedTimeCounter {
     }
 }
 
-pub async fn sleep(duration: Duration) -> () {
+pub async fn sleep(duration: Duration) {
     tokio::time::sleep(duration).await
 }
 
@@ -31,5 +31,5 @@ where
 {
     let result = tokio::time::timeout(duration, future).await;
 
-    result.map_err(|_| TimeoutError::new())
+    result.map_err(|_| TimeoutError)
 }

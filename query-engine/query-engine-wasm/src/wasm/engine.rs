@@ -6,7 +6,6 @@ use crate::{
     logger::{LogCallback, Logger},
 };
 use driver_adapters::JsObject;
-use futures::FutureExt;
 use js_sys::Function as JsFunction;
 use query_core::{
     protocol::EngineProtocol,
@@ -19,8 +18,6 @@ use serde::{Deserialize, Serialize};
 use serde_json::json;
 use std::{
     collections::{BTreeMap, HashMap},
-    future::Future,
-    panic::AssertUnwindSafe,
     path::PathBuf,
     sync::Arc,
 };
@@ -28,7 +25,6 @@ use tokio::sync::RwLock;
 use tracing::{field, Instrument, Span};
 use tracing_subscriber::filter::LevelFilter;
 use tsify::Tsify;
-use user_facing_errors::Error;
 use wasm_bindgen::prelude::wasm_bindgen;
 /// The main query engine used by JS
 #[wasm_bindgen]
@@ -210,67 +206,62 @@ impl QueryEngine {
     /// Connect to the database, allow queries to be run.
     #[wasm_bindgen]
     pub async fn connect(&self, trace: String) -> Result<(), wasm_bindgen::JsError> {
-        async_panic_to_js_error(async {
-            let span = tracing::info_span!("prisma:engine:connect");
+        let span = tracing::info_span!("prisma:engine:connect");
 
-            let mut inner = self.inner.write().await;
-            let builder = inner.as_builder()?;
-            let arced_schema = Arc::clone(&builder.schema);
-            let arced_schema_2 = Arc::clone(&builder.schema);
+        let mut inner = self.inner.write().await;
+        let builder = inner.as_builder()?;
+        let arced_schema = Arc::clone(&builder.schema);
+        let arced_schema_2 = Arc::clone(&builder.schema);
 
-            let url = {
-                let data_source = builder
-                    .schema
-                    .configuration
-                    .datasources
-                    .first()
-                    .ok_or_else(|| ApiError::configuration("No valid data source found"))?;
-                data_source
-                    .load_url_with_config_dir(&builder.config_dir, |key| builder.env.get(key).map(ToString::to_string))
-                    .map_err(|err| crate::error::ApiError::Conversion(err, builder.schema.db.source().to_owned()))?
-            };
+        let url = {
+            let data_source = builder
+                .schema
+                .configuration
+                .datasources
+                .first()
+                .ok_or_else(|| ApiError::configuration("No valid data source found"))?;
+            data_source
+                .load_url_with_config_dir(&builder.config_dir, |key| builder.env.get(key).map(ToString::to_string))
+                .map_err(|err| crate::error::ApiError::Conversion(err, builder.schema.db.source().to_owned()))?
+        };
 
-            let engine = async move {
-                // We only support one data source & generator at the moment, so take the first one (default not exposed yet).
-                let data_source = arced_schema
-                    .configuration
-                    .datasources
-                    .first()
-                    .ok_or_else(|| ApiError::configuration("No valid data source found"))?;
+        let engine = async move {
+            // We only support one data source & generator at the moment, so take the first one (default not exposed yet).
+            let data_source = arced_schema
+                .configuration
+                .datasources
+                .first()
+                .ok_or_else(|| ApiError::configuration("No valid data source found"))?;
 
-                let preview_features = arced_schema.configuration.preview_features();
+            let preview_features = arced_schema.configuration.preview_features();
 
-                let executor = load_executor(self.connector_mode, data_source, preview_features, &url).await?;
-                let connector = executor.primary_connector();
+            let executor = load_executor(self.connector_mode, data_source, preview_features, &url).await?;
+            let connector = executor.primary_connector();
 
-                let conn_span = tracing::info_span!(
-                    "prisma:engine:connection",
-                    user_facing = true,
-                    "db.type" = connector.name(),
-                );
+            let conn_span = tracing::info_span!(
+                "prisma:engine:connection",
+                user_facing = true,
+                "db.type" = connector.name(),
+            );
 
-                connector.get_connection().instrument(conn_span).await?;
+            connector.get_connection().instrument(conn_span).await?;
 
-                let query_schema_span = tracing::info_span!("prisma:engine:schema");
-                let query_schema = query_schema_span.in_scope(|| schema::build(arced_schema_2, true));
+            let query_schema_span = tracing::info_span!("prisma:engine:schema");
+            let query_schema = query_schema_span.in_scope(|| schema::build(arced_schema_2, true));
 
-                Ok(ConnectedEngine {
-                    schema: builder.schema.clone(),
-                    query_schema: Arc::new(query_schema),
-                    executor,
-                    config_dir: builder.config_dir.clone(),
-                    env: builder.env.clone(),
-                    engine_protocol: builder.engine_protocol,
-                }) as crate::Result<ConnectedEngine>
-            }
-            .instrument(span)
-            .await?;
-
-            *inner = Inner::Connected(engine);
-
-            Ok(())
-        })
+            Ok(ConnectedEngine {
+                schema: builder.schema.clone(),
+                query_schema: Arc::new(query_schema),
+                executor,
+                config_dir: builder.config_dir.clone(),
+                env: builder.env.clone(),
+                engine_protocol: builder.engine_protocol,
+            }) as crate::Result<ConnectedEngine>
+        }
+        .instrument(span)
         .await?;
+
+        *inner = Inner::Connected(engine);
 
         Ok(())
     }
@@ -278,27 +269,24 @@ impl QueryEngine {
     /// Disconnect and drop the core. Can be reconnected later with `#connect`.
     #[wasm_bindgen]
     pub async fn disconnect(&self, trace: String) -> Result<(), wasm_bindgen::JsError> {
-        async_panic_to_js_error(async {
-            let span = tracing::info_span!("prisma:engine:disconnect");
+        let span = tracing::info_span!("prisma:engine:disconnect");
 
-            async {
-                let mut inner = self.inner.write().await;
-                let engine = inner.as_engine()?;
+        async {
+            let mut inner = self.inner.write().await;
+            let engine = inner.as_engine()?;
 
-                let builder = EngineBuilder {
-                    schema: engine.schema.clone(),
-                    config_dir: engine.config_dir.clone(),
-                    env: engine.env.clone(),
-                    engine_protocol: engine.engine_protocol(),
-                };
+            let builder = EngineBuilder {
+                schema: engine.schema.clone(),
+                config_dir: engine.config_dir.clone(),
+                env: engine.env.clone(),
+                engine_protocol: engine.engine_protocol(),
+            };
 
-                *inner = Inner::Builder(builder);
+            *inner = Inner::Builder(builder);
 
-                Ok(())
-            }
-            .instrument(span)
-            .await
-        })
+            Ok(())
+        }
+        .instrument(span)
         .await
     }
 
@@ -310,122 +298,104 @@ impl QueryEngine {
         trace: String,
         tx_id: Option<String>,
     ) -> Result<String, wasm_bindgen::JsError> {
-        async_panic_to_js_error(async {
-            let inner = self.inner.read().await;
-            let engine = inner.as_engine()?;
+        let inner = self.inner.read().await;
+        let engine = inner.as_engine()?;
 
-            let query = RequestBody::try_from_str(&body, engine.engine_protocol())?;
+        let query = RequestBody::try_from_str(&body, engine.engine_protocol())?;
 
-            async move {
-                let span = if tx_id.is_none() {
-                    tracing::info_span!("prisma:engine", user_facing = true)
-                } else {
-                    Span::none()
-                };
+        async move {
+            let span = if tx_id.is_none() {
+                tracing::info_span!("prisma:engine", user_facing = true)
+            } else {
+                Span::none()
+            };
 
-                let handler = RequestHandler::new(engine.executor(), engine.query_schema(), engine.engine_protocol());
-                let response = handler
-                    .handle(query, tx_id.map(TxId::from), None)
-                    .instrument(span)
-                    .await;
+            let handler = RequestHandler::new(engine.executor(), engine.query_schema(), engine.engine_protocol());
+            let response = handler
+                .handle(query, tx_id.map(TxId::from), None)
+                .instrument(span)
+                .await;
 
-                Ok(serde_json::to_string(&response)?)
-            }
-            .await
-        })
+            Ok(serde_json::to_string(&response)?)
+        }
         .await
     }
 
     /// If connected, attempts to start a transaction in the core and returns its ID.
     #[wasm_bindgen(js_name = startTransaction)]
     pub async fn start_transaction(&self, input: String, trace: String) -> Result<String, wasm_bindgen::JsError> {
-        async_panic_to_js_error(async {
-            let inner = self.inner.read().await;
-            let engine = inner.as_engine()?;
+        let inner = self.inner.read().await;
+        let engine = inner.as_engine()?;
 
-            async move {
-                let span = tracing::info_span!("prisma:engine:itx_runner", user_facing = true, itx_id = field::Empty);
+        async move {
+            let span = tracing::info_span!("prisma:engine:itx_runner", user_facing = true, itx_id = field::Empty);
 
-                let tx_opts: TransactionOptions = serde_json::from_str(&input)?;
-                match engine
-                    .executor()
-                    .start_tx(engine.query_schema().clone(), engine.engine_protocol(), tx_opts)
-                    .instrument(span)
-                    .await
-                {
-                    Ok(tx_id) => Ok(json!({ "id": tx_id.to_string() }).to_string()),
-                    Err(err) => Ok(map_known_error(err)?),
-                }
+            let tx_opts: TransactionOptions = serde_json::from_str(&input)?;
+            match engine
+                .executor()
+                .start_tx(engine.query_schema().clone(), engine.engine_protocol(), tx_opts)
+                .instrument(span)
+                .await
+            {
+                Ok(tx_id) => Ok(json!({ "id": tx_id.to_string() }).to_string()),
+                Err(err) => Ok(map_known_error(err)?),
             }
-            .await
-        })
+        }
         .await
     }
 
     /// If connected, attempts to commit a transaction with id `tx_id` in the core.
     #[wasm_bindgen(js_name = commitTransaction)]
     pub async fn commit_transaction(&self, tx_id: String, trace: String) -> Result<String, wasm_bindgen::JsError> {
-        async_panic_to_js_error(async {
-            let inner = self.inner.read().await;
-            let engine = inner.as_engine()?;
+        let inner = self.inner.read().await;
+        let engine = inner.as_engine()?;
 
-            async move {
-                match engine.executor().commit_tx(TxId::from(tx_id)).await {
-                    Ok(_) => Ok("{}".to_string()),
-                    Err(err) => Ok(map_known_error(err)?),
-                }
+        async move {
+            match engine.executor().commit_tx(TxId::from(tx_id)).await {
+                Ok(_) => Ok("{}".to_string()),
+                Err(err) => Ok(map_known_error(err)?),
             }
-            .await
-        })
+        }
         .await
     }
 
     #[wasm_bindgen]
     pub async fn dmmf(&self, trace: String) -> Result<String, wasm_bindgen::JsError> {
-        async_panic_to_js_error(async {
-            let inner = self.inner.read().await;
-            let engine = inner.as_engine()?;
+        let inner = self.inner.read().await;
+        let engine = inner.as_engine()?;
 
-            let dmmf = dmmf::render_dmmf(&engine.query_schema);
+        let dmmf = dmmf::render_dmmf(&engine.query_schema);
 
-            let json = {
-                let _span = tracing::info_span!("prisma:engine:dmmf_to_json").entered();
-                serde_json::to_string(&dmmf)?
-            };
+        let json = {
+            let _span = tracing::info_span!("prisma:engine:dmmf_to_json").entered();
+            serde_json::to_string(&dmmf)?
+        };
 
-            Ok(json)
-        })
-        .await
+        Ok(json)
     }
 
     /// If connected, attempts to roll back a transaction with id `tx_id` in the core.
     #[wasm_bindgen(js_name = rollbackTransaction)]
     pub async fn rollback_transaction(&self, tx_id: String, trace: String) -> Result<String, wasm_bindgen::JsError> {
-        async_panic_to_js_error(async {
-            let inner = self.inner.read().await;
-            let engine = inner.as_engine()?;
+        let inner = self.inner.read().await;
+        let engine = inner.as_engine()?;
 
-            async move {
-                match engine.executor().rollback_tx(TxId::from(tx_id)).await {
-                    Ok(_) => Ok("{}".to_string()),
-                    Err(err) => Ok(map_known_error(err)?),
-                }
+        async move {
+            match engine.executor().rollback_tx(TxId::from(tx_id)).await {
+                Ok(_) => Ok("{}".to_string()),
+                Err(err) => Ok(map_known_error(err)?),
             }
-            .await
-        })
+        }
         .await
     }
 
     /// Loads the query schema. Only available when connected.
     #[wasm_bindgen(js_name = sdlSchema)]
     pub async fn sdl_schema(&self) -> Result<String, wasm_bindgen::JsError> {
-        async_panic_to_js_error(async move {
-            let inner = self.inner.read().await;
-            let engine = inner.as_engine()?;
+        let inner = self.inner.read().await;
+        let engine = inner.as_engine()?;
 
-            Ok(render_graphql_schema(engine.query_schema()))
-        })
-        .await
+        Ok(render_graphql_schema(engine.query_schema()))
     }
 
     #[wasm_bindgen]
@@ -471,17 +441,4 @@ fn stringify_env_values(origin: serde_json::Value) -> crate::Result<HashMap<Stri
     };
 
     Err(ApiError::JsonDecode(msg.to_string()))
-}
-
-async fn async_panic_to_js_error<F, R>(fut: F) -> Result<R, wasm_bindgen::JsError>
-where
-    F: Future<Output = Result<R, wasm_bindgen::JsError>>,
-{
-    match AssertUnwindSafe(fut).catch_unwind().await {
-        Ok(result) => result,
-        Err(err) => match Error::extract_panic_message(err) {
-            Some(message) => Err(wasm_bindgen::JsError::new(&format!("PANIC: {message}"))),
-            None => Err(wasm_bindgen::JsError::new("PANIC: unknown panic")),
-        },
-    }
 }

@@ -50,7 +50,7 @@ where
 {
     tokio::select! {
         result = future => Ok(result),
-        _ = sleep(duration) => Err(TimeoutError::new())
+        _ = sleep(duration) => Err(TimeoutError)
     }
 }
 
