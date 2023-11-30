@@ -405,7 +405,6 @@ impl QueryEngine {
 
     #[wasm_bindgen]
     pub async fn metrics(&self, json_options: String) -> Result<(), wasm_bindgen::JsError> {
-        log::info!("Called `QueryEngine::metrics()`");
         Err(ApiError::configuration("Metrics is not enabled in Wasm.").into())
     }
 }

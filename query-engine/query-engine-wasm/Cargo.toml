@@ -40,12 +40,9 @@ url = "2"
 serde.workspace = true
 tokio = { version = "1.25", features = ["macros", "sync", "io-util", "time"] }
 futures = "0.3"
-log = "0.4.6"
-wasm-logger = "0.2.0"
 
 tracing = "0.1"
 tracing-subscriber = { version = "0.3" }
 tracing-futures = "0.2"
 tracing-opentelemetry = "0.17.3"
 opentelemetry = { version = "0.17"}
-console_error_panic_hook = "0.1.7"
