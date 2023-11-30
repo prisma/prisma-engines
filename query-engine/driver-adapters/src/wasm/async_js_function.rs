@@ -1,5 +1,6 @@
 use js_sys::{Function as JsFunction, Promise as JsPromise};
 use serde::Serialize;
+use serde_wasm_bindgen::Serializer;
 use std::marker::PhantomData;
 use wasm_bindgen::convert::FromWasmAbi;
 use wasm_bindgen::describe::WasmDescribe;
@@ -9,6 +10,11 @@ use wasm_bindgen_futures::JsFuture;
 use super::error::into_quaint_error;
 use super::from_js::FromJsValue;
 use super::result::JsResult;
+
+// `serialize_missing_as_null` is required to make sure that "empty" values (e.g., `None` and `()`)
+//  are serialized as `null` and not `undefined`.
+// This is due to certain drivers (e.g., LibSQL) not supporting `undefined` values.
+static SERIALIZER: Serializer = Serializer::new().serialize_missing_as_null(true);
 
 #[derive(Clone)]
 pub(crate) struct AsyncJsFunction<ArgType, ReturnType>
@@ -61,7 +67,9 @@ where
     }
 
     async fn call_internal(&self, arg1: T) -> Result<JsResult<R>, JsValue> {
-        let arg1 = serde_wasm_bindgen::to_value(&arg1).map_err(|err| JsValue::from(JsError::from(&err)))?;
+        let arg1 = arg1
+            .serialize(&SERIALIZER)
+            .map_err(|err| JsValue::from(JsError::from(&err)))?;
         let return_value = self.threadsafe_fn.call1(&JsValue::null(), &arg1)?;
 
         let value = if let Some(promise) = return_value.dyn_ref::<JsPromise>() {
