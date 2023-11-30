@@ -77,7 +77,7 @@ impl SelectionResult {
     /// Projects this `SelectionResult` into a smaller or equal `SelectionResult`
     /// according to the provided [`FieldSelection`].
     pub fn project(&self, field_selection: &FieldSelection) -> SelectionResult {
-        let pairs: Vec<_> = field_selection
+        let pairs = field_selection
             .selections()
             .map(|selected_field| {
                 self.get(selected_field)
