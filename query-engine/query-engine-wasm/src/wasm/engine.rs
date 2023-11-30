@@ -14,7 +14,7 @@ use query_core::{
     telemetry, QueryExecutor, TransactionOptions, TxId,
 };
 use request_handlers::ConnectorMode;
-use request_handlers::{dmmf, load_executor, render_graphql_schema, RequestBody, RequestHandler};
+use request_handlers::{load_executor, RequestBody, RequestHandler};
 use serde::{Deserialize, Serialize};
 use serde_json::json;
 use std::{
@@ -385,28 +385,6 @@ impl QueryEngine {
         .await
     }
 
-    #[wasm_bindgen]
-    pub async fn dmmf(&self, trace: String) -> Result<String, wasm_bindgen::JsError> {
-        let inner = self.inner.read().await;
-        let engine = inner.as_engine()?;
-
-        let dispatcher = self.logger.dispatcher();
-
-        tracing::dispatcher::with_default(&dispatcher, || {
-            let span = tracing::info_span!("prisma:engine:dmmf");
-            let _ = telemetry::helpers::set_parent_context_from_json_str(&span, &trace);
-            let _guard = span.enter();
-            let dmmf = dmmf::render_dmmf(&engine.query_schema);
-
-            let json = {
-                let _span = tracing::info_span!("prisma:engine:dmmf_to_json").entered();
-                serde_json::to_string(&dmmf)?
-            };
-
-            Ok(json)
-        })
-    }
-
     /// If connected, attempts to roll back a transaction with id `tx_id` in the core.
     #[wasm_bindgen(js_name = rollbackTransaction)]
     pub async fn rollback_transaction(&self, tx_id: String, trace: String) -> Result<String, wasm_bindgen::JsError> {
@@ -423,15 +401,6 @@ impl QueryEngine {
         }
         .with_subscriber(dispatcher)
         .await
-    }
-
-    /// Loads the query schema. Only available when connected.
-    #[wasm_bindgen(js_name = sdlSchema)]
-    pub async fn sdl_schema(&self) -> Result<String, wasm_bindgen::JsError> {
-        let inner = self.inner.read().await;
-        let engine = inner.as_engine()?;
-
-        Ok(render_graphql_schema(engine.query_schema()))
     }
 
     #[wasm_bindgen]

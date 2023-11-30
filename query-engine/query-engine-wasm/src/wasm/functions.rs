@@ -1,7 +1,4 @@
-use crate::error::ApiError;
-use request_handlers::dmmf;
 use serde::Serialize;
-use std::sync::Arc;
 use tsify::Tsify;
 use wasm_bindgen::prelude::wasm_bindgen;
 
@@ -19,21 +16,6 @@ pub fn version() -> Version {
         commit: env!("GIT_HASH"),
         version: env!("CARGO_PKG_VERSION"),
     }
-}
-
-#[wasm_bindgen]
-pub fn dmmf(datamodel_string: String) -> Result<String, wasm_bindgen::JsError> {
-    let mut schema = psl::validate(datamodel_string.into());
-
-    schema
-        .diagnostics
-        .to_result()
-        .map_err(|errors| ApiError::conversion(errors, schema.db.source()))?;
-
-    let query_schema = query_core::schema::build(Arc::new(schema), true);
-    let dmmf = dmmf::render_dmmf(&query_schema);
-
-    Ok(serde_json::to_string(&dmmf)?)
 }
 
 #[wasm_bindgen]
