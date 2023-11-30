@@ -93,6 +93,11 @@ mod test {
                     JSArg::Value(JsonValue::String("23:13:01".to_string()))
                 ))
             ),
+            (
+                ValueType::Bytes(Some("hello".as_bytes().into())),
+                JSArg::Buffer("hello".as_bytes().to_vec())
+            ),
+        
         ];
 
         let mut errors: Vec<String> = vec![];

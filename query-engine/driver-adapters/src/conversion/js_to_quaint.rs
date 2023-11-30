@@ -339,6 +339,24 @@ mod proxy_test {
     }
 
     #[test]
+    fn js_value_binary_to_quaint() {
+        let column_type = ColumnType::Bytes;
+
+        // null
+        test_null(QuaintValue::null_bytes(), column_type);
+
+        // ""
+        let json_value = serde_json::Value::String("".to_string());
+        let quaint_value = js_value_to_quaint(json_value, column_type, "column_name").unwrap();
+        assert_eq!(quaint_value, QuaintValue::bytes(vec![]));
+
+        // "hello"
+        let json_value = serde_json::Value::String("hello".to_string());
+        let quaint_value = js_value_to_quaint(json_value, column_type, "column_name").unwrap();
+        assert_eq!(quaint_value, QuaintValue::bytes(vec![104, 101, 108, 108, 111]));
+    }
+
+    #[test]
     fn js_value_int32_to_quaint() {
         let column_type = ColumnType::Int32;
 

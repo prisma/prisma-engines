@@ -105,6 +105,10 @@ mod test {
                     JSArg::Value(JsonValue::Null),
                 ))
             ),
+            (
+                ValueType::Bytes(Some("hello".as_bytes().into())).into_value(),
+                JSArg::Buffer("hello".as_bytes().to_vec())
+            ),
         ];
 
         let mut errors: Vec<String> = vec![];

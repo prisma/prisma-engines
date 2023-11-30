@@ -94,6 +94,10 @@ mod test {
                     JSArg::Value(Value::Null),
                 ))
             ),
+            (
+                ValueType::Bytes(Some("hello".as_bytes().into())),
+                JSArg::Buffer("hello".as_bytes().to_vec())
+            ),
         ];
 
         let mut errors: Vec<String> = vec![];
