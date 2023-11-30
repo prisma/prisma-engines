@@ -199,7 +199,7 @@ pub struct InMemoryRecordProcessorBuilder {
 }
 
 impl InMemoryRecordProcessorBuilder {
-    pub fn new(model: Model, order_by: Vec<OrderBy>, ignore_skip: bool, ignore_take: bool) -> Self {
+    pub fn new(model: Model) -> Self {
         Self {
             args: QueryArguments {
                 model,
@@ -207,30 +207,38 @@ impl InMemoryRecordProcessorBuilder {
                 take: None,
                 skip: None,
                 filter: None,
-                order_by,
+                order_by: Default::default(),
                 distinct: None,
-                ignore_skip,
-                ignore_take,
+                ignore_skip: false,
+                ignore_take: false,
             },
         }
     }
-    pub fn _cursor(mut self, cursor: SelectionResult) -> Self {
-        self.args.cursor = Some(cursor);
+
+    pub fn cursor(mut self, cursor: &mut Option<SelectionResult>) -> Self {
+        self.args.cursor = cursor.clone();
         self
     }
 
-    pub fn _take(mut self, take: i64) -> Self {
-        self.args.take = Some(take);
+    pub fn take(mut self, args: &mut QueryArguments) -> Self {
+        self.args.take = args.take;
+        args.ignore_take = true;
         self
     }
 
-    pub fn _skip(mut self, skip: i64) -> Self {
-        self.args.skip = Some(skip);
+    pub fn skip(mut self, args: &mut QueryArguments) -> Self {
+        self.args.skip = args.skip;
+        args.ignore_skip = true;
         self
     }
 
-    pub fn _filter(mut self, filter: Filter) -> Self {
-        self.args.filter = Some(filter);
+    pub fn filter(mut self, filter: Option<Filter>) -> Self {
+        self.args.filter = filter;
+        self
+    }
+
+    pub fn order_by(mut self, order_by: Vec<OrderBy>) -> Self {
+        self.args.order_by = order_by;
         self
     }
 

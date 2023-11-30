@@ -35,7 +35,6 @@ mod distinct {
                     { id } 
                 }")
             ),
-            // r#"{"data":{"findManyUser":[{"id":1},{"id":2}]}}"#
             @r###"{"data":{"findManyUser":[{"id":2},{"id":1}]}}"###
         );
 
@@ -102,9 +101,7 @@ mod distinct {
                     { id, first_name, last_name }
                 }")
             ),
-            // r#"{"data":{"findManyUser":[{"id":2,"first_name":"Hans","last_name":"Wurst"}]}}"#
-            // ! SELECT DISTINCT ON expressions must match initial ORDER BY expressions
-            @r###"{"data":{"findManyUser":[{"id":2,"first_name":"Hans","last_name":"Wurst"},{"id":3,"first_name":"Joe","last_name":"Doe"}]}}"###
+            @r###"{"data":{"findManyUser":[{"id":2,"first_name":"Hans","last_name":"Wurst"}]}}"###
         );
 
         Ok(())
@@ -156,8 +153,6 @@ mod distinct {
                         { id, first_name, last_name }
                     }")
             ),
-            // r#"{"data":{"findManyUser":[{"id":3,"first_name":"Joe","last_name":"Doe"},{"id":2,"first_name":"Hans","last_name":"Wurst"}]}}"#
-            // ! SELECT DISTINCT ON expressions must match initial ORDER BY expressions
             @r###"{"data":{"findManyUser":[{"id":3,"first_name":"Joe","last_name":"Doe"},{"id":2,"first_name":"Hans","last_name":"Wurst"}]}}"###
         );
 
@@ -185,8 +180,6 @@ mod distinct {
                         }
                     }}")
             ),
-            // {"data":{"findManyUser":[{"id":1,"posts":[{"title":"3"},{"title":"1"},{"title":"2"}]},{"id":3,"posts":[]},{"id":4,"posts":[{"title":"1"}]},{"id":5,"posts":[{"title":"2"},{"title":"3"}]}]}}
-            // ! SELECT DISTINCT ON expressions must match initial ORDER BY expressions
             @r###"{"data":{"findManyUser":[{"id":1,"posts":[{"title":"3"},{"title":"1"},{"title":"2"}]},{"id":4,"posts":[{"title":"1"}]},{"id":3,"posts":[]},{"id":5,"posts":[{"title":"2"},{"title":"3"}]}]}}"###
         );
 
@@ -216,8 +209,6 @@ mod distinct {
                     }
                   }"}
             ),
-            // {"data":{"findManyUser":[{"id":5,"posts":[{"title":"2"},{"title":"3"}]},{"id":4,"posts":[{"title":"1"}]},{"id":3,"posts":[]},{"id":2,"posts":[{"title":"2"},{"title":"1"}]}]}}
-            // ! SELECT DISTINCT ON expressions must match initial ORDER BY expressions
             @r###"{"data":{"findManyUser":[{"id":5,"posts":[{"title":"2"},{"title":"3"}]},{"id":4,"posts":[{"title":"1"}]},{"id":3,"posts":[]},{"id":2,"posts":[{"title":"2"},{"title":"1"}]}]}}"###
         );
 

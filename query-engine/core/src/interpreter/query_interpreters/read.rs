@@ -91,19 +91,20 @@ fn read_many(
     let req_inmem_distinct = query.args.requires_inmemory_distinct();
 
     let processor = if query.args.requires_inmemory_processing() {
-        let inm_builder = InMemoryRecordProcessorBuilder::new(
-            query.args.model.clone(),
-            query.args.order_by.clone(),
-            query.args.ignore_skip,
-            query.args.ignore_take,
-        );
+        let inm_builder = InMemoryRecordProcessorBuilder::new(query.args.model.clone());
 
-        dbg!(req_inmem_distinct);
         let inm_builder = if req_inmem_distinct {
             inm_builder.distinct(&mut query.args.distinct)
         } else {
             inm_builder
         };
+
+        let inm_builder = inm_builder
+            .cursor(&mut query.args.cursor)
+            .take(&mut query.args)
+            .skip(&mut query.args)
+            .filter(query.args.filter.clone())
+            .order_by(query.args.order_by.clone());
 
         Some(inm_builder.build())
     } else {
