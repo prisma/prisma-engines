@@ -84,7 +84,7 @@ impl QueryArguments {
             .dm
             .schema
             .connector
-            .has_capability(ConnectorCapability::Distinct)
+            .has_capability(ConnectorCapability::DistinctOn)
     }
 
     fn has_distinct(&self) -> bool {
