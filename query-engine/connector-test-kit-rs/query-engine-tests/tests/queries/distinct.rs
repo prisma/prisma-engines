@@ -1,5 +1,17 @@
 use query_engine_tests::*;
 
+/// `distinct on` queries involving `orderBy`
+/// are currently forced through in-memory handling as otherwise,
+/// they fail with the following error message. This does not affect _all_
+/// cases of `distinct on` in conjunction with `orderBy`.
+///
+/// ```sql
+/// SELECT DISTINCT ON expressions must match initial ORDER BY expressions
+/// ```
+///
+/// `distinct on` queries _not_ involving `orderBy` return differently ordered
+/// result sets, hence we need to duplicate certain tests to track snapshots
+/// for both the in-db pg results, and the in-mem result sets.
 #[test_suite(schema(schemas::user_posts))]
 mod distinct {
     use indoc::indoc;
@@ -22,8 +34,8 @@ mod distinct {
     }
 
     /// Regression test for not selecting the fields the distinct is performed on: https://github.com/prisma/prisma/issues/5969
-    #[connector_test]
-    async fn no_panic(runner: Runner) -> TestResult<()> {
+    #[connector_test(exclude(CockroachDb, MongoDb, SqlServer, MySQL, Sqlite))]
+    async fn no_panic_pg(runner: Runner) -> TestResult<()> {
         test_user(&runner, r#"{ id: 1, first_name: "Joe", last_name: "Doe", email: "1" }"#).await?;
         test_user(&runner, r#"{ id: 2, first_name: "Doe", last_name: "Joe", email: "2" }"#).await?;
 
@@ -36,6 +48,26 @@ mod distinct {
                 }")
             ),
             @r###"{"data":{"findManyUser":[{"id":2},{"id":1}]}}"###
+        );
+
+        Ok(())
+    }
+
+    /// Regression test for not selecting the fields the distinct is performed on: https://github.com/prisma/prisma/issues/5969
+    #[connector_test(exclude(Postgres))]
+    async fn no_panic_mem(runner: Runner) -> TestResult<()> {
+        test_user(&runner, r#"{ id: 1, first_name: "Joe", last_name: "Doe", email: "1" }"#).await?;
+        test_user(&runner, r#"{ id: 2, first_name: "Doe", last_name: "Joe", email: "2" }"#).await?;
+
+        insta::assert_snapshot!(
+            run_query!(
+                &runner,
+                indoc!("{
+                    findManyUser(distinct: [first_name, last_name])
+                    { id } 
+                }")
+            ),
+            @r###"{"data":{"findManyUser":[{"id":1},{"id":2}]}}"###
         );
 
         Ok(())
@@ -60,8 +92,31 @@ mod distinct {
         Ok(())
     }
 
-    #[connector_test]
-    async fn with_duplicates(runner: Runner) -> TestResult<()> {
+    #[connector_test(exclude(Postgres))]
+    async fn with_duplicates_pg(runner: Runner) -> TestResult<()> {
+        test_user(&runner, r#"{ id: 1, first_name: "Joe", last_name: "Doe", email: "1" }"#).await?;
+        test_user(
+            &runner,
+            r#"{ id: 2, first_name: "Hans", last_name: "Wurst", email: "2" }"#,
+        )
+        .await?;
+        test_user(&runner, r#"{ id: 3, first_name: "Joe", last_name: "Doe", email: "3" }"#).await?;
+
+        insta::assert_snapshot!(run_query!(
+                &runner,
+                indoc!("{
+                    findManyUser(distinct: [first_name, last_name])
+                    { id, first_name, last_name }
+                }")
+            ),
+            @r###"{"data":{"findManyUser":[{"id":1,"first_name":"Joe","last_name":"Doe"},{"id":2,"first_name":"Hans","last_name":"Wurst"}]}}"###
+        );
+
+        Ok(())
+    }
+
+    #[connector_test(exclude(CockroachDb, MongoDb, SqlServer, MySQL, Sqlite))]
+    async fn with_duplicates_mem(runner: Runner) -> TestResult<()> {
         test_user(&runner, r#"{ id: 1, first_name: "Joe", last_name: "Doe", email: "1" }"#).await?;
         test_user(
             &runner,
@@ -160,8 +215,34 @@ mod distinct {
     }
 
     /// Mut return only distinct records for top record, and only for those the distinct relation records.
-    #[connector_test]
-    async fn nested_distinct(runner: Runner) -> TestResult<()> {
+    #[connector_test(exclude(CockroachDb, MongoDb, SqlServer, MySQL, Sqlite))]
+    async fn nested_distinct_pg(runner: Runner) -> TestResult<()> {
+        nested_dataset(&runner).await?;
+
+        // Returns Users 1, 3, 4, 5 top
+        // 1 => ["3", "1", "2"]
+        // 4 => ["1"]
+        // 3 => []
+        // 5 => ["2", "3"]
+        insta::assert_snapshot!(run_query!(
+                &runner,
+                indoc!("{
+                    findManyUser(distinct: [first_name, last_name])
+                    {
+                        id
+                        posts(distinct: [title], orderBy: { id: asc }) {
+                            title
+                        }
+                    }}")
+            ),
+            @r###"{"data":{"findManyUser":[{"id":1,"posts":[{"title":"3"},{"title":"1"},{"title":"2"}]},{"id":4,"posts":[{"title":"1"}]},{"id":3,"posts":[]},{"id":5,"posts":[{"title":"2"},{"title":"3"}]}]}}"###
+        );
+
+        Ok(())
+    }
+
+    #[connector_test(exclude(Postgres))]
+    async fn nested_distinct_mem(runner: Runner) -> TestResult<()> {
         nested_dataset(&runner).await?;
 
         // Returns Users 1, 3, 4, 5 top
@@ -180,7 +261,7 @@ mod distinct {
                         }
                     }}")
             ),
-            @r###"{"data":{"findManyUser":[{"id":1,"posts":[{"title":"3"},{"title":"1"},{"title":"2"}]},{"id":4,"posts":[{"title":"1"}]},{"id":3,"posts":[]},{"id":5,"posts":[{"title":"2"},{"title":"3"}]}]}}"###
+            @r###"{"data":{"findManyUser":[{"id":1,"posts":[{"title":"3"},{"title":"1"},{"title":"2"}]},{"id":3,"posts":[]},{"id":4,"posts":[{"title":"1"}]},{"id":5,"posts":[{"title":"2"},{"title":"3"}]}]}}"###
         );
 
         Ok(())
