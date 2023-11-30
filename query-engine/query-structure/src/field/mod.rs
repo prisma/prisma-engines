@@ -183,6 +183,11 @@ impl TypeIdentifier {
     pub fn is_enum(&self) -> bool {
         matches!(self, Self::Enum(..))
     }
+
+    /// Returns `true` if the type identifier is [`Json`].
+    pub fn is_json(&self) -> bool {
+        matches!(self, Self::Json)
+    }
 }
 
 #[derive(Clone, Debug, PartialEq, Eq, Hash)]

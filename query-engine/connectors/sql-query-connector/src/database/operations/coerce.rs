@@ -1,21 +1,29 @@
+use std::io;
+
+use bigdecimal::{BigDecimal, FromPrimitive};
 use itertools::{Either, Itertools};
 use query_structure::*;
 
-use crate::query_arguments_ext::QueryArgumentsExt;
+use crate::{query_arguments_ext::QueryArgumentsExt, SqlError};
 
 /// Coerces relations resolved as JSON to PrismaValues.
 /// Note: Some in-memory processing is baked into this function too for performance reasons.
-pub(crate) fn coerce_record_with_json_relation(record: &mut Record, rq_indexes: Vec<(usize, &RelationSelection)>) {
+pub(crate) fn coerce_record_with_json_relation(
+    record: &mut Record,
+    rq_indexes: Vec<(usize, &RelationSelection)>,
+) -> crate::Result<()> {
     for (val_idx, rs) in rq_indexes {
         let val = record.values.get_mut(val_idx).unwrap();
         // TODO(perf): Find ways to avoid serializing and deserializing multiple times.
         let json_val: serde_json::Value = serde_json::from_str(val.as_json().unwrap()).unwrap();
 
-        *val = coerce_json_relation_to_pv(json_val, rs);
+        *val = coerce_json_relation_to_pv(json_val, rs)?;
     }
+
+    Ok(())
 }
 
-fn coerce_json_relation_to_pv(value: serde_json::Value, rs: &RelationSelection) -> PrismaValue {
+fn coerce_json_relation_to_pv(value: serde_json::Value, rs: &RelationSelection) -> crate::Result<PrismaValue> {
     let relations = rs.relations().collect_vec();
 
     match value {
@@ -29,7 +37,7 @@ fn coerce_json_relation_to_pv(value: serde_json::Value, rs: &RelationSelection) 
                 false => Either::Right(iter),
             };
 
-            PrismaValue::List(iter.collect())
+            Ok(PrismaValue::List(iter.collect::<crate::Result<Vec<_>>>()?))
         }
         // to-one
         serde_json::Value::Array(values) => {
@@ -43,7 +51,7 @@ fn coerce_json_relation_to_pv(value: serde_json::Value, rs: &RelationSelection) 
             if let Some(val) = coerced {
                 val
             } else {
-                PrismaValue::Null
+                Ok(PrismaValue::Null)
             }
         }
         serde_json::Value::Object(obj) => {
@@ -53,44 +61,115 @@ fn coerce_json_relation_to_pv(value: serde_json::Value, rs: &RelationSelection) 
             for (key, value) in obj {
                 match related_model.fields().all().find(|f| f.db_name() == key).unwrap() {
                     Field::Scalar(sf) => {
-                        map.push((key, coerce_json_scalar_to_pv(value, &sf)));
+                        map.push((key, coerce_json_scalar_to_pv(value, &sf)?));
                     }
                     Field::Relation(rf) => {
                         // TODO: optimize this
                         if let Some(nested_selection) = relations.iter().find(|rs| rs.field == rf) {
-                            map.push((key, coerce_json_relation_to_pv(value, nested_selection)));
+                            map.push((key, coerce_json_relation_to_pv(value, nested_selection)?));
                         }
                     }
                     _ => (),
                 }
             }
 
-            PrismaValue::Object(map)
+            Ok(PrismaValue::Object(map))
         }
         _ => unreachable!(),
     }
 }
 
-pub(crate) fn coerce_json_scalar_to_pv(value: serde_json::Value, sf: &ScalarField) -> PrismaValue {
+pub(crate) fn coerce_json_scalar_to_pv(value: serde_json::Value, sf: &ScalarField) -> crate::Result<PrismaValue> {
+    if sf.type_identifier().is_json() {
+        return Ok(PrismaValue::Json(serde_json::to_string(&value)?));
+    }
+
     match value {
-        serde_json::Value::Null => PrismaValue::Null,
-        serde_json::Value::Bool(b) => PrismaValue::Boolean(b),
+        serde_json::Value::Null => Ok(PrismaValue::Null),
+        serde_json::Value::Bool(b) => Ok(PrismaValue::Boolean(b)),
         serde_json::Value::Number(n) => match sf.type_identifier() {
-            TypeIdentifier::Int => PrismaValue::Int(n.as_i64().unwrap()),
-            TypeIdentifier::BigInt => PrismaValue::BigInt(n.as_i64().unwrap()),
-            TypeIdentifier::Float => todo!(),
-            TypeIdentifier::Decimal => todo!(),
-            _ => unreachable!(),
+            TypeIdentifier::Int => Ok(PrismaValue::Int(n.as_i64().ok_or_else(|| {
+                build_conversion_error(&format!("Number({n})"), &format!("{:?}", sf.type_identifier()))
+            })?)),
+            TypeIdentifier::BigInt => Ok(PrismaValue::BigInt(n.as_i64().ok_or_else(|| {
+                build_conversion_error(&format!("Number({n})"), &format!("{:?}", sf.type_identifier()))
+            })?)),
+            TypeIdentifier::Float | TypeIdentifier::Decimal => {
+                let bd = n
+                    .as_f64()
+                    .and_then(BigDecimal::from_f64)
+                    .map(|bd| bd.normalized())
+                    .ok_or_else(|| {
+                        build_conversion_error(&format!("Number({n})"), &format!("{:?}", sf.type_identifier()))
+                    })?;
+
+                Ok(PrismaValue::Float(bd))
+            }
+            _ => Err(build_conversion_error(
+                &format!("Number({n})"),
+                &format!("{:?}", sf.type_identifier()),
+            )),
         },
         serde_json::Value::String(s) => match sf.type_identifier() {
-            TypeIdentifier::String => PrismaValue::String(s),
-            TypeIdentifier::Enum(_) => PrismaValue::Enum(s),
-            TypeIdentifier::DateTime => PrismaValue::DateTime(parse_datetime(&s).unwrap()),
-            TypeIdentifier::UUID => PrismaValue::Uuid(uuid::Uuid::parse_str(&s).unwrap()),
-            TypeIdentifier::Bytes => PrismaValue::Bytes(decode_bytes(&s).unwrap()),
-            _ => unreachable!(),
+            TypeIdentifier::String => Ok(PrismaValue::String(s)),
+            TypeIdentifier::Enum(_) => Ok(PrismaValue::Enum(s)),
+            TypeIdentifier::DateTime => Ok(PrismaValue::DateTime(parse_datetime(&format!("{s}Z")).map_err(
+                |err| {
+                    build_conversion_error_with_reason(
+                        &format!("String({s})"),
+                        &format!("{:?}", sf.type_identifier()),
+                        &err.to_string(),
+                    )
+                },
+            )?)),
+            TypeIdentifier::UUID => Ok(PrismaValue::Uuid(uuid::Uuid::parse_str(&s).map_err(|err| {
+                build_conversion_error_with_reason(
+                    &format!("String({s})"),
+                    &format!("{:?}", sf.type_identifier()),
+                    &err.to_string(),
+                )
+            })?)),
+            TypeIdentifier::Bytes => {
+                // We skip the first two characters because they are the \x prefix.
+                let bytes = hex::decode(&s[2..]).map_err(|err| {
+                    build_conversion_error_with_reason(
+                        &format!("String({s})"),
+                        &format!("{:?}", sf.type_identifier()),
+                        &err.to_string(),
+                    )
+                })?;
+
+                Ok(PrismaValue::Bytes(bytes))
+            }
+            _ => Err(build_conversion_error(
+                &format!("String({s})"),
+                &format!("{:?}", sf.type_identifier()),
+            )),
         },
-        serde_json::Value::Array(_) => todo!(),
-        serde_json::Value::Object(_) => todo!(),
+        serde_json::Value::Array(values) => Ok(PrismaValue::List(
+            values
+                .into_iter()
+                .map(|v| coerce_json_scalar_to_pv(v, sf))
+                .collect::<crate::Result<Vec<_>>>()?,
+        )),
+        serde_json::Value::Object(_) => unreachable!("Objects should be caught by the json catch-all above."),
     }
+}
+
+fn build_conversion_error(from: &str, to: &str) -> SqlError {
+    let error = io::Error::new(
+        io::ErrorKind::InvalidData,
+        format!("Unexpected conversion failure from {from} to {to}."),
+    );
+
+    SqlError::ConversionError(error.into())
+}
+
+fn build_conversion_error_with_reason(from: &str, to: &str, reason: &str) -> SqlError {
+    let error = io::Error::new(
+        io::ErrorKind::InvalidData,
+        format!("Unexpected conversion failure from {from} to {to}. Reason: ${reason}"),
+    );
+
+    SqlError::ConversionError(error.into())
 }

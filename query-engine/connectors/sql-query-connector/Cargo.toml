@@ -27,6 +27,7 @@ uuid.workspace = true
 opentelemetry = { version = "0.17", features = ["tokio"] }
 tracing-opentelemetry = "0.17.3"
 cuid = { git = "https://github.com/prisma/cuid-rust", branch = "wasm32-support" }
+hex = "0.4"
 
 [target.'cfg(not(target_arch = "wasm32"))'.dependencies]
 quaint.workspace = true
