@@ -36,12 +36,10 @@ impl ElapsedTimeCounter {
 }
 
 pub async fn sleep(duration: Duration) {
-    JsFuture::from(Promise::new(&mut |resolve, _reject| {
+    let _ = JsFuture::from(Promise::new(&mut |resolve, _reject| {
         set_timeout(&resolve, duration.as_millis() as u32);
     }))
-    .await
-    // TODO:
-    .unwrap();
+    .await;
 }
 
 pub async fn timeout<F>(duration: Duration, future: F) -> Result<F::Output, TimeoutError>
