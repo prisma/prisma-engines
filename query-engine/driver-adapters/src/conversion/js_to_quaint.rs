@@ -326,7 +326,7 @@ fn f64_to_f32(x: f64) -> quaint::Result<f32> {
 
 #[cfg(test)]
 mod proxy_test {
-    use num_bigint::BigInt;
+    use quaint::bigdecimal::num_bigint::BigInt;
     use serde_json::json;
 
     use super::*;
