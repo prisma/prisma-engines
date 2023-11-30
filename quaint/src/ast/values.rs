@@ -53,7 +53,7 @@ impl Display for GeometryValue {
 }
 
 impl FromStr for GeometryValue {
-    type Err = String;
+    type Err = Error;
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         static EWKT_REGEX: Lazy<Regex> = Lazy::new(|| Regex::new(r"^(SRID=(?P<srid>\d+);)?(?P<geometry>.+)$").unwrap());
@@ -63,12 +63,12 @@ impl FromStr for GeometryValue {
                 let srid = match capture.name("srid").map(|v| v.as_str().parse::<i32>()) {
                     None => Ok(0),
                     Some(Ok(srid)) => Ok(srid),
-                    Some(Err(_)) => Err("Invalid SRID"),
+                    Some(Err(_)) => Err(Error::builder(ErrorKind::conversion("Invalid EWKT SRID")).build()),
                 }?;
                 let wkt = capture.name("geometry").map(|v| v.as_str()).unwrap().to_string();
                 Ok(GeometryValue { srid, wkt })
             })
-            .ok_or("Invalid EWKT".to_string())?
+            .ok_or_else(|| Error::builder(ErrorKind::conversion("Invalid EWKT string")).build())?
     }
 }
 
