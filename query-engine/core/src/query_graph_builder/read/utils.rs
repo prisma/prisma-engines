@@ -132,7 +132,7 @@ fn extract_relation_selection(
 ) -> QueryGraphBuilderResult<SelectedField> {
     let object = pf
         .nested_fields
-        .expect("Invalid composite query shape: Composite field selected without sub-selection.");
+        .expect("Invalid relation query shape: Relation field selected without sub-selection.");
 
     let related_model = rf.related_model();
 

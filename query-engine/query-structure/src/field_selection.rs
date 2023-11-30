@@ -33,7 +33,8 @@ impl FieldSelection {
                 .and_then(|selection| selection.as_composite())
                 .map(|cs| cs.is_superset_of(other_cs))
                 .unwrap_or(false),
-            SelectedField::Relation(_) => todo!(),
+            // TODO: Relation selections are ignored for now to prevent breaking the existing query-based strategy to resolve relations.
+            SelectedField::Relation(_) => true,
         })
     }
 
@@ -270,7 +271,7 @@ impl CompositeSelection {
                     .and_then(|selection| selection.as_composite())
                     .map(|cs| cs.is_superset_of(other_cs))
                     .unwrap_or(false),
-                SelectedField::Relation(_) => unreachable!(),
+                SelectedField::Relation(_) => true, // A composite selection cannot hold relations.
             })
     }
 
