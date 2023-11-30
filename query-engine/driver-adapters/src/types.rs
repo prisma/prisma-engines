@@ -15,13 +15,13 @@ use serde_repr::{Deserialize_repr, Serialize_repr};
 #[cfg_attr(target_arch = "wasm32", derive(Serialize, Deserialize, Tsify))]
 #[cfg_attr(target_arch = "wasm32", tsify(into_wasm_abi, from_wasm_abi))]
 #[derive(Debug, Eq, PartialEq, Clone)]
-pub enum AdapterFlavour {
+pub enum AdapterProvider {
     Mysql,
     Postgres,
     Sqlite,
 }
 
-impl FromStr for AdapterFlavour {
+impl FromStr for AdapterProvider {
     type Err = String;
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
@@ -29,7 +29,7 @@ impl FromStr for AdapterFlavour {
             "postgres" => Ok(Self::Postgres),
             "mysql" => Ok(Self::Mysql),
             "sqlite" => Ok(Self::Sqlite),
-            _ => Err(format!("Unsupported adapter flavour: {:?}", s)),
+            _ => Err(format!("Unsupported adapter provider: {:?}", s)),
         }
     }
 }

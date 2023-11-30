@@ -22,8 +22,8 @@ pub(crate) struct CommonProxy {
     /// returning the number of affected rows.
     execute_raw: AsyncJsFunction<Query, u32>,
 
-    /// Return the flavour for this driver.
-    pub(crate) flavour: String,
+    /// Return the provider for this driver.
+    pub(crate) provider: String,
 }
 
 /// This is a JS proxy for accessing the methods specific to top level
@@ -52,12 +52,12 @@ pub(crate) struct TransactionProxy {
 
 impl CommonProxy {
     pub fn new(object: &JsObject) -> JsResult<Self> {
-        let flavour: JsString = get_named_property(object, "flavour")?;
+        let provider: JsString = get_named_property(object, "provider")?;
 
         Ok(Self {
             query_raw: get_named_property(object, "queryRaw")?,
             execute_raw: get_named_property(object, "executeRaw")?,
-            flavour: to_rust_str(flavour)?,
+            provider: to_rust_str(provider)?,
         })
     }
 
