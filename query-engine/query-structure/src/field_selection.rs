@@ -1,6 +1,7 @@
 use crate::{
     parent_container::ParentContainer, prisma_value_ext::PrismaValueExtensions, CompositeFieldRef, DomainError, Field,
-    QueryArguments, RelationField, ScalarField, ScalarFieldRef, SelectionResult, TypeIdentifier,
+    Model, ModelProjection, QueryArguments, RelationField, ScalarField, ScalarFieldRef, SelectionResult,
+    TypeIdentifier,
 };
 use itertools::Itertools;
 use prisma_value::PrismaValue;
@@ -161,6 +162,10 @@ impl FieldSelection {
             _ => None,
         })
     }
+
+    pub fn into_projection(self) -> ModelProjection {
+        self.into()
+    }
 }
 
 /// A selected field. Can be contained on a model or composite type.
@@ -195,6 +200,10 @@ impl RelationSelection {
             SelectedField::Relation(rs) => Some(rs),
             _ => None,
         })
+    }
+
+    pub fn related_model(&self) -> Model {
+        self.field.related_model()
     }
 }
 
