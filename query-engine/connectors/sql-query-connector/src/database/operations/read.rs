@@ -117,7 +117,7 @@ pub(crate) async fn get_many_records_joins(
         let mut record = Record::from(item);
 
         // Coerces json values to prisma values
-        coerce_record_with_json_relation(&mut record, rs_indexes.clone());
+        coerce_record_with_json_relation(&mut record, rs_indexes.clone())?;
 
         records.push(record)
     }
