@@ -1,4 +1,4 @@
-use crate::{Field, FieldSelection, ScalarFieldRef, SelectedField, SelectionResult, TypeIdentifier};
+use crate::{Field, FieldSelection, ScalarFieldRef, SelectedField, TypeIdentifier};
 use itertools::Itertools;
 use psl::schema_ast::ast::FieldArity;
 
@@ -102,21 +102,5 @@ impl IntoIterator for ModelProjection {
 
     fn into_iter(self) -> Self::IntoIter {
         self.fields.into_iter()
-    }
-}
-
-impl From<&SelectionResult> for ModelProjection {
-    fn from(p: &SelectionResult) -> Self {
-        let fields = p
-            .pairs
-            .iter()
-            .map(|(field_selection, _)| match field_selection {
-                SelectedField::Scalar(sf) => sf.clone().into(),
-                SelectedField::Composite(cf) => cf.field.clone().into(),
-                SelectedField::Relation(_) => todo!(),
-            })
-            .collect::<Vec<_>>();
-
-        Self::new(fields)
     }
 }

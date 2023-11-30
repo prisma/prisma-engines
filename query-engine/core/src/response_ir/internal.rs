@@ -240,7 +240,7 @@ fn serialize_record_selection_with_relations(
         InnerOutputType::Object(obj) => {
             let result = serialize_objects_with_relation(record_selection, obj)?;
 
-            process_object(field, is_list, result, name)
+            finalize_objects(field, is_list, result, name)
         }
         // We always serialize record selections into objects or lists on the top levels. Scalars and enums are handled separately.
         _ => unreachable!(),
@@ -267,15 +267,14 @@ fn serialize_record_selection(
         InnerOutputType::Object(obj) => {
             let result = serialize_objects(record_selection, obj, query_schema)?;
 
-            process_object(field, is_list, result, name)
+            finalize_objects(field, is_list, result, name)
         }
 
         _ => unreachable!(), // We always serialize record selections into objects or lists on the top levels. Scalars and enums are handled separately.
     }
 }
 
-// TODO: rename function
-fn process_object(
+fn finalize_objects(
     field: &OutputField<'_>,
     is_list: bool,
     result: IndexMap<Option<SelectionResult>, Vec<Item>>,
@@ -413,7 +412,7 @@ fn serialize_relation_selection(
 
     let mut map = Map::new();
 
-    // TODO: handle errors
+    // TODO: better handle errors
     let mut value_obj: HashMap<String, PrismaValue> = HashMap::from_iter(value.into_object().unwrap());
     let db_field_names = &rrs.fields;
     let fields: Vec<_> = db_field_names

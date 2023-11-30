@@ -1,4 +1,4 @@
-use super::coerce::coerce_record_with_join;
+use super::coerce::coerce_record_with_json_relation;
 use crate::{
     column_metadata,
     model_extensions::*,
@@ -104,7 +104,7 @@ pub(crate) async fn get_many_records_joins(
     match ctx.max_bind_values {
         Some(chunk_size) if query_arguments.should_batch(chunk_size) => {
             return Err(SqlError::QueryParameterLimitExceeded(
-                "Join queries cannot be split into multiple queries just yet. If you encounter that issue, please open an issue."
+                "Joined queries cannot be split into multiple queries just yet. If you encounter this error, please open an issue."
                     .to_string(),
             ));
         }
@@ -117,7 +117,7 @@ pub(crate) async fn get_many_records_joins(
         let mut record = Record::from(item);
 
         // Coerces json values to prisma values
-        coerce_record_with_join(&mut record, rs_indexes.clone());
+        coerce_record_with_json_relation(&mut record, rs_indexes.clone());
 
         records.push(record)
     }

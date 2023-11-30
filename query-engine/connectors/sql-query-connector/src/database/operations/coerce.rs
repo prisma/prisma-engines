@@ -3,8 +3,9 @@ use query_structure::*;
 
 use crate::query_arguments_ext::QueryArgumentsExt;
 
-// TODO: find better name
-pub(crate) fn coerce_record_with_join(record: &mut Record, rq_indexes: Vec<(usize, &RelationSelection)>) {
+/// Coerces relations resolved as JSON to PrismaValues.
+/// Note: Some in-memory processing is baked into this function too for performance reasons.
+pub(crate) fn coerce_record_with_json_relation(record: &mut Record, rq_indexes: Vec<(usize, &RelationSelection)>) {
     for (val_idx, rs) in rq_indexes {
         let val = record.values.get_mut(val_idx).unwrap();
         // TODO(perf): Find ways to avoid serializing and deserializing multiple times.
@@ -14,8 +15,7 @@ pub(crate) fn coerce_record_with_join(record: &mut Record, rq_indexes: Vec<(usiz
     }
 }
 
-// TODO: find better name
-pub(crate) fn coerce_json_relation_to_pv(value: serde_json::Value, rs: &RelationSelection) -> PrismaValue {
+fn coerce_json_relation_to_pv(value: serde_json::Value, rs: &RelationSelection) -> PrismaValue {
     let relations = rs.relations().collect_vec();
 
     match value {
