@@ -146,6 +146,6 @@ impl<S: Subscriber> Layer<S> for CallbackLayer {
         let mut visitor = JsonVisitor::new(event.metadata().level(), event.metadata().target());
         event.record(&mut visitor);
 
-        let _ = self.callback.call(&visitor.to_string());
+        let _ = self.callback.call(visitor.to_string());
     }
 }

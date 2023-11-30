@@ -35,7 +35,7 @@ impl ElapsedTimeCounter {
     }
 }
 
-pub async fn sleep(duration: Duration) -> () {
+pub async fn sleep(duration: Duration) {
     JsFuture::from(Promise::new(&mut |resolve, _reject| {
         set_timeout(&resolve, duration.as_millis() as u32);
     }))
@@ -55,5 +55,5 @@ where
 }
 
 fn now() -> f64 {
-    PERFORMANCE.as_ref().map(|p| p.now()).unwrap_or_else(|| Date::now())
+    PERFORMANCE.as_ref().map(|p| p.now()).unwrap_or_else(Date::now)
 }
