@@ -1,4 +1,4 @@
-use super::{inmemory_record_processor::InMemoryRecordProcessorBuilder, read};
+use super::{inmemory_record_processor::InMemoryRecordProcessor, read};
 use crate::{interpreter::InterpretationResult, query_ast::*};
 use connector::{self, ConnectionLike, RelAggregationRow, RelAggregationSelection};
 use query_structure::*;
@@ -10,21 +10,7 @@ pub(crate) async fn m2m(
     parent_result: Option<&ManyRecords>,
     trace_id: Option<String>,
 ) -> InterpretationResult<(ManyRecords, Option<Vec<RelAggregationRow>>)> {
-    let inm_builder = InMemoryRecordProcessorBuilder::new(query.args.model.clone());
-
-    let inm_builder = if query.args.requires_inmemory_distinct() {
-        inm_builder.distinct(&mut query.args.distinct.clone())
-    } else {
-        inm_builder
-    };
-
-    let processor = inm_builder
-        .cursor(&mut query.args.cursor)
-        .take(&mut query.args)
-        .skip(&mut query.args)
-        .filter(query.args.filter.clone())
-        .order_by(query.args.order_by.clone())
-        .build();
+    let processor = InMemoryRecordProcessor::new_from_query_args(&mut query.args);
 
     let parent_field = &query.parent_field;
     let child_link_id = parent_field.related_field().linking_fields();
@@ -205,27 +191,10 @@ pub async fn one2m(
     // However, we can't just apply a LIMIT/OFFSET for multiple parents as we need N related records PER parent.
     // We could use ROW_NUMBER() but it requires further refactoring so we're still using in-memory processing for now.
 
-    let req_inmem_distinct = query_args.requires_inmemory_distinct();
-
     let processor = if uniq_selections.len() == 1 && !query_args.requires_inmemory_processing() {
         None
     } else {
-        let inm_builder = InMemoryRecordProcessorBuilder::new(query_args.model.clone());
-
-        let inm_builder = if req_inmem_distinct {
-            inm_builder.distinct(&mut query_args.distinct)
-        } else {
-            inm_builder
-        };
-
-        let inm_builder = inm_builder
-            .cursor(&mut query_args.cursor)
-            .take(&mut query_args)
-            .skip(&mut query_args)
-            .filter(query_args.filter.clone())
-            .order_by(query_args.order_by.clone());
-
-        Some(inm_builder.build())
+        Some(InMemoryRecordProcessor::new_from_query_args(&mut query_args))
     };
 
     let mut scalars = {

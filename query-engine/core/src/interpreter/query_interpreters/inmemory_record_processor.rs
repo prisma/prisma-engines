@@ -20,9 +20,14 @@ impl InMemoryRecordProcessor {
     /// Creates a new processor from the given query args.
     /// The original args will be modified to prevent db level processing.
     pub(crate) fn new_from_query_args(args: &mut QueryArguments) -> Self {
-        let processor = Self { args: args.clone() };
+        let mut processor = Self { args: args.clone() };
 
-        args.distinct = None;
+        if !args.requires_inmemory_distinct() {
+            processor.args.distinct = None;
+        } else {
+            args.distinct = None;
+        }
+
         args.ignore_take = true;
         args.ignore_skip = true;
 
@@ -191,64 +196,5 @@ impl InMemoryRecordProcessor {
 
     fn must_apply_pagination(&self) -> bool {
         self.take.or(self.skip).is_some() || self.cursor.is_some()
-    }
-}
-
-pub struct InMemoryRecordProcessorBuilder {
-    args: QueryArguments,
-}
-
-impl InMemoryRecordProcessorBuilder {
-    pub fn new(model: Model) -> Self {
-        Self {
-            args: QueryArguments {
-                model,
-                cursor: None,
-                take: None,
-                skip: None,
-                filter: None,
-                order_by: Default::default(),
-                distinct: None,
-                ignore_skip: false,
-                ignore_take: false,
-            },
-        }
-    }
-
-    pub fn cursor(mut self, cursor: &mut Option<SelectionResult>) -> Self {
-        self.args.cursor = cursor.clone();
-        self
-    }
-
-    pub fn take(mut self, args: &mut QueryArguments) -> Self {
-        self.args.take = args.take;
-        args.ignore_take = true;
-        self
-    }
-
-    pub fn skip(mut self, args: &mut QueryArguments) -> Self {
-        self.args.skip = args.skip;
-        args.ignore_skip = true;
-        self
-    }
-
-    pub fn filter(mut self, filter: Option<Filter>) -> Self {
-        self.args.filter = filter;
-        self
-    }
-
-    pub fn order_by(mut self, order_by: Vec<OrderBy>) -> Self {
-        self.args.order_by = order_by;
-        self
-    }
-
-    pub fn distinct(mut self, distinct: &mut Option<FieldSelection>) -> Self {
-        self.args.distinct = distinct.clone();
-        *distinct = None;
-        self
-    }
-
-    pub fn build(self) -> InMemoryRecordProcessor {
-        InMemoryRecordProcessor { args: self.args }
     }
 }

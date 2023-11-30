@@ -1,4 +1,4 @@
-use super::{inmemory_record_processor::InMemoryRecordProcessorBuilder, *};
+use super::{inmemory_record_processor::InMemoryRecordProcessor, *};
 use crate::{interpreter::InterpretationResult, query_ast::*, result_ast::*};
 use connector::{self, error::ConnectorError, ConnectionLike, RelAggregationRow, RelAggregationSelection};
 use futures::future::{BoxFuture, FutureExt};
@@ -88,25 +88,8 @@ fn read_many(
     mut query: ManyRecordsQuery,
     trace_id: Option<String>,
 ) -> BoxFuture<'_, InterpretationResult<QueryResult>> {
-    let req_inmem_distinct = query.args.requires_inmemory_distinct();
-
     let processor = if query.args.requires_inmemory_processing() {
-        let inm_builder = InMemoryRecordProcessorBuilder::new(query.args.model.clone());
-
-        let inm_builder = if req_inmem_distinct {
-            inm_builder.distinct(&mut query.args.distinct)
-        } else {
-            inm_builder
-        };
-
-        let inm_builder = inm_builder
-            .cursor(&mut query.args.cursor)
-            .take(&mut query.args)
-            .skip(&mut query.args)
-            .filter(query.args.filter.clone())
-            .order_by(query.args.order_by.clone());
-
-        Some(inm_builder.build())
+        Some(InMemoryRecordProcessor::new_from_query_args(&mut query.args))
     } else {
         None
     };
