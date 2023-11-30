@@ -1107,15 +1107,12 @@ name = "driver-adapters"
 version = "0.1.0"
 dependencies = [
  "async-trait",
- "bigdecimal",
- "chrono",
  "expect-test",
  "futures",
  "js-sys",
  "metrics 0.18.1",
  "napi",
  "napi-derive",
- "num-bigint",
  "once_cell",
  "pin-project",
  "quaint",

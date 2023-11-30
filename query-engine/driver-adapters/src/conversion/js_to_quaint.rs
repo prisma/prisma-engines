@@ -2,16 +2,13 @@ use std::borrow::Cow;
 use std::str::FromStr;
 
 pub use crate::types::{ColumnType, JSResultSet, Query, TransactionOptions};
+use quaint::bigdecimal::{BigDecimal, FromPrimitive};
+use quaint::chrono::{DateTime, NaiveDate, NaiveTime, Utc};
 use quaint::{
     connector::ResultSet as QuaintResultSet,
     error::{Error as QuaintError, ErrorKind},
     Value as QuaintValue,
 };
-
-// TODO(jkomyno): import these 3rd-party crates from the `quaint-core` crate.
-use bigdecimal::{BigDecimal, FromPrimitive};
-use chrono::{DateTime, Utc};
-use chrono::{NaiveDate, NaiveTime};
 
 impl TryFrom<JSResultSet> for QuaintResultSet {
     type Error = quaint::error::Error;
@@ -210,7 +207,7 @@ pub fn js_value_to_quaint(
         },
         ColumnType::DateTime => match json_value {
             // TODO: change parsing order to prefer RFC3339
-            serde_json::Value::String(s) => chrono::NaiveDateTime::parse_from_str(&s, "%Y-%m-%d %H:%M:%S%.f")
+            serde_json::Value::String(s) => quaint::chrono::NaiveDateTime::parse_from_str(&s, "%Y-%m-%d %H:%M:%S%.f")
                 .map(|dt| DateTime::from_utc(dt, Utc))
                 .or_else(|_| DateTime::parse_from_rfc3339(&s).map(DateTime::<Utc>::from))
                 .map(QuaintValue::datetime)

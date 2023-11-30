@@ -1,6 +1,6 @@
 use crate::conversion::JSArg;
-use chrono::format::StrftimeItems;
 use once_cell::sync::Lazy;
+use quaint::chrono::format::StrftimeItems;
 use serde_json::value::Value as JsonValue;
 
 static TIME_FMT: Lazy<StrftimeItems> = Lazy::new(|| StrftimeItems::new("%H:%M:%S%.f"));
