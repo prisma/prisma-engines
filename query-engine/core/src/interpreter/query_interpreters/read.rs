@@ -122,12 +122,6 @@ fn read_many(
             .await?;
 
         let scalars = if let Some(p) = processor {
-            let scalars = if req_inmem_distinct {
-                p.apply_distinct(scalars)
-            } else {
-                scalars
-            };
-
             p.apply(scalars)
         } else {
             scalars

@@ -50,7 +50,12 @@ impl InMemoryRecordProcessor {
             records
         };
 
-        let records = self.apply_distinct(records);
+        let records = if self.requires_inmemory_distinct() {
+            self.apply_distinct(records)
+        } else {
+            records
+        };
+
         let mut records = self.apply_pagination(records);
 
         if self.needs_reversed_order() {
@@ -79,7 +84,7 @@ impl InMemoryRecordProcessor {
         records.records.first().map(|x| x.parent_id.is_some()).unwrap_or(false)
     }
 
-    pub(crate) fn apply_distinct(&self, mut records: ManyRecords) -> ManyRecords {
+    fn apply_distinct(&self, mut records: ManyRecords) -> ManyRecords {
         let field_names = &records.field_names;
 
         let distinct_selection = if let Some(ref distinct) = self.distinct {

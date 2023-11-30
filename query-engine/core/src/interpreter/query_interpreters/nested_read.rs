@@ -292,12 +292,6 @@ pub async fn one2m(
     }
 
     let scalars = if let Some(processor) = processor {
-        let scalars = if req_inmem_distinct {
-            processor.apply_distinct(scalars)
-        } else {
-            scalars
-        };
-
         processor.apply(scalars)
     } else {
         scalars
