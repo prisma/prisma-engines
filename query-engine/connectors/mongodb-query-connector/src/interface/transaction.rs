@@ -47,8 +47,6 @@ impl<'conn> Transaction for MongoDbTransaction<'conn> {
     async fn commit(&mut self) -> connector_interface::Result<i32> {
         decrement_gauge!(PRISMA_CLIENT_QUERIES_ACTIVE, 1.0);
 
-        println!("Committing transaction");
-
         utils::commit_with_retry(&mut self.connection.session)
             .await
             .map_err(|err| MongoError::from(err).into_connector_error())?;
@@ -59,15 +57,12 @@ impl<'conn> Transaction for MongoDbTransaction<'conn> {
     async fn rollback(&mut self) -> connector_interface::Result<i32> {
         decrement_gauge!(PRISMA_CLIENT_QUERIES_ACTIVE, 1.0);
 
-        println!("Rolling back transaction");
-
         self.connection
             .session
             .abort_transaction()
             .await
             .map_err(|err| MongoError::from(err).into_connector_error())?;
 
-        println!("Transaction rolled back");
         Ok(0)
     }
 
