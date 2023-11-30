@@ -27,6 +27,7 @@ jobs:
       - uses: dtolnay/rust-toolchain@stable
         with:
           components: clippy
+          targets: wasm32-unknown-unknown
       - run: |
           cargo clippy --all-features
           cargo clippy --all-features -p query-engine-wasm --target wasm32-unknown-unknown
