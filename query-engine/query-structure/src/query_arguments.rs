@@ -76,8 +76,7 @@ impl QueryArguments {
     }
 
     pub fn requires_inmemory_distinct(&self) -> bool {
-        self.has_distinct()
-            && ((!self.has_distinct_capability() && !self.has_distincton_preview()) || self.has_orderby())
+        !self.has_distincton_preview() || !self.has_distinct_capability() || self.has_orderby()
     }
 
     fn has_distincton_preview(&self) -> bool {
@@ -95,10 +94,6 @@ impl QueryArguments {
             .schema
             .connector
             .has_capability(ConnectorCapability::DistinctOn)
-    }
-
-    fn has_distinct(&self) -> bool {
-        self.distinct.is_some()
     }
 
     fn has_orderby(&self) -> bool {
