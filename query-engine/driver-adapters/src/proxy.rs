@@ -31,8 +31,8 @@ pub(crate) struct CommonProxy {
     /// returning the number of affected rows.
     execute_raw: AsyncJsFunction<Query, u32>,
 
-    /// Return the flavour for this driver.
-    pub(crate) flavour: String,
+    /// Return the provider for this driver.
+    pub(crate) provider: String,
 }
 
 /// This is a JS proxy for accessing the methods specific to top level
@@ -531,12 +531,12 @@ impl TryFrom<JSResultSet> for QuaintResultSet {
 
 impl CommonProxy {
     pub fn new(object: &JsObject) -> napi::Result<Self> {
-        let flavour: JsString = object.get_named_property("flavour")?;
+        let provider: JsString = object.get_named_property("provider")?;
 
         Ok(Self {
             query_raw: object.get_named_property("queryRaw")?,
             execute_raw: object.get_named_property("executeRaw")?,
-            flavour: flavour.into_utf8()?.as_str()?.to_owned(),
+            provider: provider.into_utf8()?.as_str()?.to_owned(),
         })
     }
 

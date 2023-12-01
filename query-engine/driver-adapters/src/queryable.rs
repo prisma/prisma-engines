@@ -28,33 +28,33 @@ use tracing::{info_span, Instrument};
 ///
 pub(crate) struct JsBaseQueryable {
     pub(crate) proxy: CommonProxy,
-    pub flavour: Flavour,
+    pub provider: Flavour,
 }
 
 impl JsBaseQueryable {
     pub(crate) fn new(proxy: CommonProxy) -> Self {
-        let flavour: Flavour = proxy.flavour.parse().unwrap();
-        Self { proxy, flavour }
+        let provider: Flavour = proxy.provider.parse().unwrap();
+        Self { proxy, provider }
     }
 
-    /// visit a quaint query AST according to the flavour of the JS connector
+    /// visit a quaint query AST according to the provider of the JS connector
     fn visit_quaint_query<'a>(&self, q: QuaintQuery<'a>) -> quaint::Result<(String, Vec<quaint::Value<'a>>)> {
-        match self.flavour {
+        match self.provider {
             Flavour::Mysql => visitor::Mysql::build(q),
             Flavour::Postgres => visitor::Postgres::build(q),
             Flavour::Sqlite => visitor::Sqlite::build(q),
-            _ => unimplemented!("Unsupported flavour for JS connector {:?}", self.flavour),
+            _ => unimplemented!("Unsupported provider for JS connector {:?}", self.provider),
         }
     }
 
     async fn build_query(&self, sql: &str, values: &[quaint::Value<'_>]) -> quaint::Result<Query> {
         let sql: String = sql.to_string();
 
-        let converter = match self.flavour {
+        let converter = match self.provider {
             Flavour::Postgres => conversion::postgres::value_to_js_arg,
             Flavour::Sqlite => conversion::sqlite::value_to_js_arg,
             Flavour::Mysql => conversion::mysql::value_to_js_arg,
-            _ => unreachable!("Unsupported flavour for JS connector {:?}", self.flavour),
+            _ => unreachable!("Unsupported provider for JS connector {:?}", self.provider),
         };
 
         let args = values
@@ -126,7 +126,7 @@ impl QuaintQueryable for JsBaseQueryable {
             return Err(Error::builder(ErrorKind::invalid_isolation_level(&isolation_level)).build());
         }
 
-        if self.flavour == Flavour::Sqlite {
+        if self.provider == Flavour::Sqlite {
             return match isolation_level {
                 IsolationLevel::Serializable => Ok(()),
                 _ => Err(Error::builder(ErrorKind::invalid_isolation_level(&isolation_level)).build()),
@@ -138,7 +138,7 @@ impl QuaintQueryable for JsBaseQueryable {
     }
 
     fn requires_isolation_first(&self) -> bool {
-        match self.flavour {
+        match self.provider {
             Flavour::Mysql => true,
             Flavour::Postgres | Flavour::Sqlite => false,
             _ => unreachable!(),
