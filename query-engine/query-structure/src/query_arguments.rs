@@ -1,4 +1,4 @@
-use psl::datamodel_connector::ConnectorCapability;
+use psl::{datamodel_connector::ConnectorCapability, PreviewFeature};
 
 use crate::*;
 
@@ -76,7 +76,17 @@ impl QueryArguments {
     }
 
     pub fn requires_inmemory_distinct(&self) -> bool {
-        self.has_distinct() && (!self.has_distinct_capability() || self.has_orderby())
+        self.has_distinct()
+            && ((!self.has_distinct_capability() && !self.has_distincton_preview()) || self.has_orderby())
+    }
+
+    fn has_distincton_preview(&self) -> bool {
+        self.model()
+            .dm
+            .schema
+            .configuration
+            .preview_features()
+            .contains(PreviewFeature::DistinctOn)
     }
 
     fn has_distinct_capability(&self) -> bool {

@@ -34,7 +34,7 @@ mod distinct {
     }
 
     /// Regression test for not selecting the fields the distinct is performed on: https://github.com/prisma/prisma/issues/5969
-    #[connector_test(exclude(CockroachDb, MongoDb, SqlServer, MySQL, Sqlite))]
+    #[connector_test(only(Postgres))]
     async fn no_panic_pg(runner: Runner) -> TestResult<()> {
         test_user(&runner, r#"{ id: 1, first_name: "Joe", last_name: "Doe", email: "1" }"#).await?;
         test_user(&runner, r#"{ id: 2, first_name: "Doe", last_name: "Joe", email: "2" }"#).await?;
@@ -55,7 +55,7 @@ mod distinct {
 
     /// Regression test for not selecting the fields the distinct is performed on: https://github.com/prisma/prisma/issues/5969
     #[connector_test(exclude(Postgres))]
-    async fn no_panic_mem(runner: Runner) -> TestResult<()> {
+    async fn no_panic_other(runner: Runner) -> TestResult<()> {
         test_user(&runner, r#"{ id: 1, first_name: "Joe", last_name: "Doe", email: "1" }"#).await?;
         test_user(&runner, r#"{ id: 2, first_name: "Doe", last_name: "Joe", email: "2" }"#).await?;
 
@@ -92,7 +92,7 @@ mod distinct {
         Ok(())
     }
 
-    #[connector_test(exclude(Postgres))]
+    #[connector_test(only(Postgres))]
     async fn with_duplicates_pg(runner: Runner) -> TestResult<()> {
         test_user(&runner, r#"{ id: 1, first_name: "Joe", last_name: "Doe", email: "1" }"#).await?;
         test_user(
@@ -109,14 +109,14 @@ mod distinct {
                     { id, first_name, last_name }
                 }")
             ),
-            @r###"{"data":{"findManyUser":[{"id":1,"first_name":"Joe","last_name":"Doe"},{"id":2,"first_name":"Hans","last_name":"Wurst"}]}}"###
+            @r###"{"data":{"findManyUser":[{"id":2,"first_name":"Hans","last_name":"Wurst"},{"id":1,"first_name":"Joe","last_name":"Doe"}]}}"###
         );
 
         Ok(())
     }
 
-    #[connector_test(exclude(CockroachDb, MongoDb, SqlServer, MySQL, Sqlite))]
-    async fn with_duplicates_mem(runner: Runner) -> TestResult<()> {
+    #[connector_test(exclude(Postgres))]
+    async fn with_duplicates_other(runner: Runner) -> TestResult<()> {
         test_user(&runner, r#"{ id: 1, first_name: "Joe", last_name: "Doe", email: "1" }"#).await?;
         test_user(
             &runner,
@@ -132,7 +132,7 @@ mod distinct {
                     { id, first_name, last_name }
                 }")
             ),
-            @r###"{"data":{"findManyUser":[{"id":2,"first_name":"Hans","last_name":"Wurst"},{"id":1,"first_name":"Joe","last_name":"Doe"}]}}"###
+            @r###"{"data":{"findManyUser":[{"id":1,"first_name":"Joe","last_name":"Doe"},{"id":2,"first_name":"Hans","last_name":"Wurst"}]}}"###
         );
 
         Ok(())
@@ -215,7 +215,7 @@ mod distinct {
     }
 
     /// Mut return only distinct records for top record, and only for those the distinct relation records.
-    #[connector_test(exclude(CockroachDb, MongoDb, SqlServer, MySQL, Sqlite))]
+    #[connector_test(only(Postgres))]
     async fn nested_distinct_pg(runner: Runner) -> TestResult<()> {
         nested_dataset(&runner).await?;
 
@@ -242,7 +242,7 @@ mod distinct {
     }
 
     #[connector_test(exclude(Postgres))]
-    async fn nested_distinct_mem(runner: Runner) -> TestResult<()> {
+    async fn nested_distinct_other(runner: Runner) -> TestResult<()> {
         nested_dataset(&runner).await?;
 
         // Returns Users 1, 3, 4, 5 top
