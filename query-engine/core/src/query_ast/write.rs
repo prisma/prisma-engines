@@ -307,8 +307,7 @@ impl UpdateRecord {
 
 #[derive(Debug, Clone)]
 pub struct UpdateRecordWithSelection {
-    // Used for serialization. When `None`, the result will only be used to fulfill other nodes requirement.
-    pub name: Option<String>,
+    pub name: String,
     pub model: Model,
     pub record_filter: RecordFilter,
     pub args: WriteArgs,
