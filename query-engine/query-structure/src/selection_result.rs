@@ -70,23 +70,19 @@ impl SelectionResult {
     pub fn split_into(self, field_selections: &[FieldSelection]) -> Vec<SelectionResult> {
         field_selections
             .iter()
-            .map(|field_selection| self.project(field_selection))
-            .collect()
-    }
+            .map(|field_selection| {
+                let pairs: Vec<_> = field_selection
+                    .selections()
+                    .map(|selected_field| {
+                        self.get(selected_field)
+                            .map(|value| (selected_field.clone(), value.clone()))
+                            .expect("Error splitting `ReturnValues`: `FieldSelection` doesn't match.")
+                    })
+                    .collect();
 
-    /// Projects this `SelectionResult` into a smaller or equal `SelectionResult`
-    /// according to the provided [`FieldSelection`].
-    pub fn project(&self, field_selection: &FieldSelection) -> SelectionResult {
-        let pairs: Vec<_> = field_selection
-            .selections()
-            .map(|selected_field| {
-                self.get(selected_field)
-                    .map(|value| (selected_field.clone(), value.clone()))
-                    .expect("Error splitting `ReturnValues`: `FieldSelection` doesn't match.")
+                SelectionResult::new(pairs)
             })
-            .collect();
-
-        SelectionResult::new(pairs)
+            .collect()
     }
 
     /// Checks if `self` only contains scalar field selections and if so, returns them all in a list.

@@ -111,10 +111,9 @@ impl FieldSelection {
         }
     }
 
-    /// Checks if a given `SelectionResult` satisfies this `FieldSelection`
-    /// (i.e., if the fields from `SelectionResult` are a superset of this `FieldSelection`).
+    /// Checks if a given `SelectionResult` belongs to this `FieldSelection`.
     pub fn matches(&self, result: &SelectionResult) -> bool {
-        self.selections().all(|s| result.get(s).is_some())
+        result.pairs.iter().all(|(rt, _)| self.selections.contains(rt))
     }
 
     /// Merges all given `FieldSelection` a set union of all.

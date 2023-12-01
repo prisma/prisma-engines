@@ -52,7 +52,7 @@ impl ExpressionResult {
         let converted = match self {
             Self::Query(ref result) => match result {
                 QueryResult::Id(id) => match id {
-                    Some(id) if field_selection.matches(id) => Some(vec![id.project(field_selection)]),
+                    Some(id) if field_selection.matches(id) => Some(vec![id.clone()]),
                     None => Some(vec![]),
                     Some(id) => {
                         trace!(
