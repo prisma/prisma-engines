@@ -127,8 +127,6 @@ pub(crate) async fn get_many_records_joins(
         records.reverse();
     }
 
-    dbg!(&records);
-
     Ok(records)
 }
 

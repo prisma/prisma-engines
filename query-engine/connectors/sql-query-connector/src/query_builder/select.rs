@@ -291,7 +291,11 @@ impl<'a> SelectBuilderExt<'a> for Select<'a> {
         selected_fields
             .selections()
             .fold(self, |acc, selection| match selection {
-                SelectedField::Scalar(sf) => acc.column(sf.as_column(ctx).table(table_alias.to_table_string())),
+                SelectedField::Scalar(sf) => acc.column(
+                    sf.as_column(ctx)
+                        .table(table_alias.to_table_string())
+                        .set_is_selected(true),
+                ),
                 SelectedField::Relation(rs) => {
                     let table_name = match rs.field.relation().is_many_to_many() {
                         true => m2m_join_alias_name(&rs.field),
