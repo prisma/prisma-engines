@@ -331,33 +331,33 @@
 ///
 </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>JsBaseQueryable {
     <span class="kw">pub</span>(<span class="kw">crate</span>) proxy: CommonProxy,
-    <span class="kw">pub </span>flavour: Flavour,
+    <span class="kw">pub </span>provider: Flavour,
 }
 
 <span class="kw">impl </span>JsBaseQueryable {
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>new(proxy: CommonProxy) -&gt; <span class="self">Self </span>{
-        <span class="kw">let </span>flavour: Flavour = proxy.flavour.parse().unwrap();
-        <span class="self">Self </span>{ proxy, flavour }
+        <span class="kw">let </span>provider: Flavour = proxy.provider.parse().unwrap();
+        <span class="self">Self </span>{ proxy, provider }
     }
 
-    <span class="doccomment">/// visit a quaint query AST according to the flavour of the JS connector
+    <span class="doccomment">/// visit a quaint query AST according to the provider of the JS connector
     </span><span class="kw">fn </span>visit_quaint_query&lt;<span class="lifetime">&#39;a</span>&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, q: QuaintQuery&lt;<span class="lifetime">&#39;a</span>&gt;) -&gt; quaint::Result&lt;(String, Vec&lt;quaint::Value&lt;<span class="lifetime">&#39;a</span>&gt;&gt;)&gt; {
-        <span class="kw">match </span><span class="self">self</span>.flavour {
+        <span class="kw">match </span><span class="self">self</span>.provider {
             Flavour::Mysql =&gt; visitor::Mysql::build(q),
             Flavour::Postgres =&gt; visitor::Postgres::build(q),
             Flavour::Sqlite =&gt; visitor::Sqlite::build(q),
-            <span class="kw">_ </span>=&gt; <span class="macro">unimplemented!</span>(<span class="string">&quot;Unsupported flavour for JS connector {:?}&quot;</span>, <span class="self">self</span>.flavour),
+            <span class="kw">_ </span>=&gt; <span class="macro">unimplemented!</span>(<span class="string">&quot;Unsupported provider for JS connector {:?}&quot;</span>, <span class="self">self</span>.provider),
         }
     }
 
     <span class="kw">async fn </span>build_query(<span class="kw-2">&amp;</span><span class="self">self</span>, sql: <span class="kw-2">&amp;</span>str, values: <span class="kw-2">&amp;</span>[quaint::Value&lt;<span class="lifetime">&#39;_</span>&gt;]) -&gt; quaint::Result&lt;Query&gt; {
         <span class="kw">let </span>sql: String = sql.to_string();
 
-        <span class="kw">let </span>converter = <span class="kw">match </span><span class="self">self</span>.flavour {
+        <span class="kw">let </span>converter = <span class="kw">match </span><span class="self">self</span>.provider {
             Flavour::Postgres =&gt; conversion::postgres::value_to_js_arg,
             Flavour::Sqlite =&gt; conversion::sqlite::value_to_js_arg,
             Flavour::Mysql =&gt; conversion::mysql::value_to_js_arg,
-            <span class="kw">_ </span>=&gt; <span class="macro">unreachable!</span>(<span class="string">&quot;Unsupported flavour for JS connector {:?}&quot;</span>, <span class="self">self</span>.flavour),
+            <span class="kw">_ </span>=&gt; <span class="macro">unreachable!</span>(<span class="string">&quot;Unsupported provider for JS connector {:?}&quot;</span>, <span class="self">self</span>.provider),
         };
 
         <span class="kw">let </span>args = values
@@ -429,7 +429,7 @@
             <span class="kw">return </span><span class="prelude-val">Err</span>(Error::builder(ErrorKind::invalid_isolation_level(<span class="kw-2">&amp;</span>isolation_level)).build());
         }
 
-        <span class="kw">if </span><span class="self">self</span>.flavour == Flavour::Sqlite {
+        <span class="kw">if </span><span class="self">self</span>.provider == Flavour::Sqlite {
             <span class="kw">return match </span>isolation_level {
                 IsolationLevel::Serializable =&gt; <span class="prelude-val">Ok</span>(()),
                 <span class="kw">_ </span>=&gt; <span class="prelude-val">Err</span>(Error::builder(ErrorKind::invalid_isolation_level(<span class="kw-2">&amp;</span>isolation_level)).build()),
@@ -441,7 +441,7 @@
     </span>}
 
     <span class="kw">fn </span>requires_isolation_first(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
-        <span class="kw">match </span><span class="self">self</span>.flavour {
+        <span class="kw">match </span><span class="self">self</span>.provider {
             Flavour::Mysql =&gt; <span class="bool-val">true</span>,
             Flavour::Postgres | Flavour::Sqlite =&gt; <span class="bool-val">false</span>,
             <span class="kw">_ </span>=&gt; <span class="macro">unreachable!</span>(),
