@@ -531,7 +531,7 @@ impl TryFrom<JSResultSet> for QuaintResultSet {
 
 impl CommonProxy {
     pub fn new(object: &JsObject) -> napi::Result<Self> {
-        let provider: JsString = object.get_named_property("provider")?;
+        let provider: JsString = object.get_named_property("provider").or_else(|_| object.get_named_property("flavour"))?;
 
         Ok(Self {
             query_raw: object.get_named_property("queryRaw")?,
