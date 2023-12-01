@@ -215,7 +215,7 @@ where
 
             Query::Write(WriteQuery::UpdateRecord(UpdateRecord::WithSelection(
                 UpdateRecordWithSelection {
-                    name: "update_with_selection".to_owned(),
+                    name: String::new(), // This node will not be serialized so we don't need a name.
                     model: model.clone(),
                     record_filter: filter.into(),
                     args,
