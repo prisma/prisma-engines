@@ -1,5 +1,6 @@
 use query_engine_tests::*;
 
+/// Regression test for https://github.com/prisma/prisma/issues/21182
 #[test_suite(schema(schema))]
 mod regression {
     use indoc::indoc;
@@ -33,7 +34,7 @@ mod regression {
     }
 
     #[connector_test]
-    async fn query_with_merged_deps(runner: Runner) -> TestResult<()> {
+    async fn query_with_normalized_dependencies(runner: Runner) -> TestResult<()> {
         run_query!(
             runner,
             indoc! {r#"
