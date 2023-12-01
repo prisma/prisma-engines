@@ -531,7 +531,15 @@ impl TryFrom<JSResultSet> for QuaintResultSet {
 
 impl CommonProxy {
     pub fn new(object: &JsObject) -> napi::Result<Self> {
-        let provider: JsString = object.get_named_property("provider").or_else(|_| object.get_named_property("flavour"))?;
+        // Background infos:
+        // - the provider was previously called "flavour", so we provide a temporary fallback for third-party providers
+        //   to give them time to adapt
+        // - reading a named property that does not exist yields a panic, despite the `Result<_, _>` return type
+        let provider: JsString = if object.has_named_property("provider")? {
+            object.get_named_property("provider")?
+        } else {
+            object.get_named_property("flavour")?
+        };
 
         Ok(Self {
             query_raw: object.get_named_property("queryRaw")?,
