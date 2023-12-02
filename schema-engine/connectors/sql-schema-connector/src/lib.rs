@@ -409,7 +409,7 @@ async fn best_effort_reset_impl(
         return Ok(());
     }
 
-    let mut migration = apply_migration::render_script(
+    let migration = apply_migration::render_script(
         &Migration::new(migration),
         &DestructiveChangeDiagnostics::default(),
         flavour,
