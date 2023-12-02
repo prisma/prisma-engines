@@ -42,7 +42,7 @@ fn failing_migration_after_migration_dropping_data(api: TestApi) {
 
            0: sql_schema_connector::apply_migration::apply_script
                    with [3mmigration_name[0m[2m=[0m"  2"
-                     at schema-engine/connectors/sql-schema-connector/src/apply_migration.rs:106
+                     at schema-engine/connectors/sql-schema-connector/src/apply_migration.rs:111
            1: schema_core::commands::apply_migrations::Applying migration
                    with [3mmigration_name[0m[2m=[0m"  2"
                      at schema-engine/core/src/commands/apply_migrations.rs:91"#]];
@@ -89,7 +89,7 @@ fn failing_step_in_migration_dropping_data(api: TestApi) {
 
            0: sql_schema_connector::apply_migration::apply_script
                    with [3mmigration_name[0m[2m=[0m"  1"
-                     at schema-engine/connectors/sql-schema-connector/src/apply_migration.rs:106
+                     at schema-engine/connectors/sql-schema-connector/src/apply_migration.rs:111
            1: schema_core::commands::apply_migrations::Applying migration
                    with [3mmigration_name[0m[2m=[0m"  1"
                      at schema-engine/core/src/commands/apply_migrations.rs:91"#]];
@@ -203,7 +203,7 @@ fn syntax_errors_return_error_position(api: TestApi) {
 
            0: sql_schema_connector::apply_migration::apply_script
                    with [3mmigration_name[0m[2m=[0m"  0"
-                     at schema-engine/connectors/sql-schema-connector/src/apply_migration.rs:106
+                     at schema-engine/connectors/sql-schema-connector/src/apply_migration.rs:111
            1: schema_core::commands::apply_migrations::Applying migration
                    with [3mmigration_name[0m[2m=[0m"  0"
                      at schema-engine/core/src/commands/apply_migrations.rs:91"#]];
