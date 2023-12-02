@@ -285,6 +285,8 @@ fn default_current_timestamp_precision_follows_column_precision(api: TestApi) {
 
     let expected_migration = indoc!(
         r#"
+        SET foreign_key_checks = 0;
+
         -- CreateTable
         CREATE TABLE `A` (
             `id` INTEGER NOT NULL,
@@ -317,6 +319,8 @@ fn datetime_dbgenerated_defaults(api: TestApi) {
 
     let expected_migration = indoc!(
         r#"
+        SET foreign_key_checks = 0;
+
         -- CreateTable
         CREATE TABLE `A` (
             `id` INTEGER NOT NULL AUTO_INCREMENT,
@@ -340,6 +344,8 @@ fn mysql_apply_migrations_errors_gives_the_failed_sql(api: TestApi) {
     let migrations_directory = api.create_migrations_directory();
 
     let migration = r#"
+        SET foreign_key_checks = 0;
+
         CREATE TABLE `Cat` ( id INTEGER PRIMARY KEY );
 
         DROP TABLE `Emu`;
@@ -479,6 +485,8 @@ fn dropping_m2m_relation_from_datamodel_works() {
     });
 
     let expected = expect![[r#"
+        SET foreign_key_checks = 0;
+
         -- DropForeignKey
         ALTER TABLE `_puppyFriendships` DROP FOREIGN KEY `_puppyFriendships_A_fkey`;
 
@@ -551,6 +559,8 @@ fn alter_constraint_name(mut api: TestApi) {
             let expected_script = if is_mysql_5_6 || is_mariadb {
                 expect![[
                      r#"
+                 SET foreign_key_checks = 0;
+
                  -- DropForeignKey
                  ALTER TABLE `B` DROP FOREIGN KEY `B_aId_fkey`;
 
@@ -575,6 +585,8 @@ fn alter_constraint_name(mut api: TestApi) {
                  "#]]
             } else {
                 expect![[r#"
+                 SET foreign_key_checks = 0;
+
                  -- DropForeignKey
                  ALTER TABLE `B` DROP FOREIGN KEY `B_aId_fkey`;
 
@@ -613,6 +625,8 @@ fn bigint_defaults_work(api: TestApi) {
         }
     "#;
     let sql = expect![[r#"
+        SET foreign_key_checks = 0;
+
         -- CreateTable
         CREATE TABLE `foo` (
             `id` VARCHAR(191) NOT NULL,
