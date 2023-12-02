@@ -5,7 +5,7 @@ use crate::{
     sql_migration::{AlterColumn, AlterEnum, AlterTable, RedefineTable, TableChange},
     sql_schema_differ::ColumnChanges,
 };
-use indoc::{indoc};
+use indoc::indoc;
 use once_cell::sync::Lazy;
 use psl::builtin_connectors::MySqlType;
 use regex::Regex;
