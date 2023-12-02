@@ -2,7 +2,7 @@ use query_engine_tests::*;
 
 // https://stackoverflow.com/questions/4380813/how-to-get-rid-of-mysql-error-prepared-statement-needs-to-be-re-prepared
 // Looks like there's a bug with create view stmt on MariaDB
-#[test_suite(schema(schema), exclude(MongoDb, MySQL("mariadb"), Vitess))]
+#[test_suite(schema(schema), exclude(MongoDb, MySQL("mariadb"), MySql(5.6), Vitess))]
 mod views {
     use query_engine_tests::{connector_test, run_query, Runner};
 
@@ -37,7 +37,7 @@ mod views {
         schema.to_owned()
     }
 
-    #[connector_test(exclude(MySql(5.6)))]
+    #[connector_test]
     async fn simple_read(runner: Runner) -> TestResult<()> {
         create_test_data(&runner, "simple_read").await?;
 
@@ -63,7 +63,7 @@ mod views {
         Ok(())
     }
 
-    #[connector_test(exclude(MySql(5.6)))]
+    #[connector_test]
     async fn filtered_read(runner: Runner) -> TestResult<()> {
         create_test_data(&runner, "filtered_read").await?;
 
@@ -88,7 +88,7 @@ mod views {
         Ok(())
     }
 
-    #[connector_test(exclude(MySql(5.6)))]
+    #[connector_test]
     async fn sorted_read(runner: Runner) -> TestResult<()> {
         create_test_data(&runner, "sorted_read").await?;
 
