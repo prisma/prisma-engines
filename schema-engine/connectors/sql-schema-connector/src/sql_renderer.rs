@@ -114,6 +114,11 @@ pub(crate) trait SqlRenderer {
         None
     }
 
+    /// Render a foreign key checks = 0.
+    fn render_foreign_key_checks_0(&self) -> Option<&'static str> {
+        None
+    }
+
     /// Render a `RenameForeignKey` step.
     fn render_rename_foreign_key(&self, fks: MigrationPair<ForeignKeyWalker<'_>>) -> String;
 

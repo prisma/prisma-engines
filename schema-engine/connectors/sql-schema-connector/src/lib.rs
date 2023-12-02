@@ -415,8 +415,6 @@ async fn best_effort_reset_impl(
         flavour,
     )?;
 
-    migration = format!("SET foreign_key_checks = 0;{}\n", migration);
-
     flavour.raw_cmd(&migration).await?;
 
     Ok(())

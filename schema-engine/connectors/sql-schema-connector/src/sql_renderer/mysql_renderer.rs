@@ -343,6 +343,14 @@ impl SqlRenderer for MysqlFlavour {
     fn render_rename_foreign_key(&self, _fks: MigrationPair<ForeignKeyWalker<'_>>) -> String {
         unreachable!("render RenameForeignKey on MySQL")
     }
+
+    fn render_commit_transaction(&self) -> Option<&'static str> {
+        let sql = indoc! { r#"
+            SET foreign_key_checks = 0;
+        "# };
+
+        Some(sql)
+    }
 }
 
 fn render_mysql_modify(

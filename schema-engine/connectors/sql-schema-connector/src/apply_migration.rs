@@ -64,6 +64,11 @@ pub(crate) fn render_script(
     // some steps don't render anything.
     let mut is_first_step = true;
 
+    if let Some(fkc0) = flavour.render_foreign_key_checks_0() {
+        script.push_str(fkc0);
+        script.push('\n');
+    }
+
     if let Some(begin) = flavour.render_begin_transaction() {
         script.push_str(begin);
         script.push('\n');
