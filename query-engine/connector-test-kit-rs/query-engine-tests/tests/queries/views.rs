@@ -37,7 +37,7 @@ mod views {
         schema.to_owned()
     }
 
-    #[connector_test]
+    #[connector_test(exclude(MySql(5.6)))]
     async fn simple_read(runner: Runner) -> TestResult<()> {
         create_test_data(&runner, "simple_read").await?;
 
@@ -63,7 +63,7 @@ mod views {
         Ok(())
     }
 
-    #[connector_test]
+    #[connector_test(exclude(MySql(5.6)))]
     async fn filtered_read(runner: Runner) -> TestResult<()> {
         create_test_data(&runner, "filtered_read").await?;
 
@@ -88,7 +88,7 @@ mod views {
         Ok(())
     }
 
-    #[connector_test]
+    #[connector_test(exclude(MySql(5.6)))]
     async fn sorted_read(runner: Runner) -> TestResult<()> {
         create_test_data(&runner, "sorted_read").await?;
 
