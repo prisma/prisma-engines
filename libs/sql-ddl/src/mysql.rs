@@ -428,6 +428,8 @@ mod tests {
 
         let expected = indoc!(
             r#"
+            SET foreign_key_checks = 0;
+            
             CREATE TABLE `Cat` (
                 `id` INTEGER NULL AUTO_INCREMENT PRIMARY KEY,
                 `test` BINARY(16) NOT NULL DEFAULT (uuid_to_bin(uuid()))

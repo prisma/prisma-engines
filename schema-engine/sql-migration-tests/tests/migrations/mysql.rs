@@ -384,7 +384,7 @@ fn mysql_apply_migrations_errors_gives_the_failed_sql(api: TestApi) {
             Database error:
             target: test.0.primary: vttablet: rpc error: code = InvalidArgument desc = Unknown table 'vt_test_0.Emu' (errno 1051) (sqlstate 42S02) (CallerID: userData1): Sql: "drop table Emu", BindVars: {}
 
-            Please check the query number 2 from the migration file.
+            Please check the query number 3 from the migration file.
 
         "#]]
     } else if cfg!(windows) {
@@ -398,7 +398,7 @@ fn mysql_apply_migrations_errors_gives_the_failed_sql(api: TestApi) {
             Database error:
             Unknown table 'mysql_apply_migrations_errors_gives_the_failed_sql.emu'
 
-            Please check the query number 2 from the migration file.
+            Please check the query number 3 from the migration file.
 
         "#]]
     } else {
@@ -412,7 +412,7 @@ fn mysql_apply_migrations_errors_gives_the_failed_sql(api: TestApi) {
             Database error:
             Unknown table 'mysql_apply_migrations_errors_gives_the_failed_sql.Emu'
 
-            Please check the query number 2 from the migration file.
+            Please check the query number 3 from the migration file.
 
         "#]]
     };

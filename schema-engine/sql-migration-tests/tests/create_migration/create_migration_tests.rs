@@ -46,6 +46,8 @@ fn basic_create_migration_works(api: TestApi) {
                     "#]]
             } else if is_mysql {
                 expect![[r#"
+                        SET foreign_key_checks = 0;
+
                         -- CreateTable
                         CREATE TABLE `Cat` (
                             `id` INTEGER NOT NULL,
@@ -158,6 +160,8 @@ fn creating_a_second_migration_should_have_the_previous_sql_schema_as_baseline(a
                         "#]]
             } else if is_mysql {
                 expect![[r#"
+                        SET foreign_key_checks = 0;
+
                         -- CreateTable
                         CREATE TABLE `Dog` (
                             `id` INTEGER NOT NULL,
@@ -382,6 +386,8 @@ fn create_enum_step_only_rendered_when_needed(api: TestApi) {
             } else if is_mysql {
                 indoc! {
                     r#"
+                        SET foreign_key_checks = 0;
+                        
                         -- CreateTable
                         CREATE TABLE `Cat` (
                             `id` INTEGER NOT NULL,
@@ -696,6 +702,8 @@ fn create_constraint_name_tests_w_implicit_names(api: TestApi) {
             } else if is_mysql {
                 expect![[
                      r#"
+                 SET foreign_key_checks = 0;
+                 
                  -- CreateTable
                  CREATE TABLE `A` (
                      `id` INTEGER NOT NULL,
@@ -933,6 +941,8 @@ fn create_constraint_name_tests_w_explicit_names(api: TestApi) {
             } else if is_mysql {
                 expect![[
                      r#"
+                 SET foreign_key_checks = 0;
+                 
                  -- CreateTable
                  CREATE TABLE `A` (
                      `id` INTEGER NOT NULL,

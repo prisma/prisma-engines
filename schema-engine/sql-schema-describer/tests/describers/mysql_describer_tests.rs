@@ -2581,6 +2581,8 @@ fn mysql_foreign_key_on_delete_must_be_handled(api: TestApi) {
 #[test_connector(tags(Mysql))]
 fn mysql_join_table_unique_indexes_must_be_inferred(api: TestApi) {
     let sql = r#"
+        SET foreign_key_checks = 0;
+
         CREATE TABLE `Cat` (
             id INTEGER AUTO_INCREMENT PRIMARY KEY,
             name TEXT
