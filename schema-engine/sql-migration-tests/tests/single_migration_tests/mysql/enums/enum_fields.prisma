@@ -22,6 +22,8 @@ enum Kind {
   error
 }
 // Expected Migration:
+// SET foreign_key_checks = 0;
+// 
 // -- CreateTable
 // CREATE TABLE `MyTable` (
 //     `id` INTEGER NOT NULL,
