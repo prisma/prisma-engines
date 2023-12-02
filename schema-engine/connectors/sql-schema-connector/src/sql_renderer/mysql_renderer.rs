@@ -5,6 +5,7 @@ use crate::{
     sql_migration::{AlterColumn, AlterEnum, AlterTable, RedefineTable, TableChange},
     sql_schema_differ::ColumnChanges,
 };
+use indoc::{formatdoc, indoc};
 use once_cell::sync::Lazy;
 use psl::builtin_connectors::MySqlType;
 use regex::Regex;
@@ -344,7 +345,7 @@ impl SqlRenderer for MysqlFlavour {
         unreachable!("render RenameForeignKey on MySQL")
     }
 
-    fn render_commit_transaction(&self) -> Option<&'static str> {
+    fn render_foreign_key_checks_0(&self) -> Option<&'static str> {
         let sql = indoc! { r#"
             SET foreign_key_checks = 0;
         "# };
