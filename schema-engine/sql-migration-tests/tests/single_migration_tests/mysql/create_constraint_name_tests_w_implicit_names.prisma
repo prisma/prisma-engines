@@ -26,6 +26,8 @@ model B {
 }
 
 // Expected Migration:
+// SET foreign_key_checks = 0;
+// 
 // -- CreateTable
 // CREATE TABLE `A` (
 //     `id` INTEGER NOT NULL,
