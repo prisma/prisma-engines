@@ -840,10 +840,9 @@ async fn push_foreign_keys(
             INNER JOIN information_schema.referential_constraints AS rc ON
                 BINARY kcu.constraint_name = BINARY rc.constraint_name
             WHERE
-                BINARY kcu.table_schema = ?
+                (BINARY kcu.table_schema = ? OR BINARY kcu.table_schema = vt_?_0)
                 AND BINARY rc.constraint_schema = ?
                 AND kcu.referenced_column_name IS NOT NULL
-
             ORDER BY
                 BINARY kcu.table_schema,
                 BINARY kcu.table_name,
@@ -869,7 +868,7 @@ async fn push_foreign_keys(
         Some((table_id, column_id, referenced_table_id, referenced_column_id))
     }
 
-    let result_set = conn.query_raw(sql, &[schema_name.into(), schema_name.into()]).await?;
+    let result_set = conn.query_raw(sql, &[schema_name.into(), schema_name.into(), schema_name.into()]).await?;
     let mut current_fk: Option<(TableId, String, ForeignKeyId)> = None;
 
     for row in result_set.into_iter() {
