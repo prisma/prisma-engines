@@ -868,7 +868,9 @@ async fn push_foreign_keys(
         Some((table_id, column_id, referenced_table_id, referenced_column_id))
     }
 
-    let result_set = conn.query_raw(sql, &[schema_name.into(), schema_name.into(), schema_name.into()]).await?;
+    let result_set = conn
+        .query_raw(sql, &[schema_name.into(), schema_name.into(), schema_name.into()])
+        .await?;
     let mut current_fk: Option<(TableId, String, ForeignKeyId)> = None;
 
     for row in result_set.into_iter() {
