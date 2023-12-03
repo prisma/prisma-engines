@@ -841,7 +841,7 @@ async fn push_foreign_keys(
                 BINARY kcu.constraint_name = BINARY rc.constraint_name
             WHERE
                 (BINARY kcu.table_schema = ? OR BINARY kcu.table_schema = ?)
-                AND BINARY rc.constraint_schema = ?
+                AND (BINARY rc.constraint_schema = ? OR BINARY rc.constraint_schema = ?)
                 AND kcu.referenced_column_name IS NOT NULL
             ORDER BY
                 BINARY kcu.table_schema,
@@ -870,7 +870,7 @@ async fn push_foreign_keys(
 
     let vt_schema_name = format!("vt_{}_0", schema_name);
     let result_set = conn
-        .query_raw(sql, &[schema_name.into(), vt_schema_name.into(), schema_name.into()])
+        .query_raw(sql, &[schema_name.into(), vt_schema_name.into(), schema_name.into(), vt_schema_name.into()])
         .await?;
     let mut current_fk: Option<(TableId, String, ForeignKeyId)> = None;
 
