@@ -79,16 +79,16 @@ features!(
     Views,
 );
 
-/// Generator preview features
+/// Generator preview features (alphabetically sorted)
 pub const ALL_PREVIEW_FEATURES: FeatureMap = FeatureMap {
     active: enumflags2::make_bitflags!(PreviewFeature::{
         Deno
-         | NativeDistinct
          | DriverAdapters
          | FullTextIndex
          | FullTextSearch
          | Metrics
          | MultiSchema
+         | NativeDistinct
          | PostgresqlExtensions
          | Tracing
          | Views
