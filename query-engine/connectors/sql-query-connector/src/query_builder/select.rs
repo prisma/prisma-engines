@@ -12,7 +12,7 @@ use crate::{
 use quaint::prelude::*;
 use query_structure::*;
 
-pub const JSON_AGG_IDENT: &str = "data";
+pub const JSON_AGG_IDENT: &str = "__prisma_data__";
 
 #[derive(Debug, Default)]
 pub(crate) struct SelectBuilder {
