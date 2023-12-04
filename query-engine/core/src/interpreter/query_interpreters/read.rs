@@ -1,8 +1,7 @@
-use super::*;
+use super::{inmemory_record_processor::InMemoryRecordProcessor, *};
 use crate::{interpreter::InterpretationResult, query_ast::*, result_ast::*};
 use connector::{self, error::ConnectorError, ConnectionLike, RelAggregationRow, RelAggregationSelection};
 use futures::future::{BoxFuture, FutureExt};
-use inmemory_record_processor::InMemoryRecordProcessor;
 use query_structure::ManyRecords;
 use std::collections::HashMap;
 use user_facing_errors::KnownError;
