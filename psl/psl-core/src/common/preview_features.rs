@@ -34,7 +34,7 @@ macro_rules! features {
     };
 }
 
-// (Usually) Append-only list of features.
+// (Usually) Append-only list of features. (alphabetically sorted)
 features!(
     AggregateApi,
     AtomicNumberOperations,
