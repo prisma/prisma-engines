@@ -5,11 +5,14 @@ pub mod cockroach_datamodel_connector;
 pub mod completions;
 
 pub use cockroach_datamodel_connector::CockroachType;
+pub use geometry::{GeometryParams, GeometryType};
 pub use mongodb::MongoDbType;
 pub use mssql_datamodel_connector::{MsSqlType, MsSqlTypeParameter};
 pub use mysql_datamodel_connector::MySqlType;
 pub use postgres_datamodel_connector::{PostgresDatasourceProperties, PostgresType};
+pub use sqlite_datamodel_connector::SQLiteType;
 
+mod geometry;
 mod mongodb;
 mod mssql_datamodel_connector;
 mod mysql_datamodel_connector;

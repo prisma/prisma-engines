@@ -9,7 +9,8 @@ use itertools::Itertools;
 use mongodb::bson::{oid::ObjectId, spec::BinarySubtype, Binary, Bson, Document, Timestamp};
 use psl::builtin_connectors::MongoDbType;
 use query_structure::{
-    CompositeFieldRef, Field, PrismaValue, RelationFieldRef, ScalarFieldRef, SelectedField, TypeIdentifier,
+    CompositeFieldRef, Field, GeometryFormat, PrismaValue, RelationFieldRef, ScalarFieldRef, SelectedField,
+    TypeIdentifier,
 };
 use serde_json::Value;
 use std::{convert::TryFrom, fmt::Display};
@@ -263,6 +264,15 @@ impl IntoBson for (&TypeIdentifier, PrismaValue) {
                 })?
             }
 
+            // Geometry
+            (TypeIdentifier::Geometry(GeometryFormat::GeoJSON), PrismaValue::GeoJson(json)) => {
+                let val: Value = serde_json::from_str(&json)?;
+                Bson::try_from(val).map_err(|_| MongoError::ConversionError {
+                    from: "Stringified JSON".to_owned(),
+                    to: "Mongo BSON (extJSON)".to_owned(),
+                })?
+            }
+
             // List values
             (typ, PrismaValue::List(vals)) => Bson::Array(
                 vals.into_iter()
@@ -373,6 +383,11 @@ fn read_scalar_value(bson: Bson, meta: &ScalarOutputMeta) -> crate::Result<Prism
 
         // Json
         (TypeIdentifier::Json, bson) => PrismaValue::Json(serde_json::to_string(&bson.into_relaxed_extjson())?),
+
+        // Geometry
+        (TypeIdentifier::Geometry(GeometryFormat::GeoJSON), bson @ Bson::Document(_)) => {
+            PrismaValue::GeoJson(serde_json::to_string(&bson.into_relaxed_extjson())?)
+        }
 
         (ident, bson) => {
             return Err(MongoError::ConversionError {

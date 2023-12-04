@@ -77,6 +77,14 @@ impl<'a> OutputType<'a> {
         InnerOutputType::Scalar(ScalarType::Bytes)
     }
 
+    pub(crate) fn ewkt_geometry() -> InnerOutputType<'a> {
+        InnerOutputType::Scalar(ScalarType::Geometry)
+    }
+
+    pub(crate) fn geojson_geometry() -> InnerOutputType<'a> {
+        InnerOutputType::Scalar(ScalarType::GeoJson)
+    }
+
     /// Attempts to recurse through the type until an object type is found.
     /// Returns Some(ObjectTypeStrongRef) if ab object type is found, None otherwise.
     pub fn as_object_type<'b>(&'b self) -> Option<&'b ObjectType<'a>> {

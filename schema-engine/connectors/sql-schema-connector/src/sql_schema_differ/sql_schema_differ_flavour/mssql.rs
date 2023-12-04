@@ -123,6 +123,16 @@ fn native_type_change_riskyness(previous: &MsSqlType, next: &MsSqlType) -> Optio
     use MsSqlTypeParameter::*;
 
     let cast = || match previous {
+        MsSqlType::Geometry => match next {
+            MsSqlType::Geometry => SafeCast,
+            _ => NotCastable,
+        },
+
+        MsSqlType::Geography => match next {
+            MsSqlType::Geography => SafeCast,
+            _ => NotCastable,
+        },
+
         // Bit, as in booleans. 1 or 0.
         MsSqlType::Bit => match next {
             MsSqlType::TinyInt => SafeCast,
