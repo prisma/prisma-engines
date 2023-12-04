@@ -15,6 +15,7 @@ in
       nodejs.pkgs.pnpm
 
       jq
+      graphviz
       wasm-bindgen-cli
       wasm-pack
     ];
