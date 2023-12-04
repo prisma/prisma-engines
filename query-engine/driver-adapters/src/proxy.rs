@@ -1,6 +1,6 @@
 use crate::send_future::SendFuture;
 pub use crate::types::{ColumnType, JSResultSet, Query, TransactionOptions};
-use crate::{from_js_value, get_named_property, to_rust_str, JsObject, JsResult, JsString};
+use crate::{from_js_value, get_named_property, has_named_property, to_rust_str, JsObject, JsResult, JsString};
 
 use crate::{AsyncJsFunction, JsTransaction};
 use futures::Future;
@@ -22,8 +22,8 @@ pub(crate) struct CommonProxy {
     /// returning the number of affected rows.
     execute_raw: AsyncJsFunction<Query, u32>,
 
-    /// Return the flavour for this driver.
-    pub(crate) flavour: String,
+    /// Return the provider for this driver.
+    pub(crate) provider: String,
 }
 
 /// This is a JS proxy for accessing the methods specific to top level
@@ -52,12 +52,20 @@ pub(crate) struct TransactionProxy {
 
 impl CommonProxy {
     pub fn new(object: &JsObject) -> JsResult<Self> {
-        let flavour: JsString = get_named_property(object, "flavour")?;
+        // Background info:
+        // - the provider was previously called "flavour", so we provide a temporary fallback for third-party providers
+        //   to give them time to adapt
+        // - reading a named property that does not exist yields a panic, despite the `Result<_, _>` return type
+        let provider: JsString = if has_named_property(object, "provider")? {
+            get_named_property(object, "provider")?
+        } else {
+            get_named_property(object, "flavour")?
+        };
 
         Ok(Self {
             query_raw: get_named_property(object, "queryRaw")?,
             execute_raw: get_named_property(object, "executeRaw")?,
-            flavour: to_rust_str(flavour)?,
+            provider: to_rust_str(provider)?,
         })
     }
 
