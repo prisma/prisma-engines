@@ -34,7 +34,7 @@ macro_rules! features {
     };
 }
 
-// (Usually) Append-only list of features.
+// (Usually) Append-only list of features. (alphabetically sorted)
 features!(
     AggregateApi,
     AtomicNumberOperations,
@@ -43,7 +43,6 @@ features!(
     ConnectOrCreate,
     CreateMany,
     DataProxy,
-    DistinctOn,
     Deno,
     Distinct,
     DriverAdapters,
@@ -65,6 +64,7 @@ features!(
     MultiSchema,
     NamedConstraints,
     NApi,
+    NativeDistinct,
     NativeTypes,
     OrderByAggregateGroup,
     OrderByNulls,
@@ -79,16 +79,16 @@ features!(
     Views,
 );
 
-/// Generator preview features
+/// Generator preview features (alphabetically sorted)
 pub const ALL_PREVIEW_FEATURES: FeatureMap = FeatureMap {
     active: enumflags2::make_bitflags!(PreviewFeature::{
         Deno
-         | DistinctOn
          | DriverAdapters
          | FullTextIndex
          | FullTextSearch
          | Metrics
          | MultiSchema
+         | NativeDistinct
          | PostgresqlExtensions
          | Tracing
          | Views
