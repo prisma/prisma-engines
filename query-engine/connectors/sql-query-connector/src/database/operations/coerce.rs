@@ -10,9 +10,9 @@ use crate::{query_arguments_ext::QueryArgumentsExt, SqlError};
 /// Note: Some in-memory processing is baked into this function too for performance reasons.
 pub(crate) fn coerce_record_with_json_relation(
     record: &mut Record,
-    rq_indexes: Vec<(usize, &RelationSelection)>,
+    rs_indexes: Vec<(usize, &RelationSelection)>,
 ) -> crate::Result<()> {
-    for (val_idx, rs) in rq_indexes {
+    for (val_idx, rs) in rs_indexes {
         let val = record.values.get_mut(val_idx).unwrap();
         // TODO(perf): Find ways to avoid serializing and deserializing multiple times.
         let json_val: serde_json::Value = serde_json::from_str(val.as_json().unwrap()).unwrap();

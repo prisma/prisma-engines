@@ -104,8 +104,7 @@ pub(crate) async fn get_many_records_joins(
     match ctx.max_bind_values {
         Some(chunk_size) if query_arguments.should_batch(chunk_size) => {
             return Err(SqlError::QueryParameterLimitExceeded(
-                "Joined queries cannot be split into multiple queries just yet. If you encounter this error, please open an issue"
-                    .to_string(),
+                "Joined queries cannot be split into multiple queries.".to_string(),
             ));
         }
         _ => (),

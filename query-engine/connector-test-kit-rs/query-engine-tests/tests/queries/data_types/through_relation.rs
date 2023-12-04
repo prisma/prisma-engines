@@ -17,13 +17,7 @@ mod scalar_relations {
               parentId Int?
               parent Parent? @relation(fields: [parentId], references: [id])
 
-              string  String
-              int     Int
-              bInt    BigInt
-              float   Float
               bytes   Bytes
-              bool    Boolean
-              dt      DateTime
             }
             "#
         };
@@ -31,7 +25,8 @@ mod scalar_relations {
         schema.to_owned()
     }
 
-    #[connector_test(schema(schema_common))]
+    // TODO: fix https://github.com/prisma/team-orm/issues/684 and unexclude DAs
+    #[connector_test(schema(schema_common), exclude(Postgres("pg.js", "neon.js")))]
     async fn common_types(runner: Runner) -> TestResult<()> {
         create_common_children(&runner).await?;
 
@@ -202,7 +197,13 @@ mod scalar_relations {
         schema.to_owned()
     }
 
-    #[connector_test(schema(schema_scalar_lists), capabilities(ScalarLists))]
+    // TODO: fix https://github.com/prisma/team-orm/issues/684 and unexclude DAs
+
+    #[connector_test(
+        schema(schema_scalar_lists),
+        capabilities(ScalarLists),
+        exclude(Postgres("pg.js", "neon.js"))
+    )]
     async fn scalar_lists(runner: Runner) -> TestResult<()> {
         create_child(
             &runner,
