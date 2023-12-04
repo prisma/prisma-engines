@@ -93,7 +93,7 @@ impl QueryArguments {
             .dm
             .schema
             .connector
-            .has_capability(ConnectorCapability::NativeDistinct);
+            .has_capability(ConnectorCapability::DistinctOn);
 
         has_distinct_feature && connector_can_distinct_in_db && self.order_by.is_empty()
     }
