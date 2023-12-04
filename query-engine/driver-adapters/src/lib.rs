@@ -38,8 +38,11 @@ pub(crate) use wasm::*;
 
 #[cfg(target_arch = "wasm32")]
 mod arch {
+    use std::str::FromStr;
+
     pub(crate) use super::JsObject;
     pub(crate) use js_sys::JsString;
+    use js_sys::Reflect;
     use tsify::Tsify;
     use wasm_bindgen::JsValue;
 
@@ -51,7 +54,7 @@ mod arch {
     }
 
     pub(crate) fn has_named_property(object: &JsObject, name: &str) -> JsResult<bool> {
-        Ok(JsObject::has_own(object, name.into()))
+        Ok(Reflect::has(&object, &JsString::from_str(name).unwrap().into())?)
     }
 
     pub(crate) fn to_rust_str(value: JsString) -> JsResult<String> {
