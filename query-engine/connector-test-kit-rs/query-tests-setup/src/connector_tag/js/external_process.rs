@@ -173,7 +173,8 @@ fn start_rpc_thread(mut receiver: mpsc::Receiver<ReqImpl>) -> Result<()> {
 
             let mut stdout = BufReader::new(process.stdout.unwrap()).lines();
             let mut stdin = process.stdin.unwrap();
-            let mut last_pending_request: Option<(jsonrpc_core::Id, oneshot::Sender<Result<serde_json::value::Value>>)> = None;
+            let mut pending_requests: HashMap<jsonrpc_core::Id, oneshot::Sender<Result<serde_json::value::Value>>> =
+                HashMap::new();
 
             loop {
                 tokio::select! {
@@ -187,11 +188,7 @@ fn start_rpc_thread(mut receiver: mpsc::Receiver<ReqImpl>) -> Result<()> {
                             {
                                 match serde_json::from_str::<jsonrpc_core::Output>(&line) {
                                     Ok(response) => {
-                                        let (id, sender) = last_pending_request.take().expect("got a response from the external process, but there was no pending request");
-                                        if &id != response.id() {
-                                            unreachable!("got a response from the external process, but the id didn't match. Are you running with cargo tests with `--test-threads=1`");
-                                        }
-
+                                        let sender = pending_requests.remove(response.id()).unwrap();
                                         match response {
                                             jsonrpc_core::Output::Success(success) => {
                                                 // The other end may be dropped if the whole
@@ -213,12 +210,7 @@ fn start_rpc_thread(mut receiver: mpsc::Receiver<ReqImpl>) -> Result<()> {
                             }
                             Ok(None) => // end of the stream
                             {
-                                tracing::error!("Error when reading from child node process. Process might have exited. Restarting...");
-                                if let Some((_, sender)) = last_pending_request.take() {
-                                    sender.send(Err(Box::new(ExecutorProcessDiedError))).unwrap();
-                                }
-                                EXTERNAL_PROCESS.restart().await;
-                                break;
+                                exit_with_message(1, "child node process stdout closed")
                             }
                             Err(err) => // log it
                             {
@@ -233,7 +225,7 @@ fn start_rpc_thread(mut receiver: mpsc::Receiver<ReqImpl>) -> Result<()> {
                                 exit_with_message(1, "The json-rpc client channel was closed");
                             }
                             Some((request, response_sender)) => {
-                                last_pending_request = Some((request.id.clone(), response_sender));
+                                pending_requests.insert(request.id.clone(), response_sender);
                                 let mut req = serde_json::to_vec(&request).unwrap();
                                 req.push(b'\n');
                                 stdin.write_all(&req).await.unwrap();
