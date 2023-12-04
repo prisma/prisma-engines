@@ -15,10 +15,10 @@ OUT_NPM_NAME="@prisma/query-engine-wasm"
 sed -i '' 's/name = "query_engine_wasm"/name = "query_engine"/g' Cargo.toml
 
 # use `wasm-pack build --release` on CI only
-if [[ -z "$BUILDKITE" ]] || [[ -z "$GITHUB_ACTIONS" ]]; then
-    BUILD_PROFILE="--release"
-else
+if [[ -z "$BUILDKITE" ]] && [[ -z "$GITHUB_ACTIONS" ]]; then
     BUILD_PROFILE="--dev"
+else
+    BUILD_PROFILE="--release"
 fi
 
 # Check if wasm-pack is installed
