@@ -254,9 +254,15 @@ pub trait Visitor<'a> {
 
         self.write("SELECT ")?;
 
-        if select.distinct {
-            self.write("DISTINCT ")?;
-        }
+        if let Some(distinct) = select.distinct {
+            match distinct {
+                DistinctType::Default => self.write("DISTINCT ")?,
+                DistinctType::OnClause(columns) => {
+                    self.write("DISTINCT ON ")?;
+                    self.surround_with("(", ") ", |ref mut s| s.visit_columns(columns))?;
+                }
+            }
+        };
 
         if !select.tables.is_empty() {
             if select.columns.is_empty() {

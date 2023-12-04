@@ -11,6 +11,7 @@ pub(crate) async fn m2m(
     trace_id: Option<String>,
 ) -> InterpretationResult<(ManyRecords, Option<Vec<RelAggregationRow>>)> {
     let processor = InMemoryRecordProcessor::new_from_query_args(&mut query.args);
+
     let parent_field = &query.parent_field;
     let child_link_id = parent_field.related_field().linking_fields();
 

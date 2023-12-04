@@ -106,6 +106,17 @@ impl SelectDefinition for QueryArguments {
             .iter()
             .fold(select_ast, |acc, o| acc.order_by(o.order_definition.clone()));
 
+        let select_ast = if let Some(distinct) = self.distinct {
+            let distinct_fields = ModelProjection::from(distinct)
+                .as_columns(ctx)
+                .map(Expression::from)
+                .collect_vec();
+
+            select_ast.distinct_on(distinct_fields)
+        } else {
+            select_ast
+        };
+
         match limit {
             Some(limit) => (select_ast.limit(limit as usize), aggregation_joins.columns),
             None => (select_ast, aggregation_joins.columns),

@@ -43,6 +43,7 @@ features!(
     ConnectOrCreate,
     CreateMany,
     DataProxy,
+    DistinctOn,
     Deno,
     Distinct,
     DriverAdapters,
@@ -83,6 +84,7 @@ features!(
 pub const ALL_PREVIEW_FEATURES: FeatureMap = FeatureMap {
     active: enumflags2::make_bitflags!(PreviewFeature::{
         Deno
+         | DistinctOn
          | DriverAdapters
          | FullTextIndex
          | FullTextSearch

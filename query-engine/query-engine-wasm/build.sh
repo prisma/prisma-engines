@@ -5,10 +5,25 @@
 OUT_VERSION="$1"
 OUT_FOLDER="pkg"
 OUT_JSON="${OUT_FOLDER}/package.json"
-OUT_TARGET="bundler" # Note(jkomyno): I wasn't able to make it work with `web` target
+OUT_TARGET="bundler"
 OUT_NPM_NAME="@prisma/query-engine-wasm"
 
-wasm-pack build --release --target $OUT_TARGET
+# The local ./Cargo.toml file uses "name = "query_engine_wasm" as library name
+# to avoid conflicts with libquery's `name = "query_engine"` library name declaration.
+# This little `sed -i` trick below is a hack to publish "@prisma/query-engine-wasm"
+# with the same binding filenames currently expected by the Prisma Client.
+sed -i '' 's/name = "query_engine_wasm"/name = "query_engine"/g' Cargo.toml
+
+# use `wasm-pack build --release` on CI only
+if [[ -z "$BUILDKITE" ]] && [[ -z "$GITHUB_ACTIONS" ]]; then
+    BUILD_PROFILE="--dev"
+else
+    BUILD_PROFILE="--release"
+fi
+
+wasm-pack build $BUILD_PROFILE --target $OUT_TARGET
+
+sed -i '' 's/name = "query_engine"/name = "query_engine_wasm"/g' Cargo.toml
 
 sleep 1
 
