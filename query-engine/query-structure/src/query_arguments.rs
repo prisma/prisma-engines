@@ -86,14 +86,14 @@ impl QueryArguments {
             .schema
             .configuration
             .preview_features()
-            .contains(PreviewFeature::DistinctOn);
+            .contains(PreviewFeature::NativeDistinct);
 
         let connector_can_distinct_in_db = self
             .model()
             .dm
             .schema
             .connector
-            .has_capability(ConnectorCapability::DistinctOn);
+            .has_capability(ConnectorCapability::NativeDistinct);
 
         has_distinct_feature && connector_can_distinct_in_db && self.order_by.is_empty()
     }
