@@ -12,7 +12,7 @@ use query_core::{
     schema::{self, QuerySchema},
     telemetry, QueryExecutor, TransactionOptions, TxId,
 };
-use request_handlers::ConnectorMode;
+use request_handlers::ConnectorKind;
 use request_handlers::{load_executor, RequestBody, RequestHandler};
 use serde::{Deserialize, Serialize};
 use serde_json::json;
@@ -29,7 +29,6 @@ use wasm_bindgen::prelude::wasm_bindgen;
 /// The main query engine used by JS
 #[wasm_bindgen]
 pub struct QueryEngine {
-    connector_mode: ConnectorMode,
     inner: RwLock<Inner>,
     logger: Logger,
 }
@@ -131,7 +130,7 @@ impl QueryEngine {
     pub fn new(
         options: ConstructorOptions,
         callback: JsFunction,
-        maybe_adapter: Option<JsObject>,
+        adapter: JsObject,
     ) -> Result<QueryEngine, wasm_bindgen::JsError> {
         let log_callback = LogCallback(callback);
 
@@ -153,27 +152,25 @@ impl QueryEngine {
         let config = &mut schema.configuration;
         let preview_features = config.preview_features();
 
-        if let Some(adapter) = maybe_adapter {
-            let js_queryable = driver_adapters::from_js(adapter);
+        let js_queryable = driver_adapters::from_js(adapter);
 
-            sql_connector::activate_driver_adapter(Arc::new(js_queryable));
+        sql_connector::activate_driver_adapter(Arc::new(js_queryable));
 
-            let provider_name = schema.connector.provider_name();
-            tracing::info!("Received driver adapter for {provider_name}.");
-        }
+        let provider_name = schema.connector.provider_name();
+        tracing::info!("Received driver adapter for {provider_name}.");
 
         schema
             .diagnostics
             .to_result()
             .map_err(|err| ApiError::conversion(err, schema.db.source()))?;
 
-        config
-            .resolve_datasource_urls_query_engine(
-                &overrides,
-                |key| env.get(key).map(ToString::to_string),
-                ignore_env_var_errors,
-            )
-            .map_err(|err| ApiError::conversion(err, schema.db.source()))?;
+        // config
+        //     .resolve_datasource_urls_query_engine(
+        //         &overrides,
+        //         |key| env.get(key).map(ToString::to_string),
+        //         ignore_env_var_errors,
+        //     )
+        //     .map_err(|err| ApiError::conversion(err, schema.db.source()))?;
 
         config
             .validate_that_one_datasource_is_provided()
@@ -193,12 +190,9 @@ impl QueryEngine {
         let log_level = log_level.parse::<LevelFilter>().unwrap();
         let logger = Logger::new(log_queries, log_level, log_callback, enable_tracing);
 
-        let connector_mode = ConnectorMode::Js;
-
         Ok(Self {
             inner: RwLock::new(Inner::Builder(builder)),
             logger,
-            connector_mode,
         })
     }
 
@@ -216,17 +210,17 @@ impl QueryEngine {
             let arced_schema = Arc::clone(&builder.schema);
             let arced_schema_2 = Arc::clone(&builder.schema);
 
-            let url = {
-                let data_source = builder
-                    .schema
-                    .configuration
-                    .datasources
-                    .first()
-                    .ok_or_else(|| ApiError::configuration("No valid data source found"))?;
-                data_source
-                    .load_url_with_config_dir(&builder.config_dir, |key| builder.env.get(key).map(ToString::to_string))
-                    .map_err(|err| crate::error::ApiError::Conversion(err, builder.schema.db.source().to_owned()))?
-            };
+            // let url = {
+            //     let data_source = builder
+            //         .schema
+            //         .configuration
+            //         .datasources
+            //         .first()
+            //         .ok_or_else(|| ApiError::configuration("No valid data source found"))?;
+            //     data_source
+            //         .load_url_with_config_dir(&builder.config_dir, |key| builder.env.get(key).map(ToString::to_string))
+            //         .map_err(|err| crate::error::ApiError::Conversion(err, builder.schema.db.source().to_owned()))?
+            // };
 
             let engine = async move {
                 // We only support one data source & generator at the moment, so take the first one (default not exposed yet).
@@ -238,7 +232,7 @@ impl QueryEngine {
 
                 let preview_features = arced_schema.configuration.preview_features();
 
-                let executor = load_executor(self.connector_mode, data_source, preview_features, &url).await?;
+                let executor = load_executor(ConnectorKind::Js {}, data_source, preview_features).await?;
                 let connector = executor.primary_connector();
 
                 let conn_span = tracing::info_span!(

@@ -14,7 +14,7 @@ use crate::AdapterResult;
 // `serialize_missing_as_null` is required to make sure that "empty" values (e.g., `None` and `()`)
 //  are serialized as `null` and not `undefined`.
 // This is due to certain drivers (e.g., LibSQL) not supporting `undefined` values.
-static SERIALIZER: Serializer = Serializer::new().serialize_missing_as_null(true);
+pub(crate) static SERIALIZER: Serializer = Serializer::new().serialize_missing_as_null(true);
 
 #[derive(Clone)]
 pub(crate) struct AsyncJsFunction<ArgType, ReturnType>

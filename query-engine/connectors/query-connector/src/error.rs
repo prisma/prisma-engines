@@ -272,6 +272,9 @@ pub enum ErrorKind {
 
     #[error("External connector error")]
     ExternalError(i32),
+
+    #[error("Invalid driver adapter: {0}")]
+    InvalidDriverAdapter(String),
 }
 
 impl From<DomainError> for ConnectorError {

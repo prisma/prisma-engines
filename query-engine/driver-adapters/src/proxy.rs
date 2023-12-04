@@ -1,8 +1,11 @@
 use crate::send_future::UnsafeFuture;
+use crate::types::JsConnectionInfo;
 pub use crate::types::{ColumnType, JSResultSet, Query, TransactionOptions};
-use crate::{from_js_value, get_named_property, has_named_property, to_rust_str, JsObject, JsResult, JsString};
+use crate::{
+    from_js_value, get_named_property, get_optional_named_property, has_named_property, to_rust_str, AsyncJsFunction,
+    JsObject, JsResult, JsString, JsTransaction,
+};
 
-use crate::{AsyncJsFunction, JsTransaction};
 use futures::Future;
 use metrics::increment_gauge;
 use std::sync::atomic::{AtomicBool, Ordering};
@@ -31,6 +34,7 @@ pub(crate) struct CommonProxy {
 #[cfg_attr(target_arch = "wasm32", wasm_bindgen(getter_with_clone))]
 pub(crate) struct DriverProxy {
     start_transaction: AsyncJsFunction<(), JsTransaction>,
+    get_connection_info: Option<AsyncJsFunction<(), JsConnectionInfo>>,
 }
 
 /// This a JS proxy for accessing the methods, specific
@@ -82,7 +86,19 @@ impl DriverProxy {
     pub fn new(object: &JsObject) -> JsResult<Self> {
         Ok(Self {
             start_transaction: get_named_property(object, "startTransaction")?,
+            get_connection_info: get_optional_named_property(object, "getConnectionInfo")?,
         })
+    }
+
+    pub async fn get_connection_info(&self) -> quaint::Result<JsConnectionInfo> {
+        UnsafeFuture(async move {
+            if let Some(fn_) = &self.get_connection_info {
+                fn_.call(()).await
+            } else {
+                Ok(JsConnectionInfo::default())
+            }
+        })
+        .await
     }
 
     async fn start_transaction_inner(&self) -> quaint::Result<Box<JsTransaction>> {

@@ -5,6 +5,7 @@ use std::str::FromStr;
 #[cfg(not(target_arch = "wasm32"))]
 use napi::bindgen_prelude::{FromNapiValue, ToNapiValue};
 
+use quaint::connector::{ExternalConnectionInfo, SqlFamily};
 #[cfg(target_arch = "wasm32")]
 use tsify::Tsify;
 
@@ -31,6 +32,52 @@ impl FromStr for AdapterFlavour {
             "sqlite" => Ok(Self::Sqlite),
             _ => Err(format!("Unsupported adapter flavour: {:?}", s)),
         }
+    }
+}
+
+impl From<AdapterFlavour> for SqlFamily {
+    fn from(value: AdapterFlavour) -> Self {
+        match value {
+            AdapterFlavour::Mysql => SqlFamily::Mysql,
+            AdapterFlavour::Postgres => SqlFamily::Postgres,
+            AdapterFlavour::Sqlite => SqlFamily::Sqlite,
+        }
+    }
+}
+
+#[cfg_attr(not(target_arch = "wasm32"), napi_derive::napi(object))]
+#[cfg_attr(target_arch = "wasm32", derive(Serialize, Deserialize, Tsify))]
+#[cfg_attr(target_arch = "wasm32", tsify(into_wasm_abi, from_wasm_abi))]
+#[cfg_attr(target_arch = "wasm32", serde(rename_all = "camelCase"))]
+pub(crate) struct JsConnectionInfo {
+    pub schema_name: Option<String>,
+}
+
+impl JsConnectionInfo {
+    pub fn into_external_connection_info(self, provider: &AdapterFlavour) -> ExternalConnectionInfo {
+        let schema_name = self.get_schema_name(provider);
+        let sql_family = provider.to_owned().into();
+        ExternalConnectionInfo::new(sql_family, schema_name.to_owned())
+    }
+    fn get_schema_name(&self, provider: &AdapterFlavour) -> &str {
+        match self.schema_name.as_ref() {
+            Some(name) => name,
+            None => self.default_schema_name(&provider),
+        }
+    }
+
+    fn default_schema_name(&self, provider: &AdapterFlavour) -> &str {
+        match provider {
+            AdapterFlavour::Mysql => quaint::connector::DEFAULT_MYSQL_DB,
+            AdapterFlavour::Postgres => quaint::connector::DEFAULT_POSTGRES_SCHEMA,
+            AdapterFlavour::Sqlite => quaint::connector::DEFAULT_SQLITE_SCHEMA,
+        }
+    }
+}
+
+impl Default for JsConnectionInfo {
+    fn default() -> Self {
+        Self { schema_name: None }
     }
 }
 

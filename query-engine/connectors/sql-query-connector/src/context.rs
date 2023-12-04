@@ -1,4 +1,4 @@
-use quaint::prelude::ConnectionInfo;
+use quaint::{connector::SqlFamily, prelude::ConnectionInfo};
 
 pub(super) struct Context<'a> {
     connection_info: &'a ConnectionInfo,
@@ -13,12 +13,12 @@ pub(super) struct Context<'a> {
 
 impl<'a> Context<'a> {
     pub(crate) fn new(connection_info: &'a ConnectionInfo, trace_id: Option<&'a str>) -> Self {
-        let (max_rows, default_batch_size) = match connection_info {
-            ConnectionInfo::Postgres(_) => (None, 32766),
+        let (max_rows, default_batch_size) = match connection_info.sql_family() {
+            SqlFamily::Postgres => (None, 32766),
             // See https://stackoverflow.com/a/11131824/788562
-            ConnectionInfo::Mysql(_) => (None, 65535),
-            ConnectionInfo::Mssql(_) => (Some(1000), 2099),
-            ConnectionInfo::Sqlite { .. } | ConnectionInfo::InMemorySqlite { .. } => (Some(999), 999),
+            SqlFamily::Mysql => (None, 65535),
+            SqlFamily::Mssql => (Some(1000), 2099),
+            SqlFamily::Sqlite => (Some(999), 999),
         };
         Context {
             connection_info,
