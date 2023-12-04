@@ -17,7 +17,13 @@ mod scalar_relations {
               parentId Int?
               parent Parent? @relation(fields: [parentId], references: [id])
 
+              string  String
+              int     Int
+              bInt    BigInt
+              float   Float
               bytes   Bytes
+              bool    Boolean
+              dt      DateTime
             }
             "#
         };
@@ -25,8 +31,11 @@ mod scalar_relations {
         schema.to_owned()
     }
 
-    // TODO: fix https://github.com/prisma/team-orm/issues/684 and unexclude DAs
-    #[connector_test(schema(schema_common), exclude(Postgres("pg.js", "neon.js")))]
+    // TODO: fix https://github.com/prisma/team-orm/issues/684, https://github.com/prisma/team-orm/issues/685  and unexclude DAs
+    #[connector_test(
+        schema(schema_common),
+        exclude(Postgres("pg.js", "neon.js"), Vitess("planetscale.js"))
+    )]
     async fn common_types(runner: Runner) -> TestResult<()> {
         create_common_children(&runner).await?;
 
