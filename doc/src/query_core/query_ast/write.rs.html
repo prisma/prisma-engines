@@ -429,6 +429,9 @@
 <a href="#429" id="429">429</a>
 <a href="#430" id="430">430</a>
 <a href="#431" id="431">431</a>
+<a href="#432" id="432">432</a>
+<a href="#433" id="433">433</a>
+<a href="#434" id="434">434</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Write query AST
 </span><span class="kw">use super</span>::{FilteredNestedMutation, FilteredQuery};
 <span class="kw">use crate</span>::{RecordQuery, ToGraphviz};
@@ -637,7 +640,11 @@
         <span class="kw">match </span><span class="self">self </span>{
             <span class="self">Self</span>::CreateRecord(q) =&gt; <span class="macro">format!</span>(<span class="string">&quot;CreateRecord(model: {}, args: {:?})&quot;</span>, q.model.name(), q.args),
             <span class="self">Self</span>::CreateManyRecords(q) =&gt; <span class="macro">format!</span>(<span class="string">&quot;CreateManyRecord(model: {})&quot;</span>, q.model.name()),
-            <span class="self">Self</span>::UpdateRecord(q) =&gt; <span class="macro">format!</span>(<span class="string">&quot;UpdateRecord(model: {})&quot;</span>, q.model().name(),),
+            <span class="self">Self</span>::UpdateRecord(q) =&gt; <span class="macro">format!</span>(
+                <span class="string">&quot;UpdateRecord(model: {}, selection: {:?})&quot;</span>,
+                q.model().name(),
+                q.selected_fields()
+            ),
             <span class="self">Self</span>::DeleteRecord(q) =&gt; <span class="macro">format!</span>(<span class="string">&quot;DeleteRecord: {}, {:?}&quot;</span>, q.model.name(), q.record_filter),
             <span class="self">Self</span>::UpdateManyRecords(q) =&gt; <span class="macro">format!</span>(<span class="string">&quot;UpdateManyRecords(model: {}, args: {:?})&quot;</span>, q.model.name(), q.args),
             <span class="self">Self</span>::DeleteManyRecords(q) =&gt; <span class="macro">format!</span>(<span class="string">&quot;DeleteManyRecords: {}&quot;</span>, q.model.name()),
@@ -734,8 +741,7 @@
 
 <span class="attr">#[derive(Debug, Clone)]
 </span><span class="kw">pub struct </span>UpdateRecordWithSelection {
-    <span class="comment">// Used for serialization. When `None`, the result will only be used to fulfill other nodes requirement.
-    </span><span class="kw">pub </span>name: <span class="prelude-ty">Option</span>&lt;String&gt;,
+    <span class="kw">pub </span>name: String,
     <span class="kw">pub </span>model: Model,
     <span class="kw">pub </span>record_filter: RecordFilter,
     <span class="kw">pub </span>args: WriteArgs,

@@ -509,7 +509,7 @@
 
             Query::Write(WriteQuery::UpdateRecord(UpdateRecord::WithSelection(
                 UpdateRecordWithSelection {
-                    name: <span class="prelude-val">Some</span>(field.name.to_owned()),
+                    name: field.name,
                     model: model.clone(),
                     record_filter: filter.into(),
                     args,
@@ -524,8 +524,8 @@
 
             Query::Write(WriteQuery::UpdateRecord(UpdateRecord::WithSelection(
                 UpdateRecordWithSelection {
-                    name: <span class="prelude-val">None</span>,
-                    model: model.clone(),
+                    name: String::new(), <span class="comment">// This node will not be serialized so we don&#39;t need a name.
+                    </span>model: model.clone(),
                     record_filter: filter.into(),
                     args,
                     selected_fields,
