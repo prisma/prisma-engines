@@ -204,7 +204,7 @@
     };
 }
 
-<span class="comment">// (Usually) Append-only list of features.
+<span class="comment">// (Usually) Append-only list of features. (alphabetically sorted)
 </span><span class="macro">features!</span>(
     AggregateApi,
     AtomicNumberOperations,
@@ -213,7 +213,6 @@
     ConnectOrCreate,
     CreateMany,
     DataProxy,
-    DistinctOn,
     Deno,
     Distinct,
     DriverAdapters,
@@ -235,6 +234,7 @@
     MultiSchema,
     NamedConstraints,
     NApi,
+    NativeDistinct,
     NativeTypes,
     OrderByAggregateGroup,
     OrderByNulls,
@@ -249,16 +249,16 @@
     Views,
 );
 
-<span class="doccomment">/// Generator preview features
+<span class="doccomment">/// Generator preview features (alphabetically sorted)
 </span><span class="kw">pub const </span>ALL_PREVIEW_FEATURES: FeatureMap = FeatureMap {
     active: <span class="macro">enumflags2::make_bitflags!</span>(PreviewFeature::{
         Deno
-         | DistinctOn
          | DriverAdapters
          | FullTextIndex
          | FullTextSearch
          | Metrics
          | MultiSchema
+         | NativeDistinct
          | PostgresqlExtensions
          | Tracing
          | Views

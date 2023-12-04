@@ -348,7 +348,7 @@
             .schema
             .configuration
             .preview_features()
-            .contains(PreviewFeature::DistinctOn);
+            .contains(PreviewFeature::NativeDistinct);
 
         <span class="kw">let </span>connector_can_distinct_in_db = <span class="self">self
             </span>.model()
