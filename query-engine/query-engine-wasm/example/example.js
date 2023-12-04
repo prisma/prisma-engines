@@ -6,14 +6,12 @@ import { readFile } from 'fs/promises'
 import { PrismaLibSQL } from '@prisma/adapter-libsql'
 import { createClient } from '@libsql/client'
 import { bindAdapter } from '@prisma/driver-adapter-utils'
-import { init, QueryEngine, getBuildTimeInfo } from '../pkg/query_engine.js'
+import {  QueryEngine, getBuildTimeInfo } from '../pkg/query_engine.js'
 
 
 async function main() {
   // Always initialize the Wasm library before using it.
   // This sets up the logging and panic hooks.
-  init()
-
 
   const client = createClient({ url: "file:./prisma/dev.db"})
   const adapter = new PrismaLibSQL(client)
