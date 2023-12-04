@@ -188,6 +188,16 @@
 <a href="#188" id="188">188</a>
 <a href="#189" id="189">189</a>
 <a href="#190" id="190">190</a>
+<a href="#191" id="191">191</a>
+<a href="#192" id="192">192</a>
+<a href="#193" id="193">193</a>
+<a href="#194" id="194">194</a>
+<a href="#195" id="195">195</a>
+<a href="#196" id="196">196</a>
+<a href="#197" id="197">197</a>
+<a href="#198" id="198">198</a>
+<a href="#199" id="199">199</a>
+<a href="#200" id="200">200</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>itertools::Itertools;
 <span class="kw">use </span>query_structure::<span class="kw-2">*</span>;
 <span class="kw">use </span>std::ops::Deref;
@@ -210,9 +220,14 @@
     <span class="doccomment">/// Creates a new processor from the given query args.
     /// The original args will be modified to prevent db level processing.
     </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>new_from_query_args(args: <span class="kw-2">&amp;mut </span>QueryArguments) -&gt; <span class="self">Self </span>{
-        <span class="kw">let </span>processor = <span class="self">Self </span>{ args: args.clone() };
+        <span class="kw">let </span><span class="kw-2">mut </span>processor = <span class="self">Self </span>{ args: args.clone() };
 
-        args.distinct = <span class="prelude-val">None</span>;
+        <span class="kw">if </span>!args.requires_inmemory_distinct() {
+            processor.args.distinct = <span class="prelude-val">None</span>;
+        } <span class="kw">else </span>{
+            args.distinct = <span class="prelude-val">None</span>;
+        }
+
         args.ignore_take = <span class="bool-val">true</span>;
         args.ignore_skip = <span class="bool-val">true</span>;
 
@@ -240,7 +255,12 @@
             records
         };
 
-        <span class="kw">let </span>records = <span class="self">self</span>.apply_distinct(records);
+        <span class="kw">let </span>records = <span class="kw">if </span><span class="self">self</span>.requires_inmemory_distinct() {
+            <span class="self">self</span>.apply_distinct(records)
+        } <span class="kw">else </span>{
+            records
+        };
+
         <span class="kw">let </span><span class="kw-2">mut </span>records = <span class="self">self</span>.apply_pagination(records);
 
         <span class="kw">if </span><span class="self">self</span>.needs_reversed_order() {

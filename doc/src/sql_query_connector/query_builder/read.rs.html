@@ -297,6 +297,17 @@
 <a href="#297" id="297">297</a>
 <a href="#298" id="298">298</a>
 <a href="#299" id="299">299</a>
+<a href="#300" id="300">300</a>
+<a href="#301" id="301">301</a>
+<a href="#302" id="302">302</a>
+<a href="#303" id="303">303</a>
+<a href="#304" id="304">304</a>
+<a href="#305" id="305">305</a>
+<a href="#306" id="306">306</a>
+<a href="#307" id="307">307</a>
+<a href="#308" id="308">308</a>
+<a href="#309" id="309">309</a>
+<a href="#310" id="310">310</a>
 </pre></div><pre class="rust"><code><span class="kw">use crate</span>::{
     cursor_condition, filter::FilterBuilder, model_extensions::<span class="kw-2">*</span>, nested_aggregations, ordering::OrderByBuilder,
     sql_trace::SqlTraceComment, Context,
@@ -404,6 +415,17 @@
         <span class="kw">let </span>select_ast = order_by_definitions
             .iter()
             .fold(select_ast, |acc, o| acc.order_by(o.order_definition.clone()));
+
+        <span class="kw">let </span>select_ast = <span class="kw">if let </span><span class="prelude-val">Some</span>(distinct) = <span class="self">self</span>.distinct {
+            <span class="kw">let </span>distinct_fields = ModelProjection::from(distinct)
+                .as_columns(ctx)
+                .map(Expression::from)
+                .collect_vec();
+
+            select_ast.distinct_on(distinct_fields)
+        } <span class="kw">else </span>{
+            select_ast
+        };
 
         <span class="kw">match </span>limit {
             <span class="prelude-val">Some</span>(limit) =&gt; (select_ast.limit(limit <span class="kw">as </span>usize), aggregation_joins.columns),

@@ -235,7 +235,34 @@
 <a href="#235" id="235">235</a>
 <a href="#236" id="236">236</a>
 <a href="#237" id="237">237</a>
-</pre></div><pre class="rust"><code><span class="kw">use crate</span>::<span class="kw-2">*</span>;
+<a href="#238" id="238">238</a>
+<a href="#239" id="239">239</a>
+<a href="#240" id="240">240</a>
+<a href="#241" id="241">241</a>
+<a href="#242" id="242">242</a>
+<a href="#243" id="243">243</a>
+<a href="#244" id="244">244</a>
+<a href="#245" id="245">245</a>
+<a href="#246" id="246">246</a>
+<a href="#247" id="247">247</a>
+<a href="#248" id="248">248</a>
+<a href="#249" id="249">249</a>
+<a href="#250" id="250">250</a>
+<a href="#251" id="251">251</a>
+<a href="#252" id="252">252</a>
+<a href="#253" id="253">253</a>
+<a href="#254" id="254">254</a>
+<a href="#255" id="255">255</a>
+<a href="#256" id="256">256</a>
+<a href="#257" id="257">257</a>
+<a href="#258" id="258">258</a>
+<a href="#259" id="259">259</a>
+<a href="#260" id="260">260</a>
+<a href="#261" id="261">261</a>
+<a href="#262" id="262">262</a>
+</pre></div><pre class="rust"><code><span class="kw">use </span>psl::{datamodel_connector::ConnectorCapability, PreviewFeature};
+
+<span class="kw">use crate</span>::<span class="kw-2">*</span>;
 
 <span class="doccomment">/// `QueryArguments` define various constraints queried data should fulfill:
 /// - `cursor`, `take`, `skip` page through the data.
@@ -307,7 +334,30 @@
     /// retrieved by the connector or if it requires the query engine to fetch a raw set
     /// of records and perform certain operations itself, in-memory.
     </span><span class="kw">pub fn </span>requires_inmemory_processing(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
-        <span class="self">self</span>.distinct.is_some() || <span class="self">self</span>.contains_unstable_cursor() || <span class="self">self</span>.contains_null_cursor()
+        <span class="self">self</span>.contains_unstable_cursor() || <span class="self">self</span>.contains_null_cursor() || <span class="self">self</span>.requires_inmemory_distinct()
+    }
+
+    <span class="kw">pub fn </span>requires_inmemory_distinct(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.distinct.is_some() &amp;&amp; !<span class="self">self</span>.can_distinct_in_db()
+    }
+
+    <span class="kw">fn </span>can_distinct_in_db(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="kw">let </span>has_distinct_feature = <span class="self">self
+            </span>.model()
+            .dm
+            .schema
+            .configuration
+            .preview_features()
+            .contains(PreviewFeature::DistinctOn);
+
+        <span class="kw">let </span>connector_can_distinct_in_db = <span class="self">self
+            </span>.model()
+            .dm
+            .schema
+            .connector
+            .has_capability(ConnectorCapability::DistinctOn);
+
+        has_distinct_feature &amp;&amp; connector_can_distinct_in_db &amp;&amp; <span class="self">self</span>.order_by.is_empty()
     }
 
     <span class="doccomment">/// An unstable cursor is a cursor that is used in conjunction with an unstable (non-unique) combination of orderBys.

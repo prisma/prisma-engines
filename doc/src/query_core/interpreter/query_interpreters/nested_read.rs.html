@@ -270,6 +270,7 @@
 <a href="#270" id="270">270</a>
 <a href="#271" id="271">271</a>
 <a href="#272" id="272">272</a>
+<a href="#273" id="273">273</a>
 </pre></div><pre class="rust"><code><span class="kw">use super</span>::{inmemory_record_processor::InMemoryRecordProcessor, read};
 <span class="kw">use crate</span>::{interpreter::InterpretationResult, query_ast::<span class="kw-2">*</span>};
 <span class="kw">use </span>connector::{<span class="self">self</span>, ConnectionLike, RelAggregationRow, RelAggregationSelection};
@@ -283,6 +284,7 @@
     trace_id: <span class="prelude-ty">Option</span>&lt;String&gt;,
 ) -&gt; InterpretationResult&lt;(ManyRecords, <span class="prelude-ty">Option</span>&lt;Vec&lt;RelAggregationRow&gt;&gt;)&gt; {
     <span class="kw">let </span>processor = InMemoryRecordProcessor::new_from_query_args(<span class="kw-2">&amp;mut </span>query.args);
+
     <span class="kw">let </span>parent_field = <span class="kw-2">&amp;</span>query.parent_field;
     <span class="kw">let </span>child_link_id = parent_field.related_field().linking_fields();
 

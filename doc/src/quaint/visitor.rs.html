@@ -1185,6 +1185,12 @@
 <a href="#1185" id="1185">1185</a>
 <a href="#1186" id="1186">1186</a>
 <a href="#1187" id="1187">1187</a>
+<a href="#1188" id="1188">1188</a>
+<a href="#1189" id="1189">1189</a>
+<a href="#1190" id="1190">1190</a>
+<a href="#1191" id="1191">1191</a>
+<a href="#1192" id="1192">1192</a>
+<a href="#1193" id="1193">1193</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Visitors for reading an abstract SQL syntax tree, generating the query and
 //! gathering parameters in the right order.
 //!
@@ -1421,9 +1427,15 @@
 
         <span class="self">self</span>.write(<span class="string">&quot;SELECT &quot;</span>)<span class="question-mark">?</span>;
 
-        <span class="kw">if </span>select.distinct {
-            <span class="self">self</span>.write(<span class="string">&quot;DISTINCT &quot;</span>)<span class="question-mark">?</span>;
-        }
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(distinct) = select.distinct {
+            <span class="kw">match </span>distinct {
+                DistinctType::Default =&gt; <span class="self">self</span>.write(<span class="string">&quot;DISTINCT &quot;</span>)<span class="question-mark">?</span>,
+                DistinctType::OnClause(columns) =&gt; {
+                    <span class="self">self</span>.write(<span class="string">&quot;DISTINCT ON &quot;</span>)<span class="question-mark">?</span>;
+                    <span class="self">self</span>.surround_with(<span class="string">&quot;(&quot;</span>, <span class="string">&quot;) &quot;</span>, |<span class="kw-2">ref mut </span>s| s.visit_columns(columns))<span class="question-mark">?</span>;
+                }
+            }
+        };
 
         <span class="kw">if </span>!select.tables.is_empty() {
             <span class="kw">if </span>select.columns.is_empty() {

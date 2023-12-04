@@ -701,13 +701,24 @@
 <a href="#701" id="701">701</a>
 <a href="#702" id="702">702</a>
 <a href="#703" id="703">703</a>
+<a href="#704" id="704">704</a>
+<a href="#705" id="705">705</a>
+<a href="#706" id="706">706</a>
+<a href="#707" id="707">707</a>
+<a href="#708" id="708">708</a>
+<a href="#709" id="709">709</a>
+<a href="#710" id="710">710</a>
+<a href="#711" id="711">711</a>
+<a href="#712" id="712">712</a>
+<a href="#713" id="713">713</a>
+<a href="#714" id="714">714</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::ast::<span class="kw-2">*</span>;
 <span class="kw">use </span>std::borrow::Cow;
 
 <span class="doccomment">/// A builder for a `SELECT` statement.
 </span><span class="attr">#[derive(Debug, PartialEq, Clone, Default)]
 </span><span class="kw">pub struct </span>Select&lt;<span class="lifetime">&#39;a</span>&gt; {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) distinct: bool,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) distinct: <span class="prelude-ty">Option</span>&lt;DistinctType&lt;<span class="lifetime">&#39;a</span>&gt;&gt;,
     <span class="kw">pub</span>(<span class="kw">crate</span>) tables: Vec&lt;Table&lt;<span class="lifetime">&#39;a</span>&gt;&gt;,
     <span class="kw">pub</span>(<span class="kw">crate</span>) columns: Vec&lt;Expression&lt;<span class="lifetime">&#39;a</span>&gt;&gt;,
     <span class="kw">pub</span>(<span class="kw">crate</span>) conditions: <span class="prelude-ty">Option</span>&lt;ConditionTree&lt;<span class="lifetime">&#39;a</span>&gt;&gt;,
@@ -719,6 +730,12 @@
     <span class="kw">pub</span>(<span class="kw">crate</span>) joins: Vec&lt;Join&lt;<span class="lifetime">&#39;a</span>&gt;&gt;,
     <span class="kw">pub</span>(<span class="kw">crate</span>) ctes: Vec&lt;CommonTableExpression&lt;<span class="lifetime">&#39;a</span>&gt;&gt;,
     <span class="kw">pub</span>(<span class="kw">crate</span>) comment: <span class="prelude-ty">Option</span>&lt;Cow&lt;<span class="lifetime">&#39;a</span>, str&gt;&gt;,
+}
+
+<span class="attr">#[derive(Debug, PartialEq, Clone)]
+</span><span class="kw">pub enum </span>DistinctType&lt;<span class="lifetime">&#39;a</span>&gt; {
+    Default,
+    OnClause(Vec&lt;Expression&lt;<span class="lifetime">&#39;a</span>&gt;&gt;),
 }
 
 <span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; From&lt;Select&lt;<span class="lifetime">&#39;a</span>&gt;&gt; <span class="kw">for </span>Expression&lt;<span class="lifetime">&#39;a</span>&gt; {
@@ -939,7 +956,12 @@
     /// # }
     /// ```
     </span><span class="kw">pub fn </span>distinct(<span class="kw-2">mut </span><span class="self">self</span>) -&gt; <span class="self">Self </span>{
-        <span class="self">self</span>.distinct = <span class="bool-val">true</span>;
+        <span class="self">self</span>.distinct = <span class="prelude-val">Some</span>(DistinctType::Default);
+        <span class="self">self
+    </span>}
+
+    <span class="kw">pub fn </span>distinct_on(<span class="kw-2">mut </span><span class="self">self</span>, columns: Vec&lt;Expression&lt;<span class="lifetime">&#39;a</span>&gt;&gt;) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.distinct = <span class="prelude-val">Some</span>(DistinctType::OnClause(columns));
         <span class="self">self
     </span>}
 

@@ -166,6 +166,8 @@
 <a href="#166" id="166">166</a>
 <a href="#167" id="167">167</a>
 <a href="#168" id="168">168</a>
+<a href="#169" id="169">169</a>
+<a href="#170" id="170">170</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>serde::{Serialize, Serializer};
 <span class="kw">use </span>std::fmt;
 
@@ -211,6 +213,7 @@
     ConnectOrCreate,
     CreateMany,
     DataProxy,
+    DistinctOn,
     Deno,
     Distinct,
     DriverAdapters,
@@ -250,6 +253,7 @@
 </span><span class="kw">pub const </span>ALL_PREVIEW_FEATURES: FeatureMap = FeatureMap {
     active: <span class="macro">enumflags2::make_bitflags!</span>(PreviewFeature::{
         Deno
+         | DistinctOn
          | DriverAdapters
          | FullTextIndex
          | FullTextSearch
