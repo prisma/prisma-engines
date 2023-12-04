@@ -76,28 +76,26 @@ impl QueryArguments {
     }
 
     pub fn requires_inmemory_distinct(&self) -> bool {
-        !self.has_distincton_preview() || !self.has_distinct_capability() || self.has_orderby()
+        self.distinct.is_some() && !self.can_distinct_in_db()
     }
 
-    fn has_distincton_preview(&self) -> bool {
-        self.model()
+    fn can_distinct_in_db(&self) -> bool {
+        let has_distinct_feature = self
+            .model()
             .dm
             .schema
             .configuration
             .preview_features()
-            .contains(PreviewFeature::DistinctOn)
-    }
+            .contains(PreviewFeature::DistinctOn);
 
-    fn has_distinct_capability(&self) -> bool {
-        self.model()
+        let connector_can_distinct_in_db = self
+            .model()
             .dm
             .schema
             .connector
-            .has_capability(ConnectorCapability::DistinctOn)
-    }
+            .has_capability(ConnectorCapability::DistinctOn);
 
-    fn has_orderby(&self) -> bool {
-        !self.order_by.is_empty()
+        has_distinct_feature && connector_can_distinct_in_db && self.order_by.is_empty()
     }
 
     /// An unstable cursor is a cursor that is used in conjunction with an unstable (non-unique) combination of orderBys.
