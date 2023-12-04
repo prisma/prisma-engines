@@ -231,6 +231,7 @@ pub trait ReadOperations {
         filter: &Filter,
         selected_fields: &FieldSelection,
         aggregation_selections: &[RelAggregationSelection],
+        relation_load_strategy: RelationLoadStrategy,
         trace_id: Option<String>,
     ) -> crate::Result<Option<SingleRecord>>;
 

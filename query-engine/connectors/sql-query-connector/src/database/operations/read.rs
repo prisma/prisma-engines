@@ -16,6 +16,57 @@ pub(crate) async fn get_single_record(
     conn: &dyn Queryable,
     model: &Model,
     filter: &Filter,
+    selected_fields: &FieldSelection,
+    aggr_selections: &[RelAggregationSelection],
+    relation_load_strategy: RelationLoadStrategy,
+    ctx: &Context<'_>,
+) -> crate::Result<Option<SingleRecord>> {
+    match relation_load_strategy {
+        RelationLoadStrategy::Join => get_single_record_joins(conn, model, filter, selected_fields, ctx).await,
+        RelationLoadStrategy::Query => {
+            get_single_record_wo_joins(
+                conn,
+                model,
+                filter,
+                &ModelProjection::from(selected_fields),
+                aggr_selections,
+                ctx,
+            )
+            .await
+        }
+    }
+}
+
+pub(crate) async fn get_single_record_joins(
+    conn: &dyn Queryable,
+    model: &Model,
+    filter: &Filter,
+    selected_fields: &FieldSelection,
+    ctx: &Context<'_>,
+) -> crate::Result<Option<SingleRecord>> {
+    let field_names: Vec<_> = selected_fields.db_names().collect();
+    let idents = selected_fields.type_identifiers_with_arities();
+    let rs_indexes = get_relation_selection_indexes(selected_fields.relations().collect(), &field_names);
+
+    let query = query_builder::select::SelectBuilder::default().build(
+        QueryArguments::from((model.clone(), filter.clone())),
+        selected_fields,
+        ctx,
+    );
+
+    let mut record = execute_find_one(conn, query, &idents, &field_names, ctx).await?;
+
+    if let Some(record) = record.as_mut() {
+        coerce_record_with_json_relation(record, rs_indexes)?;
+    };
+
+    Ok(record.map(|record| SingleRecord { record, field_names }))
+}
+
+pub(crate) async fn get_single_record_wo_joins(
+    conn: &dyn Queryable,
+    model: &Model,
+    filter: &Filter,
     selected_fields: &ModelProjection,
     aggr_selections: &[RelAggregationSelection],
     ctx: &Context<'_>,
@@ -41,18 +92,31 @@ pub(crate) async fn get_single_record(
 
     idents.append(&mut aggr_idents);
 
-    let meta = column_metadata::create(field_names.as_slice(), idents.as_slice());
+    let record = execute_find_one(conn, query, &idents, &field_names, ctx)
+        .await?
+        .map(|record| SingleRecord { record, field_names });
 
-    let record = (match conn.find(query, meta.as_slice(), ctx).await {
+    Ok(record)
+}
+
+async fn execute_find_one(
+    conn: &dyn Queryable,
+    query: Select<'_>,
+    idents: &[(TypeIdentifier, FieldArity)],
+    field_names: &[String],
+    ctx: &Context<'_>,
+) -> crate::Result<Option<Record>> {
+    let meta = column_metadata::create(field_names, idents);
+
+    let row = (match conn.find(query, meta.as_slice(), ctx).await {
         Ok(result) => Ok(Some(result)),
         Err(_e @ SqlError::RecordNotFoundForWhere(_)) => Ok(None),
         Err(_e @ SqlError::RecordDoesNotExist) => Ok(None),
         Err(e) => Err(e),
     })?
-    .map(Record::from)
-    .map(|record| SingleRecord { record, field_names });
+    .map(Record::from);
 
-    Ok(record)
+    Ok(row)
 }
 
 pub(crate) async fn get_many_records(
@@ -93,8 +157,8 @@ pub(crate) async fn get_many_records_joins(
     let field_names: Vec<_> = selected_fields.db_names().collect();
     let idents = selected_fields.type_identifiers_with_arities();
     let meta = column_metadata::create(field_names.as_slice(), idents.as_slice());
-
     let rs_indexes = get_relation_selection_indexes(selected_fields.relations().collect(), &field_names);
+
     let mut records = ManyRecords::new(field_names.clone());
 
     if let Some(0) = query_arguments.take {

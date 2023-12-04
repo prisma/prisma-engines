@@ -255,6 +255,7 @@ impl<'conn> ReadOperations for MongoDbTransaction<'conn> {
         filter: &query_structure::Filter,
         selected_fields: &FieldSelection,
         aggr_selections: &[RelAggregationSelection],
+        _relation_load_strategy: RelationLoadStrategy,
         _trace_id: Option<String>,
     ) -> connector_interface::Result<Option<SingleRecord>> {
         catch(async move {

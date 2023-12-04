@@ -69,6 +69,7 @@ impl<'tx> ReadOperations for SqlConnectorTransaction<'tx> {
         filter: &Filter,
         selected_fields: &FieldSelection,
         aggr_selections: &[RelAggregationSelection],
+        relation_load_strategy: RelationLoadStrategy,
         trace_id: Option<String>,
     ) -> connector::Result<Option<SingleRecord>> {
         catch(self.connection_info.clone(), async move {
@@ -77,8 +78,9 @@ impl<'tx> ReadOperations for SqlConnectorTransaction<'tx> {
                 self.inner.as_queryable(),
                 model,
                 filter,
-                &selected_fields.into(),
+                selected_fields,
                 aggr_selections,
+                relation_load_strategy,
                 &ctx,
             )
             .await

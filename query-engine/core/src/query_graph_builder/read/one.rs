@@ -1,4 +1,4 @@
-use super::*;
+use super::{utils::get_relation_load_strategy, *};
 use crate::{query_document::*, QueryOption, QueryOptions, ReadQuery, RecordQuery};
 use query_structure::Model;
 use schema::{constants::args, QuerySchema};
@@ -46,6 +46,10 @@ fn find_unique_with_options(
     let selected_fields = utils::collect_selected_fields(&nested_fields, None, &model, query_schema)?;
     let nested = utils::collect_nested_queries(nested_fields, &model, query_schema)?;
     let selected_fields = utils::merge_relation_selections(selected_fields, None, &nested);
+    let relation_load_strategy = get_relation_load_strategy(None, None, &nested, &aggregation_selections, query_schema);
+
+    dbg!(&selection_order);
+    dbg!(&selected_fields);
 
     Ok(ReadQuery::RecordQuery(RecordQuery {
         name,
@@ -57,5 +61,6 @@ fn find_unique_with_options(
         selection_order,
         aggregation_selections,
         options,
+        relation_load_strategy,
     }))
 }

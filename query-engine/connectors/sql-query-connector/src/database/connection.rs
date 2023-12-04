@@ -87,6 +87,7 @@ where
         filter: &Filter,
         selected_fields: &FieldSelection,
         aggr_selections: &[RelAggregationSelection],
+        relation_load_strategy: RelationLoadStrategy,
         trace_id: Option<String>,
     ) -> connector::Result<Option<SingleRecord>> {
         // [Composites] todo: FieldSelection -> ModelProjection conversion
@@ -96,8 +97,9 @@ where
                 &self.inner,
                 model,
                 filter,
-                &selected_fields.into(),
+                selected_fields,
                 aggr_selections,
+                relation_load_strategy,
                 &ctx,
             )
             .await

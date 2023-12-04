@@ -32,6 +32,11 @@ pub enum RelationLoadStrategy {
     Join,
     Query,
 }
+impl RelationLoadStrategy {
+    pub fn is_query(&self) -> bool {
+        matches!(self, RelationLoadStrategy::Query)
+    }
+}
 
 impl std::fmt::Debug for QueryArguments {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {

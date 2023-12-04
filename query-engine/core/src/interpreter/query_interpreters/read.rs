@@ -39,12 +39,13 @@ fn read_one(
                 &filter,
                 &query.selected_fields,
                 &query.aggregation_selections,
+                query.relation_load_strategy,
                 trace_id,
             )
             .await?;
 
         match scalars {
-            Some(record) => {
+            Some(record) if query.relation_load_strategy.is_query() => {
                 let scalars: ManyRecords = record.into();
                 let (scalars, aggregation_rows) =
                     extract_aggregation_rows_from_scalars(scalars, query.aggregation_selections);
@@ -58,6 +59,18 @@ fn read_one(
                     model,
                     aggregation_rows,
                 }
+                .into())
+            }
+            Some(record) => {
+                let records: ManyRecords = record.into();
+
+                Ok(dbg!(RecordSelectionWithRelations {
+                    name: query.name,
+                    model,
+                    fields: query.selection_order,
+                    records,
+                    nested: build_relation_record_selection(query.selected_fields.relations()),
+                })
                 .into())
             }
 

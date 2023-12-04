@@ -344,7 +344,7 @@ fn serialize_objects_with_relation(
 
     // Hack: we convert it to a hashset to support contains with &str as input
     // because Vec<String>::contains(&str) doesn't work and we don't want to allocate a string record value
-    let selected_db_field_names: HashSet<String> = result.fields.into_iter().collect();
+    let selected_db_field_names: HashSet<String> = result.fields.clone().into_iter().collect();
 
     for record in result.records.records.into_iter() {
         if !object_mapping.contains_key(&record.parent_id) {
@@ -352,7 +352,7 @@ fn serialize_objects_with_relation(
         }
 
         let values = record.values;
-        let mut object = IndexMap::with_capacity(values.len());
+        let mut object = HashMap::with_capacity(values.len());
 
         for (val, field) in values.into_iter().zip(fields.iter()) {
             // Skip fields that aren't part of the selection set
@@ -392,7 +392,9 @@ fn serialize_objects_with_relation(
             }
         }
 
-        let result = Item::Map(object);
+        let map = reorder_object_with_selection_order(result.fields.clone(), object);
+
+        let result = Item::Map(map);
 
         object_mapping.get_mut(&record.parent_id).unwrap().push(result);
     }
@@ -537,17 +539,24 @@ fn serialize_objects(
         let mut all_fields = result.fields.clone();
         all_fields.append(&mut aggr_fields);
 
-        let map = all_fields
-            .iter()
-            .fold(Map::with_capacity(all_fields.len()), |mut acc, field_name| {
-                acc.insert(field_name.to_owned(), object.remove(field_name).unwrap());
-                acc
-            });
+        let map = reorder_object_with_selection_order(all_fields, object);
 
         object_mapping.get_mut(&record.parent_id).unwrap().push(Item::Map(map));
     }
 
     Ok(object_mapping)
+}
+
+fn reorder_object_with_selection_order(
+    selection_order: Vec<String>,
+    mut object: HashMap<String, Item>,
+) -> IndexMap<String, Item> {
+    selection_order
+        .iter()
+        .fold(Map::with_capacity(selection_order.len()), |mut acc, field_name| {
+            acc.insert(field_name.to_owned(), object.remove(field_name).unwrap());
+            acc
+        })
 }
 
 /// Unwraps are safe due to query validation.

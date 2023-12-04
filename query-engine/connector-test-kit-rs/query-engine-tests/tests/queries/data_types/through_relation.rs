@@ -44,6 +44,16 @@ mod scalar_relations {
           @r###"{"data":{"findManyParent":[{"id":1,"children":[{"childId":1,"string":"abc","int":1,"bInt":"1","float":1.5,"bytes":"AQID","bool":false,"dt":"1900-10-10T01:10:10.001Z"},{"childId":2,"string":"def","int":-4234234,"bInt":"14324324234324","float":-2.54367,"bytes":"FDSF","bool":true,"dt":"1999-12-12T21:12:12.121Z"}]}]}}"###
         );
 
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"{ findUniqueParent(where: { id: 1 }) { id children { childId string int bInt float bytes bool dt } } }"#),
+          @r###"{"data":{"findUniqueParent":{"id":1,"children":[{"childId":1,"string":"abc","int":1,"bInt":"1","float":1.5,"bytes":"AQID","bool":false,"dt":"1900-10-10T01:10:10.001Z"},{"childId":2,"string":"def","int":-4234234,"bInt":"14324324234324","float":-2.54367,"bytes":"FDSF","bool":true,"dt":"1999-12-12T21:12:12.121Z"}]}}}"###
+        );
+
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"{ findUniqueParent(where: { id: 2 }) { id children { childId string int bInt float bytes bool dt } } }"#),
+          @r###"{"data":{"findUniqueParent":null}}"###
+        );
+
         Ok(())
     }
 
@@ -85,6 +95,11 @@ mod scalar_relations {
         insta::assert_snapshot!(
           run_query!(&runner, r#"{ findManyParent(orderBy: { id: asc }) { id children { childId json } } }"#),
           @r###"{"data":{"findManyParent":[{"id":1,"children":[{"childId":1,"json":"1"},{"childId":2,"json":"{}"},{"childId":3,"json":"{\"a\":\"b\"}"},{"childId":4,"json":"[]"},{"childId":5,"json":"[1,-1,true,{\"a\":\"b\"}]"}]}]}}"###
+        );
+
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"{ findUniqueParent(where: { id: 1 }) { id children { childId json } } }"#),
+          @r###"{"data":{"findUniqueParent":{"id":1,"children":[{"childId":1,"json":"1"},{"childId":2,"json":"{}"},{"childId":3,"json":"{\"a\":\"b\"}"},{"childId":4,"json":"[]"},{"childId":5,"json":"[1,-1,true,{\"a\":\"b\"}]"}]}}}"###
         );
 
         Ok(())
@@ -134,6 +149,11 @@ mod scalar_relations {
           @r###"{"data":{"findManyParent":[{"id":1,"children":[{"childId":1,"enum":"Red"},{"childId":2,"enum":"Green"},{"childId":3,"enum":"Blue"}]}]}}"###
         );
 
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"{ findUniqueParent(where: { id: 1 }) { id children { childId enum } } }"#),
+          @r###"{"data":{"findUniqueParent":{"id":1,"children":[{"childId":1,"enum":"Red"},{"childId":2,"enum":"Green"},{"childId":3,"enum":"Blue"}]}}}"###
+        );
+
         Ok(())
     }
 
@@ -173,6 +193,11 @@ mod scalar_relations {
         insta::assert_snapshot!(
           run_query!(&runner, r#"{ findManyParent(orderBy: { id: asc }) { id children { childId dec } } }"#),
           @r###"{"data":{"findManyParent":[{"id":1,"children":[{"childId":1,"dec":"1"},{"childId":2,"dec":"-1"},{"childId":3,"dec":"123.4567891"}]}]}}"###
+        );
+
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"{ findUniqueParent(where: { id: 1 }) { id children { childId dec } } }"#),
+          @r###"{"data":{"findUniqueParent":{"id":1,"children":[{"childId":1,"dec":"1"},{"childId":2,"dec":"-1"},{"childId":3,"dec":"123.4567891"}]}}}"###
         );
 
         Ok(())
@@ -233,6 +258,11 @@ mod scalar_relations {
         insta::assert_snapshot!(
           run_query!(&runner, r#"{ findManyParent { id children { childId string int bInt float bytes bool dt } } }"#),
           @r###"{"data":{"findManyParent":[{"id":1,"children":[{"childId":1,"string":["abc","def"],"int":[1,-1,1234567],"bInt":["1","-1","9223372036854775807","-9223372036854775807"],"float":[1.5,-1.5,1.234567],"bytes":["AQID","Qk9OSk9VUg=="],"bool":[false,true],"dt":["1900-10-10T01:10:10.001Z","1999-12-12T21:12:12.121Z"]}]}]}}"###
+        );
+
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"{ findUniqueParent(where: { id: 1 }) { id children { childId string int bInt float bytes bool dt } } }"#),
+          @r###"{"data":{"findUniqueParent":{"id":1,"children":[{"childId":1,"string":["abc","def"],"int":[1,-1,1234567],"bInt":["1","-1","9223372036854775807","-9223372036854775807"],"float":[1.5,-1.5,1.234567],"bytes":["AQID","Qk9OSk9VUg=="],"bool":[false,true],"dt":["1900-10-10T01:10:10.001Z","1999-12-12T21:12:12.121Z"]}]}}}"###
         );
 
         Ok(())

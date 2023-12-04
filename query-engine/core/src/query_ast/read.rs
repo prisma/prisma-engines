@@ -203,6 +203,7 @@ pub struct RecordQuery {
     pub selection_order: Vec<String>,
     pub aggregation_selections: Vec<RelAggregationSelection>,
     pub options: QueryOptions,
+    pub relation_load_strategy: RelationLoadStrategy,
 }
 
 #[derive(Debug, Clone)]

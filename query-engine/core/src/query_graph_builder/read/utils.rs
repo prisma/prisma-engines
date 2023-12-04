@@ -2,7 +2,7 @@ use super::*;
 use crate::{ArgumentListLookup, FieldPair, ParsedField, ReadQuery};
 use connector::RelAggregationSelection;
 use psl::{datamodel_connector::ConnectorCapability, PreviewFeature};
-use query_structure::{prelude::*, QueryArguments, RelationLoadStrategy};
+use query_structure::{prelude::*, RelationLoadStrategy};
 use schema::{
     constants::{aggregations::*, args},
     QuerySchema,
@@ -243,15 +243,16 @@ pub fn collect_relation_aggr_selections(
 }
 
 pub(crate) fn get_relation_load_strategy(
-    args: &QueryArguments,
+    cursor: Option<&SelectionResult>,
+    distinct: Option<&FieldSelection>,
     nested_queries: &[ReadQuery],
     aggregation_selections: &[RelAggregationSelection],
     query_schema: &QuerySchema,
 ) -> RelationLoadStrategy {
     if query_schema.has_feature(PreviewFeature::RelationJoins)
         && query_schema.has_capability(ConnectorCapability::LateralJoin)
-        && args.cursor.is_none()
-        && args.distinct.is_none()
+        && cursor.is_none()
+        && distinct.is_none()
         && aggregation_selections.is_empty()
         && !nested_queries.iter().any(|q| match q {
             ReadQuery::RelatedRecordsQuery(q) => q.has_cursor() || q.has_distinct() || q.has_aggregation_selections(),
