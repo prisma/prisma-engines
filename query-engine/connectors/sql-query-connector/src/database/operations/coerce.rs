@@ -29,7 +29,18 @@ fn coerce_json_relation_to_pv(value: serde_json::Value, rs: &RelationSelection) 
     match value {
         // one-to-many
         serde_json::Value::Array(values) if rs.field.is_list() => {
-            let iter = values.into_iter().map(|value| coerce_json_relation_to_pv(value, rs));
+            let iter = values.into_iter().filter_map(|value| {
+                // FIXME: In the case of m2m relations, the aggregation produces null values if the B side of the m2m table points to a record that doesn't exist.
+                // FIXME: This only seems to happen because of a bug with `relationMode=prisma`` which doesn't cleanup the relation table properly when deleting records that belongs to a m2m relation.
+                // FIXME: This hack filters down the null values from the array, but we should fix the root cause instead, if possible.
+                // FIXME: In theory, the aggregated array should only contain objects, which are the joined rows.
+                // FIXME: See m2m.rs::repro_16390 for a reproduction.
+                if value.is_null() && rs.field.relation().is_many_to_many() {
+                    None
+                } else {
+                    Some(coerce_json_relation_to_pv(value, rs))
+                }
+            });
 
             // Reverses order when using negative take.
             let iter = match rs.args.needs_reversed_order() {
@@ -75,7 +86,7 @@ fn coerce_json_relation_to_pv(value: serde_json::Value, rs: &RelationSelection) 
 
             Ok(PrismaValue::Object(map))
         }
-        _ => unreachable!(),
+        x => unreachable!("Unexpected value when deserializing JSON relation data: {x:?}"),
     }
 }
 
