@@ -48,9 +48,6 @@ fn find_unique_with_options(
     let selected_fields = utils::merge_relation_selections(selected_fields, None, &nested);
     let relation_load_strategy = get_relation_load_strategy(None, None, &nested, &aggregation_selections, query_schema);
 
-    dbg!(&selection_order);
-    dbg!(&selected_fields);
-
     Ok(ReadQuery::RecordQuery(RecordQuery {
         name,
         alias,

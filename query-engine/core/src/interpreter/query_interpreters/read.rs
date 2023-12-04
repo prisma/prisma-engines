@@ -64,13 +64,13 @@ fn read_one(
             Some(record) => {
                 let records: ManyRecords = record.into();
 
-                Ok(dbg!(RecordSelectionWithRelations {
+                Ok(RecordSelectionWithRelations {
                     name: query.name,
                     model,
                     fields: query.selection_order,
                     records,
                     nested: build_relation_record_selection(query.selected_fields.relations()),
-                })
+                }
                 .into())
             }
 
