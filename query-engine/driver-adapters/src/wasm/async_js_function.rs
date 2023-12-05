@@ -9,7 +9,7 @@ use wasm_bindgen_futures::JsFuture;
 
 use super::error::into_quaint_error;
 use super::from_js::FromJsValue;
-use super::result::JsResult;
+use crate::AdapterResult;
 
 // `serialize_missing_as_null` is required to make sure that "empty" values (e.g., `None` and `()`)
 //  are serialized as `null` and not `undefined`.
@@ -66,7 +66,7 @@ where
         }
     }
 
-    async fn call_internal(&self, arg1: T) -> Result<JsResult<R>, JsValue> {
+    async fn call_internal(&self, arg1: T) -> Result<AdapterResult<R>, JsValue> {
         let arg1 = arg1
             .serialize(&SERIALIZER)
             .map_err(|err| JsValue::from(JsError::from(&err)))?;
@@ -78,7 +78,7 @@ where
             return_value
         };
 
-        let js_result = JsResult::<R>::from_js_value(value)?;
+        let js_result = AdapterResult::<R>::from_js_value(value)?;
 
         Ok(js_result)
     }

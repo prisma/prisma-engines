@@ -1,7 +1,5 @@
-use napi::{bindgen_prelude::FromNapiValue, Env, JsUnknown, NapiValue};
-use quaint::error::{Error as QuaintError, ErrorKind};
-
 use crate::error::DriverAdapterError;
+use napi::{bindgen_prelude::FromNapiValue, Env, JsUnknown, NapiValue};
 
 impl FromNapiValue for DriverAdapterError {
     unsafe fn from_napi_value(napi_env: napi::sys::napi_env, napi_val: napi::sys::napi_value) -> napi::Result<Self> {
@@ -11,26 +9,11 @@ impl FromNapiValue for DriverAdapterError {
     }
 }
 
-impl From<DriverAdapterError> for QuaintError {
-    fn from(value: DriverAdapterError) -> Self {
-        match value {
-            DriverAdapterError::UnsupportedNativeDataType { native_type } => {
-                QuaintError::builder(ErrorKind::UnsupportedColumnType {
-                    column_type: native_type,
-                })
-                .build()
-            }
-            DriverAdapterError::GenericJs { id } => QuaintError::external_error(id),
-            DriverAdapterError::Postgres(e) => e.into(),
-            DriverAdapterError::Mysql(e) => e.into(),
-            DriverAdapterError::Sqlite(e) => e.into(),
-            // in future, more error types would be added and we'll need to convert them to proper QuaintErrors here
-        }
-    }
-}
-
-/// Wrapper for JS-side result type
-pub(crate) enum JsResult<T>
+/// Wrapper for JS-side result type.
+/// This Napi-specific implementation has the same shape and API as the Wasm implementation,
+/// but it asks for a `FromNapiValue` bound on the generic type.
+/// The duplication is needed as it's currently impossible to have target-specific generic bounds in Rust.
+pub(crate) enum AdapterResult<T>
 where
     T: FromNapiValue,
 {
@@ -38,7 +21,7 @@ where
     Err(DriverAdapterError),
 }
 
-impl<T> JsResult<T>
+impl<T> AdapterResult<T>
 where
     T: FromNapiValue,
 {
@@ -55,7 +38,7 @@ where
     }
 }
 
-impl<T> FromNapiValue for JsResult<T>
+impl<T> FromNapiValue for AdapterResult<T>
 where
     T: FromNapiValue,
 {
@@ -64,14 +47,14 @@ where
     }
 }
 
-impl<T> From<JsResult<T>> for quaint::Result<T>
+impl<T> From<AdapterResult<T>> for quaint::Result<T>
 where
     T: FromNapiValue,
 {
-    fn from(value: JsResult<T>) -> Self {
+    fn from(value: AdapterResult<T>) -> Self {
         match value {
-            JsResult::Ok(result) => Ok(result),
-            JsResult::Err(error) => Err(error.into()),
+            AdapterResult::Ok(result) => Ok(result),
+            AdapterResult::Err(error) => Err(error.into()),
         }
     }
 }

@@ -15,6 +15,33 @@ pub(crate) mod send_future;
 pub(crate) mod transaction;
 pub(crate) mod types;
 
+use crate::error::DriverAdapterError;
+use quaint::error::{Error as QuaintError, ErrorKind};
+
+#[cfg(target_arch = "wasm32")]
+pub(crate) use wasm::result::AdapterResult;
+
+#[cfg(not(target_arch = "wasm32"))]
+pub(crate) use napi::result::AdapterResult;
+
+impl From<DriverAdapterError> for QuaintError {
+    fn from(value: DriverAdapterError) -> Self {
+        match value {
+            DriverAdapterError::UnsupportedNativeDataType { native_type } => {
+                QuaintError::builder(ErrorKind::UnsupportedColumnType {
+                    column_type: native_type,
+                })
+                .build()
+            }
+            DriverAdapterError::GenericJs { id } => QuaintError::external_error(id),
+            DriverAdapterError::Postgres(e) => e.into(),
+            DriverAdapterError::Mysql(e) => e.into(),
+            DriverAdapterError::Sqlite(e) => e.into(),
+            // in future, more error types would be added and we'll need to convert them to proper QuaintErrors here
+        }
+    }
+}
+
 pub use queryable::from_js;
 pub(crate) use transaction::JsTransaction;
 

@@ -1,30 +1,14 @@
 use js_sys::Boolean as JsBoolean;
-use quaint::error::{Error as QuaintError, ErrorKind};
 use wasm_bindgen::{JsCast, JsValue};
 
 use super::from_js::FromJsValue;
 use crate::{error::DriverAdapterError, JsObjectExtern};
 
-impl From<DriverAdapterError> for QuaintError {
-    fn from(value: DriverAdapterError) -> Self {
-        match value {
-            DriverAdapterError::UnsupportedNativeDataType { native_type } => {
-                QuaintError::builder(ErrorKind::UnsupportedColumnType {
-                    column_type: native_type,
-                })
-                .build()
-            }
-            DriverAdapterError::GenericJs { id } => QuaintError::external_error(id),
-            DriverAdapterError::Postgres(e) => e.into(),
-            DriverAdapterError::Mysql(e) => e.into(),
-            DriverAdapterError::Sqlite(e) => e.into(),
-            // in future, more error types would be added and we'll need to convert them to proper QuaintErrors here
-        }
-    }
-}
-
-/// Wrapper for JS-side result type
-pub(crate) enum JsResult<T>
+/// Wrapper for JS-side result type.
+/// This Wasm-specific implementation has the same shape and API as the Napi implementation,
+/// but it asks for a `FromJsValue` bound on the generic type.
+/// The duplication is needed as it's currently impossible to have target-specific generic bounds in Rust.
+pub(crate) enum AdapterResult<T>
 where
     T: FromJsValue,
 {
@@ -32,7 +16,7 @@ where
     Err(DriverAdapterError),
 }
 
-impl<T> FromJsValue for JsResult<T>
+impl<T> FromJsValue for AdapterResult<T>
 where
     T: FromJsValue,
 {
@@ -54,14 +38,14 @@ where
     }
 }
 
-impl<T> From<JsResult<T>> for quaint::Result<T>
+impl<T> From<AdapterResult<T>> for quaint::Result<T>
 where
     T: FromJsValue,
 {
-    fn from(value: JsResult<T>) -> Self {
+    fn from(value: AdapterResult<T>) -> Self {
         match value {
-            JsResult::Ok(result) => Ok(result),
-            JsResult::Err(error) => Err(error.into()),
+            AdapterResult::Ok(result) => Ok(result),
+            AdapterResult::Err(error) => Err(error.into()),
         }
     }
 }

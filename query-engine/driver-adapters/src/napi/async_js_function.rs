@@ -5,10 +5,8 @@ use napi::{
     threadsafe_function::{ErrorStrategy, ThreadsafeFunction, ThreadsafeFunctionCallMode},
 };
 
-use super::{
-    error::{async_unwinding_panic, into_quaint_error},
-    result::JsResult,
-};
+use super::error::{async_unwinding_panic, into_quaint_error};
+use crate::AdapterResult;
 
 /// Wrapper for napi-rs's ThreadsafeFunction that is aware of
 /// JS drivers conventions. Performs following things:
@@ -47,7 +45,7 @@ where
         let js_result = async_unwinding_panic(async {
             let promise = self
                 .threadsafe_fn
-                .call_async::<Promise<JsResult<ReturnType>>>(arg)
+                .call_async::<Promise<AdapterResult<ReturnType>>>(arg)
                 .await?;
             promise.await
         })

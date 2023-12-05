@@ -4,7 +4,7 @@ mod async_js_function;
 mod error;
 mod from_js;
 mod js_object_extern;
-mod result;
+pub(crate) mod result;
 
 pub(crate) use async_js_function::AsyncJsFunction;
 pub(crate) use from_js::FromJsValue;
