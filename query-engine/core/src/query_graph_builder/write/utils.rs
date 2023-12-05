@@ -44,6 +44,7 @@ where
         selection_order: vec![],
         aggregation_selections: vec![],
         options: QueryOptions::none(),
+        relation_load_strategy: query_structure::RelationLoadStrategy::Query,
     });
 
     Query::Read(read_query)

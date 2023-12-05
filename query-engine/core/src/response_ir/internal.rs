@@ -1,6 +1,9 @@
 use super::*;
 use crate::{
-    constants::custom_types, protocol::EngineProtocol, CoreError, QueryResult, RecordAggregations, RecordSelection,
+    constants::custom_types,
+    protocol::EngineProtocol,
+    result_ast::{RecordSelectionWithRelations, RelationRecordSelection},
+    CoreError, QueryResult, RecordAggregations, RecordSelection,
 };
 use connector::{AggregationResult, RelAggregationResult, RelAggregationRow};
 use indexmap::IndexMap;
@@ -10,7 +13,7 @@ use schema::{
     constants::{aggregations::*, output_fields::*},
     *,
 };
-use std::collections::HashMap;
+use std::collections::{HashMap, HashSet};
 
 /// A grouping of items to their parent record.
 /// The item implicitly holds the information of the type of item contained.
@@ -45,6 +48,9 @@ pub(crate) fn serialize_internal(
     match result {
         QueryResult::RecordSelection(Some(rs)) => {
             serialize_record_selection(*rs, field, field.field_type(), is_list, query_schema)
+        }
+        QueryResult::RecordSelectionWithRelations(rs) => {
+            serialize_record_selection_with_relations(*rs, field, field.field_type(), is_list)
         }
         QueryResult::RecordAggregations(ras) => serialize_aggregations(field, ras),
         QueryResult::Count(c) => {
@@ -216,6 +222,31 @@ fn coerce_non_numeric(value: PrismaValue, output: &OutputType<'_>) -> PrismaValu
     }
 }
 
+fn serialize_record_selection_with_relations(
+    record_selection: RecordSelectionWithRelations,
+    field: &OutputField<'_>,
+    typ: &OutputType<'_>, // We additionally pass the type to allow recursing into nested type definitions of a field.
+    is_list: bool,
+) -> crate::Result<CheckedItemsWithParents> {
+    let name = record_selection.name.clone();
+
+    match &typ.inner {
+        inner if typ.is_list() => serialize_record_selection_with_relations(
+            record_selection,
+            field,
+            &OutputType::non_list(inner.clone()),
+            true,
+        ),
+        InnerOutputType::Object(obj) => {
+            let result = serialize_objects_with_relation(record_selection, obj)?;
+
+            finalize_objects(field, is_list, result, name)
+        }
+        // We always serialize record selections into objects or lists on the top levels. Scalars and enums are handled separately.
+        _ => unreachable!(),
+    }
+}
+
 fn serialize_record_selection(
     record_selection: RecordSelection,
     field: &OutputField<'_>,
@@ -235,54 +266,197 @@ fn serialize_record_selection(
         ),
         InnerOutputType::Object(obj) => {
             let result = serialize_objects(record_selection, obj, query_schema)?;
-            let is_optional = field.is_nullable;
 
-            // Items will be ref'ed on the top level to allow cheap clones in nested scenarios.
-            match (is_list, is_optional) {
-                // List(Opt(_)) | List(_)
-                (true, opt) => {
-                    result
-                        .into_iter()
-                        .map(|(parent, items)| {
-                            if !opt {
-                                // Check that all items are non-null
-                                if items.iter().any(|item| matches!(item, Item::Value(PrismaValue::Null))) {
-                                    return Err(CoreError::null_serialization_error(&name));
-                                }
-                            }
-
-                            Ok((parent, Item::Ref(ItemRef::new(Item::list(items)))))
-                        })
-                        .collect()
-                }
-
-                // Opt(_)
-                (false, opt) => {
-                    result
-                        .into_iter()
-                        .map(|(parent, mut items)| {
-                            // As it's not a list, we require a single result
-                            if items.len() > 1 {
-                                items.reverse();
-                                let first = items.pop().unwrap();
-
-                                // Simple return the first record in the list.
-                                Ok((parent, Item::Ref(ItemRef::new(first))))
-                            } else if items.is_empty() && opt {
-                                Ok((parent, Item::Ref(ItemRef::new(Item::Value(PrismaValue::Null)))))
-                            } else if items.is_empty() && opt {
-                                Err(CoreError::null_serialization_error(&name))
-                            } else {
-                                Ok((parent, Item::Ref(ItemRef::new(items.pop().unwrap()))))
-                            }
-                        })
-                        .collect()
-                }
-            }
+            finalize_objects(field, is_list, result, name)
         }
 
         _ => unreachable!(), // We always serialize record selections into objects or lists on the top levels. Scalars and enums are handled separately.
     }
+}
+
+fn finalize_objects(
+    field: &OutputField<'_>,
+    is_list: bool,
+    result: IndexMap<Option<SelectionResult>, Vec<Item>>,
+    name: String,
+) -> Result<IndexMap<Option<SelectionResult>, Item>, CoreError> {
+    let is_optional = field.is_nullable;
+
+    // Items will be ref'ed on the top level to allow cheap clones in nested scenarios.
+    match (is_list, is_optional) {
+        // List(Opt(_)) | List(_)
+        (true, opt) => {
+            result
+                .into_iter()
+                .map(|(parent, items)| {
+                    if !opt {
+                        // Check that all items are non-null
+                        if items.iter().any(|item| matches!(item, Item::Value(PrismaValue::Null))) {
+                            return Err(CoreError::null_serialization_error(&name));
+                        }
+                    }
+
+                    Ok((parent, Item::Ref(ItemRef::new(Item::list(items)))))
+                })
+                .collect()
+        }
+
+        // Opt(_)
+        (false, opt) => {
+            result
+                .into_iter()
+                .map(|(parent, mut items)| {
+                    // As it's not a list, we require a single result
+                    if items.len() > 1 {
+                        items.reverse();
+                        let first = items.pop().unwrap();
+
+                        // Simple return the first record in the list.
+                        Ok((parent, Item::Ref(ItemRef::new(first))))
+                    } else if items.is_empty() && opt {
+                        Ok((parent, Item::Ref(ItemRef::new(Item::Value(PrismaValue::Null)))))
+                    } else if items.is_empty() && opt {
+                        Err(CoreError::null_serialization_error(&name))
+                    } else {
+                        Ok((parent, Item::Ref(ItemRef::new(items.pop().unwrap()))))
+                    }
+                })
+                .collect()
+        }
+    }
+}
+
+// TODO: Handle errors properly
+fn serialize_objects_with_relation(
+    result: RecordSelectionWithRelations,
+    typ: &ObjectType<'_>,
+) -> crate::Result<UncheckedItemsWithParents> {
+    let mut object_mapping = UncheckedItemsWithParents::with_capacity(result.records.records.len());
+
+    let model = result.model;
+    let db_field_names = result.records.field_names;
+    let nested = result.nested;
+
+    let fields: Vec<_> = db_field_names
+        .iter()
+        .filter_map(|f| model.fields().all().find(|field| field.db_name() == f))
+        .collect();
+
+    // Hack: we convert it to a hashset to support contains with &str as input
+    // because Vec<String>::contains(&str) doesn't work and we don't want to allocate a string record value
+    let selected_db_field_names: HashSet<String> = result.fields.clone().into_iter().collect();
+
+    for record in result.records.records.into_iter() {
+        if !object_mapping.contains_key(&record.parent_id) {
+            object_mapping.insert(record.parent_id.clone(), Vec::new());
+        }
+
+        let values = record.values;
+        let mut object = HashMap::with_capacity(values.len());
+
+        for (val, field) in values.into_iter().zip(fields.iter()) {
+            // Skip fields that aren't part of the selection set
+            if !selected_db_field_names.contains(field.name()) {
+                continue;
+            }
+
+            let out_field = typ.find_field(field.name()).unwrap();
+
+            match field {
+                Field::Scalar(_) if !out_field.field_type().is_object() => {
+                    object.insert(field.name().to_owned(), serialize_scalar(out_field, val)?);
+                }
+                Field::Relation(_) if out_field.field_type().is_list() => {
+                    let inner_typ = out_field.field_type.as_object_type().unwrap();
+                    let rrs = nested.iter().find(|rrs| rrs.name == field.name()).unwrap();
+
+                    let items = val
+                        .into_list()
+                        .unwrap()
+                        .into_iter()
+                        .map(|value| serialize_relation_selection(rrs, value, inner_typ))
+                        .collect::<crate::Result<Vec<_>>>()?;
+
+                    object.insert(field.name().to_owned(), Item::list(items));
+                }
+                Field::Relation(_) => {
+                    let inner_typ = out_field.field_type.as_object_type().unwrap();
+                    let rrs = nested.iter().find(|rrs| rrs.name == field.name()).unwrap();
+
+                    object.insert(
+                        field.name().to_owned(),
+                        serialize_relation_selection(rrs, val, inner_typ)?,
+                    );
+                }
+                _ => panic!("unexpected field"),
+            }
+        }
+
+        let map = reorder_object_with_selection_order(result.fields.clone(), object);
+
+        let result = Item::Map(map);
+
+        object_mapping.get_mut(&record.parent_id).unwrap().push(result);
+    }
+
+    Ok(object_mapping)
+}
+
+fn serialize_relation_selection(
+    rrs: &RelationRecordSelection,
+    value: PrismaValue,
+    // parent_id: Option<SelectionResult>,
+    typ: &ObjectType<'_>,
+) -> crate::Result<Item> {
+    if value.is_null() {
+        return Ok(Item::Value(PrismaValue::Null));
+    }
+
+    let mut map = Map::new();
+
+    // TODO: better handle errors
+    let mut value_obj: HashMap<String, PrismaValue> = HashMap::from_iter(value.into_object().unwrap());
+    let db_field_names = &rrs.fields;
+    let fields: Vec<_> = db_field_names
+        .iter()
+        .filter_map(|f| rrs.model.fields().all().find(|field| field.name() == f))
+        .collect();
+
+    for field in fields {
+        let out_field = typ.find_field(field.name()).unwrap();
+        let value = value_obj.remove(field.db_name()).unwrap();
+
+        match field {
+            Field::Scalar(_) if !out_field.field_type().is_object() => {
+                map.insert(field.name().to_owned(), serialize_scalar(out_field, value)?);
+            }
+            Field::Relation(_) if out_field.field_type().is_list() => {
+                let inner_typ = out_field.field_type.as_object_type().unwrap();
+                let inner_rrs = rrs.nested.iter().find(|rrs| rrs.name == field.name()).unwrap();
+
+                let items = value
+                    .into_list()
+                    .unwrap()
+                    .into_iter()
+                    .map(|value| serialize_relation_selection(inner_rrs, value, inner_typ))
+                    .collect::<crate::Result<Vec<_>>>()?;
+
+                map.insert(field.name().to_owned(), Item::list(items));
+            }
+            Field::Relation(_) => {
+                let inner_typ = out_field.field_type.as_object_type().unwrap();
+                let inner_rrs = rrs.nested.iter().find(|rrs| rrs.name == field.name()).unwrap();
+
+                map.insert(
+                    field.name().to_owned(),
+                    serialize_relation_selection(inner_rrs, value, inner_typ)?,
+                );
+            }
+            _ => (),
+        }
+    }
+
+    Ok(Item::Map(map))
 }
 
 /// Serializes the given result into objects of given type.
@@ -365,26 +539,24 @@ fn serialize_objects(
         let mut all_fields = result.fields.clone();
         all_fields.append(&mut aggr_fields);
 
-        let map = all_fields
-            .iter()
-            .fold(Map::with_capacity(all_fields.len()), |mut acc, field_name| {
-                acc.insert(field_name.to_owned(), object.remove(field_name).unwrap());
-                acc
-            });
+        let map = reorder_object_with_selection_order(all_fields, object);
 
-        // TODO: Find out how to easily determine when a result is null.
-        // If the object is null or completely empty, coerce into null instead.
-        let result = Item::Map(map);
-        // let result = if result.is_null_or_empty() {
-        //     Item::Value(PrismaValue::Null)
-        // } else {
-        //     result
-        // };
-
-        object_mapping.get_mut(&record.parent_id).unwrap().push(result);
+        object_mapping.get_mut(&record.parent_id).unwrap().push(Item::Map(map));
     }
 
     Ok(object_mapping)
+}
+
+fn reorder_object_with_selection_order(
+    selection_order: Vec<String>,
+    mut object: HashMap<String, Item>,
+) -> IndexMap<String, Item> {
+    selection_order
+        .iter()
+        .fold(Map::with_capacity(selection_order.len()), |mut acc, field_name| {
+            acc.insert(field_name.to_owned(), object.remove(field_name).unwrap());
+            acc
+        })
 }
 
 /// Unwraps are safe due to query validation.

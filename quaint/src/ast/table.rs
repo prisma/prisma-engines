@@ -204,6 +204,15 @@ impl<'a> Table<'a> {
         self
     }
 
+    pub fn left_join_lateral<J>(self, join: J) -> Self
+    where
+        J: Into<JoinData<'a>>,
+    {
+        let join_data: JoinData = join.into();
+
+        self.left_join(join_data.lateral())
+    }
+
     /// Adds an `INNER JOIN` clause to the query, specifically for that table.
     /// Useful to positionally add a JOIN clause in case you are selecting from multiple tables.
     ///

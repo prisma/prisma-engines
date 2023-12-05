@@ -13,7 +13,7 @@ use quaint::{
     connector::{IsolationLevel, TransactionCapable},
     prelude::{ConnectionInfo, Queryable},
 };
-use query_structure::{prelude::*, Filter, QueryArguments, SelectionResult};
+use query_structure::{prelude::*, Filter, QueryArguments, RelationLoadStrategy, SelectionResult};
 use std::{collections::HashMap, str::FromStr};
 
 pub(crate) struct SqlConnection<C> {
@@ -87,6 +87,7 @@ where
         filter: &Filter,
         selected_fields: &FieldSelection,
         aggr_selections: &[RelAggregationSelection],
+        relation_load_strategy: RelationLoadStrategy,
         trace_id: Option<String>,
     ) -> connector::Result<Option<SingleRecord>> {
         // [Composites] todo: FieldSelection -> ModelProjection conversion
@@ -96,8 +97,9 @@ where
                 &self.inner,
                 model,
                 filter,
-                &selected_fields.into(),
+                selected_fields,
                 aggr_selections,
+                relation_load_strategy,
                 &ctx,
             )
             .await
@@ -111,16 +113,19 @@ where
         query_arguments: QueryArguments,
         selected_fields: &FieldSelection,
         aggr_selections: &[RelAggregationSelection],
+        relation_load_strategy: RelationLoadStrategy,
         trace_id: Option<String>,
     ) -> connector::Result<ManyRecords> {
         catch(self.connection_info.clone(), async move {
             let ctx = Context::new(&self.connection_info, trace_id.as_deref());
+
             read::get_many_records(
                 &self.inner,
                 model,
                 query_arguments,
-                &selected_fields.into(),
+                selected_fields,
                 aggr_selections,
+                relation_load_strategy,
                 &ctx,
             )
             .await

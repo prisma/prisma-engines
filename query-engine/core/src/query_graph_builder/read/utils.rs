@@ -1,8 +1,12 @@
 use super::*;
 use crate::{ArgumentListLookup, FieldPair, ParsedField, ReadQuery};
 use connector::RelAggregationSelection;
-use query_structure::prelude::*;
-use schema::constants::{aggregations::*, args};
+use psl::{datamodel_connector::ConnectorCapability, PreviewFeature};
+use query_structure::{prelude::*, RelationLoadStrategy};
+use schema::{
+    constants::{aggregations::*, args},
+    QuerySchema,
+};
 
 pub fn collect_selection_order(from: &[FieldPair<'_>]) -> Vec<String> {
     from.iter()
@@ -21,18 +25,19 @@ pub fn collect_selected_fields(
     from_pairs: &[FieldPair<'_>],
     distinct: Option<FieldSelection>,
     model: &Model,
-) -> FieldSelection {
+    query_schema: &QuerySchema,
+) -> QueryGraphBuilderResult<FieldSelection> {
     let model_id = model.primary_identifier();
-    let selected_fields = pairs_to_selections(model, from_pairs);
+    let selected_fields = pairs_to_selections(model, from_pairs, query_schema)?;
 
     let selection = FieldSelection::new(selected_fields);
     let selection = model_id.merge(selection);
 
     // Distinct fields are always selected because we are processing them in-memory
     if let Some(distinct) = distinct {
-        selection.merge(distinct)
+        Ok(selection.merge(distinct))
     } else {
-        selection
+        Ok(selection)
     }
 }
 
@@ -60,12 +65,20 @@ where
         .collect()
 }
 
-fn pairs_to_selections<T>(parent: T, pairs: &[FieldPair<'_>]) -> Vec<SelectedField>
+fn pairs_to_selections<T>(
+    parent: T,
+    pairs: &[FieldPair<'_>],
+    query_schema: &QuerySchema,
+) -> QueryGraphBuilderResult<Vec<SelectedField>>
 where
     T: Into<ParentContainer>,
 {
+    let should_collect_relation_selection = query_schema.has_capability(ConnectorCapability::LateralJoin)
+        && query_schema.has_feature(PreviewFeature::RelationJoins);
+
     let parent = parent.into();
-    pairs
+
+    let selected_fields = pairs
         .iter()
         .filter_map(|pair| {
             parent
@@ -73,29 +86,68 @@ where
                 .map(|field| (pair.parsed_field.clone(), field))
         })
         .flat_map(|field| match field {
-            (_, Field::Relation(rf)) => rf.scalar_fields().into_iter().map(Into::into).collect(),
-            (_, Field::Scalar(sf)) => vec![sf.into()],
-            (pf, Field::Composite(cf)) => vec![extract_composite_selection(pf, cf)],
+            (pf, Field::Relation(rf)) => {
+                let mut fields: Vec<QueryGraphBuilderResult<SelectedField>> = rf
+                    .scalar_fields()
+                    .into_iter()
+                    .map(SelectedField::from)
+                    .map(Ok)
+                    .collect();
+
+                if should_collect_relation_selection {
+                    fields.push(extract_relation_selection(pf, rf, query_schema));
+                }
+
+                fields
+            }
+            (_, Field::Scalar(sf)) => vec![Ok(sf.into())],
+            (pf, Field::Composite(cf)) => vec![extract_composite_selection(pf, cf, query_schema)],
         })
-        .collect()
+        .collect::<Result<Vec<_>, _>>()?;
+
+    Ok(selected_fields)
 }
 
-fn extract_composite_selection(pf: ParsedField<'_>, cf: CompositeFieldRef) -> SelectedField {
+fn extract_composite_selection(
+    pf: ParsedField<'_>,
+    cf: CompositeFieldRef,
+    query_schema: &QuerySchema,
+) -> QueryGraphBuilderResult<SelectedField> {
     let object = pf
         .nested_fields
         .expect("Invalid composite query shape: Composite field selected without sub-selection.");
 
     let typ = cf.typ();
 
-    SelectedField::Composite(CompositeSelection {
+    Ok(SelectedField::Composite(CompositeSelection {
         field: cf,
-        selections: pairs_to_selections(typ, &object.fields),
-    })
+        selections: pairs_to_selections(typ, &object.fields, query_schema)?,
+    }))
+}
+
+fn extract_relation_selection(
+    pf: ParsedField<'_>,
+    rf: RelationFieldRef,
+    query_schema: &QuerySchema,
+) -> QueryGraphBuilderResult<SelectedField> {
+    let object = pf
+        .nested_fields
+        .expect("Invalid relation query shape: Relation field selected without sub-selection.");
+
+    let related_model = rf.related_model();
+
+    Ok(SelectedField::Relation(RelationSelection {
+        field: rf,
+        args: extract_query_args(pf.arguments, &related_model)?,
+        result_fields: collect_selection_order(&object.fields),
+        selections: pairs_to_selections(related_model, &object.fields, query_schema)?,
+    }))
 }
 
 pub(crate) fn collect_nested_queries(
     from: Vec<FieldPair<'_>>,
     model: &Model,
+    query_schema: &QuerySchema,
 ) -> QueryGraphBuilderResult<Vec<ReadQuery>> {
     from.into_iter()
         .filter_map(|pair| {
@@ -112,7 +164,7 @@ pub(crate) fn collect_nested_queries(
                     let model = rf.related_model();
                     let parent = rf.clone();
 
-                    Some(related::find_related(pair.parsed_field, parent, model))
+                    Some(related::find_related(pair.parsed_field, parent, model, query_schema))
                 }
             }
         })
@@ -188,4 +240,27 @@ pub fn collect_relation_aggr_selections(
     }
 
     Ok(selections)
+}
+
+pub(crate) fn get_relation_load_strategy(
+    cursor: Option<&SelectionResult>,
+    distinct: Option<&FieldSelection>,
+    nested_queries: &[ReadQuery],
+    aggregation_selections: &[RelAggregationSelection],
+    query_schema: &QuerySchema,
+) -> RelationLoadStrategy {
+    if query_schema.has_feature(PreviewFeature::RelationJoins)
+        && query_schema.has_capability(ConnectorCapability::LateralJoin)
+        && cursor.is_none()
+        && distinct.is_none()
+        && aggregation_selections.is_empty()
+        && !nested_queries.iter().any(|q| match q {
+            ReadQuery::RelatedRecordsQuery(q) => q.has_cursor() || q.has_distinct() || q.has_aggregation_selections(),
+            _ => false,
+        })
+    {
+        RelationLoadStrategy::Join
+    } else {
+        RelationLoadStrategy::Query
+    }
 }
