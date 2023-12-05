@@ -13,7 +13,6 @@ tracing-core = "0.1"
 metrics = "0.18"
 uuid = { version = "1", features = ["v4"] }
 pin-project = "1"
-wasm-rs-dbg = "0.1.2"
 serde_repr.workspace = true
 
 futures = "0.3"
