@@ -231,6 +231,7 @@ pub trait ReadOperations {
         filter: &Filter,
         selected_fields: &FieldSelection,
         aggregation_selections: &[RelAggregationSelection],
+        relation_load_strategy: RelationLoadStrategy,
         trace_id: Option<String>,
     ) -> crate::Result<Option<SingleRecord>>;
 
@@ -246,6 +247,7 @@ pub trait ReadOperations {
         query_arguments: QueryArguments,
         selected_fields: &FieldSelection,
         aggregation_selections: &[RelAggregationSelection],
+        relation_load_strategy: RelationLoadStrategy,
         trace_id: Option<String>,
     ) -> crate::Result<ManyRecords>;
 

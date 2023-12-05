@@ -10,7 +10,7 @@ use connector_interface::{
     WriteOperations,
 };
 use mongodb::{ClientSession, Database};
-use query_structure::{prelude::*, SelectionResult};
+use query_structure::{prelude::*, RelationLoadStrategy, SelectionResult};
 use std::collections::HashMap;
 
 pub struct MongoDbConnection {
@@ -190,6 +190,7 @@ impl ReadOperations for MongoDbConnection {
         filter: &query_structure::Filter,
         selected_fields: &FieldSelection,
         aggr_selections: &[RelAggregationSelection],
+        _relation_load_strategy: RelationLoadStrategy,
         _trace_id: Option<String>,
     ) -> connector_interface::Result<Option<SingleRecord>> {
         catch(async move {
@@ -212,6 +213,7 @@ impl ReadOperations for MongoDbConnection {
         query_arguments: query_structure::QueryArguments,
         selected_fields: &FieldSelection,
         aggregation_selections: &[RelAggregationSelection],
+        _relation_load_strategy: RelationLoadStrategy,
         _trace_id: Option<String>,
     ) -> connector_interface::Result<ManyRecords> {
         catch(async move {

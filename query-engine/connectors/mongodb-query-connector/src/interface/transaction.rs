@@ -8,7 +8,7 @@ use connector_interface::{
 };
 use mongodb::options::{Acknowledgment, ReadConcern, TransactionOptions, WriteConcern};
 use query_engine_metrics::{decrement_gauge, increment_gauge, metrics, PRISMA_CLIENT_QUERIES_ACTIVE};
-use query_structure::SelectionResult;
+use query_structure::{RelationLoadStrategy, SelectionResult};
 use std::collections::HashMap;
 
 pub struct MongoDbTransaction<'conn> {
@@ -255,6 +255,7 @@ impl<'conn> ReadOperations for MongoDbTransaction<'conn> {
         filter: &query_structure::Filter,
         selected_fields: &FieldSelection,
         aggr_selections: &[RelAggregationSelection],
+        _relation_load_strategy: RelationLoadStrategy,
         _trace_id: Option<String>,
     ) -> connector_interface::Result<Option<SingleRecord>> {
         catch(async move {
@@ -277,6 +278,7 @@ impl<'conn> ReadOperations for MongoDbTransaction<'conn> {
         query_arguments: query_structure::QueryArguments,
         selected_fields: &FieldSelection,
         aggregation_selections: &[RelAggregationSelection],
+        _relation_load_strategy: RelationLoadStrategy,
         _trace_id: Option<String>,
     ) -> connector_interface::Result<ManyRecords> {
         catch(async move {

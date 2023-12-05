@@ -8,4 +8,5 @@ mod json_result;
 mod m2m;
 mod mongo_incorrect_fields;
 mod multi_field_unique;
+mod one2m;
 mod raw_mongo;

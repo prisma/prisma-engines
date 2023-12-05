@@ -797,6 +797,7 @@ impl QueryGraph {
                 selection_order: vec![],
                 aggregation_selections: vec![],
                 options: QueryOptions::none(),
+                relation_load_strategy: query_structure::RelationLoadStrategy::Query,
             });
 
             let reload_query = Query::Read(read_query);

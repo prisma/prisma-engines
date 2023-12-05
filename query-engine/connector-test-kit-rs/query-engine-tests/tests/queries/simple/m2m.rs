@@ -69,6 +69,49 @@ mod m2m {
         Ok(())
     }
 
+    fn schema() -> String {
+        let schema = indoc! {
+            r#"model Item {
+                id         Int        @id @default(autoincrement())
+                categories Category[]
+                createdAt  DateTime   @default(now())
+                updatedAt  DateTime?  @updatedAt
+              }
+              
+              model Category {
+                id        Int       @id @default(autoincrement())
+                items     Item[]
+                createdAt DateTime  @default(now())
+                updatedAt DateTime? @updatedAt
+              }"#
+        };
+
+        schema.to_owned()
+    }
+
+    // https://github.com/prisma/prisma/issues/16390
+    #[connector_test(schema(schema), relation_mode = "prisma", only(Postgres))]
+    async fn repro_16390(runner: Runner) -> TestResult<()> {
+        run_query!(&runner, r#"mutation { createOneCategory(data: {}) { id } }"#);
+        run_query!(
+            &runner,
+            r#"mutation { createOneItem(data: { categories: { connect: { id: 1 } } }) { id } }"#
+        );
+        run_query!(&runner, r#"mutation { deleteOneItem(where: { id: 1 }) { id } }"#);
+
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"{ findUniqueItem(where: { id: 1 }) { id categories { id } } }"#),
+          @r###"{"data":{"findUniqueItem":null}}"###
+        );
+
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"{ findUniqueCategory(where: { id: 1 }) { id items { id } } }"#),
+          @r###"{"data":{"findUniqueCategory":{"id":1,"items":[]}}}"###
+        );
+
+        Ok(())
+    }
+
     async fn test_data(runner: &Runner) -> TestResult<()> {
         runner
             .query(

@@ -304,6 +304,14 @@ impl PrismaValue {
             _ => None,
         }
     }
+
+    pub fn as_json(&self) -> Option<&String> {
+        if let Self::Json(v) = self {
+            Some(v)
+        } else {
+            None
+        }
+    }
 }
 
 impl fmt::Display for PrismaValue {

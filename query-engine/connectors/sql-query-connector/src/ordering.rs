@@ -18,8 +18,16 @@ pub(crate) struct OrderByDefinition {
 
 #[derive(Debug, Default)]
 pub(crate) struct OrderByBuilder {
+    parent_alias: Option<String>,
     // Used to generate unique join alias
     join_counter: usize,
+}
+
+impl OrderByBuilder {
+    pub(crate) fn with_parent_alias(mut self, alias: Option<String>) -> Self {
+        self.parent_alias = alias;
+        self
+    }
 }
 
 impl OrderByBuilder {
@@ -27,7 +35,6 @@ impl OrderByBuilder {
     pub(crate) fn build(&mut self, query_arguments: &QueryArguments, ctx: &Context<'_>) -> Vec<OrderByDefinition> {
         let needs_reversed_order = query_arguments.needs_reversed_order();
 
-        // The index is used to differentiate potentially separate relations to the same model.
         query_arguments
             .order_by
             .iter()
@@ -69,7 +76,11 @@ impl OrderByBuilder {
         needs_reversed_order: bool,
         ctx: &Context<'_>,
     ) -> OrderByDefinition {
-        let columns: Vec<Expression> = order_by.fields.iter().map(|sf| sf.as_column(ctx).into()).collect();
+        let columns: Vec<Expression> = order_by
+            .fields
+            .iter()
+            .map(|sf| sf.as_column(ctx).opt_table(self.parent_alias.clone()).into())
+            .collect();
         let order_column: Expression = text_search_relevance(&columns, order_by.search.clone()).into();
         let order: Option<Order> = Some(into_order(&order_by.sort_order, None, needs_reversed_order));
         let order_definition: OrderDefinition = (order_column.clone(), order);
@@ -143,9 +154,12 @@ impl OrderByBuilder {
         // Unwraps are safe because the SQL connector doesn't yet support any other type of orderBy hop but the relation hop.
         let mut joins: Vec<AliasedJoin> = vec![];
 
+        let parent_alias = self.parent_alias.clone();
+
         for (i, hop) in rest_hops.iter().enumerate() {
             let previous_join = if i > 0 { joins.get(i - 1) } else { None };
-            let previous_alias = previous_join.map(|j| j.alias.as_str());
+
+            let previous_alias = previous_join.map(|j| j.alias.as_str()).or(parent_alias.as_deref());
             let join = compute_one2m_join(hop.as_relation_hop().unwrap(), &self.join_prefix(), previous_alias, ctx);
 
             joins.push(join);
@@ -156,7 +170,7 @@ impl OrderByBuilder {
             _ => unreachable!("Order by relation aggregation other than count are not supported"),
         };
 
-        let previous_alias = joins.last().map(|j| j.alias.as_str());
+        let previous_alias = joins.last().map(|j| j.alias.as_str()).or(parent_alias.as_deref());
 
         // We perform the aggregation on the last join
         let last_aggr_join = compute_aggr_join(
@@ -185,9 +199,14 @@ impl OrderByBuilder {
     ) -> (Vec<AliasedJoin>, Column<'static>) {
         let mut joins: Vec<AliasedJoin> = vec![];
 
+        let parent_alias = self.parent_alias.clone();
+
         for (i, hop) in order_by.path.iter().enumerate() {
             let previous_join = if i > 0 { joins.get(i - 1) } else { None };
-            let previous_alias = previous_join.map(|j| j.alias.as_str());
+            let previous_alias = previous_join
+                .map(|j| &j.alias)
+                .or(parent_alias.as_ref())
+                .map(|alias| alias.as_str());
             let join = compute_one2m_join(hop.as_relation_hop().unwrap(), &self.join_prefix(), previous_alias, ctx);
 
             joins.push(join);
@@ -201,7 +220,7 @@ impl OrderByBuilder {
         let order_by_column = if let Some(last_join) = joins.last() {
             Column::from((last_join.alias.to_owned(), order_by.field.db_name().to_owned()))
         } else {
-            order_by.field.as_column(ctx)
+            order_by.field.as_column(ctx).opt_table(self.parent_alias.clone())
         };
 
         (joins, order_by_column)

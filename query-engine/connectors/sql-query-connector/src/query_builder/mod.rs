@@ -1,4 +1,5 @@
 pub(crate) mod read;
+pub(crate) mod select;
 pub(crate) mod write;
 
 use crate::context::Context;
