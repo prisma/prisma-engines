@@ -38,53 +38,47 @@ pub(crate) use wasm::*;
 
 #[cfg(target_arch = "wasm32")]
 mod arch {
-    use std::str::FromStr;
-
-    pub(crate) use super::JsObject;
     pub(crate) use js_sys::JsString;
-    use js_sys::Reflect;
+    use std::str::FromStr;
     use tsify::Tsify;
-    use wasm_bindgen::JsValue;
 
-    pub(crate) fn get_named_property<T>(object: &JsObject, name: &str) -> JsResult<T>
+    pub(crate) fn get_named_property<T>(object: &super::wasm::JsObjectExtern, name: &str) -> JsResult<T>
     where
-        T: From<JsValue>,
+        T: From<wasm_bindgen::JsValue>,
     {
         Ok(object.get(name.into())?.into())
     }
 
-    pub(crate) fn has_named_property(object: &JsObject, name: &str) -> JsResult<bool> {
-        Ok(Reflect::has(&object, &JsString::from_str(name).unwrap().into())?)
+    pub(crate) fn has_named_property(object: &super::wasm::JsObjectExtern, name: &str) -> JsResult<bool> {
+        js_sys::Reflect::has(object, &JsString::from_str(name).unwrap().into())
     }
 
     pub(crate) fn to_rust_str(value: JsString) -> JsResult<String> {
         Ok(value.into())
     }
 
-    pub(crate) fn from_js_value<C>(value: JsValue) -> C
+    pub(crate) fn from_js_value<C>(value: wasm_bindgen::JsValue) -> C
     where
         C: Tsify + serde::de::DeserializeOwned,
     {
         C::from_js(value).unwrap()
     }
 
-    pub(crate) type JsResult<T> = core::result::Result<T, JsValue>;
+    pub(crate) type JsResult<T> = core::result::Result<T, wasm_bindgen::JsValue>;
 }
 
 #[cfg(not(target_arch = "wasm32"))]
 mod arch {
-    pub(crate) use super::JsObject;
-    use napi::bindgen_prelude::FromNapiValue;
-    pub(crate) use napi::JsString;
+    pub(crate) use ::napi::JsString;
 
-    pub(crate) fn get_named_property<T>(object: &JsObject, name: &str) -> JsResult<T>
+    pub(crate) fn get_named_property<T>(object: &::napi::JsObject, name: &str) -> JsResult<T>
     where
-        T: FromNapiValue,
+        T: ::napi::bindgen_prelude::FromNapiValue,
     {
         object.get_named_property(name)
     }
 
-    pub(crate) fn has_named_property(object: &JsObject, name: &str) -> JsResult<bool> {
+    pub(crate) fn has_named_property(object: &::napi::JsObject, name: &str) -> JsResult<bool> {
         object.has_named_property(name)
     }
 
@@ -96,7 +90,7 @@ mod arch {
         value
     }
 
-    pub(crate) type JsResult<T> = napi::Result<T>;
+    pub(crate) type JsResult<T> = ::napi::Result<T>;
 }
 
 pub(crate) use arch::*;
