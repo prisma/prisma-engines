@@ -251,6 +251,11 @@
 <a href="#251" id="251">251</a>
 <a href="#252" id="252">252</a>
 <a href="#253" id="253">253</a>
+<a href="#254" id="254">254</a>
+<a href="#255" id="255">255</a>
+<a href="#256" id="256">256</a>
+<a href="#257" id="257">257</a>
+<a href="#258" id="258">258</a>
 </pre></div><pre class="rust"><code><span class="kw">mod </span>composite;
 <span class="kw">mod </span>relation;
 <span class="kw">mod </span>scalar;
@@ -435,6 +440,11 @@
     <span class="doccomment">/// Returns `true` if the type identifier is [`Enum`].
     </span><span class="kw">pub fn </span>is_enum(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
         <span class="macro">matches!</span>(<span class="self">self</span>, <span class="self">Self</span>::Enum(..))
+    }
+
+    <span class="doccomment">/// Returns `true` if the type identifier is [`Json`].
+    </span><span class="kw">pub fn </span>is_json(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="macro">matches!</span>(<span class="self">self</span>, <span class="self">Self</span>::Json)
     }
 }
 

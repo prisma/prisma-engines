@@ -369,7 +369,7 @@
     );
 
     <span class="kw">let </span>filter = extract_unique_filter(where_argument, <span class="kw-2">&amp;</span>model)<span class="question-mark">?</span>;
-    <span class="kw">let </span>read_query = read::find_unique(field.clone(), model.clone())<span class="question-mark">?</span>;
+    <span class="kw">let </span>read_query = read::find_unique(field.clone(), model.clone(), query_schema)<span class="question-mark">?</span>;
 
     <span class="kw">if </span>can_use_native_upsert {
         <span class="kw">if let </span>ReadQuery::RecordQuery(read) = read_query {

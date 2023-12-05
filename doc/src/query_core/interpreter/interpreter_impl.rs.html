@@ -308,6 +308,13 @@
 <a href="#308" id="308">308</a>
 <a href="#309" id="309">309</a>
 <a href="#310" id="310">310</a>
+<a href="#311" id="311">311</a>
+<a href="#312" id="312">312</a>
+<a href="#313" id="313">313</a>
+<a href="#314" id="314">314</a>
+<a href="#315" id="315">315</a>
+<a href="#316" id="316">316</a>
+<a href="#317" id="317">317</a>
 </pre></div><pre class="rust"><code><span class="kw">use super</span>::{
     expression::<span class="kw-2">*</span>,
     query_interpreters::{read, write},
@@ -377,6 +384,13 @@
                 <span class="comment">// We always select IDs, the unwraps are safe.
                 </span>QueryResult::RecordSelection(<span class="prelude-val">Some</span>(rs)) =&gt; <span class="prelude-val">Some</span>(
                     rs.scalars
+                        .extract_selection_results(field_selection)
+                        .expect(<span class="string">&quot;Expected record selection to contain required model ID fields.&quot;</span>)
+                        .into_iter()
+                        .collect(),
+                ),
+                QueryResult::RecordSelectionWithRelations(rsr) =&gt; <span class="prelude-val">Some</span>(
+                    rsr.records
                         .extract_selection_results(field_selection)
                         .expect(<span class="string">&quot;Expected record selection to contain required model ID fields.&quot;</span>)
                         .into_iter()

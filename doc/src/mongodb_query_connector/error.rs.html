@@ -293,6 +293,7 @@
 <a href="#293" id="293">293</a>
 <a href="#294" id="294">294</a>
 <a href="#295" id="295">295</a>
+<a href="#296" id="296">296</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>connector_interface::error::{ConnectorError, ErrorKind, MultiError};
 <span class="kw">use </span>itertools::Itertools;
 <span class="kw">use </span>mongodb::{
@@ -573,6 +574,7 @@
         <span class="kw">match </span>selected_field {
             SelectedField::Scalar(sf) =&gt; <span class="self">self</span>.decorate_with_scalar_field_info(sf),
             SelectedField::Composite(composite_sel) =&gt; <span class="self">self</span>.decorate_with_composite_field_info(<span class="kw-2">&amp;</span>composite_sel.field),
+            SelectedField::Relation(<span class="kw">_</span>) =&gt; <span class="macro">unreachable!</span>(),
         }
     }
 

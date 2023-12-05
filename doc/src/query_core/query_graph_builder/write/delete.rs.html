@@ -127,7 +127,7 @@
     <span class="kw">let </span>filter = extract_unique_filter(where_arg.value.try_into()<span class="question-mark">?</span>, <span class="kw-2">&amp;</span>model)<span class="question-mark">?</span>;
 
     <span class="comment">// Prefetch read query for the delete
-    </span><span class="kw">let </span><span class="kw-2">mut </span>read_query = read::find_unique(field, model.clone())<span class="question-mark">?</span>;
+    </span><span class="kw">let </span><span class="kw-2">mut </span>read_query = read::find_unique(field, model.clone(), query_schema)<span class="question-mark">?</span>;
     read_query.add_filter(filter.clone());
 
     <span class="kw">let </span>read_node = graph.create_node(Query::Read(read_query));

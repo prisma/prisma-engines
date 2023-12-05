@@ -271,6 +271,8 @@
 <a href="#271" id="271">271</a>
 <a href="#272" id="272">272</a>
 <a href="#273" id="273">273</a>
+<a href="#274" id="274">274</a>
+<a href="#275" id="275">275</a>
 </pre></div><pre class="rust"><code><span class="kw">use super</span>::{inmemory_record_processor::InMemoryRecordProcessor, read};
 <span class="kw">use crate</span>::{interpreter::InterpretationResult, query_ast::<span class="kw-2">*</span>};
 <span class="kw">use </span>connector::{<span class="self">self</span>, ConnectionLike, RelAggregationRow, RelAggregationSelection};
@@ -342,6 +344,7 @@
                 args,
                 <span class="kw-2">&amp;</span>query.selected_fields,
                 <span class="kw-2">&amp;</span>query.aggregation_selections,
+                RelationLoadStrategy::Query,
                 trace_id.clone(),
             )
             .<span class="kw">await</span><span class="question-mark">?
@@ -483,6 +486,7 @@
             args,
             selected_fields,
             <span class="kw-2">&amp;</span>aggr_selections,
+            RelationLoadStrategy::Query,
             trace_id,
         )
         .<span class="kw">await</span><span class="question-mark">?

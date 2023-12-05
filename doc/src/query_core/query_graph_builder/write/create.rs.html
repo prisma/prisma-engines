@@ -231,7 +231,7 @@
         <span class="kw">let </span>create_node = create::create_record_node(graph, query_schema, model.clone(), data_map)<span class="question-mark">?</span>;
 
         <span class="comment">// Follow-up read query on the write
-        </span><span class="kw">let </span>read_query = read::find_unique(field, model.clone())<span class="question-mark">?</span>;
+        </span><span class="kw">let </span>read_query = read::find_unique(field, model.clone(), query_schema)<span class="question-mark">?</span>;
         <span class="kw">let </span>read_node = graph.create_node(Query::Read(read_query));
 
         graph.add_result_node(<span class="kw-2">&amp;</span>read_node);

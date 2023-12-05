@@ -168,6 +168,15 @@
 <a href="#168" id="168">168</a>
 <a href="#169" id="169">169</a>
 <a href="#170" id="170">170</a>
+<a href="#171" id="171">171</a>
+<a href="#172" id="172">172</a>
+<a href="#173" id="173">173</a>
+<a href="#174" id="174">174</a>
+<a href="#175" id="175">175</a>
+<a href="#176" id="176">176</a>
+<a href="#177" id="177">177</a>
+<a href="#178" id="178">178</a>
+<a href="#179" id="179">179</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span><span class="kw">super</span>::read::get_single_record;
 
 <span class="kw">use </span><span class="kw">crate</span>::column_metadata::{<span class="self">self</span>, ColumnMetadata};
@@ -191,15 +200,24 @@
     selected_fields: FieldSelection,
     ctx: <span class="kw-2">&amp;</span>Context&lt;<span class="lifetime">&#39;_</span>&gt;,
 ) -&gt; <span class="kw">crate</span>::Result&lt;<span class="prelude-ty">Option</span>&lt;SingleRecord&gt;&gt; {
-    <span class="kw">let </span>selected_fields = ModelProjection::from(selected_fields);
-
     <span class="comment">// If there&#39;s nothing to update, just read the record.
     // TODO(perf): Technically, if the selectors are fulfilling the field selection, there&#39;s no need to perform an additional read.
     </span><span class="kw">if </span>args.args.is_empty() {
         <span class="kw">let </span>filter = build_update_one_filter(record_filter);
 
-        <span class="kw">return </span>get_single_record(conn, model, <span class="kw-2">&amp;</span>filter, <span class="kw-2">&amp;</span>selected_fields, <span class="kw-2">&amp;</span>[], ctx).<span class="kw">await</span>;
+        <span class="kw">return </span>get_single_record(
+            conn,
+            model,
+            <span class="kw-2">&amp;</span>filter,
+            <span class="kw-2">&amp;</span>selected_fields,
+            <span class="kw-2">&amp;</span>[],
+            RelationLoadStrategy::Query,
+            ctx,
+        )
+        .<span class="kw">await</span>;
     }
+
+    <span class="kw">let </span>selected_fields = ModelProjection::from(selected_fields);
 
     <span class="kw">let </span>cond = FilterBuilder::without_top_level_joins().visit_filter(build_update_one_filter(record_filter), ctx);
 

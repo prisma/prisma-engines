@@ -237,6 +237,25 @@
 <a href="#237" id="237">237</a>
 <a href="#238" id="238">238</a>
 <a href="#239" id="239">239</a>
+<a href="#240" id="240">240</a>
+<a href="#241" id="241">241</a>
+<a href="#242" id="242">242</a>
+<a href="#243" id="243">243</a>
+<a href="#244" id="244">244</a>
+<a href="#245" id="245">245</a>
+<a href="#246" id="246">246</a>
+<a href="#247" id="247">247</a>
+<a href="#248" id="248">248</a>
+<a href="#249" id="249">249</a>
+<a href="#250" id="250">250</a>
+<a href="#251" id="251">251</a>
+<a href="#252" id="252">252</a>
+<a href="#253" id="253">253</a>
+<a href="#254" id="254">254</a>
+<a href="#255" id="255">255</a>
+<a href="#256" id="256">256</a>
+<a href="#257" id="257">257</a>
+<a href="#258" id="258">258</a>
 </pre></div><pre class="rust"><code><span class="kw">use crate</span>::{join_utils::<span class="kw-2">*</span>, model_extensions::<span class="kw-2">*</span>, query_arguments_ext::QueryArgumentsExt, Context};
 <span class="kw">use </span>itertools::Itertools;
 <span class="kw">use </span>quaint::ast::<span class="kw-2">*</span>;
@@ -257,8 +276,16 @@
 
 <span class="attr">#[derive(Debug, Default)]
 </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>OrderByBuilder {
+    parent_alias: <span class="prelude-ty">Option</span>&lt;String&gt;,
     <span class="comment">// Used to generate unique join alias
     </span>join_counter: usize,
+}
+
+<span class="kw">impl </span>OrderByBuilder {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>with_parent_alias(<span class="kw-2">mut </span><span class="self">self</span>, alias: <span class="prelude-ty">Option</span>&lt;String&gt;) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.parent_alias = alias;
+        <span class="self">self
+    </span>}
 }
 
 <span class="kw">impl </span>OrderByBuilder {
@@ -266,8 +293,7 @@
     </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>build(<span class="kw-2">&amp;mut </span><span class="self">self</span>, query_arguments: <span class="kw-2">&amp;</span>QueryArguments, ctx: <span class="kw-2">&amp;</span>Context&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; Vec&lt;OrderByDefinition&gt; {
         <span class="kw">let </span>needs_reversed_order = query_arguments.needs_reversed_order();
 
-        <span class="comment">// The index is used to differentiate potentially separate relations to the same model.
-        </span>query_arguments
+        query_arguments
             .order_by
             .iter()
             .map(|order_by| <span class="kw">match </span>order_by {
@@ -308,7 +334,11 @@
         needs_reversed_order: bool,
         ctx: <span class="kw-2">&amp;</span>Context&lt;<span class="lifetime">&#39;_</span>&gt;,
     ) -&gt; OrderByDefinition {
-        <span class="kw">let </span>columns: Vec&lt;Expression&gt; = order_by.fields.iter().map(|sf| sf.as_column(ctx).into()).collect();
+        <span class="kw">let </span>columns: Vec&lt;Expression&gt; = order_by
+            .fields
+            .iter()
+            .map(|sf| sf.as_column(ctx).opt_table(<span class="self">self</span>.parent_alias.clone()).into())
+            .collect();
         <span class="kw">let </span>order_column: Expression = text_search_relevance(<span class="kw-2">&amp;</span>columns, order_by.search.clone()).into();
         <span class="kw">let </span>order: <span class="prelude-ty">Option</span>&lt;Order&gt; = <span class="prelude-val">Some</span>(into_order(<span class="kw-2">&amp;</span>order_by.sort_order, <span class="prelude-val">None</span>, needs_reversed_order));
         <span class="kw">let </span>order_definition: OrderDefinition = (order_column.clone(), order);
@@ -382,9 +412,12 @@
         <span class="comment">// Unwraps are safe because the SQL connector doesn&#39;t yet support any other type of orderBy hop but the relation hop.
         </span><span class="kw">let </span><span class="kw-2">mut </span>joins: Vec&lt;AliasedJoin&gt; = <span class="macro">vec!</span>[];
 
+        <span class="kw">let </span>parent_alias = <span class="self">self</span>.parent_alias.clone();
+
         <span class="kw">for </span>(i, hop) <span class="kw">in </span>rest_hops.iter().enumerate() {
             <span class="kw">let </span>previous_join = <span class="kw">if </span>i &gt; <span class="number">0 </span>{ joins.get(i - <span class="number">1</span>) } <span class="kw">else </span>{ <span class="prelude-val">None </span>};
-            <span class="kw">let </span>previous_alias = previous_join.map(|j| j.alias.as_str());
+
+            <span class="kw">let </span>previous_alias = previous_join.map(|j| j.alias.as_str()).or(parent_alias.as_deref());
             <span class="kw">let </span>join = compute_one2m_join(hop.as_relation_hop().unwrap(), <span class="kw-2">&amp;</span><span class="self">self</span>.join_prefix(), previous_alias, ctx);
 
             joins.push(join);
@@ -395,7 +428,7 @@
             <span class="kw">_ </span>=&gt; <span class="macro">unreachable!</span>(<span class="string">&quot;Order by relation aggregation other than count are not supported&quot;</span>),
         };
 
-        <span class="kw">let </span>previous_alias = joins.last().map(|j| j.alias.as_str());
+        <span class="kw">let </span>previous_alias = joins.last().map(|j| j.alias.as_str()).or(parent_alias.as_deref());
 
         <span class="comment">// We perform the aggregation on the last join
         </span><span class="kw">let </span>last_aggr_join = compute_aggr_join(
@@ -424,9 +457,14 @@
     ) -&gt; (Vec&lt;AliasedJoin&gt;, Column&lt;<span class="lifetime">&#39;static</span>&gt;) {
         <span class="kw">let </span><span class="kw-2">mut </span>joins: Vec&lt;AliasedJoin&gt; = <span class="macro">vec!</span>[];
 
+        <span class="kw">let </span>parent_alias = <span class="self">self</span>.parent_alias.clone();
+
         <span class="kw">for </span>(i, hop) <span class="kw">in </span>order_by.path.iter().enumerate() {
             <span class="kw">let </span>previous_join = <span class="kw">if </span>i &gt; <span class="number">0 </span>{ joins.get(i - <span class="number">1</span>) } <span class="kw">else </span>{ <span class="prelude-val">None </span>};
-            <span class="kw">let </span>previous_alias = previous_join.map(|j| j.alias.as_str());
+            <span class="kw">let </span>previous_alias = previous_join
+                .map(|j| <span class="kw-2">&amp;</span>j.alias)
+                .or(parent_alias.as_ref())
+                .map(|alias| alias.as_str());
             <span class="kw">let </span>join = compute_one2m_join(hop.as_relation_hop().unwrap(), <span class="kw-2">&amp;</span><span class="self">self</span>.join_prefix(), previous_alias, ctx);
 
             joins.push(join);
@@ -440,7 +478,7 @@
         </span><span class="kw">let </span>order_by_column = <span class="kw">if let </span><span class="prelude-val">Some</span>(last_join) = joins.last() {
             Column::from((last_join.alias.to_owned(), order_by.field.db_name().to_owned()))
         } <span class="kw">else </span>{
-            order_by.field.as_column(ctx)
+            order_by.field.as_column(ctx).opt_table(<span class="self">self</span>.parent_alias.clone())
         };
 
         (joins, order_by_column)

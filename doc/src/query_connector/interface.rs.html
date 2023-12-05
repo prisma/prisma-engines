@@ -373,6 +373,8 @@
 <a href="#373" id="373">373</a>
 <a href="#374" id="374">374</a>
 <a href="#375" id="375">375</a>
+<a href="#376" id="376">376</a>
+<a href="#377" id="377">377</a>
 </pre></div><pre class="rust"><code><span class="kw">use crate</span>::{coerce_null_to_zero_value, NativeUpsert, WriteArgs};
 <span class="kw">use </span>async_trait::async_trait;
 <span class="kw">use </span>prisma_value::PrismaValue;
@@ -606,6 +608,7 @@
         filter: <span class="kw-2">&amp;</span>Filter,
         selected_fields: <span class="kw-2">&amp;</span>FieldSelection,
         aggregation_selections: <span class="kw-2">&amp;</span>[RelAggregationSelection],
+        relation_load_strategy: RelationLoadStrategy,
         trace_id: <span class="prelude-ty">Option</span>&lt;String&gt;,
     ) -&gt; <span class="kw">crate</span>::Result&lt;<span class="prelude-ty">Option</span>&lt;SingleRecord&gt;&gt;;
 
@@ -621,6 +624,7 @@
         query_arguments: QueryArguments,
         selected_fields: <span class="kw-2">&amp;</span>FieldSelection,
         aggregation_selections: <span class="kw-2">&amp;</span>[RelAggregationSelection],
+        relation_load_strategy: RelationLoadStrategy,
         trace_id: <span class="prelude-ty">Option</span>&lt;String&gt;,
     ) -&gt; <span class="kw">crate</span>::Result&lt;ManyRecords&gt;;
 

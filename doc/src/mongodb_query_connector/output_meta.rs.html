@@ -148,6 +148,7 @@
 <a href="#148" id="148">148</a>
 <a href="#149" id="149">149</a>
 <a href="#150" id="150">150</a>
+<a href="#151" id="151">151</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>connector_interface::{AggregationSelection, RelAggregationSelection};
 <span class="kw">use </span>indexmap::IndexMap;
 <span class="kw">use </span>query_structure::{
@@ -230,6 +231,7 @@
                     }),
                 );
             }
+            SelectedField::Relation(<span class="kw">_</span>) =&gt; <span class="macro">unreachable!</span>(),
         }
     }
 

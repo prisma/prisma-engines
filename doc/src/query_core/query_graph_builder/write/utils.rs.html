@@ -1162,6 +1162,7 @@
 <a href="#1162" id="1162">1162</a>
 <a href="#1163" id="1163">1163</a>
 <a href="#1164" id="1164">1164</a>
+<a href="#1165" id="1165">1165</a>
 </pre></div><pre class="rust"><code><span class="kw">use crate</span>::{
     query_ast::<span class="kw-2">*</span>,
     query_graph::{Flow, Node, NodeRef, QueryGraph, QueryGraphDependency},
@@ -1208,6 +1209,7 @@
         selection_order: <span class="macro">vec!</span>[],
         aggregation_selections: <span class="macro">vec!</span>[],
         options: QueryOptions::none(),
+        relation_load_strategy: query_structure::RelationLoadStrategy::Query,
     });
 
     Query::Read(read_query)

@@ -198,11 +198,11 @@
         <span class="kw">let </span>query_schema = <span class="self">self</span>.query_schema;
 
         <span class="kw">let </span><span class="kw-2">mut </span>graph = <span class="kw">match </span>(<span class="kw-2">&amp;</span>query_info.tag, query_info.model.map(|id| <span class="self">self</span>.query_schema.internal_data_model.clone().zip(id))) {
-            (QueryTag::FindUnique, <span class="prelude-val">Some</span>(m)) =&gt; read::find_unique(parsed_field, m).map(Into::into),
-            (QueryTag::FindUniqueOrThrow, <span class="prelude-val">Some</span>(m)) =&gt; read::find_unique_or_throw(parsed_field, m).map(Into::into),
-            (QueryTag::FindFirst, <span class="prelude-val">Some</span>(m)) =&gt; read::find_first(parsed_field, m).map(Into::into),
-            (QueryTag::FindFirstOrThrow, <span class="prelude-val">Some</span>(m)) =&gt; read::find_first_or_throw(parsed_field, m).map(Into::into),
-            (QueryTag::FindMany, <span class="prelude-val">Some</span>(m)) =&gt; read::find_many(parsed_field, m).map(Into::into),
+            (QueryTag::FindUnique, <span class="prelude-val">Some</span>(m)) =&gt; read::find_unique(parsed_field, m, query_schema).map(Into::into),
+            (QueryTag::FindUniqueOrThrow, <span class="prelude-val">Some</span>(m)) =&gt; read::find_unique_or_throw(parsed_field, m, query_schema).map(Into::into),
+            (QueryTag::FindFirst, <span class="prelude-val">Some</span>(m)) =&gt; read::find_first(parsed_field, m, query_schema).map(Into::into),
+            (QueryTag::FindFirstOrThrow, <span class="prelude-val">Some</span>(m)) =&gt; read::find_first_or_throw(parsed_field, m, query_schema).map(Into::into),
+            (QueryTag::FindMany, <span class="prelude-val">Some</span>(m)) =&gt; read::find_many(parsed_field, m, query_schema).map(Into::into),
             (QueryTag::Aggregate, <span class="prelude-val">Some</span>(m)) =&gt; read::aggregate(parsed_field, m).map(Into::into),
             (QueryTag::GroupBy, <span class="prelude-val">Some</span>(m)) =&gt; read::group_by(parsed_field, m).map(Into::into),
             (QueryTag::CreateOne, <span class="prelude-val">Some</span>(m)) =&gt; QueryGraph::root(|g| write::create_record(g, query_schema, m, parsed_field)),

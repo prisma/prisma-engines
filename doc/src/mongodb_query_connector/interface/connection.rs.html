@@ -264,6 +264,8 @@
 <a href="#264" id="264">264</a>
 <a href="#265" id="265">265</a>
 <a href="#266" id="266">266</a>
+<a href="#267" id="267">267</a>
+<a href="#268" id="268">268</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span><span class="kw">super</span>::catch;
 <span class="kw">use crate</span>::{
     error::MongoError,
@@ -276,7 +278,7 @@
     WriteOperations,
 };
 <span class="kw">use </span>mongodb::{ClientSession, Database};
-<span class="kw">use </span>query_structure::{prelude::<span class="kw-2">*</span>, SelectionResult};
+<span class="kw">use </span>query_structure::{prelude::<span class="kw-2">*</span>, RelationLoadStrategy, SelectionResult};
 <span class="kw">use </span>std::collections::HashMap;
 
 <span class="kw">pub struct </span>MongoDbConnection {
@@ -456,6 +458,7 @@
         filter: <span class="kw-2">&amp;</span>query_structure::Filter,
         selected_fields: <span class="kw-2">&amp;</span>FieldSelection,
         aggr_selections: <span class="kw-2">&amp;</span>[RelAggregationSelection],
+        _relation_load_strategy: RelationLoadStrategy,
         _trace_id: <span class="prelude-ty">Option</span>&lt;String&gt;,
     ) -&gt; connector_interface::Result&lt;<span class="prelude-ty">Option</span>&lt;SingleRecord&gt;&gt; {
         catch(<span class="kw">async move </span>{
@@ -478,6 +481,7 @@
         query_arguments: query_structure::QueryArguments,
         selected_fields: <span class="kw-2">&amp;</span>FieldSelection,
         aggregation_selections: <span class="kw-2">&amp;</span>[RelAggregationSelection],
+        _relation_load_strategy: RelationLoadStrategy,
         _trace_id: <span class="prelude-ty">Option</span>&lt;String&gt;,
     ) -&gt; connector_interface::Result&lt;ManyRecords&gt; {
         catch(<span class="kw">async move </span>{

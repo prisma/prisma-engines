@@ -23,18 +23,36 @@
 <a href="#23" id="23">23</a>
 <a href="#24" id="24">24</a>
 <a href="#25" id="25">25</a>
+<a href="#26" id="26">26</a>
+<a href="#27" id="27">27</a>
+<a href="#28" id="28">28</a>
+<a href="#29" id="29">29</a>
+<a href="#30" id="30">30</a>
+<a href="#31" id="31">31</a>
+<a href="#32" id="32">32</a>
+<a href="#33" id="33">33</a>
+<a href="#34" id="34">34</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>query_structure::Model;
+<span class="kw">use </span>schema::QuerySchema;
 
 <span class="kw">use super</span>::<span class="kw-2">*</span>;
 <span class="kw">use </span><span class="kw">crate</span>::ParsedField;
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>find_first(field: ParsedField&lt;<span class="lifetime">&#39;_</span>&gt;, model: Model) -&gt; QueryGraphBuilderResult&lt;ReadQuery&gt; {
-    <span class="kw">let </span>many_query = many::find_many(field, model)<span class="question-mark">?</span>;
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>find_first(
+    field: ParsedField&lt;<span class="lifetime">&#39;_</span>&gt;,
+    model: Model,
+    query_schema: <span class="kw-2">&amp;</span>QuerySchema,
+) -&gt; QueryGraphBuilderResult&lt;ReadQuery&gt; {
+    <span class="kw">let </span>many_query = many::find_many(field, model, query_schema)<span class="question-mark">?</span>;
     try_limit_to_one(many_query)
 }
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>find_first_or_throw(field: ParsedField&lt;<span class="lifetime">&#39;_</span>&gt;, model: Model) -&gt; QueryGraphBuilderResult&lt;ReadQuery&gt; {
-    <span class="kw">let </span>many_query = many::find_many_or_throw(field, model)<span class="question-mark">?</span>;
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>find_first_or_throw(
+    field: ParsedField&lt;<span class="lifetime">&#39;_</span>&gt;,
+    model: Model,
+    query_schema: <span class="kw-2">&amp;</span>QuerySchema,
+) -&gt; QueryGraphBuilderResult&lt;ReadQuery&gt; {
+    <span class="kw">let </span>many_query = many::find_many_or_throw(field, model, query_schema)<span class="question-mark">?</span>;
     try_limit_to_one(many_query)
 }
 

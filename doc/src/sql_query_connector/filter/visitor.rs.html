@@ -1413,6 +1413,11 @@
 <a href="#1413" id="1413">1413</a>
 <a href="#1414" id="1414">1414</a>
 <a href="#1415" id="1415">1415</a>
+<a href="#1416" id="1416">1416</a>
+<a href="#1417" id="1417">1417</a>
+<a href="#1418" id="1418">1418</a>
+<a href="#1419" id="1419">1419</a>
+<a href="#1420" id="1420">1420</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span><span class="kw">super</span>::alias::<span class="kw-2">*</span>;
 <span class="kw">use </span><span class="kw">crate</span>::join_utils::{compute_one2m_join, AliasedJoin};
 <span class="kw">use crate</span>::{model_extensions::<span class="kw-2">*</span>, Context};
@@ -1442,7 +1447,7 @@
 }
 
 <span class="attr">#[derive(Debug, Clone, Default)]
-</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>FilterVisitor {
+</span><span class="kw">pub struct </span>FilterVisitor {
     <span class="doccomment">/// The last alias that&#39;s been rendered.
     </span>last_alias: <span class="prelude-ty">Option</span>&lt;Alias&gt;,
     <span class="doccomment">/// The parent alias, used when rendering nested filters so that a child filter can refer to its join.
@@ -1482,6 +1487,11 @@
     </span><span class="kw">fn </span>parent_alias(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;Alias&gt; {
         <span class="self">self</span>.parent_alias
     }
+
+    <span class="kw">pub fn </span>set_parent_alias_opt(<span class="kw-2">mut </span><span class="self">self</span>, alias: <span class="prelude-ty">Option</span>&lt;Alias&gt;) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.parent_alias = alias;
+        <span class="self">self
+    </span>}
 
     <span class="doccomment">/// A top-level join can be rendered if we&#39;re explicitly allowing it or if we&#39;re in a nested visitor.
     </span><span class="kw">fn </span>can_render_join(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {

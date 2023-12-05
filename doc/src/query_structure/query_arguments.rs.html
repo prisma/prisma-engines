@@ -260,6 +260,17 @@
 <a href="#260" id="260">260</a>
 <a href="#261" id="261">261</a>
 <a href="#262" id="262">262</a>
+<a href="#263" id="263">263</a>
+<a href="#264" id="264">264</a>
+<a href="#265" id="265">265</a>
+<a href="#266" id="266">266</a>
+<a href="#267" id="267">267</a>
+<a href="#268" id="268">268</a>
+<a href="#269" id="269">269</a>
+<a href="#270" id="270">270</a>
+<a href="#271" id="271">271</a>
+<a href="#272" id="272">272</a>
+<a href="#273" id="273">273</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>psl::{datamodel_connector::ConnectorCapability, PreviewFeature};
 
 <span class="kw">use crate</span>::<span class="kw-2">*</span>;
@@ -276,7 +287,7 @@
 /// A query argument struct is always valid over a single model only, meaning that all
 /// data referenced in a single query argument instance is always refering to data of
 /// a single model (e.g. the cursor projection, distinct projection, orderby, ...).
-</span><span class="attr">#[derive(Clone)]
+</span><span class="attr">#[derive(Clone, PartialEq, Eq, Hash)]
 </span><span class="kw">pub struct </span>QueryArguments {
     <span class="kw">pub </span>model: Model,
     <span class="kw">pub </span>cursor: <span class="prelude-ty">Option</span>&lt;SelectionResult&gt;,
@@ -287,6 +298,17 @@
     <span class="kw">pub </span>distinct: <span class="prelude-ty">Option</span>&lt;FieldSelection&gt;,
     <span class="kw">pub </span>ignore_skip: bool,
     <span class="kw">pub </span>ignore_take: bool,
+}
+
+<span class="attr">#[derive(Debug, Copy, Clone, PartialEq, Eq, Hash)]
+</span><span class="kw">pub enum </span>RelationLoadStrategy {
+    Join,
+    Query,
+}
+<span class="kw">impl </span>RelationLoadStrategy {
+    <span class="kw">pub fn </span>is_query(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="macro">matches!</span>(<span class="self">self</span>, RelationLoadStrategy::Query)
+    }
 }
 
 <span class="kw">impl </span>std::fmt::Debug <span class="kw">for </span>QueryArguments {

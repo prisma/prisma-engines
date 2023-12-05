@@ -29,6 +29,7 @@
 <a href="#29" id="29">29</a>
 <a href="#30" id="30">30</a>
 <a href="#31" id="31">31</a>
+<a href="#32" id="32">32</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::IntoBson;
 <span class="kw">use </span>mongodb::bson::{Bson, Document};
 <span class="kw">use </span>query_structure::{FieldSelection, SelectedField};
@@ -57,6 +58,7 @@
                 parent_paths.push(cs.field.db_name().to_owned());
                 path_prefixed_selection(doc, parent_paths, cs.selections);
             }
+            query_structure::SelectedField::Relation(<span class="kw">_</span>) =&gt; <span class="macro">unreachable!</span>(),
         }
     }
 }

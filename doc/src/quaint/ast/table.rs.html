@@ -470,6 +470,15 @@
 <a href="#470" id="470">470</a>
 <a href="#471" id="471">471</a>
 <a href="#472" id="472">472</a>
+<a href="#473" id="473">473</a>
+<a href="#474" id="474">474</a>
+<a href="#475" id="475">475</a>
+<a href="#476" id="476">476</a>
+<a href="#477" id="477">477</a>
+<a href="#478" id="478">478</a>
+<a href="#479" id="479">479</a>
+<a href="#480" id="480">480</a>
+<a href="#481" id="481">481</a>
 </pre></div><pre class="rust"><code><span class="kw">use super</span>::{Column, Comparable, ConditionTree, DefaultValue, ExpressionKind, IndexDefinition, Join, JoinData};
 <span class="kw">use crate</span>::{
     ast::{Expression, Row, Select, Values},
@@ -675,6 +684,15 @@
 
         <span class="self">self
     </span>}
+
+    <span class="kw">pub fn </span>left_join_lateral&lt;J&gt;(<span class="self">self</span>, join: J) -&gt; <span class="self">Self
+    </span><span class="kw">where
+        </span>J: Into&lt;JoinData&lt;<span class="lifetime">&#39;a</span>&gt;&gt;,
+    {
+        <span class="kw">let </span>join_data: JoinData = join.into();
+
+        <span class="self">self</span>.left_join(join_data.lateral())
+    }
 
     <span class="doccomment">/// Adds an `INNER JOIN` clause to the query, specifically for that table.
     /// Useful to positionally add a JOIN clause in case you are selecting from multiple tables.

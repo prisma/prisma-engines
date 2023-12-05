@@ -997,6 +997,7 @@
 <a href="#997" id="997">997</a>
 <a href="#998" id="998">998</a>
 <a href="#999" id="999">999</a>
+<a href="#1000" id="1000">1000</a>
 </pre></div><pre class="rust"><code><span class="kw">mod </span>error;
 <span class="kw">mod </span>formatters;
 <span class="kw">mod </span>guard;
@@ -1796,6 +1797,7 @@
                 selection_order: <span class="macro">vec!</span>[],
                 aggregation_selections: <span class="macro">vec!</span>[],
                 options: QueryOptions::none(),
+                relation_load_strategy: query_structure::RelationLoadStrategy::Query,
             });
 
             <span class="kw">let </span>reload_query = Query::Read(read_query);

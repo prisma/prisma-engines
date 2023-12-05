@@ -33,14 +33,18 @@
 <a href="#33" id="33">33</a>
 <a href="#34" id="34">34</a>
 <a href="#35" id="35">35</a>
+<a href="#36" id="36">36</a>
+<a href="#37" id="37">37</a>
 </pre></div><pre class="rust"><code><span class="kw">use super</span>::<span class="kw-2">*</span>;
 <span class="kw">use crate</span>::{query_document::ParsedField, ReadQuery, RelatedRecordsQuery};
 <span class="kw">use </span>query_structure::{Model, RelationFieldRef};
+<span class="kw">use </span>schema::QuerySchema;
 
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>find_related(
     field: ParsedField&lt;<span class="lifetime">&#39;_</span>&gt;,
     parent: RelationFieldRef,
     model: Model,
+    query_schema: <span class="kw-2">&amp;</span>QuerySchema,
 ) -&gt; QueryGraphBuilderResult&lt;ReadQuery&gt; {
     <span class="kw">let </span>args = extractors::extract_query_args(field.arguments, <span class="kw-2">&amp;</span>model)<span class="question-mark">?</span>;
     <span class="kw">let </span>name = field.name;
@@ -49,8 +53,8 @@
     <span class="kw">let </span>(aggr_fields_pairs, sub_selections) = extractors::extract_nested_rel_aggr_selections(sub_selections);
     <span class="kw">let </span>aggregation_selections = utils::collect_relation_aggr_selections(aggr_fields_pairs, <span class="kw-2">&amp;</span>model)<span class="question-mark">?</span>;
     <span class="kw">let </span>selection_order: Vec&lt;String&gt; = utils::collect_selection_order(<span class="kw-2">&amp;</span>sub_selections);
-    <span class="kw">let </span>selected_fields = utils::collect_selected_fields(<span class="kw-2">&amp;</span>sub_selections, args.distinct.clone(), <span class="kw-2">&amp;</span>model);
-    <span class="kw">let </span>nested = utils::collect_nested_queries(sub_selections, <span class="kw-2">&amp;</span>model)<span class="question-mark">?</span>;
+    <span class="kw">let </span>selected_fields = utils::collect_selected_fields(<span class="kw-2">&amp;</span>sub_selections, args.distinct.clone(), <span class="kw-2">&amp;</span>model, query_schema)<span class="question-mark">?</span>;
+    <span class="kw">let </span>nested = utils::collect_nested_queries(sub_selections, <span class="kw-2">&amp;</span>model, query_schema)<span class="question-mark">?</span>;
     <span class="kw">let </span>parent_field = parent;
 
     <span class="kw">let </span>selected_fields = utils::merge_relation_selections(selected_fields, <span class="prelude-val">Some</span>(parent_field.clone()), <span class="kw-2">&amp;</span>nested);

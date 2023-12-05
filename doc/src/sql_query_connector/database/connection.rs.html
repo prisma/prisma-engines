@@ -301,6 +301,11 @@
 <a href="#301" id="301">301</a>
 <a href="#302" id="302">302</a>
 <a href="#303" id="303">303</a>
+<a href="#304" id="304">304</a>
+<a href="#305" id="305">305</a>
+<a href="#306" id="306">306</a>
+<a href="#307" id="307">307</a>
+<a href="#308" id="308">308</a>
 </pre></div><pre class="rust"><code><span class="attr">#![cfg_attr(target_arch = <span class="string">&quot;wasm32&quot;</span>, allow(dead_code))]
 
 </span><span class="kw">use super</span>::{catch, transaction::SqlConnectorTransaction};
@@ -316,7 +321,7 @@
     connector::{IsolationLevel, TransactionCapable},
     prelude::{ConnectionInfo, Queryable},
 };
-<span class="kw">use </span>query_structure::{prelude::<span class="kw-2">*</span>, Filter, QueryArguments, SelectionResult};
+<span class="kw">use </span>query_structure::{prelude::<span class="kw-2">*</span>, Filter, QueryArguments, RelationLoadStrategy, SelectionResult};
 <span class="kw">use </span>std::{collections::HashMap, str::FromStr};
 
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>SqlConnection&lt;C&gt; {
@@ -390,6 +395,7 @@
         filter: <span class="kw-2">&amp;</span>Filter,
         selected_fields: <span class="kw-2">&amp;</span>FieldSelection,
         aggr_selections: <span class="kw-2">&amp;</span>[RelAggregationSelection],
+        relation_load_strategy: RelationLoadStrategy,
         trace_id: <span class="prelude-ty">Option</span>&lt;String&gt;,
     ) -&gt; connector::Result&lt;<span class="prelude-ty">Option</span>&lt;SingleRecord&gt;&gt; {
         <span class="comment">// [Composites] todo: FieldSelection -&gt; ModelProjection conversion
@@ -399,8 +405,9 @@
                 <span class="kw-2">&amp;</span><span class="self">self</span>.inner,
                 model,
                 filter,
-                <span class="kw-2">&amp;</span>selected_fields.into(),
+                selected_fields,
                 aggr_selections,
+                relation_load_strategy,
                 <span class="kw-2">&amp;</span>ctx,
             )
             .<span class="kw">await
@@ -414,16 +421,19 @@
         query_arguments: QueryArguments,
         selected_fields: <span class="kw-2">&amp;</span>FieldSelection,
         aggr_selections: <span class="kw-2">&amp;</span>[RelAggregationSelection],
+        relation_load_strategy: RelationLoadStrategy,
         trace_id: <span class="prelude-ty">Option</span>&lt;String&gt;,
     ) -&gt; connector::Result&lt;ManyRecords&gt; {
         catch(<span class="self">self</span>.connection_info.clone(), <span class="kw">async move </span>{
             <span class="kw">let </span>ctx = Context::new(<span class="kw-2">&amp;</span><span class="self">self</span>.connection_info, trace_id.as_deref());
+
             read::get_many_records(
                 <span class="kw-2">&amp;</span><span class="self">self</span>.inner,
                 model,
                 query_arguments,
-                <span class="kw-2">&amp;</span>selected_fields.into(),
+                selected_fields,
                 aggr_selections,
+                relation_load_strategy,
                 <span class="kw-2">&amp;</span>ctx,
             )
             .<span class="kw">await

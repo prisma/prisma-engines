@@ -689,6 +689,7 @@
 <a href="#689" id="689">689</a>
 <a href="#690" id="690">690</a>
 <a href="#691" id="691">691</a>
+<a href="#692" id="692">692</a>
 </pre></div><pre class="rust"><code><span class="kw">mod </span>datasource;
 <span class="kw">mod </span>native_types;
 <span class="kw">mod </span>validations;
@@ -757,7 +758,8 @@
     InsertReturning |
     UpdateReturning |
     RowIn |
-    DistinctOn
+    DistinctOn |
+    LateralJoin
 });
 
 <span class="kw">pub struct </span>PostgresDatamodelConnector;

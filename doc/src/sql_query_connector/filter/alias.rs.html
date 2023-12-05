@@ -73,6 +73,10 @@
 <a href="#73" id="73">73</a>
 <a href="#74" id="74">74</a>
 <a href="#75" id="75">75</a>
+<a href="#76" id="76">76</a>
+<a href="#77" id="77">77</a>
+<a href="#78" id="78">78</a>
+<a href="#79" id="79">79</a>
 </pre></div><pre class="rust"><code><span class="kw">use crate</span>::{model_extensions::AsColumn, <span class="kw-2">*</span>};
 
 <span class="kw">use </span>quaint::prelude::Column;
@@ -91,7 +95,7 @@
 <span class="attr">#[derive(Clone, Copy, Debug, Default)]
 </span><span class="doccomment">/// Aliasing tool to count the nesting level to help with heavily nested
 /// self-related queries.
-</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>Alias {
+</span><span class="kw">pub struct </span>Alias {
     counter: usize,
     mode: AliasMode,
 }
@@ -123,6 +127,10 @@
             AliasMode::Table =&gt; <span class="macro">format!</span>(<span class="string">&quot;t{}&quot;</span>, <span class="self">self</span>.counter),
             AliasMode::Join =&gt; <span class="macro">format!</span>(<span class="string">&quot;j{}&quot;</span>, <span class="self">self</span>.counter),
         }
+    }
+
+    <span class="kw">pub fn </span>to_table_string(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; String {
+        <span class="self">self</span>.to_string(<span class="prelude-val">Some</span>(AliasMode::Table))
     }
 }
 
