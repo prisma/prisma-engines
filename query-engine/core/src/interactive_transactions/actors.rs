@@ -388,6 +388,10 @@ pub(crate) fn spawn_client_list_clear_actor(
     closed_txs: Arc<RwLock<lru::LruCache<TxId, Option<ClosedTx>>>>,
     mut rx: Receiver<(TxId, Option<ClosedTx>)>,
 ) -> JoinHandle<()> {
+    // Note: tasks implemented via loops cannot be cancelled implicitly, so we need to spawn them in a
+    // "controlled" way, via `spawn_controlled`.
+    // The `rx_exit` receiver is used to signal the loop to exit, and that signal is emitted whenever
+    // the task is aborted (likely, due to the engine shutting down and cleaning up the allocated resources).
     spawn_controlled(Box::new(
         |mut rx_exit: tokio::sync::broadcast::Receiver<()>| async move {
             loop {
@@ -406,6 +410,7 @@ pub(crate) fn spawn_client_list_clear_actor(
                             }
                             None => {
                                 // the `rx` channel is closed.
+                                tracing::error!("rx channel is closed!");
                                 break;
                             }
                         }
