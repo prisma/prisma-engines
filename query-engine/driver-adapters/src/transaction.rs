@@ -7,7 +7,7 @@ use quaint::{
 };
 
 use crate::proxy::{TransactionOptions, TransactionProxy};
-use crate::{proxy::CommonProxy, queryable::JsBaseQueryable, send_future::SendFuture};
+use crate::{proxy::CommonProxy, queryable::JsBaseQueryable, send_future::UnsafeFuture};
 use crate::{JsObject, JsResult};
 
 // Wrapper around JS transaction objects that implements Queryable
@@ -48,7 +48,7 @@ impl QuaintTransaction for JsTransaction {
             self.inner.raw_cmd(commit_stmt).await?;
         }
 
-        SendFuture(self.tx_proxy.commit()).await
+        UnsafeFuture(self.tx_proxy.commit()).await
     }
 
     async fn rollback(&self) -> quaint::Result<()> {
@@ -64,7 +64,7 @@ impl QuaintTransaction for JsTransaction {
             self.inner.raw_cmd(rollback_stmt).await?;
         }
 
-        SendFuture(self.tx_proxy.rollback()).await
+        UnsafeFuture(self.tx_proxy.rollback()).await
     }
 
     fn as_queryable(&self) -> &dyn Queryable {

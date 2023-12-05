@@ -1,4 +1,4 @@
-use crate::send_future::SendFuture;
+use crate::send_future::UnsafeFuture;
 pub use crate::types::{ColumnType, JSResultSet, Query, TransactionOptions};
 use crate::{from_js_value, get_named_property, has_named_property, to_rust_str, JsObject, JsResult, JsString};
 
@@ -96,8 +96,8 @@ impl DriverProxy {
         Ok(Box::new(tx))
     }
 
-    pub fn start_transaction(&self) -> SendFuture<impl Future<Output = quaint::Result<Box<JsTransaction>>> + '_> {
-        SendFuture(self.start_transaction_inner())
+    pub fn start_transaction(&self) -> UnsafeFuture<impl Future<Output = quaint::Result<Box<JsTransaction>>> + '_> {
+        UnsafeFuture(self.start_transaction_inner())
     }
 }
 
@@ -135,9 +135,9 @@ impl TransactionProxy {
     ///   the underlying FFI call will be delivered to JavaScript side in lockstep, so the destructor
     ///   will not attempt rolling the transaction back even if the `commit` future was dropped while
     ///   waiting on the JavaScript call to complete and deliver response.
-    pub fn commit(&self) -> SendFuture<impl Future<Output = quaint::Result<()>> + '_> {
+    pub fn commit(&self) -> UnsafeFuture<impl Future<Output = quaint::Result<()>> + '_> {
         self.closed.store(true, Ordering::Relaxed);
-        SendFuture(self.commit.call(()))
+        UnsafeFuture(self.commit.call(()))
     }
 
     /// Rolls back the transaction via the driver adapter.
@@ -155,9 +155,9 @@ impl TransactionProxy {
     ///   the underlying FFI call will be delivered to JavaScript side in lockstep, so the destructor
     ///   will not attempt rolling back again even if the `rollback` future was dropped while waiting
     ///   on the JavaScript call to complete and deliver response.
-    pub fn rollback(&self) -> SendFuture<impl Future<Output = quaint::Result<()>> + '_> {
+    pub fn rollback(&self) -> UnsafeFuture<impl Future<Output = quaint::Result<()>> + '_> {
         self.closed.store(true, Ordering::Relaxed);
-        SendFuture(self.rollback.call(()))
+        UnsafeFuture(self.rollback.call(()))
     }
 }
 

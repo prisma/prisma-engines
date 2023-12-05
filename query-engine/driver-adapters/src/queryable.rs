@@ -3,7 +3,7 @@ use crate::types::{AdapterFlavour, Query};
 use crate::JsObject;
 
 use super::conversion;
-use crate::send_future::SendFuture;
+use crate::send_future::UnsafeFuture;
 use async_trait::async_trait;
 use futures::Future;
 use quaint::{
@@ -170,8 +170,8 @@ impl JsBaseQueryable {
         &'a self,
         sql: &'a str,
         params: &'a [quaint::Value<'a>],
-    ) -> SendFuture<impl Future<Output = quaint::Result<ResultSet>> + 'a> {
-        SendFuture(self.do_query_raw_inner(sql, params))
+    ) -> UnsafeFuture<impl Future<Output = quaint::Result<ResultSet>> + 'a> {
+        UnsafeFuture(self.do_query_raw_inner(sql, params))
     }
 
     async fn do_execute_raw_inner(&self, sql: &str, params: &[quaint::Value<'_>]) -> quaint::Result<u64> {
@@ -189,8 +189,8 @@ impl JsBaseQueryable {
         &'a self,
         sql: &'a str,
         params: &'a [quaint::Value<'a>],
-    ) -> SendFuture<impl Future<Output = quaint::Result<u64>> + 'a> {
-        SendFuture(self.do_execute_raw_inner(sql, params))
+    ) -> UnsafeFuture<impl Future<Output = quaint::Result<u64>> + 'a> {
+        UnsafeFuture(self.do_execute_raw_inner(sql, params))
     }
 }
 
