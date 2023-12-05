@@ -10,7 +10,7 @@ use query_core::{
 };
 use query_engine_metrics::{MetricFormat, MetricRegistry};
 use request_handlers::{dmmf, load_executor, render_graphql_schema, ConnectorMode, RequestBody, RequestHandler};
-use serde::{Deserialize, Serialize};
+use serde::Deserialize;
 use serde_json::json;
 use std::{
     collections::{BTreeMap, HashMap},
@@ -58,15 +58,6 @@ struct ConnectedEngine {
     env: HashMap<String, String>,
     metrics: Option<MetricRegistry>,
     engine_protocol: EngineProtocol,
-}
-
-/// Returned from the `serverInfo` method in javascript.
-#[derive(Debug, Serialize)]
-#[serde(rename_all = "camelCase")]
-struct ServerInfo {
-    commit: String,
-    version: String,
-    primary_connector: Option<String>,
 }
 
 #[derive(Debug, Deserialize)]

@@ -7,7 +7,7 @@ use crate::{
     logger::{LogCallback, Logger},
 };
 use js_sys::{Function as JsFunction, Object as JsObject};
-use serde::{Deserialize, Serialize};
+use serde::Deserialize;
 use std::{
     collections::{BTreeMap, HashMap},
     path::PathBuf,
@@ -46,15 +46,6 @@ struct ConnectedEngine {
     schema: Arc<psl::ValidatedSchema>,
     config_dir: PathBuf,
     env: HashMap<String, String>,
-}
-
-/// Returned from the `serverInfo` method in javascript.
-#[derive(Debug, Serialize)]
-#[serde(rename_all = "camelCase")]
-struct ServerInfo {
-    commit: String,
-    version: String,
-    primary_connector: Option<String>,
 }
 
 /// Parameters defining the construction of an engine.
