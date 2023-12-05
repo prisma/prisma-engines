@@ -54,7 +54,7 @@ mod arch {
     }
 
     pub(crate) fn has_named_property(object: &JsObject, name: &str) -> JsResult<bool> {
-        Ok(Reflect::has(&object, &JsString::from_str(name).unwrap().into())?)
+        Reflect::has(object, &JsString::from_str(name).unwrap().into())
     }
 
     pub(crate) fn to_rust_str(value: JsString) -> JsResult<String> {
