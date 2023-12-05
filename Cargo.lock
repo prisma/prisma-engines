@@ -842,7 +842,9 @@ dependencies = [
 name = "crosstarget-utils"
 version = "0.1.0"
 dependencies = [
+ "futures",
  "js-sys",
+ "pin-project",
  "tokio",
  "wasm-bindgen",
  "wasm-bindgen-futures",
@@ -3672,7 +3674,6 @@ dependencies = [
  "once_cell",
  "opentelemetry",
  "petgraph 0.4.13",
- "pin-project",
  "psl",
  "query-connector",
  "query-engine-metrics",
@@ -3688,7 +3689,6 @@ dependencies = [
  "tracing-subscriber",
  "user-facing-errors",
  "uuid",
- "wasm-bindgen-futures",
 ]
 
 [[package]]

@@ -1,6 +1,6 @@
-use crate::executor::task::JoinHandle;
 use crate::{protocol::EngineProtocol, ClosedTx, Operation, ResponseData};
 use connector::Connection;
+use crosstarget_utils::task::JoinHandle;
 use lru::LruCache;
 use once_cell::sync::Lazy;
 use schema::QuerySchemaRef;

@@ -10,7 +10,6 @@ mod execute_operation;
 mod interpreting_executor;
 mod pipeline;
 mod request_context;
-pub(crate) mod task;
 
 pub use self::{execute_operation::*, interpreting_executor::InterpretingExecutor};
 

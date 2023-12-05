@@ -1,10 +1,10 @@
 use super::{CachedTx, TransactionError, TxOpRequest, TxOpRequestMsg, TxOpResponse};
-use crate::executor::task::{spawn, spawn_controlled, JoinHandle};
 use crate::{
     execute_many_operations, execute_single_operation, protocol::EngineProtocol, ClosedTx, Operation, ResponseData,
     TxId,
 };
 use connector::Connection;
+use crosstarget_utils::task::{spawn, spawn_controlled, JoinHandle};
 use crosstarget_utils::time::ElapsedTimeCounter;
 use schema::QuerySchemaRef;
 use std::{collections::HashMap, sync::Arc};
