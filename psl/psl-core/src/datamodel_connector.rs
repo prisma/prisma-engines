@@ -308,6 +308,18 @@ pub trait Connector: Send + Sync {
         self.has_capability(ConnectorCapability::DecimalType)
     }
 
+    fn supports_ewkt_geometry_format(&self) -> bool {
+        self.has_capability(ConnectorCapability::EwktGeometry)
+    }
+
+    fn supports_geojson_geometry_format(&self) -> bool {
+        self.has_capability(ConnectorCapability::GeoJsonGeometry)
+    }
+
+    fn supports_raw_geometry_read(&self) -> bool {
+        self.has_capability(ConnectorCapability::GeometryRawRead)
+    }
+
     fn supported_index_types(&self) -> BitFlags<IndexAlgorithm> {
         IndexAlgorithm::BTree.into()
     }

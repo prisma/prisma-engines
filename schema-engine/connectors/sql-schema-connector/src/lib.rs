@@ -1,6 +1,6 @@
 //! The SQL migration connector.
 
-#![deny(rust_2018_idioms, unsafe_code, missing_docs)]
+#![deny(rust_2018_idioms, missing_docs)]
 
 mod apply_migration;
 mod database_schema;

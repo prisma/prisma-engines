@@ -61,6 +61,22 @@ pub trait ScalarCompare {
     where
         T: Into<ConditionValue>;
 
+    fn geometry_within<T>(&self, val: T) -> Filter
+    where
+        T: Into<ConditionValue>;
+
+    fn geometry_not_within<T>(&self, val: T) -> Filter
+    where
+        T: Into<ConditionValue>;
+
+    fn geometry_intersects<T>(&self, val: T) -> Filter
+    where
+        T: Into<ConditionValue>;
+
+    fn geometry_not_intersects<T>(&self, val: T) -> Filter
+    where
+        T: Into<ConditionValue>;
+
     fn search<T>(&self, val: T) -> Filter
     where
         T: Into<ConditionValue>;

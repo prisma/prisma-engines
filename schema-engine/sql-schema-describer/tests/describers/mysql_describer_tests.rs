@@ -674,11 +674,11 @@ fn all_mysql_column_types_must_work(api: TestApi) {
                         name: "geometry_col",
                         tpe: ColumnType {
                             full_data_type: "geometry",
-                            family: Unsupported(
-                                "geometry",
-                            ),
+                            family: Geometry,
                             arity: Nullable,
-                            native_type: None,
+                            native_type: Some(
+                                NativeTypeInstance(..),
+                            ),
                         },
                         auto_increment: false,
                         description: None,
@@ -692,11 +692,11 @@ fn all_mysql_column_types_must_work(api: TestApi) {
                         name: "point_col",
                         tpe: ColumnType {
                             full_data_type: "point",
-                            family: Unsupported(
-                                "point",
-                            ),
+                            family: Geometry,
                             arity: Nullable,
-                            native_type: None,
+                            native_type: Some(
+                                NativeTypeInstance(..),
+                            ),
                         },
                         auto_increment: false,
                         description: None,
@@ -710,11 +710,11 @@ fn all_mysql_column_types_must_work(api: TestApi) {
                         name: "linestring_col",
                         tpe: ColumnType {
                             full_data_type: "linestring",
-                            family: Unsupported(
-                                "linestring",
-                            ),
+                            family: Geometry,
                             arity: Nullable,
-                            native_type: None,
+                            native_type: Some(
+                                NativeTypeInstance(..),
+                            ),
                         },
                         auto_increment: false,
                         description: None,
@@ -728,11 +728,11 @@ fn all_mysql_column_types_must_work(api: TestApi) {
                         name: "polygon_col",
                         tpe: ColumnType {
                             full_data_type: "polygon",
-                            family: Unsupported(
-                                "polygon",
-                            ),
+                            family: Geometry,
                             arity: Nullable,
-                            native_type: None,
+                            native_type: Some(
+                                NativeTypeInstance(..),
+                            ),
                         },
                         auto_increment: false,
                         description: None,
@@ -746,11 +746,11 @@ fn all_mysql_column_types_must_work(api: TestApi) {
                         name: "multipoint_col",
                         tpe: ColumnType {
                             full_data_type: "multipoint",
-                            family: Unsupported(
-                                "multipoint",
-                            ),
+                            family: Geometry,
                             arity: Nullable,
-                            native_type: None,
+                            native_type: Some(
+                                NativeTypeInstance(..),
+                            ),
                         },
                         auto_increment: false,
                         description: None,
@@ -764,11 +764,11 @@ fn all_mysql_column_types_must_work(api: TestApi) {
                         name: "multilinestring_col",
                         tpe: ColumnType {
                             full_data_type: "multilinestring",
-                            family: Unsupported(
-                                "multilinestring",
-                            ),
+                            family: Geometry,
                             arity: Nullable,
-                            native_type: None,
+                            native_type: Some(
+                                NativeTypeInstance(..),
+                            ),
                         },
                         auto_increment: false,
                         description: None,
@@ -782,11 +782,11 @@ fn all_mysql_column_types_must_work(api: TestApi) {
                         name: "multipolygon_col",
                         tpe: ColumnType {
                             full_data_type: "multipolygon",
-                            family: Unsupported(
-                                "multipolygon",
-                            ),
+                            family: Geometry,
                             arity: Nullable,
-                            native_type: None,
+                            native_type: Some(
+                                NativeTypeInstance(..),
+                            ),
                         },
                         auto_increment: false,
                         description: None,
@@ -800,11 +800,11 @@ fn all_mysql_column_types_must_work(api: TestApi) {
                         name: "geometrycollection_col",
                         tpe: ColumnType {
                             full_data_type: "geometrycollection",
-                            family: Unsupported(
-                                "geometrycollection",
-                            ),
+                            family: Geometry,
                             arity: Nullable,
-                            native_type: None,
+                            native_type: Some(
+                                NativeTypeInstance(..),
+                            ),
                         },
                         auto_increment: false,
                         description: None,
@@ -1510,11 +1510,11 @@ fn all_mariadb_column_types_must_work(api: TestApi) {
                         name: "geometry_col",
                         tpe: ColumnType {
                             full_data_type: "geometry",
-                            family: Unsupported(
-                                "geometry",
-                            ),
+                            family: Geometry,
                             arity: Required,
-                            native_type: None,
+                            native_type: Some(
+                                NativeTypeInstance(..),
+                            ),
                         },
                         auto_increment: false,
                         description: None,
@@ -1528,11 +1528,11 @@ fn all_mariadb_column_types_must_work(api: TestApi) {
                         name: "point_col",
                         tpe: ColumnType {
                             full_data_type: "point",
-                            family: Unsupported(
-                                "point",
-                            ),
+                            family: Geometry,
                             arity: Required,
-                            native_type: None,
+                            native_type: Some(
+                                NativeTypeInstance(..),
+                            ),
                         },
                         auto_increment: false,
                         description: None,
@@ -1546,11 +1546,11 @@ fn all_mariadb_column_types_must_work(api: TestApi) {
                         name: "linestring_col",
                         tpe: ColumnType {
                             full_data_type: "linestring",
-                            family: Unsupported(
-                                "linestring",
-                            ),
+                            family: Geometry,
                             arity: Required,
-                            native_type: None,
+                            native_type: Some(
+                                NativeTypeInstance(..),
+                            ),
                         },
                         auto_increment: false,
                         description: None,
@@ -1564,11 +1564,11 @@ fn all_mariadb_column_types_must_work(api: TestApi) {
                         name: "polygon_col",
                         tpe: ColumnType {
                             full_data_type: "polygon",
-                            family: Unsupported(
-                                "polygon",
-                            ),
+                            family: Geometry,
                             arity: Required,
-                            native_type: None,
+                            native_type: Some(
+                                NativeTypeInstance(..),
+                            ),
                         },
                         auto_increment: false,
                         description: None,
@@ -1582,11 +1582,11 @@ fn all_mariadb_column_types_must_work(api: TestApi) {
                         name: "multipoint_col",
                         tpe: ColumnType {
                             full_data_type: "multipoint",
-                            family: Unsupported(
-                                "multipoint",
-                            ),
+                            family: Geometry,
                             arity: Required,
-                            native_type: None,
+                            native_type: Some(
+                                NativeTypeInstance(..),
+                            ),
                         },
                         auto_increment: false,
                         description: None,
@@ -1600,11 +1600,11 @@ fn all_mariadb_column_types_must_work(api: TestApi) {
                         name: "multilinestring_col",
                         tpe: ColumnType {
                             full_data_type: "multilinestring",
-                            family: Unsupported(
-                                "multilinestring",
-                            ),
+                            family: Geometry,
                             arity: Required,
-                            native_type: None,
+                            native_type: Some(
+                                NativeTypeInstance(..),
+                            ),
                         },
                         auto_increment: false,
                         description: None,
@@ -1618,11 +1618,11 @@ fn all_mariadb_column_types_must_work(api: TestApi) {
                         name: "multipolygon_col",
                         tpe: ColumnType {
                             full_data_type: "multipolygon",
-                            family: Unsupported(
-                                "multipolygon",
-                            ),
+                            family: Geometry,
                             arity: Required,
-                            native_type: None,
+                            native_type: Some(
+                                NativeTypeInstance(..),
+                            ),
                         },
                         auto_increment: false,
                         description: None,
@@ -1636,11 +1636,11 @@ fn all_mariadb_column_types_must_work(api: TestApi) {
                         name: "geometrycollection_col",
                         tpe: ColumnType {
                             full_data_type: "geometrycollection",
-                            family: Unsupported(
-                                "geometrycollection",
-                            ),
+                            family: Geometry,
                             arity: Required,
-                            native_type: None,
+                            native_type: Some(
+                                NativeTypeInstance(..),
+                            ),
                         },
                         auto_increment: false,
                         description: None,
@@ -1737,14 +1737,14 @@ fn all_mysql_8_column_types_must_work(api: TestApi) {
         `tinyblob_col` tinyblob NOT NULL,
         `mediumblob_col` mediumblob NOT NULL,
         `longblob_col` longblob NOT NULL,
-        `geometry_col` geometry NOT NULL,
-        `point_col` point NOT NULL,
-        `linestring_col` linestring NOT NULL,
-        `polygon_col` polygon NOT NULL,
-        `multipoint_col` multipoint NOT NULL,
-        `multilinestring_col` multilinestring NOT NULL,
-        `multipolygon_col` multipolygon NOT NULL,
-        `geometrycollection_col` geometrycollection NOT NULL,
+        `geometry_col` geometry srid 4326 NOT NULL,
+        `point_col` point srid 4326 NOT NULL,
+        `linestring_col` linestring srid 4326 NOT NULL,
+        `polygon_col` polygon srid 4326 NOT NULL,
+        `multipoint_col` multipoint srid 4326 NOT NULL,
+        `multilinestring_col` multilinestring srid 4326 NOT NULL,
+        `multipolygon_col` multipolygon srid 4326 NOT NULL,
+        `geometrycollection_col` geometrycollection srid 4326 NOT NULL,
         `json_col` json NOT NULL
         );
 
@@ -2339,11 +2339,11 @@ fn all_mysql_8_column_types_must_work(api: TestApi) {
                         name: "geometry_col",
                         tpe: ColumnType {
                             full_data_type: "geometry",
-                            family: Unsupported(
-                                "geometry",
-                            ),
+                            family: Geometry,
                             arity: Required,
-                            native_type: None,
+                            native_type: Some(
+                                NativeTypeInstance(..),
+                            ),
                         },
                         auto_increment: false,
                         description: None,
@@ -2357,11 +2357,11 @@ fn all_mysql_8_column_types_must_work(api: TestApi) {
                         name: "point_col",
                         tpe: ColumnType {
                             full_data_type: "point",
-                            family: Unsupported(
-                                "point",
-                            ),
+                            family: Geometry,
                             arity: Required,
-                            native_type: None,
+                            native_type: Some(
+                                NativeTypeInstance(..),
+                            ),
                         },
                         auto_increment: false,
                         description: None,
@@ -2375,11 +2375,11 @@ fn all_mysql_8_column_types_must_work(api: TestApi) {
                         name: "linestring_col",
                         tpe: ColumnType {
                             full_data_type: "linestring",
-                            family: Unsupported(
-                                "linestring",
-                            ),
+                            family: Geometry,
                             arity: Required,
-                            native_type: None,
+                            native_type: Some(
+                                NativeTypeInstance(..),
+                            ),
                         },
                         auto_increment: false,
                         description: None,
@@ -2393,11 +2393,11 @@ fn all_mysql_8_column_types_must_work(api: TestApi) {
                         name: "polygon_col",
                         tpe: ColumnType {
                             full_data_type: "polygon",
-                            family: Unsupported(
-                                "polygon",
-                            ),
+                            family: Geometry,
                             arity: Required,
-                            native_type: None,
+                            native_type: Some(
+                                NativeTypeInstance(..),
+                            ),
                         },
                         auto_increment: false,
                         description: None,
@@ -2411,11 +2411,11 @@ fn all_mysql_8_column_types_must_work(api: TestApi) {
                         name: "multipoint_col",
                         tpe: ColumnType {
                             full_data_type: "multipoint",
-                            family: Unsupported(
-                                "multipoint",
-                            ),
+                            family: Geometry,
                             arity: Required,
-                            native_type: None,
+                            native_type: Some(
+                                NativeTypeInstance(..),
+                            ),
                         },
                         auto_increment: false,
                         description: None,
@@ -2429,11 +2429,11 @@ fn all_mysql_8_column_types_must_work(api: TestApi) {
                         name: "multilinestring_col",
                         tpe: ColumnType {
                             full_data_type: "multilinestring",
-                            family: Unsupported(
-                                "multilinestring",
-                            ),
+                            family: Geometry,
                             arity: Required,
-                            native_type: None,
+                            native_type: Some(
+                                NativeTypeInstance(..),
+                            ),
                         },
                         auto_increment: false,
                         description: None,
@@ -2447,11 +2447,11 @@ fn all_mysql_8_column_types_must_work(api: TestApi) {
                         name: "multipolygon_col",
                         tpe: ColumnType {
                             full_data_type: "multipolygon",
-                            family: Unsupported(
-                                "multipolygon",
-                            ),
+                            family: Geometry,
                             arity: Required,
-                            native_type: None,
+                            native_type: Some(
+                                NativeTypeInstance(..),
+                            ),
                         },
                         auto_increment: false,
                         description: None,
@@ -2465,11 +2465,11 @@ fn all_mysql_8_column_types_must_work(api: TestApi) {
                         name: "geometrycollection_col",
                         tpe: ColumnType {
                             full_data_type: "geomcollection",
-                            family: Unsupported(
-                                "geomcollection",
-                            ),
+                            family: Geometry,
                             arity: Required,
-                            native_type: None,
+                            native_type: Some(
+                                NativeTypeInstance(..),
+                            ),
                         },
                         auto_increment: false,
                         description: None,

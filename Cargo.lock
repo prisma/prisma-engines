@@ -100,6 +100,15 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "3b13c32d80ecc7ab747b80c3784bce54ee8a7a0cc4fbda9bf4cda2cf6fe90854"
 
 [[package]]
+name = "approx"
+version = "0.5.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "cab112f0a86d568ea0e627cc1d6be74a1e9cd55214684db5561995f6dad897c6"
+dependencies = [
+ "num-traits",
+]
+
+[[package]]
 name = "arrayvec"
 version = "0.5.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1538,6 +1547,57 @@ dependencies = [
 ]
 
 [[package]]
+name = "geo-types"
+version = "0.7.11"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "9705398c5c7b26132e74513f4ee7c1d7dafd786004991b375c172be2be0eecaa"
+dependencies = [
+ "approx",
+ "num-traits",
+ "serde",
+]
+
+[[package]]
+name = "geojson"
+version = "0.24.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "a5d728c1df1fbf328d74151efe6cb0586f79ee813346ea981add69bd22c9241b"
+dependencies = [
+ "log",
+ "serde",
+ "serde_json",
+ "thiserror",
+]
+
+[[package]]
+name = "geozero"
+version = "0.10.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "937818b9c084b253f929b5f5dbe050e744331d94ceb0a908b08873bcb2da3066"
+dependencies = [
+ "geo-types",
+ "geojson",
+ "log",
+ "serde_json",
+ "thiserror",
+ "wkt",
+]
+
+[[package]]
+name = "geozero"
+version = "0.11.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "4b1b9a1eeae9ad09e12ec50243956105184b26440f81f978cd3aae009b214d4d"
+dependencies = [
+ "geojson",
+ "log",
+ "scroll",
+ "serde_json",
+ "thiserror",
+ "wkt",
+]
+
+[[package]]
 name = "getrandom"
 version = "0.1.16"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2126,6 +2186,12 @@ dependencies = [
 ]
 
 [[package]]
+name = "libm"
+version = "0.2.7"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "f7012b1bbb0719e1097c47611d3898568c546d597c2e74d66f6087edd5233ff4"
+
+[[package]]
 name = "libsqlite3-sys"
 version = "0.26.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2262,9 +2328,9 @@ checksum = "7e6bcd6433cff03a4bfc3d9834d504467db1f1cf6d0ea765d37d330249ed629d"
 
 [[package]]
 name = "memchr"
-version = "2.5.0"
+version = "2.6.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "2dffe52ecf27772e601905b7522cb4ef790d2cc203488bbd0e2fe85fcb74566d"
+checksum = "f665ee40bc4a3c5590afb1e9677db74a508659dfd71e126420da8274909a0167"
 
 [[package]]
 name = "memoffset"
@@ -2822,6 +2888,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "f30b0abd723be7e2ffca1272140fac1a2f084c77ec3e123c192b66af1ee9e6c2"
 dependencies = [
  "autocfg",
+ "libm",
 ]
 
 [[package]]
@@ -3555,6 +3622,7 @@ dependencies = [
  "connection-string",
  "either",
  "futures",
+ "geozero 0.11.0",
  "getrandom 0.2.10",
  "hex",
  "indoc 0.3.6",
@@ -3572,6 +3640,7 @@ dependencies = [
  "postgres-types",
  "quaint-test-macros",
  "quaint-test-setup",
+ "regex",
  "rusqlite",
  "serde",
  "serde_json",
@@ -3658,6 +3727,7 @@ dependencies = [
  "cuid",
  "enumflags2",
  "futures",
+ "geojson",
  "indexmap 1.9.3",
  "itertools",
  "lru 0.7.8",
@@ -4092,14 +4162,14 @@ dependencies = [
 
 [[package]]
 name = "regex"
-version = "1.9.3"
+version = "1.10.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "81bc1d4caf89fac26a70747fe603c130093b53c773888797a6329091246d651a"
+checksum = "380b951a9c5e80ddfd6136919eef32310721aa4aacd4889a8d39124b026ab343"
 dependencies = [
  "aho-corasick 1.0.3",
  "memchr",
- "regex-automata 0.3.6",
- "regex-syntax 0.7.4",
+ "regex-automata 0.4.3",
+ "regex-syntax 0.8.2",
 ]
 
 [[package]]
@@ -4113,13 +4183,13 @@ dependencies = [
 
 [[package]]
 name = "regex-automata"
-version = "0.3.6"
+version = "0.4.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "fed1ceff11a1dddaee50c9dc8e4938bd106e9d89ae372f192311e7da498e3b69"
+checksum = "5f804c7828047e88b2d32e2d7fe5a105da8ee3264f01902f796c8e067dc2483f"
 dependencies = [
  "aho-corasick 1.0.3",
  "memchr",
- "regex-syntax 0.7.4",
+ "regex-syntax 0.8.2",
 ]
 
 [[package]]
@@ -4130,9 +4200,9 @@ checksum = "f162c6dd7b008981e4d40210aca20b4bd0f9b60ca9271061b07f78537722f2e1"
 
 [[package]]
 name = "regex-syntax"
-version = "0.7.4"
+version = "0.8.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "e5ea92a5b6195c6ef2a0295ea818b312502c6fc94dde986c5553242e18fd4ce2"
+checksum = "c08c74e62047bb2de4ff487b251e4a92e24f48745648451635cec7d591162d9f"
 
 [[package]]
 name = "rend"
@@ -4514,6 +4584,12 @@ name = "scopeguard"
 version = "1.2.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "94143f37725109f92c262ed2cf5e59bce7498c01bcc1502d7b9afe439a4e9f49"
+
+[[package]]
+name = "scroll"
+version = "0.11.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "04c565b551bafbef4157586fa379538366e4385d42082f255bfd96e4fe8519da"
 
 [[package]]
 name = "sct"
@@ -4939,6 +5015,7 @@ dependencies = [
  "chrono",
  "cuid",
  "futures",
+ "geozero 0.10.0",
  "itertools",
  "once_cell",
  "opentelemetry",
@@ -4948,6 +5025,7 @@ dependencies = [
  "query-connector",
  "query-structure",
  "rand 0.7.3",
+ "regex",
  "serde",
  "serde_json",
  "thiserror",
@@ -6351,6 +6429,18 @@ checksum = "524e57b2c537c0f9b1e69f1965311ec12182b4122e45035b1508cd24d2adadb1"
 dependencies = [
  "cfg-if",
  "windows-sys 0.48.0",
+]
+
+[[package]]
+name = "wkt"
+version = "0.10.3"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "c3c2252781f8927974e8ba6a67c965a759a2b88ea2b1825f6862426bbb1c8f41"
+dependencies = [
+ "geo-types",
+ "log",
+ "num-traits",
+ "thiserror",
 ]
 
 [[package]]

@@ -579,51 +579,52 @@ const IMPOSSIBLE_CASTS: Cases = &[
 ];
 
 fn native_type_name_to_prisma_scalar_type_name(scalar_type: &str) -> &'static str {
-    /// Map from native type name to prisma scalar type name.
-    const TYPES_MAP: &[(&str, &str)] = &[
-        ("BigInt", "BigInt"),
-        ("Binary", "Bytes"),
-        ("Bit", "Bytes"),
-        ("Blob", "Bytes"),
-        ("Char", "String"),
-        ("Date", "DateTime"),
-        ("DateTime", "DateTime"),
-        ("Decimal", "Decimal"),
-        ("Double", "Float"),
-        ("Float", "Float"),
-        ("Int", "Int"),
-        ("Json", "Json"),
-        ("LongBlob", "Bytes"),
-        ("LongText", "String"),
-        ("MediumBlob", "Bytes"),
-        ("MediumInt", "Int"),
-        ("MediumText", "String"),
-        ("SmallInt", "Int"),
-        ("Text", "String"),
-        ("Time", "DateTime"),
-        ("Timestamp", "DateTime"),
-        ("TinyBlob", "Bytes"),
-        ("TinyInt", "Int"),
-        ("TinyText", "String"),
-        ("UnsignedBigInt", "BigInt"),
-        ("UnsignedInt", "Int"),
-        ("UnsignedMediumInt", "Int"),
-        ("UnsignedSmallInt", "Int"),
-        ("UnsignedTinyInt", "Int"),
-        ("VarBinary", "Bytes"),
-        ("VarChar", "String"),
-        ("Year", "Int"),
-    ];
-
     let scalar_type =
         scalar_type.trim_end_matches(|ch: char| [' ', ',', '(', ')'].contains(&ch) || ch.is_ascii_digit());
 
-    let idx = TYPES_MAP
-        .binary_search_by_key(&scalar_type, |(native, _prisma)| native)
-        .map_err(|_err| format!("Could not find {scalar_type} in TYPES_MAP"))
-        .unwrap();
-
-    TYPES_MAP[idx].1
+    match scalar_type {
+        "BigInt" => "BigInt",
+        "Binary" => "Bytes",
+        "Bit" => "Bytes",
+        "Blob" => "Bytes",
+        "Char" => "String",
+        "Date" => "DateTime",
+        "DateTime" => "DateTime",
+        "Decimal" => "Decimal",
+        "Double" => "Float",
+        "Float" => "Float",
+        "Int" => "Int",
+        "Json" => "Json",
+        "LongBlob" => "Bytes",
+        "LongText" => "String",
+        "MediumBlob" => "Bytes",
+        "MediumInt" => "Int",
+        "MediumText" => "String",
+        "SmallInt" => "Int",
+        "Text" => "String",
+        "Time" => "DateTime",
+        "Timestamp" => "DateTime",
+        "TinyBlob" => "Bytes",
+        "TinyInt" => "Int",
+        "TinyText" => "String",
+        "UnsignedBigInt" => "BigInt",
+        "UnsignedInt" => "Int",
+        "UnsignedMediumInt" => "Int",
+        "UnsignedSmallInt" => "Int",
+        "UnsignedTinyInt" => "Int",
+        "VarBinary" => "Bytes",
+        "VarChar" => "String",
+        "Year" => "Int",
+        "Geometry" => "Geometry",
+        "Point" => "Geometry",
+        "LineString" => "Geometry",
+        "Polygon" => "Geometry",
+        "MultiPoint" => "Geometry",
+        "MultiLineString" => "Geometry",
+        "MultiPolygon" => "Geometry",
+        "GeometryCollection" => "Geometry",
+        _ => panic!("Could not find {} in TYPES_MAP", scalar_type),
+    }
 }
 
 fn colnames_for_cases(cases: Cases) -> Vec<String> {

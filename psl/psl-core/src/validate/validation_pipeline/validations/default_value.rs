@@ -116,6 +116,8 @@ pub(super) fn validate_default_value(
                 &message, "default", *span,
             ));
         }
+        // TODO@geometry: Add geometry default value validation
+        (ScalarType::Geometry, ast::Expression::StringValue(_value, _span)) => (),
         _ => (),
     }
 }

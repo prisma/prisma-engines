@@ -12,6 +12,7 @@ use bytes::BytesMut;
 use chrono::{DateTime, NaiveDateTime, Utc};
 
 pub(crate) use decimal::DecimalWrapper;
+use geozero::{wkb::Ewkb, ToWkt};
 use postgres_types::{FromSql, ToSql, WrongType};
 use std::{convert::TryFrom, error::Error as StdError};
 use tokio_postgres::{
@@ -54,6 +55,8 @@ pub(crate) fn params_to_types(params: &[Value<'_>]) -> Vec<PostgresType> {
                 ValueType::DateTime(_) => PostgresType::TIMESTAMPTZ,
                 ValueType::Date(_) => PostgresType::TIMESTAMP,
                 ValueType::Time(_) => PostgresType::TIME,
+                ValueType::Geometry(_) => PostgresType::BYTEA,
+                ValueType::Geography(_) => PostgresType::BYTEA,
                 ValueType::Array(ref arr) => {
                     let arr = arr.as_ref().unwrap();
 
@@ -90,6 +93,8 @@ pub(crate) fn params_to_types(params: &[Value<'_>]) -> Vec<PostgresType> {
                         ValueType::DateTime(_) => PostgresType::TIMESTAMPTZ_ARRAY,
                         ValueType::Date(_) => PostgresType::TIMESTAMP_ARRAY,
                         ValueType::Time(_) => PostgresType::TIME_ARRAY,
+                        ValueType::Geometry(_) => PostgresType::BYTEA,
+                        ValueType::Geography(_) => PostgresType::BYTEA,
                         // In the case of nested arrays, we let PG infer the type
                         ValueType::Array(_) => PostgresType::UNKNOWN,
                     }
@@ -97,6 +102,18 @@ pub(crate) fn params_to_types(params: &[Value<'_>]) -> Vec<PostgresType> {
             }
         })
         .collect()
+}
+
+struct EwktString(pub String);
+
+impl<'a> FromSql<'a> for EwktString {
+    fn from_sql(_ty: &PostgresType, raw: &'a [u8]) -> Result<EwktString, Box<dyn std::error::Error + Sync + Send>> {
+        Ok(Ewkb(raw.to_owned()).to_ewkt(None).map(EwktString)?)
+    }
+
+    fn accepts(ty: &PostgresType) -> bool {
+        matches!(ty.name(), "geometry" | "geography")
+    }
 }
 
 struct XmlString(pub String);
@@ -502,6 +519,12 @@ impl GetRow for PostgresRow {
                     }
                     None => Value::null_array(),
                 },
+                ref x if matches!(x.name(), "geometry" | "geography") => {
+                    match row.try_get::<_, Option<EwktString>>(i)? {
+                        Some(ewkt) => Value::text(ewkt.0),
+                        None => Value::null_text(),
+                    }
+                }
                 ref x => match x.kind() {
                     Kind::Enum => match row.try_get(i)? {
                         Some(val) => {
@@ -854,6 +877,8 @@ impl<'a> ToSql for Value<'a> {
                 Ok(result)
             }),
             (ValueType::DateTime(value), _) => value.map(|value| value.naive_utc().to_sql(ty, out)),
+            (ValueType::Geometry(_), _) => panic!("Cannot handle raw Geometry"),
+            (ValueType::Geography(_), _) => panic!("Cannot handle raw Geography"),
         };
 
         match res {
