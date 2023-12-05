@@ -97,7 +97,7 @@ impl QueryArguments {
             .schema
             .configuration
             .preview_features()
-            .contains(PreviewFeature::DistinctOn);
+            .contains(PreviewFeature::NativeDistinct);
 
         let connector_can_distinct_in_db = self
             .model()
