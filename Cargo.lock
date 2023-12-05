@@ -3508,7 +3508,6 @@ dependencies = [
  "serde",
  "serde_json",
  "url",
- "wasm-bindgen",
 ]
 
 [[package]]
