@@ -22,7 +22,7 @@ where
     ArgType: Serialize,
     ReturnType: FromJsValue,
 {
-    threadsafe_fn: JsFunction,
+    fn_: JsFunction,
 
     _phantom_arg: PhantomData<ArgType>,
     _phantom_return: PhantomData<ReturnType>,
@@ -45,7 +45,7 @@ where
 {
     fn from(js_fn: JsFunction) -> Self {
         Self {
-            threadsafe_fn: js_fn,
+            fn_: js_fn,
             _phantom_arg: PhantomData::<T> {},
             _phantom_return: PhantomData::<R> {},
         }
@@ -70,7 +70,7 @@ where
         let arg1 = arg1
             .serialize(&SERIALIZER)
             .map_err(|err| JsValue::from(JsError::from(&err)))?;
-        let return_value = self.threadsafe_fn.call1(&JsValue::null(), &arg1)?;
+        let return_value = self.fn_.call1(&JsValue::null(), &arg1)?;
 
         let value = if let Some(promise) = return_value.dyn_ref::<JsPromise>() {
             JsFuture::from(promise.to_owned()).await?
@@ -85,7 +85,7 @@ where
 
     pub(crate) fn call_non_blocking(&self, arg: T) {
         if let Ok(arg) = serde_wasm_bindgen::to_value(&arg) {
-            _ = self.threadsafe_fn.call1(&JsValue::null(), &arg);
+            _ = self.fn_.call1(&JsValue::null(), &arg);
         }
     }
 }
