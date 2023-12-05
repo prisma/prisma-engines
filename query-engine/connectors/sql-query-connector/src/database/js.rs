@@ -13,8 +13,10 @@ use quaint::{
 };
 use std::sync::{Arc, Mutex};
 
-// TODO: evaluate turning this into `Lazy<Mutex<Option<Arc<DriverAdapter>>>>` to avoid
-// a clone+drop on the adapter passed via `Js::from_source`.
+/// TODO: evaluate turning this into `Lazy<Mutex<Option<Arc<DriverAdapter>>>>` to avoid
+/// a clone+drop on the adapter passed via `Js::from_source`.
+/// Note: this is currently blocked by Napi causing linking errors when building test binaries,
+/// as commented in [`DriverAdapter`].
 static ACTIVE_DRIVER_ADAPTER: Lazy<Mutex<Option<DriverAdapter>>> = Lazy::new(|| Mutex::new(None));
 
 fn active_driver_adapter(provider: &str) -> connector::Result<DriverAdapter> {
@@ -86,23 +88,21 @@ impl Connector for Js {
     }
 }
 
-// TODO: miguelff: I haven´t found a better way to do this, yet... please continue reading.
-//
-// There is a bug in NAPI-rs by wich compiling a binary crate that links code using napi-rs
-// bindings breaks. We could have used a JsQueryable from the `driver-adapters` crate directly, as the
-// `connection` field of a driver adapter, but that will imply using napi-rs transitively, and break
-// the tests (which are compiled as binary creates)
-//
-// To avoid the problem above I separated interface from implementation, making DriverAdapter
-// independent on napi-rs. Initially, I tried having a field Arc<&dyn TransactionCabable> to hold
-// JsQueryable at runtime. I did this, because TransactionCapable is the trait bounds required to
-// create a value of  `SqlConnection` (see [SqlConnection::new])) to actually performt the queries.
-// using JSQueryable. However, this didn't work because TransactionCapable is not object safe.
-// (has Sized as a supertrait)
-//
-// The thing is that TransactionCapable is not object safe and cannot be used in a dynamic type
-// declaration, so finally I couldn't come up with anything better then wrapping a QuaintQueryable
-// in this object, and implementing TransactionCapable (and quaint::Queryable) explicitly for it.
+/// There is a bug in NAPI-rs by wich compiling a binary crate that links code using napi-rs
+/// bindings breaks. We could have used a JsQueryable from the `driver-adapters` crate directly, as the
+/// `connection` field of a driver adapter, but that will imply using napi-rs transitively, and break
+/// the tests (which are compiled as binary creates)
+///
+/// To avoid the problem above I separated interface from implementation, making DriverAdapter
+/// independent on napi-rs. Initially, I tried having a field Arc<&dyn TransactionCabable> to hold
+/// JsQueryable at runtime. I did this, because TransactionCapable is the trait bounds required to
+/// create a value of  `SqlConnection` (see [SqlConnection::new])) to actually performt the queries.
+/// using JSQueryable. However, this didn't work because TransactionCapable is not object safe.
+/// (has Sized as a supertrait)
+///
+/// The thing is that TransactionCapable is not object safe and cannot be used in a dynamic type
+/// declaration, so finally I couldn't come up with anything better then wrapping a QuaintQueryable
+/// in this object, and implementing TransactionCapable (and quaint::Queryable) explicitly for it.
 #[derive(Clone)]
 pub struct DriverAdapter {
     connector: Arc<dyn TransactionCapable>,
