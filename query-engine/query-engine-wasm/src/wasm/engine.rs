@@ -13,6 +13,7 @@ use query_core::{
     schema::{self, QuerySchema},
     telemetry, QueryExecutor, TransactionOptions, TxId,
 };
+use query_engine_common::engine::{map_known_error, stringify_env_values};
 use request_handlers::ConnectorMode;
 use request_handlers::{load_executor, RequestBody, RequestHandler};
 use serde::{Deserialize, Serialize};
@@ -27,6 +28,7 @@ use tracing::{field, instrument::WithSubscriber, Instrument, Span};
 use tracing_subscriber::filter::LevelFilter;
 use tsify::Tsify;
 use wasm_bindgen::prelude::wasm_bindgen;
+
 /// The main query engine used by JS
 #[wasm_bindgen]
 pub struct QueryEngine {
@@ -160,7 +162,7 @@ impl QueryEngine {
             sql_connector::activate_driver_adapter(Arc::new(js_queryable));
 
             let provider_name = schema.connector.provider_name();
-            tracing::info!("Received driver adapter for {provider_name}.");
+            tracing::info!("Registered driver adapter for {provider_name}.");
         }
 
         schema
@@ -407,42 +409,4 @@ impl QueryEngine {
     pub async fn metrics(&self, json_options: String) -> Result<(), wasm_bindgen::JsError> {
         Err(ApiError::configuration("Metrics is not enabled in Wasm.").into())
     }
-}
-
-fn map_known_error(err: query_core::CoreError) -> crate::Result<String> {
-    let user_error: user_facing_errors::Error = err.into();
-    let value = serde_json::to_string(&user_error)?;
-
-    Ok(value)
-}
-
-fn stringify_env_values(origin: serde_json::Value) -> crate::Result<HashMap<String, String>> {
-    use serde_json::Value;
-
-    let msg = match origin {
-        Value::Object(map) => {
-            let mut result: HashMap<String, String> = HashMap::new();
-
-            for (key, val) in map.into_iter() {
-                match val {
-                    Value::Null => continue,
-                    Value::String(val) => {
-                        result.insert(key, val);
-                    }
-                    val => {
-                        result.insert(key, val.to_string());
-                    }
-                }
-            }
-
-            return Ok(result);
-        }
-        Value::Null => return Ok(Default::default()),
-        Value::Bool(_) => "Expected an object for the env constructor parameter, got a boolean.",
-        Value::Number(_) => "Expected an object for the env constructor parameter, got a number.",
-        Value::String(_) => "Expected an object for the env constructor parameter, got a string.",
-        Value::Array(_) => "Expected an object for the env constructor parameter, got an array.",
-    };
-
-    Err(ApiError::JsonDecode(msg.to_string()))
 }
