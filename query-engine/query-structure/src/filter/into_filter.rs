@@ -14,7 +14,8 @@ impl IntoFilter for SelectionResult {
             .into_iter()
             .map(|(selection, value)| match selection {
                 SelectedField::Scalar(sf) => sf.equals(value),
-                SelectedField::Composite(_) => todo!(), // [Composites] todo
+                SelectedField::Composite(_) => unreachable!(), // [Composites] todo
+                SelectedField::Relation(_) => unreachable!(),
             })
             .collect();
 

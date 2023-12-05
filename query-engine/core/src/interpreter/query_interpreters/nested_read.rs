@@ -69,6 +69,7 @@ pub(crate) async fn m2m(
                 args,
                 &query.selected_fields,
                 &query.aggregation_selections,
+                RelationLoadStrategy::Query,
                 trace_id.clone(),
             )
             .await?
@@ -210,6 +211,7 @@ pub async fn one2m(
             args,
             selected_fields,
             &aggr_selections,
+            RelationLoadStrategy::Query,
             trace_id,
         )
         .await?

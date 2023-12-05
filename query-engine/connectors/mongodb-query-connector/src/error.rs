@@ -278,6 +278,7 @@ impl<T> DecorateErrorWithFieldInformationExtension for crate::Result<T> {
         match selected_field {
             SelectedField::Scalar(sf) => self.decorate_with_scalar_field_info(sf),
             SelectedField::Composite(composite_sel) => self.decorate_with_composite_field_info(&composite_sel.field),
+            SelectedField::Relation(_) => unreachable!(),
         }
     }
 

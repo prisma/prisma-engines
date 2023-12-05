@@ -74,11 +74,11 @@ impl<'a> QueryGraphBuilder<'a> {
         let query_schema = self.query_schema;
 
         let mut graph = match (&query_info.tag, query_info.model.map(|id| self.query_schema.internal_data_model.clone().zip(id))) {
-            (QueryTag::FindUnique, Some(m)) => read::find_unique(parsed_field, m).map(Into::into),
-            (QueryTag::FindUniqueOrThrow, Some(m)) => read::find_unique_or_throw(parsed_field, m).map(Into::into),
-            (QueryTag::FindFirst, Some(m)) => read::find_first(parsed_field, m).map(Into::into),
-            (QueryTag::FindFirstOrThrow, Some(m)) => read::find_first_or_throw(parsed_field, m).map(Into::into),
-            (QueryTag::FindMany, Some(m)) => read::find_many(parsed_field, m).map(Into::into),
+            (QueryTag::FindUnique, Some(m)) => read::find_unique(parsed_field, m, query_schema).map(Into::into),
+            (QueryTag::FindUniqueOrThrow, Some(m)) => read::find_unique_or_throw(parsed_field, m, query_schema).map(Into::into),
+            (QueryTag::FindFirst, Some(m)) => read::find_first(parsed_field, m, query_schema).map(Into::into),
+            (QueryTag::FindFirstOrThrow, Some(m)) => read::find_first_or_throw(parsed_field, m, query_schema).map(Into::into),
+            (QueryTag::FindMany, Some(m)) => read::find_many(parsed_field, m, query_schema).map(Into::into),
             (QueryTag::Aggregate, Some(m)) => read::aggregate(parsed_field, m).map(Into::into),
             (QueryTag::GroupBy, Some(m)) => read::group_by(parsed_field, m).map(Into::into),
             (QueryTag::CreateOne, Some(m)) => QueryGraph::root(|g| write::create_record(g, query_schema, m, parsed_field)),

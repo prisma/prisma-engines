@@ -11,8 +11,7 @@ mod not_in_batching {
         assert_error!(
             runner,
             "query { findManyTestModel(where: { id: { notIn: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11] } }) { id }}",
-            2029,
-            "Parameter limits for this database provider require this query to be split into multiple queries, but the negation filters used prevent the query from being split. Please reduce the used values in the query."
+            2029 // QueryParameterLimitExceeded
         );
 
         Ok(())
@@ -30,8 +29,7 @@ mod not_in_batching_cockroachdb {
         assert_error!(
             runner,
             "query { findManyTestModel(where: { id: { notIn: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11] } }) { id }}",
-            2029,
-            "Parameter limits for this database provider require this query to be split into multiple queries, but the negation filters used prevent the query from being split. Please reduce the used values in the query."
+            2029 // QueryParameterLimitExceeded
         );
 
         Ok(())

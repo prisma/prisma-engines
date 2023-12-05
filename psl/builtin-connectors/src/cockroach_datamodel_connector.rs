@@ -58,7 +58,8 @@ const CAPABILITIES: ConnectorCapabilities = enumflags2::make_bitflags!(Connector
     FilteredInlineChildNestedToOneDisconnect |
     InsertReturning |
     UpdateReturning |
-    RowIn
+    RowIn |
+    LateralJoin
 });
 
 const SCALAR_TYPE_DEFAULTS: &[(ScalarType, CockroachType)] = &[

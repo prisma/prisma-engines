@@ -4949,6 +4949,7 @@ dependencies = [
  "chrono",
  "cuid",
  "futures",
+ "hex",
  "itertools",
  "once_cell",
  "opentelemetry",
