@@ -106,10 +106,7 @@ impl QueryArguments {
             .connector
             .has_capability(ConnectorCapability::DistinctOn);
 
-        // has_distinct_feature && connector_can_distinct_in_db && self.order_by.is_empty()
-        dbg!("hi");
-
-        has_distinct_feature && connector_can_distinct_in_db && dbg!(self.can_orderby_with_in_db_distinct())
+        has_distinct_feature && connector_can_distinct_in_db && self.can_orderby_with_in_db_distinct()
     }
 
     fn can_orderby_with_in_db_distinct(&self) -> bool {
