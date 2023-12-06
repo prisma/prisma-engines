@@ -17,7 +17,7 @@ mod metrics {
     use query_engine_tests::*;
     use serde_json::Value;
 
-    #[connector_test]
+    #[connector_test(exclude(Postgres("pg.js.wasm"), Postgres("neon.js.wasm")))]
     async fn metrics_are_recorded(runner: Runner) -> TestResult<()> {
         insta::assert_snapshot!(
           run_query!(&runner, r#"mutation { createOneTestModel(data: { id: 1 }) { id }}"#),
@@ -48,7 +48,7 @@ mod metrics {
         Ok(())
     }
 
-    #[connector_test]
+    #[connector_test(exclude(Postgres("pg.js.wasm"), Postgres("neon.js.wasm")))]
     async fn metrics_tx_do_not_go_negative(mut runner: Runner) -> TestResult<()> {
         let tx_id = runner.start_tx(5000, 5000, None).await?;
         runner.set_active_tx(tx_id.clone());

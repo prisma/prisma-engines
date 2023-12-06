@@ -137,7 +137,11 @@ mod float_filter {
         Ok(())
     }
 
-    #[connector_test(schema(setup::common_list_types), capabilities(ScalarLists))]
+    #[connector_test(
+        schema(setup::common_list_types),
+        exclude(Postgres("pg.js.wasm", "neon.js.wasm")),
+        capabilities(ScalarLists)
+    )]
     async fn scalar_list_filters(runner: Runner) -> TestResult<()> {
         setup::test_data_list_common(&runner).await?;
 

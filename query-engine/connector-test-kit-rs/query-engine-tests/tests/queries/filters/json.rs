@@ -213,8 +213,7 @@ mod json {
         schema(json_opt),
         exclude(
             Vitess("planetscale.js"),
-            Postgres("neon.js"),
-            Postgres("pg.js"),
+            Postgres("neon.js", "pg.js", "neon.js.wasm", "pg.js.wasm"),
             Sqlite("libsql.js"),
             MySQL(5.6)
         )

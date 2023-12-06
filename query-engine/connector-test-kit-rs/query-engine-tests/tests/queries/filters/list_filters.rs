@@ -1,6 +1,10 @@
 use query_engine_tests::*;
 
-#[test_suite(schema(common_list_types), capabilities(ScalarLists))]
+#[test_suite(
+    schema(common_list_types),
+    exclude(Postgres("pg.js.wasm", "neon.js.wasm")),
+    capabilities(ScalarLists)
+)]
 mod lists {
     use indoc::indoc;
     use query_engine_tests::run_query;
@@ -623,7 +627,7 @@ mod lists {
     }
 
     // Cockroachdb does not like the bytes empty array check in v21 but this will be fixed in 22.
-    #[connector_test(exclude(CockroachDB))]
+    #[connector_test(exclude(CockroachDB), exclude(Postgres("pg.js.wasm", "neon.js.wasm")))]
     async fn is_empty_bytes(runner: Runner) -> TestResult<()> {
         test_data(&runner).await?;
 
