@@ -7,7 +7,6 @@ use crate::{
 };
 use driver_adapters::JsObject;
 use js_sys::Function as JsFunction;
-use psl::PreviewFeature;
 use query_core::{
     protocol::EngineProtocol,
     schema::{self, QuerySchema},
@@ -182,7 +181,8 @@ impl QueryEngine {
             .validate_that_one_datasource_is_provided()
             .map_err(|errors| ApiError::conversion(errors, schema.db.source()))?;
 
-        let enable_tracing = config.preview_features().contains(PreviewFeature::Tracing);
+        // Telemetry panics on timings if preview feature is enabled
+        let enable_tracing = false; // config.preview_features().contains(PreviewFeature::Tracing);
         let engine_protocol = engine_protocol.unwrap_or(EngineProtocol::Json);
 
         let builder = EngineBuilder {
