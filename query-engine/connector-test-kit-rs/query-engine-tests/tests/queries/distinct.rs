@@ -97,6 +97,81 @@ mod distinct {
     }
 
     #[connector_test]
+    async fn with_orderby_basic(runner: Runner) -> TestResult<()> {
+        test_user(&runner, r#"{ id: 1, first_name: "Joe", last_name: "Doe", email: "1" }"#).await?;
+        test_user(
+            &runner,
+            r#"{ id: 2, first_name: "Hans", last_name: "Wurst", email: "2" }"#,
+        )
+        .await?;
+        test_user(&runner, r#"{ id: 3, first_name: "Joe", last_name: "Doe", email: "3" }"#).await?;
+
+        insta::assert_snapshot!(run_query!(
+                &runner,
+                indoc!("{
+                    findManyUser(
+                        orderBy: { first_name: desc },
+                        distinct: [first_name, last_name])
+                        { id, first_name, last_name }
+                    }")
+            ),
+            @r###"{"data":{"findManyUser":[{"id":1,"first_name":"Joe","last_name":"Doe"},{"id":2,"first_name":"Hans","last_name":"Wurst"}]}}"###
+        );
+
+        Ok(())
+    }
+
+    #[connector_test]
+    async fn with_orderby_non_matching(runner: Runner) -> TestResult<()> {
+        test_user(&runner, r#"{ id: 1, first_name: "Joe", last_name: "Doe", email: "1" }"#).await?;
+        test_user(
+            &runner,
+            r#"{ id: 2, first_name: "Hans", last_name: "Wurst", email: "2" }"#,
+        )
+        .await?;
+        test_user(&runner, r#"{ id: 3, first_name: "Joe", last_name: "Doe", email: "3" }"#).await?;
+
+        insta::assert_snapshot!(run_query!(
+                &runner,
+                indoc!("{
+                    findManyUser(
+                        orderBy: { id: desc },
+                        distinct: [first_name, last_name])
+                        { id, first_name, last_name }
+                    }")
+            ),
+            @r###"{"data":{"findManyUser":[{"id":3,"first_name":"Joe","last_name":"Doe"},{"id":2,"first_name":"Hans","last_name":"Wurst"}]}}"###
+        );
+
+        Ok(())
+    }
+
+    #[connector_test]
+    async fn with_orderby_similar(runner: Runner) -> TestResult<()> {
+        test_user(&runner, r#"{ id: 1, first_name: "Joe", last_name: "Doe", email: "1" }"#).await?;
+        test_user(
+            &runner,
+            r#"{ id: 2, first_name: "Hans", last_name: "Wurst", email: "2" }"#,
+        )
+        .await?;
+        test_user(&runner, r#"{ id: 3, first_name: "Joe", last_name: "Doe", email: "3" }"#).await?;
+
+        insta::assert_snapshot!(run_query!(
+                &runner,
+                indoc!("{
+                    findManyUser(
+                        orderBy: [{ first_name: desc }, { id: desc }],
+                        distinct: [first_name, last_name])
+                        { id, first_name, last_name }
+                    }")
+            ),
+            @r###"{"data":{"findManyUser":[{"id":3,"first_name":"Joe","last_name":"Doe"},{"id":2,"first_name":"Hans","last_name":"Wurst"}]}}"###
+        );
+
+        Ok(())
+    }
+
+    #[connector_test]
     async fn with_skip_basic(runner: Runner) -> TestResult<()> {
         test_user(&runner, r#"{ id: 1, first_name: "Joe", last_name: "Doe", email: "1" }"#).await?;
         test_user(
@@ -121,7 +196,7 @@ mod distinct {
     }
 
     #[connector_test]
-    async fn with_skip_orderby(runner: Runner) -> TestResult<()> {
+    async fn with_skip_orderby_basic(runner: Runner) -> TestResult<()> {
         test_user(&runner, r#"{ id: 1, first_name: "Joe", last_name: "Doe", email: "1" }"#).await?;
         test_user(
             &runner,
@@ -148,7 +223,7 @@ mod distinct {
     }
 
     #[connector_test]
-    async fn with_skip_orderby_nondistinct(runner: Runner) -> TestResult<()> {
+    async fn with_skip_orderby_order_matters(runner: Runner) -> TestResult<()> {
         test_user(&runner, r#"{ id: 1, first_name: "Joe", last_name: "Doe", email: "1" }"#).await?;
         test_user(
             &runner,
@@ -157,16 +232,18 @@ mod distinct {
         .await?;
         test_user(&runner, r#"{ id: 3, first_name: "Joe", last_name: "Doe", email: "3" }"#).await?;
 
-        insta::assert_snapshot!(run_query!(
+        insta::assert_snapshot!(
+            run_query!(
                 &runner,
                 indoc!("{
                     findManyUser(
                         orderBy: { id: desc },
+                        skip: 1,
                         distinct: [first_name, last_name])
-                        { id, first_name, last_name }
+                        { first_name, last_name }
                     }")
             ),
-            @r###"{"data":{"findManyUser":[{"id":3,"first_name":"Joe","last_name":"Doe"},{"id":2,"first_name":"Hans","last_name":"Wurst"}]}}"###
+            @r###"{"data":{"findManyUser":[{"first_name":"Hans","last_name":"Wurst"}]}}"###
         );
 
         Ok(())

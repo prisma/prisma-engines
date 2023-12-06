@@ -106,6 +106,7 @@ impl SelectDefinition for QueryArguments {
             .iter()
             .fold(select_ast, |acc, o| acc.order_by(o.order_definition.clone()));
 
+        dbg!(&self.distinct);
         let select_ast = if let Some(distinct) = self.distinct {
             let distinct_fields = ModelProjection::from(distinct)
                 .as_columns(ctx)
