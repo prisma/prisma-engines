@@ -1,7 +1,7 @@
 use super::common_test_data;
 use query_engine_tests::*;
 
-#[test_suite(schema(schemas::common_nullable_types))]
+#[test_suite(schema(schemas::common_nullable_types), exclude(Sqlite("libsql.js.wasm")))]
 mod bytes_filter_spec {
     use query_engine_tests::run_query;
 

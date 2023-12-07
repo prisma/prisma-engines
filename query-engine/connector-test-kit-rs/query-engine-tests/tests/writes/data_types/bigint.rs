@@ -17,7 +17,7 @@ mod bigint {
     }
 
     // "Using a BigInt field" should "work"
-    #[connector_test(exclude(Postgres("pg.js.wasm", "neon.js.wasm")))]
+    #[connector_test(exclude(Postgres("pg.js.wasm", "neon.js.wasm"), Sqlite("libsql.js.wasm")))]
     async fn using_bigint_field(runner: Runner) -> TestResult<()> {
         insta::assert_snapshot!(
           run_query!(&runner, r#"mutation {

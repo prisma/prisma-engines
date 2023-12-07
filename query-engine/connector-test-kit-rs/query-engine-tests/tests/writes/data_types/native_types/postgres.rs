@@ -23,7 +23,7 @@ mod postgres {
     }
 
     //"Postgres native int types" should "work"
-    #[connector_test(schema(schema_int), exclude(Postgres("pg.js.wasm", "neon.js.wasm")))]
+    #[connector_test(schema(schema_int), only(Postgres), exclude(Postgres("pg.js.wasm", "neon.js.wasm")))]
     async fn native_int_types(runner: Runner) -> TestResult<()> {
         insta::assert_snapshot!(
           run_query!(&runner, r#"mutation {
