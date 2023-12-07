@@ -188,18 +188,38 @@ pub trait Visitor<'a> {
             match j {
                 Join::Inner(data) => {
                     self.write(" INNER JOIN ")?;
+
+                    if data.lateral {
+                        self.write("LATERAL ")?;
+                    }
+
                     self.visit_join_data(data)?;
                 }
                 Join::Left(data) => {
                     self.write(" LEFT JOIN ")?;
+
+                    if data.lateral {
+                        self.write("LATERAL ")?;
+                    }
+
                     self.visit_join_data(data)?;
                 }
                 Join::Right(data) => {
                     self.write(" RIGHT JOIN ")?;
+
+                    if data.lateral {
+                        self.write("LATERAL ")?;
+                    }
+
                     self.visit_join_data(data)?;
                 }
                 Join::Full(data) => {
                     self.write(" FULL JOIN ")?;
+
+                    if data.lateral {
+                        self.write("LATERAL ")?;
+                    }
+
                     self.visit_join_data(data)?;
                 }
             }
@@ -234,9 +254,15 @@ pub trait Visitor<'a> {
 
         self.write("SELECT ")?;
 
-        if select.distinct {
-            self.write("DISTINCT ")?;
-        }
+        if let Some(distinct) = select.distinct {
+            match distinct {
+                DistinctType::Default => self.write("DISTINCT ")?,
+                DistinctType::OnClause(columns) => {
+                    self.write("DISTINCT ON ")?;
+                    self.surround_with("(", ") ", |ref mut s| s.visit_columns(columns))?;
+                }
+            }
+        };
 
         if !select.tables.is_empty() {
             if select.columns.is_empty() {
@@ -1105,6 +1131,27 @@ pub trait Visitor<'a> {
             FunctionType::Uuid => self.write("uuid()")?,
             FunctionType::Concat(concat) => {
                 self.visit_concat(concat)?;
+            }
+            FunctionType::JsonArrayAgg(array_agg) => {
+                self.write("JSON_AGG")?;
+                self.surround_with("(", ")", |s| s.visit_expression(*array_agg.expr))?;
+            }
+            FunctionType::JsonBuildObject(build_obj) => {
+                let len = build_obj.exprs.len();
+
+                self.write("JSON_BUILD_OBJECT")?;
+                self.surround_with("(", ")", |s| {
+                    for (i, (name, expr)) in build_obj.exprs.into_iter().enumerate() {
+                        s.visit_raw_value(Value::text(name))?;
+                        s.write(", ")?;
+                        s.visit_expression(expr)?;
+                        if i < (len - 1) {
+                            s.write(", ")?;
+                        }
+                    }
+
+                    Ok(())
+                })?;
             }
         };
 

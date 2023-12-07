@@ -1,9 +1,8 @@
-use super::*;
+use super::{inmemory_record_processor::InMemoryRecordProcessor, *};
 use crate::{interpreter::InterpretationResult, query_ast::*, result_ast::*};
 use connector::{self, error::ConnectorError, ConnectionLike, RelAggregationRow, RelAggregationSelection};
 use futures::future::{BoxFuture, FutureExt};
-use inmemory_record_processor::InMemoryRecordProcessor;
-use query_structure::ManyRecords;
+use query_structure::{ManyRecords, RelationLoadStrategy, RelationSelection};
 use std::collections::HashMap;
 use user_facing_errors::KnownError;
 
@@ -40,12 +39,13 @@ fn read_one(
                 &filter,
                 &query.selected_fields,
                 &query.aggregation_selections,
+                query.relation_load_strategy,
                 trace_id,
             )
             .await?;
 
         match scalars {
-            Some(record) => {
+            Some(record) if query.relation_load_strategy.is_query() => {
                 let scalars: ManyRecords = record.into();
                 let (scalars, aggregation_rows) =
                     extract_aggregation_rows_from_scalars(scalars, query.aggregation_selections);
@@ -58,6 +58,18 @@ fn read_one(
                     nested,
                     model,
                     aggregation_rows,
+                }
+                .into())
+            }
+            Some(record) => {
+                let records: ManyRecords = record.into();
+
+                Ok(RecordSelectionWithRelations {
+                    name: query.name,
+                    model,
+                    fields: query.selection_order,
+                    records,
+                    nested: build_relation_record_selection(query.selected_fields.relations()),
                 }
                 .into())
             }
@@ -86,6 +98,17 @@ fn read_one(
 /// -> Unstable cursors can't reliably be fetched by the underlying datasource, so we need to process part of it in-memory.
 fn read_many(
     tx: &mut dyn ConnectionLike,
+    query: ManyRecordsQuery,
+    trace_id: Option<String>,
+) -> BoxFuture<'_, InterpretationResult<QueryResult>> {
+    match query.relation_load_strategy {
+        RelationLoadStrategy::Join => read_many_by_joins(tx, query, trace_id),
+        RelationLoadStrategy::Query => read_many_by_queries(tx, query, trace_id),
+    }
+}
+
+fn read_many_by_queries(
+    tx: &mut dyn ConnectionLike,
     mut query: ManyRecordsQuery,
     trace_id: Option<String>,
 ) -> BoxFuture<'_, InterpretationResult<QueryResult>> {
@@ -102,6 +125,7 @@ fn read_many(
                 query.args.clone(),
                 &query.selected_fields,
                 &query.aggregation_selections,
+                query.relation_load_strategy,
                 trace_id,
             )
             .await?;
@@ -131,6 +155,53 @@ fn read_many(
     };
 
     fut.boxed()
+}
+
+fn read_many_by_joins(
+    tx: &mut dyn ConnectionLike,
+    query: ManyRecordsQuery,
+    trace_id: Option<String>,
+) -> BoxFuture<'_, InterpretationResult<QueryResult>> {
+    let fut = async move {
+        let result = tx
+            .get_many_records(
+                &query.model,
+                query.args.clone(),
+                &query.selected_fields,
+                &query.aggregation_selections,
+                query.relation_load_strategy,
+                trace_id,
+            )
+            .await?;
+
+        if result.records.is_empty() && query.options.contains(QueryOption::ThrowOnEmpty) {
+            record_not_found()
+        } else {
+            Ok(RecordSelectionWithRelations {
+                name: query.name,
+                fields: query.selection_order,
+                records: result,
+                nested: build_relation_record_selection(query.selected_fields.relations()),
+                model: query.model,
+            }
+            .into())
+        }
+    };
+
+    fut.boxed()
+}
+
+fn build_relation_record_selection<'a>(
+    selections: impl Iterator<Item = &'a RelationSelection>,
+) -> Vec<RelationRecordSelection> {
+    selections
+        .map(|rq| RelationRecordSelection {
+            name: rq.field.name().to_owned(),
+            fields: rq.result_fields.clone(),
+            model: rq.field.related_model(),
+            nested: build_relation_record_selection(rq.relations()),
+        })
+        .collect()
 }
 
 /// Queries related records for a set of parent IDs.

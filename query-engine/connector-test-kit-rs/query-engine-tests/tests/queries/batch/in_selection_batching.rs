@@ -35,7 +35,9 @@ mod isb {
     }
 
     // "batching of IN queries" should "work when having more than the specified amount of items"
-    #[connector_test]
+    // TODO(joins): Excluded because we have no support for batched queries with joins. In practice, it should happen under much less circumstances
+    // TODO(joins): than with the query-based strategy, because we don't issue `WHERE IN (parent_ids)` queries anymore to resolve relations.
+    #[connector_test(exclude_features("relationJoins"))]
     async fn in_more_items(runner: Runner) -> TestResult<()> {
         create_test_data(&runner).await?;
 
@@ -51,7 +53,9 @@ mod isb {
     }
 
     // "ascending ordering of batched IN queries" should "work when having more than the specified amount of items"
-    #[connector_test]
+    // TODO(joins): Excluded because we have no support for batched queries with joins. In practice, it should happen under much less circumstances
+    // TODO(joins): than with the query-based strategy, because we don't issue `WHERE IN (parent_ids)` queries anymore to resolve relations.
+    #[connector_test(exclude_features("relationJoins"))]
     async fn asc_in_ordering(runner: Runner) -> TestResult<()> {
         create_test_data(&runner).await?;
 
@@ -67,7 +71,9 @@ mod isb {
     }
 
     // "ascending ordering of batched IN queries" should "work when having more than the specified amount of items"
-    #[connector_test]
+    // TODO(joins): Excluded because we have no support for batched queries with joins. In practice, it should happen under much less circumstances
+    // TODO(joins): than with the query-based strategy, because we don't issue `WHERE IN (parent_ids)` queries anymore to resolve relations.
+    #[connector_test(exclude_features("relationJoins"))]
     async fn desc_in_ordering(runner: Runner) -> TestResult<()> {
         create_test_data(&runner).await?;
 
@@ -91,8 +97,7 @@ mod isb {
             r#"query {
               findManyA(where: {id: { in: [5,4,3,2,1,1,1,2,3,4,5,6,7,6,5,4,3,2,1,2,3,4,5,6] }}, orderBy: { b: { as: { _count: asc } } }) { id }
             }"#,
-            2029,
-            "Your query cannot be split into multiple queries because of the order by aggregation or relevance."
+            2029 // QueryParameterLimitExceeded
         );
 
         Ok(())
@@ -107,8 +112,7 @@ mod isb {
             r#"query {
               findManyA(where: {id: { in: [5,4,3,2,1,1,1,2,3,4,5,6,7,6,5,4,3,2,1,2,3,4,5,6] }}, orderBy: { _relevance: { fields: text, search: "something", sort: asc } }) { id }
             }"#,
-            2029,
-            "Your query cannot be split into multiple queries because of the order by aggregation or relevance."
+            2029 // QueryParameterLimitExceeded
         );
 
         Ok(())

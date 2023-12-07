@@ -327,6 +327,7 @@ impl From<(&SelectedField, PrismaValue)> for WriteOperation {
         match selection {
             SelectedField::Scalar(sf) => (sf, pv).into(),
             SelectedField::Composite(cs) => (&cs.field, pv).into(),
+            SelectedField::Relation(_) => todo!(),
         }
     }
 }

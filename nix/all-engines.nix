@@ -15,7 +15,7 @@ let
     src = srcPath;
     name = "prisma-engines-source";
   };
-  craneLib = (flakeInputs.crane.mkLib pkgs).overrideToolchain rustToolchain.default;
+  craneLib = (flakeInputs.crane.mkLib pkgs).overrideToolchain rustToolchain;
   deps = craneLib.vendorCargoDeps { inherit src; };
   libSuffix = stdenv.hostPlatform.extensions.sharedLibrary;
 in

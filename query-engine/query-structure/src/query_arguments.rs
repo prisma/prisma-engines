@@ -1,3 +1,5 @@
+use psl::{datamodel_connector::ConnectorCapability, PreviewFeature};
+
 use crate::*;
 
 /// `QueryArguments` define various constraints queried data should fulfill:
@@ -12,7 +14,7 @@ use crate::*;
 /// A query argument struct is always valid over a single model only, meaning that all
 /// data referenced in a single query argument instance is always refering to data of
 /// a single model (e.g. the cursor projection, distinct projection, orderby, ...).
-#[derive(Clone)]
+#[derive(Clone, PartialEq, Eq, Hash)]
 pub struct QueryArguments {
     pub model: Model,
     pub cursor: Option<SelectionResult>,
@@ -23,6 +25,17 @@ pub struct QueryArguments {
     pub distinct: Option<FieldSelection>,
     pub ignore_skip: bool,
     pub ignore_take: bool,
+}
+
+#[derive(Debug, Copy, Clone, PartialEq, Eq, Hash)]
+pub enum RelationLoadStrategy {
+    Join,
+    Query,
+}
+impl RelationLoadStrategy {
+    pub fn is_query(&self) -> bool {
+        matches!(self, RelationLoadStrategy::Query)
+    }
 }
 
 impl std::fmt::Debug for QueryArguments {
@@ -70,7 +83,30 @@ impl QueryArguments {
     /// retrieved by the connector or if it requires the query engine to fetch a raw set
     /// of records and perform certain operations itself, in-memory.
     pub fn requires_inmemory_processing(&self) -> bool {
-        self.distinct.is_some() || self.contains_unstable_cursor() || self.contains_null_cursor()
+        self.contains_unstable_cursor() || self.contains_null_cursor() || self.requires_inmemory_distinct()
+    }
+
+    pub fn requires_inmemory_distinct(&self) -> bool {
+        self.distinct.is_some() && !self.can_distinct_in_db()
+    }
+
+    fn can_distinct_in_db(&self) -> bool {
+        let has_distinct_feature = self
+            .model()
+            .dm
+            .schema
+            .configuration
+            .preview_features()
+            .contains(PreviewFeature::NativeDistinct);
+
+        let connector_can_distinct_in_db = self
+            .model()
+            .dm
+            .schema
+            .connector
+            .has_capability(ConnectorCapability::DistinctOn);
+
+        has_distinct_feature && connector_can_distinct_in_db && self.order_by.is_empty()
     }
 
     /// An unstable cursor is a cursor that is used in conjunction with an unstable (non-unique) combination of orderBys.

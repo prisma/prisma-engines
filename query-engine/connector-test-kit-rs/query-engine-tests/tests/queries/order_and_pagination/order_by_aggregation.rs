@@ -79,12 +79,12 @@ mod order_by_aggr {
           run_query!(&runner, r#"{
             findManyPost(orderBy: { categories: { _count: asc } }) {
               title
-              categories {
+              categories(orderBy: { name: asc }) {
                 name
               }
             }
           }"#),
-          @r###"{"data":{"findManyPost":[{"title":"bob_post_1","categories":[{"name":"Finance"}]},{"title":"alice_post_1","categories":[{"name":"News"},{"name":"Society"}]},{"title":"bob_post_2","categories":[{"name":"History"},{"name":"Gaming"},{"name":"Hacking"}]}]}}"###
+          @r###"{"data":{"findManyPost":[{"title":"bob_post_1","categories":[{"name":"Finance"}]},{"title":"alice_post_1","categories":[{"name":"News"},{"name":"Society"}]},{"title":"bob_post_2","categories":[{"name":"Gaming"},{"name":"Hacking"},{"name":"History"}]}]}}"###
         );
 
         Ok(())
@@ -98,12 +98,12 @@ mod order_by_aggr {
           run_query!(&runner, r#"{
             findManyPost(orderBy: { categories: { _count: desc } }) {
               title
-              categories {
+              categories(orderBy: { name :asc }) {
                 name
               }
             }
           }"#),
-          @r###"{"data":{"findManyPost":[{"title":"bob_post_2","categories":[{"name":"History"},{"name":"Gaming"},{"name":"Hacking"}]},{"title":"alice_post_1","categories":[{"name":"News"},{"name":"Society"}]},{"title":"bob_post_1","categories":[{"name":"Finance"}]}]}}"###
+          @r###"{"data":{"findManyPost":[{"title":"bob_post_2","categories":[{"name":"Gaming"},{"name":"Hacking"},{"name":"History"}]},{"title":"alice_post_1","categories":[{"name":"News"},{"name":"Society"}]},{"title":"bob_post_1","categories":[{"name":"Finance"}]}]}}"###
         );
 
         Ok(())
@@ -159,12 +159,12 @@ mod order_by_aggr {
           run_query!(&runner, r#"{
             findManyPost(orderBy: [{ categories: { _count: asc } }, { title: asc }]) {
               title
-              categories {
+              categories(orderBy: { name: asc }) {
                 name
               }
             }
           }"#),
-          @r###"{"data":{"findManyPost":[{"title":"bob_post_1","categories":[{"name":"Finance"}]},{"title":"alice_post_1","categories":[{"name":"News"},{"name":"Society"}]},{"title":"bob_post_2","categories":[{"name":"History"},{"name":"Gaming"},{"name":"Hacking"}]}]}}"###
+          @r###"{"data":{"findManyPost":[{"title":"bob_post_1","categories":[{"name":"Finance"}]},{"title":"alice_post_1","categories":[{"name":"News"},{"name":"Society"}]},{"title":"bob_post_2","categories":[{"name":"Gaming"},{"name":"Hacking"},{"name":"History"}]}]}}"###
         );
 
         Ok(())
@@ -181,12 +181,12 @@ mod order_by_aggr {
               user {
                 name
               }
-              categories {
+              categories(orderBy: { name: asc }) {
                 name
               }
             }
           }"#),
-          @r###"{"data":{"findManyPost":[{"user":{"name":"Alice"},"categories":[{"name":"News"},{"name":"Society"}]},{"user":{"name":"Bob"},"categories":[{"name":"History"},{"name":"Gaming"},{"name":"Hacking"}]},{"user":{"name":"Bob"},"categories":[{"name":"Finance"}]}]}}"###
+          @r###"{"data":{"findManyPost":[{"user":{"name":"Alice"},"categories":[{"name":"News"},{"name":"Society"}]},{"user":{"name":"Bob"},"categories":[{"name":"Gaming"},{"name":"Hacking"},{"name":"History"}]},{"user":{"name":"Bob"},"categories":[{"name":"Finance"}]}]}}"###
         );
 
         Ok(())
@@ -571,7 +571,7 @@ mod order_by_aggr {
             findManyPost(orderBy: [{ categories: { _count: asc } }, { title: asc }], cursor: { id: 2 }, take: 2) {
               id
               title
-              categories {
+              categories(orderBy: { name: asc }) {
                 name
               }
             }

@@ -80,6 +80,7 @@ pub fn from_selections(
                     }),
                 );
             }
+            SelectedField::Relation(_) => unreachable!(),
         }
     }
 

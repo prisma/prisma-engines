@@ -72,6 +72,13 @@ impl ExpressionResult {
                         .into_iter()
                         .collect(),
                 ),
+                QueryResult::RecordSelectionWithRelations(rsr) => Some(
+                    rsr.records
+                        .extract_selection_results(field_selection)
+                        .expect("Expected record selection to contain required model ID fields.")
+                        .into_iter()
+                        .collect(),
+                ),
                 QueryResult::RecordSelection(None) => Some(vec![]),
 
                 _ => None,
