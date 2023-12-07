@@ -109,13 +109,16 @@ mod isb {
         Ok(())
     }
 
-    #[connector_test(exclude(
-        MongoDb,
-        Postgres("pg.js.wasm"),
-        Postgres("neon.js.wasm"),
-        Sqlite("libsql.js.wasm"),
-        Vitess("planetscale.js.wasm")
-    ))]
+    #[connector_test(
+        capabilities(FullTextSearchWithoutIndex),
+        exclude(
+            MongoDb,
+            Postgres("pg.js.wasm"),
+            Postgres("neon.js.wasm"),
+            Sqlite("libsql.js.wasm"),
+            Vitess("planetscale.js.wasm")
+        )
+    )]
     async fn order_by_relevance_should_fail(runner: Runner) -> TestResult<()> {
         create_test_data(&runner).await?;
 
