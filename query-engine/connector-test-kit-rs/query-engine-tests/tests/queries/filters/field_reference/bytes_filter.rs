@@ -58,7 +58,7 @@ mod bytes_filter {
     }
 
     #[connector_test(
-        schema(setup::common_mixed_types),
+        schema(setup::common_list_types),
         exclude(Postgres("pg.js.wasm", "neon.js.wasm")),
         capabilities(ScalarLists)
     )]
