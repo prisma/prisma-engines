@@ -1,7 +1,7 @@
 use query_engine_tests::test_suite;
 use std::borrow::Cow;
 
-#[test_suite(schema(generic), exclude(Vitess("planetscale.js")))]
+#[test_suite(schema(generic), exclude(Vitess("planetscale.js", "planetscale.js.wasm")))]
 mod interactive_tx {
     use query_engine_tests::*;
     use tokio::time;
@@ -573,7 +573,7 @@ mod itx_isolation {
     use query_engine_tests::*;
 
     // All (SQL) connectors support serializable.
-    #[connector_test(exclude(MongoDb, Vitess("planetscale.js")))]
+    #[connector_test(exclude(MongoDb, Vitess("planetscale.js", "planetscale.js.wasm")))]
     async fn basic_serializable(mut runner: Runner) -> TestResult<()> {
         let tx_id = runner.start_tx(5000, 5000, Some("Serializable".to_owned())).await?;
         runner.set_active_tx(tx_id.clone());
@@ -595,7 +595,7 @@ mod itx_isolation {
         Ok(())
     }
 
-    #[connector_test(exclude(MongoDb, Vitess("planetscale.js")))]
+    #[connector_test(exclude(MongoDb, Vitess("planetscale.js", "planetscale.js.wasm")))]
     async fn casing_doesnt_matter(mut runner: Runner) -> TestResult<()> {
         let tx_id = runner.start_tx(5000, 5000, Some("sErIaLiZaBlE".to_owned())).await?;
         runner.set_active_tx(tx_id.clone());

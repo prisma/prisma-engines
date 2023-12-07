@@ -79,7 +79,13 @@ mod bytes {
 
     #[connector_test(
         schema(bytes_id),
-        exclude(MySQL, Vitess, SqlServer, Postgres("pg.js.wasm", "neon.js.wasm"), Sqlite("libsql.js.wasm"))
+        exclude(
+            MySQL,
+            Vitess,
+            SqlServer,
+            Postgres("pg.js.wasm", "neon.js.wasm"),
+            Sqlite("libsql.js.wasm")
+        )
     )]
     async fn byte_id_coercion(runner: Runner) -> TestResult<()> {
         insta::assert_snapshot!(
