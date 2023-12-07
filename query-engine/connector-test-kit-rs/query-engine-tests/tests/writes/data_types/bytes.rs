@@ -1,6 +1,9 @@
 use query_engine_tests::*;
 
-#[test_suite(exclude(Postgres("pg.js.wasm", "neon.js.wasm")))]
+#[test_suite(exclude(
+    Postgres("pg.js.wasm", "neon.js.wasm"),
+    exclude(Sqlite("libsql.js.wasm"), Vitess("planetscale.js.wasm"))
+))]
 mod bytes {
     use indoc::indoc;
     use query_engine_tests::run_query;
@@ -31,7 +34,7 @@ mod bytes {
     }
 
     // "Using a bytes field" should "work"
-    #[connector_test(schema(basic), exclude(Sqlite("libsql.js.wasm"), Vitess("planetscale.js.wasm")))]
+    #[connector_test(schema(basic))]
     async fn using_bytes_field(runner: Runner) -> TestResult<()> {
         insta::assert_snapshot!(
           run_query!(&runner, r#"mutation {
