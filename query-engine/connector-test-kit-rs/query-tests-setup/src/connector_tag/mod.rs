@@ -207,7 +207,7 @@ pub(crate) fn connection_string(
         }
 
         ConnectorVersion::Vitess(Some(VitessVersion::V8_0)) => "mysql://root@localhost:33807/test".into(),
-        ConnectorVersion::Vitess(Some(VitessVersion::PlanetscaleJs)) => {
+        ConnectorVersion::Vitess(Some(VitessVersion::PlanetscaleJsNapi | VitessVersion::PlanetscaleJsWasm)) => {
             format!("mysql://root@127.0.0.1:3310/{database}")
         }
 
