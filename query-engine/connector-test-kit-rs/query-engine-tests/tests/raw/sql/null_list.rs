@@ -7,7 +7,11 @@ mod null_list {
 
     #[connector_test(
         schema(common_list_types),
-        exclude(Postgres("pg.js.wasm", "neon.js.wasm"), Sqlite("libsql.js.wasm"))
+        exclude(
+            Postgres("pg.js.wasm", "neon.js.wasm"),
+            Sqlite("libsql.js.wasm"),
+            Vitess("planetscale.js.wasm")
+        )
     )]
     async fn null_scalar_lists(runner: Runner) -> TestResult<()> {
         run_query!(

@@ -8,7 +8,8 @@ mod not_in_batching {
         CockroachDb,
         Postgres("pg.js.wasm"),
         Postgres("neon.js.wasm"),
-        Sqlite("libsql.js.wasm")
+        Sqlite("libsql.js.wasm"),
+        Vitess("planetscale.js.wasm")
     ))]
     async fn not_in_batch_filter(runner: Runner) -> TestResult<()> {
         runner.query(r#"mutation { createManyTestModel(data: [{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{}]) { count }}"#).await?.assert_success();

@@ -5,7 +5,11 @@ mod input_coercion {
     use query_engine_tests::fmt_execute_raw;
 
     // Checks that query raw inputs are coerced to the correct types
-    #[connector_test(exclude(Postgres("pg.js.wasm", "neon.js.wasm"), Sqlite("libsql.js.wasm")))]
+    #[connector_test(exclude(
+        Postgres("pg.js.wasm", "neon.js.wasm"),
+        Sqlite("libsql.js.wasm"),
+        Vitess("planetscale.js.wasm")
+    ))]
     async fn scalar_input_correctly_coerced(runner: Runner) -> TestResult<()> {
         run_query!(
             &runner,

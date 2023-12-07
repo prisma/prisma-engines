@@ -6,7 +6,7 @@ mod string_filter {
     use super::setup;
     use query_engine_tests::run_query;
 
-    #[connector_test(exclude(Sqlite("libsql.js.wasm")))]
+    #[connector_test(exclude(Sqlite("libsql.js.wasm"), Vitess("planetscale.js.wasm")))]
     async fn basic_where_sensitive(runner: Runner) -> TestResult<()> {
         setup::test_data_common_types(&runner).await?;
 
@@ -50,7 +50,7 @@ mod string_filter {
         Ok(())
     }
 
-    #[connector_test(exclude(Sqlite("libsql.js.wasm")))]
+    #[connector_test(exclude(Sqlite("libsql.js.wasm"), Vitess("planetscale.js.wasm")))]
     async fn numeric_comparison_filters_sensitive(runner: Runner) -> TestResult<()> {
         setup::test_data_common_types(&runner).await?;
 
@@ -225,7 +225,7 @@ mod string_filter {
         Ok(())
     }
 
-    #[connector_test(exclude(Sqlite("libsql.js.wasm")))]
+    #[connector_test(exclude(Sqlite("libsql.js.wasm"), Vitess("planetscale.js.wasm")))]
     async fn string_comparison_filters_sensitive(runner: Runner) -> TestResult<()> {
         setup::test_data_common_types(&runner).await?;
         run_query!(
