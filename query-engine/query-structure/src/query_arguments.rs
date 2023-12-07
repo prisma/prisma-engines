@@ -115,11 +115,11 @@ impl QueryArguments {
                 let dist_len = distinct.as_fields().len();
 
                 if self.order_by.len() <= dist_len {
-                    return Self::ord_matches_distinct(&self.order_by, distinct);
+                    Self::ord_matches_distinct(&self.order_by, distinct)
                 } else {
                     let initial_order = &self.order_by[0..dist_len];
 
-                    return Self::ord_matches_distinct(initial_order, distinct);
+                    Self::ord_matches_distinct(initial_order, distinct)
                 }
             }
             None => unreachable!(),
