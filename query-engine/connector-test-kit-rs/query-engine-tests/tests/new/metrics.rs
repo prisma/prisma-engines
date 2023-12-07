@@ -4,8 +4,7 @@ use query_engine_tests::test_suite;
     schema(generic),
     exclude(
         Vitess("planetscale.js"),
-        Postgres("neon.js"),
-        Postgres("pg.js"),
+        Postgres("neon.js", "pg.js", "neon.js.wasm", "pg.js.wasm"),
         Sqlite("libsql.js")
     )
 )]
@@ -17,7 +16,7 @@ mod metrics {
     use query_engine_tests::*;
     use serde_json::Value;
 
-    #[connector_test(exclude(Postgres("pg.js.wasm"), Postgres("neon.js.wasm")))]
+    #[connector_test]
     async fn metrics_are_recorded(runner: Runner) -> TestResult<()> {
         insta::assert_snapshot!(
           run_query!(&runner, r#"mutation { createOneTestModel(data: { id: 1 }) { id }}"#),
@@ -48,7 +47,7 @@ mod metrics {
         Ok(())
     }
 
-    #[connector_test(exclude(Postgres("pg.js.wasm"), Postgres("neon.js.wasm")))]
+    #[connector_test]
     async fn metrics_tx_do_not_go_negative(mut runner: Runner) -> TestResult<()> {
         let tx_id = runner.start_tx(5000, 5000, None).await?;
         runner.set_active_tx(tx_id.clone());
