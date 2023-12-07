@@ -2,7 +2,8 @@ use query_engine_tests::*;
 
 #[test_suite(exclude(
     Postgres("pg.js.wasm", "neon.js.wasm"),
-    exclude(Sqlite("libsql.js.wasm"), Vitess("planetscale.js.wasm"))
+    Sqlite("libsql.js.wasm"),
+    Vitess("planetscale.js.wasm")
 ))]
 mod bytes {
     use indoc::indoc;
