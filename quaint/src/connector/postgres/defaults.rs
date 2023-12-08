@@ -1,1 +1,1 @@
-pub const DEFAULT_POSTGRES_SCHEMA: &str = "main";
+pub const DEFAULT_POSTGRES_SCHEMA: &str = "public";
