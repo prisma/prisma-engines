@@ -172,18 +172,18 @@ impl ScalarField {
         })
     }
 
-    pub fn coerce_json_datetime(&self, value: &str) -> chrono::ParseResult<DateTime<FixedOffset>> {
+    pub fn parse_json_datetime(&self, value: &str) -> chrono::ParseResult<DateTime<FixedOffset>> {
         let nt = self.native_type().map(|nt| nt.native_type);
         let connector = self.dm.schema.connector;
 
-        connector.coerce_json_datetime(value, nt)
+        connector.parse_json_datetime(value, nt)
     }
 
-    pub fn coerce_json_decimal(&self, value: &str) -> Result<BigDecimal, ParseBigDecimalError> {
+    pub fn parse_json_decimal(&self, value: &str) -> Result<BigDecimal, ParseBigDecimalError> {
         let nt = self.native_type().map(|nt| nt.native_type);
         let connector = self.dm.schema.connector;
 
-        connector.coerce_json_decimal(value, nt)
+        connector.parse_json_decimal(value, nt)
     }
 
     pub fn is_autoincrement(&self) -> bool {

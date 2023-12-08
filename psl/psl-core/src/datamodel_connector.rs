@@ -362,7 +362,7 @@ pub trait Connector: Send + Sync {
         Default::default()
     }
 
-    fn coerce_json_datetime(
+    fn parse_json_datetime(
         &self,
         _str: &str,
         _nt: Option<NativeTypeInstance>,
@@ -370,7 +370,7 @@ pub trait Connector: Send + Sync {
         unreachable!("This method is only implemented on connectors with lateral join support.")
     }
 
-    fn coerce_json_decimal(
+    fn parse_json_decimal(
         &self,
         _str: &str,
         _nt: Option<NativeTypeInstance>,

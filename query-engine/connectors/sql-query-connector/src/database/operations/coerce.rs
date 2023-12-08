@@ -132,7 +132,7 @@ pub(crate) fn coerce_json_scalar_to_pv(value: serde_json::Value, sf: &ScalarFiel
             TypeIdentifier::String => Ok(PrismaValue::String(s)),
             TypeIdentifier::Enum(_) => Ok(PrismaValue::Enum(s)),
             TypeIdentifier::DateTime => {
-                let res = sf.coerce_json_datetime(&s).map_err(|err| {
+                let res = sf.parse_json_datetime(&s).map_err(|err| {
                     build_conversion_error_with_reason(
                         sf,
                         &format!("String({s})"),
@@ -144,7 +144,7 @@ pub(crate) fn coerce_json_scalar_to_pv(value: serde_json::Value, sf: &ScalarFiel
                 Ok(PrismaValue::DateTime(res))
             }
             TypeIdentifier::Decimal => {
-                let res = sf.coerce_json_decimal(&s).map_err(|err| {
+                let res = sf.parse_json_decimal(&s).map_err(|err| {
                     build_conversion_error_with_reason(
                         sf,
                         &format!("String({s})"),

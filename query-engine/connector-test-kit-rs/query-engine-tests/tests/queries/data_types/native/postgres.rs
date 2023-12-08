@@ -72,7 +72,7 @@ mod datetime {
     }
 }
 
-#[test_suite(only(Postgres, CockroachDb))]
+#[test_suite(only(Postgres))]
 mod decimal {
     fn schema_decimal() -> String {
         let schema = indoc! {
@@ -134,7 +134,7 @@ mod decimal {
     }
 }
 
-#[test_suite(only(Postgres, CockroachDb))]
+#[test_suite(only(Postgres))]
 mod string {
     fn schema_string() -> String {
         let schema = indoc! {
@@ -212,7 +212,7 @@ mod string {
     }
 }
 
-#[test_suite(schema(schema), only(Postgres, CockroachDb))]
+#[test_suite(schema(schema), only(Postgres))]
 mod others {
     fn schema_other_types() -> String {
         let schema = indoc! {

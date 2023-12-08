@@ -310,7 +310,7 @@ impl Connector for CockroachDatamodelConnector {
         Flavour::Cockroach
     }
 
-    fn coerce_json_datetime(
+    fn parse_json_datetime(
         &self,
         str: &str,
         nt: Option<NativeTypeInstance>,
@@ -326,11 +326,14 @@ impl Connector for CockroachDatamodelConnector {
                 CockroachType::Timetz(_) => crate::utils::parse_timetz(str),
                 _ => unreachable!(),
             },
-            None => crate::utils::parse_timestamptz(str),
+            None => self.parse_json_datetime(
+                str,
+                Some(self.default_native_type_for_scalar_type(&ScalarType::DateTime)),
+            ),
         }
     }
 
-    fn coerce_json_decimal(
+    fn parse_json_decimal(
         &self,
         str: &str,
         nt: Option<NativeTypeInstance>,
@@ -342,7 +345,10 @@ impl Connector for CockroachDatamodelConnector {
                 CockroachType::Decimal(_) => crate::utils::parse_decimal(str),
                 _ => unreachable!(),
             },
-            None => crate::utils::parse_decimal(str),
+            None => self.parse_json_decimal(
+                str,
+                Some(self.default_native_type_for_scalar_type(&ScalarType::Decimal)),
+            ),
         }
     }
 }
