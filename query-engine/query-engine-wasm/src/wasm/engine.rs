@@ -164,14 +164,6 @@ impl QueryEngine {
             .to_result()
             .map_err(|err| ApiError::conversion(err, schema.db.source()))?;
 
-        // config
-        //     .resolve_datasource_urls_query_engine(
-        //         &overrides,
-        //         |key| env.get(key).map(ToString::to_string),
-        //         ignore_env_var_errors,
-        //     )
-        //     .map_err(|err| ApiError::conversion(err, schema.db.source()))?;
-
         config
             .validate_that_one_datasource_is_provided()
             .map_err(|errors| ApiError::conversion(errors, schema.db.source()))?;
@@ -209,18 +201,6 @@ impl QueryEngine {
             let builder = inner.as_builder()?;
             let arced_schema = Arc::clone(&builder.schema);
             let arced_schema_2 = Arc::clone(&builder.schema);
-
-            // let url = {
-            //     let data_source = builder
-            //         .schema
-            //         .configuration
-            //         .datasources
-            //         .first()
-            //         .ok_or_else(|| ApiError::configuration("No valid data source found"))?;
-            //     data_source
-            //         .load_url_with_config_dir(&builder.config_dir, |key| builder.env.get(key).map(ToString::to_string))
-            //         .map_err(|err| crate::error::ApiError::Conversion(err, builder.schema.db.source().to_owned()))?
-            // };
 
             let engine = async move {
                 // We only support one data source & generator at the moment, so take the first one (default not exposed yet).
