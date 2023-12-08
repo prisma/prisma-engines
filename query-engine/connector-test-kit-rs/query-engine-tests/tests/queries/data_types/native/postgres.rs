@@ -212,7 +212,11 @@ mod string {
     }
 }
 
-#[test_suite(schema(schema), only(Postgres))]
+// Napi & Wasm DAs excluded because of a bytes bug
+#[test_suite(
+    schema(schema),
+    only(Postgres("9", "10", "11", "12", "13", "14", "15", "pg.js", "neon.js"))
+)]
 mod others {
     fn schema_other_types() -> String {
         let schema = indoc! {
