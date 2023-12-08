@@ -165,7 +165,7 @@ mod create_many {
     }
 
     // "createMany" should "error on duplicates by default"
-    #[connector_test(schema(schema_4), exclude(Vitess("planetscale.js")))]
+    #[connector_test(schema(schema_4), exclude(Vitess("planetscale.js", "planetscale.js.wasm")))]
     async fn create_many_error_dups(runner: Runner) -> TestResult<()> {
         assert_error!(
             &runner,

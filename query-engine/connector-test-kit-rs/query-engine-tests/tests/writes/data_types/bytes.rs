@@ -1,6 +1,10 @@
 use query_engine_tests::*;
 
-#[test_suite]
+#[test_suite(exclude(
+    Postgres("pg.js.wasm", "neon.js.wasm"),
+    Sqlite("libsql.js.wasm"),
+    Vitess("planetscale.js.wasm")
+))]
 mod bytes {
     use indoc::indoc;
     use query_engine_tests::run_query;
@@ -77,7 +81,16 @@ mod bytes {
         Ok(())
     }
 
-    #[connector_test(schema(bytes_id), exclude(MySQL, Vitess, SqlServer))]
+    #[connector_test(
+        schema(bytes_id),
+        exclude(
+            MySQL,
+            Vitess,
+            SqlServer,
+            Postgres("pg.js.wasm", "neon.js.wasm"),
+            Sqlite("libsql.js.wasm")
+        )
+    )]
     async fn byte_id_coercion(runner: Runner) -> TestResult<()> {
         insta::assert_snapshot!(
           run_query!(runner, r#"

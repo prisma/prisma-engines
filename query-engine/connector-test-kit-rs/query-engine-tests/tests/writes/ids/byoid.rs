@@ -48,7 +48,7 @@ mod byoid {
     #[connector_test(
         schema(schema_1),
         only(MySql, Postgres, Sqlite, Vitess),
-        exclude(Vitess("planetscale.js"))
+        exclude(Vitess("planetscale.js", "planetscale.js.wasm"))
     )]
     async fn create_and_return_item_woi_1(runner: Runner) -> TestResult<()> {
         insta::assert_snapshot!(
@@ -80,7 +80,7 @@ mod byoid {
     #[connector_test(
         schema(schema_2),
         only(MySql, Postgres, Sqlite, Vitess),
-        exclude(Vitess("planetscale.js"))
+        exclude(Vitess("planetscale.js", "planetscale.js.wasm"))
     )]
     async fn create_and_return_item_woi_2(runner: Runner) -> TestResult<()> {
         insta::assert_snapshot!(
@@ -142,7 +142,7 @@ mod byoid {
     #[connector_test(
         schema(schema_1),
         only(MySql, Postgres, Sqlite, Vitess),
-        exclude(Vitess("planetscale.js"))
+        exclude(Vitess("planetscale.js", "planetscale.js.wasm"))
     )]
     async fn nested_create_return_item_woi_1(runner: Runner) -> TestResult<()> {
         insta::assert_snapshot!(
@@ -174,7 +174,7 @@ mod byoid {
     #[connector_test(
         schema(schema_2),
         only(MySql, Postgres, Sqlite, Vitess),
-        exclude(Vitess("planetscale.js"))
+        exclude(Vitess("planetscale.js", "planetscale.js.wasm"))
     )]
     async fn nested_create_return_item_woi_2(runner: Runner) -> TestResult<()> {
         insta::assert_snapshot!(
