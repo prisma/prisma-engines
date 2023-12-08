@@ -184,6 +184,12 @@
 <a href="#184" id="184">184</a>
 <a href="#185" id="185">185</a>
 <a href="#186" id="186">186</a>
+<a href="#187" id="187">187</a>
+<a href="#188" id="188">188</a>
+<a href="#189" id="189">189</a>
+<a href="#190" id="190">190</a>
+<a href="#191" id="191">191</a>
+<a href="#192" id="192">192</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::io;
 
 <span class="kw">use </span>bigdecimal::{BigDecimal, FromPrimitive};
@@ -282,7 +288,13 @@
     }
 
     <span class="kw">match </span>value {
-        serde_json::Value::Null =&gt; <span class="prelude-val">Ok</span>(PrismaValue::Null),
+        serde_json::Value::Null =&gt; {
+            <span class="kw">if </span>sf.is_list() {
+                <span class="prelude-val">Ok</span>(PrismaValue::List(<span class="macro">vec!</span>[]))
+            } <span class="kw">else </span>{
+                <span class="prelude-val">Ok</span>(PrismaValue::Null)
+            }
+        }
         serde_json::Value::Bool(b) =&gt; <span class="prelude-val">Ok</span>(PrismaValue::Boolean(b)),
         serde_json::Value::Number(n) =&gt; <span class="kw">match </span>sf.type_identifier() {
             TypeIdentifier::Int =&gt; <span class="prelude-val">Ok</span>(PrismaValue::Int(n.as_i64().ok_or_else(|| {
