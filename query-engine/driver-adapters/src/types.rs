@@ -49,6 +49,7 @@ impl From<AdapterFlavour> for SqlFamily {
 #[cfg_attr(target_arch = "wasm32", derive(Serialize, Deserialize, Tsify))]
 #[cfg_attr(target_arch = "wasm32", tsify(into_wasm_abi, from_wasm_abi))]
 #[cfg_attr(target_arch = "wasm32", serde(rename_all = "camelCase"))]
+#[derive(Default)]
 pub(crate) struct JsConnectionInfo {
     pub schema_name: Option<String>,
 }
@@ -62,7 +63,7 @@ impl JsConnectionInfo {
     fn get_schema_name(&self, provider: &AdapterFlavour) -> &str {
         match self.schema_name.as_ref() {
             Some(name) => name,
-            None => self.default_schema_name(&provider),
+            None => self.default_schema_name(provider),
         }
     }
 
@@ -72,12 +73,6 @@ impl JsConnectionInfo {
             AdapterFlavour::Postgres => quaint::connector::DEFAULT_POSTGRES_SCHEMA,
             AdapterFlavour::Sqlite => quaint::connector::DEFAULT_SQLITE_SCHEMA,
         }
-    }
-}
-
-impl Default for JsConnectionInfo {
-    fn default() -> Self {
-        Self { schema_name: None }
     }
 }
 

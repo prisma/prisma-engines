@@ -62,7 +62,7 @@ async fn driver_adapter(
     source: &Datasource,
     features: PreviewFeatures,
 ) -> Result<Box<dyn QueryExecutor + Send + Sync>, query_core::CoreError> {
-    let js = Js::new(&source, features).await?;
+    let js = Js::new(source, features).await?;
     Ok(executor_for(js, false))
 }
 
