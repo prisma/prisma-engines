@@ -31,7 +31,7 @@ jobs:
             setup_task: 'dev-pg-js'
           - name: 'neon (ws) (napi)'
             setup_task: 'dev-neon-js'
-          - name: 'libsql (napi)'
+          - name: 'libsql (Turso) (napi)'
             setup_task: 'dev-libsql-js'
           - name: 'planetscale (wasm)'
             setup_task: 'dev-planetscale-wasm'
