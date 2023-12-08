@@ -4,6 +4,8 @@ mod validations;
 
 pub use native_types::PostgresType;
 
+use bigdecimal::{BigDecimal, ParseBigDecimalError};
+use chrono::*;
 use enumflags2::BitFlags;
 use lsp_types::{CompletionItem, CompletionItemKind, CompletionList, InsertTextFormat};
 use psl_core::{
@@ -566,6 +568,47 @@ impl Connector for PostgresDatamodelConnector {
 
     fn flavour(&self) -> Flavour {
         Flavour::Postgres
+    }
+
+    fn coerce_json_datetime(
+        &self,
+        str: &str,
+        nt: Option<NativeTypeInstance>,
+    ) -> chrono::ParseResult<chrono::DateTime<FixedOffset>> {
+        let native_type: Option<&PostgresType> = nt.as_ref().map(|nt| nt.downcast_ref());
+
+        match native_type {
+            Some(pt) => match pt {
+                Timestamptz(_) => crate::utils::parse_timestamptz(str),
+                Timestamp(_) => crate::utils::parse_timestamp(str),
+                Date => crate::utils::parse_date(str),
+                Time(_) => crate::utils::parse_time(str),
+                Timetz(_) => {
+                    let time_without_tz = str.split('+').next().unwrap();
+
+                    crate::utils::parse_time(time_without_tz)
+                }
+                _ => unreachable!(),
+            },
+            None => crate::utils::parse_timestamptz(str),
+        }
+    }
+
+    fn coerce_json_decimal(
+        &self,
+        str: &str,
+        nt: Option<NativeTypeInstance>,
+    ) -> Result<BigDecimal, ParseBigDecimalError> {
+        let native_type: Option<&PostgresType> = nt.as_ref().map(|nt| nt.downcast_ref());
+
+        match native_type {
+            Some(pt) => match pt {
+                Decimal(_) => crate::utils::parse_decimal(str),
+                Money => crate::utils::parse_money(str),
+                _ => unreachable!(),
+            },
+            None => crate::utils::parse_decimal(str),
+        }
     }
 }
 

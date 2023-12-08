@@ -106,10 +106,10 @@ pub(crate) fn coerce_json_scalar_to_pv(value: serde_json::Value, sf: &ScalarFiel
         serde_json::Value::Bool(b) => Ok(PrismaValue::Boolean(b)),
         serde_json::Value::Number(n) => match sf.type_identifier() {
             TypeIdentifier::Int => Ok(PrismaValue::Int(n.as_i64().ok_or_else(|| {
-                build_conversion_error(&format!("Number({n})"), &format!("{:?}", sf.type_identifier()))
+                build_conversion_error(&sf, &format!("Number({n})"), &format!("{:?}", sf.type_identifier()))
             })?)),
             TypeIdentifier::BigInt => Ok(PrismaValue::BigInt(n.as_i64().ok_or_else(|| {
-                build_conversion_error(&format!("Number({n})"), &format!("{:?}", sf.type_identifier()))
+                build_conversion_error(&sf, &format!("Number({n})"), &format!("{:?}", sf.type_identifier()))
             })?)),
             TypeIdentifier::Float | TypeIdentifier::Decimal => {
                 let bd = n
@@ -117,12 +117,13 @@ pub(crate) fn coerce_json_scalar_to_pv(value: serde_json::Value, sf: &ScalarFiel
                     .and_then(BigDecimal::from_f64)
                     .map(|bd| bd.normalized())
                     .ok_or_else(|| {
-                        build_conversion_error(&format!("Number({n})"), &format!("{:?}", sf.type_identifier()))
+                        build_conversion_error(&sf, &format!("Number({n})"), &format!("{:?}", sf.type_identifier()))
                     })?;
 
                 Ok(PrismaValue::Float(bd))
             }
             _ => Err(build_conversion_error(
+                &sf,
                 &format!("Number({n})"),
                 &format!("{:?}", sf.type_identifier()),
             )),
@@ -130,26 +131,43 @@ pub(crate) fn coerce_json_scalar_to_pv(value: serde_json::Value, sf: &ScalarFiel
         serde_json::Value::String(s) => match sf.type_identifier() {
             TypeIdentifier::String => Ok(PrismaValue::String(s)),
             TypeIdentifier::Enum(_) => Ok(PrismaValue::Enum(s)),
-            TypeIdentifier::DateTime => Ok(PrismaValue::DateTime(parse_datetime(&format!("{s}Z")).map_err(
-                |err| {
+            TypeIdentifier::DateTime => {
+                let res = sf.coerce_json_datetime(&s).map_err(|err| {
                     build_conversion_error_with_reason(
+                        &sf,
                         &format!("String({s})"),
                         &format!("{:?}", sf.type_identifier()),
                         &err.to_string(),
                     )
-                },
-            )?)),
+                })?;
+
+                Ok(PrismaValue::DateTime(res))
+            }
+            TypeIdentifier::Decimal => {
+                let res = sf.coerce_json_decimal(&s).map_err(|err| {
+                    build_conversion_error_with_reason(
+                        &sf,
+                        &format!("String({s})"),
+                        &format!("{:?}", sf.type_identifier()),
+                        &err.to_string(),
+                    )
+                })?;
+
+                Ok(PrismaValue::Float(res))
+            }
             TypeIdentifier::UUID => Ok(PrismaValue::Uuid(uuid::Uuid::parse_str(&s).map_err(|err| {
                 build_conversion_error_with_reason(
+                    &sf,
                     &format!("String({s})"),
                     &format!("{:?}", sf.type_identifier()),
                     &err.to_string(),
                 )
             })?)),
             TypeIdentifier::Bytes => {
-                // We skip the first two characters because they are the \x prefix.
+                // We skip the first two characters because there's the \x prefix.
                 let bytes = hex::decode(&s[2..]).map_err(|err| {
                     build_conversion_error_with_reason(
+                        &sf,
                         &format!("String({s})"),
                         &format!("{:?}", sf.type_identifier()),
                         &err.to_string(),
@@ -159,6 +177,7 @@ pub(crate) fn coerce_json_scalar_to_pv(value: serde_json::Value, sf: &ScalarFiel
                 Ok(PrismaValue::Bytes(bytes))
             }
             _ => Err(build_conversion_error(
+                &sf,
                 &format!("String({s})"),
                 &format!("{:?}", sf.type_identifier()),
             )),
@@ -173,19 +192,25 @@ pub(crate) fn coerce_json_scalar_to_pv(value: serde_json::Value, sf: &ScalarFiel
     }
 }
 
-fn build_conversion_error(from: &str, to: &str) -> SqlError {
+fn build_conversion_error(sf: &ScalarField, from: &str, to: &str) -> SqlError {
+    let container_name = sf.container().name();
+    let field_name = sf.name();
+
     let error = io::Error::new(
         io::ErrorKind::InvalidData,
-        format!("Unexpected conversion failure from {from} to {to}."),
+        format!("Unexpected conversion failure for field {container_name}.{field_name} from {from} to {to}."),
     );
 
     SqlError::ConversionError(error.into())
 }
 
-fn build_conversion_error_with_reason(from: &str, to: &str, reason: &str) -> SqlError {
+fn build_conversion_error_with_reason(sf: &ScalarField, from: &str, to: &str, reason: &str) -> SqlError {
+    let container_name = sf.container().name();
+    let field_name = sf.name();
+
     let error = io::Error::new(
         io::ErrorKind::InvalidData,
-        format!("Unexpected conversion failure from {from} to {to}. Reason: ${reason}"),
+        format!("Unexpected conversion failure for field {container_name}.{field_name} from {from} to {to}. Reason: ${reason}"),
     );
 
     SqlError::ConversionError(error.into())

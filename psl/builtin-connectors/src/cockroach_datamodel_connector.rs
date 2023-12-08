@@ -1,8 +1,10 @@
 mod native_types;
 mod validations;
 
+use bigdecimal::{BigDecimal, ParseBigDecimalError};
 pub use native_types::CockroachType;
 
+use chrono::*;
 use enumflags2::BitFlags;
 use lsp_types::{CompletionItem, CompletionItemKind, CompletionList};
 use psl_core::{
@@ -306,6 +308,49 @@ impl Connector for CockroachDatamodelConnector {
 
     fn flavour(&self) -> Flavour {
         Flavour::Cockroach
+    }
+
+    fn coerce_json_datetime(
+        &self,
+        str: &str,
+        nt: Option<NativeTypeInstance>,
+    ) -> chrono::ParseResult<chrono::DateTime<FixedOffset>> {
+        let native_type: Option<&CockroachType> = nt.as_ref().map(|nt| nt.downcast_ref());
+
+        match native_type {
+            Some(ct) => match ct {
+                CockroachType::Timestamptz(_) => crate::utils::parse_timestamptz(str),
+                CockroachType::Timestamp(_) => crate::utils::parse_timestamp(str),
+                CockroachType::Date => crate::utils::parse_date(str),
+                CockroachType::Time(_) => crate::utils::parse_time(str),
+                CockroachType::Timetz(_) => {
+                    // We currently don't support time with timezone.
+                    // We strip the timezone information and parse it as a time.
+                    // This is inline with what Quaint does already.
+                    let time_without_tz = str.split("+").next().unwrap();
+
+                    crate::utils::parse_time(time_without_tz)
+                }
+                _ => unreachable!(),
+            },
+            None => crate::utils::parse_timestamptz(str),
+        }
+    }
+
+    fn coerce_json_decimal(
+        &self,
+        str: &str,
+        nt: Option<NativeTypeInstance>,
+    ) -> Result<BigDecimal, ParseBigDecimalError> {
+        let native_type: Option<&CockroachType> = nt.as_ref().map(|nt| nt.downcast_ref());
+
+        match native_type {
+            Some(pt) => match pt {
+                CockroachType::Decimal(_) => crate::utils::parse_decimal(str),
+                _ => unreachable!(),
+            },
+            None => crate::utils::parse_decimal(str),
+        }
     }
 }
 
