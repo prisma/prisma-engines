@@ -36,7 +36,7 @@
     "ws": "8.14.2"
   },
   "devDependencies": {
-    "@types/node": "20.5.1",
+    "@types/node": "20.5.9",
     "tsup": "7.2.0",
     "typescript": "5.2.2"
   }
