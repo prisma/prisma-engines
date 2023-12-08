@@ -29,6 +29,15 @@ pub(crate) fn parse_time(str: &str) -> Result<DateTime<FixedOffset>, chrono::Par
         .map(DateTime::<FixedOffset>::from)
 }
 
+pub(crate) fn parse_timetz(str: &str) -> Result<DateTime<FixedOffset>, chrono::ParseError> {
+    // We currently don't support time with timezone.
+    // We strip the timezone information and parse it as a time.
+    // This is inline with what Quaint does already.
+    let time_without_tz = str.split('+').next().unwrap();
+
+    parse_time(time_without_tz)
+}
+
 pub(crate) fn parse_money(str: &str) -> Result<BigDecimal, ParseBigDecimalError> {
     // We strip out the currency sign from the string.
     BigDecimal::from_str(&str[1..]).map(|bd| bd.normalized())

@@ -323,14 +323,7 @@ impl Connector for CockroachDatamodelConnector {
                 CockroachType::Timestamp(_) => crate::utils::parse_timestamp(str),
                 CockroachType::Date => crate::utils::parse_date(str),
                 CockroachType::Time(_) => crate::utils::parse_time(str),
-                CockroachType::Timetz(_) => {
-                    // We currently don't support time with timezone.
-                    // We strip the timezone information and parse it as a time.
-                    // This is inline with what Quaint does already.
-                    let time_without_tz = str.split("+").next().unwrap();
-
-                    crate::utils::parse_time(time_without_tz)
-                }
+                CockroachType::Timetz(_) => crate::utils::parse_timetz(str),
                 _ => unreachable!(),
             },
             None => crate::utils::parse_timestamptz(str),

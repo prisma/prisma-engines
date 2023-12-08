@@ -583,11 +583,7 @@ impl Connector for PostgresDatamodelConnector {
                 Timestamp(_) => crate::utils::parse_timestamp(str),
                 Date => crate::utils::parse_date(str),
                 Time(_) => crate::utils::parse_time(str),
-                Timetz(_) => {
-                    let time_without_tz = str.split('+').next().unwrap();
-
-                    crate::utils::parse_time(time_without_tz)
-                }
+                Timetz(_) => crate::utils::parse_timetz(str),
                 _ => unreachable!(),
             },
             None => crate::utils::parse_timestamptz(str),
