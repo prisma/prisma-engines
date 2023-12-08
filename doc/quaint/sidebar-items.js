@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"macro":["col","val","values"],"mod":["ast","connector","error","pooled","prelude","single","visitor"],"type":["Result"]};
+window.SIDEBAR_ITEMS = {"externcrate":["bigdecimal","chrono"],"macro":["col","val","values"],"mod":["ast","connector","error","pooled","prelude","single","visitor"],"type":["Result"]};

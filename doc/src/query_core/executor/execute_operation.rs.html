@@ -290,7 +290,19 @@
 <a href="#290" id="290">290</a>
 <a href="#291" id="291">291</a>
 <a href="#292" id="292">292</a>
+<a href="#293" id="293">293</a>
+<a href="#294" id="294">294</a>
+<a href="#295" id="295">295</a>
+<a href="#296" id="296">296</a>
+<a href="#297" id="297">297</a>
+<a href="#298" id="298">298</a>
+<a href="#299" id="299">299</a>
+<a href="#300" id="300">300</a>
+<a href="#301" id="301">301</a>
+<a href="#302" id="302">302</a>
+<a href="#303" id="303">303</a>
 </pre></div><pre class="rust"><code><span class="attr">#![cfg_attr(target_arch = <span class="string">&quot;wasm32&quot;</span>, allow(unused_variables))]
+#![cfg_attr(not(feature = <span class="string">&quot;metrics&quot;</span>), allow(clippy::let_and_return))]
 
 </span><span class="kw">use </span><span class="kw">super</span>::pipeline::QueryPipeline;
 <span class="kw">use crate</span>::{
@@ -298,6 +310,7 @@
     QueryGraphBuilder, QueryInterpreter, ResponseData,
 };
 <span class="kw">use </span>connector::{Connection, ConnectionLike, Connector};
+<span class="kw">use </span>crosstarget_utils::time::ElapsedTimeCounter;
 <span class="kw">use </span>futures::future;
 
 <span class="attr">#[cfg(feature = <span class="string">&quot;metrics&quot;</span>)]
@@ -306,7 +319,7 @@
 };
 
 <span class="kw">use </span>schema::{QuerySchema, QuerySchemaRef};
-<span class="kw">use </span>std::time::{Duration, Instant};
+<span class="kw">use </span>std::time::Duration;
 <span class="kw">use </span>tracing::Instrument;
 <span class="kw">use </span>tracing_futures::WithSubscriber;
 
@@ -316,13 +329,16 @@
     operation: <span class="kw-2">&amp;</span>Operation,
     trace_id: <span class="prelude-ty">Option</span>&lt;String&gt;,
 ) -&gt; <span class="kw">crate</span>::Result&lt;ResponseData&gt; {
-    <span class="kw">let </span>operation_timer = Instant::now();
+    <span class="kw">let </span>operation_timer = ElapsedTimeCounter::start();
 
     <span class="kw">let </span>(graph, serializer) = build_graph(<span class="kw-2">&amp;</span>query_schema, operation.clone())<span class="question-mark">?</span>;
     <span class="kw">let </span>result = execute_on(conn, graph, serializer, query_schema.as_ref(), trace_id).<span class="kw">await</span>;
 
     <span class="attr">#[cfg(feature = <span class="string">&quot;metrics&quot;</span>)]
-    </span><span class="macro">histogram!</span>(PRISMA_CLIENT_QUERIES_DURATION_HISTOGRAM_MS, operation_timer.elapsed());
+    </span><span class="macro">histogram!</span>(
+        PRISMA_CLIENT_QUERIES_DURATION_HISTOGRAM_MS,
+        operation_timer.elapsed_time()
+    );
 
     result
 }
@@ -341,11 +357,14 @@
     <span class="kw">let </span><span class="kw-2">mut </span>results = Vec::with_capacity(queries.len());
 
     <span class="kw">for </span>(i, (graph, serializer)) <span class="kw">in </span>queries.into_iter().enumerate() {
-        <span class="kw">let </span>operation_timer = Instant::now();
+        <span class="kw">let </span>operation_timer = ElapsedTimeCounter::start();
         <span class="kw">let </span>result = execute_on(conn, graph, serializer, query_schema.as_ref(), trace_id.clone()).<span class="kw">await</span>;
 
         <span class="attr">#[cfg(feature = <span class="string">&quot;metrics&quot;</span>)]
-        </span><span class="macro">histogram!</span>(PRISMA_CLIENT_QUERIES_DURATION_HISTOGRAM_MS, operation_timer.elapsed());
+        </span><span class="macro">histogram!</span>(
+            PRISMA_CLIENT_QUERIES_DURATION_HISTOGRAM_MS,
+            operation_timer.elapsed_time()
+        );
 
         <span class="kw">match </span>result {
             <span class="prelude-val">Ok</span>(result) =&gt; results.push(<span class="prelude-val">Ok</span>(result)),
@@ -408,7 +427,7 @@
         );
         <span class="kw">let </span>conn = connector.get_connection().instrument(conn_span).<span class="kw">await</span><span class="question-mark">?</span>;
 
-        futures.push(tokio::spawn(
+        futures.push(crosstarget_utils::spawn::spawn_if_possible(
             request_context::with_request_context(
                 engine_protocol,
                 execute_self_contained(
@@ -442,14 +461,14 @@
     retry_on_transient_error: bool,
     trace_id: <span class="prelude-ty">Option</span>&lt;String&gt;,
 ) -&gt; <span class="kw">crate</span>::Result&lt;ResponseData&gt; {
-    <span class="kw">let </span>operation_timer = Instant::now();
+    <span class="kw">let </span>operation_timer = ElapsedTimeCounter::start();
     <span class="kw">let </span>result = <span class="kw">if </span>retry_on_transient_error {
         execute_self_contained_with_retry(
             <span class="kw-2">&amp;mut </span>conn,
             query_schema,
             operation,
             force_transactions,
-            Instant::now(),
+            ElapsedTimeCounter::start(),
             trace_id,
         )
         .<span class="kw">await
@@ -460,7 +479,10 @@
     </span>};
 
     <span class="attr">#[cfg(feature = <span class="string">&quot;metrics&quot;</span>)]
-    </span><span class="macro">histogram!</span>(PRISMA_CLIENT_QUERIES_DURATION_HISTOGRAM_MS, operation_timer.elapsed());
+    </span><span class="macro">histogram!</span>(
+        PRISMA_CLIENT_QUERIES_DURATION_HISTOGRAM_MS,
+        operation_timer.elapsed_time()
+    );
 
     result
 }
@@ -492,7 +514,7 @@
     query_schema: QuerySchemaRef,
     operation: Operation,
     force_transactions: bool,
-    retry_timeout: Instant,
+    retry_timeout: ElapsedTimeCounter,
     trace_id: <span class="prelude-ty">Option</span>&lt;String&gt;,
 ) -&gt; <span class="kw">crate</span>::Result&lt;ResponseData&gt; {
     <span class="kw">let </span>(graph, serializer) = build_graph(<span class="kw-2">&amp;</span>query_schema, operation.clone())<span class="question-mark">?</span>;
@@ -508,8 +530,8 @@
             <span class="kw">let </span>(graph, serializer) = build_graph(<span class="kw-2">&amp;</span>query_schema, operation.clone())<span class="question-mark">?</span>;
             <span class="kw">let </span>res = execute_in_tx(conn, graph, serializer, query_schema.as_ref(), trace_id.clone()).<span class="kw">await</span>;
 
-            <span class="kw">if </span>is_transient_error(<span class="kw-2">&amp;</span>res) &amp;&amp; retry_timeout.elapsed() &lt; MAX_TX_TIMEOUT_RETRY_LIMIT {
-                tokio::time::sleep(TX_RETRY_BACKOFF).<span class="kw">await</span>;
+            <span class="kw">if </span>is_transient_error(<span class="kw-2">&amp;</span>res) &amp;&amp; retry_timeout.elapsed_time() &lt; MAX_TX_TIMEOUT_RETRY_LIMIT {
+                crosstarget_utils::time::sleep(TX_RETRY_BACKOFF).<span class="kw">await</span>;
                 <span class="kw">continue</span>;
             } <span class="kw">else </span>{
                 <span class="kw">return </span>res;

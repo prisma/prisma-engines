@@ -301,13 +301,31 @@
 <a href="#301" id="301">301</a>
 <a href="#302" id="302">302</a>
 <a href="#303" id="303">303</a>
-</pre></div><pre class="rust"><code><span class="kw">use crate</span>::{
-    conversion,
-    proxy::{CommonProxy, DriverProxy, Query},
-};
+<a href="#304" id="304">304</a>
+<a href="#305" id="305">305</a>
+<a href="#306" id="306">306</a>
+<a href="#307" id="307">307</a>
+<a href="#308" id="308">308</a>
+<a href="#309" id="309">309</a>
+<a href="#310" id="310">310</a>
+<a href="#311" id="311">311</a>
+<a href="#312" id="312">312</a>
+<a href="#313" id="313">313</a>
+<a href="#314" id="314">314</a>
+<a href="#315" id="315">315</a>
+<a href="#316" id="316">316</a>
+<a href="#317" id="317">317</a>
+<a href="#318" id="318">318</a>
+<a href="#319" id="319">319</a>
+<a href="#320" id="320">320</a>
+</pre></div><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::proxy::{CommonProxy, DriverProxy};
+<span class="kw">use </span><span class="kw">crate</span>::types::{AdapterFlavour, Query};
+<span class="kw">use </span><span class="kw">crate</span>::JsObject;
+
+<span class="kw">use </span><span class="kw">super</span>::conversion;
+<span class="kw">use </span><span class="kw">crate</span>::send_future::UnsafeFuture;
 <span class="kw">use </span>async_trait::async_trait;
-<span class="kw">use </span>napi::JsObject;
-<span class="kw">use </span>psl::datamodel_connector::Flavour;
+<span class="kw">use </span>futures::Future;
 <span class="kw">use </span>quaint::{
     connector::{metrics, IsolationLevel, Transaction},
     error::{Error, ErrorKind},
@@ -315,6 +333,9 @@
     visitor::{<span class="self">self</span>, Visitor},
 };
 <span class="kw">use </span>tracing::{info_span, Instrument};
+
+<span class="attr">#[cfg(target_arch = <span class="string">&quot;wasm32&quot;</span>)]
+</span><span class="kw">use </span>wasm_bindgen::prelude::wasm_bindgen;
 
 <span class="doccomment">/// A JsQueryable adapts a Proxy to implement quaint&#39;s Queryable interface. It has the
 /// responsibility of transforming inputs and outputs of `query` and `execute` methods from quaint
@@ -328,25 +349,24 @@
 /// Transforming a `JSResultSet` (what client connectors implemented in javascript provide)
 /// into a `quaint::connector::result_set::ResultSet`. A quaint `ResultSet` is basically a vector
 /// of `quaint::Value` but said type is a tagged enum, with non-unit variants that cannot be converted to javascript as is.
-///
+</span><span class="attr">#[cfg_attr(target_arch = <span class="string">&quot;wasm32&quot;</span>, wasm_bindgen(getter_with_clone))]
 </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>JsBaseQueryable {
     <span class="kw">pub</span>(<span class="kw">crate</span>) proxy: CommonProxy,
-    <span class="kw">pub </span>provider: Flavour,
+    <span class="kw">pub </span>provider: AdapterFlavour,
 }
 
 <span class="kw">impl </span>JsBaseQueryable {
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>new(proxy: CommonProxy) -&gt; <span class="self">Self </span>{
-        <span class="kw">let </span>provider: Flavour = proxy.provider.parse().unwrap();
+        <span class="kw">let </span>provider: AdapterFlavour = proxy.provider.parse().unwrap();
         <span class="self">Self </span>{ proxy, provider }
     }
 
     <span class="doccomment">/// visit a quaint query AST according to the provider of the JS connector
     </span><span class="kw">fn </span>visit_quaint_query&lt;<span class="lifetime">&#39;a</span>&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, q: QuaintQuery&lt;<span class="lifetime">&#39;a</span>&gt;) -&gt; quaint::Result&lt;(String, Vec&lt;quaint::Value&lt;<span class="lifetime">&#39;a</span>&gt;&gt;)&gt; {
         <span class="kw">match </span><span class="self">self</span>.provider {
-            Flavour::Mysql =&gt; visitor::Mysql::build(q),
-            Flavour::Postgres =&gt; visitor::Postgres::build(q),
-            Flavour::Sqlite =&gt; visitor::Sqlite::build(q),
-            <span class="kw">_ </span>=&gt; <span class="macro">unimplemented!</span>(<span class="string">&quot;Unsupported provider for JS connector {:?}&quot;</span>, <span class="self">self</span>.provider),
+            AdapterFlavour::Mysql =&gt; visitor::Mysql::build(q),
+            AdapterFlavour::Postgres =&gt; visitor::Postgres::build(q),
+            AdapterFlavour::Sqlite =&gt; visitor::Sqlite::build(q),
         }
     }
 
@@ -354,10 +374,9 @@
         <span class="kw">let </span>sql: String = sql.to_string();
 
         <span class="kw">let </span>converter = <span class="kw">match </span><span class="self">self</span>.provider {
-            Flavour::Postgres =&gt; conversion::postgres::value_to_js_arg,
-            Flavour::Sqlite =&gt; conversion::sqlite::value_to_js_arg,
-            Flavour::Mysql =&gt; conversion::mysql::value_to_js_arg,
-            <span class="kw">_ </span>=&gt; <span class="macro">unreachable!</span>(<span class="string">&quot;Unsupported provider for JS connector {:?}&quot;</span>, <span class="self">self</span>.provider),
+            AdapterFlavour::Postgres =&gt; conversion::postgres::value_to_js_arg,
+            AdapterFlavour::Sqlite =&gt; conversion::sqlite::value_to_js_arg,
+            AdapterFlavour::Mysql =&gt; conversion::mysql::value_to_js_arg,
         };
 
         <span class="kw">let </span>args = values
@@ -429,7 +448,7 @@
             <span class="kw">return </span><span class="prelude-val">Err</span>(Error::builder(ErrorKind::invalid_isolation_level(<span class="kw-2">&amp;</span>isolation_level)).build());
         }
 
-        <span class="kw">if </span><span class="self">self</span>.provider == Flavour::Sqlite {
+        <span class="kw">if </span><span class="self">self</span>.provider == AdapterFlavour::Sqlite {
             <span class="kw">return match </span>isolation_level {
                 IsolationLevel::Serializable =&gt; <span class="prelude-val">Ok</span>(()),
                 <span class="kw">_ </span>=&gt; <span class="prelude-val">Err</span>(Error::builder(ErrorKind::invalid_isolation_level(<span class="kw-2">&amp;</span>isolation_level)).build()),
@@ -442,9 +461,8 @@
 
     <span class="kw">fn </span>requires_isolation_first(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
         <span class="kw">match </span><span class="self">self</span>.provider {
-            Flavour::Mysql =&gt; <span class="bool-val">true</span>,
-            Flavour::Postgres | Flavour::Sqlite =&gt; <span class="bool-val">false</span>,
-            <span class="kw">_ </span>=&gt; <span class="macro">unreachable!</span>(),
+            AdapterFlavour::Mysql =&gt; <span class="bool-val">true</span>,
+            AdapterFlavour::Postgres | AdapterFlavour::Sqlite =&gt; <span class="bool-val">false</span>,
         }
     }
 }
@@ -454,7 +472,7 @@
         <span class="macro">format!</span>(<span class="string">r#&quot;-- Implicit &quot;{}&quot; query via underlying driver&quot;#</span>, stmt)
     }
 
-    <span class="kw">async fn </span>do_query_raw(<span class="kw-2">&amp;</span><span class="self">self</span>, sql: <span class="kw-2">&amp;</span>str, params: <span class="kw-2">&amp;</span>[quaint::Value&lt;<span class="lifetime">&#39;_</span>&gt;]) -&gt; quaint::Result&lt;ResultSet&gt; {
+    <span class="kw">async fn </span>do_query_raw_inner(<span class="kw-2">&amp;</span><span class="self">self</span>, sql: <span class="kw-2">&amp;</span>str, params: <span class="kw-2">&amp;</span>[quaint::Value&lt;<span class="lifetime">&#39;_</span>&gt;]) -&gt; quaint::Result&lt;ResultSet&gt; {
         <span class="kw">let </span>len = params.len();
         <span class="kw">let </span>serialization_span = <span class="macro">info_span!</span>(<span class="string">&quot;js:query:args&quot;</span>, user_facing = <span class="bool-val">true</span>, <span class="string">&quot;length&quot; </span>= %len);
         <span class="kw">let </span>query = <span class="self">self</span>.build_query(sql, params).instrument(serialization_span).<span class="kw">await</span><span class="question-mark">?</span>;
@@ -468,7 +486,15 @@
         result_set.try_into()
     }
 
-    <span class="kw">async fn </span>do_execute_raw(<span class="kw-2">&amp;</span><span class="self">self</span>, sql: <span class="kw-2">&amp;</span>str, params: <span class="kw-2">&amp;</span>[quaint::Value&lt;<span class="lifetime">&#39;_</span>&gt;]) -&gt; quaint::Result&lt;u64&gt; {
+    <span class="kw">fn </span>do_query_raw&lt;<span class="lifetime">&#39;a</span>&gt;(
+        <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="self">self</span>,
+        sql: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str,
+        params: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>[quaint::Value&lt;<span class="lifetime">&#39;a</span>&gt;],
+    ) -&gt; UnsafeFuture&lt;<span class="kw">impl </span>Future&lt;Output = quaint::Result&lt;ResultSet&gt;&gt; + <span class="lifetime">&#39;a</span>&gt; {
+        UnsafeFuture(<span class="self">self</span>.do_query_raw_inner(sql, params))
+    }
+
+    <span class="kw">async fn </span>do_execute_raw_inner(<span class="kw-2">&amp;</span><span class="self">self</span>, sql: <span class="kw-2">&amp;</span>str, params: <span class="kw-2">&amp;</span>[quaint::Value&lt;<span class="lifetime">&#39;_</span>&gt;]) -&gt; quaint::Result&lt;u64&gt; {
         <span class="kw">let </span>len = params.len();
         <span class="kw">let </span>serialization_span = <span class="macro">info_span!</span>(<span class="string">&quot;js:query:args&quot;</span>, user_facing = <span class="bool-val">true</span>, <span class="string">&quot;length&quot; </span>= %len);
         <span class="kw">let </span>query = <span class="self">self</span>.build_query(sql, params).instrument(serialization_span).<span class="kw">await</span><span class="question-mark">?</span>;
@@ -477,6 +503,14 @@
         <span class="kw">let </span>affected_rows = <span class="self">self</span>.proxy.execute_raw(query).instrument(sql_span).<span class="kw">await</span><span class="question-mark">?</span>;
 
         <span class="prelude-val">Ok</span>(affected_rows <span class="kw">as </span>u64)
+    }
+
+    <span class="kw">fn </span>do_execute_raw&lt;<span class="lifetime">&#39;a</span>&gt;(
+        <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="self">self</span>,
+        sql: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str,
+        params: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>[quaint::Value&lt;<span class="lifetime">&#39;a</span>&gt;],
+    ) -&gt; UnsafeFuture&lt;<span class="kw">impl </span>Future&lt;Output = quaint::Result&lt;u64&gt;&gt; + <span class="lifetime">&#39;a</span>&gt; {
+        UnsafeFuture(<span class="self">self</span>.do_execute_raw_inner(sql, params))
     }
 }
 
@@ -595,7 +629,7 @@
     }
 }
 
-<span class="kw">pub fn </span>from_napi(driver: JsObject) -&gt; JsQueryable {
+<span class="kw">pub fn </span>from_js(driver: JsObject) -&gt; JsQueryable {
     <span class="kw">let </span>common = CommonProxy::new(<span class="kw-2">&amp;</span>driver).unwrap();
     <span class="kw">let </span>driver_proxy = DriverProxy::new(<span class="kw-2">&amp;</span>driver).unwrap();
 

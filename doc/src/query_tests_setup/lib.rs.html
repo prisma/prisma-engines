@@ -321,6 +321,10 @@
 <a href="#321" id="321">321</a>
 <a href="#322" id="322">322</a>
 <a href="#323" id="323">323</a>
+<a href="#324" id="324">324</a>
+<a href="#325" id="325">325</a>
+<a href="#326" id="326">326</a>
+<a href="#327" id="327">327</a>
 </pre></div><pre class="rust"><code><span class="kw">mod </span>config;
 <span class="kw">mod </span>connector_tag;
 <span class="kw">mod </span>datamodel_rendering;
@@ -467,45 +471,47 @@
 
     <span class="kw">let </span>(dms, capabilities) = schema_with_relation(on_parent, on_child, id_only);
 
-    <span class="kw">for </span>(i, (dm, caps)) <span class="kw">in </span>dms.into_iter().zip(capabilities.into_iter()).enumerate() {
-        <span class="kw">if </span>RELATION_TEST_IDX.map(|idx| idx != i).unwrap_or(<span class="bool-val">false</span>) {
-            <span class="kw">continue</span>;
-        }
-
-        <span class="kw">let </span>required_capabilities_for_test = required_capabilities | caps;
-        <span class="kw">let </span>test_db_name = <span class="macro">format!</span>(<span class="string">&quot;{suite_name}_{test_name}_{i}&quot;</span>);
-        <span class="kw">let </span>template = dm.datamodel().to_owned();
-        <span class="kw">let </span>(connector, version) = CONFIG.test_connector().unwrap();
-
-        <span class="kw">if </span>!should_run(<span class="kw-2">&amp;</span>connector, <span class="kw-2">&amp;</span>version, only, exclude, required_capabilities_for_test) {
-            <span class="kw">continue</span>;
-        }
-
-        <span class="kw">let </span>datamodel = render_test_datamodel(<span class="kw-2">&amp;</span>test_db_name, template, <span class="kw-2">&amp;</span>[], <span class="prelude-val">None</span>, Default::default(), <span class="prelude-val">None</span>);
-        <span class="kw">let </span>(connector_tag, version) = CONFIG.test_connector().unwrap();
-        <span class="kw">let </span>metrics = setup_metrics();
-        <span class="kw">let </span>metrics_for_subscriber = metrics.clone();
-        <span class="kw">let </span>(log_capture, log_tx) = TestLogCapture::new();
-
-        run_with_tokio(
-            <span class="kw">async move </span>{
-                <span class="macro">println!</span>(<span class="string">&quot;Used datamodel:\n {}&quot;</span>, datamodel.yellow());
-                <span class="kw">let </span>runner = Runner::load(datamodel.clone(), <span class="kw-2">&amp;</span>[], version, connector_tag, metrics, log_capture)
-                    .<span class="kw">await
-                    </span>.unwrap();
-
-                test_fn(<span class="kw-2">&amp;</span>runner, <span class="kw-2">&amp;</span>dm).<span class="kw">await</span>.unwrap();
-
-                teardown_project(<span class="kw-2">&amp;</span>datamodel, Default::default(), runner.schema_id())
-                    .<span class="kw">await
-                    </span>.unwrap();
+    <span class="macro">insta::allow_duplicates! </span>{
+        <span class="kw">for </span>(i, (dm, caps)) <span class="kw">in </span>dms.into_iter().zip(capabilities.into_iter()).enumerate() {
+            <span class="kw">if </span>RELATION_TEST_IDX.map(|idx| idx != i).unwrap_or(<span class="bool-val">false</span>) {
+                <span class="kw">continue</span>;
             }
-            .with_subscriber(test_tracing_subscriber(
-                ENV_LOG_LEVEL.to_string(),
-                metrics_for_subscriber,
-                log_tx,
-            )),
-        );
+
+            <span class="kw">let </span>required_capabilities_for_test = required_capabilities | caps;
+            <span class="kw">let </span>test_db_name = <span class="macro">format!</span>(<span class="string">&quot;{suite_name}_{test_name}_{i}&quot;</span>);
+            <span class="kw">let </span>template = dm.datamodel().to_owned();
+            <span class="kw">let </span>(connector, version) = CONFIG.test_connector().unwrap();
+
+            <span class="kw">if </span>!should_run(<span class="kw-2">&amp;</span>connector, <span class="kw-2">&amp;</span>version, only, exclude, required_capabilities_for_test) {
+                <span class="kw">continue</span>;
+            }
+
+            <span class="kw">let </span>datamodel = render_test_datamodel(<span class="kw-2">&amp;</span>test_db_name, template, <span class="kw-2">&amp;</span>[], <span class="prelude-val">None</span>, Default::default(), <span class="prelude-val">None</span>);
+            <span class="kw">let </span>(connector_tag, version) = CONFIG.test_connector().unwrap();
+            <span class="kw">let </span>metrics = setup_metrics();
+            <span class="kw">let </span>metrics_for_subscriber = metrics.clone();
+            <span class="kw">let </span>(log_capture, log_tx) = TestLogCapture::new();
+
+            run_with_tokio(
+                <span class="kw">async move </span>{
+                    <span class="macro">println!</span>(<span class="string">&quot;Used datamodel:\n {}&quot;</span>, datamodel.yellow());
+                    <span class="kw">let </span>runner = Runner::load(datamodel.clone(), <span class="kw-2">&amp;</span>[], version, connector_tag, metrics, log_capture)
+                        .<span class="kw">await
+                        </span>.unwrap();
+
+                    test_fn(<span class="kw-2">&amp;</span>runner, <span class="kw-2">&amp;</span>dm).<span class="kw">await</span>.unwrap();
+
+                    teardown_project(<span class="kw-2">&amp;</span>datamodel, Default::default(), runner.schema_id())
+                        .<span class="kw">await
+                        </span>.unwrap();
+                }
+                .with_subscriber(test_tracing_subscriber(
+                    ENV_LOG_LEVEL.to_string(),
+                    metrics_for_subscriber,
+                    log_tx,
+                )),
+            );
+        }
     }
 }
 
@@ -610,7 +616,9 @@
             </span>.unwrap();
             <span class="kw">let </span>schema_id = runner.schema_id();
 
-            test_fn(runner).<span class="kw">await</span>.unwrap();
+            <span class="kw">if let </span><span class="prelude-val">Err</span>(err) = test_fn(runner).<span class="kw">await </span>{
+                <span class="macro">panic!</span>(<span class="string">&quot;💥 Test failed due to an error: {err:?}&quot;</span>);
+            }
 
             <span class="kw">crate</span>::teardown_project(<span class="kw-2">&amp;</span>datamodel, db_schemas, schema_id)
                 .<span class="kw">await

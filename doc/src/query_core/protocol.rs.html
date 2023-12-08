@@ -28,12 +28,16 @@
 <a href="#28" id="28">28</a>
 <a href="#29" id="29">29</a>
 <a href="#30" id="30">30</a>
+<a href="#31" id="31">31</a>
+<a href="#32" id="32">32</a>
+<a href="#33" id="33">33</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>serde::Deserialize;
 
 <span class="attr">#[derive(Debug, Clone, Copy, Deserialize)]
 #[serde(rename_all = <span class="string">&quot;camelCase&quot;</span>)]
 </span><span class="kw">pub enum </span>EngineProtocol {
-    Graphql,
+    <span class="attr">#[cfg(feature = <span class="string">&quot;graphql-protocol&quot;</span>)]
+    </span>Graphql,
     Json,
 }
 
@@ -44,6 +48,7 @@
     }
 
     <span class="doccomment">/// Returns `true` if the engine protocol is [`Graphql`].
+    </span><span class="attr">#[cfg(feature = <span class="string">&quot;graphql-protocol&quot;</span>)]
     </span><span class="kw">pub fn </span>is_graphql(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
         <span class="macro">matches!</span>(<span class="self">self</span>, <span class="self">Self</span>::Graphql)
     }
@@ -52,7 +57,8 @@
 <span class="kw">impl </span>From&lt;<span class="kw-2">&amp;</span>String&gt; <span class="kw">for </span>EngineProtocol {
     <span class="kw">fn </span>from(s: <span class="kw-2">&amp;</span>String) -&gt; <span class="self">Self </span>{
         <span class="kw">match </span>s.as_str() {
-            <span class="string">&quot;graphql&quot; </span>=&gt; EngineProtocol::Graphql,
+            <span class="attr">#[cfg(feature = <span class="string">&quot;graphql-protocol&quot;</span>)]
+            </span><span class="string">&quot;graphql&quot; </span>=&gt; EngineProtocol::Graphql,
             <span class="string">&quot;json&quot; </span>=&gt; EngineProtocol::Json,
             x =&gt; <span class="macro">panic!</span>(<span class="string">&quot;Unknown engine protocol &#39;{x}&#39;. Must be &#39;graphql&#39; or &#39;json&#39;.&quot;</span>),
         }

@@ -33,39 +33,59 @@
 <a href="#33" id="33">33</a>
 <a href="#34" id="34">34</a>
 <a href="#35" id="35">35</a>
-</pre></div><pre class="rust"><code><span class="kw">use </span>futures::{Future, FutureExt};
-<span class="kw">use </span>napi::Error <span class="kw">as </span>NapiError;
-<span class="kw">use </span>quaint::error::Error <span class="kw">as </span>QuaintError;
-<span class="kw">use </span>std::{any::Any, panic::AssertUnwindSafe};
+<a href="#36" id="36">36</a>
+<a href="#37" id="37">37</a>
+<a href="#38" id="38">38</a>
+<a href="#39" id="39">39</a>
+<a href="#40" id="40">40</a>
+<a href="#41" id="41">41</a>
+<a href="#42" id="42">42</a>
+<a href="#43" id="43">43</a>
+<a href="#44" id="44">44</a>
+<a href="#45" id="45">45</a>
+</pre></div><pre class="rust"><code><span class="kw">use </span>quaint::error::{MysqlError, PostgresError, SqliteError};
+<span class="kw">use </span>serde::Deserialize;
 
-<span class="doccomment">/// transforms a napi error into a quaint error copying the status and reason
-/// properties over
-</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>into_quaint_error(napi_err: NapiError) -&gt; QuaintError {
-    <span class="kw">let </span>status = napi_err.status.as_ref().to_owned();
-    <span class="kw">let </span>reason = napi_err.reason.clone();
-
-    QuaintError::raw_connector_error(status, reason)
+<span class="attr">#[derive(Deserialize)]
+#[serde(remote = <span class="string">&quot;PostgresError&quot;</span>)]
+</span><span class="kw">pub struct </span>PostgresErrorDef {
+    code: String,
+    message: String,
+    severity: String,
+    detail: <span class="prelude-ty">Option</span>&lt;String&gt;,
+    column: <span class="prelude-ty">Option</span>&lt;String&gt;,
+    hint: <span class="prelude-ty">Option</span>&lt;String&gt;,
 }
 
-<span class="doccomment">/// catches a panic thrown during the execution of an asynchronous closure and transforms it into
-/// the Error variant of a napi::Result.
-</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async fn </span>async_unwinding_panic&lt;F, R&gt;(fut: F) -&gt; napi::Result&lt;R&gt;
-<span class="kw">where
-    </span>F: Future&lt;Output = napi::Result&lt;R&gt;&gt;,
-{
-    AssertUnwindSafe(fut)
-        .catch_unwind()
-        .<span class="kw">await
-        </span>.unwrap_or_else(panic_to_napi_err)
+<span class="attr">#[derive(Deserialize)]
+#[serde(remote = <span class="string">&quot;MysqlError&quot;</span>)]
+</span><span class="kw">pub struct </span>MysqlErrorDef {
+    <span class="kw">pub </span>code: u16,
+    <span class="kw">pub </span>message: String,
+    <span class="kw">pub </span>state: String,
 }
 
-<span class="kw">fn </span>panic_to_napi_err&lt;R&gt;(panic_payload: Box&lt;<span class="kw">dyn </span>Any + Send&gt;) -&gt; napi::Result&lt;R&gt; {
-    panic_payload
-        .downcast_ref::&lt;<span class="kw-2">&amp;</span>str&gt;()
-        .map(|s| -&gt; String { (<span class="kw-2">*</span>s).to_owned() })
-        .or_else(|| panic_payload.downcast_ref::&lt;String&gt;().map(|s| s.to_owned()))
-        .map(|message| <span class="prelude-val">Err</span>(napi::Error::from_reason(<span class="macro">format!</span>(<span class="string">&quot;PANIC: {message}&quot;</span>))))
-        .ok_or(napi::Error::from_reason(<span class="string">&quot;PANIC: unknown panic&quot;</span>.to_string()))
-        .unwrap()
+<span class="attr">#[derive(Deserialize)]
+#[serde(remote = <span class="string">&quot;SqliteError&quot;</span>, rename_all = <span class="string">&quot;camelCase&quot;</span>)]
+</span><span class="kw">pub struct </span>SqliteErrorDef {
+    <span class="kw">pub </span>extended_code: i32,
+    <span class="kw">pub </span>message: <span class="prelude-ty">Option</span>&lt;String&gt;,
+}
+
+<span class="attr">#[derive(Deserialize)]
+#[serde(tag = <span class="string">&quot;kind&quot;</span>)]
+</span><span class="doccomment">/// Wrapper for JS-side errors
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">enum </span>DriverAdapterError {
+    <span class="doccomment">/// Unexpected JS exception
+    </span>GenericJs {
+        id: i32,
+    },
+    UnsupportedNativeDataType {
+        <span class="attr">#[serde(rename = <span class="string">&quot;type&quot;</span>)]
+        </span>native_type: String,
+    },
+    Postgres(<span class="attr">#[serde(with = <span class="string">&quot;PostgresErrorDef&quot;</span>)] </span>PostgresError),
+    Mysql(<span class="attr">#[serde(with = <span class="string">&quot;MysqlErrorDef&quot;</span>)] </span>MysqlError),
+    Sqlite(<span class="attr">#[serde(with = <span class="string">&quot;SqliteErrorDef&quot;</span>)] </span>SqliteError),
 }
 </code></pre></div></section></main></body></html>

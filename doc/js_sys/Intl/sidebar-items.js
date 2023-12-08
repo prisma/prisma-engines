@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"fn":["get_canonical_locales"],"struct":["Collator","DateTimeFormat","NumberFormat","PluralRules","RelativeTimeFormat"]};

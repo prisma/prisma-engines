@@ -134,19 +134,28 @@
 <a href="#134" id="134">134</a>
 <a href="#135" id="135">135</a>
 <a href="#136" id="136">136</a>
+<a href="#137" id="137">137</a>
+<a href="#138" id="138">138</a>
+<a href="#139" id="139">139</a>
+<a href="#140" id="140">140</a>
+<a href="#141" id="141">141</a>
+<a href="#142" id="142">142</a>
+<a href="#143" id="143">143</a>
+<a href="#144" id="144">144</a>
+<a href="#145" id="145">145</a>
+<a href="#146" id="146">146</a>
+<a href="#147" id="147">147</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>async_trait::async_trait;
 <span class="kw">use </span>metrics::decrement_gauge;
-<span class="kw">use </span>napi::{bindgen_prelude::FromNapiValue, JsObject};
 <span class="kw">use </span>quaint::{
     connector::{IsolationLevel, Transaction <span class="kw">as </span>QuaintTransaction},
     prelude::{Query <span class="kw">as </span>QuaintQuery, Queryable, ResultSet},
     Value,
 };
 
-<span class="kw">use crate</span>::{
-    proxy::{CommonProxy, TransactionOptions, TransactionProxy},
-    queryable::JsBaseQueryable,
-};
+<span class="kw">use </span><span class="kw">crate</span>::proxy::{TransactionOptions, TransactionProxy};
+<span class="kw">use crate</span>::{proxy::CommonProxy, queryable::JsBaseQueryable, send_future::UnsafeFuture};
+<span class="kw">use crate</span>::{JsObject, JsResult};
 
 <span class="comment">// Wrapper around JS transaction objects that implements Queryable
 // and quaint::Transaction. Can be used in place of quaint transaction,
@@ -186,7 +195,7 @@
             <span class="self">self</span>.inner.raw_cmd(commit_stmt).<span class="kw">await</span><span class="question-mark">?</span>;
         }
 
-        <span class="self">self</span>.tx_proxy.commit().<span class="kw">await
+        UnsafeFuture(<span class="self">self</span>.tx_proxy.commit()).<span class="kw">await
     </span>}
 
     <span class="kw">async fn </span>rollback(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; quaint::Result&lt;()&gt; {
@@ -202,7 +211,7 @@
             <span class="self">self</span>.inner.raw_cmd(rollback_stmt).<span class="kw">await</span><span class="question-mark">?</span>;
         }
 
-        <span class="self">self</span>.tx_proxy.rollback().<span class="kw">await
+        UnsafeFuture(<span class="self">self</span>.tx_proxy.rollback()).<span class="kw">await
     </span>}
 
     <span class="kw">fn </span>as_queryable(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw">dyn </span>Queryable {
@@ -257,12 +266,25 @@
     }
 }
 
-<span class="doccomment">/// Implementing unsafe `from_napi_value` is only way I managed to get threadsafe
-/// JsTransaction value in `DriverProxy`. Going through any intermediate safe napi.rs value,
-/// like `JsObject` or `JsUnknown` wrapped inside `JsPromise` makes it impossible to extract the value
-/// out of promise while keeping the future `Send`.
-</span><span class="kw">impl </span>FromNapiValue <span class="kw">for </span>JsTransaction {
-    <span class="kw">unsafe fn </span>from_napi_value(env: napi::sys::napi_env, napi_val: napi::sys::napi_value) -&gt; napi::Result&lt;<span class="self">Self</span>&gt; {
+<span class="attr">#[cfg(target_arch = <span class="string">&quot;wasm32&quot;</span>)]
+</span><span class="kw">impl </span><span class="kw">super</span>::wasm::FromJsValue <span class="kw">for </span>JsTransaction {
+    <span class="kw">fn </span>from_js_value(value: wasm_bindgen::prelude::JsValue) -&gt; JsResult&lt;<span class="self">Self</span>&gt; {
+        <span class="kw">use </span>wasm_bindgen::JsCast;
+
+        <span class="kw">let </span>object = value.dyn_into::&lt;JsObject&gt;()<span class="question-mark">?</span>;
+        <span class="kw">let </span>common_proxy = CommonProxy::new(<span class="kw-2">&amp;</span>object)<span class="question-mark">?</span>;
+        <span class="kw">let </span>base = JsBaseQueryable::new(common_proxy);
+        <span class="kw">let </span>tx_proxy = TransactionProxy::new(<span class="kw-2">&amp;</span>object)<span class="question-mark">?</span>;
+
+        <span class="prelude-val">Ok</span>(<span class="self">Self</span>::new(base, tx_proxy))
+    }
+}
+
+<span class="doccomment">/// Implementing unsafe `from_napi_value` allows retrieving a threadsafe `JsTransaction` in `DriverProxy`
+/// while keeping derived futures `Send`.
+</span><span class="attr">#[cfg(not(target_arch = <span class="string">&quot;wasm32&quot;</span>))]
+</span><span class="kw">impl </span>::napi::bindgen_prelude::FromNapiValue <span class="kw">for </span>JsTransaction {
+    <span class="kw">unsafe fn </span>from_napi_value(env: napi::sys::napi_env, napi_val: napi::sys::napi_value) -&gt; JsResult&lt;<span class="self">Self</span>&gt; {
         <span class="kw">let </span>object = JsObject::from_napi_value(env, napi_val)<span class="question-mark">?</span>;
         <span class="kw">let </span>common_proxy = CommonProxy::new(<span class="kw-2">&amp;</span>object)<span class="question-mark">?</span>;
         <span class="kw">let </span>tx_proxy = TransactionProxy::new(<span class="kw-2">&amp;</span>object)<span class="question-mark">?</span>;

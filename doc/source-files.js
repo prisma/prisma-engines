@@ -36,6 +36,7 @@ var sourcesIndex = JSON.parse('{\
 "colored":["",[],["color.rs","control.rs","customcolors.rs","lib.rs","style.rs"]],\
 "combine":["",[["parser",[],["byte.rs","char.rs","choice.rs","combinator.rs","error.rs","function.rs","item.rs","mod.rs","range.rs","repeat.rs","sequence.rs"]],["stream",[],["buffered.rs","easy.rs","mod.rs","state.rs"]]],["error.rs","lib.rs"]],\
 "connection_string":["",[],["ado.rs","error.rs","jdbc.rs","lib.rs","utils.rs"]],\
+"console":["",[],["common_term.rs","kb.rs","lib.rs","term.rs","unix_term.rs","utils.rs"]],\
 "convert_case":["",[],["case.rs","converter.rs","lib.rs","pattern.rs","segmentation.rs"]],\
 "core_tests":["",[],["lib.rs"]],\
 "cpufeatures":["",[],["lib.rs","x86.rs"]],\
@@ -46,9 +47,10 @@ var sourcesIndex = JSON.parse('{\
 "crossbeam_epoch":["",[["sync",[],["list.rs","mod.rs","once_lock.rs","queue.rs"]]],["atomic.rs","collector.rs","default.rs","deferred.rs","epoch.rs","guard.rs","internal.rs","lib.rs"]],\
 "crossbeam_queue":["",[],["array_queue.rs","lib.rs","seg_queue.rs"]],\
 "crossbeam_utils":["",[["atomic",[],["atomic_cell.rs","consume.rs","mod.rs","seq_lock.rs"]],["sync",[],["mod.rs","once_lock.rs","parker.rs","sharded_lock.rs","wait_group.rs"]]],["backoff.rs","cache_padded.rs","lib.rs","thread.rs"]],\
+"crosstarget_utils":["",[["native",[],["mod.rs","spawn.rs","task.rs","time.rs"]]],["common.rs","lib.rs"]],\
 "crypto_common":["",[],["lib.rs"]],\
 "ctor":["",[],["lib.rs"]],\
-"cuid":["",[["cuid1",[],["counter.rs","fingerprint.rs","random.rs"]]],["cuid1.rs","error.rs","lib.rs","text.rs","time.rs"]],\
+"cuid":["",[["cuid1",[],["counter.rs","fingerprint.rs","random.rs"]],["time",[],["mod.rs","native.rs"]]],["cuid1.rs","error.rs","lib.rs","text.rs"]],\
 "cuid2":["",[],["lib.rs"]],\
 "cuid_util":["",[],["lib.rs"]],\
 "data_encoding":["",[],["lib.rs"]],\
@@ -61,7 +63,7 @@ var sourcesIndex = JSON.parse('{\
 "digest":["",[["core_api",[],["ct_variable.rs","rt_variable.rs","wrapper.rs","xof_reader.rs"]]],["core_api.rs","digest.rs","lib.rs","mac.rs"]],\
 "dissimilar":["",[],["find.rs","lib.rs","range.rs"]],\
 "dmmf":["",[["ast_builders",[["schema_ast_builder",[],["enum_renderer.rs","field_renderer.rs","mod.rs","object_renderer.rs","schema_renderer.rs","type_renderer.rs"]]],["datamodel_ast_builder.rs","mod.rs"]],["serialization_ast",[],["datamodel_ast.rs","mappings_ast.rs","mod.rs","schema_ast.rs"]]],["lib.rs"]],\
-"driver_adapters":["",[["conversion",[],["mysql.rs","postgres.rs","sqlite.rs"]]],["async_js_function.rs","conversion.rs","error.rs","lib.rs","proxy.rs","queryable.rs","result.rs","transaction.rs"]],\
+"driver_adapters":["",[["conversion",[],["js_arg.rs","js_to_quaint.rs","mod.rs","mysql.rs","postgres.rs","sqlite.rs"]],["napi",[],["async_js_function.rs","conversion.rs","error.rs","mod.rs","result.rs"]]],["error.rs","lib.rs","proxy.rs","queryable.rs","send_future.rs","transaction.rs","types.rs"]],\
 "either":["",[],["lib.rs"]],\
 "encoding":["",[["codec",[],["ascii.rs","error.rs","japanese.rs","korean.rs","simpchinese.rs","singlebyte.rs","tradchinese.rs","utf_16.rs","utf_8.rs","whatwg.rs"]]],["all.rs","label.rs","lib.rs","types.rs","util.rs"]],\
 "encoding_index_japanese":["",[],["jis0208.rs","jis0212.rs","lib.rs"]],\
@@ -124,11 +126,11 @@ var sourcesIndex = JSON.parse('{\
 "idna":["",[],["lib.rs","punycode.rs","uts46.rs"]],\
 "indexmap":["",[["map",[["core",[],["raw.rs"]]],["core.rs","iter.rs","slice.rs"]],["set",[],["iter.rs","slice.rs"]]],["arbitrary.rs","lib.rs","macros.rs","map.rs","mutable_keys.rs","set.rs","util.rs"]],\
 "indoc":["",[],["error.rs","expr.rs","lib.rs","unindent.rs"]],\
+"insta":["",[["content",[],["json.rs","mod.rs","yaml.rs"]]],["env.rs","lib.rs","macros.rs","output.rs","runtime.rs","settings.rs","snapshot.rs","utils.rs"]],\
 "ipnet":["",[],["ipext.rs","ipnet.rs","lib.rs","mask.rs","parser.rs"]],\
 "is_terminal":["",[],["lib.rs"]],\
 "itertools":["",[["adaptors",[],["coalesce.rs","map.rs","mod.rs","multi_product.rs"]]],["combinations.rs","combinations_with_replacement.rs","concat_impl.rs","cons_tuples_impl.rs","diff.rs","duplicates_impl.rs","either_or_both.rs","exactly_one_err.rs","extrema_set.rs","flatten_ok.rs","format.rs","free.rs","group_map.rs","groupbylazy.rs","grouping_map.rs","impl_macros.rs","intersperse.rs","k_smallest.rs","kmerge_impl.rs","lazy_buffer.rs","lib.rs","merge_join.rs","minmax.rs","multipeek_impl.rs","pad_tail.rs","peek_nth.rs","peeking_take_while.rs","permutations.rs","powerset.rs","process_results_impl.rs","put_back_n_impl.rs","rciter_impl.rs","repeatn.rs","size_hint.rs","sources.rs","tee.rs","tuple_impl.rs","unique_impl.rs","unziptuple.rs","with_position.rs","zip_eq_impl.rs","zip_longest.rs","ziptuple.rs"]],\
 "itoa":["",[],["lib.rs","udiv128.rs"]],\
-"js_sys":["",[],["lib.rs"]],\
 "json_rpc_api_build":["",[],["error.rs","lib.rs","rust_crate.rs"]],\
 "jsonrpc_core":["",[["types",[],["error.rs","id.rs","mod.rs","params.rs","request.rs","response.rs","version.rs"]]],["calls.rs","delegates.rs","io.rs","lib.rs","middleware.rs"]],\
 "keccak":["",[],["lib.rs","unroll.rs"]],\
@@ -238,7 +240,7 @@ var sourcesIndex = JSON.parse('{\
 "quaint_test_setup":["",[],["lib.rs","tags.rs"]],\
 "quanta":["",[],["counter.rs","instant.rs","lib.rs","mock.rs","monotonic.rs","stats.rs","upkeep.rs"]],\
 "query_connector":["",[],["coerce.rs","error.rs","interface.rs","lib.rs","upsert.rs","write_args.rs"]],\
-"query_core":["",[["executor",[],["execute_operation.rs","interpreting_executor.rs","mod.rs","pipeline.rs","request_context.rs","task.rs"]],["interactive_transactions",[],["actor_manager.rs","actors.rs","error.rs","messages.rs","mod.rs"]],["interpreter",[["query_interpreters",[],["inmemory_record_processor.rs","mod.rs","nested_read.rs","read.rs","write.rs"]]],["error.rs","expression.rs","expressionista.rs","interpreter_impl.rs","mod.rs"]],["query_ast",[],["mod.rs","read.rs","write.rs"]],["query_document",[],["argument_value.rs","mod.rs","operation.rs","parse_ast.rs","parser.rs","selection.rs","transformers.rs"]],["query_graph",[],["error.rs","formatters.rs","guard.rs","mod.rs","transformers.rs"]],["query_graph_builder",[["extractors",[["filters",[],["composite.rs","filter_fold.rs","filter_grouping.rs","mod.rs","relation.rs","scalar.rs"]]],["mod.rs","query_arguments.rs","rel_aggregations.rs","utils.rs"]],["read",[["aggregations",[],["aggregate.rs","group_by.rs","mod.rs"]]],["first.rs","many.rs","mod.rs","one.rs","related.rs","utils.rs"]],["write",[["nested",[],["connect_nested.rs","connect_or_create_nested.rs","create_nested.rs","delete_nested.rs","disconnect_nested.rs","mod.rs","set_nested.rs","update_nested.rs","upsert_nested.rs"]]],["connect.rs","create.rs","delete.rs","disconnect.rs","mod.rs","raw.rs","update.rs","upsert.rs","utils.rs","write_args_parser.rs"]]],["builder.rs","error.rs","mod.rs"]],["response_ir",[],["internal.rs","ir_serializer.rs","mod.rs","response.rs"]],["result_ast",[],["mod.rs"]],["telemetry",[["capturing",[],["capturer.rs","helpers.rs","mod.rs","settings.rs","storage.rs","tx_ext.rs"]]],["helpers.rs","mod.rs","models.rs"]]],["constants.rs","error.rs","lib.rs","protocol.rs"]],\
+"query_core":["",[["executor",[],["execute_operation.rs","interpreting_executor.rs","mod.rs","pipeline.rs","request_context.rs"]],["interactive_transactions",[],["actor_manager.rs","actors.rs","error.rs","messages.rs","mod.rs"]],["interpreter",[["query_interpreters",[],["inmemory_record_processor.rs","mod.rs","nested_read.rs","read.rs","write.rs"]]],["error.rs","expression.rs","expressionista.rs","interpreter_impl.rs","mod.rs"]],["query_ast",[],["mod.rs","read.rs","write.rs"]],["query_document",[],["argument_value.rs","mod.rs","operation.rs","parse_ast.rs","parser.rs","selection.rs","transformers.rs"]],["query_graph",[],["error.rs","formatters.rs","guard.rs","mod.rs","transformers.rs"]],["query_graph_builder",[["extractors",[["filters",[],["composite.rs","filter_fold.rs","filter_grouping.rs","mod.rs","relation.rs","scalar.rs"]]],["mod.rs","query_arguments.rs","rel_aggregations.rs","utils.rs"]],["read",[["aggregations",[],["aggregate.rs","group_by.rs","mod.rs"]]],["first.rs","many.rs","mod.rs","one.rs","related.rs","utils.rs"]],["write",[["nested",[],["connect_nested.rs","connect_or_create_nested.rs","create_nested.rs","delete_nested.rs","disconnect_nested.rs","mod.rs","set_nested.rs","update_nested.rs","upsert_nested.rs"]]],["connect.rs","create.rs","delete.rs","disconnect.rs","mod.rs","raw.rs","update.rs","upsert.rs","utils.rs","write_args_parser.rs"]]],["builder.rs","error.rs","mod.rs"]],["response_ir",[],["internal.rs","ir_serializer.rs","mod.rs","response.rs"]],["result_ast",[],["mod.rs"]],["telemetry",[["capturing",[],["capturer.rs","helpers.rs","mod.rs","settings.rs","storage.rs","tx_ext.rs"]]],["helpers.rs","mod.rs","models.rs"]]],["constants.rs","error.rs","lib.rs","protocol.rs"]],\
 "query_engine":["",[["server",[],["mod.rs"]]],["cli.rs","context.rs","error.rs","features.rs","lib.rs","logger.rs","opt.rs","tracer.rs"]],\
 "query_engine_metrics":["",[],["common.rs","formatters.rs","lib.rs","recorder.rs","registry.rs"]],\
 "query_engine_tests":["",[["schemas",[],["basic.rs","composites.rs","json.rs","many_to_many.rs","mod.rs","one_to_many.rs"]],["utils",[],["bytes.rs","json.rs","mod.rs","querying.rs","raw.rs","string.rs","time.rs"]]],["lib.rs"]],\
@@ -291,6 +293,7 @@ var sourcesIndex = JSON.parse('{\
 "sha3":["",[],["lib.rs","macros.rs","state.rs"]],\
 "sharded_slab":["",[["page",[],["mod.rs","slot.rs","stack.rs"]]],["cfg.rs","clear.rs","implementation.rs","iter.rs","lib.rs","macros.rs","pool.rs","shard.rs","sync.rs","tid.rs"]],\
 "signal_hook_registry":["",[],["half_lock.rs","lib.rs"]],\
+"similar":["",[["algorithms",[],["capture.rs","compact.rs","hook.rs","lcs.rs","mod.rs","myers.rs","patience.rs","replace.rs","utils.rs"]],["text",[],["abstraction.rs","inline.rs","mod.rs","utils.rs"]]],["common.rs","iter.rs","lib.rs","types.rs","udiff.rs","utils.rs"]],\
 "siphasher":["",[],["lib.rs","sip.rs","sip128.rs"]],\
 "sketches_ddsketch":["",[],["config.rs","ddsketch.rs","lib.rs","store.rs"]],\
 "slab":["",[],["builder.rs","lib.rs"]],\
@@ -380,13 +383,13 @@ var sourcesIndex = JSON.parse('{\
 "want":["",[],["lib.rs"]],\
 "wasm_bindgen":["",[["cache",[],["intern.rs","mod.rs"]],["convert",[],["closures.rs","impls.rs","mod.rs","slices.rs","traits.rs"]]],["cast.rs","closure.rs","describe.rs","externref.rs","lib.rs"]],\
 "wasm_bindgen_backend":["",[],["ast.rs","codegen.rs","encode.rs","error.rs","lib.rs","util.rs"]],\
-"wasm_bindgen_futures":["",[["task",[],["singlethread.rs"]]],["lib.rs","queue.rs"]],\
 "wasm_bindgen_macro":["",[],["lib.rs"]],\
 "wasm_bindgen_macro_support":["",[],["lib.rs","parser.rs"]],\
 "wasm_bindgen_shared":["",[],["lib.rs"]],\
 "webpki":["",[["name",[],["dns_name.rs","ip_address.rs","verify.rs"]]],["calendar.rs","cert.rs","der.rs","end_entity.rs","error.rs","lib.rs","name.rs","signed_data.rs","time.rs","trust_anchor.rs","verify_cert.rs"]],\
 "webpki_roots":["",[],["lib.rs"]],\
 "wyz":["",[],["bidi.rs","comu.rs","fmt.rs","lib.rs","range.rs"]],\
+"yaml_rust":["",[],["emitter.rs","lib.rs","parser.rs","scanner.rs","yaml.rs"]],\
 "yansi":["",[],["color.rs","lib.rs","macros.rs","paint.rs","style.rs","windows.rs"]]\
 }');
 createSourceSidebar();

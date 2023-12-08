@@ -198,6 +198,8 @@
 <a href="#198" id="198">198</a>
 <a href="#199" id="199">199</a>
 <a href="#200" id="200">200</a>
+<a href="#201" id="201">201</a>
+<a href="#202" id="202">202</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span><span class="kw">super</span>::execute_operation::{execute_many_operations, execute_many_self_contained, execute_single_self_contained};
 <span class="kw">use </span><span class="kw">super</span>::request_context;
 <span class="kw">use crate</span>::{
@@ -208,7 +210,7 @@
 <span class="kw">use </span>async_trait::async_trait;
 <span class="kw">use </span>connector::Connector;
 <span class="kw">use </span>schema::QuerySchemaRef;
-<span class="kw">use </span>tokio::time::{<span class="self">self</span>, Duration};
+<span class="kw">use </span>tokio::time::Duration;
 <span class="kw">use </span>tracing_futures::Instrument;
 
 <span class="doccomment">/// Central query executor and main entry point into the query core.
@@ -236,7 +238,8 @@
     }
 }
 
-<span class="attr">#[async_trait]
+<span class="attr">#[cfg_attr(target_arch = <span class="string">&quot;wasm32&quot;</span>, async_trait(<span class="question-mark">?</span>Send))]
+#[cfg_attr(not(target_arch = <span class="string">&quot;wasm32&quot;</span>), async_trait)]
 </span><span class="kw">impl</span>&lt;C&gt; QueryExecutor <span class="kw">for </span>InterpretingExecutor&lt;C&gt;
 <span class="kw">where
     </span>C: Connector + Send + Sync + <span class="lifetime">&#39;static</span>,
@@ -340,7 +343,8 @@
     }
 }
 
-<span class="attr">#[async_trait]
+<span class="attr">#[cfg_attr(target_arch = <span class="string">&quot;wasm32&quot;</span>, async_trait(<span class="question-mark">?</span>Send))]
+#[cfg_attr(not(target_arch = <span class="string">&quot;wasm32&quot;</span>), async_trait)]
 </span><span class="kw">impl</span>&lt;C&gt; TransactionManager <span class="kw">for </span>InterpretingExecutor&lt;C&gt;
 <span class="kw">where
     </span>C: Connector + Send + Sync,
@@ -362,7 +366,7 @@
                 user_facing = <span class="bool-val">true</span>,
                 <span class="string">&quot;db.type&quot; </span>= <span class="self">self</span>.connector.name()
             );
-            <span class="kw">let </span>conn = time::timeout(
+            <span class="kw">let </span>conn = crosstarget_utils::time::timeout(
                 Duration::from_millis(tx_opts.max_acquisition_millis),
                 <span class="self">self</span>.connector.get_connection(),
             )

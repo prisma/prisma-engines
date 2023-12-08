@@ -195,6 +195,10 @@
 <a href="#195" id="195">195</a>
 <a href="#196" id="196">196</a>
 <a href="#197" id="197">197</a>
+<a href="#198" id="198">198</a>
+<a href="#199" id="199">199</a>
+<a href="#200" id="200">200</a>
+<a href="#201" id="201">201</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Telemetry Capturing is the process of recording the logs and traces happening during a request
 //! to the binary engine, and rendering them in the response.
 //!
@@ -331,7 +335,8 @@
 //!    - Finally, the server sets the `logs` and `traces` extensions in the `PrismaResponse`**[12]**,
 //!     it serializes the extended response in json format and returns it as an HTTP Response
 //!     blob **[13]**.
-//!  
+//!
+</span><span class="attr">#![allow(unused_imports, dead_code)]
 </span><span class="kw">pub use </span><span class="self">self</span>::capturer::Capturer;
 <span class="kw">pub use </span><span class="self">self</span>::settings::Settings;
 <span class="kw">pub use </span>tx_ext::TxTraceExt;
@@ -339,7 +344,6 @@
 <span class="kw">use </span><span class="self">self</span>::capturer::Processor;
 <span class="kw">use </span>once_cell::sync::Lazy;
 <span class="kw">use </span>opentelemetry::{global, sdk, trace};
-<span class="kw">use </span>query_engine_metrics::MetricRegistry;
 <span class="kw">use </span>tracing::subscriber;
 <span class="kw">use </span>tracing_subscriber::{
     filter::filter_fn, layer::Layered, prelude::__tracing_subscriber_SubscriberExt, Layer, Registry,
@@ -355,9 +359,13 @@
 
 <span class="doccomment">/// Adds a capturing layer to the given subscriber and installs the transformed subscriber as the
 /// global, default subscriber
-</span><span class="attr">#[allow(clippy::type_complexity)]
+</span><span class="attr">#[cfg(feature = <span class="string">&quot;metrics&quot;</span>)]
+#[allow(clippy::type_complexity)]
 </span><span class="kw">pub fn </span>install_capturing_layer(
-    subscriber: Layered&lt;<span class="prelude-ty">Option</span>&lt;MetricRegistry&gt;, Layered&lt;Box&lt;<span class="kw">dyn </span>Layer&lt;Registry&gt; + Send + Sync&gt;, Registry&gt;&gt;,
+    subscriber: Layered&lt;
+        <span class="prelude-ty">Option</span>&lt;query_engine_metrics::MetricRegistry&gt;,
+        Layered&lt;Box&lt;<span class="kw">dyn </span>Layer&lt;Registry&gt; + Send + Sync&gt;, Registry&gt;,
+    &gt;,
     log_queries: bool,
 ) {
     <span class="comment">// set a trace context propagator, so that the trace context is propagated via the

@@ -59,6 +59,9 @@
 <a href="#59" id="59">59</a>
 <a href="#60" id="60">60</a>
 <a href="#61" id="61">61</a>
+<a href="#62" id="62">62</a>
+<a href="#63" id="63">63</a>
+<a href="#64" id="64">64</a>
 </pre></div><pre class="rust"><code><span class="kw">use super</span>::<span class="kw-2">*</span>;
 <span class="kw">use crate</span>::{BoxFuture, SqlDatamodelRenderer};
 <span class="kw">use </span>quaint::{prelude::Queryable, single::Quaint};
@@ -95,7 +98,8 @@
 <span class="attr">#[derive(Debug, Clone, Copy, PartialEq)]
 </span><span class="kw">pub enum </span>VitessVersion {
     V8_0,
-    PlanetscaleJs,
+    PlanetscaleJsNapi,
+    PlanetscaleJsWasm,
 }
 
 <span class="kw">impl </span>FromStr <span class="kw">for </span>VitessVersion {
@@ -104,7 +108,8 @@
     <span class="kw">fn </span>from_str(s: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, <span class="self">Self</span>::Err&gt; {
         <span class="kw">let </span>version = <span class="kw">match </span>s {
             <span class="string">&quot;8.0&quot; </span>=&gt; <span class="self">Self</span>::V8_0,
-            <span class="string">&quot;planetscale.js&quot; </span>=&gt; <span class="self">Self</span>::PlanetscaleJs,
+            <span class="string">&quot;planetscale.js&quot; </span>=&gt; <span class="self">Self</span>::PlanetscaleJsNapi,
+            <span class="string">&quot;planetscale.js.wasm&quot; </span>=&gt; <span class="self">Self</span>::PlanetscaleJsWasm,
             <span class="kw">_ </span>=&gt; <span class="kw">return </span><span class="prelude-val">Err</span>(TestError::parse_error(<span class="macro">format!</span>(<span class="string">&quot;Unknown Vitess version `{s}`&quot;</span>))),
         };
 
@@ -116,7 +121,8 @@
     <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>std::fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; std::fmt::Result {
         <span class="kw">match </span><span class="self">self </span>{
             <span class="self">Self</span>::V8_0 =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;8.0&quot;</span>),
-            <span class="self">Self</span>::PlanetscaleJs =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;planetscale.js&quot;</span>),
+            <span class="self">Self</span>::PlanetscaleJsNapi =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;planetscale.js&quot;</span>),
+            <span class="self">Self</span>::PlanetscaleJsWasm =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;planetscale.js.wasm&quot;</span>),
         }
     }
 }

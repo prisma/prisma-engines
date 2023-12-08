@@ -833,6 +833,8 @@
 <a href="#833" id="833">833</a>
 <a href="#834" id="834">834</a>
 <a href="#835" id="835">835</a>
+<a href="#836" id="836">836</a>
+<a href="#837" id="837">837</a>
 </pre></div><pre class="rust"><code><span class="kw">use super</span>::<span class="kw-2">*</span>;
 <span class="kw">use crate</span>::{
     constants::custom_types,
@@ -1559,12 +1561,14 @@
 
 <span class="kw">fn </span>convert_prisma_value(field: <span class="kw-2">&amp;</span>OutputField&lt;<span class="lifetime">&#39;_</span>&gt;, value: PrismaValue, st: <span class="kw-2">&amp;</span>ScalarType) -&gt; <span class="kw">crate</span>::Result&lt;PrismaValue&gt; {
     <span class="kw">match </span><span class="kw">crate</span>::executor::get_engine_protocol() {
-        EngineProtocol::Graphql =&gt; convert_prisma_value_graphql_protocol(field, value, st),
+        <span class="attr">#[cfg(feature = <span class="string">&quot;graphql-protocol&quot;</span>)]
+        </span>EngineProtocol::Graphql =&gt; convert_prisma_value_graphql_protocol(field, value, st),
         EngineProtocol::Json =&gt; convert_prisma_value_json_protocol(field, value, st),
     }
 }
 
-<span class="kw">fn </span>convert_prisma_value_graphql_protocol(
+<span class="attr">#[cfg(feature = <span class="string">&quot;graphql-protocol&quot;</span>)]
+</span><span class="kw">fn </span>convert_prisma_value_graphql_protocol(
     field: <span class="kw-2">&amp;</span>OutputField&lt;<span class="lifetime">&#39;_</span>&gt;,
     value: PrismaValue,
     st: <span class="kw-2">&amp;</span>ScalarType,

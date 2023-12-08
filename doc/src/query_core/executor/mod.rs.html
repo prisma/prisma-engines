@@ -132,6 +132,7 @@
 <a href="#132" id="132">132</a>
 <a href="#133" id="133">133</a>
 <a href="#134" id="134">134</a>
+<a href="#135" id="135">135</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! What the executor module DOES:
 //! - Defining an overarching executor trait, to be used on consumers of the core crate.
 //! - Defining executor implementations that combine the different core modules into a coherent
@@ -144,7 +145,6 @@
 <span class="kw">mod </span>interpreting_executor;
 <span class="kw">mod </span>pipeline;
 <span class="kw">mod </span>request_context;
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">mod </span>task;
 
 <span class="kw">pub use </span><span class="self">self</span>::{execute_operation::<span class="kw-2">*</span>, interpreting_executor::InterpretingExecutor};
 
@@ -159,7 +159,8 @@
 <span class="kw">use </span>serde::{Deserialize, Serialize};
 <span class="kw">use </span>tracing::Dispatch;
 
-<span class="attr">#[async_trait]
+<span class="attr">#[cfg_attr(target_arch = <span class="string">&quot;wasm32&quot;</span>, async_trait(<span class="question-mark">?</span>Send))]
+#[cfg_attr(not(target_arch = <span class="string">&quot;wasm32&quot;</span>), async_trait)]
 </span><span class="kw">pub trait </span>QueryExecutor: TransactionManager {
     <span class="doccomment">/// Executes a single operation and returns its result.
     /// Implementers must honor the passed transaction ID and execute the operation on the transaction identified
@@ -229,7 +230,8 @@
         tx_id
     }
 }
-<span class="attr">#[async_trait]
+<span class="attr">#[cfg_attr(target_arch = <span class="string">&quot;wasm32&quot;</span>, async_trait(<span class="question-mark">?</span>Send))]
+#[cfg_attr(not(target_arch = <span class="string">&quot;wasm32&quot;</span>), async_trait)]
 </span><span class="kw">pub trait </span>TransactionManager {
     <span class="doccomment">/// Starts a new transaction.
     /// Returns ID of newly opened transaction.

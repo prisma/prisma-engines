@@ -167,6 +167,8 @@
 <a href="#167" id="167">167</a>
 <a href="#168" id="168">168</a>
 <a href="#169" id="169">169</a>
+<a href="#170" id="170">170</a>
+<a href="#171" id="171">171</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span><span class="kw">super</span>::connection::SqlConnection;
 <span class="kw">use </span><span class="kw">crate</span>::FromSource;
 <span class="kw">use </span>async_trait::async_trait;
@@ -182,7 +184,11 @@
 };
 <span class="kw">use </span>std::sync::{Arc, Mutex};
 
-<span class="kw">static </span>ACTIVE_DRIVER_ADAPTER: Lazy&lt;Mutex&lt;<span class="prelude-ty">Option</span>&lt;DriverAdapter&gt;&gt;&gt; = Lazy::new(|| Mutex::new(<span class="prelude-val">None</span>));
+<span class="doccomment">/// TODO: evaluate turning this into `Lazy&lt;Mutex&lt;Option&lt;Arc&lt;DriverAdapter&gt;&gt;&gt;&gt;` to avoid
+/// a clone+drop on the adapter passed via `Js::from_source`.
+/// Note: this is currently blocked by Napi causing linking errors when building test binaries,
+/// as commented in [`DriverAdapter`].
+</span><span class="kw">static </span>ACTIVE_DRIVER_ADAPTER: Lazy&lt;Mutex&lt;<span class="prelude-ty">Option</span>&lt;DriverAdapter&gt;&gt;&gt; = Lazy::new(|| Mutex::new(<span class="prelude-val">None</span>));
 
 <span class="kw">fn </span>active_driver_adapter(provider: <span class="kw-2">&amp;</span>str) -&gt; connector::Result&lt;DriverAdapter&gt; {
     <span class="kw">let </span>lock = ACTIVE_DRIVER_ADAPTER.lock().unwrap();
@@ -253,23 +259,21 @@
     </span>}
 }
 
-<span class="comment">// TODO: miguelff: I haven´t found a better way to do this, yet... please continue reading.
-//
-// There is a bug in NAPI-rs by wich compiling a binary crate that links code using napi-rs
-// bindings breaks. We could have used a JsQueryable from the `driver-adapters` crate directly, as the
-// `connection` field of a driver adapter, but that will imply using napi-rs transitively, and break
-// the tests (which are compiled as binary creates)
-//
-// To avoid the problem above I separated interface from implementation, making DriverAdapter
-// independent on napi-rs. Initially, I tried having a field Arc&lt;&amp;dyn TransactionCabable&gt; to hold
-// JsQueryable at runtime. I did this, because TransactionCapable is the trait bounds required to
-// create a value of  `SqlConnection` (see [SqlConnection::new])) to actually performt the queries.
-// using JSQueryable. However, this didn&#39;t work because TransactionCapable is not object safe.
-// (has Sized as a supertrait)
-//
-// The thing is that TransactionCapable is not object safe and cannot be used in a dynamic type
-// declaration, so finally I couldn&#39;t come up with anything better then wrapping a QuaintQueryable
-// in this object, and implementing TransactionCapable (and quaint::Queryable) explicitly for it.
+<span class="doccomment">/// There is a bug in NAPI-rs by wich compiling a binary crate that links code using napi-rs
+/// bindings breaks. We could have used a JsQueryable from the `driver-adapters` crate directly, as the
+/// `connection` field of a driver adapter, but that will imply using napi-rs transitively, and break
+/// the tests (which are compiled as binary creates)
+///
+/// To avoid the problem above I separated interface from implementation, making DriverAdapter
+/// independent on napi-rs. Initially, I tried having a field Arc&lt;&amp;dyn TransactionCabable&gt; to hold
+/// JsQueryable at runtime. I did this, because TransactionCapable is the trait bounds required to
+/// create a value of  `SqlConnection` (see [SqlConnection::new])) to actually performt the queries.
+/// using JSQueryable. However, this didn&#39;t work because TransactionCapable is not object safe.
+/// (has Sized as a supertrait)
+///
+/// The thing is that TransactionCapable is not object safe and cannot be used in a dynamic type
+/// declaration, so finally I couldn&#39;t come up with anything better then wrapping a QuaintQueryable
+/// in this object, and implementing TransactionCapable (and quaint::Queryable) explicitly for it.
 </span><span class="attr">#[derive(Clone)]
 </span><span class="kw">pub struct </span>DriverAdapter {
     connector: Arc&lt;<span class="kw">dyn </span>TransactionCapable&gt;,

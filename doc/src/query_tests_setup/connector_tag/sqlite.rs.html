@@ -53,6 +53,9 @@
 <a href="#53" id="53">53</a>
 <a href="#54" id="54">54</a>
 <a href="#55" id="55">55</a>
+<a href="#56" id="56">56</a>
+<a href="#57" id="57">57</a>
+<a href="#58" id="58">58</a>
 </pre></div><pre class="rust"><code><span class="kw">use super</span>::<span class="kw-2">*</span>;
 <span class="kw">use crate</span>::{BoxFuture, SqlDatamodelRenderer};
 <span class="kw">use </span>quaint::{prelude::Queryable, single::Quaint};
@@ -84,14 +87,16 @@
 <span class="attr">#[derive(Clone, Debug, PartialEq, Eq)]
 </span><span class="kw">pub enum </span>SqliteVersion {
     V3,
-    LibsqlJS,
+    LibsqlJsNapi,
+    LibsqlJsWasm,
 }
 
 <span class="kw">impl </span>ToString <span class="kw">for </span>SqliteVersion {
     <span class="kw">fn </span>to_string(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; String {
         <span class="kw">match </span><span class="self">self </span>{
             SqliteVersion::V3 =&gt; <span class="string">&quot;3&quot;</span>.to_string(),
-            SqliteVersion::LibsqlJS =&gt; <span class="string">&quot;libsql.js&quot;</span>.to_string(),
+            SqliteVersion::LibsqlJsNapi =&gt; <span class="string">&quot;libsql.js&quot;</span>.to_string(),
+            SqliteVersion::LibsqlJsWasm =&gt; <span class="string">&quot;libsql.js.wasm&quot;</span>.to_string(),
         }
     }
 }
@@ -102,7 +107,8 @@
     <span class="kw">fn </span>try_from(s: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, <span class="self">Self</span>::Error&gt; {
         <span class="kw">let </span>version = <span class="kw">match </span>s {
             <span class="string">&quot;3&quot; </span>=&gt; <span class="self">Self</span>::V3,
-            <span class="string">&quot;libsql.js&quot; </span>=&gt; <span class="self">Self</span>::LibsqlJS,
+            <span class="string">&quot;libsql.js&quot; </span>=&gt; <span class="self">Self</span>::LibsqlJsNapi,
+            <span class="string">&quot;libsql.js.wasm&quot; </span>=&gt; <span class="self">Self</span>::LibsqlJsWasm,
             <span class="kw">_ </span>=&gt; <span class="kw">return </span><span class="prelude-val">Err</span>(TestError::parse_error(<span class="macro">format!</span>(<span class="string">&quot;Unknown SQLite version `{s}`&quot;</span>))),
         };
         <span class="prelude-val">Ok</span>(version)

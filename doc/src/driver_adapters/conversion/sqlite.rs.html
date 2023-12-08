@@ -106,6 +106,10 @@
 <a href="#106" id="106">106</a>
 <a href="#107" id="107">107</a>
 <a href="#108" id="108">108</a>
+<a href="#109" id="109">109</a>
+<a href="#110" id="110">110</a>
+<a href="#111" id="111">111</a>
+<a href="#112" id="112">112</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::conversion::JSArg;
 <span class="kw">use </span>serde_json::value::Value <span class="kw">as </span>JsonValue;
 
@@ -133,8 +137,8 @@
 </span><span class="attr">#[cfg(test)]
 </span><span class="kw">mod </span>test {
     <span class="kw">use super</span>::<span class="kw-2">*</span>;
-    <span class="kw">use </span>bigdecimal::BigDecimal;
-    <span class="kw">use </span>chrono::<span class="kw-2">*</span>;
+    <span class="kw">use </span>quaint::bigdecimal::BigDecimal;
+    <span class="kw">use </span>quaint::chrono::<span class="kw-2">*</span>;
     <span class="kw">use </span>quaint::ValueType;
     <span class="kw">use </span>serde_json::Value;
     <span class="kw">use </span>std::str::FromStr;
@@ -201,6 +205,10 @@
                     JSArg::Value(Value::String(<span class="string">&quot;23:13:01&quot;</span>.to_string())),
                     JSArg::Value(Value::Null),
                 ))
+            ),
+            (
+                ValueType::Bytes(<span class="prelude-val">Some</span>(<span class="string">&quot;hello&quot;</span>.as_bytes().into())),
+                JSArg::Buffer(<span class="string">&quot;hello&quot;</span>.as_bytes().to_vec())
             ),
         ];
 

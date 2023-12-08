@@ -158,10 +158,9 @@
 <a href="#158" id="158">158</a>
 <a href="#159" id="159">159</a>
 <a href="#160" id="160">160</a>
-<a href="#161" id="161">161</a>
-</pre></div><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::executor::task::JoinHandle;
-<span class="kw">use crate</span>::{protocol::EngineProtocol, ClosedTx, Operation, ResponseData};
+</pre></div><pre class="rust"><code><span class="kw">use crate</span>::{protocol::EngineProtocol, ClosedTx, Operation, ResponseData};
 <span class="kw">use </span>connector::Connection;
+<span class="kw">use </span>crosstarget_utils::task::JoinHandle;
 <span class="kw">use </span>lru::LruCache;
 <span class="kw">use </span>once_cell::sync::Lazy;
 <span class="kw">use </span>schema::QuerySchemaRef;
@@ -198,7 +197,6 @@
 
 <span class="kw">impl </span>Drop <span class="kw">for </span>TransactionActorManager {
     <span class="kw">fn </span>drop(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
-        <span class="macro">debug!</span>(<span class="string">&quot;DROPPING TPM&quot;</span>);
         <span class="self">self</span>.bg_reader_clear.abort();
     }
 }
@@ -269,7 +267,7 @@
                              of the transaction. Consider increasing the interactive transaction timeout \
                              or doing less work in the transaction&quot;</span>,
                             timeout.as_millis(),
-                            start_time.elapsed().as_millis(),
+                            start_time.elapsed_time().as_millis(),
                         )
                     }
                     <span class="prelude-val">None </span>=&gt; {

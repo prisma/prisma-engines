@@ -129,6 +129,7 @@
 <a href="#129" id="129">129</a>
 <a href="#130" id="130">130</a>
 <a href="#131" id="131">131</a>
+<a href="#132" id="132">132</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! # quaint
 //!
 //! A database client abstraction for reading and writing to an SQL database in a
@@ -244,7 +245,8 @@
 <span class="attr">#[macro_use]
 </span><span class="kw">extern crate </span>metrics;
 
-<span class="kw">extern crate </span>bigdecimal;
+<span class="kw">pub extern crate </span>bigdecimal;
+<span class="kw">pub extern crate </span>chrono;
 
 <span class="kw">pub mod </span>ast;
 <span class="kw">pub mod </span>connector;
