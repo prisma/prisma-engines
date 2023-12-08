@@ -15,7 +15,7 @@ use query_core::{
 };
 use query_engine_metrics::MetricRegistry;
 use request_handlers::{
-    BatchTransactionOption, ConnectorMode, GraphqlBody, JsonBatchQuery, JsonBody, JsonSingleQuery, MultiQuery,
+    BatchTransactionOption, ConnectorKind, GraphqlBody, JsonBatchQuery, JsonBody, JsonSingleQuery, MultiQuery,
     RequestBody, RequestHandler,
 };
 use serde_json::json;
@@ -126,10 +126,9 @@ impl Runner {
             Some(_) => RunnerExecutor::new_external(&url, &datamodel).await?,
             None => RunnerExecutor::Builtin(
                 request_handlers::load_executor(
-                    ConnectorMode::Rust,
+                    ConnectorKind::Rust { url: url.to_owned() },
                     data_source,
                     schema.configuration.preview_features(),
-                    &url,
                 )
                 .await?,
             ),
