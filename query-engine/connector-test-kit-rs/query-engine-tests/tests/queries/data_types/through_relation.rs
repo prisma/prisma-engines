@@ -34,7 +34,11 @@ mod scalar_relations {
     // TODO: fix https://github.com/prisma/team-orm/issues/684, https://github.com/prisma/team-orm/issues/685  and unexclude DAs
     #[connector_test(
         schema(schema_common),
-        exclude(Postgres("pg.js", "neon.js"), Vitess("planetscale.js"))
+        exclude(
+            Postgres("pg.js", "neon.js", "pg.js.wasm", "neon.js.wasm"),
+            Vitess("planetscale.js", "planetscale.js.wasm"),
+            Sqlite("libsql.js.wasm")
+        )
     )]
     async fn common_types(runner: Runner) -> TestResult<()> {
         create_common_children(&runner).await?;
@@ -236,7 +240,7 @@ mod scalar_relations {
     #[connector_test(
         schema(schema_scalar_lists),
         capabilities(ScalarLists),
-        exclude(Postgres("pg.js", "neon.js"))
+        exclude(Postgres("pg.js", "neon.js", "pg.js.wasm", "neon.js.wasm"))
     )]
     async fn scalar_lists(runner: Runner) -> TestResult<()> {
         create_child(

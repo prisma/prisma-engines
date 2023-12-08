@@ -2,13 +2,11 @@ use std::marker::PhantomData;
 
 use napi::{
     bindgen_prelude::*,
-    threadsafe_function::{ErrorStrategy, ThreadsafeFunction},
+    threadsafe_function::{ErrorStrategy, ThreadsafeFunction, ThreadsafeFunctionCallMode},
 };
 
-use crate::{
-    error::{async_unwinding_panic, into_quaint_error},
-    result::JsResult,
-};
+use super::error::{async_unwinding_panic, into_quaint_error};
+use crate::AdapterResult;
 
 /// Wrapper for napi-rs's ThreadsafeFunction that is aware of
 /// JS drivers conventions. Performs following things:
@@ -47,7 +45,7 @@ where
         let js_result = async_unwinding_panic(async {
             let promise = self
                 .threadsafe_fn
-                .call_async::<Promise<JsResult<ReturnType>>>(arg)
+                .call_async::<Promise<AdapterResult<ReturnType>>>(arg)
                 .await?;
             promise.await
         })
@@ -56,8 +54,8 @@ where
         js_result.into()
     }
 
-    pub(crate) fn as_raw(&self) -> &ThreadsafeFunction<ArgType, ErrorStrategy::Fatal> {
-        &self.threadsafe_fn
+    pub(crate) fn call_non_blocking(&self, arg: ArgType) {
+        _ = self.threadsafe_fn.call(arg, ThreadsafeFunctionCallMode::NonBlocking);
     }
 }
 

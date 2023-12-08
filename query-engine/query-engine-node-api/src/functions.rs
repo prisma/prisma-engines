@@ -1,7 +1,8 @@
-use crate::error::ApiError;
 use napi_derive::napi;
 use request_handlers::dmmf;
 use std::sync::Arc;
+
+use crate::error::ApiError;
 
 #[derive(serde::Serialize, Clone, Copy)]
 #[napi(object)]

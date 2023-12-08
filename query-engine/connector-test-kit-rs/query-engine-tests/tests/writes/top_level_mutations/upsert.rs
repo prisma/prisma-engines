@@ -674,7 +674,7 @@ mod upsert {
         Ok(())
     }
 
-    #[connector_test(schema(generic), exclude(Vitess("planetscale.js")))]
+    #[connector_test(schema(generic), exclude(Vitess("planetscale.js", "planetscale.js.wasm")))]
     async fn upsert_fails_if_filter_dont_match(runner: Runner) -> TestResult<()> {
         run_query!(
             &runner,

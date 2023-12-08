@@ -192,7 +192,7 @@ impl QueryEngine {
         } else {
             #[cfg(feature = "driver-adapters")]
             if let Some(adapter) = maybe_adapter {
-                let js_queryable = driver_adapters::from_napi(adapter);
+                let js_queryable = driver_adapters::from_js(adapter);
 
                 sql_connector::activate_driver_adapter(Arc::new(js_queryable));
                 connector_mode = ConnectorMode::Js;

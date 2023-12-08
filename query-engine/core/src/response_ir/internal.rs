@@ -724,11 +724,13 @@ fn serialize_scalar(field: &OutputField<'_>, value: PrismaValue) -> crate::Resul
 
 fn convert_prisma_value(field: &OutputField<'_>, value: PrismaValue, st: &ScalarType) -> crate::Result<PrismaValue> {
     match crate::executor::get_engine_protocol() {
+        #[cfg(feature = "graphql-protocol")]
         EngineProtocol::Graphql => convert_prisma_value_graphql_protocol(field, value, st),
         EngineProtocol::Json => convert_prisma_value_json_protocol(field, value, st),
     }
 }
 
+#[cfg(feature = "graphql-protocol")]
 fn convert_prisma_value_graphql_protocol(
     field: &OutputField<'_>,
     value: PrismaValue,

@@ -1,0 +1,14 @@
+{
+  "type": "module",
+  "main": "./example.js",
+  "scripts": {
+    "dev": "node --experimental-wasm-modules ./example.js"
+  },
+  "dependencies": {
+    "@libsql/client": "0.4.0-pre.2",
+    "@prisma/adapter-libsql": "5.7.0-dev.54",
+    "@prisma/client": "5.7.0-dev.54",
+    "@prisma/driver-adapter-utils": "5.7.0-dev.54",
+    "prisma": "5.7.0-dev.54"
+  }
+}

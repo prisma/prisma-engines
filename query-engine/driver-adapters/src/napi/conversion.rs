@@ -1,25 +1,7 @@
-pub(crate) mod mysql;
-pub(crate) mod postgres;
-pub(crate) mod sqlite;
+pub(crate) use crate::conversion::JSArg;
 
 use napi::bindgen_prelude::{FromNapiValue, ToNapiValue};
 use napi::NapiValue;
-use serde::Serialize;
-use serde_json::value::Value as JsonValue;
-
-#[derive(Debug, PartialEq, Serialize)]
-#[serde(untagged)]
-pub enum JSArg {
-    Value(serde_json::Value),
-    Buffer(Vec<u8>),
-    Array(Vec<JSArg>),
-}
-
-impl From<JsonValue> for JSArg {
-    fn from(v: JsonValue) -> Self {
-        JSArg::Value(v)
-    }
-}
 
 // FromNapiValue is the napi equivalent to serde::Deserialize.
 // Note: we can safely leave this unimplemented as we don't need deserialize napi_value back to JSArg.

@@ -1,6 +1,6 @@
-use crate::executor::task::JoinHandle;
 use crate::{protocol::EngineProtocol, ClosedTx, Operation, ResponseData};
 use connector::Connection;
+use crosstarget_utils::task::JoinHandle;
 use lru::LruCache;
 use once_cell::sync::Lazy;
 use schema::QuerySchemaRef;
@@ -37,7 +37,6 @@ pub struct TransactionActorManager {
 
 impl Drop for TransactionActorManager {
     fn drop(&mut self) {
-        debug!("DROPPING TPM");
         self.bg_reader_clear.abort();
     }
 }
@@ -108,7 +107,7 @@ impl TransactionActorManager {
                              of the transaction. Consider increasing the interactive transaction timeout \
                              or doing less work in the transaction",
                             timeout.as_millis(),
-                            start_time.elapsed().as_millis(),
+                            start_time.elapsed_time().as_millis(),
                         )
                     }
                     None => {

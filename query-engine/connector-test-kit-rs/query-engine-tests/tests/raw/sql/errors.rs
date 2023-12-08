@@ -37,7 +37,7 @@ mod raw_errors {
     #[connector_test(
         schema(common_nullable_types),
         only(Postgres),
-        exclude(Postgres("neon.js"), Postgres("pg.js"))
+        exclude(Postgres("neon.js", "pg.js", "neon.js.wasm", "pg.js.wasm"))
     )]
     async fn list_param_for_scalar_column_should_not_panic_quaint(runner: Runner) -> TestResult<()> {
         assert_error!(

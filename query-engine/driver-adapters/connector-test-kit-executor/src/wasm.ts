@@ -9,6 +9,5 @@ const bytes = await fs.readFile(path.resolve(dirname, '..', '..', '..', 'query-e
 const module = new WebAssembly.Module(bytes) 
 const instance = new WebAssembly.Instance(module, { './query_engine_bg.js': wasm })
 wasm.__wbg_set_wasm(instance.exports);
-wasm.init()
 
 export const WasmQueryEngine = wasm.QueryEngine
