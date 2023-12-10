@@ -9,6 +9,8 @@ pub(super) struct Context<'a> {
     /// Maximum number of bind parameters allowed for a single query.
     /// None is unlimited.
     pub(crate) max_bind_values: Option<usize>,
+    /// Whether the current connector supports a function that converts a record to a JSON object.
+    pub(crate) supports_row_to_json_fn: bool,
 }
 
 impl<'a> Context<'a> {
@@ -20,11 +22,15 @@ impl<'a> Context<'a> {
             ConnectionInfo::Mssql(_) => (Some(1000), 2099),
             ConnectionInfo::Sqlite { .. } | ConnectionInfo::InMemorySqlite { .. } => (Some(999), 999),
         };
+
+        let supports_row_to_json_fn = matches!(connection_info, ConnectionInfo::Postgres(_));
+
         Context {
             connection_info,
             trace_id,
             max_rows,
             max_bind_values: get_batch_size(default_batch_size),
+            supports_row_to_json_fn,
         }
     }
 

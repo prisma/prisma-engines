@@ -1,4 +1,5 @@
 mod max_integer;
+mod prisma_22298;
 mod prisma_10098;
 mod prisma_10935;
 mod prisma_12572;

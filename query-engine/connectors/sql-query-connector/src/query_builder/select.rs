@@ -96,13 +96,32 @@ impl SelectBuilder {
             .alias(inner_root_table_alias.to_table_string());
 
         // SELECT * FROM "Table" as <table_alias> WHERE parent.id = child.parent_id
-        let root = Select::from_table(related_table)
+        let mut root = Select::from_table(related_table)
             .with_join_conditions(&rs.field, parent_alias, inner_root_table_alias, ctx)
             .comment("root select");
 
-        // SELECT JSON_BUILD_OBJECT() FROM ( <root> )
+        if ctx.supports_row_to_json_fn {
+            root = root.with_columns(rs.selections.iter().filter_map(|f| match f {
+                SelectedField::Scalar(sf) => Some(sf.as_column(ctx).table(inner_root_table_alias.to_table_string())),
+                SelectedField::Relation(rs) => {
+                    let table_name = match rs.field.relation().is_many_to_many() {
+                        true => m2m_join_alias_name(&rs.field),
+                        false => join_alias_name(&rs.field),
+                    };
+                    Some(Column::from((table_name, JSON_AGG_IDENT)).alias(rs.field.name().to_owned()))
+                }
+                _ => None,
+            }));
+        }
+
+        let root_as_json = match ctx.supports_row_to_json_fn {
+            true => row_to_json(root_alias.to_table_string(), false),
+            false => build_json_obj_fn(rs, ctx, root_alias),
+        };
+
+        // SELECT ROW_TO_JSON()/JSON_BUILD_OBJECT() FROM ( <root> )
         let inner = Select::from_table(Table::from(root).alias(root_alias.to_table_string()))
-            .value(build_json_obj_fn(rs, ctx, root_alias).alias(JSON_AGG_IDENT));
+            .value(root_as_json.alias(JSON_AGG_IDENT));
 
         // LEFT JOIN LATERAL () AS <inner_alias> ON TRUE
         let inner = self.with_related_queries(inner, rs.relations(), root_alias, ctx);
@@ -118,7 +137,7 @@ impl SelectBuilder {
                     .collect();
 
             // SELECT <foreign_keys>, <orderby columns>
-            inner.with_columns(selection.into())
+            inner.with_columns(ColumnIterator::from(selection))
         } else {
             // select ordering, filtering & join fields from child selections to order, filter & join them on the outer query
             let inner_selection: Vec<Column<'_>> = FieldSelection::union(vec![
@@ -131,7 +150,9 @@ impl SelectBuilder {
             .map(|c| c.table(root_alias.to_table_string()))
             .collect();
 
-            let inner = inner.with_columns(inner_selection.into()).comment("inner select");
+            let inner = inner
+                .with_columns(ColumnIterator::from(inner_selection))
+                .comment("inner select");
 
             let middle = Select::from_table(Table::from(inner).alias(inner_alias.to_table_string()))
                 // SELECT <inner_alias>.<JSON_ADD_IDENT>
@@ -214,7 +235,7 @@ trait SelectBuilderExt<'a> {
         ctx: &Context<'_>,
     ) -> Select<'a>;
     fn with_selection(self, selected_fields: &FieldSelection, table_alias: Alias, ctx: &Context<'_>) -> Select<'a>;
-    fn with_columns(self, columns: ColumnIterator) -> Select<'a>;
+    fn with_columns(self, columns: impl Iterator<Item = Column<'static>>) -> Select<'a>;
 }
 
 impl<'a> SelectBuilderExt<'a> for Select<'a> {
@@ -313,7 +334,7 @@ impl<'a> SelectBuilderExt<'a> for Select<'a> {
             })
     }
 
-    fn with_columns(self, columns: ColumnIterator) -> Select<'a> {
+    fn with_columns(self, columns: impl Iterator<Item = Column<'static>>) -> Select<'a> {
         columns.into_iter().fold(self, |select, col| select.column(col))
     }
 }
