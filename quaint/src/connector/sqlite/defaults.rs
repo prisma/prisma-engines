@@ -1,1 +1,1 @@
-pub const DEFAULT_SQLITE_SCHEMA: &str = "main";
+pub const DEFAULT_SQLITE_DATABASE: &str = "main";

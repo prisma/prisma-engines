@@ -168,12 +168,12 @@ impl Quaint {
     #[cfg(feature = "sqlite-native")]
     /// Open a new SQLite database in memory.
     pub fn new_in_memory() -> crate::Result<Quaint> {
-        use crate::connector::sqlite::DEFAULT_SQLITE_SCHEMA;
+        use crate::connector::sqlite::DEFAULT_SQLITE_DATABASE;
 
         Ok(Quaint {
             inner: Arc::new(connector::Sqlite::new_in_memory()?),
             connection_info: Arc::new(ConnectionInfo::InMemorySqlite {
-                db_name: DEFAULT_SQLITE_SCHEMA.to_owned(),
+                db_name: DEFAULT_SQLITE_DATABASE.to_owned(),
             }),
         })
     }

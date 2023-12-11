@@ -93,7 +93,7 @@ impl TryFrom<&str> for SqliteParams {
             Ok(Self {
                 connection_limit,
                 file_path: path_str.to_owned(),
-                db_name: super::DEFAULT_SQLITE_SCHEMA.to_owned(),
+                db_name: super::DEFAULT_SQLITE_DATABASE.to_owned(),
                 socket_timeout,
                 max_connection_lifetime,
                 max_idle_connection_lifetime,

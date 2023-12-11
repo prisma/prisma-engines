@@ -71,7 +71,7 @@ impl JsConnectionInfo {
         match provider {
             AdapterFlavour::Mysql => quaint::connector::DEFAULT_MYSQL_DB,
             AdapterFlavour::Postgres => quaint::connector::DEFAULT_POSTGRES_SCHEMA,
-            AdapterFlavour::Sqlite => quaint::connector::DEFAULT_SQLITE_SCHEMA,
+            AdapterFlavour::Sqlite => quaint::connector::DEFAULT_SQLITE_DATABASE,
         }
     }
 }
