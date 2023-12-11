@@ -405,6 +405,11 @@
 <a href="#405" id="405">405</a>
 <a href="#406" id="406">406</a>
 <a href="#407" id="407">407</a>
+<a href="#408" id="408">408</a>
+<a href="#409" id="409">409</a>
+<a href="#410" id="410">410</a>
+<a href="#411" id="411">411</a>
+<a href="#412" id="412">412</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::borrow::Cow;
 <span class="kw">use </span>tracing::Span;
 
@@ -517,11 +522,12 @@
         <span class="kw">let </span>linking_fields = rs.field.related_field().linking_fields();
 
         <span class="kw">if </span>rs.field.relation().is_many_to_many() {
-            <span class="kw">let </span>selection: Vec&lt;Column&lt;<span class="lifetime">&#39;_</span>&gt;&gt; = FieldSelection::union(<span class="macro">vec!</span>[order_by_selection(rs), linking_fields])
-                .into_projection()
-                .as_columns(ctx)
-                .map(|c| c.table(root_alias.to_table_string()))
-                .collect();
+            <span class="kw">let </span>selection: Vec&lt;Column&lt;<span class="lifetime">&#39;_</span>&gt;&gt; =
+                FieldSelection::union(<span class="macro">vec!</span>[order_by_selection(rs), linking_fields, filtering_selection(rs)])
+                    .into_projection()
+                    .as_columns(ctx)
+                    .map(|c| c.table(root_alias.to_table_string()))
+                    .collect();
 
             <span class="comment">// SELECT &lt;foreign_keys&gt;, &lt;orderby columns&gt;
             </span>inner.with_columns(selection.into())
@@ -559,8 +565,9 @@
 
     <span class="kw">fn </span>build_m2m_join&lt;<span class="lifetime">&#39;a</span>&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, rs: <span class="kw-2">&amp;</span>RelationSelection, parent_alias: Alias, ctx: <span class="kw-2">&amp;</span>Context&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; JoinData&lt;<span class="lifetime">&#39;a</span>&gt; {
         <span class="kw">let </span>rf = rs.field.clone();
-        <span class="kw">let </span>m2m_alias = m2m_join_alias_name(<span class="kw-2">&amp;</span>rf);
         <span class="kw">let </span>m2m_table_alias = <span class="self">self</span>.next_alias();
+        <span class="kw">let </span>m2m_join_alias = <span class="self">self</span>.next_alias();
+        <span class="kw">let </span>outer_alias = <span class="self">self</span>.next_alias();
 
         <span class="kw">let </span>left_columns = rf.related_field().m2m_columns(ctx);
         <span class="kw">let </span>right_columns = ModelProjection::from(rf.model().primary_identifier()).as_columns(ctx);
@@ -581,24 +588,27 @@
             .unwrap();
 
         <span class="kw">let </span>m2m_join_data = Table::from(<span class="self">self</span>.build_related_query_select(rs, m2m_table_alias, ctx))
-            .alias(join_alias_name(<span class="kw-2">&amp;</span>rf))
+            .alias(m2m_join_alias.to_table_string())
             .on(ConditionTree::single(<span class="bool-val">true</span>.raw()))
             .lateral();
 
         <span class="kw">let </span>child_table = rf.as_table(ctx).alias(m2m_table_alias.to_table_string());
 
         <span class="kw">let </span>inner = Select::from_table(child_table)
-            .value(Column::from((join_alias_name(<span class="kw-2">&amp;</span>rf), JSON_AGG_IDENT)))
+            .value(Column::from((m2m_join_alias.to_table_string(), JSON_AGG_IDENT)))
             .left_join(m2m_join_data) <span class="comment">// join m2m table
             </span>.and_where(join_conditions) <span class="comment">// adds join condition to the child table
-            </span>.with_ordering(<span class="kw-2">&amp;</span>rs.args, <span class="prelude-val">Some</span>(join_alias_name(<span class="kw-2">&amp;</span>rs.field)), ctx) <span class="comment">// adds ordering stmts
-            </span>.with_filters(rs.args.filter.clone(), <span class="prelude-val">None</span>, ctx) <span class="comment">// adds query filters // TODO: avoid clone filter
-            </span>.with_pagination(rs.args.take_abs(), rs.args.skip); <span class="comment">// adds pagination
+            </span>.with_ordering(<span class="kw-2">&amp;</span>rs.args, <span class="prelude-val">Some</span>(m2m_join_alias.to_table_string()), ctx) <span class="comment">// adds ordering stmts
+            </span>.with_filters(rs.args.filter.clone(), <span class="prelude-val">Some</span>(m2m_join_alias), ctx) <span class="comment">// adds query filters // TODO: avoid clone filter
+            </span>.with_pagination(rs.args.take_abs(), rs.args.skip)
+            .comment(<span class="string">&quot;inner&quot;</span>); <span class="comment">// adds pagination
 
-        </span><span class="kw">let </span>outer = Select::from_table(Table::from(inner).alias(<span class="macro">format!</span>(<span class="string">&quot;{}_1&quot;</span>, m2m_alias))).value(json_agg());
+        </span><span class="kw">let </span>outer = Select::from_table(Table::from(inner).alias(outer_alias.to_table_string()))
+            .value(json_agg())
+            .comment(<span class="string">&quot;outer&quot;</span>);
 
         Table::from(outer)
-            .alias(m2m_alias)
+            .alias(m2m_join_alias_name(<span class="kw-2">&amp;</span>rf))
             .on(ConditionTree::single(<span class="bool-val">true</span>.raw()))
             .lateral()
     }
