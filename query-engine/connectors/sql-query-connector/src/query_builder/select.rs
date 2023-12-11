@@ -110,11 +110,12 @@ impl SelectBuilder {
         let linking_fields = rs.field.related_field().linking_fields();
 
         if rs.field.relation().is_many_to_many() {
-            let selection: Vec<Column<'_>> = FieldSelection::union(vec![order_by_selection(rs), linking_fields])
-                .into_projection()
-                .as_columns(ctx)
-                .map(|c| c.table(root_alias.to_table_string()))
-                .collect();
+            let selection: Vec<Column<'_>> =
+                FieldSelection::union(vec![order_by_selection(rs), linking_fields, filtering_selection(rs)])
+                    .into_projection()
+                    .as_columns(ctx)
+                    .map(|c| c.table(root_alias.to_table_string()))
+                    .collect();
 
             // SELECT <foreign_keys>, <orderby columns>
             inner.with_columns(selection.into())
@@ -152,8 +153,9 @@ impl SelectBuilder {
 
     fn build_m2m_join<'a>(&mut self, rs: &RelationSelection, parent_alias: Alias, ctx: &Context<'_>) -> JoinData<'a> {
         let rf = rs.field.clone();
-        let m2m_alias = m2m_join_alias_name(&rf);
         let m2m_table_alias = self.next_alias();
+        let m2m_join_alias = self.next_alias();
+        let outer_alias = self.next_alias();
 
         let left_columns = rf.related_field().m2m_columns(ctx);
         let right_columns = ModelProjection::from(rf.model().primary_identifier()).as_columns(ctx);
@@ -174,24 +176,27 @@ impl SelectBuilder {
             .unwrap();
 
         let m2m_join_data = Table::from(self.build_related_query_select(rs, m2m_table_alias, ctx))
-            .alias(join_alias_name(&rf))
+            .alias(m2m_join_alias.to_table_string())
             .on(ConditionTree::single(true.raw()))
             .lateral();
 
         let child_table = rf.as_table(ctx).alias(m2m_table_alias.to_table_string());
 
         let inner = Select::from_table(child_table)
-            .value(Column::from((join_alias_name(&rf), JSON_AGG_IDENT)))
+            .value(Column::from((m2m_join_alias.to_table_string(), JSON_AGG_IDENT)))
             .left_join(m2m_join_data) // join m2m table
             .and_where(join_conditions) // adds join condition to the child table
-            .with_ordering(&rs.args, Some(join_alias_name(&rs.field)), ctx) // adds ordering stmts
-            .with_filters(rs.args.filter.clone(), None, ctx) // adds query filters // TODO: avoid clone filter
-            .with_pagination(rs.args.take_abs(), rs.args.skip); // adds pagination
+            .with_ordering(&rs.args, Some(m2m_join_alias.to_table_string()), ctx) // adds ordering stmts
+            .with_filters(rs.args.filter.clone(), Some(m2m_join_alias), ctx) // adds query filters // TODO: avoid clone filter
+            .with_pagination(rs.args.take_abs(), rs.args.skip)
+            .comment("inner"); // adds pagination
 
-        let outer = Select::from_table(Table::from(inner).alias(format!("{}_1", m2m_alias))).value(json_agg());
+        let outer = Select::from_table(Table::from(inner).alias(outer_alias.to_table_string()))
+            .value(json_agg())
+            .comment("outer");
 
         Table::from(outer)
-            .alias(m2m_alias)
+            .alias(m2m_join_alias_name(&rf))
             .on(ConditionTree::single(true.raw()))
             .lateral()
     }
