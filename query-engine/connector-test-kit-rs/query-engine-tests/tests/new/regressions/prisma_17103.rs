@@ -21,7 +21,7 @@ mod prisma_17103 {
         schema.to_owned()
     }
 
-    #[connector_test(exclude(Vitess("planetscale.js")))]
+    #[connector_test(exclude(Vitess("planetscale.js", "planetscale.js.wasm")))]
     async fn regression(runner: Runner) -> TestResult<()> {
         run_query!(
             &runner,

@@ -1,6 +1,6 @@
 use psl::diagnostics::Diagnostics;
-// use query_connector::error::ConnectorError;
-// use query_core::CoreError;
+use query_connector::error::ConnectorError;
+use query_core::CoreError;
 use thiserror::Error;
 
 #[derive(Debug, Error)]
@@ -11,11 +11,12 @@ pub enum ApiError {
     #[error("{}", _0)]
     Configuration(String),
 
-    // #[error("{}", _0)]
-    // Core(CoreError),
+    #[error("{}", _0)]
+    Core(CoreError),
 
-    // #[error("{}", _0)]
-    // Connector(ConnectorError),
+    #[error("{}", _0)]
+    Connector(ConnectorError),
+
     #[error("Can't modify an already connected engine.")]
     AlreadyConnected,
 
@@ -31,10 +32,10 @@ impl From<ApiError> for user_facing_errors::Error {
         use std::fmt::Write as _;
 
         match err {
-            // ApiError::Connector(ConnectorError {
-            //     user_facing_error: Some(err),
-            //     ..
-            // }) => err.into(),
+            ApiError::Connector(ConnectorError {
+                user_facing_error: Some(err),
+                ..
+            }) => err.into(),
             ApiError::Conversion(errors, dml_string) => {
                 let mut full_error = errors.to_pretty_string("schema.prisma", &dml_string);
                 write!(full_error, "\nValidation Error Count: {}", errors.errors().len()).unwrap();
@@ -43,7 +44,7 @@ impl From<ApiError> for user_facing_errors::Error {
                     user_facing_errors::common::SchemaParserError { full_error },
                 ))
             }
-            // ApiError::Core(error) => user_facing_errors::Error::from(error),
+            ApiError::Core(error) => user_facing_errors::Error::from(error),
             other => user_facing_errors::Error::new_non_panic_with_current_backtrace(other.to_string()),
         }
     }
@@ -59,20 +60,20 @@ impl ApiError {
     }
 }
 
-// impl From<CoreError> for ApiError {
-//     fn from(e: CoreError) -> Self {
-//         match e {
-//             CoreError::ConfigurationError(message) => Self::Configuration(message),
-//             core_error => Self::Core(core_error),
-//         }
-//     }
-// }
+impl From<CoreError> for ApiError {
+    fn from(e: CoreError) -> Self {
+        match e {
+            CoreError::ConfigurationError(message) => Self::Configuration(message),
+            core_error => Self::Core(core_error),
+        }
+    }
+}
 
-// impl From<ConnectorError> for ApiError {
-//     fn from(e: ConnectorError) -> Self {
-//         Self::Connector(e)
-//     }
-// }
+impl From<ConnectorError> for ApiError {
+    fn from(e: ConnectorError) -> Self {
+        Self::Connector(e)
+    }
+}
 
 impl From<url::ParseError> for ApiError {
     fn from(e: url::ParseError) -> Self {

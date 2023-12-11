@@ -79,7 +79,7 @@ mod order_by_dependent_pag {
 
     // "[Hops: 1] Ordering by related record field ascending with nulls" should "work"
     // TODO(julius): should enable for SQL Server when partial indices are in the PSL
-    #[connector_test(exclude(SqlServer, Vitess("planetscale.js")))]
+    #[connector_test(exclude(SqlServer, Vitess("planetscale.js", "planetscale.js.wasm")))]
     async fn hop_1_related_record_asc_nulls(runner: Runner) -> TestResult<()> {
         // 1 record has the "full chain", one half, one none
         create_row(&runner, 1, Some(1), Some(1), None).await?;
@@ -146,7 +146,7 @@ mod order_by_dependent_pag {
 
     // "[Hops: 2] Ordering by related record field ascending with nulls" should "work"
     // TODO(garren): should enable for SQL Server when partial indices are in the PSL
-    #[connector_test(exclude(SqlServer, Vitess("planetscale.js")))]
+    #[connector_test(exclude(SqlServer, Vitess("planetscale.js", "planetscale.js.wasm")))]
     async fn hop_2_related_record_asc_null(runner: Runner) -> TestResult<()> {
         // 1 record has the "full chain", one half, one none
         create_row(&runner, 1, Some(1), Some(1), None).await?;
@@ -227,7 +227,7 @@ mod order_by_dependent_pag {
 
     // "[Circular with differing records] Ordering by related record field ascending" should "work"
     // TODO(julius): should enable for SQL Server when partial indices are in the PSL
-    #[connector_test(exclude(SqlServer, Vitess("planetscale.js")))]
+    #[connector_test(exclude(SqlServer, Vitess("planetscale.js", "planetscale.js.wasm")))]
     async fn circular_diff_related_record_asc(runner: Runner) -> TestResult<()> {
         // Records form circles with their relations
         create_row(&runner, 1, Some(1), Some(1), Some(3)).await?;

@@ -34,7 +34,11 @@ mod scalar_relations {
     // TODO: fix https://github.com/prisma/team-orm/issues/684, https://github.com/prisma/team-orm/issues/685  and unexclude DAs
     #[connector_test(
         schema(schema_common),
-        exclude(Postgres("pg.js", "neon.js"), Vitess("planetscale.js"))
+        exclude(
+            Postgres("pg.js", "neon.js", "pg.js.wasm", "neon.js.wasm"),
+            Vitess("planetscale.js", "planetscale.js.wasm"),
+            Sqlite("libsql.js.wasm")
+        )
     )]
     async fn common_types(runner: Runner) -> TestResult<()> {
         create_common_children(&runner).await?;
@@ -224,6 +228,8 @@ mod scalar_relations {
             bytes   Bytes[]
             bool    Boolean[]
             dt      DateTime[]
+            empty   Int[]
+            unset   Int[]
           }
           "#
         };
@@ -236,7 +242,7 @@ mod scalar_relations {
     #[connector_test(
         schema(schema_scalar_lists),
         capabilities(ScalarLists),
-        exclude(Postgres("pg.js", "neon.js"))
+        exclude(Postgres("pg.js", "neon.js", "pg.js.wasm", "neon.js.wasm"))
     )]
     async fn scalar_lists(runner: Runner) -> TestResult<()> {
         create_child(
@@ -250,19 +256,20 @@ mod scalar_relations {
               bytes: ["AQID", "Qk9OSk9VUg=="],
               bool: [false, true],
               dt: ["1900-10-10T01:10:10.001Z", "1999-12-12T21:12:12.121Z"],
+              empty: []
           }"#,
         )
         .await?;
         create_parent(&runner, r#"{ id: 1, children: { connect: [{ childId: 1 }] } }"#).await?;
 
         insta::assert_snapshot!(
-          run_query!(&runner, r#"{ findManyParent { id children { childId string int bInt float bytes bool dt } } }"#),
-          @r###"{"data":{"findManyParent":[{"id":1,"children":[{"childId":1,"string":["abc","def"],"int":[1,-1,1234567],"bInt":["1","-1","9223372036854775807","-9223372036854775807"],"float":[1.5,-1.5,1.234567],"bytes":["AQID","Qk9OSk9VUg=="],"bool":[false,true],"dt":["1900-10-10T01:10:10.001Z","1999-12-12T21:12:12.121Z"]}]}]}}"###
+          run_query!(&runner, r#"{ findManyParent { id children { childId string int bInt float bytes bool dt empty unset } } }"#),
+          @r###"{"data":{"findManyParent":[{"id":1,"children":[{"childId":1,"string":["abc","def"],"int":[1,-1,1234567],"bInt":["1","-1","9223372036854775807","-9223372036854775807"],"float":[1.5,-1.5,1.234567],"bytes":["AQID","Qk9OSk9VUg=="],"bool":[false,true],"dt":["1900-10-10T01:10:10.001Z","1999-12-12T21:12:12.121Z"],"empty":[],"unset":[]}]}]}}"###
         );
 
         insta::assert_snapshot!(
-          run_query!(&runner, r#"{ findUniqueParent(where: { id: 1 }) { id children { childId string int bInt float bytes bool dt } } }"#),
-          @r###"{"data":{"findUniqueParent":{"id":1,"children":[{"childId":1,"string":["abc","def"],"int":[1,-1,1234567],"bInt":["1","-1","9223372036854775807","-9223372036854775807"],"float":[1.5,-1.5,1.234567],"bytes":["AQID","Qk9OSk9VUg=="],"bool":[false,true],"dt":["1900-10-10T01:10:10.001Z","1999-12-12T21:12:12.121Z"]}]}}}"###
+          run_query!(&runner, r#"{ findUniqueParent(where: { id: 1 }) { id children { childId string int bInt float bytes bool dt empty unset } } }"#),
+          @r###"{"data":{"findUniqueParent":{"id":1,"children":[{"childId":1,"string":["abc","def"],"int":[1,-1,1234567],"bInt":["1","-1","9223372036854775807","-9223372036854775807"],"float":[1.5,-1.5,1.234567],"bytes":["AQID","Qk9OSk9VUg=="],"bool":[false,true],"dt":["1900-10-10T01:10:10.001Z","1999-12-12T21:12:12.121Z"],"empty":[],"unset":[]}]}}}"###
         );
 
         Ok(())

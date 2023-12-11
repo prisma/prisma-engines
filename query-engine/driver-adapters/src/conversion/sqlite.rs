@@ -25,8 +25,8 @@ pub fn value_to_js_arg(value: &quaint::Value) -> serde_json::Result<JSArg> {
 #[cfg(test)]
 mod test {
     use super::*;
-    use bigdecimal::BigDecimal;
-    use chrono::*;
+    use quaint::bigdecimal::BigDecimal;
+    use quaint::chrono::*;
     use quaint::ValueType;
     use serde_json::Value;
     use std::str::FromStr;
@@ -93,6 +93,10 @@ mod test {
                     JSArg::Value(Value::String("23:13:01".to_string())),
                     JSArg::Value(Value::Null),
                 ))
+            ),
+            (
+                ValueType::Bytes(Some("hello".as_bytes().into())),
+                JSArg::Buffer("hello".as_bytes().to_vec())
             ),
         ];
 

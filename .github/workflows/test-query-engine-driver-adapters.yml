@@ -25,27 +25,26 @@ jobs:
       fail-fast: false
       matrix:
         adapter:
-          - name: '@prisma/adapter-planetscale'
+          - name: 'planetscale (napi)'
             setup_task: 'dev-planetscale-js'
-          - name: '@prisma/adapter-pg (napi)'
+          - name: 'pg (napi)'
             setup_task: 'dev-pg-js'
-          - name: '@prisma/adapter-neon (ws) (napi)'
+          - name: 'neon (ws) (napi)'
             setup_task: 'dev-neon-js'
-          - name: '@prisma/adapter-libsql (Turso) (napi)'
+          - name: 'libsql (Turso) (napi)'
             setup_task: 'dev-libsql-js'
-          # TODO: uncomment when WASM engine is functional
-          # - name: '@prisma/adapter-planetscale'
-          #   setup_task: 'dev-planetscale-wasm'
-          #   needs_wasm_pack: true
-          # - name: '@prisma/adapter-pg (wasm)'
-          #   setup_task: 'dev-pg-wasm'
-          #   needs_wasm_pack: true
-          # - name: '@prisma/adapter-neon (ws) (wasm)'
-          #   setup_task: 'dev-neon-wasm'
-          #   needs_wasm_pack: true
-          # - name: '@prisma/adapter-libsql (Turso) (wasm)'
-          #   setup_task: 'dev-libsql-wasm'
-          #   needs_wasm_pack: true
+          - name: 'planetscale (wasm)'
+            setup_task: 'dev-planetscale-wasm'
+            needs_wasm_pack: true
+          - name: 'pg (wasm)'
+            setup_task: 'dev-pg-wasm'
+            needs_wasm_pack: true
+          - name: 'neon (ws) (wasm)'
+            setup_task: 'dev-neon-wasm'
+            needs_wasm_pack: true
+          - name: 'libsql (Turso) (wasm)'
+            setup_task: 'dev-libsql-wasm'
+            needs_wasm_pack: true
         node_version: ['18']
     env:
       LOG_LEVEL: 'info' # Set to "debug" to trace the query engine and node process running the driver adapter
