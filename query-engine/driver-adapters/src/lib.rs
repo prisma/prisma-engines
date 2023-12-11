@@ -76,10 +76,6 @@ mod arch {
         Ok(object.get(name.into())?.into())
     }
 
-    pub(crate) fn has_named_property(object: &super::wasm::JsObjectExtern, name: &str) -> JsResult<bool> {
-        js_sys::Reflect::has(object, &JsString::from_str(name).unwrap().into())
-    }
-
     pub(crate) fn to_rust_str(value: JsString) -> JsResult<String> {
         Ok(value.into())
     }
@@ -103,10 +99,6 @@ mod arch {
         T: ::napi::bindgen_prelude::FromNapiValue,
     {
         object.get_named_property(name)
-    }
-
-    pub(crate) fn has_named_property(object: &::napi::JsObject, name: &str) -> JsResult<bool> {
-        object.has_named_property(name)
     }
 
     pub(crate) fn to_rust_str(value: JsString) -> JsResult<String> {

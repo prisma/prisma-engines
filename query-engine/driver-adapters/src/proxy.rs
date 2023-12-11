@@ -1,6 +1,6 @@
 use crate::send_future::UnsafeFuture;
 pub use crate::types::{ColumnType, JSResultSet, Query, TransactionOptions};
-use crate::{from_js_value, get_named_property, has_named_property, to_rust_str, JsObject, JsResult, JsString};
+use crate::{from_js_value, get_named_property, to_rust_str, JsObject, JsResult, JsString};
 
 use crate::{AsyncJsFunction, JsTransaction};
 use futures::Future;
@@ -52,15 +52,7 @@ pub(crate) struct TransactionProxy {
 
 impl CommonProxy {
     pub fn new(object: &JsObject) -> JsResult<Self> {
-        // Background info:
-        // - the provider was previously called "flavour", so we provide a temporary fallback for third-party providers
-        //   to give them time to adapt
-        // - reading a named property that does not exist yields a panic, despite the `Result<_, _>` return type
-        let provider: JsString = if has_named_property(object, "provider")? {
-            get_named_property(object, "provider")?
-        } else {
-            get_named_property(object, "flavour")?
-        };
+        let provider: JsString = get_named_property(object, "provider")?;
 
         Ok(Self {
             query_raw: get_named_property(object, "queryRaw")?,
