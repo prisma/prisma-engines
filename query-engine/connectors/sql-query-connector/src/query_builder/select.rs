@@ -137,7 +137,7 @@ impl SelectBuilder {
                     .collect();
 
             // SELECT <foreign_keys>, <orderby columns>
-            inner.with_columns(ColumnIterator::from(selection))
+            inner.with_columns(selection)
         } else {
             // select ordering, filtering & join fields from child selections to order, filter & join them on the outer query
             let inner_selection: Vec<Column<'_>> = FieldSelection::union(vec![
@@ -150,9 +150,7 @@ impl SelectBuilder {
             .map(|c| c.table(root_alias.to_table_string()))
             .collect();
 
-            let inner = inner
-                .with_columns(ColumnIterator::from(inner_selection))
-                .comment("inner select");
+            let inner = inner.with_columns(inner_selection).comment("inner select");
 
             let middle = Select::from_table(Table::from(inner).alias(inner_alias.to_table_string()))
                 // SELECT <inner_alias>.<JSON_ADD_IDENT>
@@ -235,7 +233,7 @@ trait SelectBuilderExt<'a> {
         ctx: &Context<'_>,
     ) -> Select<'a>;
     fn with_selection(self, selected_fields: &FieldSelection, table_alias: Alias, ctx: &Context<'_>) -> Select<'a>;
-    fn with_columns(self, columns: impl Iterator<Item = Column<'static>>) -> Select<'a>;
+    fn with_columns(self, columns: impl IntoIterator<Item = Column<'static>>) -> Select<'a>;
 }
 
 impl<'a> SelectBuilderExt<'a> for Select<'a> {
@@ -334,7 +332,7 @@ impl<'a> SelectBuilderExt<'a> for Select<'a> {
             })
     }
 
-    fn with_columns(self, columns: impl Iterator<Item = Column<'static>>) -> Select<'a> {
+    fn with_columns(self, columns: impl IntoIterator<Item = Column<'static>>) -> Select<'a> {
         columns.into_iter().fold(self, |select, col| select.column(col))
     }
 }
