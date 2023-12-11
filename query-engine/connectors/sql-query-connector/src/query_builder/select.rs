@@ -4,7 +4,7 @@ use tracing::Span;
 use crate::{
     context::Context,
     filter::alias::{Alias, AliasMode},
-    model_extensions::{AsColumn, AsColumns, AsTable, ColumnIterator, RelationFieldExt},
+    model_extensions::{AsColumn, AsColumns, AsTable, RelationFieldExt},
     ordering::OrderByBuilder,
     sql_trace::SqlTraceComment,
 };
