@@ -101,8 +101,40 @@ impl SelectBuilder {
             .comment("root select");
 
         if ctx.supports_row_to_json_fn {
-            root = root.with_columns(rs.selections.iter().filter_map(|f| match f {
-                SelectedField::Scalar(sf) => Some(sf.as_column(ctx).table(inner_root_table_alias.to_table_string())),
+            // root = root.with_columns(rs.selections.iter().filter_map(|f| match f {
+            //     SelectedField::Scalar(sf) => {
+            //         Some(sf.as_column(ctx).table(inner_root_table_alias.to_table_string()))
+            //     }
+            //     SelectedField::Relation(rs) => {
+            //         let table_name = match rs.field.relation().is_many_to_many() {
+            //             true => m2m_join_alias_name(&rs.field),
+            //             false => join_alias_name(&rs.field),
+            //         };
+            //         Some(Column::from((table_name, JSON_AGG_IDENT)).alias(rs.field.name().to_owned()))
+            //     }
+            //     _ => None,
+            // }));
+
+            let scalars_selection = FieldSelection::new(
+                rs.selections
+                    .iter()
+                    .filter(|f| matches!(f, SelectedField::Scalar(_)))
+                    .cloned()
+                    .collect(),
+            );
+
+            // TODO: linking fields in m2m
+            let scalars_with_order_and_filter = FieldSelection::union(vec![
+                scalars_selection,
+                order_by_selection(rs),
+                filtering_selection(rs),
+                relation_selection(rs),
+            ])
+            .into_projection()
+            .as_columns(ctx)
+            .map(|c| c.table(inner_root_table_alias.to_table_string()));
+
+            let relations = rs.selections.iter().filter_map(|f| match f {
                 SelectedField::Relation(rs) => {
                     let table_name = match rs.field.relation().is_many_to_many() {
                         true => m2m_join_alias_name(&rs.field),
@@ -111,7 +143,9 @@ impl SelectBuilder {
                     Some(Column::from((table_name, JSON_AGG_IDENT)).alias(rs.field.name().to_owned()))
                 }
                 _ => None,
-            }));
+            });
+
+            root = root.with_columns(scalars_with_order_and_filter).with_columns(relations);
         }
 
         // LEFT JOIN LATERAL () AS <root_alias> ON TRUE
