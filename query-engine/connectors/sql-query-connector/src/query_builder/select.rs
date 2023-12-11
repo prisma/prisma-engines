@@ -332,6 +332,7 @@ impl<'a> SelectBuilderExt<'a> for Select<'a> {
             })
     }
 
+    // TODO: ask Flavian about ColumnIterator
     fn with_columns(self, columns: impl IntoIterator<Item = Column<'static>>) -> Select<'a> {
         columns.into_iter().fold(self, |select, col| select.column(col))
     }
