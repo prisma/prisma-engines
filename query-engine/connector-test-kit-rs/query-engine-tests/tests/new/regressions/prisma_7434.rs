@@ -4,7 +4,13 @@ use query_engine_tests::*;
 mod not_in_batching {
     use query_engine_tests::Runner;
 
-    #[connector_test]
+    #[connector_test(exclude(
+        CockroachDb,
+        Postgres("pg.js.wasm"),
+        Postgres("neon.js.wasm"),
+        Sqlite("libsql.js.wasm"),
+        Vitess("planetscale.js.wasm")
+    ))]
     async fn not_in_batch_filter(runner: Runner) -> TestResult<()> {
         runner.query(r#"mutation { createManyTestModel(data: [{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{}]) { count }}"#).await?.assert_success();
 

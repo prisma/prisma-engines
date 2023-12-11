@@ -25,24 +25,24 @@ jobs:
       fail-fast: false
       matrix:
         adapter:
-          - name: '@prisma/adapter-planetscale'
+          - name: 'planetscale (napi)'
             setup_task: 'dev-planetscale-js'
-          - name: '@prisma/adapter-pg (napi)'
+          - name: 'pg (napi)'
             setup_task: 'dev-pg-js'
-          - name: '@prisma/adapter-neon (ws) (napi)'
+          - name: 'neon (ws) (napi)'
             setup_task: 'dev-neon-js'
-          - name: '@prisma/adapter-libsql (Turso) (napi)'
+          - name: 'libsql (Turso) (napi)'
             setup_task: 'dev-libsql-js'
-          - name: '@prisma/adapter-planetscale'
+          - name: 'planetscale (wasm)'
             setup_task: 'dev-planetscale-wasm'
             needs_wasm_pack: true
-          - name: '@prisma/adapter-pg (wasm)'
+          - name: 'pg (wasm)'
             setup_task: 'dev-pg-wasm'
             needs_wasm_pack: true
-          - name: '@prisma/adapter-neon (ws) (wasm)'
+          - name: 'neon (ws) (wasm)'
             setup_task: 'dev-neon-wasm'
             needs_wasm_pack: true
-          - name: '@prisma/adapter-libsql (Turso) (wasm)'
+          - name: 'libsql (Turso) (wasm)'
             setup_task: 'dev-libsql-wasm'
             needs_wasm_pack: true
         node_version: ['18']

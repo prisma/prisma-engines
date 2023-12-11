@@ -96,7 +96,13 @@ pub(crate) fn coerce_json_scalar_to_pv(value: serde_json::Value, sf: &ScalarFiel
     }
 
     match value {
-        serde_json::Value::Null => Ok(PrismaValue::Null),
+        serde_json::Value::Null => {
+            if sf.is_list() {
+                Ok(PrismaValue::List(vec![]))
+            } else {
+                Ok(PrismaValue::Null)
+            }
+        }
         serde_json::Value::Bool(b) => Ok(PrismaValue::Boolean(b)),
         serde_json::Value::Number(n) => match sf.type_identifier() {
             TypeIdentifier::Int => Ok(PrismaValue::Int(n.as_i64().ok_or_else(|| {
