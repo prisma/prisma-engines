@@ -61,15 +61,6 @@ struct ConnectedEngine {
     engine_protocol: EngineProtocol,
 }
 
-/// Returned from the `serverInfo` method in javascript.
-#[derive(Debug, Serialize)]
-#[serde(rename_all = "camelCase")]
-struct ServerInfo {
-    commit: String,
-    version: String,
-    primary_connector: Option<String>,
-}
-
 impl ConnectedEngine {
     /// The schema AST for Query Engine core.
     pub fn query_schema(&self) -> &Arc<QuerySchema> {
