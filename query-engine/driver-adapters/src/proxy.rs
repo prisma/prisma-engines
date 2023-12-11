@@ -2,7 +2,7 @@ use crate::send_future::UnsafeFuture;
 use crate::types::JsConnectionInfo;
 pub use crate::types::{ColumnType, JSResultSet, Query, TransactionOptions};
 use crate::{
-    from_js_value, get_named_property, get_optional_named_property, has_named_property, to_rust_str, AsyncJsFunction,
+    from_js_value, get_named_property, get_optional_named_property, has_named_property, to_rust_str, AdapterMethod,
     JsObject, JsResult, JsString, JsTransaction,
 };
 
@@ -19,11 +19,11 @@ use wasm_bindgen::prelude::wasm_bindgen;
 #[cfg_attr(target_arch = "wasm32", wasm_bindgen(getter_with_clone))]
 pub(crate) struct CommonProxy {
     /// Execute a query given as SQL, interpolating the given parameters.
-    query_raw: AsyncJsFunction<Query, JSResultSet>,
+    query_raw: AdapterMethod<Query, JSResultSet>,
 
     /// Execute a query given as SQL, interpolating the given parameters and
     /// returning the number of affected rows.
-    execute_raw: AsyncJsFunction<Query, u32>,
+    execute_raw: AdapterMethod<Query, u32>,
 
     /// Return the provider for this driver.
     pub(crate) provider: String,
@@ -33,8 +33,8 @@ pub(crate) struct CommonProxy {
 /// JS driver objects
 #[cfg_attr(target_arch = "wasm32", wasm_bindgen(getter_with_clone))]
 pub(crate) struct DriverProxy {
-    start_transaction: AsyncJsFunction<(), JsTransaction>,
-    get_connection_info: Option<AsyncJsFunction<(), JsConnectionInfo>>,
+    start_transaction: AdapterMethod<(), JsTransaction>,
+    get_connection_info: Option<AdapterMethod<(), JsConnectionInfo>>,
 }
 
 /// This a JS proxy for accessing the methods, specific
@@ -45,10 +45,10 @@ pub(crate) struct TransactionProxy {
     options: TransactionOptions,
 
     /// commit transaction
-    commit: AsyncJsFunction<(), ()>,
+    commit: AdapterMethod<(), ()>,
 
     /// rollback transaction
-    rollback: AsyncJsFunction<(), ()>,
+    rollback: AdapterMethod<(), ()>,
 
     /// whether the transaction has already been committed or rolled back
     closed: AtomicBool,
@@ -74,11 +74,11 @@ impl CommonProxy {
     }
 
     pub async fn query_raw(&self, params: Query) -> quaint::Result<JSResultSet> {
-        self.query_raw.call(params).await
+        self.query_raw.call_as_async(params).await
     }
 
     pub async fn execute_raw(&self, params: Query) -> quaint::Result<u32> {
-        self.execute_raw.call(params).await
+        self.execute_raw.call_as_async(params).await
     }
 }
 
@@ -93,7 +93,7 @@ impl DriverProxy {
     pub async fn get_connection_info(&self) -> quaint::Result<JsConnectionInfo> {
         UnsafeFuture(async move {
             if let Some(fn_) = &self.get_connection_info {
-                fn_.call(()).await
+                fn_.call_as_sync(()).await
             } else {
                 Ok(JsConnectionInfo::default())
             }
@@ -102,7 +102,7 @@ impl DriverProxy {
     }
 
     async fn start_transaction_inner(&self) -> quaint::Result<Box<JsTransaction>> {
-        let tx = self.start_transaction.call(()).await?;
+        let tx = self.start_transaction.call_as_async(()).await?;
 
         // Decrement for this gauge is done in JsTransaction::commit/JsTransaction::rollback
         // Previously, it was done in JsTransaction::new, similar to the native Transaction.
@@ -153,7 +153,7 @@ impl TransactionProxy {
     ///   waiting on the JavaScript call to complete and deliver response.
     pub fn commit(&self) -> UnsafeFuture<impl Future<Output = quaint::Result<()>> + '_> {
         self.closed.store(true, Ordering::Relaxed);
-        UnsafeFuture(self.commit.call(()))
+        UnsafeFuture(self.commit.call_as_async(()))
     }
 
     /// Rolls back the transaction via the driver adapter.
@@ -173,7 +173,7 @@ impl TransactionProxy {
     ///   on the JavaScript call to complete and deliver response.
     pub fn rollback(&self) -> UnsafeFuture<impl Future<Output = quaint::Result<()>> + '_> {
         self.closed.store(true, Ordering::Relaxed);
-        UnsafeFuture(self.rollback.call(()))
+        UnsafeFuture(self.rollback.call_as_async(()))
     }
 }
 
