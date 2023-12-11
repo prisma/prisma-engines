@@ -114,6 +114,9 @@ impl SelectBuilder {
             }));
         }
 
+        // LEFT JOIN LATERAL () AS <root_alias> ON TRUE
+        let root = self.with_related_queries(root, rs.relations(), inner_root_table_alias, ctx);
+
         let root_as_json = match ctx.supports_row_to_json_fn {
             true => row_to_json(root_alias.to_table_string(), false),
             false => build_json_obj_fn(rs, ctx, root_alias),
@@ -122,9 +125,6 @@ impl SelectBuilder {
         // SELECT ROW_TO_JSON()/JSON_BUILD_OBJECT() FROM ( <root> )
         let inner = Select::from_table(Table::from(root).alias(root_alias.to_table_string()))
             .value(root_as_json.alias(JSON_AGG_IDENT));
-
-        // LEFT JOIN LATERAL () AS <inner_alias> ON TRUE
-        let inner = self.with_related_queries(inner, rs.relations(), root_alias, ctx);
 
         let linking_fields = rs.field.related_field().linking_fields();
 
