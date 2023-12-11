@@ -1,6 +1,99 @@
-use std::collections::HashMap;
-
 use crate::error::ApiError;
+use query_core::{protocol::EngineProtocol, schema::QuerySchema, QueryExecutor};
+use serde::Deserialize;
+use std::{
+    collections::{BTreeMap, HashMap},
+    path::PathBuf,
+    sync::Arc,
+};
+
+#[cfg(target_arch = "wasm32")]
+use tsify::Tsify;
+
+/// The state of the engine.
+pub enum Inner {
+    /// Not connected, holding all data to form a connection.
+    Builder(EngineBuilder),
+    /// A connected engine, holding all data to disconnect and form a new
+    /// connection. Allows querying when on this state.
+    Connected(ConnectedEngine),
+}
+
+impl Inner {
+    /// Returns a builder if the engine is not connected
+    pub fn as_builder(&self) -> crate::Result<&EngineBuilder> {
+        match self {
+            Inner::Builder(ref builder) => Ok(builder),
+            Inner::Connected(_) => Err(ApiError::AlreadyConnected),
+        }
+    }
+
+    /// Returns the engine if connected
+    pub fn as_engine(&self) -> crate::Result<&ConnectedEngine> {
+        match self {
+            Inner::Builder(_) => Err(ApiError::NotConnected),
+            Inner::Connected(ref engine) => Ok(engine),
+        }
+    }
+}
+
+/// Everything needed to connect to the database and have the core running.
+pub struct EngineBuilder {
+    pub schema: Arc<psl::ValidatedSchema>,
+    pub config_dir: PathBuf,
+    pub env: HashMap<String, String>,
+    pub engine_protocol: EngineProtocol,
+}
+
+/// Internal structure for querying and reconnecting with the engine.
+pub struct ConnectedEngine {
+    pub schema: Arc<psl::ValidatedSchema>,
+    pub query_schema: Arc<QuerySchema>,
+    pub executor: crate::Executor,
+    pub config_dir: PathBuf,
+    pub env: HashMap<String, String>,
+    pub engine_protocol: EngineProtocol,
+
+    #[cfg(not(target_arch = "wasm32"))]
+    pub metrics: Option<query_engine_metrics::MetricRegistry>,
+}
+
+impl ConnectedEngine {
+    /// The schema AST for Query Engine core.
+    pub fn query_schema(&self) -> &Arc<QuerySchema> {
+        &self.query_schema
+    }
+
+    /// The query executor.
+    pub fn executor(&self) -> &(dyn QueryExecutor + Send + Sync) {
+        self.executor.as_ref()
+    }
+
+    pub fn engine_protocol(&self) -> EngineProtocol {
+        self.engine_protocol
+    }
+}
+
+/// Parameters defining the construction of an engine.
+#[derive(Debug, Deserialize)]
+#[cfg_attr(target_arch = "wasm32", derive(Tsify))]
+#[cfg_attr(target_arch = "wasm32", tsify(from_wasm_abi))]
+#[serde(rename_all = "camelCase")]
+pub struct ConstructorOptions {
+    pub datamodel: String,
+    pub log_level: String,
+    #[serde(default)]
+    pub log_queries: bool,
+    #[serde(default)]
+    pub datasource_overrides: BTreeMap<String, String>,
+    #[serde(default)]
+    pub env: serde_json::Value,
+    pub config_dir: PathBuf,
+    #[serde(default)]
+    pub ignore_env_var_errors: bool,
+    #[serde(default)]
+    pub engine_protocol: Option<EngineProtocol>,
+}
 
 pub fn map_known_error(err: query_core::CoreError) -> crate::Result<String> {
     let user_error: user_facing_errors::Error = err.into();

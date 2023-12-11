@@ -3737,14 +3737,18 @@ dependencies = [
  "psl",
  "query-connector",
  "query-core",
+ "query-engine-metrics",
+ "serde",
  "serde_json",
  "thiserror",
  "tracing",
  "tracing-futures",
  "tracing-opentelemetry",
  "tracing-subscriber",
+ "tsify",
  "url",
  "user-facing-errors",
+ "wasm-bindgen",
 ]
 
 [[package]]

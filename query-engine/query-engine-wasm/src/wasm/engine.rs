@@ -9,59 +9,21 @@ use driver_adapters::JsObject;
 use js_sys::Function as JsFunction;
 use query_core::{
     protocol::EngineProtocol,
-    schema::{self, QuerySchema},
-    telemetry, QueryExecutor, TransactionOptions, TxId,
+    schema::{self},
+    telemetry, TransactionOptions, TxId,
 };
-use query_engine_common::engine::{map_known_error, stringify_env_values};
+use query_engine_common::engine::{
+    map_known_error, stringify_env_values, ConnectedEngine, ConstructorOptions, EngineBuilder, Inner,
+};
 use request_handlers::ConnectorMode;
 use request_handlers::{load_executor, RequestBody, RequestHandler};
-use serde::{Deserialize, Serialize};
+use serde::Serialize;
 use serde_json::json;
-use std::{
-    collections::{BTreeMap, HashMap},
-    path::PathBuf,
-    sync::Arc,
-};
+use std::sync::Arc;
 use tokio::sync::RwLock;
 use tracing::{field, instrument::WithSubscriber, Instrument, Span};
 use tracing_subscriber::filter::LevelFilter;
-use tsify::Tsify;
 use wasm_bindgen::prelude::wasm_bindgen;
-
-/// The main query engine used by JS
-#[wasm_bindgen]
-pub struct QueryEngine {
-    connector_mode: ConnectorMode,
-    inner: RwLock<Inner>,
-    logger: Logger,
-}
-
-/// The state of the engine.
-enum Inner {
-    /// Not connected, holding all data to form a connection.
-    Builder(EngineBuilder),
-    /// A connected engine, holding all data to disconnect and form a new
-    /// connection. Allows querying when on this state.
-    Connected(ConnectedEngine),
-}
-
-/// Everything needed to connect to the database and have the core running.
-struct EngineBuilder {
-    schema: Arc<psl::ValidatedSchema>,
-    config_dir: PathBuf,
-    env: HashMap<String, String>,
-    engine_protocol: EngineProtocol,
-}
-
-/// Internal structure for querying and reconnecting with the engine.
-struct ConnectedEngine {
-    schema: Arc<psl::ValidatedSchema>,
-    query_schema: Arc<QuerySchema>,
-    executor: crate::Executor,
-    config_dir: PathBuf,
-    env: HashMap<String, String>,
-    engine_protocol: EngineProtocol,
-}
 
 /// Returned from the `serverInfo` method in javascript.
 #[derive(Debug, Serialize)]
@@ -72,58 +34,11 @@ struct ServerInfo {
     primary_connector: Option<String>,
 }
 
-impl ConnectedEngine {
-    /// The schema AST for Query Engine core.
-    pub fn query_schema(&self) -> &Arc<QuerySchema> {
-        &self.query_schema
-    }
-
-    /// The query executor.
-    pub fn executor(&self) -> &(dyn QueryExecutor + Send + Sync) {
-        self.executor.as_ref()
-    }
-
-    pub fn engine_protocol(&self) -> EngineProtocol {
-        self.engine_protocol
-    }
-}
-
-/// Parameters defining the construction of an engine.
-#[derive(Debug, Deserialize, Tsify)]
-#[tsify(from_wasm_abi)]
-#[serde(rename_all = "camelCase")]
-pub struct ConstructorOptions {
-    datamodel: String,
-    log_level: String,
-    #[serde(default)]
-    log_queries: bool,
-    #[serde(default)]
-    datasource_overrides: BTreeMap<String, String>,
-    #[serde(default)]
-    env: serde_json::Value,
-    config_dir: PathBuf,
-    #[serde(default)]
-    ignore_env_var_errors: bool,
-    #[serde(default)]
-    engine_protocol: Option<EngineProtocol>,
-}
-
-impl Inner {
-    /// Returns a builder if the engine is not connected
-    fn as_builder(&self) -> crate::Result<&EngineBuilder> {
-        match self {
-            Inner::Builder(ref builder) => Ok(builder),
-            Inner::Connected(_) => Err(ApiError::AlreadyConnected),
-        }
-    }
-
-    /// Returns the engine if connected
-    fn as_engine(&self) -> crate::Result<&ConnectedEngine> {
-        match self {
-            Inner::Builder(_) => Err(ApiError::NotConnected),
-            Inner::Connected(ref engine) => Ok(engine),
-        }
-    }
+#[wasm_bindgen]
+pub struct QueryEngine {
+    inner: RwLock<Inner>,
+    logger: Logger,
+    connector_mode: ConnectorMode,
 }
 
 #[wasm_bindgen]
