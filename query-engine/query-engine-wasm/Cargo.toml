@@ -49,12 +49,7 @@ opentelemetry = { version = "0.17"}
 
 [package.metadata.wasm-pack.profile.release]
 wasm-opt = [
-    "-Os",                                # focus on code size
     "--vacuum",                           # removes obviously unneeded code
     "--duplicate-function-elimination",   # removes duplicate functions 
     "--duplicate-import-elimination",     # removes duplicate imports
-    "--optimize-for-js",                  # early optimize of the instruction combinations for js
-    "--gsi",                              # globally optimize struct values
-    "--directize",                        # turns indirect calls into direct ones
-    "--cfp",                              # propagate constant struct field values
 ]
