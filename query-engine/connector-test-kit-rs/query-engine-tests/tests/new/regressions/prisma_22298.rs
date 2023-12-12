@@ -78,7 +78,7 @@ mod many_fields_in_related_table {
     }
 
     #[connector_test]
-    async fn query_51_fields_through_relation(runner: Runner) -> TestResult<()> {
+    async fn query_52_fields_through_relation(runner: Runner) -> TestResult<()> {
         insta::assert_snapshot!(
             run_query!(runner, r#"
                 mutation {
