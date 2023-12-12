@@ -53,6 +53,29 @@
 <a href="#53" id="53">53</a>
 <a href="#54" id="54">54</a>
 <a href="#55" id="55">55</a>
+<a href="#56" id="56">56</a>
+<a href="#57" id="57">57</a>
+<a href="#58" id="58">58</a>
+<a href="#59" id="59">59</a>
+<a href="#60" id="60">60</a>
+<a href="#61" id="61">61</a>
+<a href="#62" id="62">62</a>
+<a href="#63" id="63">63</a>
+<a href="#64" id="64">64</a>
+<a href="#65" id="65">65</a>
+<a href="#66" id="66">66</a>
+<a href="#67" id="67">67</a>
+<a href="#68" id="68">68</a>
+<a href="#69" id="69">69</a>
+<a href="#70" id="70">70</a>
+<a href="#71" id="71">71</a>
+<a href="#72" id="72">72</a>
+<a href="#73" id="73">73</a>
+<a href="#74" id="74">74</a>
+<a href="#75" id="75">75</a>
+<a href="#76" id="76">76</a>
+<a href="#77" id="77">77</a>
+<a href="#78" id="78">78</a>
 </pre></div><pre class="rust"><code><span class="kw">mod </span>context;
 <span class="kw">mod </span>validations;
 
@@ -64,6 +87,25 @@
 };
 <span class="kw">use </span>enumflags2::BitFlags;
 <span class="kw">use </span>parser_database::ParserDatabase;
+
+<span class="kw">pub struct </span>ParseOutput {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) db: ParserDatabase,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) relation_mode: RelationMode,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) connector: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span><span class="kw">dyn </span>Connector,
+}
+
+<span class="doccomment">/// Parse a Prisma schema, but skip validations.
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>parse_without_validation(db: ParserDatabase, sources: <span class="kw-2">&amp;</span>[configuration::Datasource]) -&gt; ParseOutput {
+    <span class="kw">let </span>source = sources.first();
+    <span class="kw">let </span>connector = source.map(|s| s.active_connector).unwrap_or(<span class="kw-2">&amp;</span>EmptyDatamodelConnector);
+    <span class="kw">let </span>relation_mode = source.map(|s| s.relation_mode()).unwrap_or_default();
+
+    ParseOutput {
+        db,
+        relation_mode,
+        connector,
+    }
+}
 
 <span class="kw">pub struct </span>ValidateOutput {
     <span class="kw">pub</span>(<span class="kw">crate</span>) db: ParserDatabase,
@@ -79,21 +121,25 @@
     preview_features: BitFlags&lt;PreviewFeature&gt;,
     diagnostics: Diagnostics,
 ) -&gt; ValidateOutput {
-    <span class="kw">let </span>source = sources.first();
-    <span class="kw">let </span>connector = source.map(|s| s.active_connector).unwrap_or(<span class="kw-2">&amp;</span>EmptyDatamodelConnector);
-    <span class="kw">let </span>relation_mode = source.map(|s| s.relation_mode()).unwrap_or_default();
+    <span class="kw">let </span>ParseOutput {
+        connector,
+        relation_mode,
+        db,
+    } = parse_without_validation(db, sources);
 
     <span class="kw">let </span><span class="kw-2">mut </span>output = ValidateOutput {
+        connector,
+        relation_mode,
         db,
         diagnostics,
-        relation_mode,
-        connector,
     };
 
     <span class="comment">// Early return so that the validator does not have to deal with invalid schemas
     </span><span class="kw">if </span>!output.diagnostics.errors().is_empty() {
         <span class="kw">return </span>output;
     }
+
+    <span class="kw">let </span>source = sources.first();
 
     <span class="kw">let </span><span class="kw-2">mut </span>context = context::Context {
         db: <span class="kw-2">&amp;</span>output.db,

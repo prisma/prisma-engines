@@ -484,7 +484,6 @@
 <a href="#484" id="484">484</a>
 <a href="#485" id="485">485</a>
 <a href="#486" id="486">486</a>
-<a href="#487" id="487">487</a>
 </pre></div><pre class="rust"><code><span class="kw">mod </span>json_adapter;
 
 <span class="kw">pub use </span>json_adapter::<span class="kw-2">*</span>;
@@ -502,7 +501,7 @@
 };
 <span class="kw">use </span>query_engine_metrics::MetricRegistry;
 <span class="kw">use </span>request_handlers::{
-    BatchTransactionOption, ConnectorMode, GraphqlBody, JsonBatchQuery, JsonBody, JsonSingleQuery, MultiQuery,
+    BatchTransactionOption, ConnectorKind, GraphqlBody, JsonBatchQuery, JsonBody, JsonSingleQuery, MultiQuery,
     RequestBody, RequestHandler,
 };
 <span class="kw">use </span>serde_json::json;
@@ -613,10 +612,9 @@
             <span class="prelude-val">Some</span>(<span class="kw">_</span>) =&gt; RunnerExecutor::new_external(<span class="kw-2">&amp;</span>url, <span class="kw-2">&amp;</span>datamodel).<span class="kw">await</span><span class="question-mark">?</span>,
             <span class="prelude-val">None </span>=&gt; RunnerExecutor::Builtin(
                 request_handlers::load_executor(
-                    ConnectorMode::Rust,
+                    ConnectorKind::Rust { url: url.to_owned() },
                     data_source,
                     schema.configuration.preview_features(),
-                    <span class="kw-2">&amp;</span>url,
                 )
                 .<span class="kw">await</span><span class="question-mark">?</span>,
             ),

@@ -56,6 +56,8 @@
 <a href="#56" id="56">56</a>
 <a href="#57" id="57">57</a>
 <a href="#58" id="58">58</a>
+<a href="#59" id="59">59</a>
+<a href="#60" id="60">60</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! A set of abstractions for database connections.
 //!
 //! Provides traits for database querying and executing, and for spawning
@@ -69,6 +71,7 @@
 
 </span><span class="kw">mod </span>connection_info;
 
+<span class="kw">pub mod </span>external;
 <span class="kw">pub mod </span>metrics;
 <span class="kw">mod </span>queryable;
 <span class="kw">mod </span>result_set;
@@ -79,6 +82,7 @@
 
 <span class="kw">pub use </span><span class="self">self</span>::result_set::<span class="kw-2">*</span>;
 <span class="kw">pub use </span>connection_info::<span class="kw-2">*</span>;
+<span class="kw">pub use </span>external::<span class="kw-2">*</span>;
 <span class="kw">pub use </span>queryable::<span class="kw-2">*</span>;
 <span class="kw">pub use </span>transaction::<span class="kw-2">*</span>;
 <span class="attr">#[cfg(any(feature = <span class="string">&quot;mssql-native&quot;</span>, feature = <span class="string">&quot;postgresql-native&quot;</span>, feature = <span class="string">&quot;mysql-native&quot;</span>))]

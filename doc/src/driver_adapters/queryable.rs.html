@@ -318,6 +318,15 @@
 <a href="#318" id="318">318</a>
 <a href="#319" id="319">319</a>
 <a href="#320" id="320">320</a>
+<a href="#321" id="321">321</a>
+<a href="#322" id="322">322</a>
+<a href="#323" id="323">323</a>
+<a href="#324" id="324">324</a>
+<a href="#325" id="325">325</a>
+<a href="#326" id="326">326</a>
+<a href="#327" id="327">327</a>
+<a href="#328" id="328">328</a>
+<a href="#329" id="329">329</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::proxy::{CommonProxy, DriverProxy};
 <span class="kw">use </span><span class="kw">crate</span>::types::{AdapterFlavour, Query};
 <span class="kw">use </span><span class="kw">crate</span>::JsObject;
@@ -326,6 +335,7 @@
 <span class="kw">use </span><span class="kw">crate</span>::send_future::UnsafeFuture;
 <span class="kw">use </span>async_trait::async_trait;
 <span class="kw">use </span>futures::Future;
+<span class="kw">use </span>quaint::connector::{ExternalConnectionInfo, ExternalConnector};
 <span class="kw">use </span>quaint::{
     connector::{metrics, IsolationLevel, Transaction},
     error::{Error, ErrorKind},
@@ -541,6 +551,14 @@
 <span class="kw">impl </span>std::fmt::Debug <span class="kw">for </span>JsQueryable {
     <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>std::fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; std::fmt::Result {
         <span class="macro">write!</span>(f, <span class="string">&quot;JSQueryable(driver)&quot;</span>)
+    }
+}
+
+<span class="attr">#[async_trait]
+</span><span class="kw">impl </span>ExternalConnector <span class="kw">for </span>JsQueryable {
+    <span class="kw">async fn </span>get_connection_info(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; quaint::Result&lt;ExternalConnectionInfo&gt; {
+        <span class="kw">let </span>conn_info = <span class="self">self</span>.driver_proxy.get_connection_info().<span class="kw">await</span><span class="question-mark">?</span>;
+        <span class="prelude-val">Ok</span>(conn_info.into_external_connection_info(<span class="kw-2">&amp;</span><span class="self">self</span>.inner.provider))
     }
 }
 

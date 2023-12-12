@@ -142,6 +142,10 @@
 <a href="#142" id="142">142</a>
 <a href="#143" id="143">143</a>
 <a href="#144" id="144">144</a>
+<a href="#145" id="145">145</a>
+<a href="#146" id="146">146</a>
+<a href="#147" id="147">147</a>
+<a href="#148" id="148">148</a>
 </pre></div><pre class="rust"><code><span class="attr">#![allow(unused_imports)]
 
 </span><span class="kw">use </span>psl::{builtin_connectors::<span class="kw-2">*</span>, Datasource, PreviewFeatures};
@@ -151,26 +155,31 @@
 <span class="kw">use </span>std::env;
 <span class="kw">use </span>url::Url;
 
-<span class="kw">use </span><span class="kw">super</span>::ConnectorMode;
+<span class="kw">pub enum </span>ConnectorKind {
+    <span class="attr">#[cfg(feature = <span class="string">&quot;native&quot;</span>)]
+    </span>Rust {
+        url: String,
+    },
+    Js,
+}
 
 <span class="doccomment">/// Loads a query executor based on the parsed Prisma schema (datasource).
 </span><span class="kw">pub async fn </span>load(
-    connector_mode: ConnectorMode,
+    connector_kind: ConnectorKind,
     source: <span class="kw-2">&amp;</span>Datasource,
     features: PreviewFeatures,
-    url: <span class="kw-2">&amp;</span>str,
 ) -&gt; query_core::Result&lt;Box&lt;<span class="kw">dyn </span>QueryExecutor + Send + Sync + <span class="lifetime">&#39;static</span>&gt;&gt; {
-    <span class="kw">match </span>connector_mode {
-        ConnectorMode::Js =&gt; {
+    <span class="kw">match </span>connector_kind {
+        ConnectorKind::Js { .. } =&gt; {
             <span class="attr">#[cfg(not(feature = <span class="string">&quot;driver-adapters&quot;</span>))]
             </span><span class="macro">panic!</span>(<span class="string">&quot;Driver adapters are not enabled, but connector mode is set to JS&quot;</span>);
 
             <span class="attr">#[cfg(feature = <span class="string">&quot;driver-adapters&quot;</span>)]
-            </span>driver_adapter(source, url, features).<span class="kw">await
+            </span>driver_adapter(source, features).<span class="kw">await
         </span>}
 
         <span class="attr">#[cfg(feature = <span class="string">&quot;native&quot;</span>)]
-        </span>ConnectorMode::Rust =&gt; {
+        </span>ConnectorKind::Rust { url } =&gt; {
             <span class="kw">if let </span><span class="prelude-val">Ok</span>(value) = env::var(<span class="string">&quot;PRISMA_DISABLE_QUAINT_EXECUTORS&quot;</span>) {
                 <span class="kw">let </span>disable = value.to_uppercase();
                 <span class="kw">if </span>disable == <span class="string">&quot;TRUE&quot; </span>|| disable == <span class="string">&quot;1&quot; </span>{
@@ -179,14 +188,14 @@
             }
 
             <span class="kw">match </span>source.active_provider {
-                p <span class="kw">if </span>SQLITE.is_provider(p) =&gt; native::sqlite(source, url, features).<span class="kw">await</span>,
-                p <span class="kw">if </span>MYSQL.is_provider(p) =&gt; native::mysql(source, url, features).<span class="kw">await</span>,
-                p <span class="kw">if </span>POSTGRES.is_provider(p) =&gt; native::postgres(source, url, features).<span class="kw">await</span>,
-                p <span class="kw">if </span>MSSQL.is_provider(p) =&gt; native::mssql(source, url, features).<span class="kw">await</span>,
-                p <span class="kw">if </span>COCKROACH.is_provider(p) =&gt; native::postgres(source, url, features).<span class="kw">await</span>,
+                p <span class="kw">if </span>SQLITE.is_provider(p) =&gt; native::sqlite(source, <span class="kw-2">&amp;</span>url, features).<span class="kw">await</span>,
+                p <span class="kw">if </span>MYSQL.is_provider(p) =&gt; native::mysql(source, <span class="kw-2">&amp;</span>url, features).<span class="kw">await</span>,
+                p <span class="kw">if </span>POSTGRES.is_provider(p) =&gt; native::postgres(source, <span class="kw-2">&amp;</span>url, features).<span class="kw">await</span>,
+                p <span class="kw">if </span>MSSQL.is_provider(p) =&gt; native::mssql(source, <span class="kw-2">&amp;</span>url, features).<span class="kw">await</span>,
+                p <span class="kw">if </span>COCKROACH.is_provider(p) =&gt; native::postgres(source, <span class="kw-2">&amp;</span>url, features).<span class="kw">await</span>,
 
                 <span class="attr">#[cfg(feature = <span class="string">&quot;mongodb&quot;</span>)]
-                </span>p <span class="kw">if </span>MONGODB.is_provider(p) =&gt; native::mongodb(source, url, features).<span class="kw">await</span>,
+                </span>p <span class="kw">if </span>MONGODB.is_provider(p) =&gt; native::mongodb(source, <span class="kw-2">&amp;</span>url, features).<span class="kw">await</span>,
 
                 x =&gt; <span class="prelude-val">Err</span>(query_core::CoreError::ConfigurationError(<span class="macro">format!</span>(
                     <span class="string">&quot;Unsupported connector type: {x}&quot;
@@ -199,10 +208,9 @@
 <span class="attr">#[cfg(feature = <span class="string">&quot;driver-adapters&quot;</span>)]
 </span><span class="kw">async fn </span>driver_adapter(
     source: <span class="kw-2">&amp;</span>Datasource,
-    url: <span class="kw-2">&amp;</span>str,
     features: PreviewFeatures,
 ) -&gt; <span class="prelude-ty">Result</span>&lt;Box&lt;<span class="kw">dyn </span>QueryExecutor + Send + Sync&gt;, query_core::CoreError&gt; {
-    <span class="kw">let </span>js = Js::from_source(source, url, features).<span class="kw">await</span><span class="question-mark">?</span>;
+    <span class="kw">let </span>js = Js::new(source, features).<span class="kw">await</span><span class="question-mark">?</span>;
     <span class="prelude-val">Ok</span>(executor_for(js, <span class="bool-val">false</span>))
 }
 

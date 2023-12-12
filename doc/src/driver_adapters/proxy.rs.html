@@ -185,11 +185,30 @@
 <a href="#185" id="185">185</a>
 <a href="#186" id="186">186</a>
 <a href="#187" id="187">187</a>
+<a href="#188" id="188">188</a>
+<a href="#189" id="189">189</a>
+<a href="#190" id="190">190</a>
+<a href="#191" id="191">191</a>
+<a href="#192" id="192">192</a>
+<a href="#193" id="193">193</a>
+<a href="#194" id="194">194</a>
+<a href="#195" id="195">195</a>
+<a href="#196" id="196">196</a>
+<a href="#197" id="197">197</a>
+<a href="#198" id="198">198</a>
+<a href="#199" id="199">199</a>
+<a href="#200" id="200">200</a>
+<a href="#201" id="201">201</a>
+<a href="#202" id="202">202</a>
+<a href="#203" id="203">203</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::send_future::UnsafeFuture;
+<span class="kw">use </span><span class="kw">crate</span>::types::JsConnectionInfo;
 <span class="kw">pub use </span><span class="kw">crate</span>::types::{ColumnType, JSResultSet, Query, TransactionOptions};
-<span class="kw">use crate</span>::{from_js_value, get_named_property, has_named_property, to_rust_str, JsObject, JsResult, JsString};
+<span class="kw">use crate</span>::{
+    from_js_value, get_named_property, get_optional_named_property, has_named_property, to_rust_str, AdapterMethod,
+    JsObject, JsResult, JsString, JsTransaction,
+};
 
-<span class="kw">use crate</span>::{AsyncJsFunction, JsTransaction};
 <span class="kw">use </span>futures::Future;
 <span class="kw">use </span>metrics::increment_gauge;
 <span class="kw">use </span>std::sync::atomic::{AtomicBool, Ordering};
@@ -203,11 +222,11 @@
 </span><span class="attr">#[cfg_attr(target_arch = <span class="string">&quot;wasm32&quot;</span>, wasm_bindgen(getter_with_clone))]
 </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>CommonProxy {
     <span class="doccomment">/// Execute a query given as SQL, interpolating the given parameters.
-    </span>query_raw: AsyncJsFunction&lt;Query, JSResultSet&gt;,
+    </span>query_raw: AdapterMethod&lt;Query, JSResultSet&gt;,
 
     <span class="doccomment">/// Execute a query given as SQL, interpolating the given parameters and
     /// returning the number of affected rows.
-    </span>execute_raw: AsyncJsFunction&lt;Query, u32&gt;,
+    </span>execute_raw: AdapterMethod&lt;Query, u32&gt;,
 
     <span class="doccomment">/// Return the provider for this driver.
     </span><span class="kw">pub</span>(<span class="kw">crate</span>) provider: String,
@@ -217,7 +236,8 @@
 /// JS driver objects
 </span><span class="attr">#[cfg_attr(target_arch = <span class="string">&quot;wasm32&quot;</span>, wasm_bindgen(getter_with_clone))]
 </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>DriverProxy {
-    start_transaction: AsyncJsFunction&lt;(), JsTransaction&gt;,
+    start_transaction: AdapterMethod&lt;(), JsTransaction&gt;,
+    get_connection_info: <span class="prelude-ty">Option</span>&lt;AdapterMethod&lt;(), JsConnectionInfo&gt;&gt;,
 }
 
 <span class="doccomment">/// This a JS proxy for accessing the methods, specific
@@ -228,10 +248,10 @@
     </span>options: TransactionOptions,
 
     <span class="doccomment">/// commit transaction
-    </span>commit: AsyncJsFunction&lt;(), ()&gt;,
+    </span>commit: AdapterMethod&lt;(), ()&gt;,
 
     <span class="doccomment">/// rollback transaction
-    </span>rollback: AsyncJsFunction&lt;(), ()&gt;,
+    </span>rollback: AdapterMethod&lt;(), ()&gt;,
 
     <span class="doccomment">/// whether the transaction has already been committed or rolled back
     </span>closed: AtomicBool,
@@ -257,11 +277,11 @@
     }
 
     <span class="kw">pub async fn </span>query_raw(<span class="kw-2">&amp;</span><span class="self">self</span>, params: Query) -&gt; quaint::Result&lt;JSResultSet&gt; {
-        <span class="self">self</span>.query_raw.call(params).<span class="kw">await
+        <span class="self">self</span>.query_raw.call_as_async(params).<span class="kw">await
     </span>}
 
     <span class="kw">pub async fn </span>execute_raw(<span class="kw-2">&amp;</span><span class="self">self</span>, params: Query) -&gt; quaint::Result&lt;u32&gt; {
-        <span class="self">self</span>.execute_raw.call(params).<span class="kw">await
+        <span class="self">self</span>.execute_raw.call_as_async(params).<span class="kw">await
     </span>}
 }
 
@@ -269,11 +289,23 @@
     <span class="kw">pub fn </span>new(object: <span class="kw-2">&amp;</span>JsObject) -&gt; JsResult&lt;<span class="self">Self</span>&gt; {
         <span class="prelude-val">Ok</span>(<span class="self">Self </span>{
             start_transaction: get_named_property(object, <span class="string">&quot;startTransaction&quot;</span>)<span class="question-mark">?</span>,
+            get_connection_info: get_optional_named_property(object, <span class="string">&quot;getConnectionInfo&quot;</span>)<span class="question-mark">?</span>,
         })
     }
 
+    <span class="kw">pub async fn </span>get_connection_info(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; quaint::Result&lt;JsConnectionInfo&gt; {
+        UnsafeFuture(<span class="kw">async move </span>{
+            <span class="kw">if let </span><span class="prelude-val">Some</span>(fn_) = <span class="kw-2">&amp;</span><span class="self">self</span>.get_connection_info {
+                fn_.call_as_sync(()).<span class="kw">await
+            </span>} <span class="kw">else </span>{
+                <span class="prelude-val">Ok</span>(JsConnectionInfo::default())
+            }
+        })
+        .<span class="kw">await
+    </span>}
+
     <span class="kw">async fn </span>start_transaction_inner(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; quaint::Result&lt;Box&lt;JsTransaction&gt;&gt; {
-        <span class="kw">let </span>tx = <span class="self">self</span>.start_transaction.call(()).<span class="kw">await</span><span class="question-mark">?</span>;
+        <span class="kw">let </span>tx = <span class="self">self</span>.start_transaction.call_as_async(()).<span class="kw">await</span><span class="question-mark">?</span>;
 
         <span class="comment">// Decrement for this gauge is done in JsTransaction::commit/JsTransaction::rollback
         // Previously, it was done in JsTransaction::new, similar to the native Transaction.
@@ -324,7 +356,7 @@
     ///   waiting on the JavaScript call to complete and deliver response.
     </span><span class="kw">pub fn </span>commit(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; UnsafeFuture&lt;<span class="kw">impl </span>Future&lt;Output = quaint::Result&lt;()&gt;&gt; + <span class="lifetime">&#39;_</span>&gt; {
         <span class="self">self</span>.closed.store(<span class="bool-val">true</span>, Ordering::Relaxed);
-        UnsafeFuture(<span class="self">self</span>.commit.call(()))
+        UnsafeFuture(<span class="self">self</span>.commit.call_as_async(()))
     }
 
     <span class="doccomment">/// Rolls back the transaction via the driver adapter.
@@ -344,7 +376,7 @@
     ///   on the JavaScript call to complete and deliver response.
     </span><span class="kw">pub fn </span>rollback(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; UnsafeFuture&lt;<span class="kw">impl </span>Future&lt;Output = quaint::Result&lt;()&gt;&gt; + <span class="lifetime">&#39;_</span>&gt; {
         <span class="self">self</span>.closed.store(<span class="bool-val">true</span>, Ordering::Relaxed);
-        UnsafeFuture(<span class="self">self</span>.rollback.call(()))
+        UnsafeFuture(<span class="self">self</span>.rollback.call_as_async(()))
     }
 }
 

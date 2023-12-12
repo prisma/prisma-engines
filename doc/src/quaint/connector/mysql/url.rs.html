@@ -458,8 +458,8 @@
     <span class="doccomment">/// Name of the database connected. Defaults to `mysql`.
     </span><span class="kw">pub fn </span>dbname(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>str {
         <span class="kw">match </span><span class="self">self</span>.url.path_segments() {
-            <span class="prelude-val">Some</span>(<span class="kw-2">mut </span>segments) =&gt; segments.next().unwrap_or(<span class="string">&quot;mysql&quot;</span>),
-            <span class="prelude-val">None </span>=&gt; <span class="string">&quot;mysql&quot;</span>,
+            <span class="prelude-val">Some</span>(<span class="kw-2">mut </span>segments) =&gt; segments.next().unwrap_or(<span class="kw">super</span>::defaults::DEFAULT_MYSQL_DB),
+            <span class="prelude-val">None </span>=&gt; <span class="kw">super</span>::defaults::DEFAULT_MYSQL_DB,
         }
     }
 

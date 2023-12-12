@@ -411,12 +411,12 @@
     <span class="attr">#[cfg(feature = <span class="string">&quot;sqlite-native&quot;</span>)]
     </span><span class="doccomment">/// Open a new SQLite database in memory.
     </span><span class="kw">pub fn </span>new_in_memory() -&gt; <span class="kw">crate</span>::Result&lt;Quaint&gt; {
-        <span class="kw">use </span><span class="kw">crate</span>::connector::DEFAULT_SQLITE_SCHEMA_NAME;
+        <span class="kw">use </span><span class="kw">crate</span>::connector::sqlite::DEFAULT_SQLITE_DATABASE;
 
         <span class="prelude-val">Ok</span>(Quaint {
             inner: Arc::new(connector::Sqlite::new_in_memory()<span class="question-mark">?</span>),
             connection_info: Arc::new(ConnectionInfo::InMemorySqlite {
-                db_name: DEFAULT_SQLITE_SCHEMA_NAME.to_owned(),
+                db_name: DEFAULT_SQLITE_DATABASE.to_owned(),
             }),
         })
     }

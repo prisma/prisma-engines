@@ -693,6 +693,7 @@
 <a href="#693" id="693">693</a>
 <a href="#694" id="694">694</a>
 <a href="#695" id="695">695</a>
+<a href="#696" id="696">696</a>
 </pre></div><pre class="rust"><code><span class="attr">#![cfg_attr(target_arch = <span class="string">&quot;wasm32&quot;</span>, allow(dead_code))]
 
 </span><span class="kw">use </span>std::{
@@ -770,8 +771,6 @@
     <span class="kw">pub</span>(<span class="kw">crate</span>) query_params: PostgresUrlQueryParams,
     <span class="kw">pub</span>(<span class="kw">crate</span>) flavour: PostgresFlavour,
 }
-
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">const </span>DEFAULT_SCHEMA: <span class="kw-2">&amp;</span>str = <span class="string">&quot;public&quot;</span>;
 
 <span class="kw">impl </span>PostgresUrl {
     <span class="doccomment">/// Parse `Url` to `PostgresUrl`. Returns error for mistyped connection
@@ -852,7 +851,10 @@
 
     <span class="doccomment">/// The database schema, defaults to `public`.
     </span><span class="kw">pub fn </span>schema(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>str {
-        <span class="self">self</span>.query_params.schema.as_deref().unwrap_or(DEFAULT_SCHEMA)
+        <span class="self">self</span>.query_params
+            .schema
+            .as_deref()
+            .unwrap_or(<span class="kw">super</span>::defaults::DEFAULT_POSTGRES_SCHEMA)
     }
 
     <span class="doccomment">/// Whether the pgbouncer mode is enabled.

@@ -362,6 +362,20 @@
 <a href="#362" id="362">362</a>
 <a href="#363" id="363">363</a>
 <a href="#364" id="364">364</a>
+<a href="#365" id="365">365</a>
+<a href="#366" id="366">366</a>
+<a href="#367" id="367">367</a>
+<a href="#368" id="368">368</a>
+<a href="#369" id="369">369</a>
+<a href="#370" id="370">370</a>
+<a href="#371" id="371">371</a>
+<a href="#372" id="372">372</a>
+<a href="#373" id="373">373</a>
+<a href="#374" id="374">374</a>
+<a href="#375" id="375">375</a>
+<a href="#376" id="376">376</a>
+<a href="#377" id="377">377</a>
+<a href="#378" id="378">378</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::error::{Error, ErrorKind};
 <span class="kw">use </span>std::{borrow::Cow, fmt};
 <span class="kw">use </span>url::Url;
@@ -376,6 +390,8 @@
 </span><span class="kw">use </span><span class="kw">crate</span>::connector::SqliteParams;
 <span class="attr">#[cfg(feature = <span class="string">&quot;sqlite&quot;</span>)]
 </span><span class="kw">use </span>std::convert::TryFrom;
+
+<span class="kw">use </span><span class="kw">super</span>::ExternalConnectionInfo;
 
 <span class="doccomment">/// General information about a SQL connection.
 </span><span class="attr">#[derive(Debug, Clone)]
@@ -398,7 +414,10 @@
         </span>db_name: String,
     },
     <span class="attr">#[cfg(feature = <span class="string">&quot;sqlite&quot;</span>)]
-    </span>InMemorySqlite { db_name: String },
+    </span>InMemorySqlite {
+        db_name: String,
+    },
+    External(ExternalConnectionInfo),
 }
 
 <span class="kw">impl </span>ConnectionInfo {
@@ -468,6 +487,7 @@
             </span>ConnectionInfo::Mssql(url) =&gt; <span class="prelude-val">Some</span>(url.dbname()),
             <span class="attr">#[cfg(feature = <span class="string">&quot;sqlite&quot;</span>)]
             </span>ConnectionInfo::Sqlite { .. } | ConnectionInfo::InMemorySqlite { .. } =&gt; <span class="prelude-val">None</span>,
+            ConnectionInfo::External(<span class="kw">_</span>) =&gt; <span class="prelude-val">None</span>,
         }
     }
 
@@ -488,6 +508,7 @@
             </span>ConnectionInfo::Sqlite { db_name, .. } =&gt; db_name,
             <span class="attr">#[cfg(feature = <span class="string">&quot;sqlite&quot;</span>)]
             </span>ConnectionInfo::InMemorySqlite { db_name } =&gt; db_name,
+            ConnectionInfo::External(info) =&gt; <span class="kw-2">&amp;</span>info.schema_name,
         }
     }
 
@@ -502,6 +523,8 @@
             </span>ConnectionInfo::Mssql(url) =&gt; url.host(),
             <span class="attr">#[cfg(feature = <span class="string">&quot;sqlite&quot;</span>)]
             </span>ConnectionInfo::Sqlite { .. } | ConnectionInfo::InMemorySqlite { .. } =&gt; <span class="string">&quot;localhost&quot;</span>,
+
+            ConnectionInfo::External(<span class="kw">_</span>) =&gt; <span class="string">&quot;external&quot;</span>,
         }
     }
 
@@ -516,6 +539,7 @@
             </span>ConnectionInfo::Mssql(url) =&gt; url.username().map(Cow::from),
             <span class="attr">#[cfg(feature = <span class="string">&quot;sqlite&quot;</span>)]
             </span>ConnectionInfo::Sqlite { .. } | ConnectionInfo::InMemorySqlite { .. } =&gt; <span class="prelude-val">None</span>,
+            ConnectionInfo::External(<span class="kw">_</span>) =&gt; <span class="prelude-val">None</span>,
         }
     }
 
@@ -532,6 +556,7 @@
             </span>ConnectionInfo::Sqlite { file_path, .. } =&gt; <span class="prelude-val">Some</span>(file_path),
             <span class="attr">#[cfg(feature = <span class="string">&quot;sqlite&quot;</span>)]
             </span>ConnectionInfo::InMemorySqlite { .. } =&gt; <span class="prelude-val">None</span>,
+            ConnectionInfo::External(<span class="kw">_</span>) =&gt; <span class="prelude-val">None</span>,
         }
     }
 
@@ -546,6 +571,7 @@
             </span>ConnectionInfo::Mssql(<span class="kw">_</span>) =&gt; SqlFamily::Mssql,
             <span class="attr">#[cfg(feature = <span class="string">&quot;sqlite&quot;</span>)]
             </span>ConnectionInfo::Sqlite { .. } | ConnectionInfo::InMemorySqlite { .. } =&gt; SqlFamily::Sqlite,
+            ConnectionInfo::External(info) =&gt; info.sql_family.to_owned(),
         }
     }
 
@@ -560,6 +586,7 @@
             </span>ConnectionInfo::Mssql(url) =&gt; <span class="prelude-val">Some</span>(url.port()),
             <span class="attr">#[cfg(feature = <span class="string">&quot;sqlite&quot;</span>)]
             </span>ConnectionInfo::Sqlite { .. } | ConnectionInfo::InMemorySqlite { .. } =&gt; <span class="prelude-val">None</span>,
+            ConnectionInfo::External(<span class="kw">_</span>) =&gt; <span class="prelude-val">None</span>,
         }
     }
 
@@ -587,6 +614,7 @@
             </span>ConnectionInfo::Sqlite { file_path, .. } =&gt; file_path.clone(),
             <span class="attr">#[cfg(feature = <span class="string">&quot;sqlite&quot;</span>)]
             </span>ConnectionInfo::InMemorySqlite { .. } =&gt; <span class="string">&quot;in-memory&quot;</span>.into(),
+            ConnectionInfo::External(<span class="kw">_</span>) =&gt; <span class="string">&quot;external&quot;</span>.into(),
         }
     }
 }

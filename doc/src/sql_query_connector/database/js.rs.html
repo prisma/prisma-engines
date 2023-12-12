@@ -167,10 +167,7 @@
 <a href="#167" id="167">167</a>
 <a href="#168" id="168">168</a>
 <a href="#169" id="169">169</a>
-<a href="#170" id="170">170</a>
-<a href="#171" id="171">171</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span><span class="kw">super</span>::connection::SqlConnection;
-<span class="kw">use </span><span class="kw">crate</span>::FromSource;
 <span class="kw">use </span>async_trait::async_trait;
 <span class="kw">use </span>connector_interface::{
     <span class="self">self </span><span class="kw">as </span>connector,
@@ -179,7 +176,7 @@
 };
 <span class="kw">use </span>once_cell::sync::Lazy;
 <span class="kw">use </span>quaint::{
-    connector::{IsolationLevel, Transaction},
+    connector::{ExternalConnector, IsolationLevel, Transaction},
     prelude::{Queryable <span class="kw">as </span>QuaintQueryable, <span class="kw-2">*</span>},
 };
 <span class="kw">use </span>std::sync::{Arc, Mutex};
@@ -201,7 +198,7 @@
         ))))
 }
 
-<span class="kw">pub fn </span>activate_driver_adapter(connector: Arc&lt;<span class="kw">dyn </span>TransactionCapable&gt;) {
+<span class="kw">pub fn </span>activate_driver_adapter(connector: Arc&lt;<span class="kw">dyn </span>ExternalConnector&gt;) {
     <span class="kw">let </span><span class="kw-2">mut </span>lock = ACTIVE_DRIVER_ADAPTER.lock().unwrap();
 
     <span class="kw-2">*</span>lock = <span class="prelude-val">Some</span>(DriverAdapter { connector });
@@ -213,29 +210,21 @@
     features: psl::PreviewFeatures,
 }
 
-<span class="kw">fn </span>get_connection_info(url: <span class="kw-2">&amp;</span>str) -&gt; connector::Result&lt;ConnectionInfo&gt; {
-    ConnectionInfo::from_url(url).map_err(|err| {
-        ConnectorError::from_kind(ErrorKind::InvalidDatabaseUrl {
-            details: err.to_string(),
-            url: url.to_string(),
-        })
-    })
-}
-
-<span class="attr">#[async_trait]
-</span><span class="kw">impl </span>FromSource <span class="kw">for </span>Js {
-    <span class="kw">async fn </span>from_source(
-        source: <span class="kw-2">&amp;</span>psl::Datasource,
-        url: <span class="kw-2">&amp;</span>str,
-        features: psl::PreviewFeatures,
-    ) -&gt; connector_interface::Result&lt;Js&gt; {
+<span class="kw">impl </span>Js {
+    <span class="kw">pub async fn </span>new(source: <span class="kw-2">&amp;</span>psl::Datasource, features: psl::PreviewFeatures) -&gt; connector_interface::Result&lt;<span class="self">Self</span>&gt; {
         <span class="kw">let </span>connector = active_driver_adapter(source.active_provider)<span class="question-mark">?</span>;
-        <span class="kw">let </span>connection_info = get_connection_info(url)<span class="question-mark">?</span>;
+
+        <span class="kw">let </span>external_conn_info = connector.get_connection_info().<span class="kw">await</span>.map_err(|e| <span class="kw">match </span>e.kind() {
+            <span class="kw-2">&amp;</span>quaint::error::ErrorKind::ExternalError(id) =&gt; ConnectorError::from_kind(ErrorKind::ExternalError(id)),
+            <span class="kw">_ </span>=&gt; ConnectorError::from_kind(ErrorKind::InvalidDriverAdapter(
+                <span class="string">&quot;Error while calling getConnectionInfo()&quot;</span>.into(),
+            )),
+        })<span class="question-mark">?</span>;
 
         <span class="prelude-val">Ok</span>(Js {
             connector,
-            connection_info,
             features,
+            connection_info: ConnectionInfo::External(external_conn_info),
         })
     }
 }
@@ -276,7 +265,14 @@
 /// in this object, and implementing TransactionCapable (and quaint::Queryable) explicitly for it.
 </span><span class="attr">#[derive(Clone)]
 </span><span class="kw">pub struct </span>DriverAdapter {
-    connector: Arc&lt;<span class="kw">dyn </span>TransactionCapable&gt;,
+    connector: Arc&lt;<span class="kw">dyn </span>ExternalConnector&gt;,
+}
+
+<span class="attr">#[async_trait]
+</span><span class="kw">impl </span>ExternalConnector <span class="kw">for </span>DriverAdapter {
+    <span class="kw">async fn </span>get_connection_info(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; quaint::Result&lt;ExternalConnectionInfo&gt; {
+        <span class="self">self</span>.connector.get_connection_info().<span class="kw">await
+    </span>}
 }
 
 <span class="attr">#[async_trait]
