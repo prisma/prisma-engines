@@ -544,7 +544,7 @@ impl<'a> Visitor<'a> for Postgres<'a> {
             })?;
 
             if i < num_chunks - 1 {
-                self.write("|| ")?;
+                self.write(" || ")?;
             }
         }
 
