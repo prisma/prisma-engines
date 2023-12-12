@@ -255,7 +255,7 @@ async function pgAdapter(url: string): Promise<DriverAdapter> {
     const schemaName = postgresSchemaName(url)
     const pool = new pgDriver.Pool(postgres_options(url))
     return new prismaPg.PrismaPg(pool, {
-        schemaName
+        schema: schemaName
     })
 
 }
@@ -274,7 +274,7 @@ async function neonWsAdapter(url: string): Promise<DriverAdapter> {
     const schemaName = postgresSchemaName(url)
 
     const pool = new NeonPool(postgres_options(url))
-    return new prismaNeon.PrismaNeon(pool, { schemaName })
+    return new prismaNeon.PrismaNeon(pool, { schema: schemaName })
 }
 
 async function libsqlAdapter(url: string): Promise<DriverAdapter> {
