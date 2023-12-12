@@ -3,10 +3,10 @@ name = "query-engine-wasm"
 version = "0.1.0"
 edition = "2021"
 
-[lib]
-doc = false
-crate-type = ["cdylib"]
-name = "query_engine_wasm"
+# [lib]
+# doc = false
+# crate-type = ["cdylib"]
+# name = "query_engine_wasm"
 
 [dependencies]
 

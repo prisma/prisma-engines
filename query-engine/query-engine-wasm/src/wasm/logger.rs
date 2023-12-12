@@ -1,10 +1,10 @@
 #![allow(dead_code)]
 
 use core::fmt;
-use js_sys::Function as JsFunction;
+// use js_sys::Function as JsFunction;
 use query_core::telemetry;
 use serde_json::Value;
-use std::collections::BTreeMap;
+use std::{collections::BTreeMap, ffi::c_char};
 use tracing::{
     field::{Field, Visit},
     level_filters::LevelFilter,
@@ -15,17 +15,25 @@ use tracing_subscriber::{
     layer::SubscriberExt,
     Layer, Registry,
 };
-use wasm_bindgen::JsValue;
+// use wasm_bindgen::JsValue;
+
+pub type CStringFunc = extern "C" fn(*const c_char);
 
 #[derive(Clone)]
-pub struct LogCallback(pub JsFunction);
+pub struct LogCallback(pub CStringFunc);
 
 impl LogCallback {
-    pub fn call<T: Into<JsValue>>(&self, arg1: T) -> Result<(), String> {
-        self.0
-            .call1(&JsValue::NULL, &arg1.into())
-            .map(|_| ())
-            .map_err(|err| err.as_string().unwrap_or_default())
+    pub fn call<T: Into<String>>(&self, arg1: T) -> Result<(), String> {
+        let message = arg1.into();
+        let message = std::ffi::CString::new(message).unwrap();
+        (self.0)(message.as_ptr());
+
+        Ok(())
+
+        // self.0
+        //     .call1(&JsValue::NULL, &arg1.into())
+        //     .map(|_| ())
+        //     .map_err(|err| err.as_string().unwrap_or_default())
     }
 }
 

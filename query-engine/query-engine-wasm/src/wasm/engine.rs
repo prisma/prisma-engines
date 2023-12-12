@@ -3,10 +3,10 @@
 
 use crate::{
     error::ApiError,
-    logger::{LogCallback, Logger},
+    logger::{LogCallback, Logger, CStringFunc},
 };
 use driver_adapters::JsObject;
-use js_sys::Function as JsFunction;
+// use js_sys::Function as JsFunction;
 use query_core::{
     protocol::EngineProtocol,
     schema::{self, QuerySchema},
@@ -24,10 +24,10 @@ use std::{
 use tokio::sync::RwLock;
 use tracing::{field, instrument::WithSubscriber, Instrument, Span};
 use tracing_subscriber::filter::LevelFilter;
-use tsify::Tsify;
-use wasm_bindgen::prelude::wasm_bindgen;
+// use tsify::Tsify;
+// use wasm_bindgen::prelude::wasm_bindgen;
 /// The main query engine used by JS
-#[wasm_bindgen]
+// #[wasm_bindgen]
 pub struct QueryEngine {
     connector_mode: ConnectorMode,
     inner: RwLock<Inner>,
@@ -87,8 +87,7 @@ impl ConnectedEngine {
 }
 
 /// Parameters defining the construction of an engine.
-#[derive(Debug, Deserialize, Tsify)]
-#[tsify(from_wasm_abi)]
+#[derive(Debug, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct ConstructorOptions {
     datamodel: String,
@@ -124,13 +123,12 @@ impl Inner {
     }
 }
 
-#[wasm_bindgen]
 impl QueryEngine {
     /// Parse a validated datamodel and configuration to allow connecting later on.
-    #[wasm_bindgen(constructor)]
+    // #[wasm_bindgen(constructor)]
     pub fn new(
         options: ConstructorOptions,
-        callback: JsFunction,
+        callback: CStringFunc,
         maybe_adapter: Option<JsObject>,
     ) -> Result<QueryEngine, wasm_bindgen::JsError> {
         let log_callback = LogCallback(callback);
@@ -203,7 +201,7 @@ impl QueryEngine {
     }
 
     /// Connect to the database, allow queries to be run.
-    #[wasm_bindgen]
+    // #[wasm_bindgen]
     pub async fn connect(&self, trace: String) -> Result<(), wasm_bindgen::JsError> {
         let dispatcher = self.logger.dispatcher();
 
@@ -273,7 +271,7 @@ impl QueryEngine {
     }
 
     /// Disconnect and drop the core. Can be reconnected later with `#connect`.
-    #[wasm_bindgen]
+    // #[wasm_bindgen]
     pub async fn disconnect(&self, trace: String) -> Result<(), wasm_bindgen::JsError> {
         let dispatcher = self.logger.dispatcher();
 
@@ -304,7 +302,7 @@ impl QueryEngine {
     }
 
     /// If connected, sends a query to the core and returns the response.
-    #[wasm_bindgen]
+    // #[wasm_bindgen]
     pub async fn query(
         &self,
         body: String,
@@ -343,7 +341,7 @@ impl QueryEngine {
     }
 
     /// If connected, attempts to start a transaction in the core and returns its ID.
-    #[wasm_bindgen(js_name = startTransaction)]
+    // #[wasm_bindgen(js_name = startTransaction)]
     pub async fn start_transaction(&self, input: String, trace: String) -> Result<String, wasm_bindgen::JsError> {
         let inner = self.inner.read().await;
         let engine = inner.as_engine()?;
@@ -368,7 +366,7 @@ impl QueryEngine {
     }
 
     /// If connected, attempts to commit a transaction with id `tx_id` in the core.
-    #[wasm_bindgen(js_name = commitTransaction)]
+    // #[wasm_bindgen(js_name = commitTransaction)]
     pub async fn commit_transaction(&self, tx_id: String, trace: String) -> Result<String, wasm_bindgen::JsError> {
         let inner = self.inner.read().await;
         let engine = inner.as_engine()?;
@@ -386,7 +384,7 @@ impl QueryEngine {
     }
 
     /// If connected, attempts to roll back a transaction with id `tx_id` in the core.
-    #[wasm_bindgen(js_name = rollbackTransaction)]
+    // #[wasm_bindgen(js_name = rollbackTransaction)]
     pub async fn rollback_transaction(&self, tx_id: String, trace: String) -> Result<String, wasm_bindgen::JsError> {
         let inner = self.inner.read().await;
         let engine = inner.as_engine()?;
@@ -403,7 +401,7 @@ impl QueryEngine {
         .await
     }
 
-    #[wasm_bindgen]
+    // #[wasm_bindgen]
     pub async fn metrics(&self, json_options: String) -> Result<(), wasm_bindgen::JsError> {
         Err(ApiError::configuration("Metrics is not enabled in Wasm.").into())
     }
