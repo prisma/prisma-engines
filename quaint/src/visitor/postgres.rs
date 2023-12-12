@@ -510,6 +510,18 @@ impl<'a> Visitor<'a> for Postgres<'a> {
 
     #[cfg(any(feature = "postgresql", feature = "mysql"))]
     fn visit_json_build_object(&mut self, build_obj: JsonBuildObject<'a>) -> visitor::Result {
+        // Functions in PostgreSQL can only accept up to 100 arguments, which means that we can't
+        // build an object with more than 50 fields using `JSON_BUILD_OBJECT`. To work around
+        // that, we chunk the fields into subsets of 50 fields or less, build one or more JSONB
+        // objects using one or more `JSONB_BUILD_OBJECT` invocations, and merge them together
+        // using the `||` operator (which is not possible with plain JSON).
+        //
+        // See <https://github.com/prisma/prisma/issues/22298>.
+        //
+        // Another alternative that was considered for the specific use case of loading relations
+        // in Query Engine was using `ROW_TO_JSON` but it turned out to not be a suitable
+        // replacement for several reasons, the main one being the limit of the length of field
+        // names (63 characters).
         const MAX_FIELDS: usize = 50;
         let num_chunks = build_obj.exprs.len().div_ceil(MAX_FIELDS);
 
