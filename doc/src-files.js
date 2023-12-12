@@ -1,4 +1,4 @@
-var sourcesIndex = JSON.parse('{\
+var srcIndex = JSON.parse('{\
 "addr2line":["",[],["function.rs","lazy.rs","lib.rs"]],\
 "adler":["",[],["algo.rs","lib.rs"]],\
 "ahash":["",[],["convert.rs","fallback_hash.rs","lib.rs","operations.rs","random_state.rs","specialize.rs"]],\
@@ -392,4 +392,4 @@ var sourcesIndex = JSON.parse('{\
 "yaml_rust":["",[],["emitter.rs","lib.rs","parser.rs","scanner.rs","yaml.rs"]],\
 "yansi":["",[],["color.rs","lib.rs","macros.rs","paint.rs","style.rs","windows.rs"]]\
 }');
-createSourceSidebar();
+createSrcSidebar();
