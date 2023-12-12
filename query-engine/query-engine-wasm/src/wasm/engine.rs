@@ -149,7 +149,8 @@ impl QueryEngine {
         let env = stringify_env_values(env)?; // we cannot trust anything JS sends us from process.env
         let overrides: Vec<(_, _)> = datasource_overrides.into_iter().collect();
 
-        let mut schema = psl::validate(datamodel.into());
+        // Note: if we used `psl::validate`, we'd add ~1MB to the Wasm artifact (before gzip).
+        let mut schema = psl::parse_without_validation(datamodel.into());
         let config = &mut schema.configuration;
         let preview_features = config.preview_features();
 
