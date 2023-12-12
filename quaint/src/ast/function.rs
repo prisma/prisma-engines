@@ -102,7 +102,9 @@ pub(crate) enum FunctionType<'a> {
     JsonExtractFirstArrayElem(JsonExtractFirstArrayElem<'a>),
     #[cfg(any(feature = "postgresql", feature = "mysql"))]
     JsonUnquote(JsonUnquote<'a>),
+    #[cfg(any(feature = "postgresql", feature = "mysql"))]
     JsonArrayAgg(JsonArrayAgg<'a>),
+    #[cfg(any(feature = "postgresql", feature = "mysql"))]
     JsonBuildObject(JsonBuildObject<'a>),
     #[cfg(any(feature = "postgresql", feature = "mysql"))]
     TextSearch(TextSearch<'a>),

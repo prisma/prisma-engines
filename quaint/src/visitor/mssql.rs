@@ -1,6 +1,6 @@
 use super::Visitor;
 #[cfg(any(feature = "postgresql", feature = "mysql"))]
-use crate::prelude::{JsonExtract, JsonType, JsonUnquote};
+use crate::prelude::{JsonArrayAgg, JsonBuildObject, JsonExtract, JsonType, JsonUnquote};
 use crate::{
     ast::{
         Column, Comparable, Expression, ExpressionKind, Insert, IntoRaw, Join, JoinData, Joinable, Merge, OnConflict,
@@ -649,6 +649,16 @@ impl<'a> Visitor<'a> for Mssql<'a> {
     #[cfg(any(feature = "postgresql", feature = "mysql"))]
     fn visit_json_type_equals(&mut self, _left: Expression<'a>, _json_type: JsonType, _not: bool) -> visitor::Result {
         unimplemented!("JSON_TYPE is not yet supported on MSSQL")
+    }
+
+    #[cfg(any(feature = "postgresql", feature = "mysql"))]
+    fn visit_json_array_agg(&mut self, _array_agg: JsonArrayAgg<'a>) -> visitor::Result {
+        unimplemented!("JSON_AGG is not yet supported on MSSQL")
+    }
+
+    #[cfg(any(feature = "postgresql", feature = "mysql"))]
+    fn visit_json_build_object(&mut self, _build_obj: JsonBuildObject<'a>) -> visitor::Result {
+        unimplemented!("JSON_BUILD_OBJECT is not yet supported on MSSQL")
     }
 
     #[cfg(any(feature = "postgresql", feature = "mysql"))]

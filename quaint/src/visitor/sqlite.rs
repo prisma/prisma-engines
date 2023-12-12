@@ -329,6 +329,16 @@ impl<'a> Visitor<'a> for Sqlite<'a> {
         unimplemented!("JSON filtering is not yet supported on SQLite")
     }
 
+    #[cfg(any(feature = "postgresql", feature = "mysql"))]
+    fn visit_json_array_agg(&mut self, _array_agg: JsonArrayAgg<'a>) -> visitor::Result {
+        unimplemented!("JSON_AGG is not yet supported on SQLite")
+    }
+
+    #[cfg(any(feature = "postgresql", feature = "mysql"))]
+    fn visit_json_build_object(&mut self, _build_obj: JsonBuildObject<'a>) -> visitor::Result {
+        unimplemented!("JSON_BUILD_OBJECT is not yet supported on SQLite")
+    }
+
     fn visit_ordering(&mut self, ordering: Ordering<'a>) -> visitor::Result {
         let len = ordering.0.len();
 

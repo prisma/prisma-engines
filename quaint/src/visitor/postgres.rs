@@ -2,6 +2,7 @@ use crate::{
     ast::*,
     visitor::{self, Visitor},
 };
+use itertools::Itertools;
 use std::{
     fmt::{self, Write},
     ops::Deref,
@@ -497,6 +498,41 @@ impl<'a> Visitor<'a> for Postgres<'a> {
                 self.write("::jsonb)")
             }
         }
+    }
+
+    #[cfg(any(feature = "postgresql", feature = "mysql"))]
+    fn visit_json_array_agg(&mut self, array_agg: JsonArrayAgg<'a>) -> visitor::Result {
+        self.write("JSONB_AGG")?;
+        self.surround_with("(", ")", |s| s.visit_expression(*array_agg.expr))?;
+
+        Ok(())
+    }
+
+    #[cfg(any(feature = "postgresql", feature = "mysql"))]
+    fn visit_json_build_object(&mut self, build_obj: JsonBuildObject<'a>) -> visitor::Result {
+        const MAX_FIELDS: usize = 50;
+        let num_chunks = build_obj.exprs.len().div_ceil(MAX_FIELDS);
+
+        for (i, chunk) in build_obj.exprs.into_iter().chunks(50).into_iter().enumerate() {
+            self.write("JSONB_BUILD_OBJECT")?;
+            self.surround_with("(", ")", |s| {
+                for (j, (name, expr)) in chunk.into_iter().enumerate() {
+                    s.visit_raw_value(Value::text(name))?;
+                    s.write(", ")?;
+                    s.visit_expression(expr)?;
+                    if j < (MAX_FIELDS - 1) {
+                        s.write(", ")?;
+                    }
+                }
+                Ok(())
+            })?;
+
+            if i < num_chunks - 1 {
+                self.write("|| ")?;
+            }
+        }
+
+        Ok(())
     }
 
     fn visit_text_search(&mut self, text_search: crate::prelude::TextSearch<'a>) -> visitor::Result {
