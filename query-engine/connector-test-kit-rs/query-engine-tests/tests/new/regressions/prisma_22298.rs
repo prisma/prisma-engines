@@ -58,6 +58,7 @@ mod many_fields_in_related_table {
                 field48 Int
                 field49 Int
                 field50 Int
+                field51 Int
                 b_id    Int
                 b       B      @relation(fields: [b_id], references: [id])
                 c       C[]
@@ -78,7 +79,7 @@ mod many_fields_in_related_table {
     }
 
     #[connector_test]
-    async fn query_52_fields_through_relation(runner: Runner) -> TestResult<()> {
+    async fn query_53_fields_through_relation(runner: Runner) -> TestResult<()> {
         insta::assert_snapshot!(
             run_query!(runner, r#"
                 mutation {
@@ -138,6 +139,7 @@ mod many_fields_in_related_table {
                                     field48: 0,
                                     field49: 0,
                                     field50: 0,
+                                    field51: 0,
                                     c: {
                                         create: {
                                             id: 1
@@ -200,6 +202,7 @@ mod many_fields_in_related_table {
                             field48
                             field49
                             field50
+                            field51
                             c {
                                 id
                             }
@@ -207,7 +210,7 @@ mod many_fields_in_related_table {
                     }
                 }
             "#),
-            @r###"{"data":{"createOneB":{"id":1,"a":[{"id":1,"field1":0,"field2":0,"field3":0,"field4":0,"field5":0,"field6":0,"field7":0,"field8":0,"field9":0,"field10":0,"field11":0,"field12":0,"field13":0,"field14":0,"field15":0,"field16":0,"field17":0,"field18":0,"field19":0,"field20":0,"field21":0,"field22":0,"field23":0,"field24":0,"field25":0,"field26":0,"field27":0,"field28":0,"field29":0,"field30":0,"field31":0,"field32":0,"field33":0,"field34":0,"field35":0,"field36":0,"field37":0,"field38":0,"field39":0,"field40":0,"field41":0,"field42":0,"field43":0,"field44":0,"field45":0,"field46":0,"field47":0,"field48":0,"field49":0,"field50":0,"c":[{"id":1}]}]}}}"###
+            @r###"{"data":{"createOneB":{"id":1,"a":[{"id":1,"field1":0,"field2":0,"field3":0,"field4":0,"field5":0,"field6":0,"field7":0,"field8":0,"field9":0,"field10":0,"field11":0,"field12":0,"field13":0,"field14":0,"field15":0,"field16":0,"field17":0,"field18":0,"field19":0,"field20":0,"field21":0,"field22":0,"field23":0,"field24":0,"field25":0,"field26":0,"field27":0,"field28":0,"field29":0,"field30":0,"field31":0,"field32":0,"field33":0,"field34":0,"field35":0,"field36":0,"field37":0,"field38":0,"field39":0,"field40":0,"field41":0,"field42":0,"field43":0,"field44":0,"field45":0,"field46":0,"field47":0,"field48":0,"field49":0,"field50":0,"field51":0,"c":[{"id":1}]}]}}}"###
         );
 
         Ok(())
