@@ -513,7 +513,7 @@ impl<'a> Visitor<'a> for Postgres<'a> {
         const MAX_FIELDS: usize = 50;
         let num_chunks = build_obj.exprs.len().div_ceil(MAX_FIELDS);
 
-        for (i, chunk) in build_obj.exprs.into_iter().chunks(50).into_iter().enumerate() {
+        for (i, chunk) in build_obj.exprs.into_iter().chunks(MAX_FIELDS).into_iter().enumerate() {
             let mut chunk = chunk.peekable();
 
             self.write("JSONB_BUILD_OBJECT")?;
