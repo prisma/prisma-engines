@@ -514,16 +514,20 @@ impl<'a> Visitor<'a> for Postgres<'a> {
         let num_chunks = build_obj.exprs.len().div_ceil(MAX_FIELDS);
 
         for (i, chunk) in build_obj.exprs.into_iter().chunks(50).into_iter().enumerate() {
+            let mut chunk = chunk.peekable();
+
             self.write("JSONB_BUILD_OBJECT")?;
+
             self.surround_with("(", ")", |s| {
-                for (j, (name, expr)) in chunk.into_iter().enumerate() {
+                while let Some((name, expr)) = chunk.next() {
                     s.visit_raw_value(Value::text(name))?;
                     s.write(", ")?;
                     s.visit_expression(expr)?;
-                    if j < (MAX_FIELDS - 1) {
+                    if chunk.peek().is_some() {
                         s.write(", ")?;
                     }
                 }
+
                 Ok(())
             })?;
 
