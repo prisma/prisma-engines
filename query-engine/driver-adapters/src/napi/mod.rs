@@ -1,8 +1,8 @@
 //! Query Engine Driver Adapters: `napi`-specific implementation.
 
-mod async_js_function;
+mod adapter_method;
 mod conversion;
 mod error;
 pub(crate) mod result;
 
-pub(crate) use async_js_function::AsyncJsFunction;
+pub(crate) use adapter_method::AdapterMethod;

@@ -76,8 +76,6 @@ pub struct PostgresUrl {
     pub(crate) flavour: PostgresFlavour,
 }
 
-pub(crate) const DEFAULT_SCHEMA: &str = "public";
-
 impl PostgresUrl {
     /// Parse `Url` to `PostgresUrl`. Returns error for mistyped connection
     /// parameters.
@@ -157,7 +155,10 @@ impl PostgresUrl {
 
     /// The database schema, defaults to `public`.
     pub fn schema(&self) -> &str {
-        self.query_params.schema.as_deref().unwrap_or(DEFAULT_SCHEMA)
+        self.query_params
+            .schema
+            .as_deref()
+            .unwrap_or(super::defaults::DEFAULT_POSTGRES_SCHEMA)
     }
 
     /// Whether the pgbouncer mode is enabled.
