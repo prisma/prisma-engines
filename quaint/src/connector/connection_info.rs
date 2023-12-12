@@ -13,6 +13,8 @@ use crate::connector::SqliteParams;
 #[cfg(feature = "sqlite")]
 use std::convert::TryFrom;
 
+use super::ExternalConnectionInfo;
+
 /// General information about a SQL connection.
 #[derive(Debug, Clone)]
 pub enum ConnectionInfo {
@@ -34,7 +36,10 @@ pub enum ConnectionInfo {
         db_name: String,
     },
     #[cfg(feature = "sqlite")]
-    InMemorySqlite { db_name: String },
+    InMemorySqlite {
+        db_name: String,
+    },
+    External(ExternalConnectionInfo),
 }
 
 impl ConnectionInfo {
@@ -104,6 +109,7 @@ impl ConnectionInfo {
             ConnectionInfo::Mssql(url) => Some(url.dbname()),
             #[cfg(feature = "sqlite")]
             ConnectionInfo::Sqlite { .. } | ConnectionInfo::InMemorySqlite { .. } => None,
+            ConnectionInfo::External(_) => None,
         }
     }
 
@@ -124,6 +130,7 @@ impl ConnectionInfo {
             ConnectionInfo::Sqlite { db_name, .. } => db_name,
             #[cfg(feature = "sqlite")]
             ConnectionInfo::InMemorySqlite { db_name } => db_name,
+            ConnectionInfo::External(info) => &info.schema_name,
         }
     }
 
@@ -138,6 +145,8 @@ impl ConnectionInfo {
             ConnectionInfo::Mssql(url) => url.host(),
             #[cfg(feature = "sqlite")]
             ConnectionInfo::Sqlite { .. } | ConnectionInfo::InMemorySqlite { .. } => "localhost",
+
+            ConnectionInfo::External(_) => "external",
         }
     }
 
@@ -152,6 +161,7 @@ impl ConnectionInfo {
             ConnectionInfo::Mssql(url) => url.username().map(Cow::from),
             #[cfg(feature = "sqlite")]
             ConnectionInfo::Sqlite { .. } | ConnectionInfo::InMemorySqlite { .. } => None,
+            ConnectionInfo::External(_) => None,
         }
     }
 
@@ -168,6 +178,7 @@ impl ConnectionInfo {
             ConnectionInfo::Sqlite { file_path, .. } => Some(file_path),
             #[cfg(feature = "sqlite")]
             ConnectionInfo::InMemorySqlite { .. } => None,
+            ConnectionInfo::External(_) => None,
         }
     }
 
@@ -182,6 +193,7 @@ impl ConnectionInfo {
             ConnectionInfo::Mssql(_) => SqlFamily::Mssql,
             #[cfg(feature = "sqlite")]
             ConnectionInfo::Sqlite { .. } | ConnectionInfo::InMemorySqlite { .. } => SqlFamily::Sqlite,
+            ConnectionInfo::External(info) => info.sql_family.to_owned(),
         }
     }
 
@@ -196,6 +208,7 @@ impl ConnectionInfo {
             ConnectionInfo::Mssql(url) => Some(url.port()),
             #[cfg(feature = "sqlite")]
             ConnectionInfo::Sqlite { .. } | ConnectionInfo::InMemorySqlite { .. } => None,
+            ConnectionInfo::External(_) => None,
         }
     }
 
@@ -223,6 +236,7 @@ impl ConnectionInfo {
             ConnectionInfo::Sqlite { file_path, .. } => file_path.clone(),
             #[cfg(feature = "sqlite")]
             ConnectionInfo::InMemorySqlite { .. } => "in-memory".into(),
+            ConnectionInfo::External(_) => "external".into(),
         }
     }
 }

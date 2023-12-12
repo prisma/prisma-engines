@@ -69,6 +69,25 @@ pub fn validate(file: SourceFile, connectors: ConnectorRegistry) -> ValidatedSch
     }
 }
 
+/// Retrieves a Prisma schema without validating it.
+/// You should only use this method when actually validating the schema is too expensive
+/// computationally or in terms of bundle size (e.g., for `query-engine-wasm`).
+pub fn parse_without_validation(file: SourceFile, connectors: ConnectorRegistry) -> ValidatedSchema {
+    let mut diagnostics = Diagnostics::new();
+    let db = ParserDatabase::new(file, &mut diagnostics);
+    let configuration = validate_configuration(db.ast(), &mut diagnostics, connectors);
+    let datasources = &configuration.datasources;
+    let out = validate::parse_without_validation(db, datasources);
+
+    ValidatedSchema {
+        diagnostics,
+        configuration,
+        connector: out.connector,
+        db: out.db,
+        relation_mode: out.relation_mode,
+    }
+}
+
 /// Loads all configuration blocks from a datamodel using the built-in source definitions.
 pub fn parse_configuration(
     schema: &str,

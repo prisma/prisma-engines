@@ -15,7 +15,7 @@ use crate::AdapterResult;
 /// - Unpacks JS `Result` type into Rust `Result` type and converts the error
 /// into `quaint::Error`.
 /// - Catches panics and converts them to `quaint:Error`
-pub(crate) struct AsyncJsFunction<ArgType, ReturnType>
+pub(crate) struct AdapterMethod<ArgType, ReturnType>
 where
     ArgType: ToNapiValue + 'static,
     ReturnType: FromNapiValue + 'static,
@@ -24,7 +24,7 @@ where
     _phantom: PhantomData<ReturnType>,
 }
 
-impl<ArgType, ReturnType> AsyncJsFunction<ArgType, ReturnType>
+impl<ArgType, ReturnType> AdapterMethod<ArgType, ReturnType>
 where
     ArgType: ToNapiValue + 'static,
     ReturnType: FromNapiValue + 'static,
@@ -35,13 +35,13 @@ where
     ) -> napi::Result<Self> {
         threadsafe_fn.unref(&env)?;
 
-        Ok(AsyncJsFunction {
+        Ok(AdapterMethod {
             threadsafe_fn,
             _phantom: PhantomData,
         })
     }
 
-    pub(crate) async fn call(&self, arg: ArgType) -> quaint::Result<ReturnType> {
+    pub(crate) async fn call_as_async(&self, arg: ArgType) -> quaint::Result<ReturnType> {
         let js_result = async_unwinding_panic(async {
             let promise = self
                 .threadsafe_fn
@@ -54,12 +54,21 @@ where
         js_result.into()
     }
 
+    pub(crate) async fn call_as_sync(&self, arg: ArgType) -> quaint::Result<ReturnType> {
+        let js_result = self
+            .threadsafe_fn
+            .call_async::<AdapterResult<ReturnType>>(arg)
+            .await
+            .map_err(into_quaint_error)?;
+        js_result.into()
+    }
+
     pub(crate) fn call_non_blocking(&self, arg: ArgType) {
         _ = self.threadsafe_fn.call(arg, ThreadsafeFunctionCallMode::NonBlocking);
     }
 }
 
-impl<ArgType, ReturnType> FromNapiValue for AsyncJsFunction<ArgType, ReturnType>
+impl<ArgType, ReturnType> FromNapiValue for AdapterMethod<ArgType, ReturnType>
 where
     ArgType: ToNapiValue + 'static,
     ReturnType: FromNapiValue + 'static,

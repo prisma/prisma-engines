@@ -14,10 +14,10 @@ use crate::AdapterResult;
 // `serialize_missing_as_null` is required to make sure that "empty" values (e.g., `None` and `()`)
 //  are serialized as `null` and not `undefined`.
 // This is due to certain drivers (e.g., LibSQL) not supporting `undefined` values.
-static SERIALIZER: Serializer = Serializer::new().serialize_missing_as_null(true);
+pub(crate) static SERIALIZER: Serializer = Serializer::new().serialize_missing_as_null(true);
 
 #[derive(Clone)]
-pub(crate) struct AsyncJsFunction<ArgType, ReturnType>
+pub(crate) struct AdapterMethod<ArgType, ReturnType>
 where
     ArgType: Serialize,
     ReturnType: FromJsValue,
@@ -28,7 +28,7 @@ where
     _phantom_return: PhantomData<ReturnType>,
 }
 
-impl<T, R> From<JsValue> for AsyncJsFunction<T, R>
+impl<T, R> From<JsValue> for AdapterMethod<T, R>
 where
     T: Serialize,
     R: FromJsValue,
@@ -38,7 +38,7 @@ where
     }
 }
 
-impl<T, R> From<JsFunction> for AsyncJsFunction<T, R>
+impl<T, R> From<JsFunction> for AdapterMethod<T, R>
 where
     T: Serialize,
     R: FromJsValue,
@@ -52,35 +52,40 @@ where
     }
 }
 
-impl<T, R> AsyncJsFunction<T, R>
+impl<T, R> AdapterMethod<T, R>
 where
     T: Serialize,
     R: FromJsValue,
 {
-    pub(crate) async fn call(&self, arg1: T) -> quaint::Result<R> {
-        let result = self.call_internal(arg1).await;
+    pub(crate) async fn call_as_async(&self, arg1: T) -> quaint::Result<R> {
+        let future = self
+            .call_internal(arg1)
+            .await
+            .and_then(|v| v.dyn_into::<JsPromise>())
+            .map(JsFuture::from)
+            .map_err(into_quaint_error)?;
 
-        match result {
-            Ok(js_result) => js_result.into(),
-            Err(err) => Err(into_quaint_error(err)),
-        }
+        let return_value = future.await.map_err(into_quaint_error)?;
+        Self::js_result_into_quaint_result(return_value)
     }
 
-    async fn call_internal(&self, arg1: T) -> Result<AdapterResult<R>, JsValue> {
+    pub(crate) async fn call_as_sync(&self, arg1: T) -> quaint::Result<R> {
+        let return_value = self.call_internal(arg1).await.map_err(into_quaint_error)?;
+
+        Self::js_result_into_quaint_result(return_value)
+    }
+
+    fn js_result_into_quaint_result(value: JsValue) -> quaint::Result<R> {
+        AdapterResult::<R>::from_js_value(value)
+            .map_err(into_quaint_error)?
+            .into()
+    }
+
+    async fn call_internal(&self, arg1: T) -> Result<JsValue, JsValue> {
         let arg1 = arg1
             .serialize(&SERIALIZER)
             .map_err(|err| JsValue::from(JsError::from(&err)))?;
-        let return_value = self.fn_.call1(&JsValue::null(), &arg1)?;
-
-        let value = if let Some(promise) = return_value.dyn_ref::<JsPromise>() {
-            JsFuture::from(promise.to_owned()).await?
-        } else {
-            return_value
-        };
-
-        let js_result = AdapterResult::<R>::from_js_value(value)?;
-
-        Ok(js_result)
+        self.fn_.call1(&JsValue::null(), &arg1)
     }
 
     pub(crate) fn call_non_blocking(&self, arg: T) {
@@ -90,7 +95,7 @@ where
     }
 }
 
-impl<ArgType, ReturnType> WasmDescribe for AsyncJsFunction<ArgType, ReturnType>
+impl<ArgType, ReturnType> WasmDescribe for AdapterMethod<ArgType, ReturnType>
 where
     ArgType: Serialize,
     ReturnType: FromJsValue,
@@ -100,7 +105,7 @@ where
     }
 }
 
-impl<ArgType, ReturnType> FromWasmAbi for AsyncJsFunction<ArgType, ReturnType>
+impl<ArgType, ReturnType> FromWasmAbi for AdapterMethod<ArgType, ReturnType>
 where
     ArgType: Serialize,
     ReturnType: FromJsValue,
