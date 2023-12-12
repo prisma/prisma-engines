@@ -5,7 +5,7 @@ use crate::{
     error::ApiError,
     logger::{LogCallback, Logger, CStringFunc},
 };
-use driver_adapters::JsObject;
+// use driver_adapters::JsObject;
 // use js_sys::Function as JsFunction;
 use query_core::{
     protocol::EngineProtocol,
@@ -129,7 +129,7 @@ impl QueryEngine {
     pub fn new(
         options: ConstructorOptions,
         callback: CStringFunc,
-        maybe_adapter: Option<JsObject>,
+        // maybe_adapter: Option<JsObject>,
     ) -> Result<QueryEngine, wasm_bindgen::JsError> {
         let log_callback = LogCallback(callback);
 
@@ -151,14 +151,14 @@ impl QueryEngine {
         let config = &mut schema.configuration;
         let preview_features = config.preview_features();
 
-        if let Some(adapter) = maybe_adapter {
-            let js_queryable = driver_adapters::from_js(adapter);
+        // if let Some(adapter) = maybe_adapter {
+        //     let js_queryable = driver_adapters::from_js(adapter);
 
-            sql_connector::activate_driver_adapter(Arc::new(js_queryable));
+        //     sql_connector::activate_driver_adapter(Arc::new(js_queryable));
 
-            let provider_name = schema.connector.provider_name();
-            tracing::info!("Received driver adapter for {provider_name}.");
-        }
+        //     let provider_name = schema.connector.provider_name();
+        //     tracing::info!("Received driver adapter for {provider_name}.");
+        // }
 
         schema
             .diagnostics
