@@ -120,6 +120,8 @@ mod arch {
     }
 
     pub(crate) fn get_optional_named_property<T>(object: &::napi::JsObject, name: &str) -> JsResult<Option<T>>
+    where
+        T: ::napi::bindgen_prelude::FromNapiValue,
     {
         if has_named_property(object, name)? {
             Ok(Some(get_named_property(object, name)?))
@@ -134,6 +136,7 @@ mod arch {
 
     pub(crate) fn to_rust_str(value: JsString) -> JsResult<String> {
         Ok(value.into_utf8()?.as_str()?.to_string())
+    }
 
     pub(crate) fn from_js_value<C>(value: C) -> C {
         value
