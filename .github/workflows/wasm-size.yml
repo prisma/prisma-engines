@@ -1,0 +1,111 @@
+name: Report wasm size
+on:
+  pull_request:
+    paths-ignore:
+      - '.github/**'
+      - '!.github/workflows/query-engine-driver-adapters.yml'
+      - '.buildkite/**'
+      - '*.md'
+      - 'LICENSE'
+      - 'CODEOWNERS'
+      - 'renovate.json'
+
+jobs:
+  pr-wasm-size:
+    name: Get PR module size
+    runs-on: ubuntu-latest
+    outputs:
+      size: ${{ steps.measure.outputs.size }} 
+      size_gz: ${{ steps.measure.outputs.size_gz }} 
+    steps:
+      - name: Checkout PR branch
+        uses: actions/checkout@v4
+      
+      - uses: dtolnay/rust-toolchain@stable
+
+      - name: 'Install wasm-pack'
+        run: cargo install wasm-pack
+      
+      - name: Build and measure PR branch
+        id: measure
+        run: |
+          make build-qe-wasm
+          echo "size=$(wc -c < query-engine/query-engine-wasm/pkg/query_engine_bg.wasm)" >> $GITHUB_OUTPUT
+          echo "size_gz=$(gzip -c query-engine/query-engine-wasm/pkg/query_engine_bg.wasm | wc -c)" >> $GITHUB_OUTPUT
+
+  base-wasm-size:
+    name: Get base branch size
+    runs-on: ubuntu-latest
+    outputs:
+      size: ${{ steps.measure.outputs.size }} 
+      size_gz: ${{ steps.measure.outputs.size_gz }} 
+    steps:
+      - name: Checkout base branch
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.base.sha }}
+      
+      - uses: dtolnay/rust-toolchain@stable
+
+      - name: 'Install wasm-pack'
+        run: cargo install wasm-pack
+      
+      - name: Build and measure base branch
+        id: measure
+        run: |
+          make build-qe-wasm
+          echo "size=$(wc -c < query-engine/query-engine-wasm/pkg/query_engine_bg.wasm)" >> $GITHUB_OUTPUT
+          echo "size_gz=$(gzip -c query-engine/query-engine-wasm/pkg/query_engine_bg.wasm | wc -c)" >> $GITHUB_OUTPUT
+  
+  report-diff:
+    name: Report module size difference
+    runs-on: ubuntu-latest
+    needs: 
+      - pr-wasm-size 
+      - base-wasm-size
+
+    steps:
+      - name: Compute difference
+        id: compute
+        run: |
+          base=$(echo "${{ needs.base-wasm-size.outputs.size }}" | numfmt --to=iec-i --suffix=B)
+          base_gz=$(echo "${{ needs.base-wasm-size.outputs.size_gz }}" | numfmt --to=iec-i --suffix=B)
+          pr=$(echo "${{ needs.pr-wasm-size.outputs.size }}" | numfmt --to=iec-i --suffix=B)
+          pr_gz=$(echo "${{ needs.pr-wasm-size.outputs.size_gz }}" | numfmt --to=iec-i --suffix=B)
+          
+          diff=$(echo "$((${{ needs.pr-wasm-size.outputs.size }} - ${{ needs.base-wasm-size.outputs.size }}))" | numfmt --to=iec-i --suffix=B)
+          diff_gz=$(echo "$((${{ needs.pr-wasm-size.outputs.size_gz }} - ${{ needs.base-wasm-size.outputs.size_gz }}))" | numfmt --to=iec-i --suffix=B)
+
+          echo "base=$base" >> $GITHUB_OUTPUT
+          echo "base_gz=$base_gz" >> $GITHUB_OUTPUT
+
+          echo "pr=$pr" >> $GITHUB_OUTPUT
+          echo "pr_gz=$pr_gz" >> $GITHUB_OUTPUT
+
+          echo "diff=$diff" >> $GITHUB_OUTPUT
+          echo "diff_gz=$diff_gz" >> $GITHUB_OUTPUT
+
+      - name: Find past report comment
+        uses: peter-evans/find-comment@v2
+        id: findReportComment
+        with:
+          issue-number: ${{ github.event.pull_request.number }}
+          body-includes: '<!-- wasm-size -->'
+
+      - name: Create or update report
+        uses: peter-evans/create-or-update-comment@v3
+        with:
+          comment-id: ${{ steps.findReportComment.outputs.comment-id }}
+          issue-number: ${{ github.event.pull_request.number }}
+          body: |
+            <!-- wasm-size -->
+            ### WASM Size
+
+            |Engine        | This PR                           | Base branch                          | Diff
+            |--------------|-----------------------------------|--------------------------------------|------------------------------------
+            | WASM         | ${{ steps.compute.outputs.pr}}    |  ${{ steps.compute.outputs.base}}    | ${{ steps.compute.outputs.diff}}
+            | WASM (gzip)  | ${{ steps.compute.outputs.pr_gz}} |  ${{ steps.compute.outputs.base_gz}} | ${{ steps.compute.outputs.diff_gz}}
+          edit-mode: replace
+
+        
+  
