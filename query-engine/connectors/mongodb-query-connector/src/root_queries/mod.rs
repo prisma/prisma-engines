@@ -67,6 +67,7 @@ where
     increment_counter!(PRISMA_DATASOURCE_QUERIES_TOTAL);
 
     // TODO: emit tracing event only when "debug" level query logs are enabled.
+    // TODO prisma/team-orm#136: fix log subscription.
     let query_string = builder.build();
     debug!(target: "mongodb_query_connector::query", item_type = "query", is_query = true, query = %query_string, duration_ms = elapsed);
 
