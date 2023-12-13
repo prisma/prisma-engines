@@ -90,7 +90,7 @@ mod arch {
         }
     }
 
-    pub(crate) fn has_named_property(object: &super::wasm::JsObjectExtern, name: &str) -> JsResult<bool> {
+    fn has_named_property(object: &super::wasm::JsObjectExtern, name: &str) -> JsResult<bool> {
         js_sys::Reflect::has(object, &JsString::from_str(name).unwrap().into())
     }
 
@@ -130,7 +130,7 @@ mod arch {
         }
     }
 
-    pub(crate) fn has_named_property(object: &::napi::JsObject, name: &str) -> JsResult<bool> {
+    fn has_named_property(object: &::napi::JsObject, name: &str) -> JsResult<bool> {
         object.has_named_property(name)
     }
 
