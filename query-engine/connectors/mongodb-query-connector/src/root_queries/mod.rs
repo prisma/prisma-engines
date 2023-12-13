@@ -47,16 +47,13 @@ fn pick_singular_id(model: &Model) -> ScalarFieldRef {
         .unwrap()
 }
 
-// Performs both metrics pushing and query logging. Query logging  might be disabled and thus
-// the query_string might not need to be built, that's why rather than a query_string
-// we receive a Builder, as it's not trivial to buid a query and we want to skip that when possible.
-//
-// As a reminder, the query string is not fed into mongo db directly, we built it for debugging
-// purposes and it's only used when the query log is enabled. For querying mongo, we use the driver
-// wire protocol to build queries from a graphql query rather than executing raw mongodb statements.
-//
-// As we don't have a mongodb query string, we need to create it from the driver object model, which
-// we better skip it if we don't need it (i.e. when the query log is disabled.)
+/// Logs the query and updates metrics for an operation performed by a passed function.
+///
+/// NOTE:
+/// 1. `dyn QueryString` is used instead of a `String` to skip expensive query serialization when
+///    query logs are disabled. This, however, is not currently implemented.
+/// 2. Query strings logged are for debugging purposes only. The actual queries constructed by
+///    MongoDB driver might look slightly different.
 pub(crate) async fn observing<'a, 'b, F, T, U>(builder: &'b dyn QueryString, f: F) -> mongodb::error::Result<T>
 where
     F: FnOnce() -> U + 'a,
@@ -69,7 +66,7 @@ where
     histogram!(PRISMA_DATASOURCE_QUERIES_DURATION_HISTOGRAM_MS, elapsed);
     increment_counter!(PRISMA_DATASOURCE_QUERIES_TOTAL);
 
-    // todo: emit tracing event with the appropriate log level only query_log is enabled. And fix log suscription
+    // TODO: emit the event only when the query logs are enabled.
     let query_string = builder.build();
     debug!(target: "mongodb_query_connector::query", item_type = "query", is_query = true, query = %query_string, duration_ms = elapsed);
 
