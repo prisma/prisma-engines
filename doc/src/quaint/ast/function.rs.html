@@ -164,6 +164,8 @@
 <a href="#164" id="164">164</a>
 <a href="#165" id="165">165</a>
 <a href="#166" id="166">166</a>
+<a href="#167" id="167">167</a>
+<a href="#168" id="168">168</a>
 </pre></div><pre class="rust"><code><span class="kw">mod </span>aggregate_to_string;
 <span class="kw">mod </span>average;
 <span class="kw">mod </span>coalesce;
@@ -268,8 +270,10 @@
     </span>JsonExtractFirstArrayElem(JsonExtractFirstArrayElem&lt;<span class="lifetime">&#39;a</span>&gt;),
     <span class="attr">#[cfg(any(feature = <span class="string">&quot;postgresql&quot;</span>, feature = <span class="string">&quot;mysql&quot;</span>))]
     </span>JsonUnquote(JsonUnquote&lt;<span class="lifetime">&#39;a</span>&gt;),
-    JsonArrayAgg(JsonArrayAgg&lt;<span class="lifetime">&#39;a</span>&gt;),
-    JsonBuildObject(JsonBuildObject&lt;<span class="lifetime">&#39;a</span>&gt;),
+    <span class="attr">#[cfg(feature = <span class="string">&quot;postgresql&quot;</span>)]
+    </span>JsonArrayAgg(JsonArrayAgg&lt;<span class="lifetime">&#39;a</span>&gt;),
+    <span class="attr">#[cfg(feature = <span class="string">&quot;postgresql&quot;</span>)]
+    </span>JsonBuildObject(JsonBuildObject&lt;<span class="lifetime">&#39;a</span>&gt;),
     <span class="attr">#[cfg(any(feature = <span class="string">&quot;postgresql&quot;</span>, feature = <span class="string">&quot;mysql&quot;</span>))]
     </span>TextSearch(TextSearch&lt;<span class="lifetime">&#39;a</span>&gt;),
     <span class="attr">#[cfg(any(feature = <span class="string">&quot;postgresql&quot;</span>, feature = <span class="string">&quot;mysql&quot;</span>))]

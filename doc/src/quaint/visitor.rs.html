@@ -1225,13 +1225,6 @@
 <a href="#1225" id="1225">1225</a>
 <a href="#1226" id="1226">1226</a>
 <a href="#1227" id="1227">1227</a>
-<a href="#1228" id="1228">1228</a>
-<a href="#1229" id="1229">1229</a>
-<a href="#1230" id="1230">1230</a>
-<a href="#1231" id="1231">1231</a>
-<a href="#1232" id="1232">1232</a>
-<a href="#1233" id="1233">1233</a>
-<a href="#1234" id="1234">1234</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Visitors for reading an abstract SQL syntax tree, generating the query and
 //! gathering parameters in the right order.
 //!
@@ -1372,6 +1365,12 @@
 
     <span class="attr">#[cfg(any(feature = <span class="string">&quot;postgresql&quot;</span>, feature = <span class="string">&quot;mysql&quot;</span>))]
     </span><span class="kw">fn </span>visit_json_unquote(<span class="kw-2">&amp;mut </span><span class="self">self</span>, json_unquote: JsonUnquote&lt;<span class="lifetime">&#39;a</span>&gt;) -&gt; <span class="prelude-ty">Result</span>;
+
+    <span class="attr">#[cfg(feature = <span class="string">&quot;postgresql&quot;</span>)]
+    </span><span class="kw">fn </span>visit_json_array_agg(<span class="kw-2">&amp;mut </span><span class="self">self</span>, array_agg: JsonArrayAgg&lt;<span class="lifetime">&#39;a</span>&gt;) -&gt; <span class="prelude-ty">Result</span>;
+
+    <span class="attr">#[cfg(feature = <span class="string">&quot;postgresql&quot;</span>)]
+    </span><span class="kw">fn </span>visit_json_build_object(<span class="kw-2">&amp;mut </span><span class="self">self</span>, build_obj: JsonBuildObject&lt;<span class="lifetime">&#39;a</span>&gt;) -&gt; <span class="prelude-ty">Result</span>;
 
     <span class="attr">#[cfg(any(feature = <span class="string">&quot;postgresql&quot;</span>, feature = <span class="string">&quot;mysql&quot;</span>))]
     </span><span class="kw">fn </span>visit_text_search(<span class="kw-2">&amp;mut </span><span class="self">self</span>, text_search: TextSearch&lt;<span class="lifetime">&#39;a</span>&gt;) -&gt; <span class="prelude-ty">Result</span>;
@@ -2366,26 +2365,13 @@
             FunctionType::Concat(concat) =&gt; {
                 <span class="self">self</span>.visit_concat(concat)<span class="question-mark">?</span>;
             }
-            FunctionType::JsonArrayAgg(array_agg) =&gt; {
-                <span class="self">self</span>.write(<span class="string">&quot;JSON_AGG&quot;</span>)<span class="question-mark">?</span>;
-                <span class="self">self</span>.surround_with(<span class="string">&quot;(&quot;</span>, <span class="string">&quot;)&quot;</span>, |s| s.visit_expression(<span class="kw-2">*</span>array_agg.expr))<span class="question-mark">?</span>;
+            <span class="attr">#[cfg(feature = <span class="string">&quot;postgresql&quot;</span>)]
+            </span>FunctionType::JsonArrayAgg(array_agg) =&gt; {
+                <span class="self">self</span>.visit_json_array_agg(array_agg)<span class="question-mark">?</span>;
             }
-            FunctionType::JsonBuildObject(build_obj) =&gt; {
-                <span class="kw">let </span>len = build_obj.exprs.len();
-
-                <span class="self">self</span>.write(<span class="string">&quot;JSON_BUILD_OBJECT&quot;</span>)<span class="question-mark">?</span>;
-                <span class="self">self</span>.surround_with(<span class="string">&quot;(&quot;</span>, <span class="string">&quot;)&quot;</span>, |s| {
-                    <span class="kw">for </span>(i, (name, expr)) <span class="kw">in </span>build_obj.exprs.into_iter().enumerate() {
-                        s.visit_raw_value(Value::text(name))<span class="question-mark">?</span>;
-                        s.write(<span class="string">&quot;, &quot;</span>)<span class="question-mark">?</span>;
-                        s.visit_expression(expr)<span class="question-mark">?</span>;
-                        <span class="kw">if </span>i &lt; (len - <span class="number">1</span>) {
-                            s.write(<span class="string">&quot;, &quot;</span>)<span class="question-mark">?</span>;
-                        }
-                    }
-
-                    <span class="prelude-val">Ok</span>(())
-                })<span class="question-mark">?</span>;
+            <span class="attr">#[cfg(feature = <span class="string">&quot;postgresql&quot;</span>)]
+            </span>FunctionType::JsonBuildObject(build_obj) =&gt; {
+                <span class="self">self</span>.visit_json_build_object(build_obj)<span class="question-mark">?</span>;
             }
         };
 

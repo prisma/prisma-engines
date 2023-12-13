@@ -1210,10 +1210,100 @@
 <a href="#1210" id="1210">1210</a>
 <a href="#1211" id="1211">1211</a>
 <a href="#1212" id="1212">1212</a>
+<a href="#1213" id="1213">1213</a>
+<a href="#1214" id="1214">1214</a>
+<a href="#1215" id="1215">1215</a>
+<a href="#1216" id="1216">1216</a>
+<a href="#1217" id="1217">1217</a>
+<a href="#1218" id="1218">1218</a>
+<a href="#1219" id="1219">1219</a>
+<a href="#1220" id="1220">1220</a>
+<a href="#1221" id="1221">1221</a>
+<a href="#1222" id="1222">1222</a>
+<a href="#1223" id="1223">1223</a>
+<a href="#1224" id="1224">1224</a>
+<a href="#1225" id="1225">1225</a>
+<a href="#1226" id="1226">1226</a>
+<a href="#1227" id="1227">1227</a>
+<a href="#1228" id="1228">1228</a>
+<a href="#1229" id="1229">1229</a>
+<a href="#1230" id="1230">1230</a>
+<a href="#1231" id="1231">1231</a>
+<a href="#1232" id="1232">1232</a>
+<a href="#1233" id="1233">1233</a>
+<a href="#1234" id="1234">1234</a>
+<a href="#1235" id="1235">1235</a>
+<a href="#1236" id="1236">1236</a>
+<a href="#1237" id="1237">1237</a>
+<a href="#1238" id="1238">1238</a>
+<a href="#1239" id="1239">1239</a>
+<a href="#1240" id="1240">1240</a>
+<a href="#1241" id="1241">1241</a>
+<a href="#1242" id="1242">1242</a>
+<a href="#1243" id="1243">1243</a>
+<a href="#1244" id="1244">1244</a>
+<a href="#1245" id="1245">1245</a>
+<a href="#1246" id="1246">1246</a>
+<a href="#1247" id="1247">1247</a>
+<a href="#1248" id="1248">1248</a>
+<a href="#1249" id="1249">1249</a>
+<a href="#1250" id="1250">1250</a>
+<a href="#1251" id="1251">1251</a>
+<a href="#1252" id="1252">1252</a>
+<a href="#1253" id="1253">1253</a>
+<a href="#1254" id="1254">1254</a>
+<a href="#1255" id="1255">1255</a>
+<a href="#1256" id="1256">1256</a>
+<a href="#1257" id="1257">1257</a>
+<a href="#1258" id="1258">1258</a>
+<a href="#1259" id="1259">1259</a>
+<a href="#1260" id="1260">1260</a>
+<a href="#1261" id="1261">1261</a>
+<a href="#1262" id="1262">1262</a>
+<a href="#1263" id="1263">1263</a>
+<a href="#1264" id="1264">1264</a>
+<a href="#1265" id="1265">1265</a>
+<a href="#1266" id="1266">1266</a>
+<a href="#1267" id="1267">1267</a>
+<a href="#1268" id="1268">1268</a>
+<a href="#1269" id="1269">1269</a>
+<a href="#1270" id="1270">1270</a>
+<a href="#1271" id="1271">1271</a>
+<a href="#1272" id="1272">1272</a>
+<a href="#1273" id="1273">1273</a>
+<a href="#1274" id="1274">1274</a>
+<a href="#1275" id="1275">1275</a>
+<a href="#1276" id="1276">1276</a>
+<a href="#1277" id="1277">1277</a>
+<a href="#1278" id="1278">1278</a>
+<a href="#1279" id="1279">1279</a>
+<a href="#1280" id="1280">1280</a>
+<a href="#1281" id="1281">1281</a>
+<a href="#1282" id="1282">1282</a>
+<a href="#1283" id="1283">1283</a>
+<a href="#1284" id="1284">1284</a>
+<a href="#1285" id="1285">1285</a>
+<a href="#1286" id="1286">1286</a>
+<a href="#1287" id="1287">1287</a>
+<a href="#1288" id="1288">1288</a>
+<a href="#1289" id="1289">1289</a>
+<a href="#1290" id="1290">1290</a>
+<a href="#1291" id="1291">1291</a>
+<a href="#1292" id="1292">1292</a>
+<a href="#1293" id="1293">1293</a>
+<a href="#1294" id="1294">1294</a>
+<a href="#1295" id="1295">1295</a>
+<a href="#1296" id="1296">1296</a>
+<a href="#1297" id="1297">1297</a>
+<a href="#1298" id="1298">1298</a>
+<a href="#1299" id="1299">1299</a>
+<a href="#1300" id="1300">1300</a>
+<a href="#1301" id="1301">1301</a>
 </pre></div><pre class="rust"><code><span class="kw">use crate</span>::{
     ast::<span class="kw-2">*</span>,
     visitor::{<span class="self">self</span>, Visitor},
 };
+<span class="kw">use </span>itertools::Itertools;
 <span class="kw">use </span>std::{
     fmt::{<span class="self">self</span>, Write},
     ops::Deref,
@@ -1709,6 +1799,57 @@
                 <span class="self">self</span>.write(<span class="string">&quot;::jsonb)&quot;</span>)
             }
         }
+    }
+
+    <span class="attr">#[cfg(feature = <span class="string">&quot;postgresql&quot;</span>)]
+    </span><span class="kw">fn </span>visit_json_array_agg(<span class="kw-2">&amp;mut </span><span class="self">self</span>, array_agg: JsonArrayAgg&lt;<span class="lifetime">&#39;a</span>&gt;) -&gt; visitor::Result {
+        <span class="self">self</span>.write(<span class="string">&quot;JSONB_AGG&quot;</span>)<span class="question-mark">?</span>;
+        <span class="self">self</span>.surround_with(<span class="string">&quot;(&quot;</span>, <span class="string">&quot;)&quot;</span>, |s| s.visit_expression(<span class="kw-2">*</span>array_agg.expr))<span class="question-mark">?</span>;
+
+        <span class="prelude-val">Ok</span>(())
+    }
+
+    <span class="attr">#[cfg(feature = <span class="string">&quot;postgresql&quot;</span>)]
+    </span><span class="kw">fn </span>visit_json_build_object(<span class="kw-2">&amp;mut </span><span class="self">self</span>, build_obj: JsonBuildObject&lt;<span class="lifetime">&#39;a</span>&gt;) -&gt; visitor::Result {
+        <span class="comment">// Functions in PostgreSQL can only accept up to 100 arguments, which means that we can&#39;t
+        // build an object with more than 50 fields using `JSON_BUILD_OBJECT`. To work around
+        // that, we chunk the fields into subsets of 50 fields or less, build one or more JSONB
+        // objects using one or more `JSONB_BUILD_OBJECT` invocations, and merge them together
+        // using the `||` operator (which is not possible with plain JSON).
+        //
+        // See &lt;https://github.com/prisma/prisma/issues/22298&gt;.
+        //
+        // Another alternative that was considered for the specific use case of loading relations
+        // in Query Engine was using `ROW_TO_JSON` but it turned out to not be a suitable
+        // replacement for several reasons, the main one being the limit of the length of field
+        // names (63 characters).
+        </span><span class="kw">const </span>MAX_FIELDS: usize = <span class="number">50</span>;
+        <span class="kw">let </span>num_chunks = build_obj.exprs.len().div_ceil(MAX_FIELDS);
+
+        <span class="kw">for </span>(i, chunk) <span class="kw">in </span>build_obj.exprs.into_iter().chunks(MAX_FIELDS).into_iter().enumerate() {
+            <span class="kw">let </span><span class="kw-2">mut </span>chunk = chunk.peekable();
+
+            <span class="self">self</span>.write(<span class="string">&quot;JSONB_BUILD_OBJECT&quot;</span>)<span class="question-mark">?</span>;
+
+            <span class="self">self</span>.surround_with(<span class="string">&quot;(&quot;</span>, <span class="string">&quot;)&quot;</span>, |s| {
+                <span class="kw">while let </span><span class="prelude-val">Some</span>((name, expr)) = chunk.next() {
+                    s.visit_raw_value(Value::text(name))<span class="question-mark">?</span>;
+                    s.write(<span class="string">&quot;, &quot;</span>)<span class="question-mark">?</span>;
+                    s.visit_expression(expr)<span class="question-mark">?</span>;
+                    <span class="kw">if </span>chunk.peek().is_some() {
+                        s.write(<span class="string">&quot;, &quot;</span>)<span class="question-mark">?</span>;
+                    }
+                }
+
+                <span class="prelude-val">Ok</span>(())
+            })<span class="question-mark">?</span>;
+
+            <span class="kw">if </span>i &lt; num_chunks - <span class="number">1 </span>{
+                <span class="self">self</span>.write(<span class="string">&quot; || &quot;</span>)<span class="question-mark">?</span>;
+            }
+        }
+
+        <span class="prelude-val">Ok</span>(())
     }
 
     <span class="kw">fn </span>visit_text_search(<span class="kw-2">&amp;mut </span><span class="self">self</span>, text_search: <span class="kw">crate</span>::prelude::TextSearch&lt;<span class="lifetime">&#39;a</span>&gt;) -&gt; visitor::Result {
@@ -2420,6 +2561,43 @@
         <span class="kw">let </span>(sql, <span class="kw">_</span>) = Postgres::build(q).unwrap();
 
         <span class="macro">assert_eq!</span>(<span class="string">&quot;SELECT MIN(\&quot;enum\&quot;)::text, MAX(\&quot;enum\&quot;)::text FROM \&quot;User\&quot;&quot;</span>, sql);
+    }
+
+    <span class="kw">mod </span>test_json_build_object {
+        <span class="kw">use super</span>::<span class="kw-2">*</span>;
+
+        <span class="attr">#[test]
+        </span><span class="kw">fn </span>simple() {
+            <span class="kw">let </span>build_json = build_json_object(<span class="number">3</span>);
+            <span class="kw">let </span>query = Select::default().value(build_json);
+            <span class="kw">let </span>(sql, <span class="kw">_</span>) = Postgres::build(query).unwrap();
+
+            <span class="macro">assert_eq!</span>(<span class="string">&quot;SELECT JSONB_BUILD_OBJECT(&#39;f1&#39;, $1, &#39;f2&#39;, $2, &#39;f3&#39;, $3)&quot;</span>, sql);
+        }
+
+        <span class="attr">#[test]
+        </span><span class="kw">fn </span>chunked() {
+            <span class="kw">let </span>build_json = build_json_object(<span class="number">110</span>);
+            <span class="kw">let </span>query = Select::default().value(build_json);
+            <span class="kw">let </span>(sql, <span class="kw">_</span>) = Postgres::build(query).unwrap();
+
+            <span class="macro">assert_eq!</span>(
+                <span class="macro">concat!</span>(
+                    <span class="string">&quot;SELECT JSONB_BUILD_OBJECT(&#39;f1&#39;, $1, &#39;f2&#39;, $2, &#39;f3&#39;, $3, &#39;f4&#39;, $4, &#39;f5&#39;, $5, &#39;f6&#39;, $6, &#39;f7&#39;, $7, &#39;f8&#39;, $8, &#39;f9&#39;, $9, &#39;f10&#39;, $10, &#39;f11&#39;, $11, &#39;f12&#39;, $12, &#39;f13&#39;, $13, &#39;f14&#39;, $14, &#39;f15&#39;, $15, &#39;f16&#39;, $16, &#39;f17&#39;, $17, &#39;f18&#39;, $18, &#39;f19&#39;, $19, &#39;f20&#39;, $20, &#39;f21&#39;, $21, &#39;f22&#39;, $22, &#39;f23&#39;, $23, &#39;f24&#39;, $24, &#39;f25&#39;, $25, &#39;f26&#39;, $26, &#39;f27&#39;, $27, &#39;f28&#39;, $28, &#39;f29&#39;, $29, &#39;f30&#39;, $30, &#39;f31&#39;, $31, &#39;f32&#39;, $32, &#39;f33&#39;, $33, &#39;f34&#39;, $34, &#39;f35&#39;, $35, &#39;f36&#39;, $36, &#39;f37&#39;, $37, &#39;f38&#39;, $38, &#39;f39&#39;, $39, &#39;f40&#39;, $40, &#39;f41&#39;, $41, &#39;f42&#39;, $42, &#39;f43&#39;, $43, &#39;f44&#39;, $44, &#39;f45&#39;, $45, &#39;f46&#39;, $46, &#39;f47&#39;, $47, &#39;f48&#39;, $48, &#39;f49&#39;, $49, &#39;f50&#39;, $50)&quot;</span>,
+                    <span class="string">&quot; || JSONB_BUILD_OBJECT(&#39;f51&#39;, $51, &#39;f52&#39;, $52, &#39;f53&#39;, $53, &#39;f54&#39;, $54, &#39;f55&#39;, $55, &#39;f56&#39;, $56, &#39;f57&#39;, $57, &#39;f58&#39;, $58, &#39;f59&#39;, $59, &#39;f60&#39;, $60, &#39;f61&#39;, $61, &#39;f62&#39;, $62, &#39;f63&#39;, $63, &#39;f64&#39;, $64, &#39;f65&#39;, $65, &#39;f66&#39;, $66, &#39;f67&#39;, $67, &#39;f68&#39;, $68, &#39;f69&#39;, $69, &#39;f70&#39;, $70, &#39;f71&#39;, $71, &#39;f72&#39;, $72, &#39;f73&#39;, $73, &#39;f74&#39;, $74, &#39;f75&#39;, $75, &#39;f76&#39;, $76, &#39;f77&#39;, $77, &#39;f78&#39;, $78, &#39;f79&#39;, $79, &#39;f80&#39;, $80, &#39;f81&#39;, $81, &#39;f82&#39;, $82, &#39;f83&#39;, $83, &#39;f84&#39;, $84, &#39;f85&#39;, $85, &#39;f86&#39;, $86, &#39;f87&#39;, $87, &#39;f88&#39;, $88, &#39;f89&#39;, $89, &#39;f90&#39;, $90, &#39;f91&#39;, $91, &#39;f92&#39;, $92, &#39;f93&#39;, $93, &#39;f94&#39;, $94, &#39;f95&#39;, $95, &#39;f96&#39;, $96, &#39;f97&#39;, $97, &#39;f98&#39;, $98, &#39;f99&#39;, $99, &#39;f100&#39;, $100)&quot;</span>,
+                    <span class="string">&quot; || JSONB_BUILD_OBJECT(&#39;f101&#39;, $101, &#39;f102&#39;, $102, &#39;f103&#39;, $103, &#39;f104&#39;, $104, &#39;f105&#39;, $105, &#39;f106&#39;, $106, &#39;f107&#39;, $107, &#39;f108&#39;, $108, &#39;f109&#39;, $109, &#39;f110&#39;, $110)&quot;
+                </span>),
+                sql
+            );
+        }
+
+        <span class="kw">fn </span>build_json_object(num_fields: u32) -&gt; JsonBuildObject&lt;<span class="lifetime">&#39;static</span>&gt; {
+            <span class="kw">let </span>fields = (<span class="number">1</span>..=num_fields)
+                .map(|i| (<span class="macro">format!</span>(<span class="string">&quot;f{i}&quot;</span>).into(), Expression::from(i <span class="kw">as </span>i64)))
+                .collect();
+
+            JsonBuildObject { exprs: fields }
+        }
     }
 }
 </code></pre></div></section></main></body></html>

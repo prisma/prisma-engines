@@ -1801,9 +1801,19 @@
 <a href="#1801" id="1801">1801</a>
 <a href="#1802" id="1802">1802</a>
 <a href="#1803" id="1803">1803</a>
+<a href="#1804" id="1804">1804</a>
+<a href="#1805" id="1805">1805</a>
+<a href="#1806" id="1806">1806</a>
+<a href="#1807" id="1807">1807</a>
+<a href="#1808" id="1808">1808</a>
+<a href="#1809" id="1809">1809</a>
+<a href="#1810" id="1810">1810</a>
+<a href="#1811" id="1811">1811</a>
+<a href="#1812" id="1812">1812</a>
+<a href="#1813" id="1813">1813</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span><span class="kw">super</span>::Visitor;
 <span class="attr">#[cfg(any(feature = <span class="string">&quot;postgresql&quot;</span>, feature = <span class="string">&quot;mysql&quot;</span>))]
-</span><span class="kw">use </span><span class="kw">crate</span>::prelude::{JsonExtract, JsonType, JsonUnquote};
+</span><span class="kw">use </span><span class="kw">crate</span>::prelude::{JsonArrayAgg, JsonBuildObject, JsonExtract, JsonType, JsonUnquote};
 <span class="kw">use crate</span>::{
     ast::{
         Column, Comparable, Expression, ExpressionKind, Insert, IntoRaw, Join, JoinData, Joinable, Merge, OnConflict,
@@ -2457,6 +2467,16 @@
     <span class="attr">#[cfg(any(feature = <span class="string">&quot;postgresql&quot;</span>, feature = <span class="string">&quot;mysql&quot;</span>))]
     </span><span class="kw">fn </span>visit_json_unquote(<span class="kw-2">&amp;mut </span><span class="self">self</span>, _json_unquote: JsonUnquote&lt;<span class="lifetime">&#39;a</span>&gt;) -&gt; visitor::Result {
         <span class="macro">unimplemented!</span>(<span class="string">&quot;JSON filtering is not yet supported on MSSQL&quot;</span>)
+    }
+
+    <span class="attr">#[cfg(feature = <span class="string">&quot;postgresql&quot;</span>)]
+    </span><span class="kw">fn </span>visit_json_array_agg(<span class="kw-2">&amp;mut </span><span class="self">self</span>, _array_agg: JsonArrayAgg&lt;<span class="lifetime">&#39;a</span>&gt;) -&gt; visitor::Result {
+        <span class="macro">unimplemented!</span>(<span class="string">&quot;JSON_AGG is not yet supported on MSSQL&quot;</span>)
+    }
+
+    <span class="attr">#[cfg(feature = <span class="string">&quot;postgresql&quot;</span>)]
+    </span><span class="kw">fn </span>visit_json_build_object(<span class="kw-2">&amp;mut </span><span class="self">self</span>, _build_obj: JsonBuildObject&lt;<span class="lifetime">&#39;a</span>&gt;) -&gt; visitor::Result {
+        <span class="macro">unimplemented!</span>(<span class="string">&quot;JSON_BUILD_OBJECT is not yet supported on MSSQL&quot;</span>)
     }
 
     <span class="attr">#[cfg(feature = <span class="string">&quot;postgresql&quot;</span>)]

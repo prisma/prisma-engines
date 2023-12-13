@@ -969,6 +969,16 @@
 <a href="#969" id="969">969</a>
 <a href="#970" id="970">970</a>
 <a href="#971" id="971">971</a>
+<a href="#972" id="972">972</a>
+<a href="#973" id="973">973</a>
+<a href="#974" id="974">974</a>
+<a href="#975" id="975">975</a>
+<a href="#976" id="976">976</a>
+<a href="#977" id="977">977</a>
+<a href="#978" id="978">978</a>
+<a href="#979" id="979">979</a>
+<a href="#980" id="980">980</a>
+<a href="#981" id="981">981</a>
 </pre></div><pre class="rust"><code><span class="kw">use crate</span>::{
     ast::<span class="kw-2">*</span>,
     error::{Error, ErrorKind},
@@ -1531,6 +1541,16 @@
         <span class="self">self</span>.write(<span class="string">&quot;)&quot;</span>)<span class="question-mark">?</span>;
 
         <span class="prelude-val">Ok</span>(())
+    }
+
+    <span class="attr">#[cfg(feature = <span class="string">&quot;postgresql&quot;</span>)]
+    </span><span class="kw">fn </span>visit_json_array_agg(<span class="kw-2">&amp;mut </span><span class="self">self</span>, _array_agg: JsonArrayAgg&lt;<span class="lifetime">&#39;a</span>&gt;) -&gt; visitor::Result {
+        <span class="macro">unimplemented!</span>(<span class="string">&quot;JSON_ARRAYAGG is not yet supported on MySQL&quot;</span>)
+    }
+
+    <span class="attr">#[cfg(feature = <span class="string">&quot;postgresql&quot;</span>)]
+    </span><span class="kw">fn </span>visit_json_build_object(<span class="kw-2">&amp;mut </span><span class="self">self</span>, _build_obj: JsonBuildObject&lt;<span class="lifetime">&#39;a</span>&gt;) -&gt; visitor::Result {
+        <span class="macro">unimplemented!</span>(<span class="string">&quot;JSON_OBJECT is not yet supported on MySQL&quot;</span>)
     }
 
     <span class="kw">fn </span>visit_ordering(<span class="kw-2">&amp;mut </span><span class="self">self</span>, ordering: Ordering&lt;<span class="lifetime">&#39;a</span>&gt;) -&gt; visitor::Result {
