@@ -51,3 +51,6 @@ workspace = true
 [dependencies.user-facing-errors]
 features = ["sql"]
 workspace = true
+
+[dev-dependencies]
+pretty_assertions = "1.4.0"

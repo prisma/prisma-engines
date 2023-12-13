@@ -175,7 +175,7 @@ impl QueryString for UpdateOne<'_> {
         fmt_doc(buffer, self.filter, 1).unwrap();
 
         if cfg!(debug_assertions) {
-            writeln!(buffer, ", ").unwrap();
+            writeln!(buffer, ",").unwrap();
         } else {
             write!(buffer, ", ").unwrap();
         }
@@ -305,6 +305,7 @@ fn fmt_val(buffer: &mut String, val: &Bson, depth: usize) -> std::fmt::Result {
 mod tests {
     use super::*;
     use bson::doc;
+    use pretty_assertions::assert_eq;
 
     #[test]
     fn test_aggregate() {

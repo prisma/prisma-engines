@@ -2496,6 +2496,7 @@ dependencies = [
  "itertools",
  "mongodb",
  "mongodb-client",
+ "pretty_assertions",
  "prisma-value",
  "psl",
  "query-connector",
