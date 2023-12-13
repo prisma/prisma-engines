@@ -553,7 +553,7 @@ impl<'a> Visitor<'a> for Mysql<'a> {
         Ok(())
     }
 
-    #[cfg(feature = "postgresql")]
+    #[cfg(any(feature = "postgresql", feature = "mysql"))]
     fn visit_json_unquote(&mut self, json_unquote: JsonUnquote<'a>) -> visitor::Result {
         self.write("JSON_UNQUOTE(")?;
         self.visit_expression(*json_unquote.expr)?;
@@ -567,7 +567,7 @@ impl<'a> Visitor<'a> for Mysql<'a> {
         unimplemented!("JSON_ARRAYAGG is not yet supported on MySQL")
     }
 
-    #[cfg(any(feature = "postgresql", feature = "mysql"))]
+    #[cfg(feature = "postgresql")]
     fn visit_json_build_object(&mut self, _build_obj: JsonBuildObject<'a>) -> visitor::Result {
         unimplemented!("JSON_OBJECT is not yet supported on MySQL")
     }
