@@ -4,7 +4,7 @@ use crate::{
     filter::{FilterPrefix, MongoFilter, MongoFilterVisitor},
     output_meta,
     query_builder::MongoReadQueryBuilder,
-    query_strings::{DeleteMany, InsertMany, InsertOne, UpdateMany, UpdateOne},
+    query_strings::{DeleteMany, InsertMany, InsertOne, RunCommand, UpdateMany, UpdateOne},
     root_queries::raw::{MongoCommand, MongoOperation},
     IntoBson,
 };
@@ -65,11 +65,9 @@ pub async fn create_record<'conn>(
     }
 
     let query_builder = InsertOne::new(&doc, coll.name());
-    let insert_result = observing(Some(&query_builder), || {
-        coll.insert_one_with_session(&doc, None, session)
-    })
-    .instrument(span)
-    .await?;
+    let insert_result = observing(&query_builder, || coll.insert_one_with_session(&doc, None, session))
+        .instrument(span)
+        .await?;
     let id_value = value_from_bson(insert_result.inserted_id, &id_meta)?;
 
     Ok(SingleRecord {
@@ -122,9 +120,9 @@ pub async fn create_records<'conn>(
     let ordered = !skip_duplicates;
     let options = Some(InsertManyOptions::builder().ordered(ordered).build());
 
-    let query_string_builder = InsertMany::new(&docs, ordered, coll.name());
+    let query_string_builder = InsertMany::new(&docs, coll.name(), ordered);
     let docs_iter = docs.iter();
-    let insert = observing(Some(&query_string_builder), || {
+    let insert = observing(&query_string_builder, || {
         coll.insert_many_with_session(docs_iter, options, session)
     })
     .instrument(span);
@@ -206,7 +204,7 @@ pub async fn update_records<'conn>(
 
     if !update_docs.is_empty() {
         let query_string_builder = UpdateMany::new(&filter, &update_docs, coll.name());
-        let res = observing(Some(&query_string_builder), || {
+        let res = observing(&query_string_builder, || {
             coll.update_many_with_session(filter.clone(), update_docs.clone(), None, session)
         })
         .instrument(span)
@@ -268,7 +266,7 @@ pub async fn delete_records<'conn>(
 
     let filter = doc! { id_field.db_name(): { "$in": ids } };
     let query_string_builder = DeleteMany::new(&filter, coll.name());
-    let delete_result = observing(Some(&query_string_builder), || {
+    let delete_result = observing(&query_string_builder, || {
         coll.delete_many_with_session(filter.clone(), None, session)
     })
     .instrument(span)
@@ -352,7 +350,7 @@ pub async fn m2m_connect<'conn>(
 
     let query_string_builder = UpdateOne::new(&parent_filter, &parent_update, parent_coll.name());
 
-    observing(Some(&query_string_builder), || {
+    observing(&query_string_builder, || {
         parent_coll.update_one_with_session(parent_filter.clone(), parent_update.clone(), None, session)
     })
     .await?;
@@ -373,7 +371,7 @@ pub async fn m2m_connect<'conn>(
 
     let child_updates = vec![child_update.clone()];
     let query_string_builder = UpdateMany::new(&child_filter, &child_updates, child_coll.name());
-    observing(Some(&query_string_builder), || {
+    observing(&query_string_builder, || {
         child_coll.update_many_with_session(child_filter.clone(), child_update.clone(), None, session)
     })
     .await?;
@@ -418,7 +416,7 @@ pub async fn m2m_disconnect<'conn>(
 
     // First update the parent and remove all child IDs to the m:n scalar field.
     let query_string_builder = UpdateOne::new(&parent_filter, &parent_update, parent_coll.name());
-    observing(Some(&query_string_builder), || {
+    observing(&query_string_builder, || {
         parent_coll.update_one_with_session(parent_filter.clone(), parent_update.clone(), None, session)
     })
     .await?;
@@ -440,7 +438,7 @@ pub async fn m2m_disconnect<'conn>(
 
     let child_updates = vec![child_update.clone()];
     let query_string_builder = UpdateMany::new(&child_filter, &child_updates, child_coll.name());
-    observing(Some(&query_string_builder), || {
+    observing(&query_string_builder, || {
         child_coll.update_many_with_session(child_filter.clone(), child_update, None, session)
     })
     .await?;
@@ -477,7 +475,11 @@ pub async fn query_raw<'conn>(
     async {
         let json_result = match mongo_command {
             MongoCommand::Raw { cmd } => {
-                let mut result = observing(None, || database.run_command_with_session(cmd, None, session)).await?;
+                let query_string_builder = RunCommand::new(&cmd);
+                let mut result = observing(&query_string_builder, || {
+                    database.run_command_with_session(cmd.clone(), None, session)
+                })
+                .await?;
 
                 // Removes unnecessary properties from raw response
                 // See https://docs.mongodb.com/v5.0/reference/method/db.runCommand

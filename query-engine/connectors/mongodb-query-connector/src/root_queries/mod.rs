@@ -57,10 +57,7 @@ fn pick_singular_id(model: &Model) -> ScalarFieldRef {
 //
 // As we don't have a mongodb query string, we need to create it from the driver object model, which
 // we better skip it if we don't need it (i.e. when the query log is disabled.)
-pub(crate) async fn observing<'a, 'b, F, T, U>(
-    query_string_builder: Option<&'b dyn QueryString>,
-    f: F,
-) -> mongodb::error::Result<T>
+pub(crate) async fn observing<'a, 'b, F, T, U>(builder: &'b dyn QueryString, f: F) -> mongodb::error::Result<T>
 where
     F: FnOnce() -> U + 'a,
     U: Future<Output = mongodb::error::Result<T>>,
@@ -72,13 +69,9 @@ where
     histogram!(PRISMA_DATASOURCE_QUERIES_DURATION_HISTOGRAM_MS, elapsed);
     increment_counter!(PRISMA_DATASOURCE_QUERIES_TOTAL);
 
-    let params: Vec<i32> = Vec::new();
-
     // todo: emit tracing event with the appropriate log level only query_log is enabled. And fix log suscription
-    if let Some(qs) = query_string_builder {
-        let qs = qs.build();
-        debug!(target: "mongodb_query_connector::query", item_type = "query", is_query = true, query = %qs, params = ?params, duration_ms=elapsed);
-    }
+    let query_string = builder.build();
+    debug!(target: "mongodb_query_connector::query", item_type = "query", is_query = true, query = %query_string, duration_ms = elapsed);
 
     res
 }

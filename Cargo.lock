@@ -2490,6 +2490,7 @@ dependencies = [
  "bson",
  "chrono",
  "cuid",
+ "derive_more",
  "futures",
  "indexmap 1.9.3",
  "itertools",
