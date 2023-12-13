@@ -66,7 +66,7 @@ where
     histogram!(PRISMA_DATASOURCE_QUERIES_DURATION_HISTOGRAM_MS, elapsed);
     increment_counter!(PRISMA_DATASOURCE_QUERIES_TOTAL);
 
-    // TODO: emit the event only when the query logs are enabled.
+    // TODO: emit tracing event only when "debug" level query logs are enabled.
     let query_string = builder.build();
     debug!(target: "mongodb_query_connector::query", item_type = "query", is_query = true, query = %query_string, duration_ms = elapsed);
 

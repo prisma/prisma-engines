@@ -498,8 +498,11 @@ pub async fn query_raw<'conn>(
                 match operation {
                     MongoOperation::Find(filter, options) => {
                         let unwrapped_filter = filter.clone().unwrap_or_default();
-                        let project = Document::default();
-                        let query_string_builder = Find::new(&unwrapped_filter, &project, coll.name());
+                        let projection = options
+                            .as_ref()
+                            .and_then(|options| options.projection.clone())
+                            .unwrap_or_default();
+                        let query_string_builder = Find::new(&unwrapped_filter, &projection, coll.name());
                         let cursor = observing(&query_string_builder, || {
                             coll.find_with_session(filter, options, session)
                         })
