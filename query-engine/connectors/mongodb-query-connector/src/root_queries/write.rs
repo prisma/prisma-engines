@@ -331,7 +331,14 @@ pub async fn m2m_connect<'conn>(
     let parent_id = parent_id.values().next().unwrap();
     let parent_id_field = pick_singular_id(&parent_model);
 
-    let parent_ids_scalar_field_name = field.walker().fields().unwrap().next().unwrap().name().to_owned();
+    let parent_ids_scalar_field_name = field
+        .walker()
+        .fields()
+        .unwrap()
+        .next()
+        .unwrap()
+        .database_name()
+        .to_owned();
     let parent_id = (&parent_id_field, parent_id)
         .into_bson()
         .decorate_with_scalar_field_info(&parent_id_field)?;
@@ -367,7 +374,7 @@ pub async fn m2m_connect<'conn>(
         .unwrap()
         .next()
         .unwrap()
-        .name()
+        .database_name()
         .to_owned();
     let child_update = doc! { "$addToSet": { child_ids_scalar_field_name: parent_id } };
 
