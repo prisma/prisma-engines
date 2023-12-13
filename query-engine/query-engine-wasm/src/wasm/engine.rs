@@ -16,7 +16,7 @@ use request_handlers::ConnectorKind;
 use request_handlers::{load_executor, RequestBody, RequestHandler};
 use serde::{Deserialize, Serialize};
 use serde_json::json;
-use std::{collections::BTreeMap, path::PathBuf, sync::Arc};
+use std::sync::Arc;
 use tokio::sync::RwLock;
 use tracing::{field, instrument::WithSubscriber, Instrument, Span};
 use tracing_subscriber::filter::LevelFilter;
@@ -41,7 +41,6 @@ enum Inner {
 /// Everything needed to connect to the database and have the core running.
 struct EngineBuilder {
     schema: Arc<psl::ValidatedSchema>,
-    config_dir: PathBuf,
     engine_protocol: EngineProtocol,
 }
 
@@ -50,7 +49,6 @@ struct ConnectedEngine {
     schema: Arc<psl::ValidatedSchema>,
     query_schema: Arc<QuerySchema>,
     executor: crate::Executor,
-    config_dir: PathBuf,
     engine_protocol: EngineProtocol,
 }
 
@@ -89,11 +87,6 @@ pub struct ConstructorOptions {
     #[serde(default)]
     log_queries: bool,
     #[serde(default)]
-    datasource_overrides: BTreeMap<String, String>,
-    config_dir: PathBuf,
-    #[serde(default)]
-    ignore_env_var_errors: bool,
-    #[serde(default)]
     engine_protocol: Option<EngineProtocol>,
 }
 
@@ -130,13 +123,8 @@ impl QueryEngine {
             datamodel,
             log_level,
             log_queries,
-            datasource_overrides,
-            config_dir,
-            ignore_env_var_errors,
             engine_protocol,
         } = options;
-
-        let overrides: Vec<(_, _)> = datasource_overrides.into_iter().collect();
 
         // Note: if we used `psl::validate`, we'd add ~1MB to the Wasm artifact (before gzip).
         let mut schema = psl::parse_without_validation(datamodel.into());
@@ -165,7 +153,6 @@ impl QueryEngine {
 
         let builder = EngineBuilder {
             schema: Arc::new(schema),
-            config_dir,
             engine_protocol,
         };
 
@@ -220,7 +207,6 @@ impl QueryEngine {
                     schema: builder.schema.clone(),
                     query_schema: Arc::new(query_schema),
                     executor,
-                    config_dir: builder.config_dir.clone(),
                     engine_protocol: builder.engine_protocol,
                 }) as crate::Result<ConnectedEngine>
             }
@@ -250,7 +236,6 @@ impl QueryEngine {
 
                 let builder = EngineBuilder {
                     schema: engine.schema.clone(),
-                    config_dir: engine.config_dir.clone(),
                     engine_protocol: engine.engine_protocol(),
                 };
 
