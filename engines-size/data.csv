@@ -943,3 +943,5 @@ date_time,branch,commit,file,size_bytes
 2023-12-13T08:38:12+00:00,main,35b101e49f7a16bc0e2e4e2d4c7ef3938ac9f473,libquery_engine.node,15893448
 2023-12-13T10:00:17+00:00,main,ea511f92562bdda3f65bd6b5efff22c2bc0badca,query-engine,18648864
 2023-12-13T10:00:17+00:00,main,ea511f92562bdda3f65bd6b5efff22c2bc0badca,libquery_engine.node,16380968
+2023-12-13T13:19:49+00:00,main,d8af2bb0859125a54b409954a430bba1b3e0e5d3,query-engine,18665248
+2023-12-13T13:19:49+00:00,main,d8af2bb0859125a54b409954a430bba1b3e0e5d3,libquery_engine.node,16389160
