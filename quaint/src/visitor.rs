@@ -139,10 +139,10 @@ pub trait Visitor<'a> {
     #[cfg(any(feature = "postgresql", feature = "mysql"))]
     fn visit_json_unquote(&mut self, json_unquote: JsonUnquote<'a>) -> Result;
 
-    #[cfg(any(feature = "postgresql", feature = "mysql"))]
+    #[cfg(feature = "postgresql")]
     fn visit_json_array_agg(&mut self, array_agg: JsonArrayAgg<'a>) -> Result;
 
-    #[cfg(any(feature = "postgresql", feature = "mysql"))]
+    #[cfg(feature = "postgresql")]
     fn visit_json_build_object(&mut self, build_obj: JsonBuildObject<'a>) -> Result;
 
     #[cfg(any(feature = "postgresql", feature = "mysql"))]

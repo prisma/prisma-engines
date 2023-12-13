@@ -500,7 +500,7 @@ impl<'a> Visitor<'a> for Postgres<'a> {
         }
     }
 
-    #[cfg(any(feature = "postgresql", feature = "mysql"))]
+    #[cfg(feature = "postgresql")]
     fn visit_json_array_agg(&mut self, array_agg: JsonArrayAgg<'a>) -> visitor::Result {
         self.write("JSONB_AGG")?;
         self.surround_with("(", ")", |s| s.visit_expression(*array_agg.expr))?;
@@ -508,7 +508,7 @@ impl<'a> Visitor<'a> for Postgres<'a> {
         Ok(())
     }
 
-    #[cfg(any(feature = "postgresql", feature = "mysql"))]
+    #[cfg(feature = "postgresql")]
     fn visit_json_build_object(&mut self, build_obj: JsonBuildObject<'a>) -> visitor::Result {
         // Functions in PostgreSQL can only accept up to 100 arguments, which means that we can't
         // build an object with more than 50 fields using `JSON_BUILD_OBJECT`. To work around

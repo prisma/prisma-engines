@@ -652,18 +652,18 @@ impl<'a> Visitor<'a> for Mssql<'a> {
     }
 
     #[cfg(any(feature = "postgresql", feature = "mysql"))]
+    fn visit_json_unquote(&mut self, _json_unquote: JsonUnquote<'a>) -> visitor::Result {
+        unimplemented!("JSON filtering is not yet supported on MSSQL")
+    }
+
+    #[cfg(feature = "postgresql")]
     fn visit_json_array_agg(&mut self, _array_agg: JsonArrayAgg<'a>) -> visitor::Result {
         unimplemented!("JSON_AGG is not yet supported on MSSQL")
     }
 
-    #[cfg(any(feature = "postgresql", feature = "mysql"))]
+    #[cfg(feature = "postgresql")]
     fn visit_json_build_object(&mut self, _build_obj: JsonBuildObject<'a>) -> visitor::Result {
         unimplemented!("JSON_BUILD_OBJECT is not yet supported on MSSQL")
-    }
-
-    #[cfg(any(feature = "postgresql", feature = "mysql"))]
-    fn visit_json_unquote(&mut self, _json_unquote: JsonUnquote<'a>) -> visitor::Result {
-        unimplemented!("JSON filtering is not yet supported on MSSQL")
     }
 
     #[cfg(feature = "postgresql")]

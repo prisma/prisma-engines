@@ -553,7 +553,7 @@ impl<'a> Visitor<'a> for Mysql<'a> {
         Ok(())
     }
 
-    #[cfg(any(feature = "postgresql", feature = "mysql"))]
+    #[cfg(feature = "postgresql")]
     fn visit_json_unquote(&mut self, json_unquote: JsonUnquote<'a>) -> visitor::Result {
         self.write("JSON_UNQUOTE(")?;
         self.visit_expression(*json_unquote.expr)?;
@@ -562,33 +562,14 @@ impl<'a> Visitor<'a> for Mysql<'a> {
         Ok(())
     }
 
-    #[cfg(any(feature = "postgresql", feature = "mysql"))]
-    fn visit_json_array_agg(&mut self, array_agg: JsonArrayAgg<'a>) -> visitor::Result {
-        self.write("JSON_ARRAYAGG")?;
-        self.surround_with("(", ")", |s| s.visit_expression(*array_agg.expr))?;
-
-        Ok(())
+    #[cfg(feature = "postgresql")]
+    fn visit_json_array_agg(&mut self, _array_agg: JsonArrayAgg<'a>) -> visitor::Result {
+        unimplemented!("JSON_ARRAYAGG is not yet supported on MySQL")
     }
 
     #[cfg(any(feature = "postgresql", feature = "mysql"))]
-    fn visit_json_build_object(&mut self, build_obj: JsonBuildObject<'a>) -> visitor::Result {
-        let len = build_obj.exprs.len();
-
-        self.write("JSON_OBJECT")?;
-        self.surround_with("(", ")", |s| {
-            for (i, (name, expr)) in build_obj.exprs.into_iter().enumerate() {
-                s.visit_raw_value(Value::text(name))?;
-                s.write(", ")?;
-                s.visit_expression(expr)?;
-                if i < (len - 1) {
-                    s.write(", ")?;
-                }
-            }
-
-            Ok(())
-        })?;
-
-        Ok(())
+    fn visit_json_build_object(&mut self, _build_obj: JsonBuildObject<'a>) -> visitor::Result {
+        unimplemented!("JSON_OBJECT is not yet supported on MySQL")
     }
 
     fn visit_ordering(&mut self, ordering: Ordering<'a>) -> visitor::Result {
