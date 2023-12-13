@@ -3,7 +3,7 @@ on:
   pull_request:
     paths-ignore:
       - '.github/**'
-      - '!.github/workflows/query-engine-driver-adapters.yml'
+      - '!.github/workflows/wasm-size.yml'
       - '.buildkite/**'
       - '*.md'
       - 'LICENSE'
