@@ -238,7 +238,7 @@
         }
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>has_named_property(object: <span class="kw-2">&amp;</span><span class="kw">super</span>::wasm::JsObjectExtern, name: <span class="kw-2">&amp;</span>str) -&gt; JsResult&lt;bool&gt; {
+    <span class="kw">fn </span>has_named_property(object: <span class="kw-2">&amp;</span><span class="kw">super</span>::wasm::JsObjectExtern, name: <span class="kw-2">&amp;</span>str) -&gt; JsResult&lt;bool&gt; {
         js_sys::Reflect::has(object, <span class="kw-2">&amp;</span>JsString::from_str(name).unwrap().into())
     }
 
@@ -278,7 +278,7 @@
         }
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>has_named_property(object: <span class="kw-2">&amp;</span>::napi::JsObject, name: <span class="kw-2">&amp;</span>str) -&gt; JsResult&lt;bool&gt; {
+    <span class="kw">fn </span>has_named_property(object: <span class="kw-2">&amp;</span>::napi::JsObject, name: <span class="kw-2">&amp;</span>str) -&gt; JsResult&lt;bool&gt; {
         object.has_named_property(name)
     }
 
