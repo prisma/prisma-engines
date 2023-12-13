@@ -4,7 +4,7 @@ use crate::{
     filter::{FilterPrefix, MongoFilter, MongoFilterVisitor},
     output_meta,
     query_builder::MongoReadQueryBuilder,
-    query_strings::{DeleteMany, InsertMany, InsertOne, RunCommand, UpdateMany, UpdateOne},
+    query_strings::{Aggregate, DeleteMany, Find, InsertMany, InsertOne, RunCommand, UpdateMany, UpdateOne},
     root_queries::raw::{MongoCommand, MongoOperation},
     IntoBson,
 };
@@ -497,12 +497,22 @@ pub async fn query_raw<'conn>(
 
                 match operation {
                     MongoOperation::Find(filter, options) => {
-                        let cursor = coll.find_with_session(filter, options, session).await?;
+                        let unwrapped_filter = filter.clone().unwrap_or_default();
+                        let project = Document::default();
+                        let query_string_builder = Find::new(&unwrapped_filter, &project, coll.name());
+                        let cursor = observing(&query_string_builder, || {
+                            coll.find_with_session(filter, options, session)
+                        })
+                        .await?;
 
                         raw::cursor_to_json(cursor, session).await?
                     }
                     MongoOperation::Aggregate(pipeline, options) => {
-                        let cursor = coll.aggregate_with_session(pipeline, options, session).await?;
+                        let query_string_builder = Aggregate::new(&pipeline, coll.name());
+                        let cursor = observing(&query_string_builder, || {
+                            coll.aggregate_with_session(pipeline.clone(), options, session)
+                        })
+                        .await?;
 
                         raw::cursor_to_json(cursor, session).await?
                     }
