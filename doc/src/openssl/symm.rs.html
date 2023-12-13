@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/nix/store/8wbf91mp5aqggnly8dsfwbyfpxzfkram-vendor-cargo-deps/c19b7c6f923b580ac259164a89f2577984ad5ab09ee9d583b888f934adbbe8d0/openssl-0.10.56/src/symm.rs`."><title>symm.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-cb6f1f67f1bcd037.css" id="mainThemeStyle"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="openssl" data-themes="" data-resource-suffix="" data-rustdoc-version="1.73.0 (cc66ad468 2023-10-03) (built from a source tarball)" data-channel="1.73.0" data-search-js="search-6dfdfced5eff6596.js" data-settings-js="settings-de11bff964e9d4e5.js" data-settings-css="settings-8c76f75bfb6bd192.css" data-theme-light-css="light-1596385f77d47ef2.css" data-theme-dark-css="dark-0a43001d3fc2282c.css" data-theme-ayu-css="ayu-fd19013d6ce078bf.css" ><script src="../../static.files/storage-db41da1a38ea3cb8.js"></script><script defer src="../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-0795b7d26be81095.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../../static.files/light-1596385f77d47ef2.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../../static.files/dark-0a43001d3fc2282c.css"><link rel="stylesheet" href="../../static.files/noscript-cffde32267a19fd6.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../openssl/index.html"><img class="rust-logo" src="../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/nix/store/a04z6lnlzhx5ri6nlgjig0ir12hyiw0n-vendor-cargo-deps/c19b7c6f923b580ac259164a89f2577984ad5ab09ee9d583b888f934adbbe8d0/openssl-0.10.60/src/symm.rs`."><title>symm.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-cb6f1f67f1bcd037.css" id="mainThemeStyle"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="openssl" data-themes="" data-resource-suffix="" data-rustdoc-version="1.73.0 (cc66ad468 2023-10-03) (built from a source tarball)" data-channel="1.73.0" data-search-js="search-6dfdfced5eff6596.js" data-settings-js="settings-de11bff964e9d4e5.js" data-settings-css="settings-8c76f75bfb6bd192.css" data-theme-light-css="light-1596385f77d47ef2.css" data-theme-dark-css="dark-0a43001d3fc2282c.css" data-theme-ayu-css="ayu-fd19013d6ce078bf.css" ><script src="../../static.files/storage-db41da1a38ea3cb8.js"></script><script defer src="../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-0795b7d26be81095.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../../static.files/light-1596385f77d47ef2.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../../static.files/dark-0a43001d3fc2282c.css"><link rel="stylesheet" href="../../static.files/noscript-cffde32267a19fd6.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../openssl/index.html"><img class="rust-logo" src="../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -1631,6 +1631,141 @@
 <a href="#1631" id="1631">1631</a>
 <a href="#1632" id="1632">1632</a>
 <a href="#1633" id="1633">1633</a>
+<a href="#1634" id="1634">1634</a>
+<a href="#1635" id="1635">1635</a>
+<a href="#1636" id="1636">1636</a>
+<a href="#1637" id="1637">1637</a>
+<a href="#1638" id="1638">1638</a>
+<a href="#1639" id="1639">1639</a>
+<a href="#1640" id="1640">1640</a>
+<a href="#1641" id="1641">1641</a>
+<a href="#1642" id="1642">1642</a>
+<a href="#1643" id="1643">1643</a>
+<a href="#1644" id="1644">1644</a>
+<a href="#1645" id="1645">1645</a>
+<a href="#1646" id="1646">1646</a>
+<a href="#1647" id="1647">1647</a>
+<a href="#1648" id="1648">1648</a>
+<a href="#1649" id="1649">1649</a>
+<a href="#1650" id="1650">1650</a>
+<a href="#1651" id="1651">1651</a>
+<a href="#1652" id="1652">1652</a>
+<a href="#1653" id="1653">1653</a>
+<a href="#1654" id="1654">1654</a>
+<a href="#1655" id="1655">1655</a>
+<a href="#1656" id="1656">1656</a>
+<a href="#1657" id="1657">1657</a>
+<a href="#1658" id="1658">1658</a>
+<a href="#1659" id="1659">1659</a>
+<a href="#1660" id="1660">1660</a>
+<a href="#1661" id="1661">1661</a>
+<a href="#1662" id="1662">1662</a>
+<a href="#1663" id="1663">1663</a>
+<a href="#1664" id="1664">1664</a>
+<a href="#1665" id="1665">1665</a>
+<a href="#1666" id="1666">1666</a>
+<a href="#1667" id="1667">1667</a>
+<a href="#1668" id="1668">1668</a>
+<a href="#1669" id="1669">1669</a>
+<a href="#1670" id="1670">1670</a>
+<a href="#1671" id="1671">1671</a>
+<a href="#1672" id="1672">1672</a>
+<a href="#1673" id="1673">1673</a>
+<a href="#1674" id="1674">1674</a>
+<a href="#1675" id="1675">1675</a>
+<a href="#1676" id="1676">1676</a>
+<a href="#1677" id="1677">1677</a>
+<a href="#1678" id="1678">1678</a>
+<a href="#1679" id="1679">1679</a>
+<a href="#1680" id="1680">1680</a>
+<a href="#1681" id="1681">1681</a>
+<a href="#1682" id="1682">1682</a>
+<a href="#1683" id="1683">1683</a>
+<a href="#1684" id="1684">1684</a>
+<a href="#1685" id="1685">1685</a>
+<a href="#1686" id="1686">1686</a>
+<a href="#1687" id="1687">1687</a>
+<a href="#1688" id="1688">1688</a>
+<a href="#1689" id="1689">1689</a>
+<a href="#1690" id="1690">1690</a>
+<a href="#1691" id="1691">1691</a>
+<a href="#1692" id="1692">1692</a>
+<a href="#1693" id="1693">1693</a>
+<a href="#1694" id="1694">1694</a>
+<a href="#1695" id="1695">1695</a>
+<a href="#1696" id="1696">1696</a>
+<a href="#1697" id="1697">1697</a>
+<a href="#1698" id="1698">1698</a>
+<a href="#1699" id="1699">1699</a>
+<a href="#1700" id="1700">1700</a>
+<a href="#1701" id="1701">1701</a>
+<a href="#1702" id="1702">1702</a>
+<a href="#1703" id="1703">1703</a>
+<a href="#1704" id="1704">1704</a>
+<a href="#1705" id="1705">1705</a>
+<a href="#1706" id="1706">1706</a>
+<a href="#1707" id="1707">1707</a>
+<a href="#1708" id="1708">1708</a>
+<a href="#1709" id="1709">1709</a>
+<a href="#1710" id="1710">1710</a>
+<a href="#1711" id="1711">1711</a>
+<a href="#1712" id="1712">1712</a>
+<a href="#1713" id="1713">1713</a>
+<a href="#1714" id="1714">1714</a>
+<a href="#1715" id="1715">1715</a>
+<a href="#1716" id="1716">1716</a>
+<a href="#1717" id="1717">1717</a>
+<a href="#1718" id="1718">1718</a>
+<a href="#1719" id="1719">1719</a>
+<a href="#1720" id="1720">1720</a>
+<a href="#1721" id="1721">1721</a>
+<a href="#1722" id="1722">1722</a>
+<a href="#1723" id="1723">1723</a>
+<a href="#1724" id="1724">1724</a>
+<a href="#1725" id="1725">1725</a>
+<a href="#1726" id="1726">1726</a>
+<a href="#1727" id="1727">1727</a>
+<a href="#1728" id="1728">1728</a>
+<a href="#1729" id="1729">1729</a>
+<a href="#1730" id="1730">1730</a>
+<a href="#1731" id="1731">1731</a>
+<a href="#1732" id="1732">1732</a>
+<a href="#1733" id="1733">1733</a>
+<a href="#1734" id="1734">1734</a>
+<a href="#1735" id="1735">1735</a>
+<a href="#1736" id="1736">1736</a>
+<a href="#1737" id="1737">1737</a>
+<a href="#1738" id="1738">1738</a>
+<a href="#1739" id="1739">1739</a>
+<a href="#1740" id="1740">1740</a>
+<a href="#1741" id="1741">1741</a>
+<a href="#1742" id="1742">1742</a>
+<a href="#1743" id="1743">1743</a>
+<a href="#1744" id="1744">1744</a>
+<a href="#1745" id="1745">1745</a>
+<a href="#1746" id="1746">1746</a>
+<a href="#1747" id="1747">1747</a>
+<a href="#1748" id="1748">1748</a>
+<a href="#1749" id="1749">1749</a>
+<a href="#1750" id="1750">1750</a>
+<a href="#1751" id="1751">1751</a>
+<a href="#1752" id="1752">1752</a>
+<a href="#1753" id="1753">1753</a>
+<a href="#1754" id="1754">1754</a>
+<a href="#1755" id="1755">1755</a>
+<a href="#1756" id="1756">1756</a>
+<a href="#1757" id="1757">1757</a>
+<a href="#1758" id="1758">1758</a>
+<a href="#1759" id="1759">1759</a>
+<a href="#1760" id="1760">1760</a>
+<a href="#1761" id="1761">1761</a>
+<a href="#1762" id="1762">1762</a>
+<a href="#1763" id="1763">1763</a>
+<a href="#1764" id="1764">1764</a>
+<a href="#1765" id="1765">1765</a>
+<a href="#1766" id="1766">1766</a>
+<a href="#1767" id="1767">1767</a>
+<a href="#1768" id="1768">1768</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! High level interface to certain symmetric ciphers.
 //!
 //! # Examples
@@ -1885,12 +2020,12 @@
         <span class="kw">unsafe </span>{ Cipher(ffi::EVP_bf_ecb()) }
     }
 
-    <span class="attr">#[cfg(not(any(boringssl, osslconf = <span class="string">&quot;OPENSSL_NO_BF&quot;</span>)))]
+    <span class="attr">#[cfg(not(osslconf = <span class="string">&quot;OPENSSL_NO_BF&quot;</span>))]
     </span><span class="kw">pub fn </span>bf_cfb64() -&gt; Cipher {
         <span class="kw">unsafe </span>{ Cipher(ffi::EVP_bf_cfb64()) }
     }
 
-    <span class="attr">#[cfg(not(any(boringssl, osslconf = <span class="string">&quot;OPENSSL_NO_BF&quot;</span>)))]
+    <span class="attr">#[cfg(not(osslconf = <span class="string">&quot;OPENSSL_NO_BF&quot;</span>))]
     </span><span class="kw">pub fn </span>bf_ofb() -&gt; Cipher {
         <span class="kw">unsafe </span>{ Cipher(ffi::EVP_bf_ofb()) }
     }
@@ -1911,9 +2046,23 @@
         <span class="kw">unsafe </span>{ Cipher(ffi::EVP_des_ede3_cbc()) }
     }
 
+    <span class="kw">pub fn </span>des_ede3_ecb() -&gt; Cipher {
+        <span class="kw">unsafe </span>{ Cipher(ffi::EVP_des_ede3_ecb()) }
+    }
+
     <span class="attr">#[cfg(not(boringssl))]
     </span><span class="kw">pub fn </span>des_ede3_cfb64() -&gt; Cipher {
         <span class="kw">unsafe </span>{ Cipher(ffi::EVP_des_ede3_cfb64()) }
+    }
+
+    <span class="attr">#[cfg(not(boringssl))]
+    </span><span class="kw">pub fn </span>des_ede3_cfb8() -&gt; Cipher {
+        <span class="kw">unsafe </span>{ Cipher(ffi::EVP_des_ede3_cfb8()) }
+    }
+
+    <span class="attr">#[cfg(not(boringssl))]
+    </span><span class="kw">pub fn </span>des_ede3_ofb() -&gt; Cipher {
+        <span class="kw">unsafe </span>{ Cipher(ffi::EVP_des_ede3_ofb()) }
     }
 
     <span class="attr">#[cfg(not(osslconf = <span class="string">&quot;OPENSSL_NO_RC4&quot;</span>))]
@@ -1921,34 +2070,134 @@
         <span class="kw">unsafe </span>{ Cipher(ffi::EVP_rc4()) }
     }
 
+    <span class="attr">#[cfg(not(osslconf = <span class="string">&quot;OPENSSL_NO_CAMELLIA&quot;</span>))]
+    </span><span class="kw">pub fn </span>camellia_128_cbc() -&gt; Cipher {
+        <span class="kw">unsafe </span>{ Cipher(ffi::EVP_camellia_128_cbc()) }
+    }
+
+    <span class="attr">#[cfg(not(osslconf = <span class="string">&quot;OPENSSL_NO_CAMELLIA&quot;</span>))]
+    </span><span class="kw">pub fn </span>camellia_128_ecb() -&gt; Cipher {
+        <span class="kw">unsafe </span>{ Cipher(ffi::EVP_camellia_128_ecb()) }
+    }
+
+    <span class="attr">#[cfg(not(osslconf = <span class="string">&quot;OPENSSL_NO_CAMELLIA&quot;</span>))]
+    </span><span class="kw">pub fn </span>camellia_128_ofb() -&gt; Cipher {
+        <span class="kw">unsafe </span>{ Cipher(ffi::EVP_camellia_128_ofb()) }
+    }
+
+    <span class="attr">#[cfg(not(osslconf = <span class="string">&quot;OPENSSL_NO_CAMELLIA&quot;</span>))]
+    </span><span class="kw">pub fn </span>camellia_128_cfb128() -&gt; Cipher {
+        <span class="kw">unsafe </span>{ Cipher(ffi::EVP_camellia_128_cfb128()) }
+    }
+
+    <span class="attr">#[cfg(not(osslconf = <span class="string">&quot;OPENSSL_NO_CAMELLIA&quot;</span>))]
+    </span><span class="kw">pub fn </span>camellia_192_cbc() -&gt; Cipher {
+        <span class="kw">unsafe </span>{ Cipher(ffi::EVP_camellia_192_cbc()) }
+    }
+
+    <span class="attr">#[cfg(not(osslconf = <span class="string">&quot;OPENSSL_NO_CAMELLIA&quot;</span>))]
+    </span><span class="kw">pub fn </span>camellia_192_ecb() -&gt; Cipher {
+        <span class="kw">unsafe </span>{ Cipher(ffi::EVP_camellia_192_ecb()) }
+    }
+
+    <span class="attr">#[cfg(not(osslconf = <span class="string">&quot;OPENSSL_NO_CAMELLIA&quot;</span>))]
+    </span><span class="kw">pub fn </span>camellia_192_ofb() -&gt; Cipher {
+        <span class="kw">unsafe </span>{ Cipher(ffi::EVP_camellia_192_ofb()) }
+    }
+
+    <span class="attr">#[cfg(not(osslconf = <span class="string">&quot;OPENSSL_NO_CAMELLIA&quot;</span>))]
+    </span><span class="kw">pub fn </span>camellia_192_cfb128() -&gt; Cipher {
+        <span class="kw">unsafe </span>{ Cipher(ffi::EVP_camellia_192_cfb128()) }
+    }
+
+    <span class="attr">#[cfg(not(osslconf = <span class="string">&quot;OPENSSL_NO_CAMELLIA&quot;</span>))]
+    </span><span class="kw">pub fn </span>camellia_256_cbc() -&gt; Cipher {
+        <span class="kw">unsafe </span>{ Cipher(ffi::EVP_camellia_256_cbc()) }
+    }
+
+    <span class="attr">#[cfg(not(osslconf = <span class="string">&quot;OPENSSL_NO_CAMELLIA&quot;</span>))]
+    </span><span class="kw">pub fn </span>camellia_256_ecb() -&gt; Cipher {
+        <span class="kw">unsafe </span>{ Cipher(ffi::EVP_camellia_256_ecb()) }
+    }
+
+    <span class="attr">#[cfg(not(osslconf = <span class="string">&quot;OPENSSL_NO_CAMELLIA&quot;</span>))]
+    </span><span class="kw">pub fn </span>camellia_256_ofb() -&gt; Cipher {
+        <span class="kw">unsafe </span>{ Cipher(ffi::EVP_camellia_256_ofb()) }
+    }
+
+    <span class="attr">#[cfg(not(osslconf = <span class="string">&quot;OPENSSL_NO_CAMELLIA&quot;</span>))]
+    </span><span class="kw">pub fn </span>camellia_256_cfb128() -&gt; Cipher {
+        <span class="kw">unsafe </span>{ Cipher(ffi::EVP_camellia_256_cfb128()) }
+    }
+
+    <span class="attr">#[cfg(not(osslconf = <span class="string">&quot;OPENSSL_NO_CAST&quot;</span>))]
+    </span><span class="kw">pub fn </span>cast5_cbc() -&gt; Cipher {
+        <span class="kw">unsafe </span>{ Cipher(ffi::EVP_cast5_cbc()) }
+    }
+
+    <span class="attr">#[cfg(not(osslconf = <span class="string">&quot;OPENSSL_NO_CAST&quot;</span>))]
+    </span><span class="kw">pub fn </span>cast5_ecb() -&gt; Cipher {
+        <span class="kw">unsafe </span>{ Cipher(ffi::EVP_cast5_ecb()) }
+    }
+
+    <span class="attr">#[cfg(not(osslconf = <span class="string">&quot;OPENSSL_NO_CAST&quot;</span>))]
+    </span><span class="kw">pub fn </span>cast5_ofb() -&gt; Cipher {
+        <span class="kw">unsafe </span>{ Cipher(ffi::EVP_cast5_ofb()) }
+    }
+
+    <span class="attr">#[cfg(not(osslconf = <span class="string">&quot;OPENSSL_NO_CAST&quot;</span>))]
+    </span><span class="kw">pub fn </span>cast5_cfb64() -&gt; Cipher {
+        <span class="kw">unsafe </span>{ Cipher(ffi::EVP_cast5_cfb64()) }
+    }
+
     <span class="doccomment">/// Requires OpenSSL 1.1.0 or newer.
-    </span><span class="attr">#[cfg(all(ossl110, not(osslconf = <span class="string">&quot;OPENSSL_NO_CHACHA&quot;</span>)))]
+    </span><span class="attr">#[cfg(all(any(ossl110, libressl310), not(osslconf = <span class="string">&quot;OPENSSL_NO_CHACHA&quot;</span>)))]
     </span><span class="kw">pub fn </span>chacha20() -&gt; Cipher {
         <span class="kw">unsafe </span>{ Cipher(ffi::EVP_chacha20()) }
     }
 
     <span class="doccomment">/// Requires OpenSSL 1.1.0 or newer.
-    </span><span class="attr">#[cfg(all(ossl110, not(osslconf = <span class="string">&quot;OPENSSL_NO_CHACHA&quot;</span>)))]
+    </span><span class="attr">#[cfg(all(any(ossl110, libressl360), not(osslconf = <span class="string">&quot;OPENSSL_NO_CHACHA&quot;</span>)))]
     </span><span class="kw">pub fn </span>chacha20_poly1305() -&gt; Cipher {
         <span class="kw">unsafe </span>{ Cipher(ffi::EVP_chacha20_poly1305()) }
     }
 
-    <span class="attr">#[cfg(not(any(boringssl, osslconf = <span class="string">&quot;OPENSSL_NO_SEED&quot;</span>)))]
+    <span class="attr">#[cfg(not(osslconf = <span class="string">&quot;OPENSSL_NO_IDEA&quot;</span>))]
+    </span><span class="kw">pub fn </span>idea_cbc() -&gt; Cipher {
+        <span class="kw">unsafe </span>{ Cipher(ffi::EVP_idea_cbc()) }
+    }
+
+    <span class="attr">#[cfg(not(osslconf = <span class="string">&quot;OPENSSL_NO_IDEA&quot;</span>))]
+    </span><span class="kw">pub fn </span>idea_ecb() -&gt; Cipher {
+        <span class="kw">unsafe </span>{ Cipher(ffi::EVP_idea_ecb()) }
+    }
+
+    <span class="attr">#[cfg(not(osslconf = <span class="string">&quot;OPENSSL_NO_IDEA&quot;</span>))]
+    </span><span class="kw">pub fn </span>idea_ofb() -&gt; Cipher {
+        <span class="kw">unsafe </span>{ Cipher(ffi::EVP_idea_ofb()) }
+    }
+
+    <span class="attr">#[cfg(not(osslconf = <span class="string">&quot;OPENSSL_NO_IDEA&quot;</span>))]
+    </span><span class="kw">pub fn </span>idea_cfb64() -&gt; Cipher {
+        <span class="kw">unsafe </span>{ Cipher(ffi::EVP_idea_cfb64()) }
+    }
+
+    <span class="attr">#[cfg(not(osslconf = <span class="string">&quot;OPENSSL_NO_SEED&quot;</span>))]
     </span><span class="kw">pub fn </span>seed_cbc() -&gt; Cipher {
         <span class="kw">unsafe </span>{ Cipher(ffi::EVP_seed_cbc()) }
     }
 
-    <span class="attr">#[cfg(not(any(boringssl, osslconf = <span class="string">&quot;OPENSSL_NO_SEED&quot;</span>)))]
+    <span class="attr">#[cfg(not(osslconf = <span class="string">&quot;OPENSSL_NO_SEED&quot;</span>))]
     </span><span class="kw">pub fn </span>seed_cfb128() -&gt; Cipher {
         <span class="kw">unsafe </span>{ Cipher(ffi::EVP_seed_cfb128()) }
     }
 
-    <span class="attr">#[cfg(not(any(boringssl, osslconf = <span class="string">&quot;OPENSSL_NO_SEED&quot;</span>)))]
+    <span class="attr">#[cfg(not(osslconf = <span class="string">&quot;OPENSSL_NO_SEED&quot;</span>))]
     </span><span class="kw">pub fn </span>seed_ecb() -&gt; Cipher {
         <span class="kw">unsafe </span>{ Cipher(ffi::EVP_seed_ecb()) }
     }
 
-    <span class="attr">#[cfg(not(any(boringssl, osslconf = <span class="string">&quot;OPENSSL_NO_SEED&quot;</span>)))]
+    <span class="attr">#[cfg(not(osslconf = <span class="string">&quot;OPENSSL_NO_SEED&quot;</span>))]
     </span><span class="kw">pub fn </span>seed_ofb() -&gt; Cipher {
         <span class="kw">unsafe </span>{ Cipher(ffi::EVP_seed_ofb()) }
     }
@@ -2213,6 +2462,27 @@
     /// Panics if `output.len() &gt; c_int::max_value()`.
     </span><span class="kw">pub fn </span>update(<span class="kw-2">&amp;mut </span><span class="self">self</span>, input: <span class="kw-2">&amp;</span>[u8], output: <span class="kw-2">&amp;mut </span>[u8]) -&gt; <span class="prelude-ty">Result</span>&lt;usize, ErrorStack&gt; {
         <span class="self">self</span>.ctx.cipher_update(input, <span class="prelude-val">Some</span>(output))
+    }
+
+    <span class="doccomment">/// Feeds data from `input` through the cipher, writing encrypted/decrypted
+    /// bytes into `output`.
+    ///
+    /// The number of bytes written to `output` is returned. Note that this may
+    /// not be equal to the length of `input`.
+    ///
+    /// # Safety
+    ///
+    /// The caller must provide an `output` buffer large enough to contain
+    /// correct number of bytes. For streaming ciphers the output buffer size
+    /// should be at least as big as the input buffer. For block ciphers the
+    /// size of the output buffer depends on the state of partially updated
+    /// blocks.
+    </span><span class="kw">pub unsafe fn </span>update_unchecked(
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>,
+        input: <span class="kw-2">&amp;</span>[u8],
+        output: <span class="kw-2">&amp;mut </span>[u8],
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;usize, ErrorStack&gt; {
+        <span class="self">self</span>.ctx.cipher_update_unchecked(input, <span class="prelude-val">Some</span>(output))
     }
 
     <span class="doccomment">/// Finishes the encryption/decryption process, writing any remaining data
@@ -3111,7 +3381,7 @@
     }
 
     <span class="attr">#[test]
-    #[cfg(ossl110)]
+    #[cfg(any(ossl110, libressl310))]
     </span><span class="kw">fn </span>test_chacha20() {
         <span class="kw">let </span>key = <span class="string">&quot;0000000000000000000000000000000000000000000000000000000000000000&quot;</span>;
         <span class="kw">let </span>iv = <span class="string">&quot;00000000000000000000000000000000&quot;</span>;
@@ -3126,7 +3396,7 @@
     }
 
     <span class="attr">#[test]
-    #[cfg(ossl110)]
+    #[cfg(any(ossl110, libressl360))]
     </span><span class="kw">fn </span>test_chacha20_poly1305() {
         <span class="kw">let </span>key = <span class="string">&quot;808182838485868788898a8b8c8d8e8f909192939495969798999a9b9c9d9e9f&quot;</span>;
         <span class="kw">let </span>iv = <span class="string">&quot;070000004041424344454647&quot;</span>;
@@ -3167,7 +3437,7 @@
     }
 
     <span class="attr">#[test]
-    #[cfg(not(any(boringssl, osslconf = <span class="string">&quot;OPENSSL_NO_SEED&quot;</span>, ossl300)))]
+    #[cfg(not(any(osslconf = <span class="string">&quot;OPENSSL_NO_SEED&quot;</span>, ossl300)))]
     </span><span class="kw">fn </span>test_seed_cbc() {
         <span class="attr">#[cfg(ossl300)]
         </span><span class="kw">let </span>_provider = <span class="kw">crate</span>::provider::Provider::try_load(<span class="prelude-val">None</span>, <span class="string">&quot;legacy&quot;</span>, <span class="bool-val">true</span>).unwrap();
@@ -3181,7 +3451,7 @@
     }
 
     <span class="attr">#[test]
-    #[cfg(not(any(boringssl, osslconf = <span class="string">&quot;OPENSSL_NO_SEED&quot;</span>, ossl300)))]
+    #[cfg(not(any(osslconf = <span class="string">&quot;OPENSSL_NO_SEED&quot;</span>, ossl300)))]
     </span><span class="kw">fn </span>test_seed_cfb128() {
         <span class="attr">#[cfg(ossl300)]
         </span><span class="kw">let </span>_provider = <span class="kw">crate</span>::provider::Provider::try_load(<span class="prelude-val">None</span>, <span class="string">&quot;legacy&quot;</span>, <span class="bool-val">true</span>).unwrap();
@@ -3195,7 +3465,7 @@
     }
 
     <span class="attr">#[test]
-    #[cfg(not(any(boringssl, osslconf = <span class="string">&quot;OPENSSL_NO_SEED&quot;</span>, ossl300)))]
+    #[cfg(not(any(osslconf = <span class="string">&quot;OPENSSL_NO_SEED&quot;</span>, ossl300)))]
     </span><span class="kw">fn </span>test_seed_ecb() {
         <span class="attr">#[cfg(ossl300)]
         </span><span class="kw">let </span>_provider = <span class="kw">crate</span>::provider::Provider::try_load(<span class="prelude-val">None</span>, <span class="string">&quot;legacy&quot;</span>, <span class="bool-val">true</span>).unwrap();
@@ -3209,7 +3479,7 @@
     }
 
     <span class="attr">#[test]
-    #[cfg(not(any(boringssl, osslconf = <span class="string">&quot;OPENSSL_NO_SEED&quot;</span>, ossl300)))]
+    #[cfg(not(any(osslconf = <span class="string">&quot;OPENSSL_NO_SEED&quot;</span>, ossl300)))]
     </span><span class="kw">fn </span>test_seed_ofb() {
         <span class="attr">#[cfg(ossl300)]
         </span><span class="kw">let </span>_provider = <span class="kw">crate</span>::provider::Provider::try_load(<span class="prelude-val">None</span>, <span class="string">&quot;legacy&quot;</span>, <span class="bool-val">true</span>).unwrap();

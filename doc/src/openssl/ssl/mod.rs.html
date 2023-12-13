@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/nix/store/8wbf91mp5aqggnly8dsfwbyfpxzfkram-vendor-cargo-deps/c19b7c6f923b580ac259164a89f2577984ad5ab09ee9d583b888f934adbbe8d0/openssl-0.10.56/src/ssl/mod.rs`."><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-cb6f1f67f1bcd037.css" id="mainThemeStyle"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="openssl" data-themes="" data-resource-suffix="" data-rustdoc-version="1.73.0 (cc66ad468 2023-10-03) (built from a source tarball)" data-channel="1.73.0" data-search-js="search-6dfdfced5eff6596.js" data-settings-js="settings-de11bff964e9d4e5.js" data-settings-css="settings-8c76f75bfb6bd192.css" data-theme-light-css="light-1596385f77d47ef2.css" data-theme-dark-css="dark-0a43001d3fc2282c.css" data-theme-ayu-css="ayu-fd19013d6ce078bf.css" ><script src="../../../static.files/storage-db41da1a38ea3cb8.js"></script><script defer src="../../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-0795b7d26be81095.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../../../static.files/light-1596385f77d47ef2.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../../../static.files/dark-0a43001d3fc2282c.css"><link rel="stylesheet" href="../../../static.files/noscript-cffde32267a19fd6.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../../openssl/index.html"><img class="rust-logo" src="../../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/nix/store/a04z6lnlzhx5ri6nlgjig0ir12hyiw0n-vendor-cargo-deps/c19b7c6f923b580ac259164a89f2577984ad5ab09ee9d583b888f934adbbe8d0/openssl-0.10.60/src/ssl/mod.rs`."><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-cb6f1f67f1bcd037.css" id="mainThemeStyle"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="openssl" data-themes="" data-resource-suffix="" data-rustdoc-version="1.73.0 (cc66ad468 2023-10-03) (built from a source tarball)" data-channel="1.73.0" data-search-js="search-6dfdfced5eff6596.js" data-settings-js="settings-de11bff964e9d4e5.js" data-settings-css="settings-8c76f75bfb6bd192.css" data-theme-light-css="light-1596385f77d47ef2.css" data-theme-dark-css="dark-0a43001d3fc2282c.css" data-theme-ayu-css="ayu-fd19013d6ce078bf.css" ><script src="../../../static.files/storage-db41da1a38ea3cb8.js"></script><script defer src="../../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-0795b7d26be81095.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../../../static.files/light-1596385f77d47ef2.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../../../static.files/dark-0a43001d3fc2282c.css"><link rel="stylesheet" href="../../../static.files/noscript-cffde32267a19fd6.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../../openssl/index.html"><img class="rust-logo" src="../../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -4192,6 +4192,121 @@
 <a href="#4192" id="4192">4192</a>
 <a href="#4193" id="4193">4193</a>
 <a href="#4194" id="4194">4194</a>
+<a href="#4195" id="4195">4195</a>
+<a href="#4196" id="4196">4196</a>
+<a href="#4197" id="4197">4197</a>
+<a href="#4198" id="4198">4198</a>
+<a href="#4199" id="4199">4199</a>
+<a href="#4200" id="4200">4200</a>
+<a href="#4201" id="4201">4201</a>
+<a href="#4202" id="4202">4202</a>
+<a href="#4203" id="4203">4203</a>
+<a href="#4204" id="4204">4204</a>
+<a href="#4205" id="4205">4205</a>
+<a href="#4206" id="4206">4206</a>
+<a href="#4207" id="4207">4207</a>
+<a href="#4208" id="4208">4208</a>
+<a href="#4209" id="4209">4209</a>
+<a href="#4210" id="4210">4210</a>
+<a href="#4211" id="4211">4211</a>
+<a href="#4212" id="4212">4212</a>
+<a href="#4213" id="4213">4213</a>
+<a href="#4214" id="4214">4214</a>
+<a href="#4215" id="4215">4215</a>
+<a href="#4216" id="4216">4216</a>
+<a href="#4217" id="4217">4217</a>
+<a href="#4218" id="4218">4218</a>
+<a href="#4219" id="4219">4219</a>
+<a href="#4220" id="4220">4220</a>
+<a href="#4221" id="4221">4221</a>
+<a href="#4222" id="4222">4222</a>
+<a href="#4223" id="4223">4223</a>
+<a href="#4224" id="4224">4224</a>
+<a href="#4225" id="4225">4225</a>
+<a href="#4226" id="4226">4226</a>
+<a href="#4227" id="4227">4227</a>
+<a href="#4228" id="4228">4228</a>
+<a href="#4229" id="4229">4229</a>
+<a href="#4230" id="4230">4230</a>
+<a href="#4231" id="4231">4231</a>
+<a href="#4232" id="4232">4232</a>
+<a href="#4233" id="4233">4233</a>
+<a href="#4234" id="4234">4234</a>
+<a href="#4235" id="4235">4235</a>
+<a href="#4236" id="4236">4236</a>
+<a href="#4237" id="4237">4237</a>
+<a href="#4238" id="4238">4238</a>
+<a href="#4239" id="4239">4239</a>
+<a href="#4240" id="4240">4240</a>
+<a href="#4241" id="4241">4241</a>
+<a href="#4242" id="4242">4242</a>
+<a href="#4243" id="4243">4243</a>
+<a href="#4244" id="4244">4244</a>
+<a href="#4245" id="4245">4245</a>
+<a href="#4246" id="4246">4246</a>
+<a href="#4247" id="4247">4247</a>
+<a href="#4248" id="4248">4248</a>
+<a href="#4249" id="4249">4249</a>
+<a href="#4250" id="4250">4250</a>
+<a href="#4251" id="4251">4251</a>
+<a href="#4252" id="4252">4252</a>
+<a href="#4253" id="4253">4253</a>
+<a href="#4254" id="4254">4254</a>
+<a href="#4255" id="4255">4255</a>
+<a href="#4256" id="4256">4256</a>
+<a href="#4257" id="4257">4257</a>
+<a href="#4258" id="4258">4258</a>
+<a href="#4259" id="4259">4259</a>
+<a href="#4260" id="4260">4260</a>
+<a href="#4261" id="4261">4261</a>
+<a href="#4262" id="4262">4262</a>
+<a href="#4263" id="4263">4263</a>
+<a href="#4264" id="4264">4264</a>
+<a href="#4265" id="4265">4265</a>
+<a href="#4266" id="4266">4266</a>
+<a href="#4267" id="4267">4267</a>
+<a href="#4268" id="4268">4268</a>
+<a href="#4269" id="4269">4269</a>
+<a href="#4270" id="4270">4270</a>
+<a href="#4271" id="4271">4271</a>
+<a href="#4272" id="4272">4272</a>
+<a href="#4273" id="4273">4273</a>
+<a href="#4274" id="4274">4274</a>
+<a href="#4275" id="4275">4275</a>
+<a href="#4276" id="4276">4276</a>
+<a href="#4277" id="4277">4277</a>
+<a href="#4278" id="4278">4278</a>
+<a href="#4279" id="4279">4279</a>
+<a href="#4280" id="4280">4280</a>
+<a href="#4281" id="4281">4281</a>
+<a href="#4282" id="4282">4282</a>
+<a href="#4283" id="4283">4283</a>
+<a href="#4284" id="4284">4284</a>
+<a href="#4285" id="4285">4285</a>
+<a href="#4286" id="4286">4286</a>
+<a href="#4287" id="4287">4287</a>
+<a href="#4288" id="4288">4288</a>
+<a href="#4289" id="4289">4289</a>
+<a href="#4290" id="4290">4290</a>
+<a href="#4291" id="4291">4291</a>
+<a href="#4292" id="4292">4292</a>
+<a href="#4293" id="4293">4293</a>
+<a href="#4294" id="4294">4294</a>
+<a href="#4295" id="4295">4295</a>
+<a href="#4296" id="4296">4296</a>
+<a href="#4297" id="4297">4297</a>
+<a href="#4298" id="4298">4298</a>
+<a href="#4299" id="4299">4299</a>
+<a href="#4300" id="4300">4300</a>
+<a href="#4301" id="4301">4301</a>
+<a href="#4302" id="4302">4302</a>
+<a href="#4303" id="4303">4303</a>
+<a href="#4304" id="4304">4304</a>
+<a href="#4305" id="4305">4305</a>
+<a href="#4306" id="4306">4306</a>
+<a href="#4307" id="4307">4307</a>
+<a href="#4308" id="4308">4308</a>
+<a href="#4309" id="4309">4309</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! SSL/TLS support.
 //!
 //! `SslConnector` and `SslAcceptor` should be used in most cases - they handle
@@ -4251,7 +4366,9 @@
 //!     }
 //! }
 //! ```
-</span><span class="kw">use </span><span class="kw">crate</span>::dh::{Dh, DhRef};
+</span><span class="attr">#[cfg(ossl300)]
+</span><span class="kw">use </span><span class="kw">crate</span>::cvt_long;
+<span class="kw">use </span><span class="kw">crate</span>::dh::{Dh, DhRef};
 <span class="attr">#[cfg(all(ossl101, not(ossl110)))]
 </span><span class="kw">use </span><span class="kw">crate</span>::ec::EcKey;
 <span class="kw">use </span><span class="kw">crate</span>::ec::EcKeyRef;
@@ -4262,6 +4379,8 @@
 <span class="attr">#[cfg(any(ossl110, libressl270))]
 </span><span class="kw">use </span><span class="kw">crate</span>::nid::Nid;
 <span class="kw">use </span><span class="kw">crate</span>::pkey::{HasPrivate, PKeyRef, Params, Private};
+<span class="attr">#[cfg(ossl300)]
+</span><span class="kw">use </span><span class="kw">crate</span>::pkey::{PKey, Public};
 <span class="kw">use </span><span class="kw">crate</span>::srtp::{SrtpProtectionProfile, SrtpProtectionProfileRef};
 <span class="kw">use </span><span class="kw">crate</span>::ssl::bio::BioMethod;
 <span class="kw">use </span><span class="kw">crate</span>::ssl::callbacks::<span class="kw-2">*</span>;
@@ -4337,6 +4456,8 @@
 
 <span class="macro">bitflags! </span>{
     <span class="doccomment">/// Options controlling the behavior of an `SslContext`.
+    </span><span class="attr">#[derive(Copy, Clone, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
+    #[repr(transparent)]
     </span><span class="kw">pub struct </span>SslOptions: SslOptionsRepr {
         <span class="doccomment">/// Disables a countermeasure against an SSLv3/TLSv1.0 vulnerability affecting CBC ciphers.
         </span><span class="kw">const </span>DONT_INSERT_EMPTY_FRAGMENTS = ffi::SSL_OP_DONT_INSERT_EMPTY_FRAGMENTS <span class="kw">as </span>SslOptionsRepr;
@@ -4475,6 +4596,8 @@
 
 <span class="macro">bitflags! </span>{
     <span class="doccomment">/// Options controlling the behavior of an `SslContext`.
+    </span><span class="attr">#[derive(Copy, Clone, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
+    #[repr(transparent)]
     </span><span class="kw">pub struct </span>SslMode: SslBitType {
         <span class="doccomment">/// Enables &quot;short writes&quot;.
         ///
@@ -4572,6 +4695,8 @@
 
 <span class="macro">bitflags! </span>{
     <span class="doccomment">/// Options controlling the behavior of certificate verification.
+    </span><span class="attr">#[derive(Copy, Clone, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
+    #[repr(transparent)]
     </span><span class="kw">pub struct </span>SslVerifyMode: i32 {
         <span class="doccomment">/// Verifies that the peer&#39;s certificate is trusted.
         ///
@@ -4604,6 +4729,8 @@
 
 <span class="macro">bitflags! </span>{
     <span class="doccomment">/// Options controlling the behavior of session caching.
+    </span><span class="attr">#[derive(Copy, Clone, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
+    #[repr(transparent)]
     </span><span class="kw">pub struct </span>SslSessionCacheMode: SslBitType {
         <span class="doccomment">/// No session caching for the client or server takes place.
         </span><span class="kw">const </span>OFF = ffi::SSL_SESS_CACHE_OFF;
@@ -4641,6 +4768,8 @@
 <span class="attr">#[cfg(ossl111)]
 </span><span class="macro">bitflags! </span>{
     <span class="doccomment">/// Which messages and under which conditions an extension should be added or expected.
+    </span><span class="attr">#[derive(Copy, Clone, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
+    #[repr(transparent)]
     </span><span class="kw">pub struct </span>ExtensionContext: c_uint {
         <span class="doccomment">/// This extension is only allowed in TLS
         </span><span class="kw">const </span>TLS_ONLY = ffi::SSL_EXT_TLS_ONLY;
@@ -4929,7 +5058,7 @@
     </span><span class="attr">#[corresponds(SSL_CTX_set_verify)]
     </span><span class="kw">pub fn </span>set_verify(<span class="kw-2">&amp;mut </span><span class="self">self</span>, mode: SslVerifyMode) {
         <span class="kw">unsafe </span>{
-            ffi::SSL_CTX_set_verify(<span class="self">self</span>.as_ptr(), mode.bits <span class="kw">as </span>c_int, <span class="prelude-val">None</span>);
+            ffi::SSL_CTX_set_verify(<span class="self">self</span>.as_ptr(), mode.bits() <span class="kw">as </span>c_int, <span class="prelude-val">None</span>);
         }
     }
 
@@ -4946,7 +5075,7 @@
     {
         <span class="kw">unsafe </span>{
             <span class="self">self</span>.set_ex_data(SslContext::cached_ex_index::&lt;F&gt;(), verify);
-            ffi::SSL_CTX_set_verify(<span class="self">self</span>.as_ptr(), mode.bits <span class="kw">as </span>c_int, <span class="prelude-val">Some</span>(raw_verify::&lt;F&gt;));
+            ffi::SSL_CTX_set_verify(<span class="self">self</span>.as_ptr(), mode.bits() <span class="kw">as </span>c_int, <span class="prelude-val">Some</span>(raw_verify::&lt;F&gt;));
         }
     }
 
@@ -5033,7 +5162,7 @@
     </span><span class="kw">pub fn </span>set_mode(<span class="kw-2">&amp;mut </span><span class="self">self</span>, mode: SslMode) -&gt; SslMode {
         <span class="kw">unsafe </span>{
             <span class="kw">let </span>bits = ffi::SSL_CTX_set_mode(<span class="self">self</span>.as_ptr(), mode.bits() <span class="kw">as </span>MtuTy) <span class="kw">as </span>SslBitType;
-            SslMode { bits }
+            SslMode::from_bits_retain(bits)
         }
     }
 
@@ -5305,14 +5434,14 @@
     </span><span class="kw">pub fn </span>set_options(<span class="kw-2">&amp;mut </span><span class="self">self</span>, option: SslOptions) -&gt; SslOptions {
         <span class="kw">let </span>bits =
             <span class="kw">unsafe </span>{ ffi::SSL_CTX_set_options(<span class="self">self</span>.as_ptr(), option.bits()) } <span class="kw">as </span>SslOptionsRepr;
-        SslOptions { bits }
+        SslOptions::from_bits_retain(bits)
     }
 
     <span class="doccomment">/// Returns the options used by the context.
     </span><span class="attr">#[corresponds(SSL_CTX_get_options)]
     </span><span class="kw">pub fn </span>options(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; SslOptions {
         <span class="kw">let </span>bits = <span class="kw">unsafe </span>{ ffi::SSL_CTX_get_options(<span class="self">self</span>.as_ptr()) } <span class="kw">as </span>SslOptionsRepr;
-        SslOptions { bits }
+        SslOptions::from_bits_retain(bits)
     }
 
     <span class="doccomment">/// Clears the options used by the context, returning the old set.
@@ -5320,7 +5449,7 @@
     </span><span class="kw">pub fn </span>clear_options(<span class="kw-2">&amp;mut </span><span class="self">self</span>, option: SslOptions) -&gt; SslOptions {
         <span class="kw">let </span>bits =
             <span class="kw">unsafe </span>{ ffi::SSL_CTX_clear_options(<span class="self">self</span>.as_ptr(), option.bits()) } <span class="kw">as </span>SslOptionsRepr;
-        SslOptions { bits }
+        SslOptions::from_bits_retain(bits)
     }
 
     <span class="doccomment">/// Sets the minimum supported protocol version.
@@ -5669,7 +5798,7 @@
     </span><span class="kw">pub fn </span>set_session_cache_mode(<span class="kw-2">&amp;mut </span><span class="self">self</span>, mode: SslSessionCacheMode) -&gt; SslSessionCacheMode {
         <span class="kw">unsafe </span>{
             <span class="kw">let </span>bits = ffi::SSL_CTX_set_session_cache_mode(<span class="self">self</span>.as_ptr(), mode.bits());
-            SslSessionCacheMode { bits }
+            SslSessionCacheMode::from_bits_retain(bits)
         }
     }
 
@@ -5752,16 +5881,34 @@
     ///
     /// This can be used to provide data to callbacks registered with the context. Use the
     /// `SslContext::new_ex_index` method to create an `Index`.
+    </span><span class="comment">// FIXME should return a result
     </span><span class="attr">#[corresponds(SSL_CTX_set_ex_data)]
     </span><span class="kw">pub fn </span>set_ex_data&lt;T&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, index: Index&lt;SslContext, T&gt;, data: T) {
         <span class="self">self</span>.set_ex_data_inner(index, data);
     }
 
     <span class="kw">fn </span>set_ex_data_inner&lt;T&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, index: Index&lt;SslContext, T&gt;, data: T) -&gt; <span class="kw-2">*mut </span>c_void {
+        <span class="kw">match </span><span class="self">self</span>.ex_data_mut(index) {
+            <span class="prelude-val">Some</span>(v) =&gt; {
+                <span class="kw-2">*</span>v = data;
+                (v <span class="kw">as </span><span class="kw-2">*mut </span>T).cast()
+            }
+            <span class="kw">_ </span>=&gt; <span class="kw">unsafe </span>{
+                <span class="kw">let </span>data = Box::into_raw(Box::new(data)) <span class="kw">as </span><span class="kw-2">*mut </span>c_void;
+                ffi::SSL_CTX_set_ex_data(<span class="self">self</span>.as_ptr(), index.as_raw(), data);
+                data
+            },
+        }
+    }
+
+    <span class="kw">fn </span>ex_data_mut&lt;T&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, index: Index&lt;SslContext, T&gt;) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;mut </span>T&gt; {
         <span class="kw">unsafe </span>{
-            <span class="kw">let </span>data = Box::into_raw(Box::new(data)) <span class="kw">as </span><span class="kw-2">*mut </span>c_void;
-            ffi::SSL_CTX_set_ex_data(<span class="self">self</span>.as_ptr(), index.as_raw(), data);
-            data
+            <span class="kw">let </span>data = ffi::SSL_CTX_get_ex_data(<span class="self">self</span>.as_ptr(), index.as_raw());
+            <span class="kw">if </span>data.is_null() {
+                <span class="prelude-val">None
+            </span>} <span class="kw">else </span>{
+                <span class="prelude-val">Some</span>(<span class="kw-2">&amp;mut *</span>data.cast())
+            }
         }
     }
 
@@ -5900,6 +6047,16 @@
     #[cfg(ossl111)]
     </span><span class="kw">pub fn </span>set_num_tickets(<span class="kw-2">&amp;mut </span><span class="self">self</span>, num_tickets: usize) -&gt; <span class="prelude-ty">Result</span>&lt;(), ErrorStack&gt; {
         <span class="kw">unsafe </span>{ cvt(ffi::SSL_CTX_set_num_tickets(<span class="self">self</span>.as_ptr(), num_tickets)).map(|<span class="kw">_</span>| ()) }
+    }
+
+    <span class="doccomment">/// Set the context&#39;s security level to a value between 0 and 5, inclusive.
+    /// A security value of 0 allows allows all parameters and algorithms.
+    ///
+    /// Requires OpenSSL 1.1.0 or newer.
+    </span><span class="attr">#[corresponds(SSL_CTX_set_security_level)]
+    #[cfg(any(ossl110, libressl360))]
+    </span><span class="kw">pub fn </span>set_security_level(<span class="kw-2">&amp;mut </span><span class="self">self</span>, level: u32) {
+        <span class="kw">unsafe </span>{ ffi::SSL_CTX_set_security_level(<span class="self">self</span>.as_ptr(), level <span class="kw">as </span>c_int) }
     }
 
     <span class="doccomment">/// Consumes the builder, returning a new `SslContext`.
@@ -6104,6 +6261,16 @@
     #[cfg(ossl111)]
     </span><span class="kw">pub fn </span>num_tickets(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; usize {
         <span class="kw">unsafe </span>{ ffi::SSL_CTX_get_num_tickets(<span class="self">self</span>.as_ptr()) }
+    }
+
+    <span class="doccomment">/// Get the context&#39;s security level, which controls the allowed parameters
+    /// and algorithms.
+    ///
+    /// Requires OpenSSL 1.1.0 or newer.
+    </span><span class="attr">#[corresponds(SSL_CTX_get_security_level)]
+    #[cfg(any(ossl110, libressl360))]
+    </span><span class="kw">pub fn </span>security_level(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; u32 {
+        <span class="kw">unsafe </span>{ ffi::SSL_CTX_get_security_level(<span class="self">self</span>.as_ptr()) <span class="kw">as </span>u32 }
     }
 }
 
@@ -6316,7 +6483,8 @@
         <span class="kw">unsafe </span>{
             <span class="kw">let </span><span class="kw-2">mut </span>len = <span class="number">0</span>;
             <span class="kw">let </span>p = ffi::SSL_SESSION_get_id(<span class="self">self</span>.as_ptr(), <span class="kw-2">&amp;mut </span>len);
-            slice::from_raw_parts(p <span class="kw">as </span><span class="kw-2">*const </span>u8, len <span class="kw">as </span>usize)
+            <span class="attr">#[allow(clippy::unnecessary_cast)]
+            </span>slice::from_raw_parts(p <span class="kw">as </span><span class="kw-2">*const </span>u8, len <span class="kw">as </span>usize)
         }
     }
 
@@ -6544,7 +6712,7 @@
     /// [`SslContextBuilder::set_verify`]: struct.SslContextBuilder.html#method.set_verify
     </span><span class="attr">#[corresponds(SSL_set_verify)]
     </span><span class="kw">pub fn </span>set_verify(<span class="kw-2">&amp;mut </span><span class="self">self</span>, mode: SslVerifyMode) {
-        <span class="kw">unsafe </span>{ ffi::SSL_set_verify(<span class="self">self</span>.as_ptr(), mode.bits <span class="kw">as </span>c_int, <span class="prelude-val">None</span>) }
+        <span class="kw">unsafe </span>{ ffi::SSL_set_verify(<span class="self">self</span>.as_ptr(), mode.bits() <span class="kw">as </span>c_int, <span class="prelude-val">None</span>) }
     }
 
     <span class="doccomment">/// Returns the verify mode that was set using `set_verify`.
@@ -6565,7 +6733,11 @@
         <span class="kw">unsafe </span>{
             <span class="comment">// this needs to be in an Arc since the callback can register a new callback!
             </span><span class="self">self</span>.set_ex_data(Ssl::cached_ex_index(), Arc::new(verify));
-            ffi::SSL_set_verify(<span class="self">self</span>.as_ptr(), mode.bits <span class="kw">as </span>c_int, <span class="prelude-val">Some</span>(ssl_raw_verify::&lt;F&gt;));
+            ffi::SSL_set_verify(
+                <span class="self">self</span>.as_ptr(),
+                mode.bits() <span class="kw">as </span>c_int,
+                <span class="prelude-val">Some</span>(ssl_raw_verify::&lt;F&gt;),
+            );
         }
     }
 
@@ -7120,15 +7292,19 @@
     ///
     /// This can be used to provide data to callbacks registered with the context. Use the
     /// `Ssl::new_ex_index` method to create an `Index`.
+    </span><span class="comment">// FIXME should return a result
     </span><span class="attr">#[corresponds(SSL_set_ex_data)]
     </span><span class="kw">pub fn </span>set_ex_data&lt;T&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, index: Index&lt;Ssl, T&gt;, data: T) {
-        <span class="kw">unsafe </span>{
-            <span class="kw">let </span>data = Box::new(data);
-            ffi::SSL_set_ex_data(
-                <span class="self">self</span>.as_ptr(),
-                index.as_raw(),
-                Box::into_raw(data) <span class="kw">as </span><span class="kw-2">*mut </span>c_void,
-            );
+        <span class="kw">match </span><span class="self">self</span>.ex_data_mut(index) {
+            <span class="prelude-val">Some</span>(v) =&gt; <span class="kw-2">*</span>v = data,
+            <span class="prelude-val">None </span>=&gt; <span class="kw">unsafe </span>{
+                <span class="kw">let </span>data = Box::new(data);
+                ffi::SSL_set_ex_data(
+                    <span class="self">self</span>.as_ptr(),
+                    index.as_raw(),
+                    Box::into_raw(data) <span class="kw">as </span><span class="kw-2">*mut </span>c_void,
+                );
+            },
         }
     }
 
@@ -7584,6 +7760,58 @@
     </span><span class="kw">pub fn </span>num_tickets(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; usize {
         <span class="kw">unsafe </span>{ ffi::SSL_get_num_tickets(<span class="self">self</span>.as_ptr()) }
     }
+
+    <span class="doccomment">/// Set the context&#39;s security level to a value between 0 and 5, inclusive.
+    /// A security value of 0 allows allows all parameters and algorithms.
+    ///
+    /// Requires OpenSSL 1.1.0 or newer.
+    </span><span class="attr">#[corresponds(SSL_set_security_level)]
+    #[cfg(any(ossl110, libressl360))]
+    </span><span class="kw">pub fn </span>set_security_level(<span class="kw-2">&amp;mut </span><span class="self">self</span>, level: u32) {
+        <span class="kw">unsafe </span>{ ffi::SSL_set_security_level(<span class="self">self</span>.as_ptr(), level <span class="kw">as </span>c_int) }
+    }
+
+    <span class="doccomment">/// Get the connection&#39;s security level, which controls the allowed parameters
+    /// and algorithms.
+    ///
+    /// Requires OpenSSL 1.1.0 or newer.
+    </span><span class="attr">#[corresponds(SSL_get_security_level)]
+    #[cfg(any(ossl110, libressl360))]
+    </span><span class="kw">pub fn </span>security_level(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; u32 {
+        <span class="kw">unsafe </span>{ ffi::SSL_get_security_level(<span class="self">self</span>.as_ptr()) <span class="kw">as </span>u32 }
+    }
+
+    <span class="doccomment">/// Get the temporary key provided by the peer that is used during key
+    /// exchange.
+    </span><span class="comment">// We use an owned value because EVP_KEY free need to be called when it is
+    // dropped
+    </span><span class="attr">#[corresponds(SSL_get_peer_tmp_key)]
+    #[cfg(ossl300)]
+    </span><span class="kw">pub fn </span>peer_tmp_key(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;PKey&lt;Public&gt;, ErrorStack&gt; {
+        <span class="kw">unsafe </span>{
+            <span class="kw">let </span><span class="kw-2">mut </span>key = ptr::null_mut();
+            <span class="kw">match </span>cvt_long(ffi::SSL_get_peer_tmp_key(<span class="self">self</span>.as_ptr(), <span class="kw-2">&amp;mut </span>key)) {
+                <span class="prelude-val">Ok</span>(<span class="kw">_</span>) =&gt; <span class="prelude-val">Ok</span>(PKey::&lt;Public&gt;::from_ptr(key)),
+                <span class="prelude-val">Err</span>(e) =&gt; <span class="prelude-val">Err</span>(e),
+            }
+        }
+    }
+
+    <span class="doccomment">/// Returns the temporary key from the local end of the connection that is
+    /// used during key exchange.
+    </span><span class="comment">// We use an owned value because EVP_KEY free need to be called when it is
+    // dropped
+    </span><span class="attr">#[corresponds(SSL_get_tmp_key)]
+    #[cfg(ossl300)]
+    </span><span class="kw">pub fn </span>tmp_key(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;PKey&lt;Private&gt;, ErrorStack&gt; {
+        <span class="kw">unsafe </span>{
+            <span class="kw">let </span><span class="kw-2">mut </span>key = ptr::null_mut();
+            <span class="kw">match </span>cvt_long(ffi::SSL_get_tmp_key(<span class="self">self</span>.as_ptr(), <span class="kw-2">&amp;mut </span>key)) {
+                <span class="prelude-val">Ok</span>(<span class="kw">_</span>) =&gt; <span class="prelude-val">Ok</span>(PKey::&lt;Private&gt;::from_ptr(key)),
+                <span class="prelude-val">Err</span>(e) =&gt; <span class="prelude-val">Err</span>(e),
+            }
+        }
+    }
 }
 
 <span class="doccomment">/// An SSL stream midway through the handshake process.
@@ -7912,7 +8140,7 @@
     </span><span class="kw">pub fn </span>get_shutdown(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; ShutdownState {
         <span class="kw">unsafe </span>{
             <span class="kw">let </span>bits = ffi::SSL_get_shutdown(<span class="self">self</span>.ssl.as_ptr());
-            ShutdownState { bits }
+            ShutdownState::from_bits_retain(bits)
         }
     }
 
@@ -8245,6 +8473,8 @@
 
 <span class="macro">bitflags! </span>{
     <span class="doccomment">/// The shutdown state of a session.
+    </span><span class="attr">#[derive(Copy, Clone, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
+    #[repr(transparent)]
     </span><span class="kw">pub struct </span>ShutdownState: c_int {
         <span class="doccomment">/// A close notify message has been sent to the peer.
         </span><span class="kw">const </span>SENT = ffi::SSL_SENT_SHUTDOWN;
