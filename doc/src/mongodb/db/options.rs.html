@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/nix/store/rw9bn419hs63s20iz4qrsgiddx2c69nb-vendor-cargo-deps/c19b7c6f923b580ac259164a89f2577984ad5ab09ee9d583b888f934adbbe8d0/mongodb-2.6.0/src/db/options.rs`."><title>options.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-cb6f1f67f1bcd037.css" id="mainThemeStyle"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="mongodb" data-themes="" data-resource-suffix="" data-rustdoc-version="1.73.0 (cc66ad468 2023-10-03) (built from a source tarball)" data-channel="1.73.0" data-search-js="search-6dfdfced5eff6596.js" data-settings-js="settings-de11bff964e9d4e5.js" data-settings-css="settings-8c76f75bfb6bd192.css" data-theme-light-css="light-1596385f77d47ef2.css" data-theme-dark-css="dark-0a43001d3fc2282c.css" data-theme-ayu-css="ayu-fd19013d6ce078bf.css" ><script src="../../../static.files/storage-db41da1a38ea3cb8.js"></script><script defer src="../../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-0795b7d26be81095.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../../../static.files/light-1596385f77d47ef2.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../../../static.files/dark-0a43001d3fc2282c.css"><link rel="stylesheet" href="../../../static.files/noscript-cffde32267a19fd6.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../../mongodb/index.html"><img class="rust-logo" src="../../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/nix/store/8wbf91mp5aqggnly8dsfwbyfpxzfkram-vendor-cargo-deps/c19b7c6f923b580ac259164a89f2577984ad5ab09ee9d583b888f934adbbe8d0/mongodb-2.8.0/src/db/options.rs`."><title>options.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-cb6f1f67f1bcd037.css" id="mainThemeStyle"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="mongodb" data-themes="" data-resource-suffix="" data-rustdoc-version="1.73.0 (cc66ad468 2023-10-03) (built from a source tarball)" data-channel="1.73.0" data-search-js="search-6dfdfced5eff6596.js" data-settings-js="settings-de11bff964e9d4e5.js" data-settings-css="settings-8c76f75bfb6bd192.css" data-theme-light-css="light-1596385f77d47ef2.css" data-theme-dark-css="dark-0a43001d3fc2282c.css" data-theme-ayu-css="ayu-fd19013d6ce078bf.css" ><script src="../../../static.files/storage-db41da1a38ea3cb8.js"></script><script defer src="../../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-0795b7d26be81095.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../../../static.files/light-1596385f77d47ef2.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../../../static.files/dark-0a43001d3fc2282c.css"><link rel="stylesheet" href="../../../static.files/noscript-cffde32267a19fd6.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../../mongodb/index.html"><img class="rust-logo" src="../../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -289,6 +289,53 @@
 <a href="#289" id="289">289</a>
 <a href="#290" id="290">290</a>
 <a href="#291" id="291">291</a>
+<a href="#292" id="292">292</a>
+<a href="#293" id="293">293</a>
+<a href="#294" id="294">294</a>
+<a href="#295" id="295">295</a>
+<a href="#296" id="296">296</a>
+<a href="#297" id="297">297</a>
+<a href="#298" id="298">298</a>
+<a href="#299" id="299">299</a>
+<a href="#300" id="300">300</a>
+<a href="#301" id="301">301</a>
+<a href="#302" id="302">302</a>
+<a href="#303" id="303">303</a>
+<a href="#304" id="304">304</a>
+<a href="#305" id="305">305</a>
+<a href="#306" id="306">306</a>
+<a href="#307" id="307">307</a>
+<a href="#308" id="308">308</a>
+<a href="#309" id="309">309</a>
+<a href="#310" id="310">310</a>
+<a href="#311" id="311">311</a>
+<a href="#312" id="312">312</a>
+<a href="#313" id="313">313</a>
+<a href="#314" id="314">314</a>
+<a href="#315" id="315">315</a>
+<a href="#316" id="316">316</a>
+<a href="#317" id="317">317</a>
+<a href="#318" id="318">318</a>
+<a href="#319" id="319">319</a>
+<a href="#320" id="320">320</a>
+<a href="#321" id="321">321</a>
+<a href="#322" id="322">322</a>
+<a href="#323" id="323">323</a>
+<a href="#324" id="324">324</a>
+<a href="#325" id="325">325</a>
+<a href="#326" id="326">326</a>
+<a href="#327" id="327">327</a>
+<a href="#328" id="328">328</a>
+<a href="#329" id="329">329</a>
+<a href="#330" id="330">330</a>
+<a href="#331" id="331">331</a>
+<a href="#332" id="332">332</a>
+<a href="#333" id="333">333</a>
+<a href="#334" id="334">334</a>
+<a href="#335" id="335">335</a>
+<a href="#336" id="336">336</a>
+<a href="#337" id="337">337</a>
+<a href="#338" id="338">338</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::time::Duration;
 
 <span class="kw">use </span>bson::doc;
@@ -298,10 +345,10 @@
 
 <span class="kw">use crate</span>::{
     bson::{Bson, Document},
-    bson_util,
     concern::{ReadConcern, WriteConcern},
-    options::Collation,
+    options::{Collation, CursorType},
     selection_criteria::SelectionCriteria,
+    serde_util,
 };
 
 <span class="doccomment">/// These are the valid options for creating a [`Database`](../struct.Database.html) with
@@ -333,13 +380,13 @@
 
     <span class="doccomment">/// The maximum size (in bytes) for a capped collection. This option is ignored if `capped` is
     /// not set to true.
-    </span><span class="attr">#[serde(serialize_with = <span class="string">&quot;bson_util::serialize_u64_option_as_i64&quot;</span>)]
+    </span><span class="attr">#[serde(serialize_with = <span class="string">&quot;serde_util::serialize_u64_option_as_i64&quot;</span>)]
     </span><span class="kw">pub </span>size: <span class="prelude-ty">Option</span>&lt;u64&gt;,
 
     <span class="doccomment">/// The maximum number of documents in a capped collection. The `size` limit takes precedence
     /// over this option. If a capped collection reaches the size limit before it reaches the
     /// maximum number of documents, MongoDB removes old documents.
-    </span><span class="attr">#[serde(serialize_with = <span class="string">&quot;bson_util::serialize_u64_option_as_i64&quot;</span>)]
+    </span><span class="attr">#[serde(serialize_with = <span class="string">&quot;serde_util::serialize_u64_option_as_i64&quot;</span>)]
     </span><span class="kw">pub </span>max: <span class="prelude-ty">Option</span>&lt;u64&gt;,
 
     <span class="doccomment">/// The storage engine that the collection should use. The value should take the following
@@ -389,11 +436,7 @@
     <span class="doccomment">/// Used to automatically delete documents in time series collections. See the [`create`
     /// command documentation](https://www.mongodb.com/docs/manual/reference/command/create/) for more
     /// information.
-    </span><span class="attr">#[serde(
-        default,
-        deserialize_with = <span class="string">&quot;bson_util::deserialize_duration_option_from_u64_seconds&quot;</span>,
-        serialize_with = <span class="string">&quot;bson_util::serialize_duration_option_as_int_secs&quot;
-    </span>)]
+    </span><span class="attr">#[serde(default, with = <span class="string">&quot;serde_util::duration_option_as_int_seconds&quot;</span>)]
     </span><span class="kw">pub </span>expire_after_seconds: <span class="prelude-ty">Option</span>&lt;Duration&gt;,
 
     <span class="doccomment">/// Options for supporting change stream pre- and post-images.
@@ -483,8 +526,10 @@
 }
 
 <span class="doccomment">/// Specifies options for creating a timeseries collection.
-</span><span class="attr">#[derive(Clone, Debug, Serialize, Deserialize, PartialEq, TypedBuilder)]
+</span><span class="attr">#[skip_serializing_none]
+#[derive(Clone, Debug, Serialize, Deserialize, PartialEq, TypedBuilder)]
 #[serde(rename_all = <span class="string">&quot;camelCase&quot;</span>)]
+#[builder(field_defaults(default))]
 #[non_exhaustive]
 </span><span class="kw">pub struct </span>TimeseriesOptions {
     <span class="doccomment">/// Name of the top-level field to be used for time. Inserted documents must have this field,
@@ -499,6 +544,31 @@
     <span class="doccomment">/// The units you&#39;d use to describe the expected interval between subsequent measurements for a
     /// time-series.  Defaults to `TimeseriesGranularity::Seconds` if unset.
     </span><span class="kw">pub </span>granularity: <span class="prelude-ty">Option</span>&lt;TimeseriesGranularity&gt;,
+
+    <span class="doccomment">/// The maximum time between timestamps in the same bucket. This value must be between 1 and
+    /// 31,536,000 seconds. If this value is set, the same value should be set for
+    /// `bucket_rounding` and `granularity` should not be set.
+    ///
+    /// This option is only available on MongoDB 6.3+.
+    </span><span class="attr">#[serde(
+        default,
+        with = <span class="string">&quot;serde_util::duration_option_as_int_seconds&quot;</span>,
+        rename = <span class="string">&quot;bucketMaxSpanSeconds&quot;
+    </span>)]
+    </span><span class="kw">pub </span>bucket_max_span: <span class="prelude-ty">Option</span>&lt;Duration&gt;,
+
+    <span class="doccomment">/// The time interval that determines the starting timestamp for a new bucket. When a document
+    /// requires a new bucket, MongoDB rounds down the document&#39;s timestamp value by this interval
+    /// to set the minimum time for the bucket.  If this value is set, the same value should be set
+    /// for `bucket_max_span` and `granularity` should not be set.
+    ///
+    /// This option is only available on MongoDB 6.3+.
+    </span><span class="attr">#[serde(
+        default,
+        with = <span class="string">&quot;serde_util::duration_option_as_int_seconds&quot;</span>,
+        rename = <span class="string">&quot;bucketRoundingSeconds&quot;
+    </span>)]
+    </span><span class="kw">pub </span>bucket_rounding: <span class="prelude-ty">Option</span>&lt;Duration&gt;,
 }
 
 <span class="doccomment">/// The units you&#39;d use to describe the expected interval between subsequent measurements for a
@@ -540,7 +610,7 @@
     /// number of round trips needed to return the entire set of documents returned by the
     /// query).
     </span><span class="attr">#[serde(
-        serialize_with = <span class="string">&quot;bson_util::serialize_u32_option_as_batch_size&quot;</span>,
+        serialize_with = <span class="string">&quot;serde_util::serialize_u32_option_as_batch_size&quot;</span>,
         rename(serialize = <span class="string">&quot;cursor&quot;</span>)
     )]
     </span><span class="kw">pub </span>batch_size: <span class="prelude-ty">Option</span>&lt;u32&gt;,
@@ -579,5 +649,29 @@
 </span><span class="kw">pub struct </span>ChangeStreamPreAndPostImages {
     <span class="doccomment">/// If `true`, change streams will be able to include pre- and post-images.
     </span><span class="kw">pub </span>enabled: bool,
+}
+
+<span class="doccomment">/// Specifies the options to a
+/// [`Database::RunCursorCommand`](../struct.Database.html#method.run_cursor_command) operation.
+</span><span class="attr">#[derive(Clone, Debug, Default, Deserialize, TypedBuilder)]
+#[builder(field_defaults(default, setter(into)))]
+#[serde(rename_all = <span class="string">&quot;camelCase&quot;</span>)]
+#[serde(default)]
+#[non_exhaustive]
+</span><span class="kw">pub struct </span>RunCursorCommandOptions {
+    <span class="doccomment">/// The default read preference for operations.
+    </span><span class="kw">pub </span>selection_criteria: <span class="prelude-ty">Option</span>&lt;SelectionCriteria&gt;,
+    <span class="doccomment">/// The type of cursor to return.
+    </span><span class="kw">pub </span>cursor_type: <span class="prelude-ty">Option</span>&lt;CursorType&gt;,
+    <span class="doccomment">/// Number of documents to return per batch.
+    </span><span class="kw">pub </span>batch_size: <span class="prelude-ty">Option</span>&lt;u32&gt;,
+    <span class="attr">#[serde(rename = <span class="string">&quot;maxtime&quot;</span>, alias = <span class="string">&quot;maxTimeMS&quot;</span>)]
+    #[serde(deserialize_with = <span class="string">&quot;serde_util::deserialize_duration_option_from_u64_millis&quot;</span>)]
+    </span><span class="doccomment">/// Optional non-negative integer value. Use this value to configure the maxTimeMS option sent
+    /// on subsequent getMore commands.
+    </span><span class="kw">pub </span>max_time: <span class="prelude-ty">Option</span>&lt;Duration&gt;,
+    <span class="doccomment">/// Optional BSON value. Use this value to configure the comment option sent on subsequent
+    /// getMore commands.
+    </span><span class="kw">pub </span>comment: <span class="prelude-ty">Option</span>&lt;Bson&gt;,
 }
 </code></pre></div></section></main></body></html>

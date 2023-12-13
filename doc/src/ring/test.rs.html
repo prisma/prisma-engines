@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/nix/store/rw9bn419hs63s20iz4qrsgiddx2c69nb-vendor-cargo-deps/c19b7c6f923b580ac259164a89f2577984ad5ab09ee9d583b888f934adbbe8d0/ring-0.16.20/src/test.rs`."><title>test.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-cb6f1f67f1bcd037.css" id="mainThemeStyle"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="ring" data-themes="" data-resource-suffix="" data-rustdoc-version="1.73.0 (cc66ad468 2023-10-03) (built from a source tarball)" data-channel="1.73.0" data-search-js="search-6dfdfced5eff6596.js" data-settings-js="settings-de11bff964e9d4e5.js" data-settings-css="settings-8c76f75bfb6bd192.css" data-theme-light-css="light-1596385f77d47ef2.css" data-theme-dark-css="dark-0a43001d3fc2282c.css" data-theme-ayu-css="ayu-fd19013d6ce078bf.css" ><script src="../../static.files/storage-db41da1a38ea3cb8.js"></script><script defer src="../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-0795b7d26be81095.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../../static.files/light-1596385f77d47ef2.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../../static.files/dark-0a43001d3fc2282c.css"><link rel="stylesheet" href="../../static.files/noscript-cffde32267a19fd6.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../ring/index.html"><img class="rust-logo" src="../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/nix/store/8wbf91mp5aqggnly8dsfwbyfpxzfkram-vendor-cargo-deps/c19b7c6f923b580ac259164a89f2577984ad5ab09ee9d583b888f934adbbe8d0/ring-0.17.7/src/test.rs`."><title>test.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-cb6f1f67f1bcd037.css" id="mainThemeStyle"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="ring" data-themes="" data-resource-suffix="" data-rustdoc-version="1.73.0 (cc66ad468 2023-10-03) (built from a source tarball)" data-channel="1.73.0" data-search-js="search-6dfdfced5eff6596.js" data-settings-js="settings-de11bff964e9d4e5.js" data-settings-css="settings-8c76f75bfb6bd192.css" data-theme-light-css="light-1596385f77d47ef2.css" data-theme-dark-css="dark-0a43001d3fc2282c.css" data-theme-ayu-css="ayu-fd19013d6ce078bf.css" ><script src="../../static.files/storage-db41da1a38ea3cb8.js"></script><script defer src="../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-0795b7d26be81095.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../../static.files/light-1596385f77d47ef2.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../../static.files/dark-0a43001d3fc2282c.css"><link rel="stylesheet" href="../../static.files/noscript-cffde32267a19fd6.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../ring/index.html"><img class="rust-logo" src="../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -638,6 +638,7 @@
 <a href="#638" id="638">638</a>
 <a href="#639" id="639">639</a>
 <a href="#640" id="640">640</a>
+<a href="#641" id="641">641</a>
 </pre></div><pre class="rust"><code><span class="comment">// Copyright 2015-2016 Brian Smith.
 //
 // Permission to use, copy, modify, and/or distribute this software for any
@@ -757,11 +758,11 @@
 //! stack trace to the line in the test code that panicked: entry 9 in the
 //! stack trace pointing to line 652 of the file `example.rs`.
 
-</span><span class="attr">#[cfg(feature = <span class="string">&quot;alloc&quot;</span>)]
-</span><span class="kw">use </span>alloc::{format, string::String, vec::Vec};
+</span><span class="kw">extern crate </span>alloc;
 
-<span class="attr">#[cfg(feature = <span class="string">&quot;alloc&quot;</span>)]
-</span><span class="kw">use crate</span>::{bits, digest, error};
+<span class="kw">use </span>alloc::{format, string::String, vec::Vec};
+
+<span class="kw">use crate</span>::{bits, digest, error};
 
 <span class="attr">#[cfg(any(feature = <span class="string">&quot;std&quot;</span>, feature = <span class="string">&quot;test_logging&quot;</span>))]
 </span><span class="kw">extern crate </span>std;
@@ -773,6 +774,10 @@
 <span class="doccomment">/// `compile_time_assert_copy::&lt;T&gt;();` fails to compile if `T` doesn&#39;t
 /// implement `Copy`.
 </span><span class="kw">pub fn </span>compile_time_assert_copy&lt;T: Copy&gt;() {}
+
+<span class="doccomment">/// `compile_time_assert_eq::&lt;T&gt;();` fails to compile if `T` doesn&#39;t
+/// implement `Eq`.
+</span><span class="kw">pub fn </span>compile_time_assert_eq&lt;T: Eq&gt;() {}
 
 <span class="doccomment">/// `compile_time_assert_send::&lt;T&gt;();` fails to compile if `T` doesn&#39;t
 /// implement `Send`.
@@ -792,14 +797,12 @@
 /// typos and omissions.
 ///
 /// Requires the `alloc` default feature to be enabled.
-</span><span class="attr">#[cfg(feature = <span class="string">&quot;alloc&quot;</span>)]
-#[derive(Debug)]
+</span><span class="attr">#[derive(Debug)]
 </span><span class="kw">pub struct </span>TestCase {
     attributes: Vec&lt;(String, String, bool)&gt;,
 }
 
-<span class="attr">#[cfg(feature = <span class="string">&quot;alloc&quot;</span>)]
-</span><span class="kw">impl </span>TestCase {
+<span class="kw">impl </span>TestCase {
     <span class="doccomment">/// Maps the string &quot;true&quot; to true and the string &quot;false&quot; to false.
     </span><span class="kw">pub fn </span>consume_bool(<span class="kw-2">&amp;mut </span><span class="self">self</span>, key: <span class="kw-2">&amp;</span>str) -&gt; bool {
         <span class="kw">match </span><span class="self">self</span>.consume_string(key).as_ref() {
@@ -831,8 +834,15 @@
     /// even number of hex digits, or as a double-quoted UTF-8 string. The
     /// empty (zero-length) value is represented as &quot;&quot;.
     </span><span class="kw">pub fn </span>consume_bytes(<span class="kw-2">&amp;mut </span><span class="self">self</span>, key: <span class="kw-2">&amp;</span>str) -&gt; Vec&lt;u8&gt; {
-        <span class="kw">let </span>s = <span class="self">self</span>.consume_string(key);
-        <span class="kw">if </span>s.starts_with(<span class="string">&#39;\&quot;&#39;</span>) {
+        <span class="self">self</span>.consume_optional_bytes(key)
+            .unwrap_or_else(|| <span class="macro">panic!</span>(<span class="string">&quot;No attribute named \&quot;{}\&quot;&quot;</span>, key))
+    }
+
+    <span class="doccomment">/// Like `consume_bytes()` except it returns `None` if the test case
+    /// doesn&#39;t have the attribute.
+    </span><span class="kw">pub fn </span>consume_optional_bytes(<span class="kw-2">&amp;mut </span><span class="self">self</span>, key: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Option</span>&lt;Vec&lt;u8&gt;&gt; {
+        <span class="kw">let </span>s = <span class="self">self</span>.consume_optional_string(key)<span class="question-mark">?</span>;
+        <span class="kw">let </span>result = <span class="kw">if </span>s.starts_with(<span class="string">&#39;\&quot;&#39;</span>) {
             <span class="comment">// The value is a quoted UTF-8 string.
 
             </span><span class="kw">let </span><span class="kw-2">mut </span>bytes = Vec::with_capacity(s.as_bytes().len() - <span class="number">2</span>);
@@ -881,7 +891,8 @@
                     <span class="macro">panic!</span>(<span class="string">&quot;{} in {}&quot;</span>, err_str, s);
                 }
             }
-        }
+        };
+        <span class="prelude-val">Some</span>(result)
     }
 
     <span class="doccomment">/// Returns the value of an attribute that is an integer, in decimal
@@ -893,7 +904,6 @@
 
     <span class="doccomment">/// Returns the value of an attribute that is an integer, in decimal
     /// notation, as a bit length.
-    </span><span class="attr">#[cfg(feature = <span class="string">&quot;alloc&quot;</span>)]
     </span><span class="kw">pub fn </span>consume_usize_bits(<span class="kw-2">&amp;mut </span><span class="self">self</span>, key: <span class="kw-2">&amp;</span>str) -&gt; bits::BitLength {
         <span class="kw">let </span>s = <span class="self">self</span>.consume_string(key);
         <span class="kw">let </span>bits = s.parse::&lt;usize&gt;().unwrap();
@@ -924,11 +934,10 @@
 }
 
 <span class="doccomment">/// References a test input file.
-</span><span class="attr">#[cfg(feature = <span class="string">&quot;alloc&quot;</span>)]
-#[macro_export]
+</span><span class="attr">#[macro_export]
 </span><span class="macro">macro_rules! </span>test_file {
     (<span class="macro-nonterminal">$file_name</span>:expr) =&gt; {
-        <span class="kw">crate</span>::test::File {
+        <span class="macro-nonterminal">$crate::test::File </span>{
             file_name: <span class="macro-nonterminal">$file_name</span>,
             contents: <span class="macro">include_str!</span>(<span class="macro-nonterminal">$file_name</span>),
         }
@@ -936,7 +945,6 @@
 }
 
 <span class="doccomment">/// A test input file.
-</span><span class="attr">#[cfg(feature = <span class="string">&quot;alloc&quot;</span>)]
 </span><span class="kw">pub struct </span>File&lt;<span class="lifetime">&#39;a</span>&gt; {
     <span class="doccomment">/// The name (path) of the file.
     </span><span class="kw">pub </span>file_name: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str,
@@ -948,9 +956,6 @@
 <span class="doccomment">/// Parses test cases out of the given file, calling `f` on each vector until
 /// `f` fails or until all the test vectors have been read. `f` can indicate
 /// failure either by returning `Err()` or by panicking.
-///
-/// Requires the `alloc` default feature to be enabled
-</span><span class="attr">#[cfg(feature = <span class="string">&quot;alloc&quot;</span>)]
 </span><span class="kw">pub fn </span>run&lt;F&gt;(test_file: File, <span class="kw-2">mut </span>f: F)
 <span class="kw">where
     </span>F: FnMut(<span class="kw-2">&amp;</span>str, <span class="kw-2">&amp;mut </span>TestCase) -&gt; <span class="prelude-ty">Result</span>&lt;(), error::Unspecified&gt;,
@@ -1001,7 +1006,6 @@
 
 <span class="doccomment">/// Decode an string of hex digits into a sequence of bytes. The input must
 /// have an even number of digits.
-</span><span class="attr">#[cfg(feature = <span class="string">&quot;alloc&quot;</span>)]
 </span><span class="kw">pub fn </span>from_hex(hex_str: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;u8&gt;, String&gt; {
     <span class="kw">if </span>hex_str.len() % <span class="number">2 </span>!= <span class="number">0 </span>{
         <span class="kw">return </span><span class="prelude-val">Err</span>(String::from(
@@ -1018,8 +1022,7 @@
     <span class="prelude-val">Ok</span>(result)
 }
 
-<span class="attr">#[cfg(feature = <span class="string">&quot;alloc&quot;</span>)]
-</span><span class="kw">fn </span>from_hex_digit(d: u8) -&gt; <span class="prelude-ty">Result</span>&lt;u8, String&gt; {
+<span class="kw">fn </span>from_hex_digit(d: u8) -&gt; <span class="prelude-ty">Result</span>&lt;u8, String&gt; {
     <span class="kw">use </span>core::ops::RangeInclusive;
     <span class="kw">const </span>DECIMAL: (u8, RangeInclusive&lt;u8&gt;) = (<span class="number">0</span>, <span class="string">b&#39;0&#39;</span>..=<span class="string">b&#39;9&#39;</span>);
     <span class="kw">const </span>HEX_LOWER: (u8, RangeInclusive&lt;u8&gt;) = (<span class="number">10</span>, <span class="string">b&#39;a&#39;</span>..=<span class="string">b&#39;f&#39;</span>);
@@ -1032,8 +1035,7 @@
     <span class="prelude-val">Err</span>(<span class="macro">format!</span>(<span class="string">&quot;Invalid hex digit &#39;{}&#39;&quot;</span>, d <span class="kw">as </span>char))
 }
 
-<span class="attr">#[cfg(feature = <span class="string">&quot;alloc&quot;</span>)]
-</span><span class="kw">fn </span>parse_test_case(
+<span class="kw">fn </span>parse_test_case(
     current_section: <span class="kw-2">&amp;mut </span>String,
     lines: <span class="kw-2">&amp;mut </span><span class="kw">dyn </span>Iterator&lt;Item = <span class="kw-2">&amp;</span>str&gt;,
 ) -&gt; <span class="prelude-ty">Option</span>&lt;TestCase&gt; {
@@ -1063,7 +1065,7 @@
             }
 
             <span class="comment">// A blank line ends a test case if the test case isn&#39;t empty.
-            </span><span class="prelude-val">Some</span>(<span class="kw-2">ref </span>line) <span class="kw">if </span>line.is_empty() =&gt; {
+            </span><span class="prelude-val">Some</span>(line) <span class="kw">if </span>line.is_empty() =&gt; {
                 <span class="kw">if </span>!is_first_line {
                     <span class="kw">return </span><span class="prelude-val">Some</span>(TestCase { attributes });
                 }
@@ -1071,9 +1073,9 @@
             </span>}
 
             <span class="comment">// Comments start with &#39;#&#39;; ignore them.
-            </span><span class="prelude-val">Some</span>(<span class="kw-2">ref </span>line) <span class="kw">if </span>line.starts_with(<span class="string">&#39;#&#39;</span>) =&gt; (),
+            </span><span class="prelude-val">Some</span>(line) <span class="kw">if </span>line.starts_with(<span class="string">&#39;#&#39;</span>) =&gt; (),
 
-            <span class="prelude-val">Some</span>(<span class="kw-2">ref </span>line) <span class="kw">if </span>line.starts_with(<span class="string">&#39;[&#39;</span>) =&gt; {
+            <span class="prelude-val">Some</span>(line) <span class="kw">if </span>line.starts_with(<span class="string">&#39;[&#39;</span>) =&gt; {
                 <span class="macro">assert!</span>(is_first_line);
                 <span class="macro">assert!</span>(line.ends_with(<span class="string">&#39;]&#39;</span>));
                 current_section.truncate(<span class="number">0</span>);
@@ -1082,7 +1084,7 @@
                 <span class="kw">let _ </span>= current_section.remove(<span class="number">0</span>);
             }
 
-            <span class="prelude-val">Some</span>(<span class="kw-2">ref </span>line) =&gt; {
+            <span class="prelude-val">Some</span>(line) =&gt; {
                 is_first_line = <span class="bool-val">false</span>;
 
                 <span class="kw">let </span>parts: Vec&lt;<span class="kw-2">&amp;</span>str&gt; = line.splitn(<span class="number">2</span>, <span class="string">&quot; = &quot;</span>).collect();
@@ -1112,7 +1114,7 @@
 /// useful for some types of fuzzing.
 </span><span class="attr">#[doc(hidden)]
 </span><span class="kw">pub mod </span>rand {
-    <span class="kw">use crate</span>::{error, polyfill, rand};
+    <span class="kw">use crate</span>::{error, rand};
 
     <span class="doccomment">/// An implementation of `SecureRandom` that always fills the output slice
     /// with the given byte.
@@ -1123,7 +1125,7 @@
 
     <span class="kw">impl </span>rand::sealed::SecureRandom <span class="kw">for </span>FixedByteRandom {
         <span class="kw">fn </span>fill_impl(<span class="kw-2">&amp;</span><span class="self">self</span>, dest: <span class="kw-2">&amp;mut </span>[u8]) -&gt; <span class="prelude-ty">Result</span>&lt;(), error::Unspecified&gt; {
-            polyfill::slice::fill(dest, <span class="self">self</span>.byte);
+            dest.fill(<span class="self">self</span>.byte);
             <span class="prelude-val">Ok</span>(())
         }
     }

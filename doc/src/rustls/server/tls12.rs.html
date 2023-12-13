@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/nix/store/rw9bn419hs63s20iz4qrsgiddx2c69nb-vendor-cargo-deps/c19b7c6f923b580ac259164a89f2577984ad5ab09ee9d583b888f934adbbe8d0/rustls-0.20.8/src/server/tls12.rs`."><title>tls12.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-cb6f1f67f1bcd037.css" id="mainThemeStyle"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="rustls" data-themes="" data-resource-suffix="" data-rustdoc-version="1.73.0 (cc66ad468 2023-10-03) (built from a source tarball)" data-channel="1.73.0" data-search-js="search-6dfdfced5eff6596.js" data-settings-js="settings-de11bff964e9d4e5.js" data-settings-css="settings-8c76f75bfb6bd192.css" data-theme-light-css="light-1596385f77d47ef2.css" data-theme-dark-css="dark-0a43001d3fc2282c.css" data-theme-ayu-css="ayu-fd19013d6ce078bf.css" ><script src="../../../static.files/storage-db41da1a38ea3cb8.js"></script><script defer src="../../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-0795b7d26be81095.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../../../static.files/light-1596385f77d47ef2.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../../../static.files/dark-0a43001d3fc2282c.css"><link rel="stylesheet" href="../../../static.files/noscript-cffde32267a19fd6.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../../rustls/index.html"><img class="rust-logo" src="../../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/nix/store/8wbf91mp5aqggnly8dsfwbyfpxzfkram-vendor-cargo-deps/c19b7c6f923b580ac259164a89f2577984ad5ab09ee9d583b888f934adbbe8d0/rustls-0.21.10/src/server/tls12.rs`."><title>tls12.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-cb6f1f67f1bcd037.css" id="mainThemeStyle"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="rustls" data-themes="" data-resource-suffix="" data-rustdoc-version="1.73.0 (cc66ad468 2023-10-03) (built from a source tarball)" data-channel="1.73.0" data-search-js="search-6dfdfced5eff6596.js" data-settings-js="settings-de11bff964e9d4e5.js" data-settings-css="settings-8c76f75bfb6bd192.css" data-theme-light-css="light-1596385f77d47ef2.css" data-theme-dark-css="dark-0a43001d3fc2282c.css" data-theme-ayu-css="ayu-fd19013d6ce078bf.css" ><script src="../../../static.files/storage-db41da1a38ea3cb8.js"></script><script defer src="../../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-0795b7d26be81095.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../../../static.files/light-1596385f77d47ef2.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../../../static.files/dark-0a43001d3fc2282c.css"><link rel="stylesheet" href="../../../static.files/noscript-cffde32267a19fd6.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../../rustls/index.html"><img class="rust-logo" src="../../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -939,10 +939,26 @@
 <a href="#939" id="939">939</a>
 <a href="#940" id="940">940</a>
 <a href="#941" id="941">941</a>
+<a href="#942" id="942">942</a>
+<a href="#943" id="943">943</a>
+<a href="#944" id="944">944</a>
+<a href="#945" id="945">945</a>
+<a href="#946" id="946">946</a>
+<a href="#947" id="947">947</a>
+<a href="#948" id="948">948</a>
+<a href="#949" id="949">949</a>
+<a href="#950" id="950">950</a>
+<a href="#951" id="951">951</a>
+<a href="#952" id="952">952</a>
+<a href="#953" id="953">953</a>
+<a href="#954" id="954">954</a>
+<a href="#955" id="955">955</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::check::inappropriate_message;
-<span class="kw">use </span><span class="kw">crate</span>::conn::{CommonState, ConnectionRandoms, Side, State};
+<span class="kw">use </span><span class="kw">crate</span>::common_state::{CommonState, Side, State};
+<span class="kw">use </span><span class="kw">crate</span>::conn::ConnectionRandoms;
 <span class="kw">use </span><span class="kw">crate</span>::enums::ProtocolVersion;
-<span class="kw">use </span><span class="kw">crate</span>::error::Error;
+<span class="kw">use </span><span class="kw">crate</span>::enums::{AlertDescription, ContentType, HandshakeType};
+<span class="kw">use </span><span class="kw">crate</span>::error::{Error, PeerIncompatible, PeerMisbehaved};
 <span class="kw">use </span><span class="kw">crate</span>::hash_hs::HandshakeHash;
 <span class="kw">use </span><span class="kw">crate</span>::key::Certificate;
 <span class="attr">#[cfg(feature = <span class="string">&quot;logging&quot;</span>)]
@@ -950,9 +966,8 @@
 <span class="kw">use </span><span class="kw">crate</span>::msgs::base::Payload;
 <span class="kw">use </span><span class="kw">crate</span>::msgs::ccs::ChangeCipherSpecPayload;
 <span class="kw">use </span><span class="kw">crate</span>::msgs::codec::Codec;
-<span class="kw">use </span><span class="kw">crate</span>::msgs::enums::{AlertDescription, ContentType, HandshakeType};
 <span class="kw">use </span><span class="kw">crate</span>::msgs::handshake::{ClientECDHParams, HandshakeMessagePayload, HandshakePayload};
-<span class="kw">use </span><span class="kw">crate</span>::msgs::handshake::{NewSessionTicketPayload, SessionID};
+<span class="kw">use </span><span class="kw">crate</span>::msgs::handshake::{NewSessionTicketPayload, SessionId};
 <span class="kw">use </span><span class="kw">crate</span>::msgs::message::{Message, MessagePayload};
 <span class="kw">use </span><span class="kw">crate</span>::msgs::persist;
 <span class="attr">#[cfg(feature = <span class="string">&quot;secret_extraction&quot;</span>)]
@@ -974,22 +989,21 @@
     <span class="kw">use </span><span class="kw">crate</span>::enums::SignatureScheme;
     <span class="kw">use </span><span class="kw">crate</span>::msgs::enums::ECPointFormat;
     <span class="kw">use </span><span class="kw">crate</span>::msgs::enums::{ClientCertificateType, Compression};
+    <span class="kw">use </span><span class="kw">crate</span>::msgs::handshake::ServerECDHParams;
     <span class="kw">use </span><span class="kw">crate</span>::msgs::handshake::{CertificateRequestPayload, ClientSessionTicket, Random};
-    <span class="kw">use </span><span class="kw">crate</span>::msgs::handshake::{
-        CertificateStatus, DigitallySignedStruct, ECDHEServerKeyExchange,
-    };
-    <span class="kw">use </span><span class="kw">crate</span>::msgs::handshake::{ClientExtension, SessionID};
+    <span class="kw">use </span><span class="kw">crate</span>::msgs::handshake::{CertificateStatus, ECDHEServerKeyExchange};
+    <span class="kw">use </span><span class="kw">crate</span>::msgs::handshake::{ClientExtension, SessionId};
     <span class="kw">use </span><span class="kw">crate</span>::msgs::handshake::{ClientHelloPayload, ServerHelloPayload};
-    <span class="kw">use </span><span class="kw">crate</span>::msgs::handshake::{ECPointFormatList, ServerECDHParams, SupportedPointFormats};
     <span class="kw">use </span><span class="kw">crate</span>::msgs::handshake::{ServerExtension, ServerKeyExchangePayload};
     <span class="kw">use </span><span class="kw">crate</span>::sign;
+    <span class="kw">use </span><span class="kw">crate</span>::verify::DigitallySignedStruct;
 
     <span class="kw">use super</span>::<span class="kw-2">*</span>;
 
     <span class="kw">pub</span>(<span class="kw">in </span><span class="kw">crate</span>::server) <span class="kw">struct </span>CompleteClientHelloHandling {
         <span class="kw">pub</span>(<span class="kw">in </span><span class="kw">crate</span>::server) config: Arc&lt;ServerConfig&gt;,
         <span class="kw">pub</span>(<span class="kw">in </span><span class="kw">crate</span>::server) transcript: HandshakeHash,
-        <span class="kw">pub</span>(<span class="kw">in </span><span class="kw">crate</span>::server) session_id: SessionID,
+        <span class="kw">pub</span>(<span class="kw">in </span><span class="kw">crate</span>::server) session_id: SessionId,
         <span class="kw">pub</span>(<span class="kw">in </span><span class="kw">crate</span>::server) suite: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>Tls12CipherSuite,
         <span class="kw">pub</span>(<span class="kw">in </span><span class="kw">crate</span>::server) using_ems: bool,
         <span class="kw">pub</span>(<span class="kw">in </span><span class="kw">crate</span>::server) randoms: ConnectionRandoms,
@@ -1016,19 +1030,28 @@
 
             <span class="kw">let </span>groups_ext = client_hello
                 .get_namedgroups_extension()
-                .ok_or_else(|| hs::incompatible(cx.common, <span class="string">&quot;client didn&#39;t describe groups&quot;</span>))<span class="question-mark">?</span>;
+                .ok_or_else(|| {
+                    cx.common.send_fatal_alert(
+                        AlertDescription::HandshakeFailure,
+                        PeerIncompatible::NamedGroupsExtensionRequired,
+                    )
+                })<span class="question-mark">?</span>;
             <span class="kw">let </span>ecpoints_ext = client_hello
                 .get_ecpoints_extension()
-                .ok_or_else(|| hs::incompatible(cx.common, <span class="string">&quot;client didn&#39;t describe ec points&quot;</span>))<span class="question-mark">?</span>;
+                .ok_or_else(|| {
+                    cx.common.send_fatal_alert(
+                        AlertDescription::HandshakeFailure,
+                        PeerIncompatible::EcPointsExtensionRequired,
+                    )
+                })<span class="question-mark">?</span>;
 
             <span class="macro">trace!</span>(<span class="string">&quot;namedgroups {:?}&quot;</span>, groups_ext);
             <span class="macro">trace!</span>(<span class="string">&quot;ecpoints {:?}&quot;</span>, ecpoints_ext);
 
             <span class="kw">if </span>!ecpoints_ext.contains(<span class="kw-2">&amp;</span>ECPointFormat::Uncompressed) {
-                cx.common
-                    .send_fatal_alert(AlertDescription::IllegalParameter);
-                <span class="kw">return </span><span class="prelude-val">Err</span>(Error::PeerIncompatibleError(
-                    <span class="string">&quot;client didn&#39;t support uncompressed ec points&quot;</span>.to_string(),
+                <span class="kw">return </span><span class="prelude-val">Err</span>(cx.common.send_fatal_alert(
+                    AlertDescription::IllegalParameter,
+                    PeerIncompatible::UncompressedEcPointsRequired,
                 ));
             }
 
@@ -1078,7 +1101,7 @@
                         .session_storage
                         .get(<span class="kw-2">&amp;</span>client_hello.session_id.get_encoding())
                 })
-                .and_then(|x| persist::ServerSessionValue::read_bytes(<span class="kw-2">&amp;</span>x))
+                .and_then(|x| persist::ServerSessionValue::read_bytes(<span class="kw-2">&amp;</span>x).ok())
                 .filter(|resumedata| {
                     hs::can_resume(<span class="self">self</span>.suite.into(), <span class="kw-2">&amp;</span>cx.data.sni, <span class="self">self</span>.using_ems, resumedata)
                 });
@@ -1093,7 +1116,10 @@
                 .resolve_sig_schemes(<span class="kw-2">&amp;</span>sigschemes_ext);
 
             <span class="kw">if </span>sigschemes.is_empty() {
-                <span class="kw">return </span><span class="prelude-val">Err</span>(hs::incompatible(cx.common, <span class="string">&quot;no overlapping sigschemes&quot;</span>));
+                <span class="kw">return </span><span class="prelude-val">Err</span>(cx.common.send_fatal_alert(
+                    AlertDescription::HandshakeFailure,
+                    PeerIncompatible::NoSignatureSchemesInCommon,
+                ));
             }
 
             <span class="kw">let </span>group = <span class="self">self
@@ -1102,13 +1128,23 @@
                 .iter()
                 .find(|skxg| groups_ext.contains(<span class="kw-2">&amp;</span>skxg.name))
                 .cloned()
-                .ok_or_else(|| hs::incompatible(cx.common, <span class="string">&quot;no supported group&quot;</span>))<span class="question-mark">?</span>;
+                .ok_or_else(|| {
+                    cx.common.send_fatal_alert(
+                        AlertDescription::HandshakeFailure,
+                        PeerIncompatible::NoKxGroupsInCommon,
+                    )
+                })<span class="question-mark">?</span>;
 
-            <span class="kw">let </span>ecpoint = ECPointFormatList::supported()
+            <span class="kw">let </span>ecpoint = ECPointFormat::SUPPORTED
                 .iter()
                 .find(|format| ecpoints_ext.contains(format))
                 .cloned()
-                .ok_or_else(|| hs::incompatible(cx.common, <span class="string">&quot;no supported point format&quot;</span>))<span class="question-mark">?</span>;
+                .ok_or_else(|| {
+                    cx.common.send_fatal_alert(
+                        AlertDescription::HandshakeFailure,
+                        PeerIncompatible::NoEcPointFormatsInCommon,
+                    )
+                })<span class="question-mark">?</span>;
 
             <span class="macro">debug_assert_eq!</span>(ecpoint, ECPointFormat::Uncompressed);
 
@@ -1117,9 +1153,9 @@
 
             <span class="comment">// If we&#39;re not offered a ticket or a potential session ID, allocate a session ID.
             </span><span class="kw">if </span>!<span class="self">self</span>.config.session_storage.can_cache() {
-                <span class="self">self</span>.session_id = SessionID::empty();
+                <span class="self">self</span>.session_id = SessionId::empty();
             } <span class="kw">else if </span><span class="self">self</span>.session_id.is_empty() &amp;&amp; !ticket_received {
-                <span class="self">self</span>.session_id = SessionID::random()<span class="question-mark">?</span>;
+                <span class="self">self</span>.session_id = SessionId::random()<span class="question-mark">?</span>;
             }
 
             <span class="self">self</span>.send_ticket = emit_server_hello(
@@ -1181,15 +1217,16 @@
             <span class="kw-2">mut </span><span class="self">self</span>,
             cx: <span class="kw-2">&amp;mut </span>ServerContext&lt;<span class="lifetime">&#39;_</span>&gt;,
             client_hello: <span class="kw-2">&amp;</span>ClientHelloPayload,
-            id: <span class="kw-2">&amp;</span>SessionID,
+            id: <span class="kw-2">&amp;</span>SessionId,
             resumedata: persist::ServerSessionValue,
         ) -&gt; hs::NextStateOrError {
             <span class="macro">debug!</span>(<span class="string">&quot;Resuming connection&quot;</span>);
 
             <span class="kw">if </span>resumedata.extended_ms &amp;&amp; !<span class="self">self</span>.using_ems {
-                <span class="kw">return </span><span class="prelude-val">Err</span>(cx
-                    .common
-                    .illegal_param(<span class="string">&quot;refusing to resume without ems&quot;</span>));
+                <span class="kw">return </span><span class="prelude-val">Err</span>(cx.common.send_fatal_alert(
+                    AlertDescription::IllegalParameter,
+                    PeerMisbehaved::ResumptionAttemptedWithVariedEms,
+                ));
             }
 
             <span class="self">self</span>.session_id = <span class="kw-2">*</span>id;
@@ -1253,7 +1290,7 @@
         config: <span class="kw-2">&amp;</span>ServerConfig,
         transcript: <span class="kw-2">&amp;mut </span>HandshakeHash,
         cx: <span class="kw-2">&amp;mut </span>ServerContext&lt;<span class="lifetime">&#39;_</span>&gt;,
-        session_id: SessionID,
+        session_id: SessionId,
         suite: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>Tls12CipherSuite,
         using_ems: bool,
         ocsp_response: <span class="kw-2">&amp;mut </span><span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>[u8]&gt;,
@@ -1381,14 +1418,10 @@
 
         <span class="kw">let </span>verify_schemes = client_auth.supported_verify_schemes();
 
-        <span class="kw">let </span>names = client_auth
+        <span class="kw">let </span>names = config
+            .verifier
             .client_auth_root_subjects()
-            .ok_or_else(|| {
-                <span class="macro">debug!</span>(<span class="string">&quot;could not determine root subjects based on SNI&quot;</span>);
-                cx.common
-                    .send_fatal_alert(AlertDescription::AccessDenied);
-                Error::General(<span class="string">&quot;client rejected by client_auth_root_subjects&quot;</span>.into())
-            })<span class="question-mark">?</span>;
+            .to_vec();
 
         <span class="kw">let </span>cr = CertificateRequestPayload {
             certtypes: <span class="macro">vec!</span>[
@@ -1432,7 +1465,7 @@
     config: Arc&lt;ServerConfig&gt;,
     transcript: HandshakeHash,
     randoms: ConnectionRandoms,
-    session_id: SessionID,
+    session_id: SessionId,
     suite: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>Tls12CipherSuite,
     using_ems: bool,
     server_kx: kx::KeyExchange,
@@ -1452,21 +1485,16 @@
         </span><span class="kw">let </span>mandatory = <span class="self">self
             </span>.config
             .verifier
-            .client_auth_mandatory()
-            .ok_or_else(|| {
-                <span class="macro">debug!</span>(<span class="string">&quot;could not determine if client auth is mandatory based on SNI&quot;</span>);
-                cx.common
-                    .send_fatal_alert(AlertDescription::AccessDenied);
-                Error::General(<span class="string">&quot;client rejected by client_auth_mandatory&quot;</span>.into())
-            })<span class="question-mark">?</span>;
+            .client_auth_mandatory();
 
         <span class="macro">trace!</span>(<span class="string">&quot;certs {:?}&quot;</span>, cert_chain);
 
         <span class="kw">let </span>client_cert = <span class="kw">match </span>cert_chain.split_first() {
             <span class="prelude-val">None </span><span class="kw">if </span>mandatory =&gt; {
-                cx.common
-                    .send_fatal_alert(AlertDescription::CertificateRequired);
-                <span class="kw">return </span><span class="prelude-val">Err</span>(Error::NoCertificatesPresented);
+                <span class="kw">return </span><span class="prelude-val">Err</span>(cx.common.send_fatal_alert(
+                    AlertDescription::CertificateRequired,
+                    Error::NoCertificatesPresented,
+                ));
             }
             <span class="prelude-val">None </span>=&gt; {
                 <span class="macro">debug!</span>(<span class="string">&quot;client auth requested but no certificate supplied&quot;</span>);
@@ -1479,8 +1507,8 @@
                     .verifier
                     .verify_client_cert(end_entity, intermediates, now)
                     .map_err(|err| {
-                        hs::incompatible(cx.common, <span class="string">&quot;certificate invalid&quot;</span>);
-                        err
+                        cx.common
+                            .send_cert_verify_error_alert(err)
                     })<span class="question-mark">?</span>;
 
                 <span class="prelude-val">Some</span>(cert_chain)
@@ -1506,7 +1534,7 @@
     config: Arc&lt;ServerConfig&gt;,
     transcript: HandshakeHash,
     randoms: ConnectionRandoms,
-    session_id: SessionID,
+    session_id: SessionId,
     suite: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>Tls12CipherSuite,
     using_ems: bool,
     server_kx: kx::KeyExchange,
@@ -1575,7 +1603,7 @@
     config: Arc&lt;ServerConfig&gt;,
     secrets: ConnectionSecrets,
     transcript: HandshakeHash,
-    session_id: SessionID,
+    session_id: SessionId,
     using_ems: bool,
     client_cert: Vec&lt;Certificate&gt;,
     send_ticket: bool,
@@ -1603,17 +1631,18 @@
                     // `transcript.abandon_client_auth()` can extract it, but its only caller in
                     // this flow will also set `ExpectClientKx::client_cert` to `None`, making it
                     // impossible to reach this state.
-                    </span>cx.common
-                        .send_fatal_alert(AlertDescription::AccessDenied);
-                    <span class="prelude-val">Err</span>(Error::General(<span class="string">&quot;client authentication not set up&quot;</span>.into()))
+                    </span><span class="kw">return </span><span class="prelude-val">Err</span>(cx.common.send_fatal_alert(
+                        AlertDescription::AccessDenied,
+                        Error::General(<span class="string">&quot;client authentication not set up&quot;</span>.into()),
+                    ));
                 }
             }
         };
 
         <span class="kw">if let </span><span class="prelude-val">Err</span>(e) = rc {
-            cx.common
-                .send_fatal_alert(AlertDescription::AccessDenied);
-            <span class="kw">return </span><span class="prelude-val">Err</span>(e);
+            <span class="kw">return </span><span class="prelude-val">Err</span>(cx
+                .common
+                .send_cert_verify_error_alert(e));
         }
 
         <span class="macro">trace!</span>(<span class="string">&quot;client CertificateVerify OK&quot;</span>);
@@ -1637,7 +1666,7 @@
     config: Arc&lt;ServerConfig&gt;,
     secrets: ConnectionSecrets,
     transcript: HandshakeHash,
-    session_id: SessionID,
+    session_id: SessionId,
     using_ems: bool,
     resuming: bool,
     send_ticket: bool,
@@ -1770,7 +1799,7 @@
     config: Arc&lt;ServerConfig&gt;,
     secrets: ConnectionSecrets,
     transcript: HandshakeHash,
-    session_id: SessionID,
+    session_id: SessionId,
     using_ems: bool,
     resuming: bool,
     send_ticket: bool,
@@ -1790,8 +1819,7 @@
             constant_time::verify_slices_are_equal(<span class="kw-2">&amp;</span>expect_verify_data, <span class="kw-2">&amp;</span>finished.<span class="number">0</span>)
                 .map_err(|<span class="kw">_</span>| {
                     cx.common
-                        .send_fatal_alert(AlertDescription::DecryptError);
-                    Error::DecryptError
+                        .send_fatal_alert(AlertDescription::DecryptError, Error::DecryptError)
                 })
                 .map(|<span class="kw">_</span>| verify::FinishedMessageVerified::assertion())<span class="question-mark">?</span>;
 

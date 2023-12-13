@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/nix/store/rw9bn419hs63s20iz4qrsgiddx2c69nb-vendor-cargo-deps/c19b7c6f923b580ac259164a89f2577984ad5ab09ee9d583b888f934adbbe8d0/rustls-0.20.8/src/msgs/handshake.rs`."><title>handshake.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-cb6f1f67f1bcd037.css" id="mainThemeStyle"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="rustls" data-themes="" data-resource-suffix="" data-rustdoc-version="1.73.0 (cc66ad468 2023-10-03) (built from a source tarball)" data-channel="1.73.0" data-search-js="search-6dfdfced5eff6596.js" data-settings-js="settings-de11bff964e9d4e5.js" data-settings-css="settings-8c76f75bfb6bd192.css" data-theme-light-css="light-1596385f77d47ef2.css" data-theme-dark-css="dark-0a43001d3fc2282c.css" data-theme-ayu-css="ayu-fd19013d6ce078bf.css" ><script src="../../../static.files/storage-db41da1a38ea3cb8.js"></script><script defer src="../../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-0795b7d26be81095.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../../../static.files/light-1596385f77d47ef2.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../../../static.files/dark-0a43001d3fc2282c.css"><link rel="stylesheet" href="../../../static.files/noscript-cffde32267a19fd6.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../../rustls/index.html"><img class="rust-logo" src="../../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/nix/store/8wbf91mp5aqggnly8dsfwbyfpxzfkram-vendor-cargo-deps/c19b7c6f923b580ac259164a89f2577984ad5ab09ee9d583b888f934adbbe8d0/rustls-0.21.10/src/msgs/handshake.rs`."><title>handshake.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-cb6f1f67f1bcd037.css" id="mainThemeStyle"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="rustls" data-themes="" data-resource-suffix="" data-rustdoc-version="1.73.0 (cc66ad468 2023-10-03) (built from a source tarball)" data-channel="1.73.0" data-search-js="search-6dfdfced5eff6596.js" data-settings-js="settings-de11bff964e9d4e5.js" data-settings-css="settings-8c76f75bfb6bd192.css" data-theme-light-css="light-1596385f77d47ef2.css" data-theme-dark-css="dark-0a43001d3fc2282c.css" data-theme-ayu-css="ayu-fd19013d6ce078bf.css" ><script src="../../../static.files/storage-db41da1a38ea3cb8.js"></script><script defer src="../../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-0795b7d26be81095.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../../../static.files/light-1596385f77d47ef2.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../../../static.files/dark-0a43001d3fc2282c.css"><link rel="stylesheet" href="../../../static.files/noscript-cffde32267a19fd6.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../../rustls/index.html"><img class="rust-logo" src="../../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -2297,131 +2297,59 @@
 <a href="#2297" id="2297">2297</a>
 <a href="#2298" id="2298">2298</a>
 <a href="#2299" id="2299">2299</a>
-<a href="#2300" id="2300">2300</a>
-<a href="#2301" id="2301">2301</a>
-<a href="#2302" id="2302">2302</a>
-<a href="#2303" id="2303">2303</a>
-<a href="#2304" id="2304">2304</a>
-<a href="#2305" id="2305">2305</a>
-<a href="#2306" id="2306">2306</a>
-<a href="#2307" id="2307">2307</a>
-<a href="#2308" id="2308">2308</a>
-<a href="#2309" id="2309">2309</a>
-<a href="#2310" id="2310">2310</a>
-<a href="#2311" id="2311">2311</a>
-<a href="#2312" id="2312">2312</a>
-<a href="#2313" id="2313">2313</a>
-<a href="#2314" id="2314">2314</a>
-<a href="#2315" id="2315">2315</a>
-<a href="#2316" id="2316">2316</a>
-<a href="#2317" id="2317">2317</a>
-<a href="#2318" id="2318">2318</a>
-<a href="#2319" id="2319">2319</a>
-<a href="#2320" id="2320">2320</a>
-<a href="#2321" id="2321">2321</a>
-<a href="#2322" id="2322">2322</a>
-<a href="#2323" id="2323">2323</a>
-<a href="#2324" id="2324">2324</a>
-<a href="#2325" id="2325">2325</a>
-<a href="#2326" id="2326">2326</a>
-<a href="#2327" id="2327">2327</a>
-<a href="#2328" id="2328">2328</a>
-<a href="#2329" id="2329">2329</a>
-<a href="#2330" id="2330">2330</a>
-<a href="#2331" id="2331">2331</a>
-<a href="#2332" id="2332">2332</a>
-<a href="#2333" id="2333">2333</a>
-<a href="#2334" id="2334">2334</a>
-<a href="#2335" id="2335">2335</a>
-<a href="#2336" id="2336">2336</a>
-<a href="#2337" id="2337">2337</a>
-<a href="#2338" id="2338">2338</a>
-<a href="#2339" id="2339">2339</a>
-<a href="#2340" id="2340">2340</a>
-<a href="#2341" id="2341">2341</a>
-<a href="#2342" id="2342">2342</a>
-<a href="#2343" id="2343">2343</a>
-<a href="#2344" id="2344">2344</a>
-<a href="#2345" id="2345">2345</a>
-<a href="#2346" id="2346">2346</a>
-<a href="#2347" id="2347">2347</a>
-<a href="#2348" id="2348">2348</a>
-<a href="#2349" id="2349">2349</a>
-<a href="#2350" id="2350">2350</a>
-<a href="#2351" id="2351">2351</a>
-<a href="#2352" id="2352">2352</a>
-<a href="#2353" id="2353">2353</a>
-<a href="#2354" id="2354">2354</a>
-<a href="#2355" id="2355">2355</a>
-<a href="#2356" id="2356">2356</a>
-<a href="#2357" id="2357">2357</a>
-<a href="#2358" id="2358">2358</a>
-<a href="#2359" id="2359">2359</a>
-<a href="#2360" id="2360">2360</a>
-<a href="#2361" id="2361">2361</a>
-<a href="#2362" id="2362">2362</a>
-<a href="#2363" id="2363">2363</a>
-<a href="#2364" id="2364">2364</a>
-<a href="#2365" id="2365">2365</a>
-<a href="#2366" id="2366">2366</a>
-<a href="#2367" id="2367">2367</a>
-<a href="#2368" id="2368">2368</a>
-<a href="#2369" id="2369">2369</a>
-<a href="#2370" id="2370">2370</a>
-<a href="#2371" id="2371">2371</a>
 </pre></div><pre class="rust"><code><span class="attr">#![allow(non_camel_case_types)]
-</span><span class="kw">use </span><span class="kw">crate</span>::enums::{CipherSuite, ProtocolVersion, SignatureScheme};
+</span><span class="kw">use </span><span class="kw">crate</span>::dns_name::{DnsName, DnsNameRef};
+<span class="kw">use </span><span class="kw">crate</span>::enums::{CipherSuite, HandshakeType, ProtocolVersion, SignatureScheme};
+<span class="kw">use </span><span class="kw">crate</span>::error::InvalidMessage;
 <span class="kw">use </span><span class="kw">crate</span>::key;
-<span class="kw">use </span><span class="kw">crate</span>::msgs::base::{Payload, PayloadU16, PayloadU24, PayloadU8};
-<span class="kw">use </span><span class="kw">crate</span>::msgs::codec;
-<span class="kw">use </span><span class="kw">crate</span>::msgs::codec::{Codec, Reader};
-<span class="kw">use </span><span class="kw">crate</span>::msgs::enums::{
-    CertificateStatusType, ClientCertificateType, Compression, ECCurveType, ECPointFormat,
-    ExtensionType, HandshakeType, HashAlgorithm, KeyUpdateRequest, NamedGroup, PSKKeyExchangeMode,
-    ServerNameType, SignatureAlgorithm,
-};
-<span class="kw">use </span><span class="kw">crate</span>::rand;
-
 <span class="attr">#[cfg(feature = <span class="string">&quot;logging&quot;</span>)]
 </span><span class="kw">use </span><span class="kw">crate</span>::log::warn;
+<span class="kw">use </span><span class="kw">crate</span>::msgs::base::{Payload, PayloadU16, PayloadU24, PayloadU8};
+<span class="kw">use </span><span class="kw">crate</span>::msgs::codec::{<span class="self">self</span>, Codec, ListLength, Reader, TlsListElement};
+<span class="kw">use </span><span class="kw">crate</span>::msgs::enums::{
+    CertificateStatusType, ClientCertificateType, Compression, ECCurveType, ECPointFormat,
+    ExtensionType, KeyUpdateRequest, NamedGroup, PSKKeyExchangeMode, ServerNameType,
+};
+<span class="kw">use </span><span class="kw">crate</span>::rand;
+<span class="kw">use </span><span class="kw">crate</span>::verify::DigitallySignedStruct;
 
 <span class="kw">use </span>std::collections;
 <span class="kw">use </span>std::fmt;
 
-<span class="macro">macro_rules! </span>declare_u8_vec(
-  (<span class="macro-nonterminal">$name</span>:ident, <span class="macro-nonterminal">$itemtype</span>:ty) =&gt; {
-    <span class="kw">pub type </span><span class="macro-nonterminal">$name </span>= Vec&lt;<span class="macro-nonterminal">$itemtype</span>&gt;;
+<span class="doccomment">/// Create a newtype wrapper around a given type.
+///
+/// This is used to create newtypes for the various TLS message types which is used to wrap
+/// the `PayloadU8` or `PayloadU16` types. This is typically used for types where we don&#39;t need
+/// anything other than access to the underlying bytes.
+</span><span class="macro">macro_rules! </span>wrapped_payload(
+  ($(<span class="attr">#[<span class="macro-nonterminal">$comment</span>:meta]</span>)* <span class="macro-nonterminal">$name</span>:ident, <span class="macro-nonterminal">$inner</span>:ident,) =&gt; {
+    $(<span class="attr">#[<span class="macro-nonterminal">$comment</span>]</span>)*
+    <span class="attr">#[derive(Clone, Debug)]
+    </span><span class="kw">pub struct </span><span class="macro-nonterminal">$name</span>(<span class="macro-nonterminal">$inner</span>);
+
+    <span class="kw">impl </span>From&lt;Vec&lt;u8&gt;&gt; <span class="kw">for </span><span class="macro-nonterminal">$name </span>{
+        <span class="kw">fn </span>from(v: Vec&lt;u8&gt;) -&gt; <span class="self">Self </span>{
+            <span class="self">Self</span>(<span class="macro-nonterminal">$inner::new</span>(v))
+        }
+    }
+
+    <span class="kw">impl </span>AsRef&lt;[u8]&gt; <span class="kw">for </span><span class="macro-nonterminal">$name </span>{
+        <span class="kw">fn </span>as_ref(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[u8] {
+            <span class="self">self</span>.<span class="number">0.0</span>.as_slice()
+        }
+    }
 
     <span class="kw">impl </span>Codec <span class="kw">for </span><span class="macro-nonterminal">$name </span>{
-      <span class="kw">fn </span>encode(<span class="kw-2">&amp;</span><span class="self">self</span>, bytes: <span class="kw-2">&amp;mut </span>Vec&lt;u8&gt;) {
-        codec::encode_vec_u8(bytes, <span class="self">self</span>);
-      }
+        <span class="kw">fn </span>encode(<span class="kw-2">&amp;</span><span class="self">self</span>, bytes: <span class="kw-2">&amp;mut </span>Vec&lt;u8&gt;) {
+            <span class="self">self</span>.<span class="number">0</span>.encode(bytes);
+        }
 
-      <span class="kw">fn </span>read(r: <span class="kw-2">&amp;mut </span>Reader) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>&gt; {
-        codec::read_vec_u8::&lt;<span class="macro-nonterminal">$itemtype</span>&gt;(r)
-      }
+        <span class="kw">fn </span>read(r: <span class="kw-2">&amp;mut </span>Reader) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, InvalidMessage&gt; {
+            <span class="prelude-val">Ok</span>(<span class="self">Self</span>(<span class="macro-nonterminal">$inner::read</span>(r)<span class="question-mark">?</span>))
+        }
     }
   }
 );
-
-<span class="macro">macro_rules! </span>declare_u16_vec(
-  (<span class="macro-nonterminal">$name</span>:ident, <span class="macro-nonterminal">$itemtype</span>:ty) =&gt; {
-    <span class="kw">pub type </span><span class="macro-nonterminal">$name </span>= Vec&lt;<span class="macro-nonterminal">$itemtype</span>&gt;;
-
-    <span class="kw">impl </span>Codec <span class="kw">for </span><span class="macro-nonterminal">$name </span>{
-      <span class="kw">fn </span>encode(<span class="kw-2">&amp;</span><span class="self">self</span>, bytes: <span class="kw-2">&amp;mut </span>Vec&lt;u8&gt;) {
-        codec::encode_vec_u16(bytes, <span class="self">self</span>);
-      }
-
-      <span class="kw">fn </span>read(r: <span class="kw-2">&amp;mut </span>Reader) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>&gt; {
-        codec::read_vec_u16::&lt;<span class="macro-nonterminal">$itemtype</span>&gt;(r)
-      }
-    }
-  }
-);
-
-<span class="macro">declare_u16_vec!</span>(VecU16OfPayloadU8, PayloadU8);
-<span class="macro">declare_u16_vec!</span>(VecU16OfPayloadU16, PayloadU16);
 
 <span class="attr">#[derive(Clone, Copy, Eq, PartialEq)]
 </span><span class="kw">pub struct </span>Random(<span class="kw">pub </span>[u8; <span class="number">32</span>]);
@@ -2444,12 +2372,15 @@
         bytes.extend_from_slice(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0</span>);
     }
 
-    <span class="kw">fn </span>read(r: <span class="kw-2">&amp;mut </span>Reader) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>&gt; {
-        <span class="kw">let </span>bytes = r.take(<span class="number">32</span>)<span class="question-mark">?</span>;
+    <span class="kw">fn </span>read(r: <span class="kw-2">&amp;mut </span>Reader) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, InvalidMessage&gt; {
+        <span class="kw">let </span>bytes = <span class="kw">match </span>r.take(<span class="number">32</span>) {
+            <span class="prelude-val">Some</span>(bytes) =&gt; bytes,
+            <span class="prelude-val">None </span>=&gt; <span class="kw">return </span><span class="prelude-val">Err</span>(InvalidMessage::MissingData(<span class="string">&quot;Random&quot;</span>)),
+        };
+
         <span class="kw">let </span><span class="kw-2">mut </span>opaque = [<span class="number">0</span>; <span class="number">32</span>];
         opaque.clone_from_slice(bytes);
-
-        <span class="prelude-val">Some</span>(<span class="self">Self</span>(opaque))
+        <span class="prelude-val">Ok</span>(<span class="self">Self</span>(opaque))
     }
 }
 
@@ -2474,18 +2405,18 @@
 }
 
 <span class="attr">#[derive(Copy, Clone)]
-</span><span class="kw">pub struct </span>SessionID {
+</span><span class="kw">pub struct </span>SessionId {
     len: usize,
     data: [u8; <span class="number">32</span>],
 }
 
-<span class="kw">impl </span>fmt::Debug <span class="kw">for </span>SessionID {
+<span class="kw">impl </span>fmt::Debug <span class="kw">for </span>SessionId {
     <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
         <span class="kw">super</span>::base::hex(f, <span class="kw-2">&amp;</span><span class="self">self</span>.data[..<span class="self">self</span>.len])
     }
 }
 
-<span class="kw">impl </span>PartialEq <span class="kw">for </span>SessionID {
+<span class="kw">impl </span>PartialEq <span class="kw">for </span>SessionId {
     <span class="kw">fn </span>eq(<span class="kw-2">&amp;</span><span class="self">self</span>, other: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; bool {
         <span class="kw">if </span><span class="self">self</span>.len != other.len {
             <span class="kw">return </span><span class="bool-val">false</span>;
@@ -2493,35 +2424,38 @@
 
         <span class="kw">let </span><span class="kw-2">mut </span>diff = <span class="number">0u8</span>;
         <span class="kw">for </span>i <span class="kw">in </span><span class="number">0</span>..<span class="self">self</span>.len {
-            diff |= <span class="self">self</span>.data[i] ^ other.data[i]
+            diff |= <span class="self">self</span>.data[i] ^ other.data[i];
         }
 
         diff == <span class="number">0u8
     </span>}
 }
 
-<span class="kw">impl </span>Codec <span class="kw">for </span>SessionID {
+<span class="kw">impl </span>Codec <span class="kw">for </span>SessionId {
     <span class="kw">fn </span>encode(<span class="kw-2">&amp;</span><span class="self">self</span>, bytes: <span class="kw-2">&amp;mut </span>Vec&lt;u8&gt;) {
         <span class="macro">debug_assert!</span>(<span class="self">self</span>.len &lt;= <span class="number">32</span>);
         bytes.push(<span class="self">self</span>.len <span class="kw">as </span>u8);
         bytes.extend_from_slice(<span class="kw-2">&amp;</span><span class="self">self</span>.data[..<span class="self">self</span>.len]);
     }
 
-    <span class="kw">fn </span>read(r: <span class="kw-2">&amp;mut </span>Reader) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>&gt; {
+    <span class="kw">fn </span>read(r: <span class="kw-2">&amp;mut </span>Reader) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, InvalidMessage&gt; {
         <span class="kw">let </span>len = u8::read(r)<span class="question-mark">? </span><span class="kw">as </span>usize;
         <span class="kw">if </span>len &gt; <span class="number">32 </span>{
-            <span class="kw">return </span><span class="prelude-val">None</span>;
+            <span class="kw">return </span><span class="prelude-val">Err</span>(InvalidMessage::TrailingData(<span class="string">&quot;SessionID&quot;</span>));
         }
 
-        <span class="kw">let </span>bytes = r.take(len)<span class="question-mark">?</span>;
+        <span class="kw">let </span>bytes = <span class="kw">match </span>r.take(len) {
+            <span class="prelude-val">Some</span>(bytes) =&gt; bytes,
+            <span class="prelude-val">None </span>=&gt; <span class="kw">return </span><span class="prelude-val">Err</span>(InvalidMessage::MissingData(<span class="string">&quot;SessionID&quot;</span>)),
+        };
+
         <span class="kw">let </span><span class="kw-2">mut </span>out = [<span class="number">0u8</span>; <span class="number">32</span>];
         out[..len].clone_from_slice(<span class="kw-2">&amp;</span>bytes[..len]);
-
-        <span class="prelude-val">Some</span>(<span class="self">Self </span>{ data: out, len })
+        <span class="prelude-val">Ok</span>(<span class="self">Self </span>{ data: out, len })
     }
 }
 
-<span class="kw">impl </span>SessionID {
+<span class="kw">impl </span>SessionId {
     <span class="kw">pub fn </span>random() -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, rand::GetRandomFailed&gt; {
         <span class="kw">let </span><span class="kw-2">mut </span>data = [<span class="number">0u8</span>; <span class="number">32</span>];
         rand::fill_random(<span class="kw-2">&amp;mut </span>data)<span class="question-mark">?</span>;
@@ -2561,95 +2495,50 @@
     }
 }
 
-<span class="macro">declare_u8_vec!</span>(ECPointFormatList, ECPointFormat);
-
-<span class="kw">pub trait </span>SupportedPointFormats {
-    <span class="kw">fn </span>supported() -&gt; ECPointFormatList;
+<span class="kw">impl </span>TlsListElement <span class="kw">for </span>ECPointFormat {
+    <span class="kw">const </span>SIZE_LEN: ListLength = ListLength::U8;
 }
 
-<span class="kw">impl </span>SupportedPointFormats <span class="kw">for </span>ECPointFormatList {
-    <span class="kw">fn </span>supported() -&gt; ECPointFormatList {
-        <span class="macro">vec!</span>[ECPointFormat::Uncompressed]
-    }
+<span class="kw">impl </span>TlsListElement <span class="kw">for </span>NamedGroup {
+    <span class="kw">const </span>SIZE_LEN: ListLength = ListLength::U16;
 }
 
-<span class="macro">declare_u16_vec!</span>(NamedGroups, NamedGroup);
-
-<span class="macro">declare_u16_vec!</span>(SupportedSignatureSchemes, SignatureScheme);
-
-<span class="kw">pub trait </span>DecomposedSignatureScheme {
-    <span class="kw">fn </span>sign(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; SignatureAlgorithm;
-    <span class="kw">fn </span>make(alg: SignatureAlgorithm, hash: HashAlgorithm) -&gt; SignatureScheme;
-}
-
-<span class="kw">impl </span>DecomposedSignatureScheme <span class="kw">for </span>SignatureScheme {
-    <span class="kw">fn </span>sign(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; SignatureAlgorithm {
-        <span class="kw">match </span><span class="kw-2">*</span><span class="self">self </span>{
-            <span class="self">Self</span>::RSA_PKCS1_SHA1
-            | <span class="self">Self</span>::RSA_PKCS1_SHA256
-            | <span class="self">Self</span>::RSA_PKCS1_SHA384
-            | <span class="self">Self</span>::RSA_PKCS1_SHA512
-            | <span class="self">Self</span>::RSA_PSS_SHA256
-            | <span class="self">Self</span>::RSA_PSS_SHA384
-            | <span class="self">Self</span>::RSA_PSS_SHA512 =&gt; SignatureAlgorithm::RSA,
-            <span class="self">Self</span>::ECDSA_NISTP256_SHA256
-            | <span class="self">Self</span>::ECDSA_NISTP384_SHA384
-            | <span class="self">Self</span>::ECDSA_NISTP521_SHA512 =&gt; SignatureAlgorithm::ECDSA,
-            <span class="kw">_ </span>=&gt; SignatureAlgorithm::Unknown(<span class="number">0</span>),
-        }
-    }
-
-    <span class="kw">fn </span>make(alg: SignatureAlgorithm, hash: HashAlgorithm) -&gt; SignatureScheme {
-        <span class="kw">use </span><span class="kw">crate</span>::msgs::enums::HashAlgorithm::{SHA1, SHA256, SHA384, SHA512};
-        <span class="kw">use </span><span class="kw">crate</span>::msgs::enums::SignatureAlgorithm::{ECDSA, RSA};
-
-        <span class="kw">match </span>(alg, hash) {
-            (RSA, SHA1) =&gt; <span class="self">Self</span>::RSA_PKCS1_SHA1,
-            (RSA, SHA256) =&gt; <span class="self">Self</span>::RSA_PKCS1_SHA256,
-            (RSA, SHA384) =&gt; <span class="self">Self</span>::RSA_PKCS1_SHA384,
-            (RSA, SHA512) =&gt; <span class="self">Self</span>::RSA_PKCS1_SHA512,
-            (ECDSA, SHA256) =&gt; <span class="self">Self</span>::ECDSA_NISTP256_SHA256,
-            (ECDSA, SHA384) =&gt; <span class="self">Self</span>::ECDSA_NISTP384_SHA384,
-            (ECDSA, SHA512) =&gt; <span class="self">Self</span>::ECDSA_NISTP521_SHA512,
-            (<span class="kw">_</span>, <span class="kw">_</span>) =&gt; <span class="macro">unreachable!</span>(),
-        }
-    }
+<span class="kw">impl </span>TlsListElement <span class="kw">for </span>SignatureScheme {
+    <span class="kw">const </span>SIZE_LEN: ListLength = ListLength::U16;
 }
 
 <span class="attr">#[derive(Clone, Debug)]
 </span><span class="kw">pub enum </span>ServerNamePayload {
-    <span class="comment">// Stored twice, bytes so we can round-trip, and DnsName for use
-    </span>HostName((PayloadU16, webpki::DnsName)),
+    HostName(DnsName),
     Unknown(Payload),
 }
 
 <span class="kw">impl </span>ServerNamePayload {
-    <span class="kw">pub fn </span>new_hostname(hostname: webpki::DnsName) -&gt; <span class="self">Self </span>{
-        <span class="kw">let </span>raw = {
-            <span class="kw">let </span>s: <span class="kw-2">&amp;</span>str = hostname.as_ref().into();
-            PayloadU16::new(s.as_bytes().into())
-        };
-        <span class="self">Self</span>::HostName((raw, hostname))
+    <span class="kw">pub fn </span>new_hostname(hostname: DnsName) -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>::HostName(hostname)
     }
 
-    <span class="kw">fn </span>read_hostname(r: <span class="kw-2">&amp;mut </span>Reader) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>&gt; {
+    <span class="kw">fn </span>read_hostname(r: <span class="kw-2">&amp;mut </span>Reader) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, InvalidMessage&gt; {
         <span class="kw">let </span>raw = PayloadU16::read(r)<span class="question-mark">?</span>;
 
-        <span class="kw">let </span>dns_name = {
-            <span class="kw">match </span>webpki::DnsNameRef::try_from_ascii(<span class="kw-2">&amp;</span>raw.<span class="number">0</span>) {
-                <span class="prelude-val">Ok</span>(dns_name) =&gt; dns_name.into(),
-                <span class="prelude-val">Err</span>(<span class="kw">_</span>) =&gt; {
-                    <span class="macro">warn!</span>(<span class="string">&quot;Illegal SNI hostname received {:?}&quot;</span>, raw.<span class="number">0</span>);
-                    <span class="kw">return </span><span class="prelude-val">None</span>;
-                }
+        <span class="kw">match </span>DnsName::try_from_ascii(<span class="kw-2">&amp;</span>raw.<span class="number">0</span>) {
+            <span class="prelude-val">Ok</span>(dns_name) =&gt; <span class="prelude-val">Ok</span>(<span class="self">Self</span>::HostName(dns_name)),
+            <span class="prelude-val">Err</span>(<span class="kw">_</span>) =&gt; {
+                <span class="macro">warn!</span>(
+                    <span class="string">&quot;Illegal SNI hostname received {:?}&quot;</span>,
+                    String::from_utf8_lossy(<span class="kw-2">&amp;</span>raw.<span class="number">0</span>)
+                );
+                <span class="prelude-val">Err</span>(InvalidMessage::InvalidServerName)
             }
-        };
-        <span class="prelude-val">Some</span>(<span class="self">Self</span>::HostName((raw, dns_name)))
+        }
     }
 
     <span class="kw">fn </span>encode(<span class="kw-2">&amp;</span><span class="self">self</span>, bytes: <span class="kw-2">&amp;mut </span>Vec&lt;u8&gt;) {
         <span class="kw">match </span><span class="kw-2">*</span><span class="self">self </span>{
-            <span class="self">Self</span>::HostName((<span class="kw-2">ref </span>r, <span class="kw">_</span>)) =&gt; r.encode(bytes),
+            <span class="self">Self</span>::HostName(<span class="kw-2">ref </span>name) =&gt; {
+                (name.as_ref().len() <span class="kw">as </span>u16).encode(bytes);
+                bytes.extend_from_slice(name.as_ref().as_bytes());
+            }
             <span class="self">Self</span>::Unknown(<span class="kw-2">ref </span>r) =&gt; r.encode(bytes),
         }
     }
@@ -2667,7 +2556,7 @@
         <span class="self">self</span>.payload.encode(bytes);
     }
 
-    <span class="kw">fn </span>read(r: <span class="kw-2">&amp;mut </span>Reader) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>&gt; {
+    <span class="kw">fn </span>read(r: <span class="kw-2">&amp;mut </span>Reader) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, InvalidMessage&gt; {
         <span class="kw">let </span>typ = ServerNameType::read(r)<span class="question-mark">?</span>;
 
         <span class="kw">let </span>payload = <span class="kw">match </span>typ {
@@ -2675,18 +2564,20 @@
             <span class="kw">_ </span>=&gt; ServerNamePayload::Unknown(Payload::read(r)),
         };
 
-        <span class="prelude-val">Some</span>(<span class="self">Self </span>{ typ, payload })
+        <span class="prelude-val">Ok</span>(<span class="self">Self </span>{ typ, payload })
     }
 }
 
-<span class="macro">declare_u16_vec!</span>(ServerNameRequest, ServerName);
+<span class="kw">impl </span>TlsListElement <span class="kw">for </span>ServerName {
+    <span class="kw">const </span>SIZE_LEN: ListLength = ListLength::U16;
+}
 
 <span class="kw">pub trait </span>ConvertServerNameList {
     <span class="kw">fn </span>has_duplicate_names_for_type(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool;
-    <span class="kw">fn </span>get_single_hostname(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;webpki::DnsNameRef&gt;;
+    <span class="kw">fn </span>get_single_hostname(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;DnsNameRef&gt;;
 }
 
-<span class="kw">impl </span>ConvertServerNameList <span class="kw">for </span>ServerNameRequest {
+<span class="kw">impl </span>ConvertServerNameList <span class="kw">for </span>[ServerName] {
     <span class="doccomment">/// RFC6066: &quot;The ServerNameList MUST NOT contain more than one name of the same name_type.&quot;
     </span><span class="kw">fn </span>has_duplicate_names_for_type(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
         <span class="kw">let </span><span class="kw-2">mut </span>seen = collections::HashSet::new();
@@ -2700,10 +2591,10 @@
         <span class="bool-val">false
     </span>}
 
-    <span class="kw">fn </span>get_single_hostname(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;webpki::DnsNameRef&gt; {
-        <span class="kw">fn </span>only_dns_hostnames(name: <span class="kw-2">&amp;</span>ServerName) -&gt; <span class="prelude-ty">Option</span>&lt;webpki::DnsNameRef&gt; {
-            <span class="kw">if let </span>ServerNamePayload::HostName((<span class="kw">_</span>, <span class="kw-2">ref </span>dns)) = name.payload {
-                <span class="prelude-val">Some</span>(dns.as_ref())
+    <span class="kw">fn </span>get_single_hostname(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;DnsNameRef&gt; {
+        <span class="kw">fn </span>only_dns_hostnames(name: <span class="kw-2">&amp;</span>ServerName) -&gt; <span class="prelude-ty">Option</span>&lt;DnsNameRef&gt; {
+            <span class="kw">if let </span>ServerNamePayload::HostName(<span class="kw-2">ref </span>dns) = name.payload {
+                <span class="prelude-val">Some</span>(dns.borrow())
             } <span class="kw">else </span>{
                 <span class="prelude-val">None
             </span>}
@@ -2715,7 +2606,11 @@
     }
 }
 
-<span class="kw">pub type </span>ProtocolNameList = VecU16OfPayloadU8;
+<span class="macro">wrapped_payload!</span>(ProtocolName, PayloadU8,);
+
+<span class="kw">impl </span>TlsListElement <span class="kw">for </span>ProtocolName {
+    <span class="kw">const </span>SIZE_LEN: ListLength = ListLength::U16;
+}
 
 <span class="kw">pub trait </span>ConvertProtocolNameList {
     <span class="kw">fn </span>from_slices(names: <span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span>[u8]]) -&gt; <span class="self">Self</span>;
@@ -2723,12 +2618,12 @@
     <span class="kw">fn </span>as_single_slice(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>[u8]&gt;;
 }
 
-<span class="kw">impl </span>ConvertProtocolNameList <span class="kw">for </span>ProtocolNameList {
+<span class="kw">impl </span>ConvertProtocolNameList <span class="kw">for </span>Vec&lt;ProtocolName&gt; {
     <span class="kw">fn </span>from_slices(names: <span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span>[u8]]) -&gt; <span class="self">Self </span>{
         <span class="kw">let </span><span class="kw-2">mut </span>ret = <span class="self">Self</span>::new();
 
         <span class="kw">for </span>name <span class="kw">in </span>names {
-            ret.push(PayloadU8::new(name.to_vec()));
+            ret.push(ProtocolName::from(name.to_vec()));
         }
 
         ret
@@ -2736,13 +2631,13 @@
 
     <span class="kw">fn </span>to_slices(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Vec&lt;<span class="kw-2">&amp;</span>[u8]&gt; {
         <span class="self">self</span>.iter()
-            .map(|proto| -&gt; <span class="kw-2">&amp;</span>[u8] { <span class="kw-2">&amp;</span>proto.<span class="number">0 </span>})
+            .map(|proto| proto.as_ref())
             .collect::&lt;Vec&lt;<span class="kw-2">&amp;</span>[u8]&gt;&gt;()
     }
 
     <span class="kw">fn </span>as_single_slice(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>[u8]&gt; {
         <span class="kw">if </span><span class="self">self</span>.len() == <span class="number">1 </span>{
-            <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="self">self</span>[<span class="number">0</span>].<span class="number">0</span>)
+            <span class="prelude-val">Some</span>(<span class="self">self</span>[<span class="number">0</span>].as_ref())
         } <span class="kw">else </span>{
             <span class="prelude-val">None
         </span>}
@@ -2771,11 +2666,11 @@
         <span class="self">self</span>.payload.encode(bytes);
     }
 
-    <span class="kw">fn </span>read(r: <span class="kw-2">&amp;mut </span>Reader) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>&gt; {
+    <span class="kw">fn </span>read(r: <span class="kw-2">&amp;mut </span>Reader) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, InvalidMessage&gt; {
         <span class="kw">let </span>group = NamedGroup::read(r)<span class="question-mark">?</span>;
         <span class="kw">let </span>payload = PayloadU16::read(r)<span class="question-mark">?</span>;
 
-        <span class="prelude-val">Some</span>(<span class="self">Self </span>{ group, payload })
+        <span class="prelude-val">Ok</span>(<span class="self">Self </span>{ group, payload })
     }
 }
 
@@ -2801,22 +2696,28 @@
         <span class="self">self</span>.obfuscated_ticket_age.encode(bytes);
     }
 
-    <span class="kw">fn </span>read(r: <span class="kw-2">&amp;mut </span>Reader) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>&gt; {
-        <span class="prelude-val">Some</span>(<span class="self">Self </span>{
+    <span class="kw">fn </span>read(r: <span class="kw-2">&amp;mut </span>Reader) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, InvalidMessage&gt; {
+        <span class="prelude-val">Ok</span>(<span class="self">Self </span>{
             identity: PayloadU16::read(r)<span class="question-mark">?</span>,
             obfuscated_ticket_age: u32::read(r)<span class="question-mark">?</span>,
         })
     }
 }
 
-<span class="macro">declare_u16_vec!</span>(PresharedKeyIdentities, PresharedKeyIdentity);
-<span class="kw">pub type </span>PresharedKeyBinder = PayloadU8;
-<span class="kw">pub type </span>PresharedKeyBinders = VecU16OfPayloadU8;
+<span class="kw">impl </span>TlsListElement <span class="kw">for </span>PresharedKeyIdentity {
+    <span class="kw">const </span>SIZE_LEN: ListLength = ListLength::U16;
+}
+
+<span class="macro">wrapped_payload!</span>(PresharedKeyBinder, PayloadU8,);
+
+<span class="kw">impl </span>TlsListElement <span class="kw">for </span>PresharedKeyBinder {
+    <span class="kw">const </span>SIZE_LEN: ListLength = ListLength::U16;
+}
 
 <span class="attr">#[derive(Clone, Debug)]
 </span><span class="kw">pub struct </span>PresharedKeyOffer {
-    <span class="kw">pub </span>identities: PresharedKeyIdentities,
-    <span class="kw">pub </span>binders: PresharedKeyBinders,
+    <span class="kw">pub </span>identities: Vec&lt;PresharedKeyIdentity&gt;,
+    <span class="kw">pub </span>binders: Vec&lt;PresharedKeyBinder&gt;,
 }
 
 <span class="kw">impl </span>PresharedKeyOffer {
@@ -2824,7 +2725,7 @@
     </span><span class="kw">pub fn </span>new(id: PresharedKeyIdentity, binder: Vec&lt;u8&gt;) -&gt; <span class="self">Self </span>{
         <span class="self">Self </span>{
             identities: <span class="macro">vec!</span>[id],
-            binders: <span class="macro">vec!</span>[PresharedKeyBinder::new(binder)],
+            binders: <span class="macro">vec!</span>[PresharedKeyBinder::from(binder)],
         }
     }
 }
@@ -2835,20 +2736,24 @@
         <span class="self">self</span>.binders.encode(bytes);
     }
 
-    <span class="kw">fn </span>read(r: <span class="kw-2">&amp;mut </span>Reader) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>&gt; {
-        <span class="prelude-val">Some</span>(<span class="self">Self </span>{
-            identities: PresharedKeyIdentities::read(r)<span class="question-mark">?</span>,
-            binders: PresharedKeyBinders::read(r)<span class="question-mark">?</span>,
+    <span class="kw">fn </span>read(r: <span class="kw-2">&amp;mut </span>Reader) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, InvalidMessage&gt; {
+        <span class="prelude-val">Ok</span>(<span class="self">Self </span>{
+            identities: Vec::read(r)<span class="question-mark">?</span>,
+            binders: Vec::read(r)<span class="question-mark">?</span>,
         })
     }
 }
 
 <span class="comment">// --- RFC6066 certificate status request ---
-</span><span class="kw">type </span>ResponderIDs = VecU16OfPayloadU16;
+</span><span class="macro">wrapped_payload!</span>(ResponderId, PayloadU16,);
+
+<span class="kw">impl </span>TlsListElement <span class="kw">for </span>ResponderId {
+    <span class="kw">const </span>SIZE_LEN: ListLength = ListLength::U16;
+}
 
 <span class="attr">#[derive(Clone, Debug)]
 </span><span class="kw">pub struct </span>OCSPCertificateStatusRequest {
-    <span class="kw">pub </span>responder_ids: ResponderIDs,
+    <span class="kw">pub </span>responder_ids: Vec&lt;ResponderId&gt;,
     <span class="kw">pub </span>extensions: PayloadU16,
 }
 
@@ -2859,9 +2764,9 @@
         <span class="self">self</span>.extensions.encode(bytes);
     }
 
-    <span class="kw">fn </span>read(r: <span class="kw-2">&amp;mut </span>Reader) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>&gt; {
-        <span class="prelude-val">Some</span>(<span class="self">Self </span>{
-            responder_ids: ResponderIDs::read(r)<span class="question-mark">?</span>,
+    <span class="kw">fn </span>read(r: <span class="kw-2">&amp;mut </span>Reader) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, InvalidMessage&gt; {
+        <span class="prelude-val">Ok</span>(<span class="self">Self </span>{
+            responder_ids: Vec::read(r)<span class="question-mark">?</span>,
             extensions: PayloadU16::read(r)<span class="question-mark">?</span>,
         })
     }
@@ -2884,17 +2789,17 @@
         }
     }
 
-    <span class="kw">fn </span>read(r: <span class="kw-2">&amp;mut </span>Reader) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>&gt; {
+    <span class="kw">fn </span>read(r: <span class="kw-2">&amp;mut </span>Reader) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, InvalidMessage&gt; {
         <span class="kw">let </span>typ = CertificateStatusType::read(r)<span class="question-mark">?</span>;
 
         <span class="kw">match </span>typ {
             CertificateStatusType::OCSP =&gt; {
                 <span class="kw">let </span>ocsp_req = OCSPCertificateStatusRequest::read(r)<span class="question-mark">?</span>;
-                <span class="prelude-val">Some</span>(<span class="self">Self</span>::OCSP(ocsp_req))
+                <span class="prelude-val">Ok</span>(<span class="self">Self</span>::OCSP(ocsp_req))
             }
             <span class="kw">_ </span>=&gt; {
                 <span class="kw">let </span>data = Payload::read(r);
-                <span class="prelude-val">Some</span>(<span class="self">Self</span>::Unknown((typ, data)))
+                <span class="prelude-val">Ok</span>(<span class="self">Self</span>::Unknown((typ, data)))
             }
         }
     }
@@ -2903,7 +2808,7 @@
 <span class="kw">impl </span>CertificateStatusRequest {
     <span class="kw">pub fn </span>build_ocsp() -&gt; <span class="self">Self </span>{
         <span class="kw">let </span>ocsp = OCSPCertificateStatusRequest {
-            responder_ids: ResponderIDs::new(),
+            responder_ids: Vec::new(),
             extensions: PayloadU16::empty(),
         };
         <span class="self">Self</span>::OCSP(ocsp)
@@ -2913,25 +2818,37 @@
 <span class="comment">// ---
 // SCTs
 
-</span><span class="kw">pub type </span>SCTList = VecU16OfPayloadU16;
+</span><span class="macro">wrapped_payload!</span>(Sct, PayloadU16,);
+
+<span class="kw">impl </span>TlsListElement <span class="kw">for </span>Sct {
+    <span class="kw">const </span>SIZE_LEN: ListLength = ListLength::U16;
+}
 
 <span class="comment">// ---
 
-</span><span class="macro">declare_u8_vec!</span>(PSKKeyExchangeModes, PSKKeyExchangeMode);
-<span class="macro">declare_u16_vec!</span>(KeyShareEntries, KeyShareEntry);
-<span class="macro">declare_u8_vec!</span>(ProtocolVersions, ProtocolVersion);
+</span><span class="kw">impl </span>TlsListElement <span class="kw">for </span>PSKKeyExchangeMode {
+    <span class="kw">const </span>SIZE_LEN: ListLength = ListLength::U8;
+}
+
+<span class="kw">impl </span>TlsListElement <span class="kw">for </span>KeyShareEntry {
+    <span class="kw">const </span>SIZE_LEN: ListLength = ListLength::U16;
+}
+
+<span class="kw">impl </span>TlsListElement <span class="kw">for </span>ProtocolVersion {
+    <span class="kw">const </span>SIZE_LEN: ListLength = ListLength::U8;
+}
 
 <span class="attr">#[derive(Clone, Debug)]
 </span><span class="kw">pub enum </span>ClientExtension {
-    ECPointFormats(ECPointFormatList),
-    NamedGroups(NamedGroups),
-    SignatureAlgorithms(SupportedSignatureSchemes),
-    ServerName(ServerNameRequest),
+    ECPointFormats(Vec&lt;ECPointFormat&gt;),
+    NamedGroups(Vec&lt;NamedGroup&gt;),
+    SignatureAlgorithms(Vec&lt;SignatureScheme&gt;),
+    ServerName(Vec&lt;ServerName&gt;),
     SessionTicket(ClientSessionTicket),
-    Protocols(ProtocolNameList),
-    SupportedVersions(ProtocolVersions),
-    KeyShare(KeyShareEntries),
-    PresharedKeyModes(PSKKeyExchangeModes),
+    Protocols(Vec&lt;ProtocolName&gt;),
+    SupportedVersions(Vec&lt;ProtocolVersion&gt;),
+    KeyShare(Vec&lt;KeyShareEntry&gt;),
+    PresharedKeyModes(Vec&lt;PSKKeyExchangeMode&gt;),
     PresharedKey(PresharedKeyOffer),
     Cookie(PayloadU16),
     ExtendedMasterSecretRequest,
@@ -2991,7 +2908,7 @@
             <span class="self">Self</span>::Cookie(<span class="kw-2">ref </span>r) =&gt; r.encode(<span class="kw-2">&amp;mut </span>sub),
             <span class="self">Self</span>::CertificateStatusRequest(<span class="kw-2">ref </span>r) =&gt; r.encode(<span class="kw-2">&amp;mut </span>sub),
             <span class="self">Self</span>::TransportParameters(<span class="kw-2">ref </span>r) | <span class="self">Self</span>::TransportParametersDraft(<span class="kw-2">ref </span>r) =&gt; {
-                sub.extend_from_slice(r)
+                sub.extend_from_slice(r);
             }
             <span class="self">Self</span>::Unknown(<span class="kw-2">ref </span>r) =&gt; r.encode(<span class="kw-2">&amp;mut </span>sub),
         }
@@ -3000,21 +2917,16 @@
         bytes.append(<span class="kw-2">&amp;mut </span>sub);
     }
 
-    <span class="kw">fn </span>read(r: <span class="kw-2">&amp;mut </span>Reader) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>&gt; {
+    <span class="kw">fn </span>read(r: <span class="kw-2">&amp;mut </span>Reader) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, InvalidMessage&gt; {
         <span class="kw">let </span>typ = ExtensionType::read(r)<span class="question-mark">?</span>;
         <span class="kw">let </span>len = u16::read(r)<span class="question-mark">? </span><span class="kw">as </span>usize;
         <span class="kw">let </span><span class="kw-2">mut </span>sub = r.sub(len)<span class="question-mark">?</span>;
 
         <span class="kw">let </span>ext = <span class="kw">match </span>typ {
-            ExtensionType::ECPointFormats =&gt; {
-                <span class="self">Self</span>::ECPointFormats(ECPointFormatList::read(<span class="kw-2">&amp;mut </span>sub)<span class="question-mark">?</span>)
-            }
-            ExtensionType::EllipticCurves =&gt; <span class="self">Self</span>::NamedGroups(NamedGroups::read(<span class="kw-2">&amp;mut </span>sub)<span class="question-mark">?</span>),
-            ExtensionType::SignatureAlgorithms =&gt; {
-                <span class="kw">let </span>schemes = SupportedSignatureSchemes::read(<span class="kw-2">&amp;mut </span>sub)<span class="question-mark">?</span>;
-                <span class="self">Self</span>::SignatureAlgorithms(schemes)
-            }
-            ExtensionType::ServerName =&gt; <span class="self">Self</span>::ServerName(ServerNameRequest::read(<span class="kw-2">&amp;mut </span>sub)<span class="question-mark">?</span>),
+            ExtensionType::ECPointFormats =&gt; <span class="self">Self</span>::ECPointFormats(Vec::read(<span class="kw-2">&amp;mut </span>sub)<span class="question-mark">?</span>),
+            ExtensionType::EllipticCurves =&gt; <span class="self">Self</span>::NamedGroups(Vec::read(<span class="kw-2">&amp;mut </span>sub)<span class="question-mark">?</span>),
+            ExtensionType::SignatureAlgorithms =&gt; <span class="self">Self</span>::SignatureAlgorithms(Vec::read(<span class="kw-2">&amp;mut </span>sub)<span class="question-mark">?</span>),
+            ExtensionType::ServerName =&gt; <span class="self">Self</span>::ServerName(Vec::read(<span class="kw-2">&amp;mut </span>sub)<span class="question-mark">?</span>),
             ExtensionType::SessionTicket =&gt; {
                 <span class="kw">if </span>sub.any_left() {
                     <span class="kw">let </span>contents = Payload::read(<span class="kw-2">&amp;mut </span>sub);
@@ -3023,16 +2935,10 @@
                     <span class="self">Self</span>::SessionTicket(ClientSessionTicket::Request)
                 }
             }
-            ExtensionType::ALProtocolNegotiation =&gt; {
-                <span class="self">Self</span>::Protocols(ProtocolNameList::read(<span class="kw-2">&amp;mut </span>sub)<span class="question-mark">?</span>)
-            }
-            ExtensionType::SupportedVersions =&gt; {
-                <span class="self">Self</span>::SupportedVersions(ProtocolVersions::read(<span class="kw-2">&amp;mut </span>sub)<span class="question-mark">?</span>)
-            }
-            ExtensionType::KeyShare =&gt; <span class="self">Self</span>::KeyShare(KeyShareEntries::read(<span class="kw-2">&amp;mut </span>sub)<span class="question-mark">?</span>),
-            ExtensionType::PSKKeyExchangeModes =&gt; {
-                <span class="self">Self</span>::PresharedKeyModes(PSKKeyExchangeModes::read(<span class="kw-2">&amp;mut </span>sub)<span class="question-mark">?</span>)
-            }
+            ExtensionType::ALProtocolNegotiation =&gt; <span class="self">Self</span>::Protocols(Vec::read(<span class="kw-2">&amp;mut </span>sub)<span class="question-mark">?</span>),
+            ExtensionType::SupportedVersions =&gt; <span class="self">Self</span>::SupportedVersions(Vec::read(<span class="kw-2">&amp;mut </span>sub)<span class="question-mark">?</span>),
+            ExtensionType::KeyShare =&gt; <span class="self">Self</span>::KeyShare(Vec::read(<span class="kw-2">&amp;mut </span>sub)<span class="question-mark">?</span>),
+            ExtensionType::PSKKeyExchangeModes =&gt; <span class="self">Self</span>::PresharedKeyModes(Vec::read(<span class="kw-2">&amp;mut </span>sub)<span class="question-mark">?</span>),
             ExtensionType::PreSharedKey =&gt; <span class="self">Self</span>::PresharedKey(PresharedKeyOffer::read(<span class="kw-2">&amp;mut </span>sub)<span class="question-mark">?</span>),
             ExtensionType::Cookie =&gt; <span class="self">Self</span>::Cookie(PayloadU16::read(<span class="kw-2">&amp;mut </span>sub)<span class="question-mark">?</span>),
             ExtensionType::ExtendedMasterSecret <span class="kw">if </span>!sub.any_left() =&gt; {
@@ -3051,22 +2957,19 @@
             <span class="kw">_ </span>=&gt; <span class="self">Self</span>::Unknown(UnknownExtension::read(typ, <span class="kw-2">&amp;mut </span>sub)),
         };
 
-        <span class="kw">if </span>sub.any_left() {
-            <span class="prelude-val">None
-        </span>} <span class="kw">else </span>{
-            <span class="prelude-val">Some</span>(ext)
-        }
+        sub.expect_empty(<span class="string">&quot;ClientExtension&quot;</span>)
+            .map(|<span class="kw">_</span>| ext)
     }
 }
 
-<span class="kw">fn </span>trim_hostname_trailing_dot_for_sni(dns_name: webpki::DnsNameRef) -&gt; webpki::DnsName {
-    <span class="kw">let </span>dns_name_str: <span class="kw-2">&amp;</span>str = dns_name.into();
+<span class="kw">fn </span>trim_hostname_trailing_dot_for_sni(dns_name: DnsNameRef) -&gt; DnsName {
+    <span class="kw">let </span>dns_name_str: <span class="kw-2">&amp;</span>str = dns_name.as_ref();
 
     <span class="comment">// RFC6066: &quot;The hostname is represented as a byte string using
     // ASCII encoding without a trailing dot&quot;
     </span><span class="kw">if </span>dns_name_str.ends_with(<span class="string">&#39;.&#39;</span>) {
         <span class="kw">let </span>trimmed = <span class="kw-2">&amp;</span>dns_name_str[<span class="number">0</span>..dns_name_str.len() - <span class="number">1</span>];
-        webpki::DnsNameRef::try_from_ascii_str(trimmed)
+        DnsNameRef::try_from(trimmed)
             .unwrap()
             .to_owned()
     } <span class="kw">else </span>{
@@ -3076,7 +2979,7 @@
 
 <span class="kw">impl </span>ClientExtension {
     <span class="doccomment">/// Make a basic SNI ServerNameRequest quoting `hostname`.
-    </span><span class="kw">pub fn </span>make_sni(dns_name: webpki::DnsNameRef) -&gt; <span class="self">Self </span>{
+    </span><span class="kw">pub fn </span>make_sni(dns_name: DnsNameRef) -&gt; <span class="self">Self </span>{
         <span class="kw">let </span>name = ServerName {
             typ: ServerNameType::HostName,
             payload: ServerNamePayload::new_hostname(trim_hostname_trailing_dot_for_sni(dns_name)),
@@ -3094,16 +2997,16 @@
 
 <span class="attr">#[derive(Clone, Debug)]
 </span><span class="kw">pub enum </span>ServerExtension {
-    ECPointFormats(ECPointFormatList),
+    ECPointFormats(Vec&lt;ECPointFormat&gt;),
     ServerNameAck,
     SessionTicketAck,
     RenegotiationInfo(PayloadU8),
-    Protocols(ProtocolNameList),
+    Protocols(Vec&lt;ProtocolName&gt;),
     KeyShare(KeyShareEntry),
     PresharedKey(u16),
     ExtendedMasterSecretAck,
     CertificateStatusAck,
-    SignedCertificateTimestamp(SCTList),
+    SignedCertificateTimestamp(Vec&lt;Sct&gt;),
     SupportedVersions(ProtocolVersion),
     TransportParameters(Vec&lt;u8&gt;),
     TransportParametersDraft(Vec&lt;u8&gt;),
@@ -3152,7 +3055,7 @@
             <span class="self">Self</span>::SignedCertificateTimestamp(<span class="kw-2">ref </span>r) =&gt; r.encode(<span class="kw-2">&amp;mut </span>sub),
             <span class="self">Self</span>::SupportedVersions(<span class="kw-2">ref </span>r) =&gt; r.encode(<span class="kw-2">&amp;mut </span>sub),
             <span class="self">Self</span>::TransportParameters(<span class="kw-2">ref </span>r) | <span class="self">Self</span>::TransportParametersDraft(<span class="kw-2">ref </span>r) =&gt; {
-                sub.extend_from_slice(r)
+                sub.extend_from_slice(r);
             }
             <span class="self">Self</span>::Unknown(<span class="kw-2">ref </span>r) =&gt; r.encode(<span class="kw-2">&amp;mut </span>sub),
         }
@@ -3161,29 +3064,22 @@
         bytes.append(<span class="kw-2">&amp;mut </span>sub);
     }
 
-    <span class="kw">fn </span>read(r: <span class="kw-2">&amp;mut </span>Reader) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>&gt; {
+    <span class="kw">fn </span>read(r: <span class="kw-2">&amp;mut </span>Reader) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, InvalidMessage&gt; {
         <span class="kw">let </span>typ = ExtensionType::read(r)<span class="question-mark">?</span>;
         <span class="kw">let </span>len = u16::read(r)<span class="question-mark">? </span><span class="kw">as </span>usize;
         <span class="kw">let </span><span class="kw-2">mut </span>sub = r.sub(len)<span class="question-mark">?</span>;
 
         <span class="kw">let </span>ext = <span class="kw">match </span>typ {
-            ExtensionType::ECPointFormats =&gt; {
-                <span class="self">Self</span>::ECPointFormats(ECPointFormatList::read(<span class="kw-2">&amp;mut </span>sub)<span class="question-mark">?</span>)
-            }
+            ExtensionType::ECPointFormats =&gt; <span class="self">Self</span>::ECPointFormats(Vec::read(<span class="kw-2">&amp;mut </span>sub)<span class="question-mark">?</span>),
             ExtensionType::ServerName =&gt; <span class="self">Self</span>::ServerNameAck,
             ExtensionType::SessionTicket =&gt; <span class="self">Self</span>::SessionTicketAck,
             ExtensionType::StatusRequest =&gt; <span class="self">Self</span>::CertificateStatusAck,
             ExtensionType::RenegotiationInfo =&gt; <span class="self">Self</span>::RenegotiationInfo(PayloadU8::read(<span class="kw-2">&amp;mut </span>sub)<span class="question-mark">?</span>),
-            ExtensionType::ALProtocolNegotiation =&gt; {
-                <span class="self">Self</span>::Protocols(ProtocolNameList::read(<span class="kw-2">&amp;mut </span>sub)<span class="question-mark">?</span>)
-            }
+            ExtensionType::ALProtocolNegotiation =&gt; <span class="self">Self</span>::Protocols(Vec::read(<span class="kw-2">&amp;mut </span>sub)<span class="question-mark">?</span>),
             ExtensionType::KeyShare =&gt; <span class="self">Self</span>::KeyShare(KeyShareEntry::read(<span class="kw-2">&amp;mut </span>sub)<span class="question-mark">?</span>),
             ExtensionType::PreSharedKey =&gt; <span class="self">Self</span>::PresharedKey(u16::read(<span class="kw-2">&amp;mut </span>sub)<span class="question-mark">?</span>),
             ExtensionType::ExtendedMasterSecret =&gt; <span class="self">Self</span>::ExtendedMasterSecretAck,
-            ExtensionType::SCT =&gt; {
-                <span class="kw">let </span>scts = SCTList::read(<span class="kw-2">&amp;mut </span>sub)<span class="question-mark">?</span>;
-                <span class="self">Self</span>::SignedCertificateTimestamp(scts)
-            }
+            ExtensionType::SCT =&gt; <span class="self">Self</span>::SignedCertificateTimestamp(Vec::read(<span class="kw-2">&amp;mut </span>sub)<span class="question-mark">?</span>),
             ExtensionType::SupportedVersions =&gt; {
                 <span class="self">Self</span>::SupportedVersions(ProtocolVersion::read(<span class="kw-2">&amp;mut </span>sub)<span class="question-mark">?</span>)
             }
@@ -3195,17 +3091,14 @@
             <span class="kw">_ </span>=&gt; <span class="self">Self</span>::Unknown(UnknownExtension::read(typ, <span class="kw-2">&amp;mut </span>sub)),
         };
 
-        <span class="kw">if </span>sub.any_left() {
-            <span class="prelude-val">None
-        </span>} <span class="kw">else </span>{
-            <span class="prelude-val">Some</span>(ext)
-        }
+        sub.expect_empty(<span class="string">&quot;ServerExtension&quot;</span>)
+            .map(|<span class="kw">_</span>| ext)
     }
 }
 
 <span class="kw">impl </span>ServerExtension {
     <span class="kw">pub fn </span>make_alpn(proto: <span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span>[u8]]) -&gt; <span class="self">Self </span>{
-        <span class="self">Self</span>::Protocols(ProtocolNameList::from_slices(proto))
+        <span class="self">Self</span>::Protocols(Vec::from_slices(proto))
     }
 
     <span class="kw">pub fn </span>make_empty_renegotiation_info() -&gt; <span class="self">Self </span>{
@@ -3214,7 +3107,7 @@
     }
 
     <span class="kw">pub fn </span>make_sct(sctl: Vec&lt;u8&gt;) -&gt; <span class="self">Self </span>{
-        <span class="kw">let </span>scts = SCTList::read_bytes(<span class="kw-2">&amp;</span>sctl).expect(<span class="string">&quot;invalid SCT list&quot;</span>);
+        <span class="kw">let </span>scts = Vec::read_bytes(<span class="kw-2">&amp;</span>sctl).expect(<span class="string">&quot;invalid SCT list&quot;</span>);
         <span class="self">Self</span>::SignedCertificateTimestamp(scts)
     }
 }
@@ -3223,7 +3116,7 @@
 </span><span class="kw">pub struct </span>ClientHelloPayload {
     <span class="kw">pub </span>client_version: ProtocolVersion,
     <span class="kw">pub </span>random: Random,
-    <span class="kw">pub </span>session_id: SessionID,
+    <span class="kw">pub </span>session_id: SessionId,
     <span class="kw">pub </span>cipher_suites: Vec&lt;CipherSuite&gt;,
     <span class="kw">pub </span>compression_methods: Vec&lt;Compression&gt;,
     <span class="kw">pub </span>extensions: Vec&lt;ClientExtension&gt;,
@@ -3234,34 +3127,46 @@
         <span class="self">self</span>.client_version.encode(bytes);
         <span class="self">self</span>.random.encode(bytes);
         <span class="self">self</span>.session_id.encode(bytes);
-        codec::encode_vec_u16(bytes, <span class="kw-2">&amp;</span><span class="self">self</span>.cipher_suites);
-        codec::encode_vec_u8(bytes, <span class="kw-2">&amp;</span><span class="self">self</span>.compression_methods);
+        <span class="self">self</span>.cipher_suites.encode(bytes);
+        <span class="self">self</span>.compression_methods.encode(bytes);
 
         <span class="kw">if </span>!<span class="self">self</span>.extensions.is_empty() {
-            codec::encode_vec_u16(bytes, <span class="kw-2">&amp;</span><span class="self">self</span>.extensions);
+            <span class="self">self</span>.extensions.encode(bytes);
         }
     }
 
-    <span class="kw">fn </span>read(r: <span class="kw-2">&amp;mut </span>Reader) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>&gt; {
+    <span class="kw">fn </span>read(r: <span class="kw-2">&amp;mut </span>Reader) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, InvalidMessage&gt; {
         <span class="kw">let </span><span class="kw-2">mut </span>ret = <span class="self">Self </span>{
             client_version: ProtocolVersion::read(r)<span class="question-mark">?</span>,
             random: Random::read(r)<span class="question-mark">?</span>,
-            session_id: SessionID::read(r)<span class="question-mark">?</span>,
-            cipher_suites: codec::read_vec_u16::&lt;CipherSuite&gt;(r)<span class="question-mark">?</span>,
-            compression_methods: codec::read_vec_u8::&lt;Compression&gt;(r)<span class="question-mark">?</span>,
+            session_id: SessionId::read(r)<span class="question-mark">?</span>,
+            cipher_suites: Vec::read(r)<span class="question-mark">?</span>,
+            compression_methods: Vec::read(r)<span class="question-mark">?</span>,
             extensions: Vec::new(),
         };
 
         <span class="kw">if </span>r.any_left() {
-            ret.extensions = codec::read_vec_u16::&lt;ClientExtension&gt;(r)<span class="question-mark">?</span>;
+            ret.extensions = Vec::read(r)<span class="question-mark">?</span>;
         }
 
-        <span class="kw">if </span>r.any_left() || ret.extensions.is_empty() {
-            <span class="prelude-val">None
-        </span>} <span class="kw">else </span>{
-            <span class="prelude-val">Some</span>(ret)
+        <span class="kw">match </span>(r.any_left(), ret.extensions.is_empty()) {
+            (<span class="bool-val">true</span>, <span class="kw">_</span>) =&gt; <span class="prelude-val">Err</span>(InvalidMessage::TrailingData(<span class="string">&quot;ClientHelloPayload&quot;</span>)),
+            (<span class="kw">_</span>, <span class="bool-val">true</span>) =&gt; <span class="prelude-val">Err</span>(InvalidMessage::MissingData(<span class="string">&quot;ClientHelloPayload&quot;</span>)),
+            <span class="kw">_ </span>=&gt; <span class="prelude-val">Ok</span>(ret),
         }
     }
+}
+
+<span class="kw">impl </span>TlsListElement <span class="kw">for </span>CipherSuite {
+    <span class="kw">const </span>SIZE_LEN: ListLength = ListLength::U16;
+}
+
+<span class="kw">impl </span>TlsListElement <span class="kw">for </span>Compression {
+    <span class="kw">const </span>SIZE_LEN: ListLength = ListLength::U8;
+}
+
+<span class="kw">impl </span>TlsListElement <span class="kw">for </span>ClientExtension {
+    <span class="kw">const </span>SIZE_LEN: ListLength = ListLength::U16;
 }
 
 <span class="kw">impl </span>ClientHelloPayload {
@@ -3288,7 +3193,7 @@
             .find(|x| x.get_type() == ext)
     }
 
-    <span class="kw">pub fn </span>get_sni_extension(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>ServerNameRequest&gt; {
+    <span class="kw">pub fn </span>get_sni_extension(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>[ServerName]&gt; {
         <span class="kw">let </span>ext = <span class="self">self</span>.find_extension(ExtensionType::ServerName)<span class="question-mark">?</span>;
         <span class="kw">match </span><span class="kw-2">*</span>ext {
             ClientExtension::ServerName(<span class="kw-2">ref </span>req) =&gt; <span class="prelude-val">Some</span>(req),
@@ -3296,7 +3201,7 @@
         }
     }
 
-    <span class="kw">pub fn </span>get_sigalgs_extension(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>SupportedSignatureSchemes&gt; {
+    <span class="kw">pub fn </span>get_sigalgs_extension(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>[SignatureScheme]&gt; {
         <span class="kw">let </span>ext = <span class="self">self</span>.find_extension(ExtensionType::SignatureAlgorithms)<span class="question-mark">?</span>;
         <span class="kw">match </span><span class="kw-2">*</span>ext {
             ClientExtension::SignatureAlgorithms(<span class="kw-2">ref </span>req) =&gt; <span class="prelude-val">Some</span>(req),
@@ -3304,7 +3209,7 @@
         }
     }
 
-    <span class="kw">pub fn </span>get_namedgroups_extension(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>NamedGroups&gt; {
+    <span class="kw">pub fn </span>get_namedgroups_extension(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>[NamedGroup]&gt; {
         <span class="kw">let </span>ext = <span class="self">self</span>.find_extension(ExtensionType::EllipticCurves)<span class="question-mark">?</span>;
         <span class="kw">match </span><span class="kw-2">*</span>ext {
             ClientExtension::NamedGroups(<span class="kw-2">ref </span>req) =&gt; <span class="prelude-val">Some</span>(req),
@@ -3312,7 +3217,7 @@
         }
     }
 
-    <span class="kw">pub fn </span>get_ecpoints_extension(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>ECPointFormatList&gt; {
+    <span class="kw">pub fn </span>get_ecpoints_extension(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>[ECPointFormat]&gt; {
         <span class="kw">let </span>ext = <span class="self">self</span>.find_extension(ExtensionType::ECPointFormats)<span class="question-mark">?</span>;
         <span class="kw">match </span><span class="kw-2">*</span>ext {
             ClientExtension::ECPointFormats(<span class="kw-2">ref </span>req) =&gt; <span class="prelude-val">Some</span>(req),
@@ -3320,7 +3225,7 @@
         }
     }
 
-    <span class="kw">pub fn </span>get_alpn_extension(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>ProtocolNameList&gt; {
+    <span class="kw">pub fn </span>get_alpn_extension(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>Vec&lt;ProtocolName&gt;&gt; {
         <span class="kw">let </span>ext = <span class="self">self</span>.find_extension(ExtensionType::ALProtocolNegotiation)<span class="question-mark">?</span>;
         <span class="kw">match </span><span class="kw-2">*</span>ext {
             ClientExtension::Protocols(<span class="kw-2">ref </span>req) =&gt; <span class="prelude-val">Some</span>(req),
@@ -3343,7 +3248,7 @@
         <span class="self">self</span>.find_extension(ExtensionType::SessionTicket)
     }
 
-    <span class="kw">pub fn </span>get_versions_extension(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>ProtocolVersions&gt; {
+    <span class="kw">pub fn </span>get_versions_extension(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>[ProtocolVersion]&gt; {
         <span class="kw">let </span>ext = <span class="self">self</span>.find_extension(ExtensionType::SupportedVersions)<span class="question-mark">?</span>;
         <span class="kw">match </span><span class="kw-2">*</span>ext {
             ClientExtension::SupportedVersions(<span class="kw-2">ref </span>vers) =&gt; <span class="prelude-val">Some</span>(vers),
@@ -3351,7 +3256,7 @@
         }
     }
 
-    <span class="kw">pub fn </span>get_keyshare_extension(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>KeyShareEntries&gt; {
+    <span class="kw">pub fn </span>get_keyshare_extension(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>[KeyShareEntry]&gt; {
         <span class="kw">let </span>ext = <span class="self">self</span>.find_extension(ExtensionType::KeyShare)<span class="question-mark">?</span>;
         <span class="kw">match </span><span class="kw-2">*</span>ext {
             ClientExtension::KeyShare(<span class="kw-2">ref </span>shares) =&gt; <span class="prelude-val">Some</span>(shares),
@@ -3389,7 +3294,7 @@
             .map_or(<span class="bool-val">false</span>, |ext| ext.get_type() == ExtensionType::PreSharedKey)
     }
 
-    <span class="kw">pub fn </span>get_psk_modes(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>PSKKeyExchangeModes&gt; {
+    <span class="kw">pub fn </span>get_psk_modes(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>[PSKKeyExchangeMode]&gt; {
         <span class="kw">let </span>ext = <span class="self">self</span>.find_extension(ExtensionType::PSKKeyExchangeModes)<span class="question-mark">?</span>;
         <span class="kw">match </span><span class="kw-2">*</span>ext {
             ClientExtension::PresharedKeyModes(<span class="kw-2">ref </span>psk_modes) =&gt; <span class="prelude-val">Some</span>(psk_modes),
@@ -3406,7 +3311,7 @@
     <span class="kw">pub fn </span>set_psk_binder(<span class="kw-2">&amp;mut </span><span class="self">self</span>, binder: <span class="kw">impl </span>Into&lt;Vec&lt;u8&gt;&gt;) {
         <span class="kw">let </span>last_extension = <span class="self">self</span>.extensions.last_mut();
         <span class="kw">if let </span><span class="prelude-val">Some</span>(ClientExtension::PresharedKey(<span class="kw-2">ref mut </span>offer)) = last_extension {
-            offer.binders[<span class="number">0</span>] = PresharedKeyBinder::new(binder.into());
+            offer.binders[<span class="number">0</span>] = PresharedKeyBinder::from(binder.into());
         }
     }
 
@@ -3456,7 +3361,7 @@
         bytes.append(<span class="kw-2">&amp;mut </span>sub);
     }
 
-    <span class="kw">fn </span>read(r: <span class="kw-2">&amp;mut </span>Reader) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>&gt; {
+    <span class="kw">fn </span>read(r: <span class="kw-2">&amp;mut </span>Reader) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, InvalidMessage&gt; {
         <span class="kw">let </span>typ = ExtensionType::read(r)<span class="question-mark">?</span>;
         <span class="kw">let </span>len = u16::read(r)<span class="question-mark">? </span><span class="kw">as </span>usize;
         <span class="kw">let </span><span class="kw-2">mut </span>sub = r.sub(len)<span class="question-mark">?</span>;
@@ -3470,18 +3375,19 @@
             <span class="kw">_ </span>=&gt; <span class="self">Self</span>::Unknown(UnknownExtension::read(typ, <span class="kw-2">&amp;mut </span>sub)),
         };
 
-        <span class="kw">if </span>sub.any_left() {
-            <span class="prelude-val">None
-        </span>} <span class="kw">else </span>{
-            <span class="prelude-val">Some</span>(ext)
-        }
+        sub.expect_empty(<span class="string">&quot;HelloRetryExtension&quot;</span>)
+            .map(|<span class="kw">_</span>| ext)
     }
+}
+
+<span class="kw">impl </span>TlsListElement <span class="kw">for </span>HelloRetryExtension {
+    <span class="kw">const </span>SIZE_LEN: ListLength = ListLength::U16;
 }
 
 <span class="attr">#[derive(Debug)]
 </span><span class="kw">pub struct </span>HelloRetryRequest {
     <span class="kw">pub </span>legacy_version: ProtocolVersion,
-    <span class="kw">pub </span>session_id: SessionID,
+    <span class="kw">pub </span>session_id: SessionId,
     <span class="kw">pub </span>cipher_suite: CipherSuite,
     <span class="kw">pub </span>extensions: Vec&lt;HelloRetryExtension&gt;,
 }
@@ -3493,23 +3399,23 @@
         <span class="self">self</span>.session_id.encode(bytes);
         <span class="self">self</span>.cipher_suite.encode(bytes);
         Compression::Null.encode(bytes);
-        codec::encode_vec_u16(bytes, <span class="kw-2">&amp;</span><span class="self">self</span>.extensions);
+        <span class="self">self</span>.extensions.encode(bytes);
     }
 
-    <span class="kw">fn </span>read(r: <span class="kw-2">&amp;mut </span>Reader) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>&gt; {
-        <span class="kw">let </span>session_id = SessionID::read(r)<span class="question-mark">?</span>;
+    <span class="kw">fn </span>read(r: <span class="kw-2">&amp;mut </span>Reader) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, InvalidMessage&gt; {
+        <span class="kw">let </span>session_id = SessionId::read(r)<span class="question-mark">?</span>;
         <span class="kw">let </span>cipher_suite = CipherSuite::read(r)<span class="question-mark">?</span>;
         <span class="kw">let </span>compression = Compression::read(r)<span class="question-mark">?</span>;
 
         <span class="kw">if </span>compression != Compression::Null {
-            <span class="kw">return </span><span class="prelude-val">None</span>;
+            <span class="kw">return </span><span class="prelude-val">Err</span>(InvalidMessage::UnsupportedCompression);
         }
 
-        <span class="prelude-val">Some</span>(<span class="self">Self </span>{
+        <span class="prelude-val">Ok</span>(<span class="self">Self </span>{
             legacy_version: ProtocolVersion::Unknown(<span class="number">0</span>),
             session_id,
             cipher_suite,
-            extensions: codec::read_vec_u16::&lt;HelloRetryExtension&gt;(r)<span class="question-mark">?</span>,
+            extensions: Vec::read(r)<span class="question-mark">?</span>,
         })
     }
 }
@@ -3575,7 +3481,7 @@
 </span><span class="kw">pub struct </span>ServerHelloPayload {
     <span class="kw">pub </span>legacy_version: ProtocolVersion,
     <span class="kw">pub </span>random: Random,
-    <span class="kw">pub </span>session_id: SessionID,
+    <span class="kw">pub </span>session_id: SessionId,
     <span class="kw">pub </span>cipher_suite: CipherSuite,
     <span class="kw">pub </span>compression_method: Compression,
     <span class="kw">pub </span>extensions: Vec&lt;ServerExtension&gt;,
@@ -3591,13 +3497,13 @@
         <span class="self">self</span>.compression_method.encode(bytes);
 
         <span class="kw">if </span>!<span class="self">self</span>.extensions.is_empty() {
-            codec::encode_vec_u16(bytes, <span class="kw-2">&amp;</span><span class="self">self</span>.extensions);
+            <span class="self">self</span>.extensions.encode(bytes);
         }
     }
 
     <span class="comment">// minus version and random, which have already been read.
-    </span><span class="kw">fn </span>read(r: <span class="kw-2">&amp;mut </span>Reader) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>&gt; {
-        <span class="kw">let </span>session_id = SessionID::read(r)<span class="question-mark">?</span>;
+    </span><span class="kw">fn </span>read(r: <span class="kw-2">&amp;mut </span>Reader) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, InvalidMessage&gt; {
+        <span class="kw">let </span>session_id = SessionId::read(r)<span class="question-mark">?</span>;
         <span class="kw">let </span>suite = CipherSuite::read(r)<span class="question-mark">?</span>;
         <span class="kw">let </span>compression = Compression::read(r)<span class="question-mark">?</span>;
 
@@ -3605,11 +3511,7 @@
         // &quot;The presence of extensions can be detected by determining whether
         //  there are bytes following the compression_method field at the end of
         //  the ServerHello.&quot;
-        </span><span class="kw">let </span>extensions = <span class="kw">if </span>r.any_left() {
-            codec::read_vec_u16::&lt;ServerExtension&gt;(r)<span class="question-mark">?
-        </span>} <span class="kw">else </span>{
-            <span class="macro">vec!</span>[]
-        };
+        </span><span class="kw">let </span>extensions = <span class="kw">if </span>r.any_left() { Vec::read(r)<span class="question-mark">? </span>} <span class="kw">else </span>{ <span class="macro">vec!</span>[] };
 
         <span class="kw">let </span>ret = <span class="self">Self </span>{
             legacy_version: ProtocolVersion::Unknown(<span class="number">0</span>),
@@ -3620,11 +3522,8 @@
             extensions,
         };
 
-        <span class="kw">if </span>r.any_left() {
-            <span class="prelude-val">None
-        </span>} <span class="kw">else </span>{
-            <span class="prelude-val">Some</span>(ret)
-        }
+        r.expect_empty(<span class="string">&quot;ServerHelloPayload&quot;</span>)
+            .map(|<span class="kw">_</span>| ret)
     }
 }
 
@@ -3651,7 +3550,7 @@
         }
     }
 
-    <span class="kw">pub fn </span>get_ecpoints_extension(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>ECPointFormatList&gt; {
+    <span class="kw">pub fn </span>get_ecpoints_extension(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>[ECPointFormat]&gt; {
         <span class="kw">let </span>ext = <span class="self">self</span>.find_extension(ExtensionType::ECPointFormats)<span class="question-mark">?</span>;
         <span class="kw">match </span><span class="kw-2">*</span>ext {
             ServerExtension::ECPointFormats(<span class="kw-2">ref </span>fmts) =&gt; <span class="prelude-val">Some</span>(fmts),
@@ -3664,7 +3563,7 @@
             .is_some()
     }
 
-    <span class="kw">pub fn </span>get_sct_list(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>SCTList&gt; {
+    <span class="kw">pub fn </span>get_sct_list(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>[Sct]&gt; {
         <span class="kw">let </span>ext = <span class="self">self</span>.find_extension(ExtensionType::SCT)<span class="question-mark">?</span>;
         <span class="kw">match </span><span class="kw-2">*</span>ext {
             ServerExtension::SignedCertificateTimestamp(<span class="kw-2">ref </span>sctl) =&gt; <span class="prelude-val">Some</span>(sctl),
@@ -3683,15 +3582,8 @@
 
 <span class="kw">pub type </span>CertificatePayload = Vec&lt;key::Certificate&gt;;
 
-<span class="kw">impl </span>Codec <span class="kw">for </span>CertificatePayload {
-    <span class="kw">fn </span>encode(<span class="kw-2">&amp;</span><span class="self">self</span>, bytes: <span class="kw-2">&amp;mut </span>Vec&lt;u8&gt;) {
-        codec::encode_vec_u24(bytes, <span class="self">self</span>);
-    }
-
-    <span class="kw">fn </span>read(r: <span class="kw-2">&amp;mut </span>Reader) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>&gt; {
-        <span class="comment">// 64KB of certificates is plenty, 16MB is obviously silly
-        </span>codec::read_vec_u24_limited(r, <span class="number">0x10000</span>)
-    }
+<span class="kw">impl </span>TlsListElement <span class="kw">for </span>key::Certificate {
+    <span class="kw">const </span>SIZE_LEN: ListLength = ListLength::U24 { max: <span class="number">0x1_0000 </span>};
 }
 
 <span class="comment">// TLS1.3 changes the Certificate payload encoding.
@@ -3701,7 +3593,7 @@
 </span><span class="attr">#[derive(Debug)]
 </span><span class="kw">pub enum </span>CertificateExtension {
     CertificateStatus(CertificateStatus),
-    SignedCertificateTimestamp(SCTList),
+    SignedCertificateTimestamp(Vec&lt;Sct&gt;),
     Unknown(UnknownExtension),
 }
 
@@ -3715,7 +3607,7 @@
     }
 
     <span class="kw">pub fn </span>make_sct(sct_list: Vec&lt;u8&gt;) -&gt; <span class="self">Self </span>{
-        <span class="kw">let </span>sctl = SCTList::read_bytes(<span class="kw-2">&amp;</span>sct_list).expect(<span class="string">&quot;invalid SCT list&quot;</span>);
+        <span class="kw">let </span>sctl = Vec::read_bytes(<span class="kw-2">&amp;</span>sct_list).expect(<span class="string">&quot;invalid SCT list&quot;</span>);
         <span class="self">Self</span>::SignedCertificateTimestamp(sctl)
     }
 
@@ -3726,7 +3618,7 @@
         }
     }
 
-    <span class="kw">pub fn </span>get_sct_list(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>SCTList&gt; {
+    <span class="kw">pub fn </span>get_sct_list(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>[Sct]&gt; {
         <span class="kw">match </span><span class="kw-2">*</span><span class="self">self </span>{
             <span class="self">Self</span>::SignedCertificateTimestamp(<span class="kw-2">ref </span>sctl) =&gt; <span class="prelude-val">Some</span>(sctl),
             <span class="kw">_ </span>=&gt; <span class="prelude-val">None</span>,
@@ -3749,7 +3641,7 @@
         bytes.append(<span class="kw-2">&amp;mut </span>sub);
     }
 
-    <span class="kw">fn </span>read(r: <span class="kw-2">&amp;mut </span>Reader) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>&gt; {
+    <span class="kw">fn </span>read(r: <span class="kw-2">&amp;mut </span>Reader) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, InvalidMessage&gt; {
         <span class="kw">let </span>typ = ExtensionType::read(r)<span class="question-mark">?</span>;
         <span class="kw">let </span>len = u16::read(r)<span class="question-mark">? </span><span class="kw">as </span>usize;
         <span class="kw">let </span><span class="kw-2">mut </span>sub = r.sub(len)<span class="question-mark">?</span>;
@@ -3759,27 +3651,23 @@
                 <span class="kw">let </span>st = CertificateStatus::read(<span class="kw-2">&amp;mut </span>sub)<span class="question-mark">?</span>;
                 <span class="self">Self</span>::CertificateStatus(st)
             }
-            ExtensionType::SCT =&gt; {
-                <span class="kw">let </span>scts = SCTList::read(<span class="kw-2">&amp;mut </span>sub)<span class="question-mark">?</span>;
-                <span class="self">Self</span>::SignedCertificateTimestamp(scts)
-            }
+            ExtensionType::SCT =&gt; <span class="self">Self</span>::SignedCertificateTimestamp(Vec::read(<span class="kw-2">&amp;mut </span>sub)<span class="question-mark">?</span>),
             <span class="kw">_ </span>=&gt; <span class="self">Self</span>::Unknown(UnknownExtension::read(typ, <span class="kw-2">&amp;mut </span>sub)),
         };
 
-        <span class="kw">if </span>sub.any_left() {
-            <span class="prelude-val">None
-        </span>} <span class="kw">else </span>{
-            <span class="prelude-val">Some</span>(ext)
-        }
+        sub.expect_empty(<span class="string">&quot;CertificateExtension&quot;</span>)
+            .map(|<span class="kw">_</span>| ext)
     }
 }
 
-<span class="macro">declare_u16_vec!</span>(CertificateExtensions, CertificateExtension);
+<span class="kw">impl </span>TlsListElement <span class="kw">for </span>CertificateExtension {
+    <span class="kw">const </span>SIZE_LEN: ListLength = ListLength::U16;
+}
 
 <span class="attr">#[derive(Debug)]
 </span><span class="kw">pub struct </span>CertificateEntry {
     <span class="kw">pub </span>cert: key::Certificate,
-    <span class="kw">pub </span>exts: CertificateExtensions,
+    <span class="kw">pub </span>exts: Vec&lt;CertificateExtension&gt;,
 }
 
 <span class="kw">impl </span>Codec <span class="kw">for </span>CertificateEntry {
@@ -3788,10 +3676,10 @@
         <span class="self">self</span>.exts.encode(bytes);
     }
 
-    <span class="kw">fn </span>read(r: <span class="kw-2">&amp;mut </span>Reader) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>&gt; {
-        <span class="prelude-val">Some</span>(<span class="self">Self </span>{
+    <span class="kw">fn </span>read(r: <span class="kw-2">&amp;mut </span>Reader) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, InvalidMessage&gt; {
+        <span class="prelude-val">Ok</span>(<span class="self">Self </span>{
             cert: key::Certificate::read(r)<span class="question-mark">?</span>,
-            exts: CertificateExtensions::read(r)<span class="question-mark">?</span>,
+            exts: Vec::read(r)<span class="question-mark">?</span>,
         })
     }
 }
@@ -3832,12 +3720,16 @@
             .and_then(CertificateExtension::get_cert_status)
     }
 
-    <span class="kw">pub fn </span>get_scts(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>SCTList&gt; {
+    <span class="kw">pub fn </span>get_scts(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>[Sct]&gt; {
         <span class="self">self</span>.exts
             .iter()
             .find(|ext| ext.get_type() == ExtensionType::SCT)
             .and_then(CertificateExtension::get_sct_list)
     }
+}
+
+<span class="kw">impl </span>TlsListElement <span class="kw">for </span>CertificateEntry {
+    <span class="kw">const </span>SIZE_LEN: ListLength = ListLength::U24 { max: <span class="number">0x1_0000 </span>};
 }
 
 <span class="attr">#[derive(Debug)]
@@ -3849,13 +3741,13 @@
 <span class="kw">impl </span>Codec <span class="kw">for </span>CertificatePayloadTLS13 {
     <span class="kw">fn </span>encode(<span class="kw-2">&amp;</span><span class="self">self</span>, bytes: <span class="kw-2">&amp;mut </span>Vec&lt;u8&gt;) {
         <span class="self">self</span>.context.encode(bytes);
-        codec::encode_vec_u24(bytes, <span class="kw-2">&amp;</span><span class="self">self</span>.entries);
+        <span class="self">self</span>.entries.encode(bytes);
     }
 
-    <span class="kw">fn </span>read(r: <span class="kw-2">&amp;mut </span>Reader) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>&gt; {
-        <span class="prelude-val">Some</span>(<span class="self">Self </span>{
+    <span class="kw">fn </span>read(r: <span class="kw-2">&amp;mut </span>Reader) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, InvalidMessage&gt; {
+        <span class="prelude-val">Ok</span>(<span class="self">Self </span>{
             context: PayloadU8::read(r)<span class="question-mark">?</span>,
-            entries: codec::read_vec_u24_limited::&lt;CertificateEntry&gt;(r, <span class="number">0x10000</span>)<span class="question-mark">?</span>,
+            entries: Vec::read(r)<span class="question-mark">?</span>,
         })
     }
 }
@@ -3906,11 +3798,10 @@
             .unwrap_or_default()
     }
 
-    <span class="kw">pub fn </span>get_end_entity_scts(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;SCTList&gt; {
+    <span class="kw">pub fn </span>get_end_entity_scts(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>[Sct]&gt; {
         <span class="self">self</span>.entries
             .first()
             .and_then(CertificateEntry::get_scts)
-            .cloned()
     }
 
     <span class="kw">pub fn </span>convert(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; CertificatePayload {
@@ -3922,7 +3813,7 @@
     }
 }
 
-<span class="attr">#[derive(Debug)]
+<span class="attr">#[derive(Clone, Copy, Debug, PartialEq)]
 </span><span class="kw">pub enum </span>KeyExchangeAlgorithm {
     BulkOnly,
     DH,
@@ -3947,55 +3838,18 @@
         <span class="self">self</span>.named_group.encode(bytes);
     }
 
-    <span class="kw">fn </span>read(r: <span class="kw-2">&amp;mut </span>Reader) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>&gt; {
+    <span class="kw">fn </span>read(r: <span class="kw-2">&amp;mut </span>Reader) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, InvalidMessage&gt; {
         <span class="kw">let </span>ct = ECCurveType::read(r)<span class="question-mark">?</span>;
-
         <span class="kw">if </span>ct != ECCurveType::NamedCurve {
-            <span class="kw">return </span><span class="prelude-val">None</span>;
+            <span class="kw">return </span><span class="prelude-val">Err</span>(InvalidMessage::UnsupportedCurveType);
         }
 
         <span class="kw">let </span>grp = NamedGroup::read(r)<span class="question-mark">?</span>;
 
-        <span class="prelude-val">Some</span>(<span class="self">Self </span>{
+        <span class="prelude-val">Ok</span>(<span class="self">Self </span>{
             curve_type: ct,
             named_group: grp,
         })
-    }
-}
-
-<span class="attr">#[derive(Debug, Clone)]
-</span><span class="kw">pub struct </span>DigitallySignedStruct {
-    <span class="kw">pub </span>scheme: SignatureScheme,
-    <span class="attr">#[deprecated(since = <span class="string">&quot;0.20.7&quot;</span>, note = <span class="string">&quot;Use signature() accessor&quot;</span>)]
-    </span><span class="kw">pub </span>sig: PayloadU16,
-}
-
-<span class="kw">impl </span>DigitallySignedStruct {
-    <span class="attr">#![allow(deprecated)]
-    </span><span class="kw">pub fn </span>new(scheme: SignatureScheme, sig: Vec&lt;u8&gt;) -&gt; <span class="self">Self </span>{
-        <span class="self">Self </span>{
-            scheme,
-            sig: PayloadU16::new(sig),
-        }
-    }
-
-    <span class="kw">pub fn </span>signature(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[u8] {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.sig.<span class="number">0
-    </span>}
-}
-
-<span class="kw">impl </span>Codec <span class="kw">for </span>DigitallySignedStruct {
-    <span class="attr">#![allow(deprecated)]
-    </span><span class="kw">fn </span>encode(<span class="kw-2">&amp;</span><span class="self">self</span>, bytes: <span class="kw-2">&amp;mut </span>Vec&lt;u8&gt;) {
-        <span class="self">self</span>.scheme.encode(bytes);
-        <span class="self">self</span>.sig.encode(bytes);
-    }
-
-    <span class="kw">fn </span>read(r: <span class="kw-2">&amp;mut </span>Reader) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>&gt; {
-        <span class="kw">let </span>scheme = SignatureScheme::read(r)<span class="question-mark">?</span>;
-        <span class="kw">let </span>sig = PayloadU16::read(r)<span class="question-mark">?</span>;
-
-        <span class="prelude-val">Some</span>(<span class="self">Self </span>{ scheme, sig })
     }
 }
 
@@ -4009,9 +3863,9 @@
         <span class="self">self</span>.public.encode(bytes);
     }
 
-    <span class="kw">fn </span>read(r: <span class="kw-2">&amp;mut </span>Reader) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>&gt; {
+    <span class="kw">fn </span>read(r: <span class="kw-2">&amp;mut </span>Reader) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, InvalidMessage&gt; {
         <span class="kw">let </span>pb = PayloadU8::read(r)<span class="question-mark">?</span>;
-        <span class="prelude-val">Some</span>(<span class="self">Self </span>{ public: pb })
+        <span class="prelude-val">Ok</span>(<span class="self">Self </span>{ public: pb })
     }
 }
 
@@ -4039,11 +3893,11 @@
         <span class="self">self</span>.public.encode(bytes);
     }
 
-    <span class="kw">fn </span>read(r: <span class="kw-2">&amp;mut </span>Reader) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>&gt; {
+    <span class="kw">fn </span>read(r: <span class="kw-2">&amp;mut </span>Reader) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, InvalidMessage&gt; {
         <span class="kw">let </span>cp = ECParameters::read(r)<span class="question-mark">?</span>;
         <span class="kw">let </span>pb = PayloadU8::read(r)<span class="question-mark">?</span>;
 
-        <span class="prelude-val">Some</span>(<span class="self">Self </span>{
+        <span class="prelude-val">Ok</span>(<span class="self">Self </span>{
             curve_params: cp,
             public: pb,
         })
@@ -4062,11 +3916,11 @@
         <span class="self">self</span>.dss.encode(bytes);
     }
 
-    <span class="kw">fn </span>read(r: <span class="kw-2">&amp;mut </span>Reader) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>&gt; {
+    <span class="kw">fn </span>read(r: <span class="kw-2">&amp;mut </span>Reader) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, InvalidMessage&gt; {
         <span class="kw">let </span>params = ServerECDHParams::read(r)<span class="question-mark">?</span>;
         <span class="kw">let </span>dss = DigitallySignedStruct::read(r)<span class="question-mark">?</span>;
 
-        <span class="prelude-val">Some</span>(<span class="self">Self </span>{ params, dss })
+        <span class="prelude-val">Ok</span>(<span class="self">Self </span>{ params, dss })
     }
 }
 
@@ -4084,25 +3938,25 @@
         }
     }
 
-    <span class="kw">fn </span>read(r: <span class="kw-2">&amp;mut </span>Reader) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>&gt; {
+    <span class="kw">fn </span>read(r: <span class="kw-2">&amp;mut </span>Reader) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, InvalidMessage&gt; {
         <span class="comment">// read as Unknown, fully parse when we know the
         // KeyExchangeAlgorithm
-        </span><span class="prelude-val">Some</span>(<span class="self">Self</span>::Unknown(Payload::read(r)))
+        </span><span class="prelude-val">Ok</span>(<span class="self">Self</span>::Unknown(Payload::read(r)))
     }
 }
 
 <span class="kw">impl </span>ServerKeyExchangePayload {
-    <span class="kw">pub fn </span>unwrap_given_kxa(<span class="kw-2">&amp;</span><span class="self">self</span>, kxa: <span class="kw-2">&amp;</span>KeyExchangeAlgorithm) -&gt; <span class="prelude-ty">Option</span>&lt;ECDHEServerKeyExchange&gt; {
+    <span class="kw">pub fn </span>unwrap_given_kxa(<span class="kw-2">&amp;</span><span class="self">self</span>, kxa: KeyExchangeAlgorithm) -&gt; <span class="prelude-ty">Option</span>&lt;ECDHEServerKeyExchange&gt; {
         <span class="kw">if let </span><span class="self">Self</span>::Unknown(<span class="kw-2">ref </span>unk) = <span class="kw-2">*</span><span class="self">self </span>{
             <span class="kw">let </span><span class="kw-2">mut </span>rd = Reader::init(<span class="kw-2">&amp;</span>unk.<span class="number">0</span>);
 
-            <span class="kw">let </span>result = <span class="kw">match </span><span class="kw-2">*</span>kxa {
+            <span class="kw">let </span>result = <span class="kw">match </span>kxa {
                 KeyExchangeAlgorithm::ECDHE =&gt; ECDHEServerKeyExchange::read(<span class="kw-2">&amp;mut </span>rd),
-                <span class="kw">_ </span>=&gt; <span class="prelude-val">None</span>,
+                <span class="kw">_ </span>=&gt; <span class="kw">return </span><span class="prelude-val">None</span>,
             };
 
             <span class="kw">if </span>!rd.any_left() {
-                <span class="kw">return </span>result;
+                <span class="kw">return </span>result.ok();
             };
         }
 
@@ -4111,7 +3965,10 @@
 }
 
 <span class="comment">// -- EncryptedExtensions (TLS1.3 only) --
-</span><span class="macro">declare_u16_vec!</span>(EncryptedExtensions, ServerExtension);
+
+</span><span class="kw">impl </span>TlsListElement <span class="kw">for </span>ServerExtension {
+    <span class="kw">const </span>SIZE_LEN: ListLength = ListLength::U16;
+}
 
 <span class="kw">pub trait </span>HasServerExtensions {
     <span class="kw">fn </span>get_extensions(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[ServerExtension];
@@ -4164,34 +4021,42 @@
     }
 }
 
-<span class="kw">impl </span>HasServerExtensions <span class="kw">for </span>EncryptedExtensions {
+<span class="kw">impl </span>HasServerExtensions <span class="kw">for </span>Vec&lt;ServerExtension&gt; {
     <span class="kw">fn </span>get_extensions(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[ServerExtension] {
         <span class="self">self
     </span>}
 }
 
-<span class="comment">// -- CertificateRequest and sundries --
-</span><span class="macro">declare_u8_vec!</span>(ClientCertificateTypes, ClientCertificateType);
-<span class="kw">pub type </span>DistinguishedName = PayloadU16;
-<span class="doccomment">/// DistinguishedNames is a `Vec&lt;Vec&lt;u8&gt;&gt;` wrapped in internal types. Each element contains the
-/// DER or BER encoded [`Subject` field from RFC 5280](https://datatracker.ietf.org/doc/html/rfc5280#section-4.1.2.6)
-/// for a single certificate. The Subject field is
-/// [encoded as an RFC 5280 `Name`](https://datatracker.ietf.org/doc/html/rfc5280#page-116).
-/// It can be decoded using [x509-parser&#39;s FromDer trait](https://docs.rs/x509-parser/latest/x509_parser/traits/trait.FromDer.html).
-///
-/// ```ignore
-/// for name in distinguished_names {
-///     use x509_parser::traits::FromDer;
-///     println!(&quot;{}&quot;, x509_parser::x509::X509Name::from_der(&amp;name.0)?.1);
-/// }
-/// ```
-</span><span class="kw">pub type </span>DistinguishedNames = VecU16OfPayloadU16;
+<span class="kw">impl </span>TlsListElement <span class="kw">for </span>ClientCertificateType {
+    <span class="kw">const </span>SIZE_LEN: ListLength = ListLength::U8;
+}
+
+<span class="macro">wrapped_payload!</span>(
+    <span class="doccomment">/// A `DistinguishedName` is a `Vec&lt;u8&gt;` wrapped in internal types.
+    ///
+    /// It contains the DER or BER encoded [`Subject` field from RFC 5280](https://datatracker.ietf.org/doc/html/rfc5280#section-4.1.2.6)
+    /// for a single certificate. The Subject field is [encoded as an RFC 5280 `Name`](https://datatracker.ietf.org/doc/html/rfc5280#page-116).
+    /// It can be decoded using [x509-parser&#39;s FromDer trait](https://docs.rs/x509-parser/latest/x509_parser/prelude/trait.FromDer.html).
+    ///
+    /// ```ignore
+    /// for name in distinguished_names {
+    ///     use x509_parser::prelude::FromDer;
+    ///     println!(&quot;{}&quot;, x509_parser::x509::X509Name::from_der(&amp;name.0)?.1);
+    /// }
+    /// ```
+    </span>DistinguishedName,
+    PayloadU16,
+);
+
+<span class="kw">impl </span>TlsListElement <span class="kw">for </span>DistinguishedName {
+    <span class="kw">const </span>SIZE_LEN: ListLength = ListLength::U16;
+}
 
 <span class="attr">#[derive(Debug)]
 </span><span class="kw">pub struct </span>CertificateRequestPayload {
-    <span class="kw">pub </span>certtypes: ClientCertificateTypes,
-    <span class="kw">pub </span>sigschemes: SupportedSignatureSchemes,
-    <span class="kw">pub </span>canames: DistinguishedNames,
+    <span class="kw">pub </span>certtypes: Vec&lt;ClientCertificateType&gt;,
+    <span class="kw">pub </span>sigschemes: Vec&lt;SignatureScheme&gt;,
+    <span class="kw">pub </span>canames: Vec&lt;DistinguishedName&gt;,
 }
 
 <span class="kw">impl </span>Codec <span class="kw">for </span>CertificateRequestPayload {
@@ -4201,16 +4066,16 @@
         <span class="self">self</span>.canames.encode(bytes);
     }
 
-    <span class="kw">fn </span>read(r: <span class="kw-2">&amp;mut </span>Reader) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>&gt; {
-        <span class="kw">let </span>certtypes = ClientCertificateTypes::read(r)<span class="question-mark">?</span>;
-        <span class="kw">let </span>sigschemes = SupportedSignatureSchemes::read(r)<span class="question-mark">?</span>;
-        <span class="kw">let </span>canames = DistinguishedNames::read(r)<span class="question-mark">?</span>;
+    <span class="kw">fn </span>read(r: <span class="kw-2">&amp;mut </span>Reader) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, InvalidMessage&gt; {
+        <span class="kw">let </span>certtypes = Vec::read(r)<span class="question-mark">?</span>;
+        <span class="kw">let </span>sigschemes = Vec::read(r)<span class="question-mark">?</span>;
+        <span class="kw">let </span>canames = Vec::read(r)<span class="question-mark">?</span>;
 
         <span class="kw">if </span>sigschemes.is_empty() {
             <span class="macro">warn!</span>(<span class="string">&quot;meaningless CertificateRequest message&quot;</span>);
-            <span class="prelude-val">None
-        </span>} <span class="kw">else </span>{
-            <span class="prelude-val">Some</span>(<span class="self">Self </span>{
+            <span class="prelude-val">Err</span>(InvalidMessage::NoSignatureSchemes)
+        } <span class="kw">else </span>{
+            <span class="prelude-val">Ok</span>(<span class="self">Self </span>{
                 certtypes,
                 sigschemes,
                 canames,
@@ -4221,8 +4086,8 @@
 
 <span class="attr">#[derive(Debug)]
 </span><span class="kw">pub enum </span>CertReqExtension {
-    SignatureAlgorithms(SupportedSignatureSchemes),
-    AuthorityNames(DistinguishedNames),
+    SignatureAlgorithms(Vec&lt;SignatureScheme&gt;),
+    AuthorityNames(Vec&lt;DistinguishedName&gt;),
     Unknown(UnknownExtension),
 }
 
@@ -4251,40 +4116,39 @@
         bytes.append(<span class="kw-2">&amp;mut </span>sub);
     }
 
-    <span class="kw">fn </span>read(r: <span class="kw-2">&amp;mut </span>Reader) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>&gt; {
+    <span class="kw">fn </span>read(r: <span class="kw-2">&amp;mut </span>Reader) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, InvalidMessage&gt; {
         <span class="kw">let </span>typ = ExtensionType::read(r)<span class="question-mark">?</span>;
         <span class="kw">let </span>len = u16::read(r)<span class="question-mark">? </span><span class="kw">as </span>usize;
         <span class="kw">let </span><span class="kw-2">mut </span>sub = r.sub(len)<span class="question-mark">?</span>;
 
         <span class="kw">let </span>ext = <span class="kw">match </span>typ {
             ExtensionType::SignatureAlgorithms =&gt; {
-                <span class="kw">let </span>schemes = SupportedSignatureSchemes::read(<span class="kw-2">&amp;mut </span>sub)<span class="question-mark">?</span>;
+                <span class="kw">let </span>schemes = Vec::read(<span class="kw-2">&amp;mut </span>sub)<span class="question-mark">?</span>;
                 <span class="kw">if </span>schemes.is_empty() {
-                    <span class="kw">return </span><span class="prelude-val">None</span>;
+                    <span class="kw">return </span><span class="prelude-val">Err</span>(InvalidMessage::NoSignatureSchemes);
                 }
                 <span class="self">Self</span>::SignatureAlgorithms(schemes)
             }
             ExtensionType::CertificateAuthorities =&gt; {
-                <span class="kw">let </span>cas = DistinguishedNames::read(<span class="kw-2">&amp;mut </span>sub)<span class="question-mark">?</span>;
+                <span class="kw">let </span>cas = Vec::read(<span class="kw-2">&amp;mut </span>sub)<span class="question-mark">?</span>;
                 <span class="self">Self</span>::AuthorityNames(cas)
             }
             <span class="kw">_ </span>=&gt; <span class="self">Self</span>::Unknown(UnknownExtension::read(typ, <span class="kw-2">&amp;mut </span>sub)),
         };
 
-        <span class="kw">if </span>sub.any_left() {
-            <span class="prelude-val">None
-        </span>} <span class="kw">else </span>{
-            <span class="prelude-val">Some</span>(ext)
-        }
+        sub.expect_empty(<span class="string">&quot;CertReqExtension&quot;</span>)
+            .map(|<span class="kw">_</span>| ext)
     }
 }
 
-<span class="macro">declare_u16_vec!</span>(CertReqExtensions, CertReqExtension);
+<span class="kw">impl </span>TlsListElement <span class="kw">for </span>CertReqExtension {
+    <span class="kw">const </span>SIZE_LEN: ListLength = ListLength::U16;
+}
 
 <span class="attr">#[derive(Debug)]
 </span><span class="kw">pub struct </span>CertificateRequestPayloadTLS13 {
     <span class="kw">pub </span>context: PayloadU8,
-    <span class="kw">pub </span>extensions: CertReqExtensions,
+    <span class="kw">pub </span>extensions: Vec&lt;CertReqExtension&gt;,
 }
 
 <span class="kw">impl </span>Codec <span class="kw">for </span>CertificateRequestPayloadTLS13 {
@@ -4293,11 +4157,11 @@
         <span class="self">self</span>.extensions.encode(bytes);
     }
 
-    <span class="kw">fn </span>read(r: <span class="kw-2">&amp;mut </span>Reader) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>&gt; {
+    <span class="kw">fn </span>read(r: <span class="kw-2">&amp;mut </span>Reader) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, InvalidMessage&gt; {
         <span class="kw">let </span>context = PayloadU8::read(r)<span class="question-mark">?</span>;
-        <span class="kw">let </span>extensions = CertReqExtensions::read(r)<span class="question-mark">?</span>;
+        <span class="kw">let </span>extensions = Vec::read(r)<span class="question-mark">?</span>;
 
-        <span class="prelude-val">Some</span>(<span class="self">Self </span>{
+        <span class="prelude-val">Ok</span>(<span class="self">Self </span>{
             context,
             extensions,
         })
@@ -4311,7 +4175,7 @@
             .find(|x| x.get_type() == ext)
     }
 
-    <span class="kw">pub fn </span>get_sigalgs_extension(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>SupportedSignatureSchemes&gt; {
+    <span class="kw">pub fn </span>get_sigalgs_extension(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>[SignatureScheme]&gt; {
         <span class="kw">let </span>ext = <span class="self">self</span>.find_extension(ExtensionType::SignatureAlgorithms)<span class="question-mark">?</span>;
         <span class="kw">match </span><span class="kw-2">*</span>ext {
             CertReqExtension::SignatureAlgorithms(<span class="kw-2">ref </span>sa) =&gt; <span class="prelude-val">Some</span>(sa),
@@ -4319,7 +4183,7 @@
         }
     }
 
-    <span class="kw">pub fn </span>get_authorities_extension(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>DistinguishedNames&gt; {
+    <span class="kw">pub fn </span>get_authorities_extension(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>[DistinguishedName]&gt; {
         <span class="kw">let </span>ext = <span class="self">self</span>.find_extension(ExtensionType::CertificateAuthorities)<span class="question-mark">?</span>;
         <span class="kw">match </span><span class="kw-2">*</span>ext {
             CertReqExtension::AuthorityNames(<span class="kw-2">ref </span>an) =&gt; <span class="prelude-val">Some</span>(an),
@@ -4350,11 +4214,11 @@
         <span class="self">self</span>.ticket.encode(bytes);
     }
 
-    <span class="kw">fn </span>read(r: <span class="kw-2">&amp;mut </span>Reader) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>&gt; {
+    <span class="kw">fn </span>read(r: <span class="kw-2">&amp;mut </span>Reader) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, InvalidMessage&gt; {
         <span class="kw">let </span>lifetime = u32::read(r)<span class="question-mark">?</span>;
         <span class="kw">let </span>ticket = PayloadU16::read(r)<span class="question-mark">?</span>;
 
-        <span class="prelude-val">Some</span>(<span class="self">Self </span>{
+        <span class="prelude-val">Ok</span>(<span class="self">Self </span>{
             lifetime_hint: lifetime,
             ticket,
         })
@@ -4391,7 +4255,7 @@
         bytes.append(<span class="kw-2">&amp;mut </span>sub);
     }
 
-    <span class="kw">fn </span>read(r: <span class="kw-2">&amp;mut </span>Reader) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>&gt; {
+    <span class="kw">fn </span>read(r: <span class="kw-2">&amp;mut </span>Reader) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, InvalidMessage&gt; {
         <span class="kw">let </span>typ = ExtensionType::read(r)<span class="question-mark">?</span>;
         <span class="kw">let </span>len = u16::read(r)<span class="question-mark">? </span><span class="kw">as </span>usize;
         <span class="kw">let </span><span class="kw-2">mut </span>sub = r.sub(len)<span class="question-mark">?</span>;
@@ -4401,15 +4265,14 @@
             <span class="kw">_ </span>=&gt; <span class="self">Self</span>::Unknown(UnknownExtension::read(typ, <span class="kw-2">&amp;mut </span>sub)),
         };
 
-        <span class="kw">if </span>sub.any_left() {
-            <span class="prelude-val">None
-        </span>} <span class="kw">else </span>{
-            <span class="prelude-val">Some</span>(ext)
-        }
+        sub.expect_empty(<span class="string">&quot;NewSessionTicketExtension&quot;</span>)
+            .map(|<span class="kw">_</span>| ext)
     }
 }
 
-<span class="macro">declare_u16_vec!</span>(NewSessionTicketExtensions, NewSessionTicketExtension);
+<span class="kw">impl </span>TlsListElement <span class="kw">for </span>NewSessionTicketExtension {
+    <span class="kw">const </span>SIZE_LEN: ListLength = ListLength::U16;
+}
 
 <span class="attr">#[derive(Debug)]
 </span><span class="kw">pub struct </span>NewSessionTicketPayloadTLS13 {
@@ -4417,7 +4280,7 @@
     <span class="kw">pub </span>age_add: u32,
     <span class="kw">pub </span>nonce: PayloadU8,
     <span class="kw">pub </span>ticket: PayloadU16,
-    <span class="kw">pub </span>exts: NewSessionTicketExtensions,
+    <span class="kw">pub </span>exts: Vec&lt;NewSessionTicketExtension&gt;,
 }
 
 <span class="kw">impl </span>NewSessionTicketPayloadTLS13 {
@@ -4470,14 +4333,14 @@
         <span class="self">self</span>.exts.encode(bytes);
     }
 
-    <span class="kw">fn </span>read(r: <span class="kw-2">&amp;mut </span>Reader) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>&gt; {
+    <span class="kw">fn </span>read(r: <span class="kw-2">&amp;mut </span>Reader) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, InvalidMessage&gt; {
         <span class="kw">let </span>lifetime = u32::read(r)<span class="question-mark">?</span>;
         <span class="kw">let </span>age_add = u32::read(r)<span class="question-mark">?</span>;
         <span class="kw">let </span>nonce = PayloadU8::read(r)<span class="question-mark">?</span>;
         <span class="kw">let </span>ticket = PayloadU16::read(r)<span class="question-mark">?</span>;
-        <span class="kw">let </span>exts = NewSessionTicketExtensions::read(r)<span class="question-mark">?</span>;
+        <span class="kw">let </span>exts = Vec::read(r)<span class="question-mark">?</span>;
 
-        <span class="prelude-val">Some</span>(<span class="self">Self </span>{
+        <span class="prelude-val">Ok</span>(<span class="self">Self </span>{
             lifetime,
             age_add,
             nonce,
@@ -4501,14 +4364,14 @@
         <span class="self">self</span>.ocsp_response.encode(bytes);
     }
 
-    <span class="kw">fn </span>read(r: <span class="kw-2">&amp;mut </span>Reader) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>&gt; {
+    <span class="kw">fn </span>read(r: <span class="kw-2">&amp;mut </span>Reader) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, InvalidMessage&gt; {
         <span class="kw">let </span>typ = CertificateStatusType::read(r)<span class="question-mark">?</span>;
 
         <span class="kw">match </span>typ {
-            CertificateStatusType::OCSP =&gt; <span class="prelude-val">Some</span>(<span class="self">Self </span>{
+            CertificateStatusType::OCSP =&gt; <span class="prelude-val">Ok</span>(<span class="self">Self </span>{
                 ocsp_response: PayloadU24::read(r)<span class="question-mark">?</span>,
             }),
-            <span class="kw">_ </span>=&gt; <span class="prelude-val">None</span>,
+            <span class="kw">_ </span>=&gt; <span class="prelude-val">Err</span>(InvalidMessage::InvalidCertificateStatusType),
         }
     }
 }
@@ -4542,7 +4405,7 @@
     ClientKeyExchange(Payload),
     NewSessionTicket(NewSessionTicketPayload),
     NewSessionTicketTLS13(NewSessionTicketPayloadTLS13),
-    EncryptedExtensions(EncryptedExtensions),
+    EncryptedExtensions(Vec&lt;ServerExtension&gt;),
     KeyUpdate(KeyUpdateRequest),
     Finished(Payload),
     CertificateStatus(CertificateStatus),
@@ -4599,13 +4462,13 @@
         bytes.append(<span class="kw-2">&amp;mut </span>sub);
     }
 
-    <span class="kw">fn </span>read(r: <span class="kw-2">&amp;mut </span>Reader) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>&gt; {
+    <span class="kw">fn </span>read(r: <span class="kw-2">&amp;mut </span>Reader) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, InvalidMessage&gt; {
         <span class="self">Self</span>::read_version(r, ProtocolVersion::TLSv1_2)
     }
 }
 
 <span class="kw">impl </span>HandshakeMessagePayload {
-    <span class="kw">pub fn </span>read_version(r: <span class="kw-2">&amp;mut </span>Reader, vers: ProtocolVersion) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>&gt; {
+    <span class="kw">pub fn </span>read_version(r: <span class="kw-2">&amp;mut </span>Reader, vers: ProtocolVersion) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, InvalidMessage&gt; {
         <span class="kw">let </span><span class="kw-2">mut </span>typ = HandshakeType::read(r)<span class="question-mark">?</span>;
         <span class="kw">let </span>len = codec::u24::read(r)<span class="question-mark">?</span>.<span class="number">0 </span><span class="kw">as </span>usize;
         <span class="kw">let </span><span class="kw-2">mut </span>sub = r.sub(len)<span class="question-mark">?</span>;
@@ -4643,9 +4506,7 @@
                 HandshakePayload::ServerKeyExchange(p)
             }
             HandshakeType::ServerHelloDone =&gt; {
-                <span class="kw">if </span>sub.any_left() {
-                    <span class="kw">return </span><span class="prelude-val">None</span>;
-                }
+                sub.expect_empty(<span class="string">&quot;ServerHelloDone&quot;</span>)<span class="question-mark">?</span>;
                 HandshakePayload::ServerHelloDone
             }
             HandshakeType::ClientKeyExchange =&gt; {
@@ -4671,15 +4532,13 @@
                 HandshakePayload::NewSessionTicket(p)
             }
             HandshakeType::EncryptedExtensions =&gt; {
-                HandshakePayload::EncryptedExtensions(EncryptedExtensions::read(<span class="kw-2">&amp;mut </span>sub)<span class="question-mark">?</span>)
+                HandshakePayload::EncryptedExtensions(Vec::read(<span class="kw-2">&amp;mut </span>sub)<span class="question-mark">?</span>)
             }
             HandshakeType::KeyUpdate =&gt; {
                 HandshakePayload::KeyUpdate(KeyUpdateRequest::read(<span class="kw-2">&amp;mut </span>sub)<span class="question-mark">?</span>)
             }
             HandshakeType::EndOfEarlyData =&gt; {
-                <span class="kw">if </span>sub.any_left() {
-                    <span class="kw">return </span><span class="prelude-val">None</span>;
-                }
+                sub.expect_empty(<span class="string">&quot;EndOfEarlyData&quot;</span>)<span class="question-mark">?</span>;
                 HandshakePayload::EndOfEarlyData
             }
             HandshakeType::Finished =&gt; HandshakePayload::Finished(Payload::read(<span class="kw-2">&amp;mut </span>sub)),
@@ -4688,20 +4547,17 @@
             }
             HandshakeType::MessageHash =&gt; {
                 <span class="comment">// does not appear on the wire
-                </span><span class="kw">return </span><span class="prelude-val">None</span>;
+                </span><span class="kw">return </span><span class="prelude-val">Err</span>(InvalidMessage::UnexpectedMessage(<span class="string">&quot;MessageHash&quot;</span>));
             }
             HandshakeType::HelloRetryRequest =&gt; {
                 <span class="comment">// not legal on wire
-                </span><span class="kw">return </span><span class="prelude-val">None</span>;
+                </span><span class="kw">return </span><span class="prelude-val">Err</span>(InvalidMessage::UnexpectedMessage(<span class="string">&quot;HelloRetryRequest&quot;</span>));
             }
             <span class="kw">_ </span>=&gt; HandshakePayload::Unknown(Payload::read(<span class="kw-2">&amp;mut </span>sub)),
         };
 
-        <span class="kw">if </span>sub.any_left() {
-            <span class="prelude-val">None
-        </span>} <span class="kw">else </span>{
-            <span class="prelude-val">Some</span>(<span class="self">Self </span>{ typ, payload })
-        }
+        sub.expect_empty(<span class="string">&quot;HandshakeMessagePayload&quot;</span>)
+            .map(|<span class="kw">_</span>| <span class="self">Self </span>{ typ, payload })
     }
 
     <span class="kw">pub fn </span>build_key_update_notify() -&gt; <span class="self">Self </span>{

@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/nix/store/rw9bn419hs63s20iz4qrsgiddx2c69nb-vendor-cargo-deps/c19b7c6f923b580ac259164a89f2577984ad5ab09ee9d583b888f934adbbe8d0/ring-0.16.20/src/ec/suite_b/ops/p256.rs`."><title>p256.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../../../static.files/rustdoc-cb6f1f67f1bcd037.css" id="mainThemeStyle"><meta name="rustdoc-vars" data-root-path="../../../../../" data-static-root-path="../../../../../static.files/" data-current-crate="ring" data-themes="" data-resource-suffix="" data-rustdoc-version="1.73.0 (cc66ad468 2023-10-03) (built from a source tarball)" data-channel="1.73.0" data-search-js="search-6dfdfced5eff6596.js" data-settings-js="settings-de11bff964e9d4e5.js" data-settings-css="settings-8c76f75bfb6bd192.css" data-theme-light-css="light-1596385f77d47ef2.css" data-theme-dark-css="dark-0a43001d3fc2282c.css" data-theme-ayu-css="ayu-fd19013d6ce078bf.css" ><script src="../../../../../static.files/storage-db41da1a38ea3cb8.js"></script><script defer src="../../../../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../../../../src-files.js"></script><script defer src="../../../../../static.files/main-0795b7d26be81095.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../../../../../static.files/light-1596385f77d47ef2.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../../../../../static.files/dark-0a43001d3fc2282c.css"><link rel="stylesheet" href="../../../../../static.files/noscript-cffde32267a19fd6.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../../../../ring/index.html"><img class="rust-logo" src="../../../../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/nix/store/8wbf91mp5aqggnly8dsfwbyfpxzfkram-vendor-cargo-deps/c19b7c6f923b580ac259164a89f2577984ad5ab09ee9d583b888f934adbbe8d0/ring-0.17.7/src/ec/suite_b/ops/p256.rs`."><title>p256.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../../../static.files/rustdoc-cb6f1f67f1bcd037.css" id="mainThemeStyle"><meta name="rustdoc-vars" data-root-path="../../../../../" data-static-root-path="../../../../../static.files/" data-current-crate="ring" data-themes="" data-resource-suffix="" data-rustdoc-version="1.73.0 (cc66ad468 2023-10-03) (built from a source tarball)" data-channel="1.73.0" data-search-js="search-6dfdfced5eff6596.js" data-settings-js="settings-de11bff964e9d4e5.js" data-settings-css="settings-8c76f75bfb6bd192.css" data-theme-light-css="light-1596385f77d47ef2.css" data-theme-dark-css="dark-0a43001d3fc2282c.css" data-theme-ayu-css="ayu-fd19013d6ce078bf.css" ><script src="../../../../../static.files/storage-db41da1a38ea3cb8.js"></script><script defer src="../../../../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../../../../src-files.js"></script><script defer src="../../../../../static.files/main-0795b7d26be81095.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../../../../../static.files/light-1596385f77d47ef2.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../../../../../static.files/dark-0a43001d3fc2282c.css"><link rel="stylesheet" href="../../../../../static.files/noscript-cffde32267a19fd6.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../../../../ring/index.html"><img class="rust-logo" src="../../../../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -327,60 +327,7 @@
 <a href="#327" id="327">327</a>
 <a href="#328" id="328">328</a>
 <a href="#329" id="329">329</a>
-<a href="#330" id="330">330</a>
-<a href="#331" id="331">331</a>
-<a href="#332" id="332">332</a>
-<a href="#333" id="333">333</a>
-<a href="#334" id="334">334</a>
-<a href="#335" id="335">335</a>
-<a href="#336" id="336">336</a>
-<a href="#337" id="337">337</a>
-<a href="#338" id="338">338</a>
-<a href="#339" id="339">339</a>
-<a href="#340" id="340">340</a>
-<a href="#341" id="341">341</a>
-<a href="#342" id="342">342</a>
-<a href="#343" id="343">343</a>
-<a href="#344" id="344">344</a>
-<a href="#345" id="345">345</a>
-<a href="#346" id="346">346</a>
-<a href="#347" id="347">347</a>
-<a href="#348" id="348">348</a>
-<a href="#349" id="349">349</a>
-<a href="#350" id="350">350</a>
-<a href="#351" id="351">351</a>
-<a href="#352" id="352">352</a>
-<a href="#353" id="353">353</a>
-<a href="#354" id="354">354</a>
-<a href="#355" id="355">355</a>
-<a href="#356" id="356">356</a>
-<a href="#357" id="357">357</a>
-<a href="#358" id="358">358</a>
-<a href="#359" id="359">359</a>
-<a href="#360" id="360">360</a>
-<a href="#361" id="361">361</a>
-<a href="#362" id="362">362</a>
-<a href="#363" id="363">363</a>
-<a href="#364" id="364">364</a>
-<a href="#365" id="365">365</a>
-<a href="#366" id="366">366</a>
-<a href="#367" id="367">367</a>
-<a href="#368" id="368">368</a>
-<a href="#369" id="369">369</a>
-<a href="#370" id="370">370</a>
-<a href="#371" id="371">371</a>
-<a href="#372" id="372">372</a>
-<a href="#373" id="373">373</a>
-<a href="#374" id="374">374</a>
-<a href="#375" id="375">375</a>
-<a href="#376" id="376">376</a>
-<a href="#377" id="377">377</a>
-<a href="#378" id="378">378</a>
-<a href="#379" id="379">379</a>
-<a href="#380" id="380">380</a>
-<a href="#381" id="381">381</a>
-<a href="#382" id="382">382</a>
-</pre></div><pre class="rust"><code><span class="comment">// Copyright 2016 Brian Smith.
+</pre></div><pre class="rust"><code><span class="comment">// Copyright 2016-2023 Brian Smith.
 //
 // Permission to use, copy, modify, and/or distribute this software for any
 // purpose with or without fee is hereby granted, provided that the above
@@ -398,66 +345,36 @@
     elem::{binary_op, binary_op_assign},
     elem_sqr_mul, elem_sqr_mul_acc, Modulus, <span class="kw-2">*</span>,
 };
-<span class="kw">use </span>core::marker::PhantomData;
-
-<span class="macro">macro_rules! </span>p256_limbs {
-    [ $(<span class="macro-nonterminal">$limb</span>:expr),+ ] =&gt; {
-        <span class="macro">limbs!</span>[$(<span class="macro-nonterminal">$limb</span>),+, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>]
-    };
-}
 
 <span class="kw">pub static </span>COMMON_OPS: CommonOps = CommonOps {
     num_limbs: <span class="number">256 </span>/ LIMB_BITS,
 
     q: Modulus {
-        p: <span class="macro">p256_limbs!</span>[
-            <span class="number">0xffffffff</span>, <span class="number">0xffffffff</span>, <span class="number">0xffffffff</span>, <span class="number">0x00000000</span>, <span class="number">0x00000000</span>, <span class="number">0x00000000</span>, <span class="number">0x00000001</span>,
-            <span class="number">0xffffffff
-        </span>],
-        rr: <span class="macro">p256_limbs!</span>[
-            <span class="number">0x00000003</span>, <span class="number">0x00000000</span>, <span class="number">0xffffffff</span>, <span class="number">0xfffffffb</span>, <span class="number">0xfffffffe</span>, <span class="number">0xffffffff</span>, <span class="number">0xfffffffd</span>,
-            <span class="number">0x00000004
-        </span>],
+        p: limbs_from_hex(<span class="string">&quot;ffffffff00000001000000000000000000000000ffffffffffffffffffffffff&quot;</span>),
+        rr: limbs_from_hex(<span class="string">&quot;4fffffffdfffffffffffffffefffffffbffffffff0000000000000003&quot;</span>),
     },
+    n: Elem::from_hex(<span class="string">&quot;ffffffff00000000ffffffffffffffffbce6faada7179e84f3b9cac2fc632551&quot;</span>),
 
-    n: Elem {
-        limbs: <span class="macro">p256_limbs!</span>[
-            <span class="number">0xfc632551</span>, <span class="number">0xf3b9cac2</span>, <span class="number">0xa7179e84</span>, <span class="number">0xbce6faad</span>, <span class="number">0xffffffff</span>, <span class="number">0xffffffff</span>, <span class="number">0x00000000</span>,
-            <span class="number">0xffffffff
-        </span>],
-        m: PhantomData,
-        encoding: PhantomData, <span class="comment">// Unencoded
-    </span>},
+    a: Elem::from_hex(<span class="string">&quot;fffffffc00000004000000000000000000000003fffffffffffffffffffffffc&quot;</span>),
+    b: Elem::from_hex(<span class="string">&quot;dc30061d04874834e5a220abf7212ed6acf005cd78843090d89cdf6229c4bddf&quot;</span>),
 
-    a: Elem {
-        limbs: <span class="macro">p256_limbs!</span>[
-            <span class="number">0xfffffffc</span>, <span class="number">0xffffffff</span>, <span class="number">0xffffffff</span>, <span class="number">0x00000003</span>, <span class="number">0x00000000</span>, <span class="number">0x00000000</span>, <span class="number">0x00000004</span>,
-            <span class="number">0xfffffffc
-        </span>],
-        m: PhantomData,
-        encoding: PhantomData, <span class="comment">// R
-    </span>},
-    b: Elem {
-        limbs: <span class="macro">p256_limbs!</span>[
-            <span class="number">0x29c4bddf</span>, <span class="number">0xd89cdf62</span>, <span class="number">0x78843090</span>, <span class="number">0xacf005cd</span>, <span class="number">0xf7212ed6</span>, <span class="number">0xe5a220ab</span>, <span class="number">0x04874834</span>,
-            <span class="number">0xdc30061d
-        </span>],
-        m: PhantomData,
-        encoding: PhantomData, <span class="comment">// R
-    </span>},
+    elem_mul_mont: p256_mul_mont,
+    elem_sqr_mont: p256_sqr_mont,
 
-    elem_add_impl: GFp_nistz256_add,
-    elem_mul_mont: GFp_nistz256_mul_mont,
-    elem_sqr_mont: GFp_nistz256_sqr_mont,
-
-    point_add_jacobian_impl: GFp_nistz256_point_add,
+    point_add_jacobian_impl: p256_point_add,
 };
+
+<span class="attr">#[cfg(test)]
+</span><span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">static </span>GENERATOR: (Elem&lt;R&gt;, Elem&lt;R&gt;) = (
+    Elem::from_hex(<span class="string">&quot;18905f76a53755c679fb732b7762251075ba95fc5fedb60179e730d418a9143c&quot;</span>),
+    Elem::from_hex(<span class="string">&quot;8571ff1825885d85d2e88688dd21f3258b4ab8e4ba19e45cddf25357ce95560a&quot;</span>),
+);
 
 <span class="kw">pub static </span>PRIVATE_KEY_OPS: PrivateKeyOps = PrivateKeyOps {
     common: <span class="kw-2">&amp;</span>COMMON_OPS,
     elem_inv_squared: p256_elem_inv_squared,
     point_mul_base_impl: p256_point_mul_base_impl,
-    point_mul_impl: GFp_nistz256_point_mul,
+    point_mul_impl: p256_point_mul,
 };
 
 <span class="kw">fn </span>p256_elem_inv_squared(a: <span class="kw-2">&amp;</span>Elem&lt;R&gt;) -&gt; Elem&lt;R&gt; {
@@ -506,56 +423,17 @@
 }
 
 <span class="kw">fn </span>p256_point_mul_base_impl(g_scalar: <span class="kw-2">&amp;</span>Scalar) -&gt; Point {
+    <span class="macro">prefixed_extern! </span>{
+        <span class="kw">fn </span>p256_point_mul_base(
+            r: <span class="kw-2">*mut </span>Limb,          <span class="comment">// [3][COMMON_OPS.num_limbs]
+            </span>g_scalar: <span class="kw-2">*const </span>Limb, <span class="comment">// [COMMON_OPS.num_limbs]
+        </span>);
+    }
+
     <span class="kw">let </span><span class="kw-2">mut </span>r = Point::new_at_infinity();
-
-    <span class="comment">// Keep this in sync with the logic for defining `GFp_USE_LARGE_TABLE` and
-    // with the logic for deciding whether to test `GFp_nistz256_point_add_affine`
-    // in suite_b/ops.rs.
-
-    </span><span class="attr">#[cfg(any(target_arch = <span class="string">&quot;aarch64&quot;</span>, target_arch = <span class="string">&quot;x86&quot;</span>, target_arch = <span class="string">&quot;x86_64&quot;</span>))]
-    </span>{
-        <span class="kw">extern </span><span class="string">&quot;C&quot; </span>{
-            <span class="kw">fn </span>GFp_nistz256_point_mul_base(
-                r: <span class="kw-2">*mut </span>Limb,          <span class="comment">// [3][COMMON_OPS.num_limbs]
-                </span>g_scalar: <span class="kw-2">*const </span>Limb, <span class="comment">// [COMMON_OPS.num_limbs]
-            </span>);
-        }
-        <span class="kw">unsafe </span>{
-            GFp_nistz256_point_mul_base(r.xyz.as_mut_ptr(), g_scalar.limbs.as_ptr());
-        }
+    <span class="kw">unsafe </span>{
+        p256_point_mul_base(r.xyz.as_mut_ptr(), g_scalar.limbs.as_ptr());
     }
-
-    <span class="attr">#[cfg(not(any(target_arch = <span class="string">&quot;aarch64&quot;</span>, target_arch = <span class="string">&quot;x86&quot;</span>, target_arch = <span class="string">&quot;x86_64&quot;</span>)))]
-    </span>{
-        <span class="kw">static </span>GENERATOR: (Elem&lt;R&gt;, Elem&lt;R&gt;) = (
-            Elem {
-                limbs: <span class="macro">p256_limbs!</span>[
-                    <span class="number">0x18a9143c</span>, <span class="number">0x79e730d4</span>, <span class="number">0x5fedb601</span>, <span class="number">0x75ba95fc</span>, <span class="number">0x77622510</span>, <span class="number">0x79fb732b</span>,
-                    <span class="number">0xa53755c6</span>, <span class="number">0x18905f76
-                </span>],
-                m: PhantomData,
-                encoding: PhantomData,
-            },
-            Elem {
-                limbs: <span class="macro">p256_limbs!</span>[
-                    <span class="number">0xce95560a</span>, <span class="number">0xddf25357</span>, <span class="number">0xba19e45c</span>, <span class="number">0x8b4ab8e4</span>, <span class="number">0xdd21f325</span>, <span class="number">0xd2e88688</span>,
-                    <span class="number">0x25885d85</span>, <span class="number">0x8571ff18
-                </span>],
-                m: PhantomData,
-                encoding: PhantomData,
-            },
-        );
-
-        <span class="kw">unsafe </span>{
-            GFp_nistz256_point_mul(
-                r.xyz.as_mut_ptr(),
-                g_scalar.limbs.as_ptr(),
-                GENERATOR.<span class="number">0</span>.limbs.as_ptr(),
-                GENERATOR.<span class="number">1</span>.limbs.as_ptr(),
-            );
-        }
-    }
-
     r
 }
 
@@ -565,36 +443,58 @@
 
 <span class="kw">pub static </span>SCALAR_OPS: ScalarOps = ScalarOps {
     common: <span class="kw-2">&amp;</span>COMMON_OPS,
-    scalar_inv_to_mont_impl: p256_scalar_inv_to_mont,
-    scalar_mul_mont: GFp_p256_scalar_mul_mont,
+    scalar_mul_mont: p256_scalar_mul_mont,
 };
 
 <span class="kw">pub static </span>PUBLIC_SCALAR_OPS: PublicScalarOps = PublicScalarOps {
     scalar_ops: <span class="kw-2">&amp;</span>SCALAR_OPS,
     public_key_ops: <span class="kw-2">&amp;</span>PUBLIC_KEY_OPS,
-    private_key_ops: <span class="kw-2">&amp;</span>PRIVATE_KEY_OPS,
 
-    q_minus_n: Elem {
-        limbs: <span class="macro">p256_limbs!</span>[<span class="number">0x039cdaae</span>, <span class="number">0x0c46353d</span>, <span class="number">0x58e8617b</span>, <span class="number">0x43190553</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>],
-        m: PhantomData,
-        encoding: PhantomData, <span class="comment">// Unencoded
-    </span>},
+    <span class="attr">#[cfg(any(target_arch = <span class="string">&quot;aarch64&quot;</span>, target_arch = <span class="string">&quot;x86_64&quot;</span>))]
+    </span>twin_mul: twin_mul_nistz256,
+
+    <span class="attr">#[cfg(not(any(target_arch = <span class="string">&quot;aarch64&quot;</span>, target_arch = <span class="string">&quot;x86_64&quot;</span>)))]
+    </span>twin_mul: |g_scalar, p_scalar, p_xy| {
+        twin_mul_inefficient(<span class="kw-2">&amp;</span>PRIVATE_KEY_OPS, g_scalar, p_scalar, p_xy)
+    },
+
+    q_minus_n: Elem::from_hex(<span class="string">&quot;4319055358e8617b0c46353d039cdaae&quot;</span>),
+
+    <span class="comment">// TODO: Use an optimized variable-time implementation.
+    </span>scalar_inv_to_mont_vartime: |s| PRIVATE_SCALAR_OPS.scalar_inv_to_mont(s),
 };
+
+<span class="attr">#[cfg(any(target_arch = <span class="string">&quot;aarch64&quot;</span>, target_arch = <span class="string">&quot;x86_64&quot;</span>))]
+</span><span class="kw">fn </span>twin_mul_nistz256(g_scalar: <span class="kw-2">&amp;</span>Scalar, p_scalar: <span class="kw-2">&amp;</span>Scalar, p_xy: <span class="kw-2">&amp;</span>(Elem&lt;R&gt;, Elem&lt;R&gt;)) -&gt; Point {
+    <span class="kw">let </span>scaled_g = point_mul_base_vartime(g_scalar);
+    <span class="kw">let </span>scaled_p = PRIVATE_KEY_OPS.point_mul(p_scalar, p_xy);
+    PRIVATE_KEY_OPS.common.point_sum(<span class="kw-2">&amp;</span>scaled_g, <span class="kw-2">&amp;</span>scaled_p)
+}
+
+<span class="attr">#[cfg(any(target_arch = <span class="string">&quot;aarch64&quot;</span>, target_arch = <span class="string">&quot;x86_64&quot;</span>))]
+</span><span class="kw">fn </span>point_mul_base_vartime(g_scalar: <span class="kw-2">&amp;</span>Scalar) -&gt; Point {
+    <span class="macro">prefixed_extern! </span>{
+        <span class="kw">fn </span>p256_point_mul_base_vartime(r: <span class="kw-2">*mut </span>Limb,          <span class="comment">// [3][COMMON_OPS.num_limbs]
+                                       </span>g_scalar: <span class="kw-2">*const </span>Limb, <span class="comment">// [COMMON_OPS.num_limbs]
+        </span>);
+    }
+    <span class="kw">let </span><span class="kw-2">mut </span>scaled_g = Point::new_at_infinity();
+    <span class="kw">unsafe </span>{
+        p256_point_mul_base_vartime(scaled_g.xyz.as_mut_ptr(), g_scalar.limbs.as_ptr());
+    }
+    scaled_g
+}
 
 <span class="kw">pub static </span>PRIVATE_SCALAR_OPS: PrivateScalarOps = PrivateScalarOps {
     scalar_ops: <span class="kw-2">&amp;</span>SCALAR_OPS,
 
-    oneRR_mod_n: Scalar {
-        limbs: <span class="macro">p256_limbs!</span>[
-            <span class="number">0xbe79eea2</span>, <span class="number">0x83244c95</span>, <span class="number">0x49bd6fa6</span>, <span class="number">0x4699799c</span>, <span class="number">0x2b6bec59</span>, <span class="number">0x2845b239</span>, <span class="number">0xf3d95620</span>,
-            <span class="number">0x66e12d94
-        </span>],
-        m: PhantomData,
-        encoding: PhantomData, <span class="comment">// R
-    </span>},
+    oneRR_mod_n: Scalar::from_hex(
+        <span class="string">&quot;66e12d94f3d956202845b2392b6bec594699799c49bd6fa683244c95be79eea2&quot;</span>,
+    ),
+    scalar_inv_to_mont: p256_scalar_inv_to_mont,
 };
 
-<span class="kw">fn </span>p256_scalar_inv_to_mont(a: <span class="kw-2">&amp;</span>Scalar&lt;Unencoded&gt;) -&gt; Scalar&lt;R&gt; {
+<span class="kw">fn </span>p256_scalar_inv_to_mont(a: Scalar&lt;R&gt;) -&gt; Scalar&lt;R&gt; {
     <span class="comment">// Calculate the modular inverse of scalar |a| using Fermat&#39;s Little
     // Theorem:
     //
@@ -606,41 +506,29 @@
 
     </span><span class="attr">#[inline]
     </span><span class="kw">fn </span>mul(a: <span class="kw-2">&amp;</span>Scalar&lt;R&gt;, b: <span class="kw-2">&amp;</span>Scalar&lt;R&gt;) -&gt; Scalar&lt;R&gt; {
-        binary_op(GFp_p256_scalar_mul_mont, a, b)
+        binary_op(p256_scalar_mul_mont, a, b)
     }
 
     <span class="attr">#[inline]
     </span><span class="kw">fn </span>sqr(a: <span class="kw-2">&amp;</span>Scalar&lt;R&gt;) -&gt; Scalar&lt;R&gt; {
-        unary_op(GFp_p256_scalar_sqr_mont, a)
+        <span class="kw">let </span><span class="kw-2">mut </span>tmp = Scalar::zero();
+        <span class="kw">unsafe </span>{ p256_scalar_sqr_rep_mont(tmp.limbs.as_mut_ptr(), a.limbs.as_ptr(), <span class="number">1</span>) }
+        tmp
     }
 
     <span class="comment">// Returns (`a` squared `squarings` times) * `b`.
     </span><span class="kw">fn </span>sqr_mul(a: <span class="kw-2">&amp;</span>Scalar&lt;R&gt;, squarings: Limb, b: <span class="kw-2">&amp;</span>Scalar&lt;R&gt;) -&gt; Scalar&lt;R&gt; {
         <span class="macro">debug_assert!</span>(squarings &gt;= <span class="number">1</span>);
         <span class="kw">let </span><span class="kw-2">mut </span>tmp = Scalar::zero();
-        <span class="kw">unsafe </span>{ GFp_p256_scalar_sqr_rep_mont(tmp.limbs.as_mut_ptr(), a.limbs.as_ptr(), squarings) }
+        <span class="kw">unsafe </span>{ p256_scalar_sqr_rep_mont(tmp.limbs.as_mut_ptr(), a.limbs.as_ptr(), squarings) }
         mul(<span class="kw-2">&amp;</span>tmp, b)
     }
 
     <span class="comment">// Sets `acc` = (`acc` squared `squarings` times) * `b`.
     </span><span class="kw">fn </span>sqr_mul_acc(acc: <span class="kw-2">&amp;mut </span>Scalar&lt;R&gt;, squarings: Limb, b: <span class="kw-2">&amp;</span>Scalar&lt;R&gt;) {
         <span class="macro">debug_assert!</span>(squarings &gt;= <span class="number">1</span>);
-        <span class="kw">unsafe </span>{
-            GFp_p256_scalar_sqr_rep_mont(acc.limbs.as_mut_ptr(), acc.limbs.as_ptr(), squarings)
-        }
-        binary_op_assign(GFp_p256_scalar_mul_mont, acc, b);
-    }
-
-    <span class="kw">fn </span>to_mont(a: <span class="kw-2">&amp;</span>Scalar) -&gt; Scalar&lt;R&gt; {
-        <span class="kw">static </span>N_RR: Scalar&lt;Unencoded&gt; = Scalar {
-            limbs: <span class="macro">p256_limbs!</span>[
-                <span class="number">0xbe79eea2</span>, <span class="number">0x83244c95</span>, <span class="number">0x49bd6fa6</span>, <span class="number">0x4699799c</span>, <span class="number">0x2b6bec59</span>, <span class="number">0x2845b239</span>, <span class="number">0xf3d95620</span>,
-                <span class="number">0x66e12d94
-            </span>],
-            m: PhantomData,
-            encoding: PhantomData,
-        };
-        binary_op(GFp_p256_scalar_mul_mont, a, <span class="kw-2">&amp;</span>N_RR)
+        <span class="kw">unsafe </span>{ p256_scalar_sqr_rep_mont(acc.limbs.as_mut_ptr(), acc.limbs.as_ptr(), squarings) }
+        binary_op_assign(p256_scalar_mul_mont, acc, b);
     }
 
     <span class="comment">// Indexes into `d`.
@@ -656,7 +544,7 @@
 
     <span class="kw">let </span><span class="kw-2">mut </span>d = [Scalar::zero(); DIGIT_COUNT];
 
-    d[B_1] = to_mont(a);
+    d[B_1] = a;
     d[B_10] = sqr(<span class="kw-2">&amp;</span>d[B_1]);
     d[B_11] = mul(<span class="kw-2">&amp;</span>d[B_10], <span class="kw-2">&amp;</span>d[B_1]);
     d[B_101] = mul(<span class="kw-2">&amp;</span>d[B_10], <span class="kw-2">&amp;</span>d[B_11]);
@@ -683,6 +571,7 @@
     //    1011110011100110111110101010110110100111000101111001111010000100
     //    1111001110111001110010101100001011111100011000110010010101001111
 
+    </span><span class="attr">#[allow(clippy::cast_possible_truncation)]
     </span><span class="kw">static </span>REMAINING_WINDOWS: [(u8, u8); <span class="number">26</span>] = [
         (<span class="number">6</span>, B_101111 <span class="kw">as </span>u8),
         (<span class="number">2 </span>+ <span class="number">3</span>, B_111 <span class="kw">as </span>u8),
@@ -719,47 +608,52 @@
     acc
 }
 
-<span class="kw">extern </span><span class="string">&quot;C&quot; </span>{
-    <span class="kw">fn </span>GFp_nistz256_add(
+<span class="macro">prefixed_extern! </span>{
+    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>p256_mul_mont(
         r: <span class="kw-2">*mut </span>Limb,   <span class="comment">// [COMMON_OPS.num_limbs]
         </span>a: <span class="kw-2">*const </span>Limb, <span class="comment">// [COMMON_OPS.num_limbs]
         </span>b: <span class="kw-2">*const </span>Limb, <span class="comment">// [COMMON_OPS.num_limbs]
     </span>);
-    <span class="kw">fn </span>GFp_nistz256_mul_mont(
-        r: <span class="kw-2">*mut </span>Limb,   <span class="comment">// [COMMON_OPS.num_limbs]
-        </span>a: <span class="kw-2">*const </span>Limb, <span class="comment">// [COMMON_OPS.num_limbs]
-        </span>b: <span class="kw-2">*const </span>Limb, <span class="comment">// [COMMON_OPS.num_limbs]
-    </span>);
-    <span class="kw">fn </span>GFp_nistz256_sqr_mont(
+    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>p256_sqr_mont(
         r: <span class="kw-2">*mut </span>Limb,   <span class="comment">// [COMMON_OPS.num_limbs]
         </span>a: <span class="kw-2">*const </span>Limb, <span class="comment">// [COMMON_OPS.num_limbs]
     </span>);
 
-    <span class="kw">fn </span>GFp_nistz256_point_add(
+    <span class="kw">fn </span>p256_point_add(
         r: <span class="kw-2">*mut </span>Limb,   <span class="comment">// [3][COMMON_OPS.num_limbs]
         </span>a: <span class="kw-2">*const </span>Limb, <span class="comment">// [3][COMMON_OPS.num_limbs]
         </span>b: <span class="kw-2">*const </span>Limb, <span class="comment">// [3][COMMON_OPS.num_limbs]
     </span>);
-    <span class="kw">fn </span>GFp_nistz256_point_mul(
+    <span class="kw">fn </span>p256_point_mul(
         r: <span class="kw-2">*mut </span>Limb,          <span class="comment">// [3][COMMON_OPS.num_limbs]
         </span>p_scalar: <span class="kw-2">*const </span>Limb, <span class="comment">// [COMMON_OPS.num_limbs]
         </span>p_x: <span class="kw-2">*const </span>Limb,      <span class="comment">// [COMMON_OPS.num_limbs]
         </span>p_y: <span class="kw-2">*const </span>Limb,      <span class="comment">// [COMMON_OPS.num_limbs]
     </span>);
 
-    <span class="kw">fn </span>GFp_p256_scalar_mul_mont(
+    <span class="kw">fn </span>p256_scalar_mul_mont(
         r: <span class="kw-2">*mut </span>Limb,   <span class="comment">// [COMMON_OPS.num_limbs]
         </span>a: <span class="kw-2">*const </span>Limb, <span class="comment">// [COMMON_OPS.num_limbs]
         </span>b: <span class="kw-2">*const </span>Limb, <span class="comment">// [COMMON_OPS.num_limbs]
     </span>);
-    <span class="kw">fn </span>GFp_p256_scalar_sqr_mont(
-        r: <span class="kw-2">*mut </span>Limb,   <span class="comment">// [COMMON_OPS.num_limbs]
-        </span>a: <span class="kw-2">*const </span>Limb, <span class="comment">// [COMMON_OPS.num_limbs]
-    </span>);
-    <span class="kw">fn </span>GFp_p256_scalar_sqr_rep_mont(
+    <span class="kw">fn </span>p256_scalar_sqr_rep_mont(
         r: <span class="kw-2">*mut </span>Limb,   <span class="comment">// [COMMON_OPS.num_limbs]
         </span>a: <span class="kw-2">*const </span>Limb, <span class="comment">// [COMMON_OPS.num_limbs]
         </span>rep: Limb,
     );
+}
+
+<span class="attr">#[cfg(test)]
+</span><span class="kw">mod </span>tests {
+    <span class="attr">#[cfg(any(target_arch = <span class="string">&quot;aarch64&quot;</span>, target_arch = <span class="string">&quot;x86_64&quot;</span>))]
+    #[test]
+    </span><span class="kw">fn </span>p256_point_mul_base_vartime_test() {
+        <span class="kw">use super</span>::{<span class="kw">super</span>::tests::point_mul_base_tests, <span class="kw-2">*</span>};
+        point_mul_base_tests(
+            <span class="kw-2">&amp;</span>PRIVATE_KEY_OPS,
+            point_mul_base_vartime,
+            <span class="macro">test_file!</span>(<span class="string">&quot;p256_point_mul_base_tests.txt&quot;</span>),
+        );
+    }
 }
 </code></pre></div></section></main></body></html>

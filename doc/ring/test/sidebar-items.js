@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"fn":["compile_time_assert_clone","compile_time_assert_copy","compile_time_assert_send","compile_time_assert_sync","from_hex","run"],"struct":["File","TestCase"]};
+window.SIDEBAR_ITEMS = {"fn":["compile_time_assert_clone","compile_time_assert_copy","compile_time_assert_eq","compile_time_assert_send","compile_time_assert_sync","from_hex","run"],"struct":["File","TestCase"]};

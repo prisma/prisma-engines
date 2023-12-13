@@ -7,7 +7,7 @@ Return an iterator across those messages.
 Payloads are borrowed.</p>
 </div></details><details class="toggle method-toggle" open><summary><section id="method.fragment_slice" class="method"><a class="src rightside" href="../../../../src/rustls/msgs/fragmenter.rs.html#35-48">source</a><h4 class="code-header">pub fn <a href="#method.fragment_slice" class="fn">fragment_slice</a>&lt;'a&gt;(
     &amp;self,
-    typ: <a class="enum" href="../enums/enum.ContentType.html" title="enum rustls::internal::msgs::enums::ContentType">ContentType</a>,
+    typ: <a class="enum" href="../../../enum.ContentType.html" title="enum rustls::ContentType">ContentType</a>,
     version: <a class="enum" href="../../../enum.ProtocolVersion.html" title="enum rustls::ProtocolVersion">ProtocolVersion</a>,
     payload: &amp;'a [<a class="primitive" href="https://doc.rust-lang.org/1.73.0/std/primitive.u8.html">u8</a>]
 ) -&gt; impl <a class="trait" href="https://doc.rust-lang.org/1.73.0/core/iter/traits/iterator/trait.Iterator.html" title="trait core::iter::traits::iterator::Iterator">Iterator</a>&lt;Item = <a class="struct" href="../message/struct.BorrowedPlainMessage.html" title="struct rustls::internal::msgs::message::BorrowedPlainMessage">BorrowedPlainMessage</a>&lt;'a&gt;&gt; + 'a</h4></section></summary><div class="docblock"><p>Enqueue borrowed fragments of (version, typ, payload) which

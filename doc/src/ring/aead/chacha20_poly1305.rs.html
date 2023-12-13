@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/nix/store/rw9bn419hs63s20iz4qrsgiddx2c69nb-vendor-cargo-deps/c19b7c6f923b580ac259164a89f2577984ad5ab09ee9d583b888f934adbbe8d0/ring-0.16.20/src/aead/chacha20_poly1305.rs`."><title>chacha20_poly1305.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-cb6f1f67f1bcd037.css" id="mainThemeStyle"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="ring" data-themes="" data-resource-suffix="" data-rustdoc-version="1.73.0 (cc66ad468 2023-10-03) (built from a source tarball)" data-channel="1.73.0" data-search-js="search-6dfdfced5eff6596.js" data-settings-js="settings-de11bff964e9d4e5.js" data-settings-css="settings-8c76f75bfb6bd192.css" data-theme-light-css="light-1596385f77d47ef2.css" data-theme-dark-css="dark-0a43001d3fc2282c.css" data-theme-ayu-css="ayu-fd19013d6ce078bf.css" ><script src="../../../static.files/storage-db41da1a38ea3cb8.js"></script><script defer src="../../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-0795b7d26be81095.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../../../static.files/light-1596385f77d47ef2.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../../../static.files/dark-0a43001d3fc2282c.css"><link rel="stylesheet" href="../../../static.files/noscript-cffde32267a19fd6.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../../ring/index.html"><img class="rust-logo" src="../../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/nix/store/8wbf91mp5aqggnly8dsfwbyfpxzfkram-vendor-cargo-deps/c19b7c6f923b580ac259164a89f2577984ad5ab09ee9d583b888f934adbbe8d0/ring-0.17.7/src/aead/chacha20_poly1305.rs`."><title>chacha20_poly1305.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-cb6f1f67f1bcd037.css" id="mainThemeStyle"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="ring" data-themes="" data-resource-suffix="" data-rustdoc-version="1.73.0 (cc66ad468 2023-10-03) (built from a source tarball)" data-channel="1.73.0" data-search-js="search-6dfdfced5eff6596.js" data-settings-js="settings-de11bff964e9d4e5.js" data-settings-css="settings-8c76f75bfb6bd192.css" data-theme-light-css="light-1596385f77d47ef2.css" data-theme-dark-css="dark-0a43001d3fc2282c.css" data-theme-ayu-css="ayu-fd19013d6ce078bf.css" ><script src="../../../static.files/storage-db41da1a38ea3cb8.js"></script><script defer src="../../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-0795b7d26be81095.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../../../static.files/light-1596385f77d47ef2.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../../../static.files/dark-0a43001d3fc2282c.css"><link rel="stylesheet" href="../../../static.files/noscript-cffde32267a19fd6.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../../ring/index.html"><img class="rust-logo" src="../../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -269,26 +269,6 @@
 <a href="#269" id="269">269</a>
 <a href="#270" id="270">270</a>
 <a href="#271" id="271">271</a>
-<a href="#272" id="272">272</a>
-<a href="#273" id="273">273</a>
-<a href="#274" id="274">274</a>
-<a href="#275" id="275">275</a>
-<a href="#276" id="276">276</a>
-<a href="#277" id="277">277</a>
-<a href="#278" id="278">278</a>
-<a href="#279" id="279">279</a>
-<a href="#280" id="280">280</a>
-<a href="#281" id="281">281</a>
-<a href="#282" id="282">282</a>
-<a href="#283" id="283">283</a>
-<a href="#284" id="284">284</a>
-<a href="#285" id="285">285</a>
-<a href="#286" id="286">286</a>
-<a href="#287" id="287">287</a>
-<a href="#288" id="288">288</a>
-<a href="#289" id="289">289</a>
-<a href="#290" id="290">290</a>
-<a href="#291" id="291">291</a>
 </pre></div><pre class="rust"><code><span class="comment">// Copyright 2015-2016 Brian Smith.
 //
 // Permission to use, copy, modify, and/or distribute this software for any
@@ -304,18 +284,20 @@
 // CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 </span><span class="kw">use super</span>::{
-    chacha::{<span class="self">self</span>, Counter},
-    iv::Iv,
-    poly1305, Aad, Block, Direction, Nonce, Tag, BLOCK_LEN,
+    chacha::{<span class="self">self</span>, Counter, Iv},
+    poly1305, Aad, Nonce, Tag,
 };
-<span class="kw">use crate</span>::{aead, cpu, endian::<span class="kw-2">*</span>, error, polyfill};
-<span class="kw">use </span>core::convert::TryInto;
+<span class="kw">use crate</span>::{
+    aead, cpu, error,
+    polyfill::{<span class="self">self</span>, ArrayFlatten},
+};
+<span class="kw">use </span>core::ops::RangeFrom;
 
-<span class="doccomment">/// ChaCha20-Poly1305 as described in [RFC 7539].
+<span class="doccomment">/// ChaCha20-Poly1305 as described in [RFC 8439].
 ///
 /// The keys are 256 bits long and the nonces are 96 bits long.
 ///
-/// [RFC 7539]: https://tools.ietf.org/html/rfc7539
+/// [RFC 8439]: https://tools.ietf.org/html/rfc8439
 </span><span class="kw">pub static </span>CHACHA20_POLY1305: aead::Algorithm = aead::Algorithm {
     key_len: chacha::KEY_LEN,
     init: chacha20_poly1305_init,
@@ -328,10 +310,13 @@
 <span class="doccomment">/// Copies |key| into |ctx_buf|.
 </span><span class="kw">fn </span>chacha20_poly1305_init(
     key: <span class="kw-2">&amp;</span>[u8],
-    _todo: cpu::Features,
+    cpu_features: cpu::Features,
 ) -&gt; <span class="prelude-ty">Result</span>&lt;aead::KeyInner, error::Unspecified&gt; {
     <span class="kw">let </span>key: [u8; chacha::KEY_LEN] = key.try_into()<span class="question-mark">?</span>;
-    <span class="prelude-val">Ok</span>(aead::KeyInner::ChaCha20Poly1305(chacha::Key::from(key)))
+    <span class="prelude-val">Ok</span>(aead::KeyInner::ChaCha20Poly1305(chacha::Key::new(
+        key,
+        cpu_features,
+    )))
 }
 
 <span class="kw">fn </span>chacha20_poly1305_seal(
@@ -339,16 +324,17 @@
     nonce: Nonce,
     aad: Aad&lt;<span class="kw-2">&amp;</span>[u8]&gt;,
     in_out: <span class="kw-2">&amp;mut </span>[u8],
-    cpu_features: cpu::Features,
 ) -&gt; Tag {
-    <span class="kw">let </span>key = <span class="kw">match </span>key {
+    <span class="kw">let </span>chacha20_key = <span class="kw">match </span>key {
         aead::KeyInner::ChaCha20Poly1305(key) =&gt; key,
         <span class="kw">_ </span>=&gt; <span class="macro">unreachable!</span>(),
     };
 
-    <span class="attr">#[cfg(target_arch = <span class="string">&quot;x86_64&quot;</span>)]
+    <span class="attr">#[cfg(any(target_arch = <span class="string">&quot;aarch64&quot;</span>, target_arch = <span class="string">&quot;x86_64&quot;</span>))]
     </span>{
-        <span class="kw">if </span>cpu::intel::SSE41.available(cpu_features) {
+        <span class="kw">if </span>cpu::intel::SSE41.available(chacha20_key.cpu_features())
+            || cpu::arm::NEON.available(chacha20_key.cpu_features())
+        {
             <span class="comment">// XXX: BoringSSL uses `alignas(16)` on `key` instead of on the
             // structure, but Rust can&#39;t do that yet; see
             // https://github.com/rust-lang/rust/issues/73557.
@@ -358,7 +344,7 @@
             </span><span class="attr">#[repr(align(<span class="number">16</span>), C)]
             #[derive(Clone, Copy)]
             </span><span class="kw">struct </span>seal_data_in {
-                key: [u8; chacha::KEY_LEN],
+                key: [u32; chacha::KEY_LEN / <span class="number">4</span>],
                 counter: u32,
                 nonce: [u8; <span class="kw">super</span>::NONCE_LEN],
                 extra_ciphertext: <span class="kw-2">*const </span>u8,
@@ -367,7 +353,7 @@
 
             <span class="kw">let </span><span class="kw-2">mut </span>data = InOut {
                 input: seal_data_in {
-                    key: <span class="kw-2">*</span>key.words_less_safe().as_byte_array(),
+                    key: <span class="kw-2">*</span>chacha20_key.words_less_safe(),
                     counter: <span class="number">0</span>,
                     nonce: <span class="kw-2">*</span>nonce.as_ref(),
                     extra_ciphertext: core::ptr::null(),
@@ -376,8 +362,8 @@
             };
 
             <span class="comment">// Encrypts `plaintext_len` bytes from `plaintext` and writes them to `out_ciphertext`.
-            </span><span class="kw">extern </span><span class="string">&quot;C&quot; </span>{
-                <span class="kw">fn </span>GFp_chacha20_poly1305_seal(
+            </span><span class="macro">prefixed_extern! </span>{
+                <span class="kw">fn </span>chacha20_poly1305_seal(
                     out_ciphertext: <span class="kw-2">*mut </span>u8,
                     plaintext: <span class="kw-2">*const </span>u8,
                     plaintext_len: usize,
@@ -388,7 +374,7 @@
             }
 
             <span class="kw">let </span>out = <span class="kw">unsafe </span>{
-                GFp_chacha20_poly1305_seal(
+                chacha20_poly1305_seal(
                     in_out.as_mut_ptr(),
                     in_out.as_ptr(),
                     in_out.len(),
@@ -403,25 +389,35 @@
         }
     }
 
-    aead(key, nonce, aad, in_out, Direction::Sealing, cpu_features)
+    <span class="kw">let </span><span class="kw-2">mut </span>counter = Counter::zero(nonce);
+    <span class="kw">let </span><span class="kw-2">mut </span>auth = {
+        <span class="kw">let </span>key = derive_poly1305_key(chacha20_key, counter.increment());
+        poly1305::Context::from_key(key)
+    };
+
+    poly1305_update_padded_16(<span class="kw-2">&amp;mut </span>auth, aad.as_ref());
+    chacha20_key.encrypt_in_place(counter, in_out);
+    poly1305_update_padded_16(<span class="kw-2">&amp;mut </span>auth, in_out);
+    finish(auth, aad.as_ref().len(), in_out.len())
 }
 
 <span class="kw">fn </span>chacha20_poly1305_open(
     key: <span class="kw-2">&amp;</span>aead::KeyInner,
     nonce: Nonce,
     aad: Aad&lt;<span class="kw-2">&amp;</span>[u8]&gt;,
-    in_prefix_len: usize,
     in_out: <span class="kw-2">&amp;mut </span>[u8],
-    cpu_features: cpu::Features,
+    src: RangeFrom&lt;usize&gt;,
 ) -&gt; Tag {
-    <span class="kw">let </span>key = <span class="kw">match </span>key {
+    <span class="kw">let </span>chacha20_key = <span class="kw">match </span>key {
         aead::KeyInner::ChaCha20Poly1305(key) =&gt; key,
         <span class="kw">_ </span>=&gt; <span class="macro">unreachable!</span>(),
     };
 
-    <span class="attr">#[cfg(target_arch = <span class="string">&quot;x86_64&quot;</span>)]
+    <span class="attr">#[cfg(any(target_arch = <span class="string">&quot;aarch64&quot;</span>, target_arch = <span class="string">&quot;x86_64&quot;</span>))]
     </span>{
-        <span class="kw">if </span>cpu::intel::SSE41.available(cpu_features) {
+        <span class="kw">if </span>cpu::intel::SSE41.available(chacha20_key.cpu_features())
+            || cpu::arm::NEON.available(chacha20_key.cpu_features())
+        {
             <span class="comment">// XXX: BoringSSL uses `alignas(16)` on `key` instead of on the
             // structure, but Rust can&#39;t do that yet; see
             // https://github.com/rust-lang/rust/issues/73557.
@@ -431,22 +427,22 @@
             </span><span class="attr">#[derive(Copy, Clone)]
             #[repr(align(<span class="number">16</span>), C)]
             </span><span class="kw">struct </span>open_data_in {
-                key: [u8; chacha::KEY_LEN],
+                key: [u32; chacha::KEY_LEN / <span class="number">4</span>],
                 counter: u32,
                 nonce: [u8; <span class="kw">super</span>::NONCE_LEN],
             }
 
             <span class="kw">let </span><span class="kw-2">mut </span>data = InOut {
                 input: open_data_in {
-                    key: <span class="kw-2">*</span>key.words_less_safe().as_byte_array(),
+                    key: <span class="kw-2">*</span>chacha20_key.words_less_safe(),
                     counter: <span class="number">0</span>,
                     nonce: <span class="kw-2">*</span>nonce.as_ref(),
                 },
             };
 
             <span class="comment">// Decrypts `plaintext_len` bytes from `ciphertext` and writes them to `out_plaintext`.
-            </span><span class="kw">extern </span><span class="string">&quot;C&quot; </span>{
-                <span class="kw">fn </span>GFp_chacha20_poly1305_open(
+            </span><span class="macro">prefixed_extern! </span>{
+                <span class="kw">fn </span>chacha20_poly1305_open(
                     out_plaintext: <span class="kw-2">*mut </span>u8,
                     ciphertext: <span class="kw-2">*const </span>u8,
                     plaintext_len: usize,
@@ -457,10 +453,10 @@
             }
 
             <span class="kw">let </span>out = <span class="kw">unsafe </span>{
-                GFp_chacha20_poly1305_open(
+                chacha20_poly1305_open(
                     in_out.as_mut_ptr(),
-                    in_out.as_ptr().add(in_prefix_len),
-                    in_out.len() - in_prefix_len,
+                    in_out.as_ptr().add(src.start),
+                    in_out.len() - src.start,
                     aad.as_ref().as_ptr(),
                     aad.as_ref().len(),
                     <span class="kw-2">&amp;mut </span>data,
@@ -472,14 +468,24 @@
         }
     }
 
-    aead(
-        key,
-        nonce,
-        aad,
-        in_out,
-        Direction::Opening { in_prefix_len },
-        cpu_features,
-    )
+    <span class="kw">let </span><span class="kw-2">mut </span>counter = Counter::zero(nonce);
+    <span class="kw">let </span><span class="kw-2">mut </span>auth = {
+        <span class="kw">let </span>key = derive_poly1305_key(chacha20_key, counter.increment());
+        poly1305::Context::from_key(key)
+    };
+
+    poly1305_update_padded_16(<span class="kw-2">&amp;mut </span>auth, aad.as_ref());
+    poly1305_update_padded_16(<span class="kw-2">&amp;mut </span>auth, <span class="kw-2">&amp;</span>in_out[src.clone()]);
+    chacha20_key.encrypt_within(counter, in_out, src.clone());
+    finish(auth, aad.as_ref().len(), in_out[src].len())
+}
+
+<span class="kw">fn </span>finish(<span class="kw-2">mut </span>auth: poly1305::Context, aad_len: usize, in_out_len: usize) -&gt; Tag {
+    <span class="kw">let </span>block: [[u8; <span class="number">8</span>]; <span class="number">2</span>] = [aad_len, in_out_len]
+        .map(polyfill::u64_from_usize)
+        .map(u64::to_le_bytes);
+    auth.update(<span class="kw-2">&amp;</span>block.array_flatten());
+    auth.finish()
 }
 
 <span class="kw">pub type </span>Key = chacha::Key;
@@ -487,7 +493,7 @@
 <span class="comment">// Keep in sync with BoringSSL&#39;s `chacha20_poly1305_open_data` and
 // `chacha20_poly1305_seal_data`.
 </span><span class="attr">#[repr(C)]
-#[cfg(target_arch = <span class="string">&quot;x86_64&quot;</span>)]
+#[cfg(any(target_arch = <span class="string">&quot;aarch64&quot;</span>, target_arch = <span class="string">&quot;x86_64&quot;</span>))]
 </span><span class="kw">union </span>InOut&lt;T&gt;
 <span class="kw">where
     </span>T: Copy,
@@ -500,83 +506,37 @@
 // 16-byte aligned. In practice it will always be 16-byte aligned because it
 // is embedded in a union where the other member of the union is 16-byte
 // aligned.
-</span><span class="attr">#[cfg(target_arch = <span class="string">&quot;x86_64&quot;</span>)]
+</span><span class="attr">#[cfg(any(target_arch = <span class="string">&quot;aarch64&quot;</span>, target_arch = <span class="string">&quot;x86_64&quot;</span>))]
 #[derive(Clone, Copy)]
 #[repr(align(<span class="number">16</span>), C)]
 </span><span class="kw">struct </span>Out {
     tag: [u8; <span class="kw">super</span>::TAG_LEN],
 }
 
-<span class="attr">#[inline(always)] </span><span class="comment">// Statically eliminate branches on `direction`.
-</span><span class="kw">fn </span>aead(
-    chacha20_key: <span class="kw-2">&amp;</span>Key,
-    nonce: Nonce,
-    Aad(aad): Aad&lt;<span class="kw-2">&amp;</span>[u8]&gt;,
-    in_out: <span class="kw-2">&amp;mut </span>[u8],
-    direction: Direction,
-    cpu_features: cpu::Features,
-) -&gt; Tag {
-    <span class="kw">let </span><span class="kw-2">mut </span>counter = Counter::zero(nonce);
-    <span class="kw">let </span><span class="kw-2">mut </span>ctx = {
-        <span class="kw">let </span>key = derive_poly1305_key(chacha20_key, counter.increment(), cpu_features);
-        poly1305::Context::from_key(key)
-    };
-
-    poly1305_update_padded_16(<span class="kw-2">&amp;mut </span>ctx, aad);
-
-    <span class="kw">let </span>in_out_len = <span class="kw">match </span>direction {
-        Direction::Opening { in_prefix_len } =&gt; {
-            poly1305_update_padded_16(<span class="kw-2">&amp;mut </span>ctx, <span class="kw-2">&amp;</span>in_out[in_prefix_len..]);
-            chacha20_key.encrypt_overlapping(counter, in_out, in_prefix_len);
-            in_out.len() - in_prefix_len
-        }
-        Direction::Sealing =&gt; {
-            chacha20_key.encrypt_in_place(counter, in_out);
-            poly1305_update_padded_16(<span class="kw-2">&amp;mut </span>ctx, in_out);
-            in_out.len()
-        }
-    };
-
-    ctx.update(
-        Block::from_u64_le(
-            LittleEndian::from(polyfill::u64_from_usize(aad.len())),
-            LittleEndian::from(polyfill::u64_from_usize(in_out_len)),
-        )
-        .as_ref(),
-    );
-    ctx.finish()
-}
-
 <span class="attr">#[inline]
 </span><span class="kw">fn </span>poly1305_update_padded_16(ctx: <span class="kw-2">&amp;mut </span>poly1305::Context, input: <span class="kw-2">&amp;</span>[u8]) {
-    <span class="kw">let </span>remainder_len = input.len() % BLOCK_LEN;
-    <span class="kw">let </span>whole_len = input.len() - remainder_len;
-    <span class="kw">if </span>whole_len &gt; <span class="number">0 </span>{
-        ctx.update(<span class="kw-2">&amp;</span>input[..whole_len]);
-    }
-    <span class="kw">if </span>remainder_len &gt; <span class="number">0 </span>{
-        <span class="kw">let </span><span class="kw-2">mut </span>block = Block::zero();
-        block.overwrite_part_at(<span class="number">0</span>, <span class="kw-2">&amp;</span>input[whole_len..]);
-        ctx.update(block.as_ref())
+    <span class="kw">if </span>!input.is_empty() {
+        ctx.update(input);
+        <span class="kw">let </span>remainder_len = input.len() % poly1305::BLOCK_LEN;
+        <span class="kw">if </span>remainder_len != <span class="number">0 </span>{
+            <span class="kw">const </span>ZEROES: [u8; poly1305::BLOCK_LEN] = [<span class="number">0</span>; poly1305::BLOCK_LEN];
+            ctx.update(<span class="kw-2">&amp;</span>ZEROES[..(poly1305::BLOCK_LEN - remainder_len)])
+        }
     }
 }
 
 <span class="comment">// Also used by chacha20_poly1305_openssh.
-</span><span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>derive_poly1305_key(
-    chacha_key: <span class="kw-2">&amp;</span>chacha::Key,
-    iv: Iv,
-    cpu_features: cpu::Features,
-) -&gt; poly1305::Key {
-    <span class="kw">let </span><span class="kw-2">mut </span>key_bytes = [<span class="number">0u8</span>; <span class="number">2 </span>* BLOCK_LEN];
-    chacha_key.encrypt_iv_xor_blocks_in_place(iv, <span class="kw-2">&amp;mut </span>key_bytes);
-    poly1305::Key::new(key_bytes, cpu_features)
+</span><span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>derive_poly1305_key(chacha_key: <span class="kw-2">&amp;</span>chacha::Key, iv: Iv) -&gt; poly1305::Key {
+    <span class="kw">let </span><span class="kw-2">mut </span>key_bytes = [<span class="number">0u8</span>; poly1305::KEY_LEN];
+    chacha_key.encrypt_iv_xor_in_place(iv, <span class="kw-2">&amp;mut </span>key_bytes);
+    poly1305::Key::new(key_bytes, chacha_key.cpu_features())
 }
 
 <span class="attr">#[cfg(test)]
 </span><span class="kw">mod </span>tests {
     <span class="attr">#[test]
     </span><span class="kw">fn </span>max_input_len_test() {
-        <span class="comment">// Errata 4858 at https://www.rfc-editor.org/errata_search.php?rfc=7539.
+        <span class="comment">// https://tools.ietf.org/html/rfc8439#section-2.8
         </span><span class="macro">assert_eq!</span>(<span class="kw">super</span>::CHACHA20_POLY1305.max_input_len, <span class="number">274_877_906_880u64</span>);
     }
 }

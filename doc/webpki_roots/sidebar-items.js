@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"static":["TLS_SERVER_ROOTS"]};
+window.SIDEBAR_ITEMS = {"constant":["TLS_SERVER_ROOTS"],"struct":["TrustAnchor"]};

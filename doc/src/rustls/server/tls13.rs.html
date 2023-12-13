@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/nix/store/rw9bn419hs63s20iz4qrsgiddx2c69nb-vendor-cargo-deps/c19b7c6f923b580ac259164a89f2577984ad5ab09ee9d583b888f934adbbe8d0/rustls-0.20.8/src/server/tls13.rs`."><title>tls13.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-cb6f1f67f1bcd037.css" id="mainThemeStyle"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="rustls" data-themes="" data-resource-suffix="" data-rustdoc-version="1.73.0 (cc66ad468 2023-10-03) (built from a source tarball)" data-channel="1.73.0" data-search-js="search-6dfdfced5eff6596.js" data-settings-js="settings-de11bff964e9d4e5.js" data-settings-css="settings-8c76f75bfb6bd192.css" data-theme-light-css="light-1596385f77d47ef2.css" data-theme-dark-css="dark-0a43001d3fc2282c.css" data-theme-ayu-css="ayu-fd19013d6ce078bf.css" ><script src="../../../static.files/storage-db41da1a38ea3cb8.js"></script><script defer src="../../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-0795b7d26be81095.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../../../static.files/light-1596385f77d47ef2.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../../../static.files/dark-0a43001d3fc2282c.css"><link rel="stylesheet" href="../../../static.files/noscript-cffde32267a19fd6.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../../rustls/index.html"><img class="rust-logo" src="../../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/nix/store/8wbf91mp5aqggnly8dsfwbyfpxzfkram-vendor-cargo-deps/c19b7c6f923b580ac259164a89f2577984ad5ab09ee9d583b888f934adbbe8d0/rustls-0.21.10/src/server/tls13.rs`."><title>tls13.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-cb6f1f67f1bcd037.css" id="mainThemeStyle"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="rustls" data-themes="" data-resource-suffix="" data-rustdoc-version="1.73.0 (cc66ad468 2023-10-03) (built from a source tarball)" data-channel="1.73.0" data-search-js="search-6dfdfced5eff6596.js" data-settings-js="settings-de11bff964e9d4e5.js" data-settings-css="settings-8c76f75bfb6bd192.css" data-theme-light-css="light-1596385f77d47ef2.css" data-theme-dark-css="dark-0a43001d3fc2282c.css" data-theme-ayu-css="ayu-fd19013d6ce078bf.css" ><script src="../../../static.files/storage-db41da1a38ea3cb8.js"></script><script defer src="../../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-0795b7d26be81095.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../../../static.files/light-1596385f77d47ef2.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../../../static.files/dark-0a43001d3fc2282c.css"><link rel="stylesheet" href="../../../static.files/noscript-cffde32267a19fd6.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../../rustls/index.html"><img class="rust-logo" src="../../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -1323,78 +1323,24 @@
 <a href="#1323" id="1323">1323</a>
 <a href="#1324" id="1324">1324</a>
 <a href="#1325" id="1325">1325</a>
-<a href="#1326" id="1326">1326</a>
-<a href="#1327" id="1327">1327</a>
-<a href="#1328" id="1328">1328</a>
-<a href="#1329" id="1329">1329</a>
-<a href="#1330" id="1330">1330</a>
-<a href="#1331" id="1331">1331</a>
-<a href="#1332" id="1332">1332</a>
-<a href="#1333" id="1333">1333</a>
-<a href="#1334" id="1334">1334</a>
-<a href="#1335" id="1335">1335</a>
-<a href="#1336" id="1336">1336</a>
-<a href="#1337" id="1337">1337</a>
-<a href="#1338" id="1338">1338</a>
-<a href="#1339" id="1339">1339</a>
-<a href="#1340" id="1340">1340</a>
-<a href="#1341" id="1341">1341</a>
-<a href="#1342" id="1342">1342</a>
-<a href="#1343" id="1343">1343</a>
-<a href="#1344" id="1344">1344</a>
-<a href="#1345" id="1345">1345</a>
-<a href="#1346" id="1346">1346</a>
-<a href="#1347" id="1347">1347</a>
-<a href="#1348" id="1348">1348</a>
-<a href="#1349" id="1349">1349</a>
-<a href="#1350" id="1350">1350</a>
-<a href="#1351" id="1351">1351</a>
-<a href="#1352" id="1352">1352</a>
-<a href="#1353" id="1353">1353</a>
-<a href="#1354" id="1354">1354</a>
-<a href="#1355" id="1355">1355</a>
-<a href="#1356" id="1356">1356</a>
-<a href="#1357" id="1357">1357</a>
-<a href="#1358" id="1358">1358</a>
-<a href="#1359" id="1359">1359</a>
-<a href="#1360" id="1360">1360</a>
-<a href="#1361" id="1361">1361</a>
-<a href="#1362" id="1362">1362</a>
-<a href="#1363" id="1363">1363</a>
-<a href="#1364" id="1364">1364</a>
-<a href="#1365" id="1365">1365</a>
-<a href="#1366" id="1366">1366</a>
-<a href="#1367" id="1367">1367</a>
-<a href="#1368" id="1368">1368</a>
-<a href="#1369" id="1369">1369</a>
-<a href="#1370" id="1370">1370</a>
-<a href="#1371" id="1371">1371</a>
-<a href="#1372" id="1372">1372</a>
-<a href="#1373" id="1373">1373</a>
-<a href="#1374" id="1374">1374</a>
-<a href="#1375" id="1375">1375</a>
-<a href="#1376" id="1376">1376</a>
-<a href="#1377" id="1377">1377</a>
-<a href="#1378" id="1378">1378</a>
-<a href="#1379" id="1379">1379</a>
-<a href="#1380" id="1380">1380</a>
-<a href="#1381" id="1381">1381</a>
-<a href="#1382" id="1382">1382</a>
-<a href="#1383" id="1383">1383</a>
-<a href="#1384" id="1384">1384</a>
-<a href="#1385" id="1385">1385</a>
-<a href="#1386" id="1386">1386</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::check::inappropriate_handshake_message;
-<span class="kw">use </span><span class="kw">crate</span>::conn::{CommonState, ConnectionRandoms, State};
+<span class="attr">#[cfg(feature = <span class="string">&quot;quic&quot;</span>)]
+</span><span class="kw">use </span><span class="kw">crate</span>::check::inappropriate_message;
+<span class="attr">#[cfg(feature = <span class="string">&quot;quic&quot;</span>)]
+</span><span class="kw">use </span><span class="kw">crate</span>::common_state::Protocol;
+<span class="attr">#[cfg(feature = <span class="string">&quot;secret_extraction&quot;</span>)]
+</span><span class="kw">use </span><span class="kw">crate</span>::common_state::Side;
+<span class="kw">use </span><span class="kw">crate</span>::common_state::{CommonState, State};
+<span class="kw">use </span><span class="kw">crate</span>::conn::ConnectionRandoms;
 <span class="kw">use </span><span class="kw">crate</span>::enums::ProtocolVersion;
-<span class="kw">use </span><span class="kw">crate</span>::error::Error;
+<span class="kw">use </span><span class="kw">crate</span>::enums::{AlertDescription, ContentType, HandshakeType};
+<span class="kw">use </span><span class="kw">crate</span>::error::{Error, PeerIncompatible, PeerMisbehaved};
 <span class="kw">use </span><span class="kw">crate</span>::hash_hs::HandshakeHash;
 <span class="kw">use </span><span class="kw">crate</span>::key::Certificate;
 <span class="attr">#[cfg(feature = <span class="string">&quot;logging&quot;</span>)]
 </span><span class="kw">use </span><span class="kw">crate</span>::log::{debug, trace, warn};
 <span class="kw">use </span><span class="kw">crate</span>::msgs::codec::Codec;
-<span class="kw">use </span><span class="kw">crate</span>::msgs::enums::{AlertDescription, KeyUpdateRequest};
-<span class="kw">use </span><span class="kw">crate</span>::msgs::enums::{ContentType, HandshakeType};
+<span class="kw">use </span><span class="kw">crate</span>::msgs::enums::KeyUpdateRequest;
 <span class="kw">use </span><span class="kw">crate</span>::msgs::handshake::HandshakeMessagePayload;
 <span class="kw">use </span><span class="kw">crate</span>::msgs::handshake::HandshakePayload;
 <span class="kw">use </span><span class="kw">crate</span>::msgs::handshake::{NewSessionTicketExtension, NewSessionTicketPayloadTLS13};
@@ -1402,14 +1348,12 @@
 <span class="kw">use </span><span class="kw">crate</span>::msgs::persist;
 <span class="kw">use </span><span class="kw">crate</span>::rand;
 <span class="kw">use </span><span class="kw">crate</span>::server::ServerConfig;
+<span class="attr">#[cfg(feature = <span class="string">&quot;secret_extraction&quot;</span>)]
+</span><span class="kw">use </span><span class="kw">crate</span>::suites::PartiallyExtractedSecrets;
 <span class="kw">use </span><span class="kw">crate</span>::ticketer;
 <span class="kw">use </span><span class="kw">crate</span>::tls13::key_schedule::{KeyScheduleTraffic, KeyScheduleTrafficWithClientFinishedPending};
 <span class="kw">use </span><span class="kw">crate</span>::tls13::Tls13CipherSuite;
 <span class="kw">use </span><span class="kw">crate</span>::verify;
-<span class="attr">#[cfg(feature = <span class="string">&quot;quic&quot;</span>)]
-</span><span class="kw">use crate</span>::{check::inappropriate_message, conn::Protocol};
-<span class="attr">#[cfg(feature = <span class="string">&quot;secret_extraction&quot;</span>)]
-</span><span class="kw">use crate</span>::{conn::Side, suites::PartiallyExtractedSecrets};
 
 <span class="kw">use </span><span class="kw">super</span>::hs::{<span class="self">self</span>, HandshakeHashOrBuffer, ServerContext};
 <span class="kw">use </span><span class="kw">super</span>::server_conn::ServerConnectionData;
@@ -1434,21 +1378,19 @@
     <span class="kw">use </span><span class="kw">crate</span>::msgs::handshake::CertificateRequestPayloadTLS13;
     <span class="kw">use </span><span class="kw">crate</span>::msgs::handshake::CertificateStatus;
     <span class="kw">use </span><span class="kw">crate</span>::msgs::handshake::ClientHelloPayload;
-    <span class="kw">use </span><span class="kw">crate</span>::msgs::handshake::DigitallySignedStruct;
     <span class="kw">use </span><span class="kw">crate</span>::msgs::handshake::HelloRetryExtension;
     <span class="kw">use </span><span class="kw">crate</span>::msgs::handshake::HelloRetryRequest;
     <span class="kw">use </span><span class="kw">crate</span>::msgs::handshake::KeyShareEntry;
     <span class="kw">use </span><span class="kw">crate</span>::msgs::handshake::Random;
     <span class="kw">use </span><span class="kw">crate</span>::msgs::handshake::ServerExtension;
     <span class="kw">use </span><span class="kw">crate</span>::msgs::handshake::ServerHelloPayload;
-    <span class="kw">use </span><span class="kw">crate</span>::msgs::handshake::SessionID;
-    <span class="attr">#[cfg(feature = <span class="string">&quot;quic&quot;</span>)]
-    </span><span class="kw">use </span><span class="kw">crate</span>::quic;
+    <span class="kw">use </span><span class="kw">crate</span>::msgs::handshake::SessionId;
     <span class="kw">use </span><span class="kw">crate</span>::server::common::ActiveCertifiedKey;
     <span class="kw">use </span><span class="kw">crate</span>::sign;
     <span class="kw">use </span><span class="kw">crate</span>::tls13::key_schedule::{
         KeyScheduleEarly, KeyScheduleHandshake, KeySchedulePreHandshake,
     };
+    <span class="kw">use </span><span class="kw">crate</span>::verify::DigitallySignedStruct;
 
     <span class="kw">use super</span>::<span class="kw-2">*</span>;
 
@@ -1465,7 +1407,7 @@
         <span class="kw">pub</span>(<span class="kw">in </span><span class="kw">crate</span>::server) suite: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>Tls13CipherSuite,
         <span class="kw">pub</span>(<span class="kw">in </span><span class="kw">crate</span>::server) randoms: ConnectionRandoms,
         <span class="kw">pub</span>(<span class="kw">in </span><span class="kw">crate</span>::server) done_retry: bool,
-        <span class="kw">pub</span>(<span class="kw">in </span><span class="kw">crate</span>::server) send_ticket: bool,
+        <span class="kw">pub</span>(<span class="kw">in </span><span class="kw">crate</span>::server) send_tickets: usize,
         <span class="kw">pub</span>(<span class="kw">in </span><span class="kw">crate</span>::server) extra_exts: Vec&lt;ServerExtension&gt;,
     }
 
@@ -1503,7 +1445,7 @@
                 </span>.transcript
                 .get_hash_given(<span class="kw-2">&amp;</span>binder_plaintext);
 
-            <span class="kw">let </span>key_schedule = KeyScheduleEarly::new(suite.hkdf_algorithm, psk);
+            <span class="kw">let </span>key_schedule = KeyScheduleEarly::new(suite, psk);
             <span class="kw">let </span>real_binder =
                 key_schedule.resumption_psk_binder_key_and_sign_verify_data(<span class="kw-2">&amp;</span>handshake_hash);
 
@@ -1518,12 +1460,12 @@
                 <span class="self">self</span>.config
                     .ticketer
                     .decrypt(ticket)
-                    .and_then(|plain| persist::ServerSessionValue::read_bytes(<span class="kw-2">&amp;</span>plain))
+                    .and_then(|plain| persist::ServerSessionValue::read_bytes(<span class="kw-2">&amp;</span>plain).ok())
             } <span class="kw">else </span>{
                 <span class="self">self</span>.config
                     .session_storage
                     .take(ticket)
-                    .and_then(|plain| persist::ServerSessionValue::read_bytes(<span class="kw-2">&amp;</span>plain))
+                    .and_then(|plain| persist::ServerSessionValue::read_bytes(<span class="kw-2">&amp;</span>plain).ok())
             }
         }
 
@@ -1536,35 +1478,50 @@
             <span class="kw-2">mut </span>sigschemes_ext: Vec&lt;SignatureScheme&gt;,
         ) -&gt; hs::NextStateOrError {
             <span class="kw">if </span>client_hello.compression_methods.len() != <span class="number">1 </span>{
-                <span class="kw">return </span><span class="prelude-val">Err</span>(cx
-                    .common
-                    .illegal_param(<span class="string">&quot;client offered wrong compressions&quot;</span>));
+                <span class="kw">return </span><span class="prelude-val">Err</span>(cx.common.send_fatal_alert(
+                    AlertDescription::IllegalParameter,
+                    PeerMisbehaved::OfferedIncorrectCompressions,
+                ));
             }
 
             <span class="kw">let </span>groups_ext = client_hello
                 .get_namedgroups_extension()
-                .ok_or_else(|| hs::incompatible(cx.common, <span class="string">&quot;client didn&#39;t describe groups&quot;</span>))<span class="question-mark">?</span>;
+                .ok_or_else(|| {
+                    cx.common.send_fatal_alert(
+                        AlertDescription::HandshakeFailure,
+                        PeerIncompatible::NamedGroupsExtensionRequired,
+                    )
+                })<span class="question-mark">?</span>;
 
             <span class="kw">let </span>tls13_schemes = sign::supported_sign_tls13();
             sigschemes_ext.retain(|scheme| tls13_schemes.contains(scheme));
 
             <span class="kw">let </span>shares_ext = client_hello
                 .get_keyshare_extension()
-                .ok_or_else(|| hs::incompatible(cx.common, <span class="string">&quot;client didn&#39;t send keyshares&quot;</span>))<span class="question-mark">?</span>;
+                .ok_or_else(|| {
+                    cx.common.send_fatal_alert(
+                        AlertDescription::HandshakeFailure,
+                        PeerIncompatible::KeyShareExtensionRequired,
+                    )
+                })<span class="question-mark">?</span>;
 
             <span class="kw">if </span>client_hello.has_keyshare_extension_with_duplicates() {
-                <span class="kw">return </span><span class="prelude-val">Err</span>(cx
-                    .common
-                    .illegal_param(<span class="string">&quot;client sent duplicate keyshares&quot;</span>));
+                <span class="kw">return </span><span class="prelude-val">Err</span>(cx.common.send_fatal_alert(
+                    AlertDescription::IllegalParameter,
+                    PeerMisbehaved::OfferedDuplicateKeyShares,
+                ));
             }
 
             <span class="kw">let </span>early_data_requested = client_hello.early_data_extension_offered();
 
             <span class="comment">// EarlyData extension is illegal in second ClientHello
             </span><span class="kw">if </span><span class="self">self</span>.done_retry &amp;&amp; early_data_requested {
-                <span class="kw">return </span><span class="prelude-val">Err</span>(cx
-                    .common
-                    .illegal_param(<span class="string">&quot;client sent EarlyData in second ClientHello&quot;</span>));
+                <span class="kw">return </span><span class="prelude-val">Err</span>({
+                    cx.common.send_fatal_alert(
+                        AlertDescription::IllegalParameter,
+                        PeerMisbehaved::EarlyDataAttemptedInSecondClientHello,
+                    )
+                });
             }
 
             <span class="comment">// choose a share that we support
@@ -1594,14 +1551,16 @@
 
                     <span class="kw">if let </span><span class="prelude-val">Some</span>(group) = retry_group_maybe {
                         <span class="kw">if </span><span class="self">self</span>.done_retry {
-                            <span class="kw">return </span><span class="prelude-val">Err</span>(cx
-                                .common
-                                .illegal_param(<span class="string">&quot;did not follow retry request&quot;</span>));
+                            <span class="kw">return </span><span class="prelude-val">Err</span>(cx.common.send_fatal_alert(
+                                AlertDescription::IllegalParameter,
+                                PeerMisbehaved::RefusedToFollowHelloRetryRequest,
+                            ));
                         }
 
                         emit_hello_retry_request(
                             <span class="kw-2">&amp;mut </span><span class="self">self</span>.transcript,
                             <span class="self">self</span>.suite,
+                            client_hello.session_id,
                             cx.common,
                             group.name,
                         );
@@ -1613,11 +1572,11 @@
                             config: <span class="self">self</span>.config,
                             transcript: HandshakeHashOrBuffer::Hash(<span class="self">self</span>.transcript),
                             <span class="attr">#[cfg(feature = <span class="string">&quot;tls12&quot;</span>)]
-                            </span>session_id: SessionID::empty(),
+                            </span>session_id: SessionId::empty(),
                             <span class="attr">#[cfg(feature = <span class="string">&quot;tls12&quot;</span>)]
                             </span>using_ems: <span class="bool-val">false</span>,
                             done_retry: <span class="bool-val">true</span>,
-                            send_ticket: <span class="self">self</span>.send_ticket,
+                            send_tickets: <span class="self">self</span>.send_tickets,
                             extra_exts: <span class="self">self</span>.extra_exts,
                         });
 
@@ -1631,9 +1590,9 @@
                         };
                     }
 
-                    <span class="kw">return </span><span class="prelude-val">Err</span>(hs::incompatible(
-                        cx.common,
-                        <span class="string">&quot;no kx group overlap with client&quot;</span>,
+                    <span class="kw">return </span><span class="prelude-val">Err</span>(cx.common.send_fatal_alert(
+                        AlertDescription::HandshakeFailure,
+                        PeerIncompatible::NoKxGroupsInCommon,
                     ));
                 }
             };
@@ -1644,19 +1603,35 @@
 
             <span class="kw">if let </span><span class="prelude-val">Some</span>(psk_offer) = client_hello.get_psk() {
                 <span class="kw">if </span>!client_hello.check_psk_ext_is_last() {
-                    <span class="kw">return </span><span class="prelude-val">Err</span>(cx
-                        .common
-                        .illegal_param(<span class="string">&quot;psk extension in wrong position&quot;</span>));
+                    <span class="kw">return </span><span class="prelude-val">Err</span>(cx.common.send_fatal_alert(
+                        AlertDescription::IllegalParameter,
+                        PeerMisbehaved::PskExtensionMustBeLast,
+                    ));
+                }
+
+                <span class="comment">// &quot;A client MUST provide a &quot;psk_key_exchange_modes&quot; extension if it
+                //  offers a &quot;pre_shared_key&quot; extension. If clients offer
+                //  &quot;pre_shared_key&quot; without a &quot;psk_key_exchange_modes&quot; extension,
+                //  servers MUST abort the handshake.&quot; - RFC8446 4.2.9
+                </span><span class="kw">if </span>client_hello.get_psk_modes().is_none() {
+                    <span class="kw">return </span><span class="prelude-val">Err</span>(cx.common.send_fatal_alert(
+                        AlertDescription::MissingExtension,
+                        PeerMisbehaved::MissingPskModesExtension,
+                    ));
                 }
 
                 <span class="kw">if </span>psk_offer.binders.is_empty() {
-                    <span class="kw">return </span><span class="prelude-val">Err</span>(hs::decode_error(cx.common, <span class="string">&quot;psk extension missing binder&quot;</span>));
+                    <span class="kw">return </span><span class="prelude-val">Err</span>(cx.common.send_fatal_alert(
+                        AlertDescription::DecodeError,
+                        PeerMisbehaved::MissingBinderInPskExtension,
+                    ));
                 }
 
                 <span class="kw">if </span>psk_offer.binders.len() != psk_offer.identities.len() {
-                    <span class="kw">return </span><span class="prelude-val">Err</span>(cx
-                        .common
-                        .illegal_param(<span class="string">&quot;psk extension mismatched ids/binders&quot;</span>));
+                    <span class="kw">return </span><span class="prelude-val">Err</span>(cx.common.send_fatal_alert(
+                        AlertDescription::IllegalParameter,
+                        PeerMisbehaved::PskExtensionWithMismatchedIdsAndBinders,
+                    ));
                 }
 
                 <span class="kw">for </span>(i, psk_id) <span class="kw">in </span>psk_offer.identities.iter().enumerate() {
@@ -1676,12 +1651,11 @@
                         <span class="self">self</span>.suite,
                         chm,
                         <span class="kw-2">&amp;</span>resume.master_secret.<span class="number">0</span>,
-                        <span class="kw-2">&amp;</span>psk_offer.binders[i].<span class="number">0</span>,
+                        psk_offer.binders[i].as_ref(),
                     ) {
-                        cx.common
-                            .send_fatal_alert(AlertDescription::DecryptError);
-                        <span class="kw">return </span><span class="prelude-val">Err</span>(Error::PeerMisbehavedError(
-                            <span class="string">&quot;client sent wrong binder&quot;</span>.to_string(),
+                        <span class="kw">return </span><span class="prelude-val">Err</span>(cx.common.send_fatal_alert(
+                            AlertDescription::DecryptError,
+                            PeerMisbehaved::IncorrectBinder,
                         ));
                     }
 
@@ -1693,11 +1667,11 @@
 
             <span class="kw">if </span>!client_hello.psk_mode_offered(PSKKeyExchangeMode::PSK_DHE_KE) {
                 <span class="macro">debug!</span>(<span class="string">&quot;Client unwilling to resume, DHE_KE not offered&quot;</span>);
-                <span class="self">self</span>.send_ticket = <span class="bool-val">false</span>;
+                <span class="self">self</span>.send_tickets = <span class="number">0</span>;
                 chosen_psk_index = <span class="prelude-val">None</span>;
                 resumedata = <span class="prelude-val">None</span>;
             } <span class="kw">else </span>{
-                <span class="self">self</span>.send_ticket = <span class="bool-val">true</span>;
+                <span class="self">self</span>.send_tickets = <span class="self">self</span>.config.send_tls13_tickets;
             }
 
             <span class="kw">if let </span><span class="prelude-val">Some</span>(<span class="kw-2">ref </span>resume) = resumedata {
@@ -1763,23 +1737,15 @@
             // are encrypted with the handshake keys.
             </span><span class="kw">match </span>doing_early_data {
                 EarlyDataDecision::Disabled =&gt; {
-                    cx.common
-                        .record_layer
-                        .set_message_decrypter(
-                            <span class="self">self</span>.suite
-                                .derive_decrypter(key_schedule.client_key()),
-                        );
+                    key_schedule.set_handshake_decrypter(<span class="prelude-val">None</span>, cx.common);
                     cx.data.early_data.reject();
                 }
                 EarlyDataDecision::RequestedButRejected =&gt; {
                     <span class="macro">debug!</span>(<span class="string">&quot;Client requested early_data, but not accepted: switching to handshake keys with trial decryption&quot;</span>);
-                    cx.common
-                        .record_layer
-                        .set_message_decrypter_with_trial_decryption(
-                            <span class="self">self</span>.suite
-                                .derive_decrypter(key_schedule.client_key()),
-                            max_early_data_size(<span class="self">self</span>.config.max_early_data_size),
-                        );
+                    key_schedule.set_handshake_decrypter(
+                        <span class="prelude-val">Some</span>(max_early_data_size(<span class="self">self</span>.config.max_early_data_size)),
+                        cx.common,
+                    );
                     cx.data.early_data.reject();
                 }
                 EarlyDataDecision::Accepted =&gt; {
@@ -1792,7 +1758,6 @@
             cx.common.check_aligned_handshake()<span class="question-mark">?</span>;
             <span class="kw">let </span>key_schedule_traffic = emit_finished_tls13(
                 <span class="kw-2">&amp;mut </span><span class="self">self</span>.transcript,
-                <span class="self">self</span>.suite,
                 <span class="kw-2">&amp;</span><span class="self">self</span>.randoms,
                 cx,
                 key_schedule,
@@ -1812,7 +1777,7 @@
                     transcript: <span class="self">self</span>.transcript,
                     suite: <span class="self">self</span>.suite,
                     key_schedule: key_schedule_traffic,
-                    send_ticket: <span class="self">self</span>.send_ticket,
+                    send_tickets: <span class="self">self</span>.send_tickets,
                 }))
             } <span class="kw">else if </span>doing_early_data == EarlyDataDecision::Accepted &amp;&amp; !cx.common.is_quic() {
                 <span class="comment">// Not used for QUIC: RFC 9001 §8.3: Clients MUST NOT send the EndOfEarlyData
@@ -1823,7 +1788,7 @@
                     transcript: <span class="self">self</span>.transcript,
                     suite: <span class="self">self</span>.suite,
                     key_schedule: key_schedule_traffic,
-                    send_ticket: <span class="self">self</span>.send_ticket,
+                    send_tickets: <span class="self">self</span>.send_tickets,
                 }))
             } <span class="kw">else </span>{
                 <span class="prelude-val">Ok</span>(Box::new(ExpectFinished {
@@ -1831,7 +1796,7 @@
                     transcript: <span class="self">self</span>.transcript,
                     suite: <span class="self">self</span>.suite,
                     key_schedule: key_schedule_traffic,
-                    send_ticket: <span class="self">self</span>.send_ticket,
+                    send_tickets: <span class="self">self</span>.send_tickets,
                 }))
             }
         }
@@ -1842,7 +1807,7 @@
         randoms: <span class="kw-2">&amp;</span>ConnectionRandoms,
         suite: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>Tls13CipherSuite,
         cx: <span class="kw-2">&amp;mut </span>ServerContext&lt;<span class="lifetime">&#39;_</span>&gt;,
-        session_id: <span class="kw-2">&amp;</span>SessionID,
+        session_id: <span class="kw-2">&amp;</span>SessionId,
         share: <span class="kw-2">&amp;</span>KeyShareEntry,
         chosen_psk_idx: <span class="prelude-ty">Option</span>&lt;usize&gt;,
         resuming_psk: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>[u8]&gt;,
@@ -1887,55 +1852,32 @@
         cx.common.send_msg(sh, <span class="bool-val">false</span>);
 
         <span class="comment">// Start key schedule
-        </span><span class="kw">let </span>(key_schedule_pre_handshake, early_data_client_key) = <span class="kw">if let </span><span class="prelude-val">Some</span>(psk) = resuming_psk {
-            <span class="kw">let </span>early_key_schedule = KeyScheduleEarly::new(suite.hkdf_algorithm, psk);
-            <span class="kw">let </span>client_early_traffic_secret = early_key_schedule.client_early_traffic_secret(
+        </span><span class="kw">let </span>key_schedule_pre_handshake = <span class="kw">if let </span><span class="prelude-val">Some</span>(psk) = resuming_psk {
+            <span class="kw">let </span>early_key_schedule = KeyScheduleEarly::new(suite, psk);
+            early_key_schedule.client_early_traffic_secret(
                 <span class="kw-2">&amp;</span>client_hello_hash,
                 <span class="kw-2">&amp;*</span>config.key_log,
                 <span class="kw-2">&amp;</span>randoms.client,
+                cx.common,
             );
 
-            (
-                KeySchedulePreHandshake::from(early_key_schedule),
-                <span class="prelude-val">Some</span>(client_early_traffic_secret),
-            )
+            KeySchedulePreHandshake::from(early_key_schedule)
         } <span class="kw">else </span>{
-            (KeySchedulePreHandshake::new(suite.hkdf_algorithm), <span class="prelude-val">None</span>)
+            KeySchedulePreHandshake::new(suite)
         };
 
         <span class="comment">// Do key exchange
         </span><span class="kw">let </span>key_schedule = kx.complete(<span class="kw-2">&amp;</span>share.payload.<span class="number">0</span>, |secret| {
-            <span class="prelude-val">Ok</span>(key_schedule_pre_handshake.into_handshake(secret))
+            key_schedule_pre_handshake.into_handshake(secret)
         })<span class="question-mark">?</span>;
 
         <span class="kw">let </span>handshake_hash = transcript.get_current_hash();
-        <span class="kw">let </span>(key_schedule, _client_key, server_key) = key_schedule.derive_handshake_secrets(
+        <span class="kw">let </span>key_schedule = key_schedule.derive_server_handshake_secrets(
             handshake_hash,
             <span class="kw-2">&amp;*</span>config.key_log,
             <span class="kw-2">&amp;</span>randoms.client,
+            cx.common,
         );
-
-        <span class="comment">// Set up to encrypt with handshake secrets, but decrypt with early_data keys.
-        // If not doing early_data after all, this is corrected later to the handshake
-        // keys (now stored in key_schedule).
-        </span>cx.common
-            .record_layer
-            .set_message_encrypter(suite.derive_encrypter(<span class="kw-2">&amp;</span>server_key));
-
-        <span class="kw">if let </span><span class="prelude-val">Some</span>(key) = <span class="kw-2">&amp;</span>early_data_client_key {
-            cx.common
-                .record_layer
-                .set_message_decrypter(suite.derive_decrypter(key));
-        }
-
-        <span class="attr">#[cfg(feature = <span class="string">&quot;quic&quot;</span>)]
-        </span><span class="kw">if </span>cx.common.is_quic() {
-            <span class="comment">// If 0-RTT should be rejected, this will be clobbered by ExtensionProcessing
-            // before the application can see.
-            </span>cx.common.quic.early_secret = early_data_client_key;
-            cx.common.quic.hs_secrets =
-                <span class="prelude-val">Some</span>(quic::Secrets::new(_client_key, server_key, suite, <span class="bool-val">false</span>));
-        }
 
         <span class="prelude-val">Ok</span>(key_schedule)
     }
@@ -1954,12 +1896,13 @@
     <span class="kw">fn </span>emit_hello_retry_request(
         transcript: <span class="kw-2">&amp;mut </span>HandshakeHash,
         suite: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>Tls13CipherSuite,
+        session_id: SessionId,
         common: <span class="kw-2">&amp;mut </span>CommonState,
         group: NamedGroup,
     ) {
         <span class="kw">let </span><span class="kw-2">mut </span>req = HelloRetryRequest {
             legacy_version: ProtocolVersion::TLSv1_2,
-            session_id: SessionID::empty(),
+            session_id,
             cipher_suite: suite.common.suite,
             extensions: Vec::new(),
         };
@@ -1985,7 +1928,8 @@
         common.send_msg(m, <span class="bool-val">false</span>);
     }
 
-    <span class="kw">fn </span>decide_if_early_data_allowed(
+    <span class="attr">#[allow(clippy::needless_pass_by_ref_mut)] </span><span class="comment">// cx only mutated if cfg(feature = &quot;quic&quot;)
+    </span><span class="kw">fn </span>decide_if_early_data_allowed(
         cx: <span class="kw-2">&amp;mut </span>ServerContext&lt;<span class="lifetime">&#39;_</span>&gt;,
         client_hello: <span class="kw-2">&amp;</span>ClientHelloPayload,
         resumedata: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>persist::ServerSessionValue&gt;,
@@ -2109,12 +2053,7 @@
         <span class="kw">let </span>names = config
             .verifier
             .client_auth_root_subjects()
-            .ok_or_else(|| {
-                <span class="macro">debug!</span>(<span class="string">&quot;could not determine root subjects based on SNI&quot;</span>);
-                cx.common
-                    .send_fatal_alert(AlertDescription::AccessDenied);
-                Error::General(<span class="string">&quot;client rejected by client_auth_root_subjects&quot;</span>.into())
-            })<span class="question-mark">?</span>;
+            .to_vec();
 
         <span class="kw">if </span>!names.is_empty() {
             cr.extensions
@@ -2194,7 +2133,12 @@
 
         <span class="kw">let </span>signer = signing_key
             .choose_scheme(schemes)
-            .ok_or_else(|| hs::incompatible(common, <span class="string">&quot;no overlapping sigschemes&quot;</span>))<span class="question-mark">?</span>;
+            .ok_or_else(|| {
+                common.send_fatal_alert(
+                    AlertDescription::HandshakeFailure,
+                    PeerIncompatible::NoSignatureSchemesInCommon,
+                )
+            })<span class="question-mark">?</span>;
 
         <span class="kw">let </span>scheme = signer.scheme();
         <span class="kw">let </span>sig = signer.sign(<span class="kw-2">&amp;</span>message)<span class="question-mark">?</span>;
@@ -2217,7 +2161,6 @@
 
     <span class="kw">fn </span>emit_finished_tls13(
         transcript: <span class="kw-2">&amp;mut </span>HandshakeHash,
-        suite: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>Tls13CipherSuite,
         randoms: <span class="kw-2">&amp;</span>ConnectionRandoms,
         cx: <span class="kw-2">&amp;mut </span>ServerContext&lt;<span class="lifetime">&#39;_</span>&gt;,
         key_schedule: KeyScheduleHandshake,
@@ -2242,23 +2185,12 @@
 
         <span class="comment">// Now move to application data keys.  Read key change is deferred until
         // the Finish message is received &amp; validated.
-        </span><span class="kw">let </span>(key_schedule_traffic, _client_key, server_key) = key_schedule
-            .into_traffic_with_client_finished_pending(
-                hash_at_server_fin,
-                <span class="kw-2">&amp;*</span>config.key_log,
-                <span class="kw-2">&amp;</span>randoms.client,
-            );
-        cx.common
-            .record_layer
-            .set_message_encrypter(suite.derive_encrypter(<span class="kw-2">&amp;</span>server_key));
-
-        <span class="attr">#[cfg(feature = <span class="string">&quot;quic&quot;</span>)]
-        </span>{
-            cx.common.quic.traffic_secrets =
-                <span class="prelude-val">Some</span>(quic::Secrets::new(_client_key, server_key, suite, <span class="bool-val">false</span>));
-        }
-
-        key_schedule_traffic
+        </span>key_schedule.into_traffic_with_client_finished_pending(
+            hash_at_server_fin,
+            <span class="kw-2">&amp;*</span>config.key_log,
+            <span class="kw-2">&amp;</span>randoms.client,
+            cx.common,
+        )
     }
 }
 
@@ -2289,7 +2221,7 @@
     transcript: HandshakeHash,
     suite: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>Tls13CipherSuite,
     key_schedule: KeyScheduleTrafficWithClientFinishedPending,
-    send_ticket: bool,
+    send_tickets: usize,
 }
 
 <span class="kw">impl </span>State&lt;ServerConnectionData&gt; <span class="kw">for </span>ExpectCertificate {
@@ -2304,9 +2236,7 @@
         <span class="comment">// We don&#39;t send any CertificateRequest extensions, so any extensions
         // here are illegal.
         </span><span class="kw">if </span>certp.any_entry_has_extension() {
-            <span class="kw">return </span><span class="prelude-val">Err</span>(Error::PeerMisbehavedError(
-                <span class="string">&quot;client sent unsolicited cert extension&quot;</span>.to_string(),
-            ));
+            <span class="kw">return </span><span class="prelude-val">Err</span>(PeerMisbehaved::UnsolicitedCertExtension.into());
         }
 
         <span class="kw">let </span>client_cert = certp.convert();
@@ -2314,13 +2244,7 @@
         <span class="kw">let </span>mandatory = <span class="self">self
             </span>.config
             .verifier
-            .client_auth_mandatory()
-            .ok_or_else(|| {
-                <span class="macro">debug!</span>(<span class="string">&quot;could not determine if client auth is mandatory based on SNI&quot;</span>);
-                cx.common
-                    .send_fatal_alert(AlertDescription::AccessDenied);
-                Error::General(<span class="string">&quot;client rejected by client_auth_mandatory&quot;</span>.into())
-            })<span class="question-mark">?</span>;
+            .client_auth_mandatory();
 
         <span class="kw">let </span>(end_entity, intermediates) = <span class="kw">match </span>client_cert.split_first() {
             <span class="prelude-val">None </span>=&gt; {
@@ -2332,13 +2256,14 @@
                         suite: <span class="self">self</span>.suite,
                         key_schedule: <span class="self">self</span>.key_schedule,
                         transcript: <span class="self">self</span>.transcript,
-                        send_ticket: <span class="self">self</span>.send_ticket,
+                        send_tickets: <span class="self">self</span>.send_tickets,
                     }));
                 }
 
-                cx.common
-                    .send_fatal_alert(AlertDescription::CertificateRequired);
-                <span class="kw">return </span><span class="prelude-val">Err</span>(Error::NoCertificatesPresented);
+                <span class="kw">return </span><span class="prelude-val">Err</span>(cx.common.send_fatal_alert(
+                    AlertDescription::CertificateRequired,
+                    Error::NoCertificatesPresented,
+                ));
             }
             <span class="prelude-val">Some</span>(chain) =&gt; chain,
         };
@@ -2348,8 +2273,8 @@
             .verifier
             .verify_client_cert(end_entity, intermediates, now)
             .map_err(|err| {
-                hs::incompatible(cx.common, <span class="string">&quot;certificate invalid&quot;</span>);
-                err
+                cx.common
+                    .send_cert_verify_error_alert(err)
             })<span class="question-mark">?</span>;
 
         <span class="prelude-val">Ok</span>(Box::new(ExpectCertificateVerify {
@@ -2358,7 +2283,7 @@
             transcript: <span class="self">self</span>.transcript,
             key_schedule: <span class="self">self</span>.key_schedule,
             client_cert,
-            send_ticket: <span class="self">self</span>.send_ticket,
+            send_tickets: <span class="self">self</span>.send_tickets,
         }))
     }
 }
@@ -2369,7 +2294,7 @@
     suite: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>Tls13CipherSuite,
     key_schedule: KeyScheduleTrafficWithClientFinishedPending,
     client_cert: Vec&lt;Certificate&gt;,
-    send_ticket: bool,
+    send_tickets: usize,
 }
 
 <span class="kw">impl </span>State&lt;ServerConnectionData&gt; <span class="kw">for </span>ExpectCertificateVerify {
@@ -2391,9 +2316,9 @@
         };
 
         <span class="kw">if let </span><span class="prelude-val">Err</span>(e) = rc {
-            cx.common
-                .send_fatal_alert(AlertDescription::AccessDenied);
-            <span class="kw">return </span><span class="prelude-val">Err</span>(e);
+            <span class="kw">return </span><span class="prelude-val">Err</span>(cx
+                .common
+                .send_cert_verify_error_alert(e));
         }
 
         <span class="macro">trace!</span>(<span class="string">&quot;client CertificateVerify OK&quot;</span>);
@@ -2405,7 +2330,7 @@
             suite: <span class="self">self</span>.suite,
             key_schedule: <span class="self">self</span>.key_schedule,
             transcript: <span class="self">self</span>.transcript,
-            send_ticket: <span class="self">self</span>.send_ticket,
+            send_tickets: <span class="self">self</span>.send_tickets,
         }))
     }
 }
@@ -2418,7 +2343,7 @@
     transcript: HandshakeHash,
     suite: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>Tls13CipherSuite,
     key_schedule: KeyScheduleTrafficWithClientFinishedPending,
-    send_ticket: bool,
+    send_tickets: usize,
 }
 
 <span class="kw">impl </span>State&lt;ServerConnectionData&gt; <span class="kw">for </span>ExpectEarlyData {
@@ -2431,13 +2356,10 @@
                     .take_received_plaintext(payload)
                 {
                     <span class="bool-val">true </span>=&gt; <span class="prelude-val">Ok</span>(<span class="self">self</span>),
-                    <span class="bool-val">false </span>=&gt; {
-                        cx.common
-                            .send_fatal_alert(AlertDescription::UnexpectedMessage);
-                        <span class="prelude-val">Err</span>(Error::PeerMisbehavedError(
-                            <span class="string">&quot;too much early_data received&quot;</span>.into(),
-                        ))
-                    }
+                    <span class="bool-val">false </span>=&gt; <span class="prelude-val">Err</span>(cx.common.send_fatal_alert(
+                        AlertDescription::UnexpectedMessage,
+                        PeerMisbehaved::TooMuchEarlyDataReceived,
+                    )),
                 }
             }
             MessagePayload::Handshake {
@@ -2448,20 +2370,15 @@
                     },
                 ..
             } =&gt; {
-                cx.common
-                    .record_layer
-                    .set_message_decrypter(
-                        <span class="self">self</span>.suite
-                            .derive_decrypter(<span class="self">self</span>.key_schedule.client_key()),
-                    );
-
+                <span class="self">self</span>.key_schedule
+                    .update_decrypter(cx.common);
                 <span class="self">self</span>.transcript.add_message(<span class="kw-2">&amp;</span>m);
                 <span class="prelude-val">Ok</span>(Box::new(ExpectFinished {
                     config: <span class="self">self</span>.config,
                     suite: <span class="self">self</span>.suite,
                     key_schedule: <span class="self">self</span>.key_schedule,
                     transcript: <span class="self">self</span>.transcript,
-                    send_ticket: <span class="self">self</span>.send_ticket,
+                    send_tickets: <span class="self">self</span>.send_tickets,
                 }))
             }
             payload =&gt; <span class="prelude-val">Err</span>(inappropriate_handshake_message(
@@ -2475,7 +2392,7 @@
 
 <span class="comment">// --- Process client&#39;s Finished ---
 </span><span class="kw">fn </span>get_server_session_value(
-    transcript: <span class="kw-2">&amp;mut </span>HandshakeHash,
+    transcript: <span class="kw-2">&amp;</span>HandshakeHash,
     suite: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>Tls13CipherSuite,
     key_schedule: <span class="kw-2">&amp;</span>KeyScheduleTraffic,
     cx: <span class="kw-2">&amp;</span>ServerContext&lt;<span class="lifetime">&#39;_</span>&gt;,
@@ -2507,12 +2424,12 @@
     transcript: HandshakeHash,
     suite: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>Tls13CipherSuite,
     key_schedule: KeyScheduleTrafficWithClientFinishedPending,
-    send_ticket: bool,
+    send_tickets: usize,
 }
 
 <span class="kw">impl </span>ExpectFinished {
     <span class="kw">fn </span>emit_ticket(
-        transcript: <span class="kw-2">&amp;mut </span>HandshakeHash,
+        transcript: <span class="kw-2">&amp;</span>HandshakeHash,
         suite: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>Tls13CipherSuite,
         cx: <span class="kw-2">&amp;mut </span>ServerContext&lt;<span class="lifetime">&#39;_</span>&gt;,
         key_schedule: <span class="kw-2">&amp;</span>KeyScheduleTraffic,
@@ -2570,7 +2487,6 @@
         };
 
         <span class="macro">trace!</span>(<span class="string">&quot;sending new ticket {:?} (stateless: {})&quot;</span>, m, stateless);
-        transcript.add_message(<span class="kw-2">&amp;</span>m);
         cx.common.send_msg(m, <span class="bool-val">true</span>);
         <span class="prelude-val">Ok</span>(())
     }
@@ -2582,16 +2498,15 @@
             <span class="macro">require_handshake_msg!</span>(m, HandshakeType::Finished, HandshakePayload::Finished)<span class="question-mark">?</span>;
 
         <span class="kw">let </span>handshake_hash = <span class="self">self</span>.transcript.get_current_hash();
-        <span class="kw">let </span>(key_schedule_traffic, expect_verify_data, client_key) = <span class="self">self
+        <span class="kw">let </span>(key_schedule_traffic, expect_verify_data) = <span class="self">self
             </span>.key_schedule
-            .sign_client_finish(<span class="kw-2">&amp;</span>handshake_hash);
+            .sign_client_finish(<span class="kw-2">&amp;</span>handshake_hash, cx.common);
 
         <span class="kw">let </span>fin = constant_time::verify_slices_are_equal(expect_verify_data.as_ref(), <span class="kw-2">&amp;</span>finished.<span class="number">0</span>)
             .map_err(|<span class="kw">_</span>| {
-                cx.common
-                    .send_fatal_alert(AlertDescription::DecryptError);
                 <span class="macro">warn!</span>(<span class="string">&quot;Finished wrong&quot;</span>);
-                Error::DecryptError
+                cx.common
+                    .send_fatal_alert(AlertDescription::DecryptError, Error::DecryptError)
             })
             .map(|<span class="kw">_</span>| verify::FinishedMessageVerified::assertion())<span class="question-mark">?</span>;
 
@@ -2601,14 +2516,9 @@
 
         cx.common.check_aligned_handshake()<span class="question-mark">?</span>;
 
-        <span class="comment">// Install keying to read future messages.
-        </span>cx.common
-            .record_layer
-            .set_message_decrypter(<span class="self">self</span>.suite.derive_decrypter(<span class="kw-2">&amp;</span>client_key));
-
-        <span class="kw">if </span><span class="self">self</span>.send_ticket {
+        <span class="kw">for _ in </span><span class="number">0</span>..<span class="self">self</span>.send_tickets {
             <span class="self">Self</span>::emit_ticket(
-                <span class="kw-2">&amp;mut </span><span class="self">self</span>.transcript,
+                <span class="kw-2">&amp;</span><span class="self">self</span>.transcript,
                 <span class="self">self</span>.suite,
                 cx,
                 <span class="kw-2">&amp;</span>key_schedule_traffic,
@@ -2630,9 +2540,7 @@
         }
 
         <span class="prelude-val">Ok</span>(Box::new(ExpectTraffic {
-            suite: <span class="self">self</span>.suite,
             key_schedule: key_schedule_traffic,
-            want_write_key_update: <span class="bool-val">false</span>,
             _fin_verified: fin,
         }))
     }
@@ -2640,9 +2548,7 @@
 
 <span class="comment">// --- Process traffic ---
 </span><span class="kw">struct </span>ExpectTraffic {
-    suite: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>Tls13CipherSuite,
     key_schedule: KeyScheduleTraffic,
-    want_write_key_update: bool,
     _fin_verified: verify::FinishedMessageVerified,
 }
 
@@ -2650,42 +2556,28 @@
     <span class="kw">fn </span>handle_key_update(
         <span class="kw-2">&amp;mut </span><span class="self">self</span>,
         common: <span class="kw-2">&amp;mut </span>CommonState,
-        kur: <span class="kw-2">&amp;</span>KeyUpdateRequest,
+        key_update_request: <span class="kw-2">&amp;</span>KeyUpdateRequest,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;(), Error&gt; {
         <span class="attr">#[cfg(feature = <span class="string">&quot;quic&quot;</span>)]
         </span>{
             <span class="kw">if let </span>Protocol::Quic = common.protocol {
-                common.send_fatal_alert(AlertDescription::UnexpectedMessage);
-                <span class="kw">let </span>msg = <span class="string">&quot;KeyUpdate received in QUIC connection&quot;</span>.to_string();
-                <span class="macro">warn!</span>(<span class="string">&quot;{}&quot;</span>, msg);
-                <span class="kw">return </span><span class="prelude-val">Err</span>(Error::PeerMisbehavedError(msg));
+                <span class="kw">return </span><span class="prelude-val">Err</span>(common.send_fatal_alert(
+                    AlertDescription::UnexpectedMessage,
+                    PeerMisbehaved::KeyUpdateReceivedInQuicConnection,
+                ));
             }
         }
 
         common.check_aligned_handshake()<span class="question-mark">?</span>;
 
-        <span class="kw">match </span>kur {
-            KeyUpdateRequest::UpdateNotRequested =&gt; {}
-            KeyUpdateRequest::UpdateRequested =&gt; {
-                <span class="self">self</span>.want_write_key_update = <span class="bool-val">true</span>;
-            }
-            <span class="kw">_ </span>=&gt; {
-                common.send_fatal_alert(AlertDescription::IllegalParameter);
-                <span class="kw">return </span><span class="prelude-val">Err</span>(Error::CorruptMessagePayload(ContentType::Handshake));
-            }
+        <span class="kw">if </span>common.should_update_key(key_update_request)<span class="question-mark">? </span>{
+            <span class="self">self</span>.key_schedule
+                .update_encrypter_and_notify(common);
         }
 
         <span class="comment">// Update our read-side keys.
-        </span><span class="kw">let </span>new_read_key = <span class="self">self
-            </span>.key_schedule
-            .next_client_application_traffic_secret();
-        common
-            .record_layer
-            .set_message_decrypter(
-                <span class="self">self</span>.suite
-                    .derive_decrypter(<span class="kw-2">&amp;</span>new_read_key),
-            );
-
+        </span><span class="self">self</span>.key_schedule
+            .update_decrypter(common);
         <span class="prelude-val">Ok</span>(())
     }
 }
@@ -2726,24 +2618,10 @@
             .export_keying_material(output, label, context)
     }
 
-    <span class="kw">fn </span>perhaps_write_key_update(<span class="kw-2">&amp;mut </span><span class="self">self</span>, common: <span class="kw-2">&amp;mut </span>CommonState) {
-        <span class="kw">if </span><span class="self">self</span>.want_write_key_update {
-            <span class="self">self</span>.want_write_key_update = <span class="bool-val">false</span>;
-            common.send_msg_encrypt(Message::build_key_update_notify().into());
-
-            <span class="kw">let </span>write_key = <span class="self">self
-                </span>.key_schedule
-                .next_server_application_traffic_secret();
-            common
-                .record_layer
-                .set_message_encrypter(<span class="self">self</span>.suite.derive_encrypter(<span class="kw-2">&amp;</span>write_key));
-        }
-    }
-
     <span class="attr">#[cfg(feature = <span class="string">&quot;secret_extraction&quot;</span>)]
     </span><span class="kw">fn </span>extract_secrets(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;PartiallyExtractedSecrets, Error&gt; {
         <span class="self">self</span>.key_schedule
-            .extract_secrets(<span class="self">self</span>.suite.common.aead_algorithm, Side::Server)
+            .extract_secrets(Side::Server)
     }
 }
 

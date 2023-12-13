@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/nix/store/rw9bn419hs63s20iz4qrsgiddx2c69nb-vendor-cargo-deps/c19b7c6f923b580ac259164a89f2577984ad5ab09ee9d583b888f934adbbe8d0/ring-0.16.20/src/hmac.rs`."><title>hmac.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-cb6f1f67f1bcd037.css" id="mainThemeStyle"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="ring" data-themes="" data-resource-suffix="" data-rustdoc-version="1.73.0 (cc66ad468 2023-10-03) (built from a source tarball)" data-channel="1.73.0" data-search-js="search-6dfdfced5eff6596.js" data-settings-js="settings-de11bff964e9d4e5.js" data-settings-css="settings-8c76f75bfb6bd192.css" data-theme-light-css="light-1596385f77d47ef2.css" data-theme-dark-css="dark-0a43001d3fc2282c.css" data-theme-ayu-css="ayu-fd19013d6ce078bf.css" ><script src="../../static.files/storage-db41da1a38ea3cb8.js"></script><script defer src="../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-0795b7d26be81095.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../../static.files/light-1596385f77d47ef2.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../../static.files/dark-0a43001d3fc2282c.css"><link rel="stylesheet" href="../../static.files/noscript-cffde32267a19fd6.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../ring/index.html"><img class="rust-logo" src="../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/nix/store/8wbf91mp5aqggnly8dsfwbyfpxzfkram-vendor-cargo-deps/c19b7c6f923b580ac259164a89f2577984ad5ab09ee9d583b888f934adbbe8d0/ring-0.17.7/src/hmac.rs`."><title>hmac.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-cb6f1f67f1bcd037.css" id="mainThemeStyle"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="ring" data-themes="" data-resource-suffix="" data-rustdoc-version="1.73.0 (cc66ad468 2023-10-03) (built from a source tarball)" data-channel="1.73.0" data-search-js="search-6dfdfced5eff6596.js" data-settings-js="settings-de11bff964e9d4e5.js" data-settings-css="settings-8c76f75bfb6bd192.css" data-theme-light-css="light-1596385f77d47ef2.css" data-theme-dark-css="dark-0a43001d3fc2282c.css" data-theme-ayu-css="ayu-fd19013d6ce078bf.css" ><script src="../../static.files/storage-db41da1a38ea3cb8.js"></script><script defer src="../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-0795b7d26be81095.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../../static.files/light-1596385f77d47ef2.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../../static.files/dark-0a43001d3fc2282c.css"><link rel="stylesheet" href="../../static.files/noscript-cffde32267a19fd6.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../ring/index.html"><img class="rust-logo" src="../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -367,22 +367,6 @@
 <a href="#367" id="367">367</a>
 <a href="#368" id="368">368</a>
 <a href="#369" id="369">369</a>
-<a href="#370" id="370">370</a>
-<a href="#371" id="371">371</a>
-<a href="#372" id="372">372</a>
-<a href="#373" id="373">373</a>
-<a href="#374" id="374">374</a>
-<a href="#375" id="375">375</a>
-<a href="#376" id="376">376</a>
-<a href="#377" id="377">377</a>
-<a href="#378" id="378">378</a>
-<a href="#379" id="379">379</a>
-<a href="#380" id="380">380</a>
-<a href="#381" id="381">381</a>
-<a href="#382" id="382">382</a>
-<a href="#383" id="383">383</a>
-<a href="#384" id="384">384</a>
-<a href="#385" id="385">385</a>
 </pre></div><pre class="rust"><code><span class="comment">// Copyright 2015-2016 Brian Smith.
 //
 // Permission to use, copy, modify, and/or distribute this software for any
@@ -520,10 +504,6 @@
 <span class="doccomment">/// HMAC using SHA-512.
 </span><span class="kw">pub static </span>HMAC_SHA512: Algorithm = Algorithm(<span class="kw-2">&amp;</span>digest::SHA512);
 
-<span class="doccomment">/// A deprecated alias for `Tag`.
-</span><span class="attr">#[deprecated(note = <span class="string">&quot;`Signature` was renamed to `Tag`. This alias will be removed soon.&quot;</span>)]
-</span><span class="kw">pub type </span>Signature = Tag;
-
 <span class="doccomment">/// An HMAC tag.
 ///
 /// For a given tag `t`, use `t.as_ref()` to get the tag value as a byte slice.
@@ -543,16 +523,6 @@
     inner: digest::BlockContext,
     outer: digest::BlockContext,
 }
-
-<span class="doccomment">/// `hmac::SigningKey` was renamed to `hmac::Key`.
-</span><span class="attr">#[deprecated(note = <span class="string">&quot;Renamed to `hmac::Key`.&quot;</span>)]
-</span><span class="kw">pub type </span>SigningKey = Key;
-
-<span class="doccomment">/// `hmac::VerificationKey` was merged into `hmac::Key`.
-</span><span class="attr">#[deprecated(
-    note = <span class="string">&quot;The distinction between verification &amp; signing keys was removed. Use `hmac::Key`.&quot;
-</span>)]
-</span><span class="kw">pub type </span>VerificationKey = Key;
 
 <span class="kw">impl </span>core::fmt::Debug <span class="kw">for </span>Key {
     <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>core::fmt::Formatter) -&gt; <span class="prelude-ty">Result</span>&lt;(), core::fmt::Error&gt; {
@@ -582,7 +552,7 @@
         </span>F: FnOnce(<span class="kw-2">&amp;mut </span>[u8]) -&gt; <span class="prelude-ty">Result</span>&lt;(), error::Unspecified&gt;,
     {
         <span class="kw">let </span><span class="kw-2">mut </span>key_bytes = [<span class="number">0</span>; digest::MAX_OUTPUT_LEN];
-        <span class="kw">let </span>key_bytes = <span class="kw-2">&amp;mut </span>key_bytes[..algorithm.<span class="number">0</span>.output_len];
+        <span class="kw">let </span>key_bytes = <span class="kw-2">&amp;mut </span>key_bytes[..algorithm.<span class="number">0</span>.output_len()];
         fill(key_bytes)<span class="question-mark">?</span>;
         <span class="prelude-val">Ok</span>(<span class="self">Self</span>::new(algorithm, key_bytes))
     }
@@ -597,8 +567,8 @@
     /// `key_value` shouldn&#39;t be a password.
     ///
     /// As specified in RFC 2104, if `key_value` is shorter than the digest
-    /// algorithm&#39;s block length (as returned by `digest::Algorithm::block_len`,
-    /// not the digest length returned by `digest::Algorithm::output_len`) then
+    /// algorithm&#39;s block length (as returned by `digest::Algorithm::block_len()`,
+    /// not the digest length returned by `digest::Algorithm::output_len()`) then
     /// it will be padded with zeros. Similarly, if it is longer than the block
     /// length then it will be compressed using the digest algorithm.
     ///
@@ -613,8 +583,10 @@
             outer: digest::BlockContext::new(digest_alg),
         };
 
+        <span class="kw">let </span>block_len = digest_alg.block_len();
+
         <span class="kw">let </span>key_hash;
-        <span class="kw">let </span>key_value = <span class="kw">if </span>key_value.len() &lt;= digest_alg.block_len {
+        <span class="kw">let </span>key_value = <span class="kw">if </span>key_value.len() &lt;= block_len {
             key_value
         } <span class="kw">else </span>{
             key_hash = digest::digest(digest_alg, key_value);
@@ -624,7 +596,7 @@
         <span class="kw">const </span>IPAD: u8 = <span class="number">0x36</span>;
 
         <span class="kw">let </span><span class="kw-2">mut </span>padded_key = [IPAD; digest::MAX_BLOCK_LEN];
-        <span class="kw">let </span>padded_key = <span class="kw-2">&amp;mut </span>padded_key[..digest_alg.block_len];
+        <span class="kw">let </span>padded_key = <span class="kw-2">&amp;mut </span>padded_key[..block_len];
 
         <span class="comment">// If the key is shorter than one block then we&#39;re supposed to act like
         // it is padded with zero bytes up to the block length. `x ^ 0 == x` so
@@ -632,7 +604,7 @@
         </span><span class="kw">for </span>(padded_key, key_value) <span class="kw">in </span>padded_key.iter_mut().zip(key_value.iter()) {
             <span class="kw-2">*</span>padded_key ^= <span class="kw-2">*</span>key_value;
         }
-        key.inner.update(<span class="kw-2">&amp;</span>padded_key);
+        key.inner.update(padded_key);
 
         <span class="kw">const </span>OPAD: u8 = <span class="number">0x5C</span>;
 
@@ -641,7 +613,7 @@
         </span><span class="kw">for </span>b <span class="kw">in </span>padded_key.iter_mut() {
             <span class="kw-2">*</span>b ^= IPAD ^ OPAD;
         }
-        key.outer.update(<span class="kw-2">&amp;</span>padded_key);
+        key.outer.update(padded_key);
 
         key
     }
@@ -655,13 +627,13 @@
 
 <span class="kw">impl </span>hkdf::KeyType <span class="kw">for </span>Algorithm {
     <span class="kw">fn </span>len(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; usize {
-        <span class="self">self</span>.digest_algorithm().output_len
+        <span class="self">self</span>.digest_algorithm().output_len()
     }
 }
 
 <span class="kw">impl </span>From&lt;hkdf::Okm&lt;<span class="lifetime">&#39;_</span>, Algorithm&gt;&gt; <span class="kw">for </span>Key {
     <span class="kw">fn </span>from(okm: hkdf::Okm&lt;Algorithm&gt;) -&gt; <span class="self">Self </span>{
-        Key::construct(<span class="kw-2">*</span>okm.len(), |buf| okm.fill(buf)).unwrap()
+        <span class="self">Self</span>::construct(<span class="kw-2">*</span>okm.len(), |buf| okm.fill(buf)).unwrap()
     }
 }
 
@@ -673,10 +645,6 @@
     inner: digest::Context,
     outer: digest::BlockContext,
 }
-
-<span class="doccomment">/// `hmac::SigningContext` was renamed to `hmac::Context`.
-</span><span class="attr">#[deprecated(note = <span class="string">&quot;Renamed to `hmac::Context`.&quot;</span>)]
-</span><span class="kw">pub type </span>SigningContext = Context;
 
 <span class="kw">impl </span>core::fmt::Debug <span class="kw">for </span>Context {
     <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>core::fmt::Formatter) -&gt; <span class="prelude-ty">Result</span>&lt;(), core::fmt::Error&gt; {
@@ -712,8 +680,8 @@
     </span><span class="kw">pub fn </span>sign(<span class="self">self</span>) -&gt; Tag {
         <span class="kw">let </span>algorithm = <span class="self">self</span>.inner.algorithm();
         <span class="kw">let </span><span class="kw-2">mut </span>pending = [<span class="number">0u8</span>; digest::MAX_BLOCK_LEN];
-        <span class="kw">let </span>pending = <span class="kw-2">&amp;mut </span>pending[..algorithm.block_len];
-        <span class="kw">let </span>num_pending = algorithm.output_len;
+        <span class="kw">let </span>pending = <span class="kw-2">&amp;mut </span>pending[..algorithm.block_len()];
+        <span class="kw">let </span>num_pending = algorithm.output_len();
         pending[..num_pending].copy_from_slice(<span class="self">self</span>.inner.finish().as_ref());
         Tag(<span class="self">self</span>.outer.finish(pending, num_pending))
     }

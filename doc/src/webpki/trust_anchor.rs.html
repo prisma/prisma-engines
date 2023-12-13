@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/nix/store/rw9bn419hs63s20iz4qrsgiddx2c69nb-vendor-cargo-deps/c19b7c6f923b580ac259164a89f2577984ad5ab09ee9d583b888f934adbbe8d0/webpki-0.22.0/src/trust_anchor.rs`."><title>trust_anchor.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-cb6f1f67f1bcd037.css" id="mainThemeStyle"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="webpki" data-themes="" data-resource-suffix="" data-rustdoc-version="1.73.0 (cc66ad468 2023-10-03) (built from a source tarball)" data-channel="1.73.0" data-search-js="search-6dfdfced5eff6596.js" data-settings-js="settings-de11bff964e9d4e5.js" data-settings-css="settings-8c76f75bfb6bd192.css" data-theme-light-css="light-1596385f77d47ef2.css" data-theme-dark-css="dark-0a43001d3fc2282c.css" data-theme-ayu-css="ayu-fd19013d6ce078bf.css" ><script src="../../static.files/storage-db41da1a38ea3cb8.js"></script><script defer src="../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-0795b7d26be81095.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../../static.files/light-1596385f77d47ef2.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../../static.files/dark-0a43001d3fc2282c.css"><link rel="stylesheet" href="../../static.files/noscript-cffde32267a19fd6.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../webpki/index.html"><img class="rust-logo" src="../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/nix/store/8wbf91mp5aqggnly8dsfwbyfpxzfkram-vendor-cargo-deps/c19b7c6f923b580ac259164a89f2577984ad5ab09ee9d583b888f934adbbe8d0/rustls-webpki-0.101.7/src/trust_anchor.rs`."><title>trust_anchor.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-cb6f1f67f1bcd037.css" id="mainThemeStyle"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="webpki" data-themes="" data-resource-suffix="" data-rustdoc-version="1.73.0 (cc66ad468 2023-10-03) (built from a source tarball)" data-channel="1.73.0" data-search-js="search-6dfdfced5eff6596.js" data-settings-js="settings-de11bff964e9d4e5.js" data-settings-css="settings-8c76f75bfb6bd192.css" data-theme-light-css="light-1596385f77d47ef2.css" data-theme-dark-css="dark-0a43001d3fc2282c.css" data-theme-ayu-css="ayu-fd19013d6ce078bf.css" ><script src="../../static.files/storage-db41da1a38ea3cb8.js"></script><script defer src="../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-0795b7d26be81095.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../../static.files/light-1596385f77d47ef2.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../../static.files/dark-0a43001d3fc2282c.css"><link rel="stylesheet" href="../../static.files/noscript-cffde32267a19fd6.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../webpki/index.html"><img class="rust-logo" src="../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -116,12 +116,8 @@
 <a href="#116" id="116">116</a>
 <a href="#117" id="117">117</a>
 <a href="#118" id="118">118</a>
-<a href="#119" id="119">119</a>
-</pre></div><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::cert::{certificate_serial_number, Cert};
-<span class="kw">use crate</span>::{
-    cert::{parse_cert_internal, EndEntityOrCa},
-    der, Error,
-};
+</pre></div><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::cert::{lenient_certificate_serial_number, Cert, EndEntityOrCa};
+<span class="kw">use crate</span>::{der, Error};
 
 <span class="doccomment">/// A trust anchor (a.k.a. root CA).
 ///
@@ -129,8 +125,8 @@
 /// anchors as full X.509 root certificates. However, those certificates
 /// contain a lot more data than is needed for verifying certificates. The
 /// `TrustAnchor` representation allows an application to store just the
-/// essential elements of trust anchors. The `webpki::trust_anchor_util` module
-/// provides functions for converting X.509 certificates to to the minimized
+/// essential elements of trust anchors. The `TrustAnchor::try_from_cert_der`
+/// function allows converting X.509 certificates to to the minimized
 /// `TrustAnchor` representation, either at runtime or in a build script.
 </span><span class="attr">#[derive(Debug)]
 </span><span class="kw">pub struct </span>TrustAnchor&lt;<span class="lifetime">&#39;a</span>&gt; {
@@ -146,11 +142,25 @@
 }
 
 <span class="doccomment">/// Trust anchors which may be used for authenticating servers.
-</span><span class="attr">#[derive(Debug)]
+</span><span class="attr">#[deprecated(
+    since = <span class="string">&quot;0.101.2&quot;</span>,
+    note = <span class="string">&quot;The per-usage trust anchor representations and verification functions are deprecated in \
+        favor of the general-purpose `TrustAnchor` type and `EndEntity::verify_for_usage` function. \
+        The new `verify_for_usage` function expresses trust anchor and end entity purpose with the \
+        key usage argument.&quot;
+</span>)]
+#[derive(Debug)]
 </span><span class="kw">pub struct </span>TlsServerTrustAnchors&lt;<span class="lifetime">&#39;a</span>&gt;(<span class="kw">pub </span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>[TrustAnchor&lt;<span class="lifetime">&#39;a</span>&gt;]);
 
 <span class="doccomment">/// Trust anchors which may be used for authenticating clients.
-</span><span class="attr">#[derive(Debug)]
+</span><span class="attr">#[deprecated(
+    since = <span class="string">&quot;0.101.2&quot;</span>,
+    note = <span class="string">&quot;The per-usage trust anchor representations and verification functions are deprecated in \
+        favor of the general-purpose `TrustAnchor` type and `EndEntity::verify_for_usage` function. \
+        The new `verify_for_usage` function expresses trust anchor and end entity purpose with the \
+        key usage argument.&quot;
+</span>)]
+#[derive(Debug)]
 </span><span class="kw">pub struct </span>TlsClientTrustAnchors&lt;<span class="lifetime">&#39;a</span>&gt;(<span class="kw">pub </span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>[TrustAnchor&lt;<span class="lifetime">&#39;a</span>&gt;]);
 
 <span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; TrustAnchor&lt;<span class="lifetime">&#39;a</span>&gt; {
@@ -165,31 +175,50 @@
         // because we don&#39;t have a reference to a child cert, which is needed for
         // `EndEntityOrCA::CA`. For this purpose, it doesn&#39;t matter.
         //
-        // v1 certificates will result in `Error::BadDER` because `parse_cert` will
+        // v1 certificates will result in `Error::BadDer` because `parse_cert` will
         // expect a version field that isn&#39;t there. In that case, try to parse the
         // certificate using a special parser for v1 certificates. Notably, that
         // parser doesn&#39;t allow extensions, so there&#39;s no need to worry about
         // embedded name constraints in a v1 certificate.
-        </span><span class="kw">match </span>parse_cert_internal(
-            cert_der,
-            EndEntityOrCa::EndEntity,
-            possibly_invalid_certificate_serial_number,
-        ) {
+        </span><span class="kw">match </span>Cert::from_der(cert_der, EndEntityOrCa::EndEntity) {
             <span class="prelude-val">Ok</span>(cert) =&gt; <span class="prelude-val">Ok</span>(<span class="self">Self</span>::from(cert)),
-            <span class="prelude-val">Err</span>(Error::UnsupportedCertVersion) =&gt; parse_cert_v1(cert_der).or(<span class="prelude-val">Err</span>(Error::BadDer)),
+            <span class="prelude-val">Err</span>(Error::UnsupportedCertVersion) =&gt; {
+                <span class="self">Self</span>::from_v1_der(cert_der).or(<span class="prelude-val">Err</span>(Error::BadDer))
+            }
             <span class="prelude-val">Err</span>(err) =&gt; <span class="prelude-val">Err</span>(err),
         }
     }
-}
 
-<span class="kw">fn </span>possibly_invalid_certificate_serial_number(input: <span class="kw-2">&amp;mut </span>untrusted::Reader) -&gt; <span class="prelude-ty">Result</span>&lt;(), Error&gt; {
-    <span class="comment">// https://tools.ietf.org/html/rfc5280#section-4.1.2.2:
-    // * Conforming CAs MUST NOT use serialNumber values longer than 20 octets.&quot;
-    // * &quot;The serial number MUST be a positive integer [...]&quot;
-    //
-    // However, we don&#39;t enforce these constraints on trust anchors, as there
-    // are widely-deployed trust anchors that violate these constraints.
-    </span>skip(input, der::Tag::Integer)
+    <span class="doccomment">/// Parses a v1 certificate directly into a TrustAnchor.
+    </span><span class="kw">fn </span>from_v1_der(cert_der: untrusted::Input&lt;<span class="lifetime">&#39;a</span>&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, Error&gt; {
+        <span class="comment">// X.509 Certificate: https://tools.ietf.org/html/rfc5280#section-4.1.
+        </span>cert_der.read_all(Error::BadDer, |cert_der| {
+            der::nested(cert_der, der::Tag::Sequence, Error::BadDer, |cert_der| {
+                <span class="kw">let </span>anchor = der::nested(cert_der, der::Tag::Sequence, Error::BadDer, |tbs| {
+                    <span class="comment">// The version number field does not appear in v1 certificates.
+                    </span>lenient_certificate_serial_number(tbs)<span class="question-mark">?</span>;
+
+                    skip(tbs, der::Tag::Sequence)<span class="question-mark">?</span>; <span class="comment">// signature.
+                    </span>skip(tbs, der::Tag::Sequence)<span class="question-mark">?</span>; <span class="comment">// issuer.
+                    </span>skip(tbs, der::Tag::Sequence)<span class="question-mark">?</span>; <span class="comment">// validity.
+                    </span><span class="kw">let </span>subject = der::expect_tag_and_get_value(tbs, der::Tag::Sequence)<span class="question-mark">?</span>;
+                    <span class="kw">let </span>spki = der::expect_tag_and_get_value(tbs, der::Tag::Sequence)<span class="question-mark">?</span>;
+
+                    <span class="prelude-val">Ok</span>(TrustAnchor {
+                        subject: subject.as_slice_less_safe(),
+                        spki: spki.as_slice_less_safe(),
+                        name_constraints: <span class="prelude-val">None</span>,
+                    })
+                });
+
+                <span class="comment">// read and discard signatureAlgorithm + signature
+                </span>skip(cert_der, der::Tag::Sequence)<span class="question-mark">?</span>;
+                skip(cert_der, der::Tag::BitString)<span class="question-mark">?</span>;
+
+                anchor
+            })
+        })
+    }
 }
 
 <span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; From&lt;Cert&lt;<span class="lifetime">&#39;a</span>&gt;&gt; <span class="kw">for </span>TrustAnchor&lt;<span class="lifetime">&#39;a</span>&gt; {
@@ -200,37 +229,6 @@
             name_constraints: cert.name_constraints.map(|nc| nc.as_slice_less_safe()),
         }
     }
-}
-
-<span class="doccomment">/// Parses a v1 certificate directly into a TrustAnchor.
-</span><span class="kw">fn </span>parse_cert_v1(cert_der: untrusted::Input) -&gt; <span class="prelude-ty">Result</span>&lt;TrustAnchor, Error&gt; {
-    <span class="comment">// X.509 Certificate: https://tools.ietf.org/html/rfc5280#section-4.1.
-    </span>cert_der.read_all(Error::BadDer, |cert_der| {
-        der::nested(cert_der, der::Tag::Sequence, Error::BadDer, |cert_der| {
-            <span class="kw">let </span>anchor = der::nested(cert_der, der::Tag::Sequence, Error::BadDer, |tbs| {
-                <span class="comment">// The version number field does not appear in v1 certificates.
-                </span>certificate_serial_number(tbs)<span class="question-mark">?</span>;
-
-                skip(tbs, der::Tag::Sequence)<span class="question-mark">?</span>; <span class="comment">// signature.
-                </span>skip(tbs, der::Tag::Sequence)<span class="question-mark">?</span>; <span class="comment">// issuer.
-                </span>skip(tbs, der::Tag::Sequence)<span class="question-mark">?</span>; <span class="comment">// validity.
-                </span><span class="kw">let </span>subject = der::expect_tag_and_get_value(tbs, der::Tag::Sequence)<span class="question-mark">?</span>;
-                <span class="kw">let </span>spki = der::expect_tag_and_get_value(tbs, der::Tag::Sequence)<span class="question-mark">?</span>;
-
-                <span class="prelude-val">Ok</span>(TrustAnchor {
-                    subject: subject.as_slice_less_safe(),
-                    spki: spki.as_slice_less_safe(),
-                    name_constraints: <span class="prelude-val">None</span>,
-                })
-            });
-
-            <span class="comment">// read and discard signatureAlgorithm + signature
-            </span>skip(cert_der, der::Tag::Sequence)<span class="question-mark">?</span>;
-            skip(cert_der, der::Tag::BitString)<span class="question-mark">?</span>;
-
-            anchor
-        })
-    })
 }
 
 <span class="kw">fn </span>skip(input: <span class="kw-2">&amp;mut </span>untrusted::Reader, tag: der::Tag) -&gt; <span class="prelude-ty">Result</span>&lt;(), Error&gt; {

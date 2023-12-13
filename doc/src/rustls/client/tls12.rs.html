@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/nix/store/rw9bn419hs63s20iz4qrsgiddx2c69nb-vendor-cargo-deps/c19b7c6f923b580ac259164a89f2577984ad5ab09ee9d583b888f934adbbe8d0/rustls-0.20.8/src/client/tls12.rs`."><title>tls12.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-cb6f1f67f1bcd037.css" id="mainThemeStyle"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="rustls" data-themes="" data-resource-suffix="" data-rustdoc-version="1.73.0 (cc66ad468 2023-10-03) (built from a source tarball)" data-channel="1.73.0" data-search-js="search-6dfdfced5eff6596.js" data-settings-js="settings-de11bff964e9d4e5.js" data-settings-css="settings-8c76f75bfb6bd192.css" data-theme-light-css="light-1596385f77d47ef2.css" data-theme-dark-css="dark-0a43001d3fc2282c.css" data-theme-ayu-css="ayu-fd19013d6ce078bf.css" ><script src="../../../static.files/storage-db41da1a38ea3cb8.js"></script><script defer src="../../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-0795b7d26be81095.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../../../static.files/light-1596385f77d47ef2.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../../../static.files/dark-0a43001d3fc2282c.css"><link rel="stylesheet" href="../../../static.files/noscript-cffde32267a19fd6.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../../rustls/index.html"><img class="rust-logo" src="../../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/nix/store/8wbf91mp5aqggnly8dsfwbyfpxzfkram-vendor-cargo-deps/c19b7c6f923b580ac259164a89f2577984ad5ab09ee9d583b888f934adbbe8d0/rustls-0.21.10/src/client/tls12.rs`."><title>tls12.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-cb6f1f67f1bcd037.css" id="mainThemeStyle"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="rustls" data-themes="" data-resource-suffix="" data-rustdoc-version="1.73.0 (cc66ad468 2023-10-03) (built from a source tarball)" data-channel="1.73.0" data-search-js="search-6dfdfced5eff6596.js" data-settings-js="settings-de11bff964e9d4e5.js" data-settings-css="settings-8c76f75bfb6bd192.css" data-theme-light-css="light-1596385f77d47ef2.css" data-theme-dark-css="dark-0a43001d3fc2282c.css" data-theme-ayu-css="ayu-fd19013d6ce078bf.css" ><script src="../../../static.files/storage-db41da1a38ea3cb8.js"></script><script defer src="../../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-0795b7d26be81095.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../../../static.files/light-1596385f77d47ef2.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../../../static.files/dark-0a43001d3fc2282c.css"><link rel="stylesheet" href="../../../static.files/noscript-cffde32267a19fd6.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../../rustls/index.html"><img class="rust-logo" src="../../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -1116,21 +1116,33 @@
 <a href="#1116" id="1116">1116</a>
 <a href="#1117" id="1117">1117</a>
 <a href="#1118" id="1118">1118</a>
+<a href="#1119" id="1119">1119</a>
+<a href="#1120" id="1120">1120</a>
+<a href="#1121" id="1121">1121</a>
+<a href="#1122" id="1122">1122</a>
+<a href="#1123" id="1123">1123</a>
+<a href="#1124" id="1124">1124</a>
+<a href="#1125" id="1125">1125</a>
+<a href="#1126" id="1126">1126</a>
+<a href="#1127" id="1127">1127</a>
+<a href="#1128" id="1128">1128</a>
+<a href="#1129" id="1129">1129</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::check::{inappropriate_handshake_message, inappropriate_message};
-<span class="kw">use </span><span class="kw">crate</span>::conn::{CommonState, ConnectionRandoms, Side, State};
+<span class="kw">use </span><span class="kw">crate</span>::common_state::{CommonState, Side, State};
+<span class="kw">use </span><span class="kw">crate</span>::conn::ConnectionRandoms;
 <span class="kw">use </span><span class="kw">crate</span>::enums::ProtocolVersion;
-<span class="kw">use </span><span class="kw">crate</span>::error::Error;
+<span class="kw">use </span><span class="kw">crate</span>::enums::{AlertDescription, ContentType, HandshakeType};
+<span class="kw">use </span><span class="kw">crate</span>::error::{Error, InvalidMessage, PeerMisbehaved};
 <span class="kw">use </span><span class="kw">crate</span>::hash_hs::HandshakeHash;
+<span class="kw">use </span><span class="kw">crate</span>::kx;
 <span class="attr">#[cfg(feature = <span class="string">&quot;logging&quot;</span>)]
-</span><span class="kw">use </span><span class="kw">crate</span>::log::{debug, trace};
+</span><span class="kw">use </span><span class="kw">crate</span>::log::{debug, trace, warn};
 <span class="kw">use </span><span class="kw">crate</span>::msgs::base::{Payload, PayloadU8};
 <span class="kw">use </span><span class="kw">crate</span>::msgs::ccs::ChangeCipherSpecPayload;
 <span class="kw">use </span><span class="kw">crate</span>::msgs::codec::Codec;
-<span class="kw">use </span><span class="kw">crate</span>::msgs::enums::AlertDescription;
-<span class="kw">use </span><span class="kw">crate</span>::msgs::enums::{ContentType, HandshakeType};
 <span class="kw">use </span><span class="kw">crate</span>::msgs::handshake::{
-    CertificatePayload, DecomposedSignatureScheme, DigitallySignedStruct, HandshakeMessagePayload,
-    HandshakePayload, NewSessionTicketPayload, SCTList, ServerECDHParams, SessionID,
+    CertificatePayload, HandshakeMessagePayload, HandshakePayload, NewSessionTicketPayload, Sct,
+    ServerECDHParams, SessionId,
 };
 <span class="kw">use </span><span class="kw">crate</span>::msgs::message::{Message, MessagePayload};
 <span class="kw">use </span><span class="kw">crate</span>::msgs::persist;
@@ -1140,7 +1152,7 @@
 <span class="kw">use </span><span class="kw">crate</span>::suites::SupportedCipherSuite;
 <span class="kw">use </span><span class="kw">crate</span>::ticketer::TimeBase;
 <span class="kw">use </span><span class="kw">crate</span>::tls12::{<span class="self">self</span>, ConnectionSecrets, Tls12CipherSuite};
-<span class="kw">use crate</span>::{kx, verify};
+<span class="kw">use </span><span class="kw">crate</span>::verify::{<span class="self">self</span>, DigitallySignedStruct};
 
 <span class="kw">use </span><span class="kw">super</span>::client_conn::ClientConnectionData;
 <span class="kw">use </span><span class="kw">super</span>::hs::ClientContext;
@@ -1188,9 +1200,12 @@
             // public values and don&#39;t require constant time comparison
             </span><span class="kw">let </span>has_downgrade_marker = <span class="self">self</span>.randoms.server[<span class="number">24</span>..] == tls12::DOWNGRADE_SENTINEL;
             <span class="kw">if </span>tls13_supported &amp;&amp; has_downgrade_marker {
-                <span class="kw">return </span><span class="prelude-val">Err</span>(cx
-                    .common
-                    .illegal_param(<span class="string">&quot;downgrade to TLS1.2 when TLS1.3 is supported&quot;</span>));
+                <span class="kw">return </span><span class="prelude-val">Err</span>({
+                    cx.common.send_fatal_alert(
+                        AlertDescription::IllegalParameter,
+                        PeerMisbehaved::AttemptedDowngradeToTls12WhenTls13IsSupported,
+                    )
+                });
             }
 
             <span class="comment">// Doing EMS?
@@ -1221,10 +1236,9 @@
                 <span class="macro">debug!</span>(<span class="string">&quot;Server sent {:?} SCTs&quot;</span>, sct_list.len());
 
                 <span class="kw">if </span>hs::sct_list_is_invalid(sct_list) {
-                    <span class="kw">let </span>error_msg = <span class="string">&quot;server sent invalid SCT list&quot;</span>.to_string();
-                    <span class="kw">return </span><span class="prelude-val">Err</span>(Error::PeerMisbehavedError(error_msg));
+                    <span class="kw">return </span><span class="prelude-val">Err</span>(PeerMisbehaved::InvalidSctList.into());
                 }
-                <span class="prelude-val">Some</span>(sct_list.clone())
+                <span class="prelude-val">Some</span>(sct_list.to_owned())
             } <span class="kw">else </span>{
                 <span class="prelude-val">None
             </span>};
@@ -1236,15 +1250,12 @@
 
                     <span class="comment">// Is the server telling lies about the ciphersuite?
                     </span><span class="kw">if </span>resuming.suite() != suite {
-                        <span class="kw">let </span>error_msg =
-                            <span class="string">&quot;abbreviated handshake offered, but with varied cs&quot;</span>.to_string();
-                        <span class="kw">return </span><span class="prelude-val">Err</span>(Error::PeerMisbehavedError(error_msg));
+                        <span class="kw">return </span><span class="prelude-val">Err</span>(PeerMisbehaved::ResumptionOfferedWithVariedCipherSuite.into());
                     }
 
                     <span class="comment">// And about EMS support?
                     </span><span class="kw">if </span>resuming.extended_ms() != <span class="self">self</span>.using_ems {
-                        <span class="kw">let </span>error_msg = <span class="string">&quot;server varied ems support over resume&quot;</span>.to_string();
-                        <span class="kw">return </span><span class="prelude-val">Err</span>(Error::PeerMisbehavedError(error_msg));
+                        <span class="kw">return </span><span class="prelude-val">Err</span>(PeerMisbehaved::ResumptionOfferedWithVariedEms.into());
                     }
 
                     <span class="kw">let </span>secrets =
@@ -1314,7 +1325,7 @@
 <span class="kw">struct </span>ExpectCertificate {
     config: Arc&lt;ClientConfig&gt;,
     resuming_session: <span class="prelude-ty">Option</span>&lt;persist::Tls12ClientSessionValue&gt;,
-    session_id: SessionID,
+    session_id: SessionId,
     server_name: ServerName,
     randoms: ConnectionRandoms,
     using_ems: bool,
@@ -1322,7 +1333,7 @@
     <span class="kw">pub</span>(<span class="kw">super</span>) suite: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>Tls12CipherSuite,
     may_send_cert_status: bool,
     must_issue_new_ticket: bool,
-    server_cert_sct_list: <span class="prelude-ty">Option</span>&lt;SCTList&gt;,
+    server_cert_sct_list: <span class="prelude-ty">Option</span>&lt;Vec&lt;Sct&gt;&gt;,
 }
 
 <span class="kw">impl </span>State&lt;ClientConnectionData&gt; <span class="kw">for </span>ExpectCertificate {
@@ -1375,13 +1386,13 @@
 <span class="kw">struct </span>ExpectCertificateStatusOrServerKx {
     config: Arc&lt;ClientConfig&gt;,
     resuming_session: <span class="prelude-ty">Option</span>&lt;persist::Tls12ClientSessionValue&gt;,
-    session_id: SessionID,
+    session_id: SessionId,
     server_name: ServerName,
     randoms: ConnectionRandoms,
     using_ems: bool,
     transcript: HandshakeHash,
     suite: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>Tls12CipherSuite,
-    server_cert_sct_list: <span class="prelude-ty">Option</span>&lt;SCTList&gt;,
+    server_cert_sct_list: <span class="prelude-ty">Option</span>&lt;Vec&lt;Sct&gt;&gt;,
     server_cert_chain: CertificatePayload,
     must_issue_new_ticket: bool,
 }
@@ -1449,13 +1460,13 @@
 <span class="kw">struct </span>ExpectCertificateStatus {
     config: Arc&lt;ClientConfig&gt;,
     resuming_session: <span class="prelude-ty">Option</span>&lt;persist::Tls12ClientSessionValue&gt;,
-    session_id: SessionID,
+    session_id: SessionId,
     server_name: ServerName,
     randoms: ConnectionRandoms,
     using_ems: bool,
     transcript: HandshakeHash,
     suite: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>Tls12CipherSuite,
-    server_cert_sct_list: <span class="prelude-ty">Option</span>&lt;SCTList&gt;,
+    server_cert_sct_list: <span class="prelude-ty">Option</span>&lt;Vec&lt;Sct&gt;&gt;,
     server_cert_chain: CertificatePayload,
     must_issue_new_ticket: bool,
 }
@@ -1503,7 +1514,7 @@
 <span class="kw">struct </span>ExpectServerKx {
     config: Arc&lt;ClientConfig&gt;,
     resuming_session: <span class="prelude-ty">Option</span>&lt;persist::Tls12ClientSessionValue&gt;,
-    session_id: SessionID,
+    session_id: SessionId,
     server_name: ServerName,
     randoms: ConnectionRandoms,
     using_ems: bool,
@@ -1523,11 +1534,12 @@
         <span class="self">self</span>.transcript.add_message(<span class="kw-2">&amp;</span>m);
 
         <span class="kw">let </span>ecdhe = opaque_kx
-            .unwrap_given_kxa(<span class="kw-2">&amp;</span><span class="self">self</span>.suite.kx)
+            .unwrap_given_kxa(<span class="self">self</span>.suite.kx)
             .ok_or_else(|| {
-                cx.common
-                    .send_fatal_alert(AlertDescription::DecodeError);
-                Error::CorruptMessagePayload(ContentType::Handshake)
+                cx.common.send_fatal_alert(
+                    AlertDescription::DecodeError,
+                    InvalidMessage::MissingKeyExchange,
+                )
             })<span class="question-mark">?</span>;
 
         <span class="comment">// Save the signature and signed parameters for later verification.
@@ -1667,7 +1679,7 @@
 </span><span class="kw">struct </span>ExpectServerDoneOrCertReq {
     config: Arc&lt;ClientConfig&gt;,
     resuming_session: <span class="prelude-ty">Option</span>&lt;persist::Tls12ClientSessionValue&gt;,
-    session_id: SessionID,
+    session_id: SessionId,
     server_name: ServerName,
     randoms: ConnectionRandoms,
     using_ems: bool,
@@ -1729,7 +1741,7 @@
 <span class="kw">struct </span>ExpectCertificateRequest {
     config: Arc&lt;ClientConfig&gt;,
     resuming_session: <span class="prelude-ty">Option</span>&lt;persist::Tls12ClientSessionValue&gt;,
-    session_id: SessionID,
+    session_id: SessionId,
     server_name: ServerName,
     randoms: ConnectionRandoms,
     using_ems: bool,
@@ -1790,7 +1802,7 @@
 <span class="kw">struct </span>ExpectServerDone {
     config: Arc&lt;ClientConfig&gt;,
     resuming_session: <span class="prelude-ty">Option</span>&lt;persist::Tls12ClientSessionValue&gt;,
-    session_id: SessionID,
+    session_id: SessionId,
     server_name: ServerName,
     randoms: ConnectionRandoms,
     using_ems: bool,
@@ -1862,7 +1874,10 @@
                 <span class="kw-2">&amp;</span>st.server_cert.ocsp_response,
                 now,
             )
-            .map_err(|err| hs::send_cert_error_alert(cx.common, err))<span class="question-mark">?</span>;
+            .map_err(|err| {
+                cx.common
+                    .send_cert_verify_error_alert(err)
+            })<span class="question-mark">?</span>;
 
         <span class="comment">// 3.
         // Build up the contents of the signed message.
@@ -1877,18 +1892,21 @@
             </span><span class="kw">let </span>sig = <span class="kw-2">&amp;</span>st.server_kx.kx_sig;
             <span class="kw">if </span>!SupportedCipherSuite::from(suite).usable_for_signature_algorithm(sig.scheme.sign())
             {
-                <span class="kw">let </span>error_message = <span class="macro">format!</span>(
+                <span class="macro">warn!</span>(
                     <span class="string">&quot;peer signed kx with wrong algorithm (got {:?} expect {:?})&quot;</span>,
                     sig.scheme.sign(),
                     suite.sign
                 );
-                <span class="kw">return </span><span class="prelude-val">Err</span>(Error::PeerMisbehavedError(error_message));
+                <span class="kw">return </span><span class="prelude-val">Err</span>(PeerMisbehaved::SignedKxWithWrongAlgorithm.into());
             }
 
             st.config
                 .verifier
                 .verify_tls12_signature(<span class="kw-2">&amp;</span>message, <span class="kw-2">&amp;</span>st.server_cert.cert_chain[<span class="number">0</span>], sig)
-                .map_err(|err| hs::send_cert_error_alert(cx.common, err))<span class="question-mark">?
+                .map_err(|err| {
+                    cx.common
+                        .send_cert_verify_error_alert(err)
+                })<span class="question-mark">?
         </span>};
         cx.common.peer_certificates = <span class="prelude-val">Some</span>(st.server_cert.cert_chain);
 
@@ -1906,9 +1924,9 @@
             tls12::decode_ecdh_params::&lt;ServerECDHParams&gt;(cx.common, <span class="kw-2">&amp;</span>st.server_kx.kx_params)<span class="question-mark">?</span>;
         <span class="kw">let </span>group =
             kx::KeyExchange::choose(ecdh_params.curve_params.named_group, <span class="kw-2">&amp;</span>st.config.kx_groups)
-                .ok_or_else(|| {
-                    Error::PeerMisbehavedError(<span class="string">&quot;peer chose an unsupported group&quot;</span>.to_string())
-                })<span class="question-mark">?</span>;
+                .ok_or(Error::PeerMisbehaved(
+                    PeerMisbehaved::SelectedUnofferedKxGroup,
+                ))<span class="question-mark">?</span>;
         <span class="kw">let </span>kx = kx::KeyExchange::start(group).ok_or(Error::FailedToGetRandomBytes)<span class="question-mark">?</span>;
 
         <span class="comment">// 5b.
@@ -1985,7 +2003,7 @@
     config: Arc&lt;ClientConfig&gt;,
     secrets: ConnectionSecrets,
     resuming_session: <span class="prelude-ty">Option</span>&lt;persist::Tls12ClientSessionValue&gt;,
-    session_id: SessionID,
+    session_id: SessionId,
     server_name: ServerName,
     using_ems: bool,
     transcript: HandshakeHash,
@@ -2029,7 +2047,7 @@
     config: Arc&lt;ClientConfig&gt;,
     secrets: ConnectionSecrets,
     resuming_session: <span class="prelude-ty">Option</span>&lt;persist::Tls12ClientSessionValue&gt;,
-    session_id: SessionID,
+    session_id: SessionId,
     server_name: ServerName,
     using_ems: bool,
     transcript: HandshakeHash,
@@ -2078,7 +2096,7 @@
 <span class="kw">struct </span>ExpectFinished {
     config: Arc&lt;ClientConfig&gt;,
     resuming_session: <span class="prelude-ty">Option</span>&lt;persist::Tls12ClientSessionValue&gt;,
-    session_id: SessionID,
+    session_id: SessionId,
     server_name: ServerName,
     using_ems: bool,
     transcript: HandshakeHash,
@@ -2091,7 +2109,7 @@
 
 <span class="kw">impl </span>ExpectFinished {
     <span class="comment">// -- Waiting for their finished --
-    </span><span class="kw">fn </span>save_session(<span class="kw-2">&amp;mut </span><span class="self">self</span>, cx: <span class="kw-2">&amp;mut </span>ClientContext&lt;<span class="lifetime">&#39;_</span>&gt;) {
+    </span><span class="kw">fn </span>save_session(<span class="kw-2">&amp;mut </span><span class="self">self</span>, cx: <span class="kw-2">&amp;</span>ClientContext&lt;<span class="lifetime">&#39;_</span>&gt;) {
         <span class="comment">// Save a ticket.  If we got a new ticket, save that.  Otherwise, save the
         // original ticket again.
         </span><span class="kw">let </span>(<span class="kw-2">mut </span>ticket, lifetime) = <span class="kw">match </span><span class="self">self</span>.ticket.take() {
@@ -2119,8 +2137,7 @@
             }
         };
 
-        <span class="kw">let </span>key = persist::ClientSessionKey::session_for_server_name(<span class="kw-2">&amp;</span><span class="self">self</span>.server_name);
-        <span class="kw">let </span>value = persist::Tls12ClientSessionValue::new(
+        <span class="kw">let </span>session_value = persist::Tls12ClientSessionValue::new(
             <span class="self">self</span>.secrets.suite(),
             <span class="self">self</span>.session_id,
             ticket,
@@ -2134,16 +2151,10 @@
             <span class="self">self</span>.using_ems,
         );
 
-        <span class="kw">let </span>worked = <span class="self">self
-            </span>.config
-            .session_storage
-            .put(key.get_encoding(), value.get_encoding());
-
-        <span class="kw">if </span>worked {
-            <span class="macro">debug!</span>(<span class="string">&quot;Session saved&quot;</span>);
-        } <span class="kw">else </span>{
-            <span class="macro">debug!</span>(<span class="string">&quot;Session not saved&quot;</span>);
-        }
+        <span class="self">self</span>.config
+            .resumption
+            .store
+            .set_tls12_session(<span class="kw-2">&amp;</span><span class="self">self</span>.server_name, session_value);
     }
 }
 
@@ -2165,8 +2176,7 @@
             constant_time::verify_slices_are_equal(<span class="kw-2">&amp;</span>expect_verify_data, <span class="kw-2">&amp;</span>finished.<span class="number">0</span>)
                 .map_err(|<span class="kw">_</span>| {
                     cx.common
-                        .send_fatal_alert(AlertDescription::DecryptError);
-                    Error::DecryptError
+                        .send_fatal_alert(AlertDescription::DecryptError, Error::DecryptError)
                 })
                 .map(|<span class="kw">_</span>| verify::FinishedMessageVerified::assertion())<span class="question-mark">?</span>;
 
@@ -2190,6 +2200,18 @@
             _sig_verified: st.sig_verified,
             _fin_verified,
         }))
+    }
+
+    <span class="comment">// we could not decrypt the encrypted handshake message with session resumption
+    // this might mean that the ticket was invalid for some reason, so we remove it
+    // from the store to restart a session from scratch
+    </span><span class="kw">fn </span>handle_decrypt_error(<span class="kw-2">&amp;</span><span class="self">self</span>) {
+        <span class="kw">if </span><span class="self">self</span>.resuming {
+            <span class="self">self</span>.config
+                .resumption
+                .store
+                .remove_tls12_session(<span class="kw-2">&amp;</span><span class="self">self</span>.server_name);
+        }
     }
 }
 

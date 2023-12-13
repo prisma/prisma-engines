@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/nix/store/rw9bn419hs63s20iz4qrsgiddx2c69nb-vendor-cargo-deps/c19b7c6f923b580ac259164a89f2577984ad5ab09ee9d583b888f934adbbe8d0/rustls-0.20.8/src/verify.rs`."><title>verify.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-cb6f1f67f1bcd037.css" id="mainThemeStyle"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="rustls" data-themes="" data-resource-suffix="" data-rustdoc-version="1.73.0 (cc66ad468 2023-10-03) (built from a source tarball)" data-channel="1.73.0" data-search-js="search-6dfdfced5eff6596.js" data-settings-js="settings-de11bff964e9d4e5.js" data-settings-css="settings-8c76f75bfb6bd192.css" data-theme-light-css="light-1596385f77d47ef2.css" data-theme-dark-css="dark-0a43001d3fc2282c.css" data-theme-ayu-css="ayu-fd19013d6ce078bf.css" ><script src="../../static.files/storage-db41da1a38ea3cb8.js"></script><script defer src="../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-0795b7d26be81095.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../../static.files/light-1596385f77d47ef2.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../../static.files/dark-0a43001d3fc2282c.css"><link rel="stylesheet" href="../../static.files/noscript-cffde32267a19fd6.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../rustls/index.html"><img class="rust-logo" src="../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/nix/store/8wbf91mp5aqggnly8dsfwbyfpxzfkram-vendor-cargo-deps/c19b7c6f923b580ac259164a89f2577984ad5ab09ee9d583b888f934adbbe8d0/rustls-0.21.10/src/verify.rs`."><title>verify.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-cb6f1f67f1bcd037.css" id="mainThemeStyle"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="rustls" data-themes="" data-resource-suffix="" data-rustdoc-version="1.73.0 (cc66ad468 2023-10-03) (built from a source tarball)" data-channel="1.73.0" data-search-js="search-6dfdfced5eff6596.js" data-settings-js="settings-de11bff964e9d4e5.js" data-settings-css="settings-8c76f75bfb6bd192.css" data-theme-light-css="light-1596385f77d47ef2.css" data-theme-dark-css="dark-0a43001d3fc2282c.css" data-theme-ayu-css="ayu-fd19013d6ce078bf.css" ><script src="../../static.files/storage-db41da1a38ea3cb8.js"></script><script defer src="../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-0795b7d26be81095.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../../static.files/light-1596385f77d47ef2.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../../static.files/dark-0a43001d3fc2282c.css"><link rel="stylesheet" href="../../static.files/noscript-cffde32267a19fd6.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../rustls/index.html"><img class="rust-logo" src="../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -807,20 +807,208 @@
 <a href="#807" id="807">807</a>
 <a href="#808" id="808">808</a>
 <a href="#809" id="809">809</a>
+<a href="#810" id="810">810</a>
+<a href="#811" id="811">811</a>
+<a href="#812" id="812">812</a>
+<a href="#813" id="813">813</a>
+<a href="#814" id="814">814</a>
+<a href="#815" id="815">815</a>
+<a href="#816" id="816">816</a>
+<a href="#817" id="817">817</a>
+<a href="#818" id="818">818</a>
+<a href="#819" id="819">819</a>
+<a href="#820" id="820">820</a>
+<a href="#821" id="821">821</a>
+<a href="#822" id="822">822</a>
+<a href="#823" id="823">823</a>
+<a href="#824" id="824">824</a>
+<a href="#825" id="825">825</a>
+<a href="#826" id="826">826</a>
+<a href="#827" id="827">827</a>
+<a href="#828" id="828">828</a>
+<a href="#829" id="829">829</a>
+<a href="#830" id="830">830</a>
+<a href="#831" id="831">831</a>
+<a href="#832" id="832">832</a>
+<a href="#833" id="833">833</a>
+<a href="#834" id="834">834</a>
+<a href="#835" id="835">835</a>
+<a href="#836" id="836">836</a>
+<a href="#837" id="837">837</a>
+<a href="#838" id="838">838</a>
+<a href="#839" id="839">839</a>
+<a href="#840" id="840">840</a>
+<a href="#841" id="841">841</a>
+<a href="#842" id="842">842</a>
+<a href="#843" id="843">843</a>
+<a href="#844" id="844">844</a>
+<a href="#845" id="845">845</a>
+<a href="#846" id="846">846</a>
+<a href="#847" id="847">847</a>
+<a href="#848" id="848">848</a>
+<a href="#849" id="849">849</a>
+<a href="#850" id="850">850</a>
+<a href="#851" id="851">851</a>
+<a href="#852" id="852">852</a>
+<a href="#853" id="853">853</a>
+<a href="#854" id="854">854</a>
+<a href="#855" id="855">855</a>
+<a href="#856" id="856">856</a>
+<a href="#857" id="857">857</a>
+<a href="#858" id="858">858</a>
+<a href="#859" id="859">859</a>
+<a href="#860" id="860">860</a>
+<a href="#861" id="861">861</a>
+<a href="#862" id="862">862</a>
+<a href="#863" id="863">863</a>
+<a href="#864" id="864">864</a>
+<a href="#865" id="865">865</a>
+<a href="#866" id="866">866</a>
+<a href="#867" id="867">867</a>
+<a href="#868" id="868">868</a>
+<a href="#869" id="869">869</a>
+<a href="#870" id="870">870</a>
+<a href="#871" id="871">871</a>
+<a href="#872" id="872">872</a>
+<a href="#873" id="873">873</a>
+<a href="#874" id="874">874</a>
+<a href="#875" id="875">875</a>
+<a href="#876" id="876">876</a>
+<a href="#877" id="877">877</a>
+<a href="#878" id="878">878</a>
+<a href="#879" id="879">879</a>
+<a href="#880" id="880">880</a>
+<a href="#881" id="881">881</a>
+<a href="#882" id="882">882</a>
+<a href="#883" id="883">883</a>
+<a href="#884" id="884">884</a>
+<a href="#885" id="885">885</a>
+<a href="#886" id="886">886</a>
+<a href="#887" id="887">887</a>
+<a href="#888" id="888">888</a>
+<a href="#889" id="889">889</a>
+<a href="#890" id="890">890</a>
+<a href="#891" id="891">891</a>
+<a href="#892" id="892">892</a>
+<a href="#893" id="893">893</a>
+<a href="#894" id="894">894</a>
+<a href="#895" id="895">895</a>
+<a href="#896" id="896">896</a>
+<a href="#897" id="897">897</a>
+<a href="#898" id="898">898</a>
+<a href="#899" id="899">899</a>
+<a href="#900" id="900">900</a>
+<a href="#901" id="901">901</a>
+<a href="#902" id="902">902</a>
+<a href="#903" id="903">903</a>
+<a href="#904" id="904">904</a>
+<a href="#905" id="905">905</a>
+<a href="#906" id="906">906</a>
+<a href="#907" id="907">907</a>
+<a href="#908" id="908">908</a>
+<a href="#909" id="909">909</a>
+<a href="#910" id="910">910</a>
+<a href="#911" id="911">911</a>
+<a href="#912" id="912">912</a>
+<a href="#913" id="913">913</a>
+<a href="#914" id="914">914</a>
+<a href="#915" id="915">915</a>
+<a href="#916" id="916">916</a>
+<a href="#917" id="917">917</a>
+<a href="#918" id="918">918</a>
+<a href="#919" id="919">919</a>
+<a href="#920" id="920">920</a>
+<a href="#921" id="921">921</a>
+<a href="#922" id="922">922</a>
+<a href="#923" id="923">923</a>
+<a href="#924" id="924">924</a>
+<a href="#925" id="925">925</a>
+<a href="#926" id="926">926</a>
+<a href="#927" id="927">927</a>
+<a href="#928" id="928">928</a>
+<a href="#929" id="929">929</a>
+<a href="#930" id="930">930</a>
+<a href="#931" id="931">931</a>
+<a href="#932" id="932">932</a>
+<a href="#933" id="933">933</a>
+<a href="#934" id="934">934</a>
+<a href="#935" id="935">935</a>
+<a href="#936" id="936">936</a>
+<a href="#937" id="937">937</a>
+<a href="#938" id="938">938</a>
+<a href="#939" id="939">939</a>
+<a href="#940" id="940">940</a>
+<a href="#941" id="941">941</a>
+<a href="#942" id="942">942</a>
+<a href="#943" id="943">943</a>
+<a href="#944" id="944">944</a>
+<a href="#945" id="945">945</a>
+<a href="#946" id="946">946</a>
+<a href="#947" id="947">947</a>
+<a href="#948" id="948">948</a>
+<a href="#949" id="949">949</a>
+<a href="#950" id="950">950</a>
+<a href="#951" id="951">951</a>
+<a href="#952" id="952">952</a>
+<a href="#953" id="953">953</a>
+<a href="#954" id="954">954</a>
+<a href="#955" id="955">955</a>
+<a href="#956" id="956">956</a>
+<a href="#957" id="957">957</a>
+<a href="#958" id="958">958</a>
+<a href="#959" id="959">959</a>
+<a href="#960" id="960">960</a>
+<a href="#961" id="961">961</a>
+<a href="#962" id="962">962</a>
+<a href="#963" id="963">963</a>
+<a href="#964" id="964">964</a>
+<a href="#965" id="965">965</a>
+<a href="#966" id="966">966</a>
+<a href="#967" id="967">967</a>
+<a href="#968" id="968">968</a>
+<a href="#969" id="969">969</a>
+<a href="#970" id="970">970</a>
+<a href="#971" id="971">971</a>
+<a href="#972" id="972">972</a>
+<a href="#973" id="973">973</a>
+<a href="#974" id="974">974</a>
+<a href="#975" id="975">975</a>
+<a href="#976" id="976">976</a>
+<a href="#977" id="977">977</a>
+<a href="#978" id="978">978</a>
+<a href="#979" id="979">979</a>
+<a href="#980" id="980">980</a>
+<a href="#981" id="981">981</a>
+<a href="#982" id="982">982</a>
+<a href="#983" id="983">983</a>
+<a href="#984" id="984">984</a>
+<a href="#985" id="985">985</a>
+<a href="#986" id="986">986</a>
+<a href="#987" id="987">987</a>
+<a href="#988" id="988">988</a>
+<a href="#989" id="989">989</a>
+<a href="#990" id="990">990</a>
+<a href="#991" id="991">991</a>
+<a href="#992" id="992">992</a>
+<a href="#993" id="993">993</a>
+<a href="#994" id="994">994</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::fmt;
 
 <span class="kw">use </span><span class="kw">crate</span>::anchors::{OwnedTrustAnchor, RootCertStore};
 <span class="kw">use </span><span class="kw">crate</span>::client::ServerName;
 <span class="kw">use </span><span class="kw">crate</span>::enums::SignatureScheme;
-<span class="kw">use </span><span class="kw">crate</span>::error::Error;
-<span class="kw">use </span><span class="kw">crate</span>::key::Certificate;
+<span class="kw">use </span><span class="kw">crate</span>::error::{
+    CertRevocationListError, CertificateError, Error, InvalidMessage, PeerMisbehaved,
+};
+<span class="kw">use </span><span class="kw">crate</span>::key::{Certificate, ParsedCertificate};
 <span class="attr">#[cfg(feature = <span class="string">&quot;logging&quot;</span>)]
 </span><span class="kw">use </span><span class="kw">crate</span>::log::{debug, trace, warn};
-<span class="kw">use </span><span class="kw">crate</span>::msgs::handshake::{DigitallySignedStruct, DistinguishedNames};
+<span class="kw">use </span><span class="kw">crate</span>::msgs::base::PayloadU16;
+<span class="kw">use </span><span class="kw">crate</span>::msgs::codec::{Codec, Reader};
+<span class="kw">use </span><span class="kw">crate</span>::msgs::handshake::DistinguishedName;
 
 <span class="kw">use </span>ring::digest::Digest;
 
-<span class="kw">use </span>std::convert::TryFrom;
 <span class="kw">use </span>std::sync::Arc;
 <span class="kw">use </span>std::time::SystemTime;
 
@@ -914,7 +1102,7 @@
     ///
     /// Note that none of the certificates have been parsed yet, so it is the responsibility of
     /// the implementor to handle invalid data. It is recommended that the implementor returns
-    /// [`Error::InvalidCertificateEncoding`] when these cases are encountered.
+    /// [`Error::InvalidCertificate(CertificateError::BadEncoding)`] when these cases are encountered.
     ///
     /// `scts` contains the Signed Certificate Timestamps (SCTs) the server
     /// sent with the end-entity certificate, if any.
@@ -1011,17 +1199,6 @@
     }
 }
 
-<span class="doccomment">/// A type which encapsulates a string that is a syntactically valid DNS name.
-</span><span class="attr">#[derive(Clone, Debug, Eq, Hash, PartialEq)]
-#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;dangerous_configuration&quot;</span>)))]
-</span><span class="kw">pub struct </span>DnsName(<span class="kw">pub</span>(<span class="kw">crate</span>) webpki::DnsName);
-
-<span class="kw">impl </span>AsRef&lt;str&gt; <span class="kw">for </span>DnsName {
-    <span class="kw">fn </span>as_ref(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>str {
-        AsRef::&lt;str&gt;::as_ref(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0</span>)
-    }
-}
-
 <span class="doccomment">/// Something that can verify a client certificate chain
 </span><span class="attr">#[allow(unreachable_pub)]
 #[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;dangerous_configuration&quot;</span>)))]
@@ -1032,11 +1209,11 @@
         <span class="bool-val">true
     </span>}
 
-    <span class="doccomment">/// Return `Some(true)` to require a client certificate and `Some(false)` to make
-    /// client authentication optional. Return `None` to abort the connection.
+    <span class="doccomment">/// Return `true` to require a client certificate and `false` to make
+    /// client authentication optional.
     /// Defaults to `Some(self.offer_client_auth())`.
-    </span><span class="kw">fn </span>client_auth_mandatory(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;bool&gt; {
-        <span class="prelude-val">Some</span>(<span class="self">self</span>.offer_client_auth())
+    </span><span class="kw">fn </span>client_auth_mandatory(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.offer_client_auth()
     }
 
     <span class="doccomment">/// Returns the [Subjects] of the client authentication trust anchors to
@@ -1050,9 +1227,8 @@
     /// [`CertificateRequest`]: https://datatracker.ietf.org/doc/html/rfc8446#section-4.3.2
     /// [`certificate_authorities`]: https://datatracker.ietf.org/doc/html/rfc8446#section-4.2.4
     ///
-    /// Return `None` to abort the connection. Return an empty `Vec` to continue
-    /// the handshake without sending a CertificateRequest message.
-    </span><span class="kw">fn </span>client_auth_root_subjects(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;DistinguishedNames&gt;;
+    /// If the return value is empty, no CertificateRequest message will be sent.
+    </span><span class="kw">fn </span>client_auth_root_subjects(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[DistinguishedName];
 
     <span class="doccomment">/// Verify the end-entity certificate `end_entity` is valid, acceptable,
     /// and chains to at least one of the trust anchors trusted by
@@ -1064,7 +1240,10 @@
     ///
     /// Note that none of the certificates have been parsed yet, so it is the responsibility of
     /// the implementor to handle invalid data. It is recommended that the implementor returns
-    /// [`Error::InvalidCertificateEncoding`] when these cases are encountered.
+    /// an [InvalidCertificate] error with the [BadEncoding] variant when these cases are encountered.
+    ///
+    /// [InvalidCertificate]: Error#variant.InvalidCertificate
+    /// [BadEncoding]: CertificateError#variant.BadEncoding
     </span><span class="kw">fn </span>verify_client_cert(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         end_entity: <span class="kw-2">&amp;</span>Certificate,
@@ -1138,6 +1317,67 @@
     }
 }
 
+<span class="doccomment">/// Verify that the end-entity certificate `end_entity` is a valid server cert
+/// and chains to at least one of the [OwnedTrustAnchor] in the `roots` [RootCertStore].
+///
+/// `intermediates` contains all certificates other than `end_entity` that
+/// were sent as part of the server&#39;s [Certificate] message. It is in the
+/// same order that the server sent them and may be empty.
+</span><span class="attr">#[allow(dead_code)]
+#[cfg_attr(not(feature = <span class="string">&quot;dangerous_configuration&quot;</span>), allow(unreachable_pub))]
+#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;dangerous_configuration&quot;</span>)))]
+</span><span class="kw">pub fn </span>verify_server_cert_signed_by_trust_anchor(
+    cert: <span class="kw-2">&amp;</span>ParsedCertificate,
+    roots: <span class="kw-2">&amp;</span>RootCertStore,
+    intermediates: <span class="kw-2">&amp;</span>[Certificate],
+    now: SystemTime,
+) -&gt; <span class="prelude-ty">Result</span>&lt;(), Error&gt; {
+    <span class="kw">let </span>chain = intermediate_chain(intermediates);
+    <span class="kw">let </span>trust_roots = trust_roots(roots);
+    <span class="kw">let </span>webpki_now = webpki::Time::try_from(now).map_err(|<span class="kw">_</span>| Error::FailedToGetCurrentTime)<span class="question-mark">?</span>;
+
+    cert.<span class="number">0
+        </span>.verify_for_usage(
+            SUPPORTED_SIG_ALGS,
+            <span class="kw-2">&amp;</span>trust_roots,
+            <span class="kw-2">&amp;</span>chain,
+            webpki_now,
+            webpki::KeyUsage::server_auth(),
+            <span class="kw-2">&amp;</span>[], <span class="comment">// no CRLs
+        </span>)
+        .map_err(pki_error)
+        .map(|<span class="kw">_</span>| ())
+}
+
+<span class="doccomment">/// Verify that the `end_entity` has a name or alternative name matching the `server_name`
+/// note: this only verifies the name and should be used in conjuction with more verification
+/// like [verify_server_cert_signed_by_trust_anchor]
+</span><span class="attr">#[cfg_attr(not(feature = <span class="string">&quot;dangerous_configuration&quot;</span>), allow(unreachable_pub))]
+#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;dangerous_configuration&quot;</span>)))]
+</span><span class="kw">pub fn </span>verify_server_name(cert: <span class="kw-2">&amp;</span>ParsedCertificate, server_name: <span class="kw-2">&amp;</span>ServerName) -&gt; <span class="prelude-ty">Result</span>&lt;(), Error&gt; {
+    <span class="kw">match </span>server_name {
+        ServerName::DnsName(dns_name) =&gt; {
+            <span class="comment">// unlikely error because dns_name::DnsNameRef and webpki::DnsNameRef
+            // should have the same encoding rules.
+            </span><span class="kw">let </span>dns_name = webpki::DnsNameRef::try_from_ascii_str(dns_name.as_ref())
+                .map_err(|<span class="kw">_</span>| Error::InvalidCertificate(CertificateError::BadEncoding))<span class="question-mark">?</span>;
+            <span class="kw">let </span>name = webpki::SubjectNameRef::DnsName(dns_name);
+            cert.<span class="number">0
+                </span>.verify_is_valid_for_subject_name(name)
+                .map_err(pki_error)<span class="question-mark">?</span>;
+        }
+        ServerName::IpAddress(ip_addr) =&gt; {
+            <span class="kw">let </span>ip_addr = webpki::IpAddr::from(<span class="kw-2">*</span>ip_addr);
+            cert.<span class="number">0
+                </span>.verify_is_valid_for_subject_name(webpki::SubjectNameRef::IpAddress(
+                    webpki::IpAddrRef::from(<span class="kw-2">&amp;</span>ip_addr),
+                ))
+                .map_err(pki_error)<span class="question-mark">?</span>;
+        }
+    }
+    <span class="prelude-val">Ok</span>(())
+}
+
 <span class="kw">impl </span>ServerCertVerifier <span class="kw">for </span>WebPkiVerifier {
     <span class="doccomment">/// Will verify the certificate is valid in the following ways:
     /// - Signed by a  trusted `RootCertStore` CA
@@ -1152,25 +1392,9 @@
         ocsp_response: <span class="kw-2">&amp;</span>[u8],
         now: SystemTime,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;ServerCertVerified, Error&gt; {
-        <span class="kw">let </span>(cert, chain, trustroots) = prepare(end_entity, intermediates, <span class="kw-2">&amp;</span><span class="self">self</span>.roots)<span class="question-mark">?</span>;
-        <span class="kw">let </span>webpki_now = webpki::Time::try_from(now).map_err(|<span class="kw">_</span>| Error::FailedToGetCurrentTime)<span class="question-mark">?</span>;
+        <span class="kw">let </span>cert = ParsedCertificate::try_from(end_entity)<span class="question-mark">?</span>;
 
-        <span class="kw">let </span>dns_name = <span class="kw">match </span>server_name {
-            ServerName::DnsName(dns_name) =&gt; dns_name,
-            ServerName::IpAddress(<span class="kw">_</span>) =&gt; {
-                <span class="kw">return </span><span class="prelude-val">Err</span>(Error::UnsupportedNameType);
-            }
-        };
-
-        <span class="kw">let </span>cert = cert
-            .verify_is_valid_tls_server_cert(
-                SUPPORTED_SIG_ALGS,
-                <span class="kw-2">&amp;</span>webpki::TlsServerTrustAnchors(<span class="kw-2">&amp;</span>trustroots),
-                <span class="kw-2">&amp;</span>chain,
-                webpki_now,
-            )
-            .map_err(pki_error)
-            .map(|<span class="kw">_</span>| cert)<span class="question-mark">?</span>;
+        verify_server_cert_signed_by_trust_anchor(<span class="kw-2">&amp;</span>cert, <span class="kw-2">&amp;</span><span class="self">self</span>.roots, intermediates, now)<span class="question-mark">?</span>;
 
         <span class="kw">if let </span><span class="prelude-val">Some</span>(policy) = <span class="kw-2">&amp;</span><span class="self">self</span>.ct_policy {
             policy.verify(end_entity, now, scts)<span class="question-mark">?</span>;
@@ -1180,9 +1404,8 @@
             <span class="macro">trace!</span>(<span class="string">&quot;Unvalidated OCSP response: {:?}&quot;</span>, ocsp_response.to_vec());
         }
 
-        cert.verify_is_valid_for_dns_name(dns_name.<span class="number">0</span>.as_ref())
-            .map_err(pki_error)
-            .map(|<span class="kw">_</span>| ServerCertVerified::assertion())
+        verify_server_name(<span class="kw-2">&amp;</span>cert, server_name)<span class="question-mark">?</span>;
+        <span class="prelude-val">Ok</span>(ServerCertVerified::assertion())
     }
 }
 
@@ -1190,7 +1413,7 @@
 </span><span class="attr">#[allow(unreachable_pub)]
 #[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;dangerous_configuration&quot;</span>)))]
 </span><span class="kw">pub struct </span>WebPkiVerifier {
-    roots: RootCertStore,
+    roots: Arc&lt;RootCertStore&gt;,
     ct_policy: <span class="prelude-ty">Option</span>&lt;CertificateTransparencyPolicy&gt;,
 }
 
@@ -1203,8 +1426,14 @@
     /// `ct_logs` is the list of logs that are trusted for Certificate
     /// Transparency. Currently CT log enforcement is opportunistic; see
     /// &lt;https://github.com/rustls/rustls/issues/479&gt;.
-    </span><span class="kw">pub fn </span>new(roots: RootCertStore, ct_policy: <span class="prelude-ty">Option</span>&lt;CertificateTransparencyPolicy&gt;) -&gt; <span class="self">Self </span>{
-        <span class="self">Self </span>{ roots, ct_policy }
+    </span><span class="kw">pub fn </span>new(
+        roots: <span class="kw">impl </span>Into&lt;Arc&lt;RootCertStore&gt;&gt;,
+        ct_policy: <span class="prelude-ty">Option</span>&lt;CertificateTransparencyPolicy&gt;,
+    ) -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{
+            roots: roots.into(),
+            ct_policy,
+        }
     }
 
     <span class="doccomment">/// Returns the signature verification methods supported by
@@ -1301,46 +1530,80 @@
     }
 }
 
-<span class="kw">type </span>CertChainAndRoots&lt;<span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span>&gt; = (
-    webpki::EndEntityCert&lt;<span class="lifetime">&#39;a</span>&gt;,
-    Vec&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>[u8]&gt;,
-    Vec&lt;webpki::TrustAnchor&lt;<span class="lifetime">&#39;b</span>&gt;&gt;,
-);
-
-<span class="kw">fn </span>prepare&lt;<span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span>&gt;(
-    end_entity: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>Certificate,
-    intermediates: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>[Certificate],
-    roots: <span class="kw-2">&amp;</span><span class="lifetime">&#39;b </span>RootCertStore,
-) -&gt; <span class="prelude-ty">Result</span>&lt;CertChainAndRoots&lt;<span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span>&gt;, Error&gt; {
-    <span class="comment">// EE cert must appear first.
-    </span><span class="kw">let </span>cert = webpki::EndEntityCert::try_from(end_entity.<span class="number">0</span>.as_ref()).map_err(pki_error)<span class="question-mark">?</span>;
-
-    <span class="kw">let </span>intermediates: Vec&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>[u8]&gt; = intermediates
+<span class="kw">fn </span>intermediate_chain(intermediates: <span class="kw-2">&amp;</span>[Certificate]) -&gt; Vec&lt;<span class="kw-2">&amp;</span>[u8]&gt; {
+    intermediates
         .iter()
         .map(|cert| cert.<span class="number">0</span>.as_ref())
-        .collect();
+        .collect()
+}
 
-    <span class="kw">let </span>trustroots: Vec&lt;webpki::TrustAnchor&gt; = roots
+<span class="kw">fn </span>trust_roots(roots: <span class="kw-2">&amp;</span>RootCertStore) -&gt; Vec&lt;webpki::TrustAnchor&gt; {
+    roots
         .roots
         .iter()
         .map(OwnedTrustAnchor::to_trust_anchor)
-        .collect();
+        .collect()
+}
 
-    <span class="prelude-val">Ok</span>((cert, intermediates, trustroots))
+<span class="doccomment">/// An unparsed DER encoded Certificate Revocation List (CRL).
+</span><span class="kw">pub struct </span>UnparsedCertRevocationList(<span class="kw">pub </span>Vec&lt;u8&gt;);
+
+<span class="kw">impl </span>UnparsedCertRevocationList {
+    <span class="doccomment">/// Parse the CRL DER, yielding a [`webpki::CertRevocationList`] or an error if the CRL
+    /// is malformed, or uses unsupported features.
+    </span><span class="kw">pub fn </span>parse(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;webpki::OwnedCertRevocationList, CertRevocationListError&gt; {
+        webpki::BorrowedCertRevocationList::from_der(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0</span>)
+            .and_then(|crl| crl.to_owned())
+            .map_err(CertRevocationListError::from)
+    }
 }
 
 <span class="doccomment">/// A `ClientCertVerifier` that will ensure that every client provides a trusted
-/// certificate, without any name checking.
+/// certificate, without any name checking. Optionally, client certificates will
+/// have their revocation status checked using the DER encoded CRLs provided.
 </span><span class="kw">pub struct </span>AllowAnyAuthenticatedClient {
     roots: RootCertStore,
+    subjects: Vec&lt;DistinguishedName&gt;,
+    crls: Vec&lt;webpki::OwnedCertRevocationList&gt;,
 }
 
 <span class="kw">impl </span>AllowAnyAuthenticatedClient {
     <span class="doccomment">/// Construct a new `AllowAnyAuthenticatedClient`.
     ///
     /// `roots` is the list of trust anchors to use for certificate validation.
-    </span><span class="kw">pub fn </span>new(roots: RootCertStore) -&gt; Arc&lt;<span class="kw">dyn </span>ClientCertVerifier&gt; {
-        Arc::new(<span class="self">Self </span>{ roots })
+    </span><span class="kw">pub fn </span>new(roots: RootCertStore) -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{
+            subjects: roots
+                .roots
+                .iter()
+                .map(|r| r.subject().clone())
+                .collect(),
+            crls: Vec::new(),
+            roots,
+        }
+    }
+
+    <span class="doccomment">/// Update the verifier to validate client certificates against the provided DER format
+    /// unparsed certificate revocation lists (CRLs).
+    </span><span class="kw">pub fn </span>with_crls(
+        <span class="self">self</span>,
+        crls: <span class="kw">impl </span>IntoIterator&lt;Item = UnparsedCertRevocationList&gt;,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, CertRevocationListError&gt; {
+        <span class="prelude-val">Ok</span>(<span class="self">Self </span>{
+            crls: crls
+                .into_iter()
+                .map(|der_crl| der_crl.parse())
+                .collect::&lt;<span class="prelude-ty">Result</span>&lt;Vec&lt;<span class="kw">_</span>&gt;, CertRevocationListError&gt;&gt;()<span class="question-mark">?</span>,
+            ..<span class="self">self
+        </span>})
+    }
+
+    <span class="doccomment">/// Wrap this verifier in an [`Arc`] and coerce it to `dyn ClientCertVerifier`
+    </span><span class="attr">#[inline(always)]
+    </span><span class="kw">pub fn </span>boxed(<span class="self">self</span>) -&gt; Arc&lt;<span class="kw">dyn </span>ClientCertVerifier&gt; {
+        <span class="comment">// This function is needed because `ClientCertVerifier` is only reachable if the
+        // `dangerous_configuration` feature is enabled, which makes coercing hard to outside users
+        </span>Arc::new(<span class="self">self</span>)
     }
 }
 
@@ -1349,9 +1612,8 @@
         <span class="bool-val">true
     </span>}
 
-    <span class="attr">#[allow(deprecated)]
-    </span><span class="kw">fn </span>client_auth_root_subjects(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;DistinguishedNames&gt; {
-        <span class="prelude-val">Some</span>(<span class="self">self</span>.roots.subjects())
+    <span class="kw">fn </span>client_auth_root_subjects(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[DistinguishedName] {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.subjects
     }
 
     <span class="kw">fn </span>verify_client_cert(
@@ -1360,16 +1622,29 @@
         intermediates: <span class="kw-2">&amp;</span>[Certificate],
         now: SystemTime,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;ClientCertVerified, Error&gt; {
-        <span class="kw">let </span>(cert, chain, trustroots) = prepare(end_entity, intermediates, <span class="kw-2">&amp;</span><span class="self">self</span>.roots)<span class="question-mark">?</span>;
+        <span class="kw">let </span>cert = ParsedCertificate::try_from(end_entity)<span class="question-mark">?</span>;
+        <span class="kw">let </span>chain = intermediate_chain(intermediates);
+        <span class="kw">let </span>trust_roots = trust_roots(<span class="kw-2">&amp;</span><span class="self">self</span>.roots);
         <span class="kw">let </span>now = webpki::Time::try_from(now).map_err(|<span class="kw">_</span>| Error::FailedToGetCurrentTime)<span class="question-mark">?</span>;
-        cert.verify_is_valid_tls_client_cert(
-            SUPPORTED_SIG_ALGS,
-            <span class="kw-2">&amp;</span>webpki::TlsClientTrustAnchors(<span class="kw-2">&amp;</span>trustroots),
-            <span class="kw-2">&amp;</span>chain,
-            now,
-        )
-        .map_err(pki_error)
-        .map(|<span class="kw">_</span>| ClientCertVerified::assertion())
+
+        <span class="attr">#[allow(trivial_casts)] </span><span class="comment">// Cast to &amp;dyn trait is required.
+        </span><span class="kw">let </span>crls = <span class="self">self
+            </span>.crls
+            .iter()
+            .map(|crl| crl <span class="kw">as </span><span class="kw-2">&amp;</span><span class="kw">dyn </span>webpki::CertRevocationList)
+            .collect::&lt;Vec&lt;<span class="kw">_</span>&gt;&gt;();
+
+        cert.<span class="number">0
+            </span>.verify_for_usage(
+                SUPPORTED_SIG_ALGS,
+                <span class="kw-2">&amp;</span>trust_roots,
+                <span class="kw-2">&amp;</span>chain,
+                now,
+                webpki::KeyUsage::client_auth(),
+                crls.as_slice(),
+            )
+            .map_err(pki_error)
+            .map(|<span class="kw">_</span>| ClientCertVerified::assertion())
     }
 }
 
@@ -1387,10 +1662,29 @@
     <span class="doccomment">/// Construct a new `AllowAnyAnonymousOrAuthenticatedClient`.
     ///
     /// `roots` is the list of trust anchors to use for certificate validation.
-    </span><span class="kw">pub fn </span>new(roots: RootCertStore) -&gt; Arc&lt;<span class="kw">dyn </span>ClientCertVerifier&gt; {
-        Arc::new(<span class="self">Self </span>{
-            inner: AllowAnyAuthenticatedClient { roots },
+    </span><span class="kw">pub fn </span>new(roots: RootCertStore) -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{
+            inner: AllowAnyAuthenticatedClient::new(roots),
+        }
+    }
+
+    <span class="doccomment">/// Update the verifier to validate client certificates against the provided DER format
+    /// unparsed certificate revocation lists (CRLs).
+    </span><span class="kw">pub fn </span>with_crls(
+        <span class="self">self</span>,
+        crls: <span class="kw">impl </span>IntoIterator&lt;Item = UnparsedCertRevocationList&gt;,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, CertRevocationListError&gt; {
+        <span class="prelude-val">Ok</span>(<span class="self">Self </span>{
+            inner: <span class="self">self</span>.inner.with_crls(crls)<span class="question-mark">?</span>,
         })
+    }
+
+    <span class="doccomment">/// Wrap this verifier in an [`Arc`] and coerce it to `dyn ClientCertVerifier`
+    </span><span class="attr">#[inline(always)]
+    </span><span class="kw">pub fn </span>boxed(<span class="self">self</span>) -&gt; Arc&lt;<span class="kw">dyn </span>ClientCertVerifier&gt; {
+        <span class="comment">// This function is needed because `ClientCertVerifier` is only reachable if the
+        // `dangerous_configuration` feature is enabled, which makes coercing hard to outside users
+        </span>Arc::new(<span class="self">self</span>)
     }
 }
 
@@ -1399,11 +1693,11 @@
         <span class="self">self</span>.inner.offer_client_auth()
     }
 
-    <span class="kw">fn </span>client_auth_mandatory(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;bool&gt; {
-        <span class="prelude-val">Some</span>(<span class="bool-val">false</span>)
-    }
+    <span class="kw">fn </span>client_auth_mandatory(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="bool-val">false
+    </span>}
 
-    <span class="kw">fn </span>client_auth_root_subjects(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;DistinguishedNames&gt; {
+    <span class="kw">fn </span>client_auth_root_subjects(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[DistinguishedName] {
         <span class="self">self</span>.inner.client_auth_root_subjects()
     }
 
@@ -1418,15 +1712,28 @@
     }
 }
 
-<span class="kw">fn </span>pki_error(error: webpki::Error) -&gt; Error {
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>pki_error(error: webpki::Error) -&gt; Error {
     <span class="kw">use </span>webpki::Error::<span class="kw-2">*</span>;
     <span class="kw">match </span>error {
-        BadDer | BadDerTime =&gt; Error::InvalidCertificateEncoding,
-        InvalidSignatureForPublicKey =&gt; Error::InvalidCertificateSignature,
-        UnsupportedSignatureAlgorithm | UnsupportedSignatureAlgorithmForPublicKey =&gt; {
-            Error::InvalidCertificateSignatureType
+        BadDer | BadDerTime =&gt; CertificateError::BadEncoding.into(),
+        CertNotValidYet =&gt; CertificateError::NotValidYet.into(),
+        CertExpired | InvalidCertValidity =&gt; CertificateError::Expired.into(),
+        UnknownIssuer =&gt; CertificateError::UnknownIssuer.into(),
+        CertNotValidForName =&gt; CertificateError::NotValidForName.into(),
+        CertRevoked =&gt; CertificateError::Revoked.into(),
+        IssuerNotCrlSigner =&gt; CertRevocationListError::IssuerInvalidForCrl.into(),
+
+        InvalidSignatureForPublicKey
+        | UnsupportedSignatureAlgorithm
+        | UnsupportedSignatureAlgorithmForPublicKey =&gt; CertificateError::BadSignature.into(),
+
+        InvalidCrlSignatureForPublicKey
+        | UnsupportedCrlSignatureAlgorithm
+        | UnsupportedCrlSignatureAlgorithmForPublicKey =&gt; {
+            CertRevocationListError::BadSignature.into()
         }
-        e =&gt; Error::InvalidCertificateData(<span class="macro">format!</span>(<span class="string">&quot;invalid peer certificate: {}&quot;</span>, e)),
+
+        <span class="kw">_ </span>=&gt; CertificateError::Other(Arc::new(error)).into(),
     }
 }
 
@@ -1434,9 +1741,13 @@
 </span><span class="kw">pub struct </span>NoClientAuth;
 
 <span class="kw">impl </span>NoClientAuth {
-    <span class="doccomment">/// Constructs a `NoClientAuth` and wraps it in an `Arc`.
-    </span><span class="kw">pub fn </span>new() -&gt; Arc&lt;<span class="kw">dyn </span>ClientCertVerifier&gt; {
-        Arc::new(<span class="self">Self</span>)
+    <span class="doccomment">/// Construct a [`NoClientAuth`], wrap it in an [`Arc`] and coerce it to
+    /// `dyn ClientCertVerifier`.
+    </span><span class="attr">#[inline(always)]
+    </span><span class="kw">pub fn </span>boxed() -&gt; Arc&lt;<span class="kw">dyn </span>ClientCertVerifier&gt; {
+        <span class="comment">// This function is needed because `ClientCertVerifier` is only reachable if the
+        // `dangerous_configuration` feature is enabled, which makes coercing hard to outside users
+        </span>Arc::new(<span class="self">Self</span>)
     }
 }
 
@@ -1445,7 +1756,7 @@
         <span class="bool-val">false
     </span>}
 
-    <span class="kw">fn </span>client_auth_root_subjects(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;DistinguishedNames&gt; {
+    <span class="kw">fn </span>client_auth_root_subjects(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[DistinguishedName] {
         <span class="macro">unimplemented!</span>();
     }
 
@@ -1456,6 +1767,42 @@
         _now: SystemTime,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;ClientCertVerified, Error&gt; {
         <span class="macro">unimplemented!</span>();
+    }
+}
+
+<span class="doccomment">/// This type combines a [`SignatureScheme`] and a signature payload produced with that scheme.
+</span><span class="attr">#[derive(Debug, Clone)]
+</span><span class="kw">pub struct </span>DigitallySignedStruct {
+    <span class="doccomment">/// The [`SignatureScheme`] used to produce the signature.
+    </span><span class="kw">pub </span>scheme: SignatureScheme,
+    sig: PayloadU16,
+}
+
+<span class="kw">impl </span>DigitallySignedStruct {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>new(scheme: SignatureScheme, sig: Vec&lt;u8&gt;) -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{
+            scheme,
+            sig: PayloadU16::new(sig),
+        }
+    }
+
+    <span class="doccomment">/// Get the signature.
+    </span><span class="kw">pub fn </span>signature(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[u8] {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.sig.<span class="number">0
+    </span>}
+}
+
+<span class="kw">impl </span>Codec <span class="kw">for </span>DigitallySignedStruct {
+    <span class="kw">fn </span>encode(<span class="kw-2">&amp;</span><span class="self">self</span>, bytes: <span class="kw-2">&amp;mut </span>Vec&lt;u8&gt;) {
+        <span class="self">self</span>.scheme.encode(bytes);
+        <span class="self">self</span>.sig.encode(bytes);
+    }
+
+    <span class="kw">fn </span>read(r: <span class="kw-2">&amp;mut </span>Reader) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, InvalidMessage&gt; {
+        <span class="kw">let </span>scheme = SignatureScheme::read(r)<span class="question-mark">?</span>;
+        <span class="kw">let </span>sig = PayloadU16::read(r)<span class="question-mark">?</span>;
+
+        <span class="prelude-val">Ok</span>(<span class="self">Self </span>{ scheme, sig })
     }
 }
 
@@ -1490,10 +1837,7 @@
         SignatureScheme::RSA_PSS_SHA384 =&gt; <span class="prelude-val">Ok</span>(RSA_PSS_SHA384),
         SignatureScheme::RSA_PSS_SHA512 =&gt; <span class="prelude-val">Ok</span>(RSA_PSS_SHA512),
 
-        <span class="kw">_ </span>=&gt; {
-            <span class="kw">let </span>error_msg = <span class="macro">format!</span>(<span class="string">&quot;received unadvertised sig scheme {:?}&quot;</span>, scheme);
-            <span class="prelude-val">Err</span>(Error::PeerMisbehavedError(error_msg))
-        }
+        <span class="kw">_ </span>=&gt; <span class="prelude-val">Err</span>(PeerMisbehaved::SignedHandshakeWithUnadvertisedSigScheme.into()),
     }
 }
 
@@ -1540,10 +1884,7 @@
         RSA_PSS_SHA256 =&gt; <span class="prelude-val">Ok</span>(<span class="kw-2">&amp;</span>webpki::RSA_PSS_2048_8192_SHA256_LEGACY_KEY),
         RSA_PSS_SHA384 =&gt; <span class="prelude-val">Ok</span>(<span class="kw-2">&amp;</span>webpki::RSA_PSS_2048_8192_SHA384_LEGACY_KEY),
         RSA_PSS_SHA512 =&gt; <span class="prelude-val">Ok</span>(<span class="kw-2">&amp;</span>webpki::RSA_PSS_2048_8192_SHA512_LEGACY_KEY),
-        <span class="kw">_ </span>=&gt; {
-            <span class="kw">let </span>error_msg = <span class="macro">format!</span>(<span class="string">&quot;received unsupported sig scheme {:?}&quot;</span>, scheme);
-            <span class="prelude-val">Err</span>(Error::PeerMisbehavedError(error_msg))
-        }
+        <span class="kw">_ </span>=&gt; <span class="prelude-val">Err</span>(PeerMisbehaved::SignedHandshakeWithUnadvertisedSigScheme.into()),
     }
 }
 
@@ -1614,6 +1955,35 @@
             <span class="macro">format!</span>(<span class="string">&quot;{:?}&quot;</span>, ServerCertVerified::assertion()),
             <span class="string">&quot;ServerCertVerified(())&quot;
         </span>);
+    }
+
+    <span class="attr">#[test]
+    </span><span class="kw">fn </span>pki_crl_errors() {
+        <span class="comment">// CRL signature errors should be turned into BadSignature.
+        </span><span class="macro">assert_eq!</span>(
+            pki_error(webpki::Error::InvalidCrlSignatureForPublicKey),
+            Error::InvalidCertRevocationList(CertRevocationListError::BadSignature),
+        );
+        <span class="macro">assert_eq!</span>(
+            pki_error(webpki::Error::UnsupportedCrlSignatureAlgorithm),
+            Error::InvalidCertRevocationList(CertRevocationListError::BadSignature),
+        );
+        <span class="macro">assert_eq!</span>(
+            pki_error(webpki::Error::UnsupportedCrlSignatureAlgorithmForPublicKey),
+            Error::InvalidCertRevocationList(CertRevocationListError::BadSignature),
+        );
+
+        <span class="comment">// Revoked cert errors should be turned into Revoked.
+        </span><span class="macro">assert_eq!</span>(
+            pki_error(webpki::Error::CertRevoked),
+            Error::InvalidCertificate(CertificateError::Revoked),
+        );
+
+        <span class="comment">// Issuer not CRL signer errors should be turned into IssuerInvalidForCrl
+        </span><span class="macro">assert_eq!</span>(
+            pki_error(webpki::Error::IssuerNotCrlSigner),
+            Error::InvalidCertRevocationList(CertRevocationListError::IssuerInvalidForCrl)
+        );
     }
 }
 </code></pre></div></section></main></body></html>

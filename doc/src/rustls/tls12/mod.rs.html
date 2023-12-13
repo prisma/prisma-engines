@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/nix/store/rw9bn419hs63s20iz4qrsgiddx2c69nb-vendor-cargo-deps/c19b7c6f923b580ac259164a89f2577984ad5ab09ee9d583b888f934adbbe8d0/rustls-0.20.8/src/tls12/mod.rs`."><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-cb6f1f67f1bcd037.css" id="mainThemeStyle"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="rustls" data-themes="" data-resource-suffix="" data-rustdoc-version="1.73.0 (cc66ad468 2023-10-03) (built from a source tarball)" data-channel="1.73.0" data-search-js="search-6dfdfced5eff6596.js" data-settings-js="settings-de11bff964e9d4e5.js" data-settings-css="settings-8c76f75bfb6bd192.css" data-theme-light-css="light-1596385f77d47ef2.css" data-theme-dark-css="dark-0a43001d3fc2282c.css" data-theme-ayu-css="ayu-fd19013d6ce078bf.css" ><script src="../../../static.files/storage-db41da1a38ea3cb8.js"></script><script defer src="../../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-0795b7d26be81095.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../../../static.files/light-1596385f77d47ef2.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../../../static.files/dark-0a43001d3fc2282c.css"><link rel="stylesheet" href="../../../static.files/noscript-cffde32267a19fd6.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../../rustls/index.html"><img class="rust-logo" src="../../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/nix/store/8wbf91mp5aqggnly8dsfwbyfpxzfkram-vendor-cargo-deps/c19b7c6f923b580ac259164a89f2577984ad5ab09ee9d583b888f934adbbe8d0/rustls-0.21.10/src/tls12/mod.rs`."><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-cb6f1f67f1bcd037.css" id="mainThemeStyle"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="rustls" data-themes="" data-resource-suffix="" data-rustdoc-version="1.73.0 (cc66ad468 2023-10-03) (built from a source tarball)" data-channel="1.73.0" data-search-js="search-6dfdfced5eff6596.js" data-settings-js="settings-de11bff964e9d4e5.js" data-settings-css="settings-8c76f75bfb6bd192.css" data-theme-light-css="light-1596385f77d47ef2.css" data-theme-dark-css="dark-0a43001d3fc2282c.css" data-theme-ayu-css="ayu-fd19013d6ce078bf.css" ><script src="../../../static.files/storage-db41da1a38ea3cb8.js"></script><script defer src="../../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-0795b7d26be81095.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../../../static.files/light-1596385f77d47ef2.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../../../static.files/dark-0a43001d3fc2282c.css"><link rel="stylesheet" href="../../../static.files/noscript-cffde32267a19fd6.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../../rustls/index.html"><img class="rust-logo" src="../../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -532,20 +532,17 @@
 <a href="#532" id="532">532</a>
 <a href="#533" id="533">533</a>
 <a href="#534" id="534">534</a>
-<a href="#535" id="535">535</a>
-<a href="#536" id="536">536</a>
-<a href="#537" id="537">537</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::cipher::{MessageDecrypter, MessageEncrypter};
-<span class="kw">use </span><span class="kw">crate</span>::conn::{CommonState, ConnectionRandoms, Side};
-<span class="kw">use </span><span class="kw">crate</span>::enums::{CipherSuite, SignatureScheme};
+<span class="kw">use </span><span class="kw">crate</span>::common_state::{CommonState, Side};
+<span class="kw">use </span><span class="kw">crate</span>::conn::ConnectionRandoms;
+<span class="kw">use </span><span class="kw">crate</span>::enums::{AlertDescription, CipherSuite, SignatureScheme};
+<span class="kw">use </span><span class="kw">crate</span>::error::{Error, InvalidMessage};
 <span class="kw">use </span><span class="kw">crate</span>::kx;
 <span class="kw">use </span><span class="kw">crate</span>::msgs::codec::{Codec, Reader};
-<span class="kw">use </span><span class="kw">crate</span>::msgs::enums::{AlertDescription, ContentType};
 <span class="kw">use </span><span class="kw">crate</span>::msgs::handshake::KeyExchangeAlgorithm;
 <span class="kw">use </span><span class="kw">crate</span>::suites::{BulkAlgorithm, CipherSuiteCommon, SupportedCipherSuite};
 <span class="attr">#[cfg(feature = <span class="string">&quot;secret_extraction&quot;</span>)]
 </span><span class="kw">use </span><span class="kw">crate</span>::suites::{ConnectionTrafficSecrets, PartiallyExtractedSecrets};
-<span class="kw">use </span><span class="kw">crate</span>::Error;
 
 <span class="kw">use </span>ring::aead;
 <span class="kw">use </span>ring::digest::Digest;
@@ -708,7 +705,7 @@
     }
 
     <span class="doccomment">/// Which hash function to use with this suite.
-    </span><span class="kw">pub fn </span>hash_algorithm(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>ring::digest::Algorithm {
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>hash_algorithm(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>ring::digest::Algorithm {
         <span class="self">self</span>.hmac_algorithm.digest_algorithm()
     }
 }
@@ -771,7 +768,6 @@
                 label.as_bytes(),
                 seed.as_ref(),
             );
-            <span class="prelude-val">Ok</span>(())
         })<span class="question-mark">?</span>;
 
         <span class="prelude-val">Ok</span>(ret)
@@ -850,8 +846,7 @@
         <span class="kw">let </span>len =
             (common.aead_algorithm.key_len() + suite.fixed_iv_len) * <span class="number">2 </span>+ suite.explicit_nonce_len;
 
-        <span class="kw">let </span><span class="kw-2">mut </span>out = Vec::new();
-        out.resize(len, <span class="number">0u8</span>);
+        <span class="kw">let </span><span class="kw-2">mut </span>out = <span class="macro">vec!</span>[<span class="number">0u8</span>; len];
 
         <span class="comment">// NOTE: opposite order to above for no good reason.
         // Don&#39;t design security protocols on drugs, kids.
@@ -878,8 +873,7 @@
     }
 
     <span class="kw">fn </span>make_verify_data(<span class="kw-2">&amp;</span><span class="self">self</span>, handshake_hash: <span class="kw-2">&amp;</span>Digest, label: <span class="kw-2">&amp;</span>[u8]) -&gt; Vec&lt;u8&gt; {
-        <span class="kw">let </span><span class="kw-2">mut </span>out = Vec::new();
-        out.resize(<span class="number">12</span>, <span class="number">0u8</span>);
+        <span class="kw">let </span><span class="kw-2">mut </span>out = <span class="macro">vec!</span>[<span class="number">0u8</span>; <span class="number">12</span>];
 
         prf::prf(
             <span class="kw-2">&amp;mut </span>out,
@@ -920,7 +914,7 @@
             <span class="kw-2">&amp;</span><span class="self">self</span>.master_secret,
             label,
             <span class="kw-2">&amp;</span>randoms,
-        )
+        );
     }
 
     <span class="attr">#[cfg(feature = <span class="string">&quot;secret_extraction&quot;</span>)]
@@ -1035,18 +1029,14 @@
     common: <span class="kw-2">&amp;mut </span>CommonState,
     kx_params: <span class="kw-2">&amp;</span>[u8],
 ) -&gt; <span class="prelude-ty">Result</span>&lt;T, Error&gt; {
-    decode_ecdh_params_::&lt;T&gt;(kx_params).ok_or_else(|| {
-        common.send_fatal_alert(AlertDescription::DecodeError);
-        Error::CorruptMessagePayload(ContentType::Handshake)
-    })
-}
-
-<span class="kw">fn </span>decode_ecdh_params_&lt;T: Codec&gt;(kx_params: <span class="kw-2">&amp;</span>[u8]) -&gt; <span class="prelude-ty">Option</span>&lt;T&gt; {
     <span class="kw">let </span><span class="kw-2">mut </span>rd = Reader::init(kx_params);
     <span class="kw">let </span>ecdh_params = T::read(<span class="kw-2">&amp;mut </span>rd)<span class="question-mark">?</span>;
     <span class="kw">match </span>rd.any_left() {
-        <span class="bool-val">false </span>=&gt; <span class="prelude-val">Some</span>(ecdh_params),
-        <span class="bool-val">true </span>=&gt; <span class="prelude-val">None</span>,
+        <span class="bool-val">false </span>=&gt; <span class="prelude-val">Ok</span>(ecdh_params),
+        <span class="bool-val">true </span>=&gt; <span class="prelude-val">Err</span>(common.send_fatal_alert(
+            AlertDescription::DecodeError,
+            InvalidMessage::InvalidDhParams,
+        )),
     }
 }
 
@@ -1055,6 +1045,7 @@
 <span class="attr">#[cfg(test)]
 </span><span class="kw">mod </span>tests {
     <span class="kw">use super</span>::<span class="kw-2">*</span>;
+    <span class="kw">use </span><span class="kw">crate</span>::common_state::{CommonState, Side};
     <span class="kw">use </span><span class="kw">crate</span>::msgs::handshake::{ClientECDHParams, ServerECDHParams};
 
     <span class="attr">#[test]
@@ -1064,12 +1055,15 @@
         <span class="kw">let </span><span class="kw-2">mut </span>server_buf = Vec::new();
         server_params.encode(<span class="kw-2">&amp;mut </span>server_buf);
         server_buf.push(<span class="number">34</span>);
-        <span class="macro">assert!</span>(decode_ecdh_params_::&lt;ServerECDHParams&gt;(<span class="kw-2">&amp;</span>server_buf).is_none());
+
+        <span class="kw">let </span><span class="kw-2">mut </span>common = CommonState::new(Side::Client);
+        <span class="macro">assert!</span>(decode_ecdh_params::&lt;ServerECDHParams&gt;(<span class="kw-2">&amp;mut </span>common, <span class="kw-2">&amp;</span>server_buf).is_err());
     }
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>client_ecdhe_invalid() {
-        <span class="macro">assert!</span>(decode_ecdh_params_::&lt;ClientECDHParams&gt;(<span class="kw-2">&amp;</span>[<span class="number">34</span>]).is_none());
+        <span class="kw">let </span><span class="kw-2">mut </span>common = CommonState::new(Side::Server);
+        <span class="macro">assert!</span>(decode_ecdh_params::&lt;ClientECDHParams&gt;(<span class="kw-2">&amp;mut </span>common, <span class="kw-2">&amp;</span>[<span class="number">34</span>]).is_err());
     }
 }
 </code></pre></div></section></main></body></html>

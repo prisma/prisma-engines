@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/nix/store/rw9bn419hs63s20iz4qrsgiddx2c69nb-vendor-cargo-deps/c19b7c6f923b580ac259164a89f2577984ad5ab09ee9d583b888f934adbbe8d0/ring-0.16.20/src/aead/poly1305.rs`."><title>poly1305.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-cb6f1f67f1bcd037.css" id="mainThemeStyle"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="ring" data-themes="" data-resource-suffix="" data-rustdoc-version="1.73.0 (cc66ad468 2023-10-03) (built from a source tarball)" data-channel="1.73.0" data-search-js="search-6dfdfced5eff6596.js" data-settings-js="settings-de11bff964e9d4e5.js" data-settings-css="settings-8c76f75bfb6bd192.css" data-theme-light-css="light-1596385f77d47ef2.css" data-theme-dark-css="dark-0a43001d3fc2282c.css" data-theme-ayu-css="ayu-fd19013d6ce078bf.css" ><script src="../../../static.files/storage-db41da1a38ea3cb8.js"></script><script defer src="../../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-0795b7d26be81095.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../../../static.files/light-1596385f77d47ef2.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../../../static.files/dark-0a43001d3fc2282c.css"><link rel="stylesheet" href="../../../static.files/noscript-cffde32267a19fd6.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../../ring/index.html"><img class="rust-logo" src="../../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/nix/store/8wbf91mp5aqggnly8dsfwbyfpxzfkram-vendor-cargo-deps/c19b7c6f923b580ac259164a89f2577984ad5ab09ee9d583b888f934adbbe8d0/ring-0.17.7/src/aead/poly1305.rs`."><title>poly1305.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-cb6f1f67f1bcd037.css" id="mainThemeStyle"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="ring" data-themes="" data-resource-suffix="" data-rustdoc-version="1.73.0 (cc66ad468 2023-10-03) (built from a source tarball)" data-channel="1.73.0" data-search-js="search-6dfdfced5eff6596.js" data-settings-js="settings-de11bff964e9d4e5.js" data-settings-css="settings-8c76f75bfb6bd192.css" data-theme-light-css="light-1596385f77d47ef2.css" data-theme-dark-css="dark-0a43001d3fc2282c.css" data-theme-ayu-css="ayu-fd19013d6ce078bf.css" ><script src="../../../static.files/storage-db41da1a38ea3cb8.js"></script><script defer src="../../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-0795b7d26be81095.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../../../static.files/light-1596385f77d47ef2.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../../../static.files/dark-0a43001d3fc2282c.css"><link rel="stylesheet" href="../../../static.files/noscript-cffde32267a19fd6.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../../ring/index.html"><img class="rust-logo" src="../../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -169,7 +169,7 @@
 
 // TODO: enforce maximum input length.
 
-</span><span class="kw">use super</span>::{block::BLOCK_LEN, Tag, TAG_LEN};
+</span><span class="kw">use super</span>::{Tag, TAG_LEN};
 <span class="kw">use crate</span>::{c, cpu};
 
 <span class="doccomment">/// A Poly1305 key.
@@ -178,7 +178,8 @@
     cpu_features: cpu::Features,
 }
 
-<span class="kw">const </span>KEY_LEN: usize = <span class="number">2 </span>* BLOCK_LEN;
+<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">const </span>BLOCK_LEN: usize = <span class="number">16</span>;
+<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">const </span>KEY_LEN: usize = <span class="number">2 </span>* BLOCK_LEN;
 
 <span class="kw">impl </span>Key {
     <span class="attr">#[inline]
@@ -196,7 +197,7 @@
     </span>cpu_features: cpu::Features,
 }
 
-<span class="comment">// Keep in sync with `poly1305_state` in GFp/poly1305.h.
+<span class="comment">// Keep in sync with `poly1305_state` in ring-core/poly1305.h.
 //
 // The C code, in particular the way the `poly1305_aligned_state` functions
 // are used, is only correct when the state buffer is 64-byte aligned.
@@ -215,13 +216,13 @@
             <span class="comment">// Apple&#39;s 32-bit ARM ABI is incompatible with the assembly code.
             </span><span class="attr">#[cfg(all(target_arch = <span class="string">&quot;arm&quot;</span>, not(target_vendor = <span class="string">&quot;apple&quot;</span>)))]
             </span>() <span class="kw">if </span>cpu::arm::NEON.available(<span class="macro-nonterminal">$features</span>) =&gt; {
-                <span class="kw">extern </span><span class="string">&quot;C&quot; </span>{
+                <span class="macro">prefixed_extern! </span>{
                     <span class="kw">fn </span><span class="macro-nonterminal">$neon_f</span>( $( <span class="macro-nonterminal">$p </span>: <span class="macro-nonterminal">$t </span>),+ );
                 }
                 <span class="kw">unsafe </span>{ <span class="macro-nonterminal">$neon_f</span>( $( <span class="macro-nonterminal">$a </span>),+ ) }
             }
             () =&gt; {
-                <span class="kw">extern </span><span class="string">&quot;C&quot; </span>{
+                <span class="macro">prefixed_extern! </span>{
                     <span class="kw">fn </span><span class="macro-nonterminal">$f</span>( $( <span class="macro-nonterminal">$p </span>: <span class="macro-nonterminal">$t </span>),+ );
                 }
                 <span class="kw">unsafe </span>{ <span class="macro-nonterminal">$f</span>( $( <span class="macro-nonterminal">$a </span>),+ ) }
@@ -245,7 +246,7 @@
 
         <span class="macro">dispatch!</span>(
             cpu_features =&gt;
-            (GFp_poly1305_init | GFp_poly1305_init_neon)
+            (CRYPTO_poly1305_init | CRYPTO_poly1305_init_neon)
             (statep: <span class="kw-2">&amp;mut </span>poly1305_state, key: <span class="kw-2">&amp;</span>[u8; KEY_LEN])
             (<span class="kw-2">&amp;mut </span>ctx.state, <span class="kw-2">&amp;</span>key_and_nonce));
 
@@ -256,7 +257,7 @@
     </span><span class="kw">pub fn </span>update(<span class="kw-2">&amp;mut </span><span class="self">self</span>, input: <span class="kw-2">&amp;</span>[u8]) {
         <span class="macro">dispatch!</span>(
             <span class="self">self</span>.cpu_features =&gt;
-            (GFp_poly1305_update | GFp_poly1305_update_neon)
+            (CRYPTO_poly1305_update | CRYPTO_poly1305_update_neon)
             (statep: <span class="kw-2">&amp;mut </span>poly1305_state, input: <span class="kw-2">*const </span>u8, in_len: c::size_t)
             (<span class="kw-2">&amp;mut </span><span class="self">self</span>.state, input.as_ptr(), input.len()));
     }
@@ -265,7 +266,7 @@
         <span class="kw">let </span><span class="kw-2">mut </span>tag = Tag([<span class="number">0u8</span>; TAG_LEN]);
         <span class="macro">dispatch!</span>(
             <span class="self">self</span>.cpu_features =&gt;
-            (GFp_poly1305_finish | GFp_poly1305_finish_neon)
+            (CRYPTO_poly1305_finish | CRYPTO_poly1305_finish_neon)
             (statep: <span class="kw-2">&amp;mut </span>poly1305_state, mac: <span class="kw-2">&amp;mut </span>[u8; TAG_LEN])
             (<span class="kw-2">&amp;mut </span><span class="self">self</span>.state, <span class="kw-2">&amp;mut </span>tag.<span class="number">0</span>));
         tag
@@ -286,7 +287,6 @@
 </span><span class="kw">mod </span>tests {
     <span class="kw">use super</span>::<span class="kw-2">*</span>;
     <span class="kw">use </span><span class="kw">crate</span>::test;
-    <span class="kw">use </span>core::convert::TryInto;
 
     <span class="comment">// Adapted from BoringSSL&#39;s crypto/poly1305/poly1305_test.cc.
     </span><span class="attr">#[test]
@@ -295,7 +295,7 @@
         test::run(<span class="macro">test_file!</span>(<span class="string">&quot;poly1305_test.txt&quot;</span>), |section, test_case| {
             <span class="macro">assert_eq!</span>(section, <span class="string">&quot;&quot;</span>);
             <span class="kw">let </span>key = test_case.consume_bytes(<span class="string">&quot;Key&quot;</span>);
-            <span class="kw">let </span>key: <span class="kw-2">&amp;</span>[u8; BLOCK_LEN * <span class="number">2</span>] = key.as_slice().try_into().unwrap();
+            <span class="kw">let </span>key: <span class="kw-2">&amp;</span>[u8; KEY_LEN] = key.as_slice().try_into().unwrap();
             <span class="kw">let </span>input = test_case.consume_bytes(<span class="string">&quot;Input&quot;</span>);
             <span class="kw">let </span>expected_mac = test_case.consume_bytes(<span class="string">&quot;MAC&quot;</span>);
             <span class="kw">let </span>key = Key::new(<span class="kw-2">*</span>key, cpu_features);

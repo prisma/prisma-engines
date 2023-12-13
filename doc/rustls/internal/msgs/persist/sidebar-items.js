@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"enum":["ClientSessionValue"],"struct":["ClientSessionCommon","ClientSessionKey","Retrieved","ServerSessionValue","Tls12ClientSessionValue","Tls13ClientSessionValue"],"type":["ServerSessionKey"]};
+window.SIDEBAR_ITEMS = {"struct":["ClientSessionCommon","Retrieved","ServerSessionValue","Tls12ClientSessionValue","Tls13ClientSessionValue"],"type":["ServerSessionKey"]};

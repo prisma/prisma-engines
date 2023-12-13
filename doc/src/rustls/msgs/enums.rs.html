@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/nix/store/rw9bn419hs63s20iz4qrsgiddx2c69nb-vendor-cargo-deps/c19b7c6f923b580ac259164a89f2577984ad5ab09ee9d583b888f934adbbe8d0/rustls-0.20.8/src/msgs/enums.rs`."><title>enums.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-cb6f1f67f1bcd037.css" id="mainThemeStyle"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="rustls" data-themes="" data-resource-suffix="" data-rustdoc-version="1.73.0 (cc66ad468 2023-10-03) (built from a source tarball)" data-channel="1.73.0" data-search-js="search-6dfdfced5eff6596.js" data-settings-js="settings-de11bff964e9d4e5.js" data-settings-css="settings-8c76f75bfb6bd192.css" data-theme-light-css="light-1596385f77d47ef2.css" data-theme-dark-css="dark-0a43001d3fc2282c.css" data-theme-ayu-css="ayu-fd19013d6ce078bf.css" ><script src="../../../static.files/storage-db41da1a38ea3cb8.js"></script><script defer src="../../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-0795b7d26be81095.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../../../static.files/light-1596385f77d47ef2.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../../../static.files/dark-0a43001d3fc2282c.css"><link rel="stylesheet" href="../../../static.files/noscript-cffde32267a19fd6.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../../rustls/index.html"><img class="rust-logo" src="../../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/nix/store/8wbf91mp5aqggnly8dsfwbyfpxzfkram-vendor-cargo-deps/c19b7c6f923b580ac259164a89f2577984ad5ab09ee9d583b888f934adbbe8d0/rustls-0.21.10/src/msgs/enums.rs`."><title>enums.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-cb6f1f67f1bcd037.css" id="mainThemeStyle"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="rustls" data-themes="" data-resource-suffix="" data-rustdoc-version="1.73.0 (cc66ad468 2023-10-03) (built from a source tarball)" data-channel="1.73.0" data-search-js="search-6dfdfced5eff6596.js" data-settings-js="settings-de11bff964e9d4e5.js" data-settings-css="settings-8c76f75bfb6bd192.css" data-theme-light-css="light-1596385f77d47ef2.css" data-theme-dark-css="dark-0a43001d3fc2282c.css" data-theme-ayu-css="ayu-fd19013d6ce078bf.css" ><script src="../../../static.files/storage-db41da1a38ea3cb8.js"></script><script defer src="../../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-0795b7d26be81095.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../../../static.files/light-1596385f77d47ef2.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../../../static.files/dark-0a43001d3fc2282c.css"><link rel="stylesheet" href="../../../static.files/noscript-cffde32267a19fd6.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../../rustls/index.html"><img class="rust-logo" src="../../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -370,9 +370,6 @@
 <a href="#370" id="370">370</a>
 <a href="#371" id="371">371</a>
 <a href="#372" id="372">372</a>
-<a href="#373" id="373">373</a>
-<a href="#374" id="374">374</a>
-<a href="#375" id="375">375</a>
 </pre></div><pre class="rust"><code><span class="attr">#![allow(clippy::upper_case_acronyms)]
 #![allow(non_camel_case_types)]
 </span><span class="doccomment">/// This file is autogenerated.  See https://github.com/ctz/tls-hacking/
@@ -392,22 +389,6 @@
         SHA256 =&gt; <span class="number">0x04</span>,
         SHA384 =&gt; <span class="number">0x05</span>,
         SHA512 =&gt; <span class="number">0x06
-    </span>}
-}
-
-<span class="macro">enum_builder! </span>{
-    <span class="doccomment">/// The `SignatureAlgorithm` TLS protocol enum.  Values in this enum are taken
-    /// from the various RFCs covering TLS, and are listed by IANA.
-    /// The `Unknown` item is used when processing unrecognised ordinals.
-    </span>@U8
-    EnumName: SignatureAlgorithm;
-    EnumVal{
-        Anonymous =&gt; <span class="number">0x00</span>,
-        RSA =&gt; <span class="number">0x01</span>,
-        DSA =&gt; <span class="number">0x02</span>,
-        ECDSA =&gt; <span class="number">0x03</span>,
-        ED25519 =&gt; <span class="number">0x07</span>,
-        ED448 =&gt; <span class="number">0x08
     </span>}
 }
 
@@ -445,50 +426,6 @@
 }
 
 <span class="macro">enum_builder! </span>{
-    <span class="doccomment">/// The `ContentType` TLS protocol enum.  Values in this enum are taken
-    /// from the various RFCs covering TLS, and are listed by IANA.
-    /// The `Unknown` item is used when processing unrecognised ordinals.
-    </span>@U8
-    EnumName: ContentType;
-    EnumVal{
-        ChangeCipherSpec =&gt; <span class="number">0x14</span>,
-        Alert =&gt; <span class="number">0x15</span>,
-        Handshake =&gt; <span class="number">0x16</span>,
-        ApplicationData =&gt; <span class="number">0x17</span>,
-        Heartbeat =&gt; <span class="number">0x18
-    </span>}
-}
-
-<span class="macro">enum_builder! </span>{
-    <span class="doccomment">/// The `HandshakeType` TLS protocol enum.  Values in this enum are taken
-    /// from the various RFCs covering TLS, and are listed by IANA.
-    /// The `Unknown` item is used when processing unrecognised ordinals.
-    </span>@U8
-    EnumName: HandshakeType;
-    EnumVal{
-        HelloRequest =&gt; <span class="number">0x00</span>,
-        ClientHello =&gt; <span class="number">0x01</span>,
-        ServerHello =&gt; <span class="number">0x02</span>,
-        HelloVerifyRequest =&gt; <span class="number">0x03</span>,
-        NewSessionTicket =&gt; <span class="number">0x04</span>,
-        EndOfEarlyData =&gt; <span class="number">0x05</span>,
-        HelloRetryRequest =&gt; <span class="number">0x06</span>,
-        EncryptedExtensions =&gt; <span class="number">0x08</span>,
-        Certificate =&gt; <span class="number">0x0b</span>,
-        ServerKeyExchange =&gt; <span class="number">0x0c</span>,
-        CertificateRequest =&gt; <span class="number">0x0d</span>,
-        ServerHelloDone =&gt; <span class="number">0x0e</span>,
-        CertificateVerify =&gt; <span class="number">0x0f</span>,
-        ClientKeyExchange =&gt; <span class="number">0x10</span>,
-        Finished =&gt; <span class="number">0x14</span>,
-        CertificateURL =&gt; <span class="number">0x15</span>,
-        CertificateStatus =&gt; <span class="number">0x16</span>,
-        KeyUpdate =&gt; <span class="number">0x18</span>,
-        MessageHash =&gt; <span class="number">0xfe
-    </span>}
-}
-
-<span class="macro">enum_builder! </span>{
     <span class="doccomment">/// The `AlertLevel` TLS protocol enum.  Values in this enum are taken
     /// from the various RFCs covering TLS, and are listed by IANA.
     /// The `Unknown` item is used when processing unrecognised ordinals.
@@ -497,50 +434,6 @@
     EnumVal{
         Warning =&gt; <span class="number">0x01</span>,
         Fatal =&gt; <span class="number">0x02
-    </span>}
-}
-
-<span class="macro">enum_builder! </span>{
-    <span class="doccomment">/// The `AlertDescription` TLS protocol enum.  Values in this enum are taken
-    /// from the various RFCs covering TLS, and are listed by IANA.
-    /// The `Unknown` item is used when processing unrecognised ordinals.
-    </span>@U8
-    EnumName: AlertDescription;
-    EnumVal{
-        CloseNotify =&gt; <span class="number">0x00</span>,
-        UnexpectedMessage =&gt; <span class="number">0x0a</span>,
-        BadRecordMac =&gt; <span class="number">0x14</span>,
-        DecryptionFailed =&gt; <span class="number">0x15</span>,
-        RecordOverflow =&gt; <span class="number">0x16</span>,
-        DecompressionFailure =&gt; <span class="number">0x1e</span>,
-        HandshakeFailure =&gt; <span class="number">0x28</span>,
-        NoCertificate =&gt; <span class="number">0x29</span>,
-        BadCertificate =&gt; <span class="number">0x2a</span>,
-        UnsupportedCertificate =&gt; <span class="number">0x2b</span>,
-        CertificateRevoked =&gt; <span class="number">0x2c</span>,
-        CertificateExpired =&gt; <span class="number">0x2d</span>,
-        CertificateUnknown =&gt; <span class="number">0x2e</span>,
-        IllegalParameter =&gt; <span class="number">0x2f</span>,
-        UnknownCA =&gt; <span class="number">0x30</span>,
-        AccessDenied =&gt; <span class="number">0x31</span>,
-        DecodeError =&gt; <span class="number">0x32</span>,
-        DecryptError =&gt; <span class="number">0x33</span>,
-        ExportRestriction =&gt; <span class="number">0x3c</span>,
-        ProtocolVersion =&gt; <span class="number">0x46</span>,
-        InsufficientSecurity =&gt; <span class="number">0x47</span>,
-        InternalError =&gt; <span class="number">0x50</span>,
-        InappropriateFallback =&gt; <span class="number">0x56</span>,
-        UserCanceled =&gt; <span class="number">0x5a</span>,
-        NoRenegotiation =&gt; <span class="number">0x64</span>,
-        MissingExtension =&gt; <span class="number">0x6d</span>,
-        UnsupportedExtension =&gt; <span class="number">0x6e</span>,
-        CertificateUnobtainable =&gt; <span class="number">0x6f</span>,
-        UnrecognisedName =&gt; <span class="number">0x70</span>,
-        BadCertificateStatusResponse =&gt; <span class="number">0x71</span>,
-        BadCertificateHashValue =&gt; <span class="number">0x72</span>,
-        UnknownPSKIdentity =&gt; <span class="number">0x73</span>,
-        CertificateRequired =&gt; <span class="number">0x74</span>,
-        NoApplicationProtocol =&gt; <span class="number">0x78
     </span>}
 }
 
@@ -618,6 +511,11 @@
     <span class="doccomment">/// The `NamedCurve` TLS protocol enum.  Values in this enum are taken
     /// from the various RFCs covering TLS, and are listed by IANA.
     /// The `Unknown` item is used when processing unrecognised ordinals.
+    ///
+    /// This enum is used for recognizing elliptic curve parameters advertised
+    /// by a peer during a TLS handshake. It is **not** a list of curves that
+    /// Rustls supports. See [`crate::kx_group`] for the list of supported
+    /// elliptic curve groups.
     </span>@U16
     EnumName: NamedCurve;
     EnumVal{
@@ -689,6 +587,10 @@
     </span>}
 }
 
+<span class="kw">impl </span>ECPointFormat {
+    <span class="kw">pub const </span>SUPPORTED: [<span class="self">Self</span>; <span class="number">1</span>] = [<span class="self">Self</span>::Uncompressed];
+}
+
 <span class="macro">enum_builder! </span>{
     <span class="doccomment">/// The `HeartbeatMode` TLS protocol enum.  Values in this enum are taken
     /// from the various RFCs covering TLS, and are listed by IANA.
@@ -747,5 +649,97 @@
     EnumVal{
         OCSP =&gt; <span class="number">0x01
     </span>}
+}
+
+<span class="attr">#[cfg(test)]
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">mod </span>tests {
+    <span class="doccomment">//! These tests are intended to provide coverage and
+    //! check panic-safety of relatively unused values.
+
+    </span><span class="kw">use super</span>::<span class="kw-2">*</span>;
+    <span class="kw">use </span><span class="kw">crate</span>::msgs::codec::Codec;
+
+    <span class="attr">#[test]
+    </span><span class="kw">fn </span>test_enums() {
+        test_enum8::&lt;HashAlgorithm&gt;(HashAlgorithm::NONE, HashAlgorithm::SHA512);
+        test_enum8::&lt;ClientCertificateType&gt;(
+            ClientCertificateType::RSASign,
+            ClientCertificateType::ECDSAFixedECDH,
+        );
+        test_enum8::&lt;Compression&gt;(Compression::Null, Compression::LSZ);
+        test_enum8::&lt;AlertLevel&gt;(AlertLevel::Warning, AlertLevel::Fatal);
+        test_enum8::&lt;HeartbeatMessageType&gt;(
+            HeartbeatMessageType::Request,
+            HeartbeatMessageType::Response,
+        );
+        test_enum16::&lt;ExtensionType&gt;(ExtensionType::ServerName, ExtensionType::RenegotiationInfo);
+        test_enum8::&lt;ServerNameType&gt;(ServerNameType::HostName, ServerNameType::HostName);
+        test_enum16::&lt;NamedCurve&gt;(
+            NamedCurve::sect163k1,
+            NamedCurve::arbitrary_explicit_char2_curves,
+        );
+        test_enum16::&lt;NamedGroup&gt;(NamedGroup::secp256r1, NamedGroup::FFDHE8192);
+        test_enum8::&lt;ECPointFormat&gt;(
+            ECPointFormat::Uncompressed,
+            ECPointFormat::ANSIX962CompressedChar2,
+        );
+        test_enum8::&lt;HeartbeatMode&gt;(
+            HeartbeatMode::PeerAllowedToSend,
+            HeartbeatMode::PeerNotAllowedToSend,
+        );
+        test_enum8::&lt;ECCurveType&gt;(ECCurveType::ExplicitPrime, ECCurveType::NamedCurve);
+        test_enum8::&lt;PSKKeyExchangeMode&gt;(
+            PSKKeyExchangeMode::PSK_KE,
+            PSKKeyExchangeMode::PSK_DHE_KE,
+        );
+        test_enum8::&lt;KeyUpdateRequest&gt;(
+            KeyUpdateRequest::UpdateNotRequested,
+            KeyUpdateRequest::UpdateRequested,
+        );
+        test_enum8::&lt;CertificateStatusType&gt;(
+            CertificateStatusType::OCSP,
+            CertificateStatusType::OCSP,
+        );
+    }
+
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>test_enum8&lt;T: Codec&gt;(first: T, last: T) {
+        <span class="kw">let </span>first_v = get8(<span class="kw-2">&amp;</span>first);
+        <span class="kw">let </span>last_v = get8(<span class="kw-2">&amp;</span>last);
+
+        <span class="kw">for </span>val <span class="kw">in </span>first_v..last_v + <span class="number">1 </span>{
+            <span class="kw">let </span><span class="kw-2">mut </span>buf = Vec::new();
+            val.encode(<span class="kw-2">&amp;mut </span>buf);
+            <span class="macro">assert_eq!</span>(buf.len(), <span class="number">1</span>);
+
+            <span class="kw">let </span>t = T::read_bytes(<span class="kw-2">&amp;</span>buf).unwrap();
+            <span class="macro">assert_eq!</span>(val, get8(<span class="kw-2">&amp;</span>t));
+        }
+    }
+
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>test_enum16&lt;T: Codec&gt;(first: T, last: T) {
+        <span class="kw">let </span>first_v = get16(<span class="kw-2">&amp;</span>first);
+        <span class="kw">let </span>last_v = get16(<span class="kw-2">&amp;</span>last);
+
+        <span class="kw">for </span>val <span class="kw">in </span>first_v..last_v + <span class="number">1 </span>{
+            <span class="kw">let </span><span class="kw-2">mut </span>buf = Vec::new();
+            val.encode(<span class="kw-2">&amp;mut </span>buf);
+            <span class="macro">assert_eq!</span>(buf.len(), <span class="number">2</span>);
+
+            <span class="kw">let </span>t = T::read_bytes(<span class="kw-2">&amp;</span>buf).unwrap();
+            <span class="macro">assert_eq!</span>(val, get16(<span class="kw-2">&amp;</span>t));
+        }
+    }
+
+    <span class="kw">fn </span>get8&lt;T: Codec&gt;(enum_value: <span class="kw-2">&amp;</span>T) -&gt; u8 {
+        <span class="kw">let </span>enc = enum_value.get_encoding();
+        <span class="macro">assert_eq!</span>(enc.len(), <span class="number">1</span>);
+        enc[<span class="number">0</span>]
+    }
+
+    <span class="kw">fn </span>get16&lt;T: Codec&gt;(enum_value: <span class="kw-2">&amp;</span>T) -&gt; u16 {
+        <span class="kw">let </span>enc = enum_value.get_encoding();
+        <span class="macro">assert_eq!</span>(enc.len(), <span class="number">2</span>);
+        (enc[<span class="number">0</span>] <span class="kw">as </span>u16 &gt;&gt; <span class="number">8</span>) | (enc[<span class="number">1</span>] <span class="kw">as </span>u16)
+    }
 }
 </code></pre></div></section></main></body></html>

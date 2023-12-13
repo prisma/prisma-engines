@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/nix/store/rw9bn419hs63s20iz4qrsgiddx2c69nb-vendor-cargo-deps/c19b7c6f923b580ac259164a89f2577984ad5ab09ee9d583b888f934adbbe8d0/ring-0.16.20/src/ec/suite_b/ops/p384.rs`."><title>p384.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../../../static.files/rustdoc-cb6f1f67f1bcd037.css" id="mainThemeStyle"><meta name="rustdoc-vars" data-root-path="../../../../../" data-static-root-path="../../../../../static.files/" data-current-crate="ring" data-themes="" data-resource-suffix="" data-rustdoc-version="1.73.0 (cc66ad468 2023-10-03) (built from a source tarball)" data-channel="1.73.0" data-search-js="search-6dfdfced5eff6596.js" data-settings-js="settings-de11bff964e9d4e5.js" data-settings-css="settings-8c76f75bfb6bd192.css" data-theme-light-css="light-1596385f77d47ef2.css" data-theme-dark-css="dark-0a43001d3fc2282c.css" data-theme-ayu-css="ayu-fd19013d6ce078bf.css" ><script src="../../../../../static.files/storage-db41da1a38ea3cb8.js"></script><script defer src="../../../../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../../../../src-files.js"></script><script defer src="../../../../../static.files/main-0795b7d26be81095.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../../../../../static.files/light-1596385f77d47ef2.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../../../../../static.files/dark-0a43001d3fc2282c.css"><link rel="stylesheet" href="../../../../../static.files/noscript-cffde32267a19fd6.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../../../../ring/index.html"><img class="rust-logo" src="../../../../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/nix/store/8wbf91mp5aqggnly8dsfwbyfpxzfkram-vendor-cargo-deps/c19b7c6f923b580ac259164a89f2577984ad5ab09ee9d583b888f934adbbe8d0/ring-0.17.7/src/ec/suite_b/ops/p384.rs`."><title>p384.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../../../static.files/rustdoc-cb6f1f67f1bcd037.css" id="mainThemeStyle"><meta name="rustdoc-vars" data-root-path="../../../../../" data-static-root-path="../../../../../static.files/" data-current-crate="ring" data-themes="" data-resource-suffix="" data-rustdoc-version="1.73.0 (cc66ad468 2023-10-03) (built from a source tarball)" data-channel="1.73.0" data-search-js="search-6dfdfced5eff6596.js" data-settings-js="settings-de11bff964e9d4e5.js" data-settings-css="settings-8c76f75bfb6bd192.css" data-theme-light-css="light-1596385f77d47ef2.css" data-theme-dark-css="dark-0a43001d3fc2282c.css" data-theme-ayu-css="ayu-fd19013d6ce078bf.css" ><script src="../../../../../static.files/storage-db41da1a38ea3cb8.js"></script><script defer src="../../../../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../../../../src-files.js"></script><script defer src="../../../../../static.files/main-0795b7d26be81095.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../../../../../static.files/light-1596385f77d47ef2.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../../../../../static.files/dark-0a43001d3fc2282c.css"><link rel="stylesheet" href="../../../../../static.files/noscript-cffde32267a19fd6.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../../../../ring/index.html"><img class="rust-logo" src="../../../../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -297,78 +297,7 @@
 <a href="#297" id="297">297</a>
 <a href="#298" id="298">298</a>
 <a href="#299" id="299">299</a>
-<a href="#300" id="300">300</a>
-<a href="#301" id="301">301</a>
-<a href="#302" id="302">302</a>
-<a href="#303" id="303">303</a>
-<a href="#304" id="304">304</a>
-<a href="#305" id="305">305</a>
-<a href="#306" id="306">306</a>
-<a href="#307" id="307">307</a>
-<a href="#308" id="308">308</a>
-<a href="#309" id="309">309</a>
-<a href="#310" id="310">310</a>
-<a href="#311" id="311">311</a>
-<a href="#312" id="312">312</a>
-<a href="#313" id="313">313</a>
-<a href="#314" id="314">314</a>
-<a href="#315" id="315">315</a>
-<a href="#316" id="316">316</a>
-<a href="#317" id="317">317</a>
-<a href="#318" id="318">318</a>
-<a href="#319" id="319">319</a>
-<a href="#320" id="320">320</a>
-<a href="#321" id="321">321</a>
-<a href="#322" id="322">322</a>
-<a href="#323" id="323">323</a>
-<a href="#324" id="324">324</a>
-<a href="#325" id="325">325</a>
-<a href="#326" id="326">326</a>
-<a href="#327" id="327">327</a>
-<a href="#328" id="328">328</a>
-<a href="#329" id="329">329</a>
-<a href="#330" id="330">330</a>
-<a href="#331" id="331">331</a>
-<a href="#332" id="332">332</a>
-<a href="#333" id="333">333</a>
-<a href="#334" id="334">334</a>
-<a href="#335" id="335">335</a>
-<a href="#336" id="336">336</a>
-<a href="#337" id="337">337</a>
-<a href="#338" id="338">338</a>
-<a href="#339" id="339">339</a>
-<a href="#340" id="340">340</a>
-<a href="#341" id="341">341</a>
-<a href="#342" id="342">342</a>
-<a href="#343" id="343">343</a>
-<a href="#344" id="344">344</a>
-<a href="#345" id="345">345</a>
-<a href="#346" id="346">346</a>
-<a href="#347" id="347">347</a>
-<a href="#348" id="348">348</a>
-<a href="#349" id="349">349</a>
-<a href="#350" id="350">350</a>
-<a href="#351" id="351">351</a>
-<a href="#352" id="352">352</a>
-<a href="#353" id="353">353</a>
-<a href="#354" id="354">354</a>
-<a href="#355" id="355">355</a>
-<a href="#356" id="356">356</a>
-<a href="#357" id="357">357</a>
-<a href="#358" id="358">358</a>
-<a href="#359" id="359">359</a>
-<a href="#360" id="360">360</a>
-<a href="#361" id="361">361</a>
-<a href="#362" id="362">362</a>
-<a href="#363" id="363">363</a>
-<a href="#364" id="364">364</a>
-<a href="#365" id="365">365</a>
-<a href="#366" id="366">366</a>
-<a href="#367" id="367">367</a>
-<a href="#368" id="368">368</a>
-<a href="#369" id="369">369</a>
-<a href="#370" id="370">370</a>
-</pre></div><pre class="rust"><code><span class="comment">// Copyright 2016 Brian Smith.
+</pre></div><pre class="rust"><code><span class="comment">// Copyright 2016-2023 Brian Smith.
 //
 // Permission to use, copy, modify, and/or distribute this software for any
 // purpose with or without fee is hereby granted, provided that the above
@@ -386,62 +315,35 @@
     elem::{binary_op, binary_op_assign},
     elem_sqr_mul, elem_sqr_mul_acc, Modulus, <span class="kw-2">*</span>,
 };
-<span class="kw">use </span>core::marker::PhantomData;
-
-<span class="macro">macro_rules! </span>p384_limbs {
-    [$(<span class="macro-nonterminal">$limb</span>:expr),+] =&gt; {
-        <span class="macro">limbs!</span>[$(<span class="macro-nonterminal">$limb</span>),+]
-    };
-}
 
 <span class="kw">pub static </span>COMMON_OPS: CommonOps = CommonOps {
     num_limbs: <span class="number">384 </span>/ LIMB_BITS,
 
     q: Modulus {
-        p: <span class="macro">p384_limbs!</span>[
-            <span class="number">0xffffffff</span>, <span class="number">0x00000000</span>, <span class="number">0x00000000</span>, <span class="number">0xffffffff</span>, <span class="number">0xfffffffe</span>, <span class="number">0xffffffff</span>, <span class="number">0xffffffff</span>,
-            <span class="number">0xffffffff</span>, <span class="number">0xffffffff</span>, <span class="number">0xffffffff</span>, <span class="number">0xffffffff</span>, <span class="number">0xffffffff
-        </span>],
-        rr: <span class="macro">p384_limbs!</span>[<span class="number">1</span>, <span class="number">0xfffffffe</span>, <span class="number">0</span>, <span class="number">2</span>, <span class="number">0</span>, <span class="number">0xfffffffe</span>, <span class="number">0</span>, <span class="number">2</span>, <span class="number">1</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>],
+        p: limbs_from_hex(<span class="string">&quot;fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffeffffffff0000000000000000ffffffff&quot;</span>),
+        rr: limbs_from_hex(<span class="string">&quot;10000000200000000fffffffe000000000000000200000000fffffffe00000001&quot;</span>),
     },
-    n: Elem {
-        limbs: <span class="macro">p384_limbs!</span>[
-            <span class="number">0xccc52973</span>, <span class="number">0xecec196a</span>, <span class="number">0x48b0a77a</span>, <span class="number">0x581a0db2</span>, <span class="number">0xf4372ddf</span>, <span class="number">0xc7634d81</span>, <span class="number">0xffffffff</span>,
-            <span class="number">0xffffffff</span>, <span class="number">0xffffffff</span>, <span class="number">0xffffffff</span>, <span class="number">0xffffffff</span>, <span class="number">0xffffffff
-        </span>],
-        m: PhantomData,
-        encoding: PhantomData, <span class="comment">// Unencoded
-    </span>},
+    n: Elem::from_hex(<span class="string">&quot;ffffffffffffffffffffffffffffffffffffffffffffffffc7634d81f4372ddf581a0db248b0a77aecec196accc52973&quot;</span>),
 
-    a: Elem {
-        limbs: <span class="macro">p384_limbs!</span>[
-            <span class="number">0xfffffffc</span>, <span class="number">0x00000003</span>, <span class="number">0x00000000</span>, <span class="number">0xfffffffc</span>, <span class="number">0xfffffffb</span>, <span class="number">0xffffffff</span>, <span class="number">0xffffffff</span>,
-            <span class="number">0xffffffff</span>, <span class="number">0xffffffff</span>, <span class="number">0xffffffff</span>, <span class="number">0xffffffff</span>, <span class="number">0xffffffff
-        </span>],
-        m: PhantomData,
-        encoding: PhantomData, <span class="comment">// Unreduced
-    </span>},
-    b: Elem {
-        limbs: <span class="macro">p384_limbs!</span>[
-            <span class="number">0x9d412dcc</span>, <span class="number">0x08118871</span>, <span class="number">0x7a4c32ec</span>, <span class="number">0xf729add8</span>, <span class="number">0x1920022e</span>, <span class="number">0x77f2209b</span>, <span class="number">0x94938ae2</span>,
-            <span class="number">0xe3374bee</span>, <span class="number">0x1f022094</span>, <span class="number">0xb62b21f4</span>, <span class="number">0x604fbff9</span>, <span class="number">0xcd08114b
-        </span>],
-        m: PhantomData,
-        encoding: PhantomData, <span class="comment">// Unreduced
-    </span>},
+    a: Elem::from_hex(<span class="string">&quot;fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffbfffffffc0000000000000003fffffffc&quot;</span>),
+    b: Elem::from_hex(<span class="string">&quot;cd08114b604fbff9b62b21f41f022094e3374bee94938ae277f2209b1920022ef729add87a4c32ec081188719d412dcc&quot;</span>),
 
-    elem_add_impl: GFp_p384_elem_add,
-    elem_mul_mont: GFp_p384_elem_mul_mont,
-    elem_sqr_mont: GFp_p384_elem_sqr_mont,
+    elem_mul_mont: p384_elem_mul_mont,
+    elem_sqr_mont: p384_elem_sqr_mont,
 
-    point_add_jacobian_impl: GFp_nistz384_point_add,
+    point_add_jacobian_impl: p384_point_add,
 };
+
+<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">static </span>GENERATOR: (Elem&lt;R&gt;, Elem&lt;R&gt;) = (
+    Elem::from_hex(<span class="string">&quot;4d3aadc2299e1513812ff723614ede2b6454868459a30eff879c3afc541b4d6e20e378e2a0d6ce383dd0756649c0b528&quot;</span>),
+    Elem::from_hex(<span class="string">&quot;2b78abc25a15c5e9dd8002263969a840c6c3521968f4ffd98bade7562e83b050a1bfa8bf7bb4a9ac23043dad4b03a4fe&quot;</span>),
+);
 
 <span class="kw">pub static </span>PRIVATE_KEY_OPS: PrivateKeyOps = PrivateKeyOps {
     common: <span class="kw-2">&amp;</span>COMMON_OPS,
     elem_inv_squared: p384_elem_inv_squared,
     point_mul_base_impl: p384_point_mul_base_impl,
-    point_mul_impl: GFp_nistz384_point_mul,
+    point_mul_impl: p384_point_mul,
 };
 
 <span class="kw">fn </span>p384_elem_inv_squared(a: <span class="kw-2">&amp;</span>Elem&lt;R&gt;) -&gt; Elem&lt;R&gt; {
@@ -502,26 +404,7 @@
 
 <span class="kw">fn </span>p384_point_mul_base_impl(a: <span class="kw-2">&amp;</span>Scalar) -&gt; Point {
     <span class="comment">// XXX: Not efficient. TODO: Precompute multiples of the generator.
-    </span><span class="kw">static </span>GENERATOR: (Elem&lt;R&gt;, Elem&lt;R&gt;) = (
-        Elem {
-            limbs: <span class="macro">p384_limbs!</span>[
-                <span class="number">0x49c0b528</span>, <span class="number">0x3dd07566</span>, <span class="number">0xa0d6ce38</span>, <span class="number">0x20e378e2</span>, <span class="number">0x541b4d6e</span>, <span class="number">0x879c3afc</span>, <span class="number">0x59a30eff</span>,
-                <span class="number">0x64548684</span>, <span class="number">0x614ede2b</span>, <span class="number">0x812ff723</span>, <span class="number">0x299e1513</span>, <span class="number">0x4d3aadc2
-            </span>],
-            m: PhantomData,
-            encoding: PhantomData,
-        },
-        Elem {
-            limbs: <span class="macro">p384_limbs!</span>[
-                <span class="number">0x4b03a4fe</span>, <span class="number">0x23043dad</span>, <span class="number">0x7bb4a9ac</span>, <span class="number">0xa1bfa8bf</span>, <span class="number">0x2e83b050</span>, <span class="number">0x8bade756</span>, <span class="number">0x68f4ffd9</span>,
-                <span class="number">0xc6c35219</span>, <span class="number">0x3969a840</span>, <span class="number">0xdd800226</span>, <span class="number">0x5a15c5e9</span>, <span class="number">0x2b78abc2
-            </span>],
-            m: PhantomData,
-            encoding: PhantomData,
-        },
-    );
-
-    PRIVATE_KEY_OPS.point_mul(a, <span class="kw-2">&amp;</span>GENERATOR)
+    </span>PRIVATE_KEY_OPS.point_mul(a, <span class="kw-2">&amp;</span>GENERATOR)
 }
 
 <span class="kw">pub static </span>PUBLIC_KEY_OPS: PublicKeyOps = PublicKeyOps {
@@ -530,57 +413,50 @@
 
 <span class="kw">pub static </span>SCALAR_OPS: ScalarOps = ScalarOps {
     common: <span class="kw-2">&amp;</span>COMMON_OPS,
-    scalar_inv_to_mont_impl: p384_scalar_inv_to_mont,
-    scalar_mul_mont: GFp_p384_scalar_mul_mont,
+    scalar_mul_mont: p384_scalar_mul_mont,
 };
 
 <span class="kw">pub static </span>PUBLIC_SCALAR_OPS: PublicScalarOps = PublicScalarOps {
     scalar_ops: <span class="kw-2">&amp;</span>SCALAR_OPS,
     public_key_ops: <span class="kw-2">&amp;</span>PUBLIC_KEY_OPS,
-    private_key_ops: <span class="kw-2">&amp;</span>PRIVATE_KEY_OPS,
+    twin_mul: |g_scalar, p_scalar, p_xy| {
+        twin_mul_inefficient(<span class="kw-2">&amp;</span>PRIVATE_KEY_OPS, g_scalar, p_scalar, p_xy)
+    },
 
-    q_minus_n: Elem {
-        limbs: <span class="macro">p384_limbs!</span>[
-            <span class="number">0x333ad68c</span>, <span class="number">0x1313e696</span>, <span class="number">0xb74f5885</span>, <span class="number">0xa7e5f24c</span>, <span class="number">0x0bc8d21f</span>, <span class="number">0x389cb27e</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>,
-            <span class="number">0
-        </span>],
+    q_minus_n: Elem::from_hex(<span class="string">&quot;389cb27e0bc8d21fa7e5f24cb74f58851313e696333ad68c&quot;</span>),
 
-        m: PhantomData,
-        encoding: PhantomData, <span class="comment">// Unencoded
-    </span>},
+    <span class="comment">// TODO: Use an optimized variable-time implementation.
+    </span>scalar_inv_to_mont_vartime: |s| PRIVATE_SCALAR_OPS.scalar_inv_to_mont(s),
 };
 
 <span class="kw">pub static </span>PRIVATE_SCALAR_OPS: PrivateScalarOps = PrivateScalarOps {
     scalar_ops: <span class="kw-2">&amp;</span>SCALAR_OPS,
 
-    oneRR_mod_n: Scalar {
-        limbs: N_RR_LIMBS,
-        m: PhantomData,
-        encoding: PhantomData, <span class="comment">// R
-    </span>},
+    oneRR_mod_n: Scalar::from_hex(<span class="string">&quot;c84ee012b39bf213fb05b7a28266895d40d49174aab1cc5bc3e483afcb82947ff3d81e5df1aa4192d319b2419b409a9&quot;</span>),
+    scalar_inv_to_mont: p384_scalar_inv_to_mont,
 };
 
-<span class="kw">fn </span>p384_scalar_inv_to_mont(a: <span class="kw-2">&amp;</span>Scalar&lt;Unencoded&gt;) -&gt; Scalar&lt;R&gt; {
+<span class="kw">fn </span>p384_scalar_inv_to_mont(a: Scalar&lt;R&gt;) -&gt; Scalar&lt;R&gt; {
     <span class="comment">// Calculate the modular inverse of scalar |a| using Fermat&#39;s Little
     // Theorem:
     //
-    //   a**-1 (mod n) == a**(n - 2) (mod n)
+    //    a**-1 (mod n) == a**(n - 2) (mod n)
     //
     // The exponent (n - 2) is:
     //
-    //     0xffffffffffffffffffffffffffffffffffffffffffffffffc7634d81f4372ddf\
-    //       581a0db248b0a77aecec196accc52971.
+    //    0xffffffffffffffffffffffffffffffffffffffffffffffffc7634d81f4372ddf\
+    //      581a0db248b0a77aecec196accc52971
 
     </span><span class="kw">fn </span>mul(a: <span class="kw-2">&amp;</span>Scalar&lt;R&gt;, b: <span class="kw-2">&amp;</span>Scalar&lt;R&gt;) -&gt; Scalar&lt;R&gt; {
-        binary_op(GFp_p384_scalar_mul_mont, a, b)
+        binary_op(p384_scalar_mul_mont, a, b)
     }
 
     <span class="kw">fn </span>sqr(a: <span class="kw-2">&amp;</span>Scalar&lt;R&gt;) -&gt; Scalar&lt;R&gt; {
-        binary_op(GFp_p384_scalar_mul_mont, a, a)
+        binary_op(p384_scalar_mul_mont, a, a)
     }
 
     <span class="kw">fn </span>sqr_mut(a: <span class="kw-2">&amp;mut </span>Scalar&lt;R&gt;) {
-        unary_op_from_binary_op_assign(GFp_p384_scalar_mul_mont, a);
+        unary_op_from_binary_op_assign(p384_scalar_mul_mont, a);
     }
 
     <span class="comment">// Returns (`a` squared `squarings` times) * `b`.
@@ -599,16 +475,7 @@
         <span class="kw">for _ in </span><span class="number">0</span>..squarings {
             sqr_mut(acc);
         }
-        binary_op_assign(GFp_p384_scalar_mul_mont, acc, b)
-    }
-
-    <span class="kw">fn </span>to_mont(a: <span class="kw-2">&amp;</span>Scalar&lt;Unencoded&gt;) -&gt; Scalar&lt;R&gt; {
-        <span class="kw">static </span>N_RR: Scalar&lt;Unencoded&gt; = Scalar {
-            limbs: N_RR_LIMBS,
-            m: PhantomData,
-            encoding: PhantomData,
-        };
-        binary_op(GFp_p384_scalar_mul_mont, a, <span class="kw-2">&amp;</span>N_RR)
+        binary_op_assign(p384_scalar_mul_mont, acc, b)
     }
 
     <span class="comment">// Indexes into `d`.
@@ -623,7 +490,7 @@
     <span class="kw">const </span>DIGIT_COUNT: usize = <span class="number">8</span>;
 
     <span class="kw">let </span><span class="kw-2">mut </span>d = [Scalar::zero(); DIGIT_COUNT];
-    d[B_1] = to_mont(a);
+    d[B_1] = a;
     <span class="kw">let </span>b_10 = sqr(<span class="kw-2">&amp;</span>d[B_1]);
     <span class="kw">for </span>i <span class="kw">in </span>B_11..DIGIT_COUNT {
         d[i] = mul(<span class="kw-2">&amp;</span>d[i - <span class="number">1</span>], <span class="kw-2">&amp;</span>b_10);
@@ -646,6 +513,7 @@
     //    0101100000011010000011011011001001001000101100001010011101111010
     //    1110110011101100000110010110101011001100110001010010100101110001
 
+    </span><span class="attr">#[allow(clippy::cast_possible_truncation)]
     </span><span class="kw">static </span>REMAINING_WINDOWS: [(u8, u8); <span class="number">39</span>] = [
         (<span class="number">2</span>, B_11 <span class="kw">as </span>u8),
         (<span class="number">3 </span>+ <span class="number">3</span>, B_111 <span class="kw">as </span>u8),
@@ -695,44 +563,34 @@
     acc
 }
 
-<span class="kw">unsafe extern </span><span class="string">&quot;C&quot; </span><span class="kw">fn </span>GFp_p384_elem_sqr_mont(
+<span class="kw">unsafe extern </span><span class="string">&quot;C&quot; </span><span class="kw">fn </span>p384_elem_sqr_mont(
     r: <span class="kw-2">*mut </span>Limb,   <span class="comment">// [COMMON_OPS.num_limbs]
     </span>a: <span class="kw-2">*const </span>Limb, <span class="comment">// [COMMON_OPS.num_limbs]
 </span>) {
     <span class="comment">// XXX: Inefficient. TODO: Make a dedicated squaring routine.
-    </span>GFp_p384_elem_mul_mont(r, a, a);
+    </span>p384_elem_mul_mont(r, a, a);
 }
 
-<span class="kw">const </span>N_RR_LIMBS: [Limb; MAX_LIMBS] = <span class="macro">p384_limbs!</span>[
-    <span class="number">0x19b409a9</span>, <span class="number">0x2d319b24</span>, <span class="number">0xdf1aa419</span>, <span class="number">0xff3d81e5</span>, <span class="number">0xfcb82947</span>, <span class="number">0xbc3e483a</span>, <span class="number">0x4aab1cc5</span>, <span class="number">0xd40d4917</span>,
-    <span class="number">0x28266895</span>, <span class="number">0x3fb05b7a</span>, <span class="number">0x2b39bf21</span>, <span class="number">0x0c84ee01
-</span>];
-
-<span class="kw">extern </span><span class="string">&quot;C&quot; </span>{
-    <span class="kw">fn </span>GFp_p384_elem_add(
-        r: <span class="kw-2">*mut </span>Limb,   <span class="comment">// [COMMON_OPS.num_limbs]
-        </span>a: <span class="kw-2">*const </span>Limb, <span class="comment">// [COMMON_OPS.num_limbs]
-        </span>b: <span class="kw-2">*const </span>Limb, <span class="comment">// [COMMON_OPS.num_limbs]
-    </span>);
-    <span class="kw">fn </span>GFp_p384_elem_mul_mont(
+<span class="macro">prefixed_extern! </span>{
+    <span class="kw">fn </span>p384_elem_mul_mont(
         r: <span class="kw-2">*mut </span>Limb,   <span class="comment">// [COMMON_OPS.num_limbs]
         </span>a: <span class="kw-2">*const </span>Limb, <span class="comment">// [COMMON_OPS.num_limbs]
         </span>b: <span class="kw-2">*const </span>Limb, <span class="comment">// [COMMON_OPS.num_limbs]
     </span>);
 
-    <span class="kw">fn </span>GFp_nistz384_point_add(
+    <span class="kw">fn </span>p384_point_add(
         r: <span class="kw-2">*mut </span>Limb,   <span class="comment">// [3][COMMON_OPS.num_limbs]
         </span>a: <span class="kw-2">*const </span>Limb, <span class="comment">// [3][COMMON_OPS.num_limbs]
         </span>b: <span class="kw-2">*const </span>Limb, <span class="comment">// [3][COMMON_OPS.num_limbs]
     </span>);
-    <span class="kw">fn </span>GFp_nistz384_point_mul(
+    <span class="kw">fn </span>p384_point_mul(
         r: <span class="kw-2">*mut </span>Limb,          <span class="comment">// [3][COMMON_OPS.num_limbs]
         </span>p_scalar: <span class="kw-2">*const </span>Limb, <span class="comment">// [COMMON_OPS.num_limbs]
         </span>p_x: <span class="kw-2">*const </span>Limb,      <span class="comment">// [COMMON_OPS.num_limbs]
         </span>p_y: <span class="kw-2">*const </span>Limb,      <span class="comment">// [COMMON_OPS.num_limbs]
     </span>);
 
-    <span class="kw">fn </span>GFp_p384_scalar_mul_mont(
+    <span class="kw">fn </span>p384_scalar_mul_mont(
         r: <span class="kw-2">*mut </span>Limb,   <span class="comment">// [COMMON_OPS.num_limbs]
         </span>a: <span class="kw-2">*const </span>Limb, <span class="comment">// [COMMON_OPS.num_limbs]
         </span>b: <span class="kw-2">*const </span>Limb, <span class="comment">// [COMMON_OPS.num_limbs]

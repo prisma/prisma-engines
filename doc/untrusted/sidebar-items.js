@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"fn":["read_all_optional"],"struct":["EndOfInput","Input","Mark","Reader"]};
+window.SIDEBAR_ITEMS = {"fn":["read_all_optional"],"struct":["EndOfInput","Input","Reader"]};

@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"struct":["Mutex","MutexGuard","Once","RwLock","RwLockReadGuard","RwLockUpgradeableGuard","RwLockWriteGuard"]};
+window.SIDEBAR_ITEMS = {"mod":["once","relax"],"type":["Once"]};

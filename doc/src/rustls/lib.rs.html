@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/nix/store/rw9bn419hs63s20iz4qrsgiddx2c69nb-vendor-cargo-deps/c19b7c6f923b580ac259164a89f2577984ad5ab09ee9d583b888f934adbbe8d0/rustls-0.20.8/src/lib.rs`."><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-cb6f1f67f1bcd037.css" id="mainThemeStyle"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="rustls" data-themes="" data-resource-suffix="" data-rustdoc-version="1.73.0 (cc66ad468 2023-10-03) (built from a source tarball)" data-channel="1.73.0" data-search-js="search-6dfdfced5eff6596.js" data-settings-js="settings-de11bff964e9d4e5.js" data-settings-css="settings-8c76f75bfb6bd192.css" data-theme-light-css="light-1596385f77d47ef2.css" data-theme-dark-css="dark-0a43001d3fc2282c.css" data-theme-ayu-css="ayu-fd19013d6ce078bf.css" ><script src="../../static.files/storage-db41da1a38ea3cb8.js"></script><script defer src="../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-0795b7d26be81095.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../../static.files/light-1596385f77d47ef2.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../../static.files/dark-0a43001d3fc2282c.css"><link rel="stylesheet" href="../../static.files/noscript-cffde32267a19fd6.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../rustls/index.html"><img class="rust-logo" src="../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/nix/store/8wbf91mp5aqggnly8dsfwbyfpxzfkram-vendor-cargo-deps/c19b7c6f923b580ac259164a89f2577984ad5ab09ee9d583b888f934adbbe8d0/rustls-0.21.10/src/lib.rs`."><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-cb6f1f67f1bcd037.css" id="mainThemeStyle"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="rustls" data-themes="" data-resource-suffix="" data-rustdoc-version="1.73.0 (cc66ad468 2023-10-03) (built from a source tarball)" data-channel="1.73.0" data-search-js="search-6dfdfced5eff6596.js" data-settings-js="settings-de11bff964e9d4e5.js" data-settings-css="settings-8c76f75bfb6bd192.css" data-theme-light-css="light-1596385f77d47ef2.css" data-theme-dark-css="dark-0a43001d3fc2282c.css" data-theme-ayu-css="ayu-fd19013d6ce078bf.css" ><script src="../../static.files/storage-db41da1a38ea3cb8.js"></script><script defer src="../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-0795b7d26be81095.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../../static.files/light-1596385f77d47ef2.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../../static.files/dark-0a43001d3fc2282c.css"><link rel="stylesheet" href="../../static.files/noscript-cffde32267a19fd6.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../rustls/index.html"><img class="rust-logo" src="../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -527,6 +527,8 @@
 <a href="#527" id="527">527</a>
 <a href="#528" id="528">528</a>
 <a href="#529" id="529">529</a>
+<a href="#530" id="530">530</a>
+<a href="#531" id="531">531</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! # Rustls - a modern TLS library
 //! Rustls is a TLS library that aims to provide a good level of cryptographic security,
 //! requires no configuration to achieve that security, and provides no unsafe features or
@@ -585,10 +587,18 @@
 //!
 //! ### Platform support
 //!
-//! Rustls uses [`ring`](https://crates.io/crates/ring) for implementing the
-//! cryptography in TLS. As a result, rustls only runs on platforms
-//! [supported by `ring`](https://github.com/briansmith/ring#online-automated-testing).
-//! At the time of writing this means x86, x86-64, armv7, and aarch64.
+//! While Rustls itself is platform independent it uses
+//! [`ring`](https://crates.io/crates/ring) for implementing the cryptography in
+//! TLS. As a result, rustls only runs on platforms
+//! supported by `ring`. At the time of writing, this means 32-bit ARM, Aarch64 (64-bit ARM),
+//! x86, x86-64, LoongArch64, 32-bit &amp; 64-bit Little Endian MIPS, 32-bit PowerPC (Big Endian),
+//! 64-bit PowerPC (Big and Little Endian), 64-bit RISC-V, and s390x. We do not presently
+//! support WebAssembly.
+//! For more information, see [the supported `ring` target platforms][ring-target-platforms].
+//!
+//! Rustls requires Rust 1.61 or later.
+//!
+//! [ring-target-platforms]: https://github.com/briansmith/ring/blob/2e8363b433fa3b3962c877d9ed2e9145612f3160/include/ring-core/target.h#L18-L64
 //!
 //! ## Design Overview
 //! ### Rustls does not take care of network IO
@@ -630,9 +640,8 @@
 //!
 //! ```rust,no_run
 //! let mut root_store = rustls::RootCertStore::empty();
-//! root_store.add_server_trust_anchors(
+//! root_store.add_trust_anchors(
 //!     webpki_roots::TLS_SERVER_ROOTS
-//!         .0
 //!         .iter()
 //!         .map(|ta| {
 //!             rustls::OwnedTrustAnchor::from_subject_spki_name_constraints(
@@ -662,11 +671,9 @@
 //! # use rustls;
 //! # use webpki;
 //! # use std::sync::Arc;
-//! # use std::convert::TryInto;
 //! # let mut root_store = rustls::RootCertStore::empty();
-//! # root_store.add_server_trust_anchors(
+//! # root_store.add_trust_anchors(
 //! #  webpki_roots::TLS_SERVER_ROOTS
-//! #      .0
 //! #      .iter()
 //! #      .map(|ta| {
 //! #          rustls::OwnedTrustAnchor::from_subject_spki_name_constraints(
@@ -696,7 +703,7 @@
 //! therefore call `client.process_new_packets()` which parses and processes the messages.
 //! Any error returned from `process_new_packets` is fatal to the connection, and will tell you
 //! why.  For example, if the server&#39;s certificate is expired `process_new_packets` will
-//! return `Err(WebPkiError(CertExpired, ValidateServerCert))`.  From this point on,
+//! return `Err(InvalidCertificate(Expired))`.  From this point on,
 //! `process_new_packets` will not do any new work and will return that error continually.
 //!
 //! You can extract newly received data by calling `client.reader()` (which implements the
@@ -789,7 +796,7 @@
 
 </span><span class="comment">// Require docs for public APIs, deny unsafe code, etc.
 </span><span class="attr">#![forbid(unsafe_code, unused_must_use)]
-#![cfg_attr(not(read_buf), forbid(unstable_features))]
+#![cfg_attr(not(any(read_buf, bench)), forbid(unstable_features))]
 #![deny(
     clippy::clone_on_ref_ptr,
     clippy::use_self,
@@ -829,8 +836,15 @@
 // is used to avoid needing `rustversion` to be compiled twice during
 // cross-compiling.
 </span><span class="attr">#![cfg_attr(read_buf, feature(read_buf))]
+#![cfg_attr(read_buf, feature(core_io_borrowed_buf))]
+#![cfg_attr(bench, feature(test))]
 
-</span><span class="comment">// log for logging (optional).
+</span><span class="comment">// Import `test` sysroot crate for `Bencher` definitions.
+</span><span class="attr">#[cfg(bench)]
+#[allow(unused_extern_crates)]
+</span><span class="kw">extern crate </span>test;
+
+<span class="comment">// log for logging (optional).
 </span><span class="attr">#[cfg(feature = <span class="string">&quot;logging&quot;</span>)]
 </span><span class="kw">use </span>log;
 
@@ -840,14 +854,15 @@
     <span class="macro">macro_rules! </span>trace    ( ($(<span class="macro-nonterminal">$tt</span>:tt)<span class="kw-2">*</span>) =&gt; {{}} );
     <span class="macro">macro_rules! </span>debug    ( ($(<span class="macro-nonterminal">$tt</span>:tt)<span class="kw-2">*</span>) =&gt; {{}} );
     <span class="macro">macro_rules! </span>warn     ( ($(<span class="macro-nonterminal">$tt</span>:tt)<span class="kw-2">*</span>) =&gt; {{}} );
-    <span class="macro">macro_rules! </span>error    ( ($(<span class="macro-nonterminal">$tt</span>:tt)<span class="kw-2">*</span>) =&gt; {{}} );
 }
 
 <span class="attr">#[macro_use]
 </span><span class="kw">mod </span>msgs;
 <span class="kw">mod </span>anchors;
 <span class="kw">mod </span>cipher;
+<span class="kw">mod </span>common_state;
 <span class="kw">mod </span>conn;
+<span class="kw">mod </span>dns_name;
 <span class="kw">mod </span>error;
 <span class="kw">mod </span>hash_hs;
 <span class="kw">mod </span>limited_cache;
@@ -886,6 +901,10 @@
     </span><span class="kw">pub mod </span>cipher {
         <span class="kw">pub use </span><span class="kw">crate</span>::cipher::MessageDecrypter;
     }
+    <span class="doccomment">/// Low-level TLS record layer functions.
+    </span><span class="kw">pub mod </span>record_layer {
+        <span class="kw">pub use </span><span class="kw">crate</span>::record_layer::{Decrypted, RecordLayer};
+    }
 }
 
 <span class="comment">// The public interface is:
@@ -893,29 +912,34 @@
 <span class="kw">pub use </span><span class="kw">crate</span>::builder::{
     ConfigBuilder, ConfigSide, WantsCipherSuites, WantsKxGroups, WantsVerifier, WantsVersions,
 };
-<span class="kw">pub use </span><span class="kw">crate</span>::conn::{
-    CommonState, Connection, ConnectionCommon, IoState, Reader, SideData, Writer,
+<span class="kw">pub use </span><span class="kw">crate</span>::common_state::{CommonState, IoState, Side};
+<span class="kw">pub use </span><span class="kw">crate</span>::conn::{Connection, ConnectionCommon, Reader, SideData, Writer};
+<span class="kw">pub use </span><span class="kw">crate</span>::enums::{
+    AlertDescription, CipherSuite, ContentType, HandshakeType, ProtocolVersion, SignatureAlgorithm,
+    SignatureScheme,
 };
-<span class="kw">pub use </span><span class="kw">crate</span>::enums::{CipherSuite, ProtocolVersion, SignatureScheme};
-<span class="kw">pub use </span><span class="kw">crate</span>::error::Error;
+<span class="kw">pub use </span><span class="kw">crate</span>::error::{
+    CertRevocationListError, CertificateError, Error, InvalidMessage, PeerIncompatible,
+    PeerMisbehaved,
+};
 <span class="kw">pub use </span><span class="kw">crate</span>::key::{Certificate, PrivateKey};
 <span class="kw">pub use </span><span class="kw">crate</span>::key_log::{KeyLog, NoKeyLog};
 <span class="kw">pub use </span><span class="kw">crate</span>::key_log_file::KeyLogFile;
 <span class="kw">pub use </span><span class="kw">crate</span>::kx::{SupportedKxGroup, ALL_KX_GROUPS};
-<span class="kw">pub use </span><span class="kw">crate</span>::msgs::enums::{
-    AlertDescription, ContentType, HandshakeType, NamedGroup, SignatureAlgorithm,
-};
-<span class="kw">pub use </span><span class="kw">crate</span>::msgs::handshake::{DigitallySignedStruct, DistinguishedNames};
+<span class="kw">pub use </span><span class="kw">crate</span>::msgs::enums::NamedGroup;
+<span class="kw">pub use </span><span class="kw">crate</span>::msgs::handshake::DistinguishedName;
 <span class="kw">pub use </span><span class="kw">crate</span>::stream::{Stream, StreamOwned};
 <span class="kw">pub use </span><span class="kw">crate</span>::suites::{
     BulkAlgorithm, SupportedCipherSuite, ALL_CIPHER_SUITES, DEFAULT_CIPHER_SUITES,
 };
 <span class="attr">#[cfg(feature = <span class="string">&quot;secret_extraction&quot;</span>)]
+#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;secret_extraction&quot;</span>)))]
 </span><span class="kw">pub use </span><span class="kw">crate</span>::suites::{ConnectionTrafficSecrets, ExtractedSecrets};
 <span class="kw">pub use </span><span class="kw">crate</span>::ticketer::Ticketer;
 <span class="attr">#[cfg(feature = <span class="string">&quot;tls12&quot;</span>)]
 </span><span class="kw">pub use </span><span class="kw">crate</span>::tls12::Tls12CipherSuite;
 <span class="kw">pub use </span><span class="kw">crate</span>::tls13::Tls13CipherSuite;
+<span class="kw">pub use </span><span class="kw">crate</span>::verify::DigitallySignedStruct;
 <span class="kw">pub use </span><span class="kw">crate</span>::versions::{SupportedProtocolVersion, ALL_VERSIONS, DEFAULT_VERSIONS};
 
 <span class="doccomment">/// Items for use in a client.
@@ -929,23 +953,25 @@
     </span><span class="kw">mod </span>tls12;
     <span class="kw">mod </span>tls13;
 
+    <span class="kw">pub use </span><span class="kw">crate</span>::dns_name::InvalidDnsNameError;
     <span class="kw">pub use </span>builder::{WantsClientCert, WantsTransparencyPolicyOrClientCert};
-    <span class="attr">#[cfg(feature = <span class="string">&quot;quic&quot;</span>)]
-    </span><span class="kw">pub use </span>client_conn::ClientQuicExt;
-    <span class="kw">pub use </span>client_conn::InvalidDnsNameError;
-    <span class="kw">pub use </span>client_conn::ResolvesClientCert;
-    <span class="kw">pub use </span>client_conn::ServerName;
-    <span class="kw">pub use </span>client_conn::StoresClientSessions;
-    <span class="kw">pub use </span>client_conn::{ClientConfig, ClientConnection, ClientConnectionData, WriteEarlyData};
-    <span class="kw">pub use </span>handy::{ClientSessionMemoryCache, NoClientSessionStorage};
+    <span class="kw">pub use </span>client_conn::{
+        ClientConfig, ClientConnection, ClientConnectionData, ClientSessionStore,
+        ResolvesClientCert, Resumption, ServerName, Tls12Resumption, WriteEarlyData,
+    };
+    <span class="kw">pub use </span>handy::ClientSessionMemoryCache;
 
     <span class="attr">#[cfg(feature = <span class="string">&quot;dangerous_configuration&quot;</span>)]
     </span><span class="kw">pub use </span><span class="kw">crate</span>::verify::{
+        verify_server_cert_signed_by_trust_anchor, verify_server_name,
         CertificateTransparencyPolicy, HandshakeSignatureValid, ServerCertVerified,
         ServerCertVerifier, WebPkiVerifier,
     };
     <span class="attr">#[cfg(feature = <span class="string">&quot;dangerous_configuration&quot;</span>)]
     </span><span class="kw">pub use </span>client_conn::danger::DangerousClientConfig;
+
+    <span class="kw">pub use </span><span class="kw">crate</span>::msgs::persist::Tls12ClientSessionValue;
+    <span class="kw">pub use </span><span class="kw">crate</span>::msgs::persist::Tls13ClientSessionValue;
 }
 
 <span class="kw">pub use </span>client::{ClientConfig, ClientConnection, ServerName};
@@ -963,12 +989,11 @@
 
     <span class="kw">pub use </span><span class="kw">crate</span>::verify::{
         AllowAnyAnonymousOrAuthenticatedClient, AllowAnyAuthenticatedClient, NoClientAuth,
+        UnparsedCertRevocationList,
     };
     <span class="kw">pub use </span>builder::WantsServerCert;
     <span class="kw">pub use </span>handy::ResolvesServerCertUsingSni;
     <span class="kw">pub use </span>handy::{NoServerSessionStorage, ServerSessionMemoryCache};
-    <span class="attr">#[cfg(feature = <span class="string">&quot;quic&quot;</span>)]
-    </span><span class="kw">pub use </span>server_conn::ServerQuicExt;
     <span class="kw">pub use </span>server_conn::StoresServerSessions;
     <span class="kw">pub use </span>server_conn::{
         Accepted, Acceptor, ReadEarlyData, ServerConfig, ServerConnection, ServerConnectionData,
@@ -976,7 +1001,11 @@
     <span class="kw">pub use </span>server_conn::{ClientHello, ProducesTickets, ResolvesServerCert};
 
     <span class="attr">#[cfg(feature = <span class="string">&quot;dangerous_configuration&quot;</span>)]
-    </span><span class="kw">pub use </span><span class="kw">crate</span>::verify::{ClientCertVerified, ClientCertVerifier, DnsName};
+    </span><span class="kw">pub use </span><span class="kw">crate</span>::dns_name::DnsName;
+    <span class="attr">#[cfg(feature = <span class="string">&quot;dangerous_configuration&quot;</span>)]
+    </span><span class="kw">pub use </span><span class="kw">crate</span>::key::ParsedCertificate;
+    <span class="attr">#[cfg(feature = <span class="string">&quot;dangerous_configuration&quot;</span>)]
+    </span><span class="kw">pub use </span><span class="kw">crate</span>::verify::{ClientCertVerified, ClientCertVerifier};
 }
 
 <span class="kw">pub use </span>server::{ServerConfig, ServerConnection};
@@ -1031,29 +1060,4 @@
 
 <span class="doccomment">/// This is the rustls manual.
 </span><span class="kw">pub mod </span>manual;
-
-<span class="doccomment">/** Type renames. */
-</span><span class="attr">#[allow(clippy::upper_case_acronyms)]
-#[doc(hidden)]
-#[deprecated(since = <span class="string">&quot;0.20.0&quot;</span>, note = <span class="string">&quot;Use ResolvesServerCertUsingSni&quot;</span>)]
-</span><span class="kw">pub type </span>ResolvesServerCertUsingSNI = server::ResolvesServerCertUsingSni;
-<span class="attr">#[allow(clippy::upper_case_acronyms)]
-#[cfg(feature = <span class="string">&quot;dangerous_configuration&quot;</span>)]
-#[doc(hidden)]
-#[deprecated(since = <span class="string">&quot;0.20.0&quot;</span>, note = <span class="string">&quot;Use client::WebPkiVerifier&quot;</span>)]
-</span><span class="kw">pub type </span>WebPKIVerifier = client::WebPkiVerifier;
-<span class="attr">#[allow(clippy::upper_case_acronyms)]
-#[doc(hidden)]
-#[deprecated(since = <span class="string">&quot;0.20.0&quot;</span>, note = <span class="string">&quot;Use Error&quot;</span>)]
-</span><span class="kw">pub type </span>TLSError = Error;
-<span class="attr">#[doc(hidden)]
-#[deprecated(since = <span class="string">&quot;0.20.0&quot;</span>, note = <span class="string">&quot;Use ClientConnection&quot;</span>)]
-</span><span class="kw">pub type </span>ClientSession = ClientConnection;
-<span class="attr">#[doc(hidden)]
-#[deprecated(since = <span class="string">&quot;0.20.0&quot;</span>, note = <span class="string">&quot;Use ServerConnection&quot;</span>)]
-</span><span class="kw">pub type </span>ServerSession = ServerConnection;
-
-<span class="comment">/* Apologies: would make a trait alias here, but those remain unstable.
-pub trait Session = Connection;
-*/
-</span></code></pre></div></section></main></body></html>
+</code></pre></div></section></main></body></html>

@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/nix/store/rw9bn419hs63s20iz4qrsgiddx2c69nb-vendor-cargo-deps/c19b7c6f923b580ac259164a89f2577984ad5ab09ee9d583b888f934adbbe8d0/rustls-0.20.8/src/server/hs.rs`."><title>hs.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-cb6f1f67f1bcd037.css" id="mainThemeStyle"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="rustls" data-themes="" data-resource-suffix="" data-rustdoc-version="1.73.0 (cc66ad468 2023-10-03) (built from a source tarball)" data-channel="1.73.0" data-search-js="search-6dfdfced5eff6596.js" data-settings-js="settings-de11bff964e9d4e5.js" data-settings-css="settings-8c76f75bfb6bd192.css" data-theme-light-css="light-1596385f77d47ef2.css" data-theme-dark-css="dark-0a43001d3fc2282c.css" data-theme-ayu-css="ayu-fd19013d6ce078bf.css" ><script src="../../../static.files/storage-db41da1a38ea3cb8.js"></script><script defer src="../../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-0795b7d26be81095.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../../../static.files/light-1596385f77d47ef2.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../../../static.files/dark-0a43001d3fc2282c.css"><link rel="stylesheet" href="../../../static.files/noscript-cffde32267a19fd6.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../../rustls/index.html"><img class="rust-logo" src="../../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/nix/store/8wbf91mp5aqggnly8dsfwbyfpxzfkram-vendor-cargo-deps/c19b7c6f923b580ac259164a89f2577984ad5ab09ee9d583b888f934adbbe8d0/rustls-0.21.10/src/server/hs.rs`."><title>hs.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-cb6f1f67f1bcd037.css" id="mainThemeStyle"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="rustls" data-themes="" data-resource-suffix="" data-rustdoc-version="1.73.0 (cc66ad468 2023-10-03) (built from a source tarball)" data-channel="1.73.0" data-search-js="search-6dfdfced5eff6596.js" data-settings-js="settings-de11bff964e9d4e5.js" data-settings-css="settings-8c76f75bfb6bd192.css" data-theme-light-css="light-1596385f77d47ef2.css" data-theme-dark-css="dark-0a43001d3fc2282c.css" data-theme-ayu-css="ayu-fd19013d6ce078bf.css" ><script src="../../../static.files/storage-db41da1a38ea3cb8.js"></script><script defer src="../../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-0795b7d26be81095.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../../../static.files/light-1596385f77d47ef2.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../../../static.files/dark-0a43001d3fc2282c.css"><link rel="stylesheet" href="../../../static.files/noscript-cffde32267a19fd6.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../../rustls/index.html"><img class="rust-logo" src="../../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -520,18 +520,24 @@
 <a href="#520" id="520">520</a>
 <a href="#521" id="521">521</a>
 <a href="#522" id="522">522</a>
-</pre></div><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::conn::{CommonState, ConnectionRandoms, State};
+<a href="#523" id="523">523</a>
+<a href="#524" id="524">524</a>
+<a href="#525" id="525">525</a>
+<a href="#526" id="526">526</a>
+<a href="#527" id="527">527</a>
+</pre></div><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::common_state::State;
+<span class="kw">use </span><span class="kw">crate</span>::conn::ConnectionRandoms;
+<span class="kw">use </span><span class="kw">crate</span>::dns_name::DnsName;
 <span class="attr">#[cfg(feature = <span class="string">&quot;tls12&quot;</span>)]
 </span><span class="kw">use </span><span class="kw">crate</span>::enums::CipherSuite;
-<span class="kw">use </span><span class="kw">crate</span>::enums::{ProtocolVersion, SignatureScheme};
-<span class="kw">use </span><span class="kw">crate</span>::error::Error;
+<span class="kw">use </span><span class="kw">crate</span>::enums::{AlertDescription, HandshakeType, ProtocolVersion, SignatureScheme};
+<span class="kw">use </span><span class="kw">crate</span>::error::{Error, PeerIncompatible, PeerMisbehaved};
 <span class="kw">use </span><span class="kw">crate</span>::hash_hs::{HandshakeHash, HandshakeHashBuffer};
 <span class="attr">#[cfg(feature = <span class="string">&quot;logging&quot;</span>)]
 </span><span class="kw">use </span><span class="kw">crate</span>::log::{debug, trace};
-<span class="kw">use </span><span class="kw">crate</span>::msgs::enums::HandshakeType;
-<span class="kw">use </span><span class="kw">crate</span>::msgs::enums::{AlertDescription, Compression, ExtensionType};
+<span class="kw">use </span><span class="kw">crate</span>::msgs::enums::{Compression, ExtensionType};
 <span class="attr">#[cfg(feature = <span class="string">&quot;tls12&quot;</span>)]
-</span><span class="kw">use </span><span class="kw">crate</span>::msgs::handshake::SessionID;
+</span><span class="kw">use </span><span class="kw">crate</span>::msgs::handshake::SessionId;
 <span class="kw">use </span><span class="kw">crate</span>::msgs::handshake::{ClientHelloPayload, Random, ServerExtension};
 <span class="kw">use </span><span class="kw">crate</span>::msgs::handshake::{ConvertProtocolNameList, ConvertServerNameList, HandshakePayload};
 <span class="kw">use </span><span class="kw">crate</span>::msgs::message::{Message, MessagePayload};
@@ -550,26 +556,11 @@
 
 <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">type </span>NextState = Box&lt;<span class="kw">dyn </span>State&lt;ServerConnectionData&gt;&gt;;
 <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">type </span>NextStateOrError = <span class="prelude-ty">Result</span>&lt;NextState, Error&gt;;
-<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">type </span>ServerContext&lt;<span class="lifetime">&#39;a</span>&gt; = <span class="kw">crate</span>::conn::Context&lt;<span class="lifetime">&#39;a</span>, ServerConnectionData&gt;;
-
-<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>incompatible(common: <span class="kw-2">&amp;mut </span>CommonState, why: <span class="kw-2">&amp;</span>str) -&gt; Error {
-    common.send_fatal_alert(AlertDescription::HandshakeFailure);
-    Error::PeerIncompatibleError(why.to_string())
-}
-
-<span class="kw">fn </span>bad_version(common: <span class="kw-2">&amp;mut </span>CommonState, why: <span class="kw-2">&amp;</span>str) -&gt; Error {
-    common.send_fatal_alert(AlertDescription::ProtocolVersion);
-    Error::PeerIncompatibleError(why.to_string())
-}
-
-<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>decode_error(common: <span class="kw-2">&amp;mut </span>CommonState, why: <span class="kw-2">&amp;</span>str) -&gt; Error {
-    common.send_fatal_alert(AlertDescription::DecodeError);
-    Error::PeerMisbehavedError(why.to_string())
-}
+<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">type </span>ServerContext&lt;<span class="lifetime">&#39;a</span>&gt; = <span class="kw">crate</span>::common_state::Context&lt;<span class="lifetime">&#39;a</span>, ServerConnectionData&gt;;
 
 <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>can_resume(
     suite: SupportedCipherSuite,
-    sni: <span class="kw-2">&amp;</span><span class="prelude-ty">Option</span>&lt;webpki::DnsName&gt;,
+    sni: <span class="kw-2">&amp;</span><span class="prelude-ty">Option</span>&lt;DnsName&gt;,
     using_ems: bool,
     resumedata: <span class="kw-2">&amp;</span>persist::ServerSessionValue,
 ) -&gt; bool {
@@ -618,9 +609,7 @@
                 .iter()
                 .any(|protocol| protocol.is_empty())
             {
-                <span class="kw">return </span><span class="prelude-val">Err</span>(Error::PeerMisbehavedError(
-                    <span class="string">&quot;client offered empty ALPN protocol&quot;</span>.to_string(),
-                ));
+                <span class="kw">return </span><span class="prelude-val">Err</span>(PeerMisbehaved::OfferedEmptyApplicationProtocol.into());
             }
 
             cx.common.alpn_protocol = our_protocols
@@ -632,9 +621,10 @@
                 <span class="self">self</span>.exts
                     .push(ServerExtension::make_alpn(<span class="kw-2">&amp;</span>[selected_protocol]));
             } <span class="kw">else if </span>!our_protocols.is_empty() {
-                cx.common
-                    .send_fatal_alert(AlertDescription::NoApplicationProtocol);
-                <span class="kw">return </span><span class="prelude-val">Err</span>(Error::NoApplicationProtocol);
+                <span class="kw">return </span><span class="prelude-val">Err</span>(cx.common.send_fatal_alert(
+                    AlertDescription::NoApplicationProtocol,
+                    Error::NoApplicationProtocol,
+                ));
             }
         }
 
@@ -651,9 +641,10 @@
                 </span><span class="kw">if </span>cx.common.alpn_protocol.is_none()
                     &amp;&amp; (!our_protocols.is_empty() || maybe_their_protocols.is_some())
                 {
-                    cx.common
-                        .send_fatal_alert(AlertDescription::NoApplicationProtocol);
-                    <span class="kw">return </span><span class="prelude-val">Err</span>(Error::NoApplicationProtocol);
+                    <span class="kw">return </span><span class="prelude-val">Err</span>(cx.common.send_fatal_alert(
+                        AlertDescription::NoApplicationProtocol,
+                        Error::NoApplicationProtocol,
+                    ));
                 }
 
                 <span class="kw">match </span>hello.get_quic_params_extension() {
@@ -661,7 +652,7 @@
                     <span class="prelude-val">None </span>=&gt; {
                         <span class="kw">return </span><span class="prelude-val">Err</span>(cx
                             .common
-                            .missing_extension(<span class="string">&quot;QUIC transport parameters not found&quot;</span>));
+                            .missing_extension(PeerMisbehaved::MissingQuicTransportParameters));
                     }
                 }
             }
@@ -762,11 +753,11 @@
     <span class="kw">pub</span>(<span class="kw">super</span>) extra_exts: Vec&lt;ServerExtension&gt;,
     <span class="kw">pub</span>(<span class="kw">super</span>) transcript: HandshakeHashOrBuffer,
     <span class="attr">#[cfg(feature = <span class="string">&quot;tls12&quot;</span>)]
-    </span><span class="kw">pub</span>(<span class="kw">super</span>) session_id: SessionID,
+    </span><span class="kw">pub</span>(<span class="kw">super</span>) session_id: SessionId,
     <span class="attr">#[cfg(feature = <span class="string">&quot;tls12&quot;</span>)]
     </span><span class="kw">pub</span>(<span class="kw">super</span>) using_ems: bool,
     <span class="kw">pub</span>(<span class="kw">super</span>) done_retry: bool,
-    <span class="kw">pub</span>(<span class="kw">super</span>) send_ticket: bool,
+    <span class="kw">pub</span>(<span class="kw">super</span>) send_tickets: usize,
 }
 
 <span class="kw">impl </span>ExpectClientHello {
@@ -782,11 +773,11 @@
             extra_exts,
             transcript: HandshakeHashOrBuffer::Buffer(transcript_buffer),
             <span class="attr">#[cfg(feature = <span class="string">&quot;tls12&quot;</span>)]
-            </span>session_id: SessionID::empty(),
+            </span>session_id: SessionId::empty(),
             <span class="attr">#[cfg(feature = <span class="string">&quot;tls12&quot;</span>)]
             </span>using_ems: <span class="bool-val">false</span>,
             done_retry: <span class="bool-val">false</span>,
-            send_ticket: <span class="bool-val">false</span>,
+            send_tickets: <span class="number">0</span>,
         }
     }
 
@@ -811,26 +802,32 @@
             <span class="kw">if </span>versions.contains(<span class="kw-2">&amp;</span>ProtocolVersion::TLSv1_3) &amp;&amp; tls13_enabled {
                 ProtocolVersion::TLSv1_3
             } <span class="kw">else if </span>!versions.contains(<span class="kw-2">&amp;</span>ProtocolVersion::TLSv1_2) || !tls12_enabled {
-                <span class="kw">return </span><span class="prelude-val">Err</span>(bad_version(cx.common, <span class="string">&quot;TLS1.2 not offered/enabled&quot;</span>));
+                <span class="kw">return </span><span class="prelude-val">Err</span>(cx.common.send_fatal_alert(
+                    AlertDescription::ProtocolVersion,
+                    PeerIncompatible::Tls12NotOfferedOrEnabled,
+                ));
             } <span class="kw">else if </span>cx.common.is_quic() {
-                <span class="kw">return </span><span class="prelude-val">Err</span>(bad_version(
-                    cx.common,
-                    <span class="string">&quot;Expecting QUIC connection, but client does not support TLSv1_3&quot;</span>,
+                <span class="kw">return </span><span class="prelude-val">Err</span>(cx.common.send_fatal_alert(
+                    AlertDescription::ProtocolVersion,
+                    PeerIncompatible::Tls13RequiredForQuic,
                 ));
             } <span class="kw">else </span>{
                 ProtocolVersion::TLSv1_2
             }
         } <span class="kw">else if </span>client_hello.client_version.get_u16() &lt; ProtocolVersion::TLSv1_2.get_u16() {
-            <span class="kw">return </span><span class="prelude-val">Err</span>(bad_version(cx.common, <span class="string">&quot;Client does not support TLSv1_2&quot;</span>));
+            <span class="kw">return </span><span class="prelude-val">Err</span>(cx.common.send_fatal_alert(
+                AlertDescription::ProtocolVersion,
+                PeerIncompatible::Tls12NotOffered,
+            ));
         } <span class="kw">else if </span>!tls12_enabled &amp;&amp; tls13_enabled {
-            <span class="kw">return </span><span class="prelude-val">Err</span>(bad_version(
-                cx.common,
-                <span class="string">&quot;Server requires TLS1.3, but client omitted versions ext&quot;</span>,
+            <span class="kw">return </span><span class="prelude-val">Err</span>(cx.common.send_fatal_alert(
+                AlertDescription::ProtocolVersion,
+                PeerIncompatible::SupportedVersionsExtensionRequired,
             ));
         } <span class="kw">else if </span>cx.common.is_quic() {
-            <span class="kw">return </span><span class="prelude-val">Err</span>(bad_version(
-                cx.common,
-                <span class="string">&quot;Expecting QUIC connection, but client does not support TLSv1_3&quot;</span>,
+            <span class="kw">return </span><span class="prelude-val">Err</span>(cx.common.send_fatal_alert(
+                AlertDescription::ProtocolVersion,
+                PeerIncompatible::Tls13RequiredForQuic,
             ));
         } <span class="kw">else </span>{
             ProtocolVersion::TLSv1_2
@@ -873,9 +870,10 @@
                 .resolve(client_hello);
 
             certkey.ok_or_else(|| {
-                cx.common
-                    .send_fatal_alert(AlertDescription::AccessDenied);
-                Error::General(<span class="string">&quot;no server certificate chain resolved&quot;</span>.to_string())
+                cx.common.send_fatal_alert(
+                    AlertDescription::AccessDenied,
+                    Error::General(<span class="string">&quot;no server certificate chain resolved&quot;</span>.to_owned()),
+                )
             })<span class="question-mark">?
         </span>};
         <span class="kw">let </span>certkey = ActiveCertifiedKey::from_certified_key(<span class="kw-2">&amp;</span>certkey);
@@ -899,7 +897,12 @@
                 <span class="kw-2">&amp;</span>suitable_suites,
             )
         }
-        .ok_or_else(|| incompatible(cx.common, <span class="string">&quot;no ciphersuites in common&quot;</span>))<span class="question-mark">?</span>;
+        .ok_or_else(|| {
+            cx.common.send_fatal_alert(
+                AlertDescription::HandshakeFailure,
+                PeerIncompatible::NoCipherSuitesInCommon,
+            )
+        })<span class="question-mark">?</span>;
 
         <span class="macro">debug!</span>(<span class="string">&quot;decided upon suite {:?}&quot;</span>, suite);
         cx.common.suite = <span class="prelude-val">Some</span>(suite);
@@ -910,9 +913,10 @@
             HandshakeHashOrBuffer::Buffer(inner) =&gt; inner.start_hash(starting_hash),
             HandshakeHashOrBuffer::Hash(inner) <span class="kw">if </span>inner.algorithm() == starting_hash =&gt; inner,
             <span class="kw">_ </span>=&gt; {
-                <span class="kw">return </span><span class="prelude-val">Err</span>(cx
-                    .common
-                    .illegal_param(<span class="string">&quot;hash differed on retry&quot;</span>));
+                <span class="kw">return </span><span class="prelude-val">Err</span>(cx.common.send_fatal_alert(
+                    AlertDescription::IllegalParameter,
+                    PeerMisbehaved::HandshakeHashVariedAfterRetry,
+                ));
             }
         };
 
@@ -925,7 +929,7 @@
                 suite,
                 randoms,
                 done_retry: <span class="self">self</span>.done_retry,
-                send_ticket: <span class="self">self</span>.send_ticket,
+                send_tickets: <span class="self">self</span>.send_tickets,
                 extra_exts: <span class="self">self</span>.extra_exts,
             }
             .handle_client_hello(cx, certkey, m, client_hello, sig_schemes),
@@ -937,7 +941,7 @@
                 suite,
                 using_ems: <span class="self">self</span>.using_ems,
                 randoms,
-                send_ticket: <span class="self">self</span>.send_ticket,
+                send_ticket: <span class="self">self</span>.send_tickets &gt; <span class="number">0</span>,
                 extra_exts: <span class="self">self</span>.extra_exts,
             }
             .handle_client_hello(
@@ -954,8 +958,7 @@
 
 <span class="kw">impl </span>State&lt;ServerConnectionData&gt; <span class="kw">for </span>ExpectClientHello {
     <span class="kw">fn </span>handle(<span class="self">self</span>: Box&lt;<span class="self">Self</span>&gt;, cx: <span class="kw-2">&amp;mut </span>ServerContext&lt;<span class="lifetime">&#39;_</span>&gt;, m: Message) -&gt; NextStateOrError {
-        <span class="kw">let </span>(client_hello, sig_schemes) =
-            process_client_hello(<span class="kw-2">&amp;</span>m, <span class="self">self</span>.done_retry, cx.common, cx.data)<span class="question-mark">?</span>;
+        <span class="kw">let </span>(client_hello, sig_schemes) = process_client_hello(<span class="kw-2">&amp;</span>m, <span class="self">self</span>.done_retry, cx)<span class="question-mark">?</span>;
         <span class="self">self</span>.with_certified_key(sig_schemes, client_hello, <span class="kw-2">&amp;</span>m, cx)
     }
 }
@@ -970,8 +973,7 @@
 </span><span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>process_client_hello&lt;<span class="lifetime">&#39;a</span>&gt;(
     m: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>Message,
     done_retry: bool,
-    common: <span class="kw-2">&amp;mut </span>CommonState,
-    data: <span class="kw-2">&amp;mut </span>ServerConnectionData,
+    cx: <span class="kw-2">&amp;mut </span>ServerContext,
 ) -&gt; <span class="prelude-ty">Result</span>&lt;(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>ClientHelloPayload, Vec&lt;SignatureScheme&gt;), Error&gt; {
     <span class="kw">let </span>client_hello =
         <span class="macro">require_handshake_msg!</span>(m, HandshakeType::ClientHello, HandshakePayload::ClientHello)<span class="question-mark">?</span>;
@@ -981,37 +983,43 @@
         .compression_methods
         .contains(<span class="kw-2">&amp;</span>Compression::Null)
     {
-        common.send_fatal_alert(AlertDescription::IllegalParameter);
-        <span class="kw">return </span><span class="prelude-val">Err</span>(Error::PeerIncompatibleError(
-            <span class="string">&quot;client did not offer Null compression&quot;</span>.to_string(),
+        <span class="kw">return </span><span class="prelude-val">Err</span>(cx.common.send_fatal_alert(
+            AlertDescription::IllegalParameter,
+            PeerIncompatible::NullCompressionRequired,
         ));
     }
 
     <span class="kw">if </span>client_hello.has_duplicate_extension() {
-        <span class="kw">return </span><span class="prelude-val">Err</span>(decode_error(common, <span class="string">&quot;client sent duplicate extensions&quot;</span>));
+        <span class="kw">return </span><span class="prelude-val">Err</span>(cx.common.send_fatal_alert(
+            AlertDescription::DecodeError,
+            PeerMisbehaved::DuplicateClientHelloExtensions,
+        ));
     }
 
     <span class="comment">// No handshake messages should follow this one in this flight.
-    </span>common.check_aligned_handshake()<span class="question-mark">?</span>;
+    </span>cx.common.check_aligned_handshake()<span class="question-mark">?</span>;
 
     <span class="comment">// Extract and validate the SNI DNS name, if any, before giving it to
     // the cert resolver. In particular, if it is invalid then we should
     // send an Illegal Parameter alert instead of the Internal Error alert
     // (or whatever) that we&#39;d send if this were checked later or in a
     // different way.
-    </span><span class="kw">let </span>sni: <span class="prelude-ty">Option</span>&lt;webpki::DnsName&gt; = <span class="kw">match </span>client_hello.get_sni_extension() {
+    </span><span class="kw">let </span>sni: <span class="prelude-ty">Option</span>&lt;DnsName&gt; = <span class="kw">match </span>client_hello.get_sni_extension() {
         <span class="prelude-val">Some</span>(sni) =&gt; {
             <span class="kw">if </span>sni.has_duplicate_names_for_type() {
-                <span class="kw">return </span><span class="prelude-val">Err</span>(decode_error(
-                    common,
-                    <span class="string">&quot;ClientHello SNI contains duplicate name types&quot;</span>,
+                <span class="kw">return </span><span class="prelude-val">Err</span>(cx.common.send_fatal_alert(
+                    AlertDescription::DecodeError,
+                    PeerMisbehaved::DuplicateServerNameTypes,
                 ));
             }
 
             <span class="kw">if let </span><span class="prelude-val">Some</span>(hostname) = sni.get_single_hostname() {
-                <span class="prelude-val">Some</span>(hostname.into())
+                <span class="prelude-val">Some</span>(hostname.to_lowercase_owned())
             } <span class="kw">else </span>{
-                <span class="kw">return </span><span class="prelude-val">Err</span>(common.illegal_param(<span class="string">&quot;ClientHello SNI did not contain a hostname&quot;</span>));
+                <span class="kw">return </span><span class="prelude-val">Err</span>(cx.common.send_fatal_alert(
+                    AlertDescription::IllegalParameter,
+                    PeerMisbehaved::ServerNameMustContainOneHostName,
+                ));
             }
         }
         <span class="prelude-val">None </span>=&gt; <span class="prelude-val">None</span>,
@@ -1021,20 +1029,22 @@
     </span><span class="kw">if let </span>(<span class="prelude-val">Some</span>(sni), <span class="bool-val">false</span>) = (<span class="kw-2">&amp;</span>sni, done_retry) {
         <span class="comment">// Save the SNI into the session.
         // The SNI hostname is immutable once set.
-        </span><span class="macro">assert!</span>(data.sni.is_none());
-        data.sni = <span class="prelude-val">Some</span>(sni.clone())
-    } <span class="kw">else if </span>data.sni != sni {
-        <span class="kw">return </span><span class="prelude-val">Err</span>(Error::PeerIncompatibleError(
-            <span class="string">&quot;SNI differed on retry&quot;</span>.to_string(),
-        ));
+        </span><span class="macro">assert!</span>(cx.data.sni.is_none());
+        cx.data.sni = <span class="prelude-val">Some</span>(sni.clone());
+    } <span class="kw">else if </span>cx.data.sni != sni {
+        <span class="kw">return </span><span class="prelude-val">Err</span>(PeerMisbehaved::ServerNameDifferedOnRetry.into());
     }
 
     <span class="kw">let </span>sig_schemes = client_hello
         .get_sigalgs_extension()
-        .ok_or_else(|| incompatible(common, <span class="string">&quot;client didn&#39;t describe signature schemes&quot;</span>))<span class="question-mark">?
-        </span>.clone();
+        .ok_or_else(|| {
+            cx.common.send_fatal_alert(
+                AlertDescription::HandshakeFailure,
+                PeerIncompatible::SignatureAlgorithmsExtensionRequired,
+            )
+        })<span class="question-mark">?</span>;
 
-    <span class="prelude-val">Ok</span>((client_hello, sig_schemes))
+    <span class="prelude-val">Ok</span>((client_hello, sig_schemes.to_owned()))
 }
 
 <span class="attr">#[allow(clippy::large_enum_variant)]

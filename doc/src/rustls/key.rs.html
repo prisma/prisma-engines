@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/nix/store/rw9bn419hs63s20iz4qrsgiddx2c69nb-vendor-cargo-deps/c19b7c6f923b580ac259164a89f2577984ad5ab09ee9d583b888f934adbbe8d0/rustls-0.20.8/src/key.rs`."><title>key.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-cb6f1f67f1bcd037.css" id="mainThemeStyle"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="rustls" data-themes="" data-resource-suffix="" data-rustdoc-version="1.73.0 (cc66ad468 2023-10-03) (built from a source tarball)" data-channel="1.73.0" data-search-js="search-6dfdfced5eff6596.js" data-settings-js="settings-de11bff964e9d4e5.js" data-settings-css="settings-8c76f75bfb6bd192.css" data-theme-light-css="light-1596385f77d47ef2.css" data-theme-dark-css="dark-0a43001d3fc2282c.css" data-theme-ayu-css="ayu-fd19013d6ce078bf.css" ><script src="../../static.files/storage-db41da1a38ea3cb8.js"></script><script defer src="../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-0795b7d26be81095.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../../static.files/light-1596385f77d47ef2.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../../static.files/dark-0a43001d3fc2282c.css"><link rel="stylesheet" href="../../static.files/noscript-cffde32267a19fd6.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../rustls/index.html"><img class="rust-logo" src="../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/nix/store/8wbf91mp5aqggnly8dsfwbyfpxzfkram-vendor-cargo-deps/c19b7c6f923b580ac259164a89f2577984ad5ab09ee9d583b888f934adbbe8d0/rustls-0.21.10/src/key.rs`."><title>key.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-cb6f1f67f1bcd037.css" id="mainThemeStyle"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="rustls" data-themes="" data-resource-suffix="" data-rustdoc-version="1.73.0 (cc66ad468 2023-10-03) (built from a source tarball)" data-channel="1.73.0" data-search-js="search-6dfdfced5eff6596.js" data-settings-js="settings-de11bff964e9d4e5.js" data-settings-css="settings-8c76f75bfb6bd192.css" data-theme-light-css="light-1596385f77d47ef2.css" data-theme-dark-css="dark-0a43001d3fc2282c.css" data-theme-ayu-css="ayu-fd19013d6ce078bf.css" ><script src="../../static.files/storage-db41da1a38ea3cb8.js"></script><script defer src="../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-0795b7d26be81095.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../../static.files/light-1596385f77d47ef2.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../../static.files/dark-0a43001d3fc2282c.css"><link rel="stylesheet" href="../../static.files/noscript-cffde32267a19fd6.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../rustls/index.html"><img class="rust-logo" src="../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -50,28 +50,164 @@
 <a href="#50" id="50">50</a>
 <a href="#51" id="51">51</a>
 <a href="#52" id="52">52</a>
+<a href="#53" id="53">53</a>
+<a href="#54" id="54">54</a>
+<a href="#55" id="55">55</a>
+<a href="#56" id="56">56</a>
+<a href="#57" id="57">57</a>
+<a href="#58" id="58">58</a>
+<a href="#59" id="59">59</a>
+<a href="#60" id="60">60</a>
+<a href="#61" id="61">61</a>
+<a href="#62" id="62">62</a>
+<a href="#63" id="63">63</a>
+<a href="#64" id="64">64</a>
+<a href="#65" id="65">65</a>
+<a href="#66" id="66">66</a>
+<a href="#67" id="67">67</a>
+<a href="#68" id="68">68</a>
+<a href="#69" id="69">69</a>
+<a href="#70" id="70">70</a>
+<a href="#71" id="71">71</a>
+<a href="#72" id="72">72</a>
+<a href="#73" id="73">73</a>
+<a href="#74" id="74">74</a>
+<a href="#75" id="75">75</a>
+<a href="#76" id="76">76</a>
+<a href="#77" id="77">77</a>
+<a href="#78" id="78">78</a>
+<a href="#79" id="79">79</a>
+<a href="#80" id="80">80</a>
+<a href="#81" id="81">81</a>
+<a href="#82" id="82">82</a>
+<a href="#83" id="83">83</a>
+<a href="#84" id="84">84</a>
+<a href="#85" id="85">85</a>
+<a href="#86" id="86">86</a>
+<a href="#87" id="87">87</a>
+<a href="#88" id="88">88</a>
+<a href="#89" id="89">89</a>
+<a href="#90" id="90">90</a>
+<a href="#91" id="91">91</a>
+<a href="#92" id="92">92</a>
+<a href="#93" id="93">93</a>
+<a href="#94" id="94">94</a>
+<a href="#95" id="95">95</a>
+<a href="#96" id="96">96</a>
+<a href="#97" id="97">97</a>
+<a href="#98" id="98">98</a>
+<a href="#99" id="99">99</a>
+<a href="#100" id="100">100</a>
+<a href="#101" id="101">101</a>
+<a href="#102" id="102">102</a>
+<a href="#103" id="103">103</a>
+<a href="#104" id="104">104</a>
+<a href="#105" id="105">105</a>
+<a href="#106" id="106">106</a>
+<a href="#107" id="107">107</a>
+<a href="#108" id="108">108</a>
+<a href="#109" id="109">109</a>
+<a href="#110" id="110">110</a>
+<a href="#111" id="111">111</a>
+<a href="#112" id="112">112</a>
+<a href="#113" id="113">113</a>
+<a href="#114" id="114">114</a>
+<a href="#115" id="115">115</a>
+<a href="#116" id="116">116</a>
+<a href="#117" id="117">117</a>
+<a href="#118" id="118">118</a>
+<a href="#119" id="119">119</a>
+<a href="#120" id="120">120</a>
+<a href="#121" id="121">121</a>
+<a href="#122" id="122">122</a>
+<a href="#123" id="123">123</a>
+<a href="#124" id="124">124</a>
+<a href="#125" id="125">125</a>
+<a href="#126" id="126">126</a>
+<a href="#127" id="127">127</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::fmt;
+
+<span class="kw">use </span><span class="kw">crate</span>::Error;
 
 <span class="doccomment">/// This type contains a private key by value.
 ///
 /// The private key must be DER-encoded ASN.1 in either
-/// PKCS#8 or PKCS#1 format.
+/// PKCS#8, PKCS#1, or Sec1 format.
 ///
-/// The `rustls-pemfile` crate can be used to extract
-/// private keys from a PEM file in these formats.
+/// A common format for storing private keys is
+/// [PEM](https://en.wikipedia.org/wiki/Privacy-Enhanced_Mail).
+/// PEM private keys are commonly stored in files with a `.pem` or `.key` suffix, and look like this:
+///
+/// ```txt
+/// -----BEGIN PRIVATE KEY-----
+/// &lt;base64-encoded private key content&gt;
+/// -----END PRIVATE KEY-----
+/// ```
+///
+/// The [`rustls-pemfile`](https://docs.rs/rustls-pemfile/latest/rustls_pemfile/) crate can be used
+/// to parse PEM files. The [`rcgen`](https://docs.rs/rcgen/latest/rcgen/) can be used to generate
+/// certificates and private keys.
+///
+/// ## Examples
+///
+/// Creating a `PrivateKey` from a PEM file containing a PKCS8-encoded private key using the `rustls_pemfile` crate:
+///
+/// ```rust
+/// use std::fs::File;
+/// use std::io::BufReader;
+/// use rustls::PrivateKey;
+///
+/// fn load_private_key_from_file(path: &amp;str) -&gt; Result&lt;PrivateKey, Box&lt;dyn std::error::Error&gt;&gt; {
+///     let file = File::open(&amp;path)?;
+///     let mut reader = BufReader::new(file);
+///     let mut keys = rustls_pemfile::pkcs8_private_keys(&amp;mut reader)?;
+///
+///     match keys.len() {
+///         0 =&gt; Err(format!(&quot;No PKCS8-encoded private key found in {path}&quot;).into()),
+///         1 =&gt; Ok(PrivateKey(keys.remove(0))),
+///         _ =&gt; Err(format!(&quot;More than one PKCS8-encoded private key found in {path}&quot;).into()),
+///     }
+/// }
+/// ```
 </span><span class="attr">#[derive(Debug, Clone, Eq, PartialEq)]
 </span><span class="kw">pub struct </span>PrivateKey(<span class="kw">pub </span>Vec&lt;u8&gt;);
 
 <span class="doccomment">/// This type contains a single certificate by value.
 ///
-/// The certificate must be DER-encoded X.509.
+/// The certificate must be in DER-encoded X.509 format.
 ///
-/// The `rustls-pemfile` crate can be used to parse a PEM file.
+/// A common format for storing certificates is
+/// [PEM](https://en.wikipedia.org/wiki/Privacy-Enhanced_Mail).
+/// PEM certificates are commonly stored in files with a `.pem`, `.cer` or `.crt` suffix, and look
+/// like this:
 ///
-/// ## Note
+/// ```txt
+/// -----BEGIN CERTIFICATE-----
+/// &lt;base64-encoded certificate content&gt;
+/// -----END CERTIFICATE-----
+/// ```
 ///
-/// If you are receiving certificates from an untrusted client or server, the contents
-/// must be validated manually.
+/// The [`rustls-pemfile`](https://docs.rs/rustls-pemfile/latest/rustls_pemfile/) crate can be used
+/// to parse PEM files. The [`rcgen`](https://docs.rs/rcgen/latest/rcgen/) crate can be used to
+/// generate certificates and private keys.
+///
+/// ## Examples
+///
+/// Parsing a PEM file to extract DER-encoded certificates:
+///
+/// ```rust
+/// use std::fs::File;
+/// use std::io::BufReader;
+/// use rustls::Certificate;
+///
+/// fn load_certificates_from_pem(path: &amp;str) -&gt; std::io::Result&lt;Vec&lt;Certificate&gt;&gt; {
+///     let file = File::open(path)?;
+///     let mut reader = BufReader::new(file);
+///     let certs = rustls_pemfile::certs(&amp;mut reader)?;
+///
+///     Ok(certs.into_iter().map(Certificate).collect())
+/// }
+/// ```
 </span><span class="attr">#[derive(Clone, Eq, Hash, Ord, PartialEq, PartialOrd)]
 </span><span class="kw">pub struct </span>Certificate(<span class="kw">pub </span>Vec&lt;u8&gt;);
 
@@ -87,6 +223,20 @@
         f.debug_tuple(<span class="string">&quot;Certificate&quot;</span>)
             .field(<span class="kw-2">&amp;</span>BsDebug(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0</span>))
             .finish()
+    }
+}
+
+<span class="doccomment">/// wrapper around internal representation of a parsed certificate. This is used in order to avoid parsing twice when specifying custom verification
+</span><span class="attr">#[cfg_attr(not(feature = <span class="string">&quot;dangerous_configuration&quot;</span>), allow(unreachable_pub))]
+#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;dangerous_configuration&quot;</span>)))]
+</span><span class="kw">pub struct </span>ParsedCertificate&lt;<span class="lifetime">&#39;a</span>&gt;(<span class="kw">pub</span>(<span class="kw">crate</span>) webpki::EndEntityCert&lt;<span class="lifetime">&#39;a</span>&gt;);
+
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; TryFrom&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>Certificate&gt; <span class="kw">for </span>ParsedCertificate&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="kw">type </span>Error = Error;
+    <span class="kw">fn </span>try_from(value: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>Certificate) -&gt; <span class="prelude-ty">Result</span>&lt;ParsedCertificate&lt;<span class="lifetime">&#39;a</span>&gt;, <span class="self">Self</span>::Error&gt; {
+        webpki::EndEntityCert::try_from(value.<span class="number">0</span>.as_ref())
+            .map_err(<span class="kw">crate</span>::verify::pki_error)
+            .map(ParsedCertificate)
     }
 }
 

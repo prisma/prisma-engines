@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/nix/store/rw9bn419hs63s20iz4qrsgiddx2c69nb-vendor-cargo-deps/c19b7c6f923b580ac259164a89f2577984ad5ab09ee9d583b888f934adbbe8d0/ring-0.16.20/src/ec/suite_b/private_key.rs`."><title>private_key.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../../static.files/rustdoc-cb6f1f67f1bcd037.css" id="mainThemeStyle"><meta name="rustdoc-vars" data-root-path="../../../../" data-static-root-path="../../../../static.files/" data-current-crate="ring" data-themes="" data-resource-suffix="" data-rustdoc-version="1.73.0 (cc66ad468 2023-10-03) (built from a source tarball)" data-channel="1.73.0" data-search-js="search-6dfdfced5eff6596.js" data-settings-js="settings-de11bff964e9d4e5.js" data-settings-css="settings-8c76f75bfb6bd192.css" data-theme-light-css="light-1596385f77d47ef2.css" data-theme-dark-css="dark-0a43001d3fc2282c.css" data-theme-ayu-css="ayu-fd19013d6ce078bf.css" ><script src="../../../../static.files/storage-db41da1a38ea3cb8.js"></script><script defer src="../../../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../../../src-files.js"></script><script defer src="../../../../static.files/main-0795b7d26be81095.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../../../../static.files/light-1596385f77d47ef2.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../../../../static.files/dark-0a43001d3fc2282c.css"><link rel="stylesheet" href="../../../../static.files/noscript-cffde32267a19fd6.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../../../ring/index.html"><img class="rust-logo" src="../../../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/nix/store/8wbf91mp5aqggnly8dsfwbyfpxzfkram-vendor-cargo-deps/c19b7c6f923b580ac259164a89f2577984ad5ab09ee9d583b888f934adbbe8d0/ring-0.17.7/src/ec/suite_b/private_key.rs`."><title>private_key.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../../static.files/rustdoc-cb6f1f67f1bcd037.css" id="mainThemeStyle"><meta name="rustdoc-vars" data-root-path="../../../../" data-static-root-path="../../../../static.files/" data-current-crate="ring" data-themes="" data-resource-suffix="" data-rustdoc-version="1.73.0 (cc66ad468 2023-10-03) (built from a source tarball)" data-channel="1.73.0" data-search-js="search-6dfdfced5eff6596.js" data-settings-js="settings-de11bff964e9d4e5.js" data-settings-css="settings-8c76f75bfb6bd192.css" data-theme-light-css="light-1596385f77d47ef2.css" data-theme-dark-css="dark-0a43001d3fc2282c.css" data-theme-ayu-css="ayu-fd19013d6ce078bf.css" ><script src="../../../../static.files/storage-db41da1a38ea3cb8.js"></script><script defer src="../../../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../../../src-files.js"></script><script defer src="../../../../static.files/main-0795b7d26be81095.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../../../../static.files/light-1596385f77d47ef2.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../../../../static.files/dark-0a43001d3fc2282c.css"><link rel="stylesheet" href="../../../../static.files/noscript-cffde32267a19fd6.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../../../ring/index.html"><img class="rust-logo" src="../../../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -194,13 +194,6 @@
 <a href="#194" id="194">194</a>
 <a href="#195" id="195">195</a>
 <a href="#196" id="196">196</a>
-<a href="#197" id="197">197</a>
-<a href="#198" id="198">198</a>
-<a href="#199" id="199">199</a>
-<a href="#200" id="200">200</a>
-<a href="#201" id="201">201</a>
-<a href="#202" id="202">202</a>
-<a href="#203" id="203">203</a>
 </pre></div><pre class="rust"><code><span class="comment">// Copyright 2016 Brian Smith.
 //
 // Permission to use, copy, modify, and/or distribute this software for any
@@ -219,21 +212,15 @@
 //! ECDSA signing).
 
 </span><span class="kw">use super</span>::{ops::<span class="kw-2">*</span>, verify_affine_point_is_on_the_curve};
-<span class="kw">use crate</span>::{
-    arithmetic::montgomery::R,
-    ec, error,
-    limb::{<span class="self">self</span>, LIMB_BYTES},
-    rand,
-};
+<span class="kw">use crate</span>::{arithmetic::montgomery::R, ec, error, limb, rand};
 
 <span class="doccomment">/// Generates a random scalar in the range [1, n).
 </span><span class="kw">pub fn </span>random_scalar(
     ops: <span class="kw-2">&amp;</span>PrivateKeyOps,
     rng: <span class="kw-2">&amp;</span><span class="kw">dyn </span>rand::SecureRandom,
 ) -&gt; <span class="prelude-ty">Result</span>&lt;Scalar, error::Unspecified&gt; {
-    <span class="kw">let </span>num_limbs = ops.common.num_limbs;
     <span class="kw">let </span><span class="kw-2">mut </span>bytes = [<span class="number">0</span>; ec::SCALAR_MAX_BYTES];
-    <span class="kw">let </span>bytes = <span class="kw-2">&amp;mut </span>bytes[..(num_limbs * LIMB_BYTES)];
+    <span class="kw">let </span>bytes = <span class="kw-2">&amp;mut </span>bytes[..ops.common.len()];
     generate_private_scalar_bytes(ops, rng, bytes)<span class="question-mark">?</span>;
     scalar_from_big_endian_bytes(ops, bytes)
 }
@@ -247,8 +234,8 @@
     // [NSA Suite B Implementer&#39;s Guide to NIST SP 800-56A] Appendix B.2,
     // &quot;Key Pair Generation by Testing Candidates&quot;.
     //
-    // [NSA Suite B Implementer&#39;s Guide to ECDSA]: doc/ecdsa.pdf.
-    // [NSA Suite B Implementer&#39;s Guide to NIST SP 800-56A]: doc/ecdh.pdf.
+    // [NSA Suite B Implementer&#39;s Guide to ECDSA]: doc/ecdsa.pdf
+    // [NSA Suite B Implementer&#39;s Guide to NIST SP 800-56A]: doc/ecdh.pdf
 
     // TODO: The NSA guide also suggests, in appendix B.1, another mechanism
     // that would avoid the need to use `rng.fill()` more than once. It works
@@ -302,7 +289,7 @@
     ops: <span class="kw-2">&amp;</span>PrivateKeyOps,
     bytes: <span class="kw-2">&amp;</span>[u8],
 ) -&gt; <span class="prelude-ty">Result</span>&lt;(), error::Unspecified&gt; {
-    <span class="macro">debug_assert_eq!</span>(bytes.len(), ops.common.num_limbs * LIMB_BYTES);
+    <span class="macro">debug_assert_eq!</span>(bytes.len(), ops.common.len());
     scalar_from_big_endian_bytes(ops, bytes).map(|<span class="kw">_</span>| ())
 }
 
@@ -319,8 +306,8 @@
     // [NSA Suite B Implementer&#39;s Guide to NIST SP 800-56A] Appendix B.2,
     // &quot;Key Pair Generation by Testing Candidates&quot;.
     //
-    // [NSA Suite B Implementer&#39;s Guide to ECDSA]: doc/ecdsa.pdf.
-    // [NSA Suite B Implementer&#39;s Guide to NIST SP 800-56A]: doc/ecdh.pdf.
+    // [NSA Suite B Implementer&#39;s Guide to ECDSA]: doc/ecdsa.pdf
+    // [NSA Suite B Implementer&#39;s Guide to NIST SP 800-56A]: doc/ecdh.pdf
     //
     // Steps 5, 6, and 7.
     //
@@ -338,12 +325,12 @@
     public_out: <span class="kw-2">&amp;mut </span>[u8],
     my_private_key: <span class="kw-2">&amp;</span>ec::Seed,
 ) -&gt; <span class="prelude-ty">Result</span>&lt;(), error::Unspecified&gt; {
-    <span class="kw">let </span>elem_and_scalar_bytes = ops.common.num_limbs * LIMB_BYTES;
+    <span class="kw">let </span>elem_and_scalar_bytes = ops.common.len();
     <span class="macro">debug_assert_eq!</span>(public_out.len(), <span class="number">1 </span>+ (<span class="number">2 </span>* elem_and_scalar_bytes));
     <span class="kw">let </span>my_private_key = private_key_as_scalar(ops, my_private_key);
     <span class="kw">let </span>my_public_key = ops.point_mul_base(<span class="kw-2">&amp;</span>my_private_key);
     public_out[<span class="number">0</span>] = <span class="number">4</span>; <span class="comment">// Uncompressed encoding.
-    </span><span class="kw">let </span>(x_out, y_out) = (<span class="kw-2">&amp;mut </span>public_out[<span class="number">1</span>..]).split_at_mut(elem_and_scalar_bytes);
+    </span><span class="kw">let </span>(x_out, y_out) = public_out[<span class="number">1</span>..].split_at_mut(elem_and_scalar_bytes);
 
     <span class="comment">// `big_endian_affine_from_jacobian` verifies that the point is not at
     // infinity and is on the curve.
@@ -392,14 +379,13 @@
     p: <span class="kw-2">&amp;</span>Point,
 ) -&gt; <span class="prelude-ty">Result</span>&lt;(), error::Unspecified&gt; {
     <span class="kw">let </span>(x_aff, y_aff) = affine_from_jacobian(ops, p)<span class="question-mark">?</span>;
-    <span class="kw">let </span>num_limbs = ops.common.num_limbs;
     <span class="kw">if let </span><span class="prelude-val">Some</span>(x_out) = x_out {
         <span class="kw">let </span>x = ops.common.elem_unencoded(<span class="kw-2">&amp;</span>x_aff);
-        limb::big_endian_from_limbs(<span class="kw-2">&amp;</span>x.limbs[..num_limbs], x_out);
+        limb::big_endian_from_limbs(ops.leak_limbs(<span class="kw-2">&amp;</span>x), x_out);
     }
     <span class="kw">if let </span><span class="prelude-val">Some</span>(y_out) = y_out {
         <span class="kw">let </span>y = ops.common.elem_unencoded(<span class="kw-2">&amp;</span>y_aff);
-        limb::big_endian_from_limbs(<span class="kw-2">&amp;</span>y.limbs[..num_limbs], y_out);
+        limb::big_endian_from_limbs(ops.leak_limbs(<span class="kw-2">&amp;</span>y), y_out);
     }
 
     <span class="prelude-val">Ok</span>(())

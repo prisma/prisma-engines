@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/nix/store/rw9bn419hs63s20iz4qrsgiddx2c69nb-vendor-cargo-deps/c19b7c6f923b580ac259164a89f2577984ad5ab09ee9d583b888f934adbbe8d0/ring-0.16.20/src/digest.rs`."><title>digest.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-cb6f1f67f1bcd037.css" id="mainThemeStyle"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="ring" data-themes="" data-resource-suffix="" data-rustdoc-version="1.73.0 (cc66ad468 2023-10-03) (built from a source tarball)" data-channel="1.73.0" data-search-js="search-6dfdfced5eff6596.js" data-settings-js="settings-de11bff964e9d4e5.js" data-settings-css="settings-8c76f75bfb6bd192.css" data-theme-light-css="light-1596385f77d47ef2.css" data-theme-dark-css="dark-0a43001d3fc2282c.css" data-theme-ayu-css="ayu-fd19013d6ce078bf.css" ><script src="../../static.files/storage-db41da1a38ea3cb8.js"></script><script defer src="../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-0795b7d26be81095.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../../static.files/light-1596385f77d47ef2.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../../static.files/dark-0a43001d3fc2282c.css"><link rel="stylesheet" href="../../static.files/noscript-cffde32267a19fd6.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../ring/index.html"><img class="rust-logo" src="../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/nix/store/8wbf91mp5aqggnly8dsfwbyfpxzfkram-vendor-cargo-deps/c19b7c6f923b580ac259164a89f2577984ad5ab09ee9d583b888f934adbbe8d0/ring-0.17.7/src/digest.rs`."><title>digest.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-cb6f1f67f1bcd037.css" id="mainThemeStyle"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="ring" data-themes="" data-resource-suffix="" data-rustdoc-version="1.73.0 (cc66ad468 2023-10-03) (built from a source tarball)" data-channel="1.73.0" data-search-js="search-6dfdfced5eff6596.js" data-settings-js="settings-de11bff964e9d4e5.js" data-settings-css="settings-8c76f75bfb6bd192.css" data-theme-light-css="light-1596385f77d47ef2.css" data-theme-dark-css="dark-0a43001d3fc2282c.css" data-theme-ayu-css="ayu-fd19013d6ce078bf.css" ><script src="../../static.files/storage-db41da1a38ea3cb8.js"></script><script defer src="../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-0795b7d26be81095.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../../static.files/light-1596385f77d47ef2.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../../static.files/dark-0a43001d3fc2282c.css"><link rel="stylesheet" href="../../static.files/noscript-cffde32267a19fd6.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../ring/index.html"><img class="rust-logo" src="../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -618,11 +618,7 @@
 // The goal for this implementation is to drive the overhead as close to zero
 // as possible.
 
-</span><span class="kw">use crate</span>::{
-    c, cpu, debug,
-    endian::{<span class="self">self</span>, BigEndian},
-    polyfill,
-};
+</span><span class="kw">use crate</span>::{c, cpu, debug, polyfill};
 <span class="kw">use </span>core::num::Wrapping;
 
 <span class="kw">mod </span>sha1;
@@ -657,7 +653,9 @@
     </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>update(<span class="kw-2">&amp;mut </span><span class="self">self</span>, input: <span class="kw-2">&amp;</span>[u8]) {
         <span class="kw">let </span>num_blocks = input.len() / <span class="self">self</span>.algorithm.block_len;
         <span class="macro">assert_eq!</span>(num_blocks * <span class="self">self</span>.algorithm.block_len, input.len());
+
         <span class="kw">if </span>num_blocks &gt; <span class="number">0 </span>{
+            <span class="kw">let </span>_cpu_features = <span class="self">self</span>.cpu_features;
             <span class="kw">unsafe </span>{
                 (<span class="self">self</span>.algorithm.block_data_order)(<span class="kw-2">&amp;mut </span><span class="self">self</span>.state, input.as_ptr(), num_blocks);
             }
@@ -678,7 +676,7 @@
         padding_pos += <span class="number">1</span>;
 
         <span class="kw">if </span>padding_pos &gt; block_len - <span class="self">self</span>.algorithm.len_len {
-            polyfill::slice::fill(<span class="kw-2">&amp;mut </span>pending[padding_pos..block_len], <span class="number">0</span>);
+            pending[padding_pos..block_len].fill(<span class="number">0</span>);
             <span class="kw">unsafe </span>{
                 (<span class="self">self</span>.algorithm.block_data_order)(<span class="kw-2">&amp;mut </span><span class="self">self</span>.state, pending.as_ptr(), <span class="number">1</span>);
             }
@@ -687,7 +685,7 @@
             </span>padding_pos = <span class="number">0</span>;
         }
 
-        polyfill::slice::fill(<span class="kw-2">&amp;mut </span>pending[padding_pos..(block_len - <span class="number">8</span>)], <span class="number">0</span>);
+        pending[padding_pos..(block_len - <span class="number">8</span>)].fill(<span class="number">0</span>);
 
         <span class="comment">// Output the length, in bits, in big endian order.
         </span><span class="kw">let </span>completed_data_bits = <span class="self">self
@@ -754,9 +752,7 @@
         }
     }
 
-    <span class="doccomment">/// Updates the digest with all the data in `data`. `update` may be called
-    /// zero or more times until `finish` is called. It must not be called
-    /// after `finish` has been called.
+    <span class="doccomment">/// Updates the digest with all the data in `data`.
     </span><span class="kw">pub fn </span>update(<span class="kw-2">&amp;mut </span><span class="self">self</span>, data: <span class="kw-2">&amp;</span>[u8]) {
         <span class="kw">let </span>block_len = <span class="self">self</span>.block.algorithm.block_len;
         <span class="kw">if </span>data.len() &lt; block_len - <span class="self">self</span>.num_pending {
@@ -784,9 +780,10 @@
         }
     }
 
-    <span class="doccomment">/// Finalizes the digest calculation and returns the digest value. `finish`
-    /// consumes the context so it cannot be (mis-)used after `finish` has been
-    /// called.
+    <span class="doccomment">/// Finalizes the digest calculation and returns the digest value.
+    ///
+    /// `finish` consumes the context so it cannot be (mis-)used after `finish`
+    /// has been called.
     </span><span class="kw">pub fn </span>finish(<span class="kw-2">mut </span><span class="self">self</span>) -&gt; Digest {
         <span class="kw">let </span>block_len = <span class="self">self</span>.block.algorithm.block_len;
         <span class="self">self</span>.block
@@ -823,7 +820,7 @@
 
 <span class="doccomment">/// A calculated digest value.
 ///
-/// Use `as_ref` to get the value as a `&amp;[u8]`.
+/// Use [`Self::as_ref`] to get the value as a `&amp;[u8]`.
 </span><span class="attr">#[derive(Clone, Copy)]
 </span><span class="kw">pub struct </span>Digest {
     value: Output,
@@ -841,8 +838,7 @@
 <span class="kw">impl </span>AsRef&lt;[u8]&gt; <span class="kw">for </span>Digest {
     <span class="attr">#[inline(always)]
     </span><span class="kw">fn </span>as_ref(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[u8] {
-        <span class="kw">let </span>as64 = <span class="kw">unsafe </span>{ <span class="kw-2">&amp;</span><span class="self">self</span>.value.as64 };
-        <span class="kw-2">&amp;</span>endian::as_byte_slice(as64)[..<span class="self">self</span>.algorithm.output_len]
+        <span class="kw-2">&amp;</span><span class="self">self</span>.value.<span class="number">0</span>[..<span class="self">self</span>.algorithm.output_len]
     }
 }
 
@@ -855,19 +851,9 @@
 
 <span class="doccomment">/// A digest algorithm.
 </span><span class="kw">pub struct </span>Algorithm {
-    <span class="doccomment">/// The length of a finalized digest.
-    </span><span class="kw">pub </span>output_len: usize,
-
-    <span class="doccomment">/// The size of the chaining value of the digest function, in bytes. For
-    /// non-truncated algorithms (SHA-1, SHA-256, SHA-512), this is equal to
-    /// `output_len`. For truncated algorithms (e.g. SHA-384, SHA-512/256),
-    /// this is equal to the length before truncation. This is mostly helpful
-    /// for determining the size of an HMAC key that is appropriate for the
-    /// digest algorithm.
-    </span><span class="kw">pub </span>chaining_len: usize,
-
-    <span class="doccomment">/// The internal block length.
-    </span><span class="kw">pub </span>block_len: usize,
+    output_len: usize,
+    chaining_len: usize,
+    block_len: usize,
 
     <span class="doccomment">/// The length of the length in the padding.
     </span>len_len: usize,
@@ -898,6 +884,29 @@
 <span class="kw">impl </span>Eq <span class="kw">for </span>Algorithm {}
 
 <span class="macro">derive_debug_via_id!</span>(Algorithm);
+
+<span class="kw">impl </span>Algorithm {
+    <span class="doccomment">/// The internal block length.
+    </span><span class="kw">pub fn </span>block_len(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; usize {
+        <span class="self">self</span>.block_len
+    }
+
+    <span class="doccomment">/// The size of the chaining value of the digest function, in bytes.
+    ///
+    /// For non-truncated algorithms (SHA-1, SHA-256, SHA-512), this is equal
+    /// to [`Self::output_len()`]. For truncated algorithms (e.g. SHA-384,
+    /// SHA-512/256), this is equal to the length before truncation. This is
+    /// mostly helpful for determining the size of an HMAC key that is
+    /// appropriate for the digest algorithm.
+    </span><span class="kw">pub fn </span>chaining_len(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; usize {
+        <span class="self">self</span>.chaining_len
+    }
+
+    <span class="doccomment">/// The length of a finalized digest.
+    </span><span class="kw">pub fn </span>output_len(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; usize {
+        <span class="self">self</span>.output_len
+    }
+}
 
 <span class="doccomment">/// SHA-1 as specified in [FIPS 180-4]. Deprecated.
 ///
@@ -932,7 +941,7 @@
     chaining_len: SHA256_OUTPUT_LEN,
     block_len: <span class="number">512 </span>/ <span class="number">8</span>,
     len_len: <span class="number">64 </span>/ <span class="number">8</span>,
-    block_data_order: sha2::GFp_sha256_block_data_order,
+    block_data_order: sha2::sha256_block_data_order,
     format_output: sha256_format_output,
     initial_state: State {
         as32: [
@@ -957,7 +966,7 @@
     chaining_len: SHA512_OUTPUT_LEN,
     block_len: SHA512_BLOCK_LEN,
     len_len: SHA512_LEN_LEN,
-    block_data_order: sha2::GFp_sha512_block_data_order,
+    block_data_order: sha2::sha512_block_data_order,
     format_output: sha512_format_output,
     initial_state: State {
         as64: [
@@ -982,7 +991,7 @@
     chaining_len: SHA512_OUTPUT_LEN,
     block_len: SHA512_BLOCK_LEN,
     len_len: SHA512_LEN_LEN,
-    block_data_order: sha2::GFp_sha512_block_data_order,
+    block_data_order: sha2::sha512_block_data_order,
     format_output: sha512_format_output,
     initial_state: State {
         as64: [
@@ -1011,7 +1020,7 @@
     chaining_len: SHA512_OUTPUT_LEN,
     block_len: SHA512_BLOCK_LEN,
     len_len: SHA512_LEN_LEN,
-    block_data_order: sha2::GFp_sha512_block_data_order,
+    block_data_order: sha2::sha512_block_data_order,
     format_output: sha512_format_output,
     initial_state: State {
         as64: [
@@ -1036,54 +1045,45 @@
 }
 
 <span class="attr">#[derive(Clone, Copy)]
-#[repr(C)]
-</span><span class="kw">union </span>Output {
-    as64: [BigEndian&lt;u64&gt;; <span class="number">512 </span>/ <span class="number">8 </span>/ core::mem::size_of::&lt;BigEndian&lt;u64&gt;&gt;()],
-    as32: [BigEndian&lt;u32&gt;; <span class="number">256 </span>/ <span class="number">8 </span>/ core::mem::size_of::&lt;BigEndian&lt;u32&gt;&gt;()],
-}
+</span><span class="kw">struct </span>Output([u8; MAX_OUTPUT_LEN]);
 
-<span class="doccomment">/// The maximum block length (`Algorithm::block_len`) of all the algorithms in
-/// this module.
+<span class="doccomment">/// The maximum block length ([`Algorithm::block_len()`]) of all the algorithms
+/// in this module.
 </span><span class="kw">pub const </span>MAX_BLOCK_LEN: usize = <span class="number">1024 </span>/ <span class="number">8</span>;
 
-<span class="doccomment">/// The maximum output length (`Algorithm::output_len`) of all the algorithms
-/// in this module.
+<span class="doccomment">/// The maximum output length ([`Algorithm::output_len()`]) of all the
+/// algorithms in this module.
 </span><span class="kw">pub const </span>MAX_OUTPUT_LEN: usize = <span class="number">512 </span>/ <span class="number">8</span>;
 
-<span class="doccomment">/// The maximum chaining length (`Algorithm::chaining_len`) of all the
+<span class="doccomment">/// The maximum chaining length ([`Algorithm::chaining_len()`]) of all the
 /// algorithms in this module.
 </span><span class="kw">pub const </span>MAX_CHAINING_LEN: usize = MAX_OUTPUT_LEN;
 
 <span class="kw">fn </span>sha256_format_output(input: State) -&gt; Output {
-    <span class="kw">let </span>input = <span class="kw">unsafe </span>{ <span class="kw-2">&amp;</span>input.as32 };
-    Output {
-        as32: [
-            BigEndian::from(input[<span class="number">0</span>]),
-            BigEndian::from(input[<span class="number">1</span>]),
-            BigEndian::from(input[<span class="number">2</span>]),
-            BigEndian::from(input[<span class="number">3</span>]),
-            BigEndian::from(input[<span class="number">4</span>]),
-            BigEndian::from(input[<span class="number">5</span>]),
-            BigEndian::from(input[<span class="number">6</span>]),
-            BigEndian::from(input[<span class="number">7</span>]),
-        ],
-    }
+    <span class="kw">let </span>input = <span class="kw">unsafe </span>{ input.as32 };
+    format_output::&lt;<span class="kw">_</span>, <span class="kw">_</span>, { core::mem::size_of::&lt;u32&gt;() }&gt;(input, u32::to_be_bytes)
 }
 
 <span class="kw">fn </span>sha512_format_output(input: State) -&gt; Output {
-    <span class="kw">let </span>input = <span class="kw">unsafe </span>{ <span class="kw-2">&amp;</span>input.as64 };
-    Output {
-        as64: [
-            BigEndian::from(input[<span class="number">0</span>]),
-            BigEndian::from(input[<span class="number">1</span>]),
-            BigEndian::from(input[<span class="number">2</span>]),
-            BigEndian::from(input[<span class="number">3</span>]),
-            BigEndian::from(input[<span class="number">4</span>]),
-            BigEndian::from(input[<span class="number">5</span>]),
-            BigEndian::from(input[<span class="number">6</span>]),
-            BigEndian::from(input[<span class="number">7</span>]),
-        ],
-    }
+    <span class="kw">let </span>input = <span class="kw">unsafe </span>{ input.as64 };
+    format_output::&lt;<span class="kw">_</span>, <span class="kw">_</span>, { core::mem::size_of::&lt;u64&gt;() }&gt;(input, u64::to_be_bytes)
+}
+
+<span class="attr">#[inline]
+</span><span class="kw">fn </span>format_output&lt;T, F, <span class="kw">const </span>N: usize&gt;(input: [Wrapping&lt;T&gt;; sha2::CHAINING_WORDS], f: F) -&gt; Output
+<span class="kw">where
+    </span>F: Fn(T) -&gt; [u8; N],
+    T: Copy,
+{
+    <span class="kw">let </span><span class="kw-2">mut </span>output = Output([<span class="number">0</span>; MAX_OUTPUT_LEN]);
+    output
+        .<span class="number">0
+        </span>.chunks_mut(N)
+        .zip(input.iter().copied().map(|Wrapping(w)| f(w)))
+        .for_each(|(o, i)| {
+            o.copy_from_slice(<span class="kw-2">&amp;</span>i);
+        });
+    output
 }
 
 <span class="doccomment">/// The length of the output of SHA-1, in bytes.
@@ -1109,8 +1109,8 @@
 
 <span class="attr">#[cfg(test)]
 </span><span class="kw">mod </span>tests {
-
     <span class="kw">mod </span>max_input {
+        <span class="kw">extern crate </span>alloc;
         <span class="kw">use </span><span class="kw">super</span>::<span class="kw">super</span>::<span class="kw">super</span>::digest;
         <span class="kw">use </span><span class="kw">crate</span>::polyfill;
         <span class="kw">use </span>alloc::vec;

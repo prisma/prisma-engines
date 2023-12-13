@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/nix/store/rw9bn419hs63s20iz4qrsgiddx2c69nb-vendor-cargo-deps/c19b7c6f923b580ac259164a89f2577984ad5ab09ee9d583b888f934adbbe8d0/rustls-0.20.8/src/stream.rs`."><title>stream.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-cb6f1f67f1bcd037.css" id="mainThemeStyle"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="rustls" data-themes="" data-resource-suffix="" data-rustdoc-version="1.73.0 (cc66ad468 2023-10-03) (built from a source tarball)" data-channel="1.73.0" data-search-js="search-6dfdfced5eff6596.js" data-settings-js="settings-de11bff964e9d4e5.js" data-settings-css="settings-8c76f75bfb6bd192.css" data-theme-light-css="light-1596385f77d47ef2.css" data-theme-dark-css="dark-0a43001d3fc2282c.css" data-theme-ayu-css="ayu-fd19013d6ce078bf.css" ><script src="../../static.files/storage-db41da1a38ea3cb8.js"></script><script defer src="../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-0795b7d26be81095.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../../static.files/light-1596385f77d47ef2.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../../static.files/dark-0a43001d3fc2282c.css"><link rel="stylesheet" href="../../static.files/noscript-cffde32267a19fd6.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../rustls/index.html"><img class="rust-logo" src="../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/nix/store/8wbf91mp5aqggnly8dsfwbyfpxzfkram-vendor-cargo-deps/c19b7c6f923b580ac259164a89f2577984ad5ab09ee9d583b888f934adbbe8d0/rustls-0.21.10/src/stream.rs`."><title>stream.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-cb6f1f67f1bcd037.css" id="mainThemeStyle"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="rustls" data-themes="" data-resource-suffix="" data-rustdoc-version="1.73.0 (cc66ad468 2023-10-03) (built from a source tarball)" data-channel="1.73.0" data-search-js="search-6dfdfced5eff6596.js" data-settings-js="settings-de11bff964e9d4e5.js" data-settings-css="settings-8c76f75bfb6bd192.css" data-theme-light-css="light-1596385f77d47ef2.css" data-theme-dark-css="dark-0a43001d3fc2282c.css" data-theme-ayu-css="ayu-fd19013d6ce078bf.css" ><script src="../../static.files/storage-db41da1a38ea3cb8.js"></script><script defer src="../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-0795b7d26be81095.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../../static.files/light-1596385f77d47ef2.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../../static.files/dark-0a43001d3fc2282c.css"><link rel="stylesheet" href="../../static.files/noscript-cffde32267a19fd6.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../rustls/index.html"><img class="rust-logo" src="../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -236,22 +236,6 @@
 <a href="#236" id="236">236</a>
 <a href="#237" id="237">237</a>
 <a href="#238" id="238">238</a>
-<a href="#239" id="239">239</a>
-<a href="#240" id="240">240</a>
-<a href="#241" id="241">241</a>
-<a href="#242" id="242">242</a>
-<a href="#243" id="243">243</a>
-<a href="#244" id="244">244</a>
-<a href="#245" id="245">245</a>
-<a href="#246" id="246">246</a>
-<a href="#247" id="247">247</a>
-<a href="#248" id="248">248</a>
-<a href="#249" id="249">249</a>
-<a href="#250" id="250">250</a>
-<a href="#251" id="251">251</a>
-<a href="#252" id="252">252</a>
-<a href="#253" id="253">253</a>
-<a href="#254" id="254">254</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::conn::{ConnectionCommon, SideData};
 
 <span class="kw">use </span>std::io::{IoSlice, Read, <span class="prelude-ty">Result</span>, Write};
@@ -309,17 +293,9 @@
         <span class="comment">// We call complete_io() in a loop since a single call may read only
         // a partial packet from the underlying transport. A full packet is
         // needed to get more plaintext, which we must do if EOF has not been
-        // hit. Otherwise, we will prematurely signal EOF by returning 0. We
-        // determine if EOF has actually been hit by checking if 0 bytes were
-        // read from the underlying transport.
+        // hit.
         </span><span class="kw">while </span><span class="self">self</span>.conn.wants_read() {
-            <span class="kw">let </span>at_eof = <span class="self">self</span>.conn.complete_io(<span class="self">self</span>.sock)<span class="question-mark">?</span>.<span class="number">0 </span>== <span class="number">0</span>;
-            <span class="kw">if </span>at_eof {
-                <span class="kw">if let </span><span class="prelude-val">Ok</span>(io_state) = <span class="self">self</span>.conn.process_new_packets() {
-                    <span class="kw">if </span>at_eof &amp;&amp; io_state.plaintext_bytes_to_read() == <span class="number">0 </span>{
-                        <span class="kw">return </span><span class="prelude-val">Ok</span>(<span class="number">0</span>);
-                    }
-                }
+            <span class="kw">if </span><span class="self">self</span>.conn.complete_io(<span class="self">self</span>.sock)<span class="question-mark">?</span>.<span class="number">0 </span>== <span class="number">0 </span>{
                 <span class="kw">break</span>;
             }
         }
@@ -328,23 +304,15 @@
     }
 
     <span class="attr">#[cfg(read_buf)]
-    </span><span class="kw">fn </span>read_buf(<span class="kw-2">&amp;mut </span><span class="self">self</span>, cursor: std::io::BorrowedCursor&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
+    </span><span class="kw">fn </span>read_buf(<span class="kw-2">&amp;mut </span><span class="self">self</span>, cursor: core::io::BorrowedCursor&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
         <span class="self">self</span>.complete_prior_io()<span class="question-mark">?</span>;
 
         <span class="comment">// We call complete_io() in a loop since a single call may read only
         // a partial packet from the underlying transport. A full packet is
         // needed to get more plaintext, which we must do if EOF has not been
-        // hit. Otherwise, we will prematurely signal EOF by returning without
-        // writing anything. We determine if EOF has actually been hit by
-        // checking if 0 bytes were read from the underlying transport.
+        // hit.
         </span><span class="kw">while </span><span class="self">self</span>.conn.wants_read() {
-            <span class="kw">let </span>at_eof = <span class="self">self</span>.conn.complete_io(<span class="self">self</span>.sock)<span class="question-mark">?</span>.<span class="number">0 </span>== <span class="number">0</span>;
-            <span class="kw">if </span>at_eof {
-                <span class="kw">if let </span><span class="prelude-val">Ok</span>(io_state) = <span class="self">self</span>.conn.process_new_packets() {
-                    <span class="kw">if </span>at_eof &amp;&amp; io_state.plaintext_bytes_to_read() == <span class="number">0 </span>{
-                        <span class="kw">return </span><span class="prelude-val">Ok</span>(());
-                    }
-                }
+            <span class="kw">if </span><span class="self">self</span>.conn.complete_io(<span class="self">self</span>.sock)<span class="question-mark">?</span>.<span class="number">0 </span>== <span class="number">0 </span>{
                 <span class="kw">break</span>;
             }
         }
@@ -464,7 +432,7 @@
     }
 
     <span class="attr">#[cfg(read_buf)]
-    </span><span class="kw">fn </span>read_buf(<span class="kw-2">&amp;mut </span><span class="self">self</span>, cursor: std::io::BorrowedCursor&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
+    </span><span class="kw">fn </span>read_buf(<span class="kw-2">&amp;mut </span><span class="self">self</span>, cursor: core::io::BorrowedCursor&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
         <span class="self">self</span>.as_stream().read_buf(cursor)
     }
 }

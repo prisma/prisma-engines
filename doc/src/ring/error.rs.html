@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/nix/store/rw9bn419hs63s20iz4qrsgiddx2c69nb-vendor-cargo-deps/c19b7c6f923b580ac259164a89f2577984ad5ab09ee9d583b888f934adbbe8d0/ring-0.16.20/src/error.rs`."><title>error.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-cb6f1f67f1bcd037.css" id="mainThemeStyle"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="ring" data-themes="" data-resource-suffix="" data-rustdoc-version="1.73.0 (cc66ad468 2023-10-03) (built from a source tarball)" data-channel="1.73.0" data-search-js="search-6dfdfced5eff6596.js" data-settings-js="settings-de11bff964e9d4e5.js" data-settings-css="settings-8c76f75bfb6bd192.css" data-theme-light-css="light-1596385f77d47ef2.css" data-theme-dark-css="dark-0a43001d3fc2282c.css" data-theme-ayu-css="ayu-fd19013d6ce078bf.css" ><script src="../../static.files/storage-db41da1a38ea3cb8.js"></script><script defer src="../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-0795b7d26be81095.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../../static.files/light-1596385f77d47ef2.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../../static.files/dark-0a43001d3fc2282c.css"><link rel="stylesheet" href="../../static.files/noscript-cffde32267a19fd6.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../ring/index.html"><img class="rust-logo" src="../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/nix/store/8wbf91mp5aqggnly8dsfwbyfpxzfkram-vendor-cargo-deps/c19b7c6f923b580ac259164a89f2577984ad5ab09ee9d583b888f934adbbe8d0/ring-0.17.7/src/error.rs`."><title>error.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-cb6f1f67f1bcd037.css" id="mainThemeStyle"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="ring" data-themes="" data-resource-suffix="" data-rustdoc-version="1.73.0 (cc66ad468 2023-10-03) (built from a source tarball)" data-channel="1.73.0" data-search-js="search-6dfdfced5eff6596.js" data-settings-js="settings-de11bff964e9d4e5.js" data-settings-css="settings-8c76f75bfb6bd192.css" data-theme-light-css="light-1596385f77d47ef2.css" data-theme-dark-css="dark-0a43001d3fc2282c.css" data-theme-ayu-css="ayu-fd19013d6ce078bf.css" ><script src="../../static.files/storage-db41da1a38ea3cb8.js"></script><script defer src="../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-0795b7d26be81095.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../../static.files/light-1596385f77d47ef2.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../../static.files/dark-0a43001d3fc2282c.css"><link rel="stylesheet" href="../../static.files/noscript-cffde32267a19fd6.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../ring/index.html"><img class="rust-logo" src="../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -196,34 +196,6 @@
 <a href="#196" id="196">196</a>
 <a href="#197" id="197">197</a>
 <a href="#198" id="198">198</a>
-<a href="#199" id="199">199</a>
-<a href="#200" id="200">200</a>
-<a href="#201" id="201">201</a>
-<a href="#202" id="202">202</a>
-<a href="#203" id="203">203</a>
-<a href="#204" id="204">204</a>
-<a href="#205" id="205">205</a>
-<a href="#206" id="206">206</a>
-<a href="#207" id="207">207</a>
-<a href="#208" id="208">208</a>
-<a href="#209" id="209">209</a>
-<a href="#210" id="210">210</a>
-<a href="#211" id="211">211</a>
-<a href="#212" id="212">212</a>
-<a href="#213" id="213">213</a>
-<a href="#214" id="214">214</a>
-<a href="#215" id="215">215</a>
-<a href="#216" id="216">216</a>
-<a href="#217" id="217">217</a>
-<a href="#218" id="218">218</a>
-<a href="#219" id="219">219</a>
-<a href="#220" id="220">220</a>
-<a href="#221" id="221">221</a>
-<a href="#222" id="222">222</a>
-<a href="#223" id="223">223</a>
-<a href="#224" id="224">224</a>
-<a href="#225" id="225">225</a>
-<a href="#226" id="226">226</a>
 </pre></div><pre class="rust"><code><span class="comment">// Copyright 2016 Brian Smith.
 //
 // Permission to use, copy, modify, and/or distribute this software for any
@@ -302,49 +274,34 @@
 </span><span class="attr">#[derive(Clone, Copy, Debug, PartialEq)]
 </span><span class="kw">pub struct </span>Unspecified;
 
-<span class="kw">impl </span>Unspecified {
-    <span class="kw">fn </span>description_() -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str {
-        <span class="string">&quot;ring::error::Unspecified&quot;
-    </span>}
-}
-
 <span class="comment">// This is required for the implementation of `std::error::Error`.
 </span><span class="kw">impl </span>core::fmt::Display <span class="kw">for </span>Unspecified {
     <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>core::fmt::Formatter) -&gt; core::fmt::Result {
-        f.write_str(<span class="self">Self</span>::description_())
+        f.write_str(<span class="string">&quot;ring::error::Unspecified&quot;</span>)
     }
 }
 
 <span class="attr">#[cfg(feature = <span class="string">&quot;std&quot;</span>)]
-</span><span class="kw">impl </span>std::error::Error <span class="kw">for </span>Unspecified {
-    <span class="attr">#[inline]
-    </span><span class="kw">fn </span>cause(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="kw">dyn </span>std::error::Error&gt; {
-        <span class="prelude-val">None
-    </span>}
-
-    <span class="kw">fn </span>description(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>str {
-        <span class="self">Self</span>::description_()
-    }
-}
+</span><span class="kw">impl </span>std::error::Error <span class="kw">for </span>Unspecified {}
 
 <span class="kw">impl </span>From&lt;untrusted::EndOfInput&gt; <span class="kw">for </span>Unspecified {
     <span class="kw">fn </span>from(<span class="kw">_</span>: untrusted::EndOfInput) -&gt; <span class="self">Self </span>{
-        Unspecified
-    }
+        <span class="self">Self
+    </span>}
 }
 
 <span class="kw">impl </span>From&lt;core::array::TryFromSliceError&gt; <span class="kw">for </span>Unspecified {
     <span class="kw">fn </span>from(<span class="kw">_</span>: core::array::TryFromSliceError) -&gt; <span class="self">Self </span>{
-        Unspecified
-    }
+        <span class="self">Self
+    </span>}
 }
 
 <span class="doccomment">/// An error parsing or validating a key.
 ///
-/// The `Display` implementation and `&lt;KeyRejected as Error&gt;::description()`
-/// will return a string that will help you better understand why a key was
-/// rejected change which errors are reported in which situations while
-/// minimizing the likelihood that any applications will be broken.
+/// The `Display` implementation will return a string that will help you better
+/// understand why a key was rejected change which errors are reported in which
+/// situations while minimizing the likelihood that any applications will be
+/// broken.
 ///
 /// Here is an incomplete list of reasons a key may be unsupported:
 ///
@@ -373,81 +330,68 @@
 </span><span class="kw">pub struct </span>KeyRejected(<span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str);
 
 <span class="kw">impl </span>KeyRejected {
-    <span class="doccomment">/// The value returned from &lt;Self as std::error::Error&gt;::description()
-    </span><span class="kw">pub fn </span>description_(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str {
-        <span class="self">self</span>.<span class="number">0
-    </span>}
-
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>inconsistent_components() -&gt; <span class="self">Self </span>{
-        KeyRejected(<span class="string">&quot;InconsistentComponents&quot;</span>)
+        <span class="self">Self</span>(<span class="string">&quot;InconsistentComponents&quot;</span>)
     }
 
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>invalid_component() -&gt; <span class="self">Self </span>{
-        KeyRejected(<span class="string">&quot;InvalidComponent&quot;</span>)
+        <span class="self">Self</span>(<span class="string">&quot;InvalidComponent&quot;</span>)
     }
 
     <span class="attr">#[inline]
     </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>invalid_encoding() -&gt; <span class="self">Self </span>{
-        KeyRejected(<span class="string">&quot;InvalidEncoding&quot;</span>)
+        <span class="self">Self</span>(<span class="string">&quot;InvalidEncoding&quot;</span>)
     }
 
     <span class="comment">// XXX: See the comment at the call site.
     </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>rng_failed() -&gt; <span class="self">Self </span>{
-        KeyRejected(<span class="string">&quot;RNG failed&quot;</span>)
+        <span class="self">Self</span>(<span class="string">&quot;RNG failed&quot;</span>)
     }
 
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>public_key_is_missing() -&gt; <span class="self">Self </span>{
-        KeyRejected(<span class="string">&quot;PublicKeyIsMissing&quot;</span>)
+        <span class="self">Self</span>(<span class="string">&quot;PublicKeyIsMissing&quot;</span>)
     }
 
     <span class="attr">#[cfg(feature = <span class="string">&quot;alloc&quot;</span>)]
     </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>too_small() -&gt; <span class="self">Self </span>{
-        KeyRejected(<span class="string">&quot;TooSmall&quot;</span>)
+        <span class="self">Self</span>(<span class="string">&quot;TooSmall&quot;</span>)
     }
 
     <span class="attr">#[cfg(feature = <span class="string">&quot;alloc&quot;</span>)]
     </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>too_large() -&gt; <span class="self">Self </span>{
-        KeyRejected(<span class="string">&quot;TooLarge&quot;</span>)
+        <span class="self">Self</span>(<span class="string">&quot;TooLarge&quot;</span>)
     }
 
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>version_not_supported() -&gt; <span class="self">Self </span>{
-        KeyRejected(<span class="string">&quot;VersionNotSupported&quot;</span>)
+        <span class="self">Self</span>(<span class="string">&quot;VersionNotSupported&quot;</span>)
     }
 
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>wrong_algorithm() -&gt; <span class="self">Self </span>{
-        KeyRejected(<span class="string">&quot;WrongAlgorithm&quot;</span>)
+        <span class="self">Self</span>(<span class="string">&quot;WrongAlgorithm&quot;</span>)
     }
 
     <span class="attr">#[cfg(feature = <span class="string">&quot;alloc&quot;</span>)]
     </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>private_modulus_len_not_multiple_of_512_bits() -&gt; <span class="self">Self </span>{
-        KeyRejected(<span class="string">&quot;PrivateModulusLenNotMultipleOf512Bits&quot;</span>)
+        <span class="self">Self</span>(<span class="string">&quot;PrivateModulusLenNotMultipleOf512Bits&quot;</span>)
     }
 
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>unexpected_error() -&gt; <span class="self">Self </span>{
-        KeyRejected(<span class="string">&quot;UnexpectedError&quot;</span>)
+        <span class="self">Self</span>(<span class="string">&quot;UnexpectedError&quot;</span>)
     }
 }
 
 <span class="attr">#[cfg(feature = <span class="string">&quot;std&quot;</span>)]
-</span><span class="kw">impl </span>std::error::Error <span class="kw">for </span>KeyRejected {
-    <span class="kw">fn </span>cause(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="kw">dyn </span>std::error::Error&gt; {
-        <span class="prelude-val">None
-    </span>}
-
-    <span class="kw">fn </span>description(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>str {
-        <span class="self">self</span>.description_()
-    }
-}
+</span><span class="kw">impl </span>std::error::Error <span class="kw">for </span>KeyRejected {}
 
 <span class="kw">impl </span>core::fmt::Display <span class="kw">for </span>KeyRejected {
     <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>core::fmt::Formatter) -&gt; core::fmt::Result {
-        f.write_str(<span class="self">self</span>.description_())
+        f.write_str(<span class="self">self</span>.<span class="number">0</span>)
     }
 }
 
 <span class="kw">impl </span>From&lt;KeyRejected&gt; <span class="kw">for </span>Unspecified {
     <span class="kw">fn </span>from(<span class="kw">_</span>: KeyRejected) -&gt; <span class="self">Self </span>{
-        Unspecified
-    }
+        <span class="self">Self
+    </span>}
 }
 </code></pre></div></section></main></body></html>

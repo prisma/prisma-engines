@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/nix/store/rw9bn419hs63s20iz4qrsgiddx2c69nb-vendor-cargo-deps/c19b7c6f923b580ac259164a89f2577984ad5ab09ee9d583b888f934adbbe8d0/rustls-0.20.8/src/client/builder.rs`."><title>builder.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-cb6f1f67f1bcd037.css" id="mainThemeStyle"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="rustls" data-themes="" data-resource-suffix="" data-rustdoc-version="1.73.0 (cc66ad468 2023-10-03) (built from a source tarball)" data-channel="1.73.0" data-search-js="search-6dfdfced5eff6596.js" data-settings-js="settings-de11bff964e9d4e5.js" data-settings-css="settings-8c76f75bfb6bd192.css" data-theme-light-css="light-1596385f77d47ef2.css" data-theme-dark-css="dark-0a43001d3fc2282c.css" data-theme-ayu-css="ayu-fd19013d6ce078bf.css" ><script src="../../../static.files/storage-db41da1a38ea3cb8.js"></script><script defer src="../../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-0795b7d26be81095.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../../../static.files/light-1596385f77d47ef2.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../../../static.files/dark-0a43001d3fc2282c.css"><link rel="stylesheet" href="../../../static.files/noscript-cffde32267a19fd6.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../../rustls/index.html"><img class="rust-logo" src="../../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/nix/store/8wbf91mp5aqggnly8dsfwbyfpxzfkram-vendor-cargo-deps/c19b7c6f923b580ac259164a89f2577984ad5ab09ee9d583b888f934adbbe8d0/rustls-0.21.10/src/client/builder.rs`."><title>builder.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-cb6f1f67f1bcd037.css" id="mainThemeStyle"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="rustls" data-themes="" data-resource-suffix="" data-rustdoc-version="1.73.0 (cc66ad468 2023-10-03) (built from a source tarball)" data-channel="1.73.0" data-search-js="search-6dfdfced5eff6596.js" data-settings-js="settings-de11bff964e9d4e5.js" data-settings-css="settings-8c76f75bfb6bd192.css" data-theme-light-css="light-1596385f77d47ef2.css" data-theme-dark-css="dark-0a43001d3fc2282c.css" data-theme-ayu-css="ayu-fd19013d6ce078bf.css" ><script src="../../../static.files/storage-db41da1a38ea3cb8.js"></script><script defer src="../../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-0795b7d26be81095.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../../../static.files/light-1596385f77d47ef2.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../../../static.files/dark-0a43001d3fc2282c.css"><link rel="stylesheet" href="../../../static.files/noscript-cffde32267a19fd6.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../../rustls/index.html"><img class="rust-logo" src="../../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -190,36 +190,65 @@
 <a href="#190" id="190">190</a>
 <a href="#191" id="191">191</a>
 <a href="#192" id="192">192</a>
-</pre></div><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::anchors;
-<span class="kw">use </span><span class="kw">crate</span>::builder::{ConfigBuilder, WantsVerifier};
-<span class="kw">use </span><span class="kw">crate</span>::client::handy;
-<span class="kw">use </span><span class="kw">crate</span>::client::{ClientConfig, ResolvesClientCert};
+<a href="#193" id="193">193</a>
+<a href="#194" id="194">194</a>
+<a href="#195" id="195">195</a>
+<a href="#196" id="196">196</a>
+<a href="#197" id="197">197</a>
+<a href="#198" id="198">198</a>
+<a href="#199" id="199">199</a>
+<a href="#200" id="200">200</a>
+<a href="#201" id="201">201</a>
+<a href="#202" id="202">202</a>
+<a href="#203" id="203">203</a>
+<a href="#204" id="204">204</a>
+<a href="#205" id="205">205</a>
+<a href="#206" id="206">206</a>
+<a href="#207" id="207">207</a>
+<a href="#208" id="208">208</a>
+<a href="#209" id="209">209</a>
+<a href="#210" id="210">210</a>
+<a href="#211" id="211">211</a>
+<a href="#212" id="212">212</a>
+<a href="#213" id="213">213</a>
+<a href="#214" id="214">214</a>
+<a href="#215" id="215">215</a>
+<a href="#216" id="216">216</a>
+<a href="#217" id="217">217</a>
+<a href="#218" id="218">218</a>
+<a href="#219" id="219">219</a>
+<a href="#220" id="220">220</a>
+<a href="#221" id="221">221</a>
+<a href="#222" id="222">222</a>
+</pre></div><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::builder::{ConfigBuilder, WantsVerifier};
+<span class="kw">use </span><span class="kw">crate</span>::client::{handy, ClientConfig, ResolvesClientCert};
 <span class="kw">use </span><span class="kw">crate</span>::error::Error;
-<span class="kw">use </span><span class="kw">crate</span>::key;
+<span class="kw">use </span><span class="kw">crate</span>::key_log::NoKeyLog;
 <span class="kw">use </span><span class="kw">crate</span>::kx::SupportedKxGroup;
 <span class="kw">use </span><span class="kw">crate</span>::suites::SupportedCipherSuite;
 <span class="kw">use </span><span class="kw">crate</span>::verify::{<span class="self">self</span>, CertificateTransparencyPolicy};
-<span class="kw">use </span><span class="kw">crate</span>::versions;
-<span class="kw">use </span><span class="kw">crate</span>::NoKeyLog;
+<span class="kw">use crate</span>::{anchors, key, versions};
+
+<span class="kw">use </span><span class="kw">super</span>::client_conn::Resumption;
 
 <span class="kw">use </span>std::marker::PhantomData;
 <span class="kw">use </span>std::sync::Arc;
 <span class="kw">use </span>std::time::SystemTime;
 
 <span class="kw">impl </span>ConfigBuilder&lt;ClientConfig, WantsVerifier&gt; {
-    <span class="doccomment">/// Choose how to verify client certificates.
+    <span class="doccomment">/// Choose how to verify server certificates.
     </span><span class="kw">pub fn </span>with_root_certificates(
         <span class="self">self</span>,
-        root_store: anchors::RootCertStore,
+        root_store: <span class="kw">impl </span>Into&lt;Arc&lt;anchors::RootCertStore&gt;&gt;,
     ) -&gt; ConfigBuilder&lt;ClientConfig, WantsTransparencyPolicyOrClientCert&gt; {
         ConfigBuilder {
             state: WantsTransparencyPolicyOrClientCert {
                 cipher_suites: <span class="self">self</span>.state.cipher_suites,
                 kx_groups: <span class="self">self</span>.state.kx_groups,
                 versions: <span class="self">self</span>.state.versions,
-                root_store,
+                root_store: root_store.into(),
             },
-            side: PhantomData::default(),
+            side: PhantomData,
         }
     }
 
@@ -236,7 +265,7 @@
                 versions: <span class="self">self</span>.state.versions,
                 verifier,
             },
-            side: PhantomData::default(),
+            side: PhantomData,
         }
     }
 }
@@ -253,7 +282,7 @@
     cipher_suites: Vec&lt;SupportedCipherSuite&gt;,
     kx_groups: Vec&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>SupportedKxGroup&gt;,
     versions: versions::EnabledVersions,
-    root_store: anchors::RootCertStore,
+    root_store: Arc&lt;anchors::RootCertStore&gt;,
 }
 
 <span class="kw">impl </span>ConfigBuilder&lt;ClientConfig, WantsTransparencyPolicyOrClientCert&gt; {
@@ -282,13 +311,29 @@
     /// `key_der` is a DER-encoded RSA, ECDSA, or Ed25519 private key.
     ///
     /// This function fails if `key_der` is invalid.
-    </span><span class="kw">pub fn </span>with_single_cert(
+    </span><span class="kw">pub fn </span>with_client_auth_cert(
         <span class="self">self</span>,
         cert_chain: Vec&lt;key::Certificate&gt;,
         key_der: key::PrivateKey,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;ClientConfig, Error&gt; {
         <span class="self">self</span>.with_logs(<span class="prelude-val">None</span>)
-            .with_single_cert(cert_chain, key_der)
+            .with_client_auth_cert(cert_chain, key_der)
+    }
+
+    <span class="doccomment">/// Sets a single certificate chain and matching private key for use
+    /// in client authentication.
+    ///
+    /// `cert_chain` is a vector of DER-encoded certificates.
+    /// `key_der` is a DER-encoded RSA, ECDSA, or Ed25519 private key.
+    ///
+    /// This function fails if `key_der` is invalid.
+    </span><span class="attr">#[deprecated(since = <span class="string">&quot;0.21.4&quot;</span>, note = <span class="string">&quot;Use `with_client_auth_cert` instead&quot;</span>)]
+    </span><span class="kw">pub fn </span>with_single_cert(
+        <span class="self">self</span>,
+        cert_chain: Vec&lt;key::Certificate&gt;,
+        key_der: key::PrivateKey,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;ClientConfig, Error&gt; {
+        <span class="self">self</span>.with_client_auth_cert(cert_chain, key_der)
     }
 
     <span class="doccomment">/// Do not support client auth.
@@ -345,13 +390,29 @@
     /// `key_der` is a DER-encoded RSA, ECDSA, or Ed25519 private key.
     ///
     /// This function fails if `key_der` is invalid.
-    </span><span class="kw">pub fn </span>with_single_cert(
+    </span><span class="kw">pub fn </span>with_client_auth_cert(
         <span class="self">self</span>,
         cert_chain: Vec&lt;key::Certificate&gt;,
         key_der: key::PrivateKey,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;ClientConfig, Error&gt; {
         <span class="kw">let </span>resolver = handy::AlwaysResolvesClientCert::new(cert_chain, <span class="kw-2">&amp;</span>key_der)<span class="question-mark">?</span>;
         <span class="prelude-val">Ok</span>(<span class="self">self</span>.with_client_cert_resolver(Arc::new(resolver)))
+    }
+
+    <span class="doccomment">/// Sets a single certificate chain and matching private key for use
+    /// in client authentication.
+    ///
+    /// `cert_chain` is a vector of DER-encoded certificates.
+    /// `key_der` is a DER-encoded RSA, ECDSA, or Ed25519 private key.
+    ///
+    /// This function fails if `key_der` is invalid.
+    </span><span class="attr">#[deprecated(since = <span class="string">&quot;0.21.4&quot;</span>, note = <span class="string">&quot;Use `with_client_auth_cert` instead&quot;</span>)]
+    </span><span class="kw">pub fn </span>with_single_cert(
+        <span class="self">self</span>,
+        cert_chain: Vec&lt;key::Certificate&gt;,
+        key_der: key::PrivateKey,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;ClientConfig, Error&gt; {
+        <span class="self">self</span>.with_client_auth_cert(cert_chain, key_der)
     }
 
     <span class="doccomment">/// Do not support client auth.
@@ -368,10 +429,9 @@
             cipher_suites: <span class="self">self</span>.state.cipher_suites,
             kx_groups: <span class="self">self</span>.state.kx_groups,
             alpn_protocols: Vec::new(),
-            session_storage: handy::ClientSessionMemoryCache::new(<span class="number">256</span>),
+            resumption: Resumption::default(),
             max_fragment_size: <span class="prelude-val">None</span>,
             client_auth_cert_resolver,
-            enable_tickets: <span class="bool-val">true</span>,
             versions: <span class="self">self</span>.state.versions,
             enable_sni: <span class="bool-val">true</span>,
             verifier: <span class="self">self</span>.state.verifier,

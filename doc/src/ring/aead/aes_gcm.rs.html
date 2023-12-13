@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/nix/store/rw9bn419hs63s20iz4qrsgiddx2c69nb-vendor-cargo-deps/c19b7c6f923b580ac259164a89f2577984ad5ab09ee9d583b888f934adbbe8d0/ring-0.16.20/src/aead/aes_gcm.rs`."><title>aes_gcm.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-cb6f1f67f1bcd037.css" id="mainThemeStyle"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="ring" data-themes="" data-resource-suffix="" data-rustdoc-version="1.73.0 (cc66ad468 2023-10-03) (built from a source tarball)" data-channel="1.73.0" data-search-js="search-6dfdfced5eff6596.js" data-settings-js="settings-de11bff964e9d4e5.js" data-settings-css="settings-8c76f75bfb6bd192.css" data-theme-light-css="light-1596385f77d47ef2.css" data-theme-dark-css="dark-0a43001d3fc2282c.css" data-theme-ayu-css="ayu-fd19013d6ce078bf.css" ><script src="../../../static.files/storage-db41da1a38ea3cb8.js"></script><script defer src="../../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-0795b7d26be81095.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../../../static.files/light-1596385f77d47ef2.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../../../static.files/dark-0a43001d3fc2282c.css"><link rel="stylesheet" href="../../../static.files/noscript-cffde32267a19fd6.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../../ring/index.html"><img class="rust-logo" src="../../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/nix/store/8wbf91mp5aqggnly8dsfwbyfpxzfkram-vendor-cargo-deps/c19b7c6f923b580ac259164a89f2577984ad5ab09ee9d583b888f934adbbe8d0/ring-0.17.7/src/aead/aes_gcm.rs`."><title>aes_gcm.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-cb6f1f67f1bcd037.css" id="mainThemeStyle"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="ring" data-themes="" data-resource-suffix="" data-rustdoc-version="1.73.0 (cc66ad468 2023-10-03) (built from a source tarball)" data-channel="1.73.0" data-search-js="search-6dfdfced5eff6596.js" data-settings-js="settings-de11bff964e9d4e5.js" data-settings-css="settings-8c76f75bfb6bd192.css" data-theme-light-css="light-1596385f77d47ef2.css" data-theme-dark-css="dark-0a43001d3fc2282c.css" data-theme-ayu-css="ayu-fd19013d6ce078bf.css" ><script src="../../../static.files/storage-db41da1a38ea3cb8.js"></script><script defer src="../../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-0795b7d26be81095.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../../../static.files/light-1596385f77d47ef2.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../../../static.files/dark-0a43001d3fc2282c.css"><link rel="stylesheet" href="../../../static.files/noscript-cffde32267a19fd6.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../../ring/index.html"><img class="rust-logo" src="../../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -282,23 +282,6 @@
 <a href="#282" id="282">282</a>
 <a href="#283" id="283">283</a>
 <a href="#284" id="284">284</a>
-<a href="#285" id="285">285</a>
-<a href="#286" id="286">286</a>
-<a href="#287" id="287">287</a>
-<a href="#288" id="288">288</a>
-<a href="#289" id="289">289</a>
-<a href="#290" id="290">290</a>
-<a href="#291" id="291">291</a>
-<a href="#292" id="292">292</a>
-<a href="#293" id="293">293</a>
-<a href="#294" id="294">294</a>
-<a href="#295" id="295">295</a>
-<a href="#296" id="296">296</a>
-<a href="#297" id="297">297</a>
-<a href="#298" id="298">298</a>
-<a href="#299" id="299">299</a>
-<a href="#300" id="300">300</a>
-<a href="#301" id="301">301</a>
 </pre></div><pre class="rust"><code><span class="comment">// Copyright 2015-2016 Brian Smith.
 //
 // Permission to use, copy, modify, and/or distribute this software for any
@@ -315,9 +298,14 @@
 
 </span><span class="kw">use super</span>::{
     aes::{<span class="self">self</span>, Counter},
-    gcm, shift, Aad, Block, Direction, Nonce, Tag, BLOCK_LEN,
+    block::{Block, BLOCK_LEN},
+    gcm, shift, Aad, Nonce, Tag,
 };
-<span class="kw">use crate</span>::{aead, cpu, endian::<span class="kw-2">*</span>, error, polyfill};
+<span class="kw">use crate</span>::{
+    aead, cpu, error,
+    polyfill::{<span class="self">self</span>},
+};
+<span class="kw">use </span>core::ops::RangeFrom;
 
 <span class="doccomment">/// AES-128 in GCM mode with 128-bit tags and 96 bit nonces.
 </span><span class="kw">pub static </span>AES_128_GCM: aead::Algorithm = aead::Algorithm {
@@ -339,7 +327,8 @@
     max_input_len: AES_GCM_MAX_INPUT_LEN,
 };
 
-<span class="kw">pub struct </span>Key {
+<span class="attr">#[derive(Clone)]
+</span><span class="kw">pub struct </span>Key {
     gcm_key: gcm::Key, <span class="comment">// First because it has a large alignment requirement.
     </span>aes_key: aes::Key,
 }
@@ -359,49 +348,90 @@
 ) -&gt; <span class="prelude-ty">Result</span>&lt;aead::KeyInner, error::Unspecified&gt; {
     <span class="kw">let </span>aes_key = aes::Key::new(key, variant, cpu_features)<span class="question-mark">?</span>;
     <span class="kw">let </span>gcm_key = gcm::Key::new(aes_key.encrypt_block(Block::zero()), cpu_features);
-    <span class="prelude-val">Ok</span>(aead::KeyInner::AesGcm(Key { aes_key, gcm_key }))
+    <span class="prelude-val">Ok</span>(aead::KeyInner::AesGcm(Key { gcm_key, aes_key }))
 }
 
 <span class="kw">const </span>CHUNK_BLOCKS: usize = <span class="number">3 </span>* <span class="number">1024 </span>/ <span class="number">16</span>;
 
-<span class="kw">fn </span>aes_gcm_seal(
-    key: <span class="kw-2">&amp;</span>aead::KeyInner,
-    nonce: Nonce,
-    aad: Aad&lt;<span class="kw-2">&amp;</span>[u8]&gt;,
-    in_out: <span class="kw-2">&amp;mut </span>[u8],
-    cpu_features: cpu::Features,
-) -&gt; Tag {
-    aead(key, nonce, aad, in_out, Direction::Sealing, cpu_features)
+<span class="kw">fn </span>aes_gcm_seal(key: <span class="kw-2">&amp;</span>aead::KeyInner, nonce: Nonce, aad: Aad&lt;<span class="kw-2">&amp;</span>[u8]&gt;, in_out: <span class="kw-2">&amp;mut </span>[u8]) -&gt; Tag {
+    <span class="kw">let </span>Key { gcm_key, aes_key } = <span class="kw">match </span>key {
+        aead::KeyInner::AesGcm(key) =&gt; key,
+        <span class="kw">_ </span>=&gt; <span class="macro">unreachable!</span>(),
+    };
+
+    <span class="kw">let </span><span class="kw-2">mut </span>ctr = Counter::one(nonce);
+    <span class="kw">let </span>tag_iv = ctr.increment();
+
+    <span class="kw">let </span>total_in_out_len = in_out.len();
+    <span class="kw">let </span>aad_len = aad.<span class="number">0</span>.len();
+    <span class="kw">let </span><span class="kw-2">mut </span>auth = gcm::Context::new(gcm_key, aad);
+
+    <span class="attr">#[cfg(target_arch = <span class="string">&quot;x86_64&quot;</span>)]
+    </span><span class="kw">let </span>in_out = {
+        <span class="kw">if </span>!aes_key.is_aes_hw() || !auth.is_avx() {
+            in_out
+        } <span class="kw">else </span>{
+            <span class="kw">use </span><span class="kw">crate</span>::c;
+            <span class="kw">let </span>(htable, xi) = auth.inner();
+            <span class="macro">prefixed_extern! </span>{
+                <span class="comment">// `HTable` and `Xi` should be 128-bit aligned. TODO: Can we shrink `HTable`? The
+                // assembly says it needs just nine values in that array.
+                </span><span class="kw">fn </span>aesni_gcm_encrypt(
+                    input: <span class="kw-2">*const </span>u8,
+                    output: <span class="kw-2">*mut </span>u8,
+                    len: c::size_t,
+                    key: <span class="kw-2">&amp;</span>aes::AES_KEY,
+                    ivec: <span class="kw-2">&amp;mut </span>Counter,
+                    Htable: <span class="kw-2">&amp;</span>gcm::HTable,
+                    Xi: <span class="kw-2">&amp;mut </span>gcm::Xi) -&gt; c::size_t;
+            }
+            <span class="kw">let </span>processed = <span class="kw">unsafe </span>{
+                aesni_gcm_encrypt(
+                    in_out.as_ptr(),
+                    in_out.as_mut_ptr(),
+                    in_out.len(),
+                    aes_key.inner_less_safe(),
+                    <span class="kw-2">&amp;mut </span>ctr,
+                    htable,
+                    xi,
+                )
+            };
+
+            <span class="kw-2">&amp;mut </span>in_out[processed..]
+        }
+    };
+
+    <span class="kw">let </span>(whole, remainder) = {
+        <span class="kw">let </span>in_out_len = in_out.len();
+        <span class="kw">let </span>whole_len = in_out_len - (in_out_len % BLOCK_LEN);
+        in_out.split_at_mut(whole_len)
+    };
+
+    <span class="kw">for </span>chunk <span class="kw">in </span>whole.chunks_mut(CHUNK_BLOCKS * BLOCK_LEN) {
+        aes_key.ctr32_encrypt_within(chunk, <span class="number">0</span>.., <span class="kw-2">&amp;mut </span>ctr);
+        auth.update_blocks(chunk);
+    }
+
+    <span class="kw">if </span>!remainder.is_empty() {
+        <span class="kw">let </span><span class="kw-2">mut </span>input = Block::zero();
+        input.overwrite_part_at(<span class="number">0</span>, remainder);
+        <span class="kw">let </span><span class="kw-2">mut </span>output = aes_key.encrypt_iv_xor_block(ctr.into(), input);
+        output.zero_from(remainder.len());
+        auth.update_block(output);
+        remainder.copy_from_slice(<span class="kw-2">&amp;</span>output.as_ref()[..remainder.len()]);
+    }
+
+    finish(aes_key, auth, tag_iv, aad_len, total_in_out_len)
 }
 
 <span class="kw">fn </span>aes_gcm_open(
     key: <span class="kw-2">&amp;</span>aead::KeyInner,
     nonce: Nonce,
     aad: Aad&lt;<span class="kw-2">&amp;</span>[u8]&gt;,
-    in_prefix_len: usize,
     in_out: <span class="kw-2">&amp;mut </span>[u8],
-    cpu_features: cpu::Features,
+    src: RangeFrom&lt;usize&gt;,
 ) -&gt; Tag {
-    aead(
-        key,
-        nonce,
-        aad,
-        in_out,
-        Direction::Opening { in_prefix_len },
-        cpu_features,
-    )
-}
-
-<span class="attr">#[inline(always)] </span><span class="comment">// Avoid branching on `direction`.
-</span><span class="kw">fn </span>aead(
-    key: <span class="kw-2">&amp;</span>aead::KeyInner,
-    nonce: Nonce,
-    aad: Aad&lt;<span class="kw-2">&amp;</span>[u8]&gt;,
-    in_out: <span class="kw-2">&amp;mut </span>[u8],
-    direction: Direction,
-    cpu_features: cpu::Features,
-) -&gt; Tag {
-    <span class="kw">let </span>Key { aes_key, gcm_key } = <span class="kw">match </span>key {
+    <span class="kw">let </span>Key { gcm_key, aes_key } = <span class="kw">match </span>key {
         aead::KeyInner::AesGcm(key) =&gt; key,
         <span class="kw">_ </span>=&gt; <span class="macro">unreachable!</span>(),
     };
@@ -410,27 +440,51 @@
     <span class="kw">let </span>tag_iv = ctr.increment();
 
     <span class="kw">let </span>aad_len = aad.<span class="number">0</span>.len();
-    <span class="kw">let </span><span class="kw-2">mut </span>gcm_ctx = gcm::Context::new(gcm_key, aad, cpu_features);
+    <span class="kw">let </span><span class="kw-2">mut </span>auth = gcm::Context::new(gcm_key, aad);
 
-    <span class="kw">let </span>in_prefix_len = <span class="kw">match </span>direction {
-        Direction::Opening { in_prefix_len } =&gt; in_prefix_len,
-        Direction::Sealing =&gt; <span class="number">0</span>,
-    };
+    <span class="kw">let </span>in_prefix_len = src.start;
 
     <span class="kw">let </span>total_in_out_len = in_out.len() - in_prefix_len;
 
-    <span class="kw">let </span>in_out = integrated_aes_gcm(
-        aes_key,
-        <span class="kw-2">&amp;mut </span>gcm_ctx,
-        in_out,
-        <span class="kw-2">&amp;mut </span>ctr,
-        direction,
-        cpu_features,
-    );
-    <span class="kw">let </span>in_out_len = in_out.len() - in_prefix_len;
+    <span class="attr">#[cfg(target_arch = <span class="string">&quot;x86_64&quot;</span>)]
+    </span><span class="kw">let </span>in_out = {
+        <span class="kw">if </span>!aes_key.is_aes_hw() || !auth.is_avx() {
+            in_out
+        } <span class="kw">else </span>{
+            <span class="kw">use </span><span class="kw">crate</span>::c;
+            <span class="kw">let </span>(htable, xi) = auth.inner();
+            <span class="macro">prefixed_extern! </span>{
+                <span class="comment">// `HTable` and `Xi` should be 128-bit aligned. TODO: Can we shrink `HTable`? The
+                // assembly says it needs just nine values in that array.
+                </span><span class="kw">fn </span>aesni_gcm_decrypt(
+                    input: <span class="kw-2">*const </span>u8,
+                    output: <span class="kw-2">*mut </span>u8,
+                    len: c::size_t,
+                    key: <span class="kw-2">&amp;</span>aes::AES_KEY,
+                    ivec: <span class="kw-2">&amp;mut </span>Counter,
+                    Htable: <span class="kw-2">&amp;</span>gcm::HTable,
+                    Xi: <span class="kw-2">&amp;mut </span>gcm::Xi) -&gt; c::size_t;
+            }
 
-    <span class="comment">// Process any (remaining) whole blocks.
-    </span><span class="kw">let </span>whole_len = in_out_len - (in_out_len % BLOCK_LEN);
+            <span class="kw">let </span>processed = <span class="kw">unsafe </span>{
+                aesni_gcm_decrypt(
+                    in_out[src.clone()].as_ptr(),
+                    in_out.as_mut_ptr(),
+                    in_out.len() - src.start,
+                    aes_key.inner_less_safe(),
+                    <span class="kw-2">&amp;mut </span>ctr,
+                    htable,
+                    xi,
+                )
+            };
+            <span class="kw-2">&amp;mut </span>in_out[processed..]
+        }
+    };
+
+    <span class="kw">let </span>whole_len = {
+        <span class="kw">let </span>in_out_len = in_out.len() - in_prefix_len;
+        in_out_len - (in_out_len % BLOCK_LEN)
+    };
     {
         <span class="kw">let </span><span class="kw-2">mut </span>chunk_len = CHUNK_BLOCKS * BLOCK_LEN;
         <span class="kw">let </span><span class="kw-2">mut </span>output = <span class="number">0</span>;
@@ -443,137 +497,49 @@
                 <span class="kw">break</span>;
             }
 
-            <span class="kw">if let </span>Direction::Opening { .. } = direction {
-                gcm_ctx.update_blocks(<span class="kw-2">&amp;</span>in_out[input..][..chunk_len]);
-            }
-
-            aes_key.ctr32_encrypt_blocks(
+            auth.update_blocks(<span class="kw-2">&amp;</span>in_out[input..][..chunk_len]);
+            aes_key.ctr32_encrypt_within(
                 <span class="kw-2">&amp;mut </span>in_out[output..][..(chunk_len + in_prefix_len)],
-                direction,
+                in_prefix_len..,
                 <span class="kw-2">&amp;mut </span>ctr,
             );
-
-            <span class="kw">if let </span>Direction::Sealing = direction {
-                gcm_ctx.update_blocks(<span class="kw-2">&amp;</span>in_out[output..][..chunk_len]);
-            }
-
             output += chunk_len;
             input += chunk_len;
         }
     }
 
-    <span class="comment">// Process any remaining partial block.
-    </span><span class="kw">let </span>remainder = <span class="kw-2">&amp;mut </span>in_out[whole_len..];
+    <span class="kw">let </span>remainder = <span class="kw-2">&amp;mut </span>in_out[whole_len..];
     shift::shift_partial((in_prefix_len, remainder), |remainder| {
         <span class="kw">let </span><span class="kw-2">mut </span>input = Block::zero();
         input.overwrite_part_at(<span class="number">0</span>, remainder);
-        <span class="kw">if let </span>Direction::Opening { .. } = direction {
-            gcm_ctx.update_block(input);
-        }
-        <span class="kw">let </span><span class="kw-2">mut </span>output = aes_key.encrypt_iv_xor_block(ctr.into(), input);
-        <span class="kw">if let </span>Direction::Sealing = direction {
-            output.zero_from(remainder.len());
-            gcm_ctx.update_block(output);
-        }
-        output
+        auth.update_block(input);
+        aes_key.encrypt_iv_xor_block(ctr.into(), input)
     });
 
+    finish(aes_key, auth, tag_iv, aad_len, total_in_out_len)
+}
+
+<span class="kw">fn </span>finish(
+    aes_key: <span class="kw-2">&amp;</span>aes::Key,
+    <span class="kw-2">mut </span>gcm_ctx: gcm::Context,
+    tag_iv: aes::Iv,
+    aad_len: usize,
+    in_out_len: usize,
+) -&gt; Tag {
     <span class="comment">// Authenticate the final block containing the input lengths.
     </span><span class="kw">let </span>aad_bits = polyfill::u64_from_usize(aad_len) &lt;&lt; <span class="number">3</span>;
-    <span class="kw">let </span>ciphertext_bits = polyfill::u64_from_usize(total_in_out_len) &lt;&lt; <span class="number">3</span>;
-    gcm_ctx.update_block(Block::from_u64_be(
-        BigEndian::from(aad_bits),
-        BigEndian::from(ciphertext_bits),
+    <span class="kw">let </span>ciphertext_bits = polyfill::u64_from_usize(in_out_len) &lt;&lt; <span class="number">3</span>;
+    gcm_ctx.update_block(Block::from(
+        [aad_bits, ciphertext_bits].map(u64::to_be_bytes),
     ));
 
     <span class="comment">// Finalize the tag and return it.
     </span>gcm_ctx.pre_finish(|pre_tag| {
-        <span class="kw">let </span>bytes = tag_iv.into_bytes_less_safe();
-        <span class="kw">let </span><span class="kw-2">mut </span>tag = aes_key.encrypt_block(Block::from(<span class="kw-2">&amp;</span>bytes));
-        tag.bitxor_assign(pre_tag.into());
+        <span class="kw">let </span>encrypted_iv = aes_key.encrypt_block(tag_iv.into_block_less_safe());
+        <span class="kw">let </span>tag = pre_tag ^ encrypted_iv;
         Tag(<span class="kw-2">*</span>tag.as_ref())
     })
 }
-
-<span class="comment">// Returns the data that wasn&#39;t processed.
-</span><span class="attr">#[cfg(target_arch = <span class="string">&quot;x86_64&quot;</span>)]
-#[inline] </span><span class="comment">// Optimize out the match on `direction`.
-</span><span class="kw">fn </span>integrated_aes_gcm&lt;<span class="lifetime">&#39;a</span>&gt;(
-    aes_key: <span class="kw-2">&amp;</span>aes::Key,
-    gcm_ctx: <span class="kw-2">&amp;mut </span>gcm::Context,
-    in_out: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span>[u8],
-    ctr: <span class="kw-2">&amp;mut </span>Counter,
-    direction: Direction,
-    cpu_features: cpu::Features,
-) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span>[u8] {
-    <span class="kw">use </span><span class="kw">crate</span>::c;
-
-    <span class="kw">if </span>!aes_key.is_aes_hw() || !gcm_ctx.is_avx2(cpu_features) {
-        <span class="kw">return </span>in_out;
-    }
-
-    <span class="kw">let </span>processed = <span class="kw">match </span>direction {
-        Direction::Opening { in_prefix_len } =&gt; {
-            <span class="kw">extern </span><span class="string">&quot;C&quot; </span>{
-                <span class="kw">fn </span>GFp_aesni_gcm_decrypt(
-                    input: <span class="kw-2">*const </span>u8,
-                    output: <span class="kw-2">*mut </span>u8,
-                    len: c::size_t,
-                    key: <span class="kw-2">&amp;</span>aes::AES_KEY,
-                    ivec: <span class="kw-2">&amp;mut </span>Counter,
-                    gcm: <span class="kw-2">&amp;mut </span>gcm::ContextInner,
-                ) -&gt; c::size_t;
-            }
-            <span class="kw">unsafe </span>{
-                GFp_aesni_gcm_decrypt(
-                    in_out[in_prefix_len..].as_ptr(),
-                    in_out.as_mut_ptr(),
-                    in_out.len() - in_prefix_len,
-                    aes_key.inner_less_safe(),
-                    ctr,
-                    gcm_ctx.inner(),
-                )
-            }
-        }
-        Direction::Sealing =&gt; {
-            <span class="kw">extern </span><span class="string">&quot;C&quot; </span>{
-                <span class="kw">fn </span>GFp_aesni_gcm_encrypt(
-                    input: <span class="kw-2">*const </span>u8,
-                    output: <span class="kw-2">*mut </span>u8,
-                    len: c::size_t,
-                    key: <span class="kw-2">&amp;</span>aes::AES_KEY,
-                    ivec: <span class="kw-2">&amp;mut </span>Counter,
-                    gcm: <span class="kw-2">&amp;mut </span>gcm::ContextInner,
-                ) -&gt; c::size_t;
-            }
-            <span class="kw">unsafe </span>{
-                GFp_aesni_gcm_encrypt(
-                    in_out.as_ptr(),
-                    in_out.as_mut_ptr(),
-                    in_out.len(),
-                    aes_key.inner_less_safe(),
-                    ctr,
-                    gcm_ctx.inner(),
-                )
-            }
-        }
-    };
-
-    <span class="kw-2">&amp;mut </span>in_out[processed..]
-}
-
-<span class="attr">#[cfg(not(target_arch = <span class="string">&quot;x86_64&quot;</span>))]
-#[inline]
-</span><span class="kw">fn </span>integrated_aes_gcm&lt;<span class="lifetime">&#39;a</span>&gt;(
-    <span class="kw">_</span>: <span class="kw-2">&amp;</span>aes::Key,
-    <span class="kw">_</span>: <span class="kw-2">&amp;mut </span>gcm::Context,
-    in_out: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span>[u8],
-    <span class="kw">_</span>: <span class="kw-2">&amp;mut </span>Counter,
-    <span class="kw">_</span>: Direction,
-    <span class="kw">_</span>: cpu::Features,
-) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span>[u8] {
-    in_out <span class="comment">// This doesn&#39;t process any of the input so it all remains.
-</span>}
 
 <span class="kw">const </span>AES_GCM_MAX_INPUT_LEN: u64 = <span class="kw">super</span>::max_input_len(BLOCK_LEN, <span class="number">2</span>);
 
