@@ -3568,6 +3568,7 @@ dependencies = [
  "getrandom 0.2.11",
  "hex",
  "indoc 0.3.6",
+ "itertools",
  "lru-cache",
  "metrics 0.18.1",
  "mobc",

@@ -76,6 +76,7 @@ metrics = "0.18"
 futures = "0.3"
 url = "2.1"
 hex = "0.4"
+itertools = "0.10"
 
 either = { version = "1.6" }
 base64 = { version = "0.12.3" }
