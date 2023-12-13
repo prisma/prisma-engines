@@ -31,7 +31,7 @@ jobs:
         run: |
           make build-qe-wasm
           echo "size=$(wc --bytes < query-engine/query-engine-wasm/pkg/query_engine_bg.wasm)" >> $GITHUB_OUTPUT
-          echo "size_gz=$(gzip -c query-engine/query-engine-wasm/pkg/query_engine_bg.wasm | wc -c)" >> $GITHUB_OUTPUT
+          echo "size_gz=$(gzip -c query-engine/query-engine-wasm/pkg/query_engine_bg.wasm | wc --bytes)" >> $GITHUB_OUTPUT
 
   base-wasm-size:
     name: Get base branch size
