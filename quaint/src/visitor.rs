@@ -1138,11 +1138,11 @@ pub trait Visitor<'a> {
             FunctionType::Concat(concat) => {
                 self.visit_concat(concat)?;
             }
-            #[cfg(any(feature = "postgresql", feature = "mysql"))]
+            #[cfg(feature = "postgresql")]
             FunctionType::JsonArrayAgg(array_agg) => {
                 self.visit_json_array_agg(array_agg)?;
             }
-            #[cfg(any(feature = "postgresql", feature = "mysql"))]
+            #[cfg(feature = "postgresql")]
             FunctionType::JsonBuildObject(build_obj) => {
                 self.visit_json_build_object(build_obj)?;
             }
