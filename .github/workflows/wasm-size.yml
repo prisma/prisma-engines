@@ -68,13 +68,13 @@ jobs:
       - name: Compute difference
         id: compute
         run: |
-          base=$(echo "${{ needs.base-wasm-size.outputs.size }}" | numfmt --to=iec-i --suffix=B)
-          base_gz=$(echo "${{ needs.base-wasm-size.outputs.size_gz }}" | numfmt --to=iec-i --suffix=B)
-          pr=$(echo "${{ needs.pr-wasm-size.outputs.size }}" | numfmt --to=iec-i --suffix=B)
-          pr_gz=$(echo "${{ needs.pr-wasm-size.outputs.size_gz }}" | numfmt --to=iec-i --suffix=B)
+          base=$(echo "${{ needs.base-wasm-size.outputs.size }}" | numfmt --format '%.3f' --to=iec-i --suffix=B)
+          base_gz=$(echo "${{ needs.base-wasm-size.outputs.size_gz }}" | numfmt --format '%.3f' --to=iec-i --suffix=B)
+          pr=$(echo "${{ needs.pr-wasm-size.outputs.size }}" | numfmt --format '%.3f' --to=iec-i  --suffix=B)
+          pr_gz=$(echo "${{ needs.pr-wasm-size.outputs.size_gz }}" | numfmt --format '%.3f' --to=iec-i --suffix=B)
           
-          diff=$(echo "$((${{ needs.pr-wasm-size.outputs.size }} - ${{ needs.base-wasm-size.outputs.size }}))" | numfmt --to=iec-i --suffix=B)
-          diff_gz=$(echo "$((${{ needs.pr-wasm-size.outputs.size_gz }} - ${{ needs.base-wasm-size.outputs.size_gz }}))" | numfmt --to=iec-i --suffix=B)
+          diff=$(echo "$((${{ needs.pr-wasm-size.outputs.size }} - ${{ needs.base-wasm-size.outputs.size }}))" | numfmt --format '%.3f' --to=iec-i --suffix=B)
+          diff_gz=$(echo "$((${{ needs.pr-wasm-size.outputs.size_gz }} - ${{ needs.base-wasm-size.outputs.size_gz }}))" | numfmt --format '%.3f' --to=iec-i --suffix=B)
 
           echo "base=$base" >> $GITHUB_OUTPUT
           echo "base_gz=$base_gz" >> $GITHUB_OUTPUT
