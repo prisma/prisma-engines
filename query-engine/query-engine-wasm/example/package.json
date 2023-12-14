@@ -6,9 +6,9 @@
   },
   "dependencies": {
     "@libsql/client": "0.4.0-pre.2",
-    "@prisma/adapter-libsql": "5.7.0",
-    "@prisma/client": "5.7.0",
-    "@prisma/driver-adapter-utils": "5.7.0",
-    "prisma": "5.7.0"
+    "@prisma/adapter-libsql": "5.8.0-dev.24",
+    "@prisma/client": "5.8.0-dev.24",
+    "@prisma/driver-adapter-utils": "5.8.0-dev.24",
+    "prisma": "5.8.0-dev.24"
   }
 }
