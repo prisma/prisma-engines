@@ -125,7 +125,7 @@ in
 
       buildPhase = ''
         cd query-engine/query-engine-wasm
-        HOME=$(mktemp -dt wasm-pack-home-XXXX) WASM_BUILD_PROFILE=${profile} ./build.sh
+        HOME=$(mktemp -dt wasm-pack-home-XXXX) WASM_BUILD_PROFILE=${profile} bash ./build.sh
       '';
 
       installPhase = ''
