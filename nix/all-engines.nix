@@ -115,7 +115,7 @@ in
     })
     { profile = "release"; };
 
-    packages.query-engine-wasm = lib.makeOverridable
+  packages.query-engine-wasm = lib.makeOverridable
     ({ profile }: stdenv.mkDerivation {
       name = "query-engine-wasm";
       inherit src;
@@ -124,8 +124,8 @@ in
       nativeBuildInputs = self'.packages.prisma-engines.nativeBuildInputs ++ (with pkgs; [wasm-pack wasm-bindgen-cli jq binaryen]);
 
       buildPhase = ''
-      cd query-engine/query-engine-wasm
-      HOME=$(mktemp -dt wasm-pack-home-XXXX) WASM_BUILD_PROFILE=${profile} ./build.sh
+        cd query-engine/query-engine-wasm
+        HOME=$(mktemp -dt wasm-pack-home-XXXX) WASM_BUILD_PROFILE=${profile} ./build.sh
       '';
 
       installPhase = ''
@@ -134,7 +134,7 @@ in
     })
     { profile = "release"; };
 
-     packages.query-engine-wasm-gz = lib.makeOverridable
+  packages.query-engine-wasm-gz = lib.makeOverridable
     ({ profile }: stdenv.mkDerivation {
       name = "query-engine-wasm-gz";
       inherit src;
