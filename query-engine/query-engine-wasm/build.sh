@@ -57,6 +57,13 @@ elif [[ "$BUILD_PROFILE" == "--profiling" ]]; then
         -o "${OUT_FOLDER}/query_engine_bg.wasm"
 fi
 
+# Convert the `.wasm` file to its human-friendly `.wat` representation for debugging purposes, if `wasm2wat` is installed
+if ! command -v wasm2wat &> /dev/null; then
+    echo "Skipping wasm2wat, as it is not installed."
+else
+    wasm2wat "${OUT_FOLDER}/query_engine_bg.wasm" -o "./query_engine.wat"
+fi
+
 sleep 1
 
 # Mark the package as a ES module, set the entry point to the query_engine.js file, mark the package as public
