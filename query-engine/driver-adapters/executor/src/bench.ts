@@ -7,7 +7,7 @@ import * as prismaPg from "@prisma/adapter-pg";
 import { DriverAdapter } from "@prisma/driver-adapter-utils";
 import { webcrypto } from "node:crypto";
 
-import { recordReplay } from "./recordReplay";
+import { recording } from "./recording";
 import prismaQueries from "../bench/queries.json";
 
 (global as any).crypto = webcrypto;
@@ -30,7 +30,7 @@ async function main(): Promise<void> {
     throw new Error("DATABASE_URL is not defined");
   }
   const pg = await pgAdapter(url);
-  const { recorder, replayer } = recordReplay(pg);
+  const { recorder, replayer } = recording(pg);
 
   await recordQueries(recorder, prismaSchema, prismaQueries);
   await benchMarkQueries(replayer, prismaSchema, prismaQueries);

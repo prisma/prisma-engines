@@ -8,12 +8,12 @@ import {
   ok,
 } from "@prisma/driver-adapter-utils";
 
-export const recordReplay = (adapter: DriverAdapter) => {
+export const recording = (adapter: DriverAdapter) => {
   const recordings = new InMemoryRecordings();
 
   return {
-    recorder: new RecordDecorator(adapter, recordings),
-    replayer: new ReplayDecorator(adapter, recordings),
+    recorder: new Recorder(adapter, recordings),
+    replayer: new Replayer(adapter, recordings),
   };
 };
 
@@ -65,7 +65,7 @@ export class InMemoryRecordings implements Recordings {
   }
 }
 
-export class RecordDecorator implements DriverAdapter {
+export class Recorder implements DriverAdapter {
   provider: "mysql" | "postgres" | "sqlite";
   recordings: Recordings;
   adapter: DriverAdapter;
@@ -82,7 +82,7 @@ export class RecordDecorator implements DriverAdapter {
         .startTransaction()
         .then((tx) => {
           if (tx.ok) {
-            resolve(ok(new RecordTransaction(tx.value, this)));
+            resolve(ok(new TxRecorder(tx.value, this)));
           } else {
             resolve(tx);
           }
@@ -129,9 +129,9 @@ export class RecordDecorator implements DriverAdapter {
   }
 }
 
-class RecordTransaction implements Transaction {
+class TxRecorder implements Transaction {
   readonly tx: Transaction;
-  readonly recordDecorator: RecordDecorator;
+  readonly recordDecorator: Recorder;
   readonly options: TransactionOptions;
   readonly provider: "mysql" | "postgres" | "sqlite";
 
@@ -149,7 +149,7 @@ class RecordTransaction implements Transaction {
     return this.recordDecorator.executeRaw(params);
   }
 
-  constructor(tx: Transaction, recordDecorator: RecordDecorator) {
+  constructor(tx: Transaction, recordDecorator: Recorder) {
     this.recordDecorator = recordDecorator;
     this.tx = tx;
     this.options = tx.options;
@@ -157,7 +157,7 @@ class RecordTransaction implements Transaction {
   }
 }
 
-export class ReplayDecorator implements DriverAdapter {
+export class Replayer implements DriverAdapter {
   provider: "mysql" | "postgres" | "sqlite";
   recordings: Recordings;
   adapter: DriverAdapter;
@@ -169,9 +169,7 @@ export class ReplayDecorator implements DriverAdapter {
   }
 
   startTransaction(): Promise<Result<Transaction>> {
-    return new Promise((resolve, reject) =>
-      resolve(ok(new ReplayTransaction(this)))
-    );
+    return new Promise((resolve, reject) => resolve(ok(new TxReplayer(this))));
   }
 
   get getConnectionInfo() {
@@ -204,8 +202,8 @@ export class ReplayDecorator implements DriverAdapter {
   }
 }
 
-class ReplayTransaction implements Transaction {
-  readonly replayDecorator: ReplayDecorator;
+class TxReplayer implements Transaction {
+  readonly replayDecorator: Replayer;
   readonly provider: "mysql" | "postgres" | "sqlite";
   readonly options: TransactionOptions;
 
@@ -230,7 +228,7 @@ class ReplayTransaction implements Transaction {
     return this.replayDecorator.executeRaw(params);
   }
 
-  constructor(replayDecorator: ReplayDecorator) {
+  constructor(replayDecorator: Replayer) {
     this.replayDecorator = replayDecorator;
     this.provider = replayDecorator.provider;
     this.options = { usePhantomQuery: false };
