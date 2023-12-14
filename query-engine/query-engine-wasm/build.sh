@@ -10,11 +10,13 @@ OUT_JSON="${OUT_FOLDER}/package.json"
 OUT_TARGET="bundler"
 OUT_NPM_NAME="@prisma/query-engine-wasm"
 
-# use `wasm-pack build --release` on CI only
-if [[ -z "${BUILDKITE:-}" ]] && [[ -z "${GITHUB_ACTIONS:-}" ]]; then
-    BUILD_PROFILE="--dev"
-else
-    BUILD_PROFILE="--release"
+if [[ -z "${WASM_BUILD_PROFILE:-}" ]]; then
+    # use `wasm-pack build --release` by default on CI only
+    if [[ -z "${BUILDKITE:-}" ]] && [[ -z "${GITHUB_ACTIONS:-}" ]]; then
+        WASM_BUILD_PROFILE="dev"
+    else
+        WASM_BUILD_PROFILE="release"
+    fi
 fi
 
 # Check if wasm-pack is installed
@@ -25,7 +27,7 @@ then
     curl https://rustwasm.github.io/wasm-pack/installer/init.sh -sSf | sh
 fi
 
-wasm-pack build $BUILD_PROFILE --target $OUT_TARGET --out-name query_engine
+wasm-pack build "--$WASM_BUILD_PROFILE" --target $OUT_TARGET --out-name query_engine
 
 sleep 1
 
