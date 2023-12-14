@@ -73,6 +73,8 @@
 <a href="#73" id="73">73</a>
 <a href="#74" id="74">74</a>
 <a href="#75" id="75">75</a>
+<a href="#76" id="76">76</a>
+<a href="#77" id="77">77</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Top level queries to satisfy the connector interface operations.
 </span><span class="kw">pub mod </span>aggregate;
 <span class="kw">pub mod </span>read;
@@ -144,7 +146,9 @@
     <span class="comment">// TODO: emit tracing event only when &quot;debug&quot; level query logs are enabled.
     // TODO prisma/team-orm#136: fix log subscription.
     </span><span class="kw">let </span>query_string = builder.build();
-    <span class="macro">debug!</span>(target: <span class="string">&quot;mongodb_query_connector::query&quot;</span>, item_type = <span class="string">&quot;query&quot;</span>, is_query = <span class="bool-val">true</span>, query = %query_string, duration_ms = elapsed);
+    <span class="comment">// NOTE: `params` is a part of the interface for query logs.
+    </span><span class="kw">let </span>params: Vec&lt;i32&gt; = <span class="macro">vec!</span>[];
+    <span class="macro">debug!</span>(target: <span class="string">&quot;mongodb_query_connector::query&quot;</span>, item_type = <span class="string">&quot;query&quot;</span>, is_query = <span class="bool-val">true</span>, query = %query_string, params = <span class="question-mark">?</span>params, duration_ms = elapsed);
 
     res
 }
