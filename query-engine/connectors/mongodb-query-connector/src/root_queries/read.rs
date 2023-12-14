@@ -1,7 +1,7 @@
 use super::*;
 use crate::{
     error::DecorateErrorWithFieldInformationExtension, output_meta, query_builder::MongoReadQueryBuilder,
-    vacuum_cursor, IntoBson,
+    query_strings::Find, vacuum_cursor, IntoBson,
 };
 use connector_interface::RelAggregationSelection;
 use mongodb::{bson::doc, options::FindOptions, ClientSession, Database};
@@ -124,16 +124,20 @@ pub async fn get_related_m2m_record_ids<'conn>(
         })
         .collect::<crate::Result<Vec<_>>>()?;
 
-    let filter = doc! { id_field.db_name(): { "$in": ids } };
-
     // Scalar field name where the relation ids list is on `model`.
     let id_holder_field = from_field.scalar_fields().into_iter().next().unwrap();
     let relation_ids_field_name = id_holder_field.name().to_owned();
-    let find_options = FindOptions::builder()
-        .projection(doc! { id_field.db_name(): 1, relation_ids_field_name: 1 })
-        .build();
 
-    let cursor = observing(None, || coll.find_with_session(filter, Some(find_options), session)).await?;
+    let filter = doc! { id_field.db_name(): { "$in": ids } };
+    let projection = doc! { id_field.db_name(): 1, relation_ids_field_name: 1 };
+
+    let query_string_builder = Find::new(&filter, &projection, coll.name());
+    let find_options = FindOptions::builder().projection(projection.clone()).build();
+
+    let cursor = observing(&query_string_builder, || {
+        coll.find_with_session(filter.clone(), Some(find_options), session)
+    })
+    .await?;
     let docs = vacuum_cursor(cursor, session).await?;
     let parent_id_meta = output_meta::from_scalar_field(&id_field);
     let related_ids_holder_meta = output_meta::from_scalar_field(&id_holder_field);
