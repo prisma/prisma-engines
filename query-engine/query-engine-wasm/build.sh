@@ -17,7 +17,6 @@ if [[ -z "${WASM_BUILD_PROFILE:-}" ]]; then
     else
         WASM_BUILD_PROFILE="release"
     fi
-    WASM_BUILD_PROFILE="dev"
 fi
 
 # Check if wasm-pack is installed
