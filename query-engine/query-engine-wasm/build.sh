@@ -12,7 +12,7 @@ OUT_NPM_NAME="@prisma/query-engine-wasm"
 
 # use `wasm-pack build --release` on CI only
 if [[ -z "${BUILDKITE:-}" ]] && [[ -z "${GITHUB_ACTIONS:-}" ]]; then
-    BUILD_PROFILE="--dev"
+    BUILD_PROFILE="--profiling"
 else
     BUILD_PROFILE="--release"
 fi
@@ -26,6 +26,36 @@ then
 fi
 
 wasm-pack build $BUILD_PROFILE --target $OUT_TARGET --out-name query_engine
+
+WASM_OPT_ARGS=(
+    "-Os"                                 # execute size-focused optimization passes
+    "--vacuum"                            # removes obviously unneeded code
+    "--duplicate-function-elimination"    # removes duplicate functions 
+    "--duplicate-import-elimination"      # removes duplicate imports
+    "--remove-unused-module-elements"     # removes unused module elements
+    "--dae-optimizing"                    # removes arguments to calls in an lto-like manner
+    "--remove-unused-names"               # removes names from location that are never branched to
+    "--rse"                               # removes redundant local.sets
+    "--gsi"                               # global struct inference, to optimize constant values
+    "--gufa-optimizing"                   # optimize the entire program using type monomorphization
+    "--strip-dwarf"                       # removes DWARF debug information
+    "--strip-producers"                   # removes the "producers" section
+    "--strip-target-features"             # removes the "target_features" section
+)
+
+if [[ "$BUILD_PROFILE" == "--release" ]]; then
+    # In release mode, we want to strip the debug symbols.
+    wasm-opt "${WASM_OPT_ARGS[@]}" \
+        "--strip-debug" \
+        "${OUT_FOLDER}/query_engine_bg.wasm" \
+        -o "${OUT_FOLDER}/query_engine_bg.wasm"
+elif [[ "$BUILD_PROFILE" == "--profiling" ]]; then
+    # In profiling mode, we want to keep the debug symbols.
+    wasm-opt "${WASM_OPT_ARGS[@]}" \
+        "--debuginfo" \
+        "${OUT_FOLDER}/query_engine_bg.wasm" \
+        -o "${OUT_FOLDER}/query_engine_bg.wasm"
+fi
 
 sleep 1
 
