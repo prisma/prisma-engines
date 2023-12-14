@@ -42,6 +42,8 @@ async function recordQueries(
   prismaQueries: any
 ): Promise<void> {
   const qe = await initQe(adapter, prismaSchema);
+  await qe.connect("");
+
   for (const prismaQuery of prismaQueries) {
     const { description, query } = prismaQuery;
     console.error("Recording query: " + description);
