@@ -22,7 +22,7 @@
   "sideEffects": false,
   "license": "Apache-2.0",
   "dependencies": {
-    "@libsql/client": "0.3.5",
+    "@libsql/client": "0.3.6",
     "@neondatabase/serverless": "0.6.0",
     "@planetscale/database": "1.11.0",
     "@prisma/adapter-libsql": "workspace:*",
