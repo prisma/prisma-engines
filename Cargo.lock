@@ -432,7 +432,6 @@ dependencies = [
 name = "builtin-psl-connectors"
 version = "0.1.0"
 dependencies = [
- "bigdecimal",
  "chrono",
  "connection-string",
  "either",

@@ -1,7 +1,6 @@
 mod native_types;
 mod validations;
 
-use bigdecimal::{BigDecimal, ParseBigDecimalError};
 pub use native_types::CockroachType;
 
 use chrono::*;
@@ -329,25 +328,6 @@ impl Connector for CockroachDatamodelConnector {
             None => self.parse_json_datetime(
                 str,
                 Some(self.default_native_type_for_scalar_type(&ScalarType::DateTime)),
-            ),
-        }
-    }
-
-    fn parse_json_decimal(
-        &self,
-        str: &str,
-        nt: Option<NativeTypeInstance>,
-    ) -> Result<BigDecimal, ParseBigDecimalError> {
-        let native_type: Option<&CockroachType> = nt.as_ref().map(|nt| nt.downcast_ref());
-
-        match native_type {
-            Some(pt) => match pt {
-                CockroachType::Decimal(_) => crate::utils::parse_decimal(str),
-                _ => unreachable!(),
-            },
-            None => self.parse_json_decimal(
-                str,
-                Some(self.default_native_type_for_scalar_type(&ScalarType::Decimal)),
             ),
         }
     }

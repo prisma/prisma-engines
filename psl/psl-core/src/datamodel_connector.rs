@@ -25,7 +25,6 @@ pub use self::{
 };
 
 use crate::{configuration::DatasourceConnectorData, Configuration, Datasource, PreviewFeature};
-use bigdecimal::{BigDecimal, ParseBigDecimalError};
 use chrono::{DateTime, FixedOffset};
 use diagnostics::{DatamodelError, Diagnostics, NativeTypeErrorFactory, Span};
 use enumflags2::BitFlags;
@@ -367,14 +366,6 @@ pub trait Connector: Send + Sync {
         _str: &str,
         _nt: Option<NativeTypeInstance>,
     ) -> chrono::ParseResult<DateTime<FixedOffset>> {
-        unreachable!("This method is only implemented on connectors with lateral join support.")
-    }
-
-    fn parse_json_decimal(
-        &self,
-        _str: &str,
-        _nt: Option<NativeTypeInstance>,
-    ) -> Result<BigDecimal, ParseBigDecimalError> {
         unreachable!("This method is only implemented on connectors with lateral join support.")
     }
 }

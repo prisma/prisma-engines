@@ -17,6 +17,24 @@ pub struct Postgres<'a> {
     parameters: Vec<Value<'a>>,
 }
 
+impl<'a> Postgres<'a> {
+    fn visit_json_build_obj_expr(&mut self, expr: Expression<'a>) -> crate::Result<()> {
+        dbg!(&expr);
+        match expr.kind() {
+            ExpressionKind::Column(col) => match (col.type_family.as_ref(), col.native_type.as_deref()) {
+                (Some(TypeFamily::Decimal(_)), Some("MONEY")) => {
+                    self.visit_expression(expr)?;
+                    self.write("::numeric")?;
+
+                    Ok(())
+                }
+                _ => self.visit_expression(expr),
+            },
+            _ => self.visit_expression(expr),
+        }
+    }
+}
+
 impl<'a> Visitor<'a> for Postgres<'a> {
     const C_BACKTICK_OPEN: &'static str = "\"";
     const C_BACKTICK_CLOSE: &'static str = "\"";
@@ -534,7 +552,7 @@ impl<'a> Visitor<'a> for Postgres<'a> {
                 while let Some((name, expr)) = chunk.next() {
                     s.visit_raw_value(Value::text(name))?;
                     s.write(", ")?;
-                    s.visit_expression(expr)?;
+                    s.visit_json_build_obj_expr(expr)?;
                     if chunk.peek().is_some() {
                         s.write(", ")?;
                     }
@@ -1288,6 +1306,21 @@ mod tests {
                 ),
                 sql
             );
+        }
+
+        #[test]
+        fn money() {
+            let build_json = json_build_object(vec![(
+                "money".into(),
+                Column::from("money")
+                    .native_column_type(Some("money"))
+                    .type_family(TypeFamily::Decimal(None))
+                    .into(),
+            )]);
+            let query = Select::default().value(build_json);
+            let (sql, _) = Postgres::build(query).unwrap();
+
+            assert_eq!(sql, "SELECT JSONB_BUILD_OBJECT('money', \"money\"::numeric)");
         }
 
         fn build_json_object(num_fields: u32) -> JsonBuildObject<'static> {

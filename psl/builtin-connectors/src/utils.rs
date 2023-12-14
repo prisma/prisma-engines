@@ -1,6 +1,4 @@
-use bigdecimal::{BigDecimal, ParseBigDecimalError};
 use chrono::*;
-use std::str::FromStr;
 
 pub(crate) fn parse_date(str: &str) -> Result<DateTime<FixedOffset>, chrono::ParseError> {
     chrono::NaiveDate::parse_from_str(str, "%Y-%m-%d")
@@ -36,13 +34,4 @@ pub(crate) fn parse_timetz(str: &str) -> Result<DateTime<FixedOffset>, chrono::P
     let time_without_tz = str.split('+').next().unwrap();
 
     parse_time(time_without_tz)
-}
-
-pub(crate) fn parse_money(str: &str) -> Result<BigDecimal, ParseBigDecimalError> {
-    // We strip out the currency sign from the string.
-    BigDecimal::from_str(&str[1..]).map(|bd| bd.normalized())
-}
-
-pub(crate) fn parse_decimal(str: &str) -> Result<BigDecimal, ParseBigDecimalError> {
-    BigDecimal::from_str(str).map(|bd| bd.normalized())
 }

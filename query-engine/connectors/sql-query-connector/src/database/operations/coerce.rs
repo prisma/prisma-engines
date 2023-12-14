@@ -1,8 +1,7 @@
-use std::io;
-
-use bigdecimal::{BigDecimal, FromPrimitive};
+use bigdecimal::{BigDecimal, FromPrimitive, ParseBigDecimalError};
 use itertools::{Either, Itertools};
 use query_structure::*;
+use std::{io, str::FromStr};
 
 use crate::{query_arguments_ext::QueryArgumentsExt, SqlError};
 
@@ -144,7 +143,7 @@ pub(crate) fn coerce_json_scalar_to_pv(value: serde_json::Value, sf: &ScalarFiel
                 Ok(PrismaValue::DateTime(res))
             }
             TypeIdentifier::Decimal => {
-                let res = sf.parse_json_decimal(&s).map_err(|err| {
+                let res = parse_decimal(&s).map_err(|err| {
                     build_conversion_error_with_reason(
                         sf,
                         &format!("String({s})"),
@@ -214,4 +213,8 @@ fn build_conversion_error_with_reason(sf: &ScalarField, from: &str, to: &str, re
     );
 
     SqlError::ConversionError(error.into())
+}
+
+fn parse_decimal(str: &str) -> std::result::Result<BigDecimal, ParseBigDecimalError> {
+    BigDecimal::from_str(str).map(|bd| bd.normalized())
 }
