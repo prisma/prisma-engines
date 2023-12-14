@@ -4,11 +4,11 @@ import * as qe from "./qe";
 import pgDriver from "pg";
 import * as prismaPg from "@prisma/adapter-pg";
 
-import { bindAdapter, DriverAdapter } from "@prisma/driver-adapter-utils";
+import { DriverAdapter } from "@prisma/driver-adapter-utils";
 import { webcrypto } from "node:crypto";
 
 import { recordReplay } from "./recordReplay";
-import prismaQueries from "./bench/queries.json";
+import prismaQueries from "../bench/queries.json";
 
 (global as any).crypto = webcrypto;
 

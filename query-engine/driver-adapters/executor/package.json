@@ -3,7 +3,7 @@
     "node": ">=16.13",
     "pnpm": ">=8.6.6 <9"
   },
-  "name": "connector-test-kit-executor",
+  "name": "executor",
   "version": "0.0.1",
   "description": "",
   "main": "dist/index.mjs",
