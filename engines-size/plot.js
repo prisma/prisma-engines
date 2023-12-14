@@ -30,6 +30,18 @@ document.querySelector("#plot-bin").append(
   })
 );
 
+document.querySelector("#plot-wasm").append(
+  createPlot({
+    data: data.filter(({ file }) => file === "query_engine_bg.wasm"),
+  })
+);
+
+document.querySelector("#plot-wasm-gz").append(
+  createPlot({
+    data: data.filter(({ file }) => file === "query_engine_bg.wasm.gz"),
+  })
+);
+
 function createPlot({ data, yDomainFromZero = false }) {
   const yDomain = [
     yDomainFromZero ? 0 : d3.min(data, (d) => d.size_bytes),
