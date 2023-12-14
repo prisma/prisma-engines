@@ -1,2 +1,2 @@
 #!/usr/bin/env bash
-node "$(dirname "${BASH_SOURCE[0]}")/../dist/index.mjs"
+node "$(dirname "${BASH_SOURCE[0]}")/../dist/testd.mjs"
