@@ -73,15 +73,6 @@
 <a href="#73" id="73">73</a>
 <a href="#74" id="74">74</a>
 <a href="#75" id="75">75</a>
-<a href="#76" id="76">76</a>
-<a href="#77" id="77">77</a>
-<a href="#78" id="78">78</a>
-<a href="#79" id="79">79</a>
-<a href="#80" id="80">80</a>
-<a href="#81" id="81">81</a>
-<a href="#82" id="82">82</a>
-<a href="#83" id="83">83</a>
-<a href="#84" id="84">84</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Top level queries to satisfy the connector interface operations.
 </span><span class="kw">pub mod </span>aggregate;
 <span class="kw">pub mod </span>read;
@@ -131,20 +122,14 @@
         .unwrap()
 }
 
-<span class="comment">// Performs both metrics pushing and query logging. Query logging  might be disabled and thus
-// the query_string might not need to be built, that&#39;s why rather than a query_string
-// we receive a Builder, as it&#39;s not trivial to buid a query and we want to skip that when possible.
-//
-// As a reminder, the query string is not fed into mongo db directly, we built it for debugging
-// purposes and it&#39;s only used when the query log is enabled. For querying mongo, we use the driver
-// wire protocol to build queries from a graphql query rather than executing raw mongodb statements.
-//
-// As we don&#39;t have a mongodb query string, we need to create it from the driver object model, which
-// we better skip it if we don&#39;t need it (i.e. when the query log is disabled.)
-</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async fn </span>observing&lt;<span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span>, F, T, U&gt;(
-    query_string_builder: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;b </span><span class="kw">dyn </span>QueryString&gt;,
-    f: F,
-) -&gt; mongodb::error::Result&lt;T&gt;
+<span class="doccomment">/// Logs the query and updates metrics for an operation performed by a passed function.
+///
+/// NOTE:
+/// 1. `dyn QueryString` is used instead of a `String` to skip expensive query serialization when
+///    query logs are disabled. This, however, is not currently implemented.
+/// 2. Query strings logged are for debugging purposes only. The actual queries constructed by
+///    MongoDB driver might look slightly different.
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async fn </span>observing&lt;<span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span>, F, T, U&gt;(builder: <span class="kw-2">&amp;</span><span class="lifetime">&#39;b </span><span class="kw">dyn </span>QueryString, f: F) -&gt; mongodb::error::Result&lt;T&gt;
 <span class="kw">where
     </span>F: FnOnce() -&gt; U + <span class="lifetime">&#39;a</span>,
     U: Future&lt;Output = mongodb::error::Result&lt;T&gt;&gt;,
@@ -156,13 +141,10 @@
     <span class="macro">histogram!</span>(PRISMA_DATASOURCE_QUERIES_DURATION_HISTOGRAM_MS, elapsed);
     <span class="macro">increment_counter!</span>(PRISMA_DATASOURCE_QUERIES_TOTAL);
 
-    <span class="kw">let </span>params: Vec&lt;i32&gt; = Vec::new();
-
-    <span class="comment">// todo: emit tracing event with the appropriate log level only query_log is enabled. And fix log suscription
-    </span><span class="kw">if let </span><span class="prelude-val">Some</span>(qs) = query_string_builder {
-        <span class="kw">let </span>qs = qs.build();
-        <span class="macro">debug!</span>(target: <span class="string">&quot;mongodb_query_connector::query&quot;</span>, item_type = <span class="string">&quot;query&quot;</span>, is_query = <span class="bool-val">true</span>, query = %qs, params = <span class="question-mark">?</span>params, duration_ms=elapsed);
-    }
+    <span class="comment">// TODO: emit tracing event only when &quot;debug&quot; level query logs are enabled.
+    // TODO prisma/team-orm#136: fix log subscription.
+    </span><span class="kw">let </span>query_string = builder.build();
+    <span class="macro">debug!</span>(target: <span class="string">&quot;mongodb_query_connector::query&quot;</span>, item_type = <span class="string">&quot;query&quot;</span>, is_query = <span class="bool-val">true</span>, query = %query_string, duration_ms = elapsed);
 
     res
 }

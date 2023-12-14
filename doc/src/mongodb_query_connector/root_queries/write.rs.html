@@ -523,13 +523,28 @@
 <a href="#523" id="523">523</a>
 <a href="#524" id="524">524</a>
 <a href="#525" id="525">525</a>
+<a href="#526" id="526">526</a>
+<a href="#527" id="527">527</a>
+<a href="#528" id="528">528</a>
+<a href="#529" id="529">529</a>
+<a href="#530" id="530">530</a>
+<a href="#531" id="531">531</a>
+<a href="#532" id="532">532</a>
+<a href="#533" id="533">533</a>
+<a href="#534" id="534">534</a>
+<a href="#535" id="535">535</a>
+<a href="#536" id="536">536</a>
+<a href="#537" id="537">537</a>
+<a href="#538" id="538">538</a>
+<a href="#539" id="539">539</a>
+<a href="#540" id="540">540</a>
 </pre></div><pre class="rust"><code><span class="kw">use super</span>::<span class="kw-2">*</span>;
 <span class="kw">use crate</span>::{
     error::{DecorateErrorWithFieldInformationExtension, MongoError},
     filter::{FilterPrefix, MongoFilter, MongoFilterVisitor},
     output_meta,
     query_builder::MongoReadQueryBuilder,
-    query_strings::{DeleteMany, InsertMany, InsertOne, UpdateMany, UpdateOne},
+    query_strings::{Aggregate, DeleteMany, Find, InsertMany, InsertOne, RunCommand, UpdateMany, UpdateOne},
     root_queries::raw::{MongoCommand, MongoOperation},
     IntoBson,
 };
@@ -590,11 +605,9 @@
     }
 
     <span class="kw">let </span>query_builder = InsertOne::new(<span class="kw-2">&amp;</span>doc, coll.name());
-    <span class="kw">let </span>insert_result = observing(<span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span>query_builder), || {
-        coll.insert_one_with_session(<span class="kw-2">&amp;</span>doc, <span class="prelude-val">None</span>, session)
-    })
-    .instrument(span)
-    .<span class="kw">await</span><span class="question-mark">?</span>;
+    <span class="kw">let </span>insert_result = observing(<span class="kw-2">&amp;</span>query_builder, || coll.insert_one_with_session(<span class="kw-2">&amp;</span>doc, <span class="prelude-val">None</span>, session))
+        .instrument(span)
+        .<span class="kw">await</span><span class="question-mark">?</span>;
     <span class="kw">let </span>id_value = value_from_bson(insert_result.inserted_id, <span class="kw-2">&amp;</span>id_meta)<span class="question-mark">?</span>;
 
     <span class="prelude-val">Ok</span>(SingleRecord {
@@ -647,9 +660,9 @@
     </span><span class="kw">let </span>ordered = !skip_duplicates;
     <span class="kw">let </span>options = <span class="prelude-val">Some</span>(InsertManyOptions::builder().ordered(ordered).build());
 
-    <span class="kw">let </span>query_string_builder = InsertMany::new(<span class="kw-2">&amp;</span>docs, ordered, coll.name());
+    <span class="kw">let </span>query_string_builder = InsertMany::new(<span class="kw-2">&amp;</span>docs, coll.name(), ordered);
     <span class="kw">let </span>docs_iter = docs.iter();
-    <span class="kw">let </span>insert = observing(<span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span>query_string_builder), || {
+    <span class="kw">let </span>insert = observing(<span class="kw-2">&amp;</span>query_string_builder, || {
         coll.insert_many_with_session(docs_iter, options, session)
     })
     .instrument(span);
@@ -731,7 +744,7 @@
 
     <span class="kw">if </span>!update_docs.is_empty() {
         <span class="kw">let </span>query_string_builder = UpdateMany::new(<span class="kw-2">&amp;</span>filter, <span class="kw-2">&amp;</span>update_docs, coll.name());
-        <span class="kw">let </span>res = observing(<span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span>query_string_builder), || {
+        <span class="kw">let </span>res = observing(<span class="kw-2">&amp;</span>query_string_builder, || {
             coll.update_many_with_session(filter.clone(), update_docs.clone(), <span class="prelude-val">None</span>, session)
         })
         .instrument(span)
@@ -793,7 +806,7 @@
 
     <span class="kw">let </span>filter = <span class="macro">doc! </span>{ id_field.db_name(): { <span class="string">&quot;$in&quot;</span>: ids } };
     <span class="kw">let </span>query_string_builder = DeleteMany::new(<span class="kw-2">&amp;</span>filter, coll.name());
-    <span class="kw">let </span>delete_result = observing(<span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span>query_string_builder), || {
+    <span class="kw">let </span>delete_result = observing(<span class="kw-2">&amp;</span>query_string_builder, || {
         coll.delete_many_with_session(filter.clone(), <span class="prelude-val">None</span>, session)
     })
     .instrument(span)
@@ -877,7 +890,7 @@
 
     <span class="kw">let </span>query_string_builder = UpdateOne::new(<span class="kw-2">&amp;</span>parent_filter, <span class="kw-2">&amp;</span>parent_update, parent_coll.name());
 
-    observing(<span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span>query_string_builder), || {
+    observing(<span class="kw-2">&amp;</span>query_string_builder, || {
         parent_coll.update_one_with_session(parent_filter.clone(), parent_update.clone(), <span class="prelude-val">None</span>, session)
     })
     .<span class="kw">await</span><span class="question-mark">?</span>;
@@ -898,7 +911,7 @@
 
     <span class="kw">let </span>child_updates = <span class="macro">vec!</span>[child_update.clone()];
     <span class="kw">let </span>query_string_builder = UpdateMany::new(<span class="kw-2">&amp;</span>child_filter, <span class="kw-2">&amp;</span>child_updates, child_coll.name());
-    observing(<span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span>query_string_builder), || {
+    observing(<span class="kw-2">&amp;</span>query_string_builder, || {
         child_coll.update_many_with_session(child_filter.clone(), child_update.clone(), <span class="prelude-val">None</span>, session)
     })
     .<span class="kw">await</span><span class="question-mark">?</span>;
@@ -943,7 +956,7 @@
 
     <span class="comment">// First update the parent and remove all child IDs to the m:n scalar field.
     </span><span class="kw">let </span>query_string_builder = UpdateOne::new(<span class="kw-2">&amp;</span>parent_filter, <span class="kw-2">&amp;</span>parent_update, parent_coll.name());
-    observing(<span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span>query_string_builder), || {
+    observing(<span class="kw-2">&amp;</span>query_string_builder, || {
         parent_coll.update_one_with_session(parent_filter.clone(), parent_update.clone(), <span class="prelude-val">None</span>, session)
     })
     .<span class="kw">await</span><span class="question-mark">?</span>;
@@ -965,7 +978,7 @@
 
     <span class="kw">let </span>child_updates = <span class="macro">vec!</span>[child_update.clone()];
     <span class="kw">let </span>query_string_builder = UpdateMany::new(<span class="kw-2">&amp;</span>child_filter, <span class="kw-2">&amp;</span>child_updates, child_coll.name());
-    observing(<span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span>query_string_builder), || {
+    observing(<span class="kw-2">&amp;</span>query_string_builder, || {
         child_coll.update_many_with_session(child_filter.clone(), child_update, <span class="prelude-val">None</span>, session)
     })
     .<span class="kw">await</span><span class="question-mark">?</span>;
@@ -1002,7 +1015,11 @@
     <span class="kw">async </span>{
         <span class="kw">let </span>json_result = <span class="kw">match </span>mongo_command {
             MongoCommand::Raw { cmd } =&gt; {
-                <span class="kw">let </span><span class="kw-2">mut </span>result = observing(<span class="prelude-val">None</span>, || database.run_command_with_session(cmd, <span class="prelude-val">None</span>, session)).<span class="kw">await</span><span class="question-mark">?</span>;
+                <span class="kw">let </span>query_string_builder = RunCommand::new(<span class="kw-2">&amp;</span>cmd);
+                <span class="kw">let </span><span class="kw-2">mut </span>result = observing(<span class="kw-2">&amp;</span>query_string_builder, || {
+                    database.run_command_with_session(cmd.clone(), <span class="prelude-val">None</span>, session)
+                })
+                .<span class="kw">await</span><span class="question-mark">?</span>;
 
                 <span class="comment">// Removes unnecessary properties from raw response
                 // See https://docs.mongodb.com/v5.0/reference/method/db.runCommand
@@ -1020,12 +1037,25 @@
 
                 <span class="kw">match </span>operation {
                     MongoOperation::Find(filter, options) =&gt; {
-                        <span class="kw">let </span>cursor = coll.find_with_session(filter, options, session).<span class="kw">await</span><span class="question-mark">?</span>;
+                        <span class="kw">let </span>unwrapped_filter = filter.clone().unwrap_or_default();
+                        <span class="kw">let </span>projection = options
+                            .as_ref()
+                            .and_then(|options| options.projection.clone())
+                            .unwrap_or_default();
+                        <span class="kw">let </span>query_string_builder = Find::new(<span class="kw-2">&amp;</span>unwrapped_filter, <span class="kw-2">&amp;</span>projection, coll.name());
+                        <span class="kw">let </span>cursor = observing(<span class="kw-2">&amp;</span>query_string_builder, || {
+                            coll.find_with_session(filter, options, session)
+                        })
+                        .<span class="kw">await</span><span class="question-mark">?</span>;
 
                         raw::cursor_to_json(cursor, session).<span class="kw">await</span><span class="question-mark">?
                     </span>}
                     MongoOperation::Aggregate(pipeline, options) =&gt; {
-                        <span class="kw">let </span>cursor = coll.aggregate_with_session(pipeline, options, session).<span class="kw">await</span><span class="question-mark">?</span>;
+                        <span class="kw">let </span>query_string_builder = Aggregate::new(<span class="kw-2">&amp;</span>pipeline, coll.name());
+                        <span class="kw">let </span>cursor = observing(<span class="kw-2">&amp;</span>query_string_builder, || {
+                            coll.aggregate_with_session(pipeline.clone(), options, session)
+                        })
+                        .<span class="kw">await</span><span class="question-mark">?</span>;
 
                         raw::cursor_to_json(cursor, session).<span class="kw">await</span><span class="question-mark">?
                     </span>}

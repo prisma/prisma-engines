@@ -163,10 +163,14 @@
 <a href="#163" id="163">163</a>
 <a href="#164" id="164">164</a>
 <a href="#165" id="165">165</a>
+<a href="#166" id="166">166</a>
+<a href="#167" id="167">167</a>
+<a href="#168" id="168">168</a>
+<a href="#169" id="169">169</a>
 </pre></div><pre class="rust"><code><span class="kw">use super</span>::<span class="kw-2">*</span>;
 <span class="kw">use crate</span>::{
     error::DecorateErrorWithFieldInformationExtension, output_meta, query_builder::MongoReadQueryBuilder,
-    vacuum_cursor, IntoBson,
+    query_strings::Find, vacuum_cursor, IntoBson,
 };
 <span class="kw">use </span>connector_interface::RelAggregationSelection;
 <span class="kw">use </span>mongodb::{bson::doc, options::FindOptions, ClientSession, Database};
@@ -289,16 +293,20 @@
         })
         .collect::&lt;<span class="kw">crate</span>::Result&lt;Vec&lt;<span class="kw">_</span>&gt;&gt;&gt;()<span class="question-mark">?</span>;
 
-    <span class="kw">let </span>filter = <span class="macro">doc! </span>{ id_field.db_name(): { <span class="string">&quot;$in&quot;</span>: ids } };
-
     <span class="comment">// Scalar field name where the relation ids list is on `model`.
     </span><span class="kw">let </span>id_holder_field = from_field.scalar_fields().into_iter().next().unwrap();
     <span class="kw">let </span>relation_ids_field_name = id_holder_field.name().to_owned();
-    <span class="kw">let </span>find_options = FindOptions::builder()
-        .projection(<span class="macro">doc! </span>{ id_field.db_name(): <span class="number">1</span>, relation_ids_field_name: <span class="number">1 </span>})
-        .build();
 
-    <span class="kw">let </span>cursor = observing(<span class="prelude-val">None</span>, || coll.find_with_session(filter, <span class="prelude-val">Some</span>(find_options), session)).<span class="kw">await</span><span class="question-mark">?</span>;
+    <span class="kw">let </span>filter = <span class="macro">doc! </span>{ id_field.db_name(): { <span class="string">&quot;$in&quot;</span>: ids } };
+    <span class="kw">let </span>projection = <span class="macro">doc! </span>{ id_field.db_name(): <span class="number">1</span>, relation_ids_field_name: <span class="number">1 </span>};
+
+    <span class="kw">let </span>query_string_builder = Find::new(<span class="kw-2">&amp;</span>filter, <span class="kw-2">&amp;</span>projection, coll.name());
+    <span class="kw">let </span>find_options = FindOptions::builder().projection(projection.clone()).build();
+
+    <span class="kw">let </span>cursor = observing(<span class="kw-2">&amp;</span>query_string_builder, || {
+        coll.find_with_session(filter.clone(), <span class="prelude-val">Some</span>(find_options), session)
+    })
+    .<span class="kw">await</span><span class="question-mark">?</span>;
     <span class="kw">let </span>docs = vacuum_cursor(cursor, session).<span class="kw">await</span><span class="question-mark">?</span>;
     <span class="kw">let </span>parent_id_meta = output_meta::from_scalar_field(<span class="kw-2">&amp;</span>id_field);
     <span class="kw">let </span>related_ids_holder_meta = output_meta::from_scalar_field(<span class="kw-2">&amp;</span>id_holder_field);
