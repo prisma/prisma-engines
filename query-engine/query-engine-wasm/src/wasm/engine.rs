@@ -16,11 +16,7 @@ use request_handlers::ConnectorKind;
 use request_handlers::{load_executor, RequestBody, RequestHandler};
 use serde::{Deserialize, Serialize};
 use serde_json::json;
-use std::{
-    collections::{BTreeMap, HashMap},
-    path::PathBuf,
-    sync::Arc,
-};
+use std::sync::Arc;
 use tokio::sync::RwLock;
 use tracing::{field, instrument::WithSubscriber, Instrument, Span};
 use tracing_subscriber::filter::LevelFilter;
@@ -45,8 +41,6 @@ enum Inner {
 /// Everything needed to connect to the database and have the core running.
 struct EngineBuilder {
     schema: Arc<psl::ValidatedSchema>,
-    config_dir: PathBuf,
-    env: HashMap<String, String>,
     engine_protocol: EngineProtocol,
 }
 
@@ -55,8 +49,6 @@ struct ConnectedEngine {
     schema: Arc<psl::ValidatedSchema>,
     query_schema: Arc<QuerySchema>,
     executor: crate::Executor,
-    config_dir: PathBuf,
-    env: HashMap<String, String>,
     engine_protocol: EngineProtocol,
 }
 
@@ -95,13 +87,6 @@ pub struct ConstructorOptions {
     #[serde(default)]
     log_queries: bool,
     #[serde(default)]
-    datasource_overrides: BTreeMap<String, String>,
-    #[serde(default)]
-    env: serde_json::Value,
-    config_dir: PathBuf,
-    #[serde(default)]
-    ignore_env_var_errors: bool,
-    #[serde(default)]
     engine_protocol: Option<EngineProtocol>,
 }
 
@@ -138,15 +123,8 @@ impl QueryEngine {
             datamodel,
             log_level,
             log_queries,
-            datasource_overrides,
-            env,
-            config_dir,
-            ignore_env_var_errors,
             engine_protocol,
         } = options;
-
-        let env = stringify_env_values(env)?; // we cannot trust anything JS sends us from process.env
-        let overrides: Vec<(_, _)> = datasource_overrides.into_iter().collect();
 
         // Note: if we used `psl::validate`, we'd add ~1MB to the Wasm artifact (before gzip).
         let mut schema = psl::parse_without_validation(datamodel.into());
@@ -175,9 +153,7 @@ impl QueryEngine {
 
         let builder = EngineBuilder {
             schema: Arc::new(schema),
-            config_dir,
             engine_protocol,
-            env,
         };
 
         let log_level = log_level.parse::<LevelFilter>().unwrap();
@@ -231,8 +207,6 @@ impl QueryEngine {
                     schema: builder.schema.clone(),
                     query_schema: Arc::new(query_schema),
                     executor,
-                    config_dir: builder.config_dir.clone(),
-                    env: builder.env.clone(),
                     engine_protocol: builder.engine_protocol,
                 }) as crate::Result<ConnectedEngine>
             }
@@ -262,8 +236,6 @@ impl QueryEngine {
 
                 let builder = EngineBuilder {
                     schema: engine.schema.clone(),
-                    config_dir: engine.config_dir.clone(),
-                    env: engine.env.clone(),
                     engine_protocol: engine.engine_protocol(),
                 };
 
@@ -389,35 +361,4 @@ fn map_known_error(err: query_core::CoreError) -> crate::Result<String> {
     let value = serde_json::to_string(&user_error)?;
 
     Ok(value)
-}
-
-fn stringify_env_values(origin: serde_json::Value) -> crate::Result<HashMap<String, String>> {
-    use serde_json::Value;
-
-    let msg = match origin {
-        Value::Object(map) => {
-            let mut result: HashMap<String, String> = HashMap::new();
-
-            for (key, val) in map.into_iter() {
-                match val {
-                    Value::Null => continue,
-                    Value::String(val) => {
-                        result.insert(key, val);
-                    }
-                    val => {
-                        result.insert(key, val.to_string());
-                    }
-                }
-            }
-
-            return Ok(result);
-        }
-        Value::Null => return Ok(Default::default()),
-        Value::Bool(_) => "Expected an object for the env constructor parameter, got a boolean.",
-        Value::Number(_) => "Expected an object for the env constructor parameter, got a number.",
-        Value::String(_) => "Expected an object for the env constructor parameter, got a string.",
-        Value::Array(_) => "Expected an object for the env constructor parameter, got an array.",
-    };
-
-    Err(ApiError::JsonDecode(msg.to_string()))
 }
