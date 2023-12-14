@@ -36,7 +36,7 @@ impl ReadQuery {
     ) -> crate::Result<Vec<Document>> {
         let opts = AggregateOptions::builder().allow_disk_use(true).build();
         let query_string_builder = Aggregate::new(&self.stages, on_collection.name());
-        let cursor = observing(Some(&query_string_builder), || {
+        let cursor = observing(&query_string_builder, || {
             on_collection.aggregate_with_session(self.stages.clone(), opts, with_session)
         })
         .await?;
