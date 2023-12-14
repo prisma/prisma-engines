@@ -10,12 +10,16 @@ OUT_JSON="${OUT_FOLDER}/package.json"
 OUT_TARGET="bundler"
 OUT_NPM_NAME="@prisma/query-engine-wasm"
 
-# use `wasm-pack build --release` on CI only
-if [[ -z "${BUILDKITE:-}" ]] && [[ -z "${GITHUB_ACTIONS:-}" ]]; then
-    BUILD_PROFILE="--profiling"
-else
-    BUILD_PROFILE="--release"
+if [[ -z "${WASM_BUILD_PROFILE:-}" ]]; then
+    # use `wasm-pack build --release` by default on CI only
+    if [[ -z "${BUILDKITE:-}" ]] && [[ -z "${GITHUB_ACTIONS:-}" ]]; then
+        WASM_BUILD_PROFILE="profiling"
+    else
+        WASM_BUILD_PROFILE="release"
+    fi
 fi
+
+echo "Using build profile: \"${WASM_BUILD_PROFILE}\"" 
 
 # Check if wasm-pack is installed
 if ! command -v wasm-pack &> /dev/null
@@ -25,7 +29,7 @@ then
     curl https://rustwasm.github.io/wasm-pack/installer/init.sh -sSf | sh
 fi
 
-wasm-pack build $BUILD_PROFILE --target $OUT_TARGET --out-name query_engine
+wasm-pack build "--$WASM_BUILD_PROFILE" --target $OUT_TARGET --out-name query_engine
 
 WASM_OPT_ARGS=(
     "-Os"                                 # execute size-focused optimization passes
@@ -43,19 +47,26 @@ WASM_OPT_ARGS=(
     "--strip-target-features"             # removes the "target_features" section
 )
 
-if [[ "$BUILD_PROFILE" == "--release" ]]; then
-    # In release mode, we want to strip the debug symbols.
-    wasm-opt "${WASM_OPT_ARGS[@]}" \
-        "--strip-debug" \
-        "${OUT_FOLDER}/query_engine_bg.wasm" \
-        -o "${OUT_FOLDER}/query_engine_bg.wasm"
-elif [[ "$BUILD_PROFILE" == "--profiling" ]]; then
-    # In profiling mode, we want to keep the debug symbols.
-    wasm-opt "${WASM_OPT_ARGS[@]}" \
-        "--debuginfo" \
-        "${OUT_FOLDER}/query_engine_bg.wasm" \
-        -o "${OUT_FOLDER}/query_engine_bg.wasm"
-fi
+case "$WASM_BUILD_PROFILE" in
+    release)
+        # In release mode, we want to strip the debug symbols.
+        wasm-opt "${WASM_OPT_ARGS[@]}" \
+            "--strip-debug" \
+            "${OUT_FOLDER}/query_engine_bg.wasm" \
+            -o "${OUT_FOLDER}/query_engine_bg.wasm"
+        ;;
+    profiling)
+        # In profiling mode, we want to keep the debug symbols.
+        wasm-opt "${WASM_OPT_ARGS[@]}" \
+            "--debuginfo" \
+            "${OUT_FOLDER}/query_engine_bg.wasm" \
+            -o "${OUT_FOLDER}/query_engine_bg.wasm"
+        ;;
+    *)
+        # In other modes (e.g., "dev"), skip wasm-opt.
+        echo "Skipping wasm-opt."
+        ;;
+esac
 
 # Convert the `.wasm` file to its human-friendly `.wat` representation for debugging purposes, if `wasm2wat` is installed
 if ! command -v wasm2wat &> /dev/null; then
