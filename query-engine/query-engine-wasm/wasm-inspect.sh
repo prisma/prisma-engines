@@ -25,7 +25,7 @@ inspect_function() {
     local function_name="$1"
 
     # Use sed to find the line number where the function starts
-    local start_line=$(sed -n "/(func \$$function_name/=" "$wat_file" | head -n 1)
+    local -r start_line=$(sed -n "/(func \$$function_name/=" "$wat_file" | head -n 1)
 
     # Check if the function exists in the file
     if [ -z "$start_line" ]; then
@@ -43,7 +43,7 @@ inspect_data() {
 
     # Use sed to find the line number where the data entry starts
     # (data (;139;)
-    local start_line=$(sed -n "/(data (;$data_entry;)/=" "$wat_file" | head -n 1)
+    local -r start_line=$(sed -n "/(data (;$data_entry;)/=" "$wat_file" | head -n 1)
 
     # Check if the function exists in the file
     if [ -z "$start_line" ]; then
@@ -57,7 +57,7 @@ inspect_data() {
 __display_wat() {
     if [ "$USE_LINK" == true ]; then
         # --link option is used, so print the link to the function location
-        local file_path=$(realpath "$wat_file")
+        local -r file_path=$(realpath "$wat_file")
         local vscode_link="$file_path:$start_line"
         echo -e "$vscode_link"
     else 
