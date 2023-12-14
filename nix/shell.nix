@@ -19,6 +19,7 @@ in
       graphviz
       wasm-bindgen-cli
       wasm-pack
+      binaryen
     ];
 
     inputsFrom = [ self'.packages.prisma-engines ];
