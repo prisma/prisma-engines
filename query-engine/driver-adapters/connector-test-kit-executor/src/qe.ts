@@ -1,13 +1,16 @@
-import type { ErrorCapturingDriverAdapter } from '@prisma/driver-adapter-utils'
-import * as napi from './engines/Library'
-import * as os from 'node:os'
-import * as path from 'node:path'
-import { fileURLToPath } from 'node:url'
+import type {
+  DriverAdapter,
+  ErrorCapturingDriverAdapter,
+} from "@prisma/driver-adapter-utils";
+import * as napi from "./engines/Library";
+import * as os from "node:os";
+import * as path from "node:path";
+import { fileURLToPath } from "node:url";
 
-const dirname = path.dirname(fileURLToPath(import.meta.url))
+const dirname = path.dirname(fileURLToPath(import.meta.url));
 
 export interface QueryEngine {
-  connect(trace: string): Promise<void>
+  connect(trace: string): Promise<void>;
   disconnect(trace: string): Promise<void>;
   query(body: string, trace: string, tx_id?: string): Promise<string>;
   startTransaction(input: string, trace: string): Promise<string>;
@@ -15,53 +18,54 @@ export interface QueryEngine {
   rollbackTransaction(tx_id: string, trace: string): Promise<string>;
 }
 
-export type QueryLogCallback = (log: string) => void
+export type QueryLogCallback = (log: string) => void;
 
+export async function initQueryEngine(
+  engineType: "Napi" | "Wasm",
+  adapter: DriverAdapter,
+  datamodel: string,
+  queryLogCallback: QueryLogCallback,
+  debug: (...args: any[]) => void
+): Promise<QueryEngine> {
+  const queryEngineOptions = {
+    datamodel,
+    configDir: ".",
+    engineProtocol: "json" as const,
+    logLevel: process.env["RUST_LOG"] ?? ("info" as any),
+    logQueries: true,
+    env: process.env,
+    ignoreEnvVarErrors: false,
+  };
 
-export async function initQueryEngine(adapter: ErrorCapturingDriverAdapter, datamodel: string, queryLogCallback: QueryLogCallback, debug: (...args: any[]) => void): QueryEngine {
-
-    const queryEngineOptions = {
-        datamodel,
-        configDir: '.',
-        engineProtocol: 'json' as const,
-        logLevel: process.env["RUST_LOG"] ?? 'info' as any,
-        logQueries: true,
-        env: process.env,
-        ignoreEnvVarErrors: false,
+  const logCallback = (event: any) => {
+    const parsed = JSON.parse(event);
+    if (parsed.is_query) {
+      queryLogCallback(parsed.query);
     }
+    debug(parsed);
+  };
 
-
-    const logCallback = (event: any) => {
-        const parsed = JSON.parse(event)
-        if (parsed.is_query) {
-            queryLogCallback(parsed.query)
-        }
-        debug(parsed)
-    }
-
-    const engineFromEnv = process.env.EXTERNAL_TEST_EXECUTOR ?? 'Napi'
-    if (engineFromEnv === 'Wasm') {
-        const { WasmQueryEngine } = await import('./wasm')
-        return  new WasmQueryEngine(queryEngineOptions, logCallback, adapter)
-    } else if (engineFromEnv === 'Napi') {
-        const { QueryEngine } = loadNapiEngine()
-        return new QueryEngine(queryEngineOptions, logCallback, adapter)
-    } else {
-        throw new TypeError(`Invalid EXTERNAL_TEST_EXECUTOR value: ${engineFromEnv}. Expected Napi or Wasm`)
-    }
-
-
+  if (engineType === "Wasm") {
+    const { WasmQueryEngine } = await import("./wasm");
+    return new WasmQueryEngine(queryEngineOptions, logCallback, adapter);
+  } else {
+    const { QueryEngine } = loadNapiEngine();
+    return new QueryEngine(queryEngineOptions, logCallback, adapter);
+  }
 }
 
 function loadNapiEngine(): napi.Library {
-    // I assume nobody will run this on Windows ¯\_(ツ)_/¯
-    const libExt = os.platform() === 'darwin' ? 'dylib' : 'so'
+  // I assume nobody will run this on Windows ¯\_(ツ)_/¯
+  const libExt = os.platform() === "darwin" ? "dylib" : "so";
 
-    const libQueryEnginePath = path.join(dirname, `../../../../target/debug/libquery_engine.${libExt}`)
+  const libQueryEnginePath = path.join(
+    dirname,
+    `../../../../target/debug/libquery_engine.${libExt}`
+  );
 
-    const libqueryEngine = { exports: {} as unknown as napi.Library }
-    // @ts-ignore
-    process.dlopen(libqueryEngine, libQueryEnginePath)
+  const libqueryEngine = { exports: {} as unknown as napi.Library };
+  // @ts-ignore
+  process.dlopen(libqueryEngine, libQueryEnginePath);
 
-    return libqueryEngine.exports
+  return libqueryEngine.exports;
 }

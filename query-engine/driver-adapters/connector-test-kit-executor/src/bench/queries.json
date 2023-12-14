@@ -1,0 +1,14 @@
+[
+    {
+        "description": "movies.findMany() (all - 25000)",
+        "query": {
+            "modelName": "Movie",
+            "action": "findMany",
+            "query": {
+                "selection": {
+                    "$scalars": true
+                }
+            }   
+        }
+    }
+]

@@ -218,9 +218,10 @@ function respondOk(requestId: number, payload: unknown) {
 }
 
 async function initQe(url: string, prismaSchema: string, logCallback: qe.QueryLogCallback): Promise<[qe.QueryEngine, ErrorCapturingDriverAdapter]> {
+    const engineType = process.env.EXTERNAL_TEST_EXECUTOR === "Wasm" ? "Wasm" : "Napi";
     const adapter = await adapterFromEnv(url) as DriverAdapter
     const errorCapturingAdapter = bindAdapter(adapter)
-    const engineInstance = await qe.initQueryEngine(errorCapturingAdapter, prismaSchema, logCallback, debug)
+    const engineInstance = await qe.initQueryEngine(engineType, errorCapturingAdapter, prismaSchema, logCallback, debug)
     return [engineInstance, errorCapturingAdapter];
 }
 
