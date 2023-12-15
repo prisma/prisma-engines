@@ -177,13 +177,13 @@ services:
       - databases
     tmpfs: /var/lib/planetscale-mysql
     volumes:
-      - "./docker/planetscale-mysql/my.cnf:/etc/mysql/my.cnf"
+      - './docker/planetscale-mysql/my.cnf:/etc/mysql/my.cnf'
     ulimits:
       nofile:
         soft: 20000
         hard: 40000
     healthcheck:
-      test: [ "CMD", "mysqladmin" ,"ping", "-h", "localhost" ]
+      test: ['CMD', 'mysqladmin', 'ping', '-h', 'localhost']
       timeout: 20s
       retries: 10
 
@@ -215,7 +215,7 @@ services:
 
   postgres16:
     image: postgres:16
-    restart: always
+    restart: unless-stopped
     command: postgres -c 'max_connections=1000'
     environment:
       POSTGRES_PASSWORD: 'prisma'
@@ -241,7 +241,7 @@ services:
       - databases
     tmpfs: /var/lib/mysql
     healthcheck:
-      test: [ "CMD", "mysqladmin" ,"ping", "-h", "localhost" ]
+      test: ['CMD', 'mysqladmin', 'ping', '-h', 'localhost']
       timeout: 20s
       retries: 10
 
@@ -259,7 +259,7 @@ services:
       - databases
     tmpfs: /var/lib/mysql
     healthcheck:
-      test: [ "CMD", "mysqladmin" ,"ping", "-h", "localhost" ]
+      test: ['CMD', 'mysqladmin', 'ping', '-h', 'localhost']
       timeout: 20s
       retries: 10
 
@@ -277,7 +277,7 @@ services:
       - databases
     tmpfs: /var/lib/mysql8
     healthcheck:
-      test: [ "CMD", "mysqladmin" ,"ping", "-h", "localhost" ]
+      test: ['CMD', 'mysqladmin', 'ping', '-h', 'localhost']
       timeout: 20s
       retries: 10
 
