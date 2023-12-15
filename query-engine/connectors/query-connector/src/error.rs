@@ -1,6 +1,6 @@
-use crate::filter::Filter;
 use itertools::Itertools;
-use prisma_models::prelude::DomainError;
+use query_structure::prelude::DomainError;
+use query_structure::Filter;
 use std::fmt::Display;
 use thiserror::Error;
 use user_facing_errors::{query_engine::DatabaseConstraint, KnownError};
@@ -272,6 +272,9 @@ pub enum ErrorKind {
 
     #[error("External connector error")]
     ExternalError(i32),
+
+    #[error("Invalid driver adapter: {0}")]
+    InvalidDriverAdapter(String),
 }
 
 impl From<DomainError> for ConnectorError {

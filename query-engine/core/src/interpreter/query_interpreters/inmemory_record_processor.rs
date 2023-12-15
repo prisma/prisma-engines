@@ -1,6 +1,5 @@
-use connector::QueryArguments;
 use itertools::Itertools;
-use prisma_models::{FieldSelection, ManyRecords, Record, SelectionResult};
+use query_structure::*;
 use std::ops::Deref;
 
 #[derive(Debug)]
@@ -21,9 +20,14 @@ impl InMemoryRecordProcessor {
     /// Creates a new processor from the given query args.
     /// The original args will be modified to prevent db level processing.
     pub(crate) fn new_from_query_args(args: &mut QueryArguments) -> Self {
-        let processor = Self { args: args.clone() };
+        let mut processor = Self { args: args.clone() };
 
-        args.distinct = None;
+        if !args.requires_inmemory_distinct() {
+            processor.args.distinct = None;
+        } else {
+            args.distinct = None;
+        }
+
         args.ignore_take = true;
         args.ignore_skip = true;
 
@@ -51,7 +55,12 @@ impl InMemoryRecordProcessor {
             records
         };
 
-        let records = self.apply_distinct(records);
+        let records = if self.requires_inmemory_distinct() {
+            self.apply_distinct(records)
+        } else {
+            records
+        };
+
         let mut records = self.apply_pagination(records);
 
         if self.needs_reversed_order() {

@@ -4,7 +4,7 @@ use mongodb::{
     bson::{self, extjson},
     error::{CommandError, Error as DriverError, TRANSIENT_TRANSACTION_ERROR},
 };
-use prisma_models::{CompositeFieldRef, Field, ScalarFieldRef, SelectedField};
+use query_structure::{CompositeFieldRef, Field, ScalarFieldRef, SelectedField};
 use regex::Regex;
 use thiserror::Error;
 use user_facing_errors::query_engine::DatabaseConstraint;
@@ -278,6 +278,7 @@ impl<T> DecorateErrorWithFieldInformationExtension for crate::Result<T> {
         match selected_field {
             SelectedField::Scalar(sf) => self.decorate_with_scalar_field_info(sf),
             SelectedField::Composite(composite_sel) => self.decorate_with_composite_field_info(&composite_sel.field),
+            SelectedField::Relation(_) => unreachable!(),
         }
     }
 

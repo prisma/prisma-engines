@@ -4,9 +4,8 @@ use crate::{
     query_graph::{Node, NodeRef, QueryGraph, QueryGraphDependency},
     ArgumentListLookup, ParsedField, ParsedInputList, ParsedInputMap,
 };
-use connector::IntoFilter;
-use prisma_models::Model;
 use psl::datamodel_connector::ConnectorCapability;
+use query_structure::{IntoFilter, Model};
 use schema::{constants::args, QuerySchema};
 use std::convert::TryInto;
 use write_args_parser::*;
@@ -33,7 +32,7 @@ pub(crate) fn create_record(
         let create_node = create::create_record_node(graph, query_schema, model.clone(), data_map)?;
 
         // Follow-up read query on the write
-        let read_query = read::find_unique(field, model.clone())?;
+        let read_query = read::find_unique(field, model.clone(), query_schema)?;
         let read_node = graph.create_node(Query::Read(read_query));
 
         graph.add_result_node(&read_node);

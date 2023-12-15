@@ -13,6 +13,6 @@ test-setup = { path = "../../../libs/test-setup" }
 
 connection-string = "*"
 enumflags2 = "*"
-mongodb = "2.3.0"
+mongodb = "2.8.0"
 url = "2"
 once_cell = "1.17.0"

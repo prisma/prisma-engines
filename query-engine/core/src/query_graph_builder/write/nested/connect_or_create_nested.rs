@@ -4,8 +4,7 @@ use crate::{
     query_graph::{Flow, Node, NodeRef, QueryGraph, QueryGraphDependency},
     Computation, ParsedInputMap, ParsedInputValue,
 };
-use connector::{Filter, IntoFilter};
-use prisma_models::{Model, RelationFieldRef, SelectionResult};
+use query_structure::{Filter, IntoFilter, Model, RelationFieldRef, SelectionResult};
 use schema::constants::args;
 use std::convert::TryInto;
 

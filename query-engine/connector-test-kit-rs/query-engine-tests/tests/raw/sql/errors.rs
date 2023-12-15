@@ -34,7 +34,11 @@ mod raw_errors {
         Ok(())
     }
 
-    #[connector_test(schema(common_nullable_types), only(Postgres), exclude(JS))]
+    #[connector_test(
+        schema(common_nullable_types),
+        only(Postgres),
+        exclude(Postgres("neon.js", "pg.js", "neon.js.wasm", "pg.js.wasm"))
+    )]
     async fn list_param_for_scalar_column_should_not_panic_quaint(runner: Runner) -> TestResult<()> {
         assert_error!(
             runner,
@@ -49,7 +53,7 @@ mod raw_errors {
         Ok(())
     }
 
-    #[connector_test(schema(common_nullable_types), only(JS, Postgres))]
+    #[connector_test(schema(common_nullable_types), only(Postgres("neon.js"), Postgres("pg.js")))]
     async fn list_param_for_scalar_column_should_not_panic_pg_js(runner: Runner) -> TestResult<()> {
         assert_error!(
             runner,

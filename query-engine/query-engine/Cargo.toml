@@ -20,7 +20,7 @@ enumflags2 = { version = "0.7"}
 psl.workspace = true
 graphql-parser = { git = "https://github.com/prisma/graphql-parser" }
 mongodb-connector = { path = "../connectors/mongodb-query-connector", optional = true, package = "mongodb-query-connector" }
-query-core = { path = "../core" }
+query-core = { path = "../core", features = ["metrics"] }
 request-handlers = { path = "../request-handlers" }
 serde.workspace = true
 serde_json.workspace = true

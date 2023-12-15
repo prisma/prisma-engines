@@ -1,7 +1,7 @@
 use crate::{model_extensions::AsColumn, *};
 
-use prisma_models::ScalarField;
 use quaint::prelude::Column;
+use query_structure::ScalarField;
 
 #[derive(Clone, Copy, Debug)]
 /// A distinction in aliasing to separate the parent table and the joined data
@@ -16,7 +16,7 @@ pub enum AliasMode {
 #[derive(Clone, Copy, Debug, Default)]
 /// Aliasing tool to count the nesting level to help with heavily nested
 /// self-related queries.
-pub(crate) struct Alias {
+pub struct Alias {
     counter: usize,
     mode: AliasMode,
 }
@@ -48,6 +48,10 @@ impl Alias {
             AliasMode::Table => format!("t{}", self.counter),
             AliasMode::Join => format!("j{}", self.counter),
         }
+    }
+
+    pub fn to_table_string(&self) -> String {
+        self.to_string(Some(AliasMode::Table))
     }
 }
 

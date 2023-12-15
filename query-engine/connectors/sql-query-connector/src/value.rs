@@ -1,8 +1,8 @@
 use crate::row::{sanitize_f32, sanitize_f64};
 use bigdecimal::{BigDecimal, FromPrimitive};
 use chrono::{DateTime, NaiveDate, Utc};
-use prisma_models::PrismaValue;
 use quaint::ValueType;
+use query_structure::PrismaValue;
 
 pub fn to_prisma_value<'a, T: Into<ValueType<'a>>>(qv: T) -> crate::Result<PrismaValue> {
     let val = match qv.into() {

@@ -6,31 +6,57 @@ edition = "2021"
 [lib]
 doc = false
 crate-type = ["cdylib"]
-name = "query_engine"
+name = "query_engine_wasm"
 
 [dependencies]
+
+query-connector = { path = "../connectors/query-connector" }
+
 anyhow = "1"
 async-trait = "0.1"
 user-facing-errors = { path = "../../libs/user-facing-errors" }
 psl.workspace = true
-prisma-models = { path = "../prisma-models" }
+query-structure = { path = "../query-structure" }
+quaint = { path = "../../quaint" }
+sql-connector = { path = "../connectors/sql-query-connector", package = "sql-query-connector" }
+request-handlers = { path = "../request-handlers", default-features = false, features = [
+    "sql",
+    "driver-adapters",
+] }
+query-core = { path = "../core" }
+driver-adapters = { path = "../driver-adapters" }
+
+connection-string.workspace = true
+js-sys.workspace = true
+serde-wasm-bindgen.workspace = true
+serde_json.workspace = true
+tsify.workspace = true
+wasm-bindgen.workspace = true
+wasm-bindgen-futures.workspace = true
+wasm-rs-dbg.workspace = true
 
 thiserror = "1"
-connection-string.workspace = true 
 url = "2"
-serde_json.workspace = true
 serde.workspace = true
 tokio = { version = "1.25", features = ["macros", "sync", "io-util", "time"] }
 futures = "0.3"
-wasm-bindgen = "=0.2.88"
-wasm-bindgen-futures = "0.4"
-serde-wasm-bindgen = "0.5"
-js-sys = "0.3"
-log = "0.4.6"
-wasm-logger = "0.2.0"
 
 tracing = "0.1"
 tracing-subscriber = { version = "0.3" }
 tracing-futures = "0.2"
-tsify = "0.4.5"
-console_error_panic_hook = "0.1.7"
+tracing-opentelemetry = "0.17.3"
+opentelemetry = { version = "0.17"}
+
+[package.metadata.wasm-pack.profile.release]
+wasm-opt = [
+    "-O",                                 # execute default optimization passes
+    "--vacuum",                           # removes obviously unneeded code
+    "--duplicate-function-elimination",   # removes duplicate functions 
+    "--duplicate-import-elimination",     # removes duplicate imports
+    "--remove-unused-module-elements",    # removes unused module elements
+    "--dae-optimizing",                   # removes arguments to calls in an lto-like manner
+    "--remove-unused-names",              # removes names from location that are never branched to
+    "--rse",                              # removes redundant local.sets
+    "--gsi",                              # global struct inference, to optimize constant values
+    "--gufa-optimizing",                  # optimize the entire program using type monomorphization
+]

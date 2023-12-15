@@ -1,7 +1,9 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "extends": [
-    "config:recommended"
+    "config:recommended",
+    ":noUnscheduledUpdates",
+    ":pinAllExceptPeerDependencies"
   ],
   "cargo": {
     "enabled": false
@@ -10,10 +12,9 @@
     "enabled": false
   },
   "schedule": [
-    "after 10pm every weekday",
-    "before 5am every weekday",
     "every weekend"
   ],
+  "minimumReleaseAge": "7 days",
   "rangeStrategy": "pin",
   "separateMinorPatch": true,
   "configMigration": true,
@@ -48,6 +49,10 @@
       "schedule": [
         "at any time"
       ]
+    },
+    {
+      "groupName": "Driver Adapters directory",
+      "matchFileNames": ["query-engine/driver-adapters/**"]
     },
     {
       "matchPackageNames": [

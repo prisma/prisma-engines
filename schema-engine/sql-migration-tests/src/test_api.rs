@@ -21,6 +21,7 @@ use schema_core::{
 };
 use sql_schema_connector::SqlSchemaConnector;
 use sql_schema_describer::SqlSchema;
+use std::time::Duration;
 use std::{
     borrow::Cow,
     fmt::{Display, Write},
@@ -194,6 +195,12 @@ impl TestApi {
         self.root.is_vitess()
     }
 
+    /// Returns a duration that is guaranteed to be larger than the maximum refresh rate after a
+    /// DDL statement
+    pub fn max_ddl_refresh_delay(&self) -> Option<Duration> {
+        self.root.max_ddl_refresh_delay()
+    }
+
     /// Insert test values
     pub fn insert<'a>(&'a mut self, table_name: &'a str) -> SingleRowInsert<'a> {
         SingleRowInsert {
@@ -321,12 +328,13 @@ impl TestApi {
     /// Plan a `schemaPush` command adding the datasource
     pub fn schema_push_w_datasource(&mut self, dm: impl Into<String>) -> SchemaPush<'_> {
         let schema = self.datamodel_with_provider(&dm.into());
-        SchemaPush::new(&mut self.connector, schema)
+        self.schema_push(schema)
     }
 
     /// Plan a `schemaPush` command
     pub fn schema_push(&mut self, dm: impl Into<String>) -> SchemaPush<'_> {
-        SchemaPush::new(&mut self.connector, dm.into())
+        let max_ddl_refresh_delay = self.max_ddl_refresh_delay();
+        SchemaPush::new(&mut self.connector, dm.into(), max_ddl_refresh_delay)
     }
 
     pub fn tags(&self) -> BitFlags<Tags> {

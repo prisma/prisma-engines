@@ -3,6 +3,7 @@
 //! A TestApi that is initialized without IO or async code and can instantiate
 //! multiple schema engines.
 
+use std::time::Duration;
 pub use test_macros::test_connector;
 pub use test_setup::sqlite_test_url;
 pub use test_setup::{runtime::run_with_thread_local_runtime as tok, BitFlags, Capabilities, Tags};
@@ -163,6 +164,12 @@ impl TestApi {
         self.tags().contains(Tags::Vitess)
     }
 
+    /// Returns a duration that is guaranteed to be larger than the maximum refresh rate after a
+    /// DDL statement
+    pub(crate) fn max_ddl_refresh_delay(&self) -> Option<Duration> {
+        self.args.max_ddl_refresh_delay()
+    }
+
     /// Returns whether the database automatically lower-cases table names.
     pub fn lower_cases_table_names(&self) -> bool {
         self.tags().contains(Tags::LowerCasesTableNames)
@@ -199,7 +206,7 @@ impl TestApi {
             ConnectionInfo::Mysql(_) => SqlSchemaConnector::new_mysql(),
             ConnectionInfo::Mssql(_) => SqlSchemaConnector::new_mssql(),
             ConnectionInfo::Sqlite { .. } => SqlSchemaConnector::new_sqlite(),
-            ConnectionInfo::InMemorySqlite { .. } => unreachable!(),
+            ConnectionInfo::InMemorySqlite { .. } | ConnectionInfo::External(_) => unreachable!(),
         };
         connector.set_params(params).unwrap();
 
@@ -208,6 +215,7 @@ impl TestApi {
             connection_info,
             tags: self.args.tags(),
             namespaces: self.args.namespaces(),
+            max_ddl_refresh_delay: self.args.max_ddl_refresh_delay(),
         }
     }
 
@@ -281,6 +289,7 @@ pub struct EngineTestApi {
     connection_info: ConnectionInfo,
     tags: BitFlags<Tags>,
     namespaces: &'static [&'static str],
+    max_ddl_refresh_delay: Option<Duration>,
 }
 
 impl EngineTestApi {
@@ -325,7 +334,7 @@ impl EngineTestApi {
 
     /// Plan a `schemaPush` command
     pub fn schema_push(&mut self, dm: impl Into<String>) -> SchemaPush<'_> {
-        SchemaPush::new(&mut self.connector, dm.into())
+        SchemaPush::new(&mut self.connector, dm.into(), self.max_ddl_refresh_delay)
     }
 
     /// The schema name of the current connected database.

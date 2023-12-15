@@ -1,4 +1,4 @@
-use crate::conversion::JSArg;
+use super::JSArg;
 use serde_json::value::Value as JsonValue;
 
 const DATETIME_FORMAT: &str = "%Y-%m-%d %H:%M:%S%.f";
@@ -28,8 +28,8 @@ pub fn value_to_js_arg(value: &quaint::Value) -> serde_json::Result<JSArg> {
 #[cfg(test)]
 mod test {
     use super::*;
-    use bigdecimal::BigDecimal;
-    use chrono::*;
+    use quaint::bigdecimal::BigDecimal;
+    use quaint::chrono::*;
     use quaint::ValueType;
     use std::str::FromStr;
 
@@ -93,6 +93,11 @@ mod test {
                     JSArg::Value(JsonValue::String("23:13:01".to_string()))
                 ))
             ),
+            (
+                ValueType::Bytes(Some("hello".as_bytes().into())),
+                JSArg::Buffer("hello".as_bytes().to_vec())
+            ),
+        
         ];
 
         let mut errors: Vec<String> = vec![];

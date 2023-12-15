@@ -57,8 +57,8 @@ impl MysqlUrl {
     /// Name of the database connected. Defaults to `mysql`.
     pub fn dbname(&self) -> &str {
         match self.url.path_segments() {
-            Some(mut segments) => segments.next().unwrap_or("mysql"),
-            None => "mysql",
+            Some(mut segments) => segments.next().unwrap_or(super::defaults::DEFAULT_MYSQL_DB),
+            None => super::defaults::DEFAULT_MYSQL_DB,
         }
     }
 

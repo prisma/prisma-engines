@@ -36,7 +36,7 @@ mod smoke_tests {
     #[connector_test]
     #[rustfmt::skip]
     async fn expected_metrics_rendered(r: Runner) -> TestResult<()> {
-        let mut qe_cmd = query_engine_cmd(r.prisma_dml(), "57582");
+        let (mut qe_cmd, url) = query_engine_cmd(r.prisma_dml());
         qe_cmd.arg("--enable-metrics");
         qe_cmd.env("PRISMA_ENGINE_PROTOCOL", "json");
 
@@ -44,7 +44,7 @@ mod smoke_tests {
             let client = reqwest::Client::new();
 
             let res = client
-                .post("http://0.0.0.0:57582/")
+                .post(url)
                 .body(
                     r#"
                     {
@@ -74,7 +74,7 @@ mod smoke_tests {
                 .text()
                 .await
                 .unwrap();
-            
+
             // I would have loved to use insta in here and check the snapshot but the order of the metrics is not guaranteed
             // And I opted for the manual checking of invariant data that provided enough confidence instead
 
@@ -82,7 +82,7 @@ mod smoke_tests {
             assert_eq!(metrics.matches("# HELP prisma_client_queries_total The total number of Prisma Client queries executed").count(), 1);
             assert_eq!(metrics.matches("# TYPE prisma_client_queries_total counter").count(), 1);
             assert_eq!(metrics.matches("prisma_client_queries_total 1").count(), 1);
-            
+
 
             assert_eq!(metrics.matches("# HELP prisma_datasource_queries_total The total number of datasource queries executed").count(), 1);
             assert_eq!(metrics.matches("# TYPE prisma_datasource_queries_total counter").count(), 1);
@@ -110,25 +110,25 @@ mod smoke_tests {
             assert_eq!(metrics.matches("# HELP prisma_pool_connections_open The number of pool connections currently open").count(), 1);
             assert_eq!(metrics.matches("# TYPE prisma_pool_connections_open gauge").count(), 1);
             assert_value_in_range(&metrics, "prisma_pool_connections_open", 0f64, 1f64);
-            
+
             // histograms
             assert_eq!(metrics.matches("# HELP prisma_client_queries_duration_histogram_ms The distribution of the time Prisma Client queries took to run end to end").count(), 1);
             assert_eq!(metrics.matches("# TYPE prisma_client_queries_duration_histogram_ms histogram").count(), 1);
 
             assert_eq!(metrics.matches("# HELP prisma_client_queries_wait_histogram_ms The distribution of the time all datasource queries spent waiting for a free connection").count(), 1);
             assert_eq!(metrics.matches("# TYPE prisma_client_queries_wait_histogram_ms histogram").count(), 1);
-            
+
             assert_eq!(metrics.matches("# HELP prisma_datasource_queries_duration_histogram_ms The distribution of the time datasource queries took to run").count(), 1);
             assert_eq!(metrics.matches("# TYPE prisma_datasource_queries_duration_histogram_ms histogram").count(), 1);
-            
+
             // Check that exist as many metrics as being accepted
             let accepted_metric_count = query_engine_metrics::ACCEPT_LIST.len();
             let displayed_metric_count = metrics.matches("# TYPE").count();
             let non_prisma_metric_count = displayed_metric_count - metrics.matches("# TYPE prisma").count();
-            
+
             assert_eq!(displayed_metric_count, accepted_metric_count);
             assert_eq!(non_prisma_metric_count, 0);
-            
+
         }).await
     }
 }

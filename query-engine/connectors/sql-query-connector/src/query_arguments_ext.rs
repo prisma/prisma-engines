@@ -1,4 +1,4 @@
-use connector_interface::QueryArguments;
+use query_structure::QueryArguments;
 
 pub(crate) trait QueryArgumentsExt {
     /// If we need to take rows before a cursor position, then we need to reverse the order in SQL.

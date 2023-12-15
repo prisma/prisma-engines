@@ -103,7 +103,9 @@ capabilities!(
     NativeUpsert,
     InsertReturning,
     UpdateReturning,
-    RowIn, // Connector supports (a, b) IN (c, d) expression.
+    RowIn,      // Connector supports (a, b) IN (c, d) expression.
+    DistinctOn, // Connector supports DB-level distinct (e.g. postgres)
+    LateralJoin,
 );
 
 /// Contains all capabilities that the connector is able to serve.

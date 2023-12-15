@@ -65,7 +65,9 @@ const CAPABILITIES: ConnectorCapabilities = enumflags2::make_bitflags!(Connector
     NativeUpsert |
     InsertReturning |
     UpdateReturning |
-    RowIn
+    RowIn |
+    DistinctOn |
+    LateralJoin
 });
 
 pub struct PostgresDatamodelConnector;

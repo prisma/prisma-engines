@@ -3,12 +3,12 @@ use crate::{database::operations::*, Context, SqlError};
 use async_trait::async_trait;
 use connector::{ConnectionLike, RelAggregationSelection};
 use connector_interface::{
-    self as connector, filter::Filter, AggregationRow, AggregationSelection, QueryArguments, ReadOperations,
-    RecordFilter, Transaction, WriteArgs, WriteOperations,
+    self as connector, AggregationRow, AggregationSelection, ReadOperations, RecordFilter, Transaction, WriteArgs,
+    WriteOperations,
 };
-use prisma_models::{prelude::*, SelectionResult};
 use prisma_value::PrismaValue;
 use quaint::prelude::ConnectionInfo;
+use query_structure::{prelude::*, Filter, QueryArguments, RelationLoadStrategy, SelectionResult};
 use std::collections::HashMap;
 
 pub struct SqlConnectorTransaction<'tx> {
@@ -69,6 +69,7 @@ impl<'tx> ReadOperations for SqlConnectorTransaction<'tx> {
         filter: &Filter,
         selected_fields: &FieldSelection,
         aggr_selections: &[RelAggregationSelection],
+        relation_load_strategy: RelationLoadStrategy,
         trace_id: Option<String>,
     ) -> connector::Result<Option<SingleRecord>> {
         catch(self.connection_info.clone(), async move {
@@ -77,8 +78,9 @@ impl<'tx> ReadOperations for SqlConnectorTransaction<'tx> {
                 self.inner.as_queryable(),
                 model,
                 filter,
-                &selected_fields.into(),
+                selected_fields,
                 aggr_selections,
+                relation_load_strategy,
                 &ctx,
             )
             .await
@@ -92,6 +94,7 @@ impl<'tx> ReadOperations for SqlConnectorTransaction<'tx> {
         query_arguments: QueryArguments,
         selected_fields: &FieldSelection,
         aggr_selections: &[RelAggregationSelection],
+        relation_load_strategy: RelationLoadStrategy,
         trace_id: Option<String>,
     ) -> connector::Result<ManyRecords> {
         catch(self.connection_info.clone(), async move {
@@ -100,8 +103,9 @@ impl<'tx> ReadOperations for SqlConnectorTransaction<'tx> {
                 self.inner.as_queryable(),
                 model,
                 query_arguments,
-                &selected_fields.into(),
+                selected_fields,
                 aggr_selections,
+                relation_load_strategy,
                 &ctx,
             )
             .await

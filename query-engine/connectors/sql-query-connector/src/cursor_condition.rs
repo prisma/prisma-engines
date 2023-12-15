@@ -5,10 +5,9 @@ use crate::{
     query_arguments_ext::QueryArgumentsExt,
     Context,
 };
-use connector_interface::QueryArguments;
 use itertools::Itertools;
-use prisma_models::*;
 use quaint::ast::*;
+use query_structure::*;
 
 #[derive(Debug)]
 struct CursorOrderDefinition {

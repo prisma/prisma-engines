@@ -1,8 +1,8 @@
 //! Write query AST
 use super::{FilteredNestedMutation, FilteredQuery};
 use crate::{RecordQuery, ToGraphviz};
-use connector::{filter::Filter, DatasourceFieldName, NativeUpsert, RecordFilter, WriteArgs};
-use prisma_models::prelude::*;
+use connector::{DatasourceFieldName, NativeUpsert, RecordFilter, WriteArgs};
+use query_structure::{prelude::*, Filter};
 use std::collections::HashMap;
 
 #[derive(Debug, Clone)]
@@ -206,7 +206,11 @@ impl ToGraphviz for WriteQuery {
         match self {
             Self::CreateRecord(q) => format!("CreateRecord(model: {}, args: {:?})", q.model.name(), q.args),
             Self::CreateManyRecords(q) => format!("CreateManyRecord(model: {})", q.model.name()),
-            Self::UpdateRecord(q) => format!("UpdateRecord(model: {})", q.model().name(),),
+            Self::UpdateRecord(q) => format!(
+                "UpdateRecord(model: {}, selection: {:?})",
+                q.model().name(),
+                q.selected_fields()
+            ),
             Self::DeleteRecord(q) => format!("DeleteRecord: {}, {:?}", q.model.name(), q.record_filter),
             Self::UpdateManyRecords(q) => format!("UpdateManyRecords(model: {}, args: {:?})", q.model.name(), q.args),
             Self::DeleteManyRecords(q) => format!("DeleteManyRecords: {}", q.model.name()),
@@ -303,8 +307,7 @@ impl UpdateRecord {
 
 #[derive(Debug, Clone)]
 pub struct UpdateRecordWithSelection {
-    // Used for serialization. When `None`, the result will only be used to fulfill other nodes requirement.
-    pub name: Option<String>,
+    pub name: String,
     pub model: Model,
     pub record_filter: RecordFilter,
     pub args: WriteArgs,

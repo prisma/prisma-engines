@@ -4,8 +4,7 @@ use crate::{
     query_graph::{Node, QueryGraph, QueryGraphDependency},
     ArgumentListLookup, FilteredQuery, ParsedField,
 };
-use connector::filter::Filter;
-use prisma_models::Model;
+use query_structure::{Filter, Model};
 use schema::{constants::args, QuerySchema};
 use std::convert::TryInto;
 
@@ -22,7 +21,7 @@ pub(crate) fn delete_record(
     let filter = extract_unique_filter(where_arg.value.try_into()?, &model)?;
 
     // Prefetch read query for the delete
-    let mut read_query = read::find_unique(field, model.clone())?;
+    let mut read_query = read::find_unique(field, model.clone(), query_schema)?;
     read_query.add_filter(filter.clone());
 
     let read_node = graph.create_node(Query::Read(read_query));

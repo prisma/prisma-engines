@@ -1,10 +1,7 @@
 use super::{inmemory_record_processor::InMemoryRecordProcessor, read};
 use crate::{interpreter::InterpretationResult, query_ast::*};
-use connector::{
-    self, filter::Filter, ConditionListValue, ConnectionLike, QueryArguments, RelAggregationRow,
-    RelAggregationSelection, ScalarCompare,
-};
-use prisma_models::{FieldSelection, ManyRecords, PrismaValue, Record, RelationFieldRef, SelectionResult};
+use connector::{self, ConnectionLike, RelAggregationRow, RelAggregationSelection};
+use query_structure::*;
 use std::collections::HashMap;
 
 pub(crate) async fn m2m(
@@ -14,6 +11,7 @@ pub(crate) async fn m2m(
     trace_id: Option<String>,
 ) -> InterpretationResult<(ManyRecords, Option<Vec<RelAggregationRow>>)> {
     let processor = InMemoryRecordProcessor::new_from_query_args(&mut query.args);
+
     let parent_field = &query.parent_field;
     let child_link_id = parent_field.related_field().linking_fields();
 
@@ -71,6 +69,7 @@ pub(crate) async fn m2m(
                 args,
                 &query.selected_fields,
                 &query.aggregation_selections,
+                RelationLoadStrategy::Query,
                 trace_id.clone(),
             )
             .await?
@@ -212,6 +211,7 @@ pub async fn one2m(
             args,
             selected_fields,
             &aggr_selections,
+            RelationLoadStrategy::Query,
             trace_id,
         )
         .await?

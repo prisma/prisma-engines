@@ -6,7 +6,10 @@ mod bytes_filter {
     use super::setup;
     use query_engine_tests::run_query;
 
-    #[connector_test(schema(setup::common_types))]
+    #[connector_test(
+        schema(setup::common_types),
+        exclude(Sqlite("libsql.js.wasm"), Vitess("planetscale.js.wasm"))
+    )]
     async fn basic_where(runner: Runner) -> TestResult<()> {
         setup::test_data_common_types(&runner).await?;
 
@@ -28,7 +31,11 @@ mod bytes_filter {
         Ok(())
     }
 
-    #[connector_test(schema(setup::common_mixed_types), capabilities(ScalarLists))]
+    #[connector_test(
+        schema(setup::common_mixed_types),
+        exclude(Postgres("pg.js.wasm", "neon.js.wasm")),
+        capabilities(ScalarLists)
+    )]
     async fn inclusion_filter(runner: Runner) -> TestResult<()> {
         setup::test_data_common_mixed_types(&runner).await?;
 
@@ -50,7 +57,11 @@ mod bytes_filter {
         Ok(())
     }
 
-    #[connector_test(schema(setup::common_list_types), capabilities(ScalarLists))]
+    #[connector_test(
+        schema(setup::common_list_types),
+        exclude(Postgres("pg.js.wasm", "neon.js.wasm")),
+        capabilities(ScalarLists)
+    )]
     async fn scalar_list_filters(runner: Runner) -> TestResult<()> {
         setup::test_data_list_common(&runner).await?;
 

@@ -1,5 +1,4 @@
 import * as qe from './qe'
-import * as engines from './engines/Library'
 import * as readline from 'node:readline'
 import * as jsonRpc from './jsonRpc'
 
@@ -23,6 +22,9 @@ import { PrismaPlanetScale } from '@prisma/adapter-planetscale'
 
 
 import {bindAdapter, DriverAdapter, ErrorCapturingDriverAdapter} from "@prisma/driver-adapter-utils";
+import { webcrypto } from 'node:crypto';
+
+(global as any).crypto = webcrypto
 
 
 const SUPPORTED_ADAPTERS: Record<string, (_ : string) => Promise<DriverAdapter>>
@@ -76,7 +78,7 @@ async function main(): Promise<void> {
 }
 
 const state: Record<number, {
-    engine: engines.QueryEngineInstance,
+    engine: qe.QueryEngine,
     adapter: ErrorCapturingDriverAdapter,
     logs: string[]
 }> = {}
@@ -87,7 +89,7 @@ async function handleRequest(method: string, params: unknown): Promise<unknown> 
             interface InitializeSchemaParams {
                 schema: string
                 schemaId: string
-                url: string
+                url: string,
             }
 
             const castParams = params as InitializeSchemaParams;
@@ -215,10 +217,10 @@ function respondOk(requestId: number, payload: unknown) {
     console.log(JSON.stringify(msg))
 }
 
-async function initQe(url: string, prismaSchema: string, logCallback: qe.QueryLogCallback): Promise<[engines.QueryEngineInstance, ErrorCapturingDriverAdapter]> {
+async function initQe(url: string, prismaSchema: string, logCallback: qe.QueryLogCallback): Promise<[qe.QueryEngine, ErrorCapturingDriverAdapter]> {
     const adapter = await adapterFromEnv(url) as DriverAdapter
     const errorCapturingAdapter = bindAdapter(adapter)
-    const engineInstance = qe.initQueryEngine(errorCapturingAdapter, prismaSchema, logCallback, debug)
+    const engineInstance = await qe.initQueryEngine(errorCapturingAdapter, prismaSchema, logCallback, debug)
     return [engineInstance, errorCapturingAdapter];
 }
 
@@ -238,20 +240,28 @@ async function adapterFromEnv(url: string): Promise<DriverAdapter> {
 
 function postgres_options(url: string): any {
     let args: any = {connectionString: url}
-    const schemaName = new URL(url).searchParams.get('schema')
+    const schemaName = postgresSchemaName(url)
     if (schemaName != null) {
         args.options = `--search_path="${schemaName}"`
     }
     return args;
 }
 
+function postgresSchemaName(url: string) {
+    return new URL(url).searchParams.get('schema') ?? undefined
+}
+
 async function pgAdapter(url: string): Promise<DriverAdapter> {
+    const schemaName = postgresSchemaName(url)
     const pool = new pgDriver.Pool(postgres_options(url))
-    return new prismaPg.PrismaPg(pool)
+    return new prismaPg.PrismaPg(pool, {
+        schema: schemaName
+    })
+
 }
 
 async function neonWsAdapter(url: string): Promise<DriverAdapter> {
-    const proxyURL = JSON.parse(process.env.DRIVER_ADAPTER_CONFIG || '{}').proxyUrl ?? ''
+    const proxyURL = JSON.parse(process.env.DRIVER_ADAPTER_CONFIG || '{}').proxy_url ?? ''
     if (proxyURL == '') {
         throw new Error("DRIVER_ADAPTER_CONFIG is not defined or empty, but its required for neon adapter.");
     }
@@ -261,8 +271,10 @@ async function neonWsAdapter(url: string): Promise<DriverAdapter> {
     neonConfig.useSecureWebSocket = false
     neonConfig.pipelineConnect = false
 
+    const schemaName = postgresSchemaName(url)
+
     const pool = new NeonPool(postgres_options(url))
-    return new prismaNeon.PrismaNeon(pool)
+    return new prismaNeon.PrismaNeon(pool, { schema: schemaName })
 }
 
 async function libsqlAdapter(url: string): Promise<DriverAdapter> {
@@ -271,17 +283,26 @@ async function libsqlAdapter(url: string): Promise<DriverAdapter> {
 }
 
 async function planetscaleAdapter(url: string): Promise<DriverAdapter> {
-    const proxyURL = JSON.parse(process.env.DRIVER_ADAPTER_CONFIG || '{}').proxyUrl ?? ''
-    if (proxyURL == '') {
+    const proxyUrl = JSON.parse(process.env.DRIVER_ADAPTER_CONFIG || '{}').proxy_url ?? ''
+    if (proxyUrl == '') {
         throw new Error("DRIVER_ADAPTER_CONFIG is not defined or empty, but its required for planetscale adapter.");
     }
 
+
     const client = new PlanetscaleClient({
-        url: proxyURL,
+        // preserving path name so proxy url would look like real DB url
+        url: copyPathName(url, proxyUrl),
         fetch,
     })
 
     return new PrismaPlanetScale(client)
+}
+
+function copyPathName(fromUrl: string, toUrl: string) {
+    const toObj = new URL(toUrl)
+    toObj.pathname = new URL(fromUrl).pathname
+
+    return toObj.toString()
 }
 
 main().catch(err)

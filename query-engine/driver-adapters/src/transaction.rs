@@ -1,16 +1,14 @@
 use async_trait::async_trait;
 use metrics::decrement_gauge;
-use napi::{bindgen_prelude::FromNapiValue, JsObject};
 use quaint::{
     connector::{IsolationLevel, Transaction as QuaintTransaction},
     prelude::{Query as QuaintQuery, Queryable, ResultSet},
     Value,
 };
 
-use crate::{
-    proxy::{CommonProxy, TransactionOptions, TransactionProxy},
-    queryable::JsBaseQueryable,
-};
+use crate::proxy::{TransactionOptions, TransactionProxy};
+use crate::{proxy::CommonProxy, queryable::JsBaseQueryable, send_future::UnsafeFuture};
+use crate::{JsObject, JsResult};
 
 // Wrapper around JS transaction objects that implements Queryable
 // and quaint::Transaction. Can be used in place of quaint transaction,
@@ -50,7 +48,7 @@ impl QuaintTransaction for JsTransaction {
             self.inner.raw_cmd(commit_stmt).await?;
         }
 
-        self.tx_proxy.commit().await
+        UnsafeFuture(self.tx_proxy.commit()).await
     }
 
     async fn rollback(&self) -> quaint::Result<()> {
@@ -66,7 +64,7 @@ impl QuaintTransaction for JsTransaction {
             self.inner.raw_cmd(rollback_stmt).await?;
         }
 
-        self.tx_proxy.rollback().await
+        UnsafeFuture(self.tx_proxy.rollback()).await
     }
 
     fn as_queryable(&self) -> &dyn Queryable {
@@ -121,12 +119,25 @@ impl Queryable for JsTransaction {
     }
 }
 
-/// Implementing unsafe `from_napi_value` is only way I managed to get threadsafe
-/// JsTransaction value in `DriverProxy`. Going through any intermediate safe napi.rs value,
-/// like `JsObject` or `JsUnknown` wrapped inside `JsPromise` makes it impossible to extract the value
-/// out of promise while keeping the future `Send`.
-impl FromNapiValue for JsTransaction {
-    unsafe fn from_napi_value(env: napi::sys::napi_env, napi_val: napi::sys::napi_value) -> napi::Result<Self> {
+#[cfg(target_arch = "wasm32")]
+impl super::wasm::FromJsValue for JsTransaction {
+    fn from_js_value(value: wasm_bindgen::prelude::JsValue) -> JsResult<Self> {
+        use wasm_bindgen::JsCast;
+
+        let object = value.dyn_into::<JsObject>()?;
+        let common_proxy = CommonProxy::new(&object)?;
+        let base = JsBaseQueryable::new(common_proxy);
+        let tx_proxy = TransactionProxy::new(&object)?;
+
+        Ok(Self::new(base, tx_proxy))
+    }
+}
+
+/// Implementing unsafe `from_napi_value` allows retrieving a threadsafe `JsTransaction` in `DriverProxy`
+/// while keeping derived futures `Send`.
+#[cfg(not(target_arch = "wasm32"))]
+impl ::napi::bindgen_prelude::FromNapiValue for JsTransaction {
+    unsafe fn from_napi_value(env: napi::sys::napi_env, napi_val: napi::sys::napi_value) -> JsResult<Self> {
         let object = JsObject::from_napi_value(env, napi_val)?;
         let common_proxy = CommonProxy::new(&object)?;
         let tx_proxy = TransactionProxy::new(&object)?;

@@ -45,7 +45,11 @@ mod byoid {
     }
 
     // "A Create Mutation" should "create and return item with own Id"
-    #[connector_test(schema(schema_1))]
+    #[connector_test(
+        schema(schema_1),
+        only(MySql, Postgres, Sqlite, Vitess),
+        exclude(Vitess("planetscale.js", "planetscale.js.wasm"))
+    )]
     async fn create_and_return_item_woi_1(runner: Runner) -> TestResult<()> {
         insta::assert_snapshot!(
           run_query!(&runner, r#"mutation {
@@ -73,7 +77,11 @@ mod byoid {
     }
 
     // "A Create Mutation" should "create and return item with own Id"
-    #[connector_test(schema(schema_2))]
+    #[connector_test(
+        schema(schema_2),
+        only(MySql, Postgres, Sqlite, Vitess),
+        exclude(Vitess("planetscale.js", "planetscale.js.wasm"))
+    )]
     async fn create_and_return_item_woi_2(runner: Runner) -> TestResult<()> {
         insta::assert_snapshot!(
           run_query!(&runner, r#"mutation {
@@ -131,7 +139,11 @@ mod byoid {
     }
 
     // "A Nested Create Mutation" should "create and return item with own Id"
-    #[connector_test(schema(schema_1))]
+    #[connector_test(
+        schema(schema_1),
+        only(MySql, Postgres, Sqlite, Vitess),
+        exclude(Vitess("planetscale.js", "planetscale.js.wasm"))
+    )]
     async fn nested_create_return_item_woi_1(runner: Runner) -> TestResult<()> {
         insta::assert_snapshot!(
           run_query!(&runner, r#"mutation {
@@ -159,7 +171,11 @@ mod byoid {
     }
 
     // "A Nested Create Mutation" should "create and return item with own Id"
-    #[connector_test(schema(schema_2))]
+    #[connector_test(
+        schema(schema_2),
+        only(MySql, Postgres, Sqlite, Vitess),
+        exclude(Vitess("planetscale.js", "planetscale.js.wasm"))
+    )]
     async fn nested_create_return_item_woi_2(runner: Runner) -> TestResult<()> {
         insta::assert_snapshot!(
           run_query!(&runner, r#"mutation {

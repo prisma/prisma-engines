@@ -191,7 +191,7 @@ mod update_inside_update {
     // ----------------------------------
 
     // "A PM to C1 relation relation" should "work"
-    #[relation_link_test(on_parent = "ToMany", on_child = "ToOneOpt")]
+    #[relation_link_test(on_parent = "ToMany", on_child = "ToOneOpt", exclude(Postgres("pg.js", "neon.js")))]
     async fn pm_c1_should_work(runner: &Runner, t: &DatamodelWithParams) -> TestResult<()> {
         let res = run_query_json!(
             runner,
@@ -384,7 +384,7 @@ mod update_inside_update {
     // ----------------------------------
 
     // "A PM to CM relation relation" should "work"
-    #[relation_link_test(on_parent = "ToMany", on_child = "ToMany")]
+    #[relation_link_test(on_parent = "ToMany", on_child = "ToMany", exclude(Postgres("pg.js", "neon.js")))]
     async fn pm_cm_should_work(runner: &Runner, t: &DatamodelWithParams) -> TestResult<()> {
         let res = run_query_json!(
             runner,

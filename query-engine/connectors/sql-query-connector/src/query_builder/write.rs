@@ -1,7 +1,7 @@
 use crate::{model_extensions::*, sql_trace::SqlTraceComment, Context};
 use connector_interface::{DatasourceFieldName, ScalarWriteOperation, WriteArgs};
-use prisma_models::*;
 use quaint::ast::*;
+use query_structure::*;
 use std::{collections::HashSet, convert::TryInto};
 use tracing::Span;
 
