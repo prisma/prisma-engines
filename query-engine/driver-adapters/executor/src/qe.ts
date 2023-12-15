@@ -1,7 +1,4 @@
-import type {
-  DriverAdapter,
-  ErrorCapturingDriverAdapter,
-} from "@prisma/driver-adapter-utils";
+import type { DriverAdapter } from "@prisma/driver-adapter-utils";
 import * as napi from "./engines/Library";
 import * as os from "node:os";
 import * as path from "node:path";
@@ -27,16 +24,6 @@ export async function initQueryEngine(
   queryLogCallback: QueryLogCallback,
   debug: (...args: any[]) => void
 ): Promise<QueryEngine> {
-  const queryEngineOptions = {
-    datamodel,
-    configDir: ".",
-    engineProtocol: "json" as const,
-    logLevel: process.env["RUST_LOG"] ?? ("info" as any),
-    logQueries: true,
-    env: process.env,
-    ignoreEnvVarErrors: false,
-  };
-
   const logCallback = (event: any) => {
     const parsed = JSON.parse(event);
     if (parsed.is_query) {
@@ -45,13 +32,27 @@ export async function initQueryEngine(
     debug(parsed);
   };
 
+  const options = queryEngineOptions(datamodel);
+
   if (engineType === "Wasm") {
     const { WasmQueryEngine } = await import("./wasm");
-    return new WasmQueryEngine(queryEngineOptions, logCallback, adapter);
+    return new WasmQueryEngine(options, logCallback, adapter);
   } else {
     const { QueryEngine } = loadNapiEngine();
-    return new QueryEngine(queryEngineOptions, logCallback, adapter);
+    return new QueryEngine(options, logCallback, adapter);
   }
+}
+
+export function queryEngineOptions(datamodel: string) {
+  return {
+    datamodel,
+    configDir: ".",
+    engineProtocol: "json" as const,
+    logLevel: process.env["RUST_LOG"] ?? ("info" as any),
+    logQueries: true,
+    env: process.env,
+    ignoreEnvVarErrors: false,
+  };
 }
 
 function loadNapiEngine(): napi.Library {

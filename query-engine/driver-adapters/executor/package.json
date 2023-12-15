@@ -23,6 +23,8 @@
     "@libsql/client": "0.3.6",
     "@neondatabase/serverless": "0.6.0",
     "@planetscale/database": "1.13.0",
+    "query-engine-wasm-latest": "npm:@prisma/query-engine-wasm@latest",
+    "query-engine-wasm-baseline": "npm:@prisma/query-engine-wasm@0.0.19",
     "@prisma/adapter-libsql": "workspace:*",
     "@prisma/adapter-neon": "workspace:*",
     "@prisma/adapter-pg": "workspace:*",

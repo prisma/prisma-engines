@@ -1,3 +1,7 @@
+/**
+ * Run with: `node --experimental-wasm-modules ./example.js`
+ * on Node.js 18+.
+ */
 import { webcrypto } from "node:crypto";
 import * as qe from "./qe";
 
@@ -10,11 +14,14 @@ import prismaQueries from "../bench/queries.json";
 
 import { run, bench, group, baseline } from "mitata";
 
+import { QueryEngine as WasmBaseline } from "query-engine-wasm-baseline";
+import { QueryEngine as WasmLatest } from "query-engine-wasm-latest";
+
 (global as any).crypto = webcrypto;
 
 async function main(): Promise<void> {
   // read the prisma schema from stdin
-  const prismaSchema = await new Promise<string>((resolve, reject) => {
+  const datamodel = await new Promise<string>((resolve, reject) => {
     let data = "";
     process.stdin.on("data", (chunk) => {
       data += chunk;
@@ -32,16 +39,16 @@ async function main(): Promise<void> {
   const pg = await pgAdapter(url);
   const { recorder, replayer } = recording(pg);
 
-  await recordQueries(recorder, prismaSchema, prismaQueries);
-  await benchMarkQueries(replayer, prismaSchema, prismaQueries);
+  await recordQueries(recorder, datamodel, prismaQueries);
+  await benchMarkQueries(replayer, datamodel, prismaQueries);
 }
 
 async function recordQueries(
   adapter: DriverAdapter,
-  prismaSchema: string,
+  datamodel: string,
   prismaQueries: any
 ): Promise<void> {
-  const qe = await initQe(adapter, prismaSchema);
+  const qe = await initQeNapiCurrent(adapter, datamodel);
   await qe.connect("");
 
   for (const prismaQuery of prismaQueries) {
@@ -53,25 +60,37 @@ async function recordQueries(
 
 async function benchMarkQueries(
   adapter: DriverAdapter,
-  prismaSchema: string,
+  datamodel: string,
   prismaQueries: any
 ) {
-  const napi = await initQe(adapter, prismaSchema, "Napi");
+  const napi = await initQeNapiCurrent(adapter, datamodel);
   napi.connect("");
-  const wasm = await initQe(adapter, prismaSchema, "Wasm");
-  wasm.connect("");
+  const wasmCurrent = await initQeWasmCurrent(adapter, datamodel);
+  wasmCurrent.connect("");
+  const wasmBaseline = await initQeWasmBaseLine(adapter, datamodel);
+  wasmBaseline.connect("");
+  const wasmLatest = await initQeWasmLatest(adapter, datamodel);
+  wasmLatest.connect("");
 
   try {
     for (const prismaQuery of prismaQueries) {
       const { description, query } = prismaQuery;
+      const jsonQuery = JSON.stringify(query);
 
       group(description, () => {
-        bench("Node API", () =>
-          napi.query(JSON.stringify(query), "", undefined)
+        bench("Web Assembly: Baseline", () =>
+          wasmBaseline.query(jsonQuery, "", undefined)
         );
-        bench("Web Assembly", () =>
-          wasm.query(JSON.stringify(query), "", undefined)
+
+        bench("Web Assembly: Latest", () =>
+          wasmLatest.query(jsonQuery, "", undefined)
         );
+
+        baseline("Web Assembly: Current", () =>
+          wasmCurrent.query(jsonQuery, "", undefined)
+        );
+
+        bench("Node API: Current", () => napi.query(jsonQuery, "", undefined));
       });
     }
 
@@ -81,7 +100,9 @@ async function benchMarkQueries(
     });
   } finally {
     napi.disconnect("");
-    wasm.disconnect("");
+    wasmCurrent.disconnect("");
+    wasmBaseline.disconnect("");
+    wasmLatest.disconnect("");
   }
 }
 
@@ -109,18 +130,44 @@ async function pgAdapter(url: string): Promise<DriverAdapter> {
   });
 }
 
-async function initQe(
+async function initQeNapiCurrent(
   adapter: DriverAdapter,
-  prismaSchema: string,
-  engineType: "Wasm" | "Napi" = "Napi"
+  datamodel: string
 ): Promise<qe.QueryEngine> {
   return await qe.initQueryEngine(
-    engineType,
+    "Napi",
     adapter,
-    prismaSchema,
+    datamodel,
     (...args) => {},
     debug
   );
+}
+
+async function initQeWasmCurrent(
+  adapter: DriverAdapter,
+  datamodel: string
+): Promise<qe.QueryEngine> {
+  return await qe.initQueryEngine(
+    "Wasm",
+    adapter,
+    datamodel,
+    (...args) => {},
+    debug
+  );
+}
+
+async function initQeWasmLatest(
+  adapter: DriverAdapter,
+  datamodel: string
+): Promise<qe.QueryEngine> {
+  return new WasmLatest(qe.queryEngineOptions(datamodel), () => {}, adapter);
+}
+
+function initQeWasmBaseLine(
+  adapter: DriverAdapter,
+  datamodel: string
+): qe.QueryEngine {
+  return new WasmBaseline(qe.queryEngineOptions(datamodel), () => {}, adapter);
 }
 
 const err = (...args: any[]) => console.error("[nodejs] ERROR:", ...args);
