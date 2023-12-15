@@ -15,7 +15,6 @@ use query_core::{
 use query_engine_common::engine::{map_known_error, ConnectedEngine, ConstructorOptions, EngineBuilder, Inner};
 use request_handlers::ConnectorKind;
 use request_handlers::{load_executor, RequestBody, RequestHandler};
-use serde::Serialize;
 use serde_json::json;
 use std::sync::Arc;
 use tokio::sync::RwLock;
@@ -28,15 +27,6 @@ use wasm_bindgen::prelude::wasm_bindgen;
 pub struct QueryEngine {
     inner: RwLock<Inner>,
     logger: Logger,
-}
-
-/// Returned from the `serverInfo` method in javascript.
-#[derive(Debug, Serialize)]
-#[serde(rename_all = "camelCase")]
-struct ServerInfo {
-    commit: String,
-    version: String,
-    primary_connector: Option<String>,
 }
 
 #[wasm_bindgen]

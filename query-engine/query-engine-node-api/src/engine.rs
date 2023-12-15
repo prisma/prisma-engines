@@ -14,7 +14,7 @@ use query_engine_common::engine::{
 };
 use query_engine_metrics::MetricFormat;
 use request_handlers::{dmmf, load_executor, render_graphql_schema, ConnectorKind, RequestBody, RequestHandler};
-use serde::{Deserialize, Serialize};
+use serde::Deserialize;
 use serde_json::json;
 use std::{collections::HashMap, future::Future, panic::AssertUnwindSafe, sync::Arc};
 use tokio::sync::RwLock;
@@ -33,15 +33,6 @@ pub struct QueryEngine {
     connector_mode: ConnectorMode,
     inner: RwLock<Inner>,
     logger: Logger,
-}
-
-/// Returned from the `serverInfo` method in javascript.
-#[derive(Debug, Serialize)]
-#[serde(rename_all = "camelCase")]
-struct ServerInfo {
-    commit: String,
-    version: String,
-    primary_connector: Option<String>,
 }
 
 #[derive(Debug, Deserialize)]
