@@ -29,7 +29,7 @@ datasource db {
 }
 
 model Post {
-  id      Int   @id @default(sequence(maxValue: 2147483647sdsafsdfsdf))
+  id      Int   @id @default(sequence(maxValue: 2147483647))
   user_id Int?
   User    User? @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
 }
