@@ -1,14 +1,6 @@
 name: Report qe benchmarks
 on:
   pull_request:
-    paths-ignore:
-      - "!.github/workflows/wasm-qe-perf.yml"
-      - ".github/**"
-      - ".buildkite/**"
-      - "*.md"
-      - "LICENSE"
-      - "CODEOWNERS"
-      - "renovate.json"
 
 jobs:
   run-benchmarks:
