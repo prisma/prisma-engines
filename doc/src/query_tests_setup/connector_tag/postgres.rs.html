@@ -85,6 +85,9 @@
 <a href="#85" id="85">85</a>
 <a href="#86" id="86">86</a>
 <a href="#87" id="87">87</a>
+<a href="#88" id="88">88</a>
+<a href="#89" id="89">89</a>
+<a href="#90" id="90">90</a>
 </pre></div><pre class="rust"><code><span class="kw">use super</span>::<span class="kw-2">*</span>;
 <span class="kw">use crate</span>::{datamodel_rendering::SqlDatamodelRenderer, BoxFuture, TestError};
 <span class="kw">use </span>quaint::{prelude::Queryable, single::Quaint};
@@ -122,6 +125,7 @@
     V13,
     V14,
     V15,
+    V16,
     PgBouncer,
     NeonJsNapi,
     PgJsNapi,
@@ -141,6 +145,7 @@
             <span class="string">&quot;13&quot; </span>=&gt; <span class="self">Self</span>::V13,
             <span class="string">&quot;14&quot; </span>=&gt; <span class="self">Self</span>::V14,
             <span class="string">&quot;15&quot; </span>=&gt; <span class="self">Self</span>::V15,
+            <span class="string">&quot;16&quot; </span>=&gt; <span class="self">Self</span>::V16,
             <span class="string">&quot;pgbouncer&quot; </span>=&gt; <span class="self">Self</span>::PgBouncer,
             <span class="string">&quot;neon.js&quot; </span>=&gt; <span class="self">Self</span>::NeonJsNapi,
             <span class="string">&quot;pg.js&quot; </span>=&gt; <span class="self">Self</span>::PgJsNapi,
@@ -163,6 +168,7 @@
             PostgresVersion::V13 =&gt; <span class="string">&quot;13&quot;</span>,
             PostgresVersion::V14 =&gt; <span class="string">&quot;14&quot;</span>,
             PostgresVersion::V15 =&gt; <span class="string">&quot;15&quot;</span>,
+            PostgresVersion::V16 =&gt; <span class="string">&quot;16&quot;</span>,
             PostgresVersion::PgBouncer =&gt; <span class="string">&quot;pgbouncer&quot;</span>,
             PostgresVersion::NeonJsNapi =&gt; <span class="string">&quot;neon.js&quot;</span>,
             PostgresVersion::PgJsNapi =&gt; <span class="string">&quot;pg.js&quot;</span>,

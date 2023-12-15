@@ -415,6 +415,7 @@
 <a href="#415" id="415">415</a>
 <a href="#416" id="416">416</a>
 <a href="#417" id="417">417</a>
+<a href="#418" id="418">418</a>
 </pre></div><pre class="rust"><code><span class="kw">mod </span>cockroachdb;
 <span class="kw">mod </span>js;
 <span class="kw">mod </span>mongodb;
@@ -544,6 +545,7 @@
                 }
                 <span class="prelude-val">Some</span>(PostgresVersion::V14) =&gt; <span class="macro">format!</span>(<span class="string">&quot;postgresql://postgres:prisma@127.0.0.1:5437/{database}&quot;</span>),
                 <span class="prelude-val">Some</span>(PostgresVersion::V15) =&gt; <span class="macro">format!</span>(<span class="string">&quot;postgresql://postgres:prisma@127.0.0.1:5438/{database}&quot;</span>),
+                <span class="prelude-val">Some</span>(PostgresVersion::V16) =&gt; <span class="macro">format!</span>(<span class="string">&quot;postgresql://postgres:prisma@127.0.0.1:5439/{database}&quot;</span>),
                 <span class="prelude-val">Some</span>(PostgresVersion::PgBouncer) =&gt; {
                     <span class="macro">format!</span>(<span class="string">&quot;postgresql://postgres:prisma@127.0.0.1:6432/db?{database}&amp;pgbouncer=true&quot;</span>)
                 }
