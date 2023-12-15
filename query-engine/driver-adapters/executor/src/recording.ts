@@ -3,162 +3,98 @@ import {
   type Query,
   type Result,
   type ResultSet,
-  type Transaction,
 } from "@prisma/driver-adapter-utils";
+import { RetryHandler } from "undici";
 
-export const recording = (adapter: DriverAdapter) => {
-  const recordings = new InMemoryRecordings();
+export function recording(adapter: DriverAdapter) {
+  const recordings = createInMemoryRecordings();
 
   return {
-    recorder: new Recorder(adapter, recordings),
-    replayer: new Replayer(adapter, recordings),
+    recorder: recorder(adapter, recordings),
+    replayer: replayer(adapter, recordings),
   };
-};
-
-export interface Recordings {
-  addQueryResults(params: Query, result: Result<ResultSet>);
-  addCommandResults(params: Query, result: Result<number>);
-  getQueryResults(params: Query): Result<ResultSet>;
-  getCommandResults(params: Query): Result<number>;
 }
 
-export class InMemoryRecordings implements Recordings {
-  readonly queryResults: Record<string, Result<ResultSet>> = {};
-  readonly commandResults: Record<string, Result<number>> = {};
-
-  addQueryResults(params: Query, result: Result<ResultSet>) {
-    const key = this.queryToKey(params);
-    if (key in this.queryResults) {
-      throw new Error(`Query already recorded: ${key}`);
-    }
-    this.queryResults[key] = result;
-  }
-
-  getQueryResults(params: Query): Result<ResultSet> {
-    const key = this.queryToKey(params);
-    if (!(key in this.queryResults)) {
-      throw new Error(`Query not recorded: ${key}`);
-    }
-    return this.queryResults[key];
-  }
-
-  addCommandResults(params: Query, result: Result<number>) {
-    const key = this.queryToKey(params);
-    if (key in this.commandResults) {
-      throw new Error(`Command already recorded: ${key}`);
-    }
-    this.commandResults[key] = result;
-  }
-
-  getCommandResults(params: Query): Result<number> {
-    const key = this.queryToKey(params);
-    if (!(key in this.commandResults)) {
-      throw new Error(`Command not recorded: ${key}`);
-    }
-    return this.commandResults[key];
-  }
-
-  protected queryToKey(query: Query): string {
-    return JSON.stringify(query);
-  }
+function recorder(adapter: DriverAdapter, recordings) {
+  return {
+    provider: adapter.provider,
+    startTransaction: () => {
+      throw new Error("Not implemented");
+    },
+    getConnectionInfo: () => {
+      return adapter.getConnectionInfo!();
+    },
+    queryRaw: (params) => {
+      return adapter.queryRaw(params).then((result) => {
+        recordings.addQueryResults(params, result);
+        return result;
+      });
+    },
+    executeRaw: (params) => {
+      return adapter.executeRaw(params).then((result) => {
+        recordings.addCommandResults(params, result);
+        return result;
+      });
+    },
+  };
 }
 
-export class Recorder implements DriverAdapter {
-  provider: "mysql" | "postgres" | "sqlite";
-  recordings: Recordings;
-  adapter: DriverAdapter;
-
-  constructor(adapter: DriverAdapter, recordings: Recordings) {
-    this.adapter = adapter;
-    this.provider = adapter.provider;
-    this.recordings = recordings;
-  }
-
-  startTransaction(): Promise<Result<Transaction>> {
-    throw new Error(
-      "Not implemented. We didn't need transactions for our use case until now."
-    );
-  }
-
-  get getConnectionInfo() {
-    if (this.adapter && typeof this.adapter.getConnectionInfo === "function") {
-      return () => this.adapter.getConnectionInfo!();
-    }
-    return undefined;
-  }
-
-  queryRaw(params: Query): Promise<Result<ResultSet>> {
-    return new Promise((resolve, reject) => {
-      this.adapter
-        .queryRaw(params)
-        .then((result) => {
-          this.recordings.addQueryResults(params, result);
-          resolve(result);
-        })
-        .catch((error) => {
-          reject(error);
-        });
-    });
-  }
-
-  executeRaw(params: Query): Promise<Result<number>> {
-    return new Promise((resolve, reject) => {
-      this.adapter
-        .executeRaw(params)
-        .then((result) => {
-          this.recordings.addCommandResults(params, result);
-          resolve(result);
-        })
-        .catch((error) => {
-          reject(error);
-        });
-    });
-  }
+function replayer(adapter: DriverAdapter, recordings) {
+  return {
+    provider: adapter.provider,
+    recordings: recordings,
+    startTransaction: () => {
+      throw new Error("Not implemented");
+    },
+    getConnectionInfo: () => {
+      return adapter.getConnectionInfo!();
+    },
+    queryRaw: async (params) => {
+      return recordings.getQueryResults(params);
+    },
+    executeRaw: async (params) => {
+      return recordings.getCommandResults(params);
+    },
+  };
 }
 
-export class Replayer implements DriverAdapter {
-  provider: "mysql" | "postgres" | "sqlite";
-  recordings: Recordings;
-  adapter: DriverAdapter;
+function createInMemoryRecordings() {
+  const queryResults = {};
+  const commandResults = {};
 
-  constructor(adapter: DriverAdapter, recordings: Recordings) {
-    this.adapter = adapter;
-    this.provider = adapter.provider;
-    this.recordings = recordings;
-  }
+  const queryToKey = (query) => JSON.stringify(query);
 
-  startTransaction(): Promise<Result<Transaction>> {
-    throw new Error(
-      "Not implemented. We didn't need transactions for our use case until now."
-    );
-  }
-
-  get getConnectionInfo() {
-    if (this.adapter && typeof this.adapter.getConnectionInfo === "function") {
-      return () => this.adapter.getConnectionInfo!();
-    }
-    return undefined;
-  }
-
-  queryRaw(params: Query): Promise<Result<ResultSet>> {
-    return new Promise((resolve, reject) => {
-      try {
-        const result = this.recordings.getQueryResults(params);
-        resolve(result);
-      } catch (error) {
-        reject(error);
+  return {
+    addQueryResults: (params, result) => {
+      const key = queryToKey(params);
+      if (key in queryResults) {
+        throw new Error(`Query already recorded: ${key}`);
       }
-    });
-  }
+      queryResults[key] = result;
+    },
 
-  executeRaw(params: Query): Promise<Result<number>> {
-    return new Promise((resolve, reject) => {
-      try {
-        const result = this.recordings.getCommandResults(params);
-        resolve(result);
-      } catch (error) {
-        reject(error);
+    getQueryResults: (params) => {
+      const key = queryToKey(params);
+      if (!(key in queryResults)) {
+        throw new Error(`Query not recorded: ${key}`);
       }
-    });
-  }
+      return queryResults[key];
+    },
+
+    addCommandResults: (params, result) => {
+      const key = queryToKey(params);
+      if (key in commandResults) {
+        throw new Error(`Command already recorded: ${key}`);
+      }
+      commandResults[key] = result;
+    },
+
+    getCommandResults: (params) => {
+      const key = queryToKey(params);
+      if (!(key in commandResults)) {
+        throw new Error(`Command not recorded: ${key}`);
+      }
+      return commandResults[key];
+    },
+  };
 }
