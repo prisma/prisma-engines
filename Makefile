@@ -149,10 +149,12 @@ test-driver-adapter-pg-wasm: test-pg-wasm
 start-pg-bench:
 	docker compose -f query-engine/driver-adapters/executor/bench/docker-compose.yml up --wait -d --remove-orphans postgres
 
+setup-pg-bench: start-pg-bench build-qe-napi build-qe-wasm build-driver-adapters-kit
+
 run-bench:
 	query-engine/driver-adapters/executor/script/bench.sh
 
-bench-pg-js: start-pg-bench build-qe-napi build-qe-wasm build-driver-adapters-kit run-bench
+bench-pg-js: setup-pg-bench run-bench
 
 start-neon-js:
 	docker compose -f docker-compose.yml up --wait -d --remove-orphans neon-proxy
