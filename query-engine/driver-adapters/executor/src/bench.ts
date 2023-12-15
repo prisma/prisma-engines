@@ -95,6 +95,7 @@ async function benchMarkQueries(
     }
 
     await run({
+      colors: false,
       collect: true,
     });
   } finally {
