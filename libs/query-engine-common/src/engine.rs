@@ -39,15 +39,26 @@ impl Inner {
     }
 }
 
+#[cfg(not(target_arch = "wasm32"))]
+pub struct EngineBuilderNative {
+    pub config_dir: PathBuf,
+    pub env: HashMap<String, String>,
+}
+
 /// Everything needed to connect to the database and have the core running.
 pub struct EngineBuilder {
     pub schema: Arc<psl::ValidatedSchema>,
     pub engine_protocol: EngineProtocol,
 
     #[cfg(not(target_arch = "wasm32"))]
+    pub native: EngineBuilderNative,
+}
+
+#[cfg(not(target_arch = "wasm32"))]
+pub struct ConnectedEngineNative {
     pub config_dir: PathBuf,
-    #[cfg(not(target_arch = "wasm32"))]
     pub env: HashMap<String, String>,
+    pub metrics: Option<query_engine_metrics::MetricRegistry>,
 }
 
 /// Internal structure for querying and reconnecting with the engine.
@@ -58,11 +69,7 @@ pub struct ConnectedEngine {
     pub engine_protocol: EngineProtocol,
 
     #[cfg(not(target_arch = "wasm32"))]
-    pub config_dir: PathBuf,
-    #[cfg(not(target_arch = "wasm32"))]
-    pub env: HashMap<String, String>,
-    #[cfg(not(target_arch = "wasm32"))]
-    pub metrics: Option<query_engine_metrics::MetricRegistry>,
+    pub native: ConnectedEngineNative,
 }
 
 impl ConnectedEngine {
@@ -81,6 +88,19 @@ impl ConnectedEngine {
     }
 }
 
+#[cfg(not(target_arch = "wasm32"))]
+#[derive(Debug, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct ConstructorOptionsNative {
+    #[serde(default)]
+    pub datasource_overrides: BTreeMap<String, String>,
+    pub config_dir: PathBuf,
+    #[serde(default)]
+    pub env: serde_json::Value,
+    #[serde(default)]
+    pub ignore_env_var_errors: bool,
+}
+
 /// Parameters defining the construction of an engine.
 #[derive(Debug, Deserialize)]
 #[cfg_attr(target_arch = "wasm32", derive(Tsify))]
@@ -95,19 +115,8 @@ pub struct ConstructorOptions {
     pub engine_protocol: Option<EngineProtocol>,
 
     #[cfg(not(target_arch = "wasm32"))]
-    #[serde(default)]
-    pub datasource_overrides: BTreeMap<String, String>,
-
-    #[cfg(not(target_arch = "wasm32"))]
-    #[serde(default)]
-    pub env: serde_json::Value,
-
-    #[cfg(not(target_arch = "wasm32"))]
-    pub config_dir: PathBuf,
-
-    #[cfg(not(target_arch = "wasm32"))]
-    #[serde(default)]
-    pub ignore_env_var_errors: bool,
+    #[serde(flatten)]
+    pub native: ConstructorOptionsNative,
 }
 
 pub fn map_known_error(err: query_core::CoreError) -> crate::Result<String> {

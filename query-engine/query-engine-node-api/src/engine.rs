@@ -9,7 +9,8 @@ use query_core::{
     telemetry, TransactionOptions, TxId,
 };
 use query_engine_common::engine::{
-    map_known_error, stringify_env_values, ConnectedEngine, ConstructorOptions, EngineBuilder, Inner,
+    map_known_error, stringify_env_values, ConnectedEngine, ConnectedEngineNative, ConstructorOptions,
+    ConstructorOptionsNative, EngineBuilder, EngineBuilderNative, Inner,
 };
 use query_engine_metrics::MetricFormat;
 use request_handlers::{dmmf, load_executor, render_graphql_schema, ConnectorKind, RequestBody, RequestHandler};
@@ -79,11 +80,8 @@ impl QueryEngine {
             datamodel,
             log_level,
             log_queries,
-            datasource_overrides,
-            env,
-            config_dir,
-            ignore_env_var_errors,
             engine_protocol,
+            native,
         } = napi_env.from_js_value(options).expect(
             r###"
             Failed to deserialize constructor options. 
@@ -95,6 +93,13 @@ impl QueryEngine {
             values for data_model, log_level, and any field that is not Option<T>
             "###,
         );
+
+        let ConstructorOptionsNative {
+            datasource_overrides,
+            config_dir,
+            env,
+            ignore_env_var_errors,
+        } = native;
 
         let env = stringify_env_values(env)?; // we cannot trust anything JS sends us from process.env
         let overrides: Vec<(_, _)> = datasource_overrides.into_iter().collect();
@@ -148,9 +153,8 @@ impl QueryEngine {
 
         let builder = EngineBuilder {
             schema: Arc::new(schema),
-            config_dir,
             engine_protocol,
-            env,
+            native: EngineBuilderNative { config_dir, env },
         };
 
         let log_level = log_level.parse::<LevelFilter>().unwrap();
@@ -206,8 +210,8 @@ impl QueryEngine {
                     let connector_kind = match self.connector_mode {
                         ConnectorMode::Rust => {
                             let url = data_source
-                                .load_url_with_config_dir(&builder.config_dir, |key| {
-                                    builder.env.get(key).map(ToString::to_string)
+                                .load_url_with_config_dir(&builder.native.config_dir, |key| {
+                                    builder.native.env.get(key).map(ToString::to_string)
                                 })
                                 .map_err(|err| {
                                     crate::error::ApiError::Conversion(err, builder.schema.db.source().to_owned())
@@ -244,10 +248,12 @@ impl QueryEngine {
                     schema: builder.schema.clone(),
                     query_schema: Arc::new(query_schema.unwrap()),
                     executor: executor?,
-                    config_dir: builder.config_dir.clone(),
-                    env: builder.env.clone(),
-                    metrics: self.logger.metrics(),
                     engine_protocol: builder.engine_protocol,
+                    native: ConnectedEngineNative {
+                        config_dir: builder.native.config_dir.clone(),
+                        env: builder.native.env.clone(),
+                        metrics: self.logger.metrics(),
+                    },
                 }) as crate::Result<ConnectedEngine>
             }
             .instrument(span)
@@ -280,9 +286,11 @@ impl QueryEngine {
 
                 let builder = EngineBuilder {
                     schema: engine.schema.clone(),
-                    config_dir: engine.config_dir.clone(),
-                    env: engine.env.clone(),
                     engine_protocol: engine.engine_protocol(),
+                    native: EngineBuilderNative {
+                        config_dir: engine.native.config_dir.clone(),
+                        env: engine.native.env.clone(),
+                    },
                 };
 
                 *inner = Inner::Builder(builder);
@@ -445,7 +453,7 @@ impl QueryEngine {
             let engine = inner.as_engine()?;
             let options: MetricOptions = serde_json::from_str(&json_options)?;
 
-            if let Some(metrics) = &engine.metrics {
+            if let Some(metrics) = &engine.native.metrics {
                 if options.is_json_format() {
                     let engine_metrics = metrics.to_json(options.global_labels);
                     let res = serde_json::to_string(&engine_metrics)?;
