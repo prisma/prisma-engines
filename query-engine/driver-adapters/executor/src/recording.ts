@@ -4,8 +4,6 @@ import {
   type Result,
   type ResultSet,
   type Transaction,
-  TransactionOptions,
-  ok,
 } from "@prisma/driver-adapter-utils";
 
 export const recording = (adapter: DriverAdapter) => {

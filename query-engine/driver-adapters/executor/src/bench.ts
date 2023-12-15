@@ -1,14 +1,14 @@
+import { webcrypto } from "node:crypto";
 import * as qe from "./qe";
 
-// pg dependencies
 import pgDriver from "pg";
 import * as prismaPg from "@prisma/adapter-pg";
-
 import { DriverAdapter } from "@prisma/driver-adapter-utils";
-import { webcrypto } from "node:crypto";
 
 import { recording } from "./recording";
 import prismaQueries from "../bench/queries.json";
+
+import { run, bench, group, baseline } from "mitata";
 
 (global as any).crypto = webcrypto;
 
@@ -56,7 +56,33 @@ async function benchMarkQueries(
   prismaSchema: string,
   prismaQueries: any
 ) {
-  throw "Not implemented";
+  const napi = await initQe(adapter, prismaSchema, "Napi");
+  napi.connect("");
+  const wasm = await initQe(adapter, prismaSchema, "Wasm");
+  wasm.connect("");
+
+  try {
+    for (const prismaQuery of prismaQueries) {
+      const { description, query } = prismaQuery;
+
+      group(description, () => {
+        bench("Node API", () =>
+          napi.query(JSON.stringify(query), "", undefined)
+        );
+        bench("Web Assembly", () =>
+          wasm.query(JSON.stringify(query), "", undefined)
+        );
+      });
+    }
+
+    await run({
+      colors: true,
+      collect: true,
+    });
+  } finally {
+    napi.disconnect("");
+    wasm.disconnect("");
+  }
 }
 
 // conditional debug logging based on LOG_LEVEL env var
@@ -85,16 +111,14 @@ async function pgAdapter(url: string): Promise<DriverAdapter> {
 
 async function initQe(
   adapter: DriverAdapter,
-  prismaSchema: string
+  prismaSchema: string,
+  engineType: "Wasm" | "Napi" = "Napi"
 ): Promise<qe.QueryEngine> {
-  const engineType =
-    process.env.EXTERNAL_TEST_EXECUTOR === "Wasm" ? "Wasm" : "Napi";
-
   return await qe.initQueryEngine(
     engineType,
     adapter,
     prismaSchema,
-    console.log,
+    (...args) => {},
     debug
   );
 }

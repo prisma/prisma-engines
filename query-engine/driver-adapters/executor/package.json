@@ -29,6 +29,7 @@
     "@prisma/adapter-planetscale": "workspace:*",
     "@prisma/driver-adapter-utils": "workspace:*",
     "@types/pg": "8.10.9",
+    "mitata": "^0.1.6",
     "pg": "8.11.3",
     "undici": "6.0.1",
     "ws": "8.14.2"
