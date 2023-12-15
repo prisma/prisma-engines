@@ -3500,6 +3500,7 @@ version = "0.1.0"
 dependencies = [
  "bigdecimal",
  "chrono",
+ "convert_case 0.6.0",
  "diagnostics",
  "enumflags2",
  "indoc 2.0.3",

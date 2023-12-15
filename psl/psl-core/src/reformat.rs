@@ -1,4 +1,5 @@
 use crate::ParserDatabase;
+use convert_case::{Case, Casing};
 use parser_database::{ast::WithSpan, walkers};
 use schema_ast::{ast, SourceFile};
 use std::{borrow::Cow, sync::Arc};
@@ -174,7 +175,7 @@ fn push_missing_relation_fields(inline: walkers::InlineRelationWalker<'_>, ctx: 
     }
 
     if inline.forward_relation_field().is_none() {
-        let field_name = inline.referenced_model().name();
+        let field_name = &inline.referenced_model().name().to_case(Case::Camel);
         let field_type = field_name;
         let arity = render_arity(forward_relation_field_arity(inline));
         let fields_arg = fields_argument(inline);
@@ -201,7 +202,7 @@ fn push_missing_scalar_fields(inline: walkers::InlineRelationWalker<'_>, ctx: &m
     });
 
     for field in missing_scalar_fields {
-        let field_name = &field.name;
+        let field_name = field.name.to_case(Case::Camel);
         let field_type = if let Some(ft) = field.tpe.as_builtin_scalar() {
             ft.as_str()
         } else {
