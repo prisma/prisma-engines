@@ -76,7 +76,21 @@ mod arch {
         Ok(object.get(name.into())?.into())
     }
 
-    pub(crate) fn has_named_property(object: &super::wasm::JsObjectExtern, name: &str) -> JsResult<bool> {
+    pub(crate) fn get_optional_named_property<T>(
+        object: &super::wasm::JsObjectExtern,
+        name: &str,
+    ) -> JsResult<Option<T>>
+    where
+        T: From<wasm_bindgen::JsValue>,
+    {
+        if has_named_property(object, name)? {
+            Ok(Some(get_named_property(object, name)?))
+        } else {
+            Ok(None)
+        }
+    }
+
+    fn has_named_property(object: &super::wasm::JsObjectExtern, name: &str) -> JsResult<bool> {
         js_sys::Reflect::has(object, &JsString::from_str(name).unwrap().into())
     }
 
@@ -105,7 +119,18 @@ mod arch {
         object.get_named_property(name)
     }
 
-    pub(crate) fn has_named_property(object: &::napi::JsObject, name: &str) -> JsResult<bool> {
+    pub(crate) fn get_optional_named_property<T>(object: &::napi::JsObject, name: &str) -> JsResult<Option<T>>
+    where
+        T: ::napi::bindgen_prelude::FromNapiValue,
+    {
+        if has_named_property(object, name)? {
+            Ok(Some(get_named_property(object, name)?))
+        } else {
+            Ok(None)
+        }
+    }
+
+    fn has_named_property(object: &::napi::JsObject, name: &str) -> JsResult<bool> {
         object.has_named_property(name)
     }
 

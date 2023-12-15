@@ -201,7 +201,7 @@ impl TestApi {
             ConnectionInfo::Mysql(_) => SqlSchemaConnector::new_mysql(),
             ConnectionInfo::Mssql(_) => SqlSchemaConnector::new_mssql(),
             ConnectionInfo::Sqlite { .. } => SqlSchemaConnector::new_sqlite(),
-            ConnectionInfo::InMemorySqlite { .. } => unreachable!(),
+            ConnectionInfo::InMemorySqlite { .. } | ConnectionInfo::External(_) => unreachable!(),
         };
         connector.set_params(params).unwrap();
 

@@ -1,5 +1,4 @@
 use super::connection::SqlConnection;
-use crate::FromSource;
 use async_trait::async_trait;
 use connector_interface::{
     self as connector,
@@ -8,7 +7,7 @@ use connector_interface::{
 };
 use once_cell::sync::Lazy;
 use quaint::{
-    connector::{IsolationLevel, Transaction},
+    connector::{ExternalConnector, IsolationLevel, Transaction},
     prelude::{Queryable as QuaintQueryable, *},
 };
 use std::sync::{Arc, Mutex};
@@ -30,7 +29,7 @@ fn active_driver_adapter(provider: &str) -> connector::Result<DriverAdapter> {
         ))))
 }
 
-pub fn activate_driver_adapter(connector: Arc<dyn TransactionCapable>) {
+pub fn activate_driver_adapter(connector: Arc<dyn ExternalConnector>) {
     let mut lock = ACTIVE_DRIVER_ADAPTER.lock().unwrap();
 
     *lock = Some(DriverAdapter { connector });
@@ -42,29 +41,21 @@ pub struct Js {
     features: psl::PreviewFeatures,
 }
 
-fn get_connection_info(url: &str) -> connector::Result<ConnectionInfo> {
-    ConnectionInfo::from_url(url).map_err(|err| {
-        ConnectorError::from_kind(ErrorKind::InvalidDatabaseUrl {
-            details: err.to_string(),
-            url: url.to_string(),
-        })
-    })
-}
-
-#[async_trait]
-impl FromSource for Js {
-    async fn from_source(
-        source: &psl::Datasource,
-        url: &str,
-        features: psl::PreviewFeatures,
-    ) -> connector_interface::Result<Js> {
+impl Js {
+    pub async fn new(source: &psl::Datasource, features: psl::PreviewFeatures) -> connector_interface::Result<Self> {
         let connector = active_driver_adapter(source.active_provider)?;
-        let connection_info = get_connection_info(url)?;
+
+        let external_conn_info = connector.get_connection_info().await.map_err(|e| match e.kind() {
+            &quaint::error::ErrorKind::ExternalError(id) => ConnectorError::from_kind(ErrorKind::ExternalError(id)),
+            _ => ConnectorError::from_kind(ErrorKind::InvalidDriverAdapter(
+                "Error while calling getConnectionInfo()".into(),
+            )),
+        })?;
 
         Ok(Js {
             connector,
-            connection_info,
             features,
+            connection_info: ConnectionInfo::External(external_conn_info),
         })
     }
 }
@@ -105,7 +96,14 @@ impl Connector for Js {
 /// in this object, and implementing TransactionCapable (and quaint::Queryable) explicitly for it.
 #[derive(Clone)]
 pub struct DriverAdapter {
-    connector: Arc<dyn TransactionCapable>,
+    connector: Arc<dyn ExternalConnector>,
+}
+
+#[async_trait]
+impl ExternalConnector for DriverAdapter {
+    async fn get_connection_info(&self) -> quaint::Result<ExternalConnectionInfo> {
+        self.connector.get_connection_info().await
+    }
 }
 
 #[async_trait]

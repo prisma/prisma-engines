@@ -1,3 +1,5 @@
+#![allow(unused_imports)]
+
 use crate::error::ApiError;
 use query_core::{protocol::EngineProtocol, schema::QuerySchema, QueryExecutor};
 use serde::Deserialize;
@@ -40,9 +42,12 @@ impl Inner {
 /// Everything needed to connect to the database and have the core running.
 pub struct EngineBuilder {
     pub schema: Arc<psl::ValidatedSchema>,
-    pub config_dir: PathBuf,
-    pub env: HashMap<String, String>,
     pub engine_protocol: EngineProtocol,
+
+    #[cfg(not(target_arch = "wasm32"))]
+    pub config_dir: PathBuf,
+    #[cfg(not(target_arch = "wasm32"))]
+    pub env: HashMap<String, String>,
 }
 
 /// Internal structure for querying and reconnecting with the engine.
@@ -50,10 +55,12 @@ pub struct ConnectedEngine {
     pub schema: Arc<psl::ValidatedSchema>,
     pub query_schema: Arc<QuerySchema>,
     pub executor: crate::Executor,
-    pub config_dir: PathBuf,
-    pub env: HashMap<String, String>,
     pub engine_protocol: EngineProtocol,
 
+    #[cfg(not(target_arch = "wasm32"))]
+    pub config_dir: PathBuf,
+    #[cfg(not(target_arch = "wasm32"))]
+    pub env: HashMap<String, String>,
     #[cfg(not(target_arch = "wasm32"))]
     pub metrics: Option<query_engine_metrics::MetricRegistry>,
 }
@@ -85,14 +92,22 @@ pub struct ConstructorOptions {
     #[serde(default)]
     pub log_queries: bool,
     #[serde(default)]
+    pub engine_protocol: Option<EngineProtocol>,
+
+    #[cfg(not(target_arch = "wasm32"))]
+    #[serde(default)]
     pub datasource_overrides: BTreeMap<String, String>,
+
+    #[cfg(not(target_arch = "wasm32"))]
     #[serde(default)]
     pub env: serde_json::Value,
+
+    #[cfg(not(target_arch = "wasm32"))]
     pub config_dir: PathBuf,
+
+    #[cfg(not(target_arch = "wasm32"))]
     #[serde(default)]
     pub ignore_env_var_errors: bool,
-    #[serde(default)]
-    pub engine_protocol: Option<EngineProtocol>,
 }
 
 pub fn map_known_error(err: query_core::CoreError) -> crate::Result<String> {

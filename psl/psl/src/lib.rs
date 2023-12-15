@@ -49,3 +49,8 @@ pub fn parse_schema(file: impl Into<SourceFile>) -> Result<ValidatedSchema, Stri
 pub fn validate(file: SourceFile) -> ValidatedSchema {
     psl_core::validate(file, builtin_connectors::BUILTIN_CONNECTORS)
 }
+
+/// Parse a Prisma schema, but skip validations.
+pub fn parse_without_validation(file: SourceFile) -> ValidatedSchema {
+    psl_core::parse_without_validation(file, builtin_connectors::BUILTIN_CONNECTORS)
+}

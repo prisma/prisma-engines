@@ -12,7 +12,7 @@ use query_engine_common::engine::{
     map_known_error, stringify_env_values, ConnectedEngine, ConstructorOptions, EngineBuilder, Inner,
 };
 use query_engine_metrics::MetricFormat;
-use request_handlers::{dmmf, load_executor, render_graphql_schema, ConnectorMode, RequestBody, RequestHandler};
+use request_handlers::{dmmf, load_executor, render_graphql_schema, ConnectorKind, RequestBody, RequestHandler};
 use serde::{Deserialize, Serialize};
 use serde_json::json;
 use std::{collections::HashMap, future::Future, panic::AssertUnwindSafe, sync::Arc};
@@ -20,6 +20,11 @@ use tokio::sync::RwLock;
 use tracing::{field, instrument::WithSubscriber, Instrument, Span};
 use tracing_subscriber::filter::LevelFilter;
 use user_facing_errors::Error;
+
+enum ConnectorMode {
+    Rust,
+    Js,
+}
 
 /// The main query engine used by JS
 #[napi]
@@ -187,18 +192,6 @@ impl QueryEngine {
             let arced_schema = Arc::clone(&builder.schema);
             let arced_schema_2 = Arc::clone(&builder.schema);
 
-            let url = {
-                let data_source = builder
-                    .schema
-                    .configuration
-                    .datasources
-                    .first()
-                    .ok_or_else(|| ApiError::configuration("No valid data source found"))?;
-                data_source
-                    .load_url_with_config_dir(&builder.config_dir, |key| builder.env.get(key).map(ToString::to_string))
-                    .map_err(|err| crate::error::ApiError::Conversion(err, builder.schema.db.source().to_owned()))?
-            };
-
             let engine = async move {
                 // We only support one data source & generator at the moment, so take the first one (default not exposed yet).
                 let data_source = arced_schema
@@ -210,7 +203,20 @@ impl QueryEngine {
                 let preview_features = arced_schema.configuration.preview_features();
 
                 let executor_fut = async {
-                    let executor = load_executor(self.connector_mode, data_source, preview_features, &url).await?;
+                    let connector_kind = match self.connector_mode {
+                        ConnectorMode::Rust => {
+                            let url = data_source
+                                .load_url_with_config_dir(&builder.config_dir, |key| {
+                                    builder.env.get(key).map(ToString::to_string)
+                                })
+                                .map_err(|err| {
+                                    crate::error::ApiError::Conversion(err, builder.schema.db.source().to_owned())
+                                })?;
+                            ConnectorKind::Rust { url }
+                        }
+                        ConnectorMode::Js => ConnectorKind::Js,
+                    };
+                    let executor = load_executor(connector_kind, data_source, preview_features).await?;
                     let connector = executor.primary_connector();
 
                     let conn_span = tracing::info_span!(

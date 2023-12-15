@@ -22,7 +22,7 @@
   "sideEffects": false,
   "license": "Apache-2.0",
   "dependencies": {
-    "@libsql/client": "0.3.5",
+    "@libsql/client": "0.3.6",
     "@neondatabase/serverless": "0.6.0",
     "@planetscale/database": "1.11.0",
     "@prisma/adapter-libsql": "workspace:*",
@@ -30,14 +30,14 @@
     "@prisma/adapter-pg": "workspace:*",
     "@prisma/adapter-planetscale": "workspace:*",
     "@prisma/driver-adapter-utils": "workspace:*",
-    "@types/pg": "8.10.2",
+    "@types/pg": "8.10.9",
     "pg": "8.11.3",
-    "undici": "5.26.5",
+    "undici": "6.0.1",
     "ws": "8.14.2"
   },
   "devDependencies": {
-    "@types/node": "20.5.1",
+    "@types/node": "20.10.4",
     "tsup": "7.2.0",
-    "typescript": "5.2.2"
+    "typescript": "5.3.3"
   }
 }

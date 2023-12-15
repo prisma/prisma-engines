@@ -11,7 +11,7 @@ quaint = { path = "../../quaint" }
 psl.workspace = true
 dmmf_crate = { path = "../dmmf", package = "dmmf" }
 itertools = "0.10"
-graphql-parser = { git = "https://github.com/prisma/graphql-parser" }
+graphql-parser = { git = "https://github.com/prisma/graphql-parser", optional = true }
 serde.workspace = true
 serde_json.workspace = true
 futures = "0.3"
@@ -42,7 +42,7 @@ native = [
     "quaint/native",
     "query-core/metrics",
 ]
-graphql-protocol = ["query-core/graphql-protocol"]
+graphql-protocol = ["query-core/graphql-protocol", "dep:graphql-parser"]
 
 [[bench]]
 name = "query_planning_bench"
