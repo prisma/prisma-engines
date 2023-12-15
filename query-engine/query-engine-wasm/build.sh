@@ -25,10 +25,10 @@ echo "Using build profile: \"${WASM_BUILD_PROFILE}\""
 if ! command -v wasm-pack &> /dev/null
 then
     echo "wasm-pack could not be found, installing now..."
-    # Install wasm-pack
     curl https://rustwasm.github.io/wasm-pack/installer/init.sh -sSf | sh
 fi
 
+echo "Building query-engine-wasm using $WASM_BUILD_PROFILE profile"
 wasm-pack build "--$WASM_BUILD_PROFILE" --target $OUT_TARGET --out-name query_engine
 
 WASM_OPT_ARGS=(

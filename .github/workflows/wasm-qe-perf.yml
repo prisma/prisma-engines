@@ -70,5 +70,5 @@ jobs:
             ${{ steps.bench.outputs.stdout }}
             ```
 
-            After changes in [${{ github.sha }}](https://github.com/prisma/${{ github.repository }}/commit/${{ github.event.pull_request.head.sha }})
+            After changes in ${{ github.event.pull_request.head.sha }}
           edit-mode: replace
