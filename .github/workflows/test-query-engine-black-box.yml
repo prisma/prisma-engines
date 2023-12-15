@@ -25,10 +25,12 @@ jobs:
       fail-fast: false
       matrix:
         database:
-          - name: 'postgres15'
+          - name: 'postgres16'
             single_threaded: false
             connector: 'postgres'
-            version: '15'
+            # Arbitrary PostgreSQL version
+            # we opted for the most recent one, there is no need to have a matrix
+            version: '16'
 
     env:
       LOG_LEVEL: 'info'

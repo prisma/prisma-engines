@@ -175,6 +175,11 @@ impl TestApi {
         self.root.is_postgres_15()
     }
 
+    /// Returns true only when testing on postgres version 16.
+    pub fn is_postgres_16(&self) -> bool {
+        self.root.is_postgres_16()
+    }
+
     /// Returns true only when testing on cockroach.
     pub fn is_cockroach(&self) -> bool {
         self.root.is_cockroach()
