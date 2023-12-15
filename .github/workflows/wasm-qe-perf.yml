@@ -3,7 +3,7 @@ on:
   pull_request:
     paths-ignore:
       - ".github/**"
-      - "!.github/workflows/wasm-perf.yml"
+      - "!.github/workflows/wasm-qe-perf.yml"
       - ".buildkite/**"
       - "*.md"
       - "LICENSE"
@@ -14,8 +14,6 @@ jobs:
   run-benchmarks:
     name: Run benchmarks
     runs-on: ubuntu-latest
-    outputs:
-      results: ${{ steps.bench.outputs.results }}
     steps:
       - name: Checkout PR branch
         uses: actions/checkout@v4
@@ -56,16 +54,10 @@ jobs:
 
       - name: Run benchmarks
         id: bench
-        run: |
-          echo "results=$(make run-bench)\n" >> $GITHUB_OUTPUT
+        uses: mathiasvr/command-output@v2.0.0
+        with:
+          run: make run-bench
 
-  report:
-    name: Report benchmarks
-    runs-on: ubuntu-latest
-    needs:
-      - run-benchmarks
-
-    steps:
       - name: Find past report comment
         uses: peter-evans/find-comment@v2
         id: findReportComment
@@ -80,9 +72,11 @@ jobs:
           issue-number: ${{ github.event.pull_request.number }}
           body: |
             <!-- qe-benchmarks -->
-            ### Query engine benchmark results
+            ### WASM engine perf 🏎
 
             ```sh
-            ${{ needs.run-benchmarks.outputs.results}}
+            ${{ steps.bench.outputs.stdout }}
             ```
+
+            After changes in [${{ github.sha }}](https://github.com/${{ github.repository }}/commit/${{ github.sha }})
           edit-mode: replace
