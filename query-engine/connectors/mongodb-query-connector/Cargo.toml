@@ -9,7 +9,7 @@ async-trait = "0.1"
 bigdecimal = "0.3"
 # bson = {version = "1.1.0", features = ["decimal128"]}
 futures = "0.3"
-itertools = "0.10"
+itertools.workspace = true
 mongodb = "2.8.0"
 bson = { version = "2.4.0", features = ["chrono-0_4", "uuid-1"] }
 rand = "0.7"

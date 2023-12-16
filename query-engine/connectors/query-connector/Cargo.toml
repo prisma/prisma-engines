@@ -8,7 +8,7 @@ anyhow = "1.0"
 async-trait = "0.1.31"
 chrono = {version = "0.4", features = ["serde"]}
 futures = "0.3"
-itertools = "0.10"
+itertools.workspace = true
 query-structure = {path = "../../query-structure"}
 prisma-value = {path = "../../../libs/prisma-value"}
 serde.workspace = true
