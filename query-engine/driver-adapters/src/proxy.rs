@@ -2,8 +2,8 @@ use crate::send_future::UnsafeFuture;
 use crate::types::JsConnectionInfo;
 pub use crate::types::{ColumnType, JSResultSet, Query, TransactionOptions};
 use crate::{
-    from_js_value, get_named_property, get_optional_named_property, to_rust_str, AdapterMethod, JsObject, JsResult,
-    JsString, JsTransaction,
+    from_js_value, get_named_property, get_optional_named_property, to_rust_str, AdapterMethod, AdapterMethodNoArgs,
+    JsObject, JsResult, JsString, JsTransaction,
 };
 
 use futures::Future;
@@ -45,10 +45,10 @@ pub(crate) struct TransactionProxy {
     options: TransactionOptions,
 
     /// commit transaction
-    commit: AdapterMethod<(), ()>,
+    commit: AdapterMethodNoArgs,
 
     /// rollback transaction
-    rollback: AdapterMethod<(), ()>,
+    rollback: AdapterMethodNoArgs,
 
     /// whether the transaction has already been committed or rolled back
     closed: AtomicBool,
@@ -66,11 +66,11 @@ impl CommonProxy {
     }
 
     pub async fn query_raw(&self, params: Query) -> quaint::Result<JSResultSet> {
-        self.query_raw.call_as_async(params).await
+        self.query_raw.call1_as_async(params).await
     }
 
     pub async fn execute_raw(&self, params: Query) -> quaint::Result<u32> {
-        self.execute_raw.call_as_async(params).await
+        self.execute_raw.call1_as_async(params).await
     }
 }
 
@@ -85,7 +85,7 @@ impl DriverProxy {
     pub async fn get_connection_info(&self) -> quaint::Result<JsConnectionInfo> {
         UnsafeFuture(async move {
             if let Some(fn_) = &self.get_connection_info {
-                fn_.call_as_sync(()).await
+                fn_.call1_as_sync(()).await
             } else {
                 Ok(JsConnectionInfo::default())
             }
@@ -94,7 +94,7 @@ impl DriverProxy {
     }
 
     async fn start_transaction_inner(&self) -> quaint::Result<Box<JsTransaction>> {
-        let tx = self.start_transaction.call_as_async(()).await?;
+        let tx = self.start_transaction.call1_as_async(()).await?;
 
         // Decrement for this gauge is done in JsTransaction::commit/JsTransaction::rollback
         // Previously, it was done in JsTransaction::new, similar to the native Transaction.
@@ -145,7 +145,7 @@ impl TransactionProxy {
     ///   waiting on the JavaScript call to complete and deliver response.
     pub fn commit(&self) -> UnsafeFuture<impl Future<Output = quaint::Result<()>> + '_> {
         self.closed.store(true, Ordering::Relaxed);
-        UnsafeFuture(self.commit.call_as_async(()))
+        UnsafeFuture(self.commit.call0_as_async())
     }
 
     /// Rolls back the transaction via the driver adapter.
@@ -165,7 +165,7 @@ impl TransactionProxy {
     ///   on the JavaScript call to complete and deliver response.
     pub fn rollback(&self) -> UnsafeFuture<impl Future<Output = quaint::Result<()>> + '_> {
         self.closed.store(true, Ordering::Relaxed);
-        UnsafeFuture(self.rollback.call_as_async(()))
+        UnsafeFuture(self.rollback.call0_as_async())
     }
 }
 
@@ -175,7 +175,7 @@ impl Drop for TransactionProxy {
             return;
         }
 
-        self.rollback.call_non_blocking(());
+        self.rollback.call0_non_blocking();
     }
 }
 

@@ -5,4 +5,4 @@ mod conversion;
 mod error;
 pub(crate) mod result;
 
-pub(crate) use adapter_method::AdapterMethod;
+pub(crate) use adapter_method::{AdapterMethod, AdapterMethodNoArgs};

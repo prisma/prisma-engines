@@ -29,7 +29,7 @@ then
     curl https://rustwasm.github.io/wasm-pack/installer/init.sh -sSf | sh
 fi
 
-wasm-pack build "--$WASM_BUILD_PROFILE" --target $OUT_TARGET --out-name query_engine
+wasm-pack build "--$WASM_BUILD_PROFILE" --target $OUT_TARGET --reference-types --out-name query_engine
 
 WASM_OPT_ARGS=(
     "-Os"                                 # execute size-focused optimization passes
@@ -45,6 +45,7 @@ WASM_OPT_ARGS=(
     "--strip-dwarf"                       # removes DWARF debug information
     "--strip-producers"                   # removes the "producers" section
     "--strip-target-features"             # removes the "target_features" section
+    "--enable-reference-types"            # enables reference types
 )
 
 case "$WASM_BUILD_PROFILE" in

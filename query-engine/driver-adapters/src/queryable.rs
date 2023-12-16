@@ -227,6 +227,8 @@ impl std::fmt::Debug for JsQueryable {
 
 #[async_trait]
 impl ExternalConnector for JsQueryable {
+    // Note: this function is async only because napi.rs doesn't provide a sync API to read
+    // the result of a threadsafe function call.
     async fn get_connection_info(&self) -> quaint::Result<ExternalConnectionInfo> {
         let conn_info = self.driver_proxy.get_connection_info().await?;
         Ok(conn_info.into_external_connection_info(&self.inner.provider))

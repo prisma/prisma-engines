@@ -17,6 +17,55 @@ use crate::AdapterResult;
 pub(crate) static SERIALIZER: Serializer = Serializer::new().serialize_missing_as_null(true);
 
 #[derive(Clone)]
+pub(crate) struct AdapterMethodNoArgs {
+    fn_: JsFunction,
+}
+
+impl From<JsValue> for AdapterMethodNoArgs {
+    fn from(js_value: JsValue) -> Self {
+        JsFunction::from(js_value).into()
+    }
+}
+
+impl From<JsFunction> for AdapterMethodNoArgs {
+    fn from(js_fn: JsFunction) -> Self {
+        Self { fn_: js_fn }
+    }
+}
+
+impl AdapterMethodNoArgs {
+    pub(crate) async fn call0_as_async(&self) -> quaint::Result<()> {
+        let future = self
+            .fn_
+            .call0(&JsValue::null())
+            .and_then(|v| v.dyn_into::<JsPromise>())
+            .map(JsFuture::from)
+            .map_err(into_quaint_error)?;
+
+        let _ = future.await;
+        Ok(())
+    }
+
+    pub(crate) fn call0_non_blocking(&self) {
+        _ = self.fn_.call0(&JsValue::null());
+    }
+}
+
+impl WasmDescribe for AdapterMethodNoArgs {
+    fn describe() {
+        JsFunction::describe();
+    }
+}
+
+impl FromWasmAbi for AdapterMethodNoArgs {
+    type Abi = <JsFunction as FromWasmAbi>::Abi;
+
+    unsafe fn from_abi(js: Self::Abi) -> Self {
+        JsFunction::from_abi(js).into()
+    }
+}
+
+#[derive(Clone)]
 pub(crate) struct AdapterMethod<ArgType, ReturnType>
 where
     ArgType: Serialize,
@@ -57,10 +106,9 @@ where
     T: Serialize,
     R: FromJsValue,
 {
-    pub(crate) async fn call_as_async(&self, arg1: T) -> quaint::Result<R> {
+    pub(crate) async fn call1_as_async(&self, arg1: T) -> quaint::Result<R> {
         let future = self
             .call_internal(arg1)
-            .await
             .and_then(|v| v.dyn_into::<JsPromise>())
             .map(JsFuture::from)
             .map_err(into_quaint_error)?;
@@ -69,8 +117,8 @@ where
         Self::js_result_into_quaint_result(return_value)
     }
 
-    pub(crate) async fn call_as_sync(&self, arg1: T) -> quaint::Result<R> {
-        let return_value = self.call_internal(arg1).await.map_err(into_quaint_error)?;
+    pub(crate) async fn call1_as_sync(&self, arg1: T) -> quaint::Result<R> {
+        let return_value = self.call_internal(arg1).map_err(into_quaint_error)?;
 
         Self::js_result_into_quaint_result(return_value)
     }
@@ -81,17 +129,11 @@ where
             .into()
     }
 
-    async fn call_internal(&self, arg1: T) -> Result<JsValue, JsValue> {
+    fn call_internal(&self, arg1: T) -> Result<JsValue, JsValue> {
         let arg1 = arg1
             .serialize(&SERIALIZER)
             .map_err(|err| JsValue::from(JsError::from(&err)))?;
         self.fn_.call1(&JsValue::null(), &arg1)
-    }
-
-    pub(crate) fn call_non_blocking(&self, arg: T) {
-        if let Ok(arg) = serde_wasm_bindgen::to_value(&arg) {
-            _ = self.fn_.call1(&JsValue::null(), &arg);
-        }
     }
 }
 
