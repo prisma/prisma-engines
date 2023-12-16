@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/nix/store/a04z6lnlzhx5ri6nlgjig0ir12hyiw0n-vendor-cargo-deps/c19b7c6f923b580ac259164a89f2577984ad5ab09ee9d583b888f934adbbe8d0/itertools-0.10.5/src/groupbylazy.rs`."><title>groupbylazy.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-fa3bb1812debf86c.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="itertools" data-themes="" data-resource-suffix="" data-rustdoc-version="1.74.1 (a28077b28 2023-12-04)" data-channel="1.74.1" data-search-js="search-8be46b629f5f14a8.js" data-settings-js="settings-74424d7eec62a23e.js" ><script src="../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-c5bd66d33317d69f.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../itertools/index.html"><img class="rust-logo" src="../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/nix/store/c4453a3v03igkgaaki07gs4c4w6xz5ri-vendor-cargo-deps/c19b7c6f923b580ac259164a89f2577984ad5ab09ee9d583b888f934adbbe8d0/itertools-0.12.0/src/groupbylazy.rs`."><title>groupbylazy.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-fa3bb1812debf86c.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="itertools" data-themes="" data-resource-suffix="" data-rustdoc-version="1.74.1 (a28077b28 2023-12-04)" data-channel="1.74.1" data-search-js="search-8be46b629f5f14a8.js" data-settings-js="settings-74424d7eec62a23e.js" ><script src="../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-c5bd66d33317d69f.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../itertools/index.html"><img class="rust-logo" src="../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -569,8 +569,41 @@
 <a href="#569" id="569">569</a>
 <a href="#570" id="570">570</a>
 <a href="#571" id="571">571</a>
-</pre></div><pre class="rust"><code><span class="kw">use </span>std::cell::{Cell, RefCell};
-<span class="kw">use </span>alloc::vec::{<span class="self">self</span>, Vec};
+<a href="#572" id="572">572</a>
+<a href="#573" id="573">573</a>
+<a href="#574" id="574">574</a>
+<a href="#575" id="575">575</a>
+<a href="#576" id="576">576</a>
+<a href="#577" id="577">577</a>
+<a href="#578" id="578">578</a>
+<a href="#579" id="579">579</a>
+<a href="#580" id="580">580</a>
+<a href="#581" id="581">581</a>
+<a href="#582" id="582">582</a>
+<a href="#583" id="583">583</a>
+<a href="#584" id="584">584</a>
+<a href="#585" id="585">585</a>
+<a href="#586" id="586">586</a>
+<a href="#587" id="587">587</a>
+<a href="#588" id="588">588</a>
+<a href="#589" id="589">589</a>
+<a href="#590" id="590">590</a>
+<a href="#591" id="591">591</a>
+<a href="#592" id="592">592</a>
+<a href="#593" id="593">593</a>
+<a href="#594" id="594">594</a>
+<a href="#595" id="595">595</a>
+<a href="#596" id="596">596</a>
+<a href="#597" id="597">597</a>
+<a href="#598" id="598">598</a>
+<a href="#599" id="599">599</a>
+<a href="#600" id="600">600</a>
+<a href="#601" id="601">601</a>
+<a href="#602" id="602">602</a>
+<a href="#603" id="603">603</a>
+<a href="#604" id="604">604</a>
+</pre></div><pre class="rust"><code><span class="kw">use </span>alloc::vec::{<span class="self">self</span>, Vec};
+<span class="kw">use </span>std::cell::{Cell, RefCell};
 
 <span class="doccomment">/// A trait to unify `FnMut` for `GroupBy` with the chunk key in `IntoChunks`
 </span><span class="kw">trait </span>KeyFunction&lt;A&gt; {
@@ -579,7 +612,8 @@
 }
 
 <span class="kw">impl</span>&lt;A, K, F: <span class="question-mark">?</span>Sized&gt; KeyFunction&lt;A&gt; <span class="kw">for </span>F
-    <span class="kw">where </span>F: FnMut(A) -&gt; K
+<span class="kw">where
+    </span>F: FnMut(A) -&gt; K,
 {
     <span class="kw">type </span>Key = K;
     <span class="attr">#[inline]
@@ -588,9 +622,8 @@
     }
 }
 
-
 <span class="doccomment">/// `ChunkIndex` acts like the grouping key function for `IntoChunks`
-</span><span class="attr">#[derive(Debug)]
+</span><span class="attr">#[derive(Debug, Clone)]
 </span><span class="kw">struct </span>ChunkIndex {
     size: usize,
     index: usize,
@@ -621,9 +654,10 @@
     }
 }
 
-
-<span class="kw">struct </span>GroupInner&lt;K, I, F&gt;
-    <span class="kw">where </span>I: Iterator
+<span class="attr">#[derive(Clone)]
+</span><span class="kw">struct </span>GroupInner&lt;K, I, F&gt;
+<span class="kw">where
+    </span>I: Iterator,
 {
     key: F,
     iter: I,
@@ -646,9 +680,10 @@
 }
 
 <span class="kw">impl</span>&lt;K, I, F&gt; GroupInner&lt;K, I, F&gt;
-    <span class="kw">where </span>I: Iterator,
-          F: <span class="kw">for</span>&lt;<span class="lifetime">&#39;a</span>&gt; KeyFunction&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>I::Item, Key=K&gt;,
-          K: PartialEq,
+<span class="kw">where
+    </span>I: Iterator,
+    F: <span class="kw">for</span>&lt;<span class="lifetime">&#39;a</span>&gt; KeyFunction&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>I::Item, Key = K&gt;,
+    K: PartialEq,
 {
     <span class="doccomment">/// `client`: Index of group that requests next element
     </span><span class="attr">#[inline(always)]
@@ -661,9 +696,8 @@
         */
         </span><span class="kw">if </span>client &lt; <span class="self">self</span>.oldest_buffered_group {
             <span class="prelude-val">None
-        </span>} <span class="kw">else if </span>client &lt; <span class="self">self</span>.top_group ||
-            (client == <span class="self">self</span>.top_group &amp;&amp;
-             <span class="self">self</span>.buffer.len() &gt; <span class="self">self</span>.top_group - <span class="self">self</span>.bottom_group)
+        </span>} <span class="kw">else if </span>client &lt; <span class="self">self</span>.top_group
+            || (client == <span class="self">self</span>.top_group &amp;&amp; <span class="self">self</span>.buffer.len() &gt; <span class="self">self</span>.top_group - <span class="self">self</span>.bottom_group)
         {
             <span class="self">self</span>.lookup_buffer(client)
         } <span class="kw">else if </span><span class="self">self</span>.done {
@@ -689,8 +723,10 @@
             // `bottom_group..oldest_buffered_group` is unused, and if it&#39;s large enough, erase it.
             </span><span class="self">self</span>.oldest_buffered_group += <span class="number">1</span>;
             <span class="comment">// skip forward further empty queues too
-            </span><span class="kw">while </span><span class="self">self</span>.buffer.get(<span class="self">self</span>.oldest_buffered_group - <span class="self">self</span>.bottom_group)
-                             .map_or(<span class="bool-val">false</span>, |buf| buf.len() == <span class="number">0</span>)
+            </span><span class="kw">while </span><span class="self">self
+                </span>.buffer
+                .get(<span class="self">self</span>.oldest_buffered_group - <span class="self">self</span>.bottom_group)
+                .map_or(<span class="bool-val">false</span>, |buf| buf.len() == <span class="number">0</span>)
             {
                 <span class="self">self</span>.oldest_buffered_group += <span class="number">1</span>;
             }
@@ -715,11 +751,13 @@
     </span><span class="kw">fn </span>next_element(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;I::Item&gt; {
         <span class="macro">debug_assert!</span>(!<span class="self">self</span>.done);
         <span class="kw">match </span><span class="self">self</span>.iter.next() {
-            <span class="prelude-val">None </span>=&gt; { <span class="self">self</span>.done = <span class="bool-val">true</span>; <span class="prelude-val">None </span>}
+            <span class="prelude-val">None </span>=&gt; {
+                <span class="self">self</span>.done = <span class="bool-val">true</span>;
+                <span class="prelude-val">None
+            </span>}
             otherwise =&gt; otherwise,
         }
     }
-
 
     <span class="attr">#[inline(never)]
     </span><span class="kw">fn </span>step_buffering(<span class="kw-2">&amp;mut </span><span class="self">self</span>, client: usize) -&gt; <span class="prelude-ty">Option</span>&lt;I::Item&gt; {
@@ -742,11 +780,13 @@
             <span class="kw">let </span>key = <span class="self">self</span>.key.call_mut(<span class="kw-2">&amp;</span>elt);
             <span class="kw">match </span><span class="self">self</span>.current_key.take() {
                 <span class="prelude-val">None </span>=&gt; {}
-                <span class="prelude-val">Some</span>(old_key) =&gt; <span class="kw">if </span>old_key != key {
-                    <span class="self">self</span>.current_key = <span class="prelude-val">Some</span>(key);
-                    first_elt = <span class="prelude-val">Some</span>(elt);
-                    <span class="kw">break</span>;
-                },
+                <span class="prelude-val">Some</span>(old_key) =&gt; {
+                    <span class="kw">if </span>old_key != key {
+                        <span class="self">self</span>.current_key = <span class="prelude-val">Some</span>(key);
+                        first_elt = <span class="prelude-val">Some</span>(elt);
+                        <span class="kw">break</span>;
+                    }
+                }
             }
             <span class="self">self</span>.current_key = <span class="prelude-val">Some</span>(key);
             <span class="kw">if </span><span class="self">self</span>.top_group != <span class="self">self</span>.dropped_group {
@@ -791,12 +831,14 @@
                 <span class="kw">let </span>key = <span class="self">self</span>.key.call_mut(<span class="kw-2">&amp;</span>elt);
                 <span class="kw">match </span><span class="self">self</span>.current_key.take() {
                     <span class="prelude-val">None </span>=&gt; {}
-                    <span class="prelude-val">Some</span>(old_key) =&gt; <span class="kw">if </span>old_key != key {
-                        <span class="self">self</span>.current_key = <span class="prelude-val">Some</span>(key);
-                        <span class="self">self</span>.current_elt = <span class="prelude-val">Some</span>(elt);
-                        <span class="self">self</span>.top_group += <span class="number">1</span>;
-                        <span class="kw">return </span><span class="prelude-val">None</span>;
-                    },
+                    <span class="prelude-val">Some</span>(old_key) =&gt; {
+                        <span class="kw">if </span>old_key != key {
+                            <span class="self">self</span>.current_key = <span class="prelude-val">Some</span>(key);
+                            <span class="self">self</span>.current_elt = <span class="prelude-val">Some</span>(elt);
+                            <span class="self">self</span>.top_group += <span class="number">1</span>;
+                            <span class="kw">return </span><span class="prelude-val">None</span>;
+                        }
+                    }
                 }
                 <span class="self">self</span>.current_key = <span class="prelude-val">Some</span>(key);
                 <span class="prelude-val">Some</span>(elt)
@@ -832,7 +874,8 @@
 }
 
 <span class="kw">impl</span>&lt;K, I, F&gt; GroupInner&lt;K, I, F&gt;
-    <span class="kw">where </span>I: Iterator,
+<span class="kw">where
+    </span>I: Iterator,
 {
     <span class="doccomment">/// Called when a group is dropped
     </span><span class="kw">fn </span>drop_group(<span class="kw-2">&amp;mut </span><span class="self">self</span>, client: usize) {
@@ -858,7 +901,8 @@
 /// See [`.group_by()`](crate::Itertools::group_by) for more information.
 </span><span class="attr">#[must_use = <span class="string">&quot;iterator adaptors are lazy and do nothing unless consumed&quot;</span>]
 </span><span class="kw">pub struct </span>GroupBy&lt;K, I, F&gt;
-    <span class="kw">where </span>I: Iterator,
+<span class="kw">where
+    </span>I: Iterator,
 {
     inner: RefCell&lt;GroupInner&lt;K, I, F&gt;&gt;,
     <span class="comment">// the group iterator&#39;s current index. Keep this in the main value
@@ -868,8 +912,9 @@
 
 <span class="doccomment">/// Create a new
 </span><span class="kw">pub fn </span>new&lt;K, J, F&gt;(iter: J, f: F) -&gt; GroupBy&lt;K, J::IntoIter, F&gt;
-    <span class="kw">where </span>J: IntoIterator,
-          F: FnMut(<span class="kw-2">&amp;</span>J::Item) -&gt; K,
+<span class="kw">where
+    </span>J: IntoIterator,
+    F: FnMut(<span class="kw-2">&amp;</span>J::Item) -&gt; K,
 {
     GroupBy {
         inner: RefCell::new(GroupInner {
@@ -889,12 +934,14 @@
 }
 
 <span class="kw">impl</span>&lt;K, I, F&gt; GroupBy&lt;K, I, F&gt;
-    <span class="kw">where </span>I: Iterator,
+<span class="kw">where
+    </span>I: Iterator,
 {
     <span class="doccomment">/// `client`: Index of group that requests next element
     </span><span class="kw">fn </span>step(<span class="kw-2">&amp;</span><span class="self">self</span>, client: usize) -&gt; <span class="prelude-ty">Option</span>&lt;I::Item&gt;
-        <span class="kw">where </span>F: FnMut(<span class="kw-2">&amp;</span>I::Item) -&gt; K,
-              K: PartialEq,
+    <span class="kw">where
+        </span>F: FnMut(<span class="kw-2">&amp;</span>I::Item) -&gt; K,
+        K: PartialEq,
     {
         <span class="self">self</span>.inner.borrow_mut().step(client)
     }
@@ -906,10 +953,11 @@
 }
 
 <span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, K, I, F&gt; IntoIterator <span class="kw">for </span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>GroupBy&lt;K, I, F&gt;
-    <span class="kw">where </span>I: Iterator,
-          I::Item: <span class="lifetime">&#39;a</span>,
-          F: FnMut(<span class="kw-2">&amp;</span>I::Item) -&gt; K,
-          K: PartialEq
+<span class="kw">where
+    </span>I: Iterator,
+    I::Item: <span class="lifetime">&#39;a</span>,
+    F: FnMut(<span class="kw-2">&amp;</span>I::Item) -&gt; K,
+    K: PartialEq,
 {
     <span class="kw">type </span>Item = (K, Group&lt;<span class="lifetime">&#39;a</span>, K, I, F&gt;);
     <span class="kw">type </span>IntoIter = Groups&lt;<span class="lifetime">&#39;a</span>, K, I, F&gt;;
@@ -919,7 +967,6 @@
     }
 }
 
-
 <span class="doccomment">/// An iterator that yields the Group iterators.
 ///
 /// Iterator element type is `(K, Group)`:
@@ -928,17 +975,19 @@
 /// See [`.group_by()`](crate::Itertools::group_by) for more information.
 </span><span class="attr">#[must_use = <span class="string">&quot;iterator adaptors are lazy and do nothing unless consumed&quot;</span>]
 </span><span class="kw">pub struct </span>Groups&lt;<span class="lifetime">&#39;a</span>, K: <span class="lifetime">&#39;a</span>, I: <span class="lifetime">&#39;a</span>, F: <span class="lifetime">&#39;a</span>&gt;
-    <span class="kw">where </span>I: Iterator,
-          I::Item: <span class="lifetime">&#39;a
-</span>{
+<span class="kw">where
+    </span>I: Iterator,
+    I::Item: <span class="lifetime">&#39;a</span>,
+{
     parent: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>GroupBy&lt;K, I, F&gt;,
 }
 
 <span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, K, I, F&gt; Iterator <span class="kw">for </span>Groups&lt;<span class="lifetime">&#39;a</span>, K, I, F&gt;
-    <span class="kw">where </span>I: Iterator,
-          I::Item: <span class="lifetime">&#39;a</span>,
-          F: FnMut(<span class="kw-2">&amp;</span>I::Item) -&gt; K,
-          K: PartialEq
+<span class="kw">where
+    </span>I: Iterator,
+    I::Item: <span class="lifetime">&#39;a</span>,
+    F: FnMut(<span class="kw-2">&amp;</span>I::Item) -&gt; K,
+    K: PartialEq,
 {
     <span class="kw">type </span>Item = (K, Group&lt;<span class="lifetime">&#39;a</span>, K, I, F&gt;);
 
@@ -949,11 +998,14 @@
         <span class="kw">let </span>inner = <span class="kw-2">&amp;mut *</span><span class="self">self</span>.parent.inner.borrow_mut();
         inner.step(index).map(|elt| {
             <span class="kw">let </span>key = inner.group_key(index);
-            (key, Group {
-                parent: <span class="self">self</span>.parent,
-                index,
-                first: <span class="prelude-val">Some</span>(elt),
-            })
+            (
+                key,
+                Group {
+                    parent: <span class="self">self</span>.parent,
+                    index,
+                    first: <span class="prelude-val">Some</span>(elt),
+                },
+            )
         })
     }
 }
@@ -962,8 +1014,9 @@
 ///
 /// Iterator element type is `I::Item`.
 </span><span class="kw">pub struct </span>Group&lt;<span class="lifetime">&#39;a</span>, K: <span class="lifetime">&#39;a</span>, I: <span class="lifetime">&#39;a</span>, F: <span class="lifetime">&#39;a</span>&gt;
-    <span class="kw">where </span>I: Iterator,
-          I::Item: <span class="lifetime">&#39;a</span>,
+<span class="kw">where
+    </span>I: Iterator,
+    I::Item: <span class="lifetime">&#39;a</span>,
 {
     parent: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>GroupBy&lt;K, I, F&gt;,
     index: usize,
@@ -971,8 +1024,9 @@
 }
 
 <span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, K, I, F&gt; Drop <span class="kw">for </span>Group&lt;<span class="lifetime">&#39;a</span>, K, I, F&gt;
-    <span class="kw">where </span>I: Iterator,
-          I::Item: <span class="lifetime">&#39;a</span>,
+<span class="kw">where
+    </span>I: Iterator,
+    I::Item: <span class="lifetime">&#39;a</span>,
 {
     <span class="kw">fn </span>drop(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
         <span class="self">self</span>.parent.drop_group(<span class="self">self</span>.index);
@@ -980,10 +1034,11 @@
 }
 
 <span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, K, I, F&gt; Iterator <span class="kw">for </span>Group&lt;<span class="lifetime">&#39;a</span>, K, I, F&gt;
-    <span class="kw">where </span>I: Iterator,
-          I::Item: <span class="lifetime">&#39;a</span>,
-          F: FnMut(<span class="kw-2">&amp;</span>I::Item) -&gt; K,
-          K: PartialEq,
+<span class="kw">where
+    </span>I: Iterator,
+    I::Item: <span class="lifetime">&#39;a</span>,
+    F: FnMut(<span class="kw-2">&amp;</span>I::Item) -&gt; K,
+    K: PartialEq,
 {
     <span class="kw">type </span>Item = I::Item;
     <span class="attr">#[inline]
@@ -999,7 +1054,8 @@
 
 </span><span class="doccomment">/// Create a new
 </span><span class="kw">pub fn </span>new_chunks&lt;J&gt;(iter: J, size: usize) -&gt; IntoChunks&lt;J::IntoIter&gt;
-    <span class="kw">where </span>J: IntoIterator,
+<span class="kw">where
+    </span>J: IntoIterator,
 {
     IntoChunks {
         inner: RefCell::new(GroupInner {
@@ -1018,7 +1074,6 @@
     }
 }
 
-
 <span class="doccomment">/// `ChunkLazy` is the storage for a lazy chunking operation.
 ///
 /// `IntoChunks` behaves just like `GroupBy`: it is iterable, and
@@ -1034,7 +1089,8 @@
 /// See [`.chunks()`](crate::Itertools::chunks) for more information.
 </span><span class="attr">#[must_use = <span class="string">&quot;iterator adaptors are lazy and do nothing unless consumed&quot;</span>]
 </span><span class="kw">pub struct </span>IntoChunks&lt;I&gt;
-    <span class="kw">where </span>I: Iterator,
+<span class="kw">where
+    </span>I: Iterator,
 {
     inner: RefCell&lt;GroupInner&lt;usize, I, ChunkIndex&gt;&gt;,
     <span class="comment">// the chunk iterator&#39;s current index. Keep this in the main value
@@ -1042,9 +1098,17 @@
     </span>index: Cell&lt;usize&gt;,
 }
 
+<span class="kw">impl</span>&lt;I&gt; Clone <span class="kw">for </span>IntoChunks&lt;I&gt;
+<span class="kw">where
+    </span>I: Clone + Iterator,
+    I::Item: Clone,
+{
+    <span class="macro">clone_fields!</span>(inner, index);
+}
 
 <span class="kw">impl</span>&lt;I&gt; IntoChunks&lt;I&gt;
-    <span class="kw">where </span>I: Iterator,
+<span class="kw">where
+    </span>I: Iterator,
 {
     <span class="doccomment">/// `client`: Index of chunk that requests next element
     </span><span class="kw">fn </span>step(<span class="kw-2">&amp;</span><span class="self">self</span>, client: usize) -&gt; <span class="prelude-ty">Option</span>&lt;I::Item&gt; {
@@ -1058,19 +1122,17 @@
 }
 
 <span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, I&gt; IntoIterator <span class="kw">for </span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>IntoChunks&lt;I&gt;
-    <span class="kw">where </span>I: Iterator,
-          I::Item: <span class="lifetime">&#39;a</span>,
+<span class="kw">where
+    </span>I: Iterator,
+    I::Item: <span class="lifetime">&#39;a</span>,
 {
     <span class="kw">type </span>Item = Chunk&lt;<span class="lifetime">&#39;a</span>, I&gt;;
     <span class="kw">type </span>IntoIter = Chunks&lt;<span class="lifetime">&#39;a</span>, I&gt;;
 
     <span class="kw">fn </span>into_iter(<span class="self">self</span>) -&gt; <span class="self">Self</span>::IntoIter {
-        Chunks {
-            parent: <span class="self">self</span>,
-        }
+        Chunks { parent: <span class="self">self </span>}
     }
 }
-
 
 <span class="doccomment">/// An iterator that yields the Chunk iterators.
 ///
@@ -1078,16 +1140,19 @@
 ///
 /// See [`.chunks()`](crate::Itertools::chunks) for more information.
 </span><span class="attr">#[must_use = <span class="string">&quot;iterator adaptors are lazy and do nothing unless consumed&quot;</span>]
+#[derive(Clone)]
 </span><span class="kw">pub struct </span>Chunks&lt;<span class="lifetime">&#39;a</span>, I: <span class="lifetime">&#39;a</span>&gt;
-    <span class="kw">where </span>I: Iterator,
-          I::Item: <span class="lifetime">&#39;a</span>,
+<span class="kw">where
+    </span>I: Iterator,
+    I::Item: <span class="lifetime">&#39;a</span>,
 {
     parent: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>IntoChunks&lt;I&gt;,
 }
 
 <span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, I&gt; Iterator <span class="kw">for </span>Chunks&lt;<span class="lifetime">&#39;a</span>, I&gt;
-    <span class="kw">where </span>I: Iterator,
-          I::Item: <span class="lifetime">&#39;a</span>,
+<span class="kw">where
+    </span>I: Iterator,
+    I::Item: <span class="lifetime">&#39;a</span>,
 {
     <span class="kw">type </span>Item = Chunk&lt;<span class="lifetime">&#39;a</span>, I&gt;;
 
@@ -1096,12 +1161,10 @@
         <span class="kw">let </span>index = <span class="self">self</span>.parent.index.get();
         <span class="self">self</span>.parent.index.set(index + <span class="number">1</span>);
         <span class="kw">let </span>inner = <span class="kw-2">&amp;mut *</span><span class="self">self</span>.parent.inner.borrow_mut();
-        inner.step(index).map(|elt| {
-            Chunk {
-                parent: <span class="self">self</span>.parent,
-                index,
-                first: <span class="prelude-val">Some</span>(elt),
-            }
+        inner.step(index).map(|elt| Chunk {
+            parent: <span class="self">self</span>.parent,
+            index,
+            first: <span class="prelude-val">Some</span>(elt),
         })
     }
 }
@@ -1110,8 +1173,9 @@
 ///
 /// Iterator element type is `I::Item`.
 </span><span class="kw">pub struct </span>Chunk&lt;<span class="lifetime">&#39;a</span>, I: <span class="lifetime">&#39;a</span>&gt;
-    <span class="kw">where </span>I: Iterator,
-          I::Item: <span class="lifetime">&#39;a</span>,
+<span class="kw">where
+    </span>I: Iterator,
+    I::Item: <span class="lifetime">&#39;a</span>,
 {
     parent: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>IntoChunks&lt;I&gt;,
     index: usize,
@@ -1119,8 +1183,9 @@
 }
 
 <span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, I&gt; Drop <span class="kw">for </span>Chunk&lt;<span class="lifetime">&#39;a</span>, I&gt;
-    <span class="kw">where </span>I: Iterator,
-          I::Item: <span class="lifetime">&#39;a</span>,
+<span class="kw">where
+    </span>I: Iterator,
+    I::Item: <span class="lifetime">&#39;a</span>,
 {
     <span class="kw">fn </span>drop(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
         <span class="self">self</span>.parent.drop_group(<span class="self">self</span>.index);
@@ -1128,8 +1193,9 @@
 }
 
 <span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, I&gt; Iterator <span class="kw">for </span>Chunk&lt;<span class="lifetime">&#39;a</span>, I&gt;
-    <span class="kw">where </span>I: Iterator,
-          I::Item: <span class="lifetime">&#39;a</span>,
+<span class="kw">where
+    </span>I: Iterator,
+    I::Item: <span class="lifetime">&#39;a</span>,
 {
     <span class="kw">type </span>Item = I::Item;
     <span class="attr">#[inline]

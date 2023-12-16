@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/nix/store/a04z6lnlzhx5ri6nlgjig0ir12hyiw0n-vendor-cargo-deps/c19b7c6f923b580ac259164a89f2577984ad5ab09ee9d583b888f934adbbe8d0/itertools-0.10.5/src/adaptors/mod.rs`."><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-fa3bb1812debf86c.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="itertools" data-themes="" data-resource-suffix="" data-rustdoc-version="1.74.1 (a28077b28 2023-12-04)" data-channel="1.74.1" data-search-js="search-8be46b629f5f14a8.js" data-settings-js="settings-74424d7eec62a23e.js" ><script src="../../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-c5bd66d33317d69f.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../../itertools/index.html"><img class="rust-logo" src="../../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/nix/store/c4453a3v03igkgaaki07gs4c4w6xz5ri-vendor-cargo-deps/c19b7c6f923b580ac259164a89f2577984ad5ab09ee9d583b888f934adbbe8d0/itertools-0.12.0/src/adaptors/mod.rs`."><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-fa3bb1812debf86c.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="itertools" data-themes="" data-resource-suffix="" data-rustdoc-version="1.74.1 (a28077b28 2023-12-04)" data-channel="1.74.1" data-search-js="search-8be46b629f5f14a8.js" data-settings-js="settings-74424d7eec62a23e.js" ><script src="../../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-c5bd66d33317d69f.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../../itertools/index.html"><img class="rust-logo" src="../../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -1149,6 +1149,62 @@
 <a href="#1149" id="1149">1149</a>
 <a href="#1150" id="1150">1150</a>
 <a href="#1151" id="1151">1151</a>
+<a href="#1152" id="1152">1152</a>
+<a href="#1153" id="1153">1153</a>
+<a href="#1154" id="1154">1154</a>
+<a href="#1155" id="1155">1155</a>
+<a href="#1156" id="1156">1156</a>
+<a href="#1157" id="1157">1157</a>
+<a href="#1158" id="1158">1158</a>
+<a href="#1159" id="1159">1159</a>
+<a href="#1160" id="1160">1160</a>
+<a href="#1161" id="1161">1161</a>
+<a href="#1162" id="1162">1162</a>
+<a href="#1163" id="1163">1163</a>
+<a href="#1164" id="1164">1164</a>
+<a href="#1165" id="1165">1165</a>
+<a href="#1166" id="1166">1166</a>
+<a href="#1167" id="1167">1167</a>
+<a href="#1168" id="1168">1168</a>
+<a href="#1169" id="1169">1169</a>
+<a href="#1170" id="1170">1170</a>
+<a href="#1171" id="1171">1171</a>
+<a href="#1172" id="1172">1172</a>
+<a href="#1173" id="1173">1173</a>
+<a href="#1174" id="1174">1174</a>
+<a href="#1175" id="1175">1175</a>
+<a href="#1176" id="1176">1176</a>
+<a href="#1177" id="1177">1177</a>
+<a href="#1178" id="1178">1178</a>
+<a href="#1179" id="1179">1179</a>
+<a href="#1180" id="1180">1180</a>
+<a href="#1181" id="1181">1181</a>
+<a href="#1182" id="1182">1182</a>
+<a href="#1183" id="1183">1183</a>
+<a href="#1184" id="1184">1184</a>
+<a href="#1185" id="1185">1185</a>
+<a href="#1186" id="1186">1186</a>
+<a href="#1187" id="1187">1187</a>
+<a href="#1188" id="1188">1188</a>
+<a href="#1189" id="1189">1189</a>
+<a href="#1190" id="1190">1190</a>
+<a href="#1191" id="1191">1191</a>
+<a href="#1192" id="1192">1192</a>
+<a href="#1193" id="1193">1193</a>
+<a href="#1194" id="1194">1194</a>
+<a href="#1195" id="1195">1195</a>
+<a href="#1196" id="1196">1196</a>
+<a href="#1197" id="1197">1197</a>
+<a href="#1198" id="1198">1198</a>
+<a href="#1199" id="1199">1199</a>
+<a href="#1200" id="1200">1200</a>
+<a href="#1201" id="1201">1201</a>
+<a href="#1202" id="1202">1202</a>
+<a href="#1203" id="1203">1203</a>
+<a href="#1204" id="1204">1204</a>
+<a href="#1205" id="1205">1205</a>
+<a href="#1206" id="1206">1206</a>
+<a href="#1207" id="1207">1207</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Licensed under the Apache License, Version 2.0
 //! &lt;https://www.apache.org/licenses/LICENSE-2.0&gt; or the MIT license
 //! &lt;https://opensource.org/licenses/MIT&gt;, at your
@@ -1159,16 +1215,16 @@
 <span class="kw">mod </span>map;
 <span class="kw">mod </span>multi_product;
 <span class="kw">pub use </span><span class="self">self</span>::coalesce::<span class="kw-2">*</span>;
-<span class="kw">pub use </span><span class="self">self</span>::map::{map_into, map_ok, MapInto, MapOk};
 <span class="attr">#[allow(deprecated)]
 </span><span class="kw">pub use </span><span class="self">self</span>::map::MapResults;
+<span class="kw">pub use </span><span class="self">self</span>::map::{map_into, map_ok, MapInto, MapOk};
 <span class="attr">#[cfg(feature = <span class="string">&quot;use_alloc&quot;</span>)]
 </span><span class="kw">pub use </span><span class="self">self</span>::multi_product::<span class="kw-2">*</span>;
 
+<span class="kw">use </span><span class="kw">crate</span>::size_hint::{<span class="self">self</span>, SizeHint};
 <span class="kw">use </span>std::fmt;
-<span class="kw">use </span>std::iter::{Fuse, Peekable, FromIterator, FusedIterator};
+<span class="kw">use </span>std::iter::{FromIterator, Fuse, FusedIterator};
 <span class="kw">use </span>std::marker::PhantomData;
-<span class="kw">use </span><span class="kw">crate</span>::size_hint;
 
 <span class="doccomment">/// An iterator adaptor that alternates elements from two iterators until both
 /// run out.
@@ -1187,9 +1243,13 @@
 <span class="doccomment">/// Create an iterator that interleaves elements in `i` and `j`.
 ///
 /// [`IntoIterator`] enabled version of `[Itertools::interleave]`.
-</span><span class="kw">pub fn </span>interleave&lt;I, J&gt;(i: I, j: J) -&gt; Interleave&lt;&lt;I <span class="kw">as </span>IntoIterator&gt;::IntoIter, &lt;J <span class="kw">as </span>IntoIterator&gt;::IntoIter&gt;
-    <span class="kw">where </span>I: IntoIterator,
-          J: IntoIterator&lt;Item = I::Item&gt;
+</span><span class="kw">pub fn </span>interleave&lt;I, J&gt;(
+    i: I,
+    j: J,
+) -&gt; Interleave&lt;&lt;I <span class="kw">as </span>IntoIterator&gt;::IntoIter, &lt;J <span class="kw">as </span>IntoIterator&gt;::IntoIter&gt;
+<span class="kw">where
+    </span>I: IntoIterator,
+    J: IntoIterator&lt;Item = I::Item&gt;,
 {
     Interleave {
         a: i.into_iter().fuse(),
@@ -1199,8 +1259,9 @@
 }
 
 <span class="kw">impl</span>&lt;I, J&gt; Iterator <span class="kw">for </span>Interleave&lt;I, J&gt;
-    <span class="kw">where </span>I: Iterator,
-          J: Iterator&lt;Item = I::Item&gt;
+<span class="kw">where
+    </span>I: Iterator,
+    J: Iterator&lt;Item = I::Item&gt;,
 {
     <span class="kw">type </span>Item = I::Item;
     <span class="attr">#[inline]
@@ -1225,9 +1286,11 @@
 }
 
 <span class="kw">impl</span>&lt;I, J&gt; FusedIterator <span class="kw">for </span>Interleave&lt;I, J&gt;
-    <span class="kw">where </span>I: Iterator,
-          J: Iterator&lt;Item = I::Item&gt;
-{}
+<span class="kw">where
+    </span>I: Iterator,
+    J: Iterator&lt;Item = I::Item&gt;,
+{
+}
 
 <span class="doccomment">/// An iterator adaptor that alternates elements from the two iterators until
 /// one of them runs out.
@@ -1239,8 +1302,9 @@
 </span><span class="attr">#[derive(Clone, Debug)]
 #[must_use = <span class="string">&quot;iterator adaptors are lazy and do nothing unless consumed&quot;</span>]
 </span><span class="kw">pub struct </span>InterleaveShortest&lt;I, J&gt;
-    <span class="kw">where </span>I: Iterator,
-          J: Iterator&lt;Item = I::Item&gt;
+<span class="kw">where
+    </span>I: Iterator,
+    J: Iterator&lt;Item = I::Item&gt;,
 {
     it0: I,
     it1: J,
@@ -1249,8 +1313,9 @@
 
 <span class="doccomment">/// Create a new `InterleaveShortest` iterator.
 </span><span class="kw">pub fn </span>interleave_shortest&lt;I, J&gt;(a: I, b: J) -&gt; InterleaveShortest&lt;I, J&gt;
-    <span class="kw">where </span>I: Iterator,
-          J: Iterator&lt;Item = I::Item&gt;
+<span class="kw">where
+    </span>I: Iterator,
+    J: Iterator&lt;Item = I::Item&gt;,
 {
     InterleaveShortest {
         it0: a,
@@ -1260,14 +1325,19 @@
 }
 
 <span class="kw">impl</span>&lt;I, J&gt; Iterator <span class="kw">for </span>InterleaveShortest&lt;I, J&gt;
-    <span class="kw">where </span>I: Iterator,
-          J: Iterator&lt;Item = I::Item&gt;
+<span class="kw">where
+    </span>I: Iterator,
+    J: Iterator&lt;Item = I::Item&gt;,
 {
     <span class="kw">type </span>Item = I::Item;
 
     <span class="attr">#[inline]
     </span><span class="kw">fn </span>next(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>::Item&gt; {
-        <span class="kw">let </span>e = <span class="kw">if </span><span class="self">self</span>.phase { <span class="self">self</span>.it1.next() } <span class="kw">else </span>{ <span class="self">self</span>.it0.next() };
+        <span class="kw">let </span>e = <span class="kw">if </span><span class="self">self</span>.phase {
+            <span class="self">self</span>.it1.next()
+        } <span class="kw">else </span>{
+            <span class="self">self</span>.it0.next()
+        };
         <span class="kw">if </span>e.is_some() {
             <span class="self">self</span>.phase = !<span class="self">self</span>.phase;
         }
@@ -1289,12 +1359,11 @@
         <span class="kw">let </span>(next_lower, next_upper) = next_hint;
         <span class="kw">let </span>(combined_lower, combined_upper) =
             size_hint::mul_scalar(size_hint::min(curr_hint, next_hint), <span class="number">2</span>);
-        <span class="kw">let </span>lower =
-            <span class="kw">if </span>curr_lower &gt; next_lower {
-                combined_lower + <span class="number">1
-            </span>} <span class="kw">else </span>{
-                combined_lower
-            };
+        <span class="kw">let </span>lower = <span class="kw">if </span>curr_lower &gt; next_lower {
+            combined_lower + <span class="number">1
+        </span>} <span class="kw">else </span>{
+            combined_lower
+        };
         <span class="kw">let </span>upper = {
             <span class="kw">let </span>extra_elem = <span class="kw">match </span>(curr_upper, next_upper) {
                 (<span class="kw">_</span>, <span class="prelude-val">None</span>) =&gt; <span class="bool-val">false</span>,
@@ -1312,17 +1381,21 @@
 }
 
 <span class="kw">impl</span>&lt;I, J&gt; FusedIterator <span class="kw">for </span>InterleaveShortest&lt;I, J&gt;
-    <span class="kw">where </span>I: FusedIterator,
-          J: FusedIterator&lt;Item = I::Item&gt;
-{}
+<span class="kw">where
+    </span>I: FusedIterator,
+    J: FusedIterator&lt;Item = I::Item&gt;,
+{
+}
 
 <span class="attr">#[derive(Clone, Debug)]
 </span><span class="doccomment">/// An iterator adaptor that allows putting back a single
 /// item to the front of the iterator.
 ///
 /// Iterator element type is `I::Item`.
+</span><span class="attr">#[must_use = <span class="string">&quot;iterator adaptors are lazy and do nothing unless consumed&quot;</span>]
 </span><span class="kw">pub struct </span>PutBack&lt;I&gt;
-    <span class="kw">where </span>I: Iterator
+<span class="kw">where
+    </span>I: Iterator,
 {
     top: <span class="prelude-ty">Option</span>&lt;I::Item&gt;,
     iter: I,
@@ -1330,7 +1403,8 @@
 
 <span class="doccomment">/// Create an iterator where you can put back a single item
 </span><span class="kw">pub fn </span>put_back&lt;I&gt;(iterable: I) -&gt; PutBack&lt;I::IntoIter&gt;
-    <span class="kw">where </span>I: IntoIterator
+<span class="kw">where
+    </span>I: IntoIterator,
 {
     PutBack {
         top: <span class="prelude-val">None</span>,
@@ -1339,7 +1413,8 @@
 }
 
 <span class="kw">impl</span>&lt;I&gt; PutBack&lt;I&gt;
-    <span class="kw">where </span>I: Iterator
+<span class="kw">where
+    </span>I: Iterator,
 {
     <span class="doccomment">/// put back value `value` (builder method)
     </span><span class="kw">pub fn </span>with_value(<span class="kw-2">mut </span><span class="self">self</span>, value: I::Item) -&gt; <span class="self">Self </span>{
@@ -1350,7 +1425,7 @@
     <span class="doccomment">/// Split the `PutBack` into its parts.
     </span><span class="attr">#[inline]
     </span><span class="kw">pub fn </span>into_parts(<span class="self">self</span>) -&gt; (<span class="prelude-ty">Option</span>&lt;I::Item&gt;, I) {
-        <span class="kw">let </span>PutBack{top, iter} = <span class="self">self</span>;
+        <span class="kw">let </span>PutBack { top, iter } = <span class="self">self</span>;
         (top, iter)
     }
 
@@ -1364,7 +1439,8 @@
 }
 
 <span class="kw">impl</span>&lt;I&gt; Iterator <span class="kw">for </span>PutBack&lt;I&gt;
-    <span class="kw">where </span>I: Iterator
+<span class="kw">where
+    </span>I: Iterator,
 {
     <span class="kw">type </span>Item = I::Item;
     <span class="attr">#[inline]
@@ -1403,7 +1479,8 @@
     }
 
     <span class="kw">fn </span>all&lt;G&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, <span class="kw-2">mut </span>f: G) -&gt; bool
-        <span class="kw">where </span>G: FnMut(<span class="self">Self</span>::Item) -&gt; bool
+    <span class="kw">where
+        </span>G: FnMut(<span class="self">Self</span>::Item) -&gt; bool,
     {
         <span class="kw">if let </span><span class="prelude-val">Some</span>(elt) = <span class="self">self</span>.top.take() {
             <span class="kw">if </span>!f(elt) {
@@ -1414,7 +1491,8 @@
     }
 
     <span class="kw">fn </span>fold&lt;Acc, G&gt;(<span class="kw-2">mut </span><span class="self">self</span>, init: Acc, <span class="kw-2">mut </span>f: G) -&gt; Acc
-        <span class="kw">where </span>G: FnMut(Acc, <span class="self">Self</span>::Item) -&gt; Acc,
+    <span class="kw">where
+        </span>G: FnMut(Acc, <span class="self">Self</span>::Item) -&gt; Acc,
     {
         <span class="kw">let </span><span class="kw-2">mut </span>accum = init;
         <span class="kw">if let </span><span class="prelude-val">Some</span>(elt) = <span class="self">self</span>.top.take() {
@@ -1433,10 +1511,14 @@
 /// See [`.cartesian_product()`](crate::Itertools::cartesian_product) for more information.
 </span><span class="attr">#[must_use = <span class="string">&quot;iterator adaptors are lazy and do nothing unless consumed&quot;</span>]
 </span><span class="kw">pub struct </span>Product&lt;I, J&gt;
-    <span class="kw">where </span>I: Iterator
+<span class="kw">where
+    </span>I: Iterator,
 {
     a: I,
-    a_cur: <span class="prelude-ty">Option</span>&lt;I::Item&gt;,
+    <span class="doccomment">/// `a_cur` is `None` while no item have been taken out of `a` (at definition).
+    /// Then `a_cur` will be `Some(Some(item))` until `a` is exhausted,
+    /// in which case `a_cur` will be `Some(None)`.
+    </span>a_cur: <span class="prelude-ty">Option</span>&lt;<span class="prelude-ty">Option</span>&lt;I::Item&gt;&gt;,
     b: J,
     b_orig: J,
 }
@@ -1444,13 +1526,14 @@
 <span class="doccomment">/// Create a new cartesian product iterator
 ///
 /// Iterator element type is `(I::Item, J::Item)`.
-</span><span class="kw">pub fn </span>cartesian_product&lt;I, J&gt;(<span class="kw-2">mut </span>i: I, j: J) -&gt; Product&lt;I, J&gt;
-    <span class="kw">where </span>I: Iterator,
-          J: Clone + Iterator,
-          I::Item: Clone
+</span><span class="kw">pub fn </span>cartesian_product&lt;I, J&gt;(i: I, j: J) -&gt; Product&lt;I, J&gt;
+<span class="kw">where
+    </span>I: Iterator,
+    J: Clone + Iterator,
+    I::Item: Clone,
 {
     Product {
-        a_cur: i.next(),
+        a_cur: <span class="prelude-val">None</span>,
         a: i,
         b: j.clone(),
         b_orig: j,
@@ -1458,54 +1541,69 @@
 }
 
 <span class="kw">impl</span>&lt;I, J&gt; Iterator <span class="kw">for </span>Product&lt;I, J&gt;
-    <span class="kw">where </span>I: Iterator,
-          J: Clone + Iterator,
-          I::Item: Clone
+<span class="kw">where
+    </span>I: Iterator,
+    J: Clone + Iterator,
+    I::Item: Clone,
 {
     <span class="kw">type </span>Item = (I::Item, J::Item);
 
     <span class="kw">fn </span>next(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>::Item&gt; {
-        <span class="kw">let </span>elt_b = <span class="kw">match </span><span class="self">self</span>.b.next() {
+        <span class="kw">let </span><span class="self">Self </span>{
+            a,
+            a_cur,
+            b,
+            b_orig,
+        } = <span class="self">self</span>;
+        <span class="kw">let </span>elt_b = <span class="kw">match </span>b.next() {
             <span class="prelude-val">None </span>=&gt; {
-                <span class="self">self</span>.b = <span class="self">self</span>.b_orig.clone();
-                <span class="kw">match </span><span class="self">self</span>.b.next() {
+                <span class="kw-2">*</span>b = b_orig.clone();
+                <span class="kw">match </span>b.next() {
                     <span class="prelude-val">None </span>=&gt; <span class="kw">return </span><span class="prelude-val">None</span>,
                     <span class="prelude-val">Some</span>(x) =&gt; {
-                        <span class="self">self</span>.a_cur = <span class="self">self</span>.a.next();
+                        <span class="kw-2">*</span>a_cur = <span class="prelude-val">Some</span>(a.next());
                         x
                     }
                 }
             }
-            <span class="prelude-val">Some</span>(x) =&gt; x
+            <span class="prelude-val">Some</span>(x) =&gt; x,
         };
-        <span class="self">self</span>.a_cur.as_ref().map(|a| (a.clone(), elt_b))
+        a_cur
+            .get_or_insert_with(|| a.next())
+            .as_ref()
+            .map(|a| (a.clone(), elt_b))
     }
 
     <span class="kw">fn </span>size_hint(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; (usize, <span class="prelude-ty">Option</span>&lt;usize&gt;) {
-        <span class="kw">let </span>has_cur = <span class="self">self</span>.a_cur.is_some() <span class="kw">as </span>usize;
         <span class="comment">// Not ExactSizeIterator because size may be larger than usize
-        </span><span class="kw">let </span>(b_min, b_max) = <span class="self">self</span>.b.size_hint();
-
-        <span class="comment">// Compute a * b_orig + b for both lower and upper bound
-        </span>size_hint::add(
-            size_hint::mul(<span class="self">self</span>.a.size_hint(), <span class="self">self</span>.b_orig.size_hint()),
-            (b_min * has_cur, b_max.map(<span class="kw">move </span>|x| x * has_cur)))
+        // Compute a * b_orig + b for both lower and upper bound
+        </span><span class="kw">let </span><span class="kw-2">mut </span>sh = size_hint::mul(<span class="self">self</span>.a.size_hint(), <span class="self">self</span>.b_orig.size_hint());
+        <span class="kw">if </span><span class="macro">matches!</span>(<span class="self">self</span>.a_cur, <span class="prelude-val">Some</span>(<span class="prelude-val">Some</span>(<span class="kw">_</span>))) {
+            sh = size_hint::add(sh, <span class="self">self</span>.b.size_hint());
+        }
+        sh
     }
 
-    <span class="kw">fn </span>fold&lt;Acc, G&gt;(<span class="kw-2">mut </span><span class="self">self</span>, <span class="kw-2">mut </span>accum: Acc, <span class="kw-2">mut </span>f: G) -&gt; Acc
-        <span class="kw">where </span>G: FnMut(Acc, <span class="self">Self</span>::Item) -&gt; Acc,
+    <span class="kw">fn </span>fold&lt;Acc, G&gt;(<span class="self">self</span>, <span class="kw-2">mut </span>accum: Acc, <span class="kw-2">mut </span>f: G) -&gt; Acc
+    <span class="kw">where
+        </span>G: FnMut(Acc, <span class="self">Self</span>::Item) -&gt; Acc,
     {
         <span class="comment">// use a split loop to handle the loose a_cur as well as avoiding to
         // clone b_orig at the end.
-        </span><span class="kw">if let </span><span class="prelude-val">Some</span>(<span class="kw-2">mut </span>a) = <span class="self">self</span>.a_cur.take() {
-            <span class="kw">let </span><span class="kw-2">mut </span>b = <span class="self">self</span>.b;
+        </span><span class="kw">let </span><span class="self">Self </span>{
+            <span class="kw-2">mut </span>a,
+            a_cur,
+            <span class="kw-2">mut </span>b,
+            b_orig,
+        } = <span class="self">self</span>;
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(<span class="kw-2">mut </span>elt_a) = a_cur.unwrap_or_else(|| a.next()) {
             <span class="kw">loop </span>{
-                accum = b.fold(accum, |acc, elt| f(acc, (a.clone(), elt)));
+                accum = b.fold(accum, |acc, elt| f(acc, (elt_a.clone(), elt)));
 
                 <span class="comment">// we can only continue iterating a if we had a first element;
-                </span><span class="kw">if let </span><span class="prelude-val">Some</span>(next_a) = <span class="self">self</span>.a.next() {
-                    b = <span class="self">self</span>.b_orig.clone();
-                    a = next_a;
+                </span><span class="kw">if let </span><span class="prelude-val">Some</span>(next_elt_a) = a.next() {
+                    b = b_orig.clone();
+                    elt_a = next_elt_a;
                 } <span class="kw">else </span>{
                     <span class="kw">break</span>;
                 }
@@ -1516,10 +1614,12 @@
 }
 
 <span class="kw">impl</span>&lt;I, J&gt; FusedIterator <span class="kw">for </span>Product&lt;I, J&gt;
-    <span class="kw">where </span>I: FusedIterator,
-          J: Clone + FusedIterator,
-          I::Item: Clone
-{}
+<span class="kw">where
+    </span>I: FusedIterator,
+    J: Clone + FusedIterator,
+    I::Item: Clone,
+{
+}
 
 <span class="doccomment">/// A “meta iterator adaptor”. Its closure receives a reference to the iterator
 /// and may pick off as many elements as it likes, to produce the next iterator element.
@@ -1534,7 +1634,10 @@
     iter: I,
 }
 
-<span class="kw">impl</span>&lt;I, F&gt; fmt::Debug <span class="kw">for </span>Batching&lt;I, F&gt; <span class="kw">where </span>I: fmt::Debug {
+<span class="kw">impl</span>&lt;I, F&gt; fmt::Debug <span class="kw">for </span>Batching&lt;I, F&gt;
+<span class="kw">where
+    </span>I: fmt::Debug,
+{
     <span class="macro">debug_fmt_fields!</span>(Batching, iter);
 }
 
@@ -1544,8 +1647,9 @@
 }
 
 <span class="kw">impl</span>&lt;B, F, I&gt; Iterator <span class="kw">for </span>Batching&lt;I, F&gt;
-    <span class="kw">where </span>I: Iterator,
-          F: FnMut(<span class="kw-2">&amp;mut </span>I) -&gt; <span class="prelude-ty">Option</span>&lt;B&gt;
+<span class="kw">where
+    </span>I: Iterator,
+    F: FnMut(<span class="kw-2">&amp;mut </span>I) -&gt; <span class="prelude-ty">Option</span>&lt;B&gt;,
 {
     <span class="kw">type </span>Item = B;
     <span class="attr">#[inline]
@@ -1561,7 +1665,7 @@
 /// then skipping forward *n-1* elements.
 ///
 /// See [`.step()`](crate::Itertools::step) for more information.
-</span><span class="attr">#[deprecated(note=<span class="string">&quot;Use std .step_by() instead&quot;</span>, since=<span class="string">&quot;0.8.0&quot;</span>)]
+</span><span class="attr">#[deprecated(note = <span class="string">&quot;Use std .step_by() instead&quot;</span>, since = <span class="string">&quot;0.8.0&quot;</span>)]
 #[allow(deprecated)]
 #[derive(Clone, Debug)]
 #[must_use = <span class="string">&quot;iterator adaptors are lazy and do nothing unless consumed&quot;</span>]
@@ -1575,7 +1679,8 @@
 /// **Panics** if the step is 0.
 </span><span class="attr">#[allow(deprecated)]
 </span><span class="kw">pub fn </span>step&lt;I&gt;(iter: I, step: usize) -&gt; Step&lt;I&gt;
-    <span class="kw">where </span>I: Iterator
+<span class="kw">where
+    </span>I: Iterator,
 {
     <span class="macro">assert!</span>(step != <span class="number">0</span>);
     Step {
@@ -1586,7 +1691,8 @@
 
 <span class="attr">#[allow(deprecated)]
 </span><span class="kw">impl</span>&lt;I&gt; Iterator <span class="kw">for </span>Step&lt;I&gt;
-    <span class="kw">where </span>I: Iterator
+<span class="kw">where
+    </span>I: Iterator,
 {
     <span class="kw">type </span>Item = I::Item;
     <span class="attr">#[inline]
@@ -1613,145 +1719,7 @@
 
 <span class="comment">// known size
 </span><span class="attr">#[allow(deprecated)]
-</span><span class="kw">impl</span>&lt;I&gt; ExactSizeIterator <span class="kw">for </span>Step&lt;I&gt;
-    <span class="kw">where </span>I: ExactSizeIterator
-{}
-
-<span class="kw">pub trait </span>MergePredicate&lt;T&gt; {
-    <span class="kw">fn </span>merge_pred(<span class="kw-2">&amp;mut </span><span class="self">self</span>, a: <span class="kw-2">&amp;</span>T, b: <span class="kw-2">&amp;</span>T) -&gt; bool;
-}
-
-<span class="attr">#[derive(Clone, Debug)]
-</span><span class="kw">pub struct </span>MergeLte;
-
-<span class="kw">impl</span>&lt;T: PartialOrd&gt; MergePredicate&lt;T&gt; <span class="kw">for </span>MergeLte {
-    <span class="kw">fn </span>merge_pred(<span class="kw-2">&amp;mut </span><span class="self">self</span>, a: <span class="kw-2">&amp;</span>T, b: <span class="kw-2">&amp;</span>T) -&gt; bool {
-        a &lt;= b
-    }
-}
-
-<span class="doccomment">/// An iterator adaptor that merges the two base iterators in ascending order.
-/// If both base iterators are sorted (ascending), the result is sorted.
-///
-/// Iterator element type is `I::Item`.
-///
-/// See [`.merge()`](crate::Itertools::merge_by) for more information.
-</span><span class="kw">pub type </span>Merge&lt;I, J&gt; = MergeBy&lt;I, J, MergeLte&gt;;
-
-<span class="doccomment">/// Create an iterator that merges elements in `i` and `j`.
-///
-/// [`IntoIterator`] enabled version of [`Itertools::merge`](crate::Itertools::merge).
-///
-/// ```
-/// use itertools::merge;
-///
-/// for elt in merge(&amp;[1, 2, 3], &amp;[2, 3, 4]) {
-///     /* loop body */
-/// }
-/// ```
-</span><span class="kw">pub fn </span>merge&lt;I, J&gt;(i: I, j: J) -&gt; Merge&lt;&lt;I <span class="kw">as </span>IntoIterator&gt;::IntoIter, &lt;J <span class="kw">as </span>IntoIterator&gt;::IntoIter&gt;
-    <span class="kw">where </span>I: IntoIterator,
-          J: IntoIterator&lt;Item = I::Item&gt;,
-          I::Item: PartialOrd
-{
-    merge_by_new(i, j, MergeLte)
-}
-
-<span class="doccomment">/// An iterator adaptor that merges the two base iterators in ascending order.
-/// If both base iterators are sorted (ascending), the result is sorted.
-///
-/// Iterator element type is `I::Item`.
-///
-/// See [`.merge_by()`](crate::Itertools::merge_by) for more information.
-</span><span class="attr">#[must_use = <span class="string">&quot;iterator adaptors are lazy and do nothing unless consumed&quot;</span>]
-</span><span class="kw">pub struct </span>MergeBy&lt;I, J, F&gt;
-    <span class="kw">where </span>I: Iterator,
-          J: Iterator&lt;Item = I::Item&gt;
-{
-    a: Peekable&lt;I&gt;,
-    b: Peekable&lt;J&gt;,
-    fused: <span class="prelude-ty">Option</span>&lt;bool&gt;,
-    cmp: F,
-}
-
-<span class="kw">impl</span>&lt;I, J, F&gt; fmt::Debug <span class="kw">for </span>MergeBy&lt;I, J, F&gt;
-    <span class="kw">where </span>I: Iterator + fmt::Debug, J: Iterator&lt;Item = I::Item&gt; + fmt::Debug,
-          I::Item: fmt::Debug,
-{
-    <span class="macro">debug_fmt_fields!</span>(MergeBy, a, b);
-}
-
-<span class="kw">impl</span>&lt;T, F: FnMut(<span class="kw-2">&amp;</span>T, <span class="kw-2">&amp;</span>T)-&gt;bool&gt; MergePredicate&lt;T&gt; <span class="kw">for </span>F {
-    <span class="kw">fn </span>merge_pred(<span class="kw-2">&amp;mut </span><span class="self">self</span>, a: <span class="kw-2">&amp;</span>T, b: <span class="kw-2">&amp;</span>T) -&gt; bool {
-        <span class="self">self</span>(a, b)
-    }
-}
-
-<span class="doccomment">/// Create a `MergeBy` iterator.
-</span><span class="kw">pub fn </span>merge_by_new&lt;I, J, F&gt;(a: I, b: J, cmp: F) -&gt; MergeBy&lt;I::IntoIter, J::IntoIter, F&gt;
-    <span class="kw">where </span>I: IntoIterator,
-          J: IntoIterator&lt;Item = I::Item&gt;,
-          F: MergePredicate&lt;I::Item&gt;,
-{
-    MergeBy {
-        a: a.into_iter().peekable(),
-        b: b.into_iter().peekable(),
-        fused: <span class="prelude-val">None</span>,
-        cmp,
-    }
-}
-
-<span class="kw">impl</span>&lt;I, J, F&gt; Clone <span class="kw">for </span>MergeBy&lt;I, J, F&gt;
-    <span class="kw">where </span>I: Iterator,
-          J: Iterator&lt;Item = I::Item&gt;,
-          Peekable&lt;I&gt;: Clone,
-          Peekable&lt;J&gt;: Clone,
-          F: Clone
-{
-    <span class="macro">clone_fields!</span>(a, b, fused, cmp);
-}
-
-<span class="kw">impl</span>&lt;I, J, F&gt; Iterator <span class="kw">for </span>MergeBy&lt;I, J, F&gt;
-    <span class="kw">where </span>I: Iterator,
-          J: Iterator&lt;Item = I::Item&gt;,
-          F: MergePredicate&lt;I::Item&gt;
-{
-    <span class="kw">type </span>Item = I::Item;
-
-    <span class="kw">fn </span>next(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>::Item&gt; {
-        <span class="kw">let </span>less_than = <span class="kw">match </span><span class="self">self</span>.fused {
-            <span class="prelude-val">Some</span>(lt) =&gt; lt,
-            <span class="prelude-val">None </span>=&gt; <span class="kw">match </span>(<span class="self">self</span>.a.peek(), <span class="self">self</span>.b.peek()) {
-                (<span class="prelude-val">Some</span>(a), <span class="prelude-val">Some</span>(b)) =&gt; <span class="self">self</span>.cmp.merge_pred(a, b),
-                (<span class="prelude-val">Some</span>(<span class="kw">_</span>), <span class="prelude-val">None</span>) =&gt; {
-                    <span class="self">self</span>.fused = <span class="prelude-val">Some</span>(<span class="bool-val">true</span>);
-                    <span class="bool-val">true
-                </span>}
-                (<span class="prelude-val">None</span>, <span class="prelude-val">Some</span>(<span class="kw">_</span>)) =&gt; {
-                    <span class="self">self</span>.fused = <span class="prelude-val">Some</span>(<span class="bool-val">false</span>);
-                    <span class="bool-val">false
-                </span>}
-                (<span class="prelude-val">None</span>, <span class="prelude-val">None</span>) =&gt; <span class="kw">return </span><span class="prelude-val">None</span>,
-            }
-        };
-        <span class="kw">if </span>less_than {
-            <span class="self">self</span>.a.next()
-        } <span class="kw">else </span>{
-            <span class="self">self</span>.b.next()
-        }
-    }
-
-    <span class="kw">fn </span>size_hint(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; (usize, <span class="prelude-ty">Option</span>&lt;usize&gt;) {
-        <span class="comment">// Not ExactSizeIterator because size may be larger than usize
-        </span>size_hint::add(<span class="self">self</span>.a.size_hint(), <span class="self">self</span>.b.size_hint())
-    }
-}
-
-<span class="kw">impl</span>&lt;I, J, F&gt; FusedIterator <span class="kw">for </span>MergeBy&lt;I, J, F&gt;
-    <span class="kw">where </span>I: FusedIterator,
-          J: FusedIterator&lt;Item = I::Item&gt;,
-          F: MergePredicate&lt;I::Item&gt;
-{}
+</span><span class="kw">impl</span>&lt;I&gt; ExactSizeIterator <span class="kw">for </span>Step&lt;I&gt; <span class="kw">where </span>I: ExactSizeIterator {}
 
 <span class="doccomment">/// An iterator adaptor that borrows from a `Clone`-able iterator
 /// to only pick off elements while the predicate returns `true`.
@@ -1764,21 +1732,24 @@
 }
 
 <span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, I, F&gt; fmt::Debug <span class="kw">for </span>TakeWhileRef&lt;<span class="lifetime">&#39;a</span>, I, F&gt;
-    <span class="kw">where </span>I: Iterator + fmt::Debug,
+<span class="kw">where
+    </span>I: Iterator + fmt::Debug,
 {
     <span class="macro">debug_fmt_fields!</span>(TakeWhileRef, iter);
 }
 
 <span class="doccomment">/// Create a new `TakeWhileRef` from a reference to clonable iterator.
 </span><span class="kw">pub fn </span>take_while_ref&lt;I, F&gt;(iter: <span class="kw-2">&amp;mut </span>I, f: F) -&gt; TakeWhileRef&lt;I, F&gt;
-    <span class="kw">where </span>I: Iterator + Clone
+<span class="kw">where
+    </span>I: Iterator + Clone,
 {
     TakeWhileRef { iter, f }
 }
 
 <span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, I, F&gt; Iterator <span class="kw">for </span>TakeWhileRef&lt;<span class="lifetime">&#39;a</span>, I, F&gt;
-    <span class="kw">where </span>I: Iterator + Clone,
-          F: FnMut(<span class="kw-2">&amp;</span>I::Item) -&gt; bool
+<span class="kw">where
+    </span>I: Iterator + Clone,
+    F: FnMut(<span class="kw-2">&amp;</span>I::Item) -&gt; bool,
 {
     <span class="kw">type </span>Item = I::Item;
 
@@ -1818,7 +1789,8 @@
 }
 
 <span class="kw">impl</span>&lt;I, A&gt; Iterator <span class="kw">for </span>WhileSome&lt;I&gt;
-    <span class="kw">where </span>I: Iterator&lt;Item = <span class="prelude-ty">Option</span>&lt;A&gt;&gt;
+<span class="kw">where
+    </span>I: Iterator&lt;Item = <span class="prelude-ty">Option</span>&lt;A&gt;&gt;,
 {
     <span class="kw">type </span>Item = A;
 
@@ -1832,6 +1804,22 @@
     <span class="kw">fn </span>size_hint(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; (usize, <span class="prelude-ty">Option</span>&lt;usize&gt;) {
         (<span class="number">0</span>, <span class="self">self</span>.iter.size_hint().<span class="number">1</span>)
     }
+
+    <span class="kw">fn </span>fold&lt;B, F&gt;(<span class="kw-2">mut </span><span class="self">self</span>, acc: B, <span class="kw-2">mut </span>f: F) -&gt; B
+    <span class="kw">where
+        </span><span class="self">Self</span>: Sized,
+        F: FnMut(B, <span class="self">Self</span>::Item) -&gt; B,
+    {
+        <span class="kw">let </span>res = <span class="self">self</span>.iter.try_fold(acc, |acc, item| <span class="kw">match </span>item {
+            <span class="prelude-val">Some</span>(item) =&gt; <span class="prelude-val">Ok</span>(f(acc, item)),
+            <span class="prelude-val">None </span>=&gt; <span class="prelude-val">Err</span>(acc),
+        });
+        <span class="kw">let </span>res = <span class="kw">match </span>res {
+            <span class="prelude-val">Ok</span>(val) =&gt; val,
+            <span class="prelude-val">Err</span>(val) =&gt; val,
+        };
+        res
+    }
 }
 
 <span class="doccomment">/// An iterator to iterate through all combinations in a `Clone`-able iterator that produces tuples
@@ -1842,8 +1830,9 @@
 </span><span class="attr">#[derive(Clone, Debug)]
 #[must_use = <span class="string">&quot;iterator adaptors are lazy and do nothing unless consumed&quot;</span>]
 </span><span class="kw">pub struct </span>TupleCombinations&lt;I, T&gt;
-    <span class="kw">where </span>I: Iterator,
-          T: HasCombination&lt;I&gt;
+<span class="kw">where
+    </span>I: Iterator,
+    T: HasCombination&lt;I&gt;,
 {
     iter: T::Combination,
     _mi: PhantomData&lt;I&gt;,
@@ -1855,9 +1844,10 @@
 
 <span class="doccomment">/// Create a new `TupleCombinations` from a clonable iterator.
 </span><span class="kw">pub fn </span>tuple_combinations&lt;T, I&gt;(iter: I) -&gt; TupleCombinations&lt;I, T&gt;
-    <span class="kw">where </span>I: Iterator + Clone,
-          I::Item: Clone,
-          T: HasCombination&lt;I&gt;,
+<span class="kw">where
+    </span>I: Iterator + Clone,
+    I::Item: Clone,
+    T: HasCombination&lt;I&gt;,
 {
     TupleCombinations {
         iter: T::Combination::from(iter),
@@ -1866,20 +1856,38 @@
 }
 
 <span class="kw">impl</span>&lt;I, T&gt; Iterator <span class="kw">for </span>TupleCombinations&lt;I, T&gt;
-    <span class="kw">where </span>I: Iterator,
-          T: HasCombination&lt;I&gt;,
+<span class="kw">where
+    </span>I: Iterator,
+    T: HasCombination&lt;I&gt;,
 {
     <span class="kw">type </span>Item = T;
 
     <span class="kw">fn </span>next(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>::Item&gt; {
         <span class="self">self</span>.iter.next()
     }
+
+    <span class="kw">fn </span>size_hint(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; SizeHint {
+        <span class="self">self</span>.iter.size_hint()
+    }
+
+    <span class="kw">fn </span>count(<span class="self">self</span>) -&gt; usize {
+        <span class="self">self</span>.iter.count()
+    }
+
+    <span class="kw">fn </span>fold&lt;B, F&gt;(<span class="self">self</span>, init: B, f: F) -&gt; B
+    <span class="kw">where
+        </span>F: FnMut(B, <span class="self">Self</span>::Item) -&gt; B,
+    {
+        <span class="self">self</span>.iter.fold(init, f)
+    }
 }
 
 <span class="kw">impl</span>&lt;I, T&gt; FusedIterator <span class="kw">for </span>TupleCombinations&lt;I, T&gt;
-    <span class="kw">where </span>I: FusedIterator,
-          T: HasCombination&lt;I&gt;,
-{}
+<span class="kw">where
+    </span>I: FusedIterator,
+    T: HasCombination&lt;I&gt;,
+{
+}
 
 <span class="attr">#[derive(Clone, Debug)]
 </span><span class="kw">pub struct </span>Tuple1Combination&lt;I&gt; {
@@ -1897,6 +1905,21 @@
 
     <span class="kw">fn </span>next(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>::Item&gt; {
         <span class="self">self</span>.iter.next().map(|x| (x,))
+    }
+
+    <span class="kw">fn </span>size_hint(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; SizeHint {
+        <span class="self">self</span>.iter.size_hint()
+    }
+
+    <span class="kw">fn </span>count(<span class="self">self</span>) -&gt; usize {
+        <span class="self">self</span>.iter.count()
+    }
+
+    <span class="kw">fn </span>fold&lt;B, F&gt;(<span class="self">self</span>, init: B, f: F) -&gt; B
+    <span class="kw">where
+        </span>F: FnMut(B, <span class="self">Self</span>::Item) -&gt; B,
+    {
+        <span class="self">self</span>.iter.map(|x| (x,)).fold(init, f)
     }
 }
 
@@ -1931,21 +1954,54 @@
 
         <span class="kw">impl</span>&lt;I, A&gt; Iterator <span class="kw">for </span><span class="macro-nonterminal">$C</span>&lt;I&gt;
             <span class="kw">where </span>I: Iterator&lt;Item = A&gt; + Clone,
-                  I::Item: Clone
+                  A: Clone,
         {
             <span class="kw">type </span>Item = (A, $(<span class="macro">ignore_ident!</span>(<span class="macro-nonterminal">$X</span>, A)),<span class="kw-2">*</span>);
 
             <span class="kw">fn </span>next(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>::Item&gt; {
-                <span class="kw">if let </span><span class="prelude-val">Some</span>(($(<span class="macro-nonterminal">$X</span>),<span class="kw-2">*</span>,)) = <span class="self">self</span>.c.next() {
+                <span class="kw">if let </span><span class="prelude-val">Some</span>(($(<span class="macro-nonterminal">$X</span>,)<span class="kw-2">*</span>)) = <span class="self">self</span>.c.next() {
                     <span class="kw">let </span>z = <span class="self">self</span>.item.clone().unwrap();
                     <span class="prelude-val">Some</span>((z, $(<span class="macro-nonterminal">$X</span>),<span class="kw-2">*</span>))
                 } <span class="kw">else </span>{
                     <span class="self">self</span>.item = <span class="self">self</span>.iter.next();
                     <span class="self">self</span>.item.clone().and_then(|z| {
                         <span class="self">self</span>.c = <span class="self">self</span>.iter.clone().into();
-                        <span class="self">self</span>.c.next().map(|($(<span class="macro-nonterminal">$X</span>),<span class="kw-2">*</span>,)| (z, $(<span class="macro-nonterminal">$X</span>),<span class="kw-2">*</span>))
+                        <span class="self">self</span>.c.next().map(|($(<span class="macro-nonterminal">$X</span>,)<span class="kw-2">*</span>)| (z, $(<span class="macro-nonterminal">$X</span>),<span class="kw-2">*</span>))
                     })
                 }
+            }
+
+            <span class="kw">fn </span>size_hint(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; SizeHint {
+                <span class="kw">const </span>K: usize = <span class="number">1 </span>+ <span class="macro">count_ident!</span>($(<span class="macro-nonterminal">$X</span>)<span class="kw-2">*</span>);
+                <span class="kw">let </span>(<span class="kw-2">mut </span>n_min, <span class="kw-2">mut </span>n_max) = <span class="self">self</span>.iter.size_hint();
+                n_min = checked_binomial(n_min, K).unwrap_or(usize::MAX);
+                n_max = n_max.and_then(|n| checked_binomial(n, K));
+                size_hint::add(<span class="self">self</span>.c.size_hint(), (n_min, n_max))
+            }
+
+            <span class="kw">fn </span>count(<span class="self">self</span>) -&gt; usize {
+                <span class="kw">const </span>K: usize = <span class="number">1 </span>+ <span class="macro">count_ident!</span>($(<span class="macro-nonterminal">$X</span>)<span class="kw-2">*</span>);
+                <span class="kw">let </span>n = <span class="self">self</span>.iter.count();
+                checked_binomial(n, K).unwrap() + <span class="self">self</span>.c.count()
+            }
+
+            <span class="kw">fn </span>fold&lt;B, F&gt;(<span class="self">self</span>, <span class="kw-2">mut </span>init: B, <span class="kw-2">mut </span>f: F) -&gt; B
+            <span class="kw">where
+                </span>F: FnMut(B, <span class="self">Self</span>::Item) -&gt; B,
+            {
+                <span class="kw">let </span><span class="self">Self </span>{ c, item, <span class="kw-2">mut </span>iter } = <span class="self">self</span>;
+                <span class="kw">if let </span><span class="prelude-val">Some</span>(z) = item.as_ref() {
+                    init = c
+                        .map(|($(<span class="macro-nonterminal">$X</span>,)<span class="kw-2">*</span>)| (z.clone(), $(<span class="macro-nonterminal">$X</span>),<span class="kw-2">*</span>))
+                        .fold(init, <span class="kw-2">&amp;mut </span>f);
+                }
+                <span class="kw">while let </span><span class="prelude-val">Some</span>(z) = iter.next() {
+                    <span class="kw">let </span>c: <span class="macro-nonterminal">$P</span>&lt;I&gt; = iter.clone().into();
+                    init = c
+                        .map(|($(<span class="macro-nonterminal">$X</span>,)<span class="kw-2">*</span>)| (z.clone(), $(<span class="macro-nonterminal">$X</span>),<span class="kw-2">*</span>))
+                        .fold(init, <span class="kw-2">&amp;mut </span>f);
+                }
+                init
             }
         }
 
@@ -1982,6 +2038,42 @@
 <span class="macro">impl_tuple_combination!</span>(Tuple11Combination Tuple10Combination; a b c d e f g h i j);
 <span class="macro">impl_tuple_combination!</span>(Tuple12Combination Tuple11Combination; a b c d e f g h i j k);
 
+<span class="comment">// https://en.wikipedia.org/wiki/Binomial_coefficient#In_programming_languages
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>checked_binomial(<span class="kw-2">mut </span>n: usize, <span class="kw-2">mut </span>k: usize) -&gt; <span class="prelude-ty">Option</span>&lt;usize&gt; {
+    <span class="kw">if </span>n &lt; k {
+        <span class="kw">return </span><span class="prelude-val">Some</span>(<span class="number">0</span>);
+    }
+    <span class="comment">// `factorial(n) / factorial(n - k) / factorial(k)` but trying to avoid it overflows:
+    </span>k = (n - k).min(k); <span class="comment">// symmetry
+    </span><span class="kw">let </span><span class="kw-2">mut </span>c = <span class="number">1</span>;
+    <span class="kw">for </span>i <span class="kw">in </span><span class="number">1</span>..=k {
+        c = (c / i)
+            .checked_mul(n)<span class="question-mark">?
+            </span>.checked_add((c % i).checked_mul(n)<span class="question-mark">? </span>/ i)<span class="question-mark">?</span>;
+        n -= <span class="number">1</span>;
+    }
+    <span class="prelude-val">Some</span>(c)
+}
+
+<span class="attr">#[test]
+</span><span class="kw">fn </span>test_checked_binomial() {
+    <span class="comment">// With the first row: [1, 0, 0, ...] and the first column full of 1s, we check
+    // row by row the recurrence relation of binomials (which is an equivalent definition).
+    // For n &gt;= 1 and k &gt;= 1 we have:
+    //   binomial(n, k) == binomial(n - 1, k - 1) + binomial(n - 1, k)
+    </span><span class="kw">const </span>LIMIT: usize = <span class="number">500</span>;
+    <span class="kw">let </span><span class="kw-2">mut </span>row = <span class="macro">vec!</span>[<span class="prelude-val">Some</span>(<span class="number">0</span>); LIMIT + <span class="number">1</span>];
+    row[<span class="number">0</span>] = <span class="prelude-val">Some</span>(<span class="number">1</span>);
+    <span class="kw">for </span>n <span class="kw">in </span><span class="number">0</span>..=LIMIT {
+        <span class="kw">for </span>k <span class="kw">in </span><span class="number">0</span>..=LIMIT {
+            <span class="macro">assert_eq!</span>(row[k], checked_binomial(n, k));
+        }
+        row = std::iter::once(<span class="prelude-val">Some</span>(<span class="number">1</span>))
+            .chain((<span class="number">1</span>..=LIMIT).map(|k| row[k - <span class="number">1</span>]<span class="question-mark">?</span>.checked_add(row[k]<span class="question-mark">?</span>)))
+            .collect();
+    }
+}
+
 <span class="doccomment">/// An iterator adapter to filter values within a nested `Result::Ok`.
 ///
 /// See [`.filter_ok()`](crate::Itertools::filter_ok) for more information.
@@ -1989,7 +2081,7 @@
 #[must_use = <span class="string">&quot;iterator adaptors are lazy and do nothing unless consumed&quot;</span>]
 </span><span class="kw">pub struct </span>FilterOk&lt;I, F&gt; {
     iter: I,
-    f: F
+    f: F,
 }
 
 <span class="kw">impl</span>&lt;I, F&gt; fmt::Debug <span class="kw">for </span>FilterOk&lt;I, F&gt;
@@ -2001,18 +2093,17 @@
 
 <span class="doccomment">/// Create a new `FilterOk` iterator.
 </span><span class="kw">pub fn </span>filter_ok&lt;I, F, T, E&gt;(iter: I, f: F) -&gt; FilterOk&lt;I, F&gt;
-    <span class="kw">where </span>I: Iterator&lt;Item = <span class="prelude-ty">Result</span>&lt;T, E&gt;&gt;,
-          F: FnMut(<span class="kw-2">&amp;</span>T) -&gt; bool,
+<span class="kw">where
+    </span>I: Iterator&lt;Item = <span class="prelude-ty">Result</span>&lt;T, E&gt;&gt;,
+    F: FnMut(<span class="kw-2">&amp;</span>T) -&gt; bool,
 {
-    FilterOk {
-        iter,
-        f,
-    }
+    FilterOk { iter, f }
 }
 
 <span class="kw">impl</span>&lt;I, F, T, E&gt; Iterator <span class="kw">for </span>FilterOk&lt;I, F&gt;
-    <span class="kw">where </span>I: Iterator&lt;Item = <span class="prelude-ty">Result</span>&lt;T, E&gt;&gt;,
-          F: FnMut(<span class="kw-2">&amp;</span>T) -&gt; bool,
+<span class="kw">where
+    </span>I: Iterator&lt;Item = <span class="prelude-ty">Result</span>&lt;T, E&gt;&gt;,
+    F: FnMut(<span class="kw-2">&amp;</span>T) -&gt; bool,
 {
     <span class="kw">type </span>Item = <span class="prelude-ty">Result</span>&lt;T, E&gt;;
 
@@ -2023,7 +2114,7 @@
                     <span class="kw">if </span>(<span class="self">self</span>.f)(<span class="kw-2">&amp;</span>v) {
                         <span class="kw">return </span><span class="prelude-val">Some</span>(<span class="prelude-val">Ok</span>(v));
                     }
-                },
+                }
                 <span class="prelude-val">Some</span>(<span class="prelude-val">Err</span>(e)) =&gt; <span class="kw">return </span><span class="prelude-val">Some</span>(<span class="prelude-val">Err</span>(e)),
                 <span class="prelude-val">None </span>=&gt; <span class="kw">return </span><span class="prelude-val">None</span>,
             }
@@ -2035,36 +2126,41 @@
     }
 
     <span class="kw">fn </span>fold&lt;Acc, Fold&gt;(<span class="self">self</span>, init: Acc, fold_f: Fold) -&gt; Acc
-        <span class="kw">where </span>Fold: FnMut(Acc, <span class="self">Self</span>::Item) -&gt; Acc,
+    <span class="kw">where
+        </span>Fold: FnMut(Acc, <span class="self">Self</span>::Item) -&gt; Acc,
     {
         <span class="kw">let </span><span class="kw-2">mut </span>f = <span class="self">self</span>.f;
-        <span class="self">self</span>.iter.filter(|v| {
-            v.as_ref().map(<span class="kw-2">&amp;mut </span>f).unwrap_or(<span class="bool-val">true</span>)
-        }).fold(init, fold_f)
+        <span class="self">self</span>.iter
+            .filter(|v| v.as_ref().map(<span class="kw-2">&amp;mut </span>f).unwrap_or(<span class="bool-val">true</span>))
+            .fold(init, fold_f)
     }
 
     <span class="kw">fn </span>collect&lt;C&gt;(<span class="self">self</span>) -&gt; C
-        <span class="kw">where </span>C: FromIterator&lt;<span class="self">Self</span>::Item&gt;
+    <span class="kw">where
+        </span>C: FromIterator&lt;<span class="self">Self</span>::Item&gt;,
     {
         <span class="kw">let </span><span class="kw-2">mut </span>f = <span class="self">self</span>.f;
-        <span class="self">self</span>.iter.filter(|v| {
-            v.as_ref().map(<span class="kw-2">&amp;mut </span>f).unwrap_or(<span class="bool-val">true</span>)
-        }).collect()
+        <span class="self">self</span>.iter
+            .filter(|v| v.as_ref().map(<span class="kw-2">&amp;mut </span>f).unwrap_or(<span class="bool-val">true</span>))
+            .collect()
     }
 }
 
 <span class="kw">impl</span>&lt;I, F, T, E&gt; FusedIterator <span class="kw">for </span>FilterOk&lt;I, F&gt;
-    <span class="kw">where </span>I: FusedIterator&lt;Item = <span class="prelude-ty">Result</span>&lt;T, E&gt;&gt;,
-          F: FnMut(<span class="kw-2">&amp;</span>T) -&gt; bool,
-{}
+<span class="kw">where
+    </span>I: FusedIterator&lt;Item = <span class="prelude-ty">Result</span>&lt;T, E&gt;&gt;,
+    F: FnMut(<span class="kw-2">&amp;</span>T) -&gt; bool,
+{
+}
 
 <span class="doccomment">/// An iterator adapter to filter and apply a transformation on values within a nested `Result::Ok`.
 ///
 /// See [`.filter_map_ok()`](crate::Itertools::filter_map_ok) for more information.
 </span><span class="attr">#[must_use = <span class="string">&quot;iterator adaptors are lazy and do nothing unless consumed&quot;</span>]
+#[derive(Clone)]
 </span><span class="kw">pub struct </span>FilterMapOk&lt;I, F&gt; {
     iter: I,
-    f: F
+    f: F,
 }
 
 <span class="kw">impl</span>&lt;I, F&gt; fmt::Debug <span class="kw">for </span>FilterMapOk&lt;I, F&gt;
@@ -2084,18 +2180,17 @@
 
 <span class="doccomment">/// Create a new `FilterOk` iterator.
 </span><span class="kw">pub fn </span>filter_map_ok&lt;I, F, T, U, E&gt;(iter: I, f: F) -&gt; FilterMapOk&lt;I, F&gt;
-    <span class="kw">where </span>I: Iterator&lt;Item = <span class="prelude-ty">Result</span>&lt;T, E&gt;&gt;,
-          F: FnMut(T) -&gt; <span class="prelude-ty">Option</span>&lt;U&gt;,
+<span class="kw">where
+    </span>I: Iterator&lt;Item = <span class="prelude-ty">Result</span>&lt;T, E&gt;&gt;,
+    F: FnMut(T) -&gt; <span class="prelude-ty">Option</span>&lt;U&gt;,
 {
-    FilterMapOk {
-        iter,
-        f,
-    }
+    FilterMapOk { iter, f }
 }
 
 <span class="kw">impl</span>&lt;I, F, T, U, E&gt; Iterator <span class="kw">for </span>FilterMapOk&lt;I, F&gt;
-    <span class="kw">where </span>I: Iterator&lt;Item = <span class="prelude-ty">Result</span>&lt;T, E&gt;&gt;,
-          F: FnMut(T) -&gt; <span class="prelude-ty">Option</span>&lt;U&gt;,
+<span class="kw">where
+    </span>I: Iterator&lt;Item = <span class="prelude-ty">Result</span>&lt;T, E&gt;&gt;,
+    F: FnMut(T) -&gt; <span class="prelude-ty">Option</span>&lt;U&gt;,
 {
     <span class="kw">type </span>Item = <span class="prelude-ty">Result</span>&lt;U, E&gt;;
 
@@ -2106,7 +2201,7 @@
                     <span class="kw">if let </span><span class="prelude-val">Some</span>(v) = (<span class="self">self</span>.f)(v) {
                         <span class="kw">return </span><span class="prelude-val">Some</span>(<span class="prelude-val">Ok</span>(v));
                     }
-                },
+                }
                 <span class="prelude-val">Some</span>(<span class="prelude-val">Err</span>(e)) =&gt; <span class="kw">return </span><span class="prelude-val">Some</span>(<span class="prelude-val">Err</span>(e)),
                 <span class="prelude-val">None </span>=&gt; <span class="kw">return </span><span class="prelude-val">None</span>,
             }
@@ -2118,28 +2213,32 @@
     }
 
     <span class="kw">fn </span>fold&lt;Acc, Fold&gt;(<span class="self">self</span>, init: Acc, fold_f: Fold) -&gt; Acc
-        <span class="kw">where </span>Fold: FnMut(Acc, <span class="self">Self</span>::Item) -&gt; Acc,
+    <span class="kw">where
+        </span>Fold: FnMut(Acc, <span class="self">Self</span>::Item) -&gt; Acc,
     {
         <span class="kw">let </span><span class="kw-2">mut </span>f = <span class="self">self</span>.f;
-        <span class="self">self</span>.iter.filter_map(|v| {
-            transpose_result(v.map(<span class="kw-2">&amp;mut </span>f))
-        }).fold(init, fold_f)
+        <span class="self">self</span>.iter
+            .filter_map(|v| transpose_result(v.map(<span class="kw-2">&amp;mut </span>f)))
+            .fold(init, fold_f)
     }
 
     <span class="kw">fn </span>collect&lt;C&gt;(<span class="self">self</span>) -&gt; C
-        <span class="kw">where </span>C: FromIterator&lt;<span class="self">Self</span>::Item&gt;
+    <span class="kw">where
+        </span>C: FromIterator&lt;<span class="self">Self</span>::Item&gt;,
     {
         <span class="kw">let </span><span class="kw-2">mut </span>f = <span class="self">self</span>.f;
-        <span class="self">self</span>.iter.filter_map(|v| {
-            transpose_result(v.map(<span class="kw-2">&amp;mut </span>f))
-        }).collect()
+        <span class="self">self</span>.iter
+            .filter_map(|v| transpose_result(v.map(<span class="kw-2">&amp;mut </span>f)))
+            .collect()
     }
 }
 
 <span class="kw">impl</span>&lt;I, F, T, U, E&gt; FusedIterator <span class="kw">for </span>FilterMapOk&lt;I, F&gt;
-    <span class="kw">where </span>I: FusedIterator&lt;Item = <span class="prelude-ty">Result</span>&lt;T, E&gt;&gt;,
-          F: FnMut(T) -&gt; <span class="prelude-ty">Option</span>&lt;U&gt;,
-{}
+<span class="kw">where
+    </span>I: FusedIterator&lt;Item = <span class="prelude-ty">Result</span>&lt;T, E&gt;&gt;,
+    F: FnMut(T) -&gt; <span class="prelude-ty">Option</span>&lt;U&gt;,
+{
+}
 
 <span class="doccomment">/// An iterator adapter to get the positions of each element that matches a predicate.
 ///
@@ -2161,19 +2260,17 @@
 
 <span class="doccomment">/// Create a new `Positions` iterator.
 </span><span class="kw">pub fn </span>positions&lt;I, F&gt;(iter: I, f: F) -&gt; Positions&lt;I, F&gt;
-    <span class="kw">where </span>I: Iterator,
-          F: FnMut(I::Item) -&gt; bool,
+<span class="kw">where
+    </span>I: Iterator,
+    F: FnMut(I::Item) -&gt; bool,
 {
-    Positions {
-        iter,
-        f,
-        count: <span class="number">0
-    </span>}
+    Positions { iter, f, count: <span class="number">0 </span>}
 }
 
 <span class="kw">impl</span>&lt;I, F&gt; Iterator <span class="kw">for </span>Positions&lt;I, F&gt;
-    <span class="kw">where </span>I: Iterator,
-          F: FnMut(I::Item) -&gt; bool,
+<span class="kw">where
+    </span>I: Iterator,
+    F: FnMut(I::Item) -&gt; bool,
 {
     <span class="kw">type </span>Item = usize;
 
@@ -2194,13 +2291,14 @@
 }
 
 <span class="kw">impl</span>&lt;I, F&gt; DoubleEndedIterator <span class="kw">for </span>Positions&lt;I, F&gt;
-    <span class="kw">where </span>I: DoubleEndedIterator + ExactSizeIterator,
-          F: FnMut(I::Item) -&gt; bool,
+<span class="kw">where
+    </span>I: DoubleEndedIterator + ExactSizeIterator,
+    F: FnMut(I::Item) -&gt; bool,
 {
     <span class="kw">fn </span>next_back(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>::Item&gt; {
         <span class="kw">while let </span><span class="prelude-val">Some</span>(v) = <span class="self">self</span>.iter.next_back() {
             <span class="kw">if </span>(<span class="self">self</span>.f)(v) {
-                <span class="kw">return </span><span class="prelude-val">Some</span>(<span class="self">self</span>.count + <span class="self">self</span>.iter.len())
+                <span class="kw">return </span><span class="prelude-val">Some</span>(<span class="self">self</span>.count + <span class="self">self</span>.iter.len());
             }
         }
         <span class="prelude-val">None
@@ -2208,9 +2306,11 @@
 }
 
 <span class="kw">impl</span>&lt;I, F&gt; FusedIterator <span class="kw">for </span>Positions&lt;I, F&gt;
-    <span class="kw">where </span>I: FusedIterator,
-          F: FnMut(I::Item) -&gt; bool,
-{}
+<span class="kw">where
+    </span>I: FusedIterator,
+    F: FnMut(I::Item) -&gt; bool,
+{
+}
 
 <span class="doccomment">/// An iterator adapter to apply a mutating function to each element before yielding it.
 ///
@@ -2259,18 +2359,28 @@
     }
 
     <span class="kw">fn </span>fold&lt;Acc, G&gt;(<span class="self">self</span>, init: Acc, <span class="kw-2">mut </span>g: G) -&gt; Acc
-        <span class="kw">where </span>G: FnMut(Acc, <span class="self">Self</span>::Item) -&gt; Acc,
+    <span class="kw">where
+        </span>G: FnMut(Acc, <span class="self">Self</span>::Item) -&gt; Acc,
     {
         <span class="kw">let </span><span class="kw-2">mut </span>f = <span class="self">self</span>.f;
-        <span class="self">self</span>.iter.fold(init, <span class="kw">move </span>|acc, <span class="kw-2">mut </span>v| { f(<span class="kw-2">&amp;mut </span>v); g(acc, v) })
+        <span class="self">self</span>.iter.fold(init, <span class="kw">move </span>|acc, <span class="kw-2">mut </span>v| {
+            f(<span class="kw-2">&amp;mut </span>v);
+            g(acc, v)
+        })
     }
 
     <span class="comment">// if possible, re-use inner iterator specializations in collect
     </span><span class="kw">fn </span>collect&lt;C&gt;(<span class="self">self</span>) -&gt; C
-        <span class="kw">where </span>C: FromIterator&lt;<span class="self">Self</span>::Item&gt;
+    <span class="kw">where
+        </span>C: FromIterator&lt;<span class="self">Self</span>::Item&gt;,
     {
         <span class="kw">let </span><span class="kw-2">mut </span>f = <span class="self">self</span>.f;
-        <span class="self">self</span>.iter.map(<span class="kw">move </span>|<span class="kw-2">mut </span>v| { f(<span class="kw-2">&amp;mut </span>v); v }).collect()
+        <span class="self">self</span>.iter
+            .map(<span class="kw">move </span>|<span class="kw-2">mut </span>v| {
+                f(<span class="kw-2">&amp;mut </span>v);
+                v
+            })
+            .collect()
     }
 }
 
@@ -2278,7 +2388,8 @@
 <span class="kw">where
     </span>I: ExactSizeIterator,
     F: FnMut(<span class="kw-2">&amp;mut </span>I::Item),
-{}
+{
+}
 
 <span class="kw">impl</span>&lt;I, F&gt; DoubleEndedIterator <span class="kw">for </span>Update&lt;I, F&gt;
 <span class="kw">where
@@ -2299,5 +2410,6 @@
 <span class="kw">where
     </span>I: FusedIterator,
     F: FnMut(<span class="kw-2">&amp;mut </span>I::Item),
-{}
+{
+}
 </code></pre></div></section></main></body></html>

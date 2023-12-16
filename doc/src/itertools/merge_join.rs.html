@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/nix/store/a04z6lnlzhx5ri6nlgjig0ir12hyiw0n-vendor-cargo-deps/c19b7c6f923b580ac259164a89f2577984ad5ab09ee9d583b888f934adbbe8d0/itertools-0.10.5/src/merge_join.rs`."><title>merge_join.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-fa3bb1812debf86c.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="itertools" data-themes="" data-resource-suffix="" data-rustdoc-version="1.74.1 (a28077b28 2023-12-04)" data-channel="1.74.1" data-search-js="search-8be46b629f5f14a8.js" data-settings-js="settings-74424d7eec62a23e.js" ><script src="../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-c5bd66d33317d69f.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../itertools/index.html"><img class="rust-logo" src="../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/nix/store/c4453a3v03igkgaaki07gs4c4w6xz5ri-vendor-cargo-deps/c19b7c6f923b580ac259164a89f2577984ad5ab09ee9d583b888f934adbbe8d0/itertools-0.12.0/src/merge_join.rs`."><title>merge_join.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-fa3bb1812debf86c.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="itertools" data-themes="" data-resource-suffix="" data-rustdoc-version="1.74.1 (a28077b28 2023-12-04)" data-channel="1.74.1" data-search-js="search-8be46b629f5f14a8.js" data-settings-js="settings-74424d7eec62a23e.js" ><script src="../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-c5bd66d33317d69f.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../itertools/index.html"><img class="rust-logo" src="../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -167,103 +167,436 @@
 <a href="#167" id="167">167</a>
 <a href="#168" id="168">168</a>
 <a href="#169" id="169">169</a>
+<a href="#170" id="170">170</a>
+<a href="#171" id="171">171</a>
+<a href="#172" id="172">172</a>
+<a href="#173" id="173">173</a>
+<a href="#174" id="174">174</a>
+<a href="#175" id="175">175</a>
+<a href="#176" id="176">176</a>
+<a href="#177" id="177">177</a>
+<a href="#178" id="178">178</a>
+<a href="#179" id="179">179</a>
+<a href="#180" id="180">180</a>
+<a href="#181" id="181">181</a>
+<a href="#182" id="182">182</a>
+<a href="#183" id="183">183</a>
+<a href="#184" id="184">184</a>
+<a href="#185" id="185">185</a>
+<a href="#186" id="186">186</a>
+<a href="#187" id="187">187</a>
+<a href="#188" id="188">188</a>
+<a href="#189" id="189">189</a>
+<a href="#190" id="190">190</a>
+<a href="#191" id="191">191</a>
+<a href="#192" id="192">192</a>
+<a href="#193" id="193">193</a>
+<a href="#194" id="194">194</a>
+<a href="#195" id="195">195</a>
+<a href="#196" id="196">196</a>
+<a href="#197" id="197">197</a>
+<a href="#198" id="198">198</a>
+<a href="#199" id="199">199</a>
+<a href="#200" id="200">200</a>
+<a href="#201" id="201">201</a>
+<a href="#202" id="202">202</a>
+<a href="#203" id="203">203</a>
+<a href="#204" id="204">204</a>
+<a href="#205" id="205">205</a>
+<a href="#206" id="206">206</a>
+<a href="#207" id="207">207</a>
+<a href="#208" id="208">208</a>
+<a href="#209" id="209">209</a>
+<a href="#210" id="210">210</a>
+<a href="#211" id="211">211</a>
+<a href="#212" id="212">212</a>
+<a href="#213" id="213">213</a>
+<a href="#214" id="214">214</a>
+<a href="#215" id="215">215</a>
+<a href="#216" id="216">216</a>
+<a href="#217" id="217">217</a>
+<a href="#218" id="218">218</a>
+<a href="#219" id="219">219</a>
+<a href="#220" id="220">220</a>
+<a href="#221" id="221">221</a>
+<a href="#222" id="222">222</a>
+<a href="#223" id="223">223</a>
+<a href="#224" id="224">224</a>
+<a href="#225" id="225">225</a>
+<a href="#226" id="226">226</a>
+<a href="#227" id="227">227</a>
+<a href="#228" id="228">228</a>
+<a href="#229" id="229">229</a>
+<a href="#230" id="230">230</a>
+<a href="#231" id="231">231</a>
+<a href="#232" id="232">232</a>
+<a href="#233" id="233">233</a>
+<a href="#234" id="234">234</a>
+<a href="#235" id="235">235</a>
+<a href="#236" id="236">236</a>
+<a href="#237" id="237">237</a>
+<a href="#238" id="238">238</a>
+<a href="#239" id="239">239</a>
+<a href="#240" id="240">240</a>
+<a href="#241" id="241">241</a>
+<a href="#242" id="242">242</a>
+<a href="#243" id="243">243</a>
+<a href="#244" id="244">244</a>
+<a href="#245" id="245">245</a>
+<a href="#246" id="246">246</a>
+<a href="#247" id="247">247</a>
+<a href="#248" id="248">248</a>
+<a href="#249" id="249">249</a>
+<a href="#250" id="250">250</a>
+<a href="#251" id="251">251</a>
+<a href="#252" id="252">252</a>
+<a href="#253" id="253">253</a>
+<a href="#254" id="254">254</a>
+<a href="#255" id="255">255</a>
+<a href="#256" id="256">256</a>
+<a href="#257" id="257">257</a>
+<a href="#258" id="258">258</a>
+<a href="#259" id="259">259</a>
+<a href="#260" id="260">260</a>
+<a href="#261" id="261">261</a>
+<a href="#262" id="262">262</a>
+<a href="#263" id="263">263</a>
+<a href="#264" id="264">264</a>
+<a href="#265" id="265">265</a>
+<a href="#266" id="266">266</a>
+<a href="#267" id="267">267</a>
+<a href="#268" id="268">268</a>
+<a href="#269" id="269">269</a>
+<a href="#270" id="270">270</a>
+<a href="#271" id="271">271</a>
+<a href="#272" id="272">272</a>
+<a href="#273" id="273">273</a>
+<a href="#274" id="274">274</a>
+<a href="#275" id="275">275</a>
+<a href="#276" id="276">276</a>
+<a href="#277" id="277">277</a>
+<a href="#278" id="278">278</a>
+<a href="#279" id="279">279</a>
+<a href="#280" id="280">280</a>
+<a href="#281" id="281">281</a>
+<a href="#282" id="282">282</a>
+<a href="#283" id="283">283</a>
+<a href="#284" id="284">284</a>
+<a href="#285" id="285">285</a>
+<a href="#286" id="286">286</a>
+<a href="#287" id="287">287</a>
+<a href="#288" id="288">288</a>
+<a href="#289" id="289">289</a>
+<a href="#290" id="290">290</a>
+<a href="#291" id="291">291</a>
+<a href="#292" id="292">292</a>
+<a href="#293" id="293">293</a>
+<a href="#294" id="294">294</a>
+<a href="#295" id="295">295</a>
+<a href="#296" id="296">296</a>
+<a href="#297" id="297">297</a>
+<a href="#298" id="298">298</a>
+<a href="#299" id="299">299</a>
+<a href="#300" id="300">300</a>
+<a href="#301" id="301">301</a>
+<a href="#302" id="302">302</a>
+<a href="#303" id="303">303</a>
+<a href="#304" id="304">304</a>
+<a href="#305" id="305">305</a>
+<a href="#306" id="306">306</a>
+<a href="#307" id="307">307</a>
+<a href="#308" id="308">308</a>
+<a href="#309" id="309">309</a>
+<a href="#310" id="310">310</a>
+<a href="#311" id="311">311</a>
+<a href="#312" id="312">312</a>
+<a href="#313" id="313">313</a>
+<a href="#314" id="314">314</a>
+<a href="#315" id="315">315</a>
+<a href="#316" id="316">316</a>
+<a href="#317" id="317">317</a>
+<a href="#318" id="318">318</a>
+<a href="#319" id="319">319</a>
+<a href="#320" id="320">320</a>
+<a href="#321" id="321">321</a>
+<a href="#322" id="322">322</a>
+<a href="#323" id="323">323</a>
+<a href="#324" id="324">324</a>
+<a href="#325" id="325">325</a>
+<a href="#326" id="326">326</a>
+<a href="#327" id="327">327</a>
+<a href="#328" id="328">328</a>
+<a href="#329" id="329">329</a>
+<a href="#330" id="330">330</a>
+<a href="#331" id="331">331</a>
+<a href="#332" id="332">332</a>
+<a href="#333" id="333">333</a>
+<a href="#334" id="334">334</a>
+<a href="#335" id="335">335</a>
+<a href="#336" id="336">336</a>
+<a href="#337" id="337">337</a>
+<a href="#338" id="338">338</a>
+<a href="#339" id="339">339</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::cmp::Ordering;
-<span class="kw">use </span>std::iter::Fuse;
 <span class="kw">use </span>std::fmt;
+<span class="kw">use </span>std::iter::{Fuse, FusedIterator};
+<span class="kw">use </span>std::marker::PhantomData;
 
-<span class="kw">use </span><span class="kw">super</span>::adaptors::{PutBack, put_back};
+<span class="kw">use </span>either::Either;
+
+<span class="kw">use </span><span class="kw">super</span>::adaptors::{put_back, PutBack};
 <span class="kw">use </span><span class="kw">crate</span>::either_or_both::EitherOrBoth;
+<span class="kw">use </span><span class="kw">crate</span>::size_hint::{<span class="self">self</span>, SizeHint};
 <span class="attr">#[cfg(doc)]
 </span><span class="kw">use </span><span class="kw">crate</span>::Itertools;
+
+<span class="attr">#[derive(Clone, Debug)]
+</span><span class="kw">pub struct </span>MergeLte;
+
+<span class="doccomment">/// An iterator adaptor that merges the two base iterators in ascending order.
+/// If both base iterators are sorted (ascending), the result is sorted.
+///
+/// Iterator element type is `I::Item`.
+///
+/// See [`.merge()`](crate::Itertools::merge_by) for more information.
+</span><span class="kw">pub type </span>Merge&lt;I, J&gt; = MergeBy&lt;I, J, MergeLte&gt;;
+
+<span class="doccomment">/// Create an iterator that merges elements in `i` and `j`.
+///
+/// [`IntoIterator`] enabled version of [`Itertools::merge`](crate::Itertools::merge).
+///
+/// ```
+/// use itertools::merge;
+///
+/// for elt in merge(&amp;[1, 2, 3], &amp;[2, 3, 4]) {
+///     /* loop body */
+/// }
+/// ```
+</span><span class="kw">pub fn </span>merge&lt;I, J&gt;(
+    i: I,
+    j: J,
+) -&gt; Merge&lt;&lt;I <span class="kw">as </span>IntoIterator&gt;::IntoIter, &lt;J <span class="kw">as </span>IntoIterator&gt;::IntoIter&gt;
+<span class="kw">where
+    </span>I: IntoIterator,
+    J: IntoIterator&lt;Item = I::Item&gt;,
+    I::Item: PartialOrd,
+{
+    merge_by_new(i, j, MergeLte)
+}
+
+<span class="doccomment">/// An iterator adaptor that merges the two base iterators in ascending order.
+/// If both base iterators are sorted (ascending), the result is sorted.
+///
+/// Iterator element type is `I::Item`.
+///
+/// See [`.merge_by()`](crate::Itertools::merge_by) for more information.
+</span><span class="attr">#[must_use = <span class="string">&quot;iterator adaptors are lazy and do nothing unless consumed&quot;</span>]
+</span><span class="kw">pub struct </span>MergeBy&lt;I: Iterator, J: Iterator, F&gt; {
+    left: PutBack&lt;Fuse&lt;I&gt;&gt;,
+    right: PutBack&lt;Fuse&lt;J&gt;&gt;,
+    cmp_fn: F,
+}
+
+<span class="doccomment">/// Create a `MergeBy` iterator.
+</span><span class="kw">pub fn </span>merge_by_new&lt;I, J, F&gt;(a: I, b: J, cmp: F) -&gt; MergeBy&lt;I::IntoIter, J::IntoIter, F&gt;
+<span class="kw">where
+    </span>I: IntoIterator,
+    J: IntoIterator&lt;Item = I::Item&gt;,
+{
+    MergeBy {
+        left: put_back(a.into_iter().fuse()),
+        right: put_back(b.into_iter().fuse()),
+        cmp_fn: cmp,
+    }
+}
 
 <span class="doccomment">/// Return an iterator adaptor that merge-joins items from the two base iterators in ascending order.
 ///
 /// [`IntoIterator`] enabled version of [`Itertools::merge_join_by`].
-</span><span class="kw">pub fn </span>merge_join_by&lt;I, J, F&gt;(left: I, right: J, cmp_fn: F)
-    -&gt; MergeJoinBy&lt;I::IntoIter, J::IntoIter, F&gt;
-    <span class="kw">where </span>I: IntoIterator,
-          J: IntoIterator,
-          F: FnMut(<span class="kw-2">&amp;</span>I::Item, <span class="kw-2">&amp;</span>J::Item) -&gt; Ordering
+</span><span class="kw">pub fn </span>merge_join_by&lt;I, J, F, T&gt;(
+    left: I,
+    right: J,
+    cmp_fn: F,
+) -&gt; MergeJoinBy&lt;I::IntoIter, J::IntoIter, F&gt;
+<span class="kw">where
+    </span>I: IntoIterator,
+    J: IntoIterator,
+    F: FnMut(<span class="kw-2">&amp;</span>I::Item, <span class="kw-2">&amp;</span>J::Item) -&gt; T,
 {
-    MergeJoinBy {
+    MergeBy {
         left: put_back(left.into_iter().fuse()),
         right: put_back(right.into_iter().fuse()),
-        cmp_fn,
+        cmp_fn: MergeFuncLR(cmp_fn, PhantomData),
     }
 }
 
 <span class="doccomment">/// An iterator adaptor that merge-joins items from the two base iterators in ascending order.
 ///
 /// See [`.merge_join_by()`](crate::Itertools::merge_join_by) for more information.
-</span><span class="attr">#[must_use = <span class="string">&quot;iterator adaptors are lazy and do nothing unless consumed&quot;</span>]
-</span><span class="kw">pub struct </span>MergeJoinBy&lt;I: Iterator, J: Iterator, F&gt; {
-    left: PutBack&lt;Fuse&lt;I&gt;&gt;,
-    right: PutBack&lt;Fuse&lt;J&gt;&gt;,
-    cmp_fn: F
+</span><span class="kw">pub type </span>MergeJoinBy&lt;I, J, F&gt; =
+    MergeBy&lt;I, J, MergeFuncLR&lt;F, &lt;F <span class="kw">as </span>FuncLR&lt;&lt;I <span class="kw">as </span>Iterator&gt;::Item, &lt;J <span class="kw">as </span>Iterator&gt;::Item&gt;&gt;::T&gt;&gt;;
+
+<span class="attr">#[derive(Clone, Debug)]
+</span><span class="kw">pub struct </span>MergeFuncLR&lt;F, T&gt;(F, PhantomData&lt;T&gt;);
+
+<span class="kw">pub trait </span>FuncLR&lt;L, R&gt; {
+    <span class="kw">type </span>T;
 }
 
-<span class="kw">impl</span>&lt;I, J, F&gt; Clone <span class="kw">for </span>MergeJoinBy&lt;I, J, F&gt;
-    <span class="kw">where </span>I: Iterator,
-          J: Iterator,
-          PutBack&lt;Fuse&lt;I&gt;&gt;: Clone,
-          PutBack&lt;Fuse&lt;J&gt;&gt;: Clone,
-          F: Clone,
-{
-    <span class="macro">clone_fields!</span>(left, right, cmp_fn);
+<span class="kw">impl</span>&lt;L, R, T, F: FnMut(<span class="kw-2">&amp;</span>L, <span class="kw-2">&amp;</span>R) -&gt; T&gt; FuncLR&lt;L, R&gt; <span class="kw">for </span>F {
+    <span class="kw">type </span>T = T;
 }
 
-<span class="kw">impl</span>&lt;I, J, F&gt; fmt::Debug <span class="kw">for </span>MergeJoinBy&lt;I, J, F&gt;
-    <span class="kw">where </span>I: Iterator + fmt::Debug,
-          I::Item: fmt::Debug,
-          J: Iterator + fmt::Debug,
-          J::Item: fmt::Debug,
-{
-    <span class="macro">debug_fmt_fields!</span>(MergeJoinBy, left, right);
+<span class="kw">pub trait </span>OrderingOrBool&lt;L, R&gt; {
+    <span class="kw">type </span>MergeResult;
+    <span class="kw">fn </span>left(left: L) -&gt; <span class="self">Self</span>::MergeResult;
+    <span class="kw">fn </span>right(right: R) -&gt; <span class="self">Self</span>::MergeResult;
+    <span class="comment">// &quot;merge&quot; never returns (Some(...), Some(...), ...) so Option&lt;Either&lt;I::Item, J::Item&gt;&gt;
+    // is appealing but it is always followed by two put_backs, so we think the compiler is
+    // smart enough to optimize it. Or we could move put_backs into &quot;merge&quot;.
+    </span><span class="kw">fn </span>merge(<span class="kw-2">&amp;mut </span><span class="self">self</span>, left: L, right: R) -&gt; (<span class="prelude-ty">Option</span>&lt;L&gt;, <span class="prelude-ty">Option</span>&lt;R&gt;, <span class="self">Self</span>::MergeResult);
+    <span class="kw">fn </span>size_hint(left: SizeHint, right: SizeHint) -&gt; SizeHint;
 }
 
-<span class="kw">impl</span>&lt;I, J, F&gt; Iterator <span class="kw">for </span>MergeJoinBy&lt;I, J, F&gt;
-    <span class="kw">where </span>I: Iterator,
-          J: Iterator,
-          F: FnMut(<span class="kw-2">&amp;</span>I::Item, <span class="kw-2">&amp;</span>J::Item) -&gt; Ordering
-{
-    <span class="kw">type </span>Item = EitherOrBoth&lt;I::Item, J::Item&gt;;
-
-    <span class="kw">fn </span>next(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>::Item&gt; {
-        <span class="kw">match </span>(<span class="self">self</span>.left.next(), <span class="self">self</span>.right.next()) {
-            (<span class="prelude-val">None</span>, <span class="prelude-val">None</span>) =&gt; <span class="prelude-val">None</span>,
-            (<span class="prelude-val">Some</span>(left), <span class="prelude-val">None</span>) =&gt;
-                <span class="prelude-val">Some</span>(EitherOrBoth::Left(left)),
-            (<span class="prelude-val">None</span>, <span class="prelude-val">Some</span>(right)) =&gt;
-                <span class="prelude-val">Some</span>(EitherOrBoth::Right(right)),
-            (<span class="prelude-val">Some</span>(left), <span class="prelude-val">Some</span>(right)) =&gt; {
-                <span class="kw">match </span>(<span class="self">self</span>.cmp_fn)(<span class="kw-2">&amp;</span>left, <span class="kw-2">&amp;</span>right) {
-                    Ordering::Equal =&gt;
-                        <span class="prelude-val">Some</span>(EitherOrBoth::Both(left, right)),
-                    Ordering::Less =&gt; {
-                        <span class="self">self</span>.right.put_back(right);
-                        <span class="prelude-val">Some</span>(EitherOrBoth::Left(left))
-                    },
-                    Ordering::Greater =&gt; {
-                        <span class="self">self</span>.left.put_back(left);
-                        <span class="prelude-val">Some</span>(EitherOrBoth::Right(right))
-                    }
-                }
-            }
+<span class="kw">impl</span>&lt;L, R, F: FnMut(<span class="kw-2">&amp;</span>L, <span class="kw-2">&amp;</span>R) -&gt; Ordering&gt; OrderingOrBool&lt;L, R&gt; <span class="kw">for </span>MergeFuncLR&lt;F, Ordering&gt; {
+    <span class="kw">type </span>MergeResult = EitherOrBoth&lt;L, R&gt;;
+    <span class="kw">fn </span>left(left: L) -&gt; <span class="self">Self</span>::MergeResult {
+        EitherOrBoth::Left(left)
+    }
+    <span class="kw">fn </span>right(right: R) -&gt; <span class="self">Self</span>::MergeResult {
+        EitherOrBoth::Right(right)
+    }
+    <span class="kw">fn </span>merge(<span class="kw-2">&amp;mut </span><span class="self">self</span>, left: L, right: R) -&gt; (<span class="prelude-ty">Option</span>&lt;L&gt;, <span class="prelude-ty">Option</span>&lt;R&gt;, <span class="self">Self</span>::MergeResult) {
+        <span class="kw">match </span><span class="self">self</span>.<span class="number">0</span>(<span class="kw-2">&amp;</span>left, <span class="kw-2">&amp;</span>right) {
+            Ordering::Equal =&gt; (<span class="prelude-val">None</span>, <span class="prelude-val">None</span>, EitherOrBoth::Both(left, right)),
+            Ordering::Less =&gt; (<span class="prelude-val">None</span>, <span class="prelude-val">Some</span>(right), EitherOrBoth::Left(left)),
+            Ordering::Greater =&gt; (<span class="prelude-val">Some</span>(left), <span class="prelude-val">None</span>, EitherOrBoth::Right(right)),
         }
     }
-
-    <span class="kw">fn </span>size_hint(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; (usize, <span class="prelude-ty">Option</span>&lt;usize&gt;) {
-        <span class="kw">let </span>(a_lower, a_upper) = <span class="self">self</span>.left.size_hint();
-        <span class="kw">let </span>(b_lower, b_upper) = <span class="self">self</span>.right.size_hint();
-
+    <span class="kw">fn </span>size_hint(left: SizeHint, right: SizeHint) -&gt; SizeHint {
+        <span class="kw">let </span>(a_lower, a_upper) = left;
+        <span class="kw">let </span>(b_lower, b_upper) = right;
         <span class="kw">let </span>lower = ::std::cmp::max(a_lower, b_lower);
-
         <span class="kw">let </span>upper = <span class="kw">match </span>(a_upper, b_upper) {
             (<span class="prelude-val">Some</span>(x), <span class="prelude-val">Some</span>(y)) =&gt; x.checked_add(y),
             <span class="kw">_ </span>=&gt; <span class="prelude-val">None</span>,
         };
-
         (lower, upper)
+    }
+}
+
+<span class="kw">impl</span>&lt;L, R, F: FnMut(<span class="kw-2">&amp;</span>L, <span class="kw-2">&amp;</span>R) -&gt; bool&gt; OrderingOrBool&lt;L, R&gt; <span class="kw">for </span>MergeFuncLR&lt;F, bool&gt; {
+    <span class="kw">type </span>MergeResult = Either&lt;L, R&gt;;
+    <span class="kw">fn </span>left(left: L) -&gt; <span class="self">Self</span>::MergeResult {
+        Either::Left(left)
+    }
+    <span class="kw">fn </span>right(right: R) -&gt; <span class="self">Self</span>::MergeResult {
+        Either::Right(right)
+    }
+    <span class="kw">fn </span>merge(<span class="kw-2">&amp;mut </span><span class="self">self</span>, left: L, right: R) -&gt; (<span class="prelude-ty">Option</span>&lt;L&gt;, <span class="prelude-ty">Option</span>&lt;R&gt;, <span class="self">Self</span>::MergeResult) {
+        <span class="kw">if </span><span class="self">self</span>.<span class="number">0</span>(<span class="kw-2">&amp;</span>left, <span class="kw-2">&amp;</span>right) {
+            (<span class="prelude-val">None</span>, <span class="prelude-val">Some</span>(right), Either::Left(left))
+        } <span class="kw">else </span>{
+            (<span class="prelude-val">Some</span>(left), <span class="prelude-val">None</span>, Either::Right(right))
+        }
+    }
+    <span class="kw">fn </span>size_hint(left: SizeHint, right: SizeHint) -&gt; SizeHint {
+        <span class="comment">// Not ExactSizeIterator because size may be larger than usize
+        </span>size_hint::add(left, right)
+    }
+}
+
+<span class="kw">impl</span>&lt;T, F: FnMut(<span class="kw-2">&amp;</span>T, <span class="kw-2">&amp;</span>T) -&gt; bool&gt; OrderingOrBool&lt;T, T&gt; <span class="kw">for </span>F {
+    <span class="kw">type </span>MergeResult = T;
+    <span class="kw">fn </span>left(left: T) -&gt; <span class="self">Self</span>::MergeResult {
+        left
+    }
+    <span class="kw">fn </span>right(right: T) -&gt; <span class="self">Self</span>::MergeResult {
+        right
+    }
+    <span class="kw">fn </span>merge(<span class="kw-2">&amp;mut </span><span class="self">self</span>, left: T, right: T) -&gt; (<span class="prelude-ty">Option</span>&lt;T&gt;, <span class="prelude-ty">Option</span>&lt;T&gt;, <span class="self">Self</span>::MergeResult) {
+        <span class="kw">if </span><span class="self">self</span>(<span class="kw-2">&amp;</span>left, <span class="kw-2">&amp;</span>right) {
+            (<span class="prelude-val">None</span>, <span class="prelude-val">Some</span>(right), left)
+        } <span class="kw">else </span>{
+            (<span class="prelude-val">Some</span>(left), <span class="prelude-val">None</span>, right)
+        }
+    }
+    <span class="kw">fn </span>size_hint(left: SizeHint, right: SizeHint) -&gt; SizeHint {
+        <span class="comment">// Not ExactSizeIterator because size may be larger than usize
+        </span>size_hint::add(left, right)
+    }
+}
+
+<span class="kw">impl</span>&lt;T: PartialOrd&gt; OrderingOrBool&lt;T, T&gt; <span class="kw">for </span>MergeLte {
+    <span class="kw">type </span>MergeResult = T;
+    <span class="kw">fn </span>left(left: T) -&gt; <span class="self">Self</span>::MergeResult {
+        left
+    }
+    <span class="kw">fn </span>right(right: T) -&gt; <span class="self">Self</span>::MergeResult {
+        right
+    }
+    <span class="kw">fn </span>merge(<span class="kw-2">&amp;mut </span><span class="self">self</span>, left: T, right: T) -&gt; (<span class="prelude-ty">Option</span>&lt;T&gt;, <span class="prelude-ty">Option</span>&lt;T&gt;, <span class="self">Self</span>::MergeResult) {
+        <span class="kw">if </span>left &lt;= right {
+            (<span class="prelude-val">None</span>, <span class="prelude-val">Some</span>(right), left)
+        } <span class="kw">else </span>{
+            (<span class="prelude-val">Some</span>(left), <span class="prelude-val">None</span>, right)
+        }
+    }
+    <span class="kw">fn </span>size_hint(left: SizeHint, right: SizeHint) -&gt; SizeHint {
+        <span class="comment">// Not ExactSizeIterator because size may be larger than usize
+        </span>size_hint::add(left, right)
+    }
+}
+
+<span class="kw">impl</span>&lt;I, J, F&gt; Clone <span class="kw">for </span>MergeBy&lt;I, J, F&gt;
+<span class="kw">where
+    </span>I: Iterator,
+    J: Iterator,
+    PutBack&lt;Fuse&lt;I&gt;&gt;: Clone,
+    PutBack&lt;Fuse&lt;J&gt;&gt;: Clone,
+    F: Clone,
+{
+    <span class="macro">clone_fields!</span>(left, right, cmp_fn);
+}
+
+<span class="kw">impl</span>&lt;I, J, F&gt; fmt::Debug <span class="kw">for </span>MergeBy&lt;I, J, F&gt;
+<span class="kw">where
+    </span>I: Iterator + fmt::Debug,
+    I::Item: fmt::Debug,
+    J: Iterator + fmt::Debug,
+    J::Item: fmt::Debug,
+{
+    <span class="macro">debug_fmt_fields!</span>(MergeBy, left, right);
+}
+
+<span class="kw">impl</span>&lt;I, J, F&gt; Iterator <span class="kw">for </span>MergeBy&lt;I, J, F&gt;
+<span class="kw">where
+    </span>I: Iterator,
+    J: Iterator,
+    F: OrderingOrBool&lt;I::Item, J::Item&gt;,
+{
+    <span class="kw">type </span>Item = F::MergeResult;
+
+    <span class="kw">fn </span>next(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>::Item&gt; {
+        <span class="kw">match </span>(<span class="self">self</span>.left.next(), <span class="self">self</span>.right.next()) {
+            (<span class="prelude-val">None</span>, <span class="prelude-val">None</span>) =&gt; <span class="prelude-val">None</span>,
+            (<span class="prelude-val">Some</span>(left), <span class="prelude-val">None</span>) =&gt; <span class="prelude-val">Some</span>(F::left(left)),
+            (<span class="prelude-val">None</span>, <span class="prelude-val">Some</span>(right)) =&gt; <span class="prelude-val">Some</span>(F::right(right)),
+            (<span class="prelude-val">Some</span>(left), <span class="prelude-val">Some</span>(right)) =&gt; {
+                <span class="kw">let </span>(left, right, next) = <span class="self">self</span>.cmp_fn.merge(left, right);
+                <span class="kw">if let </span><span class="prelude-val">Some</span>(left) = left {
+                    <span class="self">self</span>.left.put_back(left);
+                }
+                <span class="kw">if let </span><span class="prelude-val">Some</span>(right) = right {
+                    <span class="self">self</span>.right.put_back(right);
+                }
+                <span class="prelude-val">Some</span>(next)
+            }
+        }
+    }
+
+    <span class="kw">fn </span>size_hint(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; SizeHint {
+        F::size_hint(<span class="self">self</span>.left.size_hint(), <span class="self">self</span>.right.size_hint())
     }
 
     <span class="kw">fn </span>count(<span class="kw-2">mut </span><span class="self">self</span>) -&gt; usize {
@@ -275,10 +608,12 @@
                 (<span class="prelude-val">None</span>, <span class="prelude-val">Some</span>(_right)) =&gt; <span class="kw">break </span>count + <span class="number">1 </span>+ <span class="self">self</span>.right.into_parts().<span class="number">1</span>.count(),
                 (<span class="prelude-val">Some</span>(left), <span class="prelude-val">Some</span>(right)) =&gt; {
                     count += <span class="number">1</span>;
-                    <span class="kw">match </span>(<span class="self">self</span>.cmp_fn)(<span class="kw-2">&amp;</span>left, <span class="kw-2">&amp;</span>right) {
-                        Ordering::Equal =&gt; {}
-                        Ordering::Less =&gt; <span class="self">self</span>.right.put_back(right),
-                        Ordering::Greater =&gt; <span class="self">self</span>.left.put_back(left),
+                    <span class="kw">let </span>(left, right, <span class="kw">_</span>) = <span class="self">self</span>.cmp_fn.merge(left, right);
+                    <span class="kw">if let </span><span class="prelude-val">Some</span>(left) = left {
+                        <span class="self">self</span>.left.put_back(left);
+                    }
+                    <span class="kw">if let </span><span class="prelude-val">Some</span>(right) = right {
+                        <span class="self">self</span>.right.put_back(right);
                     }
                 }
             }
@@ -291,27 +626,20 @@
             <span class="kw">match </span>(<span class="self">self</span>.left.next(), <span class="self">self</span>.right.next()) {
                 (<span class="prelude-val">None</span>, <span class="prelude-val">None</span>) =&gt; <span class="kw">break </span>previous_element,
                 (<span class="prelude-val">Some</span>(left), <span class="prelude-val">None</span>) =&gt; {
-                    <span class="kw">break </span><span class="prelude-val">Some</span>(EitherOrBoth::Left(
-                        <span class="self">self</span>.left.into_parts().<span class="number">1</span>.last().unwrap_or(left),
-                    ))
+                    <span class="kw">break </span><span class="prelude-val">Some</span>(F::left(<span class="self">self</span>.left.into_parts().<span class="number">1</span>.last().unwrap_or(left)))
                 }
                 (<span class="prelude-val">None</span>, <span class="prelude-val">Some</span>(right)) =&gt; {
-                    <span class="kw">break </span><span class="prelude-val">Some</span>(EitherOrBoth::Right(
-                        <span class="self">self</span>.right.into_parts().<span class="number">1</span>.last().unwrap_or(right),
-                    ))
+                    <span class="kw">break </span><span class="prelude-val">Some</span>(F::right(<span class="self">self</span>.right.into_parts().<span class="number">1</span>.last().unwrap_or(right)))
                 }
                 (<span class="prelude-val">Some</span>(left), <span class="prelude-val">Some</span>(right)) =&gt; {
-                    previous_element = <span class="kw">match </span>(<span class="self">self</span>.cmp_fn)(<span class="kw-2">&amp;</span>left, <span class="kw-2">&amp;</span>right) {
-                        Ordering::Equal =&gt; <span class="prelude-val">Some</span>(EitherOrBoth::Both(left, right)),
-                        Ordering::Less =&gt; {
-                            <span class="self">self</span>.right.put_back(right);
-                            <span class="prelude-val">Some</span>(EitherOrBoth::Left(left))
-                        }
-                        Ordering::Greater =&gt; {
-                            <span class="self">self</span>.left.put_back(left);
-                            <span class="prelude-val">Some</span>(EitherOrBoth::Right(right))
-                        }
+                    <span class="kw">let </span>(left, right, elem) = <span class="self">self</span>.cmp_fn.merge(left, right);
+                    <span class="kw">if let </span><span class="prelude-val">Some</span>(left) = left {
+                        <span class="self">self</span>.left.put_back(left);
                     }
+                    <span class="kw">if let </span><span class="prelude-val">Some</span>(right) = right {
+                        <span class="self">self</span>.right.put_back(right);
+                    }
+                    previous_element = <span class="prelude-val">Some</span>(elem);
                 }
             }
         }
@@ -325,15 +653,27 @@
             n -= <span class="number">1</span>;
             <span class="kw">match </span>(<span class="self">self</span>.left.next(), <span class="self">self</span>.right.next()) {
                 (<span class="prelude-val">None</span>, <span class="prelude-val">None</span>) =&gt; <span class="kw">break </span><span class="prelude-val">None</span>,
-                (<span class="prelude-val">Some</span>(_left), <span class="prelude-val">None</span>) =&gt; <span class="kw">break </span><span class="self">self</span>.left.nth(n).map(EitherOrBoth::Left),
-                (<span class="prelude-val">None</span>, <span class="prelude-val">Some</span>(_right)) =&gt; <span class="kw">break </span><span class="self">self</span>.right.nth(n).map(EitherOrBoth::Right),
-                (<span class="prelude-val">Some</span>(left), <span class="prelude-val">Some</span>(right)) =&gt; <span class="kw">match </span>(<span class="self">self</span>.cmp_fn)(<span class="kw-2">&amp;</span>left, <span class="kw-2">&amp;</span>right) {
-                    Ordering::Equal =&gt; {}
-                    Ordering::Less =&gt; <span class="self">self</span>.right.put_back(right),
-                    Ordering::Greater =&gt; <span class="self">self</span>.left.put_back(left),
-                },
+                (<span class="prelude-val">Some</span>(_left), <span class="prelude-val">None</span>) =&gt; <span class="kw">break </span><span class="self">self</span>.left.nth(n).map(F::left),
+                (<span class="prelude-val">None</span>, <span class="prelude-val">Some</span>(_right)) =&gt; <span class="kw">break </span><span class="self">self</span>.right.nth(n).map(F::right),
+                (<span class="prelude-val">Some</span>(left), <span class="prelude-val">Some</span>(right)) =&gt; {
+                    <span class="kw">let </span>(left, right, <span class="kw">_</span>) = <span class="self">self</span>.cmp_fn.merge(left, right);
+                    <span class="kw">if let </span><span class="prelude-val">Some</span>(left) = left {
+                        <span class="self">self</span>.left.put_back(left);
+                    }
+                    <span class="kw">if let </span><span class="prelude-val">Some</span>(right) = right {
+                        <span class="self">self</span>.right.put_back(right);
+                    }
+                }
             }
         }
     }
+}
+
+<span class="kw">impl</span>&lt;I, J, F&gt; FusedIterator <span class="kw">for </span>MergeBy&lt;I, J, F&gt;
+<span class="kw">where
+    </span>I: Iterator,
+    J: Iterator,
+    F: OrderingOrBool&lt;I::Item, J::Item&gt;,
+{
 }
 </code></pre></div></section></main></body></html>

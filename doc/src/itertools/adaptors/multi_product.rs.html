@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/nix/store/a04z6lnlzhx5ri6nlgjig0ir12hyiw0n-vendor-cargo-deps/c19b7c6f923b580ac259164a89f2577984ad5ab09ee9d583b888f934adbbe8d0/itertools-0.10.5/src/adaptors/multi_product.rs`."><title>multi_product.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-fa3bb1812debf86c.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="itertools" data-themes="" data-resource-suffix="" data-rustdoc-version="1.74.1 (a28077b28 2023-12-04)" data-channel="1.74.1" data-search-js="search-8be46b629f5f14a8.js" data-settings-js="settings-74424d7eec62a23e.js" ><script src="../../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-c5bd66d33317d69f.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../../itertools/index.html"><img class="rust-logo" src="../../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/nix/store/c4453a3v03igkgaaki07gs4c4w6xz5ri-vendor-cargo-deps/c19b7c6f923b580ac259164a89f2577984ad5ab09ee9d583b888f934adbbe8d0/itertools-0.12.0/src/adaptors/multi_product.rs`."><title>multi_product.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-fa3bb1812debf86c.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="itertools" data-themes="" data-resource-suffix="" data-rustdoc-version="1.74.1 (a28077b28 2023-12-04)" data-channel="1.74.1" data-search-js="search-8be46b629f5f14a8.js" data-settings-js="settings-74424d7eec62a23e.js" ><script src="../../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-c5bd66d33317d69f.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../../itertools/index.html"><img class="rust-logo" src="../../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -228,6 +228,27 @@
 <a href="#228" id="228">228</a>
 <a href="#229" id="229">229</a>
 <a href="#230" id="230">230</a>
+<a href="#231" id="231">231</a>
+<a href="#232" id="232">232</a>
+<a href="#233" id="233">233</a>
+<a href="#234" id="234">234</a>
+<a href="#235" id="235">235</a>
+<a href="#236" id="236">236</a>
+<a href="#237" id="237">237</a>
+<a href="#238" id="238">238</a>
+<a href="#239" id="239">239</a>
+<a href="#240" id="240">240</a>
+<a href="#241" id="241">241</a>
+<a href="#242" id="242">242</a>
+<a href="#243" id="243">243</a>
+<a href="#244" id="244">244</a>
+<a href="#245" id="245">245</a>
+<a href="#246" id="246">246</a>
+<a href="#247" id="247">247</a>
+<a href="#248" id="248">248</a>
+<a href="#249" id="249">249</a>
+<a href="#250" id="250">250</a>
+<a href="#251" id="251">251</a>
 </pre></div><pre class="rust"><code><span class="attr">#![cfg(feature = <span class="string">&quot;use_alloc&quot;</span>)]
 
 </span><span class="kw">use </span><span class="kw">crate</span>::size_hint;
@@ -245,8 +266,9 @@
 /// for more information.
 </span><span class="attr">#[must_use = <span class="string">&quot;iterator adaptors are lazy and do nothing unless consumed&quot;</span>]
 </span><span class="kw">pub struct </span>MultiProduct&lt;I&gt;(Vec&lt;MultiProductIter&lt;I&gt;&gt;)
-    <span class="kw">where </span>I: Iterator + Clone,
-          I::Item: Clone;
+<span class="kw">where
+    </span>I: Iterator + Clone,
+    I::Item: Clone;
 
 <span class="kw">impl</span>&lt;I&gt; std::fmt::Debug <span class="kw">for </span>MultiProduct&lt;I&gt;
 <span class="kw">where
@@ -261,19 +283,25 @@
 ///
 /// Iterator element is of type `Vec&lt;H::Item::Item&gt;`.
 </span><span class="kw">pub fn </span>multi_cartesian_product&lt;H&gt;(iters: H) -&gt; MultiProduct&lt;&lt;H::Item <span class="kw">as </span>IntoIterator&gt;::IntoIter&gt;
-    <span class="kw">where </span>H: Iterator,
-          H::Item: IntoIterator,
-          &lt;H::Item <span class="kw">as </span>IntoIterator&gt;::IntoIter: Clone,
-          &lt;H::Item <span class="kw">as </span>IntoIterator&gt;::Item: Clone
+<span class="kw">where
+    </span>H: Iterator,
+    H::Item: IntoIterator,
+    &lt;H::Item <span class="kw">as </span>IntoIterator&gt;::IntoIter: Clone,
+    &lt;H::Item <span class="kw">as </span>IntoIterator&gt;::Item: Clone,
 {
-    MultiProduct(iters.map(|i| MultiProductIter::new(i.into_iter())).collect())
+    MultiProduct(
+        iters
+            .map(|i| MultiProductIter::new(i.into_iter()))
+            .collect(),
+    )
 }
 
 <span class="attr">#[derive(Clone, Debug)]
 </span><span class="doccomment">/// Holds the state of a single iterator within a `MultiProduct`.
 </span><span class="kw">struct </span>MultiProductIter&lt;I&gt;
-    <span class="kw">where </span>I: Iterator + Clone,
-          I::Item: Clone
+<span class="kw">where
+    </span>I: Iterator + Clone,
+    I::Item: Clone,
 {
     cur: <span class="prelude-ty">Option</span>&lt;I::Item&gt;,
     iter: I,
@@ -288,8 +316,9 @@
 }
 
 <span class="kw">impl</span>&lt;I&gt; MultiProduct&lt;I&gt;
-    <span class="kw">where </span>I: Iterator + Clone,
-          I::Item: Clone
+<span class="kw">where
+    </span>I: Iterator + Clone,
+    I::Item: Clone,
 {
     <span class="doccomment">/// Iterates the rightmost iterator, then recursively iterates iterators
     /// to the left if necessary.
@@ -297,7 +326,7 @@
     /// Returns true if the iteration succeeded, else false.
     </span><span class="kw">fn </span>iterate_last(
         multi_iters: <span class="kw-2">&amp;mut </span>[MultiProductIter&lt;I&gt;],
-        <span class="kw-2">mut </span>state: MultiProductIterState
+        <span class="kw-2">mut </span>state: MultiProductIterState,
     ) -&gt; bool {
         <span class="kw">use </span><span class="self">self</span>::MultiProductIterState::<span class="kw-2">*</span>;
 
@@ -307,8 +336,8 @@
                     <span class="kw">let </span>on_first_iter = !last.in_progress();
                     state = MidIter { on_first_iter };
                     on_first_iter
-                },
-                MidIter { on_first_iter } =&gt; on_first_iter
+                }
+                MidIter { on_first_iter } =&gt; on_first_iter,
             };
 
             <span class="kw">if </span>!on_first_iter {
@@ -331,16 +360,17 @@
             // At end of iteration (final iterator finishes), finish.
             </span><span class="kw">match </span>state {
                 StartOfIter =&gt; <span class="bool-val">false</span>,
-                MidIter { on_first_iter } =&gt; on_first_iter
+                MidIter { on_first_iter } =&gt; on_first_iter,
             }
         }
     }
 
     <span class="doccomment">/// Returns the unwrapped value of the next iteration.
     </span><span class="kw">fn </span>curr_iterator(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Vec&lt;I::Item&gt; {
-        <span class="self">self</span>.<span class="number">0</span>.iter().map(|multi_iter| {
-            multi_iter.cur.clone().unwrap()
-        }).collect()
+        <span class="self">self</span>.<span class="number">0
+            </span>.iter()
+            .map(|multi_iter| multi_iter.cur.clone().unwrap())
+            .collect()
     }
 
     <span class="doccomment">/// Returns true if iteration has started and has not yet finished; false
@@ -355,14 +385,15 @@
 }
 
 <span class="kw">impl</span>&lt;I&gt; MultiProductIter&lt;I&gt;
-    <span class="kw">where </span>I: Iterator + Clone,
-          I::Item: Clone
+<span class="kw">where
+    </span>I: Iterator + Clone,
+    I::Item: Clone,
 {
     <span class="kw">fn </span>new(iter: I) -&gt; <span class="self">Self </span>{
         MultiProductIter {
             cur: <span class="prelude-val">None</span>,
             iter: iter.clone(),
-            iter_orig: iter
+            iter_orig: iter,
         }
     }
 
@@ -384,16 +415,14 @@
 }
 
 <span class="kw">impl</span>&lt;I&gt; Iterator <span class="kw">for </span>MultiProduct&lt;I&gt;
-    <span class="kw">where </span>I: Iterator + Clone,
-          I::Item: Clone
+<span class="kw">where
+    </span>I: Iterator + Clone,
+    I::Item: Clone,
 {
     <span class="kw">type </span>Item = Vec&lt;I::Item&gt;;
 
     <span class="kw">fn </span>next(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>::Item&gt; {
-        <span class="kw">if </span>MultiProduct::iterate_last(
-            <span class="kw-2">&amp;mut </span><span class="self">self</span>.<span class="number">0</span>,
-            MultiProductIterState::StartOfIter
-        ) {
+        <span class="kw">if </span>MultiProduct::iterate_last(<span class="kw-2">&amp;mut </span><span class="self">self</span>.<span class="number">0</span>, MultiProductIterState::StartOfIter) {
             <span class="prelude-val">Some</span>(<span class="self">self</span>.curr_iterator())
         } <span class="kw">else </span>{
             <span class="prelude-val">None
@@ -406,18 +435,24 @@
         }
 
         <span class="kw">if </span>!<span class="self">self</span>.in_progress() {
-            <span class="kw">return </span><span class="self">self</span>.<span class="number">0</span>.into_iter().fold(<span class="number">1</span>, |acc, multi_iter| {
-                acc * multi_iter.iter.count()
-            });
+            <span class="kw">return </span><span class="self">self
+                </span>.<span class="number">0
+                </span>.into_iter()
+                .fold(<span class="number">1</span>, |acc, multi_iter| acc * multi_iter.iter.count());
         }
 
         <span class="self">self</span>.<span class="number">0</span>.into_iter().fold(
             <span class="number">0</span>,
-            |acc, MultiProductIter { iter, iter_orig, cur: <span class="kw">_ </span>}| {
+            |acc,
+             MultiProductIter {
+                 iter,
+                 iter_orig,
+                 cur: <span class="kw">_</span>,
+             }| {
                 <span class="kw">let </span>total_count = iter_orig.count();
                 <span class="kw">let </span>cur_count = iter.count();
                 acc * total_count + cur_count
-            }
+            },
         )
     }
 
@@ -435,18 +470,25 @@
 
         <span class="self">self</span>.<span class="number">0</span>.iter().fold(
             (<span class="number">0</span>, <span class="prelude-val">Some</span>(<span class="number">0</span>)),
-            |acc, <span class="kw-2">&amp;</span>MultiProductIter { <span class="kw-2">ref </span>iter, <span class="kw-2">ref </span>iter_orig, cur: <span class="kw">_ </span>}| {
+            |acc,
+             <span class="kw-2">&amp;</span>MultiProductIter {
+                 <span class="kw-2">ref </span>iter,
+                 <span class="kw-2">ref </span>iter_orig,
+                 cur: <span class="kw">_</span>,
+             }| {
                 <span class="kw">let </span>cur_size = iter.size_hint();
                 <span class="kw">let </span>total_size = iter_orig.size_hint();
                 size_hint::add(size_hint::mul(acc, total_size), cur_size)
-            }
+            },
         )
     }
 
     <span class="kw">fn </span>last(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>::Item&gt; {
         <span class="kw">let </span>iter_count = <span class="self">self</span>.<span class="number">0</span>.len();
 
-        <span class="kw">let </span>lasts: <span class="self">Self</span>::Item = <span class="self">self</span>.<span class="number">0</span>.into_iter()
+        <span class="kw">let </span>lasts: <span class="self">Self</span>::Item = <span class="self">self
+            </span>.<span class="number">0
+            </span>.into_iter()
             .map(|multi_iter| multi_iter.iter.last())
             .while_some()
             .collect();

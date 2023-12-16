@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/nix/store/a04z6lnlzhx5ri6nlgjig0ir12hyiw0n-vendor-cargo-deps/c19b7c6f923b580ac259164a89f2577984ad5ab09ee9d583b888f934adbbe8d0/itertools-0.10.5/src/tuple_impl.rs`."><title>tuple_impl.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-fa3bb1812debf86c.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="itertools" data-themes="" data-resource-suffix="" data-rustdoc-version="1.74.1 (a28077b28 2023-12-04)" data-channel="1.74.1" data-search-js="search-8be46b629f5f14a8.js" data-settings-js="settings-74424d7eec62a23e.js" ><script src="../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-c5bd66d33317d69f.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../itertools/index.html"><img class="rust-logo" src="../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/nix/store/c4453a3v03igkgaaki07gs4c4w6xz5ri-vendor-cargo-deps/c19b7c6f923b580ac259164a89f2577984ad5ab09ee9d583b888f934adbbe8d0/itertools-0.12.0/src/tuple_impl.rs`."><title>tuple_impl.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-fa3bb1812debf86c.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="itertools" data-themes="" data-resource-suffix="" data-rustdoc-version="1.74.1 (a28077b28 2023-12-04)" data-channel="1.74.1" data-search-js="search-8be46b629f5f14a8.js" data-settings-js="settings-74424d7eec62a23e.js" ><script src="../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-c5bd66d33317d69f.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../itertools/index.html"><img class="rust-logo" src="../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -329,13 +329,90 @@
 <a href="#329" id="329">329</a>
 <a href="#330" id="330">330</a>
 <a href="#331" id="331">331</a>
+<a href="#332" id="332">332</a>
+<a href="#333" id="333">333</a>
+<a href="#334" id="334">334</a>
+<a href="#335" id="335">335</a>
+<a href="#336" id="336">336</a>
+<a href="#337" id="337">337</a>
+<a href="#338" id="338">338</a>
+<a href="#339" id="339">339</a>
+<a href="#340" id="340">340</a>
+<a href="#341" id="341">341</a>
+<a href="#342" id="342">342</a>
+<a href="#343" id="343">343</a>
+<a href="#344" id="344">344</a>
+<a href="#345" id="345">345</a>
+<a href="#346" id="346">346</a>
+<a href="#347" id="347">347</a>
+<a href="#348" id="348">348</a>
+<a href="#349" id="349">349</a>
+<a href="#350" id="350">350</a>
+<a href="#351" id="351">351</a>
+<a href="#352" id="352">352</a>
+<a href="#353" id="353">353</a>
+<a href="#354" id="354">354</a>
+<a href="#355" id="355">355</a>
+<a href="#356" id="356">356</a>
+<a href="#357" id="357">357</a>
+<a href="#358" id="358">358</a>
+<a href="#359" id="359">359</a>
+<a href="#360" id="360">360</a>
+<a href="#361" id="361">361</a>
+<a href="#362" id="362">362</a>
+<a href="#363" id="363">363</a>
+<a href="#364" id="364">364</a>
+<a href="#365" id="365">365</a>
+<a href="#366" id="366">366</a>
+<a href="#367" id="367">367</a>
+<a href="#368" id="368">368</a>
+<a href="#369" id="369">369</a>
+<a href="#370" id="370">370</a>
+<a href="#371" id="371">371</a>
+<a href="#372" id="372">372</a>
+<a href="#373" id="373">373</a>
+<a href="#374" id="374">374</a>
+<a href="#375" id="375">375</a>
+<a href="#376" id="376">376</a>
+<a href="#377" id="377">377</a>
+<a href="#378" id="378">378</a>
+<a href="#379" id="379">379</a>
+<a href="#380" id="380">380</a>
+<a href="#381" id="381">381</a>
+<a href="#382" id="382">382</a>
+<a href="#383" id="383">383</a>
+<a href="#384" id="384">384</a>
+<a href="#385" id="385">385</a>
+<a href="#386" id="386">386</a>
+<a href="#387" id="387">387</a>
+<a href="#388" id="388">388</a>
+<a href="#389" id="389">389</a>
+<a href="#390" id="390">390</a>
+<a href="#391" id="391">391</a>
+<a href="#392" id="392">392</a>
+<a href="#393" id="393">393</a>
+<a href="#394" id="394">394</a>
+<a href="#395" id="395">395</a>
+<a href="#396" id="396">396</a>
+<a href="#397" id="397">397</a>
+<a href="#398" id="398">398</a>
+<a href="#399" id="399">399</a>
+<a href="#400" id="400">400</a>
+<a href="#401" id="401">401</a>
+<a href="#402" id="402">402</a>
+<a href="#403" id="403">403</a>
+<a href="#404" id="404">404</a>
+<a href="#405" id="405">405</a>
+<a href="#406" id="406">406</a>
+<a href="#407" id="407">407</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Some iterator that produces tuples
 
-</span><span class="kw">use </span>std::iter::Fuse;
+</span><span class="kw">use </span>std::iter::Cycle;
+<span class="kw">use </span>std::iter::Fuse;
 <span class="kw">use </span>std::iter::FusedIterator;
-<span class="kw">use </span>std::iter::Take;
-<span class="kw">use </span>std::iter::Cycle;
 <span class="kw">use </span>std::marker::PhantomData;
+
+<span class="kw">use </span><span class="kw">crate</span>::size_hint;
 
 <span class="comment">// `HomogeneousTuple` is a public facade for `TupleCollect`, allowing
 // tuple-related methods to be used by clients in generic contexts, while
@@ -343,9 +420,7 @@
 // See https://github.com/rust-itertools/itertools/issues/387
 
 </span><span class="doccomment">/// Implemented for homogeneous tuples of size up to 12.
-</span><span class="kw">pub trait </span>HomogeneousTuple
-    : TupleCollect
-{}
+</span><span class="kw">pub trait </span>HomogeneousTuple: TupleCollect {}
 
 <span class="kw">impl</span>&lt;T: TupleCollect&gt; HomogeneousTuple <span class="kw">for </span>T {}
 
@@ -355,25 +430,25 @@
 /// [`Tuples::into_buffer()`].
 </span><span class="attr">#[derive(Clone, Debug)]
 </span><span class="kw">pub struct </span>TupleBuffer&lt;T&gt;
-    <span class="kw">where </span>T: HomogeneousTuple
+<span class="kw">where
+    </span>T: HomogeneousTuple,
 {
     cur: usize,
     buf: T::Buffer,
 }
 
 <span class="kw">impl</span>&lt;T&gt; TupleBuffer&lt;T&gt;
-    <span class="kw">where </span>T: HomogeneousTuple
+<span class="kw">where
+    </span>T: HomogeneousTuple,
 {
     <span class="kw">fn </span>new(buf: T::Buffer) -&gt; <span class="self">Self </span>{
-        TupleBuffer {
-            cur: <span class="number">0</span>,
-            buf,
-        }
+        TupleBuffer { cur: <span class="number">0</span>, buf }
     }
 }
 
 <span class="kw">impl</span>&lt;T&gt; Iterator <span class="kw">for </span>TupleBuffer&lt;T&gt;
-    <span class="kw">where </span>T: HomogeneousTuple
+<span class="kw">where
+    </span>T: HomogeneousTuple,
 {
     <span class="kw">type </span>Item = T::Item;
 
@@ -392,18 +467,16 @@
         <span class="kw">let </span>len = <span class="kw">if </span>buffer.is_empty() {
             <span class="number">0
         </span>} <span class="kw">else </span>{
-            buffer.iter()
-                  .position(|x| x.is_none())
-                  .unwrap_or_else(|| buffer.len())
+            buffer
+                .iter()
+                .position(|x| x.is_none())
+                .unwrap_or_else(|| buffer.len())
         };
         (len, <span class="prelude-val">Some</span>(len))
     }
 }
 
-<span class="kw">impl</span>&lt;T&gt; ExactSizeIterator <span class="kw">for </span>TupleBuffer&lt;T&gt;
-    <span class="kw">where </span>T: HomogeneousTuple
-{
-}
+<span class="kw">impl</span>&lt;T&gt; ExactSizeIterator <span class="kw">for </span>TupleBuffer&lt;T&gt; <span class="kw">where </span>T: HomogeneousTuple {}
 
 <span class="doccomment">/// An iterator that groups the items in tuples of a specific size.
 ///
@@ -411,8 +484,9 @@
 </span><span class="attr">#[derive(Clone, Debug)]
 #[must_use = <span class="string">&quot;iterator adaptors are lazy and do nothing unless consumed&quot;</span>]
 </span><span class="kw">pub struct </span>Tuples&lt;I, T&gt;
-    <span class="kw">where </span>I: Iterator&lt;Item = T::Item&gt;,
-          T: HomogeneousTuple
+<span class="kw">where
+    </span>I: Iterator&lt;Item = T::Item&gt;,
+    T: HomogeneousTuple,
 {
     iter: Fuse&lt;I&gt;,
     buf: T::Buffer,
@@ -420,8 +494,9 @@
 
 <span class="doccomment">/// Create a new tuples iterator.
 </span><span class="kw">pub fn </span>tuples&lt;I, T&gt;(iter: I) -&gt; Tuples&lt;I, T&gt;
-    <span class="kw">where </span>I: Iterator&lt;Item = T::Item&gt;,
-          T: HomogeneousTuple
+<span class="kw">where
+    </span>I: Iterator&lt;Item = T::Item&gt;,
+    T: HomogeneousTuple,
 {
     Tuples {
         iter: iter.fuse(),
@@ -430,19 +505,50 @@
 }
 
 <span class="kw">impl</span>&lt;I, T&gt; Iterator <span class="kw">for </span>Tuples&lt;I, T&gt;
-    <span class="kw">where </span>I: Iterator&lt;Item = T::Item&gt;,
-          T: HomogeneousTuple
+<span class="kw">where
+    </span>I: Iterator&lt;Item = T::Item&gt;,
+    T: HomogeneousTuple,
 {
     <span class="kw">type </span>Item = T;
 
     <span class="kw">fn </span>next(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>::Item&gt; {
         T::collect_from_iter(<span class="kw-2">&amp;mut </span><span class="self">self</span>.iter, <span class="kw-2">&amp;mut </span><span class="self">self</span>.buf)
     }
+
+    <span class="kw">fn </span>size_hint(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; (usize, <span class="prelude-ty">Option</span>&lt;usize&gt;) {
+        <span class="comment">// The number of elts we&#39;ve drawn from the underlying iterator, but have
+        // not yet produced as a tuple.
+        </span><span class="kw">let </span>buffered = T::buffer_len(<span class="kw-2">&amp;</span><span class="self">self</span>.buf);
+        <span class="comment">// To that, we must add the size estimates of the underlying iterator.
+        </span><span class="kw">let </span>(unbuffered_lo, unbuffered_hi) = <span class="self">self</span>.iter.size_hint();
+        <span class="comment">// The total low estimate is the sum of the already-buffered elements,
+        // plus the low estimate of remaining unbuffered elements, divided by
+        // the tuple size.
+        </span><span class="kw">let </span>total_lo = add_then_div(unbuffered_lo, buffered, T::num_items()).unwrap_or(usize::MAX);
+        <span class="comment">// And likewise for the total high estimate, but using the high estimate
+        // of the remaining unbuffered elements.
+        </span><span class="kw">let </span>total_hi = unbuffered_hi.and_then(|hi| add_then_div(hi, buffered, T::num_items()));
+        (total_lo, total_hi)
+    }
+}
+
+<span class="doccomment">/// `(n + a) / d` avoiding overflow when possible, returns `None` if it overflows.
+</span><span class="kw">fn </span>add_then_div(n: usize, a: usize, d: usize) -&gt; <span class="prelude-ty">Option</span>&lt;usize&gt; {
+    <span class="macro">debug_assert_ne!</span>(d, <span class="number">0</span>);
+    (n / d).checked_add(a / d)<span class="question-mark">?</span>.checked_add((n % d + a % d) / d)
+}
+
+<span class="kw">impl</span>&lt;I, T&gt; ExactSizeIterator <span class="kw">for </span>Tuples&lt;I, T&gt;
+<span class="kw">where
+    </span>I: ExactSizeIterator&lt;Item = T::Item&gt;,
+    T: HomogeneousTuple,
+{
 }
 
 <span class="kw">impl</span>&lt;I, T&gt; Tuples&lt;I, T&gt;
-    <span class="kw">where </span>I: Iterator&lt;Item = T::Item&gt;,
-          T: HomogeneousTuple
+<span class="kw">where
+    </span>I: Iterator&lt;Item = T::Item&gt;,
+    T: HomogeneousTuple,
 {
     <span class="doccomment">/// Return a buffer with the produced items that was not enough to be grouped in a tuple.
     ///
@@ -459,7 +565,6 @@
     }
 }
 
-
 <span class="doccomment">/// An iterator over all contiguous windows that produces tuples of a specific size.
 ///
 /// See [`.tuple_windows()`](crate::Itertools::tuple_windows) for more
@@ -467,125 +572,172 @@
 </span><span class="attr">#[must_use = <span class="string">&quot;iterator adaptors are lazy and do nothing unless consumed&quot;</span>]
 #[derive(Clone, Debug)]
 </span><span class="kw">pub struct </span>TupleWindows&lt;I, T&gt;
-    <span class="kw">where </span>I: Iterator&lt;Item = T::Item&gt;,
-          T: HomogeneousTuple
+<span class="kw">where
+    </span>I: Iterator&lt;Item = T::Item&gt;,
+    T: HomogeneousTuple,
 {
     iter: I,
     last: <span class="prelude-ty">Option</span>&lt;T&gt;,
 }
 
 <span class="doccomment">/// Create a new tuple windows iterator.
-</span><span class="kw">pub fn </span>tuple_windows&lt;I, T&gt;(<span class="kw-2">mut </span>iter: I) -&gt; TupleWindows&lt;I, T&gt;
-    <span class="kw">where </span>I: Iterator&lt;Item = T::Item&gt;,
-          T: HomogeneousTuple,
-          T::Item: Clone
+</span><span class="kw">pub fn </span>tuple_windows&lt;I, T&gt;(iter: I) -&gt; TupleWindows&lt;I, T&gt;
+<span class="kw">where
+    </span>I: Iterator&lt;Item = T::Item&gt;,
+    T: HomogeneousTuple,
+    T::Item: Clone,
 {
-    <span class="kw">use </span>std::iter::once;
-
-    <span class="kw">let </span><span class="kw-2">mut </span>last = <span class="prelude-val">None</span>;
-    <span class="kw">if </span>T::num_items() != <span class="number">1 </span>{
-        <span class="comment">// put in a duplicate item in front of the tuple; this simplifies
-        // .next() function.
-        </span><span class="kw">if let </span><span class="prelude-val">Some</span>(item) = iter.next() {
-            <span class="kw">let </span>iter = once(item.clone()).chain(once(item)).chain(<span class="kw-2">&amp;mut </span>iter);
-            last = T::collect_from_iter_no_buf(iter);
-        }
-    }
-
-    TupleWindows {
-        iter,
-        last,
-    }
+    TupleWindows { last: <span class="prelude-val">None</span>, iter }
 }
 
 <span class="kw">impl</span>&lt;I, T&gt; Iterator <span class="kw">for </span>TupleWindows&lt;I, T&gt;
-    <span class="kw">where </span>I: Iterator&lt;Item = T::Item&gt;,
-          T: HomogeneousTuple + Clone,
-          T::Item: Clone
+<span class="kw">where
+    </span>I: Iterator&lt;Item = T::Item&gt;,
+    T: HomogeneousTuple + Clone,
+    T::Item: Clone,
 {
     <span class="kw">type </span>Item = T;
 
     <span class="kw">fn </span>next(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>::Item&gt; {
         <span class="kw">if </span>T::num_items() == <span class="number">1 </span>{
-            <span class="kw">return </span>T::collect_from_iter_no_buf(<span class="kw-2">&amp;mut </span><span class="self">self</span>.iter)
+            <span class="kw">return </span>T::collect_from_iter_no_buf(<span class="kw-2">&amp;mut </span><span class="self">self</span>.iter);
         }
-        <span class="kw">if let </span><span class="prelude-val">Some</span>(<span class="kw-2">ref mut </span>last) = <span class="self">self</span>.last {
-            <span class="kw">if let </span><span class="prelude-val">Some</span>(new) = <span class="self">self</span>.iter.next() {
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(new) = <span class="self">self</span>.iter.next() {
+            <span class="kw">if let </span><span class="prelude-val">Some</span>(<span class="kw-2">ref mut </span>last) = <span class="self">self</span>.last {
                 last.left_shift_push(new);
-                <span class="kw">return </span><span class="prelude-val">Some</span>(last.clone());
+                <span class="prelude-val">Some</span>(last.clone())
+            } <span class="kw">else </span>{
+                <span class="kw">use </span>std::iter::once;
+                <span class="kw">let </span>iter = once(new).chain(<span class="kw-2">&amp;mut </span><span class="self">self</span>.iter);
+                <span class="self">self</span>.last = T::collect_from_iter_no_buf(iter);
+                <span class="self">self</span>.last.clone()
             }
+        } <span class="kw">else </span>{
+            <span class="prelude-val">None
+        </span>}
+    }
+
+    <span class="kw">fn </span>size_hint(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; (usize, <span class="prelude-ty">Option</span>&lt;usize&gt;) {
+        <span class="kw">let </span><span class="kw-2">mut </span>sh = <span class="self">self</span>.iter.size_hint();
+        <span class="comment">// Adjust the size hint at the beginning
+        // OR when `num_items == 1` (but it does not change the size hint).
+        </span><span class="kw">if </span><span class="self">self</span>.last.is_none() {
+            sh = size_hint::sub_scalar(sh, T::num_items() - <span class="number">1</span>);
         }
-        <span class="prelude-val">None
-    </span>}
+        sh
+    }
+}
+
+<span class="kw">impl</span>&lt;I, T&gt; ExactSizeIterator <span class="kw">for </span>TupleWindows&lt;I, T&gt;
+<span class="kw">where
+    </span>I: ExactSizeIterator&lt;Item = T::Item&gt;,
+    T: HomogeneousTuple + Clone,
+    T::Item: Clone,
+{
 }
 
 <span class="kw">impl</span>&lt;I, T&gt; FusedIterator <span class="kw">for </span>TupleWindows&lt;I, T&gt;
-    <span class="kw">where </span>I: FusedIterator&lt;Item = T::Item&gt;,
-          T: HomogeneousTuple + Clone,
-          T::Item: Clone
-{}
+<span class="kw">where
+    </span>I: FusedIterator&lt;Item = T::Item&gt;,
+    T: HomogeneousTuple + Clone,
+    T::Item: Clone,
+{
+}
 
-<span class="doccomment">/// An iterator over all windows,wrapping back to the first elements when the
+<span class="doccomment">/// An iterator over all windows, wrapping back to the first elements when the
 /// window would otherwise exceed the length of the iterator, producing tuples
 /// of a specific size.
 ///
 /// See [`.circular_tuple_windows()`](crate::Itertools::circular_tuple_windows) for more
 /// information.
 </span><span class="attr">#[must_use = <span class="string">&quot;iterator adaptors are lazy and do nothing unless consumed&quot;</span>]
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 </span><span class="kw">pub struct </span>CircularTupleWindows&lt;I, T: Clone&gt;
-    <span class="kw">where </span>I: Iterator&lt;Item = T::Item&gt; + Clone,
-          T: TupleCollect + Clone
+<span class="kw">where
+    </span>I: Iterator&lt;Item = T::Item&gt; + Clone,
+    T: TupleCollect + Clone,
 {
-    iter: Take&lt;TupleWindows&lt;Cycle&lt;I&gt;, T&gt;&gt;,
-    phantom_data: PhantomData&lt;T&gt;
+    iter: TupleWindows&lt;Cycle&lt;I&gt;, T&gt;,
+    len: usize,
+    phantom_data: PhantomData&lt;T&gt;,
 }
 
 <span class="kw">pub fn </span>circular_tuple_windows&lt;I, T&gt;(iter: I) -&gt; CircularTupleWindows&lt;I, T&gt;
-    <span class="kw">where </span>I: Iterator&lt;Item = T::Item&gt; + Clone + ExactSizeIterator,
-          T: TupleCollect + Clone,
-          T::Item: Clone
+<span class="kw">where
+    </span>I: Iterator&lt;Item = T::Item&gt; + Clone + ExactSizeIterator,
+    T: TupleCollect + Clone,
+    T::Item: Clone,
 {
     <span class="kw">let </span>len = iter.len();
-    <span class="kw">let </span>iter = tuple_windows(iter.cycle()).take(len);
+    <span class="kw">let </span>iter = tuple_windows(iter.cycle());
 
     CircularTupleWindows {
         iter,
-        phantom_data: PhantomData{}
+        len,
+        phantom_data: PhantomData {},
     }
 }
 
 <span class="kw">impl</span>&lt;I, T&gt; Iterator <span class="kw">for </span>CircularTupleWindows&lt;I, T&gt;
-    <span class="kw">where </span>I: Iterator&lt;Item = T::Item&gt; + Clone,
-          T: TupleCollect + Clone,
-          T::Item: Clone
+<span class="kw">where
+    </span>I: Iterator&lt;Item = T::Item&gt; + Clone,
+    T: TupleCollect + Clone,
+    T::Item: Clone,
 {
     <span class="kw">type </span>Item = T;
 
     <span class="kw">fn </span>next(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>::Item&gt; {
-        <span class="self">self</span>.iter.next()
+        <span class="kw">if </span><span class="self">self</span>.len != <span class="number">0 </span>{
+            <span class="self">self</span>.len -= <span class="number">1</span>;
+            <span class="self">self</span>.iter.next()
+        } <span class="kw">else </span>{
+            <span class="prelude-val">None
+        </span>}
     }
+
+    <span class="kw">fn </span>size_hint(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; (usize, <span class="prelude-ty">Option</span>&lt;usize&gt;) {
+        (<span class="self">self</span>.len, <span class="prelude-val">Some</span>(<span class="self">self</span>.len))
+    }
+}
+
+<span class="kw">impl</span>&lt;I, T&gt; ExactSizeIterator <span class="kw">for </span>CircularTupleWindows&lt;I, T&gt;
+<span class="kw">where
+    </span>I: Iterator&lt;Item = T::Item&gt; + Clone,
+    T: TupleCollect + Clone,
+    T::Item: Clone,
+{
+}
+
+<span class="kw">impl</span>&lt;I, T&gt; FusedIterator <span class="kw">for </span>CircularTupleWindows&lt;I, T&gt;
+<span class="kw">where
+    </span>I: Iterator&lt;Item = T::Item&gt; + Clone,
+    T: TupleCollect + Clone,
+    T::Item: Clone,
+{
 }
 
 <span class="kw">pub trait </span>TupleCollect: Sized {
     <span class="kw">type </span>Item;
     <span class="kw">type </span>Buffer: Default + AsRef&lt;[<span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>::Item&gt;]&gt; + AsMut&lt;[<span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>::Item&gt;]&gt;;
 
+    <span class="kw">fn </span>buffer_len(buf: <span class="kw-2">&amp;</span><span class="self">Self</span>::Buffer) -&gt; usize {
+        <span class="kw">let </span>s = buf.as_ref();
+        s.iter().position(Option::is_none).unwrap_or(s.len())
+    }
+
     <span class="kw">fn </span>collect_from_iter&lt;I&gt;(iter: I, buf: <span class="kw-2">&amp;mut </span><span class="self">Self</span>::Buffer) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>&gt;
-        <span class="kw">where </span>I: IntoIterator&lt;Item = <span class="self">Self</span>::Item&gt;;
+    <span class="kw">where
+        </span>I: IntoIterator&lt;Item = <span class="self">Self</span>::Item&gt;;
 
     <span class="kw">fn </span>collect_from_iter_no_buf&lt;I&gt;(iter: I) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>&gt;
-        <span class="kw">where </span>I: IntoIterator&lt;Item = <span class="self">Self</span>::Item&gt;;
+    <span class="kw">where
+        </span>I: IntoIterator&lt;Item = <span class="self">Self</span>::Item&gt;;
 
     <span class="kw">fn </span>num_items() -&gt; usize;
 
     <span class="kw">fn </span>left_shift_push(<span class="kw-2">&amp;mut </span><span class="self">self</span>, item: <span class="self">Self</span>::Item);
 }
 
-<span class="macro">macro_rules! </span>count_ident{
-    () =&gt; {<span class="number">0</span>};
-    (<span class="macro-nonterminal">$i0</span>:ident, $(<span class="macro-nonterminal">$i</span>:ident,)<span class="kw-2">*</span>) =&gt; {<span class="number">1 </span>+ <span class="macro">count_ident!</span>($(<span class="macro-nonterminal">$i</span>,)<span class="kw-2">*</span>)};
-}
 <span class="macro">macro_rules! </span>rev_for_each_ident{
     (<span class="macro-nonterminal">$m</span>:ident, ) =&gt; {};
     (<span class="macro-nonterminal">$m</span>:ident, <span class="macro-nonterminal">$i0</span>:ident, $(<span class="macro-nonterminal">$i</span>:ident,)<span class="kw-2">*</span>) =&gt; {
@@ -600,7 +752,7 @@
         <span class="macro">impl_tuple_collect!</span>($(<span class="macro-nonterminal">$Y</span>,)<span class="kw-2">*</span>);
         <span class="kw">impl</span>&lt;A&gt; TupleCollect <span class="kw">for </span>($(<span class="macro">ignore_ident!</span>(<span class="macro-nonterminal">$Y</span>, A),)<span class="kw-2">*</span>) {
             <span class="kw">type </span>Item = A;
-            <span class="kw">type </span>Buffer = [<span class="prelude-ty">Option</span>&lt;A&gt;; <span class="macro">count_ident!</span>($(<span class="macro-nonterminal">$Y</span>,)<span class="kw-2">*</span>) - <span class="number">1</span>];
+            <span class="kw">type </span>Buffer = [<span class="prelude-ty">Option</span>&lt;A&gt;; <span class="macro">count_ident!</span>($(<span class="macro-nonterminal">$Y</span>)<span class="kw-2">*</span>) - <span class="number">1</span>];
 
             <span class="attr">#[allow(unused_assignments, unused_mut)]
             </span><span class="kw">fn </span>collect_from_iter&lt;I&gt;(iter: I, buf: <span class="kw-2">&amp;mut </span><span class="self">Self</span>::Buffer) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>&gt;
@@ -643,7 +795,7 @@
             }
 
             <span class="kw">fn </span>num_items() -&gt; usize {
-                <span class="macro">count_ident!</span>($(<span class="macro-nonterminal">$Y</span>,)<span class="kw-2">*</span>)
+                <span class="macro">count_ident!</span>($(<span class="macro-nonterminal">$Y</span>)<span class="kw-2">*</span>)
             }
 
             <span class="kw">fn </span>left_shift_push(<span class="kw-2">&amp;mut </span><span class="self">self</span>, <span class="kw-2">mut </span>item: A) {

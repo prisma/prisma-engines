@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/nix/store/a04z6lnlzhx5ri6nlgjig0ir12hyiw0n-vendor-cargo-deps/c19b7c6f923b580ac259164a89f2577984ad5ab09ee9d583b888f934adbbe8d0/itertools-0.10.5/src/free.rs`."><title>free.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-fa3bb1812debf86c.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="itertools" data-themes="" data-resource-suffix="" data-rustdoc-version="1.74.1 (a28077b28 2023-12-04)" data-channel="1.74.1" data-search-js="search-8be46b629f5f14a8.js" data-settings-js="settings-74424d7eec62a23e.js" ><script src="../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-c5bd66d33317d69f.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../itertools/index.html"><img class="rust-logo" src="../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/nix/store/c4453a3v03igkgaaki07gs4c4w6xz5ri-vendor-cargo-deps/c19b7c6f923b580ac259164a89f2577984ad5ab09ee9d583b888f934adbbe8d0/itertools-0.12.0/src/free.rs`."><title>free.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-fa3bb1812debf86c.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="itertools" data-themes="" data-resource-suffix="" data-rustdoc-version="1.74.1 (a28077b28 2023-12-04)" data-channel="1.74.1" data-search-js="search-8be46b629f5f14a8.js" data-settings-js="settings-74424d7eec62a23e.js" ><script src="../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-c5bd66d33317d69f.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../itertools/index.html"><img class="rust-logo" src="../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -284,6 +284,36 @@
 <a href="#284" id="284">284</a>
 <a href="#285" id="285">285</a>
 <a href="#286" id="286">286</a>
+<a href="#287" id="287">287</a>
+<a href="#288" id="288">288</a>
+<a href="#289" id="289">289</a>
+<a href="#290" id="290">290</a>
+<a href="#291" id="291">291</a>
+<a href="#292" id="292">292</a>
+<a href="#293" id="293">293</a>
+<a href="#294" id="294">294</a>
+<a href="#295" id="295">295</a>
+<a href="#296" id="296">296</a>
+<a href="#297" id="297">297</a>
+<a href="#298" id="298">298</a>
+<a href="#299" id="299">299</a>
+<a href="#300" id="300">300</a>
+<a href="#301" id="301">301</a>
+<a href="#302" id="302">302</a>
+<a href="#303" id="303">303</a>
+<a href="#304" id="304">304</a>
+<a href="#305" id="305">305</a>
+<a href="#306" id="306">306</a>
+<a href="#307" id="307">307</a>
+<a href="#308" id="308">308</a>
+<a href="#309" id="309">309</a>
+<a href="#310" id="310">310</a>
+<a href="#311" id="311">311</a>
+<a href="#312" id="312">312</a>
+<a href="#313" id="313">313</a>
+<a href="#314" id="314">314</a>
+<a href="#315" id="315">315</a>
+<a href="#316" id="316">316</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Free functions that create iterator adaptors or call iterator methods.
 //!
 //! The benefit of free functions is that they accept any [`IntoIterator`] as
@@ -296,30 +326,24 @@
 </span><span class="kw">type </span>VecIntoIter&lt;T&gt; = alloc::vec::IntoIter&lt;T&gt;;
 
 <span class="attr">#[cfg(feature = <span class="string">&quot;use_alloc&quot;</span>)]
-</span><span class="kw">use </span>alloc::{
-    string::String,
-};
+</span><span class="kw">use </span>alloc::string::String;
 
-<span class="kw">use </span><span class="kw">crate</span>::Itertools;
 <span class="kw">use </span><span class="kw">crate</span>::intersperse::{Intersperse, IntersperseWith};
+<span class="kw">use </span><span class="kw">crate</span>::Itertools;
 
-<span class="kw">pub use </span><span class="kw">crate</span>::adaptors::{
-    interleave,
-    merge,
-    put_back,
-};
+<span class="kw">pub use </span><span class="kw">crate</span>::adaptors::{interleave, put_back};
 <span class="attr">#[cfg(feature = <span class="string">&quot;use_alloc&quot;</span>)]
-</span><span class="kw">pub use </span><span class="kw">crate</span>::put_back_n_impl::put_back_n;
+</span><span class="kw">pub use </span><span class="kw">crate</span>::kmerge_impl::kmerge;
+<span class="kw">pub use </span><span class="kw">crate</span>::merge_join::{merge, merge_join_by};
 <span class="attr">#[cfg(feature = <span class="string">&quot;use_alloc&quot;</span>)]
 </span><span class="kw">pub use </span><span class="kw">crate</span>::multipeek_impl::multipeek;
 <span class="attr">#[cfg(feature = <span class="string">&quot;use_alloc&quot;</span>)]
 </span><span class="kw">pub use </span><span class="kw">crate</span>::peek_nth::peek_nth;
 <span class="attr">#[cfg(feature = <span class="string">&quot;use_alloc&quot;</span>)]
-</span><span class="kw">pub use </span><span class="kw">crate</span>::kmerge_impl::kmerge;
-<span class="kw">pub use </span><span class="kw">crate</span>::zip_eq_impl::zip_eq;
-<span class="kw">pub use </span><span class="kw">crate</span>::merge_join::merge_join_by;
+</span><span class="kw">pub use </span><span class="kw">crate</span>::put_back_n_impl::put_back_n;
 <span class="attr">#[cfg(feature = <span class="string">&quot;use_alloc&quot;</span>)]
 </span><span class="kw">pub use </span><span class="kw">crate</span>::rciter_impl::rciter;
+<span class="kw">pub use </span><span class="kw">crate</span>::zip_eq_impl::zip_eq;
 
 <span class="doccomment">/// Iterate `iterable` with a particular value inserted between each element.
 ///
@@ -331,8 +355,9 @@
 /// itertools::assert_equal(intersperse((0..3), 8), vec![0, 8, 1, 8, 2]);
 /// ```
 </span><span class="kw">pub fn </span>intersperse&lt;I&gt;(iterable: I, element: I::Item) -&gt; Intersperse&lt;I::IntoIter&gt;
-    <span class="kw">where </span>I: IntoIterator,
-          &lt;I <span class="kw">as </span>IntoIterator&gt;::Item: Clone
+<span class="kw">where
+    </span>I: IntoIterator,
+    &lt;I <span class="kw">as </span>IntoIterator&gt;::Item: Clone,
 {
     Itertools::intersperse(iterable.into_iter(), element)
 }
@@ -350,8 +375,9 @@
 /// assert_eq!(i, 8);
 /// ```
 </span><span class="kw">pub fn </span>intersperse_with&lt;I, F&gt;(iterable: I, element: F) -&gt; IntersperseWith&lt;I::IntoIter, F&gt;
-    <span class="kw">where </span>I: IntoIterator,
-          F: FnMut() -&gt; I::Item
+<span class="kw">where
+    </span>I: IntoIterator,
+    F: FnMut() -&gt; I::Item,
 {
     Itertools::intersperse_with(iterable.into_iter(), element)
 }
@@ -368,7 +394,8 @@
 /// }
 /// ```
 </span><span class="kw">pub fn </span>enumerate&lt;I&gt;(iterable: I) -&gt; iter::Enumerate&lt;I::IntoIter&gt;
-    <span class="kw">where </span>I: IntoIterator
+<span class="kw">where
+    </span>I: IntoIterator,
 {
     iterable.into_iter().enumerate()
 }
@@ -385,8 +412,9 @@
 /// }
 /// ```
 </span><span class="kw">pub fn </span>rev&lt;I&gt;(iterable: I) -&gt; iter::Rev&lt;I::IntoIter&gt;
-    <span class="kw">where </span>I: IntoIterator,
-          I::IntoIter: DoubleEndedIterator
+<span class="kw">where
+    </span>I: IntoIterator,
+    I::IntoIter: DoubleEndedIterator,
 {
     iterable.into_iter().rev()
 }
@@ -394,7 +422,7 @@
 <span class="doccomment">/// Converts the arguments to iterators and zips them.
 ///
 /// [`IntoIterator`] enabled version of [`Iterator::zip`].
-/// 
+///
 /// ## Example
 ///
 /// ```
@@ -407,23 +435,26 @@
 /// }
 /// assert_eq!(result, vec![(1, &#39;a&#39;),(2, &#39;b&#39;),(3, &#39;c&#39;)]);
 /// ```
-</span><span class="attr">#[deprecated(note=<span class="string">&quot;Use [std::iter::zip](https://doc.rust-lang.org/std/iter/fn.zip.html) instead&quot;</span>, since=<span class="string">&quot;0.10.4&quot;</span>)]
+</span><span class="attr">#[deprecated(
+    note = <span class="string">&quot;Use [std::iter::zip](https://doc.rust-lang.org/std/iter/fn.zip.html) instead&quot;</span>,
+    since = <span class="string">&quot;0.10.4&quot;
+</span>)]
 </span><span class="kw">pub fn </span>zip&lt;I, J&gt;(i: I, j: J) -&gt; Zip&lt;I::IntoIter, J::IntoIter&gt;
-    <span class="kw">where </span>I: IntoIterator,
-          J: IntoIterator
+<span class="kw">where
+    </span>I: IntoIterator,
+    J: IntoIterator,
 {
     i.into_iter().zip(j)
 }
 
-
-<span class="doccomment">/// Takes two iterables and creates a new iterator over both in sequence. 
+<span class="doccomment">/// Takes two iterables and creates a new iterator over both in sequence.
 ///
 /// [`IntoIterator`] enabled version of [`Iterator::chain`].
 ///
 /// ## Example
 /// ```
 /// use itertools::chain;
-/// 
+///
 /// let mut result:Vec&lt;i32&gt; = Vec::new();
 ///
 /// for element in chain(&amp;[1, 2, 3], &amp;[4]) {
@@ -431,9 +462,13 @@
 /// }
 /// assert_eq!(result, vec![1, 2, 3, 4]);
 /// ```
-</span><span class="kw">pub fn </span>chain&lt;I, J&gt;(i: I, j: J) -&gt; iter::Chain&lt;&lt;I <span class="kw">as </span>IntoIterator&gt;::IntoIter, &lt;J <span class="kw">as </span>IntoIterator&gt;::IntoIter&gt;
-    <span class="kw">where </span>I: IntoIterator,
-          J: IntoIterator&lt;Item = I::Item&gt;
+</span><span class="kw">pub fn </span>chain&lt;I, J&gt;(
+    i: I,
+    j: J,
+) -&gt; iter::Chain&lt;&lt;I <span class="kw">as </span>IntoIterator&gt;::IntoIter, &lt;J <span class="kw">as </span>IntoIterator&gt;::IntoIter&gt;
+<span class="kw">where
+    </span>I: IntoIterator,
+    J: IntoIterator&lt;Item = I::Item&gt;,
 {
     i.into_iter().chain(j)
 }
@@ -448,8 +483,9 @@
 /// assert_eq!(cloned(b&quot;abc&quot;).next(), Some(b&#39;a&#39;));
 /// ```
 </span><span class="kw">pub fn </span>cloned&lt;<span class="lifetime">&#39;a</span>, I, T: <span class="lifetime">&#39;a</span>&gt;(iterable: I) -&gt; iter::Cloned&lt;I::IntoIter&gt;
-    <span class="kw">where </span>I: IntoIterator&lt;Item=<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>T&gt;,
-          T: Clone,
+<span class="kw">where
+    </span>I: IntoIterator&lt;Item = <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>T&gt;,
+    T: Clone,
 {
     iterable.into_iter().cloned()
 }
@@ -464,8 +500,9 @@
 /// assert_eq!(fold(&amp;[1., 2., 3.], 0., |a, &amp;b| f32::max(a, b)), 3.);
 /// ```
 </span><span class="kw">pub fn </span>fold&lt;I, B, F&gt;(iterable: I, init: B, f: F) -&gt; B
-    <span class="kw">where </span>I: IntoIterator,
-          F: FnMut(B, I::Item) -&gt; B
+<span class="kw">where
+    </span>I: IntoIterator,
+    F: FnMut(B, I::Item) -&gt; B,
 {
     iterable.into_iter().fold(init, f)
 }
@@ -480,8 +517,9 @@
 /// assert!(all(&amp;[1, 2, 3], |elt| *elt &gt; 0));
 /// ```
 </span><span class="kw">pub fn </span>all&lt;I, F&gt;(iterable: I, f: F) -&gt; bool
-    <span class="kw">where </span>I: IntoIterator,
-          F: FnMut(I::Item) -&gt; bool
+<span class="kw">where
+    </span>I: IntoIterator,
+    F: FnMut(I::Item) -&gt; bool,
 {
     iterable.into_iter().all(f)
 }
@@ -496,8 +534,9 @@
 /// assert!(any(&amp;[0, -1, 2], |elt| *elt &gt; 0));
 /// ```
 </span><span class="kw">pub fn </span>any&lt;I, F&gt;(iterable: I, f: F) -&gt; bool
-    <span class="kw">where </span>I: IntoIterator,
-          F: FnMut(I::Item) -&gt; bool
+<span class="kw">where
+    </span>I: IntoIterator,
+    F: FnMut(I::Item) -&gt; bool,
 {
     iterable.into_iter().any(f)
 }
@@ -512,8 +551,9 @@
 /// assert_eq!(max(0..10), Some(9));
 /// ```
 </span><span class="kw">pub fn </span>max&lt;I&gt;(iterable: I) -&gt; <span class="prelude-ty">Option</span>&lt;I::Item&gt;
-    <span class="kw">where </span>I: IntoIterator,
-          I::Item: Ord
+<span class="kw">where
+    </span>I: IntoIterator,
+    I::Item: Ord,
 {
     iterable.into_iter().max()
 }
@@ -528,12 +568,12 @@
 /// assert_eq!(min(0..10), Some(0));
 /// ```
 </span><span class="kw">pub fn </span>min&lt;I&gt;(iterable: I) -&gt; <span class="prelude-ty">Option</span>&lt;I::Item&gt;
-    <span class="kw">where </span>I: IntoIterator,
-          I::Item: Ord
+<span class="kw">where
+    </span>I: IntoIterator,
+    I::Item: Ord,
 {
     iterable.into_iter().min()
 }
-
 
 <span class="doccomment">/// Combine all iterator elements into one String, separated by `sep`.
 ///
@@ -546,8 +586,9 @@
 /// ```
 </span><span class="attr">#[cfg(feature = <span class="string">&quot;use_alloc&quot;</span>)]
 </span><span class="kw">pub fn </span>join&lt;I&gt;(iterable: I, sep: <span class="kw-2">&amp;</span>str) -&gt; String
-    <span class="kw">where </span>I: IntoIterator,
-          I::Item: Display
+<span class="kw">where
+    </span>I: IntoIterator,
+    I::Item: Display,
 {
     iterable.into_iter().join(sep)
 }
@@ -564,10 +605,29 @@
 /// ```
 </span><span class="attr">#[cfg(feature = <span class="string">&quot;use_alloc&quot;</span>)]
 </span><span class="kw">pub fn </span>sorted&lt;I&gt;(iterable: I) -&gt; VecIntoIter&lt;I::Item&gt;
-    <span class="kw">where </span>I: IntoIterator,
-          I::Item: Ord
+<span class="kw">where
+    </span>I: IntoIterator,
+    I::Item: Ord,
 {
     iterable.into_iter().sorted()
 }
 
+<span class="doccomment">/// Sort all iterator elements into a new iterator in ascending order.
+/// This sort is unstable (i.e., may reorder equal elements).
+/// [`IntoIterator`] enabled version of [`Itertools::sorted_unstable`].
+///
+/// ```
+/// use itertools::sorted_unstable;
+/// use itertools::assert_equal;
+///
+/// assert_equal(sorted_unstable(&quot;rust&quot;.chars()), &quot;rstu&quot;.chars());
+/// ```
+</span><span class="attr">#[cfg(feature = <span class="string">&quot;use_alloc&quot;</span>)]
+</span><span class="kw">pub fn </span>sorted_unstable&lt;I&gt;(iterable: I) -&gt; VecIntoIter&lt;I::Item&gt;
+<span class="kw">where
+    </span>I: IntoIterator,
+    I::Item: Ord,
+{
+    iterable.into_iter().sorted_unstable()
+}
 </code></pre></div></section></main></body></html>
