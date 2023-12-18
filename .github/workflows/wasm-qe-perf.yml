@@ -63,10 +63,10 @@ jobs:
           comment-id: ${{ steps.findReportComment.outputs.comment-id }}
           issue-number: ${{ github.event.pull_request.number }}
           body: |
-            <!-- qe-benchmarks -->
+            <!-- wasm-engine-perf -->
             ### WASM engine perf 🏎
 
-            ```sh
+            ```
             ${{ steps.bench.outputs.stdout }}
             ```
 
