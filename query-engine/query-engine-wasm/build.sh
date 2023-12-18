@@ -13,7 +13,7 @@ OUT_NPM_NAME="@prisma/query-engine-wasm"
 if [[ -z "${WASM_BUILD_PROFILE:-}" ]]; then
     # use `wasm-pack build --release` by default on CI only
     if [[ -z "${BUILDKITE:-}" ]] && [[ -z "${GITHUB_ACTIONS:-}" ]]; then
-        WASM_BUILD_PROFILE="profiling"
+        WASM_BUILD_PROFILE="dev"
     else
         WASM_BUILD_PROFILE="release"
     fi
