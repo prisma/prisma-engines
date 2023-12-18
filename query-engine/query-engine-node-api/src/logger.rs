@@ -1,6 +1,7 @@
 use core::fmt;
 use napi::threadsafe_function::{ErrorStrategy, ThreadsafeFunction, ThreadsafeFunctionCallMode};
 use query_core::telemetry;
+use query_engine_common::logger::StringCallback;
 use query_engine_metrics::MetricRegistry;
 use serde_json::Value;
 use std::collections::BTreeMap;
@@ -47,8 +48,10 @@ impl Logger {
             FilterExt::boxed(log_level)
         };
 
+        let log_callback = CallbackLayer::new(log_callback);
+
         let is_user_trace = filter_fn(telemetry::helpers::user_facing_span_only_filter);
-        let tracer = crate::tracer::new_pipeline().install_simple(log_callback.clone());
+        let tracer = super::tracer::new_pipeline().install_simple(Box::new(log_callback.clone()));
         let telemetry = if enable_tracing {
             let telemetry = tracing_opentelemetry::layer()
                 .with_tracer(tracer)
@@ -58,7 +61,7 @@ impl Logger {
             None
         };
 
-        let layer = CallbackLayer::new(log_callback).with_filter(filters);
+        let layer = log_callback.with_filter(filters);
 
         let metrics = if enable_metrics {
             query_engine_metrics::setup();
@@ -134,6 +137,7 @@ impl<'a> ToString for JsonVisitor<'a> {
     }
 }
 
+#[derive(Clone)]
 pub(crate) struct CallbackLayer {
     callback: LogCallback,
 }
@@ -144,14 +148,24 @@ impl CallbackLayer {
     }
 }
 
+impl StringCallback for CallbackLayer {
+    fn call(&self, message: String) -> Result<(), String> {
+        let status = self.callback.call(message, ThreadsafeFunctionCallMode::Blocking);
+
+        if status != napi::Status::Ok {
+            Err(format!("Could not call JS callback: {}", status))
+        } else {
+            Ok(())
+        }
+    }
+}
+
 // A tracing layer for sending logs to a js callback, layers are composable, subscribers are not.
 impl<S: Subscriber> Layer<S> for CallbackLayer {
     fn on_event(&self, event: &tracing::Event<'_>, _ctx: tracing_subscriber::layer::Context<'_, S>) {
         let mut visitor = JsonVisitor::new(event.metadata().level(), event.metadata().target());
         event.record(&mut visitor);
 
-        let _ = self
-            .callback
-            .call(visitor.to_string(), ThreadsafeFunctionCallMode::Blocking);
+        let _ = self.call(visitor.to_string());
     }
 }
