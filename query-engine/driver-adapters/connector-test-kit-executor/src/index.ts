@@ -280,6 +280,7 @@ async function planetscaleAdapter(url: string): Promise<DriverAdapter> {
         fetch,
     })
 
+    // @ts-ignore
     return new PrismaPlanetScale(client)
 }
 
