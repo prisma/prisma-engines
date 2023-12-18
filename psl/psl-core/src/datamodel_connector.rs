@@ -25,6 +25,7 @@ pub use self::{
 };
 
 use crate::{configuration::DatasourceConnectorData, Configuration, Datasource, PreviewFeature};
+use chrono::{DateTime, FixedOffset};
 use diagnostics::{DatamodelError, Diagnostics, NativeTypeErrorFactory, Span};
 use enumflags2::BitFlags;
 use lsp_types::CompletionList;
@@ -358,6 +359,14 @@ pub trait Connector: Send + Sync {
         _diagnostics: &mut Diagnostics,
     ) -> DatasourceConnectorData {
         Default::default()
+    }
+
+    fn parse_json_datetime(
+        &self,
+        _str: &str,
+        _nt: Option<NativeTypeInstance>,
+    ) -> chrono::ParseResult<DateTime<FixedOffset>> {
+        unreachable!("This method is only implemented on connectors with lateral join support.")
     }
 }
 

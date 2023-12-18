@@ -16,6 +16,7 @@ mod mysql_datamodel_connector;
 mod native_type_definition;
 mod postgres_datamodel_connector;
 mod sqlite_datamodel_connector;
+mod utils;
 
 use psl_core::{datamodel_connector::Connector, ConnectorRegistry};
 

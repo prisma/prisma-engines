@@ -14,6 +14,7 @@ in
       nodejs.pkgs.typescript-language-server
       nodejs.pkgs.pnpm
 
+      cargo-insta
       jq
       graphviz
       wasm-bindgen-cli
