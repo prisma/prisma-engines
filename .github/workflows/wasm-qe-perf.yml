@@ -55,7 +55,7 @@ jobs:
         id: findReportComment
         with:
           issue-number: ${{ github.event.pull_request.number }}
-          body-includes: "<!-- qe-benchmarks -->"
+          body-includes: "<!-- wasm-engine-perf -->"
 
       - name: Create or update report
         uses: peter-evans/create-or-update-comment@v3
