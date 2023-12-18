@@ -46,6 +46,7 @@ tracing-subscriber = { version = "0.3" }
 tracing-futures = "0.2"
 tracing-opentelemetry = "0.17.3"
 opentelemetry = { version = "0.17"}
+lol_alloc = "0.4.0"
 
 [package.metadata.wasm-pack.profile.release]
 wasm-opt = false  # use wasm-opt explicitly in `./build.sh`

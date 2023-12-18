@@ -16,6 +16,13 @@ mod wasm;
 mod arch {
     pub use super::wasm::*;
 
+    use lol_alloc::{AssumeSingleThreaded, FreeListAllocator};
+
+    // SAFETY: This application is single threaded, so using AssumeSingleThreaded is allowed.
+    #[global_allocator]
+    static ALLOCATOR: AssumeSingleThreaded<FreeListAllocator> =
+        unsafe { AssumeSingleThreaded::new(FreeListAllocator::new()) };
+
     pub(crate) type Result<T> = std::result::Result<T, error::ApiError>;
 }
 
