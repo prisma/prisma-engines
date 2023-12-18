@@ -7,7 +7,7 @@ import * as qe from "./qe";
 
 import pgDriver from "pg";
 import * as prismaPg from "@prisma/adapter-pg";
-import { DriverAdapter } from "@prisma/driver-adapter-utils";
+import { bindAdapter, DriverAdapter } from "@prisma/driver-adapter-utils";
 
 import { recording } from "./recording";
 import prismaQueries from "../bench/queries.json";
@@ -37,7 +37,9 @@ async function main(): Promise<void> {
     throw new Error("DATABASE_URL is not defined");
   }
   const pg = await pgAdapter(url);
-  const { recorder, replayer } = recording(pg);
+  const withErrorCapturing = bindAdapter(pg);
+
+  const { recorder, replayer } = recording(withErrorCapturing);
   await recordQueries(recorder, datamodel, prismaQueries);
   await benchMarkQueries(replayer, datamodel, prismaQueries);
 }
@@ -52,7 +54,14 @@ async function recordQueries(
 
   for (const prismaQuery of prismaQueries) {
     const { description, query } = prismaQuery;
-    await qe.query(JSON.stringify(query), "", undefined);
+    const res = await qe.query(JSON.stringify(query), "", undefined);
+
+    const errors = JSON.parse(res).errors;
+    if (errors != null && errors.length > 0) {
+      throw new Error(
+        `Query failed for ${description}: ${JSON.stringify(res)}`
+      );
+    }
   }
 
   await qe.disconnect("");
@@ -71,6 +80,29 @@ async function benchMarkQueries(
   await wasmBaseline.connect("");
   const wasmLatest = await initQeWasmLatest(adapter, datamodel);
   await wasmLatest.connect("");
+
+  for (const prismaQuery of prismaQueries) {
+    const { description, query } = prismaQuery;
+
+    const adapters = {
+      Napi: napi,
+      "WASM Current": wasmCurrent,
+      "WASM Baseline": wasmBaseline,
+      "WASM Latest": wasmLatest,
+    };
+
+    for (const [adapterName, adapter] of Object.entries(adapters)) {
+      const res = await adapter.query(JSON.stringify(query), "", undefined);
+      const errors = JSON.parse(res).errors;
+      if (errors != null && errors.length > 0) {
+        throw new Error(
+          `${adapterName} - Query failed for ${description}: ${JSON.stringify(
+            res
+          )}`
+        );
+      }
+    }
+  }
 
   try {
     for (const prismaQuery of prismaQueries) {

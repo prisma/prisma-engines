@@ -67,9 +67,6 @@ function createInMemoryRecordings() {
   return {
     addQueryResults: (params, result) => {
       const key = queryToKey(params);
-      if (key in queryResults) {
-        throw new Error(`Query already recorded: ${key}`);
-      }
       queryResults[key] = result;
     },
 
@@ -83,9 +80,6 @@ function createInMemoryRecordings() {
 
     addCommandResults: (params, result) => {
       const key = queryToKey(params);
-      if (key in commandResults) {
-        throw new Error(`Command already recorded: ${key}`);
-      }
       commandResults[key] = result;
     },
 
