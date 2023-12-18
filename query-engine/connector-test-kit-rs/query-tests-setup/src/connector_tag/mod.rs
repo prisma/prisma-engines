@@ -127,6 +127,7 @@ pub(crate) fn connection_string(
                 }
                 Some(PostgresVersion::V14) => format!("postgresql://postgres:prisma@127.0.0.1:5437/{database}"),
                 Some(PostgresVersion::V15) => format!("postgresql://postgres:prisma@127.0.0.1:5438/{database}"),
+                Some(PostgresVersion::V16) => format!("postgresql://postgres:prisma@127.0.0.1:5439/{database}"),
                 Some(PostgresVersion::PgBouncer) => {
                     format!("postgresql://postgres:prisma@127.0.0.1:6432/db?{database}&pgbouncer=true")
                 }

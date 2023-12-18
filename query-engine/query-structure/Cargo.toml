@@ -5,7 +5,7 @@ version = "0.0.0"
 
 [dependencies]
 psl.workspace = true
-itertools = "0.10"
+itertools.workspace = true
 prisma-value = { path = "../../libs/prisma-value" }
 bigdecimal = "0.3"
 thiserror = "1.0"
