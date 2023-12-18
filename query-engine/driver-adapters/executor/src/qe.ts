@@ -58,10 +58,14 @@ export function queryEngineOptions(datamodel: string) {
 function loadNapiEngine(): napi.Library {
   // I assume nobody will run this on Windows ¯\_(ツ)_/¯
   const libExt = os.platform() === "darwin" ? "dylib" : "so";
+  const target =
+    process.env.TARGET || process.env.PROFILE == "release"
+      ? "release"
+      : "debug";
 
   const libQueryEnginePath = path.join(
     dirname,
-    `../../../../target/debug/libquery_engine.${libExt}`
+    `../../../../target/${target}/libquery_engine.${libExt}`
   );
 
   const libqueryEngine = { exports: {} as unknown as napi.Library };

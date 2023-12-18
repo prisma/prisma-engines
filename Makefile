@@ -12,15 +12,6 @@ LIBRARY_EXT := $(shell                            \
         (*)                    echo "so"    ;;    \
     esac)
 
-CARGO_PROFILE ?= $(shell                                  \
-    if [ -n "$$BUILDKITE" ] || [ -n "$$GITHUB_ACTIONS" ]; \
-    then                                                  \
-        echo "release";                                   \
-    else                                                  \
-        echo "dev";                                     \
-    fi                                                    \
-)
-
 default: build
 
 ###################
@@ -330,7 +321,7 @@ test-driver-adapter-planetscale-wasm: test-planetscale-wasm
 ######################
 
 build-qe-napi:
-	cargo build --package query-engine-node-api --profile $(CARGO_PROFILE)
+	cargo build --package query-engine-node-api
 
 build-qe-wasm:
 ifndef $(NIX)

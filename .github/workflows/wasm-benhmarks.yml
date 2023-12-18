@@ -1,10 +1,12 @@
-name: Wasm Benchmarks
+name: Wasm
 on:
   pull_request:
 
 jobs:
-  run-benchmarks:
+  benchmarks:
     runs-on: ubuntu-latest
+    env: # Set environment variables for the whole job
+      PROFILE: release
     steps:
       - name: Checkout PR branch
         uses: actions/checkout@v4
