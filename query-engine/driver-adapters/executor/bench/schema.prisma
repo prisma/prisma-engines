@@ -3,6 +3,11 @@ datasource db {
     url      = env("DATABASE_URL")
 }
 
+generator foo {
+    provider        = "prisma-client-js"
+    previewFeatures = ["driverAdapters"]
+}
+
 model Movie {
     id          Int    @id @default(autoincrement())
     title       String

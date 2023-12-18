@@ -63,8 +63,8 @@ async function benchMarkQueries(
   datamodel: string,
   prismaQueries: any
 ) {
-  // const napi = await initQeNapiCurrent(adapter, datamodel);
-  // await napi.connect("");
+  const napi = await initQeNapiCurrent(adapter, datamodel);
+  await napi.connect("");
   const wasmCurrent = await initQeWasmCurrent(adapter, datamodel);
   await wasmCurrent.connect("");
   const wasmBaseline = await initQeWasmBaseLine(adapter, datamodel);
@@ -77,27 +77,23 @@ async function benchMarkQueries(
       const { description, query } = prismaQuery;
       const jsonQuery = JSON.stringify(query);
 
-      var res = await wasmBaseline.query(jsonQuery, "", undefined);
-      res = await wasmLatest.query(jsonQuery, "", undefined);
-      res = await wasmCurrent.query(jsonQuery, "", undefined);
-
       group(description, () => {
         bench(
           "Web Assembly: Baseline",
-          async () => (res = await wasmBaseline.query(jsonQuery, "", undefined))
+          async () => await wasmBaseline.query(jsonQuery, "", undefined)
         );
         bench(
           "Web Assembly: Latest",
-          async () => (res = await wasmLatest.query(jsonQuery, "", undefined))
+          async () => await wasmLatest.query(jsonQuery, "", undefined)
         );
         baseline(
           "Web Assembly: Current",
-          async () => (res = await wasmCurrent.query(jsonQuery, "", undefined))
+          async () => await wasmCurrent.query(jsonQuery, "", undefined)
         );
-        // bench(
-        //   "Node API: Current",
-        //   async () => await napi.query(jsonQuery, "", undefined)
-        // );
+        bench(
+          "Node API: Current",
+          async () => await napi.query(jsonQuery, "", undefined)
+        );
       });
     }
 
@@ -106,7 +102,7 @@ async function benchMarkQueries(
       collect: true,
     });
   } finally {
-    // await napi.disconnect("");
+    await napi.disconnect("");
     await wasmCurrent.disconnect("");
     await wasmBaseline.disconnect("");
     await wasmLatest.disconnect("");
