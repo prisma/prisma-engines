@@ -149,4 +149,20 @@ in
       '';
     })
     { profile = "release"; };
+
+  packages.export-query-engine-wasm =
+    pkgs.writeShellApplication {
+      name = "export-query-engine-wasm";
+      runtimeInputs = with pkgs; [ jq ];
+      text = ''
+        set -euxo pipefail
+
+        OUTDIR="$1"
+        OUTVERSION="$2"
+        mkdir -p "$OUTDIR"
+        cp -r --no-target-directory ${self'.packages.query-engine-wasm} "$OUTDIR"
+        chmod -R +rw "$OUTDIR"
+        jq --arg new_version "$OUTVERSION" '.version = $new_version' "${self'.packages.query-engine-wasm}/package.json"  > "$OUTDIR/package.json"
+      '';
+    };
 }
