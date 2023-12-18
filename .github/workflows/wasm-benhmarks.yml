@@ -39,7 +39,7 @@ jobs:
 
       - name: Run benchmarks
         id: bench
-        run: make run-bench | tee > out.txt
+        run: make run-bench | tee out.txt
 
       - name: Read benchmark results
         id: read_results
