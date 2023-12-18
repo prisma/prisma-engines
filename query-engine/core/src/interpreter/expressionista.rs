@@ -342,6 +342,7 @@ impl Expressionista {
                     func: Box::new(move |env: Env| {
                         let mut node = node;
 
+                        // Run transformers in order on the query to retrieve the final, transformed, query.
                         for (parent_binding_name, dependency) in parent_id_deps {
                             let binding = match env.get(&parent_binding_name) {
                                 Some(binding) => Ok(binding),
