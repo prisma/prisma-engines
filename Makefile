@@ -12,6 +12,8 @@ LIBRARY_EXT := $(shell                            \
         (*)                    echo "so"    ;;    \
     esac)
 
+PROFILE ?= dev
+
 default: build
 
 ###################
@@ -394,7 +396,7 @@ otel:
 
 # Build the debug version of Query Engine Node-API library ready to be consumed by Node.js
 .PHONY: qe-node-api
-qe-node-api: build target/debug/libquery_engine.node
+qe-node-api: build target/debug/libquery_engine.node --profile=$(PROFILE)
 
 %.node: %.$(LIBRARY_EXT)
 # Remove the file first to work around a macOS bug: https://openradar.appspot.com/FB8914243
