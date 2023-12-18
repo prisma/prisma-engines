@@ -40,11 +40,8 @@ pub fn extract_query_args(
 
             args::WHERE => {
                 let val: Option<ParsedInputMap<'_>> = arg.value.try_into()?;
-                match val {
-                    Some(m) => {
-                        query_args.filter = Some(extract_filter(m, model)?);
-                    }
-                    None => (),
+                if let Some(m) = val {
+                    query_args.filter = Some(extract_filter(m, model)?);
                 }
             }
 
