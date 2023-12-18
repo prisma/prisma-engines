@@ -19,6 +19,8 @@ if [[ -z "${WASM_BUILD_PROFILE:-}" ]]; then
     fi
 fi
 
+echo "Using build profile: \"${WASM_BUILD_PROFILE}\"" 
+
 # Check if wasm-pack is installed
 if ! command -v wasm-pack &> /dev/null
 then
@@ -28,6 +30,50 @@ then
 fi
 
 wasm-pack build "--$WASM_BUILD_PROFILE" --target $OUT_TARGET --out-name query_engine
+
+WASM_OPT_ARGS=(
+    "-Os"                                 # execute size-focused optimization passes
+    "--vacuum"                            # removes obviously unneeded code
+    "--duplicate-function-elimination"    # removes duplicate functions 
+    "--duplicate-import-elimination"      # removes duplicate imports
+    "--remove-unused-module-elements"     # removes unused module elements
+    "--dae-optimizing"                    # removes arguments to calls in an lto-like manner
+    "--remove-unused-names"               # removes names from location that are never branched to
+    "--rse"                               # removes redundant local.sets
+    "--gsi"                               # global struct inference, to optimize constant values
+    "--gufa-optimizing"                   # optimize the entire program using type monomorphization
+    "--strip-dwarf"                       # removes DWARF debug information
+    "--strip-producers"                   # removes the "producers" section
+    "--strip-target-features"             # removes the "target_features" section
+)
+
+case "$WASM_BUILD_PROFILE" in
+    release)
+        # In release mode, we want to strip the debug symbols.
+        wasm-opt "${WASM_OPT_ARGS[@]}" \
+            "--strip-debug" \
+            "${OUT_FOLDER}/query_engine_bg.wasm" \
+            -o "${OUT_FOLDER}/query_engine_bg.wasm"
+        ;;
+    profiling)
+        # In profiling mode, we want to keep the debug symbols.
+        wasm-opt "${WASM_OPT_ARGS[@]}" \
+            "--debuginfo" \
+            "${OUT_FOLDER}/query_engine_bg.wasm" \
+            -o "${OUT_FOLDER}/query_engine_bg.wasm"
+        ;;
+    *)
+        # In other modes (e.g., "dev"), skip wasm-opt.
+        echo "Skipping wasm-opt."
+        ;;
+esac
+
+# Convert the `.wasm` file to its human-friendly `.wat` representation for debugging purposes, if `wasm2wat` is installed
+if ! command -v wasm2wat &> /dev/null; then
+    echo "Skipping wasm2wat, as it is not installed."
+else
+    wasm2wat "${OUT_FOLDER}/query_engine_bg.wasm" -o "./query_engine.wat"
+fi
 
 sleep 1
 
