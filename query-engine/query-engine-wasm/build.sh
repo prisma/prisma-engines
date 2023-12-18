@@ -47,26 +47,26 @@ WASM_OPT_ARGS=(
     "--strip-target-features"             # removes the "target_features" section
 )
 
-case "$WASM_BUILD_PROFILE" in
-    release)
-        # In release mode, we want to strip the debug symbols.
-        wasm-opt "${WASM_OPT_ARGS[@]}" \
-            "--strip-debug" \
-            "${OUT_FOLDER}/query_engine_bg.wasm" \
-            -o "${OUT_FOLDER}/query_engine_bg.wasm"
-        ;;
-    profiling)
-        # In profiling mode, we want to keep the debug symbols.
-        wasm-opt "${WASM_OPT_ARGS[@]}" \
-            "--debuginfo" \
-            "${OUT_FOLDER}/query_engine_bg.wasm" \
-            -o "${OUT_FOLDER}/query_engine_bg.wasm"
-        ;;
-    *)
-        # In other modes (e.g., "dev"), skip wasm-opt.
-        echo "Skipping wasm-opt."
-        ;;
-esac
+# case "$WASM_BUILD_PROFILE" in
+#     release)
+#         # In release mode, we want to strip the debug symbols.
+#         wasm-opt "${WASM_OPT_ARGS[@]}" \
+#             "--strip-debug" \
+#             "${OUT_FOLDER}/query_engine_bg.wasm" \
+#             -o "${OUT_FOLDER}/query_engine_bg.wasm"
+#         ;;
+#     profiling)
+#         # In profiling mode, we want to keep the debug symbols.
+#         wasm-opt "${WASM_OPT_ARGS[@]}" \
+#             "--debuginfo" \
+#             "${OUT_FOLDER}/query_engine_bg.wasm" \
+#             -o "${OUT_FOLDER}/query_engine_bg.wasm"
+#         ;;
+#     *)
+#         # In other modes (e.g., "dev"), skip wasm-opt.
+#         echo "Skipping wasm-opt."
+#         ;;
+# esac
 
 # Convert the `.wasm` file to its human-friendly `.wat` representation for debugging purposes, if `wasm2wat` is installed
 if ! command -v wasm2wat &> /dev/null; then
