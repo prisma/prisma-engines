@@ -35,16 +35,12 @@ jobs:
             setup_task: 'dev-libsql-js'
           - name: 'planetscale (wasm)'
             setup_task: 'dev-planetscale-wasm'
-            needs_wasm_pack: true
           - name: 'pg (wasm)'
             setup_task: 'dev-pg-wasm'
-            needs_wasm_pack: true
           - name: 'neon (ws) (wasm)'
             setup_task: 'dev-neon-wasm'
-            needs_wasm_pack: true
           - name: 'libsql (Turso) (wasm)'
             setup_task: 'dev-libsql-wasm'
-            needs_wasm_pack: true
         node_version: ['18']
     env:
       LOG_LEVEL: 'info' # Set to "debug" to trace the query engine and node process running the driver adapter
@@ -99,11 +95,7 @@ jobs:
             echo "DRIVER_ADAPTERS_BRANCH=$branch" >> "$GITHUB_ENV"
           fi
 
-      - uses: dtolnay/rust-toolchain@stable
-
-      - name: 'Install wasm-pack'
-        if: ${{ matrix.adapter.needs_wasm_pack }}
-        run: cargo install wasm-pack
+      - uses: cachix/install-nix-action@v24
 
       - run: make ${{ matrix.adapter.setup_task }}
 
