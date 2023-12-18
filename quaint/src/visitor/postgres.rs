@@ -19,7 +19,6 @@ pub struct Postgres<'a> {
 
 impl<'a> Postgres<'a> {
     fn visit_json_build_obj_expr(&mut self, expr: Expression<'a>) -> crate::Result<()> {
-        dbg!(&expr);
         match expr.kind() {
             ExpressionKind::Column(col) => match (col.type_family.as_ref(), col.native_type.as_deref()) {
                 (Some(TypeFamily::Decimal(_)), Some("MONEY")) => {
