@@ -3,6 +3,7 @@ mod validations;
 
 pub use native_types::CockroachType;
 
+use chrono::*;
 use enumflags2::BitFlags;
 use lsp_types::{CompletionItem, CompletionItemKind, CompletionList};
 use psl_core::{
@@ -306,6 +307,29 @@ impl Connector for CockroachDatamodelConnector {
 
     fn flavour(&self) -> Flavour {
         Flavour::Cockroach
+    }
+
+    fn parse_json_datetime(
+        &self,
+        str: &str,
+        nt: Option<NativeTypeInstance>,
+    ) -> chrono::ParseResult<chrono::DateTime<FixedOffset>> {
+        let native_type: Option<&CockroachType> = nt.as_ref().map(|nt| nt.downcast_ref());
+
+        match native_type {
+            Some(ct) => match ct {
+                CockroachType::Timestamptz(_) => crate::utils::parse_timestamptz(str),
+                CockroachType::Timestamp(_) => crate::utils::parse_timestamp(str),
+                CockroachType::Date => crate::utils::parse_date(str),
+                CockroachType::Time(_) => crate::utils::parse_time(str),
+                CockroachType::Timetz(_) => crate::utils::parse_timetz(str),
+                _ => unreachable!(),
+            },
+            None => self.parse_json_datetime(
+                str,
+                Some(self.default_native_type_for_scalar_type(&ScalarType::DateTime)),
+            ),
+        }
     }
 }
 

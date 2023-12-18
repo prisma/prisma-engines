@@ -1,4 +1,5 @@
 use crate::{ast, parent_container::ParentContainer, prelude::*, DefaultKind, NativeTypeInstance, ValueGenerator};
+use chrono::{DateTime, FixedOffset};
 use psl::{
     parser_database::{walkers, ScalarFieldType, ScalarType},
     schema_ast::ast::FieldArity,
@@ -168,6 +169,13 @@ impl ScalarField {
             native_type: nt,
             connector,
         })
+    }
+
+    pub fn parse_json_datetime(&self, value: &str) -> chrono::ParseResult<DateTime<FixedOffset>> {
+        let nt = self.native_type().map(|nt| nt.native_type);
+        let connector = self.dm.schema.connector;
+
+        connector.parse_json_datetime(value, nt)
     }
 
     pub fn is_autoincrement(&self) -> bool {
