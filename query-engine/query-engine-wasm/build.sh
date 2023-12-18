@@ -10,6 +10,8 @@ OUT_JSON="${OUT_FOLDER}/package.json"
 OUT_TARGET="bundler"
 OUT_NPM_NAME="@prisma/query-engine-wasm"
 
+: "${WASM_REFERENCE_TYPES:=0}"
+
 if [[ -z "${WASM_BUILD_PROFILE:-}" ]]; then
     # use `wasm-pack build --release` by default on CI only
     if [[ -z "${BUILDKITE:-}" ]] && [[ -z "${GITHUB_ACTIONS:-}" ]]; then
@@ -29,8 +31,16 @@ then
     curl https://rustwasm.github.io/wasm-pack/installer/init.sh -sSf | sh
 fi
 
-wasm-pack build "--$WASM_BUILD_PROFILE" --target $OUT_TARGET --reference-types --out-name query_engine
+# List of arguments for `wasm-pack`
+WASM_PACK_ARGS=(
+    "build"
+    "--$WASM_BUILD_PROFILE"
+    "--target" "$OUT_TARGET"
+    "--out-name" "query_engine"
+    "--scope" "prisma"
+)
 
+# List of arguments for `wasm-opt`
 WASM_OPT_ARGS=(
     "-Os"                                 # execute size-focused optimization passes
     "--vacuum"                            # removes obviously unneeded code
@@ -45,9 +55,18 @@ WASM_OPT_ARGS=(
     "--strip-dwarf"                       # removes DWARF debug information
     "--strip-producers"                   # removes the "producers" section
     "--strip-target-features"             # removes the "target_features" section
-    "--enable-reference-types"            # enables reference types
 )
 
+if [[ "$WASM_REFERENCE_TYPES" == "1" ]]; then
+    echo "Using reference types..."
+    WASM_PACK_ARGS+=("--reference-types")
+    WASM_OPT_ARGS+=("--enable-reference-types")
+fi
+
+# Compile the Rust code to WebAssembly via `wasm-pack`
+wasm-pack "${WASM_PACK_ARGS[@]}"
+
+# Optimize the generated `.wasm` file via `wasm-opt`
 case "$WASM_BUILD_PROFILE" in
     release)
         # In release mode, we want to strip the debug symbols.
