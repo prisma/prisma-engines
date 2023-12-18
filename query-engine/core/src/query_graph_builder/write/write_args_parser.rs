@@ -3,7 +3,7 @@ use crate::query_document::{ParsedInputMap, ParsedInputValue};
 use connector::{DatasourceFieldName, WriteArgs, WriteOperation};
 use query_structure::{CompositeFieldRef, Field, Model, PrismaValue, RelationFieldRef, ScalarFieldRef, TypeIdentifier};
 use schema::constants::{args, json_null, operations};
-use std::{borrow::Cow, convert::TryInto};
+use std::convert::TryInto;
 
 #[derive(Debug)]
 pub struct WriteArgsParser<'a> {
@@ -15,41 +15,40 @@ impl<'a> WriteArgsParser<'a> {
     /// Creates a new set of WriteArgsParser. Expects the parsed input map from the respective data key, not the enclosing map.
     /// E.g.: { data: { THIS MAP } } from the `data` argument of a write query.
     pub(crate) fn from(model: &Model, data_map: ParsedInputMap<'a>) -> QueryGraphBuilderResult<Self> {
-        data_map.into_iter().try_fold(
-            WriteArgsParser {
-                args: WriteArgs::new_empty(crate::executor::get_request_now()),
-                nested: Default::default(),
-            },
-            |mut args, (k, v): (Cow<'_, str>, ParsedInputValue<'_>)| {
-                let field = model.fields().find_from_all(&k).unwrap();
+        let mut args = WriteArgsParser {
+            args: WriteArgs::new_empty(crate::executor::get_request_now()),
+            nested: Default::default(),
+        };
 
-                match field {
-                    Field::Scalar(sf) if sf.is_list() => {
-                        let write_op = parse_scalar_list(v)?;
+        for (k, v) in data_map {
+            let field = model.fields().find_from_all(&k).unwrap();
 
-                        args.args.insert(&sf, write_op);
-                    }
-                    Field::Scalar(sf) => {
-                        let write_op: WriteOperation = parse_scalar(&sf, v)?;
+            match field {
+                Field::Scalar(sf) if sf.is_list() => {
+                    let write_op = parse_scalar_list(v)?;
 
-                        args.args.insert(&sf, write_op)
-                    }
+                    args.args.insert(&sf, write_op);
+                }
+                Field::Scalar(sf) => {
+                    let write_op: WriteOperation = parse_scalar(&sf, v)?;
 
-                    Field::Relation(ref rf) => match v {
-                        ParsedInputValue::Single(PrismaValue::Null) => (),
-                        _ => args.nested.push((rf.clone(), v.try_into()?)),
-                    },
+                    args.args.insert(&sf, write_op)
+                }
 
-                    Field::Composite(cf) => {
-                        let write_op = parse_composite_writes(&cf, v, &mut vec![])?;
+                Field::Relation(ref rf) => match v {
+                    ParsedInputValue::Single(PrismaValue::Null) => (),
+                    _ => args.nested.push((rf.clone(), v.try_into()?)),
+                },
 
-                        args.args.insert(&cf, write_op)
-                    }
-                };
+                Field::Composite(cf) => {
+                    let write_op = parse_composite_writes(&cf, v, &mut vec![])?;
 
-                Ok(args)
-            },
-        )
+                    args.args.insert(&cf, write_op)
+                }
+            };
+        }
+
+        Ok(args)
     }
 
     pub(crate) fn has_nested_operation(model: &Model, data_map: &ParsedInputMap<'a>) -> bool {

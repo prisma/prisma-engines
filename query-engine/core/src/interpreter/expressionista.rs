@@ -340,37 +340,35 @@ impl Expressionista {
             } else {
                 Ok(Expression::Func {
                     func: Box::new(move |env: Env| {
-                        // Run transformers in order on the query to retrieve the final, transformed, query.
-                        let node: InterpretationResult<Node> =
-                            parent_id_deps
-                                .into_iter()
-                                .try_fold(node, |node, (parent_binding_name, dependency)| {
-                                    let binding = match env.get(&parent_binding_name) {
-                                        Some(binding) => Ok(binding),
-                                        None => Err(InterpreterError::EnvVarNotFound(format!(
-                                            "Expected parent binding '{parent_binding_name}' to be present."
-                                        ))),
-                                    }?;
+                        let mut node = node;
 
-                                    let res = match dependency {
-                                        QueryGraphDependency::ProjectedDataDependency(selection, f) => binding
-                                            .as_selection_results(&selection)
-                                            .and_then(|parent_selections| Ok(f(node, parent_selections)?)),
+                        for (parent_binding_name, dependency) in parent_id_deps {
+                            let binding = match env.get(&parent_binding_name) {
+                                Some(binding) => Ok(binding),
+                                None => Err(InterpreterError::EnvVarNotFound(format!(
+                                    "Expected parent binding '{parent_binding_name}' to be present."
+                                ))),
+                            }?;
 
-                                        QueryGraphDependency::DataDependency(f) => Ok(f(node, binding)?),
+                            let res = match dependency {
+                                QueryGraphDependency::ProjectedDataDependency(selection, f) => binding
+                                    .as_selection_results(&selection)
+                                    .and_then(|parent_selections| Ok(f(node, parent_selections)?)),
 
-                                        _ => unreachable!(),
-                                    };
+                                QueryGraphDependency::DataDependency(f) => Ok(f(node, binding)?),
 
-                                    res.map_err(|err| {
-                                        InterpreterError::InterpretationError(
-                                            format!("Error for binding '{parent_binding_name}'"),
-                                            Some(Box::new(err)),
-                                        )
-                                    })
-                                });
+                                _ => unreachable!(),
+                            };
 
-                        into_expr(node?)
+                            node = res.map_err(|err| {
+                                InterpreterError::InterpretationError(
+                                    format!("Error for binding '{parent_binding_name}'"),
+                                    Some(Box::new(err)),
+                                )
+                            })?;
+                        }
+
+                        into_expr(node)
                     }),
                 })
             }
