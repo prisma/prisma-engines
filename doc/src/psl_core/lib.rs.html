@@ -145,7 +145,7 @@
 <span class="kw">use </span>parser_database::{ast, ParserDatabase, SourceFile};
 
 <span class="doccomment">/// The collection of all available connectors.
-</span><span class="kw">pub type </span>ConnectorRegistry = <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>[<span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span><span class="kw">dyn </span>datamodel_connector::Connector];
+</span><span class="kw">pub type </span>ConnectorRegistry&lt;<span class="lifetime">&#39;a</span>&gt; = <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>[<span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span><span class="kw">dyn </span>datamodel_connector::Connector];
 
 <span class="kw">pub struct </span>ValidatedSchema {
     <span class="kw">pub </span>configuration: Configuration,
@@ -169,7 +169,7 @@
 
 <span class="doccomment">/// The most general API for dealing with Prisma schemas. It accumulates what analysis and
 /// validation information it can, and returns it along with any error and warning diagnostics.
-</span><span class="kw">pub fn </span>validate(file: SourceFile, connectors: ConnectorRegistry) -&gt; ValidatedSchema {
+</span><span class="kw">pub fn </span>validate(file: SourceFile, connectors: ConnectorRegistry&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; ValidatedSchema {
     <span class="kw">let </span><span class="kw-2">mut </span>diagnostics = Diagnostics::new();
     <span class="kw">let </span>db = ParserDatabase::new(file, <span class="kw-2">&amp;mut </span>diagnostics);
     <span class="kw">let </span>configuration = validate_configuration(db.ast(), <span class="kw-2">&amp;mut </span>diagnostics, connectors);
@@ -188,7 +188,7 @@
 <span class="doccomment">/// Retrieves a Prisma schema without validating it.
 /// You should only use this method when actually validating the schema is too expensive
 /// computationally or in terms of bundle size (e.g., for `query-engine-wasm`).
-</span><span class="kw">pub fn </span>parse_without_validation(file: SourceFile, connectors: ConnectorRegistry) -&gt; ValidatedSchema {
+</span><span class="kw">pub fn </span>parse_without_validation(file: SourceFile, connectors: ConnectorRegistry&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; ValidatedSchema {
     <span class="kw">let </span><span class="kw-2">mut </span>diagnostics = Diagnostics::new();
     <span class="kw">let </span>db = ParserDatabase::new(file, <span class="kw-2">&amp;mut </span>diagnostics);
     <span class="kw">let </span>configuration = validate_configuration(db.ast(), <span class="kw-2">&amp;mut </span>diagnostics, connectors);
@@ -207,7 +207,7 @@
 <span class="doccomment">/// Loads all configuration blocks from a datamodel using the built-in source definitions.
 </span><span class="kw">pub fn </span>parse_configuration(
     schema: <span class="kw-2">&amp;</span>str,
-    connectors: ConnectorRegistry,
+    connectors: ConnectorRegistry&lt;<span class="lifetime">&#39;_</span>&gt;,
 ) -&gt; <span class="prelude-ty">Result</span>&lt;Configuration, diagnostics::Diagnostics&gt; {
     <span class="kw">let </span><span class="kw-2">mut </span>diagnostics = Diagnostics::default();
     <span class="kw">let </span>ast = schema_ast::parse_schema(schema, <span class="kw-2">&amp;mut </span>diagnostics);
@@ -218,7 +218,7 @@
 <span class="kw">fn </span>validate_configuration(
     schema_ast: <span class="kw-2">&amp;</span>ast::SchemaAst,
     diagnostics: <span class="kw-2">&amp;mut </span>Diagnostics,
-    connectors: ConnectorRegistry,
+    connectors: ConnectorRegistry&lt;<span class="lifetime">&#39;_</span>&gt;,
 ) -&gt; Configuration {
     <span class="kw">let </span>generators = generator_loader::load_generators_from_ast(schema_ast, diagnostics);
 

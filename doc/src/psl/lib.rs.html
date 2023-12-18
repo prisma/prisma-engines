@@ -54,6 +54,7 @@
 <a href="#54" id="54">54</a>
 <a href="#55" id="55">55</a>
 <a href="#56" id="56">56</a>
+<a href="#57" id="57">57</a>
 </pre></div><pre class="rust"><code><span class="attr">#![doc = <span class="macro">include_str!</span>(<span class="string">&quot;../README.md&quot;</span>)]
 #![deny(rust_2018_idioms, unsafe_code, missing_docs)]
 
@@ -68,6 +69,7 @@
     reformat,
     schema_ast,
     Configuration,
+    ConnectorRegistry,
     Datasource,
     DatasourceConnectorData,
     Generator,
@@ -107,7 +109,7 @@
 }
 
 <span class="doccomment">/// Parse a Prisma schema, but skip validations.
-</span><span class="kw">pub fn </span>parse_without_validation(file: SourceFile) -&gt; ValidatedSchema {
-    psl_core::parse_without_validation(file, builtin_connectors::BUILTIN_CONNECTORS)
+</span><span class="kw">pub fn </span>parse_without_validation(file: SourceFile, connector_registry: ConnectorRegistry&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; ValidatedSchema {
+    psl_core::parse_without_validation(file, connector_registry)
 }
 </code></pre></div></section></main></body></html>

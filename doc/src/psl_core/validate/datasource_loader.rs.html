@@ -308,7 +308,7 @@
 </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>load_datasources_from_ast(
     ast_schema: <span class="kw-2">&amp;</span>ast::SchemaAst,
     diagnostics: <span class="kw-2">&amp;mut </span>Diagnostics,
-    connectors: <span class="kw">crate</span>::ConnectorRegistry,
+    connectors: <span class="kw">crate</span>::ConnectorRegistry&lt;<span class="lifetime">&#39;_</span>&gt;,
 ) -&gt; Vec&lt;Datasource&gt; {
     <span class="kw">let </span><span class="kw-2">mut </span>sources = Vec::new();
 
@@ -334,7 +334,7 @@
 <span class="kw">fn </span>lift_datasource(
     ast_source: <span class="kw-2">&amp;</span>ast::SourceConfig,
     diagnostics: <span class="kw-2">&amp;mut </span>Diagnostics,
-    connectors: <span class="kw">crate</span>::ConnectorRegistry,
+    connectors: <span class="kw">crate</span>::ConnectorRegistry&lt;<span class="lifetime">&#39;_</span>&gt;,
 ) -&gt; <span class="prelude-ty">Option</span>&lt;Datasource&gt; {
     <span class="kw">let </span>source_name = ast_source.name.name.as_str();
     <span class="kw">let </span><span class="kw-2">mut </span>args: HashMap&lt;<span class="kw">_</span>, (<span class="kw">_</span>, <span class="kw-2">&amp;</span>Expression)&gt; = ast_source
