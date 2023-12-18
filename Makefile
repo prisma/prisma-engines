@@ -323,7 +323,7 @@ test-driver-adapter-planetscale-wasm: test-planetscale-wasm
 ######################
 
 build-qe-napi:
-	cargo build --package query-engine-node-api
+	cargo build --package query-engine-node-api --profile $(PROFILE)
 
 build-qe-wasm:
 ifndef $(NIX)
