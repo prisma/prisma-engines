@@ -3740,6 +3740,31 @@ dependencies = [
 ]
 
 [[package]]
+name = "query-engine-common"
+version = "0.1.0"
+dependencies = [
+ "async-trait",
+ "connection-string",
+ "napi",
+ "opentelemetry",
+ "psl",
+ "query-connector",
+ "query-core",
+ "query-engine-metrics",
+ "serde",
+ "serde_json",
+ "thiserror",
+ "tracing",
+ "tracing-futures",
+ "tracing-opentelemetry",
+ "tracing-subscriber",
+ "tsify",
+ "url",
+ "user-facing-errors",
+ "wasm-bindgen",
+]
+
+[[package]]
 name = "query-engine-metrics"
 version = "0.1.0"
 dependencies = [
@@ -3774,6 +3799,7 @@ dependencies = [
  "quaint",
  "query-connector",
  "query-core",
+ "query-engine-common",
  "query-engine-metrics",
  "query-structure",
  "request-handlers",
@@ -3831,6 +3857,7 @@ dependencies = [
  "quaint",
  "query-connector",
  "query-core",
+ "query-engine-common",
  "query-structure",
  "request-handlers",
  "serde",
