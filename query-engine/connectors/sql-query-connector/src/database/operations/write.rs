@@ -400,6 +400,17 @@ pub(crate) async fn delete_records(
     Ok(row_count as usize)
 }
 
+pub(crate) async fn delete_record(
+    conn: &dyn Queryable,
+    model: &Model,
+    record_filter: RecordFilter,
+    selected_fields: FieldSelection,
+    ctx: &Context<'_>,
+) -> crate::Result<Option<SingleRecord>> {
+    // TODO laplab
+    todo!()
+}
+
 /// Connect relations defined in `child_ids` to a parent defined in `parent_id`.
 /// The relation information is in the `RelationFieldRef`.
 pub(crate) async fn m2m_connect(

@@ -174,6 +174,17 @@ impl<'conn> WriteOperations for MongoDbTransaction<'conn> {
         .await
     }
 
+    async fn delete_record(
+        &mut self,
+        model: &Model,
+        record_filter: connector_interface::RecordFilter,
+        selected_fields: FieldSelection,
+        trace_id: Option<String>,
+    ) -> connector_interface::Result<Option<SingleRecord>> {
+        // TODO laplab: here
+        todo!()
+    }
+
     async fn native_upsert_record(
         &mut self,
         _upsert: connector_interface::NativeUpsert,

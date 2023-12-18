@@ -331,8 +331,18 @@ pub struct UpdateManyRecords {
 
 #[derive(Debug, Clone)]
 pub struct DeleteRecord {
+    pub name: String,
     pub model: Model,
     pub record_filter: Option<RecordFilter>,
+    /// Fields of the deleted record that client has requested to return.
+    /// `None` if the connector does not support returning the deleted row.
+    pub selected_fields: Option<DeleteRecordFields>,
+}
+
+#[derive(Debug, Clone)]
+pub struct DeleteRecordFields {
+    pub fields: FieldSelection,
+    pub order: Vec<String>,
 }
 
 #[derive(Debug, Clone)]

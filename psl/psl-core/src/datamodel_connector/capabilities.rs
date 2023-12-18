@@ -106,6 +106,7 @@ capabilities!(
     RowIn,      // Connector supports (a, b) IN (c, d) expression.
     DistinctOn, // Connector supports DB-level distinct (e.g. postgres)
     LateralJoin,
+    DeleteReturning, // Connector supports deleting records and returning them in one operation.
 );
 
 /// Contains all capabilities that the connector is able to serve.

@@ -136,6 +136,17 @@ impl WriteOperations for MongoDbConnection {
         catch(async move { write::delete_records(&self.database, &mut self.session, model, record_filter).await }).await
     }
 
+    async fn delete_record(
+        &mut self,
+        model: &Model,
+        record_filter: connector_interface::RecordFilter,
+        selected_fields: FieldSelection,
+        trace_id: Option<String>,
+    ) -> connector_interface::Result<Option<SingleRecord>> {
+        // TODO laplab: here
+        todo!()
+    }
+
     async fn m2m_connect(
         &mut self,
         field: &RelationFieldRef,

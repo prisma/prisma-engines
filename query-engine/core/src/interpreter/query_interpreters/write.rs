@@ -137,9 +137,25 @@ async fn delete_one(
         )),
     }?;
 
-    let res = tx.delete_records(&q.model, filter, trace_id).await?;
+    if let Some(selected_fields) = q.selected_fields {
+        let result = tx
+            .delete_record(&q.model, filter, selected_fields.fields, trace_id)
+            .await?
+            .map(|result| RecordSelection {
+                name: q.name,
+                fields: selected_fields.order,
+                scalars: result.into(),
+                nested: vec![],
+                model: q.model,
+                aggregation_rows: None,
+            })
+            .map(Box::new);
 
-    Ok(QueryResult::Count(res))
+        Ok(QueryResult::RecordSelection(result))
+    } else {
+        let result = tx.delete_records(&q.model, filter, trace_id).await?;
+        Ok(QueryResult::Count(result))
+    }
 }
 
 async fn update_many(

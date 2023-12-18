@@ -247,6 +247,17 @@ where
         .await
     }
 
+    async fn delete_record(
+        &mut self,
+        model: &Model,
+        record_filter: RecordFilter,
+        selected_fields: FieldSelection,
+        trace_id: Option<String>,
+    ) -> connector::Result<Option<SingleRecord>> {
+        // TODO laplab: here
+        todo!()
+    }
+
     async fn native_upsert_record(
         &mut self,
         upsert: connector_interface::NativeUpsert,
