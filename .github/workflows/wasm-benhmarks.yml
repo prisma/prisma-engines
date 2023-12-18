@@ -43,7 +43,12 @@ jobs:
 
       - name: Read benchmark results
         id: read_results
-        run: echo "::set-output name=bench_output::$(<out.txt)"
+        run: |
+          {
+            echo 'bench_output<<EOF'
+            cat out.txt
+            echo EOF
+          } >> "$GITHUB_OUTPUT"
 
       - name: Find past report comment
         uses: peter-evans/find-comment@v2
