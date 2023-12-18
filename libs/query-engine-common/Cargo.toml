@@ -1,0 +1,31 @@
+[package]
+name = "query-engine-common"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+thiserror = "1"
+url = "2"
+query-connector = { path = "../../query-engine/connectors/query-connector" }
+query-core = { path = "../../query-engine/core" }
+user-facing-errors = { path = "../user-facing-errors" }
+serde_json.workspace = true
+serde.workspace = true
+connection-string.workspace = true
+psl.workspace = true
+async-trait = "0.1"
+tracing = "0.1"
+tracing-subscriber = { version = "0.3" }
+tracing-futures = "0.2"
+tracing-opentelemetry = "0.17.3"
+opentelemetry = { version = "0.17"}
+
+[target.'cfg(not(target_arch = "wasm32"))'.dependencies]
+napi.workspace = true
+query-engine-metrics = { path = "../../query-engine/metrics" }
+
+[target.'cfg(target_arch = "wasm32")'.dependencies]
+wasm-bindgen.workspace = true
+tsify.workspace = true
