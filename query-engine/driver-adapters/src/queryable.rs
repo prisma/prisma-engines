@@ -45,9 +45,9 @@ impl JsBaseQueryable {
     /// visit a quaint query AST according to the provider of the JS connector
     fn visit_quaint_query<'a>(&self, q: QuaintQuery<'a>) -> quaint::Result<(String, Vec<quaint::Value<'a>>)> {
         match self.provider {
-            AdapterFlavour::Mysql => visitor::Mysql::build(q),
             AdapterFlavour::Postgres => visitor::Postgres::build(q),
-            AdapterFlavour::Sqlite => visitor::Sqlite::build(q),
+            // AdapterFlavour::Mysql => visitor::Mysql::build(q),
+            // AdapterFlavour::Sqlite => visitor::Sqlite::build(q),
         }
     }
 
@@ -56,8 +56,8 @@ impl JsBaseQueryable {
 
         let converter = match self.provider {
             AdapterFlavour::Postgres => conversion::postgres::value_to_js_arg,
-            AdapterFlavour::Sqlite => conversion::sqlite::value_to_js_arg,
-            AdapterFlavour::Mysql => conversion::mysql::value_to_js_arg,
+            // AdapterFlavour::Sqlite => conversion::sqlite::value_to_js_arg,
+            // AdapterFlavour::Mysql => conversion::mysql::value_to_js_arg,
         };
 
         let args = values
@@ -129,12 +129,12 @@ impl QuaintQueryable for JsBaseQueryable {
             return Err(Error::builder(ErrorKind::invalid_isolation_level(&isolation_level)).build());
         }
 
-        if self.provider == AdapterFlavour::Sqlite {
-            return match isolation_level {
-                IsolationLevel::Serializable => Ok(()),
-                _ => Err(Error::builder(ErrorKind::invalid_isolation_level(&isolation_level)).build()),
-            };
-        }
+        // if self.provider == AdapterFlavour::Sqlite {
+        //     return match isolation_level {
+        //         IsolationLevel::Serializable => Ok(()),
+        //         _ => Err(Error::builder(ErrorKind::invalid_isolation_level(&isolation_level)).build()),
+        //     };
+        // }
 
         self.raw_cmd(&format!("SET TRANSACTION ISOLATION LEVEL {isolation_level}"))
             .await
@@ -142,8 +142,8 @@ impl QuaintQueryable for JsBaseQueryable {
 
     fn requires_isolation_first(&self) -> bool {
         match self.provider {
-            AdapterFlavour::Mysql => true,
-            AdapterFlavour::Postgres | AdapterFlavour::Sqlite => false,
+            // AdapterFlavour::Mysql => true,
+            AdapterFlavour::Postgres => false, //| AdapterFlavour::Sqlite => false,
         }
     }
 }

@@ -27,4 +27,4 @@ pub const SQLITE: &'static dyn Connector = &sqlite_datamodel_connector::SqliteDa
 pub const MSSQL: &'static dyn Connector = &mssql_datamodel_connector::MsSqlDatamodelConnector;
 pub const MONGODB: &'static dyn Connector = &mongodb::MongoDbDatamodelConnector;
 
-pub static BUILTIN_CONNECTORS: ConnectorRegistry = &[POSTGRES, MYSQL, SQLITE, MSSQL, COCKROACH, MONGODB];
+pub static BUILTIN_CONNECTORS: ConnectorRegistry = &[POSTGRES];
