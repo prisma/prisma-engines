@@ -223,7 +223,14 @@
 <a href="#223" id="223">223</a>
 <a href="#224" id="224">224</a>
 <a href="#225" id="225">225</a>
-</pre></div><pre class="rust"><code><span class="kw">use </span><span class="kw">super</span>::Aliasable;
+<a href="#226" id="226">226</a>
+<a href="#227" id="227">227</a>
+<a href="#228" id="228">228</a>
+<a href="#229" id="229">229</a>
+<a href="#230" id="230">230</a>
+<a href="#231" id="231">231</a>
+<a href="#232" id="232">232</a>
+</pre></div><pre class="rust"><code><span class="kw">use super</span>::{values::NativeColumnType, Aliasable};
 <span class="kw">use crate</span>::{
     ast::{Expression, ExpressionKind, Table},
     Value,
@@ -257,6 +264,8 @@
     <span class="kw">pub</span>(<span class="kw">crate</span>) alias: <span class="prelude-ty">Option</span>&lt;Cow&lt;<span class="lifetime">&#39;a</span>, str&gt;&gt;,
     <span class="kw">pub</span>(<span class="kw">crate</span>) default: <span class="prelude-ty">Option</span>&lt;DefaultValue&lt;<span class="lifetime">&#39;a</span>&gt;&gt;,
     <span class="kw">pub</span>(<span class="kw">crate</span>) type_family: <span class="prelude-ty">Option</span>&lt;TypeFamily&gt;,
+    <span class="doccomment">/// The underlying native type of the column.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) native_type: <span class="prelude-ty">Option</span>&lt;NativeColumnType&lt;<span class="lifetime">&#39;a</span>&gt;&gt;,
     <span class="doccomment">/// Whether the column is an enum.
     </span><span class="kw">pub</span>(<span class="kw">crate</span>) is_enum: bool,
     <span class="doccomment">/// Whether the column is a (scalar) list.
@@ -355,6 +364,11 @@
             .map(|d| d == <span class="kw-2">&amp;</span>DefaultValue::Generated)
             .unwrap_or(<span class="bool-val">false</span>)
     }
+
+    <span class="kw">pub fn </span>native_column_type&lt;T: Into&lt;NativeColumnType&lt;<span class="lifetime">&#39;a</span>&gt;&gt;&gt;(<span class="kw-2">mut </span><span class="self">self</span>, native_type: <span class="prelude-ty">Option</span>&lt;T&gt;) -&gt; Column&lt;<span class="lifetime">&#39;a</span>&gt; {
+        <span class="self">self</span>.native_type = native_type.map(|nt| nt.into());
+        <span class="self">self
+    </span>}
 }
 
 <span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; From&lt;Column&lt;<span class="lifetime">&#39;a</span>&gt;&gt; <span class="kw">for </span>Expression&lt;<span class="lifetime">&#39;a</span>&gt; {

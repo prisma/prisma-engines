@@ -270,7 +270,16 @@
 <a href="#270" id="270">270</a>
 <a href="#271" id="271">271</a>
 <a href="#272" id="272">272</a>
+<a href="#273" id="273">273</a>
+<a href="#274" id="274">274</a>
+<a href="#275" id="275">275</a>
+<a href="#276" id="276">276</a>
+<a href="#277" id="277">277</a>
+<a href="#278" id="278">278</a>
+<a href="#279" id="279">279</a>
+<a href="#280" id="280">280</a>
 </pre></div><pre class="rust"><code><span class="kw">use crate</span>::{ast, parent_container::ParentContainer, prelude::<span class="kw-2">*</span>, DefaultKind, NativeTypeInstance, ValueGenerator};
+<span class="kw">use </span>chrono::{DateTime, FixedOffset};
 <span class="kw">use </span>psl::{
     parser_database::{walkers, ScalarFieldType, ScalarType},
     schema_ast::ast::FieldArity,
@@ -440,6 +449,13 @@
             native_type: nt,
             connector,
         })
+    }
+
+    <span class="kw">pub fn </span>parse_json_datetime(<span class="kw-2">&amp;</span><span class="self">self</span>, value: <span class="kw-2">&amp;</span>str) -&gt; chrono::ParseResult&lt;DateTime&lt;FixedOffset&gt;&gt; {
+        <span class="kw">let </span>nt = <span class="self">self</span>.native_type().map(|nt| nt.native_type);
+        <span class="kw">let </span>connector = <span class="self">self</span>.dm.schema.connector;
+
+        connector.parse_json_datetime(value, nt)
     }
 
     <span class="kw">pub fn </span>is_autoincrement(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {

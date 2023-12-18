@@ -112,6 +112,7 @@
 <a href="#112" id="112">112</a>
 <a href="#113" id="113">113</a>
 <a href="#114" id="114">114</a>
+<a href="#115" id="115">115</a>
 </pre></div><pre class="rust"><code><span class="kw">use crate</span>::{model_extensions::ScalarFieldExt, Context};
 <span class="kw">use </span>itertools::Itertools;
 <span class="kw">use </span>quaint::ast::{Column, Row};
@@ -221,6 +222,7 @@
 
         Column::from((full_table_name, col))
             .type_family(<span class="self">self</span>.type_family())
+            .native_column_type(<span class="self">self</span>.native_type().map(|nt| nt.name()))
             .set_is_enum(<span class="self">self</span>.type_identifier().is_enum())
             .set_is_list(<span class="self">self</span>.is_list())
             .default(quaint::ast::DefaultValue::Generated)

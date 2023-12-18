@@ -436,6 +436,15 @@
 <a href="#436" id="436">436</a>
 <a href="#437" id="437">437</a>
 <a href="#438" id="438">438</a>
+<a href="#439" id="439">439</a>
+<a href="#440" id="440">440</a>
+<a href="#441" id="441">441</a>
+<a href="#442" id="442">442</a>
+<a href="#443" id="443">443</a>
+<a href="#444" id="444">444</a>
+<a href="#445" id="445">445</a>
+<a href="#446" id="446">446</a>
+<a href="#447" id="447">447</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! The interface implemented by connectors for Prisma schema validation and interpretation.
 
 /// Connector capabilities
@@ -463,6 +472,7 @@
 };
 
 <span class="kw">use crate</span>::{configuration::DatasourceConnectorData, Configuration, Datasource, PreviewFeature};
+<span class="kw">use </span>chrono::{DateTime, FixedOffset};
 <span class="kw">use </span>diagnostics::{DatamodelError, Diagnostics, NativeTypeErrorFactory, Span};
 <span class="kw">use </span>enumflags2::BitFlags;
 <span class="kw">use </span>lsp_types::CompletionList;
@@ -796,6 +806,14 @@
         _diagnostics: <span class="kw-2">&amp;mut </span>Diagnostics,
     ) -&gt; DatasourceConnectorData {
         Default::default()
+    }
+
+    <span class="kw">fn </span>parse_json_datetime(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        _str: <span class="kw-2">&amp;</span>str,
+        _nt: <span class="prelude-ty">Option</span>&lt;NativeTypeInstance&gt;,
+    ) -&gt; chrono::ParseResult&lt;DateTime&lt;FixedOffset&gt;&gt; {
+        <span class="macro">unreachable!</span>(<span class="string">&quot;This method is only implemented on connectors with lateral join support.&quot;</span>)
     }
 }
 

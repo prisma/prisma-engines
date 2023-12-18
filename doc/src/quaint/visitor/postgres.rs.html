@@ -1299,6 +1299,38 @@
 <a href="#1299" id="1299">1299</a>
 <a href="#1300" id="1300">1300</a>
 <a href="#1301" id="1301">1301</a>
+<a href="#1302" id="1302">1302</a>
+<a href="#1303" id="1303">1303</a>
+<a href="#1304" id="1304">1304</a>
+<a href="#1305" id="1305">1305</a>
+<a href="#1306" id="1306">1306</a>
+<a href="#1307" id="1307">1307</a>
+<a href="#1308" id="1308">1308</a>
+<a href="#1309" id="1309">1309</a>
+<a href="#1310" id="1310">1310</a>
+<a href="#1311" id="1311">1311</a>
+<a href="#1312" id="1312">1312</a>
+<a href="#1313" id="1313">1313</a>
+<a href="#1314" id="1314">1314</a>
+<a href="#1315" id="1315">1315</a>
+<a href="#1316" id="1316">1316</a>
+<a href="#1317" id="1317">1317</a>
+<a href="#1318" id="1318">1318</a>
+<a href="#1319" id="1319">1319</a>
+<a href="#1320" id="1320">1320</a>
+<a href="#1321" id="1321">1321</a>
+<a href="#1322" id="1322">1322</a>
+<a href="#1323" id="1323">1323</a>
+<a href="#1324" id="1324">1324</a>
+<a href="#1325" id="1325">1325</a>
+<a href="#1326" id="1326">1326</a>
+<a href="#1327" id="1327">1327</a>
+<a href="#1328" id="1328">1328</a>
+<a href="#1329" id="1329">1329</a>
+<a href="#1330" id="1330">1330</a>
+<a href="#1331" id="1331">1331</a>
+<a href="#1332" id="1332">1332</a>
+<a href="#1333" id="1333">1333</a>
 </pre></div><pre class="rust"><code><span class="kw">use crate</span>::{
     ast::<span class="kw-2">*</span>,
     visitor::{<span class="self">self</span>, Visitor},
@@ -1316,6 +1348,23 @@
 </span><span class="kw">pub struct </span>Postgres&lt;<span class="lifetime">&#39;a</span>&gt; {
     query: String,
     parameters: Vec&lt;Value&lt;<span class="lifetime">&#39;a</span>&gt;&gt;,
+}
+
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; Postgres&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="kw">fn </span>visit_json_build_obj_expr(<span class="kw-2">&amp;mut </span><span class="self">self</span>, expr: Expression&lt;<span class="lifetime">&#39;a</span>&gt;) -&gt; <span class="kw">crate</span>::Result&lt;()&gt; {
+        <span class="kw">match </span>expr.kind() {
+            ExpressionKind::Column(col) =&gt; <span class="kw">match </span>(col.type_family.as_ref(), col.native_type.as_deref()) {
+                (<span class="prelude-val">Some</span>(TypeFamily::Decimal(<span class="kw">_</span>)), <span class="prelude-val">Some</span>(<span class="string">&quot;MONEY&quot;</span>)) =&gt; {
+                    <span class="self">self</span>.visit_expression(expr)<span class="question-mark">?</span>;
+                    <span class="self">self</span>.write(<span class="string">&quot;::numeric&quot;</span>)<span class="question-mark">?</span>;
+
+                    <span class="prelude-val">Ok</span>(())
+                }
+                <span class="kw">_ </span>=&gt; <span class="self">self</span>.visit_expression(expr),
+            },
+            <span class="kw">_ </span>=&gt; <span class="self">self</span>.visit_expression(expr),
+        }
+    }
 }
 
 <span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; Visitor&lt;<span class="lifetime">&#39;a</span>&gt; <span class="kw">for </span>Postgres&lt;<span class="lifetime">&#39;a</span>&gt; {
@@ -1835,7 +1884,7 @@
                 <span class="kw">while let </span><span class="prelude-val">Some</span>((name, expr)) = chunk.next() {
                     s.visit_raw_value(Value::text(name))<span class="question-mark">?</span>;
                     s.write(<span class="string">&quot;, &quot;</span>)<span class="question-mark">?</span>;
-                    s.visit_expression(expr)<span class="question-mark">?</span>;
+                    s.visit_json_build_obj_expr(expr)<span class="question-mark">?</span>;
                     <span class="kw">if </span>chunk.peek().is_some() {
                         s.write(<span class="string">&quot;, &quot;</span>)<span class="question-mark">?</span>;
                     }
@@ -2589,6 +2638,21 @@
                 </span>),
                 sql
             );
+        }
+
+        <span class="attr">#[test]
+        </span><span class="kw">fn </span>money() {
+            <span class="kw">let </span>build_json = json_build_object(<span class="macro">vec!</span>[(
+                <span class="string">&quot;money&quot;</span>.into(),
+                Column::from(<span class="string">&quot;money&quot;</span>)
+                    .native_column_type(<span class="prelude-val">Some</span>(<span class="string">&quot;money&quot;</span>))
+                    .type_family(TypeFamily::Decimal(<span class="prelude-val">None</span>))
+                    .into(),
+            )]);
+            <span class="kw">let </span>query = Select::default().value(build_json);
+            <span class="kw">let </span>(sql, <span class="kw">_</span>) = Postgres::build(query).unwrap();
+
+            <span class="macro">assert_eq!</span>(sql, <span class="string">&quot;SELECT JSONB_BUILD_OBJECT(&#39;money&#39;, \&quot;money\&quot;::numeric)&quot;</span>);
         }
 
         <span class="kw">fn </span>build_json_object(num_fields: u32) -&gt; JsonBuildObject&lt;<span class="lifetime">&#39;static</span>&gt; {
