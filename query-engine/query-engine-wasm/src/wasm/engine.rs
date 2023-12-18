@@ -7,6 +7,8 @@ use crate::{
 };
 use driver_adapters::JsObject;
 use js_sys::Function as JsFunction;
+use psl::builtin_connectors::{MYSQL, POSTGRES, SQLITE};
+use psl::ConnectorRegistry;
 use query_core::{
     protocol::EngineProtocol,
     schema::{self},
@@ -48,7 +50,8 @@ impl QueryEngine {
         } = options;
 
         // Note: if we used `psl::validate`, we'd add ~1MB to the Wasm artifact (before gzip).
-        let mut schema = psl::parse_without_validation(datamodel.into());
+        let connector_registry: ConnectorRegistry<'_> = &[POSTGRES, MYSQL, SQLITE];
+        let mut schema = psl::parse_without_validation(datamodel.into(), connector_registry);
         let config = &mut schema.configuration;
         let preview_features = config.preview_features();
 
