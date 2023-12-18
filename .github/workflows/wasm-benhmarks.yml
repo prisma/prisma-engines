@@ -50,6 +50,21 @@ jobs:
             echo EOF
           } >> "$GITHUB_OUTPUT"
 
+      - name: Summarize results
+        id: summarize_results
+        run: |
+          input="${{ steps.read_results.outputs.bench_output }}"
+          regressed=$(echo "$input" | grep "slower than Web Assembly: Latest" | cut -f1 -d'x' | awk '$1 > 1.05' | wc -l )
+          if [ "$regressed" -gt 0 ]; then
+              message="🚨 WASM query-engine: $regressed benchmarks have regressed"
+              status=failed
+          else
+              message="✅ WASM query-engine: no benchmarks have regressed"
+              status=passed
+          fi
+          echo "summary=$message" >> $GITHUB_OUTPUT
+          echo "status=$status" >> $GITHUB_OUTPUT
+
       - name: Find past report comment
         uses: peter-evans/find-comment@v2
         id: findReportComment
@@ -64,11 +79,21 @@ jobs:
           issue-number: ${{ github.event.pull_request.number }}
           body: |
             <!-- wasm-engine-perf -->
-            ### WASM engine perf 🏎
+            #### ${{ steps.summarize_results.outputs.summary }}
+
+            <details>
+            <summary>Full benchmark report</summary>
 
             ```
             ${{ steps.read_results.outputs.bench_output }}
             ```
+            </details>
 
             After changes in ${{ github.event.pull_request.head.sha }}
           edit-mode: replace
+
+      - name: Fail workflow if regression detected
+        if: steps.summarize_results.outputs.status == 'failed'
+        run: |
+          echo "Workflow failed due to benchmark regression."
+          exit 1
