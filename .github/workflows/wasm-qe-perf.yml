@@ -1,10 +1,9 @@
-name: Report qe benchmarks
+name: Wasm Benchmarks
 on:
   pull_request:
 
 jobs:
   run-benchmarks:
-    name: Run benchmarks
     runs-on: ubuntu-latest
     steps:
       - name: Checkout PR branch
