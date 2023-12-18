@@ -9,10 +9,10 @@ in
 {
   packages.prisma-schema-wasm = stdenv.mkDerivation {
     name = "prisma-schema-wasm";
-    nativeBuildInputs = with pkgs; [ git wasm-bindgen-cli toolchain ];
+    nativeBuildInputs = with pkgs; [ git wasm-bindgen-cli toolchain binaryen ];
     inherit (self'.packages.prisma-engines) configurePhase src;
 
-    buildPhase = "cargo build --release --target=wasm32-unknown-unknown -p prisma-schema-build";
+    buildPhase = "cargo build --profile=wasm-release --target=wasm32-unknown-unknown -p prisma-schema-build";
     installPhase = readFile "${scriptsDir}/install.sh";
   };
 
