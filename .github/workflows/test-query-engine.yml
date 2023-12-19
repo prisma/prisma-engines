@@ -104,7 +104,7 @@ jobs:
         env:
           CLICOLOR_FORCE: 1
 
-      - run: export WORKSPACE_ROOT=$(pwd) && cargo nextest run -p query-engine-tests --partition hash:${{ matrix.partition }}
+      - run: export WORKSPACE_ROOT=$(pwd) && cargo nextest run -p query-engine-tests --partition hash:${{ matrix.partition }} --test-threads=8
         if: ${{ !matrix.database.single_threaded }}
         env:
           CLICOLOR_FORCE: 1
