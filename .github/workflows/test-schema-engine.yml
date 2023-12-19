@@ -5,9 +5,8 @@ on:
       - main
   pull_request:
     paths-ignore:
-      # Generic
-      - ".github/**"
       - "!.github/workflows/test-schema-engine.yml"
+      - ".github/**"
       - ".buildkite/**"
       - "*.md"
       - "LICENSE"

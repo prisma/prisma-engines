@@ -5,8 +5,8 @@ on:
       - main
   pull_request:
     paths-ignore:
+      - "!.github/workflows/build-prisma-schema-wasm.yml"
       - ".github/**"
-      - "!.github/workflows/build-wasm.yml"
       - ".buildkite/**"
       - "*.md"
       - "LICENSE"
