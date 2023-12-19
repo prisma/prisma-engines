@@ -12,6 +12,7 @@ pub use psl_core::{
     reformat,
     schema_ast,
     Configuration,
+    ConnectorRegistry,
     Datasource,
     DatasourceConnectorData,
     Generator,
@@ -51,6 +52,6 @@ pub fn validate(file: SourceFile) -> ValidatedSchema {
 }
 
 /// Parse a Prisma schema, but skip validations.
-pub fn parse_without_validation(file: SourceFile) -> ValidatedSchema {
-    psl_core::parse_without_validation(file, builtin_connectors::BUILTIN_CONNECTORS)
+pub fn parse_without_validation(file: SourceFile, connector_registry: ConnectorRegistry<'_>) -> ValidatedSchema {
+    psl_core::parse_without_validation(file, connector_registry)
 }
