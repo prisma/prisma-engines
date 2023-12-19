@@ -9,7 +9,7 @@ psl.workspace = true
 serde.workspace = true
 serde_json.workspace = true
 schema = { path = "../schema" }
-indexmap = { version = "1.7", features = ["serde-1"] }
+indexmap.workspace = true
 query-structure = { path = "../query-structure", features = ["default_generators"] }
 
 [dev-dependencies]

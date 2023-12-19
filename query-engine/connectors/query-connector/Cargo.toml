@@ -16,4 +16,4 @@ serde_json.workspace = true
 thiserror = "1.0"
 user-facing-errors = {path = "../../../libs/user-facing-errors", features = ["sql"]}
 uuid = "1"
-indexmap = "1.7"
+indexmap.workspace = true
