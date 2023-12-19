@@ -129,7 +129,7 @@ fn schema_to_connector(
     let (source, url, preview_features, shadow_database_url) = parse_configuration(schema)?;
 
     let url = config_dir
-        .map(|config_dir| source.active_connector.set_config_dir(config_dir, &url).into_owned())
+        .map(|config_dir| psl::set_config_dir(source.active_connector.flavour(), config_dir, &url).into_owned())
         .unwrap_or(url);
 
     let params = ConnectorParams {
