@@ -95,7 +95,7 @@ jobs:
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
       - name: "Start ${{ matrix.database.name }} (${{ matrix.engine_protocol }})"
-        run: make start-${{ matrix.database.name }
+        run: make start-${{ matrix.database.name }}
 
       - run: export WORKSPACE_ROOT=$(pwd) && cargo nextest run -p query-engine-tests --partition hash:${{ matrix.partition }} --test-threads=1
         if: ${{ matrix.database.single_threaded }}
