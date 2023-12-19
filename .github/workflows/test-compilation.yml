@@ -2,8 +2,8 @@ name: Workspace
 on:
   pull_request:
     paths-ignore:
-      - ".github/**"
       - "!.github/workflows/test-compilation.yml"
+      - ".github/**"
       - ".buildkite/**"
       - "*.md"
       - "LICENSE"

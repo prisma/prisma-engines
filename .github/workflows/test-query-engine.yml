@@ -5,8 +5,8 @@ on:
       - main
   pull_request:
     paths-ignore:
-      - ".github/**"
       - "!.github/workflows/test-query-engine.yml"
+      - ".github/**"
       - ".buildkite/**"
       - "*.md"
       - "LICENSE"
@@ -22,6 +22,7 @@ jobs:
     name: "${{ matrix.database.name }} - ${{ matrix.engine_protocol }} ${{ matrix.partition }}"
 
     strategy:
+      fail-fast: false
       matrix:
         database:
           - name: "vitess_8_0"
