@@ -33,11 +33,7 @@ use parser_database::{
     ast::{self, SchemaPosition},
     walkers, IndexAlgorithm, ParserDatabase, ReferentialAction, ScalarType,
 };
-use std::{
-    borrow::Cow,
-    collections::{BTreeMap, HashMap},
-    str::FromStr,
-};
+use std::{borrow::Cow, collections::HashMap, str::FromStr};
 
 pub const EXTENSIONS_KEY: &str = "extensions";
 
