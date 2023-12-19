@@ -1,4 +1,4 @@
-name: Wasm perf
+name: Query Engine (WASM)
 on:
   pull_request:
     paths-ignore:

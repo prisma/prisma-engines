@@ -1,14 +1,14 @@
-name: Test release binary compilation
+name: Workspace
 on:
   pull_request:
     paths-ignore:
-      - '.github/**'
-      - '!.github/workflows/compilation.yml'
-      - '.buildkite/**'
-      - '*.md'
-      - 'LICENSE'
-      - 'CODEOWNERS'
-      - 'renovate.json'
+      - ".github/**"
+      - "!.github/workflows/test-compilation.yml"
+      - ".buildkite/**"
+      - "*.md"
+      - "LICENSE"
+      - "CODEOWNERS"
+      - "renovate.json"
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -16,7 +16,7 @@ concurrency:
 
 jobs:
   test-crate-compilation:
-    name: 'Compile top level crates on Linux'
+    name: "Check release compilation"
     strategy:
       fail-fast: false
     runs-on: ubuntu-latest
@@ -24,17 +24,17 @@ jobs:
       - uses: actions/checkout@v4
       - uses: dtolnay/rust-toolchain@stable
 
-      - run: 'cargo clean && cargo build --release -p schema-engine-cli'
-        name: 'Compile Migration Engine'
+      - run: "cargo clean && cargo build --release -p schema-engine-cli"
+        name: "Compile Migration Engine"
 
-      - run: 'cargo clean && cargo build --release -p prisma-fmt'
-        name: 'Compile prisma-fmt'
+      - run: "cargo clean && cargo build --release -p prisma-fmt"
+        name: "Compile prisma-fmt"
 
-      - run: 'cargo clean && cargo build --release -p query-engine'
-        name: 'Compile Query Engine Binary'
+      - run: "cargo clean && cargo build --release -p query-engine"
+        name: "Compile Query Engine Binary"
 
-      - run: 'cargo clean && cargo build --release -p query-engine-node-api'
-        name: 'Compile Query Engine Library'
+      - run: "cargo clean && cargo build --release -p query-engine-node-api"
+        name: "Compile Query Engine Library"
 
-      - name: 'Check that Cargo.lock did not change'
-        run: 'git diff --exit-code'
+      - name: "Check that Cargo.lock did not change"
+        run: "git diff --exit-code"

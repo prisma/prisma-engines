@@ -1,4 +1,4 @@
-name: QE
+name: Query Engine
 on:
   push:
     branches:
