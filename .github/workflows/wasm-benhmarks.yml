@@ -56,7 +56,7 @@ jobs:
           input="${{ steps.read_results.outputs.bench_output }}"
           regressed=$(echo "$input" | grep "slower than Web Assembly: Latest" | cut -f1 -d'x' | awk '$1 > 1.05' | wc -l )
           if [ "$regressed" -gt 0 ]; then
-              message="🚨 WASM query-engine: $regressed benchmarks have regressed"
+              message="🚨 WASM query-engine: $regressed benchmark(s) have regressed"
               status=failed
           else
               message="✅ WASM query-engine: no benchmarks have regressed"
