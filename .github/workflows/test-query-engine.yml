@@ -97,12 +97,12 @@ jobs:
 
       - uses: taiki-e/install-action@nextest
 
-      - run: export WORKSPACE_ROOT=$(pwd) && cargo nextest --package query-engine-tests -- --test-threads=1
+      - run: export WORKSPACE_ROOT=$(pwd) && cargo nextest run -p query-engine-tests --test-threads=1
         if: ${{ matrix.database.single_threaded }}
         env:
           CLICOLOR_FORCE: 1
 
-      - run: export WORKSPACE_ROOT=$(pwd) && cargo nextest --package query-engine-tests -- --test-threads=8
+      - run: export WORKSPACE_ROOT=$(pwd) && cargo nextest run -p query-engine-tests
         if: ${{ !matrix.database.single_threaded }}
         env:
           CLICOLOR_FORCE: 1
