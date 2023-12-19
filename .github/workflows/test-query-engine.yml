@@ -6,12 +6,12 @@ on:
   pull_request:
     paths-ignore:
       - '.github/**'
-      - '!.github/workflows/query-engine.yml'
       - '.buildkite/**'
       - '*.md'
       - 'LICENSE'
       - 'CODEOWNERS'
       - 'renovate.json'
+      - "!.github/workflows/test-query-engine.yml"
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
