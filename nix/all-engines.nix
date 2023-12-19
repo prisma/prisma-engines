@@ -115,6 +115,8 @@ in
     })
     { profile = "release"; };
 
+
+
   packages.query-engine-wasm = lib.makeOverridable
     ({ profile }: stdenv.mkDerivation {
       name = "query-engine-wasm";

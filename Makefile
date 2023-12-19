@@ -12,6 +12,8 @@ LIBRARY_EXT := $(shell                            \
         (*)                    echo "so"    ;;    \
     esac)
 
+PROFILE ?= dev
+
 default: build
 
 ###################
@@ -88,14 +90,14 @@ start-sqlite:
 dev-sqlite:
 	cp $(CONFIG_PATH)/sqlite $(CONFIG_FILE)
 
-dev-libsql-js: build-qe-napi build-connector-kit-js
+dev-libsql-js: build-qe-napi build-driver-adapters-kit
 	cp $(CONFIG_PATH)/libsql-js $(CONFIG_FILE)
 
 test-libsql-js: dev-libsql-js test-qe-st
 
 test-driver-adapter-libsql: test-libsql-js
 
-dev-libsql-wasm: build-qe-wasm build-connector-kit-js
+dev-libsql-wasm: build-qe-wasm build-driver-adapters-kit
 	cp $(CONFIG_PATH)/libsql-wasm $(CONFIG_FILE)
 
 test-libsql-wasm: dev-libsql-wasm test-qe-st
@@ -133,12 +135,12 @@ dev-postgres13: start-postgres13
 
 start-pg-js: start-postgres13
 
-dev-pg-js: start-pg-js build-qe-napi build-connector-kit-js
+dev-pg-js: start-pg-js build-qe-napi build-driver-adapters-kit
 	cp $(CONFIG_PATH)/pg-js $(CONFIG_FILE)
 
 test-pg-js: dev-pg-js test-qe-st
 
-dev-pg-wasm: start-pg-js build-qe-wasm build-connector-kit-js
+dev-pg-wasm: start-pg-js build-qe-wasm build-driver-adapters-kit
 	cp $(CONFIG_PATH)/pg-wasm $(CONFIG_FILE)
 
 test-pg-wasm: dev-pg-wasm test-qe-st
@@ -146,15 +148,26 @@ test-pg-wasm: dev-pg-wasm test-qe-st
 test-driver-adapter-pg: test-pg-js
 test-driver-adapter-pg-wasm: test-pg-wasm
 
+start-pg-bench:
+	docker compose -f query-engine/driver-adapters/executor/bench/docker-compose.yml up --wait -d --remove-orphans postgres
+
+setup-pg-bench: start-pg-bench build-qe-napi build-qe-wasm build-driver-adapters-kit
+
+run-bench:
+	DATABASE_URL="postgresql://postgres:postgres@localhost:5432/bench?schema=imdb_bench&sslmode=disable" \
+	node --experimental-wasm-modules query-engine/driver-adapters/executor/dist/bench.mjs
+
+bench-pg-js: setup-pg-bench run-bench
+
 start-neon-js:
 	docker compose -f docker-compose.yml up --wait -d --remove-orphans neon-proxy
 
-dev-neon-js: start-neon-js build-qe-napi build-connector-kit-js
+dev-neon-js: start-neon-js build-qe-napi build-driver-adapters-kit
 	cp $(CONFIG_PATH)/neon-js $(CONFIG_FILE)
 
 test-neon-js: dev-neon-js test-qe-st
 
-dev-neon-wasm: start-neon-js build-qe-wasm build-connector-kit-js
+dev-neon-wasm: start-neon-js build-qe-wasm build-driver-adapters-kit
 	cp $(CONFIG_PATH)/neon-wasm $(CONFIG_FILE)
 
 test-neon-wasm: dev-neon-wasm test-qe-st
@@ -293,12 +306,12 @@ dev-vitess_8_0: start-vitess_8_0
 start-planetscale-js:
 	docker compose -f docker-compose.yml up -d --remove-orphans planetscale-proxy
 
-dev-planetscale-js: start-planetscale-js build-qe-napi build-connector-kit-js
+dev-planetscale-js: start-planetscale-js build-qe-napi build-driver-adapters-kit
 	cp $(CONFIG_PATH)/planetscale-js $(CONFIG_FILE)
 
 test-planetscale-js: dev-planetscale-js test-qe-st
 
-dev-planetscale-wasm: start-planetscale-js build-qe-wasm build-connector-kit-js
+dev-planetscale-wasm: start-planetscale-js build-qe-wasm build-driver-adapters-kit
 	cp $(CONFIG_PATH)/planetscale-wasm $(CONFIG_FILE)
 
 test-planetscale-wasm: dev-planetscale-wasm test-qe-st
@@ -311,7 +324,7 @@ test-driver-adapter-planetscale-wasm: test-planetscale-wasm
 ######################
 
 build-qe-napi:
-	cargo build --package query-engine-node-api
+	cargo build --package query-engine-node-api --profile $(PROFILE)
 
 build-qe-wasm:
 ifndef $(NIX)
@@ -322,7 +335,7 @@ else
 	cd query-engine/query-engine-wasm && ./build.sh
 endif
 
-build-connector-kit-js: build-driver-adapters
+build-driver-adapters-kit: build-driver-adapters
 	cd query-engine/driver-adapters && pnpm i && pnpm build
 
 build-driver-adapters: ensure-prisma-present
@@ -384,7 +397,7 @@ otel:
 
 # Build the debug version of Query Engine Node-API library ready to be consumed by Node.js
 .PHONY: qe-node-api
-qe-node-api: build target/debug/libquery_engine.node
+qe-node-api: build target/debug/libquery_engine.node --profile=$(PROFILE)
 
 %.node: %.$(LIBRARY_EXT)
 # Remove the file first to work around a macOS bug: https://openradar.appspot.com/FB8914243

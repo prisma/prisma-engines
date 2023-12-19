@@ -1,0 +1,44 @@
+{
+  "engines": {
+    "node": ">=16.13",
+    "pnpm": ">=8.6.6 <9"
+  },
+  "name": "executor",
+  "version": "0.0.1",
+  "description": "",
+  "private": true,
+  "scripts": {
+    "build": "tsup ./src/testd.ts ./src/bench.ts --format esm --dts"
+  },
+  "tsup": {
+    "external": [
+      "../../../query-engine-wasm/pkg/query_engine_bg.js"
+    ]
+  },
+  "keywords": [],
+  "author": "",
+  "sideEffects": false,
+  "license": "Apache-2.0",
+  "dependencies": {
+    "@libsql/client": "0.3.6",
+    "@neondatabase/serverless": "0.6.0",
+    "@planetscale/database": "1.13.0",
+    "query-engine-wasm-latest": "npm:@prisma/query-engine-wasm@latest",
+    "query-engine-wasm-baseline": "npm:@prisma/query-engine-wasm@0.0.19",
+    "@prisma/adapter-libsql": "workspace:*",
+    "@prisma/adapter-neon": "workspace:*",
+    "@prisma/adapter-pg": "workspace:*",
+    "@prisma/adapter-planetscale": "workspace:*",
+    "@prisma/driver-adapter-utils": "workspace:*",
+    "@types/pg": "8.10.9",
+    "mitata": "^0.1.6",
+    "pg": "8.11.3",
+    "undici": "6.0.1",
+    "ws": "8.14.2"
+  },
+  "devDependencies": {
+    "@types/node": "20.10.4",
+    "tsup": "7.2.0",
+    "typescript": "5.3.3"
+  }
+}

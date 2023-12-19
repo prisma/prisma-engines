@@ -1,0 +1,107 @@
+name: Wasm perf
+on:
+  pull_request:
+    paths-ignore:
+      - ".github/**"
+      - "!.github/workflows/wasm-benchmarks.yml"
+      - ".buildkite/**"
+      - "*.md"
+      - "LICENSE"
+      - "CODEOWNERS"
+      - "renovate.json"
+
+jobs:
+  benchmarks:
+    runs-on: ubuntu-latest
+    env: # Set environment variables for the whole job
+      PROFILE: release
+    steps:
+      - name: Checkout PR branch
+        uses: actions/checkout@v4
+
+      - name: "Setup Node.js"
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node_version }}
+
+      - name: "Setup pnpm"
+        uses: pnpm/action-setup@v2
+        with:
+          version: 8
+
+      - name: "Login to Docker Hub"
+        uses: docker/login-action@v3
+        continue-on-error: true
+        env:
+          DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
+          DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
+        if: "${{ env.DOCKERHUB_USERNAME != '' && env.DOCKERHUB_TOKEN != '' }}"
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - uses: cachix/install-nix-action@v24
+
+      - name: Setup benchmark
+        run: make setup-pg-bench
+
+      - name: Run benchmarks
+        id: bench
+        run: make run-bench | tee out.txt
+
+      - name: Read benchmark results
+        id: read_results
+        run: |
+          {
+            echo 'bench_output<<EOF'
+            cat out.txt
+            echo EOF
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Summarize results
+        id: summarize_results
+        run: |
+          input="${{ steps.read_results.outputs.bench_output }}"
+          regressed=$(echo "$input" | grep "slower than Web Assembly: Latest" | cut -f1 -d'x' | awk '$1 > 1.01' | wc -l )          
+          if [ "$regressed" -gt 0 ]; then
+              message="🚨 WASM query-engine: $regressed benchmark(s) have regressed at least 1%"
+              status=failed
+          else
+              message="✅ WASM query-engine: no benchmarks have regressed"
+              status=passed
+          fi
+          echo "summary=$message" >> $GITHUB_OUTPUT
+          echo "status=$status" >> $GITHUB_OUTPUT
+
+      - name: Find past report comment
+        uses: peter-evans/find-comment@v2
+        id: findReportComment
+        with:
+          issue-number: ${{ github.event.pull_request.number }}
+          body-includes: "<!-- wasm-engine-perf -->"
+
+      - name: Create or update report
+        uses: peter-evans/create-or-update-comment@v3
+        with:
+          comment-id: ${{ steps.findReportComment.outputs.comment-id }}
+          issue-number: ${{ github.event.pull_request.number }}
+          body: |
+            <!-- wasm-engine-perf -->
+            #### ${{ steps.summarize_results.outputs.summary }}
+
+            <details>
+            <summary>Full benchmark report</summary>
+
+            ```
+            ${{ steps.read_results.outputs.bench_output }}
+            ```
+            </details>
+
+            After changes in ${{ github.event.pull_request.head.sha }}
+          edit-mode: replace
+
+      - name: Fail workflow if regression detected
+        if: steps.summarize_results.outputs.status == 'failed'
+        run: |
+          echo "Workflow failed due to benchmark regression."
+          exit 1
