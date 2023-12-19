@@ -1,17 +1,17 @@
-name: Codspeed Benchmark
+name: Query Engine
 on:
   push:
     branches:
       - main
   pull_request:
     paths-ignore:
-      - '.github/**'
-      - '!.github/workflows/benchmark.yml'
-      - '.buildkite/**'
-      - '*.md'
-      - 'LICENSE'
-      - 'CODEOWNERS'
-      - 'renovate.json'
+      - ".github/**"
+      - "!.github/workflows/benchmark.yml"
+      - ".buildkite/**"
+      - "*.md"
+      - "LICENSE"
+      - "CODEOWNERS"
+      - "renovate.json"
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -19,7 +19,7 @@ concurrency:
 
 jobs:
   benchmark:
-    name: 'Run benchmarks on Linux'
+    name: "Codespeed benchmarks"
 
     runs-on: ubuntu-latest
     steps:
@@ -29,10 +29,10 @@ jobs:
       - name: Install cargo-codspeed
         run: cargo install cargo-codspeed
 
-      - name: 'Build the benchmark targets: schema'
+      - name: "Build the benchmark targets: schema"
         run: cargo codspeed build -p schema
 
-      - name: 'Build the benchmark targets: request-handlers'
+      - name: "Build the benchmark targets: request-handlers"
         run: cargo codspeed build -p request-handlers
 
       - name: Run the benchmarks

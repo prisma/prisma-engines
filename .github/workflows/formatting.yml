@@ -1,17 +1,17 @@
-name: Formatting
+name: Workspace
 on:
   push:
     branches:
       - main
   pull_request:
     paths-ignore:
-      - '.github/**'
-      - '!.github/workflows/formatting.yml'
-      - '.buildkite/**'
-      - '*.md'
-      - 'LICENSE'
-      - 'CODEOWNERS'
-      - 'renovate.json'
+      - ".github/**"
+      - "!.github/workflows/formatting.yml"
+      - ".buildkite/**"
+      - "*.md"
+      - "LICENSE"
+      - "CODEOWNERS"
+      - "renovate.json"
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -19,9 +19,10 @@ concurrency:
 
 jobs:
   clippy:
+    name: clippy linting
     runs-on: ubuntu-latest
     env:
-      RUSTFLAGS: '-Dwarnings'
+      RUSTFLAGS: "-Dwarnings"
     steps:
       - uses: actions/checkout@v4
       - uses: dtolnay/rust-toolchain@stable
@@ -32,7 +33,7 @@ jobs:
           cargo clippy --all-features
           cargo clippy --all-features -p query-engine-wasm --target wasm32-unknown-unknown
 
-  format:
+  rustfmt:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -41,6 +42,7 @@ jobs:
           components: rustfmt
       - name: Check formatting
         run: cargo fmt -- --check
+
   shellcheck:
     runs-on: ubuntu-latest
     steps:

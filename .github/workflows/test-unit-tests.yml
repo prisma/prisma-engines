@@ -1,17 +1,17 @@
-name: Test Unit tests
+name: Workspace
 on:
   push:
     branches:
       - main
   pull_request:
     paths-ignore:
-      - '.github/**'
-      - '!.github/workflows/unit-tests.yml'
-      - '.buildkite/**'
-      - '*.md'
-      - 'LICENSE'
-      - 'CODEOWNERS'
-      - 'renovate.json'
+      - ".github/**"
+      - "!.github/workflows/test-unit-tests.yml"
+      - ".buildkite/**"
+      - "*.md"
+      - "LICENSE"
+      - "CODEOWNERS"
+      - "renovate.json"
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -19,7 +19,7 @@ concurrency:
 
 jobs:
   test:
-    name: Workspace unit tests
+    name: Unit tests
 
     strategy:
       fail-fast: false

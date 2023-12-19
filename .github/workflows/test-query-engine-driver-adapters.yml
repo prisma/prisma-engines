@@ -1,17 +1,17 @@
-name: Test Driver Adapters
+name: Query Engine
 on:
   push:
     branches:
       - main
   pull_request:
     paths-ignore:
-      - '.github/**'
-      - '!.github/workflows/query-engine-driver-adapters.yml'
-      - '.buildkite/**'
-      - '*.md'
-      - 'LICENSE'
-      - 'CODEOWNERS'
-      - 'renovate.json'
+      - ".github/**"
+      - "!.github/workflows/test-query-engine-driver-adapters.yml"
+      - ".buildkite/**"
+      - "*.md"
+      - "LICENSE"
+      - "CODEOWNERS"
+      - "renovate.json"
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -19,39 +19,39 @@ concurrency:
 
 jobs:
   rust-query-engine-tests:
-    name: '${{ matrix.adapter.name }} on node v${{ matrix.node_version }}'
+    name: "Adapter ${{ matrix.adapter.name }}"
 
     strategy:
       fail-fast: false
       matrix:
         adapter:
-          - name: 'planetscale (napi)'
-            setup_task: 'dev-planetscale-js'
-          - name: 'pg (napi)'
-            setup_task: 'dev-pg-js'
-          - name: 'neon (ws) (napi)'
-            setup_task: 'dev-neon-js'
-          - name: 'libsql (Turso) (napi)'
-            setup_task: 'dev-libsql-js'
-          - name: 'planetscale (wasm)'
-            setup_task: 'dev-planetscale-wasm'
-          - name: 'pg (wasm)'
-            setup_task: 'dev-pg-wasm'
-          - name: 'neon (ws) (wasm)'
-            setup_task: 'dev-neon-wasm'
-          - name: 'libsql (Turso) (wasm)'
-            setup_task: 'dev-libsql-wasm'
-        node_version: ['18']
+          - name: "planetscale (napi)"
+            setup_task: "dev-planetscale-js"
+          - name: "pg (napi)"
+            setup_task: "dev-pg-js"
+          - name: "neon (napi)"
+            setup_task: "dev-neon-js"
+          - name: "libsql (napi)"
+            setup_task: "dev-libsql-js"
+          - name: "planetscale (wasm)"
+            setup_task: "dev-planetscale-wasm"
+          - name: "pg (wasm)"
+            setup_task: "dev-pg-wasm"
+          - name: "neon (wasm)"
+            setup_task: "dev-neon-wasm"
+          - name: "libsql (wasm)"
+            setup_task: "dev-libsql-wasm"
+        node_version: ["18"]
     env:
-      LOG_LEVEL: 'info' # Set to "debug" to trace the query engine and node process running the driver adapter
-      LOG_QUERIES: 'y'
-      RUST_LOG: 'info'
-      RUST_LOG_FORMAT: 'devel'
-      RUST_BACKTRACE: '1'
-      CLICOLOR_FORCE: '1'
-      CLOSED_TX_CLEANUP: '2'
-      SIMPLE_TEST_MODE: '1'
-      QUERY_BATCH_SIZE: '10'
+      LOG_LEVEL: "info" # Set to "debug" to trace the query engine and node process running the driver adapter
+      LOG_QUERIES: "y"
+      RUST_LOG: "info"
+      RUST_LOG_FORMAT: "devel"
+      RUST_BACKTRACE: "1"
+      CLICOLOR_FORCE: "1"
+      CLOSED_TX_CLEANUP: "2"
+      SIMPLE_TEST_MODE: "1"
+      QUERY_BATCH_SIZE: "10"
       WORKSPACE_ROOT: ${{ github.workspace }}
 
     runs-on: ubuntu-latest
@@ -60,22 +60,22 @@ jobs:
         with:
           ref: ${{ github.event.pull_request.head.sha }}
 
-      - name: 'Setup Node.js'
+      - name: "Setup Node.js"
         uses: actions/setup-node@v4
         with:
           node-version: ${{ matrix.node_version }}
 
-      - name: 'Setup pnpm'
+      - name: "Setup pnpm"
         uses: pnpm/action-setup@v2
         with:
           version: 8
 
-      - name: 'Get pnpm store directory'
+      - name: "Get pnpm store directory"
         shell: bash
         run: |
           echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_ENV
 
-      - name: 'Login to Docker Hub'
+      - name: "Login to Docker Hub"
         uses: docker/login-action@v3
         continue-on-error: true
         env:
@@ -99,5 +99,5 @@ jobs:
 
       - run: make ${{ matrix.adapter.setup_task }}
 
-      - name: 'Run tests'
+      - name: "Run tests"
         run: cargo test --package query-engine-tests -- --test-threads=1

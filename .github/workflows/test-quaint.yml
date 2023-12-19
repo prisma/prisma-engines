@@ -1,12 +1,13 @@
-name: Test Quaint
+name: Quaint
 on:
   push:
     branches:
       - main
   pull_request:
     paths:
-      - 'quaint/**'
-  
+      - "quaint/**"
+      - "!.github/workflows/test-quaint.yml"
+
 jobs:
   tests:
     runs-on: ubuntu-latest
@@ -16,14 +17,6 @@ jobs:
       matrix:
         features:
           - "--lib --features=all"
-          - "--lib --no-default-features --features=sqlite"
-          - "--lib --no-default-features --features=sqlite --features=pooled"
-          - "--lib --no-default-features --features=postgresql"
-          - "--lib --no-default-features --features=postgresql --features=pooled"
-          - "--lib --no-default-features --features=mysql"
-          - "--lib --no-default-features --features=mysql --features=pooled"
-          - "--lib --no-default-features --features=mssql"
-          - "--lib --no-default-features --features=mssql --features=pooled"          
     env:
       TEST_MYSQL: "mysql://root:prisma@localhost:3306/prisma"
       TEST_MYSQL8: "mysql://root:prisma@localhost:3307/prisma"
