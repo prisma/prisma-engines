@@ -3,7 +3,6 @@ mod validations;
 
 pub use native_types::{MsSqlType, MsSqlTypeParameter};
 
-use connection_string::JdbcString;
 use enumflags2::BitFlags;
 use lsp_types::{CompletionItem, CompletionItemKind, CompletionList};
 use psl_core::{
@@ -15,7 +14,6 @@ use psl_core::{
     parser_database::{self, ast, ParserDatabase, ReferentialAction, ScalarType},
     PreviewFeature,
 };
-use std::borrow::Cow;
 
 use MsSqlType::*;
 use MsSqlTypeParameter::*;
@@ -161,35 +159,6 @@ impl Connector for MsSqlDatamodelConnector {
         SCALAR_TYPE_DEFAULTS
             .iter()
             .any(|(st, nt)| scalar_type == st && native_type == nt)
-    }
-
-    fn set_config_dir<'a>(&self, config_dir: &std::path::Path, url: &'a str) -> Cow<'a, str> {
-        let mut jdbc: JdbcString = match format!("jdbc:{url}").parse() {
-            Ok(jdbc) => jdbc,
-            _ => return Cow::from(url),
-        };
-
-        let set_root = |path: String| {
-            let path = std::path::Path::new(&path);
-
-            if path.is_relative() {
-                Some(config_dir.join(path).to_str().map(ToString::to_string).unwrap())
-            } else {
-                Some(path.to_str().unwrap().to_string())
-            }
-        };
-
-        let props = jdbc.properties_mut();
-
-        let cert_path = props.remove("trustservercertificateca").and_then(set_root);
-
-        if let Some(path) = cert_path {
-            props.insert("trustServerCertificateCA".to_owned(), path);
-        }
-
-        let final_connection_string = format!("{jdbc}").replace("jdbc:sqlserver://", "sqlserver://");
-
-        Cow::Owned(final_connection_string)
     }
 
     fn validate_native_type_arguments(

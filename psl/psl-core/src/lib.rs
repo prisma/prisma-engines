@@ -11,6 +11,7 @@ pub mod mcf;
 mod common;
 mod configuration;
 mod reformat;
+mod set_config_dir;
 mod validate;
 
 pub use crate::{
@@ -23,6 +24,7 @@ pub use crate::{
 pub use diagnostics;
 pub use parser_database::{self, is_reserved_type_name};
 pub use schema_ast;
+pub use set_config_dir::set_config_dir;
 
 use self::validate::{datasource_loader, generator_loader};
 use diagnostics::Diagnostics;
