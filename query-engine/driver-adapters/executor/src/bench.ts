@@ -39,8 +39,15 @@ async function main(): Promise<void> {
   const pg = await pgAdapter(url);
   const withErrorCapturing = bindAdapter(pg);
 
+  // We build two decorators for recording and replaying db queries.
   const { recorder, replayer } = recording(withErrorCapturing);
+
+  // We exercise the queries recording them
   await recordQueries(recorder, datamodel, prismaQueries);
+
+  // Then we benchmark the execution of the queries but instead of hitting the DB
+  // we fetch results from the recordings, thus isolating the performance
+  // of the engine + driver adapter code from that of the DB IO.
   await benchMarkQueries(replayer, datamodel, prismaQueries);
 }
 
@@ -52,19 +59,21 @@ async function recordQueries(
   const qe = await initQeWasmBaseLine(adapter, datamodel);
   await qe.connect("");
 
-  for (const prismaQuery of prismaQueries) {
-    const { description, query } = prismaQuery;
-    const res = await qe.query(JSON.stringify(query), "", undefined);
+  try {
+    for (const prismaQuery of prismaQueries) {
+      const { description, query } = prismaQuery;
+      const res = await qe.query(JSON.stringify(query), "", undefined);
 
-    const errors = JSON.parse(res).errors;
-    if (errors != null && errors.length > 0) {
-      throw new Error(
-        `Query failed for ${description}: ${JSON.stringify(res)}`
-      );
+      const errors = JSON.parse(res).errors;
+      if (errors != null && errors.length > 0) {
+        throw new Error(
+          `Query failed for ${description}: ${JSON.stringify(res)}`
+        );
+      }
     }
+  } finally {
+    await qe.disconnect("");
   }
-
-  await qe.disconnect("");
 }
 
 async function benchMarkQueries(
@@ -108,23 +117,27 @@ async function benchMarkQueries(
     for (const prismaQuery of prismaQueries) {
       const { description, query } = prismaQuery;
       const jsonQuery = JSON.stringify(query);
+      const irrelevantTraceId = "";
+      const noTx = undefined;
 
       group(description, () => {
         bench(
           "Web Assembly: Baseline",
-          async () => await wasmBaseline.query(jsonQuery, "", undefined)
+          async () =>
+            await wasmBaseline.query(jsonQuery, irrelevantTraceId, noTx)
         );
         bench(
           "Web Assembly: Latest",
-          async () => await wasmLatest.query(jsonQuery, "", undefined)
+          async () => await wasmLatest.query(jsonQuery, irrelevantTraceId, noTx)
         );
         baseline(
           "Web Assembly: Current",
-          async () => await wasmCurrent.query(jsonQuery, "", undefined)
+          async () =>
+            await wasmCurrent.query(jsonQuery, irrelevantTraceId, noTx)
         );
         bench(
           "Node API: Current",
-          async () => await napi.query(jsonQuery, "", undefined)
+          async () => await napi.query(jsonQuery, irrelevantTraceId, noTx)
         );
       });
     }

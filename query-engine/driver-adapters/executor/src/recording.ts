@@ -24,17 +24,16 @@ function recorder(adapter: DriverAdapter, recordings) {
     getConnectionInfo: () => {
       return adapter.getConnectionInfo!();
     },
-    queryRaw: (params) => {
-      return adapter.queryRaw(params).then((result) => {
-        recordings.addQueryResults(params, result);
-        return result;
-      });
+    queryRaw: async (params) => {
+      const result = adapter.queryRaw(params);
+      recordings.addQueryResults(params, result);
+      return result;
     },
-    executeRaw: (params) => {
-      return adapter.executeRaw(params).then((result) => {
-        recordings.addCommandResults(params, result);
-        return result;
-      });
+
+    executeRaw: async (params) => {
+      const result = adapter.executeRaw(params);
+      recordings.addCommandResults(params, result);
+      return result;
     },
   };
 }
