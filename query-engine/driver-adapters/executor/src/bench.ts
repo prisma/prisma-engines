@@ -92,19 +92,19 @@ async function benchMarkQueries(
   for (const prismaQuery of prismaQueries) {
     const { description, query } = prismaQuery;
 
-    const adapters = {
+    const engines = {
       Napi: napi,
       "WASM Current": wasmCurrent,
       "WASM Baseline": wasmBaseline,
       "WASM Latest": wasmLatest,
     };
 
-    for (const [adapterName, adapter] of Object.entries(adapters)) {
-      const res = await adapter.query(JSON.stringify(query), "", undefined);
+    for (const [engineName, engine] of Object.entries(engines)) {
+      const res = await engine.query(JSON.stringify(query), "", undefined);
       const errors = JSON.parse(res).errors;
       if (errors != null && errors.length > 0) {
         throw new Error(
-          `${adapterName} - Query failed for ${description}: ${JSON.stringify(
+          `${engineName} - Query failed for ${description}: ${JSON.stringify(
             res
           )}`
         );

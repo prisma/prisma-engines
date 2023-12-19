@@ -63,7 +63,7 @@ function loadNapiEngine(): napi.Library {
       ? "release"
       : "debug";
 
-  const libQueryEnginePath = path.join(
+  const libQueryEnginePath = path.resolve(
     dirname,
     `../../../../target/${target}/libquery_engine.${libExt}`
   );
