@@ -154,7 +154,8 @@ start-pg-bench:
 setup-pg-bench: start-pg-bench build-qe-napi build-qe-wasm build-driver-adapters-kit
 
 run-bench:
-	query-engine/driver-adapters/executor/script/bench.sh
+	DATABASE_URL="postgresql://postgres:postgres@localhost:5432/bench?schema=imdb_bench&sslmode=disable" \
+	node --experimental-wasm-modules query-engine/driver-adapters/executor/dist/bench.mjs
 
 bench-pg-js: setup-pg-bench run-bench
 

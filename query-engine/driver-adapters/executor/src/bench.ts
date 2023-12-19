@@ -3,6 +3,10 @@
  * on Node.js 18+.
  */
 import { webcrypto } from "node:crypto";
+import * as fs from "node:fs/promises";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
+
 import * as qe from "./qe";
 
 import pgDriver from "pg";
@@ -21,16 +25,11 @@ import { QueryEngine as WasmLatest } from "query-engine-wasm-latest";
 
 async function main(): Promise<void> {
   // read the prisma schema from stdin
-  const datamodel = await new Promise<string>((resolve, reject) => {
-    let data = "";
-    process.stdin.on("data", (chunk) => {
-      data += chunk;
-    });
-    process.stdin.on("end", () => {
-      resolve(data);
-    });
-    process.stdin.on("error", reject);
-  });
+
+  const dirname = path.dirname(fileURLToPath(import.meta.url));
+  var datamodel = (
+    await fs.readFile(path.resolve(dirname, "..", "bench", "schema.prisma"))
+  ).toString();
 
   const url = process.env.DATABASE_URL;
   if (url == null) {
