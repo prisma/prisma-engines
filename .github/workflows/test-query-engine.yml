@@ -95,12 +95,14 @@ jobs:
 
       - uses: dtolnay/rust-toolchain@stable
 
-      - run: export WORKSPACE_ROOT=$(pwd) && cargo test --package query-engine-tests -- --test-threads=1
+      - uses: taiki-e/install-action@nextest
+
+      - run: export WORKSPACE_ROOT=$(pwd) && cargo nextest --package query-engine-tests -- --test-threads=1
         if: ${{ matrix.database.single_threaded }}
         env:
           CLICOLOR_FORCE: 1
 
-      - run: export WORKSPACE_ROOT=$(pwd) && cargo test --package query-engine-tests -- --test-threads=8
+      - run: export WORKSPACE_ROOT=$(pwd) && cargo nextest --package query-engine-tests -- --test-threads=8
         if: ${{ !matrix.database.single_threaded }}
         env:
           CLICOLOR_FORCE: 1
