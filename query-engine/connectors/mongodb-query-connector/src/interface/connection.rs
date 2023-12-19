@@ -114,6 +114,7 @@ impl WriteOperations for MongoDbConnection {
             )
             .await?;
 
+            // NOTE: Atomic updates are not yet implemented for MongoDB, so we only return ids.
             let record = result.into_iter().next().map(|id| SingleRecord {
                 record: Record::from(id),
                 field_names: selected_fields
@@ -141,10 +142,16 @@ impl WriteOperations for MongoDbConnection {
         model: &Model,
         record_filter: connector_interface::RecordFilter,
         selected_fields: FieldSelection,
-        trace_id: Option<String>,
+        _trace_id: Option<String>,
     ) -> connector_interface::Result<Option<SingleRecord>> {
-        // TODO laplab: here
-        todo!()
+        catch(write::delete_record(
+            &self.database,
+            &mut self.session,
+            model,
+            record_filter,
+            selected_fields,
+        ))
+        .await
     }
 
     async fn m2m_connect(

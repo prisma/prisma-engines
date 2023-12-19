@@ -4,7 +4,7 @@ use crate::{
     filter::{FilterPrefix, MongoFilter, MongoFilterVisitor},
     output_meta,
     query_builder::MongoReadQueryBuilder,
-    query_strings::{Aggregate, DeleteMany, Find, InsertMany, InsertOne, RunCommand, UpdateMany, UpdateOne},
+    query_strings::{Aggregate, DeleteMany, DeleteOne, Find, InsertMany, InsertOne, RunCommand, UpdateMany, UpdateOne},
     root_queries::raw::{MongoCommand, MongoOperation},
     IntoBson,
 };
@@ -273,6 +273,48 @@ pub async fn delete_records<'conn>(
     .await?;
 
     Ok(delete_result.deleted_count as usize)
+}
+
+pub async fn delete_record<'conn>(
+    database: &Database,
+    session: &mut ClientSession,
+    model: &Model,
+    record_filter: RecordFilter,
+    selected_fields: FieldSelection,
+) -> crate::Result<Option<SingleRecord>> {
+    let coll = database.collection::<Document>(model.db_name());
+    let (filter, joins) = MongoFilterVisitor::new(FilterPrefix::default(), false)
+        .visit(record_filter.filter)?
+        .render();
+    debug_assert!(
+        joins.is_empty(),
+        "filter should not contain any predicates on relations"
+    );
+
+    // All filters use `aggregate` command syntax by default. To use rendered expression in `find*`
+    // command family, it needs to be wrapped in `$expr`.
+    let filter = doc! {
+        "$expr": filter,
+    };
+
+    let span = info_span!(
+        "prisma:engine:db_query",
+        user_facing = true,
+        "db.statement" = &format_args!("db.{}.findAndModify(*)", coll.name())
+    );
+    let query_string_builder = DeleteOne::new(&filter, coll.name());
+    observing(&query_string_builder, || {
+        coll.find_one_and_delete_with_session(filter.clone(), None, session)
+    })
+    .instrument(span)
+    .await?
+    .map(|document| {
+        let meta_mapping = output_meta::from_selected_fields(&selected_fields, &[]);
+        let field_names: Vec<_> = selected_fields.db_names().collect();
+        let record = document_to_record(document, &field_names, &meta_mapping)?;
+        Ok(SingleRecord { record, field_names })
+    })
+    .transpose()
 }
 
 /// Retrives document ids based on the given filter.

@@ -143,6 +143,7 @@ impl<'conn> WriteOperations for MongoDbTransaction<'conn> {
                 UpdateType::One,
             )
             .await?;
+            // NOTE: Atomic updates are not yet implemented for MongoDB, so we only return ids.
             let record = result.into_iter().next().map(|id| SingleRecord {
                 record: Record::from(id),
                 field_names: selected_fields
@@ -162,6 +163,7 @@ impl<'conn> WriteOperations for MongoDbTransaction<'conn> {
         record_filter: connector_interface::RecordFilter,
         _trace_id: Option<String>,
     ) -> connector_interface::Result<usize> {
+        // TODO laplab: remove unnecessary async moves.
         catch(async move {
             write::delete_records(
                 &self.connection.database,
@@ -179,10 +181,16 @@ impl<'conn> WriteOperations for MongoDbTransaction<'conn> {
         model: &Model,
         record_filter: connector_interface::RecordFilter,
         selected_fields: FieldSelection,
-        trace_id: Option<String>,
+        _trace_id: Option<String>,
     ) -> connector_interface::Result<Option<SingleRecord>> {
-        // TODO laplab: here
-        todo!()
+        catch(write::delete_record(
+            &self.connection.database,
+            &mut self.connection.session,
+            model,
+            record_filter,
+            selected_fields,
+        ))
+        .await
     }
 
     async fn native_upsert_record(

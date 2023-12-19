@@ -146,6 +146,7 @@ pub fn delete_many_records(
 /// 1. Connector supports such operations
 /// 2. The selection set contains no relation
 fn can_use_atomic_delete(query_schema: &QuerySchema, field: &ParsedField<'_>) -> bool {
+    // TODO laplab: check that the filter does not contain any predicates on relations.
     if !query_schema.has_capability(ConnectorCapability::DeleteReturning) {
         return false;
     }
