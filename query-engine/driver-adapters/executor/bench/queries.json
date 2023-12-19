@@ -2,76 +2,80 @@
     {
         "description": "movies.findMany() (all - 25000)",
         "query": {
-            "modelName": "Movie",
             "action": "findMany",
+            "modelName": "Movie",
             "query": {
                 "selection": {
                     "$scalars": true
                 }
-            }   
+            }
         }
     },
     {
         "description": "movies.findMany({ take: 2000 })",
         "query": {
-            "modelName": "Movie",
             "action": "findMany",
+            "modelName": "Movie",
             "query": {
                 "arguments": {
                     "take": 2000
-                },            
+                },
                 "selection": {
                     "$scalars": true
                 }
-            }   
+            }
         }
     },
     {
         "description": "movies.findMany({ where: {...}, take: 2000 })",
         "query": {
-            "modelName": "Movie",
             "action": "findMany",
+            "modelName": "Movie",
             "query": {
                 "arguments": {
                     "take": 2000,
                     "where": {
-                        "title": { "contains": "cyan" }
+                        "title": {
+                            "contains": "cyan"
+                        }
                     }
                 },
                 "selection": {
                     "$scalars": true
                 }
-            }   
+            }
         }
     },
     {
         "description": "movies.findMany({ include: { cast: true } take: 2000 }) (m2m)",
         "query": {
-            "modelName": "Movie",
             "action": "findMany",
+            "modelName": "Movie",
             "query": {
                 "arguments": {
-                    "take": 2000                    
+                    "take": 2000
                 },
                 "include": {
                     "cast": true
-                },                   
+                },
                 "selection": {
                     "$scalars": true
                 }
-            }   
+            }
         }
     },
     {
         "description": "movies.findMany({ where: {...}, include: { cast: true } take: 2000 }) (m2m)",
         "query": {
-            "modelName": "Movie",
             "action": "findMany",
+            "modelName": "Movie",
             "query": {
                 "arguments": {
-                    "take": 2000,                    
+                    "take": 2000,
                     "where": {
-                        "title": { "contains": "cyan" }
+                        "title": {
+                            "contains": "cyan"
+                        }
                     }
                 },
                 "include": {
@@ -80,17 +84,17 @@
                 "selection": {
                     "$scalars": true
                 }
-            }   
+            }
         }
     },
     {
         "description": "movies.findMany({ take: 2000, include: { cast: { include: { person: true } } } })",
         "query": {
-            "modelName": "Movie",
             "action": "findMany",
+            "modelName": "Movie",
             "query": {
                 "arguments": {
-                    "take": 2000                  
+                    "take": 2000
                 },
                 "include": {
                     "cast": {
@@ -102,19 +106,21 @@
                 "selection": {
                     "$scalars": true
                 }
-            }   
+            }
         }
     },
     {
         "description": "movie.findMany({ where: { ... }, take: 2000, include: { cast: { include: { person: true } } } })",
         "query": {
-            "modelName": "Movie",
             "action": "findMany",
+            "modelName": "Movie",
             "query": {
-                "arguments": {                
-                    "take": 2000,                    
+                "arguments": {
+                    "take": 2000,
                     "where": {
-                        "title": { "contains": "cyan" }
+                        "title": {
+                            "contains": "cyan"
+                        }
                     }
                 },
                 "include": {
@@ -127,62 +133,77 @@
                 "selection": {
                     "$scalars": true
                 }
-            }   
+            }
         }
     },
     {
         "description": "movie.findMany({ where: { reviews: { author: { ... } }, take: 100 }) (to-many -> to-one)",
         "query": {
-            "modelName": "Movie",
             "action": "findMany",
+            "modelName": "Movie",
             "query": {
-                "arguments": {                
-                     "where": {
+                "arguments": {
+                    "take": 100,
+                    "where": {
                         "reviews": {
                             "some": {
                                 "author": {
-                                    "OR": [{ "name": { "gt": "a" } }, { "name": { "lt": "f" } }]
+                                    "OR": [
+                                        {
+                                            "name": {
+                                                "gt": "a"
+                                            }
+                                        },
+                                        {
+                                            "name": {
+                                                "lt": "f"
+                                            }
+                                        }
+                                    ]
                                 }
                             }
                         }
-                    },
-                    "take": 100
+                    }
                 },
                 "selection": {
                     "$scalars": true
                 }
-            }   
+            }
         }
     },
     {
         "description": "movie.findMany({ where: { cast: { person: { ... } }, take: 100 }) (m2m -> to-one)",
         "query": {
-            "modelName": "Movie",
             "action": "findMany",
+            "modelName": "Movie",
             "query": {
-                "arguments": {                
+                "arguments": {
+                    "take": 100,
                     "where": {
                         "cast": {
                             "some": {
                                 "person": {
                                     "OR": [
                                         {
-                                            "last_name": { "gt": "a" }
+                                            "last_name": {
+                                                "gt": "a"
+                                            }
                                         },
                                         {
-                                            "last_name": { "lt": "f" }
+                                            "last_name": {
+                                                "lt": "f"
+                                            }
                                         }
                                     ]
                                 }
                             }
                         }
-                    },
-                    "take": 100
+                    }
                 },
                 "selection": {
                     "$scalars": true
                 }
-            }   
+            }
         }
     }
 ]
