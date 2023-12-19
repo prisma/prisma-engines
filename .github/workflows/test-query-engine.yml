@@ -1,4 +1,4 @@
-name: Test Query Engine
+name: QE
 on:
   push:
     branches:
@@ -19,7 +19,7 @@ concurrency:
 
 jobs:
   rust-query-engine-tests:
-    name: "${{ matrix.database.name }} (${{ matrix.engine_protocol }}) on Linux"
+    name: "${{ matrix.database.name }} - ${{ matrix.engine_protocol }} ${{ matrix.partition }}"
 
     strategy:
       fail-fast: false
@@ -60,6 +60,7 @@ jobs:
             connector: "cockroachdb"
             version: "22.1"
         engine_protocol: [graphql, json]
+        partition: ["1/4", "2/4", "3/4", "4/4"]
 
     env:
       LOG_LEVEL: "info"
@@ -74,6 +75,7 @@ jobs:
       TEST_CONNECTOR: ${{ matrix.database.connector }}
       TEST_CONNECTOR_VERSION: ${{ matrix.database.version }}
       PRISMA_ENGINE_PROTOCOL: ${{ matrix.engine_protocol }}
+      PARTITION: ${{ matrix.partition }}
 
     runs-on: ubuntu-latest
     steps:
@@ -97,12 +99,12 @@ jobs:
 
       - uses: taiki-e/install-action@nextest
 
-      - run: export WORKSPACE_ROOT=$(pwd) && cargo nextest run -p query-engine-tests --test-threads=1
+      - run: export WORKSPACE_ROOT=$(pwd) && cargo nextest run -p query-engine-tests --partition hash:${{ matrix.partition }} --test-threads=1
         if: ${{ matrix.database.single_threaded }}
         env:
           CLICOLOR_FORCE: 1
 
-      - run: export WORKSPACE_ROOT=$(pwd) && cargo nextest run -p query-engine-tests
+      - run: export WORKSPACE_ROOT=$(pwd) && cargo nextest run -p query-engine-tests --partition hash:${{ matrix.partition }}
         if: ${{ !matrix.database.single_threaded }}
         env:
           CLICOLOR_FORCE: 1
