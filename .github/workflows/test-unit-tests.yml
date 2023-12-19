@@ -1,4 +1,4 @@
-name: Workspace
+name: "All crates: unit tests"
 on:
   push:
     branches:
@@ -19,8 +19,6 @@ concurrency:
 
 jobs:
   test:
-    name: Unit tests
-
     strategy:
       fail-fast: false
 

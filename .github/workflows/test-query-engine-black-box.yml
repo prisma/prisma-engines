@@ -1,4 +1,4 @@
-name: Query Engine
+name: "QE: black-box tests"
 on:
   push:
     branches:
@@ -18,9 +18,7 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  rust-tests:
-    name: "Black-box testing"
-
+  test:
     strategy:
       fail-fast: false
       matrix:

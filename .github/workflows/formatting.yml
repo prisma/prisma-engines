@@ -1,4 +1,4 @@
-name: Workspace
+name: "All crates: linting"
 on:
   push:
     branches:

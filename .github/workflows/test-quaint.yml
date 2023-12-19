@@ -1,4 +1,4 @@
-name: Quaint
+name: "Quaint: integration tests"
 on:
   push:
     branches:

@@ -1,4 +1,4 @@
-name: Query Engine
+name: "QE: integration tests"
 on:
   push:
     branches:
