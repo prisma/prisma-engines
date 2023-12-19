@@ -37,6 +37,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: dtolnay/rust-toolchain@stable
+      - uses: taiki-e/install-action@nextest
 
       - name: Login to Docker Hub
         uses: docker/login-action@v3
@@ -48,7 +49,7 @@ jobs:
       - name: "Start ${{ matrix.database.name }}"
         run: make start-${{ matrix.database.name }}-single
 
-      - run: cargo test -p mongodb-schema-connector
+      - run: cargo nextest run -p mongodb-schema-connector
         env:
           CLICOLOR_FORCE: 1
           TEST_DATABASE_URL: ${{ matrix.database.url }}
@@ -106,6 +107,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: dtolnay/rust-toolchain@stable
+      - uses: taiki-e/install-action@nextest
 
       - name: Login to Docker Hub
         uses: docker/login-action@v3
@@ -121,26 +123,26 @@ jobs:
       - name: "Start ${{ matrix.database.name }}"
         run: make start-${{ matrix.database.name }}
 
-      - run: cargo test -p sql-introspection-tests
+      - run: cargo nextest run -p sql-introspection-tests
         if: ${{ !matrix.database.single_threaded }}
         env:
           CLICOLOR_FORCE: 1
           TEST_DATABASE_URL: ${{ matrix.database.url }}
 
-      - run: cargo test -p sql-schema-describer
+      - run: cargo nextest run -p sql-schema-describer
         if: ${{ !matrix.database.single_threaded }}
         env:
           CLICOLOR_FORCE: 1
           TEST_DATABASE_URL: ${{ matrix.database.url }}
 
-      - run: cargo test -p sql-migration-tests
+      - run: cargo nextest run -p sql-migration-tests
         if: ${{ !matrix.database.single_threaded }}
         env:
           CLICOLOR_FORCE: 1
           TEST_DATABASE_URL: ${{ matrix.database.url }}
           RUST_LOG: debug
 
-      - run: cargo test -p schema-engine-cli
+      - run: cargo nextest run -p schema-engine-cli
         if: ${{ !matrix.database.single_threaded }}
         env:
           CLICOLOR_FORCE: 1
@@ -149,14 +151,14 @@ jobs:
       #
       # Vitess tests
       #
-      - run: cargo test -p sql-introspection-tests -- --test-threads=1
+      - run: cargo nextest run -p sql-introspection-tests --test-threads=1
         if: ${{ matrix.database.is_vitess }}
         env:
           CLICOLOR_FORCE: 1
           TEST_DATABASE_URL: ${{ matrix.database.url }}
           TEST_SHADOW_DATABASE_URL: ${{ matrix.database.shadow_database_url }}
 
-      - run: cargo test -p sql-migration-tests -- --test-threads=1
+      - run: cargo nextest run -p sql-migration-tests --test-threads=1
         if: ${{ matrix.database.is_vitess }}
         env:
           CLICOLOR_FORCE: 1
@@ -164,7 +166,7 @@ jobs:
           TEST_SHADOW_DATABASE_URL: ${{ matrix.database.shadow_database_url }}
           RUST_LOG: debug
 
-      - run: cargo test -p schema-engine-cli -- --test-threads=1
+      - run: cargo nextest run -p schema-engine-cli --test-threads=1
         if: ${{ matrix.database.is_vitess }}
         env:
           CLICOLOR_FORCE: 1
@@ -174,26 +176,26 @@ jobs:
       #
       # Single threaded tests (excluding Vitess)
       #
-      - run: cargo test -p sql-schema-describer -- --test-threads=1
+      - run: cargo nextest run -p sql-schema-describer --test-threads=1
         if: ${{ !matrix.database.is_vitess && matrix.database.single_threaded }}
         env:
           CLICOLOR_FORCE: 1
           TEST_DATABASE_URL: ${{ matrix.database.url }}
 
-      - run: cargo test -p sql-introspection-tests -- --test-threads=1
+      - run: cargo nextest run -p sql-introspection-tests --test-threads=1
         if: ${{ !matrix.database.is_vitess && matrix.database.single_threaded }}
         env:
           CLICOLOR_FORCE: 1
           TEST_DATABASE_URL: ${{ matrix.database.url }}
 
-      - run: cargo test -p sql-migration-tests -- --test-threads=1
+      - run: cargo nextest run -p sql-migration-tests --test-threads=1
         if: ${{ !matrix.database.is_vitess && matrix.database.single_threaded }}
         env:
           CLICOLOR_FORCE: 1
           TEST_DATABASE_URL: ${{ matrix.database.url }}
           RUST_LOG: debug
 
-      - run: cargo test -p schema-engine-cli -- --test-threads=1
+      - run: cargo nextest run -p schema-engine-cli --test-threads=1
         if: ${{ !matrix.database.is_vitess && matrix.database.single_threaded }}
         env:
           CLICOLOR_FORCE: 1
@@ -220,6 +222,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: dtolnay/rust-toolchain@stable
+      - uses: taiki-e/install-action@nextest
 
       - uses: actions/cache@v3
         with:
@@ -240,6 +243,6 @@ jobs:
           sudo sc start MySQL
 
       - name: Run tests
-        run: cargo test -p sql-migration-tests
+        run: cargo nextest run -p sql-migration-tests
         env:
           TEST_DATABASE_URL: ${{ matrix.db.url }}
