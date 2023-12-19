@@ -22,7 +22,6 @@ jobs:
     name: "${{ matrix.database.name }} - ${{ matrix.engine_protocol }} ${{ matrix.partition }}"
 
     strategy:
-      fail-fast: false
       matrix:
         database:
           - name: "vitess_8_0"
