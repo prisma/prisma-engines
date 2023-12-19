@@ -52,3 +52,11 @@ wasm-opt = false  # use wasm-opt explicitly in `./build.sh`
 
 [package.metadata.wasm-pack.profile.profiling]
 wasm-opt = false  # use wasm-opt explicitly in `./build.sh`
+
+[build]
+target = "wasm32-unknown-unknown"
+rustflags = [
+    "-C", "link-arg=--no-entry",                      # inform cargo that no `main` function exists
+    "-Z", "build-std=std,panic_abort",                # ask nightly cargo to rebuild part of the standard library
+    "-Z", "build-std-features=panic_immediate_abort"  # ask nightly cargo to use the experimental `panic="immediate_abort"` strategy
+]

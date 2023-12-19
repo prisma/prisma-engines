@@ -29,7 +29,17 @@ then
     curl https://rustwasm.github.io/wasm-pack/installer/init.sh -sSf | sh
 fi
 
-wasm-pack build "--$WASM_BUILD_PROFILE" --target $OUT_TARGET --out-name query_engine
+# Preliminary steps:
+# - rustup component add --toolchain nightly rust-src
+# - rustup toolchain install nightly-2023-11-01 --force
+
+# Alternative steps without wasm-pack (which doesn't support `+nightly` by default):
+# - cargo +nightly build -Z build-std=std,panic_abort -Z build-std-features=panic_immediate_abort -p query-engine-wasm --target=wasm32-unknown-unknown --release
+# - wasm-bindgen --target bundler --out-name query_engine --out-dir ./pkg ../../target/wasm32-unknown-unknown/release/query_engine_wasm.wasm
+
+# CARGO_BUILD_RUSTFLAGS='-Z build-std=std,panic_abort -Z build-std-features=panic_immediate_abort --target=wasm32-unknown-unknown' \
+rustup run nightly \
+    wasm-pack build "--$WASM_BUILD_PROFILE" --target $OUT_TARGET --out-name query_engine
 
 WASM_OPT_ARGS=(
     "-Os"                                 # execute size-focused optimization passes
