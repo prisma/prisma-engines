@@ -1,4 +1,4 @@
-name: Query Engine (WASM)
+name: "QE: WASM benchmarks"
 on:
   pull_request:
     paths-ignore:
@@ -8,7 +8,10 @@ on:
       - "*.md"
       - "LICENSE"
       - "CODEOWNERS"
-      - "renovate.json"
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   benchmarks:

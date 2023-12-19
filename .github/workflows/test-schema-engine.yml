@@ -1,4 +1,4 @@
-name: Schema Engine
+name: "SE: integration tests"
 on:
   push:
     branches:
