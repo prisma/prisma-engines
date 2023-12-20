@@ -39,7 +39,7 @@ fn find_unique_field(ctx: &QuerySchema, model: Model) -> OutputField<'_> {
 
     field(
         format!("findUnique{}", model.name()),
-        move || vec![arguments::where_unique_argument(ctx, cloned_model)],
+        move || arguments::find_unique_arguments(ctx, cloned_model),
         OutputType::object(objects::model::model_object_type(ctx, model)),
         Some(QueryInfo {
             model: Some(model_id),
@@ -56,7 +56,7 @@ fn find_unique_or_throw_field(ctx: &QuerySchema, model: Model) -> OutputField<'_
     let cloned_model = model.clone();
     field(
         format!("findUnique{}OrThrow", model.name()),
-        move || vec![arguments::where_unique_argument(ctx, cloned_model)],
+        move || arguments::find_unique_arguments(ctx, cloned_model),
         OutputType::object(objects::model::model_object_type(ctx, model)),
         Some(QueryInfo {
             model: Some(model_id),

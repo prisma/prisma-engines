@@ -18,6 +18,18 @@ pub(crate) fn where_unique_argument(ctx: &QuerySchema, model: Model) -> InputFie
     input_field(args::WHERE.to_owned(), vec![InputType::object(input_object_type)], None)
 }
 
+/// Builds "relationLoadStrategy" argument, if the corresponding functionality is available.
+pub(crate) fn relation_load_strategy_argument(ctx: &QuerySchema) -> Option<InputField<'_>> {
+    enum_types::relation_load_strategy(ctx).map(|load_strategy_type| {
+        input_field(
+            args::RELATION_LOAD_STRATEGY,
+            vec![InputType::Enum(load_strategy_type)],
+            None,
+        )
+        .optional()
+    })
+}
+
 /// Builds "where" (unique) argument intended for the delete field.
 pub(crate) fn delete_one_arguments(ctx: &QuerySchema, model: Model) -> Vec<InputField<'_>> {
     vec![where_unique_argument(ctx, model)]
@@ -131,6 +143,12 @@ pub(crate) fn group_by_arguments(ctx: &QuerySchema, model: Model) -> Vec<InputFi
     ]
 }
 
+pub(crate) fn find_unique_arguments(ctx: &QuerySchema, model: Model) -> Vec<InputField<'_>> {
+    std::iter::once(where_unique_argument(ctx, model))
+        .chain(relation_load_strategy_argument(ctx))
+        .collect()
+}
+
 pub(crate) struct ManyRecordsSelectionArgumentsBuilder<'a> {
     ctx: &'a QuerySchema,
     model: Model,
@@ -182,14 +200,7 @@ impl<'a> ManyRecordsSelectionArgumentsBuilder<'a> {
         }
 
         if self.include_relation_load_strategy {
-            args.extend(enum_types::relation_load_strategy(self.ctx).map(|load_strategy_type| {
-                input_field(
-                    args::RELATION_LOAD_STRATEGY,
-                    vec![InputType::Enum(load_strategy_type)],
-                    None,
-                )
-                .optional()
-            }))
+            args.extend(relation_load_strategy_argument(self.ctx))
         }
 
         args
