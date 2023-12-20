@@ -1,4 +1,4 @@
-{ pkgs, system, self', ... }:
+{ pkgs, lib, self', ... }:
 
 let
   toolchain = pkgs.rust-bin.fromRustupToolchainFile ../prisma-schema-wasm/rust-toolchain.toml;
@@ -7,14 +7,22 @@ let
   inherit (builtins) readFile replaceStrings;
 in
 {
-  packages.prisma-schema-wasm = stdenv.mkDerivation {
-    name = "prisma-schema-wasm";
-    nativeBuildInputs = with pkgs; [ git wasm-bindgen-cli toolchain ];
-    inherit (self'.packages.prisma-engines) configurePhase src;
+  packages.prisma-schema-wasm = lib.makeOverridable
+    ({ profile }: stdenv.mkDerivation {
+      name = "prisma-schema-wasm";
+      nativeBuildInputs = with pkgs; [ git wasm-bindgen-cli toolchain ];
+      inherit (self'.packages.prisma-engines) configurePhase src;
 
-    buildPhase = "cargo build --release --target=wasm32-unknown-unknown -p prisma-schema-build";
-    installPhase = readFile "${scriptsDir}/install.sh";
-  };
+      buildPhase = "cargo build --profile=${profile} --target=wasm32-unknown-unknown -p prisma-schema-build";
+      installPhase = readFile "${scriptsDir}/install.sh";
+
+      WASM_BUILD_PROFILE = profile;
+
+      passthru = {
+        dev = self'.packages.prisma-schema-wasm.override { profile = "dev"; };
+      };
+    })
+    { profile = "release"; };
 
   # Takes a package version as its single argument, and produces
   # prisma-schema-wasm with the right package.json in a temporary directory,
