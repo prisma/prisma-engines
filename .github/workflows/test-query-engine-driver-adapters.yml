@@ -19,7 +19,7 @@ concurrency:
 
 jobs:
   rust-query-engine-tests:
-    name: "Adapter ${{ matrix.adapter.name }}"
+    name: "Adapter ${{ matrix.adapter.name }} ${{ matrix.partition }}"
 
     strategy:
       fail-fast: false
@@ -42,6 +42,7 @@ jobs:
           - name: "libsql (wasm)"
             setup_task: "dev-libsql-wasm"
         node_version: ["18"]
+        partition: ["1/4", "2/4", "3/4", "4/4"]
     env:
       LOG_LEVEL: "info" # Set to "debug" to trace the query engine and node process running the driver adapter
       LOG_QUERIES: "y"
@@ -96,8 +97,9 @@ jobs:
           fi
 
       - uses: cachix/install-nix-action@v24
+      - uses: taiki-e/install-action@nextest
 
       - run: make ${{ matrix.adapter.setup_task }}
 
       - name: "Run tests"
-        run: cargo test --package query-engine-tests -- --test-threads=1
+        run: cargo nextest run --package query-engine-tests --test-threads=1 --partition hash:${{ matrix.partition }}
