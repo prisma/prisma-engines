@@ -30,6 +30,13 @@ pub(crate) fn relation_load_strategy_argument(ctx: &QuerySchema) -> Option<Input
     })
 }
 
+/// Builds "where" (unique) and "relationLoadStrategy" arguments for the findUnique field.
+pub(crate) fn find_unique_arguments(ctx: &QuerySchema, model: Model) -> Vec<InputField<'_>> {
+    std::iter::once(where_unique_argument(ctx, model))
+        .chain(relation_load_strategy_argument(ctx))
+        .collect()
+}
+
 /// Builds "where" (unique) and "relationLoadStrategy" arguments intended for the delete field.
 pub(crate) fn delete_one_arguments(ctx: &QuerySchema, model: Model) -> Vec<InputField<'_>> {
     std::iter::once(where_unique_argument(ctx, model))
@@ -152,12 +159,6 @@ pub(crate) fn group_by_arguments(ctx: &QuerySchema, model: Model) -> Vec<InputFi
         input_field(args::TAKE, vec![InputType::int()], None).optional(),
         input_field(args::SKIP, vec![InputType::int()], None).optional(),
     ]
-}
-
-pub(crate) fn find_unique_arguments(ctx: &QuerySchema, model: Model) -> Vec<InputField<'_>> {
-    std::iter::once(where_unique_argument(ctx, model))
-        .chain(relation_load_strategy_argument(ctx))
-        .collect()
 }
 
 pub(crate) struct ManyRecordsSelectionArgumentsBuilder<'a> {
