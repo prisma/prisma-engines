@@ -30,29 +30,40 @@ pub(crate) fn relation_load_strategy_argument(ctx: &QuerySchema) -> Option<Input
     })
 }
 
-/// Builds "where" (unique) argument intended for the delete field.
+/// Builds "where" (unique) and "relationLoadStrategy" arguments intended for the delete field.
 pub(crate) fn delete_one_arguments(ctx: &QuerySchema, model: Model) -> Vec<InputField<'_>> {
-    vec![where_unique_argument(ctx, model)]
+    std::iter::once(where_unique_argument(ctx, model))
+        .chain(relation_load_strategy_argument(ctx))
+        .collect()
 }
 
-/// Builds "where" (unique) and "data" arguments intended for the update field.
+/// Builds "where" (unique), "data" and "relationLoadStrategy" arguments intended for the update field.
 pub(crate) fn update_one_arguments(ctx: &QuerySchema, model: Model) -> Vec<InputField<'_>> {
     let unique_arg = where_unique_argument(ctx, model.clone());
     let update_types = update_one_objects::update_one_input_types(ctx, model, None);
-    vec![input_field(args::DATA.to_owned(), update_types, None), unique_arg]
+
+    let mut args = vec![input_field(args::DATA.to_owned(), update_types, None), unique_arg];
+
+    args.extend(relation_load_strategy_argument(ctx));
+
+    args
 }
 
-/// Builds "where" (unique), "create", and "update" arguments intended for the upsert field.
+/// Builds "where" (unique), "create", "update" and "relationLoadStrategy" arguments intended for the upsert field.
 pub(crate) fn upsert_arguments(ctx: &QuerySchema, model: Model) -> Vec<InputField<'_>> {
     let where_unique_arg = where_unique_argument(ctx, model.clone());
     let update_types = update_one_objects::update_one_input_types(ctx, model.clone(), None);
     let create_types = create_one::create_one_input_types(ctx, model, None);
 
-    vec![
+    let mut args = vec![
         where_unique_arg,
         input_field(args::CREATE.to_owned(), create_types, None),
         input_field(args::UPDATE.to_owned(), update_types, None),
-    ]
+    ];
+
+    args.extend(relation_load_strategy_argument(ctx));
+
+    args
 }
 
 /// Builds "where" and "data" arguments intended for the update many field.
