@@ -11,6 +11,7 @@ pub use psl_core::{
     parser_database::{self, SourceFile},
     reformat,
     schema_ast,
+    set_config_dir,
     Configuration,
     ConnectorRegistry,
     Datasource,
