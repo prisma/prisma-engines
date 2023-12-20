@@ -9,6 +9,7 @@ use driver_adapters::JsObject;
 use js_sys::Function as JsFunction;
 use psl::builtin_connectors::{MYSQL, POSTGRES, SQLITE};
 use psl::ConnectorRegistry;
+use quaint::connector::ExternalConnector;
 use query_core::{
     protocol::EngineProtocol,
     schema::{self},
@@ -18,7 +19,7 @@ use query_engine_common::engine::{map_known_error, ConnectedEngine, ConstructorO
 use request_handlers::ConnectorKind;
 use request_handlers::{load_executor, RequestBody, RequestHandler};
 use serde_json::json;
-use std::sync::Arc;
+use std::{marker::PhantomData, sync::Arc};
 use tokio::sync::RwLock;
 use tracing::{field, instrument::WithSubscriber, Instrument, Span};
 use tracing_subscriber::filter::LevelFilter;
@@ -28,6 +29,7 @@ use wasm_bindgen::prelude::wasm_bindgen;
 #[wasm_bindgen]
 pub struct QueryEngine {
     inner: RwLock<Inner>,
+    adapter: Arc<dyn ExternalConnector>,
     logger: Logger,
 }
 
@@ -55,9 +57,7 @@ impl QueryEngine {
         let config = &mut schema.configuration;
         let preview_features = config.preview_features();
 
-        let js_queryable = driver_adapters::from_js(adapter);
-
-        sql_connector::activate_driver_adapter(Arc::new(js_queryable));
+        let js_queryable = Arc::new(driver_adapters::from_js(adapter));
 
         let provider_name = schema.connector.provider_name();
         tracing::info!("Registered driver adapter for {provider_name}.");
@@ -85,6 +85,7 @@ impl QueryEngine {
 
         Ok(Self {
             inner: RwLock::new(Inner::Builder(builder)),
+            adapter: js_queryable,
             logger,
         })
     }
@@ -104,16 +105,16 @@ impl QueryEngine {
             let arced_schema_2 = Arc::clone(&builder.schema);
 
             let engine = async move {
-                // We only support one data source & generator at the moment, so take the first one (default not exposed yet).
-                let data_source = arced_schema
-                    .configuration
-                    .datasources
-                    .first()
-                    .ok_or_else(|| ApiError::configuration("No valid data source found"))?;
-
                 let preview_features = arced_schema.configuration.preview_features();
 
-                let executor = load_executor(ConnectorKind::Js {}, data_source, preview_features).await?;
+                let executor = load_executor(
+                    ConnectorKind::Js {
+                        adapter: Arc::clone(&self.adapter),
+                        _phantom: PhantomData,
+                    },
+                    preview_features,
+                )
+                .await?;
                 let connector = executor.primary_connector();
 
                 let conn_span = tracing::info_span!(

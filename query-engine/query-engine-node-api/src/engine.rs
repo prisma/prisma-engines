@@ -3,6 +3,7 @@ use futures::FutureExt;
 use napi::{threadsafe_function::ThreadSafeCallContext, Env, JsFunction, JsObject, JsUnknown};
 use napi_derive::napi;
 use psl::PreviewFeature;
+use quaint::connector::ExternalConnector;
 use query_core::{
     protocol::EngineProtocol,
     schema::{self},
@@ -16,7 +17,7 @@ use query_engine_metrics::MetricFormat;
 use request_handlers::{dmmf, load_executor, render_graphql_schema, ConnectorKind, RequestBody, RequestHandler};
 use serde::Deserialize;
 use serde_json::json;
-use std::{collections::HashMap, future::Future, panic::AssertUnwindSafe, sync::Arc};
+use std::{collections::HashMap, future::Future, marker::PhantomData, panic::AssertUnwindSafe, sync::Arc};
 use tokio::sync::RwLock;
 use tracing::{field, instrument::WithSubscriber, Instrument, Span};
 use tracing_subscriber::filter::LevelFilter;
@@ -24,7 +25,7 @@ use user_facing_errors::Error;
 
 enum ConnectorMode {
     Rust,
-    Js,
+    Js { adapter: Arc<dyn ExternalConnector> },
 }
 
 /// The main query engine used by JS
@@ -111,8 +112,9 @@ impl QueryEngine {
             if let Some(adapter) = maybe_adapter {
                 let js_queryable = driver_adapters::from_js(adapter);
 
-                sql_connector::activate_driver_adapter(Arc::new(js_queryable));
-                connector_mode = ConnectorMode::Js;
+                connector_mode = ConnectorMode::Js {
+                    adapter: Arc::new(js_queryable),
+                };
 
                 let provider_name = schema.connector.provider_name();
                 tracing::info!("Registered driver adapter for {provider_name}.");
@@ -207,11 +209,17 @@ impl QueryEngine {
                                 .map_err(|err| {
                                     crate::error::ApiError::Conversion(err, builder.schema.db.source().to_owned())
                                 })?;
-                            ConnectorKind::Rust { url }
+                            ConnectorKind::Rust {
+                                url,
+                                datasource: data_source,
+                            }
                         }
-                        ConnectorMode::Js => ConnectorKind::Js,
+                        ConnectorMode::Js { ref adapter } => ConnectorKind::Js {
+                            adapter: Arc::clone(adapter),
+                            _phantom: PhantomData,
+                        },
                     };
-                    let executor = load_executor(connector_kind, data_source, preview_features).await?;
+                    let executor = load_executor(connector_kind, preview_features).await?;
                     let connector = executor.primary_connector();
 
                     let conn_span = tracing::info_span!(
