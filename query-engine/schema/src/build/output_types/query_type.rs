@@ -75,8 +75,8 @@ fn find_first_field(ctx: &QuerySchema, model: Model) -> OutputField<'_> {
         field_name,
         move || {
             arguments::ManyRecordsSelectionArgumentsBuilder::new(ctx, cloned_model)
-                .include_distinct(true)
-                .include_relation_load_strategy(true)
+                .include_distinct()
+                .include_relation_load_strategy()
                 .build()
         },
         OutputType::object(objects::model::model_object_type(ctx, model.clone())),
@@ -99,8 +99,8 @@ fn find_first_or_throw_field(ctx: &QuerySchema, model: Model) -> OutputField<'_>
         field_name,
         move || {
             arguments::ManyRecordsSelectionArgumentsBuilder::new(ctx, model)
-                .include_distinct(true)
-                .include_relation_load_strategy(true)
+                .include_distinct()
+                .include_relation_load_strategy()
                 .build()
         },
         OutputType::object(objects::model::model_object_type(ctx, cloned_model)),
@@ -122,8 +122,8 @@ fn all_items_field(ctx: &QuerySchema, model: Model) -> OutputField<'_> {
         field_name,
         move || {
             arguments::ManyRecordsSelectionArgumentsBuilder::new(ctx, model)
-                .include_distinct(true)
-                .include_relation_load_strategy(true)
+                .include_distinct()
+                .include_relation_load_strategy()
                 .build()
         },
         OutputType::list(InnerOutputType::Object(object_type)),

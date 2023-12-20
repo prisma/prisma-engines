@@ -83,7 +83,7 @@ pub(crate) fn many_records_output_field_arguments(ctx: &QuerySchema, field: Mode
 /// Builds "many records where" arguments for to-many relation selection sets.
 pub(crate) fn relation_to_many_selection_arguments(ctx: &QuerySchema, model: Model) -> Vec<InputField<'_>> {
     ManyRecordsSelectionArgumentsBuilder::new(ctx, model)
-        .include_distinct(true)
+        .include_distinct()
         .build()
 }
 
@@ -148,13 +148,13 @@ impl<'a> ManyRecordsSelectionArgumentsBuilder<'a> {
         }
     }
 
-    pub(crate) fn include_distinct(mut self, value: bool) -> Self {
-        self.include_distinct = value;
+    pub(crate) fn include_distinct(mut self) -> Self {
+        self.include_distinct = true;
         self
     }
 
-    pub(crate) fn include_relation_load_strategy(mut self, value: bool) -> Self {
-        self.include_relation_load_strategy = value;
+    pub(crate) fn include_relation_load_strategy(mut self) -> Self {
+        self.include_relation_load_strategy = true;
         self
     }
 
