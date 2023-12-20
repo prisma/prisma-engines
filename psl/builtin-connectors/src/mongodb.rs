@@ -60,13 +60,13 @@ impl Connector for MongoDbDatamodelConnector {
         BitFlags::empty()
     }
 
-    fn validate_relation_field(
-        &self,
-        field: psl_core::parser_database::walkers::RelationFieldWalker<'_>,
-        errors: &mut Diagnostics,
-    ) {
-        validations::relation_same_native_type(field, errors);
-    }
+    // fn validate_relation_field(
+    //     &self,
+    //     field: psl_core::parser_database::walkers::RelationFieldWalker<'_>,
+    //     errors: &mut Diagnostics,
+    // ) {
+    //     validations::relation_same_native_type(field, errors);
+    // }
 
     fn available_native_type_constructors(&self) -> &'static [NativeTypeConstructor] {
         mongodb_types::CONSTRUCTORS

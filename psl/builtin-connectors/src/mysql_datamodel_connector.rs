@@ -178,50 +178,50 @@ impl Connector for MySqlDatamodelConnector {
             .any(|(st, nt)| scalar_type == st && native_type == nt)
     }
 
-    fn validate_native_type_arguments(
-        &self,
-        native_type_instance: &NativeTypeInstance,
-        scalar_type: &ScalarType,
-        span: Span,
-        errors: &mut Diagnostics,
-    ) {
-        let native_type: &MySqlType = native_type_instance.downcast_ref();
-        let error = self.native_instance_error(native_type_instance);
+    // fn validate_native_type_arguments(
+    //     &self,
+    //     native_type_instance: &NativeTypeInstance,
+    //     scalar_type: &ScalarType,
+    //     span: Span,
+    //     errors: &mut Diagnostics,
+    // ) {
+    //     let native_type: &MySqlType = native_type_instance.downcast_ref();
+    //     let error = self.native_instance_error(native_type_instance);
 
-        match native_type {
-            Decimal(Some((precision, scale))) if scale > precision => {
-                errors.push_error(error.new_scale_larger_than_precision_error(span))
-            }
-            Decimal(Some((precision, _))) if *precision > 65 => {
-                errors.push_error(error.new_argument_m_out_of_range_error("Precision can range from 1 to 65.", span))
-            }
-            Decimal(Some((_, scale))) if *scale > 30 => {
-                errors.push_error(error.new_argument_m_out_of_range_error("Scale can range from 0 to 30.", span))
-            }
-            Bit(length) if *length == 0 || *length > 64 => {
-                errors.push_error(error.new_argument_m_out_of_range_error("M can range from 1 to 64.", span))
-            }
-            Char(length) if *length > 255 => {
-                errors.push_error(error.new_argument_m_out_of_range_error("M can range from 0 to 255.", span))
-            }
-            VarChar(length) if *length > 65535 => {
-                errors.push_error(error.new_argument_m_out_of_range_error("M can range from 0 to 65,535.", span))
-            }
-            Bit(n) if *n > 1 && matches!(scalar_type, ScalarType::Boolean) => {
-                errors.push_error(error.new_argument_m_out_of_range_error("only Bit(1) can be used as Boolean.", span))
-            }
-            _ => (),
-        }
-    }
+    //     match native_type {
+    //         Decimal(Some((precision, scale))) if scale > precision => {
+    //             errors.push_error(error.new_scale_larger_than_precision_error(span))
+    //         }
+    //         Decimal(Some((precision, _))) if *precision > 65 => {
+    //             errors.push_error(error.new_argument_m_out_of_range_error("Precision can range from 1 to 65.", span))
+    //         }
+    //         Decimal(Some((_, scale))) if *scale > 30 => {
+    //             errors.push_error(error.new_argument_m_out_of_range_error("Scale can range from 0 to 30.", span))
+    //         }
+    //         Bit(length) if *length == 0 || *length > 64 => {
+    //             errors.push_error(error.new_argument_m_out_of_range_error("M can range from 1 to 64.", span))
+    //         }
+    //         Char(length) if *length > 255 => {
+    //             errors.push_error(error.new_argument_m_out_of_range_error("M can range from 0 to 255.", span))
+    //         }
+    //         VarChar(length) if *length > 65535 => {
+    //             errors.push_error(error.new_argument_m_out_of_range_error("M can range from 0 to 65,535.", span))
+    //         }
+    //         Bit(n) if *n > 1 && matches!(scalar_type, ScalarType::Boolean) => {
+    //             errors.push_error(error.new_argument_m_out_of_range_error("only Bit(1) can be used as Boolean.", span))
+    //         }
+    //         _ => (),
+    //     }
+    // }
 
-    fn validate_enum(&self, r#enum: walkers::EnumWalker<'_>, diagnostics: &mut Diagnostics) {
-        if let Some((_, span)) = r#enum.schema() {
-            diagnostics.push_error(DatamodelError::new_static(
-                "MySQL enums do not belong to a schema.",
-                span,
-            ));
-        }
-    }
+    // fn validate_enum(&self, r#enum: walkers::EnumWalker<'_>, diagnostics: &mut Diagnostics) {
+    //     if let Some((_, span)) = r#enum.schema() {
+    //         diagnostics.push_error(DatamodelError::new_static(
+    //             "MySQL enums do not belong to a schema.",
+    //             span,
+    //         ));
+    //     }
+    // }
 
     fn constraint_violation_scopes(&self) -> &'static [ConstraintScope] {
         CONSTRAINT_SCOPES

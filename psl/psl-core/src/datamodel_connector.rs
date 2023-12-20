@@ -155,18 +155,18 @@ pub trait Connector: Send + Sync {
     }
 
     /// Validate that the arguments passed to a native type attribute are valid.
-    fn validate_native_type_arguments(
-        &self,
-        _native_type: &NativeTypeInstance,
-        _scalar_type: &ScalarType,
-        _span: Span,
-        _: &mut Diagnostics,
-    ) {
-    }
+    // fn validate_native_type_arguments(
+    //     &self,
+    //     _native_type: &NativeTypeInstance,
+    //     _scalar_type: &ScalarType,
+    //     _span: Span,
+    //     _: &mut Diagnostics,
+    // ) {
+    // }
 
-    fn validate_enum(&self, _enum: walkers::EnumWalker<'_>, _: &mut Diagnostics) {}
-    fn validate_relation_field(&self, _field: walkers::RelationFieldWalker<'_>, _: &mut Diagnostics) {}
-    fn validate_datasource(&self, _: BitFlags<PreviewFeature>, _: &Datasource, _: &mut Diagnostics) {}
+    // fn validate_enum(&self, _enum: walkers::EnumWalker<'_>, _: &mut Diagnostics) {}
+    // fn validate_relation_field(&self, _field: walkers::RelationFieldWalker<'_>, _: &mut Diagnostics) {}
+    // fn validate_datasource(&self, _: BitFlags<PreviewFeature>, _: &Datasource, _: &mut Diagnostics) {}
 
     fn validate_scalar_field_unknown_default_functions(
         &self,

@@ -161,48 +161,48 @@ impl Connector for MsSqlDatamodelConnector {
             .any(|(st, nt)| scalar_type == st && native_type == nt)
     }
 
-    fn validate_native_type_arguments(
-        &self,
-        native_type: &NativeTypeInstance,
-        _scalar_type: &ScalarType,
-        span: Span,
-        errors: &mut Diagnostics,
-    ) {
-        let r#type: &MsSqlType = native_type.downcast_ref();
-        let error = self.native_instance_error(native_type);
+    // fn validate_native_type_arguments(
+    //     &self,
+    //     native_type: &NativeTypeInstance,
+    //     _scalar_type: &ScalarType,
+    //     span: Span,
+    //     errors: &mut Diagnostics,
+    // ) {
+    //     let r#type: &MsSqlType = native_type.downcast_ref();
+    //     let error = self.native_instance_error(native_type);
 
-        match r#type {
-            Decimal(Some((precision, scale))) if scale > precision => {
-                errors.push_error(error.new_scale_larger_than_precision_error(span));
-            }
-            Decimal(Some((prec, _))) if *prec == 0 || *prec > 38 => {
-                errors.push_error(error.new_argument_m_out_of_range_error("Precision can range from 1 to 38.", span));
-            }
-            Decimal(Some((_, scale))) if *scale > 38 => {
-                errors.push_error(error.new_argument_m_out_of_range_error("Scale can range from 0 to 38.", span))
-            }
-            Float(Some(bits)) if *bits == 0 || *bits > 53 => {
-                errors.push_error(error.new_argument_m_out_of_range_error("Bits can range from 1 to 53.", span))
-            }
-            NVarChar(Some(Number(p))) if *p > 4000 => errors.push_error(error.new_argument_m_out_of_range_error(
-                "Length can range from 1 to 4000. For larger sizes, use the `Max` variant.",
-                span,
-            )),
-            VarChar(Some(Number(p))) | VarBinary(Some(Number(p))) if *p > 8000 => {
-                errors.push_error(error.new_argument_m_out_of_range_error(
-                    r#"Length can range from 1 to 8000. For larger sizes, use the `Max` variant."#,
-                    span,
-                ))
-            }
-            NChar(Some(p)) if *p > 4000 => {
-                errors.push_error(error.new_argument_m_out_of_range_error("Length can range from 1 to 4000.", span))
-            }
-            Char(Some(p)) | Binary(Some(p)) if *p > 8000 => {
-                errors.push_error(error.new_argument_m_out_of_range_error("Length can range from 1 to 8000.", span))
-            }
-            _ => (),
-        }
-    }
+    //     match r#type {
+    //         Decimal(Some((precision, scale))) if scale > precision => {
+    //             errors.push_error(error.new_scale_larger_than_precision_error(span));
+    //         }
+    //         Decimal(Some((prec, _))) if *prec == 0 || *prec > 38 => {
+    //             errors.push_error(error.new_argument_m_out_of_range_error("Precision can range from 1 to 38.", span));
+    //         }
+    //         Decimal(Some((_, scale))) if *scale > 38 => {
+    //             errors.push_error(error.new_argument_m_out_of_range_error("Scale can range from 0 to 38.", span))
+    //         }
+    //         Float(Some(bits)) if *bits == 0 || *bits > 53 => {
+    //             errors.push_error(error.new_argument_m_out_of_range_error("Bits can range from 1 to 53.", span))
+    //         }
+    //         NVarChar(Some(Number(p))) if *p > 4000 => errors.push_error(error.new_argument_m_out_of_range_error(
+    //             "Length can range from 1 to 4000. For larger sizes, use the `Max` variant.",
+    //             span,
+    //         )),
+    //         VarChar(Some(Number(p))) | VarBinary(Some(Number(p))) if *p > 8000 => {
+    //             errors.push_error(error.new_argument_m_out_of_range_error(
+    //                 r#"Length can range from 1 to 8000. For larger sizes, use the `Max` variant."#,
+    //                 span,
+    //             ))
+    //         }
+    //         NChar(Some(p)) if *p > 4000 => {
+    //             errors.push_error(error.new_argument_m_out_of_range_error("Length can range from 1 to 4000.", span))
+    //         }
+    //         Char(Some(p)) | Binary(Some(p)) if *p > 8000 => {
+    //             errors.push_error(error.new_argument_m_out_of_range_error("Length can range from 1 to 8000.", span))
+    //         }
+    //         _ => (),
+    //     }
+    // }
 
     fn constraint_violation_scopes(&self) -> &'static [ConstraintScope] {
         CONSTRAINT_SCOPES

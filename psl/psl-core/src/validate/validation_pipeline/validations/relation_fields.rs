@@ -288,7 +288,7 @@ pub(super) fn validate_missing_relation_indexes(relation_field: RelationFieldWal
 }
 
 pub(super) fn connector_specific(field: RelationFieldWalker<'_>, ctx: &mut Context<'_>) {
-    ctx.connector.validate_relation_field(field, ctx.diagnostics)
+    // ctx.connector.validate_relation_field(field, ctx.diagnostics)
 }
 
 /// An subgroup is left-wise included in a supergroup if the subgroup is contained in the supergroup, and all the entries of

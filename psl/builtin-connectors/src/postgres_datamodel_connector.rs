@@ -352,47 +352,47 @@ impl Connector for PostgresDatamodelConnector {
             .any(|(st, nt)| scalar_type == st && native_type == nt)
     }
 
-    fn validate_native_type_arguments(
-        &self,
-        native_type_instance: &NativeTypeInstance,
-        _scalar_type: &ScalarType,
-        span: ast::Span,
-        errors: &mut Diagnostics,
-    ) {
-        let native_type: &PostgresType = native_type_instance.downcast_ref();
-        let error = self.native_instance_error(native_type_instance);
+    // fn validate_native_type_arguments(
+    //     &self,
+    //     native_type_instance: &NativeTypeInstance,
+    //     _scalar_type: &ScalarType,
+    //     span: ast::Span,
+    //     errors: &mut Diagnostics,
+    // ) {
+    //     let native_type: &PostgresType = native_type_instance.downcast_ref();
+    //     let error = self.native_instance_error(native_type_instance);
 
-        match native_type {
-            Decimal(Some((precision, scale))) if scale > precision => {
-                errors.push_error(error.new_scale_larger_than_precision_error(span))
-            }
-            Decimal(Some((prec, _))) if *prec > 1000 || *prec == 0 => {
-                errors.push_error(error.new_argument_m_out_of_range_error(
-                    "Precision must be positive with a maximum value of 1000.",
-                    span,
-                ))
-            }
-            Bit(Some(0)) | VarBit(Some(0)) => {
-                errors.push_error(error.new_argument_m_out_of_range_error("M must be a positive integer.", span))
-            }
-            Timestamp(Some(p)) | Timestamptz(Some(p)) | Time(Some(p)) | Timetz(Some(p)) if *p > 6 => {
-                errors.push_error(error.new_argument_m_out_of_range_error("M can range from 0 to 6.", span))
-            }
-            _ => (),
-        }
-    }
+    //     match native_type {
+    //         Decimal(Some((precision, scale))) if scale > precision => {
+    //             errors.push_error(error.new_scale_larger_than_precision_error(span))
+    //         }
+    //         Decimal(Some((prec, _))) if *prec > 1000 || *prec == 0 => {
+    //             errors.push_error(error.new_argument_m_out_of_range_error(
+    //                 "Precision must be positive with a maximum value of 1000.",
+    //                 span,
+    //             ))
+    //         }
+    //         Bit(Some(0)) | VarBit(Some(0)) => {
+    //             errors.push_error(error.new_argument_m_out_of_range_error("M must be a positive integer.", span))
+    //         }
+    //         Timestamp(Some(p)) | Timestamptz(Some(p)) | Time(Some(p)) | Timetz(Some(p)) if *p > 6 => {
+    //             errors.push_error(error.new_argument_m_out_of_range_error("M can range from 0 to 6.", span))
+    //         }
+    //         _ => (),
+    //     }
+    // }
 
-    fn validate_datasource(
-        &self,
-        preview_features: BitFlags<PreviewFeature>,
-        ds: &Datasource,
-        errors: &mut Diagnostics,
-    ) {
-        if let Some(props) = ds.downcast_connector_data::<PostgresDatasourceProperties>() {
-            validations::extensions_preview_flag_must_be_set(preview_features, props, errors);
-            validations::extension_names_follow_prisma_syntax_rules(preview_features, props, errors);
-        }
-    }
+    // fn validate_datasource(
+    //     &self,
+    //     preview_features: BitFlags<PreviewFeature>,
+    //     ds: &Datasource,
+    //     errors: &mut Diagnostics,
+    // ) {
+    //     if let Some(props) = ds.downcast_connector_data::<PostgresDatasourceProperties>() {
+    //         validations::extensions_preview_flag_must_be_set(preview_features, props, errors);
+    //         validations::extension_names_follow_prisma_syntax_rules(preview_features, props, errors);
+    //     }
+    // }
 
     fn constraint_violation_scopes(&self) -> &'static [ConstraintScope] {
         CONSTRAINT_SCOPES

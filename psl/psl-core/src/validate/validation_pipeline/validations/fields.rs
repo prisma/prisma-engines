@@ -214,8 +214,8 @@ pub(super) fn validate_native_type_arguments<'db>(field: impl Into<TypedFieldWal
     }
 
     if let Some(native_type) = ctx.connector.parse_native_type(type_name, args, span, ctx.diagnostics) {
-        ctx.connector
-            .validate_native_type_arguments(&native_type, &scalar_type, span, ctx.diagnostics);
+        // ctx.connector
+        //     .validate_native_type_arguments(&native_type, &scalar_type, span, ctx.diagnostics);
     }
 }
 

@@ -168,40 +168,40 @@ impl Connector for CockroachDatamodelConnector {
         native_type.downcast_ref::<CockroachType>().to_parts()
     }
 
-    fn validate_native_type_arguments(
-        &self,
-        native_type_instance: &NativeTypeInstance,
-        _scalar_type: &ScalarType,
-        span: ast::Span,
-        errors: &mut Diagnostics,
-    ) {
-        let native_type: &CockroachType = native_type_instance.downcast_ref();
-        let error = self.native_instance_error(native_type_instance);
+    // fn validate_native_type_arguments(
+    //     &self,
+    //     native_type_instance: &NativeTypeInstance,
+    //     _scalar_type: &ScalarType,
+    //     span: ast::Span,
+    //     errors: &mut Diagnostics,
+    // ) {
+    //     let native_type: &CockroachType = native_type_instance.downcast_ref();
+    //     let error = self.native_instance_error(native_type_instance);
 
-        match native_type {
-            CockroachType::Decimal(Some((precision, scale))) if scale > precision => {
-                errors.push_error(error.new_scale_larger_than_precision_error(span))
-            }
-            CockroachType::Decimal(Some((prec, _))) if *prec > 1000 || *prec == 0 => {
-                errors.push_error(error.new_argument_m_out_of_range_error(
-                    "Precision must be positive with a maximum value of 1000.",
-                    span,
-                ))
-            }
-            CockroachType::Bit(Some(0)) | CockroachType::VarBit(Some(0)) => {
-                errors.push_error(error.new_argument_m_out_of_range_error("M must be a positive integer.", span))
-            }
-            CockroachType::Timestamp(Some(p))
-            | CockroachType::Timestamptz(Some(p))
-            | CockroachType::Time(Some(p))
-            | CockroachType::Timetz(Some(p))
-                if *p > 6 =>
-            {
-                errors.push_error(error.new_argument_m_out_of_range_error("M can range from 0 to 6.", span))
-            }
-            _ => (),
-        }
-    }
+    //     match native_type {
+    //         CockroachType::Decimal(Some((precision, scale))) if scale > precision => {
+    //             errors.push_error(error.new_scale_larger_than_precision_error(span))
+    //         }
+    //         CockroachType::Decimal(Some((prec, _))) if *prec > 1000 || *prec == 0 => {
+    //             errors.push_error(error.new_argument_m_out_of_range_error(
+    //                 "Precision must be positive with a maximum value of 1000.",
+    //                 span,
+    //             ))
+    //         }
+    //         CockroachType::Bit(Some(0)) | CockroachType::VarBit(Some(0)) => {
+    //             errors.push_error(error.new_argument_m_out_of_range_error("M must be a positive integer.", span))
+    //         }
+    //         CockroachType::Timestamp(Some(p))
+    //         | CockroachType::Timestamptz(Some(p))
+    //         | CockroachType::Time(Some(p))
+    //         | CockroachType::Timetz(Some(p))
+    //             if *p > 6 =>
+    //         {
+    //             errors.push_error(error.new_argument_m_out_of_range_error("M can range from 0 to 6.", span))
+    //         }
+    //         _ => (),
+    //     }
+    // }
 
     fn validate_scalar_field_unknown_default_functions(
         &self,
