@@ -64,7 +64,7 @@ pub(crate) fn many_records_output_field_arguments(ctx: &QuerySchema, field: Mode
         ModelField::Scalar(_) => vec![],
 
         // To-many relation.
-        ModelField::Relation(rf) if rf.is_list() => relation_to_many_selection_arguments(ctx, rf.related_model(), true),
+        ModelField::Relation(rf) if rf.is_list() => relation_to_many_selection_arguments(ctx, rf.related_model()),
 
         // To-one optional relation.
         ModelField::Relation(rf) if !rf.is_required() => relation_to_one_selection_arguments(ctx, rf.related_model()),
@@ -81,32 +81,10 @@ pub(crate) fn many_records_output_field_arguments(ctx: &QuerySchema, field: Mode
 }
 
 /// Builds "many records where" arguments for to-many relation selection sets.
-pub(crate) fn relation_to_many_selection_arguments(
-    ctx: &QuerySchema,
-    model: Model,
-    include_distinct: bool,
-) -> Vec<InputField<'_>> {
-    let unique_input_type = InputType::object(filter_objects::where_unique_object_type(ctx, model.clone()));
-    let order_by_options = OrderByOptions {
-        include_relations: true,
-        include_scalar_aggregations: false,
-        include_full_text_search: ctx.can_full_text_search(),
-    };
-
-    let mut args = vec![
-        where_argument(ctx, &model),
-        order_by_argument(ctx, model.clone().into(), order_by_options),
-        input_field(args::CURSOR, vec![unique_input_type], None).optional(),
-        input_field(args::TAKE, vec![InputType::int()], None).optional(),
-        input_field(args::SKIP, vec![InputType::int()], None).optional(),
-    ];
-
-    if include_distinct {
-        let input_types = list_union_type(InputType::Enum(model_field_enum(&model)), true);
-        args.push(input_field(args::DISTINCT, input_types, None).optional());
-    }
-
-    args
+pub(crate) fn relation_to_many_selection_arguments(ctx: &QuerySchema, model: Model) -> Vec<InputField<'_>> {
+    ManyRecordsSelectionArgumentsBuilder::new(ctx, model)
+        .include_distinct(true)
+        .build()
 }
 
 /// Builds "many records where" arguments for to-many relation selection sets.
@@ -151,4 +129,69 @@ pub(crate) fn group_by_arguments(ctx: &QuerySchema, model: Model) -> Vec<InputFi
         input_field(args::TAKE, vec![InputType::int()], None).optional(),
         input_field(args::SKIP, vec![InputType::int()], None).optional(),
     ]
+}
+
+pub(crate) struct ManyRecordsSelectionArgumentsBuilder<'a> {
+    ctx: &'a QuerySchema,
+    model: Model,
+    include_distinct: bool,
+    include_relation_load_strategy: bool,
+}
+
+impl<'a> ManyRecordsSelectionArgumentsBuilder<'a> {
+    pub(crate) fn new(ctx: &'a QuerySchema, model: Model) -> Self {
+        Self {
+            ctx,
+            model,
+            include_distinct: false,
+            include_relation_load_strategy: false,
+        }
+    }
+
+    pub(crate) fn include_distinct(mut self, value: bool) -> Self {
+        self.include_distinct = value;
+        self
+    }
+
+    pub(crate) fn include_relation_load_strategy(mut self, value: bool) -> Self {
+        self.include_relation_load_strategy = value;
+        self
+    }
+
+    pub(crate) fn build(self) -> Vec<InputField<'a>> {
+        let unique_input_type =
+            InputType::object(filter_objects::where_unique_object_type(self.ctx, self.model.clone()));
+
+        let order_by_options = OrderByOptions {
+            include_relations: true,
+            include_scalar_aggregations: false,
+            include_full_text_search: self.ctx.can_full_text_search(),
+        };
+
+        let mut args = vec![
+            where_argument(self.ctx, &self.model),
+            order_by_argument(self.ctx, self.model.clone().into(), order_by_options),
+            input_field(args::CURSOR, vec![unique_input_type], None).optional(),
+            input_field(args::TAKE, vec![InputType::int()], None).optional(),
+            input_field(args::SKIP, vec![InputType::int()], None).optional(),
+        ];
+
+        if self.include_distinct {
+            let input_types = list_union_type(InputType::Enum(model_field_enum(&self.model)), true);
+            args.push(input_field(args::DISTINCT, input_types, None).optional());
+        }
+
+        if self.include_relation_load_strategy {
+            args.extend(enum_types::relation_load_strategy(self.ctx).map(|load_strategy_type| {
+                input_field(
+                    args::RELATION_LOAD_STRATEGY,
+                    vec![InputType::Enum(load_strategy_type)],
+                    None,
+                )
+                .optional()
+            }))
+        }
+
+        args
+    }
 }
