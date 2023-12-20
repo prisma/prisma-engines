@@ -114,6 +114,8 @@
 <a href="#114" id="114">114</a>
 <a href="#115" id="115">115</a>
 <a href="#116" id="116">116</a>
+<a href="#117" id="117">117</a>
+<a href="#118" id="118">118</a>
 </pre></div><pre class="rust"><code><span class="attr">#![doc = <span class="macro">include_str!</span>(<span class="string">&quot;../README.md&quot;</span>)]
 #![deny(rust_2018_idioms, unsafe_code)]
 #![allow(clippy::derive_partial_eq_without_eq)]
@@ -127,6 +129,7 @@
 <span class="kw">mod </span>common;
 <span class="kw">mod </span>configuration;
 <span class="kw">mod </span>reformat;
+<span class="kw">mod </span>set_config_dir;
 <span class="kw">mod </span>validate;
 
 <span class="kw">pub use crate</span>::{
@@ -139,6 +142,7 @@
 <span class="kw">pub use </span>diagnostics;
 <span class="kw">pub use </span>parser_database::{<span class="self">self</span>, is_reserved_type_name};
 <span class="kw">pub use </span>schema_ast;
+<span class="kw">pub use </span>set_config_dir::set_config_dir;
 
 <span class="kw">use </span><span class="self">self</span>::validate::{datasource_loader, generator_loader};
 <span class="kw">use </span>diagnostics::Diagnostics;

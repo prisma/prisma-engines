@@ -292,10 +292,12 @@
 <a href="#292" id="292">292</a>
 <a href="#293" id="293">293</a>
 <a href="#294" id="294">294</a>
+<a href="#295" id="295">295</a>
 </pre></div><pre class="rust"><code><span class="kw">use crate</span>::{
     configuration::StringFromEnvVar,
     datamodel_connector::{Connector, ConnectorCapabilities, RelationMode},
     diagnostics::{DatamodelError, Diagnostics, Span},
+    set_config_dir,
 };
 <span class="kw">use </span>std::{any::Any, borrow::Cow, path::Path};
 
@@ -502,7 +504,7 @@
     {
         <span class="comment">//CHECKUP
         </span><span class="kw">let </span>url = <span class="self">self</span>.load_url(env)<span class="question-mark">?</span>;
-        <span class="kw">let </span>url = <span class="self">self</span>.active_connector.set_config_dir(config_dir, <span class="kw-2">&amp;</span>url);
+        <span class="kw">let </span>url = set_config_dir(<span class="self">self</span>.active_connector.flavour(), config_dir, <span class="kw-2">&amp;</span>url);
 
         <span class="prelude-val">Ok</span>(url.into_owned())
     }

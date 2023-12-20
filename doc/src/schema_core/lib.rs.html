@@ -331,7 +331,7 @@
     <span class="kw">let </span>(source, url, preview_features, shadow_database_url) = parse_configuration(schema)<span class="question-mark">?</span>;
 
     <span class="kw">let </span>url = config_dir
-        .map(|config_dir| source.active_connector.set_config_dir(config_dir, <span class="kw-2">&amp;</span>url).into_owned())
+        .map(|config_dir| psl::set_config_dir(source.active_connector.flavour(), config_dir, <span class="kw-2">&amp;</span>url).into_owned())
         .unwrap_or(url);
 
     <span class="kw">let </span>params = ConnectorParams {
