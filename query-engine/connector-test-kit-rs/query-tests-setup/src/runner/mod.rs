@@ -119,15 +119,17 @@ impl Runner {
 
         let protocol = EngineProtocol::from(&ENGINE_PROTOCOL.to_string());
         let schema = psl::parse_schema(&datamodel).unwrap();
-        let data_source = schema.configuration.datasources.first().unwrap();
-        let url = data_source.load_url(|key| env::var(key).ok()).unwrap();
+        let datasource = schema.configuration.datasources.first().unwrap();
+        let url = datasource.load_url(|key| env::var(key).ok()).unwrap();
 
         let executor = match crate::CONFIG.external_test_executor() {
             Some(_) => RunnerExecutor::new_external(&url, &datamodel).await?,
             None => RunnerExecutor::Builtin(
                 request_handlers::load_executor(
-                    ConnectorKind::Rust { url: url.to_owned() },
-                    data_source,
+                    ConnectorKind::Rust {
+                        url: url.to_owned(),
+                        datasource,
+                    },
                     schema.configuration.preview_features(),
                 )
                 .await?,
