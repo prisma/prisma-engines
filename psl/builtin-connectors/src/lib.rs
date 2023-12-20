@@ -4,6 +4,8 @@
 pub mod cockroach_datamodel_connector;
 pub mod completions;
 
+pub mod validations;
+
 pub use cockroach_datamodel_connector::CockroachType;
 pub use mongodb::MongoDbType;
 pub use mssql_datamodel_connector::{MsSqlType, MsSqlTypeParameter};

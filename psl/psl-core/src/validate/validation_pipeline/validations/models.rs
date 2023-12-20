@@ -246,7 +246,7 @@ pub(crate) fn primary_key_connector_specific(model: ModelWalker<'_>, ctx: &mut C
 }
 
 pub(super) fn connector_specific(model: ModelWalker<'_>, ctx: &mut Context<'_>) {
-    ctx.connector.validate_model(model, ctx.relation_mode, ctx.diagnostics)
+    // ctx.connector.validate_model(model, ctx.relation_mode, ctx.diagnostics)
 }
 
 pub(super) fn id_has_fields(model: ModelWalker<'_>, ctx: &mut Context<'_>) {

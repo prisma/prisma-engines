@@ -1,5 +1,5 @@
 mod native_types;
-mod validations;
+pub(crate) mod validations;
 
 pub use native_types::{MsSqlType, MsSqlTypeParameter};
 
@@ -201,21 +201,6 @@ impl Connector for MsSqlDatamodelConnector {
                 errors.push_error(error.new_argument_m_out_of_range_error("Length can range from 1 to 8000.", span))
             }
             _ => (),
-        }
-    }
-
-    fn validate_model(
-        &self,
-        model: parser_database::walkers::ModelWalker<'_>,
-        _: RelationMode,
-        errors: &mut Diagnostics,
-    ) {
-        for index in model.indexes() {
-            validations::index_uses_correct_field_types(self, index, errors);
-        }
-
-        if let Some(pk) = model.primary_key() {
-            validations::primary_key_uses_correct_field_types(self, pk, errors);
         }
     }
 

@@ -1,5 +1,5 @@
 mod native_types;
-mod validations;
+pub(crate) mod validations;
 
 pub use native_types::CockroachType;
 
@@ -200,14 +200,6 @@ impl Connector for CockroachDatamodelConnector {
                 errors.push_error(error.new_argument_m_out_of_range_error("M can range from 0 to 6.", span))
             }
             _ => (),
-        }
-    }
-
-    fn validate_model(&self, model: ModelWalker<'_>, _: RelationMode, diagnostics: &mut Diagnostics) {
-        validations::autoincrement_validations(model, diagnostics);
-
-        for index in model.indexes() {
-            validations::inverted_index_validations(index, diagnostics);
         }
     }
 

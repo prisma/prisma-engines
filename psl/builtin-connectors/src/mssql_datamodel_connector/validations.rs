@@ -3,6 +3,7 @@ use psl_core::{
     datamodel_connector::{walker_ext_traits::ScalarFieldWalkerExt, Connector},
     diagnostics::{DatamodelError, Diagnostics},
     parser_database::{
+        self,
         walkers::{IndexWalker, PrimaryKeyWalker},
         ScalarType,
     },
@@ -67,5 +68,19 @@ pub(crate) fn primary_key_uses_correct_field_types(
 
             break;
         }
+    }
+}
+
+pub(crate) fn validate_model(
+    connector: &dyn Connector,
+    model: parser_database::walkers::ModelWalker<'_>,
+    errors: &mut Diagnostics,
+) {
+    for index in model.indexes() {
+        index_uses_correct_field_types(connector, index, errors);
+    }
+
+    if let Some(pk) = model.primary_key() {
+        primary_key_uses_correct_field_types(connector, pk, errors);
     }
 }

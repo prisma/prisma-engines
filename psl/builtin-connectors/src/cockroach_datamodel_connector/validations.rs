@@ -67,3 +67,11 @@ pub(super) fn autoincrement_validations(model: ModelWalker<'_>, errors: &mut Dia
         ));
     }
 }
+
+pub(crate) fn validate_model(model: ModelWalker<'_>, diagnostics: &mut Diagnostics) {
+    autoincrement_validations(model, diagnostics);
+
+    for index in model.indexes() {
+        inverted_index_validations(index, diagnostics);
+    }
+}

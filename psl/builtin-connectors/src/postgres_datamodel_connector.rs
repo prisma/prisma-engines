@@ -1,6 +1,6 @@
 mod datasource;
 mod native_types;
-mod validations;
+pub(crate) mod validations;
 
 pub use native_types::PostgresType;
 
@@ -379,14 +379,6 @@ impl Connector for PostgresDatamodelConnector {
                 errors.push_error(error.new_argument_m_out_of_range_error("M can range from 0 to 6.", span))
             }
             _ => (),
-        }
-    }
-
-    fn validate_model(&self, model: walkers::ModelWalker<'_>, _: RelationMode, errors: &mut Diagnostics) {
-        for index in model.indexes() {
-            validations::compatible_native_types(index, self, errors);
-            validations::generalized_index_validations(index, self, errors);
-            validations::spgist_indexed_column_count(index, errors);
         }
     }
 

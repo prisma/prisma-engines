@@ -1,9 +1,13 @@
 use crate::PostgresType;
 use enumflags2::BitFlags;
 use psl_core::{
-    datamodel_connector::{walker_ext_traits::*, Connector},
+    datamodel_connector::{walker_ext_traits::*, Connector, Flavour, RelationMode},
     diagnostics::{DatamodelError, Diagnostics},
-    parser_database::{ast::WithSpan, walkers::IndexWalker, IndexAlgorithm, OperatorClass},
+    parser_database::{
+        ast::WithSpan,
+        walkers::{self, IndexWalker},
+        IndexAlgorithm, OperatorClass,
+    },
     PreviewFeature,
 };
 
@@ -514,5 +518,12 @@ pub(super) fn extension_names_follow_prisma_syntax_rules(
                 extension.span,
             ))
         }
+    }
+}
+pub(crate) fn validate_model(connector: &dyn Connector, model: walkers::ModelWalker<'_>, errors: &mut Diagnostics) {
+    for index in model.indexes() {
+        compatible_native_types(index, connector, errors);
+        generalized_index_validations(index, connector, errors);
+        spgist_indexed_column_count(index, errors);
     }
 }
