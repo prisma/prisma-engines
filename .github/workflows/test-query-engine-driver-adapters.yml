@@ -19,7 +19,7 @@ concurrency:
 
 jobs:
   rust-query-engine-tests:
-    name: "Adapter ${{ matrix.adapter.name }} ${{ matrix.partition }}"
+    name: "${{ matrix.adapter.name }} ${{ matrix.partition }}"
 
     strategy:
       fail-fast: false
