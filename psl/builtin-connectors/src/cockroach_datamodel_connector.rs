@@ -60,6 +60,7 @@ const CAPABILITIES: ConnectorCapabilities = enumflags2::make_bitflags!(Connector
     InsertReturning |
     UpdateReturning |
     RowIn |
+    DistinctOn |
     LateralJoin
 });
 
