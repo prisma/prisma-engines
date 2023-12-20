@@ -331,6 +331,7 @@ pub trait WriteOperations {
     ) -> crate::Result<SingleRecord>;
 
     /// Delete records in the `Model` with the given `Filter`.
+    // TODO laplab: support `RETURNING`.
     async fn delete_records(
         &mut self,
         model: &Model,
@@ -340,7 +341,7 @@ pub trait WriteOperations {
 
     /// Delete single record in the `Model` with the given `Filter`.
     /// Return selected fields of the deleted record, if the connector
-    /// supports it. If the connector does not support it, returns an error.
+    /// supports it. If the connector does not support it, error is returned.
     async fn delete_record(
         &mut self,
         model: &Model,

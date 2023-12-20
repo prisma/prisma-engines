@@ -724,6 +724,31 @@ impl<'a> Visitor<'a> for Postgres<'a> {
 
         Ok(())
     }
+
+    fn visit_delete(&mut self, delete: Delete<'a>) -> visitor::Result {
+        self.write("DELETE FROM ")?;
+        self.visit_table(delete.table, true)?;
+
+        if let Some(conditions) = delete.conditions {
+            self.write(" WHERE ")?;
+            self.visit_conditions(conditions)?;
+        }
+
+        if let Some(returning) = delete.returning {
+            if !returning.is_empty() {
+                let values = returning.into_iter().map(|r| r.into()).collect();
+                self.write(" RETURNING ")?;
+                self.visit_columns(values)?;
+            }
+        }
+
+        if let Some(comment) = delete.comment {
+            self.write(" ")?;
+            self.visit_comment(comment)?;
+        }
+
+        Ok(())
+    }
 }
 
 #[cfg(test)]

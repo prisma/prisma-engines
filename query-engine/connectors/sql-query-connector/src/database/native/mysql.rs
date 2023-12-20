@@ -65,7 +65,7 @@ impl FromSource for Mysql {
 #[async_trait]
 impl Connector for Mysql {
     async fn get_connection<'a>(&'a self) -> connector::Result<Box<dyn Connection + Send + Sync + 'static>> {
-        catch(self.connection_info.clone(), async move {
+        catch(&self.connection_info, async move {
             let runtime_conn = self.pool.check_out().await?;
 
             // Note: `runtime_conn` must be `Sized`, as that's required by `TransactionCapable`
