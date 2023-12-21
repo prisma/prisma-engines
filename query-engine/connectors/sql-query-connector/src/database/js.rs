@@ -5,35 +5,11 @@ use connector_interface::{
     error::{ConnectorError, ErrorKind},
     Connection, Connector,
 };
-use once_cell::sync::Lazy;
 use quaint::{
     connector::{ExternalConnector, IsolationLevel, Transaction},
     prelude::{Queryable as QuaintQueryable, *},
 };
-use std::sync::{Arc, Mutex};
-
-/// TODO: evaluate turning this into `Lazy<Mutex<Option<Arc<DriverAdapter>>>>` to avoid
-/// a clone+drop on the adapter passed via `Js::from_source`.
-/// Note: this is currently blocked by Napi causing linking errors when building test binaries,
-/// as commented in [`DriverAdapter`].
-static ACTIVE_DRIVER_ADAPTER: Lazy<Mutex<Option<DriverAdapter>>> = Lazy::new(|| Mutex::new(None));
-
-fn active_driver_adapter(provider: &str) -> connector::Result<DriverAdapter> {
-    let lock = ACTIVE_DRIVER_ADAPTER.lock().unwrap();
-
-    lock.as_ref()
-        .map(|conn_ref| conn_ref.to_owned())
-        .ok_or(ConnectorError::from_kind(ErrorKind::UnsupportedConnector(format!(
-            "A driver adapter for {} was not registered",
-            provider
-        ))))
-}
-
-pub fn activate_driver_adapter(connector: Arc<dyn ExternalConnector>) {
-    let mut lock = ACTIVE_DRIVER_ADAPTER.lock().unwrap();
-
-    *lock = Some(DriverAdapter { connector });
-}
+use std::sync::Arc;
 
 pub struct Js {
     connector: DriverAdapter,
@@ -42,9 +18,10 @@ pub struct Js {
 }
 
 impl Js {
-    pub async fn new(source: &psl::Datasource, features: psl::PreviewFeatures) -> connector_interface::Result<Self> {
-        let connector = active_driver_adapter(source.active_provider)?;
-
+    pub async fn new(
+        connector: Arc<dyn ExternalConnector>,
+        features: psl::PreviewFeatures,
+    ) -> connector_interface::Result<Self> {
         let external_conn_info = connector.get_connection_info().await.map_err(|e| match e.kind() {
             &quaint::error::ErrorKind::ExternalError(id) => ConnectorError::from_kind(ErrorKind::ExternalError(id)),
             _ => ConnectorError::from_kind(ErrorKind::InvalidDriverAdapter(
@@ -53,7 +30,7 @@ impl Js {
         })?;
 
         Ok(Js {
-            connector,
+            connector: DriverAdapter { connector },
             features,
             connection_info: ConnectionInfo::External(external_conn_info),
         })
@@ -97,13 +74,6 @@ impl Connector for Js {
 #[derive(Clone)]
 pub struct DriverAdapter {
     connector: Arc<dyn ExternalConnector>,
-}
-
-#[async_trait]
-impl ExternalConnector for DriverAdapter {
-    async fn get_connection_info(&self) -> quaint::Result<ExternalConnectionInfo> {
-        self.connector.get_connection_info().await
-    }
 }
 
 #[async_trait]
