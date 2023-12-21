@@ -15,7 +15,7 @@ use query_engine_tests::*;
 #[test_suite(schema(schemas::user_posts))]
 mod distinct {
     use indoc::indoc;
-    use query_engine_tests::run_query;
+    use query_engine_tests::{match_connector_result, run_query};
 
     #[connector_test]
     async fn empty_database(runner: Runner) -> TestResult<()> {
@@ -34,40 +34,21 @@ mod distinct {
     }
 
     /// Regression test for not selecting the fields the distinct is performed on: https://github.com/prisma/prisma/issues/5969
-    #[connector_test(only(Postgres))]
-    async fn no_panic_pg(runner: Runner) -> TestResult<()> {
+    #[connector_test]
+    async fn no_panic(runner: Runner) -> TestResult<()> {
         test_user(&runner, r#"{ id: 1, first_name: "Joe", last_name: "Doe", email: "1" }"#).await?;
         test_user(&runner, r#"{ id: 2, first_name: "Doe", last_name: "Joe", email: "2" }"#).await?;
 
-        insta::assert_snapshot!(
-            run_query!(
-                &runner,
-                indoc!("{
-                    findManyUser(distinct: [first_name, last_name])
-                    { id } 
-                }")
+        match_connector_result!(
+            &runner,
+            indoc!(
+                "{
+                        findManyUser(distinct: [first_name, last_name])
+                        { id, first_name, last_name }
+                    }"
             ),
-            @r###"{"data":{"findManyUser":[{"id":2},{"id":1}]}}"###
-        );
-
-        Ok(())
-    }
-
-    /// Regression test for not selecting the fields the distinct is performed on: https://github.com/prisma/prisma/issues/5969
-    #[connector_test(exclude(Postgres))]
-    async fn no_panic_other(runner: Runner) -> TestResult<()> {
-        test_user(&runner, r#"{ id: 1, first_name: "Joe", last_name: "Doe", email: "1" }"#).await?;
-        test_user(&runner, r#"{ id: 2, first_name: "Doe", last_name: "Joe", email: "2" }"#).await?;
-
-        insta::assert_snapshot!(
-            run_query!(
-                &runner,
-                indoc!("{
-                    findManyUser(distinct: [first_name, last_name])
-                    { id } 
-                }")
-            ),
-            @r###"{"data":{"findManyUser":[{"id":1},{"id":2}]}}"###
+            Postgres(_) => r###"{"data":{"findManyUser":[{"id":2,"first_name":"Doe","last_name":"Joe"},{"id":1,"first_name":"Joe","last_name":"Doe"}]}}"###,
+            _ => r###"{"data":{"findManyUser":[{"id":1,"first_name":"Joe","last_name":"Doe"},{"id":2,"first_name":"Doe","last_name":"Joe"}]}}"###
         );
 
         Ok(())
@@ -92,8 +73,8 @@ mod distinct {
         Ok(())
     }
 
-    #[connector_test(only(Postgres))]
-    async fn with_duplicates_pg(runner: Runner) -> TestResult<()> {
+    #[connector_test]
+    async fn with_duplicates(runner: Runner) -> TestResult<()> {
         test_user(&runner, r#"{ id: 1, first_name: "Joe", last_name: "Doe", email: "1" }"#).await?;
         test_user(
             &runner,
@@ -102,37 +83,14 @@ mod distinct {
         .await?;
         test_user(&runner, r#"{ id: 3, first_name: "Joe", last_name: "Doe", email: "3" }"#).await?;
 
-        insta::assert_snapshot!(run_query!(
-                &runner,
-                indoc!("{
-                    findManyUser(distinct: [first_name, last_name])
-                    { id, first_name, last_name }
-                }")
-            ),
-            @r###"{"data":{"findManyUser":[{"id":2,"first_name":"Hans","last_name":"Wurst"},{"id":1,"first_name":"Joe","last_name":"Doe"}]}}"###
-        );
-
-        Ok(())
-    }
-
-    #[connector_test(exclude(Postgres))]
-    async fn with_duplicates_other(runner: Runner) -> TestResult<()> {
-        test_user(&runner, r#"{ id: 1, first_name: "Joe", last_name: "Doe", email: "1" }"#).await?;
-        test_user(
+        match_connector_result!(
             &runner,
-            r#"{ id: 2, first_name: "Hans", last_name: "Wurst", email: "2" }"#,
-        )
-        .await?;
-        test_user(&runner, r#"{ id: 3, first_name: "Joe", last_name: "Doe", email: "3" }"#).await?;
-
-        insta::assert_snapshot!(run_query!(
-                &runner,
-                indoc!("{
-                    findManyUser(distinct: [first_name, last_name])
-                    { id, first_name, last_name }
-                }")
-            ),
-            @r###"{"data":{"findManyUser":[{"id":1,"first_name":"Joe","last_name":"Doe"},{"id":2,"first_name":"Hans","last_name":"Wurst"}]}}"###
+            indoc!("{
+                findManyUser(distinct: [first_name, last_name])
+                { id, first_name, last_name }
+            }"),
+            Postgres(_) => r###"{"data":{"findManyUser":[{"id":2,"first_name":"Hans","last_name":"Wurst"},{"id":1,"first_name":"Joe","last_name":"Doe"}]}}"###,
+            _ => r###"{"data":{"findManyUser":[{"id":1,"first_name":"Joe","last_name":"Doe"},{"id":2,"first_name":"Hans","last_name":"Wurst"}]}}"###
         );
 
         Ok(())
@@ -215,8 +173,8 @@ mod distinct {
     }
 
     /// Mut return only distinct records for top record, and only for those the distinct relation records.
-    #[connector_test(only(Postgres))]
-    async fn nested_distinct_pg(runner: Runner) -> TestResult<()> {
+    #[connector_test]
+    async fn nested_distinct(runner: Runner) -> TestResult<()> {
         nested_dataset(&runner).await?;
 
         // Returns Users 1, 3, 4, 5 top
@@ -224,44 +182,18 @@ mod distinct {
         // 4 => ["1"]
         // 3 => []
         // 5 => ["2", "3"]
-        insta::assert_snapshot!(run_query!(
-                &runner,
-                indoc!("{
-                    findManyUser(distinct: [first_name, last_name])
-                    {
-                        id
-                        posts(distinct: [title], orderBy: { id: asc }) {
-                            title
-                        }
-                    }}")
-            ),
-            @r###"{"data":{"findManyUser":[{"id":1,"posts":[{"title":"3"},{"title":"1"},{"title":"2"}]},{"id":4,"posts":[{"title":"1"}]},{"id":3,"posts":[]},{"id":5,"posts":[{"title":"2"},{"title":"3"}]}]}}"###
-        );
-
-        Ok(())
-    }
-
-    #[connector_test(exclude(Postgres))]
-    async fn nested_distinct_other(runner: Runner) -> TestResult<()> {
-        nested_dataset(&runner).await?;
-
-        // Returns Users 1, 3, 4, 5 top
-        // 1 => ["3", "1", "2"]
-        // 3 => []
-        // 4 => ["1"]
-        // 5 => ["2", "3"]
-        insta::assert_snapshot!(run_query!(
-                &runner,
-                indoc!("{
-                    findManyUser(distinct: [first_name, last_name])
-                    {
-                        id
-                        posts(distinct: [title], orderBy: { id: asc }) {
-                            title
-                        }
-                    }}")
-            ),
-            @r###"{"data":{"findManyUser":[{"id":1,"posts":[{"title":"3"},{"title":"1"},{"title":"2"}]},{"id":3,"posts":[]},{"id":4,"posts":[{"title":"1"}]},{"id":5,"posts":[{"title":"2"},{"title":"3"}]}]}}"###
+        match_connector_result!(
+            &runner,
+            indoc!("{
+                findManyUser(distinct: [first_name, last_name])
+                {
+                    id
+                    posts(distinct: [title], orderBy: { id: asc }) {
+                        title
+                    }
+                }}"),
+            Postgres(_) => r###"{"data":{"findManyUser":[{"id":1,"posts":[{"title":"3"},{"title":"1"},{"title":"2"}]},{"id":4,"posts":[{"title":"1"}]},{"id":3,"posts":[]},{"id":5,"posts":[{"title":"2"},{"title":"3"}]}]}}"###,
+            _ => r###"{"data":{"findManyUser":[{"id":1,"posts":[{"title":"3"},{"title":"1"},{"title":"2"}]},{"id":3,"posts":[]},{"id":4,"posts":[{"title":"1"}]},{"id":5,"posts":[{"title":"2"},{"title":"3"}]}]}}"###
         );
 
         Ok(())
