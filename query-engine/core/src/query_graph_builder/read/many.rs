@@ -41,6 +41,7 @@ fn find_many_with_options(
     let selected_fields = utils::merge_cursor_fields(selected_fields, &args.cursor);
 
     let relation_load_strategy = get_relation_load_strategy(
+        args.relation_load_strategy,
         args.cursor.as_ref(),
         args.distinct.as_ref(),
         &nested,
