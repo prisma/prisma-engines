@@ -221,8 +221,8 @@ impl<'a> TryFrom<ParsedInputValue<'a>> for RelationLoadStrategy {
         let prisma_value = PrismaValue::try_from(value)?;
 
         match prisma_value {
-            PrismaValue::String(s) if s == load_strategy::JOIN => Ok(RelationLoadStrategy::Join),
-            PrismaValue::String(s) if s == load_strategy::QUERY => Ok(RelationLoadStrategy::Query),
+            PrismaValue::Enum(e) if e == load_strategy::JOIN => Ok(RelationLoadStrategy::Join),
+            PrismaValue::Enum(e) if e == load_strategy::QUERY => Ok(RelationLoadStrategy::Query),
             v => Err(ValidationError::unexpected_runtime_error(format!(
                 "Attempted conversion of ParsedInputValue ({v:?}) into relation load strategy enum value failed."
             ))),
