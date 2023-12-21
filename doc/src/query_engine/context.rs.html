@@ -193,14 +193,14 @@
             <span class="kw">let </span>preview_features = config.preview_features();
 
             <span class="comment">// We only support one data source at the moment, so take the first one (default not exposed yet).
-            </span><span class="kw">let </span>data_source = config
+            </span><span class="kw">let </span>datasource = config
                 .datasources
                 .first()
                 .ok_or_else(|| PrismaError::ConfigurationError(<span class="string">&quot;No valid data source found&quot;</span>.into()))<span class="question-mark">?</span>;
 
-            <span class="kw">let </span>url = data_source.load_url(|key| env::var(key).ok())<span class="question-mark">?</span>;
+            <span class="kw">let </span>url = datasource.load_url(|key| env::var(key).ok())<span class="question-mark">?</span>;
             <span class="comment">// Load executor
-            </span><span class="kw">let </span>executor = load_executor(ConnectorKind::Rust { url }, data_source, preview_features).<span class="kw">await</span><span class="question-mark">?</span>;
+            </span><span class="kw">let </span>executor = load_executor(ConnectorKind::Rust { url, datasource }, preview_features).<span class="kw">await</span><span class="question-mark">?</span>;
             executor.primary_connector().get_connection().<span class="kw">await</span><span class="question-mark">?</span>;
             PrismaResult::&lt;<span class="kw">_</span>&gt;::Ok(executor)
         });

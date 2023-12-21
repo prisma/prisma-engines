@@ -137,36 +137,6 @@
 <a href="#137" id="137">137</a>
 <a href="#138" id="138">138</a>
 <a href="#139" id="139">139</a>
-<a href="#140" id="140">140</a>
-<a href="#141" id="141">141</a>
-<a href="#142" id="142">142</a>
-<a href="#143" id="143">143</a>
-<a href="#144" id="144">144</a>
-<a href="#145" id="145">145</a>
-<a href="#146" id="146">146</a>
-<a href="#147" id="147">147</a>
-<a href="#148" id="148">148</a>
-<a href="#149" id="149">149</a>
-<a href="#150" id="150">150</a>
-<a href="#151" id="151">151</a>
-<a href="#152" id="152">152</a>
-<a href="#153" id="153">153</a>
-<a href="#154" id="154">154</a>
-<a href="#155" id="155">155</a>
-<a href="#156" id="156">156</a>
-<a href="#157" id="157">157</a>
-<a href="#158" id="158">158</a>
-<a href="#159" id="159">159</a>
-<a href="#160" id="160">160</a>
-<a href="#161" id="161">161</a>
-<a href="#162" id="162">162</a>
-<a href="#163" id="163">163</a>
-<a href="#164" id="164">164</a>
-<a href="#165" id="165">165</a>
-<a href="#166" id="166">166</a>
-<a href="#167" id="167">167</a>
-<a href="#168" id="168">168</a>
-<a href="#169" id="169">169</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span><span class="kw">super</span>::connection::SqlConnection;
 <span class="kw">use </span>async_trait::async_trait;
 <span class="kw">use </span>connector_interface::{
@@ -174,35 +144,11 @@
     error::{ConnectorError, ErrorKind},
     Connection, Connector,
 };
-<span class="kw">use </span>once_cell::sync::Lazy;
 <span class="kw">use </span>quaint::{
     connector::{ExternalConnector, IsolationLevel, Transaction},
     prelude::{Queryable <span class="kw">as </span>QuaintQueryable, <span class="kw-2">*</span>},
 };
-<span class="kw">use </span>std::sync::{Arc, Mutex};
-
-<span class="doccomment">/// TODO: evaluate turning this into `Lazy&lt;Mutex&lt;Option&lt;Arc&lt;DriverAdapter&gt;&gt;&gt;&gt;` to avoid
-/// a clone+drop on the adapter passed via `Js::from_source`.
-/// Note: this is currently blocked by Napi causing linking errors when building test binaries,
-/// as commented in [`DriverAdapter`].
-</span><span class="kw">static </span>ACTIVE_DRIVER_ADAPTER: Lazy&lt;Mutex&lt;<span class="prelude-ty">Option</span>&lt;DriverAdapter&gt;&gt;&gt; = Lazy::new(|| Mutex::new(<span class="prelude-val">None</span>));
-
-<span class="kw">fn </span>active_driver_adapter(provider: <span class="kw-2">&amp;</span>str) -&gt; connector::Result&lt;DriverAdapter&gt; {
-    <span class="kw">let </span>lock = ACTIVE_DRIVER_ADAPTER.lock().unwrap();
-
-    lock.as_ref()
-        .map(|conn_ref| conn_ref.to_owned())
-        .ok_or(ConnectorError::from_kind(ErrorKind::UnsupportedConnector(<span class="macro">format!</span>(
-            <span class="string">&quot;A driver adapter for {} was not registered&quot;</span>,
-            provider
-        ))))
-}
-
-<span class="kw">pub fn </span>activate_driver_adapter(connector: Arc&lt;<span class="kw">dyn </span>ExternalConnector&gt;) {
-    <span class="kw">let </span><span class="kw-2">mut </span>lock = ACTIVE_DRIVER_ADAPTER.lock().unwrap();
-
-    <span class="kw-2">*</span>lock = <span class="prelude-val">Some</span>(DriverAdapter { connector });
-}
+<span class="kw">use </span>std::sync::Arc;
 
 <span class="kw">pub struct </span>Js {
     connector: DriverAdapter,
@@ -211,9 +157,10 @@
 }
 
 <span class="kw">impl </span>Js {
-    <span class="kw">pub async fn </span>new(source: <span class="kw-2">&amp;</span>psl::Datasource, features: psl::PreviewFeatures) -&gt; connector_interface::Result&lt;<span class="self">Self</span>&gt; {
-        <span class="kw">let </span>connector = active_driver_adapter(source.active_provider)<span class="question-mark">?</span>;
-
+    <span class="kw">pub async fn </span>new(
+        connector: Arc&lt;<span class="kw">dyn </span>ExternalConnector&gt;,
+        features: psl::PreviewFeatures,
+    ) -&gt; connector_interface::Result&lt;<span class="self">Self</span>&gt; {
         <span class="kw">let </span>external_conn_info = connector.get_connection_info().<span class="kw">await</span>.map_err(|e| <span class="kw">match </span>e.kind() {
             <span class="kw-2">&amp;</span>quaint::error::ErrorKind::ExternalError(id) =&gt; ConnectorError::from_kind(ErrorKind::ExternalError(id)),
             <span class="kw">_ </span>=&gt; ConnectorError::from_kind(ErrorKind::InvalidDriverAdapter(
@@ -222,7 +169,7 @@
         })<span class="question-mark">?</span>;
 
         <span class="prelude-val">Ok</span>(Js {
-            connector,
+            connector: DriverAdapter { connector },
             features,
             connection_info: ConnectionInfo::External(external_conn_info),
         })
@@ -266,13 +213,6 @@
 </span><span class="attr">#[derive(Clone)]
 </span><span class="kw">pub struct </span>DriverAdapter {
     connector: Arc&lt;<span class="kw">dyn </span>ExternalConnector&gt;,
-}
-
-<span class="attr">#[async_trait]
-</span><span class="kw">impl </span>ExternalConnector <span class="kw">for </span>DriverAdapter {
-    <span class="kw">async fn </span>get_connection_info(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; quaint::Result&lt;ExternalConnectionInfo&gt; {
-        <span class="self">self</span>.connector.get_connection_info().<span class="kw">await
-    </span>}
 }
 
 <span class="attr">#[async_trait]
