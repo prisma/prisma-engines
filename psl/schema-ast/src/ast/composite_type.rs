@@ -1,3 +1,5 @@
+use serde::{Deserialize, Serialize};
+
 use crate::ast::{Comment, Field, FieldId, Identifier, SchemaAst, Span};
 
 use super::{WithDocumentation, WithIdentifier};
@@ -7,7 +9,7 @@ use super::{WithDocumentation, WithIdentifier};
 ///
 /// A composite type has no definition in the database schema, and is completely
 /// a Prisma concept. It gives type-safety to dynamic data such as JSON.
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct CompositeType {
     /// The name of the type.
     ///

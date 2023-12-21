@@ -1,9 +1,11 @@
+use serde::{Deserialize, Serialize};
+
 use super::{ArgumentsList, Identifier, Span, WithIdentifier, WithSpan};
 use std::ops::Index;
 
 /// An attribute (following `@` or `@@``) on a model, model field, enum, enum value or composite
 /// type field.
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Attribute {
     /// The name of the attribute:
     ///

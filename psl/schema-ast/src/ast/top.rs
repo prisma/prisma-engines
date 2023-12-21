@@ -1,7 +1,9 @@
+use serde::{Deserialize, Serialize};
+
 use crate::ast::{traits::WithSpan, CompositeType, Enum, GeneratorConfig, Identifier, Model, SourceConfig, Span};
 
 /// Enum for distinguishing between top-level entries
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub enum Top {
     /// A composite type
     CompositeType(CompositeType),

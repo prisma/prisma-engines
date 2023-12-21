@@ -32,6 +32,7 @@ pub use indentation_type::IndentationType;
 pub use model::{FieldId, Model};
 pub use newline_type::NewlineType;
 pub use r#enum::{Enum, EnumValue, EnumValueId};
+use serde::{Deserialize, Serialize};
 pub use source_config::SourceConfig;
 pub use top::Top;
 pub use traits::{WithAttributes, WithDocumentation, WithIdentifier, WithName, WithSpan};
@@ -45,7 +46,7 @@ pub use traits::{WithAttributes, WithDocumentation, WithIdentifier, WithName, Wi
 /// annotated with its location in the text representation.
 /// Basically, the AST is an object oriented representation of the datamodel's text.
 /// Schema = Datamodel + Generators + Datasources
-#[derive(Debug)]
+#[derive(Debug, Serialize, Deserialize)]
 pub struct SchemaAst {
     /// All models, enums, composite types, datasources, generators and type aliases.
     pub tops: Vec<Top>,

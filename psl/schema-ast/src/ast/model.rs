@@ -1,3 +1,5 @@
+use serde::{Deserialize, Serialize};
+
 use super::{Attribute, Comment, Field, Identifier, Span, WithAttributes, WithDocumentation, WithIdentifier, WithSpan};
 
 /// An opaque identifier for a field in an AST model. Use the
@@ -21,7 +23,7 @@ impl std::ops::Index<FieldId> for Model {
 }
 
 /// A model declaration.
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Model {
     /// The name of the model.
     ///

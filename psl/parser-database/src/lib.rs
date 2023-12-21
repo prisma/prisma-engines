@@ -39,6 +39,7 @@ mod types;
 pub use coerce_expression::{coerce, coerce_array, coerce_opt};
 pub use names::is_reserved_type_name;
 pub use relations::{ManyToManyRelationId, ReferentialAction, RelationId};
+use schema_ast::ast::SchemaAst;
 pub use schema_ast::{ast, SourceFile};
 pub use types::{
     IndexAlgorithm, IndexFieldPath, IndexType, OperatorClass, RelationFieldId, ScalarFieldId, ScalarFieldType,
@@ -70,7 +71,7 @@ use names::Names;
 ///   Currently only index name collisions.
 pub struct ParserDatabase {
     ast: ast::SchemaAst,
-    file: schema_ast::SourceFile,
+    file: Option<schema_ast::SourceFile>,
     interner: interner::StringInterner,
     names: Names,
     types: Types,
@@ -81,7 +82,11 @@ impl ParserDatabase {
     /// See the docs on [ParserDatabase](/struct.ParserDatabase.html).
     pub fn new(file: schema_ast::SourceFile, diagnostics: &mut Diagnostics) -> Self {
         let ast = schema_ast::parse_schema(file.as_str(), diagnostics);
+        Self::from_ast(ast, diagnostics, Some(file))
+    }
 
+    /// Construct database from AST
+    pub fn from_ast(ast: SchemaAst, diagnostics: &mut Diagnostics, file: Option<SourceFile>) -> Self {
         let mut interner = Default::default();
         let mut names = Default::default();
         let mut types = Default::default();
@@ -157,7 +162,8 @@ impl ParserDatabase {
 
     /// The source file contents.
     pub fn source(&self) -> &str {
-        self.file.as_str()
+        ""
+        //self.file.as_str()
     }
 }
 

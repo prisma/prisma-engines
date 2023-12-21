@@ -1,5 +1,7 @@
+use serde::{Deserialize, Serialize};
+
 /// Represents a location in a datamodel's text representation.
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
 pub struct Span {
     pub start: usize,
     pub end: usize,

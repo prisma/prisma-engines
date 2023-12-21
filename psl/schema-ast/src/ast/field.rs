@@ -1,9 +1,11 @@
+use serde::{Deserialize, Serialize};
+
 use super::{
     Attribute, Comment, Identifier, Span, WithAttributes, WithDocumentation, WithIdentifier, WithName, WithSpan,
 };
 
 /// A field definition in a model or a composite type.
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Field {
     /// The field's type.
     ///
@@ -92,7 +94,7 @@ impl WithDocumentation for Field {
 }
 
 /// An arity of a data model field.
-#[derive(Copy, Debug, Clone, PartialEq, Eq, Hash)]
+#[derive(Copy, Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
 pub enum FieldArity {
     /// The field either must be in an insert statement, or the field must have
     /// a default value for the insert to succeed.
@@ -130,7 +132,7 @@ impl FieldArity {
     }
 }
 
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub enum FieldType {
     Supported(Identifier),
     /// Unsupported("...")

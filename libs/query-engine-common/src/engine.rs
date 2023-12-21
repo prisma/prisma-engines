@@ -107,7 +107,7 @@ pub struct ConstructorOptionsNative {
 #[cfg_attr(target_arch = "wasm32", tsify(from_wasm_abi))]
 #[serde(rename_all = "camelCase")]
 pub struct ConstructorOptions {
-    pub datamodel: String,
+    pub datamodel: Vec<u8>,
     pub log_level: String,
     #[serde(default)]
     pub log_queries: bool,

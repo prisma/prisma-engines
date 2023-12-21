@@ -1,7 +1,9 @@
+use serde::{Deserialize, Serialize};
+
 use super::{Comment, ConfigBlockProperty, Identifier, Span, WithDocumentation, WithIdentifier, WithSpan};
 
 /// A source block declaration.
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct SourceConfig {
     /// Name of this source.
     pub name: Identifier,
