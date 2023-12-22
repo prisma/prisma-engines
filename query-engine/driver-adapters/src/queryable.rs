@@ -45,9 +45,9 @@ impl JsBaseQueryable {
     /// visit a quaint query AST according to the provider of the JS connector
     fn visit_quaint_query<'a>(&self, q: QuaintQuery<'a>) -> quaint::Result<(String, Vec<quaint::Value<'a>>)> {
         match self.provider {
-            AdapterFlavour::Mysql => visitor::Mysql::build(q),
-            AdapterFlavour::Postgres => visitor::Postgres::build(q),
             AdapterFlavour::Sqlite => visitor::Sqlite::build(q),
+            // AdapterFlavour::Mysql => visitor::Mysql::build(q),
+            // AdapterFlavour::Postgres => visitor::Postgres::build(q),
         }
     }
 
@@ -55,9 +55,9 @@ impl JsBaseQueryable {
         let sql: String = sql.to_string();
 
         let converter = match self.provider {
-            AdapterFlavour::Postgres => conversion::postgres::value_to_js_arg,
             AdapterFlavour::Sqlite => conversion::sqlite::value_to_js_arg,
-            AdapterFlavour::Mysql => conversion::mysql::value_to_js_arg,
+            // AdapterFlavour::Postgres => conversion::postgres::value_to_js_arg,
+            // AdapterFlavour::Mysql => conversion::mysql::value_to_js_arg,
         };
 
         let args = values
@@ -142,8 +142,9 @@ impl QuaintQueryable for JsBaseQueryable {
 
     fn requires_isolation_first(&self) -> bool {
         match self.provider {
-            AdapterFlavour::Mysql => true,
-            AdapterFlavour::Postgres | AdapterFlavour::Sqlite => false,
+            AdapterFlavour::Sqlite => false,
+            // AdapterFlavour::Mysql => true,
+            // AdapterFlavour::Postgres => false,
         }
     }
 }
