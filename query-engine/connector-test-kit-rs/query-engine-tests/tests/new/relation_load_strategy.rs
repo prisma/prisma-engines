@@ -346,4 +346,25 @@ mod relation_load_strategy {
         "#,
         r#"{"data":{"upsertOneUser":{"login":"ardent commenter","comments":[{"post":{"title":"first post"},"body":"a comment"}]}}}"#
     );
+
+    #[connector_test]
+    async fn test_no_strategy_in_nested_relations(runner: Runner) -> TestResult<()> {
+        let query = r#"
+            query {
+                findManyUser {
+                    id
+                    posts(relationLoadStrategy: query) {
+                        comments {
+                            id
+                        }
+                    }
+                }
+            }
+        "#;
+
+        let res = runner.query(query.to_owned()).await?;
+        res.assert_failure(2009, Some("Argument does not exist in enclosing type".to_owned()));
+
+        Ok(())
+    }
 }
