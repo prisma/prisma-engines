@@ -69,10 +69,13 @@ pub struct Enum {
     ///   Value2
     /// }
     /// ```
+    #[serde(skip)]
     pub(crate) documentation: Option<Comment>,
     /// The location of this enum in the text representation.
+    #[serde(skip)]
     pub span: Span,
     /// The span of the inner contents.
+    #[serde(skip)]
     pub inner_span: Span,
 }
 
@@ -115,8 +118,10 @@ pub struct EnumValue {
     /// The name of the enum value as it will be exposed by the api.
     pub name: Identifier,
     pub attributes: Vec<Attribute>,
+    #[serde(skip)]
     pub(crate) documentation: Option<Comment>,
     /// The location of this enum value in the text representation.
+    #[serde(skip)]
     pub span: Span,
 }
 

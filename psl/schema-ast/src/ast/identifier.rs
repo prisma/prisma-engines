@@ -8,6 +8,7 @@ pub struct Identifier {
     /// The identifier contents.
     pub name: String,
     /// The span of the AST node.
+    #[serde(skip)]
     pub span: Span,
 }
 

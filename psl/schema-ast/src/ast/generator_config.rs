@@ -11,8 +11,10 @@ pub struct GeneratorConfig {
     /// Top-level configuration properties for this generator.
     pub properties: Vec<ConfigBlockProperty>,
     /// The comments for this generator block.
+    #[serde(skip)]
     pub(crate) documentation: Option<Comment>,
     /// The location of this generator block in the text representation.
+    #[serde(skip)]
     pub span: Span,
 }
 

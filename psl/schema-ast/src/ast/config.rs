@@ -31,6 +31,7 @@ pub struct ConfigBlockProperty {
     /// ```
     pub value: Option<Expression>,
     /// The node span.
+    #[serde(skip)]
     pub span: Span,
 }
 

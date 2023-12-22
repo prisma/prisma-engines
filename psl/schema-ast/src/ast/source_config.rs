@@ -10,10 +10,13 @@ pub struct SourceConfig {
     /// Top-level configuration properties for this source.
     pub properties: Vec<ConfigBlockProperty>,
     /// The comments for this source block.
+    #[serde(skip)]
     pub(crate) documentation: Option<Comment>,
     /// The location of this source block in the text representation.
+    #[serde(skip)]
     pub span: Span,
     /// The span of the inner contents.
+    #[serde(skip)]
     pub inner_span: Span,
 }
 

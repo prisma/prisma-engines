@@ -53,6 +53,7 @@ pub struct Argument {
     /// ```
     pub value: Expression,
     /// Location of the argument in the text representation.
+    #[serde(skip)]
     pub span: Span,
 }
 

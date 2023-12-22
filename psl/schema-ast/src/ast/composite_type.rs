@@ -36,10 +36,13 @@ pub struct CompositeType {
     ///   bar String
     /// }
     /// ```
+    #[serde(skip)]
     pub(crate) documentation: Option<Comment>,
     /// The location of this type in the text representation.
+    #[serde(skip)]
     pub span: Span,
     /// The span of the inner contents.
+    #[serde(skip)]
     pub inner_span: Span,
 }
 

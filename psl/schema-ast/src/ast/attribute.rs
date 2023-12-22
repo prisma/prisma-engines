@@ -22,6 +22,7 @@ pub struct Attribute {
     /// ```
     pub arguments: ArgumentsList,
     /// The AST span of the node.
+    #[serde(skip)]
     pub span: Span,
 }
 

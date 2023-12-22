@@ -67,6 +67,7 @@ pub struct Model {
     ///   field String
     /// }
     /// ```
+    #[serde(skip)]
     pub(crate) documentation: Option<Comment>,
     /// Is the model defined as a view in the database.
     ///

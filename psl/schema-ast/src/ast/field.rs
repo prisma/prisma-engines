@@ -37,8 +37,10 @@ pub struct Field {
     ///     ^^^^^^^^^^^
     /// name String @id @default("lol")
     /// ```
+    #[serde(skip)]
     pub(crate) documentation: Option<Comment>,
     /// The location of this field in the text representation.
+    #[serde(skip)]
     pub(crate) span: Span,
 }
 
