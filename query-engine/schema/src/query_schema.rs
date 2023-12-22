@@ -14,6 +14,23 @@ enum Operation {
 
 type LazyField = Box<dyn for<'a> Fn(&'a QuerySchema) -> OutputField<'a> + Send + Sync>;
 
+const CAPABILITIES: ConnectorCapabilities = enumflags2::make_bitflags!(ConnectorCapability::{
+    AnyId |
+    AutoIncrement |
+    CompoundIds |
+    SqlQueryRaw |
+    RelationFieldsInArbitraryOrder |
+    UpdateableId |
+    ImplicitManyToManyRelation |
+    DecimalType |
+    BackwardCompatibleQueryRaw |
+    OrderByNullsFirstLast |
+    SupportsTxIsolationSerializable |
+    NativeUpsert |
+    FilteredInlineChildNestedToOneDisconnect |
+    RowIn
+});
+
 /// The query schema defines which operations (query/mutations) are possible on a database, based
 /// on a Prisma schema.
 ///
@@ -101,7 +118,7 @@ impl QuerySchema {
     }
 
     pub fn has_capability(&self, capability: ConnectorCapability) -> bool {
-        self.connector.has_capability(capability)
+        CAPABILITIES.contains(capability)
     }
 
     pub fn capabilities(&self) -> ConnectorCapabilities {

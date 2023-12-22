@@ -4504,6 +4504,7 @@ name = "schema"
 version = "0.1.0"
 dependencies = [
  "codspeed-criterion-compat",
+ "enumflags2",
  "once_cell",
  "psl",
  "query-structure",
