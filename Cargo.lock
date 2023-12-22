@@ -672,6 +672,7 @@ version = "0.1.0"
 dependencies = [
  "bincode",
  "psl",
+ "serde",
 ]
 
 [[package]]
