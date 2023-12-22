@@ -309,7 +309,7 @@ pub async fn delete_record<'conn>(
     .instrument(span)
     .await?
     .ok_or(MongoError::RecordDoesNotExist {
-        cause: "Record to delete does not exist".to_owned(),
+        cause: "Record to delete does not exist.".to_owned(),
     })?;
 
     let meta_mapping = output_meta::from_selected_fields(&selected_fields, &[]);

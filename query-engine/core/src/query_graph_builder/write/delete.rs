@@ -147,12 +147,22 @@ pub fn delete_many_records(
 /// 1. Connector supports such operations
 /// 2. The selection set contains no relation
 fn can_use_atomic_delete(query_schema: &QuerySchema, model: &Model, field: &ParsedField<'_>) -> bool {
-    // TODO laplab: check that the filter does not contain any predicates on relations if we are on MongoDB.
     if !query_schema.has_capability(ConnectorCapability::DeleteReturning) {
         return false;
     }
 
     if field.has_nested_selection() {
+        return false;
+    }
+
+    let relations_selected = field
+        .nested_fields
+        .as_ref()
+        .unwrap()
+        .fields
+        .iter()
+        .any(|pair| pair.schema_field.maps_to_relation());
+    if relations_selected && !query_schema.has_capability(ConnectorCapability::SupportsFiltersOnRelationsWithoutJoins) {
         return false;
     }
 
