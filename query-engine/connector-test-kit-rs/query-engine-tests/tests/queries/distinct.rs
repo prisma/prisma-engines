@@ -43,12 +43,12 @@ mod distinct {
             &runner,
             indoc!(
                 "{
-                        findManyUser(distinct: [first_name, last_name])
-                        { id, first_name, last_name }
-                    }"
+                    findManyUser(distinct: [first_name, last_name])
+                    { id }
+                }"
             ),
-            Postgres(_) => r###"{"data":{"findManyUser":[{"id":2,"first_name":"Doe","last_name":"Joe"},{"id":1,"first_name":"Joe","last_name":"Doe"}]}}"###,
-            _ => r###"{"data":{"findManyUser":[{"id":1,"first_name":"Joe","last_name":"Doe"},{"id":2,"first_name":"Doe","last_name":"Joe"}]}}"###
+            Postgres(_) => r###"{"data":{"findManyUser":[{"id":2},{"id":1}]}}"###,
+            _ => r###"{"data":{"findManyUser":[{"id":1},{"id":2}]}}"###
         );
 
         Ok(())
