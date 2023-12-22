@@ -362,8 +362,8 @@ mod relation_load_strategy {
             }
         "#;
 
-        let res = runner.query(query.to_owned()).await?;
-        res.assert_failure(2009, Some("Argument does not exist in enclosing type".to_owned()));
+        let res = runner.query(query).await?;
+        res.assert_failure(2009, Some("Argument does not exist in enclosing type".into()));
 
         Ok(())
     }
