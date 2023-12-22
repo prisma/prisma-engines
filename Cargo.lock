@@ -3831,6 +3831,7 @@ dependencies = [
  "indoc 2.0.3",
  "insta",
  "once_cell",
+ "paste",
  "prisma-value",
  "psl",
  "query-engine-metrics",
