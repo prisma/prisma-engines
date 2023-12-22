@@ -25,7 +25,7 @@ mod relation_load_strategy {
                 body     String
                 post     Post   @relation(fields: [postId], references: [id], onDelete: Cascade)
                 postId   Int
-                author   User   @relation(fields: [authorId], references: [id], onDelete: Cascade)
+                author   User   @relation(fields: [authorId], references: [id], onDelete: NoAction, onUpdate: NoAction)
                 authorId Int
             }
         "#}
