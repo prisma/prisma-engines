@@ -187,12 +187,6 @@
 <a href="#187" id="187">187</a>
 <a href="#188" id="188">188</a>
 <a href="#189" id="189">189</a>
-<a href="#190" id="190">190</a>
-<a href="#191" id="191">191</a>
-<a href="#192" id="192">192</a>
-<a href="#193" id="193">193</a>
-<a href="#194" id="194">194</a>
-<a href="#195" id="195">195</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::send_future::UnsafeFuture;
 <span class="kw">use </span><span class="kw">crate</span>::types::JsConnectionInfo;
 <span class="kw">pub use </span><span class="kw">crate</span>::types::{ColumnType, JSResultSet, Query, TransactionOptions};
@@ -205,13 +199,9 @@
 <span class="kw">use </span>metrics::increment_gauge;
 <span class="kw">use </span>std::sync::atomic::{AtomicBool, Ordering};
 
-<span class="attr">#[cfg(target_arch = <span class="string">&quot;wasm32&quot;</span>)]
-</span><span class="kw">use </span>wasm_bindgen::prelude::wasm_bindgen;
-
 <span class="doccomment">/// Proxy is a struct wrapping a javascript object that exhibits basic primitives for
 /// querying and executing SQL (i.e. a client connector). The Proxy uses Napi/Wasm&#39;s JsFunction
 /// to invoke the code within the node runtime that implements the client connector.
-</span><span class="attr">#[cfg_attr(target_arch = <span class="string">&quot;wasm32&quot;</span>, wasm_bindgen(getter_with_clone))]
 </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>CommonProxy {
     <span class="doccomment">/// Execute a query given as SQL, interpolating the given parameters.
     </span>query_raw: AdapterMethod&lt;Query, JSResultSet&gt;,
@@ -226,7 +216,6 @@
 
 <span class="doccomment">/// This is a JS proxy for accessing the methods specific to top level
 /// JS driver objects
-</span><span class="attr">#[cfg_attr(target_arch = <span class="string">&quot;wasm32&quot;</span>, wasm_bindgen(getter_with_clone))]
 </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>DriverProxy {
     start_transaction: AdapterMethod&lt;(), JsTransaction&gt;,
     get_connection_info: <span class="prelude-ty">Option</span>&lt;AdapterMethod&lt;(), JsConnectionInfo&gt;&gt;,
@@ -234,7 +223,6 @@
 
 <span class="doccomment">/// This a JS proxy for accessing the methods, specific
 /// to JS transaction objects
-</span><span class="attr">#[cfg_attr(target_arch = <span class="string">&quot;wasm32&quot;</span>, wasm_bindgen(getter_with_clone))]
 </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>TransactionProxy {
     <span class="doccomment">/// transaction options
     </span>options: TransactionOptions,

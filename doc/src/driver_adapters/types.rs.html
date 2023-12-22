@@ -259,12 +259,6 @@
 <a href="#259" id="259">259</a>
 <a href="#260" id="260">260</a>
 <a href="#261" id="261">261</a>
-<a href="#262" id="262">262</a>
-<a href="#263" id="263">263</a>
-<a href="#264" id="264">264</a>
-<a href="#265" id="265">265</a>
-<a href="#266" id="266">266</a>
-<a href="#267" id="267">267</a>
 </pre></div><pre class="rust"><code><span class="attr">#![allow(unused_imports)]
 
 </span><span class="kw">use </span>std::str::FromStr;
@@ -280,8 +274,7 @@
 <span class="kw">use </span>serde::{Deserialize, Serialize};
 <span class="kw">use </span>serde_repr::{Deserialize_repr, Serialize_repr};
 
-<span class="attr">#[cfg_attr(target_arch = <span class="string">&quot;wasm32&quot;</span>, derive(Serialize, Deserialize, Tsify))]
-#[cfg_attr(target_arch = <span class="string">&quot;wasm32&quot;</span>, tsify(into_wasm_abi, from_wasm_abi))]
+<span class="attr">#[cfg_attr(target_arch = <span class="string">&quot;wasm32&quot;</span>, derive(Deserialize))]
 #[derive(Debug, Eq, PartialEq, Clone)]
 </span><span class="kw">pub enum </span>AdapterFlavour {
     Mysql,
@@ -313,8 +306,7 @@
 }
 
 <span class="attr">#[cfg_attr(not(target_arch = <span class="string">&quot;wasm32&quot;</span>), napi_derive::napi(object))]
-#[cfg_attr(target_arch = <span class="string">&quot;wasm32&quot;</span>, derive(Serialize, Deserialize, Tsify))]
-#[cfg_attr(target_arch = <span class="string">&quot;wasm32&quot;</span>, tsify(into_wasm_abi, from_wasm_abi))]
+#[cfg_attr(target_arch = <span class="string">&quot;wasm32&quot;</span>, derive(Deserialize))]
 #[cfg_attr(target_arch = <span class="string">&quot;wasm32&quot;</span>, serde(rename_all = <span class="string">&quot;camelCase&quot;</span>))]
 #[derive(Default)]
 </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>JsConnectionInfo {
@@ -358,8 +350,7 @@
 /// representing the Value in javascript.
 ///
 </span><span class="attr">#[cfg_attr(not(target_arch = <span class="string">&quot;wasm32&quot;</span>), napi_derive::napi(object))]
-#[cfg_attr(target_arch = <span class="string">&quot;wasm32&quot;</span>, derive(Serialize, Deserialize, Tsify))]
-#[cfg_attr(target_arch = <span class="string">&quot;wasm32&quot;</span>, tsify(into_wasm_abi, from_wasm_abi))]
+#[cfg_attr(target_arch = <span class="string">&quot;wasm32&quot;</span>, derive(Deserialize))]
 #[cfg_attr(target_arch = <span class="string">&quot;wasm32&quot;</span>, serde(rename_all = <span class="string">&quot;camelCase&quot;</span>))]
 #[derive(Debug)]
 </span><span class="kw">pub struct </span>JSResultSet {
@@ -377,8 +368,7 @@
 }
 
 <span class="attr">#[cfg_attr(not(target_arch = <span class="string">&quot;wasm32&quot;</span>), napi_derive::napi(object))]
-#[cfg_attr(target_arch = <span class="string">&quot;wasm32&quot;</span>, derive(Clone, Copy, Serialize_repr, Deserialize_repr, Tsify))]
-#[cfg_attr(target_arch = <span class="string">&quot;wasm32&quot;</span>, tsify(into_wasm_abi, from_wasm_abi))]
+#[cfg_attr(target_arch = <span class="string">&quot;wasm32&quot;</span>, derive(Clone, Copy, Deserialize_repr))]
 #[repr(u8)]
 #[derive(Debug)]
 </span><span class="kw">pub enum </span>ColumnType {
@@ -514,8 +504,7 @@
 }
 
 <span class="attr">#[cfg_attr(not(target_arch = <span class="string">&quot;wasm32&quot;</span>), napi_derive::napi(object))]
-#[cfg_attr(target_arch = <span class="string">&quot;wasm32&quot;</span>, derive(Serialize, Tsify))]
-#[cfg_attr(target_arch = <span class="string">&quot;wasm32&quot;</span>, tsify(into_wasm_abi))]
+#[cfg_attr(target_arch = <span class="string">&quot;wasm32&quot;</span>, derive(Serialize))]
 #[derive(Debug, Default)]
 </span><span class="kw">pub struct </span>Query {
     <span class="kw">pub </span>sql: String,
@@ -523,8 +512,7 @@
 }
 
 <span class="attr">#[cfg_attr(not(target_arch = <span class="string">&quot;wasm32&quot;</span>), napi_derive::napi(object))]
-#[cfg_attr(target_arch = <span class="string">&quot;wasm32&quot;</span>, derive(Serialize, Deserialize, Tsify))]
-#[cfg_attr(target_arch = <span class="string">&quot;wasm32&quot;</span>, tsify(into_wasm_abi, from_wasm_abi))]
+#[cfg_attr(target_arch = <span class="string">&quot;wasm32&quot;</span>, derive(Deserialize, Tsify))]
 #[cfg_attr(target_arch = <span class="string">&quot;wasm32&quot;</span>, serde(rename_all = <span class="string">&quot;camelCase&quot;</span>))]
 #[derive(Debug, Default)]
 </span><span class="kw">pub struct </span>TransactionOptions {
