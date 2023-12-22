@@ -11,6 +11,7 @@ pub mod mcf;
 mod common;
 mod configuration;
 mod reformat;
+mod set_config_dir;
 mod validate;
 
 pub use crate::{
@@ -23,13 +24,14 @@ pub use crate::{
 pub use diagnostics;
 pub use parser_database::{self, is_reserved_type_name};
 pub use schema_ast;
+pub use set_config_dir::set_config_dir;
 
 use self::validate::{datasource_loader, generator_loader};
 use diagnostics::Diagnostics;
 use parser_database::{ast, ParserDatabase, SourceFile};
 
 /// The collection of all available connectors.
-pub type ConnectorRegistry = &'static [&'static dyn datamodel_connector::Connector];
+pub type ConnectorRegistry<'a> = &'a [&'static dyn datamodel_connector::Connector];
 
 pub struct ValidatedSchema {
     pub configuration: Configuration,
@@ -53,7 +55,7 @@ impl ValidatedSchema {
 
 /// The most general API for dealing with Prisma schemas. It accumulates what analysis and
 /// validation information it can, and returns it along with any error and warning diagnostics.
-pub fn validate(file: SourceFile, connectors: ConnectorRegistry) -> ValidatedSchema {
+pub fn validate(file: SourceFile, connectors: ConnectorRegistry<'_>) -> ValidatedSchema {
     let mut diagnostics = Diagnostics::new();
     let db = ParserDatabase::new(file, &mut diagnostics);
     let configuration = validate_configuration(db.ast(), &mut diagnostics, connectors);
@@ -72,7 +74,7 @@ pub fn validate(file: SourceFile, connectors: ConnectorRegistry) -> ValidatedSch
 /// Retrieves a Prisma schema without validating it.
 /// You should only use this method when actually validating the schema is too expensive
 /// computationally or in terms of bundle size (e.g., for `query-engine-wasm`).
-pub fn parse_without_validation(file: SourceFile, connectors: ConnectorRegistry) -> ValidatedSchema {
+pub fn parse_without_validation(file: SourceFile, connectors: ConnectorRegistry<'_>) -> ValidatedSchema {
     let mut diagnostics = Diagnostics::new();
     let db = ParserDatabase::new(file, &mut diagnostics);
     let configuration = validate_configuration(db.ast(), &mut diagnostics, connectors);
@@ -91,7 +93,7 @@ pub fn parse_without_validation(file: SourceFile, connectors: ConnectorRegistry)
 /// Loads all configuration blocks from a datamodel using the built-in source definitions.
 pub fn parse_configuration(
     schema: &str,
-    connectors: ConnectorRegistry,
+    connectors: ConnectorRegistry<'_>,
 ) -> Result<Configuration, diagnostics::Diagnostics> {
     let mut diagnostics = Diagnostics::default();
     let ast = schema_ast::parse_schema(schema, &mut diagnostics);
@@ -102,7 +104,7 @@ pub fn parse_configuration(
 fn validate_configuration(
     schema_ast: &ast::SchemaAst,
     diagnostics: &mut Diagnostics,
-    connectors: ConnectorRegistry,
+    connectors: ConnectorRegistry<'_>,
 ) -> Configuration {
     let generators = generator_loader::load_generators_from_ast(schema_ast, diagnostics);
 

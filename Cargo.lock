@@ -3510,6 +3510,7 @@ version = "0.1.0"
 dependencies = [
  "bigdecimal",
  "chrono",
+ "connection-string",
  "diagnostics",
  "enumflags2",
  "indoc 2.0.3",

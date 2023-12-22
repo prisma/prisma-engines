@@ -5,4 +5,4 @@ packages:
   - '../../../prisma/packages/adapter-planetscale'
   - '../../../prisma/packages/driver-adapter-utils'
   - '../../../prisma/packages/debug'
-  - './connector-test-kit-executor'
+  - './executor'

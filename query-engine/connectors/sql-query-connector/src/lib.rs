@@ -24,7 +24,7 @@ use quaint::prelude::Queryable;
 
 pub use database::FromSource;
 #[cfg(feature = "driver-adapters")]
-pub use database::{activate_driver_adapter, Js};
+pub use database::Js;
 pub use error::SqlError;
 
 #[cfg(not(target_arch = "wasm32"))]
