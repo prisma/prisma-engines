@@ -33,7 +33,7 @@ hex = "0.4"
 quaint.workspace = true
 
 [target.'cfg(target_arch = "wasm32")'.dependencies]
-quaint = { path = "../../../quaint" }
+quaint = { path = "../../../quaint", default-features = false, features = ["postgresql"] }
 
 [dependencies.connector-interface]
 package = "query-connector"

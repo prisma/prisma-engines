@@ -11,7 +11,7 @@ backtrace = "0.3.40"
 tracing = "0.1"
 indoc.workspace = true
 itertools.workspace = true
-quaint = { path = "../../quaint", optional = true }
+quaint = { path = "../../quaint", optional = true, default-features = false, features = ["postgresql"] }
 
 [features]
 default = []

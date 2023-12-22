@@ -17,7 +17,7 @@ async-trait = "0.1"
 user-facing-errors = { path = "../../libs/user-facing-errors" }
 psl.workspace = true
 query-structure = { path = "../query-structure" }
-quaint = { path = "../../quaint" }
+quaint = { path = "../../quaint", default-features = false, features = ["postgresql"] }
 sql-connector = { path = "../connectors/sql-query-connector", package = "sql-query-connector" }
 request-handlers = { path = "../request-handlers", default-features = false, features = [
     "sql",
