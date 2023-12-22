@@ -18,8 +18,8 @@ use serde_repr::{Deserialize_repr, Serialize_repr};
 #[derive(Debug, Eq, PartialEq, Clone)]
 pub enum AdapterFlavour {
     Mysql,
-    Postgres,
-    Sqlite,
+    // Postgres,
+    // Sqlite,
 }
 
 impl FromStr for AdapterFlavour {
@@ -27,9 +27,9 @@ impl FromStr for AdapterFlavour {
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         match s {
-            "postgres" => Ok(Self::Postgres),
             "mysql" => Ok(Self::Mysql),
-            "sqlite" => Ok(Self::Sqlite),
+            // "postgres" => Ok(Self::Postgres),
+            // "sqlite" => Ok(Self::Sqlite),
             _ => Err(format!("Unsupported adapter flavour: {:?}", s)),
         }
     }
@@ -39,8 +39,8 @@ impl From<AdapterFlavour> for SqlFamily {
     fn from(value: AdapterFlavour) -> Self {
         match value {
             AdapterFlavour::Mysql => SqlFamily::Mysql,
-            AdapterFlavour::Postgres => SqlFamily::Postgres,
-            AdapterFlavour::Sqlite => SqlFamily::Sqlite,
+            // AdapterFlavour::Postgres => SqlFamily::Postgres,
+            // AdapterFlavour::Sqlite => SqlFamily::Sqlite,
         }
     }
 }
@@ -70,8 +70,8 @@ impl JsConnectionInfo {
     fn default_schema_name(&self, provider: &AdapterFlavour) -> &str {
         match provider {
             AdapterFlavour::Mysql => quaint::connector::DEFAULT_MYSQL_DB,
-            AdapterFlavour::Postgres => quaint::connector::DEFAULT_POSTGRES_SCHEMA,
-            AdapterFlavour::Sqlite => quaint::connector::DEFAULT_SQLITE_DATABASE,
+            // AdapterFlavour::Postgres => quaint::connector::DEFAULT_POSTGRES_SCHEMA,
+            // AdapterFlavour::Sqlite => quaint::connector::DEFAULT_SQLITE_DATABASE,
         }
     }
 }
