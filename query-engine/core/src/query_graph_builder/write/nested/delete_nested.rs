@@ -54,7 +54,7 @@ pub fn nested_delete(
             graph,
             query_schema,
             child_model,
-            &find_child_records_node,
+            Some(&find_child_records_node),
             &delete_many_node,
         )?;
 
@@ -111,7 +111,7 @@ pub fn nested_delete(
                 graph,
                 query_schema,
                 child_model,
-                &find_child_records_node,
+                Some(&find_child_records_node),
                 &delete_record_node,
             )?;
 
@@ -172,7 +172,7 @@ pub fn nested_delete_many(
             graph,
             query_schema,
             child_model,
-            &find_child_records_node,
+            Some(&find_child_records_node),
             &delete_many_node,
         )?;
 

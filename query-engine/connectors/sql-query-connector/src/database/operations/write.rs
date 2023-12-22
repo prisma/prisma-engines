@@ -418,13 +418,11 @@ pub(crate) async fn delete_record(
         .query(write::delete_returning(model, filter, &selected_fields, ctx))
         .await?;
 
-    let result_row = result_set
-        .into_iter()
-        // TODO laplab: error if more than one record was returned.
-        .next()
-        .ok_or(SqlError::RecordDoesNotExist {
-            cause: "Record to delete does not exist.".to_owned(),
-        })?;
+    let mut result_iter = result_set.into_iter();
+    let result_row = result_iter.next().ok_or(SqlError::RecordDoesNotExist {
+        cause: "Record to delete does not exist.".to_owned(),
+    })?;
+    debug_assert!(result_iter.next().is_none(), "Filter returned more than one row. This is a bug because we must always require `id` in filters for `deleteOne` mutations");
 
     let field_db_names: Vec<_> = selected_fields.db_names().collect();
     let types_and_arities = selected_fields.type_identifiers_with_arities();

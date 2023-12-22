@@ -190,7 +190,6 @@ pub(crate) fn chunk_update_with_ids(
     Ok(query)
 }
 
-// TODO laplab: why `Query` has `'static` lifetime?
 pub(crate) fn delete_returning(
     model: &Model,
     filter: ConditionTree<'static>,

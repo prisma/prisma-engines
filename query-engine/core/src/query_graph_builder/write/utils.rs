@@ -343,7 +343,7 @@ pub fn insert_existing_1to1_related_model_checks(
 
 /// Inserts emulated referential actions for `onDelete` into the graph.
 /// All relations that refer to the `model` row(s) being deleted are checked for their desired emulation and inserted accordingly.
-/// Right now, supported modes are `Restrict` and `SetNull` (cascade will follow).
+/// TODO laplab: update comment.
 /// Those checks fail at runtime and are inserted between `parent_node` and `child_node`.
 ///
 /// This function is usually part of a delete (`deleteOne` or `deleteMany`).
@@ -386,7 +386,7 @@ pub(crate) fn insert_emulated_on_delete(
     graph: &mut QueryGraph,
     query_schema: &QuerySchema,
     model_to_delete: &Model,
-    parent_node: &NodeRef,
+    parent_node: Option<&NodeRef>,
     child_node: &NodeRef,
 ) -> QueryGraphBuilderResult<()> {
     // If the connector uses the `RelationMode::ForeignKeys` mode, we do not do any checks / emulation.
@@ -400,9 +400,12 @@ pub(crate) fn insert_emulated_on_delete(
 
     for rf in relation_fields {
         match rf.relation().on_delete() {
-            ReferentialAction::NoAction | ReferentialAction::Restrict => {
-                emulate_on_delete_restrict(graph, &rf, parent_node, child_node)?
-            }
+            ReferentialAction::NoAction | ReferentialAction::Restrict => emulate_on_delete_restrict(
+                graph,
+                &rf,
+                parent_node.expect("bug: caller must have checked for `Restrict` relations"),
+                child_node,
+            )?,
             ReferentialAction::SetNull => {
                 emulate_on_delete_set_null(graph, query_schema, &rf, parent_node, child_node)?
             }
@@ -515,7 +518,7 @@ pub fn emulate_on_delete_cascade(
     graph: &mut QueryGraph,
     relation_field: &RelationFieldRef, // This is the field _on the other model_ for cascade.
     query_schema: &QuerySchema,
-    parent_node: &NodeRef,
+    parent_node: Option<&NodeRef>,
     child_node: &NodeRef,
 ) -> QueryGraphBuilderResult<()> {
     let dependent_model = relation_field.model();
@@ -523,8 +526,9 @@ pub fn emulate_on_delete_cascade(
     let child_model_identifier = parent_relation_field.related_model().primary_identifier();
 
     // Records that need to be deleted for the cascade.
+    let node_providing_ids = parent_node.unwrap_or(child_node);
     let dependent_records_node =
-        insert_find_children_by_parent_node(graph, parent_node, &parent_relation_field, Filter::empty())?;
+        insert_find_children_by_parent_node(graph, node_providing_ids, &parent_relation_field, Filter::empty())?;
 
     let delete_query = WriteQuery::DeleteManyRecords(DeleteManyRecords {
         model: dependent_model.clone(),
@@ -537,7 +541,7 @@ pub fn emulate_on_delete_cascade(
         graph,
         query_schema,
         &dependent_model,
-        &dependent_records_node,
+        Some(&dependent_records_node),
         &delete_dependents_node,
     )?;
 
@@ -556,11 +560,13 @@ pub fn emulate_on_delete_cascade(
         ),
     )?;
 
-    graph.create_edge(
-        &delete_dependents_node,
-        child_node,
-        QueryGraphDependency::ExecutionOrder,
-    )?;
+    if parent_node.is_some() {
+        graph.create_edge(
+            &delete_dependents_node,
+            child_node,
+            QueryGraphDependency::ExecutionOrder,
+        )?;
+    }
 
     Ok(())
 }
@@ -607,7 +613,7 @@ pub fn emulate_on_delete_set_null(
     graph: &mut QueryGraph,
     query_schema: &QuerySchema,
     relation_field: &RelationFieldRef,
-    parent_node: &NodeRef,
+    parent_node: Option<&NodeRef>,
     child_node: &NodeRef,
 ) -> QueryGraphBuilderResult<()> {
     let dependent_model = relation_field.model();
@@ -632,8 +638,9 @@ pub fn emulate_on_delete_set_null(
     }
 
     // Records that need to be updated for the cascade.
+    let node_providing_ids = parent_node.unwrap_or(child_node);
     let dependent_records_node =
-        insert_find_children_by_parent_node(graph, parent_node, &parent_relation_field, Filter::empty())?;
+        insert_find_children_by_parent_node(graph, node_providing_ids, &parent_relation_field, Filter::empty())?;
 
     let set_null_query = WriteQuery::UpdateManyRecords(UpdateManyRecords {
         model: dependent_model.clone(),
@@ -659,11 +666,13 @@ pub fn emulate_on_delete_set_null(
         ),
     )?;
 
-    graph.create_edge(
-        &set_null_dependents_node,
-        child_node,
-        QueryGraphDependency::ExecutionOrder,
-    )?;
+    if parent_node.is_some() {
+        graph.create_edge(
+            &set_null_dependents_node,
+            child_node,
+            QueryGraphDependency::ExecutionOrder,
+        )?;
+    }
 
     // Collect other relation fields that share at least one common foreign key with the relation field we're dealing with
     let overlapping_relation_fields = collect_overlapping_relation_fields(dependent_model, relation_field);
@@ -1143,7 +1152,10 @@ pub fn emulate_on_update_cascade(
 }
 
 /// Collect relation fields that share at least one common foreign key with `relation_field`.
-fn collect_overlapping_relation_fields(model: Model, relation_field: &RelationFieldRef) -> Vec<RelationFieldRef> {
+pub(crate) fn collect_overlapping_relation_fields(
+    model: Model,
+    relation_field: &RelationFieldRef,
+) -> Vec<RelationFieldRef> {
     let child_fks = relation_field.left_scalars();
 
     let dependent_relation_fields: Vec<_> = model

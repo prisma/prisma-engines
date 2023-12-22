@@ -1,11 +1,11 @@
-use super::*;
+use super::{utils::collect_overlapping_relation_fields, *};
 use crate::{
     query_ast::*,
     query_graph::{Node, QueryGraph, QueryGraphDependency},
     ArgumentListLookup, FilteredQuery, ParsedField,
 };
-use psl::datamodel_connector::ConnectorCapability;
-use query_structure::{Filter, Model};
+use psl::{datamodel_connector::ConnectorCapability, parser_database::ReferentialAction};
+use query_structure::{Filter, Model, RelationFieldRef};
 use schema::{constants::args, QuerySchema};
 use std::convert::TryInto;
 
@@ -21,14 +21,14 @@ pub(crate) fn delete_record(
     let where_arg = field.arguments.lookup(args::WHERE).unwrap();
     let filter = extract_unique_filter(where_arg.value.try_into()?, &model)?;
 
-    if can_use_atomic_delete(query_schema, &field) {
+    if can_use_atomic_delete(query_schema, &model, &field) {
         // Database supports returning the deleted row, so just the delete node will suffice.
         let nested_fields = field.nested_fields.unwrap().fields;
         let selected_fields = read::utils::collect_selected_scalars(&nested_fields, &model);
         let selection_order = read::utils::collect_selection_order(&nested_fields);
         let delete_query = Query::Write(WriteQuery::DeleteRecord(DeleteRecord {
             name: field.name,
-            model,
+            model: model.clone(),
             record_filter: Some(filter.into()),
             selected_fields: Some(DeleteRecordFields {
                 fields: selected_fields,
@@ -37,7 +37,8 @@ pub(crate) fn delete_record(
         }));
         let delete_node = graph.create_node(delete_query);
 
-        // TODO laplab: figure out how do we update relations here.
+        utils::insert_emulated_on_delete(graph, query_schema, &model, None, &delete_node)?;
+
         graph.add_result_node(&delete_node);
     } else {
         // In case database does not support returning the deleted row, we need to emulate that
@@ -55,7 +56,7 @@ pub(crate) fn delete_record(
         let delete_node = graph.create_node(delete_query);
 
         // Ensure relevant relations are updated after delete.
-        utils::insert_emulated_on_delete(graph, query_schema, &model, &read_node, &delete_node)?;
+        utils::insert_emulated_on_delete(graph, query_schema, &model, Some(&read_node), &delete_node)?;
 
         // If the read node did not find the row, we know for sure that the delete node also won't
         // find it because:
@@ -67,8 +68,8 @@ pub(crate) fn delete_record(
         graph.create_edge(
             &read_node,
             &delete_node,
-            // TODO laplab: should this be `DataDependency`? Currently, `DeleteRecord` only ever
-            // returns count. Now it returns the record as well, but this is not in 100% of cases.
+            // NOTE: We do not actually use primary identifier returned from `read_node`, this edge
+            // is just checking if any records matched the filter.
             QueryGraphDependency::ProjectedDataDependency(
                 model.primary_identifier(),
                 Box::new(|delete_node, parent_ids| {
@@ -117,7 +118,7 @@ pub fn delete_many_records(
         let read_query = utils::read_ids_infallible(model.clone(), model_id.clone(), filter);
         let read_query_node = graph.create_node(read_query);
 
-        utils::insert_emulated_on_delete(graph, query_schema, &model, &read_query_node, &delete_many_node)?;
+        utils::insert_emulated_on_delete(graph, query_schema, &model, Some(&read_query_node), &delete_many_node)?;
 
         graph.create_edge(
             &read_query_node,
@@ -145,8 +146,8 @@ pub fn delete_many_records(
 /// We only perform such delete when:
 /// 1. Connector supports such operations
 /// 2. The selection set contains no relation
-fn can_use_atomic_delete(query_schema: &QuerySchema, field: &ParsedField<'_>) -> bool {
-    // TODO laplab: check that the filter does not contain any predicates on relations.
+fn can_use_atomic_delete(query_schema: &QuerySchema, model: &Model, field: &ParsedField<'_>) -> bool {
+    // TODO laplab: check that the filter does not contain any predicates on relations if we are on MongoDB.
     if !query_schema.has_capability(ConnectorCapability::DeleteReturning) {
         return false;
     }
@@ -155,5 +156,63 @@ fn can_use_atomic_delete(query_schema: &QuerySchema, field: &ParsedField<'_>) ->
         return false;
     }
 
+    // `ReferentialAction::Restrict` action requires us to check if any connected records exist
+    // before performing delete. To do that, we need ids of records to be deleted. Atomic delete
+    // would provide us with ids, but it would also delete the record immediately, so we won't be
+    // able to check anything. So in this case we resort to a plan with a separate read node,
+    // allowing us to perform the check before deleting anything.
+    if has_restrict_on_delete(model) {
+        return false;
+    }
+
     true
+}
+
+fn has_restrict_on_delete(model: &Model) -> bool {
+    let internal_model = &model.dm;
+    let relation_fields = internal_model.fields_pointing_to_model(model);
+    for relation_field in relation_fields {
+        match relation_field.relation().on_delete() {
+            ReferentialAction::NoAction | ReferentialAction::Restrict => return true,
+            ReferentialAction::SetNull => {
+                let overlapping_fields = collect_overlapping_relation_fields(relation_field.model(), &relation_field);
+                if has_restrict_on_update(overlapping_fields.into_iter()) {
+                    return true;
+                }
+            }
+            ReferentialAction::Cascade => {
+                if has_restrict_on_delete(&relation_field.model()) {
+                    return true;
+                }
+            }
+            _ => unreachable!(),
+        }
+    }
+
+    false
+}
+
+fn has_restrict_on_update(relation_fields: impl Iterator<Item = RelationFieldRef>) -> bool {
+    for relation_field in relation_fields {
+        match relation_field.relation().on_update() {
+            ReferentialAction::NoAction | ReferentialAction::Restrict => return true,
+            ReferentialAction::SetNull => {
+                let overlapping_fields = collect_overlapping_relation_fields(relation_field.model(), &relation_field);
+                if has_restrict_on_update(overlapping_fields.into_iter()) {
+                    return true;
+                }
+            }
+            ReferentialAction::Cascade => {
+                let dependent_model = relation_field.model();
+                let internal_model = &dependent_model.dm;
+                let relation_fields = internal_model.fields_pointing_to_model(&dependent_model);
+                if has_restrict_on_update(relation_fields) {
+                    return true;
+                }
+            }
+            _ => unreachable!(),
+        }
+    }
+
+    false
 }
