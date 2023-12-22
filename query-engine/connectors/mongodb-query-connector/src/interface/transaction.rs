@@ -182,7 +182,7 @@ impl<'conn> WriteOperations for MongoDbTransaction<'conn> {
         record_filter: connector_interface::RecordFilter,
         selected_fields: FieldSelection,
         _trace_id: Option<String>,
-    ) -> connector_interface::Result<Option<SingleRecord>> {
+    ) -> connector_interface::Result<SingleRecord> {
         catch(write::delete_record(
             &self.connection.database,
             &mut self.connection.session,

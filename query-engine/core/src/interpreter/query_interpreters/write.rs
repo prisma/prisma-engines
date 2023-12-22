@@ -138,20 +138,19 @@ async fn delete_one(
     }?;
 
     if let Some(selected_fields) = q.selected_fields {
-        let result = tx
+        let record = tx
             .delete_record(&q.model, filter, selected_fields.fields, trace_id)
-            .await?
-            .map(|result| RecordSelection {
-                name: q.name,
-                fields: selected_fields.order,
-                scalars: result.into(),
-                nested: vec![],
-                model: q.model,
-                aggregation_rows: None,
-            })
-            .map(Box::new);
+            .await?;
+        let selection = RecordSelection {
+            name: q.name,
+            fields: selected_fields.order,
+            scalars: record.into(),
+            nested: vec![],
+            model: q.model,
+            aggregation_rows: None,
+        };
 
-        Ok(QueryResult::RecordSelection(result))
+        Ok(QueryResult::RecordSelection(Some(Box::new(selection))))
     } else {
         let result = tx.delete_records(&q.model, filter, trace_id).await?;
         Ok(QueryResult::Count(result))

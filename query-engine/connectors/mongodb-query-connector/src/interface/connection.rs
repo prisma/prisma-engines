@@ -134,6 +134,7 @@ impl WriteOperations for MongoDbConnection {
         record_filter: connector_interface::RecordFilter,
         _trace_id: Option<String>,
     ) -> connector_interface::Result<usize> {
+        // TODO laplab: remove async move
         catch(async move { write::delete_records(&self.database, &mut self.session, model, record_filter).await }).await
     }
 
@@ -143,7 +144,7 @@ impl WriteOperations for MongoDbConnection {
         record_filter: connector_interface::RecordFilter,
         selected_fields: FieldSelection,
         _trace_id: Option<String>,
-    ) -> connector_interface::Result<Option<SingleRecord>> {
+    ) -> connector_interface::Result<SingleRecord> {
         catch(write::delete_record(
             &self.database,
             &mut self.session,

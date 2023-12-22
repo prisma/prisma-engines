@@ -348,7 +348,7 @@ pub trait WriteOperations {
         record_filter: RecordFilter,
         selected_fields: FieldSelection,
         trace_id: Option<String>,
-    ) -> crate::Result<Option<SingleRecord>>;
+    ) -> crate::Result<SingleRecord>;
 
     // We plan to remove the methods below in the future. We want emulate them with the ones above. Those should suffice.
 

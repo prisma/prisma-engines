@@ -91,8 +91,8 @@ pub enum SqlError {
     #[error("Foreign key constraint failed")]
     ForeignKeyConstraintViolation { constraint: DatabaseConstraint },
 
-    #[error("Record does not exist.")]
-    RecordDoesNotExist,
+    #[error("Record does not exist: {cause}")]
+    RecordDoesNotExist { cause: String },
 
     #[error("Table {} does not exist", _0)]
     TableDoesNotExist(String),
@@ -197,7 +197,9 @@ impl SqlError {
             SqlError::ForeignKeyConstraintViolation { constraint } => {
                 ConnectorError::from_kind(ErrorKind::ForeignKeyConstraintViolation { constraint })
             }
-            SqlError::RecordDoesNotExist => ConnectorError::from_kind(ErrorKind::RecordDoesNotExist),
+            SqlError::RecordDoesNotExist { cause } => {
+                ConnectorError::from_kind(ErrorKind::RecordDoesNotExist { cause })
+            }
             SqlError::TableDoesNotExist(table) => ConnectorError::from_kind(ErrorKind::TableDoesNotExist { table }),
             SqlError::ColumnDoesNotExist(column) => ConnectorError::from_kind(ErrorKind::ColumnDoesNotExist { column }),
             SqlError::ConnectionError(e) => ConnectorError {
@@ -283,7 +285,9 @@ impl From<quaint::error::Error> for SqlError {
             QuaintKind::QueryError(qe) => Self::QueryError(qe),
             QuaintKind::QueryInvalidInput(qe) => Self::QueryInvalidInput(qe),
             e @ QuaintKind::IoError(_) => Self::ConnectionError(e),
-            QuaintKind::NotFound => Self::RecordDoesNotExist,
+            QuaintKind::NotFound => Self::RecordDoesNotExist {
+                cause: "Record not found".to_owned(),
+            },
             QuaintKind::UniqueConstraintViolation { constraint } => Self::UniqueConstraintViolation {
                 constraint: constraint.into(),
             },

@@ -248,7 +248,7 @@ impl<'tx> WriteOperations for SqlConnectorTransaction<'tx> {
         record_filter: RecordFilter,
         selected_fields: FieldSelection,
         trace_id: Option<String>,
-    ) -> connector::Result<Option<SingleRecord>> {
+    ) -> connector::Result<SingleRecord> {
         let ctx = Context::new(&self.connection_info, trace_id.as_deref());
         catch(
             &self.connection_info,

@@ -406,7 +406,7 @@ pub(crate) async fn delete_record(
     record_filter: RecordFilter,
     selected_fields: FieldSelection,
     ctx: &Context<'_>,
-) -> crate::Result<Option<SingleRecord>> {
+) -> crate::Result<SingleRecord> {
     // TODO laplab: what the heck are selectors?
     debug_assert!(!record_filter.has_selectors());
 
@@ -417,23 +417,24 @@ pub(crate) async fn delete_record(
         .query(write::delete_returning(model, filter, &selected_fields, ctx))
         .await?;
 
-    result_set
+    let result_row = result_set
         .into_iter()
         // TODO laplab: error if more than one record was returned.
         .next()
-        .map(|result_row| {
-            let field_db_names: Vec<_> = selected_fields.db_names().collect();
-            let types_and_arities = selected_fields.type_identifiers_with_arities();
-            let meta = column_metadata::create(&field_db_names, &types_and_arities);
-            let sql_row = result_row.to_sql_row(&meta)?;
+        .ok_or(SqlError::RecordDoesNotExist {
+            cause: "Record to delete does not exist.".to_owned(),
+        })?;
 
-            let record = Record::from(sql_row);
-            Ok(SingleRecord {
-                record,
-                field_names: field_db_names,
-            })
-        })
-        .transpose()
+    let field_db_names: Vec<_> = selected_fields.db_names().collect();
+    let types_and_arities = selected_fields.type_identifiers_with_arities();
+    let meta = column_metadata::create(&field_db_names, &types_and_arities);
+    let sql_row = result_row.to_sql_row(&meta)?;
+
+    let record = Record::from(sql_row);
+    Ok(SingleRecord {
+        record,
+        field_names: field_db_names,
+    })
 }
 
 /// Connect relations defined in `child_ids` to a parent defined in `parent_id`.
