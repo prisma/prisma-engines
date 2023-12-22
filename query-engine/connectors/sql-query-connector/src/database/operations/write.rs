@@ -407,7 +407,8 @@ pub(crate) async fn delete_record(
     selected_fields: FieldSelection,
     ctx: &Context<'_>,
 ) -> crate::Result<SingleRecord> {
-    // TODO laplab: what the heck are selectors?
+    // We explicitly checked in the query builder that there are no nested mutation
+    // in combination with this operation.
     debug_assert!(!record_filter.has_selectors());
 
     let filter = FilterBuilder::without_top_level_joins().visit_filter(record_filter.filter, ctx);

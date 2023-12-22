@@ -93,20 +93,8 @@ impl QueryResult {
         let err_code = err_code.map(|code| format!("P{code}"));
         let err_exists = self.errors().into_iter().any(|err| {
             let code_matches = err.code() == err_code.as_deref();
-            if !code_matches {
-                panic!("code does not match");
-            }
             let msg_matches = match msg_contains.as_ref() {
-                Some(msg) => {
-                    let result = err.message().contains(msg);
-                    if !result {
-                        println!("laplab: left side: {}", err.message());
-                        println!("laplab: right side: {}", msg);
-
-                        panic!("message does not match");
-                    }
-                    result
-                }
+                Some(msg) => err.message().contains(msg),
                 None => true,
             };
 

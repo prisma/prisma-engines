@@ -77,9 +77,12 @@ impl<'conn> WriteOperations for MongoDbTransaction<'conn> {
         _selected_fields: FieldSelection,
         _trace_id: Option<String>,
     ) -> connector_interface::Result<SingleRecord> {
-        catch(async move {
-            write::create_record(&self.connection.database, &mut self.connection.session, model, args).await
-        })
+        catch(write::create_record(
+            &self.connection.database,
+            &mut self.connection.session,
+            model,
+            args,
+        ))
         .await
     }
 
@@ -90,16 +93,13 @@ impl<'conn> WriteOperations for MongoDbTransaction<'conn> {
         skip_duplicates: bool,
         _trace_id: Option<String>,
     ) -> connector_interface::Result<usize> {
-        catch(async move {
-            write::create_records(
-                &self.connection.database,
-                &mut self.connection.session,
-                model,
-                args,
-                skip_duplicates,
-            )
-            .await
-        })
+        catch(write::create_records(
+            &self.connection.database,
+            &mut self.connection.session,
+            model,
+            args,
+            skip_duplicates,
+        ))
         .await
     }
 
@@ -163,16 +163,12 @@ impl<'conn> WriteOperations for MongoDbTransaction<'conn> {
         record_filter: connector_interface::RecordFilter,
         _trace_id: Option<String>,
     ) -> connector_interface::Result<usize> {
-        // TODO laplab: remove unnecessary async moves.
-        catch(async move {
-            write::delete_records(
-                &self.connection.database,
-                &mut self.connection.session,
-                model,
-                record_filter,
-            )
-            .await
-        })
+        catch(write::delete_records(
+            &self.connection.database,
+            &mut self.connection.session,
+            model,
+            record_filter,
+        ))
         .await
     }
 
@@ -208,16 +204,13 @@ impl<'conn> WriteOperations for MongoDbTransaction<'conn> {
         child_ids: &[SelectionResult],
         _trace_id: Option<String>,
     ) -> connector_interface::Result<()> {
-        catch(async move {
-            write::m2m_connect(
-                &self.connection.database,
-                &mut self.connection.session,
-                field,
-                parent_id,
-                child_ids,
-            )
-            .await
-        })
+        catch(write::m2m_connect(
+            &self.connection.database,
+            &mut self.connection.session,
+            field,
+            parent_id,
+            child_ids,
+        ))
         .await
     }
 
@@ -228,22 +221,23 @@ impl<'conn> WriteOperations for MongoDbTransaction<'conn> {
         child_ids: &[SelectionResult],
         _trace_id: Option<String>,
     ) -> connector_interface::Result<()> {
-        catch(async move {
-            write::m2m_disconnect(
-                &self.connection.database,
-                &mut self.connection.session,
-                field,
-                parent_id,
-                child_ids,
-            )
-            .await
-        })
+        catch(write::m2m_disconnect(
+            &self.connection.database,
+            &mut self.connection.session,
+            field,
+            parent_id,
+            child_ids,
+        ))
         .await
     }
 
     async fn execute_raw(&mut self, inputs: HashMap<String, PrismaValue>) -> connector_interface::Result<usize> {
-        catch(async move { write::execute_raw(&self.connection.database, &mut self.connection.session, inputs).await })
-            .await
+        catch(write::execute_raw(
+            &self.connection.database,
+            &mut self.connection.session,
+            inputs,
+        ))
+        .await
     }
 
     async fn query_raw(
@@ -252,16 +246,13 @@ impl<'conn> WriteOperations for MongoDbTransaction<'conn> {
         inputs: HashMap<String, PrismaValue>,
         query_type: Option<String>,
     ) -> connector_interface::Result<serde_json::Value> {
-        catch(async move {
-            write::query_raw(
-                &self.connection.database,
-                &mut self.connection.session,
-                model,
-                inputs,
-                query_type,
-            )
-            .await
-        })
+        catch(write::query_raw(
+            &self.connection.database,
+            &mut self.connection.session,
+            model,
+            inputs,
+            query_type,
+        ))
         .await
     }
 }
@@ -277,17 +268,14 @@ impl<'conn> ReadOperations for MongoDbTransaction<'conn> {
         _relation_load_strategy: RelationLoadStrategy,
         _trace_id: Option<String>,
     ) -> connector_interface::Result<Option<SingleRecord>> {
-        catch(async move {
-            read::get_single_record(
-                &self.connection.database,
-                &mut self.connection.session,
-                model,
-                filter,
-                selected_fields,
-                aggr_selections,
-            )
-            .await
-        })
+        catch(read::get_single_record(
+            &self.connection.database,
+            &mut self.connection.session,
+            model,
+            filter,
+            selected_fields,
+            aggr_selections,
+        ))
         .await
     }
 
@@ -300,17 +288,14 @@ impl<'conn> ReadOperations for MongoDbTransaction<'conn> {
         _relation_load_strategy: RelationLoadStrategy,
         _trace_id: Option<String>,
     ) -> connector_interface::Result<ManyRecords> {
-        catch(async move {
-            read::get_many_records(
-                &self.connection.database,
-                &mut self.connection.session,
-                model,
-                query_arguments,
-                selected_fields,
-                aggregation_selections,
-            )
-            .await
-        })
+        catch(read::get_many_records(
+            &self.connection.database,
+            &mut self.connection.session,
+            model,
+            query_arguments,
+            selected_fields,
+            aggregation_selections,
+        ))
         .await
     }
 
@@ -320,15 +305,12 @@ impl<'conn> ReadOperations for MongoDbTransaction<'conn> {
         from_record_ids: &[SelectionResult],
         _trace_id: Option<String>,
     ) -> connector_interface::Result<Vec<(SelectionResult, SelectionResult)>> {
-        catch(async move {
-            read::get_related_m2m_record_ids(
-                &self.connection.database,
-                &mut self.connection.session,
-                from_field,
-                from_record_ids,
-            )
-            .await
-        })
+        catch(read::get_related_m2m_record_ids(
+            &self.connection.database,
+            &mut self.connection.session,
+            from_field,
+            from_record_ids,
+        ))
         .await
     }
 
@@ -341,18 +323,15 @@ impl<'conn> ReadOperations for MongoDbTransaction<'conn> {
         having: Option<query_structure::Filter>,
         _trace_id: Option<String>,
     ) -> connector_interface::Result<Vec<connector_interface::AggregationRow>> {
-        catch(async move {
-            aggregate::aggregate(
-                &self.connection.database,
-                &mut self.connection.session,
-                model,
-                query_arguments,
-                selections,
-                group_by,
-                having,
-            )
-            .await
-        })
+        catch(aggregate::aggregate(
+            &self.connection.database,
+            &mut self.connection.session,
+            model,
+            query_arguments,
+            selections,
+            group_by,
+            having,
+        ))
         .await
     }
 }
