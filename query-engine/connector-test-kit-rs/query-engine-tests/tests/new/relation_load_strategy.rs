@@ -1,6 +1,6 @@
 use query_engine_tests::*;
 
-#[test_suite(schema(schema), only(Postgres, CockroachDb))]
+#[test_suite(schema(schema))]
 mod relation_load_strategy {
     fn schema() -> String {
         indoc! {r#"
@@ -95,9 +95,9 @@ mod relation_load_strategy {
     }
 
     macro_rules! relation_load_strategy_test {
-        ($name:ident, $strategy:ident, $query:expr, $result:literal) => {
+        ($name:ident, $strategy:ident, $query:expr, $result:literal $(, $attrs:expr)*) => {
             paste::paste! {
-                #[connector_test(suite = "relation_load_strategy", schema(schema))]
+                #[connector_test(suite = "relation_load_strategy", schema(schema) $(, $attrs)*)]
                 async fn [<test_ $name _ $strategy>](mut runner: Runner) -> TestResult<()> {
                     seed(&mut runner).await?;
                     assert_used_lateral_join(&mut runner, false).await;
@@ -123,7 +123,7 @@ mod relation_load_strategy {
 
     macro_rules! relation_load_strategy_tests_pair {
         ($name:ident, $query:expr, $result:literal) => {
-            relation_load_strategy_test!($name, join, $query, $result);
+            relation_load_strategy_test!($name, join, $query, $result, only(Postgres, CockroachDb));
             relation_load_strategy_test!($name, query, $query, $result);
         };
     }
