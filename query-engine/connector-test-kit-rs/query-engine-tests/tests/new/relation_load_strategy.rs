@@ -90,7 +90,7 @@ mod relation_load_strategy {
 
         assert_eq!(
             actual, expected,
-            "expected later join to be used: {expected}, instead it was: {actual}"
+            "expected lateral join to be used: {expected}, instead it was: {actual}"
         );
     }
 
