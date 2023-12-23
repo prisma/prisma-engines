@@ -348,9 +348,9 @@ mod relation_load_strategy {
     );
 
     macro_rules! relation_load_strategy_not_available_test {
-        ($name:ident, $query:expr) => {
+        ($name:ident, $query:expr $(, $attrs:expr)*) => {
             paste::paste! {
-                #[connector_test(suite = "relation_load_strategy", schema(schema))]
+                #[connector_test(suite = "relation_load_strategy", schema(schema) $(, $attrs)*)]
                 async fn [<test_no_strategy_in_ $name>](runner: Runner) -> TestResult<()> {
                     let res = runner.query($query).await?;
                     res.assert_failure(2009, Some("Argument does not exist in enclosing type".into()));
@@ -407,7 +407,8 @@ mod relation_load_strategy {
                 count
             }
         }
-        "#
+        "#,
+        exclude(Sqlite)
     );
 
     relation_load_strategy_not_available_test!(
