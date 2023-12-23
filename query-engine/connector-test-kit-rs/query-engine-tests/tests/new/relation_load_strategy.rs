@@ -347,24 +347,91 @@ mod relation_load_strategy {
         r#"{"data":{"upsertOneUser":{"login":"ardent commenter","comments":[{"post":{"title":"first post"},"body":"a comment"}]}}}"#
     );
 
-    #[connector_test]
-    async fn test_no_strategy_in_nested_relations(runner: Runner) -> TestResult<()> {
-        let query = r#"
-            query {
-                findManyUser {
-                    id
-                    posts(relationLoadStrategy: query) {
-                        comments {
-                            id
-                        }
-                    }
+    macro_rules! relation_load_strategy_not_available_test {
+        ($name:ident, $query:expr) => {
+            paste::paste! {
+                #[connector_test(suite = "relation_load_strategy", schema(schema))]
+                async fn [<test_no_strategy_in_ $name>](runner: Runner) -> TestResult<()> {
+                    let res = runner.query($query).await?;
+                    res.assert_failure(2009, Some("Argument does not exist in enclosing type".into()));
+                    Ok(())
                 }
             }
-        "#;
-
-        let res = runner.query(query).await?;
-        res.assert_failure(2009, Some("Argument does not exist in enclosing type".into()));
-
-        Ok(())
+        };
     }
+
+    relation_load_strategy_not_available_test!(
+        nested_relations,
+        r#"
+        query {
+            findManyUser {
+                id
+                posts(relationLoadStrategy: query) {
+                    comments { id }
+                }
+            }
+        }
+        "#
+    );
+
+    relation_load_strategy_not_available_test!(
+        aggregate,
+        r#"
+        query {
+            aggregateUser(relationLoadStrategy: query) {
+                _count { _all }
+            }
+        }
+        "#
+    );
+
+    relation_load_strategy_not_available_test!(
+        group_by,
+        r#"
+        query {
+            groupByUser(relationLoadStrategy: query, by: id) {
+                id
+            }
+        }
+        "#
+    );
+
+    relation_load_strategy_not_available_test!(
+        create_many,
+        r#"
+        mutation {
+            createManyUser(
+                relationLoadStrategy: query,
+                data: { id: 1, login: "user" }
+            ) {
+                count
+            }
+        }
+        "#
+    );
+
+    relation_load_strategy_not_available_test!(
+        update_many,
+        r#"
+        mutation {
+            updateManyUser(
+                relationLoadStrategy: query,
+                data: { login: "user" }
+            ) {
+                count
+            }
+        }
+        "#
+    );
+
+    relation_load_strategy_not_available_test!(
+        delete_many,
+        r#"
+        mutation {
+            deleteManyUser(relationLoadStrategy: query) {
+                count
+            }
+        }
+        "#
+    );
 }
