@@ -167,7 +167,7 @@
 ///
 /// Not complete and not meant for external use in this state. Made for
 /// compatibility purposes.
-</span><span class="attr">#[derive(Debug, Clone, PartialEq)]
+</span><span class="attr">#[derive(Debug, PartialEq)]
 </span><span class="kw">pub struct </span>Merge&lt;<span class="lifetime">&#39;a</span>&gt; {
     <span class="kw">pub</span>(<span class="kw">crate</span>) table: Table&lt;<span class="lifetime">&#39;a</span>&gt;,
     <span class="kw">pub</span>(<span class="kw">crate</span>) using: Using&lt;<span class="lifetime">&#39;a</span>&gt;,
@@ -213,7 +213,7 @@
     }
 }
 
-<span class="attr">#[derive(Debug, Clone, PartialEq)]
+<span class="attr">#[derive(Debug, PartialEq)]
 </span><span class="kw">pub struct </span>Using&lt;<span class="lifetime">&#39;a</span>&gt; {
     <span class="kw">pub</span>(<span class="kw">crate</span>) base_query: Query&lt;<span class="lifetime">&#39;a</span>&gt;,
     <span class="kw">pub</span>(<span class="kw">crate</span>) columns: Vec&lt;Column&lt;<span class="lifetime">&#39;a</span>&gt;&gt;,

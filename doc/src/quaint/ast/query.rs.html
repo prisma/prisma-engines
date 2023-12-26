@@ -114,7 +114,7 @@
 <span class="kw">use </span><span class="kw">super</span>::IntoCommonTableExpression;
 
 <span class="doccomment">/// A database query
-</span><span class="attr">#[derive(Debug, Clone, PartialEq)]
+</span><span class="attr">#[derive(Debug, PartialEq)]
 </span><span class="kw">pub enum </span>Query&lt;<span class="lifetime">&#39;a</span>&gt; {
     Select(Box&lt;Select&lt;<span class="lifetime">&#39;a</span>&gt;&gt;),
     Insert(Box&lt;Insert&lt;<span class="lifetime">&#39;a</span>&gt;&gt;),
