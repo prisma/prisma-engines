@@ -19,26 +19,26 @@ use super::ExternalConnectionInfo;
 #[derive(Debug, Clone)]
 pub enum ConnectionInfo {
     /// A PostgreSQL connection URL.
-    #[cfg(feature = "postgresql")]
-    Postgres(PostgresUrl),
-    /// A MySQL connection URL.
-    #[cfg(feature = "mysql")]
-    Mysql(MysqlUrl),
-    /// A SQL Server connection URL.
-    #[cfg(feature = "mssql")]
-    Mssql(MssqlUrl),
-    /// A SQLite connection URL.
-    #[cfg(feature = "sqlite")]
-    Sqlite {
-        /// The filesystem path of the SQLite database.
-        file_path: String,
-        /// The name the database is bound to - Always "main"
-        db_name: String,
-    },
-    #[cfg(feature = "sqlite")]
-    InMemorySqlite {
-        db_name: String,
-    },
+    // #[cfg(feature = "postgresql")]
+    // Postgres(PostgresUrl),
+    // /// A MySQL connection URL.
+    // #[cfg(feature = "mysql")]
+    // Mysql(MysqlUrl),
+    // /// A SQL Server connection URL.
+    // #[cfg(feature = "mssql")]
+    // Mssql(MssqlUrl),
+    // /// A SQLite connection URL.
+    // #[cfg(feature = "sqlite")]
+    // Sqlite {
+    //     /// The filesystem path of the SQLite database.
+    //     file_path: String,
+    //     /// The name the database is bound to - Always "main"
+    //     db_name: String,
+    // },
+    // #[cfg(feature = "sqlite")]
+    // InMemorySqlite {
+    //     db_name: String,
+    // },
     External(ExternalConnectionInfo),
 }
 
@@ -47,68 +47,68 @@ impl ConnectionInfo {
     ///
     /// Will fail if URI is invalid or the scheme points to an unsupported
     /// database.
-    pub fn from_url(url_str: &str) -> crate::Result<Self> {
-        let url_result: Result<Url, _> = url_str.parse();
+    // pub fn from_url(url_str: &str) -> crate::Result<Self> {
+    //     let url_result: Result<Url, _> = url_str.parse();
 
-        // Non-URL database strings are interpreted as SQLite file paths.
-        match url_str {
-            #[cfg(feature = "sqlite")]
-            s if s.starts_with("file") => {
-                if url_result.is_err() {
-                    let params = SqliteParams::try_from(s)?;
+    //     // Non-URL database strings are interpreted as SQLite file paths.
+    //     match url_str {
+    //         #[cfg(feature = "sqlite")]
+    //         s if s.starts_with("file") => {
+    //             if url_result.is_err() {
+    //                 let params = SqliteParams::try_from(s)?;
 
-                    return Ok(ConnectionInfo::Sqlite {
-                        file_path: params.file_path,
-                        db_name: params.db_name,
-                    });
-                }
-            }
-            #[cfg(feature = "mssql")]
-            s if s.starts_with("jdbc:sqlserver") || s.starts_with("sqlserver") => {
-                return Ok(ConnectionInfo::Mssql(MssqlUrl::new(url_str)?));
-            }
-            _ => (),
-        }
+    //                 return Ok(ConnectionInfo::Sqlite {
+    //                     file_path: params.file_path,
+    //                     db_name: params.db_name,
+    //                 });
+    //             }
+    //         }
+    //         #[cfg(feature = "mssql")]
+    //         s if s.starts_with("jdbc:sqlserver") || s.starts_with("sqlserver") => {
+    //             return Ok(ConnectionInfo::Mssql(MssqlUrl::new(url_str)?));
+    //         }
+    //         _ => (),
+    //     }
 
-        let url = url_result?;
+    //     let url = url_result?;
 
-        let sql_family = SqlFamily::from_scheme(url.scheme()).ok_or_else(|| {
-            let kind =
-                ErrorKind::DatabaseUrlIsInvalid(format!("{} is not a supported database URL scheme.", url.scheme()));
+    //     let sql_family = SqlFamily::from_scheme(url.scheme()).ok_or_else(|| {
+    //         let kind =
+    //             ErrorKind::DatabaseUrlIsInvalid(format!("{} is not a supported database URL scheme.", url.scheme()));
 
-            Error::builder(kind).build()
-        })?;
+    //         Error::builder(kind).build()
+    //     })?;
 
-        match sql_family {
-            #[cfg(feature = "mysql")]
-            SqlFamily::Mysql => Ok(ConnectionInfo::Mysql(MysqlUrl::new(url)?)),
-            #[cfg(feature = "sqlite")]
-            SqlFamily::Sqlite => {
-                let params = SqliteParams::try_from(url_str)?;
+    //     match sql_family {
+    //         #[cfg(feature = "mysql")]
+    //         SqlFamily::Mysql => Ok(ConnectionInfo::Mysql(MysqlUrl::new(url)?)),
+    //         #[cfg(feature = "sqlite")]
+    //         SqlFamily::Sqlite => {
+    //             let params = SqliteParams::try_from(url_str)?;
 
-                Ok(ConnectionInfo::Sqlite {
-                    file_path: params.file_path,
-                    db_name: params.db_name,
-                })
-            }
-            #[cfg(feature = "postgresql")]
-            SqlFamily::Postgres => Ok(ConnectionInfo::Postgres(PostgresUrl::new(url)?)),
-            #[allow(unreachable_patterns)]
-            _ => unreachable!(),
-        }
-    }
+    //             Ok(ConnectionInfo::Sqlite {
+    //                 file_path: params.file_path,
+    //                 db_name: params.db_name,
+    //             })
+    //         }
+    //         #[cfg(feature = "postgresql")]
+    //         SqlFamily::Postgres => Ok(ConnectionInfo::Postgres(PostgresUrl::new(url)?)),
+    //         #[allow(unreachable_patterns)]
+    //         _ => unreachable!(),
+    //     }
+    // }
 
     /// The provided database name. This will be `None` on SQLite.
     pub fn dbname(&self) -> Option<&str> {
         match self {
-            #[cfg(feature = "postgresql")]
-            ConnectionInfo::Postgres(url) => Some(url.dbname()),
-            #[cfg(feature = "mysql")]
-            ConnectionInfo::Mysql(url) => Some(url.dbname()),
-            #[cfg(feature = "mssql")]
-            ConnectionInfo::Mssql(url) => Some(url.dbname()),
-            #[cfg(feature = "sqlite")]
-            ConnectionInfo::Sqlite { .. } | ConnectionInfo::InMemorySqlite { .. } => None,
+            // #[cfg(feature = "postgresql")]
+            // ConnectionInfo::Postgres(url) => Some(url.dbname()),
+            // #[cfg(feature = "mysql")]
+            // ConnectionInfo::Mysql(url) => Some(url.dbname()),
+            // #[cfg(feature = "mssql")]
+            // ConnectionInfo::Mssql(url) => Some(url.dbname()),
+            // #[cfg(feature = "sqlite")]
+            // ConnectionInfo::Sqlite { .. } | ConnectionInfo::InMemorySqlite { .. } => None,
             ConnectionInfo::External(_) => None,
         }
     }
@@ -120,16 +120,16 @@ impl ConnectionInfo {
     /// - In MySQL, it is the database name.
     pub fn schema_name(&self) -> &str {
         match self {
-            #[cfg(feature = "postgresql")]
-            ConnectionInfo::Postgres(url) => url.schema(),
-            #[cfg(feature = "mysql")]
-            ConnectionInfo::Mysql(url) => url.dbname(),
-            #[cfg(feature = "mssql")]
-            ConnectionInfo::Mssql(url) => url.schema(),
-            #[cfg(feature = "sqlite")]
-            ConnectionInfo::Sqlite { db_name, .. } => db_name,
-            #[cfg(feature = "sqlite")]
-            ConnectionInfo::InMemorySqlite { db_name } => db_name,
+            // #[cfg(feature = "postgresql")]
+            // ConnectionInfo::Postgres(url) => url.schema(),
+            // #[cfg(feature = "mysql")]
+            // ConnectionInfo::Mysql(url) => url.dbname(),
+            // #[cfg(feature = "mssql")]
+            // ConnectionInfo::Mssql(url) => url.schema(),
+            // #[cfg(feature = "sqlite")]
+            // ConnectionInfo::Sqlite { db_name, .. } => db_name,
+            // #[cfg(feature = "sqlite")]
+            // ConnectionInfo::InMemorySqlite { db_name } => db_name,
             ConnectionInfo::External(info) => &info.schema_name,
         }
     }
@@ -137,15 +137,14 @@ impl ConnectionInfo {
     /// The provided database host. This will be `"localhost"` on SQLite.
     pub fn host(&self) -> &str {
         match self {
-            #[cfg(feature = "postgresql")]
-            ConnectionInfo::Postgres(url) => url.host(),
-            #[cfg(feature = "mysql")]
-            ConnectionInfo::Mysql(url) => url.host(),
-            #[cfg(feature = "mssql")]
-            ConnectionInfo::Mssql(url) => url.host(),
-            #[cfg(feature = "sqlite")]
-            ConnectionInfo::Sqlite { .. } | ConnectionInfo::InMemorySqlite { .. } => "localhost",
-
+            // #[cfg(feature = "postgresql")]
+            // ConnectionInfo::Postgres(url) => url.host(),
+            // #[cfg(feature = "mysql")]
+            // ConnectionInfo::Mysql(url) => url.host(),
+            // #[cfg(feature = "mssql")]
+            // ConnectionInfo::Mssql(url) => url.host(),
+            // #[cfg(feature = "sqlite")]
+            // ConnectionInfo::Sqlite { .. } | ConnectionInfo::InMemorySqlite { .. } => "localhost",
             ConnectionInfo::External(_) => "external",
         }
     }
@@ -153,14 +152,14 @@ impl ConnectionInfo {
     /// The provided database user name. This will be `None` on SQLite.
     pub fn username(&self) -> Option<Cow<str>> {
         match self {
-            #[cfg(feature = "postgresql")]
-            ConnectionInfo::Postgres(url) => Some(url.username()),
-            #[cfg(feature = "mysql")]
-            ConnectionInfo::Mysql(url) => Some(url.username()),
-            #[cfg(feature = "mssql")]
-            ConnectionInfo::Mssql(url) => url.username().map(Cow::from),
-            #[cfg(feature = "sqlite")]
-            ConnectionInfo::Sqlite { .. } | ConnectionInfo::InMemorySqlite { .. } => None,
+            // #[cfg(feature = "postgresql")]
+            // ConnectionInfo::Postgres(url) => Some(url.username()),
+            // #[cfg(feature = "mysql")]
+            // ConnectionInfo::Mysql(url) => Some(url.username()),
+            // #[cfg(feature = "mssql")]
+            // ConnectionInfo::Mssql(url) => url.username().map(Cow::from),
+            // #[cfg(feature = "sqlite")]
+            // ConnectionInfo::Sqlite { .. } | ConnectionInfo::InMemorySqlite { .. } => None,
             ConnectionInfo::External(_) => None,
         }
     }
@@ -168,16 +167,16 @@ impl ConnectionInfo {
     /// The database file for SQLite, otherwise `None`.
     pub fn file_path(&self) -> Option<&str> {
         match self {
-            #[cfg(feature = "postgresql")]
-            ConnectionInfo::Postgres(_) => None,
-            #[cfg(feature = "mysql")]
-            ConnectionInfo::Mysql(_) => None,
-            #[cfg(feature = "mssql")]
-            ConnectionInfo::Mssql(_) => None,
-            #[cfg(feature = "sqlite")]
-            ConnectionInfo::Sqlite { file_path, .. } => Some(file_path),
-            #[cfg(feature = "sqlite")]
-            ConnectionInfo::InMemorySqlite { .. } => None,
+            // #[cfg(feature = "postgresql")]
+            // ConnectionInfo::Postgres(_) => None,
+            // #[cfg(feature = "mysql")]
+            // ConnectionInfo::Mysql(_) => None,
+            // #[cfg(feature = "mssql")]
+            // ConnectionInfo::Mssql(_) => None,
+            // #[cfg(feature = "sqlite")]
+            // ConnectionInfo::Sqlite { file_path, .. } => Some(file_path),
+            // #[cfg(feature = "sqlite")]
+            // ConnectionInfo::InMemorySqlite { .. } => None,
             ConnectionInfo::External(_) => None,
         }
     }
@@ -185,14 +184,14 @@ impl ConnectionInfo {
     /// The family of databases connected.
     pub fn sql_family(&self) -> SqlFamily {
         match self {
-            #[cfg(feature = "postgresql")]
-            ConnectionInfo::Postgres(_) => SqlFamily::Postgres,
-            #[cfg(feature = "mysql")]
-            ConnectionInfo::Mysql(_) => SqlFamily::Mysql,
-            #[cfg(feature = "mssql")]
-            ConnectionInfo::Mssql(_) => SqlFamily::Mssql,
-            #[cfg(feature = "sqlite")]
-            ConnectionInfo::Sqlite { .. } | ConnectionInfo::InMemorySqlite { .. } => SqlFamily::Sqlite,
+            // #[cfg(feature = "postgresql")]
+            // ConnectionInfo::Postgres(_) => SqlFamily::Postgres,
+            // #[cfg(feature = "mysql")]
+            // ConnectionInfo::Mysql(_) => SqlFamily::Mysql,
+            // #[cfg(feature = "mssql")]
+            // ConnectionInfo::Mssql(_) => SqlFamily::Mssql,
+            // #[cfg(feature = "sqlite")]
+            // ConnectionInfo::Sqlite { .. } | ConnectionInfo::InMemorySqlite { .. } => SqlFamily::Sqlite,
             ConnectionInfo::External(info) => info.sql_family.to_owned(),
         }
     }
@@ -200,14 +199,14 @@ impl ConnectionInfo {
     /// The provided database port, if applicable.
     pub fn port(&self) -> Option<u16> {
         match self {
-            #[cfg(feature = "postgresql")]
-            ConnectionInfo::Postgres(url) => Some(url.port()),
-            #[cfg(feature = "mysql")]
-            ConnectionInfo::Mysql(url) => Some(url.port()),
-            #[cfg(feature = "mssql")]
-            ConnectionInfo::Mssql(url) => Some(url.port()),
-            #[cfg(feature = "sqlite")]
-            ConnectionInfo::Sqlite { .. } | ConnectionInfo::InMemorySqlite { .. } => None,
+            // #[cfg(feature = "postgresql")]
+            // ConnectionInfo::Postgres(url) => Some(url.port()),
+            // #[cfg(feature = "mysql")]
+            // ConnectionInfo::Mysql(url) => Some(url.port()),
+            // #[cfg(feature = "mssql")]
+            // ConnectionInfo::Mssql(url) => Some(url.port()),
+            // #[cfg(feature = "sqlite")]
+            // ConnectionInfo::Sqlite { .. } | ConnectionInfo::InMemorySqlite { .. } => None,
             ConnectionInfo::External(_) => None,
         }
     }
@@ -216,8 +215,8 @@ impl ConnectionInfo {
     pub fn pg_bouncer(&self) -> bool {
         #[allow(unreachable_patterns)]
         match self {
-            #[cfg(feature = "postgresql")]
-            ConnectionInfo::Postgres(url) => url.pg_bouncer(),
+            // #[cfg(feature = "postgresql")]
+            // ConnectionInfo::Postgres(url) => url.pg_bouncer(),
             _ => false,
         }
     }
@@ -226,16 +225,16 @@ impl ConnectionInfo {
     /// and port on MySQL/Postgres, and the file path on SQLite.
     pub fn database_location(&self) -> String {
         match self {
-            #[cfg(feature = "postgresql")]
-            ConnectionInfo::Postgres(url) => format!("{}:{}", url.host(), url.port()),
-            #[cfg(feature = "mysql")]
-            ConnectionInfo::Mysql(url) => format!("{}:{}", url.host(), url.port()),
-            #[cfg(feature = "mssql")]
-            ConnectionInfo::Mssql(url) => format!("{}:{}", url.host(), url.port()),
-            #[cfg(feature = "sqlite")]
-            ConnectionInfo::Sqlite { file_path, .. } => file_path.clone(),
-            #[cfg(feature = "sqlite")]
-            ConnectionInfo::InMemorySqlite { .. } => "in-memory".into(),
+            // #[cfg(feature = "postgresql")]
+            // ConnectionInfo::Postgres(url) => format!("{}:{}", url.host(), url.port()),
+            // #[cfg(feature = "mysql")]
+            // ConnectionInfo::Mysql(url) => format!("{}:{}", url.host(), url.port()),
+            // #[cfg(feature = "mssql")]
+            // ConnectionInfo::Mssql(url) => format!("{}:{}", url.host(), url.port()),
+            // #[cfg(feature = "sqlite")]
+            // ConnectionInfo::Sqlite { file_path, .. } => file_path.clone(),
+            // #[cfg(feature = "sqlite")]
+            // ConnectionInfo::InMemorySqlite { .. } => "in-memory".into(),
             ConnectionInfo::External(_) => "external".into(),
         }
     }

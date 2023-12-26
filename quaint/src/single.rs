@@ -125,45 +125,45 @@ impl Quaint {
     /// - `isolationLevel` the transaction isolation level. Possible values:
     ///   `READ UNCOMMITTED`, `READ COMMITTED`, `REPEATABLE READ`, `SNAPSHOT`,
     ///   `SERIALIZABLE`.
-    #[cfg_attr(target_arch = "wasm32", allow(unused_variables))]
-    #[allow(unreachable_code)]
-    pub async fn new(url_str: &str) -> crate::Result<Self> {
-        let inner = match url_str {
-            #[cfg(feature = "sqlite-native")]
-            s if s.starts_with("file") => {
-                let params = connector::SqliteParams::try_from(s)?;
-                let sqlite = connector::Sqlite::new(&params.file_path)?;
+    // #[cfg_attr(target_arch = "wasm32", allow(unused_variables))]
+    // #[allow(unreachable_code)]
+    // pub async fn new(url_str: &str) -> crate::Result<Self> {
+    //     let inner = match url_str {
+    //         #[cfg(feature = "sqlite-native")]
+    //         s if s.starts_with("file") => {
+    //             let params = connector::SqliteParams::try_from(s)?;
+    //             let sqlite = connector::Sqlite::new(&params.file_path)?;
 
-                Arc::new(sqlite) as Arc<dyn Queryable>
-            }
-            #[cfg(feature = "mysql-native")]
-            s if s.starts_with("mysql") => {
-                let url = connector::MysqlUrl::new(url::Url::parse(s)?)?;
-                let mysql = connector::Mysql::new(url).await?;
+    //             Arc::new(sqlite) as Arc<dyn Queryable>
+    //         }
+    //         #[cfg(feature = "mysql-native")]
+    //         s if s.starts_with("mysql") => {
+    //             let url = connector::MysqlUrl::new(url::Url::parse(s)?)?;
+    //             let mysql = connector::Mysql::new(url).await?;
 
-                Arc::new(mysql) as Arc<dyn Queryable>
-            }
-            #[cfg(feature = "postgresql-native")]
-            s if s.starts_with("postgres") || s.starts_with("postgresql") => {
-                let url = connector::PostgresUrl::new(url::Url::parse(s)?)?;
-                let psql = connector::PostgreSql::new(url).await?;
-                Arc::new(psql) as Arc<dyn Queryable>
-            }
-            #[cfg(feature = "mssql-native")]
-            s if s.starts_with("jdbc:sqlserver") | s.starts_with("sqlserver") => {
-                let url = connector::MssqlUrl::new(s)?;
-                let psql = connector::Mssql::new(url).await?;
+    //             Arc::new(mysql) as Arc<dyn Queryable>
+    //         }
+    //         #[cfg(feature = "postgresql-native")]
+    //         s if s.starts_with("postgres") || s.starts_with("postgresql") => {
+    //             let url = connector::PostgresUrl::new(url::Url::parse(s)?)?;
+    //             let psql = connector::PostgreSql::new(url).await?;
+    //             Arc::new(psql) as Arc<dyn Queryable>
+    //         }
+    //         #[cfg(feature = "mssql-native")]
+    //         s if s.starts_with("jdbc:sqlserver") | s.starts_with("sqlserver") => {
+    //             let url = connector::MssqlUrl::new(s)?;
+    //             let psql = connector::Mssql::new(url).await?;
 
-                Arc::new(psql) as Arc<dyn Queryable>
-            }
-            _ => unimplemented!("Supported url schemes: file or sqlite, mysql, postgresql or jdbc:sqlserver."),
-        };
+    //             Arc::new(psql) as Arc<dyn Queryable>
+    //         }
+    //         _ => unimplemented!("Supported url schemes: file or sqlite, mysql, postgresql or jdbc:sqlserver."),
+    //     };
 
-        let connection_info = Arc::new(ConnectionInfo::from_url(url_str)?);
-        Self::log_start(&connection_info);
+    //     let connection_info = Arc::new(ConnectionInfo::from_url(url_str)?);
+    //     Self::log_start(&connection_info);
 
-        Ok(Self { inner, connection_info })
-    }
+    //     Ok(Self { inner, connection_info })
+    // }
 
     #[cfg(feature = "sqlite-native")]
     /// Open a new SQLite database in memory.

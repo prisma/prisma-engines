@@ -163,9 +163,8 @@ pub enum ErrorKind {
     #[error("Error querying the database: {}", _0)]
     QueryError(Box<dyn std::error::Error + Send + Sync + 'static>),
 
-    #[error("Invalid input provided to query: {}", _0)]
-    QueryInvalidInput(String),
-
+    // #[error("Invalid input provided to query: {}", _0)]
+    // QueryInvalidInput(String),
     #[error("Database does not exist: {}", db_name)]
     DatabaseDoesNotExist { db_name: Name },
 
@@ -193,9 +192,8 @@ pub enum ErrorKind {
     #[error("Foreign key constraint failed: {}", constraint)]
     ForeignKeyConstraintViolation { constraint: DatabaseConstraint },
 
-    #[error("Error creating a database connection.")]
-    ConnectionError(Box<dyn std::error::Error + Send + Sync + 'static>),
-
+    // #[error("Error creating a database connection.")]
+    // ConnectionError(Box<dyn std::error::Error + Send + Sync + 'static>),
     #[error("Error reading the column value: {}", _0)]
     ColumnReadFailure(Box<dyn std::error::Error + Send + Sync + 'static>),
 
@@ -220,12 +218,11 @@ pub enum ErrorKind {
     #[error("The provided arguments are not supported")]
     InvalidConnectionArguments,
 
-    #[error("Error in an I/O operation: {0}")]
-    IoError(io::Error),
+    // #[error("Error in an I/O operation: {0}")]
+    // IoError(io::Error),
 
-    #[error("Timed out when connecting to the database.")]
-    ConnectTimeout,
-
+    // #[error("Timed out when connecting to the database.")]
+    // ConnectTimeout,
     #[error("The server terminated the connection.")]
     ConnectionClosed,
 
@@ -243,9 +240,8 @@ pub enum ErrorKind {
     #[error("Timed out during query execution.")]
     SocketTimeout,
 
-    #[error("Error opening a TLS connection. {}", message)]
-    TlsError { message: String },
-
+    // #[error("Error opening a TLS connection. {}", message)]
+    // TlsError { message: String },
     #[error("Value out of range error. {}", message)]
     ValueOutOfRange { message: String },
 
@@ -357,11 +353,11 @@ impl From<url::ParseError> for Error {
     }
 }
 
-impl From<io::Error> for Error {
-    fn from(e: io::Error) -> Error {
-        Error::builder(ErrorKind::IoError(e)).build()
-    }
-}
+// impl From<io::Error> for Error {
+//     fn from(e: io::Error) -> Error {
+//         Error::builder(ErrorKind::IoError(e)).build()
+//     }
+// }
 
 impl From<std::num::ParseIntError> for Error {
     fn from(_e: std::num::ParseIntError) -> Error {

@@ -58,11 +58,11 @@ impl ConnectorError {
                     message: format!("{message}"),
                 },
             )),
-            ErrorKind::QueryInvalidInput(message) => Some(KnownError::new(
-                user_facing_errors::query_engine::DatabaseAssertionViolation {
-                    database_error: message.to_owned(),
-                },
-            )),
+            // ErrorKind::QueryInvalidInput(message) => Some(KnownError::new(
+            //     user_facing_errors::query_engine::DatabaseAssertionViolation {
+            //         database_error: message.to_owned(),
+            //     },
+            // )),
             ErrorKind::UnsupportedFeature(feature) => {
                 Some(KnownError::new(user_facing_errors::query_engine::UnsupportedFeature {
                     feature: feature.clone(),
@@ -95,18 +95,18 @@ impl ConnectorError {
             ErrorKind::TransactionAborted { message } => Some(KnownError::new(
                 user_facing_errors::query_engine::InteractiveTransactionError { error: message.clone() },
             )),
-            ErrorKind::TransactionWriteConflict => Some(KnownError::new(
-                user_facing_errors::query_engine::TransactionWriteConflict {},
-            )),
+            // ErrorKind::TransactionWriteConflict => Some(KnownError::new(
+            //     user_facing_errors::query_engine::TransactionWriteConflict {},
+            // )),
             ErrorKind::TransactionAlreadyClosed { message } => {
                 Some(KnownError::new(user_facing_errors::common::TransactionAlreadyClosed {
                     message: message.clone(),
                 }))
             }
             ErrorKind::ConnectionClosed => Some(KnownError::new(user_facing_errors::common::ConnectionClosed)),
-            ErrorKind::MongoReplicaSetRequired => Some(KnownError::new(
-                user_facing_errors::query_engine::MongoReplicaSetRequired {},
-            )),
+            // ErrorKind::MongoReplicaSetRequired => Some(KnownError::new(
+            //     user_facing_errors::query_engine::MongoReplicaSetRequired {},
+            // )),
             ErrorKind::RawDatabaseError { code, message } => Some(user_facing_errors::KnownError::new(
                 user_facing_errors::query_engine::RawQueryFailed {
                     code: code.clone(),
@@ -203,9 +203,8 @@ pub enum ErrorKind {
     #[error("Conversion error: {}", _0)]
     ConversionError(anyhow::Error),
 
-    #[error("Invalid input provided to query: {}", _0)]
-    QueryInvalidInput(String),
-
+    // #[error("Invalid input provided to query: {}", _0)]
+    // QueryInvalidInput(String),
     #[error("Conversion error: {}", _0)]
     InternalConversionError(String),
 

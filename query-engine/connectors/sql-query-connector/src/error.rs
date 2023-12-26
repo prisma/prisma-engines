@@ -10,7 +10,7 @@ pub(crate) enum RawError {
         expected: usize,
         actual: usize,
     },
-    QueryInvalidInput(String),
+    // QueryInvalidInput(String),
     ConnectionClosed,
     Database {
         code: Option<String>,
@@ -30,7 +30,7 @@ impl From<RawError> for SqlError {
             RawError::IncorrectNumberOfParameters { expected, actual } => {
                 Self::IncorrectNumberOfParameters { expected, actual }
             }
-            RawError::QueryInvalidInput(message) => Self::QueryInvalidInput(message),
+            // RawError::QueryInvalidInput(message) => Self::QueryInvalidInput(message),
             RawError::UnsupportedColumnType { column_type } => Self::RawError {
                 code: String::from("N/A"),
                 message: format!(
@@ -60,7 +60,7 @@ impl From<quaint::error::Error> for RawError {
             quaint::error::ErrorKind::UnsupportedColumnType { column_type } => Self::UnsupportedColumnType {
                 column_type: column_type.to_owned(),
             },
-            quaint::error::ErrorKind::QueryInvalidInput(message) => Self::QueryInvalidInput(message.to_owned()),
+            // quaint::error::ErrorKind::QueryInvalidInput(message) => Self::QueryInvalidInput(message.to_owned()),
             quaint::error::ErrorKind::ExternalError(id) => Self::External { id: *id },
             _ => Self::Database {
                 code: e.original_code().map(ToString::to_string),
@@ -106,9 +106,8 @@ pub enum SqlError {
     #[error("Error querying the database: {}", _0)]
     QueryError(Box<dyn std::error::Error + Send + Sync>),
 
-    #[error("Invalid input provided to query: {}", _0)]
-    QueryInvalidInput(String),
-
+    // #[error("Invalid input provided to query: {}", _0)]
+    // QueryInvalidInput(String),
     #[error("The column value was different from the model")]
     ColumnReadFailure(Box<dyn std::error::Error + Send + Sync>),
 
@@ -230,7 +229,7 @@ impl SqlError {
                 child_name,
             }),
             SqlError::ConversionError(e) => ConnectorError::from_kind(ErrorKind::ConversionError(e)),
-            SqlError::QueryInvalidInput(e) => ConnectorError::from_kind(ErrorKind::QueryInvalidInput(e)),
+            // SqlError::QueryInvalidInput(e) => ConnectorError::from_kind(ErrorKind::QueryInvalidInput(e)),
             SqlError::IncorrectNumberOfParameters { expected, actual } => {
                 ConnectorError::from_kind(ErrorKind::IncorrectNumberOfParameters { expected, actual })
             }
@@ -281,8 +280,8 @@ impl From<quaint::error::Error> for SqlError {
                 message: reason,
             },
             QuaintKind::QueryError(qe) => Self::QueryError(qe),
-            QuaintKind::QueryInvalidInput(qe) => Self::QueryInvalidInput(qe),
-            e @ QuaintKind::IoError(_) => Self::ConnectionError(e),
+            // QuaintKind::QueryInvalidInput(qe) => Self::QueryInvalidInput(qe),
+            // e @ QuaintKind::IoError(_) => Self::ConnectionError(e),
             QuaintKind::NotFound => Self::RecordDoesNotExist,
             QuaintKind::UniqueConstraintViolation { constraint } => Self::UniqueConstraintViolation {
                 constraint: constraint.into(),
@@ -296,7 +295,7 @@ impl From<quaint::error::Error> for SqlError {
                 constraint: constraint.into(),
             },
             QuaintKind::MissingFullTextSearchIndex => Self::MissingFullTextSearchIndex,
-            e @ QuaintKind::ConnectionError(_) => Self::ConnectionError(e),
+            // e @ QuaintKind::ConnectionError(_) => Self::ConnectionError(e),
             QuaintKind::ColumnReadFailure(e) => Self::ColumnReadFailure(e),
             QuaintKind::ColumnNotFound { column } => SqlError::ColumnDoesNotExist(format!("{column}")),
             QuaintKind::TableDoesNotExist { table } => SqlError::TableDoesNotExist(format!("{table}")),
@@ -315,16 +314,18 @@ impl From<quaint::error::Error> for SqlError {
             e @ QuaintKind::ValueOutOfRange { .. } => SqlError::QueryError(e.into()),
             e @ QuaintKind::UUIDError(_) => SqlError::ConversionError(e.into()),
             e @ QuaintKind::DatabaseUrlIsInvalid { .. } => SqlError::ConnectionError(e),
+
+            // Note: not sure whether `DatabaseDoesNotExist` is reachable when targeting `wasm32`
             e @ QuaintKind::DatabaseDoesNotExist { .. } => SqlError::ConnectionError(e),
             e @ QuaintKind::AuthenticationFailed { .. } => SqlError::ConnectionError(e),
             e @ QuaintKind::DatabaseAccessDenied { .. } => SqlError::ConnectionError(e),
             e @ QuaintKind::DatabaseAlreadyExists { .. } => SqlError::ConnectionError(e),
             e @ QuaintKind::InvalidConnectionArguments => SqlError::ConnectionError(e),
-            e @ QuaintKind::ConnectTimeout => SqlError::ConnectionError(e),
+            // e @ QuaintKind::ConnectTimeout => SqlError::ConnectionError(e),
             e @ QuaintKind::SocketTimeout => SqlError::ConnectionError(e),
             e @ QuaintKind::PoolTimeout { .. } => SqlError::ConnectionError(e),
             e @ QuaintKind::PoolClosed { .. } => SqlError::ConnectionError(e),
-            e @ QuaintKind::TlsError { .. } => Self::ConnectionError(e),
+            // e @ QuaintKind::TlsError { .. } => Self::ConnectionError(e),
         }
     }
 }

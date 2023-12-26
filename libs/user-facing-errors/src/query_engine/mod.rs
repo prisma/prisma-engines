@@ -113,12 +113,13 @@ pub struct TypeMismatch {
     pub field_name: String,
 }
 
-#[derive(Debug, UserFacingError, Serialize)]
-#[user_facing(code = "P2007", message = "Data validation error `{database_error}`")]
-pub struct TypeMismatchInvalidCustomType {
-    /// Database error returned by the underlying data source
-    pub database_error: String,
-}
+// Note: this error isn't used anywhere in the codebase.
+// #[derive(Debug, UserFacingError, Serialize)]
+// #[user_facing(code = "P2007", message = "Data validation error `{database_error}`")]
+// pub struct TypeMismatchInvalidCustomType {
+//     /// Database error returned by the underlying data source
+//     pub database_error: String,
+// }
 
 #[derive(Debug, UserFacingError, Serialize)]
 #[user_facing(
@@ -233,15 +234,15 @@ pub struct InconsistentColumnData {
     pub message: String,
 }
 
-#[derive(Debug, UserFacingError, Serialize)]
-#[user_facing(
-    code = "P2024",
-    message = "Timed out fetching a new connection from the connection pool. More info: http://pris.ly/d/connection-pool (Current connection pool timeout: {timeout}, connection limit: {connection_limit})"
-)]
-pub struct PoolTimeout {
-    pub connection_limit: u64,
-    pub timeout: u64,
-}
+// #[derive(Debug, UserFacingError, Serialize)]
+// #[user_facing(
+//     code = "P2024",
+//     message = "Timed out fetching a new connection from the connection pool. More info: http://pris.ly/d/connection-pool (Current connection pool timeout: {timeout}, connection limit: {connection_limit})"
+// )]
+// pub struct PoolTimeout {
+//     pub connection_limit: u64,
+//     pub timeout: u64,
+// }
 
 #[derive(Debug, UserFacingError, Serialize)]
 #[user_facing(
@@ -289,12 +290,12 @@ pub struct QueryParameterLimitExceeded {
 )]
 pub struct MissingFullTextSearchIndex {}
 
-#[derive(Debug, UserFacingError, Serialize)]
-#[user_facing(
-    code = "P2031",
-    message = "Prisma needs to perform transactions, which requires your MongoDB server to be run as a replica set. https://pris.ly/d/mongodb-replica-set"
-)]
-pub struct MongoReplicaSetRequired {}
+// #[derive(Debug, UserFacingError, Serialize)]
+// #[user_facing(
+//     code = "P2031",
+//     message = "Prisma needs to perform transactions, which requires your MongoDB server to be run as a replica set. https://pris.ly/d/mongodb-replica-set"
+// )]
+// pub struct MongoReplicaSetRequired {}
 
 #[derive(Debug, UserFacingError, Serialize)]
 #[user_facing(
@@ -315,19 +316,19 @@ pub struct ValueFitError {
     pub details: String,
 }
 
-#[derive(Debug, UserFacingError, Serialize)]
-#[user_facing(
-    code = "P2034",
-    message = "Transaction failed due to a write conflict or a deadlock. Please retry your transaction"
-)]
-pub struct TransactionWriteConflict {}
+// #[derive(Debug, UserFacingError, Serialize)]
+// #[user_facing(
+//     code = "P2034",
+//     message = "Transaction failed due to a write conflict or a deadlock. Please retry your transaction"
+// )]
+// pub struct TransactionWriteConflict {}
 
-#[derive(Debug, UserFacingError, Serialize)]
-#[user_facing(code = "P2035", message = "Assertion violation on the database: `{database_error}`")]
-pub struct DatabaseAssertionViolation {
-    /// Database error returned by the underlying connector driver.
-    pub database_error: String,
-}
+// #[derive(Debug, UserFacingError, Serialize)]
+// #[user_facing(code = "P2035", message = "Assertion violation on the database: `{database_error}`")]
+// pub struct DatabaseAssertionViolation {
+//     /// Database error returned by the underlying connector driver.
+//     pub database_error: String,
+// }
 
 #[derive(Debug, UserFacingError, Serialize)]
 #[user_facing(code = "P2036", message = "Error in external connector (id {id})")]
