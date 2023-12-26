@@ -608,7 +608,7 @@ mod tests {
         match res {
             Ok(_) => unreachable!(),
             Err(e) => match e.kind() {
-                ErrorKind::TlsError { .. } => (),
+                ErrorKind::Native(NativeErrorKind::TlsError { .. }) => (),
                 other => panic!("{:#?}", other),
             },
         }
@@ -626,7 +626,7 @@ mod tests {
         match res {
             Ok(_) => unreachable!(),
             Err(e) => match e.kind() {
-                ErrorKind::IncorrectNumberOfParameters { expected, actual } => {
+                ErrorKind::Native(NativeErrorKind::IncorrectNumberOfParameters { expected, actual }) => {
                     assert_eq!(1, *expected);
                     assert_eq!(2, *actual);
                 }

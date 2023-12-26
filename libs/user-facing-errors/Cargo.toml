@@ -15,4 +15,5 @@ quaint = { path = "../../quaint", optional = true }
 
 [features]
 default = []
+# native = ["quaint/native"]
 sql = ["quaint"]

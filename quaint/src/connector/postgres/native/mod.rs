@@ -7,6 +7,7 @@ mod error;
 pub(crate) use crate::connector::postgres::url::PostgresUrl;
 use crate::connector::postgres::url::{Hidden, SslAcceptMode, SslParams};
 use crate::connector::{timeout, IsolationLevel, Transaction};
+use crate::error::NativeErrorKind;
 
 use crate::{
     ast::{Query, Value},
@@ -93,9 +94,9 @@ impl SslParams {
 
         if let Some(ref cert_file) = self.certificate_file {
             let cert = fs::read(cert_file).map_err(|err| {
-                Error::builder(ErrorKind::TlsError {
+                Error::builder(ErrorKind::Native(NativeErrorKind::TlsError {
                     message: format!("cert file not found ({err})"),
-                })
+                }))
                 .build()
             })?;
 
@@ -104,9 +105,9 @@ impl SslParams {
 
         if let Some(ref identity_file) = self.identity_file {
             let db = fs::read(identity_file).map_err(|err| {
-                Error::builder(ErrorKind::TlsError {
+                Error::builder(ErrorKind::Native(NativeErrorKind::TlsError {
                     message: format!("identity file not found ({err})"),
-                })
+                }))
                 .build()
             })?;
             let password = self.identity_password.0.as_deref().unwrap_or("");
@@ -305,11 +306,11 @@ impl PostgreSql {
         if params.len() > i16::MAX as usize {
             // tokio_postgres would return an error here. Let's avoid calling the driver
             // and return an error early.
-            let kind = ErrorKind::QueryInvalidInput(format!(
+            let kind = ErrorKind::Native(NativeErrorKind::QueryInvalidInput(format!(
                 "too many bind variables in prepared statement, expected maximum of {}, received {}",
                 i16::MAX,
                 params.len()
-            ));
+            )));
             Err(Error::builder(kind).build())
         } else {
             Ok(())
@@ -371,10 +372,10 @@ impl Queryable for PostgreSql {
             let stmt = self.fetch_cached(sql, &[]).await?;
 
             if stmt.params().len() != params.len() {
-                let kind = ErrorKind::IncorrectNumberOfParameters {
+                let kind = ErrorKind::Native(NativeErrorKind::IncorrectNumberOfParameters {
                     expected: stmt.params().len(),
                     actual: params.len(),
-                };
+                });
 
                 return Err(Error::builder(kind).build());
             }
@@ -401,10 +402,10 @@ impl Queryable for PostgreSql {
             let stmt = self.fetch_cached(sql, params).await?;
 
             if stmt.params().len() != params.len() {
-                let kind = ErrorKind::IncorrectNumberOfParameters {
+                let kind = ErrorKind::Native(NativeErrorKind::IncorrectNumberOfParameters {
                     expected: stmt.params().len(),
                     actual: params.len(),
-                };
+                });
 
                 return Err(Error::builder(kind).build());
             }
@@ -437,10 +438,10 @@ impl Queryable for PostgreSql {
             let stmt = self.fetch_cached(sql, &[]).await?;
 
             if stmt.params().len() != params.len() {
-                let kind = ErrorKind::IncorrectNumberOfParameters {
+                let kind = ErrorKind::Native(NativeErrorKind::IncorrectNumberOfParameters {
                     expected: stmt.params().len(),
                     actual: params.len(),
-                };
+                });
 
                 return Err(Error::builder(kind).build());
             }
@@ -461,10 +462,10 @@ impl Queryable for PostgreSql {
             let stmt = self.fetch_cached(sql, params).await?;
 
             if stmt.params().len() != params.len() {
-                let kind = ErrorKind::IncorrectNumberOfParameters {
+                let kind = ErrorKind::Native(NativeErrorKind::IncorrectNumberOfParameters {
                     expected: stmt.params().len(),
                     actual: params.len(),
-                };
+                });
 
                 return Err(Error::builder(kind).build());
             }
