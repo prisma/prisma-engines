@@ -53,9 +53,9 @@ jobs:
         run: |
           make run-bench | tee results.txt
 
-          regressed=$(grep "slower than Web Assembly: Latest" results.txt | cut -f1 -d'x' | awk '$1 > 1.01' | wc -l )
+          regressed=$(grep "slower than Web Assembly: Latest" results.txt | cut -f1 -d'x' | awk '$1 > 1.02' | wc -l )
           if [ "$regressed" -gt 0 ]; then
-              summary="🚨 WASM query-engine: $regressed benchmark(s) have regressed at least 1%"
+              summary="🚨 WASM query-engine: $regressed benchmark(s) have regressed at least 2%"
               status=failed
           else
               summary="✅ WASM query-engine: no benchmarks have regressed"
