@@ -268,6 +268,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "bincode"
+version = "1.3.3"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "b1f45e9417d87227c7a56d22e471c6206462cba514c7590c09aff4cf6d1ddcad"
+dependencies = [
+ "serde",
+]
+
+[[package]]
 name = "bindgen"
 version = "0.59.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -658,6 +667,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "compile-schema"
+version = "0.1.0"
+dependencies = [
+ "bincode",
+ "psl",
+ "serde",
+]
+
+[[package]]
 name = "connection-string"
 version = "0.2.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1042,6 +1060,7 @@ dependencies = [
  "colored",
  "indoc 2.0.3",
  "pest",
+ "serde",
 ]
 
 [[package]]
@@ -3081,6 +3100,7 @@ dependencies = [
 name = "parser-database"
 version = "0.1.0"
 dependencies = [
+ "bincode",
  "diagnostics",
  "either",
  "enumflags2",
@@ -3509,6 +3529,7 @@ name = "psl-core"
 version = "0.1.0"
 dependencies = [
  "bigdecimal",
+ "bincode",
  "chrono",
  "connection-string",
  "diagnostics",
@@ -4514,9 +4535,11 @@ dependencies = [
 name = "schema-ast"
 version = "0.1.0"
 dependencies = [
+ "bincode",
  "diagnostics",
  "pest",
  "pest_derive",
+ "serde",
 ]
 
 [[package]]

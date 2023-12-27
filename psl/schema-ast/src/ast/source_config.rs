@@ -1,17 +1,22 @@
+use serde::{Deserialize, Serialize};
+
 use super::{Comment, ConfigBlockProperty, Identifier, Span, WithDocumentation, WithIdentifier, WithSpan};
 
 /// A source block declaration.
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct SourceConfig {
     /// Name of this source.
     pub name: Identifier,
     /// Top-level configuration properties for this source.
     pub properties: Vec<ConfigBlockProperty>,
     /// The comments for this source block.
+    #[serde(skip)]
     pub(crate) documentation: Option<Comment>,
     /// The location of this source block in the text representation.
+    #[serde(skip)]
     pub span: Span,
     /// The span of the inner contents.
+    #[serde(skip)]
     pub inner_span: Span,
 }
 

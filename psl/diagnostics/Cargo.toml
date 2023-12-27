@@ -7,3 +7,4 @@ edition = "2021"
 colored = "2"
 pest = "2.1.3"
 indoc.workspace = true
+serde.workspace = true

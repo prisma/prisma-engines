@@ -53,7 +53,7 @@ impl QueryEngine {
 
         // Note: if we used `psl::validate`, we'd add ~1MB to the Wasm artifact (before gzip).
         let connector_registry: ConnectorRegistry<'_> = &[POSTGRES, MYSQL, SQLITE];
-        let mut schema = psl::parse_without_validation(datamodel.into(), connector_registry);
+        let mut schema = psl::parse_bincode(&datamodel, connector_registry);
         let config = &mut schema.configuration;
         let preview_features = config.preview_features();
 

@@ -1,3 +1,5 @@
+use serde::{Deserialize, Serialize};
+
 use crate::ast::{Expression, Identifier, Span, WithSpan};
 
 /// A named property in a config block.
@@ -8,7 +10,7 @@ use crate::ast::{Expression, Identifier, Span, WithSpan};
 ///     ^^^^^^^^^^^^^^^^
 /// }
 /// ```
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct ConfigBlockProperty {
     /// The property name.
     ///
@@ -29,6 +31,7 @@ pub struct ConfigBlockProperty {
     /// ```
     pub value: Option<Expression>,
     /// The node span.
+    #[serde(skip)]
     pub span: Span,
 }
 

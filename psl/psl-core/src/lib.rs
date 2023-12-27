@@ -24,6 +24,7 @@ pub use crate::{
 pub use diagnostics;
 pub use parser_database::{self, is_reserved_type_name};
 pub use schema_ast;
+use schema_ast::ast::SchemaAst;
 pub use set_config_dir::set_config_dir;
 
 use self::validate::{datasource_loader, generator_loader};
@@ -77,6 +78,23 @@ pub fn validate(file: SourceFile, connectors: ConnectorRegistry<'_>) -> Validate
 pub fn parse_without_validation(file: SourceFile, connectors: ConnectorRegistry<'_>) -> ValidatedSchema {
     let mut diagnostics = Diagnostics::new();
     let db = ParserDatabase::new(file, &mut diagnostics);
+    let configuration = validate_configuration(db.ast(), &mut diagnostics, connectors);
+    let datasources = &configuration.datasources;
+    let out = validate::parse_without_validation(db, datasources);
+
+    ValidatedSchema {
+        diagnostics,
+        configuration,
+        connector: out.connector,
+        db: out.db,
+        relation_mode: out.relation_mode,
+    }
+}
+
+pub fn parse_bincode(buffer: &[u8], connectors: ConnectorRegistry<'_>) -> ValidatedSchema {
+    let ast: SchemaAst = bincode::deserialize(buffer).unwrap();
+    let mut diagnostics = Diagnostics::new();
+    let db = ParserDatabase::from_ast(ast, &mut diagnostics, None);
     let configuration = validate_configuration(db.ast(), &mut diagnostics, connectors);
     let datasources = &configuration.datasources;
     let out = validate::parse_without_validation(db, datasources);
