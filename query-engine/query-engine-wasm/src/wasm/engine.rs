@@ -53,13 +53,9 @@ impl QueryEngine {
 
         // Note: if we used `psl::validate`, we'd add ~1MB to the Wasm artifact (before gzip).
         let connector_registry: ConnectorRegistry<'_> = &[POSTGRES, MYSQL, SQLITE];
-        let mut schema = psl::parse_without_validation(datamodel.into(), connector_registry);
-        let config = &mut schema.configuration;
-        let preview_features = config.preview_features();
+        let schema = psl::parse_without_validation(datamodel.into(), connector_registry);
 
         let js_queryable = Arc::new(driver_adapters::from_js(adapter));
-
-        let provider_name = schema.connector.provider_name();
 
         // Telemetry panics on timings if preview feature is enabled
         let enable_tracing = false; // config.preview_features().contains(PreviewFeature::Tracing);
