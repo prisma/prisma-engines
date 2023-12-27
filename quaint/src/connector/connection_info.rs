@@ -23,6 +23,7 @@ use super::NativeConnectionInfo;
 
 /// General information about a SQL connection.
 #[derive(Debug, Clone)]
+#[cfg_attr(target_arch = "wasm32", repr(transparent))]
 pub enum ConnectionInfo {
     #[cfg(not(target_arch = "wasm32"))]
     Native(NativeConnectionInfo),
