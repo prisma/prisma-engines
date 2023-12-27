@@ -1,4 +1,5 @@
 #![cfg_attr(target_arch = "wasm32", allow(unused_imports))]
+#![cfg_attr(not(target_arch = "wasm32"), allow(clippy::large_enum_variant))]
 
 use crate::error::{Error, ErrorKind};
 use std::{borrow::Cow, fmt};
@@ -156,9 +157,9 @@ impl ConnectionInfo {
             #[cfg(not(target_arch = "wasm32"))]
             ConnectionInfo::Native(info) => match info {
                 #[cfg(feature = "postgresql")]
-                NativeConnectionInfo::Postgres(url) => Some(url.username()).map(Cow::from),
+                NativeConnectionInfo::Postgres(url) => Some(url.username()),
                 #[cfg(feature = "mysql")]
-                NativeConnectionInfo::Mysql(url) => Some(url.username()).map(Cow::from),
+                NativeConnectionInfo::Mysql(url) => Some(url.username()),
                 #[cfg(feature = "mssql")]
                 NativeConnectionInfo::Mssql(url) => url.username().map(Cow::from),
                 #[cfg(feature = "sqlite")]
@@ -227,12 +228,8 @@ impl ConnectionInfo {
     /// Whether the pgbouncer mode is enabled.
     pub fn pg_bouncer(&self) -> bool {
         match self {
-            #[cfg(not(target_arch = "wasm32"))]
-            ConnectionInfo::Native(info) => match info {
-                #[cfg(feature = "postgresql")]
-                NativeConnectionInfo::Postgres(url) => url.pg_bouncer(),
-                _ => false,
-            },
+            #[cfg(all(not(target_arch = "wasm32"), feature = "postgresql"))]
+            ConnectionInfo::Native(NativeConnectionInfo::Postgres(url)) => url.pg_bouncer(),
             _ => false,
         }
     }
