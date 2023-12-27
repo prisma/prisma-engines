@@ -62,15 +62,6 @@ impl QueryEngine {
         let provider_name = schema.connector.provider_name();
         tracing::info!("Registered driver adapter for {provider_name}.");
 
-        schema
-            .diagnostics
-            .to_result()
-            .map_err(|err| ApiError::conversion(err, schema.db.source()))?;
-
-        config
-            .validate_that_one_datasource_is_provided()
-            .map_err(|errors| ApiError::conversion(errors, schema.db.source()))?;
-
         // Telemetry panics on timings if preview feature is enabled
         let enable_tracing = false; // config.preview_features().contains(PreviewFeature::Tracing);
         let engine_protocol = engine_protocol.unwrap_or(EngineProtocol::Json);
