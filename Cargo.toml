@@ -92,7 +92,7 @@ strip = "symbols"
 [profile.release]
 lto = "fat"
 codegen-units = 1
-opt-level = 's'   # Optimize for size.
+opt-level = 'z'   # Optimize for size.
 
 [profile.profiling]
 inherits = "release"
