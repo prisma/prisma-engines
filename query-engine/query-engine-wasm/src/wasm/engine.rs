@@ -56,8 +56,7 @@ impl QueryEngine {
 
         let js_queryable = Arc::new(driver_adapters::from_js(adapter));
 
-        // Telemetry panics on timings if preview feature is enabled
-        let enable_tracing = false; // config.preview_features().contains(PreviewFeature::Tracing);
+        // We skip telemetry to avoid runtime panics.
         let engine_protocol = EngineProtocol::Json;
 
         let builder = EngineBuilder {
@@ -66,7 +65,7 @@ impl QueryEngine {
         };
 
         let log_level = log_level.parse::<LevelFilter>().unwrap_or(Level::INFO.into());
-        let logger = Logger::new(log_queries, log_level, log_callback, enable_tracing);
+        let logger = Logger::new(log_queries, log_level, log_callback);
 
         Ok(Self {
             inner: RwLock::new(Inner::Builder(builder)),
