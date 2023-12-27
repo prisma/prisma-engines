@@ -38,12 +38,6 @@ pub fn invalid_connection_string_description(error_details: &str) -> String {
     details.replace('\n', " ")
 }
 
-// The following errors may arise from both native or external connections (TODO, check if this is true):
-// - `DatabaseDoesNotExist`
-// - `DatabaseAccessDenied`
-// - `DatabaseAlreadyExists`
-// - `TableDoesNotExist`
-// - `DatabaseUrlIsInvalid`
 pub fn render_quaint_error(kind: &ErrorKind, connection_info: &ConnectionInfo) -> Option<KnownError> {
     let default_value: Option<KnownError> = None;
 
