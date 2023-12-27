@@ -85,12 +85,11 @@ impl QueryEngine {
 
             let mut inner = self.inner.write().await;
             let builder = inner.as_builder()?;
+
+            let preview_features = builder.schema.configuration.preview_features();
             let arced_schema = Arc::clone(&builder.schema);
-            let arced_schema_2 = Arc::clone(&builder.schema);
 
             let engine = async move {
-                let preview_features = arced_schema.configuration.preview_features();
-
                 let executor = load_executor(
                     ConnectorKind::Js {
                         adapter: Arc::clone(&self.adapter),
@@ -110,7 +109,7 @@ impl QueryEngine {
                 connector.get_connection().instrument(conn_span).await?;
 
                 let query_schema_span = tracing::info_span!("prisma:engine:schema");
-                let query_schema = query_schema_span.in_scope(|| schema::build(arced_schema_2, true));
+                let query_schema = query_schema_span.in_scope(|| schema::build(arced_schema, true));
 
                 Ok(ConnectedEngine {
                     schema: builder.schema.clone(),
