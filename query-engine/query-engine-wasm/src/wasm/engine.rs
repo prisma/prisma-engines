@@ -48,7 +48,6 @@ impl QueryEngine {
             datamodel,
             log_level,
             log_queries,
-            engine_protocol,
         } = options;
 
         // Note: if we used `psl::validate`, we'd add ~1MB to the Wasm artifact (before gzip).
@@ -59,7 +58,7 @@ impl QueryEngine {
 
         // Telemetry panics on timings if preview feature is enabled
         let enable_tracing = false; // config.preview_features().contains(PreviewFeature::Tracing);
-        let engine_protocol = engine_protocol.unwrap_or(EngineProtocol::Json);
+        let engine_protocol = EngineProtocol::Json;
 
         let builder = EngineBuilder {
             schema: Arc::new(schema),
