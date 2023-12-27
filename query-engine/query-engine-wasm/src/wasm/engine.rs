@@ -60,7 +60,6 @@ impl QueryEngine {
         let js_queryable = Arc::new(driver_adapters::from_js(adapter));
 
         let provider_name = schema.connector.provider_name();
-        tracing::info!("Registered driver adapter for {provider_name}.");
 
         // Telemetry panics on timings if preview feature is enabled
         let enable_tracing = false; // config.preview_features().contains(PreviewFeature::Tracing);
