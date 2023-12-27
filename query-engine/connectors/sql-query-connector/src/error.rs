@@ -292,19 +292,20 @@ impl From<query_structure::ConversionFailure> for SqlError {
 }
 
 impl From<quaint::error::Error> for SqlError {
-    fn from(e: quaint::error::Error) -> Self {
-        match QuaintKind::from(e) {
+    fn from(error: quaint::error::Error) -> Self {
+        let quaint_kind = QuaintKind::from(error);
+
+        match quaint_kind {
             #[cfg(not(target_arch = "wasm32"))]
-            e @ QuaintKind::Native(native_error_kind) => match native_error_kind {
-                NativeErrorKind::QueryInvalidInput(qe) => Self::QueryInvalidInput(qe),
-                NativeErrorKind::IoError(_) | NativeErrorKind::ConnectionError(_) => Self::ConnectionError(e),
+            QuaintKind::Native(ref native_error_kind) => match native_error_kind {
+                NativeErrorKind::QueryInvalidInput(ref qe) => Self::QueryInvalidInput(qe.to_owned()),
+                NativeErrorKind::IoError(_) | NativeErrorKind::ConnectionError(_) => Self::ConnectionError(quaint_kind),
                 NativeErrorKind::ConnectionClosed => SqlError::ConnectionClosed,
-                ee @ NativeErrorKind::IncorrectNumberOfParameters { .. } => SqlError::QueryError(ee.into()),
-                NativeErrorKind::ConnectTimeout => SqlError::ConnectionError(e),
-                NativeErrorKind::PoolTimeout { .. } => SqlError::ConnectionError(e),
-                NativeErrorKind::PoolClosed { .. } => SqlError::ConnectionError(e),
-                NativeErrorKind::TlsError { .. } => Self::ConnectionError(e),
-                _ => unreachable!(),
+                NativeErrorKind::IncorrectNumberOfParameters { .. } => SqlError::QueryError(quaint_kind.into()),
+                NativeErrorKind::ConnectTimeout => SqlError::ConnectionError(quaint_kind),
+                NativeErrorKind::PoolTimeout { .. } => SqlError::ConnectionError(quaint_kind),
+                NativeErrorKind::PoolClosed { .. } => SqlError::ConnectionError(quaint_kind),
+                NativeErrorKind::TlsError { .. } => Self::ConnectionError(quaint_kind),
             },
 
             QuaintKind::RawConnectorError { status, reason } => Self::RawError {

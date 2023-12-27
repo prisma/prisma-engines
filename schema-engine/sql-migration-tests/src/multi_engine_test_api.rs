@@ -14,7 +14,7 @@ use crate::{
 };
 use psl::PreviewFeature;
 use quaint::{
-    prelude::{ConnectionInfo, Queryable, ResultSet},
+    prelude::{ConnectionInfo, NativeConnectionInfo, Queryable, ResultSet},
     single::Quaint,
 };
 use schema_core::schema_connector::{ConnectorParams, SchemaConnector};
@@ -196,17 +196,19 @@ impl TestApi {
         };
 
         let mut connector = match &connection_info {
-            ConnectionInfo::Postgres(_) => {
+            ConnectionInfo::Native(NativeConnectionInfo::Postgres(_)) => {
                 if self.args.provider() == "cockroachdb" {
                     SqlSchemaConnector::new_cockroach()
                 } else {
                     SqlSchemaConnector::new_postgres()
                 }
             }
-            ConnectionInfo::Mysql(_) => SqlSchemaConnector::new_mysql(),
-            ConnectionInfo::Mssql(_) => SqlSchemaConnector::new_mssql(),
-            ConnectionInfo::Sqlite { .. } => SqlSchemaConnector::new_sqlite(),
-            ConnectionInfo::InMemorySqlite { .. } | ConnectionInfo::External(_) => unreachable!(),
+            ConnectionInfo::Native(NativeConnectionInfo::Mysql(_)) => SqlSchemaConnector::new_mysql(),
+            ConnectionInfo::Native(NativeConnectionInfo::Mssql(_)) => SqlSchemaConnector::new_mssql(),
+            ConnectionInfo::Native(NativeConnectionInfo::Sqlite { .. }) => SqlSchemaConnector::new_sqlite(),
+            ConnectionInfo::Native(NativeConnectionInfo::InMemorySqlite { .. }) | ConnectionInfo::External(_) => {
+                unreachable!()
+            }
         };
         connector.set_params(params).unwrap();
 
