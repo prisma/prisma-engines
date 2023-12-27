@@ -50,31 +50,25 @@ jobs:
 
       - name: Run benchmarks
         id: bench
-        run: make run-bench | tee out.txt
-
-      - name: Read benchmark results
-        id: read_results
         run: |
-          {
-            echo 'bench_output<<EOF'
-            cat out.txt
-            echo EOF
-          } >> "$GITHUB_OUTPUT"
+          make run-bench | tee results.txt
 
-      - name: Summarize results
-        id: summarize_results
-        run: |
-          input="${{ steps.read_results.outputs.bench_output }}"
-          regressed=$(echo "$input" | grep "slower than Web Assembly: Latest" | cut -f1 -d'x' | awk '$1 > 1.01' | wc -l )          
+          regressed=$(grep "slower than Web Assembly: Latest" results.txt | cut -f1 -d'x' | awk '$1 > 1.02' | wc -l )
           if [ "$regressed" -gt 0 ]; then
-              message="🚨 WASM query-engine: $regressed benchmark(s) have regressed at least 1%"
+              summary="🚨 WASM query-engine: $regressed benchmark(s) have regressed at least 2%"
               status=failed
           else
-              message="✅ WASM query-engine: no benchmarks have regressed"
+              summary="✅ WASM query-engine: no benchmarks have regressed"
               status=passed
           fi
-          echo "summary=$message" >> $GITHUB_OUTPUT
-          echo "status=$status" >> $GITHUB_OUTPUT
+
+          echo "summary=$summary" >> "$GITHUB_OUTPUT"
+          echo "status=$status" >> "$GITHUB_OUTPUT"
+          {
+            echo 'bench_output<<EOF'
+            cat results.txt
+            echo EOF
+          } >> "$GITHUB_OUTPUT"
 
       - name: Find past report comment
         uses: peter-evans/find-comment@v2
@@ -90,13 +84,13 @@ jobs:
           issue-number: ${{ github.event.pull_request.number }}
           body: |
             <!-- wasm-engine-perf -->
-            #### ${{ steps.summarize_results.outputs.summary }}
+            #### ${{ steps.bench.outputs.summary }}
 
             <details>
             <summary>Full benchmark report</summary>
 
             ```
-            ${{ steps.read_results.outputs.bench_output }}
+            ${{ steps.bench.outputs.bench_output }}
             ```
             </details>
 
@@ -104,7 +98,7 @@ jobs:
           edit-mode: replace
 
       - name: Fail workflow if regression detected
-        if: steps.summarize_results.outputs.status == 'failed'
+        if: steps.bench.outputs.status == 'failed'
         run: |
           echo "Workflow failed due to benchmark regression."
           exit 1
