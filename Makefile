@@ -3,7 +3,7 @@ CONFIG_FILE = .test_config
 SCHEMA_EXAMPLES_PATH = ./query-engine/example_schemas
 DEV_SCHEMA_FILE = dev_datamodel.prisma
 DRIVER_ADAPTERS_BRANCH ?= main
-NIX := $(shell command -v nix 2> /dev/null)
+NIX := $(shell type nix 2> /dev/null)
 
 LIBRARY_EXT := $(shell                            \
     case "$$(uname -s)" in                        \
