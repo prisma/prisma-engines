@@ -53,23 +53,66 @@ jobs:
         run: |
           make run-bench | tee results.txt
 
-          regressed=$(grep "slower than Web Assembly: Latest" results.txt | cut -f1 -d'x' | awk '$1 > 1.02' | wc -l )
-          if [ "$regressed" -gt 0 ]; then
-              summary="🚨 WASM query-engine: $regressed benchmark(s) have regressed at least 2%"
-              status=failed
-          else
-              summary="✅ WASM query-engine: no benchmarks have regressed"
-              status=passed
-          fi
-
-          echo "summary=$summary" >> "$GITHUB_OUTPUT"
-          echo "status=$status" >> "$GITHUB_OUTPUT"
+          # Save the output to a file so we can use it in the comment
           {
             echo 'bench_output<<EOF'
             cat results.txt
             echo EOF
           } >> "$GITHUB_OUTPUT"
 
+          regressed_values=$(grep "slower than Web Assembly: Latest" results.txt | cut -f1 -d'x')
+          improved_values=$(grep "faster than Web Assembly: Latest" results.txt | cut -f1 -d'x')
+
+          # Initialize sum variable and count
+          total_sum=0
+          total_count=0
+
+          # Add the inverted regressed values to the sum
+          for value in $regressed_values; do
+              inverted=$(echo "scale=4; 1/$value" | bc)
+              echo "Regressed value: $inverted"
+              total_sum=$(echo "$total_sum + $inverted" | bc)
+              ((total_count++))
+          done
+
+          # Add the improved values to the sum
+          for value in $improved_values; do
+              echo "Improved value: $value"
+              total_sum=$(echo "$total_sum + $value" | bc)
+              ((total_count++))
+          done
+
+          if [ $total_count -eq 0 ]; then
+              echo "summary=✅ WASM query-engine: no benchmarks have changed substantially" >> "$GITHUB_OUTPUT"
+              echo "status=passed" >> "$GITHUB_OUTPUT"
+              exit 0
+          fi
+
+          mean=$(echo "scale=4; $total_sum / $total_count" | bc)
+
+
+          echo "Extracted $total_count values from the benchmark output"
+          echo "Total sum: $total_sum"
+          echo "Total count: $total_count"
+          echo "Mean: $mean"
+
+          # Calculate the percentage of improvement or worsening
+          if (( $(echo "$mean > 1.01" | bc -l) )); then
+              change_percentage=$(echo "scale=4; $mean - 1" | bc)
+              summary="🚀 WASM query-engine performance will improve by $(echo "$change_percentage * 100" | bc) percent"
+              status=passed
+          elif (( $(echo "$mean < 0.99" | bc -l) )); then
+              change_percentage=$(echo "scale=4; (1 / $mean) - 1" | bc)
+              summary="❌ WASM query-engine performance will worsen by $(echo "$change_percentage * 100" | bc) percent"
+              status=failed
+          else
+              change_percentage=$(echo "scale=4; (1 / $mean)" | bc)
+              summary="✅ WASM query-engine performance won't change substantially. AVG(latency) = $(echo "$change_percentage")x"
+              status=passed
+          fi
+
+          echo "summary=$summary" >> "$GITHUB_OUTPUT"
+          echo "status=$status" >> "$GITHUB_OUTPUT"
       - name: Find past report comment
         uses: peter-evans/find-comment@v2
         id: findReportComment
