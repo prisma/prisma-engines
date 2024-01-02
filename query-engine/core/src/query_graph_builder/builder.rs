@@ -43,7 +43,7 @@ impl<'a> QueryGraphBuilder<'a> {
         root_object: ObjectType<'a>, // Either the query or mutation object.
         root_object_fields: &dyn Fn(&str) -> Option<OutputField<'a>>,
     ) -> QueryGraphBuilderResult<(QueryGraph, IrSerializer<'a>)> {
-        let mut selections = vec![selection];
+        let selections = vec![selection.clone()];
         let mut parsed_object = QueryDocumentParser::new(crate::executor::get_request_now()).parse(
             &selections,
             &root_object,
@@ -53,7 +53,7 @@ impl<'a> QueryGraphBuilder<'a> {
 
         // Because we're processing root objects, there can only be one query / mutation.
         let field_pair = parsed_object.fields.pop().unwrap();
-        let serializer = Self::derive_serializer(&selections.pop().unwrap(), field_pair.schema_field.clone());
+        let serializer = Self::derive_serializer(&selection, field_pair.schema_field.clone());
 
         if field_pair.schema_field.query_info().is_some() {
             let graph = self.dispatch_build(field_pair)?;
