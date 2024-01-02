@@ -251,7 +251,7 @@ impl QueryDocumentParser {
                 // This means that a JsonList([1, 2]) will be coerced as an `ArgumentValue::List([1, 2])`.
                 // We need this early matcher to make sure we coerce this array back to JSON.
                 (list @ ArgumentValue::List(_), InputType::Scalar(ScalarType::JsonList)) if is_protocol_json => {
-                    let json_val = serde_json::to_value(list.clone()).map_err(|err| {
+                    let json_val = serde_json::to_value(list).map_err(|err| {
                         ValidationError::invalid_argument_value(
                             selection_path.segments(),
                             argument_path.segments(),
@@ -502,7 +502,7 @@ impl QueryDocumentParser {
         let mut prisma_values = Vec::with_capacity(values.len());
 
         for v in values.iter() {
-            let pv = PrismaValue::try_from(v.clone()).map_err(|err| {
+            let pv = PrismaValue::try_from(v).map_err(|err| {
                 ValidationError::invalid_argument_value(
                     selection_path.segments(),
                     argument_path.segments(),
