@@ -21,7 +21,7 @@ use request_handlers::{load_executor, RequestBody, RequestHandler};
 use serde_json::json;
 use std::{marker::PhantomData, sync::Arc};
 use tokio::sync::RwLock;
-use tracing::{field, instrument::WithSubscriber, Instrument, Span};
+use tracing::{field, instrument::WithSubscriber, Instrument, Level, Span};
 use tracing_subscriber::filter::LevelFilter;
 use wasm_bindgen::prelude::wasm_bindgen;
 
@@ -48,40 +48,24 @@ impl QueryEngine {
             datamodel,
             log_level,
             log_queries,
-            engine_protocol,
         } = options;
 
         // Note: if we used `psl::validate`, we'd add ~1MB to the Wasm artifact (before gzip).
         let connector_registry: ConnectorRegistry<'_> = &[POSTGRES, MYSQL, SQLITE];
-        let mut schema = psl::parse_without_validation(datamodel.into(), connector_registry);
-        let config = &mut schema.configuration;
-        let preview_features = config.preview_features();
+        let schema = psl::parse_without_validation(datamodel.into(), connector_registry);
 
         let js_queryable = Arc::new(driver_adapters::from_js(adapter));
 
-        let provider_name = schema.connector.provider_name();
-        tracing::info!("Registered driver adapter for {provider_name}.");
-
-        schema
-            .diagnostics
-            .to_result()
-            .map_err(|err| ApiError::conversion(err, schema.db.source()))?;
-
-        config
-            .validate_that_one_datasource_is_provided()
-            .map_err(|errors| ApiError::conversion(errors, schema.db.source()))?;
-
-        // Telemetry panics on timings if preview feature is enabled
-        let enable_tracing = false; // config.preview_features().contains(PreviewFeature::Tracing);
-        let engine_protocol = engine_protocol.unwrap_or(EngineProtocol::Json);
+        // We skip telemetry to avoid runtime panics.
+        let engine_protocol = EngineProtocol::Json;
 
         let builder = EngineBuilder {
             schema: Arc::new(schema),
             engine_protocol,
         };
 
-        let log_level = log_level.parse::<LevelFilter>().unwrap();
-        let logger = Logger::new(log_queries, log_level, log_callback, enable_tracing);
+        let log_level = log_level.parse::<LevelFilter>().unwrap_or(Level::INFO.into());
+        let logger = Logger::new(log_queries, log_level, log_callback);
 
         Ok(Self {
             inner: RwLock::new(Inner::Builder(builder)),
@@ -101,12 +85,11 @@ impl QueryEngine {
 
             let mut inner = self.inner.write().await;
             let builder = inner.as_builder()?;
+
+            let preview_features = builder.schema.configuration.preview_features();
             let arced_schema = Arc::clone(&builder.schema);
-            let arced_schema_2 = Arc::clone(&builder.schema);
 
             let engine = async move {
-                let preview_features = arced_schema.configuration.preview_features();
-
                 let executor = load_executor(
                     ConnectorKind::Js {
                         adapter: Arc::clone(&self.adapter),
@@ -126,7 +109,7 @@ impl QueryEngine {
                 connector.get_connection().instrument(conn_span).await?;
 
                 let query_schema_span = tracing::info_span!("prisma:engine:schema");
-                let query_schema = query_schema_span.in_scope(|| schema::build(arced_schema_2, true));
+                let query_schema = query_schema_span.in_scope(|| schema::build(arced_schema, true));
 
                 Ok(ConnectedEngine {
                     schema: builder.schema.clone(),
