@@ -76,7 +76,7 @@ impl TryFrom<&serde_json::Value> for PrismaValue {
         match v {
             serde_json::Value::String(s) => Ok(PrismaValue::String(s.to_owned())),
             serde_json::Value::Array(v) => {
-                let vals: PrismaValueResult<Vec<PrismaValue>> = v.into_iter().map(PrismaValue::try_from).collect();
+                let vals: PrismaValueResult<Vec<PrismaValue>> = v.iter().map(PrismaValue::try_from).collect();
                 Ok(PrismaValue::List(vals?))
             }
             serde_json::Value::Null => Ok(PrismaValue::Null),

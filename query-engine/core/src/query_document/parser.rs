@@ -244,7 +244,7 @@ impl QueryDocumentParser {
                     return Ok(ParsedInputValue::Single(self.to_json(
                         &selection_path,
                         &argument_path,
-                        &value,
+                        value,
                     )?))
                 }
                 // With the JSON protocol, JSON values are sent as deserialized values.
