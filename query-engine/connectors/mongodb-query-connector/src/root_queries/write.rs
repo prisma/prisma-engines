@@ -338,7 +338,7 @@ pub async fn m2m_connect<'conn>(
     let child_ids = child_ids
         .iter()
         .map(|child_id| {
-            let (selection, value) = child_id.pairs.get(0).unwrap();
+            let (selection, value) = child_id.pairs.first().unwrap();
 
             (selection, value.clone())
                 .into_bson()
@@ -404,7 +404,7 @@ pub async fn m2m_disconnect<'conn>(
     let child_ids = child_ids
         .iter()
         .map(|child_id| {
-            let (field, value) = child_id.pairs.get(0).unwrap();
+            let (field, value) = child_id.pairs.first().unwrap();
 
             (field, value.clone())
                 .into_bson()

@@ -2,7 +2,6 @@
 
 use core::fmt;
 use js_sys::Function as JsFunction;
-use query_core::telemetry;
 use query_engine_common::logger::StringCallback;
 use serde_json::Value;
 use std::collections::BTreeMap;
@@ -30,40 +29,25 @@ pub(crate) struct Logger {
 
 impl Logger {
     /// Creates a new logger using a call layer
-    pub fn new(log_queries: bool, log_level: LevelFilter, log_callback: LogCallback, enable_tracing: bool) -> Self {
+    pub fn new(log_queries: bool, log_level: LevelFilter, log_callback: LogCallback) -> Self {
         let is_sql_query = filter_fn(|meta| {
             meta.target() == "quaint::connector::metrics" && meta.fields().iter().any(|f| f.name() == "query")
         });
 
-        // is a mongodb query?
-        let is_mongo_query = filter_fn(|meta| meta.target() == "mongodb_query_connector::query");
-
         // We need to filter the messages to send to our callback logging mechanism
         let filters = if log_queries {
             // Filter trace query events (for query log) or based in the defined log level
-            is_sql_query.or(is_mongo_query).or(log_level).boxed()
+            is_sql_query.or(log_level).boxed()
         } else {
             // Filter based in the defined log level
             FilterExt::boxed(log_level)
         };
 
         let log_callback = CallbackLayer::new(log_callback);
-
-        let is_user_trace = filter_fn(telemetry::helpers::user_facing_span_only_filter);
-        let tracer = super::tracer::new_pipeline().install_simple(Box::new(log_callback.clone()));
-        let telemetry = if enable_tracing {
-            let telemetry = tracing_opentelemetry::layer()
-                .with_tracer(tracer)
-                .with_filter(is_user_trace);
-            Some(telemetry)
-        } else {
-            None
-        };
-
         let layer = log_callback.with_filter(filters);
 
         Self {
-            dispatcher: Dispatch::new(Registry::default().with(telemetry).with(layer)),
+            dispatcher: Dispatch::new(Registry::default().with(layer)),
         }
     }
 
