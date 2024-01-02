@@ -257,6 +257,8 @@
     </span><span class="kw">pub </span>env: serde_json::Value,
     <span class="attr">#[serde(default)]
     </span><span class="kw">pub </span>ignore_env_var_errors: bool,
+    <span class="attr">#[serde(default)]
+    </span><span class="kw">pub </span>engine_protocol: <span class="prelude-ty">Option</span>&lt;EngineProtocol&gt;,
 }
 
 <span class="doccomment">/// Parameters defining the construction of an engine.
@@ -269,8 +271,6 @@
     <span class="kw">pub </span>log_level: String,
     <span class="attr">#[serde(default)]
     </span><span class="kw">pub </span>log_queries: bool,
-    <span class="attr">#[serde(default)]
-    </span><span class="kw">pub </span>engine_protocol: <span class="prelude-ty">Option</span>&lt;EngineProtocol&gt;,
 
     <span class="attr">#[cfg(not(target_arch = <span class="string">&quot;wasm32&quot;</span>))]
     #[serde(flatten)]
