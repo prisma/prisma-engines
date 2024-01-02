@@ -68,13 +68,7 @@ impl QueryDocumentParser {
             .map(|selection| {
                 let field_name = selection.name();
                 match resolve_field(field_name) {
-                    Some(field) => self.parse_field(
-                        selection_path.clone(),
-                        argument_path.clone(),
-                        selection,
-                        field,
-                        query_schema,
-                    ),
+                    Some(field) => self.parse_field(&selection_path, &argument_path, selection, field, query_schema),
                     None => Err(ValidationError::unknown_selection_field(
                         selection_path.add(field_name.to_owned()).segments(),
                         conversions::schema_object_to_output_type_description(schema_object),
@@ -88,8 +82,8 @@ impl QueryDocumentParser {
     /// Parses and validates a selection against a schema (output) field.
     fn parse_field<'a>(
         &self,
-        selection_path: Path,
-        argument_path: Path,
+        selection_path: &Path,
+        argument_path: &Path,
         selection: &Selection,
         schema_field: OutputField<'a>,
         query_schema: &'a QuerySchema,
@@ -98,8 +92,8 @@ impl QueryDocumentParser {
 
         // Parse and validate all provided arguments for the field
         self.parse_arguments(
-            selection_path.clone(),
-            argument_path.clone(),
+            &selection_path,
+            argument_path,
             &schema_field,
             selection.arguments(),
             query_schema,
@@ -146,8 +140,8 @@ impl QueryDocumentParser {
     /// Parses and validates selection arguments against a schema defined field.
     fn parse_arguments<'a>(
         &self,
-        selection_path: Path,
-        argument_path: Path,
+        selection_path: &Path,
+        argument_path: &Path,
         schema_field: &OutputField<'a>,
         given_arguments: &[(String, ArgumentValue)],
         query_schema: &'a QuerySchema,
