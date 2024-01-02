@@ -232,7 +232,7 @@ impl QueryDocumentParser {
         let is_protocol_json = get_engine_protocol().is_json();
 
         for input_type in possible_input_types {
-            match (value.clone(), input_type) {
+            match (&value, input_type) {
                 // With the JSON protocol, JSON values are sent as deserialized values.
                 // This means JSON can match with pretty much anything. A string, an int, an object, an array.
                 // This is an early catch-all.
@@ -264,7 +264,7 @@ impl QueryDocumentParser {
 
                     return Ok(ParsedInputValue::Single(json_list));
                 }
-                (ArgumentValue::Scalar(pv), input_type) => match (pv, input_type) {
+                (ArgumentValue::Scalar(pv), input_type) => match (pv.clone(), input_type) {
                     // Null handling
                     (PrismaValue::Null, InputType::Scalar(ScalarType::Null)) => {
                         return Ok(ParsedInputValue::Single(PrismaValue::Null))
