@@ -30,8 +30,8 @@ impl QueryDocumentParser {
         query_schema: &'a QuerySchema,
     ) -> QueryParserResult<ParsedObject<'a>> {
         self.parse_object(
-            &Path::default(),
-            &Path::default(),
+            Path::default(),
+            Path::default(),
             selections,
             schema_object,
             Some(fields),
@@ -46,8 +46,8 @@ impl QueryDocumentParser {
     /// validation in the serialization step.
     fn parse_object<'a>(
         &self,
-        selection_path: &Path,
-        argument_path: &Path,
+        selection_path: Path,
+        argument_path: Path,
         selections: &[Selection],
         schema_object: &ObjectType<'a>,
         resolve_field: Option<ResolveField<'a, '_>>,
@@ -68,7 +68,7 @@ impl QueryDocumentParser {
             .map(|selection| {
                 let field_name = selection.name();
                 match resolve_field(field_name) {
-                    Some(field) => self.parse_field(selection_path, argument_path, selection, field, query_schema),
+                    Some(field) => self.parse_field(&selection_path, &argument_path, selection, field, query_schema),
                     None => Err(ValidationError::unknown_selection_field(
                         selection_path.add(field_name.to_owned()).segments(),
                         conversions::schema_object_to_output_type_description(schema_object),
@@ -108,8 +108,8 @@ impl QueryDocumentParser {
                 // If the output type of the field is an object type of any form, validate the sub selection as well.
                 let nested_fields = schema_field.field_type().as_object_type().map(|obj| {
                     self.parse_object(
-                        &selection_path,
-                        argument_path,
+                        selection_path.clone(),
+                        argument_path.clone(),
                         selection.nested_selections(),
                         obj,
                         None,
@@ -176,8 +176,8 @@ impl QueryDocumentParser {
                 match selection_arg {
                     Some((_, value)) => Some(
                         self.parse_input_value(
-                            selection_path,
-                            &argument_path,
+                            selection_path.clone(),
+                            argument_path,
                             value,
                             input_field.field_types(),
                             query_schema,
@@ -204,8 +204,8 @@ impl QueryDocumentParser {
     /// Matching is done in order of definition on the input type. First matching type wins.
     fn parse_input_value<'a>(
         &self,
-        selection_path: &Path,
-        argument_path: &Path,
+        selection_path: Path,
+        argument_path: Path,
         value: ArgumentValue,
         possible_input_types: &[InputType<'a>],
         query_schema: &'a QuerySchema,
@@ -236,8 +236,8 @@ impl QueryDocumentParser {
                     if value.should_be_parsed_as_json() && is_protocol_json =>
                 {
                     return Ok(ParsedInputValue::Single(self.to_json(
-                        selection_path,
-                        argument_path,
+                        &selection_path,
+                        &argument_path,
                         &value,
                     )?))
                 }
@@ -254,7 +254,7 @@ impl QueryDocumentParser {
                             Some(Box::new(err)),
                         )
                     })?;
-                    let json_list = self.parse_json_list_from_value(selection_path, &argument_path, json_val)?;
+                    let json_list = self.parse_json_list_from_value(&selection_path, &argument_path, json_val)?;
 
                     return Ok(ParsedInputValue::Single(json_list));
                 }
@@ -270,18 +270,18 @@ impl QueryDocumentParser {
                     ))),
                     // Scalar handling
                     (pv, InputType::Scalar(st)) => try_this!(self
-                        .parse_scalar(selection_path, argument_path, pv, *st, &value)
+                        .parse_scalar(&selection_path, &argument_path, pv, *st, &value)
                         .map(ParsedInputValue::Single)),
 
                     // Enum handling
                     (pv @ PrismaValue::Enum(_), InputType::Enum(et)) => {
-                        try_this!(self.parse_enum(selection_path, argument_path, pv, et))
+                        try_this!(self.parse_enum(&selection_path, &argument_path, pv, et))
                     }
                     (pv @ PrismaValue::String(_), InputType::Enum(et)) => {
-                        try_this!(self.parse_enum(selection_path, argument_path, pv, et))
+                        try_this!(self.parse_enum(&selection_path, &argument_path, pv, et))
                     }
                     (pv @ PrismaValue::Boolean(_), InputType::Enum(et)) => {
-                        try_this!(self.parse_enum(selection_path, argument_path, pv, et))
+                        try_this!(self.parse_enum(&selection_path, &argument_path, pv, et))
                     }
                     // Invalid combinations
                     (_, input_type) => try_this!(Err(ValidationError::invalid_argument_type(
@@ -297,12 +297,18 @@ impl QueryDocumentParser {
 
                 // List handling.
                 (ArgumentValue::List(values), InputType::List(l)) => try_this!(self
-                    .parse_list(selection_path, argument_path, values.clone(), l, query_schema)
+                    .parse_list(&selection_path, &argument_path, values.clone(), l, query_schema)
                     .map(ParsedInputValue::List)),
 
                 // Object handling
                 (ArgumentValue::Object(o) | ArgumentValue::FieldRef(o), InputType::Object(obj)) => try_this!(self
-                    .parse_input_object(selection_path, argument_path, o.clone(), obj, query_schema,)
+                    .parse_input_object(
+                        selection_path.clone(),
+                        argument_path.clone(),
+                        o.clone(),
+                        obj,
+                        query_schema,
+                    )
                     .map(ParsedInputValue::Map)),
 
                 // Invalid combinations
@@ -559,7 +565,15 @@ impl QueryDocumentParser {
     ) -> QueryParserResult<Vec<ParsedInputValue<'a>>> {
         values
             .into_iter()
-            .map(|val| self.parse_input_value(selection_path, argument_path, val, &[value_type.clone()], query_schema))
+            .map(|val| {
+                self.parse_input_value(
+                    selection_path.clone(),
+                    argument_path.clone(),
+                    val,
+                    &[value_type.clone()],
+                    query_schema,
+                )
+            })
             .collect::<QueryParserResult<Vec<ParsedInputValue<'a>>>>()
     }
 
@@ -614,8 +628,8 @@ impl QueryDocumentParser {
     /// Parses and validates an input object recursively.
     fn parse_input_object<'a>(
         &self,
-        selection_path: &Path,
-        argument_path: &Path,
+        selection_path: Path,
+        argument_path: Path,
         object: ArgumentValueObject,
         schema_object: &InputObjectType<'a>,
         query_schema: &'a QuerySchema,
@@ -646,8 +660,8 @@ impl QueryDocumentParser {
                         };
 
                         match self.parse_input_value(
-                            selection_path,
-                            &argument_path,
+                            selection_path.clone(),
+                            argument_path,
                             default_pv.into(),
                             field.field_types(),
                             query_schema,
@@ -686,8 +700,8 @@ impl QueryDocumentParser {
 
                 let argument_path = argument_path.add(field.name.clone().into_owned());
                 let parsed = self.parse_input_value(
-                    &selection_path,
-                    &argument_path,
+                    selection_path.clone(),
+                    argument_path,
                     value,
                     field.field_types(),
                     query_schema,
