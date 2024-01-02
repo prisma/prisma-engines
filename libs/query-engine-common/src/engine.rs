@@ -99,6 +99,8 @@ pub struct ConstructorOptionsNative {
     pub env: serde_json::Value,
     #[serde(default)]
     pub ignore_env_var_errors: bool,
+    #[serde(default)]
+    pub engine_protocol: Option<EngineProtocol>,
 }
 
 /// Parameters defining the construction of an engine.
@@ -111,8 +113,6 @@ pub struct ConstructorOptions {
     pub log_level: String,
     #[serde(default)]
     pub log_queries: bool,
-    #[serde(default)]
-    pub engine_protocol: Option<EngineProtocol>,
 
     #[cfg(not(target_arch = "wasm32"))]
     #[serde(flatten)]
