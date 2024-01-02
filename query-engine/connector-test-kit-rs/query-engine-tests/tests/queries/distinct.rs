@@ -251,7 +251,7 @@ mod distinct {
 
     /// Mut return only distinct records for top record, and only for those the distinct relation records.
     #[connector_test]
-    async fn nested_distinct(runner: Runner) -> TestResult<()> {
+    async fn nested_distinct_id(runner: Runner) -> TestResult<()> {
         nested_dataset(&runner).await?;
 
         // Returns Users 1, 3, 4, 5 top
@@ -271,6 +271,33 @@ mod distinct {
                 }}"),
             Postgres(_) => r###"{"data":{"findManyUser":[{"id":1,"posts":[{"title":"3"},{"title":"1"},{"title":"2"}]},{"id":4,"posts":[{"title":"1"}]},{"id":3,"posts":[]},{"id":5,"posts":[{"title":"2"},{"title":"3"}]}]}}"###,
             _ => r###"{"data":{"findManyUser":[{"id":1,"posts":[{"title":"3"},{"title":"1"},{"title":"2"}]},{"id":3,"posts":[]},{"id":4,"posts":[{"title":"1"}]},{"id":5,"posts":[{"title":"2"},{"title":"3"}]}]}}"###
+        );
+
+        Ok(())
+    }
+
+    #[connector_test]
+    async fn nested_distinct_title(runner: Runner) -> TestResult<()> {
+        nested_dataset(&runner).await?;
+
+        // Returns Users 1, 3, 4, 5 top
+        // 1 => ["3", "1", "2"]
+        // 4 => ["1"]
+        // 3 => []
+        // 5 => ["2", "3"]
+
+        match_connector_result!(
+            &runner,
+            indoc!("{
+                findManyUser(
+                    distinct: [first_name, last_name], orderBy: {first_name: asc})
+                    {
+                        id, first_name
+                        posts(distinct: [title], orderBy: { title: asc }) { title }
+                    }
+                }"),
+            Postgres(_) => r###"{"data":{"findManyUser":[{"id":1,"first_name":"Joe","posts":[]},{"id":4,"first_name":"Papa","posts":[{"title":"1"}]},{"id":3,"first_name":"Rocky","posts":[]},{"id":5,"first_name":"Troll","posts":[{"title":"2"},{"title":"3"}]}]}}"###,
+            _ => r###"{"data":{"findManyUser":[{"id":1,"first_name":"Joe","posts":[{"title":"1"},{"title":"2"},{"title":"3"}]},{"id":4,"first_name":"Papa","posts":[{"title":"1"}]},{"id":3,"first_name":"Rocky","posts":[]},{"id":5,"first_name":"Troll","posts":[{"title":"2"},{"title":"3"}]}]}}"###
         );
 
         Ok(())
