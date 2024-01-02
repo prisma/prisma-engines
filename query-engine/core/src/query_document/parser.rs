@@ -229,6 +229,8 @@ impl QueryDocumentParser {
             };
         }
 
+        let is_protocol_json = get_engine_protocol().is_json();
+
         for input_type in possible_input_types {
             match (value.clone(), input_type) {
                 // With the JSON protocol, JSON values are sent as deserialized values.
@@ -237,7 +239,7 @@ impl QueryDocumentParser {
                 // We do not get into this catch-all _if_ the value is already Json, if it's a FieldRef or if it's an Enum.
                 // We don't because they've already been desambiguified at the procotol adapter level.
                 (value, InputType::<'a>::Scalar(ScalarType::Json))
-                    if value.should_be_parsed_as_json() && get_engine_protocol().is_json() =>
+                    if value.should_be_parsed_as_json() && is_protocol_json =>
                 {
                     return Ok(ParsedInputValue::Single(self.to_json(
                         &selection_path,
@@ -248,9 +250,7 @@ impl QueryDocumentParser {
                 // With the JSON protocol, JSON values are sent as deserialized values.
                 // This means that a JsonList([1, 2]) will be coerced as an `ArgumentValue::List([1, 2])`.
                 // We need this early matcher to make sure we coerce this array back to JSON.
-                (list @ ArgumentValue::List(_), InputType::Scalar(ScalarType::JsonList))
-                    if get_engine_protocol().is_json() =>
-                {
+                (list @ ArgumentValue::List(_), InputType::Scalar(ScalarType::JsonList)) if is_protocol_json => {
                     let json_val = serde_json::to_value(list.clone()).map_err(|err| {
                         ValidationError::invalid_argument_value(
                             selection_path.segments(),

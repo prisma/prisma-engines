@@ -35,6 +35,9 @@ pub(crate) fn get_request_now() -> PrismaValue {
 ///
 /// If we had a query context we carry for the entire lifetime of the query, it would belong there.
 pub(crate) fn get_engine_protocol() -> EngineProtocol {
+    #[cfg(target_arch = "wasm32")]
+    return EngineProtocol::Json;
+    #[cfg(not(target_arch = "wasm32"))]
     REQUEST_CONTEXT.with(|rc| rc.engine_protocol)
 }
 
