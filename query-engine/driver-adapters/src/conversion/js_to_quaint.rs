@@ -1,7 +1,7 @@
 use std::borrow::Cow;
 use std::str::FromStr;
 
-pub use crate::types::{ColumnType, JSResultSet, Query, TransactionOptions};
+pub use crate::types::{ColumnType, JSResultSet};
 use quaint::bigdecimal::{BigDecimal, FromPrimitive};
 use quaint::chrono::{DateTime, NaiveDate, NaiveTime, Utc};
 use quaint::{
