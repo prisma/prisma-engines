@@ -1,5 +1,3 @@
 [toolchain]
-channel = "stable"
-components = []
-targets = []
-profile = "minimal"
+channel = "1.75.0"
+targets = ["wasm32-unknown-unknown"]
