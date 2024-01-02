@@ -27,7 +27,7 @@ pub(crate) fn calculate_sql_schema(datamodel: &ValidatedSchema, flavour: &dyn Sq
         schemas: Default::default(),
     };
 
-    if let Some(ds) = context.datamodel.configuration.datasources.get(0) {
+    if let Some(ds) = context.datamodel.configuration.datasources.first() {
         for (schema, _) in &ds.namespaces {
             context
                 .schemas
@@ -608,6 +608,6 @@ fn unwrap_dbgenerated(expr: &ast::Expression) -> Option<String> {
         .unwrap()
         .1
         .arguments
-        .get(0)
+        .first()
         .map(|arg| arg.value.as_string_value().unwrap().0.to_owned())
 }
