@@ -74,6 +74,10 @@ impl WriteQuery {
             Self::CreateManyRecords(_) => None,
             Self::UpdateRecord(UpdateRecord::WithSelection(ur)) => Some(ur.selected_fields.clone()),
             Self::UpdateRecord(UpdateRecord::WithoutSelection(_)) => returns_id,
+            Self::DeleteRecord(DeleteRecord {
+                selected_fields: Some(selected_fields),
+                ..
+            }) => Some(selected_fields.fields.clone()),
             Self::DeleteRecord(_) => returns_id,
             Self::UpdateManyRecords(_) => returns_id,
             Self::DeleteManyRecords(_) => None,
@@ -211,7 +215,12 @@ impl ToGraphviz for WriteQuery {
                 q.model().name(),
                 q.selected_fields()
             ),
-            Self::DeleteRecord(q) => format!("DeleteRecord: {}, {:?}", q.model.name(), q.record_filter),
+            Self::DeleteRecord(q) => format!(
+                "DeleteRecord: {}, {:?}, {:?}",
+                q.model.name(),
+                q.record_filter,
+                q.selected_fields
+            ),
             Self::UpdateManyRecords(q) => format!("UpdateManyRecords(model: {}, args: {:?})", q.model.name(), q.args),
             Self::DeleteManyRecords(q) => format!("DeleteManyRecords: {}", q.model.name()),
             Self::ConnectRecords(_) => "ConnectRecords".to_string(),

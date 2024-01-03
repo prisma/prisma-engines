@@ -24,8 +24,22 @@ pub(crate) fn delete_record(
     if can_use_atomic_delete(query_schema, &model, &field) {
         // Database supports returning the deleted row, so just the delete node will suffice.
         let nested_fields = field.nested_fields.unwrap().fields;
-        let selected_fields = read::utils::collect_selected_scalars(&nested_fields, &model);
+        let mut selected_fields = read::utils::collect_selected_scalars(&nested_fields, &model);
         let selection_order = read::utils::collect_selection_order(&nested_fields);
+
+        let internal_model = &model.dm;
+        let relation_fields = internal_model.fields_pointing_to_model(&model);
+        for relation_field in relation_fields {
+            let parent_relation_field = relation_field.related_field();
+            let linking_fields = parent_relation_field.linking_fields();
+            println!(
+                "laplab: looking at relation field {:?},\ncorresponding parent field is {:?},\nfound linking fields {:?},\nselection before update: {:?}",
+                relation_field, parent_relation_field, linking_fields, selected_fields,
+            );
+            selected_fields = selected_fields.merge(linking_fields);
+            println!("laplab: selection after update: {:?}", selected_fields);
+        }
+
         let delete_query = Query::Write(WriteQuery::DeleteRecord(DeleteRecord {
             name: field.name,
             model: model.clone(),

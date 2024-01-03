@@ -180,7 +180,9 @@ impl Runner {
             },
         };
 
-        tracing::debug!("Querying: {}", query.clone().green());
+        // TODO laplab: For some reason, `debug` level does not display a message from here, I have
+        // no idea why.
+        tracing::info!("Querying: {}", query);
 
         let handler = RequestHandler::new(&**executor, &self.query_schema, self.protocol);
 
@@ -314,7 +316,7 @@ impl Runner {
                 };
                 let json_query = JsonBody::Batch(JsonBatchQuery { batch, transaction });
                 let response_str: String = executor_process_request(
-                        "query", 
+                        "query",
                         json!({ "query": json_query, "schemaId": schema_id, "txId": self.current_tx_id.as_ref().map(ToString::to_string) })
                     ).await?;
 
