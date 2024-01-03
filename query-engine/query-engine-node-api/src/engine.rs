@@ -72,7 +72,6 @@ impl QueryEngine {
             datamodel,
             log_level,
             log_queries,
-            engine_protocol,
             native,
         } = napi_env.from_js_value(options).expect(
             r###"
@@ -91,6 +90,7 @@ impl QueryEngine {
             config_dir,
             env,
             ignore_env_var_errors,
+            engine_protocol,
         } = native;
 
         let env = stringify_env_values(env)?; // we cannot trust anything JS sends us from process.env
