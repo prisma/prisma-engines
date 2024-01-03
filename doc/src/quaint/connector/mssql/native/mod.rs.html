@@ -451,7 +451,7 @@
         <span class="kw">let </span>rows = <span class="self">self</span>.query_raw(query, <span class="kw-2">&amp;</span>[]).<span class="kw">await</span><span class="question-mark">?</span>;
 
         <span class="kw">let </span>version_string = rows
-            .get(<span class="number">0</span>)
+            .first()
             .and_then(|row| row.get(<span class="string">&quot;version&quot;</span>).and_then(|version| version.to_string()));
 
         <span class="prelude-val">Ok</span>(version_string)

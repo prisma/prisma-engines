@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"constant":["TROUBLE_CHARS"],"enum":["RawParam"],"fn":["date_iso_string","datetime_iso_string","enclose","enclose_all","fmt_execute_raw","fmt_query_raw","now","string_to_base64","stringify"],"macro":["assert_error","assert_query","is_one_of","jNull","match_connector_result","retry","run_query","run_query_json","run_query_pretty"]};
+window.SIDEBAR_ITEMS = {"constant":["TROUBLE_CHARS"],"enum":["RawParam"],"fn":["date_iso_string","datetime_iso_string","enclose","enclose_all","fmt_execute_raw","fmt_query_raw","now","string_to_base64","stringify"]};

@@ -207,7 +207,7 @@
     </span><span class="kw">pub fn </span>parse_many_first(<span class="kw-2">&amp;</span><span class="self">self</span>, json: serde_json::Value, path: <span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span>str]) -&gt; <span class="prelude-ty">Result</span>&lt;String, TestError&gt; {
         <span class="kw">let </span>val = <span class="self">self</span>.where_many.parse(<span class="kw-2">&amp;</span>json, path)<span class="question-mark">?</span>;
 
-        <span class="prelude-val">Ok</span>(val.get(<span class="number">0</span>).unwrap().to_owned())
+        <span class="prelude-val">Ok</span>(val.first().unwrap().to_owned())
     }
 
     <span class="doccomment">/// Parses the JSON _array_ result of a mutation sent to the Query Engine in order to extract the generated id(s).

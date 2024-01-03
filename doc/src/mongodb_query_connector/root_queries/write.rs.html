@@ -878,7 +878,7 @@
     <span class="kw">let </span>child_ids = child_ids
         .iter()
         .map(|child_id| {
-            <span class="kw">let </span>(selection, value) = child_id.pairs.get(<span class="number">0</span>).unwrap();
+            <span class="kw">let </span>(selection, value) = child_id.pairs.first().unwrap();
 
             (selection, value.clone())
                 .into_bson()
@@ -944,7 +944,7 @@
     <span class="kw">let </span>child_ids = child_ids
         .iter()
         .map(|child_id| {
-            <span class="kw">let </span>(field, value) = child_id.pairs.get(<span class="number">0</span>).unwrap();
+            <span class="kw">let </span>(field, value) = child_id.pairs.first().unwrap();
 
             (field, value.clone())
                 .into_bson()

@@ -1262,7 +1262,7 @@ SET enable_experimental_alter_column_type_general = true;
 
                     <span class="kw">let </span>version =
                         schema_exists_result
-                          .get(<span class="number">0</span>)
+                          .first()
                           .and_then(|row| row.at(<span class="number">1</span>).and_then(|ver_str| row.at(<span class="number">2</span>).map(|ver_num| (ver_str, ver_num))))
                           .and_then(|(ver_str,ver_num)| ver_str.to_string().and_then(|version| ver_num.as_integer().map(|version_number| (version, version_number))));
 
@@ -1295,7 +1295,7 @@ SET enable_experimental_alter_column_type_general = true;
                     }
 
                     <span class="kw">if let </span><span class="prelude-val">Some</span>(<span class="bool-val">true</span>) = schema_exists_result
-                        .get(<span class="number">0</span>)
+                        .first()
                         .and_then(|row| row.at(<span class="number">0</span>).and_then(|value| value.as_bool()))
                     {
                         <span class="kw">return </span><span class="prelude-val">Ok</span>((circumstances, connection))

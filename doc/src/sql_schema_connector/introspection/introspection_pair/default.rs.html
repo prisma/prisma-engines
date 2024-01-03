@@ -275,7 +275,7 @@
                 <span class="prelude-val">Some</span>(previous) <span class="kw">if </span>previous.is_nanoid() =&gt; {
                     <span class="kw">let </span>length = previous.value().as_function().and_then(|(<span class="kw">_</span>, args, <span class="kw">_</span>)| {
                         args.arguments
-                            .get(<span class="number">0</span>)
+                            .first()
                             .map(|arg| arg.value.as_numeric_value().unwrap().<span class="number">0</span>.parse::&lt;u8&gt;().unwrap())
                     });
 
