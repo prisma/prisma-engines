@@ -67,8 +67,6 @@ where
 
 #[cfg(target_arch = "wasm32")]
 mod arch {
-    use super::*;
-
     #[inline(always)]
     pub(crate) fn is_engine_protocol_json() -> bool {
         true
