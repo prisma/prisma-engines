@@ -19,4 +19,5 @@ mod arch {
     pub(crate) type Result<T> = std::result::Result<T, error::ApiError>;
 }
 
+#[cfg_attr(not(target_arch = "wasm32"), allow(unused_imports))]
 pub use arch::*;
