@@ -1,5 +1,5 @@
 use super::*;
-use crate::{executor::get_engine_protocol, schema::*};
+use crate::{executor::is_engine_protocol_json, schema::*};
 use bigdecimal::{BigDecimal, ToPrimitive};
 use chrono::prelude::*;
 use core::fmt;
@@ -229,7 +229,7 @@ impl QueryDocumentParser {
             };
         }
 
-        let is_protocol_json = get_engine_protocol().is_json();
+        let is_protocol_json = is_engine_protocol_json();
 
         for input_type in possible_input_types {
             match (&value, input_type) {

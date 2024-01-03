@@ -1,4 +1,3 @@
-#![cfg_attr(target_arch = "wasm32", allow(dead_code))]
 use crate::protocol::EngineProtocol;
 use query_structure::PrismaValue;
 
@@ -36,9 +35,6 @@ pub(crate) fn get_request_now() -> PrismaValue {
 ///
 /// If we had a query context we carry for the entire lifetime of the query, it would belong there.
 pub(crate) fn get_engine_protocol() -> EngineProtocol {
-    #[cfg(target_arch = "wasm32")]
-    return EngineProtocol::Json;
-    #[cfg(not(target_arch = "wasm32"))]
     REQUEST_CONTEXT.with(|rc| rc.engine_protocol)
 }
 
@@ -68,3 +64,28 @@ where
         REQUEST_CONTEXT.scope(ctx, fut).await
     }
 }
+
+#[cfg(target_arch = "wasm32")]
+mod arch {
+    use super::*;
+
+    #[inline(always)]
+    pub(crate) fn is_engine_protocol_json() -> bool {
+        true
+    }
+}
+
+#[cfg(not(target_arch = "wasm32"))]
+mod arch {
+    use super::*;
+
+    pub(crate) fn is_engine_protocol_json() -> bool {
+        REQUEST_CONTEXT
+            .try_with(|rc| rc.engine_protocol)
+            .ok()
+            .map(|p| p.is_json())
+            == Some(true)
+    }
+}
+
+pub(crate) use arch::is_engine_protocol_json;
