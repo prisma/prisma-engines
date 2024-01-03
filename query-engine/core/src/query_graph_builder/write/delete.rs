@@ -185,7 +185,8 @@ fn can_use_atomic_delete(query_schema: &QuerySchema, model: &Model, field: &Pars
     // would provide us with ids, but it would also delete the record immediately, so we won't be
     // able to check anything. So in this case we resort to a plan with a separate read node,
     // allowing us to perform the check before deleting anything.
-    if has_restrict_on_delete(model) {
+    // TODO laplab: expand comment.
+    if !query_schema.relation_mode().uses_foreign_keys() && has_restrict_on_delete(model) {
         return false;
     }
 
