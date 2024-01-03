@@ -1,6 +1,6 @@
 use crate::send_future::UnsafeFuture;
 use crate::types::JsConnectionInfo;
-pub use crate::types::{ColumnType, JSResultSet, Query, TransactionOptions};
+pub use crate::types::{JSResultSet, Query, TransactionOptions};
 use crate::{
     from_js_value, get_named_property, get_optional_named_property, to_rust_str, AdapterMethod, JsObject, JsResult,
     JsString, JsTransaction,
