@@ -43,7 +43,12 @@ impl<'a> QueryGraphBuilder<'a> {
         root_object: ObjectType<'a>, // Either the query or mutation object.
         root_object_fields: &dyn Fn(&str) -> Option<OutputField<'a>>,
     ) -> QueryGraphBuilderResult<(QueryGraph, IrSerializer<'a>)> {
-        let selections = vec![selection.clone()];
+        let selection_key = selection
+            .alias()
+            .clone()
+            .unwrap_or_else(|| selection.name().to_string());
+
+        let selections = vec![selection];
         let mut parsed_object = QueryDocumentParser::new(crate::executor::get_request_now()).parse(
             &selections,
             &root_object,
@@ -53,10 +58,13 @@ impl<'a> QueryGraphBuilder<'a> {
 
         // Because we're processing root objects, there can only be one query / mutation.
         let field_pair = parsed_object.fields.pop().unwrap();
-        let serializer = Self::derive_serializer(&selection, field_pair.schema_field.clone());
 
-        if field_pair.schema_field.query_info().is_some() {
-            let graph = self.dispatch_build(field_pair)?;
+        if let Some(query_info) = field_pair.schema_field.query_info() {
+            let graph = self.dispatch_build(&query_info, field_pair.clone())?;
+            let serializer = IrSerializer {
+                key: selection_key,
+                output_field: field_pair.schema_field,
+            };
             Ok((graph, serializer))
         } else {
             Err(QueryGraphBuilderError::SchemaError(format!(
@@ -68,9 +76,8 @@ impl<'a> QueryGraphBuilder<'a> {
     }
 
     #[rustfmt::skip]
-    fn dispatch_build(&self, field_pair: FieldPair<'a>) -> QueryGraphBuilderResult<QueryGraph> {
-        let query_info = field_pair.schema_field.query_info().unwrap();
-        let parsed_field = field_pair.parsed_field;
+    fn dispatch_build(&self, query_info: &QueryInfo, field_pair: FieldPair<'a>) -> QueryGraphBuilderResult<QueryGraph> {
+        let parsed_field = field_pair.parsed_field.clone();
         let query_schema = self.query_schema;
 
         let mut graph = match (&query_info.tag, query_info.model.map(|id| self.query_schema.internal_data_model.clone().zip(id))) {
@@ -110,15 +117,5 @@ impl<'a> QueryGraphBuilder<'a> {
         }
 
         Ok(graph)
-    }
-
-    fn derive_serializer(selection: &Selection, field: OutputField<'a>) -> IrSerializer<'a> {
-        IrSerializer {
-            key: selection
-                .alias()
-                .clone()
-                .unwrap_or_else(|| selection.name().to_string()),
-            output_field: field,
-        }
     }
 }
