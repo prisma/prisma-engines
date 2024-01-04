@@ -1,4 +1,4 @@
-#![cfg_attr(target_arch = "wasm32", allow(unused_variables))]
+#![allow(unused_variables)]
 #![cfg_attr(not(feature = "metrics"), allow(clippy::let_and_return))]
 
 use super::pipeline::QueryPipeline;

@@ -461,7 +461,7 @@ async fn default_values(api: &mut TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_connector(tags(Postgres), exclude(CockroachDb, Postgres14, Postgres15))]
+#[test_connector(tags(Postgres), exclude(CockroachDb, Postgres14, Postgres15, Postgres16))]
 async fn pg_default_value_as_dbgenerated(api: &mut TestApi) -> TestResult {
     let sequence = "CREATE SEQUENCE test_seq START 1".to_string();
     api.database().execute_raw(&sequence, &[]).await?;

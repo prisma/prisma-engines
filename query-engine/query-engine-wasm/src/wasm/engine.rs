@@ -7,105 +7,30 @@ use crate::{
 };
 use driver_adapters::JsObject;
 use js_sys::Function as JsFunction;
+use psl::builtin_connectors::{MYSQL, POSTGRES, SQLITE};
+use psl::ConnectorRegistry;
+use quaint::connector::ExternalConnector;
 use query_core::{
     protocol::EngineProtocol,
-    schema::{self, QuerySchema},
-    telemetry, QueryExecutor, TransactionOptions, TxId,
+    schema::{self},
+    telemetry, TransactionOptions, TxId,
 };
+use query_engine_common::engine::{map_known_error, ConnectedEngine, ConstructorOptions, EngineBuilder, Inner};
 use request_handlers::ConnectorKind;
 use request_handlers::{load_executor, RequestBody, RequestHandler};
-use serde::{Deserialize, Serialize};
 use serde_json::json;
-use std::sync::Arc;
+use std::{marker::PhantomData, sync::Arc};
 use tokio::sync::RwLock;
-use tracing::{field, instrument::WithSubscriber, Instrument, Span};
+use tracing::{field, instrument::WithSubscriber, Instrument, Level, Span};
 use tracing_subscriber::filter::LevelFilter;
-use tsify::Tsify;
 use wasm_bindgen::prelude::wasm_bindgen;
+
 /// The main query engine used by JS
 #[wasm_bindgen]
 pub struct QueryEngine {
     inner: RwLock<Inner>,
+    adapter: Arc<dyn ExternalConnector>,
     logger: Logger,
-}
-
-/// The state of the engine.
-enum Inner {
-    /// Not connected, holding all data to form a connection.
-    Builder(EngineBuilder),
-    /// A connected engine, holding all data to disconnect and form a new
-    /// connection. Allows querying when on this state.
-    Connected(ConnectedEngine),
-}
-
-/// Everything needed to connect to the database and have the core running.
-struct EngineBuilder {
-    schema: Arc<psl::ValidatedSchema>,
-    engine_protocol: EngineProtocol,
-}
-
-/// Internal structure for querying and reconnecting with the engine.
-struct ConnectedEngine {
-    schema: Arc<psl::ValidatedSchema>,
-    query_schema: Arc<QuerySchema>,
-    executor: crate::Executor,
-    engine_protocol: EngineProtocol,
-}
-
-/// Returned from the `serverInfo` method in javascript.
-#[derive(Debug, Serialize)]
-#[serde(rename_all = "camelCase")]
-struct ServerInfo {
-    commit: String,
-    version: String,
-    primary_connector: Option<String>,
-}
-
-impl ConnectedEngine {
-    /// The schema AST for Query Engine core.
-    pub fn query_schema(&self) -> &Arc<QuerySchema> {
-        &self.query_schema
-    }
-
-    /// The query executor.
-    pub fn executor(&self) -> &(dyn QueryExecutor + Send + Sync) {
-        self.executor.as_ref()
-    }
-
-    pub fn engine_protocol(&self) -> EngineProtocol {
-        self.engine_protocol
-    }
-}
-
-/// Parameters defining the construction of an engine.
-#[derive(Debug, Deserialize, Tsify)]
-#[tsify(from_wasm_abi)]
-#[serde(rename_all = "camelCase")]
-pub struct ConstructorOptions {
-    datamodel: String,
-    log_level: String,
-    #[serde(default)]
-    log_queries: bool,
-    #[serde(default)]
-    engine_protocol: Option<EngineProtocol>,
-}
-
-impl Inner {
-    /// Returns a builder if the engine is not connected
-    fn as_builder(&self) -> crate::Result<&EngineBuilder> {
-        match self {
-            Inner::Builder(ref builder) => Ok(builder),
-            Inner::Connected(_) => Err(ApiError::AlreadyConnected),
-        }
-    }
-
-    /// Returns the engine if connected
-    fn as_engine(&self) -> crate::Result<&ConnectedEngine> {
-        match self {
-            Inner::Builder(_) => Err(ApiError::NotConnected),
-            Inner::Connected(ref engine) => Ok(engine),
-        }
-    }
 }
 
 #[wasm_bindgen]
@@ -123,44 +48,28 @@ impl QueryEngine {
             datamodel,
             log_level,
             log_queries,
-            engine_protocol,
         } = options;
 
         // Note: if we used `psl::validate`, we'd add ~1MB to the Wasm artifact (before gzip).
-        let mut schema = psl::parse_without_validation(datamodel.into());
-        let config = &mut schema.configuration;
-        let preview_features = config.preview_features();
+        let connector_registry: ConnectorRegistry<'_> = &[POSTGRES, MYSQL, SQLITE];
+        let schema = psl::parse_without_validation(datamodel.into(), connector_registry);
 
-        let js_queryable = driver_adapters::from_js(adapter);
+        let js_queryable = Arc::new(driver_adapters::from_js(adapter));
 
-        sql_connector::activate_driver_adapter(Arc::new(js_queryable));
-
-        let provider_name = schema.connector.provider_name();
-        tracing::info!("Received driver adapter for {provider_name}.");
-
-        schema
-            .diagnostics
-            .to_result()
-            .map_err(|err| ApiError::conversion(err, schema.db.source()))?;
-
-        config
-            .validate_that_one_datasource_is_provided()
-            .map_err(|errors| ApiError::conversion(errors, schema.db.source()))?;
-
-        // Telemetry panics on timings if preview feature is enabled
-        let enable_tracing = false; // config.preview_features().contains(PreviewFeature::Tracing);
-        let engine_protocol = engine_protocol.unwrap_or(EngineProtocol::Json);
+        // We skip telemetry to avoid runtime panics.
+        let engine_protocol = EngineProtocol::Json;
 
         let builder = EngineBuilder {
             schema: Arc::new(schema),
             engine_protocol,
         };
 
-        let log_level = log_level.parse::<LevelFilter>().unwrap();
-        let logger = Logger::new(log_queries, log_level, log_callback, enable_tracing);
+        let log_level = log_level.parse::<LevelFilter>().unwrap_or(Level::INFO.into());
+        let logger = Logger::new(log_queries, log_level, log_callback);
 
         Ok(Self {
             inner: RwLock::new(Inner::Builder(builder)),
+            adapter: js_queryable,
             logger,
         })
     }
@@ -176,20 +85,19 @@ impl QueryEngine {
 
             let mut inner = self.inner.write().await;
             let builder = inner.as_builder()?;
+
+            let preview_features = builder.schema.configuration.preview_features();
             let arced_schema = Arc::clone(&builder.schema);
-            let arced_schema_2 = Arc::clone(&builder.schema);
 
             let engine = async move {
-                // We only support one data source & generator at the moment, so take the first one (default not exposed yet).
-                let data_source = arced_schema
-                    .configuration
-                    .datasources
-                    .first()
-                    .ok_or_else(|| ApiError::configuration("No valid data source found"))?;
-
-                let preview_features = arced_schema.configuration.preview_features();
-
-                let executor = load_executor(ConnectorKind::Js {}, data_source, preview_features).await?;
+                let executor = load_executor(
+                    ConnectorKind::Js {
+                        adapter: Arc::clone(&self.adapter),
+                        _phantom: PhantomData,
+                    },
+                    preview_features,
+                )
+                .await?;
                 let connector = executor.primary_connector();
 
                 let conn_span = tracing::info_span!(
@@ -201,7 +109,7 @@ impl QueryEngine {
                 connector.get_connection().instrument(conn_span).await?;
 
                 let query_schema_span = tracing::info_span!("prisma:engine:schema");
-                let query_schema = query_schema_span.in_scope(|| schema::build(arced_schema_2, true));
+                let query_schema = query_schema_span.in_scope(|| schema::build(arced_schema, true));
 
                 Ok(ConnectedEngine {
                     schema: builder.schema.clone(),
@@ -354,11 +262,4 @@ impl QueryEngine {
     pub async fn metrics(&self, json_options: String) -> Result<(), wasm_bindgen::JsError> {
         Err(ApiError::configuration("Metrics is not enabled in Wasm.").into())
     }
-}
-
-fn map_known_error(err: query_core::CoreError) -> crate::Result<String> {
-    let user_error: user_facing_errors::Error = err.into();
-    let value = serde_json::to_string(&user_error)?;
-
-    Ok(value)
 }

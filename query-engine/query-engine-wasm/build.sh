@@ -15,21 +15,13 @@ OUT_NPM_NAME="@prisma/query-engine-wasm"
 if [[ -z "${WASM_BUILD_PROFILE:-}" ]]; then
     # use `wasm-pack build --release` by default on CI only
     if [[ -z "${BUILDKITE:-}" ]] && [[ -z "${GITHUB_ACTIONS:-}" ]]; then
-        WASM_BUILD_PROFILE="profiling"
+        WASM_BUILD_PROFILE="dev"
     else
         WASM_BUILD_PROFILE="release"
     fi
 fi
 
 echo "Using build profile: \"${WASM_BUILD_PROFILE}\"" 
-
-# Check if wasm-pack is installed
-if ! command -v wasm-pack &> /dev/null
-then
-    echo "wasm-pack could not be found, installing now..."
-    # Install wasm-pack
-    curl https://rustwasm.github.io/wasm-pack/installer/init.sh -sSf | sh
-fi
 
 # List of arguments for `wasm-pack`
 WASM_PACK_ARGS=(
@@ -61,6 +53,14 @@ if [[ "$WASM_REFERENCE_TYPES" == "1" ]]; then
     echo "Using reference types..."
     WASM_PACK_ARGS+=("--reference-types")
     WASM_OPT_ARGS+=("--enable-reference-types")
+fi
+
+
+# Check if wasm-pack is installed
+if ! command -v wasm-pack &> /dev/null
+then
+    echo "wasm-pack could not be found, installing now..."
+    curl https://rustwasm.github.io/wasm-pack/installer/init.sh -sSf | sh
 fi
 
 # Compile the Rust code to WebAssembly via `wasm-pack`

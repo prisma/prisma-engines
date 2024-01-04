@@ -15,9 +15,6 @@ use quaint::{
 };
 use tracing::{info_span, Instrument};
 
-#[cfg(target_arch = "wasm32")]
-use wasm_bindgen::prelude::wasm_bindgen;
-
 /// A JsQueryable adapts a Proxy to implement quaint's Queryable interface. It has the
 /// responsibility of transforming inputs and outputs of `query` and `execute` methods from quaint
 /// types to types that can be translated into javascript and viceversa. This is to let the rest of
@@ -30,7 +27,6 @@ use wasm_bindgen::prelude::wasm_bindgen;
 /// Transforming a `JSResultSet` (what client connectors implemented in javascript provide)
 /// into a `quaint::connector::result_set::ResultSet`. A quaint `ResultSet` is basically a vector
 /// of `quaint::Value` but said type is a tagged enum, with non-unit variants that cannot be converted to javascript as is.
-#[cfg_attr(target_arch = "wasm32", wasm_bindgen(getter_with_clone))]
 pub(crate) struct JsBaseQueryable {
     pub(crate) proxy: CommonProxy,
     pub provider: AdapterFlavour,

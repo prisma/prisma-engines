@@ -16,6 +16,7 @@ mod mysql_datamodel_connector;
 mod native_type_definition;
 mod postgres_datamodel_connector;
 mod sqlite_datamodel_connector;
+mod utils;
 
 use psl_core::{datamodel_connector::Connector, ConnectorRegistry};
 
@@ -26,4 +27,4 @@ pub const SQLITE: &'static dyn Connector = &sqlite_datamodel_connector::SqliteDa
 pub const MSSQL: &'static dyn Connector = &mssql_datamodel_connector::MsSqlDatamodelConnector;
 pub const MONGODB: &'static dyn Connector = &mongodb::MongoDbDatamodelConnector;
 
-pub static BUILTIN_CONNECTORS: ConnectorRegistry = &[POSTGRES, MYSQL, SQLITE, MSSQL, COCKROACH, MONGODB];
+pub static BUILTIN_CONNECTORS: ConnectorRegistry<'static> = &[POSTGRES, MYSQL, SQLITE, MSSQL, COCKROACH, MONGODB];

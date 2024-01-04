@@ -18,7 +18,7 @@ user-facing-errors = { path = "../../../libs/user-facing-errors" }
 thiserror = "1.0"
 async-trait = "0.1"
 nom = "7.1"
-itertools = "0.10"
+itertools.workspace = true
 regex = "1"
 serde.workspace = true
 tracing = "0.1"

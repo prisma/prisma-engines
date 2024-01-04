@@ -10,7 +10,7 @@ user-facing-errors = { path = "../../libs/user-facing-errors" }
 quaint = { path = "../../quaint" }
 psl.workspace = true
 dmmf_crate = { path = "../dmmf", package = "dmmf" }
-itertools = "0.10"
+itertools.workspace = true
 graphql-parser = { git = "https://github.com/prisma/graphql-parser", optional = true }
 serde.workspace = true
 serde_json.workspace = true

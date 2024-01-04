@@ -2,7 +2,7 @@
 
 use core::fmt;
 use js_sys::Function as JsFunction;
-use query_core::telemetry;
+use query_engine_common::logger::StringCallback;
 use serde_json::Value;
 use std::collections::BTreeMap;
 use tracing::{
@@ -20,15 +20,6 @@ use wasm_bindgen::JsValue;
 #[derive(Clone)]
 pub struct LogCallback(pub JsFunction);
 
-impl LogCallback {
-    pub fn call<T: Into<JsValue>>(&self, arg1: T) -> Result<(), String> {
-        self.0
-            .call1(&JsValue::NULL, &arg1.into())
-            .map(|_| ())
-            .map_err(|err| err.as_string().unwrap_or_default())
-    }
-}
-
 unsafe impl Send for LogCallback {}
 unsafe impl Sync for LogCallback {}
 
@@ -38,38 +29,25 @@ pub(crate) struct Logger {
 
 impl Logger {
     /// Creates a new logger using a call layer
-    pub fn new(log_queries: bool, log_level: LevelFilter, log_callback: LogCallback, enable_tracing: bool) -> Self {
+    pub fn new(log_queries: bool, log_level: LevelFilter, log_callback: LogCallback) -> Self {
         let is_sql_query = filter_fn(|meta| {
             meta.target() == "quaint::connector::metrics" && meta.fields().iter().any(|f| f.name() == "query")
         });
 
-        // is a mongodb query?
-        let is_mongo_query = filter_fn(|meta| meta.target() == "mongodb_query_connector::query");
-
         // We need to filter the messages to send to our callback logging mechanism
         let filters = if log_queries {
             // Filter trace query events (for query log) or based in the defined log level
-            is_sql_query.or(is_mongo_query).or(log_level).boxed()
+            is_sql_query.or(log_level).boxed()
         } else {
             // Filter based in the defined log level
             FilterExt::boxed(log_level)
         };
 
-        let is_user_trace = filter_fn(telemetry::helpers::user_facing_span_only_filter);
-        let tracer = super::tracer::new_pipeline().install_simple(log_callback.clone());
-        let telemetry = if enable_tracing {
-            let telemetry = tracing_opentelemetry::layer()
-                .with_tracer(tracer)
-                .with_filter(is_user_trace);
-            Some(telemetry)
-        } else {
-            None
-        };
-
-        let layer = CallbackLayer::new(log_callback).with_filter(filters);
+        let log_callback = CallbackLayer::new(log_callback);
+        let layer = log_callback.with_filter(filters);
 
         Self {
-            dispatcher: Dispatch::new(Registry::default().with(telemetry).with(layer)),
+            dispatcher: Dispatch::new(Registry::default().with(layer)),
         }
     }
 
@@ -130,6 +108,7 @@ impl<'a> ToString for JsonVisitor<'a> {
     }
 }
 
+#[derive(Clone)]
 pub(crate) struct CallbackLayer {
     callback: LogCallback,
 }
@@ -140,12 +119,22 @@ impl CallbackLayer {
     }
 }
 
+impl StringCallback for CallbackLayer {
+    fn call(&self, message: String) -> Result<(), String> {
+        self.callback
+            .0
+            .call1(&JsValue::NULL, &message.into())
+            .map(|_| ())
+            .map_err(|err| format!("Could not call JS callback: {}", err.as_string().unwrap_or_default()))
+    }
+}
+
 // A tracing layer for sending logs to a js callback, layers are composable, subscribers are not.
 impl<S: Subscriber> Layer<S> for CallbackLayer {
     fn on_event(&self, event: &tracing::Event<'_>, _ctx: tracing_subscriber::layer::Context<'_, S>) {
         let mut visitor = JsonVisitor::new(event.metadata().level(), event.metadata().target());
         event.record(&mut visitor);
 
-        let _ = self.callback.call(visitor.to_string());
+        let _ = self.call(visitor.to_string());
     }
 }

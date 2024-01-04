@@ -432,6 +432,7 @@ dependencies = [
 name = "builtin-psl-connectors"
 version = "0.1.0"
 dependencies = [
+ "chrono",
  "connection-string",
  "either",
  "enumflags2",
@@ -748,7 +749,7 @@ dependencies = [
  "ciborium",
  "clap 3.2.25",
  "criterion-plot",
- "itertools",
+ "itertools 0.10.5",
  "lazy_static",
  "num-traits",
  "oorandom",
@@ -769,7 +770,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "6b50826342786a51a89e2da3a28f1c32b06e387201bc2d19791f622c673706b1"
 dependencies = [
  "cast",
- "itertools",
+ "itertools 0.10.5",
 ]
 
 [[package]]
@@ -1085,7 +1086,7 @@ dependencies = [
  "flate2",
  "indexmap 1.9.3",
  "indoc 2.0.3",
- "itertools",
+ "itertools 0.12.0",
  "pretty_assertions",
  "psl",
  "query-structure",
@@ -1985,6 +1986,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "itertools"
+version = "0.12.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "25db6b064527c5d482d0423354fcd07a89a2dfe07b67892e62411946db7f07b0"
+dependencies = [
+ "either",
+]
+
+[[package]]
 name = "itoa"
 version = "1.0.9"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2493,7 +2503,7 @@ dependencies = [
  "derive_more",
  "futures",
  "indexmap 1.9.3",
- "itertools",
+ "itertools 0.12.0",
  "mongodb",
  "mongodb-client",
  "pretty_assertions",
@@ -3446,7 +3456,7 @@ checksum = "62941722fb675d463659e49c4f3fe1fe792ff24fe5bbaa9c08cd3b98a1c354f5"
 dependencies = [
  "bytes",
  "heck 0.3.3",
- "itertools",
+ "itertools 0.10.5",
  "lazy_static",
  "log",
  "multimap",
@@ -3465,7 +3475,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "f9cc1a3263e07e0bf68e96268f37665207b49560d98739662cdfaae215c720fe"
 dependencies = [
  "anyhow",
- "itertools",
+ "itertools 0.10.5",
  "proc-macro2",
  "quote",
  "syn 1.0.109",
@@ -3500,10 +3510,11 @@ version = "0.1.0"
 dependencies = [
  "bigdecimal",
  "chrono",
+ "connection-string",
  "diagnostics",
  "enumflags2",
  "indoc 2.0.3",
- "itertools",
+ "itertools 0.12.0",
  "lsp-types",
  "once_cell",
  "parser-database",
@@ -3570,7 +3581,7 @@ dependencies = [
  "getrandom 0.2.11",
  "hex",
  "indoc 0.3.6",
- "itertools",
+ "itertools 0.12.0",
  "lru-cache",
  "metrics 0.18.1",
  "mobc",
@@ -3649,7 +3660,7 @@ dependencies = [
  "chrono",
  "futures",
  "indexmap 1.9.3",
- "itertools",
+ "itertools 0.12.0",
  "prisma-value",
  "query-structure",
  "serde",
@@ -3673,7 +3684,7 @@ dependencies = [
  "enumflags2",
  "futures",
  "indexmap 1.9.3",
- "itertools",
+ "itertools 0.12.0",
  "lru 0.7.8",
  "once_cell",
  "opentelemetry",
@@ -3731,6 +3742,31 @@ dependencies = [
 ]
 
 [[package]]
+name = "query-engine-common"
+version = "0.1.0"
+dependencies = [
+ "async-trait",
+ "connection-string",
+ "napi",
+ "opentelemetry",
+ "psl",
+ "query-connector",
+ "query-core",
+ "query-engine-metrics",
+ "serde",
+ "serde_json",
+ "thiserror",
+ "tracing",
+ "tracing-futures",
+ "tracing-opentelemetry",
+ "tracing-subscriber",
+ "tsify",
+ "url",
+ "user-facing-errors",
+ "wasm-bindgen",
+]
+
+[[package]]
 name = "query-engine-metrics"
 version = "0.1.0"
 dependencies = [
@@ -3765,6 +3801,7 @@ dependencies = [
  "quaint",
  "query-connector",
  "query-core",
+ "query-engine-common",
  "query-engine-metrics",
  "query-structure",
  "request-handlers",
@@ -3822,6 +3859,7 @@ dependencies = [
  "quaint",
  "query-connector",
  "query-core",
+ "query-engine-common",
  "query-structure",
  "request-handlers",
  "serde",
@@ -3850,7 +3888,7 @@ dependencies = [
  "chrono",
  "cuid",
  "getrandom 0.2.11",
- "itertools",
+ "itertools 0.12.0",
  "nanoid",
  "prisma-value",
  "psl",
@@ -3879,7 +3917,7 @@ dependencies = [
  "indexmap 1.9.3",
  "indoc 2.0.3",
  "insta",
- "itertools",
+ "itertools 0.12.0",
  "jsonrpc-core",
  "nom",
  "once_cell",
@@ -4169,7 +4207,7 @@ dependencies = [
  "graphql-parser",
  "indexmap 1.9.3",
  "insta",
- "itertools",
+ "itertools 0.12.0",
  "mongodb-query-connector",
  "once_cell",
  "psl",
@@ -4984,7 +5022,7 @@ dependencies = [
  "cuid",
  "futures",
  "hex",
- "itertools",
+ "itertools 0.12.0",
  "once_cell",
  "opentelemetry",
  "prisma-value",
@@ -5062,11 +5100,11 @@ dependencies = [
 
 [[package]]
 name = "sqlformat"
-version = "0.2.1"
+version = "0.2.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "0c12bc9199d1db8234678b7051747c07f517cdcf019262d1847b94ec8b1aee3e"
+checksum = "ce81b7bd7c4493975347ef60d8c7e8b742d4694f4c49f93e0a12ea263938176c"
 dependencies = [
- "itertools",
+ "itertools 0.12.0",
  "nom",
  "unicode_categories",
 ]
@@ -5948,7 +5986,7 @@ version = "0.1.0"
 dependencies = [
  "backtrace",
  "indoc 2.0.3",
- "itertools",
+ "itertools 0.12.0",
  "quaint",
  "serde",
  "serde_json",

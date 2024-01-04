@@ -7,7 +7,6 @@ use psl_core::{
     diagnostics::{DatamodelError, Diagnostics, Span},
     parser_database::{ReferentialAction, ScalarType},
 };
-use std::borrow::Cow;
 
 const NATIVE_TYPE_CONSTRUCTORS: &[NativeTypeConstructor] = &[];
 const CONSTRAINT_SCOPES: &[ConstraintScope] = &[ConstraintScope::GlobalKeyIndex];
@@ -102,24 +101,6 @@ impl Connector for SqliteDatamodelConnector {
             span,
         ));
         None
-    }
-
-    fn set_config_dir<'a>(&self, config_dir: &std::path::Path, url: &'a str) -> Cow<'a, str> {
-        let set_root = |path: &str| {
-            let path = std::path::Path::new(path);
-
-            if path.is_relative() {
-                Some(config_dir.join(path).to_str().map(ToString::to_string).unwrap())
-            } else {
-                None
-            }
-        };
-
-        if let Some(path) = set_root(url.trim_start_matches("file:")) {
-            return Cow::Owned(format!("file:{path}"));
-        };
-
-        Cow::Borrowed(url)
     }
 
     fn validate_url(&self, url: &str) -> Result<(), String> {

@@ -76,7 +76,7 @@ metrics = "0.18"
 futures = "0.3"
 url = "2.1"
 hex = "0.4"
-itertools = "0.10"
+itertools.workspace = true
 
 either = { version = "1.6" }
 base64 = { version = "0.12.3" }
@@ -88,7 +88,7 @@ bit-vec = { version = "0.6.1", optional = true }
 bytes = { version = "1.0", optional = true }
 mobc = { version = "0.8", optional = true }
 serde = { version = "1.0", optional = true }
-sqlformat = { version = "0.2.0", optional = true }
+sqlformat = { version = "0.2.3", optional = true }
 uuid = { version = "1", features = ["v4"] }
 crosstarget-utils = { path = "../libs/crosstarget-utils" }
 

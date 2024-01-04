@@ -1,67 +1,67 @@
-name: Report wasm size
+name: "QE: WASM size"
 on:
   pull_request:
     paths-ignore:
-      - '.github/**'
-      - '!.github/workflows/wasm-size.yml'
-      - '.buildkite/**'
-      - '*.md'
-      - 'LICENSE'
-      - 'CODEOWNERS'
-      - 'renovate.json'
+      - ".github/**"
+      - "!.github/workflows/wasm-size.yml"
+      - ".buildkite/**"
+      - "*.md"
+      - "LICENSE"
+      - "CODEOWNERS"
+      - "renovate.json"
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   pr-wasm-size:
-    name: Get PR module size
+    name: calculate module size (pr)
     runs-on: ubuntu-latest
     outputs:
-      size: ${{ steps.measure.outputs.size }} 
-      size_gz: ${{ steps.measure.outputs.size_gz }} 
+      size: ${{ steps.measure.outputs.size }}
+      size_gz: ${{ steps.measure.outputs.size_gz }}
     steps:
       - name: Checkout PR branch
         uses: actions/checkout@v4
-      
-      - uses: dtolnay/rust-toolchain@stable
 
-      - name: 'Install wasm-pack'
-        run: cargo install wasm-pack
-      
+      - uses: cachix/install-nix-action@v24
+
       - name: Build and measure PR branch
         id: measure
         run: |
-          make build-qe-wasm
-          echo "size=$(wc --bytes < query-engine/query-engine-wasm/pkg/query_engine_bg.wasm)" >> $GITHUB_OUTPUT
-          echo "size_gz=$(gzip -cn query-engine/query-engine-wasm/pkg/query_engine_bg.wasm | wc --bytes)" >> $GITHUB_OUTPUT
+          nix build -L .#query-engine-wasm .#query-engine-wasm-gz
+
+          echo "size=$(wc --bytes < ./result/query_engine_bg.wasm)" >> $GITHUB_OUTPUT
+          echo "size_gz=$(wc --bytes < ./result-1/query_engine_bg.wasm.gz)" >> $GITHUB_OUTPUT
 
   base-wasm-size:
-    name: Get base branch size
+    name: calculate module size (main)
     runs-on: ubuntu-latest
     outputs:
-      size: ${{ steps.measure.outputs.size }} 
-      size_gz: ${{ steps.measure.outputs.size_gz }} 
+      size: ${{ steps.measure.outputs.size }}
+      size_gz: ${{ steps.measure.outputs.size_gz }}
     steps:
       - name: Checkout base branch
         uses: actions/checkout@v4
         with:
           ref: ${{ github.event.pull_request.base.sha }}
-      
-      - uses: dtolnay/rust-toolchain@stable
 
-      - name: 'Install wasm-pack'
-        run: cargo install wasm-pack
-      
+      - uses: cachix/install-nix-action@v24
+
       - name: Build and measure base branch
         id: measure
         run: |
-          make build-qe-wasm
-          echo "size=$(wc --bytes < query-engine/query-engine-wasm/pkg/query_engine_bg.wasm)" >> $GITHUB_OUTPUT
-          echo "size_gz=$(gzip -cn query-engine/query-engine-wasm/pkg/query_engine_bg.wasm | wc --bytes)" >> $GITHUB_OUTPUT
-  
+          nix build -L .#query-engine-wasm .#query-engine-wasm-gz
+
+          echo "size=$(wc --bytes < ./result/query_engine_bg.wasm)" >> $GITHUB_OUTPUT
+          echo "size_gz=$(wc --bytes < ./result-1/query_engine_bg.wasm.gz)" >> $GITHUB_OUTPUT
+
   report-diff:
-    name: Report module size difference
+    name: report module size
     runs-on: ubuntu-latest
-    needs: 
-      - pr-wasm-size 
+    needs:
+      - pr-wasm-size
       - base-wasm-size
 
     steps:
@@ -72,7 +72,7 @@ jobs:
           base_gz=$(echo "${{ needs.base-wasm-size.outputs.size_gz }}" | numfmt --format '%.3f' --to=iec-i --suffix=B)
           pr=$(echo "${{ needs.pr-wasm-size.outputs.size }}" | numfmt --format '%.3f' --to=iec-i  --suffix=B)
           pr_gz=$(echo "${{ needs.pr-wasm-size.outputs.size_gz }}" | numfmt --format '%.3f' --to=iec-i --suffix=B)
-          
+
           diff=$(echo "$((${{ needs.pr-wasm-size.outputs.size }} - ${{ needs.base-wasm-size.outputs.size }}))" | numfmt --format '%.3f' --to=iec-i --suffix=B)
           diff_gz=$(echo "$((${{ needs.pr-wasm-size.outputs.size_gz }} - ${{ needs.base-wasm-size.outputs.size_gz }}))" | numfmt --format '%.3f' --to=iec-i --suffix=B)
 
@@ -90,7 +90,7 @@ jobs:
         id: findReportComment
         with:
           issue-number: ${{ github.event.pull_request.number }}
-          body-includes: '<!-- wasm-size -->'
+          body-includes: "<!-- wasm-size -->"
 
       - name: Create or update report
         uses: peter-evans/create-or-update-comment@v3
@@ -106,6 +106,3 @@ jobs:
             | WASM         | ${{ steps.compute.outputs.pr}}    |  ${{ steps.compute.outputs.base}}    | ${{ steps.compute.outputs.diff}}
             | WASM (gzip)  | ${{ steps.compute.outputs.pr_gz}} |  ${{ steps.compute.outputs.base_gz}} | ${{ steps.compute.outputs.diff_gz}}
           edit-mode: replace
-
-        
-  

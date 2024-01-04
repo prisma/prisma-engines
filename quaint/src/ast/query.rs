@@ -4,7 +4,7 @@ use std::borrow::Cow;
 use super::IntoCommonTableExpression;
 
 /// A database query
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, PartialEq)]
 pub enum Query<'a> {
     Select(Box<Select<'a>>),
     Insert(Box<Insert<'a>>),

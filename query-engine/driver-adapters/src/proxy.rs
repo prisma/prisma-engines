@@ -1,6 +1,6 @@
 use crate::send_future::UnsafeFuture;
 use crate::types::JsConnectionInfo;
-pub use crate::types::{ColumnType, JSResultSet, Query, TransactionOptions};
+pub use crate::types::{JSResultSet, Query, TransactionOptions};
 use crate::{
     from_js_value, get_named_property, get_optional_named_property, to_rust_str, AdapterMethod, AdapterMethodNoArgs,
     JsObject, JsResult, JsString, JsTransaction,
@@ -10,13 +10,9 @@ use futures::Future;
 use metrics::increment_gauge;
 use std::sync::atomic::{AtomicBool, Ordering};
 
-#[cfg(target_arch = "wasm32")]
-use wasm_bindgen::prelude::wasm_bindgen;
-
 /// Proxy is a struct wrapping a javascript object that exhibits basic primitives for
 /// querying and executing SQL (i.e. a client connector). The Proxy uses Napi/Wasm's JsFunction
 /// to invoke the code within the node runtime that implements the client connector.
-#[cfg_attr(target_arch = "wasm32", wasm_bindgen(getter_with_clone))]
 pub(crate) struct CommonProxy {
     /// Execute a query given as SQL, interpolating the given parameters.
     query_raw: AdapterMethod<Query, JSResultSet>,
@@ -31,7 +27,6 @@ pub(crate) struct CommonProxy {
 
 /// This is a JS proxy for accessing the methods specific to top level
 /// JS driver objects
-#[cfg_attr(target_arch = "wasm32", wasm_bindgen(getter_with_clone))]
 pub(crate) struct DriverProxy {
     start_transaction: AdapterMethod<(), JsTransaction>,
     get_connection_info: Option<AdapterMethod<(), JsConnectionInfo>>,
@@ -39,7 +34,6 @@ pub(crate) struct DriverProxy {
 
 /// This a JS proxy for accessing the methods, specific
 /// to JS transaction objects
-#[cfg_attr(target_arch = "wasm32", wasm_bindgen(getter_with_clone))]
 pub(crate) struct TransactionProxy {
     /// transaction options
     options: TransactionOptions,

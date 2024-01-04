@@ -183,8 +183,7 @@ impl TestConfig {
     }
 
     pub fn external_test_executor_path(&self) -> Option<String> {
-        const DEFAULT_TEST_EXECUTOR: &str =
-            "query-engine/driver-adapters/connector-test-kit-executor/script/start_node.sh";
+        const DEFAULT_TEST_EXECUTOR: &str = "query-engine/driver-adapters/executor/script/testd.sh";
         self.external_test_executor
             .as_ref()
             .and_then(|_| {

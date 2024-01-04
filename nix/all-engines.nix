@@ -115,6 +115,8 @@ in
     })
     { profile = "release"; };
 
+
+
   packages.query-engine-wasm = lib.makeOverridable
     ({ profile }: stdenv.mkDerivation {
       name = "query-engine-wasm";
@@ -125,7 +127,7 @@ in
 
       buildPhase = ''
         cd query-engine/query-engine-wasm
-        HOME=$(mktemp -dt wasm-pack-home-XXXX) WASM_BUILD_PROFILE=${profile} ./build.sh
+        HOME=$(mktemp -dt wasm-pack-home-XXXX) WASM_BUILD_PROFILE=${profile} bash ./build.sh
       '';
 
       installPhase = ''
@@ -149,4 +151,20 @@ in
       '';
     })
     { profile = "release"; };
+
+  packages.export-query-engine-wasm =
+    pkgs.writeShellApplication {
+      name = "export-query-engine-wasm";
+      runtimeInputs = with pkgs; [ jq ];
+      text = ''
+        set -euxo pipefail
+
+        OUTDIR="$1"
+        OUTVERSION="$2"
+        mkdir -p "$OUTDIR"
+        cp -r --no-target-directory ${self'.packages.query-engine-wasm} "$OUTDIR"
+        chmod -R +rw "$OUTDIR"
+        jq --arg new_version "$OUTVERSION" '.version = $new_version' "${self'.packages.query-engine-wasm}/package.json"  > "$OUTDIR/package.json"
+      '';
+    };
 }

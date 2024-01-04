@@ -19,4 +19,4 @@ pretty_assertions = "1"
 flate2 = "1.0"
 similar = { version = "2.2.1", features=["text", "inline", "bytes"] }
 colored = "2.0.0"
-itertools = "0.10.5"
+itertools.workspace = true
