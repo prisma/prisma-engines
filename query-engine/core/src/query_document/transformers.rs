@@ -142,7 +142,6 @@ impl<'a> TryFrom<ParsedInputValue<'a>> for Option<f64> {
         let prisma_value = PrismaValue::try_from(value)?;
 
         match prisma_value {
-            PrismaValue::Float(d) => Ok(d.to_f64()),
             PrismaValue::Null => Ok(None),
             v => Err(ValidationError::unexpected_runtime_error(format!(
                 "Attempted conversion of non-float Prisma value type ({v:?}) into float failed."

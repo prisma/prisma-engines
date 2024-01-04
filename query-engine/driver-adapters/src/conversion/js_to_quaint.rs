@@ -109,46 +109,6 @@ pub fn js_value_to_quaint(
                 "expected a string or number in column '{column_name}', found {mismatch}"
             )),
         },
-        ColumnType::Float => match json_value {
-            // n.as_f32() is not implemented, so we need to downcast from f64 instead.
-            // We assume that the JSON value is a valid f32 number, but we check for overflows anyway.
-            serde_json::Value::Number(n) => n
-                .as_f64()
-                .ok_or(conversion_error!(
-                    "number must be a float in column '{column_name}', got {n}"
-                ))
-                .and_then(f64_to_f32)
-                .map(QuaintValue::float),
-            serde_json::Value::Null => Ok(QuaintValue::null_float()),
-            mismatch => Err(conversion_error!(
-                "expected an f32 number in column '{column_name}', found {mismatch}"
-            )),
-        },
-        ColumnType::Double => match json_value {
-            serde_json::Value::Number(n) => n.as_f64().map(QuaintValue::double).ok_or(conversion_error!(
-                "number must be a f64 in column '{column_name}', got {n}"
-            )),
-            serde_json::Value::Null => Ok(QuaintValue::null_double()),
-            mismatch => Err(conversion_error!(
-                "expected an f64 number in column '{column_name}', found {mismatch}"
-            )),
-        },
-        ColumnType::Numeric => match json_value {
-            serde_json::Value::String(s) => BigDecimal::from_str(&s).map(QuaintValue::numeric).map_err(|e| {
-                conversion_error!("invalid numeric value when parsing {s} in column '{column_name}': {e}")
-            }),
-            serde_json::Value::Number(n) => n
-                .as_f64()
-                .and_then(BigDecimal::from_f64)
-                .ok_or(conversion_error!(
-                    "number must be an f64 in column '{column_name}', got {n}"
-                ))
-                .map(QuaintValue::numeric),
-            serde_json::Value::Null => Ok(QuaintValue::null_numeric()),
-            mismatch => Err(conversion_error!(
-                "expected a string-encoded number in column '{column_name}', found {mismatch}",
-            )),
-        },
         ColumnType::Boolean => match json_value {
             serde_json::Value::Bool(b) => Ok(QuaintValue::boolean(b)),
             serde_json::Value::Null => Ok(QuaintValue::null_boolean()),
@@ -258,23 +218,16 @@ pub fn js_value_to_quaint(
             )),
         },
         ColumnType::UnknownNumber => match json_value {
-            serde_json::Value::Number(n) => n
-                .as_i64()
-                .map(QuaintValue::int64)
-                .or(n.as_f64().map(QuaintValue::double))
-                .ok_or(conversion_error!(
-                    "number must be an i64 or f64 in column '{column_name}', got {n}"
-                )),
+            serde_json::Value::Number(n) => n.as_i64().map(QuaintValue::int64).ok_or(conversion_error!(
+                "number must be an i64 in column '{column_name}', got {n}"
+            )),
             mismatch => Err(conversion_error!(
-                "expected a either an i64 or a f64 in column '{column_name}', found {mismatch}",
+                "expected a either an i64 in column '{column_name}', found {mismatch}",
             )),
         },
 
         ColumnType::Int32Array => js_array_to_quaint(ColumnType::Int32, json_value, column_name),
         ColumnType::Int64Array => js_array_to_quaint(ColumnType::Int64, json_value, column_name),
-        ColumnType::FloatArray => js_array_to_quaint(ColumnType::Float, json_value, column_name),
-        ColumnType::DoubleArray => js_array_to_quaint(ColumnType::Double, json_value, column_name),
-        ColumnType::NumericArray => js_array_to_quaint(ColumnType::Numeric, json_value, column_name),
         ColumnType::BooleanArray => js_array_to_quaint(ColumnType::Boolean, json_value, column_name),
         ColumnType::CharacterArray => js_array_to_quaint(ColumnType::Character, json_value, column_name),
         ColumnType::TextArray => js_array_to_quaint(ColumnType::Text, json_value, column_name),

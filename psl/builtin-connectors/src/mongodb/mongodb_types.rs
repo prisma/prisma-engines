@@ -8,7 +8,6 @@ crate::native_type_definition! {
     /// Taken from: <https://docs.mongodb.com/manual/reference/bson-types/>
     MongoDbType;
     String -> String,
-    Double -> Float,
     BinData -> Bytes,
     ObjectId -> String | Bytes,
     Bool -> Boolean,
@@ -36,7 +35,6 @@ static DEFAULT_MAPPING: Lazy<HashMap<ScalarType, MongoDbType>> = Lazy::new(|| {
     vec![
         (ScalarType::Int, MongoDbType::Int),
         (ScalarType::BigInt, MongoDbType::Long),
-        (ScalarType::Float, MongoDbType::Double),
         (ScalarType::Boolean, MongoDbType::Bool),
         (ScalarType::String, MongoDbType::String),
         (ScalarType::DateTime, MongoDbType::Timestamp),

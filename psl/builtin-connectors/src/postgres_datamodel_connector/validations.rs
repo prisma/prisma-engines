@@ -243,35 +243,6 @@ pub(super) fn generalized_index_validations(
                 (Some(PostgresType::Date), Some(DateMinMaxOps)) => (),
                 (Some(PostgresType::Date), Some(DateMinMaxMultiOps)) => (),
 
-                // Float4
-                (Some(PostgresType::Real), None) => (),
-                (Some(PostgresType::Real), Some(Float4BloomOps)) => (),
-                (Some(PostgresType::Real), Some(Float4MinMaxOps)) => (),
-                (Some(PostgresType::Real), Some(Float4MinMaxMultiOps)) => (),
-
-                // Float8
-                (Some(PostgresType::DoublePrecision), None) => (),
-                (Some(PostgresType::DoublePrecision), Some(Float8BloomOps)) => (),
-                (Some(PostgresType::DoublePrecision), Some(Float8MinMaxOps)) => (),
-                (Some(PostgresType::DoublePrecision), Some(Float8MinMaxMultiOps)) => (),
-                (None, None) if r#type.is_float() => (),
-                (None, Some(Float8BloomOps | Float8MinMaxOps | Float8MinMaxMultiOps)) => {
-                    if !r#type.is_float() {
-                        let name = field.as_index_field().name();
-                        let opclass = opclass.unwrap();
-
-                        let msg = format!(
-                            "The given operator class `{opclass}` points to the field `{name}` that is not of Float type."
-                        );
-
-                        errors.push_error(DatamodelError::new_attribute_validation_error(
-                            &msg,
-                            index.attribute_name(),
-                            index.ast_attribute().span,
-                        ));
-                    }
-                }
-
                 // Inet
                 (Some(PostgresType::Inet), None) => (),
                 (Some(PostgresType::Inet), Some(InetInclusionOps)) => (),
@@ -321,29 +292,6 @@ pub(super) fn generalized_index_validations(
 
                         let msg = format!(
                             "The given operator class `{opclass}` points to the field `{name}` that is not of BigInt type."
-                        );
-
-                        errors.push_error(DatamodelError::new_attribute_validation_error(
-                            &msg,
-                            index.attribute_name(),
-                            index.ast_attribute().span,
-                        ));
-                    }
-                }
-
-                // Numeric
-                (Some(PostgresType::Decimal(_)), None) => (),
-                (Some(PostgresType::Decimal(_)), Some(NumericBloomOps)) => (),
-                (Some(PostgresType::Decimal(_)), Some(NumericMinMaxOps)) => (),
-                (Some(PostgresType::Decimal(_)), Some(NumericMinMaxMultiOps)) => (),
-                (None, None) if r#type.is_decimal() => (),
-                (None, Some(NumericBloomOps | NumericMinMaxOps | NumericMinMaxMultiOps)) => {
-                    if !r#type.is_decimal() {
-                        let name = field.as_index_field().name();
-                        let opclass = opclass.unwrap();
-
-                        let msg = format!(
-                            "The given operator class `{opclass}` points to the field `{name}` that is not of Decimal type."
                         );
 
                         errors.push_error(DatamodelError::new_attribute_validation_error(

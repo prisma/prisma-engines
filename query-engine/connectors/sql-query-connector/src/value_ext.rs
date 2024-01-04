@@ -14,14 +14,11 @@ impl<'a> IntoTypedJsonExtension for quaint::Value<'a> {
         let type_name = match self.typed {
             quaint::ValueType::Int32(_) => "int",
             quaint::ValueType::Int64(_) => "bigint",
-            quaint::ValueType::Float(_) => "float",
-            quaint::ValueType::Double(_) => "double",
             quaint::ValueType::Text(_) => "string",
             quaint::ValueType::Enum(_, _) => "enum",
             quaint::ValueType::Bytes(_) => "bytes",
             quaint::ValueType::Boolean(_) => "bool",
             quaint::ValueType::Char(_) => "char",
-            quaint::ValueType::Numeric(_) => "decimal",
             quaint::ValueType::Json(_) => "json",
             quaint::ValueType::Xml(_) => "xml",
             quaint::ValueType::Uuid(_) => "uuid",
@@ -42,7 +39,6 @@ impl<'a> IntoTypedJsonExtension for quaint::Value<'a> {
                 serde_json::Value::Array(values.into_iter().map(|value| value.as_typed_json()).collect())
             }
             quaint::ValueType::Int64(Some(value)) => serde_json::Value::String(value.to_string()),
-            quaint::ValueType::Numeric(Some(decimal)) => serde_json::Value::String(decimal.normalized().to_string()),
             x => serde_json::Value::from(x),
         };
 

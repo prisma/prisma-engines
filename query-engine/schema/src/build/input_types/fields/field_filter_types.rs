@@ -231,14 +231,12 @@ fn full_scalar_filter_type(
                 .chain(query_mode_field(ctx, nested))
                 .collect(),
 
-            TypeIdentifier::Int
-            | TypeIdentifier::BigInt
-            | TypeIdentifier::Float
-            | TypeIdentifier::DateTime
-            | TypeIdentifier::Decimal => equality_filters(mapped_scalar_type.clone(), nullable)
-                .chain(inclusion_filters(ctx, mapped_scalar_type.clone(), nullable))
-                .chain(alphanumeric_filters(ctx, mapped_scalar_type.clone()))
-                .collect(),
+            TypeIdentifier::Int | TypeIdentifier::BigInt | TypeIdentifier::DateTime => {
+                equality_filters(mapped_scalar_type.clone(), nullable)
+                    .chain(inclusion_filters(ctx, mapped_scalar_type.clone(), nullable))
+                    .chain(alphanumeric_filters(ctx, mapped_scalar_type.clone()))
+                    .collect()
+            }
 
             TypeIdentifier::Json => {
                 let mut filters: Vec<InputField<'_>> =
@@ -495,10 +493,7 @@ fn aggregate_filter_field(
 }
 
 fn map_avg_type_ident(typ: TypeIdentifier) -> TypeIdentifier {
-    match &typ {
-        TypeIdentifier::Int | TypeIdentifier::BigInt | TypeIdentifier::Float => TypeIdentifier::Float,
-        _ => typ,
-    }
+    typ
 }
 
 // Shorthand `not equals` filter input field, skips the nested object filter.

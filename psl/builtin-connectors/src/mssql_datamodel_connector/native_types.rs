@@ -44,22 +44,8 @@ crate::native_type_definition! {
     Int -> Int,
     /// Maps to `i64` in Rust.
     BigInt -> BigInt,
-    /// Numeric data types that have fixed precision and scale. Decimal and
-    /// numeric are synonyms and can be used interchangeably.
-    Decimal(Option<(u32, u32)>) -> Decimal,
-    /// 8-byte numeric money value, accurate to a ten-thousandth of the monetary
-    /// units.
-    Money -> Float,
-    /// 4-byte numeric money value, accurate to a ten-thousandth of the monetary
-    /// units.
-    SmallMoney -> Float,
     /// One or zero. Used mostly for booleans.
     Bit -> Boolean | Int,
-    /// A floating point value. Has two sizes: numbers 1 to 24 represent `f32`,
-    /// 25 to 53 represent `f64`.
-    Float(Option<u32>) -> Float,
-    /// A synonym for `float(24)`/`f32`.
-    Real -> Float,
     /// Defines a date.
     Date -> DateTime,
     /// Defines a time.

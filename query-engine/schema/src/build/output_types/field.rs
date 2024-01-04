@@ -29,8 +29,6 @@ pub(crate) fn map_scalar_output_type_for_field(ctx: &'_ QuerySchema, field: Scal
 pub(crate) fn map_scalar_output_type<'a>(ctx: &'a QuerySchema, typ: &TypeIdentifier, list: bool) -> OutputType<'a> {
     let output_type = match typ {
         TypeIdentifier::String => OutputType::string(),
-        TypeIdentifier::Float => OutputType::float(),
-        TypeIdentifier::Decimal => OutputType::decimal(),
         TypeIdentifier::Boolean => OutputType::boolean(),
         TypeIdentifier::Enum(e) => OutputType::enum_type(map_schema_enum_type(ctx, *e)),
         TypeIdentifier::Json => OutputType::json(),

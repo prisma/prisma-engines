@@ -69,8 +69,6 @@ pub struct MySqlDatamodelConnector;
 const SCALAR_TYPE_DEFAULTS: &[(ScalarType, MySqlType)] = &[
     (ScalarType::Int, MySqlType::Int),
     (ScalarType::BigInt, MySqlType::BigInt),
-    (ScalarType::Float, MySqlType::Double),
-    (ScalarType::Decimal, MySqlType::Decimal(Some((65, 30)))),
     (ScalarType::Boolean, MySqlType::TinyInt),
     (ScalarType::String, MySqlType::VarChar(191)),
     (ScalarType::DateTime, MySqlType::DateTime(Some(3))),
@@ -126,11 +124,6 @@ impl Connector for MySqlDatamodelConnector {
             TinyInt => ScalarType::Int,
             //BigInt
             BigInt => ScalarType::BigInt,
-            //Float
-            Float => ScalarType::Float,
-            Double => ScalarType::Float,
-            //Decimal
-            Decimal(_) => ScalarType::Decimal,
             //DateTime
             DateTime(_) => ScalarType::DateTime,
             Date => ScalarType::DateTime,
@@ -189,15 +182,6 @@ impl Connector for MySqlDatamodelConnector {
         let error = self.native_instance_error(native_type_instance);
 
         match native_type {
-            Decimal(Some((precision, scale))) if scale > precision => {
-                errors.push_error(error.new_scale_larger_than_precision_error(span))
-            }
-            Decimal(Some((precision, _))) if *precision > 65 => {
-                errors.push_error(error.new_argument_m_out_of_range_error("Precision can range from 1 to 65.", span))
-            }
-            Decimal(Some((_, scale))) if *scale > 30 => {
-                errors.push_error(error.new_argument_m_out_of_range_error("Scale can range from 0 to 30.", span))
-            }
             Bit(length) if *length == 0 || *length > 64 => {
                 errors.push_error(error.new_argument_m_out_of_range_error("M can range from 1 to 64.", span))
             }

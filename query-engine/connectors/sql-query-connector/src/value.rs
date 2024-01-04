@@ -1,5 +1,3 @@
-use crate::row::{sanitize_f32, sanitize_f64};
-use bigdecimal::{BigDecimal, FromPrimitive};
 use chrono::{DateTime, NaiveDate, Utc};
 use quaint::ValueType;
 use query_structure::PrismaValue;
@@ -8,26 +6,6 @@ pub fn to_prisma_value<'a, T: Into<ValueType<'a>>>(qv: T) -> crate::Result<Prism
     let val = match qv.into() {
         ValueType::Int32(i) => i.map(|i| PrismaValue::Int(i as i64)).unwrap_or(PrismaValue::Null),
         ValueType::Int64(i) => i.map(PrismaValue::Int).unwrap_or(PrismaValue::Null),
-        ValueType::Float(Some(f)) => {
-            sanitize_f32(f, "BigDecimal")?;
-
-            PrismaValue::Float(BigDecimal::from_f32(f).unwrap().normalized())
-        }
-
-        ValueType::Float(None) => PrismaValue::Null,
-
-        ValueType::Double(Some(f)) => {
-            sanitize_f64(f, "BigDecimal")?;
-
-            PrismaValue::Float(BigDecimal::from_f64(f).unwrap().normalized())
-        }
-
-        ValueType::Double(None) => PrismaValue::Null,
-
-        ValueType::Numeric(d) => d
-            // chop the trailing zeroes off so javascript doesn't start rounding things wrong
-            .map(|d| PrismaValue::Float(d.normalized()))
-            .unwrap_or(PrismaValue::Null),
 
         ValueType::Text(s) => s
             .map(|s| PrismaValue::String(s.into_owned()))

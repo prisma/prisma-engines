@@ -778,12 +778,6 @@ fn convert_prisma_value_json_protocol(
         (ScalarType::DateTime, PrismaValue::DateTime(x)) => {
             custom_types::make_object(custom_types::DATETIME, PrismaValue::DateTime(x))
         }
-        (ScalarType::Decimal, PrismaValue::Float(x)) => {
-            custom_types::make_object(custom_types::DECIMAL, PrismaValue::String(x.to_string()))
-        }
-        (ScalarType::Decimal, PrismaValue::Int(x)) => {
-            custom_types::make_object(custom_types::DECIMAL, PrismaValue::String(x.to_string()))
-        }
         (ScalarType::BigInt, PrismaValue::BigInt(x)) => {
             custom_types::make_object(custom_types::BIGINT, PrismaValue::BigInt(x))
         }
@@ -796,7 +790,6 @@ fn convert_prisma_value_json_protocol(
         (ScalarType::UUID, PrismaValue::Uuid(x)) => PrismaValue::Uuid(x),
         (ScalarType::Boolean, PrismaValue::Boolean(x)) => PrismaValue::Boolean(x),
         (ScalarType::Int, PrismaValue::Int(x)) => PrismaValue::Int(x),
-        (ScalarType::Float, PrismaValue::Float(x)) => PrismaValue::Float(x),
 
         (st, pv) => {
             return Err(crate::FieldConversionError::create(

@@ -40,8 +40,6 @@ impl<'a> Mysql<'a> {
                     if let Some(int) = number.as_i64() {
                         // NOTE: JS numbers are 64bit numbers
                         Ok(Value::int64(int))
-                    } else if let Some(float) = number.as_f64() {
-                        Ok(Value::double(float))
                     } else {
                         unreachable!()
                     }
@@ -122,18 +120,6 @@ impl<'a> Visitor<'a> for Mysql<'a> {
         let res = match &value.typed {
             ValueType::Int32(i) => i.map(|i| self.write(i)),
             ValueType::Int64(i) => i.map(|i| self.write(i)),
-            ValueType::Float(d) => d.map(|f| match f {
-                f if f.is_nan() => self.write("'NaN'"),
-                f if f == f32::INFINITY => self.write("'Infinity'"),
-                f if f == f32::NEG_INFINITY => self.write("'-Infinity"),
-                v => self.write(format!("{v:?}")),
-            }),
-            ValueType::Double(d) => d.map(|f| match f {
-                f if f.is_nan() => self.write("'NaN'"),
-                f if f == f64::INFINITY => self.write("'Infinity'"),
-                f if f == f64::NEG_INFINITY => self.write("'-Infinity"),
-                v => self.write(format!("{v:?}")),
-            }),
             ValueType::Text(t) => t.as_ref().map(|t| self.write(format!("'{t}'"))),
             ValueType::Enum(e, _) => e.as_ref().map(|e| self.write(e)),
             ValueType::Bytes(b) => b.as_ref().map(|b| self.write(format!("x'{}'", hex::encode(b)))),
@@ -148,8 +134,6 @@ impl<'a> Visitor<'a> for Mysql<'a> {
 
                 return Err(builder.build());
             }
-
-            ValueType::Numeric(r) => r.as_ref().map(|r| self.write(r)),
 
             ValueType::Json(j) => match j {
                 Some(ref j) => {

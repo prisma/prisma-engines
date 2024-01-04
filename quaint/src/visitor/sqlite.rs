@@ -81,18 +81,6 @@ impl<'a> Visitor<'a> for Sqlite<'a> {
             ValueType::Bytes(b) => b.as_ref().map(|b| self.write(format!("x'{}'", hex::encode(b)))),
             ValueType::Boolean(b) => b.map(|b| self.write(b)),
             ValueType::Char(c) => c.map(|c| self.write(format!("'{c}'"))),
-            ValueType::Float(d) => d.map(|f| match f {
-                f if f.is_nan() => self.write("'NaN'"),
-                f if f == f32::INFINITY => self.write("'Infinity'"),
-                f if f == f32::NEG_INFINITY => self.write("'-Infinity"),
-                v => self.write(format!("{v:?}")),
-            }),
-            ValueType::Double(d) => d.map(|f| match f {
-                f if f.is_nan() => self.write("'NaN'"),
-                f if f == f64::INFINITY => self.write("'Infinity'"),
-                f if f == f64::NEG_INFINITY => self.write("'-Infinity"),
-                v => self.write(format!("{v:?}")),
-            }),
             ValueType::Array(_) | ValueType::EnumArray(_, _) => {
                 let msg = "Arrays are not supported in SQLite.";
                 let kind = ErrorKind::conversion(msg);
@@ -110,8 +98,6 @@ impl<'a> Visitor<'a> for Sqlite<'a> {
                 }
                 None => None,
             },
-
-            ValueType::Numeric(r) => r.as_ref().map(|r| self.write(r)),
             ValueType::Uuid(uuid) => uuid.map(|uuid| self.write(format!("'{}'", uuid.hyphenated()))),
             ValueType::DateTime(dt) => dt.map(|dt| self.write(format!("'{}'", dt.to_rfc3339(),))),
             ValueType::Date(date) => date.map(|date| self.write(format!("'{date}'"))),

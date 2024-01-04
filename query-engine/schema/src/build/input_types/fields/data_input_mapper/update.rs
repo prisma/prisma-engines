@@ -19,10 +19,6 @@ impl UpdateDataInputFieldMapper {
 impl DataInputFieldMapper for UpdateDataInputFieldMapper {
     fn map_scalar<'a>(&self, ctx: &'a QuerySchema, sf: ScalarFieldRef) -> InputField<'a> {
         let base_update_type = match sf.type_identifier() {
-            TypeIdentifier::Float => InputType::object(update_operations_object_type(ctx, "Float", sf.clone(), true)),
-            TypeIdentifier::Decimal => {
-                InputType::object(update_operations_object_type(ctx, "Decimal", sf.clone(), true))
-            }
             TypeIdentifier::Int => InputType::object(update_operations_object_type(ctx, "Int", sf.clone(), true)),
             TypeIdentifier::BigInt => InputType::object(update_operations_object_type(ctx, "BigInt", sf.clone(), true)),
             TypeIdentifier::String => {

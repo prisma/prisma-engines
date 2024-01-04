@@ -312,18 +312,6 @@ impl<'a> Visitor<'a> for Mssql<'a> {
         let res = match value.typed {
             ValueType::Int32(i) => i.map(|i| self.write(i)),
             ValueType::Int64(i) => i.map(|i| self.write(i)),
-            ValueType::Float(d) => d.map(|f| match f {
-                f if f.is_nan() => self.write("'NaN'"),
-                f if f == f32::INFINITY => self.write("'Infinity'"),
-                f if f == f32::NEG_INFINITY => self.write("'-Infinity"),
-                v => self.write(format!("{v:?}")),
-            }),
-            ValueType::Double(d) => d.map(|f| match f {
-                f if f.is_nan() => self.write("'NaN'"),
-                f if f == f64::INFINITY => self.write("'Infinity'"),
-                f if f == f64::NEG_INFINITY => self.write("'-Infinity"),
-                v => self.write(format!("{v:?}")),
-            }),
             ValueType::Text(t) => t.map(|t| self.write(format!("'{t}'"))),
             ValueType::Enum(e, _) => e.map(|e| self.write(e)),
             ValueType::Bytes(b) => b.map(|b| self.write(format!("0x{}", hex::encode(b)))),
@@ -341,7 +329,6 @@ impl<'a> Visitor<'a> for Mssql<'a> {
 
             ValueType::Json(j) => j.map(|j| self.write(format!("'{}'", serde_json::to_string(&j).unwrap()))),
 
-            ValueType::Numeric(r) => r.map(|r| self.write(r)),
             ValueType::Uuid(uuid) => uuid.map(|uuid| {
                 let s = format!("CONVERT(uniqueidentifier, N'{}')", uuid.hyphenated());
                 self.write(s)

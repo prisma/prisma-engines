@@ -110,17 +110,6 @@ pub(crate) fn coerce_json_scalar_to_pv(value: serde_json::Value, sf: &ScalarFiel
             TypeIdentifier::BigInt => Ok(PrismaValue::BigInt(n.as_i64().ok_or_else(|| {
                 build_conversion_error(sf, &format!("Number({n})"), &format!("{:?}", sf.type_identifier()))
             })?)),
-            TypeIdentifier::Float | TypeIdentifier::Decimal => {
-                let bd = n
-                    .as_f64()
-                    .and_then(BigDecimal::from_f64)
-                    .map(|bd| bd.normalized())
-                    .ok_or_else(|| {
-                        build_conversion_error(sf, &format!("Number({n})"), &format!("{:?}", sf.type_identifier()))
-                    })?;
-
-                Ok(PrismaValue::Float(bd))
-            }
             _ => Err(build_conversion_error(
                 sf,
                 &format!("Number({n})"),
@@ -141,18 +130,6 @@ pub(crate) fn coerce_json_scalar_to_pv(value: serde_json::Value, sf: &ScalarFiel
                 })?;
 
                 Ok(PrismaValue::DateTime(res))
-            }
-            TypeIdentifier::Decimal => {
-                let res = parse_decimal(&s).map_err(|err| {
-                    build_conversion_error_with_reason(
-                        sf,
-                        &format!("String({s})"),
-                        &format!("{:?}", sf.type_identifier()),
-                        &err.to_string(),
-                    )
-                })?;
-
-                Ok(PrismaValue::Float(res))
             }
             TypeIdentifier::UUID => Ok(PrismaValue::Uuid(uuid::Uuid::parse_str(&s).map_err(|err| {
                 build_conversion_error_with_reason(

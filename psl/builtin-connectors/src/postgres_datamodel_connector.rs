@@ -76,8 +76,6 @@ pub struct PostgresDatamodelConnector;
 const SCALAR_TYPE_DEFAULTS: &[(ScalarType, PostgresType)] = &[
     (ScalarType::Int, PostgresType::Integer),
     (ScalarType::BigInt, PostgresType::BigInt),
-    (ScalarType::Float, PostgresType::DoublePrecision),
-    (ScalarType::Decimal, PostgresType::Decimal(Some((65, 30)))),
     (ScalarType::Boolean, PostgresType::Boolean),
     (ScalarType::String, PostgresType::Text),
     (ScalarType::DateTime, PostgresType::Timestamp(Some(3))),
@@ -309,12 +307,6 @@ impl Connector for PostgresDatamodelConnector {
             Oid => ScalarType::Int,
             // BigInt
             BigInt => ScalarType::BigInt,
-            // Float
-            Real => ScalarType::Float,
-            DoublePrecision => ScalarType::Float,
-            // Decimal
-            Decimal(_) => ScalarType::Decimal,
-            Money => ScalarType::Float,
             // DateTime
             Timestamp(_) => ScalarType::DateTime,
             Timestamptz(_) => ScalarType::DateTime,
@@ -363,15 +355,6 @@ impl Connector for PostgresDatamodelConnector {
         let error = self.native_instance_error(native_type_instance);
 
         match native_type {
-            Decimal(Some((precision, scale))) if scale > precision => {
-                errors.push_error(error.new_scale_larger_than_precision_error(span))
-            }
-            Decimal(Some((prec, _))) if *prec > 1000 || *prec == 0 => {
-                errors.push_error(error.new_argument_m_out_of_range_error(
-                    "Precision must be positive with a maximum value of 1000.",
-                    span,
-                ))
-            }
             Bit(Some(0)) | VarBit(Some(0)) => {
                 errors.push_error(error.new_argument_m_out_of_range_error("M must be a positive integer.", span))
             }
@@ -639,11 +622,6 @@ fn allowed_index_operator_classes(algo: IndexAlgorithm, field: walkers::ScalarFi
             classes.push(OperatorClass::Float4MinMaxOps);
             classes.push(OperatorClass::Float4MinMaxMultiOps);
         }
-        (IndexAlgorithm::Brin, Some(ScalarType::Float), _) => {
-            classes.push(OperatorClass::Float8BloomOps);
-            classes.push(OperatorClass::Float8MinMaxOps);
-            classes.push(OperatorClass::Float8MinMaxMultiOps);
-        }
         (IndexAlgorithm::Brin, _, Some("Inet")) => {
             classes.push(OperatorClass::InetBloomOps);
             classes.push(OperatorClass::InetInclusionOps);
@@ -664,11 +642,6 @@ fn allowed_index_operator_classes(algo: IndexAlgorithm, field: walkers::ScalarFi
             classes.push(OperatorClass::Int8BloomOps);
             classes.push(OperatorClass::Int8MinMaxOps);
             classes.push(OperatorClass::Int8MinMaxMultiOps);
-        }
-        (IndexAlgorithm::Brin, Some(ScalarType::Decimal), _) => {
-            classes.push(OperatorClass::NumericBloomOps);
-            classes.push(OperatorClass::NumericMinMaxOps);
-            classes.push(OperatorClass::NumericMinMaxMultiOps);
         }
         (IndexAlgorithm::Brin, _, Some("Oid")) => {
             classes.push(OperatorClass::OidBloomOps);

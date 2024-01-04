@@ -1,6 +1,5 @@
 use crate::datamodel_connector::ConnectorCapability;
 use crate::{diagnostics::DatamodelError, validate::validation_pipeline::context::Context};
-use bigdecimal::BigDecimal;
 use parser_database::ScalarType;
 use schema_ast::ast::{self, Expression};
 
@@ -102,18 +101,6 @@ pub(super) fn validate_default_value(
 
             ctx.push_error(DatamodelError::new_attribute_validation_error(
                 &message, "@default", *span,
-            ));
-        }
-        (ScalarType::Decimal, ast::Expression::StringValue(value, span)) => {
-            let details = match value.parse::<BigDecimal>() {
-                Ok(_) => return,
-                Err(details) => details,
-            };
-
-            let message = format!("Parse error: \"{value}\" is not a valid decimal. ({details})");
-
-            ctx.push_error(DatamodelError::new_attribute_validation_error(
-                &message, "default", *span,
             ));
         }
         _ => (),

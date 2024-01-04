@@ -160,10 +160,7 @@ fn validate_scalar_default_literal(
         | (ScalarType::Bytes, ast::Expression::StringValue(_, _))
         | (ScalarType::Int, ast::Expression::NumericValue(_, _))
         | (ScalarType::BigInt, ast::Expression::NumericValue(_, _))
-        | (ScalarType::Float, ast::Expression::NumericValue(_, _))
-        | (ScalarType::DateTime, ast::Expression::StringValue(_, _))
-        | (ScalarType::Decimal, ast::Expression::NumericValue(_, _))
-        | (ScalarType::Decimal, ast::Expression::StringValue(_, _)) => accept(ctx),
+        | (ScalarType::DateTime, ast::Expression::StringValue(_, _)) => accept(ctx),
         (ScalarType::Boolean, ast::Expression::ConstantValue(val, span)) => {
             validate_default_bool_value(val, *span, accept, ctx)
         }

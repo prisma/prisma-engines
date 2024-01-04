@@ -1,7 +1,6 @@
 use crate::ast::*;
 use crate::error::{Error, ErrorKind};
 
-use bigdecimal::{BigDecimal, FromPrimitive, ToPrimitive};
 use chrono::{DateTime, NaiveDate, NaiveTime, Utc};
 use serde_json::{Number, Value as JsonValue};
 use std::fmt::Display;
@@ -84,21 +83,6 @@ impl<'a> Value<'a> {
         I: Into<i64>,
     {
         ValueType::int64(value).into_value()
-    }
-
-    /// Creates a new decimal value.
-    pub fn numeric(value: BigDecimal) -> Self {
-        ValueType::numeric(value).into_value()
-    }
-
-    /// Creates a new float value.
-    pub fn float(value: f32) -> Self {
-        ValueType::float(value).into_value()
-    }
-
-    /// Creates a new double value.
-    pub fn double(value: f64) -> Self {
-        ValueType::double(value).into_value()
     }
 
     /// Creates a new string value.
@@ -285,36 +269,6 @@ impl<'a> Value<'a> {
         self.typed.as_integer()
     }
 
-    /// Returns a `f64` if the value is a double, otherwise `None`.
-    pub fn as_f64(&self) -> Option<f64> {
-        self.typed.as_f64()
-    }
-
-    /// Returns a `f32` if the value is a double, otherwise `None`.
-    pub fn as_f32(&self) -> Option<f32> {
-        self.typed.as_f32()
-    }
-
-    /// `true` if the `Value` is a numeric value or can be converted to one.
-
-    pub fn is_numeric(&self) -> bool {
-        self.typed.is_numeric()
-    }
-
-    /// Returns a bigdecimal, if the value is a numeric, float or double value,
-    /// otherwise `None`.
-
-    pub fn into_numeric(self) -> Option<BigDecimal> {
-        self.typed.into_numeric()
-    }
-
-    /// Returns a reference to a bigdecimal, if the value is a numeric.
-    /// Otherwise `None`.
-
-    pub fn as_numeric(&self) -> Option<&BigDecimal> {
-        self.typed.as_numeric()
-    }
-
     /// `true` if the `Value` is a boolean value.
     pub fn is_bool(&self) -> bool {
         self.typed.is_bool()
@@ -409,14 +363,6 @@ impl<'a> Value<'a> {
         ValueType::Int64(None).into()
     }
 
-    pub fn null_float() -> Self {
-        ValueType::Float(None).into()
-    }
-
-    pub fn null_double() -> Self {
-        ValueType::Double(None).into()
-    }
-
     pub fn null_text() -> Self {
         ValueType::Text(None).into()
     }
@@ -443,10 +389,6 @@ impl<'a> Value<'a> {
 
     pub fn null_array() -> Self {
         ValueType::Array(None).into()
-    }
-
-    pub fn null_numeric() -> Self {
-        ValueType::Numeric(None).into()
     }
 
     pub fn null_json() -> Self {
@@ -504,10 +446,6 @@ pub enum ValueType<'a> {
     Int32(Option<i32>),
     /// 64-bit signed integer.
     Int64(Option<i64>),
-    /// 32-bit floating point.
-    Float(Option<f32>),
-    /// 64-bit floating point.
-    Double(Option<f64>),
     /// String value.
     Text(Option<Cow<'a, str>>),
     /// Database enum value.
@@ -526,8 +464,6 @@ pub enum ValueType<'a> {
     Char(Option<char>),
     /// An array value (PostgreSQL).
     Array(Option<Vec<Value<'a>>>),
-    /// A numeric value.
-    Numeric(Option<BigDecimal>),
     /// A JSON value.
     Json(Option<serde_json::Value>),
     /// A XML value.
@@ -565,8 +501,6 @@ impl<'a> fmt::Display for ValueType<'a> {
         let res = match self {
             ValueType::Int32(val) => val.map(|v| write!(f, "{v}")),
             ValueType::Int64(val) => val.map(|v| write!(f, "{v}")),
-            ValueType::Float(val) => val.map(|v| write!(f, "{v}")),
-            ValueType::Double(val) => val.map(|v| write!(f, "{v}")),
             ValueType::Text(val) => val.as_ref().map(|v| write!(f, "\"{v}\"")),
             ValueType::Bytes(val) => val.as_ref().map(|v| write!(f, "<{} bytes blob>", v.len())),
             ValueType::Enum(val, _) => val.as_ref().map(|v| write!(f, "\"{v}\"")),
@@ -600,7 +534,6 @@ impl<'a> fmt::Display for ValueType<'a> {
             }),
             ValueType::Xml(val) => val.as_ref().map(|v| write!(f, "{v}")),
 
-            ValueType::Numeric(val) => val.as_ref().map(|v| write!(f, "{v}")),
             ValueType::Json(val) => val.as_ref().map(|v| write!(f, "{v}")),
             ValueType::Uuid(val) => val.map(|v| write!(f, "\"{v}\"")),
             ValueType::DateTime(val) => val.map(|v| write!(f, "\"{v}\"")),
@@ -626,14 +559,6 @@ impl<'a> From<ValueType<'a>> for serde_json::Value {
         let res = match pv {
             ValueType::Int32(i) => i.map(|i| serde_json::Value::Number(Number::from(i))),
             ValueType::Int64(i) => i.map(|i| serde_json::Value::Number(Number::from(i))),
-            ValueType::Float(f) => f.map(|f| match Number::from_f64(f as f64) {
-                Some(number) => serde_json::Value::Number(number),
-                None => serde_json::Value::Null,
-            }),
-            ValueType::Double(f) => f.map(|f| match Number::from_f64(f) {
-                Some(number) => serde_json::Value::Number(number),
-                None => serde_json::Value::Null,
-            }),
             ValueType::Text(cow) => cow.map(|cow| serde_json::Value::String(cow.into_owned())),
             ValueType::Bytes(bytes) => bytes.map(|bytes| serde_json::Value::String(base64::encode(bytes))),
             ValueType::Enum(cow, _) => cow.map(|cow| serde_json::Value::String(cow.into_owned())),
@@ -658,7 +583,6 @@ impl<'a> From<ValueType<'a>> for serde_json::Value {
                 v.map(|v| serde_json::Value::Array(v.into_iter().map(serde_json::Value::from).collect()))
             }
 
-            ValueType::Numeric(d) => d.map(|d| serde_json::to_value(d.to_f64().unwrap()).unwrap()),
             ValueType::Json(v) => v,
             ValueType::Uuid(u) => u.map(|u| serde_json::Value::String(u.hyphenated().to_string())),
             ValueType::DateTime(dt) => dt.map(|dt| serde_json::Value::String(dt.to_rfc3339())),
@@ -692,22 +616,6 @@ impl<'a> ValueType<'a> {
         I: Into<i64>,
     {
         Self::Int64(Some(value.into()))
-    }
-
-    /// Creates a new decimal value.
-
-    pub(crate) fn numeric(value: BigDecimal) -> Self {
-        Self::Numeric(Some(value))
-    }
-
-    /// Creates a new float value.
-    pub(crate) fn float(value: f32) -> Self {
-        Self::Float(Some(value))
-    }
-
-    /// Creates a new double value.
-    pub(crate) fn double(value: f64) -> Self {
-        Self::Double(Some(value))
     }
 
     /// Creates a new string value.
@@ -823,8 +731,6 @@ impl<'a> ValueType<'a> {
         match self {
             Self::Int32(i) => i.is_none(),
             Self::Int64(i) => i.is_none(),
-            Self::Float(i) => i.is_none(),
-            Self::Double(i) => i.is_none(),
             Self::Text(t) => t.is_none(),
             Self::Enum(e, _) => e.is_none(),
             Self::EnumArray(e, _) => e.is_none(),
@@ -833,7 +739,6 @@ impl<'a> ValueType<'a> {
             Self::Char(c) => c.is_none(),
             Self::Array(v) => v.is_none(),
             Self::Xml(s) => s.is_none(),
-            Self::Numeric(r) => r.is_none(),
             Self::Uuid(u) => u.is_none(),
             Self::DateTime(dt) => dt.is_none(),
             Self::Date(d) => d.is_none(),
@@ -942,50 +847,6 @@ impl<'a> ValueType<'a> {
         match self {
             Self::Int32(i) => i.map(|i| i as i64),
             Self::Int64(i) => *i,
-            _ => None,
-        }
-    }
-
-    /// Returns a `f64` if the value is a double, otherwise `None`.
-    pub(crate) fn as_f64(&self) -> Option<f64> {
-        match self {
-            Self::Double(Some(f)) => Some(*f),
-            _ => None,
-        }
-    }
-
-    /// Returns a `f32` if the value is a double, otherwise `None`.
-    pub(crate) fn as_f32(&self) -> Option<f32> {
-        match self {
-            Self::Float(Some(f)) => Some(*f),
-            _ => None,
-        }
-    }
-
-    /// `true` if the `Value` is a numeric value or can be converted to one.
-
-    pub(crate) fn is_numeric(&self) -> bool {
-        matches!(self, Self::Numeric(_) | Self::Float(_) | Self::Double(_))
-    }
-
-    /// Returns a bigdecimal, if the value is a numeric, float or double value,
-    /// otherwise `None`.
-
-    pub(crate) fn into_numeric(self) -> Option<BigDecimal> {
-        match self {
-            Self::Numeric(d) => d,
-            Self::Float(f) => f.and_then(BigDecimal::from_f32),
-            Self::Double(f) => f.and_then(BigDecimal::from_f64),
-            _ => None,
-        }
-    }
-
-    /// Returns a reference to a bigdecimal, if the value is a numeric.
-    /// Otherwise `None`.
-
-    pub(crate) fn as_numeric(&self) -> Option<&BigDecimal> {
-        match self {
-            Self::Numeric(d) => d.as_ref(),
             _ => None,
         }
     }
@@ -1135,12 +996,9 @@ value!(val: &'a &str, Text, (*val).into());
 value!(val: String, Text, val.into());
 value!(val: usize, Int64, i64::try_from(val).unwrap());
 value!(val: &'a [u8], Bytes, val.into());
-value!(val: f64, Double, val);
-value!(val: f32, Float, val);
 value!(val: DateTime<Utc>, DateTime, val);
 value!(val: chrono::NaiveTime, Time, val);
 value!(val: chrono::NaiveDate, Date, val);
-value!(val: BigDecimal, Numeric, val);
 value!(val: JsonValue, Json, val);
 value!(val: Uuid, Uuid, val);
 
@@ -1162,26 +1020,6 @@ impl<'a> TryFrom<Value<'a>> for i32 {
         value
             .as_i32()
             .ok_or_else(|| Error::builder(ErrorKind::conversion("Not an i32")).build())
-    }
-}
-
-impl<'a> TryFrom<Value<'a>> for BigDecimal {
-    type Error = Error;
-
-    fn try_from(value: Value<'a>) -> Result<BigDecimal, Self::Error> {
-        value
-            .into_numeric()
-            .ok_or_else(|| Error::builder(ErrorKind::conversion("Not a decimal")).build())
-    }
-}
-
-impl<'a> TryFrom<Value<'a>> for f64 {
-    type Error = Error;
-
-    fn try_from(value: Value<'a>) -> Result<f64, Self::Error> {
-        value
-            .as_f64()
-            .ok_or_else(|| Error::builder(ErrorKind::conversion("Not a f64")).build())
     }
 }
 

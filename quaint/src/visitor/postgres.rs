@@ -184,18 +184,6 @@ impl<'a> Visitor<'a> for Postgres<'a> {
             ValueType::Boolean(b) => b.map(|b| self.write(b)),
             ValueType::Xml(cow) => cow.as_ref().map(|cow| self.write(format!("'{cow}'"))),
             ValueType::Char(c) => c.map(|c| self.write(format!("'{c}'"))),
-            ValueType::Float(d) => d.map(|f| match f {
-                f if f.is_nan() => self.write("'NaN'"),
-                f if f == f32::INFINITY => self.write("'Infinity'"),
-                f if f == f32::NEG_INFINITY => self.write("'-Infinity"),
-                v => self.write(format!("{v:?}")),
-            }),
-            ValueType::Double(d) => d.map(|f| match f {
-                f if f.is_nan() => self.write("'NaN'"),
-                f if f == f64::INFINITY => self.write("'Infinity'"),
-                f if f == f64::NEG_INFINITY => self.write("'-Infinity"),
-                v => self.write(format!("{v:?}")),
-            }),
             ValueType::Array(ary) => ary.as_ref().map(|ary| {
                 self.surround_with("'{", "}'", |ref mut s| {
                     let len = ary.len();
@@ -241,7 +229,6 @@ impl<'a> Visitor<'a> for Postgres<'a> {
                 .as_ref()
                 .map(|j| self.write(format!("'{}'", serde_json::to_string(&j).unwrap()))),
 
-            ValueType::Numeric(r) => r.as_ref().map(|r| self.write(r)),
             ValueType::Uuid(uuid) => uuid.map(|uuid| self.write(format!("'{}'", uuid.hyphenated()))),
             ValueType::DateTime(dt) => dt.map(|dt| self.write(format!("'{}'", dt.to_rfc3339(),))),
             ValueType::Date(date) => date.map(|date| self.write(format!("'{date}'"))),

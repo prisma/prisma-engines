@@ -16,7 +16,6 @@ impl ScalarFieldExt for ScalarField {
     fn value<'a>(&self, pv: PrismaValue, ctx: &Context<'_>) -> Value<'a> {
         let value = match (pv, self.type_identifier()) {
             (PrismaValue::String(s), _) => s.into(),
-            (PrismaValue::Float(f), _) => f.into(),
             (PrismaValue::Boolean(b), _) => b.into(),
             (PrismaValue::DateTime(d), _) => d.with_timezone(&Utc).into(),
             (PrismaValue::Enum(e), TypeIdentifier::Enum(enum_id)) => {
@@ -55,8 +54,6 @@ impl ScalarFieldExt for ScalarField {
             (PrismaValue::Object(_), _) => unimplemented!(),
             (PrismaValue::Null, ident) => match ident {
                 TypeIdentifier::String => Value::null_text(),
-                TypeIdentifier::Float => Value::null_numeric(),
-                TypeIdentifier::Decimal => Value::null_numeric(),
                 TypeIdentifier::Boolean => Value::null_boolean(),
                 TypeIdentifier::Enum(enum_id) => {
                     let enum_walker = self.dm.clone().zip(enum_id);
@@ -86,16 +83,6 @@ impl ScalarFieldExt for ScalarField {
             TypeIdentifier::String => TypeFamily::Text(parse_scalar_length(self)),
             TypeIdentifier::Int => TypeFamily::Int,
             TypeIdentifier::BigInt => TypeFamily::Int,
-            TypeIdentifier::Float => TypeFamily::Double,
-            TypeIdentifier::Decimal => {
-                let params = self
-                    .native_type()
-                    .map(|nt| nt.args().into_iter())
-                    .and_then(|mut args| Some((args.next()?, args.next()?)))
-                    .and_then(|(p, s)| Some((p.parse::<u8>().ok()?, s.parse::<u8>().ok()?)));
-
-                TypeFamily::Decimal(params)
-            }
             TypeIdentifier::Boolean => TypeFamily::Boolean,
             TypeIdentifier::Enum(_) => TypeFamily::Text(Some(TypeDataLength::Constant(8000))),
             TypeIdentifier::UUID => TypeFamily::Uuid,
@@ -112,7 +99,6 @@ impl ScalarFieldExt for ScalarField {
 pub fn convert_lossy<'a>(pv: PrismaValue) -> Value<'a> {
     match pv {
         PrismaValue::String(s) => s.into(),
-        PrismaValue::Float(f) => f.into(),
         PrismaValue::Boolean(b) => b.into(),
         PrismaValue::DateTime(d) => d.with_timezone(&Utc).into(),
         PrismaValue::Enum(e) => e.into(),

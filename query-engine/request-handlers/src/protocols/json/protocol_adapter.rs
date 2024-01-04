@@ -161,16 +161,7 @@ impl<'a> JsonProtocolAdapter<'a> {
             }
             serde_json::Value::Null => Ok(ArgumentValue::null()),
             serde_json::Value::Bool(b) => Ok(ArgumentValue::bool(b)),
-            serde_json::Value::Number(num) => {
-                if num.is_i64() {
-                    Ok(ArgumentValue::int(num.as_i64().unwrap()))
-                } else {
-                    let fl = num.as_f64().unwrap();
-                    let dec = BigDecimal::from_f64(fl).unwrap().normalized();
-
-                    Ok(ArgumentValue::float(dec))
-                }
-            }
+            serde_json::Value::Number(num) => Ok(ArgumentValue::int(num.as_i64().unwrap())),
             serde_json::Value::Object(mut obj) => match obj.get(custom_types::TYPE).as_ref().and_then(|s| s.as_str()) {
                 Some(custom_types::DATETIME) => {
                     let value = obj
@@ -188,16 +179,6 @@ impl<'a> JsonProtocolAdapter<'a> {
                         .ok_or_else(build_err)?;
 
                     i64::from_str(value).map(ArgumentValue::bigint).map_err(|_| build_err())
-                }
-                Some(custom_types::DECIMAL) => {
-                    let value = obj
-                        .get(custom_types::VALUE)
-                        .and_then(|v| v.as_str())
-                        .ok_or_else(build_err)?;
-
-                    BigDecimal::from_str(value)
-                        .map(ArgumentValue::float)
-                        .map_err(|_| build_err())
                 }
                 Some(custom_types::BYTES) => {
                     let value = obj

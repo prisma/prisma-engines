@@ -66,8 +66,6 @@ const CAPABILITIES: ConnectorCapabilities = enumflags2::make_bitflags!(Connector
 const SCALAR_TYPE_DEFAULTS: &[(ScalarType, CockroachType)] = &[
     (ScalarType::Int, CockroachType::Int4),
     (ScalarType::BigInt, CockroachType::Int8),
-    (ScalarType::Float, CockroachType::Float8),
-    (ScalarType::Decimal, CockroachType::Decimal(Some((65, 30)))),
     (ScalarType::Boolean, CockroachType::Bool),
     (ScalarType::String, CockroachType::String(None)),
     (ScalarType::DateTime, CockroachType::Timestamp(Some(3))),
@@ -123,11 +121,6 @@ impl Connector for CockroachDatamodelConnector {
             CockroachType::Oid => ScalarType::Int,
             // BigInt
             CockroachType::Int8 => ScalarType::BigInt,
-            // Float
-            CockroachType::Float4 => ScalarType::Float,
-            CockroachType::Float8 => ScalarType::Float,
-            // Decimal
-            CockroachType::Decimal(_) => ScalarType::Decimal,
             // DateTime
             CockroachType::Timestamp(_) => ScalarType::DateTime,
             CockroachType::Timestamptz(_) => ScalarType::DateTime,
@@ -179,15 +172,6 @@ impl Connector for CockroachDatamodelConnector {
         let error = self.native_instance_error(native_type_instance);
 
         match native_type {
-            CockroachType::Decimal(Some((precision, scale))) if scale > precision => {
-                errors.push_error(error.new_scale_larger_than_precision_error(span))
-            }
-            CockroachType::Decimal(Some((prec, _))) if *prec > 1000 || *prec == 0 => {
-                errors.push_error(error.new_argument_m_out_of_range_error(
-                    "Precision must be positive with a maximum value of 1000.",
-                    span,
-                ))
-            }
             CockroachType::Bit(Some(0)) | CockroachType::VarBit(Some(0)) => {
                 errors.push_error(error.new_argument_m_out_of_range_error("M must be a positive integer.", span))
             }

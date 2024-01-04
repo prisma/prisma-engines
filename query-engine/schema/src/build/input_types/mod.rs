@@ -13,8 +13,6 @@ fn map_scalar_input_type(ctx: &'_ QuerySchema, typ: TypeIdentifier, list: bool) 
     let typ = match typ {
         TypeIdentifier::String => InputType::string(),
         TypeIdentifier::Int => InputType::int(),
-        TypeIdentifier::Float => InputType::float(),
-        TypeIdentifier::Decimal => InputType::decimal(),
         TypeIdentifier::Boolean => InputType::boolean(),
         TypeIdentifier::UUID => InputType::uuid(),
         TypeIdentifier::DateTime => InputType::date_time(),

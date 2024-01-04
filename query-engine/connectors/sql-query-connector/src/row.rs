@@ -198,38 +198,6 @@ fn row_value_to_prisma_value(p_value: Value, meta: ColumnMetadata<'_>) -> Result
             }
             _ => return Err(create_error(&p_value)),
         },
-        TypeIdentifier::Float | TypeIdentifier::Decimal => match p_value.typed {
-            value if value.is_null() => PrismaValue::Null,
-            ValueType::Numeric(Some(f)) => PrismaValue::Float(f.normalized()),
-            ValueType::Double(Some(f)) => match f {
-                f if f.is_nan() => return Err(create_error(&p_value)),
-                f if f.is_infinite() => return Err(create_error(&p_value)),
-                _ => PrismaValue::Float(BigDecimal::from_f64(f).unwrap().normalized()),
-            },
-            ValueType::Float(Some(f)) => match f {
-                f if f.is_nan() => return Err(create_error(&p_value)),
-                f if f.is_infinite() => return Err(create_error(&p_value)),
-                _ => PrismaValue::Float(BigDecimal::from_f32(f).unwrap().normalized()),
-            },
-            ValueType::Int32(Some(i)) => match BigDecimal::from_i32(i) {
-                Some(dec) => PrismaValue::Float(dec),
-                None => return Err(create_error(&p_value)),
-            },
-            ValueType::Int64(Some(i)) => match BigDecimal::from_i64(i) {
-                Some(dec) => PrismaValue::Float(dec),
-                None => return Err(create_error(&p_value)),
-            },
-            ValueType::Text(_) | ValueType::Bytes(_) => {
-                let dec: BigDecimal = p_value
-                    .as_str()
-                    .expect("text/bytes as str")
-                    .parse()
-                    .map_err(|_| create_error(&p_value))?;
-
-                PrismaValue::Float(dec.normalized())
-            }
-            _ => return Err(create_error(&p_value)),
-        },
         TypeIdentifier::Int => match p_value.typed {
             value if value.is_null() => PrismaValue::Null,
             ValueType::Int32(Some(i)) => PrismaValue::Int(i as i64),
@@ -238,17 +206,6 @@ fn row_value_to_prisma_value(p_value: Value, meta: ColumnMetadata<'_>) -> Result
             ValueType::Text(Some(ref txt)) => {
                 PrismaValue::Int(i64::from_str(txt.trim_start_matches('\0')).map_err(|_| create_error(&p_value))?)
             }
-            ValueType::Float(Some(f)) => {
-                sanitize_f32(f, "Int")?;
-
-                PrismaValue::Int(big_decimal_to_i64(BigDecimal::from_f32(f).unwrap(), "Int")?)
-            }
-            ValueType::Double(Some(f)) => {
-                sanitize_f64(f, "Int")?;
-
-                PrismaValue::Int(big_decimal_to_i64(BigDecimal::from_f64(f).unwrap(), "Int")?)
-            }
-            ValueType::Numeric(Some(dec)) => PrismaValue::Int(big_decimal_to_i64(dec, "Int")?),
             ValueType::Boolean(Some(bool)) => PrismaValue::Int(bool as i64),
             other => to_prisma_value(other)?,
         },
@@ -260,17 +217,6 @@ fn row_value_to_prisma_value(p_value: Value, meta: ColumnMetadata<'_>) -> Result
             ValueType::Text(Some(ref txt)) => {
                 PrismaValue::BigInt(i64::from_str(txt.trim_start_matches('\0')).map_err(|_| create_error(&p_value))?)
             }
-            ValueType::Float(Some(f)) => {
-                sanitize_f32(f, "BigInt")?;
-
-                PrismaValue::BigInt(big_decimal_to_i64(BigDecimal::from_f32(f).unwrap(), "BigInt")?)
-            }
-            ValueType::Double(Some(f)) => {
-                sanitize_f64(f, "BigInt")?;
-
-                PrismaValue::BigInt(big_decimal_to_i64(BigDecimal::from_f64(f).unwrap(), "BigInt")?)
-            }
-            ValueType::Numeric(Some(dec)) => PrismaValue::BigInt(big_decimal_to_i64(dec, "BigInt")?),
             ValueType::Boolean(Some(bool)) => PrismaValue::BigInt(bool as i64),
             other => to_prisma_value(other)?,
         },

@@ -140,8 +140,6 @@ pub enum TypeIdentifier {
     String,
     Int,
     BigInt,
-    Float,
-    Decimal,
     Boolean,
     Enum(ast::EnumId),
     UUID,
@@ -153,10 +151,7 @@ pub enum TypeIdentifier {
 
 impl TypeIdentifier {
     pub fn is_numeric(&self) -> bool {
-        matches!(
-            self,
-            TypeIdentifier::Int | TypeIdentifier::BigInt | TypeIdentifier::Float | TypeIdentifier::Decimal
-        )
+        matches!(self, TypeIdentifier::Int | TypeIdentifier::BigInt)
     }
 
     pub fn type_name(&self, schema: &psl::ValidatedSchema) -> Cow<'static, str> {
@@ -164,8 +159,6 @@ impl TypeIdentifier {
             TypeIdentifier::String => "String".into(),
             TypeIdentifier::Int => "Int".into(),
             TypeIdentifier::BigInt => "BigInt".into(),
-            TypeIdentifier::Float => "Float".into(),
-            TypeIdentifier::Decimal => "Decimal".into(),
             TypeIdentifier::Boolean => "Bool".into(),
             TypeIdentifier::Enum(enum_id) => {
                 let enum_name = schema.db.walk(*enum_id).name();
@@ -247,11 +240,9 @@ impl From<ScalarType> for TypeIdentifier {
             ScalarType::String => Self::String,
             ScalarType::Int => Self::Int,
             ScalarType::BigInt => Self::BigInt,
-            ScalarType::Float => Self::Float,
             ScalarType::Boolean => Self::Boolean,
             ScalarType::DateTime => Self::DateTime,
             ScalarType::Json => Self::Json,
-            ScalarType::Decimal => Self::Decimal,
             ScalarType::Bytes => Self::Bytes,
         }
     }

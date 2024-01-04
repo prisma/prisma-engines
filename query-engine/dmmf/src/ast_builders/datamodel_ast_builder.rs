@@ -1,7 +1,6 @@
 use crate::serialization_ast::datamodel_ast::{
     Datamodel, Enum, EnumValue, Field, Function, Model, PrimaryKey, UniqueIndex,
 };
-use bigdecimal::ToPrimitive;
 use psl::{
     parser_database::{walkers, ScalarFieldType},
     schema_ast::ast::WithDocumentation,
@@ -253,9 +252,6 @@ fn prisma_value_to_serde(value: &PrismaValue) -> serde_json::Value {
         PrismaValue::Boolean(val) => serde_json::Value::Bool(*val),
         PrismaValue::String(val) => serde_json::Value::String(val.clone()),
         PrismaValue::Enum(val) => serde_json::Value::String(val.clone()),
-        PrismaValue::Float(val) => {
-            serde_json::Value::Number(serde_json::Number::from_f64(val.to_f64().unwrap()).unwrap())
-        }
         PrismaValue::Int(val) => serde_json::Value::Number(serde_json::Number::from_f64(*val as f64).unwrap()),
         PrismaValue::BigInt(val) => serde_json::Value::String(val.to_string()),
         PrismaValue::DateTime(val) => serde_json::Value::String(val.to_rfc3339()),

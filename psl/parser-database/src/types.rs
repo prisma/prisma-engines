@@ -236,11 +236,6 @@ impl ScalarFieldType {
         matches!(self, Self::BuiltInScalar(ScalarType::DateTime))
     }
 
-    /// True if the field's type is Float.
-    pub fn is_float(self) -> bool {
-        matches!(self, Self::BuiltInScalar(ScalarType::Float))
-    }
-
     /// True if the field's type is Int.
     pub fn is_int(self) -> bool {
         matches!(self, Self::BuiltInScalar(ScalarType::Int))
@@ -249,11 +244,6 @@ impl ScalarFieldType {
     /// True if the field's type is BigInt.
     pub fn is_bigint(self) -> bool {
         matches!(self, Self::BuiltInScalar(ScalarType::BigInt))
-    }
-
-    /// True if the field's type is Decimal.
-    pub fn is_decimal(self) -> bool {
-        matches!(self, Self::BuiltInScalar(ScalarType::Decimal))
     }
 }
 
@@ -420,13 +410,7 @@ impl IndexAlgorithm {
             IndexAlgorithm::Gin => r#type.is_json() || field.ast_field().arity.is_list(),
             IndexAlgorithm::SpGist => r#type.is_string(),
             IndexAlgorithm::Brin => {
-                r#type.is_string()
-                    || r#type.is_bytes()
-                    || r#type.is_datetime()
-                    || r#type.is_float()
-                    || r#type.is_int()
-                    || r#type.is_bigint()
-                    || r#type.is_decimal()
+                r#type.is_string() || r#type.is_bytes() || r#type.is_datetime() || r#type.is_int() || r#type.is_bigint()
             }
         }
     }
@@ -1393,13 +1377,11 @@ impl Default for SortOrder {
 pub enum ScalarType {
     Int,
     BigInt,
-    Float,
     Boolean,
     String,
     DateTime,
     Json,
     Bytes,
-    Decimal,
 }
 
 impl ScalarType {
@@ -1408,13 +1390,11 @@ impl ScalarType {
         match self {
             ScalarType::Int => "Int",
             ScalarType::BigInt => "BigInt",
-            ScalarType::Float => "Float",
             ScalarType::Boolean => "Boolean",
             ScalarType::String => "String",
             ScalarType::DateTime => "DateTime",
             ScalarType::Json => "Json",
             ScalarType::Bytes => "Bytes",
-            ScalarType::Decimal => "Decimal",
         }
     }
 
@@ -1427,13 +1407,11 @@ impl ScalarType {
         match s {
             "Int" => Some(ScalarType::Int),
             "BigInt" => Some(ScalarType::BigInt),
-            "Float" => Some(ScalarType::Float),
             "Boolean" => Some(ScalarType::Boolean),
             "String" => Some(ScalarType::String),
             "DateTime" => Some(ScalarType::DateTime),
             "Json" => Some(ScalarType::Json),
             "Bytes" => Some(ScalarType::Bytes),
-            "Decimal" => Some(ScalarType::Decimal),
             _ => None,
         }
     }

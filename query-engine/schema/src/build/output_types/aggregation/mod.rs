@@ -6,10 +6,6 @@ pub(crate) mod plain;
 
 fn field_avg_output_type(ctx: &'_ QuerySchema, field: ScalarField) -> OutputType<'_> {
     match field.type_identifier() {
-        TypeIdentifier::Int | TypeIdentifier::BigInt | TypeIdentifier::Float => {
-            OutputType::non_list(OutputType::float())
-        }
-        TypeIdentifier::Decimal => OutputType::non_list(OutputType::decimal()),
         _ => field::map_scalar_output_type_for_field(ctx, field),
     }
 }

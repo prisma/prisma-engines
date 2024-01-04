@@ -8,7 +8,6 @@ const TIME_FORMAT: &str = "%H:%M:%S%.f";
 #[rustfmt::skip]
 pub fn value_to_js_arg(value: &quaint::Value) -> serde_json::Result<JSArg> {
     let res = match &value.typed {
-        quaint::ValueType::Numeric(Some(bd)) => JSArg::Value(JsonValue::String(bd.to_string())),
         quaint::ValueType::Json(Some(s)) => JSArg::Value(JsonValue::String(serde_json::to_string(s)?)),
         quaint::ValueType::Bytes(Some(bytes)) => JSArg::Buffer(bytes.to_vec()),
         quaint::ValueType::Date(Some(d)) => JSArg::Value(JsonValue::String(d.format(DATE_FORMAT).to_string())),

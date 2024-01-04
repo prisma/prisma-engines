@@ -26,10 +26,6 @@ impl ArgumentValue {
         Self::Scalar(PrismaValue::Int(i))
     }
 
-    pub fn float(dec: BigDecimal) -> Self {
-        Self::Scalar(PrismaValue::Float(dec))
-    }
-
     pub fn string(str: String) -> Self {
         Self::Scalar(PrismaValue::String(str))
     }

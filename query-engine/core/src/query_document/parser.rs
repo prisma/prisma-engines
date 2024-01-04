@@ -362,7 +362,6 @@ impl QueryDocumentParser {
                 self.parse_json_list_from_str(selection_path, argument_path, &s)
             }
             (PrismaValue::String(s), ScalarType::Bytes) => self.parse_bytes(selection_path, argument_path, s),
-            (PrismaValue::String(s), ScalarType::Decimal) => self.parse_decimal(selection_path, argument_path, s),
             (PrismaValue::String(s), ScalarType::BigInt) => self.parse_bigint(selection_path, argument_path, s),
             (PrismaValue::String(s), ScalarType::UUID) => self
                 .parse_uuid(selection_path, argument_path, s.as_str())
@@ -376,21 +375,7 @@ impl QueryDocumentParser {
 
             // Int coercion matchers
             (PrismaValue::Int(i), ScalarType::Int) => Ok(PrismaValue::Int(i)),
-            (PrismaValue::Int(i), ScalarType::Float) => Ok(PrismaValue::Float(BigDecimal::from(i))),
-            (PrismaValue::Int(i), ScalarType::Decimal) => Ok(PrismaValue::Float(BigDecimal::from(i))),
             (PrismaValue::Int(i), ScalarType::BigInt) => Ok(PrismaValue::BigInt(i)),
-
-            // Float coercion matchers
-            (PrismaValue::Float(f), ScalarType::Float) => Ok(PrismaValue::Float(f)),
-            (PrismaValue::Float(f), ScalarType::Decimal) => Ok(PrismaValue::Float(f)),
-            (PrismaValue::Float(f), ScalarType::Int) => match f.to_i64() {
-                Some(converted) => Ok(PrismaValue::Int(converted)),
-                None => Err(ValidationError::value_too_large(
-                    selection_path.segments(),
-                    argument_path.segments(),
-                    f.to_string(),
-                )),
-            },
 
             // UUID coercion matchers
             (PrismaValue::Uuid(uuid), ScalarType::String) => Ok(PrismaValue::String(uuid.to_string())),
@@ -437,23 +422,6 @@ impl QueryDocumentParser {
                     Some(Box::new(err)),
                 )
             })
-    }
-
-    fn parse_decimal(
-        &self,
-        selection_path: &Path,
-        argument_path: &Path,
-        value: String,
-    ) -> QueryParserResult<PrismaValue> {
-        BigDecimal::from_str(&value).map(PrismaValue::Float).map_err(|err| {
-            ValidationError::invalid_argument_value(
-                selection_path.segments(),
-                argument_path.segments(),
-                value,
-                "decimal String",
-                Some(Box::new(err)),
-            )
-        })
     }
 
     fn parse_bigint(
@@ -888,7 +856,6 @@ pub(crate) mod conversions {
             PrismaValue::Object(_) => "Object".to_string(),
             PrismaValue::Null => "Null".to_string(),
             PrismaValue::DateTime(_) => "DateTime".to_string(),
-            PrismaValue::Float(_) => "Float".to_string(),
             PrismaValue::BigInt(_) => "BigInt".to_string(),
             PrismaValue::Bytes(_) => "Bytes".to_string(),
         }

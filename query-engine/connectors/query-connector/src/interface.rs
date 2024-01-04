@@ -137,7 +137,7 @@ impl AggregationSelection {
                 mapped
             }
 
-            AggregationSelection::Average(fields) => Self::map_field_types(fields, Some(TypeIdentifier::Float)),
+            AggregationSelection::Average(fields) => Self::map_field_types(fields, Some(TypeIdentifier::Int)),
             AggregationSelection::Sum(fields) => Self::map_field_types(fields, None),
             AggregationSelection::Min(fields) => Self::map_field_types(fields, None),
             AggregationSelection::Max(fields) => Self::map_field_types(fields, None),

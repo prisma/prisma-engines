@@ -58,8 +58,6 @@ pub(crate) struct MsSqlDatamodelConnector;
 const SCALAR_TYPE_DEFAULTS: &[(ScalarType, MsSqlType)] = &[
     (ScalarType::Int, MsSqlType::Int),
     (ScalarType::BigInt, MsSqlType::BigInt),
-    (ScalarType::Float, MsSqlType::Float(Some(53))),
-    (ScalarType::Decimal, MsSqlType::Decimal(Some((32, 16)))),
     (ScalarType::Boolean, MsSqlType::Bit),
     (
         ScalarType::String,
@@ -116,13 +114,6 @@ impl Connector for MsSqlDatamodelConnector {
             Int => ScalarType::Int,
             //BigInt
             BigInt => ScalarType::Int,
-            //Float
-            Float(_) => ScalarType::Float,
-            SmallMoney => ScalarType::Float,
-            Money => ScalarType::Float,
-            Real => ScalarType::Float,
-            //Decimal
-            Decimal(_) => ScalarType::Decimal,
             //DateTime
             Date => ScalarType::DateTime,
             Time => ScalarType::DateTime,
@@ -172,18 +163,6 @@ impl Connector for MsSqlDatamodelConnector {
         let error = self.native_instance_error(native_type);
 
         match r#type {
-            Decimal(Some((precision, scale))) if scale > precision => {
-                errors.push_error(error.new_scale_larger_than_precision_error(span));
-            }
-            Decimal(Some((prec, _))) if *prec == 0 || *prec > 38 => {
-                errors.push_error(error.new_argument_m_out_of_range_error("Precision can range from 1 to 38.", span));
-            }
-            Decimal(Some((_, scale))) if *scale > 38 => {
-                errors.push_error(error.new_argument_m_out_of_range_error("Scale can range from 0 to 38.", span))
-            }
-            Float(Some(bits)) if *bits == 0 || *bits > 53 => {
-                errors.push_error(error.new_argument_m_out_of_range_error("Bits can range from 1 to 53.", span))
-            }
             NVarChar(Some(Number(p))) if *p > 4000 => errors.push_error(error.new_argument_m_out_of_range_error(
                 "Length can range from 1 to 4000. For larger sizes, use the `Max` variant.",
                 span,
