@@ -69,18 +69,18 @@ pub fn decode_bytes(s: &str) -> PrismaValueResult<Vec<u8>> {
     base64::decode(s).map_err(|_| ConversionFailure::new("base64 encoded bytes", "PrismaValue::Bytes"))
 }
 
-impl TryFrom<serde_json::Value> for PrismaValue {
+impl TryFrom<&serde_json::Value> for PrismaValue {
     type Error = crate::error::ConversionFailure;
 
-    fn try_from(v: serde_json::Value) -> PrismaValueResult<Self> {
+    fn try_from(v: &serde_json::Value) -> PrismaValueResult<Self> {
         match v {
-            serde_json::Value::String(s) => Ok(PrismaValue::String(s)),
+            serde_json::Value::String(s) => Ok(PrismaValue::String(s.to_owned())),
             serde_json::Value::Array(v) => {
-                let vals: PrismaValueResult<Vec<PrismaValue>> = v.into_iter().map(PrismaValue::try_from).collect();
+                let vals: PrismaValueResult<Vec<PrismaValue>> = v.iter().map(PrismaValue::try_from).collect();
                 Ok(PrismaValue::List(vals?))
             }
             serde_json::Value::Null => Ok(PrismaValue::Null),
-            serde_json::Value::Bool(b) => Ok(PrismaValue::Boolean(b)),
+            serde_json::Value::Bool(b) => Ok(PrismaValue::Boolean(*b)),
             serde_json::Value::Number(num) => {
                 if num.is_i64() {
                     Ok(PrismaValue::Int(num.as_i64().unwrap()))

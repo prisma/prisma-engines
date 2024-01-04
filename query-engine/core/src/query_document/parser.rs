@@ -502,7 +502,7 @@ impl QueryDocumentParser {
         let mut prisma_values = Vec::with_capacity(values.len());
 
         for v in values.iter() {
-            let pv = PrismaValue::try_from(v.clone()).map_err(|err| {
+            let pv = PrismaValue::try_from(v).map_err(|err| {
                 ValidationError::invalid_argument_value(
                     selection_path.segments(),
                     argument_path.segments(),
