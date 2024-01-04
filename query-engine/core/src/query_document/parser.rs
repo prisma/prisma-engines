@@ -230,7 +230,7 @@ impl QueryDocumentParser {
         }
 
         for input_type in possible_input_types {
-            match (value.clone(), input_type) {
+            match (&value, input_type) {
                 // With the JSON protocol, JSON values are sent as deserialized values.
                 // This means JSON can match with pretty much anything. A string, an int, an object, an array.
                 // This is an early catch-all.
@@ -242,7 +242,7 @@ impl QueryDocumentParser {
                     return Ok(ParsedInputValue::Single(self.to_json(
                         &selection_path,
                         &argument_path,
-                        &value,
+                        value,
                     )?))
                 }
                 // With the JSON protocol, JSON values are sent as deserialized values.
@@ -251,7 +251,7 @@ impl QueryDocumentParser {
                 (list @ ArgumentValue::List(_), InputType::Scalar(ScalarType::JsonList))
                     if get_engine_protocol().is_json() =>
                 {
-                    let json_val = serde_json::to_value(list.clone()).map_err(|err| {
+                    let json_val = serde_json::to_value(list).map_err(|err| {
                         ValidationError::invalid_argument_value(
                             selection_path.segments(),
                             argument_path.segments(),
@@ -264,7 +264,7 @@ impl QueryDocumentParser {
 
                     return Ok(ParsedInputValue::Single(json_list));
                 }
-                (ArgumentValue::Scalar(pv), input_type) => match (pv, input_type) {
+                (ArgumentValue::Scalar(pv), input_type) => match (pv.clone(), input_type) {
                     // Null handling
                     (PrismaValue::Null, InputType::Scalar(ScalarType::Null)) => {
                         return Ok(ParsedInputValue::Single(PrismaValue::Null))
