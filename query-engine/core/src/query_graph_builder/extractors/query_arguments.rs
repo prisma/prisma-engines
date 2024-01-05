@@ -14,50 +14,40 @@ pub fn extract_query_args(
     arguments: Vec<ParsedArgument<'_>>,
     model: &Model,
 ) -> QueryGraphBuilderResult<QueryArguments> {
-    let query_args = arguments.into_iter().try_fold(
-        QueryArguments::new(model.clone()),
-        |result, arg| -> QueryGraphBuilderResult<QueryArguments> {
-            match arg.name.as_str() {
-                args::CURSOR => Ok(QueryArguments {
-                    cursor: extract_cursor(arg.value, model)?,
-                    ..result
-                }),
+    let mut query_args = QueryArguments::new(model.clone());
 
-                args::TAKE => Ok(QueryArguments {
-                    take: arg.value.try_into()?,
-                    ..result
-                }),
-
-                args::SKIP => Ok(QueryArguments {
-                    skip: extract_skip(arg.value)?,
-                    ..result
-                }),
-
-                args::ORDER_BY => Ok(QueryArguments {
-                    order_by: extract_order_by(&model.into(), arg.value)?,
-                    ..result
-                }),
-
-                args::DISTINCT => Ok(QueryArguments {
-                    distinct: Some(extract_distinct(arg.value)?),
-                    ..result
-                }),
-
-                args::WHERE => {
-                    let val: Option<ParsedInputMap<'_>> = arg.value.try_into()?;
-                    match val {
-                        Some(m) => {
-                            let filter = Some(extract_filter(m, model)?);
-                            Ok(QueryArguments { filter, ..result })
-                        }
-                        None => Ok(result),
-                    }
-                }
-
-                _ => Ok(result),
+    for arg in arguments {
+        match arg.name.as_str() {
+            args::CURSOR => {
+                query_args.cursor = extract_cursor(arg.value, model)?;
             }
-        },
-    )?;
+
+            args::TAKE => {
+                query_args.take = arg.value.try_into()?;
+            }
+
+            args::SKIP => {
+                query_args.skip = extract_skip(arg.value)?;
+            }
+
+            args::ORDER_BY => {
+                query_args.order_by = extract_order_by(&model.into(), arg.value)?;
+            }
+
+            args::DISTINCT => {
+                query_args.distinct = Some(extract_distinct(arg.value)?);
+            }
+
+            args::WHERE => {
+                let val: Option<ParsedInputMap<'_>> = arg.value.try_into()?;
+                if let Some(m) = val {
+                    query_args.filter = Some(extract_filter(m, model)?);
+                }
+            }
+
+            _ => (),
+        };
+    }
 
     Ok(finalize_arguments(query_args, model))
 }
