@@ -211,14 +211,14 @@ fn merge_search_filters(filter: Filter) -> Filter {
 }
 
 fn fold_search_filters(filters: Vec<Filter>) -> Vec<Filter> {
-    let mut filters_by_val: HashMap<PrismaValue, &Filter> = HashMap::new();
+    let mut filters_by_val: HashMap<PrismaValue, Filter> = HashMap::new();
     let mut projections_by_val: HashMap<PrismaValue, Vec<ScalarProjection>> = HashMap::new();
 
     // output.len() <= filters.len()
     let mut output: Vec<Filter> = Vec::with_capacity(filters.len());
 
     // Gather search filters that have the same condition
-    for filter in filters.iter() {
+    for filter in filters.into_iter() {
         match filter {
             Filter::Scalar(ref sf) => match sf.condition {
                 ScalarCondition::Search(ref pv, _) => {
@@ -232,7 +232,7 @@ fn fold_search_filters(filters: Vec<Filter>) -> Vec<Filter> {
                         filters_by_val.insert(pv.clone(), filter);
                     }
                 }
-                _ => output.push(filter.clone()),
+                _ => output.push(filter),
             },
             Filter::And(and) => {
                 output.push(Filter::And(fold_search_filters(and)));
@@ -243,14 +243,13 @@ fn fold_search_filters(filters: Vec<Filter>) -> Vec<Filter> {
             Filter::Not(not) => {
                 output.push(Filter::Not(fold_search_filters(not)));
             }
-            x => output.push(x.clone()),
+            _ => output.push(filter),
         }
     }
 
     // Merge the search filters that have the same condition
-    for (pv, filter) in filters_by_val.into_iter() {
+    for (pv, mut filter) in filters_by_val.into_iter() {
         let projections = projections_by_val.get_mut(&pv).unwrap();
-        let mut filter = filter.clone();
 
         match filter {
             Filter::Scalar(ref mut sf) => match sf.condition {
