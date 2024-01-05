@@ -203,17 +203,19 @@ fn merge_search_filters(filter: Filter) -> Filter {
     let flattened = fold_filter(filter);
 
     match flattened {
-        Filter::And(and) => Filter::And(fold_search_filters(&and)),
-        Filter::Or(or) => Filter::Or(fold_search_filters(&or)),
-        Filter::Not(not) => Filter::Not(fold_search_filters(&not)),
+        Filter::And(and) => Filter::And(fold_search_filters(and)),
+        Filter::Or(or) => Filter::Or(fold_search_filters(or)),
+        Filter::Not(not) => Filter::Not(fold_search_filters(not)),
         _ => flattened,
     }
 }
 
-fn fold_search_filters(filters: &[Filter]) -> Vec<Filter> {
+fn fold_search_filters(filters: Vec<Filter>) -> Vec<Filter> {
     let mut filters_by_val: HashMap<PrismaValue, &Filter> = HashMap::new();
     let mut projections_by_val: HashMap<PrismaValue, Vec<ScalarProjection>> = HashMap::new();
-    let mut output: Vec<Filter> = vec![];
+
+    // output.len() <= filters.len()
+    let mut output: Vec<Filter> = Vec::with_capacity(filters.len());
 
     // Gather search filters that have the same condition
     for filter in filters.iter() {
@@ -258,12 +260,12 @@ fn fold_search_filters(filters: &[Filter]) -> Vec<Filter> {
                 ScalarCondition::NotSearch(_, ref mut search_proj) => {
                     search_proj.append(projections);
                 }
-                _ => unreachable!(),
+                _ => (),
             },
-            _ => unreachable!(),
-        }
+            _ => (),
+        };
 
-        output.push(filter.clone());
+        output.push(filter);
     }
 
     output
