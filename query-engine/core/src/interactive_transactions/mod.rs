@@ -59,7 +59,7 @@ where
         let contents = s.into();
         // This postcondition is to ensure that the TxId is long enough as to be able to derive
         // a TraceId from it.
-        assert!(
+        debug_assert!(
             contents.len() >= MINIMUM_TX_ID_LENGTH,
             "minimum length for a TxId ({}) is {}, but was {}",
             contents,
