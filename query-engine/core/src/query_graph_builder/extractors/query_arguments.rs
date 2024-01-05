@@ -94,9 +94,8 @@ fn process_order_object(
                 return process_order_object(container, object, path, Some(sort_aggr));
             }
 
-            let field = container
-                .find_field(&field_name)
-                .expect("Fields must be valid after validation passed.");
+            // Fields must be valid after validation passed.
+            let field = container.find_field(&field_name).unwrap();
 
             match field {
                 Field::Relation(rf) if rf.is_list() => {
@@ -105,8 +104,9 @@ fn process_order_object(
                     path.push(rf.into());
 
                     let (inner_field_name, inner_field_value) = object.into_iter().next().unwrap();
-                    let sort_aggregation = extract_sort_aggregation(inner_field_name.as_ref())
-                        .expect("To-many relation orderBy must be an aggregation ordering.");
+
+                    // To-many relation orderBy must be an aggregation ordering.
+                    let sort_aggregation = extract_sort_aggregation(inner_field_name.as_ref()).unwrap();
 
                     let (sort_order, _) = extract_order_by_args(inner_field_value)?;
                     Ok(Some(OrderBy::to_many_aggregation(path, sort_order, sort_aggregation)))
@@ -136,8 +136,9 @@ fn process_order_object(
                     path.push(cf.into());
 
                     let (inner_field_name, inner_field_value) = object.into_iter().next().unwrap();
-                    let sort_aggregation = extract_sort_aggregation(inner_field_name.as_ref())
-                        .expect("To-many composite orderBy must be an aggregation ordering.");
+
+                    // To-many composite orderBy must be an aggregation ordering.
+                    let sort_aggregation = extract_sort_aggregation(inner_field_name.as_ref()).unwrap();
 
                     let (sort_order, _) = extract_order_by_args(inner_field_value)?;
                     Ok(Some(OrderBy::to_many_aggregation(path, sort_order, sort_aggregation)))
