@@ -280,11 +280,11 @@ pub(crate) async fn spawn_itx_actor(
             // result.
             let c_tx = match conn.start_transaction(isolation_level).await {
                 Ok(c_tx) => {
-                    open_transaction_send.send(Ok(())).unwrap();
+                    let _ = open_transaction_send.send(Ok(()));
                     c_tx
                 }
                 Err(err) => {
-                    open_transaction_send.send(Err(err)).unwrap();
+                    let _ = open_transaction_send.send(Err(err));
                     return;
                 }
             };
