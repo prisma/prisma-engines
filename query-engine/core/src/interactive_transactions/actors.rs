@@ -232,13 +232,15 @@ impl ITXClient {
     }
 
     fn handle_error(&self, msg: TxOpResponse) -> TransactionError {
+        let invalid_transaction_msg = "Transaction is no longer valid. Last state:";
+
         match msg {
             TxOpResponse::Committed(..) => {
-                let reason = "Transaction is no longer valid. Last state: 'Committed'".to_string();
+                let reason = format!("{} 'Committed'", &invalid_transaction_msg);
                 TransactionError::Closed { reason }
             }
             TxOpResponse::RolledBack(..) => {
-                let reason = "Transaction is no longer valid. Last state: 'RolledBack'".to_string();
+                let reason = format!("{} 'RolledBack'", &invalid_transaction_msg);
                 TransactionError::Closed { reason }
             }
             other => {
