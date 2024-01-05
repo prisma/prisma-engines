@@ -228,8 +228,6 @@ fn serialize_record_selection_with_relations(
     typ: &OutputType<'_>, // We additionally pass the type to allow recursing into nested type definitions of a field.
     is_list: bool,
 ) -> crate::Result<CheckedItemsWithParents> {
-    let name = record_selection.name.clone();
-
     match &typ.inner {
         inner if typ.is_list() => serialize_record_selection_with_relations(
             record_selection,
@@ -238,6 +236,7 @@ fn serialize_record_selection_with_relations(
             true,
         ),
         InnerOutputType::Object(obj) => {
+            let name = record_selection.name.clone();
             let result = serialize_objects_with_relation(record_selection, obj)?;
 
             finalize_objects(field, is_list, result, name)
@@ -254,8 +253,6 @@ fn serialize_record_selection(
     is_list: bool,
     query_schema: &QuerySchema,
 ) -> crate::Result<CheckedItemsWithParents> {
-    let name = record_selection.name.clone();
-
     match &typ.inner {
         inner if typ.is_list() => serialize_record_selection(
             record_selection,
@@ -265,6 +262,7 @@ fn serialize_record_selection(
             query_schema,
         ),
         InnerOutputType::Object(obj) => {
+            let name = record_selection.name.clone();
             let result = serialize_objects(record_selection, obj, query_schema)?;
 
             finalize_objects(field, is_list, result, name)
