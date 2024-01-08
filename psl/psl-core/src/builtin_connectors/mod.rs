@@ -1,6 +1,3 @@
-#![deny(rust_2018_idioms, unsafe_code)]
-#![allow(clippy::derive_partial_eq_without_eq)]
-
 pub mod cockroach_datamodel_connector;
 pub mod completions;
 
@@ -18,7 +15,7 @@ mod postgres_datamodel_connector;
 mod sqlite_datamodel_connector;
 mod utils;
 
-use psl_core::{datamodel_connector::Connector, ConnectorRegistry};
+use crate::{datamodel_connector::Connector, ConnectorRegistry};
 
 pub const POSTGRES: &'static dyn Connector = &postgres_datamodel_connector::PostgresDatamodelConnector;
 pub const COCKROACH: &'static dyn Connector = &cockroach_datamodel_connector::CockroachDatamodelConnector;

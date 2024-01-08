@@ -1,7 +1,7 @@
 #![doc = include_str!("../README.md")]
 #![deny(rust_2018_idioms, unsafe_code, missing_docs)]
 
-pub use builtin_psl_connectors as builtin_connectors;
+pub use psl_core::builtin_connectors;
 pub use psl_core::{
     datamodel_connector,
     diagnostics::{self, Diagnostics},

@@ -429,21 +429,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "builtin-psl-connectors"
-version = "0.1.0"
-dependencies = [
- "chrono",
- "connection-string",
- "either",
- "enumflags2",
- "indoc 2.0.3",
- "lsp-types",
- "once_cell",
- "psl-core",
- "regex",
-]
-
-[[package]]
 name = "bumpalo"
 version = "3.13.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -3496,7 +3481,6 @@ name = "psl"
 version = "0.1.0"
 dependencies = [
  "base64 0.13.1",
- "builtin-psl-connectors",
  "dissimilar",
  "either",
  "expect-test",
@@ -3512,6 +3496,7 @@ dependencies = [
  "chrono",
  "connection-string",
  "diagnostics",
+ "either",
  "enumflags2",
  "indoc 2.0.3",
  "itertools 0.12.0",

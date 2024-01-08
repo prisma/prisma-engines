@@ -3,9 +3,7 @@ mod validations;
 
 pub use native_types::{MsSqlType, MsSqlTypeParameter};
 
-use enumflags2::BitFlags;
-use lsp_types::{CompletionItem, CompletionItemKind, CompletionList};
-use psl_core::{
+use crate::{
     datamodel_connector::{
         Connector, ConnectorCapabilities, ConnectorCapability, ConstraintScope, Flavour, NativeTypeConstructor,
         NativeTypeInstance, RelationMode,
@@ -14,11 +12,13 @@ use psl_core::{
     parser_database::{self, ast, ParserDatabase, ReferentialAction, ScalarType},
     PreviewFeature,
 };
+use enumflags2::BitFlags;
+use lsp_types::{CompletionItem, CompletionItemKind, CompletionList};
 
 use MsSqlType::*;
 use MsSqlTypeParameter::*;
 
-use crate::completions;
+use super::completions;
 
 const CONSTRAINT_SCOPES: &[ConstraintScope] = &[
     ConstraintScope::GlobalPrimaryKeyForeignKeyDefault,
@@ -269,7 +269,7 @@ impl Connector for MsSqlDatamodelConnector {
         }
     }
 
-    fn datasource_completions(&self, config: &psl_core::Configuration, completion_list: &mut CompletionList) {
+    fn datasource_completions(&self, config: &crate::Configuration, completion_list: &mut CompletionList) {
         let ds = match config.datasources.first() {
             Some(ds) => ds,
             None => return,

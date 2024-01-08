@@ -1,7 +1,7 @@
+use crate::datamodel_connector::format_completion_docs;
 use lsp_types::{
     CompletionItem, CompletionItemKind, CompletionList, Documentation, InsertTextFormat, MarkupContent, MarkupKind,
 };
-use psl_core::datamodel_connector::format_completion_docs;
 
 pub(crate) fn extensions_completion(completion_list: &mut CompletionList) {
     completion_list.items.push(CompletionItem {

@@ -1,12 +1,14 @@
-use indoc::formatdoc;
-use psl_core::diagnostics::{DatamodelWarning, Span};
-use psl_core::parser_database::ast::WithSpan;
-use psl_core::parser_database::ReferentialAction;
-use psl_core::{
+use crate::{
     datamodel_connector::{walker_ext_traits::ScalarFieldWalkerExt, Connector},
     diagnostics::Diagnostics,
-    parser_database::walkers::{IndexWalker, PrimaryKeyWalker, RelationFieldWalker},
+    diagnostics::{DatamodelWarning, Span},
+    parser_database::{
+        ast::WithSpan,
+        walkers::{IndexWalker, PrimaryKeyWalker, RelationFieldWalker},
+        ReferentialAction,
+    },
 };
+use indoc::formatdoc;
 
 const LENGTH_GUIDE: &str = " Please use the `length` argument to the field in the index definition to allow this.";
 
