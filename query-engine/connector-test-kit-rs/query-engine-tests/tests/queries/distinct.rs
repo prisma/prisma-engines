@@ -232,7 +232,8 @@ mod distinct {
                     { id, first_name, last_name }
                 }"#
             ),
-            _ => r#"{"data":{"findManyUser":[{"id":1,"first_name":"Joe","last_name":"Doe"},{"id":2,"first_name":"Bro","last_name":"Doe"}]}}"#
+            Postgres(_) => r#"{"data":{"findManyUser":[{"id":1,"first_name":"Joe","last_name":"Doe"},{"id":2,"first_name":"Bro","last_name":"Doe"}]}}"#,
+            _ => ""
         );
 
         Ok(())
