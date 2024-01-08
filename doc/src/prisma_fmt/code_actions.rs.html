@@ -264,6 +264,14 @@
 <a href="#264" id="264">264</a>
 <a href="#265" id="265">265</a>
 <a href="#266" id="266">266</a>
+<a href="#267" id="267">267</a>
+<a href="#268" id="268">268</a>
+<a href="#269" id="269">269</a>
+<a href="#270" id="270">270</a>
+<a href="#271" id="271">271</a>
+<a href="#272" id="272">272</a>
+<a href="#273" id="273">273</a>
+<a href="#274" id="274">274</a>
 </pre></div><pre class="rust"><code><span class="kw">mod </span>mongodb;
 <span class="kw">mod </span>multi_schema;
 <span class="kw">mod </span>relation_mode;
@@ -321,6 +329,14 @@
 
         <span class="kw">if </span><span class="macro">matches!</span>(datasource, <span class="prelude-val">Some</span>(ds) <span class="kw">if </span>ds.active_provider == <span class="string">&quot;mongodb&quot;</span>) {
             mongodb::add_at_map_for_id(<span class="kw-2">&amp;mut </span>actions, <span class="kw-2">&amp;</span>params, validated_schema.db.source(), model);
+
+            mongodb::add_native_for_auto_id(
+                <span class="kw-2">&amp;mut </span>actions,
+                <span class="kw-2">&amp;</span>params,
+                validated_schema.db.source(),
+                model,
+                datasource.unwrap(),
+            );
         }
     }
 
