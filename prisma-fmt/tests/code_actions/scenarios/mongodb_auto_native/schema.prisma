@@ -2,7 +2,7 @@ generator client {
     provider = "prisma-client-js"
 }
 
-datasource db {
+datasource RedPanda {
     provider = "mongodb"
     url      = env("DATABASE_URL")
 }

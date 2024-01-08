@@ -32,7 +32,7 @@
                 "character": 0
               }
             },
-            "newText": " @db.ObjectId\n"
+            "newText": " @RedPanda.ObjectId\n"
           }
         ]
       }

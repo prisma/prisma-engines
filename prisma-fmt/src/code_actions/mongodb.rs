@@ -1,5 +1,5 @@
 use lsp_types::{CodeAction, CodeActionKind, CodeActionOrCommand};
-use psl::{parser_database::walkers::ModelWalker, schema_ast::ast::WithSpan};
+use psl::{parser_database::walkers::ModelWalker, schema_ast::ast::WithSpan, Datasource};
 
 pub(super) fn add_at_map_for_id(
     actions: &mut Vec<CodeActionOrCommand>,
@@ -55,6 +55,7 @@ pub(super) fn add_native_for_auto_id(
     params: &lsp_types::CodeActionParams,
     schema: &str,
     model: ModelWalker<'_>,
+    source: &Datasource,
 ) {
     let pk = match model.primary_key() {
         Some(pk) => pk,
@@ -84,7 +85,7 @@ pub(super) fn add_native_for_auto_id(
         None => return,
     };
 
-    let formatted_attribute = super::format_field_attribute(r#"@db.ObjectId"#);
+    let formatted_attribute = super::format_field_attribute(format!("@{}.ObjectId", source.name).as_str());
 
     let edit = super::create_text_edit(schema, formatted_attribute, true, field.ast_field().span(), params);
 
