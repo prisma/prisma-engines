@@ -127,9 +127,13 @@ impl QueryArguments {
     }
 
     fn ord_matches_distinct(order_by: &[OrderBy], distinct: &FieldSelection) -> bool {
-        order_by
-            .iter()
-            .all(|ord| distinct.contains(ord.field().unwrap().name()))
+        order_by.iter().all(|ord| {
+            if let Some(field) = ord.field() {
+                distinct.contains(field.name())
+            } else {
+                false
+            }
+        })
     }
 
     /// An unstable cursor is a cursor that is used in conjunction with an unstable (non-unique) combination of orderBys.

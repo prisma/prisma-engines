@@ -196,6 +196,48 @@ mod distinct {
 
         Ok(())
     }
+
+    #[connector_test(capabilities(FullTextSearchWithoutIndex))]
+    async fn with_orderby_non_scalar(runner: Runner) -> TestResult<()> {
+        test_user(
+            &runner,
+            r#"{
+                id: 1,
+                first_name: "Joe",
+                last_name: "Doe",
+                email: "1"
+            }"#,
+        )
+        .await?;
+
+        test_user(
+            &runner,
+            r#"{
+                id: 2,
+                first_name: "Bro",
+                last_name: "Doe",
+                email: "2"
+            }"#,
+        )
+        .await?;
+
+        match_connector_result!(
+            &runner,
+            indoc!(
+                r#"{
+                    findManyUser(
+                        orderBy: { _relevance: { fields: ["first_name"], search: "developer", sort: desc } }
+                        distinct: [first_name]
+                    )
+                    { id, first_name, last_name }
+                }"#
+            ),
+            _ => r#"{"data":{"findManyUser":[{"id":1,"first_name":"Joe","last_name":"Doe"},{"id":2,"first_name":"Bro","last_name":"Doe"}]}}"#
+        );
+
+        Ok(())
+    }
+
     // endregion
 
     #[connector_test]
@@ -293,7 +335,8 @@ mod distinct {
                     distinct: [first_name, last_name], orderBy: {first_name: asc})
                     {
                         id, first_name
-                        posts(distinct: [title], orderBy: { title: asc }) { title }
+                        posts(distinct: [title], orderBy: { title: asc })
+                        { title }
                     }
                 }"),
             Postgres(_) => r###"{"data":{"findManyUser":[{"id":1,"first_name":"Joe","posts":[]},{"id":4,"first_name":"Papa","posts":[{"title":"1"}]},{"id":3,"first_name":"Rocky","posts":[]},{"id":5,"first_name":"Troll","posts":[{"title":"2"},{"title":"3"}]}]}}"###,
