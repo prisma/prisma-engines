@@ -228,7 +228,7 @@ services:
 
   mysql-5-6:
     image: mysql:5.6.50
-    command: mysqld --table_open_cache=30000 --table_definition_cache=30000
+    command: mysqld --table_definition_cache=2000
     restart: unless-stopped
     platform: linux/x86_64
     environment:
