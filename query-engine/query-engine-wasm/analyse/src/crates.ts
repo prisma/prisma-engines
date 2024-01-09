@@ -55,10 +55,19 @@ function parseEntry({ name, ...rest }: TwiggyEntry): ParsedTwiggyEntry | undefin
     'custom section',
     'wasm magic'
   ]
+
+  const stringsToAvoid = [
+    // memory utilities
+    'memmove',
+    'memset',
+    'memcpy',
+    'memcmp',
+  ]
   
   if (
     prefixesToAvoid.some(prefix => name.startsWith(prefix))
     || substringsToAvoid.some(substring => name.includes(substring))
+    || stringsToAvoid.includes(name)
   ) {
     return undefined
   }
