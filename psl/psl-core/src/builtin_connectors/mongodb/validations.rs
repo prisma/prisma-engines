@@ -268,3 +268,30 @@ pub(crate) fn relation_same_native_type(
         }
     };
 }
+
+pub(crate) fn validate_model(model: ModelWalker<'_>, errors: &mut Diagnostics) {
+    id_must_be_defined(model, errors);
+
+    if let Some(pk) = model.primary_key() {
+        id_field_must_have_a_correct_mapped_name(pk, errors);
+    }
+
+    for field in model.scalar_fields() {
+        objectid_type_required_with_auto_attribute(field, errors);
+        auto_attribute_must_be_an_id(field, errors);
+        dbgenerated_attribute_is_not_allowed(field, errors);
+        field_name_uses_valid_characters(field, errors);
+    }
+
+    for index in model.indexes() {
+        index_is_not_defined_multiple_times_to_same_fields(index, errors);
+        unique_cannot_be_defined_to_id_field(index, errors);
+    }
+}
+
+pub(crate) fn validate_relation_field(
+    field: crate::parser_database::walkers::RelationFieldWalker<'_>,
+    errors: &mut Diagnostics,
+) {
+    relation_same_native_type(field, errors);
+}

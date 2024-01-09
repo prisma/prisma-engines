@@ -26,12 +26,12 @@ pub use self::{
 
 use crate::{configuration::DatasourceConnectorData, Configuration, Datasource, PreviewFeature};
 use chrono::{DateTime, FixedOffset};
-use diagnostics::{DatamodelError, Diagnostics, NativeTypeErrorFactory, Span};
+use diagnostics::{Diagnostics, NativeTypeErrorFactory, Span};
 use enumflags2::BitFlags;
 use lsp_types::CompletionList;
 use parser_database::{
     ast::{self, SchemaPosition},
-    walkers, IndexAlgorithm, ParserDatabase, ReferentialAction, ScalarType,
+    IndexAlgorithm, ParserDatabase, ReferentialAction, ScalarType,
 };
 use std::{borrow::Cow, collections::HashMap, str::FromStr};
 
@@ -154,31 +154,7 @@ pub trait Connector: Send + Sync {
         }
     }
 
-    /// Validate that the arguments passed to a native type attribute are valid.
-    fn validate_native_type_arguments(
-        &self,
-        _native_type: &NativeTypeInstance,
-        _scalar_type: &ScalarType,
-        _span: Span,
-        _: &mut Diagnostics,
-    ) {
-    }
-
-    fn validate_enum(&self, _enum: walkers::EnumWalker<'_>, _: &mut Diagnostics) {}
-    fn validate_model(&self, _model: walkers::ModelWalker<'_>, _: RelationMode, _: &mut Diagnostics) {}
-    fn validate_relation_field(&self, _field: walkers::RelationFieldWalker<'_>, _: &mut Diagnostics) {}
     fn validate_datasource(&self, _: BitFlags<PreviewFeature>, _: &Datasource, _: &mut Diagnostics) {}
-
-    fn validate_scalar_field_unknown_default_functions(
-        &self,
-        db: &parser_database::ParserDatabase,
-        diagnostics: &mut Diagnostics,
-    ) {
-        for d in db.walk_scalar_field_defaults_with_unknown_function() {
-            let (func_name, _, span) = d.value().as_function().unwrap();
-            diagnostics.push_error(DatamodelError::new_default_unknown_function(func_name, span));
-        }
-    }
 
     /// The scopes in which a constraint name should be validated. If empty, doesn't check for name
     /// clashes in the validation phase.

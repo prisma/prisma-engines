@@ -1,5 +1,5 @@
 use crate::{
-    datamodel_connector::{walker_ext_traits::ScalarFieldWalkerExt, Connector},
+    datamodel_connector::{walker_ext_traits::ScalarFieldWalkerExt, Connector, NativeTypeInstance, RelationMode},
     diagnostics::Diagnostics,
     diagnostics::{DatamodelWarning, Span},
     parser_database::{
@@ -8,7 +8,11 @@ use crate::{
         ReferentialAction,
     },
 };
+use diagnostics::DatamodelError;
 use indoc::formatdoc;
+use parser_database::{walkers, ScalarType};
+
+use super::MySqlType;
 
 const LENGTH_GUIDE: &str = " Please use the `length` argument to the field in the index definition to allow this.";
 
@@ -127,5 +131,72 @@ pub(crate) fn uses_native_referential_action_set_default(
     if let Some(ReferentialAction::SetDefault) = field.explicit_on_update() {
         let span = get_span("onUpdate");
         diagnostics.push_warning(DatamodelWarning::new(warning_msg(), span));
+    }
+}
+
+pub(crate) fn validate_model(
+    connector: &dyn Connector,
+    model: walkers::ModelWalker<'_>,
+    relation_mode: RelationMode,
+    errors: &mut Diagnostics,
+) {
+    for index in model.indexes() {
+        field_types_can_be_used_in_an_index(connector, index, errors);
+    }
+
+    if let Some(pk) = model.primary_key() {
+        field_types_can_be_used_in_a_primary_key(connector, pk, errors);
+    }
+
+    if relation_mode.uses_foreign_keys() {
+        for field in model.relation_fields() {
+            uses_native_referential_action_set_default(connector, field, errors);
+        }
+    }
+}
+
+pub(crate) fn validate_enum(r#enum: walkers::EnumWalker<'_>, diagnostics: &mut Diagnostics) {
+    if let Some((_, span)) = r#enum.schema() {
+        diagnostics.push_error(DatamodelError::new_static(
+            "MySQL enums do not belong to a schema.",
+            span,
+        ));
+    }
+}
+
+pub(crate) fn validate_native_type_arguments(
+    connector: &dyn Connector,
+    native_type_instance: &NativeTypeInstance,
+    scalar_type: &ScalarType,
+    span: Span,
+    errors: &mut Diagnostics,
+) {
+    use MySqlType::*;
+    let native_type: &MySqlType = native_type_instance.downcast_ref();
+    let error = connector.native_instance_error(native_type_instance);
+
+    match native_type {
+        Decimal(Some((precision, scale))) if scale > precision => {
+            errors.push_error(error.new_scale_larger_than_precision_error(span))
+        }
+        Decimal(Some((precision, _))) if *precision > 65 => {
+            errors.push_error(error.new_argument_m_out_of_range_error("Precision can range from 1 to 65.", span))
+        }
+        Decimal(Some((_, scale))) if *scale > 30 => {
+            errors.push_error(error.new_argument_m_out_of_range_error("Scale can range from 0 to 30.", span))
+        }
+        Bit(length) if *length == 0 || *length > 64 => {
+            errors.push_error(error.new_argument_m_out_of_range_error("M can range from 1 to 64.", span))
+        }
+        Char(length) if *length > 255 => {
+            errors.push_error(error.new_argument_m_out_of_range_error("M can range from 0 to 255.", span))
+        }
+        VarChar(length) if *length > 65535 => {
+            errors.push_error(error.new_argument_m_out_of_range_error("M can range from 0 to 65,535.", span))
+        }
+        Bit(n) if *n > 1 && matches!(scalar_type, ScalarType::Boolean) => {
+            errors.push_error(error.new_argument_m_out_of_range_error("only Bit(1) can be used as Boolean.", span))
+        }
+        _ => (),
     }
 }

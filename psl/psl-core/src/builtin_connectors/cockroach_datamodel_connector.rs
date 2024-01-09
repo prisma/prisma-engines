@@ -1,20 +1,17 @@
 mod native_types;
-mod validations;
+pub(super) mod validations;
 
 pub use native_types::CockroachType;
 
 use crate::{
     datamodel_connector::{
         Connector, ConnectorCapabilities, ConnectorCapability, ConstraintScope, Flavour, NativeTypeConstructor,
-        NativeTypeInstance, RelationMode, StringFilter,
+        NativeTypeInstance, StringFilter,
     },
     diagnostics::{DatamodelError, Diagnostics},
     parser_database::{
-        self,
         ast::{self, SchemaPosition},
-        coerce,
-        walkers::ModelWalker,
-        IndexAlgorithm, ParserDatabase, ReferentialAction, ScalarType,
+        coerce, IndexAlgorithm, ParserDatabase, ReferentialAction, ScalarType,
     },
     PreviewFeature,
 };
@@ -166,65 +163,6 @@ impl Connector for CockroachDatamodelConnector {
 
     fn native_type_to_parts(&self, native_type: &NativeTypeInstance) -> (&'static str, Vec<String>) {
         native_type.downcast_ref::<CockroachType>().to_parts()
-    }
-
-    fn validate_native_type_arguments(
-        &self,
-        native_type_instance: &NativeTypeInstance,
-        _scalar_type: &ScalarType,
-        span: ast::Span,
-        errors: &mut Diagnostics,
-    ) {
-        let native_type: &CockroachType = native_type_instance.downcast_ref();
-        let error = self.native_instance_error(native_type_instance);
-
-        match native_type {
-            CockroachType::Decimal(Some((precision, scale))) if scale > precision => {
-                errors.push_error(error.new_scale_larger_than_precision_error(span))
-            }
-            CockroachType::Decimal(Some((prec, _))) if *prec > 1000 || *prec == 0 => {
-                errors.push_error(error.new_argument_m_out_of_range_error(
-                    "Precision must be positive with a maximum value of 1000.",
-                    span,
-                ))
-            }
-            CockroachType::Bit(Some(0)) | CockroachType::VarBit(Some(0)) => {
-                errors.push_error(error.new_argument_m_out_of_range_error("M must be a positive integer.", span))
-            }
-            CockroachType::Timestamp(Some(p))
-            | CockroachType::Timestamptz(Some(p))
-            | CockroachType::Time(Some(p))
-            | CockroachType::Timetz(Some(p))
-                if *p > 6 =>
-            {
-                errors.push_error(error.new_argument_m_out_of_range_error("M can range from 0 to 6.", span))
-            }
-            _ => (),
-        }
-    }
-
-    fn validate_model(&self, model: ModelWalker<'_>, _: RelationMode, diagnostics: &mut Diagnostics) {
-        validations::autoincrement_validations(model, diagnostics);
-
-        for index in model.indexes() {
-            validations::inverted_index_validations(index, diagnostics);
-        }
-    }
-
-    fn validate_scalar_field_unknown_default_functions(
-        &self,
-        db: &parser_database::ParserDatabase,
-        diagnostics: &mut Diagnostics,
-    ) {
-        for d in db.walk_scalar_field_defaults_with_unknown_function() {
-            let (func_name, args, span) = d.value().as_function().unwrap();
-            match func_name {
-                "sequence" => {
-                    SequenceFunction::validate(args, diagnostics);
-                }
-                _ => diagnostics.push_error(DatamodelError::new_default_unknown_function(func_name, span)),
-            }
-        }
     }
 
     fn constraint_violation_scopes(&self) -> &'static [ConstraintScope] {

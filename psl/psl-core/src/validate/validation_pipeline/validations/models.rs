@@ -1,6 +1,6 @@
 use super::database_name::validate_db_name;
 use crate::{
-    ast,
+    ast, builtin_connectors,
     datamodel_connector::{walker_ext_traits::*, ConnectorCapability},
     diagnostics::DatamodelError,
     parser_database::ast::{WithName, WithSpan},
@@ -246,7 +246,7 @@ pub(crate) fn primary_key_connector_specific(model: ModelWalker<'_>, ctx: &mut C
 }
 
 pub(super) fn connector_specific(model: ModelWalker<'_>, ctx: &mut Context<'_>) {
-    ctx.connector.validate_model(model, ctx.relation_mode, ctx.diagnostics)
+    builtin_connectors::validations::validate_model(ctx.connector, model, ctx.relation_mode, ctx.diagnostics)
 }
 
 pub(super) fn id_has_fields(model: ModelWalker<'_>, ctx: &mut Context<'_>) {

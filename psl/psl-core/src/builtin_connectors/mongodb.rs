@@ -1,5 +1,5 @@
 mod mongodb_types;
-mod validations;
+pub(super) mod validations;
 
 pub use mongodb_types::MongoDbType;
 
@@ -9,7 +9,7 @@ use crate::{
         NativeTypeInstance, RelationMode,
     },
     diagnostics::{Diagnostics, Span},
-    parser_database::{walkers::*, ReferentialAction, ScalarType},
+    parser_database::{ReferentialAction, ScalarType},
 };
 use enumflags2::BitFlags;
 use mongodb_types::*;
@@ -58,34 +58,6 @@ impl Connector for MongoDbDatamodelConnector {
 
     fn referential_actions(&self) -> BitFlags<ReferentialAction> {
         BitFlags::empty()
-    }
-
-    fn validate_model(&self, model: ModelWalker<'_>, _: RelationMode, errors: &mut Diagnostics) {
-        validations::id_must_be_defined(model, errors);
-
-        if let Some(pk) = model.primary_key() {
-            validations::id_field_must_have_a_correct_mapped_name(pk, errors);
-        }
-
-        for field in model.scalar_fields() {
-            validations::objectid_type_required_with_auto_attribute(field, errors);
-            validations::auto_attribute_must_be_an_id(field, errors);
-            validations::dbgenerated_attribute_is_not_allowed(field, errors);
-            validations::field_name_uses_valid_characters(field, errors);
-        }
-
-        for index in model.indexes() {
-            validations::index_is_not_defined_multiple_times_to_same_fields(index, errors);
-            validations::unique_cannot_be_defined_to_id_field(index, errors);
-        }
-    }
-
-    fn validate_relation_field(
-        &self,
-        field: crate::parser_database::walkers::RelationFieldWalker<'_>,
-        errors: &mut Diagnostics,
-    ) {
-        validations::relation_same_native_type(field, errors);
     }
 
     fn available_native_type_constructors(&self) -> &'static [NativeTypeConstructor] {

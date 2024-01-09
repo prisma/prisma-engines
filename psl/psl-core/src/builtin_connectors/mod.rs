@@ -14,6 +14,7 @@ mod native_type_definition;
 mod postgres_datamodel_connector;
 mod sqlite_datamodel_connector;
 mod utils;
+pub(crate) mod validations;
 
 use crate::{datamodel_connector::Connector, ConnectorRegistry};
 

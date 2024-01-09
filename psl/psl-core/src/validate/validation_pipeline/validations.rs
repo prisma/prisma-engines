@@ -13,6 +13,8 @@ mod relation_fields;
 mod relations;
 mod views;
 
+use crate::builtin_connectors;
+
 use super::context::Context;
 use names::Names;
 use parser_database::walkers::RefinedRelationWalker;
@@ -34,8 +36,11 @@ pub(super) fn validate(ctx: &mut Context<'_>) {
         }
     }
 
-    ctx.connector
-        .validate_scalar_field_unknown_default_functions(ctx.db, ctx.diagnostics);
+    builtin_connectors::validations::validate_scalar_field_unknown_default_functions(
+        ctx.connector,
+        ctx.db,
+        ctx.diagnostics,
+    );
 
     if let Some(ds) = ctx.datasource {
         datasource::schemas_property_without_preview_feature(ds, ctx);
@@ -145,7 +150,7 @@ pub(super) fn validate(ctx: &mut Context<'_>) {
         enums::schema_attribute_supported_in_connector(r#enum, ctx);
         enums::schema_attribute_missing(r#enum, ctx);
 
-        ctx.connector.validate_enum(r#enum, ctx.diagnostics);
+        builtin_connectors::validations::validate_enum(ctx.connector, r#enum, ctx.diagnostics);
     }
 
     for relation in ctx.db.walk_relations() {

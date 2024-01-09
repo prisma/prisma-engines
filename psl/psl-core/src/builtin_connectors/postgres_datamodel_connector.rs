@@ -1,6 +1,6 @@
 mod datasource;
 mod native_types;
-mod validations;
+pub(super) mod validations;
 
 pub use native_types::PostgresType;
 
@@ -350,44 +350,6 @@ impl Connector for PostgresDatamodelConnector {
         SCALAR_TYPE_DEFAULTS
             .iter()
             .any(|(st, nt)| scalar_type == st && native_type == nt)
-    }
-
-    fn validate_native_type_arguments(
-        &self,
-        native_type_instance: &NativeTypeInstance,
-        _scalar_type: &ScalarType,
-        span: ast::Span,
-        errors: &mut Diagnostics,
-    ) {
-        let native_type: &PostgresType = native_type_instance.downcast_ref();
-        let error = self.native_instance_error(native_type_instance);
-
-        match native_type {
-            Decimal(Some((precision, scale))) if scale > precision => {
-                errors.push_error(error.new_scale_larger_than_precision_error(span))
-            }
-            Decimal(Some((prec, _))) if *prec > 1000 || *prec == 0 => {
-                errors.push_error(error.new_argument_m_out_of_range_error(
-                    "Precision must be positive with a maximum value of 1000.",
-                    span,
-                ))
-            }
-            Bit(Some(0)) | VarBit(Some(0)) => {
-                errors.push_error(error.new_argument_m_out_of_range_error("M must be a positive integer.", span))
-            }
-            Timestamp(Some(p)) | Timestamptz(Some(p)) | Time(Some(p)) | Timetz(Some(p)) if *p > 6 => {
-                errors.push_error(error.new_argument_m_out_of_range_error("M can range from 0 to 6.", span))
-            }
-            _ => (),
-        }
-    }
-
-    fn validate_model(&self, model: walkers::ModelWalker<'_>, _: RelationMode, errors: &mut Diagnostics) {
-        for index in model.indexes() {
-            validations::compatible_native_types(index, self, errors);
-            validations::generalized_index_validations(index, self, errors);
-            validations::spgist_indexed_column_count(index, errors);
-        }
     }
 
     fn validate_datasource(

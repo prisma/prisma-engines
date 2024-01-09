@@ -4,7 +4,10 @@ use super::{
     default_value,
     names::{NameTaken, Names},
 };
-use crate::datamodel_connector::{walker_ext_traits::*, ConnectorCapability};
+use crate::{
+    builtin_connectors,
+    datamodel_connector::{walker_ext_traits::*, ConnectorCapability},
+};
 use crate::{diagnostics::DatamodelError, validate::validation_pipeline::context::Context};
 use parser_database::{
     ast::{self, WithSpan},
@@ -214,8 +217,13 @@ pub(super) fn validate_native_type_arguments<'db>(field: impl Into<TypedFieldWal
     }
 
     if let Some(native_type) = ctx.connector.parse_native_type(type_name, args, span, ctx.diagnostics) {
-        ctx.connector
-            .validate_native_type_arguments(&native_type, &scalar_type, span, ctx.diagnostics);
+        builtin_connectors::validations::validate_native_type_arguments(
+            ctx.connector,
+            &native_type,
+            &scalar_type,
+            span,
+            ctx.diagnostics,
+        );
     }
 }
 
