@@ -1,7 +1,8 @@
 use indoc::formatdoc;
+use psl_core::datamodel_connector::RelationMode;
 use psl_core::diagnostics::{DatamodelWarning, Span};
 use psl_core::parser_database::ast::WithSpan;
-use psl_core::parser_database::ReferentialAction;
+use psl_core::parser_database::{walkers, ReferentialAction};
 use psl_core::{
     datamodel_connector::{walker_ext_traits::ScalarFieldWalkerExt, Connector},
     diagnostics::Diagnostics,
@@ -125,5 +126,26 @@ pub(crate) fn uses_native_referential_action_set_default(
     if let Some(ReferentialAction::SetDefault) = field.explicit_on_update() {
         let span = get_span("onUpdate");
         diagnostics.push_warning(DatamodelWarning::new(warning_msg(), span));
+    }
+}
+
+pub(crate) fn validate_model(
+    connector: &dyn Connector,
+    model: walkers::ModelWalker<'_>,
+    relation_mode: RelationMode,
+    errors: &mut Diagnostics,
+) {
+    for index in model.indexes() {
+        field_types_can_be_used_in_an_index(connector, index, errors);
+    }
+
+    if let Some(pk) = model.primary_key() {
+        field_types_can_be_used_in_a_primary_key(connector, pk, errors);
+    }
+
+    if relation_mode.uses_foreign_keys() {
+        for field in model.relation_fields() {
+            uses_native_referential_action_set_default(connector, field, errors);
+        }
     }
 }
