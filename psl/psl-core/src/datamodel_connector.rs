@@ -24,7 +24,7 @@ pub use self::{
     relation_mode::RelationMode,
 };
 
-use crate::{configuration::DatasourceConnectorData, Configuration, Datasource, PreviewFeature};
+use crate::{configuration::DatasourceConnectorData, Configuration};
 use chrono::{DateTime, FixedOffset};
 use diagnostics::{Diagnostics, NativeTypeErrorFactory, Span};
 use enumflags2::BitFlags;
@@ -153,8 +153,6 @@ pub trait Connector: Send + Sync {
             _ => panic!("Unexpected scalar input object name for string filters: `{input_object_name}`"),
         }
     }
-
-    fn validate_datasource(&self, _: BitFlags<PreviewFeature>, _: &Datasource, _: &mut Diagnostics) {}
 
     /// The scopes in which a constraint name should be validated. If empty, doesn't check for name
     /// clashes in the validation phase.

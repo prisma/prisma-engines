@@ -3,7 +3,7 @@ use crate::{
     datamodel_connector::{walker_ext_traits::*, Connector, NativeTypeInstance},
     diagnostics::{DatamodelError, Diagnostics},
     parser_database::{ast::WithSpan, walkers::IndexWalker, IndexAlgorithm, OperatorClass},
-    PreviewFeature,
+    Datasource, PreviewFeature,
 };
 use enumflags2::BitFlags;
 use parser_database::walkers;
@@ -527,7 +527,7 @@ pub(crate) fn validate_model(connector: &dyn Connector, model: walkers::ModelWal
     }
 }
 
-pub fn validate_native_type_arguments(
+pub(crate) fn validate_native_type_arguments(
     connector: &dyn Connector,
     native_type_instance: &NativeTypeInstance,
     span: ast::Span,
@@ -551,5 +551,16 @@ pub fn validate_native_type_arguments(
             errors.push_error(error.new_argument_m_out_of_range_error("M can range from 0 to 6.", span))
         }
         _ => (),
+    }
+}
+
+pub(crate) fn validate_datasource(
+    preview_features: BitFlags<PreviewFeature>,
+    ds: &Datasource,
+    errors: &mut Diagnostics,
+) {
+    if let Some(props) = ds.downcast_connector_data::<PostgresDatasourceProperties>() {
+        extensions_preview_flag_must_be_set(preview_features, props, errors);
+        extension_names_follow_prisma_syntax_rules(preview_features, props, errors);
     }
 }

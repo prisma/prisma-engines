@@ -45,8 +45,7 @@ pub(super) fn validate(ctx: &mut Context<'_>) {
     if let Some(ds) = ctx.datasource {
         datasource::schemas_property_without_preview_feature(ds, ctx);
         datasource::schemas_property_with_no_connector_support(ds, ctx);
-        ctx.connector
-            .validate_datasource(ctx.preview_features, ds, ctx.diagnostics);
+        builtin_connectors::validations::validate_datasource(ctx.connector, ctx.preview_features, ds, ctx.diagnostics);
     }
 
     // Model validations

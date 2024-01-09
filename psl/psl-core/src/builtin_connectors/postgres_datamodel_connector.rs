@@ -11,7 +11,7 @@ use crate::{
     },
     diagnostics::Diagnostics,
     parser_database::{ast, walkers, IndexAlgorithm, OperatorClass, ParserDatabase, ReferentialAction, ScalarType},
-    Configuration, Datasource, DatasourceConnectorData, PreviewFeature,
+    Configuration, DatasourceConnectorData, PreviewFeature,
 };
 use chrono::*;
 use enumflags2::BitFlags;
@@ -350,18 +350,6 @@ impl Connector for PostgresDatamodelConnector {
         SCALAR_TYPE_DEFAULTS
             .iter()
             .any(|(st, nt)| scalar_type == st && native_type == nt)
-    }
-
-    fn validate_datasource(
-        &self,
-        preview_features: BitFlags<PreviewFeature>,
-        ds: &Datasource,
-        errors: &mut Diagnostics,
-    ) {
-        if let Some(props) = ds.downcast_connector_data::<PostgresDatasourceProperties>() {
-            validations::extensions_preview_flag_must_be_set(preview_features, props, errors);
-            validations::extension_names_follow_prisma_syntax_rules(preview_features, props, errors);
-        }
     }
 
     fn constraint_violation_scopes(&self) -> &'static [ConstraintScope] {
