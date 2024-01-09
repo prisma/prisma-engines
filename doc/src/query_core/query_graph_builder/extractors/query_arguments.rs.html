@@ -348,6 +348,11 @@
 <a href="#348" id="348">348</a>
 <a href="#349" id="349">349</a>
 <a href="#350" id="350">350</a>
+<a href="#351" id="351">351</a>
+<a href="#352" id="352">352</a>
+<a href="#353" id="353">353</a>
+<a href="#354" id="354">354</a>
+<a href="#355" id="355">355</a>
 </pre></div><pre class="rust"><code><span class="kw">use super</span>::<span class="kw-2">*</span>;
 <span class="kw">use crate</span>::{
     query_document::{ParsedArgument, ParsedInputMap},
@@ -403,6 +408,11 @@
                         <span class="prelude-val">None </span>=&gt; <span class="prelude-val">Ok</span>(result),
                     }
                 }
+
+                args::RELATION_LOAD_STRATEGY =&gt; <span class="prelude-val">Ok</span>(QueryArguments {
+                    relation_load_strategy: <span class="prelude-val">Some</span>(arg.value.try_into()<span class="question-mark">?</span>),
+                    ..result
+                }),
 
                 <span class="kw">_ </span>=&gt; <span class="prelude-val">Ok</span>(result),
             }

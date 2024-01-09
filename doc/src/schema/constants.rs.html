@@ -166,9 +166,16 @@
 <a href="#166" id="166">166</a>
 <a href="#167" id="167">167</a>
 <a href="#168" id="168">168</a>
+<a href="#169" id="169">169</a>
+<a href="#170" id="170">170</a>
+<a href="#171" id="171">171</a>
+<a href="#172" id="172">172</a>
+<a href="#173" id="173">173</a>
+<a href="#174" id="174">174</a>
 </pre></div><pre class="rust"><code><span class="kw">pub mod </span>args {
     <span class="kw">pub const </span>WHERE: <span class="kw-2">&amp;</span>str = <span class="string">&quot;where&quot;</span>;
     <span class="kw">pub const </span>DATA: <span class="kw-2">&amp;</span>str = <span class="string">&quot;data&quot;</span>;
+    <span class="kw">pub const </span>RELATION_LOAD_STRATEGY: <span class="kw-2">&amp;</span>str = <span class="string">&quot;relationLoadStrategy&quot;</span>;
 
     <span class="comment">// upsert args
     </span><span class="kw">pub const </span>CREATE: <span class="kw-2">&amp;</span>str = <span class="string">&quot;create&quot;</span>;
@@ -334,4 +341,9 @@
 }
 
 <span class="kw">pub mod </span>deprecation {}
+
+<span class="kw">pub mod </span>load_strategy {
+    <span class="kw">pub const </span>JOIN: <span class="kw-2">&amp;</span>str = <span class="string">&quot;join&quot;</span>;
+    <span class="kw">pub const </span>QUERY: <span class="kw-2">&amp;</span>str = <span class="string">&quot;query&quot;</span>;
+}
 </code></pre></div></section></main></body></html>

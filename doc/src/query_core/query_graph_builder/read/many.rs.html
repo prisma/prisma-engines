@@ -61,6 +61,7 @@
 <a href="#61" id="61">61</a>
 <a href="#62" id="62">62</a>
 <a href="#63" id="63">63</a>
+<a href="#64" id="64">64</a>
 </pre></div><pre class="rust"><code><span class="kw">use super</span>::{utils::get_relation_load_strategy, <span class="kw-2">*</span>};
 <span class="kw">use crate</span>::{query_document::ParsedField, ManyRecordsQuery, QueryOption, QueryOptions, ReadQuery};
 <span class="kw">use </span>query_structure::Model;
@@ -104,6 +105,7 @@
     <span class="kw">let </span>selected_fields = utils::merge_cursor_fields(selected_fields, <span class="kw-2">&amp;</span>args.cursor);
 
     <span class="kw">let </span>relation_load_strategy = get_relation_load_strategy(
+        args.relation_load_strategy,
         args.cursor.as_ref(),
         args.distinct.as_ref(),
         <span class="kw-2">&amp;</span>nested,

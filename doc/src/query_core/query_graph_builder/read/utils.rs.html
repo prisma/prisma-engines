@@ -264,6 +264,8 @@
 <a href="#264" id="264">264</a>
 <a href="#265" id="265">265</a>
 <a href="#266" id="266">266</a>
+<a href="#267" id="267">267</a>
+<a href="#268" id="268">268</a>
 </pre></div><pre class="rust"><code><span class="kw">use super</span>::<span class="kw-2">*</span>;
 <span class="kw">use crate</span>::{ArgumentListLookup, FieldPair, ParsedField, ReadQuery};
 <span class="kw">use </span>connector::RelAggregationSelection;
@@ -509,6 +511,7 @@
 }
 
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>get_relation_load_strategy(
+    requested_strategy: <span class="prelude-ty">Option</span>&lt;RelationLoadStrategy&gt;,
     cursor: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>SelectionResult&gt;,
     distinct: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>FieldSelection&gt;,
     nested_queries: <span class="kw-2">&amp;</span>[ReadQuery],
@@ -524,6 +527,7 @@
             ReadQuery::RelatedRecordsQuery(q) =&gt; q.has_cursor() || q.has_distinct() || q.has_aggregation_selections(),
             <span class="kw">_ </span>=&gt; <span class="bool-val">false</span>,
         })
+        &amp;&amp; requested_strategy != <span class="prelude-val">Some</span>(RelationLoadStrategy::Query)
     {
         RelationLoadStrategy::Join
     } <span class="kw">else </span>{

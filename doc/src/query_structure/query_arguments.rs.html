@@ -271,6 +271,10 @@
 <a href="#271" id="271">271</a>
 <a href="#272" id="272">272</a>
 <a href="#273" id="273">273</a>
+<a href="#274" id="274">274</a>
+<a href="#275" id="275">275</a>
+<a href="#276" id="276">276</a>
+<a href="#277" id="277">277</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>psl::{datamodel_connector::ConnectorCapability, PreviewFeature};
 
 <span class="kw">use crate</span>::<span class="kw-2">*</span>;
@@ -298,6 +302,7 @@
     <span class="kw">pub </span>distinct: <span class="prelude-ty">Option</span>&lt;FieldSelection&gt;,
     <span class="kw">pub </span>ignore_skip: bool,
     <span class="kw">pub </span>ignore_take: bool,
+    <span class="kw">pub </span>relation_load_strategy: <span class="prelude-ty">Option</span>&lt;RelationLoadStrategy&gt;,
 }
 
 <span class="attr">#[derive(Debug, Copy, Clone, PartialEq, Eq, Hash)]
@@ -339,6 +344,7 @@
             distinct: <span class="prelude-val">None</span>,
             ignore_take: <span class="bool-val">false</span>,
             ignore_skip: <span class="bool-val">false</span>,
+            relation_load_strategy: <span class="prelude-val">None</span>,
         }
     }
 
@@ -508,6 +514,7 @@
                 <span class="kw">let </span>distinct = <span class="self">self</span>.distinct;
                 <span class="kw">let </span>ignore_skip = <span class="self">self</span>.ignore_skip;
                 <span class="kw">let </span>ignore_take = <span class="self">self</span>.ignore_take;
+                <span class="kw">let </span>relation_load_strategy = <span class="self">self</span>.relation_load_strategy;
 
                 filter
                     .batched(chunk_size)
@@ -522,6 +529,7 @@
                         distinct: distinct.clone(),
                         ignore_skip,
                         ignore_take,
+                        relation_load_strategy,
                     })
                     .collect()
             }

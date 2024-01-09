@@ -203,6 +203,7 @@ var srcIndex = JSON.parse('{\
 "parking_lot_core":["",[["thread_parker",[],["linux.rs","mod.rs"]]],["lib.rs","parking_lot.rs","spinwait.rs","util.rs","word_lock.rs"]],\
 "parse_hyperlinks":["",[["parser",[],["asciidoc.rs","html.rs","markdown.rs","mod.rs","parse.rs","restructured_text.rs","wikitext.rs"]]],["iterator.rs","lib.rs","renderer.rs"]],\
 "parser_database":["",[["attributes",[],["default.rs","id.rs","map.rs","native_types.rs","schema.rs"]],["context",[],["attributes.rs"]],["names",[],["reserved_model_names.rs"]],["types",[],["index_fields.rs"]],["walkers",[["model",[],["primary_key.rs","unique_criteria.rs"]],["relation",[["inline",[],["complete.rs"]]],["implicit_many_to_many.rs","inline.rs","two_way_embedded_many_to_many.rs"]]],["composite_type.rs","enum.rs","field.rs","index.rs","model.rs","relation.rs","relation_field.rs","scalar_field.rs"]]],["attributes.rs","coerce_expression.rs","context.rs","interner.rs","lib.rs","names.rs","relations.rs","types.rs","walkers.rs"]],\
+"paste":["",[],["attr.rs","error.rs","lib.rs","segment.rs"]],\
 "pbkdf2":["",[],["lib.rs"]],\
 "pem":["",[],["errors.rs","lib.rs","parser.rs"]],\
 "percent_encoding":["",[],["lib.rs"]],\
