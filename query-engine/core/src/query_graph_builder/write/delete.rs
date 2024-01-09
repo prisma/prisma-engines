@@ -32,12 +32,7 @@ pub(crate) fn delete_record(
         for relation_field in relation_fields {
             let parent_relation_field = relation_field.related_field();
             let linking_fields = parent_relation_field.linking_fields();
-            println!(
-                "laplab: looking at relation field {:?},\ncorresponding parent field is {:?},\nfound linking fields {:?},\nselection before update: {:?}",
-                relation_field, parent_relation_field, linking_fields, selected_fields,
-            );
             selected_fields = selected_fields.merge(linking_fields);
-            println!("laplab: selection after update: {:?}", selected_fields);
         }
 
         let delete_query = Query::Write(WriteQuery::DeleteRecord(DeleteRecord {

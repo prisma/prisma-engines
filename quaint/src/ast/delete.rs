@@ -83,16 +83,14 @@ impl<'a> Delete<'a> {
     /// Sets the returned columns.
     ///
     /// ```rust
-    /// # use quaint::{ast::*, visitor::{Visitor, Postgres}};
+    /// # use quaint::{ast::*, visitor::{Visitor, Sqlite}};
     /// # fn main() -> Result<(), quaint::error::Error> {
-    /// let query = Insert::single_into("users");
-    /// let insert = Insert::from(query).returning(vec!["id"]);
-    /// let (sql, _) = Postgres::build(insert)?;
+    /// let query = Delete::from_table("users").returning(vec!["id"]);
+    /// let (sql, _) = Sqlite::build(query)?;
     ///
-    /// assert_eq!("INSERT INTO \"users\" DEFAULT VALUES RETURNING \"id\"", sql);
+    /// assert_eq!("DELETE FROM `users` RETURNING \"id\"", sql);
     /// # Ok(())
     /// # }
-    /// ```
     #[cfg(any(feature = "postgresql", feature = "mssql", feature = "sqlite"))]
     pub fn returning<K, I>(mut self, columns: I) -> Self
     where

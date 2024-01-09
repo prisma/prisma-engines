@@ -33,7 +33,7 @@ impl<'a> Postgres<'a> {
         }
     }
 
-    fn returning(&mut self, returning: Option<Vec<Column<'a>>>) -> visitor::Result {
+    fn visit_returning(&mut self, returning: Option<Vec<Column<'a>>>) -> visitor::Result {
         if let Some(returning) = returning {
             if !returning.is_empty() {
                 let values = returning.into_iter().map(|r| r.into()).collect();
@@ -339,7 +339,7 @@ impl<'a> Visitor<'a> for Postgres<'a> {
             None => (),
         }
 
-        self.returning(insert.returning)?;
+        self.visit_returning(insert.returning)?;
 
         if let Some(comment) = insert.comment {
             self.write(" ")?;
@@ -739,7 +739,7 @@ impl<'a> Visitor<'a> for Postgres<'a> {
             self.visit_conditions(conditions)?;
         }
 
-        self.returning(delete.returning)?;
+        self.visit_returning(delete.returning)?;
 
         if let Some(comment) = delete.comment {
             self.write(" ")?;
