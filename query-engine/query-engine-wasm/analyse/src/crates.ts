@@ -12,6 +12,30 @@ type ParsedTwiggyEntry = {
 }
 
 function parseEntry({ name, ...rest }: TwiggyEntry): ParsedTwiggyEntry | undefined {
+  const sections = [
+    'data',
+    'type',
+    'global',
+    'table',
+    'elem',
+    'memory',
+  ]
+  
+  if (
+    sections.some(section => name.startsWith(`${section}[`))
+  ) {
+    let sectionName = name.split('[')[0]
+    sectionName = `${sectionName}[..] 🧩`
+
+    return {
+      crate: sectionName,
+      original: {
+        name,
+        ...rest,
+      },
+    }
+  }
+  
   const prefixesToAvoid = [        
     // exported functions
     'queryengine_',
@@ -22,12 +46,6 @@ function parseEntry({ name, ...rest }: TwiggyEntry): ParsedTwiggyEntry | undefin
 
     // misc. noise
     '"function names"',
-    'data[',
-    'type[',
-    'global[',
-    'table[',
-    'elem[',
-    'memory[',
     'export ',
     'import ',
   ]
@@ -59,17 +77,15 @@ function parseEntry({ name, ...rest }: TwiggyEntry): ParsedTwiggyEntry | undefin
   name = match ? match[1] : name
 
   // extract the crate name, e.g., `psl_core`
-  let crateName = name.split('::')[0]
+  const crateName = name.split('::')[0]
 
-  const parsedTwiggyEntry: ParsedTwiggyEntry = {
+  return {
     crate: crateName,
     original: {
       name,
       ...rest,
     },
   }
-
-  return parsedTwiggyEntry
 }
 
 // print the twiggy data as a markdown table with columns:
