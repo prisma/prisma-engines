@@ -32,26 +32,23 @@ impl Connection {
         if let Some(version) = version {
             let cockroach_version_prefix = "CockroachDB CCL v";
 
-            let semver: Option<(u8, u8)> = version
-                .strip_prefix(cockroach_version_prefix)
-                .map(|v| {
-                    let semver_unparsed: String = v.chars().take_while(|&c| c.is_digit(10) || c == '.').collect();
+            let semver: Option<(u8, u8)> = version.strip_prefix(cockroach_version_prefix).and_then(|v| {
+                let semver_unparsed: String = v.chars().take_while(|&c| c.is_ascii_digit() || c == '.').collect();
 
-                    // we only consider the major and minor version, as the patch version is not interesting for us
-                    semver_unparsed.split_once('.').and_then(|(major, minor_and_patch)| {
-                        let major = major.parse::<u8>().ok();
+                // we only consider the major and minor version, as the patch version is not interesting for us
+                semver_unparsed.split_once('.').and_then(|(major, minor_and_patch)| {
+                    let major = major.parse::<u8>().ok();
 
-                        let minor = minor_and_patch
-                            .chars()
-                            .take_while(|&c| c != '.')
-                            .collect::<String>()
-                            .parse::<u8>()
-                            .ok();
+                    let minor = minor_and_patch
+                        .chars()
+                        .take_while(|&c| c != '.')
+                        .collect::<String>()
+                        .parse::<u8>()
+                        .ok();
 
-                        major.zip(minor)
-                    })
+                    major.zip(minor)
                 })
-                .flatten();
+            });
 
             match semver {
                 Some((major, minor)) if (major == 22 && minor >= 2) || major >= 23 => {
