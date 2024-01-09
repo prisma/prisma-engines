@@ -73,7 +73,7 @@ impl Connector for EmptyDatamodelConnector {
     }
 
     fn flavour(&self) -> Flavour {
-        unreachable!()
+        Flavour::Sqlite
     }
 }
 
