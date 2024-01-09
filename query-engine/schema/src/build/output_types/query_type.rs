@@ -39,7 +39,7 @@ fn find_unique_field(ctx: &QuerySchema, model: Model) -> OutputField<'_> {
 
     field(
         format!("findUnique{}", model.name()),
-        move || vec![arguments::where_unique_argument(ctx, cloned_model)],
+        move || arguments::find_unique_arguments(ctx, cloned_model),
         OutputType::object(objects::model::model_object_type(ctx, model)),
         Some(QueryInfo {
             model: Some(model_id),
@@ -56,7 +56,7 @@ fn find_unique_or_throw_field(ctx: &QuerySchema, model: Model) -> OutputField<'_
     let cloned_model = model.clone();
     field(
         format!("findUnique{}OrThrow", model.name()),
-        move || vec![arguments::where_unique_argument(ctx, cloned_model)],
+        move || arguments::find_unique_arguments(ctx, cloned_model),
         OutputType::object(objects::model::model_object_type(ctx, model)),
         Some(QueryInfo {
             model: Some(model_id),
@@ -73,7 +73,12 @@ fn find_first_field(ctx: &QuerySchema, model: Model) -> OutputField<'_> {
 
     field(
         field_name,
-        move || arguments::relation_to_many_selection_arguments(ctx, cloned_model, true),
+        move || {
+            arguments::ManyRecordsSelectionArgumentsBuilder::new(ctx, cloned_model)
+                .include_distinct()
+                .include_relation_load_strategy()
+                .build()
+        },
         OutputType::object(objects::model::model_object_type(ctx, model.clone())),
         Some(QueryInfo {
             model: Some(model.id),
@@ -92,7 +97,12 @@ fn find_first_or_throw_field(ctx: &QuerySchema, model: Model) -> OutputField<'_>
 
     field(
         field_name,
-        move || arguments::relation_to_many_selection_arguments(ctx, model, true),
+        move || {
+            arguments::ManyRecordsSelectionArgumentsBuilder::new(ctx, model)
+                .include_distinct()
+                .include_relation_load_strategy()
+                .build()
+        },
         OutputType::object(objects::model::model_object_type(ctx, cloned_model)),
         Some(QueryInfo {
             model: Some(model_id),
@@ -110,7 +120,12 @@ fn all_items_field(ctx: &QuerySchema, model: Model) -> OutputField<'_> {
 
     field(
         field_name,
-        move || arguments::relation_to_many_selection_arguments(ctx, model, true),
+        move || {
+            arguments::ManyRecordsSelectionArgumentsBuilder::new(ctx, model)
+                .include_distinct()
+                .include_relation_load_strategy()
+                .build()
+        },
         OutputType::list(InnerOutputType::Object(object_type)),
         Some(QueryInfo {
             model: Some(model_id),
@@ -125,7 +140,7 @@ fn plain_aggregation_field(ctx: &QuerySchema, model: Model) -> OutputField<'_> {
     let model_id = model.id;
     field(
         format!("aggregate{}", model.name()),
-        move || arguments::relation_to_many_selection_arguments(ctx, cloned_model, false),
+        move || arguments::ManyRecordsSelectionArgumentsBuilder::new(ctx, cloned_model).build(),
         OutputType::object(aggregation::plain::aggregation_object_type(ctx, model)),
         Some(QueryInfo {
             model: Some(model_id),

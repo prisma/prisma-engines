@@ -7,7 +7,7 @@
 use super::*;
 use bigdecimal::ToPrimitive;
 use chrono::prelude::*;
-use query_structure::{OrderBy, PrismaValue, ScalarFieldRef};
+use query_structure::{OrderBy, PrismaValue, RelationLoadStrategy, ScalarFieldRef};
 use std::convert::TryInto;
 use user_facing_errors::query_engine::validation::ValidationError;
 
@@ -209,6 +209,22 @@ impl<'a> TryFrom<ParsedInputValue<'a>> for bool {
             PrismaValue::Boolean(b) => Ok(b),
             v => Err(ValidationError::unexpected_runtime_error(format!(
                 "Attempted conversion of non-boolean Prisma value type ({v:?}) into bool failed."
+            ))),
+        }
+    }
+}
+
+impl<'a> TryFrom<ParsedInputValue<'a>> for RelationLoadStrategy {
+    type Error = ValidationError;
+
+    fn try_from(value: ParsedInputValue<'a>) -> QueryParserResult<RelationLoadStrategy> {
+        let prisma_value = PrismaValue::try_from(value)?;
+
+        match prisma_value {
+            PrismaValue::Enum(e) if e == load_strategy::JOIN => Ok(RelationLoadStrategy::Join),
+            PrismaValue::Enum(e) if e == load_strategy::QUERY => Ok(RelationLoadStrategy::Query),
+            v => Err(ValidationError::unexpected_runtime_error(format!(
+                "Attempted conversion of ParsedInputValue ({v:?}) into relation load strategy enum value failed."
             ))),
         }
     }

@@ -54,6 +54,11 @@ pub fn extract_query_args(
                     }
                 }
 
+                args::RELATION_LOAD_STRATEGY => Ok(QueryArguments {
+                    relation_load_strategy: Some(arg.value.try_into()?),
+                    ..result
+                }),
+
                 _ => Ok(result),
             }
         },

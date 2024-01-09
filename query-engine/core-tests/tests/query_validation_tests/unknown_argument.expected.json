@@ -44,6 +44,12 @@
           "UserScalarFieldEnum",
           "UserScalarFieldEnum[]"
         ]
+      },
+      {
+        "name": "relationLoadStrategy",
+        "typeNames": [
+          "RelationLoadStrategy"
+        ]
       }
     ],
     "selectionPath": [
