@@ -180,8 +180,6 @@ impl Runner {
             },
         };
 
-        // TODO laplab: For some reason, `debug` level does not display a message from here, I have
-        // no idea why.
         tracing::info!("Querying: {}", query);
 
         let handler = RequestHandler::new(&**executor, &self.query_schema, self.protocol);
