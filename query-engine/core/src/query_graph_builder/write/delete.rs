@@ -27,6 +27,11 @@ pub(crate) fn delete_record(
         let mut selected_fields = read::utils::collect_selected_scalars(&nested_fields, &model);
         let selection_order = read::utils::collect_selection_order(&nested_fields);
 
+        // Make sure to request all foreign key fields in addition to the fields selected by the user.
+        // This ensures that delete emulation below has all the data it needs, so that the "reload" node
+        // is not inserted between delete node and emulation subtree.
+        // NOTE: "Reload" node will always throw an error here because we just deleted the record
+        // it tries to fetch.
         let internal_model = &model.dm;
         let relation_fields = internal_model.fields_pointing_to_model(&model);
         for relation_field in relation_fields {
@@ -46,7 +51,7 @@ pub(crate) fn delete_record(
         }));
         let delete_node = graph.create_node(delete_query);
 
-        utils::insert_emulated_on_delete(graph, query_schema, &model, None, &delete_node)?;
+        utils::insert_emulated_on_delete(graph, query_schema, &model, &delete_node)?;
 
         graph.add_result_node(&delete_node);
     } else {
@@ -65,7 +70,8 @@ pub(crate) fn delete_record(
         let delete_node = graph.create_node(delete_query);
 
         // Ensure relevant relations are updated after delete.
-        utils::insert_emulated_on_delete(graph, query_schema, &model, Some(&read_node), &delete_node)?;
+        let dependencies = utils::insert_emulated_on_delete(graph, query_schema, &model, &read_node)?;
+        utils::create_execution_order_edges(graph, dependencies, delete_node)?;
 
         // If the read node did not find the row, we know for sure that the delete node also won't
         // find it because:
@@ -127,7 +133,8 @@ pub fn delete_many_records(
         let read_query = utils::read_ids_infallible(model.clone(), model_id.clone(), filter);
         let read_query_node = graph.create_node(read_query);
 
-        utils::insert_emulated_on_delete(graph, query_schema, &model, Some(&read_query_node), &delete_many_node)?;
+        let dependencies = utils::insert_emulated_on_delete(graph, query_schema, &model, &read_query_node)?;
+        utils::create_execution_order_edges(graph, dependencies, delete_many_node)?;
 
         graph.create_edge(
             &read_query_node,
