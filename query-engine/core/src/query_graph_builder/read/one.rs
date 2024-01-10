@@ -36,6 +36,12 @@ fn find_unique_with_options(
         None => None,
     };
 
+    let requested_rel_load_strategy = field
+        .arguments
+        .lookup(args::RELATION_LOAD_STRATEGY)
+        .map(|arg| arg.value.try_into())
+        .transpose()?;
+
     let name = field.name;
     let alias = field.alias;
     let model = model;
@@ -46,7 +52,15 @@ fn find_unique_with_options(
     let selected_fields = utils::collect_selected_fields(&nested_fields, None, &model, query_schema)?;
     let nested = utils::collect_nested_queries(nested_fields, &model, query_schema)?;
     let selected_fields = utils::merge_relation_selections(selected_fields, None, &nested);
-    let relation_load_strategy = get_relation_load_strategy(None, None, &nested, &aggregation_selections, query_schema);
+
+    let relation_load_strategy = get_relation_load_strategy(
+        requested_rel_load_strategy,
+        None,
+        None,
+        &nested,
+        &aggregation_selections,
+        query_schema,
+    );
 
     Ok(ReadQuery::RecordQuery(RecordQuery {
         name,
