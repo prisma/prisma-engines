@@ -16,7 +16,7 @@ pub(crate) fn group_by(mut field: ParsedField<'_>, model: Model) -> QueryGraphBu
         None => None,
     };
 
-    let args = extractors::extract_query_args(field.arguments, &model)?;
+    let args = extractors::extract_query_args(field.arguments, &model, None)?;
     let nested_fields = field.nested_fields.unwrap().fields;
     let selection_order = collect_selection_tree(&nested_fields);
 

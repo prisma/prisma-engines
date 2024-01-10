@@ -8,7 +8,7 @@ pub(crate) fn aggregate(field: ParsedField<'_>, model: Model) -> QueryGraphBuild
     let model = model;
     let nested_fields = field.nested_fields.unwrap().fields;
     let selection_order = collect_selection_tree(&nested_fields);
-    let args = extractors::extract_query_args(field.arguments, &model)?;
+    let args = extractors::extract_query_args(field.arguments, &model, None)?;
 
     // Reject any inmemory-requiring operation for aggregations, we don't have an in-memory aggregator yet.
     if args.requires_inmemory_processing() {

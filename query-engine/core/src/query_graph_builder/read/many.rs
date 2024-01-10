@@ -26,7 +26,7 @@ fn find_many_with_options(
     options: QueryOptions,
     query_schema: &QuerySchema,
 ) -> QueryGraphBuilderResult<ReadQuery> {
-    let args = extractors::extract_query_args(field.arguments, &model)?;
+    let args = extractors::extract_query_args(field.arguments, &model, None)?;
     let name = field.name;
     let alias = field.alias;
     let nested_fields = field.nested_fields.unwrap().fields;
