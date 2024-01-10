@@ -340,7 +340,7 @@ mod distinct {
                         { title }
                     }
                 }"),
-            Postgres(_) => r###"{"data":{"findManyUser":[{"id":1,"first_name":"Joe","posts":[]},{"id":4,"first_name":"Papa","posts":[{"title":"1"}]},{"id":3,"first_name":"Rocky","posts":[]},{"id":5,"first_name":"Troll","posts":[{"title":"2"},{"title":"3"}]}]}}"###,
+            Postgres(_) => r###"{"data":{"findManyUser":[{"id":1,"first_name":"Joe","posts":[{"title":"1"},{"title":"2"},{"title":"3"}]},{"id":4,"first_name":"Papa","posts":[{"title":"1"}]},{"id":3,"first_name":"Rocky","posts":[]},{"id":5,"first_name":"Troll","posts":[{"title":"2"},{"title":"3"}]}]}}"###,
             _ => r###"{"data":{"findManyUser":[{"id":1,"first_name":"Joe","posts":[{"title":"1"},{"title":"2"},{"title":"3"}]},{"id":4,"first_name":"Papa","posts":[{"title":"1"}]},{"id":3,"first_name":"Rocky","posts":[]},{"id":5,"first_name":"Troll","posts":[{"title":"2"},{"title":"3"}]}]}}"###
         );
 

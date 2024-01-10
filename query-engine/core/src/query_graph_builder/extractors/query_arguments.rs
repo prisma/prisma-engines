@@ -3,6 +3,8 @@ use crate::{
     query_document::{ParsedArgument, ParsedInputMap},
     QueryGraphBuilderError, QueryGraphBuilderResult,
 };
+
+use itertools::Itertools;
 use query_structure::{prelude::*, QueryArguments};
 use schema::constants::{aggregations, args, ordering};
 use std::convert::TryInto;
@@ -328,6 +330,7 @@ fn extract_compound_cursor_field(
 
 /// Runs final transformations on the QueryArguments.
 fn finalize_arguments(mut args: QueryArguments, model: &Model) -> QueryArguments {
+    dbg!(&args);
     // Check if the query requires an implicit ordering added to the arguments.
     // An implicit ordering is convenient for deterministic results for take and skip, for cursor it's _required_
     // as a cursor needs a direction to page. We simply take the primary identifier as a default order-by.
@@ -346,5 +349,34 @@ fn finalize_arguments(mut args: QueryArguments, model: &Model) -> QueryArguments
         args.order_by.extend(order_bys);
     }
 
-    args
+    // TODO(@druue): define when we need to do this
+    let add_relation_id = args.model.name() != "User";
+
+    let distinct = if add_relation_id {
+        let fs = if let Some(distinct) = &args.distinct {
+            // TODO(@druue): figure out how to only get the specific relation ids that are relevant for the query
+            // TODO(@druue): as this currently just pulls all of them
+            // ?(@druue): Is there a cleaner / more succinct way to do this?
+            let field_ids = args
+                .model()
+                .fields()
+                .relation()
+                .map(|r| r.linking_fields())
+                .collect_vec();
+
+            let fs = dbg!(query_structure::FieldSelection::union(field_ids));
+
+            Some(distinct.clone().merge(fs))
+        } else {
+            None
+        };
+
+        fs
+    } else {
+        args.distinct.clone()
+    };
+
+    dbg!(&distinct);
+
+    QueryArguments { distinct, ..args }
 }
