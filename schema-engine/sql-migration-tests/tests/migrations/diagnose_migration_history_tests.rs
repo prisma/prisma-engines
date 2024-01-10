@@ -569,7 +569,7 @@ fn diagnose_migrations_history_reports_migrations_failing_to_apply_cleanly(api: 
             assert!(
                 known_error.message.contains("yolo")
                     || known_error.message.contains("YOLO")
-                    || known_error.message.contains("(not available)")
+                    || known_error.message.contains("MISSING")
             );
         }
         _ => panic!("assertion failed"),

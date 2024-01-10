@@ -22,7 +22,7 @@ impl fmt::Display for DatabaseConstraint {
             }
             Self::Index(index) => write!(f, "constraint: `{index}`"),
             Self::ForeignKey => write!(f, "foreign key"),
-            Self::CannotParse => write!(f, "(not available)"),
+            Self::CannotParse => write!(f, "THIS SHOULD BE SOMETHING ELSE (mod.rs, DatabaseConstraint, parsing)"),
         }
     }
 }
