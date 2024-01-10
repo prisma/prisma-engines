@@ -329,9 +329,10 @@ mod distinct {
         // 3 => []
         // 5 => ["2", "3"]
 
-        match_connector_result!(
-            &runner,
-            indoc!("{
+        insta::assert_snapshot!(run_query!(
+                &runner,
+                indoc!(
+                    "{
                 findManyUser(
                     distinct: [first_name, last_name], orderBy: {first_name: asc})
                     {
@@ -339,9 +340,9 @@ mod distinct {
                         posts(distinct: [title], orderBy: { title: asc })
                         { title }
                     }
-                }"),
-            Postgres(_) => r###"{"data":{"findManyUser":[{"id":1,"first_name":"Joe","posts":[{"title":"1"},{"title":"2"},{"title":"3"}]},{"id":4,"first_name":"Papa","posts":[{"title":"1"}]},{"id":3,"first_name":"Rocky","posts":[]},{"id":5,"first_name":"Troll","posts":[{"title":"2"},{"title":"3"}]}]}}"###,
-            _ => r###"{"data":{"findManyUser":[{"id":1,"first_name":"Joe","posts":[{"title":"1"},{"title":"2"},{"title":"3"}]},{"id":4,"first_name":"Papa","posts":[{"title":"1"}]},{"id":3,"first_name":"Rocky","posts":[]},{"id":5,"first_name":"Troll","posts":[{"title":"2"},{"title":"3"}]}]}}"###
+                }")
+            ),
+            @r###"{"data":{"findManyUser":[{"id":1,"first_name":"Joe","posts":[{"title":"1"},{"title":"2"},{"title":"3"}]},{"id":4,"first_name":"Papa","posts":[{"title":"1"}]},{"id":3,"first_name":"Rocky","posts":[]},{"id":5,"first_name":"Troll","posts":[{"title":"2"},{"title":"3"}]}]}}"###
         );
 
         Ok(())
