@@ -404,3 +404,7 @@ qe-node-api: build target/debug/libquery_engine.node --profile=$(PROFILE)
 # otherwise macOS gatekeeper may kill the Node.js process when it tries to load the library
 	if [[ "$$(uname -sm)" == "Darwin arm64" ]]; then rm -f $@; fi
 	cp $< $@
+
+.PHONY: dbpush
+db-push:
+	cargo run -p test-cli schema-push --force dev_datamodel.prisma
