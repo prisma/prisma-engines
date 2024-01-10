@@ -352,7 +352,7 @@ fn finalize_arguments(mut args: QueryArguments, model: &Model, relation: Option<
         if let Some(relation) = relation {
             let relation = relation.related_field().linking_fields();
 
-            Some(relation.merge(distinct))
+            Some(distinct.merge(relation))
         } else {
             Some(distinct)
         }
