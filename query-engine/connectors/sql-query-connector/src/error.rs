@@ -68,11 +68,9 @@ impl From<quaint::error::Error> for RawError {
 
         match e.kind() {
             #[cfg(not(target_arch = "wasm32"))]
-            quaint::error::ErrorKind::Native(native_error_kind) => match native_error_kind {
-                NativeErrorKind::ConnectionClosed => Self::Native(NativeRawError::ConnectionClosed),
-                _ => default_value,
-            },
-
+            quaint::error::ErrorKind::Native(NativeErrorKind::ConnectionClosed) => {
+                Self::Native(NativeRawError::ConnectionClosed)
+            }
             quaint::error::ErrorKind::IncorrectNumberOfParameters { expected, actual } => {
                 Self::IncorrectNumberOfParameters {
                     expected: *expected,
