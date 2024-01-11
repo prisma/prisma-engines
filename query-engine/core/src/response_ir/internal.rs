@@ -7,7 +7,6 @@ use crate::{
 };
 use connector::{AggregationResult, RelAggregationResult, RelAggregationRow};
 use indexmap::IndexMap;
-use itertools::Itertools;
 use query_structure::{CompositeFieldRef, Field, PrismaValue, SelectionResult};
 use schema::{
     constants::{aggregations::*, output_fields::*},

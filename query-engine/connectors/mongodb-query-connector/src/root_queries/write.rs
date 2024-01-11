@@ -312,7 +312,7 @@ pub async fn delete_record<'conn>(
         cause: "Record to delete does not exist.".to_owned(),
     })?;
 
-    let meta_mapping = output_meta::from_selected_fields(&selected_fields, &[]);
+    let meta_mapping = output_meta::from_selected_fields(&selected_fields);
     let field_names: Vec<_> = selected_fields.db_names().collect();
     let record = document_to_record(document, &field_names, &meta_mapping)?;
     Ok(SingleRecord { record, field_names })

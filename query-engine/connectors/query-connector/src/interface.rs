@@ -176,6 +176,8 @@ pub enum AggregationResult {
     Max(ScalarFieldRef, PrismaValue),
 }
 
+////// Remove all of this:
+
 #[derive(Debug, Clone)]
 pub enum RelAggregationSelection {
     // Always a count(*) for now
@@ -217,6 +219,8 @@ impl RelAggregationSelection {
     }
 }
 
+//////////
+
 #[async_trait]
 pub trait ReadOperations {
     /// Gets a single record or `None` back from the database.
@@ -230,7 +234,6 @@ pub trait ReadOperations {
         model: &Model,
         filter: &Filter,
         selected_fields: &FieldSelection,
-        aggregation_selections: &[RelAggregationSelection],
         relation_load_strategy: RelationLoadStrategy,
         trace_id: Option<String>,
     ) -> crate::Result<Option<SingleRecord>>;
@@ -246,7 +249,6 @@ pub trait ReadOperations {
         model: &Model,
         query_arguments: QueryArguments,
         selected_fields: &FieldSelection,
-        aggregation_selections: &[RelAggregationSelection],
         relation_load_strategy: RelationLoadStrategy,
         trace_id: Option<String>,
     ) -> crate::Result<ManyRecords>;

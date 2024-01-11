@@ -1,6 +1,6 @@
 use crate::{DomainError, FieldSelection, PrismaValue, ScalarFieldRef, SelectedField};
 use itertools::Itertools;
-use std::convert::TryFrom;
+use std::{borrow::Cow, convert::TryFrom};
 
 /// Represents a set of results.
 #[derive(Default, Clone, PartialEq, Eq, Hash)]
@@ -61,7 +61,7 @@ impl SelectionResult {
         self.len() == 0
     }
 
-    pub fn db_names(&self) -> impl Iterator<Item = &str> + '_ {
+    pub fn db_names(&self) -> impl Iterator<Item = Cow<'_, str>> + '_ {
         self.pairs.iter().map(|(field, _)| field.db_name())
     }
 
@@ -95,6 +95,7 @@ impl SelectionResult {
                 SelectedField::Scalar(sf) => Some(sf.clone()),
                 SelectedField::Composite(_) => None,
                 SelectedField::Relation(_) => None,
+                SelectedField::Virtual(_) => None,
             })
             .collect();
 

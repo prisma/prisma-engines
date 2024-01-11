@@ -172,7 +172,7 @@ impl Record {
         let pairs: Vec<_> = extraction_selection
             .selections()
             .map(|selection| {
-                self.get_field_value(field_names, selection.db_name())
+                self.get_field_value(field_names, &selection.db_name())
                     .and_then(|val| Ok((selection.clone(), selection.coerce_value(val.clone())?)))
             })
             .collect::<crate::Result<Vec<_>>>()?;

@@ -6,8 +6,7 @@ use crate::{
 };
 use async_trait::async_trait;
 use connector_interface::{
-    Connection, ConnectionLike, ReadOperations, RelAggregationSelection, Transaction, UpdateType, WriteArgs,
-    WriteOperations,
+    Connection, ConnectionLike, ReadOperations, Transaction, UpdateType, WriteArgs, WriteOperations,
 };
 use mongodb::{ClientSession, Database};
 use query_structure::{prelude::*, RelationLoadStrategy, SelectionResult};
@@ -234,7 +233,6 @@ impl ReadOperations for MongoDbConnection {
         model: &Model,
         filter: &query_structure::Filter,
         selected_fields: &FieldSelection,
-        aggr_selections: &[RelAggregationSelection],
         _relation_load_strategy: RelationLoadStrategy,
         _trace_id: Option<String>,
     ) -> connector_interface::Result<Option<SingleRecord>> {
@@ -244,7 +242,6 @@ impl ReadOperations for MongoDbConnection {
             model,
             filter,
             selected_fields,
-            aggr_selections,
         ))
         .await
     }
@@ -254,7 +251,6 @@ impl ReadOperations for MongoDbConnection {
         model: &Model,
         query_arguments: query_structure::QueryArguments,
         selected_fields: &FieldSelection,
-        aggregation_selections: &[RelAggregationSelection],
         _relation_load_strategy: RelationLoadStrategy,
         _trace_id: Option<String>,
     ) -> connector_interface::Result<ManyRecords> {
@@ -264,7 +260,6 @@ impl ReadOperations for MongoDbConnection {
             model,
             query_arguments,
             selected_fields,
-            aggregation_selections,
         ))
         .await
     }
