@@ -16,6 +16,29 @@ pub struct Sqlite<'a> {
 }
 
 impl<'a> Sqlite<'a> {
+    fn returning(&mut self, returning: Option<Vec<Column<'a>>>) -> visitor::Result {
+        if let Some(returning) = returning {
+            if !returning.is_empty() {
+                let values_len = returning.len();
+                self.write(" RETURNING ")?;
+
+                for (i, column) in returning.into_iter().enumerate() {
+                    // Workaround for SQLite parsing bug
+                    // https://sqlite.org/forum/info/6c141f151fa5c444db257eb4d95c302b70bfe5515901cf987e83ed8ebd434c49?t=h
+                    self.surround_with_backticks(&column.name)?;
+                    self.write(" AS ")?;
+                    self.surround_with_backticks(&column.name)?;
+                    if i < (values_len - 1) {
+                        self.write(", ")?;
+                    }
+                }
+            }
+        }
+        Ok(())
+    }
+}
+
+impl<'a> Sqlite<'a> {
     fn visit_order_by(&mut self, direction: &str, value: Expression<'a>) -> visitor::Result {
         self.visit_expression(value)?;
         self.write(format!(" {direction}"))?;
@@ -198,22 +221,7 @@ impl<'a> Visitor<'a> for Sqlite<'a> {
             self.visit_upsert(update)?;
         }
 
-        if let Some(returning) = insert.returning {
-            if !returning.is_empty() {
-                let values_len = returning.len();
-                self.write(" RETURNING ")?;
-
-                for (i, column) in returning.into_iter().enumerate() {
-                    //yay https://sqlite.org/forum/info/6c141f151fa5c444db257eb4d95c302b70bfe5515901cf987e83ed8ebd434c49?t=h
-                    self.surround_with_backticks(&column.name)?;
-                    self.write(" AS ")?;
-                    self.surround_with_backticks(&column.name)?;
-                    if i < (values_len - 1) {
-                        self.write(", ")?;
-                    }
-                }
-            }
-        }
+        self.returning(insert.returning)?;
 
         if let Some(comment) = insert.comment {
             self.write("; ")?;
@@ -389,6 +397,25 @@ impl<'a> Visitor<'a> for Sqlite<'a> {
 
             Ok(())
         })?;
+
+        Ok(())
+    }
+
+    fn visit_delete(&mut self, delete: Delete<'a>) -> visitor::Result {
+        self.write("DELETE FROM ")?;
+        self.visit_table(delete.table, true)?;
+
+        if let Some(conditions) = delete.conditions {
+            self.write(" WHERE ")?;
+            self.visit_conditions(conditions)?;
+        }
+
+        self.returning(delete.returning)?;
+
+        if let Some(comment) = delete.comment {
+            self.write(" ")?;
+            self.visit_comment(comment)?;
+        }
 
         Ok(())
     }

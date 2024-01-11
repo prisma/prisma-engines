@@ -59,7 +59,8 @@ const CAPABILITIES: ConnectorCapabilities = enumflags2::make_bitflags!(Connector
     SupportsTxIsolationReadCommitted |
     SupportsTxIsolationRepeatableRead |
     SupportsTxIsolationSerializable |
-    RowIn
+    RowIn |
+    SupportsFiltersOnRelationsWithoutJoins
 });
 
 const CONSTRAINT_SCOPES: &[ConstraintScope] = &[ConstraintScope::GlobalForeignKey, ConstraintScope::ModelKeyIndex];

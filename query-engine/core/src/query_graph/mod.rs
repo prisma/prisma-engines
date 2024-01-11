@@ -889,8 +889,9 @@ impl QueryGraph {
                 continue;
             }
 
-            // No connector supports returning more than the primary identifier for a delete just yet.
-            if query.is_delete_one() {
+            // If the connector does not support returning more than the primary identifier for a delete,
+            // do not update the selection set.
+            if query.is_delete_one() && !capabilities.contains(ConnectorCapability::DeleteReturning) {
                 continue;
             }
 
