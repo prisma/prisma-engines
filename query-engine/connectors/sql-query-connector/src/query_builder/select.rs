@@ -406,7 +406,12 @@ fn m2m_join_alias_name(rf: &RelationField) -> String {
 fn json_agg() -> Function<'static> {
     coalesce(vec![
         json_array_agg(Column::from(JSON_AGG_IDENT)).into(),
-        Expression::from("[]".raw()),
+        Expression::from(Value::json(empty_json_array()).raw()),
     ])
     .alias(JSON_AGG_IDENT)
+}
+
+#[inline]
+fn empty_json_array() -> serde_json::Value {
+    serde_json::Value::Array(Vec::new())
 }

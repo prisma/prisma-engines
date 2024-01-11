@@ -121,6 +121,17 @@ pub(crate) fn coerce_json_scalar_to_pv(value: serde_json::Value, sf: &ScalarFiel
 
                 Ok(PrismaValue::Float(bd))
             }
+            TypeIdentifier::Boolean => {
+                let err =
+                    || build_conversion_error(sf, &format!("Number({n})"), &format!("{:?}", sf.type_identifier()));
+                let i = n.as_i64().ok_or_else(err)?;
+
+                match i {
+                    0 => Ok(PrismaValue::Boolean(false)),
+                    1 => Ok(PrismaValue::Boolean(true)),
+                    _ => Err(err()),
+                }
+            }
             _ => Err(build_conversion_error(
                 sf,
                 &format!("Number({n})"),
@@ -142,7 +153,7 @@ pub(crate) fn coerce_json_scalar_to_pv(value: serde_json::Value, sf: &ScalarFiel
 
                 Ok(PrismaValue::DateTime(res))
             }
-            TypeIdentifier::Decimal => {
+            TypeIdentifier::Decimal | TypeIdentifier::Float => {
                 let res = parse_decimal(&s).map_err(|err| {
                     build_conversion_error_with_reason(
                         sf,
@@ -163,8 +174,7 @@ pub(crate) fn coerce_json_scalar_to_pv(value: serde_json::Value, sf: &ScalarFiel
                 )
             })?)),
             TypeIdentifier::Bytes => {
-                // We skip the first two characters because there's the \x prefix.
-                let bytes = hex::decode(&s[2..]).map_err(|err| {
+                let bytes = decode_bytes(&s).map_err(|err| {
                     build_conversion_error_with_reason(
                         sf,
                         &format!("String({s})"),

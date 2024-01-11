@@ -27,6 +27,13 @@ impl<'a> Postgres<'a> {
 
                     Ok(())
                 }
+                (_, Some("BYTES") | Some("BYTEA")) => {
+                    self.write("ENCODE(")?;
+                    self.visit_expression(expr)?;
+                    self.write(", 'base64')")?;
+
+                    Ok(())
+                }
                 _ => self.visit_expression(expr),
             },
             _ => self.visit_expression(expr),

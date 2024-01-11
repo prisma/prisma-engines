@@ -1,6 +1,7 @@
 mod native_types;
 mod validations;
 
+use chrono::FixedOffset;
 pub use native_types::MySqlType;
 
 use super::completions;
@@ -60,7 +61,8 @@ const CAPABILITIES: ConnectorCapabilities = enumflags2::make_bitflags!(Connector
     SupportsTxIsolationRepeatableRead |
     SupportsTxIsolationSerializable |
     RowIn |
-    SupportsFiltersOnRelationsWithoutJoins
+    SupportsFiltersOnRelationsWithoutJoins |
+    LateralJoin
 });
 
 const CONSTRAINT_SCOPES: &[ConstraintScope] = &[ConstraintScope::GlobalForeignKey, ConstraintScope::ModelKeyIndex];
@@ -284,5 +286,27 @@ impl Connector for MySqlDatamodelConnector {
 
     fn flavour(&self) -> Flavour {
         Flavour::Mysql
+    }
+
+    fn parse_json_datetime(
+        &self,
+        str: &str,
+        nt: Option<NativeTypeInstance>,
+    ) -> chrono::ParseResult<chrono::DateTime<FixedOffset>> {
+        let native_type: Option<&MySqlType> = nt.as_ref().map(|nt| nt.downcast_ref());
+
+        match native_type {
+            Some(pt) => match pt {
+                Date => super::utils::common::parse_date(str),
+                Time(_) => super::utils::common::parse_time(str),
+                DateTime(_) => super::utils::mysql::parse_datetime(str),
+                Timestamp(_) => super::utils::mysql::parse_timestamp(str),
+                _ => unreachable!(),
+            },
+            None => self.parse_json_datetime(
+                str,
+                Some(self.default_native_type_for_scalar_type(&ScalarType::DateTime)),
+            ),
+        }
     }
 }

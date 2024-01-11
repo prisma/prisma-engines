@@ -247,9 +247,17 @@ pub(crate) fn get_relation_load_strategy(
     cursor: Option<&SelectionResult>,
     distinct: Option<&FieldSelection>,
     nested_queries: &[ReadQuery],
+    field_selection: &FieldSelection,
     aggregation_selections: &[RelAggregationSelection],
     query_schema: &QuerySchema,
 ) -> RelationLoadStrategy {
+    // MySQL does not support M2M ordering with lateral joins.
+    // We fallback to the query-based strategy when a m2m relation with ordering is present.
+    let supports_m2m_ordering = field_selection
+        .relations()
+        .any(|rf| rf.field.relation().is_many_to_many() && !rf.args.order_by.is_empty())
+        && query_schema.has_capability(ConnectorCapability::M2MLateralJoinOrdering);
+
     if query_schema.has_feature(PreviewFeature::RelationJoins)
         && query_schema.has_capability(ConnectorCapability::LateralJoin)
         && cursor.is_none()
@@ -259,6 +267,7 @@ pub(crate) fn get_relation_load_strategy(
             ReadQuery::RelatedRecordsQuery(q) => q.has_cursor() || q.has_distinct() || q.has_aggregation_selections(),
             _ => false,
         })
+        && supports_m2m_ordering
         && requested_strategy != Some(RelationLoadStrategy::Query)
     {
         RelationLoadStrategy::Join

@@ -155,15 +155,28 @@ impl ScalarField {
     }
 
     pub fn native_type(&self) -> Option<NativeTypeInstance> {
-        let (_, name, args, span) = match self.id {
+        let connector = self.dm.schema.connector;
+        let raw_nt = match self.id {
             ScalarFieldId::InModel(id) => self.dm.walk(id).raw_native_type(),
             ScalarFieldId::InCompositeType(id) => self.dm.walk(id).raw_native_type(),
-        }?;
-        let connector = self.dm.schema.connector;
+        };
+        let psl_nt = raw_nt
+            .and_then(|(_, name, args, span)| connector.parse_native_type(name, args, span, &mut Default::default()));
 
-        let nt = connector
-            .parse_native_type(name, args, span, &mut Default::default())
-            .unwrap();
+        let nt = match self.id {
+            ScalarFieldId::InModel(id) => psl_nt.or_else(|| {
+                self.dm
+                    .walk(id)
+                    .scalar_type()
+                    .map(|st| connector.default_native_type_for_scalar_type(&st))
+            }),
+            ScalarFieldId::InCompositeType(id) => psl_nt.or_else(|| {
+                self.dm
+                    .walk(id)
+                    .scalar_type()
+                    .map(|st| connector.default_native_type_for_scalar_type(&st))
+            }),
+        }?;
 
         Some(NativeTypeInstance {
             native_type: nt,

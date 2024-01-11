@@ -62,7 +62,8 @@ const CAPABILITIES: ConnectorCapabilities = enumflags2::make_bitflags!(Connector
     RowIn |
     LateralJoin |
     DeleteReturning |
-    SupportsFiltersOnRelationsWithoutJoins
+    SupportsFiltersOnRelationsWithoutJoins |
+    M2MLateralJoinOrdering
 });
 
 const SCALAR_TYPE_DEFAULTS: &[(ScalarType, CockroachType)] = &[
@@ -320,11 +321,11 @@ impl Connector for CockroachDatamodelConnector {
 
         match native_type {
             Some(ct) => match ct {
-                CockroachType::Timestamptz(_) => super::utils::parse_timestamptz(str),
-                CockroachType::Timestamp(_) => super::utils::parse_timestamp(str),
-                CockroachType::Date => super::utils::parse_date(str),
-                CockroachType::Time(_) => super::utils::parse_time(str),
-                CockroachType::Timetz(_) => super::utils::parse_timetz(str),
+                CockroachType::Timestamptz(_) => super::utils::postgres::parse_timestamptz(str),
+                CockroachType::Timestamp(_) => super::utils::postgres::parse_timestamp(str),
+                CockroachType::Date => super::utils::common::parse_date(str),
+                CockroachType::Time(_) => super::utils::common::parse_time(str),
+                CockroachType::Timetz(_) => super::utils::postgres::parse_timetz(str),
                 _ => unreachable!(),
             },
             None => self.parse_json_datetime(

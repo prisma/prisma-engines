@@ -70,7 +70,8 @@ const CAPABILITIES: ConnectorCapabilities = enumflags2::make_bitflags!(Connector
     DistinctOn |
     LateralJoin |
     DeleteReturning |
-    SupportsFiltersOnRelationsWithoutJoins
+    SupportsFiltersOnRelationsWithoutJoins |
+    M2MLateralJoinOrdering
 });
 
 pub struct PostgresDatamodelConnector;
@@ -580,11 +581,11 @@ impl Connector for PostgresDatamodelConnector {
 
         match native_type {
             Some(pt) => match pt {
-                Timestamptz(_) => super::utils::parse_timestamptz(str),
-                Timestamp(_) => super::utils::parse_timestamp(str),
-                Date => super::utils::parse_date(str),
-                Time(_) => super::utils::parse_time(str),
-                Timetz(_) => super::utils::parse_timetz(str),
+                Timestamptz(_) => super::utils::postgres::parse_timestamptz(str),
+                Timestamp(_) => super::utils::postgres::parse_timestamp(str),
+                Date => super::utils::common::parse_date(str),
+                Time(_) => super::utils::common::parse_time(str),
+                Timetz(_) => super::utils::postgres::parse_timetz(str),
                 _ => unreachable!(),
             },
             None => self.parse_json_datetime(

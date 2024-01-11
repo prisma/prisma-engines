@@ -58,6 +58,7 @@ fn find_unique_with_options(
         None,
         None,
         &nested,
+        &selected_fields,
         &aggregation_selections,
         query_schema,
     );

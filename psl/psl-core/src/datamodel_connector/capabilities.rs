@@ -108,6 +108,7 @@ capabilities!(
     LateralJoin,
     DeleteReturning, // Connector supports deleting records and returning them in one operation.
     SupportsFiltersOnRelationsWithoutJoins, // Connector supports rendering filters on relation fields without joins.
+    M2MLateralJoinOrdering
 );
 
 /// Contains all capabilities that the connector is able to serve.
