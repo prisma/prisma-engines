@@ -3,7 +3,6 @@ use crate::{
     error::DecorateErrorWithFieldInformationExtension, output_meta, query_builder::MongoReadQueryBuilder,
     query_strings::Find, vacuum_cursor, IntoBson,
 };
-use connector_interface::RelAggregationSelection;
 use mongodb::{bson::doc, options::FindOptions, ClientSession, Database};
 use query_structure::*;
 use tracing::{info_span, Instrument};
@@ -15,7 +14,6 @@ pub async fn get_single_record<'conn>(
     model: &Model,
     filter: &Filter,
     selected_fields: &FieldSelection,
-    aggregation_selections: &[RelAggregationSelection],
 ) -> crate::Result<Option<SingleRecord>> {
     let coll = database.collection(model.db_name());
 
@@ -25,11 +23,11 @@ pub async fn get_single_record<'conn>(
         "db.statement" = &format_args!("db.{}.findOne(*)", coll.name())
     );
 
-    let meta_mapping = output_meta::from_selected_fields(selected_fields, aggregation_selections);
+    let meta_mapping = output_meta::from_selected_fields(selected_fields);
     let query_arguments: QueryArguments = (model.clone(), filter.clone()).into();
     let query = MongoReadQueryBuilder::from_args(query_arguments)?
         .with_model_projection(selected_fields.clone())?
-        .with_aggregation_selections(aggregation_selections)?
+        .with_virtual_fields(selected_fields.virtuals())?
         .build()?;
 
     let docs = query.execute(coll, session).instrument(span).await?;
@@ -37,10 +35,7 @@ pub async fn get_single_record<'conn>(
     if docs.is_empty() {
         Ok(None)
     } else {
-        let field_names: Vec<_> = selected_fields
-            .db_names()
-            .chain(aggregation_selections.iter().map(|aggr_sel| aggr_sel.db_alias()))
-            .collect();
+        let field_names: Vec<_> = selected_fields.db_names().collect();
         let doc = docs.into_iter().next().unwrap();
         let record = document_to_record(doc, &field_names, &meta_mapping)?;
 
@@ -61,7 +56,6 @@ pub async fn get_many_records<'conn>(
     model: &Model,
     query_arguments: QueryArguments,
     selected_fields: &FieldSelection,
-    aggregation_selections: &[RelAggregationSelection],
 ) -> crate::Result<ManyRecords> {
     let coll = database.collection(model.db_name());
 
@@ -72,12 +66,9 @@ pub async fn get_many_records<'conn>(
     );
 
     let reverse_order = query_arguments.take.map(|t| t < 0).unwrap_or(false);
-    let field_names: Vec<_> = selected_fields
-        .db_names()
-        .chain(aggregation_selections.iter().map(|aggr_sel| aggr_sel.db_alias()))
-        .collect();
+    let field_names: Vec<_> = selected_fields.db_names().collect();
 
-    let meta_mapping = output_meta::from_selected_fields(selected_fields, aggregation_selections);
+    let meta_mapping = output_meta::from_selected_fields(selected_fields);
     let mut records = ManyRecords::new(field_names.clone());
 
     if let Some(0) = query_arguments.take {
@@ -86,7 +77,7 @@ pub async fn get_many_records<'conn>(
 
     let query = MongoReadQueryBuilder::from_args(query_arguments)?
         .with_model_projection(selected_fields.clone())?
-        .with_aggregation_selections(aggregation_selections)?
+        .with_virtual_fields(selected_fields.virtuals())?
         .build()?;
 
     let docs = query.execute(coll, session).instrument(span).await?;

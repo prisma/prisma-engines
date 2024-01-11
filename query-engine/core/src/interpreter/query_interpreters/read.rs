@@ -37,8 +37,7 @@ fn read_one(
             .get_single_record(
                 &model,
                 &filter,
-                &query.selected_fields,
-                &query.aggregation_selections,
+                &query.full_selection,
                 query.relation_load_strategy,
                 trace_id,
             )
@@ -47,8 +46,8 @@ fn read_one(
         match scalars {
             Some(record) if query.relation_load_strategy.is_query() => {
                 let scalars: ManyRecords = record.into();
-                let (scalars, aggregation_rows) =
-                    extract_aggregation_rows_from_scalars(scalars, query.aggregation_selections);
+                // let (scalars, aggregation_rows) =
+                //     extract_aggregation_rows_from_scalars(scalars, query.aggregation_selections);
                 let nested: Vec<QueryResult> = process_nested(tx, query.nested, Some(&scalars)).await?;
 
                 Ok(RecordSelection {
@@ -57,7 +56,7 @@ fn read_one(
                     scalars,
                     nested,
                     model,
-                    aggregation_rows,
+                    // aggregation_rows,
                 }
                 .into())
             }
@@ -69,7 +68,7 @@ fn read_one(
                     model,
                     fields: query.selection_order,
                     records,
-                    nested: build_relation_record_selection(query.selected_fields.relations()),
+                    nested: build_relation_record_selection(query.full_selection.relations()),
                 }
                 .into())
             }
@@ -82,7 +81,7 @@ fn read_one(
                 scalars: ManyRecords::default(),
                 nested: vec![],
                 model,
-                aggregation_rows: None,
+                // aggregation_rows: None,
             })))),
         }
     };
@@ -123,8 +122,8 @@ fn read_many_by_queries(
             .get_many_records(
                 &query.model,
                 query.args.clone(),
-                &query.selected_fields,
-                &query.aggregation_selections,
+                &query.full_selection,
+                // &query.aggregation_selections,
                 query.relation_load_strategy,
                 trace_id,
             )
@@ -136,7 +135,7 @@ fn read_many_by_queries(
             scalars
         };
 
-        let (scalars, aggregation_rows) = extract_aggregation_rows_from_scalars(scalars, query.aggregation_selections);
+        // let (scalars, aggregation_rows) = extract_aggregation_rows_from_scalars(scalars, query.aggregation_selections);
 
         if scalars.records.is_empty() && query.options.contains(QueryOption::ThrowOnEmpty) {
             record_not_found()
@@ -148,7 +147,7 @@ fn read_many_by_queries(
                 scalars,
                 nested,
                 model: query.model,
-                aggregation_rows,
+                // aggregation_rows,
             }
             .into())
         }
@@ -167,8 +166,8 @@ fn read_many_by_joins(
             .get_many_records(
                 &query.model,
                 query.args.clone(),
-                &query.selected_fields,
-                &query.aggregation_selections,
+                &query.full_selection,
+                // &query.aggregation_selections,
                 query.relation_load_strategy,
                 trace_id,
             )
@@ -181,7 +180,7 @@ fn read_many_by_joins(
                 name: query.name,
                 fields: query.selection_order,
                 records: result,
-                nested: build_relation_record_selection(query.selected_fields.relations()),
+                nested: build_relation_record_selection(query.full_selection.relations()),
                 model: query.model,
             }
             .into())
@@ -214,7 +213,7 @@ fn read_related<'conn>(
     let fut = async move {
         let relation = query.parent_field.relation();
 
-        let (scalars, aggregation_rows) = if relation.is_many_to_many() {
+        let scalars = if relation.is_many_to_many() {
             nested_read::m2m(tx, &mut query, parent_result, trace_id).await?
         } else {
             nested_read::one2m(
@@ -223,8 +222,8 @@ fn read_related<'conn>(
                 query.parent_results,
                 parent_result,
                 query.args.clone(),
-                &query.selected_fields,
-                query.aggregation_selections,
+                &query.full_selection,
+                // query.aggregation_selections,
                 trace_id,
             )
             .await?
@@ -238,7 +237,7 @@ fn read_related<'conn>(
             scalars,
             nested,
             model,
-            aggregation_rows,
+            // aggregation_rows,
         }
         .into())
     };
@@ -305,6 +304,7 @@ fn process_nested<'conn>(
 /// This means the SQL result we get back from the database contains additional aggregation data that needs to be remapped according to the schema
 /// This function takes care of removing the aggregation data from the database result and collects it separately
 /// so that it can be serialized separately later according to the schema
+// TODO: remove
 pub(crate) fn extract_aggregation_rows_from_scalars(
     mut scalars: ManyRecords,
     aggr_selections: Vec<RelAggregationSelection>,
