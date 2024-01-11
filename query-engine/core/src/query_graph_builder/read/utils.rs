@@ -253,10 +253,11 @@ pub(crate) fn get_relation_load_strategy(
 ) -> RelationLoadStrategy {
     // MySQL does not support M2M ordering with lateral joins.
     // We fallback to the query-based strategy when a m2m relation with ordering is present.
-    let supports_m2m_ordering = field_selection
+    let has_ordered_m2m = field_selection
         .relations()
-        .any(|rf| rf.field.relation().is_many_to_many() && !rf.args.order_by.is_empty())
-        && query_schema.has_capability(ConnectorCapability::M2MLateralJoinOrdering);
+        .any(|rf| rf.field.relation().is_many_to_many() && !rf.args.order_by.is_empty());
+    let can_order_m2m = query_schema.has_capability(ConnectorCapability::LateralJoinM2MOrdering);
+    let supports_m2m_ordering = !has_ordered_m2m || can_order_m2m;
 
     if query_schema.has_feature(PreviewFeature::RelationJoins)
         && query_schema.has_capability(ConnectorCapability::LateralJoin)
