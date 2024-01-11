@@ -182,16 +182,6 @@
 <a href="#182" id="182">182</a>
 <a href="#183" id="183">183</a>
 <a href="#184" id="184">184</a>
-<a href="#185" id="185">185</a>
-<a href="#186" id="186">186</a>
-<a href="#187" id="187">187</a>
-<a href="#188" id="188">188</a>
-<a href="#189" id="189">189</a>
-<a href="#190" id="190">190</a>
-<a href="#191" id="191">191</a>
-<a href="#192" id="192">192</a>
-<a href="#193" id="193">193</a>
-<a href="#194" id="194">194</a>
 </pre></div><pre class="rust"><code><span class="kw">use super</span>::<span class="kw-2">*</span>;
 <span class="kw">use crate</span>::{
     query_ast::<span class="kw-2">*</span>,
@@ -244,13 +234,9 @@
         <span class="kw">let </span>find_child_records_node =
             utils::insert_find_children_by_parent_node(graph, parent_node, parent_relation_field, or_filter)<span class="question-mark">?</span>;
 
-        utils::insert_emulated_on_delete(
-            graph,
-            query_schema,
-            child_model,
-            <span class="kw-2">&amp;</span>find_child_records_node,
-            <span class="kw-2">&amp;</span>delete_many_node,
-        )<span class="question-mark">?</span>;
+        <span class="kw">let </span>dependencies =
+            utils::insert_emulated_on_delete(graph, query_schema, child_model, <span class="kw-2">&amp;</span>find_child_records_node)<span class="question-mark">?</span>;
+        utils::create_execution_order_edges(graph, dependencies, delete_many_node)<span class="question-mark">?</span>;
 
         <span class="kw">let </span>relation_name = parent_relation_field.relation().name();
         <span class="kw">let </span>parent_name = parent_relation_field.model().name().to_owned();
@@ -295,17 +281,15 @@
                 utils::insert_find_children_by_parent_node(graph, parent_node, parent_relation_field, filter.clone())<span class="question-mark">?</span>;
 
             <span class="kw">let </span>delete_record_node = graph.create_node(Query::Write(WriteQuery::DeleteRecord(DeleteRecord {
+                name: String::new(),
                 model: child_model.clone(),
                 record_filter: <span class="prelude-val">Some</span>(filter.into()),
+                selected_fields: <span class="prelude-val">None</span>,
             })));
 
-            utils::insert_emulated_on_delete(
-                graph,
-                query_schema,
-                child_model,
-                <span class="kw-2">&amp;</span>find_child_records_node,
-                <span class="kw-2">&amp;</span>delete_record_node,
-            )<span class="question-mark">?</span>;
+            <span class="kw">let </span>dependencies =
+                utils::insert_emulated_on_delete(graph, query_schema, child_model, <span class="kw-2">&amp;</span>find_child_records_node)<span class="question-mark">?</span>;
+            utils::create_execution_order_edges(graph, dependencies, delete_record_node)<span class="question-mark">?</span>;
 
             <span class="kw">let </span>relation_name = parent_relation_field.relation().name();
             <span class="kw">let </span>child_model_name = child_model.name().to_owned();
@@ -360,13 +344,9 @@
         });
 
         <span class="kw">let </span>delete_many_node = graph.create_node(Query::Write(delete_many));
-        utils::insert_emulated_on_delete(
-            graph,
-            query_schema,
-            child_model,
-            <span class="kw-2">&amp;</span>find_child_records_node,
-            <span class="kw-2">&amp;</span>delete_many_node,
-        )<span class="question-mark">?</span>;
+        <span class="kw">let </span>dependencies =
+            utils::insert_emulated_on_delete(graph, query_schema, child_model, <span class="kw-2">&amp;</span>find_child_records_node)<span class="question-mark">?</span>;
+        utils::create_execution_order_edges(graph, dependencies, delete_many_node)<span class="question-mark">?</span>;
 
         graph.create_edge(
             <span class="kw-2">&amp;</span>find_child_records_node,

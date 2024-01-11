@@ -151,7 +151,7 @@
 <span class="attr">#[async_trait]
 </span><span class="kw">impl </span>Connector <span class="kw">for </span>Mysql {
     <span class="kw">async fn </span>get_connection&lt;<span class="lifetime">&#39;a</span>&gt;(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="self">self</span>) -&gt; connector::Result&lt;Box&lt;<span class="kw">dyn </span>Connection + Send + Sync + <span class="lifetime">&#39;static</span>&gt;&gt; {
-        catch(<span class="self">self</span>.connection_info.clone(), <span class="kw">async move </span>{
+        catch(<span class="kw-2">&amp;</span><span class="self">self</span>.connection_info, <span class="kw">async move </span>{
             <span class="kw">let </span>runtime_conn = <span class="self">self</span>.pool.check_out().<span class="kw">await</span><span class="question-mark">?</span>;
 
             <span class="comment">// Note: `runtime_conn` must be `Sized`, as that&#39;s required by `TransactionCapable`

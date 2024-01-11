@@ -266,6 +266,45 @@
 <a href="#266" id="266">266</a>
 <a href="#267" id="267">267</a>
 <a href="#268" id="268">268</a>
+<a href="#269" id="269">269</a>
+<a href="#270" id="270">270</a>
+<a href="#271" id="271">271</a>
+<a href="#272" id="272">272</a>
+<a href="#273" id="273">273</a>
+<a href="#274" id="274">274</a>
+<a href="#275" id="275">275</a>
+<a href="#276" id="276">276</a>
+<a href="#277" id="277">277</a>
+<a href="#278" id="278">278</a>
+<a href="#279" id="279">279</a>
+<a href="#280" id="280">280</a>
+<a href="#281" id="281">281</a>
+<a href="#282" id="282">282</a>
+<a href="#283" id="283">283</a>
+<a href="#284" id="284">284</a>
+<a href="#285" id="285">285</a>
+<a href="#286" id="286">286</a>
+<a href="#287" id="287">287</a>
+<a href="#288" id="288">288</a>
+<a href="#289" id="289">289</a>
+<a href="#290" id="290">290</a>
+<a href="#291" id="291">291</a>
+<a href="#292" id="292">292</a>
+<a href="#293" id="293">293</a>
+<a href="#294" id="294">294</a>
+<a href="#295" id="295">295</a>
+<a href="#296" id="296">296</a>
+<a href="#297" id="297">297</a>
+<a href="#298" id="298">298</a>
+<a href="#299" id="299">299</a>
+<a href="#300" id="300">300</a>
+<a href="#301" id="301">301</a>
+<a href="#302" id="302">302</a>
+<a href="#303" id="303">303</a>
+<a href="#304" id="304">304</a>
+<a href="#305" id="305">305</a>
+<a href="#306" id="306">306</a>
+<a href="#307" id="307">307</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span><span class="kw">super</span>::catch;
 <span class="kw">use crate</span>::{
     error::MongoError,
@@ -324,7 +363,7 @@
         </span>_selected_fields: FieldSelection,
         _trace_id: <span class="prelude-ty">Option</span>&lt;String&gt;,
     ) -&gt; connector_interface::Result&lt;SingleRecord&gt; {
-        catch(<span class="kw">async move </span>{ write::create_record(<span class="kw-2">&amp;</span><span class="self">self</span>.database, <span class="kw-2">&amp;mut </span><span class="self">self</span>.session, model, args).<span class="kw">await </span>}).<span class="kw">await
+        catch(write::create_record(<span class="kw-2">&amp;</span><span class="self">self</span>.database, <span class="kw-2">&amp;mut </span><span class="self">self</span>.session, model, args)).<span class="kw">await
     </span>}
 
     <span class="kw">async fn </span>create_records(
@@ -334,9 +373,13 @@
         skip_duplicates: bool,
         _trace_id: <span class="prelude-ty">Option</span>&lt;String&gt;,
     ) -&gt; connector_interface::Result&lt;usize&gt; {
-        catch(
-            <span class="kw">async move </span>{ write::create_records(<span class="kw-2">&amp;</span><span class="self">self</span>.database, <span class="kw-2">&amp;mut </span><span class="self">self</span>.session, model, args, skip_duplicates).<span class="kw">await </span>},
-        )
+        catch(write::create_records(
+            <span class="kw-2">&amp;</span><span class="self">self</span>.database,
+            <span class="kw-2">&amp;mut </span><span class="self">self</span>.session,
+            model,
+            args,
+            skip_duplicates,
+        ))
         .<span class="kw">await
     </span>}
 
@@ -382,7 +425,8 @@
             )
             .<span class="kw">await</span><span class="question-mark">?</span>;
 
-            <span class="kw">let </span>record = result.into_iter().next().map(|id| SingleRecord {
+            <span class="comment">// NOTE: Atomic updates are not yet implemented for MongoDB, so we only return ids.
+            </span><span class="kw">let </span>record = result.into_iter().next().map(|id| SingleRecord {
                 record: Record::from(id),
                 field_names: selected_fields
                     .unwrap_or_else(|| model.primary_identifier())
@@ -401,7 +445,30 @@
         record_filter: connector_interface::RecordFilter,
         _trace_id: <span class="prelude-ty">Option</span>&lt;String&gt;,
     ) -&gt; connector_interface::Result&lt;usize&gt; {
-        catch(<span class="kw">async move </span>{ write::delete_records(<span class="kw-2">&amp;</span><span class="self">self</span>.database, <span class="kw-2">&amp;mut </span><span class="self">self</span>.session, model, record_filter).<span class="kw">await </span>}).<span class="kw">await
+        catch(write::delete_records(
+            <span class="kw-2">&amp;</span><span class="self">self</span>.database,
+            <span class="kw-2">&amp;mut </span><span class="self">self</span>.session,
+            model,
+            record_filter,
+        ))
+        .<span class="kw">await
+    </span>}
+
+    <span class="kw">async fn </span>delete_record(
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>,
+        model: <span class="kw-2">&amp;</span>Model,
+        record_filter: connector_interface::RecordFilter,
+        selected_fields: FieldSelection,
+        _trace_id: <span class="prelude-ty">Option</span>&lt;String&gt;,
+    ) -&gt; connector_interface::Result&lt;SingleRecord&gt; {
+        catch(write::delete_record(
+            <span class="kw-2">&amp;</span><span class="self">self</span>.database,
+            <span class="kw-2">&amp;mut </span><span class="self">self</span>.session,
+            model,
+            record_filter,
+            selected_fields,
+        ))
+        .<span class="kw">await
     </span>}
 
     <span class="kw">async fn </span>m2m_connect(
@@ -411,8 +478,14 @@
         child_ids: <span class="kw-2">&amp;</span>[SelectionResult],
         _trace_id: <span class="prelude-ty">Option</span>&lt;String&gt;,
     ) -&gt; connector_interface::Result&lt;()&gt; {
-        catch(<span class="kw">async move </span>{ write::m2m_connect(<span class="kw-2">&amp;</span><span class="self">self</span>.database, <span class="kw-2">&amp;mut </span><span class="self">self</span>.session, field, parent_id, child_ids).<span class="kw">await </span>})
-            .<span class="kw">await
+        catch(write::m2m_connect(
+            <span class="kw-2">&amp;</span><span class="self">self</span>.database,
+            <span class="kw-2">&amp;mut </span><span class="self">self</span>.session,
+            field,
+            parent_id,
+            child_ids,
+        ))
+        .<span class="kw">await
     </span>}
 
     <span class="kw">async fn </span>m2m_disconnect(
@@ -422,14 +495,18 @@
         child_ids: <span class="kw-2">&amp;</span>[SelectionResult],
         _trace_id: <span class="prelude-ty">Option</span>&lt;String&gt;,
     ) -&gt; connector_interface::Result&lt;()&gt; {
-        catch(
-            <span class="kw">async move </span>{ write::m2m_disconnect(<span class="kw-2">&amp;</span><span class="self">self</span>.database, <span class="kw-2">&amp;mut </span><span class="self">self</span>.session, field, parent_id, child_ids).<span class="kw">await </span>},
-        )
+        catch(write::m2m_disconnect(
+            <span class="kw-2">&amp;</span><span class="self">self</span>.database,
+            <span class="kw-2">&amp;mut </span><span class="self">self</span>.session,
+            field,
+            parent_id,
+            child_ids,
+        ))
         .<span class="kw">await
     </span>}
 
     <span class="kw">async fn </span>execute_raw(<span class="kw-2">&amp;mut </span><span class="self">self</span>, inputs: HashMap&lt;String, PrismaValue&gt;) -&gt; connector_interface::Result&lt;usize&gt; {
-        catch(<span class="kw">async move </span>{ write::execute_raw(<span class="kw-2">&amp;</span><span class="self">self</span>.database, <span class="kw-2">&amp;mut </span><span class="self">self</span>.session, inputs).<span class="kw">await </span>}).<span class="kw">await
+        catch(write::execute_raw(<span class="kw-2">&amp;</span><span class="self">self</span>.database, <span class="kw-2">&amp;mut </span><span class="self">self</span>.session, inputs)).<span class="kw">await
     </span>}
 
     <span class="kw">async fn </span>query_raw(
@@ -438,7 +515,14 @@
         inputs: HashMap&lt;String, PrismaValue&gt;,
         query_type: <span class="prelude-ty">Option</span>&lt;String&gt;,
     ) -&gt; connector_interface::Result&lt;serde_json::Value&gt; {
-        catch(<span class="kw">async move </span>{ write::query_raw(<span class="kw-2">&amp;</span><span class="self">self</span>.database, <span class="kw-2">&amp;mut </span><span class="self">self</span>.session, model, inputs, query_type).<span class="kw">await </span>}).<span class="kw">await
+        catch(write::query_raw(
+            <span class="kw-2">&amp;</span><span class="self">self</span>.database,
+            <span class="kw-2">&amp;mut </span><span class="self">self</span>.session,
+            model,
+            inputs,
+            query_type,
+        ))
+        .<span class="kw">await
     </span>}
 
     <span class="kw">async fn </span>native_upsert_record(
@@ -461,17 +545,14 @@
         _relation_load_strategy: RelationLoadStrategy,
         _trace_id: <span class="prelude-ty">Option</span>&lt;String&gt;,
     ) -&gt; connector_interface::Result&lt;<span class="prelude-ty">Option</span>&lt;SingleRecord&gt;&gt; {
-        catch(<span class="kw">async move </span>{
-            read::get_single_record(
-                <span class="kw-2">&amp;</span><span class="self">self</span>.database,
-                <span class="kw-2">&amp;mut </span><span class="self">self</span>.session,
-                model,
-                filter,
-                selected_fields,
-                aggr_selections,
-            )
-            .<span class="kw">await
-        </span>})
+        catch(read::get_single_record(
+            <span class="kw-2">&amp;</span><span class="self">self</span>.database,
+            <span class="kw-2">&amp;mut </span><span class="self">self</span>.session,
+            model,
+            filter,
+            selected_fields,
+            aggr_selections,
+        ))
         .<span class="kw">await
     </span>}
 
@@ -484,17 +565,14 @@
         _relation_load_strategy: RelationLoadStrategy,
         _trace_id: <span class="prelude-ty">Option</span>&lt;String&gt;,
     ) -&gt; connector_interface::Result&lt;ManyRecords&gt; {
-        catch(<span class="kw">async move </span>{
-            read::get_many_records(
-                <span class="kw-2">&amp;</span><span class="self">self</span>.database,
-                <span class="kw-2">&amp;mut </span><span class="self">self</span>.session,
-                model,
-                query_arguments,
-                selected_fields,
-                aggregation_selections,
-            )
-            .<span class="kw">await
-        </span>})
+        catch(read::get_many_records(
+            <span class="kw-2">&amp;</span><span class="self">self</span>.database,
+            <span class="kw-2">&amp;mut </span><span class="self">self</span>.session,
+            model,
+            query_arguments,
+            selected_fields,
+            aggregation_selections,
+        ))
         .<span class="kw">await
     </span>}
 
@@ -504,9 +582,12 @@
         from_record_ids: <span class="kw-2">&amp;</span>[SelectionResult],
         _trace_id: <span class="prelude-ty">Option</span>&lt;String&gt;,
     ) -&gt; connector_interface::Result&lt;Vec&lt;(SelectionResult, SelectionResult)&gt;&gt; {
-        catch(<span class="kw">async move </span>{
-            read::get_related_m2m_record_ids(<span class="kw-2">&amp;</span><span class="self">self</span>.database, <span class="kw-2">&amp;mut </span><span class="self">self</span>.session, from_field, from_record_ids).<span class="kw">await
-        </span>})
+        catch(read::get_related_m2m_record_ids(
+            <span class="kw-2">&amp;</span><span class="self">self</span>.database,
+            <span class="kw-2">&amp;mut </span><span class="self">self</span>.session,
+            from_field,
+            from_record_ids,
+        ))
         .<span class="kw">await
     </span>}
 
@@ -519,18 +600,15 @@
         having: <span class="prelude-ty">Option</span>&lt;query_structure::Filter&gt;,
         _trace_id: <span class="prelude-ty">Option</span>&lt;String&gt;,
     ) -&gt; connector_interface::Result&lt;Vec&lt;connector_interface::AggregationRow&gt;&gt; {
-        catch(<span class="kw">async move </span>{
-            aggregate::aggregate(
-                <span class="kw-2">&amp;</span><span class="self">self</span>.database,
-                <span class="kw-2">&amp;mut </span><span class="self">self</span>.session,
-                model,
-                query_arguments,
-                selections,
-                group_by,
-                having,
-            )
-            .<span class="kw">await
-        </span>})
+        catch(aggregate::aggregate(
+            <span class="kw-2">&amp;</span><span class="self">self</span>.database,
+            <span class="kw-2">&amp;mut </span><span class="self">self</span>.session,
+            model,
+            query_arguments,
+            selections,
+            group_by,
+            having,
+        ))
         .<span class="kw">await
     </span>}
 }

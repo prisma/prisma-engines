@@ -179,7 +179,7 @@
 <span class="attr">#[async_trait]
 </span><span class="kw">impl </span>Connector <span class="kw">for </span>Js {
     <span class="kw">async fn </span>get_connection&lt;<span class="lifetime">&#39;a</span>&gt;(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="self">self</span>) -&gt; connector::Result&lt;Box&lt;<span class="kw">dyn </span>Connection + Send + Sync + <span class="lifetime">&#39;static</span>&gt;&gt; {
-        <span class="kw">super</span>::catch(<span class="self">self</span>.connection_info.clone(), <span class="kw">async move </span>{
+        <span class="kw">super</span>::catch(<span class="kw-2">&amp;</span><span class="self">self</span>.connection_info, <span class="kw">async move </span>{
             <span class="kw">let </span>sql_conn = SqlConnection::new(<span class="self">self</span>.connector.clone(), <span class="kw-2">&amp;</span><span class="self">self</span>.connection_info, <span class="self">self</span>.features);
             <span class="prelude-val">Ok</span>(Box::new(sql_conn) <span class="kw">as </span>Box&lt;<span class="kw">dyn </span>Connection + Send + Sync + <span class="lifetime">&#39;static</span>&gt;)
         })

@@ -450,6 +450,42 @@
 <a href="#450" id="450">450</a>
 <a href="#451" id="451">451</a>
 <a href="#452" id="452">452</a>
+<a href="#453" id="453">453</a>
+<a href="#454" id="454">454</a>
+<a href="#455" id="455">455</a>
+<a href="#456" id="456">456</a>
+<a href="#457" id="457">457</a>
+<a href="#458" id="458">458</a>
+<a href="#459" id="459">459</a>
+<a href="#460" id="460">460</a>
+<a href="#461" id="461">461</a>
+<a href="#462" id="462">462</a>
+<a href="#463" id="463">463</a>
+<a href="#464" id="464">464</a>
+<a href="#465" id="465">465</a>
+<a href="#466" id="466">466</a>
+<a href="#467" id="467">467</a>
+<a href="#468" id="468">468</a>
+<a href="#469" id="469">469</a>
+<a href="#470" id="470">470</a>
+<a href="#471" id="471">471</a>
+<a href="#472" id="472">472</a>
+<a href="#473" id="473">473</a>
+<a href="#474" id="474">474</a>
+<a href="#475" id="475">475</a>
+<a href="#476" id="476">476</a>
+<a href="#477" id="477">477</a>
+<a href="#478" id="478">478</a>
+<a href="#479" id="479">479</a>
+<a href="#480" id="480">480</a>
+<a href="#481" id="481">481</a>
+<a href="#482" id="482">482</a>
+<a href="#483" id="483">483</a>
+<a href="#484" id="484">484</a>
+<a href="#485" id="485">485</a>
+<a href="#486" id="486">486</a>
+<a href="#487" id="487">487</a>
+<a href="#488" id="488">488</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span><span class="kw">super</span>::update::<span class="kw-2">*</span>;
 <span class="kw">use </span><span class="kw">crate</span>::column_metadata;
 <span class="kw">use </span><span class="kw">crate</span>::filter::FilterBuilder;
@@ -850,6 +886,42 @@
     </span>};
 
     <span class="prelude-val">Ok</span>(row_count <span class="kw">as </span>usize)
+}
+
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async fn </span>delete_record(
+    conn: <span class="kw-2">&amp;</span><span class="kw">dyn </span>Queryable,
+    model: <span class="kw-2">&amp;</span>Model,
+    record_filter: RecordFilter,
+    selected_fields: FieldSelection,
+    ctx: <span class="kw-2">&amp;</span>Context&lt;<span class="lifetime">&#39;_</span>&gt;,
+) -&gt; <span class="kw">crate</span>::Result&lt;SingleRecord&gt; {
+    <span class="comment">// We explicitly checked in the query builder that there are no nested mutation
+    // in combination with this operation.
+    </span><span class="macro">debug_assert!</span>(!record_filter.has_selectors());
+
+    <span class="kw">let </span>filter = FilterBuilder::without_top_level_joins().visit_filter(record_filter.filter, ctx);
+    <span class="kw">let </span>selected_fields: ModelProjection = selected_fields.into();
+
+    <span class="kw">let </span>result_set = conn
+        .query(write::delete_returning(model, filter, <span class="kw-2">&amp;</span>selected_fields, ctx))
+        .<span class="kw">await</span><span class="question-mark">?</span>;
+
+    <span class="kw">let </span><span class="kw-2">mut </span>result_iter = result_set.into_iter();
+    <span class="kw">let </span>result_row = result_iter.next().ok_or(SqlError::RecordDoesNotExist {
+        cause: <span class="string">&quot;Record to delete does not exist.&quot;</span>.to_owned(),
+    })<span class="question-mark">?</span>;
+    <span class="macro">debug_assert!</span>(result_iter.next().is_none(), <span class="string">&quot;Filter returned more than one row. This is a bug because we must always require `id` in filters for `deleteOne` mutations&quot;</span>);
+
+    <span class="kw">let </span>field_db_names: Vec&lt;<span class="kw">_</span>&gt; = selected_fields.db_names().collect();
+    <span class="kw">let </span>types_and_arities = selected_fields.type_identifiers_with_arities();
+    <span class="kw">let </span>meta = column_metadata::create(<span class="kw-2">&amp;</span>field_db_names, <span class="kw-2">&amp;</span>types_and_arities);
+    <span class="kw">let </span>sql_row = result_row.to_sql_row(<span class="kw-2">&amp;</span>meta)<span class="question-mark">?</span>;
+
+    <span class="kw">let </span>record = Record::from(sql_row);
+    <span class="prelude-val">Ok</span>(SingleRecord {
+        record,
+        field_names: field_db_names,
+    })
 }
 
 <span class="doccomment">/// Connect relations defined in `child_ids` to a parent defined in `parent_id`.

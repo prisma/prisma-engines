@@ -50,8 +50,6 @@
 <a href="#50" id="50">50</a>
 <a href="#51" id="51">51</a>
 <a href="#52" id="52">52</a>
-<a href="#53" id="53">53</a>
-<a href="#54" id="54">54</a>
 </pre></div><pre class="rust"><code><span class="kw">mod </span>connection;
 <span class="attr">#[cfg(feature = <span class="string">&quot;driver-adapters&quot;</span>)]
 </span><span class="kw">mod </span>js;
@@ -97,13 +95,11 @@
         </span><span class="self">Self</span>: Connector + Sized;
 }
 
-<span class="kw">async fn </span>catch&lt;O&gt;(
-    connection_info: quaint::prelude::ConnectionInfo,
+<span class="attr">#[inline]
+</span><span class="kw">async fn </span>catch&lt;O&gt;(
+    connection_info: <span class="kw-2">&amp;</span>quaint::prelude::ConnectionInfo,
     fut: <span class="kw">impl </span>std::future::Future&lt;Output = <span class="prelude-ty">Result</span>&lt;O, <span class="kw">crate</span>::SqlError&gt;&gt;,
 ) -&gt; <span class="prelude-ty">Result</span>&lt;O, ConnectorError&gt; {
-    <span class="kw">match </span>fut.<span class="kw">await </span>{
-        <span class="prelude-val">Ok</span>(o) =&gt; <span class="prelude-val">Ok</span>(o),
-        <span class="prelude-val">Err</span>(err) =&gt; <span class="prelude-val">Err</span>(err.into_connector_error(<span class="kw-2">&amp;</span>connection_info)),
-    }
+    fut.<span class="kw">await</span>.map_err(|err| err.into_connector_error(connection_info))
 }
 </code></pre></div></section></main></body></html>

@@ -205,7 +205,7 @@
         <span class="self">self</span>.execute(q.into()).<span class="kw">await
     </span>}
 
-    <span class="doccomment">/// Execute a `DELETE` query, returning the number of affected rows.
+    <span class="doccomment">/// Execute a `DELETE` query.
     </span><span class="kw">async fn </span>delete(<span class="kw-2">&amp;</span><span class="self">self</span>, q: Delete&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; <span class="kw">crate</span>::Result&lt;()&gt; {
         <span class="self">self</span>.query(q.into()).<span class="kw">await</span><span class="question-mark">?</span>;
         <span class="prelude-val">Ok</span>(())

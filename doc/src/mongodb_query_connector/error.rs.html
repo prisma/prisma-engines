@@ -294,6 +294,13 @@
 <a href="#294" id="294">294</a>
 <a href="#295" id="295">295</a>
 <a href="#296" id="296">296</a>
+<a href="#297" id="297">297</a>
+<a href="#298" id="298">298</a>
+<a href="#299" id="299">299</a>
+<a href="#300" id="300">300</a>
+<a href="#301" id="301">301</a>
+<a href="#302" id="302">302</a>
+<a href="#303" id="303">303</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>connector_interface::error::{ConnectorError, ErrorKind, MultiError};
 <span class="kw">use </span>itertools::Itertools;
 <span class="kw">use </span>mongodb::{
@@ -355,6 +362,9 @@
         have: String,
         want: String,
     },
+
+    <span class="attr">#[error(<span class="string">&quot;Record does not exist: {cause}&quot;</span>)]
+    </span>RecordDoesNotExist { cause: String },
 }
 
 <span class="kw">impl </span>MongoError {
@@ -419,6 +429,10 @@
                 conn_err.set_transient(is_transient);
 
                 conn_err
+            }
+
+            MongoError::RecordDoesNotExist { cause } =&gt; {
+                ConnectorError::from_kind(ErrorKind::RecordDoesNotExist { cause })
             }
         }
     }

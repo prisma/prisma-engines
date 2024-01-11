@@ -668,7 +668,7 @@
             },
         };
 
-        <span class="macro">tracing::debug!</span>(<span class="string">&quot;Querying: {}&quot;</span>, query.clone().green());
+        <span class="macro">tracing::info!</span>(<span class="string">&quot;Querying: {}&quot;</span>, query);
 
         <span class="kw">let </span>handler = RequestHandler::new(<span class="kw-2">&amp;**</span>executor, <span class="kw-2">&amp;</span><span class="self">self</span>.query_schema, <span class="self">self</span>.protocol);
 
@@ -802,7 +802,7 @@
                 };
                 <span class="kw">let </span>json_query = JsonBody::Batch(JsonBatchQuery { batch, transaction });
                 <span class="kw">let </span>response_str: String = executor_process_request(
-                        <span class="string">&quot;query&quot;</span>, 
+                        <span class="string">&quot;query&quot;</span>,
                         <span class="macro">json!</span>({ <span class="string">&quot;query&quot;</span>: json_query, <span class="string">&quot;schemaId&quot;</span>: schema_id, <span class="string">&quot;txId&quot;</span>: <span class="self">self</span>.current_tx_id.as_ref().map(ToString::to_string) })
                     ).<span class="kw">await</span><span class="question-mark">?</span>;
 

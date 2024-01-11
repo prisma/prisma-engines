@@ -300,6 +300,9 @@
 <a href="#300" id="300">300</a>
 <a href="#301" id="301">301</a>
 <a href="#302" id="302">302</a>
+<a href="#303" id="303">303</a>
+<a href="#304" id="304">304</a>
+<a href="#305" id="305">305</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>itertools::Itertools;
 <span class="kw">use </span>query_structure::prelude::DomainError;
 <span class="kw">use </span>query_structure::Filter;
@@ -418,6 +421,9 @@
             ErrorKind::ExternalError(id) =&gt; <span class="prelude-val">Some</span>(user_facing_errors::KnownError::new(
                 user_facing_errors::query_engine::ExternalError { id: id.to_owned() },
             )),
+            ErrorKind::RecordDoesNotExist { cause } =&gt; <span class="prelude-val">Some</span>(KnownError::new(
+                user_facing_errors::query_engine::RecordRequiredButNotFound { cause: cause.clone() },
+            )),
             <span class="kw">_ </span>=&gt; <span class="prelude-val">None</span>,
         };
 
@@ -448,8 +454,8 @@
     <span class="attr">#[error(<span class="string">&quot;Foreign key constraint failed&quot;</span>)]
     </span>ForeignKeyConstraintViolation { constraint: DatabaseConstraint },
 
-    <span class="attr">#[error(<span class="string">&quot;Record does not exist.&quot;</span>)]
-    </span>RecordDoesNotExist,
+    <span class="attr">#[error(<span class="string">&quot;Record does not exist: {cause}&quot;</span>)]
+    </span>RecordDoesNotExist { cause: String },
 
     <span class="attr">#[error(<span class="string">&quot;Column &#39;{}&#39; does not exist.&quot;</span>, column)]
     </span>ColumnDoesNotExist { column: String },

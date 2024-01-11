@@ -377,6 +377,11 @@
 <a href="#377" id="377">377</a>
 <a href="#378" id="378">378</a>
 <a href="#379" id="379">379</a>
+<a href="#380" id="380">380</a>
+<a href="#381" id="381">381</a>
+<a href="#382" id="382">382</a>
+<a href="#383" id="383">383</a>
+<a href="#384" id="384">384</a>
 </pre></div><pre class="rust"><code><span class="kw">use crate</span>::{
     parent_container::ParentContainer, prisma_value_ext::PrismaValueExtensions, CompositeFieldRef, DomainError, Field,
     Model, ModelProjection, QueryArguments, RelationField, ScalarField, ScalarFieldRef, SelectionResult,
@@ -523,6 +528,11 @@
         <span class="kw">let </span>selections = <span class="self">self</span>.selections.into_iter().chain(other.selections).unique().collect();
 
         FieldSelection { selections }
+    }
+
+    <span class="kw">pub fn </span>merge_in_place(<span class="kw-2">&amp;mut </span><span class="self">self</span>, other: FieldSelection) {
+        <span class="kw">let </span>this = std::mem::take(<span class="self">self</span>);
+        <span class="kw-2">*</span><span class="self">self </span>= this.merge(other);
     }
 
     <span class="kw">pub fn </span>type_identifiers_with_arities(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Vec&lt;(TypeIdentifier, FieldArity)&gt; {

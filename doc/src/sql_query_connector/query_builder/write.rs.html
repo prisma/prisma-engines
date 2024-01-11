@@ -267,6 +267,21 @@
 <a href="#267" id="267">267</a>
 <a href="#268" id="268">268</a>
 <a href="#269" id="269">269</a>
+<a href="#270" id="270">270</a>
+<a href="#271" id="271">271</a>
+<a href="#272" id="272">272</a>
+<a href="#273" id="273">273</a>
+<a href="#274" id="274">274</a>
+<a href="#275" id="275">275</a>
+<a href="#276" id="276">276</a>
+<a href="#277" id="277">277</a>
+<a href="#278" id="278">278</a>
+<a href="#279" id="279">279</a>
+<a href="#280" id="280">280</a>
+<a href="#281" id="281">281</a>
+<a href="#282" id="282">282</a>
+<a href="#283" id="283">283</a>
+<a href="#284" id="284">284</a>
 </pre></div><pre class="rust"><code><span class="kw">use crate</span>::{model_extensions::<span class="kw-2">*</span>, sql_trace::SqlTraceComment, Context};
 <span class="kw">use </span>connector_interface::{DatasourceFieldName, ScalarWriteOperation, WriteArgs};
 <span class="kw">use </span>quaint::ast::<span class="kw-2">*</span>;
@@ -457,6 +472,21 @@
     });
 
     <span class="prelude-val">Ok</span>(query)
+}
+
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>delete_returning(
+    model: <span class="kw-2">&amp;</span>Model,
+    filter: ConditionTree&lt;<span class="lifetime">&#39;static</span>&gt;,
+    selected_fields: <span class="kw-2">&amp;</span>ModelProjection,
+    ctx: <span class="kw-2">&amp;</span>Context&lt;<span class="lifetime">&#39;_</span>&gt;,
+) -&gt; Query&lt;<span class="lifetime">&#39;static</span>&gt; {
+    <span class="kw">let </span>selected_columns = selected_fields.as_columns(ctx).map(|c| c.set_is_selected(<span class="bool-val">true</span>));
+    Delete::from_table(model.as_table(ctx))
+        .so_that(filter)
+        .returning(selected_columns)
+        .append_trace(<span class="kw-2">&amp;</span>Span::current())
+        .add_trace_id(ctx.trace_id)
+        .into()
 }
 
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>delete_many_from_filter(

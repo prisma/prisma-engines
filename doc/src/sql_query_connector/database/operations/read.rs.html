@@ -559,7 +559,7 @@
     <span class="kw">let </span>row = (<span class="kw">match </span>conn.find(query, meta.as_slice(), ctx).<span class="kw">await </span>{
         <span class="prelude-val">Ok</span>(result) =&gt; <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(result)),
         <span class="prelude-val">Err</span>(_e @ SqlError::RecordNotFoundForWhere(<span class="kw">_</span>)) =&gt; <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>),
-        <span class="prelude-val">Err</span>(_e @ SqlError::RecordDoesNotExist) =&gt; <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>),
+        <span class="prelude-val">Err</span>(_e @ SqlError::RecordDoesNotExist { .. }) =&gt; <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>),
         <span class="prelude-val">Err</span>(e) =&gt; <span class="prelude-val">Err</span>(e),
     })<span class="question-mark">?
     </span>.map(Record::from);

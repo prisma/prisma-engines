@@ -998,6 +998,7 @@
 <a href="#998" id="998">998</a>
 <a href="#999" id="999">999</a>
 <a href="#1000" id="1000">1000</a>
+<a href="#1001" id="1001">1001</a>
 </pre></div><pre class="rust"><code><span class="kw">mod </span>error;
 <span class="kw">mod </span>formatters;
 <span class="kw">mod </span>guard;
@@ -1889,8 +1890,9 @@
                 <span class="kw">continue</span>;
             }
 
-            <span class="comment">// No connector supports returning more than the primary identifier for a delete just yet.
-            </span><span class="kw">if </span>query.is_delete_one() {
+            <span class="comment">// If the connector does not support returning more than the primary identifier for a delete,
+            // do not update the selection set.
+            </span><span class="kw">if </span>query.is_delete_one() &amp;&amp; !capabilities.contains(ConnectorCapability::DeleteReturning) {
                 <span class="kw">continue</span>;
             }
 

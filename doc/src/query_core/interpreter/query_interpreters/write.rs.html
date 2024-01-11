@@ -193,6 +193,21 @@
 <a href="#193" id="193">193</a>
 <a href="#194" id="194">194</a>
 <a href="#195" id="195">195</a>
+<a href="#196" id="196">196</a>
+<a href="#197" id="197">197</a>
+<a href="#198" id="198">198</a>
+<a href="#199" id="199">199</a>
+<a href="#200" id="200">200</a>
+<a href="#201" id="201">201</a>
+<a href="#202" id="202">202</a>
+<a href="#203" id="203">203</a>
+<a href="#204" id="204">204</a>
+<a href="#205" id="205">205</a>
+<a href="#206" id="206">206</a>
+<a href="#207" id="207">207</a>
+<a href="#208" id="208">208</a>
+<a href="#209" id="209">209</a>
+<a href="#210" id="210">210</a>
 </pre></div><pre class="rust"><code><span class="kw">use crate</span>::{
     interpreter::{InterpretationResult, InterpreterError},
     query_ast::<span class="kw-2">*</span>,
@@ -332,9 +347,24 @@
         )),
     }<span class="question-mark">?</span>;
 
-    <span class="kw">let </span>res = tx.delete_records(<span class="kw-2">&amp;</span>q.model, filter, trace_id).<span class="kw">await</span><span class="question-mark">?</span>;
+    <span class="kw">if let </span><span class="prelude-val">Some</span>(selected_fields) = q.selected_fields {
+        <span class="kw">let </span>record = tx
+            .delete_record(<span class="kw-2">&amp;</span>q.model, filter, selected_fields.fields, trace_id)
+            .<span class="kw">await</span><span class="question-mark">?</span>;
+        <span class="kw">let </span>selection = RecordSelection {
+            name: q.name,
+            fields: selected_fields.order,
+            scalars: record.into(),
+            nested: <span class="macro">vec!</span>[],
+            model: q.model,
+            aggregation_rows: <span class="prelude-val">None</span>,
+        };
 
-    <span class="prelude-val">Ok</span>(QueryResult::Count(res))
+        <span class="prelude-val">Ok</span>(QueryResult::RecordSelection(<span class="prelude-val">Some</span>(Box::new(selection))))
+    } <span class="kw">else </span>{
+        <span class="kw">let </span>result = tx.delete_records(<span class="kw-2">&amp;</span>q.model, filter, trace_id).<span class="kw">await</span><span class="question-mark">?</span>;
+        <span class="prelude-val">Ok</span>(QueryResult::Count(result))
+    }
 }
 
 <span class="kw">async fn </span>update_many(

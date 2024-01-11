@@ -282,6 +282,20 @@
 <a href="#282" id="282">282</a>
 <a href="#283" id="283">283</a>
 <a href="#284" id="284">284</a>
+<a href="#285" id="285">285</a>
+<a href="#286" id="286">286</a>
+<a href="#287" id="287">287</a>
+<a href="#288" id="288">288</a>
+<a href="#289" id="289">289</a>
+<a href="#290" id="290">290</a>
+<a href="#291" id="291">291</a>
+<a href="#292" id="292">292</a>
+<a href="#293" id="293">293</a>
+<a href="#294" id="294">294</a>
+<a href="#295" id="295">295</a>
+<a href="#296" id="296">296</a>
+<a href="#297" id="297">297</a>
+<a href="#298" id="298">298</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Filtering types to select records from the database
 //!
 //! The creation of the types should be done with
@@ -508,6 +522,20 @@
         <span class="kw">let </span>filter_check = |sf: <span class="kw-2">&amp;</span>ScalarFilter| sf.is_unique();
         <span class="self">Self</span>::filter_and_collect_scalars(<span class="self">self</span>, filter_check, <span class="kw-2">&amp;mut </span>uniques);
         uniques
+    }
+
+    <span class="doccomment">/// Returns true if filter contains conditions on relation fields.
+    </span><span class="kw">pub fn </span>has_relations(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="kw">use </span>AggregationFilter::<span class="kw-2">*</span>;
+        <span class="kw">use </span>Filter::<span class="kw-2">*</span>;
+        <span class="kw">match </span><span class="self">self </span>{
+            Not(branches) | Or(branches) | And(branches) =&gt; branches.iter().any(|filter| filter.has_relations()),
+            Scalar(..) | ScalarList(..) | Composite(..) | BoolFilter(..) | Empty =&gt; <span class="bool-val">false</span>,
+            Aggregation(filter) =&gt; <span class="kw">match </span>filter {
+                Average(filter) | Count(filter) | Sum(filter) | Min(filter) | Max(filter) =&gt; filter.has_relations(),
+            },
+            OneRelationIsNull(..) | Relation(..) =&gt; <span class="bool-val">true</span>,
+        }
     }
 
     <span class="kw">fn </span>filter_and_collect_scalars(

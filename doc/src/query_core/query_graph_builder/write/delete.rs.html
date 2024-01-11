@@ -104,12 +104,82 @@
 <a href="#104" id="104">104</a>
 <a href="#105" id="105">105</a>
 <a href="#106" id="106">106</a>
+<a href="#107" id="107">107</a>
+<a href="#108" id="108">108</a>
+<a href="#109" id="109">109</a>
+<a href="#110" id="110">110</a>
+<a href="#111" id="111">111</a>
+<a href="#112" id="112">112</a>
+<a href="#113" id="113">113</a>
+<a href="#114" id="114">114</a>
+<a href="#115" id="115">115</a>
+<a href="#116" id="116">116</a>
+<a href="#117" id="117">117</a>
+<a href="#118" id="118">118</a>
+<a href="#119" id="119">119</a>
+<a href="#120" id="120">120</a>
+<a href="#121" id="121">121</a>
+<a href="#122" id="122">122</a>
+<a href="#123" id="123">123</a>
+<a href="#124" id="124">124</a>
+<a href="#125" id="125">125</a>
+<a href="#126" id="126">126</a>
+<a href="#127" id="127">127</a>
+<a href="#128" id="128">128</a>
+<a href="#129" id="129">129</a>
+<a href="#130" id="130">130</a>
+<a href="#131" id="131">131</a>
+<a href="#132" id="132">132</a>
+<a href="#133" id="133">133</a>
+<a href="#134" id="134">134</a>
+<a href="#135" id="135">135</a>
+<a href="#136" id="136">136</a>
+<a href="#137" id="137">137</a>
+<a href="#138" id="138">138</a>
+<a href="#139" id="139">139</a>
+<a href="#140" id="140">140</a>
+<a href="#141" id="141">141</a>
+<a href="#142" id="142">142</a>
+<a href="#143" id="143">143</a>
+<a href="#144" id="144">144</a>
+<a href="#145" id="145">145</a>
+<a href="#146" id="146">146</a>
+<a href="#147" id="147">147</a>
+<a href="#148" id="148">148</a>
+<a href="#149" id="149">149</a>
+<a href="#150" id="150">150</a>
+<a href="#151" id="151">151</a>
+<a href="#152" id="152">152</a>
+<a href="#153" id="153">153</a>
+<a href="#154" id="154">154</a>
+<a href="#155" id="155">155</a>
+<a href="#156" id="156">156</a>
+<a href="#157" id="157">157</a>
+<a href="#158" id="158">158</a>
+<a href="#159" id="159">159</a>
+<a href="#160" id="160">160</a>
+<a href="#161" id="161">161</a>
+<a href="#162" id="162">162</a>
+<a href="#163" id="163">163</a>
+<a href="#164" id="164">164</a>
+<a href="#165" id="165">165</a>
+<a href="#166" id="166">166</a>
+<a href="#167" id="167">167</a>
+<a href="#168" id="168">168</a>
+<a href="#169" id="169">169</a>
+<a href="#170" id="170">170</a>
+<a href="#171" id="171">171</a>
+<a href="#172" id="172">172</a>
+<a href="#173" id="173">173</a>
+<a href="#174" id="174">174</a>
+<a href="#175" id="175">175</a>
 </pre></div><pre class="rust"><code><span class="kw">use super</span>::<span class="kw-2">*</span>;
 <span class="kw">use crate</span>::{
     query_ast::<span class="kw-2">*</span>,
     query_graph::{Node, QueryGraph, QueryGraphDependency},
     ArgumentListLookup, FilteredQuery, ParsedField,
 };
+<span class="kw">use </span>psl::datamodel_connector::ConnectorCapability;
 <span class="kw">use </span>query_structure::{Filter, Model};
 <span class="kw">use </span>schema::{constants::args, QuerySchema};
 <span class="kw">use </span>std::convert::TryInto;
@@ -121,42 +191,85 @@
     model: Model,
     <span class="kw-2">mut </span>field: ParsedField&lt;<span class="lifetime">&#39;_</span>&gt;,
 ) -&gt; QueryGraphBuilderResult&lt;()&gt; {
-    graph.flag_transactional();
-
     <span class="kw">let </span>where_arg = field.arguments.lookup(args::WHERE).unwrap();
     <span class="kw">let </span>filter = extract_unique_filter(where_arg.value.try_into()<span class="question-mark">?</span>, <span class="kw-2">&amp;</span>model)<span class="question-mark">?</span>;
 
-    <span class="comment">// Prefetch read query for the delete
-    </span><span class="kw">let </span><span class="kw-2">mut </span>read_query = read::find_unique(field, model.clone(), query_schema)<span class="question-mark">?</span>;
-    read_query.add_filter(filter.clone());
+    <span class="kw">if </span>can_use_atomic_delete(query_schema, <span class="kw-2">&amp;</span>field, <span class="kw-2">&amp;</span>filter) {
+        <span class="comment">// Database supports returning the deleted row, so just the delete node will suffice.
+        </span><span class="kw">let </span>nested_fields = field.nested_fields.unwrap().fields;
+        <span class="kw">let </span>selected_fields = read::utils::collect_selected_scalars(<span class="kw-2">&amp;</span>nested_fields, <span class="kw-2">&amp;</span>model);
+        <span class="kw">let </span>selection_order = read::utils::collect_selection_order(<span class="kw-2">&amp;</span>nested_fields);
 
-    <span class="kw">let </span>read_node = graph.create_node(Query::Read(read_query));
-    <span class="kw">let </span>delete_query = Query::Write(WriteQuery::DeleteRecord(DeleteRecord {
-        model: model.clone(),
-        record_filter: <span class="prelude-val">Some</span>(filter.into()),
-    }));
-
-    <span class="kw">let </span>delete_node = graph.create_node(delete_query);
-    utils::insert_emulated_on_delete(graph, query_schema, <span class="kw-2">&amp;</span>model, <span class="kw-2">&amp;</span>read_node, <span class="kw-2">&amp;</span>delete_node)<span class="question-mark">?</span>;
-
-    graph.create_edge(
-        <span class="kw-2">&amp;</span>read_node,
-        <span class="kw-2">&amp;</span>delete_node,
-        QueryGraphDependency::ProjectedDataDependency(
-            model.primary_identifier(),
-            Box::new(|delete_node, parent_ids| {
-                <span class="kw">if </span>!parent_ids.is_empty() {
-                    <span class="prelude-val">Ok</span>(delete_node)
-                } <span class="kw">else </span>{
-                    <span class="prelude-val">Err</span>(QueryGraphBuilderError::RecordNotFound(
-                        <span class="string">&quot;Record to delete does not exist.&quot;</span>.to_owned(),
-                    ))
-                }
+        <span class="kw">let </span>delete_query = Query::Write(WriteQuery::DeleteRecord(DeleteRecord {
+            name: field.name,
+            model: model.clone(),
+            record_filter: <span class="prelude-val">Some</span>(filter.into()),
+            selected_fields: <span class="prelude-val">Some</span>(DeleteRecordFields {
+                fields: selected_fields,
+                order: selection_order,
             }),
-        ),
-    )<span class="question-mark">?</span>;
+        }));
+        <span class="kw">let </span>delete_node = graph.create_node(delete_query);
 
-    graph.add_result_node(<span class="kw-2">&amp;</span>read_node);
+        <span class="kw">let </span>emulation_nodes = utils::insert_emulated_on_delete(graph, query_schema, <span class="kw-2">&amp;</span>model, <span class="kw-2">&amp;</span>delete_node)<span class="question-mark">?</span>;
+        <span class="kw">if </span>!emulation_nodes.is_empty() {
+            <span class="comment">// If there are any emulation nodes present, we will be making multiple queries,
+            // which means we need transaction.
+            </span>graph.flag_transactional();
+        }
+
+        graph.add_result_node(<span class="kw-2">&amp;</span>delete_node);
+    } <span class="kw">else </span>{
+        <span class="comment">// In case database does not support returning the deleted row, we need to emulate that
+        // behaviour by first reading the row and only then deleting it.
+        // Since we need to do multiple queries, transaction is always required.
+        </span>graph.flag_transactional();
+
+        <span class="kw">let </span><span class="kw-2">mut </span>read_query = read::find_unique(field, model.clone(), query_schema)<span class="question-mark">?</span>;
+        read_query.add_filter(filter.clone());
+        <span class="kw">let </span>read_node = graph.create_node(Query::Read(read_query));
+
+        <span class="kw">let </span>delete_query = Query::Write(WriteQuery::DeleteRecord(DeleteRecord {
+            name: String::new(),
+            model: model.clone(),
+            record_filter: <span class="prelude-val">Some</span>(filter.into()),
+            selected_fields: <span class="prelude-val">None</span>,
+        }));
+        <span class="kw">let </span>delete_node = graph.create_node(delete_query);
+
+        <span class="comment">// Ensure relevant relations are updated after delete.
+        </span><span class="kw">let </span>dependencies = utils::insert_emulated_on_delete(graph, query_schema, <span class="kw-2">&amp;</span>model, <span class="kw-2">&amp;</span>read_node)<span class="question-mark">?</span>;
+        utils::create_execution_order_edges(graph, dependencies, delete_node)<span class="question-mark">?</span>;
+
+        <span class="comment">// If the read node did not find the row, we know for sure that the delete node also won&#39;t
+        // find it because:
+        //  1. Both nodes use the same filter
+        //  2. Whole operation is executed in a transaction
+        // We insert a &quot;fake&quot; dependency between the nodes to avoid executing the delete if read
+        // failed. Delete node does not actually need primary identifier from read operation - it
+        // just needs to know that we read something.
+        </span>graph.create_edge(
+            <span class="kw-2">&amp;</span>read_node,
+            <span class="kw-2">&amp;</span>delete_node,
+            <span class="comment">// NOTE: We do not actually use primary identifier returned from `read_node`, this edge
+            // is just checking if any records matched the filter.
+            </span>QueryGraphDependency::ProjectedDataDependency(
+                model.primary_identifier(),
+                Box::new(|delete_node, parent_ids| {
+                    <span class="kw">if </span>!parent_ids.is_empty() {
+                        <span class="prelude-val">Ok</span>(delete_node)
+                    } <span class="kw">else </span>{
+                        <span class="prelude-val">Err</span>(QueryGraphBuilderError::RecordNotFound(
+                            <span class="string">&quot;Record to delete does not exist.&quot;</span>.to_owned(),
+                        ))
+                    }
+                }),
+            ),
+        )<span class="question-mark">?</span>;
+
+        <span class="comment">// Read node is the result one, because it returns the row we just deleted.
+        </span>graph.add_result_node(<span class="kw-2">&amp;</span>read_node);
+    }
 
     <span class="prelude-val">Ok</span>(())
 }
@@ -188,7 +301,8 @@
         <span class="kw">let </span>read_query = utils::read_ids_infallible(model.clone(), model_id.clone(), filter);
         <span class="kw">let </span>read_query_node = graph.create_node(read_query);
 
-        utils::insert_emulated_on_delete(graph, query_schema, <span class="kw-2">&amp;</span>model, <span class="kw-2">&amp;</span>read_query_node, <span class="kw-2">&amp;</span>delete_many_node)<span class="question-mark">?</span>;
+        <span class="kw">let </span>dependencies = utils::insert_emulated_on_delete(graph, query_schema, <span class="kw-2">&amp;</span>model, <span class="kw-2">&amp;</span>read_query_node)<span class="question-mark">?</span>;
+        utils::create_execution_order_edges(graph, dependencies, delete_many_node)<span class="question-mark">?</span>;
 
         graph.create_edge(
             <span class="kw-2">&amp;</span>read_query_node,
@@ -210,4 +324,28 @@
 
     <span class="prelude-val">Ok</span>(())
 }
+
+<span class="doccomment">/// An atomic delete is a delete performed in a single operation. It uses `DELETE ... RETURNING` or
+/// similar statement.
+/// We only perform such delete when:
+/// 1. Connector supports such operations
+/// 2. There are no nested selections
+/// 3. Either there are no predicates on relation fields or connector supports generating
+///    filters without joins for such predicates
+</span><span class="kw">fn </span>can_use_atomic_delete(query_schema: <span class="kw-2">&amp;</span>QuerySchema, field: <span class="kw-2">&amp;</span>ParsedField&lt;<span class="lifetime">&#39;_</span>&gt;, filter: <span class="kw-2">&amp;</span>Filter) -&gt; bool {
+    <span class="kw">if </span>!query_schema.has_capability(ConnectorCapability::DeleteReturning) {
+        <span class="kw">return </span><span class="bool-val">false</span>;
+    }
+
+    <span class="kw">if </span>field.has_nested_selection() {
+        <span class="kw">return </span><span class="bool-val">false</span>;
+    }
+    <span class="kw">if </span>filter.has_relations()
+        &amp;&amp; !query_schema.has_capability(ConnectorCapability::SupportsFiltersOnRelationsWithoutJoins)
+    {
+        <span class="kw">return </span><span class="bool-val">false</span>;
+    }
+
+    <span class="bool-val">true
+</span>}
 </code></pre></div></section></main></body></html>

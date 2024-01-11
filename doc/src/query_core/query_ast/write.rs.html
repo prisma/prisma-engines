@@ -432,6 +432,29 @@
 <a href="#432" id="432">432</a>
 <a href="#433" id="433">433</a>
 <a href="#434" id="434">434</a>
+<a href="#435" id="435">435</a>
+<a href="#436" id="436">436</a>
+<a href="#437" id="437">437</a>
+<a href="#438" id="438">438</a>
+<a href="#439" id="439">439</a>
+<a href="#440" id="440">440</a>
+<a href="#441" id="441">441</a>
+<a href="#442" id="442">442</a>
+<a href="#443" id="443">443</a>
+<a href="#444" id="444">444</a>
+<a href="#445" id="445">445</a>
+<a href="#446" id="446">446</a>
+<a href="#447" id="447">447</a>
+<a href="#448" id="448">448</a>
+<a href="#449" id="449">449</a>
+<a href="#450" id="450">450</a>
+<a href="#451" id="451">451</a>
+<a href="#452" id="452">452</a>
+<a href="#453" id="453">453</a>
+<a href="#454" id="454">454</a>
+<a href="#455" id="455">455</a>
+<a href="#456" id="456">456</a>
+<a href="#457" id="457">457</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Write query AST
 </span><span class="kw">use super</span>::{FilteredNestedMutation, FilteredQuery};
 <span class="kw">use crate</span>::{RecordQuery, ToGraphviz};
@@ -508,6 +531,10 @@
             <span class="self">Self</span>::CreateManyRecords(<span class="kw">_</span>) =&gt; <span class="prelude-val">None</span>,
             <span class="self">Self</span>::UpdateRecord(UpdateRecord::WithSelection(ur)) =&gt; <span class="prelude-val">Some</span>(ur.selected_fields.clone()),
             <span class="self">Self</span>::UpdateRecord(UpdateRecord::WithoutSelection(<span class="kw">_</span>)) =&gt; returns_id,
+            <span class="self">Self</span>::DeleteRecord(DeleteRecord {
+                selected_fields: <span class="prelude-val">Some</span>(selected_fields),
+                ..
+            }) =&gt; <span class="prelude-val">Some</span>(selected_fields.fields.clone()),
             <span class="self">Self</span>::DeleteRecord(<span class="kw">_</span>) =&gt; returns_id,
             <span class="self">Self</span>::UpdateManyRecords(<span class="kw">_</span>) =&gt; returns_id,
             <span class="self">Self</span>::DeleteManyRecords(<span class="kw">_</span>) =&gt; <span class="prelude-val">None</span>,
@@ -522,13 +549,17 @@
     <span class="doccomment">/// Updates the field selection of the query to satisfy the inputted FieldSelection.
     </span><span class="kw">pub fn </span>satisfy_dependency(<span class="kw-2">&amp;mut </span><span class="self">self</span>, fields: FieldSelection) {
         <span class="kw">match </span><span class="self">self </span>{
-            <span class="self">Self</span>::CreateRecord(cr) =&gt; cr.selected_fields = cr.selected_fields.clone().merge(fields),
-            <span class="self">Self</span>::UpdateRecord(UpdateRecord::WithSelection(ur)) =&gt; {
-                ur.selected_fields = ur.selected_fields.clone().merge(fields)
-            }
+            <span class="self">Self</span>::CreateRecord(cr) =&gt; cr.selected_fields.merge_in_place(fields),
+            <span class="self">Self</span>::UpdateRecord(UpdateRecord::WithSelection(ur)) =&gt; ur.selected_fields.merge_in_place(fields),
             <span class="self">Self</span>::UpdateRecord(UpdateRecord::WithoutSelection(<span class="kw">_</span>)) =&gt; (),
             <span class="self">Self</span>::CreateManyRecords(<span class="kw">_</span>) =&gt; (),
-            <span class="self">Self</span>::DeleteRecord(<span class="kw">_</span>) =&gt; (),
+            <span class="self">Self</span>::DeleteRecord(DeleteRecord {
+                selected_fields: <span class="prelude-val">Some</span>(selected_fields),
+                ..
+            }) =&gt; selected_fields.fields.merge_in_place(fields),
+            <span class="self">Self</span>::DeleteRecord(DeleteRecord {
+                selected_fields: <span class="prelude-val">None</span>, ..
+            }) =&gt; (),
             <span class="self">Self</span>::UpdateManyRecords(<span class="kw">_</span>) =&gt; (),
             <span class="self">Self</span>::DeleteManyRecords(<span class="kw">_</span>) =&gt; (),
             <span class="self">Self</span>::ConnectRecords(<span class="kw">_</span>) =&gt; (),
@@ -645,7 +676,12 @@
                 q.model().name(),
                 q.selected_fields()
             ),
-            <span class="self">Self</span>::DeleteRecord(q) =&gt; <span class="macro">format!</span>(<span class="string">&quot;DeleteRecord: {}, {:?}&quot;</span>, q.model.name(), q.record_filter),
+            <span class="self">Self</span>::DeleteRecord(q) =&gt; <span class="macro">format!</span>(
+                <span class="string">&quot;DeleteRecord: {}, {:?}, {:?}&quot;</span>,
+                q.model.name(),
+                q.record_filter,
+                q.selected_fields
+            ),
             <span class="self">Self</span>::UpdateManyRecords(q) =&gt; <span class="macro">format!</span>(<span class="string">&quot;UpdateManyRecords(model: {}, args: {:?})&quot;</span>, q.model.name(), q.args),
             <span class="self">Self</span>::DeleteManyRecords(q) =&gt; <span class="macro">format!</span>(<span class="string">&quot;DeleteManyRecords: {}&quot;</span>, q.model.name()),
             <span class="self">Self</span>::ConnectRecords(<span class="kw">_</span>) =&gt; <span class="string">&quot;ConnectRecords&quot;</span>.to_string(),
@@ -765,8 +801,18 @@
 
 <span class="attr">#[derive(Debug, Clone)]
 </span><span class="kw">pub struct </span>DeleteRecord {
+    <span class="kw">pub </span>name: String,
     <span class="kw">pub </span>model: Model,
     <span class="kw">pub </span>record_filter: <span class="prelude-ty">Option</span>&lt;RecordFilter&gt;,
+    <span class="doccomment">/// Fields of the deleted record that client has requested to return.
+    /// `None` if the connector does not support returning the deleted row.
+    </span><span class="kw">pub </span>selected_fields: <span class="prelude-ty">Option</span>&lt;DeleteRecordFields&gt;,
+}
+
+<span class="attr">#[derive(Debug, Clone)]
+</span><span class="kw">pub struct </span>DeleteRecordFields {
+    <span class="kw">pub </span>fields: FieldSelection,
+    <span class="kw">pub </span>order: Vec&lt;String&gt;,
 }
 
 <span class="attr">#[derive(Debug, Clone)]

@@ -298,6 +298,8 @@
 <a href="#298" id="298">298</a>
 <a href="#299" id="299">299</a>
 <a href="#300" id="300">300</a>
+<a href="#301" id="301">301</a>
+<a href="#302" id="302">302</a>
 </pre></div><pre class="rust"><code><span class="kw">mod </span>native_types;
 <span class="kw">mod </span>validations;
 
@@ -350,8 +352,10 @@
     SupportsTxIsolationReadCommitted |
     SupportsTxIsolationRepeatableRead |
     SupportsTxIsolationSerializable |
-    SupportsTxIsolationSnapshot
-});
+    SupportsTxIsolationSnapshot |
+    SupportsFiltersOnRelationsWithoutJoins
+    <span class="comment">// InsertReturning | DeleteReturning - unimplemented.
+</span>});
 
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>MsSqlDatamodelConnector;
 

@@ -57,6 +57,10 @@
 <a href="#57" id="57">57</a>
 <a href="#58" id="58">58</a>
 <a href="#59" id="59">59</a>
+<a href="#60" id="60">60</a>
+<a href="#61" id="61">61</a>
+<a href="#62" id="62">62</a>
+<a href="#63" id="63">63</a>
 </pre></div><pre class="rust"><code><span class="kw">use crate</span>::{QueryGraphBuilderError, QueryGraphError};
 <span class="kw">use </span>connector::error::ConnectorError;
 <span class="kw">use </span>query_structure::DomainError;
@@ -88,6 +92,10 @@
     <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
         <span class="kw">match </span><span class="self">self </span>{
             <span class="self">Self</span>::QueryGraphBuilderError(e) =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;{e:?}&quot;</span>),
+            <span class="self">Self</span>::ConnectorError(ConnectorError {
+                user_facing_error: <span class="prelude-val">Some</span>(e),
+                ..
+            }) =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;{e:?}&quot;</span>),
             <span class="kw">_ </span>=&gt; <span class="macro">write!</span>(f, <span class="string">&quot;Error occurred during query execution:\n{self:?}&quot;</span>),
         }
     }

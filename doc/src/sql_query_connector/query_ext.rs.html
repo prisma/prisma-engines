@@ -221,6 +221,8 @@
 <a href="#221" id="221">221</a>
 <a href="#222" id="222">222</a>
 <a href="#223" id="223">223</a>
+<a href="#224" id="224">224</a>
+<a href="#225" id="225">225</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::filter::FilterBuilder;
 <span class="kw">use crate</span>::{
     column_metadata, error::<span class="kw-2">*</span>, model_extensions::<span class="kw-2">*</span>, sql_trace::trace_parent_to_string, sql_trace::SqlTraceComment,
@@ -326,7 +328,9 @@
             .<span class="kw">await</span><span class="question-mark">?
             </span>.into_iter()
             .next()
-            .ok_or(SqlError::RecordDoesNotExist)
+            .ok_or(SqlError::RecordDoesNotExist {
+                cause: <span class="string">&quot;Filter returned no results&quot;</span>.to_owned(),
+            })
     }
 
     <span class="kw">async fn </span>filter_selectors(

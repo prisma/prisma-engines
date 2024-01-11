@@ -110,6 +110,8 @@
 <a href="#110" id="110">110</a>
 <a href="#111" id="111">111</a>
 <a href="#112" id="112">112</a>
+<a href="#113" id="113">113</a>
+<a href="#114" id="114">114</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::{fmt, str::FromStr};
 
 <span class="doccomment">/// Not all Databases are created equal. Hence connectors for our datasources support different capabilities.
@@ -218,7 +220,9 @@
     RowIn,      <span class="comment">// Connector supports (a, b) IN (c, d) expression.
     </span>DistinctOn, <span class="comment">// Connector supports DB-level distinct (e.g. postgres)
     </span>LateralJoin,
-);
+    DeleteReturning, <span class="comment">// Connector supports deleting records and returning them in one operation.
+    </span>SupportsFiltersOnRelationsWithoutJoins, <span class="comment">// Connector supports rendering filters on relation fields without joins.
+</span>);
 
 <span class="doccomment">/// Contains all capabilities that the connector is able to serve.
 </span><span class="kw">pub type </span>ConnectorCapabilities = enumflags2::BitFlags&lt;ConnectorCapability&gt;;

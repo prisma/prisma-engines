@@ -1331,6 +1331,30 @@
 <a href="#1331" id="1331">1331</a>
 <a href="#1332" id="1332">1332</a>
 <a href="#1333" id="1333">1333</a>
+<a href="#1334" id="1334">1334</a>
+<a href="#1335" id="1335">1335</a>
+<a href="#1336" id="1336">1336</a>
+<a href="#1337" id="1337">1337</a>
+<a href="#1338" id="1338">1338</a>
+<a href="#1339" id="1339">1339</a>
+<a href="#1340" id="1340">1340</a>
+<a href="#1341" id="1341">1341</a>
+<a href="#1342" id="1342">1342</a>
+<a href="#1343" id="1343">1343</a>
+<a href="#1344" id="1344">1344</a>
+<a href="#1345" id="1345">1345</a>
+<a href="#1346" id="1346">1346</a>
+<a href="#1347" id="1347">1347</a>
+<a href="#1348" id="1348">1348</a>
+<a href="#1349" id="1349">1349</a>
+<a href="#1350" id="1350">1350</a>
+<a href="#1351" id="1351">1351</a>
+<a href="#1352" id="1352">1352</a>
+<a href="#1353" id="1353">1353</a>
+<a href="#1354" id="1354">1354</a>
+<a href="#1355" id="1355">1355</a>
+<a href="#1356" id="1356">1356</a>
+<a href="#1357" id="1357">1357</a>
 </pre></div><pre class="rust"><code><span class="kw">use crate</span>::{
     ast::<span class="kw-2">*</span>,
     visitor::{<span class="self">self</span>, Visitor},
@@ -1364,6 +1388,17 @@
             },
             <span class="kw">_ </span>=&gt; <span class="self">self</span>.visit_expression(expr),
         }
+    }
+
+    <span class="kw">fn </span>visit_returning(<span class="kw-2">&amp;mut </span><span class="self">self</span>, returning: <span class="prelude-ty">Option</span>&lt;Vec&lt;Column&lt;<span class="lifetime">&#39;a</span>&gt;&gt;&gt;) -&gt; visitor::Result {
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(returning) = returning {
+            <span class="kw">if </span>!returning.is_empty() {
+                <span class="kw">let </span>values = returning.into_iter().map(|r| r.into()).collect();
+                <span class="self">self</span>.write(<span class="string">&quot; RETURNING &quot;</span>)<span class="question-mark">?</span>;
+                <span class="self">self</span>.visit_columns(values)<span class="question-mark">?</span>;
+            }
+        }
+        <span class="prelude-val">Ok</span>(())
     }
 }
 
@@ -1661,13 +1696,7 @@
             <span class="prelude-val">None </span>=&gt; (),
         }
 
-        <span class="kw">if let </span><span class="prelude-val">Some</span>(returning) = insert.returning {
-            <span class="kw">if </span>!returning.is_empty() {
-                <span class="kw">let </span>values = returning.into_iter().map(|r| r.into()).collect();
-                <span class="self">self</span>.write(<span class="string">&quot; RETURNING &quot;</span>)<span class="question-mark">?</span>;
-                <span class="self">self</span>.visit_columns(values)<span class="question-mark">?</span>;
-            }
-        };
+        <span class="self">self</span>.visit_returning(insert.returning)<span class="question-mark">?</span>;
 
         <span class="kw">if let </span><span class="prelude-val">Some</span>(comment) = insert.comment {
             <span class="self">self</span>.write(<span class="string">&quot; &quot;</span>)<span class="question-mark">?</span>;
@@ -2053,6 +2082,25 @@
 
         <span class="kw">if </span>should_cast {
             <span class="self">self</span>.write(<span class="string">&quot;::text&quot;</span>)<span class="question-mark">?</span>;
+        }
+
+        <span class="prelude-val">Ok</span>(())
+    }
+
+    <span class="kw">fn </span>visit_delete(<span class="kw-2">&amp;mut </span><span class="self">self</span>, delete: Delete&lt;<span class="lifetime">&#39;a</span>&gt;) -&gt; visitor::Result {
+        <span class="self">self</span>.write(<span class="string">&quot;DELETE FROM &quot;</span>)<span class="question-mark">?</span>;
+        <span class="self">self</span>.visit_table(delete.table, <span class="bool-val">true</span>)<span class="question-mark">?</span>;
+
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(conditions) = delete.conditions {
+            <span class="self">self</span>.write(<span class="string">&quot; WHERE &quot;</span>)<span class="question-mark">?</span>;
+            <span class="self">self</span>.visit_conditions(conditions)<span class="question-mark">?</span>;
+        }
+
+        <span class="self">self</span>.visit_returning(delete.returning)<span class="question-mark">?</span>;
+
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(comment) = delete.comment {
+            <span class="self">self</span>.write(<span class="string">&quot; &quot;</span>)<span class="question-mark">?</span>;
+            <span class="self">self</span>.visit_comment(comment)<span class="question-mark">?</span>;
         }
 
         <span class="prelude-val">Ok</span>(())

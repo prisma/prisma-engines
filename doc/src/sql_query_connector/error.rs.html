@@ -352,6 +352,10 @@
 <a href="#352" id="352">352</a>
 <a href="#353" id="353">353</a>
 <a href="#354" id="354">354</a>
+<a href="#355" id="355">355</a>
+<a href="#356" id="356">356</a>
+<a href="#357" id="357">357</a>
+<a href="#358" id="358">358</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>connector_interface::error::<span class="kw-2">*</span>;
 <span class="kw">use </span>quaint::error::ErrorKind <span class="kw">as </span>QuaintKind;
 <span class="kw">use </span>query_structure::{prelude::DomainError, Filter};
@@ -445,8 +449,8 @@
     <span class="attr">#[error(<span class="string">&quot;Foreign key constraint failed&quot;</span>)]
     </span>ForeignKeyConstraintViolation { constraint: DatabaseConstraint },
 
-    <span class="attr">#[error(<span class="string">&quot;Record does not exist.&quot;</span>)]
-    </span>RecordDoesNotExist,
+    <span class="attr">#[error(<span class="string">&quot;Record does not exist: {cause}&quot;</span>)]
+    </span>RecordDoesNotExist { cause: String },
 
     <span class="attr">#[error(<span class="string">&quot;Table {} does not exist&quot;</span>, _0)]
     </span>TableDoesNotExist(String),
@@ -551,7 +555,9 @@
             SqlError::ForeignKeyConstraintViolation { constraint } =&gt; {
                 ConnectorError::from_kind(ErrorKind::ForeignKeyConstraintViolation { constraint })
             }
-            SqlError::RecordDoesNotExist =&gt; ConnectorError::from_kind(ErrorKind::RecordDoesNotExist),
+            SqlError::RecordDoesNotExist { cause } =&gt; {
+                ConnectorError::from_kind(ErrorKind::RecordDoesNotExist { cause })
+            }
             SqlError::TableDoesNotExist(table) =&gt; ConnectorError::from_kind(ErrorKind::TableDoesNotExist { table }),
             SqlError::ColumnDoesNotExist(column) =&gt; ConnectorError::from_kind(ErrorKind::ColumnDoesNotExist { column }),
             SqlError::ConnectionError(e) =&gt; ConnectorError {
@@ -637,7 +643,9 @@
             QuaintKind::QueryError(qe) =&gt; <span class="self">Self</span>::QueryError(qe),
             QuaintKind::QueryInvalidInput(qe) =&gt; <span class="self">Self</span>::QueryInvalidInput(qe),
             e @ QuaintKind::IoError(<span class="kw">_</span>) =&gt; <span class="self">Self</span>::ConnectionError(e),
-            QuaintKind::NotFound =&gt; <span class="self">Self</span>::RecordDoesNotExist,
+            QuaintKind::NotFound =&gt; <span class="self">Self</span>::RecordDoesNotExist {
+                cause: <span class="string">&quot;Record not found&quot;</span>.to_owned(),
+            },
             QuaintKind::UniqueConstraintViolation { constraint } =&gt; <span class="self">Self</span>::UniqueConstraintViolation {
                 constraint: constraint.into(),
             },

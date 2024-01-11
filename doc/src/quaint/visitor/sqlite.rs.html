@@ -1007,6 +1007,33 @@
 <a href="#1007" id="1007">1007</a>
 <a href="#1008" id="1008">1008</a>
 <a href="#1009" id="1009">1009</a>
+<a href="#1010" id="1010">1010</a>
+<a href="#1011" id="1011">1011</a>
+<a href="#1012" id="1012">1012</a>
+<a href="#1013" id="1013">1013</a>
+<a href="#1014" id="1014">1014</a>
+<a href="#1015" id="1015">1015</a>
+<a href="#1016" id="1016">1016</a>
+<a href="#1017" id="1017">1017</a>
+<a href="#1018" id="1018">1018</a>
+<a href="#1019" id="1019">1019</a>
+<a href="#1020" id="1020">1020</a>
+<a href="#1021" id="1021">1021</a>
+<a href="#1022" id="1022">1022</a>
+<a href="#1023" id="1023">1023</a>
+<a href="#1024" id="1024">1024</a>
+<a href="#1025" id="1025">1025</a>
+<a href="#1026" id="1026">1026</a>
+<a href="#1027" id="1027">1027</a>
+<a href="#1028" id="1028">1028</a>
+<a href="#1029" id="1029">1029</a>
+<a href="#1030" id="1030">1030</a>
+<a href="#1031" id="1031">1031</a>
+<a href="#1032" id="1032">1032</a>
+<a href="#1033" id="1033">1033</a>
+<a href="#1034" id="1034">1034</a>
+<a href="#1035" id="1035">1035</a>
+<a href="#1036" id="1036">1036</a>
 </pre></div><pre class="rust"><code><span class="kw">use crate</span>::{
     ast::<span class="kw-2">*</span>,
     error::{Error, ErrorKind},
@@ -1022,6 +1049,29 @@
 </span><span class="kw">pub struct </span>Sqlite&lt;<span class="lifetime">&#39;a</span>&gt; {
     query: String,
     parameters: Vec&lt;Value&lt;<span class="lifetime">&#39;a</span>&gt;&gt;,
+}
+
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; Sqlite&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="kw">fn </span>returning(<span class="kw-2">&amp;mut </span><span class="self">self</span>, returning: <span class="prelude-ty">Option</span>&lt;Vec&lt;Column&lt;<span class="lifetime">&#39;a</span>&gt;&gt;&gt;) -&gt; visitor::Result {
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(returning) = returning {
+            <span class="kw">if </span>!returning.is_empty() {
+                <span class="kw">let </span>values_len = returning.len();
+                <span class="self">self</span>.write(<span class="string">&quot; RETURNING &quot;</span>)<span class="question-mark">?</span>;
+
+                <span class="kw">for </span>(i, column) <span class="kw">in </span>returning.into_iter().enumerate() {
+                    <span class="comment">// Workaround for SQLite parsing bug
+                    // https://sqlite.org/forum/info/6c141f151fa5c444db257eb4d95c302b70bfe5515901cf987e83ed8ebd434c49?t=h
+                    </span><span class="self">self</span>.surround_with_backticks(<span class="kw-2">&amp;</span>column.name)<span class="question-mark">?</span>;
+                    <span class="self">self</span>.write(<span class="string">&quot; AS &quot;</span>)<span class="question-mark">?</span>;
+                    <span class="self">self</span>.surround_with_backticks(<span class="kw-2">&amp;</span>column.name)<span class="question-mark">?</span>;
+                    <span class="kw">if </span>i &lt; (values_len - <span class="number">1</span>) {
+                        <span class="self">self</span>.write(<span class="string">&quot;, &quot;</span>)<span class="question-mark">?</span>;
+                    }
+                }
+            }
+        }
+        <span class="prelude-val">Ok</span>(())
+    }
 }
 
 <span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; Sqlite&lt;<span class="lifetime">&#39;a</span>&gt; {
@@ -1207,22 +1257,7 @@
             <span class="self">self</span>.visit_upsert(update)<span class="question-mark">?</span>;
         }
 
-        <span class="kw">if let </span><span class="prelude-val">Some</span>(returning) = insert.returning {
-            <span class="kw">if </span>!returning.is_empty() {
-                <span class="kw">let </span>values_len = returning.len();
-                <span class="self">self</span>.write(<span class="string">&quot; RETURNING &quot;</span>)<span class="question-mark">?</span>;
-
-                <span class="kw">for </span>(i, column) <span class="kw">in </span>returning.into_iter().enumerate() {
-                    <span class="comment">//yay https://sqlite.org/forum/info/6c141f151fa5c444db257eb4d95c302b70bfe5515901cf987e83ed8ebd434c49?t=h
-                    </span><span class="self">self</span>.surround_with_backticks(<span class="kw-2">&amp;</span>column.name)<span class="question-mark">?</span>;
-                    <span class="self">self</span>.write(<span class="string">&quot; AS &quot;</span>)<span class="question-mark">?</span>;
-                    <span class="self">self</span>.surround_with_backticks(<span class="kw-2">&amp;</span>column.name)<span class="question-mark">?</span>;
-                    <span class="kw">if </span>i &lt; (values_len - <span class="number">1</span>) {
-                        <span class="self">self</span>.write(<span class="string">&quot;, &quot;</span>)<span class="question-mark">?</span>;
-                    }
-                }
-            }
-        }
+        <span class="self">self</span>.returning(insert.returning)<span class="question-mark">?</span>;
 
         <span class="kw">if let </span><span class="prelude-val">Some</span>(comment) = insert.comment {
             <span class="self">self</span>.write(<span class="string">&quot;; &quot;</span>)<span class="question-mark">?</span>;
@@ -1398,6 +1433,25 @@
 
             <span class="prelude-val">Ok</span>(())
         })<span class="question-mark">?</span>;
+
+        <span class="prelude-val">Ok</span>(())
+    }
+
+    <span class="kw">fn </span>visit_delete(<span class="kw-2">&amp;mut </span><span class="self">self</span>, delete: Delete&lt;<span class="lifetime">&#39;a</span>&gt;) -&gt; visitor::Result {
+        <span class="self">self</span>.write(<span class="string">&quot;DELETE FROM &quot;</span>)<span class="question-mark">?</span>;
+        <span class="self">self</span>.visit_table(delete.table, <span class="bool-val">true</span>)<span class="question-mark">?</span>;
+
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(conditions) = delete.conditions {
+            <span class="self">self</span>.write(<span class="string">&quot; WHERE &quot;</span>)<span class="question-mark">?</span>;
+            <span class="self">self</span>.visit_conditions(conditions)<span class="question-mark">?</span>;
+        }
+
+        <span class="self">self</span>.returning(delete.returning)<span class="question-mark">?</span>;
+
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(comment) = delete.comment {
+            <span class="self">self</span>.write(<span class="string">&quot; &quot;</span>)<span class="question-mark">?</span>;
+            <span class="self">self</span>.visit_comment(comment)<span class="question-mark">?</span>;
+        }
 
         <span class="prelude-val">Ok</span>(())
     }

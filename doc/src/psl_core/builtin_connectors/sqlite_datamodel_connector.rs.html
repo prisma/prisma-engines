@@ -115,6 +115,8 @@
 <a href="#115" id="115">115</a>
 <a href="#116" id="116">116</a>
 <a href="#117" id="117">117</a>
+<a href="#118" id="118">118</a>
+<a href="#119" id="119">119</a>
 </pre></div><pre class="rust"><code><span class="kw">use crate</span>::{
     datamodel_connector::{
         Connector, ConnectorCapabilities, ConnectorCapability, ConstraintScope, Flavour, NativeTypeConstructor,
@@ -141,11 +143,13 @@
     SupportsTxIsolationSerializable |
     NativeUpsert |
     FilteredInlineChildNestedToOneDisconnect |
-    RowIn
-    <span class="comment">// InsertReturning - While SQLite does support RETURNING, it does not return column information on the way back from the database.
-    // This column type information is necessary in order to preserve consistency for some data types such as int, where values could overflow.
+    RowIn |
+    <span class="comment">// InsertReturning, DeleteReturning, UpdateReturning - While SQLite does support RETURNING, it does not return column information on the
+    // way back from the database. This column type information is necessary in order to preserve consistency for some data types such as int,
+    // where values could overflow.
     // Since we care to stay consistent with reads, it is not enabled.
-</span>});
+    </span>SupportsFiltersOnRelationsWithoutJoins
+});
 
 <span class="kw">pub struct </span>SqliteDatamodelConnector;
 

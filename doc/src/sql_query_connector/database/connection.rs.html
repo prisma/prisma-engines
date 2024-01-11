@@ -306,6 +306,22 @@
 <a href="#306" id="306">306</a>
 <a href="#307" id="307">307</a>
 <a href="#308" id="308">308</a>
+<a href="#309" id="309">309</a>
+<a href="#310" id="310">310</a>
+<a href="#311" id="311">311</a>
+<a href="#312" id="312">312</a>
+<a href="#313" id="313">313</a>
+<a href="#314" id="314">314</a>
+<a href="#315" id="315">315</a>
+<a href="#316" id="316">316</a>
+<a href="#317" id="317">317</a>
+<a href="#318" id="318">318</a>
+<a href="#319" id="319">319</a>
+<a href="#320" id="320">320</a>
+<a href="#321" id="321">321</a>
+<a href="#322" id="322">322</a>
+<a href="#323" id="323">323</a>
+<a href="#324" id="324">324</a>
 </pre></div><pre class="rust"><code><span class="attr">#![cfg_attr(target_arch = <span class="string">&quot;wasm32&quot;</span>, allow(dead_code))]
 
 </span><span class="kw">use super</span>::{catch, transaction::SqlConnectorTransaction};
@@ -371,7 +387,7 @@
 
         <span class="kw">let </span>fut_tx = <span class="self">self</span>.inner.start_transaction(isolation_level);
 
-        catch(<span class="self">self</span>.connection_info.clone(), <span class="kw">async move </span>{
+        catch(<span class="kw-2">&amp;</span><span class="self">self</span>.connection_info, <span class="kw">async move </span>{
             <span class="kw">let </span>tx = fut_tx.<span class="kw">await</span>.map_err(SqlError::from)<span class="question-mark">?</span>;
 
             <span class="prelude-val">Ok</span>(Box::new(SqlConnectorTransaction::new(tx, connection_info, features)) <span class="kw">as </span>Box&lt;<span class="kw">dyn </span>Transaction&gt;)
@@ -399,8 +415,9 @@
         trace_id: <span class="prelude-ty">Option</span>&lt;String&gt;,
     ) -&gt; connector::Result&lt;<span class="prelude-ty">Option</span>&lt;SingleRecord&gt;&gt; {
         <span class="comment">// [Composites] todo: FieldSelection -&gt; ModelProjection conversion
-        </span>catch(<span class="self">self</span>.connection_info.clone(), <span class="kw">async move </span>{
-            <span class="kw">let </span>ctx = Context::new(<span class="kw-2">&amp;</span><span class="self">self</span>.connection_info, trace_id.as_deref());
+        </span><span class="kw">let </span>ctx = Context::new(<span class="kw-2">&amp;</span><span class="self">self</span>.connection_info, trace_id.as_deref());
+        catch(
+            <span class="kw-2">&amp;</span><span class="self">self</span>.connection_info,
             read::get_single_record(
                 <span class="kw-2">&amp;</span><span class="self">self</span>.inner,
                 model,
@@ -409,9 +426,8 @@
                 aggr_selections,
                 relation_load_strategy,
                 <span class="kw-2">&amp;</span>ctx,
-            )
-            .<span class="kw">await
-        </span>})
+            ),
+        )
         .<span class="kw">await
     </span>}
 
@@ -424,9 +440,9 @@
         relation_load_strategy: RelationLoadStrategy,
         trace_id: <span class="prelude-ty">Option</span>&lt;String&gt;,
     ) -&gt; connector::Result&lt;ManyRecords&gt; {
-        catch(<span class="self">self</span>.connection_info.clone(), <span class="kw">async move </span>{
-            <span class="kw">let </span>ctx = Context::new(<span class="kw-2">&amp;</span><span class="self">self</span>.connection_info, trace_id.as_deref());
-
+        <span class="kw">let </span>ctx = Context::new(<span class="kw-2">&amp;</span><span class="self">self</span>.connection_info, trace_id.as_deref());
+        catch(
+            <span class="kw-2">&amp;</span><span class="self">self</span>.connection_info,
             read::get_many_records(
                 <span class="kw-2">&amp;</span><span class="self">self</span>.inner,
                 model,
@@ -435,9 +451,8 @@
                 aggr_selections,
                 relation_load_strategy,
                 <span class="kw-2">&amp;</span>ctx,
-            )
-            .<span class="kw">await
-        </span>})
+            ),
+        )
         .<span class="kw">await
     </span>}
 
@@ -447,10 +462,11 @@
         from_record_ids: <span class="kw-2">&amp;</span>[SelectionResult],
         trace_id: <span class="prelude-ty">Option</span>&lt;String&gt;,
     ) -&gt; connector::Result&lt;Vec&lt;(SelectionResult, SelectionResult)&gt;&gt; {
-        catch(<span class="self">self</span>.connection_info.clone(), <span class="kw">async move </span>{
-            <span class="kw">let </span>ctx = Context::new(<span class="kw-2">&amp;</span><span class="self">self</span>.connection_info, trace_id.as_deref());
-            read::get_related_m2m_record_ids(<span class="kw-2">&amp;</span><span class="self">self</span>.inner, from_field, from_record_ids, <span class="kw-2">&amp;</span>ctx).<span class="kw">await
-        </span>})
+        <span class="kw">let </span>ctx = Context::new(<span class="kw-2">&amp;</span><span class="self">self</span>.connection_info, trace_id.as_deref());
+        catch(
+            <span class="kw-2">&amp;</span><span class="self">self</span>.connection_info,
+            read::get_related_m2m_record_ids(<span class="kw-2">&amp;</span><span class="self">self</span>.inner, from_field, from_record_ids, <span class="kw-2">&amp;</span>ctx),
+        )
         .<span class="kw">await
     </span>}
 
@@ -463,10 +479,11 @@
         having: <span class="prelude-ty">Option</span>&lt;Filter&gt;,
         trace_id: <span class="prelude-ty">Option</span>&lt;String&gt;,
     ) -&gt; connector::Result&lt;Vec&lt;AggregationRow&gt;&gt; {
-        catch(<span class="self">self</span>.connection_info.clone(), <span class="kw">async move </span>{
-            <span class="kw">let </span>ctx = Context::new(<span class="kw-2">&amp;</span><span class="self">self</span>.connection_info, trace_id.as_deref());
-            read::aggregate(<span class="kw-2">&amp;</span><span class="self">self</span>.inner, model, query_arguments, selections, group_by, having, <span class="kw-2">&amp;</span>ctx).<span class="kw">await
-        </span>})
+        <span class="kw">let </span>ctx = Context::new(<span class="kw-2">&amp;</span><span class="self">self</span>.connection_info, trace_id.as_deref());
+        catch(
+            <span class="kw-2">&amp;</span><span class="self">self</span>.connection_info,
+            read::aggregate(<span class="kw-2">&amp;</span><span class="self">self</span>.inner, model, query_arguments, selections, group_by, having, <span class="kw-2">&amp;</span>ctx),
+        )
         .<span class="kw">await
     </span>}
 }
@@ -483,8 +500,9 @@
         selected_fields: FieldSelection,
         trace_id: <span class="prelude-ty">Option</span>&lt;String&gt;,
     ) -&gt; connector::Result&lt;SingleRecord&gt; {
-        catch(<span class="self">self</span>.connection_info.clone(), <span class="kw">async move </span>{
-            <span class="kw">let </span>ctx = Context::new(<span class="kw-2">&amp;</span><span class="self">self</span>.connection_info, trace_id.as_deref());
+        <span class="kw">let </span>ctx = Context::new(<span class="kw-2">&amp;</span><span class="self">self</span>.connection_info, trace_id.as_deref());
+        catch(
+            <span class="kw-2">&amp;</span><span class="self">self</span>.connection_info,
             write::create_record(
                 <span class="kw-2">&amp;</span><span class="self">self</span>.inner,
                 <span class="kw-2">&amp;</span><span class="self">self</span>.connection_info.sql_family(),
@@ -492,9 +510,8 @@
                 args,
                 selected_fields,
                 <span class="kw-2">&amp;</span>ctx,
-            )
-            .<span class="kw">await
-        </span>})
+            ),
+        )
         .<span class="kw">await
     </span>}
 
@@ -505,10 +522,11 @@
         skip_duplicates: bool,
         trace_id: <span class="prelude-ty">Option</span>&lt;String&gt;,
     ) -&gt; connector::Result&lt;usize&gt; {
-        catch(<span class="self">self</span>.connection_info.clone(), <span class="kw">async move </span>{
-            <span class="kw">let </span>ctx = Context::new(<span class="kw-2">&amp;</span><span class="self">self</span>.connection_info, trace_id.as_deref());
-            write::create_records(<span class="kw-2">&amp;</span><span class="self">self</span>.inner, model, args, skip_duplicates, <span class="kw-2">&amp;</span>ctx).<span class="kw">await
-        </span>})
+        <span class="kw">let </span>ctx = Context::new(<span class="kw-2">&amp;</span><span class="self">self</span>.connection_info, trace_id.as_deref());
+        catch(
+            <span class="kw-2">&amp;</span><span class="self">self</span>.connection_info,
+            write::create_records(<span class="kw-2">&amp;</span><span class="self">self</span>.inner, model, args, skip_duplicates, <span class="kw-2">&amp;</span>ctx),
+        )
         .<span class="kw">await
     </span>}
 
@@ -519,10 +537,11 @@
         args: WriteArgs,
         trace_id: <span class="prelude-ty">Option</span>&lt;String&gt;,
     ) -&gt; connector::Result&lt;usize&gt; {
-        catch(<span class="self">self</span>.connection_info.clone(), <span class="kw">async move </span>{
-            <span class="kw">let </span>ctx = Context::new(<span class="kw-2">&amp;</span><span class="self">self</span>.connection_info, trace_id.as_deref());
-            write::update_records(<span class="kw-2">&amp;</span><span class="self">self</span>.inner, model, record_filter, args, <span class="kw-2">&amp;</span>ctx).<span class="kw">await
-        </span>})
+        <span class="kw">let </span>ctx = Context::new(<span class="kw-2">&amp;</span><span class="self">self</span>.connection_info, trace_id.as_deref());
+        catch(
+            <span class="kw-2">&amp;</span><span class="self">self</span>.connection_info,
+            write::update_records(<span class="kw-2">&amp;</span><span class="self">self</span>.inner, model, record_filter, args, <span class="kw-2">&amp;</span>ctx),
+        )
         .<span class="kw">await
     </span>}
 
@@ -534,11 +553,11 @@
         selected_fields: <span class="prelude-ty">Option</span>&lt;FieldSelection&gt;,
         trace_id: <span class="prelude-ty">Option</span>&lt;String&gt;,
     ) -&gt; connector::Result&lt;<span class="prelude-ty">Option</span>&lt;SingleRecord&gt;&gt; {
-        catch(<span class="self">self</span>.connection_info.clone(), <span class="kw">async move </span>{
-            <span class="kw">let </span>ctx = Context::new(<span class="kw-2">&amp;</span><span class="self">self</span>.connection_info, trace_id.as_deref());
-
-            write::update_record(<span class="kw-2">&amp;</span><span class="self">self</span>.inner, model, record_filter, args, selected_fields, <span class="kw-2">&amp;</span>ctx).<span class="kw">await
-        </span>})
+        <span class="kw">let </span>ctx = Context::new(<span class="kw-2">&amp;</span><span class="self">self</span>.connection_info, trace_id.as_deref());
+        catch(
+            <span class="kw-2">&amp;</span><span class="self">self</span>.connection_info,
+            write::update_record(<span class="kw-2">&amp;</span><span class="self">self</span>.inner, model, record_filter, args, selected_fields, <span class="kw-2">&amp;</span>ctx),
+        )
         .<span class="kw">await
     </span>}
 
@@ -548,10 +567,26 @@
         record_filter: RecordFilter,
         trace_id: <span class="prelude-ty">Option</span>&lt;String&gt;,
     ) -&gt; connector::Result&lt;usize&gt; {
-        catch(<span class="self">self</span>.connection_info.clone(), <span class="kw">async move </span>{
-            <span class="kw">let </span>ctx = Context::new(<span class="kw-2">&amp;</span><span class="self">self</span>.connection_info, trace_id.as_deref());
-            write::delete_records(<span class="kw-2">&amp;</span><span class="self">self</span>.inner, model, record_filter, <span class="kw-2">&amp;</span>ctx).<span class="kw">await
-        </span>})
+        <span class="kw">let </span>ctx = Context::new(<span class="kw-2">&amp;</span><span class="self">self</span>.connection_info, trace_id.as_deref());
+        catch(
+            <span class="kw-2">&amp;</span><span class="self">self</span>.connection_info,
+            write::delete_records(<span class="kw-2">&amp;</span><span class="self">self</span>.inner, model, record_filter, <span class="kw-2">&amp;</span>ctx),
+        )
+        .<span class="kw">await
+    </span>}
+
+    <span class="kw">async fn </span>delete_record(
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>,
+        model: <span class="kw-2">&amp;</span>Model,
+        record_filter: RecordFilter,
+        selected_fields: FieldSelection,
+        trace_id: <span class="prelude-ty">Option</span>&lt;String&gt;,
+    ) -&gt; connector::Result&lt;SingleRecord&gt; {
+        <span class="kw">let </span>ctx = Context::new(<span class="kw-2">&amp;</span><span class="self">self</span>.connection_info, trace_id.as_deref());
+        catch(
+            <span class="kw-2">&amp;</span><span class="self">self</span>.connection_info,
+            write::delete_record(<span class="kw-2">&amp;</span><span class="self">self</span>.inner, model, record_filter, selected_fields, <span class="kw-2">&amp;</span>ctx),
+        )
         .<span class="kw">await
     </span>}
 
@@ -560,11 +595,8 @@
         upsert: connector_interface::NativeUpsert,
         trace_id: <span class="prelude-ty">Option</span>&lt;String&gt;,
     ) -&gt; connector::Result&lt;SingleRecord&gt; {
-        catch(<span class="self">self</span>.connection_info.clone(), <span class="kw">async move </span>{
-            <span class="kw">let </span>ctx = Context::new(<span class="kw-2">&amp;</span><span class="self">self</span>.connection_info, trace_id.as_deref());
-            upsert::native_upsert(<span class="kw-2">&amp;</span><span class="self">self</span>.inner, upsert, <span class="kw-2">&amp;</span>ctx).<span class="kw">await
-        </span>})
-        .<span class="kw">await
+        <span class="kw">let </span>ctx = Context::new(<span class="kw-2">&amp;</span><span class="self">self</span>.connection_info, trace_id.as_deref());
+        catch(<span class="kw-2">&amp;</span><span class="self">self</span>.connection_info, upsert::native_upsert(<span class="kw-2">&amp;</span><span class="self">self</span>.inner, upsert, <span class="kw-2">&amp;</span>ctx)).<span class="kw">await
     </span>}
 
     <span class="kw">async fn </span>m2m_connect(
@@ -574,10 +606,11 @@
         child_ids: <span class="kw-2">&amp;</span>[SelectionResult],
         trace_id: <span class="prelude-ty">Option</span>&lt;String&gt;,
     ) -&gt; connector::Result&lt;()&gt; {
-        catch(<span class="self">self</span>.connection_info.clone(), <span class="kw">async move </span>{
-            <span class="kw">let </span>ctx = Context::new(<span class="kw-2">&amp;</span><span class="self">self</span>.connection_info, trace_id.as_deref());
-            write::m2m_connect(<span class="kw-2">&amp;</span><span class="self">self</span>.inner, field, parent_id, child_ids, <span class="kw-2">&amp;</span>ctx).<span class="kw">await
-        </span>})
+        <span class="kw">let </span>ctx = Context::new(<span class="kw-2">&amp;</span><span class="self">self</span>.connection_info, trace_id.as_deref());
+        catch(
+            <span class="kw-2">&amp;</span><span class="self">self</span>.connection_info,
+            write::m2m_connect(<span class="kw-2">&amp;</span><span class="self">self</span>.inner, field, parent_id, child_ids, <span class="kw-2">&amp;</span>ctx),
+        )
         .<span class="kw">await
     </span>}
 
@@ -588,17 +621,19 @@
         child_ids: <span class="kw-2">&amp;</span>[SelectionResult],
         trace_id: <span class="prelude-ty">Option</span>&lt;String&gt;,
     ) -&gt; connector::Result&lt;()&gt; {
-        catch(<span class="self">self</span>.connection_info.clone(), <span class="kw">async move </span>{
-            <span class="kw">let </span>ctx = Context::new(<span class="kw-2">&amp;</span><span class="self">self</span>.connection_info, trace_id.as_deref());
-            write::m2m_disconnect(<span class="kw-2">&amp;</span><span class="self">self</span>.inner, field, parent_id, child_ids, <span class="kw-2">&amp;</span>ctx).<span class="kw">await
-        </span>})
+        <span class="kw">let </span>ctx = Context::new(<span class="kw-2">&amp;</span><span class="self">self</span>.connection_info, trace_id.as_deref());
+        catch(
+            <span class="kw-2">&amp;</span><span class="self">self</span>.connection_info,
+            write::m2m_disconnect(<span class="kw-2">&amp;</span><span class="self">self</span>.inner, field, parent_id, child_ids, <span class="kw-2">&amp;</span>ctx),
+        )
         .<span class="kw">await
     </span>}
 
     <span class="kw">async fn </span>execute_raw(<span class="kw-2">&amp;mut </span><span class="self">self</span>, inputs: HashMap&lt;String, PrismaValue&gt;) -&gt; connector::Result&lt;usize&gt; {
-        catch(<span class="self">self</span>.connection_info.clone(), <span class="kw">async move </span>{
-            write::execute_raw(<span class="kw-2">&amp;</span><span class="self">self</span>.inner, <span class="self">self</span>.features, inputs).<span class="kw">await
-        </span>})
+        catch(
+            <span class="kw-2">&amp;</span><span class="self">self</span>.connection_info,
+            write::execute_raw(<span class="kw-2">&amp;</span><span class="self">self</span>.inner, <span class="self">self</span>.features, inputs),
+        )
         .<span class="kw">await
     </span>}
 
@@ -608,10 +643,7 @@
         inputs: HashMap&lt;String, PrismaValue&gt;,
         _query_type: <span class="prelude-ty">Option</span>&lt;String&gt;,
     ) -&gt; connector::Result&lt;serde_json::Value&gt; {
-        catch(<span class="self">self</span>.connection_info.clone(), <span class="kw">async move </span>{
-            write::query_raw(<span class="kw-2">&amp;</span><span class="self">self</span>.inner, inputs).<span class="kw">await
-        </span>})
-        .<span class="kw">await
+        catch(<span class="kw-2">&amp;</span><span class="self">self</span>.connection_info, write::query_raw(<span class="kw-2">&amp;</span><span class="self">self</span>.inner, inputs)).<span class="kw">await
     </span>}
 }
 </code></pre></div></section></main></body></html>

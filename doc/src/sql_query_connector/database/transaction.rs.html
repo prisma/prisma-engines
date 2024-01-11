@@ -300,6 +300,25 @@
 <a href="#300" id="300">300</a>
 <a href="#301" id="301">301</a>
 <a href="#302" id="302">302</a>
+<a href="#303" id="303">303</a>
+<a href="#304" id="304">304</a>
+<a href="#305" id="305">305</a>
+<a href="#306" id="306">306</a>
+<a href="#307" id="307">307</a>
+<a href="#308" id="308">308</a>
+<a href="#309" id="309">309</a>
+<a href="#310" id="310">310</a>
+<a href="#311" id="311">311</a>
+<a href="#312" id="312">312</a>
+<a href="#313" id="313">313</a>
+<a href="#314" id="314">314</a>
+<a href="#315" id="315">315</a>
+<a href="#316" id="316">316</a>
+<a href="#317" id="317">317</a>
+<a href="#318" id="318">318</a>
+<a href="#319" id="319">319</a>
+<a href="#320" id="320">320</a>
+<a href="#321" id="321">321</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span><span class="kw">super</span>::catch;
 <span class="kw">use crate</span>::{database::operations::<span class="kw-2">*</span>, Context, SqlError};
 <span class="kw">use </span>async_trait::async_trait;
@@ -340,14 +359,14 @@
 <span class="attr">#[async_trait]
 </span><span class="kw">impl</span>&lt;<span class="lifetime">&#39;tx</span>&gt; Transaction <span class="kw">for </span>SqlConnectorTransaction&lt;<span class="lifetime">&#39;tx</span>&gt; {
     <span class="kw">async fn </span>commit(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; connector::Result&lt;()&gt; {
-        catch(<span class="self">self</span>.connection_info.clone(), <span class="kw">async move </span>{
+        catch(<span class="kw-2">&amp;</span><span class="self">self</span>.connection_info, <span class="kw">async </span>{
             <span class="self">self</span>.inner.commit().<span class="kw">await</span>.map_err(SqlError::from)
         })
         .<span class="kw">await
     </span>}
 
     <span class="kw">async fn </span>rollback(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; connector::Result&lt;()&gt; {
-        catch(<span class="self">self</span>.connection_info.clone(), <span class="kw">async move </span>{
+        catch(<span class="kw-2">&amp;</span><span class="self">self</span>.connection_info, <span class="kw">async </span>{
             <span class="kw">let </span>res = <span class="self">self</span>.inner.rollback().<span class="kw">await</span>.map_err(SqlError::from);
 
             <span class="kw">match </span>res {
@@ -374,8 +393,9 @@
         relation_load_strategy: RelationLoadStrategy,
         trace_id: <span class="prelude-ty">Option</span>&lt;String&gt;,
     ) -&gt; connector::Result&lt;<span class="prelude-ty">Option</span>&lt;SingleRecord&gt;&gt; {
-        catch(<span class="self">self</span>.connection_info.clone(), <span class="kw">async move </span>{
-            <span class="kw">let </span>ctx = Context::new(<span class="kw-2">&amp;</span><span class="self">self</span>.connection_info, trace_id.as_deref());
+        <span class="kw">let </span>ctx = Context::new(<span class="kw-2">&amp;</span><span class="self">self</span>.connection_info, trace_id.as_deref());
+        catch(
+            <span class="kw-2">&amp;</span><span class="self">self</span>.connection_info,
             read::get_single_record(
                 <span class="self">self</span>.inner.as_queryable(),
                 model,
@@ -384,9 +404,8 @@
                 aggr_selections,
                 relation_load_strategy,
                 <span class="kw-2">&amp;</span>ctx,
-            )
-            .<span class="kw">await
-        </span>})
+            ),
+        )
         .<span class="kw">await
     </span>}
 
@@ -399,8 +418,9 @@
         relation_load_strategy: RelationLoadStrategy,
         trace_id: <span class="prelude-ty">Option</span>&lt;String&gt;,
     ) -&gt; connector::Result&lt;ManyRecords&gt; {
-        catch(<span class="self">self</span>.connection_info.clone(), <span class="kw">async move </span>{
-            <span class="kw">let </span>ctx = Context::new(<span class="kw-2">&amp;</span><span class="self">self</span>.connection_info, trace_id.as_deref());
+        <span class="kw">let </span>ctx = Context::new(<span class="kw-2">&amp;</span><span class="self">self</span>.connection_info, trace_id.as_deref());
+        catch(
+            <span class="kw-2">&amp;</span><span class="self">self</span>.connection_info,
             read::get_many_records(
                 <span class="self">self</span>.inner.as_queryable(),
                 model,
@@ -409,9 +429,8 @@
                 aggr_selections,
                 relation_load_strategy,
                 <span class="kw-2">&amp;</span>ctx,
-            )
-            .<span class="kw">await
-        </span>})
+            ),
+        )
         .<span class="kw">await
     </span>}
 
@@ -421,8 +440,8 @@
         from_record_ids: <span class="kw-2">&amp;</span>[SelectionResult],
         trace_id: <span class="prelude-ty">Option</span>&lt;String&gt;,
     ) -&gt; connector::Result&lt;Vec&lt;(SelectionResult, SelectionResult)&gt;&gt; {
-        catch(<span class="self">self</span>.connection_info.clone(), <span class="kw">async move </span>{
-            <span class="kw">let </span>ctx = Context::new(<span class="kw-2">&amp;</span><span class="self">self</span>.connection_info, trace_id.as_deref());
+        <span class="kw">let </span>ctx = Context::new(<span class="kw-2">&amp;</span><span class="self">self</span>.connection_info, trace_id.as_deref());
+        catch(<span class="kw-2">&amp;</span><span class="self">self</span>.connection_info, <span class="kw">async </span>{
             read::get_related_m2m_record_ids(<span class="self">self</span>.inner.as_queryable(), from_field, from_record_ids, <span class="kw-2">&amp;</span>ctx).<span class="kw">await
         </span>})
         .<span class="kw">await
@@ -437,8 +456,9 @@
         having: <span class="prelude-ty">Option</span>&lt;Filter&gt;,
         trace_id: <span class="prelude-ty">Option</span>&lt;String&gt;,
     ) -&gt; connector::Result&lt;Vec&lt;AggregationRow&gt;&gt; {
-        catch(<span class="self">self</span>.connection_info.clone(), <span class="kw">async move </span>{
-            <span class="kw">let </span>ctx = Context::new(<span class="kw-2">&amp;</span><span class="self">self</span>.connection_info, trace_id.as_deref());
+        <span class="kw">let </span>ctx = Context::new(<span class="kw-2">&amp;</span><span class="self">self</span>.connection_info, trace_id.as_deref());
+        catch(
+            <span class="kw-2">&amp;</span><span class="self">self</span>.connection_info,
             read::aggregate(
                 <span class="self">self</span>.inner.as_queryable(),
                 model,
@@ -447,9 +467,8 @@
                 group_by,
                 having,
                 <span class="kw-2">&amp;</span>ctx,
-            )
-            .<span class="kw">await
-        </span>})
+            ),
+        )
         .<span class="kw">await
     </span>}
 }
@@ -463,8 +482,9 @@
         selected_fields: FieldSelection,
         trace_id: <span class="prelude-ty">Option</span>&lt;String&gt;,
     ) -&gt; connector::Result&lt;SingleRecord&gt; {
-        catch(<span class="self">self</span>.connection_info.clone(), <span class="kw">async move </span>{
-            <span class="kw">let </span>ctx = Context::new(<span class="kw-2">&amp;</span><span class="self">self</span>.connection_info, trace_id.as_deref());
+        <span class="kw">let </span>ctx = Context::new(<span class="kw-2">&amp;</span><span class="self">self</span>.connection_info, trace_id.as_deref());
+        catch(
+            <span class="kw-2">&amp;</span><span class="self">self</span>.connection_info,
             write::create_record(
                 <span class="self">self</span>.inner.as_queryable(),
                 <span class="kw-2">&amp;</span><span class="self">self</span>.connection_info.sql_family(),
@@ -472,9 +492,8 @@
                 args,
                 selected_fields,
                 <span class="kw-2">&amp;</span>ctx,
-            )
-            .<span class="kw">await
-        </span>})
+            ),
+        )
         .<span class="kw">await
     </span>}
 
@@ -485,10 +504,11 @@
         skip_duplicates: bool,
         trace_id: <span class="prelude-ty">Option</span>&lt;String&gt;,
     ) -&gt; connector::Result&lt;usize&gt; {
-        catch(<span class="self">self</span>.connection_info.clone(), <span class="kw">async move </span>{
-            <span class="kw">let </span>ctx = Context::new(<span class="kw-2">&amp;</span><span class="self">self</span>.connection_info, trace_id.as_deref());
-            write::create_records(<span class="self">self</span>.inner.as_queryable(), model, args, skip_duplicates, <span class="kw-2">&amp;</span>ctx).<span class="kw">await
-        </span>})
+        <span class="kw">let </span>ctx = Context::new(<span class="kw-2">&amp;</span><span class="self">self</span>.connection_info, trace_id.as_deref());
+        catch(
+            <span class="kw-2">&amp;</span><span class="self">self</span>.connection_info,
+            write::create_records(<span class="self">self</span>.inner.as_queryable(), model, args, skip_duplicates, <span class="kw-2">&amp;</span>ctx),
+        )
         .<span class="kw">await
     </span>}
 
@@ -499,10 +519,11 @@
         args: WriteArgs,
         trace_id: <span class="prelude-ty">Option</span>&lt;String&gt;,
     ) -&gt; connector::Result&lt;usize&gt; {
-        catch(<span class="self">self</span>.connection_info.clone(), <span class="kw">async move </span>{
-            <span class="kw">let </span>ctx = Context::new(<span class="kw-2">&amp;</span><span class="self">self</span>.connection_info, trace_id.as_deref());
-            write::update_records(<span class="self">self</span>.inner.as_queryable(), model, record_filter, args, <span class="kw-2">&amp;</span>ctx).<span class="kw">await
-        </span>})
+        <span class="kw">let </span>ctx = Context::new(<span class="kw-2">&amp;</span><span class="self">self</span>.connection_info, trace_id.as_deref());
+        catch(
+            <span class="kw-2">&amp;</span><span class="self">self</span>.connection_info,
+            write::update_records(<span class="self">self</span>.inner.as_queryable(), model, record_filter, args, <span class="kw-2">&amp;</span>ctx),
+        )
         .<span class="kw">await
     </span>}
 
@@ -514,9 +535,9 @@
         selected_fields: <span class="prelude-ty">Option</span>&lt;FieldSelection&gt;,
         trace_id: <span class="prelude-ty">Option</span>&lt;String&gt;,
     ) -&gt; connector::Result&lt;<span class="prelude-ty">Option</span>&lt;SingleRecord&gt;&gt; {
-        catch(<span class="self">self</span>.connection_info.clone(), <span class="kw">async move </span>{
-            <span class="kw">let </span>ctx = Context::new(<span class="kw-2">&amp;</span><span class="self">self</span>.connection_info, trace_id.as_deref());
-
+        <span class="kw">let </span>ctx = Context::new(<span class="kw-2">&amp;</span><span class="self">self</span>.connection_info, trace_id.as_deref());
+        catch(
+            <span class="kw-2">&amp;</span><span class="self">self</span>.connection_info,
             write::update_record(
                 <span class="self">self</span>.inner.as_queryable(),
                 model,
@@ -524,9 +545,8 @@
                 args,
                 selected_fields,
                 <span class="kw-2">&amp;</span>ctx,
-            )
-            .<span class="kw">await
-        </span>})
+            ),
+        )
         .<span class="kw">await
     </span>}
 
@@ -536,10 +556,25 @@
         record_filter: RecordFilter,
         trace_id: <span class="prelude-ty">Option</span>&lt;String&gt;,
     ) -&gt; connector::Result&lt;usize&gt; {
-        catch(<span class="self">self</span>.connection_info.clone(), <span class="kw">async move </span>{
+        catch(<span class="kw-2">&amp;</span><span class="self">self</span>.connection_info, <span class="kw">async </span>{
             <span class="kw">let </span>ctx = Context::new(<span class="kw-2">&amp;</span><span class="self">self</span>.connection_info, trace_id.as_deref());
             write::delete_records(<span class="self">self</span>.inner.as_queryable(), model, record_filter, <span class="kw-2">&amp;</span>ctx).<span class="kw">await
         </span>})
+        .<span class="kw">await
+    </span>}
+
+    <span class="kw">async fn </span>delete_record(
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>,
+        model: <span class="kw-2">&amp;</span>Model,
+        record_filter: RecordFilter,
+        selected_fields: FieldSelection,
+        trace_id: <span class="prelude-ty">Option</span>&lt;String&gt;,
+    ) -&gt; connector::Result&lt;SingleRecord&gt; {
+        <span class="kw">let </span>ctx = Context::new(<span class="kw-2">&amp;</span><span class="self">self</span>.connection_info, trace_id.as_deref());
+        catch(
+            <span class="kw-2">&amp;</span><span class="self">self</span>.connection_info,
+            write::delete_record(<span class="self">self</span>.inner.as_queryable(), model, record_filter, selected_fields, <span class="kw-2">&amp;</span>ctx),
+        )
         .<span class="kw">await
     </span>}
 
@@ -548,7 +583,7 @@
         upsert: connector_interface::NativeUpsert,
         trace_id: <span class="prelude-ty">Option</span>&lt;String&gt;,
     ) -&gt; connector::Result&lt;SingleRecord&gt; {
-        catch(<span class="self">self</span>.connection_info.clone(), <span class="kw">async move </span>{
+        catch(<span class="kw-2">&amp;</span><span class="self">self</span>.connection_info, <span class="kw">async </span>{
             <span class="kw">let </span>ctx = Context::new(<span class="kw-2">&amp;</span><span class="self">self</span>.connection_info, trace_id.as_deref());
             upsert::native_upsert(<span class="self">self</span>.inner.as_queryable(), upsert, <span class="kw-2">&amp;</span>ctx).<span class="kw">await
         </span>})
@@ -562,7 +597,7 @@
         child_ids: <span class="kw-2">&amp;</span>[SelectionResult],
         trace_id: <span class="prelude-ty">Option</span>&lt;String&gt;,
     ) -&gt; connector::Result&lt;()&gt; {
-        catch(<span class="self">self</span>.connection_info.clone(), <span class="kw">async move </span>{
+        catch(<span class="kw-2">&amp;</span><span class="self">self</span>.connection_info, <span class="kw">async </span>{
             <span class="kw">let </span>ctx = Context::new(<span class="kw-2">&amp;</span><span class="self">self</span>.connection_info, trace_id.as_deref());
             write::m2m_connect(<span class="self">self</span>.inner.as_queryable(), field, parent_id, child_ids, <span class="kw-2">&amp;</span>ctx).<span class="kw">await
         </span>})
@@ -576,17 +611,19 @@
         child_ids: <span class="kw-2">&amp;</span>[SelectionResult],
         trace_id: <span class="prelude-ty">Option</span>&lt;String&gt;,
     ) -&gt; connector::Result&lt;()&gt; {
-        catch(<span class="self">self</span>.connection_info.clone(), <span class="kw">async move </span>{
-            <span class="kw">let </span>ctx = Context::new(<span class="kw-2">&amp;</span><span class="self">self</span>.connection_info, trace_id.as_deref());
-            write::m2m_disconnect(<span class="self">self</span>.inner.as_queryable(), field, parent_id, child_ids, <span class="kw-2">&amp;</span>ctx).<span class="kw">await
-        </span>})
+        <span class="kw">let </span>ctx = Context::new(<span class="kw-2">&amp;</span><span class="self">self</span>.connection_info, trace_id.as_deref());
+        catch(
+            <span class="kw-2">&amp;</span><span class="self">self</span>.connection_info,
+            write::m2m_disconnect(<span class="self">self</span>.inner.as_queryable(), field, parent_id, child_ids, <span class="kw-2">&amp;</span>ctx),
+        )
         .<span class="kw">await
     </span>}
 
     <span class="kw">async fn </span>execute_raw(<span class="kw-2">&amp;mut </span><span class="self">self</span>, inputs: HashMap&lt;String, PrismaValue&gt;) -&gt; connector::Result&lt;usize&gt; {
-        catch(<span class="self">self</span>.connection_info.clone(), <span class="kw">async move </span>{
-            write::execute_raw(<span class="self">self</span>.inner.as_queryable(), <span class="self">self</span>.features, inputs).<span class="kw">await
-        </span>})
+        catch(
+            <span class="kw-2">&amp;</span><span class="self">self</span>.connection_info,
+            write::execute_raw(<span class="self">self</span>.inner.as_queryable(), <span class="self">self</span>.features, inputs),
+        )
         .<span class="kw">await
     </span>}
 
@@ -596,9 +633,10 @@
         inputs: HashMap&lt;String, PrismaValue&gt;,
         _query_type: <span class="prelude-ty">Option</span>&lt;String&gt;,
     ) -&gt; connector::Result&lt;serde_json::Value&gt; {
-        catch(<span class="self">self</span>.connection_info.clone(), <span class="kw">async move </span>{
-            write::query_raw(<span class="self">self</span>.inner.as_queryable(), inputs).<span class="kw">await
-        </span>})
+        catch(
+            <span class="kw-2">&amp;</span><span class="self">self</span>.connection_info,
+            write::query_raw(<span class="self">self</span>.inner.as_queryable(), inputs),
+        )
         .<span class="kw">await
     </span>}
 }
