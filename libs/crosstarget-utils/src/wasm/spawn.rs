@@ -1,10 +1,12 @@
 use std::future::Future;
 
+use futures::FutureExt;
+
 use crate::common::SpawnError;
 
-pub async fn spawn_if_possible<F>(future: F) -> Result<F::Output, SpawnError>
+pub fn spawn_if_possible<F>(future: F) -> impl Future<F::Output, SpawnError>
 where
     F: Future + 'static,
 {
-    Ok(future.await)
+    future.map(Ok)
 }
