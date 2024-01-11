@@ -92,13 +92,17 @@ impl WriteQuery {
     /// Updates the field selection of the query to satisfy the inputted FieldSelection.
     pub fn satisfy_dependency(&mut self, fields: FieldSelection) {
         match self {
-            Self::CreateRecord(cr) => cr.selected_fields = cr.selected_fields.clone().merge(fields),
-            Self::UpdateRecord(UpdateRecord::WithSelection(ur)) => {
-                ur.selected_fields = ur.selected_fields.clone().merge(fields)
-            }
+            Self::CreateRecord(cr) => cr.selected_fields.merge_in_place(fields),
+            Self::UpdateRecord(UpdateRecord::WithSelection(ur)) => ur.selected_fields.merge_in_place(fields),
             Self::UpdateRecord(UpdateRecord::WithoutSelection(_)) => (),
             Self::CreateManyRecords(_) => (),
-            Self::DeleteRecord(_) => (),
+            Self::DeleteRecord(DeleteRecord {
+                selected_fields: Some(selected_fields),
+                ..
+            }) => selected_fields.fields.merge_in_place(fields),
+            Self::DeleteRecord(DeleteRecord {
+                selected_fields: None, ..
+            }) => (),
             Self::UpdateManyRecords(_) => (),
             Self::DeleteManyRecords(_) => (),
             Self::ConnectRecords(_) => (),

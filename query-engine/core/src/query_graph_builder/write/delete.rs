@@ -22,21 +22,8 @@ pub(crate) fn delete_record(
     if can_use_atomic_delete(query_schema, &field, &filter) {
         // Database supports returning the deleted row, so just the delete node will suffice.
         let nested_fields = field.nested_fields.unwrap().fields;
-        let mut selected_fields = read::utils::collect_selected_scalars(&nested_fields, &model);
+        let selected_fields = read::utils::collect_selected_scalars(&nested_fields, &model);
         let selection_order = read::utils::collect_selection_order(&nested_fields);
-
-        // Make sure to request all foreign key fields in addition to the fields selected by the user.
-        // This ensures that delete emulation below has all the data it needs, so that the "reload" node
-        // is not inserted between delete node and emulation subtree.
-        // NOTE: "Reload" node will always throw an error here because we just deleted the record
-        // it tries to fetch.
-        let internal_model = &model.dm;
-        let relation_fields = internal_model.fields_pointing_to_model(&model);
-        for relation_field in relation_fields {
-            let parent_relation_field = relation_field.related_field();
-            let linking_fields = parent_relation_field.linking_fields();
-            selected_fields = selected_fields.merge(linking_fields);
-        }
 
         let delete_query = Query::Write(WriteQuery::DeleteRecord(DeleteRecord {
             name: field.name,
