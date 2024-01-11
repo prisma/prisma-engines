@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"constant":["COCKROACH","MONGODB","MSSQL","MYSQL","POSTGRES","SQLITE"],"enum":["MongoDbType","MsSqlType","MsSqlTypeParameter","MySqlType","PostgresType"],"mod":["cockroach_datamodel_connector","completions"],"static":["BUILTIN_CONNECTORS"],"struct":["PostgresDatasourceProperties"]};
