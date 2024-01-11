@@ -1,7 +1,7 @@
 use super::catch;
 use crate::{database::operations::*, Context, SqlError};
 use async_trait::async_trait;
-use connector::{ConnectionLike, RelAggregationSelection};
+use connector::ConnectionLike;
 use connector_interface::{
     self as connector, AggregationRow, AggregationSelection, ReadOperations, RecordFilter, Transaction, WriteArgs,
     WriteOperations,
@@ -68,7 +68,6 @@ impl<'tx> ReadOperations for SqlConnectorTransaction<'tx> {
         model: &Model,
         filter: &Filter,
         selected_fields: &FieldSelection,
-        aggr_selections: &[RelAggregationSelection],
         relation_load_strategy: RelationLoadStrategy,
         trace_id: Option<String>,
     ) -> connector::Result<Option<SingleRecord>> {
@@ -80,7 +79,6 @@ impl<'tx> ReadOperations for SqlConnectorTransaction<'tx> {
                 model,
                 filter,
                 selected_fields,
-                aggr_selections,
                 relation_load_strategy,
                 &ctx,
             ),
@@ -93,7 +91,6 @@ impl<'tx> ReadOperations for SqlConnectorTransaction<'tx> {
         model: &Model,
         query_arguments: QueryArguments,
         selected_fields: &FieldSelection,
-        aggr_selections: &[RelAggregationSelection],
         relation_load_strategy: RelationLoadStrategy,
         trace_id: Option<String>,
     ) -> connector::Result<ManyRecords> {
@@ -105,7 +102,6 @@ impl<'tx> ReadOperations for SqlConnectorTransaction<'tx> {
                 model,
                 query_arguments,
                 selected_fields,
-                aggr_selections,
                 relation_load_strategy,
                 &ctx,
             ),

@@ -39,10 +39,11 @@ where
         alias: None,
         model: model.clone(),
         args: (model, filter).into(),
-        selected_fields,
+        full_selection: selected_fields,
+        user_selection: selected_fields,
         nested: vec![],
         selection_order: vec![],
-        aggregation_selections: vec![],
+        // aggregation_selections: vec![],
         options: QueryOptions::none(),
         relation_load_strategy: query_structure::RelationLoadStrategy::Query,
     });
@@ -112,8 +113,8 @@ where
         parent_field: parent_relation_field.clone(),
         parent_results: None,
         args: (child_model, filter).into(),
-        selected_fields,
-        aggregation_selections: vec![],
+        user_selection: selected_fields.clone(),
+        full_selection: selected_fields,
         nested: vec![],
         selection_order: vec![],
     })));
@@ -839,7 +840,7 @@ pub fn emulate_on_update_restrict(
 
     let linking_fields_updated = linking_fields
         .into_iter()
-        .any(|parent_pk| parent_update_args.get_field_value(parent_pk.db_name()).is_some());
+        .any(|parent_pk| parent_update_args.get_field_value(&parent_pk.db_name()).is_some());
 
     graph.create_edge(
         &read_node,

@@ -2,8 +2,8 @@ use crate::{
     join_utils::{compute_aggr_join, AggregationType, AliasedJoin},
     Context,
 };
-use connector_interface::RelAggregationSelection;
 use quaint::prelude::*;
+use query_structure::VirtualSelection;
 
 #[derive(Debug)]
 pub(crate) struct RelAggregationJoins {
@@ -13,13 +13,14 @@ pub(crate) struct RelAggregationJoins {
     pub(crate) columns: Vec<Expression<'static>>,
 }
 
-pub(crate) fn build(aggr_selections: &[RelAggregationSelection], ctx: &Context<'_>) -> RelAggregationJoins {
+// TODO: forward an iterator all the way from `FieldSelection::virtuals` to here without collecting
+pub(crate) fn build(virtual_selections: &[&VirtualSelection], ctx: &Context<'_>) -> RelAggregationJoins {
     let mut joins = vec![];
     let mut columns: Vec<Expression<'static>> = vec![];
 
-    for (index, selection) in aggr_selections.iter().enumerate() {
+    for (index, selection) in virtual_selections.iter().enumerate() {
         match selection {
-            RelAggregationSelection::Count(rf, filter) => {
+            VirtualSelection::RelationCount(rf, filter) => {
                 let join_alias = format!("aggr_selection_{index}");
                 let aggregator_alias = selection.db_alias();
                 let join = compute_aggr_join(

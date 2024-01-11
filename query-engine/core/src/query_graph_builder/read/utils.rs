@@ -1,6 +1,5 @@
 use super::*;
 use crate::{ArgumentListLookup, FieldPair, ParsedField, ReadQuery};
-use connector::RelAggregationSelection;
 use psl::{datamodel_connector::ConnectorCapability, PreviewFeature};
 use query_structure::{prelude::*, RelationLoadStrategy};
 use schema::{
@@ -211,13 +210,13 @@ pub fn merge_cursor_fields(selected_fields: FieldSelection, cursor: &Option<Sele
     }
 }
 
-pub fn collect_relation_aggr_selections(
-    from: Vec<FieldPair<'_>>,
+pub(crate) fn collect_virtual_fields(
+    aggr_fields: Vec<FieldPair<'_>>,
     model: &Model,
-) -> QueryGraphBuilderResult<Vec<RelAggregationSelection>> {
+) -> QueryGraphBuilderResult<FieldSelection> {
     let mut selections = vec![];
 
-    for pair in from {
+    for pair in aggr_fields {
         match pair.parsed_field.name.as_str() {
             UNDERSCORE_COUNT => {
                 let nested_fields = pair.parsed_field.nested_fields.unwrap();
@@ -227,36 +226,44 @@ pub fn collect_relation_aggr_selections(
                         .fields()
                         .find_from_relation_fields(&nested_pair.parsed_field.name)
                         .unwrap();
+
                     let filter = match nested_pair.parsed_field.arguments.lookup(args::WHERE) {
                         Some(where_arg) => Some(extract_filter(where_arg.value.try_into()?, rf.related_model())?),
                         _ => None,
                     };
 
-                    selections.push(RelAggregationSelection::Count(rf, filter));
+                    selections.push(SelectedField::Virtual(VirtualSelection::RelationCount(rf, filter)));
                 }
             }
-            field_name => panic!("Unknown field name \"{field_name}\" for a relation aggregation"),
+            field_name => {
+                return Err(QueryGraphBuilderError::InputError(format!(
+                    "Unknown field name \"{field_name}\" for a relation aggregation"
+                )))
+            }
         }
     }
 
-    Ok(selections)
+    Ok(FieldSelection::new(selections))
 }
 
+// TODO: most of the arguments should be derived from `selected_fields`
 pub(crate) fn get_relation_load_strategy(
     requested_strategy: Option<RelationLoadStrategy>,
     cursor: Option<&SelectionResult>,
     distinct: Option<&FieldSelection>,
     nested_queries: &[ReadQuery],
-    aggregation_selections: &[RelAggregationSelection],
+    // aggregation_selections: &[RelAggregationSelection],
+    selected_fields: &FieldSelection,
     query_schema: &QuerySchema,
 ) -> RelationLoadStrategy {
     if query_schema.has_feature(PreviewFeature::RelationJoins)
         && query_schema.has_capability(ConnectorCapability::LateralJoin)
         && cursor.is_none()
         && distinct.is_none()
-        && aggregation_selections.is_empty()
+        // && aggregation_selections.is_empty()
+        && !selected_fields.has_virtual_fields()
         && !nested_queries.iter().any(|q| match q {
-            ReadQuery::RelatedRecordsQuery(q) => q.has_cursor() || q.has_distinct() || q.has_aggregation_selections(),
+            ReadQuery::RelatedRecordsQuery(q) => q.has_cursor() || q.has_distinct() || q.has_virtual_selections(),
             _ => false,
         })
         && requested_strategy != Some(RelationLoadStrategy::Query)

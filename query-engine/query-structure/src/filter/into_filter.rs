@@ -16,6 +16,7 @@ impl IntoFilter for SelectionResult {
                 SelectedField::Scalar(sf) => sf.equals(value),
                 SelectedField::Composite(_) => unreachable!(), // [Composites] todo
                 SelectedField::Relation(_) => unreachable!(),
+                SelectedField::Virtual(_) => unreachable!(),
             })
             .collect();
 

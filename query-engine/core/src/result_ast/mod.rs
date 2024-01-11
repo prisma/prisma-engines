@@ -1,4 +1,4 @@
-use connector::{AggregationRow, RelAggregationRow};
+use connector::AggregationRow;
 use query_structure::{ManyRecords, Model, SelectionResult};
 
 #[derive(Debug, Clone)]
@@ -64,9 +64,8 @@ pub struct RecordSelection {
 
     /// The model of the contained records.
     pub(crate) model: Model,
-
-    /// Holds an ordered list of aggregation selections results for each contained record
-    pub(crate) aggregation_rows: Option<Vec<RelAggregationRow>>,
+    // Holds an ordered list of aggregation selections results for each contained record
+    // pub(crate) aggregation_rows: Option<Vec<RelAggregationRow>>,
 }
 
 impl From<RecordSelection> for QueryResult {
