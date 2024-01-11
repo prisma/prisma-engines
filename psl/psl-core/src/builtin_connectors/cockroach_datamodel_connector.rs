@@ -3,10 +3,7 @@ mod validations;
 
 pub use native_types::CockroachType;
 
-use chrono::*;
-use enumflags2::BitFlags;
-use lsp_types::{CompletionItem, CompletionItemKind, CompletionList};
-use psl_core::{
+use crate::{
     datamodel_connector::{
         Connector, ConnectorCapabilities, ConnectorCapability, ConstraintScope, Flavour, NativeTypeConstructor,
         NativeTypeInstance, RelationMode, StringFilter,
@@ -21,9 +18,12 @@ use psl_core::{
     },
     PreviewFeature,
 };
+use chrono::*;
+use enumflags2::BitFlags;
+use lsp_types::{CompletionItem, CompletionItemKind, CompletionList};
 use std::borrow::Cow;
 
-use crate::completions;
+use super::completions;
 
 const CONSTRAINT_SCOPES: &[ConstraintScope] = &[ConstraintScope::ModelPrimaryKeyKeyIndexForeignKey];
 
@@ -294,7 +294,7 @@ impl Connector for CockroachDatamodelConnector {
         }
     }
 
-    fn datasource_completions(&self, config: &psl_core::Configuration, completion_list: &mut CompletionList) {
+    fn datasource_completions(&self, config: &crate::Configuration, completion_list: &mut CompletionList) {
         let ds = match config.datasources.first() {
             Some(ds) => ds,
             None => return,
@@ -318,11 +318,11 @@ impl Connector for CockroachDatamodelConnector {
 
         match native_type {
             Some(ct) => match ct {
-                CockroachType::Timestamptz(_) => crate::utils::parse_timestamptz(str),
-                CockroachType::Timestamp(_) => crate::utils::parse_timestamp(str),
-                CockroachType::Date => crate::utils::parse_date(str),
-                CockroachType::Time(_) => crate::utils::parse_time(str),
-                CockroachType::Timetz(_) => crate::utils::parse_timetz(str),
+                CockroachType::Timestamptz(_) => super::utils::parse_timestamptz(str),
+                CockroachType::Timestamp(_) => super::utils::parse_timestamp(str),
+                CockroachType::Date => super::utils::parse_date(str),
+                CockroachType::Time(_) => super::utils::parse_time(str),
+                CockroachType::Timetz(_) => super::utils::parse_timetz(str),
                 _ => unreachable!(),
             },
             None => self.parse_json_datetime(

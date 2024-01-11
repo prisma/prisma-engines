@@ -25,6 +25,7 @@ pub struct QueryArguments {
     pub distinct: Option<FieldSelection>,
     pub ignore_skip: bool,
     pub ignore_take: bool,
+    pub relation_load_strategy: Option<RelationLoadStrategy>,
 }
 
 #[derive(Debug, Copy, Clone, PartialEq, Eq, Hash)]
@@ -66,6 +67,7 @@ impl QueryArguments {
             distinct: None,
             ignore_take: false,
             ignore_skip: false,
+            relation_load_strategy: None,
         }
     }
 
@@ -235,6 +237,7 @@ impl QueryArguments {
                 let distinct = self.distinct;
                 let ignore_skip = self.ignore_skip;
                 let ignore_take = self.ignore_take;
+                let relation_load_strategy = self.relation_load_strategy;
 
                 filter
                     .batched(chunk_size)
@@ -249,6 +252,7 @@ impl QueryArguments {
                         distinct: distinct.clone(),
                         ignore_skip,
                         ignore_take,
+                        relation_load_strategy,
                     })
                     .collect()
             }

@@ -1,4 +1,4 @@
-use psl_core::{
+use crate::{
     diagnostics::{DatamodelError, Diagnostics},
     parser_database::{
         walkers::{IndexWalker, ModelWalker},

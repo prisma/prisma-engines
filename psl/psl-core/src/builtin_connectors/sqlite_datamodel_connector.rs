@@ -1,5 +1,4 @@
-use enumflags2::BitFlags;
-use psl_core::{
+use crate::{
     datamodel_connector::{
         Connector, ConnectorCapabilities, ConnectorCapability, ConstraintScope, Flavour, NativeTypeConstructor,
         NativeTypeInstance,
@@ -7,6 +6,7 @@ use psl_core::{
     diagnostics::{DatamodelError, Diagnostics, Span},
     parser_database::{ReferentialAction, ScalarType},
 };
+use enumflags2::BitFlags;
 
 const NATIVE_TYPE_CONSTRUCTORS: &[NativeTypeConstructor] = &[];
 const CONSTRAINT_SCOPES: &[ConstraintScope] = &[ConstraintScope::GlobalKeyIndex];

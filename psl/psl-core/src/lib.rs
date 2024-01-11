@@ -2,6 +2,7 @@
 #![deny(rust_2018_idioms, unsafe_code)]
 #![allow(clippy::derive_partial_eq_without_eq)]
 
+pub mod builtin_connectors;
 pub mod datamodel_connector;
 
 /// `mcf`: Turns a collection of `configuration::Datasource` and `configuration::Generator` into a

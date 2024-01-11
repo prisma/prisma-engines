@@ -1,6 +1,5 @@
-use super::PostgresExtensions;
-use crate::postgres_datamodel_connector::PostgresExtension;
-use psl_core::{
+use super::{PostgresExtension, PostgresExtensions};
+use crate::{
     datamodel_connector::EXTENSIONS_KEY,
     diagnostics::{DatamodelError, Diagnostics},
     parser_database::{ast, coerce, coerce_array},
