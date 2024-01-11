@@ -25,8 +25,10 @@ const CAPABILITIES: ConnectorCapabilities = enumflags2::make_bitflags!(Connector
     NativeUpsert |
     FilteredInlineChildNestedToOneDisconnect |
     RowIn |
-    InsertReturning |
-    DeleteReturning |
+    // InsertReturning, DeleteReturning, UpdateReturning - While SQLite does support RETURNING, it does not return column information on the
+    // way back from the database. This column type information is necessary in order to preserve consistency for some data types such as int,
+    // where values could overflow.
+    // Since we care to stay consistent with reads, it is not enabled.
     SupportsFiltersOnRelationsWithoutJoins
 });
 
