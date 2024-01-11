@@ -226,6 +226,20 @@ impl Filter {
         uniques
     }
 
+    /// Returns true if filter contains conditions on relation fields.
+    pub fn has_relations(&self) -> bool {
+        use AggregationFilter::*;
+        use Filter::*;
+        match self {
+            Not(branches) | Or(branches) | And(branches) => branches.iter().any(|filter| filter.has_relations()),
+            Scalar(..) | ScalarList(..) | Composite(..) | BoolFilter(..) | Empty => false,
+            Aggregation(filter) => match filter {
+                Average(filter) | Count(filter) | Sum(filter) | Min(filter) | Max(filter) => filter.has_relations(),
+            },
+            OneRelationIsNull(..) | Relation(..) => true,
+        }
+    }
+
     fn filter_and_collect_scalars(
         filter: &Filter,
         filter_check: fn(&ScalarFilter) -> bool,
