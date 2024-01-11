@@ -10,9 +10,9 @@ in
       devToolchain
       llvmPackages_latest.bintools
 
-      nodejs
-      nodejs.pkgs.typescript-language-server
-      nodejs.pkgs.pnpm
+      nodejs_20
+      nodejs_20.pkgs.typescript-language-server
+      nodejs_20.pkgs.pnpm
 
       cargo-insta
       jq

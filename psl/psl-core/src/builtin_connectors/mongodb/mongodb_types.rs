@@ -1,5 +1,5 @@
+use crate::parser_database::ScalarType;
 use once_cell::sync::Lazy;
-use psl_core::parser_database::ScalarType;
 use std::collections::HashMap;
 
 crate::native_type_definition! {

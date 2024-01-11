@@ -3,9 +3,7 @@ mod validations;
 
 pub use mongodb_types::MongoDbType;
 
-use enumflags2::BitFlags;
-use mongodb_types::*;
-use psl_core::{
+use crate::{
     datamodel_connector::{
         Connector, ConnectorCapabilities, ConnectorCapability, ConstraintScope, Flavour, NativeTypeConstructor,
         NativeTypeInstance, RelationMode,
@@ -13,6 +11,8 @@ use psl_core::{
     diagnostics::{Diagnostics, Span},
     parser_database::{walkers::*, ReferentialAction, ScalarType},
 };
+use enumflags2::BitFlags;
+use mongodb_types::*;
 use std::result::Result as StdResult;
 
 const CAPABILITIES: ConnectorCapabilities = enumflags2::make_bitflags!(ConnectorCapability::{
@@ -82,7 +82,7 @@ impl Connector for MongoDbDatamodelConnector {
 
     fn validate_relation_field(
         &self,
-        field: psl_core::parser_database::walkers::RelationFieldWalker<'_>,
+        field: crate::parser_database::walkers::RelationFieldWalker<'_>,
         errors: &mut Diagnostics,
     ) {
         validations::relation_same_native_type(field, errors);

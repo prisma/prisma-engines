@@ -243,6 +243,7 @@ pub fn collect_relation_aggr_selections(
 }
 
 pub(crate) fn get_relation_load_strategy(
+    requested_strategy: Option<RelationLoadStrategy>,
     cursor: Option<&SelectionResult>,
     distinct: Option<&FieldSelection>,
     nested_queries: &[ReadQuery],
@@ -258,6 +259,7 @@ pub(crate) fn get_relation_load_strategy(
             ReadQuery::RelatedRecordsQuery(q) => q.has_cursor() || q.has_distinct() || q.has_aggregation_selections(),
             _ => false,
         })
+        && requested_strategy != Some(RelationLoadStrategy::Query)
     {
         RelationLoadStrategy::Join
     } else {

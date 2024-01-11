@@ -1,11 +1,11 @@
-use crate::PostgresType;
-use enumflags2::BitFlags;
-use psl_core::{
+use super::PostgresType;
+use crate::{
     datamodel_connector::{walker_ext_traits::*, Connector},
     diagnostics::{DatamodelError, Diagnostics},
     parser_database::{ast::WithSpan, walkers::IndexWalker, IndexAlgorithm, OperatorClass},
     PreviewFeature,
 };
+use enumflags2::BitFlags;
 
 use super::PostgresDatasourceProperties;
 

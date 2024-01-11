@@ -6,7 +6,7 @@ pub enum MsSqlTypeParameter {
     Max,
 }
 
-impl psl_core::datamodel_connector::NativeTypeArguments for MsSqlTypeParameter {
+impl crate::datamodel_connector::NativeTypeArguments for MsSqlTypeParameter {
     const DESCRIPTION: &'static str = "an integer or `Max`";
     const OPTIONAL_ARGUMENTS_COUNT: usize = 0;
     const REQUIRED_ARGUMENTS_COUNT: usize = 1;

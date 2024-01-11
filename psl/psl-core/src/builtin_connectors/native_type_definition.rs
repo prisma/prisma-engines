@@ -52,8 +52,8 @@ macro_rules! native_type_definition {
             pub fn from_parts(
                 name: &str,
                 arguments: &[String],
-                span: psl_core::parser_database::ast::Span,
-                diagnostics: &mut psl_core::diagnostics::Diagnostics
+                span: $crate::parser_database::ast::Span,
+                diagnostics: &mut $crate::diagnostics::Diagnostics
             ) -> Option<Self> {
                 use $enumName::*;
 
@@ -130,7 +130,7 @@ macro_rules! native_type_definition {
             $self,
             {
                 $($body)*
-                $variant(arg) => (stringify!($variant), <$param as psl_core::datamodel_connector::NativeTypeArguments>::to_parts(arg)),
+                $variant(arg) => (stringify!($variant), <$param as $crate::datamodel_connector::NativeTypeArguments>::to_parts(arg)),
             }
             $($tail)*
         }
@@ -163,7 +163,7 @@ macro_rules! native_type_definition {
         match $name {
             $($body)*
             _ => {
-                $diagnostics.push_error(psl_core::diagnostics::DatamodelError::new_native_type_parser_error($name, $span));
+                $diagnostics.push_error($crate::diagnostics::DatamodelError::new_native_type_parser_error($name, $span));
                 None
             },
         }
@@ -182,12 +182,12 @@ macro_rules! native_type_definition {
             {
                 $($body)*
                 name if name == stringify!($variant) => {
-                    let args  = <$params as psl_core::datamodel_connector::NativeTypeArguments>::from_parts($arguments);
+                    let args  = <$params as $crate::datamodel_connector::NativeTypeArguments>::from_parts($arguments);
                     match args {
                         Some(args) => Some($variant(args)),
                         None => {
                             let rendered_args = format!("({})", $arguments.join(", "));
-                            $diagnostics.push_error(psl_core::diagnostics::DatamodelError::new_value_parser_error(<$params as psl_core::datamodel_connector::NativeTypeArguments>::DESCRIPTION, &rendered_args, $span));
+                            $diagnostics.push_error($crate::diagnostics::DatamodelError::new_value_parser_error(<$params as $crate::datamodel_connector::NativeTypeArguments>::DESCRIPTION, &rendered_args, $span));
                             None
                         }
                     }
@@ -221,7 +221,7 @@ macro_rules! native_type_definition {
         { $($body:tt)* }
     ) => {
         #[allow(unused_imports)]
-        use psl_core::datamodel_connector::NativeTypeConstructor;
+        use $crate::datamodel_connector::NativeTypeConstructor;
 
         pub(crate) const CONSTRUCTORS: &[NativeTypeConstructor] = &[
             $( $body )*
@@ -242,7 +242,7 @@ macro_rules! native_type_definition {
                     name: stringify!($variant),
                     number_of_args: 0,
                     number_of_optional_args: 0,
-                    prisma_types: &[$(psl_core::parser_database::ScalarType::$scalar),*],
+                    prisma_types: &[$($crate::parser_database::ScalarType::$scalar),*],
                 },
             }
             $($tail)*
@@ -261,9 +261,9 @@ macro_rules! native_type_definition {
                 $($body)*
                 NativeTypeConstructor {
                     name: stringify!($variant),
-                    number_of_args: <$params as psl_core::datamodel_connector::NativeTypeArguments>::REQUIRED_ARGUMENTS_COUNT,
-                    number_of_optional_args: <$params as psl_core::datamodel_connector::NativeTypeArguments>::OPTIONAL_ARGUMENTS_COUNT,
-                    prisma_types: &[$(psl_core::parser_database::ScalarType::$scalar),*],
+                    number_of_args: <$params as $crate::datamodel_connector::NativeTypeArguments>::REQUIRED_ARGUMENTS_COUNT,
+                    number_of_optional_args: <$params as $crate::datamodel_connector::NativeTypeArguments>::OPTIONAL_ARGUMENTS_COUNT,
+                    prisma_types: &[$($crate::parser_database::ScalarType::$scalar),*],
                 },
             }
             $($tail)*

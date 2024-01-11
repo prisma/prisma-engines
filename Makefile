@@ -327,7 +327,7 @@ build-qe-napi:
 	cargo build --package query-engine-node-api --profile $(PROFILE)
 
 build-qe-wasm:
-ifndef $(NIX)
+ifdef NIX
 	@echo "Building wasm engine on nix"
 	rm -rf query-engine/query-engine-wasm/pkg
 	nix run .#export-query-engine-wasm query-engine/query-engine-wasm/pkg 0.0.0
