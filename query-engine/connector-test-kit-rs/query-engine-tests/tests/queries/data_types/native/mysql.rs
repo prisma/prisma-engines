@@ -1,7 +1,7 @@
 use indoc::indoc;
 use query_engine_tests::*;
 
-#[test_suite(only(Mysql("8.0")))]
+#[test_suite(only(Mysql("8")))]
 mod datetime {
     fn schema_date() -> String {
         let schema = indoc! {
@@ -70,7 +70,7 @@ mod datetime {
     }
 }
 
-#[test_suite(only(Mysql("8.0")))]
+#[test_suite(only(Mysql("8")))]
 mod decimal {
     fn schema_decimal() -> String {
         let schema = indoc! {
@@ -130,7 +130,7 @@ mod decimal {
     }
 }
 
-#[test_suite(only(Mysql("8.0")))]
+#[test_suite(only(Mysql("8")))]
 mod string {
     fn schema_string() -> String {
         let schema = indoc! {
@@ -205,7 +205,7 @@ mod string {
     }
 }
 
-#[test_suite(only(MySql("8.0")))]
+#[test_suite(only(MySql("8")))]
 mod bytes {
     fn schema_bytes() -> String {
         let schema = indoc! {

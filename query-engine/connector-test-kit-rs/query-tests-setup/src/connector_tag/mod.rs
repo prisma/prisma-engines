@@ -328,12 +328,12 @@ pub(crate) fn should_run(
 
     let exclusions = exclude
         .iter()
-        .filter_map(|c| ConnectorVersion::try_from(*c).ok())
+        .map(|c| ConnectorVersion::try_from(*c).unwrap())
         .collect::<Vec<_>>();
 
     let inclusions = only
         .iter()
-        .filter_map(|c| ConnectorVersion::try_from(*c).ok())
+        .map(|c| ConnectorVersion::try_from(*c).unwrap())
         .collect::<Vec<_>>();
 
     for exclusion in exclusions.iter() {
