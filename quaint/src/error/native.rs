@@ -2,9 +2,6 @@ use thiserror::Error;
 
 #[derive(Debug, Error)]
 pub enum NativeErrorKind {
-    #[error("Invalid input provided to query: {}", _0)]
-    QueryInvalidInput(String),
-
     #[error("Error creating a database connection.")]
     ConnectionError(Box<dyn std::error::Error + Send + Sync + 'static>),
 
@@ -30,11 +27,4 @@ pub enum NativeErrorKind {
 
     #[error("Error opening a TLS connection. {}", message)]
     TlsError { message: String },
-
-    #[error(
-        "Incorrect number of parameters given to a statement. Expected {}: got: {}.",
-        expected,
-        actual
-    )]
-    IncorrectNumberOfParameters { expected: usize, actual: usize },
 }

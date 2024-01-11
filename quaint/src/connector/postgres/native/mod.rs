@@ -306,11 +306,11 @@ impl PostgreSql {
         if params.len() > i16::MAX as usize {
             // tokio_postgres would return an error here. Let's avoid calling the driver
             // and return an error early.
-            let kind = ErrorKind::Native(NativeErrorKind::QueryInvalidInput(format!(
+            let kind = ErrorKind::QueryInvalidInput(format!(
                 "too many bind variables in prepared statement, expected maximum of {}, received {}",
                 i16::MAX,
                 params.len()
-            )));
+            ));
             Err(Error::builder(kind).build())
         } else {
             Ok(())
@@ -372,10 +372,10 @@ impl Queryable for PostgreSql {
             let stmt = self.fetch_cached(sql, &[]).await?;
 
             if stmt.params().len() != params.len() {
-                let kind = ErrorKind::Native(NativeErrorKind::IncorrectNumberOfParameters {
+                let kind = ErrorKind::IncorrectNumberOfParameters {
                     expected: stmt.params().len(),
                     actual: params.len(),
-                });
+                };
 
                 return Err(Error::builder(kind).build());
             }
@@ -402,10 +402,10 @@ impl Queryable for PostgreSql {
             let stmt = self.fetch_cached(sql, params).await?;
 
             if stmt.params().len() != params.len() {
-                let kind = ErrorKind::Native(NativeErrorKind::IncorrectNumberOfParameters {
+                let kind = ErrorKind::IncorrectNumberOfParameters {
                     expected: stmt.params().len(),
                     actual: params.len(),
-                });
+                };
 
                 return Err(Error::builder(kind).build());
             }
@@ -438,10 +438,10 @@ impl Queryable for PostgreSql {
             let stmt = self.fetch_cached(sql, &[]).await?;
 
             if stmt.params().len() != params.len() {
-                let kind = ErrorKind::Native(NativeErrorKind::IncorrectNumberOfParameters {
+                let kind = ErrorKind::IncorrectNumberOfParameters {
                     expected: stmt.params().len(),
                     actual: params.len(),
-                });
+                };
 
                 return Err(Error::builder(kind).build());
             }
@@ -462,10 +462,10 @@ impl Queryable for PostgreSql {
             let stmt = self.fetch_cached(sql, params).await?;
 
             if stmt.params().len() != params.len() {
-                let kind = ErrorKind::Native(NativeErrorKind::IncorrectNumberOfParameters {
+                let kind = ErrorKind::IncorrectNumberOfParameters {
                     expected: stmt.params().len(),
                     actual: params.len(),
-                });
+                };
 
                 return Err(Error::builder(kind).build());
             }

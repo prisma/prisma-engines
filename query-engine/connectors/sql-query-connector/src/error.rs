@@ -10,8 +10,6 @@ use quaint::error::NativeErrorKind;
 
 #[cfg(not(target_arch = "wasm32"))]
 pub(crate) enum NativeRawError {
-    IncorrectNumberOfParameters { expected: usize, actual: usize },
-    QueryInvalidInput(String),
     ConnectionClosed,
 }
 
@@ -25,6 +23,11 @@ pub(crate) enum RawError {
     UnsupportedColumnType {
         column_type: String,
     },
+    IncorrectNumberOfParameters {
+        expected: usize,
+        actual: usize,
+    },
+    QueryInvalidInput(String),
     External {
         id: i32,
     },
@@ -35,12 +38,12 @@ impl From<RawError> for SqlError {
         match re {
             #[cfg(not(target_arch = "wasm32"))]
             RawError::Native(native) => match native {
-                NativeRawError::IncorrectNumberOfParameters { expected, actual } => {
-                    SqlError::IncorrectNumberOfParameters { expected, actual }
-                }
-                NativeRawError::QueryInvalidInput(message) => SqlError::QueryInvalidInput(message),
                 NativeRawError::ConnectionClosed => SqlError::ConnectionClosed,
             },
+            RawError::IncorrectNumberOfParameters { expected, actual } => {
+                Self::IncorrectNumberOfParameters { expected, actual }
+            }
+            RawError::QueryInvalidInput(message) => Self::QueryInvalidInput(message),
             RawError::UnsupportedColumnType { column_type } => Self::RawError {
                 code: String::from("N/A"),
                 message: format!(
@@ -66,22 +69,20 @@ impl From<quaint::error::Error> for RawError {
         match e.kind() {
             #[cfg(not(target_arch = "wasm32"))]
             quaint::error::ErrorKind::Native(native_error_kind) => match native_error_kind {
-                NativeErrorKind::IncorrectNumberOfParameters { expected, actual } => {
-                    Self::Native(NativeRawError::IncorrectNumberOfParameters {
-                        expected: *expected,
-                        actual: *actual,
-                    })
-                }
                 NativeErrorKind::ConnectionClosed => Self::Native(NativeRawError::ConnectionClosed),
-                NativeErrorKind::QueryInvalidInput(message) => {
-                    Self::Native(NativeRawError::QueryInvalidInput(message.to_owned()))
-                }
                 _ => default_value,
             },
 
+            quaint::error::ErrorKind::IncorrectNumberOfParameters { expected, actual } => {
+                Self::IncorrectNumberOfParameters {
+                    expected: *expected,
+                    actual: *actual,
+                }
+            }
             quaint::error::ErrorKind::UnsupportedColumnType { column_type } => Self::UnsupportedColumnType {
                 column_type: column_type.to_owned(),
             },
+            quaint::error::ErrorKind::QueryInvalidInput(message) => Self::QueryInvalidInput(message.to_owned()),
             quaint::error::ErrorKind::ExternalError(id) => Self::External { id: *id },
             _ => default_value,
         }
@@ -298,10 +299,8 @@ impl From<quaint::error::Error> for SqlError {
         match quaint_kind {
             #[cfg(not(target_arch = "wasm32"))]
             QuaintKind::Native(ref native_error_kind) => match native_error_kind {
-                NativeErrorKind::QueryInvalidInput(ref qe) => Self::QueryInvalidInput(qe.to_owned()),
                 NativeErrorKind::IoError(_) | NativeErrorKind::ConnectionError(_) => Self::ConnectionError(quaint_kind),
                 NativeErrorKind::ConnectionClosed => SqlError::ConnectionClosed,
-                NativeErrorKind::IncorrectNumberOfParameters { .. } => SqlError::QueryError(quaint_kind.into()),
                 NativeErrorKind::ConnectTimeout => SqlError::ConnectionError(quaint_kind),
                 NativeErrorKind::PoolTimeout { .. } => SqlError::ConnectionError(quaint_kind),
                 NativeErrorKind::PoolClosed { .. } => SqlError::ConnectionError(quaint_kind),
@@ -313,6 +312,7 @@ impl From<quaint::error::Error> for SqlError {
                 message: reason,
             },
             QuaintKind::QueryError(qe) => Self::QueryError(qe),
+            QuaintKind::QueryInvalidInput(qe) => Self::QueryInvalidInput(qe),
             QuaintKind::NotFound => Self::RecordDoesNotExist,
             QuaintKind::UniqueConstraintViolation { constraint } => Self::UniqueConstraintViolation {
                 constraint: constraint.into(),
@@ -336,6 +336,7 @@ impl From<quaint::error::Error> for SqlError {
             QuaintKind::ExternalError(error_id) => Self::ExternalError(error_id),
             e @ QuaintKind::UnsupportedColumnType { .. } => SqlError::ConversionError(e.into()),
             e @ QuaintKind::TransactionAlreadyClosed(_) => SqlError::TransactionAlreadyClosed(format!("{e}")),
+            e @ QuaintKind::IncorrectNumberOfParameters { .. } => SqlError::QueryError(e.into()),
             e @ QuaintKind::ConversionError(_) => SqlError::ConversionError(e.into()),
             e @ QuaintKind::ResultIndexOutOfBounds { .. } => SqlError::QueryError(e.into()),
             e @ QuaintKind::ResultTypeMismatch { .. } => SqlError::QueryError(e.into()),

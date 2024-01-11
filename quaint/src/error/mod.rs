@@ -145,6 +145,9 @@ pub enum ErrorKind {
     #[error("Error querying the database: {}", _0)]
     QueryError(Box<dyn std::error::Error + Send + Sync + 'static>),
 
+    #[error("Invalid input provided to query: {}", _0)]
+    QueryInvalidInput(String),
+
     #[error("Database does not exist: {}", db_name)]
     DatabaseDoesNotExist { db_name: Name },
 
@@ -201,6 +204,13 @@ pub enum ErrorKind {
 
     #[error("Value out of range error. {}", message)]
     ValueOutOfRange { message: String },
+
+    #[error(
+        "Incorrect number of parameters given to a statement. Expected {}: got: {}.",
+        expected,
+        actual
+    )]
+    IncorrectNumberOfParameters { expected: usize, actual: usize },
 
     #[error("Transaction was already closed: {}", _0)]
     TransactionAlreadyClosed(String),
