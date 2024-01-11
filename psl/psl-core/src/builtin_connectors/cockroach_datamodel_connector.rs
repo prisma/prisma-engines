@@ -144,7 +144,7 @@ impl Connector for CockroachDatamodelConnector {
         }
     }
 
-    fn default_native_type_for_scalar_type(&self, scalar_type: &ScalarType) -> NativeTypeInstance {
+    fn default_native_type_for_scalar_type(&self, scalar_type: &ScalarType) -> Option<NativeTypeInstance> {
         let native_type = SCALAR_TYPE_DEFAULTS
             .iter()
             .find(|(st, _)| st == scalar_type)
@@ -152,7 +152,7 @@ impl Connector for CockroachDatamodelConnector {
             .ok_or_else(|| format!("Could not find scalar type {scalar_type:?} in SCALAR_TYPE_DEFAULTS"))
             .unwrap();
 
-        NativeTypeInstance::new::<CockroachType>(*native_type)
+        Some(NativeTypeInstance::new::<CockroachType>(*native_type))
     }
 
     fn native_type_is_default_for_scalar_type(
@@ -328,10 +328,7 @@ impl Connector for CockroachDatamodelConnector {
                 CockroachType::Timetz(_) => super::utils::postgres::parse_timetz(str),
                 _ => unreachable!(),
             },
-            None => self.parse_json_datetime(
-                str,
-                Some(self.default_native_type_for_scalar_type(&ScalarType::DateTime)),
-            ),
+            None => self.parse_json_datetime(str, self.default_native_type_for_scalar_type(&ScalarType::DateTime)),
         }
     }
 }

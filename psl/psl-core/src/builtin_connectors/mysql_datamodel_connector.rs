@@ -158,7 +158,7 @@ impl Connector for MySqlDatamodelConnector {
         }
     }
 
-    fn default_native_type_for_scalar_type(&self, scalar_type: &ScalarType) -> NativeTypeInstance {
+    fn default_native_type_for_scalar_type(&self, scalar_type: &ScalarType) -> Option<NativeTypeInstance> {
         let native_type = SCALAR_TYPE_DEFAULTS
             .iter()
             .find(|(st, _)| st == scalar_type)
@@ -166,7 +166,7 @@ impl Connector for MySqlDatamodelConnector {
             .ok_or_else(|| format!("Could not find scalar type {scalar_type:?} in SCALAR_TYPE_DEFAULTS"))
             .unwrap();
 
-        NativeTypeInstance::new::<MySqlType>(*native_type)
+        Some(NativeTypeInstance::new::<MySqlType>(*native_type))
     }
 
     fn native_type_is_default_for_scalar_type(
@@ -303,10 +303,7 @@ impl Connector for MySqlDatamodelConnector {
                 Timestamp(_) => super::utils::mysql::parse_timestamp(str),
                 _ => unreachable!(),
             },
-            None => self.parse_json_datetime(
-                str,
-                Some(self.default_native_type_for_scalar_type(&ScalarType::DateTime)),
-            ),
+            None => self.parse_json_datetime(str, self.default_native_type_for_scalar_type(&ScalarType::DateTime)),
         }
     }
 }

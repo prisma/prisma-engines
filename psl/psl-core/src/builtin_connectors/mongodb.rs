@@ -93,9 +93,10 @@ impl Connector for MongoDbDatamodelConnector {
         mongodb_types::CONSTRUCTORS
     }
 
-    fn default_native_type_for_scalar_type(&self, scalar_type: &ScalarType) -> NativeTypeInstance {
+    fn default_native_type_for_scalar_type(&self, scalar_type: &ScalarType) -> Option<NativeTypeInstance> {
         let native_type = default_for(scalar_type);
-        NativeTypeInstance::new::<MongoDbType>(*native_type)
+
+        Some(NativeTypeInstance::new::<MongoDbType>(*native_type))
     }
 
     fn native_type_is_default_for_scalar_type(
