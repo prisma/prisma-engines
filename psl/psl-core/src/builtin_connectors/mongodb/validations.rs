@@ -1,4 +1,4 @@
-use psl_core::{
+use crate::{
     diagnostics::{DatamodelError, DatamodelWarning, Diagnostics},
     parser_database::{
         ast::{WithName, WithSpan},
@@ -214,7 +214,7 @@ pub(crate) fn field_name_uses_valid_characters(field: ScalarFieldWalker<'_>, err
 
 /// Makes sure underlying fields of a relation have the same native types.
 pub(crate) fn relation_same_native_type(
-    field: psl_core::parser_database::walkers::RelationFieldWalker<'_>,
+    field: crate::parser_database::walkers::RelationFieldWalker<'_>,
     errors: &mut Diagnostics,
 ) {
     let references = field.referenced_fields();

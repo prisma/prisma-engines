@@ -4,10 +4,7 @@ mod validations;
 
 pub use native_types::PostgresType;
 
-use chrono::*;
-use enumflags2::BitFlags;
-use lsp_types::{CompletionItem, CompletionItemKind, CompletionList, InsertTextFormat};
-use psl_core::{
+use crate::{
     datamodel_connector::{
         Connector, ConnectorCapabilities, ConnectorCapability, ConstraintScope, Flavour, NativeTypeConstructor,
         NativeTypeInstance, RelationMode, StringFilter,
@@ -16,10 +13,13 @@ use psl_core::{
     parser_database::{ast, walkers, IndexAlgorithm, OperatorClass, ParserDatabase, ReferentialAction, ScalarType},
     Configuration, Datasource, DatasourceConnectorData, PreviewFeature,
 };
+use chrono::*;
+use enumflags2::BitFlags;
+use lsp_types::{CompletionItem, CompletionItemKind, CompletionList, InsertTextFormat};
 use std::{borrow::Cow, collections::HashMap};
 use PostgresType::*;
 
-use crate::completions;
+use super::completions;
 
 const CONSTRAINT_SCOPES: &[ConstraintScope] = &[
     ConstraintScope::GlobalPrimaryKeyKeyIndex,
@@ -578,11 +578,11 @@ impl Connector for PostgresDatamodelConnector {
 
         match native_type {
             Some(pt) => match pt {
-                Timestamptz(_) => crate::utils::parse_timestamptz(str),
-                Timestamp(_) => crate::utils::parse_timestamp(str),
-                Date => crate::utils::parse_date(str),
-                Time(_) => crate::utils::parse_time(str),
-                Timetz(_) => crate::utils::parse_timetz(str),
+                Timestamptz(_) => super::utils::parse_timestamptz(str),
+                Timestamp(_) => super::utils::parse_timestamp(str),
+                Date => super::utils::parse_date(str),
+                Time(_) => super::utils::parse_time(str),
+                Timetz(_) => super::utils::parse_timetz(str),
                 _ => unreachable!(),
             },
             None => self.parse_json_datetime(

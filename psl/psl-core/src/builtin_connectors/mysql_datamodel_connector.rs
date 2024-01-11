@@ -3,10 +3,8 @@ mod validations;
 
 pub use native_types::MySqlType;
 
-use crate::completions;
-use enumflags2::BitFlags;
-use lsp_types::CompletionList;
-use psl_core::{
+use super::completions;
+use crate::{
     datamodel_connector::{
         Connector, ConnectorCapabilities, ConnectorCapability, ConstraintScope, Flavour, NativeTypeConstructor,
         NativeTypeInstance, RelationMode,
@@ -15,6 +13,8 @@ use psl_core::{
     parser_database::{walkers, ReferentialAction, ScalarType},
     PreviewFeature,
 };
+use enumflags2::BitFlags;
+use lsp_types::CompletionList;
 use MySqlType::*;
 
 const TINY_BLOB_TYPE_NAME: &str = "TinyBlob";
@@ -270,7 +270,7 @@ impl Connector for MySqlDatamodelConnector {
         Ok(())
     }
 
-    fn datasource_completions(&self, config: &psl_core::Configuration, completion_list: &mut CompletionList) {
+    fn datasource_completions(&self, config: &crate::Configuration, completion_list: &mut CompletionList) {
         let ds = match config.datasources.first() {
             Some(ds) => ds,
             None => return,

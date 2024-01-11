@@ -1,5 +1,5 @@
 use super::MsSqlType;
-use psl_core::{
+use crate::{
     datamodel_connector::{walker_ext_traits::ScalarFieldWalkerExt, Connector},
     diagnostics::{DatamodelError, Diagnostics},
     parser_database::{
