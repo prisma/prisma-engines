@@ -163,8 +163,6 @@ impl ScalarField {
         let psl_nt = raw_nt
             .and_then(|(_, name, args, span)| connector.parse_native_type(name, args, span, &mut Default::default()));
 
-        dbg!(&psl_nt);
-
         let nt = match self.id {
             ScalarFieldId::InModel(id) => psl_nt.or_else(|| {
                 self.dm
