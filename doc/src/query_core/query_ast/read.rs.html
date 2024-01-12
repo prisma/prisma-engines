@@ -287,7 +287,7 @@
 <span class="kw">use </span>connector::{AggregationSelection, RelAggregationSelection};
 <span class="kw">use </span>enumflags2::BitFlags;
 <span class="kw">use </span>query_structure::{prelude::<span class="kw-2">*</span>, Filter, QueryArguments, RelationLoadStrategy};
-<span class="kw">use </span>std::fmt::Display;
+<span class="kw">use </span>std::{fmt::Display, mem};
 
 <span class="attr">#[allow(clippy::enum_variant_names)]
 #[derive(Debug, Clone)]
@@ -318,13 +318,13 @@
     </span><span class="kw">pub fn </span>satisfy_dependency(<span class="kw-2">&amp;mut </span><span class="self">self</span>, field_selection: FieldSelection) {
         <span class="kw">match </span><span class="self">self </span>{
             ReadQuery::RecordQuery(x) =&gt; {
-                x.selected_fields = x.selected_fields.clone().merge(field_selection);
+                x.selected_fields = mem::take(<span class="kw-2">&amp;mut </span>x.selected_fields).merge(field_selection);
             }
             ReadQuery::ManyRecordsQuery(x) =&gt; {
-                x.selected_fields = x.selected_fields.clone().merge(field_selection);
+                x.selected_fields = mem::take(<span class="kw-2">&amp;mut </span>x.selected_fields).merge(field_selection);
             }
             ReadQuery::RelatedRecordsQuery(x) =&gt; {
-                x.selected_fields = x.selected_fields.clone().merge(field_selection);
+                x.selected_fields = mem::take(<span class="kw-2">&amp;mut </span>x.selected_fields).merge(field_selection);
             }
             ReadQuery::AggregateRecordsQuery(<span class="kw">_</span>) =&gt; (),
         }
