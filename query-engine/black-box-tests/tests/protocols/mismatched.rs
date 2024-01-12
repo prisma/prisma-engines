@@ -37,17 +37,12 @@ mod mismatched {
 
     #[connector_test]
     async fn json_query_over_json_protocol_engine(r: Runner) -> TestResult<()> {
-        let mut qe_cmd = query_engine_cmd(r.prisma_dml(), "57582");
+        let (mut qe_cmd, url) = query_engine_cmd(r.prisma_dml());
         qe_cmd.env("PRISMA_ENGINE_PROTOCOL", "json");
 
         with_child_process(&mut qe_cmd, async move {
             let client = reqwest::Client::new();
-            let res = client
-                .post("http://0.0.0.0:57582/")
-                .body(JSON_QUERY)
-                .send()
-                .await
-                .unwrap();
+            let res = client.post(url).body(JSON_QUERY).send().await.unwrap();
             insta::assert_snapshot!(res.text().await.unwrap(), @r###"{"data":{"findManyPerson":[]}}"###);
         })
         .await
@@ -55,13 +50,13 @@ mod mismatched {
 
     #[connector_test]
     async fn graphql_query_over_json_protocol_engine(r: Runner) -> TestResult<()> {
-        let mut qe_cmd = query_engine_cmd(r.prisma_dml(), "57582");
+        let (mut qe_cmd, url) = query_engine_cmd(r.prisma_dml());
         qe_cmd.env("PRISMA_ENGINE_PROTOCOL", "json");
 
         with_child_process(&mut qe_cmd, async move {
             let client = reqwest::Client::new();
             let res = client
-                .post("http://0.0.0.0:57582/")
+                .post(url)
                 .body(GRAPHQL_QUERY)
                 .send()
                 .await
@@ -75,13 +70,13 @@ mod mismatched {
 
     #[connector_test]
     async fn json_query_over_graphql_protocol_engine(r: Runner) -> TestResult<()> {
-        let mut qe_cmd = query_engine_cmd(r.prisma_dml(), "57582");
+        let (mut qe_cmd, url) = query_engine_cmd(r.prisma_dml());
         qe_cmd.env("PRISMA_ENGINE_PROTOCOL", "graphql");
 
         with_child_process(&mut qe_cmd, async move {
             let client = reqwest::Client::new();
             let res = client
-                .post("http://0.0.0.0:57582/")
+                .post(url)
                 .body(JSON_QUERY)
                 .send()
                 .await

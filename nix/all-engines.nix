@@ -26,7 +26,7 @@ in
 
     buildInputs = [ pkgs.openssl.out ];
     nativeBuildInputs = with pkgs; [
-      cargo
+      rustToolchain
       git # for our build scripts that bake in the git hash
       protobuf # for tonic
       openssl.dev
@@ -114,4 +114,57 @@ in
       '';
     })
     { profile = "release"; };
+
+
+
+  packages.query-engine-wasm = lib.makeOverridable
+    ({ profile }: stdenv.mkDerivation {
+      name = "query-engine-wasm";
+      inherit src;
+      inherit (self'.packages.prisma-engines) buildInputs configurePhase dontStrip;
+
+      nativeBuildInputs = self'.packages.prisma-engines.nativeBuildInputs ++ (with pkgs; [wasm-pack wasm-bindgen-cli jq binaryen]);
+
+      buildPhase = ''
+        cd query-engine/query-engine-wasm
+        HOME=$(mktemp -dt wasm-pack-home-XXXX) WASM_BUILD_PROFILE=${profile} bash ./build.sh
+      '';
+
+      installPhase = ''
+      cp -r pkg $out
+      '';
+    })
+    { profile = "release"; };
+
+  packages.query-engine-wasm-gz = lib.makeOverridable
+    ({ profile }: stdenv.mkDerivation {
+      name = "query-engine-wasm-gz";
+      inherit src;
+
+      buildPhase = ''
+      gzip -cn ${self'.packages.query-engine-wasm}/query_engine_bg.wasm > query_engine_bg.wasm.gz
+      '';
+
+      installPhase = ''
+      mkdir -p $out
+      cp query_engine_bg.wasm.gz $out/
+      '';
+    })
+    { profile = "release"; };
+
+  packages.export-query-engine-wasm =
+    pkgs.writeShellApplication {
+      name = "export-query-engine-wasm";
+      runtimeInputs = with pkgs; [ jq ];
+      text = ''
+        set -euxo pipefail
+
+        OUTDIR="$1"
+        OUTVERSION="$2"
+        mkdir -p "$OUTDIR"
+        cp -r --no-target-directory ${self'.packages.query-engine-wasm} "$OUTDIR"
+        chmod -R +rw "$OUTDIR"
+        jq --arg new_version "$OUTVERSION" '.version = $new_version' "${self'.packages.query-engine-wasm}/package.json"  > "$OUTDIR/package.json"
+      '';
+    };
 }

@@ -34,6 +34,7 @@ pub enum IdentifierType {
     OrderByRelevanceInput(ParentContainer),
     OrderByToManyAggregateInput(ParentContainer),
     RelationCreateInput(RelationField, RelationField, bool),
+    RelationLoadStrategy,
     RelationUpdateInput(RelationField, RelationField, bool),
     ScalarFieldEnum(Model),
     ScalarFilterInput(Model, bool),
@@ -304,6 +305,7 @@ impl std::fmt::Display for IdentifierType {
                 ),
                 _ => write!(f, "{}UncheckedUpdateManyInput", model.name()),
             },
+            IdentifierType::RelationLoadStrategy => write!(f, "RelationLoadStrategy"),
         }
     }
 }

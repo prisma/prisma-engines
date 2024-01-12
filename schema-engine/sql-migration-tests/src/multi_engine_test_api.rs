@@ -144,6 +144,11 @@ impl TestApi {
         self.tags().contains(Tags::Postgres15)
     }
 
+    /// Returns true only when testing on postgres version 16.
+    pub fn is_postgres_16(&self) -> bool {
+        self.tags().contains(Tags::Postgres16)
+    }
+
     /// Returns true only when testing on cockroach.
     pub fn is_cockroach(&self) -> bool {
         self.tags().contains(Tags::CockroachDb)
@@ -201,7 +206,7 @@ impl TestApi {
             ConnectionInfo::Mysql(_) => SqlSchemaConnector::new_mysql(),
             ConnectionInfo::Mssql(_) => SqlSchemaConnector::new_mssql(),
             ConnectionInfo::Sqlite { .. } => SqlSchemaConnector::new_sqlite(),
-            ConnectionInfo::InMemorySqlite { .. } => unreachable!(),
+            ConnectionInfo::InMemorySqlite { .. } | ConnectionInfo::External(_) => unreachable!(),
         };
         connector.set_params(params).unwrap();
 

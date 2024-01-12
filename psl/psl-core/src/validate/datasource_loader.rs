@@ -25,7 +25,7 @@ const PROVIDER_KEY: &str = "provider";
 pub(crate) fn load_datasources_from_ast(
     ast_schema: &ast::SchemaAst,
     diagnostics: &mut Diagnostics,
-    connectors: crate::ConnectorRegistry,
+    connectors: crate::ConnectorRegistry<'_>,
 ) -> Vec<Datasource> {
     let mut sources = Vec::new();
 
@@ -51,7 +51,7 @@ pub(crate) fn load_datasources_from_ast(
 fn lift_datasource(
     ast_source: &ast::SourceConfig,
     diagnostics: &mut Diagnostics,
-    connectors: crate::ConnectorRegistry,
+    connectors: crate::ConnectorRegistry<'_>,
 ) -> Option<Datasource> {
     let source_name = ast_source.name.name.as_str();
     let mut args: HashMap<_, (_, &Expression)> = ast_source

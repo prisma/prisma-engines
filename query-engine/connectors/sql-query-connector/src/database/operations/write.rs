@@ -400,6 +400,42 @@ pub(crate) async fn delete_records(
     Ok(row_count as usize)
 }
 
+pub(crate) async fn delete_record(
+    conn: &dyn Queryable,
+    model: &Model,
+    record_filter: RecordFilter,
+    selected_fields: FieldSelection,
+    ctx: &Context<'_>,
+) -> crate::Result<SingleRecord> {
+    // We explicitly checked in the query builder that there are no nested mutation
+    // in combination with this operation.
+    debug_assert!(!record_filter.has_selectors());
+
+    let filter = FilterBuilder::without_top_level_joins().visit_filter(record_filter.filter, ctx);
+    let selected_fields: ModelProjection = selected_fields.into();
+
+    let result_set = conn
+        .query(write::delete_returning(model, filter, &selected_fields, ctx))
+        .await?;
+
+    let mut result_iter = result_set.into_iter();
+    let result_row = result_iter.next().ok_or(SqlError::RecordDoesNotExist {
+        cause: "Record to delete does not exist.".to_owned(),
+    })?;
+    debug_assert!(result_iter.next().is_none(), "Filter returned more than one row. This is a bug because we must always require `id` in filters for `deleteOne` mutations");
+
+    let field_db_names: Vec<_> = selected_fields.db_names().collect();
+    let types_and_arities = selected_fields.type_identifiers_with_arities();
+    let meta = column_metadata::create(&field_db_names, &types_and_arities);
+    let sql_row = result_row.to_sql_row(&meta)?;
+
+    let record = Record::from(sql_row);
+    Ok(SingleRecord {
+        record,
+        field_names: field_db_names,
+    })
+}
+
 /// Connect relations defined in `child_ids` to a parent defined in `parent_id`.
 /// The relation information is in the `RelationFieldRef`.
 pub(crate) async fn m2m_connect(

@@ -364,7 +364,7 @@ fn validate_dbgenerated_args(args: &[ast::Argument], accept: AcceptFn<'_>, ctx: 
         bail()
     }
 
-    match args.get(0).map(|arg| &arg.value) {
+    match args.first().map(|arg| &arg.value) {
         Some(ast::Expression::StringValue(val, _)) if val.is_empty() => {
             ctx.push_attribute_validation_error(
                 "dbgenerated() takes either no argument, or a single nonempty string argument.",
@@ -382,7 +382,7 @@ fn validate_nanoid_args(args: &[ast::Argument], accept: AcceptFn<'_>, ctx: &mut 
         bail()
     }
 
-    match args.get(0).map(|arg| &arg.value) {
+    match args.first().map(|arg| &arg.value) {
         Some(ast::Expression::NumericValue(val, _)) if val.parse::<u8>().unwrap() < 2 => {
             ctx.push_attribute_validation_error(
                 "`nanoid()` takes either no argument, or a single integer argument >= 2.",

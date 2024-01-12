@@ -59,6 +59,9 @@ pub enum MongoError {
         have: String,
         want: String,
     },
+
+    #[error("Record does not exist: {cause}")]
+    RecordDoesNotExist { cause: String },
 }
 
 impl MongoError {
@@ -123,6 +126,10 @@ impl MongoError {
                 conn_err.set_transient(is_transient);
 
                 conn_err
+            }
+
+            MongoError::RecordDoesNotExist { cause } => {
+                ConnectorError::from_kind(ErrorKind::RecordDoesNotExist { cause })
             }
         }
     }

@@ -111,7 +111,7 @@ async fn execute_find_one(
     let row = (match conn.find(query, meta.as_slice(), ctx).await {
         Ok(result) => Ok(Some(result)),
         Err(_e @ SqlError::RecordNotFoundForWhere(_)) => Ok(None),
-        Err(_e @ SqlError::RecordDoesNotExist) => Ok(None),
+        Err(_e @ SqlError::RecordDoesNotExist { .. }) => Ok(None),
         Err(e) => Err(e),
     })?
     .map(Record::from);

@@ -1,32 +1,40 @@
 #![allow(unused_imports)]
 
 use psl::{builtin_connectors::*, Datasource, PreviewFeatures};
+use quaint::connector::ExternalConnector;
 use query_core::{executor::InterpretingExecutor, Connector, QueryExecutor};
 use sql_query_connector::*;
 use std::collections::HashMap;
 use std::env;
+use std::marker::PhantomData;
+use std::sync::Arc;
 use url::Url;
 
-use super::ConnectorMode;
+pub enum ConnectorKind<'a> {
+    #[cfg(feature = "native")]
+    Rust { url: String, datasource: &'a Datasource },
+    Js {
+        adapter: Arc<dyn ExternalConnector>,
+        _phantom: PhantomData<&'a ()>, // required for WASM target, where JS is the only variant and lifetime gets unused
+    },
+}
 
 /// Loads a query executor based on the parsed Prisma schema (datasource).
 pub async fn load(
-    connector_mode: ConnectorMode,
-    source: &Datasource,
+    connector_kind: ConnectorKind<'_>,
     features: PreviewFeatures,
-    url: &str,
 ) -> query_core::Result<Box<dyn QueryExecutor + Send + Sync + 'static>> {
-    match connector_mode {
-        ConnectorMode::Js => {
+    match connector_kind {
+        ConnectorKind::Js { adapter, _phantom } => {
             #[cfg(not(feature = "driver-adapters"))]
             panic!("Driver adapters are not enabled, but connector mode is set to JS");
 
             #[cfg(feature = "driver-adapters")]
-            driver_adapter(source, url, features).await
+            driver_adapter(adapter, features).await
         }
 
         #[cfg(feature = "native")]
-        ConnectorMode::Rust => {
+        ConnectorKind::Rust { url, datasource } => {
             if let Ok(value) = env::var("PRISMA_DISABLE_QUAINT_EXECUTORS") {
                 let disable = value.to_uppercase();
                 if disable == "TRUE" || disable == "1" {
@@ -34,15 +42,15 @@ pub async fn load(
                 }
             }
 
-            match source.active_provider {
-                p if SQLITE.is_provider(p) => native::sqlite(source, url, features).await,
-                p if MYSQL.is_provider(p) => native::mysql(source, url, features).await,
-                p if POSTGRES.is_provider(p) => native::postgres(source, url, features).await,
-                p if MSSQL.is_provider(p) => native::mssql(source, url, features).await,
-                p if COCKROACH.is_provider(p) => native::postgres(source, url, features).await,
+            match datasource.active_provider {
+                p if SQLITE.is_provider(p) => native::sqlite(datasource, &url, features).await,
+                p if MYSQL.is_provider(p) => native::mysql(datasource, &url, features).await,
+                p if POSTGRES.is_provider(p) => native::postgres(datasource, &url, features).await,
+                p if MSSQL.is_provider(p) => native::mssql(datasource, &url, features).await,
+                p if COCKROACH.is_provider(p) => native::postgres(datasource, &url, features).await,
 
                 #[cfg(feature = "mongodb")]
-                p if MONGODB.is_provider(p) => native::mongodb(source, url, features).await,
+                p if MONGODB.is_provider(p) => native::mongodb(datasource, &url, features).await,
 
                 x => Err(query_core::CoreError::ConfigurationError(format!(
                     "Unsupported connector type: {x}"
@@ -54,11 +62,12 @@ pub async fn load(
 
 #[cfg(feature = "driver-adapters")]
 async fn driver_adapter(
-    source: &Datasource,
-    url: &str,
+    driver_adapter: Arc<dyn ExternalConnector>,
     features: PreviewFeatures,
 ) -> Result<Box<dyn QueryExecutor + Send + Sync>, query_core::CoreError> {
-    let js = Js::from_source(source, url, features).await?;
+    use quaint::connector::ExternalConnector;
+
+    let js = Js::new(driver_adapter, features).await?;
     Ok(executor_for(js, false))
 }
 

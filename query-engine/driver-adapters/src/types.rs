@@ -5,6 +5,7 @@ use std::str::FromStr;
 #[cfg(not(target_arch = "wasm32"))]
 use napi::bindgen_prelude::{FromNapiValue, ToNapiValue};
 
+use quaint::connector::{ExternalConnectionInfo, SqlFamily};
 #[cfg(target_arch = "wasm32")]
 use tsify::Tsify;
 
@@ -12,8 +13,7 @@ use crate::conversion::JSArg;
 use serde::{Deserialize, Serialize};
 use serde_repr::{Deserialize_repr, Serialize_repr};
 
-#[cfg_attr(target_arch = "wasm32", derive(Serialize, Deserialize, Tsify))]
-#[cfg_attr(target_arch = "wasm32", tsify(into_wasm_abi, from_wasm_abi))]
+#[cfg_attr(target_arch = "wasm32", derive(Deserialize))]
 #[derive(Debug, Eq, PartialEq, Clone)]
 pub enum AdapterFlavour {
     Mysql,
@@ -34,6 +34,46 @@ impl FromStr for AdapterFlavour {
     }
 }
 
+impl From<AdapterFlavour> for SqlFamily {
+    fn from(value: AdapterFlavour) -> Self {
+        match value {
+            AdapterFlavour::Mysql => SqlFamily::Mysql,
+            AdapterFlavour::Postgres => SqlFamily::Postgres,
+            AdapterFlavour::Sqlite => SqlFamily::Sqlite,
+        }
+    }
+}
+
+#[cfg_attr(not(target_arch = "wasm32"), napi_derive::napi(object))]
+#[cfg_attr(target_arch = "wasm32", derive(Deserialize))]
+#[cfg_attr(target_arch = "wasm32", serde(rename_all = "camelCase"))]
+#[derive(Default)]
+pub(crate) struct JsConnectionInfo {
+    pub schema_name: Option<String>,
+}
+
+impl JsConnectionInfo {
+    pub fn into_external_connection_info(self, provider: &AdapterFlavour) -> ExternalConnectionInfo {
+        let schema_name = self.get_schema_name(provider);
+        let sql_family = provider.to_owned().into();
+        ExternalConnectionInfo::new(sql_family, schema_name.to_owned())
+    }
+    fn get_schema_name(&self, provider: &AdapterFlavour) -> &str {
+        match self.schema_name.as_ref() {
+            Some(name) => name,
+            None => self.default_schema_name(provider),
+        }
+    }
+
+    fn default_schema_name(&self, provider: &AdapterFlavour) -> &str {
+        match provider {
+            AdapterFlavour::Mysql => quaint::connector::DEFAULT_MYSQL_DB,
+            AdapterFlavour::Postgres => quaint::connector::DEFAULT_POSTGRES_SCHEMA,
+            AdapterFlavour::Sqlite => quaint::connector::DEFAULT_SQLITE_DATABASE,
+        }
+    }
+}
+
 /// This result set is more convenient to be manipulated from both Rust and NodeJS.
 /// Quaint's version of ResultSet is:
 ///
@@ -49,8 +89,7 @@ impl FromStr for AdapterFlavour {
 /// representing the Value in javascript.
 ///
 #[cfg_attr(not(target_arch = "wasm32"), napi_derive::napi(object))]
-#[cfg_attr(target_arch = "wasm32", derive(Serialize, Deserialize, Tsify))]
-#[cfg_attr(target_arch = "wasm32", tsify(into_wasm_abi, from_wasm_abi))]
+#[cfg_attr(target_arch = "wasm32", derive(Deserialize))]
 #[cfg_attr(target_arch = "wasm32", serde(rename_all = "camelCase"))]
 #[derive(Debug)]
 pub struct JSResultSet {
@@ -68,8 +107,7 @@ impl JSResultSet {
 }
 
 #[cfg_attr(not(target_arch = "wasm32"), napi_derive::napi(object))]
-#[cfg_attr(target_arch = "wasm32", derive(Clone, Copy, Serialize_repr, Deserialize_repr, Tsify))]
-#[cfg_attr(target_arch = "wasm32", tsify(into_wasm_abi, from_wasm_abi))]
+#[cfg_attr(target_arch = "wasm32", derive(Clone, Copy, Deserialize_repr))]
 #[repr(u8)]
 #[derive(Debug)]
 pub enum ColumnType {
@@ -205,8 +243,7 @@ pub enum ColumnType {
 }
 
 #[cfg_attr(not(target_arch = "wasm32"), napi_derive::napi(object))]
-#[cfg_attr(target_arch = "wasm32", derive(Serialize, Tsify))]
-#[cfg_attr(target_arch = "wasm32", tsify(into_wasm_abi))]
+#[cfg_attr(target_arch = "wasm32", derive(Serialize))]
 #[derive(Debug, Default)]
 pub struct Query {
     pub sql: String,
@@ -214,8 +251,7 @@ pub struct Query {
 }
 
 #[cfg_attr(not(target_arch = "wasm32"), napi_derive::napi(object))]
-#[cfg_attr(target_arch = "wasm32", derive(Serialize, Deserialize, Tsify))]
-#[cfg_attr(target_arch = "wasm32", tsify(into_wasm_abi, from_wasm_abi))]
+#[cfg_attr(target_arch = "wasm32", derive(Deserialize, Tsify))]
 #[cfg_attr(target_arch = "wasm32", serde(rename_all = "camelCase"))]
 #[derive(Debug, Default)]
 pub struct TransactionOptions {

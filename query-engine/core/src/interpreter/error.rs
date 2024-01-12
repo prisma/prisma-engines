@@ -29,6 +29,10 @@ impl fmt::Display for InterpreterError {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
             Self::QueryGraphBuilderError(e) => write!(f, "{e:?}"),
+            Self::ConnectorError(ConnectorError {
+                user_facing_error: Some(e),
+                ..
+            }) => write!(f, "{e:?}"),
             _ => write!(f, "Error occurred during query execution:\n{self:?}"),
         }
     }

@@ -1,4 +1,5 @@
 use crate::{ast, parent_container::ParentContainer, prelude::*, DefaultKind, NativeTypeInstance, ValueGenerator};
+use chrono::{DateTime, FixedOffset};
 use psl::{
     parser_database::{walkers, ScalarFieldType, ScalarType},
     schema_ast::ast::FieldArity,
@@ -170,6 +171,13 @@ impl ScalarField {
         })
     }
 
+    pub fn parse_json_datetime(&self, value: &str) -> chrono::ParseResult<DateTime<FixedOffset>> {
+        let nt = self.native_type().map(|nt| nt.native_type);
+        let connector = self.dm.schema.connector;
+
+        connector.parse_json_datetime(value, nt)
+    }
+
     pub fn is_autoincrement(&self) -> bool {
         match self.id {
             ScalarFieldId::InModel(id) => self.dm.walk(id).is_autoincrement(),
@@ -199,7 +207,7 @@ pub fn dml_default_kind(default_value: &ast::Expression, scalar_type: Option<Sca
         ast::Expression::Function(funcname, args, _) if funcname == "dbgenerated" => {
             DefaultKind::Expression(ValueGenerator::new_dbgenerated(
                 args.arguments
-                    .get(0)
+                    .first()
                     .and_then(|arg| arg.value.as_string_value())
                     .map(|(val, _)| val.to_owned())
                     .unwrap_or_else(String::new),
@@ -223,7 +231,7 @@ pub fn dml_default_kind(default_value: &ast::Expression, scalar_type: Option<Sca
         ast::Expression::Function(funcname, args, _) if funcname == "nanoid" => {
             DefaultKind::Expression(ValueGenerator::new_nanoid(
                 args.arguments
-                    .get(0)
+                    .first()
                     .and_then(|arg| arg.value.as_numeric_value())
                     .map(|(val, _)| val.parse::<u8>().unwrap()),
             ))

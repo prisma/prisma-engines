@@ -6,6 +6,7 @@ use super::conversion;
 use crate::send_future::UnsafeFuture;
 use async_trait::async_trait;
 use futures::Future;
+use quaint::connector::{ExternalConnectionInfo, ExternalConnector};
 use quaint::{
     connector::{metrics, IsolationLevel, Transaction},
     error::{Error, ErrorKind},
@@ -13,9 +14,6 @@ use quaint::{
     visitor::{self, Visitor},
 };
 use tracing::{info_span, Instrument};
-
-#[cfg(target_arch = "wasm32")]
-use wasm_bindgen::prelude::wasm_bindgen;
 
 /// A JsQueryable adapts a Proxy to implement quaint's Queryable interface. It has the
 /// responsibility of transforming inputs and outputs of `query` and `execute` methods from quaint
@@ -29,7 +27,6 @@ use wasm_bindgen::prelude::wasm_bindgen;
 /// Transforming a `JSResultSet` (what client connectors implemented in javascript provide)
 /// into a `quaint::connector::result_set::ResultSet`. A quaint `ResultSet` is basically a vector
 /// of `quaint::Value` but said type is a tagged enum, with non-unit variants that cannot be converted to javascript as is.
-#[cfg_attr(target_arch = "wasm32", wasm_bindgen(getter_with_clone))]
 pub(crate) struct JsBaseQueryable {
     pub(crate) proxy: CommonProxy,
     pub provider: AdapterFlavour,
@@ -221,6 +218,14 @@ impl std::fmt::Display for JsQueryable {
 impl std::fmt::Debug for JsQueryable {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "JSQueryable(driver)")
+    }
+}
+
+#[async_trait]
+impl ExternalConnector for JsQueryable {
+    async fn get_connection_info(&self) -> quaint::Result<ExternalConnectionInfo> {
+        let conn_info = self.driver_proxy.get_connection_info().await?;
+        Ok(conn_info.into_external_connection_info(&self.inner.provider))
     }
 }
 

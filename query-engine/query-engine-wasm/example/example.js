@@ -76,10 +76,6 @@ async function main() {
   await queryEngine.disconnect('trace')
   // console.log('after disconnect')
 
-  // console.log('before close')
-  await driverAdapter.close()
-  // console.log('after close')
-
   // console.log('before free')
   queryEngine.free()
   // console.log('after free')
