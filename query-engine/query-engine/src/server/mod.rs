@@ -189,7 +189,7 @@ async fn request_handler(cx: Arc<PrismaContext>, req: Request<Body>) -> Result<R
             }
             Err(e) => {
                 let ufe: user_facing_errors::Error = request_handlers::HandlerError::query_conversion(format!(
-                    "Error parsing {:?} query. {}",
+                    "Error parsing {:?} query. Ensure that engine protocol of the client and the engine matches. {}",
                     cx.engine_protocol(),
                     e
                 ))
