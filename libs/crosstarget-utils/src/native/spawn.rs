@@ -1,4 +1,4 @@
-use futures::FutureExt;
+use futures::TryFutureExt;
 use std::future::Future;
 
 use crate::common::SpawnError;
@@ -8,8 +8,5 @@ where
     F: Future + 'static + Send,
     F::Output: Send + 'static,
 {
-    tokio::spawn(future).map(|result| match result {
-        Ok(result) => Ok(result),
-        Err(_) => Err(SpawnError),
-    })
+    tokio::spawn(future).map_err(|_| SpawnError)
 }

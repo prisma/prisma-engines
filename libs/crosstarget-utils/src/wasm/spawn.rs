@@ -1,6 +1,6 @@
 use std::future::Future;
 
-use futures::FutureExt;
+use futures::TryFutureExt;
 use tokio::sync::oneshot;
 use wasm_bindgen_futures::spawn_local;
 
@@ -10,14 +10,11 @@ pub fn spawn_if_possible<F>(future: F) -> impl Future<Output = Result<F::Output,
 where
     F: Future + 'static,
 {
-    let (sx, rx) = oneshot::channel::<F::Output>();
+    let (sx, rx) = oneshot::channel();
     spawn_local(async move {
         let result = future.await;
-        let _ = sx.send(result);
+        _ = sx.send(result);
     });
 
-    rx.map(|result| match result {
-        Ok(result) => Ok(result),
-        Err(_) => Err(SpawnError),
-    })
+    rx.map_err(|_| SpawnError)
 }
