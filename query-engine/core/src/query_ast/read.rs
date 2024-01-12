@@ -4,7 +4,7 @@ use crate::ToGraphviz;
 use connector::{AggregationSelection, RelAggregationSelection};
 use enumflags2::BitFlags;
 use query_structure::{prelude::*, Filter, QueryArguments, RelationLoadStrategy};
-use std::fmt::Display;
+use std::{fmt::Display, mem};
 
 #[allow(clippy::enum_variant_names)]
 #[derive(Debug, Clone)]
@@ -35,13 +35,13 @@ impl ReadQuery {
     pub fn satisfy_dependency(&mut self, field_selection: FieldSelection) {
         match self {
             ReadQuery::RecordQuery(x) => {
-                x.selected_fields = x.selected_fields.clone().merge(field_selection);
+                x.selected_fields = mem::take(&mut x.selected_fields).merge(field_selection);
             }
             ReadQuery::ManyRecordsQuery(x) => {
-                x.selected_fields = x.selected_fields.clone().merge(field_selection);
+                x.selected_fields = mem::take(&mut x.selected_fields).merge(field_selection);
             }
             ReadQuery::RelatedRecordsQuery(x) => {
-                x.selected_fields = x.selected_fields.clone().merge(field_selection);
+                x.selected_fields = mem::take(&mut x.selected_fields).merge(field_selection);
             }
             ReadQuery::AggregateRecordsQuery(_) => (),
         }
