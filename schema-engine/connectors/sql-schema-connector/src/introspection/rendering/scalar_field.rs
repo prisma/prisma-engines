@@ -33,7 +33,7 @@ pub(crate) fn render(field: ScalarFieldPair<'_>) -> renderer::Field<'_> {
         rendered.documentation(docs);
     }
 
-    if let Some(default) = defaults::render(field.default()) {
+    if let Some(default) = defaults::render(&field) {
         rendered.default(default);
     }
 

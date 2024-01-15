@@ -215,7 +215,7 @@ impl<'a> ScalarFieldPair<'a> {
         self.previous.is_none() && self.description().is_some()
     }
 
-    fn column_type_family(self) -> &'a sql::ColumnTypeFamily {
+    pub(crate) fn column_type_family(self) -> &'a sql::ColumnTypeFamily {
         self.next.column_type_family()
     }
 }
