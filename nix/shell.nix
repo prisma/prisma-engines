@@ -15,6 +15,7 @@ in
       nodejs_20.pkgs.pnpm
 
       cargo-insta
+      cargo-nextest
       jq
       graphviz
       wasm-bindgen-cli
