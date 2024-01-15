@@ -9,15 +9,17 @@
 <a href="#9" id="9">9</a>
 <a href="#10" id="10">10</a>
 <a href="#11" id="11">11</a>
-</pre></div><pre class="rust"><code><span class="kw">use </span>std::future::Future;
+<a href="#12" id="12">12</a>
+</pre></div><pre class="rust"><code><span class="kw">use </span>futures::TryFutureExt;
+<span class="kw">use </span>std::future::Future;
 
 <span class="kw">use </span><span class="kw">crate</span>::common::SpawnError;
 
-<span class="kw">pub async fn </span>spawn_if_possible&lt;F&gt;(future: F) -&gt; <span class="prelude-ty">Result</span>&lt;F::Output, SpawnError&gt;
+<span class="kw">pub fn </span>spawn_if_possible&lt;F&gt;(future: F) -&gt; <span class="kw">impl </span>Future&lt;Output = <span class="prelude-ty">Result</span>&lt;F::Output, SpawnError&gt;&gt;
 <span class="kw">where
     </span>F: Future + <span class="lifetime">&#39;static </span>+ Send,
     F::Output: Send + <span class="lifetime">&#39;static</span>,
 {
-    tokio::spawn(future).<span class="kw">await</span>.map_err(|<span class="kw">_</span>| SpawnError)
+    tokio::spawn(future).map_err(|<span class="kw">_</span>| SpawnError)
 }
 </code></pre></div></section></main></body></html>
