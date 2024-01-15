@@ -21,10 +21,13 @@ import { Client as PlanetscaleClient } from '@planetscale/database'
 import { PrismaPlanetScale } from '@prisma/adapter-planetscale'
 
 
+
 import {bindAdapter, DriverAdapter, ErrorCapturingDriverAdapter} from "@prisma/driver-adapter-utils";
 import { webcrypto } from 'node:crypto';
 
-(global as any).crypto = webcrypto
+if (!global.crypto) {
+  global.crypto = webcrypto as Crypto
+}
 
 
 const SUPPORTED_ADAPTERS: Record<string, (_ : string) => Promise<DriverAdapter>>

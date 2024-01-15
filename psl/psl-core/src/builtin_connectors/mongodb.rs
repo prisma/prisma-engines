@@ -30,7 +30,8 @@ const CAPABILITIES: ConnectorCapabilities = enumflags2::make_bitflags!(Connector
     MongoDbQueryRaw |
     DefaultValueAuto |
     TwoWayEmbeddedManyToManyRelation |
-    UndefinedType
+    UndefinedType |
+    DeleteReturning
 });
 
 pub(crate) struct MongoDbDatamodelConnector;

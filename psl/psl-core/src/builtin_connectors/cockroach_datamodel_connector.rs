@@ -60,7 +60,9 @@ const CAPABILITIES: ConnectorCapabilities = enumflags2::make_bitflags!(Connector
     InsertReturning |
     UpdateReturning |
     RowIn |
-    LateralJoin
+    LateralJoin |
+    DeleteReturning |
+    SupportsFiltersOnRelationsWithoutJoins
 });
 
 const SCALAR_TYPE_DEFAULTS: &[(ScalarType, CockroachType)] = &[

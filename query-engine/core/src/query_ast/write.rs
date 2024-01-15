@@ -74,6 +74,10 @@ impl WriteQuery {
             Self::CreateManyRecords(_) => None,
             Self::UpdateRecord(UpdateRecord::WithSelection(ur)) => Some(ur.selected_fields.clone()),
             Self::UpdateRecord(UpdateRecord::WithoutSelection(_)) => returns_id,
+            Self::DeleteRecord(DeleteRecord {
+                selected_fields: Some(selected_fields),
+                ..
+            }) => Some(selected_fields.fields.clone()),
             Self::DeleteRecord(_) => returns_id,
             Self::UpdateManyRecords(_) => returns_id,
             Self::DeleteManyRecords(_) => None,
@@ -88,13 +92,17 @@ impl WriteQuery {
     /// Updates the field selection of the query to satisfy the inputted FieldSelection.
     pub fn satisfy_dependency(&mut self, fields: FieldSelection) {
         match self {
-            Self::CreateRecord(cr) => cr.selected_fields = cr.selected_fields.clone().merge(fields),
-            Self::UpdateRecord(UpdateRecord::WithSelection(ur)) => {
-                ur.selected_fields = ur.selected_fields.clone().merge(fields)
-            }
+            Self::CreateRecord(cr) => cr.selected_fields.merge_in_place(fields),
+            Self::UpdateRecord(UpdateRecord::WithSelection(ur)) => ur.selected_fields.merge_in_place(fields),
             Self::UpdateRecord(UpdateRecord::WithoutSelection(_)) => (),
             Self::CreateManyRecords(_) => (),
-            Self::DeleteRecord(_) => (),
+            Self::DeleteRecord(DeleteRecord {
+                selected_fields: Some(selected_fields),
+                ..
+            }) => selected_fields.fields.merge_in_place(fields),
+            Self::DeleteRecord(DeleteRecord {
+                selected_fields: None, ..
+            }) => (),
             Self::UpdateManyRecords(_) => (),
             Self::DeleteManyRecords(_) => (),
             Self::ConnectRecords(_) => (),
@@ -211,7 +219,12 @@ impl ToGraphviz for WriteQuery {
                 q.model().name(),
                 q.selected_fields()
             ),
-            Self::DeleteRecord(q) => format!("DeleteRecord: {}, {:?}", q.model.name(), q.record_filter),
+            Self::DeleteRecord(q) => format!(
+                "DeleteRecord: {}, {:?}, {:?}",
+                q.model.name(),
+                q.record_filter,
+                q.selected_fields
+            ),
             Self::UpdateManyRecords(q) => format!("UpdateManyRecords(model: {}, args: {:?})", q.model.name(), q.args),
             Self::DeleteManyRecords(q) => format!("DeleteManyRecords: {}", q.model.name()),
             Self::ConnectRecords(_) => "ConnectRecords".to_string(),
@@ -331,8 +344,18 @@ pub struct UpdateManyRecords {
 
 #[derive(Debug, Clone)]
 pub struct DeleteRecord {
+    pub name: String,
     pub model: Model,
     pub record_filter: Option<RecordFilter>,
+    /// Fields of the deleted record that client has requested to return.
+    /// `None` if the connector does not support returning the deleted row.
+    pub selected_fields: Option<DeleteRecordFields>,
+}
+
+#[derive(Debug, Clone)]
+pub struct DeleteRecordFields {
+    pub fields: FieldSelection,
+    pub order: Vec<String>,
 }
 
 #[derive(Debug, Clone)]

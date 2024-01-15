@@ -146,6 +146,11 @@ impl FieldSelection {
         FieldSelection { selections }
     }
 
+    pub fn merge_in_place(&mut self, other: FieldSelection) {
+        let this = std::mem::take(self);
+        *self = this.merge(other);
+    }
+
     pub fn type_identifiers_with_arities(&self) -> Vec<(TypeIdentifier, FieldArity)> {
         self.selections()
             .filter_map(|selection| match selection {

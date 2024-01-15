@@ -32,6 +32,17 @@ impl<'a> Postgres<'a> {
             _ => self.visit_expression(expr),
         }
     }
+
+    fn visit_returning(&mut self, returning: Option<Vec<Column<'a>>>) -> visitor::Result {
+        if let Some(returning) = returning {
+            if !returning.is_empty() {
+                let values = returning.into_iter().map(|r| r.into()).collect();
+                self.write(" RETURNING ")?;
+                self.visit_columns(values)?;
+            }
+        }
+        Ok(())
+    }
 }
 
 impl<'a> Visitor<'a> for Postgres<'a> {
@@ -328,13 +339,7 @@ impl<'a> Visitor<'a> for Postgres<'a> {
             None => (),
         }
 
-        if let Some(returning) = insert.returning {
-            if !returning.is_empty() {
-                let values = returning.into_iter().map(|r| r.into()).collect();
-                self.write(" RETURNING ")?;
-                self.visit_columns(values)?;
-            }
-        };
+        self.visit_returning(insert.returning)?;
 
         if let Some(comment) = insert.comment {
             self.write(" ")?;
@@ -720,6 +725,25 @@ impl<'a> Visitor<'a> for Postgres<'a> {
 
         if should_cast {
             self.write("::text")?;
+        }
+
+        Ok(())
+    }
+
+    fn visit_delete(&mut self, delete: Delete<'a>) -> visitor::Result {
+        self.write("DELETE FROM ")?;
+        self.visit_table(delete.table, true)?;
+
+        if let Some(conditions) = delete.conditions {
+            self.write(" WHERE ")?;
+            self.visit_conditions(conditions)?;
+        }
+
+        self.visit_returning(delete.returning)?;
+
+        if let Some(comment) = delete.comment {
+            self.write(" ")?;
+            self.visit_comment(comment)?;
         }
 
         Ok(())

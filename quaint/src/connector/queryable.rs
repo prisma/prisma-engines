@@ -75,7 +75,7 @@ pub trait Queryable: Send + Sync {
         self.execute(q.into()).await
     }
 
-    /// Execute a `DELETE` query, returning the number of affected rows.
+    /// Execute a `DELETE` query.
     async fn delete(&self, q: Delete<'_>) -> crate::Result<()> {
         self.query(q.into()).await?;
         Ok(())

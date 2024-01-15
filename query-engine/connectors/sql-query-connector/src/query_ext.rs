@@ -103,7 +103,9 @@ impl<Q: Queryable + ?Sized> QueryExt for Q {
             .await?
             .into_iter()
             .next()
-            .ok_or(SqlError::RecordDoesNotExist)
+            .ok_or(SqlError::RecordDoesNotExist {
+                cause: "Filter returned no results".to_owned(),
+            })
     }
 
     async fn filter_selectors(

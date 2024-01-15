@@ -63,7 +63,7 @@ where
 
         let fut_tx = self.inner.start_transaction(isolation_level);
 
-        catch(self.connection_info.clone(), async move {
+        catch(&self.connection_info, async move {
             let tx = fut_tx.await.map_err(SqlError::from)?;
 
             Ok(Box::new(SqlConnectorTransaction::new(tx, connection_info, features)) as Box<dyn Transaction>)
@@ -91,8 +91,9 @@ where
         trace_id: Option<String>,
     ) -> connector::Result<Option<SingleRecord>> {
         // [Composites] todo: FieldSelection -> ModelProjection conversion
-        catch(self.connection_info.clone(), async move {
-            let ctx = Context::new(&self.connection_info, trace_id.as_deref());
+        let ctx = Context::new(&self.connection_info, trace_id.as_deref());
+        catch(
+            &self.connection_info,
             read::get_single_record(
                 &self.inner,
                 model,
@@ -101,9 +102,8 @@ where
                 aggr_selections,
                 relation_load_strategy,
                 &ctx,
-            )
-            .await
-        })
+            ),
+        )
         .await
     }
 
@@ -116,9 +116,9 @@ where
         relation_load_strategy: RelationLoadStrategy,
         trace_id: Option<String>,
     ) -> connector::Result<ManyRecords> {
-        catch(self.connection_info.clone(), async move {
-            let ctx = Context::new(&self.connection_info, trace_id.as_deref());
-
+        let ctx = Context::new(&self.connection_info, trace_id.as_deref());
+        catch(
+            &self.connection_info,
             read::get_many_records(
                 &self.inner,
                 model,
@@ -127,9 +127,8 @@ where
                 aggr_selections,
                 relation_load_strategy,
                 &ctx,
-            )
-            .await
-        })
+            ),
+        )
         .await
     }
 
@@ -139,10 +138,11 @@ where
         from_record_ids: &[SelectionResult],
         trace_id: Option<String>,
     ) -> connector::Result<Vec<(SelectionResult, SelectionResult)>> {
-        catch(self.connection_info.clone(), async move {
-            let ctx = Context::new(&self.connection_info, trace_id.as_deref());
-            read::get_related_m2m_record_ids(&self.inner, from_field, from_record_ids, &ctx).await
-        })
+        let ctx = Context::new(&self.connection_info, trace_id.as_deref());
+        catch(
+            &self.connection_info,
+            read::get_related_m2m_record_ids(&self.inner, from_field, from_record_ids, &ctx),
+        )
         .await
     }
 
@@ -155,10 +155,11 @@ where
         having: Option<Filter>,
         trace_id: Option<String>,
     ) -> connector::Result<Vec<AggregationRow>> {
-        catch(self.connection_info.clone(), async move {
-            let ctx = Context::new(&self.connection_info, trace_id.as_deref());
-            read::aggregate(&self.inner, model, query_arguments, selections, group_by, having, &ctx).await
-        })
+        let ctx = Context::new(&self.connection_info, trace_id.as_deref());
+        catch(
+            &self.connection_info,
+            read::aggregate(&self.inner, model, query_arguments, selections, group_by, having, &ctx),
+        )
         .await
     }
 }
@@ -175,8 +176,9 @@ where
         selected_fields: FieldSelection,
         trace_id: Option<String>,
     ) -> connector::Result<SingleRecord> {
-        catch(self.connection_info.clone(), async move {
-            let ctx = Context::new(&self.connection_info, trace_id.as_deref());
+        let ctx = Context::new(&self.connection_info, trace_id.as_deref());
+        catch(
+            &self.connection_info,
             write::create_record(
                 &self.inner,
                 &self.connection_info.sql_family(),
@@ -184,9 +186,8 @@ where
                 args,
                 selected_fields,
                 &ctx,
-            )
-            .await
-        })
+            ),
+        )
         .await
     }
 
@@ -197,10 +198,11 @@ where
         skip_duplicates: bool,
         trace_id: Option<String>,
     ) -> connector::Result<usize> {
-        catch(self.connection_info.clone(), async move {
-            let ctx = Context::new(&self.connection_info, trace_id.as_deref());
-            write::create_records(&self.inner, model, args, skip_duplicates, &ctx).await
-        })
+        let ctx = Context::new(&self.connection_info, trace_id.as_deref());
+        catch(
+            &self.connection_info,
+            write::create_records(&self.inner, model, args, skip_duplicates, &ctx),
+        )
         .await
     }
 
@@ -211,10 +213,11 @@ where
         args: WriteArgs,
         trace_id: Option<String>,
     ) -> connector::Result<usize> {
-        catch(self.connection_info.clone(), async move {
-            let ctx = Context::new(&self.connection_info, trace_id.as_deref());
-            write::update_records(&self.inner, model, record_filter, args, &ctx).await
-        })
+        let ctx = Context::new(&self.connection_info, trace_id.as_deref());
+        catch(
+            &self.connection_info,
+            write::update_records(&self.inner, model, record_filter, args, &ctx),
+        )
         .await
     }
 
@@ -226,11 +229,11 @@ where
         selected_fields: Option<FieldSelection>,
         trace_id: Option<String>,
     ) -> connector::Result<Option<SingleRecord>> {
-        catch(self.connection_info.clone(), async move {
-            let ctx = Context::new(&self.connection_info, trace_id.as_deref());
-
-            write::update_record(&self.inner, model, record_filter, args, selected_fields, &ctx).await
-        })
+        let ctx = Context::new(&self.connection_info, trace_id.as_deref());
+        catch(
+            &self.connection_info,
+            write::update_record(&self.inner, model, record_filter, args, selected_fields, &ctx),
+        )
         .await
     }
 
@@ -240,10 +243,26 @@ where
         record_filter: RecordFilter,
         trace_id: Option<String>,
     ) -> connector::Result<usize> {
-        catch(self.connection_info.clone(), async move {
-            let ctx = Context::new(&self.connection_info, trace_id.as_deref());
-            write::delete_records(&self.inner, model, record_filter, &ctx).await
-        })
+        let ctx = Context::new(&self.connection_info, trace_id.as_deref());
+        catch(
+            &self.connection_info,
+            write::delete_records(&self.inner, model, record_filter, &ctx),
+        )
+        .await
+    }
+
+    async fn delete_record(
+        &mut self,
+        model: &Model,
+        record_filter: RecordFilter,
+        selected_fields: FieldSelection,
+        trace_id: Option<String>,
+    ) -> connector::Result<SingleRecord> {
+        let ctx = Context::new(&self.connection_info, trace_id.as_deref());
+        catch(
+            &self.connection_info,
+            write::delete_record(&self.inner, model, record_filter, selected_fields, &ctx),
+        )
         .await
     }
 
@@ -252,11 +271,8 @@ where
         upsert: connector_interface::NativeUpsert,
         trace_id: Option<String>,
     ) -> connector::Result<SingleRecord> {
-        catch(self.connection_info.clone(), async move {
-            let ctx = Context::new(&self.connection_info, trace_id.as_deref());
-            upsert::native_upsert(&self.inner, upsert, &ctx).await
-        })
-        .await
+        let ctx = Context::new(&self.connection_info, trace_id.as_deref());
+        catch(&self.connection_info, upsert::native_upsert(&self.inner, upsert, &ctx)).await
     }
 
     async fn m2m_connect(
@@ -266,10 +282,11 @@ where
         child_ids: &[SelectionResult],
         trace_id: Option<String>,
     ) -> connector::Result<()> {
-        catch(self.connection_info.clone(), async move {
-            let ctx = Context::new(&self.connection_info, trace_id.as_deref());
-            write::m2m_connect(&self.inner, field, parent_id, child_ids, &ctx).await
-        })
+        let ctx = Context::new(&self.connection_info, trace_id.as_deref());
+        catch(
+            &self.connection_info,
+            write::m2m_connect(&self.inner, field, parent_id, child_ids, &ctx),
+        )
         .await
     }
 
@@ -280,17 +297,19 @@ where
         child_ids: &[SelectionResult],
         trace_id: Option<String>,
     ) -> connector::Result<()> {
-        catch(self.connection_info.clone(), async move {
-            let ctx = Context::new(&self.connection_info, trace_id.as_deref());
-            write::m2m_disconnect(&self.inner, field, parent_id, child_ids, &ctx).await
-        })
+        let ctx = Context::new(&self.connection_info, trace_id.as_deref());
+        catch(
+            &self.connection_info,
+            write::m2m_disconnect(&self.inner, field, parent_id, child_ids, &ctx),
+        )
         .await
     }
 
     async fn execute_raw(&mut self, inputs: HashMap<String, PrismaValue>) -> connector::Result<usize> {
-        catch(self.connection_info.clone(), async move {
-            write::execute_raw(&self.inner, self.features, inputs).await
-        })
+        catch(
+            &self.connection_info,
+            write::execute_raw(&self.inner, self.features, inputs),
+        )
         .await
     }
 
@@ -300,9 +319,6 @@ where
         inputs: HashMap<String, PrismaValue>,
         _query_type: Option<String>,
     ) -> connector::Result<serde_json::Value> {
-        catch(self.connection_info.clone(), async move {
-            write::query_raw(&self.inner, inputs).await
-        })
-        .await
+        catch(&self.connection_info, write::query_raw(&self.inner, inputs)).await
     }
 }

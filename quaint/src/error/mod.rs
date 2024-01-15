@@ -160,7 +160,7 @@ pub enum ErrorKind {
     #[error("Authentication failed for user {}", user)]
     AuthenticationFailed { user: Name },
 
-    #[error("Query returned no data")]
+    #[error("Query returned no data.")]
     NotFound,
 
     #[error("No such table: {}", table)]

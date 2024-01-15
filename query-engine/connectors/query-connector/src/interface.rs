@@ -338,6 +338,17 @@ pub trait WriteOperations {
         trace_id: Option<String>,
     ) -> crate::Result<usize>;
 
+    /// Delete single record in the `Model` with the given `Filter`.
+    /// Return selected fields of the deleted record, if the connector
+    /// supports it. If the connector does not support it, error is returned.
+    async fn delete_record(
+        &mut self,
+        model: &Model,
+        record_filter: RecordFilter,
+        selected_fields: FieldSelection,
+        trace_id: Option<String>,
+    ) -> crate::Result<SingleRecord>;
+
     // We plan to remove the methods below in the future. We want emulate them with the ones above. Those should suffice.
 
     /// Connect the children to the parent (m2m relation only).

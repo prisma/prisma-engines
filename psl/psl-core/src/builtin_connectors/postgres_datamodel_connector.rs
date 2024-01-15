@@ -68,7 +68,9 @@ const CAPABILITIES: ConnectorCapabilities = enumflags2::make_bitflags!(Connector
     UpdateReturning |
     RowIn |
     DistinctOn |
-    LateralJoin
+    LateralJoin |
+    DeleteReturning |
+    SupportsFiltersOnRelationsWithoutJoins
 });
 
 pub struct PostgresDatamodelConnector;
