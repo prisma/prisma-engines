@@ -21,7 +21,7 @@
   "license": "Apache-2.0",
   "dependencies": {
     "@libsql/client": "0.3.6",
-    "@neondatabase/serverless": "0.6.0",
+    "@neondatabase/serverless": "0.7.2",
     "@planetscale/database": "1.13.0",
     "query-engine-wasm-latest": "npm:@prisma/query-engine-wasm@latest",
     "query-engine-wasm-baseline": "npm:@prisma/query-engine-wasm@0.0.19",
