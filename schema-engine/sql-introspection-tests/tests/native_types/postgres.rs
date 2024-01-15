@@ -159,6 +159,8 @@ async fn native_type_array_columns_feature_on(api: &mut TestApi) -> TestResult {
 async fn cdb_char_is_a_char(api: &mut TestApi) -> TestResult {
     // https://github.com/prisma/prisma/issues/12281
 
+    api.normalise_int_type().await?;
+
     api.barrel()
         .execute(move |migration| {
             migration.create_table("Blog", move |t| {

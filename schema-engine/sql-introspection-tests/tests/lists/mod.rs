@@ -5,6 +5,8 @@ use test_macros::test_connector;
 
 #[test_connector(capabilities(ScalarLists))]
 async fn scalar_list_types(api: &mut TestApi) -> TestResult {
+    api.normalise_int_type().await?;
+
     api.barrel()
         .execute(|migration| {
             migration.create_table("Post", |t| {

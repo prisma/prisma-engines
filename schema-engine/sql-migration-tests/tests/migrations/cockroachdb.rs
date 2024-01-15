@@ -1200,7 +1200,6 @@ fn sequence_with_multiple_models_works(api: TestApi) {
     "#]];
 
     api.expect_sql_for_schema(schema, &sql);
-
     api.schema_push(schema).send().assert_green();
     api.schema_push(schema).send().assert_green().assert_no_steps();
 }

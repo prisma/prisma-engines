@@ -63,9 +63,9 @@ async fn default_values_on_relations(api: &mut TestApi) -> TestResult {
 
     let expected = expect![[r#"
         model Post {
-          id      BigInt @id @default(autoincrement())
-          user_id Int?   @default(0)
-          User    User?  @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+          id      BigInt  @id @default(autoincrement())
+          user_id BigInt? @default(0)
+          User    User?   @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
         }
 
         model User {
@@ -103,13 +103,13 @@ async fn a_self_relation(api: &mut TestApi) -> TestResult {
 
     let expected = expect![[r#"
         model User {
-          id                                  BigInt @id @default(autoincrement())
-          recruited_by                        Int?
-          direct_report                       Int?
-          User_User_direct_reportToUser       User?  @relation("User_direct_reportToUser", fields: [direct_report], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "direct_report_fkey")
-          other_User_User_direct_reportToUser User[] @relation("User_direct_reportToUser")
-          User_User_recruited_byToUser        User?  @relation("User_recruited_byToUser", fields: [recruited_by], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "recruited_by_fkey")
-          other_User_User_recruited_byToUser  User[] @relation("User_recruited_byToUser")
+          id                                  BigInt  @id @default(autoincrement())
+          recruited_by                        BigInt?
+          direct_report                       BigInt?
+          User_User_direct_reportToUser       User?   @relation("User_direct_reportToUser", fields: [direct_report], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "direct_report_fkey")
+          other_User_User_direct_reportToUser User[]  @relation("User_direct_reportToUser")
+          User_User_recruited_byToUser        User?   @relation("User_recruited_byToUser", fields: [recruited_by], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "recruited_by_fkey")
+          other_User_User_recruited_byToUser  User[]  @relation("User_recruited_byToUser")
         }
     "#]];
 
@@ -149,8 +149,8 @@ async fn a_many_to_many_relation_with_an_id(api: &mut TestApi) -> TestResult {
 
         model PostsToUsers {
           id      BigInt @id @default(autoincrement())
-          user_id Int
-          post_id Int
+          user_id BigInt
+          post_id BigInt
           Post    Post   @relation(fields: [post_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
           User    User   @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
         }
