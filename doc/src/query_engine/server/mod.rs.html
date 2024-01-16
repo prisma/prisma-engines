@@ -727,7 +727,7 @@
             }
             <span class="prelude-val">Err</span>(e) =&gt; {
                 <span class="kw">let </span>ufe: user_facing_errors::Error = request_handlers::HandlerError::query_conversion(<span class="macro">format!</span>(
-                    <span class="string">&quot;Error parsing {:?} query. {}&quot;</span>,
+                    <span class="string">&quot;Error parsing {:?} query. Ensure that engine protocol of the client and the engine matches. {}&quot;</span>,
                     cx.engine_protocol(),
                     e
                 ))
