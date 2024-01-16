@@ -608,7 +608,7 @@ mod tests {
         match res {
             Ok(_) => unreachable!(),
             Err(e) => match e.kind() {
-                ErrorKind::TlsError { .. } => (),
+                ErrorKind::Native(NativeErrorKind::TlsError { .. }) => (),
                 other => panic!("{:#?}", other),
             },
         }
