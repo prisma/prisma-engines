@@ -3,6 +3,7 @@ mod validations;
 
 use chrono::FixedOffset;
 pub use native_types::MySqlType;
+use prisma_value::{decode_bytes, PrismaValueResult};
 
 use super::completions;
 use crate::{
@@ -305,5 +306,10 @@ impl Connector for MySqlDatamodelConnector {
             },
             None => self.parse_json_datetime(str, self.default_native_type_for_scalar_type(&ScalarType::DateTime)),
         }
+    }
+
+    // On MySQL, bytes are encoded as base64 in the database directly.
+    fn parse_json_bytes(&self, str: &str, _nt: Option<NativeTypeInstance>) -> PrismaValueResult<Vec<u8>> {
+        decode_bytes(str)
     }
 }

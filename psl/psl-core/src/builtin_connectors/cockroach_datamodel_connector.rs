@@ -331,6 +331,23 @@ impl Connector for CockroachDatamodelConnector {
             None => self.parse_json_datetime(str, self.default_native_type_for_scalar_type(&ScalarType::DateTime)),
         }
     }
+
+    fn parse_json_bytes(&self, str: &str, nt: Option<NativeTypeInstance>) -> prisma_value::PrismaValueResult<Vec<u8>> {
+        let native_type: Option<&CockroachType> = nt.as_ref().map(|nt| nt.downcast_ref());
+
+        match native_type {
+            Some(ct) => match ct {
+                CockroachType::Bytes => {
+                    super::utils::postgres::parse_bytes(str).map_err(|_| prisma_value::ConversionFailure {
+                        from: "hex".into(),
+                        to: "bytes".into(),
+                    })
+                }
+                _ => unreachable!(),
+            },
+            None => self.parse_json_bytes(str, self.default_native_type_for_scalar_type(&ScalarType::Bytes)),
+        }
+    }
 }
 
 /// An `@default(sequence())` function.

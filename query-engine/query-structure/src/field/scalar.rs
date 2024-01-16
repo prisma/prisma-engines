@@ -156,27 +156,21 @@ impl ScalarField {
 
     pub fn native_type(&self) -> Option<NativeTypeInstance> {
         let connector = self.dm.schema.connector;
+
         let raw_nt = match self.id {
             ScalarFieldId::InModel(id) => self.dm.walk(id).raw_native_type(),
             ScalarFieldId::InCompositeType(id) => self.dm.walk(id).raw_native_type(),
         };
+
         let psl_nt = raw_nt
             .and_then(|(_, name, args, span)| connector.parse_native_type(name, args, span, &mut Default::default()));
 
-        let nt = match self.id {
-            ScalarFieldId::InModel(id) => psl_nt.or_else(|| {
-                self.dm
-                    .walk(id)
-                    .scalar_type()
-                    .and_then(|st| connector.default_native_type_for_scalar_type(&st))
-            }),
-            ScalarFieldId::InCompositeType(id) => psl_nt.or_else(|| {
-                self.dm
-                    .walk(id)
-                    .scalar_type()
-                    .and_then(|st| connector.default_native_type_for_scalar_type(&st))
-            }),
-        }?;
+        let scalar_type = match self.id {
+            ScalarFieldId::InModel(id) => self.dm.walk(id).scalar_type(),
+            ScalarFieldId::InCompositeType(id) => self.dm.walk(id).scalar_type(),
+        };
+
+        let nt = psl_nt.or_else(|| scalar_type.and_then(|st| connector.default_native_type_for_scalar_type(&st)))?;
 
         Some(NativeTypeInstance {
             native_type: nt,
@@ -189,6 +183,13 @@ impl ScalarField {
         let connector = self.dm.schema.connector;
 
         connector.parse_json_datetime(value, nt)
+    }
+
+    pub fn parse_json_bytes(&self, value: &str) -> PrismaValueResult<Vec<u8>> {
+        let nt = self.native_type().map(|nt| nt.native_type);
+        let connector = self.dm.schema.connector;
+
+        connector.parse_json_bytes(value, nt)
     }
 
     pub fn is_autoincrement(&self) -> bool {

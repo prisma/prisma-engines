@@ -44,6 +44,10 @@ pub(crate) mod postgres {
 
         super::common::parse_time(time_without_tz)
     }
+
+    pub(crate) fn parse_bytes(str: &str) -> Result<Vec<u8>, hex::FromHexError> {
+        hex::decode(&str[2..])
+    }
 }
 
 pub(crate) mod mysql {

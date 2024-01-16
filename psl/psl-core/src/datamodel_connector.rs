@@ -321,6 +321,14 @@ pub trait Connector: Send + Sync {
     ) -> chrono::ParseResult<DateTime<FixedOffset>> {
         unreachable!("This method is only implemented on connectors with lateral join support.")
     }
+
+    fn parse_json_bytes(
+        &self,
+        _str: &str,
+        _nt: Option<NativeTypeInstance>,
+    ) -> prisma_value::PrismaValueResult<Vec<u8>> {
+        unreachable!("This method is only implemented on connectors with lateral join support.")
+    }
 }
 
 #[derive(Copy, Clone, Debug, PartialEq)]
