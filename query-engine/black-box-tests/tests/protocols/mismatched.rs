@@ -63,7 +63,7 @@ mod mismatched {
                 .unwrap();
 
             assert_eq!(res.status(), reqwest::StatusCode::UNPROCESSABLE_ENTITY);
-            insta::assert_snapshot!(res.text().await.unwrap(), @r###"{"is_panic":false,"message":"Error parsing Json query. data did not match any variant of untagged enum JsonBody","backtrace":null}"###);
+            insta::assert_snapshot!(res.text().await.unwrap(), @r###"{"is_panic":false,"message":"Error parsing Json query. Ensure that engine protocol of the client and the engine matches. data did not match any variant of untagged enum JsonBody","backtrace":null}"###);
         })
         .await
     }
@@ -83,7 +83,7 @@ mod mismatched {
                 .unwrap();
 
             assert_eq!(res.status(), reqwest::StatusCode::UNPROCESSABLE_ENTITY);
-            insta::assert_snapshot!(res.text().await.unwrap(), @r###"{"is_panic":false,"message":"Error parsing Graphql query. data did not match any variant of untagged enum GraphqlBody","backtrace":null}"###);
+            insta::assert_snapshot!(res.text().await.unwrap(), @r###"{"is_panic":false,"message":"Error parsing Graphql query. Ensure that engine protocol of the client and the engine matches. data did not match any variant of untagged enum GraphqlBody","backtrace":null}"###);
         })
         .await
     }
