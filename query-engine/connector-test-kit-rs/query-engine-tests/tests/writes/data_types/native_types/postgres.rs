@@ -191,7 +191,11 @@ mod postgres {
     }
 
     // "Other Postgres native types" should "work"
-    #[connector_test(schema(schema_other_types), only(Postgres), exclude(CockroachDb))]
+    #[connector_test(
+        schema(schema_other_types),
+        only(Postgres),
+        exclude(CockroachDb, Postgres("pg.js.wasm", "neon.js.wasm"))
+    )]
     async fn native_other_types(runner: Runner) -> TestResult<()> {
         insta::assert_snapshot!(
           run_query!(&runner, r#"mutation {
