@@ -241,6 +241,10 @@
 <a href="#241" id="241">241</a>
 <a href="#242" id="242">242</a>
 <a href="#243" id="243">243</a>
+<a href="#244" id="244">244</a>
+<a href="#245" id="245">245</a>
+<a href="#246" id="246">246</a>
+<a href="#247" id="247">247</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! A single connection abstraction to a SQL database.
 
 </span><span class="kw">use crate</span>::{
@@ -252,6 +256,9 @@
 
 <span class="attr">#[cfg(feature = <span class="string">&quot;sqlite-native&quot;</span>)]
 </span><span class="kw">use </span>std::convert::TryFrom;
+
+<span class="attr">#[cfg(feature = <span class="string">&quot;native&quot;</span>)]
+</span><span class="kw">use </span><span class="kw">crate</span>::connector::NativeConnectionInfo;
 
 <span class="doccomment">/// The main entry point and an abstraction over a database connection.
 </span><span class="attr">#[derive(Clone)]
@@ -368,7 +375,7 @@
     /// - `isolationLevel` the transaction isolation level. Possible values:
     ///   `READ UNCOMMITTED`, `READ COMMITTED`, `REPEATABLE READ`, `SNAPSHOT`,
     ///   `SERIALIZABLE`.
-    </span><span class="attr">#[cfg_attr(target_arch = <span class="string">&quot;wasm32&quot;</span>, allow(unused_variables))]
+    </span><span class="attr">#[cfg(feature = <span class="string">&quot;native&quot;</span>)]
     #[allow(unreachable_code)]
     </span><span class="kw">pub async fn </span>new(url_str: <span class="kw-2">&amp;</span>str) -&gt; <span class="kw">crate</span>::Result&lt;<span class="self">Self</span>&gt; {
         <span class="kw">let </span>inner = <span class="kw">match </span>url_str {
@@ -415,9 +422,9 @@
 
         <span class="prelude-val">Ok</span>(Quaint {
             inner: Arc::new(connector::Sqlite::new_in_memory()<span class="question-mark">?</span>),
-            connection_info: Arc::new(ConnectionInfo::InMemorySqlite {
+            connection_info: Arc::new(ConnectionInfo::Native(NativeConnectionInfo::InMemorySqlite {
                 db_name: DEFAULT_SQLITE_DATABASE.to_owned(),
-            }),
+            })),
         })
     }
 
@@ -426,7 +433,8 @@
         <span class="kw-2">&amp;</span><span class="self">self</span>.connection_info
     }
 
-    <span class="kw">fn </span>log_start(info: <span class="kw-2">&amp;</span>ConnectionInfo) {
+    <span class="attr">#[cfg(feature = <span class="string">&quot;native&quot;</span>)]
+    </span><span class="kw">fn </span>log_start(info: <span class="kw-2">&amp;</span>ConnectionInfo) {
         <span class="kw">let </span>family = info.sql_family();
         <span class="kw">let </span>pg_bouncer = <span class="kw">if </span>info.pg_bouncer() { <span class="string">&quot; in PgBouncer mode&quot; </span>} <span class="kw">else </span>{ <span class="string">&quot;&quot; </span>};
 

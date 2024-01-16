@@ -348,6 +348,8 @@
 <a href="#348" id="348">348</a>
 <a href="#349" id="349">349</a>
 <a href="#350" id="350">350</a>
+<a href="#351" id="351">351</a>
+<a href="#352" id="352">352</a>
 </pre></div><pre class="rust"><code><span class="attr">#![deny(missing_docs)]
 
 </span><span class="doccomment">//! A TestApi that is initialized without IO or async code and can instantiate
@@ -364,7 +366,7 @@
 };
 <span class="kw">use </span>psl::PreviewFeature;
 <span class="kw">use </span>quaint::{
-    prelude::{ConnectionInfo, Queryable, ResultSet},
+    prelude::{ConnectionInfo, NativeConnectionInfo, Queryable, ResultSet},
     single::Quaint,
 };
 <span class="kw">use </span>schema_core::schema_connector::{ConnectorParams, SchemaConnector};
@@ -546,17 +548,19 @@
         };
 
         <span class="kw">let </span><span class="kw-2">mut </span>connector = <span class="kw">match </span><span class="kw-2">&amp;</span>connection_info {
-            ConnectionInfo::Postgres(<span class="kw">_</span>) =&gt; {
+            ConnectionInfo::Native(NativeConnectionInfo::Postgres(<span class="kw">_</span>)) =&gt; {
                 <span class="kw">if </span><span class="self">self</span>.args.provider() == <span class="string">&quot;cockroachdb&quot; </span>{
                     SqlSchemaConnector::new_cockroach()
                 } <span class="kw">else </span>{
                     SqlSchemaConnector::new_postgres()
                 }
             }
-            ConnectionInfo::Mysql(<span class="kw">_</span>) =&gt; SqlSchemaConnector::new_mysql(),
-            ConnectionInfo::Mssql(<span class="kw">_</span>) =&gt; SqlSchemaConnector::new_mssql(),
-            ConnectionInfo::Sqlite { .. } =&gt; SqlSchemaConnector::new_sqlite(),
-            ConnectionInfo::InMemorySqlite { .. } | ConnectionInfo::External(<span class="kw">_</span>) =&gt; <span class="macro">unreachable!</span>(),
+            ConnectionInfo::Native(NativeConnectionInfo::Mysql(<span class="kw">_</span>)) =&gt; SqlSchemaConnector::new_mysql(),
+            ConnectionInfo::Native(NativeConnectionInfo::Mssql(<span class="kw">_</span>)) =&gt; SqlSchemaConnector::new_mssql(),
+            ConnectionInfo::Native(NativeConnectionInfo::Sqlite { .. }) =&gt; SqlSchemaConnector::new_sqlite(),
+            ConnectionInfo::Native(NativeConnectionInfo::InMemorySqlite { .. }) | ConnectionInfo::External(<span class="kw">_</span>) =&gt; {
+                <span class="macro">unreachable!</span>()
+            }
         };
         connector.set_params(params).unwrap();
 

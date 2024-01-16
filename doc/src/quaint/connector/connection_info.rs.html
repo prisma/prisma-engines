@@ -376,7 +376,26 @@
 <a href="#376" id="376">376</a>
 <a href="#377" id="377">377</a>
 <a href="#378" id="378">378</a>
-</pre></div><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::error::{Error, ErrorKind};
+<a href="#379" id="379">379</a>
+<a href="#380" id="380">380</a>
+<a href="#381" id="381">381</a>
+<a href="#382" id="382">382</a>
+<a href="#383" id="383">383</a>
+<a href="#384" id="384">384</a>
+<a href="#385" id="385">385</a>
+<a href="#386" id="386">386</a>
+<a href="#387" id="387">387</a>
+<a href="#388" id="388">388</a>
+<a href="#389" id="389">389</a>
+<a href="#390" id="390">390</a>
+<a href="#391" id="391">391</a>
+<a href="#392" id="392">392</a>
+<a href="#393" id="393">393</a>
+<a href="#394" id="394">394</a>
+</pre></div><pre class="rust"><code><span class="attr">#![cfg_attr(target_arch = <span class="string">&quot;wasm32&quot;</span>, allow(unused_imports))]
+#![cfg_attr(not(target_arch = <span class="string">&quot;wasm32&quot;</span>), allow(clippy::large_enum_variant))]
+
+</span><span class="kw">use </span><span class="kw">crate</span>::error::{Error, ErrorKind};
 <span class="kw">use </span>std::{borrow::Cow, fmt};
 <span class="kw">use </span>url::Url;
 
@@ -393,30 +412,15 @@
 
 <span class="kw">use </span><span class="kw">super</span>::ExternalConnectionInfo;
 
+<span class="attr">#[cfg(not(target_arch = <span class="string">&quot;wasm32&quot;</span>))]
+</span><span class="kw">use </span><span class="kw">super</span>::NativeConnectionInfo;
+
 <span class="doccomment">/// General information about a SQL connection.
 </span><span class="attr">#[derive(Debug, Clone)]
+#[cfg_attr(target_arch = <span class="string">&quot;wasm32&quot;</span>, repr(transparent))]
 </span><span class="kw">pub enum </span>ConnectionInfo {
-    <span class="doccomment">/// A PostgreSQL connection URL.
-    </span><span class="attr">#[cfg(feature = <span class="string">&quot;postgresql&quot;</span>)]
-    </span>Postgres(PostgresUrl),
-    <span class="doccomment">/// A MySQL connection URL.
-    </span><span class="attr">#[cfg(feature = <span class="string">&quot;mysql&quot;</span>)]
-    </span>Mysql(MysqlUrl),
-    <span class="doccomment">/// A SQL Server connection URL.
-    </span><span class="attr">#[cfg(feature = <span class="string">&quot;mssql&quot;</span>)]
-    </span>Mssql(MssqlUrl),
-    <span class="doccomment">/// A SQLite connection URL.
-    </span><span class="attr">#[cfg(feature = <span class="string">&quot;sqlite&quot;</span>)]
-    </span>Sqlite {
-        <span class="doccomment">/// The filesystem path of the SQLite database.
-        </span>file_path: String,
-        <span class="doccomment">/// The name the database is bound to - Always &quot;main&quot;
-        </span>db_name: String,
-    },
-    <span class="attr">#[cfg(feature = <span class="string">&quot;sqlite&quot;</span>)]
-    </span>InMemorySqlite {
-        db_name: String,
-    },
+    <span class="attr">#[cfg(not(target_arch = <span class="string">&quot;wasm32&quot;</span>))]
+    </span>Native(NativeConnectionInfo),
     External(ExternalConnectionInfo),
 }
 
@@ -425,6 +429,7 @@
     ///
     /// Will fail if URI is invalid or the scheme points to an unsupported
     /// database.
+    </span><span class="attr">#[cfg(not(target_arch = <span class="string">&quot;wasm32&quot;</span>))]
     </span><span class="kw">pub fn </span>from_url(url_str: <span class="kw-2">&amp;</span>str) -&gt; <span class="kw">crate</span>::Result&lt;<span class="self">Self</span>&gt; {
         <span class="kw">let </span>url_result: <span class="prelude-ty">Result</span>&lt;Url, <span class="kw">_</span>&gt; = url_str.parse();
 
@@ -435,15 +440,17 @@
                 <span class="kw">if </span>url_result.is_err() {
                     <span class="kw">let </span>params = SqliteParams::try_from(s)<span class="question-mark">?</span>;
 
-                    <span class="kw">return </span><span class="prelude-val">Ok</span>(ConnectionInfo::Sqlite {
+                    <span class="kw">return </span><span class="prelude-val">Ok</span>(ConnectionInfo::Native(NativeConnectionInfo::Sqlite {
                         file_path: params.file_path,
                         db_name: params.db_name,
-                    });
+                    }));
                 }
             }
             <span class="attr">#[cfg(feature = <span class="string">&quot;mssql&quot;</span>)]
             </span>s <span class="kw">if </span>s.starts_with(<span class="string">&quot;jdbc:sqlserver&quot;</span>) || s.starts_with(<span class="string">&quot;sqlserver&quot;</span>) =&gt; {
-                <span class="kw">return </span><span class="prelude-val">Ok</span>(ConnectionInfo::Mssql(MssqlUrl::new(url_str)<span class="question-mark">?</span>));
+                <span class="kw">return </span><span class="prelude-val">Ok</span>(ConnectionInfo::Native(NativeConnectionInfo::Mssql(MssqlUrl::new(
+                    url_str,
+                )<span class="question-mark">?</span>)));
             }
             <span class="kw">_ </span>=&gt; (),
         }
@@ -459,18 +466,20 @@
 
         <span class="kw">match </span>sql_family {
             <span class="attr">#[cfg(feature = <span class="string">&quot;mysql&quot;</span>)]
-            </span>SqlFamily::Mysql =&gt; <span class="prelude-val">Ok</span>(ConnectionInfo::Mysql(MysqlUrl::new(url)<span class="question-mark">?</span>)),
+            </span>SqlFamily::Mysql =&gt; <span class="prelude-val">Ok</span>(ConnectionInfo::Native(NativeConnectionInfo::Mysql(MysqlUrl::new(url)<span class="question-mark">?</span>))),
             <span class="attr">#[cfg(feature = <span class="string">&quot;sqlite&quot;</span>)]
             </span>SqlFamily::Sqlite =&gt; {
                 <span class="kw">let </span>params = SqliteParams::try_from(url_str)<span class="question-mark">?</span>;
 
-                <span class="prelude-val">Ok</span>(ConnectionInfo::Sqlite {
+                <span class="prelude-val">Ok</span>(ConnectionInfo::Native(NativeConnectionInfo::Sqlite {
                     file_path: params.file_path,
                     db_name: params.db_name,
-                })
+                }))
             }
             <span class="attr">#[cfg(feature = <span class="string">&quot;postgresql&quot;</span>)]
-            </span>SqlFamily::Postgres =&gt; <span class="prelude-val">Ok</span>(ConnectionInfo::Postgres(PostgresUrl::new(url)<span class="question-mark">?</span>)),
+            </span>SqlFamily::Postgres =&gt; <span class="prelude-val">Ok</span>(ConnectionInfo::Native(NativeConnectionInfo::Postgres(
+                PostgresUrl::new(url)<span class="question-mark">?</span>,
+            ))),
             <span class="attr">#[allow(unreachable_patterns)]
             </span><span class="kw">_ </span>=&gt; <span class="macro">unreachable!</span>(),
         }
@@ -479,14 +488,17 @@
     <span class="doccomment">/// The provided database name. This will be `None` on SQLite.
     </span><span class="kw">pub fn </span>dbname(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt; {
         <span class="kw">match </span><span class="self">self </span>{
-            <span class="attr">#[cfg(feature = <span class="string">&quot;postgresql&quot;</span>)]
-            </span>ConnectionInfo::Postgres(url) =&gt; <span class="prelude-val">Some</span>(url.dbname()),
-            <span class="attr">#[cfg(feature = <span class="string">&quot;mysql&quot;</span>)]
-            </span>ConnectionInfo::Mysql(url) =&gt; <span class="prelude-val">Some</span>(url.dbname()),
-            <span class="attr">#[cfg(feature = <span class="string">&quot;mssql&quot;</span>)]
-            </span>ConnectionInfo::Mssql(url) =&gt; <span class="prelude-val">Some</span>(url.dbname()),
-            <span class="attr">#[cfg(feature = <span class="string">&quot;sqlite&quot;</span>)]
-            </span>ConnectionInfo::Sqlite { .. } | ConnectionInfo::InMemorySqlite { .. } =&gt; <span class="prelude-val">None</span>,
+            <span class="attr">#[cfg(not(target_arch = <span class="string">&quot;wasm32&quot;</span>))]
+            </span>ConnectionInfo::Native(info) =&gt; <span class="kw">match </span>info {
+                <span class="attr">#[cfg(feature = <span class="string">&quot;postgresql&quot;</span>)]
+                </span>NativeConnectionInfo::Postgres(url) =&gt; <span class="prelude-val">Some</span>(url.dbname()),
+                <span class="attr">#[cfg(feature = <span class="string">&quot;mysql&quot;</span>)]
+                </span>NativeConnectionInfo::Mysql(url) =&gt; <span class="prelude-val">Some</span>(url.dbname()),
+                <span class="attr">#[cfg(feature = <span class="string">&quot;mssql&quot;</span>)]
+                </span>NativeConnectionInfo::Mssql(url) =&gt; <span class="prelude-val">Some</span>(url.dbname()),
+                <span class="attr">#[cfg(feature = <span class="string">&quot;sqlite&quot;</span>)]
+                </span>NativeConnectionInfo::Sqlite { .. } | NativeConnectionInfo::InMemorySqlite { .. } =&gt; <span class="prelude-val">None</span>,
+            },
             ConnectionInfo::External(<span class="kw">_</span>) =&gt; <span class="prelude-val">None</span>,
         }
     }
@@ -498,16 +510,19 @@
     /// - In MySQL, it is the database name.
     </span><span class="kw">pub fn </span>schema_name(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>str {
         <span class="kw">match </span><span class="self">self </span>{
-            <span class="attr">#[cfg(feature = <span class="string">&quot;postgresql&quot;</span>)]
-            </span>ConnectionInfo::Postgres(url) =&gt; url.schema(),
-            <span class="attr">#[cfg(feature = <span class="string">&quot;mysql&quot;</span>)]
-            </span>ConnectionInfo::Mysql(url) =&gt; url.dbname(),
-            <span class="attr">#[cfg(feature = <span class="string">&quot;mssql&quot;</span>)]
-            </span>ConnectionInfo::Mssql(url) =&gt; url.schema(),
-            <span class="attr">#[cfg(feature = <span class="string">&quot;sqlite&quot;</span>)]
-            </span>ConnectionInfo::Sqlite { db_name, .. } =&gt; db_name,
-            <span class="attr">#[cfg(feature = <span class="string">&quot;sqlite&quot;</span>)]
-            </span>ConnectionInfo::InMemorySqlite { db_name } =&gt; db_name,
+            <span class="attr">#[cfg(not(target_arch = <span class="string">&quot;wasm32&quot;</span>))]
+            </span>ConnectionInfo::Native(info) =&gt; <span class="kw">match </span>info {
+                <span class="attr">#[cfg(feature = <span class="string">&quot;postgresql&quot;</span>)]
+                </span>NativeConnectionInfo::Postgres(url) =&gt; url.schema(),
+                <span class="attr">#[cfg(feature = <span class="string">&quot;mysql&quot;</span>)]
+                </span>NativeConnectionInfo::Mysql(url) =&gt; url.dbname(),
+                <span class="attr">#[cfg(feature = <span class="string">&quot;mssql&quot;</span>)]
+                </span>NativeConnectionInfo::Mssql(url) =&gt; url.schema(),
+                <span class="attr">#[cfg(feature = <span class="string">&quot;sqlite&quot;</span>)]
+                </span>NativeConnectionInfo::Sqlite { db_name, .. } =&gt; db_name,
+                <span class="attr">#[cfg(feature = <span class="string">&quot;sqlite&quot;</span>)]
+                </span>NativeConnectionInfo::InMemorySqlite { db_name } =&gt; db_name,
+            },
             ConnectionInfo::External(info) =&gt; <span class="kw-2">&amp;</span>info.schema_name,
         }
     }
@@ -515,30 +530,36 @@
     <span class="doccomment">/// The provided database host. This will be `&quot;localhost&quot;` on SQLite.
     </span><span class="kw">pub fn </span>host(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>str {
         <span class="kw">match </span><span class="self">self </span>{
-            <span class="attr">#[cfg(feature = <span class="string">&quot;postgresql&quot;</span>)]
-            </span>ConnectionInfo::Postgres(url) =&gt; url.host(),
-            <span class="attr">#[cfg(feature = <span class="string">&quot;mysql&quot;</span>)]
-            </span>ConnectionInfo::Mysql(url) =&gt; url.host(),
-            <span class="attr">#[cfg(feature = <span class="string">&quot;mssql&quot;</span>)]
-            </span>ConnectionInfo::Mssql(url) =&gt; url.host(),
-            <span class="attr">#[cfg(feature = <span class="string">&quot;sqlite&quot;</span>)]
-            </span>ConnectionInfo::Sqlite { .. } | ConnectionInfo::InMemorySqlite { .. } =&gt; <span class="string">&quot;localhost&quot;</span>,
-
+            <span class="attr">#[cfg(not(target_arch = <span class="string">&quot;wasm32&quot;</span>))]
+            </span>ConnectionInfo::Native(info) =&gt; <span class="kw">match </span>info {
+                <span class="attr">#[cfg(feature = <span class="string">&quot;postgresql&quot;</span>)]
+                </span>NativeConnectionInfo::Postgres(url) =&gt; url.host(),
+                <span class="attr">#[cfg(feature = <span class="string">&quot;mysql&quot;</span>)]
+                </span>NativeConnectionInfo::Mysql(url) =&gt; url.host(),
+                <span class="attr">#[cfg(feature = <span class="string">&quot;mssql&quot;</span>)]
+                </span>NativeConnectionInfo::Mssql(url) =&gt; url.host(),
+                <span class="attr">#[cfg(feature = <span class="string">&quot;sqlite&quot;</span>)]
+                </span>NativeConnectionInfo::Sqlite { .. } | NativeConnectionInfo::InMemorySqlite { .. } =&gt; <span class="string">&quot;localhost&quot;</span>,
+            },
             ConnectionInfo::External(<span class="kw">_</span>) =&gt; <span class="string">&quot;external&quot;</span>,
         }
     }
 
     <span class="doccomment">/// The provided database user name. This will be `None` on SQLite.
     </span><span class="kw">pub fn </span>username(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;Cow&lt;str&gt;&gt; {
-        <span class="kw">match </span><span class="self">self </span>{
-            <span class="attr">#[cfg(feature = <span class="string">&quot;postgresql&quot;</span>)]
-            </span>ConnectionInfo::Postgres(url) =&gt; <span class="prelude-val">Some</span>(url.username()),
-            <span class="attr">#[cfg(feature = <span class="string">&quot;mysql&quot;</span>)]
-            </span>ConnectionInfo::Mysql(url) =&gt; <span class="prelude-val">Some</span>(url.username()),
-            <span class="attr">#[cfg(feature = <span class="string">&quot;mssql&quot;</span>)]
-            </span>ConnectionInfo::Mssql(url) =&gt; url.username().map(Cow::from),
-            <span class="attr">#[cfg(feature = <span class="string">&quot;sqlite&quot;</span>)]
-            </span>ConnectionInfo::Sqlite { .. } | ConnectionInfo::InMemorySqlite { .. } =&gt; <span class="prelude-val">None</span>,
+        <span class="comment">// TODO: why do some of the native `.username()` methods return an `Option&lt;&amp;str&gt;` and others a `Cow&lt;str&gt;`?
+        </span><span class="kw">match </span><span class="self">self </span>{
+            <span class="attr">#[cfg(not(target_arch = <span class="string">&quot;wasm32&quot;</span>))]
+            </span>ConnectionInfo::Native(info) =&gt; <span class="kw">match </span>info {
+                <span class="attr">#[cfg(feature = <span class="string">&quot;postgresql&quot;</span>)]
+                </span>NativeConnectionInfo::Postgres(url) =&gt; <span class="prelude-val">Some</span>(url.username()),
+                <span class="attr">#[cfg(feature = <span class="string">&quot;mysql&quot;</span>)]
+                </span>NativeConnectionInfo::Mysql(url) =&gt; <span class="prelude-val">Some</span>(url.username()),
+                <span class="attr">#[cfg(feature = <span class="string">&quot;mssql&quot;</span>)]
+                </span>NativeConnectionInfo::Mssql(url) =&gt; url.username().map(Cow::from),
+                <span class="attr">#[cfg(feature = <span class="string">&quot;sqlite&quot;</span>)]
+                </span>NativeConnectionInfo::Sqlite { .. } | NativeConnectionInfo::InMemorySqlite { .. } =&gt; <span class="prelude-val">None</span>,
+            },
             ConnectionInfo::External(<span class="kw">_</span>) =&gt; <span class="prelude-val">None</span>,
         }
     }
@@ -546,16 +567,19 @@
     <span class="doccomment">/// The database file for SQLite, otherwise `None`.
     </span><span class="kw">pub fn </span>file_path(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt; {
         <span class="kw">match </span><span class="self">self </span>{
-            <span class="attr">#[cfg(feature = <span class="string">&quot;postgresql&quot;</span>)]
-            </span>ConnectionInfo::Postgres(<span class="kw">_</span>) =&gt; <span class="prelude-val">None</span>,
-            <span class="attr">#[cfg(feature = <span class="string">&quot;mysql&quot;</span>)]
-            </span>ConnectionInfo::Mysql(<span class="kw">_</span>) =&gt; <span class="prelude-val">None</span>,
-            <span class="attr">#[cfg(feature = <span class="string">&quot;mssql&quot;</span>)]
-            </span>ConnectionInfo::Mssql(<span class="kw">_</span>) =&gt; <span class="prelude-val">None</span>,
-            <span class="attr">#[cfg(feature = <span class="string">&quot;sqlite&quot;</span>)]
-            </span>ConnectionInfo::Sqlite { file_path, .. } =&gt; <span class="prelude-val">Some</span>(file_path),
-            <span class="attr">#[cfg(feature = <span class="string">&quot;sqlite&quot;</span>)]
-            </span>ConnectionInfo::InMemorySqlite { .. } =&gt; <span class="prelude-val">None</span>,
+            <span class="attr">#[cfg(not(target_arch = <span class="string">&quot;wasm32&quot;</span>))]
+            </span>ConnectionInfo::Native(info) =&gt; <span class="kw">match </span>info {
+                <span class="attr">#[cfg(feature = <span class="string">&quot;postgresql&quot;</span>)]
+                </span>NativeConnectionInfo::Postgres(<span class="kw">_</span>) =&gt; <span class="prelude-val">None</span>,
+                <span class="attr">#[cfg(feature = <span class="string">&quot;mysql&quot;</span>)]
+                </span>NativeConnectionInfo::Mysql(<span class="kw">_</span>) =&gt; <span class="prelude-val">None</span>,
+                <span class="attr">#[cfg(feature = <span class="string">&quot;mssql&quot;</span>)]
+                </span>NativeConnectionInfo::Mssql(<span class="kw">_</span>) =&gt; <span class="prelude-val">None</span>,
+                <span class="attr">#[cfg(feature = <span class="string">&quot;sqlite&quot;</span>)]
+                </span>NativeConnectionInfo::Sqlite { file_path, .. } =&gt; <span class="prelude-val">Some</span>(file_path),
+                <span class="attr">#[cfg(feature = <span class="string">&quot;sqlite&quot;</span>)]
+                </span>NativeConnectionInfo::InMemorySqlite { .. } =&gt; <span class="prelude-val">None</span>,
+            },
             ConnectionInfo::External(<span class="kw">_</span>) =&gt; <span class="prelude-val">None</span>,
         }
     }
@@ -563,14 +587,17 @@
     <span class="doccomment">/// The family of databases connected.
     </span><span class="kw">pub fn </span>sql_family(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; SqlFamily {
         <span class="kw">match </span><span class="self">self </span>{
-            <span class="attr">#[cfg(feature = <span class="string">&quot;postgresql&quot;</span>)]
-            </span>ConnectionInfo::Postgres(<span class="kw">_</span>) =&gt; SqlFamily::Postgres,
-            <span class="attr">#[cfg(feature = <span class="string">&quot;mysql&quot;</span>)]
-            </span>ConnectionInfo::Mysql(<span class="kw">_</span>) =&gt; SqlFamily::Mysql,
-            <span class="attr">#[cfg(feature = <span class="string">&quot;mssql&quot;</span>)]
-            </span>ConnectionInfo::Mssql(<span class="kw">_</span>) =&gt; SqlFamily::Mssql,
-            <span class="attr">#[cfg(feature = <span class="string">&quot;sqlite&quot;</span>)]
-            </span>ConnectionInfo::Sqlite { .. } | ConnectionInfo::InMemorySqlite { .. } =&gt; SqlFamily::Sqlite,
+            <span class="attr">#[cfg(not(target_arch = <span class="string">&quot;wasm32&quot;</span>))]
+            </span>ConnectionInfo::Native(info) =&gt; <span class="kw">match </span>info {
+                <span class="attr">#[cfg(feature = <span class="string">&quot;postgresql&quot;</span>)]
+                </span>NativeConnectionInfo::Postgres(<span class="kw">_</span>) =&gt; SqlFamily::Postgres,
+                <span class="attr">#[cfg(feature = <span class="string">&quot;mysql&quot;</span>)]
+                </span>NativeConnectionInfo::Mysql(<span class="kw">_</span>) =&gt; SqlFamily::Mysql,
+                <span class="attr">#[cfg(feature = <span class="string">&quot;mssql&quot;</span>)]
+                </span>NativeConnectionInfo::Mssql(<span class="kw">_</span>) =&gt; SqlFamily::Mssql,
+                <span class="attr">#[cfg(feature = <span class="string">&quot;sqlite&quot;</span>)]
+                </span>NativeConnectionInfo::Sqlite { .. } | NativeConnectionInfo::InMemorySqlite { .. } =&gt; SqlFamily::Sqlite,
+            },
             ConnectionInfo::External(info) =&gt; info.sql_family.to_owned(),
         }
     }
@@ -578,24 +605,26 @@
     <span class="doccomment">/// The provided database port, if applicable.
     </span><span class="kw">pub fn </span>port(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;u16&gt; {
         <span class="kw">match </span><span class="self">self </span>{
-            <span class="attr">#[cfg(feature = <span class="string">&quot;postgresql&quot;</span>)]
-            </span>ConnectionInfo::Postgres(url) =&gt; <span class="prelude-val">Some</span>(url.port()),
-            <span class="attr">#[cfg(feature = <span class="string">&quot;mysql&quot;</span>)]
-            </span>ConnectionInfo::Mysql(url) =&gt; <span class="prelude-val">Some</span>(url.port()),
-            <span class="attr">#[cfg(feature = <span class="string">&quot;mssql&quot;</span>)]
-            </span>ConnectionInfo::Mssql(url) =&gt; <span class="prelude-val">Some</span>(url.port()),
-            <span class="attr">#[cfg(feature = <span class="string">&quot;sqlite&quot;</span>)]
-            </span>ConnectionInfo::Sqlite { .. } | ConnectionInfo::InMemorySqlite { .. } =&gt; <span class="prelude-val">None</span>,
+            <span class="attr">#[cfg(not(target_arch = <span class="string">&quot;wasm32&quot;</span>))]
+            </span>ConnectionInfo::Native(info) =&gt; <span class="kw">match </span>info {
+                <span class="attr">#[cfg(feature = <span class="string">&quot;postgresql&quot;</span>)]
+                </span>NativeConnectionInfo::Postgres(url) =&gt; <span class="prelude-val">Some</span>(url.port()),
+                <span class="attr">#[cfg(feature = <span class="string">&quot;mysql&quot;</span>)]
+                </span>NativeConnectionInfo::Mysql(url) =&gt; <span class="prelude-val">Some</span>(url.port()),
+                <span class="attr">#[cfg(feature = <span class="string">&quot;mssql&quot;</span>)]
+                </span>NativeConnectionInfo::Mssql(url) =&gt; <span class="prelude-val">Some</span>(url.port()),
+                <span class="attr">#[cfg(feature = <span class="string">&quot;sqlite&quot;</span>)]
+                </span>NativeConnectionInfo::Sqlite { .. } | NativeConnectionInfo::InMemorySqlite { .. } =&gt; <span class="prelude-val">None</span>,
+            },
             ConnectionInfo::External(<span class="kw">_</span>) =&gt; <span class="prelude-val">None</span>,
         }
     }
 
     <span class="doccomment">/// Whether the pgbouncer mode is enabled.
     </span><span class="kw">pub fn </span>pg_bouncer(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
-        <span class="attr">#[allow(unreachable_patterns)]
-        </span><span class="kw">match </span><span class="self">self </span>{
-            <span class="attr">#[cfg(feature = <span class="string">&quot;postgresql&quot;</span>)]
-            </span>ConnectionInfo::Postgres(url) =&gt; url.pg_bouncer(),
+        <span class="kw">match </span><span class="self">self </span>{
+            <span class="attr">#[cfg(all(not(target_arch = <span class="string">&quot;wasm32&quot;</span>), feature = <span class="string">&quot;postgresql&quot;</span>))]
+            </span>ConnectionInfo::Native(NativeConnectionInfo::Postgres(url)) =&gt; url.pg_bouncer(),
             <span class="kw">_ </span>=&gt; <span class="bool-val">false</span>,
         }
     }
@@ -604,16 +633,19 @@
     /// and port on MySQL/Postgres, and the file path on SQLite.
     </span><span class="kw">pub fn </span>database_location(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; String {
         <span class="kw">match </span><span class="self">self </span>{
-            <span class="attr">#[cfg(feature = <span class="string">&quot;postgresql&quot;</span>)]
-            </span>ConnectionInfo::Postgres(url) =&gt; <span class="macro">format!</span>(<span class="string">&quot;{}:{}&quot;</span>, url.host(), url.port()),
-            <span class="attr">#[cfg(feature = <span class="string">&quot;mysql&quot;</span>)]
-            </span>ConnectionInfo::Mysql(url) =&gt; <span class="macro">format!</span>(<span class="string">&quot;{}:{}&quot;</span>, url.host(), url.port()),
-            <span class="attr">#[cfg(feature = <span class="string">&quot;mssql&quot;</span>)]
-            </span>ConnectionInfo::Mssql(url) =&gt; <span class="macro">format!</span>(<span class="string">&quot;{}:{}&quot;</span>, url.host(), url.port()),
-            <span class="attr">#[cfg(feature = <span class="string">&quot;sqlite&quot;</span>)]
-            </span>ConnectionInfo::Sqlite { file_path, .. } =&gt; file_path.clone(),
-            <span class="attr">#[cfg(feature = <span class="string">&quot;sqlite&quot;</span>)]
-            </span>ConnectionInfo::InMemorySqlite { .. } =&gt; <span class="string">&quot;in-memory&quot;</span>.into(),
+            <span class="attr">#[cfg(not(target_arch = <span class="string">&quot;wasm32&quot;</span>))]
+            </span>ConnectionInfo::Native(info) =&gt; <span class="kw">match </span>info {
+                <span class="attr">#[cfg(feature = <span class="string">&quot;postgresql&quot;</span>)]
+                </span>NativeConnectionInfo::Postgres(url) =&gt; <span class="macro">format!</span>(<span class="string">&quot;{}:{}&quot;</span>, url.host(), url.port()),
+                <span class="attr">#[cfg(feature = <span class="string">&quot;mysql&quot;</span>)]
+                </span>NativeConnectionInfo::Mysql(url) =&gt; <span class="macro">format!</span>(<span class="string">&quot;{}:{}&quot;</span>, url.host(), url.port()),
+                <span class="attr">#[cfg(feature = <span class="string">&quot;mssql&quot;</span>)]
+                </span>NativeConnectionInfo::Mssql(url) =&gt; <span class="macro">format!</span>(<span class="string">&quot;{}:{}&quot;</span>, url.host(), url.port()),
+                <span class="attr">#[cfg(feature = <span class="string">&quot;sqlite&quot;</span>)]
+                </span>NativeConnectionInfo::Sqlite { file_path, .. } =&gt; file_path.clone(),
+                <span class="attr">#[cfg(feature = <span class="string">&quot;sqlite&quot;</span>)]
+                </span>NativeConnectionInfo::InMemorySqlite { .. } =&gt; <span class="string">&quot;in-memory&quot;</span>.into(),
+            },
             ConnectionInfo::External(<span class="kw">_</span>) =&gt; <span class="string">&quot;external&quot;</span>.into(),
         }
     }
@@ -731,7 +763,7 @@
         <span class="kw">let </span>conn_info = ConnectionInfo::from_url(<span class="string">&quot;file:dev.db&quot;</span>).unwrap();
 
         <span class="attr">#[allow(irrefutable_let_patterns)]
-        </span><span class="kw">if let </span>ConnectionInfo::Sqlite { file_path, db_name: <span class="kw">_ </span>} = conn_info {
+        </span><span class="kw">if let </span>ConnectionInfo::Native(NativeConnectionInfo::Sqlite { file_path, db_name: <span class="kw">_ </span>}) = conn_info {
             <span class="macro">assert_eq!</span>(file_path, <span class="string">&quot;dev.db&quot;</span>);
         } <span class="kw">else </span>{
             <span class="macro">panic!</span>(<span class="string">&quot;Wrong type of connection info, should be Sqlite&quot;</span>);
@@ -744,7 +776,7 @@
         <span class="kw">let </span>conn_info = ConnectionInfo::from_url(<span class="string">&quot;mysql://myuser:my%23pass%23word@lclhst:5432/mydb&quot;</span>).unwrap();
 
         <span class="attr">#[allow(irrefutable_let_patterns)]
-        </span><span class="kw">if let </span>ConnectionInfo::Mysql(url) = conn_info {
+        </span><span class="kw">if let </span>ConnectionInfo::Native(NativeConnectionInfo::Mysql(url)) = conn_info {
             <span class="macro">assert_eq!</span>(url.password().unwrap(), <span class="string">&quot;my#pass#word&quot;</span>);
             <span class="macro">assert_eq!</span>(url.host(), <span class="string">&quot;lclhst&quot;</span>);
             <span class="macro">assert_eq!</span>(url.username(), <span class="string">&quot;myuser&quot;</span>);

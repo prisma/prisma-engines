@@ -124,11 +124,16 @@
 <a href="#124" id="124">124</a>
 <a href="#125" id="125">125</a>
 <a href="#126" id="126">126</a>
+<a href="#127" id="127">127</a>
+<a href="#128" id="128">128</a>
+<a href="#129" id="129">129</a>
+<a href="#130" id="130">130</a>
+<a href="#131" id="131">131</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>tokio_postgres::error::DbError;
 
 <span class="kw">use crate</span>::{
     connector::postgres::error::PostgresError,
-    error::{Error, ErrorKind},
+    error::{Error, ErrorKind, NativeErrorKind},
 };
 
 <span class="kw">impl </span>From&lt;<span class="kw-2">&amp;</span>DbError&gt; <span class="kw">for </span>PostgresError {
@@ -147,7 +152,7 @@
 <span class="kw">impl </span>From&lt;tokio_postgres::error::Error&gt; <span class="kw">for </span>Error {
     <span class="kw">fn </span>from(e: tokio_postgres::error::Error) -&gt; Error {
         <span class="kw">if </span>e.is_closed() {
-            <span class="kw">return </span>Error::builder(ErrorKind::ConnectionClosed).build();
+            <span class="kw">return </span>Error::builder(ErrorKind::Native(NativeErrorKind::ConnectionClosed)).build();
         }
 
         <span class="kw">if let </span><span class="prelude-val">Some</span>(db_error) = e.as_db_error() {
@@ -172,7 +177,7 @@
 
         <span class="kw">match </span>reason.as_str() {
             <span class="string">&quot;error connecting to server: timed out&quot; </span>=&gt; {
-                <span class="kw">let </span><span class="kw-2">mut </span>builder = Error::builder(ErrorKind::ConnectTimeout);
+                <span class="kw">let </span><span class="kw-2">mut </span>builder = Error::builder(ErrorKind::Native(NativeErrorKind::ConnectTimeout));
 
                 <span class="kw">if let </span><span class="prelude-val">Some</span>(code) = code {
                     builder.set_original_code(code);
@@ -183,9 +188,9 @@
             } <span class="comment">// sigh...
             // https://github.com/sfackler/rust-postgres/blob/0c84ed9f8201f4e5b4803199a24afa2c9f3723b2/tokio-postgres/src/connect_tls.rs#L37
             </span><span class="string">&quot;error performing TLS handshake: server does not support TLS&quot; </span>=&gt; {
-                <span class="kw">let </span><span class="kw-2">mut </span>builder = Error::builder(ErrorKind::TlsError {
+                <span class="kw">let </span><span class="kw-2">mut </span>builder = Error::builder(ErrorKind::Native(NativeErrorKind::TlsError {
                     message: reason.clone(),
-                });
+                }));
 
                 <span class="kw">if let </span><span class="prelude-val">Some</span>(code) = code {
                     builder.set_original_code(code);
@@ -231,7 +236,12 @@
 
     err.source()
         .and_then(|err| err.downcast_ref::&lt;std::io::Error&gt;())
-        .map(|err| ErrorKind::ConnectionError(Box::new(std::io::Error::new(err.kind(), <span class="macro">format!</span>(<span class="string">&quot;{err}&quot;</span>)))))
+        .map(|err| {
+            ErrorKind::Native(NativeErrorKind::ConnectionError(Box::new(std::io::Error::new(
+                err.kind(),
+                <span class="macro">format!</span>(<span class="string">&quot;{err}&quot;</span>),
+            ))))
+        })
         .map(|kind| Error::builder(kind).build())
 }
 
@@ -243,9 +253,9 @@
 
 <span class="kw">impl </span>From&lt;<span class="kw-2">&amp;</span>native_tls::Error&gt; <span class="kw">for </span>Error {
     <span class="kw">fn </span>from(e: <span class="kw-2">&amp;</span>native_tls::Error) -&gt; Error {
-        <span class="kw">let </span>kind = ErrorKind::TlsError {
+        <span class="kw">let </span>kind = ErrorKind::Native(NativeErrorKind::TlsError {
             message: <span class="macro">format!</span>(<span class="string">&quot;{e}&quot;</span>),
-        };
+        });
 
         Error::builder(kind).build()
     }

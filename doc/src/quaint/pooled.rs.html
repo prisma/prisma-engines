@@ -508,6 +508,11 @@
 <a href="#508" id="508">508</a>
 <a href="#509" id="509">509</a>
 <a href="#510" id="510">510</a>
+<a href="#511" id="511">511</a>
+<a href="#512" id="512">512</a>
+<a href="#513" id="513">513</a>
+<a href="#514" id="514">514</a>
+<a href="#515" id="515">515</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! # A connection pool to a SQL database.
 //!
 //! A pool is created through the [`builder`] method, starting from a connection
@@ -662,6 +667,9 @@
 
 <span class="kw">pub use </span>manager::<span class="kw-2">*</span>;
 
+<span class="attr">#[cfg(feature = <span class="string">&quot;native&quot;</span>)]
+</span><span class="kw">use crate</span>::{connector::NativeConnectionInfo, error::NativeErrorKind};
+
 <span class="kw">use crate</span>::{
     connector::{ConnectionInfo, PostgresFlavour},
     error::{Error, ErrorKind},
@@ -813,7 +821,7 @@
     ///
     /// - Defaults to `PostgresFlavour::Unknown`.
     </span><span class="kw">pub fn </span>set_postgres_flavour(<span class="kw-2">&amp;mut </span><span class="self">self</span>, flavour: PostgresFlavour) {
-        <span class="kw">if let </span>ConnectionInfo::Postgres(<span class="kw-2">ref mut </span>url) = <span class="self">self</span>.connection_info {
+        <span class="kw">if let </span>ConnectionInfo::Native(NativeConnectionInfo::Postgres(<span class="kw-2">ref mut </span>url)) = <span class="self">self</span>.connection_info {
             url.set_flavour(flavour);
         }
 
@@ -994,7 +1002,9 @@
 
         <span class="kw">let </span>inner = <span class="kw">match </span>res {
             <span class="prelude-val">Ok</span>(conn) =&gt; conn,
-            <span class="prelude-val">Err</span>(mobc::Error::PoolClosed) =&gt; <span class="kw">return </span><span class="prelude-val">Err</span>(Error::builder(ErrorKind::PoolClosed {}).build()),
+            <span class="prelude-val">Err</span>(mobc::Error::PoolClosed) =&gt; {
+                <span class="kw">return </span><span class="prelude-val">Err</span>(Error::builder(ErrorKind::Native(NativeErrorKind::PoolClosed {})).build())
+            }
             <span class="prelude-val">Err</span>(mobc::Error::Timeout) =&gt; {
                 <span class="kw">let </span>state = <span class="self">self</span>.inner.state().<span class="kw">await</span>;
                 <span class="comment">// We can use unwrap here because a pool timeout has to be set to use a connection pool
@@ -1005,7 +1015,7 @@
             }
             <span class="prelude-val">Err</span>(mobc::Error::Inner(e)) =&gt; <span class="kw">return </span><span class="prelude-val">Err</span>(e),
             <span class="prelude-val">Err</span>(e @ mobc::Error::BadConn) =&gt; {
-                <span class="kw">let </span>error = Error::builder(ErrorKind::ConnectionError(Box::new(e))).build();
+                <span class="kw">let </span>error = Error::builder(ErrorKind::Native(NativeErrorKind::ConnectionError(Box::new(e)))).build();
                 <span class="kw">return </span><span class="prelude-val">Err</span>(error);
             }
         };

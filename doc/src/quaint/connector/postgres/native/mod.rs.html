@@ -970,6 +970,7 @@
 <a href="#970" id="970">970</a>
 <a href="#971" id="971">971</a>
 <a href="#972" id="972">972</a>
+<a href="#973" id="973">973</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Definitions for the Postgres connector.
 //! This module is not compatible with wasm32-* targets.
 //! This module is only available with the `postgresql-native` feature.
@@ -979,6 +980,7 @@
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use </span><span class="kw">crate</span>::connector::postgres::url::PostgresUrl;
 <span class="kw">use </span><span class="kw">crate</span>::connector::postgres::url::{Hidden, SslAcceptMode, SslParams};
 <span class="kw">use </span><span class="kw">crate</span>::connector::{timeout, IsolationLevel, Transaction};
+<span class="kw">use </span><span class="kw">crate</span>::error::NativeErrorKind;
 
 <span class="kw">use crate</span>::{
     ast::{Query, Value},
@@ -1065,9 +1067,9 @@
 
         <span class="kw">if let </span><span class="prelude-val">Some</span>(<span class="kw-2">ref </span>cert_file) = <span class="self">self</span>.certificate_file {
             <span class="kw">let </span>cert = fs::read(cert_file).map_err(|err| {
-                Error::builder(ErrorKind::TlsError {
+                Error::builder(ErrorKind::Native(NativeErrorKind::TlsError {
                     message: <span class="macro">format!</span>(<span class="string">&quot;cert file not found ({err})&quot;</span>),
-                })
+                }))
                 .build()
             })<span class="question-mark">?</span>;
 
@@ -1076,9 +1078,9 @@
 
         <span class="kw">if let </span><span class="prelude-val">Some</span>(<span class="kw-2">ref </span>identity_file) = <span class="self">self</span>.identity_file {
             <span class="kw">let </span>db = fs::read(identity_file).map_err(|err| {
-                Error::builder(ErrorKind::TlsError {
+                Error::builder(ErrorKind::Native(NativeErrorKind::TlsError {
                     message: <span class="macro">format!</span>(<span class="string">&quot;identity file not found ({err})&quot;</span>),
-                })
+                }))
                 .build()
             })<span class="question-mark">?</span>;
             <span class="kw">let </span>password = <span class="self">self</span>.identity_password.<span class="number">0</span>.as_deref().unwrap_or(<span class="string">&quot;&quot;</span>);

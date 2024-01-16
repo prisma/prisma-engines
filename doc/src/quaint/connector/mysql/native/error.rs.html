@@ -34,9 +34,11 @@
 <a href="#34" id="34">34</a>
 <a href="#35" id="35">35</a>
 <a href="#36" id="36">36</a>
+<a href="#37" id="37">37</a>
+<a href="#38" id="38">38</a>
 </pre></div><pre class="rust"><code><span class="kw">use crate</span>::{
     connector::mysql::error::MysqlError,
-    error::{Error, ErrorKind},
+    error::{Error, ErrorKind, NativeErrorKind},
 };
 <span class="kw">use </span>mysql_async <span class="kw">as </span>my;
 
@@ -53,14 +55,16 @@
 <span class="kw">impl </span>From&lt;my::Error&gt; <span class="kw">for </span>Error {
     <span class="kw">fn </span>from(e: my::Error) -&gt; Error {
         <span class="kw">match </span>e {
-            my::Error::Io(my::IoError::Tls(err)) =&gt; Error::builder(ErrorKind::TlsError {
+            my::Error::Io(my::IoError::Tls(err)) =&gt; Error::builder(ErrorKind::Native(NativeErrorKind::TlsError {
                 message: err.to_string(),
-            })
+            }))
             .build(),
             my::Error::Io(my::IoError::Io(err)) <span class="kw">if </span>err.kind() == std::io::ErrorKind::UnexpectedEof =&gt; {
-                Error::builder(ErrorKind::ConnectionClosed).build()
+                Error::builder(ErrorKind::Native(NativeErrorKind::ConnectionClosed)).build()
             }
-            my::Error::Io(io_error) =&gt; Error::builder(ErrorKind::ConnectionError(io_error.into())).build(),
+            my::Error::Io(io_error) =&gt; {
+                Error::builder(ErrorKind::Native(NativeErrorKind::ConnectionError(io_error.into()))).build()
+            }
             my::Error::Driver(e) =&gt; Error::builder(ErrorKind::QueryError(e.into())).build(),
             my::Error::Server(<span class="kw-2">ref </span>server_error) =&gt; {
                 <span class="kw">let </span>mysql_error: MysqlError = server_error.into();

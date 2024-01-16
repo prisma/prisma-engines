@@ -1304,7 +1304,7 @@
         <span class="kw">match </span>res {
             <span class="prelude-val">Ok</span>(<span class="kw">_</span>) =&gt; <span class="macro">unreachable!</span>(),
             <span class="prelude-val">Err</span>(e) =&gt; <span class="kw">match </span>e.kind() {
-                ErrorKind::TlsError { .. } =&gt; (),
+                ErrorKind::Native(NativeErrorKind::TlsError { .. }) =&gt; (),
                 other =&gt; <span class="macro">panic!</span>(<span class="string">&quot;{:#?}&quot;</span>, other),
             },
         }

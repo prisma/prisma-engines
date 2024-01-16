@@ -356,6 +356,29 @@
 <a href="#356" id="356">356</a>
 <a href="#357" id="357">357</a>
 <a href="#358" id="358">358</a>
+<a href="#359" id="359">359</a>
+<a href="#360" id="360">360</a>
+<a href="#361" id="361">361</a>
+<a href="#362" id="362">362</a>
+<a href="#363" id="363">363</a>
+<a href="#364" id="364">364</a>
+<a href="#365" id="365">365</a>
+<a href="#366" id="366">366</a>
+<a href="#367" id="367">367</a>
+<a href="#368" id="368">368</a>
+<a href="#369" id="369">369</a>
+<a href="#370" id="370">370</a>
+<a href="#371" id="371">371</a>
+<a href="#372" id="372">372</a>
+<a href="#373" id="373">373</a>
+<a href="#374" id="374">374</a>
+<a href="#375" id="375">375</a>
+<a href="#376" id="376">376</a>
+<a href="#377" id="377">377</a>
+<a href="#378" id="378">378</a>
+<a href="#379" id="379">379</a>
+<a href="#380" id="380">380</a>
+<a href="#381" id="381">381</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>connector_interface::error::<span class="kw-2">*</span>;
 <span class="kw">use </span>quaint::error::ErrorKind <span class="kw">as </span>QuaintKind;
 <span class="kw">use </span>query_structure::{prelude::DomainError, Filter};
@@ -363,13 +386,17 @@
 <span class="kw">use </span>thiserror::Error;
 <span class="kw">use </span>user_facing_errors::query_engine::DatabaseConstraint;
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">enum </span>RawError {
-    IncorrectNumberOfParameters {
-        expected: usize,
-        actual: usize,
-    },
-    QueryInvalidInput(String),
+<span class="attr">#[cfg(not(target_arch = <span class="string">&quot;wasm32&quot;</span>))]
+</span><span class="kw">use </span>quaint::error::NativeErrorKind;
+
+<span class="attr">#[cfg(not(target_arch = <span class="string">&quot;wasm32&quot;</span>))]
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">enum </span>NativeRawError {
     ConnectionClosed,
+}
+
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">enum </span>RawError {
+    <span class="attr">#[cfg(not(target_arch = <span class="string">&quot;wasm32&quot;</span>))]
+    </span>Native(NativeRawError),
     Database {
         code: <span class="prelude-ty">Option</span>&lt;String&gt;,
         message: <span class="prelude-ty">Option</span>&lt;String&gt;,
@@ -377,6 +404,11 @@
     UnsupportedColumnType {
         column_type: String,
     },
+    IncorrectNumberOfParameters {
+        expected: usize,
+        actual: usize,
+    },
+    QueryInvalidInput(String),
     External {
         id: i32,
     },
@@ -385,6 +417,10 @@
 <span class="kw">impl </span>From&lt;RawError&gt; <span class="kw">for </span>SqlError {
     <span class="kw">fn </span>from(re: RawError) -&gt; SqlError {
         <span class="kw">match </span>re {
+            <span class="attr">#[cfg(not(target_arch = <span class="string">&quot;wasm32&quot;</span>))]
+            </span>RawError::Native(native) =&gt; <span class="kw">match </span>native {
+                NativeRawError::ConnectionClosed =&gt; SqlError::ConnectionClosed,
+            },
             RawError::IncorrectNumberOfParameters { expected, actual } =&gt; {
                 <span class="self">Self</span>::IncorrectNumberOfParameters { expected, actual }
             }
@@ -395,7 +431,6 @@
                     <span class="string">r#&quot;Failed to deserialize column of type &#39;{column_type}&#39;. If you&#39;re using $queryRaw and this column is explicitly marked as `Unsupported` in your Prisma schema, try casting this column to any supported Prisma type such as `String`.&quot;#
                 </span>),
             },
-            RawError::ConnectionClosed =&gt; <span class="self">Self</span>::ConnectionClosed,
             RawError::Database { code, message } =&gt; <span class="self">Self</span>::RawError {
                 code: code.unwrap_or_else(|| String::from(<span class="string">&quot;N/A&quot;</span>)),
                 message: message.unwrap_or_else(|| String::from(<span class="string">&quot;N/A&quot;</span>)),
@@ -407,23 +442,28 @@
 
 <span class="kw">impl </span>From&lt;quaint::error::Error&gt; <span class="kw">for </span>RawError {
     <span class="kw">fn </span>from(e: quaint::error::Error) -&gt; <span class="self">Self </span>{
+        <span class="kw">let </span>default_value: RawError = <span class="self">Self</span>::Database {
+            code: e.original_code().map(ToString::to_string),
+            message: e.original_message().map(ToString::to_string),
+        };
+
         <span class="kw">match </span>e.kind() {
+            <span class="attr">#[cfg(not(target_arch = <span class="string">&quot;wasm32&quot;</span>))]
+            </span>quaint::error::ErrorKind::Native(NativeErrorKind::ConnectionClosed) =&gt; {
+                <span class="self">Self</span>::Native(NativeRawError::ConnectionClosed)
+            }
             quaint::error::ErrorKind::IncorrectNumberOfParameters { expected, actual } =&gt; {
                 <span class="self">Self</span>::IncorrectNumberOfParameters {
                     expected: <span class="kw-2">*</span>expected,
                     actual: <span class="kw-2">*</span>actual,
                 }
             }
-            quaint::error::ErrorKind::ConnectionClosed =&gt; <span class="self">Self</span>::ConnectionClosed,
             quaint::error::ErrorKind::UnsupportedColumnType { column_type } =&gt; <span class="self">Self</span>::UnsupportedColumnType {
                 column_type: column_type.to_owned(),
             },
             quaint::error::ErrorKind::QueryInvalidInput(message) =&gt; <span class="self">Self</span>::QueryInvalidInput(message.to_owned()),
             quaint::error::ErrorKind::ExternalError(id) =&gt; <span class="self">Self</span>::External { id: <span class="kw-2">*</span>id },
-            <span class="kw">_ </span>=&gt; <span class="self">Self</span>::Database {
-                code: e.original_code().map(ToString::to_string),
-                message: e.original_message().map(ToString::to_string),
-            },
+            <span class="kw">_ </span>=&gt; default_value,
         }
     }
 }
@@ -634,15 +674,26 @@
 }
 
 <span class="kw">impl </span>From&lt;quaint::error::Error&gt; <span class="kw">for </span>SqlError {
-    <span class="kw">fn </span>from(e: quaint::error::Error) -&gt; <span class="self">Self </span>{
-        <span class="kw">match </span>QuaintKind::from(e) {
+    <span class="kw">fn </span>from(error: quaint::error::Error) -&gt; <span class="self">Self </span>{
+        <span class="kw">let </span>quaint_kind = QuaintKind::from(error);
+
+        <span class="kw">match </span>quaint_kind {
+            <span class="attr">#[cfg(not(target_arch = <span class="string">&quot;wasm32&quot;</span>))]
+            </span>QuaintKind::Native(<span class="kw-2">ref </span>native_error_kind) =&gt; <span class="kw">match </span>native_error_kind {
+                NativeErrorKind::IoError(<span class="kw">_</span>) | NativeErrorKind::ConnectionError(<span class="kw">_</span>) =&gt; <span class="self">Self</span>::ConnectionError(quaint_kind),
+                NativeErrorKind::ConnectionClosed =&gt; SqlError::ConnectionClosed,
+                NativeErrorKind::ConnectTimeout =&gt; SqlError::ConnectionError(quaint_kind),
+                NativeErrorKind::PoolTimeout { .. } =&gt; SqlError::ConnectionError(quaint_kind),
+                NativeErrorKind::PoolClosed { .. } =&gt; SqlError::ConnectionError(quaint_kind),
+                NativeErrorKind::TlsError { .. } =&gt; <span class="self">Self</span>::ConnectionError(quaint_kind),
+            },
+
             QuaintKind::RawConnectorError { status, reason } =&gt; <span class="self">Self</span>::RawError {
                 code: status,
                 message: reason,
             },
             QuaintKind::QueryError(qe) =&gt; <span class="self">Self</span>::QueryError(qe),
             QuaintKind::QueryInvalidInput(qe) =&gt; <span class="self">Self</span>::QueryInvalidInput(qe),
-            e @ QuaintKind::IoError(<span class="kw">_</span>) =&gt; <span class="self">Self</span>::ConnectionError(e),
             QuaintKind::NotFound =&gt; <span class="self">Self</span>::RecordDoesNotExist {
                 cause: <span class="string">&quot;Record not found&quot;</span>.to_owned(),
             },
@@ -658,11 +709,10 @@
                 constraint: constraint.into(),
             },
             QuaintKind::MissingFullTextSearchIndex =&gt; <span class="self">Self</span>::MissingFullTextSearchIndex,
-            e @ QuaintKind::ConnectionError(<span class="kw">_</span>) =&gt; <span class="self">Self</span>::ConnectionError(e),
             QuaintKind::ColumnReadFailure(e) =&gt; <span class="self">Self</span>::ColumnReadFailure(e),
             QuaintKind::ColumnNotFound { column } =&gt; SqlError::ColumnDoesNotExist(<span class="macro">format!</span>(<span class="string">&quot;{column}&quot;</span>)),
             QuaintKind::TableDoesNotExist { table } =&gt; SqlError::TableDoesNotExist(<span class="macro">format!</span>(<span class="string">&quot;{table}&quot;</span>)),
-            QuaintKind::ConnectionClosed =&gt; SqlError::ConnectionClosed,
+
             QuaintKind::InvalidIsolationLevel(msg) =&gt; <span class="self">Self</span>::InvalidIsolationLevel(msg),
             QuaintKind::TransactionWriteConflict =&gt; <span class="self">Self</span>::TransactionWriteConflict,
             QuaintKind::RollbackWithoutBegin =&gt; <span class="self">Self</span>::RollbackWithoutBegin,
@@ -682,11 +732,7 @@
             e @ QuaintKind::DatabaseAccessDenied { .. } =&gt; SqlError::ConnectionError(e),
             e @ QuaintKind::DatabaseAlreadyExists { .. } =&gt; SqlError::ConnectionError(e),
             e @ QuaintKind::InvalidConnectionArguments =&gt; SqlError::ConnectionError(e),
-            e @ QuaintKind::ConnectTimeout =&gt; SqlError::ConnectionError(e),
             e @ QuaintKind::SocketTimeout =&gt; SqlError::ConnectionError(e),
-            e @ QuaintKind::PoolTimeout { .. } =&gt; SqlError::ConnectionError(e),
-            e @ QuaintKind::PoolClosed { .. } =&gt; SqlError::ConnectionError(e),
-            e @ QuaintKind::TlsError { .. } =&gt; <span class="self">Self</span>::ConnectionError(e),
         }
     }
 }
