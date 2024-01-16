@@ -45,13 +45,6 @@ pub fn render_quaint_error(kind: &ErrorKind, connection_info: &ConnectionInfo) -
         (ErrorKind::DatabaseDoesNotExist { .. }, ConnectionInfo::External(_)) => default_value,
         #[cfg(not(target_arch = "wasm32"))]
         (ErrorKind::DatabaseDoesNotExist { db_name }, _) => match connection_info {
-            ConnectionInfo::Native(NativeConnectionInfo::Mysql(url)) => {
-                Some(KnownError::new(common::DatabaseDoesNotExist::Mysql {
-                    database_name: db_name.to_string(),
-                    database_host: url.host().to_owned(),
-                    database_port: url.port(),
-                }))
-            }
             ConnectionInfo::Native(NativeConnectionInfo::Postgres(url)) => {
                 Some(KnownError::new(common::DatabaseDoesNotExist::Postgres {
                     database_name: db_name.to_string(),
@@ -59,9 +52,16 @@ pub fn render_quaint_error(kind: &ErrorKind, connection_info: &ConnectionInfo) -
                     database_port: url.port(),
                 }))
             }
+            ConnectionInfo::Native(NativeConnectionInfo::Mysql(url)) => {
+                Some(KnownError::new(common::DatabaseDoesNotExist::Mysql {
+                    database_name: url.dbname().to_owned(),
+                    database_host: url.host().to_owned(),
+                    database_port: url.port(),
+                }))
+            }
             ConnectionInfo::Native(NativeConnectionInfo::Mssql(url)) => {
                 Some(KnownError::new(common::DatabaseDoesNotExist::Mssql {
-                    database_name: db_name.to_string(),
+                    database_name: url.dbname().to_owned(),
                     database_host: url.host().to_owned(),
                     database_port: url.port(),
                 }))
