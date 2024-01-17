@@ -7,6 +7,7 @@ mod error;
 pub(crate) use crate::connector::postgres::url::PostgresUrl;
 use crate::connector::postgres::url::{Hidden, SslAcceptMode, SslParams};
 use crate::connector::{timeout, IsolationLevel, Transaction};
+use crate::error::NativeErrorKind;
 
 use crate::{
     ast::{Query, Value},
@@ -93,9 +94,9 @@ impl SslParams {
 
         if let Some(ref cert_file) = self.certificate_file {
             let cert = fs::read(cert_file).map_err(|err| {
-                Error::builder(ErrorKind::TlsError {
+                Error::builder(ErrorKind::Native(NativeErrorKind::TlsError {
                     message: format!("cert file not found ({err})"),
-                })
+                }))
                 .build()
             })?;
 
@@ -104,9 +105,9 @@ impl SslParams {
 
         if let Some(ref identity_file) = self.identity_file {
             let db = fs::read(identity_file).map_err(|err| {
-                Error::builder(ErrorKind::TlsError {
+                Error::builder(ErrorKind::Native(NativeErrorKind::TlsError {
                     message: format!("identity file not found ({err})"),
-                })
+                }))
                 .build()
             })?;
             let password = self.identity_password.0.as_deref().unwrap_or("");

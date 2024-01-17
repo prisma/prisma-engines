@@ -1,14 +1,24 @@
 //! Error module
+
+#[cfg(not(target_arch = "wasm32"))]
+pub mod native;
+
+pub(crate) mod name;
+
 use crate::connector::IsolationLevel;
-use std::{borrow::Cow, fmt, io, num};
+use std::{borrow::Cow, fmt, num};
 use thiserror::Error;
 
 #[cfg(feature = "pooled")]
 use std::time::Duration;
 
+#[cfg(not(target_arch = "wasm32"))]
+pub use native::NativeErrorKind;
+
 pub use crate::connector::mysql::MysqlError;
 pub use crate::connector::postgres::PostgresError;
 pub use crate::connector::sqlite::SqliteError;
+pub(crate) use name::Name;
 
 #[derive(Debug, PartialEq, Eq)]
 pub enum DatabaseConstraint {
@@ -37,39 +47,6 @@ impl fmt::Display for DatabaseConstraint {
             Self::Index(index) => index.fmt(f),
             Self::ForeignKey => "FOREIGN KEY".fmt(f),
             Self::CannotParse => "".fmt(f),
-        }
-    }
-}
-
-#[derive(Debug, PartialEq, Eq)]
-pub enum Name {
-    Available(String),
-    Unavailable,
-}
-
-impl Name {
-    pub fn available(name: impl ToString) -> Self {
-        Self::Available(name.to_string())
-    }
-}
-
-impl fmt::Display for Name {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        match self {
-            Self::Available(name) => name.fmt(f),
-            Self::Unavailable => write!(f, "(not available)"),
-        }
-    }
-}
-
-impl<T> From<Option<T>> for Name
-where
-    T: ToString,
-{
-    fn from(name: Option<T>) -> Self {
-        match name {
-            Some(name) => Self::available(name),
-            None => Self::Unavailable,
         }
     }
 }
@@ -134,8 +111,9 @@ impl Error {
     }
 
     /// Determines if the error was associated with closed connection.
+    #[cfg(not(target_arch = "wasm32"))]
     pub fn is_closed(&self) -> bool {
-        matches!(self.kind, ErrorKind::ConnectionClosed)
+        matches!(self.kind, ErrorKind::Native(NativeErrorKind::ConnectionClosed))
     }
 
     // Builds an error from a raw error coming from the connector
@@ -157,6 +135,10 @@ impl fmt::Display for Error {
 
 #[derive(Debug, Error)]
 pub enum ErrorKind {
+    #[cfg(not(target_arch = "wasm32"))]
+    #[error("Error in the underlying connector")]
+    Native(NativeErrorKind),
+
     #[error("Error in the underlying connector ({}): {}", status, reason)]
     RawConnectorError { status: String, reason: String },
 
@@ -193,9 +175,6 @@ pub enum ErrorKind {
     #[error("Foreign key constraint failed: {}", constraint)]
     ForeignKeyConstraintViolation { constraint: DatabaseConstraint },
 
-    #[error("Error creating a database connection.")]
-    ConnectionError(Box<dyn std::error::Error + Send + Sync + 'static>),
-
     #[error("Error reading the column value: {}", _0)]
     ColumnReadFailure(Box<dyn std::error::Error + Send + Sync + 'static>),
 
@@ -220,31 +199,8 @@ pub enum ErrorKind {
     #[error("The provided arguments are not supported")]
     InvalidConnectionArguments,
 
-    #[error("Error in an I/O operation: {0}")]
-    IoError(io::Error),
-
-    #[error("Timed out when connecting to the database.")]
-    ConnectTimeout,
-
-    #[error("The server terminated the connection.")]
-    ConnectionClosed,
-
-    #[error(
-        "Timed out fetching a connection from the pool (connection limit: {}, in use: {}, pool timeout {})",
-        max_open,
-        in_use,
-        timeout
-    )]
-    PoolTimeout { max_open: u64, in_use: u64, timeout: u64 },
-
-    #[error("The connection pool has been closed")]
-    PoolClosed {},
-
     #[error("Timed out during query execution.")]
     SocketTimeout,
-
-    #[error("Error opening a TLS connection. {}", message)]
-    TlsError { message: String },
 
     #[error("Value out of range error. {}", message)]
     ValueOutOfRange { message: String },
@@ -281,6 +237,13 @@ pub enum ErrorKind {
     ExternalError(i32),
 }
 
+#[cfg(not(target_arch = "wasm32"))]
+impl From<std::io::Error> for Error {
+    fn from(e: std::io::Error) -> Error {
+        Error::builder(ErrorKind::Native(NativeErrorKind::IoError(e))).build()
+    }
+}
+
 impl ErrorKind {
     #[cfg(feature = "mysql-native")]
     pub(crate) fn value_out_of_range(msg: impl Into<String>) -> Self {
@@ -298,11 +261,11 @@ impl ErrorKind {
 
     #[cfg(feature = "pooled")]
     pub(crate) fn pool_timeout(max_open: u64, in_use: u64, timeout: Duration) -> Self {
-        Self::PoolTimeout {
+        Self::Native(NativeErrorKind::PoolTimeout {
             max_open,
             in_use,
             timeout: timeout.as_secs(),
-        }
+        })
     }
 
     pub fn invalid_isolation_level(isolation_level: &IsolationLevel) -> Self {
@@ -354,12 +317,6 @@ impl From<url::ParseError> for Error {
     fn from(e: url::ParseError) -> Error {
         let kind = ErrorKind::DatabaseUrlIsInvalid(e.to_string());
         Error::builder(kind).build()
-    }
-}
-
-impl From<io::Error> for Error {
-    fn from(e: io::Error) -> Error {
-        Error::builder(ErrorKind::IoError(e)).build()
     }
 }
 
