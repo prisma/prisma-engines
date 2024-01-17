@@ -335,6 +335,18 @@ else
 	cd query-engine/query-engine-wasm && ./build.sh
 endif
 
+.PHONY: measure-qe-wasm
+measure-qe-wasm: build-qe-wasm	
+	@cd query-engine/query-engine-wasm/pkg; \
+	gzip -c query_engine_bg.wasm | wc -c | awk '{$$1/=(1024*1024); printf "%.3fMB\n", $$1}' > temp_size.txt; \
+	if [ ! -f size.txt ]; then \
+		echo "0MB" > size.txt; \
+	fi; \
+	echo "Previous size: `cat size.txt`"; \
+	echo "Current size: `cat temp_size.txt`"; \
+	awk '{print $$1}' size.txt temp_size.txt | paste -d" " - - | awk '{printf "Increment: %.3fMB\n", $$2 - $$1}'; \
+	mv temp_size.txt size.txt; \
+
 build-driver-adapters-kit: build-driver-adapters
 	cd query-engine/driver-adapters && pnpm i && pnpm build
 
