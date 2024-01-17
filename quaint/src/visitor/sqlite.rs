@@ -419,6 +419,41 @@ impl<'a> Visitor<'a> for Sqlite<'a> {
 
         Ok(())
     }
+
+    fn visit_update(&mut self, update: Update<'a>) -> visitor::Result {
+        self.write("UPDATE ")?;
+        self.visit_table(update.table, true)?;
+
+        {
+            self.write(" SET ")?;
+            let pairs = update.columns.into_iter().zip(update.values);
+            let len = pairs.len();
+
+            for (i, (key, value)) in pairs.enumerate() {
+                self.visit_column(key)?;
+                self.write(" = ")?;
+                self.visit_expression(value)?;
+
+                if i < (len - 1) {
+                    self.write(", ")?;
+                }
+            }
+        }
+
+        if let Some(conditions) = update.conditions {
+            self.write(" WHERE ")?;
+            self.visit_conditions(conditions)?;
+        }
+
+        self.returning(update.returning)?;
+
+        if let Some(comment) = update.comment {
+            self.write(" ")?;
+            self.visit_comment(comment)?;
+        }
+
+        Ok(())
+    }
 }
 
 #[cfg(test)]
