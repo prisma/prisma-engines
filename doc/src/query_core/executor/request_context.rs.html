@@ -64,6 +64,7 @@
 <a href="#64" id="64">64</a>
 <a href="#65" id="65">65</a>
 <a href="#66" id="66">66</a>
+<a href="#67" id="67">67</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::protocol::EngineProtocol;
 <span class="kw">use </span>query_structure::PrismaValue;
 
@@ -84,14 +85,15 @@
 ///
 /// If we had a query context we carry for the entire lifetime of the query, it would belong there.
 </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>get_request_now() -&gt; PrismaValue {
-    <span class="comment">// FIXME: we want to bypass task locals if this code is executed outside of a tokio context. As
-    // of this writing, it happens only in the query validation test suite.
-    //
-    // Eventually, this will go away when we have a plain query context reference we pass around.
-    </span><span class="kw">if </span>tokio::runtime::Handle::try_current().is_err() {
-        <span class="kw">return </span>PrismaValue::DateTime(chrono::Utc::now().into());
-    }
-    REQUEST_CONTEXT.with(|rc| rc.request_now.clone())
+    REQUEST_CONTEXT.try_with(|rc| rc.request_now.clone()).unwrap_or_else(|<span class="kw">_</span>|
+            <span class="comment">// Task local might not be set in some cases.
+            // At the moment of writing, this happens only in query validation test suite.
+            // In that case, we want to fall back to realtime value. On the other hand, if task local is
+            // set, we want to use it, even if we are not running inside of tokio runtime (for example, 
+            // in WASM case)
+            //
+            // Eventually, this will go away when we have a plain query context reference we pass around.
+            </span>PrismaValue::DateTime(chrono::Utc::now().into()))
 }
 
 <span class="doccomment">/// The engine protocol used for the whole duration of a request.
