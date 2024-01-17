@@ -1034,6 +1034,41 @@
 <a href="#1034" id="1034">1034</a>
 <a href="#1035" id="1035">1035</a>
 <a href="#1036" id="1036">1036</a>
+<a href="#1037" id="1037">1037</a>
+<a href="#1038" id="1038">1038</a>
+<a href="#1039" id="1039">1039</a>
+<a href="#1040" id="1040">1040</a>
+<a href="#1041" id="1041">1041</a>
+<a href="#1042" id="1042">1042</a>
+<a href="#1043" id="1043">1043</a>
+<a href="#1044" id="1044">1044</a>
+<a href="#1045" id="1045">1045</a>
+<a href="#1046" id="1046">1046</a>
+<a href="#1047" id="1047">1047</a>
+<a href="#1048" id="1048">1048</a>
+<a href="#1049" id="1049">1049</a>
+<a href="#1050" id="1050">1050</a>
+<a href="#1051" id="1051">1051</a>
+<a href="#1052" id="1052">1052</a>
+<a href="#1053" id="1053">1053</a>
+<a href="#1054" id="1054">1054</a>
+<a href="#1055" id="1055">1055</a>
+<a href="#1056" id="1056">1056</a>
+<a href="#1057" id="1057">1057</a>
+<a href="#1058" id="1058">1058</a>
+<a href="#1059" id="1059">1059</a>
+<a href="#1060" id="1060">1060</a>
+<a href="#1061" id="1061">1061</a>
+<a href="#1062" id="1062">1062</a>
+<a href="#1063" id="1063">1063</a>
+<a href="#1064" id="1064">1064</a>
+<a href="#1065" id="1065">1065</a>
+<a href="#1066" id="1066">1066</a>
+<a href="#1067" id="1067">1067</a>
+<a href="#1068" id="1068">1068</a>
+<a href="#1069" id="1069">1069</a>
+<a href="#1070" id="1070">1070</a>
+<a href="#1071" id="1071">1071</a>
 </pre></div><pre class="rust"><code><span class="kw">use crate</span>::{
     ast::<span class="kw-2">*</span>,
     error::{Error, ErrorKind},
@@ -1449,6 +1484,41 @@
         <span class="self">self</span>.returning(delete.returning)<span class="question-mark">?</span>;
 
         <span class="kw">if let </span><span class="prelude-val">Some</span>(comment) = delete.comment {
+            <span class="self">self</span>.write(<span class="string">&quot; &quot;</span>)<span class="question-mark">?</span>;
+            <span class="self">self</span>.visit_comment(comment)<span class="question-mark">?</span>;
+        }
+
+        <span class="prelude-val">Ok</span>(())
+    }
+
+    <span class="kw">fn </span>visit_update(<span class="kw-2">&amp;mut </span><span class="self">self</span>, update: Update&lt;<span class="lifetime">&#39;a</span>&gt;) -&gt; visitor::Result {
+        <span class="self">self</span>.write(<span class="string">&quot;UPDATE &quot;</span>)<span class="question-mark">?</span>;
+        <span class="self">self</span>.visit_table(update.table, <span class="bool-val">true</span>)<span class="question-mark">?</span>;
+
+        {
+            <span class="self">self</span>.write(<span class="string">&quot; SET &quot;</span>)<span class="question-mark">?</span>;
+            <span class="kw">let </span>pairs = update.columns.into_iter().zip(update.values);
+            <span class="kw">let </span>len = pairs.len();
+
+            <span class="kw">for </span>(i, (key, value)) <span class="kw">in </span>pairs.enumerate() {
+                <span class="self">self</span>.visit_column(key)<span class="question-mark">?</span>;
+                <span class="self">self</span>.write(<span class="string">&quot; = &quot;</span>)<span class="question-mark">?</span>;
+                <span class="self">self</span>.visit_expression(value)<span class="question-mark">?</span>;
+
+                <span class="kw">if </span>i &lt; (len - <span class="number">1</span>) {
+                    <span class="self">self</span>.write(<span class="string">&quot;, &quot;</span>)<span class="question-mark">?</span>;
+                }
+            }
+        }
+
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(conditions) = update.conditions {
+            <span class="self">self</span>.write(<span class="string">&quot; WHERE &quot;</span>)<span class="question-mark">?</span>;
+            <span class="self">self</span>.visit_conditions(conditions)<span class="question-mark">?</span>;
+        }
+
+        <span class="self">self</span>.returning(update.returning)<span class="question-mark">?</span>;
+
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(comment) = update.comment {
             <span class="self">self</span>.write(<span class="string">&quot; &quot;</span>)<span class="question-mark">?</span>;
             <span class="self">self</span>.visit_comment(comment)<span class="question-mark">?</span>;
         }
