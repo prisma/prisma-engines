@@ -90,6 +90,10 @@ fn authentication_failure_must_return_a_known_error_on_mysql(api: TestApi) {
     assert_eq!(json_error, expected);
 }
 
+// TODO(tech-debt): get rid of provider-specific PSL `dm` declaration, and use `test_api::datamodel_with_provider` utility instead.
+// See: https://github.com/prisma/team-orm/issues/835.
+// This issue also currently prevents us from defining an `Mssql`-specific copy of this `unreachable_database_*` test case,
+// due to url parsing differences between the `url` crate and `quaint`'s `MssqlUrl` struct.
 #[test_connector(tags(Mysql))]
 fn unreachable_database_must_return_a_proper_error_on_mysql(api: TestApi) {
     let mut url: Url = api.connection_string().parse().unwrap();
@@ -134,42 +138,6 @@ fn unreachable_database_must_return_a_proper_error_on_postgres(api: TestApi) {
         r#"
             datasource db {{
               provider = "postgres"
-              url      = "{url}"
-            }}
-        "#
-    );
-
-    let error = tok(connection_error(dm));
-
-    let host = url.host().unwrap().to_string();
-    let port = url.port().unwrap();
-
-    let json_error = serde_json::to_value(&error.to_user_facing()).unwrap();
-    let expected = json!({
-        "is_panic": false,
-        "message": format!("Can't reach database server at `{host}`:`{port}`\n\nPlease make sure your database server is running at `{host}`:`{port}`."),
-        "meta": {
-            "database_host": host,
-            "database_port": port,
-        },
-        "error_code": "P1001"
-    });
-
-    assert_eq!(json_error, expected);
-}
-
-// TODO(tech-debt): get rid of provider-specific PSL `dm` declaration, and use `test_api::datamodel_with_provider` utility instead.
-// See: https://github.com/prisma/team-orm/issues/835.
-#[test_connector(tags(Mssql))]
-fn unreachable_database_must_return_a_proper_error_on_sqlserver(api: TestApi) {
-    let mut url: Url = api.connection_string().parse().unwrap();
-
-    url.set_port(Some(8787)).unwrap();
-
-    let dm = format!(
-        r#"
-            datasource db {{
-              provider = "sqlserver"
               url      = "{url}"
             }}
         "#
