@@ -1,6 +1,6 @@
 use query_engine_tests::*;
 
-#[test_suite(capabilities(JsonFiltering), exclude(Mysql56))]
+#[test_suite(capabilities(JsonFiltering), exclude(MySQL(5.6)))]
 mod json_filter {
     use query_engine_tests::run_query;
 
@@ -25,7 +25,8 @@ mod json_filter {
             Postgres("pg.js"),
             Postgres("neon.js"),
             Sqlite("libsql.js"),
-            Vitess("planetscale.js")
+            Vitess("planetscale.js"),
+            MySQL(5.6)
         )
     )]
     async fn does_not_strip_nulls_in_json(runner: Runner) -> TestResult<()> {
