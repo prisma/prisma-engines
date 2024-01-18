@@ -258,7 +258,6 @@
 <a href="#258" id="258">258</a>
 <a href="#259" id="259">259</a>
 <a href="#260" id="260">260</a>
-<a href="#261" id="261">261</a>
 </pre></div><pre class="rust"><code><span class="attr">#![allow(unused_imports)]
 
 </span><span class="kw">use </span>std::str::FromStr;
@@ -504,7 +503,6 @@
 }
 
 <span class="attr">#[cfg_attr(not(target_arch = <span class="string">&quot;wasm32&quot;</span>), napi_derive::napi(object))]
-#[cfg_attr(target_arch = <span class="string">&quot;wasm32&quot;</span>, derive(Serialize))]
 #[derive(Debug, Default)]
 </span><span class="kw">pub struct </span>Query {
     <span class="kw">pub </span>sql: String,
