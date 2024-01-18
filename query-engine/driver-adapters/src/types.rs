@@ -243,7 +243,6 @@ pub enum ColumnType {
 }
 
 #[cfg_attr(not(target_arch = "wasm32"), napi_derive::napi(object))]
-#[cfg_attr(target_arch = "wasm32", derive(Serialize))]
 #[derive(Debug, Default)]
 pub struct Query {
     pub sql: String,

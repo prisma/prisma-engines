@@ -3,7 +3,7 @@ CONFIG_FILE = .test_config
 SCHEMA_EXAMPLES_PATH = ./query-engine/example_schemas
 DEV_SCHEMA_FILE = dev_datamodel.prisma
 DRIVER_ADAPTERS_BRANCH ?= main
-NIX := $(shell command -v nix 2> /dev/null)
+NIX := $(shell type nix 2> /dev/null)
 
 LIBRARY_EXT := $(shell                            \
     case "$$(uname -s)" in                        \
@@ -334,6 +334,10 @@ ifdef NIX
 else
 	cd query-engine/query-engine-wasm && ./build.sh
 endif
+
+measure-qe-wasm: build-qe-wasm	
+	@cd query-engine/query-engine-wasm/pkg; \
+	gzip -k -c query_engine_bg.wasm | wc -c | awk '{$$1/=(1024*1024); printf "Current wasm query-engine size compressed: %.3fMB\n", $$1}'
 
 build-driver-adapters-kit: build-driver-adapters
 	cd query-engine/driver-adapters && pnpm i && pnpm build

@@ -229,6 +229,12 @@ pub fn render_quaint_error(kind: &ErrorKind, connection_info: &ConnectionInfo) -
                     database_host: url.host().to_owned(),
                 }))
             }
+            (NativeErrorKind::ConnectionError(_), ConnectionInfo::Native(NativeConnectionInfo::Mssql(url))) => {
+                Some(KnownError::new(common::DatabaseNotReachable {
+                    database_port: url.port(),
+                    database_host: url.host().to_owned(),
+                }))
+            }
             (NativeErrorKind::TlsError { message }, _) => Some(KnownError::new(common::TlsConnectionError {
                 message: message.into(),
             })),
