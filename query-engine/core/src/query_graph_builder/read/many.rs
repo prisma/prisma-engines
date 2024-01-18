@@ -45,7 +45,6 @@ fn find_many_with_options(
         args.cursor.as_ref(),
         args.distinct.as_ref(),
         &nested,
-        &selected_fields,
         &aggregation_selections,
         query_schema,
     );

@@ -1,3 +1,4 @@
+use psl::datamodel_connector::Flavour;
 use std::borrow::Cow;
 use tracing::Span;
 
@@ -133,6 +134,12 @@ impl SelectBuilder {
 
             let inner = inner.with_columns(inner_selection.into()).comment("inner select");
 
+            let take = match is_mysql(rs) {
+                // On MySQL, using LIMIT makes the ordering of the JSON_AGG working. Beware, this is undocumented behavior.
+                true => rs.args.take_abs().or(Some(i64::MAX)),
+                false => rs.args.take_abs(),
+            };
+
             let middle = Select::from_table(Table::from(inner).alias(inner_alias.to_table_string()))
                 // SELECT <inner_alias>.<JSON_ADD_IDENT>
                 .column(Column::from((inner_alias.to_table_string(), JSON_AGG_IDENT)))
@@ -141,7 +148,7 @@ impl SelectBuilder {
                 // WHERE ...
                 .with_filters(rs.args.filter.clone(), Some(inner_alias), ctx)
                 // LIMIT $1 OFFSET $2
-                .with_pagination(rs.args.take_abs(), rs.args.skip)
+                .with_pagination(take, rs.args.skip)
                 .comment("middle select");
 
             // SELECT COALESCE(JSON_AGG(<inner_alias>), '[]') AS <inner_alias> FROM ( <middle> ) as <inner_alias_2>
@@ -181,6 +188,11 @@ impl SelectBuilder {
             .lateral();
 
         let child_table = rf.as_table(ctx).alias(m2m_table_alias.to_table_string());
+        let take = match is_mysql(rs) {
+            // On MySQL, using LIMIT makes the ordering of the JSON_AGG working. Beware, this is undocumented behavior.
+            true => rs.args.take_abs().or(Some(i64::MAX)),
+            false => rs.args.take_abs(),
+        };
 
         let inner = Select::from_table(child_table)
             .value(Column::from((m2m_join_alias.to_table_string(), JSON_AGG_IDENT)))
@@ -188,7 +200,7 @@ impl SelectBuilder {
             .and_where(join_conditions) // adds join condition to the child table
             .with_ordering(&rs.args, Some(m2m_join_alias.to_table_string()), ctx) // adds ordering stmts
             .with_filters(rs.args.filter.clone(), Some(m2m_join_alias), ctx) // adds query filters // TODO: avoid clone filter
-            .with_pagination(rs.args.take_abs(), rs.args.skip)
+            .with_pagination(take, rs.args.skip)
             .comment("inner"); // adds pagination
 
         let outer = Select::from_table(Table::from(inner).alias(outer_alias.to_table_string()))
@@ -414,4 +426,10 @@ fn json_agg() -> Function<'static> {
 #[inline]
 fn empty_json_array() -> serde_json::Value {
     serde_json::Value::Array(Vec::new())
+}
+
+// TODO: Hack to get around the fact that we don't have a way to know if we're on mysql or not
+// TODO: Remove this once we have a proper way to know the connector type
+fn is_mysql(rs: &RelationSelection) -> bool {
+    rs.args.model().dm.schema.connector.flavour() == Flavour::Mysql
 }
