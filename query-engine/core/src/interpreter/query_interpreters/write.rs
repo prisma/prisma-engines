@@ -48,7 +48,6 @@ async fn create_one(
     Ok(QueryResult::RecordSelection(Some(Box::new(RecordSelection {
         name: q.name,
         fields: q.selection_order,
-        // aggregation_rows: None,
         model: q.model,
         scalars: res.into(),
         nested: vec![],
@@ -89,7 +88,6 @@ async fn update_one(
                     scalars: res.into(),
                     nested: vec![],
                     model: q.model,
-                    // aggregation_rows: None,
                 })
                 .map(Box::new);
 
@@ -118,7 +116,6 @@ async fn native_upsert(
         scalars: scalars.into(),
         nested: Vec::new(),
         model: query.model().clone(),
-        // aggregation_rows: None,
     }
     .into())
 }

@@ -52,7 +52,7 @@ fn read_one(
 
                 Ok(RecordSelection {
                     name: query.name,
-                    fields: query.selection_order,
+                    fields: query.user_selection.into_inner(),
                     scalars,
                     nested,
                     model,
@@ -66,7 +66,7 @@ fn read_one(
                 Ok(RecordSelectionWithRelations {
                     name: query.name,
                     model,
-                    fields: query.selection_order,
+                    fields: query.user_selection.into_inner(),
                     records,
                     nested: build_relation_record_selection(query.full_selection.relations()),
                 }
@@ -77,7 +77,7 @@ fn read_one(
 
             None => Ok(QueryResult::RecordSelection(Some(Box::new(RecordSelection {
                 name: query.name,
-                fields: query.selection_order,
+                fields: query.user_selection.into_inner(),
                 scalars: ManyRecords::default(),
                 nested: vec![],
                 model,
@@ -143,7 +143,7 @@ fn read_many_by_queries(
             let nested: Vec<QueryResult> = process_nested(tx, query.nested, Some(&scalars)).await?;
             Ok(RecordSelection {
                 name: query.name,
-                fields: query.selection_order,
+                fields: query.user_selection.into_inner(),
                 scalars,
                 nested,
                 model: query.model,
@@ -178,7 +178,7 @@ fn read_many_by_joins(
         } else {
             Ok(RecordSelectionWithRelations {
                 name: query.name,
-                fields: query.selection_order,
+                fields: query.user_selection.into_inner(),
                 records: result,
                 nested: build_relation_record_selection(query.full_selection.relations()),
                 model: query.model,
@@ -233,7 +233,7 @@ fn read_related<'conn>(
 
         Ok(RecordSelection {
             name: query.name,
-            fields: query.selection_order,
+            fields: query.user_selection.into_inner(),
             scalars,
             nested,
             model,
