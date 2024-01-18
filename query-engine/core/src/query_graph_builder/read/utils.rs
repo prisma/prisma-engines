@@ -25,19 +25,21 @@ pub fn collect_selected_fields(
     distinct: Option<FieldSelection>,
     model: &Model,
     query_schema: &QuerySchema,
-) -> QueryGraphBuilderResult<FieldSelection> {
+) -> QueryGraphBuilderResult<(FieldSelection, FieldSelection)> {
     let model_id = model.primary_identifier();
-    let selected_fields = pairs_to_selections(model, from_pairs, query_schema)?;
+    let (user_selected_fields, full_selected_fields) = pairs_to_selections(model, from_pairs, query_schema)?;
 
-    let selection = FieldSelection::new(selected_fields);
-    let selection = model_id.merge(selection);
+    let user_selection = FieldSelection::new(user_selected_fields);
+    let full_selection = FieldSelection::new(full_selected_fields);
+
+    let mut full_selection = model_id.merge(full_selection);
 
     // Distinct fields are always selected because we are processing them in-memory
     if let Some(distinct) = distinct {
-        Ok(selection.merge(distinct))
-    } else {
-        Ok(selection)
+        full_selection.merge_in_place(distinct);
     }
+
+    Ok((user_selection, full_selection))
 }
 
 /// Creates a `FieldSelection` from a query selection, which contains only scalar fields.
@@ -68,7 +70,7 @@ fn pairs_to_selections<T>(
     parent: T,
     pairs: &[FieldPair<'_>],
     query_schema: &QuerySchema,
-) -> QueryGraphBuilderResult<Vec<SelectedField>>
+) -> QueryGraphBuilderResult<(Vec<SelectedField>, Vec<SelectedField>)>
 where
     T: Into<ParentContainer>,
 {
@@ -77,34 +79,84 @@ where
 
     let parent = parent.into();
 
-    let selected_fields = pairs
-        .iter()
-        .filter_map(|pair| {
-            parent
-                .find_field(&pair.parsed_field.name)
-                .map(|field| (pair.parsed_field.clone(), field))
-        })
-        .flat_map(|field| match field {
-            (pf, Field::Relation(rf)) => {
-                let mut fields: Vec<QueryGraphBuilderResult<SelectedField>> = rf
-                    .scalar_fields()
-                    .into_iter()
-                    .map(SelectedField::from)
-                    .map(Ok)
-                    .collect();
+    let user_selection = Vec::new();
+    let internal_selection = Vec::new();
 
-                if should_collect_relation_selection {
-                    fields.push(extract_relation_selection(pf, rf, query_schema));
-                }
+    for pair in pairs {
+        let field = parent.find_field(&pair.parsed_field.name);
 
-                fields
+        match (pair.parsed_field, field) {
+            (pf, Some(Field::Relation(rf))) => {
+                let mut fields = rf.scalar_fields().into_iter().map(SelectedField::from);
+
+                internal_selection.extend(fields);
+
+                // TODO: we probably always need it if this function defines the selection order
+                // if should_collect_relation_selection {
+                user_selection.push(extract_relation_selection(pf, rf, query_schema)?);
+                // }
             }
-            (_, Field::Scalar(sf)) => vec![Ok(sf.into())],
-            (pf, Field::Composite(cf)) => vec![extract_composite_selection(pf, cf, query_schema)],
-        })
-        .collect::<Result<Vec<_>, _>>()?;
 
-    Ok(selected_fields)
+            (_, Some(Field::Scalar(sf))) => {
+                user_selection.push(sf.into());
+            }
+
+            (pf, Some(Field::Composite(cf))) => {
+                user_selection.push(extract_composite_selection(pf, cf, query_schema)?);
+            }
+
+            (pf, None) if pf.name == UNDERSCORE_COUNT => match parent {
+                ParentContainer::Model(model) => {
+                    user_selection.extend(extract_relation_count_selections(pf, &model)?);
+                }
+                ParentContainer::CompositeType(_) => {
+                    unreachable!("Unexpected relation aggregation selection selection inside a composite type query")
+                }
+            },
+
+            (pf, None) => unreachable!(
+                "Field '{}' does not exist on enclosing type and is not a known virtual field",
+                pf.name
+            ),
+        }
+    }
+
+    let full_selection = user_selection
+        .iter()
+        .cloned()
+        .chain(internal_selection.into_iter())
+        .collect();
+
+    Ok((user_selection, full_selection))
+
+    // let selected_fields = pairs
+    //     .iter()
+    //     .filter_map(|pair| {
+    //         parent
+    //             .find_field(&pair.parsed_field.name)
+    //             .map(|field| (pair.parsed_field.clone(), field))
+    //     })
+    //     .flat_map(|field| match field {
+    //         (pf, Field::Relation(rf)) => {
+    //             let mut fields: Vec<QueryGraphBuilderResult<SelectedField>> = rf
+    //                 .scalar_fields()
+    //                 .into_iter()
+    //                 .map(SelectedField::from)
+    //                 .map(Ok)
+    //                 .collect();
+
+    //             if should_collect_relation_selection {
+    //                 fields.push(extract_relation_selection(pf, rf, query_schema));
+    //             }
+
+    //             fields
+    //         }
+    //         (_, Field::Scalar(sf)) => vec![Ok(sf.into())],
+    //         (pf, Field::Composite(cf)) => vec![extract_composite_selection(pf, cf, query_schema)],
+    //     })
+    //     .collect::<Result<Vec<_>, _>>()?;
+
+    // Ok(selected_fields)
 }
 
 fn extract_composite_selection(
@@ -120,7 +172,7 @@ fn extract_composite_selection(
 
     Ok(SelectedField::Composite(CompositeSelection {
         field: cf,
-        selections: pairs_to_selections(typ, &object.fields, query_schema)?,
+        selections: pairs_to_selections(typ, &object.fields, query_schema)?.1,
     }))
 }
 
@@ -139,8 +191,37 @@ fn extract_relation_selection(
         field: rf,
         args: extract_query_args(pf.arguments, &related_model)?,
         result_fields: collect_selection_order(&object.fields),
-        selections: pairs_to_selections(related_model, &object.fields, query_schema)?,
+        selections: pairs_to_selections(related_model, &object.fields, query_schema)?.1,
     }))
+}
+
+fn extract_relation_count_selections(
+    pf: ParsedField<'_>,
+    model: &Model,
+) -> QueryGraphBuilderResult<Vec<SelectedField>> {
+    let object = pf
+        .nested_fields
+        .expect("Invalid query shape: relation aggregation virtual field selected without relations to aggregate.");
+
+    object
+        .fields
+        .into_iter()
+        .map(|mut nested_pair| -> QueryGraphBuilderResult<_> {
+            let rf = model
+                .fields()
+                .find_from_relation_fields(&nested_pair.parsed_field.name)
+                .expect("Selected relation in relation aggregation virtual field must exist on the model");
+
+            let filter = nested_pair
+                .parsed_field
+                .arguments
+                .lookup(args::WHERE)
+                .map(|where_arg| extract_filter(where_arg.value.try_into()?, rf.related_model()))
+                .transpose()?;
+
+            Ok(SelectedField::Virtual(VirtualSelection::RelationCount(rf, filter)))
+        })
+        .collect()
 }
 
 pub(crate) fn collect_nested_queries(
@@ -246,7 +327,6 @@ pub(crate) fn collect_virtual_fields(
     Ok(FieldSelection::new(selections))
 }
 
-// TODO: most of the arguments should be derived from `selected_fields`
 pub(crate) fn get_relation_load_strategy(
     requested_strategy: Option<RelationLoadStrategy>,
     cursor: Option<&SelectionResult>,

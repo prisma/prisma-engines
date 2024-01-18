@@ -201,7 +201,7 @@ pub struct RecordQuery {
     pub user_selection: FieldSelection,
     pub full_selection: FieldSelection,
     pub(crate) nested: Vec<ReadQuery>,
-    pub selection_order: Vec<String>,
+    // pub selection_order: Vec<String>,
     // pub aggregation_selections: Vec<RelAggregationSelection>,
     pub options: QueryOptions,
     pub relation_load_strategy: RelationLoadStrategy,
@@ -216,7 +216,7 @@ pub struct ManyRecordsQuery {
     pub user_selection: FieldSelection,
     pub full_selection: FieldSelection,
     pub(crate) nested: Vec<ReadQuery>,
-    pub selection_order: Vec<String>, // TODO: get rid of it as well
+    // pub selection_order: Vec<String>, // TODO: get rid of it as well
     // pub aggregation_selections: Vec<RelAggregationSelection>,
     pub options: QueryOptions,
     pub relation_load_strategy: RelationLoadStrategy,
@@ -231,7 +231,7 @@ pub struct RelatedRecordsQuery {
     pub user_selection: FieldSelection,
     pub full_selection: FieldSelection,
     pub nested: Vec<ReadQuery>,
-    pub selection_order: Vec<String>,
+    // pub selection_order: Vec<String>,
     // pub aggregation_selections: Vec<RelAggregationSelection>,
     /// Fields and values of the parent to satisfy the relation query without
     /// relying on the parent result passed by the interpreter.
