@@ -30,15 +30,17 @@ fn find_many_with_options(
     let name = field.name;
     let alias = field.alias;
     let nested_fields = field.nested_fields.unwrap().fields;
-    let (aggr_fields_pairs, nested_fields) = extractors::extract_nested_rel_aggr_selections(nested_fields);
-    let virtual_fields = utils::collect_virtual_fields(aggr_fields_pairs, &model)?;
-    let selection_order: Vec<String> = utils::collect_selection_order(&nested_fields);
-    let selected_fields = utils::collect_selected_fields(&nested_fields, args.distinct.clone(), &model, query_schema)?;
+    // let (aggr_fields_pairs, nested_fields) = extractors::extract_nested_rel_aggr_selections(nested_fields);
+    // let virtual_fields = utils::collect_virtual_fields(aggr_fields_pairs, &model)?;
+    // let selection_order: Vec<String> = utils::collect_selection_order(&nested_fields);
+    let (user_selection, full_selection) =
+        utils::collect_selected_fields(&nested_fields, args.distinct.clone(), &model, query_schema)?;
+
     let nested = utils::collect_nested_queries(nested_fields, &model, query_schema)?;
 
-    let selected_fields = utils::merge_relation_selections(selected_fields, None, &nested);
-    let selected_fields = utils::merge_cursor_fields(selected_fields, &args.cursor);
-    let selected_fields = selected_fields.clone().merge(virtual_fields);
+    let full_selection = utils::merge_relation_selections(full_selection, None, &nested);
+    let full_selection = utils::merge_cursor_fields(full_selection, &args.cursor);
+    // let selected_fields = selected_fields.clone().merge(virtual_fields);
 
     let relation_load_strategy = get_relation_load_strategy(
         args.relation_load_strategy,
@@ -46,7 +48,7 @@ fn find_many_with_options(
         args.distinct.as_ref(),
         &nested,
         // &aggregation_selections,
-        &selected_fields,
+        &user_selection,
         query_schema,
     );
 
@@ -55,10 +57,10 @@ fn find_many_with_options(
         alias,
         model,
         args,
-        user_selection: selected_fields.clone(),
-        full_selection: selected_fields,
+        user_selection,
+        full_selection,
         nested,
-        selection_order,
+        // selection_order,
         // aggregation_selections,
         options,
         relation_load_strategy,

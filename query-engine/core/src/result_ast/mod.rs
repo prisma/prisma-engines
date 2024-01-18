@@ -1,5 +1,5 @@
 use connector::AggregationRow;
-use query_structure::{ManyRecords, Model, SelectionResult};
+use query_structure::{ManyRecords, Model, SelectionResult, SelectedField};
 
 #[derive(Debug, Clone)]
 pub(crate) enum QueryResult {
@@ -18,7 +18,7 @@ pub struct RecordSelectionWithRelations {
     pub(crate) name: String,
 
     /// Holds an ordered list of selected field names for each contained record.
-    pub(crate) fields: Vec<String>,
+    pub(crate) fields: Vec<SelectedField>,
 
     /// Selection results
     pub(crate) records: ManyRecords,
@@ -53,7 +53,7 @@ pub struct RecordSelection {
     pub(crate) name: String,
 
     /// Holds an ordered list of selected field names for each contained record.
-    pub(crate) fields: Vec<String>,
+    pub(crate) fields: Vec<SelectedField>,
 
     /// Scalar field results
     pub(crate) scalars: ManyRecords,

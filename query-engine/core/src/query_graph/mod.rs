@@ -793,10 +793,8 @@ impl QueryGraph {
                 model: model.clone(),
                 args: QueryArguments::new(model),
                 full_selection: identifiers.merge(primary_model_id.clone()),
-                user_selection: identifiers.merge(primary_model_id.clone()),
+                user_selection: vec![].into(),
                 nested: vec![],
-                selection_order: vec![],
-                // aggregation_selections: vec![],
                 options: QueryOptions::none(),
                 relation_load_strategy: query_structure::RelationLoadStrategy::Query,
             });
