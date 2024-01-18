@@ -1,6 +1,6 @@
 use query_engine_tests::*;
 
-#[test_suite(capabilities(JsonFiltering), exclude(MySql(5.6)))]
+#[test_suite(capabilities(JsonFiltering), exclude(Mysql56))]
 mod json_filter {
     use query_engine_tests::run_query;
 
