@@ -28,7 +28,7 @@ mod basic_types {
         schema.to_owned()
     }
 
-    #[connector_test(exclude(Postgres("pg.js.wasm", "neon.js.wasm")))]
+    #[connector_test]
     async fn set_base(runner: Runner) -> TestResult<()> {
         insta::assert_snapshot!(
           run_query!(&runner, format!(r#"mutation {{
@@ -59,7 +59,7 @@ mod basic_types {
 
     // "Scalar lists" should "be behave like regular values for create and update operations"
     // Skipped for CockroachDB as enum array concatenation is not supported (https://github.com/cockroachdb/cockroach/issues/71388).
-    #[connector_test(exclude(CockroachDb, Postgres("pg.js.wasm", "neon.js.wasm")))]
+    #[connector_test(exclude(CockroachDb))]
     async fn behave_like_regular_val_for_create_and_update(runner: Runner) -> TestResult<()> {
         insta::assert_snapshot!(
           run_query!(&runner, format!(r#"mutation {{
@@ -158,7 +158,7 @@ mod basic_types {
     }
 
     // "A Create Mutation" should "create and return items with list values with shorthand notation"
-    #[connector_test(exclude(Postgres("pg.js.wasm", "neon.js.wasm")))]
+    #[connector_test]
     async fn create_mut_work_with_list_vals(runner: Runner) -> TestResult<()> {
         insta::assert_snapshot!(
           run_query!(&runner, format!(r#"mutation {{

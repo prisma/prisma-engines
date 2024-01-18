@@ -1,14 +1,6 @@
 use query_engine_tests::*;
 
-#[test_suite(
-    schema(common_nullable_types),
-    exclude(
-        Postgres("pg.js.wasm"),
-        Postgres("neon.js.wasm"),
-        Sqlite("libsql.js.wasm"),
-        Vitess("planetscale.js.wasm")
-    )
-)]
+#[test_suite(schema(common_nullable_types))]
 mod bytes {
     use query_engine_tests::{run_query, EngineProtocol, Runner};
 
