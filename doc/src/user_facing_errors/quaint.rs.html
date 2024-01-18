@@ -263,6 +263,12 @@
 <a href="#263" id="263">263</a>
 <a href="#264" id="264">264</a>
 <a href="#265" id="265">265</a>
+<a href="#266" id="266">266</a>
+<a href="#267" id="267">267</a>
+<a href="#268" id="268">268</a>
+<a href="#269" id="269">269</a>
+<a href="#270" id="270">270</a>
+<a href="#271" id="271">271</a>
 </pre></div><pre class="rust"><code><span class="kw">use crate</span>::{common, query_engine, KnownError};
 <span class="kw">use </span>indoc::formatdoc;
 <span class="kw">use </span>quaint::{error::ErrorKind, prelude::ConnectionInfo};
@@ -489,6 +495,12 @@
                 }))
             }
             (NativeErrorKind::ConnectionError(<span class="kw">_</span>), ConnectionInfo::Native(NativeConnectionInfo::Mysql(url))) =&gt; {
+                <span class="prelude-val">Some</span>(KnownError::new(common::DatabaseNotReachable {
+                    database_port: url.port(),
+                    database_host: url.host().to_owned(),
+                }))
+            }
+            (NativeErrorKind::ConnectionError(<span class="kw">_</span>), ConnectionInfo::Native(NativeConnectionInfo::Mssql(url))) =&gt; {
                 <span class="prelude-val">Some</span>(KnownError::new(common::DatabaseNotReachable {
                     database_port: url.port(),
                     database_host: url.host().to_owned(),
