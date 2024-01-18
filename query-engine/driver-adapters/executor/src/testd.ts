@@ -298,7 +298,7 @@ async function planetscaleAdapter(url: string): Promise<DriverAdapter> {
         url: copyPathName(url, proxyUrl),
         fetch,
 
-        // TODO: remove once https://github.com/planetscale/database-js/pull/159 is merged.
+        // TODO: remove once https://github.com/planetscale/database-js/pull/159 is published upstream.
         format: formatPlanetScaleQuery,
     })
 

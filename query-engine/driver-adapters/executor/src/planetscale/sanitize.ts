@@ -1,5 +1,5 @@
 // This is a temporary workaround for `bigint` serialization issues in the Planetscale driver,
-// which will be fixed upstream once https://github.com/planetscale/database-js/pull/159 is merged.
+// which will be fixed upstream once https://github.com/planetscale/database-js/pull/159 is published.
 // This only impacts Rust tests concerning `driver-adapters`.
 
 type Stringable = { toString: () => string }

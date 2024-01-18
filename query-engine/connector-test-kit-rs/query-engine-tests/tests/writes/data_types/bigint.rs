@@ -17,8 +17,7 @@ mod bigint {
     }
 
     // "Using a BigInt field" should "work"
-    // TODO: https://github.com/prisma/team-orm/issues/836
-    #[connector_test(exclude(Vitess("planetscale.js.wasm")))]
+    #[connector_test()]
     async fn using_bigint_field(runner: Runner) -> TestResult<()> {
         insta::assert_snapshot!(
           run_query!(&runner, r#"mutation {
