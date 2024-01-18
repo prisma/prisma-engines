@@ -276,6 +276,16 @@ impl ConnectorVersion {
             | (_, Postgres(..)) => false,
         }
     }
+
+    /// Returns `true` if the connector version is [`MySql`].
+    pub fn is_mysql(&self) -> bool {
+        matches!(self, Self::MySql(..))
+    }
+
+    /// Returns `true` if the connector version is [`Vitess`].
+    pub fn is_vitess(&self) -> bool {
+        matches!(self, Self::Vitess(..))
+    }
 }
 
 impl fmt::Display for ConnectorVersion {

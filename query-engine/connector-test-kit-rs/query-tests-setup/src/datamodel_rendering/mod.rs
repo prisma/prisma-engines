@@ -4,11 +4,13 @@ mod sql_renderer;
 pub use mongodb_renderer::*;
 pub use sql_renderer::*;
 
-use crate::{connection_string, templating, DatamodelFragment, IdFragment, M2mFragment, CONFIG};
+use crate::{
+    connection_string, templating, ConnectorVersion, DatamodelFragment, IdFragment, M2mFragment, MySqlVersion, CONFIG,
+};
 use indoc::indoc;
 use itertools::Itertools;
 use once_cell::sync::Lazy;
-use psl::ALL_PREVIEW_FEATURES;
+use psl::{PreviewFeature, ALL_PREVIEW_FEATURES};
 use regex::Regex;
 
 /// Test configuration, loaded once at runtime.
@@ -37,7 +39,7 @@ pub fn render_test_datamodel(
     isolation_level: Option<&'static str>,
 ) -> String {
     let (tag, version) = CONFIG.test_connector().unwrap();
-    let preview_features = render_preview_features(excluded_features);
+    let preview_features = render_preview_features(excluded_features, &version);
 
     let is_multi_schema = !db_schemas.is_empty();
 
@@ -89,8 +91,15 @@ fn process_template(template: String, renderer: Box<dyn DatamodelRenderer>) -> S
     })
 }
 
-fn render_preview_features(excluded_features: &[&str]) -> String {
-    let excluded_features: Vec<_> = excluded_features.iter().map(|f| format!(r#""{f}""#)).collect();
+fn render_preview_features(excluded_features: &[&str], version: &ConnectorVersion) -> String {
+    let mut excluded_features: Vec<_> = excluded_features.iter().map(|f| format!(r#""{f}""#)).collect();
+
+    // TODO: Remove this once we are able to have version speficic preview features.
+    if version.is_vitess()
+        || (version.is_mysql() && !matches!(version, ConnectorVersion::MySql(Some(MySqlVersion::V8))))
+    {
+        excluded_features.push(format!(r#""{}""#, PreviewFeature::RelationJoins));
+    }
 
     ALL_PREVIEW_FEATURES
         .active_features()
