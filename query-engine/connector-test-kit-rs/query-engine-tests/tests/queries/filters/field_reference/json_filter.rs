@@ -17,6 +17,36 @@ mod json_filter {
         schema.to_owned()
     }
 
+    // Note: testing the absence of "JSON-null stripping" in Napi.rs Driver Adapters requires patching napi.rs.
+    // Please see: https://github.com/prisma/team-orm/issues/683#issuecomment-1898305228.
+    #[connector_test(
+        schema(schema),
+        exclude(
+            Postgres("pg.js"),
+            Postgres("neon.js"),
+            Sqlite("libsql.js"),
+            Vitess("planetscale.js")
+        )
+    )]
+    async fn does_not_strip_nulls_in_json(runner: Runner) -> TestResult<()> {
+        run_query!(
+            &runner,
+            r#"mutation { createOneTestModel(data: { id: 1, json: "{\"a\":null}"}) { id } }"#
+        );
+
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"{
+          findManyTestModel {
+              id
+              json
+          }
+        }"#),
+          @r###"{"data":{"findManyTestModel":[{"id":1,"json":"{\"a\":null}"}]}}"###
+        );
+
+        Ok(())
+    }
+
     #[connector_test(schema(schema))]
     async fn basic_where(runner: Runner) -> TestResult<()> {
         test_data(&runner).await?;
