@@ -484,7 +484,7 @@ fn serialize_objects(
 
     let fields: Vec<_> = db_field_names
         .iter()
-        .filter_map(|f| model.fields().find_from_non_virtual_by_db_name(f).ok())
+        .map(|f| (f, model.fields().find_from_non_virtual_by_db_name(f).ok()))
         .collect();
 
     let virtual_field_names: HashSet<_> = result.virtual_fields.iter().map(|f| f.db_alias()).collect();
@@ -503,8 +503,9 @@ fn serialize_objects(
         let mut object = HashMap::with_capacity(values.len());
 
         for (val, field) in values.into_iter().zip(fields.iter()) {
-            match result.virtual_fields.iter().find(|f| f.db_alias() == field.name()) {
-                None => {
+            // match result.virtual_fields.iter().find(|f| f.db_alias() == field.name()) {
+            match field {
+                (_, Some(field)) => {
                     let out_field = typ
                         .find_field(field.name())
                         .expect("Non-virtual field must be defined in the type");
@@ -516,7 +517,13 @@ fn serialize_objects(
                     }
                 }
 
-                Some(vs) => {
+                (field_name, None) => {
+                    let vs = result
+                        .virtual_fields
+                        .iter()
+                        .find(|f| f.db_alias() == **field_name)
+                        .expect("Couldn't find virtual field by name");
+
                     let (virtual_obj_name, nested_field_name) = vs.serialized_name();
 
                     let virtual_obj = object
