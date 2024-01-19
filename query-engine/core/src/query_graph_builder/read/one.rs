@@ -64,7 +64,7 @@ fn find_unique_with_options(
         alias,
         model,
         filter,
-        full_selection: selected_fields,
+        selected_fields,
         nested,
         selection_order,
         options,

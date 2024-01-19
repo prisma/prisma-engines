@@ -27,14 +27,14 @@ pub(crate) async fn m2m(
     };
 
     if parent_ids.is_empty() {
-        return Ok(ManyRecords::empty(&query.full_selection));
+        return Ok(ManyRecords::empty(&query.selected_fields));
     }
 
     let ids = tx
         .get_related_m2m_record_ids(&query.parent_field, &parent_ids, trace_id.clone())
         .await?;
     if ids.is_empty() {
-        return Ok(ManyRecords::empty(&query.full_selection));
+        return Ok(ManyRecords::empty(&query.selected_fields));
     }
 
     let child_model_id = query.parent_field.related_model().primary_identifier();
@@ -52,10 +52,10 @@ pub(crate) async fn m2m(
     // - there is no virtual fields selection (relation aggregation)
     // - the selection set is the child_link_id
     let mut scalars = if query.args.do_nothing()
-        && !query.full_selection.has_virtual_fields()
-        && child_link_id == query.full_selection
+        && !query.selected_fields.has_virtual_fields()
+        && child_link_id == query.selected_fields
     {
-        ManyRecords::from((child_ids, &query.full_selection)).with_unique_records()
+        ManyRecords::from((child_ids, &query.selected_fields)).with_unique_records()
     } else {
         let mut args = query.args.clone();
         let filter = child_link_id.is_in(ConditionListValue::list(child_ids));
@@ -68,7 +68,7 @@ pub(crate) async fn m2m(
         tx.get_many_records(
             &query.parent_field.related_model(),
             args,
-            &query.full_selection,
+            &query.selected_fields,
             RelationLoadStrategy::Query,
             trace_id.clone(),
         )

@@ -39,7 +39,7 @@ where
         alias: None,
         model: model.clone(),
         args: (model, filter).into(),
-        full_selection: selected_fields,
+        selected_fields,
         nested: vec![],
         selection_order: vec![],
         options: QueryOptions::none(),
@@ -111,7 +111,7 @@ where
         parent_field: parent_relation_field.clone(),
         parent_results: None,
         args: (child_model, filter).into(),
-        full_selection: selected_fields,
+        selected_fields,
         nested: vec![],
         selection_order: vec![],
     })));
