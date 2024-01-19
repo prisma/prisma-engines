@@ -54,6 +54,15 @@ impl FieldSelection {
         self.virtuals().cloned().collect()
     }
 
+    pub fn without_relations(&self) -> Self {
+        FieldSelection::new(
+            self.selections()
+                .filter(|field| !matches!(field, SelectedField::Relation(_)))
+                .cloned()
+                .collect(),
+        )
+    }
+
     /// Returns all Prisma (e.g. schema model field) names of contained fields.
     /// Does _not_ recurse into composite selections and only iterates top level fields.
     pub fn prisma_names(&self) -> impl Iterator<Item = String> + '_ {
