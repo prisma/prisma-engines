@@ -509,16 +509,10 @@ fn serialize_objects(
                         .find_field(field.name())
                         .expect("Non-virtual field must be defined in the type");
 
-                    match field {
-                        Field::Composite(cf) => {
-                            object.insert(field.name().to_owned(), serialize_composite(cf, out_field, val)?);
-                        }
-
-                        _ if !out_field.field_type().is_object() => {
-                            object.insert(field.name().to_owned(), serialize_scalar(out_field, val)?);
-                        }
-
-                        _ => (),
+                    if let Field::Composite(cf) = field {
+                        object.insert(field.name().to_owned(), serialize_composite(cf, out_field, val)?);
+                    } else if !out_field.field_type().is_object() {
+                        object.insert(field.name().to_owned(), serialize_scalar(out_field, val)?);
                     }
                 }
 
