@@ -127,7 +127,6 @@ impl SelectDefinition for QueryArguments {
 pub(crate) fn get_records<T>(
     model: &Model,
     columns: impl Iterator<Item = Column<'static>>,
-    // aggr_selections: &[RelAggregationSelection],
     virtual_selections: &[&VirtualSelection],
     query: T,
     ctx: &Context<'_>,

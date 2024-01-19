@@ -50,6 +50,10 @@ impl FieldSelection {
         })
     }
 
+    pub fn virtuals_owned(&self) -> Vec<VirtualSelection> {
+        self.virtuals().cloned().collect()
+    }
+
     /// Returns all Prisma (e.g. schema model field) names of contained fields.
     /// Does _not_ recurse into composite selections and only iterates top level fields.
     pub fn prisma_names(&self) -> impl Iterator<Item = String> + '_ {

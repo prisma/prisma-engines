@@ -25,7 +25,7 @@ impl ReadQuery {
     fn returns(&self) -> Option<&FieldSelection> {
         match self {
             ReadQuery::RecordQuery(x) => Some(&x.full_selection),
-            ReadQuery::ManyRecordsQuery(x) => Some(&x.full_selection), // TODO
+            ReadQuery::ManyRecordsQuery(x) => Some(&x.full_selection),
             ReadQuery::RelatedRecordsQuery(x) => Some(&x.full_selection),
             ReadQuery::AggregateRecordsQuery(_x) => None,
         }
@@ -198,11 +198,10 @@ pub struct RecordQuery {
     pub alias: Option<String>,
     pub model: Model,
     pub filter: Option<Filter>,
-    pub user_selection: FieldSelection,
+    // TODO: split into `user_selection` and `full_selection` and get rid of `selection_order`
     pub full_selection: FieldSelection,
     pub(crate) nested: Vec<ReadQuery>,
-    // pub selection_order: Vec<String>,
-    // pub aggregation_selections: Vec<RelAggregationSelection>,
+    pub selection_order: Vec<String>,
     pub options: QueryOptions,
     pub relation_load_strategy: RelationLoadStrategy,
 }
@@ -213,11 +212,10 @@ pub struct ManyRecordsQuery {
     pub alias: Option<String>,
     pub model: Model,
     pub args: QueryArguments,
-    pub user_selection: FieldSelection,
+    // TODO: split into `user_selection` and `full_selection` and get rid of `selection_order`
     pub full_selection: FieldSelection,
     pub(crate) nested: Vec<ReadQuery>,
-    // pub selection_order: Vec<String>, // TODO: get rid of it as well
-    // pub aggregation_selections: Vec<RelAggregationSelection>,
+    pub selection_order: Vec<String>,
     pub options: QueryOptions,
     pub relation_load_strategy: RelationLoadStrategy,
 }
@@ -228,11 +226,10 @@ pub struct RelatedRecordsQuery {
     pub alias: Option<String>,
     pub parent_field: RelationFieldRef,
     pub args: QueryArguments,
-    pub user_selection: FieldSelection,
+    // TODO: split into `user_selection` and `full_selection` and get rid of `selection_order`
     pub full_selection: FieldSelection,
     pub nested: Vec<ReadQuery>,
-    // pub selection_order: Vec<String>,
-    // pub aggregation_selections: Vec<RelAggregationSelection>,
+    pub selection_order: Vec<String>,
     /// Fields and values of the parent to satisfy the relation query without
     /// relying on the parent result passed by the interpreter.
     pub parent_results: Option<Vec<SelectionResult>>,

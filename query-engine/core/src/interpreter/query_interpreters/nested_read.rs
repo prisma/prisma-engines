@@ -265,7 +265,6 @@ pub async fn one2m(
     } else {
         scalars
     };
-    // let (scalars, aggregation_rows) = read::extract_aggregation_rows_from_scalars(scalars, aggr_selections);
 
     Ok(scalars)
 }
