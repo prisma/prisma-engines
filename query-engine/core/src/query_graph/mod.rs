@@ -792,7 +792,7 @@ impl QueryGraph {
                 alias: None,
                 model: model.clone(),
                 args: QueryArguments::new(model),
-                full_selection: identifiers.merge(primary_model_id.clone()),
+                selected_fields: identifiers.merge(primary_model_id.clone()),
                 nested: vec![],
                 selection_order: vec![],
                 options: QueryOptions::none(),
