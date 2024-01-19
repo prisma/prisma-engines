@@ -5,7 +5,7 @@ use crate::{
     result_ast::{RecordSelectionWithRelations, RelationRecordSelection},
     CoreError, QueryResult, RecordAggregations, RecordSelection,
 };
-use connector::{AggregationResult, RelAggregationResult, RelAggregationRow};
+use connector::AggregationResult;
 use indexmap::IndexMap;
 use query_structure::{CompositeFieldRef, Field, PrismaValue, SelectionResult};
 use schema::{
@@ -174,23 +174,23 @@ fn serialize_aggregations(
     Ok(envelope)
 }
 
-fn write_rel_aggregation_row(row: &RelAggregationRow, map: &mut HashMap<String, Item>) {
-    for result in row.iter() {
-        match result {
-            RelAggregationResult::Count(rf, count) => match map.get_mut(UNDERSCORE_COUNT) {
-                Some(item) => match item {
-                    Item::Map(inner_map) => inner_map.insert(rf.name().to_owned(), Item::Value(count.clone())),
-                    _ => unreachable!(),
-                },
-                None => {
-                    let mut inner_map: Map = Map::new();
-                    inner_map.insert(rf.name().to_owned(), Item::Value(count.clone()));
-                    map.insert(UNDERSCORE_COUNT.to_owned(), Item::Map(inner_map))
-                }
-            },
-        };
-    }
-}
+// fn write_rel_aggregation_row(row: &RelAggregationRow, map: &mut HashMap<String, Item>) {
+//     for result in row.iter() {
+//         match result {
+//             RelAggregationResult::Count(rf, count) => match map.get_mut(UNDERSCORE_COUNT) {
+//                 Some(item) => match item {
+//                     Item::Map(inner_map) => inner_map.insert(rf.name().to_owned(), Item::Value(count.clone())),
+//                     _ => unreachable!(),
+//                 },
+//                 None => {
+//                     let mut inner_map: Map = Map::new();
+//                     inner_map.insert(rf.name().to_owned(), Item::Value(count.clone()));
+//                     map.insert(UNDERSCORE_COUNT.to_owned(), Item::Map(inner_map))
+//                 }
+//             },
+//         };
+//     }
+// }
 
 fn extract_aggregate_object_type<'a, 'b>(output_type: &'b OutputType<'a>) -> &'b ObjectType<'a> {
     match &output_type.inner {
