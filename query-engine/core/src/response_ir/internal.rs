@@ -391,7 +391,7 @@ fn serialize_objects_with_relation(
             }
         }
 
-        let map = reorder_object_with_selection_order(result.fields.clone(), object);
+        let map = reorder_object_with_selection_order(&result.fields, object);
 
         let result = Item::Map(map);
 
@@ -487,6 +487,8 @@ fn serialize_objects(
         .filter_map(|f| model.fields().find_from_non_virtual_by_db_name(f).ok())
         .collect();
 
+    let virtual_field_names: HashSet<_> = result.virtual_fields.iter().map(|f| f.db_alias()).collect();
+
     // Write all fields, nested and list fields unordered into a map, afterwards order all into the final order.
     // If nothing is written to the object, write null instead.
     for (r_index, record) in result.scalars.records.into_iter().enumerate() {
@@ -501,44 +503,62 @@ fn serialize_objects(
         let mut object = HashMap::with_capacity(values.len());
 
         for (val, field) in values.into_iter().zip(fields.iter()) {
-            let out_field = typ.find_field(field.name()).unwrap();
+            match result.virtual_fields.iter().find(|f| f.db_alias() == field.name()) {
+                None => {
+                    let out_field = typ
+                        .find_field(field.name())
+                        .expect("Non-virtual field must be defined in the type");
 
-            match field {
-                Field::Composite(cf) => {
-                    object.insert(field.name().to_owned(), serialize_composite(cf, out_field, val)?);
+                    match field {
+                        Field::Composite(cf) => {
+                            object.insert(field.name().to_owned(), serialize_composite(cf, out_field, val)?);
+                        }
+
+                        _ if !out_field.field_type().is_object() => {
+                            object.insert(field.name().to_owned(), serialize_scalar(out_field, val)?);
+                        }
+
+                        _ => (),
+                    }
                 }
 
-                _ if !out_field.field_type().is_object() => {
-                    object.insert(field.name().to_owned(), serialize_scalar(out_field, val)?);
-                }
+                Some(vs) => {
+                    let (virtual_obj_name, nested_field_name) = vs.serialized_name();
 
-                _ => (),
+                    let virtual_obj = object
+                        .entry(virtual_obj_name.into())
+                        .or_insert(Item::Map(Map::new()))
+                        .as_map_mut()
+                        .expect("Virtual and scalar fields must not collide");
+
+                    virtual_obj.insert(nested_field_name.into(), Item::Value(vs.coerce_value(val)?));
+                }
             }
         }
 
         // Write nested results
         write_nested_items(&record_id, &mut nested_mapping, &mut object, typ)?;
 
-        let aggr_row = result.aggregation_rows.as_ref().map(|rows| rows.get(r_index).unwrap());
-        if let Some(aggr_row) = aggr_row {
-            write_rel_aggregation_row(aggr_row, &mut object);
-        }
+        // let aggr_row = result.aggregation_rows.as_ref().map(|rows| rows.get(r_index).unwrap());
+        // if let Some(aggr_row) = aggr_row {
+        //     write_rel_aggregation_row(aggr_row, &mut object);
+        // }
 
-        let mut aggr_fields = aggr_row
-            .map(|row| {
-                row.iter()
-                    .map(|aggr_result| match aggr_result {
-                        RelAggregationResult::Count(_, _) => UNDERSCORE_COUNT.to_owned(),
-                    })
-                    .unique()
-                    .collect()
-            })
-            .unwrap_or_default();
+        // let mut aggr_fields = aggr_row
+        //     .map(|row| {
+        //         row.iter()
+        //             .map(|aggr_result| match aggr_result {
+        //                 RelAggregationResult::Count(_, _) => UNDERSCORE_COUNT.to_owned(),
+        //             })
+        //             .unique()
+        //             .collect()
+        //     })
+        //     .unwrap_or_default();
 
-        let mut all_fields = result.fields.clone();
-        all_fields.append(&mut aggr_fields);
+        // let mut all_fields = result.fields.clone();
+        // all_fields.append(&mut aggr_fields);
 
-        let map = reorder_object_with_selection_order(all_fields, object);
+        let map = reorder_object_with_selection_order(&result.fields, object);
 
         object_mapping.get_mut(&record.parent_id).unwrap().push(Item::Map(map));
     }
@@ -547,7 +567,7 @@ fn serialize_objects(
 }
 
 fn reorder_object_with_selection_order(
-    selection_order: Vec<String>,
+    selection_order: &[String],
     mut object: HashMap<String, Item>,
 ) -> IndexMap<String, Item> {
     selection_order

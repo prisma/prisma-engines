@@ -245,6 +245,14 @@ impl VirtualSelection {
         }
     }
 
+    pub fn serialized_name(&self) -> (&'static str, &str) {
+        match self {
+            // TODO: we can't use UNDERSCORE_COUNT here because it would require a cyclic
+            // dependency between `schema` and `query-structure` crates.
+            Self::RelationCount(rf, _) => ("_count", rf.name()),
+        }
+    }
+
     pub fn model(&self) -> Model {
         match self {
             Self::RelationCount(rf, _) => rf.model(),
