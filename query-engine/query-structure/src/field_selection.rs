@@ -63,6 +63,14 @@ impl FieldSelection {
         )
     }
 
+    pub fn into_virtuals_last(self) -> Self {
+        let (virtuals, non_virtuals): (Vec<_>, Vec<_>) = self
+            .into_iter()
+            .partition(|field| matches!(field, SelectedField::Virtual(_)));
+
+        FieldSelection::new(non_virtuals.into_iter().chain(virtuals).collect())
+    }
+
     /// Returns all Prisma (e.g. schema model field) names of contained fields.
     /// Does _not_ recurse into composite selections and only iterates top level fields.
     pub fn prisma_names(&self) -> impl Iterator<Item = String> + '_ {
