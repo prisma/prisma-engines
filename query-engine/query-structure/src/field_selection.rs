@@ -372,7 +372,7 @@ impl CompositeSelection {
                     .map(|cs| cs.is_superset_of(other_cs))
                     .unwrap_or(false),
                 SelectedField::Relation(_) => true, // A composite selection cannot hold relations.
-                SelectedField::Virtual(_) => true,  // TODO
+                SelectedField::Virtual(vs) => self.contains(&vs.db_alias()),
             })
     }
 
