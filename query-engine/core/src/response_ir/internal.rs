@@ -466,7 +466,7 @@ fn serialize_objects(
 
     let model_fields: Vec<_> = db_field_names
         .iter()
-        .map(|field_name| model.fields().find_from_non_virtual_by_db_name(field_name).ok())
+        .map(|f| model.fields().find_from_non_virtual_by_db_name(f).ok())
         .collect();
 
     // Write all fields, nested and list fields unordered into a map, afterwards order all into the final order.
