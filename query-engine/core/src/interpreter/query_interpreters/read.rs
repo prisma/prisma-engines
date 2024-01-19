@@ -46,17 +46,15 @@ fn read_one(
         match scalars {
             Some(record) if query.relation_load_strategy.is_query() => {
                 let scalars: ManyRecords = record.into();
-                // let (scalars, aggregation_rows) =
-                //     extract_aggregation_rows_from_scalars(scalars, query.aggregation_selections);
                 let nested: Vec<QueryResult> = process_nested(tx, query.nested, Some(&scalars)).await?;
 
                 Ok(RecordSelection {
                     name: query.name,
-                    fields: query.user_selection.into_inner(),
+                    fields: query.selection_order,
                     scalars,
                     nested,
                     model,
-                    // aggregation_rows,
+                    virtual_fields: query.full_selection.virtuals_owned(),
                 }
                 .into())
             }
@@ -66,7 +64,7 @@ fn read_one(
                 Ok(RecordSelectionWithRelations {
                     name: query.name,
                     model,
-                    fields: query.user_selection.into_inner(),
+                    fields: query.selection_order,
                     records,
                     nested: build_relation_record_selection(query.full_selection.relations()),
                 }
@@ -77,11 +75,11 @@ fn read_one(
 
             None => Ok(QueryResult::RecordSelection(Some(Box::new(RecordSelection {
                 name: query.name,
-                fields: query.user_selection.into_inner(),
+                fields: query.selection_order,
                 scalars: ManyRecords::default(),
                 nested: vec![],
                 model,
-                // aggregation_rows: None,
+                virtual_fields: query.full_selection.virtuals_owned(),
             })))),
         }
     };
@@ -143,11 +141,11 @@ fn read_many_by_queries(
             let nested: Vec<QueryResult> = process_nested(tx, query.nested, Some(&scalars)).await?;
             Ok(RecordSelection {
                 name: query.name,
-                fields: query.user_selection.into_inner(),
+                fields: query.selection_order,
                 scalars,
                 nested,
                 model: query.model,
-                // aggregation_rows,
+                virtual_fields: query.full_selection.virtuals_owned(),
             }
             .into())
         }
@@ -178,7 +176,7 @@ fn read_many_by_joins(
         } else {
             Ok(RecordSelectionWithRelations {
                 name: query.name,
-                fields: query.user_selection.into_inner(),
+                fields: query.selection_order,
                 records: result,
                 nested: build_relation_record_selection(query.full_selection.relations()),
                 model: query.model,
@@ -233,11 +231,11 @@ fn read_related<'conn>(
 
         Ok(RecordSelection {
             name: query.name,
-            fields: query.user_selection.into_inner(),
+            fields: query.selection_order,
             scalars,
             nested,
             model,
-            // aggregation_rows,
+            virtual_fields: query.full_selection.virtuals_owned(),
         }
         .into())
     };

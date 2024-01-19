@@ -45,21 +45,17 @@ fn find_unique_with_options(
     let name = field.name;
     let alias = field.alias;
     let nested_fields = field.nested_fields.unwrap().fields;
-    // let (aggr_fields_pairs, nested_fields) = extractors::extract_nested_rel_aggr_selections(nested_fields);
-    // let virtual_fields = utils::collect_virtual_fields(aggr_fields_pairs, &model)?;
-    // let selection_order = utils::collect_selection_order(&nested_fields);
-    let (user_selection, full_selection) = utils::collect_selected_fields(&nested_fields, None, &model, query_schema)?;
+    let selection_order = utils::collect_selection_order(&nested_fields);
+    let selected_fields = utils::collect_selected_fields(&nested_fields, None, &model, query_schema)?;
     let nested = utils::collect_nested_queries(nested_fields, &model, query_schema)?;
-    let full_selection = utils::merge_relation_selections(full_selection, None, &nested);
-    // let selected_fields = selected_fields.merge(virtual_fields);
+    let selected_fields = utils::merge_relation_selections(selected_fields, None, &nested);
 
     let relation_load_strategy = get_relation_load_strategy(
         requested_rel_load_strategy,
         None,
         None,
         &nested,
-        // &aggregation_selections,
-        &user_selection,
+        &selected_fields,
         query_schema,
     );
 
@@ -68,11 +64,9 @@ fn find_unique_with_options(
         alias,
         model,
         filter,
-        user_selection,
-        full_selection,
+        full_selection: selected_fields,
         nested,
-        // selection_order,
-        // aggregation_selections,
+        selection_order,
         options,
         relation_load_strategy,
     }))

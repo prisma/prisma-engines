@@ -40,8 +40,8 @@ where
         model: model.clone(),
         args: (model, filter).into(),
         full_selection: selected_fields,
-        user_selection: vec![].into(),
         nested: vec![],
+        selection_order: vec![],
         options: QueryOptions::none(),
         relation_load_strategy: query_structure::RelationLoadStrategy::Query,
     });
@@ -111,9 +111,9 @@ where
         parent_field: parent_relation_field.clone(),
         parent_results: None,
         args: (child_model, filter).into(),
-        user_selection: vec![].into(),
         full_selection: selected_fields,
         nested: vec![],
+        selection_order: vec![],
     })));
 
     graph.create_edge(

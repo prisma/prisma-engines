@@ -51,6 +51,7 @@ async fn create_one(
         model: q.model,
         scalars: res.into(),
         nested: vec![],
+        virtual_fields: vec![],
     }))))
 }
 
@@ -88,6 +89,7 @@ async fn update_one(
                     scalars: res.into(),
                     nested: vec![],
                     model: q.model,
+                    virtual_fields: vec![],
                 })
                 .map(Box::new);
 
@@ -116,6 +118,7 @@ async fn native_upsert(
         scalars: scalars.into(),
         nested: Vec::new(),
         model: query.model().clone(),
+        virtual_fields: vec![],
     }
     .into())
 }
@@ -144,7 +147,7 @@ async fn delete_one(
             scalars: record.into(),
             nested: vec![],
             model: q.model,
-            // aggregation_rows: None,
+            virtual_fields: vec![],
         };
 
         Ok(QueryResult::RecordSelection(Some(Box::new(selection))))
