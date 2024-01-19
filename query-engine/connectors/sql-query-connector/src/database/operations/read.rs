@@ -66,7 +66,7 @@ pub(crate) async fn get_single_record_wo_joins(
         ModelProjection::from(&selected_fields)
             .as_columns(ctx)
             .mark_all_selected(),
-        &selected_fields.virtuals().collect::<Vec<_>>(), // TODO: pass the iterator all the way down
+        selected_fields.virtuals(),
         filter,
         ctx,
     );
@@ -215,7 +215,7 @@ pub(crate) async fn get_many_records_wo_joins(
                     ModelProjection::from(&selected_fields)
                         .as_columns(ctx)
                         .mark_all_selected(),
-                    &selected_fields.virtuals().collect::<Vec<_>>(), // TODO: pass an iterator
+                    selected_fields.virtuals(),
                     args,
                     ctx,
                 );
@@ -239,7 +239,7 @@ pub(crate) async fn get_many_records_wo_joins(
                 ModelProjection::from(&selected_fields)
                     .as_columns(ctx)
                     .mark_all_selected(),
-                &selected_fields.virtuals().collect::<Vec<_>>(), // TODO: pass an iterator
+                selected_fields.virtuals(),
                 query_arguments,
                 ctx,
             );

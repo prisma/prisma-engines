@@ -9,19 +9,19 @@ use query_structure::*;
 use tracing::Span;
 
 pub(crate) trait SelectDefinition {
-    fn into_select(
+    fn into_select<'a>(
         self,
         _: &Model,
-        virtual_selections: &[&VirtualSelection],
+        virtual_selections: impl IntoIterator<Item = &'a VirtualSelection>,
         ctx: &Context<'_>,
     ) -> (Select<'static>, Vec<Expression<'static>>);
 }
 
 impl SelectDefinition for Filter {
-    fn into_select(
+    fn into_select<'a>(
         self,
         model: &Model,
-        virtual_selections: &[&VirtualSelection],
+        virtual_selections: impl IntoIterator<Item = &'a VirtualSelection>,
         ctx: &Context<'_>,
     ) -> (Select<'static>, Vec<Expression<'static>>) {
         let args = QueryArguments::from((model.clone(), self));
@@ -30,10 +30,10 @@ impl SelectDefinition for Filter {
 }
 
 impl SelectDefinition for &Filter {
-    fn into_select(
+    fn into_select<'a>(
         self,
         model: &Model,
-        virtual_selections: &[&VirtualSelection],
+        virtual_selections: impl IntoIterator<Item = &'a VirtualSelection>,
         ctx: &Context<'_>,
     ) -> (Select<'static>, Vec<Expression<'static>>) {
         self.clone().into_select(model, virtual_selections, ctx)
@@ -41,10 +41,10 @@ impl SelectDefinition for &Filter {
 }
 
 impl SelectDefinition for Select<'static> {
-    fn into_select(
+    fn into_select<'a>(
         self,
         _: &Model,
-        _: &[&VirtualSelection],
+        _: impl IntoIterator<Item = &'a VirtualSelection>,
         _ctx: &Context<'_>,
     ) -> (Select<'static>, Vec<Expression<'static>>) {
         (self, vec![])
@@ -52,10 +52,10 @@ impl SelectDefinition for Select<'static> {
 }
 
 impl SelectDefinition for QueryArguments {
-    fn into_select(
+    fn into_select<'a>(
         self,
         model: &Model,
-        virtual_selections: &[&VirtualSelection],
+        virtual_selections: impl IntoIterator<Item = &'a VirtualSelection>,
         ctx: &Context<'_>,
     ) -> (Select<'static>, Vec<Expression<'static>>) {
         let order_by_definitions = OrderByBuilder::default().build(&self, ctx);
@@ -124,10 +124,10 @@ impl SelectDefinition for QueryArguments {
     }
 }
 
-pub(crate) fn get_records<T>(
+pub(crate) fn get_records<'a, T>(
     model: &Model,
     columns: impl Iterator<Item = Column<'static>>,
-    virtual_selections: &[&VirtualSelection],
+    virtual_selections: impl IntoIterator<Item = &'a VirtualSelection>,
     query: T,
     ctx: &Context<'_>,
 ) -> Select<'static>
