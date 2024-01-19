@@ -4,7 +4,7 @@ use mongodb::{
     bson::{self, extjson},
     error::{CommandError, Error as DriverError, TRANSIENT_TRANSACTION_ERROR},
 };
-use query_structure::{CompositeFieldRef, Field, ScalarFieldRef, SelectedField};
+use query_structure::{CompositeFieldRef, Field, ScalarFieldRef, SelectedField, VirtualSelection};
 use regex::Regex;
 use thiserror::Error;
 use user_facing_errors::query_engine::DatabaseConstraint;
@@ -274,6 +274,7 @@ pub trait DecorateErrorWithFieldInformationExtension {
     fn decorate_with_scalar_field_info(self, sf: &ScalarFieldRef) -> Self;
     fn decorate_with_field_name(self, field_name: &str) -> Self;
     fn decorate_with_composite_field_info(self, cf: &CompositeFieldRef) -> Self;
+    fn decorate_with_virtual_field_info(self, vs: &VirtualSelection) -> Self;
 }
 
 impl<T> DecorateErrorWithFieldInformationExtension for crate::Result<T> {
@@ -286,7 +287,7 @@ impl<T> DecorateErrorWithFieldInformationExtension for crate::Result<T> {
             SelectedField::Scalar(sf) => self.decorate_with_scalar_field_info(sf),
             SelectedField::Composite(composite_sel) => self.decorate_with_composite_field_info(&composite_sel.field),
             SelectedField::Relation(_) => unreachable!(),
-            SelectedField::Virtual(_) => todo!(),
+            SelectedField::Virtual(vs) => self.decorate_with_virtual_field_info(vs),
         }
     }
 
@@ -300,5 +301,9 @@ impl<T> DecorateErrorWithFieldInformationExtension for crate::Result<T> {
 
     fn decorate_with_composite_field_info(self, cf: &CompositeFieldRef) -> Self {
         self.map_err(|err| err.decorate_with_field_name(cf.name()))
+    }
+
+    fn decorate_with_virtual_field_info(self, vs: &VirtualSelection) -> Self {
+        self.map_err(|err| err.decorate_with_field_name(&vs.db_alias()))
     }
 }
