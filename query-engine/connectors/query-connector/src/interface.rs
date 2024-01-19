@@ -176,51 +176,6 @@ pub enum AggregationResult {
     Max(ScalarFieldRef, PrismaValue),
 }
 
-////// Remove all of this:
-
-#[derive(Debug, Clone)]
-pub enum RelAggregationSelection {
-    // Always a count(*) for now
-    Count(RelationFieldRef, Option<Filter>),
-}
-
-pub type RelAggregationRow = Vec<RelAggregationResult>;
-
-#[derive(Debug, Clone)]
-pub enum RelAggregationResult {
-    Count(RelationFieldRef, PrismaValue),
-}
-
-impl RelAggregationSelection {
-    pub fn db_alias(&self) -> String {
-        match self {
-            RelAggregationSelection::Count(rf, _) => {
-                format!("_aggr_count_{}", rf.name())
-            }
-        }
-    }
-
-    pub fn field_name(&self) -> &str {
-        match self {
-            RelAggregationSelection::Count(rf, _) => rf.name(),
-        }
-    }
-
-    pub fn type_identifier_with_arity(&self) -> (TypeIdentifier, FieldArity) {
-        match self {
-            RelAggregationSelection::Count(_, _) => (TypeIdentifier::Int, FieldArity::Required),
-        }
-    }
-
-    pub fn into_result(self, val: PrismaValue) -> RelAggregationResult {
-        match self {
-            RelAggregationSelection::Count(rf, _) => RelAggregationResult::Count(rf, coerce_null_to_zero_value(val)),
-        }
-    }
-}
-
-//////////
-
 #[async_trait]
 pub trait ReadOperations {
     /// Gets a single record or `None` back from the database.
