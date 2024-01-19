@@ -120,7 +120,6 @@ fn read_many_by_queries(
                 &query.model,
                 query.args.clone(),
                 &query.selected_fields,
-                // &query.aggregation_selections,
                 query.relation_load_strategy,
                 trace_id,
             )
@@ -131,8 +130,6 @@ fn read_many_by_queries(
         } else {
             scalars
         };
-
-        // let (scalars, aggregation_rows) = extract_aggregation_rows_from_scalars(scalars, query.aggregation_selections);
 
         if scalars.records.is_empty() && query.options.contains(QueryOption::ThrowOnEmpty) {
             record_not_found()
@@ -164,7 +161,6 @@ fn read_many_by_joins(
                 &query.model,
                 query.args.clone(),
                 &query.selected_fields,
-                // &query.aggregation_selections,
                 query.relation_load_strategy,
                 trace_id,
             )
@@ -220,7 +216,6 @@ fn read_related<'conn>(
                 parent_result,
                 query.args.clone(),
                 &query.selected_fields,
-                // query.aggregation_selections,
                 trace_id,
             )
             .await?
