@@ -8,6 +8,7 @@ use crate::{
     ENGINE_PROTOCOL,
 };
 use colored::Colorize;
+use quaint::connector::SqlFamily;
 use query_core::{
     protocol::EngineProtocol,
     schema::{self, QuerySchemaRef},
@@ -105,6 +106,10 @@ impl Runner {
 
     pub fn prisma_dml(&self) -> &str {
         self.query_schema.internal_data_model.schema.db.source()
+    }
+
+    pub fn sql_family(&self) -> Option<SqlFamily> {
+        self.version.sql_family()
     }
 
     pub async fn load(

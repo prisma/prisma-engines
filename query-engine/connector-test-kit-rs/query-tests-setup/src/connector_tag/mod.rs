@@ -20,6 +20,7 @@ pub(crate) use vitess::*;
 
 use crate::{datamodel_rendering::DatamodelRenderer, BoxFuture, TestConfig, TestError, CONFIG};
 use psl::datamodel_connector::ConnectorCapabilities;
+use quaint::prelude::SqlFamily;
 use std::{convert::TryFrom, fmt};
 
 pub trait ConnectorTagInterface {
@@ -274,6 +275,18 @@ impl ConnectorVersion {
             | (_, Vitess(..))
             | (Postgres(..), _)
             | (_, Postgres(..)) => false,
+        }
+    }
+
+    pub(crate) fn sql_family(&self) -> Option<SqlFamily> {
+        match self {
+            Self::SqlServer(_) => Some(SqlFamily::Mssql),
+            Self::Postgres(_) => Some(SqlFamily::Postgres),
+            Self::MySql(_) => Some(SqlFamily::Mysql),
+            Self::Sqlite(_) => Some(SqlFamily::Sqlite),
+            Self::CockroachDb(_) => Some(SqlFamily::Postgres),
+            Self::Vitess(_) => Some(SqlFamily::Mysql),
+            _ => None,
         }
     }
 }
