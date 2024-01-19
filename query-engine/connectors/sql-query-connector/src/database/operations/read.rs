@@ -59,7 +59,7 @@ pub(crate) async fn get_single_record_wo_joins(
     selected_fields: &FieldSelection,
     ctx: &Context<'_>,
 ) -> crate::Result<Option<SingleRecord>> {
-    let selected_fields = selected_fields.without_relations();
+    let selected_fields = selected_fields.without_relations().into_virtuals_last();
 
     let query = read::get_records(
         model,
@@ -171,7 +171,7 @@ pub(crate) async fn get_many_records_wo_joins(
     selected_fields: &FieldSelection,
     ctx: &Context<'_>,
 ) -> crate::Result<ManyRecords> {
-    let selected_fields = selected_fields.without_relations();
+    let selected_fields = selected_fields.without_relations().into_virtuals_last();
     let reversed = query_arguments.needs_reversed_order();
 
     let field_names: Vec<_> = selected_fields.db_names().collect();
