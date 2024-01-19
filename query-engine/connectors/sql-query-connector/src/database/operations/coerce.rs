@@ -13,10 +13,20 @@ pub(crate) fn coerce_record_with_json_relation(
 ) -> crate::Result<()> {
     for (val_idx, rs) in rs_indexes {
         let val = record.values.get_mut(val_idx).unwrap();
-        // TODO(perf): Find ways to avoid serializing and deserializing multiple times.
-        let json_val: serde_json::Value = serde_json::from_str(val.as_json().unwrap()).unwrap();
+        match val {
+            PrismaValue::Null if rs.field.is_list() => {
+                *val = PrismaValue::List(vec![]);
+            }
+            PrismaValue::Null if rs.field.is_optional() => {
+                continue;
+            }
+            val => {
+                // TODO(perf): Find ways to avoid serializing and deserializing multiple times.
+                let json_val: serde_json::Value = serde_json::from_str(val.as_json().unwrap()).unwrap();
 
-        *val = coerce_json_relation_to_pv(json_val, rs)?;
+                *val = coerce_json_relation_to_pv(json_val, rs)?;
+            }
+        }
     }
 
     Ok(())
@@ -26,6 +36,8 @@ fn coerce_json_relation_to_pv(value: serde_json::Value, rs: &RelationSelection) 
     let relations = rs.relations().collect_vec();
 
     match value {
+        // Some versions of MySQL return null when offsetting by more than the number of rows available.
+        serde_json::Value::Null if rs.field.is_list() => Ok(PrismaValue::List(vec![])),
         // one-to-many
         serde_json::Value::Array(values) if rs.field.is_list() => {
             let iter = values.into_iter().filter_map(|value| {
