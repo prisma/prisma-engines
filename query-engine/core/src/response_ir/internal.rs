@@ -7,7 +7,7 @@ use crate::{
 };
 use connector::AggregationResult;
 use indexmap::IndexMap;
-use query_structure::{CompositeFieldRef, Field, PrismaValue, SelectionResult};
+use query_structure::{CompositeFieldRef, Field, PrismaValue, SelectionResult, VirtualSelection};
 use schema::{
     constants::{aggregations::*, output_fields::*},
     *,
@@ -440,6 +440,11 @@ fn serialize_relation_selection(
     Ok(Item::Map(map))
 }
 
+enum SerializedField<'a, 'b> {
+    Model(Field, &'a OutputField<'b>),
+    Virtual(&'a VirtualSelection),
+}
+
 /// Serializes the given result into objects of given type.
 /// Doesn't validate the shape of the result set ("unchecked" result).
 /// Returns a vector of serialized objects (as Item::Map), grouped into a map by parent, if present.
@@ -464,9 +469,26 @@ fn serialize_objects(
     let db_field_names = result.records.field_names;
     let model = result.model;
 
-    let model_fields: Vec<_> = db_field_names
+    let fields: Vec<_> = db_field_names
         .iter()
-        .map(|f| model.fields().find_from_non_virtual_by_db_name(f).ok())
+        .map(|name| {
+            model
+                .fields()
+                .find_from_non_virtual_by_db_name(name)
+                .ok()
+                .and_then(|field| {
+                    typ.find_field(field.name())
+                        .map(|out_field| SerializedField::Model(field, out_field))
+                })
+                .or_else(|| {
+                    result
+                        .virtual_fields
+                        .iter()
+                        .find(|f| f.db_alias() == *name)
+                        .map(SerializedField::Virtual)
+                })
+                .expect("Field must be a known scalar or virtual")
+        })
         .collect();
 
     // Write all fields, nested and list fields unordered into a map, afterwards order all into the final order.
@@ -482,27 +504,17 @@ fn serialize_objects(
         let values = record.values;
         let mut object = HashMap::with_capacity(values.len());
 
-        for (val, (field_name, field)) in values.into_iter().zip(db_field_names.iter().zip(model_fields.iter())) {
+        for (val, field) in values.into_iter().zip(fields.iter()) {
             match field {
-                Some(field) => {
-                    let out_field = typ
-                        .find_field(field.name())
-                        .expect("Non-virtual field must be defined in the type");
-
-                    if let Field::Composite(ref cf) = field {
+                SerializedField::Model(field, out_field) => {
+                    if let Field::Composite(cf) = field {
                         object.insert(field.name().to_owned(), serialize_composite(cf, out_field, val)?);
                     } else if !out_field.field_type().is_object() {
                         object.insert(field.name().to_owned(), serialize_scalar(out_field, val)?);
                     }
                 }
 
-                None => {
-                    let vs = result
-                        .virtual_fields
-                        .iter()
-                        .find(|f| f.db_alias() == *field_name)
-                        .expect("Couldn't find virtual field by name");
-
+                SerializedField::Virtual(vs) => {
                     let (virtual_obj_name, nested_field_name) = vs.serialized_name();
 
                     let virtual_obj = object
