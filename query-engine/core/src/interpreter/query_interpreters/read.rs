@@ -32,7 +32,7 @@ fn read_one(
     let fut = async move {
         let model = query.model;
         let filter = query.filter.expect("Expected filter to be set for ReadOne query.");
-        let scalars = tx
+        let record = tx
             .get_single_record(
                 &model,
                 &filter,
@@ -42,15 +42,15 @@ fn read_one(
             )
             .await?;
 
-        match scalars {
+        match record {
             Some(record) if query.relation_load_strategy.is_query() => {
-                let scalars: ManyRecords = record.into();
-                let nested: Vec<QueryResult> = process_nested(tx, query.nested, Some(&scalars)).await?;
+                let records: ManyRecords = record.into();
+                let nested: Vec<QueryResult> = process_nested(tx, query.nested, Some(&records)).await?;
 
                 Ok(RecordSelection {
                     name: query.name,
                     fields: query.selection_order,
-                    scalars,
+                    records,
                     nested,
                     model,
                     virtual_fields: query.selected_fields.virtuals_owned(),
@@ -75,7 +75,7 @@ fn read_one(
             None => Ok(QueryResult::RecordSelection(Some(Box::new(RecordSelection {
                 name: query.name,
                 fields: query.selection_order,
-                scalars: ManyRecords::default(),
+                records: ManyRecords::default(),
                 nested: vec![],
                 model,
                 virtual_fields: query.selected_fields.virtuals_owned(),
@@ -115,7 +115,7 @@ fn read_many_by_queries(
     };
 
     let fut = async move {
-        let scalars = tx
+        let records = tx
             .get_many_records(
                 &query.model,
                 query.args.clone(),
@@ -125,20 +125,20 @@ fn read_many_by_queries(
             )
             .await?;
 
-        let scalars = if let Some(p) = processor {
-            p.apply(scalars)
+        let records = if let Some(p) = processor {
+            p.apply(records)
         } else {
-            scalars
+            records
         };
 
-        if scalars.records.is_empty() && query.options.contains(QueryOption::ThrowOnEmpty) {
+        if records.records.is_empty() && query.options.contains(QueryOption::ThrowOnEmpty) {
             record_not_found()
         } else {
-            let nested: Vec<QueryResult> = process_nested(tx, query.nested, Some(&scalars)).await?;
+            let nested: Vec<QueryResult> = process_nested(tx, query.nested, Some(&records)).await?;
             Ok(RecordSelection {
                 name: query.name,
                 fields: query.selection_order,
-                scalars,
+                records,
                 nested,
                 model: query.model,
                 virtual_fields: query.selected_fields.virtuals_owned(),
@@ -206,7 +206,7 @@ fn read_related<'conn>(
     let fut = async move {
         let relation = query.parent_field.relation();
 
-        let scalars = if relation.is_many_to_many() {
+        let records = if relation.is_many_to_many() {
             nested_read::m2m(tx, &mut query, parent_result, trace_id).await?
         } else {
             nested_read::one2m(
@@ -221,12 +221,12 @@ fn read_related<'conn>(
             .await?
         };
         let model = query.parent_field.related_model();
-        let nested: Vec<QueryResult> = process_nested(tx, query.nested, Some(&scalars)).await?;
+        let nested: Vec<QueryResult> = process_nested(tx, query.nested, Some(&records)).await?;
 
         Ok(RecordSelection {
             name: query.name,
             fields: query.selection_order,
-            scalars,
+            records,
             nested,
             model,
             virtual_fields: query.selected_fields.virtuals_owned(),

@@ -460,13 +460,13 @@ fn serialize_objects(
     // to prevent expensive copying during serialization).
 
     // Finally, serialize the objects based on the selected fields.
-    let mut object_mapping = UncheckedItemsWithParents::with_capacity(result.scalars.records.len());
-    let db_field_names = result.scalars.field_names;
+    let mut object_mapping = UncheckedItemsWithParents::with_capacity(result.records.records.len());
+    let db_field_names = result.records.field_names;
     let model = result.model;
 
     // Write all fields, nested and list fields unordered into a map, afterwards order all into the final order.
     // If nothing is written to the object, write null instead.
-    for record in result.scalars.records {
+    for record in result.records.records {
         let record_id = Some(record.extract_selection_result(&db_field_names, &model.primary_identifier())?);
 
         if !object_mapping.contains_key(&record.parent_id) {
