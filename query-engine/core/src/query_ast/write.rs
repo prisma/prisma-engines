@@ -143,7 +143,7 @@ impl WriteQuery {
             record_filter,
             create,
             update,
-            read.full_selection,
+            read.selected_fields,
             read.selection_order,
         )))
     }

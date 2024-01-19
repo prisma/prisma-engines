@@ -36,7 +36,7 @@ fn read_one(
             .get_single_record(
                 &model,
                 &filter,
-                &query.full_selection,
+                &query.selected_fields,
                 query.relation_load_strategy,
                 trace_id,
             )
@@ -53,7 +53,7 @@ fn read_one(
                     scalars,
                     nested,
                     model,
-                    virtual_fields: query.full_selection.virtuals_owned(),
+                    virtual_fields: query.selected_fields.virtuals_owned(),
                 }
                 .into())
             }
@@ -65,7 +65,7 @@ fn read_one(
                     model,
                     fields: query.selection_order,
                     records,
-                    nested: build_relation_record_selection(query.full_selection.relations()),
+                    nested: build_relation_record_selection(query.selected_fields.relations()),
                 }
                 .into())
             }
@@ -78,7 +78,7 @@ fn read_one(
                 scalars: ManyRecords::default(),
                 nested: vec![],
                 model,
-                virtual_fields: query.full_selection.virtuals_owned(),
+                virtual_fields: query.selected_fields.virtuals_owned(),
             })))),
         }
     };
@@ -119,7 +119,7 @@ fn read_many_by_queries(
             .get_many_records(
                 &query.model,
                 query.args.clone(),
-                &query.full_selection,
+                &query.selected_fields,
                 // &query.aggregation_selections,
                 query.relation_load_strategy,
                 trace_id,
@@ -144,7 +144,7 @@ fn read_many_by_queries(
                 scalars,
                 nested,
                 model: query.model,
-                virtual_fields: query.full_selection.virtuals_owned(),
+                virtual_fields: query.selected_fields.virtuals_owned(),
             }
             .into())
         }
@@ -163,7 +163,7 @@ fn read_many_by_joins(
             .get_many_records(
                 &query.model,
                 query.args.clone(),
-                &query.full_selection,
+                &query.selected_fields,
                 // &query.aggregation_selections,
                 query.relation_load_strategy,
                 trace_id,
@@ -177,7 +177,7 @@ fn read_many_by_joins(
                 name: query.name,
                 fields: query.selection_order,
                 records: result,
-                nested: build_relation_record_selection(query.full_selection.relations()),
+                nested: build_relation_record_selection(query.selected_fields.relations()),
                 model: query.model,
             }
             .into())
@@ -219,7 +219,7 @@ fn read_related<'conn>(
                 query.parent_results,
                 parent_result,
                 query.args.clone(),
-                &query.full_selection,
+                &query.selected_fields,
                 // query.aggregation_selections,
                 trace_id,
             )
@@ -234,7 +234,7 @@ fn read_related<'conn>(
             scalars,
             nested,
             model,
-            virtual_fields: query.full_selection.virtuals_owned(),
+            virtual_fields: query.selected_fields.virtuals_owned(),
         }
         .into())
     };

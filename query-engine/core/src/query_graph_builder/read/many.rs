@@ -51,7 +51,7 @@ fn find_many_with_options(
         alias,
         model,
         args,
-        full_selection: selected_fields,
+        selected_fields,
         nested,
         selection_order,
         options,

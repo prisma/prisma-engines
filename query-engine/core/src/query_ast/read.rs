@@ -24,9 +24,9 @@ impl ReadQuery {
     /// Returns the field selection of a read query.
     fn returns(&self) -> Option<&FieldSelection> {
         match self {
-            ReadQuery::RecordQuery(x) => Some(&x.full_selection),
-            ReadQuery::ManyRecordsQuery(x) => Some(&x.full_selection),
-            ReadQuery::RelatedRecordsQuery(x) => Some(&x.full_selection),
+            ReadQuery::RecordQuery(x) => Some(&x.selected_fields),
+            ReadQuery::ManyRecordsQuery(x) => Some(&x.selected_fields),
+            ReadQuery::RelatedRecordsQuery(x) => Some(&x.selected_fields),
             ReadQuery::AggregateRecordsQuery(_x) => None,
         }
     }
@@ -35,13 +35,13 @@ impl ReadQuery {
     pub fn satisfy_dependency(&mut self, field_selection: FieldSelection) {
         match self {
             ReadQuery::RecordQuery(x) => {
-                x.full_selection.merge_in_place(field_selection);
+                x.selected_fields.merge_in_place(field_selection);
             }
             ReadQuery::ManyRecordsQuery(x) => {
-                x.full_selection.merge_in_place(field_selection);
+                x.selected_fields.merge_in_place(field_selection);
             }
             ReadQuery::RelatedRecordsQuery(x) => {
-                x.full_selection.merge_in_place(field_selection);
+                x.selected_fields.merge_in_place(field_selection);
             }
             ReadQuery::AggregateRecordsQuery(_) => (),
         }
@@ -80,9 +80,9 @@ impl ReadQuery {
         }
 
         match self {
-            ReadQuery::RecordQuery(q) => has_virtuals(&q.full_selection, &q.nested),
-            ReadQuery::ManyRecordsQuery(q) => has_virtuals(&q.full_selection, &q.nested),
-            ReadQuery::RelatedRecordsQuery(q) => has_virtuals(&q.full_selection, &q.nested),
+            ReadQuery::RecordQuery(q) => has_virtuals(&q.selected_fields, &q.nested),
+            ReadQuery::ManyRecordsQuery(q) => has_virtuals(&q.selected_fields, &q.nested),
+            ReadQuery::RelatedRecordsQuery(q) => has_virtuals(&q.selected_fields, &q.nested),
             ReadQuery::AggregateRecordsQuery(_) => false,
         }
     }
@@ -112,14 +112,14 @@ impl Display for ReadQuery {
             Self::RecordQuery(q) => write!(
                 f,
                 "RecordQuery(name: '{}', selection: {}, filter: {:?})",
-                q.name, q.full_selection, q.filter
+                q.name, q.selected_fields, q.filter
             ),
             Self::ManyRecordsQuery(q) => write!(
                 f,
                 r#"ManyRecordsQuery(name: '{}', model: '{}', selection: {}, args: {:?})"#,
                 q.name,
                 q.model.name(),
-                q.full_selection,
+                q.selected_fields,
                 q.args
             ),
             Self::RelatedRecordsQuery(q) => write!(
@@ -128,7 +128,7 @@ impl Display for ReadQuery {
                 q.name,
                 q.parent_field.model().name(),
                 q.parent_field.name(),
-                q.full_selection
+                q.selected_fields
             ),
             Self::AggregateRecordsQuery(q) => write!(f, "AggregateRecordsQuery: {}", q.name),
         }
@@ -138,19 +138,19 @@ impl Display for ReadQuery {
 impl ToGraphviz for ReadQuery {
     fn to_graphviz(&self) -> String {
         match self {
-            Self::RecordQuery(q) => format!("RecordQuery(name: '{}', selection: {})", q.name, q.full_selection),
+            Self::RecordQuery(q) => format!("RecordQuery(name: '{}', selection: {})", q.name, q.selected_fields),
             Self::ManyRecordsQuery(q) => format!(
                 r#"ManyRecordsQuery(name: '{}', model: '{}', selection: {})"#,
                 q.name,
                 q.model.name(),
-                q.full_selection
+                q.selected_fields
             ),
             Self::RelatedRecordsQuery(q) => format!(
                 "RelatedRecordsQuery(name: '{}', parent model: '{}', parent relation field: {}, selection: {})",
                 q.name,
                 q.parent_field.model().name(),
                 q.parent_field.name(),
-                q.full_selection
+                q.selected_fields
             ),
             Self::AggregateRecordsQuery(q) => format!("AggregateRecordsQuery: {}", q.name),
         }
@@ -199,7 +199,7 @@ pub struct RecordQuery {
     pub model: Model,
     pub filter: Option<Filter>,
     // TODO: split into `user_selection` and `full_selection` and get rid of `selection_order`
-    pub full_selection: FieldSelection,
+    pub selected_fields: FieldSelection,
     pub(crate) nested: Vec<ReadQuery>,
     pub selection_order: Vec<String>,
     pub options: QueryOptions,
@@ -213,7 +213,7 @@ pub struct ManyRecordsQuery {
     pub model: Model,
     pub args: QueryArguments,
     // TODO: split into `user_selection` and `full_selection` and get rid of `selection_order`
-    pub full_selection: FieldSelection,
+    pub selected_fields: FieldSelection,
     pub(crate) nested: Vec<ReadQuery>,
     pub selection_order: Vec<String>,
     pub options: QueryOptions,
@@ -227,7 +227,7 @@ pub struct RelatedRecordsQuery {
     pub parent_field: RelationFieldRef,
     pub args: QueryArguments,
     // TODO: split into `user_selection` and `full_selection` and get rid of `selection_order`
-    pub full_selection: FieldSelection,
+    pub selected_fields: FieldSelection,
     pub nested: Vec<ReadQuery>,
     pub selection_order: Vec<String>,
     /// Fields and values of the parent to satisfy the relation query without
@@ -245,7 +245,7 @@ impl RelatedRecordsQuery {
     }
 
     pub fn has_virtual_selections(&self) -> bool {
-        self.full_selection.has_virtual_fields() || self.nested.iter().any(|q| q.has_virtual_selections())
+        self.selected_fields.has_virtual_fields() || self.nested.iter().any(|q| q.has_virtual_selections())
     }
 }
 
