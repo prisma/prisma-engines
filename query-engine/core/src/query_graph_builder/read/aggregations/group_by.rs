@@ -1,7 +1,6 @@
 use super::*;
 use crate::{query_document::ParsedField, AggregateRecordsQuery, ArgumentListLookup, ParsedInputValue, ReadQuery};
-use connector::Filter;
-use prisma_models::{Model, OrderBy, ScalarFieldRef};
+use query_structure::{Filter, Model, OrderBy, ScalarFieldRef};
 use schema::constants::args;
 use std::convert::TryInto;
 

@@ -3,8 +3,7 @@ use crate::{
     query_document::{ParsedArgument, ParsedInputMap},
     QueryGraphBuilderError, QueryGraphBuilderResult,
 };
-use connector::QueryArguments;
-use prisma_models::prelude::*;
+use query_structure::{prelude::*, QueryArguments};
 use schema::constants::{aggregations, args, ordering};
 use std::convert::TryInto;
 
@@ -54,6 +53,11 @@ pub fn extract_query_args(
                         None => Ok(result),
                     }
                 }
+
+                args::RELATION_LOAD_STRATEGY => Ok(QueryArguments {
+                    relation_load_strategy: Some(arg.value.try_into()?),
+                    ..result
+                }),
 
                 _ => Ok(result),
             }

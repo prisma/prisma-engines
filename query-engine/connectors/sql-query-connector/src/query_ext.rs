@@ -4,13 +4,13 @@ use crate::{
     value_ext::IntoTypedJsonExtension, ColumnMetadata, Context, SqlRow, ToSqlRow,
 };
 use async_trait::async_trait;
-use connector_interface::{filter::Filter, RecordFilter};
+use connector_interface::RecordFilter;
 use futures::future::FutureExt;
 use itertools::Itertools;
 use opentelemetry::trace::TraceContextExt;
 use opentelemetry::trace::TraceFlags;
-use prisma_models::*;
 use quaint::{ast::*, connector::Queryable};
+use query_structure::*;
 use serde_json::{Map, Value};
 use std::{collections::HashMap, panic::AssertUnwindSafe};
 use tracing::{info_span, Span};
@@ -103,7 +103,9 @@ impl<Q: Queryable + ?Sized> QueryExt for Q {
             .await?
             .into_iter()
             .next()
-            .ok_or(SqlError::RecordDoesNotExist)
+            .ok_or(SqlError::RecordDoesNotExist {
+                cause: "Filter returned no results".to_owned(),
+            })
     }
 
     async fn filter_selectors(

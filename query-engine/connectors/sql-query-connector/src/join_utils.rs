@@ -1,7 +1,6 @@
 use crate::{filter::FilterBuilder, model_extensions::*, Context};
-use connector_interface::Filter;
-use prisma_models::*;
 use quaint::prelude::*;
+use query_structure::*;
 
 #[derive(Debug, Clone)]
 pub(crate) struct AliasedJoin {

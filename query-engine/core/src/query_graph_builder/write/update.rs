@@ -5,9 +5,8 @@ use crate::{
     query_graph::{Node, NodeRef, QueryGraph, QueryGraphDependency},
     ArgumentListLookup, ParsedField, ParsedInputMap,
 };
-use connector::{Filter, IntoFilter};
-use prisma_models::Model;
 use psl::datamodel_connector::ConnectorCapability;
+use query_structure::{Filter, IntoFilter, Model};
 use schema::{constants::args, QuerySchema};
 use std::convert::TryInto;
 
@@ -89,7 +88,7 @@ pub(crate) fn update_record(
     } else {
         graph.flag_transactional();
 
-        let read_query = read::find_unique(field, model.clone())?;
+        let read_query = read::find_unique(field, model.clone(), query_schema)?;
         let read_node = graph.create_node(Query::Read(read_query));
 
         graph.add_result_node(&read_node);
@@ -201,7 +200,7 @@ where
 
             Query::Write(WriteQuery::UpdateRecord(UpdateRecord::WithSelection(
                 UpdateRecordWithSelection {
-                    name: Some(field.name.to_owned()),
+                    name: field.name,
                     model: model.clone(),
                     record_filter: filter.into(),
                     args,
@@ -216,7 +215,7 @@ where
 
             Query::Write(WriteQuery::UpdateRecord(UpdateRecord::WithSelection(
                 UpdateRecordWithSelection {
-                    name: None,
+                    name: String::new(), // This node will not be serialized so we don't need a name.
                     model: model.clone(),
                     record_filter: filter.into(),
                     args,

@@ -4,7 +4,7 @@ use sql_migration_tests::test_api::*;
 fn introspect_partition_tables() {
     // Postgres9 does not support partition tables, and Postgres10 does not support primary keys on
     // partition tables.
-    let test_db = test_setup::only!(Postgres11, Postgres12, Postgres13, Postgres14, Postgres15 ; exclude: CockroachDb);
+    let test_db = test_setup::only!(Postgres11, Postgres12, Postgres13, Postgres14, Postgres15, Postgres16 ; exclude: CockroachDb);
     let (_, url_str) = tok(test_setup::postgres::create_postgres_database(
         test_db.url(),
         "postgres_introspect_partition_tables",
@@ -84,7 +84,7 @@ model blocks {{
 fn inherited_table_regression_fix() {
     // Postgres9 does not support partition tables, and Postgres10 does not support primary keys on
     // partition tables.
-    let test_db = test_setup::only!(Postgres11, Postgres12, Postgres13, Postgres14, Postgres15 ; exclude: CockroachDb);
+    let test_db = test_setup::only!(Postgres11, Postgres12, Postgres13, Postgres14, Postgres15, Postgres16 ; exclude: CockroachDb);
     let (_, url_str) = tok(test_setup::postgres::create_postgres_database(
         test_db.url(),
         "inherited_table_regression_fix",
@@ -155,7 +155,7 @@ model cities {{
 
 #[test]
 fn inherited_table_detect_primary_key() {
-    let test_db = test_setup::only!(Postgres11, Postgres12, Postgres13, Postgres14, Postgres15 ; exclude: CockroachDb);
+    let test_db = test_setup::only!(Postgres11, Postgres12, Postgres13, Postgres14, Postgres15, Postgres16 ; exclude: CockroachDb);
     let (_, url_str) = tok(test_setup::postgres::create_postgres_database(
         test_db.url(),
         "inherited_table_detect_primary_key",

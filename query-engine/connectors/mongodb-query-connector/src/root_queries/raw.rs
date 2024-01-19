@@ -4,7 +4,7 @@ use mongodb::{
     bson::{from_bson, Bson, Document},
     options::*,
 };
-use prisma_models::{Model, PrismaValue};
+use query_structure::{Model, PrismaValue};
 use std::collections::HashMap;
 
 #[allow(clippy::large_enum_variant)]

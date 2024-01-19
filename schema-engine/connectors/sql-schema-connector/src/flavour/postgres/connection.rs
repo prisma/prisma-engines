@@ -5,7 +5,7 @@ use indoc::indoc;
 use psl::PreviewFeature;
 use quaint::{
     connector::{self, tokio_postgres::error::ErrorPosition, PostgresUrl},
-    prelude::{ConnectionInfo, Queryable},
+    prelude::{ConnectionInfo, NativeConnectionInfo, Queryable},
 };
 use schema_connector::{ConnectorError, ConnectorResult, Namespaces};
 use sql_schema_describer::{postgres::PostgresSchemaExt, SqlSchema};
@@ -202,5 +202,10 @@ fn normalize_sql_schema(schema: &mut SqlSchema, preview_features: BitFlags<Previ
 }
 
 fn quaint_err(url: &PostgresUrl) -> impl (Fn(quaint::error::Error) -> ConnectorError) + '_ {
-    |err| crate::flavour::quaint_error_to_connector_error(err, &ConnectionInfo::Postgres(url.clone()))
+    |err| {
+        crate::flavour::quaint_error_to_connector_error(
+            err,
+            &ConnectionInfo::Native(NativeConnectionInfo::Postgres(url.clone())),
+        )
+    }
 }

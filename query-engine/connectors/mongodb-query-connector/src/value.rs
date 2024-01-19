@@ -7,10 +7,10 @@ use bigdecimal::{BigDecimal, FromPrimitive, ToPrimitive};
 use chrono::{TimeZone, Utc};
 use itertools::Itertools;
 use mongodb::bson::{oid::ObjectId, spec::BinarySubtype, Binary, Bson, Document, Timestamp};
-use prisma_models::{
+use psl::builtin_connectors::MongoDbType;
+use query_structure::{
     CompositeFieldRef, Field, PrismaValue, RelationFieldRef, ScalarFieldRef, SelectedField, TypeIdentifier,
 };
-use psl::builtin_connectors::MongoDbType;
 use serde_json::Value;
 use std::{convert::TryFrom, fmt::Display};
 
@@ -23,6 +23,7 @@ impl IntoBson for (&SelectedField, PrismaValue) {
         match selection {
             SelectedField::Scalar(sf) => (sf, value).into_bson(),
             SelectedField::Composite(_) => todo!(), // [Composites] todo
+            SelectedField::Relation(_) => unreachable!(),
         }
     }
 }

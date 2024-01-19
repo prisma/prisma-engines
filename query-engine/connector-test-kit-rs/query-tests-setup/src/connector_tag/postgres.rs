@@ -35,7 +35,12 @@ pub enum PostgresVersion {
     V13,
     V14,
     V15,
+    V16,
     PgBouncer,
+    NeonJsNapi,
+    PgJsNapi,
+    NeonJsWasm,
+    PgJsWasm,
 }
 
 impl TryFrom<&str> for PostgresVersion {
@@ -50,7 +55,12 @@ impl TryFrom<&str> for PostgresVersion {
             "13" => Self::V13,
             "14" => Self::V14,
             "15" => Self::V15,
+            "16" => Self::V16,
             "pgbouncer" => Self::PgBouncer,
+            "neon.js" => Self::NeonJsNapi,
+            "pg.js" => Self::PgJsNapi,
+            "pg.js.wasm" => Self::PgJsWasm,
+            "neon.js.wasm" => Self::NeonJsWasm,
             _ => return Err(TestError::parse_error(format!("Unknown Postgres version `{s}`"))),
         };
 
@@ -68,7 +78,12 @@ impl ToString for PostgresVersion {
             PostgresVersion::V13 => "13",
             PostgresVersion::V14 => "14",
             PostgresVersion::V15 => "15",
+            PostgresVersion::V16 => "16",
             PostgresVersion::PgBouncer => "pgbouncer",
+            PostgresVersion::NeonJsNapi => "neon.js",
+            PostgresVersion::PgJsNapi => "pg.js",
+            PostgresVersion::PgJsWasm => "pg.js.wasm",
+            PostgresVersion::NeonJsWasm => "pg.js.wasm",
         }
         .to_owned()
     }

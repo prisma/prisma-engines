@@ -2,10 +2,10 @@ use crate::{
     cursor_condition, filter::FilterBuilder, model_extensions::*, nested_aggregations, ordering::OrderByBuilder,
     sql_trace::SqlTraceComment, Context,
 };
-use connector_interface::{filter::Filter, AggregationSelection, QueryArguments, RelAggregationSelection};
+use connector_interface::{AggregationSelection, RelAggregationSelection};
 use itertools::Itertools;
-use prisma_models::*;
 use quaint::ast::*;
+use query_structure::*;
 use tracing::Span;
 
 pub(crate) trait SelectDefinition {
@@ -106,6 +106,17 @@ impl SelectDefinition for QueryArguments {
             .iter()
             .fold(select_ast, |acc, o| acc.order_by(o.order_definition.clone()));
 
+        let select_ast = if let Some(distinct) = self.distinct {
+            let distinct_fields = ModelProjection::from(distinct)
+                .as_columns(ctx)
+                .map(Expression::from)
+                .collect_vec();
+
+            select_ast.distinct_on(distinct_fields)
+        } else {
+            select_ast
+        };
+
         match limit {
             Some(limit) => (select_ast.limit(limit as usize), aggregation_joins.columns),
             None => (select_ast, aggregation_joins.columns),
@@ -124,9 +135,7 @@ where
     T: SelectDefinition,
 {
     let (select, additional_selection_set) = query.into_select(model, aggr_selections, ctx);
-    let select = columns
-        .map(|c| c.set_is_selected(true))
-        .fold(select, |acc, col| acc.column(col));
+    let select = columns.fold(select, |acc, col| acc.column(col));
 
     let select = select.append_trace(&Span::current()).add_trace_id(ctx.trace_id);
 
@@ -176,7 +185,11 @@ pub(crate) fn aggregate(
             .append_trace(&Span::current())
             .add_trace_id(ctx.trace_id),
         |select, next_op| match next_op {
-            AggregationSelection::Field(field) => select.column(Column::from(field.db_name().to_owned())),
+            AggregationSelection::Field(field) => select.column(
+                Column::from(field.db_name().to_owned())
+                    .set_is_enum(field.type_identifier().is_enum())
+                    .set_is_selected(true),
+            ),
 
             AggregationSelection::Count { all, fields } => {
                 let select = fields.iter().fold(select, |select, next_field| {
@@ -199,11 +212,15 @@ pub(crate) fn aggregate(
             }),
 
             AggregationSelection::Min(fields) => fields.iter().fold(select, |select, next_field| {
-                select.value(min(Column::from(next_field.db_name().to_owned())))
+                select.value(min(Column::from(next_field.db_name().to_owned())
+                    .set_is_enum(next_field.type_identifier().is_enum())
+                    .set_is_selected(true)))
             }),
 
             AggregationSelection::Max(fields) => fields.iter().fold(select, |select, next_field| {
-                select.value(max(Column::from(next_field.db_name().to_owned())))
+                select.value(max(Column::from(next_field.db_name().to_owned())
+                    .set_is_enum(next_field.type_identifier().is_enum())
+                    .set_is_selected(true)))
             }),
         },
     )
@@ -243,11 +260,11 @@ pub(crate) fn group_by_aggregate(
         }),
 
         AggregationSelection::Min(fields) => fields.iter().fold(select, |select, next_field| {
-            select.value(min(next_field.as_column(ctx)))
+            select.value(min(next_field.as_column(ctx).set_is_selected(true)))
         }),
 
         AggregationSelection::Max(fields) => fields.iter().fold(select, |select, next_field| {
-            select.value(max(next_field.as_column(ctx)))
+            select.value(max(next_field.as_column(ctx).set_is_selected(true)))
         }),
     });
 

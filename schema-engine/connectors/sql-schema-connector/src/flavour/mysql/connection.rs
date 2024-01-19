@@ -7,7 +7,7 @@ use quaint::{
         mysql_async::{self as my, prelude::Query},
         MysqlUrl,
     },
-    prelude::{ConnectionInfo, Queryable},
+    prelude::{ConnectionInfo, NativeConnectionInfo, Queryable},
 };
 use schema_connector::{ConnectorError, ConnectorResult};
 use sql_schema_describer::{DescriberErrorKind, SqlSchema};
@@ -160,7 +160,12 @@ impl Connection {
 }
 
 fn quaint_err(url: &MysqlUrl) -> impl (Fn(quaint::error::Error) -> ConnectorError) + '_ {
-    |err| crate::flavour::quaint_error_to_connector_error(err, &ConnectionInfo::Mysql(url.clone()))
+    |err| {
+        crate::flavour::quaint_error_to_connector_error(
+            err,
+            &ConnectionInfo::Native(NativeConnectionInfo::Mysql(url.clone())),
+        )
+    }
 }
 
 fn convert_server_error(circumstances: BitFlags<super::Circumstances>, error: &my::Error) -> Option<KnownError> {

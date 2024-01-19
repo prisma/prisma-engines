@@ -1,7 +1,7 @@
-use crate::{coerce_null_to_zero_value, Filter, NativeUpsert, QueryArguments, WriteArgs};
+use crate::{coerce_null_to_zero_value, NativeUpsert, WriteArgs};
 use async_trait::async_trait;
-use prisma_models::{ast::FieldArity, *};
 use prisma_value::PrismaValue;
+use query_structure::{ast::FieldArity, *};
 use std::collections::HashMap;
 
 #[async_trait]
@@ -231,6 +231,7 @@ pub trait ReadOperations {
         filter: &Filter,
         selected_fields: &FieldSelection,
         aggregation_selections: &[RelAggregationSelection],
+        relation_load_strategy: RelationLoadStrategy,
         trace_id: Option<String>,
     ) -> crate::Result<Option<SingleRecord>>;
 
@@ -246,6 +247,7 @@ pub trait ReadOperations {
         query_arguments: QueryArguments,
         selected_fields: &FieldSelection,
         aggregation_selections: &[RelAggregationSelection],
+        relation_load_strategy: RelationLoadStrategy,
         trace_id: Option<String>,
     ) -> crate::Result<ManyRecords>;
 
@@ -335,6 +337,17 @@ pub trait WriteOperations {
         record_filter: RecordFilter,
         trace_id: Option<String>,
     ) -> crate::Result<usize>;
+
+    /// Delete single record in the `Model` with the given `Filter`.
+    /// Return selected fields of the deleted record, if the connector
+    /// supports it. If the connector does not support it, error is returned.
+    async fn delete_record(
+        &mut self,
+        model: &Model,
+        record_filter: RecordFilter,
+        selected_fields: FieldSelection,
+        trace_id: Option<String>,
+    ) -> crate::Result<SingleRecord>;
 
     // We plan to remove the methods below in the future. We want emulate them with the ones above. Those should suffice.
 

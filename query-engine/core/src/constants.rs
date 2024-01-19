@@ -1,5 +1,5 @@
 pub mod custom_types {
-    use prisma_models::PrismaValue;
+    use query_structure::PrismaValue;
 
     pub const TYPE: &str = "$type";
     pub const VALUE: &str = "value";

@@ -1,8 +1,4 @@
-use std::fmt;
-
 use crate::error::*;
-use rusqlite::ffi;
-use rusqlite::types::FromSqlError;
 
 #[derive(Debug)]
 pub struct SqliteError {
@@ -10,14 +6,10 @@ pub struct SqliteError {
     pub message: Option<String>,
 }
 
-impl fmt::Display for SqliteError {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(
-            f,
-            "Error code {}: {}",
-            self.extended_code,
-            ffi::code_to_str(self.extended_code)
-        )
+#[cfg(not(feature = "sqlite-native"))]
+impl std::fmt::Display for SqliteError {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "Error code {}", self.extended_code)
     }
 }
 
@@ -37,7 +29,7 @@ impl From<SqliteError> for Error {
     fn from(error: SqliteError) -> Self {
         match error {
             SqliteError {
-                extended_code: ffi::SQLITE_CONSTRAINT_UNIQUE | ffi::SQLITE_CONSTRAINT_PRIMARYKEY,
+                extended_code: super::ffi::SQLITE_CONSTRAINT_UNIQUE | super::ffi::SQLITE_CONSTRAINT_PRIMARYKEY,
                 message: Some(description),
             } => {
                 let constraint = description
@@ -58,7 +50,7 @@ impl From<SqliteError> for Error {
             }
 
             SqliteError {
-                extended_code: ffi::SQLITE_CONSTRAINT_NOTNULL,
+                extended_code: super::ffi::SQLITE_CONSTRAINT_NOTNULL,
                 message: Some(description),
             } => {
                 let constraint = description
@@ -79,7 +71,7 @@ impl From<SqliteError> for Error {
             }
 
             SqliteError {
-                extended_code: ffi::SQLITE_CONSTRAINT_FOREIGNKEY | ffi::SQLITE_CONSTRAINT_TRIGGER,
+                extended_code: super::ffi::SQLITE_CONSTRAINT_FOREIGNKEY | super::ffi::SQLITE_CONSTRAINT_TRIGGER,
                 message: Some(description),
             } => {
                 let mut builder = Error::builder(ErrorKind::ForeignKeyConstraintViolation {
@@ -92,7 +84,7 @@ impl From<SqliteError> for Error {
                 builder.build()
             }
 
-            SqliteError { extended_code, message } if error.primary_code() == ffi::SQLITE_BUSY => {
+            SqliteError { extended_code, message } if error.primary_code() == super::ffi::SQLITE_BUSY => {
                 let mut builder = Error::builder(ErrorKind::SocketTimeout);
                 builder.set_original_code(format!("{extended_code}"));
 
@@ -150,57 +142,5 @@ impl From<SqliteError> for Error {
                 }
             },
         }
-    }
-}
-
-impl From<rusqlite::Error> for Error {
-    fn from(e: rusqlite::Error) -> Error {
-        match e {
-            rusqlite::Error::ToSqlConversionFailure(error) => match error.downcast::<Error>() {
-                Ok(error) => *error,
-                Err(error) => {
-                    let mut builder = Error::builder(ErrorKind::QueryError(error));
-
-                    builder.set_original_message("Could not interpret parameters in an SQLite query.");
-
-                    builder.build()
-                }
-            },
-            rusqlite::Error::InvalidQuery => {
-                let mut builder = Error::builder(ErrorKind::QueryError(e.into()));
-
-                builder.set_original_message(
-                    "Could not interpret the query or its parameters. Check the syntax and parameter types.",
-                );
-
-                builder.build()
-            }
-            rusqlite::Error::ExecuteReturnedResults => {
-                let mut builder = Error::builder(ErrorKind::QueryError(e.into()));
-                builder.set_original_message("Execute returned results, which is not allowed in SQLite.");
-
-                builder.build()
-            }
-
-            rusqlite::Error::QueryReturnedNoRows => Error::builder(ErrorKind::NotFound).build(),
-
-            rusqlite::Error::SqliteFailure(ffi::Error { code: _, extended_code }, message) => {
-                SqliteError::new(extended_code, message).into()
-            }
-
-            rusqlite::Error::SqlInputError {
-                error: ffi::Error { extended_code, .. },
-                msg,
-                ..
-            } => SqliteError::new(extended_code, Some(msg)).into(),
-
-            e => Error::builder(ErrorKind::QueryError(e.into())).build(),
-        }
-    }
-}
-
-impl From<FromSqlError> for Error {
-    fn from(e: FromSqlError) -> Error {
-        Error::builder(ErrorKind::ColumnReadFailure(e.into())).build()
     }
 }

@@ -81,10 +81,10 @@ async fn update_one(
         .await?;
 
     match q {
-        UpdateRecord::WithSelection(q) if q.name.is_some() => {
+        UpdateRecord::WithSelection(q) => {
             let res = res
                 .map(|res| RecordSelection {
-                    name: q.name.unwrap(),
+                    name: q.name,
                     fields: q.selection_order,
                     scalars: res.into(),
                     nested: vec![],
@@ -94,13 +94,6 @@ async fn update_one(
                 .map(Box::new);
 
             Ok(QueryResult::RecordSelection(res))
-        }
-        UpdateRecord::WithSelection(q) => {
-            let res = res
-                .map(|record| record.extract_selection_result(&q.selected_fields))
-                .transpose()?;
-
-            Ok(QueryResult::Id(res))
         }
         UpdateRecord::WithoutSelection(_) => {
             let res = res
@@ -144,9 +137,24 @@ async fn delete_one(
         )),
     }?;
 
-    let res = tx.delete_records(&q.model, filter, trace_id).await?;
+    if let Some(selected_fields) = q.selected_fields {
+        let record = tx
+            .delete_record(&q.model, filter, selected_fields.fields, trace_id)
+            .await?;
+        let selection = RecordSelection {
+            name: q.name,
+            fields: selected_fields.order,
+            scalars: record.into(),
+            nested: vec![],
+            model: q.model,
+            aggregation_rows: None,
+        };
 
-    Ok(QueryResult::Count(res))
+        Ok(QueryResult::RecordSelection(Some(Box::new(selection))))
+    } else {
+        let result = tx.delete_records(&q.model, filter, trace_id).await?;
+        Ok(QueryResult::Count(result))
+    }
 }
 
 async fn update_many(

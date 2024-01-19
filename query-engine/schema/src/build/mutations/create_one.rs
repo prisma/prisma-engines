@@ -3,9 +3,9 @@ use crate::{
     Identifier, IdentifierType, InputField, InputObjectType, InputType, OutputField, OutputType, QueryInfo, QueryTag,
 };
 use constants::*;
-use input_types::fields::data_input_mapper::*;
+use input_types::fields::{arguments, data_input_mapper::*};
 use output_types::objects;
-use prisma_models::{Model, RelationFieldRef};
+use query_structure::{Model, RelationFieldRef};
 
 /// Builds a create mutation field (e.g. createUser) for given model.
 pub(crate) fn create_one(ctx: &QuerySchema, model: Model) -> OutputField<'_> {
@@ -15,7 +15,7 @@ pub(crate) fn create_one(ctx: &QuerySchema, model: Model) -> OutputField<'_> {
 
     field(
         field_name,
-        move || create_one_arguments(ctx, model).unwrap_or_default(),
+        move || create_one_arguments(ctx, model),
         OutputType::object(objects::model::model_object_type(ctx, cloned_model)),
         Some(QueryInfo {
             model: Some(model_id),
@@ -26,14 +26,18 @@ pub(crate) fn create_one(ctx: &QuerySchema, model: Model) -> OutputField<'_> {
 
 /// Builds "data" argument intended for the create field.
 /// The data argument is not present if no data can be created.
-pub(crate) fn create_one_arguments(ctx: &QuerySchema, model: Model) -> Option<Vec<InputField<'_>>> {
+pub(crate) fn create_one_arguments(ctx: &QuerySchema, model: Model) -> Vec<InputField<'_>> {
     let any_field_required = model
         .fields()
         .all()
         .any(|f| f.is_required() && f.as_scalar().map(|f| f.default_value().is_none()).unwrap_or(true));
+
     let create_types = create_one_input_types(ctx, model, None);
-    let field = input_field(args::DATA, create_types, None);
-    Some(vec![field.optional_if(!any_field_required)])
+    let data_field = input_field(args::DATA, create_types, None).optional_if(!any_field_required);
+
+    std::iter::once(data_field)
+        .chain(arguments::relation_load_strategy_argument(ctx))
+        .collect()
 }
 
 pub(crate) fn create_one_input_types(

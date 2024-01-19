@@ -5,8 +5,7 @@ use crate::{
     query_graph::{Flow, Node, NodeRef, QueryGraph, QueryGraphDependency},
     ParsedInputMap, ParsedInputValue,
 };
-use connector::Filter;
-use prisma_models::RelationFieldRef;
+use query_structure::{Filter, RelationFieldRef};
 use schema::constants::args;
 use std::convert::TryInto;
 

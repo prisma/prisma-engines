@@ -1,11 +1,11 @@
 use crate::context::Context;
 use chrono::Utc;
-use prisma_models::{ScalarField, TypeIdentifier};
 use prisma_value::PrismaValue;
 use quaint::{
     ast::{EnumName, Value, ValueType},
     prelude::{EnumVariant, TypeDataLength, TypeFamily},
 };
+use query_structure::{ScalarField, TypeIdentifier};
 
 pub(crate) trait ScalarFieldExt {
     fn value<'a>(&self, pv: PrismaValue, ctx: &Context<'_>) -> Value<'a>;

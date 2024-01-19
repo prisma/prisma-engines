@@ -139,6 +139,12 @@ pub trait Visitor<'a> {
     #[cfg(any(feature = "postgresql", feature = "mysql"))]
     fn visit_json_unquote(&mut self, json_unquote: JsonUnquote<'a>) -> Result;
 
+    #[cfg(feature = "postgresql")]
+    fn visit_json_array_agg(&mut self, array_agg: JsonArrayAgg<'a>) -> Result;
+
+    #[cfg(feature = "postgresql")]
+    fn visit_json_build_object(&mut self, build_obj: JsonBuildObject<'a>) -> Result;
+
     #[cfg(any(feature = "postgresql", feature = "mysql"))]
     fn visit_text_search(&mut self, text_search: TextSearch<'a>) -> Result;
 
@@ -188,18 +194,38 @@ pub trait Visitor<'a> {
             match j {
                 Join::Inner(data) => {
                     self.write(" INNER JOIN ")?;
+
+                    if data.lateral {
+                        self.write("LATERAL ")?;
+                    }
+
                     self.visit_join_data(data)?;
                 }
                 Join::Left(data) => {
                     self.write(" LEFT JOIN ")?;
+
+                    if data.lateral {
+                        self.write("LATERAL ")?;
+                    }
+
                     self.visit_join_data(data)?;
                 }
                 Join::Right(data) => {
                     self.write(" RIGHT JOIN ")?;
+
+                    if data.lateral {
+                        self.write("LATERAL ")?;
+                    }
+
                     self.visit_join_data(data)?;
                 }
                 Join::Full(data) => {
                     self.write(" FULL JOIN ")?;
+
+                    if data.lateral {
+                        self.write("LATERAL ")?;
+                    }
+
                     self.visit_join_data(data)?;
                 }
             }
@@ -234,9 +260,15 @@ pub trait Visitor<'a> {
 
         self.write("SELECT ")?;
 
-        if select.distinct {
-            self.write("DISTINCT ")?;
-        }
+        if let Some(distinct) = select.distinct {
+            match distinct {
+                DistinctType::Default => self.write("DISTINCT ")?,
+                DistinctType::OnClause(columns) => {
+                    self.write("DISTINCT ON ")?;
+                    self.surround_with("(", ") ", |ref mut s| s.visit_columns(columns))?;
+                }
+            }
+        };
 
         if !select.tables.is_empty() {
             if select.columns.is_empty() {
@@ -1004,6 +1036,20 @@ pub trait Visitor<'a> {
         Ok(())
     }
 
+    fn visit_min(&mut self, min: Minimum<'a>) -> Result {
+        self.write("MIN")?;
+        self.surround_with("(", ")", |ref mut s| s.visit_column(min.column))?;
+
+        Ok(())
+    }
+
+    fn visit_max(&mut self, max: Maximum<'a>) -> Result {
+        self.write("MAX")?;
+        self.surround_with("(", ")", |ref mut s| s.visit_column(max.column))?;
+
+        Ok(())
+    }
+
     fn visit_function(&mut self, fun: Function<'a>) -> Result {
         match fun.typ_ {
             FunctionType::RowNumber(fun_rownum) => {
@@ -1046,12 +1092,10 @@ pub trait Visitor<'a> {
                 self.surround_with("(", ")", |ref mut s| s.visit_expression(*upper.expression))?;
             }
             FunctionType::Minimum(min) => {
-                self.write("MIN")?;
-                self.surround_with("(", ")", |ref mut s| s.visit_column(min.column))?;
+                self.visit_min(min)?;
             }
             FunctionType::Maximum(max) => {
-                self.write("MAX")?;
-                self.surround_with("(", ")", |ref mut s| s.visit_column(max.column))?;
+                self.visit_max(max)?;
             }
             FunctionType::Coalesce(coalesce) => {
                 self.write("COALESCE")?;
@@ -1093,6 +1137,14 @@ pub trait Visitor<'a> {
             FunctionType::Uuid => self.write("uuid()")?,
             FunctionType::Concat(concat) => {
                 self.visit_concat(concat)?;
+            }
+            #[cfg(feature = "postgresql")]
+            FunctionType::JsonArrayAgg(array_agg) => {
+                self.visit_json_array_agg(array_agg)?;
+            }
+            #[cfg(feature = "postgresql")]
+            FunctionType::JsonBuildObject(build_obj) => {
+                self.visit_json_build_object(build_obj)?;
             }
         };
 

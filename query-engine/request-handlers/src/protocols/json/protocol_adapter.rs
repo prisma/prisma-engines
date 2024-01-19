@@ -1,12 +1,12 @@
 use crate::{FieldQuery, HandlerError, JsonSingleQuery, SelectionSet};
 use bigdecimal::{BigDecimal, FromPrimitive};
 use indexmap::IndexMap;
-use prisma_models::{decode_bytes, parse_datetime, prelude::ParentContainer, Field};
 use query_core::{
     constants::custom_types,
     schema::{ObjectType, OutputField, QuerySchema},
     ArgumentValue, Operation, Selection,
 };
+use query_structure::{decode_bytes, parse_datetime, prelude::ParentContainer, Field};
 use serde_json::Value as JsonValue;
 use std::str::FromStr;
 

@@ -4,7 +4,7 @@ use mongodb::{
     bson::{self, extjson},
     error::{CommandError, Error as DriverError, TRANSIENT_TRANSACTION_ERROR},
 };
-use prisma_models::{CompositeFieldRef, Field, ScalarFieldRef, SelectedField};
+use query_structure::{CompositeFieldRef, Field, ScalarFieldRef, SelectedField};
 use regex::Regex;
 use thiserror::Error;
 use user_facing_errors::query_engine::DatabaseConstraint;
@@ -59,6 +59,9 @@ pub enum MongoError {
         have: String,
         want: String,
     },
+
+    #[error("Record does not exist: {cause}")]
+    RecordDoesNotExist { cause: String },
 }
 
 impl MongoError {
@@ -123,6 +126,10 @@ impl MongoError {
                 conn_err.set_transient(is_transient);
 
                 conn_err
+            }
+
+            MongoError::RecordDoesNotExist { cause } => {
+                ConnectorError::from_kind(ErrorKind::RecordDoesNotExist { cause })
             }
         }
     }
@@ -278,6 +285,7 @@ impl<T> DecorateErrorWithFieldInformationExtension for crate::Result<T> {
         match selected_field {
             SelectedField::Scalar(sf) => self.decorate_with_scalar_field_info(sf),
             SelectedField::Composite(composite_sel) => self.decorate_with_composite_field_info(&composite_sel.field),
+            SelectedField::Relation(_) => unreachable!(),
         }
     }
 

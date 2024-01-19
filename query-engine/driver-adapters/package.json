@@ -1,0 +1,25 @@
+{
+  "private": true,
+  "name": "js",
+  "version": "0.0.2",
+  "description": "",
+  "engines": {
+    "node": ">=16.13",
+    "pnpm": ">=8.6.6 <9"
+  },
+  "license": "Apache-2.0",
+  "scripts": {
+    "build": "pnpm -r run build",
+    "lint": "pnpm -r run lint",
+    "clean": "git clean -dXf -e !query-engine/driver-adapters"
+  },
+  "keywords": [],
+  "author": "",
+  "devDependencies": {
+    "@types/node": "20.10.4",
+    "tsup": "8.0.1",
+    "typescript": "5.3.3",
+    "esbuild": "0.19.8",
+    "esbuild-register": "3.5.0"
+  }
+}

@@ -1,4 +1,4 @@
-use connector::Filter;
+use query_structure::Filter;
 
 pub fn fold_filter(filter: Filter) -> Filter {
     match filter {

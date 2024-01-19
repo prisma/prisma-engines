@@ -9,7 +9,7 @@ use query_core::{
 };
 use query_engine_metrics::setup as metric_setup;
 use query_engine_metrics::MetricRegistry;
-use request_handlers::{load_executor, ConnectorMode};
+use request_handlers::{load_executor, ConnectorKind};
 use std::{env, fmt, sync::Arc};
 use tracing::Instrument;
 
@@ -56,15 +56,14 @@ impl PrismaContext {
             let preview_features = config.preview_features();
 
             // We only support one data source at the moment, so take the first one (default not exposed yet).
-            let data_source = config
+            let datasource = config
                 .datasources
                 .first()
                 .ok_or_else(|| PrismaError::ConfigurationError("No valid data source found".into()))?;
 
-            let url = data_source.load_url(|key| env::var(key).ok())?;
+            let url = datasource.load_url(|key| env::var(key).ok())?;
             // Load executor
-            let connector_mode = ConnectorMode::Rust;
-            let executor = load_executor(connector_mode, data_source, preview_features, &url).await?;
+            let executor = load_executor(ConnectorKind::Rust { url, datasource }, preview_features).await?;
             executor.primary_connector().get_connection().await?;
             PrismaResult::<_>::Ok(executor)
         });

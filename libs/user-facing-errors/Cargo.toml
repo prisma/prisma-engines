@@ -10,8 +10,8 @@ serde.workspace = true
 backtrace = "0.3.40"
 tracing = "0.1"
 indoc.workspace = true
-itertools = "0.10"
-quaint = { workspace = true, optional = true }
+itertools.workspace = true
+quaint = { path = "../../quaint", optional = true }
 
 [features]
 default = []

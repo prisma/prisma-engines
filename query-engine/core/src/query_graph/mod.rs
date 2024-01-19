@@ -10,7 +10,6 @@ use crate::{
     interpreter::ExpressionResult, FilteredQuery, ManyRecordsQuery, Query, QueryGraphBuilderResult, QueryOptions,
     ReadQuery,
 };
-use connector::{IntoFilter, QueryArguments};
 use guard::*;
 use itertools::Itertools;
 use petgraph::{
@@ -18,7 +17,7 @@ use petgraph::{
     visit::{EdgeRef as PEdgeRef, NodeIndexable},
     *,
 };
-use prisma_models::{FieldSelection, SelectionResult};
+use query_structure::{FieldSelection, IntoFilter, QueryArguments, SelectionResult};
 use std::{collections::HashSet, fmt};
 
 pub type QueryGraphResult<T> = std::result::Result<T, QueryGraphError>;
@@ -798,6 +797,7 @@ impl QueryGraph {
                 selection_order: vec![],
                 aggregation_selections: vec![],
                 options: QueryOptions::none(),
+                relation_load_strategy: query_structure::RelationLoadStrategy::Query,
             });
 
             let reload_query = Query::Read(read_query);
@@ -889,8 +889,9 @@ impl QueryGraph {
                 continue;
             }
 
-            // No connector supports returning more than the primary identifier for a delete just yet.
-            if query.is_delete_one() {
+            // If the connector does not support returning more than the primary identifier for a delete,
+            // do not update the selection set.
+            if query.is_delete_one() && !capabilities.contains(ConnectorCapability::DeleteReturning) {
                 continue;
             }
 

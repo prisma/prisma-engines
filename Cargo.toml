@@ -21,7 +21,7 @@ members = [
   "query-engine/dmmf",
   "query-engine/driver-adapters",
   "query-engine/metrics",
-  "query-engine/prisma-models",
+  "query-engine/query-structure",
   "query-engine/query-engine",
   "query-engine/query-engine-node-api",
   "query-engine/query-engine-wasm",
@@ -50,6 +50,7 @@ tokio = { version = "1.25", features = [
 user-facing-errors = { path = "./libs/user-facing-errors" }
 uuid = { version = "1", features = ["serde"] }
 indoc = "2.0.1"
+itertools = "0.12"
 connection-string = "0.2"
 napi = { version = "2.12.4", default-features = false, features = [
   "napi8",
@@ -57,6 +58,14 @@ napi = { version = "2.12.4", default-features = false, features = [
   "serde-json",
 ] }
 napi-derive = "2.12.4"
+js-sys = { version = "0.3" }
+serde_repr = { version = "0.1.17" }
+serde-wasm-bindgen = { version = "0.5" }
+tsify = { version = "0.4.5" }
+wasm-bindgen = { version = "0.2.89" }
+wasm-bindgen-futures = { version = "0.4" }
+wasm-rs-dbg = { version = "0.1.2" }
+wasm-bindgen-test = { version = "0.3.0" }
 
 [workspace.dependencies.quaint]
 path = "quaint"
@@ -68,6 +77,7 @@ features = [
   "pooled",
   "postgresql",
   "sqlite",
+  "native",
 ]
 
 [profile.dev.package.backtrace]

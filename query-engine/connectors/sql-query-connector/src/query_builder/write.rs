@@ -1,7 +1,7 @@
 use crate::{model_extensions::*, sql_trace::SqlTraceComment, Context};
 use connector_interface::{DatasourceFieldName, ScalarWriteOperation, WriteArgs};
-use prisma_models::*;
 use quaint::ast::*;
+use query_structure::*;
 use std::{collections::HashSet, convert::TryInto};
 use tracing::Span;
 
@@ -188,6 +188,21 @@ pub(crate) fn chunk_update_with_ids(
     });
 
     Ok(query)
+}
+
+pub(crate) fn delete_returning(
+    model: &Model,
+    filter: ConditionTree<'static>,
+    selected_fields: &ModelProjection,
+    ctx: &Context<'_>,
+) -> Query<'static> {
+    let selected_columns = selected_fields.as_columns(ctx).map(|c| c.set_is_selected(true));
+    Delete::from_table(model.as_table(ctx))
+        .so_that(filter)
+        .returning(selected_columns)
+        .append_trace(&Span::current())
+        .add_trace_id(ctx.trace_id)
+        .into()
 }
 
 pub(crate) fn delete_many_from_filter(

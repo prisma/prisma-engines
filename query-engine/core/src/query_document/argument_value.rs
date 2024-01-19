@@ -1,7 +1,7 @@
 use bigdecimal::BigDecimal;
 use chrono::{DateTime, FixedOffset};
 use indexmap::IndexMap;
-use prisma_models::PrismaValue;
+use query_structure::PrismaValue;
 use serde::Serialize;
 
 pub type ArgumentValueObject = IndexMap<String, ArgumentValue>;
