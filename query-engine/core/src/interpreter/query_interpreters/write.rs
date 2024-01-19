@@ -49,7 +49,7 @@ async fn create_one(
         name: q.name,
         fields: q.selection_order,
         model: q.model,
-        scalars: res.into(),
+        records: res.into(),
         nested: vec![],
         virtual_fields: vec![],
     }))))
@@ -86,7 +86,7 @@ async fn update_one(
                 .map(|res| RecordSelection {
                     name: q.name,
                     fields: q.selection_order,
-                    scalars: res.into(),
+                    records: res.into(),
                     nested: vec![],
                     model: q.model,
                     virtual_fields: vec![],
@@ -115,7 +115,7 @@ async fn native_upsert(
     Ok(RecordSelection {
         name: query.name().to_string(),
         fields: query.selection_order().to_owned(),
-        scalars: scalars.into(),
+        records: scalars.into(),
         nested: Vec::new(),
         model: query.model().clone(),
         virtual_fields: vec![],
@@ -144,7 +144,7 @@ async fn delete_one(
         let selection = RecordSelection {
             name: q.name,
             fields: selected_fields.order,
-            scalars: record.into(),
+            records: record.into(),
             nested: vec![],
             model: q.model,
             virtual_fields: vec![],

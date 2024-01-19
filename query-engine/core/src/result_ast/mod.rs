@@ -56,8 +56,7 @@ pub struct RecordSelection {
     pub(crate) fields: Vec<String>,
 
     /// Selection results (includes scalar and virtual fields)
-    // TODO: rename to `records`
-    pub(crate) scalars: ManyRecords,
+    pub(crate) records: ManyRecords,
 
     /// Nested query results
     // Todo this is only here because reads are still resolved in one go
