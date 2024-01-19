@@ -482,11 +482,6 @@ fn serialize_objects(
     let db_field_names = result.scalars.field_names;
     let model = result.model;
 
-    let fields: Vec<_> = db_field_names
-        .iter()
-        .map(|f| (f, model.fields().find_from_non_virtual_by_db_name(f).ok()))
-        .collect();
-
     let virtual_field_names: HashSet<_> = result.virtual_fields.iter().map(|f| f.db_alias()).collect();
 
     // Write all fields, nested and list fields unordered into a map, afterwards order all into the final order.
@@ -502,26 +497,27 @@ fn serialize_objects(
         let values = record.values;
         let mut object = HashMap::with_capacity(values.len());
 
-        for (val, field) in values.into_iter().zip(fields.iter()) {
-            // match result.virtual_fields.iter().find(|f| f.db_alias() == field.name()) {
+        for (val, field_name) in values.into_iter().zip(db_field_names.iter()) {
+            let field = model.fields().find_from_non_virtual_by_db_name(field_name).ok();
+
             match field {
-                (_, Some(field)) => {
+                Some(field) => {
                     let out_field = typ
                         .find_field(field.name())
                         .expect("Non-virtual field must be defined in the type");
 
-                    if let Field::Composite(cf) = field {
+                    if let Field::Composite(ref cf) = field {
                         object.insert(field.name().to_owned(), serialize_composite(cf, out_field, val)?);
                     } else if !out_field.field_type().is_object() {
                         object.insert(field.name().to_owned(), serialize_scalar(out_field, val)?);
                     }
                 }
 
-                (field_name, None) => {
+                None => {
                     let vs = result
                         .virtual_fields
                         .iter()
-                        .find(|f| f.db_alias() == **field_name)
+                        .find(|f| f.db_alias() == *field_name)
                         .expect("Couldn't find virtual field by name");
 
                     let (virtual_obj_name, nested_field_name) = vs.serialized_name();
