@@ -174,24 +174,6 @@ fn serialize_aggregations(
     Ok(envelope)
 }
 
-// fn write_rel_aggregation_row(row: &RelAggregationRow, map: &mut HashMap<String, Item>) {
-//     for result in row.iter() {
-//         match result {
-//             RelAggregationResult::Count(rf, count) => match map.get_mut(UNDERSCORE_COUNT) {
-//                 Some(item) => match item {
-//                     Item::Map(inner_map) => inner_map.insert(rf.name().to_owned(), Item::Value(count.clone())),
-//                     _ => unreachable!(),
-//                 },
-//                 None => {
-//                     let mut inner_map: Map = Map::new();
-//                     inner_map.insert(rf.name().to_owned(), Item::Value(count.clone()));
-//                     map.insert(UNDERSCORE_COUNT.to_owned(), Item::Map(inner_map))
-//                 }
-//             },
-//         };
-//     }
-// }
-
 fn extract_aggregate_object_type<'a, 'b>(output_type: &'b OutputType<'a>) -> &'b ObjectType<'a> {
     match &output_type.inner {
         InnerOutputType::Object(obj) => obj,
@@ -482,11 +464,9 @@ fn serialize_objects(
     let db_field_names = result.scalars.field_names;
     let model = result.model;
 
-    let virtual_field_names: HashSet<_> = result.virtual_fields.iter().map(|f| f.db_alias()).collect();
-
     // Write all fields, nested and list fields unordered into a map, afterwards order all into the final order.
     // If nothing is written to the object, write null instead.
-    for (r_index, record) in result.scalars.records.into_iter().enumerate() {
+    for record in result.scalars.records {
         let record_id = Some(record.extract_selection_result(&db_field_names, &model.primary_identifier())?);
 
         if !object_mapping.contains_key(&record.parent_id) {
@@ -535,25 +515,6 @@ fn serialize_objects(
 
         // Write nested results
         write_nested_items(&record_id, &mut nested_mapping, &mut object, typ)?;
-
-        // let aggr_row = result.aggregation_rows.as_ref().map(|rows| rows.get(r_index).unwrap());
-        // if let Some(aggr_row) = aggr_row {
-        //     write_rel_aggregation_row(aggr_row, &mut object);
-        // }
-
-        // let mut aggr_fields = aggr_row
-        //     .map(|row| {
-        //         row.iter()
-        //             .map(|aggr_result| match aggr_result {
-        //                 RelAggregationResult::Count(_, _) => UNDERSCORE_COUNT.to_owned(),
-        //             })
-        //             .unique()
-        //             .collect()
-        //     })
-        //     .unwrap_or_default();
-
-        // let mut all_fields = result.fields.clone();
-        // all_fields.append(&mut aggr_fields);
 
         let map = reorder_object_with_selection_order(&result.fields, object);
 
