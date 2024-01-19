@@ -464,6 +464,11 @@ fn serialize_objects(
     let db_field_names = result.records.field_names;
     let model = result.model;
 
+    let model_fields: Vec<_> = db_field_names
+        .iter()
+        .map(|field_name| model.fields().find_from_non_virtual_by_db_name(field_name).ok())
+        .collect();
+
     // Write all fields, nested and list fields unordered into a map, afterwards order all into the final order.
     // If nothing is written to the object, write null instead.
     for record in result.records.records {
@@ -477,9 +482,7 @@ fn serialize_objects(
         let values = record.values;
         let mut object = HashMap::with_capacity(values.len());
 
-        for (val, field_name) in values.into_iter().zip(db_field_names.iter()) {
-            let field = model.fields().find_from_non_virtual_by_db_name(field_name).ok();
-
+        for (val, (field_name, field)) in values.into_iter().zip(db_field_names.iter().zip(model_fields.iter())) {
             match field {
                 Some(field) => {
                     let out_field = typ
