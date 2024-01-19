@@ -13,12 +13,14 @@ pub(crate) struct RelAggregationJoins {
     pub(crate) columns: Vec<Expression<'static>>,
 }
 
-// TODO: forward an iterator all the way from `FieldSelection::virtuals` to here without collecting
-pub(crate) fn build(virtual_selections: &[&VirtualSelection], ctx: &Context<'_>) -> RelAggregationJoins {
+pub(crate) fn build<'a>(
+    virtual_selections: impl IntoIterator<Item = &'a VirtualSelection>,
+    ctx: &Context<'_>,
+) -> RelAggregationJoins {
     let mut joins = vec![];
     let mut columns: Vec<Expression<'static>> = vec![];
 
-    for (index, selection) in virtual_selections.iter().enumerate() {
+    for (index, selection) in virtual_selections.into_iter().enumerate() {
         match selection {
             VirtualSelection::RelationCount(rf, filter) => {
                 let join_alias = format!("aggr_selection_{index}");
