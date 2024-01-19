@@ -77,12 +77,12 @@ where
 
     let parent = parent.into();
 
-    let selected_fields = Vec::new();
+    let mut selected_fields = Vec::new();
 
     for pair in pairs {
         let field = parent.find_field(&pair.parsed_field.name);
 
-        match (pair.parsed_field, field) {
+        match (pair.parsed_field.clone(), field) {
             (pf, Some(Field::Relation(rf))) => {
                 let fields = rf.scalar_fields().into_iter().map(SelectedField::from);
 
@@ -102,8 +102,8 @@ where
             }
 
             (pf, None) if pf.name == UNDERSCORE_COUNT => match parent {
-                ParentContainer::Model(model) => {
-                    selected_fields.extend(extract_relation_count_selections(pf, &model)?);
+                ParentContainer::Model(ref model) => {
+                    selected_fields.extend(extract_relation_count_selections(pf, model)?);
                 }
                 ParentContainer::CompositeType(_) => {
                     unreachable!("Unexpected relation aggregation selection inside a composite type query")
