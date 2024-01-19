@@ -59,9 +59,11 @@ pub(crate) async fn get_single_record_wo_joins(
     selected_fields: &FieldSelection,
     ctx: &Context<'_>,
 ) -> crate::Result<Option<SingleRecord>> {
+    let selected_fields = selected_fields.without_relations();
+
     let query = read::get_records(
         model,
-        ModelProjection::from(selected_fields)
+        ModelProjection::from(&selected_fields)
             .as_columns(ctx)
             .mark_all_selected(),
         &selected_fields.virtuals().collect::<Vec<_>>(), // TODO: pass the iterator all the way down
@@ -169,6 +171,7 @@ pub(crate) async fn get_many_records_wo_joins(
     selected_fields: &FieldSelection,
     ctx: &Context<'_>,
 ) -> crate::Result<ManyRecords> {
+    let selected_fields = selected_fields.without_relations();
     let reversed = query_arguments.needs_reversed_order();
 
     let field_names: Vec<_> = selected_fields.db_names().collect();
@@ -209,7 +212,7 @@ pub(crate) async fn get_many_records_wo_joins(
             for args in batches.into_iter() {
                 let query = read::get_records(
                     model,
-                    ModelProjection::from(selected_fields)
+                    ModelProjection::from(&selected_fields)
                         .as_columns(ctx)
                         .mark_all_selected(),
                     &selected_fields.virtuals().collect::<Vec<_>>(), // TODO: pass an iterator
@@ -233,7 +236,7 @@ pub(crate) async fn get_many_records_wo_joins(
         _ => {
             let query = read::get_records(
                 model,
-                ModelProjection::from(selected_fields)
+                ModelProjection::from(&selected_fields)
                     .as_columns(ctx)
                     .mark_all_selected(),
                 &selected_fields.virtuals().collect::<Vec<_>>(), // TODO: pass an iterator
