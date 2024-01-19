@@ -1,4 +1,4 @@
-use crate::{coerce_null_to_zero_value, NativeUpsert, WriteArgs};
+use crate::{NativeUpsert, WriteArgs};
 use async_trait::async_trait;
 use prisma_value::PrismaValue;
 use query_structure::{ast::FieldArity, *};
