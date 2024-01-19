@@ -106,7 +106,7 @@ where
                     selected_fields.extend(extract_relation_count_selections(pf, &model)?);
                 }
                 ParentContainer::CompositeType(_) => {
-                    unreachable!("Unexpected relation aggregation selection selection inside a composite type query")
+                    unreachable!("Unexpected relation aggregation selection inside a composite type query")
                 }
             },
 
