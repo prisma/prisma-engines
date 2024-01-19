@@ -298,6 +298,56 @@ impl SqlFamily {
         }
     }
 
+    /// Get the default max rows for a batch insert.
+    pub fn max_insert_rows(&self) -> Option<usize> {
+        match self {
+            #[cfg(feature = "postgresql")]
+            SqlFamily::Postgres => None,
+            #[cfg(feature = "mysql")]
+            SqlFamily::Mysql => None,
+            #[cfg(feature = "sqlite")]
+            SqlFamily::Sqlite => Some(999),
+            #[cfg(feature = "mssql")]
+            SqlFamily::Mssql => Some(1000),
+        }
+    }
+
+    /// Get the max number of bind parameters for a single query, which in targets other
+    /// than Wasm can be controlled with the env var QUERY_BATCH_SIZE.
+    #[cfg(not(target_arch = "wasm32"))]
+    pub fn max_bind_values(&self) -> usize {
+        use once_cell::sync::Lazy;
+
+        static BATCH_SIZE_OVERRIDE: Lazy<Option<usize>> = Lazy::new(|| {
+            std::env::var("QUERY_BATCH_SIZE")
+                .ok()
+                .map(|size| size.parse().expect("QUERY_BATCH_SIZE: not a valid size"))
+        });
+
+        (*BATCH_SIZE_OVERRIDE).unwrap_or(self.default_max_bind_values())
+    }
+
+    /// Get the default max number of bind parameters for a single query, in Wasm there's no
+    /// environment, and we omit that knob.
+    #[cfg(target_arch = "wasm32")]
+    pub fn max_bind_values(&self) -> usize {
+        self.default_max_bind_values()
+    }
+
+    #[inline(always)]
+    fn default_max_bind_values(&self) -> usize {
+        match self {
+            #[cfg(feature = "postgresql")]
+            SqlFamily::Postgres => 32766,
+            #[cfg(feature = "mysql")]
+            SqlFamily::Mysql => 65535,
+            #[cfg(feature = "sqlite")]
+            SqlFamily::Sqlite => 999,
+            #[cfg(feature = "mssql")]
+            SqlFamily::Mssql => 2099,
+        }
+    }
+
     /// Check if a family exists for the given scheme.
     pub fn scheme_is_supported(url_scheme: &str) -> bool {
         Self::from_scheme(url_scheme).is_some()

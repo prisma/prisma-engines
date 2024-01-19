@@ -273,7 +273,7 @@ async fn create_many_nonempty(
         vec![args]
     };
 
-    let partitioned_batches = if let Some(max_rows) = ctx.max_rows {
+    let partitioned_batches = if let Some(max_rows) = ctx.max_insert_rows {
         let capacity = batches.len();
         batches
             .into_iter()
