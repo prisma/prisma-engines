@@ -44,8 +44,8 @@ fn read_one(
 
         match record {
             Some(record) if query.relation_load_strategy.is_query() => {
-                let records: ManyRecords = record.into();
-                let nested: Vec<QueryResult> = process_nested(tx, query.nested, Some(&records)).await?;
+                let records = record.into();
+                let nested = process_nested(tx, query.nested, Some(&records)).await?;
 
                 Ok(RecordSelection {
                     name: query.name,
