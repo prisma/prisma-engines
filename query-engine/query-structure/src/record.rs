@@ -49,7 +49,7 @@ impl ManyRecords {
     pub fn empty(selected_fields: &FieldSelection) -> Self {
         Self {
             records: Vec::new(),
-            field_names: selected_fields.prisma_names().collect(),
+            field_names: selected_fields.db_names().collect(),
         }
     }
 
