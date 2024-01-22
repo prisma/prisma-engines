@@ -10,9 +10,12 @@ mod not_in_batching {
 
         assert_error!(
             runner,
-            "query { findManyTestModel(where: { id: { notIn: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11] } }) { id }}",
-            2029 // QueryParameterLimitExceeded
-        );
+            with_id_excess!(
+                runner,
+                "query { findManyTestModel(where: { id: { notIn: [:id_list:] } }) { id }}"
+            ),
+            2029
+        ); // QueryParameterLimitExceeded
 
         Ok(())
     }
@@ -28,9 +31,12 @@ mod not_in_batching_cockroachdb {
 
         assert_error!(
             runner,
-            "query { findManyTestModel(where: { id: { notIn: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11] } }) { id }}",
-            2029 // QueryParameterLimitExceeded
-        );
+            with_id_excess!(
+                runner,
+                "query { findManyTestModel(where: { id: { notIn: [:id_list:] } }) { id }}"
+            ),
+            2029
+        ); // QueryParameterLimitExceeded
 
         Ok(())
     }

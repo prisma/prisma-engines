@@ -327,15 +327,15 @@ impl SqlFamily {
         (*BATCH_SIZE_OVERRIDE).unwrap_or(self.default_max_bind_values())
     }
 
-    /// Get the default max number of bind parameters for a single query, in Wasm there's no
+    /// Get the max number of bind parameters for a single query, in Wasm there's no
     /// environment, and we omit that knob.
     #[cfg(target_arch = "wasm32")]
     pub fn max_bind_values(&self) -> usize {
         self.default_max_bind_values()
     }
 
-    #[inline(always)]
-    fn default_max_bind_values(&self) -> usize {
+    /// Get the default max number of bind parameters for a single query.
+    pub fn default_max_bind_values(&self) -> usize {
         match self {
             #[cfg(feature = "postgresql")]
             SqlFamily::Postgres => 32766,

@@ -94,9 +94,7 @@ mod isb {
 
         assert_error!(
             runner,
-            r#"query {
-              findManyA(where: {id: { in: [5,4,3,2,1,1,1,2,3,4,5,6,7,6,5,4,3,2,1,2,3,4,5,6] }}, orderBy: { b: { as: { _count: asc } } }) { id }
-            }"#,
+            with_id_excess!(&runner, "query { findManyA(where: {id: { in: [:id_list:] }}, orderBy: { b: { as: { _count: asc } } } ) { id } }"),
             2029 // QueryParameterLimitExceeded
         );
 
@@ -109,9 +107,10 @@ mod isb {
 
         assert_error!(
             runner,
-            r#"query {
-              findManyA(where: {id: { in: [5,4,3,2,1,1,1,2,3,4,5,6,7,6,5,4,3,2,1,2,3,4,5,6] }}, orderBy: { _relevance: { fields: text, search: "something", sort: asc } }) { id }
-            }"#,
+            with_id_excess!(
+                &runner,
+                r#"query { findManyA(where: {id: { in: [:id_list:] }}, orderBy: { _relevance: { fields: text, search: "something", sort: asc } } ) { id } }"#
+            ),
             2029 // QueryParameterLimitExceeded
         );
 

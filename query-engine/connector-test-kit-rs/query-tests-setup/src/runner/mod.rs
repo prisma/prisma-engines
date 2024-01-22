@@ -8,7 +8,6 @@ use crate::{
     ENGINE_PROTOCOL,
 };
 use colored::Colorize;
-use quaint::connector::SqlFamily;
 use query_core::{
     protocol::EngineProtocol,
     schema::{self, QuerySchemaRef},
@@ -108,8 +107,8 @@ impl Runner {
         self.query_schema.internal_data_model.schema.db.source()
     }
 
-    pub fn sql_family(&self) -> Option<SqlFamily> {
-        self.version.sql_family()
+    pub fn max_bind_values(&self) -> Option<usize> {
+        self.connector_version().max_bind_values()
     }
 
     pub async fn load(

@@ -17,12 +17,12 @@ impl<'a> Context<'a> {
         let max_insert_rows = sql_family.max_insert_rows();
         let max_bind_values = sql_family.max_bind_values();
 
-        return Context {
+        Context {
             connection_info,
             trace_id,
             max_insert_rows,
             max_bind_values: Some(max_bind_values),
-        };
+        }
     }
 
     pub(crate) fn schema_name(&self) -> &str {
