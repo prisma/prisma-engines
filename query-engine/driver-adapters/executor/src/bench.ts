@@ -213,6 +213,7 @@ function initQeWasmBaseLine(
   return new WasmBaseline(qe.queryEngineOptions(datamodel), debug, adapter);
 }
 
-const err = (...args: any[]) => console.error("[nodejs] ERROR:", ...args);
-
-main().catch(err);
+main().catch((err) => {
+  console.error(err);
+  process.exit(1);
+});
