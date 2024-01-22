@@ -25,7 +25,7 @@ jobs:
       - name: "Setup Node.js"
         uses: actions/setup-node@v4
         with:
-          node-version: ${{ matrix.node_version }}
+          node-version: 18
 
       - name: "Setup pnpm"
         uses: pnpm/action-setup@v2
@@ -83,9 +83,9 @@ jobs:
           done
 
           if [ $total_count -eq 0 ]; then
-              echo "summary=✅ WASM query-engine: no benchmarks have changed substantially" >> "$GITHUB_OUTPUT"
-              echo "status=passed" >> "$GITHUB_OUTPUT"
-              exit 0
+              echo "summary=💥 something was wrong running the benchmarks" >> "$GITHUB_OUTPUT"
+              echo "status=failed" >> "$GITHUB_OUTPUT"
+              exit 1
           fi
 
           mean=$(echo "scale=4; $total_sum / $total_count" | bc)
