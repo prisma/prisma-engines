@@ -19,8 +19,6 @@ import { PrismaLibSQL } from '@prisma/adapter-libsql'
 // planetscale dependencies
 import { Client as PlanetscaleClient } from '@planetscale/database'
 import { PrismaPlanetScale } from '@prisma/adapter-planetscale'
-import { format as formatPlanetScaleQuery } from './planetscale/sanitize'
-
 
 
 import {bindAdapter, DriverAdapter, ErrorCapturingDriverAdapter} from "@prisma/driver-adapter-utils";
@@ -297,9 +295,6 @@ async function planetscaleAdapter(url: string): Promise<DriverAdapter> {
         // preserving path name so proxy url would look like real DB url
         url: copyPathName(url, proxyUrl),
         fetch,
-
-        // TODO: remove once https://github.com/planetscale/database-js/pull/159 is published upstream.
-        format: formatPlanetScaleQuery,
     })
 
     return new PrismaPlanetScale(client)
