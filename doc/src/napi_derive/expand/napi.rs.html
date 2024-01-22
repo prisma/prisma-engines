@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/nix/store/i5grg1srqdma4c801qfmy3jvqhy5yj6d-vendor-cargo-deps/c19b7c6f923b580ac259164a89f2577984ad5ab09ee9d583b888f934adbbe8d0/napi-derive-2.13.0/src/expand/napi.rs`."><title>napi.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-9ee3a5e31a2afa3e.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="napi_derive" data-themes="" data-resource-suffix="" data-rustdoc-version="1.75.0 (82e1608df 2023-12-21)" data-channel="1.75.0" data-search-js="search-8fbf244ebcf71464.js" data-settings-js="settings-74424d7eec62a23e.js" ><script src="../../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-9dd44ab47b99a0fb.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/nix/store/xrh9hh7wcxxigiq7fvai859cplhnq1x4-vendor-cargo-deps/c19b7c6f923b580ac259164a89f2577984ad5ab09ee9d583b888f934adbbe8d0/napi-derive-2.14.6/src/expand/napi.rs`."><title>napi.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-9ee3a5e31a2afa3e.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="napi_derive" data-themes="" data-resource-suffix="" data-rustdoc-version="1.75.0 (82e1608df 2023-12-21)" data-channel="1.75.0" data-search-js="search-8fbf244ebcf71464.js" data-settings-js="settings-74424d7eec62a23e.js" ><script src="../../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-9dd44ab47b99a0fb.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -229,29 +229,17 @@
 <a href="#229" id="229">229</a>
 <a href="#230" id="230">230</a>
 <a href="#231" id="231">231</a>
-<a href="#232" id="232">232</a>
-<a href="#233" id="233">233</a>
-<a href="#234" id="234">234</a>
-<a href="#235" id="235">235</a>
-<a href="#236" id="236">236</a>
-<a href="#237" id="237">237</a>
-<a href="#238" id="238">238</a>
-<a href="#239" id="239">239</a>
-<a href="#240" id="240">240</a>
-<a href="#241" id="241">241</a>
-<a href="#242" id="242">242</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::env;
 <span class="kw">use </span>std::fs;
-<span class="attr">#[cfg(feature = <span class="string">&quot;type-def&quot;</span>)]
-</span><span class="kw">use </span>std::io::BufWriter;
+<span class="kw">use </span>std::io::BufWriter;
 <span class="kw">use </span>std::io::Write;
 <span class="kw">use </span>std::sync::atomic::{AtomicBool, Ordering};
 
 <span class="kw">use </span><span class="kw">crate</span>::parser::{attrs::BindgenAttrs, ParseNapi};
 <span class="attr">#[cfg(feature = <span class="string">&quot;type-def&quot;</span>)]
 </span><span class="kw">use </span>napi_derive_backend::ToTypeDef;
-<span class="kw">use </span>napi_derive_backend::{BindgenResult, Napi, TryToTokens, REGISTER_IDENTS};
-<span class="kw">use </span>proc_macro2::{TokenStream, TokenTree};
+<span class="kw">use </span>napi_derive_backend::{BindgenResult, Napi, TryToTokens};
+<span class="kw">use </span>proc_macro2::TokenStream;
 <span class="kw">use </span>quote::ToTokens;
 <span class="kw">use </span>syn::{Attribute, Item};
 
@@ -276,7 +264,7 @@
     </span>prepare_type_def_file();
 
     <span class="kw">if let </span><span class="prelude-val">Ok</span>(wasi_register_file) = env::var(<span class="string">&quot;WASI_REGISTER_TMP_PATH&quot;</span>) {
-      <span class="kw">if let </span><span class="prelude-val">Err</span>(_e) = fs::remove_file(wasi_register_file) {
+      <span class="kw">if let </span><span class="prelude-val">Err</span>(_e) = remove_existed_def_file(<span class="kw-2">&amp;</span>wasi_register_file) {
         <span class="attr">#[cfg(debug_assertions)]
         </span>{
           <span class="macro">println!</span>(<span class="string">&quot;Failed to manipulate wasi register file: {:?}&quot;</span>, _e);
@@ -309,7 +297,7 @@
                 .attrs
                 .iter()
                 .enumerate()
-                .find(|(<span class="kw">_</span>, m)| m.path.segments[<span class="number">0</span>].ident == <span class="string">&quot;napi&quot;</span>);
+                .find(|(<span class="kw">_</span>, m)| m.path().is_ident(<span class="string">&quot;napi&quot;</span>));
               <span class="kw">if </span>mod_in_mod.is_some() {
                 <span class="macro">bail_span!</span>(
                   mod_,
@@ -322,11 +310,13 @@
             <span class="kw">_ </span>=&gt; <span class="kw-2">&amp;mut </span>empty_attrs,
           },
         ) {
-          <span class="kw">let </span>napi = item.parse_napi(<span class="kw-2">&amp;mut </span>tokens, item_opts)<span class="question-mark">?</span>;
+          <span class="kw">let </span>napi = item.parse_napi(<span class="kw-2">&amp;mut </span>tokens, <span class="kw-2">&amp;</span>item_opts)<span class="question-mark">?</span>;
+          item_opts.check_used()<span class="question-mark">?</span>;
           napi.try_to_tokens(<span class="kw-2">&amp;mut </span>tokens)<span class="question-mark">?</span>;
 
           <span class="attr">#[cfg(feature = <span class="string">&quot;type-def&quot;</span>)]
           </span>output_type_def(<span class="kw-2">&amp;</span>napi);
+          output_wasi_register_def(<span class="kw-2">&amp;</span>napi);
         } <span class="kw">else </span>{
           item.to_tokens(<span class="kw-2">&amp;mut </span>tokens);
         };
@@ -338,30 +328,39 @@
       .attrs
       .clone()
       .into_iter()
-      .filter(|attr| attr.path.segments[<span class="number">0</span>].ident != <span class="string">&quot;napi&quot;</span>)
+      .filter(|attr| attr.path().is_ident(<span class="string">&quot;napi&quot;</span>))
       .collect();
     <span class="kw">let </span>mod_name = js_mod.ident;
     <span class="kw">let </span>visible = js_mod.vis;
     <span class="kw">let </span>mod_tokens = <span class="macro">quote! </span>{ #(#js_mod_attrs)* #visible <span class="kw">mod </span>#mod_name { #tokens } };
     <span class="prelude-val">Ok</span>(mod_tokens)
   } <span class="kw">else </span>{
-    <span class="kw">let </span>napi = item.parse_napi(<span class="kw-2">&amp;mut </span>tokens, opts)<span class="question-mark">?</span>;
+    <span class="kw">let </span>napi = item.parse_napi(<span class="kw-2">&amp;mut </span>tokens, <span class="kw-2">&amp;</span>opts)<span class="question-mark">?</span>;
+    opts.check_used()<span class="question-mark">?</span>;
     napi.try_to_tokens(<span class="kw-2">&amp;mut </span>tokens)<span class="question-mark">?</span>;
 
     <span class="attr">#[cfg(feature = <span class="string">&quot;type-def&quot;</span>)]
     </span>output_type_def(<span class="kw-2">&amp;</span>napi);
-
-    REGISTER_IDENTS.with(|idents| {
-      <span class="kw">if let </span><span class="prelude-val">Ok</span>(wasi_register_file) = env::var(<span class="string">&quot;WASI_REGISTER_TMP_PATH&quot;</span>) {
-        <span class="kw">let </span><span class="kw-2">mut </span>file =
-          fs::File::create(wasi_register_file).expect(<span class="string">&quot;Create wasi register file failed&quot;</span>);
-        file
-          .write_all(<span class="macro">format!</span>(<span class="string">&quot;{:?}&quot;</span>, idents.borrow()).as_bytes())
-          .expect(<span class="string">&quot;Write wasi register file failed&quot;</span>);
-      }
-    });
-
+    output_wasi_register_def(<span class="kw-2">&amp;</span>napi);
     <span class="prelude-val">Ok</span>(tokens)
+  }
+}
+
+<span class="kw">fn </span>output_wasi_register_def(napi: <span class="kw-2">&amp;</span>Napi) {
+  <span class="kw">if let </span><span class="prelude-val">Ok</span>(wasi_register_file) = env::var(<span class="string">&quot;WASI_REGISTER_TMP_PATH&quot;</span>) {
+    fs::OpenOptions::new()
+      .append(<span class="bool-val">true</span>)
+      .create(<span class="bool-val">true</span>)
+      .open(wasi_register_file)
+      .and_then(|file| {
+        <span class="kw">let </span><span class="kw-2">mut </span>writer = BufWriter::&lt;fs::File&gt;::new(file);
+        <span class="kw">let </span>pkg_name: String = std::env::var(<span class="string">&quot;CARGO_PKG_NAME&quot;</span>).expect(<span class="string">&quot;CARGO_PKG_NAME is not set&quot;</span>);
+        writer.write_all(<span class="macro">format!</span>(<span class="string">&quot;{pkg_name}: {}&quot;</span>, napi.register_name()).as_bytes())<span class="question-mark">?</span>;
+        writer.write_all(<span class="string">&quot;\n&quot;</span>.as_bytes())
+      })
+      .unwrap_or_else(|e| {
+        <span class="macro">println!</span>(<span class="string">&quot;Failed to write wasi register file: {:?}&quot;</span>, e);
+      });
   }
 }
 
@@ -389,41 +388,28 @@
   js_namespace: String,
   attrs: <span class="kw-2">&amp;mut </span>Vec&lt;syn::Attribute&gt;,
 ) -&gt; <span class="prelude-ty">Option</span>&lt;BindgenAttrs&gt; {
-  <span class="kw">let </span>napi_attr = attrs.clone();
-  <span class="kw">let </span>napi_attr = napi_attr
+  <span class="kw">let </span>napi_attr = attrs
     .iter()
     .enumerate()
-    .find(|(<span class="kw">_</span>, m)| m.path.segments[<span class="number">0</span>].ident == <span class="string">&quot;napi&quot;</span>);
-  <span class="kw">if let </span><span class="prelude-val">Some</span>((index, napi_attr)) = napi_attr {
-    <span class="kw">let </span>attr_token_stream = napi_attr.tokens.clone();
-    <span class="kw">let </span>raw_attr_stream = attr_token_stream.to_string();
-    <span class="kw">let </span>raw_attr_stream = <span class="kw">if </span>!raw_attr_stream.is_empty() {
-      raw_attr_stream
-        .strip_prefix(<span class="string">&#39;(&#39;</span>)
-        .unwrap()
-        .strip_suffix(<span class="string">&#39;)&#39;</span>)
-        .unwrap()
-        .to_string()
-    } <span class="kw">else </span>{
-      raw_attr_stream
-    };
-    <span class="kw">let </span>raw_attr_token_stream = syn::parse_str::&lt;TokenStream&gt;(raw_attr_stream.as_str()).unwrap();
+    .find(|(<span class="kw">_</span>, m)| m.path().is_ident(<span class="string">&quot;napi&quot;</span>));
 
-    <span class="kw">let </span>new_attr: syn::Attribute = <span class="kw">if </span>!raw_attr_stream.is_empty() {
-      <span class="macro">syn::parse_quote!</span>(
-        <span class="attr">#[napi(#raw_attr_token_stream, namespace = #js_namespace)]
-      </span>)
-    } <span class="kw">else </span>{
-      <span class="macro">syn::parse_quote!</span>(
-        <span class="attr">#[napi(namespace = #js_namespace)]
-      </span>)
+  <span class="kw">if let </span><span class="prelude-val">Some</span>((index, napi_attr)) = napi_attr {
+    <span class="comment">// adds `namespace = #js_namespace` into `#[napi]` attribute
+    </span><span class="kw">let </span>new_attr = <span class="kw">match </span><span class="kw-2">&amp;</span>napi_attr.meta {
+      syn::Meta::Path(<span class="kw">_</span>) =&gt; {
+        <span class="macro">syn::parse_quote!</span>(<span class="attr">#[napi(namespace = #js_namespace)]</span>)
+      }
+      syn::Meta::List(list) =&gt; {
+        <span class="kw">let </span>existing = list.tokens.clone();
+        <span class="macro">syn::parse_quote!</span>(<span class="attr">#[napi(#existing, namespace = #js_namespace)]</span>)
+      }
+      syn::Meta::NameValue(name_value) =&gt; {
+        <span class="kw">let </span>existing = <span class="kw-2">&amp;</span>name_value.value;
+        <span class="macro">syn::parse_quote!</span>(<span class="attr">#[napi(#existing, namespace = #js_namespace)]</span>)
+      }
     };
-    <span class="kw">let </span>struct_opts: BindgenAttrs =
-      <span class="kw">if let </span><span class="prelude-val">Some</span>(TokenTree::Group(g)) = new_attr.tokens.into_iter().next() {
-        syn::parse2(g.stream()).ok()<span class="question-mark">?
-      </span>} <span class="kw">else </span>{
-        syn::parse2(<span class="macro">quote! </span>{}).ok()<span class="question-mark">?
-      </span>};
+
+    <span class="kw">let </span>struct_opts = BindgenAttrs::try_from(<span class="kw-2">&amp;</span>new_attr).unwrap();
     attrs.remove(index);
     <span class="prelude-val">Some</span>(struct_opts)
   } <span class="kw">else </span>{
@@ -436,7 +422,7 @@
   <span class="kw">if let </span><span class="prelude-val">Ok</span>(<span class="kw-2">ref </span>type_def_file) = env::var(<span class="string">&quot;TYPE_DEF_TMP_PATH&quot;</span>) {
     <span class="kw">use </span>napi_derive_backend::{NAPI_RS_CLI_VERSION, NAPI_RS_CLI_VERSION_WITH_SHARED_CRATES_FIX};
     <span class="kw">if let </span><span class="prelude-val">Err</span>(_e) = <span class="kw">if </span><span class="kw-2">*</span>NAPI_RS_CLI_VERSION &gt;= <span class="kw-2">*</span>NAPI_RS_CLI_VERSION_WITH_SHARED_CRATES_FIX {
-      remove_existed_type_def(type_def_file)
+      remove_existed_def_file(type_def_file)
     } <span class="kw">else </span>{
       fs::remove_file(type_def_file)
     } {
@@ -448,12 +434,11 @@
   }
 }
 
-<span class="attr">#[cfg(feature = <span class="string">&quot;type-def&quot;</span>)]
-</span><span class="kw">fn </span>remove_existed_type_def(type_def_file: <span class="kw-2">&amp;</span>str) -&gt; std::io::Result&lt;()&gt; {
+<span class="kw">fn </span>remove_existed_def_file(def_file: <span class="kw-2">&amp;</span>str) -&gt; std::io::Result&lt;()&gt; {
   <span class="kw">use </span>std::io::{BufRead, BufReader};
 
   <span class="kw">let </span>pkg_name = std::env::var(<span class="string">&quot;CARGO_PKG_NAME&quot;</span>).expect(<span class="string">&quot;CARGO_PKG_NAME is not set&quot;</span>);
-  <span class="kw">if let </span><span class="prelude-val">Ok</span>(content) = std::fs::File::open(type_def_file) {
+  <span class="kw">if let </span><span class="prelude-val">Ok</span>(content) = std::fs::File::open(def_file) {
     <span class="kw">let </span>reader = BufReader::new(content);
     <span class="kw">let </span>cleaned_content = reader
       .lines()
@@ -471,14 +456,7 @@
       })
       .collect::&lt;Vec&lt;String&gt;&gt;()
       .join(<span class="string">&quot;\n&quot;</span>);
-    <span class="kw">let </span><span class="kw-2">mut </span>content = std::fs::OpenOptions::new()
-      .read(<span class="bool-val">true</span>)
-      .write(<span class="bool-val">true</span>)
-      .truncate(<span class="bool-val">true</span>)
-      .open(type_def_file)<span class="question-mark">?</span>;
-
-    content.write_all(cleaned_content.as_bytes())<span class="question-mark">?</span>;
-    content.write_all(<span class="string">b&quot;\n&quot;</span>)<span class="question-mark">?</span>;
+    std::fs::write(def_file, <span class="macro">format!</span>(<span class="string">&quot;{cleaned_content}\n&quot;</span>))<span class="question-mark">?</span>;
   }
   <span class="prelude-val">Ok</span>(())
 }

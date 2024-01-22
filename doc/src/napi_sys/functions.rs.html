@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/nix/store/i5grg1srqdma4c801qfmy3jvqhy5yj6d-vendor-cargo-deps/c19b7c6f923b580ac259164a89f2577984ad5ab09ee9d583b888f934adbbe8d0/napi-sys-2.2.3/src/functions.rs`."><title>functions.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-9ee3a5e31a2afa3e.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="napi_sys" data-themes="" data-resource-suffix="" data-rustdoc-version="1.75.0 (82e1608df 2023-12-21)" data-channel="1.75.0" data-search-js="search-8fbf244ebcf71464.js" data-settings-js="settings-74424d7eec62a23e.js" ><script src="../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-9dd44ab47b99a0fb.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/nix/store/xrh9hh7wcxxigiq7fvai859cplhnq1x4-vendor-cargo-deps/c19b7c6f923b580ac259164a89f2577984ad5ab09ee9d583b888f934adbbe8d0/napi-sys-2.3.0/src/functions.rs`."><title>functions.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-9ee3a5e31a2afa3e.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="napi_sys" data-themes="" data-resource-suffix="" data-rustdoc-version="1.75.0 (82e1608df 2023-12-21)" data-channel="1.75.0" data-search-js="search-8fbf244ebcf71464.js" data-settings-js="settings-74424d7eec62a23e.js" ><script src="../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-9dd44ab47b99a0fb.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -766,6 +766,51 @@
 <a href="#766" id="766">766</a>
 <a href="#767" id="767">767</a>
 <a href="#768" id="768">768</a>
+<a href="#769" id="769">769</a>
+<a href="#770" id="770">770</a>
+<a href="#771" id="771">771</a>
+<a href="#772" id="772">772</a>
+<a href="#773" id="773">773</a>
+<a href="#774" id="774">774</a>
+<a href="#775" id="775">775</a>
+<a href="#776" id="776">776</a>
+<a href="#777" id="777">777</a>
+<a href="#778" id="778">778</a>
+<a href="#779" id="779">779</a>
+<a href="#780" id="780">780</a>
+<a href="#781" id="781">781</a>
+<a href="#782" id="782">782</a>
+<a href="#783" id="783">783</a>
+<a href="#784" id="784">784</a>
+<a href="#785" id="785">785</a>
+<a href="#786" id="786">786</a>
+<a href="#787" id="787">787</a>
+<a href="#788" id="788">788</a>
+<a href="#789" id="789">789</a>
+<a href="#790" id="790">790</a>
+<a href="#791" id="791">791</a>
+<a href="#792" id="792">792</a>
+<a href="#793" id="793">793</a>
+<a href="#794" id="794">794</a>
+<a href="#795" id="795">795</a>
+<a href="#796" id="796">796</a>
+<a href="#797" id="797">797</a>
+<a href="#798" id="798">798</a>
+<a href="#799" id="799">799</a>
+<a href="#800" id="800">800</a>
+<a href="#801" id="801">801</a>
+<a href="#802" id="802">802</a>
+<a href="#803" id="803">803</a>
+<a href="#804" id="804">804</a>
+<a href="#805" id="805">805</a>
+<a href="#806" id="806">806</a>
+<a href="#807" id="807">807</a>
+<a href="#808" id="808">808</a>
+<a href="#809" id="809">809</a>
+<a href="#810" id="810">810</a>
+<a href="#811" id="811">811</a>
+<a href="#812" id="812">812</a>
+<a href="#813" id="813">813</a>
 </pre></div><pre class="rust"><code><span class="attr">#![allow(clippy::too_many_arguments)]
 
 </span><span class="kw">mod </span>napi1 {
@@ -1255,10 +1300,13 @@
 <span class="attr">#[cfg(feature = <span class="string">&quot;napi2&quot;</span>)]
 </span><span class="kw">mod </span>napi2 {
   <span class="kw">use </span><span class="kw">super</span>::<span class="kw">super</span>::types::<span class="kw-2">*</span>;
+  <span class="kw">use </span>std::os::raw::c_int;
 
   <span class="macro">generate!</span>(
     <span class="kw">extern </span><span class="string">&quot;C&quot; </span>{
       <span class="kw">fn </span>napi_get_uv_event_loop(env: napi_env, loop_: <span class="kw-2">*mut *mut </span>uv_loop_s) -&gt; napi_status;
+
+      <span class="kw">fn </span>uv_run(loop_: <span class="kw-2">*mut </span>uv_loop_s, mode: uv_run_mode) -&gt; c_int;
     }
   );
 }
@@ -1463,14 +1511,20 @@
   );
 }
 
-<span class="attr">#[cfg(feature = <span class="string">&quot;experimental&quot;</span>)]
-</span><span class="kw">mod </span>experimental {
+<span class="attr">#[cfg(feature = <span class="string">&quot;napi9&quot;</span>)]
+</span><span class="kw">mod </span>napi9 {
   <span class="kw">use </span>std::os::raw::c_char;
 
   <span class="kw">use </span><span class="kw">super</span>::<span class="kw">super</span>::types::<span class="kw-2">*</span>;
 
   <span class="macro">generate!</span>(
     <span class="kw">extern </span><span class="string">&quot;C&quot; </span>{
+      <span class="kw">fn </span>node_api_symbol_for(
+        env: napi_env,
+        utf8name: <span class="kw-2">*const </span>c_char,
+        length: usize,
+        result: <span class="kw-2">*mut </span>napi_value,
+      ) -&gt; napi_status;
       <span class="kw">fn </span>node_api_get_module_file_name(env: napi_env, result: <span class="kw-2">*mut *const </span>c_char) -&gt; napi_status;
       <span class="kw">fn </span>node_api_create_syntax_error(
         env: napi_env,
@@ -1488,7 +1542,39 @@
 }
 
 <span class="attr">#[cfg(feature = <span class="string">&quot;experimental&quot;</span>)]
+</span><span class="kw">mod </span>experimental {
+  <span class="kw">use </span>std::os::raw::{c_char, c_void};
+
+  <span class="kw">use </span><span class="kw">super</span>::<span class="kw">super</span>::types::<span class="kw-2">*</span>;
+
+  <span class="macro">generate!</span>(
+    <span class="kw">extern </span><span class="string">&quot;C&quot; </span>{
+      <span class="kw">fn </span>node_api_create_external_string_latin1(
+        env: napi_env,
+        str_: <span class="kw-2">*const </span>c_char,
+        length: usize,
+        napi_finalize: napi_finalize,
+        finalize_hint: <span class="kw-2">*mut </span>c_void,
+        result: <span class="kw-2">*mut </span>napi_value,
+        copied: <span class="kw-2">*mut </span>bool,
+      ) -&gt; napi_status;
+
+      <span class="kw">fn </span>node_api_create_external_string_utf16(
+        env: napi_env,
+        str_: <span class="kw-2">*const </span>u16,
+        length: usize,
+        napi_finalize: napi_finalize,
+        finalize_hint: <span class="kw-2">*mut </span>c_void,
+        result: <span class="kw-2">*mut </span>napi_value,
+        copied: <span class="kw-2">*mut </span>bool,
+      ) -&gt; napi_status;
+    }
+  );
+}
+
+<span class="attr">#[cfg(feature = <span class="string">&quot;experimental&quot;</span>)]
 </span><span class="kw">pub use </span>experimental::<span class="kw-2">*</span>;
+
 <span class="kw">pub use </span>napi1::<span class="kw-2">*</span>;
 <span class="attr">#[cfg(feature = <span class="string">&quot;napi2&quot;</span>)]
 </span><span class="kw">pub use </span>napi2::<span class="kw-2">*</span>;
@@ -1504,9 +1590,11 @@
 </span><span class="kw">pub use </span>napi7::<span class="kw-2">*</span>;
 <span class="attr">#[cfg(feature = <span class="string">&quot;napi8&quot;</span>)]
 </span><span class="kw">pub use </span>napi8::<span class="kw-2">*</span>;
+<span class="attr">#[cfg(feature = <span class="string">&quot;napi9&quot;</span>)]
+</span><span class="kw">pub use </span>napi9::<span class="kw-2">*</span>;
 
 <span class="attr">#[cfg(windows)]
-</span><span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">unsafe fn </span>load() -&gt; <span class="prelude-ty">Result</span>&lt;libloading::Library, libloading::Error&gt; {
+</span><span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">unsafe fn </span>load_all() -&gt; <span class="prelude-ty">Result</span>&lt;libloading::Library, libloading::Error&gt; {
   <span class="kw">let </span>host = <span class="kw">match </span>libloading::os::windows::Library::this() {
     <span class="prelude-val">Ok</span>(lib) =&gt; lib.into(),
     <span class="prelude-val">Err</span>(err) =&gt; {
@@ -1530,6 +1618,8 @@
   </span>napi7::load(<span class="kw-2">&amp;</span>host)<span class="question-mark">?</span>;
   <span class="attr">#[cfg(feature = <span class="string">&quot;napi8&quot;</span>)]
   </span>napi8::load(<span class="kw-2">&amp;</span>host)<span class="question-mark">?</span>;
+  <span class="attr">#[cfg(feature = <span class="string">&quot;napi9&quot;</span>)]
+  </span>napi9::load(<span class="kw-2">&amp;</span>host)<span class="question-mark">?</span>;
   <span class="attr">#[cfg(feature = <span class="string">&quot;experimental&quot;</span>)]
   </span>experimental::load(<span class="kw-2">&amp;</span>host)<span class="question-mark">?</span>;
   <span class="prelude-val">Ok</span>(host)

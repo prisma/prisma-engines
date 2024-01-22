@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/nix/store/i5grg1srqdma4c801qfmy3jvqhy5yj6d-vendor-cargo-deps/c19b7c6f923b580ac259164a89f2577984ad5ab09ee9d583b888f934adbbe8d0/napi-2.13.2/src/bindgen_runtime/callback_info.rs`."><title>callback_info.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-9ee3a5e31a2afa3e.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="napi" data-themes="" data-resource-suffix="" data-rustdoc-version="1.75.0 (82e1608df 2023-12-21)" data-channel="1.75.0" data-search-js="search-8fbf244ebcf71464.js" data-settings-js="settings-74424d7eec62a23e.js" ><script src="../../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-9dd44ab47b99a0fb.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/nix/store/xrh9hh7wcxxigiq7fvai859cplhnq1x4-vendor-cargo-deps/c19b7c6f923b580ac259164a89f2577984ad5ab09ee9d583b888f934adbbe8d0/napi-2.14.2/src/bindgen_runtime/callback_info.rs`."><title>callback_info.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-9ee3a5e31a2afa3e.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="napi" data-themes="" data-resource-suffix="" data-rustdoc-version="1.75.0 (82e1608df 2023-12-21)" data-channel="1.75.0" data-search-js="search-8fbf244ebcf71464.js" data-settings-js="settings-74424d7eec62a23e.js" ><script src="../../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-9dd44ab47b99a0fb.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -216,6 +216,35 @@
 <a href="#216" id="216">216</a>
 <a href="#217" id="217">217</a>
 <a href="#218" id="218">218</a>
+<a href="#219" id="219">219</a>
+<a href="#220" id="220">220</a>
+<a href="#221" id="221">221</a>
+<a href="#222" id="222">222</a>
+<a href="#223" id="223">223</a>
+<a href="#224" id="224">224</a>
+<a href="#225" id="225">225</a>
+<a href="#226" id="226">226</a>
+<a href="#227" id="227">227</a>
+<a href="#228" id="228">228</a>
+<a href="#229" id="229">229</a>
+<a href="#230" id="230">230</a>
+<a href="#231" id="231">231</a>
+<a href="#232" id="232">232</a>
+<a href="#233" id="233">233</a>
+<a href="#234" id="234">234</a>
+<a href="#235" id="235">235</a>
+<a href="#236" id="236">236</a>
+<a href="#237" id="237">237</a>
+<a href="#238" id="238">238</a>
+<a href="#239" id="239">239</a>
+<a href="#240" id="240">240</a>
+<a href="#241" id="241">241</a>
+<a href="#242" id="242">242</a>
+<a href="#243" id="243">243</a>
+<a href="#244" id="244">244</a>
+<a href="#245" id="245">245</a>
+<a href="#246" id="246">246</a>
+<a href="#247" id="247">247</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::cell::Cell;
 <span class="kw">use </span>std::ffi::c_void;
 <span class="kw">use </span>std::ptr;
@@ -234,6 +263,7 @@
   env: sys::napi_env,
   <span class="kw">pub </span>this: sys::napi_value,
   <span class="kw">pub </span>args: [sys::napi_value; N],
+  this_reference: sys::napi_ref,
 }
 
 <span class="kw">impl</span>&lt;<span class="kw">const </span>N: usize&gt; CallbackInfo&lt;N&gt; {
@@ -242,6 +272,9 @@
     env: sys::napi_env,
     callback_info: sys::napi_callback_info,
     required_argc: <span class="prelude-ty">Option</span>&lt;usize&gt;,
+    <span class="comment">// for async class factory, the `this` will be used after the async call
+    // so we must create reference for it and use it after async resolved
+    </span>use_after_async: bool,
   ) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>&gt; {
     <span class="kw">let </span><span class="kw-2">mut </span>this = ptr::null_mut();
     <span class="kw">let </span><span class="kw-2">mut </span>args = [ptr::null_mut(); N];
@@ -273,7 +306,21 @@
       }
     }
 
-    <span class="prelude-val">Ok</span>(<span class="self">Self </span>{ env, this, args })
+    <span class="kw">let </span><span class="kw-2">mut </span>this_reference = ptr::null_mut();
+
+    <span class="kw">if </span>use_after_async {
+      <span class="macro">check_status!</span>(
+        <span class="kw">unsafe </span>{ sys::napi_create_reference(env, this, <span class="number">1</span>, <span class="kw-2">&amp;mut </span>this_reference) },
+        <span class="string">&quot;Failed to create reference for `this` in async class factory&quot;
+      </span>)<span class="question-mark">?</span>;
+    }
+
+    <span class="prelude-val">Ok</span>(<span class="self">Self </span>{
+      env,
+      this,
+      args,
+      this_reference,
+    })
   }
 
   <span class="kw">pub fn </span>get_arg(<span class="kw-2">&amp;</span><span class="self">self</span>, index: usize) -&gt; sys::napi_value {
@@ -359,8 +406,18 @@
     js_name: <span class="kw-2">&amp;</span>str,
     obj: T,
   ) -&gt; <span class="prelude-ty">Result</span>&lt;(sys::napi_value, <span class="kw-2">*mut </span>T)&gt; {
-    <span class="kw">let </span>this = <span class="self">self</span>.this();
+    <span class="kw">let </span><span class="kw-2">mut </span>this = <span class="self">self</span>.this();
     <span class="kw">let </span><span class="kw-2">mut </span>instance = ptr::null_mut();
+    <span class="kw">if </span>!<span class="self">self</span>.this_reference.is_null() {
+      <span class="macro">check_status!</span>(
+        <span class="kw">unsafe </span>{ sys::napi_get_reference_value(<span class="self">self</span>.env, <span class="self">self</span>.this_reference, <span class="kw-2">&amp;mut </span>this) },
+        <span class="string">&quot;Failed to get reference value for `this` in async class factory&quot;
+      </span>)<span class="question-mark">?</span>;
+      <span class="macro">check_status!</span>(
+        <span class="kw">unsafe </span>{ sys::napi_delete_reference(<span class="self">self</span>.env, <span class="self">self</span>.this_reference) },
+        <span class="string">&quot;Failed to delete reference for `this` in async class factory&quot;
+      </span>)<span class="question-mark">?</span>;
+    }
     ___CALL_FROM_FACTORY.with(|s| s.store(<span class="bool-val">true</span>, Ordering::Relaxed));
     <span class="kw">let </span>status =
       <span class="kw">unsafe </span>{ sys::napi_new_instance(<span class="self">self</span>.env, this, <span class="number">0</span>, ptr::null_mut(), <span class="kw-2">&amp;mut </span>instance) };
@@ -372,6 +429,7 @@
       <span class="kw">unsafe </span>{ sys::napi_throw(<span class="self">self</span>.env, exception) };
       <span class="kw">return </span><span class="prelude-val">Ok</span>((ptr::null_mut(), ptr::null_mut()));
     }
+    <span class="macro">check_status!</span>(status, <span class="string">&quot;Failed to create instance of class `{}`&quot;</span>, js_name)<span class="question-mark">?</span>;
     <span class="kw">let </span>obj = Box::new(obj);
     <span class="kw">let </span>initial_finalize: Box&lt;<span class="kw">dyn </span>FnOnce()&gt; = Box::new(|| {});
     <span class="kw">let </span>finalize_callbacks_ptr = Rc::into_raw(Rc::new(Cell::new(Box::into_raw(initial_finalize))));
@@ -382,7 +440,7 @@
         sys::napi_wrap(
           <span class="self">self</span>.env,
           instance,
-          value_ref <span class="kw">as </span><span class="kw-2">*mut </span>c_void,
+          value_ref.cast(),
           <span class="prelude-val">Some</span>(raw_finalize_unchecked::&lt;T&gt;),
           ptr::null_mut(),
           <span class="kw-2">&amp;mut </span>object_ref,

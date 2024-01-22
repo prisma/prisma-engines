@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/nix/store/i5grg1srqdma4c801qfmy3jvqhy5yj6d-vendor-cargo-deps/c19b7c6f923b580ac259164a89f2577984ad5ab09ee9d583b888f934adbbe8d0/napi-2.13.2/src/tokio_runtime.rs`."><title>tokio_runtime.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-9ee3a5e31a2afa3e.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="napi" data-themes="" data-resource-suffix="" data-rustdoc-version="1.75.0 (82e1608df 2023-12-21)" data-channel="1.75.0" data-search-js="search-8fbf244ebcf71464.js" data-settings-js="settings-74424d7eec62a23e.js" ><script src="../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-9dd44ab47b99a0fb.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/nix/store/xrh9hh7wcxxigiq7fvai859cplhnq1x4-vendor-cargo-deps/c19b7c6f923b580ac259164a89f2577984ad5ab09ee9d583b888f934adbbe8d0/napi-2.14.2/src/tokio_runtime.rs`."><title>tokio_runtime.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-9ee3a5e31a2afa3e.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="napi" data-themes="" data-resource-suffix="" data-rustdoc-version="1.75.0 (82e1608df 2023-12-21)" data-channel="1.75.0" data-search-js="search-8fbf244ebcf71464.js" data-settings-js="settings-74424d7eec62a23e.js" ><script src="../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-9dd44ab47b99a0fb.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -112,7 +112,47 @@
 <a href="#112" id="112">112</a>
 <a href="#113" id="113">113</a>
 <a href="#114" id="114">114</a>
-</pre></div><pre class="rust"><code><span class="kw">use </span>std::{future::Future, sync::RwLock};
+<a href="#115" id="115">115</a>
+<a href="#116" id="116">116</a>
+<a href="#117" id="117">117</a>
+<a href="#118" id="118">118</a>
+<a href="#119" id="119">119</a>
+<a href="#120" id="120">120</a>
+<a href="#121" id="121">121</a>
+<a href="#122" id="122">122</a>
+<a href="#123" id="123">123</a>
+<a href="#124" id="124">124</a>
+<a href="#125" id="125">125</a>
+<a href="#126" id="126">126</a>
+<a href="#127" id="127">127</a>
+<a href="#128" id="128">128</a>
+<a href="#129" id="129">129</a>
+<a href="#130" id="130">130</a>
+<a href="#131" id="131">131</a>
+<a href="#132" id="132">132</a>
+<a href="#133" id="133">133</a>
+<a href="#134" id="134">134</a>
+<a href="#135" id="135">135</a>
+<a href="#136" id="136">136</a>
+<a href="#137" id="137">137</a>
+<a href="#138" id="138">138</a>
+<a href="#139" id="139">139</a>
+<a href="#140" id="140">140</a>
+<a href="#141" id="141">141</a>
+<a href="#142" id="142">142</a>
+<a href="#143" id="143">143</a>
+<a href="#144" id="144">144</a>
+<a href="#145" id="145">145</a>
+<a href="#146" id="146">146</a>
+<a href="#147" id="147">147</a>
+<a href="#148" id="148">148</a>
+<a href="#149" id="149">149</a>
+<a href="#150" id="150">150</a>
+<a href="#151" id="151">151</a>
+<a href="#152" id="152">152</a>
+<a href="#153" id="153">153</a>
+<a href="#154" id="154">154</a>
+</pre></div><pre class="rust"><code><span class="kw">use </span>std::{future::Future, marker::PhantomData, sync::RwLock};
 
 <span class="kw">use </span>once_cell::sync::Lazy;
 <span class="kw">use </span>tokio::runtime::Runtime;
@@ -120,13 +160,13 @@
 <span class="kw">use crate</span>::{sys, JsDeferred, JsUnknown, NapiValue, <span class="prelude-ty">Result</span>};
 
 <span class="kw">fn </span>create_runtime() -&gt; <span class="prelude-ty">Option</span>&lt;Runtime&gt; {
-  <span class="attr">#[cfg(not(target_arch = <span class="string">&quot;wasm32&quot;</span>))]
+  <span class="attr">#[cfg(not(target_family = <span class="string">&quot;wasm&quot;</span>))]
   </span>{
     <span class="kw">let </span>runtime = tokio::runtime::Runtime::new().expect(<span class="string">&quot;Create tokio runtime failed&quot;</span>);
     <span class="prelude-val">Some</span>(runtime)
   }
 
-  <span class="attr">#[cfg(target_arch = <span class="string">&quot;wasm32&quot;</span>)]
+  <span class="attr">#[cfg(target_family = <span class="string">&quot;wasm&quot;</span>)]
   </span>{
     tokio::runtime::Builder::new_current_thread()
       .enable_all()
@@ -137,14 +177,14 @@
 
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">static </span>RT: Lazy&lt;RwLock&lt;<span class="prelude-ty">Option</span>&lt;Runtime&gt;&gt;&gt; = Lazy::new(|| RwLock::new(create_runtime()));
 
-<span class="attr">#[cfg(windows)]
+<span class="attr">#[cfg(not(any(target_os = <span class="string">&quot;macos&quot;</span>, target_family = <span class="string">&quot;wasm&quot;</span>)))]
 </span><span class="kw">static </span>RT_REFERENCE_COUNT: std::sync::atomic::AtomicUsize = std::sync::atomic::AtomicUsize::new(<span class="number">0</span>);
 
 <span class="doccomment">/// Ensure that the Tokio runtime is initialized.
 /// In windows the Tokio runtime will be dropped when Node env exits.
 /// But in Electron renderer process, the Node env will exits and recreate when the window reloads.
 /// So we need to ensure that the Tokio runtime is initialized when the Node env is created.
-</span><span class="attr">#[cfg(windows)]
+</span><span class="attr">#[cfg(not(any(target_os = <span class="string">&quot;macos&quot;</span>, target_family = <span class="string">&quot;wasm&quot;</span>)))]
 </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>ensure_runtime() {
   <span class="kw">use </span>std::sync::atomic::Ordering;
 
@@ -156,7 +196,7 @@
   RT_REFERENCE_COUNT.fetch_add(<span class="number">1</span>, Ordering::Relaxed);
 }
 
-<span class="attr">#[cfg(windows)]
+<span class="attr">#[cfg(not(any(target_os = <span class="string">&quot;macos&quot;</span>, target_family = <span class="string">&quot;wasm&quot;</span>)))]
 </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">unsafe extern </span><span class="string">&quot;C&quot; </span><span class="kw">fn </span>drop_runtime(_arg: <span class="kw-2">*mut </span>std::ffi::c_void) {
   <span class="kw">use </span>std::sync::atomic::Ordering;
 
@@ -197,11 +237,43 @@
   f()
 }
 
+<span class="kw">struct </span>SendableResolver&lt;
+  Data: <span class="lifetime">&#39;static </span>+ Send,
+  R: <span class="lifetime">&#39;static </span>+ FnOnce(sys::napi_env, Data) -&gt; <span class="prelude-ty">Result</span>&lt;sys::napi_value&gt;,
+&gt; {
+  inner: R,
+  _data: PhantomData&lt;Data&gt;,
+}
+
+<span class="comment">// the `SendableResolver` will be only called in the `threadsafe_function_call_js` callback
+// which means it will be always called in the Node.js JavaScript thread
+// so the inner function is not required to be `Send`
+// but the `Send` bound is required by the `execute_tokio_future` function
+</span><span class="kw">unsafe impl</span>&lt;Data: <span class="lifetime">&#39;static </span>+ Send, R: <span class="lifetime">&#39;static </span>+ FnOnce(sys::napi_env, Data) -&gt; <span class="prelude-ty">Result</span>&lt;sys::napi_value&gt;&gt;
+  Send <span class="kw">for </span>SendableResolver&lt;Data, R&gt;
+{
+}
+
+<span class="kw">impl</span>&lt;Data: <span class="lifetime">&#39;static </span>+ Send, R: <span class="lifetime">&#39;static </span>+ FnOnce(sys::napi_env, Data) -&gt; <span class="prelude-ty">Result</span>&lt;sys::napi_value&gt;&gt;
+  SendableResolver&lt;Data, R&gt;
+{
+  <span class="kw">fn </span>new(inner: R) -&gt; <span class="self">Self </span>{
+    <span class="self">Self </span>{
+      inner,
+      _data: PhantomData,
+    }
+  }
+
+  <span class="kw">fn </span>resolve(<span class="self">self</span>, env: sys::napi_env, data: Data) -&gt; <span class="prelude-ty">Result</span>&lt;sys::napi_value&gt; {
+    (<span class="self">self</span>.inner)(env, data)
+  }
+}
+
 <span class="attr">#[allow(clippy::not_unsafe_ptr_arg_deref)]
 </span><span class="kw">pub fn </span>execute_tokio_future&lt;
   Data: <span class="lifetime">&#39;static </span>+ Send,
   Fut: <span class="lifetime">&#39;static </span>+ Send + Future&lt;Output = <span class="prelude-ty">Result</span>&lt;Data&gt;&gt;,
-  Resolver: <span class="lifetime">&#39;static </span>+ Send + Sync + FnOnce(sys::napi_env, Data) -&gt; <span class="prelude-ty">Result</span>&lt;sys::napi_value&gt;,
+  Resolver: <span class="lifetime">&#39;static </span>+ FnOnce(sys::napi_env, Data) -&gt; <span class="prelude-ty">Result</span>&lt;sys::napi_value&gt;,
 &gt;(
   env: sys::napi_env,
   fut: Fut,
@@ -209,20 +281,28 @@
 ) -&gt; <span class="prelude-ty">Result</span>&lt;sys::napi_value&gt; {
   <span class="kw">let </span>(deferred, promise) = JsDeferred::new(env)<span class="question-mark">?</span>;
 
-  <span class="kw">let </span>inner = <span class="kw">async move </span>{
+  <span class="kw">let </span>sendable_resolver = SendableResolver::new(resolver);
+
+  <span class="kw">let </span>inner = <span class="kw">async </span>{
     <span class="kw">match </span>fut.<span class="kw">await </span>{
-      <span class="prelude-val">Ok</span>(v) =&gt; deferred.resolve(|env| {
-        resolver(env.raw(), v).map(|v| <span class="kw">unsafe </span>{ JsUnknown::from_raw_unchecked(env.raw(), v) })
+      <span class="prelude-val">Ok</span>(v) =&gt; deferred.resolve(<span class="kw">move </span>|env| {
+        sendable_resolver
+          .resolve(env.raw(), v)
+          .map(|v| <span class="kw">unsafe </span>{ JsUnknown::from_raw_unchecked(env.raw(), v) })
       }),
       <span class="prelude-val">Err</span>(e) =&gt; deferred.reject(e),
     }
   };
 
-  <span class="attr">#[cfg(not(target_arch = <span class="string">&quot;wasm32&quot;</span>))]
+  <span class="attr">#[cfg(not(target_family = <span class="string">&quot;wasm&quot;</span>))]
   </span>spawn(inner);
 
-  <span class="attr">#[cfg(target_arch = <span class="string">&quot;wasm32&quot;</span>)]
-  </span>block_on(inner);
+  <span class="attr">#[cfg(target_family = <span class="string">&quot;wasm&quot;</span>)]
+  </span>{
+    std::thread::spawn(|| {
+      block_on(inner);
+    });
+  }
 
   <span class="prelude-val">Ok</span>(promise.<span class="number">0</span>.value)
 }

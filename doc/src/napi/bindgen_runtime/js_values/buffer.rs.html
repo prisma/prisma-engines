@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/nix/store/i5grg1srqdma4c801qfmy3jvqhy5yj6d-vendor-cargo-deps/c19b7c6f923b580ac259164a89f2577984ad5ab09ee9d583b888f934adbbe8d0/napi-2.13.2/src/bindgen_runtime/js_values/buffer.rs`."><title>buffer.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../../static.files/rustdoc-9ee3a5e31a2afa3e.css"><meta name="rustdoc-vars" data-root-path="../../../../" data-static-root-path="../../../../static.files/" data-current-crate="napi" data-themes="" data-resource-suffix="" data-rustdoc-version="1.75.0 (82e1608df 2023-12-21)" data-channel="1.75.0" data-search-js="search-8fbf244ebcf71464.js" data-settings-js="settings-74424d7eec62a23e.js" ><script src="../../../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../../../src-files.js"></script><script defer src="../../../../static.files/main-9dd44ab47b99a0fb.js"></script><noscript><link rel="stylesheet" href="../../../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/nix/store/xrh9hh7wcxxigiq7fvai859cplhnq1x4-vendor-cargo-deps/c19b7c6f923b580ac259164a89f2577984ad5ab09ee9d583b888f934adbbe8d0/napi-2.14.2/src/bindgen_runtime/js_values/buffer.rs`."><title>buffer.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../../static.files/rustdoc-9ee3a5e31a2afa3e.css"><meta name="rustdoc-vars" data-root-path="../../../../" data-static-root-path="../../../../static.files/" data-current-crate="napi" data-themes="" data-resource-suffix="" data-rustdoc-version="1.75.0 (82e1608df 2023-12-21)" data-channel="1.75.0" data-search-js="search-8fbf244ebcf71464.js" data-settings-js="settings-74424d7eec62a23e.js" ><script src="../../../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../../../src-files.js"></script><script defer src="../../../../static.files/main-9dd44ab47b99a0fb.js"></script><noscript><link rel="stylesheet" href="../../../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -293,6 +293,24 @@
 <a href="#293" id="293">293</a>
 <a href="#294" id="294">294</a>
 <a href="#295" id="295">295</a>
+<a href="#296" id="296">296</a>
+<a href="#297" id="297">297</a>
+<a href="#298" id="298">298</a>
+<a href="#299" id="299">299</a>
+<a href="#300" id="300">300</a>
+<a href="#301" id="301">301</a>
+<a href="#302" id="302">302</a>
+<a href="#303" id="303">303</a>
+<a href="#304" id="304">304</a>
+<a href="#305" id="305">305</a>
+<a href="#306" id="306">306</a>
+<a href="#307" id="307">307</a>
+<a href="#308" id="308">308</a>
+<a href="#309" id="309">309</a>
+<a href="#310" id="310">310</a>
+<a href="#311" id="311">311</a>
+<a href="#312" id="312">312</a>
+<a href="#313" id="313">313</a>
 </pre></div><pre class="rust"><code><span class="attr">#[cfg(all(debug_assertions, not(windows)))]
 </span><span class="kw">use </span>std::collections::HashSet;
 <span class="kw">use </span>std::ffi::c_void;
@@ -304,8 +322,8 @@
 <span class="attr">#[cfg(all(debug_assertions, not(windows)))]
 </span><span class="kw">use </span>std::sync::Mutex;
 
-<span class="attr">#[cfg(all(feature = <span class="string">&quot;napi4&quot;</span>, not(target_arch = <span class="string">&quot;wasm32&quot;</span>)))]
-</span><span class="kw">use </span><span class="kw">crate</span>::bindgen_prelude::{CUSTOM_GC_TSFN, THREADS_CAN_ACCESS_ENV, THREAD_DESTROYED};
+<span class="attr">#[cfg(all(feature = <span class="string">&quot;napi4&quot;</span>, not(feature = <span class="string">&quot;noop&quot;</span>), not(target_family = <span class="string">&quot;wasm&quot;</span>)))]
+</span><span class="kw">use </span><span class="kw">crate</span>::bindgen_prelude::{CUSTOM_GC_TSFN, CUSTOM_GC_TSFN_DESTROYED, THREADS_CAN_ACCESS_ENV};
 <span class="kw">use crate</span>::{bindgen_prelude::<span class="kw-2">*</span>, check_status, sys, <span class="prelude-ty">Result</span>, ValueType};
 
 <span class="attr">#[cfg(all(debug_assertions, not(windows)))]
@@ -329,15 +347,15 @@
   <span class="kw">fn </span>drop(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
     <span class="kw">if </span>Arc::strong_count(<span class="kw-2">&amp;</span><span class="self">self</span>.ref_count) == <span class="number">1 </span>{
       <span class="kw">if let </span><span class="prelude-val">Some</span>((ref_, env)) = <span class="self">self</span>.raw {
-        <span class="attr">#[cfg(all(feature = <span class="string">&quot;napi4&quot;</span>, not(target_arch = <span class="string">&quot;wasm32&quot;</span>)))]
+        <span class="kw">if </span>ref_.is_null() {
+          <span class="kw">return</span>;
+        }
+        <span class="attr">#[cfg(all(feature = <span class="string">&quot;napi4&quot;</span>, not(feature = <span class="string">&quot;noop&quot;</span>), not(target_family = <span class="string">&quot;wasm&quot;</span>)))]
         </span>{
-          <span class="kw">if </span>THREAD_DESTROYED.with(|closed| closed.load(std::sync::atomic::Ordering::Relaxed)) {
+          <span class="kw">if </span>CUSTOM_GC_TSFN_DESTROYED.load(std::sync::atomic::Ordering::SeqCst) {
             <span class="kw">return</span>;
           }
-          <span class="kw">if </span>!THREADS_CAN_ACCESS_ENV
-            .get_or_init(Default::default)
-            .contains(<span class="kw-2">&amp;</span>std::thread::current().id())
-          {
+          <span class="kw">if </span>!THREADS_CAN_ACCESS_ENV.borrow_mut(|m| m.get(<span class="kw-2">&amp;</span>std::thread::current().id()).is_some()) {
             <span class="kw">let </span>status = <span class="kw">unsafe </span>{
               sys::napi_call_threadsafe_function(
                 CUSTOM_GC_TSFN.load(std::sync::atomic::Ordering::SeqCst),
@@ -346,8 +364,8 @@
               )
             };
             <span class="macro">assert!</span>(
-              status == sys::Status::napi_ok,
-              <span class="string">&quot;Call custom GC in ArrayBuffer::drop failed {:?}&quot;</span>,
+              status == sys::Status::napi_ok || status == sys::Status::napi_closing,
+              <span class="string">&quot;Call custom GC in Buffer::drop failed {}&quot;</span>,
               Status::from(status)
             );
             <span class="kw">return</span>;
@@ -358,6 +376,10 @@
           env,
           <span class="kw">unsafe </span>{ sys::napi_reference_unref(env, ref_, <span class="kw-2">&amp;mut </span>ref_count) },
           <span class="string">&quot;Failed to unref Buffer reference in drop&quot;
+        </span>);
+        <span class="macro">debug_assert!</span>(
+          ref_count == <span class="number">0</span>,
+          <span class="string">&quot;Buffer reference count in Buffer::drop is not zero&quot;
         </span>);
         <span class="macro">check_status_or_throw!</span>(
           env,
@@ -384,6 +406,12 @@
       raw: <span class="self">self</span>.raw,
       ref_count: <span class="self">self</span>.ref_count.clone(),
     }
+  }
+}
+
+<span class="kw">impl </span>Default <span class="kw">for </span>Buffer {
+  <span class="kw">fn </span>default() -&gt; <span class="self">Self </span>{
+    <span class="self">Self</span>::from(Vec::default())
   }
 }
 
@@ -506,7 +534,7 @@
 }
 
 <span class="kw">impl </span>ToNapiValue <span class="kw">for </span>Buffer {
-  <span class="kw">unsafe fn </span>to_napi_value(env: sys::napi_env, val: <span class="self">Self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;sys::napi_value&gt; {
+  <span class="kw">unsafe fn </span>to_napi_value(env: sys::napi_env, <span class="kw-2">mut </span>val: <span class="self">Self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;sys::napi_value&gt; {
     <span class="comment">// From Node.js value, not from `Vec&lt;u8&gt;`
     </span><span class="kw">if let </span><span class="prelude-val">Some</span>((ref_, <span class="kw">_</span>)) = val.raw {
       <span class="kw">let </span><span class="kw-2">mut </span>buf = ptr::null_mut();
@@ -514,6 +542,14 @@
         <span class="kw">unsafe </span>{ sys::napi_get_reference_value(env, ref_, <span class="kw-2">&amp;mut </span>buf) },
         <span class="string">&quot;Failed to get Buffer value from reference&quot;
       </span>)<span class="question-mark">?</span>;
+      <span class="comment">// fast path for Buffer::drop
+      </span><span class="kw">if </span>Arc::strong_count(<span class="kw-2">&amp;</span>val.ref_count) == <span class="number">1 </span>{
+        <span class="macro">check_status!</span>(
+          <span class="kw">unsafe </span>{ sys::napi_delete_reference(env, ref_) },
+          <span class="string">&quot;Failed to delete Buffer reference in Buffer::to_napi_value&quot;
+        </span>)<span class="question-mark">?</span>;
+        val.raw = <span class="prelude-val">Some</span>((ptr::null_mut(), ptr::null_mut()));
+      }
       <span class="kw">return </span><span class="prelude-val">Ok</span>(buf);
     }
     <span class="kw">let </span>len = val.len;

@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/nix/store/i5grg1srqdma4c801qfmy3jvqhy5yj6d-vendor-cargo-deps/c19b7c6f923b580ac259164a89f2577984ad5ab09ee9d583b888f934adbbe8d0/napi-2.13.2/src/bindgen_runtime/module_register.rs`."><title>module_register.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-9ee3a5e31a2afa3e.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="napi" data-themes="" data-resource-suffix="" data-rustdoc-version="1.75.0 (82e1608df 2023-12-21)" data-channel="1.75.0" data-search-js="search-8fbf244ebcf71464.js" data-settings-js="settings-74424d7eec62a23e.js" ><script src="../../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-9dd44ab47b99a0fb.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/nix/store/xrh9hh7wcxxigiq7fvai859cplhnq1x4-vendor-cargo-deps/c19b7c6f923b580ac259164a89f2577984ad5ab09ee9d583b888f934adbbe8d0/napi-2.14.2/src/bindgen_runtime/module_register.rs`."><title>module_register.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-9ee3a5e31a2afa3e.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="napi" data-themes="" data-resource-suffix="" data-rustdoc-version="1.75.0 (82e1608df 2023-12-21)" data-channel="1.75.0" data-search-js="search-8fbf244ebcf71464.js" data-settings-js="settings-74424d7eec62a23e.js" ><script src="../../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-9dd44ab47b99a0fb.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -626,80 +626,22 @@
 <a href="#626" id="626">626</a>
 <a href="#627" id="627">627</a>
 <a href="#628" id="628">628</a>
-<a href="#629" id="629">629</a>
-<a href="#630" id="630">630</a>
-<a href="#631" id="631">631</a>
-<a href="#632" id="632">632</a>
-<a href="#633" id="633">633</a>
-<a href="#634" id="634">634</a>
-<a href="#635" id="635">635</a>
-<a href="#636" id="636">636</a>
-<a href="#637" id="637">637</a>
-<a href="#638" id="638">638</a>
-<a href="#639" id="639">639</a>
-<a href="#640" id="640">640</a>
-<a href="#641" id="641">641</a>
-<a href="#642" id="642">642</a>
-<a href="#643" id="643">643</a>
-<a href="#644" id="644">644</a>
-<a href="#645" id="645">645</a>
-<a href="#646" id="646">646</a>
-<a href="#647" id="647">647</a>
-<a href="#648" id="648">648</a>
-<a href="#649" id="649">649</a>
-<a href="#650" id="650">650</a>
-<a href="#651" id="651">651</a>
-<a href="#652" id="652">652</a>
-<a href="#653" id="653">653</a>
-<a href="#654" id="654">654</a>
-<a href="#655" id="655">655</a>
-<a href="#656" id="656">656</a>
-<a href="#657" id="657">657</a>
-<a href="#658" id="658">658</a>
-<a href="#659" id="659">659</a>
-<a href="#660" id="660">660</a>
-<a href="#661" id="661">661</a>
-<a href="#662" id="662">662</a>
-<a href="#663" id="663">663</a>
-<a href="#664" id="664">664</a>
-<a href="#665" id="665">665</a>
-<a href="#666" id="666">666</a>
-<a href="#667" id="667">667</a>
-<a href="#668" id="668">668</a>
-<a href="#669" id="669">669</a>
-<a href="#670" id="670">670</a>
-<a href="#671" id="671">671</a>
-<a href="#672" id="672">672</a>
-<a href="#673" id="673">673</a>
-<a href="#674" id="674">674</a>
-<a href="#675" id="675">675</a>
-<a href="#676" id="676">676</a>
-<a href="#677" id="677">677</a>
-<a href="#678" id="678">678</a>
-<a href="#679" id="679">679</a>
-<a href="#680" id="680">680</a>
-<a href="#681" id="681">681</a>
-<a href="#682" id="682">682</a>
-<a href="#683" id="683">683</a>
-<a href="#684" id="684">684</a>
-<a href="#685" id="685">685</a>
-<a href="#686" id="686">686</a>
-<a href="#687" id="687">687</a>
-<a href="#688" id="688">688</a>
-<a href="#689" id="689">689</a>
-<a href="#690" id="690">690</a>
-<a href="#691" id="691">691</a>
-<a href="#692" id="692">692</a>
-<a href="#693" id="693">693</a>
-<a href="#694" id="694">694</a>
-</pre></div><pre class="rust"><code><span class="kw">use </span>std::collections::{HashMap, HashSet};
+</pre></div><pre class="rust"><code><span class="kw">use </span>std::collections::HashMap;
+<span class="attr">#[cfg(not(feature = <span class="string">&quot;noop&quot;</span>))]
+</span><span class="kw">use </span>std::collections::HashSet;
 <span class="kw">use </span>std::ffi::CStr;
-<span class="attr">#[cfg(all(feature = <span class="string">&quot;napi4&quot;</span>, not(target_arch = <span class="string">&quot;wasm32&quot;</span>), not(feature = <span class="string">&quot;noop&quot;</span>)))]
-</span><span class="kw">use </span>std::hash::Hash;
-<span class="attr">#[cfg(all(feature = <span class="string">&quot;napi4&quot;</span>, not(target_arch = <span class="string">&quot;wasm32&quot;</span>)))]
-</span><span class="kw">use </span>std::ops::Deref;
 <span class="kw">use </span>std::ptr;
-<span class="kw">use </span>std::sync::atomic::{AtomicBool, AtomicPtr, AtomicUsize, Ordering};
+<span class="attr">#[cfg(all(feature = <span class="string">&quot;napi4&quot;</span>, not(target_family = <span class="string">&quot;wasm&quot;</span>)))]
+</span><span class="kw">use </span>std::sync::atomic::AtomicPtr;
+<span class="attr">#[cfg(all(
+  not(any(target_os = <span class="string">&quot;macos&quot;</span>, target_family = <span class="string">&quot;wasm&quot;</span>)),
+  feature = <span class="string">&quot;napi4&quot;</span>,
+  feature = <span class="string">&quot;tokio_rt&quot;
+</span>))]
+</span><span class="kw">use </span>std::sync::atomic::AtomicUsize;
+<span class="attr">#[cfg(not(feature = <span class="string">&quot;noop&quot;</span>))]
+</span><span class="kw">use </span>std::sync::atomic::{AtomicBool, Ordering};
+<span class="kw">use </span>std::sync::RwLock;
 <span class="kw">use </span>std::thread::ThreadId;
 
 <span class="kw">use </span>once_cell::sync::Lazy;
@@ -712,110 +654,13 @@
 <span class="kw">pub type </span>ModuleExportsCallback =
   <span class="kw">unsafe fn</span>(env: sys::napi_env, exports: sys::napi_value) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt;;
 
-<span class="kw">struct </span>PersistedPerInstanceVec&lt;T&gt; {
-  inner: AtomicPtr&lt;T&gt;,
-  length: AtomicUsize,
-}
-
-<span class="kw">impl</span>&lt;T&gt; Default <span class="kw">for </span>PersistedPerInstanceVec&lt;T&gt; {
-  <span class="kw">fn </span>default() -&gt; <span class="self">Self </span>{
-    <span class="kw">let </span><span class="kw-2">mut </span>vec: Vec&lt;T&gt; = Vec::with_capacity(<span class="number">1</span>);
-    <span class="kw">let </span>ret = <span class="self">Self </span>{
-      inner: AtomicPtr::new(vec.as_mut_ptr()),
-      length: AtomicUsize::new(<span class="number">0</span>),
-    };
-    std::mem::forget(vec);
-    ret
-  }
-}
-
-<span class="kw">impl</span>&lt;T&gt; PersistedPerInstanceVec&lt;T&gt; {
-  <span class="attr">#[cfg(not(feature = <span class="string">&quot;noop&quot;</span>))]
-  #[allow(clippy::mut_from_ref)]
-  </span><span class="kw">fn </span>borrow_mut&lt;F&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, f: F)
-  <span class="kw">where
-    </span>F: FnOnce(<span class="kw-2">&amp;mut </span>[T]),
-  {
-    <span class="kw">let </span>length = <span class="self">self</span>.length.load(Ordering::Relaxed);
-    <span class="kw">if </span>length == <span class="number">0 </span>{
-      f(<span class="kw-2">&amp;mut </span>[]);
-    } <span class="kw">else </span>{
-      <span class="kw">let </span>inner = <span class="self">self</span>.inner.load(Ordering::Relaxed);
-      <span class="kw">let </span><span class="kw-2">mut </span>temp = <span class="kw">unsafe </span>{ Vec::from_raw_parts(inner, length, length) };
-      f(temp.as_mut_slice());
-      <span class="comment">// Inner Vec has been reallocated, so we need to update the pointer
-      </span><span class="kw">if </span>temp.as_mut_ptr() != inner {
-        <span class="self">self</span>.inner.store(temp.as_mut_ptr(), Ordering::Relaxed);
-      }
-      <span class="self">self</span>.length.store(temp.len(), Ordering::Relaxed);
-      std::mem::forget(temp);
-    }
-  }
-
-  <span class="kw">fn </span>push(<span class="kw-2">&amp;</span><span class="self">self</span>, item: T) {
-    <span class="kw">let </span>length = <span class="self">self</span>.length.load(Ordering::Relaxed);
-    <span class="kw">let </span>inner = <span class="self">self</span>.inner.load(Ordering::Relaxed);
-    <span class="kw">let </span><span class="kw-2">mut </span>temp = <span class="kw">unsafe </span>{ Vec::from_raw_parts(inner, length, length) };
-    temp.push(item);
-    <span class="comment">// Inner Vec has been reallocated, so we need to update the pointer
-    </span><span class="kw">if </span>temp.as_mut_ptr() != inner {
-      <span class="self">self</span>.inner.store(temp.as_mut_ptr(), Ordering::Relaxed);
-    }
-    std::mem::forget(temp);
-
-    <span class="self">self</span>.length.fetch_add(<span class="number">1</span>, Ordering::Relaxed);
-  }
-}
-
-<span class="kw">unsafe impl</span>&lt;T: Send&gt; Send <span class="kw">for </span>PersistedPerInstanceVec&lt;T&gt; {}
-<span class="kw">unsafe impl</span>&lt;T: Sync&gt; Sync <span class="kw">for </span>PersistedPerInstanceVec&lt;T&gt; {}
-
-<span class="attr">#[cfg(all(feature = <span class="string">&quot;napi4&quot;</span>, not(target_arch = <span class="string">&quot;wasm32&quot;</span>)))]
-</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>PersistedPerInstanceHashSet&lt;T: <span class="lifetime">&#39;static</span>&gt; {
-  inner: <span class="kw-2">*mut </span>HashSet&lt;T&gt;,
-}
-
-<span class="attr">#[cfg(not(feature = <span class="string">&quot;noop&quot;</span>))]
-#[cfg(all(feature = <span class="string">&quot;napi4&quot;</span>, not(target_arch = <span class="string">&quot;wasm32&quot;</span>)))]
-</span><span class="kw">impl</span>&lt;T: <span class="lifetime">&#39;static </span>+ PartialEq + Eq + Hash&gt; PersistedPerInstanceHashSet&lt;T&gt; {
-  <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>insert(<span class="kw-2">&amp;</span><span class="self">self</span>, item: T) {
-    Box::leak(<span class="kw">unsafe </span>{ Box::from_raw(<span class="self">self</span>.inner) }).insert(item);
-  }
-
-  <span class="kw">fn </span>remove(<span class="kw-2">&amp;</span><span class="self">self</span>, item: <span class="kw-2">&amp;</span>T) {
-    Box::leak(<span class="kw">unsafe </span>{ Box::from_raw(<span class="self">self</span>.inner) }).remove(item);
-  }
-}
-
-<span class="attr">#[cfg(all(feature = <span class="string">&quot;napi4&quot;</span>, not(target_arch = <span class="string">&quot;wasm32&quot;</span>)))]
-</span><span class="kw">impl</span>&lt;T: <span class="lifetime">&#39;static</span>&gt; Deref <span class="kw">for </span>PersistedPerInstanceHashSet&lt;T&gt; {
-  <span class="kw">type </span>Target = HashSet&lt;T&gt;;
-
-  <span class="kw">fn </span>deref(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="self">Self</span>::Target {
-    Box::leak(<span class="kw">unsafe </span>{ Box::from_raw(<span class="self">self</span>.inner) })
-  }
-}
-
-<span class="attr">#[cfg(all(feature = <span class="string">&quot;napi4&quot;</span>, not(target_arch = <span class="string">&quot;wasm32&quot;</span>)))]
-</span><span class="kw">impl</span>&lt;T: <span class="lifetime">&#39;static</span>&gt; Default <span class="kw">for </span>PersistedPerInstanceHashSet&lt;T&gt; {
-  <span class="kw">fn </span>default() -&gt; <span class="self">Self </span>{
-    <span class="self">Self </span>{
-      inner: Box::leak(Box::default()),
-    }
-  }
-}
-
-<span class="attr">#[cfg(all(feature = <span class="string">&quot;napi4&quot;</span>, not(target_arch = <span class="string">&quot;wasm32&quot;</span>)))]
-</span><span class="kw">unsafe impl</span>&lt;T: Send&gt; Send <span class="kw">for </span>PersistedPerInstanceHashSet&lt;T&gt; {}
-<span class="attr">#[cfg(all(feature = <span class="string">&quot;napi4&quot;</span>, not(target_arch = <span class="string">&quot;wasm32&quot;</span>)))]
-</span><span class="kw">unsafe impl</span>&lt;T: Sync&gt; Sync <span class="kw">for </span>PersistedPerInstanceHashSet&lt;T&gt; {}
-
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>PersistedPerInstanceHashMap&lt;K, V&gt;(<span class="kw-2">*mut </span>HashMap&lt;K, V&gt;);
+<span class="attr">#[repr(transparent)]
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>PersistedPerInstanceHashMap&lt;K, V&gt;(RwLock&lt;HashMap&lt;K, V&gt;&gt;);
 
 <span class="kw">impl</span>&lt;K, V&gt; PersistedPerInstanceHashMap&lt;K, V&gt; {
   <span class="attr">#[cfg(not(feature = <span class="string">&quot;noop&quot;</span>))]
   </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>from_hashmap(hashmap: HashMap&lt;K, V&gt;) -&gt; <span class="self">Self </span>{
-    <span class="self">Self</span>(Box::into_raw(Box::new(hashmap)))
+    <span class="self">Self</span>(RwLock::new(hashmap))
   }
 
   <span class="attr">#[allow(clippy::mut_from_ref)]
@@ -823,19 +668,19 @@
   <span class="kw">where
     </span>F: FnOnce(<span class="kw-2">&amp;mut </span>HashMap&lt;K, V&gt;) -&gt; R,
   {
-    f(<span class="kw">unsafe </span>{ Box::leak(Box::from_raw(<span class="self">self</span>.<span class="number">0</span>)) })
+    <span class="kw">let </span><span class="kw-2">mut </span>write_lock = <span class="self">self</span>.<span class="number">0</span>.write().unwrap();
+    f(<span class="kw-2">&amp;mut *</span>write_lock)
   }
 }
 
 <span class="kw">impl</span>&lt;K, V&gt; Default <span class="kw">for </span>PersistedPerInstanceHashMap&lt;K, V&gt; {
   <span class="kw">fn </span>default() -&gt; <span class="self">Self </span>{
-    <span class="kw">let </span>map = Default::default();
-    <span class="self">Self</span>(Box::into_raw(Box::new(map)))
+    <span class="self">Self</span>(RwLock::new(HashMap::default()))
   }
 }
 
 <span class="kw">type </span>ModuleRegisterCallback =
-  PersistedPerInstanceVec&lt;(<span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str&gt;, (<span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str, ExportRegisterCallback))&gt;;
+  RwLock&lt;Vec&lt;(<span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str&gt;, (<span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str, ExportRegisterCallback))&gt;&gt;;
 
 <span class="kw">type </span>ModuleClassProperty = PersistedPerInstanceHashMap&lt;
   <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str,
@@ -857,28 +702,23 @@
 </span><span class="kw">static </span>FIRST_MODULE_REGISTERED: AtomicBool = AtomicBool::new(<span class="bool-val">false</span>);
 <span class="kw">static </span>REGISTERED_CLASSES: Lazy&lt;RegisteredClassesMap&gt; = Lazy::new(Default::default);
 <span class="kw">static </span>FN_REGISTER_MAP: Lazy&lt;FnRegisterMap&gt; = Lazy::new(Default::default);
-<span class="attr">#[cfg(all(feature = <span class="string">&quot;napi4&quot;</span>, not(target_arch = <span class="string">&quot;wasm32&quot;</span>)))]
+<span class="attr">#[cfg(all(feature = <span class="string">&quot;napi4&quot;</span>, not(feature = <span class="string">&quot;noop&quot;</span>), not(target_family = <span class="string">&quot;wasm&quot;</span>)))]
 </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">static </span>CUSTOM_GC_TSFN: AtomicPtr&lt;sys::napi_threadsafe_function__&gt; =
   AtomicPtr::new(ptr::null_mut());
-<span class="attr">#[cfg(all(feature = <span class="string">&quot;napi4&quot;</span>, not(target_arch = <span class="string">&quot;wasm32&quot;</span>)))]
-</span><span class="macro">thread_local! </span>{
-  <span class="comment">// CustomGC ThreadsafeFunction may be deleted during the process exit.
-  // And there may still some Buffer alive after that.
-  </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">static </span>THREAD_DESTROYED: AtomicBool = AtomicBool::new(<span class="bool-val">false</span>);
-}
-<span class="attr">#[cfg(all(feature = <span class="string">&quot;napi4&quot;</span>, not(target_arch = <span class="string">&quot;wasm32&quot;</span>)))]
+<span class="attr">#[cfg(all(feature = <span class="string">&quot;napi4&quot;</span>, not(feature = <span class="string">&quot;noop&quot;</span>), not(target_family = <span class="string">&quot;wasm&quot;</span>)))]
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">static </span>CUSTOM_GC_TSFN_DESTROYED: AtomicBool = AtomicBool::new(<span class="bool-val">false</span>);
+<span class="attr">#[cfg(all(feature = <span class="string">&quot;napi4&quot;</span>, not(feature = <span class="string">&quot;noop&quot;</span>), not(target_family = <span class="string">&quot;wasm&quot;</span>)))]
 </span><span class="comment">// Store thread id of the thread that created the CustomGC ThreadsafeFunction.
-</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">static </span>THREADS_CAN_ACCESS_ENV: once_cell::sync::OnceCell&lt;
-  PersistedPerInstanceHashSet&lt;ThreadId&gt;,
-&gt; = once_cell::sync::OnceCell::new();
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">static </span>THREADS_CAN_ACCESS_ENV: once_cell::sync::Lazy&lt;
+  PersistedPerInstanceHashMap&lt;ThreadId, bool&gt;,
+&gt; = once_cell::sync::Lazy::new(Default::default);
 
 <span class="kw">type </span>RegisteredClasses =
   PersistedPerInstanceHashMap&lt;<span class="comment">/* export name */ </span>String, <span class="comment">/* constructor */ </span>sys::napi_ref&gt;;
 
 <span class="attr">#[cfg(all(feature = <span class="string">&quot;compat-mode&quot;</span>, not(feature = <span class="string">&quot;noop&quot;</span>)))]
 </span><span class="comment">// compatibility for #[module_exports]
-</span><span class="kw">static </span>MODULE_EXPORTS: Lazy&lt;PersistedPerInstanceVec&lt;ModuleExportsCallback&gt;&gt; =
-  Lazy::new(Default::default);
+</span><span class="kw">static </span>MODULE_EXPORTS: Lazy&lt;RwLock&lt;Vec&lt;ModuleExportsCallback&gt;&gt;&gt; = Lazy::new(Default::default);
 
 <span class="attr">#[cfg(not(feature = <span class="string">&quot;noop&quot;</span>))]
 #[inline]
@@ -902,7 +742,10 @@
 #[cfg(all(feature = <span class="string">&quot;compat-mode&quot;</span>, not(feature = <span class="string">&quot;noop&quot;</span>)))]
 </span><span class="comment">// compatibility for #[module_exports]
 </span><span class="kw">pub fn </span>register_module_exports(callback: ModuleExportsCallback) {
-  MODULE_EXPORTS.push(callback);
+  MODULE_EXPORTS
+    .write()
+    .expect(<span class="string">&quot;Register module exports failed&quot;</span>)
+    .push(callback);
 }
 
 <span class="attr">#[doc(hidden)]
@@ -911,7 +754,10 @@
   name: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str,
   cb: ExportRegisterCallback,
 ) {
-  MODULE_REGISTER_CALLBACK.push((js_mod, (name, cb)));
+  MODULE_REGISTER_CALLBACK
+    .write()
+    .expect(<span class="string">&quot;Register module export failed&quot;</span>)
+    .push((js_mod, (name, cb)));
 }
 
 <span class="attr">#[doc(hidden)]
@@ -936,7 +782,7 @@
     <span class="kw">let </span>val = inner.entry(rust_name).or_default();
     <span class="kw">let </span>val = val.entry(js_mod).or_default();
     val.<span class="number">0 </span>= js_name;
-    val.<span class="number">1</span>.extend(props.into_iter());
+    val.<span class="number">1</span>.extend(props);
   });
 }
 
@@ -1033,7 +879,7 @@
   }
 }
 
-<span class="attr">#[cfg(all(target_arch = <span class="string">&quot;wasm32&quot;</span>, not(feature = <span class="string">&quot;noop&quot;</span>)))]
+<span class="attr">#[cfg(all(target_family = <span class="string">&quot;wasm&quot;</span>, not(feature = <span class="string">&quot;noop&quot;</span>)))]
 #[no_mangle]
 </span><span class="kw">unsafe extern </span><span class="string">&quot;C&quot; </span><span class="kw">fn </span>napi_register_wasm_v1(
   env: sys::napi_env,
@@ -1044,7 +890,14 @@
 
 <span class="attr">#[cfg(not(feature = <span class="string">&quot;noop&quot;</span>))]
 #[no_mangle]
-</span><span class="kw">unsafe extern </span><span class="string">&quot;C&quot; </span><span class="kw">fn </span>napi_register_module_v1(
+</span><span class="doccomment">/// Register the n-api module exports.
+///
+/// # Safety
+/// This method is meant to be called by Node.js while importing the n-api module.
+/// Only call this method if the current module is **not** imported by a node-like runtime.
+///
+/// Arguments `env` and `exports` must **not** be null.
+</span><span class="kw">pub unsafe extern </span><span class="string">&quot;C&quot; </span><span class="kw">fn </span>napi_register_module_v1(
   env: sys::napi_env,
   exports: sys::napi_value,
 ) -&gt; sys::napi_value {
@@ -1054,8 +907,12 @@
     wait_first_thread_registered();
   }
   <span class="kw">let </span><span class="kw-2">mut </span>exports_objects: HashSet&lt;String&gt; = HashSet::default();
-  MODULE_REGISTER_CALLBACK.borrow_mut(|inner| {
-    inner
+
+  {
+    <span class="kw">let </span><span class="kw-2">mut </span>register_callback = MODULE_REGISTER_CALLBACK
+      .write()
+      .expect(<span class="string">&quot;Write MODULE_REGISTER_CALLBACK in napi_register_module_v1 failed&quot;</span>);
+    register_callback
       .iter_mut()
       .fold(
         HashMap::&lt;<span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str&gt;, Vec&lt;(<span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str, ExportRegisterCallback)&gt;&gt;::new(),
@@ -1125,8 +982,8 @@
             }
           }
         }
-      })
-  });
+      });
+  }
 
   <span class="kw">let </span><span class="kw-2">mut </span>registered_classes = HashMap::new();
 
@@ -1167,7 +1024,10 @@
           }
           <span class="kw">let </span>(ctor, props): (Vec&lt;<span class="kw">_</span>&gt;, Vec&lt;<span class="kw">_</span>&gt;) = props.iter().partition(|prop| prop.is_ctor);
 
-          <span class="kw">let </span>ctor = ctor.get(<span class="number">0</span>).map(|c| c.raw().method.unwrap()).unwrap_or(noop);
+          <span class="kw">let </span>ctor = ctor
+            .first()
+            .map(|c| c.raw().method.unwrap())
+            .unwrap_or(noop);
           <span class="kw">let </span>raw_props: Vec&lt;<span class="kw">_</span>&gt; = props.iter().map(|prop| prop.raw()).collect();
 
           <span class="kw">let </span>js_class_name = CStr::from_bytes_with_nul_unchecked(js_name.as_bytes());
@@ -1224,15 +1084,20 @@
   });
 
   <span class="attr">#[cfg(feature = <span class="string">&quot;compat-mode&quot;</span>)]
-  </span>MODULE_EXPORTS.borrow_mut(|inner| {
-    inner.iter().for_each(|callback| <span class="kw">unsafe </span>{
+  </span>{
+    <span class="kw">let </span>module_exports = MODULE_EXPORTS.read().expect(<span class="string">&quot;Read MODULE_EXPORTS failed&quot;</span>);
+    module_exports.iter().for_each(|callback| <span class="kw">unsafe </span>{
       <span class="kw">if let </span><span class="prelude-val">Err</span>(e) = callback(env, exports) {
         JsError::from(e).throw_into(env);
       }
     })
-  });
+  }
 
-  <span class="attr">#[cfg(all(windows, feature = <span class="string">&quot;napi4&quot;</span>, feature = <span class="string">&quot;tokio_rt&quot;</span>))]
+  <span class="attr">#[cfg(all(
+    not(any(target_os = <span class="string">&quot;macos&quot;</span>, target_family = <span class="string">&quot;wasm&quot;</span>)),
+    feature = <span class="string">&quot;napi4&quot;</span>,
+    feature = <span class="string">&quot;tokio_rt&quot;
+  </span>))]
   </span>{
     <span class="kw">crate</span>::tokio_runtime::ensure_runtime();
 
@@ -1248,7 +1113,7 @@
       )
     };
   }
-  <span class="attr">#[cfg(all(feature = <span class="string">&quot;napi4&quot;</span>, not(target_arch = <span class="string">&quot;wasm32&quot;</span>)))]
+  <span class="attr">#[cfg(all(feature = <span class="string">&quot;napi4&quot;</span>, not(target_family = <span class="string">&quot;wasm&quot;</span>)))]
   </span>create_custom_gc(env);
   FIRST_MODULE_REGISTERED.store(<span class="bool-val">true</span>, Ordering::SeqCst);
   exports
@@ -1272,67 +1137,69 @@
   ptr::null_mut()
 }
 
-<span class="attr">#[cfg(all(feature = <span class="string">&quot;napi4&quot;</span>, not(target_arch = <span class="string">&quot;wasm32&quot;</span>), not(feature = <span class="string">&quot;noop&quot;</span>)))]
+<span class="attr">#[cfg(all(feature = <span class="string">&quot;napi4&quot;</span>, not(target_family = <span class="string">&quot;wasm&quot;</span>), not(feature = <span class="string">&quot;noop&quot;</span>)))]
 </span><span class="kw">fn </span>create_custom_gc(env: sys::napi_env) {
   <span class="kw">use </span>std::os::raw::c_char;
 
-  <span class="kw">let </span><span class="kw-2">mut </span>custom_gc_fn = ptr::null_mut();
-  <span class="macro">check_status_or_throw!</span>(
-    env,
-    <span class="kw">unsafe </span>{
-      sys::napi_create_function(
-        env,
-        <span class="string">&quot;custom_gc&quot;</span>.as_ptr() <span class="kw">as </span><span class="kw-2">*const </span>c_char,
-        <span class="number">9</span>,
-        <span class="prelude-val">Some</span>(empty),
-        ptr::null_mut(),
-        <span class="kw-2">&amp;mut </span>custom_gc_fn,
-      )
-    },
-    <span class="string">&quot;Create Custom GC Function in napi_register_module_v1 failed&quot;
-  </span>);
-  <span class="kw">let </span><span class="kw-2">mut </span>async_resource_name = ptr::null_mut();
-  <span class="macro">check_status_or_throw!</span>(
-    env,
-    <span class="kw">unsafe </span>{
-      sys::napi_create_string_utf8(
-        env,
-        <span class="string">&quot;CustomGC&quot;</span>.as_ptr() <span class="kw">as </span><span class="kw-2">*const </span>c_char,
-        <span class="number">8</span>,
-        <span class="kw-2">&amp;mut </span>async_resource_name,
-      )
-    },
-    <span class="string">&quot;Create async resource string in napi_register_module_v1&quot;
-  </span>);
-  <span class="kw">let </span><span class="kw-2">mut </span>custom_gc_tsfn = ptr::null_mut();
-  <span class="macro">check_status_or_throw!</span>(
-    env,
-    <span class="kw">unsafe </span>{
-      sys::napi_create_threadsafe_function(
-        env,
-        custom_gc_fn,
-        ptr::null_mut(),
-        async_resource_name,
-        <span class="number">0</span>,
-        <span class="number">1</span>,
-        ptr::null_mut(),
-        <span class="prelude-val">Some</span>(custom_gc_finalize),
-        ptr::null_mut(),
-        <span class="prelude-val">Some</span>(custom_gc),
-        <span class="kw-2">&amp;mut </span>custom_gc_tsfn,
-      )
-    },
-    <span class="string">&quot;Create Custom GC ThreadsafeFunction in napi_register_module_v1 failed&quot;
-  </span>);
-  <span class="macro">check_status_or_throw!</span>(
-    env,
-    <span class="kw">unsafe </span>{ sys::napi_unref_threadsafe_function(env, custom_gc_tsfn) },
-    <span class="string">&quot;Unref Custom GC ThreadsafeFunction in napi_register_module_v1 failed&quot;
-  </span>);
-  CUSTOM_GC_TSFN.store(custom_gc_tsfn, Ordering::Relaxed);
-  <span class="kw">let </span>threads = THREADS_CAN_ACCESS_ENV.get_or_init(Default::default);
+  <span class="kw">if </span>!FIRST_MODULE_REGISTERED.load(Ordering::SeqCst) {
+    <span class="kw">let </span><span class="kw-2">mut </span>custom_gc_fn = ptr::null_mut();
+    <span class="macro">check_status_or_throw!</span>(
+      env,
+      <span class="kw">unsafe </span>{
+        sys::napi_create_function(
+          env,
+          <span class="string">&quot;custom_gc&quot;</span>.as_ptr().cast(),
+          <span class="number">9</span>,
+          <span class="prelude-val">Some</span>(empty),
+          ptr::null_mut(),
+          <span class="kw-2">&amp;mut </span>custom_gc_fn,
+        )
+      },
+      <span class="string">&quot;Create Custom GC Function in napi_register_module_v1 failed&quot;
+    </span>);
+    <span class="kw">let </span><span class="kw-2">mut </span>async_resource_name = ptr::null_mut();
+    <span class="macro">check_status_or_throw!</span>(
+      env,
+      <span class="kw">unsafe </span>{
+        sys::napi_create_string_utf8(
+          env,
+          <span class="string">&quot;CustomGC&quot;</span>.as_ptr() <span class="kw">as </span><span class="kw-2">*const </span>c_char,
+          <span class="number">8</span>,
+          <span class="kw-2">&amp;mut </span>async_resource_name,
+        )
+      },
+      <span class="string">&quot;Create async resource string in napi_register_module_v1&quot;
+    </span>);
+    <span class="kw">let </span><span class="kw-2">mut </span>custom_gc_tsfn = ptr::null_mut();
+    <span class="macro">check_status_or_throw!</span>(
+      env,
+      <span class="kw">unsafe </span>{
+        sys::napi_create_threadsafe_function(
+          env,
+          custom_gc_fn,
+          ptr::null_mut(),
+          async_resource_name,
+          <span class="number">0</span>,
+          <span class="number">1</span>,
+          ptr::null_mut(),
+          <span class="prelude-val">Some</span>(custom_gc_finalize),
+          ptr::null_mut(),
+          <span class="prelude-val">Some</span>(custom_gc),
+          <span class="kw-2">&amp;mut </span>custom_gc_tsfn,
+        )
+      },
+      <span class="string">&quot;Create Custom GC ThreadsafeFunction in napi_register_module_v1 failed&quot;
+    </span>);
+    <span class="macro">check_status_or_throw!</span>(
+      env,
+      <span class="kw">unsafe </span>{ sys::napi_unref_threadsafe_function(env, custom_gc_tsfn) },
+      <span class="string">&quot;Unref Custom GC ThreadsafeFunction in napi_register_module_v1 failed&quot;
+    </span>);
+    CUSTOM_GC_TSFN.store(custom_gc_tsfn, Ordering::Relaxed);
+  }
+
   <span class="kw">let </span>current_thread_id = std::thread::current().id();
-  threads.insert(current_thread_id);
+  THREADS_CAN_ACCESS_ENV.borrow_mut(|m| m.insert(current_thread_id, <span class="bool-val">true</span>));
   <span class="macro">check_status_or_throw!</span>(
     env,
     <span class="kw">unsafe </span>{
@@ -1346,33 +1213,29 @@
   </span>);
 }
 
-<span class="attr">#[cfg(all(feature = <span class="string">&quot;napi4&quot;</span>, not(target_arch = <span class="string">&quot;wasm32&quot;</span>), not(feature = <span class="string">&quot;noop&quot;</span>)))]
+<span class="attr">#[cfg(all(feature = <span class="string">&quot;napi4&quot;</span>, not(target_family = <span class="string">&quot;wasm&quot;</span>), not(feature = <span class="string">&quot;noop&quot;</span>)))]
 </span><span class="kw">unsafe extern </span><span class="string">&quot;C&quot; </span><span class="kw">fn </span>remove_thread_id(id: <span class="kw-2">*mut </span>std::ffi::c_void) {
   <span class="kw">let </span>thread_id = <span class="kw">unsafe </span>{ Box::from_raw(id.cast::&lt;ThreadId&gt;()) };
-  THREADS_CAN_ACCESS_ENV
-    .get_or_init(Default::default)
-    .remove(<span class="kw-2">&amp;*</span>thread_id);
+  THREADS_CAN_ACCESS_ENV.borrow_mut(|m| m.insert(<span class="kw-2">*</span>thread_id, <span class="bool-val">false</span>));
 }
 
-<span class="attr">#[cfg(all(feature = <span class="string">&quot;napi4&quot;</span>, not(target_arch = <span class="string">&quot;wasm32&quot;</span>), not(feature = <span class="string">&quot;noop&quot;</span>)))]
+<span class="attr">#[cfg(all(feature = <span class="string">&quot;napi4&quot;</span>, not(target_family = <span class="string">&quot;wasm&quot;</span>), not(feature = <span class="string">&quot;noop&quot;</span>)))]
 #[allow(unused)]
 </span><span class="kw">unsafe extern </span><span class="string">&quot;C&quot; </span><span class="kw">fn </span>empty(env: sys::napi_env, info: sys::napi_callback_info) -&gt; sys::napi_value {
   ptr::null_mut()
 }
 
-<span class="attr">#[cfg(all(feature = <span class="string">&quot;napi4&quot;</span>, not(target_arch = <span class="string">&quot;wasm32&quot;</span>), not(feature = <span class="string">&quot;noop&quot;</span>)))]
-#[allow(unused)]
+<span class="attr">#[cfg(all(feature = <span class="string">&quot;napi4&quot;</span>, not(target_family = <span class="string">&quot;wasm&quot;</span>), not(feature = <span class="string">&quot;noop&quot;</span>)))]
+#[allow(unused_variables)]
 </span><span class="kw">unsafe extern </span><span class="string">&quot;C&quot; </span><span class="kw">fn </span>custom_gc_finalize(
   env: sys::napi_env,
   finalize_data: <span class="kw-2">*mut </span>std::ffi::c_void,
   finalize_hint: <span class="kw-2">*mut </span>std::ffi::c_void,
 ) {
-  THREAD_DESTROYED.with(|closed| {
-    closed.store(<span class="bool-val">true</span>, Ordering::Relaxed);
-  });
+  CUSTOM_GC_TSFN_DESTROYED.store(<span class="bool-val">true</span>, Ordering::SeqCst);
 }
 
-<span class="attr">#[cfg(all(feature = <span class="string">&quot;napi4&quot;</span>, not(target_arch = <span class="string">&quot;wasm32&quot;</span>), not(feature = <span class="string">&quot;noop&quot;</span>)))]
+<span class="attr">#[cfg(all(feature = <span class="string">&quot;napi4&quot;</span>, not(target_family = <span class="string">&quot;wasm&quot;</span>), not(feature = <span class="string">&quot;noop&quot;</span>)))]
 </span><span class="comment">// recycle the ArrayBuffer/Buffer Reference if the ArrayBuffer/Buffer is not dropped on the main thread
 </span><span class="kw">extern </span><span class="string">&quot;C&quot; </span><span class="kw">fn </span>custom_gc(
   env: sys::napi_env,
@@ -1380,9 +1243,14 @@
   _context: <span class="kw-2">*mut </span>std::ffi::c_void,
   data: <span class="kw-2">*mut </span>std::ffi::c_void,
 ) {
+  <span class="comment">// current thread was destroyed
+  </span><span class="kw">if </span>THREADS_CAN_ACCESS_ENV.borrow_mut(|m| m.get(<span class="kw-2">&amp;</span>std::thread::current().id()) == <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="bool-val">false</span>)) {
+    <span class="kw">return</span>;
+  }
+  <span class="kw">let </span><span class="kw-2">mut </span>reference = <span class="number">0</span>;
   <span class="macro">check_status_or_throw!</span>(
     env,
-    <span class="kw">unsafe </span>{ sys::napi_delete_reference(env, data <span class="kw">as </span>sys::napi_ref) },
+    <span class="kw">unsafe </span>{ sys::napi_reference_unref(env, data.cast(), <span class="kw-2">&amp;mut </span>reference) },
     <span class="string">&quot;Failed to delete Buffer reference in Custom GC&quot;
   </span>);
 }

@@ -366,7 +366,7 @@
     }
 }
 
-<span class="attr">#[cfg_attr(not(target_arch = <span class="string">&quot;wasm32&quot;</span>), napi_derive::napi(object))]
+<span class="attr">#[cfg_attr(not(target_arch = <span class="string">&quot;wasm32&quot;</span>), napi_derive::napi)]
 #[cfg_attr(target_arch = <span class="string">&quot;wasm32&quot;</span>, derive(Clone, Copy, Deserialize_repr))]
 #[repr(u8)]
 #[derive(Debug)]
