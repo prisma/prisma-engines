@@ -8,8 +8,8 @@
     "crates": "node --import tsx --no-warnings ./src/crates.ts"
   },
   "devDependencies": {
-    "ts-node": "^10.9.2",
-    "tsx": "^4.7.0",
-    "typescript": "^5.3.3"
+    "ts-node": "10.9.2",
+    "tsx": "4.7.0",
+    "typescript": "5.3.3"
   }
 }

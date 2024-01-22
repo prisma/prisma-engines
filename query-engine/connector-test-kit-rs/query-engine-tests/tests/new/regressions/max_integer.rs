@@ -187,6 +187,8 @@ mod max_integer {
         schema.to_owned()
     }
 
+    // Info: `driver-adapters` are currently excluded because they yield a different error message,
+    // coming straight from the database.
     #[connector_test(
         schema(overflow_pg),
         only(Postgres),
