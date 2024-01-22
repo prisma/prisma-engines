@@ -282,7 +282,7 @@ impl ConnectorVersion {
     ///
     /// max_bind_values is overriden by the QUERY_BATCH_SIZE env var in targets other than WASM.
     ///
-    /// Connectors which underyling implementation is WASM don'thave any max_bind_values override
+    /// Connectors which underyling implementation is WASM don't have any max_bind_values override
     /// as there's no such thing as runtime environment.
     ///
     /// From the PoV of the test binary, the target architecture is that of where the test runs,
