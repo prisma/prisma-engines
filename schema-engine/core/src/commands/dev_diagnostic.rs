@@ -106,7 +106,7 @@ Drift detected: Your database schema is not in sync with your migration history.
 
 The following is a summary of the differences between the expected database schema given your migrations files, and the actual schema of the database.
 
-It should be understood as the set of changes to get from the expected schema to the actual schema.
+This summary details discrepancies by listing elements found in the current database schema but missing in your Prisma schema, indicating the Prisma schema updates required for alignment.
 "#;
 
 const FIRST_TIME_MIGRATION_MESSAGE: &str = r#"
