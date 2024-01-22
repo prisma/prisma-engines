@@ -486,6 +486,10 @@
 <a href="#486" id="486">486</a>
 <a href="#487" id="487">487</a>
 <a href="#488" id="488">488</a>
+<a href="#489" id="489">489</a>
+<a href="#490" id="490">490</a>
+<a href="#491" id="491">491</a>
+<a href="#492" id="492">492</a>
 </pre></div><pre class="rust"><code><span class="kw">mod </span>json_adapter;
 
 <span class="kw">pub use </span>json_adapter::<span class="kw-2">*</span>;
@@ -593,6 +597,10 @@
 
     <span class="kw">pub fn </span>prisma_dml(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>str {
         <span class="self">self</span>.query_schema.internal_data_model.schema.db.source()
+    }
+
+    <span class="kw">pub fn </span>max_bind_values(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;usize&gt; {
+        <span class="self">self</span>.connector_version().max_bind_values()
     }
 
     <span class="kw">pub async fn </span>load(

@@ -416,6 +416,56 @@
 <a href="#416" id="416">416</a>
 <a href="#417" id="417">417</a>
 <a href="#418" id="418">418</a>
+<a href="#419" id="419">419</a>
+<a href="#420" id="420">420</a>
+<a href="#421" id="421">421</a>
+<a href="#422" id="422">422</a>
+<a href="#423" id="423">423</a>
+<a href="#424" id="424">424</a>
+<a href="#425" id="425">425</a>
+<a href="#426" id="426">426</a>
+<a href="#427" id="427">427</a>
+<a href="#428" id="428">428</a>
+<a href="#429" id="429">429</a>
+<a href="#430" id="430">430</a>
+<a href="#431" id="431">431</a>
+<a href="#432" id="432">432</a>
+<a href="#433" id="433">433</a>
+<a href="#434" id="434">434</a>
+<a href="#435" id="435">435</a>
+<a href="#436" id="436">436</a>
+<a href="#437" id="437">437</a>
+<a href="#438" id="438">438</a>
+<a href="#439" id="439">439</a>
+<a href="#440" id="440">440</a>
+<a href="#441" id="441">441</a>
+<a href="#442" id="442">442</a>
+<a href="#443" id="443">443</a>
+<a href="#444" id="444">444</a>
+<a href="#445" id="445">445</a>
+<a href="#446" id="446">446</a>
+<a href="#447" id="447">447</a>
+<a href="#448" id="448">448</a>
+<a href="#449" id="449">449</a>
+<a href="#450" id="450">450</a>
+<a href="#451" id="451">451</a>
+<a href="#452" id="452">452</a>
+<a href="#453" id="453">453</a>
+<a href="#454" id="454">454</a>
+<a href="#455" id="455">455</a>
+<a href="#456" id="456">456</a>
+<a href="#457" id="457">457</a>
+<a href="#458" id="458">458</a>
+<a href="#459" id="459">459</a>
+<a href="#460" id="460">460</a>
+<a href="#461" id="461">461</a>
+<a href="#462" id="462">462</a>
+<a href="#463" id="463">463</a>
+<a href="#464" id="464">464</a>
+<a href="#465" id="465">465</a>
+<a href="#466" id="466">466</a>
+<a href="#467" id="467">467</a>
+<a href="#468" id="468">468</a>
 </pre></div><pre class="rust"><code><span class="kw">mod </span>cockroachdb;
 <span class="kw">mod </span>js;
 <span class="kw">mod </span>mongodb;
@@ -438,6 +488,7 @@
 
 <span class="kw">use crate</span>::{datamodel_rendering::DatamodelRenderer, BoxFuture, TestConfig, TestError, CONFIG};
 <span class="kw">use </span>psl::datamodel_connector::ConnectorCapabilities;
+<span class="kw">use </span>quaint::prelude::SqlFamily;
 <span class="kw">use </span>std::{convert::TryFrom, fmt};
 
 <span class="kw">pub trait </span>ConnectorTagInterface {
@@ -693,6 +744,55 @@
             | (Postgres(..), <span class="kw">_</span>)
             | (<span class="kw">_</span>, Postgres(..)) =&gt; <span class="bool-val">false</span>,
         }
+    }
+
+    <span class="doccomment">/// The maximum number of rows allowed in a single insert query.
+    ///
+    /// max_bind_values is overriden by the QUERY_BATCH_SIZE env var in targets other than WASM.
+    ///
+    /// Connectors which underyling implementation is WASM don&#39;t have any max_bind_values override
+    /// as there&#39;s no such thing as runtime environment.
+    ///
+    /// From the PoV of the test binary, the target architecture is that of where the test runs,
+    /// generally x86_64, or aarch64, etc.
+    ///
+    /// As a consequence there is an mismatch between the the max_bind_values as seen by the test
+    /// binary (overriden by the QUERY_BATCH_SIZE env var) and the max_bind_values as seen by the
+    /// WASM engine being exercised in those tests, through the RunnerExecutor::External test runner.
+    ///
+    /// What we do in here, is returning the number of max_bind_values hat the connector under test
+    /// will use. i.e. if it&#39;s a WASM connector, the default, not overridable one. Otherwise the one
+    /// as seen by the test binary (which will be the same as the engine exercised)
+    </span><span class="kw">pub fn </span>max_bind_values(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;usize&gt; {
+        <span class="kw">if </span><span class="self">self</span>.is_wasm() {
+            <span class="self">self</span>.sql_family().map(|f| f.default_max_bind_values())
+        } <span class="kw">else </span>{
+            <span class="self">self</span>.sql_family().map(|f| f.max_bind_values())
+        }
+    }
+
+    <span class="doccomment">/// SQL family for the connector
+    </span><span class="kw">fn </span>sql_family(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;SqlFamily&gt; {
+        <span class="kw">match </span><span class="self">self </span>{
+            <span class="self">Self</span>::SqlServer(<span class="kw">_</span>) =&gt; <span class="prelude-val">Some</span>(SqlFamily::Mssql),
+            <span class="self">Self</span>::Postgres(<span class="kw">_</span>) =&gt; <span class="prelude-val">Some</span>(SqlFamily::Postgres),
+            <span class="self">Self</span>::MySql(<span class="kw">_</span>) =&gt; <span class="prelude-val">Some</span>(SqlFamily::Mysql),
+            <span class="self">Self</span>::Sqlite(<span class="kw">_</span>) =&gt; <span class="prelude-val">Some</span>(SqlFamily::Sqlite),
+            <span class="self">Self</span>::CockroachDb(<span class="kw">_</span>) =&gt; <span class="prelude-val">Some</span>(SqlFamily::Postgres),
+            <span class="self">Self</span>::Vitess(<span class="kw">_</span>) =&gt; <span class="prelude-val">Some</span>(SqlFamily::Mysql),
+            <span class="kw">_ </span>=&gt; <span class="prelude-val">None</span>,
+        }
+    }
+
+    <span class="doccomment">/// Determines if the connector uses a driver adapter implemented in Wasm
+    </span><span class="kw">fn </span>is_wasm(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="macro">matches!</span>(
+            <span class="self">self</span>,
+            <span class="self">Self</span>::Postgres(<span class="prelude-val">Some</span>(PostgresVersion::PgJsWasm))
+                | <span class="self">Self</span>::Postgres(<span class="prelude-val">Some</span>(PostgresVersion::NeonJsWasm))
+                | <span class="self">Self</span>::Vitess(<span class="prelude-val">Some</span>(VitessVersion::PlanetscaleJsWasm))
+                | <span class="self">Self</span>::Sqlite(<span class="prelude-val">Some</span>(SqliteVersion::LibsqlJsWasm))
+        )
     }
 }
 

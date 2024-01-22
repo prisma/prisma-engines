@@ -761,7 +761,7 @@
         <span class="macro">vec!</span>[args]
     };
 
-    <span class="kw">let </span>partitioned_batches = <span class="kw">if let </span><span class="prelude-val">Some</span>(max_rows) = ctx.max_rows {
+    <span class="kw">let </span>partitioned_batches = <span class="kw">if let </span><span class="prelude-val">Some</span>(max_rows) = ctx.max_insert_rows {
         <span class="kw">let </span>capacity = batches.len();
         batches
             .into_iter()
