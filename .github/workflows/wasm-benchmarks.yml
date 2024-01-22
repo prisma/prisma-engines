@@ -24,8 +24,6 @@ jobs:
 
       - name: "Setup Node.js"
         uses: actions/setup-node@v4
-        with:
-          node-version: 18
 
       - name: "Setup pnpm"
         uses: pnpm/action-setup@v2
@@ -51,17 +49,15 @@ jobs:
       - name: Run benchmarks
         id: bench
         run: |
-          make run-bench | tee results.txt
-
-          # Save the output to a file so we can use it in the comment
-          {
-            echo 'bench_output<<EOF'
-            cat results.txt
-            echo EOF
-          } >> "$GITHUB_OUTPUT"
+          make run-bench | tee results.txt          
 
           regressed_values=$(grep "slower than Web Assembly: Latest" results.txt | cut -f1 -d'x')
-          improved_values=$(grep "faster than Web Assembly: Latest" results.txt | cut -f1 -d'x')
+          echo "Regressed values:"
+          echo $regressed_values
+
+          improved_values=$(grep "faster than Web Assembly: Latest" results.txt | cut -f1 -d'x')          
+          echo "Improved values:"
+          echo $improved_values
 
           # Initialize sum variable and count
           total_sum=0
@@ -83,8 +79,7 @@ jobs:
           done
 
           if [ $total_count -eq 0 ]; then
-              echo "summary=💥 something was wrong running the benchmarks" >> "$GITHUB_OUTPUT"
-              echo "status=failed" >> "$GITHUB_OUTPUT"
+              echo "💥 something was wrong running the benchmarks"              
               exit 1
           fi
 
@@ -113,6 +108,13 @@ jobs:
 
           echo "summary=$summary" >> "$GITHUB_OUTPUT"
           echo "status=$status" >> "$GITHUB_OUTPUT"
+
+          # Save the output to a file so we can use it in the comment
+          {
+            echo 'bench_output<<EOF'
+            cat results.txt
+            echo EOF
+          } >> "$GITHUB_OUTPUT"
       - name: Find past report comment
         uses: peter-evans/find-comment@v2
         id: findReportComment
