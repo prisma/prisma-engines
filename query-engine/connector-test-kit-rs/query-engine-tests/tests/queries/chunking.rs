@@ -1,8 +1,16 @@
 use query_engine_tests::*;
 
-/// Port note: Batch size for testing is now 10 by default, not configurable (look at the direnv).
+/// * QUERY_BATCH_SIZE for testing is 10, configured in direnv.
+/// * It should be called QUERY_CHUNK_SIZE instead, because it's a knob to configure query chunking
+///  which is splitting queries with more arguments than accepted by the database, in multiple
+///  queries.
+/// * WASM versions of the engine don't allow for runtime configuration of this value so they default
+///  the mininum supported by any database on a SQL family (eg. Postgres, MySQL, SQLite, SQL Server,
+///  etc.) As such, in order to guarantee chunking happens, a large number of arguments --larger
+///  than the default-- needs to be used, to have actual coverage of chunking code while exercising
+///  WASM query engines.
 #[test_suite(schema(schema))]
-mod isb {
+mod chunking {
     use indoc::indoc;
     use query_engine_tests::{assert_error, run_query};
 
@@ -34,8 +42,8 @@ mod isb {
         schema.to_owned()
     }
 
-    // "batching of IN queries" should "work when having more than the specified amount of items"
-    // TODO(joins): Excluded because we have no support for batched queries with joins. In practice, it should happen under much less circumstances
+    // "chunking of IN queries" should "work when having more than the specified amount of items"
+    // TODO(joins): Excluded because we have no support for chunked queries with joins. In practice, it should happen under much less circumstances
     // TODO(joins): than with the query-based strategy, because we don't issue `WHERE IN (parent_ids)` queries anymore to resolve relations.
     #[connector_test(exclude_features("relationJoins"))]
     async fn in_more_items(runner: Runner) -> TestResult<()> {
@@ -52,8 +60,8 @@ mod isb {
         Ok(())
     }
 
-    // "ascending ordering of batched IN queries" should "work when having more than the specified amount of items"
-    // TODO(joins): Excluded because we have no support for batched queries with joins. In practice, it should happen under much less circumstances
+    // "ascending ordering of chunked IN queries" should "work when having more than the specified amount of items"
+    // TODO(joins): Excluded because we have no support for chunked queries with joins. In practice, it should happen under much less circumstances
     // TODO(joins): than with the query-based strategy, because we don't issue `WHERE IN (parent_ids)` queries anymore to resolve relations.
     #[connector_test(exclude_features("relationJoins"))]
     async fn asc_in_ordering(runner: Runner) -> TestResult<()> {
@@ -70,8 +78,8 @@ mod isb {
         Ok(())
     }
 
-    // "ascending ordering of batched IN queries" should "work when having more than the specified amount of items"
-    // TODO(joins): Excluded because we have no support for batched queries with joins. In practice, it should happen under much less circumstances
+    // "ascending ordering of chunked IN queries" should "work when having more than the specified amount of items"
+    // TODO(joins): Excluded because we have no support for chunked queries with joins. In practice, it should happen under much less circumstances
     // TODO(joins): than with the query-based strategy, because we don't issue `WHERE IN (parent_ids)` queries anymore to resolve relations.
     #[connector_test(exclude_features("relationJoins"))]
     async fn desc_in_ordering(runner: Runner) -> TestResult<()> {
@@ -88,45 +96,29 @@ mod isb {
         Ok(())
     }
 
-    #[connector_test(exclude(
-        MongoDb,
-        Postgres("pg.js.wasm"),
-        Postgres("neon.js.wasm"),
-        Sqlite("libsql.js.wasm"),
-        Vitess("planetscale.js.wasm")
-    ))]
+    #[connector_test(exclude(MongoDb))]
     async fn order_by_aggregation_should_fail(runner: Runner) -> TestResult<()> {
         create_test_data(&runner).await?;
 
         assert_error!(
             runner,
-            r#"query {
-              findManyA(where: {id: { in: [5,4,3,2,1,1,1,2,3,4,5,6,7,6,5,4,3,2,1,2,3,4,5,6] }}, orderBy: { b: { as: { _count: asc } } }) { id }
-            }"#,
+            with_id_excess!(&runner, "query { findManyA(where: {id: { in: [:id_list:] }}, orderBy: { b: { as: { _count: asc } } } ) { id } }"),
             2029 // QueryParameterLimitExceeded
         );
 
         Ok(())
     }
 
-    #[connector_test(
-        capabilities(FullTextSearchWithoutIndex),
-        exclude(
-            MongoDb,
-            Postgres("pg.js.wasm"),
-            Postgres("neon.js.wasm"),
-            Sqlite("libsql.js.wasm"),
-            Vitess("planetscale.js.wasm")
-        )
-    )]
+    #[connector_test(capabilities(FullTextSearchWithoutIndex), exclude(MongoDb))]
     async fn order_by_relevance_should_fail(runner: Runner) -> TestResult<()> {
         create_test_data(&runner).await?;
 
         assert_error!(
             runner,
-            r#"query {
-              findManyA(where: {id: { in: [5,4,3,2,1,1,1,2,3,4,5,6,7,6,5,4,3,2,1,2,3,4,5,6] }}, orderBy: { _relevance: { fields: text, search: "something", sort: asc } }) { id }
-            }"#,
+            with_id_excess!(
+                &runner,
+                r#"query { findManyA(where: {id: { in: [:id_list:] }}, orderBy: { _relevance: { fields: text, search: "something", sort: asc } } ) { id } }"#
+            ),
             2029 // QueryParameterLimitExceeded
         );
 

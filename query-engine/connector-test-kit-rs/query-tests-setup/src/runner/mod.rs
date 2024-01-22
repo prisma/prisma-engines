@@ -107,6 +107,10 @@ impl Runner {
         self.query_schema.internal_data_model.schema.db.source()
     }
 
+    pub fn max_bind_values(&self) -> Option<usize> {
+        self.connector_version().max_bind_values()
+    }
+
     pub async fn load(
         datamodel: String,
         db_schemas: &[&str],
