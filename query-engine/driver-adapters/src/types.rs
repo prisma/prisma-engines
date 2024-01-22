@@ -106,7 +106,7 @@ impl JSResultSet {
     }
 }
 
-#[cfg_attr(not(target_arch = "wasm32"), napi_derive::napi(object))]
+#[cfg_attr(not(target_arch = "wasm32"), napi_derive::napi)]
 #[cfg_attr(target_arch = "wasm32", derive(Clone, Copy, Deserialize_repr))]
 #[repr(u8)]
 #[derive(Debug)]
