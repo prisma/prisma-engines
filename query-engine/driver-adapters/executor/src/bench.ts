@@ -21,7 +21,9 @@ import { run, bench, group, baseline } from "mitata";
 import { QueryEngine as WasmBaseline } from "query-engine-wasm-baseline";
 import { QueryEngine as WasmLatest } from "query-engine-wasm-latest";
 
-(global as any).crypto = webcrypto;
+if (!global.crypto) {
+  (global as any).crypto = webcrypto;
+}
 
 async function main(): Promise<void> {
   // read the prisma schema from stdin
