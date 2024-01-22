@@ -542,7 +542,7 @@ fn drift_can_be_detected_without_migrations_table_dev(api: TestApi) {
 
         The following is a summary of the differences between the expected database schema given your migrations files, and the actual schema of the database.
 
-        It should be understood as the set of changes to get from the expected schema to the actual schema.
+        This summary details discrepancies by listing elements found in the current database schema but missing in your Prisma schema, indicating the Prisma schema updates required for alignment.
 
         If you are running this the first time on an existing database, please make sure to read this documentation page:
         https://www.prisma.io/docs/guides/database/developing-with-prisma-migrate/troubleshooting-development
@@ -582,7 +582,7 @@ fn drift_detect_first_time_message_should_not_be_dispyed_if_migration_table_exis
 
         The following is a summary of the differences between the expected database schema given your migrations files, and the actual schema of the database.
 
-        It should be understood as the set of changes to get from the expected schema to the actual schema.
+        This summary details discrepancies by listing elements found in the current database schema but missing in your Prisma schema, indicating the Prisma schema updates required for alignment.
 
         [+] Added tables
           - cat
