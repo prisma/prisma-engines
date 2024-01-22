@@ -316,15 +316,15 @@ impl SqlFamily {
     /// than Wasm can be controlled with the env var QUERY_BATCH_SIZE.
     #[cfg(not(target_arch = "wasm32"))]
     pub fn max_bind_values(&self) -> usize {
-        use once_cell::sync::Lazy;
-
-        static BATCH_SIZE_OVERRIDE: Lazy<Option<usize>> = Lazy::new(|| {
-            std::env::var("QUERY_BATCH_SIZE")
-                .ok()
-                .map(|size| size.parse().expect("QUERY_BATCH_SIZE: not a valid size"))
-        });
-
-        (*BATCH_SIZE_OVERRIDE).unwrap_or(self.default_max_bind_values())
+        use std::sync::OnceLock;
+        static BATCH_SIZE_OVERRIDE: OnceLock<Option<usize>> = OnceLock::new();
+        BATCH_SIZE_OVERRIDE
+            .get_or_init(|| {
+                std::env::var("QUERY_BATCH_SIZE")
+                    .ok()
+                    .map(|size| size.parse().expect("QUERY_BATCH_SIZE: not a valid size"))
+            })
+            .unwrap_or(self.default_max_bind_values())
     }
 
     /// Get the max number of bind parameters for a single query, in Wasm there's no
