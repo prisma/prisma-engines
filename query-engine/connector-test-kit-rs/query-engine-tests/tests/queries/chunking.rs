@@ -4,7 +4,7 @@ use query_engine_tests::*;
 /// * It should be called QUERY_CHUNK_SIZE instead, because it's a knob to configure query chunking
 ///  which is splitting queries with more arguments than accepted by the database, in multiple
 ///  queries.
-/// * WASM versions of the engine don't accept runtime configuration of this value so they default
+/// * WASM versions of the engine don't allow for runtime configuration of this value so they default
 ///  the mininum supported by any database on a SQL family (eg. Postgres, MySQL, SQLite, SQL Server,
 ///  etc.) As such, in order to guarantee chunking happens, a large number of arguments --larger
 ///  than the default-- needs to be used, to have actual coverage of chunking code while exercising

@@ -1,7 +1,7 @@
 use query_engine_tests::*;
 
 #[test_suite(schema(autoinc_id), capabilities(CreateMany, AutoIncrement), exclude(CockroachDb))]
-mod not_in_batching {
+mod not_in_chunking {
     use query_engine_tests::Runner;
 
     #[connector_test(exclude(CockroachDb))]
@@ -20,7 +20,7 @@ mod not_in_batching {
 }
 
 #[test_suite(schema(autoinc_id_cockroachdb), only(CockroachDb))]
-mod not_in_batching_cockroachdb {
+mod not_in_chunking_cockroachdb {
     use query_engine_tests::Runner;
 
     #[connector_test]
