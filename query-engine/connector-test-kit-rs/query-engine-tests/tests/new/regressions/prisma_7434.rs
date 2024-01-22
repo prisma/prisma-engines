@@ -6,8 +6,6 @@ mod not_in_batching {
 
     #[connector_test(exclude(CockroachDb))]
     async fn not_in_batch_filter(runner: Runner) -> TestResult<()> {
-        runner.query(r#"mutation { createManyTestModel(data: [{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{}]) { count }}"#).await?.assert_success();
-
         assert_error!(
             runner,
             with_id_excess!(
@@ -27,8 +25,6 @@ mod not_in_batching_cockroachdb {
 
     #[connector_test]
     async fn not_in_batch_filter(runner: Runner) -> TestResult<()> {
-        runner.query(r#"mutation { createManyTestModel(data: [{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{}]) { count }}"#).await?.assert_success();
-
         assert_error!(
             runner,
             with_id_excess!(
