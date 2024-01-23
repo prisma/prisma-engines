@@ -61,8 +61,14 @@ function createInMemoryRecordings() {
   const queryResults: Map<string, Result<ResultSet>> = new Map();
   const commandResults: Map<string, Result<number>> = new Map();
 
+  // Recording is currently only used in benchmarks. Before we used to serialize the whole query
+  // (sql + args) but since bigints are not serialized by JSON.stringify, and we didn’t really need
+  // args for benchmarks, we just serialize the sql part.
+  //
+  // If this ever changes (we reuse query recording in tests) we need to make sure to serialize the
+  // args as well.
   const queryToKey = (params: Query) => {
-    return JSON.stringify(params);
+    return JSON.stringify(params.sql);
   };
 
   return {
