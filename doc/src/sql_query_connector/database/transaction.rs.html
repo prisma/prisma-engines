@@ -315,14 +315,10 @@
 <a href="#315" id="315">315</a>
 <a href="#316" id="316">316</a>
 <a href="#317" id="317">317</a>
-<a href="#318" id="318">318</a>
-<a href="#319" id="319">319</a>
-<a href="#320" id="320">320</a>
-<a href="#321" id="321">321</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span><span class="kw">super</span>::catch;
 <span class="kw">use crate</span>::{database::operations::<span class="kw-2">*</span>, Context, SqlError};
 <span class="kw">use </span>async_trait::async_trait;
-<span class="kw">use </span>connector::{ConnectionLike, RelAggregationSelection};
+<span class="kw">use </span>connector::ConnectionLike;
 <span class="kw">use </span>connector_interface::{
     <span class="self">self </span><span class="kw">as </span>connector, AggregationRow, AggregationSelection, ReadOperations, RecordFilter, Transaction, WriteArgs,
     WriteOperations,
@@ -389,7 +385,6 @@
         model: <span class="kw-2">&amp;</span>Model,
         filter: <span class="kw-2">&amp;</span>Filter,
         selected_fields: <span class="kw-2">&amp;</span>FieldSelection,
-        aggr_selections: <span class="kw-2">&amp;</span>[RelAggregationSelection],
         relation_load_strategy: RelationLoadStrategy,
         trace_id: <span class="prelude-ty">Option</span>&lt;String&gt;,
     ) -&gt; connector::Result&lt;<span class="prelude-ty">Option</span>&lt;SingleRecord&gt;&gt; {
@@ -401,7 +396,6 @@
                 model,
                 filter,
                 selected_fields,
-                aggr_selections,
                 relation_load_strategy,
                 <span class="kw-2">&amp;</span>ctx,
             ),
@@ -414,7 +408,6 @@
         model: <span class="kw-2">&amp;</span>Model,
         query_arguments: QueryArguments,
         selected_fields: <span class="kw-2">&amp;</span>FieldSelection,
-        aggr_selections: <span class="kw-2">&amp;</span>[RelAggregationSelection],
         relation_load_strategy: RelationLoadStrategy,
         trace_id: <span class="prelude-ty">Option</span>&lt;String&gt;,
     ) -&gt; connector::Result&lt;ManyRecords&gt; {
@@ -426,7 +419,6 @@
                 model,
                 query_arguments,
                 selected_fields,
-                aggr_selections,
                 relation_load_strategy,
                 <span class="kw-2">&amp;</span>ctx,
             ),

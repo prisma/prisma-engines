@@ -489,6 +489,7 @@
 <a href="#489" id="489">489</a>
 <a href="#490" id="490">490</a>
 <a href="#491" id="491">491</a>
+<a href="#492" id="492">492</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::error::{ConnectorError, ErrorKind};
 <span class="kw">use </span>indexmap::{map::Keys, IndexMap};
 <span class="kw">use </span>query_structure::{
@@ -819,6 +820,7 @@
             SelectedField::Scalar(sf) =&gt; (sf, pv).into(),
             SelectedField::Composite(cs) =&gt; (<span class="kw-2">&amp;</span>cs.field, pv).into(),
             SelectedField::Relation(<span class="kw">_</span>) =&gt; <span class="macro">todo!</span>(),
+            SelectedField::Virtual(<span class="kw">_</span>) =&gt; <span class="macro">todo!</span>(),
         }
     }
 }
@@ -953,7 +955,7 @@
         .pairs
         .iter()
         .enumerate()
-        .filter_map(|(i, (selection, <span class="kw">_</span>))| incoming_args.get_field_value(selection.db_name()).map(|val| (i, val)))
+        .filter_map(|(i, (selection, <span class="kw">_</span>))| incoming_args.get_field_value(<span class="kw-2">&amp;</span>selection.db_name()).map(|val| (i, val)))
         .collect();
 
     loaded_ids

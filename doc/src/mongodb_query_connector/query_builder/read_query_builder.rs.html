@@ -476,14 +476,14 @@
     root_queries::observing,
     vacuum_cursor, BsonTransform, IntoBson,
 };
-<span class="kw">use </span>connector_interface::{AggregationSelection, RelAggregationSelection};
+<span class="kw">use </span>connector_interface::AggregationSelection;
 <span class="kw">use </span>itertools::Itertools;
 <span class="kw">use </span>mongodb::{
     bson::{doc, Document},
     options::AggregateOptions,
     ClientSession, Collection,
 };
-<span class="kw">use </span>query_structure::{FieldSelection, Filter, Model, QueryArguments, ScalarFieldRef};
+<span class="kw">use </span>query_structure::{FieldSelection, Filter, Model, QueryArguments, ScalarFieldRef, VirtualSelection};
 <span class="kw">use </span>std::convert::TryFrom;
 
 <span class="comment">// Mongo Driver broke usage of the simple API, can&#39;t be used by us anymore.
@@ -821,13 +821,13 @@
     }
 
     <span class="doccomment">/// Adds the necessary joins and the associated selections to the projection
-    </span><span class="kw">pub fn </span>with_aggregation_selections(
+    </span><span class="kw">pub fn </span>with_virtual_fields&lt;<span class="lifetime">&#39;a</span>&gt;(
         <span class="kw-2">mut </span><span class="self">self</span>,
-        aggregation_selections: <span class="kw-2">&amp;</span>[RelAggregationSelection],
+        virtual_selections: <span class="kw">impl </span>Iterator&lt;Item = <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>VirtualSelection&gt;,
     ) -&gt; <span class="kw">crate</span>::Result&lt;<span class="self">Self</span>&gt; {
-        <span class="kw">for </span>aggr <span class="kw">in </span>aggregation_selections {
+        <span class="kw">for </span>aggr <span class="kw">in </span>virtual_selections {
             <span class="kw">let </span>join = <span class="kw">match </span>aggr {
-                RelAggregationSelection::Count(rf, filter) =&gt; {
+                VirtualSelection::RelationCount(rf, filter) =&gt; {
                     <span class="kw">let </span>filter = filter
                         .as_ref()
                         .map(|f| MongoFilterVisitor::new(FilterPrefix::default(), <span class="bool-val">false</span>).visit(f.clone()))

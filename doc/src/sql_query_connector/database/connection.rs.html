@@ -318,16 +318,12 @@
 <a href="#318" id="318">318</a>
 <a href="#319" id="319">319</a>
 <a href="#320" id="320">320</a>
-<a href="#321" id="321">321</a>
-<a href="#322" id="322">322</a>
-<a href="#323" id="323">323</a>
-<a href="#324" id="324">324</a>
 </pre></div><pre class="rust"><code><span class="attr">#![cfg_attr(target_arch = <span class="string">&quot;wasm32&quot;</span>, allow(dead_code))]
 
 </span><span class="kw">use super</span>::{catch, transaction::SqlConnectorTransaction};
 <span class="kw">use crate</span>::{database::operations::<span class="kw-2">*</span>, Context, SqlError};
 <span class="kw">use </span>async_trait::async_trait;
-<span class="kw">use </span>connector::{ConnectionLike, RelAggregationSelection};
+<span class="kw">use </span>connector::ConnectionLike;
 <span class="kw">use </span>connector_interface::{
     <span class="self">self </span><span class="kw">as </span>connector, AggregationRow, AggregationSelection, Connection, ReadOperations, RecordFilter, Transaction,
     WriteArgs, WriteOperations,
@@ -410,7 +406,6 @@
         model: <span class="kw-2">&amp;</span>Model,
         filter: <span class="kw-2">&amp;</span>Filter,
         selected_fields: <span class="kw-2">&amp;</span>FieldSelection,
-        aggr_selections: <span class="kw-2">&amp;</span>[RelAggregationSelection],
         relation_load_strategy: RelationLoadStrategy,
         trace_id: <span class="prelude-ty">Option</span>&lt;String&gt;,
     ) -&gt; connector::Result&lt;<span class="prelude-ty">Option</span>&lt;SingleRecord&gt;&gt; {
@@ -423,7 +418,6 @@
                 model,
                 filter,
                 selected_fields,
-                aggr_selections,
                 relation_load_strategy,
                 <span class="kw-2">&amp;</span>ctx,
             ),
@@ -436,7 +430,6 @@
         model: <span class="kw-2">&amp;</span>Model,
         query_arguments: QueryArguments,
         selected_fields: <span class="kw-2">&amp;</span>FieldSelection,
-        aggr_selections: <span class="kw-2">&amp;</span>[RelAggregationSelection],
         relation_load_strategy: RelationLoadStrategy,
         trace_id: <span class="prelude-ty">Option</span>&lt;String&gt;,
     ) -&gt; connector::Result&lt;ManyRecords&gt; {
@@ -448,7 +441,6 @@
                 model,
                 query_arguments,
                 selected_fields,
-                aggr_selections,
                 relation_load_strategy,
                 <span class="kw-2">&amp;</span>ctx,
             ),

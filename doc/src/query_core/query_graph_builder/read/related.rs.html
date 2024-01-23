@@ -32,9 +32,6 @@
 <a href="#32" id="32">32</a>
 <a href="#33" id="33">33</a>
 <a href="#34" id="34">34</a>
-<a href="#35" id="35">35</a>
-<a href="#36" id="36">36</a>
-<a href="#37" id="37">37</a>
 </pre></div><pre class="rust"><code><span class="kw">use super</span>::<span class="kw-2">*</span>;
 <span class="kw">use crate</span>::{query_document::ParsedField, ReadQuery, RelatedRecordsQuery};
 <span class="kw">use </span>query_structure::{Model, RelationFieldRef};
@@ -50,8 +47,6 @@
     <span class="kw">let </span>name = field.name;
     <span class="kw">let </span>alias = field.alias;
     <span class="kw">let </span>sub_selections = field.nested_fields.unwrap().fields;
-    <span class="kw">let </span>(aggr_fields_pairs, sub_selections) = extractors::extract_nested_rel_aggr_selections(sub_selections);
-    <span class="kw">let </span>aggregation_selections = utils::collect_relation_aggr_selections(aggr_fields_pairs, <span class="kw-2">&amp;</span>model)<span class="question-mark">?</span>;
     <span class="kw">let </span>selection_order: Vec&lt;String&gt; = utils::collect_selection_order(<span class="kw-2">&amp;</span>sub_selections);
     <span class="kw">let </span>selected_fields = utils::collect_selected_fields(<span class="kw-2">&amp;</span>sub_selections, args.distinct.clone(), <span class="kw-2">&amp;</span>model, query_schema)<span class="question-mark">?</span>;
     <span class="kw">let </span>nested = utils::collect_nested_queries(sub_selections, <span class="kw-2">&amp;</span>model, query_schema)<span class="question-mark">?</span>;
@@ -68,7 +63,6 @@
         selected_fields,
         nested,
         selection_order,
-        aggregation_selections,
         parent_results: <span class="prelude-val">None</span>,
     }))
 }

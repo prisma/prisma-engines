@@ -173,9 +173,10 @@
 <a href="#173" id="173">173</a>
 <a href="#174" id="174">174</a>
 <a href="#175" id="175">175</a>
+<a href="#176" id="176">176</a>
 </pre></div><pre class="rust"><code><span class="kw">use crate</span>::{DomainError, FieldSelection, PrismaValue, ScalarFieldRef, SelectedField};
 <span class="kw">use </span>itertools::Itertools;
-<span class="kw">use </span>std::convert::TryFrom;
+<span class="kw">use </span>std::{borrow::Cow, convert::TryFrom};
 
 <span class="doccomment">/// Represents a set of results.
 </span><span class="attr">#[derive(Default, Clone, PartialEq, Eq, Hash)]
@@ -236,7 +237,7 @@
         <span class="self">self</span>.len() == <span class="number">0
     </span>}
 
-    <span class="kw">pub fn </span>db_names(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw">impl </span>Iterator&lt;Item = <span class="kw-2">&amp;</span>str&gt; + <span class="lifetime">&#39;_ </span>{
+    <span class="kw">pub fn </span>db_names(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw">impl </span>Iterator&lt;Item = Cow&lt;<span class="lifetime">&#39;_</span>, str&gt;&gt; + <span class="lifetime">&#39;_ </span>{
         <span class="self">self</span>.pairs.iter().map(|(field, <span class="kw">_</span>)| field.db_name())
     }
 
@@ -270,6 +271,7 @@
                 SelectedField::Scalar(sf) =&gt; <span class="prelude-val">Some</span>(sf.clone()),
                 SelectedField::Composite(<span class="kw">_</span>) =&gt; <span class="prelude-val">None</span>,
                 SelectedField::Relation(<span class="kw">_</span>) =&gt; <span class="prelude-val">None</span>,
+                SelectedField::Virtual(<span class="kw">_</span>) =&gt; <span class="prelude-val">None</span>,
             })
             .collect();
 

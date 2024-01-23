@@ -141,15 +141,7 @@
 <a href="#141" id="141">141</a>
 <a href="#142" id="142">142</a>
 <a href="#143" id="143">143</a>
-<a href="#144" id="144">144</a>
-<a href="#145" id="145">145</a>
-<a href="#146" id="146">146</a>
-<a href="#147" id="147">147</a>
-<a href="#148" id="148">148</a>
-<a href="#149" id="149">149</a>
-<a href="#150" id="150">150</a>
-<a href="#151" id="151">151</a>
-</pre></div><pre class="rust"><code><span class="kw">use </span>connector_interface::{AggregationSelection, RelAggregationSelection};
+</pre></div><pre class="rust"><code><span class="kw">use </span>connector_interface::AggregationSelection;
 <span class="kw">use </span>indexmap::IndexMap;
 <span class="kw">use </span>query_structure::{
     ast::FieldArity, DefaultKind, FieldSelection, PrismaValue, ScalarFieldRef, SelectedField, TypeIdentifier,
@@ -199,18 +191,12 @@
     }
 }
 
-<span class="kw">pub fn </span>from_selected_fields(
-    selected_fields: <span class="kw-2">&amp;</span>FieldSelection,
-    aggregation_selections: <span class="kw-2">&amp;</span>[RelAggregationSelection],
-) -&gt; OutputMetaMapping {
-    <span class="kw">let </span>selections: Vec&lt;<span class="kw-2">&amp;</span>SelectedField&gt; = selected_fields.selections().collect();
-    from_selections(<span class="kw-2">&amp;</span>selections, aggregation_selections)
+<span class="kw">pub fn </span>from_selected_fields(selected_fields: <span class="kw-2">&amp;</span>FieldSelection) -&gt; OutputMetaMapping {
+    <span class="kw">let </span>selections: Vec&lt;<span class="kw">_</span>&gt; = selected_fields.selections().collect();
+    from_selections(<span class="kw-2">&amp;</span>selections)
 }
 
-<span class="kw">pub fn </span>from_selections(
-    selected_fields: <span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span>SelectedField],
-    aggregation_selections: <span class="kw-2">&amp;</span>[RelAggregationSelection],
-) -&gt; OutputMetaMapping {
+<span class="kw">pub fn </span>from_selections(selected_fields: <span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span>SelectedField]) -&gt; OutputMetaMapping {
     <span class="kw">let </span><span class="kw-2">mut </span>map = OutputMetaMapping::new();
 
     <span class="kw">for </span>selection <span class="kw">in </span>selected_fields {
@@ -221,7 +207,7 @@
 
             SelectedField::Composite(cs) =&gt; {
                 <span class="kw">let </span>selections: Vec&lt;<span class="kw-2">&amp;</span>SelectedField&gt; = cs.selections.iter().collect();
-                <span class="kw">let </span>inner = from_selections(<span class="kw-2">&amp;</span>selections, <span class="kw-2">&amp;</span>[]);
+                <span class="kw">let </span>inner = from_selections(<span class="kw-2">&amp;</span>selections);
 
                 map.insert(
                     cs.field.db_name().to_owned(),
@@ -231,12 +217,22 @@
                     }),
                 );
             }
-            SelectedField::Relation(<span class="kw">_</span>) =&gt; <span class="macro">unreachable!</span>(),
-        }
-    }
 
-    <span class="kw">for </span>selection <span class="kw">in </span>aggregation_selections {
-        map.insert(selection.db_alias(), from_rel_aggregation_selection(selection));
+            SelectedField::Relation(<span class="kw">_</span>) =&gt; <span class="macro">unreachable!</span>(),
+
+            SelectedField::Virtual(vs) =&gt; {
+                <span class="kw">let </span>(ident, arity) = vs.type_identifier_with_arity();
+
+                map.insert(
+                    vs.db_alias(),
+                    OutputMeta::Scalar(ScalarOutputMeta {
+                        ident,
+                        default: <span class="prelude-val">None</span>,
+                        list: <span class="macro">matches!</span>(arity, FieldArity::List),
+                    }),
+                );
+            }
+        }
     }
 
     map
@@ -275,18 +271,6 @@
     }
 
     map
-}
-
-<span class="doccomment">/// Mapping for one specific relation aggregation selection.
-/// DB alias -&gt; OutputMeta
-</span><span class="kw">pub fn </span>from_rel_aggregation_selection(aggr_selection: <span class="kw-2">&amp;</span>RelAggregationSelection) -&gt; OutputMeta {
-    <span class="kw">let </span>(ident, arity) = aggr_selection.type_identifier_with_arity();
-
-    OutputMeta::Scalar(ScalarOutputMeta {
-        ident,
-        default: <span class="prelude-val">None</span>,
-        list: <span class="macro">matches!</span>(arity, FieldArity::List),
-    })
 }
 
 <span class="kw">impl </span>From&lt;ScalarOutputMeta&gt; <span class="kw">for </span>OutputMeta {

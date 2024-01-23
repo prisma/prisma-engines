@@ -383,7 +383,7 @@
 
                 <span class="comment">// We always select IDs, the unwraps are safe.
                 </span>QueryResult::RecordSelection(<span class="prelude-val">Some</span>(rs)) =&gt; <span class="prelude-val">Some</span>(
-                    rs.scalars
+                    rs.records
                         .extract_selection_results(field_selection)
                         .expect(<span class="string">&quot;Expected record selection to contain required model ID fields.&quot;</span>)
                         .into_iter()

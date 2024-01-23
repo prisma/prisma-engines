@@ -194,6 +194,16 @@
 <a href="#194" id="194">194</a>
 <a href="#195" id="195">195</a>
 <a href="#196" id="196">196</a>
+<a href="#197" id="197">197</a>
+<a href="#198" id="198">198</a>
+<a href="#199" id="199">199</a>
+<a href="#200" id="200">200</a>
+<a href="#201" id="201">201</a>
+<a href="#202" id="202">202</a>
+<a href="#203" id="203">203</a>
+<a href="#204" id="204">204</a>
+<a href="#205" id="205">205</a>
+<a href="#206" id="206">206</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Prisma Response IR (Intermediate Representation).
 //!
 //! This module takes care of processing query execution results
@@ -318,6 +328,16 @@
         <span class="kw">match </span><span class="self">self </span>{
             <span class="self">Self</span>::Map(m) =&gt; <span class="prelude-val">Some</span>(m),
             <span class="self">Self</span>::Ref(r) =&gt; r.as_map(),
+            <span class="kw">_ </span>=&gt; <span class="prelude-val">None</span>,
+        }
+    }
+
+    <span class="doccomment">/// Returns a mutable reference to the underlying map, if the element is a map and the map is
+    /// owned. Unlike [`Item::as_map`], it doesn&#39;t allow obtaining a reference to a shared map
+    /// referenced via [`ItemRef`].
+    </span><span class="kw">pub fn </span>as_map_mut(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;mut </span>Map&gt; {
+        <span class="kw">match </span><span class="self">self </span>{
+            <span class="self">Self</span>::Map(m) =&gt; <span class="prelude-val">Some</span>(m),
             <span class="kw">_ </span>=&gt; <span class="prelude-val">None</span>,
         }
     }

@@ -58,10 +58,6 @@
 <a href="#58" id="58">58</a>
 <a href="#59" id="59">59</a>
 <a href="#60" id="60">60</a>
-<a href="#61" id="61">61</a>
-<a href="#62" id="62">62</a>
-<a href="#63" id="63">63</a>
-<a href="#64" id="64">64</a>
 </pre></div><pre class="rust"><code><span class="kw">use super</span>::{utils::get_relation_load_strategy, <span class="kw-2">*</span>};
 <span class="kw">use crate</span>::{query_document::ParsedField, ManyRecordsQuery, QueryOption, QueryOptions, ReadQuery};
 <span class="kw">use </span>query_structure::Model;
@@ -94,12 +90,9 @@
     <span class="kw">let </span>name = field.name;
     <span class="kw">let </span>alias = field.alias;
     <span class="kw">let </span>nested_fields = field.nested_fields.unwrap().fields;
-    <span class="kw">let </span>(aggr_fields_pairs, nested_fields) = extractors::extract_nested_rel_aggr_selections(nested_fields);
-    <span class="kw">let </span>aggregation_selections = utils::collect_relation_aggr_selections(aggr_fields_pairs, <span class="kw-2">&amp;</span>model)<span class="question-mark">?</span>;
     <span class="kw">let </span>selection_order: Vec&lt;String&gt; = utils::collect_selection_order(<span class="kw-2">&amp;</span>nested_fields);
     <span class="kw">let </span>selected_fields = utils::collect_selected_fields(<span class="kw-2">&amp;</span>nested_fields, args.distinct.clone(), <span class="kw-2">&amp;</span>model, query_schema)<span class="question-mark">?</span>;
     <span class="kw">let </span>nested = utils::collect_nested_queries(nested_fields, <span class="kw-2">&amp;</span>model, query_schema)<span class="question-mark">?</span>;
-    <span class="kw">let </span>model = model;
 
     <span class="kw">let </span>selected_fields = utils::merge_relation_selections(selected_fields, <span class="prelude-val">None</span>, <span class="kw-2">&amp;</span>nested);
     <span class="kw">let </span>selected_fields = utils::merge_cursor_fields(selected_fields, <span class="kw-2">&amp;</span>args.cursor);
@@ -109,7 +102,7 @@
         args.cursor.as_ref(),
         args.distinct.as_ref(),
         <span class="kw-2">&amp;</span>nested,
-        <span class="kw-2">&amp;</span>aggregation_selections,
+        <span class="kw-2">&amp;</span>selected_fields,
         query_schema,
     );
 
@@ -121,7 +114,6 @@
         selected_fields,
         nested,
         selection_order,
-        aggregation_selections,
         options,
         relation_load_strategy,
     }))

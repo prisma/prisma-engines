@@ -4,20 +4,8 @@
 <a href="#4" id="4">4</a>
 <a href="#5" id="5">5</a>
 <a href="#6" id="6">6</a>
-<a href="#7" id="7">7</a>
-<a href="#8" id="8">8</a>
-<a href="#9" id="9">9</a>
-<a href="#10" id="10">10</a>
-<a href="#11" id="11">11</a>
-<a href="#12" id="12">12</a>
 </pre></div><pre class="rust"><code><span class="kw">use super</span>::<span class="kw-2">*</span>;
 <span class="kw">use </span>schema::constants::aggregations::<span class="kw-2">*</span>;
-
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>extract_nested_rel_aggr_selections(
-    field_pairs: Vec&lt;FieldPair&lt;<span class="lifetime">&#39;_</span>&gt;&gt;,
-) -&gt; (Vec&lt;FieldPair&lt;<span class="lifetime">&#39;_</span>&gt;&gt;, Vec&lt;FieldPair&lt;<span class="lifetime">&#39;_</span>&gt;&gt;) {
-    field_pairs.into_iter().partition(is_aggr_selection)
-}
 
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>is_aggr_selection(pair: <span class="kw-2">&amp;</span>FieldPair&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; bool {
     <span class="macro">matches!</span>(pair.parsed_field.name.as_str(), UNDERSCORE_COUNT)

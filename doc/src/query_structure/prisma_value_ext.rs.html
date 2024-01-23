@@ -63,12 +63,12 @@
 <span class="kw">use </span>bigdecimal::ToPrimitive;
 
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">trait </span>PrismaValueExtensions {
-    <span class="kw">fn </span>coerce(<span class="self">self</span>, to_type: <span class="kw-2">&amp;</span>TypeIdentifier) -&gt; <span class="kw">crate</span>::Result&lt;PrismaValue&gt;;
+    <span class="kw">fn </span>coerce(<span class="self">self</span>, to_type: TypeIdentifier) -&gt; <span class="kw">crate</span>::Result&lt;PrismaValue&gt;;
 }
 
 <span class="kw">impl </span>PrismaValueExtensions <span class="kw">for </span>PrismaValue {
     <span class="comment">// Todo this is not exhaustive for now.
-    </span><span class="kw">fn </span>coerce(<span class="self">self</span>, to_type: <span class="kw-2">&amp;</span>TypeIdentifier) -&gt; <span class="kw">crate</span>::Result&lt;PrismaValue&gt; {
+    </span><span class="kw">fn </span>coerce(<span class="self">self</span>, to_type: TypeIdentifier) -&gt; <span class="kw">crate</span>::Result&lt;PrismaValue&gt; {
         <span class="kw">let </span>coerced = <span class="kw">match </span>(<span class="self">self</span>, to_type) {
             <span class="comment">// Trivial cases
             </span>(PrismaValue::Null, <span class="kw">_</span>) =&gt; PrismaValue::Null,

@@ -312,49 +312,49 @@
     cursor_condition, filter::FilterBuilder, model_extensions::<span class="kw-2">*</span>, nested_aggregations, ordering::OrderByBuilder,
     sql_trace::SqlTraceComment, Context,
 };
-<span class="kw">use </span>connector_interface::{AggregationSelection, RelAggregationSelection};
+<span class="kw">use </span>connector_interface::AggregationSelection;
 <span class="kw">use </span>itertools::Itertools;
 <span class="kw">use </span>quaint::ast::<span class="kw-2">*</span>;
 <span class="kw">use </span>query_structure::<span class="kw-2">*</span>;
 <span class="kw">use </span>tracing::Span;
 
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">trait </span>SelectDefinition {
-    <span class="kw">fn </span>into_select(
+    <span class="kw">fn </span>into_select&lt;<span class="lifetime">&#39;a</span>&gt;(
         <span class="self">self</span>,
         <span class="kw">_</span>: <span class="kw-2">&amp;</span>Model,
-        aggr_selections: <span class="kw-2">&amp;</span>[RelAggregationSelection],
+        virtual_selections: <span class="kw">impl </span>IntoIterator&lt;Item = <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>VirtualSelection&gt;,
         ctx: <span class="kw-2">&amp;</span>Context&lt;<span class="lifetime">&#39;_</span>&gt;,
     ) -&gt; (Select&lt;<span class="lifetime">&#39;static</span>&gt;, Vec&lt;Expression&lt;<span class="lifetime">&#39;static</span>&gt;&gt;);
 }
 
 <span class="kw">impl </span>SelectDefinition <span class="kw">for </span>Filter {
-    <span class="kw">fn </span>into_select(
+    <span class="kw">fn </span>into_select&lt;<span class="lifetime">&#39;a</span>&gt;(
         <span class="self">self</span>,
         model: <span class="kw-2">&amp;</span>Model,
-        aggr_selections: <span class="kw-2">&amp;</span>[RelAggregationSelection],
+        virtual_selections: <span class="kw">impl </span>IntoIterator&lt;Item = <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>VirtualSelection&gt;,
         ctx: <span class="kw-2">&amp;</span>Context&lt;<span class="lifetime">&#39;_</span>&gt;,
     ) -&gt; (Select&lt;<span class="lifetime">&#39;static</span>&gt;, Vec&lt;Expression&lt;<span class="lifetime">&#39;static</span>&gt;&gt;) {
         <span class="kw">let </span>args = QueryArguments::from((model.clone(), <span class="self">self</span>));
-        args.into_select(model, aggr_selections, ctx)
+        args.into_select(model, virtual_selections, ctx)
     }
 }
 
 <span class="kw">impl </span>SelectDefinition <span class="kw">for </span><span class="kw-2">&amp;</span>Filter {
-    <span class="kw">fn </span>into_select(
+    <span class="kw">fn </span>into_select&lt;<span class="lifetime">&#39;a</span>&gt;(
         <span class="self">self</span>,
         model: <span class="kw-2">&amp;</span>Model,
-        aggr_selections: <span class="kw-2">&amp;</span>[RelAggregationSelection],
+        virtual_selections: <span class="kw">impl </span>IntoIterator&lt;Item = <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>VirtualSelection&gt;,
         ctx: <span class="kw-2">&amp;</span>Context&lt;<span class="lifetime">&#39;_</span>&gt;,
     ) -&gt; (Select&lt;<span class="lifetime">&#39;static</span>&gt;, Vec&lt;Expression&lt;<span class="lifetime">&#39;static</span>&gt;&gt;) {
-        <span class="self">self</span>.clone().into_select(model, aggr_selections, ctx)
+        <span class="self">self</span>.clone().into_select(model, virtual_selections, ctx)
     }
 }
 
 <span class="kw">impl </span>SelectDefinition <span class="kw">for </span>Select&lt;<span class="lifetime">&#39;static</span>&gt; {
-    <span class="kw">fn </span>into_select(
+    <span class="kw">fn </span>into_select&lt;<span class="lifetime">&#39;a</span>&gt;(
         <span class="self">self</span>,
         <span class="kw">_</span>: <span class="kw-2">&amp;</span>Model,
-        <span class="kw">_</span>: <span class="kw-2">&amp;</span>[RelAggregationSelection],
+        <span class="kw">_</span>: <span class="kw">impl </span>IntoIterator&lt;Item = <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>VirtualSelection&gt;,
         _ctx: <span class="kw-2">&amp;</span>Context&lt;<span class="lifetime">&#39;_</span>&gt;,
     ) -&gt; (Select&lt;<span class="lifetime">&#39;static</span>&gt;, Vec&lt;Expression&lt;<span class="lifetime">&#39;static</span>&gt;&gt;) {
         (<span class="self">self</span>, <span class="macro">vec!</span>[])
@@ -362,15 +362,15 @@
 }
 
 <span class="kw">impl </span>SelectDefinition <span class="kw">for </span>QueryArguments {
-    <span class="kw">fn </span>into_select(
+    <span class="kw">fn </span>into_select&lt;<span class="lifetime">&#39;a</span>&gt;(
         <span class="self">self</span>,
         model: <span class="kw-2">&amp;</span>Model,
-        aggr_selections: <span class="kw-2">&amp;</span>[RelAggregationSelection],
+        virtual_selections: <span class="kw">impl </span>IntoIterator&lt;Item = <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>VirtualSelection&gt;,
         ctx: <span class="kw-2">&amp;</span>Context&lt;<span class="lifetime">&#39;_</span>&gt;,
     ) -&gt; (Select&lt;<span class="lifetime">&#39;static</span>&gt;, Vec&lt;Expression&lt;<span class="lifetime">&#39;static</span>&gt;&gt;) {
         <span class="kw">let </span>order_by_definitions = OrderByBuilder::default().build(<span class="kw-2">&amp;</span><span class="self">self</span>, ctx);
         <span class="kw">let </span>cursor_condition = cursor_condition::build(<span class="kw-2">&amp;</span><span class="self">self</span>, model, <span class="kw-2">&amp;</span>order_by_definitions, ctx);
-        <span class="kw">let </span>aggregation_joins = nested_aggregations::build(aggr_selections, ctx);
+        <span class="kw">let </span>aggregation_joins = nested_aggregations::build(virtual_selections, ctx);
 
         <span class="kw">let </span>limit = <span class="kw">if </span><span class="self">self</span>.ignore_take { <span class="prelude-val">None </span>} <span class="kw">else </span>{ <span class="self">self</span>.take_abs() };
         <span class="kw">let </span>skip = <span class="kw">if </span><span class="self">self</span>.ignore_skip { <span class="number">0 </span>} <span class="kw">else </span>{ <span class="self">self</span>.skip.unwrap_or(<span class="number">0</span>) };
@@ -434,17 +434,17 @@
     }
 }
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>get_records&lt;T&gt;(
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>get_records&lt;<span class="lifetime">&#39;a</span>, T&gt;(
     model: <span class="kw-2">&amp;</span>Model,
     columns: <span class="kw">impl </span>Iterator&lt;Item = Column&lt;<span class="lifetime">&#39;static</span>&gt;&gt;,
-    aggr_selections: <span class="kw-2">&amp;</span>[RelAggregationSelection],
+    virtual_selections: <span class="kw">impl </span>IntoIterator&lt;Item = <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>VirtualSelection&gt;,
     query: T,
     ctx: <span class="kw-2">&amp;</span>Context&lt;<span class="lifetime">&#39;_</span>&gt;,
 ) -&gt; Select&lt;<span class="lifetime">&#39;static</span>&gt;
 <span class="kw">where
     </span>T: SelectDefinition,
 {
-    <span class="kw">let </span>(select, additional_selection_set) = query.into_select(model, aggr_selections, ctx);
+    <span class="kw">let </span>(select, additional_selection_set) = query.into_select(model, virtual_selections, ctx);
     <span class="kw">let </span>select = columns.fold(select, |acc, col| acc.column(col));
 
     <span class="kw">let </span>select = select.append_trace(<span class="kw-2">&amp;</span>Span::current()).add_trace_id(ctx.trace_id);

@@ -258,10 +258,10 @@
     <span class="prelude-val">Ok</span>(QueryResult::RecordSelection(<span class="prelude-val">Some</span>(Box::new(RecordSelection {
         name: q.name,
         fields: q.selection_order,
-        aggregation_rows: <span class="prelude-val">None</span>,
         model: q.model,
-        scalars: res.into(),
+        records: res.into(),
         nested: <span class="macro">vec!</span>[],
+        virtual_fields: <span class="macro">vec!</span>[],
     }))))
 }
 
@@ -296,10 +296,10 @@
                 .map(|res| RecordSelection {
                     name: q.name,
                     fields: q.selection_order,
-                    scalars: res.into(),
+                    records: res.into(),
                     nested: <span class="macro">vec!</span>[],
                     model: q.model,
-                    aggregation_rows: <span class="prelude-val">None</span>,
+                    virtual_fields: <span class="macro">vec!</span>[],
                 })
                 .map(Box::new);
 
@@ -325,10 +325,10 @@
     <span class="prelude-val">Ok</span>(RecordSelection {
         name: query.name().to_string(),
         fields: query.selection_order().to_owned(),
-        scalars: scalars.into(),
+        records: scalars.into(),
         nested: Vec::new(),
         model: query.model().clone(),
-        aggregation_rows: <span class="prelude-val">None</span>,
+        virtual_fields: <span class="macro">vec!</span>[],
     }
     .into())
 }
@@ -354,10 +354,10 @@
         <span class="kw">let </span>selection = RecordSelection {
             name: q.name,
             fields: selected_fields.order,
-            scalars: record.into(),
+            records: record.into(),
             nested: <span class="macro">vec!</span>[],
             model: q.model,
-            aggregation_rows: <span class="prelude-val">None</span>,
+            virtual_fields: <span class="macro">vec!</span>[],
         };
 
         <span class="prelude-val">Ok</span>(QueryResult::RecordSelection(<span class="prelude-val">Some</span>(Box::new(selection))))

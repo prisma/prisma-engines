@@ -329,20 +329,12 @@
 <a href="#329" id="329">329</a>
 <a href="#330" id="330">330</a>
 <a href="#331" id="331">331</a>
-<a href="#332" id="332">332</a>
-<a href="#333" id="333">333</a>
-<a href="#334" id="334">334</a>
-<a href="#335" id="335">335</a>
-<a href="#336" id="336">336</a>
-<a href="#337" id="337">337</a>
 </pre></div><pre class="rust"><code><span class="kw">use super</span>::<span class="kw-2">*</span>;
 <span class="kw">use crate</span>::{
     error::MongoError,
     root_queries::{aggregate, read, write},
 };
-<span class="kw">use </span>connector_interface::{
-    ConnectionLike, ReadOperations, RelAggregationSelection, Transaction, UpdateType, WriteOperations,
-};
+<span class="kw">use </span>connector_interface::{ConnectionLike, ReadOperations, Transaction, UpdateType, WriteOperations};
 <span class="kw">use </span>mongodb::options::{Acknowledgment, ReadConcern, TransactionOptions, WriteConcern};
 <span class="kw">use </span>query_engine_metrics::{decrement_gauge, increment_gauge, metrics, PRISMA_CLIENT_QUERIES_ACTIVE};
 <span class="kw">use </span>query_structure::{RelationLoadStrategy, SelectionResult};
@@ -601,7 +593,6 @@
         model: <span class="kw-2">&amp;</span>Model,
         filter: <span class="kw-2">&amp;</span>query_structure::Filter,
         selected_fields: <span class="kw-2">&amp;</span>FieldSelection,
-        aggr_selections: <span class="kw-2">&amp;</span>[RelAggregationSelection],
         _relation_load_strategy: RelationLoadStrategy,
         _trace_id: <span class="prelude-ty">Option</span>&lt;String&gt;,
     ) -&gt; connector_interface::Result&lt;<span class="prelude-ty">Option</span>&lt;SingleRecord&gt;&gt; {
@@ -611,7 +602,6 @@
             model,
             filter,
             selected_fields,
-            aggr_selections,
         ))
         .<span class="kw">await
     </span>}
@@ -621,7 +611,6 @@
         model: <span class="kw-2">&amp;</span>Model,
         query_arguments: query_structure::QueryArguments,
         selected_fields: <span class="kw-2">&amp;</span>FieldSelection,
-        aggregation_selections: <span class="kw-2">&amp;</span>[RelAggregationSelection],
         _relation_load_strategy: RelationLoadStrategy,
         _trace_id: <span class="prelude-ty">Option</span>&lt;String&gt;,
     ) -&gt; connector_interface::Result&lt;ManyRecords&gt; {
@@ -631,7 +620,6 @@
             model,
             query_arguments,
             selected_fields,
-            aggregation_selections,
         ))
         .<span class="kw">await
     </span>}

@@ -40,12 +40,15 @@
 <a href="#40" id="40">40</a>
 <a href="#41" id="41">41</a>
 <a href="#42" id="42">42</a>
+<a href="#43" id="43">43</a>
+<a href="#44" id="44">44</a>
+<a href="#45" id="45">45</a>
 </pre></div><pre class="rust"><code><span class="kw">use crate</span>::{
     join_utils::{compute_aggr_join, AggregationType, AliasedJoin},
     Context,
 };
-<span class="kw">use </span>connector_interface::RelAggregationSelection;
 <span class="kw">use </span>quaint::prelude::<span class="kw-2">*</span>;
+<span class="kw">use </span>query_structure::VirtualSelection;
 
 <span class="attr">#[derive(Debug)]
 </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>RelAggregationJoins {
@@ -55,13 +58,16 @@
     </span><span class="kw">pub</span>(<span class="kw">crate</span>) columns: Vec&lt;Expression&lt;<span class="lifetime">&#39;static</span>&gt;&gt;,
 }
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>build(aggr_selections: <span class="kw-2">&amp;</span>[RelAggregationSelection], ctx: <span class="kw-2">&amp;</span>Context&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; RelAggregationJoins {
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>build&lt;<span class="lifetime">&#39;a</span>&gt;(
+    virtual_selections: <span class="kw">impl </span>IntoIterator&lt;Item = <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>VirtualSelection&gt;,
+    ctx: <span class="kw-2">&amp;</span>Context&lt;<span class="lifetime">&#39;_</span>&gt;,
+) -&gt; RelAggregationJoins {
     <span class="kw">let </span><span class="kw-2">mut </span>joins = <span class="macro">vec!</span>[];
     <span class="kw">let </span><span class="kw-2">mut </span>columns: Vec&lt;Expression&lt;<span class="lifetime">&#39;static</span>&gt;&gt; = <span class="macro">vec!</span>[];
 
-    <span class="kw">for </span>(index, selection) <span class="kw">in </span>aggr_selections.iter().enumerate() {
+    <span class="kw">for </span>(index, selection) <span class="kw">in </span>virtual_selections.into_iter().enumerate() {
         <span class="kw">match </span>selection {
-            RelAggregationSelection::Count(rf, filter) =&gt; {
+            VirtualSelection::RelationCount(rf, filter) =&gt; {
                 <span class="kw">let </span>join_alias = <span class="macro">format!</span>(<span class="string">&quot;aggr_selection_{index}&quot;</span>);
                 <span class="kw">let </span>aggregator_alias = selection.db_alias();
                 <span class="kw">let </span>join = compute_aggr_join(

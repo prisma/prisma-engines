@@ -1146,8 +1146,6 @@
 <a href="#1146" id="1146">1146</a>
 <a href="#1147" id="1147">1147</a>
 <a href="#1148" id="1148">1148</a>
-<a href="#1149" id="1149">1149</a>
-<a href="#1150" id="1150">1150</a>
 </pre></div><pre class="rust"><code><span class="kw">use crate</span>::{
     query_ast::<span class="kw-2">*</span>,
     query_graph::{Flow, Node, NodeRef, QueryGraph, QueryGraphDependency},
@@ -1192,7 +1190,6 @@
         selected_fields,
         nested: <span class="macro">vec!</span>[],
         selection_order: <span class="macro">vec!</span>[],
-        aggregation_selections: <span class="macro">vec!</span>[],
         options: QueryOptions::none(),
         relation_load_strategy: query_structure::RelationLoadStrategy::Query,
     });
@@ -1263,7 +1260,6 @@
         parent_results: <span class="prelude-val">None</span>,
         args: (child_model, filter).into(),
         selected_fields,
-        aggregation_selections: <span class="macro">vec!</span>[],
         nested: <span class="macro">vec!</span>[],
         selection_order: <span class="macro">vec!</span>[],
     })));
@@ -1989,7 +1985,7 @@
 
     <span class="kw">let </span>linking_fields_updated = linking_fields
         .into_iter()
-        .any(|parent_pk| parent_update_args.get_field_value(parent_pk.db_name()).is_some());
+        .any(|parent_pk| parent_update_args.get_field_value(<span class="kw-2">&amp;</span>parent_pk.db_name()).is_some());
 
     graph.create_edge(
         <span class="kw-2">&amp;</span>read_node,

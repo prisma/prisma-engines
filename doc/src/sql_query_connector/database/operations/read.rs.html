@@ -410,42 +410,6 @@
 <a href="#410" id="410">410</a>
 <a href="#411" id="411">411</a>
 <a href="#412" id="412">412</a>
-<a href="#413" id="413">413</a>
-<a href="#414" id="414">414</a>
-<a href="#415" id="415">415</a>
-<a href="#416" id="416">416</a>
-<a href="#417" id="417">417</a>
-<a href="#418" id="418">418</a>
-<a href="#419" id="419">419</a>
-<a href="#420" id="420">420</a>
-<a href="#421" id="421">421</a>
-<a href="#422" id="422">422</a>
-<a href="#423" id="423">423</a>
-<a href="#424" id="424">424</a>
-<a href="#425" id="425">425</a>
-<a href="#426" id="426">426</a>
-<a href="#427" id="427">427</a>
-<a href="#428" id="428">428</a>
-<a href="#429" id="429">429</a>
-<a href="#430" id="430">430</a>
-<a href="#431" id="431">431</a>
-<a href="#432" id="432">432</a>
-<a href="#433" id="433">433</a>
-<a href="#434" id="434">434</a>
-<a href="#435" id="435">435</a>
-<a href="#436" id="436">436</a>
-<a href="#437" id="437">437</a>
-<a href="#438" id="438">438</a>
-<a href="#439" id="439">439</a>
-<a href="#440" id="440">440</a>
-<a href="#441" id="441">441</a>
-<a href="#442" id="442">442</a>
-<a href="#443" id="443">443</a>
-<a href="#444" id="444">444</a>
-<a href="#445" id="445">445</a>
-<a href="#446" id="446">446</a>
-<a href="#447" id="447">447</a>
-<a href="#448" id="448">448</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span><span class="kw">super</span>::coerce::coerce_record_with_json_relation;
 <span class="kw">use crate</span>::{
     column_metadata,
@@ -465,23 +429,12 @@
     model: <span class="kw-2">&amp;</span>Model,
     filter: <span class="kw-2">&amp;</span>Filter,
     selected_fields: <span class="kw-2">&amp;</span>FieldSelection,
-    aggr_selections: <span class="kw-2">&amp;</span>[RelAggregationSelection],
     relation_load_strategy: RelationLoadStrategy,
     ctx: <span class="kw-2">&amp;</span>Context&lt;<span class="lifetime">&#39;_</span>&gt;,
 ) -&gt; <span class="kw">crate</span>::Result&lt;<span class="prelude-ty">Option</span>&lt;SingleRecord&gt;&gt; {
     <span class="kw">match </span>relation_load_strategy {
         RelationLoadStrategy::Join =&gt; get_single_record_joins(conn, model, filter, selected_fields, ctx).<span class="kw">await</span>,
-        RelationLoadStrategy::Query =&gt; {
-            get_single_record_wo_joins(
-                conn,
-                model,
-                filter,
-                <span class="kw-2">&amp;</span>ModelProjection::from(selected_fields),
-                aggr_selections,
-                ctx,
-            )
-            .<span class="kw">await
-        </span>}
+        RelationLoadStrategy::Query =&gt; get_single_record_wo_joins(conn, model, filter, selected_fields, ctx).<span class="kw">await</span>,
     }
 }
 
@@ -515,30 +468,24 @@
     conn: <span class="kw-2">&amp;</span><span class="kw">dyn </span>Queryable,
     model: <span class="kw-2">&amp;</span>Model,
     filter: <span class="kw-2">&amp;</span>Filter,
-    selected_fields: <span class="kw-2">&amp;</span>ModelProjection,
-    aggr_selections: <span class="kw-2">&amp;</span>[RelAggregationSelection],
+    selected_fields: <span class="kw-2">&amp;</span>FieldSelection,
     ctx: <span class="kw-2">&amp;</span>Context&lt;<span class="lifetime">&#39;_</span>&gt;,
 ) -&gt; <span class="kw">crate</span>::Result&lt;<span class="prelude-ty">Option</span>&lt;SingleRecord&gt;&gt; {
+    <span class="kw">let </span>selected_fields = selected_fields.without_relations().into_virtuals_last();
+
     <span class="kw">let </span>query = read::get_records(
         model,
-        selected_fields.as_columns(ctx).mark_all_selected(),
-        aggr_selections,
+        ModelProjection::from(<span class="kw-2">&amp;</span>selected_fields)
+            .as_columns(ctx)
+            .mark_all_selected(),
+        selected_fields.virtuals(),
         filter,
         ctx,
     );
 
-    <span class="kw">let </span><span class="kw-2">mut </span>field_names: Vec&lt;<span class="kw">_</span>&gt; = selected_fields.db_names().collect();
-    <span class="kw">let </span><span class="kw-2">mut </span>aggr_field_names: Vec&lt;<span class="kw">_</span>&gt; = aggr_selections.iter().map(|aggr_sel| aggr_sel.db_alias()).collect();
+    <span class="kw">let </span>field_names: Vec&lt;<span class="kw">_</span>&gt; = selected_fields.db_names().collect();
 
-    field_names.append(<span class="kw-2">&amp;mut </span>aggr_field_names);
-
-    <span class="kw">let </span><span class="kw-2">mut </span>idents = selected_fields.type_identifiers_with_arities();
-    <span class="kw">let </span><span class="kw-2">mut </span>aggr_idents = aggr_selections
-        .iter()
-        .map(|aggr_sel| aggr_sel.type_identifier_with_arity())
-        .collect();
-
-    idents.append(<span class="kw-2">&amp;mut </span>aggr_idents);
+    <span class="kw">let </span>idents = selected_fields.type_identifiers_with_arities();
 
     <span class="kw">let </span>record = execute_find_one(conn, query, <span class="kw-2">&amp;</span>idents, <span class="kw-2">&amp;</span>field_names, ctx)
         .<span class="kw">await</span><span class="question-mark">?
@@ -572,24 +519,13 @@
     model: <span class="kw-2">&amp;</span>Model,
     query_arguments: QueryArguments,
     selected_fields: <span class="kw-2">&amp;</span>FieldSelection,
-    aggr_selections: <span class="kw-2">&amp;</span>[RelAggregationSelection],
     relation_load_strategy: RelationLoadStrategy,
     ctx: <span class="kw-2">&amp;</span>Context&lt;<span class="lifetime">&#39;_</span>&gt;,
 ) -&gt; <span class="kw">crate</span>::Result&lt;ManyRecords&gt; {
     <span class="kw">match </span>relation_load_strategy {
-        RelationLoadStrategy::Join =&gt; {
-            get_many_records_joins(conn, model, query_arguments, selected_fields, aggr_selections, ctx).<span class="kw">await
-        </span>}
+        RelationLoadStrategy::Join =&gt; get_many_records_joins(conn, model, query_arguments, selected_fields, ctx).<span class="kw">await</span>,
         RelationLoadStrategy::Query =&gt; {
-            get_many_records_wo_joins(
-                conn,
-                model,
-                query_arguments,
-                <span class="kw-2">&amp;</span>ModelProjection::from(selected_fields),
-                aggr_selections,
-                ctx,
-            )
-            .<span class="kw">await
+            get_many_records_wo_joins(conn, model, query_arguments, selected_fields, ctx).<span class="kw">await
         </span>}
     }
 }
@@ -599,7 +535,6 @@
     _model: <span class="kw-2">&amp;</span>Model,
     query_arguments: QueryArguments,
     selected_fields: <span class="kw-2">&amp;</span>FieldSelection,
-    _aggr_selections: <span class="kw-2">&amp;</span>[RelAggregationSelection],
     ctx: <span class="kw-2">&amp;</span>Context&lt;<span class="lifetime">&#39;_</span>&gt;,
 ) -&gt; <span class="kw">crate</span>::Result&lt;ManyRecords&gt; {
     <span class="kw">let </span>field_names: Vec&lt;<span class="kw">_</span>&gt; = selected_fields.db_names().collect();
@@ -645,25 +580,14 @@
     conn: <span class="kw-2">&amp;</span><span class="kw">dyn </span>Queryable,
     model: <span class="kw-2">&amp;</span>Model,
     <span class="kw-2">mut </span>query_arguments: QueryArguments,
-    selected_fields: <span class="kw-2">&amp;</span>ModelProjection,
-    aggr_selections: <span class="kw-2">&amp;</span>[RelAggregationSelection],
+    selected_fields: <span class="kw-2">&amp;</span>FieldSelection,
     ctx: <span class="kw-2">&amp;</span>Context&lt;<span class="lifetime">&#39;_</span>&gt;,
 ) -&gt; <span class="kw">crate</span>::Result&lt;ManyRecords&gt; {
+    <span class="kw">let </span>selected_fields = selected_fields.without_relations().into_virtuals_last();
     <span class="kw">let </span>reversed = query_arguments.needs_reversed_order();
 
-    <span class="kw">let </span><span class="kw-2">mut </span>field_names: Vec&lt;<span class="kw">_</span>&gt; = selected_fields.db_names().collect();
-    <span class="kw">let </span><span class="kw-2">mut </span>aggr_field_names: Vec&lt;<span class="kw">_</span>&gt; = aggr_selections.iter().map(|aggr_sel| aggr_sel.db_alias()).collect();
-
-    field_names.append(<span class="kw-2">&amp;mut </span>aggr_field_names);
-
-    <span class="kw">let </span><span class="kw-2">mut </span>aggr_idents = aggr_selections
-        .iter()
-        .map(|aggr_sel| aggr_sel.type_identifier_with_arity())
-        .collect();
-
-    <span class="kw">let </span><span class="kw-2">mut </span>idents = selected_fields.type_identifiers_with_arities();
-
-    idents.append(<span class="kw-2">&amp;mut </span>aggr_idents);
+    <span class="kw">let </span>field_names: Vec&lt;<span class="kw">_</span>&gt; = selected_fields.db_names().collect();
+    <span class="kw">let </span>idents = selected_fields.type_identifiers_with_arities();
 
     <span class="kw">let </span>meta = column_metadata::create(field_names.as_slice(), idents.as_slice());
     <span class="kw">let </span><span class="kw-2">mut </span>records = ManyRecords::new(field_names.clone());
@@ -700,8 +624,10 @@
             <span class="kw">for </span>args <span class="kw">in </span>batches.into_iter() {
                 <span class="kw">let </span>query = read::get_records(
                     model,
-                    selected_fields.as_columns(ctx).mark_all_selected(),
-                    aggr_selections,
+                    ModelProjection::from(<span class="kw-2">&amp;</span>selected_fields)
+                        .as_columns(ctx)
+                        .mark_all_selected(),
+                    selected_fields.virtuals(),
                     args,
                     ctx,
                 );
@@ -722,8 +648,10 @@
         <span class="kw">_ </span>=&gt; {
             <span class="kw">let </span>query = read::get_records(
                 model,
-                selected_fields.as_columns(ctx).mark_all_selected(),
-                aggr_selections,
+                ModelProjection::from(<span class="kw-2">&amp;</span>selected_fields)
+                    .as_columns(ctx)
+                    .mark_all_selected(),
+                selected_fields.virtuals(),
                 query_arguments,
                 ctx,
             );

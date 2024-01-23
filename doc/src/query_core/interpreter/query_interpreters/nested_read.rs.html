@@ -268,14 +268,9 @@
 <a href="#268" id="268">268</a>
 <a href="#269" id="269">269</a>
 <a href="#270" id="270">270</a>
-<a href="#271" id="271">271</a>
-<a href="#272" id="272">272</a>
-<a href="#273" id="273">273</a>
-<a href="#274" id="274">274</a>
-<a href="#275" id="275">275</a>
-</pre></div><pre class="rust"><code><span class="kw">use super</span>::{inmemory_record_processor::InMemoryRecordProcessor, read};
+</pre></div><pre class="rust"><code><span class="kw">use </span><span class="kw">super</span>::inmemory_record_processor::InMemoryRecordProcessor;
 <span class="kw">use crate</span>::{interpreter::InterpretationResult, query_ast::<span class="kw-2">*</span>};
-<span class="kw">use </span>connector::{<span class="self">self</span>, ConnectionLike, RelAggregationRow, RelAggregationSelection};
+<span class="kw">use </span>connector::ConnectionLike;
 <span class="kw">use </span>query_structure::<span class="kw-2">*</span>;
 <span class="kw">use </span>std::collections::HashMap;
 
@@ -284,7 +279,7 @@
     query: <span class="kw-2">&amp;mut </span>RelatedRecordsQuery,
     parent_result: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>ManyRecords&gt;,
     trace_id: <span class="prelude-ty">Option</span>&lt;String&gt;,
-) -&gt; InterpretationResult&lt;(ManyRecords, <span class="prelude-ty">Option</span>&lt;Vec&lt;RelAggregationRow&gt;&gt;)&gt; {
+) -&gt; InterpretationResult&lt;ManyRecords&gt; {
     <span class="kw">let </span>processor = InMemoryRecordProcessor::new_from_query_args(<span class="kw-2">&amp;mut </span>query.args);
 
     <span class="kw">let </span>parent_field = <span class="kw-2">&amp;</span>query.parent_field;
@@ -302,14 +297,14 @@
     };
 
     <span class="kw">if </span>parent_ids.is_empty() {
-        <span class="kw">return </span><span class="prelude-val">Ok</span>((ManyRecords::empty(<span class="kw-2">&amp;</span>query.selected_fields), <span class="prelude-val">None</span>));
+        <span class="kw">return </span><span class="prelude-val">Ok</span>(ManyRecords::empty(<span class="kw-2">&amp;</span>query.selected_fields));
     }
 
     <span class="kw">let </span>ids = tx
         .get_related_m2m_record_ids(<span class="kw-2">&amp;</span>query.parent_field, <span class="kw-2">&amp;</span>parent_ids, trace_id.clone())
         .<span class="kw">await</span><span class="question-mark">?</span>;
     <span class="kw">if </span>ids.is_empty() {
-        <span class="kw">return </span><span class="prelude-val">Ok</span>((ManyRecords::empty(<span class="kw-2">&amp;</span>query.selected_fields), <span class="prelude-val">None</span>));
+        <span class="kw">return </span><span class="prelude-val">Ok</span>(ManyRecords::empty(<span class="kw-2">&amp;</span>query.selected_fields));
     }
 
     <span class="kw">let </span>child_model_id = query.parent_field.related_model().primary_identifier();
@@ -324,31 +319,31 @@
 
     <span class="comment">// a roundtrip can be avoided if:
     // - there is no additional filter
-    // - there is no aggregation selection
+    // - there is no virtual fields selection (relation aggregation)
     // - the selection set is the child_link_id
-    </span><span class="kw">let </span><span class="kw-2">mut </span>scalars =
-        <span class="kw">if </span>query.args.do_nothing() &amp;&amp; query.aggregation_selections.is_empty() &amp;&amp; child_link_id == query.selected_fields
-        {
-            ManyRecords::from((child_ids, <span class="kw-2">&amp;</span>query.selected_fields)).with_unique_records()
-        } <span class="kw">else </span>{
-            <span class="kw">let </span><span class="kw-2">mut </span>args = query.args.clone();
-            <span class="kw">let </span>filter = child_link_id.is_in(ConditionListValue::list(child_ids));
+    </span><span class="kw">let </span><span class="kw-2">mut </span>scalars = <span class="kw">if </span>query.args.do_nothing()
+        &amp;&amp; !query.selected_fields.has_virtual_fields()
+        &amp;&amp; child_link_id == query.selected_fields
+    {
+        ManyRecords::from((child_ids, <span class="kw-2">&amp;</span>query.selected_fields)).with_unique_records()
+    } <span class="kw">else </span>{
+        <span class="kw">let </span><span class="kw-2">mut </span>args = query.args.clone();
+        <span class="kw">let </span>filter = child_link_id.is_in(ConditionListValue::list(child_ids));
 
-            args.filter = <span class="kw">match </span>args.filter {
-                <span class="prelude-val">Some</span>(existing_filter) =&gt; <span class="prelude-val">Some</span>(Filter::and(<span class="macro">vec!</span>[existing_filter, filter])),
-                <span class="prelude-val">None </span>=&gt; <span class="prelude-val">Some</span>(filter),
-            };
+        args.filter = <span class="kw">match </span>args.filter {
+            <span class="prelude-val">Some</span>(existing_filter) =&gt; <span class="prelude-val">Some</span>(Filter::and(<span class="macro">vec!</span>[existing_filter, filter])),
+            <span class="prelude-val">None </span>=&gt; <span class="prelude-val">Some</span>(filter),
+        };
 
-            tx.get_many_records(
-                <span class="kw-2">&amp;</span>query.parent_field.related_model(),
-                args,
-                <span class="kw-2">&amp;</span>query.selected_fields,
-                <span class="kw-2">&amp;</span>query.aggregation_selections,
-                RelationLoadStrategy::Query,
-                trace_id.clone(),
-            )
-            .<span class="kw">await</span><span class="question-mark">?
-        </span>};
+        tx.get_many_records(
+            <span class="kw-2">&amp;</span>query.parent_field.related_model(),
+            args,
+            <span class="kw-2">&amp;</span>query.selected_fields,
+            RelationLoadStrategy::Query,
+            trace_id.clone(),
+        )
+        .<span class="kw">await</span><span class="question-mark">?
+    </span>};
 
     <span class="comment">// Child id to parent ids
     </span><span class="kw">let </span><span class="kw-2">mut </span>id_map: HashMap&lt;SelectionResult, Vec&lt;SelectionResult&gt;&gt; = HashMap::new();
@@ -399,10 +394,8 @@
     }
 
     <span class="kw">let </span>scalars = processor.apply(scalars);
-    <span class="kw">let </span>(scalars, aggregation_rows) =
-        read::extract_aggregation_rows_from_scalars(scalars, query.aggregation_selections.clone());
 
-    <span class="prelude-val">Ok</span>((scalars, aggregation_rows))
+    <span class="prelude-val">Ok</span>(scalars)
 }
 
 <span class="comment">// [DTODO] This is implemented in an inefficient fashion, e.g. too much Arc cloning going on.
@@ -414,9 +407,8 @@
     parent_result: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>ManyRecords&gt;,
     <span class="kw-2">mut </span>query_args: QueryArguments,
     selected_fields: <span class="kw-2">&amp;</span>FieldSelection,
-    aggr_selections: Vec&lt;RelAggregationSelection&gt;,
     trace_id: <span class="prelude-ty">Option</span>&lt;String&gt;,
-) -&gt; InterpretationResult&lt;(ManyRecords, <span class="prelude-ty">Option</span>&lt;Vec&lt;RelAggregationRow&gt;&gt;)&gt; {
+) -&gt; InterpretationResult&lt;ManyRecords&gt; {
     <span class="kw">let </span>parent_model_id = parent_field.model().primary_identifier();
     <span class="kw">let </span>parent_link_id = parent_field.linking_fields();
     <span class="kw">let </span>child_link_id = parent_field.related_field().linking_fields();
@@ -460,7 +452,7 @@
         .collect();
 
     <span class="kw">if </span>uniq_selections.is_empty() {
-        <span class="kw">return </span><span class="prelude-val">Ok</span>((ManyRecords::empty(selected_fields), <span class="prelude-val">None</span>));
+        <span class="kw">return </span><span class="prelude-val">Ok</span>(ManyRecords::empty(selected_fields));
     }
 
     <span class="comment">// If we&#39;re fetching related records from a single parent, then we can apply normal pagination instead of in-memory processing.
@@ -485,7 +477,6 @@
             <span class="kw-2">&amp;</span>parent_field.related_model(),
             args,
             selected_fields,
-            <span class="kw-2">&amp;</span>aggr_selections,
             RelationLoadStrategy::Query,
             trace_id,
         )
@@ -544,8 +535,7 @@
     } <span class="kw">else </span>{
         scalars
     };
-    <span class="kw">let </span>(scalars, aggregation_rows) = read::extract_aggregation_rows_from_scalars(scalars, aggr_selections);
 
-    <span class="prelude-val">Ok</span>((scalars, aggregation_rows))
+    <span class="prelude-val">Ok</span>(scalars)
 }
 </code></pre></div></section></main></body></html>

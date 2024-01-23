@@ -486,6 +486,7 @@
 <a href="#486" id="486">486</a>
 <a href="#487" id="487">487</a>
 <a href="#488" id="488">488</a>
+<a href="#489" id="489">489</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span><span class="kw">super</span>::update::<span class="kw-2">*</span>;
 <span class="kw">use </span><span class="kw">crate</span>::column_metadata;
 <span class="kw">use </span><span class="kw">crate</span>::filter::FilterBuilder;
@@ -501,6 +502,7 @@
     prelude::{native_uuid, uuid_to_bin, uuid_to_bin_swapped, Aliasable, Select, SqlFamily},
 };
 <span class="kw">use </span>query_structure::<span class="kw-2">*</span>;
+<span class="kw">use </span>std::borrow::Cow;
 <span class="kw">use </span>std::{
     collections::{HashMap, HashSet},
     ops::Deref,
@@ -661,7 +663,7 @@
 
         <span class="comment">// All values provided in the write args
         </span>(<span class="prelude-val">Some</span>(identifier), <span class="kw">_</span>, <span class="kw">_</span>) <span class="kw">if </span>!identifier.misses_autogen_value() =&gt; {
-            <span class="kw">let </span>field_names = identifier.db_names().map(ToOwned::to_owned).collect();
+            <span class="kw">let </span>field_names = identifier.db_names().map(Cow::into_owned).collect();
             <span class="kw">let </span>record = Record::from(identifier);
 
             <span class="prelude-val">Ok</span>(SingleRecord { record, field_names })
@@ -671,7 +673,7 @@
         </span>(<span class="prelude-val">Some</span>(<span class="kw-2">mut </span>identifier), <span class="kw">_</span>, <span class="prelude-val">Some</span>(num)) <span class="kw">if </span>identifier.misses_autogen_value() =&gt; {
             identifier.add_autogen_value(num <span class="kw">as </span>i64);
 
-            <span class="kw">let </span>field_names = identifier.db_names().map(ToOwned::to_owned).collect();
+            <span class="kw">let </span>field_names = identifier.db_names().map(Cow::into_owned).collect();
             <span class="kw">let </span>record = Record::from(identifier);
 
             <span class="prelude-val">Ok</span>(SingleRecord { record, field_names })

@@ -104,6 +104,7 @@
 <a href="#104" id="104">104</a>
 <a href="#105" id="105">105</a>
 <a href="#106" id="106">106</a>
+<a href="#107" id="107">107</a>
 </pre></div><pre class="rust"><code><span class="kw">use crate</span>::{Field, FieldSelection, ScalarFieldRef, SelectedField, TypeIdentifier};
 <span class="kw">use </span>itertools::Itertools;
 <span class="kw">use </span>psl::schema_ast::ast::FieldArity;
@@ -137,6 +138,7 @@
                     SelectedField::Scalar(sf) =&gt; <span class="prelude-val">Some</span>(sf.clone().into()),
                     SelectedField::Composite(_cf) =&gt; <span class="prelude-val">None</span>,
                     SelectedField::Relation(<span class="kw">_</span>) =&gt; <span class="prelude-val">None</span>,
+                    SelectedField::Virtual(<span class="kw">_</span>) =&gt; <span class="prelude-val">None</span>,
                 })
                 .collect(),
         }

@@ -158,21 +158,11 @@
 <a href="#158" id="158">158</a>
 <a href="#159" id="159">159</a>
 <a href="#160" id="160">160</a>
-<a href="#161" id="161">161</a>
-<a href="#162" id="162">162</a>
-<a href="#163" id="163">163</a>
-<a href="#164" id="164">164</a>
-<a href="#165" id="165">165</a>
-<a href="#166" id="166">166</a>
-<a href="#167" id="167">167</a>
-<a href="#168" id="168">168</a>
-<a href="#169" id="169">169</a>
 </pre></div><pre class="rust"><code><span class="kw">use super</span>::<span class="kw-2">*</span>;
 <span class="kw">use crate</span>::{
     error::DecorateErrorWithFieldInformationExtension, output_meta, query_builder::MongoReadQueryBuilder,
     query_strings::Find, vacuum_cursor, IntoBson,
 };
-<span class="kw">use </span>connector_interface::RelAggregationSelection;
 <span class="kw">use </span>mongodb::{bson::doc, options::FindOptions, ClientSession, Database};
 <span class="kw">use </span>query_structure::<span class="kw-2">*</span>;
 <span class="kw">use </span>tracing::{info_span, Instrument};
@@ -184,7 +174,6 @@
     model: <span class="kw-2">&amp;</span>Model,
     filter: <span class="kw-2">&amp;</span>Filter,
     selected_fields: <span class="kw-2">&amp;</span>FieldSelection,
-    aggregation_selections: <span class="kw-2">&amp;</span>[RelAggregationSelection],
 ) -&gt; <span class="kw">crate</span>::Result&lt;<span class="prelude-ty">Option</span>&lt;SingleRecord&gt;&gt; {
     <span class="kw">let </span>coll = database.collection(model.db_name());
 
@@ -194,11 +183,11 @@
         <span class="string">&quot;db.statement&quot; </span>= <span class="kw-2">&amp;</span><span class="macro">format_args!</span>(<span class="string">&quot;db.{}.findOne(*)&quot;</span>, coll.name())
     );
 
-    <span class="kw">let </span>meta_mapping = output_meta::from_selected_fields(selected_fields, aggregation_selections);
+    <span class="kw">let </span>meta_mapping = output_meta::from_selected_fields(selected_fields);
     <span class="kw">let </span>query_arguments: QueryArguments = (model.clone(), filter.clone()).into();
     <span class="kw">let </span>query = MongoReadQueryBuilder::from_args(query_arguments)<span class="question-mark">?
         </span>.with_model_projection(selected_fields.clone())<span class="question-mark">?
-        </span>.with_aggregation_selections(aggregation_selections)<span class="question-mark">?
+        </span>.with_virtual_fields(selected_fields.virtuals())<span class="question-mark">?
         </span>.build()<span class="question-mark">?</span>;
 
     <span class="kw">let </span>docs = query.execute(coll, session).instrument(span).<span class="kw">await</span><span class="question-mark">?</span>;
@@ -206,10 +195,7 @@
     <span class="kw">if </span>docs.is_empty() {
         <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>)
     } <span class="kw">else </span>{
-        <span class="kw">let </span>field_names: Vec&lt;<span class="kw">_</span>&gt; = selected_fields
-            .db_names()
-            .chain(aggregation_selections.iter().map(|aggr_sel| aggr_sel.db_alias()))
-            .collect();
+        <span class="kw">let </span>field_names: Vec&lt;<span class="kw">_</span>&gt; = selected_fields.db_names().collect();
         <span class="kw">let </span>doc = docs.into_iter().next().unwrap();
         <span class="kw">let </span>record = document_to_record(doc, <span class="kw-2">&amp;</span>field_names, <span class="kw-2">&amp;</span>meta_mapping)<span class="question-mark">?</span>;
 
@@ -230,7 +216,6 @@
     model: <span class="kw-2">&amp;</span>Model,
     query_arguments: QueryArguments,
     selected_fields: <span class="kw-2">&amp;</span>FieldSelection,
-    aggregation_selections: <span class="kw-2">&amp;</span>[RelAggregationSelection],
 ) -&gt; <span class="kw">crate</span>::Result&lt;ManyRecords&gt; {
     <span class="kw">let </span>coll = database.collection(model.db_name());
 
@@ -241,12 +226,9 @@
     );
 
     <span class="kw">let </span>reverse_order = query_arguments.take.map(|t| t &lt; <span class="number">0</span>).unwrap_or(<span class="bool-val">false</span>);
-    <span class="kw">let </span>field_names: Vec&lt;<span class="kw">_</span>&gt; = selected_fields
-        .db_names()
-        .chain(aggregation_selections.iter().map(|aggr_sel| aggr_sel.db_alias()))
-        .collect();
+    <span class="kw">let </span>field_names: Vec&lt;<span class="kw">_</span>&gt; = selected_fields.db_names().collect();
 
-    <span class="kw">let </span>meta_mapping = output_meta::from_selected_fields(selected_fields, aggregation_selections);
+    <span class="kw">let </span>meta_mapping = output_meta::from_selected_fields(selected_fields);
     <span class="kw">let </span><span class="kw-2">mut </span>records = ManyRecords::new(field_names.clone());
 
     <span class="kw">if let </span><span class="prelude-val">Some</span>(<span class="number">0</span>) = query_arguments.take {
@@ -255,7 +237,7 @@
 
     <span class="kw">let </span>query = MongoReadQueryBuilder::from_args(query_arguments)<span class="question-mark">?
         </span>.with_model_projection(selected_fields.clone())<span class="question-mark">?
-        </span>.with_aggregation_selections(aggregation_selections)<span class="question-mark">?
+        </span>.with_virtual_fields(selected_fields.virtuals())<span class="question-mark">?
         </span>.build()<span class="question-mark">?</span>;
 
     <span class="kw">let </span>docs = query.execute(coll, session).instrument(span).<span class="kw">await</span><span class="question-mark">?</span>;

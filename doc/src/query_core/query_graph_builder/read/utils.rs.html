@@ -266,9 +266,18 @@
 <a href="#266" id="266">266</a>
 <a href="#267" id="267">267</a>
 <a href="#268" id="268">268</a>
+<a href="#269" id="269">269</a>
+<a href="#270" id="270">270</a>
+<a href="#271" id="271">271</a>
+<a href="#272" id="272">272</a>
+<a href="#273" id="273">273</a>
+<a href="#274" id="274">274</a>
+<a href="#275" id="275">275</a>
+<a href="#276" id="276">276</a>
+<a href="#277" id="277">277</a>
+<a href="#278" id="278">278</a>
 </pre></div><pre class="rust"><code><span class="kw">use super</span>::<span class="kw-2">*</span>;
 <span class="kw">use crate</span>::{ArgumentListLookup, FieldPair, ParsedField, ReadQuery};
-<span class="kw">use </span>connector::RelAggregationSelection;
 <span class="kw">use </span>psl::{datamodel_connector::ConnectorCapability, PreviewFeature};
 <span class="kw">use </span>query_structure::{prelude::<span class="kw-2">*</span>, RelationLoadStrategy};
 <span class="kw">use </span>schema::{
@@ -346,32 +355,45 @@
 
     <span class="kw">let </span>parent = parent.into();
 
-    <span class="kw">let </span>selected_fields = pairs
-        .iter()
-        .filter_map(|pair| {
-            parent
-                .find_field(<span class="kw-2">&amp;</span>pair.parsed_field.name)
-                .map(|field| (pair.parsed_field.clone(), field))
-        })
-        .flat_map(|field| <span class="kw">match </span>field {
-            (pf, Field::Relation(rf)) =&gt; {
-                <span class="kw">let </span><span class="kw-2">mut </span>fields: Vec&lt;QueryGraphBuilderResult&lt;SelectedField&gt;&gt; = rf
-                    .scalar_fields()
-                    .into_iter()
-                    .map(SelectedField::from)
-                    .map(<span class="prelude-val">Ok</span>)
-                    .collect();
+    <span class="kw">let </span><span class="kw-2">mut </span>selected_fields = Vec::new();
+
+    <span class="kw">for </span>pair <span class="kw">in </span>pairs {
+        <span class="kw">let </span>field = parent.find_field(<span class="kw-2">&amp;</span>pair.parsed_field.name);
+
+        <span class="kw">match </span>(pair.parsed_field.clone(), field) {
+            (pf, <span class="prelude-val">Some</span>(Field::Relation(rf))) =&gt; {
+                <span class="kw">let </span>fields = rf.scalar_fields().into_iter().map(SelectedField::from);
+
+                selected_fields.extend(fields);
 
                 <span class="kw">if </span>should_collect_relation_selection {
-                    fields.push(extract_relation_selection(pf, rf, query_schema));
+                    selected_fields.push(extract_relation_selection(pf, rf, query_schema)<span class="question-mark">?</span>);
                 }
-
-                fields
             }
-            (<span class="kw">_</span>, Field::Scalar(sf)) =&gt; <span class="macro">vec!</span>[<span class="prelude-val">Ok</span>(sf.into())],
-            (pf, Field::Composite(cf)) =&gt; <span class="macro">vec!</span>[extract_composite_selection(pf, cf, query_schema)],
-        })
-        .collect::&lt;<span class="prelude-ty">Result</span>&lt;Vec&lt;<span class="kw">_</span>&gt;, <span class="kw">_</span>&gt;&gt;()<span class="question-mark">?</span>;
+
+            (<span class="kw">_</span>, <span class="prelude-val">Some</span>(Field::Scalar(sf))) =&gt; {
+                selected_fields.push(sf.into());
+            }
+
+            (pf, <span class="prelude-val">Some</span>(Field::Composite(cf))) =&gt; {
+                selected_fields.push(extract_composite_selection(pf, cf, query_schema)<span class="question-mark">?</span>);
+            }
+
+            (pf, <span class="prelude-val">None</span>) <span class="kw">if </span>pf.name == UNDERSCORE_COUNT =&gt; <span class="kw">match </span>parent {
+                ParentContainer::Model(<span class="kw-2">ref </span>model) =&gt; {
+                    selected_fields.extend(extract_relation_count_selections(pf, model)<span class="question-mark">?</span>);
+                }
+                ParentContainer::CompositeType(<span class="kw">_</span>) =&gt; {
+                    <span class="macro">unreachable!</span>(<span class="string">&quot;Unexpected relation aggregation selection inside a composite type query&quot;</span>)
+                }
+            },
+
+            (pf, <span class="prelude-val">None</span>) =&gt; <span class="macro">unreachable!</span>(
+                <span class="string">&quot;Field &#39;{}&#39; does not exist on enclosing type and is not a known virtual field&quot;</span>,
+                pf.name
+            ),
+        }
+    }
 
     <span class="prelude-val">Ok</span>(selected_fields)
 }
@@ -410,6 +432,35 @@
         result_fields: collect_selection_order(<span class="kw-2">&amp;</span>object.fields),
         selections: pairs_to_selections(related_model, <span class="kw-2">&amp;</span>object.fields, query_schema)<span class="question-mark">?</span>,
     }))
+}
+
+<span class="kw">fn </span>extract_relation_count_selections(
+    pf: ParsedField&lt;<span class="lifetime">&#39;_</span>&gt;,
+    model: <span class="kw-2">&amp;</span>Model,
+) -&gt; QueryGraphBuilderResult&lt;Vec&lt;SelectedField&gt;&gt; {
+    <span class="kw">let </span>object = pf
+        .nested_fields
+        .expect(<span class="string">&quot;Invalid query shape: relation aggregation virtual field selected without relations to aggregate.&quot;</span>);
+
+    object
+        .fields
+        .into_iter()
+        .map(|<span class="kw-2">mut </span>nested_pair| -&gt; QueryGraphBuilderResult&lt;<span class="kw">_</span>&gt; {
+            <span class="kw">let </span>rf = model
+                .fields()
+                .find_from_relation_fields(<span class="kw-2">&amp;</span>nested_pair.parsed_field.name)
+                .expect(<span class="string">&quot;Selected relation in relation aggregation virtual field must exist on the model&quot;</span>);
+
+            <span class="kw">let </span>filter = nested_pair
+                .parsed_field
+                .arguments
+                .lookup(args::WHERE)
+                .map(|where_arg| extract_filter(where_arg.value.try_into()<span class="question-mark">?</span>, rf.related_model()))
+                .transpose()<span class="question-mark">?</span>;
+
+            <span class="prelude-val">Ok</span>(SelectedField::Virtual(VirtualSelection::RelationCount(rf, filter)))
+        })
+        .collect()
 }
 
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>collect_nested_queries(
@@ -479,52 +530,21 @@
     }
 }
 
-<span class="kw">pub fn </span>collect_relation_aggr_selections(
-    from: Vec&lt;FieldPair&lt;<span class="lifetime">&#39;_</span>&gt;&gt;,
-    model: <span class="kw-2">&amp;</span>Model,
-) -&gt; QueryGraphBuilderResult&lt;Vec&lt;RelAggregationSelection&gt;&gt; {
-    <span class="kw">let </span><span class="kw-2">mut </span>selections = <span class="macro">vec!</span>[];
-
-    <span class="kw">for </span>pair <span class="kw">in </span>from {
-        <span class="kw">match </span>pair.parsed_field.name.as_str() {
-            UNDERSCORE_COUNT =&gt; {
-                <span class="kw">let </span>nested_fields = pair.parsed_field.nested_fields.unwrap();
-
-                <span class="kw">for </span><span class="kw-2">mut </span>nested_pair <span class="kw">in </span>nested_fields.fields {
-                    <span class="kw">let </span>rf = model
-                        .fields()
-                        .find_from_relation_fields(<span class="kw-2">&amp;</span>nested_pair.parsed_field.name)
-                        .unwrap();
-                    <span class="kw">let </span>filter = <span class="kw">match </span>nested_pair.parsed_field.arguments.lookup(args::WHERE) {
-                        <span class="prelude-val">Some</span>(where_arg) =&gt; <span class="prelude-val">Some</span>(extract_filter(where_arg.value.try_into()<span class="question-mark">?</span>, rf.related_model())<span class="question-mark">?</span>),
-                        <span class="kw">_ </span>=&gt; <span class="prelude-val">None</span>,
-                    };
-
-                    selections.push(RelAggregationSelection::Count(rf, filter));
-                }
-            }
-            field_name =&gt; <span class="macro">panic!</span>(<span class="string">&quot;Unknown field name \&quot;{field_name}\&quot; for a relation aggregation&quot;</span>),
-        }
-    }
-
-    <span class="prelude-val">Ok</span>(selections)
-}
-
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>get_relation_load_strategy(
     requested_strategy: <span class="prelude-ty">Option</span>&lt;RelationLoadStrategy&gt;,
     cursor: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>SelectionResult&gt;,
     distinct: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>FieldSelection&gt;,
     nested_queries: <span class="kw-2">&amp;</span>[ReadQuery],
-    aggregation_selections: <span class="kw-2">&amp;</span>[RelAggregationSelection],
+    selected_fields: <span class="kw-2">&amp;</span>FieldSelection,
     query_schema: <span class="kw-2">&amp;</span>QuerySchema,
 ) -&gt; RelationLoadStrategy {
     <span class="kw">if </span>query_schema.has_feature(PreviewFeature::RelationJoins)
         &amp;&amp; query_schema.has_capability(ConnectorCapability::LateralJoin)
         &amp;&amp; cursor.is_none()
         &amp;&amp; distinct.is_none()
-        &amp;&amp; aggregation_selections.is_empty()
+        &amp;&amp; !selected_fields.has_virtual_fields()
         &amp;&amp; !nested_queries.iter().any(|q| <span class="kw">match </span>q {
-            ReadQuery::RelatedRecordsQuery(q) =&gt; q.has_cursor() || q.has_distinct() || q.has_aggregation_selections(),
+            ReadQuery::RelatedRecordsQuery(q) =&gt; q.has_cursor() || q.has_distinct() || q.has_virtual_selections(),
             <span class="kw">_ </span>=&gt; <span class="bool-val">false</span>,
         })
         &amp;&amp; requested_strategy != <span class="prelude-val">Some</span>(RelationLoadStrategy::Query)

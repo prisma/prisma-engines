@@ -265,7 +265,7 @@
     <span class="kw">pub fn </span>empty(selected_fields: <span class="kw-2">&amp;</span>FieldSelection) -&gt; <span class="self">Self </span>{
         <span class="self">Self </span>{
             records: Vec::new(),
-            field_names: selected_fields.prisma_names().collect(),
+            field_names: selected_fields.db_names().collect(),
         }
     }
 
@@ -388,7 +388,7 @@
         <span class="kw">let </span>pairs: Vec&lt;<span class="kw">_</span>&gt; = extraction_selection
             .selections()
             .map(|selection| {
-                <span class="self">self</span>.get_field_value(field_names, selection.db_name())
+                <span class="self">self</span>.get_field_value(field_names, <span class="kw-2">&amp;</span>selection.db_name())
                     .and_then(|val| <span class="prelude-val">Ok</span>((selection.clone(), selection.coerce_value(val.clone())<span class="question-mark">?</span>)))
             })
             .collect::&lt;<span class="kw">crate</span>::Result&lt;Vec&lt;<span class="kw">_</span>&gt;&gt;&gt;()<span class="question-mark">?</span>;

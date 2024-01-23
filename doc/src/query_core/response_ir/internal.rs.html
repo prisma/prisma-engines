@@ -828,13 +828,6 @@
 <a href="#828" id="828">828</a>
 <a href="#829" id="829">829</a>
 <a href="#830" id="830">830</a>
-<a href="#831" id="831">831</a>
-<a href="#832" id="832">832</a>
-<a href="#833" id="833">833</a>
-<a href="#834" id="834">834</a>
-<a href="#835" id="835">835</a>
-<a href="#836" id="836">836</a>
-<a href="#837" id="837">837</a>
 </pre></div><pre class="rust"><code><span class="kw">use super</span>::<span class="kw-2">*</span>;
 <span class="kw">use crate</span>::{
     constants::custom_types,
@@ -842,10 +835,9 @@
     result_ast::{RecordSelectionWithRelations, RelationRecordSelection},
     CoreError, QueryResult, RecordAggregations, RecordSelection,
 };
-<span class="kw">use </span>connector::{AggregationResult, RelAggregationResult, RelAggregationRow};
+<span class="kw">use </span>connector::AggregationResult;
 <span class="kw">use </span>indexmap::IndexMap;
-<span class="kw">use </span>itertools::Itertools;
-<span class="kw">use </span>query_structure::{CompositeFieldRef, Field, PrismaValue, SelectionResult};
+<span class="kw">use </span>query_structure::{CompositeFieldRef, Field, PrismaValue, SelectionResult, VirtualSelection};
 <span class="kw">use </span>schema::{
     constants::{aggregations::<span class="kw-2">*</span>, output_fields::<span class="kw-2">*</span>},
     <span class="kw-2">*</span>,
@@ -1010,24 +1002,6 @@
     };
 
     <span class="prelude-val">Ok</span>(envelope)
-}
-
-<span class="kw">fn </span>write_rel_aggregation_row(row: <span class="kw-2">&amp;</span>RelAggregationRow, map: <span class="kw-2">&amp;mut </span>HashMap&lt;String, Item&gt;) {
-    <span class="kw">for </span>result <span class="kw">in </span>row.iter() {
-        <span class="kw">match </span>result {
-            RelAggregationResult::Count(rf, count) =&gt; <span class="kw">match </span>map.get_mut(UNDERSCORE_COUNT) {
-                <span class="prelude-val">Some</span>(item) =&gt; <span class="kw">match </span>item {
-                    Item::Map(inner_map) =&gt; inner_map.insert(rf.name().to_owned(), Item::Value(count.clone())),
-                    <span class="kw">_ </span>=&gt; <span class="macro">unreachable!</span>(),
-                },
-                <span class="prelude-val">None </span>=&gt; {
-                    <span class="kw">let </span><span class="kw-2">mut </span>inner_map: Map = Map::new();
-                    inner_map.insert(rf.name().to_owned(), Item::Value(count.clone()));
-                    map.insert(UNDERSCORE_COUNT.to_owned(), Item::Map(inner_map))
-                }
-            },
-        };
-    }
 }
 
 <span class="kw">fn </span>extract_aggregate_object_type&lt;<span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span>&gt;(output_type: <span class="kw-2">&amp;</span><span class="lifetime">&#39;b </span>OutputType&lt;<span class="lifetime">&#39;a</span>&gt;) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;b </span>ObjectType&lt;<span class="lifetime">&#39;a</span>&gt; {
@@ -1229,7 +1203,7 @@
             }
         }
 
-        <span class="kw">let </span>map = reorder_object_with_selection_order(result.fields.clone(), object);
+        <span class="kw">let </span>map = reorder_object_with_selection_order(<span class="kw-2">&amp;</span>result.fields, object);
 
         <span class="kw">let </span>result = Item::Map(map);
 
@@ -1296,6 +1270,11 @@
     <span class="prelude-val">Ok</span>(Item::Map(map))
 }
 
+<span class="kw">enum </span>SerializedField&lt;<span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span>&gt; {
+    Model(Field, <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>OutputField&lt;<span class="lifetime">&#39;b</span>&gt;),
+    Virtual(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>VirtualSelection),
+}
+
 <span class="doccomment">/// Serializes the given result into objects of given type.
 /// Doesn&#39;t validate the shape of the result set (&quot;unchecked&quot; result).
 /// Returns a vector of serialized objects (as Item::Map), grouped into a map by parent, if present.
@@ -1316,18 +1295,36 @@
     // to prevent expensive copying during serialization).
 
     // Finally, serialize the objects based on the selected fields.
-    </span><span class="kw">let </span><span class="kw-2">mut </span>object_mapping = UncheckedItemsWithParents::with_capacity(result.scalars.records.len());
-    <span class="kw">let </span>db_field_names = result.scalars.field_names;
+    </span><span class="kw">let </span><span class="kw-2">mut </span>object_mapping = UncheckedItemsWithParents::with_capacity(result.records.records.len());
+    <span class="kw">let </span>db_field_names = result.records.field_names;
     <span class="kw">let </span>model = result.model;
 
     <span class="kw">let </span>fields: Vec&lt;<span class="kw">_</span>&gt; = db_field_names
         .iter()
-        .filter_map(|f| model.fields().find_from_non_virtual_by_db_name(f).ok())
+        .map(|name| {
+            model
+                .fields()
+                .find_from_non_virtual_by_db_name(name)
+                .ok()
+                .and_then(|field| {
+                    typ.find_field(field.name())
+                        .map(|out_field| SerializedField::Model(field, out_field))
+                })
+                .or_else(|| {
+                    result
+                        .virtual_fields
+                        .iter()
+                        .find(|f| f.db_alias() == <span class="kw-2">*</span>name)
+                        .map(SerializedField::Virtual)
+                })
+                <span class="comment">// Shouldn&#39;t happen, implies that the query returned unknown fields.
+                </span>.expect(<span class="string">&quot;Field must be a known scalar or virtual&quot;</span>)
+        })
         .collect();
 
     <span class="comment">// Write all fields, nested and list fields unordered into a map, afterwards order all into the final order.
     // If nothing is written to the object, write null instead.
-    </span><span class="kw">for </span>(r_index, record) <span class="kw">in </span>result.scalars.records.into_iter().enumerate() {
+    </span><span class="kw">for </span>record <span class="kw">in </span>result.records.records {
         <span class="kw">let </span>record_id = <span class="prelude-val">Some</span>(record.extract_selection_result(<span class="kw-2">&amp;</span>db_field_names, <span class="kw-2">&amp;</span>model.primary_identifier())<span class="question-mark">?</span>);
 
         <span class="kw">if </span>!object_mapping.contains_key(<span class="kw-2">&amp;</span>record.parent_id) {
@@ -1339,44 +1336,33 @@
         <span class="kw">let </span><span class="kw-2">mut </span>object = HashMap::with_capacity(values.len());
 
         <span class="kw">for </span>(val, field) <span class="kw">in </span>values.into_iter().zip(fields.iter()) {
-            <span class="kw">let </span>out_field = typ.find_field(field.name()).unwrap();
-
             <span class="kw">match </span>field {
-                Field::Composite(cf) =&gt; {
-                    object.insert(field.name().to_owned(), serialize_composite(cf, out_field, val)<span class="question-mark">?</span>);
+                SerializedField::Model(field, out_field) =&gt; {
+                    <span class="kw">if let </span>Field::Composite(cf) = field {
+                        object.insert(field.name().to_owned(), serialize_composite(cf, out_field, val)<span class="question-mark">?</span>);
+                    } <span class="kw">else if </span>!out_field.field_type().is_object() {
+                        object.insert(field.name().to_owned(), serialize_scalar(out_field, val)<span class="question-mark">?</span>);
+                    }
                 }
 
-                <span class="kw">_ if </span>!out_field.field_type().is_object() =&gt; {
-                    object.insert(field.name().to_owned(), serialize_scalar(out_field, val)<span class="question-mark">?</span>);
-                }
+                SerializedField::Virtual(vs) =&gt; {
+                    <span class="kw">let </span>(virtual_obj_name, nested_field_name) = vs.serialized_name();
 
-                <span class="kw">_ </span>=&gt; (),
+                    <span class="kw">let </span>virtual_obj = object
+                        .entry(virtual_obj_name.into())
+                        .or_insert(Item::Map(Map::new()))
+                        .as_map_mut()
+                        .expect(<span class="string">&quot;Virtual and scalar fields must not collide&quot;</span>);
+
+                    virtual_obj.insert(nested_field_name.into(), Item::Value(vs.coerce_value(val)<span class="question-mark">?</span>));
+                }
             }
         }
 
         <span class="comment">// Write nested results
         </span>write_nested_items(<span class="kw-2">&amp;</span>record_id, <span class="kw-2">&amp;mut </span>nested_mapping, <span class="kw-2">&amp;mut </span>object, typ)<span class="question-mark">?</span>;
 
-        <span class="kw">let </span>aggr_row = result.aggregation_rows.as_ref().map(|rows| rows.get(r_index).unwrap());
-        <span class="kw">if let </span><span class="prelude-val">Some</span>(aggr_row) = aggr_row {
-            write_rel_aggregation_row(aggr_row, <span class="kw-2">&amp;mut </span>object);
-        }
-
-        <span class="kw">let </span><span class="kw-2">mut </span>aggr_fields = aggr_row
-            .map(|row| {
-                row.iter()
-                    .map(|aggr_result| <span class="kw">match </span>aggr_result {
-                        RelAggregationResult::Count(<span class="kw">_</span>, <span class="kw">_</span>) =&gt; UNDERSCORE_COUNT.to_owned(),
-                    })
-                    .unique()
-                    .collect()
-            })
-            .unwrap_or_default();
-
-        <span class="kw">let </span><span class="kw-2">mut </span>all_fields = result.fields.clone();
-        all_fields.append(<span class="kw-2">&amp;mut </span>aggr_fields);
-
-        <span class="kw">let </span>map = reorder_object_with_selection_order(all_fields, object);
+        <span class="kw">let </span>map = reorder_object_with_selection_order(<span class="kw-2">&amp;</span>result.fields, object);
 
         object_mapping.get_mut(<span class="kw-2">&amp;</span>record.parent_id).unwrap().push(Item::Map(map));
     }
@@ -1385,7 +1371,7 @@
 }
 
 <span class="kw">fn </span>reorder_object_with_selection_order(
-    selection_order: Vec&lt;String&gt;,
+    selection_order: <span class="kw-2">&amp;</span>[String],
     <span class="kw-2">mut </span>object: HashMap&lt;String, Item&gt;,
 ) -&gt; IndexMap&lt;String, Item&gt; {
     selection_order

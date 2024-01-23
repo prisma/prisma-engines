@@ -301,73 +301,11 @@
 <a href="#301" id="301">301</a>
 <a href="#302" id="302">302</a>
 <a href="#303" id="303">303</a>
-<a href="#304" id="304">304</a>
-<a href="#305" id="305">305</a>
-<a href="#306" id="306">306</a>
-<a href="#307" id="307">307</a>
-<a href="#308" id="308">308</a>
-<a href="#309" id="309">309</a>
-<a href="#310" id="310">310</a>
-<a href="#311" id="311">311</a>
-<a href="#312" id="312">312</a>
-<a href="#313" id="313">313</a>
-<a href="#314" id="314">314</a>
-<a href="#315" id="315">315</a>
-<a href="#316" id="316">316</a>
-<a href="#317" id="317">317</a>
-<a href="#318" id="318">318</a>
-<a href="#319" id="319">319</a>
-<a href="#320" id="320">320</a>
-<a href="#321" id="321">321</a>
-<a href="#322" id="322">322</a>
-<a href="#323" id="323">323</a>
-<a href="#324" id="324">324</a>
-<a href="#325" id="325">325</a>
-<a href="#326" id="326">326</a>
-<a href="#327" id="327">327</a>
-<a href="#328" id="328">328</a>
-<a href="#329" id="329">329</a>
-<a href="#330" id="330">330</a>
-<a href="#331" id="331">331</a>
-<a href="#332" id="332">332</a>
-<a href="#333" id="333">333</a>
-<a href="#334" id="334">334</a>
-<a href="#335" id="335">335</a>
-<a href="#336" id="336">336</a>
-<a href="#337" id="337">337</a>
-<a href="#338" id="338">338</a>
-<a href="#339" id="339">339</a>
-<a href="#340" id="340">340</a>
-<a href="#341" id="341">341</a>
-<a href="#342" id="342">342</a>
-<a href="#343" id="343">343</a>
-<a href="#344" id="344">344</a>
-<a href="#345" id="345">345</a>
-<a href="#346" id="346">346</a>
-<a href="#347" id="347">347</a>
-<a href="#348" id="348">348</a>
-<a href="#349" id="349">349</a>
-<a href="#350" id="350">350</a>
-<a href="#351" id="351">351</a>
-<a href="#352" id="352">352</a>
-<a href="#353" id="353">353</a>
-<a href="#354" id="354">354</a>
-<a href="#355" id="355">355</a>
-<a href="#356" id="356">356</a>
-<a href="#357" id="357">357</a>
-<a href="#358" id="358">358</a>
-<a href="#359" id="359">359</a>
-<a href="#360" id="360">360</a>
-<a href="#361" id="361">361</a>
-<a href="#362" id="362">362</a>
-<a href="#363" id="363">363</a>
-<a href="#364" id="364">364</a>
 </pre></div><pre class="rust"><code><span class="kw">use super</span>::{inmemory_record_processor::InMemoryRecordProcessor, <span class="kw-2">*</span>};
 <span class="kw">use crate</span>::{interpreter::InterpretationResult, query_ast::<span class="kw-2">*</span>, result_ast::<span class="kw-2">*</span>};
-<span class="kw">use </span>connector::{<span class="self">self</span>, error::ConnectorError, ConnectionLike, RelAggregationRow, RelAggregationSelection};
+<span class="kw">use </span>connector::{error::ConnectorError, ConnectionLike};
 <span class="kw">use </span>futures::future::{BoxFuture, FutureExt};
 <span class="kw">use </span>query_structure::{ManyRecords, RelationLoadStrategy, RelationSelection};
-<span class="kw">use </span>std::collections::HashMap;
 <span class="kw">use </span>user_facing_errors::KnownError;
 
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>execute&lt;<span class="lifetime">&#39;conn</span>&gt;(
@@ -397,31 +335,28 @@
     <span class="kw">let </span>fut = <span class="kw">async move </span>{
         <span class="kw">let </span>model = query.model;
         <span class="kw">let </span>filter = query.filter.expect(<span class="string">&quot;Expected filter to be set for ReadOne query.&quot;</span>);
-        <span class="kw">let </span>scalars = tx
+        <span class="kw">let </span>record = tx
             .get_single_record(
                 <span class="kw-2">&amp;</span>model,
                 <span class="kw-2">&amp;</span>filter,
                 <span class="kw-2">&amp;</span>query.selected_fields,
-                <span class="kw-2">&amp;</span>query.aggregation_selections,
                 query.relation_load_strategy,
                 trace_id,
             )
             .<span class="kw">await</span><span class="question-mark">?</span>;
 
-        <span class="kw">match </span>scalars {
+        <span class="kw">match </span>record {
             <span class="prelude-val">Some</span>(record) <span class="kw">if </span>query.relation_load_strategy.is_query() =&gt; {
-                <span class="kw">let </span>scalars: ManyRecords = record.into();
-                <span class="kw">let </span>(scalars, aggregation_rows) =
-                    extract_aggregation_rows_from_scalars(scalars, query.aggregation_selections);
-                <span class="kw">let </span>nested: Vec&lt;QueryResult&gt; = process_nested(tx, query.nested, <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span>scalars)).<span class="kw">await</span><span class="question-mark">?</span>;
+                <span class="kw">let </span>records = record.into();
+                <span class="kw">let </span>nested = process_nested(tx, query.nested, <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span>records)).<span class="kw">await</span><span class="question-mark">?</span>;
 
                 <span class="prelude-val">Ok</span>(RecordSelection {
                     name: query.name,
                     fields: query.selection_order,
-                    scalars,
+                    records,
                     nested,
                     model,
-                    aggregation_rows,
+                    virtual_fields: query.selected_fields.virtuals_owned(),
                 }
                 .into())
             }
@@ -443,10 +378,10 @@
             <span class="prelude-val">None </span>=&gt; <span class="prelude-val">Ok</span>(QueryResult::RecordSelection(<span class="prelude-val">Some</span>(Box::new(RecordSelection {
                 name: query.name,
                 fields: query.selection_order,
-                scalars: ManyRecords::default(),
+                records: ManyRecords::default(),
                 nested: <span class="macro">vec!</span>[],
                 model,
-                aggregation_rows: <span class="prelude-val">None</span>,
+                virtual_fields: query.selected_fields.virtuals_owned(),
             })))),
         }
     };
@@ -483,36 +418,33 @@
     </span>};
 
     <span class="kw">let </span>fut = <span class="kw">async move </span>{
-        <span class="kw">let </span>scalars = tx
+        <span class="kw">let </span>records = tx
             .get_many_records(
                 <span class="kw-2">&amp;</span>query.model,
                 query.args.clone(),
                 <span class="kw-2">&amp;</span>query.selected_fields,
-                <span class="kw-2">&amp;</span>query.aggregation_selections,
                 query.relation_load_strategy,
                 trace_id,
             )
             .<span class="kw">await</span><span class="question-mark">?</span>;
 
-        <span class="kw">let </span>scalars = <span class="kw">if let </span><span class="prelude-val">Some</span>(p) = processor {
-            p.apply(scalars)
+        <span class="kw">let </span>records = <span class="kw">if let </span><span class="prelude-val">Some</span>(p) = processor {
+            p.apply(records)
         } <span class="kw">else </span>{
-            scalars
+            records
         };
 
-        <span class="kw">let </span>(scalars, aggregation_rows) = extract_aggregation_rows_from_scalars(scalars, query.aggregation_selections);
-
-        <span class="kw">if </span>scalars.records.is_empty() &amp;&amp; query.options.contains(QueryOption::ThrowOnEmpty) {
+        <span class="kw">if </span>records.records.is_empty() &amp;&amp; query.options.contains(QueryOption::ThrowOnEmpty) {
             record_not_found()
         } <span class="kw">else </span>{
-            <span class="kw">let </span>nested: Vec&lt;QueryResult&gt; = process_nested(tx, query.nested, <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span>scalars)).<span class="kw">await</span><span class="question-mark">?</span>;
+            <span class="kw">let </span>nested: Vec&lt;QueryResult&gt; = process_nested(tx, query.nested, <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span>records)).<span class="kw">await</span><span class="question-mark">?</span>;
             <span class="prelude-val">Ok</span>(RecordSelection {
                 name: query.name,
                 fields: query.selection_order,
-                scalars,
+                records,
                 nested,
                 model: query.model,
-                aggregation_rows,
+                virtual_fields: query.selected_fields.virtuals_owned(),
             }
             .into())
         }
@@ -532,7 +464,6 @@
                 <span class="kw-2">&amp;</span>query.model,
                 query.args.clone(),
                 <span class="kw-2">&amp;</span>query.selected_fields,
-                <span class="kw-2">&amp;</span>query.aggregation_selections,
                 query.relation_load_strategy,
                 trace_id,
             )
@@ -578,7 +509,7 @@
     <span class="kw">let </span>fut = <span class="kw">async move </span>{
         <span class="kw">let </span>relation = query.parent_field.relation();
 
-        <span class="kw">let </span>(scalars, aggregation_rows) = <span class="kw">if </span>relation.is_many_to_many() {
+        <span class="kw">let </span>records = <span class="kw">if </span>relation.is_many_to_many() {
             nested_read::m2m(tx, <span class="kw-2">&amp;mut </span>query, parent_result, trace_id).<span class="kw">await</span><span class="question-mark">?
         </span>} <span class="kw">else </span>{
             nested_read::one2m(
@@ -588,21 +519,20 @@
                 parent_result,
                 query.args.clone(),
                 <span class="kw-2">&amp;</span>query.selected_fields,
-                query.aggregation_selections,
                 trace_id,
             )
             .<span class="kw">await</span><span class="question-mark">?
         </span>};
         <span class="kw">let </span>model = query.parent_field.related_model();
-        <span class="kw">let </span>nested: Vec&lt;QueryResult&gt; = process_nested(tx, query.nested, <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span>scalars)).<span class="kw">await</span><span class="question-mark">?</span>;
+        <span class="kw">let </span>nested: Vec&lt;QueryResult&gt; = process_nested(tx, query.nested, <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span>records)).<span class="kw">await</span><span class="question-mark">?</span>;
 
         <span class="prelude-val">Ok</span>(RecordSelection {
             name: query.name,
             fields: query.selection_order,
-            scalars,
+            records,
             nested,
             model,
-            aggregation_rows,
+            virtual_fields: query.selected_fields.virtuals_owned(),
         }
         .into())
     };
@@ -659,58 +589,6 @@
     };
 
     fut.boxed()
-}
-
-<span class="doccomment">/// Removes the relation aggregation data from the database result and collect it into some RelAggregationRow
-/// Explanation: Relation aggregations on a findMany are selected from an output object type. eg:
-/// findManyX { _count { rel_1, rel 2 } }
-/// Output object types are typically used for selecting relations, so they&#39;re are queried in a different request
-/// In the case of relation aggregations though, we query that data along side the request sent for the base model (&quot;X&quot; in the query above)
-/// This means the SQL result we get back from the database contains additional aggregation data that needs to be remapped according to the schema
-/// This function takes care of removing the aggregation data from the database result and collects it separately
-/// so that it can be serialized separately later according to the schema
-</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>extract_aggregation_rows_from_scalars(
-    <span class="kw-2">mut </span>scalars: ManyRecords,
-    aggr_selections: Vec&lt;RelAggregationSelection&gt;,
-) -&gt; (ManyRecords, <span class="prelude-ty">Option</span>&lt;Vec&lt;RelAggregationRow&gt;&gt;) {
-    <span class="kw">if </span>aggr_selections.is_empty() {
-        <span class="kw">return </span>(scalars, <span class="prelude-val">None</span>);
-    }
-
-    <span class="kw">let </span>aggr_field_names: HashMap&lt;String, <span class="kw-2">&amp;</span>RelAggregationSelection&gt; = aggr_selections
-        .iter()
-        .map(|aggr_sel| (aggr_sel.db_alias(), aggr_sel))
-        .collect();
-
-    <span class="kw">let </span>indexes_to_remove: Vec&lt;<span class="kw">_</span>&gt; = scalars
-        .field_names
-        .iter()
-        .enumerate()
-        .filter_map(|(i, field_name)| aggr_field_names.get(field_name).map(|aggr_sel| (i, <span class="kw-2">*</span>aggr_sel)))
-        .collect();
-
-    <span class="kw">let </span><span class="kw-2">mut </span>aggregation_rows: Vec&lt;RelAggregationRow&gt; = <span class="macro">vec!</span>[];
-
-    <span class="kw">for </span>(n_record_removed, (index_to_remove, aggr_sel)) <span class="kw">in </span>indexes_to_remove.into_iter().enumerate() {
-        <span class="kw">let </span>index_to_remove = index_to_remove - n_record_removed;
-
-        <span class="comment">// Remove all aggr field names
-        </span>scalars.field_names.remove(index_to_remove);
-
-        <span class="comment">// Remove and collect all aggr prisma values
-        </span><span class="kw">for </span>(r_index, record) <span class="kw">in </span>scalars.records.iter_mut().enumerate() {
-            <span class="kw">let </span>val = record.values.remove(index_to_remove);
-            <span class="kw">let </span>aggr_result = aggr_sel.clone().into_result(val);
-
-            <span class="comment">// Group the aggregation results by record
-            </span><span class="kw">match </span>aggregation_rows.get_mut(r_index) {
-                <span class="prelude-val">Some</span>(inner_vec) =&gt; inner_vec.push(aggr_result),
-                <span class="prelude-val">None </span>=&gt; aggregation_rows.push(<span class="macro">vec!</span>[aggr_result]),
-            }
-        }
-    }
-
-    (scalars, <span class="prelude-val">Some</span>(aggregation_rows))
 }
 
 <span class="comment">// Custom error built for findXOrThrow queries, when a record is not found and it needs to throw an error

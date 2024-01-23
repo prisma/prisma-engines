@@ -280,14 +280,13 @@
 <a href="#280" id="280">280</a>
 <a href="#281" id="281">281</a>
 <a href="#282" id="282">282</a>
-<a href="#283" id="283">283</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Prisma read query AST
 </span><span class="kw">use </span><span class="kw">super</span>::FilteredQuery;
 <span class="kw">use </span><span class="kw">crate</span>::ToGraphviz;
-<span class="kw">use </span>connector::{AggregationSelection, RelAggregationSelection};
+<span class="kw">use </span>connector::AggregationSelection;
 <span class="kw">use </span>enumflags2::BitFlags;
 <span class="kw">use </span>query_structure::{prelude::<span class="kw-2">*</span>, Filter, QueryArguments, RelationLoadStrategy};
-<span class="kw">use </span>std::{fmt::Display, mem};
+<span class="kw">use </span>std::fmt::Display;
 
 <span class="attr">#[allow(clippy::enum_variant_names)]
 #[derive(Debug, Clone)]
@@ -318,13 +317,13 @@
     </span><span class="kw">pub fn </span>satisfy_dependency(<span class="kw-2">&amp;mut </span><span class="self">self</span>, field_selection: FieldSelection) {
         <span class="kw">match </span><span class="self">self </span>{
             ReadQuery::RecordQuery(x) =&gt; {
-                x.selected_fields = mem::take(<span class="kw-2">&amp;mut </span>x.selected_fields).merge(field_selection);
+                x.selected_fields.merge_in_place(field_selection);
             }
             ReadQuery::ManyRecordsQuery(x) =&gt; {
-                x.selected_fields = mem::take(<span class="kw-2">&amp;mut </span>x.selected_fields).merge(field_selection);
+                x.selected_fields.merge_in_place(field_selection);
             }
             ReadQuery::RelatedRecordsQuery(x) =&gt; {
-                x.selected_fields = mem::take(<span class="kw-2">&amp;mut </span>x.selected_fields).merge(field_selection);
+                x.selected_fields.merge_in_place(field_selection);
             }
             ReadQuery::AggregateRecordsQuery(<span class="kw">_</span>) =&gt; (),
         }
@@ -357,15 +356,15 @@
         }
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>has_aggregation_selections(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
-        <span class="kw">fn </span>has_aggregations(selections: <span class="kw-2">&amp;</span>[RelAggregationSelection], nested: <span class="kw-2">&amp;</span>[ReadQuery]) -&gt; bool {
-            !selections.is_empty() || nested.iter().any(|q| q.has_aggregation_selections())
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>has_virtual_selections(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="kw">fn </span>has_virtuals(selection: <span class="kw-2">&amp;</span>FieldSelection, nested: <span class="kw-2">&amp;</span>[ReadQuery]) -&gt; bool {
+            selection.has_virtual_fields() || nested.iter().any(|q| q.has_virtual_selections())
         }
 
         <span class="kw">match </span><span class="self">self </span>{
-            ReadQuery::RecordQuery(q) =&gt; has_aggregations(<span class="kw-2">&amp;</span>q.aggregation_selections, <span class="kw-2">&amp;</span>q.nested),
-            ReadQuery::ManyRecordsQuery(q) =&gt; has_aggregations(<span class="kw-2">&amp;</span>q.aggregation_selections, <span class="kw-2">&amp;</span>q.nested),
-            ReadQuery::RelatedRecordsQuery(q) =&gt; has_aggregations(<span class="kw-2">&amp;</span>q.aggregation_selections, <span class="kw-2">&amp;</span>q.nested),
+            ReadQuery::RecordQuery(q) =&gt; has_virtuals(<span class="kw-2">&amp;</span>q.selected_fields, <span class="kw-2">&amp;</span>q.nested),
+            ReadQuery::ManyRecordsQuery(q) =&gt; has_virtuals(<span class="kw-2">&amp;</span>q.selected_fields, <span class="kw-2">&amp;</span>q.nested),
+            ReadQuery::RelatedRecordsQuery(q) =&gt; has_virtuals(<span class="kw-2">&amp;</span>q.selected_fields, <span class="kw-2">&amp;</span>q.nested),
             ReadQuery::AggregateRecordsQuery(<span class="kw">_</span>) =&gt; <span class="bool-val">false</span>,
         }
     }
@@ -481,10 +480,10 @@
     <span class="kw">pub </span>alias: <span class="prelude-ty">Option</span>&lt;String&gt;,
     <span class="kw">pub </span>model: Model,
     <span class="kw">pub </span>filter: <span class="prelude-ty">Option</span>&lt;Filter&gt;,
-    <span class="kw">pub </span>selected_fields: FieldSelection,
+    <span class="comment">// TODO: split into `user_selection` and `full_selection` and get rid of `selection_order`
+    </span><span class="kw">pub </span>selected_fields: FieldSelection,
     <span class="kw">pub</span>(<span class="kw">crate</span>) nested: Vec&lt;ReadQuery&gt;,
     <span class="kw">pub </span>selection_order: Vec&lt;String&gt;,
-    <span class="kw">pub </span>aggregation_selections: Vec&lt;RelAggregationSelection&gt;,
     <span class="kw">pub </span>options: QueryOptions,
     <span class="kw">pub </span>relation_load_strategy: RelationLoadStrategy,
 }
@@ -495,10 +494,10 @@
     <span class="kw">pub </span>alias: <span class="prelude-ty">Option</span>&lt;String&gt;,
     <span class="kw">pub </span>model: Model,
     <span class="kw">pub </span>args: QueryArguments,
-    <span class="kw">pub </span>selected_fields: FieldSelection,
+    <span class="comment">// TODO: split into `user_selection` and `full_selection` and get rid of `selection_order`
+    </span><span class="kw">pub </span>selected_fields: FieldSelection,
     <span class="kw">pub</span>(<span class="kw">crate</span>) nested: Vec&lt;ReadQuery&gt;,
     <span class="kw">pub </span>selection_order: Vec&lt;String&gt;,
-    <span class="kw">pub </span>aggregation_selections: Vec&lt;RelAggregationSelection&gt;,
     <span class="kw">pub </span>options: QueryOptions,
     <span class="kw">pub </span>relation_load_strategy: RelationLoadStrategy,
 }
@@ -509,11 +508,10 @@
     <span class="kw">pub </span>alias: <span class="prelude-ty">Option</span>&lt;String&gt;,
     <span class="kw">pub </span>parent_field: RelationFieldRef,
     <span class="kw">pub </span>args: QueryArguments,
-    <span class="kw">pub </span>selected_fields: FieldSelection,
+    <span class="comment">// TODO: split into `user_selection` and `full_selection` and get rid of `selection_order`
+    </span><span class="kw">pub </span>selected_fields: FieldSelection,
     <span class="kw">pub </span>nested: Vec&lt;ReadQuery&gt;,
     <span class="kw">pub </span>selection_order: Vec&lt;String&gt;,
-    <span class="kw">pub </span>aggregation_selections: Vec&lt;RelAggregationSelection&gt;,
-
     <span class="doccomment">/// Fields and values of the parent to satisfy the relation query without
     /// relying on the parent result passed by the interpreter.
     </span><span class="kw">pub </span>parent_results: <span class="prelude-ty">Option</span>&lt;Vec&lt;SelectionResult&gt;&gt;,
@@ -528,8 +526,8 @@
         <span class="self">self</span>.args.distinct.is_some() || <span class="self">self</span>.nested.iter().any(|q| q.has_distinct())
     }
 
-    <span class="kw">pub fn </span>has_aggregation_selections(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
-        !<span class="self">self</span>.aggregation_selections.is_empty() || <span class="self">self</span>.nested.iter().any(|q| q.has_aggregation_selections())
+    <span class="kw">pub fn </span>has_virtual_selections(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.selected_fields.has_virtual_fields() || <span class="self">self</span>.nested.iter().any(|q| q.has_virtual_selections())
     }
 }
 

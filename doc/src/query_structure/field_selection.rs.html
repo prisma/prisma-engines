@@ -382,15 +382,112 @@
 <a href="#382" id="382">382</a>
 <a href="#383" id="383">383</a>
 <a href="#384" id="384">384</a>
+<a href="#385" id="385">385</a>
+<a href="#386" id="386">386</a>
+<a href="#387" id="387">387</a>
+<a href="#388" id="388">388</a>
+<a href="#389" id="389">389</a>
+<a href="#390" id="390">390</a>
+<a href="#391" id="391">391</a>
+<a href="#392" id="392">392</a>
+<a href="#393" id="393">393</a>
+<a href="#394" id="394">394</a>
+<a href="#395" id="395">395</a>
+<a href="#396" id="396">396</a>
+<a href="#397" id="397">397</a>
+<a href="#398" id="398">398</a>
+<a href="#399" id="399">399</a>
+<a href="#400" id="400">400</a>
+<a href="#401" id="401">401</a>
+<a href="#402" id="402">402</a>
+<a href="#403" id="403">403</a>
+<a href="#404" id="404">404</a>
+<a href="#405" id="405">405</a>
+<a href="#406" id="406">406</a>
+<a href="#407" id="407">407</a>
+<a href="#408" id="408">408</a>
+<a href="#409" id="409">409</a>
+<a href="#410" id="410">410</a>
+<a href="#411" id="411">411</a>
+<a href="#412" id="412">412</a>
+<a href="#413" id="413">413</a>
+<a href="#414" id="414">414</a>
+<a href="#415" id="415">415</a>
+<a href="#416" id="416">416</a>
+<a href="#417" id="417">417</a>
+<a href="#418" id="418">418</a>
+<a href="#419" id="419">419</a>
+<a href="#420" id="420">420</a>
+<a href="#421" id="421">421</a>
+<a href="#422" id="422">422</a>
+<a href="#423" id="423">423</a>
+<a href="#424" id="424">424</a>
+<a href="#425" id="425">425</a>
+<a href="#426" id="426">426</a>
+<a href="#427" id="427">427</a>
+<a href="#428" id="428">428</a>
+<a href="#429" id="429">429</a>
+<a href="#430" id="430">430</a>
+<a href="#431" id="431">431</a>
+<a href="#432" id="432">432</a>
+<a href="#433" id="433">433</a>
+<a href="#434" id="434">434</a>
+<a href="#435" id="435">435</a>
+<a href="#436" id="436">436</a>
+<a href="#437" id="437">437</a>
+<a href="#438" id="438">438</a>
+<a href="#439" id="439">439</a>
+<a href="#440" id="440">440</a>
+<a href="#441" id="441">441</a>
+<a href="#442" id="442">442</a>
+<a href="#443" id="443">443</a>
+<a href="#444" id="444">444</a>
+<a href="#445" id="445">445</a>
+<a href="#446" id="446">446</a>
+<a href="#447" id="447">447</a>
+<a href="#448" id="448">448</a>
+<a href="#449" id="449">449</a>
+<a href="#450" id="450">450</a>
+<a href="#451" id="451">451</a>
+<a href="#452" id="452">452</a>
+<a href="#453" id="453">453</a>
+<a href="#454" id="454">454</a>
+<a href="#455" id="455">455</a>
+<a href="#456" id="456">456</a>
+<a href="#457" id="457">457</a>
+<a href="#458" id="458">458</a>
+<a href="#459" id="459">459</a>
+<a href="#460" id="460">460</a>
+<a href="#461" id="461">461</a>
+<a href="#462" id="462">462</a>
+<a href="#463" id="463">463</a>
+<a href="#464" id="464">464</a>
+<a href="#465" id="465">465</a>
+<a href="#466" id="466">466</a>
+<a href="#467" id="467">467</a>
+<a href="#468" id="468">468</a>
+<a href="#469" id="469">469</a>
+<a href="#470" id="470">470</a>
+<a href="#471" id="471">471</a>
+<a href="#472" id="472">472</a>
+<a href="#473" id="473">473</a>
+<a href="#474" id="474">474</a>
+<a href="#475" id="475">475</a>
+<a href="#476" id="476">476</a>
+<a href="#477" id="477">477</a>
+<a href="#478" id="478">478</a>
+<a href="#479" id="479">479</a>
+<a href="#480" id="480">480</a>
+<a href="#481" id="481">481</a>
 </pre></div><pre class="rust"><code><span class="kw">use crate</span>::{
     parent_container::ParentContainer, prisma_value_ext::PrismaValueExtensions, CompositeFieldRef, DomainError, Field,
-    Model, ModelProjection, QueryArguments, RelationField, ScalarField, ScalarFieldRef, SelectionResult,
-    TypeIdentifier,
+    Filter, Model, ModelProjection, QueryArguments, RelationField, RelationFieldRef, ScalarField, ScalarFieldRef,
+    SelectionResult, TypeIdentifier,
 };
 <span class="kw">use </span>itertools::Itertools;
 <span class="kw">use </span>prisma_value::PrismaValue;
 <span class="kw">use </span>psl::schema_ast::ast::FieldArity;
-<span class="kw">use </span>std::fmt::Display;
+<span class="kw">use </span>std::{borrow::Cow, fmt::Display};
 
 <span class="doccomment">/// A selection of fields from a model.
 </span><span class="attr">#[derive(Debug, Clone, PartialEq, Default, Hash, Eq)]
@@ -419,6 +516,7 @@
                 .unwrap_or(<span class="bool-val">false</span>),
             <span class="comment">// TODO: Relation selections are ignored for now to prevent breaking the existing query-based strategy to resolve relations.
             </span>SelectedField::Relation(<span class="kw">_</span>) =&gt; <span class="bool-val">true</span>,
+            SelectedField::Virtual(vs) =&gt; <span class="self">self</span>.contains(<span class="kw-2">&amp;</span>vs.db_alias()),
         })
     }
 
@@ -426,16 +524,44 @@
         <span class="self">self</span>.selections.iter()
     }
 
+    <span class="kw">pub fn </span>virtuals(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw">impl </span>Iterator&lt;Item = <span class="kw-2">&amp;</span>VirtualSelection&gt; {
+        <span class="self">self</span>.selections().filter_map(|field| <span class="kw">match </span>field {
+            SelectedField::Virtual(<span class="kw-2">ref </span>vs) =&gt; <span class="prelude-val">Some</span>(vs),
+            <span class="kw">_ </span>=&gt; <span class="prelude-val">None</span>,
+        })
+    }
+
+    <span class="kw">pub fn </span>virtuals_owned(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Vec&lt;VirtualSelection&gt; {
+        <span class="self">self</span>.virtuals().cloned().collect()
+    }
+
+    <span class="kw">pub fn </span>without_relations(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="self">Self </span>{
+        FieldSelection::new(
+            <span class="self">self</span>.selections()
+                .filter(|field| !<span class="macro">matches!</span>(field, SelectedField::Relation(<span class="kw">_</span>)))
+                .cloned()
+                .collect(),
+        )
+    }
+
+    <span class="kw">pub fn </span>into_virtuals_last(<span class="self">self</span>) -&gt; <span class="self">Self </span>{
+        <span class="kw">let </span>(virtuals, non_virtuals): (Vec&lt;<span class="kw">_</span>&gt;, Vec&lt;<span class="kw">_</span>&gt;) = <span class="self">self
+            </span>.into_iter()
+            .partition(|field| <span class="macro">matches!</span>(field, SelectedField::Virtual(<span class="kw">_</span>)));
+
+        FieldSelection::new(non_virtuals.into_iter().chain(virtuals).collect())
+    }
+
     <span class="doccomment">/// Returns all Prisma (e.g. schema model field) names of contained fields.
     /// Does _not_ recurse into composite selections and only iterates top level fields.
     </span><span class="kw">pub fn </span>prisma_names(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw">impl </span>Iterator&lt;Item = String&gt; + <span class="lifetime">&#39;_ </span>{
-        <span class="self">self</span>.selections.iter().map(|f| f.prisma_name().to_owned())
+        <span class="self">self</span>.selections.iter().map(|f| f.prisma_name().into_owned())
     }
 
     <span class="doccomment">/// Returns all database (e.g. column or document field) names of contained fields.
     /// Does _not_ recurse into composite selections and only iterates level fields.
     </span><span class="kw">pub fn </span>db_names(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw">impl </span>Iterator&lt;Item = String&gt; + <span class="lifetime">&#39;_ </span>{
-        <span class="self">self</span>.selections.iter().map(|f| f.db_name().to_owned())
+        <span class="self">self</span>.selections.iter().map(|f| f.db_name().into_owned())
     }
 
     <span class="doccomment">/// Checked if a field of prisma name `name` is present in this `FieldSelection`.
@@ -453,6 +579,7 @@
                 SelectedField::Scalar(sf) =&gt; sf.clone().into(),
                 SelectedField::Composite(cf) =&gt; cf.field.clone().into(),
                 SelectedField::Relation(rs) =&gt; rs.field.clone().into(),
+                SelectedField::Virtual(vs) =&gt; vs.field(),
             })
             .collect()
     }
@@ -466,6 +593,7 @@
                 SelectedField::Scalar(sf) =&gt; <span class="prelude-val">Some</span>(sf.clone()),
                 SelectedField::Composite(<span class="kw">_</span>) =&gt; <span class="prelude-val">None</span>,
                 SelectedField::Relation(<span class="kw">_</span>) =&gt; <span class="prelude-val">None</span>,
+                SelectedField::Virtual(<span class="kw">_</span>) =&gt; <span class="prelude-val">None</span>,
             })
             .collect::&lt;Vec&lt;<span class="kw">_</span>&gt;&gt;();
 
@@ -542,6 +670,7 @@
                 SelectedField::Relation(rf) <span class="kw">if </span>rf.field.is_list() =&gt; <span class="prelude-val">Some</span>((TypeIdentifier::Json, FieldArity::Required)),
                 SelectedField::Relation(rf) =&gt; <span class="prelude-val">Some</span>((TypeIdentifier::Json, rf.field.arity())),
                 SelectedField::Composite(<span class="kw">_</span>) =&gt; <span class="prelude-val">None</span>,
+                SelectedField::Virtual(vs) =&gt; <span class="prelude-val">Some</span>(vs.type_identifier_with_arity()),
             })
             .collect()
     }
@@ -556,15 +685,20 @@
     <span class="kw">pub fn </span>into_projection(<span class="self">self</span>) -&gt; ModelProjection {
         <span class="self">self</span>.into()
     }
+
+    <span class="kw">pub fn </span>has_virtual_fields(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.selections()
+            .any(|field| <span class="macro">matches!</span>(field, SelectedField::Virtual(<span class="kw">_</span>)))
+    }
 }
 
 <span class="doccomment">/// A selected field. Can be contained on a model or composite type.
-</span><span class="comment">// Todo: Think about virtual selections like aggregations.
 </span><span class="attr">#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 </span><span class="kw">pub enum </span>SelectedField {
     Scalar(ScalarFieldRef),
     Composite(CompositeSelection),
     Relation(RelationSelection),
+    Virtual(VirtualSelection),
 }
 
 <span class="attr">#[derive(Debug, Clone, PartialEq, Eq, Hash)]
@@ -597,20 +731,76 @@
     }
 }
 
-<span class="kw">impl </span>SelectedField {
-    <span class="kw">pub fn </span>prisma_name(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>str {
+<span class="attr">#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+</span><span class="kw">pub enum </span>VirtualSelection {
+    RelationCount(RelationFieldRef, <span class="prelude-ty">Option</span>&lt;Filter&gt;),
+}
+
+<span class="kw">impl </span>VirtualSelection {
+    <span class="kw">pub fn </span>db_alias(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; String {
         <span class="kw">match </span><span class="self">self </span>{
-            SelectedField::Scalar(sf) =&gt; sf.name(),
-            SelectedField::Composite(cf) =&gt; cf.field.name(),
-            SelectedField::Relation(rs) =&gt; rs.field.name(),
+            <span class="self">Self</span>::RelationCount(rf, <span class="kw">_</span>) =&gt; <span class="macro">format!</span>(<span class="string">&quot;_aggr_count_{}&quot;</span>, rf.name()),
         }
     }
 
-    <span class="kw">pub fn </span>db_name(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>str {
+    <span class="kw">pub fn </span>serialized_name(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; (<span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str, <span class="kw-2">&amp;</span>str) {
         <span class="kw">match </span><span class="self">self </span>{
-            SelectedField::Scalar(sf) =&gt; sf.db_name(),
-            SelectedField::Composite(cs) =&gt; cs.field.db_name(),
-            SelectedField::Relation(rs) =&gt; rs.field.name(),
+            <span class="comment">// TODO: we can&#39;t use UNDERSCORE_COUNT here because it would require a circular
+            // dependency between `schema` and `query-structure` crates.
+            </span><span class="self">Self</span>::RelationCount(rf, <span class="kw">_</span>) =&gt; (<span class="string">&quot;_count&quot;</span>, rf.name()),
+        }
+    }
+
+    <span class="kw">pub fn </span>model(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Model {
+        <span class="kw">match </span><span class="self">self </span>{
+            <span class="self">Self</span>::RelationCount(rf, <span class="kw">_</span>) =&gt; rf.model(),
+        }
+    }
+
+    <span class="kw">pub fn </span>coerce_value(<span class="kw-2">&amp;</span><span class="self">self</span>, value: PrismaValue) -&gt; <span class="kw">crate</span>::Result&lt;PrismaValue&gt; {
+        <span class="kw">match </span><span class="self">self </span>{
+            <span class="self">Self</span>::RelationCount(<span class="kw">_</span>, <span class="kw">_</span>) =&gt; <span class="kw">match </span>value {
+                PrismaValue::Null =&gt; <span class="prelude-val">Ok</span>(PrismaValue::Int(<span class="number">0</span>)),
+                <span class="kw">_ </span>=&gt; value.coerce(TypeIdentifier::Int),
+            },
+        }
+    }
+
+    <span class="kw">pub fn </span>field(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Field {
+        <span class="kw">match </span><span class="self">self </span>{
+            <span class="self">Self</span>::RelationCount(rf, <span class="kw">_</span>) =&gt; rf.clone().into(),
+        }
+    }
+
+    <span class="kw">pub fn </span>type_identifier_with_arity(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; (TypeIdentifier, FieldArity) {
+        <span class="kw">match </span><span class="self">self </span>{
+            <span class="self">Self</span>::RelationCount(<span class="kw">_</span>, <span class="kw">_</span>) =&gt; (TypeIdentifier::Int, FieldArity::Required),
+        }
+    }
+}
+
+<span class="kw">impl </span>Display <span class="kw">for </span>VirtualSelection {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>std::fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; std::fmt::Result {
+        <span class="macro">write!</span>(f, <span class="string">&quot;{}&quot;</span>, <span class="self">self</span>.db_alias())
+    }
+}
+
+<span class="kw">impl </span>SelectedField {
+    <span class="kw">pub fn </span>prisma_name(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Cow&lt;<span class="lifetime">&#39;_</span>, str&gt; {
+        <span class="kw">match </span><span class="self">self </span>{
+            SelectedField::Scalar(sf) =&gt; sf.name().into(),
+            SelectedField::Composite(cf) =&gt; cf.field.name().into(),
+            SelectedField::Relation(rs) =&gt; rs.field.name().into(),
+            SelectedField::Virtual(vs) =&gt; vs.db_alias().into(),
+        }
+    }
+
+    <span class="kw">pub fn </span>db_name(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Cow&lt;<span class="lifetime">&#39;_</span>, str&gt; {
+        <span class="kw">match </span><span class="self">self </span>{
+            SelectedField::Scalar(sf) =&gt; sf.db_name().into(),
+            SelectedField::Composite(cs) =&gt; cs.field.db_name().into(),
+            SelectedField::Relation(rs) =&gt; rs.field.name().into(),
+            SelectedField::Virtual(vs) =&gt; vs.db_alias().into(),
         }
     }
 
@@ -626,15 +816,17 @@
             SelectedField::Scalar(sf) =&gt; sf.container(),
             SelectedField::Composite(cs) =&gt; cs.field.container(),
             SelectedField::Relation(rs) =&gt; ParentContainer::from(rs.field.model()),
+            SelectedField::Virtual(vs) =&gt; ParentContainer::from(vs.model()),
         }
     }
 
     <span class="doccomment">/// Coerces a value to fit the selection. If the conversion is not possible, an error will be thrown.
     </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>coerce_value(<span class="kw-2">&amp;</span><span class="self">self</span>, value: PrismaValue) -&gt; <span class="kw">crate</span>::Result&lt;PrismaValue&gt; {
         <span class="kw">match </span><span class="self">self </span>{
-            SelectedField::Scalar(sf) =&gt; value.coerce(<span class="kw-2">&amp;</span>sf.type_identifier()),
+            SelectedField::Scalar(sf) =&gt; value.coerce(sf.type_identifier()),
             SelectedField::Composite(cs) =&gt; cs.coerce_value(value),
             SelectedField::Relation(<span class="kw">_</span>) =&gt; <span class="macro">todo!</span>(),
+            SelectedField::Virtual(vs) =&gt; vs.coerce_value(value),
         }
     }
 
@@ -661,7 +853,8 @@
                     .map(|cs| cs.is_superset_of(other_cs))
                     .unwrap_or(<span class="bool-val">false</span>),
                 SelectedField::Relation(<span class="kw">_</span>) =&gt; <span class="bool-val">true</span>, <span class="comment">// A composite selection cannot hold relations.
-            </span>})
+                </span>SelectedField::Virtual(vs) =&gt; <span class="self">self</span>.contains(<span class="kw-2">&amp;</span>vs.db_alias()),
+            })
     }
 
     <span class="kw">pub fn </span>contains(<span class="kw-2">&amp;</span><span class="self">self</span>, name: <span class="kw-2">&amp;</span>str) -&gt; bool {
@@ -742,6 +935,7 @@
                 rs.field,
                 rs.selections.iter().map(|selection| <span class="macro">format!</span>(<span class="string">&quot;{selection}&quot;</span>)).join(<span class="string">&quot;, &quot;</span>)
             ),
+            SelectedField::Virtual(vs) =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;{vs}&quot;</span>),
         }
     }
 }
