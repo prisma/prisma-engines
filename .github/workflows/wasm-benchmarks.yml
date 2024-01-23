@@ -54,13 +54,9 @@ jobs:
         run: |
           make run-bench | tee results.txt          
 
-          regressed_values=$(grep "slower than Web Assembly: Latest" results.txt | cut -f1 -d'x')
-          echo "Regressed values:"
-          echo $regressed_values
-
+          # Extract the values from the benchmark output
+          regressed_values=$(grep "slower than Web Assembly: Latest" results.txt | cut -f1 -d'x')          
           improved_values=$(grep "faster than Web Assembly: Latest" results.txt | cut -f1 -d'x')          
-          echo "Improved values:"
-          echo $improved_values
 
           # Initialize sum variable and count
           total_sum=0
@@ -71,14 +67,14 @@ jobs:
               inverted=$(echo "scale=4; 1/$value" | bc)
               echo "Regressed value: $inverted"
               total_sum=$(echo "$total_sum + $inverted" | bc)
-              ((total_count++))
+              total_count=$((total_count + 1))
           done
 
           # Add the improved values to the sum
           for value in $improved_values; do
               echo "Improved value: $value"
               total_sum=$(echo "$total_sum + $value" | bc)
-              ((total_count++))
+              total_count=$((total_count + 1))
           done
 
           if [ $total_count -eq 0 ]; then
@@ -88,24 +84,23 @@ jobs:
 
           mean=$(echo "scale=4; $total_sum / $total_count" | bc)
 
-
           echo "Extracted $total_count values from the benchmark output"
           echo "Total sum: $total_sum"
           echo "Total count: $total_count"
           echo "Mean: $mean"
 
-          # Calculate the percentage of improvement or worsening
-          if (( $(echo "$mean > 1.01" | bc -l) )); then
-              change_percentage=$(echo "scale=4; $mean - 1" | bc)
-              summary="🚀 WASM query-engine performance will improve by $(echo "$change_percentage * 100" | bc) percent"
-              status=passed
-          elif (( $(echo "$mean < 0.99" | bc -l) )); then
-              change_percentage=$(echo "scale=4; (1 / $mean) - 1" | bc)
-              summary="❌ WASM query-engine performance will worsen by $(echo "$change_percentage * 100" | bc) percent"
+          # Report improvement or worsening. Fails if >= 1.5% worsening.          
+          if (( $(echo "$mean < 0.985" | bc -l) )); then
+              percent=$(echo "scale=4; ((1 / $mean) - 1) * 100" | bc)
+              summary="❌ WASM query-engine performance will worsen by $(printf %.2f "$percent")%"
               status=failed
+          elif (( $(echo "$mean > 1.015" | bc -l) )); then
+              percent=$(echo "scale=4; ($mean - 1) * 100" | bc)
+              summary="🚀 WASM query-engine performance will improve by $(printf %.2f "$percent")%"
+              status=passed
           else
-              change_percentage=$(echo "scale=4; (1 / $mean)" | bc)
-              summary="✅ WASM query-engine performance won't change substantially. AVG(latency) = $(echo "$change_percentage")x"
+              delta=$(echo "scale=4; (1 / $mean)" | bc)
+              summary="✅ WASM query-engine performance won't change substantially. AVG(latency) = $(printf %.2f "$delta")x"
               status=passed
           fi
 
