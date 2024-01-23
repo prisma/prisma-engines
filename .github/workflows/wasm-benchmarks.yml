@@ -99,8 +99,8 @@ jobs:
               summary="🚀 WASM query-engine performance will improve by $(printf %.2f "$percent")%"
               status=passed
           else
-              delta=$(echo "scale=4; (1 / $mean)" | bc)
-              summary="✅ WASM query-engine performance won't change substantially. AVG(latency) = $(printf %.2f "$delta")x"
+              delta=$(echo "scale=3; (1 / $mean)" | bc)
+              summary="✅ WASM query-engine performance won't change substantially ($(printf %.3f "$delta")x)"
               status=passed
           fi
 
