@@ -335,7 +335,7 @@ impl SelectedField {
             SelectedField::Scalar(sf) => sf.container(),
             SelectedField::Composite(cs) => cs.field.container(),
             SelectedField::Relation(rs) => ParentContainer::from(rs.field.model()),
-            SelectedField::Virtual(vs) => ParentContainer::from(vs.model()), // TODO
+            SelectedField::Virtual(vs) => ParentContainer::from(vs.model()),
         }
     }
 
