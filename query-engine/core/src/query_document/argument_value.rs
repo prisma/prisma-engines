@@ -4,6 +4,8 @@ use indexmap::IndexMap;
 use query_structure::PrismaValue;
 use serde::Serialize;
 
+use super::raw_json_value::RawJson;
+
 pub type ArgumentValueObject = IndexMap<String, ArgumentValue>;
 
 /// Represents the input values in a Document.
@@ -14,6 +16,7 @@ pub enum ArgumentValue {
     Scalar(PrismaValue),
     Object(ArgumentValueObject),
     List(Vec<ArgumentValue>),
+    Json(RawJson),
     FieldRef(ArgumentValueObject),
 }
 
@@ -43,7 +46,7 @@ impl ArgumentValue {
     }
 
     pub fn json(str: String) -> Self {
-        Self::Scalar(PrismaValue::Json(str))
+        Self::Json(RawJson::from_string(str))
     }
 
     pub fn bytes(bytes: Vec<u8>) -> Self {
@@ -76,6 +79,7 @@ impl ArgumentValue {
     pub(crate) fn should_be_parsed_as_json(&self) -> bool {
         match self {
             ArgumentValue::Object(_) => true,
+            ArgumentValue::Json(_) => true,
             ArgumentValue::List(l) => l.iter().all(|v| v.should_be_parsed_as_json()),
             ArgumentValue::Scalar(pv) => !matches!(pv, PrismaValue::Enum(_) | PrismaValue::Json(_)),
             ArgumentValue::FieldRef(_) => false,

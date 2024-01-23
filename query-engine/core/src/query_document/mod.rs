@@ -18,6 +18,7 @@ mod argument_value;
 mod operation;
 mod parse_ast;
 mod parser;
+mod raw_json_value;
 mod selection;
 mod transformers;
 
