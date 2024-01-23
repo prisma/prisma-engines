@@ -795,7 +795,6 @@ impl QueryGraph {
                 selected_fields: identifiers.merge(primary_model_id.clone()),
                 nested: vec![],
                 selection_order: vec![],
-                aggregation_selections: vec![],
                 options: QueryOptions::none(),
                 relation_load_strategy: query_structure::RelationLoadStrategy::Query,
             });

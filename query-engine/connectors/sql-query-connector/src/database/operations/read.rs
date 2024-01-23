@@ -17,23 +17,12 @@ pub(crate) async fn get_single_record(
     model: &Model,
     filter: &Filter,
     selected_fields: &FieldSelection,
-    aggr_selections: &[RelAggregationSelection],
     relation_load_strategy: RelationLoadStrategy,
     ctx: &Context<'_>,
 ) -> crate::Result<Option<SingleRecord>> {
     match relation_load_strategy {
         RelationLoadStrategy::Join => get_single_record_joins(conn, model, filter, selected_fields, ctx).await,
-        RelationLoadStrategy::Query => {
-            get_single_record_wo_joins(
-                conn,
-                model,
-                filter,
-                &ModelProjection::from(selected_fields),
-                aggr_selections,
-                ctx,
-            )
-            .await
-        }
+        RelationLoadStrategy::Query => get_single_record_wo_joins(conn, model, filter, selected_fields, ctx).await,
     }
 }
 
@@ -67,30 +56,24 @@ pub(crate) async fn get_single_record_wo_joins(
     conn: &dyn Queryable,
     model: &Model,
     filter: &Filter,
-    selected_fields: &ModelProjection,
-    aggr_selections: &[RelAggregationSelection],
+    selected_fields: &FieldSelection,
     ctx: &Context<'_>,
 ) -> crate::Result<Option<SingleRecord>> {
+    let selected_fields = selected_fields.without_relations().into_virtuals_last();
+
     let query = read::get_records(
         model,
-        selected_fields.as_columns(ctx).mark_all_selected(),
-        aggr_selections,
+        ModelProjection::from(&selected_fields)
+            .as_columns(ctx)
+            .mark_all_selected(),
+        selected_fields.virtuals(),
         filter,
         ctx,
     );
 
-    let mut field_names: Vec<_> = selected_fields.db_names().collect();
-    let mut aggr_field_names: Vec<_> = aggr_selections.iter().map(|aggr_sel| aggr_sel.db_alias()).collect();
+    let field_names: Vec<_> = selected_fields.db_names().collect();
 
-    field_names.append(&mut aggr_field_names);
-
-    let mut idents = selected_fields.type_identifiers_with_arities();
-    let mut aggr_idents = aggr_selections
-        .iter()
-        .map(|aggr_sel| aggr_sel.type_identifier_with_arity())
-        .collect();
-
-    idents.append(&mut aggr_idents);
+    let idents = selected_fields.type_identifiers_with_arities();
 
     let record = execute_find_one(conn, query, &idents, &field_names, ctx)
         .await?
@@ -124,24 +107,13 @@ pub(crate) async fn get_many_records(
     model: &Model,
     query_arguments: QueryArguments,
     selected_fields: &FieldSelection,
-    aggr_selections: &[RelAggregationSelection],
     relation_load_strategy: RelationLoadStrategy,
     ctx: &Context<'_>,
 ) -> crate::Result<ManyRecords> {
     match relation_load_strategy {
-        RelationLoadStrategy::Join => {
-            get_many_records_joins(conn, model, query_arguments, selected_fields, aggr_selections, ctx).await
-        }
+        RelationLoadStrategy::Join => get_many_records_joins(conn, model, query_arguments, selected_fields, ctx).await,
         RelationLoadStrategy::Query => {
-            get_many_records_wo_joins(
-                conn,
-                model,
-                query_arguments,
-                &ModelProjection::from(selected_fields),
-                aggr_selections,
-                ctx,
-            )
-            .await
+            get_many_records_wo_joins(conn, model, query_arguments, selected_fields, ctx).await
         }
     }
 }
@@ -151,7 +123,6 @@ pub(crate) async fn get_many_records_joins(
     _model: &Model,
     query_arguments: QueryArguments,
     selected_fields: &FieldSelection,
-    _aggr_selections: &[RelAggregationSelection],
     ctx: &Context<'_>,
 ) -> crate::Result<ManyRecords> {
     let field_names: Vec<_> = selected_fields.db_names().collect();
@@ -197,25 +168,14 @@ pub(crate) async fn get_many_records_wo_joins(
     conn: &dyn Queryable,
     model: &Model,
     mut query_arguments: QueryArguments,
-    selected_fields: &ModelProjection,
-    aggr_selections: &[RelAggregationSelection],
+    selected_fields: &FieldSelection,
     ctx: &Context<'_>,
 ) -> crate::Result<ManyRecords> {
+    let selected_fields = selected_fields.without_relations().into_virtuals_last();
     let reversed = query_arguments.needs_reversed_order();
 
-    let mut field_names: Vec<_> = selected_fields.db_names().collect();
-    let mut aggr_field_names: Vec<_> = aggr_selections.iter().map(|aggr_sel| aggr_sel.db_alias()).collect();
-
-    field_names.append(&mut aggr_field_names);
-
-    let mut aggr_idents = aggr_selections
-        .iter()
-        .map(|aggr_sel| aggr_sel.type_identifier_with_arity())
-        .collect();
-
-    let mut idents = selected_fields.type_identifiers_with_arities();
-
-    idents.append(&mut aggr_idents);
+    let field_names: Vec<_> = selected_fields.db_names().collect();
+    let idents = selected_fields.type_identifiers_with_arities();
 
     let meta = column_metadata::create(field_names.as_slice(), idents.as_slice());
     let mut records = ManyRecords::new(field_names.clone());
@@ -252,8 +212,10 @@ pub(crate) async fn get_many_records_wo_joins(
             for args in batches.into_iter() {
                 let query = read::get_records(
                     model,
-                    selected_fields.as_columns(ctx).mark_all_selected(),
-                    aggr_selections,
+                    ModelProjection::from(&selected_fields)
+                        .as_columns(ctx)
+                        .mark_all_selected(),
+                    selected_fields.virtuals(),
                     args,
                     ctx,
                 );
@@ -274,8 +236,10 @@ pub(crate) async fn get_many_records_wo_joins(
         _ => {
             let query = read::get_records(
                 model,
-                selected_fields.as_columns(ctx).mark_all_selected(),
-                aggr_selections,
+                ModelProjection::from(&selected_fields)
+                    .as_columns(ctx)
+                    .mark_all_selected(),
+                selected_fields.virtuals(),
                 query_arguments,
                 ctx,
             );

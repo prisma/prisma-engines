@@ -31,6 +31,7 @@ impl From<&FieldSelection> for ModelProjection {
                     SelectedField::Scalar(sf) => Some(sf.clone().into()),
                     SelectedField::Composite(_cf) => None,
                     SelectedField::Relation(_) => None,
+                    SelectedField::Virtual(_) => None,
                 })
                 .collect(),
         }

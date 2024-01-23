@@ -1,10 +1,10 @@
 //! Prisma read query AST
 use super::FilteredQuery;
 use crate::ToGraphviz;
-use connector::{AggregationSelection, RelAggregationSelection};
+use connector::AggregationSelection;
 use enumflags2::BitFlags;
 use query_structure::{prelude::*, Filter, QueryArguments, RelationLoadStrategy};
-use std::{fmt::Display, mem};
+use std::fmt::Display;
 
 #[allow(clippy::enum_variant_names)]
 #[derive(Debug, Clone)]
@@ -35,13 +35,13 @@ impl ReadQuery {
     pub fn satisfy_dependency(&mut self, field_selection: FieldSelection) {
         match self {
             ReadQuery::RecordQuery(x) => {
-                x.selected_fields = mem::take(&mut x.selected_fields).merge(field_selection);
+                x.selected_fields.merge_in_place(field_selection);
             }
             ReadQuery::ManyRecordsQuery(x) => {
-                x.selected_fields = mem::take(&mut x.selected_fields).merge(field_selection);
+                x.selected_fields.merge_in_place(field_selection);
             }
             ReadQuery::RelatedRecordsQuery(x) => {
-                x.selected_fields = mem::take(&mut x.selected_fields).merge(field_selection);
+                x.selected_fields.merge_in_place(field_selection);
             }
             ReadQuery::AggregateRecordsQuery(_) => (),
         }
@@ -74,15 +74,15 @@ impl ReadQuery {
         }
     }
 
-    pub(crate) fn has_aggregation_selections(&self) -> bool {
-        fn has_aggregations(selections: &[RelAggregationSelection], nested: &[ReadQuery]) -> bool {
-            !selections.is_empty() || nested.iter().any(|q| q.has_aggregation_selections())
+    pub(crate) fn has_virtual_selections(&self) -> bool {
+        fn has_virtuals(selection: &FieldSelection, nested: &[ReadQuery]) -> bool {
+            selection.has_virtual_fields() || nested.iter().any(|q| q.has_virtual_selections())
         }
 
         match self {
-            ReadQuery::RecordQuery(q) => has_aggregations(&q.aggregation_selections, &q.nested),
-            ReadQuery::ManyRecordsQuery(q) => has_aggregations(&q.aggregation_selections, &q.nested),
-            ReadQuery::RelatedRecordsQuery(q) => has_aggregations(&q.aggregation_selections, &q.nested),
+            ReadQuery::RecordQuery(q) => has_virtuals(&q.selected_fields, &q.nested),
+            ReadQuery::ManyRecordsQuery(q) => has_virtuals(&q.selected_fields, &q.nested),
+            ReadQuery::RelatedRecordsQuery(q) => has_virtuals(&q.selected_fields, &q.nested),
             ReadQuery::AggregateRecordsQuery(_) => false,
         }
     }
@@ -198,10 +198,10 @@ pub struct RecordQuery {
     pub alias: Option<String>,
     pub model: Model,
     pub filter: Option<Filter>,
+    // TODO: split into `user_selection` and `full_selection` and get rid of `selection_order`
     pub selected_fields: FieldSelection,
     pub(crate) nested: Vec<ReadQuery>,
     pub selection_order: Vec<String>,
-    pub aggregation_selections: Vec<RelAggregationSelection>,
     pub options: QueryOptions,
     pub relation_load_strategy: RelationLoadStrategy,
 }
@@ -212,10 +212,10 @@ pub struct ManyRecordsQuery {
     pub alias: Option<String>,
     pub model: Model,
     pub args: QueryArguments,
+    // TODO: split into `user_selection` and `full_selection` and get rid of `selection_order`
     pub selected_fields: FieldSelection,
     pub(crate) nested: Vec<ReadQuery>,
     pub selection_order: Vec<String>,
-    pub aggregation_selections: Vec<RelAggregationSelection>,
     pub options: QueryOptions,
     pub relation_load_strategy: RelationLoadStrategy,
 }
@@ -226,11 +226,10 @@ pub struct RelatedRecordsQuery {
     pub alias: Option<String>,
     pub parent_field: RelationFieldRef,
     pub args: QueryArguments,
+    // TODO: split into `user_selection` and `full_selection` and get rid of `selection_order`
     pub selected_fields: FieldSelection,
     pub nested: Vec<ReadQuery>,
     pub selection_order: Vec<String>,
-    pub aggregation_selections: Vec<RelAggregationSelection>,
-
     /// Fields and values of the parent to satisfy the relation query without
     /// relying on the parent result passed by the interpreter.
     pub parent_results: Option<Vec<SelectionResult>>,
@@ -245,8 +244,8 @@ impl RelatedRecordsQuery {
         self.args.distinct.is_some() || self.nested.iter().any(|q| q.has_distinct())
     }
 
-    pub fn has_aggregation_selections(&self) -> bool {
-        !self.aggregation_selections.is_empty() || self.nested.iter().any(|q| q.has_aggregation_selections())
+    pub fn has_virtual_selections(&self) -> bool {
+        self.selected_fields.has_virtual_fields() || self.nested.iter().any(|q| q.has_virtual_selections())
     }
 }
 
