@@ -487,6 +487,7 @@ fn serialize_objects(
                         .find(|f| f.db_alias() == *name)
                         .map(SerializedField::Virtual)
                 })
+                // Shouldn't happen, implies that the query returned unknown fields.
                 .expect("Field must be a known scalar or virtual")
         })
         .collect();
