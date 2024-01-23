@@ -1288,10 +1288,10 @@ mod tests {
         assert_debug_snapshot!(operation.arguments()[0].1, @r###"
         Object(
             {
-                "x": Scalar(
-                    Json(
-                        "{ \"$type\": \"foo\", \"value\": \"bar\" }",
-                    ),
+                "x": Json(
+                    RawJson {
+                        value: "{ \"$type\": \"foo\", \"value\": \"bar\" }",
+                    },
                 ),
             },
         )
