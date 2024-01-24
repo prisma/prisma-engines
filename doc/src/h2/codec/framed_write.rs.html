@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/nix/store/yh9brscl6iblm2lq9z2bapylgqbcfrwf-vendor-cargo-deps/c19b7c6f923b580ac259164a89f2577984ad5ab09ee9d583b888f934adbbe8d0/h2-0.3.20/src/codec/framed_write.rs`."><title>framed_write.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-9ee3a5e31a2afa3e.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="h2" data-themes="" data-resource-suffix="" data-rustdoc-version="1.75.0 (82e1608df 2023-12-21)" data-channel="1.75.0" data-search-js="search-8fbf244ebcf71464.js" data-settings-js="settings-74424d7eec62a23e.js" ><script src="../../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-9dd44ab47b99a0fb.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/nix/store/dwq9ypb5hjza74k25zjh8fz7iianxycz-vendor-cargo-deps/c19b7c6f923b580ac259164a89f2577984ad5ab09ee9d583b888f934adbbe8d0/h2-0.3.24/src/codec/framed_write.rs`."><title>framed_write.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-9ee3a5e31a2afa3e.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="h2" data-themes="" data-resource-suffix="" data-rustdoc-version="1.75.0 (82e1608df 2023-12-21)" data-channel="1.75.0" data-search-js="search-8fbf244ebcf71464.js" data-settings-js="settings-74424d7eec62a23e.js" ><script src="../../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-9dd44ab47b99a0fb.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -360,18 +360,6 @@
 <a href="#360" id="360">360</a>
 <a href="#361" id="361">361</a>
 <a href="#362" id="362">362</a>
-<a href="#363" id="363">363</a>
-<a href="#364" id="364">364</a>
-<a href="#365" id="365">365</a>
-<a href="#366" id="366">366</a>
-<a href="#367" id="367">367</a>
-<a href="#368" id="368">368</a>
-<a href="#369" id="369">369</a>
-<a href="#370" id="370">370</a>
-<a href="#371" id="371">371</a>
-<a href="#372" id="372">372</a>
-<a href="#373" id="373">373</a>
-<a href="#374" id="374">374</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::codec::UserError;
 <span class="kw">use </span><span class="kw">crate</span>::codec::UserError::<span class="kw-2">*</span>;
 <span class="kw">use </span><span class="kw">crate</span>::frame::{<span class="self">self</span>, Frame, FrameSize};
@@ -381,8 +369,9 @@
 <span class="kw">use </span>std::pin::Pin;
 <span class="kw">use </span>std::task::{Context, Poll};
 <span class="kw">use </span>tokio::io::{AsyncRead, AsyncWrite, ReadBuf};
+<span class="kw">use </span>tokio_util::io::poll_write_buf;
 
-<span class="kw">use </span>std::io::{<span class="self">self</span>, Cursor, IoSlice};
+<span class="kw">use </span>std::io::{<span class="self">self</span>, Cursor};
 
 <span class="comment">// A macro to get around a method needing to borrow &amp;mut self
 </span><span class="macro">macro_rules! </span>limited_write_buf {
@@ -419,8 +408,11 @@
     <span class="doccomment">/// Max frame size, this is specified by the peer
     </span>max_frame_size: FrameSize,
 
-    <span class="doccomment">/// Whether or not the wrapped `AsyncWrite` supports vectored IO.
-    </span>is_write_vectored: bool,
+    <span class="doccomment">/// Chain payloads bigger than this.
+    </span>chain_threshold: usize,
+
+    <span class="doccomment">/// Min buffer required to attempt to write a frame
+    </span>min_buffer_capacity: usize,
 }
 
 <span class="attr">#[derive(Debug)]
@@ -435,13 +427,15 @@
 /// frame that big.
 </span><span class="kw">const </span>DEFAULT_BUFFER_CAPACITY: usize = <span class="number">16 </span>* <span class="number">1_024</span>;
 
-<span class="doccomment">/// Min buffer required to attempt to write a frame
-</span><span class="kw">const </span>MIN_BUFFER_CAPACITY: usize = frame::HEADER_LEN + CHAIN_THRESHOLD;
-
-<span class="doccomment">/// Chain payloads bigger than this. The remote will never advertise a max frame
-/// size less than this (well, the spec says the max frame size can&#39;t be less
-/// than 16kb, so not even close).
+<span class="doccomment">/// Chain payloads bigger than this when vectored I/O is enabled. The remote
+/// will never advertise a max frame size less than this (well, the spec says
+/// the max frame size can&#39;t be less than 16kb, so not even close).
 </span><span class="kw">const </span>CHAIN_THRESHOLD: usize = <span class="number">256</span>;
+
+<span class="doccomment">/// Chain payloads bigger than this when vectored I/O is **not** enabled.
+/// A larger value in this scenario will reduce the number of small and
+/// fragmented data being sent, and hereby improve the throughput.
+</span><span class="kw">const </span>CHAIN_THRESHOLD_WITHOUT_VECTORED_IO: usize = <span class="number">1024</span>;
 
 <span class="comment">// TODO: Make generic
 </span><span class="kw">impl</span>&lt;T, B&gt; FramedWrite&lt;T, B&gt;
@@ -450,7 +444,11 @@
     B: Buf,
 {
     <span class="kw">pub fn </span>new(inner: T) -&gt; FramedWrite&lt;T, B&gt; {
-        <span class="kw">let </span>is_write_vectored = inner.is_write_vectored();
+        <span class="kw">let </span>chain_threshold = <span class="kw">if </span>inner.is_write_vectored() {
+            CHAIN_THRESHOLD
+        } <span class="kw">else </span>{
+            CHAIN_THRESHOLD_WITHOUT_VECTORED_IO
+        };
         FramedWrite {
             inner,
             encoder: Encoder {
@@ -459,7 +457,8 @@
                 next: <span class="prelude-val">None</span>,
                 last_data_frame: <span class="prelude-val">None</span>,
                 max_frame_size: frame::DEFAULT_MAX_FRAME_SIZE,
-                is_write_vectored,
+                chain_threshold,
+                min_buffer_capacity: chain_threshold + frame::HEADER_LEN,
             },
         }
     }
@@ -500,23 +499,17 @@
                     <span class="prelude-val">Some</span>(Next::Data(<span class="kw-2">ref mut </span>frame)) =&gt; {
                         <span class="macro">tracing::trace!</span>(queued_data_frame = <span class="bool-val">true</span>);
                         <span class="kw">let </span><span class="kw-2">mut </span>buf = (<span class="kw-2">&amp;mut </span><span class="self">self</span>.encoder.buf).chain(frame.payload_mut());
-                        <span class="macro">ready!</span>(write(
-                            <span class="kw-2">&amp;mut </span><span class="self">self</span>.inner,
-                            <span class="self">self</span>.encoder.is_write_vectored,
-                            <span class="kw-2">&amp;mut </span>buf,
-                            cx,
-                        ))<span class="question-mark">?
+                        <span class="macro">ready!</span>(poll_write_buf(Pin::new(<span class="kw-2">&amp;mut </span><span class="self">self</span>.inner), cx, <span class="kw-2">&amp;mut </span>buf))<span class="question-mark">?
                     </span>}
                     <span class="kw">_ </span>=&gt; {
                         <span class="macro">tracing::trace!</span>(queued_data_frame = <span class="bool-val">false</span>);
-                        <span class="macro">ready!</span>(write(
-                            <span class="kw-2">&amp;mut </span><span class="self">self</span>.inner,
-                            <span class="self">self</span>.encoder.is_write_vectored,
-                            <span class="kw-2">&amp;mut </span><span class="self">self</span>.encoder.buf,
+                        <span class="macro">ready!</span>(poll_write_buf(
+                            Pin::new(<span class="kw-2">&amp;mut </span><span class="self">self</span>.inner),
                             cx,
+                            <span class="kw-2">&amp;mut </span><span class="self">self</span>.encoder.buf
                         ))<span class="question-mark">?
                     </span>}
-                }
+                };
             }
 
             <span class="kw">match </span><span class="self">self</span>.encoder.unset_frame() {
@@ -537,30 +530,6 @@
         <span class="macro">ready!</span>(<span class="self">self</span>.flush(cx))<span class="question-mark">?</span>;
         Pin::new(<span class="kw-2">&amp;mut </span><span class="self">self</span>.inner).poll_shutdown(cx)
     }
-}
-
-<span class="kw">fn </span>write&lt;T, B&gt;(
-    writer: <span class="kw-2">&amp;mut </span>T,
-    is_write_vectored: bool,
-    buf: <span class="kw-2">&amp;mut </span>B,
-    cx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;,
-) -&gt; Poll&lt;io::Result&lt;()&gt;&gt;
-<span class="kw">where
-    </span>T: AsyncWrite + Unpin,
-    B: Buf,
-{
-    <span class="comment">// TODO(eliza): when tokio-util 0.5.1 is released, this
-    // could just use `poll_write_buf`...
-    </span><span class="kw">const </span>MAX_IOVS: usize = <span class="number">64</span>;
-    <span class="kw">let </span>n = <span class="kw">if </span>is_write_vectored {
-        <span class="kw">let </span><span class="kw-2">mut </span>bufs = [IoSlice::new(<span class="kw-2">&amp;</span>[]); MAX_IOVS];
-        <span class="kw">let </span>cnt = buf.chunks_vectored(<span class="kw-2">&amp;mut </span>bufs);
-        <span class="macro">ready!</span>(Pin::new(writer).poll_write_vectored(cx, <span class="kw-2">&amp;</span>bufs[..cnt]))<span class="question-mark">?
-    </span>} <span class="kw">else </span>{
-        <span class="macro">ready!</span>(Pin::new(writer).poll_write(cx, buf.chunk()))<span class="question-mark">?
-    </span>};
-    buf.advance(n);
-    <span class="prelude-val">Ok</span>(()).into()
 }
 
 <span class="attr">#[must_use]
@@ -614,11 +583,16 @@
                     <span class="kw">return </span><span class="prelude-val">Err</span>(PayloadTooBig);
                 }
 
-                <span class="kw">if </span>len &gt;= CHAIN_THRESHOLD {
+                <span class="kw">if </span>len &gt;= <span class="self">self</span>.chain_threshold {
                     <span class="kw">let </span>head = v.head();
 
                     <span class="comment">// Encode the frame head to the buffer
                     </span>head.encode(len, <span class="self">self</span>.buf.get_mut());
+
+                    <span class="kw">if </span><span class="self">self</span>.buf.get_ref().remaining() &lt; <span class="self">self</span>.chain_threshold {
+                        <span class="kw">let </span>extra_bytes = <span class="self">self</span>.chain_threshold - <span class="self">self</span>.buf.remaining();
+                        <span class="self">self</span>.buf.get_mut().put(v.payload_mut().take(extra_bytes));
+                    }
 
                     <span class="comment">// Save the data frame
                     </span><span class="self">self</span>.next = <span class="prelude-val">Some</span>(Next::Data(v));
@@ -679,7 +653,9 @@
     }
 
     <span class="kw">fn </span>has_capacity(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
-        <span class="self">self</span>.next.is_none() &amp;&amp; <span class="self">self</span>.buf.get_ref().remaining_mut() &gt;= MIN_BUFFER_CAPACITY
+        <span class="self">self</span>.next.is_none()
+            &amp;&amp; (<span class="self">self</span>.buf.get_ref().capacity() - <span class="self">self</span>.buf.get_ref().len()
+                &gt;= <span class="self">self</span>.min_buffer_capacity)
     }
 
     <span class="kw">fn </span>is_empty(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {

@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/nix/store/yh9brscl6iblm2lq9z2bapylgqbcfrwf-vendor-cargo-deps/c19b7c6f923b580ac259164a89f2577984ad5ab09ee9d583b888f934adbbe8d0/h2-0.3.20/src/proto/streams/streams.rs`."><title>streams.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../../static.files/rustdoc-9ee3a5e31a2afa3e.css"><meta name="rustdoc-vars" data-root-path="../../../../" data-static-root-path="../../../../static.files/" data-current-crate="h2" data-themes="" data-resource-suffix="" data-rustdoc-version="1.75.0 (82e1608df 2023-12-21)" data-channel="1.75.0" data-search-js="search-8fbf244ebcf71464.js" data-settings-js="settings-74424d7eec62a23e.js" ><script src="../../../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../../../src-files.js"></script><script defer src="../../../../static.files/main-9dd44ab47b99a0fb.js"></script><noscript><link rel="stylesheet" href="../../../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/nix/store/dwq9ypb5hjza74k25zjh8fz7iianxycz-vendor-cargo-deps/c19b7c6f923b580ac259164a89f2577984ad5ab09ee9d583b888f934adbbe8d0/h2-0.3.24/src/proto/streams/streams.rs`."><title>streams.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../../static.files/rustdoc-9ee3a5e31a2afa3e.css"><meta name="rustdoc-vars" data-root-path="../../../../" data-static-root-path="../../../../static.files/" data-current-crate="h2" data-themes="" data-resource-suffix="" data-rustdoc-version="1.75.0 (82e1608df 2023-12-21)" data-channel="1.75.0" data-search-js="search-8fbf244ebcf71464.js" data-settings-js="settings-74424d7eec62a23e.js" ><script src="../../../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../../../src-files.js"></script><script defer src="../../../../static.files/main-9dd44ab47b99a0fb.js"></script><noscript><link rel="stylesheet" href="../../../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -1584,6 +1584,28 @@
 <a href="#1584" id="1584">1584</a>
 <a href="#1585" id="1585">1585</a>
 <a href="#1586" id="1586">1586</a>
+<a href="#1587" id="1587">1587</a>
+<a href="#1588" id="1588">1588</a>
+<a href="#1589" id="1589">1589</a>
+<a href="#1590" id="1590">1590</a>
+<a href="#1591" id="1591">1591</a>
+<a href="#1592" id="1592">1592</a>
+<a href="#1593" id="1593">1593</a>
+<a href="#1594" id="1594">1594</a>
+<a href="#1595" id="1595">1595</a>
+<a href="#1596" id="1596">1596</a>
+<a href="#1597" id="1597">1597</a>
+<a href="#1598" id="1598">1598</a>
+<a href="#1599" id="1599">1599</a>
+<a href="#1600" id="1600">1600</a>
+<a href="#1601" id="1601">1601</a>
+<a href="#1602" id="1602">1602</a>
+<a href="#1603" id="1603">1603</a>
+<a href="#1604" id="1604">1604</a>
+<a href="#1605" id="1605">1605</a>
+<a href="#1606" id="1606">1606</a>
+<a href="#1607" id="1607">1607</a>
+<a href="#1608" id="1608">1608</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span><span class="kw">super</span>::recv::RecvHeaderBlockError;
 <span class="kw">use </span><span class="kw">super</span>::store::{<span class="self">self</span>, Entry, Resolve, Store};
 <span class="kw">use super</span>::{Buffer, Config, Counts, Prioritized, Recv, Send, Stream, StreamId};
@@ -1802,7 +1824,7 @@
         <span class="kw-2">mut </span>request: Request&lt;()&gt;,
         end_of_stream: bool,
         pending: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>OpaqueStreamRef&gt;,
-    ) -&gt; <span class="prelude-ty">Result</span>&lt;StreamRef&lt;B&gt;, SendError&gt; {
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;(StreamRef&lt;B&gt;, bool), SendError&gt; {
         <span class="kw">use </span><span class="kw">super</span>::stream::ContentLength;
         <span class="kw">use </span>http::Method;
 
@@ -1884,10 +1906,14 @@
         // the lock, so it can&#39;t.
         </span>me.refs += <span class="number">1</span>;
 
-        <span class="prelude-val">Ok</span>(StreamRef {
-            opaque: OpaqueStreamRef::new(<span class="self">self</span>.inner.clone(), <span class="kw-2">&amp;mut </span>stream),
-            send_buffer: <span class="self">self</span>.send_buffer.clone(),
-        })
+        <span class="kw">let </span>is_full = me.counts.next_send_stream_will_reach_capacity();
+        <span class="prelude-val">Ok</span>((
+            StreamRef {
+                opaque: OpaqueStreamRef::new(<span class="self">self</span>.inner.clone(), <span class="kw-2">&amp;mut </span>stream),
+                send_buffer: <span class="self">self</span>.send_buffer.clone(),
+            },
+            is_full,
+        ))
     }
 
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>is_extended_connect_protocol_enabled(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
@@ -2312,7 +2338,11 @@
                 }
 
                 <span class="comment">// The stream must be receive open
-                </span>stream.state.ensure_recv_open()<span class="question-mark">?</span>;
+                </span><span class="kw">if </span>!stream.state.ensure_recv_open()<span class="question-mark">? </span>{
+                    <span class="macro">proto_err!</span>(conn: <span class="string">&quot;recv_push_promise: initiating stream is not opened&quot;</span>);
+                    <span class="kw">return </span><span class="prelude-val">Err</span>(Error::library_go_away(Reason::PROTOCOL_ERROR));
+                }
+
                 stream.key()
             }
             <span class="prelude-val">None </span>=&gt; {
@@ -3120,10 +3150,24 @@
     ) -&gt; <span class="prelude-ty">Result</span>&lt;(), Error&gt; {
         <span class="kw">if let </span><span class="prelude-val">Err</span>(Error::Reset(stream_id, reason, initiator)) = res {
             <span class="macro">debug_assert_eq!</span>(stream_id, stream.id);
-            <span class="comment">// Reset the stream.
-            </span><span class="self">self</span>.send
-                .send_reset(reason, initiator, buffer, stream, counts, <span class="kw-2">&amp;mut </span><span class="self">self</span>.task);
-            <span class="prelude-val">Ok</span>(())
+
+            <span class="kw">if </span>counts.can_inc_num_local_error_resets() {
+                counts.inc_num_local_error_resets();
+
+                <span class="comment">// Reset the stream.
+                </span><span class="self">self</span>.send
+                    .send_reset(reason, initiator, buffer, stream, counts, <span class="kw-2">&amp;mut </span><span class="self">self</span>.task);
+                <span class="prelude-val">Ok</span>(())
+            } <span class="kw">else </span>{
+                <span class="macro">tracing::warn!</span>(
+                    <span class="string">&quot;reset_on_recv_stream_err; locally-reset streams reached limit ({:?})&quot;</span>,
+                    counts.max_local_error_resets().unwrap(),
+                );
+                <span class="prelude-val">Err</span>(Error::library_go_away_data(
+                    Reason::ENHANCE_YOUR_CALM,
+                    <span class="string">&quot;too_many_internal_resets&quot;</span>,
+                ))
+            }
         } <span class="kw">else </span>{
             res
         }
