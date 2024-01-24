@@ -257,14 +257,12 @@ pub(crate) fn get_relation_load_strategy(
     cursor: Option<&SelectionResult>,
     distinct: Option<&FieldSelection>,
     nested_queries: &[ReadQuery],
-    selected_fields: &FieldSelection,
     query_schema: &QuerySchema,
 ) -> RelationLoadStrategy {
     if query_schema.has_feature(PreviewFeature::RelationJoins)
         && query_schema.has_capability(ConnectorCapability::LateralJoin)
         && cursor.is_none()
         && distinct.is_none()
-        && !selected_fields.has_virtual_fields()
         && !nested_queries.iter().any(|q| match q {
             ReadQuery::RelatedRecordsQuery(q) => q.has_cursor() || q.has_distinct() || q.has_virtual_selections(),
             _ => false,
