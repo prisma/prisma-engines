@@ -208,6 +208,16 @@ impl<'a> JsonProtocolAdapter<'a> {
                     decode_bytes(value).map(ArgumentValue::bytes).map_err(|_| build_err())
                 }
                 Some(custom_types::JSON) => {
+                    // At the moment, client would send {"$type": "Json"} record only in 1 case:
+                    // if anywhere in the user's input it would see `$type` key, it will encode as json
+                    // to avoid conflict with protocol-level `$type` keys. 
+                    // Such record will not necessary be top level, it can be nested. See https://github.com/prisma/prisma/issues/21454.
+                    //
+                    // In that case, when serializing the JSON value, we don't want to treat such objects as strings but rather, insert their
+                    // value as is into generated document. 
+                    // See also query-engine/core/src/query_document/raw_json_value.rs
+                    // To future generations: I am sorry, we failed you, JSON handling in TS client is mess. If you are reading this,
+                    // ask for explicit wrapper for JSON values on the client side that would solve most of this mess https://github.com/prisma/prisma/issues/19611
                     let value = obj
                         .remove(custom_types::VALUE)
                         .and_then(|v| match v {
